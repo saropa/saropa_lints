@@ -10,11 +10,11 @@ import * as vscode from 'vscode';
 import * as nodePath from 'node:path';
 import { getProjectRoot } from '../projectRoot';
 import {
-  readViolations,
   filterDisabledFromData,
   type Violation,
   type ViolationsData,
 } from '../violationsReader';
+import { buildViolationsDataFromDiagnostics } from '../liveDiagnosticsModel';
 import { sortedNumericCountEntries } from '../keyedCountBreakdown';
 import type { Suppressions } from '../suppressionsStore';
 import { readDisabledRules } from '../configWriter';
@@ -40,12 +40,10 @@ import {
   VIOLATIONS_GROUP_BY_MODES,
 } from './issuesTreeModel';
 import {
-  buildFindingsEmptyStateHtml,
   renderViolationsDashboardHtml,
   type AnalyzerSuppressionsSlice,
   type ViewSuppressionsSlice,
 } from './violationsDashboardHtml';
-import { countSupplementaryDiagnostics } from '../supplementaryDiagnostics';
 import { l10n } from '../i18n/runtime';
 
 const PANEL_VIEW_TYPE = 'saropaViolationsWideReport';
@@ -53,13 +51,14 @@ const MAX_SOURCE_VIOLATIONS = 4000;
 
 let currentPanel: vscode.WebviewPanel | undefined;
 let todosAndHacksSnapshot: TodoHackSnapshot | undefined;
-// Live-diagnostics refresh for supplementary-counts pills (#224). Disposed
-// when the panel closes. Debounced so a flurry of analyzer-update events
-// (typical right after `dart analyze` completes — VS Code re-emits many
-// per-file diagnostic changes) coalesces into a single dashboard rebuild.
-let supplementaryDiagnosticsListener: vscode.Disposable | undefined;
-let supplementaryRefreshTimer: NodeJS.Timeout | undefined;
-const SUPPLEMENTARY_REFRESH_DEBOUNCE_MS = 500;
+// Live-diagnostics refresh: rebuilds the dashboard from getDiagnostics() on
+// every (debounced) diagnostic change, so it stays in sync with the Problems
+// panel. Disposed when the panel closes. Debounced so a flurry of analyzer
+// updates (VS Code re-emits many per-file diagnostic changes after a run)
+// coalesces into a single rebuild.
+let liveDiagnosticsListener: vscode.Disposable | undefined;
+let liveRefreshTimer: NodeJS.Timeout | undefined;
+const LIVE_REFRESH_DEBOUNCE_MS = 500;
 
 interface DashboardState {
   groupBy: GroupByMode;
@@ -200,13 +199,19 @@ async function rebuildDashboardHtml(
     return;
   }
 
-  const raw = readViolations(root);
-  if (!raw) {
-    panel.webview.html = emptyStateHtml(l10n('wideReport.noReportYet'));
-    return;
-  }
-
   const cfg = vscode.workspace.getConfiguration('saropaLints');
+
+  // Source findings from LIVE diagnostics — the same array the Problems panel
+  // shows — not the batch violations.json export. This keeps the dashboard
+  // structurally in sync with Problems (no stale "0 findings / grade A" while
+  // Problems shows dozens) and triggers zero analysis (the analyzer already
+  // produced these for the Problems panel; we only read the result). An empty
+  // result is a genuine clean state that renders the zeroed dashboard, not a
+  // "no report yet" wall — so there is no early-return empty-state branch here
+  // any more. Phase #1a: findings only, no per-rule enrichment (see
+  // liveDiagnosticsModel).
+  const raw = buildViolationsDataFromDiagnostics(root, undefined, cfg.get<string>('tier'));
+
   const state = getDashboardState(cfg);
   const disabled = readDisabledRules(root);
   const afterDisabled = filterDisabledFromData(raw, disabled);
@@ -249,11 +254,9 @@ async function rebuildDashboardHtml(
     driftAdvisorSnapshot = await loadDriftAdvisorSnapshot();
   }
 
-  // Always compute supplementary counts — promo pills need the count even
-  // when the toggle is off (so the promo only shows when there's a gap to
-  // surface). Setting state is read fresh on each rebuild so toggling a pill
-  // immediately flips the rendered state on the next refresh.
-  const supplementary = buildSupplementarySlice(cfg, totalAfterDisable);
+  // Scanner promo state (file-system TODO/HACK scanner). Read fresh each
+  // rebuild so toggling the scanner flips its pill on the next paint.
+  const scanner = buildScannerSlice(cfg);
 
   panel.webview.html = renderViolationsDashboardHtml({
     exportViolations: lastExportViolations,
@@ -285,7 +288,7 @@ async function rebuildDashboardHtml(
     topRules: pickTopRules(lastExportViolations, TOP_RULES_LIMIT),
     filesAffected: countDistinctFiles(afterDisabled.violations),
     enabledRuleCount: raw.config?.enabledRuleCount,
-    supplementary,
+    scanner,
   });
 
   void panel.webview.postMessage({
@@ -295,42 +298,21 @@ async function rebuildDashboardHtml(
 }
 
 /**
- * Read the three supplementary toggles and combine with a live diagnostic
- * recount. Counts are always computed (regardless of toggle state) because
- * the renderer needs to know whether the gap exists in order to decide
- * whether a promo pill is worth showing.
- *
- * Cheap call: `getDiagnostics()` reads already-computed VS Code state, no
- * analysis is triggered. Safe to invoke on every dashboard rebuild.
+ * Scanner-promo state for the status line: whether the file-system TODO/HACK
+ * scanner is enabled, and whether the workspace has any Dart files worth
+ * scanning. `hasDartFiles` reads already-computed VS Code diagnostics (a
+ * `.dart` file in the Problems set means there is Dart to scan) — no analysis
+ * is triggered, so it is safe on every rebuild.
  */
-function buildSupplementarySlice(
+function buildScannerSlice(
   cfg: vscode.WorkspaceConfiguration,
-  saropaViolationCount: number,
-): {
-  otherAnalyzerEnabled: boolean;
-  analyzerTodosEnabled: boolean;
-  scannerEnabled: boolean;
-  otherAnalyzerCount: number;
-  analyzerTodosCount: number;
-  hasDartFiles: boolean;
-} {
-  const counts = countSupplementaryDiagnostics(saropaViolationCount);
+): { enabled: boolean; hasDartFiles: boolean } {
+  const hasDartFiles = vscode.languages
+    .getDiagnostics()
+    .some(([uri]) => uri.fsPath.endsWith('.dart'));
   return {
-    otherAnalyzerEnabled: cfg.get<boolean>(
-      'includeOtherAnalyzerFindingsInDashboard',
-      false,
-    ),
-    analyzerTodosEnabled: cfg.get<boolean>(
-      'includeAnalyzerTodosInDashboard',
-      false,
-    ),
-    scannerEnabled: cfg.get<boolean>(
-      'todosAndHacks.workspaceScanEnabled',
-      false,
-    ),
-    otherAnalyzerCount: counts.otherAnalyzerCount,
-    analyzerTodosCount: counts.analyzerTodosCount,
-    hasDartFiles: counts.hasDartFiles,
+    enabled: cfg.get<boolean>('todosAndHacks.workspaceScanEnabled', false),
+    hasDartFiles,
   };
 }
 
@@ -540,10 +522,6 @@ async function loadDriftAdvisorSnapshot(): Promise<DriftAdvisorSnapshot> {
   }
 }
 
-function emptyStateHtml(message: string): string {
-  return buildFindingsEmptyStateHtml(message);
-}
-
 function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel {
   if (currentPanel) {
     return currentPanel;
@@ -559,34 +537,34 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
   currentPanel.onDidDispose(() => {
     currentPanel = undefined;
     // Stop listening for live diagnostic changes once the dashboard is gone —
-    // no point recomputing supplementary counts for a panel that does not
-    // exist, and we leak the listener if we do not dispose explicitly.
-    supplementaryDiagnosticsListener?.dispose();
-    supplementaryDiagnosticsListener = undefined;
-    if (supplementaryRefreshTimer) {
-      clearTimeout(supplementaryRefreshTimer);
-      supplementaryRefreshTimer = undefined;
+    // no point rebuilding a panel that does not exist, and we leak the
+    // listener if we do not dispose explicitly.
+    liveDiagnosticsListener?.dispose();
+    liveDiagnosticsListener = undefined;
+    if (liveRefreshTimer) {
+      clearTimeout(liveRefreshTimer);
+      liveRefreshTimer = undefined;
     }
   });
 
-  // Live supplementary-counts refresh (#224). The Problems panel updates as
-  // analysis runs; this listener keeps the dashboard pills in sync without
-  // requiring the user to click refresh. Debounced because a single analysis
-  // run typically emits dozens of per-URI diagnostic events.
-  supplementaryDiagnosticsListener = vscode.languages.onDidChangeDiagnostics(() => {
+  // Live refresh. The Problems panel updates as analysis runs; this listener
+  // rebuilds the dashboard from the same diagnostics so the two stay in sync
+  // without the user clicking refresh. Debounced because a single analysis run
+  // typically emits dozens of per-URI diagnostic events.
+  liveDiagnosticsListener = vscode.languages.onDidChangeDiagnostics(() => {
     if (!currentPanel?.visible) return;
     // Diagnostics are actively changing → analysis is streaming results in, so
     // the on-disk health score is mid-flight. Dim the gauge to "computing" now
     // (avoids the A→E whiplash); the debounced rebuild below ships a fresh
     // gauge with the settled grade once the dust settles.
     void currentPanel.webview.postMessage({ type: 'gaugePending', pending: true });
-    if (supplementaryRefreshTimer) clearTimeout(supplementaryRefreshTimer);
-    supplementaryRefreshTimer = setTimeout(() => {
-      supplementaryRefreshTimer = undefined;
+    if (liveRefreshTimer) clearTimeout(liveRefreshTimer);
+    liveRefreshTimer = setTimeout(() => {
+      liveRefreshTimer = undefined;
       if (currentPanel?.visible) {
         void rebuildDashboardHtml(context, currentPanel);
       }
-    }, SUPPLEMENTARY_REFRESH_DEBOUNCE_MS);
+    }, LIVE_REFRESH_DEBOUNCE_MS);
   });
 
   currentPanel.webview.onDidReceiveMessage(async (msg: unknown) => {
@@ -682,30 +660,13 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       await rebuildDashboardHtml(context, currentPanel!);
       return;
     }
-    // Dashboard supplementary-counts pills (#224) — pill click in the
-    // webview posts `{ type: 'toggleSupplementary', source }`. We map the
-    // source key to the matching workspace setting and flip it. The
-    // `onDidChangeConfiguration` handler in extension.ts will trigger the
-    // dashboard refresh, so no manual rebuild is needed here — but we still
-    // invalidate the scanner snapshot when toggling the scanner so the next
-    // rebuild re-scans the workspace from scratch.
+    // Scanner pill click — the webview posts `{ type: 'toggleSupplementary',
+    // source: 'scanner' }`. Flip the file-system TODO/HACK scanner setting and
+    // invalidate its snapshot so the next rebuild re-scans (or stops). The
+    // 'other'/'todos' analyzer toggles were removed when the dashboard became
+    // holistic; those findings now appear directly in the main list.
     if (data.type === 'toggleSupplementary') {
-      const source = (data as { source?: string }).source;
-      if (source === 'other') {
-        const cur = cfg.get<boolean>('includeOtherAnalyzerFindingsInDashboard', false);
-        await cfg.update(
-          'includeOtherAnalyzerFindingsInDashboard',
-          !cur,
-          vscode.ConfigurationTarget.Workspace,
-        );
-      } else if (source === 'todos') {
-        const cur = cfg.get<boolean>('includeAnalyzerTodosInDashboard', false);
-        await cfg.update(
-          'includeAnalyzerTodosInDashboard',
-          !cur,
-          vscode.ConfigurationTarget.Workspace,
-        );
-      } else if (source === 'scanner') {
+      if ((data as { source?: string }).source === 'scanner') {
         const todoCfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
         const cur = todoCfg.get<boolean>('workspaceScanEnabled', false);
         await todoCfg.update(
@@ -713,13 +674,10 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
           !cur,
           vscode.ConfigurationTarget.Workspace,
         );
-        // Snapshot cache must be invalidated so the scanner actually re-runs
-        // (or stops contributing) on the next dashboard rebuild.
         todosAndHacksSnapshot = undefined;
       }
-      // Force the rebuild here too — onDidChangeConfiguration is racey vs
-      // user expectations after a pill click; the pill should flip its
-      // visible state on the very next paint.
+      // Force the rebuild — onDidChangeConfiguration is racey vs user
+      // expectations after a pill click; the pill should flip on the next paint.
       if (currentPanel) {
         await rebuildDashboardHtml(context, currentPanel);
       }

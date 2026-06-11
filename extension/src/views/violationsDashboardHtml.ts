@@ -147,30 +147,21 @@ export interface ViolationsDashboardHtmlInput {
     files?: ReadonlyArray<{ file: string; count: number; line: number }>;
   }>;
   /**
-   * Live supplementary diagnostic state powering the status-line toggle pills
-   * (gap-closing affordance for issue #224). Each source is a three-state
-   * pill on the dashboard: hidden / promo (off, gap present) / count (on).
+   * State for the file-system TODO/HACK scanner *promo* pill in the status
+   * line. When the scanner is off and the workspace has Dart files, a muted
+   * promo pill invites enabling it; the ON-state "{N} TODO · {N} HACK" pill is
+   * rendered in buildStatusLine from todoHackSnapshot.
    *
-   * Counts come from `vscode.languages.getDiagnostics()` and reflect the
-   * Problems panel; saropa's own findings are subtracted out so the residual
-   * is the *additional* context the user would see in Problems but not on
-   * this dashboard. Display-only — never feeds health score, KPI cards, or
-   * the violations list itself.
+   * (The analyzer-findings/TODO supplementary pills were removed once the
+   * dashboard became holistic — those diagnostics now appear directly in the
+   * main findings list, so there is no longer a gap to surface.)
    */
-  supplementary?: {
-    /** Workspace setting `saropaLints.includeOtherAnalyzerFindingsInDashboard`. */
-    otherAnalyzerEnabled: boolean;
-    /** Workspace setting `saropaLints.includeAnalyzerTodosInDashboard`. */
-    analyzerTodosEnabled: boolean;
-    /** Workspace setting `saropaLints.todosAndHacks.workspaceScanEnabled` (existing). */
-    scannerEnabled: boolean;
-    /** Non-saropa analyzer findings on `.dart` files (excludes TODO diagnostics). */
-    otherAnalyzerCount: number;
-    /** Analyzer-side `code: "todo"` diagnostics on `.dart` files. */
-    analyzerTodosCount: number;
+  scanner?: {
+    /** Workspace setting `saropaLints.todosAndHacks.workspaceScanEnabled`. */
+    enabled: boolean;
     /**
-     * Whether the workspace has any `.dart` files. Drives the scanner-promo
-     * pill — surfacing it in a workspace with no Dart code is just noise.
+     * Whether the workspace has any `.dart` files — gates the promo so it is
+     * not advertised in a workspace with no Dart code.
      */
     hasDartFiles: boolean;
   };
@@ -309,62 +300,17 @@ function buildGauge(score: number): string {
 }
 
 /**
- * Build the three-state toggle pills for the supplementary-counts feature
- * (#224). Each source (other analyzer findings / analyzer TODOs / scanner)
- * renders as zero or one pill depending on its setting state and whether
- * there is anything worth surfacing.
- *
- * - OFF + gap present  → muted "promo" pill inviting the user to enable.
- * - OFF + no gap       → hidden (no need to advertise an empty bucket).
- * - ON  + count > 0    → solid count pill, clickable to disable.
- * - ON  + count == 0   → hidden (avoids a useless "+0 ..." pill).
- *
- * The scanner pill is rendered ELSEWHERE in `buildStatusLine` when ON (to
- * preserve the existing "{N} TODO · {N} HACK" pill shape and tests). This
- * helper only returns the scanner *promo* — never the scanner ON state.
+ * Build the file-system TODO/HACK scanner *promo* pill — the muted invite
+ * shown when the scanner is off and there are Dart files to scan. Returns
+ * nothing once the scanner is on (its "{N} TODO · {N} HACK" pill is rendered in
+ * buildStatusLine from todoHackSnapshot) or in a workspace with no Dart code.
  */
-function buildSupplementaryPills(input: ViolationsDashboardHtmlInput): string[] {
-  const s = input.supplementary;
-  if (!s) return [];
-  const out: string[] = [];
-
-  // Other analyzer findings — bucket includes built-in Dart SDK lints AND any
-  // third-party custom_lint plugins (riverpod_lint, etc.). Label is honest
-  // about that (NOT "Dart lints" alone).
-  if (s.otherAnalyzerEnabled && s.otherAnalyzerCount > 0) {
-    out.push(
-      `<span class="pill toggle on" data-toggle="other" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipLive'))}">${escapeHtml(l10n('findingsDash.supplementary.otherAnalyzerOn', { count: String(s.otherAnalyzerCount) }))}</span>`,
-    );
-  } else if (!s.otherAnalyzerEnabled && s.otherAnalyzerCount > 0) {
-    out.push(
-      `<span class="pill toggle promo" data-toggle="other" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipPromoClickToOn'))}">${escapeHtml(l10n('findingsDash.supplementary.otherAnalyzerPromo'))}</span>`,
-    );
-  }
-
-  // Analyzer-side TODO diagnostics (`code: "todo"`) — independent of the
-  // file-system scanner; matches what Problems panel shows for #224's "20
-  // TODOs" complaint.
-  if (s.analyzerTodosEnabled && s.analyzerTodosCount > 0) {
-    out.push(
-      `<span class="pill toggle on" data-toggle="todos" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipLive'))}">${escapeHtml(l10n('findingsDash.supplementary.analyzerTodosOn', { count: String(s.analyzerTodosCount) }))}</span>`,
-    );
-  } else if (!s.analyzerTodosEnabled && s.analyzerTodosCount > 0) {
-    out.push(
-      `<span class="pill toggle promo" data-toggle="todos" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipPromoClickToOn'))}">${escapeHtml(l10n('findingsDash.supplementary.analyzerTodosPromo'))}</span>`,
-    );
-  }
-
-  // Scanner promo only — the ON state pill is rendered in buildStatusLine
-  // alongside the existing todoHackSnapshot logic. Only suggest enabling the
-  // scanner if there are .dart files to scan; promoting it in a non-Dart
-  // workspace is just noise.
-  if (!s.scannerEnabled && s.hasDartFiles) {
-    out.push(
-      `<span class="pill toggle promo" data-toggle="scanner" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipPromoClickToOn'))}">${escapeHtml(l10n('findingsDash.supplementary.scannerPromo'))}</span>`,
-    );
-  }
-
-  return out;
+function buildScannerPromoPill(input: ViolationsDashboardHtmlInput): string[] {
+  const s = input.scanner;
+  if (!s || s.enabled || !s.hasDartFiles) return [];
+  return [
+    `<span class="pill toggle promo" data-toggle="scanner" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.supplementary.tooltipPromoClickToOn'))}">${escapeHtml(l10n('findingsDash.supplementary.scannerPromo'))}</span>`,
+  ];
 }
 
 /** Status line under the title — freshness + highest-signal facts (§4.1). */
@@ -391,12 +337,10 @@ function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
       `<span class="pill toggle on" data-toggle="scanner" role="button" tabindex="0" title="${escapeHtml(l10n('findingsDash.status.todoHackTitle'))} — ${escapeHtml(l10n('findingsDash.supplementary.tooltipScanner'))}">${todos} TODO · ${hacks} HACK</span>`,
     );
   }
-  // Supplementary toggle pills (#224) — live next to the saropa pills so the
-  // discoverability gap is closed on the surface that has it. Each source has
-  // three render states: hidden / promo (off, gap present) / count (on).
-  // Promo pills only render when there is actually a gap to surface, so a
-  // clean workspace never sees them.
-  parts.push(...buildSupplementaryPills(input));
+  // Scanner promo pill — invites enabling the file-system TODO/HACK scanner
+  // when it is off and there are Dart files to scan. Renders nothing once the
+  // scanner is on (the ON pill above) or in a non-Dart workspace.
+  parts.push(...buildScannerPromoPill(input));
   const drift = input.driftAdvisorSnapshot;
   if (drift.integrationEnabled) {
     if (drift.connected) {

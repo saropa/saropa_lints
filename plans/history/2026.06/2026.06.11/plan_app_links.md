@@ -332,3 +332,37 @@ other pending Tier B packs (`google_sign_in_7`, `connectivity_plus_6`,
 - [Flutter deep-linking guide — dev.to](https://dev.to/ankushppie/flutter-deep-linking-complete-guide-for-android-app-links-ios-universal-links-4kde)
 - [FlutterFlow issue #3223 — getInitialAppLink removed in v6](https://github.com/FlutterFlow/flutterflow-issues/issues/3223)
 - [supabase-flutter issue #941 — getInitialAppLink NoSuchMethodError](https://github.com/supabase/supabase-flutter/issues/941)
+
+
+---
+
+## Finish Report (2026-06-11)
+
+## app_links rule reconciliation
+
+### Existing coverage found (grep over `lib/src/rules/`)
+- **`avoid_app_links_sensitive_params`** (`package_specific_rules.dart`) — flags tokens/passwords/secrets embedded in deep-link URL strings. Distinct from every proposed rule; no overlap.
+- **`require_stream_subscription_cancel`** (`disposal_rules.dart`) and **`avoid_unassigned_stream_subscriptions`** (`async_rules.dart`) — generic stream-subscription disposal coverage that already subsumes the proposed `app_links_subscription_not_canceled`.
+- `navigation_rules.dart` references the literal token `getInitialLink` in a regex for a deep-link navigation heuristic — unrelated to AppLinks API correctness; no overlap.
+
+### Proposals dropped (5 of 8)
+| Proposed rule | Decision | Reason |
+|---|---|---|
+| `app_links_subscription_not_canceled` | DROP (overlap) | Covered by `require_stream_subscription_cancel` + `avoid_unassigned_stream_subscriptions`; the plan's 2026-06-11 validation already marked it DROP. A package-specific message is not a distinct diagnostic. |
+| `app_links_missing_initial_link` | DROP (obsolete) | On v6+ the stream covers the cold-start link, so `getInitialLink()` is optional; systematic FP when the call lives in a service class. Plan validation flagged OBSOLETE. |
+| `app_links_use_get_initial_link` | DROP (out of scope) | v5->v6 migration rule needing a `<`-gate rule pack; the pack wiring is in shared files (tiers/registry/generator) this task must not touch, and the archetype awaits a maintainer decision per the plan. |
+| `app_links_use_uri_link_stream` | DROP (out of scope) | Same gated-pack dependency on shared-file infrastructure. |
+| `app_links_use_get_latest_link` | DROP (out of scope) | Same gated-pack dependency on shared-file infrastructure. |
+
+### Kept rules (3)
+| Rule | Tier | Severity | Fix | Reasoning |
+|---|---|---|---|---|
+| `app_links_listen_in_build` | recommended | WARNING | no | New, non-subsumed. Subscribing to `uriLinkStream`/`stringLinkStream` inside `build()` creates a fresh, never-canceled subscription per rebuild and duplicates navigation. A genuine correctness bug -> WARNING -> recommended. Distinct from the disposal rules (those flag a stored-but-uncanceled subscription; this flags subscribing in the wrong place where there is no disposal hook at all). |
+| `app_links_uncaught_stream_error` | comprehensive | INFO | no | New, non-subsumed. `.listen(...)` on the link stream with no `onError:` lets platform-channel/malformed-URI stream errors reach the zone uncaught handler. Report-only and INFO because the plan's mechanical-fix variant would insert a no-op TODO handler (banned). Tiered comprehensive as a heuristic best-practice nudge. `avoid_swallowing_exceptions` targets catch blocks, not missing stream `onError:`, so no overlap. |
+| `app_links_avoid_get_initial_link_string` | comprehensive | INFO | yes | New, non-subsumed. Prefers the validated `Uri` surface (`getInitialLink`/`getLatestLink`) over the raw-`String` accessors that re-introduce `Uri.parse` failure modes. Mechanical name-swap quick fix (call shape identical apart from element type). INFO because raw-string use for logging is sometimes intentional -> comprehensive. |
+
+### Refinement note
+Each kept rule adds a distinct, more precise diagnostic than any generic rule: the build-subscription leak (no generic rule covers "subscribe in the wrong lifecycle method"), the missing stream `onError:` (generic exception rules cover catch blocks only), and the String-vs-Uri API preference (no generic equivalent).
+
+### Validation
+`dart analyze lib/src/rules/packages/app_links_rules.dart` is clean apart from three expected `PackageImports.appLinks` undefined-getter errors (one per rule), resolved at merge when `appLinks = {'package:app_links/'}` is added. Fixtures use the non-const `AppLinks()` factory to match the real API. Test file mirrors `geocoding_rules_test.dart` (instantiation pin + fixture-existence check per rule).

@@ -140,22 +140,6 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'sync',
   },
   {
-    command: 'saropaLints.toggleIncludeOtherAnalyzerFindingsInDashboard',
-    title: 'Toggle Show Other Analyzer Findings on Dashboard',
-    description:
-      'Show a supplementary pill on the Findings Dashboard with the count of non-saropa analyzer findings on .dart files — built-in Dart SDK lints plus any third-party custom_lint plugins (e.g. riverpod_lint). Display-only; never affects health score or filtering.',
-    category: 'Setup & Configuration',
-    icon: 'symbol-misc',
-  },
-  {
-    command: 'saropaLints.toggleIncludeAnalyzerTodosInDashboard',
-    title: 'Toggle Show Analyzer TODOs on Dashboard',
-    description:
-      'Show a supplementary pill on the Findings Dashboard with the count of analyzer-side TODO diagnostics (`code: "todo"`) on .dart files. Distinct from the saropa file-system TODO/HACK scanner.',
-    category: 'Setup & Configuration',
-    icon: 'comment',
-  },
-  {
     command: 'saropaLints.toggleTodosAndHacksScanner',
     title: 'Toggle TODO/HACK Workspace Scanner',
     description:

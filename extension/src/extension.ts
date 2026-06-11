@@ -735,15 +735,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         void vscode.commands.executeCommand('saropaLints.driftAdvisor.refresh');
         scheduleDriftAdvisorPoll();
       }
-      // Dashboard supplementary-counts toggles (#224). Settings UI edits flow
-      // through here too, so the open dashboard updates whether the user
-      // clicked a pill, ran a command, or edited settings.json directly.
-      if (
-        e.affectsConfiguration('saropaLints.includeOtherAnalyzerFindingsInDashboard') ||
-        e.affectsConfiguration('saropaLints.includeAnalyzerTodosInDashboard')
-      ) {
-        refreshFindingsDashboardIfOpen(context);
-      }
     }),
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
       invalidateProjectRoot();
@@ -1171,35 +1162,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       await cfg.update('runAnalysisAfterDependencyChange', !cur, target);
       refreshAllSections();
     }),
-    // Dashboard supplementary-counts toggles (#224). Each command flips one
-    // workspace setting and refreshes the open dashboard so the corresponding
-    // status-line pill updates immediately. Wired here (not in the sidebar
-    // config tree) so the toggles remain discoverable via the command
-    // palette without polluting the sidebar with standalone-config rows.
-    vscode.commands.registerCommand(
-      'saropaLints.toggleIncludeOtherAnalyzerFindingsInDashboard',
-      async () => {
-        const cfg = vscode.workspace.getConfiguration('saropaLints');
-        const cur = cfg.get<boolean>('includeOtherAnalyzerFindingsInDashboard', false);
-        const target = vscode.workspace.workspaceFolders?.length
-          ? vscode.ConfigurationTarget.Workspace
-          : vscode.ConfigurationTarget.Global;
-        await cfg.update('includeOtherAnalyzerFindingsInDashboard', !cur, target);
-        refreshFindingsDashboardIfOpen(context);
-      },
-    ),
-    vscode.commands.registerCommand(
-      'saropaLints.toggleIncludeAnalyzerTodosInDashboard',
-      async () => {
-        const cfg = vscode.workspace.getConfiguration('saropaLints');
-        const cur = cfg.get<boolean>('includeAnalyzerTodosInDashboard', false);
-        const target = vscode.workspace.workspaceFolders?.length
-          ? vscode.ConfigurationTarget.Workspace
-          : vscode.ConfigurationTarget.Global;
-        await cfg.update('includeAnalyzerTodosInDashboard', !cur, target);
-        refreshFindingsDashboardIfOpen(context);
-      },
-    ),
     vscode.commands.registerCommand(
       'saropaLints.toggleTodosAndHacksScanner',
       async () => {

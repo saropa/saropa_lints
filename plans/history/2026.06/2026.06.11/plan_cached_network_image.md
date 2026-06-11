@@ -266,3 +266,46 @@ Not a lint rule — an infra fix to `lib/src/import_utils.dart`.
 - [GitHub issue #675 — maxWidthDiskCache on CachedNetworkImageProvider](https://github.com/Baseflow/flutter_cached_network_image/issues/675)
 - [GitHub issue #980 — errorWidget not called on retry with disk cache params](https://github.com/Baseflow/flutter_cached_network_image/issues/980)
 - [Flutter docs — cached-images cookbook](https://docs.flutter.dev/cookbook/images/cached-images)
+
+
+---
+
+## Finish Report (2026-06-11)
+
+## cached_network_image rules — reconciliation + implementation
+
+### Step 1 reconciliation (grepped BEFORE writing)
+
+Grepped `lib/src/rules/` for `cached_network_image`, `CachedNetworkImage`, `CachedNetworkImageProvider`, `CacheManager`, `Image.network`, and the verbs/nouns in each proposed rule name.
+
+**Existing coverage found (do NOT duplicate):**
+- WIDGET-form rules in `media/image_rules.dart`: `require_cached_image_dimensions`, `require_cached_image_placeholder`, `require_cached_image_error_widget`, `prefer_cached_image_fade_animation`, `prefer_cached_image_cache_manager` (flags a widget with NO cacheManager), `require_cached_image_device_pixel_ratio`, `avoid_cached_image_unbounded_list`, `avoid_cached_image_web`.
+- `network/api_network_rules.dart:2786` `avoid_cached_image_in_build` — variable cacheKey in build.
+- `widget/widget_patterns_avoid_prefer_rules.dart:2311` `prefer_cached_network_image` — flags `Image.network(...)` and suggests `CachedNetworkImage`.
+- `widget/ui_ux_rules.dart:1863` — only checks `CircleAvatar(backgroundImage:)` referencing `CachedNetworkImageProvider`, NOT standalone provider construction.
+
+**Dropped (3):**
+- `prefer_cached_network_image_over_image_network` — DROP: subsumed by existing `prefer_cached_network_image`. Both fire on `Image.network` `InstanceCreationExpression` nodes with the same migrate diagnostic. The proposed import-gate adds no distinct, more-precise diagnostic; it would co-fire/duplicate.
+- `fix_import_utils_ce_fork` — not a rule; it is a shared-file infra edit (excluded from this task).
+- `require_cached_image_cache_key` — plan self-marked NOT lint-able (needs cross-call-site URL/size analysis).
+
+**Kept (3 — genuinely new, provider-form + inline-manager gaps no existing rule covers):**
+
+| rule_name | tier | severity | type | why new / distinct |
+|---|---|---|---|---|
+| `require_cached_image_provider_dimensions` | professional | WARNING | bug | All 8 existing dimension/quality rules check the `CachedNetworkImage` WIDGET. None check the `CachedNetworkImageProvider` (ImageProvider) form, which decodes full-res into the image cache without `maxWidth`/`maxHeight`. Distinct OOM footgun at a separate node type. |
+| `require_cached_image_provider_error_listener` | comprehensive | INFO | codeSmell | The provider form has no `errorWidget`/`errorBuilder`; failures surface ONLY via `errorListener`. No existing rule covers this — migrating widget→provider silently drops error visibility. INFO because some pipelines log elsewhere. |
+| `avoid_inline_cache_manager_construction` | professional | WARNING | bug | Existing `prefer_cached_image_cache_manager` flags the OPPOSITE (widget with NO cacheManager). This flags the wrong WAY of supplying one: a `CacheManager`/`DefaultCacheManager` built inline as the `cacheManager:` value, rebuilt every frame (one cache DB per item per scroll in a builder). |
+
+**Tier reasoning:** the two WARNING best-practice rules → professional; the INFO/heuristic listener rule → comprehensive (per tier guidance: WARNING best-practice → professional/comprehensive, INFO/heuristic → comprehensive). The plan suggested `recommendedOnlyRules` for the dimensions rule, but it is a best-practice WARNING (not an ERROR crash/correctness rule), so professional is the correct band.
+
+### Files written (non-shared only)
+- `lib/src/rules/packages/cached_network_image_rules.dart` — 3 rule classes, no quick fixes (none of the kept rules call for a mechanical fix; the only fix-bearing proposal was the dropped migration rule). Library dartdoc names the existing widget-form coverage it complements. `dart analyze` on the file: clean, no issues.
+- `example_packages/lib/cached_network_image/{require_cached_image_provider_dimensions,require_cached_image_provider_error_listener,avoid_inline_cache_manager_construction}_fixture.dart` — one per rule, `bad()` with `// expect_lint:` + non-triggering `good()` near-miss. Fixtures import `package:cached_network_image/cached_network_image.dart` so the `fileImportsPackage(node, PackageImports.cachedNetworkImage)` gate matches the existing constant (which holds only the non-`_ce` URI).
+- `test/rules/packages/cached_network_image_rules_test.dart` — mirrors `geocoding_rules_test.dart` (instantiation pin + fixture-existence per rule). All 6 tests pass.
+
+### Not touched (per instructions)
+`lib/src/import_utils.dart` (constant already exists; `_ce` fork URI extension is the deferred infra item), `lib/src/rules/all_rules.dart`, `lib/saropa_lints.dart`, `lib/src/tiers.dart`, `CHANGELOG.md`. No git operations.
+
+### Conventions matched against templates
+`SaropaLintRule` + `runWithReporter` + `impact`/`ruleType` (bug/codeSmell, no `correctness`)/`cost`/`tags:{'packages'}`/`requiredPatterns`; `LintCode` first-positional snake_case name; problemMessage starts with `[rule_name]` and exceeds 200 chars; `correctionMessage` set; `addInstanceCreationExpression` for the two constructor rules and `addNamedExpression` for the inline-manager rule; `reporter.atNode(...)` on AstNodes only.

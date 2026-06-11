@@ -152,3 +152,45 @@
 - [GitHub dart-lang/http: ClientException not catchable issue #160](https://github.com/dart-lang/http/issues/160)
 - [blog.burkharts.net: HttpClients Essential Facts and Tips](https://blog.burkharts.net/everything-you-always-wanted-to-know-about-httpclients)
 - [Flutter docs: Fetch data cookbook](https://docs.flutter.dev/cookbook/networking/fetch-data)
+
+
+---
+
+## Finish Report (2026-06-11)
+
+## http package rules — reconciliation + new coverage
+
+### Reconciliation against existing coverage (grepped `lib/src/rules/` first)
+
+The plan's own VALIDATION annotations were confirmed by grep. Existing rules found that subsume proposals:
+
+| Proposed | Existing rule (location) | Disposition |
+|---|---|---|
+| `require_http_timeout` | `require_request_timeout` (api_network_rules.dart:601), `prefer_timeout_on_requests` (:3493), `require_future_timeout` (async_rules.dart:2610) | DROP (triple overlap) |
+| `require_http_status_check` | `require_http_status_check` (api_network_rules.dart:58) — **same name** | DROP (registration collision) |
+| `require_http_content_type_on_post` | `require_content_type_check` (:1816), `require_content_type_validation` (:4471) | DROP (overlap) |
+| `require_http_exception_handling` | error-handling family; thin `ClientException` delta, high-FP design | DROP (marginal value) |
+| `require_http_body_bytes_for_binary` | none, but name-substring heuristic, cannot read Content-Type | DROP (high-FP, demote-or-cut annotation) |
+| `require_http_client_close` (proposed name) | `require_http_client_close` (resource_management_rules.dart:325) targets **dart:io `HttpClient`**, NOT `package:http` `Client` | RENAMED to `require_http_package_client_close` to avoid the exact name collision while keeping the genuinely distinct package:http target |
+
+Net: 5 of 8 proposals dropped, 1 renamed, 3 kept.
+
+### Kept rules
+
+| rule_name | tier | severity | fix | reasoning |
+|---|---|---|---|---|
+| `require_http_package_client_close` | recommended | WARNING | no | A `package:http` `Client`/`IOClient`/`RetryClient`/`BrowserClient` created in a local var and never `.close()`d leaks sockets. Distinct target from the existing dart:io rule (different type, renamed name). Suppressed when the client is returned, assigned to a field, or passed out (ownership transfers). Syntactic ctor-name match (no element resolution) so it works under the scan CLI. |
+| `avoid_http_top_level_in_loop` | professional | WARNING | no | Top-level `http.get/post/...` inside a for/while/do loop. Each top-level call builds and tears down a throwaway `Client`, discarding the keep-alive pool per iteration — a documented performance anti-pattern (README recommends a shared `Client`). Null-target gate distinguishes `http.get` from `client.get`/`dio.get`. codeSmell/low cost → professional. |
+| `avoid_http_string_url` | recommended | ERROR | yes (`Uri.parse(...)` wrap) | A String literal passed to an http request function. http 1.0.0 removed String support (requires `Uri`), so this is a compile error after upgrading from ^0.13. Detected syntactically on a string-literal first argument, so an existing `Uri.parse(...)` argument is never flagged. Mechanical fix wraps the literal. ERROR/correctness → recommended. |
+
+### Files
+- `lib/src/rules/packages/http_rules.dart` — 3 rule classes + `_WrapInUriParseFix`
+- `example_packages/lib/http/{require_http_package_client_close,avoid_http_top_level_in_loop,avoid_http_string_url}_fixture.dart`
+- `test/rules/packages/http_rules_test.dart`
+
+### Verification
+`dart analyze lib/src/rules/packages/http_rules.dart` is clean except the three expected `PackageImports.http` undefined-getter errors (resolve when the shared const is merged). One real defect was caught and fixed during analysis: the client-close rule originally reported `node.name` (a `Token`) — changed to report the `InstanceCreationExpression` initializer (an `AstNode`).
+
+### Merge note (2026-06-11)
+During the merge scan-verification, `avoid_http_top_level_in_loop` was found NOT to fire on its own fixture: it bailed on any call with a non-null AST target (`if (node.target != null) return;`), but the idiomatic `import 'package:http/http.dart' as http;` makes `http.get(...)` a prefixed invocation whose target is the `http` prefix. Fixed to accept the http import prefix as a valid top-level target (via a new `_httpImportPrefix` helper) while still rejecting instance calls like `someClient.get`. All 3 http rules now scan-verify firing.
+

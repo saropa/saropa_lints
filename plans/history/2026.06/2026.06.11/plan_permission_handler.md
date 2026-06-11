@@ -160,3 +160,43 @@ Use a URI prefix check (`libraryUri.startsWith('package:permission_handler')`) r
 - [Handling Permissions Correctly in Flutter — production-grade guide (AppsonAir)](https://www.appsonair.com/blogs/handling-permissions-correctly-in-flutter-production-grade-guide)
 - [Best Practices for Handling Permissions in Flutter (Medium — Hicham Boudanes)](https://medium.com/@hicham.boudanes/best-practices-for-handling-permissions-in-flutter-0ce2779238fe)
 - [Flutter Permission Handler Not Opening App Settings (copyprogramming.com)](https://copyprogramming.com/howto/flutter-permission-handler-package-not-opening-app-settings-when-permission-is-permanently-denied)
+
+
+---
+
+## Finish Report (2026-06-11)
+
+## permission_handler rules — reconciliation + new coverage
+
+### Existing coverage found (reconciled against, NOT duplicated)
+The repo already ships substantial permission_handler coverage:
+- `require_permission_permanent_denial_handling` (flow/error_handling_rules.dart:2080) — permanently-denied flow without an `isPermanentlyDenied`/`openAppSettings` branch.
+- `require_permission_denied_handling` (network/api_network_rules.dart) — denied-status handling.
+- `require_permission_rationale` (network/api_network_rules.dart:2989) — `shouldShowRequestRationale` convention.
+- `require_permission_status_check` (network/api_network_rules.dart:3078) — a gated feature (getCurrentPosition, takePicture, etc.) accessed with NO permission status check (the inverse direction).
+- `avoid_permission_request_loop`, `prefer_permission_minimal_request`, `require_camera_permission_check`, `require_location_permission_rationale`, `avoid_permission_handler_null_safety` (security/permission_rules.dart).
+- Manifest/plist + Android-13 image-picker rules (widget/android rules).
+
+### Proposals dropped (4)
+| Proposed | Why dropped |
+|---|---|
+| `permission_handler_unchecked_permanently_denied` | Overlaps `require_permission_permanent_denial_handling`. Plan: DROP. |
+| `permission_handler_should_show_rationale_ios` | Duplicate of `require_permission_rationale` (same shouldShowRequestRationale flow). Plan: DROP. |
+| `permission_handler_missing_open_app_settings` | Subsumed by `require_permission_permanent_denial_handling` + `require_permission_denied_handling`. Plan: DROP. |
+| `permission_handler_deprecated_storage` | Infeasible: needs `compileSdkVersion` from build.gradle; no gradle reader exists in lib/src/ (only AndroidManifestChecker). Plan: INFEASIBLE. |
+
+### Rules kept (5)
+| rule_name | tier | severity | fix | reasoning |
+|---|---|---|---|---|
+| `permission_handler_request_in_build` | recommended | ERROR | no | New shape — no existing rule flags `.request()` synchronously in an overridden `build()`. Crash/correctness (dialog re-fires every rebuild) → recommended. Skips nested closures (Builder/onPressed) via the FunctionExpression-before-build walk. |
+| `permission_handler_location_always_before_when_in_use` | professional | WARNING | no | New shape — the existing `require_location_permission_rationale` is about rationale dialogs, not the Android 10+ foreground-before-background ordering. Best-practice correctness, scoped to the function body as a floor (two-method split flows not visible) → professional. |
+| `permission_handler_deprecated_calendar` | recommended | WARNING | yes | New — factual 11.4.0 API deprecation; `avoid_permission_handler_null_safety` only covers pre-8.0 APIs. Mechanical single-identifier fix to `Permission.calendarFullAccess` (behavior-equivalent). Factual deprecation → recommended. Matched as `PrefixedIdentifier` (prefix `Permission`, id `calendar`) so string literals never trigger. |
+| `permission_handler_status_without_request` | comprehensive | INFO | no | Distinct, more precise than `require_permission_status_check` (which fires the inverse: gated feature used with NO status check). This fires when status IS read but `.request()` never appears in the file, so the permission can never be elevated. File-level heuristic with centralized-service FP risk → INFO/comprehensive. Skips test files. |
+| `permission_handler_batched_request_preferred` | comprehensive | INFO | no | New — `prefer_permission_minimal_request` flags over-broad `request([a,b,c])` lists (opposite concern); this flags N separate single `.request()` calls that could batch into one list call. Skips result-gated sequential flows (request inside an if/switch). Opinionated UX heuristic → INFO/comprehensive. |
+
+### Validation
+- `dart analyze lib/src/rules/packages/permission_handler_rules.dart` — clean (No issues found).
+- `dart test test/rules/packages/permission_handler_rules_test.dart` — 10/10 pass (5 instantiation pins + 5 fixture-existence).
+- `PackageImports.permissionHandler` already exists in lib/src/import_utils.dart:71 — referenced, not re-added.
+- Quick fix follows `_ClampImageQualityFix extends ReplaceNodeFix` (fixKind + computeReplacement, wired via fixGenerators).
+- Shared files (import_utils.dart, all_rules.dart, saropa_lints.dart, tiers.dart, CHANGELOG.md) NOT touched; no git run.
