@@ -741,7 +741,7 @@
       "likesUnavailable": "pub.dev পছন্দগুলি উপলভ্য নয়",
       "likesCount": "{count} pub.dev পছন্দ করে",
       "downloadsUnavailable": "pub.dev 30 দিনের ডাউনলোডগুলি উপলভ্য নয়।",
-      "downloadsCount": "{count} downloads in the last 30 days",
+      "downloadsCount": "গত 30 দিনে {count} ডাউনলোড",
       "sizeUnavailable": "pub.dev থেকে আকার পাওয়া যায় না",
       "noVulnerabilities": "কোন পরিচিত দুর্বলতা নেই",
       "licenseUnspecified": "pub.dev এ লাইসেন্স নির্দিষ্ট করা হয়নি",

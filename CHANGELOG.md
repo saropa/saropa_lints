@@ -62,7 +62,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [13.12.5]
 
 Adds one-click quick fixes for eight more lint rules, so common simplifications can be applied straight from the IDE lightbulb instead of by hand. An if/else (or if plus a following return) that returns `true` in one branch and `false` in the other collapses to a direct return of the condition, a nested `if` with no else on either level merges into a single combined condition, an explicit null-check-then-call becomes the null-aware `?.` form, and a class that holds only static members is marked `abstract final` so it can no longer be instantiated. Redundant arguments and a redundant nullable `?` are now removable in one click too. A severity recalibration moves 46 rules that flag preferences, performance, robustness gaps, or deployment-config issues (not broken or crashing code) from error down to warning, so they no longer fail a strict build; rules that mark genuine compile errors, runtime crashes, data corruption, or security holes keep error severity. No action required. [log](https://github.com/saropa/saropa_lints/blob/v13.12.5/CHANGELOG.md)
 
@@ -98,6 +98,7 @@ Adds one-click quick fixes for eight more lint rules, so common simplifications 
 - Removed 396 empty-body stub tests (`test('…', () {})`) plus 255 `group()` blocks those deletions left empty (651 statements across 47 test files). An empty test body always passes and asserts nothing, giving false coverage confidence. The stub guard now hard-gates the empty-body shape to zero via `scanEmptyBodyStubTests`; 27 legitimate assertion-free tests (does-not-throw and helper-asserted) are retained. Restoring behavioral coverage for the affected rules is tracked as Phase 2 in `plans/BUG_stub_tests_in_suite.md`. Test-suite hygiene only; no rule or runtime change.
 - The publish audit now blocks on the stub guard. `run_stub_guard_check` runs the guard test in the audit phase and feeds `AuditResult.stub_guard_passed` into `has_blocking_issues`, so a reintroduced always-pass stub fails the publish audit (exit code 11) instead of only failing the wave-through-able Step 7 test run. Release tooling only.
 - Reorganized `CHANGELOG_ARCHIVE.md` so non-user-facing entries (publish/CI tooling, audit scripts, test fixtures, internal refactors, doc/ROADMAP housekeeping) across historical releases now sit in collapsed `<details><summary>Maintenance</summary>` blocks instead of `### Added`/`### Changed`/`### Fixed`. Content relocated verbatim; the oldest releases (2.3.5 and earlier) still have a residual loose-bullet pass pending. Archive formatting only.
+- Closed two locale-catalog gaps the MT run left identical to English: the Bengali Package Dashboard "downloads in the last 30 days" cell now reads in Bengali, and the Persian bullet-only `• {dep}` string is registered as a curated dictionary passthrough so the coverage gate stops flagging a punctuation-plus-placeholder string that has no translatable content. Locale catalog only; no rule or runtime change.
 
 </details>
 
