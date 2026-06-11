@@ -806,6 +806,31 @@ def _split_into_phrases(text: str) -> list[str]:
     return [text]
 
 
+# A "strong" clause boundary is one safe to pre-split a single terminator-less
+# sentence on BEFORE attempting it whole: a line break, an em/en dash, or a
+# semicolon/colon — each followed by whitespace so a URL ("https://…") or dotted
+# version ("1.2.3") is never split mid-token. A bare comma is deliberately
+# excluded: a comma inside one ordinary sentence ("Show the count, then refresh")
+# is not a clause worth splitting, and pre-splitting it would cost NLLB the
+# sentence context it needs to translate fluently. Comma splitting still happens,
+# but only as a deeper fallback inside _split_into_phrases once a whole-call
+# attempt has actually failed.
+_STRONG_PHRASE_BOUNDARY_RE = re.compile(r"\n|[—–;:]\s")
+
+
+def _has_strong_phrase_boundary(text: str) -> bool:
+    """True when *text* carries a semicolon/colon/dash/line-break clause split.
+
+    Gates proactive phrase routing in ``nllb_translate``: a string like
+    ``"Run project-wide checks ...: unused files, circular dependencies, ..."``
+    has no sentence terminator and may sit UNDER the token gate, yet sending its
+    colon-introduced list as one greedy-decode call degenerates into repetition
+    and burns the full per-call deadline before falling back to Google. Splitting
+    on the colon keeps each clause short enough to finish in seconds on NLLB.
+    """
+    return _STRONG_PHRASE_BOUNDARY_RE.search(text) is not None
+
+
 def _translate_via_phrases(text: str, target: str) -> str | None:
     """Translate a single over-long sentence clause-by-clause and rejoin.
 
@@ -871,11 +896,26 @@ def nllb_translate(text: str, locale: str) -> str | None:
     # CTranslate2's mutex and stalls following calls. Per-sentence calls each
     # finish well inside the deadline. Single-sentence inputs (most UI labels)
     # fall through with only the regex-scan overhead.
+    # ``attempted_phrase_split`` lets the timeout handler below skip a redundant
+    # second clause-split (and its repeated NLLB work) when one already ran here.
+    attempted_phrase_split = False
     if len(_split_into_sentences(plain)) > 1:
         split_result = _translate_via_sentences(plain, locale)
         if split_result is not None:
             return split_result
         # Fall through for one single-shot attempt before the caller's fallback.
+    elif _has_strong_phrase_boundary(plain):
+        # No sentence terminator, but a semicolon/colon/dash/line-break clause
+        # split — pre-split it before the single-shot call even when it is under
+        # the token gate. A colon-introduced list sent whole degenerates and
+        # burns the full deadline (real incident: th 'Run project-wide checks
+        # ... cannot do: unused files, circular dependencies, …'); splitting on
+        # the colon keeps each clause fast and on NLLB instead of bouncing the
+        # whole string to Google after a 10s timeout.
+        attempted_phrase_split = True
+        phrase_result = _translate_via_phrases(plain, locale)
+        if phrase_result is not None:
+            return phrase_result
 
     deadline = float(
         os.environ.get("SAROPA_NLLB_STRING_TIMEOUT", str(_DEFAULT_STRING_TIMEOUT_SEC)).strip()
@@ -902,9 +942,13 @@ def nllb_translate(text: str, locale: str) -> str | None:
             split_result = _translate_via_sentences(plain, locale)
             if split_result is not None:
                 return split_result
-            phrase_result = _translate_via_phrases(plain, locale)
-            if phrase_result is not None:
-                return phrase_result
+            # Skip the clause split when the proactive strong-boundary branch
+            # already ran it and came back empty — re-running it here would repeat
+            # every clause's NLLB call for the same null result.
+            if not attempted_phrase_split:
+                phrase_result = _translate_via_phrases(plain, locale)
+                if phrase_result is not None:
+                    return phrase_result
             # Genuinely unsplittable atom over the gate: record EVERY occurrence
             # (not just the first) so the run report names every string NLLB could
             # not handle, instead of hiding all but one behind a once-only log.
@@ -927,6 +971,16 @@ def nllb_translate(text: str, locale: str) -> str | None:
             no_repeat_ngram_size=3,
         )
         if results is None:
+            # Last-resort split before giving up: a comma-only enumeration (no
+            # strong boundary, so it was NOT pre-split above) can still degenerate
+            # past the deadline. Clause-split it now so a long comma list keeps the
+            # work on NLLB rather than the whole string bouncing to Google on one
+            # timeout. Skipped when a phrase split already ran, to avoid repeating
+            # all that NLLB work for the same null result.
+            if not attempted_phrase_split:
+                phrase_result = _translate_via_phrases(plain, locale)
+                if phrase_result is not None:
+                    return phrase_result
             truncated = plain[:80].replace("\n", " ").replace("\r", " ")
             ellipsis = "…" if len(plain) > 80 else ""
             _diag(f"[nllb] translate_batch timed out > {deadline:.0f}s on target={locale!r}, input={truncated!r}{ellipsis}; falling back")

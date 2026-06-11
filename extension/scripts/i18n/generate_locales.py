@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import signal
 import sys
+import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -591,6 +592,103 @@ def _run_audit(
     return 0
 
 
+# Non-TTY cadence: how many strings between plain progress lines when stdout is
+# piped (CI, log capture), where a carriage-return animation would corrupt the
+# captured log. Kept independent of mt_fallback's internal checkpoint constant so
+# the two can be tuned separately.
+_PROGRESS_LOG_EVERY = 25
+
+
+def _fmt_duration(seconds: float) -> str:
+    """Compact ``mm:ss`` (or ``h:mm:ss`` past an hour) for an ETA/elapsed value.
+
+    Returns ``--:--`` for a nonpositive or NaN input so an unknown ETA (rate not
+    yet established, division by zero) renders as a placeholder rather than ``0:00``,
+    which would falsely read as "done".
+    """
+    if seconds <= 0 or seconds != seconds:  # nonpositive, or NaN (x != x)
+        return "--:--"
+    total = int(seconds)
+    hours, rem = divmod(total, 3600)
+    minutes, secs = divmod(rem, 60)
+    if hours:
+        return f"{hours:d}:{minutes:02d}:{secs:02d}"
+    return f"{minutes:02d}:{secs:02d}"
+
+
+class _TranslationProgress:
+    """Live per-locale throughput + ETA reporter, driven by the prefetch loop.
+
+    The MT phase is otherwise silent for minutes — NLLB runs ~1-3 strings/sec, so
+    a 1000+ string locale shows nothing between "translating N strings" and the
+    final "wrote" line. This redraws one carriage-return line with words-per-minute
+    and a remaining-time estimate so the operator can see the run is alive and how
+    long it has left.
+
+    Output goes to stdout because that is the handle term_color enabled Windows VT
+    processing on (so ``\\r`` and the clear-to-EOL escape render), and it keeps the
+    bar consistent with the surrounding ``[i18n]`` lines. On a non-TTY stdout (CI /
+    piped capture) it emits a plain newline-terminated line every
+    ``_PROGRESS_LOG_EVERY`` strings instead, so the animation never corrupts a log.
+
+    ETA extrapolates from elapsed time and the fraction of strings done rather than
+    the word rate: word counts per string vary wildly (a 2-word label vs a 60-word
+    paragraph), which would make a word-rate ETA jump around. Words-per-minute is
+    still reported from the word tally, since that is the operator-requested metric.
+    """
+
+    _BAR_WIDTH = 24
+
+    def __init__(self, locale: str) -> None:
+        self._locale = locale
+        self._words = 0
+        self._start = time.monotonic()
+        self._last_render = 0.0
+        # Color/VT was enabled against stdout, so gate the animation on the same
+        # handle; a piped stdout falls back to plain checkpoint lines.
+        self._tty = sys.stdout.isatty()
+
+    def __call__(self, done: int, total: int, source: str) -> None:
+        self._words += len(source.split())
+        now = time.monotonic()
+        final = done >= total
+        if self._tty:
+            # Throttle redraws so a fast Google run (~5/s) doesn't thrash the line;
+            # always draw the final frame so the completed bar is left on screen.
+            if not final and (now - self._last_render) < 0.2:
+                return
+        elif not final and done % _PROGRESS_LOG_EVERY != 0:
+            # Non-TTY: only at checkpoints and on the last string.
+            return
+        self._last_render = now
+
+        elapsed = now - self._start
+        wpm = (self._words / elapsed * 60.0) if elapsed > 0 else 0.0
+        rate = (done / elapsed) if elapsed > 0 else 0.0
+        eta = ((total - done) / rate) if rate > 0 else 0.0
+
+        line = (
+            f"  {c('cyan', self._locale)} {self._bar(done, total)} "
+            f"{done}/{total}  {c('gray', f'{wpm:,.0f} wpm')}  "
+            f"{c('gray', f'ETA {_fmt_duration(eta)}')}"
+        )
+        if self._tty:
+            # \r returns to column 0; \033[K clears to EOL so a shorter later line
+            # (fewer digits, smaller ETA) can't leave stale trailing characters.
+            sys.stdout.write("\r" + line + "\033[K")
+            if final:
+                sys.stdout.write("\n")
+        else:
+            sys.stdout.write(line + "\n")
+        sys.stdout.flush()
+
+    def _bar(self, done: int, total: int) -> str:
+        if total <= 0:
+            return "[" + " " * self._BAR_WIDTH + "]"
+        filled = min(self._BAR_WIDTH, int(self._BAR_WIDTH * done / total))
+        return "[" + "#" * filled + "-" * (self._BAR_WIDTH - filled) + "]"
+
+
 def main() -> int:
     args = parse_args()
 
@@ -691,11 +789,16 @@ def main() -> int:
                 phase = c("gray", f"translating {pending} new strings via {engine_label}…")
             print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: {phase}", flush=True)
 
+            # Live words-per-minute + ETA bar for the otherwise-silent MT phase.
+            # Only when there is real work to translate; an all-cached locale
+            # (pending == 0) prints nothing extra.
+            progress = _TranslationProgress(locale) if pending else None
             prefetch_machine_translations(
                 locale,
                 sorted_unique,
                 cache=mt_cache,
                 dict_table=dict_table,
+                progress=progress,
             )
             # Engine mix for the strings this run actually translated — makes a
             # silent NLLB->Google fallback visible instead of hidden behind the

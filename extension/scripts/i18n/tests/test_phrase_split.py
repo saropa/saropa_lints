@@ -59,6 +59,56 @@ class TestPhraseSplit(unittest.TestCase):
         self.assertEqual(len(parts), 2)
 
 
+class TestStrongPhraseBoundary(unittest.TestCase):
+    """Pin which boundaries pre-split a terminator-less string BEFORE the first
+    NLLB call. Semicolons/colons/dashes/line-breaks qualify; a bare comma and any
+    URL/version colon do not (those must keep their sentence context / token)."""
+
+    def test_colon_is_a_strong_boundary(self) -> None:
+        # The real incident: a colon-introduced list under the token gate that
+        # degenerated and burned the full deadline before this routing existed.
+        text = "Run project-wide checks that single-file analysis cannot do: unused files, circular deps"
+        self.assertTrue(ne._has_strong_phrase_boundary(text))
+
+    def test_semicolon_and_dash_and_newline_are_strong(self) -> None:
+        self.assertTrue(ne._has_strong_phrase_boundary("first clause; second clause"))
+        self.assertTrue(ne._has_strong_phrase_boundary("label — detail follows"))
+        self.assertTrue(ne._has_strong_phrase_boundary("line one\nline two"))
+
+    def test_bare_comma_is_not_strong(self) -> None:
+        # A comma inside one sentence keeps the sentence context NLLB needs; comma
+        # splitting still happens, but only as a deeper fallback, never pre-emptively.
+        self.assertFalse(ne._has_strong_phrase_boundary("Show the count, then refresh"))
+
+    def test_url_and_version_colon_are_not_strong(self) -> None:
+        # ':' / '.' with no trailing whitespace must never count (a split URL 404s).
+        self.assertFalse(ne._has_strong_phrase_boundary("See https://example.com/path now"))
+        self.assertFalse(ne._has_strong_phrase_boundary("Requires version 1.2.3 or newer"))
+
+    def test_plain_sentence_is_not_strong(self) -> None:
+        self.assertFalse(ne._has_strong_phrase_boundary("Show the count then refresh the view"))
+
+
+class TestSubGateRouting(unittest.TestCase):
+    """nllb_translate must pre-split a terminator-less, UNDER-gate string on its
+    strong boundary, so a colon list never reaches the single-shot call that used
+    to time out. The model is stubbed; no inference runs."""
+
+    def test_colon_string_routes_to_phrase_split_before_single_shot(self) -> None:
+        text = "Do this: alpha and beta"  # one sentence, has a colon, short
+        # Neutralize an ambient SAROPA_SKIP_NLLB=1 (the suite often runs with it)
+        # so the routing under test is actually reached rather than short-circuited.
+        with mock.patch.dict(os.environ, {"SAROPA_SKIP_NLLB": "0"}), \
+             mock.patch.object(ne, "_ensure_model", return_value=True), \
+             mock.patch.object(ne, "_translate_via_phrases", return_value="SPLIT") as via_phrases, \
+             mock.patch.object(ne, "_translate_batch_with_deadline") as single_shot:
+            out = ne.nllb_translate(text, "de")
+        self.assertEqual(out, "SPLIT")
+        via_phrases.assert_called_once()
+        # The whole point: the degenerating single-shot path is never reached.
+        single_shot.assert_not_called()
+
+
 class TestTranslateViaPhrases(unittest.TestCase):
     def test_translates_each_clause_and_rejoins(self) -> None:
         # Stub prefixes each clause (a genuine change, not a case-only echo the

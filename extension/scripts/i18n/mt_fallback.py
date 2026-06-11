@@ -15,6 +15,7 @@ import os
 import re
 import threading
 import time
+from collections.abc import Callable
 from pathlib import Path
 
 # Match `{token}` segments so machine translation cannot rename interpolation keys.
@@ -874,11 +875,20 @@ def prefetch_machine_translations(
     *,
     cache: dict[str, str],
     dict_table: dict[str, str],
+    progress: Callable[[int, int, str], None] | None = None,
 ) -> None:
     """Translate strings missing from *dict_table* and *cache* (sequential, rate-limited).
 
     Raises ``KeyboardInterrupt`` so the caller can save the partial cache and
     exit cleanly. Anything fetched before interrupt is already in *cache*.
+
+    *progress*, when supplied, is called after each string with
+    ``(done, total, source)`` so the caller can render a live throughput / ETA
+    bar. Presentation lives in the caller (``generate_locales``) — this loop owns
+    only the per-string completion signal, not how it is displayed. The source
+    string is passed so the caller can size throughput by word count (the
+    operator-requested "words per minute"); a NLLB call is far too slow to make
+    the callback cost matter.
     """
     if locale == "en" or not _mt_env_enabled():
         return
@@ -890,6 +900,7 @@ def prefetch_machine_translations(
     if not pending:
         return
 
+    total = len(pending)
     for i, src in enumerate(pending):
         # Cooperative cancel: a single Ctrl-C sets the stop flag; finish the
         # in-flight string above, then break here so the caller flushes a clean
@@ -902,6 +913,8 @@ def prefetch_machine_translations(
         # results are identical regardless of which entry point warmed them. The
         # Google pacing gap lives in _google_fetch.
         _translate_one(locale, src, cache=cache, primary=primary)
+        if progress is not None:
+            progress(i + 1, total, src)
         # Periodic checkpoint so a hard kill mid-locale loses at most
         # _CHECKPOINT_EVERY strings of work, not the whole locale.
         if (i + 1) % _CHECKPOINT_EVERY == 0:
