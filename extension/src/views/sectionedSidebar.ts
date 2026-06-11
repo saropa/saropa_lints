@@ -256,13 +256,6 @@ function buildActionItems(): LeafItem[] {
             new vscode.ThemeColor('debugIcon.startForeground'),
         ),
         new LeafItem(
-            'Open Findings Dashboard',
-            'Editor tab · filters · JSON',
-            'saropaLints.revealFindingsDashboard',
-            'list-tree',
-            new vscode.ThemeColor('textLink.foreground'),
-        ),
-        new LeafItem(
             'Initialize / Update config',
             undefined,
             'saropaLints.initializeConfig',

@@ -201,6 +201,23 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     }
   });
 
+  // The findings dashboard is reachable from the Dashboards section
+  // ("Findings Dashboard" → openViolationsWideReport). A second row in the
+  // Actions panel that opened the same dashboard was redundant, so it was
+  // removed. Pin its absence so a future copy edit does not reintroduce the
+  // duplicate.
+  it('Actions section does not duplicate the findings dashboard', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+    for (const node of actions.getChildren()) {
+      const item = actions.getTreeItem(node as never);
+      assert.notStrictEqual(
+        item.command?.command,
+        'saropaLints.revealFindingsDashboard',
+        'findings dashboard is already in the Dashboards section — no Actions-panel duplicate',
+      );
+    }
+  });
+
   it('Config tree does not surface the composite analyzer plugin scaffold', () => {
     type CommandShape = { command?: { command?: string } };
     const rows = configProvider.getChildren() as Array<unknown>;
