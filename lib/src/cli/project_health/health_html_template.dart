@@ -374,15 +374,27 @@ setInterval(refreshChip, 30000);
 // having to compute per-folder aggregates here. (Folder-level cognitive heat
 // requires data-layer changes; tracked as a follow-up.)
 const RAMP = [[254,243,199],[253,186,116],[249,115,22],[194,65,12]];
-function rampColor(t){
+function rampRgb(t){
   const last = RAMP.length - 1;
   const i = Math.min(last - 1, Math.max(0, Math.floor(t * last)));
   const f = t * last - i;
   const a = RAMP[i], b = RAMP[i+1];
-  return "rgb(" +
-    Math.round(a[0] + (b[0]-a[0])*f) + "," +
-    Math.round(a[1] + (b[1]-a[1])*f) + "," +
-    Math.round(a[2] + (b[2]-a[2])*f) + ")";
+  return [
+    Math.round(a[0] + (b[0]-a[0])*f),
+    Math.round(a[1] + (b[1]-a[1])*f),
+    Math.round(a[2] + (b[2]-a[2])*f)
+  ];
+}
+function rgbCss(c){ return "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")"; }
+// Pick near-black or near-white label text from the TILE'S OWN fill, not the
+// page's dark/light mode. The treemap fill is the same orange ramp in both
+// modes, so a mode-keyed text color goes invisible: the old labels rendered
+// light `fg` on cream tiles (white-on-white headings) in dark mode and a fixed
+// dark slate that vanished on the darkest brown tiles. Rec. 709 luma; the .58
+// cutoff keeps the mid-orange tiles legible with dark text.
+function contrastText(rgb){
+  const luma = (0.2126*rgb[0] + 0.7152*rgb[1] + 0.0722*rgb[2]) / 255;
+  return luma > 0.58 ? "#0f172a" : "#f8fafc";
 }
 function maxLeaf(node, m){
   if (!node.children || node.children.length === 0) return Math.max(m, node.value || 0);
@@ -390,19 +402,34 @@ function maxLeaf(node, m){
   for (const c of node.children) cur = maxLeaf(c, cur);
   return cur;
 }
+// Paint each node's fill from its LOC, and set the label/upperLabel text color
+// from that fill so headings stay legible regardless of page mode. Returns the
+// node's [fillRgb, ratio] so a folder can adopt its hottest leaf's color — the
+// header band the user sees — and contrast its title against it.
 function paint(node, max){
   if (!node.children || node.children.length === 0) {
     const ratio = max > 0 ? (node.value || 0) / max : 0;
+    const rgb = rampRgb(ratio);
     node.itemStyle = {
-      color: rampColor(ratio),
+      color: rgbCss(rgb),
       borderRadius: 4,
       borderColor: dark ? "rgba(0,0,0,.45)" : "rgba(255,255,255,.7)",
       borderWidth: 1,
       gapWidth: 2
     };
-    return;
+    node.label = { color: contrastText(rgb) };
+    return [rgb, ratio];
   }
-  for (const c of node.children) paint(c, max);
+  let hotRatio = -1, hotRgb = RAMP[0];
+  for (const c of node.children) {
+    const r = paint(c, max);
+    if (r[1] > hotRatio) { hotRatio = r[1]; hotRgb = r[0]; }
+  }
+  // Folder header band adopts the hottest descendant's color (mirrors ECharts'
+  // rollup) so its title contrasts against the band actually rendered.
+  node.itemStyle = { color: rgbCss(hotRgb), gapWidth: 2, borderRadius: 6 };
+  node.upperLabel = { color: contrastText(hotRgb) };
+  return [hotRgb, hotRatio];
 }
 
 const treeRoot = DATA.folderTree || { name: "(root)", children: [] };
