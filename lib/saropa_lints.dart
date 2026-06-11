@@ -2541,6 +2541,16 @@ _allRuleFactories = <SaropaLintRule Function()>[
   InAppReviewMissingStoreListingFallbackRule.new,
   InAppReviewIosStoreListingMissingAppIdRule.new,
 
+  // Geocoding rules (geocoding_rules.dart)
+  GeocodingUncheckedFirstRule.new,
+  GeocodingMissingExceptionHandlerRule.new,
+  GeocodingPreferNoResultFoundCatchRule.new,
+  GeocodingLocaleSetBeforeCallRule.new,
+  GeocodingConcurrentLocaleRaceRule.new,
+  GeocodingMissingIsPresentCheckRule.new,
+  GeocodingCallInTextFieldListenerRule.new,
+  GeocodingDeprecatedLocaleParamRule.new,
+
   // Local Auth rules (local_auth_rules.dart)
   LocalAuthUncheckedResultRule.new,
   LocalAuthMissingCapabilityCheckRule.new,

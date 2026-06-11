@@ -763,6 +763,9 @@ const Set<String> essentialRules = <String>{
 /// Recommended tier rules - Essential + common mistakes, performance basics.
 /// Catches bugs that don't immediately crash but cause poor UX, sluggish performance.
 const Set<String> recommendedOnlyRules = <String>{
+  // Geocoding (geocoding_rules.dart) - crash + migration
+  'geocoding_unchecked_first',
+  'geocoding_deprecated_locale_param',
   // Local Auth (local_auth_rules.dart) - security correctness
   'local_auth_unchecked_result',
   'local_auth_missing_capability_check',
@@ -2847,6 +2850,13 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // Geocoding (geocoding_rules.dart)
+  'geocoding_missing_exception_handler',
+  'geocoding_prefer_no_result_found_catch',
+  'geocoding_locale_set_before_call',
+  'geocoding_concurrent_locale_race',
+  'geocoding_missing_is_present_check',
+  'geocoding_call_in_text_field_listener',
   // File Picker (file_picker_rules.dart)
   'file_picker_unchecked_null_result',
   'file_picker_path_on_web',
@@ -3893,6 +3903,18 @@ const Set<String> qrScannerPackageRules = <String>{
   'require_qr_permission_check',
 };
 
+/// Rules specific to the geocoding package.
+const Set<String> geocodingPackageRules = <String>{
+  'geocoding_unchecked_first',
+  'geocoding_missing_exception_handler',
+  'geocoding_prefer_no_result_found_catch',
+  'geocoding_locale_set_before_call',
+  'geocoding_concurrent_locale_race',
+  'geocoding_missing_is_present_check',
+  'geocoding_call_in_text_field_listener',
+  'geocoding_deprecated_locale_param',
+};
+
 /// Rules specific to the local_auth package (always-on subset).
 const Set<String> localAuthPackageRules = <String>{
   'local_auth_unchecked_result',
@@ -3994,6 +4016,7 @@ Map<String, Set<String>> get packageRuleSets => {
   'device_calendar': deviceCalendarPackageRules,
   'file_picker': filePickerPackageRules,
   'local_auth': localAuthPackageRules,
+  'geocoding': geocodingPackageRules,
   'flame': flamePackageRules,
 };
 
@@ -4026,6 +4049,7 @@ const List<String> allPackages = <String>[
   'device_calendar',
   'file_picker',
   'local_auth',
+  'geocoding',
   'flame',
 ];
 

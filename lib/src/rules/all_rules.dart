@@ -143,6 +143,7 @@ export 'packages/equatable_rules.dart';
 export 'packages/file_picker_rules.dart';
 export 'packages/firebase_rules.dart';
 export 'packages/flame_rules.dart';
+export 'packages/geocoding_rules.dart';
 export 'packages/flutter_hooks_rules.dart';
 export 'packages/geolocator_rules.dart';
 export 'packages/get_it_rules.dart';

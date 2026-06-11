@@ -55,6 +55,9 @@ class PackageImports {
   /// Geolocator package imports.
   static const Set<String> geolocator = {'package:geolocator/'};
 
+  /// Geocoding package imports.
+  static const Set<String> geocoding = {'package:geocoding/'};
+
   /// Connectivity packages (both legacy and current).
   static const Set<String> connectivity = {
     'package:connectivity_plus/',

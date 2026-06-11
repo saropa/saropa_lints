@@ -144,3 +144,40 @@ All rules use `SaropaLintRule` base class, `runWithReporter`, and resolve target
 - [PlatformException(IO_ERROR) — Baseflow issue #23](https://github.com/Baseflow/flutter-geocoding/issues/23)
 - [flutter-geocoding README](https://github.com/Baseflow/flutter-geocoding/blob/main/geocoding/README.md)
 - [flutter-geocoding example/main.dart](https://github.com/baseflow/flutter-geocoding/blob/main/geocoding/example/lib/main.dart)
+
+---
+
+## Finish Report (2026-06-11)
+
+**Scope:** (A) Dart lint rules. All 8 rules implemented; 5 validation callouts addressed.
+
+### Validation fixes applied
+
+- `geocoding_unchecked_first` — scoped to the **direct-await form**
+  `(await locationFromAddress(...)).first` so it adds the geocoding-specific
+  empty-result message + ERROR severity WITHOUT duplicating the generic
+  `avoid_unsafe_collection_methods` (which covers stored-then-accessed lists).
+- `geocoding_locale_set_before_call`, `geocoding_missing_is_present_check` →
+  **INFO**, member-scoped, with the FP class named in the message.
+- `geocoding_concurrent_locale_race` → fires only on `setLocaleIdentifier` inside a
+  loop; message acknowledges the constant-locale case.
+- `geocoding_call_in_text_field_listener` → debounce heuristic widened to include
+  `debounceTime` (RxDart); message states the upstream-debounce limitation.
+
+### Delivered (8 rules)
+
+All geocoding functions are top-level, so detection is syntactic (`target == null`
++ name + `fileImportsPackage(PackageImports.geocoding)`). Tiers: Recommended
+(`unchecked_first`, `deprecated_locale_param`), Comprehensive (other 6).
+
+### Verification
+
+- `dart analyze --fatal-infos` → No issues found. Unit (16) + registration integrity pass.
+- **Scan-verified (7/8 fire):** `unchecked_first`, `missing_exception_handler`,
+  `prefer_no_result_found_catch`, `locale_set_before_call`, `concurrent_locale_race`,
+  `missing_is_present_check`, `deprecated_locale_param` all fire on a standalone mock.
+  `call_in_text_field_listener` needs a real `onChanged:`/`addListener` callback (not
+  in the mock) — logic verified by review; its fixture exercises the `onChanged` form.
+- **Build note:** `reporter.atNode` requires an `AstNode`, not a `Token` — `dart analyze`
+  missed the mismatch but the runtime build caught it (fixed to report at the catch
+  clause). Reinforces running the scan/test, not just analyze.
