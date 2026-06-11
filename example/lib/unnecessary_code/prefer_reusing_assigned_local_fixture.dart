@@ -154,6 +154,26 @@ void goodSeparateAllocations() {
   use(isVisible);
 }
 
+// GOOD: a receiver-less instance method that advances a cursor returns a
+// different value each call. Reusing `left` would skip the second `_term()`
+// and break the parser, so neither call must lint (recursive-descent pattern).
+class MiniParser {
+  MiniParser(this._tokens);
+  final List<int> _tokens;
+  int _pos = 0;
+
+  int _term() => _tokens[_pos++];
+
+  int sum() {
+    int left = _term();
+    while (_pos < _tokens.length) {
+      final int right = _term();
+      left = left + right;
+    }
+    return left;
+  }
+}
+
 // --- Mock helpers so the fixture parses standalone. ---
 
 class ValueNotifier<T> {
