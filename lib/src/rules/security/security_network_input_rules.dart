@@ -224,6 +224,17 @@ class RequireInputSanitizationRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  /// Matches variable names that signal attacker-controlled URL input.
+  ///
+  /// Uses a leading boundary (start-of-string or a non-letter) so that
+  /// `userInput`/`user_url` match but unrelated identifiers that merely
+  /// embed the letters (`composerInput` for a rich-text body, `inputtedAt`)
+  /// do not. The pattern is still a name heuristic and cannot certify that
+  /// the value is untrusted — it only reduces the obvious false positives.
+  static final RegExp _userInputNamePattern = RegExp(
+    r'(^|[^a-z])(user|input)',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -232,12 +243,16 @@ class RequireInputSanitizationRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check for SQL-like operations
+      // Check for SQL-like operations. `execute` is excluded here because
+      // it is a generic method name (animation controllers, command objects,
+      // process runners all expose `execute`); flagging any `.execute('$x')`
+      // would fire on non-SQL code. The dedicated avoid_dynamic_sql rule
+      // (already ERROR) covers `execute` with proper PRAGMA exemptions, so
+      // there is no detection gap from dropping it here.
       if (methodName == 'rawQuery' ||
           methodName == 'rawInsert' ||
           methodName == 'rawUpdate' ||
-          methodName == 'rawDelete' ||
-          methodName == 'execute') {
+          methodName == 'rawDelete') {
         // Check if first argument is string interpolation
         if (node.argumentList.arguments.isEmpty) return;
 
@@ -247,19 +262,26 @@ class RequireInputSanitizationRule extends SaropaLintRule {
         }
       }
 
-      // Check for URL loading
+      // Check for URL loading.
       if (methodName == 'loadUrl' ||
           methodName == 'loadRequest' ||
           methodName == 'launchUrl') {
         if (node.argumentList.arguments.isEmpty) return;
 
         final Expression firstArg = node.argumentList.arguments.first;
-        // If it's a direct variable without validation, flag it
+        // If it's a direct variable without validation, flag it. The name
+        // heuristic is the only signal available (the rule cannot prove the
+        // variable is attacker-controlled), so this branch can never be
+        // build-breaking ERROR-safe. `param` was dropped: webview_flutter's
+        // real API is `loadRequest(LoadRequestParams(...))` and `params` /
+        // `paramount` / `parameterized` variables are common and unrelated
+        // to user input, so `name.contains('param')` was a pure false
+        // positive generator. Require a word-boundary `user`/`input` match
+        // rather than a bare substring so `userName`-style display fields and
+        // `inputDecoration` do not trip the rule.
         if (firstArg is SimpleIdentifier) {
           final String name = firstArg.name.toLowerCase();
-          if (name.contains('user') ||
-              name.contains('input') ||
-              name.contains('param')) {
+          if (_userInputNamePattern.hasMatch(name)) {
             reporter.atNode(node);
           }
         }
@@ -2135,7 +2157,9 @@ class AvoidPathTraversalRule extends SaropaLintRule {
     '[avoid_path_traversal] File paths constructed from user input may allow path traversal attacks (e.g., "../"), enabling access to sensitive files outside the intended directory. Validate and canonicalize paths before file access, and reject any input containing parent-directory segments. {v8}',
     correctionMessage:
         'Sanitize and validate file paths to prevent traversal (e.g., remove "../", use path package), and restrict access to allowed directories only.',
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): structural — a function parameter proven to
+    // reach a File/Directory path (whole-identifier match); residuals suppress.
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static final List<RegExp> _pathTraversalThrowPatterns = [RegExp(r'\.\.')];
@@ -2174,11 +2198,18 @@ class AvoidPathTraversalRule extends SaropaLintRule {
       final FormalParameterList? params = _getFunctionParameters(node);
       if (params == null) return;
 
-      // Check if any parameter is used in the path
+      // Check if any parameter is used in the path. Use a word-boundary
+      // match rather than a bare substring: a parameter named `id` or `dir`
+      // would otherwise match inside unrelated identifiers (`config.idPath`,
+      // `appDirectory`), falsely marking the path as parameter-tainted and
+      // flagging a path the user never influenced. `\b` ensures the
+      // identifier is referenced as a whole token.
       String? usedParam;
       for (final FormalParameter param in params.parameters) {
         final String paramName = param.name?.lexeme ?? '';
-        if (paramName.isNotEmpty && argSource.contains(paramName)) {
+        if (paramName.isEmpty) continue;
+        final RegExp paramRef = RegExp('\\b${RegExp.escape(paramName)}\\b');
+        if (paramRef.hasMatch(argSource)) {
           usedParam = paramName;
           break;
         }
@@ -2318,22 +2349,35 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
         return;
       }
 
-      final String nodeSource = node.toSource();
-
-      // Check for data URL with HTML content
-      if (!nodeSource.contains('data:text/html') &&
-          !nodeSource.contains('loadHtml') &&
-          !nodeSource.contains('loadData')) {
-        return;
+      // Locate the argument carrying inline HTML (a `data:text/html` URL or
+      // an HTML-loading parameter). Only that argument is the XSS sink, so
+      // the interpolation / escaping tests below run against it alone rather
+      // than the whole constructor. Scanning the whole `toSource()` for `$`
+      // mis-fires when an unrelated named argument (a callback, a controller)
+      // contains interpolation while the HTML body is a constant literal.
+      Expression? htmlArg;
+      for (final Expression arg in node.argumentList.arguments) {
+        final Expression value = arg is NamedExpression ? arg.expression : arg;
+        final String argSource = value.toSource();
+        if (argSource.contains('data:text/html') ||
+            argSource.contains('loadHtml') ||
+            argSource.contains('loadData')) {
+          htmlArg = value;
+          break;
+        }
       }
 
+      if (htmlArg == null) return;
+
+      final String htmlSource = htmlArg.toSource();
+
       // Check if content has interpolation (user content)
-      if (nodeSource.contains(r'$')) {
+      if (htmlSource.contains(r'$')) {
         // Check for escaping/sanitization
-        if (nodeSource.contains('htmlEscape') ||
-            nodeSource.contains('sanitize') ||
-            nodeSource.contains('escape') ||
-            nodeSource.contains('HtmlUnescape')) {
+        if (htmlSource.contains('htmlEscape') ||
+            htmlSource.contains('sanitize') ||
+            htmlSource.contains('escape') ||
+            htmlSource.contains('HtmlUnescape')) {
           return; // Has escaping
         }
 
@@ -2341,23 +2385,33 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
       }
     });
 
-    // Also check for direct loadHtml calls
+    // Also check for direct loadHtml calls. `loadData` is intentionally
+    // excluded: it is a generic method name used by charting, data-table,
+    // and pagination libraries (`chart.loadData('$series')`), so flagging
+    // any `loadData('$x')` produced false positives on non-WebView code.
+    // `loadHtml` / `loadHtmlString` are WebView-specific enough to keep, and
+    // the interpolated HTML argument is the genuine XSS sink.
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      if (methodName != 'loadHtml' &&
-          methodName != 'loadHtmlString' &&
-          methodName != 'loadData') {
+      if (methodName != 'loadHtml' && methodName != 'loadHtmlString') {
         return;
       }
 
-      final String nodeSource = node.toSource();
+      // Inspect only the HTML argument for interpolation, not the whole
+      // invocation. A non-content named argument (e.g. a `baseUrl:` built
+      // from a variable) otherwise satisfies the `$` test even when the HTML
+      // body is a constant literal, producing a false positive.
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+      final Expression htmlArg = args.first;
+      final String htmlSource = htmlArg.toSource();
 
       // Check for interpolation without escaping
-      if (nodeSource.contains(r'$') &&
-          !nodeSource.contains('htmlEscape') &&
-          !nodeSource.contains('sanitize') &&
-          !nodeSource.contains('escape')) {
+      if (htmlSource.contains(r'$') &&
+          !htmlSource.contains('htmlEscape') &&
+          !htmlSource.contains('sanitize') &&
+          !htmlSource.contains('escape')) {
         reporter.atNode(node);
       }
     });
@@ -4149,7 +4203,13 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
           final String blockSource = enclosingBlock.toSource().toLowerCase();
 
           // cspell:ignore allowedhost trusteddom
-          // Check for URL validation patterns
+          // Check for URL validation patterns. `validate`/`sanitize`/`allow`
+          // are added so a named validation helper invoked in the same block
+          // (`final safe = validateUrl(controller.text);`) counts as
+          // validation. Without it, any code that factors validation into a
+          // helper rather than inlining a `.scheme`/`.host` check is a false
+          // positive. This only widens the exemption (suppresses reports), so
+          // it cannot introduce new false positives.
           final bool hasValidation =
               blockSource.contains('.scheme') ||
               blockSource.contains('.host') ||
@@ -4158,7 +4218,10 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
               blockSource.contains('allowedhost') ||
               blockSource.contains('allowed_host') ||
               blockSource.contains('trusteddom') ||
-              blockSource.contains('trusted_dom');
+              blockSource.contains('trusted_dom') ||
+              blockSource.contains('validate') ||
+              blockSource.contains('sanitize') ||
+              blockSource.contains('allow');
 
           if (hasValidation) continue;
         }
@@ -4204,11 +4267,18 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
                 final String blockSource = enclosingBlock
                     .toSource()
                     .toLowerCase();
+                // Mirror the helper-aware validation check used in the HTTP
+                // method branch above: a named validation helper in the same
+                // block counts, so factored-out validation is not a false
+                // positive. Widening the exemption only suppresses reports.
                 final bool hasValidation =
                     blockSource.contains('.scheme') ||
                     blockSource.contains('.host') ||
                     blockSource.contains('allowlist') ||
-                    blockSource.contains('whitelist');
+                    blockSource.contains('whitelist') ||
+                    blockSource.contains('validate') ||
+                    blockSource.contains('sanitize') ||
+                    blockSource.contains('allow');
 
                 if (!hasValidation) {
                   reporter.atNode(arg);

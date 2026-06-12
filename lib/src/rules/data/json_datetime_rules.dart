@@ -7,6 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/json_datetime/use_try_parse_fix.dart';
@@ -824,7 +826,9 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
     correctionMessage:
         'Convert to JSON-safe type: use .toIso8601String() for DateTime, '
         '.toJson() for objects, or remove non-serializable values.',
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): SDK non-encodable type with no toJson — a
+    // deterministic runtime jsonEncode failure. Types that serialize are skipped.
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Types that are known to NOT be JSON-encodable.
@@ -928,6 +932,17 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
       final typeName = type.element?.name ?? '';
       final typeStr = type.getDisplayString();
 
+      // A value whose type declares a toJson() serializes correctly regardless
+      // of its type name. `_nonEncodableTypes` matches by SIMPLE NAME, so a
+      // user-defined class that happens to be called File, Key, State, Element,
+      // Type, Socket, Stream, etc. (all in the set) would be mis-flagged even
+      // though it is JSON-ready. jsonEncode honors a toJson() on the value, so
+      // its presence makes this a definite false positive. Skipping here keeps
+      // the rule safe to raise to ERROR — SDK types in the set (DateTime, Uri,
+      // BigInt, the typed lists, Widget, ...) genuinely have no toJson() and
+      // still flag.
+      if (_hasToJson(type)) return;
+
       // Check for known non-encodable types
       if (_nonEncodableTypes.contains(typeName)) {
         reporter.atNode(value);
@@ -987,6 +1002,27 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
         }
       }
     }
+  }
+
+  /// True when [type] declares or inherits a `toJson` method, meaning the value
+  /// serializes correctly even if its simple name collides with an entry in
+  /// [_nonEncodableTypes]. Checks the type's own members and all supertypes so
+  /// an inherited `toJson` on a base class is honored. SDK types in the set have
+  /// no `toJson`, so they are unaffected.
+  bool _hasToJson(DartType type) {
+    if (type is! InterfaceType) return false;
+
+    bool declaresToJson(InterfaceElement element) =>
+        element.methods.any((MethodElement m) => m.name == 'toJson') ||
+        element.getters.any((GetterElement g) => g.name == 'toJson');
+
+    if (declaresToJson(type.element)) return true;
+    for (final InterfaceType supertype in type.allSupertypes) {
+      // Object is a supertype of everything and never has toJson; the loop
+      // simply finds it nowhere and falls through to false for plain SDK types.
+      if (declaresToJson(supertype.element)) return true;
+    }
+    return false;
   }
 }
 

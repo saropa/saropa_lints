@@ -159,6 +159,13 @@ class RequireImageDisposalRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  /// Matches `ui.Image` as a generic element inside `List<...>` / `Set<...>`
+  /// without matching the longer `ui.ImageFilter` / `ui.ImageProvider` family.
+  /// The trailing `[>?]` (or boundary) prevents `ui.ImageFilter` from passing.
+  static final RegExp _uiImageGenericPattern = RegExp(
+    r'<\s*ui\.Image\??\s*>',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -178,10 +185,14 @@ class RequireImageDisposalRule extends SaropaLintRule {
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
-          final String fieldSource = member.toSource();
-          if (fieldSource.contains('ui.Image') ||
-              fieldSource.contains('Image ') &&
-                  fieldSource.contains('dart:ui')) {
+          // Inspect the type annotation, not the whole field source. A bare
+          // `contains('ui.Image')` matched `ui.ImageFilter`, `ui.ImageProvider`,
+          // `ui.ImageByteFormat`, and `ui.ImageDescriptor` — none of which own
+          // native image memory or expose `dispose()`. Flagging those is a
+          // false positive that would break the build at ERROR severity, so we
+          // require the type to be exactly `ui.Image` (the disposable
+          // `dart:ui` Image handle), allowing nullable / `List<>` wrappers.
+          if (_isUiImageFieldType(member.fields.type)) {
             hasUiImageField = true;
           }
         }
@@ -200,6 +211,34 @@ class RequireImageDisposalRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+
+  /// Whether [type] is the disposable `dart:ui` `Image` handle (possibly
+  /// nullable or wrapped in a `List`/`Set`), as opposed to a similarly-prefixed
+  /// but non-disposable `ui.Image*` type (`ui.ImageFilter`, `ui.ImageProvider`,
+  /// `ui.ImageByteFormat`, `ui.ImageDescriptor`).
+  ///
+  /// Matched on the prefixed `ui.Image` spelling only, because that is how the
+  /// `dart:ui` Image is conventionally referenced when imported `as ui`. A bare
+  /// `Image` is the Flutter widget (not disposable) and is deliberately not
+  /// matched here.
+  static bool _isUiImageFieldType(TypeAnnotation? type) {
+    if (type == null) return false;
+
+    final String source = type.toSource();
+
+    // Strip the nullable marker so `ui.Image?` is recognized.
+    final String base = source.endsWith('?')
+        ? source.substring(0, source.length - 1)
+        : source;
+
+    if (base == 'ui.Image') return true;
+
+    // Recognize a collection of images: `List<ui.Image>` / `Set<ui.Image>`,
+    // optionally with nullable elements. A word-boundary match on the exact
+    // `ui.Image` token (followed by `>`, `?`, or end) avoids matching the
+    // longer `ui.ImageFilter`/`ui.ImageProvider` family.
+    return _uiImageGenericPattern.hasMatch(base);
   }
 }
 
@@ -544,23 +583,45 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
 
-      // Check if target is likely an Expando
-      final String targetSource = target.toSource().toLowerCase();
-      if (!RegExp(r'\bexpando\b').hasMatch(targetSource) &&
-          !RegExp(r'_meta').hasMatch(targetSource)) {
-        return;
+      // Confirm the target's static type is actually Expando before flagging.
+      // The previous `_meta` name heuristic fired on any field/variable whose
+      // name contained `_meta` — including plain `Map<String, X> _metadata`
+      // caches — so `_metadata[id] = Meta(id: id)` (a normal map write that
+      // creates no GC cycle) was reported. Requiring the Expando type removes
+      // that false-positive class. Fall back to the `\bexpando\b` name match
+      // only when the type is unresolved (e.g. dynamic), so source-only callers
+      // still get coverage without the over-broad `_meta` trigger.
+      final String? targetTypeName = target.staticType?.element?.name;
+      final bool targetIsExpando = targetTypeName == 'Expando';
+      if (!targetIsExpando) {
+        if (targetTypeName != null) return;
+        final String targetSource = target.toSource().toLowerCase();
+        if (!RegExp(r'\bexpando\b').hasMatch(targetSource)) return;
       }
 
       // Check if this is an assignment
       final AstNode? parent = node.parent;
       if (parent is! AssignmentExpression) return;
 
+      // Only a simple identifier key can be matched against the value as a
+      // whole word. A composite key (`'user_$id'`, `items[i]`, `a + b`) cannot
+      // be tested for "value references the key object" by substring without
+      // false positives — e.g. key `i` matched `items[i]` in the value, and
+      // key `id` matched `identity`. Skip non-identifier keys rather than
+      // mis-flag them.
+      final Expression keyExpr = node.index;
+      if (keyExpr is! SimpleIdentifier) return;
+      final String keyName = keyExpr.name;
+
       final Expression rightSide = parent.rightHandSide;
       final String valueSource = rightSide.toSource();
-      final String keySource = node.index.toSource();
 
-      // Check if value contains reference to key
-      if (valueSource.contains(keySource)) {
+      // Require the key identifier to appear as a whole word in the value, so
+      // `expando[id] = Wrapper(child: widget.child)` (no reference back to the
+      // `id` key) is not flagged merely because `id` is a substring of another
+      // token.
+      final RegExp keyWord = RegExp('\\b${RegExp.escape(keyName)}\\b');
+      if (keyWord.hasMatch(valueSource)) {
         reporter.atNode(parent);
       }
     });

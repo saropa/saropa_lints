@@ -358,7 +358,9 @@ class AvoidDriftUpdateWithoutWhereRule extends SaropaLintRule {
     correctionMessage:
         'Add a where() clause: (update(table)..where((t) => t.id.equals(id)))'
         '.write(companion)',
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): fires only on the inline update(t)..write() /
+    // delete(t).go() shape with no where on its own receiver chain — data loss.
+    severity: DiagnosticSeverity.ERROR,
   );
 
   @override
@@ -372,18 +374,27 @@ class AvoidDriftUpdateWithoutWhereRule extends SaropaLintRule {
       if (methodName != 'write' && methodName != 'go') return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
-      // Walk the expression chain to find the originating update/delete call
-      final chainSource = _getFullChainSource(node);
-      if (chainSource == null) return;
+      // Resolve THIS terminal's own receiver expression — the builder it is
+      // called on. Reasoning over the whole enclosing statement source (the
+      // old approach) mis-fired at ERROR severity: a statement like
+      // `await delete(record).then((_) => sink.write(data))` contains a bare
+      // `delete(` token and a `write` terminal that belong to entirely
+      // unrelated calls, yet the regex over the full statement flagged it.
+      // The data-loss hazard only exists when the `update(...)`/`delete(...)`
+      // builder is the actual receiver chain of this write/go, so we bind the
+      // search to the terminal's own target.
+      final receiver = node.target;
+      if (receiver == null) return;
 
-      // Check if chain starts with update() or delete()
-      final hasUpdate = RegExp(r'\bupdate\s*\(').hasMatch(chainSource);
-      final hasDelete = RegExp(r'\bdelete\s*\(').hasMatch(chainSource);
-      if (!hasUpdate && !hasDelete) return;
-
-      // Check if where() appears in the chain
-      if (RegExp(r'\.where\s*\(').hasMatch(chainSource)) return;
-      if (RegExp(r'\.\.where\s*\(').hasMatch(chainSource)) return;
+      // Walk the receiver chain to confirm it ORIGINATES in a bare
+      // `update(...)` / `delete(...)` invocation (Drift's query builders are
+      // top-level methods on the database, so the head is a MethodInvocation
+      // with a null target). A `where` anywhere on that same chain — as a
+      // cascade (`..where`) or a method call (`.where`) — scopes the
+      // operation and clears the violation.
+      final origin = _driftMutationOrigin(receiver);
+      if (origin == null) return;
+      if (origin.hasWhere) return;
 
       reporter.atNode(node.methodName);
     });
@@ -401,6 +412,69 @@ String? _getFullChainSource(AstNode node) {
     current = current.parent;
   }
   return node.toSource();
+}
+
+/// Result of walking a Drift mutation builder chain: whether the chain
+/// originates in a bare `update(...)` / `delete(...)` call and whether a
+/// `where(...)` scopes it.
+class _DriftMutationOrigin {
+  const _DriftMutationOrigin({required this.hasWhere});
+  final bool hasWhere;
+}
+
+/// Walks the receiver [expr] of a `write()` / `go()` terminal DOWN to its
+/// head, confirming it is a Drift mutation builder rooted in a bare
+/// `update(...)` or `delete(...)` invocation (top-level methods on the
+/// database — the head MethodInvocation has a null target). Returns null
+/// when the chain is not such a builder, so unrelated `write`/`go` calls
+/// (file sinks, go_router `context.go`, etc.) never trip the rule.
+///
+/// Tracks whether any `where(...)` appears on the same chain — as a cascade
+/// section (`..where`) or a chained call (`.where`) — because that scopes the
+/// mutation and clears the data-loss hazard.
+_DriftMutationOrigin? _driftMutationOrigin(Expression expr) {
+  bool hasWhere = false;
+  Expression? current = expr;
+
+  while (current != null) {
+    // Unwrap parentheses: `(update(t)..where(...))`.
+    if (current is ParenthesizedExpression) {
+      current = current.expression;
+      continue;
+    }
+
+    // A cascade carries the `..where(...)` sections; its target is the
+    // builder the cascades apply to.
+    if (current is CascadeExpression) {
+      for (final section in current.cascadeSections) {
+        if (section is MethodInvocation && section.methodName.name == 'where') {
+          hasWhere = true;
+        }
+      }
+      current = current.target;
+      continue;
+    }
+
+    if (current is MethodInvocation) {
+      final name = current.methodName.name;
+      final target = current.target;
+      // Head of the chain: a bare `update(...)` / `delete(...)` with no
+      // receiver is Drift's query builder entry point.
+      if ((name == 'update' || name == 'delete') && target == null) {
+        return _DriftMutationOrigin(hasWhere: hasWhere);
+      }
+      // `.where(...)` chained (non-cascade) form also scopes the mutation.
+      if (name == 'where') hasWhere = true;
+      current = target;
+      continue;
+    }
+
+    // Anything else (identifier holding a pre-built query, a property
+    // access, etc.) is not a recognizable inline builder origin. We cannot
+    // prove the table-wide mutation hazard, so stay silent.
+    return null;
+  }
+  return null;
 }
 
 // =============================================================================
@@ -2833,13 +2907,47 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
       if (node.name.label.name != 'onCreate') return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
+      // `onCreate:` is a generic parameter name used far beyond Drift
+      // (sqflite's openDatabase, custom widgets/builders, state-machine
+      // configs). At ERROR severity we must not fire on those, so require
+      // this argument to belong to a `MigrationStrategy(...)` invocation —
+      // Drift's only consumer of an onCreate that needs createAll().
+      if (!_isMigrationStrategyArgument(node)) return;
+
+      // Only inspect inline callbacks. A tear-off / identifier reference
+      // (`onCreate: _seedSchema`) delegates to a method we cannot read here;
+      // assuming it omits createAll() would be a false positive, so stay
+      // silent on anything that is not a function literal.
+      final callback = node.expression;
+      if (callback is! FunctionExpression) return;
+
       // Check if the callback body contains createAll
-      final callbackSource = node.expression.toSource();
+      final callbackSource = callback.toSource();
       if (!RegExp(r'\bcreateAll\b').hasMatch(callbackSource)) {
         reporter.atNode(node);
       }
     });
   }
+}
+
+/// True when [arg] is a named argument of a `MigrationStrategy(...)`
+/// instance-creation expression. Walks from the argument up through its
+/// ArgumentList to the construction node, so the onCreate handler we flag is
+/// unambiguously Drift's migration callback and not some unrelated
+/// `onCreate:` parameter that happens to share the name.
+bool _isMigrationStrategyArgument(NamedExpression arg) {
+  final argList = arg.parent;
+  if (argList is! ArgumentList) return false;
+  final creation = argList.parent;
+  if (creation is InstanceCreationExpression) {
+    return creation.constructorName.type.name.lexeme == 'MigrationStrategy';
+  }
+  // `MigrationStrategy(...)` can also parse as a MethodInvocation when the
+  // constructor is referenced without `const`/`new` in some contexts.
+  if (creation is MethodInvocation) {
+    return creation.methodName.name == 'MigrationStrategy';
+  }
+  return false;
 }
 
 // =============================================================================

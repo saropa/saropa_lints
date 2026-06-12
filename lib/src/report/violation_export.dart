@@ -606,6 +606,27 @@ class ViolationExporter {
     };
   }
 
+  /// Build the `ruleMetadataByRule` JSON map for an arbitrary rule set,
+  /// independent of any analysis run.
+  ///
+  /// The live-analysis export ([_buildRuleMetadataLookup]) only snapshots the
+  /// rules that were enabled or triggered. The VS Code extension needs the SAME
+  /// per-rule metadata for EVERY rule up front — it enriches live analyzer
+  /// diagnostics (which carry no metadata) so the Issues-panel rule-type/status
+  /// filters and security-hotspot review work without first running an export.
+  /// Routing both through `_RuleMetadataSnapshot` keeps the bundled catalog
+  /// byte-identical to what an export would emit for the same rule, so the two
+  /// data sources can never drift.
+  static Map<String, Object?> buildRuleMetadataCatalog(
+    Iterable<SaropaLintRule> rules,
+  ) {
+    final lookup = <String, _RuleMetadataSnapshot>{
+      for (final rule in rules)
+        rule.code.lowerCaseName: _RuleMetadataSnapshot.fromRule(rule),
+    };
+    return _ruleMetadataLookupToJson(lookup);
+  }
+
   static Map<String, _RuleMetadataSnapshot> _buildRuleMetadataLookup({
     required ReportConfig? config,
     required Map<LintImpact, List<ViolationRecord>> violations,

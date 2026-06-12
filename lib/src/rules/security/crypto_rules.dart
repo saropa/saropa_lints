@@ -361,6 +361,29 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
     'RC4',
   };
 
+  /// Lowercase `des` collides with the near-universal `des` abbreviation for
+  /// "description" (`widget.des`, `item.des`, `des.trim()`), so flagging it on a
+  /// bare identifier or arbitrary method call produces ERROR-breaking false
+  /// positives on ordinary code. The DES cipher is only safely identifiable
+  /// when `des` receives an actual cryptographic operation, so it is required
+  /// to appear with one of [_cryptoOperationMethods] below rather than via the
+  /// bare-identifier path. The unambiguous spellings (`DES`, `3des`,
+  /// `TripleDES`) remain in [_deprecatedAlgorithms] for the type/constructor and
+  /// prefixed-identifier paths.
+  static const String _ambiguousDes = 'des';
+
+  /// Method names that mark a receiver as performing a crypto operation. Used to
+  /// disambiguate the otherwise-ambiguous `des` receiver (`des.convert(...)` is
+  /// the cipher; `des.trim()` / `des.isEmpty` is a description string).
+  static const Set<String> _cryptoOperationMethods = <String>{
+    'convert',
+    'encrypt',
+    'decrypt',
+    'process',
+    'encode',
+    'decode',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -371,9 +394,17 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target is SimpleIdentifier) {
         final String targetName = target.name;
-        if (_deprecatedAlgorithms.contains(targetName)) {
-          reporter.atNode(target);
+        if (!_deprecatedAlgorithms.contains(targetName)) return;
+
+        // Lowercase `des` only flags when the invoked method is an actual
+        // crypto operation, so `description.trim()`-style receivers named `des`
+        // are not mistaken for the DES cipher.
+        if (targetName == _ambiguousDes &&
+            !_cryptoOperationMethods.contains(node.methodName.name)) {
+          return;
         }
+
+        reporter.atNode(target);
       }
     });
 
@@ -388,9 +419,15 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
     // Check for prefixed identifiers like crypto.md5
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
       final String identifierName = node.identifier.name;
-      if (_deprecatedAlgorithms.contains(identifierName)) {
-        reporter.atNode(node.identifier, code);
-      }
+      if (!_deprecatedAlgorithms.contains(identifierName)) return;
+
+      // Bare `x.des` is overwhelmingly a "description" field access, not the
+      // DES cipher — exclude lowercase `des` from the prefixed-identifier path
+      // to avoid ERROR-breaking false positives. Uppercase `DES` (a real
+      // algorithm spelling) still flags.
+      if (identifierName == _ambiguousDes) return;
+
+      reporter.atNode(node.identifier, code);
     });
   }
 }

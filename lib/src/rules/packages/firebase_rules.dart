@@ -464,8 +464,22 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
 
       final String mainSource = node.toSource();
 
-      // Skip if main has Firebase.initializeApp
-      if (mainSource.contains('Firebase.initializeApp')) return;
+      // Skip if main initializes Firebase. We match `initializeApp` broadly
+      // (not only the `Firebase.initializeApp` form) so qualified, aliased,
+      // or partially-wrapped calls all count as initialization.
+      if (mainSource.contains('initializeApp')) return;
+
+      // Skip if main delegates startup to a helper that very likely performs
+      // initialization. Cross-function init (a `bootstrap()` / `setup*()` /
+      // `configure*()` wrapper that calls Firebase.initializeApp) is common
+      // and invisible to this file-local check; firing through it would be a
+      // false positive, so when main awaits any such call we stay silent.
+      if (RegExp(
+        r'\b(?:bootstrap|setup|configure|init)\w*\s*\(',
+        caseSensitive: false,
+      ).hasMatch(mainSource)) {
+        return;
+      }
 
       // Check if main uses any Firebase service
       for (final String service in _firebaseServices) {
