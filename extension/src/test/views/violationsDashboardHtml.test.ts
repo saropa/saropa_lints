@@ -110,13 +110,20 @@ describe('violationsDashboardHtml', () => {
     assert.ok(html.includes('lib/generated'));
   });
 
-  it('renders the hero status line and last-run pill when a timestamp is supplied', () => {
+  it('renders the hero status line with a clickable, self-ticking freshness pill', () => {
     const recent = new Date(Date.now() - 90_000).toISOString();
     const html = renderViolationsDashboardHtml(
       minimalInput({ reportTimestamp: recent, extensionVersion: '1.2.3' }),
     );
     assert.ok(html.includes('class="status-line"'));
-    assert.ok(html.includes('Last run'));
+    // "Updated" replaced "Last run": the stamp reflects the last repaint from
+    // live diagnostics, not a separate analysis pass.
+    assert.ok(html.includes('Updated'));
+    // The pill is a refresh button and carries the ticking template attrs so the
+    // webview can re-age the label without a host rebuild.
+    assert.ok(html.includes('data-action="refresh"'));
+    assert.ok(html.includes('class="freshness-rel"'));
+    assert.ok(html.includes(`data-updated-at="${recent}"`));
     assert.ok(html.includes('v1.2.3'));
   });
 

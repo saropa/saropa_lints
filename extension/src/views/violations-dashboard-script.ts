@@ -812,6 +812,66 @@ export function buildScript(): string {
     if (el) el.addEventListener('click', fn);
   }
 
+  /* Freshness pill — "Updated <rel>", clickable to refresh + self-ticking.
+     A backgrounded panel does not auto-repaint (the host's diagnostics
+     listener early-returns when the panel is hidden), so without these two
+     behaviors the label would freeze at "just now" from its last paint and
+     there would be no in-panel way to pull fresh data. tickFreshness recomputes
+     the relative label from the localized {n} templates baked into the pill's
+     data attributes — matching the server formatRelative buckets exactly so the
+     two never disagree. */
+  function tickFreshness() {
+    document.querySelectorAll('.freshness-rel[data-updated-at]').forEach(function (el) {
+      var iso = el.getAttribute('data-updated-at');
+      var t = Date.parse(iso || '');
+      if (!isFinite(t)) return;
+      var diff = Date.now() - t;
+      var txt;
+      if (diff < 0) {
+        txt = el.getAttribute('data-t-justnow');
+      } else {
+        var sec = Math.floor(diff / 1000);
+        if (sec < 45) {
+          txt = el.getAttribute('data-t-justnow');
+        } else {
+          var min = Math.floor(sec / 60);
+          if (min < 60) {
+            txt = (el.getAttribute('data-t-min') || '').replace('{n}', String(min));
+          } else {
+            var hr = Math.floor(min / 60);
+            if (hr < 24) {
+              txt = (el.getAttribute('data-t-hr') || '').replace('{n}', String(hr));
+            } else {
+              txt = (el.getAttribute('data-t-day') || '').replace('{n}', String(Math.floor(hr / 24)));
+            }
+          }
+        }
+      }
+      if (txt != null) el.textContent = txt;
+    });
+  }
+  // Re-tick on a slow interval and whenever the tab regains focus, so a panel
+  // returning from the background immediately shows its true age.
+  setInterval(tickFreshness, 30000);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) tickFreshness(); });
+  window.addEventListener('focus', tickFreshness);
+
+  // Click / Enter / Space on the freshness pill (or any data-action="refresh"
+  // element) re-reads the analyzer's current diagnostics — the same {type:'refresh'}
+  // the More-menu "Reload from disk" item fires.
+  function fireRefreshAction(target) {
+    if (target && target.closest && target.closest('[data-action="refresh"]')) {
+      vscode.postMessage({ type: 'refresh' });
+      return true;
+    }
+    return false;
+  }
+  document.addEventListener('click', function (e) { fireRefreshAction(e.target); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (fireRefreshAction(e.target)) e.preventDefault();
+  });
+
   window.addEventListener('message', function (event) {
     var msg = event && event.data ? event.data : null;
     if (!msg) return;

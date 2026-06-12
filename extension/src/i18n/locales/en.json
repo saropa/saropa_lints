@@ -270,6 +270,8 @@
     },
     "status": {
       "lastRunPrefix": "Last run",
+      "updatedPrefix": "Updated",
+      "refreshHint": "Click to refresh from the analyzer",
       "lastRunUnknown": "Last run unknown",
       "noTimestampTitle": "No timestamp on violations.json",
       "findingsAfterFilterTitle": "Total findings after disabled-rule filter",
