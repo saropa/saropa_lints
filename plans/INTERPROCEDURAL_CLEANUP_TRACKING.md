@@ -56,11 +56,25 @@ Per-method rules resolve the enclosing class via `node.thisOrAncestorOfType<Clas
 | `require_database_close` | Its residual is a `Future<Database>` factory whose CALLER (a different class/scope) closes the connection — cross-class, not same-class-helper. Same-class walk cannot see the caller. |
 | `require_field_dispose` | Already has its own helper expansion (`_expandMethodCalls`, depth-limited). Its residuals are AutoDispose-mixin disposal and the lexeme-only `State` check — neither is a helper-delegation FP. |
 
-## ERROR re-evaluation (gated — needs sign-off)
+## ERROR re-evaluation (done 2026-06-12)
 
-Once a rule's helper-delegation FP is resolved, it becomes a candidate to flip WARNING -> ERROR.
-The flip stays gated per the SEV-01 process (a build-breaking ERROR false positive breaks every
-consumer). Candidates after rollout: the rules above whose ONLY residual was helper delegation.
-`require_stream_subscription_cancel` (collection-ownership), `require_image_disposal`
-(parent-owned), and the non-leak NEEDS_DISCUSSION rules are NOT addressed by this capability and
-stay WARNING.
+Each of the 5 rolled-out rules was re-audited for residuals BEYOND helper delegation:
+
+- **`require_platform_channel_cleanup` → flipped to ERROR.** Helper teardown is now followed
+  interprocedurally, and the setup trigger is AST-based (a string literal mentioning
+  `setMethodCallHandler` no longer triggers it — the same self-trigger class the isolate rule had).
+  An un-torn-down handler crashes with setState on an unmounted widget. Verified via scan CLI:
+  fires (severity ERROR) on a real handler with no teardown; silent on the string-mention and
+  cleaned cases.
+- **`require_websocket_close` → kept WARNING.** Added a parent-owned-socket skip (`= widget.x`),
+  but kept WARNING NOT for lack of precision: `avoid_websocket_memory_leak` already covers the
+  constructed-channel leak at ERROR, so promoting this too would double-report ERROR on the same
+  code. Stays the broader WARNING (it also catches dart:io `WebSocket`).
+- **`require_file_close_in_finally`, `require_http_client_close`, `require_native_resource_cleanup`
+  → kept WARNING.** Per-method, local-handle rules: a handle passed to a top-level/other-class
+  function that closes it, or wrapped in a returned object, escapes the same-class walk and would
+  be a build-breaking false positive at ERROR. Acceptable as a warning, not as an error.
+
+Net: 1 flipped (platform_channel), 4 kept WARNING with the residual named at each rule's
+`severity:` field. `require_stream_subscription_cancel` (collection-ownership) and
+`require_image_disposal` (parent-owned) are not addressed by this capability and stay WARNING.

@@ -67,9 +67,10 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
         'leaks file descriptor, exhausting system limits. {v4}',
     correctionMessage:
         'Use try-finally or convenience methods like readAsString().',
-    // SEV-01: a close in a same-class helper the method delegates to is now
-    // recognized via interprocedural cleanup tracking (extract-method pattern).
-    // Kept WARNING pending the gated ERROR re-evaluation.
+    // SEV-01 (re-evaluated, kept WARNING): a close in a same-class helper is now
+    // recognized, but a handle passed to a top-level/other-class function that
+    // closes it would be a false positive at ERROR — the same-class walk cannot
+    // see that escape, so this stays WARNING.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -395,10 +396,11 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
     '[require_http_client_close] Unclosed HttpClient leaks socket '
         'connections and memory, eventually exhausting system resources. {v5}',
     correctionMessage: 'Call client.close() in finally block.',
-    // SEV-01: a client closed in a same-class helper the method delegates to is
-    // now recognized via interprocedural cleanup tracking. Kept WARNING pending
-    // the gated ERROR re-evaluation; a client handed to a DI wrapper in another
-    // class is still under-detected (a false negative, not a build risk).
+    // SEV-01 (re-evaluated, kept WARNING): a client closed in a same-class helper
+    // is now recognized via interprocedural tracking, but a local client passed
+    // to a top-level/other-class function that closes it (or wrapped in a
+    // returned object) would be a false positive at ERROR — the same-class walk
+    // cannot see those escapes, so this stays WARNING.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -528,9 +530,10 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
     '[require_native_resource_cleanup] Unfreed native memory leaks '
         'outside Dart GC, causing permanent memory loss until app restart. {v3}',
     correctionMessage: 'Call free() in finally block for native allocations.',
-    // SEV-01: a free() in a same-class helper the method delegates to is now
-    // recognized via interprocedural cleanup tracking (arena/borrowed-pointer
-    // FPs were already fixed). Kept WARNING pending the gated ERROR re-evaluation.
+    // SEV-01 (re-evaluated, kept WARNING): a free() in a same-class helper is now
+    // recognized, but a pointer passed to a top-level/other-class function that
+    // frees it would be a false positive at ERROR — the same-class walk cannot
+    // see that escape, so this stays WARNING.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -672,11 +675,12 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
     '[require_websocket_close] Unclosed WebSocket leaks connections and '
         'continues receiving data after widget disposal, causing errors. {v5}',
     correctionMessage: 'Add _socket.close() in dispose method.',
-    // SEV-01: the helper-delegation false positive is now resolved by
-    // interprocedural cleanup tracking — dispose() is followed into same-class
-    // helpers (see interprocedural_cleanup_utils.dart). Kept WARNING pending the
-    // ERROR re-evaluation; the only residual is under-detection of an untyped
-    // `late final _s = WebSocket.connect()` (a false negative, not a build risk).
+    // SEV-01: helper delegation resolved by interprocedural cleanup tracking,
+    // and parent-supplied sockets (`= widget.socket`) are now skipped. Kept
+    // WARNING deliberately, NOT for lack of precision: avoid_websocket_memory_leak
+    // already covers the constructed-channel leak at ERROR, so promoting this too
+    // would double-report ERROR on the same code. This stays the broader WARNING
+    // (it also catches dart:io WebSocket, which the other rule does not).
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -692,6 +696,35 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
   /// extracted into a same-class helper called from dispose() is recognized.
   static bool _closesSocket(FunctionBody body) =>
       _socketClosePattern.hasMatch(body.toSource());
+
+  /// Whether [field] is a WebSocket fed from the parent widget (`= widget.x`,
+  /// inline or assigned in initState). The Flutter ownership contract is that
+  /// whoever constructs a resource closes it, so a parent-supplied socket must
+  /// not be flagged here (and disposing it would be a double-close bug). Only
+  /// sockets this State owns require a local close.
+  static bool _isParentOwnedSocket(FieldDeclaration field, String classSource) {
+    for (final VariableDeclaration v in field.fields.variables) {
+      final Expression? init = v.initializer;
+      if (init != null && _readsWidget(init)) return true;
+      // Assigned from `widget.*` elsewhere in the class (e.g. in initState).
+      final RegExp assignedFromWidget = RegExp(
+        '${RegExp.escape(v.name.lexeme)}' r'\s*=\s*widget\.',
+      );
+      if (assignedFromWidget.hasMatch(classSource)) return true;
+    }
+    return false;
+  }
+
+  /// Whether [expr] reads a member of the enclosing State's `widget`.
+  static bool _readsWidget(Expression expr) {
+    if (expr is PrefixedIdentifier) return expr.prefix.name == 'widget';
+    if (expr is PropertyAccess) {
+      final Expression? target = expr.target;
+      if (target is SimpleIdentifier) return target.name == 'widget';
+      if (target is PrefixedIdentifier) return target.prefix.name == 'widget';
+    }
+    return false;
+  }
 
   @override
   void runWithReporter(
@@ -710,13 +743,18 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
       // source. Substring matching previously fired on unrelated fields like
       // `final String webSocketUrl = '...'` or `final int webSocketRetryCount`,
       // which hold no socket to close.
+      final String classSource = node.toSource();
       bool hasWebSocket = false;
       MethodDeclaration? disposeMethod;
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toSource();
-          if (typeName != null && _webSocketTypePattern.hasMatch(typeName)) {
+          // Only count a socket this State OWNS — skip a parent-supplied field
+          // (`= widget.socket`), which the parent is responsible for closing.
+          if (typeName != null &&
+              _webSocketTypePattern.hasMatch(typeName) &&
+              !_isParentOwnedSocket(member, classSource)) {
             hasWebSocket = true;
           }
         }
@@ -800,10 +838,12 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
     '[require_platform_channel_cleanup] Active platform channel handler '
         'receives callbacks after dispose, causing setState on unmounted widget. {v5}',
     correctionMessage: 'Set handler to null in dispose method.',
-    // SEV-01: helper-delegated teardown is now resolved by interprocedural
-    // cleanup tracking (dispose() is followed into same-class helpers). Kept
-    // WARNING pending the gated ERROR re-evaluation.
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): an active MethodChannel/EventChannel handler
+    // that outlives the State fires callbacks after dispose → setState on an
+    // unmounted widget (a crash). Detection is now precise enough for a build
+    // gate: setup is confirmed by a real AST invocation (not a substring), and
+    // teardown is followed interprocedurally into dispose()'s helpers.
+    severity: DiagnosticSeverity.ERROR,
   );
 
   // Whitespace-tolerant `setMethodCallHandler(null)` — the prior exact-string
@@ -840,13 +880,14 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
       final String superName = extendsClause.superclass.toSource();
       if (!superName.startsWith('State<')) return;
 
-      final String classSource = node.toSource();
-
-      // Check for channel handler setup
-      if (!classSource.contains('setMethodCallHandler') &&
-          !classSource.contains('receiveBroadcastStream')) {
-        return;
-      }
+      // Confirm real channel-handler setup via the AST, not a substring of the
+      // class source — a string literal or comment mentioning the API must not
+      // trip an ERROR-severity build gate (the same self-trigger class the
+      // isolate rule had).
+      final _ChannelHandlerSetupVisitor setupVisitor =
+          _ChannelHandlerSetupVisitor();
+      node.accept(setupVisitor);
+      if (!setupVisitor.found) return;
 
       // Find dispose and follow it into same-class helpers (interprocedural):
       // teardown extracted into `_unbind()` is recognized as real cleanup,
@@ -868,6 +909,25 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+}
+
+/// Finds a real `setMethodCallHandler(...)` or `receiveBroadcastStream(...)`
+/// invocation, so a string literal or comment mentioning the API does not trip
+/// the require_platform_channel_cleanup rule (required for ERROR severity).
+class _ChannelHandlerSetupVisitor extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (!found) {
+      final String name = node.methodName.name;
+      if (name == 'setMethodCallHandler' || name == 'receiveBroadcastStream') {
+        found = true;
+        return;
+      }
+    }
+    super.visitMethodInvocation(node);
   }
 }
 

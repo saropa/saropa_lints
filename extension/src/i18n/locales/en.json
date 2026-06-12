@@ -32,6 +32,11 @@
     "enabledToast": "Enabled the {pack} rule pack in analysis_options.yaml",
     "enableFailed": "Could not enable the {pack} rule pack — open the Rule Packs dashboard to enable it"
   },
+  "startupNudge": {
+    "message": "Saropa Lints: {count} rule pack suggestion(s) apply to this project.",
+    "review": "Review",
+    "dismiss": "Dismiss"
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION",
