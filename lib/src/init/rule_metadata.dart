@@ -158,8 +158,8 @@ RuleStatus getRuleStatusFromMetadata(String ruleName) {
 Set<String> lifecycleFilteredRules(Set<String> enabled) {
   return <String>{
     for (final rule in enabled)
-      if (getRuleStatusFromMetadata(rule) case RuleStatus.beta ||
-          RuleStatus.deprecated)
+      if (getRuleStatusFromMetadata(rule)
+          case RuleStatus.beta || RuleStatus.deprecated)
         rule,
   };
 }

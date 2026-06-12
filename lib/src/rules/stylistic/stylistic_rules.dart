@@ -4599,8 +4599,7 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
       if (content.isEmpty) continue;
       if (CommentPatterns.isSpecialMarker(content)) continue;
       if (!CommentPatterns.isLikelyCode(content)) continue;
-      if (blockIsProse &&
-          !CommentPatterns.hasStrongCodeIndicators(content)) {
+      if (blockIsProse && !CommentPatterns.hasStrongCodeIndicators(content)) {
         continue;
       }
       reporter.atToken(commentToken);

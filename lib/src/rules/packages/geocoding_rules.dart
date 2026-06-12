@@ -13,7 +13,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
 
-/// The two geocoding lookup functions (top-level, return Future<List<...>>).
+/// The two geocoding lookup functions (top-level, return `Future<List<...>`>).
 const Set<String> _geocodingLookups = <String>{
   'locationFromAddress',
   'placemarkFromCoordinates',

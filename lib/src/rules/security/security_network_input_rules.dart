@@ -231,9 +231,7 @@ class RequireInputSanitizationRule extends SaropaLintRule {
   /// embed the letters (`composerInput` for a rich-text body, `inputtedAt`)
   /// do not. The pattern is still a name heuristic and cannot certify that
   /// the value is untrusted — it only reduces the obvious false positives.
-  static final RegExp _userInputNamePattern = RegExp(
-    r'(^|[^a-z])(user|input)',
-  );
+  static final RegExp _userInputNamePattern = RegExp(r'(^|[^a-z])(user|input)');
 
   @override
   void runWithReporter(

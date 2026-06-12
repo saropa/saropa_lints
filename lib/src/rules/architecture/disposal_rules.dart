@@ -984,7 +984,7 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
       r'(?:this\.)?' +
           RegExp.escape(fieldName) +
           r'\s*=\s*[^;]*?(?:WebSocketChannel|IOWebSocketChannel|'
-          r'HtmlWebSocketChannel)\s*[.(]',
+              r'HtmlWebSocketChannel)\s*[.(]',
     );
     return assignsChannel.hasMatch(classSource);
   }
@@ -1334,9 +1334,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
     // Assigned from a listen() result somewhere in the class:
     // `_sub = stream.listen(...)` / `_sub = await x.listen(...)`.
     final RegExp assignsListen = RegExp(
-      r'(?:this\.)?' +
-          RegExp.escape(fieldName) +
-          r'\s*=\s*[^;]*?\.listen\s*\(',
+      r'(?:this\.)?' + RegExp.escape(fieldName) + r'\s*=\s*[^;]*?\.listen\s*\(',
     );
     return assignsListen.hasMatch(classSource);
   }
@@ -2515,7 +2513,10 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
   /// Walks enclosing if-statements and matches `field == null` (with optional
   /// `this.` prefix, either operand order). Conservative: only the exact
   /// equals-null shape qualifies, so it never suppresses a real reassignment.
-  bool _isGuardedByNullCheck(AssignmentExpression assignment, String fieldName) {
+  bool _isGuardedByNullCheck(
+    AssignmentExpression assignment,
+    String fieldName,
+  ) {
     AstNode? current = assignment.parent;
     while (current != null) {
       if (current is MethodDeclaration || current is ClassDeclaration) break;

@@ -428,7 +428,7 @@ class AppleSignInUncheckedAvailabilityRule extends SaropaLintRule {
 ///
 /// Since: v4.17.0 | Rule version: v1
 ///
-/// **OWASP:** [M3:Insecure Authentication] — skipping server validation of the
+/// **OWASP:** `M3:Insecure Authentication` — skipping server validation of the
 /// identity token defeats the authentication flow entirely.
 ///
 /// `AuthorizationCredentialAppleID.identityToken` is typed `String?`. The

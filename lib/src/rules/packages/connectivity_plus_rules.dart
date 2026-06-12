@@ -6,7 +6,7 @@
 ///   1. `avoid_pre_v6_single_connectivity_result` — pre-upgrade readiness rule
 ///      for projects on connectivity_plus <6.0.0. The v6 release changed the
 ///      return type of checkConnectivity() / onConnectivityChanged events from
-///      a single ConnectivityResult to List<ConnectivityResult>. Code that
+///      a single ConnectivityResult to `List<ConnectivityResult>`. Code that
 ///      uses a bare `==` / `!=` comparison against a ConnectivityResult enum
 ///      value will be a type error after the bump. Relocated into the
 ///      `connectivity_plus_6` version-gated pack (<6.0.0).

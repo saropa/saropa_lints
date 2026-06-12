@@ -165,9 +165,7 @@ class RequireImageDisposalRule extends SaropaLintRule {
   /// Matches `ui.Image` as a generic element inside `List<...>` / `Set<...>`
   /// without matching the longer `ui.ImageFilter` / `ui.ImageProvider` family.
   /// The trailing `[>?]` (or boundary) prevents `ui.ImageFilter` from passing.
-  static final RegExp _uiImageGenericPattern = RegExp(
-    r'<\s*ui\.Image\??\s*>',
-  );
+  static final RegExp _uiImageGenericPattern = RegExp(r'<\s*ui\.Image\??\s*>');
 
   @override
   void runWithReporter(

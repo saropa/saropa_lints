@@ -11,7 +11,7 @@
 ///     → notification silently discarded.
 ///   - createNotification() with no prior isNotificationAllowed() await → silent
 ///     OS drop on Android 13+ / iOS.
-///   - NotificationContent(id: <negative>) → ID silently randomized by plugin,
+///   - NotificationContent(id: `<negative>`) → ID silently randomized by plugin,
 ///     cancel(id) ineffective. Provides a quick fix.
 ///   - createNotification() / requestPermissionToSendNotifications() invoked
 ///     before setListeners() in the same block → events delivered to no handler.

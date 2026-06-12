@@ -8,10 +8,10 @@ import 'package:test/test.dart';
 /// lets leak/disposal rules follow teardown moved out of `dispose()` into a
 /// helper, instead of guessing that any private call forwards cleanup.
 
-ClassDeclaration _classOf(String code) =>
-    parseString(content: code, throwIfDiagnostics: false).unit.declarations
-        .whereType<ClassDeclaration>()
-        .first;
+ClassDeclaration _classOf(String code) => parseString(
+  content: code,
+  throwIfDiagnostics: false,
+).unit.declarations.whereType<ClassDeclaration>().first;
 
 MethodDeclaration _method(ClassDeclaration c, String name) => c.bodyMembers
     .whereType<MethodDeclaration>()
