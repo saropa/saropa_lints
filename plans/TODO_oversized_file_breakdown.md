@@ -47,3 +47,56 @@ risk (the test pins output); untested ones need a render spot-check after.
   lower value than the markup splits, do last.
 - CSS-in-TS files split cleanly by component but are low risk / low urgency.
 - `issuesTree.ts` is a sidebar tree (not a dashboard); its split is independent of consolidation.
+
+---
+
+## Finish Report (2026-06-12) — Findings dashboard decomposition
+
+### What changed
+
+The editor Findings (Violations) dashboard's HTML builder had grown to a single 2155-line file mixing
+the input data types, an ~800-line embedded webview client script, and every section builder (hero,
+KPI cards, toolbar, tables, charts, and the TODO/HACK, Drift, and suppressions panels). The file was
+modular only by internal function boundaries, not by module — a reader had to scroll the whole file to
+find any one section, and no section could be imported independently.
+
+`violationsDashboardHtml.ts` is now a 136-line composer. Its parts moved into focused sibling modules:
+
+- `violations-dashboard-shared.ts` — input/suppression types, `escapeHtml`, `SEVERITY_ORDER`,
+  `formatRelative`. Every section module depends on this one small module rather than on each other.
+- `violations-dashboard-script.ts` — the embedded client script, its l10n string map, and the default
+  severity/impact arrays it seeds panel state with.
+- `violations-dashboard-top.ts` — hero gauge, status line, KPI filter cards, toolbar, more-actions
+  menu, active-filter chips.
+- `violations-dashboard-tables.ts` — the Top Rules triage table and the grouped, sortable findings
+  table (rows, meta line, overflow note, empty state).
+- `violations-dashboard-panels.ts` — severity-mix chart, TODO/HACK block, Drift Advisor block,
+  suppressions / view-hides block.
+
+The composer re-exports `AnalyzerSuppressionsSlice` and `ViewSuppressionsSlice` so the two external
+importers (`violationsWideReportView.ts` and the dashboard test) reference them from the composer,
+unchanged.
+
+### Why
+
+The section builders are the reusable building blocks the planned single central dashboard composes
+(see CENTRAL_DASHBOARD_CONSOLIDATION.md): the consolidation folds the findings experience into one
+dashboard, and that dashboard imports `buildTopRulesTable`, `buildKpiCards`, the chart and panel
+builders, etc. directly. Splitting them out is a prerequisite that is valuable on its own regardless
+of whether the full consolidation ships.
+
+### Verification
+
+- Extraction was mechanical (line-range moves, no transcription), with imports computed per module
+  and fixed against the type-checker.
+- `npm run check-types` clean on the first pass after the section split.
+- `violationsDashboardHtml.test` (30 cases pinning the rendered markup) green — the rendered output is
+  byte-identical, so the refactor is behavior-preserving.
+
+### Scope note
+
+Behavior-preserving internal refactor; no user-facing change, no new or changed strings. The Findings
+dashboard is closed; the table above tracks the remaining oversized view files (kept linked-surface
+dashboards) for follow-up.
+
+Finish report appended: plans/TODO_oversized_file_breakdown.md
