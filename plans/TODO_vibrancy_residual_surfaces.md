@@ -23,12 +23,20 @@ These are the verified-unbuilt residuals + triage clusters.
 
 Action: research the scoring model first; do not build until the model is specified.
 
-## 5.2 Package network / dependency diagram **[OPEN — verified]**
+## 5.2 Package network / dependency diagram **[DONE — already shipped, audit grep miss]**
 
-No `networkDiagram` / dependency-graph surface in vibrancy.
+The audit reported "no dependency-graph surface" because it grepped for `networkDiagram`. The surface
+exists under a different name: `buildNetworkSection` (extension/src/vibrancy/views/report-html.ts)
+emits a `#dep-network` payload (nodes = direct packages, links = their transitives that are also
+scanned packages), rendered by the `renderNetwork` force/column layout in `report-script.ts` as a
+scrollable SVG inside the report's collapsible "network" panel. It carries its own prior bug-fix
+history (the "chetracters" overlapping-label fix), confirming it is a real, exercised feature — not a
+stub.
 
-Action: build a dependency-graph view (nodes = packages, edges = deps) once 5.x priorities are set.
-Self-contained webview; no blocker beyond prioritization.
+This satisfies §5.2's goal (nodes = packages, edges = deps). A second, standalone force-directed
+webview was started during triage and then removed: it would have duplicated existing, working
+functionality, which "search before creating" forbids. No build performed. See the Finish Report
+below.
 
 ## 5.3 package_vibrancy remediation — 14-item list **[DONE 2026-06-12 — already shipped]**
 
@@ -95,3 +103,36 @@ dropped. No behavior changed; no user-facing string changed.
 
 No feature work required — §5.3 is closed as already-shipped. §5.1 (flight-risk scoring,
 research-gated), §5.2 (dependency-graph view), and §5.4 (Usage collector) remain open in this plan.
+
+---
+
+## Finish Report — 5.2 (2026-06-12)
+
+### Package dependency diagram — verified already implemented
+
+A dependency diagram for the Package Vibrancy report was listed as unbuilt because the audit searched
+for the symbol `networkDiagram`. The feature ships under a different name: `buildNetworkSection`
+(extension/src/vibrancy/views/report-html.ts) derives nodes from the direct dependencies and links
+from each package's transitives that are also scanned packages, emitting a `#dep-network` payload
+that the `renderNetwork` routine in `report-script.ts` lays out as a scrollable SVG (direct packages
+in a left column, unique transitives in a right column, edges between). It lives in a collapsible
+"network" panel at the bottom of the report and carries documented prior bug fixes (an
+overlapping-label defect), so it is an exercised feature rather than a placeholder.
+
+Because that surface already answers "which packages depend on which," no new view was warranted. A
+standalone force-directed model/webview begun during triage (`dependency-graph-model.ts`) was removed
+before commit — shipping it would have duplicated working functionality, which the "search before
+creating" rule prohibits.
+
+#### Verification
+
+- The diagram path was traced end to end: `buildNetworkSection` → `#dep-network[data-network]` →
+  `renderNetwork` SVG output, plus its CSS (`.network-canvas`, `.network-wrap`) and l10n
+  (`packageDashboard.network.summary`).
+- No code shipped for §5.2; the started parallel model was deleted.
+
+#### Outcome
+
+§5.2 closed as already-shipped. Remaining open in this plan: §5.1 (flight-risk predictive scoring,
+research-gated — a scoring model must be defined before any code) and §5.4 (whether the cross-file
+Usage collector is name-based or element-resolved — a separate confirm-then-maybe-build item).
