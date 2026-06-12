@@ -78,3 +78,73 @@ Each of the 5 rolled-out rules was re-audited for residuals BEYOND helper delega
 Net: 1 flipped (platform_channel), 4 kept WARNING with the residual named at each rule's
 `severity:` field. `require_stream_subscription_cancel` (collection-ownership) and
 `require_image_disposal` (parent-owned) are not addressed by this capability and stay WARNING.
+
+## Finish Report (2026-06-12)
+
+### What changed and why
+
+Several leak/disposal lint rules detected the absence of a cleanup call by scanning a single
+method body. When teardown was moved out of `dispose()` into a helper — the routine extract-method
+refactor `dispose()` → `_teardown()` → `_socket.close()` — that scan saw no close and reported a
+leak that did not exist. The prior workaround treated any receiver-less private call inside
+`dispose()` as cleanup, which was wrong in both directions: it suppressed a genuine leak when the
+helper did NOT clean up, and was too imprecise to support ERROR severity.
+
+A reusable capability resolves this by following the call graph instead of guessing.
+`lib/src/interprocedural_cleanup_utils.dart` adds `reachableSameClassMethods(start, classNode)` —
+the start method plus every method transitively reachable from it by a same-class invocation
+(receiver-less or `this.`-prefixed). It is AST-only (callees resolved by name against the class's
+own declarations, which is sound because a class cannot declare two methods with one name), so it
+runs in the single-file analysis path; it is cycle-safe and bounded by the class's method count.
+`anyReachableBody(start, classNode, predicate)` runs a cleanup predicate over the start body and
+every reachable helper body.
+
+Five resource-cleanup rules now use it: `require_websocket_close` and
+`require_platform_channel_cleanup` (class-based, follow `dispose()` into helpers) and
+`require_file_close_in_finally`, `require_http_client_close`, `require_native_resource_cleanup`
+(per-method, follow the opener's same-class helpers). `require_native_resource_cleanup` follows only
+an explicit `free()` into helpers, not the structural `finally`/`Arena`/`using` patterns, which
+describe a method's own scope and would over-suppress if matched in an unrelated helper.
+
+The per-method rules resolve their enclosing class with
+`node.thisOrAncestorOfType<ClassDeclaration>()`. A `MethodDeclaration`'s direct parent is the
+`ClassBody` in analyzer 10+, not the `ClassDeclaration`, so a plain `node.parent is ClassDeclaration`
+check silently disabled the helper follow — surfaced by scan-CLI verification, which showed the
+rules firing on the helper-delegation case before the ancestor lookup was corrected.
+
+### ERROR re-evaluation outcome
+
+`require_platform_channel_cleanup` was promoted to ERROR: its substring setup trigger
+(`classSource.contains('setMethodCallHandler')`, which a string literal or comment could trip) was
+replaced with an AST visitor requiring a real `setMethodCallHandler`/`receiveBroadcastStream`
+invocation, and teardown is followed interprocedurally. An un-torn-down handler fires callbacks
+after dispose and crashes with setState on an unmounted widget. `require_websocket_close` gained a
+parent-owned-socket skip (`= widget.x`) but stays WARNING because `avoid_websocket_memory_leak`
+already covers the constructed-channel leak at ERROR and a second ERROR would double-report on the
+same code. The three per-method rules stay WARNING: a local handle passed to a function in another
+file (or wrapped in a returned object) escapes the same-class walk, which is acceptable for a
+warning but would be a build-breaking false positive at ERROR.
+
+### Verification
+
+`lib/src/interprocedural_cleanup_utils.dart` is covered by
+`test/interprocedural_cleanup_utils_test.dart` (8 cases): direct cleanup, called helper, transitive
+chain, `this.`-prefixed call, uncalled-helper-does-NOT-suppress (the false negative the old
+heuristic produced), field-receiver-not-followed, and mutually-recursive-helper termination. Each
+rule change was verified end-to-end with the scan CLI on fixtures pairing a helper-delegation case
+(must not fire) against a real-leak case (must fire); `require_platform_channel_cleanup` was
+additionally confirmed to fire at severity ERROR on a real handler, stay silent on a string-literal
+mention and on a cleaned class, and `require_websocket_close` to skip a `= widget.channel` field.
+`dart analyze --fatal-infos` is clean across the package; the affected rule, integrity
+(anti-pattern `.contains()` gate), and utility test suites pass.
+
+### Files
+
+- Added: `lib/src/interprocedural_cleanup_utils.dart`,
+  `test/interprocedural_cleanup_utils_test.dart`
+- Modified: `lib/src/rules/resources/resource_management_rules.dart` (5 rules + 1 severity flip),
+  `CHANGELOG.md`
+
+Finish report appended: plans/INTERPROCEDURAL_CLEANUP_TRACKING.md
+Plan archived: plans/INTERPROCEDURAL_CLEANUP_TRACKING.md → plans/history/2026.06/2026.06.12/INTERPROCEDURAL_CLEANUP_TRACKING.md
+No bug archive — task did not close a bugs/*.md file
