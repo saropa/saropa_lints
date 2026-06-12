@@ -48,7 +48,12 @@ class CommentPatterns {
     // Identifier immediately followed by code punctuation (no space).
     // Colon excluded: prose labels (OK:, BAD:, LINT:) cause too many false
     // positives. Dart loop labels (outerLoop:) are caught by keyword patterns.
-    r'^[a-zA-Z_$][a-zA-Z0-9_$]*[\.\(\[\{]|'
+    // The dot branch additionally requires a selector after it: `foo.bar` is
+    // member access, but `result.` (a word ending a wrapped prose sentence with
+    // a period) is NOT code — a trailing dot with nothing after it is never
+    // valid Dart. Parens/brackets/braces still match bare (`foo(`, `list[`,
+    // `obj{`).
+    r'^[a-zA-Z_$][a-zA-Z0-9_$]*(?:[\(\[\{]|\.[a-zA-Z_$])|'
     // Assignment pattern: identifier = something
     r'^[a-zA-Z_$][a-zA-Z0-9_$]*\s*=\s*\S|'
     // Control flow keywords followed by opening paren or block
@@ -112,6 +117,32 @@ class CommentPatterns {
     if (content == null || content.isEmpty) return false;
     if (_isLikelyProse(content)) return false;
     return codePattern.hasMatch(content);
+  }
+
+  /// Returns true if [content] reads as natural-language prose.
+  ///
+  /// Exposes the same heuristic [isLikelyCode] uses internally so callers can
+  /// judge a *block* of joined comment lines, not just one line. A single
+  /// wrapped line that names a real API method (`base64Url.decode reject the
+  /// token.`) is textually identical to member access and cannot be told apart
+  /// in isolation — the prose signal lives in the surrounding lines, so the
+  /// caller joins the contiguous comment run and asks this.
+  /// Returns false if [content] is null or empty.
+  static bool isLikelyProse(String? content) {
+    if (content == null || content.isEmpty) return false;
+    return _isLikelyProse(content);
+  }
+
+  /// Returns true if [content] contains syntax that is unambiguously code
+  /// (call with parens, arrow `=>`, braces, or a control-flow keyword + paren).
+  ///
+  /// Used as the carve-out when a prose block contains a line that is dead code
+  /// on its own: such a line stays flagged even inside a prose run, so genuine
+  /// commented-out code sitting under a prose comment is not hidden.
+  /// Returns false if [content] is null or empty.
+  static bool hasStrongCodeIndicators(String? content) {
+    if (content == null || content.isEmpty) return false;
+    return _hasStrongCodeIndicators(content);
   }
 
   /// Common English function words that appear in prose but rarely in code.

@@ -100,20 +100,20 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: prefer_returning_shorthands
-// Source: lib\src\rules\return_rules.dart
+// Test fixture for: prefer_arrow_functions
+// Source: lib\src\rules\stylistic\stylistic_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_returning_shorthands
-// expect_lint: prefer_returning_shorthands
+// BAD: Should trigger prefer_arrow_functions
 class _BadClass982 {
+  // expect_lint: prefer_arrow_functions
   String getValue() {
     return 'hello';
   } // Block body with single return
 }
 
-// GOOD: Should NOT trigger prefer_returning_shorthands
+// GOOD: Should NOT trigger prefer_arrow_functions
 class _GoodClass982 {
   String getValue() => 'hello'; // Arrow shorthand
 }

@@ -44,16 +44,6 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
-    test('PreferReturningShorthandsRule', () {
-      final rule = PreferReturningShorthandsRule();
-      expect(rule.code.lowerCaseName, 'prefer_returning_shorthands');
-      expect(
-        rule.code.problemMessage,
-        contains('[prefer_returning_shorthands]'),
-      );
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
-    });
     test('AvoidReturningNullForVoidRule', () {
       final rule = AvoidReturningNullForVoidRule();
       expect(rule.code.lowerCaseName, 'avoid_returning_null_for_void');
@@ -83,7 +73,6 @@ void main() {
       'avoid_returning_void',
       'avoid_unnecessary_return',
       'prefer_immediate_return',
-      'prefer_returning_shorthands',
       'avoid_returning_null_for_void',
       'avoid_returning_null_for_future',
     ];
@@ -129,12 +118,4 @@ void main() {
     });
   });
 
-  group('Return - Preference Rules', () {
-    group('prefer_returning_shorthands', () {
-      test('rule offers quick fix (convert to expression body)', () {
-        final rule = PreferReturningShorthandsRule();
-        expect(rule.fixGenerators, isNotEmpty);
-      });
-    });
-  });
 }

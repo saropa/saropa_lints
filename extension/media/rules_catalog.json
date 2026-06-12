@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2314,
+  "ruleCount": 2313,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -22736,21 +22736,6 @@
       }
     },
     "prefer_returning_conditionals": {
-      "ruleType": "codeSmell",
-      "ruleStatus": "ready",
-      "requiresReview": false,
-      "defaultReviewState": null,
-      "cweIds": [],
-      "certIds": [],
-      "tags": [
-        "reliability"
-      ],
-      "accuracyTarget": {
-        "expectZeroFalsePositives": true,
-        "description": "Code smell default target: zero false positives."
-      }
-    },
-    "prefer_returning_shorthands": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,

@@ -121,6 +121,38 @@ void goodExamples() {
   // Default timeout is 30s (configurable via settings); zero disables it.
   // Parse results (JSON or XML) are cached; expired entries are evicted hourly.
   // The overlay (semi-transparent) covers the viewport; tapping dismisses it.
+
+  // Single word ending a wrapped prose sentence with a period (should NOT
+  // trigger - a trailing dot with nothing after it is sentence punctuation,
+  // not member access)
+  // result.
+  // value.
+  // done.
+
+  // A wrapped prose block whose final physical line is one word + period
+  // (should NOT trigger on the last line)
+  // Dart ints are 64-bit, so the shift chain must reach 32: stopping at 16
+  // leaves inputs above 2^32 with an unfilled high half and a wrong
+  // result.
+
+  // A contiguous prose block whose middle/last line references an API as
+  // identifier.method (textually identical to member access, but the block is
+  // prose - should NOT trigger on any line)
+  // base64url omits padding, but base64Url.decode requires the length to be a
+  // multiple of four - restore the stripped padding before decoding so that
+  // base64Url.decode reject an otherwise-valid token.
+}
+
+// =============================================================================
+// BAD: Genuine dead code adjacent to a prose comment still triggers
+// =============================================================================
+
+void deadCodeUnderProse() {
+  // A real commented-out statement directly under a prose line must still fire:
+  // the strong-code carve-out (call + parens) keeps it flagged even though the
+  // block above it is prose.
+  // expect_lint: prefer_no_commented_out_code
+  // foo.bar();
 }
 
 // =============================================================================

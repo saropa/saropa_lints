@@ -654,7 +654,6 @@ saropa_lints:
     - avoid_returning_cascades: false
     - avoid_returning_this: false
     - avoid_returning_void: false
-    - prefer_returning_shorthands: false
     - avoid_unnecessary_return: false
     - prefer_immediate_return: false
 

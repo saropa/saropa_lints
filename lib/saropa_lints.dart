@@ -483,7 +483,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferPrefixedGlobalConstantsRule.new,
   PreferPrivateExtensionTypeFieldRule.new,
   AvoidRenamingRepresentationGettersRule.new,
-  PreferReturningShorthandsRule.new,
   RecordFieldsOrderingRule.new,
   PreferPatternDestructuringRule.new,
   MatchLibFolderStructureRule.new,

@@ -194,10 +194,6 @@ void main() {
     hasFix('AvoidUnnecessaryReturnRule', () => AvoidUnnecessaryReturnRule());
     hasFix('PreferImmediateReturnRule', () => PreferImmediateReturnRule());
     hasFix(
-      'PreferReturningShorthandsRule',
-      () => PreferReturningShorthandsRule(),
-    );
-    hasFix(
       'AvoidReturningNullForVoidRule',
       () => AvoidReturningNullForVoidRule(),
     );
@@ -294,6 +290,9 @@ void main() {
     hasFix('PreferConstDeclarationsRule', () => PreferConstDeclarationsRule());
 
     // Stylistic (stylistic_rules + stylistic_additional) (7)
+    // prefer_arrow_functions absorbed the convert-to-expression-body fix when
+    // the duplicate prefer_returning_shorthands rule was merged into it.
+    hasFix('PreferArrowFunctionsRule', () => PreferArrowFunctionsRule());
     hasFix('PreferSingleQuotesRule', () => PreferSingleQuotesRule());
     hasFix('PreferDoubleQuotesRule', () => PreferDoubleQuotesRule());
     hasFix(
