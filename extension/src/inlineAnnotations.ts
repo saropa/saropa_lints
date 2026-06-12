@@ -12,7 +12,8 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import { readViolations, Violation, ViolationsData } from './violationsReader';
+import { Violation, ViolationsData } from './violationsReader';
+import { readLiveViolations } from './liveViolationsData';
 import { getProjectRoot } from './projectRoot';
 
 // --- Decoration types (one per severity for VS Code perf) ---
@@ -47,19 +48,21 @@ const infoDecorationType = vscode.window.createTextEditorDecorationType({
 const MAX_MESSAGE_LENGTH = 80;
 
 // --- Violations cache ---
-// Avoids re-reading violations.json from disk on every editor switch.
-// Invalidated by `invalidateAnnotationCache()` (called from refreshAll).
+// Annotations now read live diagnostics (same source as the squiggles, status
+// bar, and Issues tree) so the end-of-line text cannot diverge from the Problems
+// panel. The cache still avoids rebuilding the model on every editor switch;
+// `invalidateAnnotationCache()` clears it on the debounced diagnostic-change tick.
 
 let cachedData: { root: string; data: ViolationsData | null } | null = null;
 
 function getCachedViolations(root: string): ViolationsData | null {
   if (cachedData?.root === root) return cachedData.data;
-  const data = readViolations(root);
+  const data = readLiveViolations(root);
   cachedData = { root, data };
   return data;
 }
 
-/** Invalidate the violations cache. Call when violations.json changes. */
+/** Invalidate the annotations cache. Call when live diagnostics change. */
 export function invalidateAnnotationCache(): void {
   cachedData = null;
 }

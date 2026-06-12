@@ -990,6 +990,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         diagnosticsRefreshTimer = undefined;
         updateAllStatusBars();
         issuesProvider.refresh();
+        // Code lenses and inline annotations also read live diagnostics now, so
+        // refresh them on the same debounced tick rather than only when
+        // violations.json is rewritten.
+        invalidateCodeLenses();
+        invalidateAnnotationCache();
+        updateAnnotationsForAllEditors();
         updateContext(
           getConfig().get<boolean>('enabled', true) ?? true,
           issuesProvider.hasViolations(),

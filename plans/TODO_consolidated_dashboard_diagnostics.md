@@ -28,29 +28,46 @@ now executes headlessly in CI ([consolidatedClient.test.ts](../extension/src/tes
 Action: human render verification (`/verify` or manual F5), then tune. Pure-code automation of
 event bubbling is not worth a jsdom dependency for one webview — leave as a launch-test item.
 
-## 2. Surfaces still on the batch `violations.json` path **[OPEN — verified]**
+## 2. Surfaces still on the batch `violations.json` path
 
-`liveViolationsData.ts` centralizes the "prefer live diagnostics" read. The status-bar score and
-Issues tree adopted it; these have not, and still show stale batch data between scans:
+`liveViolationsData.ts` centralizes the "prefer live diagnostics" read. Per-surface verdict after
+reading each consumer (2026-06-12) — the audit's flat list was optimistic; only the surfaces that
+consume just message/rule/severity/line/file are clean swaps. The live model is phase #1a (no
+per-rule metadata, timestamp always "now", never stale), so metadata- and freshness-coupled
+surfaces are NOT simple swaps.
 
-- [codeLensProvider.ts](../extension/src/codeLensProvider.ts)
-- [issuesViewCommands.ts](../extension/src/commands/issuesViewCommands.ts)
-- [configSuggestions.ts](../extension/src/config/configSuggestions.ts)
-- inline annotations
-- the triage dashboard
-- the rule-packs panel
+- [codeLensProvider.ts](../extension/src/codeLensProvider.ts) — **MIGRATED 2026-06-12.** Per-file
+  count now live; refreshed on the debounced `onDidChangeDiagnostics` tick. (The `(N critical)`
+  suffix was already dead under the batch source — `readViolations` normalizes `critical → error`
+  — so nothing was lost.)
+- inline annotations ([inlineAnnotations.ts](../extension/src/inlineAnnotations.ts)) —
+  **MIGRATED 2026-06-12.** End-of-line text now matches the squiggles exactly; cache invalidated on
+  the same debounced tick.
+- [issuesViewCommands.ts](../extension/src/commands/issuesViewCommands.ts) — **BLOCKED on phase #1b.**
+  Its two `readViolations` callers consume `byRuleType` / `byRuleStatus` / `ruleMetadataByRule`
+  (rule-metadata filters + security-hotspot review). The live model carries none of these; swapping
+  would empty the filters and break hotspot review. Migrate only after the bundled rule catalog
+  (phase #1b) lands.
+- [configSuggestions.ts](../extension/src/config/configSuggestions.ts) — **NOT APPLICABLE.** Reads
+  pubspec + analysis_options, never `violations.json`. Audit listed it imprecisely.
+- triage dashboard ([triageDashboardHtml.ts](../extension/src/views/triageDashboardHtml.ts)) —
+  **NOT A TARGET (by design).** Its job is to report the batch export's *freshness*
+  (stale / missing / no-per-rule / run-analysis). Live diagnostics are never stale, so migrating
+  would delete the surface's reason to exist.
+- rule-packs panel ([rulePacksWebviewProvider.ts](../extension/src/rulePacks/rulePacksWebviewProvider.ts)) —
+  **NOT A CLEAN SWAP.** Uses the export *timestamp* ("analysis last run at…") and a disabled-rule
+  suppressions snapshot. Live's timestamp is always "now", which would mislabel the run age.
 
-Action: migrate each to the `liveViolationsData` helper incrementally, with a debounced
-`onDidChangeDiagnostics` listener (same pattern as the status-bar/Issues-tree migration). One
-surface per commit; verify the displayed count tracks the editor's live diagnostics.
+**Remaining actionable work here:** only issuesViewCommands, and only once phase #1b adds the
+bundled rule catalog to the live model. The other four are intentionally batch-bound or N/A.
 
-## 3. Supplementary analyzer-lints dashboard pill **[OPEN — needs per-item confirm]**
+## 3. Supplementary analyzer-lints dashboard pill **[CLOSED — obsolete 2026-06-12]**
 
-Source: `DASHBOARD_SUPPLEMENTARY_COUNTS.md` (2026-05-13). The TODO/HACK workspace-scan half
-shipped ([todosAndHacksTree.ts](../extension/src/views/todosAndHacksTree.ts)). The
-`showAnalyzerLints` dashboard pills (surface non-Saropa analyzer findings + analyzer TODOs
-alongside the Saropa count) were **not found in code** during the audit.
+Source: `DASHBOARD_SUPPLEMENTARY_COUNTS.md` (2026-05-13). The pills were **not absent-and-pending —
+they were deliberately removed**. The 13.13.0 CHANGELOG "Removed (Extension)" entry records that
+the "show other analyzer findings" and "show analyzer TODOs" toggles (settings + commands) were
+deleted once the Findings Dashboard became holistic: those diagnostics now appear directly in the
+main findings list, so the separate opt-in pills were redundant. The TODO/HACK workspace scan
+([todosAndHacksTree.ts](../extension/src/views/todosAndHacksTree.ts)) remains as its own tree.
 
-Action: confirm the analyzer-lints pill + toggle is absent (grep `showAnalyzerLints`), then build
-it if missing — a pill reading the same live-diagnostics source, filtered to non-`saropa_lints`
-diagnostic sources, gated by a `showAnalyzerLints` setting.
+No work — building the pill would re-introduce the redundancy 13.13.0 removed.
