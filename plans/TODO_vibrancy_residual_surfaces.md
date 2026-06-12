@@ -65,3 +65,33 @@ name-based.
 
 Action: read the current Usage collector — if name-based, the element-resolution upgrade is the
 work; if already element-resolved, mark done.
+
+---
+
+## Finish Report — 5.3 (2026-06-12)
+
+### Package Vibrancy 14-item remediation — verified already implemented
+
+The April 2026 remediation plan listed 14 fixes for the Package Vibrancy report (footprint-toggle
+correctness, UTC age accuracy, sortable/deep-linked columns, filters, grade tooltip, and emoji
+cleanup). A per-item code triage against the current report views found that the vibrancy UI shipped
+all of the functional items in the interim — each backed by concrete code (the footprint mode
+buttons and `updateTotalSizeSummary`, the `Copy`/`Save` export actions and `_saveReportJson`, the
+`.size-link` / `.dep-nav-link` / `.file-link` handlers, the age slider and dev-deps toggle, the
+grade tooltip, the category/deps comparators, and the UTC day-boundary age computation).
+
+The only residue was the dependency-count cell (item 13): the rendered output already contained no
+tree emoji, but a code comment still described showing "a tree icon." The comment was corrected to
+state what the code actually renders (a plain count plus a shared-deps badge) and why the emoji was
+dropped. No behavior changed; no user-facing string changed.
+
+#### Verification
+
+- Triage covered all 14 items with file:line evidence across `report-html.ts`, `report-script.ts`,
+  `report-styles.ts`, and `report-webview.ts`.
+- `npm run check-types` clean.
+
+#### Outcome
+
+No feature work required — §5.3 is closed as already-shipped. §5.1 (flight-risk scoring,
+research-gated), §5.2 (dependency-graph view), and §5.4 (Usage collector) remain open in this plan.
