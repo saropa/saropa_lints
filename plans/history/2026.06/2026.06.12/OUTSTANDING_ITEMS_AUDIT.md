@@ -128,3 +128,21 @@ These were prominent "outstanding" entries in older reports; current code shows 
 6. Genuine deferral choices (no code blocker): **§3** project-health deferrals (isolate pool / adaptive defaults / SQLite) and **§4.1–4.2** `accuracyTarget` / `certIds` population — build only if a consumer justifies it.
 
 > **No item remains blocked on a maintainer decision.** The single decision gate the reports pointed to (the `<` gate archetype) is ratified in code.
+
+---
+
+## Closed 2026-06-12 — split into per-subsystem TODO plans
+
+This sweep's job (surface buried work so it doesn't vanish at session close) is done: the §1–§2
+top-priority cluster shipped, and every remaining OPEN / triage / deferral item now lives in a
+focused, separately-tracked plan. This file is archived to `history/2026.06/2026.06.12/`.
+
+| Audit section | Lands in |
+|---|---|
+| §1.1 visual render, §1.2 remaining live-diagnostics surfaces, §6 analyzer-lints pill | `TODO_consolidated_dashboard_diagnostics.md` |
+| §3.1 Phase-4 render verify, §3.4 SQLite deferral | `TODO_project_health_phase4.md` |
+| §3.2 isolate pool, §3.3 adaptive defaults | already in `deferred/PROJECT_HEALTH_isolate_worker_pool.md`, `deferred/PROJECT_HEALTH_adaptive_huge_workspace.md` |
+| §4.1 accuracyTarget, §4.2 certIds, §4.3 lifecycle | `TODO_rule_metadata_completeness.md` |
+| §5.1–§5.4 vibrancy residuals | `TODO_vibrancy_residual_surfaces.md` |
+| §1.4 i18n MT cadence | POLICY — standing deferral, no plan needed |
+| §1.1–1.3, §2.1–2.2, §7 | SHIPPED — recorded in `history/2026.06/2026.06.12/` finish records |
