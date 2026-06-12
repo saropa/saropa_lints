@@ -67,9 +67,9 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
         'leaks file descriptor, exhausting system limits. {v4}',
     correctionMessage:
         'Use try-finally or convenience methods like readAsString().',
-    // SEV-01 (kept WARNING): a close performed in a sibling/helper method is
-    // invisible to this single-body scan (extract-method pattern), so an ERROR
-    // would break correct code — not ERROR-safe without cross-method analysis.
+    // SEV-01: a close in a same-class helper the method delegates to is now
+    // recognized via interprocedural cleanup tracking (extract-method pattern).
+    // Kept WARNING pending the gated ERROR re-evaluation.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -100,6 +100,15 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
     r'\b(?:readAsString|readAsBytes|writeAsString|writeAsBytes)\s*\(',
   );
 
+  /// Whether [body] closes a file handle or uses a self-closing convenience
+  /// reader/writer. Used with [anyReachableBody] so a close extracted into a
+  /// same-class helper the opener delegates to is recognized.
+  static bool _closesFile(FunctionBody body) {
+    final String src = body.toSource();
+    return _closeCallPattern.hasMatch(src) ||
+        _readWriteConveniencePattern.hasMatch(src);
+  }
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -120,17 +129,21 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
       // body-scoped scan cannot inspect. Skip to avoid a build-breaking FP.
       if (_fieldAssignedOpenPattern.hasMatch(bodySource)) return;
 
-      final bool hasClose = _closeCallPattern.hasMatch(bodySource);
-
-      // Only flag the unambiguous leak shape: a handle is opened and the body
-      // contains NO `.close(` anywhere AND no convenience reader. The former
+      // Only flag the unambiguous leak shape: a handle is opened and neither the
+      // method nor any same-class helper it delegates to closes it (or uses a
+      // convenience reader). Following helpers interprocedurally recognizes a
+      // close extracted into `_writeAndClose(sink)`. The former
       // `!hasFinally && hasClose` branch fired whenever a sink was closed
-      // outside a `finally` (e.g. `.whenComplete(() => sink.close())`,
-      // `await using(...)`, or a trailing close on the happy path) — all
-      // legitimately-cleaned shapes the rule misread as leaks. Dropping that
-      // branch trades a narrow extra catch for the elimination of a large FP
-      // class, which is the correct trade for an error-severity build gate.
-      if (!hasClose && !_readWriteConveniencePattern.hasMatch(bodySource)) {
+      // outside a `finally` — legitimately-cleaned shapes the rule misread as
+      // leaks — so it was dropped.
+      // MethodDeclaration's direct parent is the ClassBody, so resolve the
+      // ClassDeclaration ancestor to follow same-class helpers.
+      final ClassDeclaration? cls = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      final bool closed = cls != null
+          ? anyReachableBody(node, cls, _closesFile)
+          : _closesFile(body);
+      if (!closed) {
         reporter.atNode(node);
       }
     });
@@ -382,8 +395,10 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
     '[require_http_client_close] Unclosed HttpClient leaks socket '
         'connections and memory, eventually exhausting system resources. {v5}',
     correctionMessage: 'Call client.close() in finally block.',
-    // SEV-01 (kept WARNING): a client passed to a helper or wrapped by DI that
-    // owns close() is invisible to the single-body scan — not ERROR-safe.
+    // SEV-01: a client closed in a same-class helper the method delegates to is
+    // now recognized via interprocedural cleanup tracking. Kept WARNING pending
+    // the gated ERROR re-evaluation; a client handed to a DI wrapper in another
+    // class is still under-detected (a false negative, not a build risk).
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -423,7 +438,17 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
       // the lifetime, so absence of a local close is not a leak.
       if (_returnsHttpClient(node, bodySource)) return;
 
-      if (!_httpClosePatterns.any((re) => re.hasMatch(bodySource))) {
+      // Interprocedural cleanup: if the method belongs to a class, follow its
+      // same-class helper calls so a client closed in a helper it delegates to
+      // (`_send(client)` → `client.close()`) is recognized, not flagged. A
+      // MethodDeclaration's direct parent is the ClassBody, so resolve the
+      // ClassDeclaration ancestor rather than reading node.parent.
+      final ClassDeclaration? cls = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      final bool closed = cls != null
+          ? anyReachableBody(node, cls, _closesHttpClient)
+          : _closesHttpClient(body);
+      if (!closed) {
         reporter.atNode(node);
       }
     });
@@ -445,6 +470,13 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
       }
     }
     return RegExp(r'return\s+HttpClient\s*\(\s*\)').hasMatch(bodySource);
+  }
+
+  /// Whether [body] closes an HttpClient. Used with [anyReachableBody] so a
+  /// close performed in a same-class helper the method delegates to is found.
+  static bool _closesHttpClient(FunctionBody body) {
+    final String src = body.toSource();
+    return _httpClosePatterns.any((RegExp re) => re.hasMatch(src));
   }
 }
 
@@ -496,9 +528,9 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
     '[require_native_resource_cleanup] Unfreed native memory leaks '
         'outside Dart GC, causing permanent memory loss until app restart. {v3}',
     correctionMessage: 'Call free() in finally block for native allocations.',
-    // SEV-01 (kept WARNING): the arena/borrowed-pointer FPs are fixed, but a
-    // malloc whose free() lives in a helper still mis-fires — not ERROR-safe
-    // without cross-method analysis.
+    // SEV-01: a free() in a same-class helper the method delegates to is now
+    // recognized via interprocedural cleanup tracking (arena/borrowed-pointer
+    // FPs were already fixed). Kept WARNING pending the gated ERROR re-evaluation.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -529,6 +561,14 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
   static final RegExp _returnsPointerPattern = RegExp(
     r'return\s+\w*(?:calloc|malloc|allocate)\b',
   );
+  static final RegExp _explicitFreePattern = RegExp(r'\bfree\s*\(');
+
+  /// Whether [body] explicitly calls `free(...)`. Used with [anyReachableBody]
+  /// to follow a free extracted into a same-class helper, WITHOUT following the
+  /// structural finally/Arena/using patterns (those describe a method's own
+  /// scope, so matching them in an unrelated helper would over-suppress).
+  static bool _freesNativeExplicit(FunctionBody body) =>
+      _explicitFreePattern.hasMatch(body.toSource());
 
   @override
   void runWithReporter(
@@ -550,7 +590,22 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
         return;
       }
 
-      if (!_nativeCleanupPatterns.any((re) => re.hasMatch(bodySource))) {
+      if (_nativeCleanupPatterns.any((re) => re.hasMatch(bodySource))) {
+        return; // freed locally, or an Arena/using/finally scope frees it
+      }
+
+      // Interprocedural: follow same-class helpers for an explicit free() — the
+      // extract-method case (`_release(ptr)` → `free(ptr)`). Only the explicit
+      // free pattern is followed (not finally/Arena/using, which describe the
+      // local method's own structure), to avoid over-suppressing on an unrelated
+      // helper that merely contains a try/finally.
+      // MethodDeclaration's direct parent is the ClassBody, so resolve the
+      // ClassDeclaration ancestor to follow same-class helpers.
+      final ClassDeclaration? cls = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      final bool freedInHelper =
+          cls != null && anyReachableBody(node, cls, _freesNativeExplicit);
+      if (!freedInHelper) {
         reporter.atNode(node);
       }
     });
@@ -745,9 +800,9 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
     '[require_platform_channel_cleanup] Active platform channel handler '
         'receives callbacks after dispose, causing setState on unmounted widget. {v5}',
     correctionMessage: 'Set handler to null in dispose method.',
-    // SEV-01 (kept WARNING): the re-flag logic bug is fixed, but cleanup
-    // delegated to a helper is still matched only heuristically — not yet
-    // deterministic enough for ERROR.
+    // SEV-01: helper-delegated teardown is now resolved by interprocedural
+    // cleanup tracking (dispose() is followed into same-class helpers). Kept
+    // WARNING pending the gated ERROR re-evaluation.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -757,12 +812,20 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
   static final RegExp _handlerNullifyPattern = RegExp(
     r'setMethodCallHandler\s*\(\s*null\s*\)',
   );
-  // A receiver-less private call statement inside dispose, e.g. `_teardown();`.
-  // Cleanup is frequently extracted into a helper the body-scoped scan cannot
-  // follow; assuming such a call forwards teardown avoids build-breaking FPs.
-  static final RegExp _disposeHelperCallPattern = RegExp(
-    r'(?:^|\{|;)\s*_\w+\s*\(',
+  // Channel teardown other than nulling the handler: removeMethodCallHandler,
+  // or cancelling a broadcast-stream subscription.
+  static final RegExp _channelTeardownPattern = RegExp(
+    r'removeMethodCallHandler|\.cancel(?:Safe)?\s*\(',
   );
+
+  /// Whether [body] tears down the platform channel. Used with
+  /// [anyReachableBody] so teardown extracted into a same-class helper called
+  /// from dispose() is recognized instead of guessed.
+  static bool _tearsDownChannel(FunctionBody body) {
+    final String src = body.toSource();
+    return _handlerNullifyPattern.hasMatch(src) ||
+        _channelTeardownPattern.hasMatch(src);
+  }
 
   @override
   void runWithReporter(
@@ -785,33 +848,25 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
         return;
       }
 
-      // Check for cleanup in dispose. Any recognized teardown shape early-
-      // returns clean; falling through to the bottom means none was found.
+      // Find dispose and follow it into same-class helpers (interprocedural):
+      // teardown extracted into `_unbind()` is recognized as real cleanup,
+      // replacing the prior "any private call in dispose counts" heuristic that
+      // both mis-suppressed genuine leaks and was too imprecise for ERROR. No
+      // dispose() at all means the handler is never torn down.
+      MethodDeclaration? disposeMethod;
       for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          final String disposeSource = member.body.toSource();
-          // Recognized cleanup shapes (whitespace-tolerant), plus a bare
-          // private helper call that forwards teardown. The former exact-string
-          // `setMethodCallHandler(null)` missed `setMethodCallHandler( null )`
-          // and `removeMethodCallHandler`, and the old trailing
-          // `classSource.contains('setMethodCallHandler')` guard re-flagged
-          // every class that DID clean up via a helper — both build-breaking
-          // FPs that this consolidated check removes.
-          if (_handlerNullifyPattern.hasMatch(disposeSource) ||
-              disposeSource.contains('removeMethodCallHandler') ||
-              disposeSource.contains('.cancel(') ||
-              disposeSource.contains('.cancelSafe(') ||
-              _disposeHelperCallPattern.hasMatch(disposeSource)) {
-            return; // Good - cleanup found
-          }
+          disposeMethod = member;
+          break;
         }
       }
 
-      // Every cleaned case already hit the early `return` inside the loop, so
-      // reaching here means setup is present and no recognized teardown exists
-      // (the class either lacks a dispose or has one that never tears the
-      // handler down). Both are genuine leaks.
-      reporter.atNode(node);
+      final bool cleaned =
+          disposeMethod != null &&
+          anyReachableBody(disposeMethod, node, _tearsDownChannel);
+      if (!cleaned) {
+        reporter.atNode(node);
+      }
     });
   }
 }
