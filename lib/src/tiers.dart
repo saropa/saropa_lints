@@ -2982,6 +2982,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'local_auth_use_error_dialogs_removed',
   'local_auth_sticky_auth_renamed',
   'local_auth_platform_exception_catch',
+  // app_links v6 migration (app_links_rules.dart) — relocated to app_links_6
+  'app_links_use_get_initial_link',
+  'app_links_use_get_latest_link',
+  'app_links_use_uri_link_stream',
   // Google Maps Flutter (google_maps_flutter_rules.dart)
   'google_maps_unknown_map_id_error_unchecked',
   // audioplayers (audioplayers_rules.dart)
@@ -4133,6 +4137,10 @@ const Set<String> appLinksPackageRules = <String>{
   'app_links_listen_in_build',
   'app_links_uncaught_stream_error',
   'app_links_avoid_get_initial_link_string',
+  // v6 pre-upgrade migration — relocated to pack app_links_6 (gate < 6.0.0).
+  'app_links_use_get_initial_link',
+  'app_links_use_get_latest_link',
+  'app_links_use_uri_link_stream',
 };
 
 /// Rules specific to the receive_sharing_intent package.

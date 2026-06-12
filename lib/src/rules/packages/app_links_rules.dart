@@ -31,6 +31,23 @@ const Map<String, String> _stringLinkToUriMethod = <String, String>{
   'getLatestLinkString': 'getLatestLink',
 };
 
+/// app_links v5 stream getters removed in 6.0.0, each mapped to its v6
+/// replacement. A reference to one of these will not compile after the v6 bump.
+const Map<String, String> _removedV5StreamToV6 = <String, String>{
+  'allUriLinkStream': 'uriLinkStream',
+  'allStringLinkStream': 'stringLinkStream',
+};
+
+/// Every app_links v5 symbol removed in 6.0.0 → its v6 replacement, used by the
+/// shared rename quick fix. The fix only consults the identifier the rule
+/// reported at, so one map covers all three pre-upgrade rules.
+const Map<String, String> _v5ToV6Rename = <String, String>{
+  'getInitialAppLink': 'getInitialLink',
+  'getLatestAppLink': 'getLatestLink',
+  'allUriLinkStream': 'uriLinkStream',
+  'allStringLinkStream': 'stringLinkStream',
+};
+
 /// The getter name of a `<AppLinks>.uriLinkStream` / `.stringLinkStream`
 /// receiver, or null when [receiver] is not one of those property reads.
 ///
@@ -315,6 +332,253 @@ class _SwapToUriMethodFix extends ReplaceNodeFix {
   String computeReplacement(AstNode node) {
     if (node is SimpleIdentifier) {
       final String? replacement = _stringLinkToUriMethod[node.name];
+      if (replacement != null) return replacement;
+    }
+    return node.toSource();
+  }
+}
+
+// =============================================================================
+// app_links_use_get_initial_link  (pre-upgrade migration, pack app_links_6)
+// =============================================================================
+
+/// Flags `getInitialAppLink()` — removed in app_links 6.0.0.
+///
+/// Since: v13.13.0 | Rule version: v1
+///
+/// Gated to `app_links < 6.0.0` (pre-upgrade readiness): the symbol still exists
+/// on 5.x, so this is a WARNING nudge, not a compile error — but the call will
+/// not compile after the v6 bump. The v6 replacement is `getInitialLink()`,
+/// which returns the same `Future<Uri?>`; the fix is a pure method rename.
+///
+/// **BAD:**
+/// ```dart
+/// final uri = await appLinks.getInitialAppLink();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final uri = await appLinks.getInitialLink();
+/// ```
+class AppLinksUseGetInitialLinkRule extends SaropaLintRule {
+  AppLinksUseGetInitialLinkRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'getInitialAppLink'};
+
+  static const LintCode _code = LintCode(
+    'app_links_use_get_initial_link',
+    '[app_links_use_get_initial_link] getInitialAppLink() was removed in app_links 6.0.0; code calling it compiles on 5.x but will not compile after the v6 upgrade. The v6 replacement is getInitialLink(), which returns the same Future<Uri?> deep link — a direct method rename with no behavior change. Gate: app_links < 6.0.0 (pre-upgrade readiness). {v1}',
+    correctionMessage:
+        'Rename getInitialAppLink() to getInitialLink() (same Future<Uri?> result).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _AppLinksV6RenameFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'getInitialAppLink') return;
+      if (!fileImportsPackage(node, PackageImports.appLinks)) return;
+
+      reporter.atNode(node.methodName);
+    });
+  }
+}
+
+// =============================================================================
+// app_links_use_get_latest_link  (pre-upgrade migration, pack app_links_6)
+// =============================================================================
+
+/// Flags `getLatestAppLink()` — removed in app_links 6.0.0.
+///
+/// Since: v13.13.0 | Rule version: v1
+///
+/// Gated to `app_links < 6.0.0` (pre-upgrade readiness): the symbol still exists
+/// on 5.x, so this is a WARNING nudge — but the call will not compile after the
+/// v6 bump. The v6 replacement is `getLatestLink()`, which returns the same
+/// `Future<Uri?>`; the fix is a pure method rename.
+///
+/// **BAD:**
+/// ```dart
+/// final uri = await appLinks.getLatestAppLink();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final uri = await appLinks.getLatestLink();
+/// ```
+class AppLinksUseGetLatestLinkRule extends SaropaLintRule {
+  AppLinksUseGetLatestLinkRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{'getLatestAppLink'};
+
+  static const LintCode _code = LintCode(
+    'app_links_use_get_latest_link',
+    '[app_links_use_get_latest_link] getLatestAppLink() was removed in app_links 6.0.0; code calling it compiles on 5.x but will not compile after the v6 upgrade. The v6 replacement is getLatestLink(), which returns the same Future<Uri?> deep link — a direct method rename with no behavior change. Gate: app_links < 6.0.0 (pre-upgrade readiness). {v1}',
+    correctionMessage:
+        'Rename getLatestAppLink() to getLatestLink() (same Future<Uri?> result).',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _AppLinksV6RenameFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'getLatestAppLink') return;
+      if (!fileImportsPackage(node, PackageImports.appLinks)) return;
+
+      reporter.atNode(node.methodName);
+    });
+  }
+}
+
+// =============================================================================
+// app_links_use_uri_link_stream  (pre-upgrade migration, pack app_links_6)
+// =============================================================================
+
+/// Flags `allUriLinkStream` / `allStringLinkStream` — removed in app_links 6.0.0.
+///
+/// Since: v13.13.0 | Rule version: v1
+///
+/// Gated to `app_links < 6.0.0` (pre-upgrade readiness): the getters still exist
+/// on 5.x, so this is a WARNING nudge — but a reference will not compile after
+/// the v6 bump. The v6 replacements are `uriLinkStream` / `stringLinkStream`,
+/// which emit the same broadcast deep-link events; the fix is a pure rename.
+///
+/// Matched as both a `PrefixedIdentifier` (`appLinks.allUriLinkStream`) and a
+/// `PropertyAccess` (`AppLinks().allUriLinkStream`); the import gate keeps the
+/// distinctive getter names from colliding with unrelated code.
+///
+/// **BAD:**
+/// ```dart
+/// appLinks.allUriLinkStream.listen(_handle);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// appLinks.uriLinkStream.listen(_handle);
+/// ```
+class AppLinksUseUriLinkStreamRule extends SaropaLintRule {
+  AppLinksUseUriLinkStreamRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    'allUriLinkStream',
+    'allStringLinkStream',
+  };
+
+  static const LintCode _code = LintCode(
+    'app_links_use_uri_link_stream',
+    '[app_links_use_uri_link_stream] The app_links link-stream getters allUriLinkStream / allStringLinkStream were removed in 6.0.0; references compile on 5.x but will not compile after the v6 upgrade. The v6 replacements are uriLinkStream / stringLinkStream, which emit the same broadcast Uri / String deep-link events — a direct getter rename with no behavior change. Gate: app_links < 6.0.0 (pre-upgrade readiness). {v1}',
+    correctionMessage:
+        'Rename allUriLinkStream to uriLinkStream and allStringLinkStream to stringLinkStream.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        _AppLinksV6RenameFix(context: context),
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // `appLinks.allUriLinkStream` — prefixed-identifier property read.
+    context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      if (!_removedV5StreamToV6.containsKey(node.identifier.name)) return;
+      if (!fileImportsPackage(node, PackageImports.appLinks)) return;
+
+      reporter.atNode(node.identifier);
+    });
+
+    // `AppLinks().allUriLinkStream` — property access on a non-identifier target.
+    context.addPropertyAccess((PropertyAccess node) {
+      if (!_removedV5StreamToV6.containsKey(node.propertyName.name)) return;
+      if (!fileImportsPackage(node, PackageImports.appLinks)) return;
+
+      reporter.atNode(node.propertyName);
+    });
+  }
+}
+
+/// Quick fix shared by the three app_links v6 pre-upgrade rules: rename the
+/// reported v5 identifier to its v6 replacement.
+///
+/// The call/access shape is identical across the rename (same result type, same
+/// arguments), so a name-only replacement of the reported identifier is safe.
+/// The fix consults [_v5ToV6Rename] by the identifier's own name, so the single
+/// class serves the method-call rules and the stream-getter rule alike.
+class _AppLinksV6RenameFix extends ReplaceNodeFix {
+  _AppLinksV6RenameFix({required super.context});
+
+  @override
+  FixKind get fixKind => FixKind(
+    'saropa.fix.appLinksV6Rename',
+    80,
+    'Migrate to the app_links v6 API',
+  );
+
+  @override
+  String computeReplacement(AstNode node) {
+    if (node is SimpleIdentifier) {
+      final String? replacement = _v5ToV6Rename[node.name];
       if (replacement != null) return replacement;
     }
     return node.toSource();

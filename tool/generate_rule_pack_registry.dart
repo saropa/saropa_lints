@@ -84,6 +84,7 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
   // (line ~"kPubspecMarkersByPack[pack] ?? {}"). The generator contract requires
   // one non-empty marker per extracted pack id; each maps 1:1 to its dep name.
   'app_links': {'app_links'},
+  'app_links_6': {'app_links'},
   'audioplayers': {'audioplayers'},
   'cached_network_image': {'cached_network_image'},
   'device_calendar': {'device_calendar'},
@@ -177,6 +178,7 @@ const Map<String, String> kPackUiLabels = {
   'webview_flutter': 'webview_flutter (pre-upgrade)',
   'local_auth': 'Local Auth',
   'local_auth_3': 'local_auth 3.x (pre-upgrade)',
+  'app_links_6': 'app_links 6.x (pre-upgrade)',
 };
 
 String _uiLabelForPackId(String pack) {

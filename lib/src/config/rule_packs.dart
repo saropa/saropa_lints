@@ -168,6 +168,13 @@ const Map<String, RulePackDependencyGate> kRulePackDependencyGates = {
     dependency: 'local_auth',
     constraint: '<3.0.0',
   ),
+  // app_links 6.0.0 removed getInitialAppLink / getLatestAppLink and the
+  // allUriLinkStream / allStringLinkStream getters. Flag 5.x code that breaks
+  // on the 6.0 bump.
+  'app_links_6': RulePackDependencyGate(
+    dependency: 'app_links',
+    constraint: '<6.0.0',
+  ),
 };
 
 /// Packs that require pubspec `environment` SDK constraints (Phase 6).

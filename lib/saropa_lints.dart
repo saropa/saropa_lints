@@ -2601,6 +2601,10 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AppLinksListenInBuildRule.new,
   AppLinksUncaughtStreamErrorRule.new,
   AppLinksAvoidGetInitialLinkStringRule.new,
+  // app_links v6 pre-upgrade migration (pack app_links_6, gate < 6.0.0)
+  AppLinksUseGetInitialLinkRule.new,
+  AppLinksUseGetLatestLinkRule.new,
+  AppLinksUseUriLinkStreamRule.new,
 
   // Geocoding rules (geocoding_rules.dart)
   GeocodingUncheckedFirstRule.new,

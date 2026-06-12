@@ -53,8 +53,8 @@ Source keys are in `en.json`; translation runs on the i18n cadence (NLLB not run
 ### 2.1 `<` gate archetype — RATIFIED, packs shipped **[SHIPPED]**
 The pre-upgrade `<version` gate archetype was ratified and the gated packs shipped — verified in [lib/src/config/rule_packs.dart](../lib/src/config/rule_packs.dart) `kRulePackDependencyGates`: `local_auth_3` (`<3.0.0`), `google_sign_in_7` (`<7.0.0`), `connectivity_plus_6` (`<6.0.0`), `webview_flutter` (`<4.0.0`), `file_picker_10` / `file_picker_12`. The report headers that still read "blocked on `<` gate decision" are stale; their own finish reports record the ratification. **No decision outstanding.**
 
-### 2.2 app_links migration pack — unbuilt (no longer blocked) **[OPEN — verified]**
-Source: [plan_app_links.md](history/2026.06/2026.06.11/plan_app_links.md). The 3 always-on correctness rules shipped (`avoid_get_initial_link_string`, `listen_in_build`, `uncaught_stream_error`), but the 3 pre-upgrade migration rules (`get_initial_link` / `uri_link_stream` / `get_latest_link`, pack `app_links_6`) are **not present** in `tiers.dart` / `rule_packs.dart`. The gate archetype they waited on now exists, so this is unblocked — it just needs building like any other `<`-gated pack.
+### 2.2 app_links migration pack **[SHIPPED 2026-06-12]**
+The 3 pre-upgrade migration rules now ship in the gated `app_links_6` pack (gate `app_links < 6.0.0`): `app_links_use_get_initial_link`, `app_links_use_get_latest_link`, `app_links_use_uri_link_stream`, each with a rename quick fix and relocated out of the base `app_links` pack. See [history record](history/2026.06/2026.06.12/app-links-v6-migration-pack.md). Pack audit `OK (3)`, `dart analyze` clean, full suite (6027) green.
 
 ---
 

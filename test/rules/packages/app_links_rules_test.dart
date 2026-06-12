@@ -4,7 +4,14 @@ import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/app_links_rules.dart';
 
-/// Tests for 3 app_links lint rules.
+/// Tests for app_links lint rules:
+///   - 3 always-on best-practice / safety rules
+///   - 3 version-gated migration rules (pack: app_links_6, gate: < 6.0.0)
+///
+/// Migration rules carry no fixture (matching the local_auth_3 exemplar): their
+/// BAD example references symbols removed in v6, which do not resolve on a v6
+/// project and would not fire under the pack gate. Fixtures cover the always-on
+/// rules only.
 ///
 /// Test fixtures: example_packages/lib/app_links/*
 void main() {
@@ -33,6 +40,23 @@ void main() {
       'AppLinksAvoidGetInitialLinkStringRule',
       'app_links_avoid_get_initial_link_string',
       () => AppLinksAvoidGetInitialLinkStringRule(),
+    );
+
+    // Migration rules (app_links_6 pack, gate: app_links < 6.0.0).
+    testRule(
+      'AppLinksUseGetInitialLinkRule',
+      'app_links_use_get_initial_link',
+      () => AppLinksUseGetInitialLinkRule(),
+    );
+    testRule(
+      'AppLinksUseGetLatestLinkRule',
+      'app_links_use_get_latest_link',
+      () => AppLinksUseGetLatestLinkRule(),
+    );
+    testRule(
+      'AppLinksUseUriLinkStreamRule',
+      'app_links_use_uri_link_stream',
+      () => AppLinksUseUriLinkStreamRule(),
     );
   });
 
