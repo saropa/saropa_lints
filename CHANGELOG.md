@@ -131,6 +131,7 @@ Adds crash, performance, and contract rules for seventeen more packages, each ac
 - The extension i18n audit and NLLB-fallback reports now write to datetime-stamped, day-bucketed paths (`extension/reports/<YYYYMMDD>/<YYYYMMDD_HHMMSS>_i18n_translation_audit.md`) instead of a single fixed file, so successive audit runs no longer overwrite each other and each run stays a durable record. Build tooling only (excluded from the `.vsix`); no behavior change for users.
 - Rewrote the archived finish reports under `plans/` into third-person engineering-record voice, removing AI-session narration (chat-quoting `Trigger` openers, "reviewed by another AI" lines, first-person/session deixis) from 58 internal documents while preserving every technical fact. Documentation housekeeping only; not shipped to pub.dev.
 - Added headless execution coverage for the consolidated dashboard's webview client: a new test `eval`s the template-literal client against a minimal recording-DOM harness (no new dependency) and drives its load, model-patch, and occurrences-render paths, so a syntax error or a regex literal mangled by template-literal escaping now fails CI instead of shipping as a blank dashboard. Test harness only; no runtime change.
+- Wrapped the consolidated dashboard's debounced model push in an error boundary so a model-build throw is logged and skipped instead of silently killing the live-refresh loop. Defensive hardening; no change on the success path.
 
 </details>
 

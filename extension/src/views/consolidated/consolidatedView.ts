@@ -99,8 +99,16 @@ function handleMessage(msg: unknown): void {
 function pushModel(): void {
   const root = getProjectRoot();
   if (!root || !panel) return;
-  lastModel = buildConsolidatedModel(root);
-  void panel.webview.postMessage(toModelMessage(lastModel));
+  // The model build is pure and low-risk, but pushModel runs inside a debounced
+  // timer (and the diagnostics listener) with no caller to catch a throw — an
+  // unhandled error there would silently kill the refresh loop. Guard it so one
+  // bad build is logged and skipped, leaving the last good model on screen.
+  try {
+    lastModel = buildConsolidatedModel(root);
+    void panel.webview.postMessage(toModelMessage(lastModel));
+  } catch (err) {
+    console.error('[saropaLints] consolidated dashboard model build failed', err);
+  }
 }
 
 function pushOccurrences(rule: string): void {

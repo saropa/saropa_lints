@@ -40,8 +40,8 @@ annotations, the triage dashboard, and the rule-packs panel. The
 `liveViolationsData` helper now centralizes the "prefer live" read, so these can
 adopt it incrementally.
 
-### 1.3 `pushModel` not try/catch-wrapped **[OPEN — verified]**
-[consolidatedView.ts](../extension/src/views/consolidated/consolidatedView.ts) runs the debounced `pushModel()` inside a timer with no error boundary; a model-build throw would be unhandled. Minor defensive hardening.
+### 1.3 `pushModel` error boundary **[SHIPPED 2026-06-12]**
+[consolidatedView.ts](../extension/src/views/consolidated/consolidatedView.ts) `pushModel()` now wraps the model build + post in try/catch, logging and skipping a bad build instead of letting an unhandled throw kill the debounced refresh loop. See [history record](history/2026.06/2026.06.12/consolidated-pushmodel-error-boundary.md).
 
 ### 1.4 18 `consolidated.*` keys English-only in 24 locales **[POLICY]**
 Source keys are in `en.json`; translation runs on the i18n cadence (NLLB not run). The publish coverage gate (`generate_locales.py --fail-on-missing`) blocks release until filled. No action here beyond the standing cadence.
