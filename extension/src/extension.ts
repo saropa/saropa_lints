@@ -67,11 +67,13 @@ import {
 } from './views/ruleExplainView';
 import {
   readViolations,
-  filterDisabledFromData,
   hasViolations,
   ViolationsData,
   getViolationsPath as getViolationsFilePath,
 } from './violationsReader';
+// Status-bar score reads LIVE diagnostics (same source as the Findings wide
+// report and the Issues tree) so the grade never lags the Problems panel.
+import { readVisibleLiveViolations } from './liveViolationsData';
 import {
   SecurityHotspotReviewStateService,
 } from './securityHotspotReviewState';
@@ -376,11 +378,13 @@ function updateContext(enabled: boolean, hasViolations: boolean) {
  * Dashboard-consistent view of violations:
  * apply disabled-rule filtering to the current report before computing scores.
  */
-function readVisibleViolations(root: string): ViolationsData | null {
-  const raw = readViolations(root);
-  if (!raw) return null;
-  const disabled = readDisabledRules(root);
-  return filterDisabledFromData(raw, disabled);
+// Live source: the status bar and the views that call this now grade against
+// the analyzer's current diagnostics, not the stale violations.json export.
+// Always returns data (live is never "no report") — an empty result means the
+// project is clean, which the status bar renders as a 100% score rather than a
+// blank. Disabled rules are filtered so a muted rule never drags the grade.
+function readVisibleViolations(root: string): ViolationsData {
+  return readVisibleLiveViolations(root);
 }
 
 /**
@@ -915,7 +919,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
     if (en) {
       const root = getProjectRoot();
-      const data = preloadedData ?? (root ? readViolations(root) : null);
+      // Live + disabled-filtered: the score matches the Problems panel and never
+      // counts a muted rule. (Was the raw, file-based readViolations.)
+      const data = preloadedData ?? (root ? readVisibleViolations(root) : null);
       const health = data ? computeHealthScore(data) : null;
       // Finding count folded into this single item (was a separate ⚠ entry).
       const badge = findingsBadge(data);
@@ -970,6 +976,28 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     statusBarItem.show();
   };
   updateAllStatusBars();
+
+  // The status-bar score and Issues tree now read live diagnostics, so they must
+  // refresh when the analyzer updates them — otherwise they would only move on an
+  // explicit command and re-introduce the very staleness this migration removes.
+  // Debounced to coalesce the per-file burst VS Code emits during one analysis
+  // pass into a single refresh (same 400ms the consolidated dashboard uses).
+  let diagnosticsRefreshTimer: NodeJS.Timeout | undefined;
+  context.subscriptions.push(
+    vscode.languages.onDidChangeDiagnostics(() => {
+      if (diagnosticsRefreshTimer) clearTimeout(diagnosticsRefreshTimer);
+      diagnosticsRefreshTimer = setTimeout(() => {
+        diagnosticsRefreshTimer = undefined;
+        updateAllStatusBars();
+        issuesProvider.refresh();
+        updateContext(
+          getConfig().get<boolean>('enabled', true) ?? true,
+          issuesProvider.hasViolations(),
+        );
+      }, 400);
+    }),
+    { dispose: () => diagnosticsRefreshTimer && clearTimeout(diagnosticsRefreshTimer) },
+  );
 
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.enable', async () => {
