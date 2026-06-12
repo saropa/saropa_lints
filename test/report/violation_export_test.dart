@@ -818,7 +818,9 @@ void main() {
   // both sources) never sees a divergent record.
   group('buildRuleMetadataCatalog', () {
     test('covers every rule with a well-formed metadata record', () {
-      final catalog = ViolationExporter.buildRuleMetadataCatalog(allSaropaRules);
+      final catalog = ViolationExporter.buildRuleMetadataCatalog(
+        allSaropaRules,
+      );
 
       expect(catalog, isNotEmpty);
       expect(
@@ -839,7 +841,9 @@ void main() {
     });
 
     test('flags security-hotspot rules as requiresReview', () {
-      final catalog = ViolationExporter.buildRuleMetadataCatalog(allSaropaRules);
+      final catalog = ViolationExporter.buildRuleMetadataCatalog(
+        allSaropaRules,
+      );
 
       // At least one hotspot rule exists in the rule set; each must be marked so
       // the extension's hotspot-review action recognizes it from the catalog.
