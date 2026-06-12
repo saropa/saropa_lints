@@ -1365,7 +1365,9 @@ function buildDepsCell(
         ? l10n('packageDashboard.deps.tooltipHeaderShared', { total: String(total), shared: String(shared) })
         : l10n('packageDashboard.deps.tooltipHeader', { total: String(total) });
     const tooltip = `${tooltipHeader}\n${depLines.join('\n')}`;
-    /* Show count with a tree icon; highlight if shared deps exist. */
+    /* Render the transitive count as a plain number (no tree emoji — it read as
+       decorative noise in a dense table); append a shared-deps badge when any
+       transitive is also pulled in by another package. */
     const sharedBadge = shared > 0
         ? ` <span class="badge-shared" title="${escapeHtml(l10n('packageDashboard.deps.sharedBadgeTitle', { count: String(shared) }))}">${shared}s</span>`
         : '';
