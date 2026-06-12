@@ -2366,6 +2366,9 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
         'or App Store rejection. Gallery-only usage does not need this. {v6}',
     correctionMessage:
         'Add NSCameraUsageDescription to Info.plist for camera access.',
+    // SEV-01 (kept WARNING): reads the real Info.plist and ImageSource.camera is
+    // a strong signal, but the receiver is not verified to be ImagePicker, so an
+    // unrelated pickImage(source:) could mis-fire — needs a receiver-type guard.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -2443,6 +2446,9 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
         'causes SecurityException crash when user tries to take a photo. {v4}',
     correctionMessage:
         'Add <uses-permission android:name="android.permission.CAMERA"/> to manifest.',
+    // SEV-01 (kept WARNING): reads the real AndroidManifest and gates on missing
+    // CAMERA, but does not verify the receiver is ImagePicker — needs a
+    // receiver-type guard before ERROR.
     severity: DiagnosticSeverity.WARNING,
   );
 
