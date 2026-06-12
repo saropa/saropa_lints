@@ -88,6 +88,8 @@
     "src/healthGrade.ts",
     "src/views/consolidated/consolidatedModel.ts",
     "src/test/consolidatedModel.test.ts",
+    "src/views/consolidated/consolidatedClient.ts",
+    "src/test/consolidatedClient.test.ts",
     "src/cross-file-commands.ts",
     "src/test/formatAnalysisIssuesMessage.test.ts",
     "src/test/findLatestAnalysisReport.test.ts",

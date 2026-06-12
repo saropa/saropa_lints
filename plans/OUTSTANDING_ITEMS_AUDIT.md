@@ -22,10 +22,9 @@ Items carry **no time estimates** by project convention — they are characteriz
 
 Source: [consolidated-dashboard.md](history/2026.06/2026.06.11/consolidated-dashboard.md), [findings-dashboard-live-diagnostics-sync.md](history/2026.06/2026.06.11/findings-dashboard-live-diagnostics-sync.md)
 
-### 1.1 Consolidated webview never rendered — visual + interaction unverified **[OPEN — verified]**
-The model is unit-tested and the view is wired to the live diagnostics listener, but the client is an **un-typechecked template string** ([consolidatedClient.ts](../extension/src/views/consolidated/consolidatedClient.ts)) and the dashboard has never been launched in the Extension Development Host. Every interaction (DOM-patch reconciler, lazy occurrence fetch, filter, keyboard nav) and the elevated stylesheet are unverified at runtime.
-- **De-risk without a GUI:** add a headless DOM test that `eval`s `getConsolidatedClient()` into a jsdom/linkedom document and drives `model`/`occurrences` messages + click/keydown — catches the interaction bugs an `includes()` test cannot (see memory `reference_webview_template_literal_regex_trap`). Then a human F5 render + tuning round for pixels only.
-- **Risk:** client logic correctness is currently asserted by code review alone.
+### 1.1 Consolidated webview — execution now covered headlessly; visual render still pending **[PARTIAL 2026-06-12]**
+The client ([consolidatedClient.ts](../extension/src/views/consolidated/consolidatedClient.ts)) was an un-typechecked template string that had never executed. A headless harness ([consolidatedClient.test.ts](../extension/src/test/consolidatedClient.test.ts)) now `eval`s the whole client against a minimal recording-DOM and drives the load, `model`, and `occurrences` paths, plus extract-evals `esc()` to prove its regex literals survived template-literal escaping (the `reference_webview_template_literal_regex_trap` class). See [history record](history/2026.06/2026.06.12/consolidated-client-headless-eval-test.md).
+- **Still open:** click / keyboard interaction depends on real DOM tree navigation (`closest`, `parentElement`) the stub does not model, and the **visual render** (theme, layout, the elevated stylesheet) needs a human F5 in the Extension Development Host. The string now executes in CI; pixels and event bubbling do not.
 
 ### 1.2 Live-diagnostics migration of the high-value surfaces **[SHIPPED 2026-06-12]**
 The status-bar score and the Issues sidebar tree now read live diagnostics via the
