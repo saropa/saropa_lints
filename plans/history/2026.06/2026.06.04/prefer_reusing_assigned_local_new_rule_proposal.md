@@ -240,8 +240,6 @@ cover:
 
 ## Finish Report (2026-06-04)
 
-
-
 ### Scope
 
 (A) Dart lint rules / analyzer plugin. Touches `lib/` (rule + fix), `lib/src/tiers.dart`,
@@ -273,7 +271,7 @@ cover:
 
 - **Audit:** Grepped `test/` for `prefer_reusing_assigned_local`,
   `PreferReusingAssignedLocalRule`, `ReuseAssignedLocalFix`, `reuseAssignedLocal`
-  — the only hit is the file I edited (`unnecessary_code_rules_test.dart`). No
+  — the only hit is the edited file (`unnecessary_code_rules_test.dart`). No
   other test pinned the changed symbols.
 - **New tests:** Added an instantiation pin, a fixture-presence entry, and a
   fix-generator presence check; bumped the file's rule-count doc comment to 15.

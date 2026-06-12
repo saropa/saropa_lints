@@ -170,8 +170,6 @@ Verified via `dart run saropa_lints scan` against a temp copy (example dirs are 
 
 ## Finish Report (2026-06-04)
 
-
-
 **Scope:** (A) Dart lint rule / analyzer plugin.
 
 ### What changed (core logic)

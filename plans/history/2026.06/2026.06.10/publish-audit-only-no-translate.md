@@ -1,10 +1,10 @@
 # Publish runs locale AUDIT only — never translates; add audit/abort menu options
 
-**Trigger (user request, verbatim):**
-1. "give me an option to abort and an option to simply audit (to file) missing translations (gaps) and low-quality translations" — for the interactive `generate_locales.py` mode menu.
-2. "do not do translation as part of publish.py. audit only and ask the user to retry (default), ignore or abort" — for the publish pipeline's locale coverage step.
+This change adds two operator paths to the extension i18n build tooling (Python):
+1. An abort option and a file-only audit of missing translations (gaps) and low-quality translations in the interactive `generate_locales.py` mode menu.
+2. Audit-only locale coverage in the publish pipeline (no translation), prompting the operator to retry (default), ignore, or abort.
 
-Both land in the extension i18n build tooling (Python). The standing hard rule is that publish must never kick off a machine-translation job; this change makes that explicit in the pipeline and gives the operator a read-only audit path plus a clean abort.
+The standing hard rule is that publish must never kick off a machine-translation job; this change makes that explicit in the pipeline and gives the operator a read-only audit path plus a clean abort.
 
 ## Finish Report (2026-06-10)
 
@@ -38,7 +38,7 @@ Both land in the extension i18n build tooling (Python). The standing hard rule i
 - **Standalone safety preserved:** menu `[4]` / `--mode audit` without `--fail-on-missing` still exits 0, so the new read-only preview never gates a dev run.
 
 ### Tests
-- Audited `tests/` for changed symbols. `prune_low_quality` referenced in `test_mt_provenance_modes.py` (unchanged by me). No test referenced the renamed `_extension_publish` function except the module itself.
+- Audited `tests/` for changed symbols. `prune_low_quality` referenced in `test_mt_provenance_modes.py` (left unchanged). No test referenced the renamed `_extension_publish` function except the module itself.
 - Added `test_low_quality_entries_lists_without_removing` and `test_low_quality_entries_empty_when_google_primary` to `test_mt_provenance_modes.py`.
 - Ran (Python `unittest`):
   - `test_mt_provenance_modes.py` — 10 passed (was 8).

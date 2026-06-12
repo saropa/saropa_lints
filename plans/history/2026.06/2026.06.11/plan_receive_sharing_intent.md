@@ -117,7 +117,7 @@ Class names (follow the project's `*Rule` suffix convention):
 
 ## Finish Report (2026-06-11)
 
- Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
 
 **Shipped.** 3 rules: rsi_missing_initial_media, rsi_missing_reset_after_initial_media, rsi_unfiltered_shared_media_type. Dropped rsi_stream_subscription_not_canceled and rsi_unchecked_shared_media_list (overlap).
 

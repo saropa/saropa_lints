@@ -82,8 +82,6 @@ The fixture has no map/set-literal-element case. Add a GOOD case: `'k': xs.map((
 
 ## Finish Report (2026-06-03)
 
-
-
 ### Scope
 
 (A) Dart lint rules / analyzer plugin. Touched `lib/src/rules/core/performance_rules.dart` (rule logic) and `example/lib/performance/avoid_large_list_copy_fixture.dart` (fixtures), plus `CHANGELOG.md`.

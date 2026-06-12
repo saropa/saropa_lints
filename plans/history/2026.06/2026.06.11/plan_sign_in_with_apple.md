@@ -173,7 +173,7 @@ All detection uses:
 
 ## Finish Report (2026-06-11)
 
- Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
 
 **Shipped.** 6 rules (unhandled_authorization_exception, unhandled_cancel, unchecked_availability, null_identity_token, relying_on_name_email, unchecked_credential_state). Dropped apple_sign_in_missing_nonce (exact duplicate). The two de-conflict rules scoped to the assignment-to-non-nullable path (not the ! path) to avoid co-firing with avoid_null_assertion.
 

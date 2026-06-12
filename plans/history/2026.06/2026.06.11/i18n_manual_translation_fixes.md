@@ -1,12 +1,10 @@
 # i18n Manual Translation Fixes
 
-**Trigger:** User ran the i18n translation audit (`generate_translations.py` mode `[4] audit only`) and asked, in two passes, to "manually fix these translations" — first the genuinely-missing strings (English shipping in a non-English locale), then the low-quality set, scoped via AskUserQuestion to **"genuinely-weak only"** (curate only entries that are clearly wrong, in languages where the error is unambiguous). NLLB / any MT pipeline was deliberately not run (hard prohibition).
+**Problem:** The i18n translation audit (`generate_translations.py` mode `[4] audit only`) surfaced translations needing manual fixes, addressed in two passes: first the genuinely-missing strings (English shipping in a non-English locale), then the low-quality set scoped to **genuinely-weak only** (only entries that are clearly wrong, in languages where the error is unambiguous). NLLB / any MT pipeline was deliberately not run (hard prohibition).
 
 ---
 
 ## Finish Report (2026-06-11)
-
-
 
 ### Scope
 
@@ -54,7 +52,7 @@ The ~350 "low-quality" flags are **not bugs and not shipping English** — they 
 
 ### Coverage gate
 
-The user's mode-`[4]` audit (run after Batch 1) reported **0 missing** for all 20 non-CJK locales including `hi`/`fil`/`sw`. Batch 2 touched low-quality (not missing) entries, so the missing count stays 0. `generate_locales.py` was **not** re-run, to avoid a gated cross-locale mass regeneration (and any MT invocation).
+The mode-`[4]` audit (run after Batch 1) reported **0 missing** for all 20 non-CJK locales including `hi`/`fil`/`sw`. Batch 2 touched low-quality (not missing) entries, so the missing count stays 0. `generate_locales.py` was **not** re-run, to avoid a gated cross-locale mass regeneration (and any MT invocation).
 
 ### Maintenance
 

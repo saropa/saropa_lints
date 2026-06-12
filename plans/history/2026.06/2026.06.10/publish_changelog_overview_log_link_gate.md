@@ -1,11 +1,5 @@
 # Publish gate: CHANGELOG Overview + version-pinned [log] link
 
-User request (verbatim):
-
-> 1. update the publish.py script to check for the release intro and log link in
-> changelog.md. the log link must be set to the proposed version.
-> 2. if the intro is not found then ask the user to retry/ignore/abort. default to retry
-
 The publish workflow renamed `[Unreleased]` to `[version]` and validated that the
 section existed, but never enforced that the section opens with the user-facing
 Overview paragraph (and its `[log](.../vX.Y.Z/CHANGELOG.md)` link) mandated by the
@@ -13,8 +7,6 @@ CHANGELOG MAINTENANCE NOTES. Releases could ship with no summary, or with a `[lo
 link still pointing at `/main/` or a prior tag. This task adds that gate.
 
 ## Finish Report (2026-06-10)
-
-
 
 ### Scope
 **(C) docs/scripts only** — Python publish tooling under `scripts/modules/` plus a
@@ -49,7 +41,7 @@ for `validate_changelog`, `check_changelog_overview`, `validate_changelog_versio
 `_extract_changelog_section_body`, `_gate_changelog_overview`. No existing test
 references any symbol touched (matches were source files only). The two existing
 changelog tests (`test_changelog_empty_sections.py`, `test_tag_clash_promotion.py`)
-exercise sibling functions I did not modify; ran them anyway as a regression guard —
+exercise sibling functions left unmodified; ran them anyway as a regression guard —
 all pass.
 
 **B. New tests:** added `scripts/modules/tests/test_changelog_overview.py` (9 cases):
@@ -77,7 +69,7 @@ Import sanity: `python -c "import scripts.modules._publish_steps, scripts.module
 ### Finish report persistence
 Finish report saved: plans/history/2026.06/2026.06.10/publish_changelog_overview_log_link_gate.md
 
-### Core diff summary (for Reviewer AI)
+### Core diff summary
 - `scripts/modules/_version_changelog.py`: `+_extract_changelog_section_body(content, version)`
   (raw, unstripped section body) and `+check_changelog_overview(changelog_path, version) -> list[str]`
   (returns problems: missing section / missing intro prose / missing `[log]` link /

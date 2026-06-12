@@ -698,7 +698,7 @@ Choose by **whether the old API still compiles on the new version**:
 
 **Scope (LINTER variant):** (A) Dart analyzer-plugin config + tooling + tests, plus (C) docs. No rule logic changed; this is rule-pack registry / resolver / tooling work.
 
-**Trigger:** user asked "what to build next?" after the prior session's plan-status review; chosen direction was "one real semver pack" — the first non-demo semver-gated package pack, replacing the `collection_compat` placeholder as the only gated entry.
+**Goal:** Ship the first non-demo semver-gated package pack, replacing the `collection_compat` placeholder as the only gated entry.
 
 **What shipped (two related slices):**
 
@@ -706,7 +706,7 @@ Choose by **whether the old API still compiles on the new version**:
 
 2. **First real semver-gated package pack — `riverpod_2`.** Gates `prefer_notifier_over_state` on `riverpod >= 2.0.0` (the `NotifierProvider` migration target only exists in Riverpod 2.x). This surfaced and closed an architecture gap: the flat-gate design could previously only gate **standalone** packs (`collection_compat`), because a rule owned by an ungated package pack (`riverpod`) would be re-added whenever that pack was enabled. New **relocation** mechanism — `kRelocatedRulePackCodes` + `applyRelocatedRulePacks` in `tool/rule_pack_audit.dart`, applied by BOTH the generator and the audit — MOVES a version-gated rule out of its file-derived pack into the gated pack, so the gate is authoritative.
 
-**Reviewer-AI notes:**
+**Implementation notes:**
 
 - The relocation is applied in one shared function consumed by both `tool/rule_pack_audit.dart` (consistency check) and `tool/generate_rule_pack_registry.dart` (codegen), so generated registry and audit cannot drift. Generated files (`rule_pack_codes_generated.dart`, `extension/src/rulePacks/rulePackDefinitions.ts`) were regenerated twice (the TS writer reads the compiled registry, so a second `dart run` picks up the relocated pack) and then `dart format`-ed to match the committed convention.
 - `prefer_notifier_over_state` left the `riverpod` pack (39 codes now) and is the sole member of `riverpod_2` — verified by an ownership test, not just the gate test.
@@ -724,9 +724,7 @@ Choose by **whether the old API still compiles on the new version**:
 
 ## Finish Report (2026-06-10) — semver-pack expansion + upgrade-pack nudge
 
-
-
-**Trigger:** user said "i want ALL of this built" in response to a proposed list of additional gated packs + an extension nudge (other gated options: dio 5, bloc 8, riverpod 3, go_router 6; plus platform gates).
+**Goal:** Build the full set of additional gated packs plus an extension nudge (dio 5, bloc 8, riverpod 3, go_router 6; platform gates considered and skipped — see below).
 
 **Scope:** (A) Dart lint rules/plugin, (B) VS Code extension, (C) docs.
 
@@ -739,12 +737,12 @@ Choose by **whether the old API still compiles on the new version**:
 5. **Extension upgrade-pack nudge** — `upgradePackNudge.ts` (vscode wiring) + `upgradePackNudgeLogic.ts` (pure, tested). On activation + each pubspec.lock change, offers once per workspace (workspaceState) to enable any dependency-gated pack whose resolved lock version satisfies the gate. Reads pubspec.lock and applies the same `>=` gate the plugin enforces. Opt-out `saropaLints.upgradePackNudge.enabled` (manifest setting + en nls key).
 6. **Docs** — rule_packs guide, CHANGELOG (Added + Added (Extension)), this plan note.
 
-**Reviewer notes / non-obvious decisions:**
+**Non-obvious decisions:**
 
 - **Scan harness uses unresolved AST.** Keyword-less `GoRoute(...)` is a `MethodInvocation` there, not `InstanceCreationExpression` (production/custom_lint resolves it). The go_router rule registers BOTH hooks so it works in production and is scan-verifiable; a given call is only ever one node type per mode, so no double-report. The bloc rule's first attempt (`addMethodDeclaration` + `ClassDeclaration.members`) failed to compile/fire here for the same unresolved-AST reason and was switched to the class-declaration + source-regex idiom.
 - **Relocation is authoritative.** Each new rule (except go_router) is moved out of its ungated base pack via `kRelocatedRulePackCodes` so enabling the base pack cannot bypass the version gate. Applied by both the generator and the audit.
 - **Each new rule sits in exactly one core tier** (`comprehensiveOnlyRules`) to satisfy the integrity invariant; pack ownership strips it from tier-derived enables (harmless tier listing).
-- **Platform gates (Appendix C): intentionally NOT built** (user chose "Skip it"). Redundant with the existing platform rule sets (`iosPlatformRules` etc.) + `platforms:` config + `ProjectContext` directory detection; no concrete platform-specific migration to anchor a non-contrived pack.
+- **Platform gates (Appendix C): intentionally NOT built.** Redundant with the existing platform rule sets (`iosPlatformRules` etc.) + `platforms:` config + `ProjectContext` directory detection; no concrete platform-specific migration to anchor a non-contrived pack.
 
 **Verification:** `dart analyze --fatal-infos` clean; `dart run tool/rule_pack_audit.dart` exit 0; 262 tests across `test/config/` + the four package rule tests + integrity pass; extension `tsc --noEmit` clean; 7 new `upgradePackNudgeLogic` unit tests pass. Each rule's detection confirmed via the scan CLI against its fixture (correct hits, none on the GOOD/migrated form).
 

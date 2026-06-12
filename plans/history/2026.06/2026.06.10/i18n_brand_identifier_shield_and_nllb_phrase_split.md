@@ -1,18 +1,15 @@
 # i18n brand/identifier shield repair + NLLB phrase splitter & fallback report
 
-**Triggered by:** the user noticed `extension/package.nls.ar.json` rendered the
-brand as `"Saropa الوبر"` ("Lints" machine-translated to Arabic). Investigation
-showed the translation pipeline shielded only the bare word `"Saropa"`, so the
-*rest* of every brand/proper-noun/code-identifier was being machine-translated or
-transliterated across the locale catalogs. The user then asked to (a) repair the
-shipped catalogs, (b) gate the terms so future regenerations stay correct, and
-(c) fix the NLLB pipeline so long strings are translated phrase-by-phrase instead
-of silently dropping to Google/English, with proper reporting.
+`extension/package.nls.ar.json` rendered the brand as `"Saropa الوبر"` ("Lints"
+machine-translated to Arabic). The translation pipeline shielded only the bare
+word `"Saropa"`, so the *rest* of every brand/proper-noun/code-identifier was
+being machine-translated or transliterated across the locale catalogs. This
+change (a) repairs the shipped catalogs, (b) gates the terms so future
+regenerations stay correct, and (c) fixes the NLLB pipeline so long strings are
+translated phrase-by-phrase instead of silently dropping to Google/English, with
+proper reporting.
 
 ## Finish Report (2026-06-10)
-
-### 1. Critical note
-
 
 ### 2. Scope
 - **(C)** build tooling — Python i18n scripts under `extension/scripts/i18n/`.
@@ -46,12 +43,12 @@ of silently dropping to Google/English, with proper reporting.
 - `dart analyze`/`dart format` (~70): semantically translated ("dart" → projectile "dardos/arrows/phi tiêu"), reordered; mostly reads as acceptable localized "Dart analysis".
 - ~15 dropped/garbled sentences: ar `extension.description` dropped "Dart"; fa/th `violations.json` became a verb phrase.
 
-### 8. Pipeline changes (core logic, for the Reviewer AI)
+### 8. Pipeline changes (core logic)
 - `nllb_engine.py`: new `_split_into_phrases` / `_translate_via_phrases`; token-gate path now tries sentence-split → phrase-split → `_record_long_input` (records EVERY over-gate unsplittable input, replacing the once-only `_long_input_skip_logged` flag). New `long_inputs()` / `reset_long_inputs()`.
 - `mt_fallback.py`: `_DO_NOT_TRANSLATE` expanded to 20 terms; new `_fallback_log` + `_record_fallback` / `fallback_log()` (cleared in `reset_engine_stats`); `_translate_one` records google/english fallbacks.
 - `generate_locales.py`: imports `fallback_log`; calls `reset_long_inputs()` at run start; new `write_fallback_report()` → `reports/i18n_nllb_fallbacks.md`, printed in the run summary.
 
 ### 9. Concurrency note
-During this /finish, the working tree was being modified and committed by a **concurrent session** (new commits `affddbec`/`29d62604`/`f2a4e560` — one with a bare `@` subject — appeared, and `git status` shifted between calls). All of this task's code changes were verified present in `HEAD` (ar `displayName` = "Saropa Lints", 20 gate terms, CHANGELOG brand bullet, `test_phrase_split.py` tracked) — i.e. already committed under those concurrent commits' (unrelated) subjects. This finish report is committed separately so the i18n work has a properly-described durable record.
+The working tree was modified and committed by a **concurrent session** (new commits `affddbec`/`29d62604`/`f2a4e560` — one with a bare `@` subject — appeared, and `git status` shifted between calls). All of this task's code changes were verified present in `HEAD` (ar `displayName` = "Saropa Lints", 20 gate terms, CHANGELOG brand bullet, `test_phrase_split.py` tracked) — i.e. already committed under those concurrent commits' (unrelated) subjects. This report is committed separately so the i18n work has a properly-described durable record.
 
 Out of standing scope but flagged earlier: `Dart`/`Flutter` and code-identifier transliteration were repaired here; the global CLAUDE.md gained a full-absolute-path rule for user-run script commands (outside this repo).

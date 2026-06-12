@@ -292,12 +292,12 @@ Note: the project's unit tests pin instantiation only; fixture behavior is
 verified by reading + the new `expect_lint:` markers. The scan CLI uses
 unresolved `parseString`, so `node.constructorName.type.element?.name`
 returns null there and the rule no-ops — production analyzer (where the
-user encountered the FP) does full resolution, so the fix lands as designed.
+FP was reported) does full resolution, so the fix lands as designed.
 
 ## Commits
 
 - `de245617` — fix(rules): avoid_small_touch_targets skips wide-band region recognizers
-- (follow-up this turn) — docs(bugs): append finish report to archived avoid_small_touch_targets bug
+- (follow-up) — docs(bugs): append finish report to archived avoid_small_touch_targets bug
 
 ---
 
@@ -355,7 +355,7 @@ Rule version stamp bumped: DartDoc `v5` → `v6`, problem-message `{v5}` → `{v
 
 1. Predicate trace on paper against the bug's repro (wide pill → no fire).
 2. Original `_bad1` / `_good1` semantics preserved under the new predicate.
-3. Production analyzer (where the user hit the FP in `app_search_bar.dart:655`) does full resolution → fix lands as designed.
+3. Production analyzer (where the FP surfaced in `app_search_bar.dart:655`) does full resolution → fix lands as designed.
 
 ### Project Maintenance
 

@@ -1,6 +1,6 @@
 # Quick Fix Batches 16–18 (2026-06-10)
 
-Trigger: "our quick fix coverage is awful. we need to actually implement a mass of these" → continued the incremental QUICK_FIX_PLAN program. Three batches landed, adding quick fixes to 8 previously fix-less rules and dropping the quick-fix audit from 1701 to 1693 unfixed rules. This record was split out of the active `plans/QUICK_FIX_PLAN.md` so the active plan carries only remaining work.
+Continuation of the incremental QUICK_FIX_PLAN program to expand quick-fix coverage. Three batches landed, adding quick fixes to 8 previously fix-less rules and dropping the quick-fix audit from 1701 to 1693 unfixed rules. This record was split out of the active `plans/QUICK_FIX_PLAN.md` so the active plan carries only remaining work.
 
 ## Batch 16 — control flow + structure (EASY/MEDIUM)
 

@@ -185,7 +185,7 @@
 ## audioplayers rules — validation reconciliation and final state
 
 ### Prior state discovered
-The rules file `lib/src/rules/packages/audioplayers_rules.dart`, all 6 fixtures under `example_packages/lib/audioplayers/`, were already present from an in-progress attempt. Only the test file was missing. I created `test/rules/packages/audioplayers_rules_test.dart` (instantiation pins + fixture-existence checks mirroring `geocoding_rules_test.dart`). No rule logic or fixtures were modified — they already match the live `geocoding_rules.dart` / `image_picker_rules.dart` conventions (`SaropaLintRule`, `runWithReporter`, `fileImportsPackage(node, PackageImports.audioplayers)`, `ReplaceNodeFix` for the one quick fix).
+The rules file `lib/src/rules/packages/audioplayers_rules.dart`, all 6 fixtures under `example_packages/lib/audioplayers/`, were already present from an in-progress attempt. Only the test file was missing. A new `test/rules/packages/audioplayers_rules_test.dart` was created (instantiation pins + fixture-existence checks mirroring `geocoding_rules_test.dart`). No rule logic or fixtures were modified — they already match the live `geocoding_rules.dart` / `image_picker_rules.dart` conventions (`SaropaLintRule`, `runWithReporter`, `fileImportsPackage(node, PackageImports.audioplayers)`, `ReplaceNodeFix` for the one quick fix).
 
 ### Reconciliation against existing coverage (grepped `lib/src/rules/` before keeping anything)
 The plan proposed 9 rules. Three were dropped as duplicates of shipped rules:

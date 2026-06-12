@@ -165,12 +165,10 @@ violating pattern.
 
 ## Finish Report (2026-06-10)
 
-
-
 **Scope:** (A) Dart analyzer-plugin code + (C) docs/scripts. No rule-behavior
 change, no extension/UI change. Phase 1 (stub removal) and the non-overridable
 publish gate are complete; Phase 2 (writing real fixture-backed tests) is
-explicitly deferred at the user's instruction and remains tracked above.
+deferred and remains tracked above.
 
 **Deep review:**
 - `stub_density.dart`: `scanEmptyBodyStubTests` / `emptyBodyStubCountIn` mirror
@@ -207,17 +205,17 @@ audit gate). README verified — no updates needed (no rule/test count cited).
 ROADMAP — N/A (no lint entry completed). Guides reviewed — nothing user-facing.
 No bug archive — task did not close a `bugs/*.md` file.
 
-**Plan disposition:** stays ACTIVE, not moved/split. The user explicitly
-directed Phase 2 be tracked in this plan and deferred; the remaining scope is a
-self-contained, unstarted phase documented above. Deliberate deviation from the
-A-MOVE "split or archive" default, justified by that instruction.
+**Plan disposition:** stays ACTIVE, not moved/split. Phase 2 is tracked in this
+plan and deferred; the remaining scope is a self-contained, unstarted phase
+documented above. Deliberate deviation from the A-MOVE "split or archive"
+default.
 
 **Outstanding:** Phase 2 — author real fixture-backed trigger/non-trigger tests
 via the resolved-analyzer oracle for the rules whose stub placeholders were
 removed; fix fake fixtures (e.g. `avoid_god_class`'s empty BAD class) as
 encountered.
 
-**Files this finish pass:** `test/project_health/fix_and_stub_test.dart`
+**Files:** `test/project_health/fix_and_stub_test.dart`
 (new `emptyBodyStubCountIn` tests), `plans/BUG_stub_tests_in_suite.md` (this
 report). Phase 1 + gate code landed earlier in commits `b086d7d6` and
 `29d62604` (gate code swept into a concurrent session's commit `0f739a8d`).

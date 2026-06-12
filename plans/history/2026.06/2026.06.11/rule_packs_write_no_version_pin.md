@@ -1,13 +1,10 @@
 # Fix: "Enable upgrade lints" nudge failed on configs without a plugin `version:` pin
 
-**Trigger (user report, verbatim):** "this very project is raising an upgrade toast then showing this error — Saropa Lints: could not write analysis_options.yaml (rule_packs)."
+**Problem:** The "Enable upgrade lints" nudge raised an upgrade toast then surfaced the error `Saropa Lints: could not write analysis_options.yaml (rule_packs).`
 
 The saropa_lints package's own `analysis_options.yaml` deliberately omits the `version:` pin under `plugins.saropa_lints:` (the plugin loads from workspace source, not pub.dev). The upgrade-pack nudge's YAML writer could only anchor a new `rule_packs` block on a `version:` line directly under `saropa_lints:`, so with no version line it found no anchor, returned `false`, and surfaced the error toast.
 
 ## Finish Report (2026-06-11)
-
-### 1. Critical Note
-
 
 ### 2. Scope
 **(B) VS Code extension (TypeScript).** Touches `extension/src/rulePacks/rulePackYaml.ts` (writer logic), `extension/src/test/rulePacks/rulePackYaml.test.ts` (regression test), and root `CHANGELOG.md`. No Dart lint-rule / analyzer-plugin (A) code and no docs/scripts-only (C) work beyond the changelog.

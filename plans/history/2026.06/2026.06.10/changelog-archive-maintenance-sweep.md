@@ -1,6 +1,6 @@
 # CHANGELOG_ARCHIVE Maintenance-Section Sweep
 
-**Trigger (user request, verbatim):** "all non-user facing changes must be moved to a detail section within their release. this also applies to changelog_archive.md" — with the example format of a `<details><summary>Maintenance</summary>` block containing a `**Tooling**` bold subheading.
+All non-user-facing changelog entries are relocated into a collapsed `<details><summary>Maintenance</summary>` block within their release, using a `**Tooling**` bold subheading where a section had internal structure. This applies to `CHANGELOG_ARCHIVE.md` as well as the active changelog.
 
 This task relocated non-user-facing entries (publish-script / CI / GitHub-Actions tooling, audit-script and DX-audit changes, test-fixture and test-mock additions, internal refactors / dead-code removal, ROADMAP / README / CONTRIBUTING doc housekeeping, and `### Administration` / `### Build Process` / `### Publishing` / `### Package Publishing Changes` / `### Documentation` / `### Tooling` / `### Tests Disabled` / `### Tier Set Maintenance` / `### Audit Script v2.0` style ad-hoc sections) out of the user-facing `### Added` / `### Changed` / `### Fixed` sections and into collapsed `<details><summary>Maintenance</summary>` blocks inside each affected release.
 
@@ -12,7 +12,7 @@ This task relocated non-user-facing entries (publish-script / CI / GitHub-Action
 ### What was done
 - `CHANGELOG.md` (the active changelog) was audited first and confirmed already disciplined — its maintenance content was already inside `<details>` blocks. No top-level misfiling found there.
 - `CHANGELOG_ARCHIVE.md` was swept top-to-bottom. ~60 new `<details><summary>Maintenance</summary>` blocks were created (or existing maintenance bullets folded into them), bringing the file to 100 balanced Maintenance blocks total (the archive already carried disciplined Maintenance blocks for the 13.x releases the user moved in mid-task).
-- Content was **relocated verbatim**, never reworded or deleted. Pre-existing typos, unclosed backticks, and emojis in archived entries were preserved (not my authoring to alter). Empty section headers left behind by a move were removed; blank-line spacing before headers was repaired where a move had glued a bullet to a heading.
+- Content was **relocated verbatim**, never reworded or deleted. Pre-existing typos, unclosed backticks, and emojis in archived entries were preserved (existing content, not altered). Empty section headers left behind by a move were removed; blank-line spacing before headers was repaired where a move had glued a bullet to a heading.
 - Ad-hoc non-standard maintenance sections were converted to `<details>` Maintenance blocks; where a section had internal structure (e.g. `### Audit Script v2.0`, `### Quick Fix Policy Update`), its heading became a `**bold**` subheading inside the block, matching the format in the user's example.
 
 ### Releases swept (fully audited and corrected)

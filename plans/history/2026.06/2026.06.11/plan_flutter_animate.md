@@ -300,7 +300,7 @@ Set `impact`, `cost`, and `ruleType` fields. Tags: `const {'packages'}`.
 
 ## Finish Report (2026-06-11)
 
- Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
 
 **Shipped.** 6 rules (unconditional_repeat_in_on_play, restart_on_hot_reload_in_release, no_key_in_list, empty_animate_list, fixed_target_literal, auto_play_false_no_driver). Dropped flutter_animate_external_controller_not_disposed (overlap with disposal rules).
 

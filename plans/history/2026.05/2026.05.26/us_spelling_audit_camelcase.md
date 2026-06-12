@@ -1,6 +1,6 @@
 # US-Spelling Audit: CamelCase Coverage + Plan-History Exemption
 
-The publish-time audit reported two hits and the user asked whether
+The publish-time audit reported two hits, raising the question of whether
 `/bin/` should be excluded. `/bin/` is shipped Dart source (CLI entry
 points like `dart run saropa_lints:project_vibrancy`) — it must NOT be
 excluded. The two reported hits were real US-spelling violations the
@@ -34,7 +34,7 @@ docs that re-trip the gate after their work has shipped.
 | `example/lib/flutter_mocks.dart` | Same suppression on the `CancelToken.isCancelled` mock; comment rephrased so the explanatory text doesn't itself trip the audit. |
 | `scripts/modules/_us_spelling.py` | Added `_UK_CAMEL_PATTERN` (lookahead/lookbehind for lowercase->Uppercase boundary) running alongside the existing `\b`-based `_UK_PATTERN`; added per-line span dedupe; added `_should_skip_plans_history` to exempt archived plan docs; added `test_us_spelling.py` to `_SKIP_FILES`. |
 | `scripts/modules/tests/test_us_spelling.py` | NEW — 8 unit tests pinning standalone-word matches, CamelCase embeds, leading-underscore non-match, out-of-dictionary non-match, `cspell` suppression, and per-line span dedupe. |
-| `plans/history/2026.05/2026.05.25/PROJECT_HEALTH_DASHBOARD_PLAN.md` | One uncommitted prose fix from earlier (`cancelling` → `canceling`); included because it was one of the original audit hits the user authorized fixing. |
+| `plans/history/2026.05/2026.05.25/PROJECT_HEALTH_DASHBOARD_PLAN.md` | One uncommitted prose fix from earlier (`cancelling` → `canceling`); included because it was one of the original audit hits authorized for fixing. |
 | `CHANGELOG.md` | Added Maintenance bullet under `[13.11.0]` describing the audit widen and the `plans/history/` exemption; tagged with HTML `cspell:ignore` comment so the bullet's own example identifiers don't trip the audit. |
 | `plans/history/2026.05/2026.05.26/us_spelling_audit_camelcase.md` | NEW — this file. |
 

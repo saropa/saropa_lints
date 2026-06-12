@@ -223,8 +223,6 @@ sibling fix).
 
 ## Finish Report (2026-06-03)
 
-
-
 ### Scope
 (A) Dart lint rules / analyzer plugin — dartdoc on an existing rule plus its `example/` fixture, CHANGELOG, and this bug file. No rule logic, tier, severity, message, or registration changed.
 
@@ -240,7 +238,7 @@ The narrow same-file iterate-only auto-skip floated in Suggested Fix. It catches
 
 ### Testing
 - `dart test test/rules/code_quality/code_quality_rules_test.dart` → All 208 tests passed. The rule's test is an instantiation/registration pin (class + code name); dartdoc/fixture edits cannot break it. Audited: this is the only test file referencing the rule.
-- The suppression path my doc relies on is covered by `test/utils/ignore_utils_test.dart` (added by sibling commit `6ad47bbc`).
+- The suppression path the documentation relies on is covered by `test/utils/ignore_utils_test.dart` (added by sibling commit `6ad47bbc`).
 - This rule needs enum type resolution, so the standalone `scan` CLI (unresolved ASTs) cannot exercise it and CI does not run fixtures — the fixture is documentation of intended behavior, not an executable assertion.
 
 ### Reviewer notes

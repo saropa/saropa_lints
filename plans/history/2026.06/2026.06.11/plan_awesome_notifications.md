@@ -145,7 +145,7 @@ No migration rules are proposed: `awesome_notifications` has no widely-used pred
 
 ## Finish Report (2026-06-11)
 
- Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
 
 **Shipped.** 7 rules (non_static_listener, handler_wrong_parameter_type, missing_pragma_annotation, undeclared_channel_key, create_without_permission_check, negative_notification_id with quick fix, listeners_before_display). Dropped awesome_notifications_hardcoded_notification_id (overlap with avoid_notification_same_id).
 

@@ -69,8 +69,6 @@ New `example_*` dirs go in `analysis_options.yaml` exclude.
 
 ## Finish Report (2026-06-10)
 
-
-
 **Scope:** (A) Dart lint rules / analyzer plugin + `example/` fixtures + Dart `test/`.
 
 All 23 false-positive reports filed 2026-06-09/10 are addressed across 6 commits on `main`:
@@ -86,6 +84,6 @@ All 23 false-positive reports filed 2026-06-09/10 are addressed across 6 commits
 
 **Full suite:** `dart test test/rules/ test/integrity/` → 5362 pass, 1 skipped. All changed rule files `dart analyze` clean (the only 2 warnings are a pre-existing `ExtensionType.primaryConstructor` dead-code issue in an unrelated rule, surfaced by analyzer drift — not introduced by this work).
 
-**Documented residual (not a hidden gap):** prefer_value_listenable_builder clears categories 1/2/4/6; categories 3 (transient in-flight lock) and 5 (persisted-pref mirror) remain by design — the bug report itself flags them as structurally indistinguishable from single-value display state, so suppressing them would risk killing genuine positives. Recorded in that bug's archived finish report; surfaced to the user as a follow-up decision.
+**Documented residual (not a hidden gap):** prefer_value_listenable_builder clears categories 1/2/4/6; categories 3 (transient in-flight lock) and 5 (persisted-pref mirror) remain by design — the bug report itself flags them as structurally indistinguishable from single-value display state, so suppressing them would risk killing genuine positives. Recorded in that bug's archived finish report as a follow-up decision.
 
 **Bugs archived:** all 22 reports → `plans/history/2026.06/2026.06.10/` (avoid_mixed_environments was already at `2026.06.09/`), each with an appended `## Finish Report`.

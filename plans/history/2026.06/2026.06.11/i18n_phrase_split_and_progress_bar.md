@@ -1,16 +1,12 @@
 # i18n: semicolon/colon phrase splitting + WPM/ETA progress bar
 
-**Triggered by:** While translating Thai (`th`), the NLLB engine logged
+**Problem:** While translating Thai (`th`), the NLLB engine logged
 `translate_batch timed out > 10s on target='th', input='Run project-wide checks that single-file analysis cannot do: unused files, circu…'; falling back`.
-The user asked to (1) split phrases naturally by semicolons and colons, and (2) have
+Two changes address it: (1) split phrases naturally by semicolons and colons, and (2) have
 the progress bar report words-per-minute and an ETA. Build tooling only
 (`extension/scripts/i18n/`); excluded from the `.vsix`, no pub.dev/Marketplace impact.
 
 ## Finish Report (2026-06-11)
-
-### 1. Critical note
-
-
 
 ### 2. Scope
 
@@ -53,7 +49,7 @@ webview code touched. LINTER-variant Sections keyed to (A) are marked SKIPPED be
   (`prefetch_machine_translations`, `_translate_via_phrases`, `_split_into_phrases`,
   `nllb_translate`, `progress`). Matches in `test_phrase_split.py`,
   `test_mt_provenance_modes.py`, `test_nllb_engine.py`, `test_nllb_wiring.py`. None
-  pinned behavior I changed — `_split_into_phrases`/`_translate_via_phrases` bodies
+  pinned the changed behavior — `_split_into_phrases`/`_translate_via_phrases` bodies
   are untouched, and `progress` is a new optional parameter (default `None`,
   backward-compatible). All 5 existing files pass unchanged.
 - **B. New tests.** Extended `test_phrase_split.py` with `TestStrongPhraseBoundary`
