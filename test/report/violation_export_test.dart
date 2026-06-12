@@ -5,6 +5,7 @@ library;
 import 'dart:convert' show json;
 import 'dart:io' show Directory, File, Platform;
 
+import 'package:saropa_lints/saropa_lints.dart' show allSaropaRules;
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
@@ -807,6 +808,50 @@ void main() {
       expect(severities['rule_a'], 'error');
       expect(severities['rule_b'], 'warning');
       expect(severities['rule_c'], 'info');
+    });
+  });
+
+  // The bundled rule catalog the VS Code extension ships is produced by
+  // [ViolationExporter.buildRuleMetadataCatalog] over [allSaropaRules]. These
+  // pin that it covers the full rule set and emits the same per-rule shape the
+  // live-analysis export does, so the extension's deserializer (one TS type for
+  // both sources) never sees a divergent record.
+  group('buildRuleMetadataCatalog', () {
+    test('covers every rule with a well-formed metadata record', () {
+      final catalog = ViolationExporter.buildRuleMetadataCatalog(allSaropaRules);
+
+      expect(catalog, isNotEmpty);
+      expect(
+        catalog.length,
+        allSaropaRules.length,
+        reason: 'one entry per rule, keyed by lower-case rule name',
+      );
+
+      // Every value carries the full snapshot the export emits — the extension
+      // reads ruleType/ruleStatus for filters and requiresReview for hotspots.
+      for (final entry in catalog.entries) {
+        final meta = entry.value! as Map<String, Object?>;
+        expect(meta.containsKey('ruleType'), isTrue, reason: entry.key);
+        expect(meta['ruleStatus'], isNotNull, reason: entry.key);
+        expect(meta.containsKey('requiresReview'), isTrue, reason: entry.key);
+        expect(meta['cweIds'], isA<List<Object?>>(), reason: entry.key);
+      }
+    });
+
+    test('flags security-hotspot rules as requiresReview', () {
+      final catalog = ViolationExporter.buildRuleMetadataCatalog(allSaropaRules);
+
+      // At least one hotspot rule exists in the rule set; each must be marked so
+      // the extension's hotspot-review action recognizes it from the catalog.
+      final hotspots = catalog.entries.where((e) {
+        final meta = e.value! as Map<String, Object?>;
+        return meta['ruleType'] == 'securityHotspot';
+      });
+      expect(hotspots, isNotEmpty);
+      for (final hotspot in hotspots) {
+        final meta = hotspot.value! as Map<String, Object?>;
+        expect(meta['requiresReview'], isTrue, reason: hotspot.key);
+      }
     });
   });
 }

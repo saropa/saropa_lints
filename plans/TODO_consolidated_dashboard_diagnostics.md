@@ -43,11 +43,12 @@ surfaces are NOT simple swaps.
 - inline annotations ([inlineAnnotations.ts](../extension/src/inlineAnnotations.ts)) —
   **MIGRATED 2026-06-12.** End-of-line text now matches the squiggles exactly; cache invalidated on
   the same debounced tick.
-- [issuesViewCommands.ts](../extension/src/commands/issuesViewCommands.ts) — **BLOCKED on phase #1b.**
-  Its two `readViolations` callers consume `byRuleType` / `byRuleStatus` / `ruleMetadataByRule`
-  (rule-metadata filters + security-hotspot review). The live model carries none of these; swapping
-  would empty the filters and break hotspot review. Migrate only after the bundled rule catalog
-  (phase #1b) lands.
+- [issuesViewCommands.ts](../extension/src/commands/issuesViewCommands.ts) — **MIGRATED 2026-06-12.**
+  The bundled rule catalog (phase #1b) now ships: `bin/generate_rule_catalog.dart` emits
+  `extension/media/rules_catalog.json` from `allSaropaRules`, `ruleCatalog.ts` loads it, and
+  `applyRuleCatalog` enriches the live model with `ruleMetadataByRule` / `byRuleType` / `byRuleStatus`.
+  The two callers are now injected with `readLiveViolations`, so the rule-type/status filters and
+  security-hotspot review work off live findings. See the Finish Report below.
 - [configSuggestions.ts](../extension/src/config/configSuggestions.ts) — **NOT APPLICABLE.** Reads
   pubspec + analysis_options, never `violations.json`. Audit listed it imprecisely.
 - triage dashboard ([triageDashboardHtml.ts](../extension/src/views/triageDashboardHtml.ts)) —
@@ -58,8 +59,8 @@ surfaces are NOT simple swaps.
   **NOT A CLEAN SWAP.** Uses the export *timestamp* ("analysis last run at…") and a disabled-rule
   suppressions snapshot. Live's timestamp is always "now", which would mislabel the run age.
 
-**Remaining actionable work here:** only issuesViewCommands, and only once phase #1b adds the
-bundled rule catalog to the live model. The other four are intentionally batch-bound or N/A.
+**Remaining actionable work here:** none for §2 — issuesViewCommands shipped, the other four are
+intentionally batch-bound or N/A. The plan stays active for the §1.1 visual-render verification.
 
 ## 3. Supplementary analyzer-lints dashboard pill **[CLOSED — obsolete 2026-06-12]**
 
@@ -71,3 +72,60 @@ main findings list, so the separate opt-in pills were redundant. The TODO/HACK w
 ([todosAndHacksTree.ts](../extension/src/views/todosAndHacksTree.ts)) remains as its own tree.
 
 No work — building the pill would re-introduce the redundancy 13.13.0 removed.
+
+---
+
+## Finish Report (2026-06-12)
+
+### Rule-details catalog — unblocks live metadata filters + hotspot review
+
+Live analyzer diagnostics carry only file, line, rule name, severity, and message — no per-rule
+type, lifecycle status, or security-review flag. Two Issues-panel actions need that metadata: the
+"filter by rule type/status" command and the security-hotspot review. They previously read the
+batch `violations.json` export, which goes stale between analysis runs, so the surfaces that had
+already moved to live diagnostics (status bar, Issues tree, dashboard, code lens, annotations)
+could not include these two without losing their metadata. A bundled catalog of every rule's
+metadata closes that gap.
+
+#### What was built
+
+- **`ViolationExporter.buildRuleMetadataCatalog(rules)`** (lib/src/report/violation_export.dart) —
+  a public builder that reuses the existing private `_RuleMetadataSnapshot.fromRule` so the catalog
+  is byte-identical to what an analysis export emits per rule (single source of truth; the two can
+  never drift).
+- **`bin/generate_rule_catalog.dart`** — a generator that walks `allSaropaRules` and writes
+  `extension/media/rules_catalog.json` (2314 rules). Run with
+  `dart run saropa_lints:generate_rule_catalog`.
+- **`extension/src/ruleCatalog.ts`** — loads the bundled catalog once at activation
+  (`initRuleCatalog`), caches it, and degrades to an empty catalog on a missing/malformed file so
+  activation never fails.
+- **`applyRuleCatalog(data, catalog)`** (extension/src/liveDiagnosticsModel.ts) — a separate pure
+  enrichment step that attaches `ruleMetadataByRule` for rules present in the model and issue-weights
+  `byRuleType` / `byRuleStatus`, with the same `unspecified` / `ready` defaults the export uses.
+  Kept separate from the diagnostic-to-violation builder so that builder and its many callers/tests
+  stay catalog-agnostic.
+- **`readLiveViolations`** (extension/src/liveViolationsData.ts) applies the catalog by default;
+  `issuesViewCommands` is now injected with `readLiveViolations`, so both metadata-driven handlers
+  read live findings.
+- **Publish wiring** — `regenerate_rule_catalog` in scripts/modules/_extension_publish.py
+  regenerates the catalog before the extension is compiled into the `.vsix`, so a rule added or
+  retuned since the last manual run never ships a stale catalog (non-fatal: ships the committed
+  catalog on a tooling failure).
+
+#### Verification
+
+- Extension suite: 1240 passing (10 new — `applyRuleCatalog` ×4 covering present/missing-rule
+  bucketing, issue-weighting, and empty-catalog passthrough; `ruleCatalog` loader ×6 covering load,
+  cache, and the missing/malformed/no-rules degrade paths). The 11 failures are pre-existing and
+  unrelated (cross-file commands, language picker), confirmed identical on the prior commit.
+- Dart `test/report/violation_export_test.dart`: 32 passing, including 2 new cases pinning that the
+  catalog covers every rule with a well-formed record and that security-hotspot rules carry
+  `requiresReview`.
+- `npm run check-types` clean; `dart analyze` clean on the changed Dart files.
+
+#### Scope note
+
+The live model remains phase #1a for the freshness-coupled surfaces (triage dashboard, rule-packs
+panel) and the not-applicable one (configSuggestions) — those are intentionally not migrated, per
+§2 above. This task closed only the issuesViewCommands sub-item; the plan stays active for the
+§1.1 consolidated-webview visual-render verification.

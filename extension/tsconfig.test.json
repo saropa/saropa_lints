@@ -85,6 +85,8 @@
     "src/test/liveDiagnosticsModel.test.ts",
     "src/liveViolationsData.ts",
     "src/test/liveViolationsData.test.ts",
+    "src/ruleCatalog.ts",
+    "src/test/ruleCatalog.test.ts",
     "src/healthGrade.ts",
     "src/views/consolidated/consolidatedModel.ts",
     "src/test/consolidatedModel.test.ts",

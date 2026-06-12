@@ -191,6 +191,38 @@ def _prompt_locale_coverage_failure() -> str:
         return "abort"
 
 
+def regenerate_rule_catalog(project_dir: Path) -> bool:
+    """Regenerate the bundled rule-metadata catalog the extension ships.
+
+    The extension bundles ``extension/media/rules_catalog.json`` (rule name ->
+    type/status/security metadata) so the live-diagnostics path can drive the
+    Issues-panel metadata filters and hotspot review without a stale export. The
+    catalog is byte-derived from the rule definitions, so it must be regenerated
+    at package time — otherwise a rule added or retuned since the last manual run
+    would ship a stale catalog and the filters would mis-bucket it. Mirrors the
+    locale coverage gate's "regenerate generated assets before packaging" role.
+
+    Non-fatal: a generation failure prints a warning and lets the (committed)
+    catalog ship, rather than aborting the whole publish over a tooling hiccup.
+    """
+    r = run_command(
+        ["dart", "run", "saropa_lints:generate_rule_catalog"],
+        project_dir,
+        "Regenerate rule catalog",
+        capture_output=True,
+        allow_failure=True,
+    )
+    if r.returncode != 0:
+        print_warning(
+            "Could not regenerate rules_catalog.json — shipping the committed "
+            "catalog. Run `dart run saropa_lints:generate_rule_catalog` manually."
+        )
+        if r.stderr:
+            print_warning(r.stderr.strip())
+        return False
+    return True
+
+
 def run_extension_compile(project_dir: Path) -> bool:
     """Run npm run compile in extension directory. Returns True on success."""
     ext_dir = _extension_dir(project_dir)
@@ -465,6 +497,10 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
             break
         print_error("Publish aborted at extension locale coverage gate.")
         return None
+    # Keep the bundled rule-metadata catalog current with the rule definitions
+    # before compiling it into the .vsix (non-fatal — ships the committed catalog
+    # on failure).
+    regenerate_rule_catalog(project_dir)
     if not run_extension_compile(project_dir):
         return None
     vsix = run_extension_package(project_dir, version)
