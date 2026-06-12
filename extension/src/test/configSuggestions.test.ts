@@ -81,6 +81,45 @@ describe('computeConfigSuggestions', () => {
     assert.ok(!out.some((s) => s.packId === 'bloc'));
   });
 
+  // The lockfile path: a dependencyGate pack (dio_5) is suggested only when the
+  // RESOLVED version in pubspec.lock satisfies the gate, never from pubspec alone.
+  const dioPubspec =
+    'name: app\ndependencies:\n  dio: ^5.0.0\ndev_dependencies:\n  saropa_lints: ^13.0.0\n';
+  const configuredOptions = 'plugins:\n  saropa_lints:\n    version: "13.0.0"\n';
+
+  it('suggests a dependency-gated upgrade pack when pubspec.lock satisfies the gate', () => {
+    const root = makeWorkspace();
+    write(root, 'pubspec.yaml', dioPubspec);
+    write(root, 'analysis_options.yaml', configuredOptions);
+    write(root, 'pubspec.lock', 'packages:\n  dio:\n    version: "5.4.0"\n');
+    const out = computeConfigSuggestions(root);
+    assert.ok(
+      out.some((s) => s.kind === 'pack-available' && s.packId === 'dio_5'),
+      'expected dio_5 upgrade pack when resolved dio is 5.x',
+    );
+  });
+
+  it('does not suggest the upgrade pack when the resolved version is below the gate', () => {
+    const root = makeWorkspace();
+    write(root, 'pubspec.yaml', dioPubspec);
+    write(root, 'analysis_options.yaml', configuredOptions);
+    write(root, 'pubspec.lock', 'packages:\n  dio:\n    version: "4.0.6"\n');
+    const out = computeConfigSuggestions(root);
+    assert.ok(
+      !out.some((s) => s.packId === 'dio_5'),
+      'dio 4.x must not surface the dio_5 migration pack',
+    );
+  });
+
+  it('does not suggest the upgrade pack from pubspec alone (no lockfile)', () => {
+    const root = makeWorkspace();
+    write(root, 'pubspec.yaml', dioPubspec);
+    write(root, 'analysis_options.yaml', configuredOptions);
+    // No pubspec.lock: the gate is unverifiable, so dio_5 must stay hidden.
+    const out = computeConfigSuggestions(root);
+    assert.ok(!out.some((s) => s.packId === 'dio_5'));
+  });
+
   it('countConfigSuggestions matches the array length', () => {
     const root = makeWorkspace();
     write(

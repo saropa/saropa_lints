@@ -28,6 +28,10 @@ import {
   readAnalysisOptionsPath,
   readRulePacksEnabled,
 } from '../rulePacks/rulePackYaml';
+import {
+  applicableDisabledPacks,
+  parseLockVersions,
+} from '../rulePacks/upgradePackNudgeLogic';
 
 /** Discriminator for how a suggestion should be rendered and acted on. */
 export type ConfigSuggestionKind = 'init-missing' | 'pack-available';
@@ -48,6 +52,16 @@ export interface ConfigSuggestion {
 /** Reads pubspec.yaml content, or '' when absent/unreadable. */
 function readPubspecContent(root: string): string {
   const p = path.join(root, 'pubspec.yaml');
+  try {
+    return fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : '';
+  } catch {
+    return '';
+  }
+}
+
+/** Reads pubspec.lock content, or '' when absent/unreadable (pub get not run). */
+function readPubspecLock(root: string): string {
+  const p = path.join(root, 'pubspec.lock');
   try {
     return fs.existsSync(p) ? fs.readFileSync(p, 'utf-8') : '';
   } catch {
@@ -77,12 +91,13 @@ function hasSaropaLintsConfigured(root: string): boolean {
 }
 
 /**
- * A pack is only proactively suggestable when its applicability is verifiable
- * from the pubspec alone. {@link isPackDetected} fully resolves sdkGate packs,
- * but cannot check a `dependencyGate` semver lower bound — so a version-migration
- * pack (dio_5, bloc_8, …) would be suggested even on the old major. Those are
- * already handled by the dedicated upgrade-pack nudge, so we exclude
- * dependencyGate packs here to avoid double-surfacing and false positives.
+ * A pack is only suggestable FROM THE PUBSPEC ALONE when its applicability is
+ * verifiable there. {@link isPackDetected} fully resolves sdkGate packs, but
+ * cannot check a `dependencyGate` semver lower bound — so a version-migration
+ * pack (dio_5, bloc_8, …) would be suggested even on the old major. We exclude
+ * dependencyGate packs from the pubspec path to avoid that false positive; they
+ * are added back via the lockfile path (see {@link upgradePackSuggestions}),
+ * which resolves the actual installed version and applies the `>=` gate.
  */
 function isProactivelySuggestable(
   def: RulePackDefinition,
@@ -92,12 +107,44 @@ function isProactivelySuggestable(
   return isPackDetected(def, pubspecContent);
 }
 
+/** Maps a rule-pack definition to a `pack-available` suggestion. */
+function toPackSuggestion(def: RulePackDefinition): ConfigSuggestion {
+  return {
+    kind: 'pack-available',
+    id: def.id,
+    packId: def.id,
+    packLabel: def.label,
+    ruleCount: def.ruleCodes.length,
+  };
+}
+
+/**
+ * Dependency-gated migration packs (dio_5, bloc_8, …) whose `>=` gate the
+ * RESOLVED lockfile version actually satisfies, and that are not enabled.
+ *
+ * This is the lockfile counterpart to the pubspec-only {@link isProactivelySuggestable}
+ * exclusion: pubspec can't verify the semver lower bound, but pubspec.lock pins
+ * the installed version, so these become safe to surface without false positives.
+ * Folding them in here makes the Suggestions view the single complete list of
+ * applicable packs — there is no separate per-pack upgrade toast to compete with.
+ */
+function upgradePackSuggestions(
+  root: string,
+  enabled: ReadonlySet<string>,
+): ConfigSuggestion[] {
+  const lockContent = readPubspecLock(root);
+  if (!lockContent) return [];
+  const lockVersions = parseLockVersions(lockContent);
+  return applicableDisabledPacks(lockVersions, enabled).map(toPackSuggestion);
+}
+
 /**
  * Computes the proactive config suggestions for [root].
  *
  * Order: init-missing first (it gates everything else — without a plugin block
  * no rule runs), then applicable-but-disabled packs sorted by label for stable
- * display and test output.
+ * display and test output. "Applicable" spans both pubspec-detected packs
+ * (sdkGate + plain dependency presence) and lockfile-resolved upgrade packs.
  *
  * Returns [] when saropa_lints is not even a dependency (nothing to suggest) so
  * the badge stays hidden in unrelated projects.
@@ -119,20 +166,17 @@ export function computeConfigSuggestions(root: string): ConfigSuggestion[] {
   const pubspecContent = readPubspecContent(root);
   const enabled = new Set(readRulePacksEnabled(root));
 
-  const available = RULE_PACK_DEFINITIONS.filter(
+  const fromPubspec = RULE_PACK_DEFINITIONS.filter(
     (def) => !enabled.has(def.id) && isProactivelySuggestable(def, pubspecContent),
-  ).sort((a, b) => a.label.localeCompare(b.label));
+  ).map(toPackSuggestion);
 
-  for (const def of available) {
-    suggestions.push({
-      kind: 'pack-available',
-      id: def.id,
-      packId: def.id,
-      packLabel: def.label,
-      ruleCount: def.ruleCodes.length,
-    });
-  }
+  // dependencyGate and other packs are disjoint (isProactivelySuggestable
+  // returns false for dependencyGate), so a simple concat cannot duplicate ids.
+  const packs = [...fromPubspec, ...upgradePackSuggestions(root, enabled)].sort(
+    (a, b) => (a.packLabel ?? a.id).localeCompare(b.packLabel ?? b.id),
+  );
 
+  suggestions.push(...packs);
   return suggestions;
 }
 

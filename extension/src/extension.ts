@@ -59,7 +59,7 @@ import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
 import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
 import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
-import { maybeOfferUpgradePacks } from './rulePacks/upgradePackNudge';
+import { maybeShowStartupSuggestion } from './rulePacks/startupSuggestionNudge';
 import {
   openRuleExplainPanelForViolation,
   openRuleExplainPanel,
@@ -573,8 +573,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // running init, or editing analysis_options must re-count immediately. A light
   // watcher keeps the count live even when no analysis has run.
   {
+    // pubspec.lock is included because the suggestion count now folds in
+    // lockfile-resolved upgrade packs — a `pub upgrade` that brings a migration
+    // pack into range must re-count the badge, not just on the next analysis.
     const configWatcher = vscode.workspace.createFileSystemWatcher(
-      '**/{analysis_options.yaml,analysis_options_custom.yaml,pubspec.yaml}',
+      '**/{analysis_options.yaml,analysis_options_custom.yaml,pubspec.yaml,pubspec.lock}',
     );
     configWatcher.onDidChange(refreshConfigSuggestions);
     configWatcher.onDidCreate(refreshConfigSuggestions);
@@ -847,17 +850,20 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     depWatcher.onDidChange(triggerAnalysisAfterDependencyChange);
     depWatcher.onDidCreate(triggerAnalysisAfterDependencyChange);
     // A resolved-version change (after `pub upgrade`) may bring the project into
-    // range of a semver-gated migration pack; offer to enable the upgrade lints.
-    depWatcher.onDidChange(() => void maybeOfferUpgradePacks(context));
-    depWatcher.onDidCreate(() => void maybeOfferUpgradePacks(context));
+    // range of a semver-gated migration pack; surface it through the single
+    // coalesced suggestion toast rather than a competing per-pack notification.
+    depWatcher.onDidChange(() => void maybeShowStartupSuggestion(context));
+    depWatcher.onDidCreate(() => void maybeShowStartupSuggestion(context));
     context.subscriptions.push(depWatcher, {
       dispose: () => { if (depChangeTimer) clearTimeout(depChangeTimer); },
     });
   }
 
-  // Offer applicable migration packs once on activation (deferred so it never
-  // blocks startup); subsequent offers fire from the pubspec.lock watcher above.
-  setTimeout(() => void maybeOfferUpgradePacks(context), 4_000);
+  // Surface applicable rule-pack suggestions in one coalesced toast on activation
+  // (deferred so it never blocks startup); subsequent offers fire from the
+  // pubspec.lock watcher above. The in-flight guard in the nudge collapses any
+  // overlap between this timer and the watcher to a single notification.
+  setTimeout(() => void maybeShowStartupSuggestion(context), 4_000);
 
   syncRuleMetadataFromViolations(root ? readViolations(root) : null);
 
