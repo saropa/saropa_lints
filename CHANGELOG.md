@@ -62,7 +62,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [13.12.6]
 
 Sharpens roughly thirty leak, disposal, security, and package rules so they stop flagging code that is already correct, ahead of grading some of them as build-breaking errors. Resources cleaned up in a helper or handed to a caller, controllers owned by a parent widget, encrypted SharedPreferences keys, and Drift queries that do carry a `where` are no longer reported. Names are matched on whole-word and resolved-type boundaries instead of substrings, so `pin` no longer matches `shopping` and `ui.ImageFilter` is no longer mistaken for a disposable image. No action required.
 
@@ -85,6 +85,10 @@ Sharpens roughly thirty leak, disposal, security, and package rules so they stop
 - **Memory and path rules use resolved types and word boundaries.** `require_image_disposal` matches exactly `ui.Image` (not `ui.ImageFilter`/`Provider`/`Descriptor`), `avoid_expando_circular_references` requires a real `Expando` and a whole-token key, and `avoid_path_traversal`/`require_file_path_sanitization` match the tainting parameter as a whole identifier.
 - **Drift, WebView, and animation detection narrowed to real sinks.** `avoid_drift_update_without_where` walks the query's own receiver chain so an unrelated `.write()`/`.go()` no longer trips it and a query carrying `where` is cleared; `prefer_html_escape` targets only the HTML argument of a WebView sink; `avoid_flashing_content` requires a literal `repeat(reverse: true)` with a sub-333ms duration.
 - **`prefer_no_commented_out_code` no longer flags wrapped prose.** A prose comment whose final wrapped line is a single word ending a sentence (`// result.`), or a line that names an API method mid-sentence (`// base64Url.decode rejects the token.`), is no longer mistaken for commented-out code. The rule now judges each contiguous `//` run as one block rather than line by line, so the surrounding prose is taken into account; a genuine commented-out statement sitting under a prose comment is still flagged. No action required.
+
+### Fixed (Extension)
+
+- **Dashboard labels stranded in English are now localized in six languages.** The review status "not applicable", the Persian "version" section header, the French links heading, and the documentation quality badge now render in the active display language for German, Spanish, Persian, Bengali, Filipino, and French instead of showing English; acronyms and cognates that are correct as-is (WASM, PR, Repository) are kept English on purpose. No action required.
 
 ## [13.13.0]
 
