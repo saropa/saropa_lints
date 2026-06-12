@@ -9,6 +9,11 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'app_links_listen_in_build',
     'app_links_uncaught_stream_error',
   },
+  'app_links_6': {
+    'app_links_use_get_initial_link',
+    'app_links_use_get_latest_link',
+    'app_links_use_uri_link_stream',
+  },
   'audioplayers': {
     'audioplayers_hardcoded_volume_above_one',
     'audioplayers_low_latency_with_seek',
@@ -646,6 +651,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
 /// Pubspec markers for generated packs (keep extension rulePackDefinitions in sync).
 const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'app_links': {'app_links'},
+  'app_links_6': {'app_links'},
   'audioplayers': {'audioplayers'},
   'auto_route': {'auto_route'},
   'awesome_notifications': {'awesome_notifications'},

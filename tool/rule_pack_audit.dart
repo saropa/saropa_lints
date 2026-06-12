@@ -133,6 +133,20 @@ kRelocatedRulePackCodes = {
     fromPack: 'local_auth',
     toPack: 'local_auth_3',
   ),
+  // app_links 6.0 removed getInitialAppLink / getLatestAppLink and the
+  // allUriLinkStream / allStringLinkStream getters.
+  'app_links_use_get_initial_link': (
+    fromPack: 'app_links',
+    toPack: 'app_links_6',
+  ),
+  'app_links_use_get_latest_link': (
+    fromPack: 'app_links',
+    toPack: 'app_links_6',
+  ),
+  'app_links_use_uri_link_stream': (
+    fromPack: 'app_links',
+    toPack: 'app_links_6',
+  ),
 };
 
 /// Returns a new map with [kRelocatedRulePackCodes] applied: each code is
