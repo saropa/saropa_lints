@@ -9,7 +9,16 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { normalizePath, cachedFileExists, clearFileExistsCache } from '../pathUtils';
 import { getRelatedRules, getRuleDescription, getRuleDocUrl } from '../ruleMetadata';
-import { readViolations, hasViolations, Violation } from '../violationsReader';
+import { Violation } from '../violationsReader';
+// Status-bar score + this tree now read LIVE diagnostics (same source as the
+// Findings wide report) instead of the stale violations.json export, so the
+// count can never lag the Problems panel. Aliased to the former names to keep
+// every call site below unchanged — only the data source moves. The tree's own
+// disabled / text / suppression filtering still runs on the returned set.
+import {
+  readLiveViolations as readViolations,
+  hasLiveViolations as hasViolations,
+} from '../liveViolationsData';
 import {
   SecurityHotspotReviewStateService,
   isSecurityHotspotViolation,

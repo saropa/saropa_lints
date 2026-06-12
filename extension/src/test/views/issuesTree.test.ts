@@ -13,7 +13,9 @@ import { TreeItemCollapsibleState } from '../vibrancy/vscode-mock-classes';
 // projectRoot's getProjectRoot is called in getTreeItem and many methods.
 import * as projectRoot from '../../projectRoot';
 import * as suppressionsStore from '../../suppressionsStore';
-import * as violationsReader from '../../violationsReader';
+// The tree now sources findings from live diagnostics (liveViolationsData),
+// not the violations.json reader, so the fake data is injected there.
+import * as liveViolationsData from '../../liveViolationsData';
 import * as pathUtils from '../../pathUtils';
 import { setRelatedRulesMetadata } from '../../ruleMetadata';
 
@@ -153,7 +155,7 @@ describe('IssuesTreeProvider self-contained element children', () => {
       hiddenSeverities: [],
       hiddenImpacts: [],
     });
-    readViolationsStub = sinon.stub(violationsReader, 'readViolations');
+    readViolationsStub = sinon.stub(liveViolationsData, 'readLiveViolations');
   });
 
   afterEach(() => {
@@ -300,7 +302,7 @@ describe('IssuesTreeProvider root rows (no help chrome)', () => {
       hiddenSeverities: [],
       hiddenImpacts: [],
     });
-    readViolationsStub = sinon.stub(violationsReader, 'readViolations');
+    readViolationsStub = sinon.stub(liveViolationsData, 'readLiveViolations');
   });
 
   afterEach(() => {
@@ -347,7 +349,7 @@ describe('IssuesTreeProvider metadata grouping modes', () => {
       hiddenSeverities: [],
       hiddenImpacts: [],
     });
-    readViolationsStub = sinon.stub(violationsReader, 'readViolations');
+    readViolationsStub = sinon.stub(liveViolationsData, 'readLiveViolations');
   });
 
   afterEach(() => {
