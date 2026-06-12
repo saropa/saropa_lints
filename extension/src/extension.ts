@@ -73,7 +73,8 @@ import {
 } from './violationsReader';
 // Status-bar score reads LIVE diagnostics (same source as the Findings wide
 // report and the Issues tree) so the grade never lags the Problems panel.
-import { readVisibleLiveViolations } from './liveViolationsData';
+import { readLiveViolations, readVisibleLiveViolations } from './liveViolationsData';
+import { initRuleCatalog } from './ruleCatalog';
 import {
   SecurityHotspotReviewStateService,
 } from './securityHotspotReviewState';
@@ -425,6 +426,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     return setCurrentLocale(requested);
   };
   applyUiLocalePreference();
+
+  // Load the bundled rule-metadata catalog once so the live-diagnostics path can
+  // attach per-rule type/status/security flags (a Diagnostic carries none). Cached
+  // for the session; a missing asset degrades to an empty catalog, never throws.
+  initRuleCatalog(context.extensionUri.fsPath);
 
   // Detect whether this workspace is a Dart/Flutter project so the UI can
   // show appropriate welcome content instead of a misleading "Enable" button.
@@ -1784,7 +1790,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       issuesProvider,
       updateIssuesViewMessage,
       getProjectRoot,
-      readViolations,
+      // Live source enriched with the bundled rule catalog: the metadata filters
+      // and hotspot review read per-rule type/status from the catalog now, so
+      // they stay in sync with the Problems panel instead of a stale export.
+      readViolations: readLiveViolations,
       hotspotReviewState,
     }),
     // I2: Triage actions — disable/enable rules via analysis_options_custom.yaml overrides.

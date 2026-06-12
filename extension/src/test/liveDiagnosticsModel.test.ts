@@ -20,7 +20,8 @@ import './vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';
 import * as vscode from 'vscode';
-import { buildViolationsDataFromDiagnostics } from '../liveDiagnosticsModel';
+import { applyRuleCatalog, buildViolationsDataFromDiagnostics } from '../liveDiagnosticsModel';
+import type { RuleMetadataData } from '../violationsReader';
 
 const ROOT = '/proj';
 
@@ -171,5 +172,55 @@ describe('buildViolationsDataFromDiagnostics', () => {
   it('passes the configured tier through without reading any file', () => {
     const data = buildViolationsDataFromDiagnostics(ROOT, fakeGet([]), 'professional');
     assert.strictEqual(data.config?.tier, 'professional');
+  });
+});
+
+describe('applyRuleCatalog', () => {
+  // A minimal catalog: one security-hotspot rule, one ordinary bug rule.
+  const catalog: Record<string, RuleMetadataData> = {
+    avoid_hardcoded_secret: {
+      ruleType: 'securityHotspot',
+      ruleStatus: 'ready',
+      requiresReview: true,
+      tags: ['security', 'review-required'],
+    },
+    avoid_print: { ruleType: 'codeSmell', ruleStatus: 'beta' },
+  };
+
+  function modelWith(rules: string[]): ReturnType<typeof buildViolationsDataFromDiagnostics> {
+    const entries = [[uri('/proj/lib/a.dart'), rules.map((r) => diag({ code: r }))]] as const;
+    return buildViolationsDataFromDiagnostics(ROOT, fakeGet(entries));
+  }
+
+  it('attaches per-rule metadata only for rules present in the model', () => {
+    const data = applyRuleCatalog(modelWith(['avoid_print']), catalog);
+    assert.deepStrictEqual(Object.keys(data.config?.ruleMetadataByRule ?? {}), ['avoid_print']);
+    assert.strictEqual(data.config?.ruleMetadataByRule?.avoid_print?.ruleStatus, 'beta');
+  });
+
+  it('issue-weights byRuleType and byRuleStatus from the catalog', () => {
+    // Two avoid_print (codeSmell/beta) + one hotspot (securityHotspot/ready).
+    const data = applyRuleCatalog(
+      modelWith(['avoid_print', 'avoid_print', 'avoid_hardcoded_secret']),
+      catalog,
+    );
+    assert.strictEqual(data.summary?.byRuleType?.codeSmell, 2);
+    assert.strictEqual(data.summary?.byRuleType?.securityHotspot, 1);
+    assert.strictEqual(data.summary?.byRuleStatus?.beta, 2);
+    assert.strictEqual(data.summary?.byRuleStatus?.ready, 1);
+  });
+
+  it('falls rules missing from the catalog into unspecified/ready', () => {
+    const data = applyRuleCatalog(modelWith(['some_unknown_rule']), catalog);
+    assert.strictEqual(data.summary?.byRuleType?.unspecified, 1);
+    assert.strictEqual(data.summary?.byRuleStatus?.ready, 1);
+    // No metadata copied for a rule the catalog does not know.
+    assert.strictEqual(data.config?.ruleMetadataByRule?.some_unknown_rule, undefined);
+  });
+
+  it('returns the model unchanged when the catalog is empty', () => {
+    const model = modelWith(['avoid_print']);
+    const data = applyRuleCatalog(model, {});
+    assert.strictEqual(data, model);
   });
 });
