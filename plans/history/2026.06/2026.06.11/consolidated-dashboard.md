@@ -1,10 +1,10 @@
 # Consolidated dashboard — async-first webview (build + stylesheet elevation)
 
-**Trigger.** After the #1a live-diagnostics work, the user asked to "spec a super consolidated, powerful, beautiful, useful dashboard," then — worried about "jank, bloat and general performance" — to make it "lazy loading, async first design," then "a level of wow beauty… start building right away, don't wait for any more feedback, we can tune later." When challenged ("either you used world-class glorious style sheets and UX design principles or didn't"), the stylesheet was honestly assessed and elevated.
+**Goal.** Following the #1a live-diagnostics work, add a consolidated dashboard webview built with an async-first, lazy-loading design to avoid jank and bloat, with a high-quality, contrast-safe stylesheet. A first-pass stylesheet was then assessed against world-class CSS/UX principles and elevated.
 
 This is the VS Code extension only (TypeScript/CSS). No Dart lint rules changed.
 
-> **Commit note:** the bulk of this build (model, view, client, command, test, healthGrade extraction) was swept into commit `4c1a40de` by another workstream's commit (whose subject is about package rules). This finish pass commits the remaining piece — the stylesheet elevation in `consolidatedStyles.ts` — plus this report. Git history is recoverable; the feature is fully committed across the two commits.
+> **Commit note:** the bulk of this build (model, view, client, command, test, healthGrade extraction) landed in commit `4c1a40de` (whose subject is about package rules). The remaining piece — the stylesheet elevation in `consolidatedStyles.ts` — plus this report committed separately. The feature is fully committed across the two commits.
 
 ## Finish Report (2026-06-11)
 
@@ -22,14 +22,14 @@ A new, self-contained **consolidated dashboard** webview, built async-first from
 - Command `saropaLints.openConsolidatedDashboard` registered (extension.ts + package.json + package.nls.json + command catalog).
 - **[consolidatedModel.test.ts](extension/src/test/consolidatedModel.test.ts)** — 5 tests.
 
-### Performance / async architecture (the explicit mandate)
+### Performance / async architecture
 - **Shell-once**: `webview.html` set a single time; every refresh is a `postMessage` the client patches in — no full re-render, scroll/focus/expansion survive. (The legacy dashboard reassigns `.html` on every change; this was deliberately *not* repeated.)
 - **Lazy**: initial payload ≈ N rule headers; occurrences stream per-rule on expand, capped at 200 with a "+N more".
-- **Zero-analysis**: reads live `getDiagnostics()` (the analyzer already produced them); 400 ms debounce coalesces bursts; in-memory regroup only — never spawns analysis (the explicit "this can CRUSH a PC" concern).
+- **Zero-analysis**: reads live `getDiagnostics()` (the analyzer already produced them); 400 ms debounce coalesces bursts; in-memory regroup only — never spawns analysis (avoiding the CPU-crush path).
 - **No bloat**: vanilla JS + CSS, no framework or charting lib added.
 
-### Stylesheet elevation (this commit's diff)
-Honest self-assessment found the first-pass CSS was principled (theme tokens, hierarchy, severity color language) but **not world-class**: opacity-muting (not contrast-safe), ad-hoc spacing/half-pixel type, an infinite idle pulse that contradicted its own motion rule. The elevation:
+### Stylesheet elevation
+The first-pass CSS was principled (theme tokens, hierarchy, severity color language) but **not world-class**: opacity-muting (not contrast-safe), ad-hoc spacing/half-pixel type, an infinite idle pulse that contradicted its own motion rule. The elevation:
 - **Token scales** — spacing on a 4px rhythm (`--s-*`), a type scale (`--t-*`), radii tokens; no raw/half-pixel values.
 - **Semantic secondary color** — `--vscode-descriptionForeground` (`--text-2`) replaces every opacity-mute, so contrast is theme-managed.
 - **Motion discipline** — the infinite pulse removed; the live dot is a steady accent with a soft ring.
@@ -41,12 +41,12 @@ Honest self-assessment found the first-pass CSS was principled (theme tokens, hi
 - **Docs:** module header on every new file states the why (async-first, single-source grade, lazy).
 
 ### Testing
-- **Audited** `extension/src/test/` for changed symbols (`severityScore`/`scoreToGrade`/`gradeColor`/`healthGrade`/`computeHealthScore`/`consolidated`/`buildConsolidatedModel`). Matches: `consolidatedModel.test.ts` (new, mine); `healthScore.test.ts` (tests the separate `healthScore.ts` module — untouched); `comparison-html.test.ts` (vibrancy — coincidental word, unaffected). `violationsDashboardHtml.test.ts` does NOT reference the extracted grade fns, and the formula is byte-identical, so the gauge output is unchanged.
+- **Audited** `extension/src/test/` for changed symbols (`severityScore`/`scoreToGrade`/`gradeColor`/`healthGrade`/`computeHealthScore`/`consolidated`/`buildConsolidatedModel`). Matches: `consolidatedModel.test.ts` (new); `healthScore.test.ts` (tests the separate `healthScore.ts` module — untouched); `comparison-html.test.ts` (vibrancy — coincidental word, unaffected). `violationsDashboardHtml.test.ts` does NOT reference the extracted grade fns, and the formula is byte-identical, so the gauge output is unchanged.
 - **New:** `consolidatedModel.test.ts` — grouping, worst-severity-then-count rank, grade from severity mix (matches shared `severityScore`), totals/distinct files, lazy occurrences with root-relative paths + prefix-stripped messages.
 - **Run:** `npm run check-types` clean; `verify-manifest-nls-keys` OK (306 keys); `npm test` = **1220 passing / 11 failing**. The 11 pre-exist (cross-file CLI + a languagePick locale-coverage assertion, untouched modules) — zero regressions; the catalog test that initially caught a missing entry now passes.
 
 ### l10n
-- This turn's diff is CSS only (exempt). The dashboard's strings are externalized to the `consolidated.*` en.json namespace + a 2-key SL bundle + host-pre-formatted message fields; no dev strings in en.json (reverse audit clean).
+- The stylesheet-elevation diff is CSS only (exempt). The dashboard's strings are externalized to the `consolidated.*` en.json namespace + a 2-key SL bundle + host-pre-formatted message fields; no dev strings in en.json (reverse audit clean).
 - **Catalog regeneration NOT run** — `generate_translations.py` is the banned NLLB pipeline; per the standing rule, source keys are added now and translated on the i18n cadence. The 18 `consolidated.*` keys are English-only in the 24 locales until then; the publish coverage gate (`generate_locales.py --fail-on-missing`) will require them before any release (not this step).
 
 ### Maintenance

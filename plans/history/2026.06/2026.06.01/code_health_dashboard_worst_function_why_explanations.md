@@ -1,6 +1,6 @@
 # Code Health Dashboard — surface WHY each "worst function" scored low
 
-The user (looking at a real saropa contacts scan) pointed at the *Worst functions* table and said: *"'worst functions' doesn't explain WHY they are the worst!"*. The flag pills were single-word labels (`unused`, `complex`, `undocumented`) with no inline evidence; the threshold rule that fired was invisible; a reader had to triangulate across the Score / Usage / Coverage / Complexity / Changed columns to reconstruct WHY a given function landed on the list. The follow-up ask was: *"the score field should include an expander arrow and expanding any row should list the issues clearly."* This task delivers both.
+The *Worst functions* table did not explain why each function scored low. The flag pills were single-word labels (`unused`, `complex`, `undocumented`) with no inline evidence; the threshold rule that fired was invisible; a reader had to triangulate across the Score / Usage / Coverage / Complexity / Changed columns to reconstruct why a given function landed on the list. This change adds inline evidence to each flag and a per-row expander arrow on the score field that lists the issues clearly.
 
 ## Finish Report (2026-06-01)
 
@@ -30,7 +30,7 @@ VS Code extension only (`extension/src/views/*.ts`, `extension/src/i18n/locales/
 | `extension/src/test/views/projectVibrancyReportHtml.test.ts` | Two new tests: scaffolding pin + token-preservation pin. |
 | `CHANGELOG.md` | New `[Unreleased]` section with one `### Changed (Extension)` entry. |
 
-### Deep review notes for the reviewer AI
+### Deep review notes
 
 - **Score-pill alignment was previously `text-align: center` but is now `text-align: left`** because the cell carries two children (chevron + pill). Center alignment with two heterogeneous children read as wobbly; left is intentional. Stated explicitly in the consolidated `.col-score` rule.
 - **`flagInfo(f, r)` is defensive about unknown flags** — if the CLI ever emits a flag not in `FLAG_DESC` (e.g. a future flag added on the Dart side before i18n catches up), the helper returns `{label: f.replace(/_/g, ' '), evidence: '', rule: ''}` so the pill still renders rather than crashing the client script.
@@ -45,7 +45,7 @@ VS Code extension only (`extension/src/views/*.ts`, `extension/src/i18n/locales/
 - `tsc -p extension/tsconfig.test.json`: clean (exit 0).
 - `mocha out-test/test/views/projectVibrancyReportHtml.test.js`: **21/21 passing** (19 existing + 2 new).
 - `mocha out-test/test/views/**/*.test.js`: **167/167 passing**.
-- Full extension `npm test`: 1185 passing. The 10 failures are all in `cross-file commands` (a feature not touched by this task and with pre-existing uncommitted state from before this session — `git log` confirms the test file has no commits since `9141c509` and the working tree has no relevant modifications). Out of scope per the "Never raise unrelated issues" rule.
+- Full extension `npm test`: 1185 passing. The 10 failures are all in `cross-file commands` (a feature not touched by this change and with pre-existing uncommitted state — `git log` confirms the test file has no commits since `9141c509` and the working tree has no relevant modifications). Out of scope per the "Never raise unrelated issues" rule.
 
 ### Out of scope / not done
 

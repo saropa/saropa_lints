@@ -301,7 +301,7 @@ containing this fix is consumed by that repo.
 - `CHANGELOG.md` — added `### Fixed` entry under `[Unreleased]`.
 - `bugs/function_always_returns_null_false_positive_override_of_nullable_getter.md` — flipped `Status` to `Fixed`, populated `Changes Made`, appended this finish report. The file is renamed in the same commit to `plan/history/2026.05/2026.05.31/`.
 
-**Files explicitly excluded from this commit** (other workstreams' unverified changes already in the working tree at the start of this task; not mine to commit):
+**Files explicitly excluded from this commit** (other workstreams' unverified changes already in the working tree at the start of this task; out of scope for this commit):
 
 - `example/lib/accessibility/avoid_small_touch_targets_fixture.dart`
 - `example/lib/widget_layout/prefer_layout_builder_for_constraints_fixture.dart`

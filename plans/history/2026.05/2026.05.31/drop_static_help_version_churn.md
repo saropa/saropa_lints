@@ -1,13 +1,12 @@
 # Drop static `views.help.name` version churn
 
-## Trigger
+## Problem
 
-After landing the CI test-path fix and removing the post-publish auto-bump
-(commit `5e1943ba` earlier in this session), three `extension/package.nls.*.json`
-files remained modified in the working tree (`ar`, `fa`, `pl`) with a stale
+After the CI test-path fix and the removal of the post-publish auto-bump
+(commit `5e1943ba`), three `extension/package.nls.*.json`
+files (`ar`, `fa`, `pl`) carried a stale
 `(الإصدار 13.11.1)` / `(نسخه 13.11.1)` / `(wersja 13.11.1)` translated
-parenthetical alongside the suffix `(v13.11.2)`. The user asked: "why do
-these exist, and can we fix it." Investigation traced the residue to a
+parenthetical alongside the suffix `(v13.11.2)`. The residue traces to a
 manifest-time sync script writing a value that the runtime code at
 [extension/src/extension.ts:506-513](../../../../extension/src/extension.ts#L506-L513)
 explicitly overrides; the static value is dead code that nobody reads.
@@ -96,7 +95,7 @@ checks. It does not pin the value of `views.help.name` nor assert any
 the key still exists and still resolves to a non-undefined string.
 
 No Python test under `scripts/modules/tests/` references any changed symbol.
-Python suite ran green earlier this session (53/53). Extension TS suite
+Python suite ran green (53/53). Extension TS suite
 not executed in this environment — audited by inspection only.
 
 ### Files changed

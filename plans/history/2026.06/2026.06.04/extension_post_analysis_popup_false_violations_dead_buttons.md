@@ -1,6 +1,6 @@
 # Extension post-analysis popup: false "violations found" + dead Copy/Open Report buttons
 
-**Trigger (user report):** "i keep getting a modal popup from saropa_lints in my projects. it says there are violations. there are 4 buttons, only the open dashboard button works - the other 3 are broken (copy, report, etc). and when the dashboard opens there are no issues." Later clarified: "it's the snackbar that pops up after a scan when i load a project." User then asked "shouldn't there ALWAYS be a report?" and directed: do both fixes.
+**Problem:** On project load, the post-scan notification from saropa_lints claimed violations were found, but the Findings dashboard opened empty. Of its four actions, only **View Violations** (Open Dashboard) worked; **Copy Report** / **Open Report** flashed a transient "no report found" toast and read as broken. Two fixes are needed: make the popup honest (gate each button on the artifact it acts upon) and drive the popup from the plugin's real output rather than the `dart analyze` exit code.
 
 The popup is `showAnalysisIssuesNotification` in `extension/src/setup.ts`, fired after a `dart analyze` run returns a non-zero exit. Its four actions are **View Violations** / **Copy Report** / **Open Report** / **Show Output**.
 

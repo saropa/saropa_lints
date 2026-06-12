@@ -1,8 +1,8 @@
 # Findings Dashboard — live-diagnostics sync (+ supplementary cleanup)
 
-**Trigger.** During a design discussion about surfacing lint findings, a screenshot showed the VS Code Findings Dashboard reporting `0 findings / grade A 100 / "Last run just now"` while the Problems panel directly below it held 38 live `saropa_lints` findings. Root cause: the dashboard read the batch `reports/.saropa_lints/violations.json` export (only written by an explicit, expensive analysis run), while the Problems panel reads the live analyzer diagnostics — two sources, free to diverge. The user asked to (#1a) make the dashboard read live diagnostics so it can never diverge, holistically (all linters, no saropa-only separation), then to clean up the now-redundant analyzer "supplementary counts" machinery.
+**Problem.** The VS Code Findings Dashboard reported `0 findings / grade A 100 / "Last run just now"` while the Problems panel directly below it held 38 live `saropa_lints` findings. Root cause: the dashboard read the batch `reports/.saropa_lints/violations.json` export (only written by an explicit, expensive analysis run), while the Problems panel reads the live analyzer diagnostics — two sources, free to diverge. This change (#1a) makes the dashboard read live diagnostics so it can never diverge, holistically (all linters, no saropa-only separation), then cleans up the now-redundant analyzer "supplementary counts" machinery.
 
-This work is the VS Code extension only (TypeScript). No Dart lint rules changed.
+This change is the VS Code extension only (TypeScript). No Dart lint rules changed.
 
 ## Finish Report (2026-06-11)
 
@@ -55,4 +55,4 @@ Finish report saved: `plans/history/2026.06/2026.06.11/findings-dashboard-live-d
 
 ### Outstanding / not yet verified
 - **#1b (enrichment) not done** — live findings carry file/line/rule/message/severity but not `correctionMessage`/OWASP/tier-aware metadata for saropa rules (needs a bundled generated rule catalog). Tracked as the next phase; out of scope here.
-- **Not run in the Extension Development Host** — the model is unit-pinned and plugs into the pre-existing live-refresh listener, but the dashboard has not been launched live against a real project this session.
+- **Not run in the Extension Development Host** — the model is unit-pinned and plugs into the pre-existing live-refresh listener, but the dashboard has not been launched live against a real project.

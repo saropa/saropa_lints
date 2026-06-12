@@ -1,16 +1,13 @@
 # Save Upgrade Report button (Package Dashboard)
 
-**Triggered by:** User request — "add a new button next to 'Save' called 'Save Upgrade Report'; it should only report all the details about packages that have an update available."
+Adds a "Save Upgrade Report" button next to the existing "Save" button in the Package Dashboard, exporting only the details of packages that have an update available.
 
 Scope: VS Code extension (TypeScript) only — the Package Vibrancy report webview (`VibrancyReportPanel`, panel title "Saropa Package Dashboard"). No Dart lint-rule code touched.
 
 ## Finish Report (2026-06-10)
 
-### 1. Critical note
-
-
 ### 2. Scope
-Project is `saropa_lints` → LINTER variant. But the change set is **(B-equivalent) VS Code extension TypeScript**, which the linter variant's (A)/(C) buckets don't model. Handled honestly: Dart-rule-specific sections marked SKIPPED with that reason; real TypeScript review + tests performed.
+Project is `saropa_lints` → LINTER variant. The change set is **(B-equivalent) VS Code extension TypeScript**, which the linter variant's (A)/(C) buckets don't model. Dart-rule-specific sections are marked SKIPPED with that reason; TypeScript review + tests were performed.
 
 - (A) Dart lint rules / analyzer plugin: **not touched**.
 - (C) docs/scripts: CHANGELOG + a new history file touched.
@@ -18,7 +15,7 @@ Project is `saropa_lints` → LINTER variant. But the change set is **(B-equival
 
 ### 3. Deep Review
 - **Logic & Safety:** New webview→host message `saveUpgradeReportJson`. Filter runs in the webview (`report-script.ts`): keeps rows where `update.status` is present and not `'up-to-date'`/`'unknown'` — the same outdated test the existing modernization filter uses (`report-script.ts` ~line 215, `hasUpdates`). No new race: reuses the existing debounce/disable pattern of the Save button (button disabled during save, re-enabled after 2s). Empty result (no outdated packages) writes a valid `[]` — acceptable, the user still gets a file and the "Saved report JSON" toast.
-- **Architecture & Adherence:** Did not duplicate the save routine. Refactored `_saveReportJson(rows)` → `_saveReportJson(rows, nameSuffix)` so both reports share one method; the existing call passes `'pubspec_vibrancy'` (preserving the exact prior filename `..._pubspec_vibrancy.json`), the new call passes `'pubspec_upgrade'`. Single source of truth for the dated-folder + timestamp logic.
+- **Architecture & Adherence:** The save routine is not duplicated. `_saveReportJson(rows)` was refactored to `_saveReportJson(rows, nameSuffix)` so both reports share one method; the existing call passes `'pubspec_vibrancy'` (preserving the exact prior filename `..._pubspec_vibrancy.json`), the new call passes `'pubspec_upgrade'`. Single source of truth for the dated-folder + timestamp logic.
 - **Linter-Specific Integrity:** SKIPPED [extension-only — no Dart rules, tiers, or LintImpact involved].
 - **Performance:** Filter is an O(n) pass over already-materialized `packageData` on a user click; negligible.
 - **Documentation Quality:** Added WHY comments at the new button (what "outdated" means + cross-reference to the shared test), at the script handler, and the webview message branch.

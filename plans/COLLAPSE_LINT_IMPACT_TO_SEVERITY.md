@@ -256,9 +256,7 @@ The Scope 1 changes intentionally did not touch the underlying data model (`Lint
 
 ## Finish Report (2026-06-05)
 
-
-
-**Trigger:** "do some work on this: COLLAPSE_LINT_IMPACT_TO_SEVERITY.md" — picked up the open follow-up queue and closed SEV-03 fully plus the highest-impact part of SEV-04.
+**Scope:** Advanced the open follow-up queue, closing SEV-03 fully plus the highest-impact part of SEV-04.
 
 **Plan status after this pass (why it stays active, not archived):** the plan still has genuinely open scope — **SEV-01 (P1)** rule-by-rule severity audit is untouched, and **SEV-04 is only partial**. It is also the canonical tracker referenced from `ROADMAP.md`. Splitting the queue into a separate active file would fragment that single tracker, so the plan is kept active with its checkboxes updated rather than split + archived. The `Active follow-up queue` at the top is the live representation of remaining work.
 
@@ -289,7 +287,7 @@ The Scope 1 changes intentionally did not touch the underlying data model (`Lint
 
 ## Finish Report (2026-06-10)
 
-**Trigger:** "so then do sev-01 and sev-04" — picked up the two remaining open queue items.
+**Scope:** Closed the two remaining open queue items, SEV-01 and SEV-04.
 
 ### SEV-04 — DX scripts accept `error|warning|info` (DONE)
 
@@ -318,7 +316,7 @@ Generated a complete read-only cross-check of every rule's `severity:` field aga
 
 ### Bucket A sweep — COMPLETE (2026-06-10, round 3)
 
-Maintainer directive: "do bucket A". Read every remaining ERROR rule whose explicit `impact` getter said warning/info and graded each against the three-level model. **35 more downgraded ERROR→WARNING** (on top of the 11 above = **46 total**), each with an inline `// SEV-01 (downgraded from ERROR):` why-comment, applied via a scoped script (one replacement confined to each rule's own `LintCode` block):
+Read every remaining ERROR rule whose explicit `impact` getter said warning/info and graded each against the three-level model. **35 more downgraded ERROR→WARNING** (on top of the 11 above = **46 total**), each with an inline `// SEV-01 (downgraded from ERROR):` why-comment, applied via a scoped script (one replacement confined to each rule's own `LintCode` block):
 
 - Performance: `avoid_get_find_in_build`, `require_vsync_mixin`, `avoid_provider_of_in_build`, `avoid_watch_in_callbacks`, `require_update_should_notify`, `avoid_ref_in_build_body`, `require_auto_dispose`.
 - Functional/architecture (no crash): `avoid_global_key_in_build`, `avoid_provider_recreate`, `avoid_provider_in_widget`, `avoid_global_riverpod_providers`, `require_isar_links_load`, `avoid_multiple_material_apps`, `require_cache_key_determinism`, `avoid_late_for_nullable`.
@@ -332,7 +330,7 @@ Maintainer directive: "do bucket A". Read every remaining ERROR rule whose expli
 
 ### Bucket B — plan (under-rated WARNING→ERROR upgrades; NOT started)
 
-Maintainer constraint (verbatim intent): an upgrade to ERROR makes every false positive a build-breaker, which "is going to REALLY PISS PEOPLE OFF" — so **each of the 46 candidates needs its own false-positive analysis before any upgrade**, not a bulk flip. The plan when picked up:
+An upgrade to ERROR makes every false positive a build-breaker for consumers, so **each of the 46 candidates needs its own false-positive analysis before any upgrade**, not a bulk flip. The plan when picked up:
 
 1. **For each candidate, measure detection robustness, not just intent.** A rule may *deserve* ERROR by consequence (security, resource leak) yet be too heuristic to *carry* ERROR. Read the rule's `run()` body and classify its matcher: type-resolved (safe) vs. string/name-heuristic vs. cross-file/config-inference (FP-prone). Examples in the set that are heuristic and thus risky to upgrade: `avoid_path_traversal`, `require_secure_storage`, name-keyword route/permission detectors.
 2. **Upgrade ONLY rules that are both (a) genuinely MUST-fix in consequence AND (b) precise (type-driven, near-zero FP).** Everything else stays WARNING regardless of how serious the consequence is — a build-breaking false positive on a security rule is worse for adoption than a yellow squiggle.

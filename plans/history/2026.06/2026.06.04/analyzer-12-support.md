@@ -1,6 +1,6 @@
 # Analyzer 12 support
 
-Triggered by the user asking, while viewing `pubspec.yaml`: "flutter has recently upgrades, so are these locks still relevant?" — referring to the `analyzer: ">=9.0.0 <12.0.0"` cap and its comment claiming the package must stay below analyzer 12 because Flutter stable pinned `meta 1.17.0`. Investigation showed the meta precondition is now met (Flutter 3.44.1 ships `meta 1.18.0`), so the cap could move to admit analyzer 12 — but only after migrating the plugin source for analyzer 12's breaking API changes.
+The `analyzer: ">=9.0.0 <12.0.0"` cap carried a comment claiming the package must stay below analyzer 12 because Flutter stable pinned `meta 1.17.0`. That meta precondition is now met (Flutter 3.44.1 ships `meta 1.18.0`), so the cap can move to admit analyzer 12 — but only after migrating the plugin source for analyzer 12's breaking API changes.
 
 ## Finish Report (2026-06-04)
 

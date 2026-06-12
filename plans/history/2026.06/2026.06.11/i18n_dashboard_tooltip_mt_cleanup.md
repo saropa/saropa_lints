@@ -1,12 +1,10 @@
 # i18n Dashboard Tooltip MT-Garbage Cleanup
 
-**Trigger:** User ran the i18n translation audit and pasted the missing-translation sample ("we are so close to full translation! do these manually"), asking to hand-fix the remaining gaps. Fixing those surfaced a much larger problem: the package-dashboard tooltip/label keys carried hallucinated machine-translation output (trailing invented clauses, `_PH0_` artifacts, mistranslated technical terms) across nearly every locale. The user approved extending the manual cleanup first to four locales, then to all 24. NLLB / any MT pipeline was deliberately not run (hard prohibition); the read-only coverage gate was run in forced `--mode audit` to avoid the non-TTY `gaps` default that would touch the engine.
+**Problem:** The i18n translation audit surfaced remaining missing-translation gaps to hand-fix. Fixing those surfaced a much larger problem: the package-dashboard tooltip/label keys carried hallucinated machine-translation output (trailing invented clauses, `_PH0_` artifacts, mistranslated technical terms) across nearly every locale. The manual cleanup extended first to four locales, then to all 24. NLLB / any MT pipeline was deliberately not run (hard prohibition); the read-only coverage gate was run in forced `--mode audit` to avoid the non-TTY `gaps` default that would touch the engine.
 
 ---
 
 ## Finish Report (2026-06-11)
-
-
 
 ### Scope
 
@@ -25,7 +23,7 @@ Two phases against six package-dashboard keys: `downloadsCount`, `tooltipDep`, `
 - `sizeLabel` → `{label}: {size}` (identity); `fr` keeps its French colon spacing `{label} : {size}`.
 - `downloadsCount` → cleaned word order / left-English fragments in `es`, `ja`, `ko`, `tr`, `sw`, `ur`, `zh`.
 
-**Durability:** `dictionaries.py` now holds the two identity passthroughs — `• {dep}` in all 24 blocks and `{label}: {size}` in 23 (all except `fr`) — exactly once per block (two duplicate `{label}: {size}` entries I introduced mid-task in `fil`/`sw` were removed), plus the four manual `downloadsCount`/`tooltipHeader` translations pinned for `ur`/`hi`/`zh`/`sw`. The identity passthroughs are required for the coverage gate: `compute_stats` counts a `"X": "X"` dict entry as translated, and these strings are not auto-skipped (`should_skip_machine_translate` returns False — residue after placeholder removal is empty, not a single letter).
+**Durability:** `dictionaries.py` now holds the two identity passthroughs — `• {dep}` in all 24 blocks and `{label}: {size}` in 23 (all except `fr`) — exactly once per block (two duplicate `{label}: {size}` entries introduced mid-task in `fil`/`sw` were removed), plus the four manual `downloadsCount`/`tooltipHeader` translations pinned for `ur`/`hi`/`zh`/`sw`. The identity passthroughs are required for the coverage gate: `compute_stats` counts a `"X": "X"` dict entry as translated, and these strings are not auto-skipped (`should_skip_machine_translate` returns False — residue after placeholder removal is empty, not a single letter).
 
 ### Verification
 

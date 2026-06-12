@@ -267,7 +267,7 @@ LINTER variant. (A) Dart lint rule + fixture + behavior test + CHANGELOG + bug a
 - `CHANGELOG.md` — entry under `[Unreleased] > Fixed` (third bullet).
 - `bugs/...md` → `plans/history/2026.06/2026.06.01/...md` (this file). Status flipped to `Fixed`; Changes Made, Tests Added, downstream-workaround note filled in.
 
-### Core logic diff (Reviewer AI)
+### Core logic diff
 
 The fix is a 3-condition AST predicate gating the existing `reporter.atNode(value)` call when `value is MethodInvocation`:
 
@@ -311,4 +311,4 @@ None for this task. The downstream `// ignore:` markers in `contacts` repo can b
 
 ### Scope notes
 
-Working tree at the moment of commit also contains unrelated in-progress work from other workstreams (`require_late_initialization_in_init_state` rule fix, `require_error_widget` rule fix, the corresponding bug archives). Those are NOT included in this commit — only my own files are staged. The CHANGELOG file is committed as-is (it carries three Unreleased bullets — mine plus the two from the other workstreams, which are documentation entries already added by those sessions); the implementation code behind the other two bullets stays uncommitted in the working tree for those sessions to land.
+The working tree at commit time also contains unrelated in-progress work from other workstreams (`require_late_initialization_in_init_state` rule fix, `require_error_widget` rule fix, the corresponding bug archives). Those are NOT included in this commit — only the files for this fix are staged. The CHANGELOG file is committed as-is (it carries three Unreleased bullets — this fix plus the two from the other workstreams, which are documentation entries already added by those sessions); the implementation code behind the other two bullets stays uncommitted in the working tree for those sessions to land.

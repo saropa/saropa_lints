@@ -1,16 +1,14 @@
 # Internalize `ren` feature-gravity into saropa_lints (rules + dashboard)
 
-**Trigger:** The user asked to review the external project `https://github.com/gearscrafter/ren`
-(a Flutter "feature gravity" performance analyzer), then said: *"need to internalize the
-feature into the appropriate lint rules and screens. obviously apply all the corrections
-needed and you write the code."* The user chose (via AskUserQuestion) to **extend the existing
-Project Health dashboard** rather than build a new one.
+This change internalizes the "feature gravity" performance-analysis concept from the external
+project `https://github.com/gearscrafter/ren` into saropa_lints, as both lint rules and an
+extension of the existing Project Health dashboard (not a new dashboard).
 
 `ren`'s real insight is **compound** performance detection — a widget is expensive because of
-its parent (e.g. `Opacity` inside `AnimatedBuilder`). Its flaws (which "apply all corrections"
-required fixing): presence-only over-reporting, and a feature-gravity score that **divided by
-file count** so adding harmless files lowered the score (demonstrated: ren dropped a single
-catastrophic pattern from 29%/MEDIUM to 6%/LOW after 4 empty files were added).
+its parent (e.g. `Opacity` inside `AnimatedBuilder`). Two flaws are corrected in the port:
+presence-only over-reporting, and a feature-gravity score that **divided by file count** so
+adding harmless files lowered the score (demonstrated: ren dropped a single catastrophic pattern
+from 29%/MEDIUM to 6%/LOW after 4 empty files were added).
 
 ## Finish Report (2026-06-09)
 

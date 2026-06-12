@@ -1,10 +1,8 @@
 # Remove duplicate "Open Findings Dashboard" from sidebar Actions panel
 
-Triggered by the user's request: "remove the duplicate 'open findings dashboard' from the extension sidebar > actions panel". The Saropa Lints activity-bar sidebar surfaced the findings dashboard twice — once as "Findings Dashboard" in the Dashboards section and again as "Open Findings Dashboard" in the Actions panel, both with the same `Editor tab · filters · JSON` subtitle.
+The Saropa Lints activity-bar sidebar surfaced the findings dashboard twice — once as "Findings Dashboard" in the Dashboards section and again as "Open Findings Dashboard" in the Actions panel, both with the same `Editor tab · filters · JSON` subtitle. This change removes the duplicate "Open Findings Dashboard" row from the Actions panel.
 
 ## Finish Report (2026-06-11)
-
-
 
 ### Scope
 (B) VS Code extension — TypeScript sidebar view + its test, plus the root CHANGELOG. No Dart lint-rule code touched.

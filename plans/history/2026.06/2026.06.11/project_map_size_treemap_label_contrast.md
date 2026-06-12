@@ -1,10 +1,8 @@
 # Project Map size treemap — illegible folder/file labels
 
-Triggered by a user report (screenshot) of the Saropa Project Map ▸ size map: "contrast issues … headings are white on white or missing." Folder headings rendered invisible in dark mode and the darkest tiles showed unreadable file names. No `bugs/*.md` existed for this; the report was raised in chat.
+The Saropa Project Map ▸ size map had contrast defects: folder headings rendered invisible (white on white or missing) in dark mode, and the darkest tiles showed unreadable file names. This change makes the treemap labels legible against their tile fills.
 
 ## Finish Report (2026-06-11)
-
-
 
 ### Scope
 

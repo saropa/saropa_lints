@@ -245,8 +245,8 @@ rule in correct file; `tiers.dart` unchanged (behavior fix, not a new rule);
 point are not mechanically determinable). WHY-comments added at both sites.
 
 **Tests.** `dart test test/rules/data/json_datetime_rules_test.dart` → 27/27
-pass (instantiation + fixture-exists pins; none asserted the message/regex I
-changed, so none broke). Behavior is pinned by the extended `expect_lint`
+pass (instantiation + fixture-exists pins; none asserted the changed
+message/regex, so none broke). Behavior is pinned by the extended `expect_lint`
 fixture (4 cases). `dart analyze` on the rule file → clean.
 
 **Verification limitation.** The rule registers only

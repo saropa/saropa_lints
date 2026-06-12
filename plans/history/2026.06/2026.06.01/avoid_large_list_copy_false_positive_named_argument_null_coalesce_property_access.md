@@ -172,8 +172,6 @@ Each ignore carries a line-level rationale pointing at this bug.
 
 ## Finish Report (2026-06-01)
 
-
-
 **Scope:** (A) Dart lint rules — `lib/src/rules/core/performance_rules.dart`, `example/lib/performance/avoid_large_list_copy_fixture.dart`, `CHANGELOG.md`.
 
 ### Change summary

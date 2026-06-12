@@ -254,7 +254,7 @@ old API still compiles on the new version.
 
 ## Finish Report (2026-06-11)
 
- Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
 
 **Shipped.** share_plus_11 pack: prefer_shareplus_instance (migration, quick fix) + 4 always-on correctness rules (missing_position_origin, unchecked_result, empty_share_params, uri_and_text_conflict). Dropped share_plus_unawaited_share (overlap with avoid_unawaited_future).
 

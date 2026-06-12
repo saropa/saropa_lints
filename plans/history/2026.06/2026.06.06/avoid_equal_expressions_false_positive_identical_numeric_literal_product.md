@@ -131,8 +131,6 @@ Add fixtures asserting NO lint for `1024 * 1024`, `60 * 60`, `n + n`,
 
 ## Finish Report (2026-06-06)
 
-
-
 ### Scope
 (A) Dart lint rules / analyzer plugin. Single-rule false-positive fix.
 

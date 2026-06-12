@@ -45,7 +45,7 @@ When `pubspec.yaml` was at `X.Y.Z` and tag `v{X.Y.Z}` already existed on the rem
 1. **Wrong intent.** The stub inserter assumed the top CHANGELOG section was already correct for the prior release and that any new release needed its own new section. In practice, when a re-publish happens against an existing tag, the top section's content was almost always authored *for* the new release (because `pubspec.yaml` hadn't been bumped, the publish process couldn't have advanced past it). A rename, not an insert, was the right move.
 2. **Wrong insertion position.** `add_version_section` searches for the first `---\n\n?## \[VERSION\]` boundary. Recent sections in this repo's CHANGELOG omit the `---` separator between them (only the archive split has one), so the search jumps past every recent section and lands in the archive block — invisible to readers.
 
-The user's rule was stated directly in the conversation that closed this: **"the filename and the changelog MUST be in sync."** The script had no enforcement of that invariant.
+The governing invariant: **the `.vsix` filename and the CHANGELOG MUST be in sync.** The script had no enforcement of that invariant.
 
 ---
 
@@ -83,8 +83,6 @@ The script-level abort makes "release `[X.Y.Z+1]` with a top section reading `[X
 ---
 
 ## Finish Report (2026-06-03)
-
-**Trigger:** User asked to "review and fix" this bug doc.
 
 **Scope:** (C) docs/scripts only. The underlying code fix (`maybe_bump_for_tag_clash` rewrite + `_promote_top_section_to_version` helper + 4-case regression test) had already landed in commit `c724d148`. This pass reviewed that fix against the live repo and corrected the doc.
 

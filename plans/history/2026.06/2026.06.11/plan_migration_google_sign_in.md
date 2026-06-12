@@ -273,11 +273,11 @@ old API still compiles on the new version.
 
 ## Finish Report (2026-06-11)
 
- Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
 
 **Shipped.** google_sign_in_7 (<7) migration rule avoid_pre_v7_google_sign_in + google_sign_in (>=7) usage pack with 5 correctness rules. Resolves this plan's open <-gate archetype decision (now ratified and shipped). auth_token rule kept report-only per validation.
 
-Rules marked DROP / defer in the 2026-06-11 VALIDATION notes were intentionally not implemented (duplicates, overlap with existing rules, or feasibility concerns) — that triage is honored, not skipped. Every rule is import-gated via `fileImportsPackage`; migration rules are version-gated via `kRulePackDependencyGates` and relocated out of their base pack via `kRelocatedRulePackCodes` so a project on the old major never sees a rule for an API it lacks.
+Rules marked DROP / defer in the 2026-06-11 VALIDATION notes were intentionally not implemented (duplicates, overlap with existing rules, or feasibility concerns). Every rule is import-gated via `fileImportsPackage`; migration rules are version-gated via `kRulePackDependencyGates` and relocated out of their base pack via `kRelocatedRulePackCodes` so a project on the old major never sees a rule for an API it lacks.
 
 **Verification.** `dart analyze lib --fatal-infos` clean; `dart run tool/rule_pack_audit.dart` exit 0; full test suite green (1336 tests across test/integrity, test/config, test/rules/packages); registry regenerated twice + `dart format`. Rules authored by parallel subagents then serially registered into the shared files (tiers.dart, saropa_lints.dart, import_utils.dart, all_rules.dart, rule_packs.dart, generator + audit).
 

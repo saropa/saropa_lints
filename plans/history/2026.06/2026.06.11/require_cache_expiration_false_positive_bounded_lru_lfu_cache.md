@@ -276,8 +276,6 @@ none of the three bounded / `toMap()` cases.
 
 ## Finish Report (2026-06-11)
 
-
-
 **Scope:** (A) Dart lint rules / analyzer plugin.
 
 ### Deep review

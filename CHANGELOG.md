@@ -62,11 +62,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [13.13.0]
 
-Adds lint rules for twelve more packages — quick_actions, in_app_review, local_auth, file_picker, device_calendar, home_widget, geocoding, image_picker, google_maps_flutter, audioplayers, flutter_map, and youtube_player_flutter. The rules catch the documented crash, performance, and contract traps for each: shortcuts that do nothing on a cold-start tap, review prompts fired against store guidelines, discarded biometric-auth results, file-picker cancel/web/custom-type mistakes, calendar permission and timezone bugs, home-widget callbacks tree-shaken in release, geocoding crashes on empty results, image_picker lost-data and range traps, per-frame map rebuilds and deprecated map APIs, dead audio listeners under low-latency/loop modes, the OpenStreetMap user-agent block, and the youtube_player v10 controller-leak. Each package's rules run only in files that import it, so projects that do not use a package see nothing. The VS Code Findings Dashboard now mirrors the live Problems panel — so it never shows a stale grade while real warnings sit unaddressed — and lists findings from every analyzer in one combined view. No action required.
-
-Also adds rules for five more packages — receive_sharing_intent, sign_in_with_apple, lottie, flutter_animate, and awesome_notifications — plus the first batch of version-gated package migration packs. The migration packs flag API breaks across share_plus 11, sensors_plus 4, flutter_svg 2, file_picker 10/12, connectivity_plus 6, google_sign_in 7, webview_flutter 4, and local_auth 3. This introduces the **pre-upgrade (`<`-gate) pack archetype**: where the old major's API was removed in the new major (so the compiler already errors after the bump), the pack instead gates on the *old* major and flags current code that will break when you upgrade — opt-in upgrade prep. Each pack runs only when the relevant package resolves at the gated version, and each rule runs only in files that import it. No action required.
+Adds crash, performance, and contract rules for seventeen more packages, each active only in files that import it. Introduces version-gated migration packs that flag code which will break on a major-version upgrade, so you can prepare before bumping. The VS Code Findings Dashboard now mirrors the live Problems panel, never showing a stale grade while real warnings sit unaddressed. No action required.
 
 ### Added
 
@@ -129,6 +127,7 @@ Also adds rules for five more packages — receive_sharing_intent, sign_in_with_
 <summary>Maintenance</summary>
 
 - The extension i18n audit and NLLB-fallback reports now write to datetime-stamped, day-bucketed paths (`extension/reports/<YYYYMMDD>/<YYYYMMDD_HHMMSS>_i18n_translation_audit.md`) instead of a single fixed file, so successive audit runs no longer overwrite each other and each run stays a durable record. Build tooling only (excluded from the `.vsix`); no behavior change for users.
+- Rewrote the archived finish reports under `plans/` into third-person engineering-record voice, removing AI-session narration (chat-quoting `Trigger` openers, "reviewed by another AI" lines, first-person/session deixis) from 58 internal documents while preserving every technical fact. Documentation housekeeping only; not shipped to pub.dev.
 
 </details>
 

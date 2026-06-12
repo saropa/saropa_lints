@@ -1,10 +1,8 @@
 # i18n Audit Report — Datetime-Stamped Output Paths
 
-The user reported that audit output logs must be datetime-stamped rather than written to a single fixed file. The triggering observation: an audit-only run of `generate_translations.py` wrote its report to the fixed path `extension/reports/i18n_translation_audit.md`, overwriting any prior run. Required convention (verbatim from the user): `reports/<date>/<date_time>_<name>` — e.g. `reports/20260611/20260611_005206_i18n_translation_audit.md`.
+Audit output logs are datetime-stamped rather than written to a single fixed file. Previously an audit-only run of `generate_translations.py` wrote its report to the fixed path `extension/reports/i18n_translation_audit.md`, overwriting any prior run. The required convention is `reports/<date>/<date_time>_<name>` — e.g. `reports/20260611/20260611_005206_i18n_translation_audit.md`.
 
 ## Finish Report (2026-06-11)
-
-
 
 ### Scope
 
@@ -35,5 +33,5 @@ The user reported that audit output logs must be datetime-stamped rather than wr
 
 ### Out of scope / not done
 
-- I did not run any translation pipeline (NLLB / Google / `setup_arb_translate.py`). The pasted terminal log included a `setup_arb_translate.py` invocation in the `d:\src\contacts` project — a different repo and a translation job — which I neither ran nor edited.
-- No pruning/retention policy for accumulated stamped reports was added (not requested).
+- No translation pipeline (NLLB / Google / `setup_arb_translate.py`) was run or edited as part of this change.
+- No pruning/retention policy for accumulated stamped reports was added.

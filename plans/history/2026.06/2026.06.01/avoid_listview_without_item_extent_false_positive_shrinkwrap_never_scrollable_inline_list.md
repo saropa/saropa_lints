@@ -157,7 +157,7 @@ Sibling FP bug for the same rule's `ListView.separated` constructor-allowlist ga
 **Why this fix and not the alternatives:**
 
 - Removing `'separated'` from the rule's allowlist (sibling bug's proposal) was *not* done here — that's the other open bug. This fix is orthogonal: it skips both `.builder` and `.separated` when the inline-non-scrolling pattern is detected, without otherwise changing `.separated` handling. The sibling bug stays open.
-- Structural detection (no semantic resolution) is acceptable here because the inline-non-scrolling idiom is overwhelmingly written with a `const NeverScrollableScrollPhysics()` literal or a bare constructor call — both parse as `InstanceCreationExpression` under custom_lint's resolved AST. We do not chase `physics: someConstField` references; those are rare enough that the false-positive cost is acceptable until reported.
+- Structural detection (no semantic resolution) is acceptable here because the inline-non-scrolling idiom is overwhelmingly written with a `const NeverScrollableScrollPhysics()` literal or a bare constructor call — both parse as `InstanceCreationExpression` under custom_lint's resolved AST. `physics: someConstField` references are not chased; those are rare enough that the false-positive cost is acceptable until reported.
 
 **Testing:**
 
@@ -169,7 +169,7 @@ Sibling FP bug for the same rule's `ListView.separated` constructor-allowlist ga
 
 **Scan-CLI verification note:** The Saropa scan CLI uses unresolved `parseString`, so `ListView.builder(...)` is parsed as `MethodInvocation` rather than `InstanceCreationExpression`, and the rule's `addInstanceCreationExpression` visitor does not see it from that CLI. This is a CLI limitation, not a rule defect — custom_lint runs the rule against fully-resolved ASTs in production. The unit-test mirror visitor in `listview_extent_metadata_rules_test.dart` handles both shapes and pins the exemption against the resolved (`const`-prefixed) form that real Dart code uses.
 
-**Sibling `.separated` bug also fixed in the same commit:** The user extended the change to also drop `'separated'` from the rule's constructor allowlist (`widget_layout_flex_scroll_rules.dart:609`), closing the unfixable-on-separated bug at the same time. Doc comment, problem message ({v7}), `Since/Updated`, and the fixture's `.separated` case were updated to match. See archived sibling report at [avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md](./avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md).
+**Sibling `.separated` bug also fixed in the same commit:** The change was extended to also drop `'separated'` from the rule's constructor allowlist (`widget_layout_flex_scroll_rules.dart:609`), closing the unfixable-on-separated bug at the same time. Doc comment, problem message ({v7}), `Since/Updated`, and the fixture's `.separated` case were updated to match. See archived sibling report at [avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md](./avoid_listview_without_item_extent_false_positive_listview_separated_unfixable.md).
 
 **Out of scope (deliberately not touched):**
 

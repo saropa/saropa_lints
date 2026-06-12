@@ -1,13 +1,10 @@
 # i18n manual gap-fill — bn `downloadsCount`, fa `• {dep}`
 
-The user ran `extension/scripts/generate_translations.py` (mode 2: gaps + upgrade low-quality to NLLB), interrupted it during the `fil` locale, and reported that two keys came back identical to English and "have to be manually translated." This task hand-fills those two catalog gaps without running any MT pipeline (a hard standing prohibition), and registers them in the curated dictionary so a future regen reproduces them instead of re-flagging.
+An interrupted run of `extension/scripts/generate_translations.py` (mode 2: gaps + upgrade low-quality to NLLB), stopped during the `fil` locale, left two keys identical to their English source. This task hand-fills those two catalog gaps without running any MT pipeline (a hard standing prohibition), and registers them in the curated dictionary so a future regen reproduces them instead of re-flagging.
 
 ## Finish Report (2026-06-10)
 
 **Scope:** (B) VS Code extension i18n — locale catalog + curated translation dictionary. No Dart lint-rule / analyzer code touched.
-
-### 1. Critical note
-
 
 ### 2. What changed and why
 The interrupted MT run left two strings untranslated (output identical to English source):
@@ -41,7 +38,7 @@ Both entries were added to `extension/scripts/i18n/dictionaries.py` (the durable
 - No bug archive — task did not close a `bugs/*.md` file.
 
 ### 7. Outstanding work — NOT part of this task (needs user authorization)
-A systemic MT defect was found while doing this: the sentinel-shield placeholder token (`_PH0_` / `_ PH0__`) leaks into shipped output, with the engine appending garbage around it. **14 strings across the 5 just-processed locales (ar, bn, de, es, fa)** are affected, e.g. `bn tooltipDep` = `• {dep} _ PH0__ এর মাধ্যমে`, `ar tooltipDep` = `• {dep} _ PH0__ = الحالة المرضية.`, `es grade` = `Grado: {grade} El grado es de _PH0_.`. These pass the mechanical "differs from English = translated" check, so the coverage gate reports 100% while shipping broken copy. This is a sentinel-restoration bug in `generate_translations.py`, not a per-string gap — hand-fixing the 14 strings treats the symptom while the next MT run reintroduces them. Surfaced to the user with a y/n; they invoked `/finish` on the two-gap task instead of authorizing the root-cause fix, so it remains open and unaddressed.
+A systemic MT defect was found while doing this: the sentinel-shield placeholder token (`_PH0_` / `_ PH0__`) leaks into shipped output, with the engine appending garbage around it. **14 strings across the 5 just-processed locales (ar, bn, de, es, fa)** are affected, e.g. `bn tooltipDep` = `• {dep} _ PH0__ এর মাধ্যমে`, `ar tooltipDep` = `• {dep} _ PH0__ = الحالة المرضية.`, `es grade` = `Grado: {grade} El grado es de _PH0_.`. These pass the mechanical "differs from English = translated" check, so the coverage gate reports 100% while shipping broken copy. This is a sentinel-restoration bug in `generate_translations.py`, not a per-string gap — hand-fixing the 14 strings treats the symptom while the next MT run reintroduces them. The root-cause fix was not authorized for this task and remains open and unaddressed.
 
 ### Files changed
 - `extension/scripts/i18n/dictionaries.py` — `bn` + `fa` curated entries (4 lines incl. comments).

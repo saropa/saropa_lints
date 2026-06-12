@@ -296,7 +296,7 @@ old API still compiles on the new version.
 
 ## Finish Report (2026-06-11)
 
- Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
+Scope (LINTER variant): (A) Dart lint rules / analyzer plugin + (C) docs.
 
 **Shipped.** webview_flutter pack (whole-gated <4): avoid_pre_v4_webview_widget. The 5 correctness rules were all dropped per validation (duplicates / overlap / feasibility), so the pre-upgrade migration rule ships alone.
 
