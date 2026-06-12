@@ -143,6 +143,25 @@ Verdict legend:
 - **KEEP_WARNING** — detection is irreducibly heuristic (guesses intent from a variable NAME, or
   infers cross-file state it cannot read). Hardening reduced noise but cannot reach ERROR precision.
 
+## SEV-01 CLOSED 2026-06-12
+
+Both buckets are resolved. Bucket A (over-rated ERROR -> WARNING) completed earlier.
+Bucket B (this audit): 46 rules read individually, false positives hardened, 10 flipped to
+ERROR with user sign-off.
+
+Final disposition of the remaining 36 Bucket B rules — no further code change pending:
+- **21 KEEP_WARNING** — irreducibly heuristic (name-guessing, absence-of-call with no cross-file
+  visibility, or inference of native config the Dart rule never reads). Stay WARNING permanently.
+- **14 NEEDS_DISCUSSION + 1 held (`require_drift_create_all_in_oncreate`)** — kept at WARNING as
+  the final decision. Each could only reach ERROR by building interprocedural (cross-method)
+  cleanup tracking, which is a new capability, not a rule tweak. Until that exists, ERROR would
+  produce build-breaking false positives on the cleanup-in-a-helper pattern. Each now carries a
+  `// SEV-01 (kept WARNING):` comment at its `severity:` field naming the exact residual FP, so
+  the reason lives at the code site, not only here.
+
+Revisit trigger: if cross-method flow analysis is added to the rule engine, re-evaluate the 15
+WARNING-with-residual rules for promotion. No other open work.
+
 ### APPLIED 2026-06-12 — 10 of 11 flipped WARNING -> ERROR
 
 Signed off by the user. The 10 rules below had their LintCode `severity:` changed to

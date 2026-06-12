@@ -345,6 +345,9 @@ class AvoidDeprecatedCryptoAlgorithmsRule extends SaropaLintRule {
     '[avoid_deprecated_crypto_algorithms] The use of outdated cryptographic algorithms such as MD5, SHA1, DES, 3DES, and RC4 exposes your application to well-known attacks. These algorithms have been broken by the security community: MD5 and SHA1 are vulnerable to collision and preimage attacks, allowing attackers to forge digital signatures or tamper with data. DES and 3DES have insufficient key lengths and are susceptible to brute-force attacks, while RC4 is vulnerable to several biases and key recovery attacks. Continuing to use these algorithms puts all encrypted or hashed data at risk of compromise, regardless of other security measures. {v2}',
     correctionMessage:
         'Replace all uses of deprecated algorithms with modern, secure alternatives. For hashing, use SHA-256 or stronger (SHA-384, SHA-512) for integrity, and HMAC with a strong hash for authentication. For encryption, use AES-256 in a secure mode (e.g., GCM or CBC with random IVs). For password storage, use dedicated password hashing algorithms like bcrypt, scrypt, or Argon2. Review your codebase, dependencies, and third-party libraries for any references to MD5, SHA1, DES, 3DES, or RC4, and refactor to use only cryptographically secure primitives. Document your cryptographic choices and ensure all team members are aware of the risks of deprecated algorithms.',
+    // SEV-01 (kept WARNING): the `des` abbreviation FP is closed and md5/sha1/
+    // rc4/DES detection is near-deterministic, but a consumer type legitimately
+    // named RC4/DES must be confirmed absent before this is safe as ERROR.
     severity: DiagnosticSeverity.WARNING,
   );
 

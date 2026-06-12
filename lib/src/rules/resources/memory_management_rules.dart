@@ -156,6 +156,9 @@ class RequireImageDisposalRule extends SaropaLintRule {
     '[require_image_disposal] Failing to dispose of images or image streams can lead to memory leaks, increased memory usage, and eventual app crashes, especially in image-heavy applications. This is critical for apps that load or manipulate images dynamically. See https://docs.flutter.dev/perf/memory#images. {v6}',
     correctionMessage:
         'Dispose of images and image streams when they are no longer needed to free memory and maintain app performance. See https://docs.flutter.dev/perf/memory#images for best practices.',
+    // SEV-01 (kept WARNING): the ui.ImageFilter/Provider substring FP is fixed,
+    // but a State holding a parent-owned ui.Image is still flagged; disposing it
+    // would be a double-free, so ERROR is unsafe without ownership analysis.
     severity: DiagnosticSeverity.WARNING,
   );
 

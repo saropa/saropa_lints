@@ -1353,6 +1353,9 @@ class RequireDisposeRule extends SaropaLintRule {
     correctionMessage:
         'Add a dispose() method that disposes this field, '
         'or ensure the existing dispose() method handles it.',
+    // SEV-01 (kept WARNING): parent-owned controllers are now skipped, but
+    // disposal via an AutoDispose mixin (string-only detection) and the lexeme-
+    // only `State` superclass check still risk false ERRORs.
     severity: DiagnosticSeverity.WARNING,
   );
 

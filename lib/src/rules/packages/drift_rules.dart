@@ -2895,6 +2895,10 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
     correctionMessage:
         'Add await m.createAll() in the onCreate callback '
         'to create all tables on first launch.',
+    // SEV-01 (kept WARNING, held from the ERROR flip): bound to an inline
+    // MigrationStrategy onCreate body, but a body that delegates createAll to a
+    // helper (onCreate: (m) => _setup(m)) is still flagged — unacceptable as a
+    // build-breaking ERROR until cross-method analysis exists.
     severity: DiagnosticSeverity.WARNING,
   );
 

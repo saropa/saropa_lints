@@ -2331,6 +2331,9 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
     '[prefer_html_escape] Displaying user-generated content in a WebView without proper HTML escaping exposes your app to cross-site scripting (XSS) attacks. Malicious input can execute scripts, steal user data, or compromise device security. Always sanitize and escape user content before rendering it in a web context. {v4}',
     correctionMessage:
         'Escape all user content using htmlEscape.convert() or a trusted sanitization library before displaying it in a WebView or similar widget. This prevents XSS and protects users from malicious input.',
+    // SEV-01 (kept WARNING): now scoped to a real WebView sink, but escape
+    // detection is a substring check — a variable named `escapeKey` falsely
+    // suppresses and a custom escaper is missed — not ERROR-safe.
     severity: DiagnosticSeverity.WARNING,
   );
 

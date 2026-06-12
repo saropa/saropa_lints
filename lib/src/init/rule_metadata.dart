@@ -3,7 +3,6 @@ library;
 
 import 'package:saropa_lints/saropa_lints.dart'
     show RuleStatus, RuleTier, SaropaLintRule, allSaropaRules;
-import 'package:saropa_lints/src/analyzer_compat.dart';
 // ignore: implementation_imports
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 import 'package:saropa_lints/src/string_slice_utils.dart';
@@ -144,6 +143,25 @@ Map<String, RuleMetadata> getRuleMetadata() {
 /// Gets the lifecycle status for a rule.
 RuleStatus getRuleStatusFromMetadata(String ruleName) {
   return getRuleMetadata()[ruleName]?.ruleStatus ?? RuleStatus.ready;
+}
+
+/// Returns the subset of [enabled] whose lifecycle status is beta or deprecated.
+///
+/// Beta and deprecated rules are excluded from generated tier output unless the
+/// user explicitly opts in via a persistent override — beta rules may carry more
+/// false positives or change behavior, and deprecated rules are slated for
+/// removal, so neither belongs in a fresh config a user did not hand-pick. Both
+/// config-generation paths must apply this identically: the interactive
+/// `init_runner` and the headless `runWriteConfig` (the path the VS Code
+/// extension and CI use). Centralized here so the two cannot drift — a beta rule
+/// that slips through one path but not the other is exactly the bug this removes.
+Set<String> lifecycleFilteredRules(Set<String> enabled) {
+  return <String>{
+    for (final rule in enabled)
+      if (getRuleStatusFromMetadata(rule) case RuleStatus.beta ||
+          RuleStatus.deprecated)
+        rule,
+  };
 }
 
 /// Gets the problem message for a rule (for YAML comment).

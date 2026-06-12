@@ -66,6 +66,9 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
         'leaks file descriptor, exhausting system limits. {v4}',
     correctionMessage:
         'Use try-finally or convenience methods like readAsString().',
+    // SEV-01 (kept WARNING): a close performed in a sibling/helper method is
+    // invisible to this single-body scan (extract-method pattern), so an ERROR
+    // would break correct code — not ERROR-safe without cross-method analysis.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -185,6 +188,9 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
         'and may exhaust connection pool, causing app failures. {v7}',
     correctionMessage:
         'Close database in finally block or use connection pool.',
+    // SEV-01 (kept WARNING): still lints a Future<Database> factory whose
+    // callers close the connection; cross-method/ownership tracking is needed
+    // before this could break builds at ERROR.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -375,6 +381,8 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
     '[require_http_client_close] Unclosed HttpClient leaks socket '
         'connections and memory, eventually exhausting system resources. {v5}',
     correctionMessage: 'Call client.close() in finally block.',
+    // SEV-01 (kept WARNING): a client passed to a helper or wrapped by DI that
+    // owns close() is invisible to the single-body scan — not ERROR-safe.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -487,6 +495,9 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
     '[require_native_resource_cleanup] Unfreed native memory leaks '
         'outside Dart GC, causing permanent memory loss until app restart. {v3}',
     correctionMessage: 'Call free() in finally block for native allocations.',
+    // SEV-01 (kept WARNING): the arena/borrowed-pointer FPs are fixed, but a
+    // malloc whose free() lives in a helper still mis-fires — not ERROR-safe
+    // without cross-method analysis.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -605,6 +616,9 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
     '[require_websocket_close] Unclosed WebSocket leaks connections and '
         'continues receiving data after widget disposal, causing errors. {v5}',
     correctionMessage: 'Add _socket.close() in dispose method.',
+    // SEV-01 (kept WARNING): helper-delegated teardown is matched only by a
+    // heuristic (any _x() in dispose) and untyped `late final` sockets are
+    // under-detected — too imprecise for a build-breaking ERROR.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -725,6 +739,9 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
     '[require_platform_channel_cleanup] Active platform channel handler '
         'receives callbacks after dispose, causing setState on unmounted widget. {v5}',
     correctionMessage: 'Set handler to null in dispose method.',
+    // SEV-01 (kept WARNING): the re-flag logic bug is fixed, but cleanup
+    // delegated to a helper is still matched only heuristically — not yet
+    // deterministic enough for ERROR.
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -849,6 +866,9 @@ class RequireIsolateKillRule extends SaropaLintRule {
     '[require_isolate_kill] Unkilled Isolate continues consuming CPU and '
         'memory, and may send messages to disposed handlers causing crashes. {v3}',
     correctionMessage: 'Call isolate.kill() in cleanup/dispose method.',
+    // SEV-01 (kept WARNING): kill-via-helper and intentional app-lifetime
+    // workers (Isolate.exit) still mis-fire — not ERROR-safe without flow
+    // analysis.
     severity: DiagnosticSeverity.WARNING,
   );
 

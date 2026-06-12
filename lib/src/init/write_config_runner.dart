@@ -14,6 +14,7 @@ import 'package:saropa_lints/src/init/custom_overrides_core.dart';
 import 'package:saropa_lints/src/init/log_writer.dart';
 import 'package:saropa_lints/src/init/platforms_packages.dart';
 import 'package:saropa_lints/src/init/project_info.dart';
+import 'package:saropa_lints/src/init/rule_metadata.dart';
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 
 /// Options for headless config write (extension / CI).
@@ -148,6 +149,17 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
   if (packageDisabledRules.isNotEmpty) {
     enabledRules = enabledRules.difference(packageDisabledRules);
     disabledRules = disabledRules.union(packageDisabledRules);
+  }
+
+  // Lifecycle defaults: drop beta/deprecated rules from the generated tier set
+  // (mirrors init_runner). A user who explicitly enabled one via RULE OVERRIDES
+  // keeps it — permanentOverrides was captured above and is re-applied through
+  // userCustomizations when the plugins section is generated, so explicit
+  // opt-ins survive this filter.
+  final lifecycleFiltered = lifecycleFilteredRules(enabledRules);
+  if (lifecycleFiltered.isNotEmpty) {
+    enabledRules = enabledRules.difference(lifecycleFiltered);
+    disabledRules = disabledRules.union(lifecycleFiltered);
   }
 
   final outputPath = options.resolvedOutputPath;

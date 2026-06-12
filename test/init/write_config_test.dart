@@ -130,5 +130,58 @@ plugins:
         }
       },
     );
+
+    // The headless path the VS Code extension and CI use must apply the same
+    // beta/deprecated lifecycle filter the interactive init does — without it a
+    // beta rule sitting in a tier would be enabled in extension-written configs
+    // while init excluded it (the divergence this filter closes). Enabled rules
+    // are emitted as `rule: true`, so the beta rule's absence proves the filter.
+    test('excludes beta/deprecated rules from the generated tier set', () {
+      final dir = Directory.systemTemp.createTempSync('write_config_test');
+      try {
+        final result = runWriteConfig(
+          WriteConfigOptions(targetDir: dir.path, tier: 'essential'),
+        );
+        expect(result.ok, isTrue);
+        final content = File(
+          '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
+        ).readAsStringSync();
+
+        // avoid_api_key_in_code is an essential-tier rule marked RuleStatus.beta.
+        expect(content.contains('avoid_api_key_in_code: true'), isFalse);
+        // Essential output is non-empty (the filter did not wipe the tier).
+        expect(content.contains('diagnostics:'), isTrue);
+      } finally {
+        dir.deleteSync(recursive: true);
+      }
+    });
+
+    // The filter is a default, not a hard ban: a user who explicitly enables a
+    // beta rule via RULE OVERRIDES keeps it. Two-pass so the override lands in a
+    // canonical (already-migrated) custom file the second run will not rewrite.
+    test('honors an explicit override re-enabling a beta rule', () {
+      final dir = Directory.systemTemp.createTempSync('write_config_test');
+      try {
+        final opts = WriteConfigOptions(targetDir: dir.path, tier: 'essential');
+        // First pass creates the canonical analysis_options_custom.yaml.
+        expect(runWriteConfig(opts).ok, isTrue);
+        final customFile = File(
+          '${dir.path}${Platform.pathSeparator}analysis_options_custom.yaml',
+        );
+        // Append an explicit enable override (extractOverridesFromFile matches a
+        // `rule: true` line anywhere in the file).
+        customFile.writeAsStringSync(
+          '${customFile.readAsStringSync()}\n    avoid_api_key_in_code: true\n',
+        );
+        // Second pass must re-enable the opted-in beta rule.
+        expect(runWriteConfig(opts).ok, isTrue);
+        final content = File(
+          '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
+        ).readAsStringSync();
+        expect(content.contains('avoid_api_key_in_code: true'), isTrue);
+      } finally {
+        dir.deleteSync(recursive: true);
+      }
+    });
   });
 }

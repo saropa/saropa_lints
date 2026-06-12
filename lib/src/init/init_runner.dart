@@ -250,14 +250,9 @@ Future<void> runInit(List<String> args) async {
   }
 
   // Lifecycle defaults: beta/deprecated rules are excluded from fresh tier
-  // output unless users explicitly opt in via persistent overrides.
-  final lifecycleFiltered = <String>{};
-  for (final rule in finalEnabled) {
-    final status = getRuleStatusFromMetadata(rule);
-    if (status == RuleStatus.beta || status == RuleStatus.deprecated) {
-      lifecycleFiltered.add(rule);
-    }
-  }
+  // output unless users explicitly opt in via persistent overrides. Shared with
+  // the headless runWriteConfig so both config paths filter identically.
+  final lifecycleFiltered = lifecycleFilteredRules(finalEnabled);
   if (lifecycleFiltered.isNotEmpty) {
     finalEnabled = finalEnabled.difference(lifecycleFiltered);
     finalDisabled = finalDisabled.union(lifecycleFiltered);

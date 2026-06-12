@@ -1199,6 +1199,9 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
         'Callbacks fire after State disposal, causing setState errors and memory leaks. {v4}',
     correctionMessage:
         'Add _sub?.cancel() in dispose(), or for-in loop for collections.',
+    // SEV-01 (kept WARNING): single-subscription ownership is now precise, but
+    // the List<StreamSubscription> collection path has no ownership filter and
+    // relies on loop-shape regex — not ERROR-safe until that path is hardened.
     severity: DiagnosticSeverity.WARNING,
   );
 
