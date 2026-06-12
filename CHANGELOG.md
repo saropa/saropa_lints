@@ -62,6 +62,22 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+Sharpens roughly thirty leak, disposal, security, and package rules so they stop flagging code that is already correct, ahead of grading some of them as build-breaking errors. Resources cleaned up in a helper or handed to a caller, controllers owned by a parent widget, encrypted SharedPreferences keys, and Drift queries that do carry a `where` are no longer reported. Names are matched on whole-word and resolved-type boundaries instead of substrings, so `pin` no longer matches `shopping` and `ui.ImageFilter` is no longer mistaken for a disposable image. No action required.
+
+### Changed
+
+- **Ten high-confidence rules upgraded from warning to error.** After per-rule false-positive hardening, these rules now fail `dart analyze` instead of warning, because each fires only on a genuinely broken shape (a leak with no cleanup anywhere, a Drift `delete`/`update` with no `where`, a missing iOS permission verified against the actual `Info.plist`, a non-JSON-encodable `toJson` value, a sub-333ms seizure-risk flash): `avoid_websocket_memory_leak`, `require_dispose_implementation`, `prefer_dispose_before_new_instance`, `avoid_stream_subscription_in_field`, `avoid_not_encodable_in_to_json`, `avoid_drift_update_without_where`, `require_ios_permission_description`, `require_ios_face_id_usage_description`, `avoid_flashing_content`, `avoid_path_traversal`. If one fires on your code, it has found a real defect — fix it, or downgrade the single rule in your `analysis_options.yaml` if your project is the exception.
+
+### Fixed
+
+- **Seven resource-cleanup rules no longer false-positive on ownership transfer.** `require_file_close_in_finally`, `require_http_client_close`, `require_native_resource_cleanup`, and `require_database_close` now skip a resource assigned to a field or returned to the caller (closed elsewhere), `require_native_resource_cleanup` recognizes `Arena`/`using` auto-free scopes and no longer demands a `free()` on a borrowed `Pointer.fromAddress`, and `require_platform_channel_cleanup`/`require_isolate_kill`/`require_websocket_close` recognize teardown delegated to a helper and ignore matching text in string literals. `require_platform_channel_cleanup` also no longer re-flags a class that cleans up via `removeMethodCallHandler`.
+- **Disposal and lifecycle rules respect ownership.** `avoid_websocket_memory_leak`, `require_stream_subscription_cancel`, `require_dispose_implementation`, and `require_field_dispose` now skip resources supplied by a parent (`widget.controller`) and recognize cleanup performed in any method, not just `dispose()`; `prefer_dispose_before_new_instance` no longer flags an assignment guarded by a null check.
+- **Name and type matching tightened across security and storage rules.** Key matching in `prefer_encrypted_prefs`/`avoid_auth_state_in_prefs` is now whole-word (`pin` no longer matches `shopping`, `spinner`, `mapping`), `require_secure_storage` skips objects that are not actually `SharedPreferences`, `avoid_deprecated_crypto_algorithms` no longer treats the `des` abbreviation (description) as DES, and `require_secure_password_field` inspects `obscureText` as a literal rather than matching nested children.
+- **Memory and path rules use resolved types and word boundaries.** `require_image_disposal` matches exactly `ui.Image` (not `ui.ImageFilter`/`Provider`/`Descriptor`), `avoid_expando_circular_references` requires a real `Expando` and a whole-token key, and `avoid_path_traversal`/`require_file_path_sanitization` match the tainting parameter as a whole identifier.
+- **Drift, WebView, and animation detection narrowed to real sinks.** `avoid_drift_update_without_where` walks the query's own receiver chain so an unrelated `.write()`/`.go()` no longer trips it and a query carrying `where` is cleared; `prefer_html_escape` targets only the HTML argument of a WebView sink; `avoid_flashing_content` requires a literal `repeat(reverse: true)` with a sub-333ms duration.
+
 ## [13.13.0]
 
 Adds crash, performance, and contract rules for seventeen more packages, each active only in files that import it. Introduces version-gated migration packs that flag code which will break on a major-version upgrade, so you can prepare before bumping. The VS Code Findings Dashboard now mirrors the live Problems panel, never showing a stale grade while real warnings sit unaddressed. No action required.

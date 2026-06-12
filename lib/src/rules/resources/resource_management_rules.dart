@@ -73,13 +73,24 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
     r'\.(?:openRead|openWrite|openSync)\s*\(',
   );
   static final RegExp _genericOpenPattern = RegExp(r'\.open\s*\(');
+  // `\b` before `File(` so the indicator does not match `XFile(`, `ProfileX(`,
+  // `_MyFile(` etc. — unanchored `File\s*\(` previously fired on any identifier
+  // ending in "File", a systematic false positive for the `image_picker`
+  // `XFile` type and any domain type whose name ends in "File".
   static final List<RegExp> _fileIndicatorPatterns = <RegExp>[
-    RegExp(r'File\s*\('),
+    RegExp(r'\bFile\s*\('),
     RegExp(r'\bIOSink\b'),
     RegExp(r'\bRandomAccessFile\b'),
     RegExp(r'dart:io'),
   ];
-  static final RegExp _finallyPattern = RegExp(r'\bfinally\b');
+  // A handle assigned to an instance field (`_sink = file.openWrite()`) has its
+  // lifetime owned by the enclosing class and is conventionally closed in a
+  // sibling `dispose()`/`close()`. A method-body-scoped scan cannot see that
+  // sibling, so flagging here is a guaranteed false positive for the
+  // store-then-dispose-elsewhere pattern. Detect the field-assignment shape.
+  static final RegExp _fieldAssignedOpenPattern = RegExp(
+    r'_\w+\s*=\s*\w+\.(?:openRead|openWrite|openSync|open)\s*\(',
+  );
   static final RegExp _closeCallPattern = RegExp(r'\.close\s*\(');
   static final RegExp _readWriteConveniencePattern = RegExp(
     r'\b(?:readAsString|readAsBytes|writeAsString|writeAsBytes)\s*\(',
@@ -101,13 +112,21 @@ class RequireFileCloseInFinallyRule extends SaropaLintRule {
 
       if (!hasFileOpen) return;
 
-      final bool hasFinally = _finallyPattern.hasMatch(bodySource);
+      // Ownership transferred to a field — closed in a sibling method this
+      // body-scoped scan cannot inspect. Skip to avoid a build-breaking FP.
+      if (_fieldAssignedOpenPattern.hasMatch(bodySource)) return;
+
       final bool hasClose = _closeCallPattern.hasMatch(bodySource);
 
-      if (!hasFinally && hasClose) {
-        reporter.atNode(node);
-      } else if (!hasClose &&
-          !_readWriteConveniencePattern.hasMatch(bodySource)) {
+      // Only flag the unambiguous leak shape: a handle is opened and the body
+      // contains NO `.close(` anywhere AND no convenience reader. The former
+      // `!hasFinally && hasClose` branch fired whenever a sink was closed
+      // outside a `finally` (e.g. `.whenComplete(() => sink.close())`,
+      // `await using(...)`, or a trailing close on the happy path) — all
+      // legitimately-cleaned shapes the rule misread as leaks. Dropping that
+      // branch trades a narrow extra catch for the elimination of a large FP
+      // class, which is the correct trade for an error-severity build gate.
+      if (!hasClose && !_readWriteConveniencePattern.hasMatch(bodySource)) {
         reporter.atNode(node);
       }
     });
@@ -175,6 +194,14 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
     RegExp(r'\bdispose\s*\('),
     RegExp(r'\bdisposeSafe\s*\('),
   ];
+  // Connection assigned to an instance field (`_db = await openDatabase(...)`)
+  // is owned by the class and closed in a sibling dispose/close that a
+  // body-scoped scan cannot inspect. This complements the name-based
+  // open-helper heuristic below: it catches field-storing methods whose names
+  // do NOT start with init/open/setup (e.g. `_loadData`, `connect`).
+  static final RegExp _fieldAssignedDatabasePattern = RegExp(
+    r'_\w+\s*=\s*(?:await\s+)?openDatabase\s*\(',
+  );
 
   @override
   void runWithReporter(
@@ -205,6 +232,10 @@ class RequireDatabaseCloseRule extends SaropaLintRule {
           bodySource.indexOf('methodName') >= 0) {
         return;
       }
+
+      // Ownership transferred to a field — closed in a sibling dispose this
+      // body-scoped scan cannot see. Skip to avoid a build-breaking FP.
+      if (_fieldAssignedDatabasePattern.hasMatch(bodySource)) return;
 
       // Open-in-helper / close-in-caller pattern: `init*`/`open*`/`setup*`
       // helpers that return Future<bool>/Future<void> (or bool/void) signal
@@ -347,12 +378,22 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  static final RegExp _httpClientCtorPattern = RegExp(r'HttpClient\s*\(\s*\)');
+  // `\b` so `MyHttpClient()` / `FakeHttpClient()` test doubles do not match the
+  // raw-socket `dart:io` `HttpClient` constructor this rule targets.
+  static final RegExp _httpClientCtorPattern = RegExp(
+    r'\bHttpClient\s*\(\s*\)',
+  );
   static final List<RegExp> _httpClosePatterns = <RegExp>[
     RegExp(r'\.close\s*\('),
     RegExp(r'\.closeSafe\s*\('),
     RegExp(r'\.close\s*;'),
   ];
+  // Client assigned to an instance field (`_client = HttpClient()`) is owned by
+  // the class and conventionally closed in a sibling `dispose()`/`close()` that
+  // a body-scoped scan cannot see — flagging here is a guaranteed FP.
+  static final RegExp _fieldAssignedClientPattern = RegExp(
+    r'_\w+\s*=\s*HttpClient\s*\(\s*\)',
+  );
 
   @override
   void runWithReporter(
@@ -365,10 +406,36 @@ class RequireHttpClientCloseRule extends SaropaLintRule {
 
       if (!_httpClientCtorPattern.hasMatch(bodySource)) return;
 
+      // Ownership transferred to a field — closed elsewhere. Skip.
+      if (_fieldAssignedClientPattern.hasMatch(bodySource)) return;
+
+      // Method hands the client back to the caller (`return HttpClient()` or a
+      // factory whose declared return type is HttpClient). The caller now owns
+      // the lifetime, so absence of a local close is not a leak.
+      if (_returnsHttpClient(node, bodySource)) return;
+
       if (!_httpClosePatterns.any((re) => re.hasMatch(bodySource))) {
         reporter.atNode(node);
       }
     });
+  }
+
+  /// Whether [node] transfers HttpClient ownership to its caller.
+  ///
+  /// Two ownership-transfer shapes are recognized:
+  /// 1. Declared return type is `HttpClient` / `Future<HttpClient>` — a factory.
+  /// 2. The body directly returns the constructed client (`return HttpClient()`).
+  /// Either way the caller owns the close, so a missing local close is correct.
+  static bool _returnsHttpClient(MethodDeclaration node, String bodySource) {
+    final TypeAnnotation? returnType = node.returnType;
+    if (returnType != null) {
+      final String returnSource = returnType.toSource();
+      if (returnSource == 'HttpClient' ||
+          returnSource == 'Future<HttpClient>') {
+        return true;
+      }
+    }
+    return RegExp(r'return\s+HttpClient\s*\(\s*\)').hasMatch(bodySource);
   }
 }
 
@@ -423,17 +490,33 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // `Pointer.fromAddress` is intentionally NOT an allocation trigger: it
+  // constructs a *borrowed* view over memory the caller already owns — freeing
+  // it would be a double-free / use-after-free bug, the opposite of what this
+  // rule should encourage. Including it produced wrong-direction false
+  // positives demanding `free()` on pointers that must never be freed here.
   static final List<RegExp> _allocPatterns = <RegExp>[
     RegExp(r'calloc\s*<'),
     RegExp(r'malloc\s*<'),
     RegExp(r'\ballocate\s*\('),
-    RegExp(r'Pointer\.fromAddress'),
   ];
   static final List<RegExp> _nativeCleanupPatterns = <RegExp>[
     RegExp(r'\.free\s*\('),
     RegExp(r'\bfree\s*\('),
     RegExp(r'\bfinally\b'),
+    // `Arena` / `using` scope frees every allocation automatically on exit, so
+    // its presence means cleanup is handled even without an explicit `free()`.
+    RegExp(r'\bArena\b'),
+    RegExp(r'\busing\s*\('),
   ];
+  // Allocation assigned to an instance field is owned by the class and freed in
+  // a sibling dispose — a body-scoped scan cannot see that, so skip.
+  static final RegExp _fieldAssignedAllocPattern = RegExp(
+    r'_\w+\s*=\s*\w*(?:calloc|malloc|allocate)\b',
+  );
+  static final RegExp _returnsPointerPattern = RegExp(
+    r'return\s+\w*(?:calloc|malloc|allocate)\b',
+  );
 
   @override
   void runWithReporter(
@@ -447,6 +530,13 @@ class RequireNativeResourceCleanupRule extends SaropaLintRule {
       final bool hasAlloc = _allocPatterns.any((re) => re.hasMatch(bodySource));
 
       if (!hasAlloc) return;
+
+      // Ownership transferred to a field or returned to the caller — freed
+      // elsewhere, not a local leak.
+      if (_fieldAssignedAllocPattern.hasMatch(bodySource) ||
+          _returnsPointerPattern.hasMatch(bodySource)) {
+        return;
+      }
 
       if (!_nativeCleanupPatterns.any((re) => re.hasMatch(bodySource))) {
         reporter.atNode(node);
@@ -518,6 +608,12 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // `WebSocket` / `WebSocketChannel` (with optional `?` nullability, generics,
+  // or `late` already stripped by reading `.type`) as the field type.
+  static final RegExp _webSocketTypePattern = RegExp(r'\bWebSocket\w*');
+  // A receiver-less private call statement inside dispose, e.g. `_cleanup();`.
+  static final RegExp _bareHelperCallPattern = RegExp(r'(?:^|\{|;)\s*_\w+\s*\(');
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -537,19 +633,28 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
-          final String fieldSource = member.toSource();
-          if (fieldSource.contains('WebSocket') ||
-              fieldSource.contains('WebSocketChannel')) {
+          // Match WebSocket as the field's declared TYPE, not anywhere in the
+          // field source. Substring matching previously fired on unrelated
+          // fields like `final String webSocketUrl = '...'` or
+          // `final int webSocketRetryCount = 3`, which hold no socket to close.
+          final String? typeName = member.fields.type?.toSource();
+          if (typeName != null && _webSocketTypePattern.hasMatch(typeName)) {
             hasWebSocket = true;
           }
         }
 
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
           final String disposeSource = member.body.toSource();
-          // Check for close (including *Safe extension variants)
+          // Check for close (including *Safe extension variants). Also treat a
+          // bare helper delegation (`_disposeSocket();` / `_cleanup();`) as
+          // cleanup: a private method invocation with no receiver inside
+          // dispose almost always forwards teardown, and a body-scoped scan
+          // cannot follow into it — so assuming it closes avoids a
+          // build-breaking FP on the common extract-method pattern.
           if (disposeSource.contains('.close(') ||
               disposeSource.contains('.closeSafe(') ||
-              disposeSource.contains('.sink.close')) {
+              disposeSource.contains('.sink.close') ||
+              _bareHelperCallPattern.hasMatch(disposeSource)) {
             hasDisposeClose = true;
           }
         }
@@ -623,6 +728,19 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // Whitespace-tolerant `setMethodCallHandler(null)` — the prior exact-string
+  // check missed `setMethodCallHandler( null )` and `setMethodCallHandler(\n
+  // null)`, false-positiving on correctly-cleaned code formatted with spaces.
+  static final RegExp _handlerNullifyPattern = RegExp(
+    r'setMethodCallHandler\s*\(\s*null\s*\)',
+  );
+  // A receiver-less private call statement inside dispose, e.g. `_teardown();`.
+  // Cleanup is frequently extracted into a helper the body-scoped scan cannot
+  // follow; assuming such a call forwards teardown avoids build-breaking FPs.
+  static final RegExp _disposeHelperCallPattern = RegExp(
+    r'(?:^|\{|;)\s*_\w+\s*\(',
+  );
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -644,25 +762,33 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
         return;
       }
 
-      // Check for cleanup in dispose
-      bool hasDispose = false;
+      // Check for cleanup in dispose. Any recognized teardown shape early-
+      // returns clean; falling through to the bottom means none was found.
       for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          hasDispose = true;
           final String disposeSource = member.body.toSource();
-          // Check if handler is nullified or subscription canceled
-          // (including *Safe extension variants)
-          if (disposeSource.contains('setMethodCallHandler(null)') ||
+          // Recognized cleanup shapes (whitespace-tolerant), plus a bare
+          // private helper call that forwards teardown. The former exact-string
+          // `setMethodCallHandler(null)` missed `setMethodCallHandler( null )`
+          // and `removeMethodCallHandler`, and the old trailing
+          // `classSource.contains('setMethodCallHandler')` guard re-flagged
+          // every class that DID clean up via a helper — both build-breaking
+          // FPs that this consolidated check removes.
+          if (_handlerNullifyPattern.hasMatch(disposeSource) ||
+              disposeSource.contains('removeMethodCallHandler') ||
               disposeSource.contains('.cancel(') ||
-              disposeSource.contains('.cancelSafe(')) {
+              disposeSource.contains('.cancelSafe(') ||
+              _disposeHelperCallPattern.hasMatch(disposeSource)) {
             return; // Good - cleanup found
           }
         }
       }
 
-      if (!hasDispose || classSource.contains('setMethodCallHandler')) {
-        reporter.atNode(node);
-      }
+      // Every cleaned case already hit the early `return` inside the loop, so
+      // reaching here means setup is present and no recognized teardown exists
+      // (the class either lacks a dispose or has one that never tears the
+      // handler down). Both are genuine leaks.
+      reporter.atNode(node);
     });
   }
 }
@@ -732,19 +858,50 @@ class RequireIsolateKillRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addClassDeclaration((ClassDeclaration node) {
+      // Detect `Isolate.spawn` / `Isolate.spawnUri` as a real invocation via the
+      // AST rather than a substring of the class source. The substring form
+      // self-triggered on string literals like `'Isolate.spawn'` (this lints
+      // package, codegen, and docs-emitting tooling all contain such strings),
+      // a guaranteed false positive for an error-severity gate.
+      final _IsolateSpawnVisitor spawnVisitor = _IsolateSpawnVisitor();
+      node.accept(spawnVisitor);
+      if (!spawnVisitor.found) return;
+
       final String classSource = node.toSource();
 
-      // Check for Isolate.spawn
-      if (!classSource.contains('Isolate.spawn') &&
-          !classSource.contains('Isolate.spawnUri')) {
+      // Recognized teardown: an explicit `.kill(` on the isolate, OR
+      // `Isolate.exit(` (the spawned isolate self-terminates and the parent is
+      // not expected to call kill — a legitimate cleanup the old check missed).
+      if (classSource.contains('.kill(') ||
+          classSource.contains('Isolate.exit')) {
         return;
       }
 
-      // Check for kill
-      if (!classSource.contains('.kill(')) {
-        reporter.atNode(node);
-      }
+      reporter.atNode(node);
     });
+  }
+}
+
+/// Finds a genuine `Isolate.spawn` / `Isolate.spawnUri` method invocation.
+///
+/// Used instead of substring matching so string literals and comments that
+/// merely mention the API do not trip the require_isolate_kill rule.
+class _IsolateSpawnVisitor extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (!found) {
+      final Expression? target = node.target;
+      final String name = node.methodName.name;
+      if (target is SimpleIdentifier &&
+          target.name == 'Isolate' &&
+          (name == 'spawn' || name == 'spawnUri')) {
+        found = true;
+        return;
+      }
+    }
+    super.visitMethodInvocation(node);
   }
 }
 

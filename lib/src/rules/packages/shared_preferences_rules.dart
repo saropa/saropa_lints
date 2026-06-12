@@ -547,10 +547,11 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
 
-      // Check for SharedPreferences set methods
-      if (methodName != 'setString' &&
-          methodName != 'setStringList' &&
-          methodName != 'setBool') {
+      // Check for SharedPreferences set methods. setBool is intentionally
+      // excluded: a boolean value can never carry an actual credential, so
+      // keys like `has_token` / `is_authenticated` are flags, not secrets —
+      // flagging them at ERROR severity would be a false positive.
+      if (methodName != 'setString' && methodName != 'setStringList') {
         return;
       }
 
@@ -564,13 +565,20 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
         return;
       }
 
-      // Check if key contains sensitive patterns
+      // Check if key contains sensitive patterns. Match on word boundaries
+      // rather than bare substring so unrelated keys do not trip the rule:
+      // plain `.contains('session')` mis-fires on `session_count` /
+      // `last_session_time` (non-sensitive metadata), and `.contains('secret')`
+      // mis-fires on `secretary_name`. Word-boundary matching keeps the
+      // genuine `auth_token` / `session_id` hits while dropping those.
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
       final String keySource = args.arguments.first.toSource().toLowerCase();
       for (final String sensitive in _sensitiveKeys) {
-        if (keySource.contains(sensitive)) {
+        if (RegExp(
+          r'\b' + RegExp.escape(sensitive) + r'\b',
+        ).hasMatch(keySource)) {
           reporter.atNode(node);
           return;
         }
@@ -679,9 +687,16 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
+      // Match on word boundaries, not bare substring. Plain
+      // `.contains('pin')` mis-fires on common unrelated keys —
+      // `shopping_cart`, `spinner`, `mapping`, `topping` all contain the
+      // letters "pin" — which at ERROR severity would break unrelated builds.
+      // Word boundaries keep `pin_code` / `pin` while dropping those.
       final String keySource = args.arguments.first.toSource().toLowerCase();
       for (final String sensitive in _sensitivePatterns) {
-        if (keySource.contains(sensitive)) {
+        if (RegExp(
+          r'\b' + RegExp.escape(sensitive) + r'\b',
+        ).hasMatch(keySource)) {
           reporter.atNode(node);
           return;
         }

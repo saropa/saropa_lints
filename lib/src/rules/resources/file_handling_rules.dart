@@ -1851,7 +1851,15 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
     // Check if any parameter is used in the path
     for (final FormalParameter param in params.parameters) {
       final String paramName = param.name?.lexeme ?? '';
-      if (paramName.isEmpty || !pathSource.contains(paramName)) continue;
+      if (paramName.isEmpty) continue;
+
+      // Match the parameter name as a whole identifier, not a substring. A bare
+      // `contains(paramName)` reported `File('${dir.path}/identity.json')` when
+      // a parameter happened to be named `id` (it is a substring of "identity"),
+      // even though `id` is never used in the path. Word-boundary matching
+      // requires the parameter to appear as its own token in the path source.
+      final RegExp paramWord = RegExp('\\b${RegExp.escape(paramName)}\\b');
+      if (!paramWord.hasMatch(pathSource)) continue;
 
       // A private helper whose tainted parameter receives nothing but
       // compile-time string literals at every observed call site cannot be

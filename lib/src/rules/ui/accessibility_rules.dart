@@ -2938,7 +2938,9 @@ class AvoidFlashingContentRule extends SaropaLintRule {
         'with photosensitive epilepsy. WCAG 2.3.1 compliance required. {v4}',
     correctionMessage:
         'Increase duration to at least 333ms to stay under 3 flashes/second.',
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): requires a literal repeat(reverse: true) with
+    // a literal sub-333ms Duration on a resolved AnimationController — real flash.
+    severity: DiagnosticSeverity.ERROR,
   );
   @override
   void runWithReporter(
@@ -2964,15 +2966,41 @@ class AvoidFlashingContentRule extends SaropaLintRule {
     });
   }
 
-  /// Check for cascade like `AnimationController(...)..repeat()`.
+  /// Check for cascade like `AnimationController(...)..repeat(reverse: true)`.
+  ///
+  /// WCAG flashing is repeated luminance REVERSAL: the screen must alternate
+  /// between two states multiple times per second. Only `repeat(reverse: true)`
+  /// produces that alternation (0->1->0->1...). A bare `repeat()` (no reverse)
+  /// is a sawtooth — it ramps 0->1 then jump-cuts back to 0 and ramps again,
+  /// which drives continuous-forward motion (a spinner, marquee, or progress
+  /// sweep), not an alternating flash. Flagging bare `repeat()` at ERROR would
+  /// break the build for every fast continuous-rotation loader, so require an
+  /// explicit `reverse: true` argument before treating the loop as flashing.
   bool _hasRepeatCascade(InstanceCreationExpression node) {
     final AstNode? parent = node.parent;
     if (parent is! CascadeExpression) return false;
     if (parent.target != node) return false;
 
     for (final Expression section in parent.cascadeSections) {
-      if (section is MethodInvocation && section.methodName.name == 'repeat') {
+      if (section is MethodInvocation &&
+          section.methodName.name == 'repeat' &&
+          _repeatReversesDirection(section)) {
         return true;
+      }
+    }
+    return false;
+  }
+
+  /// True only when `repeat` is called with `reverse: true` literally.
+  ///
+  /// A non-literal reverse value (a variable, a const reference, a ternary)
+  /// is unknowable statically; treating those as flashing would let an ERROR
+  /// false-fire on `repeat(reverse: someRuntimeFlag)`, so they are not flagged.
+  bool _repeatReversesDirection(MethodInvocation repeatCall) {
+    for (final Expression arg in repeatCall.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'reverse') {
+        final Expression value = arg.expression;
+        return value is BooleanLiteral && value.value;
       }
     }
     return false;

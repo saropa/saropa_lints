@@ -1565,6 +1565,18 @@ class RequireDisposeRule extends SaropaLintRule {
       return null;
     }
 
+    // Ownership transfer: a field whose initializer reads from `widget.*` (or
+    // any other field/parameter) is owned by the parent that constructed it.
+    // The Flutter contract is that whoever creates a controller disposes it, so
+    // a State that disposes a parent-supplied controller is the actual bug. At
+    // ERROR severity, flagging "missing disposal" here would break correct code
+    // and push the developer toward a double-dispose crash. Only fields the
+    // State constructs itself need local disposal, so skip parent-derived ones.
+    final Expression? initializer = node.fields.variables.first.initializer;
+    if (initializer != null && _isParentOwnedInitializer(initializer)) {
+      return null;
+    }
+
     final String fieldName = node.fields.variables.first.name.lexeme;
     final String? disposeMethod = _disposableTypes[typeName];
     if (disposeMethod == null) return null;
@@ -1575,6 +1587,29 @@ class RequireDisposeRule extends SaropaLintRule {
       disposeMethod: disposeMethod,
       declaration: node,
     );
+  }
+
+  /// True when [initializer] reads the controller from the enclosing widget
+  /// (`widget.controller`), meaning the parent owns it and is responsible for
+  /// disposal. Narrow on purpose: a locally constructed controller
+  /// (`TextEditingController()`) is NOT parent-owned and still needs disposal,
+  /// so only an explicit `widget.<member>` read short-circuits the check.
+  static bool _isParentOwnedInitializer(Expression initializer) {
+    // `widget.controller`
+    if (initializer is PrefixedIdentifier) {
+      return initializer.prefix.name == 'widget';
+    }
+    // `widget.config.controller` (chained) — receiver root is still `widget`.
+    if (initializer is PropertyAccess) {
+      final Expression? target = initializer.target;
+      if (target is SimpleIdentifier) {
+        return target.name == 'widget';
+      }
+      if (target is PrefixedIdentifier) {
+        return target.prefix.name == 'widget';
+      }
+    }
+    return false;
   }
 
   /// Returns true if [disposeBody] shows this field being disposed (direct, ?., or cascade).

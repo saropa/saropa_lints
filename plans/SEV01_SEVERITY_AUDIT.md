@@ -125,3 +125,99 @@ All ERROR-severity rules whose explicit impact getter said warning/info have bee
 - `prefer_platform_io_conditional` — throws UnsupportedError, crashes Flutter web
 - `prefer_url_launcher_uri_over_string` — Uri.parse throws FormatException at runtime
 - `prefer_fail_test_case` — deliberate always-fail pipeline visibility hook
+
+## Bucket B audit (2026-06-12) — every rule individually read + hardened for false positives
+
+All 46 Bucket B rules were read individually. Before any WARNING->ERROR flip, each rule's
+detection logic was audited for false positives (an ERROR-severity FP breaks every consumer's
+`dart analyze`). Clear FP classes were hardened in code (word-boundary name matching, resolved
+static-type guards over lexeme/substring matching, ownership-transfer skips, native-config-file
+verification). No `severity:` field or `impact` getter was changed — the flips below await sign-off.
+
+Verdict legend:
+- **ERROR_SAFE** — detection is structural/deterministic; after hardening, a flag proves a real
+  crash / compile error / data loss / verified-missing-config / leak with near-zero FP. Safe to flip.
+- **NEEDS_DISCUSSION** — dominant FP class hardened, but a residual FP remains (usually
+  cleanup-in-a-helper that single-method scanning cannot see). Flip only with eyes open, or after
+  adding cross-method flow analysis.
+- **KEEP_WARNING** — detection is irreducibly heuristic (guesses intent from a variable NAME, or
+  infers cross-file state it cannot read). Hardening reduced noise but cannot reach ERROR precision.
+
+### APPLIED 2026-06-12 — 10 of 11 flipped WARNING -> ERROR
+
+Signed off by the user. The 10 rules below had their LintCode `severity:` changed to
+`DiagnosticSeverity.ERROR`, each with a `// SEV-01 (upgraded to ERROR):` comment at the call
+site. `require_drift_create_all_in_oncreate` was HELD at WARNING — its inline-onCreate-delegates-
+to-a-helper residual FP is unacceptable for a build-breaking error until cross-method analysis
+exists. `require_ios_permission_description` has two LintCode definitions (static `_code` + the
+dynamic missing-keys builder); BOTH were flipped so the reported diagnostic is ERROR.
+
+Flipped: `avoid_websocket_memory_leak`, `require_dispose_implementation`,
+`prefer_dispose_before_new_instance`, `avoid_stream_subscription_in_field`,
+`avoid_not_encodable_in_to_json`, `avoid_drift_update_without_where`,
+`require_ios_permission_description`, `require_ios_face_id_usage_description`,
+`avoid_flashing_content`, `avoid_path_traversal`.
+
+### Recommended FLIP to ERROR (11 — ERROR_SAFE; 10 applied, drift onCreate held)
+
+| File | Rule | Why ERROR-safe after hardening |
+|------|------|--------------------------------|
+| architecture\disposal_rules.dart | `avoid_websocket_memory_leak` | Ownership-filtered + all-method cleanup scan + null-aware close; flag = State-owned channel never closed |
+| architecture\disposal_rules.dart | `require_dispose_implementation` | Fires only when a State that creates an owned disposable has zero `dispose()` |
+| architecture\disposal_rules.dart | `prefer_dispose_before_new_instance` | Added null-guard skip; flag = fresh `Type()` overwrites a live field with no dispose-before |
+| core\async_rules.dart | `avoid_stream_subscription_in_field` | Already AST-hardened (supertype Stream check, closure + ownership-transfer guards); no FP shape found |
+| data\json_datetime_rules.dart | `avoid_not_encodable_in_to_json` | Added `_hasToJson` static-type check; suppresses types that actually serialize, SDK non-encodables still flag |
+| packages\drift_rules.dart | `avoid_drift_update_without_where` | Rewrote to AST receiver-chain walk; fires only on inline `update(t)..write()` / `delete(t).go()` with no where = data loss |
+| packages\drift_rules.dart | `require_drift_create_all_in_oncreate` | Bound to `MigrationStrategy(onCreate: (m){...})` inline body; missing `createAll` deterministically crashes first launch (caveat below) |
+| platforms\ios_capabilities_permissions_rules.dart | `require_ios_permission_description` | Reads real Info.plist (`InfoPlistChecker`); fires only when plist exists AND omits key; element-resolved type match |
+| platforms\ios_capabilities_permissions_rules.dart | `require_ios_face_id_usage_description` | Reads real plist; requires resolved `LocalAuthentication` receiver |
+| ui\accessibility_rules.dart | `avoid_flashing_content` | Now requires literal `repeat(reverse: true)` + literal `Duration(<333ms)` on resolved AnimationController = real sub-333ms flash |
+| security\security_network_input_rules.dart | `avoid_path_traversal` | Structural (param proven to reach a `File`/`Directory` path) + word-boundary fix; residuals bias toward suppression |
+
+Caveat — `require_drift_create_all_in_oncreate`: an inline `onCreate` body that delegates
+`createAll` to a helper (`onCreate: (m) async { await _setup(m); }`) is still flagged. Uncommon
+shape; drop to NEEDS_DISCUSSION if zero-FP at ERROR is required.
+
+### NEEDS_DISCUSSION (14 — residual FP, mostly cleanup-in-helper)
+
+| File | Rule | Residual FP blocking ERROR |
+|------|------|----------------------------|
+| architecture\disposal_rules.dart | `require_stream_subscription_cancel` | Single-sub path now safe; `List<StreamSubscription>` collection path lacks ownership filter |
+| resources\resource_management_rules.dart | `require_file_close_in_finally` | close-in-helper invisible (extract-method) |
+| resources\resource_management_rules.dart | `require_database_close` | keeps linting `Future<Database>` factories whose callers close |
+| resources\resource_management_rules.dart | `require_http_client_close` | pass-to-helper / DI wrapper close invisible |
+| resources\resource_management_rules.dart | `require_native_resource_cleanup` | `free()` in a helper still mis-fires (arena + Pointer.fromAddress FPs fixed) |
+| resources\resource_management_rules.dart | `require_websocket_close` | helper-call teardown is heuristic; untyped `late final` now under-detected |
+| resources\resource_management_rules.dart | `require_platform_channel_cleanup` | fixed an outright logic bug; now helper-heuristic dependent |
+| resources\resource_management_rules.dart | `require_isolate_kill` | kill-via-helper / app-lifetime workers still mis-fire (string self-match + self-exit fixed) |
+| resources\memory_management_rules.dart | `require_image_disposal` | `ui.Image*` substring FP fixed; State holding a parent-owned `ui.Image` still mis-flags |
+| security\crypto_rules.dart | `avoid_deprecated_crypto_algorithms` | `des` abbreviation FP closed; confirm no benign type named `RC4`/`DES` in target codebases |
+| security\security_network_input_rules.dart | `prefer_html_escape` | scoped to WebView sink now; escape-detection is still a `toSource().contains('escape')` substring |
+| widget\widget_patterns_require_rules.dart | `require_image_picker_permission_ios` | reads real plist but does not verify receiver is `ImagePicker` |
+| widget\widget_patterns_require_rules.dart | `require_image_picker_permission_android` | reads real manifest but does not verify receiver is `ImagePicker` |
+| widget\widget_lifecycle_rules.dart | `require_field_dispose` | parent-owned guard added; disposal-via-mixin + lexeme-only `State` check still risky |
+
+### KEEP_WARNING (21 — irreducibly heuristic; do NOT flip)
+
+Hardened to reduce noise but cannot reach ERROR precision (name-guessing, absence-of-call with
+no cross-file visibility, or inference of native config the Dart rule never reads):
+
+- security\security_network_input_rules.dart — `require_input_sanitization`, `avoid_user_controlled_urls`
+- security\security_auth_storage_rules.dart — `require_secure_storage`, `require_auth_check`, `require_data_encryption`, `require_secure_password_field`, `avoid_sensitive_data_in_clipboard`
+- security\crypto_rules.dart — `prefer_secure_random_for_crypto` (indicators include common words `sign`/`hash`/`key`/`iv`)
+- resources\memory_management_rules.dart — `require_cache_eviction_policy`, `avoid_expando_circular_references`
+- resources\file_handling_rules.dart — `require_file_path_sanitization`
+- packages\firebase_rules.dart — `require_firebase_init_before_use`
+- packages\hive_rules.dart — `require_hive_type_adapter`, `prefer_hive_encryption`
+- packages\shared_preferences_rules.dart — `avoid_auth_state_in_prefs`, `prefer_encrypted_prefs`
+- widget\widget_patterns_require_rules.dart — `require_permission_manifest_android`, `require_permission_plist_ios`, `require_url_launcher_queries_android`, `require_url_launcher_schemes_ios` (flag an import or call, never read the native file)
+- commerce\iap_rules.dart — `avoid_entitlement_without_server`
+
+### Hardening applied (false-positive fixes landed this round, severity unchanged)
+
+These are behavior-narrowing bug fixes — fewer false positives — applied regardless of any flip:
+- Word-boundary name matching replacing raw `.contains`: `prefer_encrypted_prefs` (`pin` no longer matches `shopping`/`spinner`/`mapping`), `avoid_auth_state_in_prefs`, `require_file_path_sanitization`, `avoid_path_traversal`, `require_input_sanitization`.
+- Resolved static-type guards over lexeme/substring matching: `require_secure_storage` (skip non-`SharedPreferences`), `require_image_disposal` (exact `ui.Image`, not `ui.ImageFilter`/`Provider`/...), `avoid_expando_circular_references` (require `Expando` type), `avoid_not_encodable_in_to_json` (`_hasToJson`), `require_ios_permission_description` (element-resolved type).
+- Ownership-transfer / all-method-scan skips: websocket/subscription/dispose/native/http/db rules now recognize field-stored, returned, or helper-cleaned resources.
+- Logic-bug fix: `require_platform_channel_cleanup` previously re-flagged every class that cleaned up via a helper or `removeMethodCallHandler`.
+- Scope fixes: `prefer_html_escape` now targets the HTML-bearing argument of a WebView sink only; `avoid_drift_update_without_where` walks the terminal's own receiver chain; `avoid_flashing_content` requires literal `reverse: true`.

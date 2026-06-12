@@ -561,14 +561,34 @@ class AvoidEntitlementWithoutServerRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // Suppression patterns: any of these in the enclosing scope is taken as
+  // evidence the developer performs server / SDK-side verification, so the
+  // client-side `==` is not the sole gate. Broadening this list only REDUCES
+  // reports, which is the safe direction for an ERROR-candidate rule — every
+  // added pattern can suppress a false positive but can never create one.
+  // Coverage includes the major receipt-validation SDKs (RevenueCat,
+  // Qonversion, Adapty, Glassfy, Superwall) plus generic backend verbs that
+  // unambiguously denote server validation of a receipt/purchase/entitlement.
   static final List<RegExp> _serverPatternRegexes = <RegExp>[
     RegExp(r'\bverifyReceipt\b'),
     RegExp(r'\bserverVerificationData\b'),
     RegExp(r'\bvalidatePurchase\b'),
     RegExp(r'\bverifyPurchase\b'),
+    RegExp(r'\bvalidateReceipt\b'),
     RegExp(r'\bRevenueCat\b'),
     RegExp(r'\bPurchases\.instance\b'),
+    RegExp(r'\bcustomerInfo\b'),
     RegExp(r'\bQonversion\b'),
+    RegExp(r'\bAdapty\b'),
+    RegExp(r'\bGlassfy\b'),
+    RegExp(r'\bSuperwall\b'),
+    // Generic server-side entitlement/receipt verification verbs. Word-anchored
+    // and require the receipt/purchase/entitlement noun so unrelated names like
+    // `verifyEmail` or `validateForm` do not count as IAP server validation.
+    RegExp(
+      r'\b(?:verify|validate|confirm|check)[A-Za-z]*'
+      r'(?:Receipt|Purchase|Entitlement|Subscription)\b',
+    ),
   ];
   static final RegExp _purchaseStatusPattern = RegExp(
     r'PurchaseStatus\.(?:purchased|restored)',
@@ -595,19 +615,34 @@ class AvoidEntitlementWithoutServerRule extends SaropaLintRule {
     });
   }
 
+  /// Returns the widest practical source scope to search for a server-side
+  /// verification call.
+  ///
+  /// Prefer the enclosing CLASS over the immediate FunctionBody. A purchase
+  /// handler is almost always a `purchaseStream.listen((details) { ... })`
+  /// closure, whose FunctionBody is just the `if` block — the actual
+  /// `verifyReceipt` / backend call lives in the surrounding method or a
+  /// sibling method/field of the same widget-state or service class. Stopping
+  /// at the first (closure) FunctionBody therefore mis-flagged correctly
+  /// server-validated code, which is intolerable at ERROR severity. Widening
+  /// to the class can only SUPPRESS reports (it strictly grows the searched
+  /// text), so it removes false positives without adding any.
   String? _findEnclosingBodySource(AstNode node) {
     AstNode? current = node.parent;
+    FunctionBody? firstBody;
     while (current != null) {
-      // Check method-level first — server verification in the same method
-      if (current is FunctionBody) {
-        return current.toSource();
+      // Remember the innermost function body as a fallback for top-level
+      // (non-class) code where no enclosing class exists.
+      if (firstBody == null && current is FunctionBody) {
+        firstBody = current;
       }
-      // Fall back to class-level for field-based patterns
+      // The class subsumes the method body and every sibling helper/field, so
+      // a verification call anywhere in the class counts as "server-validated".
       if (current is ClassDeclaration) {
         return current.toSource();
       }
       current = current.parent;
     }
-    return null;
+    return firstBody?.toSource();
   }
 }

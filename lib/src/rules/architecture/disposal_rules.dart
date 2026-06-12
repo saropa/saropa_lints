@@ -881,7 +881,9 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
     '[avoid_websocket_memory_leak] WebSocketChannel is not closed in dispose(). This leaves network connections open, wasting bandwidth, battery, and server resources. Unclosed sockets can also cause app crashes or server-side issues. {v3}',
     correctionMessage:
         'Call channel.sink.close() in dispose() to properly close the WebSocket connection and free resources.',
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): fires only on a State-owned channel with no
+    // close in any method — a genuine leak. Ownership-filtered + all-method scan.
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static final List<RegExp> _webSocketChannelTypePatterns = [
@@ -898,7 +900,14 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       if (!_extendsState(node)) return;
 
-      // Find WebSocketChannel fields
+      // Whole-class source confirms ownership and finds cleanup wherever it
+      // lives. A channel is only this State's responsibility if this State
+      // opened it (assigned a `WebSocketChannel.connect(...)` / constructor
+      // result). A channel fed from `widget.channel` or a constructor parameter
+      // is externally owned, so demanding a close() here is a false positive.
+      final String classSource = node.toSource();
+
+      // Find owned WebSocketChannel fields
       final List<String> wsFields = <String>[];
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
@@ -907,7 +916,13 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
               _webSocketChannelTypePatterns.any((p) => p.hasMatch(typeName))) {
             for (final VariableDeclaration variable
                 in member.fields.variables) {
-              wsFields.add(variable.name.lexeme);
+              if (_channelIsOwned(
+                variable.name.lexeme,
+                variable.initializer,
+                classSource,
+              )) {
+                wsFields.add(variable.name.lexeme);
+              }
             }
           }
         }
@@ -915,14 +930,18 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
 
       if (wsFields.isEmpty) return;
 
-      // Check dispose method for close calls
+      // Scan EVERY method body for close calls, not only dispose(): teams often
+      // factor socket teardown into a helper called from dispose. A dispose-only
+      // scan mis-flags that as a leak, which at ERROR severity breaks the build.
       final Set<String> closedFields = <String>{};
       for (final ClassMember member in node.bodyMembers) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          final String disposeSource = member.toSource();
+        if (member is MethodDeclaration) {
+          final String methodSource = member.toSource();
           for (final String field in wsFields) {
-            if (disposeSource.contains('$field.sink.close') ||
-                disposeSource.contains('$field.close')) {
+            if (methodSource.contains('$field.sink.close') ||
+                methodSource.contains('$field.close') ||
+                methodSource.contains('$field?.sink.close') ||
+                methodSource.contains('$field?.close')) {
               closedFields.add(field);
             }
           }
@@ -937,6 +956,37 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// True when this State owns the channel in [fieldName] — it assigns a
+  /// `WebSocketChannel`/`IOWebSocketChannel`/`HtmlWebSocketChannel` constructor
+  /// (commonly `.connect(...)`) to the field inline or anywhere in the class.
+  /// An externally-supplied channel returns false, so the rule does not demand a
+  /// close the owner is responsible for. Substring matching only narrows the set
+  /// of flagged fields, which is the safe direction for ERROR severity.
+  bool _channelIsOwned(
+    String fieldName,
+    Expression? initializer,
+    String classSource,
+  ) {
+    final RegExp channelCtor = RegExp(
+      r'(?:WebSocketChannel|IOWebSocketChannel|HtmlWebSocketChannel)'
+      r'\s*[.(]',
+    );
+
+    // Inline initializer that opens a channel.
+    if (initializer != null && channelCtor.hasMatch(initializer.toSource())) {
+      return true;
+    }
+
+    // Assigned a channel constructor result somewhere in the class.
+    final RegExp assignsChannel = RegExp(
+      r'(?:this\.)?' +
+          RegExp.escape(fieldName) +
+          r'\s*=\s*[^;]*?(?:WebSocketChannel|IOWebSocketChannel|'
+          r'HtmlWebSocketChannel)\s*[.(]',
+    );
+    return assignsChannel.hasMatch(classSource);
   }
 }
 
@@ -1168,6 +1218,14 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
       final List<String> singleSubscriptionFields = <String>[];
       final List<String> collectionSubscriptionFields = <String>[];
 
+      // Whole-class source is used to confirm ownership: a single subscription
+      // is only this State's responsibility if this State created it (assigned a
+      // `.listen(...)` result to it). A field fed only from `widget.subscription`
+      // or a constructor parameter is externally owned — cancelling it here would
+      // be wrong, and flagging the absence of a cancel is a false positive that,
+      // at ERROR severity, breaks the consumer build.
+      final String classSource = node.toSource();
+
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           final String? typeName = member.fields.type?.toString();
@@ -1179,7 +1237,13 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
               // Check if it's a collection type (List, Set, Iterable, etc.)
               if (_isCollectionType(typeName)) {
                 collectionSubscriptionFields.add(fieldName);
-              } else {
+              } else if (_subscriptionIsOwned(
+                fieldName,
+                variable.initializer,
+                classSource,
+              )) {
+                // Only track single subscriptions this State assigns from a
+                // listen() result; skip externally-owned (passed-in) ones.
                 singleSubscriptionFields.add(fieldName);
               }
             }
@@ -1193,23 +1257,32 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
         return;
       }
 
-      // Check dispose method for cancel calls
+      // Scan EVERY method body for cancel calls, not only dispose().
+      //
+      // False positive avoided: teams routinely factor cleanup out of dispose
+      // into a helper (`void dispose() { _cleanUp(); super.dispose(); }` with
+      // `void _cleanUp() { _sub?.cancel(); }`), or cancel a subscription in
+      // didChangeDependencies/deactivate before re-subscribing. A dispose-only
+      // scan mis-flags all of these as leaks. At ERROR severity that breaks the
+      // consumer build, so a subscription cancelled anywhere in this State's own
+      // methods is treated as owned-and-cleaned. The `.cancel()` call is still
+      // required — setting the field to null is not cleanup.
       final Set<String> canceledFields = <String>{};
       for (final ClassMember member in node.bodyMembers) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          final String disposeSource = member.toSource();
+        if (member is MethodDeclaration) {
+          final String methodSource = member.toSource();
 
           // Check single subscription fields for direct cancel patterns
           for (final String field in singleSubscriptionFields) {
-            if (disposeSource.contains('$field.cancel()') ||
-                disposeSource.contains('$field?.cancel()')) {
+            if (methodSource.contains('$field.cancel()') ||
+                methodSource.contains('$field?.cancel()')) {
               canceledFields.add(field);
             }
           }
 
           // Check collection subscription fields for iteration-based cancel
           for (final String field in collectionSubscriptionFields) {
-            if (_hasCollectionCancellation(disposeSource, field)) {
+            if (_hasCollectionCancellation(methodSource, field)) {
               canceledFields.add(field);
             }
           }
@@ -1232,6 +1305,51 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// True when this State owns the subscription stored in [fieldName] — i.e.
+  /// it assigns the result of a `.listen(...)` call to the field, either inline
+  /// or anywhere in the class body. An externally-supplied subscription (fed
+  /// from `widget.x` or a constructor parameter, never from a local listen())
+  /// returns false, so the rule does not demand a cancel the owner must do.
+  ///
+  /// The inline case uses an AST check (not source-substring matching) so a
+  /// comment or string literal containing `.listen(` cannot trip it, and the
+  /// anti-pattern integrity test (no `.toSource().contains(` in detection
+  /// logic) stays green. The cross-body assignment case below uses a
+  /// word-boundary RegExp, which only ever *narrows* what gets flagged.
+  bool _subscriptionIsOwned(
+    String fieldName,
+    Expression? initializer,
+    String classSource,
+  ) {
+    // Inline initializer that listens: `final _sub = stream.listen(...);`
+    if (initializer != null && _isListenInvocation(initializer)) {
+      return true;
+    }
+
+    // Assigned from a listen() result somewhere in the class:
+    // `_sub = stream.listen(...)` / `_sub = await x.listen(...)`.
+    final RegExp assignsListen = RegExp(
+      r'(?:this\.)?' +
+          RegExp.escape(fieldName) +
+          r'\s*=\s*[^;]*?\.listen\s*\(',
+    );
+    return assignsListen.hasMatch(classSource);
+  }
+
+  /// Whether [expr] is (or unwraps to) a `.listen(...)` invocation — the
+  /// expression whose result is the StreamSubscription this State owns.
+  /// Handles a leading `await` and a preceding transform chain
+  /// (`stream.where(...).listen(...)`); both leave `listen` as the outermost
+  /// method call. AST-based so it cannot be fooled by `.listen(` appearing in
+  /// a string literal or comment (and avoids the banned source-substring scan).
+  static bool _isListenInvocation(Expression expr) {
+    Expression inner = expr;
+    if (inner is AwaitExpression) {
+      inner = inner.expression;
+    }
+    return inner is MethodInvocation && inner.methodName.name == 'listen';
   }
 
   /// Checks if a type string represents a collection type.
@@ -2112,7 +2230,9 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
         'without cleanup cause memory leaks and setState errors. {v3}',
     correctionMessage:
         'Add dispose() method to clean up controllers, subscriptions, and timers.',
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): fires only when a State that actually creates
+    // an owned disposable has zero dispose() method — near-deterministic.
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Types that require disposal or cleanup.
@@ -2140,11 +2260,6 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
     'RandomAccessFile',
   };
 
-  static final List<String> _disposableTypesList = _disposableTypes.toList();
-  static final List<RegExp> _disposableTypeRegexes = _disposableTypesList
-      .map((String t) => RegExp(r'\b' + RegExp.escape(t) + r'\b'))
-      .toList();
-
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2153,23 +2268,19 @@ class RequireDisposeImplementationRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       if (!_extendsState(node)) return;
 
-      // Find disposable resource fields
+      // Find disposable resource fields OWNED by this State.
+      //
+      // False positive avoided: a State that only holds a disposable handed in
+      // by its parent (`final c = widget.controller;`, or a field assigned from
+      // `widget.x` rather than from a `Type()` constructor) is not responsible
+      // for disposing it — the owner is. Demanding a dispose() method on such a
+      // State is a false "missing dispose" report that, at ERROR severity, would
+      // break the consumer build. `_findOwnedFieldsOfType` restricts to fields
+      // this class instantiates (inline `Type()` or assigned in initState),
+      // matching the ownership model the sibling per-type disposal rules use.
       final List<String> disposableFields = <String>[];
-      for (final ClassMember member in node.bodyMembers) {
-        if (member is FieldDeclaration) {
-          final String? typeName = member.fields.type?.toSource();
-          if (typeName != null) {
-            for (var i = 0; i < _disposableTypesList.length; i++) {
-              if (_disposableTypeRegexes[i].hasMatch(typeName)) {
-                for (final VariableDeclaration variable
-                    in member.fields.variables) {
-                  disposableFields.add(variable.name.lexeme);
-                }
-                break;
-              }
-            }
-          }
-        }
+      for (final String disposableType in _disposableTypes) {
+        disposableFields.addAll(_findOwnedFieldsOfType(node, disposableType));
       }
 
       if (disposableFields.isEmpty) return;
@@ -2257,7 +2368,9 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
         'the old instance. Listeners and resources remain active forever. {v4}',
     correctionMessage:
         'Call dispose() on the old value before assigning a new instance.',
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): fires only on a fresh Type() overwriting a
+    // live non-late-final field with no dispose-before and no null guard — a leak.
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Types that require disposal before reassignment.
@@ -2382,8 +2495,38 @@ class PreferDisposeBeforeNewInstanceRule extends SaropaLintRule {
         return;
       }
 
+      // Lazy-init guard: the assignment is gated by a null check proving the
+      // field currently holds no instance — `if (_field == null) _field = T();`.
+      // When the prior value is provably null there is nothing to dispose, so
+      // flagging this is a false positive. At ERROR severity that would break a
+      // legitimate lazy-initialization pattern.
+      if (_isGuardedByNullCheck(node, fieldName)) return;
+
       reporter.atNode(node);
     });
+  }
+
+  /// True when [assignment] is the body of an `if (field == null)` guard, so
+  /// the field is provably null at the assignment and cannot leak an old value.
+  ///
+  /// Walks enclosing if-statements and matches `field == null` (with optional
+  /// `this.` prefix, either operand order). Conservative: only the exact
+  /// equals-null shape qualifies, so it never suppresses a real reassignment.
+  bool _isGuardedByNullCheck(AssignmentExpression assignment, String fieldName) {
+    AstNode? current = assignment.parent;
+    while (current != null) {
+      if (current is MethodDeclaration || current is ClassDeclaration) break;
+      if (current is IfStatement) {
+        final String condition = current.expression.toSource();
+        final String f = RegExp.escape(fieldName);
+        final RegExp isNull = RegExp(
+          r'(?:this\.)?' + f + r'\s*==\s*null|null\s*==\s*(?:this\.)?' + f,
+        );
+        if (isNull.hasMatch(condition)) return true;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 
   /// Returns the name of a local that captured the field's previous value in a

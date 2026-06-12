@@ -100,6 +100,19 @@ class RequireSecureStorageRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
 
+      // When the receiver's static type is resolvable and is NOT
+      // SharedPreferences, skip. The `pref`/`shared` NAME heuristic below
+      // collides with ordinary domain objects (`userPref.setX(...)`,
+      // `shared_state.setX(...)`) that have nothing to do with preference
+      // storage; flagging those at ERROR severity would break unrelated builds.
+      // The check is a negative filter only — an unresolved type (partial
+      // analysis) falls through to the name heuristic rather than suppressing a
+      // real finding.
+      final String? targetType = target.staticType?.getDisplayString();
+      if (targetType != null && !targetType.contains('SharedPreferences')) {
+        return;
+      }
+
       final String targetSource = target.toSource().toLowerCase();
       if (!_prefSharedTargetPatterns.any((p) => p.hasMatch(targetSource))) {
         return;
@@ -1509,21 +1522,44 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
         return;
       }
 
-      final String nodeSource = node.toSource();
+      // Inspect the named arguments via the AST rather than substring-matching
+      // the rendered source. The previous `nodeSource.contains('... false')`
+      // approach was whitespace-brittle: a correctly-secured field written as
+      // `enableSuggestions:false` (no space) or split across wrapped lines by
+      // the formatter was a false positive, and `obscureText: true` matched even
+      // when `true` was actually a getter expression. Reading the literal value
+      // off each NamedExpression removes that formatting dependence.
+      bool obscureTextTrue = false;
+      bool enableSuggestionsFalse = false;
+      bool autocorrectFalse = false;
 
-      // Check if this is a password field
-      if (!nodeSource.contains('obscureText: true') &&
-          !nodeSource.contains('obscureText:true')) {
-        return; // Not a password field
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+
+        final String label = arg.name.label.name;
+        final Expression value = arg.expression;
+
+        // Only a literal `true` / `false` is decidable here. A non-literal
+        // (e.g. `obscureText: _obscure`) leaves the flag at its default, so a
+        // field whose security settings are computed at runtime is NOT flagged
+        // — that is intentional: ERROR-flagging an unknowable runtime value is
+        // the false-positive class this rule must avoid.
+        if (value is! BooleanLiteral) continue;
+
+        switch (label) {
+          case 'obscureText':
+            obscureTextTrue = value.value;
+          case 'enableSuggestions':
+            enableSuggestionsFalse = !value.value;
+          case 'autocorrect':
+            autocorrectFalse = !value.value;
+        }
       }
 
-      // Check for secure keyboard settings
-      final bool hasEnableSuggestions = nodeSource.contains(
-        'enableSuggestions: false',
-      );
-      final bool hasAutocorrect = nodeSource.contains('autocorrect: false');
+      // Only password fields (obscureText literally true) are in scope.
+      if (!obscureTextTrue) return;
 
-      if (!hasEnableSuggestions || !hasAutocorrect) {
+      if (!enableSuggestionsFalse || !autocorrectFalse) {
         reporter.atNode(node);
       }
     });

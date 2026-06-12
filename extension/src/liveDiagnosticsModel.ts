@@ -30,6 +30,8 @@ import * as vscode from 'vscode';
 import type {
   BySeverity,
   IssuesByRule,
+  MetadataIssueBreakdown,
+  RuleMetadataData,
   Violation,
   ViolationsData,
 } from './violationsReader';
@@ -150,8 +152,56 @@ export function buildViolationsDataFromDiagnostics(
       byImpact: { ...bySeverity },
       issuesByRule,
     },
-    // enabledRuleCount and rich per-rule metadata are phase #1b (bundled
-    // catalog). tier comes from the live setting, not a stale file.
+    // Rich per-rule metadata is attached separately by [applyRuleCatalog] from
+    // the bundled rule catalog — a Diagnostic carries none. tier comes from the
+    // live setting, not a stale file.
     config: tier ? { tier } : undefined,
+  };
+}
+
+/**
+ * Attach per-rule metadata from the bundled rule catalog to a live model.
+ *
+ * Why this is a separate step. A live `Diagnostic` carries only file / line /
+ * rule / severity / message — no rule type, lifecycle status, or security-review
+ * flag. The Issues-panel rule-type/status filters and security-hotspot review
+ * need that metadata. The catalog (rule name → metadata, generated from the
+ * analyzer package) supplies it; this enriches the already-built model so the
+ * pure diagnostic-to-violation builder stays catalog-agnostic and its many
+ * callers/tests are untouched.
+ *
+ * Only rules actually present in the model are copied into `ruleMetadataByRule`
+ * (keeps the payload to what the surfaces read), and `byRuleType` / `byRuleStatus`
+ * are issue-weighted exactly like the export's [_MetadataIssueBreakdown] — rules
+ * with no catalog entry fall into `unspecified` / `ready`, matching the export's
+ * defaults so the filter UI reads identically from either source. An empty
+ * catalog returns the model unchanged.
+ */
+export function applyRuleCatalog(
+  data: ViolationsData,
+  catalog: Record<string, RuleMetadataData>,
+): ViolationsData {
+  if (Object.keys(catalog).length === 0) return data;
+
+  const issuesByRule = data.summary?.issuesByRule ?? {};
+  const ruleMetadataByRule: Record<string, RuleMetadataData> = {};
+  const byRuleType: MetadataIssueBreakdown = {};
+  const byRuleStatus: MetadataIssueBreakdown = {};
+
+  for (const [rule, count] of Object.entries(issuesByRule)) {
+    const meta = catalog[rule];
+    if (meta) ruleMetadataByRule[rule] = meta;
+    // Defaults mirror the Dart export (ruleType→'unspecified', status→'ready')
+    // so a rule missing from the catalog still groups somewhere in the filter.
+    const type = meta?.ruleType ?? 'unspecified';
+    const status = meta?.ruleStatus ?? 'ready';
+    byRuleType[type] = (byRuleType[type] ?? 0) + count;
+    byRuleStatus[status] = (byRuleStatus[status] ?? 0) + count;
+  }
+
+  return {
+    ...data,
+    summary: { ...data.summary, byRuleType, byRuleStatus },
+    config: { ...data.config, ruleMetadataByRule },
   };
 }

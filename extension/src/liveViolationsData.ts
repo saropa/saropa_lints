@@ -26,11 +26,17 @@
 
 import * as vscode from 'vscode';
 import {
+  applyRuleCatalog,
   buildViolationsDataFromDiagnostics,
   type GetDiagnosticsFn,
 } from './liveDiagnosticsModel';
-import { filterDisabledFromData, type ViolationsData } from './violationsReader';
+import {
+  filterDisabledFromData,
+  type RuleMetadataData,
+  type ViolationsData,
+} from './violationsReader';
 import { readDisabledRules } from './configWriter';
+import { getRuleCatalog } from './ruleCatalog';
 
 /**
  * Resolve the user's configured tier without reading a stale file. Only called
@@ -51,8 +57,15 @@ export function readLiveViolations(
   root: string,
   getDiagnostics?: GetDiagnosticsFn,
   tier: string | undefined = resolveTier(),
+  catalog: Record<string, RuleMetadataData> = getRuleCatalog(),
 ): ViolationsData {
-  return buildViolationsDataFromDiagnostics(root, getDiagnostics, tier);
+  // Enrich the bare diagnostic model with per-rule metadata so the Issues-panel
+  // rule-type/status filters and security-hotspot review work off the live
+  // source. The catalog defaults to the bundled one; tests inject a stub.
+  return applyRuleCatalog(
+    buildViolationsDataFromDiagnostics(root, getDiagnostics, tier),
+    catalog,
+  );
 }
 
 /**

@@ -2996,7 +2996,9 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
         'to call _subscription.cancel() in dispose(), preventing leaks. '
         'See https://docs.flutter.dev/perf/memory#dispose-resources for more '
         'information.',
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): structural — an uncaptured/void-stored
+    // .listen() on a real Stream, with closure + ownership-transfer guards.
+    severity: DiagnosticSeverity.ERROR,
   );
 
   static const Set<String> _subscriptionVarNames = {

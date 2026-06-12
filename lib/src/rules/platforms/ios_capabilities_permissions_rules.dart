@@ -106,7 +106,9 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
     '[require_ios_permission_description] Missing Info.plist keys cause App '
         'Store rejection or instant crash when the permission is requested. {v5}',
     correctionMessage: 'Add the missing key(s) to ios/Runner/Info.plist.',
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): reads the real Info.plist; fires only when the
+    // plist exists AND omits the key. Missing key = App Store rejection / crash.
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Methods on ImagePicker that access device resources.
@@ -126,7 +128,9 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
           '${missingKeys.join(", ")}',
       correctionMessage:
           'Add ${missingKeys.join(" and ")} to ios/Runner/Info.plist.',
-      severity: DiagnosticSeverity.WARNING,
+      // SEV-01 (upgraded to ERROR): mirrors the static _code severity; this is
+      // the diagnostic actually reported once missing plist keys are confirmed.
+      severity: DiagnosticSeverity.ERROR,
     );
   }
 
@@ -141,7 +145,15 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
 
     // Check for permission-requiring types (non-ImagePicker).
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.typeName;
+      // Prefer the resolved element name over the raw lexeme. The mapping keys
+      // include generic, collision-prone names (`Location`, `Record`, `Health`,
+      // `Geolocator`) that a consumer can legitimately use for their own class.
+      // At ERROR severity a lexeme-only match (`Record()` referring to a local
+      // data type, not the `record` plugin) would break the build on correct
+      // code, so resolve the constructor's element and only fall back to the
+      // lexeme when resolution is unavailable (still string-gated below).
+      final String typeName =
+          node.constructorName.type.element?.name ?? node.typeName;
 
       // Get required keys for this type.
       final requiredKeys = IosPermissionMapping.getRequiredKeys(typeName);
@@ -680,7 +692,9 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
     correctionMessage:
         'Add NSFaceIDUsageDescription to ios/Runner/Info.plist explaining '
         'why your app uses Face ID.',
-    severity: DiagnosticSeverity.WARNING,
+    // SEV-01 (upgraded to ERROR): reads the real plist, requires a resolved
+    // LocalAuthentication receiver; missing NSFaceIDUsageDescription crashes.
+    severity: DiagnosticSeverity.ERROR,
   );
 
   /// Type names from the local_auth package.
