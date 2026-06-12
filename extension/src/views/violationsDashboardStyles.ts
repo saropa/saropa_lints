@@ -134,6 +134,22 @@ export function getViolationsDashboardStyles(): string {
     .status-line .pill.bad  { color: var(--status-bad); }
     .status-line .pill.warn { color: var(--accent-warning); }
 
+    /* Freshness pill doubles as a refresh button (role="button" +
+       tabindex="0"): pointer cursor + hover tint signal it is clickable, and
+       a focus-visible ring keeps it keyboard-discoverable. */
+    .status-line .pill.freshness {
+      cursor: pointer;
+      user-select: none;
+      transition: background .15s;
+    }
+    .status-line .pill.freshness:hover {
+      background: var(--vscode-toolbar-hoverBackground, var(--surface-3));
+    }
+    .status-line .pill.freshness:focus-visible {
+      outline: 1px solid var(--vscode-focusBorder);
+      outline-offset: 2px;
+    }
+
     /* Toggle pills (#224) — clickable status-line affordances for the
        supplementary-counts feature. Promo state telegraphs "available but
        inactive" via dashed border + reduced opacity; ON state inherits the

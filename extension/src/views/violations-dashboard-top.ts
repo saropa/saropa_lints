@@ -112,7 +112,30 @@ export function buildStatusLine(input: ViolationsDashboardHtmlInput): string {
   const rel = formatRelative(input.reportTimestamp);
   if (rel) {
     const iso = escapeHtml(input.reportTimestamp ?? '');
-    parts.push(`<span class="pill" title="${iso}">⟳ ${l10n('findingsDash.status.lastRunPrefix')} ${escapeHtml(rel)}</span>`);
+    // The timestamp is the moment this dashboard last repainted from live
+    // diagnostics (liveDiagnosticsModel stamps it at build), so "Updated" is
+    // accurate where "Last run" implied a separate analysis pass. The pill is
+    // clickable (data-action="refresh") because a backgrounded panel does not
+    // auto-repaint — the user can pull the analyzer's current state on demand.
+    //
+    // The relative label re-ticks client-side: we ship the localized time
+    // templates as data attributes with a literal {n} placeholder (mirroring
+    // formatRelative's buckets exactly) so the webview can recompute "5m ago"
+    // every 30s without another host rebuild. Without this the label would
+    // freeze at "just now" until the next diagnostics change.
+    const tJustNow = escapeHtml(l10n('findingsDash.time.justNow'));
+    const tMin = escapeHtml(l10n('findingsDash.time.minutesAgo', { min: '{n}' }));
+    const tHr = escapeHtml(l10n('findingsDash.time.hoursAgo', { hr: '{n}' }));
+    const tDay = escapeHtml(l10n('findingsDash.time.daysAgo', { day: '{n}' }));
+    const hint = escapeHtml(l10n('findingsDash.status.refreshHint'));
+    parts.push(
+      `<span class="pill freshness" role="button" tabindex="0" data-action="refresh" title="${hint} · ${iso}">` +
+        `⟳ ${escapeHtml(l10n('findingsDash.status.updatedPrefix'))} ` +
+        `<span class="freshness-rel" data-updated-at="${iso}"` +
+        ` data-t-justnow="${tJustNow}" data-t-min="${tMin}" data-t-hr="${tHr}" data-t-day="${tDay}">` +
+        `${escapeHtml(rel)}</span>` +
+        `</span>`,
+    );
   } else {
     parts.push(`<span class="pill warn" title="${escapeHtml(l10n('findingsDash.status.noTimestampTitle'))}">⟳ ${escapeHtml(l10n('findingsDash.status.lastRunUnknown'))}</span>`);
   }
