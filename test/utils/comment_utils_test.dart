@@ -231,6 +231,22 @@ void main() {
           isFalse,
         );
       });
+
+      // Regression: a single identifier-shaped word ending a wrapped prose
+      // sentence with a period (e.g. the last physical line of a block comment)
+      // is sentence punctuation, not member access. A trailing dot with nothing
+      // after it is never valid Dart.
+      test('single word + sentence period: result.', () {
+        expect(CommentPatterns.isLikelyCode('result.'), isFalse);
+      });
+
+      test('single word + sentence period: value.', () {
+        expect(CommentPatterns.isLikelyCode('value.'), isFalse);
+      });
+
+      test('single word + sentence period: done.', () {
+        expect(CommentPatterns.isLikelyCode('done.'), isFalse);
+      });
     });
 
     group('should still detect actual code after tightening', () {
@@ -266,6 +282,21 @@ void main() {
         expect(CommentPatterns.isLikelyCode('list.sort()'), isTrue);
       });
 
+      // Regression guards: the dot branch still matches real member access
+      // (a selector follows the dot), so tightening it for prose tails like
+      // `result.` does not let true member access slip through.
+      test('foo.bar — member access', () {
+        expect(CommentPatterns.isLikelyCode('foo.bar'), isTrue);
+      });
+
+      test('list.add(item) — method call', () {
+        expect(CommentPatterns.isLikelyCode('list.add(item)'), isTrue);
+      });
+
+      test('obj.field = x — field assignment', () {
+        expect(CommentPatterns.isLikelyCode('obj.field = x'), isTrue);
+      });
+
       // Strong code indicators should bypass prose guard
       test('for (int i in list) — not prose despite for/in', () {
         expect(CommentPatterns.isLikelyCode('for (int i in list)'), isTrue);
@@ -284,6 +315,65 @@ void main() {
           isTrue,
         );
       });
+    });
+  });
+
+  // Block-level prose detection: a single wrapped line that names a real API
+  // method is identical to member access in isolation; the contiguous comment
+  // block is what reveals it as prose.
+  group('CommentPatterns.isLikelyProse', () {
+    test('null/empty is not prose', () {
+      expect(CommentPatterns.isLikelyProse(null), isFalse);
+      expect(CommentPatterns.isLikelyProse(''), isFalse);
+    });
+
+    test('joined wrapped block referencing an API reads as prose', () {
+      // The reproducer block from jwt_structure_utils.dart, joined.
+      const String joined =
+          "base64url omits '=' padding, but base64Url.decode requires the "
+          'length to be a multiple of four — restore the stripped padding '
+          'before decoding. The outer `% block` keeps this at 0 when the '
+          'length is already aligned; `block - 0` would otherwise append a '
+          "spurious full '====' block and make base64Url.decode reject an "
+          'otherwise-valid token.';
+      expect(CommentPatterns.isLikelyProse(joined), isTrue);
+    });
+
+    test('an isolated API-reference line is NOT seen as prose', () {
+      // One function word ("an") and no strong indicators: below the per-line
+      // threshold, which is exactly why block-level evaluation is needed.
+      expect(
+        CommentPatterns.isLikelyProse(
+          'base64Url.decode reject an otherwise-valid token.',
+        ),
+        isFalse,
+      );
+    });
+  });
+
+  group('CommentPatterns.hasStrongCodeIndicators', () {
+    test('null/empty has no strong indicators', () {
+      expect(CommentPatterns.hasStrongCodeIndicators(null), isFalse);
+      expect(CommentPatterns.hasStrongCodeIndicators(''), isFalse);
+    });
+
+    test('call with parens is strong code', () {
+      expect(CommentPatterns.hasStrongCodeIndicators('foo.bar();'), isTrue);
+    });
+
+    test('arrow and braces are strong code', () {
+      expect(CommentPatterns.hasStrongCodeIndicators('(a) => a + 1'), isTrue);
+      expect(CommentPatterns.hasStrongCodeIndicators('class X {'), isTrue);
+    });
+
+    test('in-prose API reference is NOT strong code', () {
+      // No parens/arrow/braces, so it cannot rescue itself from a prose block.
+      expect(
+        CommentPatterns.hasStrongCodeIndicators(
+          'base64Url.decode reject the token.',
+        ),
+        isFalse,
+      );
     });
   });
 

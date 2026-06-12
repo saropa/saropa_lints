@@ -60,7 +60,6 @@ const Map<String, List<String>> stylisticRuleCategories =
         'prefer_conditional_expressions',
         'prefer_returning_condition',
         'prefer_returning_conditionals',
-        'prefer_returning_shorthands',
         'prefer_pushing_conditional_expressions',
         'prefer_getter_over_method',
       ],

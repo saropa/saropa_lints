@@ -7,7 +7,8 @@ import '../../native/saropa_fix.dart';
 
 /// Quick fix: Convert single "return expr;" body to expression body "=> expr".
 ///
-/// Matches [PreferReturningShorthandsRule].
+/// Used by `PreferArrowFunctionsRule` (previously also the now-removed
+/// `prefer_returning_shorthands`, which it absorbed).
 class ConvertToExpressionBodyFix extends SaropaFixProducer {
   ConvertToExpressionBodyFix({required super.context});
 

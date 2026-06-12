@@ -111,7 +111,6 @@ const Set<String> stylisticRules = <String>{
   'prefer_conditional_expressions', // Moved from professional (opinionated)
   'prefer_returning_condition', // Moved from professional (opinionated)
   'prefer_returning_conditionals', // Moved from professional (opinionated)
-  'prefer_returning_shorthands', // Moved from professional (opinionated)
   'prefer_pushing_conditional_expressions', // Moved from professional (opinionated)
   'prefer_type_over_var', // Moved from professional (conflicts with prefer_var_over_explicit_type)
   // === Function & Parameter style ===
@@ -2693,7 +2692,7 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_required_before_optional' moved to stylisticRules (opinionated)
   // 'prefer_returning_condition' moved to stylisticRules (opinionated)
   // 'prefer_returning_conditionals' moved to stylisticRules (opinionated)
-  // 'prefer_returning_shorthands' moved to stylisticRules (opinionated)
+  // 'prefer_returning_shorthands' removed — merged into prefer_arrow_functions
   'prefer_rich_text_for_complex',
   // 'prefer_richtext_over_text_rich' moved to stylisticRules (opinionated)
   // 'prefer_screaming_case_constants' moved to stylisticRules (opinionated)

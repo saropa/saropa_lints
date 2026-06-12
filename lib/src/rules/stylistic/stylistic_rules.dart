@@ -25,6 +25,7 @@ import '../../fixes/stylistic/replace_single_cascade_with_dot_fix.dart';
 import '../../fixes/stylistic/swap_string_delimiter_fix.dart';
 import '../../fixes/stylistic/remove_closure_parameter_type_fix.dart';
 import '../../fixes/stylistic/convert_to_expression_body_getter_fix.dart';
+import '../../fixes/return/convert_to_expression_body_fix.dart';
 
 // ============================================================================
 // STYLISTIC / OPINIONATED RULES
@@ -249,9 +250,18 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
 
 /// Warns when block body functions could be written as arrow functions.
 ///
-/// Since: v1.3.0 | Updated: v4.13.0 | Rule version: v3
+/// Since: v1.3.0 | Updated: v5.x | Rule version: v4
 ///
 /// This is an **opinionated rule** - not included in any tier by default.
+///
+/// Supersedes the former `prefer_returning_shorthands` rule, whose detection
+/// was a strict subset (functions + methods only) of this rule. The quick fix
+/// that converts the block body to `=> expr` was grafted here when the two
+/// rules were merged, so the duplicate no longer double-reports on the same
+/// single-return body.
+///
+/// **Quick fix available:** Converts the single-return block body to `=> expr`
+/// (functions and methods; lambdas are detected but not auto-fixed).
 ///
 /// **Pros of arrow functions:**
 /// - More concise and readable for simple returns
@@ -300,7 +310,7 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_arrow_functions',
-    '[prefer_arrow_functions] Function body contains only a single return statement. Block syntax adds unnecessary braces and visual noise for simple expressions; convert to arrow syntax (=>) to signal a pure, single-expression return. {v3}',
+    '[prefer_arrow_functions] Function body contains only a single return statement. Block syntax adds unnecessary braces and visual noise for simple expressions; convert to arrow syntax (=>) to signal a pure, single-expression return. {v4}',
     correctionMessage:
         'Convert to arrow syntax (=> expression) to signal a pure, single-expression return and reduce visual noise.',
     severity: DiagnosticSeverity.INFO,
@@ -358,6 +368,16 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
 
     return false;
   }
+
+  // The fix walks up from the reported name token to the enclosing
+  // BlockFunctionBody, so it only resolves for function/method declarations
+  // (reported via atToken on the name); lambdas are reported on the whole
+  // FunctionExpression and the fix returns early there without offering.
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ConvertToExpressionBodyFix(context: context),
+  ];
 }
 
 /// Prefer arrow (=>) for simple getters.
@@ -4498,42 +4518,115 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addCompilationUnit((CompilationUnit unit) {
-      Token? token = unit.beginToken;
-
-      while (token != null && !token.isEof) {
-        Token? commentToken = token.precedingComments;
-
-        while (commentToken != null) {
-          final String lexeme = commentToken.lexeme;
-
-          // Only check single-line comments (not doc comments)
-          if (lexeme.startsWith('//') && !lexeme.startsWith('///')) {
-            final String content = lexeme.substring(2).trim();
-
-            // Skip empty comments
-            if (content.isEmpty) {
-              commentToken = commentToken.next;
-              continue;
-            }
-
-            // Skip special markers (TODO, FIXME, ignore, etc)
-            if (CommentPatterns.isSpecialMarker(content)) {
-              commentToken = commentToken.next;
-              continue;
-            }
-
-            // Flag if this looks like commented-out code
-            if (CommentPatterns.isLikelyCode(content)) {
-              reporter.atToken(commentToken);
-            }
-          }
-
-          commentToken = commentToken.next;
-        }
-
-        token = token.next;
-      }
+      _scanUnit(reporter, unit);
     });
+  }
+
+  /// Walks every token's leading comment chain. Comments attach to the token
+  /// they precede, so each contiguous `//` run is visited exactly once.
+  void _scanUnit(SaropaDiagnosticReporter reporter, CompilationUnit unit) {
+    // lineInfo is guarded nullable to match the rest of this file; adjacency
+    // detection is impossible without it, so bail rather than misgroup lines.
+    final LineInfo? lineInfo = unit.lineInfo;
+    if (lineInfo == null) return;
+
+    Token? token = unit.beginToken;
+    while (token != null && !token.isEof) {
+      final Token? comments = token.precedingComments;
+      if (comments != null) {
+        _scanCommentChain(reporter, lineInfo, comments);
+      }
+      token = token.next;
+    }
+  }
+
+  /// Splits one leading comment chain into contiguous single-line `//` blocks
+  /// and reports each block. A block ends at a doc comment, a block comment, or
+  /// a line-number gap (blank line / code between comments).
+  void _scanCommentChain(
+    SaropaDiagnosticReporter reporter,
+    LineInfo lineInfo,
+    Token first,
+  ) {
+    Token? commentToken = first;
+    while (commentToken != null) {
+      final List<Token> block = _collectBlock(lineInfo, commentToken);
+      if (block.isEmpty) {
+        // Not a `//` line comment (e.g. a `/* */` block): step over it.
+        commentToken = commentToken.next;
+        continue;
+      }
+      _reportBlock(reporter, block);
+      commentToken = block.last.next;
+    }
+  }
+
+  /// Gathers the maximal run of single-line `//` comments starting at [first]
+  /// that sit on consecutive source lines. Returns an empty list when [first]
+  /// is not a single-line comment.
+  List<Token> _collectBlock(LineInfo lineInfo, Token first) {
+    final List<Token> block = <Token>[];
+    int? prevLine;
+    Token? cursor = first;
+    while (cursor != null) {
+      final String lexeme = cursor.lexeme;
+      if (!lexeme.startsWith('//') || lexeme.startsWith('///')) break;
+      final int line = lineInfo.getLocation(cursor.offset).lineNumber;
+      // A gap means a blank line or code interrupted the run: stop the block.
+      if (prevLine != null && line != prevLine + 1) break;
+      block.add(cursor);
+      prevLine = line;
+      cursor = cursor.next;
+    }
+    return block;
+  }
+
+  /// Reports commented-out code lines within one contiguous block.
+  ///
+  /// The block is judged as a whole: a line that names an API method in prose
+  /// (`base64Url.decode reject the token.`) is indistinguishable from member
+  /// access on its own, but the joined block reveals it is prose. When the
+  /// block is prose, only lines that are unambiguously code on their own (the
+  /// strong-code carve-out) stay flagged, so genuine dead code sitting under a
+  /// prose comment is still caught.
+  void _reportBlock(SaropaDiagnosticReporter reporter, List<Token> block) {
+    final bool blockIsProse = CommentPatterns.isLikelyProse(
+      _joinBlockContent(block),
+    );
+
+    for (final Token commentToken in block) {
+      final String content = commentToken.lexeme.substring(2).trim();
+      if (content.isEmpty) continue;
+      if (CommentPatterns.isSpecialMarker(content)) continue;
+      if (!CommentPatterns.isLikelyCode(content)) continue;
+      if (blockIsProse &&
+          !CommentPatterns.hasStrongCodeIndicators(content)) {
+        continue;
+      }
+      reporter.atToken(commentToken);
+    }
+  }
+
+  /// Joins the prose-bearing content of a block for prose evaluation.
+  ///
+  /// Excluded from the join: empty lines, special markers (`TODO`,
+  /// `expect_lint`, …), AND lines that are unambiguously code on their own
+  /// (the strong-code carve-out). Strong-code lines must be excluded so a
+  /// single dead-code statement embedded in a prose block does not drag the
+  /// whole block's prose signal down to "code" — that would un-skip every
+  /// genuinely-prose sibling line. Those strong lines are still flagged
+  /// individually in [_reportBlock]; here they simply do not vote on prose.
+  String _joinBlockContent(List<Token> block) {
+    final StringBuffer buffer = StringBuffer();
+    for (final Token commentToken in block) {
+      final String content = commentToken.lexeme.substring(2).trim();
+      if (content.isEmpty) continue;
+      if (CommentPatterns.isSpecialMarker(content)) continue;
+      if (CommentPatterns.hasStrongCodeIndicators(content)) continue;
+      if (buffer.isNotEmpty) buffer.write(' ');
+      buffer.write(content);
+    }
+    return buffer.toString();
   }
 }
 

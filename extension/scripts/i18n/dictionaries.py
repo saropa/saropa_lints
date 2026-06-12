@@ -154,6 +154,24 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "CC {cc}": "CC {cc}",
         "Distribution": "Distribution",
+        # Manual audit 2026-06-12: most of these are French cognates spelled identically to English
+        # (Archive, Dimensions, Documentation, Excellent, Suggestion(s), Version(s), versions) plus the WASM
+        # acronym — pinned as curated passthroughs so the gate stops flagging them. "Links" genuinely
+        # translates to "Liens" (hyperlinks), and "+docs" to "+documentation" to match the already-localized
+        # sibling badges (+essais, +exemple, +outils).
+        "Archive": "Archive",
+        "Dimensions": "Dimensions",
+        "Documentation": "Documentation",
+        "Excellent": "Excellent",
+        "Links": "Liens",
+        "SUGGESTION": "SUGGESTION",
+        "SUGGESTIONS": "SUGGESTIONS",
+        "Suggestions": "Suggestions",
+        "VERSION": "VERSION",
+        "Versions": "Versions",
+        "WASM": "WASM",
+        "versions": "versions",
+        "+docs": "+documentation",
         "impact ≠ {v}": "impact ≠ {v}",
         "Search": "Rechercher",
         "Search Packages": "Rechercher",
@@ -436,6 +454,18 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Info": "Info",
         "OWASP": "OWASP",
         "Open Code Health": "Code Health öffnen",
+        # Curated passthroughs (manual audit 2026-06-12): German renders each identical to English.
+        # "Version"/"Repository"/"Upgrade" are the standard German/loanword forms, "Links" is the German
+        # word for hyperlinks, and "PR"/"PRs"/"WASM"/"Deps" are acronyms left untranslated. Pinning English
+        # here stops the coverage gate from re-flagging strings already triaged as correct-as-English.
+        "Links": "Links",
+        "PR": "PR",
+        "Repository": "Repository",
+        "Transitive Deps": "Transitive Deps",
+        "Upgrade": "Upgrade",
+        "VERSION": "VERSION",
+        "WASM": "WASM",
+        "{count} PRs": "{count} PRs",
         "PRs": "PRs",
         "Pause": "Pause",
         "Saropa": "Saropa",
@@ -509,6 +539,12 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "#": "#",
         "OWASP": "OWASP",
         "Vulnerable": "Vulnerable",
+        # Manual audit 2026-06-12: "No" and "WASM" are identical in Spanish (cognate / acronym) — pinned as
+        # curated passthroughs so the gate stops flagging them. "+docs" is translated to "+documentos" to
+        # match the sibling quality badges that are already localized (+pruebas, +ejemplo, +herramientas).
+        "No": "No",
+        "WASM": "WASM",
+        "+docs": "+documentos",
         "Vulns": "Vuln.",
         "pubspec.yaml": "pubspec.yaml",
         "total": "total",
@@ -1051,6 +1087,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "TODOs & HACKS": "করণীয় ও হ্যাকস",
         "TODOs & Hacks": "করণীয় ও হ্যাকস",
         "Vulns": "দুর্বলতা",
+        # Manual audit 2026-06-12: "N/A" was left English next to the localized sibling reviewApplicable
+        # ("প্রযোজ্য"); translated to its negation "প্রযোজ্য নয়" so the Applicable / Not-applicable pair matches.
+        "N/A": "প্রযোজ্য নয়",
         "pubspec.yaml": "pubspec.yaml",
         "{count} categories": "{count} ক্যাটাগরি",
         "{count} commands": "{count} কমান্ড",
@@ -1106,6 +1145,13 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Curated passthrough: bullet glyph + bare {dep} placeholder has no translatable content; the sibling tooltipDepShared carries the only translatable word "(shared)".
         "• {dep}": "• {dep}",
         "Deps": "وابستگی‌ها",
+        # Manual audit 2026-06-12: "WASM" is an acronym left in Latin script (curated passthrough). "VERSION"
+        # is a section header that was still English among otherwise-Persian headers — translated to "نسخه"
+        # (the word already used in links.versions / versionTitle). "N/A" is translated to the negation of the
+        # localized sibling reviewApplicable ("قابل اجرا") so the Applicable / Not-applicable pair matches.
+        "VERSION": "نسخه",
+        "WASM": "WASM",
+        "N/A": "قابل اجرا نیست",
         "Drift Advisor: Refresh": "مشاور انحراف: بروزرسانی",
         "OWASP": "OWASP",
         "Open Code Health": "باز کردن سلامت کد",
@@ -1193,6 +1239,31 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Code Health": "Code Health",
         "Dependency Network": "Dependency Network",
         "Deps": "Mga Dep",
+        # Manual audit 2026-06-12: "N/A" and "+docs" genuinely translate — "N/A" to the negation of the
+        # localized sibling reviewApplicable ("Naaangkop"), and "+docs" to "+mga dokumento" to match the
+        # already-localized sibling badges (+mga pagsubok, +halimbawa, +mga kasangkapan). The rest are
+        # acronyms, code-format badges, and technical terms the Filipino UI already keeps in English (matching
+        # their existing values in fil.json); pinned as curated passthroughs so the gate stops re-flagging them.
+        "N/A": "Hindi naaangkop",
+        "+docs": "+mga dokumento",
+        "({rating}/10 bloat)": "({rating}/10 bloat)",
+        "ALERTS": "ALERTS",
+        "Archive": "Archive",
+        "Bloat Rating": "Bloat Rating",
+        "Changelog": "Changelog",
+        "DIRECT DEPS": "DIRECT DEPS",
+        "PR": "PR",
+        "Prerelease": "Prerelease",
+        "Pub Points": "Pub Points",
+        "Publisher": "Publisher",
+        "README IMAGES": "README IMAGES",
+        "Transitive Deps": "Transitive Deps",
+        "VERSION": "VERSION",
+        "Version Gap": "Version Gap",
+        "WASM": "WASM",
+        "changelog": "changelog",
+        "dev": "dev",
+        "reverse dependency count": "reverse dependency count",
         "Drift Advisor": "Drift Advisor",
         "Drift offline": "Drift offline",
         "Function": "Function",

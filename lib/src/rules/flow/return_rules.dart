@@ -1,12 +1,10 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
-import '../../fixes/return/convert_to_expression_body_fix.dart';
 import '../../fixes/return/inline_immediate_return_fix.dart';
 import '../../fixes/return/remove_return_void_fix.dart';
 import '../../fixes/return/remove_unnecessary_return_fix.dart';
@@ -424,100 +422,6 @@ class PreferImmediateReturnRule extends SaropaLintRule {
       }
     });
   }
-}
-
-/// Warns when arrow function could be used instead of block.
-///
-/// Since: v1.5.1 | Updated: v4.13.0 | Rule version: v5
-///
-/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
-///
-/// Simple return statements should use arrow syntax.
-///
-/// ### Example
-///
-/// #### BAD:
-/// ```dart
-/// int getValue() {
-///   return 42;
-/// }
-/// ```
-///
-/// #### GOOD:
-/// ```dart
-/// int getValue() => 42;
-/// ```
-///
-/// **Quick fix available:** Converts to expression body with =>.
-class PreferReturningShorthandsRule extends SaropaLintRule {
-  PreferReturningShorthandsRule() : super(code: _code);
-
-  /// Stylistic preference only. No performance or correctness benefit.
-  @override
-  LintImpact get impact => LintImpact.info;
-
-  @override
-  RuleType? get ruleType => RuleType.codeSmell;
-
-  @override
-  Set<String> get tags => const {'reliability'};
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  @override
-  String get exampleBad =>
-      'int getValue() {\n'
-      '  return 42;\n'
-      '}';
-
-  @override
-  String get exampleGood => 'int getValue() => 42;';
-
-  static const LintCode _code = LintCode(
-    'prefer_returning_shorthands',
-    '[prefer_returning_shorthands] Simplifying return expressions to shorter forms is a code style preference. Both produce equivalent compiled output with no performance impact. Enable via the stylistic tier. {v5}',
-    correctionMessage:
-        'Convert to expression body with =>. Verify the change works correctly with existing tests and add coverage for the new behavior.',
-    severity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    SaropaDiagnosticReporter reporter,
-    SaropaContext context,
-  ) {
-    context.addMethodDeclaration((MethodDeclaration node) {
-      _checkBody(node.body, node.name, reporter);
-    });
-
-    context.addFunctionDeclaration((FunctionDeclaration node) {
-      _checkBody(node.functionExpression.body, node.name, reporter);
-    });
-  }
-
-  void _checkBody(
-    FunctionBody body,
-    Token nameToken,
-    SaropaDiagnosticReporter reporter,
-  ) {
-    if (body is! BlockFunctionBody) return;
-
-    final Block block = body.block;
-    if (block.statements.length != 1) return;
-
-    final Statement stmt = block.statements.first;
-    if (stmt is ReturnStatement && stmt.expression != null) {
-      // Single return statement - could use arrow
-      reporter.atToken(nameToken);
-    }
-  }
-
-  @override
-  List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        ConvertToExpressionBodyFix(context: context),
-  ];
 }
 
 /// Warns when returning `null` from a function with `void` return type.

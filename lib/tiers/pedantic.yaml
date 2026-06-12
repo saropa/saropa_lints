@@ -49,7 +49,6 @@ plugins:
       prefer_extracting_function_callbacks: true
       avoid_returning_cascades: true
       avoid_returning_void: true
-      prefer_returning_shorthands: true
       avoid_unnecessary_return: true
       prefer_immediate_return: true
       prefer_declaring_const_constructor: true
