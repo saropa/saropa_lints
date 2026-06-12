@@ -131,3 +131,24 @@ void _good459b() {
 void _good459c() {
   final fmt = DateFormat.jmz();
 }
+
+// GOOD: .pattern introspection only — never formatted/displayed (case 1)
+bool _good459d(String? locale) =>
+    DateFormat.jm(locale).pattern?.contains('H') ?? false;
+
+// GOOD: seconds-only format — seconds are timezone-invariant (case 2)
+void _good459e(String? locale) {
+  final fmt = DateFormat('ss', locale).format(DateTime.now());
+}
+
+// GOOD: single seconds char — case 2 boundary
+void _good459f() {
+  final fmt = DateFormat('s').format(DateTime.now());
+}
+
+// BAD: minute+second — minutes ARE timezone-variant (guards against
+// over-correcting the seconds-only carve-out)
+// expect_lint: require_timezone_display
+void _bad459c() {
+  final fmt = DateFormat('mm:ss');
+}

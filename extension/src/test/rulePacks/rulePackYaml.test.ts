@@ -116,4 +116,35 @@ plugins:
       fs.rmSync(root, { recursive: true, force: true });
     }
   });
+
+  // Regression: the saropa_lints package's own dev config omits the version
+  // pin (plugin loads from workspace source). The writer must still find an
+  // anchor; previously it returned false and surfaced "could not write
+  // analysis_options.yaml (rule_packs)" on the upgrade nudge.
+  it('writeRulePacksEnabled inserts block when version pin is absent', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-rule-packs-'));
+    try {
+      const analysisPath = path.join(root, 'analysis_options.yaml');
+      fs.writeFileSync(
+        analysisPath,
+        `
+plugins:
+  saropa_lints:
+    # No version: pin — plugin loads from workspace source.
+    # Regenerate with: dart run saropa_lints:init --tier recommended
+    diagnostics:
+      foo: true
+`,
+        'utf-8',
+      );
+
+      assert.strictEqual(writeRulePacksEnabled(root, ['riverpod', 'drift']), true);
+      const content = fs.readFileSync(analysisPath, 'utf-8');
+      assert.strictEqual(content.includes('rule_packs:'), true);
+      assert.strictEqual(content.includes('diagnostics:'), true);
+      assert.deepStrictEqual(parseRulePacksEnabled(content), ['riverpod', 'drift']);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
 });

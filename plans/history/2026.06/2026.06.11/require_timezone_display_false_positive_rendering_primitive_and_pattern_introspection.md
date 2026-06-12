@@ -1,6 +1,6 @@
 # BUG: `require_timezone_display` — fires on `.pattern`-only introspection and on seconds-only formats
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -157,13 +157,50 @@ It should add:
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+Cases 1 and 2 (the two definitive defects) are fixed in
+`lib/src/rules/data/json_datetime_rules.dart`. Case 3 (rendering-primitive
+library boundary) is intentionally **not** addressed — it is the weak class the
+report itself flags as "reasonable people can want the rule here," and the
+sanctioned escape is `// ignore_for_file: require_timezone_display` in a
+formatter library. No rule option was added to avoid scope creep.
+
+**Case 2 — seconds-only formats.** Narrowed the time-component gate from
+`RegExp(r'[Hhms]')` to `RegExp(r'[Hhm]')`. Seconds are timezone-invariant
+(offsets are always whole-minute or coarser), so a format whose only time char
+is `s` no longer matches. Formats containing hours or minutes — including
+`mm:ss` — still match, because minutes ARE timezone-variant.
+
+**Case 1 — `.pattern`-only introspection.** Added `_isPatternIntrospection`,
+which returns `true` when the `DateFormat` instance's immediate parent is a
+`PropertyAccess` selecting `pattern` (e.g. `DateFormat.jm(locale).pattern`).
+`runWithReporter` early-returns before any report when this holds. A
+conservative immediate-parent check covers the locale-hour-detection idiom
+without full data-flow analysis.
+
+### Verification note
+
+This rule registers only `addInstanceCreationExpression`. The `scan` CLI parses
+with unresolved `parseString`, under which `DateFormat(...)` parses as a
+`MethodInvocation`, not an `InstanceCreationExpression` — so the rule emits
+nothing under `scan` (confirmed: the sibling `require_intl_date_format_locale`,
+which has a `MethodInvocation` fallback, fired on the same fixture while this
+rule did not; see its comment at `internationalization_rules.dart:1370-1384`).
+The rule fires normally in the resolved custom_lint/IDE environment, which is
+where the bug was observed. The fix is therefore validated by construction plus
+`dart analyze` (clean), and by the `expect_lint` fixture for the resolved path.
 
 ---
 
 ## Tests Added
 
-<!-- Fill in when a fix is written. -->
+`example/lib/json_datetime/require_timezone_display_fixture.dart` extended with:
+
+1. `DateFormat.jm(locale).pattern?.contains('H')` — `.pattern` introspection,
+   expect NO lint (case 1).
+2. `DateFormat('ss', locale)` — seconds-only, expect NO lint (case 2).
+3. `DateFormat('s')` — single seconds char, expect NO lint (case 2 boundary).
+4. `DateFormat('mm:ss')` — minute+second, expect LINT (guards against
+   over-correcting the seconds carve-out, since minutes are timezone-variant).
 
 ---
 
@@ -179,3 +216,52 @@ It should add:
 - Dart SDK version: as configured in saropa_dart_utils
 - custom_lint version: as configured in saropa_dart_utils
 - Triggering project/file: `saropa_dart_utils` — `lib/datetime/date_time_intl_time_display_extensions.dart`, `lib/datetime/date_time_intl_display_render.dart`
+
+---
+
+## Finish Report (2026-06-11)
+
+**Scope:** (A) Dart lint rule — `RequireTimezoneDisplayRule` in
+`lib/src/rules/data/json_datetime_rules.dart`. No extension/TypeScript touched.
+
+**Resolution.** Fixed the two definitive false-positive classes; case 3
+(formatter-library boundary) intentionally left to `// ignore_for_file` as the
+report recommends — no rule option added (scope creep on shared config).
+
+- **Case 2 (seconds-only):** time-component gate narrowed `RegExp(r'[Hhms]')` →
+  `RegExp(r'[Hhm]')`. Seconds are timezone-invariant (offsets are whole-minute
+  or coarser), so `DateFormat('ss')` / `DateFormat('s')` no longer match;
+  `mm:ss` and `HH:mm` still match. Fractional-second `S` was never in the set,
+  so `DateFormat('ss.SSS')` is also correctly silent.
+- **Case 1 (`.pattern` introspection):** added static `_isPatternIntrospection`
+  — true when the instance's immediate parent is a `PropertyAccess` selecting
+  `pattern`. `runWithReporter` early-returns before any report. Covers the
+  `DateFormat.jm(locale).pattern` locale-hour-detection idiom without data-flow
+  analysis.
+
+**Deep review.** Nullable parent check (no deref/recursion/race); O(1) cost;
+rule in correct file; `tiers.dart` unchanged (behavior fix, not a new rule);
+`LintImpact` unchanged; quick fix omitted (the timezone token and insertion
+point are not mechanically determinable). WHY-comments added at both sites.
+
+**Tests.** `dart test test/rules/data/json_datetime_rules_test.dart` → 27/27
+pass (instantiation + fixture-exists pins; none asserted the message/regex I
+changed, so none broke). Behavior is pinned by the extended `expect_lint`
+fixture (4 cases). `dart analyze` on the rule file → clean.
+
+**Verification limitation.** The rule registers only
+`addInstanceCreationExpression`. The `scan` CLI parses unresolved
+(`parseString`), under which `DateFormat(...)` is a `MethodInvocation`, not an
+`InstanceCreationExpression` — so the rule emits nothing under `scan`
+(confirmed: sibling `require_intl_date_format_locale`, which has a
+`MethodInvocation` fallback, fired on the same fixture while this rule did not).
+The rule fires in the resolved custom_lint/IDE path, where the bug was observed.
+Adding a `MethodInvocation` fallback would make it scan-verifiable but expands
+coverage beyond the reported symptom — not done without sign-off.
+
+**Files:** `lib/src/rules/data/json_datetime_rules.dart`,
+`example/lib/json_datetime/require_timezone_display_fixture.dart`,
+`CHANGELOG.md`, this bug report (archived).
+
+Finish report appended: this file.
+Bug archived: `bugs/require_timezone_display_false_positive_rendering_primitive_and_pattern_introspection.md` → `plans/history/2026.06/2026.06.11/require_timezone_display_false_positive_rendering_primitive_and_pattern_introspection.md`

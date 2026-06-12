@@ -126,7 +126,23 @@ export function writeRulePacksEnabled(workspaceRoot: string, packIds: readonly s
 }
 
 function insertRulePacksAfterVersion(content: string, blockBody: string): string | null {
-  const m = /(saropa_lints:\s*\n\s*version:\s*[^\n]+\n)/.exec(content);
-  if (!m) return null;
-  return content.replace(m[0], `${m[1]}${blockBody}`);
+  // Preferred anchor: insert immediately after the `version:` pin, which is
+  // where `dart run saropa_lints:init` places the plugin config for consumer
+  // projects, so the rule_packs block lands at the top of that mapping.
+  const versioned = /(saropa_lints:\s*\n\s*version:\s*[^\n]+\n)/.exec(content);
+  if (versioned) {
+    return content.replace(versioned[0], `${versioned[0]}${blockBody}`);
+  }
+  // Fallback: some configs intentionally omit the version pin — notably the
+  // saropa_lints package's own dev analysis_options.yaml, which loads the
+  // plugin from workspace source rather than a pub.dev version. Without this
+  // branch the write returns null and the user sees "could not write
+  // analysis_options.yaml (rule_packs)." Anchor on the `saropa_lints:` mapping
+  // key and insert the block as its first child (4-space body under the
+  // 2-space key). The `#`-prefixed `saropa_lints:init` comment lines cannot
+  // match: they require `saropa_lints:` at the line's leading indent followed
+  // by end-of-line, not `:init`.
+  const pluginKey = /^[ \t]*saropa_lints:[ \t]*\n/m.exec(content);
+  if (!pluginKey) return null;
+  return content.replace(pluginKey[0], `${pluginKey[0]}${blockBody}`);
 }

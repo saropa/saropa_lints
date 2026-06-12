@@ -1618,8 +1618,14 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  /// Time patterns that indicate time is being formatted.
-  static final RegExp _timePattern = RegExp(r'[Hhms]');
+  /// Time patterns that indicate a timezone-variant time is being formatted.
+  ///
+  /// Deliberately excludes a lone `s` (seconds): timezone offsets are always
+  /// whole-minute or coarser (e.g. +05:30, +05:45, +12:45), so the seconds
+  /// field is identical in every zone. A seconds-only format cannot be misread
+  /// across zones, so requiring a timezone indicator on it is a false positive.
+  /// Hours (`H`/`h`) and minutes (`m`) ARE timezone-variant, so they still gate.
+  static final RegExp _timePattern = RegExp(r'[Hhm]');
 
   /// Timezone patterns that indicate timezone is included.
   static final RegExp _timezonePattern = RegExp(r'[zZvOxX]');
@@ -1655,6 +1661,12 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'DateFormat') return;
 
+      // Skip when the DateFormat is built only to read its `.pattern` string
+      // (the locale-hour-detection idiom: `DateFormat.jm(l).pattern`). Nothing
+      // is rendered, so the rule's premise ("a displayed time misleads users")
+      // is structurally impossible and reporting here is a false positive.
+      if (_isPatternIntrospection(node)) return;
+
       final String? namedCtor = node.constructorName.name?.name;
 
       // Check named constructors (e.g., DateFormat.Hm())
@@ -1687,6 +1699,18 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+
+  /// True when the constructed `DateFormat`'s immediate consumer is its
+  /// `.pattern` getter, e.g. `DateFormat.jm(locale).pattern`. The result is a
+  /// `String?` read for introspection (locale-hour detection), never rendered,
+  /// so no displayed time can mislead a user. A conservative immediate-parent
+  /// check covers the common idiom without full data-flow analysis.
+  static bool _isPatternIntrospection(InstanceCreationExpression node) {
+    final AstNode? parent = node.parent;
+    return parent is PropertyAccess &&
+        parent.target == node &&
+        parent.propertyName.name == 'pattern';
   }
 }
 
