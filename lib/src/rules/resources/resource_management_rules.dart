@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../../interprocedural_cleanup_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../target_matcher_utils.dart';
 
@@ -616,17 +617,26 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
     '[require_websocket_close] Unclosed WebSocket leaks connections and '
         'continues receiving data after widget disposal, causing errors. {v5}',
     correctionMessage: 'Add _socket.close() in dispose method.',
-    // SEV-01 (kept WARNING): helper-delegated teardown is matched only by a
-    // heuristic (any _x() in dispose) and untyped `late final` sockets are
-    // under-detected — too imprecise for a build-breaking ERROR.
+    // SEV-01: the helper-delegation false positive is now resolved by
+    // interprocedural cleanup tracking — dispose() is followed into same-class
+    // helpers (see interprocedural_cleanup_utils.dart). Kept WARNING pending the
+    // ERROR re-evaluation; the only residual is under-detection of an untyped
+    // `late final _s = WebSocket.connect()` (a false negative, not a build risk).
     severity: DiagnosticSeverity.WARNING,
   );
 
   // `WebSocket` / `WebSocketChannel` (with optional `?` nullability, generics,
   // or `late` already stripped by reading `.type`) as the field type.
   static final RegExp _webSocketTypePattern = RegExp(r'\bWebSocket\w*');
-  // A receiver-less private call statement inside dispose, e.g. `_cleanup();`.
-  static final RegExp _bareHelperCallPattern = RegExp(r'(?:^|\{|;)\s*_\w+\s*\(');
+  // A socket close: `.close(`, `.closeSafe(`, or `.sink.close`.
+  static final RegExp _socketClosePattern = RegExp(
+    r'\.(?:close|closeSafe)\s*\(|\.sink\.close',
+  );
+
+  /// Whether [body] closes a socket. Used with [anyReachableBody] so a close
+  /// extracted into a same-class helper called from dispose() is recognized.
+  static bool _closesSocket(FunctionBody body) =>
+      _socketClosePattern.hasMatch(body.toSource());
 
   @override
   void runWithReporter(
@@ -641,40 +651,36 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
       final String superName = extendsClause.superclass.toSource();
       if (!superName.startsWith('State<')) return;
 
-      // Check for WebSocket fields
+      // Match WebSocket as the field's declared TYPE, not anywhere in the field
+      // source. Substring matching previously fired on unrelated fields like
+      // `final String webSocketUrl = '...'` or `final int webSocketRetryCount`,
+      // which hold no socket to close.
       bool hasWebSocket = false;
-      bool hasDisposeClose = false;
+      MethodDeclaration? disposeMethod;
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
-          // Match WebSocket as the field's declared TYPE, not anywhere in the
-          // field source. Substring matching previously fired on unrelated
-          // fields like `final String webSocketUrl = '...'` or
-          // `final int webSocketRetryCount = 3`, which hold no socket to close.
           final String? typeName = member.fields.type?.toSource();
           if (typeName != null && _webSocketTypePattern.hasMatch(typeName)) {
             hasWebSocket = true;
           }
         }
-
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          final String disposeSource = member.body.toSource();
-          // Check for close (including *Safe extension variants). Also treat a
-          // bare helper delegation (`_disposeSocket();` / `_cleanup();`) as
-          // cleanup: a private method invocation with no receiver inside
-          // dispose almost always forwards teardown, and a body-scoped scan
-          // cannot follow into it — so assuming it closes avoids a
-          // build-breaking FP on the common extract-method pattern.
-          if (disposeSource.contains('.close(') ||
-              disposeSource.contains('.closeSafe(') ||
-              disposeSource.contains('.sink.close') ||
-              _bareHelperCallPattern.hasMatch(disposeSource)) {
-            hasDisposeClose = true;
-          }
+          disposeMethod = member;
         }
       }
 
-      if (hasWebSocket && !hasDisposeClose) {
+      if (!hasWebSocket) return;
+
+      // Interprocedural cleanup tracking: follow dispose() into same-class
+      // helpers so a close extracted into `_closeSocket()` counts, instead of
+      // assuming any private call forwards teardown (which mis-suppressed real
+      // leaks). No dispose() at all means the socket is definitely not closed.
+      final bool closed =
+          disposeMethod != null &&
+          anyReachableBody(disposeMethod, node, _closesSocket);
+
+      if (!closed) {
         reporter.atNode(node);
       }
     });
