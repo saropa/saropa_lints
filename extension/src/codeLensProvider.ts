@@ -6,12 +6,12 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { normalizePath } from './pathUtils';
-import { readViolations } from './violationsReader';
+import { readLiveViolations } from './liveViolationsData';
 import { getProjectRoot } from './projectRoot';
 
 let codeLensChangeEmitter: vscode.EventEmitter<void> | undefined;
 
-/** Call when violations.json changes so Code Lenses refresh. */
+/** Call when live diagnostics change so Code Lenses refresh. */
 export function invalidateCodeLenses(): void {
   codeLensChangeEmitter?.fire();
 }
@@ -29,7 +29,10 @@ export function registerCodeLensProvider(context: vscode.ExtensionContext): void
       const root = getProjectRoot();
       if (!root || document.languageId !== 'dart') return [];
 
-      const data = readViolations(root);
+      // Live diagnostics (same source as the status bar, Issues tree, and wide
+      // report) so the per-file count tracks the Problems panel instead of the
+      // batch violations.json export, which goes stale between analysis runs.
+      const data = readLiveViolations(root);
       if (!data?.violations?.length) return [];
 
       const docPath = document.uri.fsPath;

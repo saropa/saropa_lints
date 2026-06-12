@@ -111,6 +111,7 @@ Adds crash, performance, and contract rules for seventeen more packages, each ac
 - **The Findings Dashboard now reads live analyzer findings instead of a saved report**, so it stays in sync with the Problems panel — no more stale "0 findings, grade A" while warnings sit there — and refreshes as you edit with no manual "Run analysis" step. No action required.
 - **The dashboard is now holistic**, listing findings from built-in Dart lints and other `custom_lint` plugins alongside Saropa rules in one combined view instead of Saropa rules alone. No action required.
 - **The status-bar score and the Issues list now read live analyzer findings like the dashboard**, so they stay in sync with the Problems panel (no stale grade or finding count between runs), refresh automatically as you edit, and now include findings from built-in Dart lints and other `custom_lint` plugins. No action required.
+- **The editor code-lens count and inline end-of-line annotations now read live analyzer findings too**, so the "N violations" lens above a file and the annotation text alongside each line match the squiggles exactly and update as you edit, instead of reflecting the last saved report. No action required.
 
 ### Fixed (Extension)
 
