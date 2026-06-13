@@ -1122,3 +1122,119 @@ def print_contains_audit_status(
             Color.YELLOW,
         )
         print_stat("Rule files scanned", n_rule_files, Color.CYAN)
+
+
+# =============================================================================
+# DEPENDENCY-IMPORT CONSISTENCY (publish blocker)
+# =============================================================================
+
+# Matches a real Dart import/export directive of a `package:` URI. Anchored at
+# the start of the line so a `package:` substring buried in a string literal or
+# trailing comment is not mistaken for a directive.
+_IMPORT_DIRECTIVE_RE = re.compile(
+    r"""^\s*(?:import|export)\s+['"]package:([a-z0-9_]+)/"""
+)
+
+# Lines that may legitimately appear within the directive header without ending
+# it: other directives, a library/part clause, annotations, and comments.
+_HEADER_CONTINUE_RE = re.compile(r"""^\s*(?:import|export|library|part|@|//|/\*|\*)""")
+
+
+def _imported_packages_in_header(path: Path) -> set[str]:
+    """Return packages imported/exported as real directives in a file header.
+
+    Only the directive section at the top of the file is scanned. Dart grammar
+    requires every import/export/part directive to precede the first
+    declaration, so stopping at the first declaration line excludes the
+    ``package:`` strings that appear *inside* rule bodies — detection patterns
+    and Bad/Good DartDoc examples. Without that bound, every rule that
+    documents ``import 'package:firebase_auth/...'`` as an example would be a
+    false positive. Matched against real directives, never substrings.
+    """
+    packages: set[str] = set()
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return packages
+    for raw in text.splitlines():
+        match = _IMPORT_DIRECTIVE_RE.match(raw)
+        if match:
+            packages.add(match.group(1))
+            continue
+        # Blank lines and header constructs keep us in the directive region;
+        # the first real declaration (class/const/void/...) ends it.
+        if raw.strip() == "" or _HEADER_CONTINUE_RE.match(raw):
+            continue
+        break
+    return packages
+
+
+def _declared_dependencies(pubspec_path: Path) -> set[str]:
+    """Return the package names under ``dependencies:`` in pubspec.yaml.
+
+    dev_dependencies are deliberately excluded: shipped code (lib/ and the
+    bin/ executables) may only import runtime dependencies, so a lib/ import of
+    a dev-only package is exactly the defect this check exists to catch.
+    Indentation-parsed rather than via a YAML library so the audit hot path
+    carries no external import that could fail to load.
+    """
+    deps: set[str] = set()
+    if not pubspec_path.exists():
+        return deps
+    in_deps = False
+    for raw in pubspec_path.read_text(encoding="utf-8").splitlines():
+        if re.match(r"^dependencies:\s*$", raw):
+            in_deps = True
+            continue
+        if in_deps:
+            # A new unindented key (e.g. dev_dependencies:) ends the block.
+            if re.match(r"^[A-Za-z_]", raw):
+                break
+            key = re.match(r"^  ([A-Za-z0-9_]+):", raw)
+            if key:
+                deps.add(key.group(1))
+    return deps
+
+
+def get_dependency_import_status(project_dir: Path) -> dict:
+    """Verify every package imported by shipped code is a direct dependency.
+
+    Reproduces ``dart pub publish``'s "depend on referenced packages"
+    validation deterministically and BEFORE the release tag is created. This is
+    the only gate that can catch a missing direct dependency in this repo:
+    lib/** sits in ``analyzer.exclude`` (plugin dogfooding), so neither local
+    nor CI ``dart analyze`` ever inspects lib/ imports, and the pub-publish
+    error otherwise surfaces only inside the tag-triggered GitHub Actions
+    publish job — after the tag is already burned. The missing ``meta``
+    dependency sank both v13.12.6 and v13.12.7 this way (2026-06-12).
+
+    Scans lib/ and bin/ (both ship) for real import/export directives and
+    returns the packages that are neither a declared ``dependencies`` entry nor
+    the package's own name. Returns ``{"declared": set, "missing": {pkg:
+    [files]}}``.
+    """
+    pubspec_path = project_dir / "pubspec.yaml"
+    declared = _declared_dependencies(pubspec_path)
+    own_name = ""
+    if pubspec_path.exists():
+        name_match = re.search(
+            r"^name:\s*(.+)$",
+            pubspec_path.read_text(encoding="utf-8"),
+            re.MULTILINE,
+        )
+        if name_match:
+            own_name = name_match.group(1).strip()
+    allowed = declared | ({own_name} if own_name else set())
+
+    missing: dict[str, list[str]] = {}
+    for root in ("lib", "bin"):
+        base = project_dir / root
+        if not base.is_dir():
+            continue
+        for path in sorted(base.rglob("*.dart")):
+            for pkg in _imported_packages_in_header(path):
+                if pkg in allowed:
+                    continue
+                rel = path.relative_to(project_dir).as_posix()
+                missing.setdefault(pkg, []).append(rel)
+    return {"declared": declared, "missing": missing}

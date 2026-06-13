@@ -30,6 +30,7 @@ from scripts.modules._audit_checks import (
     find_duplicate_rules,
     find_orphan_rules,
     get_contains_audit_status,
+    get_dependency_import_status,
     get_file_stats,
     get_implemented_rules,
     get_owasp_coverage,
@@ -106,6 +107,7 @@ class AuditResult:
     contains_audit_over_baseline: bool = False
     analysis_passed: bool = True
     stub_guard_passed: bool = True
+    dependency_imports_ok: bool = True
 
     @property
     def has_blocking_issues(self) -> bool:
@@ -118,6 +120,9 @@ class AuditResult:
         - Any rule file exceeds .contains() baseline (CI would fail)
         - dart analyze --fatal-infos failed (run during audit)
         - Stub-test guard failed (empty-body / tautology stubs present)
+        - A shipped file imports a package not declared in dependencies
+          (dart pub publish rejects it, but only on the post-tag CI job —
+          this gate moves that failure ahead of the tag; see v13.12.6/.7)
         """
         return bool(
             not self.tier_integrity_passed
@@ -128,6 +133,7 @@ class AuditResult:
             or self.contains_audit_over_baseline
             or not self.analysis_passed
             or not self.stub_guard_passed
+            or not self.dependency_imports_ok
         )
 
 
@@ -777,6 +783,37 @@ def run_full_audit(
     checks.append(stub_guard_check)
     stub_guard_passed = stub_guard_check[0] != _FAIL
 
+    # Dependency-import consistency (BLOCKING): every package imported by
+    # shipped code (lib/ + bin/) must be a declared dependency, or
+    # `dart pub publish` fails on the post-tag CI job and burns the version
+    # tag. Reproduced here pre-tag because lib/** is in analyzer.exclude, so no
+    # `dart analyze` run ever sees these imports.
+    dep_status = get_dependency_import_status(project_dir)
+    dep_missing = dep_status.get("missing", {})
+    if dep_missing:
+        dep_details = []
+        for pkg in sorted(dep_missing):
+            files = dep_missing[pkg]
+            shown = ", ".join(files[:3]) + (
+                f" (+{len(files) - 3} more)" if len(files) > 3 else ""
+            )
+            dep_details.append(
+                f"{pkg}: add to pubspec dependencies (imported by {shown})"
+            )
+        checks.append((
+            _FAIL,
+            "Imported package(s) missing from pubspec dependencies "
+            "(dart pub publish would reject)",
+            dep_details,
+        ))
+    else:
+        checks.append((
+            _PASS,
+            "All shipped imports are declared dependencies",
+            [],
+        ))
+    dependency_imports_ok = not dep_missing
+
     if extra_checks:
         checks.extend(extra_checks)
 
@@ -861,4 +898,5 @@ def run_full_audit(
         tier_integrity_passed=tier_integrity_passed,
         contains_audit_over_baseline=bool(over_baseline),
         stub_guard_passed=stub_guard_passed,
+        dependency_imports_ok=dependency_imports_ok,
     )
