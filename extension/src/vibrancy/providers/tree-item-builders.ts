@@ -7,7 +7,7 @@ import { categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
 import { severityEmoji, severityLabel, worstSeverity } from '../scoring/vuln-classifier';
-import { formatSharedDepDetail } from '../scoring/blocker-analyzer';
+import { formatSharedDepDetail, formatConstrainedReason, formatPinIntent } from '../scoring/blocker-analyzer';
 import { DetailItem, GroupItem, SourceCodeItem } from './tree-item-classes';
 
 /** Tree group/detail builders: version rows, community, licenses, dep graph items. */
@@ -148,6 +148,12 @@ function buildVersionGroup(result: VibrancyResult): GroupItem {
             '🌐 WASM', result.wasmReady ? 'Ready' : 'Not ready',
         ));
     }
+    // Documented do-not-upgrade / do-not-use intent — shown in the always-present
+    // Version group so it appears even when the dep is on its pinned latest.
+    const pin = formatPinIntent(result.pinIntent);
+    if (pin) {
+        items.push(new DetailItem('🔒 Pin', pin));
+    }
     // Collapse when on latest version — the details are less actionable
     const state = isLatest
         ? vscode.TreeItemCollapsibleState.Collapsed
@@ -187,6 +193,10 @@ function buildUpdateGroup(result: VibrancyResult): GroupItem | null {
                 '  vibrancy', scoreToGrade(b.blockerVibrancyScore),
             ));
         }
+    }
+    const constrained = formatConstrainedReason(result.constrainedReason);
+    if (constrained) {
+        items.push(new DetailItem('🔧 Constrained', constrained));
     }
     appendChangelogItems(items, ui, result.package.name);
     return new GroupItem('⬆️ Update', items);

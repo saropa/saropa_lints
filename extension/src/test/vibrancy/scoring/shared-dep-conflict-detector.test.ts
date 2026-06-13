@@ -159,6 +159,55 @@ describe('shared-dep-conflict-detector', () => {
             assert.strictEqual(conflicts[0].constrainerPackage, 'saropa_lints');
         });
 
+        it('attributes an SDK-pinned shared dep to the SDK package', () => {
+            // characters blocked, flutter_test (SDK) is a dependent with no
+            // readable constraint — inferred SDK pin, not read.
+            const outdated = [
+                entry({
+                    package: 'some_pkg', current: '1.0.0',
+                    resolvable: '1.0.0', latest: '2.0.0',
+                }),
+                entry({
+                    package: 'characters', current: '1.4.0',
+                    resolvable: '1.4.0', latest: '1.4.1',
+                }),
+            ];
+            const conflicts = detectSharedDepConflicts(
+                outdated,
+                reverse({ characters: ['some_pkg', 'flutter_test'] }),
+                new Map(), // no readable constraints anywhere
+                new Set(['some_pkg']),
+                new Set(['flutter_test']), // flutter_test is an SDK package
+            );
+            assert.strictEqual(conflicts.length, 1);
+            assert.strictEqual(conflicts[0].constrainerPackage, 'flutter_test');
+            assert.strictEqual(conflicts[0].viaSdk, true);
+            assert.strictEqual(conflicts[0].constrainerConstraint, '');
+        });
+
+        it('prefers a readable hosted ceiling over the SDK inference', () => {
+            const outdated = [
+                entry({
+                    package: 'dart_style', current: '3.1.7',
+                    resolvable: '3.1.7', latest: '3.1.8',
+                }),
+                entry({
+                    package: 'analyzer', current: '12.0.0',
+                    resolvable: '12.0.0', latest: '13.1.0',
+                }),
+            ];
+            const conflicts = detectSharedDepConflicts(
+                outdated,
+                reverse({ analyzer: ['dart_style', 'saropa_lints', 'flutter_test'] }),
+                constraints({ saropa_lints: { analyzer: '>=9.0.0 <13.0.0' } }),
+                new Set(['dart_style', 'saropa_lints']),
+                new Set(['flutter_test']),
+            );
+            assert.strictEqual(conflicts.length, 1);
+            assert.strictEqual(conflicts[0].constrainerPackage, 'saropa_lints');
+            assert.strictEqual(conflicts[0].viaSdk, false);
+        });
+
         it('returns empty with no constraint data', () => {
             const outdated = [
                 entry({

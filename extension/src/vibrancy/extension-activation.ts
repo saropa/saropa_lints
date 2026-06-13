@@ -60,6 +60,7 @@ import { snapshotVersions, notifyLockDiff } from './services/lock-diff-notifier'
 import { detectFamilySplits } from './scoring/family-conflict-detector';
 import { AdoptionGateProvider } from './providers/adoption-gate';
 import { enrichWithBlockers } from './services/blocker-enricher';
+import { attachPinIntents } from './services/pin-intent-parser';
 import { buildUpgradeOrder, setOverrideAnalyses } from './scoring/upgrade-sequencer';
 import { executeUpgradePlan, formatUpgradePlan, formatUpgradeReport } from './services/upgrade-executor';
 import { fetchDepGraph, buildReverseDeps } from './services/dep-graph';
@@ -1098,9 +1099,14 @@ async function runScanInner(
             if (signal.aborted) { return; }
             progress.report({ message: 'Analyzing upgrade blockers...' });
             const enrichResult = await enrichWithBlockers(
-                withComplexity, workspaceRoot, logger,
+                withComplexity, workspaceRoot, logger, deps,
             );
-            let results = enrichResult.results;
+            // Attach documented do-not-upgrade / do-not-use intent from pubspec
+            // comments so a deliberately-frozen dep is marked as an intentional
+            // hold rather than nagged as a missed upgrade.
+            let results: VibrancyResult[] = attachPinIntents(
+                enrichResult.results, parsed.yamlContent,
+            );
             lastReverseDeps = enrichResult.reverseDeps;
 
             if (signal.aborted) { return; }

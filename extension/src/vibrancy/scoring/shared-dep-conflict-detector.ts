@@ -30,8 +30,24 @@ export interface SharedDepConflict {
     readonly sharedLatest: string;
     /** The sibling whose constraint is the binding ceiling (e.g. "saropa_lints"). */
     readonly constrainerPackage: string;
-    /** The constraint that sibling places on the shared dep (e.g. ">=9.0.0 <13.0.0"). */
+    /** The constraint that sibling places on the shared dep (e.g. ">=9.0.0 <13.0.0"); empty when SDK-inferred. */
     readonly constrainerConstraint: string;
+    /**
+     * True when the constrainer is a Flutter/Dart SDK package (flutter_test, …)
+     * whose pin is opaque — `pub deps --json` carries no constraints and SDK
+     * pubspecs expose no readable semver range, so the block is INFERRED from
+     * "blocked shared dep + SDK dependent + no readable hosted ceiling" rather
+     * than read. This is the characters/collection/path/stack_trace class.
+     */
+    readonly viaSdk: boolean;
+}
+
+/** A constrainer the detector attributed a block to. */
+interface ConstrainerMatch {
+    readonly package: string;
+    /** Readable binding constraint, or null when inferred from an SDK pin. */
+    readonly constraint: string | null;
+    readonly viaSdk: boolean;
 }
 
 /** Constraint each package declares on each dependency: pkg -> (dep -> range). */
@@ -88,6 +104,13 @@ function isBindingCeiling(
  * Among the siblings that depend on shared dep T, find the one whose
  * constraint is the binding ceiling. Prefers direct deps so the reported
  * blocker is one the user can actually act on.
+ *
+ * When no sibling exposes a readable binding constraint but an SDK package
+ * depends on T, the block is attributed to the SDK: a blocked shared dep with
+ * an SDK dependent and no hosted ceiling is almost certainly pinned by the SDK
+ * (flutter_test pins exact characters/collection/path/stack_trace). The pin is
+ * opaque, so this match is INFERRED, not read — same inference the override
+ * analyzer already makes for SDK-transitive overrides.
  */
 function findConstrainer(
     sharedDep: PubOutdatedEntry,
@@ -95,19 +118,27 @@ function findConstrainer(
     reverseDeps: ReadonlyMap<string, readonly DepEdge[]>,
     constraints: ConstraintIndex,
     directDeps: ReadonlySet<string>,
-): string | null {
-    let fallback: string | null = null;
+    sdkPackages: ReadonlySet<string>,
+): ConstrainerMatch | null {
+    let hostedFallback: ConstrainerMatch | null = null;
+    let sdkDependent: string | null = null;
     for (const candidate of dependentsOf(sharedDep.package, reverseDeps)) {
         if (candidate === excludePackage) { continue; }
+        if (sdkPackages.has(candidate)) { sdkDependent ??= candidate; }
         const constraint = constraints.get(candidate)?.get(sharedDep.package);
         if (!constraint) { continue; }
         if (!isBindingCeiling(
             constraint, sharedDep.resolvable!, sharedDep.latest!,
         )) { continue; }
-        if (directDeps.has(candidate)) { return candidate; }
-        fallback ??= candidate;
+        const match = { package: candidate, constraint, viaSdk: false };
+        if (directDeps.has(candidate)) { return match; }
+        hostedFallback ??= match;
     }
-    return fallback;
+    if (hostedFallback) { return hostedFallback; }
+    if (sdkDependent) {
+        return { package: sdkDependent, constraint: null, viaSdk: true };
+    }
+    return null;
 }
 
 /**
@@ -120,6 +151,7 @@ export function detectSharedDepConflicts(
     reverseDeps: ReadonlyMap<string, readonly DepEdge[]>,
     constraints: ConstraintIndex,
     directDeps: ReadonlySet<string>,
+    sdkPackages: ReadonlySet<string> = new Set(),
 ): SharedDepConflict[] {
     const contested = findContestedSharedDeps(outdated, reverseDeps);
     if (contested.size === 0) { return []; }
@@ -132,7 +164,8 @@ export function detectSharedDepConflicts(
                 continue;
             }
             const constrainer = findConstrainer(
-                shared, entry.package, reverseDeps, constraints, directDeps,
+                shared, entry.package, reverseDeps,
+                constraints, directDeps, sdkPackages,
             );
             if (!constrainer) { continue; }
             conflicts.push({
@@ -142,9 +175,9 @@ export function detectSharedDepConflicts(
                 sharedDependency: name,
                 sharedResolvable: shared.resolvable ?? '',
                 sharedLatest: shared.latest ?? '',
-                constrainerPackage: constrainer,
-                constrainerConstraint:
-                    constraints.get(constrainer)?.get(name) ?? '',
+                constrainerPackage: constrainer.package,
+                constrainerConstraint: constrainer.constraint ?? '',
+                viaSdk: constrainer.viaSdk,
             });
             break;
         }

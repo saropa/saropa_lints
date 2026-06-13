@@ -11,6 +11,7 @@ import {
 import { buildExceededDiagnostics } from '../scoring/budget-checker';
 import { filterBySeverity } from '../scoring/vuln-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
+import { isHostedUpgradeable } from '../scoring/blocker-analyzer';
 
 // Maps scan results to VS Code diagnostics (budget, vulns, EOL, known issues).
 const SEVERITY_MAP: Record<number, vscode.DiagnosticSeverity> = {
@@ -130,7 +131,13 @@ export class VibrancyDiagnostics {
             if (showPerLineOther
                 && result.category === 'vibrant'
                 && result.updateInfo
-                && result.updateInfo.updateStatus !== 'up-to-date') {
+                && result.updateInfo.updateStatus !== 'up-to-date'
+                // Git/path/SDK deps can't be bumped by editing a constraint;
+                // a pub.dev "latest" gap for them is a non-actionable squiggle.
+                && isHostedUpgradeable(result.package.source)
+                // A documented do-not-upgrade / do-not-use hold is deliberate;
+                // nagging to bump it is noise the maintainer already answered.
+                && !result.pinIntent) {
                 const updateMsg = `${result.package.name} — Update available: ${result.updateInfo.currentVersion} → ${result.updateInfo.latestVersion} (${result.updateInfo.updateStatus})`;
                 const updateDiag = new vscode.Diagnostic(
                     vscodeRange, updateMsg, vscode.DiagnosticSeverity.Hint,
