@@ -6,7 +6,9 @@
  */
 
 import * as vscode from 'vscode';
-import { VibrancyResult, DepEdge, BlockerInfo, PubOutdatedEntry } from '../types';
+import {
+    VibrancyResult, DepEdge, BlockerInfo, PubOutdatedEntry, PackageDependency,
+} from '../types';
 import { ScanLogger } from './scan-logger';
 import { fetchPubOutdated } from './pub-outdated';
 import { fetchDepGraph, buildReverseDeps } from './dep-graph';
@@ -27,8 +29,15 @@ export async function enrichWithBlockers(
     results: VibrancyResult[],
     workspaceRoot: vscode.Uri,
     logger: ScanLogger,
+    deps: readonly PackageDependency[] = [],
 ): Promise<BlockerEnrichResult> {
     const cwd = workspaceRoot.fsPath;
+    // SDK-sourced packages (flutter, flutter_test, …) pin exact transitive
+    // versions opaquely; the diamond detector uses this set for its SDK-pin
+    // fallback when no hosted constrainer is readable.
+    const sdkPackages = new Set(
+        deps.filter(d => d.source === 'sdk').map(d => d.name),
+    );
     const [outdatedResult, depGraphResult] = await Promise.all([
         fetchPubOutdated(cwd),
         fetchDepGraph(cwd),
@@ -67,7 +76,7 @@ export async function enrichWithBlockers(
     // returns the wrong blocker or none.
     await mergeSharedDepConflicts(
         outdatedResult.entries, reverseDeps, directNames,
-        results, workspaceRoot, blockerMap, logger,
+        results, workspaceRoot, blockerMap, logger, sdkPackages,
     );
 
     const outdatedMap = new Map(
@@ -82,6 +91,16 @@ export async function enrichWithBlockers(
             ...r,
             blocker: blockerMap.get(r.package.name) ?? null,
             upgradeBlockStatus: status,
+            // A `constrained` row is capped by the user's own constraint; name
+            // the line and the version it would otherwise reach so the reason
+            // is actionable instead of a bare label.
+            constrainedReason: status === 'constrained' && entry
+                ? {
+                    constraint: r.package.constraint,
+                    resolvable: entry.resolvable ?? '',
+                    latest: entry.latest ?? '',
+                }
+                : null,
         };
     });
     return { results: enriched, reverseDeps };
@@ -100,13 +119,14 @@ async function mergeSharedDepConflicts(
     workspaceRoot: vscode.Uri,
     blockerMap: Map<string, BlockerInfo>,
     logger: ScanLogger,
+    sdkPackages: ReadonlySet<string>,
 ): Promise<void> {
     const candidates = collectConstrainerCandidates(outdated, reverseDeps);
     if (candidates.size === 0) { return; }
 
     const constraints = await buildConstraintIndex(workspaceRoot, candidates);
     const conflicts = detectSharedDepConflicts(
-        outdated, reverseDeps, constraints, directNames,
+        outdated, reverseDeps, constraints, directNames, sdkPackages,
     );
     if (conflicts.length === 0) { return; }
 
@@ -159,5 +179,6 @@ function toBlockerInfo(
         sharedDependencyResolvable: conflict.sharedResolvable,
         sharedDependencyLatest: conflict.sharedLatest,
         blockerConstraint: conflict.constrainerConstraint,
+        blockerIsSdkPin: conflict.viaSdk,
     };
 }

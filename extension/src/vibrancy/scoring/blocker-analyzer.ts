@@ -7,7 +7,7 @@
 
 import {
     PubOutdatedEntry, DepEdge, VibrancyResult,
-    BlockerInfo, UpgradeBlockStatus,
+    BlockerInfo, UpgradeBlockStatus, ConstrainedReason,
 } from '../types';
 import { compareVersions } from '../services/changelog-service';
 
@@ -73,7 +73,11 @@ export function findBlockers(
 export function formatSharedDepDetail(blocker: BlockerInfo): string | null {
     if (!blocker.sharedDependency) { return null; }
     const parts = [`via ${blocker.sharedDependency}`];
-    if (blocker.blockerConstraint) {
+    // SDK pins are opaque — there is no readable range, so name the SDK as the
+    // pinner instead of printing a constraint that was never read.
+    if (blocker.blockerIsSdkPin) {
+        parts.push(`— pinned by ${blocker.blockerPackage} (Flutter SDK)`);
+    } else if (blocker.blockerConstraint) {
         parts.push(`— ${blocker.blockerPackage} caps ${blocker.blockerConstraint}`);
     }
     if (blocker.sharedDependencyResolvable && blocker.sharedDependencyLatest) {
@@ -83,6 +87,60 @@ export function formatSharedDepDetail(blocker: BlockerInfo): string | null {
         );
     }
     return parts.join(' ');
+}
+
+/**
+ * Plain-text label for a documented pin intent ("Held: <reason>" /
+ * "Do not use: <reason>"), or null when there is no intent. Lets the UI mark a
+ * deliberate hold instead of presenting the dep as a missed upgrade.
+ */
+export function formatPinIntent(
+    intent: { reason: string; kind: 'do-not-upgrade' | 'do-not-use' } | null | undefined,
+): string | null {
+    if (!intent) { return null; }
+    const label = intent.kind === 'do-not-use' ? 'Do not use' : 'Held';
+    return intent.reason ? `${label}: ${intent.reason}` : label;
+}
+
+/**
+ * Only hosted (pub.dev) packages can be upgraded by editing a version
+ * constraint. Git, path, and SDK deps are managed elsewhere, so a pub.dev
+ * "latest" gap for them is not an actionable upgrade.
+ */
+export function isHostedUpgradeable(source: string): boolean {
+    return source === 'hosted';
+}
+
+/**
+ * Short note explaining why a non-hosted package's version gap is not a pub
+ * upgrade (e.g. "via git override", "via path override", "SDK-managed"), or
+ * null for a normal hosted package. Keeps the version arrow from reading as a
+ * stuck pub bump when the dep is actually managed by an override or the SDK.
+ */
+export function managedSourceNote(source: string): string | null {
+    switch (source) {
+        case 'git': return 'via git override';
+        case 'path': return 'via path override';
+        case 'sdk': return 'SDK-managed';
+        default: return null;
+    }
+}
+
+/**
+ * Plain-text reason for a `constrained` row — names the user's own constraint
+ * and the version pub could otherwise reach, so the cap reads as actionable
+ * ("your constraint ^1.9.0 caps this — 1.9.2 resolvable, 1.9.2 latest") rather
+ * than a bare "constrained" label. Returns null when no reason is attached.
+ */
+export function formatConstrainedReason(
+    reason: ConstrainedReason | null | undefined,
+): string | null {
+    if (!reason || !reason.constraint) { return null; }
+    const tail = reason.resolvable
+        ? ` — ${reason.resolvable} resolvable`
+        + (reason.latest ? `, ${reason.latest} latest` : '')
+        : '';
+    return `your constraint ${reason.constraint} caps this${tail}`;
 }
 
 function findBlockerForPackage(

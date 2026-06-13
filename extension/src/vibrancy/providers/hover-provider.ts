@@ -11,7 +11,7 @@ import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
-import { formatSharedDepDetail } from '../scoring/blocker-analyzer';
+import { formatSharedDepDetail, formatConstrainedReason, managedSourceNote, formatPinIntent } from '../scoring/blocker-analyzer';
 import { formatSizeMB, formatSizeKB } from '../scoring/bloat-calculator';
 import { findEnvironmentRange } from '../services/pubspec-parser';
 import {
@@ -171,7 +171,10 @@ function appendHoverVersion(md: vscode.MarkdownString, r: VibrancyResult): void 
         }
     }
     if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date') {
-        rows.push(`| Update | ${r.updateInfo.currentVersion} → ${r.updateInfo.latestVersion} (${r.updateInfo.updateStatus}) |`);
+        // Annotate non-hosted deps so the version gap doesn't read as a stuck
+        // pub upgrade — git/path/SDK deps aren't bumped by editing a caret.
+        const srcNote = managedSourceNote(r.package.source);
+        rows.push(`| Update | ${r.updateInfo.currentVersion} → ${r.updateInfo.latestVersion} (${r.updateInfo.updateStatus})${srcNote ? ` — ${srcNote}` : ''} |`);
         if (r.blocker) {
             const detail = formatSharedDepDetail(r.blocker);
             rows.push(
@@ -179,6 +182,16 @@ function appendHoverVersion(md: vscode.MarkdownString, r: VibrancyResult): void 
                 + `${detail ? ` ${detail}` : ''} |`,
             );
         }
+        const constrained = formatConstrainedReason(r.constrainedReason);
+        if (constrained) {
+            rows.push(`| Constrained | ${constrained} |`);
+        }
+    }
+    // Pin intent applies even when up-to-date (e.g. a do-not-use package), so
+    // it lives outside the update block.
+    const pin = formatPinIntent(r.pinIntent);
+    if (pin) {
+        rows.push(`| 🔒 Pin | ${pin} |`);
     }
     if (r.license) {
         const tier = classifyLicense(r.license);

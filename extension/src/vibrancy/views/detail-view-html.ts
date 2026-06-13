@@ -151,17 +151,38 @@ function buildUpdateSection(r: VibrancyResult): string {
 
     if (r.blocker) {
         // Diamond conflict adds the shared-dep reason inline; ordinary blocks
-        // show just the blocker name as before.
+        // show just the blocker name. The SDK variant has no readable range.
         const via = r.blocker.sharedDependency
-            ? ` — ${escapeHtml(l10n('packageDetail.version.blockedVia', {
-                blocker: r.blocker.blockerPackage,
-                dep: r.blocker.sharedDependency,
-                constraint: r.blocker.blockerConstraint ?? '',
-                resolvable: r.blocker.sharedDependencyResolvable ?? '',
-                latest: r.blocker.sharedDependencyLatest ?? '',
-            }))}`
+            ? ` — ${escapeHtml(l10n(
+                r.blocker.blockerIsSdkPin
+                    ? 'packageDetail.version.blockedViaSdk'
+                    : 'packageDetail.version.blockedVia',
+                {
+                    blocker: r.blocker.blockerPackage,
+                    dep: r.blocker.sharedDependency,
+                    constraint: r.blocker.blockerConstraint ?? '',
+                    resolvable: r.blocker.sharedDependencyResolvable ?? '',
+                    latest: r.blocker.sharedDependencyLatest ?? '',
+                }))}`
             : '';
         parts.push(`<div class="blocker-info">⚠️ ${l10n('detailView.update.blockedBy', { package: escapeHtml(r.blocker.blockerPackage) })}${via}</div>`);
+    }
+
+    // Constrained by the user's own pubspec line.
+    if (r.constrainedReason) {
+        parts.push(`<div class="blocker-info">🔧 ${escapeHtml(l10n('packageDetail.version.constrainedBy', {
+            constraint: r.constrainedReason.constraint,
+            resolvable: r.constrainedReason.resolvable,
+            latest: r.constrainedReason.latest,
+        }))}</div>`);
+    }
+
+    // Documented do-not-upgrade / do-not-use hold from the pubspec comment.
+    if (r.pinIntent) {
+        const pinLabel = r.pinIntent.kind === 'do-not-use'
+            ? l10n('packageDetail.version.pinDoNotUse')
+            : l10n('packageDetail.version.pinHeld');
+        parts.push(`<div class="blocker-info">🔒 ${escapeHtml(pinLabel)}: ${escapeHtml(r.pinIntent.reason)}</div>`);
     }
 
     return buildSection(`⬆️ ${l10n('detailView.section.update')}`, parts);

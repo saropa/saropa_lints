@@ -211,9 +211,13 @@ function buildVersionSection(r: VibrancyResult): string {
             rows.push(row(l10n('packageDetail.version.blockedBy'), `<strong>${escapeHtml(r.blocker.blockerPackage)}</strong>`));
             // Diamond conflict: name the shared transitive dep and the binding
             // ceiling so the user sees WHY the sibling holds this back, not just
-            // that it does. Absent for ordinary reverse-dependency blocks.
+            // that it does. Absent for ordinary reverse-dependency blocks. The
+            // SDK variant has no readable range, so it uses different wording.
             if (r.blocker.sharedDependency) {
-                rows.push(row('', escapeHtml(l10n('packageDetail.version.blockedVia', {
+                const key = r.blocker.blockerIsSdkPin
+                    ? 'packageDetail.version.blockedViaSdk'
+                    : 'packageDetail.version.blockedVia';
+                rows.push(row('', escapeHtml(l10n(key, {
                     blocker: r.blocker.blockerPackage,
                     dep: r.blocker.sharedDependency,
                     constraint: r.blocker.blockerConstraint ?? '',
@@ -222,6 +226,24 @@ function buildVersionSection(r: VibrancyResult): string {
                 }))));
             }
         }
+        // Constrained by the user's own pubspec line — name it so the cap is
+        // actionable rather than an unexplained "constrained" label.
+        if (r.constrainedReason) {
+            rows.push(row(l10n('packageDetail.version.constrained'),
+                escapeHtml(l10n('packageDetail.version.constrainedBy', {
+                    constraint: r.constrainedReason.constraint,
+                    resolvable: r.constrainedReason.resolvable,
+                    latest: r.constrainedReason.latest,
+                }))));
+        }
+    }
+    // Documented do-not-upgrade / do-not-use intent — shown regardless of the
+    // update status so a deliberately-frozen dep reads as a hold, not neglect.
+    if (r.pinIntent) {
+        const pinLabel = r.pinIntent.kind === 'do-not-use'
+            ? l10n('packageDetail.version.pinDoNotUse')
+            : l10n('packageDetail.version.pinHeld');
+        rows.push(row(`🔒 ${pinLabel}`, escapeHtml(r.pinIntent.reason)));
     }
     /* Prefer code size — what the package contributes to a built app.
        Falls back to the archive total when the tarball analyzer couldn't run.

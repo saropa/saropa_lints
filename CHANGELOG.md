@@ -64,16 +64,32 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Hardens the release pipeline so a missing dependency can no longer reach pub.dev, and teaches the Package Vibrancy dashboard to name the real package behind a stuck upgrade when two dependencies fight over a shared transitive dependency. No rule changes. No action required.
+Hardens the release pipeline so a missing dependency can no longer reach pub.dev, and teaches the Package Vibrancy dashboard to name the real package behind a stuck upgrade when two dependencies fight over a shared transitive dependency. Also polishes the extension dashboards so their filters can be driven from the keyboard and their colors follow your editor theme under light and high-contrast modes. No rule changes. No action required.
 
 ### Added (Extension)
 
-- **Package Vibrancy now explains shared-dependency (diamond) upgrade blocks.** When a package is held back because a sibling dependency caps a shared transitive dependency it needs — for example `dart_style` stuck because another dependency pins `analyzer` low — the dashboard now names the blocking sibling, the shared dependency, and the resolvable-vs-latest gap instead of showing an unexplained block; no action required.
+- **Package Vibrancy now explains shared-dependency (diamond) upgrade blocks, including SDK pins.** When a package is held back because a sibling caps a shared transitive dependency it needs — `dart_style` stuck because another dependency pins `analyzer` low, or a package pinned by the Flutter SDK's exact `characters`/`collection`/`meta` — the dashboard names the blocker, the shared dependency, and the resolvable-vs-latest gap instead of showing an unexplained block; no action required.
+- **`constrained` packages now name the constraint holding them back.** A package the resolver could lift but your own pubspec caps now shows "your constraint `^x` caps this — `y` resolvable" so the line to edit is obvious, instead of a bare "constrained" label; no action required.
+- **Git, path, and SDK dependencies no longer show as stuck pub upgrades.** A version gap on an overridden or SDK dependency is annotated as managed (and its "update available" squiggle suppressed), because such deps can't be bumped by editing a constraint; no action required.
+- **Deliberately-pinned dependencies are marked as intentional holds.** A "do not bump" / "do not use" note in a dependency's pubspec comment is read and shown as a pin, and its upgrade nag suppressed, so a frozen dependency reads as a decision rather than neglect; no action required.
+
+### Fixed
+
+- **Line-level `// ignore:` no longer over-suppresses rules whose name is a prefix of another.** An `// ignore: my_rule_extended` comment was matched by a bare substring check, so it also silenced the distinct, shorter `my_rule` on the same line or declaration — hiding real diagnostics. Matching is now whole-word (`\b`-anchored), consistent with `// ignore_for_file:`. If you relied on a single ignore accidentally covering a prefix-named rule, add that rule to the comment explicitly.
+- **Baseline files no longer suppress violations in the wrong file when two filenames share a suffix.** A baseline entry for `util.dart` was matched against `my_util.dart` (and any path merely ending in the same characters) because path comparison used an unbounded suffix check, hiding real violations in unrelated files. Suffix matching now requires a path-segment (`/`) boundary, so relative-vs-absolute paths still match but distinct files do not.
+
+### Fixed (Extension)
+
+- **Findings dashboard sections now open compact again.** Every group except the first re-collapses on load as intended, instead of all sections expanding, so a large report opens scannable rather than as one long wall; no action required.
+- **Dashboard filters are now fully keyboard-accessible.** The Package Vibrancy summary cards focus with Tab and toggle their filter on Enter or Space, and a visible focus ring was added to the package-comparison Add buttons, the rule-triage actions, and the project-vibrancy score-threshold input, so the dashboards can be driven without a mouse; no action required.
+- **Several dashboard surfaces now follow light and high-contrast themes correctly.** Package-status badge text, the Findings dashboard top-rules text, and a few control borders and focus rings were bound to editor theme colors instead of fixed values that could wash out or disappear in the opposite theme; no action required.
+- **Command Catalog category headers stay visible while scrolling.** The sticky section label now pins just beneath the toolbar instead of sliding behind it, so you can always see which category you are scrolling through; no action required.
 
 <details><summary>Maintenance</summary>
 
 - **New publish audit gate: every package imported by shipped code must be a declared dependency.** The release audit (STEP 1, before any tag is pushed) now scans `lib/` and `bin/` for real import/export directives and fails if an imported package is absent from pubspec `dependencies`. This catches the class of defect that sank v13.12.6 and v13.12.7 (a `meta` import with no `meta` dependency): `lib/**` is in `analyzer.exclude` for plugin dogfooding, so no `dart analyze` run inspects these imports, and `dart pub publish` only rejected them on the post-tag CI job — after the tag was burned. The gate is deterministic and Dart-version-independent, and ignores `package:` URIs that appear inside rule detection patterns or DartDoc examples.
 - **The same gate now runs in CI on every push and pull request.** A new `scripts/check_dependency_imports.py` (shared logic with the release audit) runs in the `analyze` job, so a missing dependency fails at merge time rather than at release. The pre-existing `dart pub publish --dry-run` CI step could not be relied on for this: its exit code for a missing dependency is Dart-version-dependent and was treated as a non-fatal warning.
+- **New Playwright UX render harness for the editor dashboards.** `npm run ux` renders each dashboard builder's HTML against a light/dark/high-contrast `--vscode-*` theme shim, runs axe-core, checks horizontal overflow at narrow and wide widths, and captures screenshots — so visual and accessibility regressions are caught outside the VS Code host. Dev-only; generated pages and screenshots are gitignored.
 
 </details>
 

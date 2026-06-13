@@ -5,6 +5,8 @@
 import * as assert from 'assert';
 import {
     classifyUpgradeStatus, findBlockers, formatSharedDepDetail,
+    formatConstrainedReason, managedSourceNote, isHostedUpgradeable,
+    formatPinIntent,
 } from '../../../vibrancy/scoring/blocker-analyzer';
 import { PubOutdatedEntry, DepEdge, VibrancyResult, BlockerInfo } from '../../../vibrancy/types';
 import { makeMinimalResult } from '../test-helpers';
@@ -191,6 +193,73 @@ describe('blocker-analyzer', () => {
                 detail,
                 'via analyzer — saropa_lints caps >=9.0.0 <13.0.0 '
                 + '(12.0.0 resolvable, 13.1.0 latest)',
+            );
+        });
+
+        it('names the SDK as pinner for an SDK-inferred block', () => {
+            const detail = formatSharedDepDetail(blocker({
+                blockerPackage: 'flutter_test',
+                sharedDependency: 'characters',
+                blockerConstraint: '',
+                blockerIsSdkPin: true,
+                sharedDependencyResolvable: '1.4.0',
+                sharedDependencyLatest: '1.4.1',
+            }));
+            assert.strictEqual(
+                detail,
+                'via characters — pinned by flutter_test (Flutter SDK) '
+                + '(1.4.0 resolvable, 1.4.1 latest)',
+            );
+        });
+    });
+
+    describe('formatConstrainedReason', () => {
+        it('returns null when no reason', () => {
+            assert.strictEqual(formatConstrainedReason(null), null);
+            assert.strictEqual(formatConstrainedReason(undefined), null);
+        });
+
+        it('names the constraint and the resolvable/latest gap', () => {
+            assert.strictEqual(
+                formatConstrainedReason({
+                    constraint: '^1.9.0', resolvable: '1.9.2', latest: '1.9.2',
+                }),
+                'your constraint ^1.9.0 caps this — 1.9.2 resolvable, 1.9.2 latest',
+            );
+        });
+    });
+
+    describe('managedSourceNote / isHostedUpgradeable', () => {
+        it('flags non-hosted sources', () => {
+            assert.strictEqual(managedSourceNote('git'), 'via git override');
+            assert.strictEqual(managedSourceNote('path'), 'via path override');
+            assert.strictEqual(managedSourceNote('sdk'), 'SDK-managed');
+            assert.strictEqual(managedSourceNote('hosted'), null);
+        });
+
+        it('treats only hosted as pub-upgradeable', () => {
+            assert.strictEqual(isHostedUpgradeable('hosted'), true);
+            assert.strictEqual(isHostedUpgradeable('git'), false);
+            assert.strictEqual(isHostedUpgradeable('sdk'), false);
+        });
+    });
+
+    describe('formatPinIntent', () => {
+        it('returns null when no intent', () => {
+            assert.strictEqual(formatPinIntent(null), null);
+        });
+
+        it('labels a do-not-upgrade hold', () => {
+            assert.strictEqual(
+                formatPinIntent({ reason: 'DO NOT BUMP', kind: 'do-not-upgrade' }),
+                'Held: DO NOT BUMP',
+            );
+        });
+
+        it('labels a do-not-use package', () => {
+            assert.strictEqual(
+                formatPinIntent({ reason: 'COMMERCIAL', kind: 'do-not-use' }),
+                'Do not use: COMMERCIAL',
             );
         });
     });

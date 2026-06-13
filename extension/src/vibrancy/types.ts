@@ -247,6 +247,28 @@ export type UpgradeBlockStatus =
     | 'blocked'
     | 'constrained';
 
+/**
+ * A documented intent to NOT upgrade a dependency, parsed from its pubspec
+ * comment. Distinguishes an intentional hold (build break, do-not-use, frozen)
+ * from neglect, so the scanner stops nagging to bump a deliberately-pinned dep.
+ */
+export interface PinIntent {
+    /** The extracted reason line (e.g. "DO NOT BUMP home_widget to 0.9.2"). */
+    readonly reason: string;
+    /** Coarse classification driving wording and severity. */
+    readonly kind: 'do-not-upgrade' | 'do-not-use';
+}
+
+/** Why a `constrained` upgrade is capped by the user's own pubspec constraint. */
+export interface ConstrainedReason {
+    /** The constraint declared in the workspace pubspec (e.g. "^1.9.0"). */
+    readonly constraint: string;
+    /** The version pub could resolve to if the constraint were relaxed. */
+    readonly resolvable: string;
+    /** The latest published version. */
+    readonly latest: string;
+}
+
 /** Information about what blocks a package upgrade. */
 export interface BlockerInfo {
     readonly blockedPackage: string;
@@ -271,8 +293,15 @@ export interface BlockerInfo {
     readonly sharedDependencyResolvable?: string | null;
     /** Latest published version of the shared dep. */
     readonly sharedDependencyLatest?: string | null;
-    /** The constraint `blockerPackage` places on the shared dep (e.g. ">=9.0.0 <13.0.0"). */
+    /** The constraint `blockerPackage` places on the shared dep (e.g. ">=9.0.0 <13.0.0"); empty when SDK-inferred. */
     readonly blockerConstraint?: string | null;
+    /**
+     * True when `blockerPackage` is a Flutter/Dart SDK package whose pin on the
+     * shared dep is opaque (inferred, not read). Drives the display wording —
+     * "pinned by the Flutter SDK" rather than "caps <range>" — because there is
+     * no readable constraint string to show.
+     */
+    readonly blockerIsSdkPin?: boolean;
 }
 
 /** README content parsed for display: logo and inline images. */
@@ -344,6 +373,20 @@ export interface VibrancyResult {
     readonly wasmReady: boolean | null;
     readonly blocker: BlockerInfo | null;
     readonly upgradeBlockStatus: UpgradeBlockStatus;
+    /**
+     * For `constrained` rows: the user's OWN pubspec constraint that caps the
+     * upgrade, plus the version pub could otherwise resolve to. A `constrained`
+     * status is purely arithmetic (upgradable < resolvable) and previously
+     * surfaced no reason; this names the line the user must edit. Null for any
+     * other status.
+     */
+    readonly constrainedReason?: ConstrainedReason | null;
+    /**
+     * Documented do-not-upgrade / do-not-use intent parsed from the pubspec
+     * comment, or null when the pin (if any) is undocumented. Lets the UI mark
+     * a deliberate hold instead of reporting it as a missed upgrade.
+     */
+    readonly pinIntent?: PinIntent | null;
     readonly transitiveInfo: TransitiveInfo | null;
     readonly alternatives: readonly AlternativeSuggestion[];
     /** Latest prerelease version if newer than stable (e.g., '2.0.0-dev.1'). */
