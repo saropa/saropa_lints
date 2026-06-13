@@ -22,6 +22,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 - `feature_lint_rule_prefer_us_english_spelling.md`
 - `infra_us_spelling_dictionary_coverage_gaps.md`
 
+## Raised Reports (2026-06-13)
+
+- `prefer_layout_builder_for_constraints_false_positive_mediaquery_fallback_and_viewport_fraction.md`
+
 ---
 
 ## File Naming
