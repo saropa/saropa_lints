@@ -64,10 +64,12 @@ export function buildKnownIssuesHtml(): string {
 <body>
     <a href="#known-issues-main" class="skip-link">Skip to issues table</a>
     <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
-    <header>${heroHtml}</header>
+    ${heroHtml}
+    <section class="ki-controls" aria-label="Summary and filters">
     ${buildSummaryCards(issues.length, withReplacement)}
     ${buildToolbar()}
     ${buildChipStrip()}
+    </section>
     <main id="known-issues-main" tabindex="-1">
     ${buildTable(issues)}
     ${buildEmptyState()}
@@ -172,7 +174,7 @@ function buildToolbar(): string {
 }
 
 function buildTable(issues: KnownIssue[]): string {
-    return `<table>
+    return `<div class="table-scroll"><table>
         <thead><tr>
             <th data-col="name">Package<span class="sort-arrow"></span></th>
             <th data-col="reason">Reason<span class="sort-arrow"></span></th>
@@ -182,7 +184,7 @@ function buildTable(issues: KnownIssue[]): string {
         <tbody id="pkg-body">
             ${issues.map(buildRow).join('\n')}
         </tbody>
-    </table>`;
+    </table></div>`;
 }
 
 function buildRow(issue: KnownIssue): string {

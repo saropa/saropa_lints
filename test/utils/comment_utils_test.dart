@@ -377,6 +377,61 @@ void main() {
     });
   });
 
+  group('CommentPatterns.isWrappedProseFragment', () {
+    test('null/empty is not a prose fragment', () {
+      expect(CommentPatterns.isWrappedProseFragment(null), isFalse);
+      expect(CommentPatterns.isWrappedProseFragment(''), isFalse);
+    });
+
+    test('lowercase continuation citing a call mid-sentence is a fragment', () {
+      // The reproducer middle line: lowercase start + function words ("this",
+      // "in"), even though it names formatNumberLocale(...). Must be vetoed so
+      // the strong-code carve-out does not re-flag it inside a prose block.
+      expect(
+        CommentPatterns.isWrappedProseFragment(
+          'this, formatNumberLocale(x, decimalPlaces: 25) crashed '
+          '(formatDouble in',
+        ),
+        isTrue,
+      );
+    });
+
+    test('lowercase line with an unbalanced trailing paren is a fragment', () {
+      expect(
+        CommentPatterns.isWrappedProseFragment(
+          'an empty result (rare in practice but observed in the',
+        ),
+        isTrue,
+      );
+    });
+
+    test('genuine dead-code statement is NOT a fragment', () {
+      // Starts lowercase ("return") but carries no function words, so it stays
+      // flagged as dead code under a prose lead-in.
+      expect(
+        CommentPatterns.isWrappedProseFragment('return cache.get(key);'),
+        isFalse,
+      );
+    });
+
+    test('lowercase statement with no function words is NOT a fragment', () {
+      expect(
+        CommentPatterns.isWrappedProseFragment('final result = getValue();'),
+        isFalse,
+      );
+    });
+
+    test('capitalized sentence start is NOT a fragment', () {
+      // Sentence-initial lines do not begin with a lowercase continuation word.
+      expect(
+        CommentPatterns.isWrappedProseFragment(
+          'Without this, formatNumberLocale(x) crashed in the helper.',
+        ),
+        isFalse,
+      );
+    });
+  });
+
   group('CommentPatterns.isSpecialMarker', () {
     test('should detect TODO markers', () {
       expect(CommentPatterns.isSpecialMarker('TODO: fix this'), isTrue);

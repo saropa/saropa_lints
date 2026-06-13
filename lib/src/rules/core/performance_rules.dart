@@ -265,10 +265,44 @@ class _ExpensiveOperationVisitor extends RecursiveAstVisitor<void> {
   final LintCode code;
   final Set<String> expensiveOps;
 
+  // dart:core conversions whose `parse`/`tryParse` are cheap O(n) scans, not
+  // the heavy JSON/format/IO parsing this rule targets. Identified by the
+  // RESOLVED result type (canonical display, reliable) so a genuinely heavy
+  // `Foo.parse(...)` that returns a domain object still flags.
+  static const Set<String> _cheapParseResultTypes = <String>{
+    'int',
+    'double',
+    'num',
+    'bool',
+    'BigInt',
+    'DateTime',
+    'Uri',
+    'Duration',
+  };
+
+  bool _isCheapPrimitiveParse(MethodInvocation node) {
+    final DartType? type = node.staticType;
+    if (type == null) return false;
+    var name = type.getDisplayString();
+    if (name.endsWith('?')) {
+      name = name.substring(0, name.length - 1);
+    }
+    return _cheapParseResultTypes.contains(name);
+  }
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (expensiveOps.contains(node.methodName.name)) {
-      reporter.atNode(node);
+    final String name = node.methodName.name;
+    if (expensiveOps.contains(name)) {
+      // `int.parse`, `double.tryParse`, `DateTime.parse`, `Uri.parse` etc. are
+      // cheap and extremely common in build(); only the heavy parsing
+      // (JSON/format returning a non-primitive) is the real concern.
+      final bool cheapPrimitive =
+          (name == 'parse' || name == 'tryParse') &&
+          _isCheapPrimitiveParse(node);
+      if (!cheapPrimitive) {
+        reporter.atNode(node);
+      }
     }
     super.visitMethodInvocation(node);
   }

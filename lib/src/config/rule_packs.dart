@@ -347,7 +347,7 @@ Set<String> allRulePackCodes() {
 Set<String> get knownRulePackIds => kRulePackRuleCodes.keys.toSet();
 
 /// `pubspec.yaml` dependency keys (any line `  name:`) that suggest a pack.
-/// Keys match [kRulePackRuleCodes]. The `package_specific` pack may use an empty set.
+/// Keys match [kRulePackRuleCodes]. Every pack declares at least one marker.
 const Map<String, Set<String>> kRulePackPubspecMarkers = {
   ...kRulePackPubspecMarkersGenerated,
   // SDK packs are primarily gated by `environment` constraints.

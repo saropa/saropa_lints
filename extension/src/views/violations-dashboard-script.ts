@@ -446,6 +446,17 @@ export function buildScript(): string {
     gr.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
     });
+    // Apply the server-rendered collapsed state on load. Sections after the
+    // first render aria-expanded="false" (compact-by-default), but toggle()
+    // only fires on user interaction — without this pass the child rows stay
+    // visible and the collapsed flag is cosmetic, showing every section open.
+    if (gr.getAttribute('aria-expanded') === 'false') {
+      var initSib = gr.nextElementSibling;
+      while (initSib && !initSib.classList.contains('group-row')) {
+        initSib.style.display = 'none';
+        initSib = initSib.nextElementSibling;
+      }
+    }
   });
   bindClick('expand-all', function () {
     document.querySelectorAll('tr.group-row[aria-expanded="false"]').forEach(function (gr) { gr.click(); });

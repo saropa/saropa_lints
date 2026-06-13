@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "Keamanan · Kualitas · Keselamatan",
+    "searchPlaceholder": "Aturan filter... aturan penyaringan.",
+    "empty": "Semuanya jelas  ⁇ Tidak ada temuan, tidak ditemukan.",
+    "liveTitle": "Live  ⁇  Hiduplah dengan cara yang benar. update saat Anda mengedit.",
+    "fetching": "Membawa... membawa.",
+    "noOccurrences": "Tidak ada kejadian yang terjadi.",
+    "summaryFindings": "{count} temuan",
+    "summaryRules": "{count} aturan",
+    "more": "+{count} lebih banyak lagi.",
+    "wordErrors": "kesalahan-kesalahan yang terjadi.",
+    "wordWarnings": "peringatan, dan peringatan.",
+    "wordInfo": "informasi",
+    "wordFiles": "file yang berisi data.",
+    "gradeExcellent": "Sangat bagus, sangat baik.",
+    "gradeGood": "Baik baik bagus.",
+    "gradeFair": "Fair Trade adalah perdagangan yang adil.",
+    "gradeWeak": "Lemah, lemah dan tidak kuat.",
+    "gradeSevere": "Sangat parah sangat berat."
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇  adalah {count} saran konfigurasi (s)",
+    "initMissing": {
+      "title": "Siapkan Saropa Lints (run init)",
+      "detail": "saropa_lints berada di pubspec tetapi tidak ada konfigurasi analis yang terhubung belum."
+    },
+    "packAvailable": {
+      "title": "Aktifkan paket aturan {pack}.",
+      "detail": "{count} aturan untuk paket dalam spesifikasi pub Anda."
+    },
+    "enabledToast": "Mengaktifkan paket aturan {pack} di analysis_options.yaml",
+    "enableFailed": "Tidak dapat mengaktifkan paket aturan {pack}  ⁇ buka dasbor Rule Packs untuk mengaktifkannya."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: adalah suatu senyawa yang {count} saran paket aturan (s) berlaku untuk proyek ini.",
+    "review": "Review Review adalah ulasan yang dilakukan.",
+    "dismiss": "Mengusir dari pekerjaan.",
+    "reviewFailed": "Tidak dapat membuka tinjauan paket aturan Saropa Lints. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "Versi yang lebih baik adalah versi",
@@ -35,6 +74,15 @@
       "published": "Diterbitkan Dipublikasikan Terbit",
       "update": "Update adalah update yang dilakukan oleh orang lain.",
       "blockedBy": "Diblokir oleh:",
+      "blockedVia": "{blocker} caps {dep} {constraint} ({resolvable} dapat diselesaikan, {latest} terbaru)",
+      "blockedViaSdk": "disematkan oleh {blocker} (Flutter SDK) untuk {dep} ({resolvable} dapat diselesaikan, {latest} terbaru)",
+      "constrained": "Terbatas, terikat.",
+      "constrainedBy": "Kendala Anda {constraint} membatasi ini ({resolvable} dapat diselesaikan, {latest} terbaru)",
+      "pinHeld": "Held Held Dilakukan",
+      "pinDoNotUse": "Jangan gunakan untuk penggunaan.",
+      "drift": "Drift lintas proyek.",
+      "driftBehind": "Di belakang: di depan. {siblings} (Anda memiliki {own})",
+      "driftDiffers": "Berbeda: berbeda. {siblings} (Anda memiliki {own})",
       "codeSize": "Ukuran Kode Ukuran kode",
       "archiveSize": "Ukuran Arsip - ukuran arsip.",
       "bloat": "({rating}/10 kembung)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "Toggle layout lebar penuh.",
     "sortBy": "Diurutkan menurut {column}",
     "expandRow": "Memperluas baris Expand row.",
+    "copyRow": "Salin baris-baris salinan.",
+    "comparisonDimension": "Metrik metrik adalah suatu metode yang digunakan untuk mengukur",
     "collapseRow": "Baris runtuhnya baris.",
     "selectAll": "Pilih semua baris.",
     "keyboardShortcuts": "Pintasan keyboard shortcut.",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints Bahasa UI bahasa",
       "placeholder": "Pilih bahasa untuk sidebar dan dasbor.",
-      "auto": "Auto (mengikuti bahasa tampilan VS Code)"
+      "auto": "Auto (mengikuti bahasa tampilan VS Code)",
+      "coverage": "{pct}% diterjemahkan  ⁇ Rest Shows dalam Bahasa Inggris"
     },
     "reloadPrompt": "Bahasa yang disetel ke {locale}. Muat ulang jendela untuk memperbarui sidebar dan label perintah.",
     "reloadNow": "Reload sekarang.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "Perjalanan terakhir, jalankan.",
+      "updatedPrefix": "Update yang diperbarui.",
+      "refreshHint": "Klik untuk refresh dari analyzer.",
       "lastRunUnknown": "Last run tidak diketahui.",
       "noTimestampTitle": "Tidak ada tanda waktu pada violations.json.",
       "findingsAfterFilterTitle": "Total temuan setelah filter disabled-rule filter.",
@@ -327,7 +380,7 @@
       "refreshExtension": "Ekstensi Refresh adalah ekstensi yang diperbarui.",
       "openPackageDashboard": "Buka Dashboard paket yang terbuka.",
       "openCodeHealth": "Open Code Health Kesehatan",
-      "openLintsConfig": "Open Lints Config Mengkonfigurasi",
+      "openLintsConfig": "Mengelola Rule Packs.",
       "reloadFromDisk": "Mengisi ulang dari disk.",
       "reloadFromDiskTitle": "Re-render dashboard dari violations.json terakhir tanpa menjalankan kembali analiser.",
       "reEnableDisabledRules": "Re-enable disabled rules... mengaktifkan kembali aturan yang telah dinonaktifkan.",
@@ -539,12 +592,17 @@
     "noMatchingFindingsCopy": "Tidak ada temuan yang cocok untuk disalin.",
     "couldNotOpenFile": "Tidak dapat membuka file: {path}",
     "saveReportNoWorkspace": "Buka folder workspace sebelum menyimpan laporan.",
-    "savedFindings": "Temuan {count} yang disimpan: {path}",
+    "savedFindings": "Ditemukan {count} yang disimpan: {path} adalah",
     "couldNotSaveReportJson": "Tidak dapat menyimpan laporan JSON."
   },
   "packageDashboard": {
     "documentTitle": "Saropa Dashboard Paket dari Panel",
     "heroTitle": "Saropa Dashboard Paket dari Panel",
+    "detailPane": {
+      "aria": "Detail paket yang lengkap.",
+      "title": "Detail paket yang lengkap.",
+      "close": "Detail dekat detail yang sangat dekat."
+    },
     "status": {
       "packagesCount": "{count} paket",
       "packagesBreakdown": "{direct} langsung, {transitive} transitif",
@@ -801,8 +859,8 @@
       "showTransitives": "Tunjukkan ketergantungan transitif.",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (dibagikan)",
-      "tooltipHeader": "{total} dependensi transitif",
-      "tooltipHeaderShared": "{total} dependensi transitif ({shared} dibagikan)",
+      "tooltipHeader": "{total} transitif deps deps",
+      "tooltipHeaderShared": "Deps transitif {total} ({shared} dibagikan)",
       "sharedBadgeTitle": "{count} dibagi dengan paket lain.",
       "sharedBadge": "berbagi yang dibagikan bersama-sama.",
       "transitiveDepsHeading": "Transitif Ketergantungan ({count})"
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "Paket paket paket paket yang bagus.",
       "packages": "paket-paket yang dikemas."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "Jelaskan aturan ini."
+    },
+    "enableRule": {
+      "done": "Aturan yang diaktifkan adalah {ruleId}. Analisis Re-Run untuk diterapkan.",
+      "runAnalysis": "Jalankan analisis analisa.",
+      "noWorkspace": "Buka folder ruang kerja untuk mengaktifkan aturan."
+    },
+    "openFinding": {
+      "noWorkspace": "Buka folder ruang kerja untuk membuka sebuah temuan.",
+      "notFound": "Tidak dapat membuka {file}."
     }
   }
 }

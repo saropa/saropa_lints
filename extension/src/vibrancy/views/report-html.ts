@@ -12,6 +12,7 @@ import {
 import { formatSizeMB, formatSizeKB } from '../scoring/bloat-calculator';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { getReportStyles } from './report-styles';
+import { getPackageDetailStylesScoped } from './package-detail-styles';
 import { getPillButtonStyles } from './pill-button-styles';
 import { getReportScript } from './report-script';
 import { createWebviewCspNonce, escapeHtml } from './html-utils';
@@ -130,27 +131,42 @@ export function buildReportHtml(options: ReportOptions): string {
          via SMIL <animate>, so no inline style attributes are needed. -->
     <meta http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'nonce-${cspNonce}'; script-src 'nonce-${cspNonce}';">
-    <style nonce="${cspNonce}">${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}</style>
+    <style nonce="${cspNonce}">${getPillButtonStyles()}${getReportStyles()}${getChartStyles()}${getKeyboardShortcutsStyles()}${getPackageDetailStylesScoped()}</style>
 </head>
 <body>
-    <div class="report-header">
+    <header class="report-header">
         <div class="hero-text">
           <h1>${escapeHtml(l10n('packageDashboard.heroTitle'))} <span class="header-version">v${escapeHtml(options.extensionVersion)}</span></h1>
           ${statusLineHtml.replace('</p>', `${buildKeyboardShortcutsButton()}${buildFullWidthToggle()}</p>`)}
         </div>
         ${buildRadialGauge(avg)}
-    </div>
+    </header>
+    <main>
     ${buildGradeBreakdown(results, avg)}
     ${buildReportSummary(options)}
     ${buildChartSection(results)}
     ${buildFiltersSection(options)}
+    <div class="dash-split">
     ${buildPackagesSection(results, options)}
+    ${/* Docked master-detail pane (§7). Hidden until a row is selected so the
+        default view stays the full-width table; the host renders one package's
+        rich detail on demand and the client injects it here, replacing the
+        former standalone PackageDetailPanel tab. */ ''}
+    <aside id="detail-pane" class="detail-pane pkg-detail" aria-label="${escapeHtml(l10n('packageDashboard.detailPane.aria'))}" tabindex="-1" hidden>
+        <div class="detail-pane-head">
+            <span class="detail-pane-kicker">${escapeHtml(l10n('packageDashboard.detailPane.title'))}</span>
+            <button type="button" class="detail-pane-close" id="detailPaneClose" title="${escapeHtml(l10n('packageDashboard.detailPane.close'))}" aria-label="${escapeHtml(l10n('packageDashboard.detailPane.close'))}">×</button>
+        </div>
+        <div id="detail-pane-body"></div>
+    </aside>
+    </div>
     ${/* Network panel lives at the bottom: it's a wide, scrollable diagram
        * that pushes the high-density table further down when placed above,
        * so users had to scroll past it just to reach the package list.
        * Anchoring it after the table keeps the primary view (status, chart,
        * table) immediately visible and treats the network as a drill-down. */ ''}
     ${buildNetworkSection(results)}
+    </main>
     ${buildKeyboardShortcutsOverlay([
         { key: '/', label: l10n('packageDashboard.shortcuts.focusSearch') },
         { key: '↓ / j', label: l10n('packageDashboard.shortcuts.nextRow') },
@@ -565,16 +581,16 @@ function buildReportSummary(options: ReportOptions): string {
             data-total-size-total="${totalAllBytes}">
             <div class="count">${totalSize}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.totalSize'))}</div>
         </div>
-        <div class="summary-card vibrant" data-filter="vibrant" title="${escapeHtml(gradeTitle('vibrantTitle'))}"><div class="count">${counts.vibrant}</div><div class="label">A</div></div>
-        <div class="summary-card stable" data-filter="stable" title="${escapeHtml(gradeTitle('stableTitle'))}"><div class="count">${counts.stable}</div><div class="label">B</div></div>
-        <div class="summary-card outdated" data-filter="outdated" title="${escapeHtml(gradeTitle('outdatedTitle'))}"><div class="count">${counts.outdated}</div><div class="label">C</div></div>
-        <div class="summary-card abandoned" data-filter="abandoned" title="${escapeHtml(gradeTitle('abandonedTitle'))}"><div class="count">${counts.abandoned}</div><div class="label">E</div></div>
-        <div class="summary-card eol" data-filter="end-of-life" title="${escapeHtml(gradeTitle('eolTitle'))}"><div class="count">${counts.eol}</div><div class="label">F</div></div>
-        <div class="summary-card updates" data-filter="updates"><div class="count">${updates}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.updates'))}</div></div>
-        <div class="summary-card unused" data-filter="unused"><div class="count">${results.filter(r => r.isUnused).length}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.unused'))}</div></div>
-        ${singleUse > 0 ? `<div class="summary-card single-use" data-filter="single-use"><div class="count">${singleUse}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.singleUse'))}</div></div>` : ''}
-        <div class="summary-card vulns" data-filter="vulns"><div class="count">${vulnPackages}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.vulnerable'))}</div></div>
-        <div class="summary-card overrides" data-filter="overrides"><div class="count">${overrideCount}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.overrides'))}</div></div>
+        <div class="summary-card vibrant" data-filter="vibrant" role="button" tabindex="0" title="${escapeHtml(gradeTitle('vibrantTitle'))}"><div class="count">${counts.vibrant}</div><div class="label">A</div></div>
+        <div class="summary-card stable" data-filter="stable" role="button" tabindex="0" title="${escapeHtml(gradeTitle('stableTitle'))}"><div class="count">${counts.stable}</div><div class="label">B</div></div>
+        <div class="summary-card outdated" data-filter="outdated" role="button" tabindex="0" title="${escapeHtml(gradeTitle('outdatedTitle'))}"><div class="count">${counts.outdated}</div><div class="label">C</div></div>
+        <div class="summary-card abandoned" data-filter="abandoned" role="button" tabindex="0" title="${escapeHtml(gradeTitle('abandonedTitle'))}"><div class="count">${counts.abandoned}</div><div class="label">E</div></div>
+        <div class="summary-card eol" data-filter="end-of-life" role="button" tabindex="0" title="${escapeHtml(gradeTitle('eolTitle'))}"><div class="count">${counts.eol}</div><div class="label">F</div></div>
+        <div class="summary-card updates" data-filter="updates" role="button" tabindex="0"><div class="count">${updates}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.updates'))}</div></div>
+        <div class="summary-card unused" data-filter="unused" role="button" tabindex="0"><div class="count">${results.filter(r => r.isUnused).length}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.unused'))}</div></div>
+        ${singleUse > 0 ? `<div class="summary-card single-use" data-filter="single-use" role="button" tabindex="0"><div class="count">${singleUse}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.singleUse'))}</div></div>` : ''}
+        <div class="summary-card vulns" data-filter="vulns" role="button" tabindex="0"><div class="count">${vulnPackages}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.vulnerable'))}</div></div>
+        <div class="summary-card overrides" data-filter="overrides" role="button" tabindex="0"><div class="count">${overrideCount}</div><div class="label">${escapeHtml(l10n('packageDashboard.summary.overrides'))}</div></div>
     </div>`;
 }
 
@@ -606,7 +622,7 @@ function buildPackagesSection(
     const title = escapeHtml(l10n('packageDashboard.sections.packages'));
     return `<details class="packages-section dashboard-collapsible" open>
         <summary><h2>${title}</h2></summary>
-        ${buildReportTable(results, options.overrideNames, options.packageTrends)}
+        <div class="table-scroll">${buildReportTable(results, options.overrideNames, options.packageTrends)}</div>
     </details>`;
 }
 
@@ -793,8 +809,8 @@ function buildReportTable(
 
     return `<table>
         <thead><tr>
-            <th class="col-expand"></th>
-            <th class="col-copy"></th>
+            <th class="col-expand"><span class="sr-only">${escapeHtml(l10n('a11y.expandRow'))}</span></th>
+            <th class="col-copy"><span class="sr-only">${escapeHtml(l10n('a11y.copyRow'))}</span></th>
             ${th('name', col('name', 'label'), col('name', 'tooltip'))}
             ${th('version', col('version', 'label'), col('version', 'tooltip'))}
             ${th('score', col('score', 'label'), col('score', 'tooltip'))}
@@ -905,10 +921,11 @@ function buildRow(
         ${buildUpdateCell(r)}
         ${hidden.has('status') ? '' : buildStatusCell(r)}
         ${hidden.has('description') ? '' : buildDescCell(r)}
-    </tr>
-    <tr class="detail-row" data-detail-for="${name}" hidden>
-        <td colspan="${colspan}">${buildDetailCard(r)}</td>
     </tr>`;
+    // The former inline detail row (buildDetailCard) is retired: selecting a row
+    // now opens the richer docked detail pane (report-script openDetailPane),
+    // so the dashboard has ONE detail surface instead of a light inline card
+    // plus the standalone panel.
 }
 
 function buildNameCell(r: VibrancyResult): string {

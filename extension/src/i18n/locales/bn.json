@@ -1,1152 +1,1171 @@
 {
   "consolidated": {
-    "kicker": "নিরাপত্তা · গুণমান",
+    "kicker": "নিরাপত্তা · গুণমান · সুরক্ষা",
     "searchPlaceholder": "ফিল্টার নিয়ম...",
-    "empty": "সব পরিষ্কার - কোন অনুসন্ধান",
-    "liveTitle": "লাইভ — আপনি সম্পাদনা করার সাথে সাথে আপডেট",
-    "fetching": "আনা হচ্ছে...",
-    "noOccurrences": "কোন ঘটনা নেই",
+    "empty": "সব পরিষ্কার  ⁇ কোন ফলাফল পাওয়া যায়নি",
+    "liveTitle": "লাইভ  ⁇ আপনি সম্পাদনা করার সময় আপডেটগুলি আপডেটেড হয়।",
+    "fetching": "আনা... আনতে ...",
+    "noOccurrences": "কোন ঘটনা ঘটেনি।",
     "summaryFindings": "{count} ফাইন্ডিং",
     "summaryRules": "{count} রুল",
-    "more": "+{count} আরও",
-    "wordErrors": "ত্রুটি",
-    "wordWarnings": "সতর্কতা",
-    "wordInfo": "তথ্য",
-    "wordFiles": "ফাইল",
-    "gradeExcellent": "চমৎকার",
-    "gradeGood": "ভাল",
-    "gradeFair": "মেলা",
-    "gradeWeak": "দুর্বল",
-    "gradeSevere": "গুরুতর"
+    "more": "+{count} আরো বেশি",
+    "wordErrors": "ত্রুটিগুলি ভুল ত্রুটি ত্রুটি",
+    "wordWarnings": "সতর্কতা, সতর্কবার্তা।",
+    "wordInfo": "তথ্যের জন্য, তথ্যের সাথে যোগাযোগ করুন।",
+    "wordFiles": "ফাইলগুলি ফাইলগুলির মধ্যে রয়েছে",
+    "gradeExcellent": "চমৎকার, অসাধারণ।",
+    "gradeGood": "ভাল, ভালো, ভালো",
+    "gradeFair": "Fair fair মেলা মেলা",
+    "gradeWeak": "দুর্বল, দুর্বল।",
+    "gradeSevere": "গুরুতর মারাত্মক তীব্র"
   },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints — {count} কনফিগারেশন পরামর্শ(গুলি)",
+    "badgeTooltip": "Saropa Lints  ⁇   ⁇ {count} কনফিগ পরামর্শ (s)",
     "initMissing": {
-      "title": "Saropa Lints সেট আপ করুন (init চালান)",
-      "detail": "saropa_lints পাবস্পেকে আছে কিন্তু কোনো বিশ্লেষক কনফিগারেশন এখনও ওয়্যার্ড করা হয়নি"
+      "title": "Saropa Lints সেট আপ করুন (রান ইনিশ)",
+      "detail": "saropa_lints pubspec-এ রয়েছে কিন্তু কোন বিশ্লেষক কনফিগারেশন এখনো সংযুক্ত করা হয়নি।"
     },
     "packAvailable": {
-      "title": "{pack} নিয়ম প্যাক সক্ষম করুন",
-      "detail": "আপনার পাবস্পেকের প্যাকেজের জন্য {count} নিয়ম"
+      "title": "{pack} নিয়ম প্যাক সক্ষম করুন।",
+      "detail": "{count} আপনার পাবস্পেকের একটি প্যাকেজের জন্য নিয়ম।"
     },
-    "enabledToast": "analysis_options.yaml-এ {pack} নিয়ম প্যাক সক্রিয় করা হয়েছে",
-    "enableFailed": "{pack} নিয়ম প্যাক সক্ষম করা যায়নি — এটি সক্ষম করতে নিয়ম প্যাক ড্যাশবোর্ড খুলুন"
+    "enabledToast": "analysis_options.yaml এ {pack} রুল প্যাক সক্ষম করা হয়েছে।",
+    "enableFailed": "{pack} নিয়ম প্যাক  ⁇  সক্ষম করতে পারেনি এটি সক্ষম করতে নিয়ম প্যাক ড্যাশবোর্ড খুলুন।"
   },
   "startupNudge": {
-    "message": "Saropa Lints: {count} নিয়ম প্যাক পরামর্শ(গুলি) এই প্রকল্পে প্রযোজ্য।",
-    "review": "পর্যালোচনা",
-    "dismiss": "খারিজ"
+    "message": "Saropa Lints: PH1__ এর সাথে সম্পর্কিতঃ {count} নিয়ম প্যাক পরামর্শগুলি এই প্রকল্পের জন্য প্রযোজ্য।",
+    "review": "পর্যালোচনা পর্যালোচনার পর্যালোচনায় পর্যালোচনামূলকভাবে পর্যালোচিত হয়",
+    "dismiss": "বরখাস্ত করা হয়।",
+    "reviewFailed": "Saropa Lints নিয়ম প্যাক পর্যালোচনা খোলা যায়নি। {error}"
   },
   "packageDetail": {
     "section": {
-      "version": "সংস্করণ",
-      "community": "সম্প্রদায়",
-      "dependencies": "নির্ভরতা",
-      "alerts": "সতর্কতা",
-      "platforms": "প্ল্যাটফর্ম",
-      "suggestions": "পরামর্শ",
-      "readmeImages": "README ইমেজ"
+      "version": "VERSION সংস্করণ",
+      "community": "কমিউনিটি সম্প্রদায়ের সদস্যরা।",
+      "dependencies": "ডিপেনডেন্সিগুলি",
+      "alerts": "সতর্কতা Alerts",
+      "platforms": "প্ল্যাটফর্মগুলি প্ল্যাটଫর্মগুলির জন্য উপযুক্ত",
+      "suggestions": "পরামর্শগুলি সুপারিশ করুন",
+      "readmeImages": "README ইমেজগুলি পড়ুন"
     },
     "header": {
       "logoAlt": "{name} লোগো",
       "grade": "গ্রেড {grade}",
-      "licenseTitle": "লাইসেন্স",
+      "licenseTitle": "লাইসেন্স লাইসেন্সিং",
       "published": "প্রকাশিত {date}"
     },
     "partialBanner": {
-      "partReadme": "README এবং লোগো",
-      "partGap": "সংস্করণ-ব্যবধান পিআর এবং সমস্যা",
-      "partReverseDeps": "বিপরীত নির্ভরতা গণনা",
-      "listTwo": "{first} এবং {second}",
-      "listMany": "{head}, এবং {last}",
-      "message": "কিছু বিভাগ লোড করা যায়নি: {list}।",
-      "retry": "আবার চেষ্টা করুন",
-      "retryTitle": "ব্যর্থ আনা পুনরায় চেষ্টা করুন."
+      "partReadme": "README এবং লোগো।",
+      "partGap": "সংস্করণ-বিভাজন পিআর এবং ইস্যুগুলির সমস্যাগুলি।",
+      "partReverseDeps": "বিপরীত নির্ভরতা গণনা কাউন্টার",
+      "listTwo": "{first} এবং {second} এর মধ্যে _",
+      "listMany": "{head}, এবং {last}।",
+      "message": "কিছু বিভাগ লোড করা যায়নিঃ {list}.",
+      "retry": "পুনরায় চেষ্টা করুন Retry.",
+      "retryTitle": "ব্যর্থ fetches পুনরায় চেষ্টা করুন।"
     },
     "description": {
-      "readMore": "আরো পড়ুন"
+      "readMore": "আরও পড়ুন Read More"
     },
     "version": {
-      "constraint": "সীমাবদ্ধতা",
-      "latest": "সর্বশেষ",
-      "prerelease": "প্রিলিলিজ",
-      "published": "প্রকাশিত হয়েছে",
-      "update": "আপডেট",
-      "blockedBy": "দ্বারা অবরুদ্ধ",
-      "codeSize": "কোড সাইজ",
-      "archiveSize": "সংরক্ষণাগার আকার",
-      "bloat": "({rating}/10 ব্লোট)",
-      "onDisk": "ডিস্কে",
-      "upgrade": "আপগ্রেড করুন",
+      "constraint": "সীমাবদ্ধতা প্রতিবন্ধকতা",
+      "latest": "সর্বশেষ Latest সাম্প্রতিকতম",
+      "prerelease": "প্রি-রিলিজ প্রাক রিলিজ",
+      "published": "প্রকাশিত প্রকাশিত Published",
+      "update": "আপডেট করুন Update Update",
+      "blockedBy": "দ্বারা ব্লক করা হয়েছে",
+      "blockedVia": "{blocker} ক্যাপস {dep} {constraint} ({resolvable} সমাধানযোগ্য, {latest} সর্বশেষ)",
+      "blockedViaSdk": "{dep} ({resolvable} সমাধানযোগ্য, {latest} সর্বশেষ) জন্য {blocker} (Flutter SDK) দ্বারা পিন করা হয়েছে",
+      "constrained": "সীমাবদ্ধতা দ্বারা আবদ্ধ।",
+      "constrainedBy": "আপনার {constraint} সীমাবদ্ধতা এটিকে ক্যাপ করে ({resolvable} সমাধানযোগ্য, {latest} সর্বশেষ) ।",
+      "pinHeld": "অনুষ্ঠিত হয়েছিল Held",
+      "pinDoNotUse": "ব্যবহার করবেন না।",
+      "drift": "ক্রস-প্রকল্প ড্রিফট ড্রাইভ।",
+      "driftBehind": "পিছনে: {siblings} (আপনার কাছে {own} আছে)",
+      "driftDiffers": "পার্থক্য: {siblings} (আপনার {own} আছে)",
+      "codeSize": "কোডের আকার, কোড সাইজ",
+      "archiveSize": "আর্কাইভের আকার আর্কইভের আয়তন",
+      "bloat": "({rating}/10 bloat) এর সাথে সম্পর্কিত",
+      "onDisk": "ডিস্ক অন ডিস্কে",
+      "upgrade": "আপগ্রেড করুন আপগ্রিড আপগ্রেস।",
       "viewChangelog": "চেঞ্জলগ দেখুন"
     },
     "community": {
-      "stars": "তারা",
-      "likes": "পছন্দ",
-      "report": "রিপোর্ট",
-      "openIssues": "ওপেন ইস্যু",
-      "openPrs": "পিআর খুলুন",
+      "stars": "নক্ষত্র তারকা তারা",
+      "likes": "পছন্দগুলি পছন্দ করে",
+      "report": "রিপোর্ট, প্রতিবেদন",
+      "openIssues": "উন্মুক্ত সমস্যাসমূহ",
+      "openPrs": "ওপেন পিআরএস (Open PRs) এর মাধ্যমে।",
       "activity": "কার্যকলাপ (90d)",
-      "activityValue": "{closed} সমস্যাগুলি বন্ধ, {merged} PRs একত্রিত হয়েছে৷",
-      "noActivity": "কোনো সাম্প্রতিক কার্যকলাপ নেই",
-      "lastCommit": "লাস্ট কমিট",
-      "pubPoints": "পাব পয়েন্ট",
+      "activityValue": "{closed} ইস্যু বন্ধ, {merged} PRs একত্রিত।",
+      "noActivity": "সাম্প্রতিক কোন কার্যকলাপ নেই",
+      "lastCommit": "সর্বশেষ প্রতিশ্রুতি শেষ কমিট",
+      "pubPoints": "পাব পয়েন্টস (Pub Points)",
       "verified": "(যাচাইকৃত)",
-      "publisher": "প্রকাশক",
+      "publisher": "প্রকাশক সম্পাদক প্রকাশক।",
       "flagged": "({count} পতাকাঙ্কিত)",
-      "transitiveDeps": "ট্রানজিটিভ ডিপস",
+      "transitiveDeps": "ট্রানজিটিভ ডিপস।",
       "footprintBreakdown": "{unique} অনন্য &middot; +{shared} ভাগ করা = {total} মোট",
-      "footprintTooltip": "নিজস্ব {own} + অনন্য ট্রানজিটিভ {unique} + শেয়ার করা ট্রানজিটিভ {shared}। এই ডিপটি সরানো হলে {saved} (শেয়ারড ডিপগুলি অন্যদের দ্বারা টানা থাকে) সংরক্ষণ করে।",
-      "trueFootprint": "সত্যিকারের পদচিহ্ন",
+      "footprintTooltip": "নিজস্ব {own} + অনন্য ট্রানজিটিভস {unique} + ভাগ করা ট্রানজিটভ্স {shared}. এই dep অপসারণ {saved} সংরক্ষণ করে (ভাগ করা deps অন্যদের দ্বারা টানা থাকে).",
+      "trueFootprint": "সত্যিকারের পদচিহ্নের ছাপ",
       "packagesCount": "{count} প্যাকেজ",
-      "dependents": "নির্ভরশীল"
+      "dependents": "নির্ভরশীল ব্যক্তিরা"
     },
     "fileUsages": {
-      "commentedOut": "মন্তব্য করা রেফারেন্স:",
-      "fileCount": "{count} ফাইল",
-      "exportNoteTitle": "অন্তত একটি ব্যবহার একটি রপ্তানি নির্দেশ",
-      "publicApiSurface": "সর্বজনীন API পৃষ্ঠ",
+      "commentedOut": "মন্তব্য-বহির্ভূত রেফারেন্সঃ",
+      "fileCount": "{count} ফাইলগুলি _PH0_ ফাইলগুলিতে সংরক্ষণ করে।",
+      "exportNoteTitle": "অন্তত একটি ব্যবহার রপ্তানি নির্দেশিকা।",
+      "publicApiSurface": "পাবলিক এপিআই সারফেস API পৃষ্ঠ",
       "header": "ফাইল ব্যবহার ({label})",
-      "commentedReexportTitle": "মন্তব্য-আউট পুনরায় রপ্তানি",
-      "reexportTitle": "পুনরায় রপ্তানি করা হয়েছে — এই লাইব্রেরির সর্বজনীন API-এর অংশ",
-      "reexportBadge": "পুনরায় রপ্তানি"
+      "commentedReexportTitle": "মন্তব্য-আউট পুনরায় রফতানি",
+      "reexportTitle": "পুনরায় রফতানি করা হয়েছে এই লাইব্রেরির পাবলিক এপিআই এর অংশ।",
+      "reexportBadge": "রিকোস্ট-এক্সপোর্ট পুনরায় রপ্তানি"
     },
     "alerts": {
-      "archived": "আর্কাইভ করা — সংগ্রহস্থল শুধুমাত্র পঠনযোগ্য",
-      "knownIssue": "পরিচিত সমস্যা: {reason}",
-      "unused": "অব্যবহৃত — কোনো আমদানি শনাক্ত হয়নি",
-      "fix": "— ঠিক করুন: {version}"
+      "archived": "আর্কাইভ করা  ⁇  সংগ্রহস্থলটি কেবল পঠনযোগ্য।",
+      "knownIssue": "পরিচিত ইস্যুঃ {reason}",
+      "unused": "অব্যবহৃত  ⁇  কোন আমদানি সনাক্ত করা যায়নি",
+      "fix": "⁇  ঠিক করুনঃ {version}"
     },
     "versionGap": {
-      "versionTitle": "সংস্করণ গ্যাপ",
-      "overrideTitle": "গ্যাপ ওভাররাইড করুন",
-      "noDates": "এই প্যাকেজের সংস্করণের তারিখ নির্ধারণ করা যায়নি।",
-      "noItems": "এই সংস্করণগুলির মধ্যে কোন PR বা সমস্যা পাওয়া যায়নি।",
-      "prsMerged": "PRs একীভূত",
-      "issuesClosed": "সমস্যা বন্ধ",
-      "searchLabel": "সার্চ পিআর এবং সমস্যা",
-      "searchPlaceholder": "সার্চ পিআর এবং সমস্যা...",
-      "filterAria": "বিভাগ অনুসারে ফিল্টার করুন",
-      "filterAll": "সব",
-      "filterUnreviewed": "পর্যালোচনা করা হয়নি",
-      "filterPrs": "পিআর",
-      "filterIssues": "ইস্যু",
-      "typePr": "জনসংযোগ",
-      "typeIssue": "ইস্যু",
+      "versionTitle": "Gap Version গ্যাপ সংস্করণ",
+      "overrideTitle": "ওভাররাইড গ্যাপকে উপেক্ষা করুন।",
+      "noDates": "এই প্যাকেজের জন্য সংস্করণ তারিখগুলি নির্ধারণ করতে পারেনি।",
+      "noItems": "এই সংস্করণগুলির মধ্যে কোনও পিআর বা সমস্যা পাওয়া যায় নি।",
+      "prsMerged": "পিআরএস একত্রিত হয়েছে।",
+      "issuesClosed": "ইস্যুগুলি বন্ধ হয়েছে, সমস্যাগুলি বন্ধ হয়ে গেছে।",
+      "searchLabel": "PRs এবং সমস্যা অনুসন্ধান করুন।",
+      "searchPlaceholder": "পিআর এবং ইস্যু অনুসন্ধান করুন ... সমস্যাগুলি সন্ধান করুন।",
+      "filterAria": "বিভাগ অনুযায়ী ফিল্টার করুন।",
+      "filterAll": "সব, সমস্ত, সকলই",
+      "filterUnreviewed": "Unreviewed পর্যালোচনা করা হয়নি",
+      "filterPrs": "পিআরএস (PRs) -এর মাধ্যমে প্রকাশ্যে প্রচার করা হয়।",
+      "filterIssues": "ইস্যুগুলি সমস্যাগুলি",
+      "typePr": "PR PR PR প্রিন্ট করুন",
+      "typeIssue": "ইস্যু ইস্যুর সমস্যা",
       "reviewReviewed": "পর্যালোচনা করা হয়েছে",
-      "reviewApplicable": "প্রযোজ্য",
+      "reviewApplicable": "প্রযোজ্য Applicable প্রয়োগযোগ্য",
       "reviewNotApplicable": "প্রযোজ্য নয়",
-      "notesPlaceholder": "নোট...",
-      "colType": "টাইপ",
-      "colTitle": "শিরোনাম",
-      "colAuthor": "লেখক",
-      "colReview": "পর্যালোচনা",
+      "notesPlaceholder": "নোট...নোট।",
+      "colType": "টাইপ প্রকারের ধরণ",
+      "colTitle": "Title শিরোনাম নামকরণ",
+      "colAuthor": "লেখক লেখিকা লেখক লেখক Author",
+      "colReview": "পর্যালোচনা পর্যালোচনার পর্যালোচনায় পর্যালোচনামূলকভাবে পর্যালোচিত হয়",
       "summaryFooter": "{total} এর {triaged} triaged | {applicable} প্রযোজ্য | {notApplicable} N/A | {unreviewed} বাকি",
-      "truncated": "{limit} আইটেমগুলিতে ফলাফলগুলি কাটা হয়েছে৷"
+      "truncated": "ফলাফলগুলি {limit} আইটেমগুলিতে সংক্ষিপ্ত করা হয়েছে।"
     },
     "platforms": {
-      "wasm": "ডব্লিউএএসএম"
+      "wasm": "WASM এর অর্থ হচ্ছে ওয়াসম।"
     },
     "images": {
-      "alt": "README ইমেজ"
+      "alt": "README ইমেজ চিত্র Readme"
     },
     "links": {
       "viewOnPubDev": "pub.dev এ দেখুন",
-      "documentation": "ডকুমেন্টেশন",
-      "changelog": "চেঞ্জলগ",
-      "versions": "সংস্করণ",
-      "repository": "ভান্ডার",
-      "openIssues": "ওপেন ইস্যু",
-      "reportIssue": "রিপোর্ট ইস্যু"
+      "documentation": "ডকুমেন্টেশন নথিভুক্তকরণ",
+      "changelog": "পরিবর্তনের লগ পরিবর্তন করুন",
+      "versions": "সংস্করণগুলি Versions",
+      "repository": "রেপোজিটরি রিপজিটরি।",
+      "openIssues": "উন্মুক্ত সমস্যাসমূহ",
+      "reportIssue": "রিপোর্ট ইস্যু সমস্যা"
     },
     "a11y": {
-      "skipToDetails": "প্যাকেজের বিবরণ এড়িয়ে যান"
+      "skipToDetails": "প্যাকেজের বিশদটি এড়িয়ে যান।"
     },
     "shortcuts": {
-      "showOverlay": "এই শর্টকাট ওভারলে দেখান",
-      "closeOverlay": "কীবোর্ড-শর্টকাট ওভারলে বন্ধ করুন"
+      "showOverlay": "এই শর্টকাট ওভারলে প্রদর্শন করুন।",
+      "closeOverlay": "কীবোর্ড-শর্টকাট ওভারলেটি বন্ধ করুন।"
     }
   },
   "toolbar": {
-    "runAnalysis": "বিশ্লেষণ চালান",
-    "rescan": "রিস্ক্যান করুন",
-    "refresh": "রিফ্রেশ",
+    "runAnalysis": "Run analysis চালান বিশ্লেষণ",
+    "rescan": "পুনরায় স্ক্যান করুন Rescan",
+    "refresh": "সতেজতা আনুন এবং রিফ্রেশ করুন।",
     "copyJson": "JSON কপি করুন",
-    "saveReport": "প্রতিবেদন সংরক্ষণ করুন",
-    "moreActions": "আরো কর্ম",
-    "clearAll": "সব সাফ করুন",
-    "resetView": "ভিউ রিসেট করুন"
+    "saveReport": "Save report save the report. প্রতিবেদন সংরক্ষণ করুন।",
+    "moreActions": "আরও কর্মকাণ্ড, আরো পদক্ষেপ",
+    "clearAll": "সব পরিষ্কার, সবকিছু সাফ।",
+    "resetView": "রিসেট ভিউতে, পুনরায় সেট করুন।"
   },
   "empty": {
-    "noFindingsTitle": "কোনো খোঁজ নেই",
-    "noFindingsMessage": "কর্মক্ষেত্র স্ক্যান করতে বিশ্লেষণ চালান।",
-    "noFindingsCta": "বিশ্লেষণ চালান",
-    "noMatchTitle": "কোন মিল নেই",
-    "noMatchMessage": "বর্তমান ফিল্টারগুলির সাথে কোনো সারি মেলে না৷",
-    "noMatchCta": "ফিল্টার রিসেট করুন",
-    "noProjectTitle": "কোন কর্মক্ষেত্র খোলা নেই",
-    "noProjectMessage": "ফলাফলগুলি দেখতে একটি Flutter বা Dart প্রকল্প খুলুন।",
-    "noProjectCta": "ফোল্ডার খুলুন",
-    "noDataTitle": "এখনো কোনো তথ্য নেই",
-    "noDataMessage": "এই ড্যাশবোর্ডটি পূরণ করতে একটি স্ক্যান চালান৷",
-    "noDataCta": "বিশ্লেষণ চালান"
+    "noFindingsTitle": "কোন ফলাফল পাওয়া যায়নি",
+    "noFindingsMessage": "ওয়ার্কস্পেস স্ক্যান করার জন্য বিশ্লেষণ চালান।",
+    "noFindingsCta": "Run analysis চালান বিশ্লেষণ",
+    "noMatchTitle": "কোন ম্যাচ নেই",
+    "noMatchMessage": "কোন সারি বর্তমান ফিল্টারগুলির সাথে মেলে না।",
+    "noMatchCta": "রিসেট ফিল্টারগুলি পুনরায় সেট করুন",
+    "noProjectTitle": "কোন ওয়ার্কস্পেস খোলা নেই।",
+    "noProjectMessage": "ফলাফল দেখতে একটি Flutter বা Dart প্রকল্প খুলুন।",
+    "noProjectCta": "ফোল্ডার মেনু খুলুন খোলা ফোলডার মেনুর খোলার",
+    "noDataTitle": "এখনও কোনও তথ্য নেই।",
+    "noDataMessage": "এই ড্যাশবোর্ডটি পূরণ করতে একটি স্ক্যান চালান।",
+    "noDataCta": "Run analysis চালান বিশ্লেষণ"
   },
   "loading": {
-    "thinking": "ভাবছেন…",
-    "preparing": "প্রস্তুত হচ্ছে...",
-    "checking": "পরীক্ষা করা হচ্ছে...",
-    "fetching": "আনা হচ্ছে...",
-    "working": "কাজ করছে...",
-    "scanning": "স্ক্যান করা হচ্ছে...",
-    "cancel": "বাতিল করুন",
-    "runningAnalysis": "বিশ্লেষণ চলছে...",
-    "analysisComplete": "বিশ্লেষণ সম্পূর্ণ",
-    "refreshingDashboard": "সাম্প্রতিক ফলাফলের সাথে ড্যাশবোর্ড রিফ্রেশ করছে।",
-    "analysisStartedDetail": "শুরু হলো বিশ্লেষণ। ডায়াগনস্টিকস সংগ্রহ করা হচ্ছে...",
-    "analysisFailedDetail": "বিশ্লেষণ ব্যর্থ হয়েছে. বিস্তারিত জানার জন্য আউটপুট চেক করুন."
+    "thinking": "ভাবছি... চিন্তা করছি।",
+    "preparing": "প্রস্তুতি... প্রস্তুত হচ্ছে।",
+    "checking": "চেকিং...চেকিং।",
+    "fetching": "আনা... আনতে ...",
+    "working": "কাজ... কাজ করে।",
+    "scanning": "স্ক্যানিং ... স্ক্রিন।",
+    "cancel": "বাতিল করুন Cancel",
+    "runningAnalysis": "চলমান বিশ্লেষণ ...",
+    "analysisComplete": "বিশ্লেষণ সম্পূর্ণ করুন, সমাপ্তি।",
+    "refreshingDashboard": "সর্বশেষ অনুসন্ধানগুলির সাথে রিফ্রেশিং ড্যাশবোর্ড।",
+    "analysisStartedDetail": "বিশ্লেষণ শুরু হয়েছে। ডায়াগনস্টিক সংগ্রহ ...",
+    "analysisFailedDetail": "বিশ্লেষণ ব্যর্থ হয়েছে. বিস্তারিত জানার জন্য আউটপুটটি পরীক্ষা করুন।"
   },
   "error": {
-    "genericTitle": "কিছু ভুল হয়েছে",
-    "retry": "আবার চেষ্টা করুন",
+    "genericTitle": "কিছু একটা ভুল হয়ে গেছে।",
+    "retry": "পুনরায় চেষ্টা করুন Retry.",
     "reload": "পুনরায় লোড করুন",
-    "copyDetails": "বিবরণ অনুলিপি করুন",
-    "unreachable": "{target} পৌঁছানো যায়নি",
+    "copyDetails": "কপি করুন বিস্তারিত তথ্য।",
+    "unreachable": "{target}-এ পৌঁছাতে পারেনি",
     "partialSummary": "{total} এর মধ্যে {loaded} {item} লোড হয়েছে। {failed} ব্যর্থ।",
     "partialRetry": "পুনরায় চেষ্টা ব্যর্থ হয়েছে"
   },
   "offline": {
-    "banner": "অফলাইন — রিফ্রেশ করতে পুনরায় সংযোগ করুন।",
-    "cachedFooter": "{when} থেকে ক্যাশে করা ডেটা দেখানো হচ্ছে।",
-    "reconnecting": "পুনরায় সংযোগ করা হচ্ছে..."
+    "banner": "অফলাইন  ⁇  রিফ্রেশ করার জন্য পুনরায় সংযোগ করুন।",
+    "cachedFooter": "{when}. থেকে ক্যাশেড ডেটা দেখানো হচ্ছে।",
+    "reconnecting": "পুনরায় সংযোগ... পুনঃসংযোগ করা হচ্ছে।"
   },
   "stale": {
-    "statusPill": "শেষ সফল রান {when} — রিফ্রেশ ব্যর্থ হয়েছে৷"
+    "statusPill": "সর্বশেষ সফল রান {when}  ⁇  রিফ্রেশ ব্যর্থ হয়েছে"
   },
   "filter": {
-    "searchPlaceholder": "অনুসন্ধান…",
-    "clearSearch": "সাফ অনুসন্ধান",
-    "activeLabel": "সক্রিয় ফিল্টার:",
-    "recentLabel": "সাম্প্রতিক ▾",
-    "chipRemove": "সরান"
+    "searchPlaceholder": "অনুসন্ধান... সার্চ ...",
+    "clearSearch": "অনুসন্ধান সাফ করুন পরিষ্কার অনুসন্ধান",
+    "activeLabel": "সক্রিয় ফিল্টারঃ",
+    "recentLabel": "সাম্প্রতিক  ⁇",
+    "chipRemove": "Remove remove অপসারণ করা"
   },
   "a11y": {
-    "toggleFullWidth": "পূর্ণ-প্রস্থ লেআউট টগল করুন",
-    "sortBy": "{column} অনুসারে সাজান",
-    "expandRow": "সারি প্রসারিত করুন",
-    "collapseRow": "সারি সঙ্কুচিত করুন",
-    "selectAll": "সব সারি নির্বাচন করুন",
-    "keyboardShortcuts": "কীবোর্ড শর্টকাট",
-    "announcer": "ফিল্টার এবং সাজানোর অবস্থার আপডেটগুলি এখানে ঘোষণা করা হয়েছে।"
+    "toggleFullWidth": "টগল করুন পূর্ণ-প্রস্থের লেআউট।",
+    "sortBy": "{column} দ্বারা বাছাই করুন।",
+    "expandRow": "রিং সম্প্রসারণ করুন",
+    "copyRow": "কপি রাইডের অনুলিপি করুন",
+    "comparisonDimension": "মেট্রিক্স (Metric) হলো একটি পরিমাপ পদ্ধতি।",
+    "collapseRow": "পতন সারি ভাঙ্গন সারণী",
+    "selectAll": "সমস্ত সারি নির্বাচন করুন।",
+    "keyboardShortcuts": "কীবোর্ড শর্টকাটগুলি",
+    "announcer": "ফিল্টার এবং বাছাইয়ের স্থিতির আপডেটগুলি এখানে ঘোষণা করা হয়েছে।"
   },
   "uiLanguage": {
     "pick": {
       "title": "Saropa Lints UI ভাষা",
-      "placeholder": "সাইডবার এবং ড্যাশবোর্ডের জন্য ভাষা বেছে নিন",
-      "auto": "স্বয়ংক্রিয় (VS Code প্রদর্শন ভাষা অনুসরণ করুন)",
-      "coverage": "{pct}% অনূদিত — বাকি দেখায় ইংরেজিতে"
+      "placeholder": "সাইডবার এবং ড্যাশবোর্ডের জন্য ভাষা নির্বাচন করুন।",
+      "auto": "অটো (পরবর্তী VS Code প্রদর্শন ভাষা)",
+      "coverage": "{pct}% অনুবাদ  ⁇ বিশ্রাম শো ইংরেজিতে দেখায়"
     },
-    "reloadPrompt": "ভাষা {locale} এ সেট করা হয়েছে। সাইডবার এবং কমান্ড লেবেল আপডেট করতে উইন্ডোটি পুনরায় লোড করুন।",
-    "reloadNow": "এখন রিলোড করুন",
-    "reloadLater": "পরে"
+    "reloadPrompt": "ভাষা {locale}. সেট করা আছে। সাইডবার এবং কমান্ড লেবেল আপডেট করতে উইন্ডোটি পুনরায় লোড করুন।",
+    "reloadNow": "এখনই পুনরায় লোড করুন।",
+    "reloadLater": "পরে পরবর্তীতে পরে পরে"
   },
   "brand": {
     "prefix": "Saropa "
   },
   "findingsDash": {
-    "pageTitle": "Saropa Findings ড্যাশবোর্ড",
-    "documentTitle": "Saropa Findings ড্যাশবোর্ড",
-    "skipToFindings": "ফলাফল এড়িয়ে যান",
+    "pageTitle": "Saropa ফলাফল ড্যাশবোর্ড",
+    "documentTitle": "Saropa ফলাফল ড্যাশবোর্ড",
+    "skipToFindings": "ফলাফল এড়িয়ে যান।",
     "secondaryAsideLabel": "সেকেন্ডারি ডায়াগনস্টিকস",
     "hero": {
-      "productTitle": "অনুসন্ধান ড্যাশবোর্ড",
-      "gaugeTitle": "স্বাস্থ্য স্কোর {score} (গ্রেড {grade})। ত্রুটিগুলি সবচেয়ে ভারী।",
+      "productTitle": "ফলাফল ড্যাশবোর্ড",
+      "gaugeTitle": "স্বাস্থ্য স্কোর {score} (গ্রেড {grade}) । ভুলের ওজন সবচেয়ে বেশি।",
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "এইমাত্র",
+      "justNow": "এইমাত্র, এখনই।",
       "minutesAgo": "{min} মিনিট আগে",
       "hoursAgo": "{hr} ঘণ্টা আগে",
       "daysAgo": "{day} দিন আগে"
     },
     "status": {
-      "lastRunPrefix": "শেষ রান",
-      "lastRunUnknown": "শেষ রান অজানা",
-      "noTimestampTitle": "violations.json-এ কোনো টাইমস্ট্যাম্প নেই",
-      "findingsAfterFilterTitle": "নিষ্ক্রিয়-নিয়ম ফিল্টারের পরে মোট ফলাফল",
+      "lastRunPrefix": "শেষ রান, সর্বশেষ চালানো।",
+      "updatedPrefix": "আপডেট করা হয়েছে Updated",
+      "refreshHint": "বিশ্লেষক থেকে রিফ্রেশ করতে ক্লিক করুন।",
+      "lastRunUnknown": "শেষ চালানো অজানা",
+      "noTimestampTitle": "violations.json এ কোন টাইমস্ট্যাম্প নেই।",
+      "findingsAfterFilterTitle": "অক্ষম-নিয়ম ফিল্টার করার পরে মোট ফলাফলগুলি",
       "findingOne": "{count} ফাইন্ডিং",
       "findingOther": "{count} ফাইন্ডিং",
-      "todoHackTitle": "কর্মক্ষেত্রে TODO এবং HACK মার্কার পাওয়া গেছে",
-      "driftOnTitle": "ড্রিফ্ট উপদেষ্টা সংযুক্ত: {label}",
-      "driftOnPill": "ড্রিফ্ট অন · {count}",
-      "driftOfflineTitle": "ড্রিফ্ট অ্যাডভাইজার সক্রিয় কিন্তু কোনো সার্ভার পাওয়া যায়নি",
-      "driftOfflinePill": "ড্রিফ্ট অফলাইন",
-      "enabledRulesTitle": "বর্তমান স্তরে নিয়ম চালু করা হয়েছে",
+      "todoHackTitle": "কর্মক্ষেত্রে TODO এবং HACK মার্কার পাওয়া গেছে।",
+      "driftOnTitle": "ড্রিফট অ্যাডভাইজার সংযুক্তঃ {label}",
+      "driftOnPill": "ড্রিফট অন · {count}",
+      "driftOfflineTitle": "ড্রিফট অ্যাডভাইজার সক্ষম করা হয়েছে কিন্তু কোন সার্ভার পাওয়া যায়নি।",
+      "driftOfflinePill": "ড্রাইভ অফলাইন ড্রিফট করুন",
+      "enabledRulesTitle": "বর্তমান স্তরের সক্ষম নিয়মগুলিকে সক্রিয় করা হয়েছে",
       "rulesCount": "{count} রুল"
     },
     "groupBy": {
-      "severity": "তীব্রতা",
-      "file": "ফাইল",
-      "impact": "প্রভাব",
-      "rule": "নিয়ম",
+      "severity": "গুরুতরতা Severity",
+      "file": "ফাইলের নাম File file",
+      "impact": "প্রভাবের উপর প্রভাব ফেলার জন্য একটি কার্যকর উপায়।",
+      "rule": "নিয়মকানুন Rule Rule",
       "owasp": "OWASP",
-      "ruleType": "নিয়মের ধরন",
-      "ruleStatus": "নিয়মের অবস্থা"
+      "ruleType": "নিয়মের ধরন Rule type",
+      "ruleStatus": "Rule Status রুল স্ট্যাটাস"
     },
     "seg": {
-      "toggleSeverityTitle": "{v} তীব্রতা টগল করুন",
-      "toggleImpactTitle": "{v} প্রভাব টগল করুন"
+      "toggleSeverityTitle": "টগল {v} তীব্রতা।",
+      "toggleImpactTitle": "টগল {v} প্রভাব প্রভাব টগলে।"
     },
     "kpi": {
-      "visibleLabel": "দৃশ্যমান ফলাফল",
-      "allMatched": "সব মিলে গেছে",
-      "ofTotal": "মোট {total} এর",
-      "clearFiltersTitle": "সমস্ত ফিল্টার সাফ করতে ক্লিক করুন",
-      "errorsLabel": "ত্রুটি",
-      "errorsSubFix": "ঠিক করতে হবে",
-      "errorsSubClear": "কোনটি - পরিষ্কার",
-      "errorsTitle": "ফিল্টার ফাইন্ডিংগুলিকে ত্রুটি (সমাধান করতে হবে — ভাঙ্গা / বিপর্যস্ত হবে / শোষণযোগ্য)",
-      "warningsLabel": "সতর্কতা",
-      "warningsSubBad": "ব্যর্থ বা খারাপ দেখতে পারে",
-      "warningsSubClear": "কোনটি - পরিষ্কার",
-      "warningsTitle": "সতর্কতাগুলিকে ফিল্টার করুন (ব্যর্থ হতে পারে বা খারাপ দেখতে পারে)",
-      "infoLabel": "তথ্য",
-      "infoSub": "FYI — শৈলী / পরামর্শ",
-      "infoSubNone": "কোনটি",
-      "infoTitle": "তথ্য ফিল্টার অনুসন্ধান (FYI — শৈলী এবং পরামর্শ)",
-      "filesLabel": "ফাইল প্রভাবিত",
-      "filesSubAcross": "রপ্তানি জুড়ে",
-      "filesSubNone": "কোন ফাইল প্রভাবিত",
-      "filesTitle": "স্বতন্ত্র ফাইল অন্তত একটি অনুসন্ধান অবদান",
-      "topRuleLabel": "শীর্ষ নিয়ম",
-      "topRuleTitle": "নিয়ম {name} করার জন্য অনুসন্ধানগুলি ফিল্টার করুন"
+      "visibleLabel": "দৃশ্যমান ফলাফলগুলি দৃশ্যমান।",
+      "allMatched": "সবগুলোই মিলছে, সবগুলো মিলে গেছে।",
+      "ofTotal": "{total} মোটের _PH0_ এর",
+      "clearFiltersTitle": "ক্লিক করুন সমস্ত ফিল্টার সাফ করতে।",
+      "errorsLabel": "ত্রুটিগুলি ত্রুটিসমূহ",
+      "errorsSubFix": "অবশ্যই ঠিক করতে হবে fix",
+      "errorsSubClear": "none  ⁇  পরিষ্কার",
+      "errorsTitle": "ফিল্টার ত্রুটিগুলির জন্য অনুসন্ধানগুলি (ফিক্স করতে হবে  ⁇  ভাঙা / ক্র্যাশ করবে / শোষণযোগ্য)",
+      "warningsLabel": "সতর্কতা সতর্কবার্তা",
+      "warningsSubBad": "ব্যর্থ হতে পারে বা খারাপ দেখায়।",
+      "warningsSubClear": "none  ⁇  পরিষ্কার",
+      "warningsTitle": "সতর্কতা (ব্যর্থ হতে পারে বা খারাপ দেখতে) জন্য ফিল্টার ফলাফল",
+      "infoLabel": "ইনফো ইনফোর ইনফোতে তথ্য",
+      "infoSub": "FYI  ⁇  স্টাইল / পরামর্শ",
+      "infoSubNone": "না, কোনটিই নয়।",
+      "infoTitle": "তথ্যের জন্য অনুসন্ধানগুলি ফিল্টার করুন (FYI  ⁇  স্টাইল এবং পরামর্শ)",
+      "filesLabel": "ক্ষতিগ্রস্ত ফাইলগুলি প্রভাবিত হয়েছে",
+      "filesSubAcross": "রপ্তানি-রফতানির পুরো প্রক্রিয়া জুড়ে।",
+      "filesSubNone": "কোন ফাইল প্রভাবিত হয় নি",
+      "filesTitle": "স্বতন্ত্র ফাইলগুলি কমপক্ষে একটি সন্ধান অবদান রাখে",
+      "topRuleLabel": "শীর্ষ নিয়ম, সর্বোচ্চ নিয়ম।",
+      "topRuleTitle": "{name} নিয়মের জন্য ফিল্টার ফলাফলগুলি ফিল্টর করুন।"
     },
     "toolbar": {
-      "ariaFiltersActions": "ফিল্টার এবং কর্ম",
-      "groupByFieldTitle": "নির্বাচিত মাত্রা অনুসারে গোষ্ঠীর ফলাফল",
-      "groupByLabel": "দ্বারা গ্রুপ",
-      "textFilterTitle": "ফাইল পাথ, নিয়ম, বা বার্তা পাঠ্য দ্বারা অনুসন্ধানগুলি ফিল্টার করুন",
-      "textFilterPlaceholder": "ফাইল, নিয়ম বা বার্তা দ্বারা ফিল্টার করুন...",
-      "textFilterAria": "টেক্সট ফিল্টার",
-      "clearTextFilterTitle": "পাঠ্য ফিল্টার সাফ করুন",
-      "clearTextFilterAria": "পাঠ্য ফিল্টার সাফ করুন",
-      "recentFiltersTitle": "সাম্প্রতিক ফিল্টার",
+      "ariaFiltersActions": "ফিল্টার এবং ক্রিয়াগুলি।",
+      "groupByFieldTitle": "নির্বাচিত মাত্রা অনুযায়ী গ্রুপের ফলাফল",
+      "groupByLabel": "গ্রুপ অনুযায়ী গোষ্ঠী।",
+      "textFilterTitle": "ফাইল পাথ, নিয়ম বা বার্তা পাঠ্যের দ্বারা অনুসন্ধানগুলি ফিল্টার করুন।",
+      "textFilterPlaceholder": "ফাইল, নিয়ম বা বার্তা... অনুসারে ফিল্টার করুন।",
+      "textFilterAria": "টেক্সট ফিল্টার - পাঠ্য ফিল্টারের জন্য।",
+      "clearTextFilterTitle": "ক্লিয়ার টেক্সট ফিল্টার সাফ করুন",
+      "clearTextFilterAria": "ক্লিয়ার টেক্সট ফিল্টার সাফ করুন",
+      "recentFiltersTitle": "সাম্প্রতিক ফিল্টারগুলি",
       "clearRecentTitle": "সমস্ত সাম্প্রতিক ফিল্টার সাফ করুন",
-      "clearRecentButton": "পরিষ্কার",
-      "recentFiltersListAria": "সাম্প্রতিক ফিল্টার",
-      "runAnalysisTitle": "Saropa Lints বিশ্লেষণ চালান",
-      "refreshViolationsTitle": "ডিস্ক থেকে violations.json পুনরায় লোড করুন",
-      "severityGroupAria": "তীব্রতা ফিল্টার",
-      "severityLabel": "তীব্রতা",
-      "impactGroupAria": "ইমপ্যাক্ট ফিল্টার",
-      "impactLabel": "প্রভাব",
-      "moreSummary": "আরও",
+      "clearRecentButton": "Clear পরিষ্কার পরিষ্কার পরিষ্কার",
+      "recentFiltersListAria": "সাম্প্রতিক ফিল্টারগুলি",
+      "runAnalysisTitle": "Saropa Lints বিশ্লেষণ চালান।",
+      "refreshViolationsTitle": "ডিস্ক থেকে violations.json পুনরায় লোড করুন।",
+      "severityGroupAria": "গুরুতরতা ফিল্টার করুন।",
+      "severityLabel": "গুরুতরতা Severity",
+      "impactGroupAria": "ইমপ্যাক্ট ফিল্টার ইম্প্যাক্ট ফিল্ম।",
+      "impactLabel": "প্রভাবের উপর প্রভাব ফেলার জন্য একটি কার্যকর উপায়।",
+      "moreSummary": "More More আরো More আরও",
       "moreChevron": "▾",
-      "copyJsonTitle": "ফিল্টার করা লঙ্ঘনগুলিকে JSON ({count}) হিসাবে অনুলিপি করুন",
-      "saveReportTitle": "প্রতিবেদনে JSON হিসাবে ফিল্টার করা লঙ্ঘনগুলি সংরক্ষণ করুন/YYYYMMDD/"
+      "copyJsonTitle": "JSON ({count}) হিসাবে ফিল্টার করা লঙ্ঘনগুলি অনুলিপি করুন।",
+      "saveReportTitle": "ফিল্টার করা লঙ্ঘনগুলি JSON হিসাবে রিপোর্ট / YYYYMMDD/ এ সংরক্ষণ করুন।"
     },
     "chip": {
-      "contains": "\"{q}\" আছে",
+      "contains": "\"{q}\" ধারণ করে।",
       "severityOff": "তীব্রতা ≠ {v}",
       "impactOff": "প্রভাব ≠ {v}",
       "resetAllTitle": "সমস্ত ফিল্টার রিসেট করুন",
-      "removeFilterAria": "ফিল্টার সরান"
+      "removeFilterAria": "ফিল্টার অপসারণ করুন"
     },
     "menuPalette": {
-      "help": "সাহায্য",
-      "groupBy": "গ্রুপ করে…",
+      "help": "সাহায্যের জন্য সহায়তা করুন",
+      "groupBy": "গ্রুপ দ্বারা ... দ্বারা... গ্রুপ।",
       "textFilter": "টেক্সট ফিল্টার...",
-      "severityImpact": "তীব্রতা ফিল্টার…",
-      "hideRules": "নিয়ম লুকান...",
-      "ruleMetadata": "নিয়ম মেটাডেটা",
-      "clearFilters": "ফিল্টার সাফ করুন",
-      "clearSuppressions": "সাফ দমন",
-      "clearFileFocus": "ফাইল ফোকাস পরিষ্কার করুন",
-      "matchActiveEditor": "সক্রিয় সম্পাদক ম্যাচ",
-      "copyTreeJson": "ট্রি JSON কপি করুন",
-      "refreshExtension": "রিফ্রেশ এক্সটেনশন",
+      "severityImpact": "গুরুতরতা ফিল্টার ... তীব্রতা ফিল্ডার।",
+      "hideRules": "গোপন নিয়ম... লুকানো নিয়ম।",
+      "ruleMetadata": "নিয়ম মেটাডেটা।",
+      "clearFilters": "ফিল্টার সাফ করুন।",
+      "clearSuppressions": "সুস্পষ্টভাবে দমন করা।",
+      "clearFileFocus": "ফাইল ফোকাস সাফ করুন",
+      "matchActiveEditor": "ম্যাচ সক্রিয় সম্পাদক মেলান।",
+      "copyTreeJson": "JSON এর কপি ট্রি অনুলিপি করুন।",
+      "refreshExtension": "রিফ্রেশ এক্সটেনশনটি আপডেট করুন।",
       "openPackageDashboard": "প্যাকেজ ড্যাশবোর্ড খুলুন",
-      "openCodeHealth": "স্বাস্থ্য কোড খুলুন",
-      "openLintsConfig": "লিন্টস কনফিগারেশন খুলুন",
+      "openCodeHealth": "ওপেন কোড হেলথ হ্যালুডে",
+      "openLintsConfig": "নিয়ম প্যাকগুলি পরিচালনা করুন",
       "reloadFromDisk": "ডিস্ক থেকে পুনরায় লোড করুন",
-      "reloadFromDiskTitle": "বিশ্লেষক পুনরায় চালানো ছাড়া শেষ violations.json থেকে ড্যাশবোর্ড পুনরায় রেন্ডার করুন।",
-      "reEnableDisabledRules": "অক্ষম করা নিয়মগুলি পুনরায় সক্ষম করুন...",
-      "reEnableDisabledRulesTitle": "analysis_options_custom.yaml-এ বর্তমানে অক্ষম করা নিয়মগুলির একটি দ্রুত-বাছাই খুলুন এবং নির্বাচিতগুলিকে পুনরায় সক্ষম করুন৷",
-      "reEnableNoneTitle": "কোন নিয়ম বর্তমানে নিষ্ক্রিয়",
-      "reEnableNoneMessage": "analysis_options_custom.yaml এর মাধ্যমে বর্তমানে কোনো নিয়ম নিষ্ক্রিয় করা নেই।",
-      "reEnableQuickPickTitle": "অক্ষম নিয়মগুলি পুনরায় সক্ষম করুন৷",
-      "reEnableQuickPickPlaceholder": "পুনরায় সক্ষম করতে এক বা একাধিক নিয়ম নির্বাচন করুন৷",
-      "menuGroupExport": "রপ্তানি",
-      "menuGroupFilter": "ফিল্টার এবং ফোকাস",
-      "menuGroupOpen": "ড্যাশবোর্ড খুলুন",
-      "menuGroupSystem": "সিস্টেম"
+      "reloadFromDiskTitle": "বিশ্লেষকটি পুনরায় চালানো ছাড়াই শেষ violations.json থেকে ড্যাশবোর্ডটিকে আবার রেন্ডার করুন।",
+      "reEnableDisabledRules": "পুনরায় সক্ষম করুন অক্ষম নিয়ম ... নিষ্ক্রিয় নিয়মগুলি।",
+      "reEnableDisabledRulesTitle": "analysis_options_custom.yaml এ বর্তমানে নিষ্ক্রিয় নিয়মগুলির একটি দ্রুত-পিক খুলুন এবং নির্বাচিতগুলি পুনরায় সক্ষম করুন।",
+      "reEnableNoneTitle": "কোন নিয়ম নেই বর্তমানে অক্ষম",
+      "reEnableNoneMessage": "analysis_options_custom.yaml.am এর মাধ্যমে বর্তমানে কোনও নিয়ম অক্ষম করা হয়নি।",
+      "reEnableQuickPickTitle": "পুনরায় সক্ষম করুন অক্ষম নিয়মগুলিকে আবার সক্ষম করুন",
+      "reEnableQuickPickPlaceholder": "পুনরায় সক্ষম করতে এক বা একাধিক নিয়ম নির্বাচন করুন।",
+      "menuGroupExport": "রপ্তানি এক্সপোর্ট",
+      "menuGroupFilter": "ফিল্টার এবং ফোকাস করুন",
+      "menuGroupOpen": "ড্যাশবোর্ড খুলুন।",
+      "menuGroupSystem": "সিস্টেম সিস্টেম System"
     },
     "progress": {
-      "runningLabel": "বিশ্লেষণ চলছে...",
-      "runningMeta": "এটি বড় প্রকল্পগুলিতে একটি মুহূর্ত নিতে পারে।"
+      "runningLabel": "চলমান বিশ্লেষণ ...",
+      "runningMeta": "বড় প্রকল্পে এটি কিছুটা সময় নিতে পারে।"
     },
     "topRules": {
-      "sectionAria": "গণনা অনুসারে শীর্ষ নিয়ম",
-      "hideTitle": "শুধুমাত্র আমার জন্য লুকান — ওয়ার্কস্পেস-লেভেল, ক্লিয়ার সাপ্রেশনের মাধ্যমে বিপরীত করা যায়",
-      "hideButton": "লুকান",
-      "disableTitle": "পুরো প্রকল্পের জন্য নিষ্ক্রিয় করুন — analysis_options_custom.yaml লিখে এবং বিশ্লেষণ পুনরায় চালায়",
-      "disableButton": "নিষ্ক্রিয় করুন",
-      "workspaceOnlyShort": "শুধুমাত্র কর্মক্ষেত্র",
-      "projectConfigShort": "প্রজেক্ট কনফিগারেশন (লেখে analysis_options_custom.yaml)",
+      "sectionAria": "গণনা অনুসারে শীর্ষস্থানীয় নিয়মগুলি",
+      "hideTitle": "আমার জন্য কেবলমাত্র works কর্মক্ষেত্রের স্তরের লুকান, ক্লিয়ার সাপ্রেসনের মাধ্যমে বিপরীতমুখী।",
+      "hideButton": "লুকিয়ে থাকো, লুকিয়ে রাখো।",
+      "disableTitle": "পুরো প্রকল্পের জন্য অক্ষম করুন  ⁇  লিখেছে analysis_options_custom.yaml এবং পুনরায় চালিত বিশ্লেষণ বিশ্লেষন।",
+      "disableButton": "অক্ষম করুন নিষ্ক্রিয় করুন",
+      "workspaceOnlyShort": "শুধুমাত্র ওয়ার্কস্পেস (Work Space)",
+      "projectConfigShort": "project config (লেখা হয় analysis_options_custom.yaml) ।",
       "topRulesOne": "শীর্ষ {count} নিয়ম",
-      "topRulesOther": "শীর্ষ {count} নিয়ম",
+      "topRulesOther": "শীর্ষ {count} নিয়মগুলি",
       "colRank": "#",
-      "colRule": "নিয়ম",
-      "colCount": "গণনা",
-      "colSeverity": "তীব্রতা",
-      "colActionsAria": "সারি কর্ম",
-      "filesAffected": "ফাইল প্রভাবিত ({count})"
+      "colRule": "নিয়মকানুন Rule Rule",
+      "colCount": "কাউন্ট কান্ট কাউন্ট কাউন্ট",
+      "colSeverity": "গুরুতরতা Severity",
+      "colActionsAria": "সারি ক্রিয়াকলাপগুলি রোল ক্রিয়া",
+      "filesAffected": "ক্ষতিগ্রস্ত ফাইলগুলি ({count})"
     },
     "findings": {
-      "sectionAria": "ফাইন্ডিংস",
-      "expandAll": "সব প্রসারিত",
-      "collapseAll": "সব সঙ্কুচিত করুন",
+      "sectionAria": "ফলাফলঃ অনুসন্ধানগুলি পাওয়া গেছে।",
+      "expandAll": "সমস্ত প্রসারিত করুন",
+      "collapseAll": "সব ভেঙে পড়ুক,",
       "bulkSelected": "{count} নির্বাচিত",
-      "bulkCopy": "JSON হিসাবে নির্বাচিত অনুলিপি",
-      "selectAllTitle": "সমস্ত দৃশ্যমান ফলাফল নির্বাচন করুন",
-      "selectAllAria": "সমস্ত দৃশ্যমান ফলাফল নির্বাচন করুন",
-      "colSeverity": "তীব্রতা",
-      "colRule": "নিয়ম",
-      "colMessage": "বার্তা",
-      "colLine": "লাইন",
-      "colActionsAria": "সারি কর্ম",
-      "selectRowAria": "এই অনুসন্ধান সারি নির্বাচন করুন",
-      "copyRowTitle": "এই অনুসন্ধানটি JSON হিসাবে অনুলিপি করুন",
+      "bulkCopy": "JSON হিসাবে নির্বাচিত কপি অনুলিপি করুন।",
+      "selectAllTitle": "সমস্ত দৃশ্যমান ফলাফল নির্বাচন করুন।",
+      "selectAllAria": "সমস্ত দৃশ্যমান ফলাফল নির্বাচন করুন।",
+      "colSeverity": "গুরুতরতা Severity",
+      "colRule": "নিয়মকানুন Rule Rule",
+      "colMessage": "বার্তা বার্তা মেসেজ",
+      "colLine": "লাইন, লাইন, লাইনের মধ্যে",
+      "colActionsAria": "সারি ক্রিয়াকলাপগুলি রোল ক্রিয়া",
+      "selectRowAria": "এই সন্ধান সারিটি নির্বাচন করুন।",
+      "copyRowTitle": "এই ফলাফলটি JSON হিসাবে অনুলিপি করুন।",
       "metaShown": "{filtered} দেখানো হয়েছে",
       "metaAfterDisable": "অক্ষম-রুল ফিল্টারের পরে {total}",
-      "metaSourceCap": "পারফরম্যান্সের জন্য উৎস {max} এ ক্যাপ করা হয়েছে",
-      "metaGroupedBy": "{mode} দ্বারা গোষ্ঠীবদ্ধ",
-      "overflowNote": "রেন্ডার পারফরম্যান্সের জন্য উৎস তালিকা {max} এ কাটা হয়েছে।",
-      "runAgain": "আবার বিশ্লেষণ চালান",
-      "emptyNoViolations": "শেষ বিশ্লেষণে কোন লঙ্ঘন নেই।",
-      "emptyNoMatch": "বর্তমান ফিল্টারগুলির সাথে কোন লঙ্ঘন মেলে না।",
-      "emptyHintNoData": "`reports/.saropa_lints/violations.json` পপুলেট করতে বিশ্লেষণ চালান, তারপর রিফ্রেশ করুন।",
-      "emptyHintFilters": "ফিল্টারগুলি সামঞ্জস্য করুন বা ফলাফলগুলি দেখতে আবার বিশ্লেষণ চালান৷",
-      "reRunAnalysis": "পুনরায় চালানো বিশ্লেষণ",
-      "resetFilters": "ফিল্টার রিসেট করুন",
+      "metaSourceCap": "কর্মক্ষমতা জন্য {max} এ সীমিত উৎস।",
+      "metaGroupedBy": "{mode} দ্বারা গ্রুপ করা হয়।",
+      "overflowNote": "রেন্ডারিং পারফরম্যান্সের জন্য {max} এ সংক্ষিপ্ত উত্স তালিকা।",
+      "runAgain": "আবার বিশ্লেষণ চালান।",
+      "emptyNoViolations": "শেষ বিশ্লেষণ চালানোর সময় কোনও লঙ্ঘন হয়নি।",
+      "emptyNoMatch": "কোনও লঙ্ঘন বর্তমান ফিল্টারগুলির সাথে মেলে না।",
+      "emptyHintNoData": "∀reports/.saropa_lints/violations.json` পূরণ করতে বিশ্লেষণ চালান, তারপরে রিফ্রেশ করুন।",
+      "emptyHintFilters": "ফলাফলগুলি দেখতে ফিল্টারগুলি সামঞ্জস্য করুন বা বিশ্লেষণটি আবার চালান।",
+      "reRunAnalysis": "পুনরায় চালিত বিশ্লেষণের বিশ্লেষন।",
+      "resetFilters": "রিসেট ফিল্টারগুলি পুনরায় সেট করুন",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "চার্ট মিশ্রিত করুন",
-      "heading": "মিক্স",
-      "metaClickSlice": "ফিল্টার করতে একটি স্লাইস ক্লিক করুন",
-      "severityMix": "তীব্রতা মিশ্রণ",
-      "impactMix": "প্রভাব মিশ্রণ",
-      "filterBarTitle": "শুধুমাত্র {key} এ ফিল্টার করুন",
-      "donutTotal": "মোট"
+      "sectionAria": "মিক্স চার্টগুলি মিশ্রিত করুন।",
+      "heading": "মিশ্রণ মিক্স মিক্স মিক্স করুন",
+      "metaClickSlice": "ফিল্টার করতে একটি স্লাইসে ক্লিক করুন।",
+      "severityMix": "গুরুতরতা মিশ্রণ।",
+      "impactMix": "ইমপ্যাক্ট মিক্স ইম্প্যাক্ট মিশ্রণ",
+      "filterBarTitle": "শুধুমাত্র {key} এ ফিল্টার করুন।",
+      "donutTotal": "মোটামুটি, পুরো সংখ্যাটি।"
     },
     "todoHack": {
-      "sectionAria": "TODOs এবং HACKS",
+      "sectionAria": "টোডো এবং হ্যাকস।",
       "headingDisabled": "করণীয় ও হ্যাকস",
-      "metaDisabled": "স্ক্যান নিষ্ক্রিয়",
-      "scanOff": "ওয়ার্কস্পেস স্ক্যান বন্ধ আছে — প্রোজেক্ট ফাইল থেকে সারফেস মার্কার করতে সক্ষম করুন।",
-      "enableScan": "স্ক্যান সক্ষম করুন",
+      "metaDisabled": "স্ক্যান অক্ষম করা হয়েছে",
+      "scanOff": "ওয়ার্কস্পেস স্ক্যান বন্ধ  ⁇  প্রকল্প ফাইল থেকে পৃষ্ঠ চিহ্নিতকারী সক্ষম করুন।",
+      "enableScan": "স্ক্যানিং সক্ষম করুন স্ক্যান সক্রিয় করুন",
       "heading": "করণীয় ও হ্যাকস",
       "subsectionNone": "{title}: স্ক্যান রেঞ্জে কিছুই নেই।",
-      "capNote": "স্ক্যান হিট ম্যাক্স-ফাইল ক্যাপ; সম্পূর্ণ কভারেজের জন্য `saropaLints.todosAndHacks.maxFilesToScan` বাড়ান।",
-      "notePill": "নোট",
+      "capNote": "স্ক্যান করুন সর্বোচ্চ ফাইলের ক্যাপটি হিট করুন; সম্পূর্ণ আচ্ছাদনের জন্য ∀saropaLints.todosAndHacks.maxFilesToScan゙ বাড়ান।",
+      "notePill": "নোট নোট নোটে",
       "todosLabel": "করণীয়",
-      "hacksLabel": "হ্যাকস"
+      "hacksLabel": "হ্যাকস হ্যাচগুলি"
     },
     "drift": {
-      "sectionAria": "ড্রিফ্ট উপদেষ্টা",
-      "headingOff": "ড্রিফ্ট উপদেষ্টা",
-      "metaOff": "একীকরণ বন্ধ",
-      "enableBlurb": "ড্রিফ্ট অ্যাডভাইজার ইন্টিগ্রেশন সক্ষম করুন এখানে ডাটাবেসের পরামর্শগুলিকে পৃষ্ঠ করুন৷",
-      "enable": "সক্ষম করুন",
-      "headingNoServer": "ড্রিফ্ট উপদেষ্টা",
-      "metaNoServer": "সার্ভার নেই",
-      "noServerBlurb": "কনফিগার করা পোর্টে কোনো ড্রিফ্ট অ্যাডভাইজার সার্ভার পাওয়া যায়নি।",
-      "retry": "আবার চেষ্টা করুন",
-      "headingConnected": "ড্রিফ্ট উপদেষ্টা",
-      "metaConnected": "সংযুক্ত",
-      "noIssues": "{label} এর সাথে সংযুক্ত — কোন বর্তমান সমস্যা নেই।",
-      "refresh": "রিফ্রেশ",
+      "sectionAria": "ড্রিফট অ্যাডভাইজার",
+      "headingOff": "ড্রিফট অ্যাডভাইজার",
+      "metaOff": "ইন্টিগ্রেশন অফ ইন্ডিগ্রেশন বন্ধ।",
+      "enableBlurb": "এখানে ডাটাবেস প্রস্তাবনাগুলির পৃষ্ঠায় ড্রিফ্ট অ্যাডভাইজার সংহতকরণ সক্ষম করুন।",
+      "enable": "Enable সক্ষম করুন সক্রিয় করুন",
+      "headingNoServer": "ড্রিফট অ্যাডভাইজার",
+      "metaNoServer": "কোন সার্ভার নেই, কোনও সার্ভারের প্রয়োজন নেই।",
+      "noServerBlurb": "কনফিগার করা পোর্টগুলিতে কোনও ড্রিফ্ট অ্যাডভাইজার সার্ভার পাওয়া যায় নি।",
+      "retry": "পুনরায় চেষ্টা করুন Retry.",
+      "headingConnected": "ড্রিফট অ্যাডভাইজার",
+      "metaConnected": "সংযুক্ত সংযুক্ত সংযোগযুক্ত সংযুক্তিযুক্ত",
+      "noIssues": "{label} এর সাথে সংযুক্ত  ⁇  কোন বর্তমান সমস্যা নেই।",
+      "refresh": "সতেজতা আনুন এবং রিফ্রেশ করুন।",
       "openBrowser": "ব্রাউজারে খুলুন",
-      "headingIssues": "ড্রিফ্ট উপদেষ্টা",
-      "disable": "ড্রিফ্ট উপদেষ্টা অক্ষম করুন"
+      "headingIssues": "ড্রিফট অ্যাডভাইজার",
+      "disable": "ড্রিফট অ্যাডভাইজার অক্ষম করুন"
     },
     "suppressions": {
-      "sectionAria": "দমন",
-      "headingExport": "দমন (রপ্তানি)",
-      "viewHidesHeading": "ইস্যু ভিউ লুকায়",
-      "viewHidesMetaActive": "সক্রিয়",
-      "viewHidesMetaNone": "কোনটি",
-      "noneInExport": "বর্তমান `violations.json` এক্সপোর্টে কোনো বিশ্লেষক দমন নেই। উপেক্ষা বা বেসলাইন সম্পাদনা করার পরে বিশ্লেষণ চালান।",
-      "totalRow": "মোট — পরিষ্কার ফিল্টার এবং খোলা অনুসন্ধান",
+      "sectionAria": "দমন-নিরোধের কাজ।",
+      "headingExport": "নিষ্ক্রিয়করণ (রপ্তানি)",
+      "viewHidesHeading": "ইস্যু দৃশ্য লুকায়",
+      "viewHidesMetaActive": "সক্রিয়ভাবে কার্যকরী সক্রিয় সক্রিয়",
+      "viewHidesMetaNone": "না, কোনটিই নয়।",
+      "noneInExport": "বর্তমান `violations.json̅ রফতানিতে কোনও বিশ্লেষক দমন নেই। সম্পাদনা করার পরে বিশ্লেষণ চালান উপেক্ষা করে বা বেসলাইনগুলি পূরণ করতে।",
+      "totalRow": "মোট  ⁇  পরিষ্কার ফিল্টার এবং খোলা ফলাফল",
       "byRule": "নিয়ম অনুসারে ({count})",
-      "byFile": "ফাইল অনুসারে ({count})",
+      "byFile": "ফাইল দ্বারা ({count})",
       "noEntries": "কোন এন্ট্রি নেই.",
-      "nothingHidden": "এই কর্মক্ষেত্রে সমস্যা তালিকা থেকে কিছুই লুকানো নেই। ফোল্ডার, ফাইল বা নিয়ম লুকানোর জন্য ট্রি কনটেক্সট অ্যাকশন ব্যবহার করুন; তারা কর্মক্ষেত্র অবস্থায় টিকে থাকে।",
+      "nothingHidden": "এই কর্মক্ষেত্রে সমস্যা তালিকা থেকে কিছুই লুকানো নেই। ফোল্ডার, ফাইল বা নিয়মগুলি লুকানোর জন্য গাছের প্রসঙ্গ ক্রিয়াকলাপ ব্যবহার করুন; তারা কর্মক্ষেত্রের অবস্থায় স্থায়ী হয়।",
       "folderPattern": "{count} ফোল্ডার",
       "filePattern": "{count} ফাইল প্যাটার্ন",
       "ruleGlobal": "{count} রুল (বিশ্বব্যাপী)",
       "perFileRules": "{count} ফাইল (প্রতি-ফাইল রুল হাইড সহ)",
       "severityHides": "{count} তীব্রতা হাইড",
       "impactHides": "{count} ইমপ্যাক্ট হাইড",
-      "activeHides": "সক্রিয় আড়াল: {counts}।",
-      "viewHidesFooter": "এই হাইডগুলি শুধুমাত্র সমস্যা/ড্যাশবোর্ড তালিকাকে সঙ্কুচিত করে; তারা `violations.json` এ লেখা হয় না।",
-      "clearViewHides": "সমস্ত ভিউ হাইড সাফ করুন",
+      "activeHides": "সক্রিয় চামড়াঃ {counts}. .",
+      "viewHidesFooter": "এই হিলগুলি কেবলমাত্র ইস্যু / ড্যাশবোর্ড তালিকাটি সঙ্কুচিত করে; তারা `violations.json`. এ লেখা হয় না।",
+      "clearViewHides": "Clear all view hides ক্লিয়ার অল ভিউ লুকিয়ে রাখে",
       "foldersSample": "ফোল্ডার (নমুনা)",
-      "filesSample": "ফাইল / গ্লবস (নমুনা)",
+      "filesSample": "ফাইল / গ্লোব (নমুনা)",
       "rulesSample": "নিয়ম (নমুনা)",
       "perFileRulesSample": "ফাইল প্রতি নিয়ম (নমুনা)",
-      "unknownKind": "অজানা"
+      "unknownKind": "অজানা অজ্ঞাত অজান"
     },
     "script": {
-      "analysisRunning": "বিশ্লেষণ চলছে...",
-      "analysisComplete": "বিশ্লেষণ সম্পূর্ণ",
-      "metaRunning": "এটি বড় প্রকল্পগুলিতে একটি মুহূর্ত নিতে পারে।",
-      "metaDone": "সাম্প্রতিক ফলাফলের সাথে ড্যাশবোর্ড রিফ্রেশ করছে।",
+      "analysisRunning": "চলমান বিশ্লেষণ ...",
+      "analysisComplete": "বিশ্লেষণ সম্পূর্ণ করুন, সমাপ্তি।",
+      "metaRunning": "বড় প্রকল্পে এটি কিছুটা সময় নিতে পারে।",
+      "metaDone": "সর্বশেষ অনুসন্ধানগুলির সাথে রিফ্রেশিং ড্যাশবোর্ড।",
       "announceSearch": "অনুসন্ধান {q}",
       "announceSeverities": "{n} তীব্রতা",
       "announceImpacts": "{n} প্রভাব",
-      "announceCleared": "সমস্ত ফিল্টার সাফ করা হয়েছে৷",
-      "announceFiltersPrefix": "ফিল্টার:",
+      "announceCleared": "সমস্ত ফিল্টার সাফ করা হয়েছে",
+      "announceFiltersPrefix": "ফিল্টারঃ",
       "bulkSelected": "{n} নির্বাচিত",
-      "analysisStartedDetail": "শুরু হলো বিশ্লেষণ। ডায়াগনস্টিকস সংগ্রহ করা হচ্ছে...",
-      "announceStarted": "শুরু হলো বিশ্লেষণ",
-      "announceComplete": "বিশ্লেষণ সম্পূর্ণ",
+      "analysisStartedDetail": "বিশ্লেষণ শুরু হয়েছে। ডায়াগনস্টিক সংগ্রহ ...",
+      "announceStarted": "বিশ্লেষণ শুরু হয়েছে, শুরু হয়েছে।",
+      "announceComplete": "বিশ্লেষণ সম্পূর্ণ করুন, সমাপ্তি।",
       "announceFailed": "বিশ্লেষণ ব্যর্থ হয়েছে",
-      "analysisFailedDetail": "বিশ্লেষণ ব্যর্থ হয়েছে. বিস্তারিত জানার জন্য আউটপুট চেক করুন.",
-      "removeRecentAria": "সরান",
-      "removeRecentTitle": "সরান",
+      "analysisFailedDetail": "বিশ্লেষণ ব্যর্থ হয়েছে. বিস্তারিত জানার জন্য আউটপুটটি পরীক্ষা করুন।",
+      "removeRecentAria": "Remove remove অপসারণ করা",
+      "removeRecentTitle": "Remove remove অপসারণ করা",
       "bulkSelectedTpl": "{n} নির্বাচিত"
     },
     "emptyState": {
-      "hintAfterMessage": "violations.json তৈরি করতে একটি Saropa Lints বিশ্লেষণ চালান, তারপর এখানে রিফ্রেশ ব্যবহার করুন বা এই ড্যাশবোর্ডটি আবার খুলুন।",
-      "refreshDisk": "ডিস্ক থেকে রিফ্রেশ করুন"
+      "hintAfterMessage": "violations.json উত্পন্ন করতে একটি Saropa Lints বিশ্লেষণ চালান, তারপরে এখানে রিফ্রেশ করুন বা এই ড্যাশবোর্ডটি পুনরায় খুলুন।",
+      "refreshDisk": "ডিস্ক থেকে রিফ্রেশ করুন।"
     },
     "shortcuts": {
-      "focusTextFilter": "টেক্সট ফিল্টার ফোকাস করুন",
-      "clearTextFilter": "ফোকাস করা টেক্সট ফিল্টার সাফ করুন",
-      "activateKpi": "ফোকাসড কেপিআই কার্ড বা চার্ট বার সক্রিয় করুন",
-      "activateKpiSpace": "ফোকাসড কেপিআই কার্ড বা চার্ট বার সক্রিয় করুন",
-      "showOverlay": "এই শর্টকাট ওভারলে দেখান"
+      "focusTextFilter": "ফোকাস করুন টেক্সট ফিল্টারটি।",
+      "clearTextFilter": "ফোকাসযুক্ত পাঠ্য ফিল্টারটি সাফ করুন।",
+      "activateKpi": "ফোকাসযুক্ত কেপিআই কার্ড বা চার্ট বারটি সক্রিয় করুন।",
+      "activateKpiSpace": "ফোকাসযুক্ত কেপিআই কার্ড বা চার্ট বারটি সক্রিয় করুন।",
+      "showOverlay": "এই শর্টকাট ওভারলে প্রদর্শন করুন।"
     },
-    "unknownAnalyzerKind": "অজানা",
+    "unknownAnalyzerKind": "অজানা অজ্ঞাত অজান",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} অন্যান্য বিশ্লেষক অনুসন্ধান",
-      "otherAnalyzerPromo": "+? অন্যান্য বিশ্লেষক অনুসন্ধান - দেখান",
+      "otherAnalyzerOn": "+{count} অন্যান্য বিশ্লেষক ফলাফল",
+      "otherAnalyzerPromo": "+? অন্যান্য বিশ্লেষক ফলাফল  ⁇  প্রদর্শন করে",
       "analyzerTodosOn": "+{count} বিশ্লেষক TODOs",
-      "analyzerTodosPromo": "+? বিশ্লেষক TODOs — দেখান",
-      "scannerPromo": "TODO/HACK স্ক্যানার সক্ষম করুন",
-      "tooltipLive": "VS Code সমস্যা প্যানেল থেকে লাইভ। বিশ্লেষণ সম্পূর্ণ হওয়ার সাথে সাথে আপডেটগুলি। লুকাতে ক্লিক করুন.",
-      "tooltipScanner": "Saropa ফাইল-সিস্টেম স্ক্যানার — উৎসে খোলা TODO/HACK মার্কার গণনা করে।",
-      "tooltipPromoClickToOn": "সক্রিয় করতে ক্লিক করুন"
+      "analyzerTodosPromo": "+? বিশ্লেষক TODOs  ⁇  প্রদর্শন করুন",
+      "scannerPromo": "TODO/HACK স্ক্যানার সক্ষম করুন।",
+      "tooltipLive": "VS Code সমস্যা প্যানেল থেকে লাইভ। বিশ্লেষণ সম্পূর্ণ হওয়ার সাথে আপডেট করা হবে। লুকানোর জন্য ক্লিক করুন।",
+      "tooltipScanner": "Saropa ফাইল-সিস্টেম স্ক্যানার  ⁇  সোর্সে খোলা TODO/HACK মার্কার গণনা করে।",
+      "tooltipPromoClickToOn": "সক্ষম করতে ক্লিক করুন সক্রিয় করতে ক্লिक করুন।"
     }
   },
   "triageDash": {
-    "showInIssues": "ইস্যুতে দেখান",
-    "disableRules": "নিয়ম অক্ষম করুন",
-    "enableRules": "নিয়ম চালু করুন",
-    "issues": "ইস্যু",
-    "off": "বন্ধ",
-    "on": "চালু",
-    "colRule": "নিয়ম",
-    "colIssues": "ইস্যু",
+    "showInIssues": "ইস্যুগুলিতে দেখান।",
+    "disableRules": "নিয়ম অক্ষম করুন নিষ্ক্রিয়করণ বিধি",
+    "enableRules": "নিয়মগুলি সক্ষম করুন।",
+    "issues": "ইস্যুগুলি সমস্যাগুলি",
+    "off": "Off off off off অফ অফ অফ",
+    "on": "উপর, উপরে, ওপর",
+    "colRule": "নিয়মকানুন Rule Rule",
+    "colIssues": "ইস্যুগুলি সমস্যাগুলি",
     "zeroIssueRules": "শূন্য ইস্যু সহ {count} রুল — টিয়ারে স্বয়ংক্রিয়ভাবে সক্ষম।",
     "disabledOverrides": "`analysis_options_custom.yaml` এ ওভাররাইড দ্বারা {count} রুল অক্ষম করা হয়েছে।",
-    "summaryRuleTriage": "রুল triage",
-    "hintNoViolations": "এখনো কোনো `report/.saropa_lints/violations.json` নেই। বিশ্লেষণ চালান, তারপর এই ট্যাবটি রিফ্রেশ করুন৷",
-    "hintUnreadable": "কোন পঠনযোগ্য লঙ্ঘন রপ্তানি. প্রথমে Saropa Lints বিশ্লেষণ চালান।",
-    "hintStale": "ট্রাইজ ডেটা পুরানো হতে পারে (রপ্তানি {age} পুরানো)। বর্তমান গোষ্ঠীর জন্য বিশ্লেষণ পুনরায় চালান।",
-    "hintNoPerRule": "এই রপ্তানির নিয়ম অনুযায়ী কোনো সমস্যা নেই। একটি বর্তমান Saropa Lints প্লাগইন দিয়ে পুনরায় বিশ্লেষণ করুন।",
-    "hintBuildFailed": "এই রপ্তানি থেকে triage নির্মাণ করা যায়নি. একটি নতুন বিশ্লেষণ চালান.",
-    "summaryVolume": "নিয়ম ট্রাইজ (ভলিউম / অবশ্যই ফিক্স / স্টাইলিস্টিক)",
-    "hintSameAsTree": "Triage কার্যকলাপ-বার গাছের মতো একই গ্রুপিং: সমস্যাগুলি ফিল্টার করুন বা `analysis_options_custom.yaml`-এ নিয়মগুলি নিষ্ক্রিয়/সক্ষম করুন৷ বড় গ্রুপ নিশ্চিতকরণের জন্য জিজ্ঞাসা করতে পারে."
+    "summaryRuleTriage": "রুল ট্রায়াগার ট্রায়াজেড।",
+    "hintNoViolations": "এখনও কোন রিপোর্ট/. .saropa_lints/violations.json হয়নি। বিশ্লেষণ চালান, তারপরে এই ট্যাবটি রিফ্রেশ করুন।",
+    "hintUnreadable": "কোন পাঠযোগ্য লঙ্ঘন রপ্তানি. এক্সপোর্ট. প্রথমে Saropa Lints বিশ্লেষণ চালান।",
+    "hintStale": "ট্রায়াজ ডেটা পুরানো হতে পারে (এক্সপোর্ট {age} পুরাতন) । বর্তমান গ্রুপগুলির জন্য পুনরায় চালিত বিশ্লেষণ।",
+    "hintNoPerRule": "এই রপ্তানির কোনও নিয়ম-প্রণালী নেই। একটি বর্তমান Saropa Lints প্লাগইন দিয়ে পুনরায় বিশ্লেষণ করুন।",
+    "hintBuildFailed": "এই রফতানি থেকে ট্রায়াল তৈরি করতে পারেনি। একটি নতুন বিশ্লেষণ চালান।",
+    "summaryVolume": "নিয়ম ট্রায়াগ (ভলিউম / অবশ্যই-ফিক্স / শৈলীর)",
+    "hintSameAsTree": "Triage activity-bar tree এর মতো একই গ্রুপিংঃ ফিল্টার ইস্যু, অথবা `analysis_options_custom.yaml゙.in এ নিয়ম নিষ্ক্রিয়/সক্ষম করুন। বড় দলগুলি নিশ্চিতকরণের জন্য জিজ্ঞাসা করতে পারে।"
   },
   "kbdOverlay": {
-    "toggleTitle": "কীবোর্ড শর্টকাট দেখান (?)",
-    "toggleAria": "কীবোর্ড শর্টকাট দেখান",
-    "dialogTitle": "কীবোর্ড শর্টকাট",
-    "closeAria": "কীবোর্ড শর্টকাট বন্ধ করুন",
-    "footer": "Esc টিপুন বা বন্ধ করতে বাইরে ক্লিক করুন।"
+    "toggleTitle": "কীবোর্ড শর্টকাটগুলি (?) দেখান",
+    "toggleAria": "কীবোর্ড শর্টকাটগুলি দেখান",
+    "dialogTitle": "কীবোর্ড শর্টকাটগুলি",
+    "closeAria": "কীবোর্ড শর্টকাটগুলি বন্ধ করুন",
+    "footer": "বন্ধ করতে Esc বা ক্লিক করুন বাইরের দিকে।"
   },
   "wideReport": {
     "openWorkspaceFirst": "প্রথমে একটি ওয়ার্কস্পেস ফোল্ডার খুলুন।",
-    "noReportYet": "এখনও কোন লঙ্ঘন রিপোর্ট. প্রথমে Saropa Lints বিশ্লেষণ চালান।",
+    "noReportYet": "এখনও পর্যন্ত কোনও লঙ্ঘনের রিপোর্ট নেই। প্রথমে Saropa Lints বিশ্লেষণ চালান।",
     "clipboardCopyFailed": "ক্লিপবোর্ডে অনুলিপি করা যায়নি।",
-    "copiedViolationsJson": "JSON হিসাবে {count} লঙ্ঘন(গুলি) কপি করা হয়েছে।",
-    "copiedOneViolationJson": "JSON হিসেবে ১টি লঙ্ঘন কপি করা হয়েছে।",
-    "driftNotConnected": "ড্রিফ্ট অ্যাডভাইজার সার্ভার সংযুক্ত নেই।",
-    "copiedBulkFindings": "JSON হিসাবে {count}টি নির্বাচিত অনুসন্ধান(গুলি) কপি করা হয়েছে৷",
-    "noMatchingFindingsCopy": "অনুলিপি করার জন্য কোনো মিল খুঁজে পাওয়া যায়নি।",
-    "couldNotOpenFile": "ফাইল খোলা যায়নি: {path}",
-    "saveReportNoWorkspace": "রিপোর্ট সংরক্ষণ করার আগে একটি ওয়ার্কস্পেস ফোল্ডার খুলুন।",
-    "savedFindings": "সংরক্ষিত {count} ফাইন্ডিং(গুলি): {path}",
-    "couldNotSaveReportJson": "রিপোর্ট JSON সংরক্ষণ করা যায়নি."
+    "copiedViolationsJson": "JSON. হিসাবে {count} লঙ্ঘন কপি করা হয়েছে (s) ।",
+    "copiedOneViolationJson": "JSON. হিসাবে 1 টি লঙ্ঘন অনুলিপি করা হয়েছে।",
+    "driftNotConnected": "ড্রিফট অ্যাডভাইজার সার্ভার সংযুক্ত নয়।",
+    "copiedBulkFindings": "JSON. হিসাবে {count} নির্বাচিত সন্ধানগুলি (s) অনুলিপি করা হয়েছে।",
+    "noMatchingFindingsCopy": "কপি করার জন্য কোনও মিলছে না।",
+    "couldNotOpenFile": "ফাইলটি খুলতে পারেনিঃ {path}",
+    "saveReportNoWorkspace": "প্রতিবেদন সংরক্ষণ করার আগে একটি কর্মক্ষেত্র ফোল্ডার খুলুন।",
+    "savedFindings": "সংরক্ষিত {count} finding(s): {path}",
+    "couldNotSaveReportJson": "রিপোর্ট JSON সংরক্ষণ করতে ব্যর্থ।"
   },
   "packageDashboard": {
     "documentTitle": "Saropa প্যাকেজ ড্যাশবোর্ড",
     "heroTitle": "Saropa প্যাকেজ ড্যাশবোর্ড",
+    "detailPane": {
+      "aria": "প্যাকেজিংয়ের বিস্তারিত বিবরণ",
+      "title": "প্যাকেজিংয়ের বিস্তারিত বিবরণ",
+      "close": "ঘনিষ্ঠভাবে বিস্তারিত বিবরণ।"
+    },
     "status": {
       "packagesCount": "{count} প্যাকেজ",
       "packagesBreakdown": "{direct} সরাসরি, {transitive} ট্রানজিটিভ",
       "gradeLine": "গ্রেড {grade} · {avg}/100",
       "flaggedCount": "{count} ফ্ল্যাগ করা হয়েছে",
-      "flaggedTitle": "পরিত্যক্ত বা জীবনের শেষ",
-      "lastScanLabel": "{when} স্ক্যান করা হয়েছে",
-      "lastScanTitle": "যখন এই ড্যাশবোর্ড ডেটা আনা হয়েছিল — {timestamp}। রিফ্রেশ করতে রিস্ক্যান ক্লিক করুন।",
-      "lastScanUnknown": "স্ক্যান করা (সময় অজানা)",
-      "lastScanUnknownTitle": "এই স্ক্যানটি ড্যাশবোর্ড ট্র্যাক করা টাইমস্ট্যাম্পের আগে চলে। রিফ্রেশ করতে রিস্ক্যান ক্লিক করুন।"
+      "flaggedTitle": "পরিত্যক্ত বা জীবনের শেষের দিকে",
+      "lastScanLabel": "স্ক্যান করা {when}",
+      "lastScanTitle": "যখন এই ড্যাশবোর্ডের ডেটা  ⁇  {timestamp}. fetched ছিল। রিফ্রেশ করতে পুনরায় স্ক্যান ক্লিক করুন।",
+      "lastScanUnknown": "স্ক্যান করা হয়েছে (সময় অজানা)",
+      "lastScanUnknownTitle": "এই স্ক্যানটি ড্যাশবোর্ডের ট্র্যাকিং টাইমস্ট্যাম্পগুলির আগে চালিত হয়েছিল। রিফ্রেশ করতে পুনরায় স্ক্যান ক্লিক করুন।"
     },
     "time": {
-      "justNow": "এইমাত্র",
+      "justNow": "এইমাত্র, এখনই।",
       "minutesAgo": "{min} মিনিট আগে",
       "hoursAgo": "{hr} ঘণ্টা আগে",
       "daysAgo": "{day} দিন আগে"
     },
     "scanning": {
-      "heading": "প্যাকেজ স্ক্যান করা হচ্ছে",
-      "body1": "Saropa এই প্রকল্পে প্রতিটি সরাসরি নির্ভরতার জন্য pub.dev মেটাডেটা, GitHub কার্যকলাপ এবং নির্ভরতা গ্রাফ আনছে।",
+      "heading": "স্ক্যানিং প্যাকেজগুলি স্ক্রিন করুন",
+      "body1": "Saropa এই প্রকল্পের প্রতিটি সরাসরি নির্ভরতার জন্য pub.dev মেটাডেটা, GitHub ক্রিয়াকলাপ এবং নির্ভরতা গ্রাফগুলি আনছে।",
       "body2": "স্ক্যান শেষ হলে এই পৃষ্ঠাটি স্বয়ংক্রিয়ভাবে রিফ্রেশ হবে। আপনি নীচের ডানদিকে অগ্রগতি বিজ্ঞপ্তি থেকে বাতিল করতে পারেন।",
       "versionStamp": "Saropa প্যাকেজ ড্যাশবোর্ড v{version}"
     },
-    "gaugeTitle": "প্রজেক্ট প্যাকেজ গ্রেড: {grade}",
+    "gaugeTitle": "প্রকল্প প্যাকেজ গ্রেডঃ {grade}",
     "summary": {
-      "packages": "প্যাকেজ",
-      "projectGrade": "প্রকল্প প্যাকেজ গ্রেড",
+      "packages": "প্যাকেজিংয়ের জন্য প্যাকেট",
+      "projectGrade": "প্রকল্প প্যাকেজ গ্রেডিং",
       "totalSize": "মোট আকার*",
       "gradeTooltip": "প্রকল্প গ্রেড {avgGrade}\nগড় স্কোর: {avgScore}/100\nপ্যাকেজ: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "প্রাণবন্ত",
-      "stableTitle": "স্থিতিশীল",
-      "outdatedTitle": "সেকেলে",
-      "abandonedTitle": "পরিত্যক্ত",
-      "eolTitle": "জীবনের শেষ",
-      "updates": "আপডেট",
-      "unused": "অব্যবহৃত",
-      "singleUse": "একক ব্যবহার",
-      "vulnerable": "দুর্বল",
-      "overrides": "ওভাররাইড করে",
-      "caveatLine1": "*কোডের আকার দেখানো হয়েছে (lib + ঘোষিত সম্পদ), যখন কোডের আকার অনুপলব্ধ থাকে তখন pub.dev সংরক্ষণাগার আকারে ফিরে আসে। dev_dependencies (build_runner, lints, saropa_lints, ইত্যাদি) বাদ দেয় — এগুলি কখনই APK/IPA/ওয়েব বান্ডেলে পাঠানো হয় না। গাছ কাঁপানোর পর প্রকৃত অ্যাপের আকার ছোট হবে।",
-      "caveatLine2": "অ্যাক্টিভিটি থ্রেশহোল্ড: 90d = বাসি, 180d = সুপ্ত (কমিট + রিলিজ টাইমলাইন)।"
+      "vibrantTitle": "প্রাণবন্ত, সজীব।",
+      "stableTitle": "স্থিতিশীল স্থির",
+      "outdatedTitle": "পুরানো, অপ্রচলিত।",
+      "abandonedTitle": "পরিত্যক্ত, পরিত্যাক্ত",
+      "eolTitle": "জীবনের শেষের দিকে",
+      "updates": "আপডেটগুলি আপডেটের জন্য",
+      "unused": "অব্যবহৃত, অপ্রয়োজনীয়।",
+      "singleUse": "একক ব্যবহারের জন্য",
+      "vulnerable": "দুর্বল ভ্রান্তিপূর্ণ",
+      "overrides": "ওভাররাইডগুলিকে অগ্রাহ্য করে",
+      "caveatLine1": "* কোডের আকারগুলি দেখানো হয়েছে (লিব + ঘোষিত সম্পদ), যখন কোড আকারটি অনুপলব্ধ থাকে তখন pub.dev সংরক্ষণাগার আকারে ফিরে আসে। dev_dependencies (build_runner, lints, saropa_lints ইত্যাদি)  ⁇  তারা কখনই APK / IPA / ওয়েব বান্ডেলের সাথে শিপ করে না। প্রকৃত অ্যাপ্লিকেশন আকার গাছ কাঁপানো পরে ছোট হবে।",
+      "caveatLine2": "ক্রিয়াকলাপের প্রান্তিকতাঃ 90d = জরাজীর্ণ, 180d = নিদ্রিত (প্রতিশ্রুতিবদ্ধ + প্রকাশের সময়সীমা) ।"
     },
     "breakdown": {
-      "title": "কেন গ্রেড {grade}? — {avgScore}/100 গড় {pkgCount} প্যাকেজ জুড়ে",
-      "hint": "প্রসারিত করতে ক্লিক করুন",
-      "distributionHeading": "বিতরণ",
-      "signalsHeading": "স্কোর নিচে টেনে ঝুঁকি সংকেত",
-      "signalFlagged": "{count} পতাকাযুক্ত (পরিত্যক্ত / জীবনের শেষ)",
-      "signalVulnerable": "পরিচিত দুর্বলতা সহ {count}",
-      "signalUpdates": "{count} আপডেট উপলব্ধ আছে",
-      "bottomHeading": "সর্বনিম্ন স্কোরিং প্যাকেজ",
-      "thresholdsHeading": "স্কোর কিভাবে গ্রেডে মানচিত্র করে",
-      "thresholdA": "70+ — প্রাণবন্ত: সক্রিয়ভাবে রক্ষণাবেক্ষণ করা হয়েছে, সম্প্রতি প্রকাশিত হয়েছে",
-      "thresholdB": "40-69 — স্থিতিশীল: এখনও বজায় আছে কিন্তু ধীর",
-      "thresholdC": "20-39 — পুরানো: রিলিজের মধ্যে দীর্ঘ ব্যবধান",
-      "thresholdE": "20 এর নিচে — পরিত্যক্ত: নিষ্ক্রিয়তার লক্ষণ",
-      "thresholdF": "pub.dev-এ বন্ধ বা সংরক্ষণাগারভুক্ত (স্কোর ব্যবহার করা হয়নি)",
-      "filterTooltip": "শুধু এই বিভাগে প্যাকেজ টেবিল ফিল্টার",
-      "jumpTooltip": "প্যাকেজ টেবিলে {name} এ যান"
+      "title": "কেন {grade} গ্রেড? — {pkgCount} প্যাকেজ জুড়ে {avgScore}/100 গড়",
+      "hint": "ক্লিক করুন সম্প্রসারণ করতে।",
+      "distributionHeading": "বিতরণ, বন্টন",
+      "signalsHeading": "ঝুঁকি সংকেত স্কোরটি নীচে টেনে নিয়ে যাওয়ার জন্য।",
+      "signalFlagged": "{count} পতাকাঙ্কিত (পরিত্যক্ত / জীবনের শেষ)",
+      "signalVulnerable": "{count} পরিচিত দুর্বলতা সঙ্গে।",
+      "signalUpdates": "{count} আপডেটগুলি উপলব্ধ রয়েছে।",
+      "bottomHeading": "সর্বনিম্ন স্কোরিং প্যাকেজগুলি।",
+      "thresholdsHeading": "স্কোরগুলি কীভাবে গ্রেডের সাথে মানচিত্র তৈরি করে",
+      "thresholdA": "70+  ⁇  প্রাণবন্তঃ সক্রিয়ভাবে রক্ষণাবেক্ষণ করা, সম্প্রতি প্রকাশিত।",
+      "thresholdB": "40 ⁇ 69  ⁇  স্থিতিশীলঃ এখনও বজায় রাখা কিন্তু ধীর গতির।",
+      "thresholdC": "20 ⁇ 39  ⁇  পুরানোঃ রিলিজের মধ্যে দীর্ঘ ফাঁক।",
+      "thresholdE": "20 এর নিচে  ⁇  পরিত্যক্তঃ অকার্যকরতার লক্ষণ",
+      "thresholdF": "স্থগিত বা সংরক্ষণাগারভুক্ত on pub.dev (স্কোর ব্যবহৃত হয় না)",
+      "filterTooltip": "প্যাকেজ টেবিলটি কেবল এই বিভাগে ফিল্টার করুন।",
+      "jumpTooltip": "প্যাকেজিং টেবিলের {name} এ ঝাঁপিয়ে পড়ুন।"
     },
     "network": {
-      "summary": "নির্ভরতা নেটওয়ার্ক"
+      "summary": "ডিপেনডেন্সি নেটওয়ার্ক (Dependency Network) এর উপর নির্ভরশীল"
     },
     "sections": {
-      "sizeDistribution": "আকার বিতরণ",
-      "sizeDistributionCaption": "dev_dependencies বাদ দেয় — এগুলি কখনই APK/IPA/ওয়েব বান্ডেলে পাঠানো হয় না।",
-      "filters": "ফিল্টার",
-      "packages": "প্যাকেজ"
+      "sizeDistribution": "আকার বন্টন, আকার বিতরণ।",
+      "sizeDistributionCaption": "dev_dependencies  ⁇  বাদ দেয় তারা কখনই APK / IPA / ওয়েব বান্ডেলটিতে শিপ করে না।",
+      "filters": "ফিল্টারগুলি ফিল্টারের মতো।",
+      "packages": "প্যাকেজিংয়ের জন্য প্যাকেট"
     },
     "toolbar": {
-      "openPubspecTitle": "pubspec.yaml খুলুন",
+      "openPubspecTitle": "খোলা pubspec.yaml",
       "openPubspecLabel": "pubspec.yaml",
-      "copyAllTitle": "রিপোর্ট JSON কপি করুন (সমস্ত সারি + বিবরণ)",
-      "copyAllLabel": "কপি",
-      "saveAllTitle": "প্রতিবেদন JSON-কে প্রতিবেদনে সংরক্ষণ করুন/YYYYMMDD/...",
-      "saveAllLabel": "সংরক্ষণ করুন",
-      "saveUpgradeTitle": "রিপোর্ট/YYYYMMDD/... এ উপলব্ধ আপডেট সহ শুধুমাত্র প্যাকেজের একটি প্রতিবেদন সংরক্ষণ করুন।",
+      "copyAllTitle": "প্রতিবেদন JSON (সমস্ত সারি + বিবরণ) অনুলিপি করুন।",
+      "copyAllLabel": "কপি,কপি,অনুলিপি করে দিন।",
+      "saveAllTitle": "প্রতিবেদন JSON সংরক্ষণ করুন reports/YYY YMMDD/... এ",
+      "saveAllLabel": "Save save সংরক্ষণ করুন",
+      "saveUpgradeTitle": "রিপোর্ট/YYY YMMDD/... এর একটি উপলব্ধ আপডেট সহ শুধুমাত্র প্যাকেজগুলির একটি প্রতিবেদন সংরক্ষণ করুন।",
       "saveUpgradeLabel": "আপগ্রেড রিপোর্ট সংরক্ষণ করুন",
-      "resetViewTitle": "ফিল্টার রিসেট করুন, সাজান এবং সেভ করা ভিউ স্টেট",
-      "resetViewLabel": "ভিউ রিসেট করুন",
-      "rescanTitle": "প্যাকেজগুলি পুনরায় স্ক্যান করুন — pub.dev ক্যাশে সাফ করে এবং সংস্করণগুলি পুনরায় আনয়ন করে",
-      "rescanLabel": "রিস্ক্যান করুন",
-      "openOtherTitle": "ভাইব্রেন্সি স্ক্যানের জন্য একটি নতুন উইন্ডোতে আরেকটি pubspec.yaml এর প্রকল্প খুলুন",
-      "openOtherLabel": "প্রকল্প খুলুন...",
-      "footprintGroupAria": "সাইজ কলাম ফুটপ্রিন্ট মোড",
-      "footprintGroupTitle": "সাইজ কলাম যা দেখায়: শুধুমাত্র নিজের কোড সাইজ, প্লাস ইউনিক ট্রানজিটিভ (সরানো হলে খরচ), বা প্লাস সব ট্রানজিটিভ (তাত্ত্বিক সর্বোচ্চ)। কোডের আকার অনুপলব্ধ হলে সংরক্ষণাগার আকারে ফিরে আসে।",
-      "footprintLabel": "পদচিহ্ন:",
-      "footprintOwnTitle": "শুধুমাত্র নিজস্ব কোড আকার (lib + ঘোষিত সম্পদ); অনুপলব্ধ হলে pub.dev সংরক্ষণাগার আকারে ফিরে আসে",
-      "footprintOwn": "নিজের",
-      "footprintUniqueTitle": "নিজস্ব আকার + ট্রানজিটিভ শুধুমাত্র এই ডিপ দ্বারা ব্যবহৃত হয় (যদি আপনি এটি সরিয়ে দেন)",
-      "footprintUnique": "+ অনন্য",
-      "footprintTotalTitle": "নিজস্ব আকার + সমস্ত ট্রানজিটিভ, অন্যান্য ডিপের সাথে ভাগ করা সহ",
-      "footprintTotal": "+ সব",
-      "searchLabel": "প্যাকেজ অনুসন্ধান করুন",
-      "searchPlaceholder": "প্যাকেজ অনুসন্ধান করুন...",
-      "clearSearchTitle": "সাফ অনুসন্ধান",
-      "clearSearchAria": "সাফ অনুসন্ধান",
-      "ageFilterTitle": "প্রকাশের বয়স অনুসারে ফিল্টার করুন",
-      "publishedAgeLabel": "প্রকাশিত বয়স",
-      "ageMaxAll": "সব",
-      "presetFilterTitle": "দ্রুত ফিল্টার প্রিসেট প্রয়োগ করুন",
-      "presetLabel": "প্রিসেট",
-      "presetNone": "কোনোটিই নয়",
-      "presetModernization": "আধুনিকায়ন",
-      "presetRiskHotspots": "ঝুঁকিপূর্ণ হটস্পট",
-      "presetCleanup": "ক্লিনআপ প্রার্থীরা",
-      "presetDirectOnly": "শুধুমাত্র সরাসরি",
-      "devToggleTitle": "সারণী এবং মোটে dev নির্ভরতা অন্তর্ভুক্ত করুন",
-      "includeDev": "dev অন্তর্ভুক্ত করুন",
-      "activeFiltersLabel": "সক্রিয় ফিল্টার:",
-      "clearAllFilters": "সব সাফ করুন"
+      "resetViewTitle": "ফিল্টারগুলি রিসেট করুন, বাছাই করুন এবং দৃশ্যের স্থিতি সংরক্ষণ করুন।",
+      "resetViewLabel": "রিসেট ভিউতে, পুনরায় সেট করুন।",
+      "rescanTitle": "পুনরায় স্ক্যান প্যাকেজ  ⁇  pub.dev ক্যাশে সাফ করে এবং সংস্করণগুলি আবার আনতে পারে।",
+      "rescanLabel": "পুনরায় স্ক্যান করুন Rescan",
+      "openOtherTitle": "ভাইব্র্যান্সি স্ক্যানের জন্য একটি নতুন উইন্ডোতে অন্য pubspec.yaml এর প্রকল্পটি খুলুন।",
+      "openOtherLabel": "ওপেন প্রজেক্ট...",
+      "footprintGroupAria": "আকার কলাম ফুটপ্রিন্ট মোড",
+      "footprintGroupTitle": "আকার কলামে কী দেখানো হয়ঃ কেবলমাত্র নিজস্ব কোডের আকার, প্লাস অনন্য ট্রানজিটিভস (মূল্য যদি সরিয়ে ফেলা হয়) বা সমস্ত ট্রান্সিটিভগুলি (তত্ত্বগত সর্বোচ্চ) । কোডের আকার অনুপলব্ধ হলে এটি সংরক্ষণাগার আকারে ফিরে আসে।",
+      "footprintLabel": "পদচিহ্নঃ পাদদেশের ছাপ",
+      "footprintOwnTitle": "শুধুমাত্র নিজস্ব কোড আকার (lib + ঘোষিত সম্পদ); যখন অ-অপলব্ধ থাকে তখন pub.dev আর্কাইভের আকারে ফিরে আসে।",
+      "footprintOwn": "নিজের মালিকানা, নিজস্ব সম্পদ।",
+      "footprintUniqueTitle": "নিজস্ব আকার + ট্রানজিটিভগুলি কেবল এই ডিপ দ্বারা ব্যবহৃত হয় (আপনি যদি এটি সরিয়ে ফেলেন তবে সঞ্চয়)",
+      "footprintUnique": "+ অনন্য Unique",
+      "footprintTotalTitle": "নিজস্ব আকার + সমস্ত ট্রানজিটিভ, অন্যান্য বিভাগের সাথে ভাগ করা সহ।",
+      "footprintTotal": "+ সব + সমস্ত",
+      "searchLabel": "অনুসন্ধান প্যাকেজগুলি সন্ধান করুন",
+      "searchPlaceholder": "প্যাকেজ অনুসন্ধান করুন ...",
+      "clearSearchTitle": "অনুসন্ধান সাফ করুন পরিষ্কার অনুসন্ধান",
+      "clearSearchAria": "অনুসন্ধান সাফ করুন পরিষ্কার অনুসন্ধান",
+      "ageFilterTitle": "বয়স প্রকাশের দ্বারা ফিল্টার করুন",
+      "publishedAgeLabel": "প্রকাশিত বয়স বয়স।",
+      "ageMaxAll": "সব, সমস্ত, সকলই",
+      "presetFilterTitle": "দ্রুত ফিল্টার প্রিসেটগুলি প্রয়োগ করুন",
+      "presetLabel": "প্রিসেট প্রেস সেট",
+      "presetNone": "না, না, কেউ নেই।",
+      "presetModernization": "আধুনিকীকরণ।",
+      "presetRiskHotspots": "ঝুঁকি হটস্পটগুলি হ'ল ঝুঁকির হট স্পট।",
+      "presetCleanup": "ক্লিনআপ প্রার্থী প্রার্থীদের",
+      "presetDirectOnly": "শুধুমাত্র সরাসরি কেবলমাত্র প্রত্যক্ষ",
+      "devToggleTitle": "টেবিল এবং মোটের মধ্যে dev নির্ভরতা অন্তর্ভুক্ত করুন।",
+      "includeDev": "অন্তর্ভুক্ত dev dev.",
+      "activeFiltersLabel": "সক্রিয় ফিল্টারঃ",
+      "clearAllFilters": "সব পরিষ্কার, সবকিছু সাফ।"
     },
     "columns": {
       "name": {
-        "label": "প্যাকেজ",
-        "tooltip": "প্যাকেজের নাম — pubspec.yaml এন্ট্রি খুলতে ক্লিক করুন"
+        "label": "প্যাকেজিংয়ের জন্য একটি ভাল মানের।",
+        "tooltip": "প্যাকেজের নাম  ⁇  pubspec.yaml এন্ট্রি খোলার জন্য ক্লিক করুন।"
       },
       "version": {
-        "label": "সংস্করণ",
-        "tooltip": "pubspec.lock থেকে ইনস্টল করা সংস্করণ"
+        "label": "সংস্করণ সংস্করণ Version",
+        "tooltip": "pubspec.lock থেকে ইনস্টল করা সংস্করণ।"
       },
       "score": {
-        "label": "শ্রেণী",
-        "tooltip": "ভাইব্রেন্সি শ্রেণীবিভাগ এবং স্বাস্থ্য স্কোর (0-10)"
+        "label": "Category শ্রেণীবিভাগের বিষয়শ্রেণী বিভাগ",
+        "tooltip": "প্রাণশক্তি শ্রেণিবিন্যাস এবং স্বাস্থ্যের স্কোর (0 ⁇ 10)"
       },
       "published": {
-        "label": "প্রকাশিত হয়েছে",
-        "tooltip": "ইনস্টল করা সংস্করণটি pub.dev-এ প্রকাশিত হওয়ার তারিখ"
+        "label": "প্রকাশিত প্রকাশিত Published",
+        "tooltip": "ইনস্টল করা সংস্করণটি pub.dev এ প্রকাশিত হওয়ার তারিখ।"
       },
       "activity": {
-        "label": "কার্যকলাপ",
-        "tooltip": "কমিট থেকে কোড-এবং-রিলিজ অ্যাক্টিভিটি গ্রেড + রিসেন্সি প্রকাশ করুন"
+        "label": "কার্যকলাপ ক্রিয়াকলাপ",
+        "tooltip": "কোড-এবং-রিলিজ কার্যকলাপ গ্রেড থেকে প্রতিশ্রুতি + প্রকাশের সাম্প্রতিকতা।"
       },
       "likes": {
-        "label": "পছন্দ",
-        "tooltip": "pub.dev পছন্দ করে — প্যাকেজ স্কোর পৃষ্ঠা খুলতে ক্লিক করুন"
+        "label": "পছন্দগুলি পছন্দ করে",
+        "tooltip": "pub.dev পছন্দ  ⁇  প্যাকেজ স্কোর পৃষ্ঠা খোলার জন্য ক্লিক করুন।"
       },
       "downloads": {
-        "label": "ডাউনলোড",
-        "tooltip": "pub.dev গত 30 দিনে ডাউনলোড হয়েছে — প্যাকেজ স্কোর পৃষ্ঠা খুলতে ক্লিক করুন"
+        "label": "ডাউনলোডসমূহ Downloads",
+        "tooltip": "গত 30 দিনের মধ্যে pub.dev ডাউনলোডগুলি  ⁇  প্যাকেজ স্কোর পৃষ্ঠাটি খোলার জন্য ক্লিক করুন।"
       },
       "issues": {
-        "label": "ইস্যু",
-        "tooltip": "GitHub সমস্যাগুলি খুলুন (উপলব্ধ হলে পুল অনুরোধগুলি বাদ দেয়)"
+        "label": "ইস্যুগুলি সমস্যাগুলি",
+        "tooltip": "খোলা GitHub ইস্যু (যদি পাওয়া যায় তবে টান অনুরোধগুলি বাদ দেয়)"
       },
       "prs": {
-        "label": "পিআর",
-        "tooltip": "GitHub পুল অনুরোধ খুলুন"
+        "label": "পিআরএস (PRs) -এর মাধ্যমে প্রকাশ্যে প্রচার করা হয়।",
+        "tooltip": "GitHub টান অনুরোধগুলি খুলুন।"
       },
       "size": {
-        "label": "আকার",
-        "tooltip": "কোড আকার (lib + ঘোষিত সম্পদ); কোড আকার অনুপলব্ধ হলে pub.dev সংরক্ষণাগার আকারে ফিরে আসে"
+        "label": "আকার মাপ সাইজ আকার আকার",
+        "tooltip": "কোড আকার (লিব + ঘোষিত সম্পদ); যখন কোডের আকার অনুপলব্ধ থাকে তখন pub.dev সংরক্ষণাগার আকারে ফিরে আসে।"
       },
       "deps": {
-        "label": "ডিপস",
-        "tooltip": "প্রত্যক্ষ ট্রানজিটিভ নির্ভরতা — ভাগ করা ডিপগুলি হাইলাইট করা হয়েছে৷"
+        "label": "ডিপস ডেপস",
+        "tooltip": "সরাসরি ট্রানজিটিভ নির্ভরতা  ⁇  ভাগ করা ডেপস হাইলাইট করা হয়েছে"
       },
       "files": {
-        "label": "তথ্যসূত্র",
-        "tooltip": "এই প্যাকেজটি আমদানি করে এমন উৎস ফাইলের সংখ্যা — অনুসন্ধান করতে ক্লিক করুন"
+        "label": "রেফারেন্সগুলি উল্লেখ করুন",
+        "tooltip": "এই প্যাকেজটি আমদানি করে এমন উত্স ফাইলের সংখ্যা  ⁇  অনুসন্ধান করতে ক্লিক করুন"
       },
       "transitives": {
-        "label": "ট্রানজিটিভস",
-        "tooltip": "ট্রানজিটিভ (পরোক্ষ) নির্ভরতার সংখ্যা এই প্যাকেজ টানে"
+        "label": "ট্রানজিটিভস (Transitive) -এর অর্থ হলো-অস্থায়ী।",
+        "tooltip": "এই প্যাকেজটি যে পরিমাণ ট্রানজিটিভ (অপ্রত্যক্ষ) নির্ভরতা টানছে তার সংখ্যা।"
       },
       "vulns": {
         "label": "দুর্বলতা",
-        "tooltip": "OSV এবং GitHub অ্যাডভাইজরি ডেটাবেস থেকে পরিচিত নিরাপত্তা দুর্বলতা"
+        "tooltip": "OSV এবং GitHub উপদেষ্টা ডাটাবেস থেকে পরিচিত নিরাপত্তা দুর্বলতা।"
       },
       "license": {
-        "label": "লাইসেন্স",
-        "tooltip": "pub.dev থেকে SPDX লাইসেন্স শনাক্তকারী"
+        "label": "লাইসেন্স লাইসেন্সিং",
+        "tooltip": "pub.dev থেকে SPDX লাইসেন্স আইডেন্টিফায়ার।"
       },
       "update": {
-        "label": "আপডেট",
-        "tooltip": "উপলব্ধ সংস্করণ আপডেট: প্রধান, গৌণ, বা প্যাচ"
+        "label": "আপডেট করুন Update Update",
+        "tooltip": "উপলব্ধ সংস্করণ আপডেটঃ প্রধান, ছোটখাটো বা প্যাচ।"
       },
       "status": {
-        "label": "স্ট্যাটাস",
-        "tooltip": "ব্যবহারের স্থিতি: প্যাকেজটি আপনার কোডে অব্যবহৃত দেখাচ্ছে কিনা"
+        "label": "স্ট্যাটাস স্টেটস স্ট্যাটিস স্ট্যাটস",
+        "tooltip": "ব্যবহারের অবস্থাঃ আপনার কোডে প্যাকেজটি অব্যবহৃত হিসাবে উপস্থিত কিনা তা নির্ধারণ করুন।"
       },
       "description": {
-        "label": "বর্ণনা",
-        "tooltip": "pub.dev থেকে প্যাকেজের বিবরণ"
+        "label": "বর্ণনা Description Description বিবরণী",
+        "tooltip": "pub.dev থেকে প্যাকেজিংয়ের বর্ণনা।"
       }
     },
     "cells": {
-      "noGithub": "কোনো GitHub সংগ্রহস্থল পাওয়া যায়নি",
-      "devBadge": "দেব",
-      "transitiveBadge": "ট্রানজিটিভ",
-      "publishDateUnavailable": "pub.dev থেকে প্রকাশের তারিখ উপলব্ধ নয়",
-      "activityGradeUnavailable": "কার্যকলাপ গ্রেড অনুপলব্ধ (অনুপস্থিত প্রতিশ্রুতি বা রিলিজ ডেটা)",
-      "activityFallback": "সাম্প্রতিক প্রতিশ্রুতি এবং প্রকাশের উপর ভিত্তি করে কার্যকলাপ",
-      "likesUnavailable": "pub.dev পছন্দগুলি উপলব্ধ নয়৷",
+      "noGithub": "কোন GitHub সংগ্রহস্থল পাওয়া যায় নি।",
+      "devBadge": "dev dev dev Dev এর অর্থ কী?",
+      "transitiveBadge": "transitive - অস্থায়ী, ট্রানজিটিভ।",
+      "publishDateUnavailable": "প্রকাশের তারিখ pub.dev থেকে উপলভ্য নয়",
+      "activityGradeUnavailable": "অ্যাক্টিভিটি গ্রেড অনুপলব্ধ (কমিট বা রিলিজ ডেটা মিস করা)",
+      "activityFallback": "সাম্প্রতিক প্রতিশ্রুতি এবং প্রকাশের উপর ভিত্তি করে ক্রিয়াকলাপ।",
+      "likesUnavailable": "pub.dev পছন্দগুলি উপলভ্য নয়",
       "likesCount": "{count} pub.dev পছন্দ করে",
-      "downloadsUnavailable": "pub.dev 30-দিনের ডাউনলোডগুলি উপলব্ধ নয়৷",
+      "downloadsUnavailable": "pub.dev 30 দিনের ডাউনলোডগুলি উপলভ্য নয়।",
       "downloadsCount": "গত 30 দিনে {count} ডাউনলোড",
-      "sizeUnavailable": "pub.dev থেকে আকার উপলব্ধ নয়",
-      "noVulnerabilities": "কোন পরিচিত দুর্বলতা",
-      "licenseUnspecified": "pub.dev-এ লাইসেন্স নির্দিষ্ট করা নেই",
-      "unusedBadge": "অব্যবহৃত",
-      "packageInUse": "প্যাকেজ ব্যবহার করা হয়"
+      "sizeUnavailable": "pub.dev থেকে আকার পাওয়া যায় না",
+      "noVulnerabilities": "কোন পরিচিত দুর্বলতা নেই",
+      "licenseUnspecified": "pub.dev এ লাইসেন্স নির্দিষ্ট করা হয়নি",
+      "unusedBadge": "অব্যবহৃত, অপ্রয়োজনীয়।",
+      "packageInUse": "প্যাকেজটি ব্যবহারে রয়েছে।"
     },
     "row": {
-      "expandDetails": "বিশদ বিবরণ প্রসারিত করুন",
-      "copyRowJson": "JSON হিসাবে সারি কপি করুন"
+      "expandDetails": "বিস্তারিত বিবরণ প্রসারিত করুন।",
+      "copyRowJson": "JSON হিসাবে সারি অনুলিপি করুন"
     },
     "shortcuts": {
-      "focusSearch": "অনুসন্ধান ক্ষেত্রে ফোকাস করুন",
-      "nextRow": "পরবর্তী প্যাকেজ সারি হাইলাইট করুন",
-      "prevRow": "পূর্ববর্তী প্যাকেজ সারি হাইলাইট করুন",
-      "toggleDetail": "হাইলাইট করা প্যাকেজের বিস্তারিত বিস্তৃতি টগল করুন",
-      "escapeSearch": "সাফ ফোকাসড অনুসন্ধান; দ্বিতীয় Esc সমস্ত প্রসারিত সারি ভেঙে দেয়",
-      "historyBack": "প্যাকেজ নেভিগেশন ইতিহাসের মাধ্যমে ফিরে যান",
-      "showOverlay": "এই শর্টকাট ওভারলে দেখান"
+      "focusSearch": "ফোকাস অনুসন্ধান ক্ষেত্রের উপর ফোকস করুন।",
+      "nextRow": "পরবর্তী প্যাকেজ লাইনের লাইনটি হাইলাইট করুন।",
+      "prevRow": "পূর্ববর্তী প্যাকেজ লাইনের হাইলাইট করুন।",
+      "toggleDetail": "হাইলাইট করা প্যাকেজ বিস্তারিত এক্সপ্যান্ডার টগল করুন।",
+      "escapeSearch": "পরিষ্কার ফোকাসযুক্ত অনুসন্ধান; দ্বিতীয় Esc সমস্ত প্রসারিত সারিগুলিকে ধসে পড়ে।",
+      "historyBack": "প্যাকেজ নেভিগেশন ইতিহাসের মাধ্যমে ফিরে যান।",
+      "showOverlay": "এই শর্টকাট ওভারলে প্রদর্শন করুন।"
     },
     "versionTooltip": {
-      "installed": "ইনস্টল করা হয়েছে: {version} ({date})",
-      "latest": "সর্বশেষ: {version}",
-      "created": "তৈরি করা হয়েছে: {date}",
-      "constraint": "সীমাবদ্ধতা: {constraint}"
+      "installed": "ইনস্টল করাঃ {version} ({date})",
+      "latest": "সর্বশেষঃ {version}",
+      "created": "তৈরি করেছেনঃ {date}",
+      "constraint": "সীমাবদ্ধতাঃ {constraint}"
     },
     "healthTooltip": {
-      "grade": "গ্রেড: {grade}",
-      "resolutionVelocity": "রেজোলিউশন বেগ: {value}",
-      "engagementLevel": "বাগদান স্তর: {value}",
-      "popularity": "জনপ্রিয়তা: {value}",
-      "publisherTrust": "প্রকাশক ট্রাস্ট: {value}",
-      "codeCommits": "কোড কমিট: {age} আগে",
-      "latestRelease": "সর্বশেষ প্রকাশ: {age} আগে",
-      "activitySignal": "কার্যকলাপ সংকেত: {signal}"
+      "grade": "গ্রেডঃ {grade}",
+      "resolutionVelocity": "রেজোলিউশন গতিঃ {value}",
+      "engagementLevel": "নিযুক্তিকরণ স্তরঃ {value}",
+      "popularity": "জনপ্রিয়তাঃ {value}",
+      "publisherTrust": "প্রকাশক বিশ্বাসঃ {value}",
+      "codeCommits": "কোড commits: {age} ago",
+      "latestRelease": "সর্বশেষ রিলিজঃ {age} বছর আগে",
+      "activitySignal": "কার্যকলাপ সংকেতঃ {signal}"
     },
     "size": {
-      "codeSize": "কোড আকার: {size}",
-      "archiveSize": "সংরক্ষণাগার আকার: {size}",
-      "onDisk": "ডিস্কে: {size}",
-      "withUniqueTransitives": "অনন্য ট্রানজিটিভ সহ: {size}",
-      "withSharedTransitives": "শেয়ার্ড ট্রানজিটিভ সহ: {size}",
-      "openFolder": "স্থানীয় প্যাকেজ ফোল্ডার খুলুন"
+      "codeSize": "কোডের আকারঃ {size}",
+      "archiveSize": "আর্কাইভের আকারঃ {size}",
+      "onDisk": "ডিস্কেঃ {size}",
+      "withUniqueTransitives": "অনন্য ট্রানজিটিভ সহঃ {size}",
+      "withSharedTransitives": "ভাগ করা ট্রানজিটিভগুলির সাথেঃ {size}",
+      "openFolder": "স্থানীয় প্যাকেজ ফোল্ডারটি খুলুন।"
     },
     "references": {
-      "noImports": "কোনো উৎস ফাইল আমদানি সনাক্ত করা যায়নি",
-      "reExportLine": "{location} (পুনরায় রপ্তানি)",
-      "reExportSuffix": "(পুনঃ রপ্তানি)",
-      "publicApiSurface": "সর্বজনীন API পৃষ্ঠ - অন্তত একটি ব্যবহার একটি পুনরায় রপ্তানি হয়.",
-      "reExportedBadge": "পুনরায় রপ্তানি করা হয়",
-      "openFileReferences": "ফাইল রেফারেন্স খুলুন",
-      "searchImports": "অনুসন্ধান আমদানি",
+      "noImports": "কোনও উত্স ফাইল আমদানি সনাক্ত করা হয়নি",
+      "reExportLine": "{location} (পুনরায় রফতানি)",
+      "reExportSuffix": "(পুনরায় রপ্তানি)",
+      "publicApiSurface": "পাবলিক এপিআই পৃষ্ঠ  ⁇  কমপক্ষে একটি ব্যবহার পুনরায় রফতানি।",
+      "reExportedBadge": "পুনরায় রফতানি করা হয়েছে",
+      "openFileReferences": "ফাইলের রেফারেন্স খুলুন",
+      "searchImports": "অনুসন্ধান আমদানি-আমদানির সন্ধান করুন",
       "fileReferencesHeading": "ফাইল রেফারেন্স ({count})",
-      "andMore": "... এবং {count} আরও"
+      "andMore": "... এবং {count} আরও বেশি।"
     },
     "deps": {
-      "noTransitives": "কোনো ট্রানজিটিভ নির্ভরতা নেই",
-      "showTransitives": "ট্রানজিটিভ নির্ভরতা দেখান",
+      "noTransitives": "কোন ট্রানজিটিভ নির্ভরতা নেই।",
+      "showTransitives": "ট্রানজিটিভ নির্ভরতা দেখাও।",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (ভাগ করা)",
       "tooltipHeader": "{total} ট্রানজিটিভ ডিপস",
       "tooltipHeaderShared": "{total} ট্রানজিটিভ ডেপস ({shared} শেয়ার করা হয়েছে)",
-      "sharedBadgeTitle": "{count} অন্যান্য প্যাকেজের সাথে শেয়ার করা হয়েছে",
-      "sharedBadge": "ভাগ করা",
-      "transitiveDepsHeading": "ট্রানজিটিভ নির্ভরতা ({count})"
+      "sharedBadgeTitle": "{count} অন্যান্য প্যাকেজের সাথে ভাগ করা হয়।",
+      "sharedBadge": "শেয়ার করা ভাগ করে নেওয়া ভাগ করে নেওয়ার জন্য।",
+      "transitiveDepsHeading": "ট্রানজিটিভ ডিপেনডেন্সি ({count})"
     },
     "dormancy": {
-      "noActivity6mo": "6+ মাসে কোন কমিট বা কোন রিলিজ নেই",
-      "noActivity3mo": "3+ মাসে কোন কমিট বা কোন রিলিজ নেই",
-      "releaseActiveCodeInactive": "রিলিজ সক্রিয়, কোড নিষ্ক্রিয় (কমিট ছাড়া 3+ মাস)",
-      "codeActiveReleaseSlow": "কোড সক্রিয়, রিলিজ ক্যাডেন্স ধীর (3+ মাস)"
+      "noActivity6mo": "6+ মাসে কোনও প্রতিশ্রুতিবদ্ধ এবং মুক্তি নেই।",
+      "noActivity3mo": "3+ মাসে কোনও কমিট এবং রিলিজ নেই।",
+      "releaseActiveCodeInactive": "রিলিজ সক্রিয়, কোড নিষ্ক্রিয় (3+ মাস কোন কমিট ছাড়াই)",
+      "codeActiveReleaseSlow": "কোড সক্রিয়, রিলিজ ক্যাডেন্স ধীর (3+ মাস) ।"
     },
     "activity": {
-      "withDormancy": "{dormancy} (অ্যাক্টিভিটি গ্রেড {grade})",
-      "healthy": "কোড এবং রিলিজ কার্যকলাপ স্বাস্থ্যকর (অ্যাক্টিভিটি গ্রেড {grade})"
+      "withDormancy": "{dormancy} (কর্মক্ষমতা গ্রেড {grade})",
+      "healthy": "কোড এবং মুক্তি কার্যকলাপ সুস্থ (অ্যাক্টিভিটি গ্রেড {grade}) ।"
     },
     "detail": {
-      "codeCommitActivity": "কোড কমিট কার্যকলাপ",
-      "releaseActivity": "রিলিজ কার্যকলাপ",
-      "dormancySignal": "সুপ্ততার সংকেত",
-      "ago": "{age} আগে",
-      "qualityExample": "+উদাহরণ",
-      "qualityExampleTitle": "চালানযোগ্য ডেমো পাঠানো হয়",
-      "qualityTests": "+পরীক্ষা",
-      "qualityTestsTitle": "একটি পরীক্ষা স্যুট জাহাজ",
-      "qualityTools": "+সরঞ্জাম",
-      "qualityToolsTitle": "জাহাজ রক্ষণাবেক্ষণকারী টুলিং",
-      "qualityDocs": "+ডক্স",
-      "qualityDocsTitle": "জাহাজ বর্ধিত ডকুমেন্টেশন",
-      "healthScore": "স্বাস্থ্য স্কোর",
-      "resolutionVelocity": "রেজোলিউশন বেগ",
-      "engagementLevel": "এনগেজমেন্ট লেভেল",
-      "popularity": "জনপ্রিয়তা",
-      "publisherTrust": "প্রকাশক ট্রাস্ট",
-      "fixInVersion": "→ {version} এ ঠিক করুন",
+      "codeCommitActivity": "কোড কমিট অ্যাক্টিভিটি কমান্ড কমিশন কার্যকলাপ",
+      "releaseActivity": "রিলিজ কার্যকলাপের মুক্তির ক্রিয়াকলাপ।",
+      "dormancySignal": "নিদ্রা সিগন্যাল",
+      "ago": "{age} ago আগে",
+      "qualityExample": "+উদাহরণস্বরূপ উদাহরণ",
+      "qualityExampleTitle": "একটি চালনাযোগ্য ডেমো শিপিং করে।",
+      "qualityTests": "+পরীক্ষা-নিরীক্ষা",
+      "qualityTestsTitle": "একটি পরীক্ষার স্যুট শিপিং করে।",
+      "qualityTools": "+ সরঞ্জামসমূহ",
+      "qualityToolsTitle": "জাহাজ রক্ষণাবেক্ষণকারী সরঞ্জাম সরঞ্জামের সরঞ্জামাদি",
+      "qualityDocs": "+docs ডকুমেন্টস",
+      "qualityDocsTitle": "জাহাজগুলি প্রসারিত ডকুমেন্টেশন নথিভুক্ত করে।",
+      "healthScore": "স্বাস্থ্য স্কোর (Health Score) -এর মাধ্যমে।",
+      "resolutionVelocity": "রেজোলিউশন গতিবেগ",
+      "engagementLevel": "Engagement Level (প্রবৃত্তি স্তর)",
+      "popularity": "জনপ্রিয়তা Popularity জনপ্রিয়তা",
+      "publisherTrust": "প্রকাশক ট্রাস্টের উপর নির্ভরশীল।",
+      "fixInVersion": "→ {version} এ ফিক্স করুন",
       "vulnerabilitiesHeading": "দুর্বলতা ({count})"
     },
     "links": {
-      "heading": "লিঙ্ক",
+      "heading": "লিঙ্কগুলি লিংকসমূহ",
       "pubDev": "pub.dev",
-      "changelog": "চেঞ্জলগ",
-      "versions": "সংস্করণ",
-      "repository": "ভান্ডার",
-      "issues": "সমস্যা"
+      "changelog": "পরিবর্তনের লগ পরিবর্তন করুন",
+      "versions": "সংস্করণগুলি - ভার্সনগুলির জন্য একটি সংক্ষিপ্তসার।",
+      "repository": "রেজিস্ট্রি রিপোজিটরি।",
+      "issues": "বিষয়গুলি সমস্যাগুলির সাথে সম্পর্কিত।"
     }
   },
   "commandCatalog": {
-    "documentTitle": "Saropa কমান্ড ক্যাটালগ",
-    "skipLink": "কমান্ড ক্যাটালগ এড়িয়ে যান",
-    "heroTitle": "Saropa কমান্ড ক্যাটালগ",
+    "documentTitle": "Saropa কমান্ড ক্যাটালগ ক্যাটাগরি",
+    "skipLink": "ক্যাটালগ থেকে কমান্ডে যান।",
+    "heroTitle": "Saropa কমান্ড ক্যাটালগ ক্যাটাগরি",
     "status": {
       "commands": "{count} কমান্ড",
       "categories": "{count} ক্যাটাগরি",
       "recent": "{count} সাম্প্রতিক",
       "internalHidden": "{count} শুধুমাত্র কনটেক্সট-মেনু (লুকানো)",
-      "wordCommands": "আদেশ",
-      "wordCategories": "বিভাগ",
-      "wordRecent": "সাম্প্রতিক"
+      "wordCommands": "কমান্ডগুলি আদেশ দেয়।",
+      "wordCategories": "বিভাগসমূহ শ্রেণীবিভাগগুলি বিষয়শ্রেণীসমূহ",
+      "wordRecent": "সাম্প্রতিক, সম্প্রতি, অতিসম্প্রতি"
     },
     "search": {
-      "placeholder": "শিরোনাম, বিবরণ, বা কমান্ড আইডি অনুসন্ধান করুন...",
-      "ariaLabel": "অনুসন্ধান কমান্ড",
-      "clearAria": "সাফ অনুসন্ধান",
-      "hintLine1": "প্রতিটি কমান্ডের সাথে মেলে",
-      "hintStrongTitle": "শিরোনাম",
-      "hintStrongDesc": "বর্ণনা",
-      "hintStrongId": "আইডি",
-      "hintLine2": "(আইডি টোকেনগুলিও ফাঁকা থাকে — টাইপ",
-      "hintLine2kbd": "বিশ্লেষণ চালান",
-      "hintLine2End": "বিন্দু ছাড়া)।"
+      "placeholder": "অনুসন্ধানের শিরোনাম, বর্ণনা বা কমান্ড আইডি ...",
+      "ariaLabel": "অনুসন্ধান কমান্ডগুলি সন্ধান করুন",
+      "clearAria": "অনুসন্ধান সাফ করুন পরিষ্কার অনুসন্ধান",
+      "hintLine1": "প্রতিটি কমান্ডের সাথে মেলে।",
+      "hintStrongTitle": "Title শিরোনাম পদবি",
+      "hintStrongDesc": "বর্ণনা Description description বিবরণী",
+      "hintStrongId": "id id id আইডি",
+      "hintLine2": "(আইডি টোকেনগুলিও  ⁇  টাইপ স্পেসিং করা হয়।",
+      "hintLine2kbd": "রান অ্যানালিসিস, রান এনালিসিস।",
+      "hintLine2End": "বিন্দু ছাড়া) ।"
     },
     "toolbar": {
-      "showInternal": "প্রসঙ্গ-মেনু কমান্ড দেখান",
-      "collapseAll": "সব সঙ্কুচিত করুন"
+      "showInternal": "প্রসঙ্গ-মেনু কমান্ডগুলি দেখান",
+      "collapseAll": "সব ভেঙে পড়ুক,"
     },
     "recentPopover": {
-      "title": "সাম্প্রতিক অনুসন্ধান",
-      "clearTitle": "সমস্ত সাম্প্রতিক অনুসন্ধানগুলি সাফ করুন৷",
-      "clearButton": "পরিষ্কার",
-      "listAria": "সাম্প্রতিক অনুসন্ধান"
+      "title": "সাম্প্রতিক অনুসন্ধানগুলি",
+      "clearTitle": "সাম্প্রতিক সকল অনুসন্ধান সাফ করুন",
+      "clearButton": "Clear পরিষ্কার পরিষ্কার পরিষ্কার",
+      "listAria": "সাম্প্রতিক অনুসন্ধানগুলি"
     },
     "filterChips": {
-      "ariaRegion": "সক্রিয় ফিল্টার",
-      "activeLabel": "সক্রিয় ফিল্টার:",
-      "clearAll": "সব সাফ করুন"
+      "ariaRegion": "সক্রিয় ফিল্টারগুলি অ্যাক্টিভ ফিল্টারের সাথে যুক্ত।",
+      "activeLabel": "সক্রিয় ফিল্টারঃ",
+      "clearAll": "সব পরিষ্কার, সবকিছু সাফ।"
     },
     "bands": {
-      "frequentTitle": "ঘন ঘন",
-      "frequentHint": "আপনার সেশন জুড়ে সর্বাধিক ব্যবহৃত",
-      "recentTitle": "সাম্প্রতিক",
-      "recentClear": "পরিষ্কার",
-      "recentHint": "আবার চালানোর জন্য ক্লিক করুন · নতুনতম প্রথমে"
+      "frequentTitle": "প্রায়শই ঘন ঘন",
+      "frequentHint": "আপনার সেশন জুড়ে সর্বাধিক ব্যবহৃত।",
+      "recentTitle": "সাম্প্রতিক সম্প্রতি সাম্প্রতি সাম্প্রত সাম্প্রদায়িক",
+      "recentClear": "Clear পরিষ্কার পরিষ্কার পরিষ্কার",
+      "recentHint": "আবার চালানোর জন্য ক্লিক করুন · সর্বশেষ প্রথম"
     },
     "noResults": {
-      "message": "আপনার অনুসন্ধানের সাথে কোন কমান্ড মেলে না।",
-      "reset": "ফিল্টার রিসেট করুন"
+      "message": "কোন কমান্ড আপনার অনুসন্ধানের সাথে মেলে না।",
+      "reset": "রিসেট ফিল্টারগুলি পুনরায় সেট করুন"
     },
     "entry": {
-      "internalBadgeTitle": "শুধুমাত্র প্রসঙ্গ মেনু থেকে ট্রিগার করা হয়েছে",
-      "internalBadge": "মেনু",
-      "copyTitle": "কমান্ড আইডি কপি করুন ({id})",
-      "copyAria": "কমান্ড আইডি কপি করুন"
+      "internalBadgeTitle": "শুধুমাত্র প্রসঙ্গ মেনু থেকে ট্রিগার করা হয়।",
+      "internalBadge": "মেনু মেনুর জন্য, এটি একটি মেমরি।",
+      "copyTitle": "কমান্ড আইডি ({id}) অনুলিপি করুন।",
+      "copyAria": "কমান্ড আইডি অনুলিপি করুন।"
     },
-    "categoryJumpTitle": "ঝাঁপ দাও {category}",
+    "categoryJumpTitle": "{category} এ ঝাঁপ দাও",
     "shortcuts": {
-      "focusSearch": "অনুসন্ধান ক্ষেত্রে ফোকাস করুন",
-      "navRows": "দৃশ্যমান কমান্ড সারি নেভিগেট করুন",
-      "homeEnd": "প্রথম বা শেষ দৃশ্যমান সারিতে যান",
-      "enterRun": "ফোকাসড কমান্ড চালান",
-      "escClear": "সাফ অনুসন্ধান এবং ফিল্টার রিসেট",
-      "showOverlay": "এই শর্টকাট ওভারলে দেখান"
+      "focusSearch": "ফোকাস অনুসন্ধান ক্ষেত্রের উপর ফোকস করুন।",
+      "navRows": "দৃশ্যমান কমান্ড লাইন নেভিগেট করুন",
+      "homeEnd": "প্রথম বা শেষ দৃশ্যমান সারিতে ঝাঁপিয়ে পড়ুন।",
+      "enterRun": "ফোকাস কমান্ডটি চালান।",
+      "escClear": "অনুসন্ধান এবং রিসেট ফিল্টারগুলি সাফ করুন।",
+      "showOverlay": "এই শর্টকাট ওভারলে প্রদর্শন করুন।"
     },
     "script": {
-      "moreSuffix": "+{count} আরও",
-      "showLess": "কম দেখান",
-      "runSingular": "চালানো",
-      "runPlural": "রান",
-      "recentWord": "সাম্প্রতিক",
-      "expandAll": "সব প্রসারিত",
-      "collapseAll": "সব সঙ্কুচিত করুন",
-      "searchChip": "অনুসন্ধান করুন: \"{query}\"",
-      "internalChip": "প্রসঙ্গ-মেনু কমান্ড দেখানো হচ্ছে",
-      "removeFilterPrefix": "ফিল্টার সরান",
+      "moreSuffix": "+{count} আরো বেশি",
+      "showLess": "Show less কম দেখান",
+      "runSingular": "রান, রান , রান।",
+      "runPlural": "রান, রান করে।",
+      "recentWord": "সাম্প্রতিক, সম্প্রতি, অতিসম্প্রতি",
+      "expandAll": "সমস্ত প্রসারিত করুন",
+      "collapseAll": "সব ভেঙে পড়ুক,",
+      "searchChip": "অনুসন্ধানঃ \"{query}\"",
+      "internalChip": "প্রসঙ্গ-মেনু কমান্ড প্রদর্শন করা হচ্ছে",
+      "removeFilterPrefix": "ফিল্টার অপসারণ করুন",
       "matchOne": "{count} মিল",
       "matchOther": "{count} মিল"
     }
   },
   "codeHealth": {
     "documentTitle": "Saropa কোড স্বাস্থ্য ড্যাশবোর্ড",
-    "skipToTable": "ফাংশন টেবিল এড়িয়ে যান",
+    "skipToTable": "ফাংশন টেবিলের দিকে ঝাঁপিয়ে পড়ুন।",
     "openWorkspaceFirst": "প্রথমে একটি Dart/Flutter ওয়ার্কস্পেস খুলুন।",
-    "scanningTitle": "কোড স্বাস্থ্য: স্ক্যানিং ফাংশন...",
+    "scanningTitle": "কোড স্বাস্থ্যঃ স্ক্যানিং ফাংশন ...",
     "scan": {
-      "title": "প্রকল্পের স্বাস্থ্য স্ক্যান করা হচ্ছে",
-      "subtitle": "আপনার কোড পড়া. স্ক্যানটি আরও শেখার সাথে সাথে ড্যাশবোর্ডটি পূরণ হয়৷",
-      "waiting": "স্ক্যান শুরু হচ্ছে...",
-      "launching": "স্ক্যানার চালু করা হচ্ছে...",
-      "collect": "ফাইলগুলি আবিষ্কার করা হচ্ছে...",
-      "firstRunHint": "প্রথম রান স্ক্যানার কম্পাইল; বড় প্রকল্পগুলি ফাইলগুলি উপস্থিত হওয়ার আগে কিছুক্ষণ সময় নেয়।",
-      "paused": "বিরতি দেওয়া হয়েছে",
-      "stopped": "স্ক্যান বন্ধ",
-      "elapsed": "অতিবাহিত",
+      "title": "স্ক্যানিং প্রকল্প স্বাস্থ্য স্বাস্থ্য",
+      "subtitle": "আপনার কোড পড়া. স্ক্যান আরও শিখলে ড্যাশবোর্ডটি ভরাট করে।",
+      "waiting": "স্ক্যান শুরু হচ্ছে ...",
+      "launching": "লঞ্চিং স্ক্যানার...",
+      "collect": "ফাইলগুলি আবিষ্কার করা ...",
+      "firstRunHint": "প্রথম রান স্ক্যানারটি সংকলন করে; বড় প্রকল্পগুলি ফাইল প্রদর্শিত হওয়ার আগে কিছুক্ষণ সময় নেয়।",
+      "paused": "Paused স্থগিত করা হয়েছে",
+      "stopped": "স্ক্যানিং বন্ধ হয়ে গেছে।",
+      "elapsed": "elapsed গত হয়েছে",
       "phase": {
-        "parse": "ফাইল পার্সিং",
-        "history": "গিট ইতিহাস পড়া",
-        "blame": "কম্পিউটিং কোড বয়স",
-        "usage": "রেফারেন্স গণনা",
-        "score": "স্কোরিং ফাংশন"
+        "parse": "ফাইল পার্সিং করা হচ্ছে",
+        "history": "গিট ইতিহাস পড়া git ইতিহাস পড়ার।",
+        "blame": "কম্পিউটিং কোড বয়স বয়স",
+        "usage": "রেফারেন্স গণনা করা হচ্ছে",
+        "score": "স্কোরিং ফাংশনগুলি পয়েন্টারিংয়ের কাজ করে।"
       },
       "counter": {
-        "files": "ফাইল",
-        "functions": "ফাংশন",
-        "problems": "সমস্যা পাওয়া গেছে"
+        "files": "ফাইলগুলি ফাইলগুলি",
+        "functions": "ফাংশনগুলি ফাংশনের কাজ করে।",
+        "problems": "সমস্যা পাওয়া গেছে Problems found"
       },
       "counters": {
-        "aria": "লাইভ স্ক্যান কাউন্টার"
+        "aria": "লাইভ স্ক্যান কাউন্টারগুলি লাইভ স্কেন কাউন্টারে পরিণত হয়"
       },
       "controls": {
-        "aria": "স্ক্যান নিয়ন্ত্রণ"
+        "aria": "স্ক্যান কন্ট্রোলগুলি স্ক্রিন করুন"
       },
       "btn": {
-        "pause": "বিরতি",
-        "resume": "পুনরায় শুরু করুন",
-        "restart": "রিস্টার্ট করুন",
-        "cancel": "বাতিল করুন"
+        "pause": "Pause বিরতি",
+        "resume": "সিভি রিজিউম করুন।",
+        "restart": "পুনরায় চালু করুন, আবার শুরু করুন।",
+        "cancel": "বাতিল করুন Cancel"
       },
       "preview": {
-        "heading": "এ পর্যন্ত পাওয়া সমস্যা",
-        "empty": "এখনো কোনো সমস্যা পাওয়া যায়নি..."
+        "heading": "এখন পর্যন্ত যে সমস্যাগুলি পাওয়া গেছে সেগুলির মধ্যে কয়েকটি এখানে দেওয়া হল।",
+        "empty": "এখনও কোনও সমস্যা পাওয়া যায়নি ..."
       },
       "version": {
-        "engine": "ইঞ্জিন",
-        "detecting": "সনাক্ত করা হচ্ছে...",
-        "legacy": "উত্তরাধিকার - কোন লাইভ অগ্রগতি নেই (এই প্রকল্পের saropa_lints এটি পূর্ববর্তী)"
+        "engine": "ইঞ্জিন মেশিন ইঞ্জিন ইঞ্জিনে,",
+        "detecting": "সনাক্তকরণ ... সনাক্ত করা হচ্ছে ...",
+        "legacy": "legacy  ⁇  কোন লাইভ প্রগতি নেই (এই প্রকল্পের saropa_lints এর আগে)"
       }
     },
-    "runReportFirst": "আবার রিপোর্ট চালান, তারপর JSON কপি করুন।",
-    "copiedJson": "কোড Health JSON ক্লিপবোর্ডে কপি করা হয়েছে।",
-    "couldNotOpenFile": "ফাইল খোলা যায়নি: {path}",
+    "runReportFirst": "রিপোর্টটি আবার চালান, তারপরে JSON. কপি করুন।",
+    "copiedJson": "কোড হেলথ JSON ক্লিপবোর্ডে অনুলিপি করা হয়েছে।",
+    "couldNotOpenFile": "ফাইলটি খুলতে পারেনিঃ {path}",
     "panelTitle": "Saropa কোড স্বাস্থ্য ড্যাশবোর্ড",
     "hero": {
       "title": "Saropa কোড স্বাস্থ্য ড্যাশবোর্ড",
-      "generated": "উৎপন্ন",
+      "generated": "উত্পন্ন জেনারেট করা হয়েছে",
       "functionOne": "{count} ফাংশন",
       "functionOther": "{count} ফাংশন",
-      "avgFormat": "গড় {score} ({grade})",
-      "gatesFailing": "গেট ব্যর্থ",
-      "gatesPassing": "গেট পাসিং"
+      "avgFormat": "avg {score} ({grade}) এর মধ্যে রয়েছে।",
+      "gatesFailing": "দরজা ব্যর্থ হচ্ছে",
+      "gatesPassing": "গেটগুলি পাস করে যাওয়া গেটস।"
     },
     "gauge": {
-      "tooltip": "100 এর গড় স্কোর {rounded} (গ্রেড {grade})।",
-      "ariaLabel": "গড় স্কোর {rounded} 100"
+      "tooltip": "গড় স্কোর {rounded} 100 (গ্রেড {grade}) ।",
+      "ariaLabel": "গড় স্কোর {rounded} 100 এর মধ্যে _PH0_"
     },
     "gate": {
-      "fallback": "গুণমান গেট ব্যর্থ হয়েছে — কোড স্বাস্থ্য সেটিংসে থ্রেশহোল্ড পর্যালোচনা করুন।",
+      "fallback": "কোড স্বাস্থ্য সেটিংসে গুণমানের গেটগুলি ব্যর্থ হয়েছে  ⁇  পর্যালোচনা থ্রেশহোল্ড।",
       "failingOne": "{count} গেট ব্যর্থ — থ্রেশহোল্ড পর্যালোচনা করুন, বা gates.violations পরিদর্শন করতে JSON কপি করুন।",
       "failingOther": "{count} গেট ব্যর্থ — থ্রেশহোল্ড পর্যালোচনা করুন, বা gates.violations পরিদর্শন করতে JSON কপি করুন।",
-      "openSettingsTitle": "থ্রেশহোল্ড সামঞ্জস্য করতে কোড স্বাস্থ্য সেটিংস খুলুন।",
-      "openSettingsButton": "কোড স্বাস্থ্য সেটিংস খুলুন"
+      "openSettingsTitle": "প্রান্তিকগুলি সামঞ্জস্য করতে কোড স্বাস্থ্য সেটিংস খুলুন।",
+      "openSettingsButton": "ওপেন কোড স্বাস্থ্য সেটিংস"
     },
     "kpi": {
-      "ariaLabel": "কোড স্বাস্থ্য সারাংশ",
-      "allClear": "কোনো বিভাগ জুড়ে কোনো পতাকাঙ্কিত ফাংশন নেই — সব পরিষ্কার।",
-      "clickToFilter": "ফ্ল্যাগযুক্ত ফাংশনে টেবিল ফিল্টার করতে ক্লিক করুন {flag}।",
-      "noFlagged": "কোন ফাংশন পতাকাঙ্কিত {flag}.",
-      "unused": "অব্যবহৃত",
-      "unusedSub": "ফাংশন কোথাও উল্লেখ করা হয়নি",
-      "uncovered": "অনাবৃত",
-      "uncoveredSub": "LCOV কভারেজ নেই",
-      "stubTested": "স্টাব-পরীক্ষিত",
-      "stubTestedSub": "পরীক্ষা বিদ্যমান কিন্তু সামান্য জোর",
-      "suspiciousCoverage": "সন্দেহজনক কভারেজ",
-      "suspiciousCoverageSub": "কভারেজ বানোয়াট দেখায়",
-      "testDrift": "টেস্ট ড্রিফট",
-      "testDriftSub": "পরীক্ষা ফাংশন পিছিয়ে"
+      "ariaLabel": "কোড স্বাস্থ্য সারসংক্ষেপ",
+      "allClear": "কোনও বিভাগে কোন ফ্ল্যাগযুক্ত ফাংশন নেই  ⁇  সব পরিষ্কার।",
+      "clickToFilter": "{flag}. পতাকাযুক্ত ফাংশনগুলিতে টেবিলটি ফিল্টার করতে ক্লিক করুন।",
+      "noFlagged": "কোন ফাংশন পতাকাঙ্কিত {flag}. .",
+      "unused": "অব্যবহৃত, অপ্রয়োজনীয়।",
+      "unusedSub": "ফাংশনগুলিকে কোথাও উল্লেখ করা হয়নি।",
+      "uncovered": "উন্মুক্ত করা হয়েছে Uncovered",
+      "uncoveredSub": "কোন LCOV কভারেজ নেই",
+      "stubTested": "স্টব-পরীক্ষিত স্টাব টেস্ট করা।",
+      "stubTestedSub": "পরীক্ষা বিদ্যমান কিন্তু সামান্য দাবি করে।",
+      "suspiciousCoverage": "সন্দেহজনক কভারেজ।",
+      "suspiciousCoverageSub": "কভারেজ দেখায় ফ্যাব্রিকেটেড চেহারা",
+      "testDrift": "টেস্ট ড্রিফ্টের জন্য পরীক্ষা করুন।",
+      "testDriftSub": "পরীক্ষাগুলি ফাংশনটি পরীক্ষা করে, ফাংশনের পিছনে থাকে।"
     },
     "toolbar": {
-      "ariaLabel": "কোড স্বাস্থ্য কর্ম",
-      "rescanTitle": "কোড হেলথ স্ক্যান পুনরায় চালান এবং এই ড্যাশবোর্ড রিফ্রেশ করুন।",
-      "rescan": "রিস্ক্যান করুন",
-      "copyJsonTitle": "ক্লিপবোর্ডে কাঁচা কোড হেলথ JSON কপি করুন।",
+      "ariaLabel": "কোড স্বাস্থ্য কর্ম স্বাস্থ্য ব্যবস্থা",
+      "rescanTitle": "কোড হেলথ স্ক্যানটি আবার চালান এবং এই ড্যাশবোর্ডটি রিফ্রেশ করুন।",
+      "rescan": "পুনরায় স্ক্যান করুন Rescan",
+      "copyJsonTitle": "কাঁচা কোড স্বাস্থ্য JSON ক্লিপবোর্ডে অনুলিপি করুন।",
       "copyJson": "JSON কপি করুন",
       "settingsTitle": "কোড স্বাস্থ্য সেটিংস খুলুন।",
-      "settingsButton": "কোড স্বাস্থ্য সেটিংস",
-      "filterTitle": "নাম, ফাইল বা পতাকা দ্বারা সারি ফিল্টার করুন।",
-      "filterLabel": "ফিল্টার সারি",
+      "settingsButton": "কোড স্বাস্থ্য সেটিংসে",
+      "filterTitle": "নাম, ফাইল বা পতাকা অনুসারে ফিল্টার সারিগুলি।",
+      "filterLabel": "ফিল্টার সারিগুলিকে ফিল্টারের সাথে সংযুক্ত করুন",
       "filterPlaceholder": "ফিল্টার সারি..."
     },
     "table": {
-      "ariaLabel": "স্কোর দ্বারা সবচেয়ে খারাপ ফাংশন",
-      "heading": "সবচেয়ে খারাপ ফাংশন",
-      "topCount": "{total} এর শীর্ষ {shown}",
-      "colGrade": "গ্রেড",
-      "colScore": "স্কোর",
-      "colFunction": "ফাংশন",
-      "colFile": "ফাইল",
-      "colLine": "লাইন",
-      "colUsage": "ব্যবহার",
-      "colCoverage": "কভারেজ",
-      "colComplexity": "জটিলতা",
-      "colFlags": "পতাকা",
-      "noMatch": "কোন ফাংশন বর্তমান ফিল্টার মেলে না.",
-      "resetFiltersTitle": "অনুসন্ধান এবং যেকোনো সক্রিয় পতাকা ফিল্টার সাফ করুন।",
-      "resetFilters": "ফিল্টার রিসেট করুন",
-      "hint": "স্কোর দ্বারা সবচেয়ে খারাপ 200 ফাংশন দেখানো হচ্ছে। আরও সংকীর্ণ করতে অনুসন্ধান ক্ষেত্রটি ব্যবহার করুন।",
-      "expanderAriaCollapsed": "সমস্যার বিবরণ দেখান",
-      "expanderAriaExpanded": "সমস্যার বিবরণ লুকান",
-      "detailHeading": "কেন এই ফাংশন {score} স্কোর করেছে",
-      "detailNoIssues": "এই সারিতে কোন পতাকা নেই — স্কোরটি উপরের কলামের মান দ্বারা চালিত হয় (ব্যবহার, কভারেজ, জটিলতা, বয়স, ডকুমেন্টেশন)।",
-      "suppressLabel": "ফাইলে চাপা দিন",
-      "suppressTooltip": "এই ফাইলটিতে `// ignore_for_file: code_health:<flag>` লেখে যাতে ভবিষ্যতের স্ক্যানগুলি পুরো ফাইলের জন্য এই পতাকাটি ফেলে দেয়।"
+      "ariaLabel": "স্কোর অনুযায়ী সবচেয়ে খারাপ ফাংশন",
+      "heading": "সবচেয়ে খারাপ ফাংশনগুলি কাজ করে।",
+      "topCount": "শীর্ষ {shown} এর {total}",
+      "colGrade": "গ্রেড গ্রেড, গ্রেডের মান",
+      "colScore": "স্কোর স্কোর করুন।",
+      "colFunction": "ফাংশন ফাংশনের ফাংশনে",
+      "colFile": "ফাইলের নাম File file",
+      "colLine": "লাইন, লাইন, লাইনের মধ্যে",
+      "colUsage": "ব্যবহার Usage Usage এর অর্থ",
+      "colCoverage": "কভারেজ আওতায় রাখুন",
+      "colComplexity": "জটিলতা কমপ্লেক্সিটি",
+      "colFlags": "পতাকা, পতাকাধ্বনি।",
+      "noMatch": "কোন ফাংশন বর্তমান ফিল্টারগুলির সাথে মেলে না।",
+      "resetFiltersTitle": "অনুসন্ধান এবং যে কোনও সক্রিয় পতাকা ফিল্টার সাফ করুন।",
+      "resetFilters": "রিসেট ফিল্টারগুলি পুনরায় সেট করুন",
+      "hint": "স্কোর অনুসারে সবচেয়ে খারাপ ২০০ টি ফাংশন দেখানো হচ্ছে। আরও সংকীর্ণ করতে অনুসন্ধান ক্ষেত্রটি ব্যবহার করুন।",
+      "expanderAriaCollapsed": "ইস্যু বিশদ বিবরণ দেখান",
+      "expanderAriaExpanded": "সমস্যাটির বিশদ তথ্য লুকান Hide issue details",
+      "detailHeading": "এই ফাংশনটি {score} স্কোর করেছে কেন?",
+      "detailNoIssues": "এই সারিতে কোন পতাকা নেই  ⁇  স্কোরটি উপরের কলামের মান দ্বারা পরিচালিত হয় (ব্যবহার, কভারেজ, জটিলতা, বয়স, ডকুমেন্টেশন) ।",
+      "suppressLabel": "ফাইলের মধ্যে দমন করুন",
+      "suppressTooltip": "এই ফাইলটিতে ∀//ignore_for_file: code_health:<flag>` লিখে দেয় যাতে ভবিষ্যতে স্ক্যানের সময় পুরো ফাইলটির জন্য এই পতাকাটি বাদ দেওয়া হয়।"
     },
     "flag": {
       "unused": {
-        "label": "অব্যবহৃত",
-        "evidence": "0 কলার",
-        "rule": "অন্য কোনো ফাইল এই ফাংশনের নাম উল্লেখ না করলে ফ্ল্যাগ করা হয়।"
+        "label": "অব্যবহৃত, অপ্রয়োজনীয়।",
+        "evidence": "0 কলার, 0 কলিং",
+        "rule": "যখন অন্য কোনও ফাইল এই ফাংশন নামের উল্লেখ করে না তখন ফ্ল্যাগ করা হয়।"
       },
       "uncovered": {
-        "label": "অনাবৃত",
-        "evidence": "{pct}% পরীক্ষা",
+        "label": "উন্মুক্ত, আচ্ছাদিত",
+        "evidence": "{pct}% পরীক্ষার পরীক্ষা করে।",
         "rule": "LCOV 0% লাইন কভারেজ রিপোর্ট করলে ফ্ল্যাগ করা হয়।"
       },
       "complex": {
-        "label": "জটিল",
+        "label": "জটিল জটিল জটিল কঠিন",
         "evidence": "CC {cc}",
-        "rule": "সাইক্লোমেটিক জটিলতা 10 ছাড়িয়ে গেলে ফ্ল্যাগ করা হয়।"
+        "rule": "যখন সাইক্লোমেটিক জটিলতা 10 ছাড়িয়ে যায় তখন ফ্ল্যাগ করা হয়।"
       },
       "undocumented": {
-        "label": "অনথিভুক্ত",
-        "evidence": "CC {cc}, কোন নথি নেই",
-        "rule": "একটি জটিল ফাংশন (CC > 10) এর কোনো ডক মন্তব্য না থাকলে ফ্ল্যাগ করা হয়।"
+        "label": "নথিভুক্ত নয় এমন অভিবাসীদের জন্য",
+        "evidence": "সিসি {cc}, কোন ডক নেই।",
+        "rule": "একটি জটিল ফাংশন (সিসি > 10) কোন ডক মন্তব্য নেই যখন পতাকাঙ্কিত।"
       },
       "test_drift": {
-        "label": "পরীক্ষা প্রবাহ",
-        "evidence": "পরীক্ষা ফাংশন পিছিয়ে",
-        "rule": "ফ্ল্যাগ করা হয় যখন নতুন লিঙ্ক করা টেস্ট ফাইলটি অর্থপূর্ণভাবে ফাংশনের সোর্স ফাইলের চেয়ে পুরানো হয়।"
+        "label": "টেস্ট ড্রিফ্ট ড্রাইভিং পরীক্ষা।",
+        "evidence": "পরীক্ষাগুলি ফাংশনটি পরীক্ষা করে, ফাংশনের পিছনে থাকে।",
+        "rule": "সর্বশেষ সংযুক্ত পরীক্ষার ফাইলটি ফাংশনের উত্স ফাইলের চেয়ে অর্থপূর্ণভাবে পুরানো হলে ফ্ল্যাগ করা হয়।"
       },
       "stub_tested": {
-        "label": "অসম্পূর্ণ-পরীক্ষিত",
-        "evidence": "পাতলা দাবী",
-        "rule": "ফ্ল্যাগ করা হয়েছে যখন একটি লিঙ্ক করা পরীক্ষা বিদ্যমান কিন্তু সবেমাত্র কিছু দাবি করে।"
+        "label": "স্টব-পরীক্ষিত।",
+        "evidence": "পাতলা asserts দৃঢ়ভাবে প্রতিশ্রুতিবদ্ধ।",
+        "rule": "একটি লিঙ্কযুক্ত পরীক্ষা বিদ্যমান যখন পতাকাভুক্ত কিন্তু খুব কমই কিছু affirms।"
       },
       "suspicious_coverage": {
-        "label": "সন্দেহজনক কভারেজ",
+        "label": "সন্দেহজনক কভারেজ।",
         "evidence": "{pct}% কোন পরীক্ষা ছাড়াই",
-        "rule": "LCOV উচ্চ কভারেজ রিপোর্ট করলে ফ্ল্যাগ করা হয় কিন্তু কোনো পরীক্ষা ফাংশন উল্লেখ করে না।"
+        "rule": "LCOV উচ্চ কভারেজ রিপোর্ট করে কিন্তু কোন পরীক্ষা ফাংশন উল্লেখ না হলে ফ্ল্যাগ করা হয়।"
       }
     },
     "shortcuts": {
-      "focusFilter": "সারি ফিল্টার ফোকাস করুন",
-      "clearFilter": "ফোকাসড সারি ফিল্টার সাফ করুন",
-      "activateKpi": "ফোকাসড কেপিআই কার্ড সক্রিয় করুন",
-      "activateKpiSpace": "ফোকাসড কেপিআই কার্ড সক্রিয় করুন",
-      "showOverlay": "এই শর্টকাট ওভারলে দেখান"
+      "focusFilter": "রিং ফিল্টার ফোকাস করুন",
+      "clearFilter": "ফোকাসযুক্ত সারি ফিল্টারটি সাফ করুন",
+      "activateKpi": "ফোকাসযুক্ত কেপিআই কার্ড সক্রিয় করুন",
+      "activateKpiSpace": "ফোকাসযুক্ত কেপিআই কার্ড সক্রিয় করুন",
+      "showOverlay": "এই শর্টকাট ওভারলে প্রদর্শন করুন।"
     },
     "script": {
-      "activeFiltersLabel": "সক্রিয় ফিল্টার:",
-      "searchChip": "অনুসন্ধান: \"{q}\"",
-      "flagChip": "পতাকা: {flag}",
-      "removeAria": "{key} সরান",
-      "clearAll": "সব সাফ করুন",
+      "activeFiltersLabel": "সক্রিয় ফিল্টারঃ",
+      "searchChip": "অনুসন্ধানঃ \"{q}\"",
+      "flagChip": "পতাকাঃ {flag}",
+      "removeAria": "{key} অপসারণ করুন।",
+      "clearAll": "সব পরিষ্কার, সবকিছু সাফ।",
       "rowsVisible": "{total} সারির মধ্যে {visible} দৃশ্যমান",
-      "neverRun": "কখনই দৌড়ান না"
+      "neverRun": "কখনো দৌড়াও না, কখনোই পালাবে না।"
     },
     "freshness": {
-      "justNow": "এইমাত্র",
+      "justNow": "এইমাত্র, এখনই।",
       "minutesAgo": "{min} মিনিট আগে",
       "hoursAgo": "{hr} ঘণ্টা আগে",
       "daysAgo": "{day} দিন আগে",
@@ -1154,221 +1173,235 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "এখনও কোনো violations.json নেই — দমন স্ন্যাপশট তৈরি করতে বিশ্লেষণ চালান।",
-    "zeroTotal": "সর্বশেষ রপ্তানিতে 0 বিশ্লেষক দমন।",
-    "noKindBreakdown": "এই রপ্তানিতে কোন বাই-কাইন্ড ব্রেকডাউন নেই।",
-    "title": "দমন (রপ্তানি)",
-    "readOnlyNote": "(শুধু-পঠন; ব্রাউজ এবং কাজ করার জন্য অনুসন্ধানগুলি খুলুন।)",
-    "openFindings": "ফাইন্ডিংস ড্যাশবোর্ড খুলুন"
+    "noData": "এখনও কোন violations.json নেই  ⁇  নিপীড়ন স্ন্যাপশট পূরণ করতে বিশ্লেষণ চালান।",
+    "zeroTotal": "0 সর্বশেষ রপ্তানিতে বিশ্লেষক দমন।",
+    "noKindBreakdown": "এই রপ্তানির কোনও প্রকারের বিশ্লেষণ নেই।",
+    "title": "নিষ্ক্রিয়করণ (রপ্তানি)",
+    "readOnlyNote": "(শুধুমাত্র পাঠযোগ্য; ব্রাউজ এবং কাজ করার জন্য Findings খুলুন।",
+    "openFindings": "খোলা ফলাফল ড্যাশবোর্ড"
   },
   "configMirrors": {
-    "noFileRisk": "প্রতি-ফাইল ঝুঁকি ভাঙ্গন নেই (স্কোপের মধ্যে কোন লঙ্ঘন নেই)।",
-    "suppressionNote": "মিলছে violations.json সারাংশ, লাইভ সাইডবার সাপ্রেশন টগল নয়।",
-    "noSuppression": "এই রপ্তানিতে কোন দমন সামগ্রিক নয় (পুরানো বিশ্লেষক বা শূন্য দমন)।",
+    "noFileRisk": "ফাইল-প্রতি ঝুঁকির বিশ্লেষণ নেই (স্কোপে কোনও লঙ্ঘন নেই) ।",
+    "suppressionNote": "ম্যাচ violations.json সারসংক্ষেপ, লাইভ সাইডবার নিষ্ক্রিয়করণ টগল নয়।",
+    "noSuppression": "এই রফতানিতে কোনও দমন সমষ্টি নেই (পুরানো বিশ্লেষক বা শূন্য দমন) ।",
     "owaspSignal": "এই এক্সপোর্টে {count} লঙ্ঘন OWASP মোবাইল/ওয়েব ম্যাপিং বহন করে — সম্পূর্ণ ম্যাট্রিক্স এবং এক্সপোর্টের জন্য Security Posture খুলুন।",
-    "summarySuppressions": "দমন (স্ন্যাপশট রপ্তানি)",
-    "summaryOwasp": "নিরাপত্তা ভঙ্গি (OWASP সংকেত)",
-    "summaryFileRisk": "ফাইল ঝুঁকি (শীর্ষ ফাইল)"
+    "summarySuppressions": "মুছে ফেলা (রপ্তানি স্ন্যাপশট)",
+    "summaryOwasp": "সুরক্ষা অবস্থান (OWASP সংকেত)",
+    "summaryFileRisk": "ফাইল ঝুঁকি (শীর্ষস্থানীয় ফাইল)"
   },
   "telemetry": {
     "heroTitle": "সম্পর্কিত নিয়ম টেলিমেট্রি",
-    "skipToCounters": "টেলিমেট্রি কাউন্টারে যান",
-    "lastEvent": "শেষ ঘটনা {relative}",
-    "noEvents": "কোন ঘটনা রেকর্ড করা হয়নি",
+    "skipToCounters": "টেলিমেট্রি কাউন্টারে যান।",
+    "lastEvent": "শেষ ইভেন্ট {relative}",
+    "noEvents": "কোনও ইভেন্ট রেকর্ড করা হয়নি",
     "totalEventOne": "{count} মোট ইভেন্ট",
     "totalEventOther": "{count} মোট ইভেন্ট",
-    "noCountersTitle": "রিসেট করার জন্য কোন কাউন্টার নেই।",
-    "resetTitle": "সমস্ত কাউন্টার রিসেট করুন",
-    "refreshTitle": "ডিস্ক থেকে টেলিমেট্রি কাউন্টার পুনরায় লোড করুন",
-    "refresh": "রিফ্রেশ",
-    "copyTitle": "JSON হিসেবে স্ন্যাপশট কপি করুন",
+    "noCountersTitle": "রিসেট করার মতো কাউন্টার নেই।",
+    "resetTitle": "সমস্ত কাউন্টার পুনরায় সেট করুন।",
+    "refreshTitle": "ডিস্ক থেকে টেলিমেট্রি কাউন্টারগুলি পুনরায় লোড করুন।",
+    "refresh": "সতেজতা আনুন এবং রিফ্রেশ করুন।",
+    "copyTitle": "স্ন্যাপশটটি JSON হিসাবে অনুলিপি করুন।",
     "copyJson": "JSON কপি করুন",
-    "resetCounters": "কাউন্টার রিসেট করুন",
-    "countersAria": "কাউন্টার",
-    "countersHeading": "ইভেন্ট কাউন্টার",
-    "thEvent": "ঘটনা",
-    "thCount": "গণনা",
-    "emptyMessage": "এখনও কোনো টেলিমেট্রি ইভেন্ট রেকর্ড করা হয়নি — কাউন্টার ক্যাপচার করা শুরু করতে ফাইন্ডিংস ড্যাশবোর্ড থেকে একটি নিয়ম খুলুন।",
-    "openFindingsTitle": "Saropa Findings ড্যাশবোর্ড খুলুন।",
-    "openFindings": "ফাইন্ডিংস ড্যাশবোর্ড খুলুন",
-    "lastPropsHeading": "শেষ ঘটনা বৈশিষ্ট্য",
-    "copiedJson": "Saropa Lints: অনুলিপি করা সম্পর্কিত নিয়ম টেলিমেট্রি JSON.",
-    "countersReset": "Saropa Lints: সম্পর্কিত নিয়ম টেলিমেট্রি কাউন্টার রিসেট."
+    "resetCounters": "রিসেট কাউন্টারগুলি পুনরায় সেট করুন।",
+    "countersAria": "কাউন্টারগুলি গণনা করে।",
+    "countersHeading": "ইভেন্ট কাউন্টারগুলি ইভেন্টে পরিমাপ করে।",
+    "thEvent": "ঘটনা ঘটল, ঘটনা ঘটেছে।",
+    "thCount": "কাউন্ট কান্ট কাউন্ট কাউন্ট",
+    "emptyMessage": "এখনও কোনও টেলিমেট্রি ইভেন্ট রেকর্ড করা হয়নি Find কাউন্টারগুলি ক্যাপচার শুরু করতে ফাইন্ডিং ড্যাশবোর্ড থেকে একটি নিয়ম খুলুন।",
+    "openFindingsTitle": "Saropa Findings Dashboard. খুলুন _ PH0__ অনুসন্ধান ড্যাশবোর্ড।",
+    "openFindings": "খোলা ফলাফল ড্যাশবোর্ড",
+    "lastPropsHeading": "শেষ ইভেন্টের বৈশিষ্ট্যগুলি",
+    "copiedJson": "Saropa Lints: সম্পর্কিত নিয়ম টেলিমেট্রি JSON অনুলিপি করা হয়েছে।",
+    "countersReset": "Saropa Lints: সম্পর্কিত নিয়ম টেলিমেট্রি কাউন্টার রিসেট।"
   },
   "sidebarLayout": {
     "summary": "অ্যাক্টিভিটি বার লেআউট",
-    "hint": "Saropa কার্যকলাপ-বার বিভাগগুলি এখানে চালু বা বন্ধ করুন (ড্যাশবোর্ড না রেখে ওয়ার্কস্পেসের সাথে সংরক্ষিত)।"
+    "hint": "Saropa অ্যাক্টিভিটি-বার বিভাগগুলি এখানে চালু বা বন্ধ করুন (ড্যাশবোর্ড ছাড়াই ওয়ার্কস্পেসের সাথে সংরক্ষিত) ।"
   },
   "securityPosture": {
     "issueOne": "{count} ইস্যু",
     "issueOther": "{count} ইস্যু",
-    "noIssues": "কোন সমস্যা নেই",
-    "showIssues": "সমস্যা দেখান",
+    "noIssues": "কোন সমস্যা নেই No issues",
+    "showIssues": "Show issues ইস্যু দেখান",
     "violationTooltip": "{ruleCount} রুল জুড়ে {count} লঙ্ঘন। ইস্যুগুলিতে দেখাতে ক্লিক করুন।",
-    "noViolationsTooltip": "এই বিভাগে ম্যাপ করা কোনো লঙ্ঘন নেই।"
+    "noViolationsTooltip": "এই বিভাগে কোনও লঙ্ঘন ম্যাপ করা হয়নি।"
   },
   "comparison": {
     "title": "প্যাকেজ তুলনা",
     "actions": {
-      "addToProject": "প্রকল্পে যোগ করুন"
+      "addToProject": "প্রকল্পে যুক্ত করুন যোগ করুন"
     },
     "table": {
       "row": {
-        "vibrancyGrade": "ভাইব্রেন্সি গ্রেড",
-        "category": "শ্রেণী",
-        "latestVersion": "সর্বশেষ সংস্করণ",
-        "published": "প্রকাশিত হয়েছে",
-        "publisher": "প্রকাশক",
-        "pubPoints": "পাব পয়েন্ট",
-        "githubStars": "GitHub তারা",
-        "openIssues": "ওপেন ইস্যু",
-        "codeSize": "কোড সাইজ",
-        "bloatRating": "ব্লোট রেটিং",
-        "license": "লাইসেন্স",
-        "platforms": "প্ল্যাটফর্ম",
-        "inThisProject": "এই প্রকল্পে"
+        "vibrancyGrade": "প্রাণশক্তি গ্রেডের মান।",
+        "category": "Category শ্রেণীবিভাগের বিষয়শ্রেণী বিভাগ",
+        "latestVersion": "সর্বশেষ সংস্করণ সর্বশেষতম সংস্করণ",
+        "published": "প্রকাশিত প্রকাশিত Published",
+        "publisher": "প্রকাশক সম্পাদক প্রকাশক।",
+        "pubPoints": "পাব পয়েন্টস (Pub Points)",
+        "githubStars": "GitHub তারকাদের তারা",
+        "openIssues": "উন্মুক্ত সমস্যাসমূহ",
+        "codeSize": "কোডের আকার, কোড সাইজ",
+        "bloatRating": "ব্লাউট রেটিং",
+        "license": "লাইসেন্স লাইসেন্সিং",
+        "platforms": "প্ল্যাটফর্মগুলি প্ল্যাটଫর্মগুলি",
+        "inThisProject": "এই প্রকল্পে In This Project এর মাধ্যমে"
       },
       "value": {
-        "unverified": "— (যাচাই করা হয়নি)",
-        "allPlatforms": "সব",
-        "yes": "হ্যাঁ",
-        "no": "না"
+        "unverified": "⁇  (নিশ্চিত নয়)",
+        "allPlatforms": "সব, সমস্ত, সকলই",
+        "yes": "হ্যাঁ, হ্যাঁ, হাঁ, হাঁ - এইটা তো আমার কথা।",
+        "no": "না, না,না,না-ই বলেছে।"
       },
       "badge": {
-        "inProject": "প্রকল্পে"
+        "inProject": "ইন প্রজেক্ট ইন প্রোজেক্টে"
       }
     },
     "status": {
-      "packagesSelected": "{count} প্যাকেজ নির্বাচন করা হয়েছে",
-      "packagesCompared": "{count} প্যাকেজ তুলনা",
-      "dimensionsRankedOne": "{count} মাত্রা র‌্যাঙ্ক করা হয়েছে",
-      "dimensionsRankedOther": "{count} মাত্রা র‌্যাঙ্ক করা হয়েছে",
-      "morePackages": "+{count} আরও"
+      "packagesSelected": "{count} প্যাকেজগুলি নির্বাচিত প্যাকেটগুলির সাথে সংযুক্ত করা হয়।",
+      "packagesCompared": "{count} প্যাকেজগুলির তুলনা করা হয়েছে।",
+      "dimensionsRankedOne": "{count} মাত্রা র্যাঙ্কড ডিমেনশন।",
+      "dimensionsRankedOther": "{count} মাত্রা র্যাঙ্কড আকারের।",
+      "morePackages": "+{count} আরো বেশি"
     },
     "empty": {
-      "ariaLabel": "কোনো প্যাকেজ নেই",
-      "message": "তুলনা করার জন্য কোনো প্যাকেজ নির্বাচন করা হয়নি। প্যাকেজ ড্যাশবোর্ডে দুই বা ততোধিক প্যাকেজে ডান-ক্লিক করুন এবং {compare} নির্বাচন করুন।",
-      "compareWord": "তুলনা করুন",
+      "ariaLabel": "কোন প্যাকেজ নেই",
+      "message": "তুলনার জন্য কোন প্যাকেজ নির্বাচন করা হয়নি। প্যাকেজ ড্যাশবোর্ডে দুটি বা ততোধিক প্যাকেট রাইট ক্লিক করুন এবং {compare}. নির্বাচন করুন।",
+      "compareWord": "তুলনা করুন Compare",
       "openDashboard": "প্যাকেজ ড্যাশবোর্ড খুলুন",
       "openDashboardTitle": "Saropa প্যাকেজ ড্যাশবোর্ড খুলুন।"
     },
     "a11y": {
-      "skipToTable": "তুলনা টেবিল এড়িয়ে যান",
-      "recommendation": "সুপারিশ",
-      "addingToProject": "প্রকল্পে {name} যোগ করা হচ্ছে"
+      "skipToTable": "তুলনা টেবিল এড়িয়ে যান।",
+      "recommendation": "সুপারিশ Recommendation সুপারেশনের পরামর্শ",
+      "addingToProject": "প্রকল্পে {name} যুক্ত করা হচ্ছে"
     },
     "shortcuts": {
-      "showOverlay": "এই শর্টকাট ওভারলে দেখান",
-      "closeOverlay": "কীবোর্ড-শর্টকাট ওভারলে বন্ধ করুন"
+      "showOverlay": "এই শর্টকাট ওভারলে প্রদর্শন করুন।",
+      "closeOverlay": "কীবোর্ড-শর্টকাট ওভারলেটি বন্ধ করুন।"
     },
     "kpi": {
-      "ariaLabel": "তুলনা সারাংশ",
-      "leading": "নেতৃস্থানীয়",
-      "leadingTitle": "প্যাকেজ সর্বাধিক মাত্রা জয় দ্বারা নেতৃস্থানীয়.",
-      "dimensionWinsOne": "{count} মাত্রা জয়",
+      "ariaLabel": "তুলনা সারাংশের সারসংক্ষেপ।",
+      "leading": "লিডিং লিডিশন",
+      "leadingTitle": "প্যাকেজটি সর্বাধিক মাত্রা দ্বারা নেতৃত্ব দিচ্ছে wins.",
+      "dimensionWinsOne": "{count} মাত্রা জয় জিতেছে",
       "dimensionWinsOther": "{count} মাত্রা জিতেছে",
-      "packages": "প্যাকেজ",
-      "packagesTitle": "পাশাপাশি তুলনা করা প্যাকেজের সংখ্যা।",
-      "inComparison": "তুলনায়",
-      "dimensions": "মাত্রা",
-      "dimensionsTitle": "মাত্রার সংখ্যা যেখানে একজন বিজয়ীকে স্থান দেওয়া যেতে পারে।",
-      "ranked": "স্থান পেয়েছে"
+      "packages": "প্যাকেজিংয়ের জন্য প্যাকেট",
+      "packagesTitle": "প্যাকেজগুলির সংখ্যা পাশাপাশি তুলনা করা হয়েছে।",
+      "inComparison": "তুলনায়, তুলনা করার জন্য।",
+      "dimensions": "মাত্রা পরিমাপ",
+      "dimensionsTitle": "যে মাত্রাগুলিতে একজন বিজয়ীকে স্থান দেওয়া যেতে পারে তার সংখ্যা।",
+      "ranked": "র্যাঙ্কিংয়ে শীর্ষে রয়েছেন।"
     },
     "toolbar": {
-      "ariaLabel": "তুলনা কর্ম",
+      "ariaLabel": "তুলনা কর্মকাণ্ডের সাথে তুলনা করুন।",
       "packageDashboard": "প্যাকেজ ড্যাশবোর্ড",
-      "packageDashboardTitle": "আরও প্যাকেজ তুলনা করতে প্যাকেজ ড্যাশবোর্ড খুলুন।"
+      "packageDashboardTitle": "আরও প্যাকেজ তুলনা করতে প্যাকেট ড্যাশবোর্ড খুলুন।"
     }
   },
   "detailView": {
     "empty": {
-      "selectPackage": "বিস্তারিত দেখতে একটি প্যাকেজ নির্বাচন করুন"
+      "selectPackage": "বিস্তারিত দেখতে একটি প্যাকেজ নির্বাচন করুন।"
     },
     "section": {
-      "version": "সংস্করণ",
-      "update": "আপডেট করুন",
-      "suggestion": "সাজেশন",
-      "community": "সম্প্রদায়",
-      "dependencies": "নির্ভরতা",
-      "alerts": "সতর্কতা",
-      "platforms": "প্ল্যাটফর্ম",
-      "directDeps": "ডাইরেক্ট ডিপস",
-      "readmeImages": "README ইমেজ"
+      "version": "VERSION সংস্করণ",
+      "update": "আপডেট করুনঃ আপডেটের সময়।",
+      "suggestion": "পরামর্শঃ সুপারিশ।",
+      "community": "কমিউনিটি সম্প্রদায়ের সদস্যরা।",
+      "dependencies": "ডিপেনডেন্সিগুলি",
+      "alerts": "সতর্কতা Alerts",
+      "platforms": "প্ল্যাটফর্মগুলি প্ল্যাটଫর্মগুলির জন্য উপযুক্ত",
+      "directDeps": "ডাইরেক্ট ডিপজট (Direct Deposits) -এর মাধ্যমে আম",
+      "readmeImages": "README ইমেজগুলি পড়ুন"
     },
     "version": {
       "published": "প্রকাশিতঃ {date}",
-      "codeSize": "কোড সাইজ",
-      "archive": "সংরক্ষণাগার",
+      "codeSize": "কোডের আকার, কোড সাইজ",
+      "archive": "আর্কাইভ ফাইল সংরক্ষণাগার",
       "sizeLabel": "{label}: {size}",
       "source": "উত্স: {code} কোড · {comments} মন্তব্য · {files} ফাইল",
-      "replace": "প্রতিস্থাপন করুন: {summary}"
+      "replace": "প্রতিস্থাপন করুনঃ {summary}"
     },
     "update": {
-      "upgrade": "আপগ্রেড করুন",
-      "changelog": "চেঞ্জলগ",
-      "blockedBy": "{package} দ্বারা অবরুদ্ধ"
+      "upgrade": "আপগ্রেড করুন আপগ্রিড আপগ্রেস।",
+      "changelog": "পরিবর্তনের লগ পরিবর্তন করুন",
+      "blockedBy": "{package} দ্বারা ব্লক করা হয়েছে"
     },
     "suggestion": {
-      "migrateTo": "{package}-এ স্থানান্তরিত করার কথা বিবেচনা করুন।",
-      "consider": "বিবেচনা করুন: {text}।",
-      "alternatives": "বিকল্প: {names}",
-      "unused": "এই প্যাকেজটি অব্যবহৃত বলে মনে হচ্ছে — এটি সরানোর কথা বিবেচনা করুন।"
+      "migrateTo": "{package}. এ স্থানান্তর করার বিষয়টি বিবেচনা করুন।",
+      "consider": "বিবেচনা করুনঃ {text}. .",
+      "alternatives": "বিকল্পঃ {names}",
+      "unused": "এই প্যাকেজটি অব্যবহৃত বলে মনে হচ্ছে  ⁇  এটি অপসারণের বিষয়ে বিবেচনা করুন।"
     },
     "community": {
       "issues": "{count} ইস্যু",
-      "prs": "{count} পিআর",
-      "activity90d": "90d: {closed} সমস্যা বন্ধ, {merged} PRs একত্রিত হয়েছে",
-      "lastCommit": "শেষ প্রতিশ্রুতি: {time}",
-      "archived": "সংগ্রহস্থল আর্কাইভ করা হয়",
-      "pubPoints": "{points}/160 পাব পয়েন্ট",
-      "latestRelease": "সর্বশেষ প্রকাশ: {age} আগে",
-      "dependents": "{count} নির্ভরশীল"
+      "prs": "{count} পিআরএস",
+      "activity90d": "90d: {closed} ইস্যু বন্ধ, {merged} PRs একত্রিত।",
+      "lastCommit": "সর্বশেষ কমিটঃ {time}",
+      "archived": "সংগ্রহস্থল সংরক্ষণাগারভুক্ত করা হয়।",
+      "pubPoints": "{points}/160 পাব পয়েন্টগুলি",
+      "latestRelease": "সর্বশেষ রিলিজঃ {age} বছর আগে",
+      "dependents": "{count} নির্ভরশীল ব্যক্তিরা"
     },
     "dormancy": {
-      "noActivity6mo": "6+ মাসে কোন কমিট বা কোন রিলিজ নেই",
-      "noActivity3mo": "3+ মাসে কোন কমিট বা কোন রিলিজ নেই",
-      "codeInactive": "রিলিজ সক্রিয়, কোড নিষ্ক্রিয় (কমিট ছাড়া 3+ মাস)",
-      "releaseSlower": "কোড সক্রিয়, রিলিজ ক্যাডেন্স ধীর (3+ মাস)"
+      "noActivity6mo": "6+ মাসে কোনও প্রতিশ্রুতিবদ্ধ এবং মুক্তি নেই।",
+      "noActivity3mo": "3+ মাসে কোনও কমিট এবং রিলিজ নেই।",
+      "codeInactive": "রিলিজ সক্রিয়, কোড নিষ্ক্রিয় (3+ মাস কোন কমিট ছাড়াই)",
+      "releaseSlower": "কোড সক্রিয়, রিলিজ ক্যাডেন্স ধীর (3+ মাস) ।"
     },
     "dependencies": {
       "flagged": "({count} পতাকাঙ্কিত)",
-      "transitiveCount": "{count} ট্রানজিটিভ প্যাকেজ",
-      "unique": "{count} অনন্য",
-      "shared": "{count} শেয়ার করা হয়েছে ({pct}%)",
-      "moreOverflow": "+{count} আরও",
-      "sharedList": "শেয়ার করা হয়েছে: {names}"
+      "transitiveCount": "{count} ট্রানজিটিভ প্যাকেজগুলি",
+      "unique": "{count} অনন্য, স্বতন্ত্র",
+      "shared": "{count} ভাগ করা ({pct}%) ।",
+      "moreOverflow": "+{count} আরো বেশি",
+      "sharedList": "শেয়ার করাঃ {names}"
     },
     "platforms": {
-      "wasm": "ডব্লিউএএসএম"
+      "wasm": "WASM এর অর্থ হচ্ছে ওয়াসম।"
     },
     "links": {
-      "viewFullDetails": "সম্পূর্ণ বিবরণ দেখুন",
+      "viewFullDetails": "View Full Details সম্পূর্ণ বিবরণ দেখুন",
       "pubDev": "pub.dev",
-      "documentation": "ডকুমেন্টেশন",
-      "changelog": "চেঞ্জলগ",
-      "repository": "ভান্ডার",
-      "issues": "ইস্যু",
-      "reportIssue": "রিপোর্ট ইস্যু"
+      "documentation": "ডকুমেন্টেশন নথিভুক্তকরণ",
+      "changelog": "পরিবর্তনের লগ পরিবর্তন করুন",
+      "repository": "রেপোজিটরি রিপজিটরি।",
+      "issues": "ইস্যুগুলি সমস্যাগুলি",
+      "reportIssue": "রিপোর্ট ইস্যু সমস্যা"
     },
     "logoAlt": "{packageName} লোগো",
-    "readMore": "আরো",
-    "readmeImageAlt": "README ইমেজ"
+    "readMore": "আরো বেশি আরও বেশি",
+    "readmeImageAlt": "README ইমেজ চিত্র Readme"
   },
   "chart": {
     "toggle": {
-      "excludeShared": "শেয়ার করা বাদ দিন"
+      "excludeShared": "ভাগ করা ব্যতীত শেয়ার করুন"
     },
     "filter": {
-      "clear": "পরিষ্কার"
+      "clear": "Clear পরিষ্কার পরিষ্কার পরিষ্কার"
     },
     "bucket": {
       "other": "অন্যান্য ({count} {noun})",
-      "uniqueTransitives": "ইউনিক ট্রানজিটিভ ({count})",
-      "sharedTransitives": "শেয়ার্ড ট্রানজিটিভ ({count})"
+      "uniqueTransitives": "অনন্য ট্রানজিটিভস ({count})",
+      "sharedTransitives": "শেয়ার্ড ট্রানজিটিভস ({count})"
     },
     "noun": {
-      "package": "প্যাকেজ",
-      "packages": "প্যাকেজ"
+      "package": "প্যাকেজিংয়ের জন্য একটি ভাল প্যাকেট।",
+      "packages": "প্যাকেজিংয়ের জন্য, এটি একটি ভাল ধারণা।"
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "এই নিয়মটি ব্যাখ্যা করুন।"
+    },
+    "enableRule": {
+      "done": "সক্ষম নিয়ম {ruleId}. . পুনরায় চালিত বিশ্লেষণ প্রয়োগ করতে হবে।",
+      "runAnalysis": "Run analysis চালান বিশ্লেষণ",
+      "noWorkspace": "একটি নিয়ম সক্ষম করতে একটি কর্মক্ষেত্র ফোল্ডার খুলুন।"
+    },
+    "openFinding": {
+      "noWorkspace": "একটি সন্ধান খোলার জন্য কোনও ওয়ার্কস্পেস ফোল্ডার খুলুন।",
+      "notFound": "{file}. খুলতে পারেনি।"
     }
   }
 }

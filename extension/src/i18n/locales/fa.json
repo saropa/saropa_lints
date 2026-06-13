@@ -1,487 +1,501 @@
 {
   "consolidated": {
-    "kicker": "امنیت · کیفیت",
-    "searchPlaceholder": "قوانین فیلتر…",
-    "empty": "همه چیز واضح است - هیچ یافته ای",
-    "liveTitle": "زنده - در حین ویرایش به‌روزرسانی می‌شود",
-    "fetching": "در حال واکشی…",
-    "noOccurrences": "هیچ اتفاقی وجود ندارد",
+    "kicker": "امنیت · کیفیت · ایمنی",
+    "searchPlaceholder": "قوانین فیلتر...",
+    "empty": "همه چیز روشن است  ⁇ هیچ یافته ای در این مورد وجود ندارد.",
+    "liveTitle": "زنده  ⁇  زندگی کنید به روزرسانی ها در حین ویرایش شما انجام می شود.",
+    "fetching": "...منتظر...",
+    "noOccurrences": "هیچ اتفاقاتی رخ نداد",
     "summaryFindings": "{count} یافته",
     "summaryRules": "{count} قانون",
     "more": "+{count} بیشتر",
-    "wordErrors": "خطاها",
-    "wordWarnings": "هشدارها",
-    "wordInfo": "اطلاعات",
-    "wordFiles": "فایل ها",
-    "gradeExcellent": "عالی",
-    "gradeGood": "خوب",
-    "gradeFair": "منصفانه",
-    "gradeWeak": "ضعیف",
-    "gradeSevere": "شدید"
+    "wordErrors": "اشتباهات خطا خطاهای خطا",
+    "wordWarnings": "هشدارها و هشدارهای هشداردهنده",
+    "wordInfo": "اطلاعات، اطلاعات، اطلاعاتی",
+    "wordFiles": "فایل های فايل ها را به صورت",
+    "gradeExcellent": "عالی، بسیار عالی.",
+    "gradeGood": "خوب خوب خوب",
+    "gradeFair": "منصفانه، عادلانه و منصفانه",
+    "gradeWeak": "ضعیف و ضعیف، ضعف را به خود جلب می کند.",
+    "gradeSevere": "شدید بسیار شدید"
   },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints - پیشنهاد(های) پیکربندی {count}",
+    "badgeTooltip": "Saropa Lints  ⁇ {count} پیشنهاد config (((s)",
     "initMissing": {
-      "title": "راه اندازی Saropa Lints (run init)",
-      "detail": "saropa_lints در pubspec است اما هنوز پیکربندی آنالایزر وصل نشده است"
+      "title": "Saropa Lints را تنظیم کنید (run init)",
+      "detail": "saropa_lints در pubspec است اما هیچ پیکربندی آنالیزور هنوز به سیم متصل نشده است."
     },
     "packAvailable": {
-      "title": "بسته قانون {pack} را فعال کنید",
-      "detail": "قوانین {count} برای یک بسته در pubspec شما"
+      "title": "فعال کردن بسته قواعد {pack}",
+      "detail": "{count} قوانین بسته بندی در پب شما"
     },
-    "enabledToast": "بسته قانون {pack} را در analysis_options.yaml فعال کرد",
-    "enableFailed": "بسته قانون {pack} فعال نشد — داشبورد Rule Packs را باز کنید تا فعال شود"
+    "enabledToast": "فعال کردن بسته قواعد {pack} در analysis_options.yaml",
+    "enableFailed": "نتوانست بسته قواعد {pack} را فعال کند  ⁇ داشبورد Rule Packs را باز کنید تا آن را فعال کنید."
   },
   "startupNudge": {
-    "message": "Saropa Lints: پیشنهاد(های) بسته قانون {count} برای این پروژه اعمال می شود.",
-    "review": "بررسی کنید",
-    "dismiss": "رد کردن"
+    "message": "Saropa Lints: _PH1_: به معنی PH1. {count} پیشنهاد بسته قواعد (s) به این پروژه اعمال می شود.",
+    "review": "بررسی Review Review بازبینی",
+    "dismiss": "اخراج از کار",
+    "reviewFailed": "بازبینی بسته قانون Saropa Lints باز نشد. {error}"
   },
   "packageDetail": {
     "section": {
       "version": "نسخه",
-      "community": "جامعه",
-      "dependencies": "وابستگی ها",
-      "alerts": "هشدارها",
-      "platforms": "پلت فرم ها",
-      "suggestions": "پیشنهادات",
-      "readmeImages": "تصاویر را بخوانید"
+      "community": "جامعه ی جهانی:",
+      "dependencies": "وابستگی ها (Dependences)",
+      "alerts": "هشدارها: هشدارهای هشداردهنده",
+      "platforms": "پلتفرم های پلی استور",
+      "suggestions": "پیشنهادات پیشنهادی",
+      "readmeImages": "تصاویر README"
     },
     "header": {
-      "logoAlt": "آرم {name}",
+      "logoAlt": "{name} لوگو _ PH0__",
       "grade": "درجه {grade}",
-      "licenseTitle": "مجوز",
-      "published": "{date} منتشر شد"
+      "licenseTitle": "مجوزهای مجاز:",
+      "published": "منتشر شده {date}"
     },
     "partialBanner": {
       "partReadme": "README و لوگو",
-      "partGap": "روابط عمومی و مشکلات نسخه-شکاف",
-      "partReverseDeps": "شمارش وابستگی معکوس",
+      "partGap": "PRs نسخه شکاف و مسائل مربوط به مسئله.",
+      "partReverseDeps": "شمارش وابستگی معکوس (reverse dependence count)",
       "listTwo": "{first} و {second}",
-      "listMany": "{head} و {last}",
-      "message": "برخی از بخش‌ها بارگیری نشدند: {list}.",
-      "retry": "دوباره امتحان کنید",
-      "retryTitle": "واکشی ناموفق را دوباره امتحان کنید."
+      "listMany": "{head}، و {last}",
+      "message": "برخی از بخش ها نتوانستند بارگذاری شوند: {list}.",
+      "retry": "دوباره تلاش کنید Retry",
+      "retryTitle": "دوباره تلاش کنید تا بازیافت های ناموفق را انجام دهید."
     },
     "description": {
-      "readMore": "ادامه مطلب"
+      "readMore": "بیشتر بخوانید:"
     },
     "version": {
-      "constraint": "محدودیت",
-      "latest": "آخرین",
-      "prerelease": "پیش انتشار",
-      "published": "منتشر شد",
-      "update": "به روز رسانی",
-      "blockedBy": "مسدود شده توسط",
-      "codeSize": "اندازه کد",
-      "archiveSize": "اندازه آرشیو",
+      "constraint": "محدودیت محدود کننده",
+      "latest": "آخرین تازه ترین جدیدترین",
+      "prerelease": "پیش انتشار (Pre-Release)",
+      "published": "منتشر شده انتشار یافته",
+      "update": "Update update به روز رسانی کنید",
+      "blockedBy": "بلاک شده توسط:",
+      "blockedVia": "{blocker} کپس های {dep} {constraint} ({resolvable} قابل حل، {latest} جدیدترین)",
+      "blockedViaSdk": "پین شده توسط {blocker} (Flutter SDK) برای {dep} ({resolvable} قابل حل، آخرین {latest})",
+      "constrained": "محدود شده و محدود شد.",
+      "constrainedBy": "محدودیت {constraint} شما این را محدود می کند ({resolvable} قابل حل، {latest} جدیدترین)",
+      "pinHeld": "برگزار شد برگزار شد",
+      "pinDoNotUse": "استفاده نکنید از آن استفاده نکنید.",
+      "drift": "جریان پروژه های متقابل در حال حرکت است.",
+      "driftBehind": "پشت: از عقب {siblings} (شما دارای {own} هستید)",
+      "driftDiffers": "تفاوت ها: متفاوت است. {siblings} (شما دارای {own} هستید)",
+      "codeSize": "کد سایز اندازه کد",
+      "archiveSize": "اندازه آرشیو: حجم آرکائیو",
       "bloat": "({rating}/10 نفخ)",
-      "onDisk": "روی دیسک",
-      "upgrade": "ارتقا دهید",
-      "viewChangelog": "مشاهده تغییرات"
+      "onDisk": "در دیسک روی دیسک",
+      "upgrade": "ارتقاء Upgrade به روزرسانی",
+      "viewChangelog": "مشاهده Changelog"
     },
     "community": {
-      "stars": "ستاره ها",
-      "likes": "دوست دارد",
-      "report": "گزارش دهید",
-      "openIssues": "مسائل را باز کنید",
-      "openPrs": "روابط عمومی را باز کنید",
+      "stars": "ستاره ها ستارگان ستارگان",
+      "likes": "لایک ها را دوست دارد",
+      "report": "گزارش گزارش گزارش گزارشی",
+      "openIssues": "مسائل باز (Open Issues)",
+      "openPrs": "روابط عمومی باز (Open PRs)",
       "activity": "فعالیت (90d)",
-      "activityValue": "مشکلات {closed} بسته شد، {merged} PR ادغام شد",
-      "noActivity": "هیچ فعالیت اخیری وجود ندارد",
-      "lastCommit": "آخرین تعهد",
-      "pubPoints": "امتیاز میخانه",
-      "verified": "(تأیید شده)",
-      "publisher": "ناشر",
-      "flagged": "({count} پرچم گذاری شده است)",
-      "transitiveDeps": "دپ های گذرا",
-      "footprintBreakdown": "{unique} منحصر به فرد &middot; +{shared} مشترک = {total} کل",
-      "footprintTooltip": "دارای {own} + گذراهای منحصر به فرد {unique} + انتقالی مشترک {shared}. با حذف این دپ، {saved} ذخیره می شود (دیپ های مشترک توسط دیگران کشیده می شوند).",
-      "trueFootprint": "ردپای واقعی",
+      "activityValue": "{closed} مسائل بسته شده، {merged} PRs ادغام شد.",
+      "noActivity": "هیچ فعالیت اخیر در این مدت وجود ندارد.",
+      "lastCommit": "آخرین تعهد: Last Commit",
+      "pubPoints": "پب ها (Pub Points) نقطه های شرابخانه ای هستند.",
+      "verified": "(تایید شده)",
+      "publisher": "ناشر ناشر انتشارات",
+      "flagged": "({count} پرچم دار)",
+      "transitiveDeps": "ذخایر انتقالی (Transitive Deps)",
+      "footprintBreakdown": "{unique} منحصر به فرد و متوسط؛ +{shared} مشترک = {total} مجموع",
+      "footprintTooltip": "{own} خود + ترانزیتیو های منحصر به فرد {unique} + ترانسیتوی مشترک {shared}. حذف این dep باعث ذخیره {saved} می شود (deps مشترک توسط دیگران کشیده می شوند).",
+      "trueFootprint": "اثر واقعی پا (True Footprint)",
       "packagesCount": "{count} بسته",
-      "dependents": "افراد وابسته"
+      "dependents": "افراد وابسته به شما"
     },
     "fileUsages": {
-      "commentedOut": "مراجع نظر داده شده:",
-      "fileCount": "فایل های {count}",
-      "exportNoteTitle": "حداقل یک مورد استفاده، یک دستورالعمل صادراتی است",
-      "publicApiSurface": "سطح API عمومی",
-      "header": "استفاده از فایل ({label})",
-      "commentedReexportTitle": "اظهار نظر صادرات مجدد",
-      "reexportTitle": "دوباره صادر شد - بخشی از API عمومی این کتابخانه",
-      "reexportBadge": "صادرات مجدد"
+      "commentedOut": "مرجع های بدون نظر:",
+      "fileCount": "{count} فایل های فایلی",
+      "exportNoteTitle": "حداقل یک کاربرد آن، دستورالعمل صادرات است.",
+      "publicApiSurface": "سطح عمومی API API surface",
+      "header": "استفاده از فایل ها ({label})",
+      "commentedReexportTitle": "بازآفرینی با نظرات خارج شده",
+      "reexportTitle": "باز صادر شده  ⁇  بخشی از API عمومی این کتابخانه است.",
+      "reexportBadge": "صادرات مجدد - بازآفرینی"
     },
     "alerts": {
-      "archived": "آرشیو شده - مخزن فقط خواندنی است",
-      "knownIssue": "موضوع شناخته شده: {reason}",
-      "unused": "استفاده نشده - هیچ وارداتی شناسایی نشد",
-      "fix": "— رفع: {version}"
+      "archived": "آرشیو شده  ⁇  مخزن فقط برای خواندن است.",
+      "knownIssue": "مسئله شناخته شده: {reason}",
+      "unused": "استفاده نشده  ⁇  هیچ وارداتی شناسایی نشد.",
+      "fix": "⁇  درست کردن: {version}"
     },
     "versionGap": {
-      "versionTitle": "نسخه شکاف",
-      "overrideTitle": "نادیده گرفتن شکاف",
-      "noDates": "نمی توان تاریخ نسخه این بسته را تعیین کرد.",
-      "noItems": "هیچ PR یا مشکلی بین این نسخه ها یافت نشد.",
-      "prsMerged": "روابط عمومی ها ادغام شدند",
-      "issuesClosed": "مسائل بسته شد",
-      "searchLabel": "روابط عمومی و مسائل را جستجو کنید",
-      "searchPlaceholder": "جستجوی روابط عمومی و مسائل...",
-      "filterAria": "بر اساس دسته بندی فیلتر کنید",
-      "filterAll": "همه",
-      "filterUnreviewed": "بررسی نشده",
-      "filterPrs": "روابط عمومی",
-      "filterIssues": "مسائل",
-      "typePr": "روابط عمومی",
-      "typeIssue": "موضوع",
-      "reviewReviewed": "بررسی شد",
-      "reviewApplicable": "قابل اجرا",
+      "versionTitle": "نسخه Gap ورژن گپ",
+      "overrideTitle": "Override Gap را نادیده بگیرید",
+      "noDates": "نتوانست تاریخ نسخه برای این بسته را تعیین کند.",
+      "noItems": "هیچ PR یا مشکلی بین این نسخه ها پیدا نشد.",
+      "prsMerged": "PRs ادغام شده اند.",
+      "issuesClosed": "مسایل بسته شده مسائل بسته شده",
+      "searchLabel": "جستجو PRs و مسائل را پیدا کنید.",
+      "searchPlaceholder": "جستجو در مورد روابط عمومی و مسائل...",
+      "filterAria": "فیلتر بر اساس دسته بندی",
+      "filterAll": "همه، همه، همگی",
+      "filterUnreviewed": "بررسی نشده است.",
+      "filterPrs": "PRs (اعلام عمومی)",
+      "filterIssues": "مسائل و مسائلی که مطرح می شود",
+      "typePr": "PR PR PR در حال حاضر",
+      "typeIssue": "موضوع: مسئله ی قضایی",
+      "reviewReviewed": "بررسی شده است.",
+      "reviewApplicable": "قابل استفاده قابل اجرا",
       "reviewNotApplicable": "قابل اجرا نیست",
       "notesPlaceholder": "یادداشت ها...",
-      "colType": "تایپ کنید",
-      "colTitle": "عنوان",
-      "colAuthor": "نویسنده",
-      "colReview": "بررسی کنید",
+      "colType": "نوع: نوع نوع نوع",
+      "colTitle": "عنوان عنوان عنوان نام",
+      "colAuthor": "نویسنده ی کتاب: مؤلف",
+      "colReview": "بررسی Review Review بازبینی",
       "summaryFooter": "{triaged} از {total} تریاژ شده | {applicable} قابل اجرا | {notApplicable} N/A | {unreviewed} باقی مانده است",
-      "truncated": "نتایج به موارد {limit} کوتاه شد."
+      "truncated": "نتایج به موارد {limit} قطع شده است."
     },
     "platforms": {
       "wasm": "WASM"
     },
     "images": {
-      "alt": "تصویر README"
+      "alt": "تصویر README image را بخوانید"
     },
     "links": {
-      "viewOnPubDev": "مشاهده در pub.dev",
-      "documentation": "مستندات",
-      "changelog": "تغییرات",
-      "versions": "نسخه ها",
-      "repository": "مخزن",
-      "openIssues": "مسائل را باز کنید",
-      "reportIssue": "گزارش مسئله"
+      "viewOnPubDev": "نمای pub.dev",
+      "documentation": "مستندات اسناد مدارک",
+      "changelog": "Changelog: تغییرات در ژورنال",
+      "versions": "نسخه ها Versions ورژن ها",
+      "repository": "مخزن اطلاعات Repository",
+      "openIssues": "مسائل باز (Open Issues)",
+      "reportIssue": "گزارش موضوعی، مسئله ای"
     },
     "a11y": {
-      "skipToDetails": "به جزئیات بسته بروید"
+      "skipToDetails": "به جزئیات بسته بندی بروید."
     },
     "shortcuts": {
-      "showOverlay": "این روکش میانبر را نشان دهید",
-      "closeOverlay": "پوشش میانبر صفحه کلید را ببندید"
+      "showOverlay": "این shortcut overlay را نشان دهید.",
+      "closeOverlay": "پوشش کلیدواژه های میانبر صفحه کلید را ببندید."
     }
   },
   "toolbar": {
-    "runAnalysis": "تجزیه و تحلیل را اجرا کنید",
-    "rescan": "اسکن مجدد",
-    "refresh": "تازه کردن",
-    "copyJson": "JSON را کپی کنید",
-    "saveReport": "ذخیره گزارش",
-    "moreActions": "اقدامات بیشتر",
-    "clearAll": "همه را پاک کنید",
-    "resetView": "بازنشانی نمای"
+    "runAnalysis": "تحلیل را اجرا کنید.",
+    "rescan": "اسکن مجدد Rescan",
+    "refresh": "به راحتی و با آرامش استراحت کنید.",
+    "copyJson": "کپی JSON را کپی کنید",
+    "saveReport": "ذخیره گزارش Save report را انجام دهید.",
+    "moreActions": "اقدامات بیشتری انجام شود.",
+    "clearAll": "همه چیز را پاک کنید.",
+    "resetView": "نمایش Reset View در حالت ریست قرار می گیرد."
   },
   "empty": {
-    "noFindingsTitle": "هیچ یافته ای",
-    "noFindingsMessage": "تجزیه و تحلیل را برای اسکن فضای کاری اجرا کنید.",
-    "noFindingsCta": "تجزیه و تحلیل را اجرا کنید",
-    "noMatchTitle": "هیچ مسابقه ای وجود ندارد",
+    "noFindingsTitle": "هیچ یافته ای در این مورد وجود ندارد.",
+    "noFindingsMessage": "برای اسکن فضای کاری، تجزیه و تحلیل را اجرا کنید.",
+    "noFindingsCta": "تحلیل را اجرا کنید.",
+    "noMatchTitle": "هیچ تطابقی وجود ندارد",
     "noMatchMessage": "هیچ ردیفی با فیلترهای فعلی مطابقت ندارد.",
-    "noMatchCta": "بازنشانی فیلترها",
-    "noProjectTitle": "هیچ فضای کاری باز نیست",
-    "noProjectMessage": "برای مشاهده یافته‌ها، یک پروژه Flutter یا Dart را باز کنید.",
-    "noProjectCta": "پوشه را باز کنید",
-    "noDataTitle": "هنوز هیچ داده ای وجود ندارد",
-    "noDataMessage": "برای پر کردن این داشبورد اسکن را اجرا کنید.",
-    "noDataCta": "تجزیه و تحلیل را اجرا کنید"
+    "noMatchCta": "فیلترهای ریست فلترها را از نو تنظیم کنید.",
+    "noProjectTitle": "هیچ فضای کاری باز نیست.",
+    "noProjectMessage": "یک پروژه Flutter یا Dart را باز کنید تا یافته ها را ببینید.",
+    "noProjectCta": "پوشه های فولدر را باز کنید",
+    "noDataTitle": "هنوز هیچ داده ای وجود ندارد.",
+    "noDataMessage": "برای پر کردن این داشبورد، اسکن را اجرا کنید.",
+    "noDataCta": "تحلیل را اجرا کنید."
   },
   "loading": {
-    "thinking": "فکر کردن…",
-    "preparing": "در حال آماده سازی…",
-    "checking": "در حال بررسی…",
-    "fetching": "در حال واکشی…",
-    "working": "در حال کار…",
-    "scanning": "در حال اسکن…",
-    "cancel": "لغو کنید",
-    "runningAnalysis": "تجزیه و تحلیل در حال اجرا…",
-    "analysisComplete": "تحلیل کامل شد",
-    "refreshingDashboard": "داشبورد تازه با آخرین یافته ها.",
-    "analysisStartedDetail": "تحلیل شروع شد در حال جمع آوری تشخیص…",
-    "analysisFailedDetail": "تجزیه و تحلیل شکست خورد. خروجی را برای جزئیات بررسی کنید."
+    "thinking": "فکر کردن...فکر کردن",
+    "preparing": "آماده شدن...آماده سازی",
+    "checking": "چک کردن...بررسی",
+    "fetching": "...منتظر...",
+    "working": "کار کردن...کارکردن",
+    "scanning": "اسکن...اسکین کردن",
+    "cancel": "لغو کن لغو کنید",
+    "runningAnalysis": "انجام تجزیه و تحلیل...",
+    "analysisComplete": "تجزیه و تحلیل کامل تکمیل شده است.",
+    "refreshingDashboard": "داشبورد تازه کننده با آخرین یافته ها.",
+    "analysisStartedDetail": "تجزیه و تحلیل شروع شد. جمع آوری تشخیص...",
+    "analysisFailedDetail": "تجزیه و تحلیل شکست خورده است. برای جزئیات، خروجی را بررسی کنید."
   },
   "error": {
-    "genericTitle": "مشکلی پیش آمد",
-    "retry": "دوباره امتحان کنید",
-    "reload": "بارگذاری مجدد",
-    "copyDetails": "کپی جزئیات",
-    "unreachable": "نمی توان به {target} رسید",
+    "genericTitle": "یک چیزی اشتباه پیش رفت.",
+    "retry": "دوباره تلاش کنید Retry",
+    "reload": "بارگذاری مجدد را انجام دهید.",
+    "copyDetails": "جزئیات کپی را کپی کنید.",
+    "unreachable": "نتوانسته به {target} دسترسی پیدا کند.",
     "partialSummary": "{loaded} از {total} {item} بارگذاری شد. {failed} مورد ناموفق بود.",
-    "partialRetry": "تلاش مجدد ناموفق بود"
+    "partialRetry": "تلاش مجدد شکست خورده است."
   },
   "offline": {
-    "banner": "آفلاین - برای تازه کردن دوباره وصل شوید.",
-    "cachedFooter": "نمایش داده های کش شده از {when}.",
-    "reconnecting": "در حال اتصال مجدد…"
+    "banner": "آفلاین  ⁇  برای تازه شدن دوباره به اینترنت متصل شوید.",
+    "cachedFooter": "نمایش داده های ذخیره شده از {when}.",
+    "reconnecting": "دوباره وصل می شوم..."
   },
   "stale": {
-    "statusPill": "آخرین اجرای موفقیت آمیز {when} — به روز رسانی انجام نشد"
+    "statusPill": "آخرین اجرای موفق {when}  ⁇  refresh ناکام شد"
   },
   "filter": {
-    "searchPlaceholder": "جستجو…",
-    "clearSearch": "جستجو را پاک کنید",
-    "activeLabel": "فیلترهای فعال:",
-    "recentLabel": "اخیر ▾",
-    "chipRemove": "حذف کنید"
+    "searchPlaceholder": "جستجو... جست وجو ...",
+    "clearSearch": "پاک کردن جستجو از جستجوی واضح",
+    "activeLabel": "فیلترهای فعال: فیلتر های فعال",
+    "recentLabel": "⁇  اخیر  ⁇",
+    "chipRemove": "حذف remove از بین بردن"
   },
   "a11y": {
-    "toggleFullWidth": "طرح بندی تمام عرض را تغییر دهید",
-    "sortBy": "مرتب سازی بر اساس {column}",
-    "expandRow": "سطر را بزرگ کنید",
-    "collapseRow": "جمع کردن ردیف",
+    "toggleFullWidth": "طرح بندی با عرض کامل Toggle را تغییر دهید.",
+    "sortBy": "مرتب کردن بر اساس {column}",
+    "expandRow": "ردیف را گسترش دهید",
+    "copyRow": "ردیف کپی را کپی کنید",
+    "comparisonDimension": "متریک متریک Metric",
+    "collapseRow": "ردیف سقوط:",
     "selectAll": "همه ردیف ها را انتخاب کنید",
-    "keyboardShortcuts": "میانبرهای صفحه کلید",
-    "announcer": "به‌روزرسانی‌های فیلتر و مرتب‌سازی وضعیت در اینجا اعلام می‌شود."
+    "keyboardShortcuts": "میانبر های صفحه کلید (keyboard shortcuts)",
+    "announcer": "به روزرسانی های فیلتر و حالت مرتب سازی در اینجا اعلام می شود."
   },
   "uiLanguage": {
     "pick": {
-      "title": "زبان رابط کاربری Saropa Lints",
-      "placeholder": "زبان را برای نوار کناری و داشبورد انتخاب کنید",
+      "title": "Saropa Lints زبان UI",
+      "placeholder": "زبان را برای نوار کناری و داشبورد ها انتخاب کنید.",
       "auto": "خودکار (زبان نمایش VS Code را دنبال کنید)",
-      "coverage": "{pct}% ترجمه شده - بقیه نمایش ها به زبان انگلیسی است"
+      "coverage": "{pct}% ترجمه شده  ⁇ نمایش های استراحت به زبان انگلیسی"
     },
-    "reloadPrompt": "زبان روی {locale} تنظیم شده است. برای به‌روزرسانی نوار کناری و برچسب‌های فرمان، پنجره را دوباره بارگیری کنید.",
-    "reloadNow": "اکنون بارگیری مجدد",
-    "reloadLater": "بعدا"
+    "reloadPrompt": "زبان را به {locale}. پنجره را بارگذاری کنید تا برچسب های نوار کناری و فرمان ها به روز شود.",
+    "reloadNow": "حالا بارگیری مجدد کنید.",
+    "reloadLater": "بعد بعداً بعدها"
   },
   "brand": {
     "prefix": "Saropa "
   },
   "findingsDash": {
-    "pageTitle": "داشبورد یافته های Saropa",
-    "documentTitle": "داشبورد یافته های Saropa",
-    "skipToFindings": "پرش به یافته ها",
-    "secondaryAsideLabel": "تشخیص ثانویه",
+    "pageTitle": "Saropa داشبورد یافته ها",
+    "documentTitle": "Saropa داشبورد یافته ها",
+    "skipToFindings": "به یافته ها بروید.",
+    "secondaryAsideLabel": "تشخیص ثانویه: تشخیص ثانوی",
     "hero": {
-      "productTitle": "داشبورد یافته ها",
-      "gaugeTitle": "نمره سلامت {score} (درجه {grade}). خطاها سنگین ترین وزن را دارند.",
+      "productTitle": "نتایج Dashboard یافته ها",
+      "gaugeTitle": "نمره سلامت {score} (درجه {grade}). اشتباهات سنگین ترین وزن را دارند.",
       "gaugePending": "…"
     },
     "time": {
-      "justNow": "همین الان",
+      "justNow": "همین الان، درست در این لحظه.",
       "minutesAgo": "{min} دقیقه پیش",
       "hoursAgo": "{hr} ساعت پیش",
       "daysAgo": "{day} روز پیش"
     },
     "status": {
-      "lastRunPrefix": "آخرین اجرا",
-      "lastRunUnknown": "آخرین اجرا ناشناخته",
-      "noTimestampTitle": "هیچ مهر زمانی در violations.json وجود ندارد",
-      "findingsAfterFilterTitle": "کل یافته‌ها پس از فیلتر قانون غیرفعال",
+      "lastRunPrefix": "آخرین اجرا، آخرین اجرای",
+      "updatedPrefix": "به روز شده است",
+      "refreshHint": "برای تازه کردن از آنالیزور کلیک کنید.",
+      "lastRunUnknown": "آخرین اجرا ناشناخته نامعلوم",
+      "noTimestampTitle": "هیچ زمان بندی در violations.json نیست.",
+      "findingsAfterFilterTitle": "کل یافته ها پس از فیلتر قاعده غیرفعال",
       "findingOne": "{count} یافته",
       "findingOther": "{count} یافته",
-      "todoHackTitle": "نشانگرهای TODO و HACK موجود در فضای کاری",
-      "driftOnTitle": "Drift Advisor متصل است: {label}",
-      "driftOnPill": "رانش در · {count}",
-      "driftOfflineTitle": "Drift Advisor فعال است اما سروری پیدا نشد",
-      "driftOfflinePill": "دریفت آفلاین",
-      "enabledRulesTitle": "قوانین فعال در ردیف فعلی",
+      "todoHackTitle": "نشانگرهای TODO و HACK در فضای کاری یافت شد.",
+      "driftOnTitle": "مشاور جریان متصل شده است: {label}",
+      "driftOnPill": "در حال حرکت بر روی · {count}",
+      "driftOfflineTitle": "Drift Advisor فعال شده اما هیچ سرور پیدا نشده است.",
+      "driftOfflinePill": "درایف کردن به صورت آفلاین",
+      "enabledRulesTitle": "قوانین فعال شده در سطح فعلی",
       "rulesCount": "{count} قانون"
     },
     "groupBy": {
-      "severity": "شدت",
-      "file": "فایل",
-      "impact": "تاثیر",
-      "rule": "قانون",
+      "severity": "شدت: میزان شدید بودن",
+      "file": "فایل های فولدر را به صورت زیر نمایش دهید:",
+      "impact": "تاثیرات بر اثر اثرات تأثیر",
+      "rule": "قاعده قانون اساسی",
       "owasp": "OWASP",
-      "ruleType": "نوع قانون",
-      "ruleStatus": "وضعیت قانون"
+      "ruleType": "نوع قاعده: نوع قانون",
+      "ruleStatus": "وضعیت قاعده در قانون"
     },
     "seg": {
-      "toggleSeverityTitle": "{v} شدت را تغییر دهید",
-      "toggleImpactTitle": "ضربه {v} را تغییر دهید"
+      "toggleSeverityTitle": "{v} شدت را تغییر دهید.",
+      "toggleImpactTitle": "Toggle {v} تاثیر ضربه ای"
     },
     "kpi": {
       "visibleLabel": "یافته های قابل مشاهده",
-      "allMatched": "همه مطابقت دارند",
-      "ofTotal": "از {total} کل",
-      "clearFiltersTitle": "برای پاک کردن همه فیلترها کلیک کنید",
-      "errorsLabel": "خطاها",
-      "errorsSubFix": "باید رفع شود",
-      "errorsSubClear": "هیچکدام - واضح است",
-      "errorsTitle": "یافته‌ها را برای خطاها فیلتر کنید (باید برطرف شود - خراب / خراب می‌شود / قابل بهره‌برداری)",
-      "warningsLabel": "هشدارها",
-      "warningsSubBad": "ممکن است شکست بخورد یا بد به نظر برسد",
-      "warningsSubClear": "هیچکدام - واضح است",
-      "warningsTitle": "یافته‌ها را برای هشدارها فیلتر کنید (ممکن است خراب شود یا بد به نظر برسد)",
-      "infoLabel": "اطلاعات",
-      "infoSub": "FYI - سبک / پیشنهادات",
-      "infoSubNone": "هیچ کدام",
-      "infoTitle": "فیلتر کردن یافته ها به اطلاعات (FYI - سبک و پیشنهادات)",
-      "filesLabel": "فایل ها تحت تاثیر قرار گرفتند",
-      "filesSubAcross": "در سراسر صادرات",
-      "filesSubNone": "هیچ فایلی تحت تاثیر قرار نگرفت",
-      "filesTitle": "فایل‌های متمایز که حداقل در یک یافته مشارکت دارند",
-      "topRuleLabel": "قانون برتر",
-      "topRuleTitle": "یافته ها را برای قانون {name} فیلتر کنید"
+      "allMatched": "همه آنها با هم تطبیق داشتند.",
+      "ofTotal": "از مجموع {total}",
+      "clearFiltersTitle": "برای پاک کردن تمام فیلترها روی آن کلیک کنید.",
+      "errorsLabel": "اشتباهات خطا ها",
+      "errorsSubFix": "باید درست کرد باید درست کند",
+      "errorsSubClear": "هیچ  ⁇  روشن",
+      "errorsTitle": "فیلترهای پیدا شده برای خطا (باید درست شود  ⁇  شکسته / سقوط خواهد کرد / قابل استفاده)",
+      "warningsLabel": "هشدارها و هشدارهای مربوط به آن",
+      "warningsSubBad": "می تواند شکست بخورد یا بد به نظر برسد.",
+      "warningsSubClear": "هیچ  ⁇  روشن",
+      "warningsTitle": "نتایج را به هشدارها فیلتر کنید (ممکن است شکست بخورد یا بد به نظر برسد)",
+      "infoLabel": "اطلاعات و اطلاعیه ها را به اشتراک بگذارید",
+      "infoSub": "برای اطلاع شما  ⁇  سبک / پیشنهادات",
+      "infoSubNone": "هیچ کدام از این ها وجود ندارد.",
+      "infoTitle": "نتایج را به اطلاعات فیلتر کنید (برای اطلاع شما، سبک و پیشنهادات)",
+      "filesLabel": "فایل های تحت تاثیر قرار گرفته،",
+      "filesSubAcross": "در سراسر صادرات و صادرات.",
+      "filesSubNone": "هیچ فایل ای تحت تاثیر قرار نگرفته است.",
+      "filesTitle": "فایل های متمایز که حداقل یک یافته را به دست می آورند.",
+      "topRuleLabel": "قانون برتر، قاعده ی بالاست.",
+      "topRuleTitle": "یافته های فیلتر را به {name} قانون بفرستید."
     },
     "toolbar": {
-      "ariaFiltersActions": "فیلترها و اقدامات",
-      "groupByFieldTitle": "گروه بندی یافته ها بر اساس بعد انتخاب شده",
-      "groupByLabel": "گروه بندی بر اساس",
-      "textFilterTitle": "یافته ها را بر اساس مسیر فایل، قانون یا متن پیام فیلتر کنید",
-      "textFilterPlaceholder": "فیلتر بر اساس فایل، قانون یا پیام…",
-      "textFilterAria": "فیلتر متن",
-      "clearTextFilterTitle": "فیلتر متن را پاک کنید",
-      "clearTextFilterAria": "فیلتر متن را پاک کنید",
-      "recentFiltersTitle": "فیلترهای اخیر",
-      "clearRecentTitle": "تمام فیلترهای اخیر را پاک کنید",
-      "clearRecentButton": "پاک کردن",
-      "recentFiltersListAria": "فیلترهای اخیر",
-      "runAnalysisTitle": "تجزیه و تحلیل Saropa Lints را اجرا کنید",
-      "refreshViolationsTitle": "violations.json را از دیسک بارگیری مجدد کنید",
-      "severityGroupAria": "فیلتر شدت",
-      "severityLabel": "شدت",
-      "impactGroupAria": "فیلتر ضربه",
-      "impactLabel": "تاثیر",
-      "moreSummary": "بیشتر",
+      "ariaFiltersActions": "فیلترها و اقدامات انجام شده",
+      "groupByFieldTitle": "یافته های گروهی بر اساس ابعاد انتخاب شده",
+      "groupByLabel": "گروه به گروه بر اساس گروه",
+      "textFilterTitle": "یافته های فیلتر شده را بر اساس مسیر فایل، قاعده یا متن پیام فیلتری کنید.",
+      "textFilterPlaceholder": "فیلتر کردن بر اساس فایل، قاعده یا پیام...",
+      "textFilterAria": "فیلتر متن: فیلتر متنی",
+      "clearTextFilterTitle": "فیلتر متن پاک را تمیز کنید",
+      "clearTextFilterAria": "فیلتر متن پاک را تمیز کنید",
+      "recentFiltersTitle": "فیلترهای اخیر:",
+      "clearRecentTitle": "پاک کردن تمام فیلترهای اخیر",
+      "clearRecentButton": "صاف شفاف روشن",
+      "recentFiltersListAria": "فیلترهای اخیر:",
+      "runAnalysisTitle": "Saropa Lints تحلیل را اجرا کنید.",
+      "refreshViolationsTitle": "بارگذاری مجدد violations.json از دیسک",
+      "severityGroupAria": "فیلتر شدت: فیلتری که در آن میزان شدید بودن بیماری مشخص می شود.",
+      "severityLabel": "شدت: میزان شدید بودن",
+      "impactGroupAria": "فیلتر ضربه ای (Impact Filter) ، یک فیلتر موشک است.",
+      "impactLabel": "تاثیرات بر اثر اثرات تأثیر",
+      "moreSummary": "بیشتر بیشتر بیشتر More",
       "moreChevron": "▾",
-      "copyJsonTitle": "کپی نقض فیلتر شده به عنوان JSON ({count})",
-      "saveReportTitle": "ذخیره تخلفات فیلتر شده به عنوان JSON در گزارش ها/YYYYMMDD/"
+      "copyJsonTitle": "کپی کردن نقض های فیلتر شده به عنوان JSON ({count})",
+      "saveReportTitle": "ذخیره نقض فیلتر شده به عنوان JSON در گزارش ها / YYYYMMDD/"
     },
     "chip": {
-      "contains": "حاوی \"{q}\"",
+      "contains": "حاوی \"{q}\" است.",
       "severityOff": "شدت ≠ {v}",
       "impactOff": "تاثیر ≠ {v}",
-      "resetAllTitle": "همه فیلترها را بازنشانی کنید",
-      "removeFilterAria": "فیلتر را بردارید"
+      "resetAllTitle": "همه فیلترها را از نو تنظیم کنید.",
+      "removeFilterAria": "فیلتر را از بین ببرید"
     },
     "menuPalette": {
-      "help": "کمک کنید",
-      "groupBy": "گروه بندی بر اساس…",
-      "textFilter": "فیلتر متن…",
-      "severityImpact": "فیلتر شدت…",
-      "hideRules": "پنهان کردن قوانین…",
-      "ruleMetadata": "فراداده قانون",
-      "clearFilters": "فیلترها را پاک کنید",
-      "clearSuppressions": "سرکوب ها را پاک کنید",
-      "clearFileFocus": "فوکوس فایل را پاک کنید",
-      "matchActiveEditor": "با ویرایشگر فعال مطابقت دهید",
-      "copyTreeJson": "درخت JSON را کپی کنید",
-      "refreshExtension": "برنامه افزودنی را بازخوانی کنید",
-      "openPackageDashboard": "داشبورد Package را باز کنید",
+      "help": "کمک به یاری کردن",
+      "groupBy": "گروه بندی به ...",
+      "textFilter": "فیلتر متن ...",
+      "severityImpact": "فیلتر شدت...",
+      "hideRules": "قوانین پنهان... قواعد مخفی",
+      "ruleMetadata": "Rule metadata میتا داده ها",
+      "clearFilters": "فیلترهای پاک را از بین ببرید.",
+      "clearSuppressions": "سرکوب های آشکار",
+      "clearFileFocus": "تمرکز فایل را پاک کنید",
+      "matchActiveEditor": "مطابقت با ویرایشگر فعال Match Active",
+      "copyTreeJson": "درخت کپی JSON را کپی کنید",
+      "refreshExtension": "افزونه Refresh extension را به عنوان یک برنامه ی جدید معرفی می کنیم.",
+      "openPackageDashboard": "صفحه داشبورد بسته را باز کنید",
       "openCodeHealth": "باز کردن سلامت کد",
-      "openLintsConfig": "Lints Config را باز کنید",
-      "reloadFromDisk": "بارگیری مجدد از دیسک",
-      "reloadFromDiskTitle": "داشبورد را از آخرین violations.json بدون اجرای مجدد آنالایزر رندر کنید.",
-      "reEnableDisabledRules": "دوباره فعال کردن قوانین غیرفعال…",
-      "reEnableDisabledRulesTitle": "یک انتخاب سریع از قوانینی که در حال حاضر در analysis_options_custom.yaml غیرفعال شده اند را باز کنید و موارد انتخاب شده را دوباره فعال کنید.",
-      "reEnableNoneTitle": "هیچ قانونی در حال حاضر غیرفعال نیست",
-      "reEnableNoneMessage": "در حال حاضر هیچ قانونی از طریق analysis_options_custom.yaml غیرفعال نشده است.",
-      "reEnableQuickPickTitle": "قوانین غیرفعال را دوباره فعال کنید",
-      "reEnableQuickPickPlaceholder": "یک یا چند قانون را برای فعال کردن مجدد انتخاب کنید",
-      "menuGroupExport": "صادرات",
-      "menuGroupFilter": "فیلتر و فوکوس",
-      "menuGroupOpen": "داشبورد را باز کنید",
-      "menuGroupSystem": "سیستم"
+      "openLintsConfig": "مدیریت Rule Packs بسته های قاعده",
+      "reloadFromDisk": "بارگذاری مجدد از دیسک",
+      "reloadFromDiskTitle": "داشبورد را از آخرین violations.json بدون دوباره اجرا کردن آنالیزور مجدداً رندر کنید.",
+      "reEnableDisabledRules": "قوانین غیرفعال شده را دوباره فعال کنید...",
+      "reEnableDisabledRulesTitle": "یک انتخاب سریع از قوانین که در حال حاضر غیرفعال شده اند را در analysis_options_custom.yaml باز کنید و دوباره آن هایی را که انتخاب کرده اید فعال کنید.",
+      "reEnableNoneTitle": "هیچ قانونی در حال حاضر غیرفعال شده است",
+      "reEnableNoneMessage": "در حال حاضر هیچ قاعده ای از طریق analysis_options_custom.yaml غیرفعال نشده است.",
+      "reEnableQuickPickTitle": "قوانین غیرفعال شده را دوباره فعال کنید",
+      "reEnableQuickPickPlaceholder": "یک یا چند قانون را برای فعال کردن مجدد انتخاب کنید.",
+      "menuGroupExport": "صادرات و فروش:",
+      "menuGroupFilter": "فیلتر و فوکوس کنید",
+      "menuGroupOpen": "داشبورد را باز کنید.",
+      "menuGroupSystem": "سیستم سیستم System"
     },
     "progress": {
-      "runningLabel": "تجزیه و تحلیل در حال اجرا…",
-      "runningMeta": "این می تواند در پروژه های بزرگ یک لحظه طول بکشد."
+      "runningLabel": "انجام تجزیه و تحلیل...",
+      "runningMeta": "این کار می تواند در پروژه های بزرگ کمی طول بکشد."
     },
     "topRules": {
-      "sectionAria": "قوانین برتر بر اساس شمارش",
-      "hideTitle": "فقط برای من مخفی شود - در سطح فضای کاری، قابل برگشت از طریق پاک کردن سرکوب‌ها",
-      "hideButton": "پنهان کردن",
-      "disableTitle": "برای کل پروژه غیرفعال شود — analysis_options_custom.yaml می نویسد و آنالیز را دوباره اجرا می کند",
-      "disableButton": "غیر فعال کردن",
-      "workspaceOnlyShort": "فقط فضای کار",
-      "projectConfigShort": "پیکربندی پروژه (نوشتن analysis_options_custom.yaml)",
-      "topRulesOne": "قانون بالای {count}",
-      "topRulesOther": "قوانین {count} برتر",
+      "sectionAria": "قوانین برتر به ترتیب تعداد بازی ها",
+      "hideTitle": "فقط برای من پنهان کنید  ⁇  سطح فضای کاری، قابل برگشت از طریق Clear Suppressions",
+      "hideButton": "پنهان شدن، مخفی کردن",
+      "disableTitle": "غیرفعال کردن برای کل پروژه  ⁇  می نویسد analysis_options_custom.yaml و دوباره اجرا تجزیه و تحلیل",
+      "disableButton": "غیرفعال کردن Disable",
+      "workspaceOnlyShort": "فقط فضای کاری",
+      "projectConfigShort": "config پروژه (به analysis_options_custom.yaml می نویسد)",
+      "topRulesOne": "قاعده {count} بالا",
+      "topRulesOther": "قوانین برتر {count}",
       "colRank": "#",
-      "colRule": "قانون",
-      "colCount": "بشمار",
-      "colSeverity": "شدت",
-      "colActionsAria": "اقدامات ردیف",
-      "filesAffected": "فایل های تحت تأثیر ({count})"
+      "colRule": "قاعده قانون اساسی",
+      "colCount": "شمارش و شمردن",
+      "colSeverity": "شدت: میزان شدید بودن",
+      "colActionsAria": "اقدامات صف (Row actions) اعمال ردیف",
+      "filesAffected": "فایل های تحت تاثیر ({count})"
     },
     "findings": {
-      "sectionAria": "یافته ها",
+      "sectionAria": "یافته ها: نتایج حاصل از بررسی",
       "expandAll": "همه را گسترش دهید",
-      "collapseAll": "همه را جمع کن",
+      "collapseAll": "همه چیز فرو می ریزد.",
       "bulkSelected": "{count} انتخاب شده",
-      "bulkCopy": "کپی به عنوان JSON انتخاب شده است",
-      "selectAllTitle": "همه یافته های قابل مشاهده را انتخاب کنید",
-      "selectAllAria": "همه یافته های قابل مشاهده را انتخاب کنید",
-      "colSeverity": "شدت",
-      "colRule": "قانون",
-      "colMessage": "پیام",
-      "colLine": "خط",
-      "colActionsAria": "اقدامات ردیف",
-      "selectRowAria": "این ردیف یافتن را انتخاب کنید",
-      "copyRowTitle": "این یافته را به صورت JSON کپی کنید",
+      "bulkCopy": "کپی کردن انتخاب شده به عنوان JSON",
+      "selectAllTitle": "تمام یافته های قابل مشاهده را انتخاب کنید.",
+      "selectAllAria": "تمام یافته های قابل مشاهده را انتخاب کنید.",
+      "colSeverity": "شدت: میزان شدید بودن",
+      "colRule": "قاعده قانون اساسی",
+      "colMessage": "پیام پیغام پیام پیام",
+      "colLine": "خط خط خط",
+      "colActionsAria": "اقدامات صف (Row actions) اعمال ردیف",
+      "selectRowAria": "این ردیف یافتن را انتخاب کنید.",
+      "copyRowTitle": "این یافته را به عنوان JSON کپی کنید.",
       "metaShown": "{filtered} مورد نمایش داده شد",
       "metaAfterDisable": "{total} مورد پس از فیلتر قوانین غیرفعال",
-      "metaSourceCap": "منبع برای عملکرد در {max} محدود شده است",
-      "metaGroupedBy": "گروه بندی شده توسط {mode}",
-      "overflowNote": "لیست منبع برای عملکرد رندر در {max} کوتاه شده است.",
-      "runAgain": "دوباره آنالیز را اجرا کنید",
-      "emptyNoViolations": "هیچ تخلفی در اجرای آخرین تحلیل وجود ندارد.",
-      "emptyNoMatch": "هیچ تخلفی با فیلترهای فعلی مطابقت ندارد.",
-      "emptyHintNoData": "تجزیه و تحلیل را برای پر کردن «reports/.saropa_lints/violations.json» اجرا کنید، سپس بازخوانی کنید.",
+      "metaSourceCap": "منبع با حد {max} برای عملکرد _ PH0__ محدود شده است.",
+      "metaGroupedBy": "که با {mode} گروه بندی شده اند.",
+      "overflowNote": "لیست منابع در {max} برای عملکرد رندر کوتاه شده است.",
+      "runAgain": "دوباره آنالیز را اجرا کنید.",
+      "emptyNoViolations": "هیچ نقض در آخرین تحلیل اجرا نشده است.",
+      "emptyNoMatch": "هیچ نقض ای با فیلترهای فعلی مطابقت ندارد.",
+      "emptyHintNoData": "برای پر کردن گزارش ها، تجزیه و تحلیل را اجرا کنید/.saropa_lints/violations.json`, سپس refresh .",
       "emptyHintFilters": "فیلترها را تنظیم کنید یا تجزیه و تحلیل را دوباره اجرا کنید تا یافته ها را ببینید.",
-      "reRunAnalysis": "آنالیز را دوباره اجرا کنید",
-      "resetFilters": "بازنشانی فیلترها",
+      "reRunAnalysis": "تجزیه و تحلیل Re-run Analysis: بررسی مجدد",
+      "resetFilters": "فیلترهای ریست فلترها را از نو تنظیم کنید.",
       "linePrefix": "L{line}"
     },
     "charts": {
-      "sectionAria": "نمودارها را مخلوط کنید",
-      "heading": "مخلوط کنید",
-      "metaClickSlice": "برای فیلتر کردن، بر روی آن کلیک کنید",
-      "severityMix": "ترکیب شدت",
-      "impactMix": "ترکیب ضربه",
-      "filterBarTitle": "فقط به {key} فیلتر کنید",
-      "donutTotal": "کل"
+      "sectionAria": "نمودار های مخلوط (mix chart)",
+      "heading": "مخلوط کردن، ترکیب کردن",
+      "metaClickSlice": "برای فیلتر کردن یک تراشه روی آن کلیک کنید.",
+      "severityMix": "ترکیبی از شدت و شدت.",
+      "impactMix": "ترکیب اثرات مخلوط اثر",
+      "filterBarTitle": "فیلتر فقط به {key}",
+      "donutTotal": "کل مجموعی از مجموعه ها"
     },
     "todoHack": {
-      "sectionAria": "TODO و هک",
-      "headingDisabled": "TODO و هک",
-      "metaDisabled": "اسکن غیرفعال شد",
-      "scanOff": "اسکن فضای کاری خاموش است — فعال کردن نشانگرهای سطح فایل‌های پروژه.",
-      "enableScan": "اسکن را فعال کنید",
-      "heading": "TODO و هک",
+      "sectionAria": "همه چیز و هک ها",
+      "headingDisabled": "همه چیز و حقه ها",
+      "metaDisabled": "اسکن غیرفعال شده است",
+      "scanOff": "اسکن فضای کاری غیرفعال است  ⁇  امکان نمایش سطح مارکرها از فایل های پروژه را فراهم می کند.",
+      "enableScan": "فعال کردن اسکن سکان",
+      "heading": "همه چیز و حقه ها",
       "subsectionNone": "{title}: هیچ موردی در محدوده اسکن نیست.",
-      "capNote": "Scan hit max-file cap; برای پوشش کامل، `saropaLints.todosAndHacks.maxFilesToScan` را بالا ببرید.",
-      "notePill": "توجه داشته باشید",
+      "capNote": "اسکن حداکثر فایل را می گیرد؛ برای پوشش کامل، ∀saropaLints.todosAndHacks.maxFilesToScanˇ را افزایش دهید.",
+      "notePill": "یادداشت ها: یادآوری",
       "todosLabel": "کارهای باقی‌مانده",
-      "hacksLabel": "هک ها"
+      "hacksLabel": "HACKS هاکس"
     },
     "drift": {
-      "sectionAria": "مشاور دریفت",
-      "headingOff": "مشاور دریفت",
-      "metaOff": "ادغام خاموش",
-      "enableBlurb": "ادغام Drift Advisor را برای نمایش پیشنهادات پایگاه داده در اینجا فعال کنید.",
-      "enable": "فعال کردن",
-      "headingNoServer": "مشاور دریفت",
-      "metaNoServer": "بدون سرور",
+      "sectionAria": "مشاور جریان (Drift Advisor)",
+      "headingOff": "مشاور جریان (Drift Advisor)",
+      "metaOff": "ادغام کردن، از هم جدا شدن.",
+      "enableBlurb": "ادغام Drift Advisor را با پیشنهادات پایگاه داده های سطحی در اینجا فعال کنید.",
+      "enable": "فعال کردن enable Enable امکان پذیر ساختن",
+      "headingNoServer": "مشاور جریان (Drift Advisor)",
+      "metaNoServer": "هیچ سرور و سرور نیست.",
       "noServerBlurb": "هیچ سرور Drift Advisor در پورت های پیکربندی شده یافت نشد.",
-      "retry": "دوباره امتحان کنید",
-      "headingConnected": "مشاور دریفت",
-      "metaConnected": "متصل است",
-      "noIssues": "به {label} متصل شد - مشکل فعلی وجود ندارد.",
-      "refresh": "تازه کردن",
-      "openBrowser": "در مرورگر باز کنید",
-      "headingIssues": "مشاور دریفت",
-      "disable": "Drift Advisor را غیرفعال کنید"
+      "retry": "دوباره تلاش کنید Retry",
+      "headingConnected": "مشاور جریان (Drift Advisor)",
+      "metaConnected": "متصل به هم پیوسته شده است.",
+      "noIssues": "به {label} متصل شده است  ⁇  هیچ مشکلی در حال حاضر وجود ندارد.",
+      "refresh": "به راحتی و با آرامش استراحت کنید.",
+      "openBrowser": "در مرورگر باز شود.",
+      "headingIssues": "مشاور جریان (Drift Advisor)",
+      "disable": "غیرفعال کردن Drift Advisor"
     },
     "suppressions": {
-      "sectionAria": "سرکوب ها",
-      "headingExport": "سرکوب (صادرات)",
-      "viewHidesHeading": "نمایش مسائل پنهان می شود",
-      "viewHidesMetaActive": "فعال",
-      "viewHidesMetaNone": "هیچ کدام",
-      "noneInExport": "در صادرات «violations.json» کنونی هیچ تحلیلگر سرکوبگر وجود ندارد. تجزیه و تحلیل را پس از ویرایش نادیده گرفته یا خطوط پایه برای پر کردن اجرا کنید.",
-      "totalRow": "مجموع - فیلترها را پاک کنید و یافته‌ها را باز کنید",
-      "byRule": "طبق قانون ({count})",
-      "byFile": "بر اساس فایل ({count})",
-      "noEntries": "ورودی وجود ندارد.",
-      "nothingHidden": "هیچ چیز از لیست مشکلات در این فضای کاری پنهان نیست. از اقدامات زمینه درختی برای پنهان کردن پوشه ها، فایل ها یا قوانین استفاده کنید. آنها در حالت فضای کاری باقی می مانند.",
+      "sectionAria": "سرکوب های سرکوب",
+      "headingExport": "حذف (صادرات)",
+      "viewHidesHeading": "دیدگاه مسائل پنهان می کند",
+      "viewHidesMetaActive": "فعالان فعال فعال فعال هستند.",
+      "viewHidesMetaNone": "هیچ کدام از این ها وجود ندارد.",
+      "noneInExport": "هیچ سرکوب آنالیزور در صادرات فعلی `violations.json̅. تحلیل را پس از ویرایش نادیده می گیرد یا خطوط پایه برای پر کردن.",
+      "totalRow": "مجموع  ⁇  فیلترهای شفاف و یافته های باز",
+      "byRule": "به طور معمول ({count})",
+      "byFile": "با فایل ({count})",
+      "noEntries": "هیچ ورودی ای وجود ندارد.",
+      "nothingHidden": "هیچ چیز از لیست مسائل در این فضای کاری پنهان نیست. از tree context actions برای پنهان کردن پوشه ها، فایل ها یا قوانین استفاده کنید؛ آنها در حالت فضای کاری باقی می مانند.",
       "folderPattern": "{count} پوشه",
       "filePattern": "{count} الگوی فایل",
       "ruleGlobal": "{count} قانون به صورت سراسری",
@@ -489,664 +503,669 @@
       "severityHides": "{count} پنهان‌سازی شدت",
       "impactHides": "{count} پنهان‌سازی تأثیر",
       "activeHides": "پوست های فعال: {counts}.",
-      "viewHidesFooter": "این پنهان‌ها فقط فهرست مسائل / داشبورد را کوچک می‌کنند. آنها روی 'violations.json' نوشته نمی شوند.",
-      "clearViewHides": "پاک کردن همه موارد پنهان",
+      "viewHidesFooter": "این پوشه ها تنها لیست مسائل / داشبورد را کوچک می کنند؛ آنها به `violations.json`. نوشته نشده اند",
+      "clearViewHides": "پاک کردن همه نمایش ها پنهان می کند",
       "foldersSample": "پوشه ها (نمونه)",
-      "filesSample": "فایل ها / گلوب ها (نمونه)",
+      "filesSample": "فایل ها / گلوب (نمونه)",
       "rulesSample": "قوانین (نمونه)",
-      "perFileRulesSample": "قوانین هر فایل (نمونه)",
-      "unknownKind": "ناشناس"
+      "perFileRulesSample": "قوانین پرونده ای (نمونه)",
+      "unknownKind": "ناشناخته نامعلوم ناشناخت"
     },
     "script": {
-      "analysisRunning": "تجزیه و تحلیل در حال اجرا…",
-      "analysisComplete": "تحلیل کامل شد",
-      "metaRunning": "این می تواند در پروژه های بزرگ یک لحظه طول بکشد.",
-      "metaDone": "داشبورد تازه با آخرین یافته ها.",
+      "analysisRunning": "انجام تجزیه و تحلیل...",
+      "analysisComplete": "تجزیه و تحلیل کامل تکمیل شده است.",
+      "metaRunning": "این کار می تواند در پروژه های بزرگ کمی طول بکشد.",
+      "metaDone": "داشبورد تازه کننده با آخرین یافته ها.",
       "announceSearch": "جستجو {q}",
       "announceSeverities": "{n} شدت",
       "announceImpacts": "{n} تأثیر",
-      "announceCleared": "همه فیلترها پاک شدند",
-      "announceFiltersPrefix": "فیلترها:",
+      "announceCleared": "تمام فیلترها پاک شده اند.",
+      "announceFiltersPrefix": "فیلترها: فیلترهای",
       "bulkSelected": "{n} مورد انتخاب شد",
-      "analysisStartedDetail": "تحلیل شروع شد در حال جمع آوری تشخیص…",
-      "announceStarted": "تحلیل شروع شد",
-      "announceComplete": "تحلیل کامل شد",
-      "announceFailed": "تجزیه و تحلیل شکست خورد",
-      "analysisFailedDetail": "تجزیه و تحلیل شکست خورد. خروجی را برای جزئیات بررسی کنید.",
-      "removeRecentAria": "حذف کنید",
-      "removeRecentTitle": "حذف کنید",
+      "analysisStartedDetail": "تجزیه و تحلیل شروع شد. جمع آوری تشخیص...",
+      "announceStarted": "شروع به تجزیه و تحلیل شد",
+      "announceComplete": "تجزیه و تحلیل کامل تکمیل شده است.",
+      "announceFailed": "تجزیه و تحلیل شکست خورده است.",
+      "analysisFailedDetail": "تجزیه و تحلیل شکست خورده است. برای جزئیات، خروجی را بررسی کنید.",
+      "removeRecentAria": "حذف remove از بین بردن",
+      "removeRecentTitle": "حذف remove از بین بردن",
       "bulkSelectedTpl": "{n} مورد انتخاب شد"
     },
     "emptyState": {
-      "hintAfterMessage": "تجزیه و تحلیل Saropa Lints را برای تولید violations.json اجرا کنید، سپس از Refresh در اینجا استفاده کنید یا این داشبورد را دوباره باز کنید.",
-      "refreshDisk": "بازخوانی از دیسک"
+      "hintAfterMessage": "برای تولید violations.json، یک تجزیه و تحلیل Saropa Lints را اجرا کنید، سپس از Refresh here استفاده کنید یا این داشبورد را دوباره باز کنید.",
+      "refreshDisk": "Refresh از دیسک"
     },
     "shortcuts": {
-      "focusTextFilter": "روی فیلتر متن تمرکز کنید",
-      "clearTextFilter": "فیلتر متن متمرکز را پاک کنید",
-      "activateKpi": "کارت متمرکز KPI یا نوار نمودار را فعال کنید",
-      "activateKpiSpace": "کارت متمرکز KPI یا نوار نمودار را فعال کنید",
-      "showOverlay": "این روکش میانبر را نشان دهید"
+      "focusTextFilter": "تمرکز فیلتر متن را بر روی فیلتر متنی متمرکز کنید.",
+      "clearTextFilter": "فیلتر متن متمرکز شده را پاک کنید.",
+      "activateKpi": "کارت KPI متمرکز یا نوار نمودار را فعال کنید.",
+      "activateKpiSpace": "کارت KPI متمرکز یا نوار نمودار را فعال کنید.",
+      "showOverlay": "این shortcut overlay را نشان دهید."
     },
-    "unknownAnalyzerKind": "ناشناس",
+    "unknownAnalyzerKind": "ناشناخته نامعلوم ناشناخت",
     "supplementary": {
-      "otherAnalyzerOn": "+{count} دیگر یافته های تحلیلگر",
-      "otherAnalyzerPromo": "+؟ سایر یافته های تحلیلگر - نشان می دهد",
-      "analyzerTodosOn": "+{count} آنالایزر TODOs",
-      "analyzerTodosPromo": "+؟ تجزیه و تحلیل TODOs - نشان می دهد",
-      "scannerPromo": "اسکنر TODO/HACK را فعال کنید",
-      "tooltipLive": "پخش زنده از پنل مشکلات VS Code. با تکمیل تجزیه و تحلیل، به روز رسانی می شود. برای پنهان کردن کلیک کنید.",
-      "tooltipScanner": "اسکنر سیستم فایل Saropa - نشانگرهای باز TODO/HACK را در منبع می شمارد.",
-      "tooltipPromoClickToOn": "برای فعال کردن کلیک کنید"
+      "otherAnalyzerOn": "+{count} سایر یافته های آنالیزور",
+      "otherAnalyzerPromo": "+? سایر یافته های آنالیزور  ⁇  نشان می دهد",
+      "analyzerTodosOn": "+{count} تجزیه کننده TODOs",
+      "analyzerTodosPromo": "+? تحلیلگر TODOs  ⁇  نشان می دهد",
+      "scannerPromo": "اسکنر TODO/HACK را فعال کنید.",
+      "tooltipLive": "پخش زنده از پنل مشکلات VS Code. به روزرسانی ها با تکمیل تحلیل. برای پنهان کردن کلیک کنید.",
+      "tooltipScanner": "Saropa اسکنر فایل سیستم  ⁇  نشانگرهای باز TODO/HACK را در منبع می شمارد.",
+      "tooltipPromoClickToOn": "برای فعال کردن آن کلیک کنید."
     }
   },
   "triageDash": {
-    "showInIssues": "نمایش در مسائل",
-    "disableRules": "قوانین را غیرفعال کنید",
-    "enableRules": "قوانین را فعال کنید",
-    "issues": "مسائل",
-    "off": "خاموش",
-    "on": "روشن",
-    "colRule": "قانون",
-    "colIssues": "مسائل",
+    "showInIssues": "در مسائل نشان دهید.",
+    "disableRules": "قوانین غیرفعال کردن را از کار ببرید",
+    "enableRules": "قوانین فعال سازی (enable rules)",
+    "issues": "مسائل و مسائلی که مطرح می شود",
+    "off": "بیرون و بیرون، دور و بر",
+    "on": "و در ادامه به این موضوع اشاره کرد.",
+    "colRule": "قاعده قانون اساسی",
+    "colIssues": "مسائل و مسائلی که مطرح می شود",
     "zeroIssueRules": "{count} قانون بدون مشکل — در این سطح به‌طور خودکار فعال شد.",
     "disabledOverrides": "{count} قانون به دلیل بازنویسی در `analysis_options_custom.yaml` غیرفعال شدند.",
-    "summaryRuleTriage": "تریاژ قانون",
+    "summaryRuleTriage": "قانون تریج (Rule Triage) ، در مورد انتخاب افراد برای کار است.",
     "hintNoViolations": "هنوز هیچ «گزارش/.saropa_lints/violations.json» وجود ندارد. تجزیه و تحلیل را اجرا کنید، سپس این برگه را بازخوانی کنید.",
-    "hintUnreadable": "بدون تخلف قابل خواندن صادرات. ابتدا آنالیز Saropa Lints را اجرا کنید.",
-    "hintStale": "داده های تریاژ ممکن است قدیمی باشد (صادرات {age} قدیمی است). اجرای مجدد تجزیه و تحلیل برای گروه های فعلی.",
-    "hintNoPerRule": "این صادرات هیچ مشکلی بر اساس قانون ندارد. با افزونه Saropa Lints فعلی، دوباره آنالیز کنید.",
-    "hintBuildFailed": "نمی‌توان از این صادرات تریاژ ساخت. یک تحلیل تازه انجام دهید.",
-    "summaryVolume": "تریاژ قانون (حجم / باید اصلاح شود / سبک)",
-    "hintSameAsTree": "گروه بندی مشابه درخت نوار فعالیت Triage: مشکلات را فیلتر کنید یا قوانین را در «analysis_options_custom.yaml» غیرفعال/فعال کنید. گروه های بزرگ ممکن است درخواست تایید کنند."
+    "hintUnreadable": "هیچ نقض قابل خواندن صادرات. ابتدا تجزیه و تحلیل Saropa Lints را اجرا کنید.",
+    "hintStale": "داده های تریاژ ممکن است قدیمی باشند (برآمد {age} قدیمی است). تجزیه و تحلیل تکرار برای گروه های فعلی.",
+    "hintNoPerRule": "این صادرات هیچ شمارش اصولی برای هر موضوع ندارد. دوباره با یک افزونه Saropa Lints فعلی آنالیز کنید.",
+    "hintBuildFailed": "نمی توان از این صادرات، یک سریال ساخت. یک تحلیل تازه را اجرا کنید.",
+    "summaryVolume": "ردیابی قوانین (حجم / باید ثابت شود / سبک)",
+    "hintSameAsTree": "همان گروه بندی که در درخت فعالیت-بار Triage وجود دارد: مسائل فیلتر، یا قوانین غیرفعال / فعال کردن در `analysis_options_custom.yaml゙. گروه های بزرگ ممکن است برای تایید درخواست کنند."
   },
   "kbdOverlay": {
-    "toggleTitle": "نمایش میانبرهای صفحه کلید (؟)",
-    "toggleAria": "نمایش میانبرهای صفحه کلید",
-    "dialogTitle": "میانبرهای صفحه کلید",
-    "closeAria": "میانبرهای صفحه کلید را ببندید",
-    "footer": "Esc را فشار دهید یا برای بستن در خارج کلیک کنید."
+    "toggleTitle": "میانبر های صفحه کلید را نشان دهید (?)",
+    "toggleAria": "میانبر های صفحه کلید را نشان دهید",
+    "dialogTitle": "میانبر های صفحه کلید (keyboard shortcuts)",
+    "closeAria": "میانبر های صفحه کلید را ببندید",
+    "footer": "برای بستن، Esc را فشار دهید یا روی خارج کلیک کنید."
   },
   "wideReport": {
-    "openWorkspaceFirst": "ابتدا یک پوشه فضای کاری باز کنید.",
-    "noReportYet": "هنوز تخلفی گزارش نشده است ابتدا آنالیز Saropa Lints را اجرا کنید.",
-    "clipboardCopyFailed": "در کلیپ بورد کپی نشد.",
-    "copiedViolationsJson": "نقض(های) {count} به عنوان JSON کپی شد.",
-    "copiedOneViolationJson": "1 نقض به عنوان JSON کپی شد.",
-    "driftNotConnected": "سرور Drift Advisor متصل نیست.",
-    "copiedBulkFindings": "{count} یافته(های) انتخاب شده به عنوان JSON کپی شد.",
-    "noMatchingFindingsCopy": "هیچ یافته منطبقی برای کپی وجود ندارد.",
-    "couldNotOpenFile": "فایل باز نشد: {path}",
-    "saveReportNoWorkspace": "قبل از ذخیره گزارش، یک پوشه فضای کاری باز کنید.",
-    "savedFindings": "ذخیره شده {count} یافته(های): {path}",
-    "couldNotSaveReportJson": "گزارش JSON ذخیره نشد."
+    "openWorkspaceFirst": "ابتدا یک پوشه فضای کاری را باز کنید.",
+    "noReportYet": "هنوز هیچ گزارشی از تخلفات گزارش نشده است. ابتدا تجزیه و تحلیل Saropa Lints را اجرا کنید.",
+    "clipboardCopyFailed": "نتوانست به کلیپ بورد کپی کند.",
+    "copiedViolationsJson": "کپی شده {count} نقض (((s) به عنوان JSON.",
+    "copiedOneViolationJson": "کپی شده 1 نقض به عنوان JSON.",
+    "driftNotConnected": "سرور Drift Advisor به اینترنت متصل نشده است.",
+    "copiedBulkFindings": "کپی {count} یافته های انتخاب شده (((s) به عنوان JSON.",
+    "noMatchingFindingsCopy": "هیچ یافته ای برای کپی کردن وجود ندارد.",
+    "couldNotOpenFile": "نتوانست فایل: {path} را باز کند",
+    "saveReportNoWorkspace": "قبل از ذخیره گزارش، یک پوشه فضای کاری را باز کنید.",
+    "savedFindings": "یافته های ذخیره شده {count}: {path}",
+    "couldNotSaveReportJson": "نتوانست JSON گزارش را ذخیره کند."
   },
   "packageDashboard": {
-    "documentTitle": "داشبورد بسته Saropa",
-    "heroTitle": "داشبورد بسته Saropa",
+    "documentTitle": "Saropa داشبورد بسته بندی",
+    "heroTitle": "Saropa داشبورد بسته بندی",
+    "detailPane": {
+      "aria": "جزئیات بسته بندی:",
+      "title": "جزئیات بسته بندی:",
+      "close": "جزئیات نزدیک به دقیق"
+    },
     "status": {
       "packagesCount": "{count} بسته",
       "packagesBreakdown": "{direct} مستقیم، {transitive} غیرمستقیم",
       "gradeLine": "درجه {grade} · {avg}/100",
       "flaggedCount": "{count} نشان‌دار شده",
-      "flaggedTitle": "رها شده یا به پایان رسیده است",
-      "lastScanLabel": "اسکن {when}",
-      "lastScanTitle": "وقتی داده‌های داشبورد واکشی شد - {timestamp}. برای بازخوانی روی Rescan کلیک کنید.",
-      "lastScanUnknown": "اسکن شده (زمان نامشخص)",
-      "lastScanUnknownTitle": "این اسکن قبل از اینکه داشبورد مُهرهای زمانی را ردیابی کند انجام شد. برای بازخوانی روی Rescan کلیک کنید."
+      "flaggedTitle": "رها شده یا در پایان عمر",
+      "lastScanLabel": "اسکن {when} انجام شد.",
+      "lastScanTitle": "وقتی این داده های داشبورد به دست آورده شد  ⁇  {timestamp}. برای تازه کردن کلیک کنید Rescan .",
+      "lastScanUnknown": "اسکن شده (زمان نامعلوم)",
+      "lastScanUnknownTitle": "این اسکن قبل از اینکه داشبورد زمان ثبت شده را ردیابی کند، انجام شد. برای تازه کردن کلیک کنید Rescan ."
     },
     "time": {
-      "justNow": "همین الان",
+      "justNow": "همین الان، درست در این لحظه.",
       "minutesAgo": "{min} دقیقه پیش",
       "hoursAgo": "{hr} ساعت پیش",
       "daysAgo": "{day} روز پیش"
     },
     "scanning": {
-      "heading": "اسکن بسته ها",
-      "body1": "Saropa در حال واکشی متاداده pub.dev، فعالیت GitHub و نمودارهای وابستگی برای هر وابستگی مستقیم در این پروژه است.",
-      "body2": "پس از پایان اسکن، این صفحه به طور خودکار بازخوانی می شود. می‌توانید از اعلان پیشرفت در پایین سمت راست لغو کنید.",
-      "versionStamp": "داشبورد بسته Saropa v{version}"
+      "heading": "بسته های اسکنینگ",
+      "body1": "Saropa متاداده pub.dev، فعالیت GitHub و نمودارهای وابستگی را برای هر وابستگی مستقیم در این پروژه واکشی می کند.",
+      "body2": "این صفحه به طور خودکار هنگامی که اسکن کامل می شود، تازه خواهد شد. شما می توانید از طریق اطلاعیه پیشرفت در پایین سمت راست آن را لغو کنید.",
+      "versionStamp": "Saropa داشبورد بسته v{version}"
     },
-    "gaugeTitle": "درجه بسته پروژه: {grade}",
+    "gaugeTitle": "بسته پروژه درجه: {grade}",
     "summary": {
-      "packages": "بسته ها",
-      "projectGrade": "درجه بسته پروژه",
+      "packages": "بسته های حمل و نقل",
+      "projectGrade": "بسته پروژه درجه بندی پکیج پروژه",
       "totalSize": "اندازه کل*",
-      "gradeTooltip": "درجه پروژه {avgGrade}\nمیانگین امتیاز: {avgScore}/100\nبسته ها: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
-      "vibrantTitle": "پر جنب و جوش",
-      "stableTitle": "پایدار",
-      "outdatedTitle": "منسوخ شده",
-      "abandonedTitle": "رها شده است",
-      "eolTitle": "پایان زندگی",
-      "updates": "به روز رسانی ها",
-      "unused": "استفاده نشده",
-      "singleUse": "یکبار مصرف",
-      "vulnerable": "آسیب پذیر",
-      "overrides": "لغو می کند",
-      "caveatLine1": "*اندازه های کد نشان داده شده (lib + دارایی های اعلام شده)، زمانی که اندازه کد در دسترس نباشد به اندازه بایگانی pub.dev برمی گردد. Dependencies dev_dependencies (build_runner، lints، saropa_lints و غیره) را در بر نمی‌گیرد - آنها هرگز به APK / IPA / بسته وب ارسال نمی‌شوند. اندازه واقعی برنامه پس از تکان دادن درخت کوچکتر خواهد شد.",
-      "caveatLine2": "آستانه فعالیت: 90d = قدیمی، 180d = غیرفعال (تعهد + جدول زمانی انتشار)."
+      "gradeTooltip": "درجه پروژه {avgGrade}\nمیانگین امتیاز: {avgScore}/100\nبسته بندی: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
+      "vibrantTitle": "پر جنب و جوش، پرانرژی.",
+      "stableTitle": "پایدار استوار است.",
+      "outdatedTitle": "قدیمی و منسوخ شده",
+      "abandonedTitle": "رها شده و متروک",
+      "eolTitle": "پایان زندگی:",
+      "updates": "به روزرسانی ها Updates",
+      "unused": "استفاده نشده است.",
+      "singleUse": "یکبار مصرفی برای استفاده ی واحد",
+      "vulnerable": "آسیب پذیر: آسیب پذیر.",
+      "overrides": "Overrides را نادیده می گیرد.",
+      "caveatLine1": "* اندازه کد نشان داده شده (lib + declared assets) ، در صورت عدم دسترسی به اندازه کد، به اندازه آرشیو pub.dev باز می گردد. شامل dev_dependencies (build_runner، lints، saropa_lints و غیره)  ⁇  آنها هرگز به بسته APK / IPA / وب ارسال نمی شوند. اندازه واقعی اپلیکیشن پس از لرزش درخت کوچکتر خواهد شد.",
+      "caveatLine2": "آستانه های فعالیت: 90d = قدیمی، 180d = خواب (تزمه های زمانی تعهد + آزاد کردن)."
     },
     "breakdown": {
-      "title": "چرا درجه {grade}؟ — {avgScore}/100 میانگین در بسته های {pkgCount}",
-      "hint": "برای گسترش کلیک کنید",
-      "distributionHeading": "توزیع",
-      "signalsHeading": "سیگنال های ریسک امتیاز را به پایین می کشد",
-      "signalFlagged": "{count} پرچمدار (رها شده / پایان عمر)",
+      "title": "چرا نمره {grade}؟  ⁇  {avgScore}/100 میانگین در بسته های {pkgCount}",
+      "hint": "برای گسترش کلیک کنید تا آن را بزرگ کنید.",
+      "distributionHeading": "توزیع و پخش:",
+      "signalsHeading": "سیگنال های خطر که باعث کاهش امتیاز می شود.",
+      "signalFlagged": "{count} پرچم دار (تخلیه شده / پایان عمر)",
       "signalVulnerable": "{count} با آسیب پذیری های شناخته شده",
-      "signalUpdates": "{count} به روز رسانی در دسترس است",
-      "bottomHeading": "بسته های با کمترین امتیاز",
-      "thresholdsHeading": "نحوه نگاشت نمرات به نمرات",
-      "thresholdA": "70+ — پر جنب و جوش: فعالانه نگهداری می شود، اخیراً منتشر شده است",
-      "thresholdB": "40-69 - پایدار: همچنان حفظ می شود اما کند می شود",
-      "thresholdC": "20-39 - منسوخ شده: فاصله های طولانی بین نسخه ها",
-      "thresholdE": "زیر 20 - رها شده: نشانه های عدم فعالیت",
-      "thresholdF": "متوقف شده یا در pub.dev بایگانی شده است (امتیاز استفاده نشده است)",
-      "filterTooltip": "جدول بسته را فقط به این دسته فیلتر کنید",
-      "jumpTooltip": "در جدول بسته به {name} بروید"
+      "signalUpdates": "{count} به روزرسانی های موجود را در اختیار داشته باشد.",
+      "bottomHeading": "بسته های با کمترین امتیاز، بسته هایی هستند که بیشترین نمره را کسب می کنند.",
+      "thresholdsHeading": "چگونه نمرات به درجه های مربوط می شود",
+      "thresholdA": "70+  ⁇  پر جنب و جوش: به طور فعال نگهداری می شود، اخیرا منتشر شده است.",
+      "thresholdB": "40 ⁇ 69  ⁇  پایدار: هنوز حفظ شده اما در حال کند شدن است.",
+      "thresholdC": "20 ⁇ 39  ⁇  منسوخ شده: فاصله طولانی بین انتشارات",
+      "thresholdE": "زیر 20  ⁇  رها شده: نشانه های بی فعالیت",
+      "thresholdF": "ادامه داده نشده یا بایگانی شده در pub.dev (نتیجه استفاده نشد)",
+      "filterTooltip": "جدول بسته بندی را فقط به این دسته فیلتر کنید.",
+      "jumpTooltip": "به {name} در جدول بسته بندی بروید."
     },
     "network": {
-      "summary": "شبکه وابستگی"
+      "summary": "شبکه وابستگی (Dependency Network) ، یک شبکه وابسته است."
     },
     "sections": {
-      "sizeDistribution": "توزیع اندازه",
-      "sizeDistributionCaption": "Dependencies dev_dependencies را شامل نمی شود - آنها هرگز به بسته نرم افزاری APK / IPA / وب ارسال نمی شوند.",
-      "filters": "فیلترها",
-      "packages": "بسته ها"
+      "sizeDistribution": "توزیع اندازه، توزیع سایز",
+      "sizeDistributionCaption": "dev_dependencies را حذف می کند  ⁇  آنها هرگز به بسته APK / IPA / وب ارسال نمی شوند.",
+      "filters": "فیلترها: فیلترهای فیلتر",
+      "packages": "بسته های حمل و نقل"
     },
     "toolbar": {
-      "openPubspecTitle": "pubspec.yaml را باز کنید",
+      "openPubspecTitle": "pubspec.yaml را باز کنید.",
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "کپی گزارش JSON (همه ردیف ها + جزئیات)",
-      "copyAllLabel": "کپی کنید",
-      "saveAllTitle": "ذخیره گزارش JSON در گزارش‌ها/YYYYMMDD/...",
-      "saveAllLabel": "ذخیره کنید",
-      "saveUpgradeTitle": "ذخیره یک گزارش فقط از بسته‌ها با به‌روزرسانی در دسترس برای گزارش‌ها/YYYYMMDD/...",
-      "saveUpgradeLabel": "ذخیره گزارش ارتقا",
-      "resetViewTitle": "بازنشانی فیلترها، مرتب‌سازی و وضعیت نمای ذخیره شده",
-      "resetViewLabel": "بازنشانی نمای",
-      "rescanTitle": "اسکن مجدد بسته ها - کش pub.dev را پاک می کند و نسخه ها را دوباره واکشی می کند",
-      "rescanLabel": "اسکن مجدد",
-      "openOtherTitle": "پروژه دیگری از pubspec.yaml را در یک پنجره جدید برای اسکن Vibrancy باز کنید",
-      "openOtherLabel": "باز کردن پروژه…",
-      "footprintGroupAria": "حالت ردپای ستون اندازه",
-      "footprintGroupTitle": "آنچه که ستون Size نشان می‌دهد: فقط اندازه کد خود، به‌علاوه متعدی‌های منحصربه‌فرد (هزینه در صورت حذف)، یا به‌علاوه همه موارد انتقالی (حداکثر نظری). وقتی اندازه کد در دسترس نباشد به اندازه بایگانی باز می گردد.",
-      "footprintLabel": "رد پا:",
-      "footprintOwnTitle": "فقط اندازه کد شخصی (lib + دارایی های اعلام شده)؛ وقتی در دسترس نباشد به اندازه بایگانی pub.dev برمی گردد",
-      "footprintOwn": "صاحب",
-      "footprintUniqueTitle": "اندازه شخصی + موارد انتقالی که فقط توسط این قسمت استفاده می شود (در صورت حذف آن صرفه جویی می شود)",
-      "footprintUnique": "+ بی نظیر",
-      "footprintTotalTitle": "اندازه شخصی + همه موارد انتقالی، از جمله مواردی که با سایر بخش‌ها به اشتراک گذاشته شده است",
-      "footprintTotal": "+ همه",
-      "searchLabel": "جستجوی بسته ها",
-      "searchPlaceholder": "جستجوی بسته ها…",
-      "clearSearchTitle": "جستجو را پاک کنید",
-      "clearSearchAria": "جستجو را پاک کنید",
-      "ageFilterTitle": "بر اساس سن انتشار فیلتر کنید",
-      "publishedAgeLabel": "سن منتشر شده",
-      "ageMaxAll": "همه",
-      "presetFilterTitle": "از پیش تنظیمات فیلتر سریع استفاده کنید",
-      "presetLabel": "از پیش تعیین شده",
-      "presetNone": "هیچ کدام",
-      "presetModernization": "نوسازی",
-      "presetRiskHotspots": "نقاط خطر",
-      "presetCleanup": "نامزدهای پاکسازی",
-      "presetDirectOnly": "فقط مستقیم",
-      "devToggleTitle": "وابستگی های توسعه دهنده را در جدول و مجموع لحاظ کنید",
-      "includeDev": "شامل توسعه دهنده",
-      "activeFiltersLabel": "فیلترهای فعال:",
-      "clearAllFilters": "همه را پاک کنید"
+      "copyAllLabel": "کپی کپی کاپیتو",
+      "saveAllTitle": "ذخیره گزارش JSON به گزارش ها/سالسالMMDD/...",
+      "saveAllLabel": "Save Save ذخیره کنید",
+      "saveUpgradeTitle": "یک گزارش را فقط از بسته ها با به روزرسانی موجود برای گزارشات/YYY YMMDD/... ذخیره کنید.",
+      "saveUpgradeLabel": "گزارش ارتقاء را ذخیره کنید Save Upgrade Report",
+      "resetViewTitle": "فیلترها را از نو تنظیم کنید، مرتب سازی و ذخیره وضعیت نمایش.",
+      "resetViewLabel": "نمایش Reset View در حالت ریست قرار می گیرد.",
+      "rescanTitle": "Rescan بسته ها  ⁇  کش pub.dev را پاک می کند و نسخه های نسخه ای را دوباره بازمی گرداند.",
+      "rescanLabel": "اسکن مجدد Rescan",
+      "openOtherTitle": "پروژه ی pubspec.yaml را در پنجره ای جدید برای اسکن Vibrancy باز کنید.",
+      "openOtherLabel": "پروژه باز...",
+      "footprintGroupAria": "حالت چاپ پا ستون اندازه (size column)",
+      "footprintGroupTitle": "آنچه ستون Size نشان می دهد: فقط اندازه کد خود، به علاوه ترانزیتیو های منحصر به فرد (اگر هزینه حذف شود) ، یا به اضافه همه ترانزیت ها (محدودی نظری). زمانی که کد در دسترس نباشد، به اندازه آرشیو باز می گردد.",
+      "footprintLabel": "اثرپذیری: Footprint: رد پا",
+      "footprintOwnTitle": "فقط اندازه کد خود (lib + declared assets) ؛ وقتی که در دسترس نباشد به pub.dev باز می گردد.",
+      "footprintOwn": "مالکیت خود را داشته باشید",
+      "footprintUniqueTitle": "اندازه خود + ترانزیتیو هایی که فقط توسط این بخش استفاده می شود (اگر آن را حذف کنید، پس انداز خواهید کرد)",
+      "footprintUnique": "+ منحصر به فرد",
+      "footprintTotalTitle": "اندازه خود + تمام ترانزیتیو ها، از جمله آنهایی که با سایر بخش ها به اشتراک گذاشته شده اند.",
+      "footprintTotal": "+ همه + تمام",
+      "searchLabel": "بسته های جستجو برای جستجوی بسته ها",
+      "searchPlaceholder": "بسته های جستجو ...",
+      "clearSearchTitle": "پاک کردن جستجو از جستجوی واضح",
+      "clearSearchAria": "پاک کردن جستجو از جستجوی واضح",
+      "ageFilterTitle": "فیلتر کردن بر اساس سن انتشار",
+      "publishedAgeLabel": "سن انتشار: سن منتشر شده",
+      "ageMaxAll": "همه، همه، همگی",
+      "presetFilterTitle": "اعمال پیش تنظیمات سریع فیلتر",
+      "presetLabel": "پیش تنظیم شده Preset",
+      "presetNone": "هیچ کدام از این ها وجود ندارد.",
+      "presetModernization": "مدرنیزه کردن (Modernisation)",
+      "presetRiskHotspots": "نقاط خطر خطرناک (Risk hotspots)",
+      "presetCleanup": "کاندیداهای تمیز کردن",
+      "presetDirectOnly": "فقط مستقیم تنها مستقیم",
+      "devToggleTitle": "وابستگی های dev را در جدول و مجموع ها شامل شوید.",
+      "includeDev": "شامل dev dev شود.",
+      "activeFiltersLabel": "فیلترهای فعال: فیلتر های فعال",
+      "clearAllFilters": "همه چیز را پاک کنید."
     },
     "columns": {
       "name": {
-        "label": "بسته",
-        "tooltip": "نام بسته - برای باز کردن ورودی pubspec.yaml کلیک کنید"
+        "label": "بسته بندی پکیج:",
+        "tooltip": "نام بسته  ⁇  برای باز کردن ورودی pubspec.yaml کلیک کنید."
       },
       "version": {
-        "label": "نسخه",
+        "label": "نسخه ای از این کتاب،",
         "tooltip": "نسخه نصب شده از pubspec.lock"
       },
       "score": {
-        "label": "دسته بندی",
-        "tooltip": "طبقه بندی شادابی و نمره سلامت (0-10)"
+        "label": "دسته بندی: Category Category دسته بندی",
+        "tooltip": "طبقه بندی حیات و امتیاز سلامت (0 ⁇ 10)"
       },
       "published": {
-        "label": "منتشر شد",
-        "tooltip": "تاریخ انتشار نسخه نصب شده در pub.dev"
+        "label": "منتشر شده انتشار یافته",
+        "tooltip": "تاریخ انتشار نسخه نصب شده به pub.dev"
       },
       "activity": {
-        "label": "فعالیت",
-        "tooltip": "درجه فعالیت کد و انتشار از commit + انتشار اخیر"
+        "label": "فعالیت های فعالانه",
+        "tooltip": "درجه فعالیت کد و انتشار از commit + publish recency"
       },
       "likes": {
-        "label": "دوست دارد",
-        "tooltip": "pub.dev دوست دارد - برای باز کردن صفحه امتیاز بسته کلیک کنید"
+        "label": "لایک ها را دوست دارد",
+        "tooltip": "pub.dev لایک  ⁇  کلیک کنید تا صفحه نمره بسته باز شود."
       },
       "downloads": {
-        "label": "دانلودها",
-        "tooltip": "دانلودهای pub.dev در 30 روز گذشته — برای باز کردن صفحه امتیاز بسته کلیک کنید"
+        "label": "دانلود ها Downloads",
+        "tooltip": "pub.dev دانلود در 30 روز گذشته  ⁇  برای باز کردن صفحه نمره بسته کلیک کنید تا صفحه نمرات بسته را باز کنید."
       },
       "issues": {
-        "label": "مسائل",
-        "tooltip": "مشکلات GitHub را باز کنید (در صورت وجود درخواست های کشش را حذف نمی کند)"
+        "label": "مسائل و مسائلی که مطرح می شود",
+        "tooltip": "باز کردن مسائل GitHub (با استثنای درخواست های pull در صورت وجود)"
       },
       "prs": {
-        "label": "روابط عمومی",
-        "tooltip": "درخواست های کشش GitHub را باز کنید"
+        "label": "PRs (اعلام عمومی)",
+        "tooltip": "GitHub باز کردن درخواست های pull"
       },
       "size": {
-        "label": "اندازه",
-        "tooltip": "اندازه کد (lib + دارایی های اعلام شده)؛ زمانی که اندازه کد در دسترس نباشد به اندازه بایگانی pub.dev برمی گردد"
+        "label": "اندازه ی سایز: Size",
+        "tooltip": "اندازه کد (lib + declared assets) ؛ وقتی که سایز کد در دسترس نباشد، به pub.dev باز می گردد."
       },
       "deps": {
         "label": "وابستگی‌ها",
-        "tooltip": "وابستگی های گذرا مستقیم - قسمت های مشترک برجسته شده اند"
+        "tooltip": "وابستگی های مستقیم انتقالی  ⁇  مشترک بودن بخش ها برجسته شده است."
       },
       "files": {
-        "label": "مراجع",
-        "tooltip": "تعداد فایل های منبعی که این بسته را وارد می کنند — برای جستجو کلیک کنید"
+        "label": "مرجع ها مرجع های ارجاعی",
+        "tooltip": "تعداد فایل های منبع که این بسته را وارد می کنند  ⁇  برای جستجو کلیک کنید تا جستجو کنید."
       },
       "transitives": {
-        "label": "گذرا",
-        "tooltip": "تعداد وابستگی های گذرا (غیر مستقیم) که این بسته وارد می کند"
+        "label": "ترانزیتیو ها (Transitive)",
+        "tooltip": "تعداد وابستگی های انتقالی (غیرمستقیم) که این بسته به آن ها می پردازد."
       },
       "vulns": {
         "label": "آسیب‌پذیری‌ها",
-        "tooltip": "آسیب پذیری های امنیتی شناخته شده از پایگاه داده های OSV و GitHub Advisory"
+        "tooltip": "آسیب پذیری های امنیتی شناخته شده از پایگاه داده های مشاوره ای OSV و GitHub"
       },
       "license": {
-        "label": "مجوز",
-        "tooltip": "شناسه مجوز SPDX از pub.dev"
+        "label": "مجوزهای مجاز:",
+        "tooltip": "SPDX شناسه مجوز از pub.dev"
       },
       "update": {
-        "label": "به روز رسانی",
-        "tooltip": "به روز رسانی نسخه موجود: اصلی، جزئی یا پچ"
+        "label": "Update update به روز رسانی کنید",
+        "tooltip": "به روز رسانی نسخه موجود: مهم، جزئی یا پچ"
       },
       "status": {
-        "label": "وضعیت",
-        "tooltip": "وضعیت استفاده: آیا بسته در کد شما استفاده نشده به نظر می رسد"
+        "label": "وضعیت Status موقعیت وضعیت",
+        "tooltip": "وضعیت استفاده: آیا بسته در کد شما به عنوان غیرمستعمل ظاهر می شود یا خیر."
       },
       "description": {
-        "label": "توضیحات",
-        "tooltip": "توضیحات بسته از pub.dev"
+        "label": "توضیحات توصیف شرح مشخصات",
+        "tooltip": "توضیحات بسته بندی از pub.dev"
       }
     },
     "cells": {
-      "noGithub": "هیچ مخزن GitHub یافت نشد",
-      "devBadge": "توسعه دهنده",
-      "transitiveBadge": "متعدی",
-      "publishDateUnavailable": "تاریخ انتشار از pub.dev در دسترس نیست",
-      "activityGradeUnavailable": "درجه فعالیت در دسترس نیست (داده‌های مربوط به تعهد یا انتشار موجود نیست)",
-      "activityFallback": "فعالیت بر اساس تعهدات و انتشارات اخیر",
-      "likesUnavailable": "لایک های pub.dev موجود نیست",
+      "noGithub": "هیچ مخزن GitHub پیدا نشد.",
+      "devBadge": "دیوید dev dev",
+      "transitiveBadge": "ترانزیتیو transitive: انتقال پذیر.",
+      "publishDateUnavailable": "تاریخ انتشار از pub.dev در دسترس نیست.",
+      "activityGradeUnavailable": "درجه فعالیت در دسترس نیست (داده های commit یا release را از دست داده است)",
+      "activityFallback": "فعالیت بر اساس تعهدات و انتشار های اخیر",
+      "likesUnavailable": "pub.dev لایک ها در دسترس نیستند",
       "likesCount": "{count} لایک در pub.dev",
-      "downloadsUnavailable": "دانلودهای 30 روزه pub.dev در دسترس نیستند",
-      "downloadsCount": "دانلود {count} در 30 روز گذشته",
-      "sizeUnavailable": "اندازه از pub.dev در دسترس نیست",
-      "noVulnerabilities": "هیچ آسیب پذیری شناخته شده ای وجود ندارد",
-      "licenseUnspecified": "مجوز در pub.dev مشخص نشده است",
-      "unusedBadge": "استفاده نشده",
+      "downloadsUnavailable": "pub.dev دانلود 30 روزه در دسترس نیست.",
+      "downloadsCount": "{count} دانلود ها در 30 روز گذشته",
+      "sizeUnavailable": "اندازه در دسترس نیست از pub.dev",
+      "noVulnerabilities": "هیچ آسیب پذیری شناخته شده ای وجود ندارد.",
+      "licenseUnspecified": "مجوز مشخص نشده در pub.dev",
+      "unusedBadge": "استفاده نشده است.",
       "packageInUse": "بسته در حال استفاده است"
     },
     "row": {
-      "expandDetails": "جزئیات را گسترش دهید",
-      "copyRowJson": "ردیف را به عنوان JSON کپی کنید"
+      "expandDetails": "جزئیات را گسترش دهید.",
+      "copyRowJson": "ردیف را به عنوان JSON کپی کنید."
     },
     "shortcuts": {
-      "focusSearch": "فیلد جستجو را متمرکز کنید",
-      "nextRow": "ردیف بسته بعدی را برجسته کنید",
-      "prevRow": "ردیف بسته قبلی را برجسته کنید",
-      "toggleDetail": "گسترش دهنده جزئیات بسته برجسته شده را تغییر دهید",
-      "escapeSearch": "پاک کردن جستجوی متمرکز؛ Esc دوم تمام ردیف های گسترش یافته را جمع می کند",
-      "historyBack": "به تاریخچه پیمایش بسته برگردید",
-      "showOverlay": "این روکش میانبر را نشان دهید"
+      "focusSearch": "تمرکز بر روی میدان جستجو",
+      "nextRow": "خط بسته بندی بعدی را برجسته کنید.",
+      "prevRow": "خط بسته بندی قبلی را برجسته کنید.",
+      "toggleDetail": "در این حالت، اکسپاندر جزئیات بسته برجسته شده را تغییر دهید.",
+      "escapeSearch": "جستجوی متمرکز را پاک کنید؛ در دوم Esc تمام ردیف های گسترش یافته را فرو می ریزد.",
+      "historyBack": "به مرور تاریخچه ی ناوبری بسته ها برگردید.",
+      "showOverlay": "این shortcut overlay را نشان دهید."
     },
     "versionTooltip": {
       "installed": "نصب شده: {version} ({date})",
       "latest": "آخرین: {version}",
-      "created": "ایجاد شده: {date}",
+      "created": "ایجاد شده توسط: {date}",
       "constraint": "محدودیت: {constraint}"
     },
     "healthTooltip": {
       "grade": "درجه: {grade}",
       "resolutionVelocity": "سرعت رزولوشن: {value}",
-      "engagementLevel": "سطح تعامل: {value}",
+      "engagementLevel": "سطح مشارکت: {value}",
       "popularity": "محبوبیت: {value}",
-      "publisherTrust": "اعتماد ناشر: {value}",
-      "codeCommits": "کد انجام می شود: {age} پیش",
-      "latestRelease": "آخرین نسخه: {age} ago",
+      "publisherTrust": "ناشر اعتماد: {value}",
+      "codeCommits": "کد commit می کند: {age} پیش از این",
+      "latestRelease": "آخرین نسخه: {age} پیش از این",
       "activitySignal": "سیگنال فعالیت: {signal}"
     },
     "size": {
       "codeSize": "اندازه کد: {size}",
       "archiveSize": "اندازه آرشیو: {size}",
-      "onDisk": "روی دیسک: {size}",
-      "withUniqueTransitives": "با انتقال منحصر به فرد: {size}",
-      "withSharedTransitives": "با انتقال مشترک: {size}",
-      "openFolder": "پوشه بسته محلی را باز کنید"
+      "onDisk": "در دیسک: {size}",
+      "withUniqueTransitives": "با ترانزیتیو های منحصر به فرد: {size}",
+      "withSharedTransitives": "با ترانزیتیو های مشترک: {size}",
+      "openFolder": "پوشه ی بسته های محلی را باز کنید."
     },
     "references": {
-      "noImports": "هیچ وارد کردن فایل منبع شناسایی نشد",
-      "reExportLine": "{location} (صادرات مجدد)",
-      "reExportSuffix": "(صادرات مجدد)",
-      "publicApiSurface": "سطح API عمومی - حداقل یک استفاده، صادرات مجدد است.",
-      "reExportedBadge": "دوباره صادر شد",
-      "openFileReferences": "مراجع فایل را باز کنید",
-      "searchImports": "جستجوی واردات",
-      "fileReferencesHeading": "مراجع فایل ({count})",
+      "noImports": "هیچ فایل منبع وارداتی شناسایی نشده است.",
+      "reExportLine": "{location} (باز صادرات)",
+      "reExportSuffix": "(باز صادرات)",
+      "publicApiSurface": "سطح API عمومی  ⁇  حداقل یک استفاده از آن، صادرات مجدد است.",
+      "reExportedBadge": "باز صادر شده و مجدداً صادر می شود.",
+      "openFileReferences": "باز کردن مرجع فایل های باز",
+      "searchImports": "جستجو واردات و واردات",
+      "fileReferencesHeading": "ارجاعات فایل ({count})",
       "andMore": "... و {count} بیشتر"
     },
     "deps": {
-      "noTransitives": "بدون وابستگی گذرا",
-      "showTransitives": "نمایش وابستگی های گذرا",
+      "noTransitives": "بدون وابستگی های انتقالی.",
+      "showTransitives": "وابستگی های انتقالی را نشان دهید.",
       "tooltipDep": "• {dep}",
-      "tooltipDepShared": "• {dep} (به اشتراک گذاشته شده)",
-      "tooltipHeader": "عمق های انتقالی {total}",
+      "tooltipDepShared": "• {dep} (مشترک)",
+      "tooltipHeader": "{total} deps انتقالی",
       "tooltipHeaderShared": "عمق انتقالی {total} ({shared} مشترک)",
-      "sharedBadgeTitle": "{count} با بسته های دیگر به اشتراک گذاشته شده است",
-      "sharedBadge": "به اشتراک گذاشته شده است",
-      "transitiveDepsHeading": "وابستگی های گذرا ({count})"
+      "sharedBadgeTitle": "{count} با سایر بسته ها به اشتراک گذاشته شده است.",
+      "sharedBadge": "اشتراک گذاری مشترک به اشتراک گذاشته شده است",
+      "transitiveDepsHeading": "وابستگی های انتقالی ({count})"
     },
     "dormancy": {
-      "noActivity6mo": "بدون تعهد و بدون انتشار در 6+ ماه",
-      "noActivity3mo": "بدون تعهد و بدون انتشار در 3+ ماه",
-      "releaseActiveCodeInactive": "انتشار فعال، کد غیرفعال (3+ ماه بدون تعهد)",
-      "codeActiveReleaseSlow": "کد فعال است، آهنگ انتشار کندتر است (3+ ماه)"
+      "noActivity6mo": "هیچ تعهد و انتشار در 6 ماه گذشته وجود نداشته است.",
+      "noActivity3mo": "هیچ تعهد و انتشار در 3+ ماه",
+      "releaseActiveCodeInactive": "انتشار فعال، کد غیرفعال (۳+ ماه بدون تعهد)",
+      "codeActiveReleaseSlow": "کد فعال است، سرعت انتشار کندتر (3+ ماه) است."
     },
     "activity": {
       "withDormancy": "{dormancy} (درجه فعالیت {grade})",
-      "healthy": "فعالیت کد و انتشار سالم است (درجه فعالیت {grade})"
+      "healthy": "کد و فعالیت آزاد سازی سالم است (درجه ی فعالیت {grade})"
     },
     "detail": {
-      "codeCommitActivity": "فعالیت تعهد کد",
-      "releaseActivity": "انتشار فعالیت",
-      "dormancySignal": "سیگنال خواب",
-      "ago": "{age} پیش",
-      "qualityExample": "+مثال",
-      "qualityExampleTitle": "نسخه ی نمایشی قابل اجرا را ارسال می کند",
-      "qualityTests": "+تست ها",
-      "qualityTestsTitle": "یک مجموعه آزمایشی ارسال می کند",
-      "qualityTools": "+ابزار",
-      "qualityToolsTitle": "ابزار نگهداری کشتی",
-      "qualityDocs": "+ اسناد",
-      "qualityDocsTitle": "اسناد توسعه یافته را ارسال می کند",
-      "healthScore": "نمره سلامتی",
-      "resolutionVelocity": "سرعت رزولوشن",
-      "engagementLevel": "سطح تعامل",
-      "popularity": "محبوبیت",
-      "publisherTrust": "اعتماد ناشر",
-      "fixInVersion": "→ رفع در {version}",
+      "codeCommitActivity": "کد تعهد فعالیت انجام می دهد",
+      "releaseActivity": "فعالیت انتشار:",
+      "dormancySignal": "سیگنال خوابگاهی، یک سیگنال بیکار است.",
+      "ago": "{age} پیش از این",
+      "qualityExample": "+مثال مثال",
+      "qualityExampleTitle": "یک نسخه ی نمایشی قابل اجرا را با ما همراه می کند.",
+      "qualityTests": "+تست های آزمایشی",
+      "qualityTestsTitle": "یک مجموعه تست را به همراه دارد.",
+      "qualityTools": "+ ابزارها و ابزارهایی که برای استفاده در کار هستند",
+      "qualityToolsTitle": "ابزار نگهداری کشتی ها",
+      "qualityDocs": "+docs: دستاویزات",
+      "qualityDocsTitle": "کشتی ها اسناد مستندات گسترده را ارائه می دهند.",
+      "healthScore": "نمره سلامت Health Score به صورت زیر است:",
+      "resolutionVelocity": "سرعت رزولوشن Resolution Velocity (سرعت قطعنامه)",
+      "engagementLevel": "سطح مشارکت: میزان تعامل",
+      "popularity": "محبوبیت شهرت",
+      "publisherTrust": "ناشر اعتماد اعتماد",
+      "fixInVersion": "→ در {version} ثابت کنید",
       "vulnerabilitiesHeading": "آسیب پذیری ها ({count})"
     },
     "links": {
-      "heading": "پیوندها",
+      "heading": "لینک ها Links",
       "pubDev": "pub.dev",
-      "changelog": "تغییرات ثبت شده",
-      "versions": "نسخه ها",
-      "repository": "مخزن",
-      "issues": "مسائل"
+      "changelog": "در changelog تغییرات ایجاد شده است.",
+      "versions": "نسخه ها: نسخه های ورژن",
+      "repository": "مخزن ذخیره سازی repo.",
+      "issues": "مسائل مربوط به موضوعات موضوعاتی"
     }
   },
   "commandCatalog": {
-    "documentTitle": "کاتالوگ فرمان Saropa",
-    "skipLink": "به کاتالوگ فرمان بروید",
-    "heroTitle": "کاتالوگ فرمان Saropa",
+    "documentTitle": "Saropa کاتالوگ فرماندهی",
+    "skipLink": "کاتالوگ Skip to Command را انتخاب کنید.",
+    "heroTitle": "Saropa کاتالوگ فرماندهی",
     "status": {
       "commands": "{count} دستور",
       "categories": "{count} دسته‌بندی",
       "recent": "{count} اخیر",
       "internalHidden": "{count} فقط منوی کلیک‌راست (پنهان)",
-      "wordCommands": "دستورات",
-      "wordCategories": "دسته بندی ها",
-      "wordRecent": "اخیر"
+      "wordCommands": "دستورات فرماندهی",
+      "wordCategories": "دسته بندی ها: Categories",
+      "wordRecent": "اخیراً اخیر، تازه ترین"
     },
     "search": {
-      "placeholder": "جستجوی عنوان، توضیحات یا شناسه فرمان…",
-      "ariaLabel": "دستورات جستجو",
-      "clearAria": "جستجو را پاک کنید",
-      "hintLine1": "با هر فرمان مطابقت دارد",
-      "hintStrongTitle": "عنوان",
-      "hintStrongDesc": "توضیحات",
-      "hintStrongId": "شناسه",
-      "hintLine2": "(توکن‌های شناسه نیز با فاصله هستند — تایپ کنید",
-      "hintLine2kbd": "تحلیل اجرا",
-      "hintLine2End": "بدون نقطه)."
+      "placeholder": "عنوان جستجو، توصیف یا ID فرمان...",
+      "ariaLabel": "دستورات جستجو فرمان های جستجو",
+      "clearAria": "پاک کردن جستجو از جستجوی واضح",
+      "hintLine1": "با هر فرماندهی مطابقت دارد.",
+      "hintStrongTitle": "عنوان عنوان عنوان title",
+      "hintStrongDesc": "توضیحات: توصیف مشخصات",
+      "hintStrongId": "id id id Id این است که",
+      "hintLine2": "(توکن های id نیز با فاصله  ⁇  نوع هستند.",
+      "hintLine2kbd": "تحلیل اجرا، تجزیه و تحلیل اجرا",
+      "hintLine2End": "بدون نقطه).) ، و در این صورت،"
     },
     "toolbar": {
-      "showInternal": "نمایش دستورات منوی زمینه",
-      "collapseAll": "همه را جمع کن"
+      "showInternal": "نمایش دستورات منوی زمینه ای",
+      "collapseAll": "همه چیز فرو می ریزد."
     },
     "recentPopover": {
-      "title": "جستجوهای اخیر",
-      "clearTitle": "تمام جستجوهای اخیر را پاک کنید",
-      "clearButton": "پاک کردن",
-      "listAria": "جستجوهای اخیر"
+      "title": "جستجوهای اخیر جستجو های اخیر",
+      "clearTitle": "پاک کردن تمام جستجوهای اخیر",
+      "clearButton": "صاف شفاف روشن",
+      "listAria": "جستجوهای اخیر جستجو های اخیر"
     },
     "filterChips": {
-      "ariaRegion": "فیلترهای فعال",
-      "activeLabel": "فیلترهای فعال:",
-      "clearAll": "همه را پاک کنید"
+      "ariaRegion": "فیلترهای فعال: فیلتر های فعال",
+      "activeLabel": "فیلترهای فعال: فیلتر های فعال",
+      "clearAll": "همه چیز را پاک کنید."
     },
     "bands": {
-      "frequentTitle": "مکرر",
+      "frequentTitle": "اغلب مکرر متداول",
       "frequentHint": "بیشترین استفاده در جلسات شما",
-      "recentTitle": "اخیر",
-      "recentClear": "پاک کردن",
-      "recentHint": "برای اجرا مجدد کلیک کنید · ابتدا جدیدترین"
+      "recentTitle": "اخیراً اخیر اخیر",
+      "recentClear": "صاف شفاف روشن",
+      "recentHint": "برای اجرا مجدد روی آن کلیک کنید · جدیدترین ها اول"
     },
     "noResults": {
-      "message": "هیچ فرمانی با جستجوی شما مطابقت ندارد.",
-      "reset": "بازنشانی فیلترها"
+      "message": "هیچ فرمان دیگری با جستجوی شما مطابقت ندارد.",
+      "reset": "فیلترهای ریست فلترها را از نو تنظیم کنید."
     },
     "entry": {
-      "internalBadgeTitle": "فقط از منوهای زمینه فعال می شود",
-      "internalBadge": "منو",
-      "copyTitle": "کپی شناسه فرمان ({id})",
-      "copyAria": "شناسه فرمان را کپی کنید"
+      "internalBadgeTitle": "فقط از منوهای زمینه ای فعال می شود.",
+      "internalBadge": "منوی منو Menu",
+      "copyTitle": "کپی از id فرمان ({id})",
+      "copyAria": "کپی ID فرمان را کپی کنید."
     },
-    "categoryJumpTitle": "پرش به {category}",
+    "categoryJumpTitle": "به {category} بروید.",
     "shortcuts": {
-      "focusSearch": "فیلد جستجو را متمرکز کنید",
-      "navRows": "در ردیف های فرمان قابل مشاهده حرکت کنید",
-      "homeEnd": "پرش به اولین یا آخرین ردیف قابل مشاهده",
-      "enterRun": "دستور متمرکز را اجرا کنید",
-      "escClear": "فیلترهای جستجو و بازنشانی را پاک کنید",
-      "showOverlay": "این روکش میانبر را نشان دهید"
+      "focusSearch": "تمرکز بر روی میدان جستجو",
+      "navRows": "حرکت در ردیف های فرمان قابل مشاهده را هدایت کنید.",
+      "homeEnd": "به اولین یا آخرین ردیف قابل مشاهده بروید.",
+      "enterRun": "دستور Focused را اجرا کنید.",
+      "escClear": "فیلترهای جستجو و تنظیم مجدد را پاک کنید.",
+      "showOverlay": "این shortcut overlay را نشان دهید."
     },
     "script": {
       "moreSuffix": "+{count} بیشتر",
-      "showLess": "کمتر نشان دادن",
-      "runSingular": "اجرا کنید",
-      "runPlural": "اجرا می شود",
-      "recentWord": "اخیر",
+      "showLess": "Show less کمتر نشان دهید",
+      "runSingular": "فرار، فرار، دویدن",
+      "runPlural": "می رود، می رود.",
+      "recentWord": "اخیراً اخیر، تازه ترین",
       "expandAll": "همه را گسترش دهید",
-      "collapseAll": "همه را جمع کن",
+      "collapseAll": "همه چیز فرو می ریزد.",
       "searchChip": "جستجو: \"{query}\"",
-      "internalChip": "نمایش دستورات منوی زمینه",
-      "removeFilterPrefix": "فیلتر را بردارید",
+      "internalChip": "نمایش دستورات منوی زمینه ای",
+      "removeFilterPrefix": "فیلتر را از بین ببرید",
       "matchOne": "{count} تطابق",
       "matchOther": "{count} تطابق"
     }
   },
   "codeHealth": {
-    "documentTitle": "داشبورد سلامت کد Saropa",
-    "skipToTable": "پرش به جدول توابع",
+    "documentTitle": "Saropa کد Health Dashboard صفحه کنترل سلامت",
+    "skipToTable": "به توابع جدول بروید.",
     "openWorkspaceFirst": "ابتدا یک فضای کاری Dart/Flutter را باز کنید.",
-    "scanningTitle": "کد سلامت: توابع اسکن…",
+    "scanningTitle": "کد سلامت: عملکرد اسکن...",
     "scan": {
-      "title": "اسکن سلامت پروژه",
-      "subtitle": "خواندن کد شما داشبورد با اطلاعات بیشتر در اسکن پر می شود.",
-      "waiting": "شروع اسکن…",
-      "launching": "در حال راه اندازی اسکنر…",
-      "collect": "در حال کشف فایل ها…",
-      "firstRunHint": "اولین اجرا اسکنر را کامپایل می کند. پروژه های بزرگ یک لحظه طول می کشد تا فایل ها ظاهر شوند.",
-      "paused": "مکث کرد",
+      "title": "اسکن پروژه سلامت سلامت",
+      "subtitle": "کد شما را می خواند. داشبورد به عنوان اسکن بیشتر یاد می گیرد پر می شود.",
+      "waiting": "شروع اسکن...",
+      "launching": "... اسکنر پرتاب",
+      "collect": "کشف پرونده ها...",
+      "firstRunHint": "اولین اجرا اسکنر را کامپایل می کند؛ پروژه های بزرگ قبل از ظاهر شدن فایل ها یک لحظه طول می کشد.",
+      "paused": "توقف و متوقف شدن",
       "stopped": "اسکن متوقف شد",
-      "elapsed": "گذشت",
+      "elapsed": "زمان سپری شده",
       "phase": {
-        "parse": "تجزیه فایل ها",
-        "history": "خواندن تاریخچه git",
-        "blame": "سن کد محاسباتی",
-        "usage": "شمارش مراجع",
-        "score": "توابع امتیاز دهی"
+        "parse": "تجزیه فایل های پارس",
+        "history": "خواندن تاریخچه Git git",
+        "blame": "سن کد محاسباتی Age Code",
+        "usage": "شمارش مرجع ها",
+        "score": "عملکردهای امتیاز دهی:"
       },
       "counter": {
-        "files": "فایل ها",
-        "functions": "توابع",
-        "problems": "مشکلات پیدا شد"
+        "files": "فایل ها و فایلها",
+        "functions": "وظایف عملکردها",
+        "problems": "مشکلات پیدا شده مسائل یافت شد"
       },
       "counters": {
-        "aria": "شمارنده های اسکن زنده"
+        "aria": "شمارنده های اسکن زنده، شماری از اسکن های زنده را نشان می دهند."
       },
       "controls": {
-        "aria": "اسکن کنترل ها"
+        "aria": "اسکن کنترل های اسکن کنترلهای اسکن"
       },
       "btn": {
-        "pause": "مکث کنید",
-        "resume": "رزومه",
-        "restart": "راه اندازی مجدد",
-        "cancel": "لغو کنید"
+        "pause": "توقف مکث (pause)",
+        "resume": "رزومه ی زندگی خود را ادامه دهید",
+        "restart": "راه اندازی مجدد دوباره Restart کردن",
+        "cancel": "لغو کن لغو کنید"
       },
       "preview": {
-        "heading": "مشکلاتی که تاکنون پیدا شده است",
-        "empty": "هنوز مشکلی پیدا نشد…"
+        "heading": "مشکلات یافت شده تا کنون",
+        "empty": "هنوز هیچ مشکلی پیدا نشده است ..."
       },
       "version": {
-        "engine": "موتور",
-        "detecting": "تشخیص…",
-        "legacy": "میراث - بدون پیشرفت زنده (saropa_lints این پروژه قبل از آن است)"
+        "engine": "موتورهای ماشین، موتورز و موتورها",
+        "detecting": "کشف... تشخیص ...",
+        "legacy": "میراث  ⁇  هیچ پیشرفت زنده ای وجود ندارد (پروژه saropa_lints این پروژه از آن پیش می رود)"
       }
     },
-    "runReportFirst": "گزارش را دوباره اجرا کنید، سپس JSON را کپی کنید.",
-    "copiedJson": "Code Health JSON در کلیپ بورد کپی شد.",
-    "couldNotOpenFile": "فایل باز نشد: {path}",
-    "panelTitle": "داشبورد سلامت کد Saropa",
+    "runReportFirst": "گزارش را دوباره اجرا کنید، سپس JSON.کپی کنید",
+    "copiedJson": "کد سلامت JSON کپی شده به کلیپ بورد.",
+    "couldNotOpenFile": "نتوانست فایل: {path} را باز کند",
+    "panelTitle": "Saropa کد Health Dashboard صفحه کنترل سلامت",
     "hero": {
-      "title": "داشبورد سلامت کد Saropa",
-      "generated": "تولید شده است",
+      "title": "Saropa کد Health Dashboard صفحه کنترل سلامت",
+      "generated": "تولید شده ایجاد شده",
       "functionOne": "{count} تابع",
       "functionOther": "{count} تابع",
-      "avgFormat": "میانگین {score} ({grade})",
-      "gatesFailing": "دروازه ها شکست می خورند",
-      "gatesPassing": "دروازه های عبور"
+      "avgFormat": "avg {score} ({grade}) است.",
+      "gatesFailing": "دروازه ها شکست خورده اند",
+      "gatesPassing": "دروازه های عبور از گذرگاه"
     },
     "gauge": {
-      "tooltip": "میانگین امتیاز {rounded} از 100 (درجه {grade}).",
-      "ariaLabel": "میانگین امتیاز {rounded} از 100"
+      "tooltip": "نمره متوسط {rounded} از 100 (درجه {grade}).",
+      "ariaLabel": "نمره متوسط {rounded} از 100"
     },
     "gate": {
-      "fallback": "دروازه‌های کیفیت ناموفق بود - آستانه‌های بازبینی در تنظیمات Code Health.",
+      "fallback": "دروازه های کیفیت شکست خورد  ⁇  آستانه های بازبینی در تنظیمات سلامت کد.",
       "failingOne": "{count} دروازه ناموفق — حد آستانه را بررسی کنید یا برای بررسی gates.violations کد JSON را کپی کنید.",
       "failingOther": "{count} دروازه ناموفق — حد آستانه را بررسی کنید یا برای بررسی gates.violations کد JSON را کپی کنید.",
-      "openSettingsTitle": "تنظیمات Code Health را برای تنظیم آستانه ها باز کنید.",
-      "openSettingsButton": "تنظیمات Code Health را باز کنید"
+      "openSettingsTitle": "تنظیمات Code Health را باز کنید تا آستانه ها را تنظیم کنید.",
+      "openSettingsButton": "کد باز تنظیمات سلامت"
     },
     "kpi": {
-      "ariaLabel": "خلاصه کد سلامت",
-      "allClear": "هیچ توابع پرچم‌گذاری شده در هیچ دسته‌ای وجود ندارد - همه واضح است.",
-      "clickToFilter": "برای فیلتر کردن جدول به توابع پرچمدار {flag} کلیک کنید.",
-      "noFlagged": "هیچ عملکردی با {flag} پرچم گذاری نشده است.",
-      "unused": "استفاده نشده",
-      "unusedSub": "توابع به هیچ کجا ارجاع داده نمی شود",
-      "uncovered": "بدون پوشش",
-      "uncoveredSub": "بدون پوشش LCOV",
-      "stubTested": "خرد تست شده",
-      "stubTestedSub": "آزمون‌ها وجود دارند، اما ادعای کمی دارند",
-      "suspiciousCoverage": "پوشش مشکوک",
-      "suspiciousCoverageSub": "پوشش ساخته شده به نظر می رسد",
-      "testDrift": "رانش تست",
-      "testDriftSub": "تست ها عملکرد را عقب می اندازند"
+      "ariaLabel": "خلاصه ای از کد سلامت",
+      "allClear": "هیچ عملکردی در هر دسته بندی پرچم دار نشده است  ⁇  همه چیز روشن است.",
+      "clickToFilter": "برای فیلتر کردن جدول به سمت توابع با پرچم {flag} کلیک کنید.",
+      "noFlagged": "هیچ عملکردی با پرچم {flag}.",
+      "unused": "استفاده نشده است.",
+      "unusedSub": "توابع که در هیچ جا به آنها اشاره نشده است.",
+      "uncovered": "پرده از روی سرش برداشته شد.",
+      "uncoveredSub": "هیچ پوشش LCOV وجود ندارد.",
+      "stubTested": "تست های ضدعفونی شده با استوب",
+      "stubTestedSub": "آزمایشات وجود دارد اما ادعا کمی را تایید می کند.",
+      "suspiciousCoverage": "پوشش مشکوک: پوشش مشکوکی",
+      "suspiciousCoverageSub": "پوشش ظاهراً ساختگی است.",
+      "testDrift": "در آزمایش drift test drift استفاده می شود.",
+      "testDriftSub": "تست ها عملکرد تابع را عقب می اندازند."
     },
     "toolbar": {
-      "ariaLabel": "اقدامات بهداشتی کد",
-      "rescanTitle": "اسکن Code Health را دوباره اجرا کنید و این داشبورد را تازه کنید.",
-      "rescan": "اسکن مجدد",
-      "copyJsonTitle": "کد خام JSON Health را در کلیپ بورد کپی کنید.",
-      "copyJson": "JSON را کپی کنید",
-      "settingsTitle": "تنظیمات Code Health را باز کنید.",
-      "settingsButton": "تنظیمات Code Health",
-      "filterTitle": "ردیف ها را بر اساس نام، فایل یا پرچم فیلتر کنید.",
-      "filterLabel": "فیلتر کردن ردیف ها",
-      "filterPlaceholder": "فیلتر کردن ردیف‌ها…"
+      "ariaLabel": "کد اقدامات بهداشتی:",
+      "rescanTitle": "اسکن سلامت کد را دوباره اجرا کنید و این داشبورد را تازه کنید.",
+      "rescan": "اسکن مجدد Rescan",
+      "copyJsonTitle": "کد خام سلامت JSON را به کلیپ بورد کپی کنید.",
+      "copyJson": "کپی JSON را کپی کنید",
+      "settingsTitle": "تنظیمات سلامت کد را باز کنید.",
+      "settingsButton": "کد تنظیمات بهداشتی تنظیمات سلامتی",
+      "filterTitle": "ردیف های فیلتر را بر اساس نام، فایل یا پرچم.",
+      "filterLabel": "ردیف های فیلتر:صفحات فیلتری",
+      "filterPlaceholder": "ردیف های فیلتر..."
     },
     "table": {
-      "ariaLabel": "بدترین توابع با نمره",
-      "heading": "بدترین عملکردها",
-      "topCount": "بالای {shown} از {total}",
-      "colGrade": "درجه",
-      "colScore": "امتیاز",
-      "colFunction": "تابع",
-      "colFile": "فایل",
-      "colLine": "خط",
-      "colUsage": "استفاده",
-      "colCoverage": "پوشش",
-      "colComplexity": "پیچیدگی",
-      "colFlags": "پرچم ها",
+      "ariaLabel": "بدترین عملکردها بر اساس نمره",
+      "heading": "بدترین عملکردها، کارکردهای بد هستند.",
+      "topCount": "{shown} بالای {total}",
+      "colGrade": "درجه ی تحصیلی: نمره ای که به آن می رسید.",
+      "colScore": "امتیاز نمره ای را بدست آورید",
+      "colFunction": "عملکرد تابع تابع",
+      "colFile": "فایل های فولدر را به صورت زیر نمایش دهید:",
+      "colLine": "خط خط خط",
+      "colUsage": "استفاده از کاربرد Usage",
+      "colCoverage": "پوشش: پوشش کلیه",
+      "colComplexity": "پیچیدگی: پیچیده بودن",
+      "colFlags": "پرچم ها پرچمها",
       "noMatch": "هیچ عملکردی با فیلترهای فعلی مطابقت ندارد.",
       "resetFiltersTitle": "جستجو و هر فیلتر پرچم فعال را پاک کنید.",
-      "resetFilters": "بازنشانی فیلترها",
-      "hint": "نمایش بدترین 200 عملکرد بر اساس امتیاز. از قسمت جستجو برای محدود کردن بیشتر استفاده کنید.",
-      "expanderAriaCollapsed": "نمایش جزئیات مسئله",
-      "expanderAriaExpanded": "پنهان کردن جزئیات مشکل",
-      "detailHeading": "چرا این تابع به {score} امتیاز داد",
-      "detailNoIssues": "هیچ پرچمی در این ردیف وجود ندارد - امتیاز توسط مقادیر ستون بالا (استفاده، پوشش، پیچیدگی، سن، مستندات) تعیین می‌شود.",
-      "suppressLabel": "سرکوب در فایل",
-      "suppressTooltip": "«// ignore_for_file: code_health:<flag>» را در این فایل می‌نویسد تا اسکن‌های بعدی این پرچم را برای کل فایل حذف کنند."
+      "resetFilters": "فیلترهای ریست فلترها را از نو تنظیم کنید.",
+      "hint": "نمایش بدترین 200 عملکرد بر اساس امتیاز. از فیلد جستجو برای محدود کردن بیشتر استفاده کنید.",
+      "expanderAriaCollapsed": "جزئیات مسئله را نشان دهید",
+      "expanderAriaExpanded": "جزئیات مسئله را پنهان کنید Hide issue details",
+      "detailHeading": "چرا این تابع {score} امتیاز داده است؟",
+      "detailNoIssues": "هیچ پرچم در این ردیف  ⁇  امتیاز توسط مقادیر ستون بالا (استفاده، پوشش، پیچیدگی، سن، مستندات) هدایت می شود.",
+      "suppressLabel": "Suppress در فایل suppress را سرکوب کنید.",
+      "suppressTooltip": "`// ignore_for_file: code_health:<flag>̅ را در این فایل می نویسد تا اسکن های آینده، این پرچم را برای کل پرونده حذف کند."
     },
     "flag": {
       "unused": {
-        "label": "استفاده نشده",
+        "label": "استفاده نشده و غیرمستعمل",
         "evidence": "0 تماس گیرنده",
-        "rule": "زمانی که هیچ فایل دیگری به این نام تابع اشاره نمی کند، پرچم گذاری می شود."
+        "rule": "پرچم گذاری شده زمانی که هیچ فایل دیگری به این نام تابع ارجاع نمی دهد."
       },
       "uncovered": {
-        "label": "بدون پوشش",
-        "evidence": "تست {pct}٪",
-        "rule": "زمانی که LCOV پوشش خط 0٪ را گزارش می‌کند، پرچم‌گذاری می‌شود."
+        "label": "پرده برنمی دارد.",
+        "evidence": "{pct}% تست های آزمایش",
+        "rule": "هنگامی که LCOV گزارش می دهد پوشش خط 0٪ را نشان می دهد."
       },
       "complex": {
-        "label": "مجتمع",
-        "evidence": "رونوشت {cc}",
-        "rule": "زمانی که پیچیدگی سیکلوماتیک از 10 بیشتر شود، علامت گذاری می شود."
+        "label": "پیچیده ای که به صورت پیچیده و پیچیده است.",
+        "evidence": "CC {cc} _پروتین",
+        "rule": "هنگامی که پیچیدگی سایکلوماتیک بیش از ۱۰ باشد، پرچم گذاری می شود."
       },
       "undocumented": {
-        "label": "بدون سند",
-        "evidence": "CC {cc}، بدون سند",
-        "rule": "زمانی که یک تابع پیچیده (CC > 10) هیچ نظر سندی نداشته باشد، پرچم‌گذاری می‌شود."
+        "label": "افراد بدون اسناد و مدارک",
+        "evidence": "CC {cc}، بدون هیچ مدرکی.",
+        "rule": "پرچم گذاری زمانی که یک تابع پیچیده (CC > 10) هیچ کامنت doc ندارد."
       },
       "test_drift": {
-        "label": "رانش آزمون",
-        "evidence": "تست ها عملکرد را عقب می اندازند",
-        "rule": "زمانی که جدیدترین فایل آزمایشی پیوند شده به طور معنی‌داری قدیمی‌تر از فایل منبع تابع باشد، پرچم‌گذاری می‌شود."
+        "label": "تست drift در آزمون Drift",
+        "evidence": "تست ها عملکرد تابع را عقب می اندازند.",
+        "rule": "پرچم گذاری زمانی که جدیدترین فایل تست مرتبط به طور معنی داری قدیمی تر از پرونده منبع تابع است."
       },
       "stub_tested": {
-        "label": "خرد تست شده",
-        "evidence": "ادعاهای نازک",
-        "rule": "هنگامی که یک آزمایش پیوندی وجود دارد اما به سختی چیزی را ادعا می کند، پرچم گذاری می شود."
+        "label": "تست های Stub-tested انجام شده است.",
+        "evidence": "پتین ادعا می کند که ادعای خود را دارد.",
+        "rule": "پرچم گذاری زمانی انجام می شود که یک تست مرتبط وجود داشته باشد اما به سختی چیزی را تأیید کند."
       },
       "suspicious_coverage": {
-        "label": "پوشش مشکوک",
-        "evidence": "{pct}٪ بدون آزمایش",
-        "rule": "زمانی که LCOV پوشش بالایی را گزارش می‌کند اما هیچ آزمایشی به عملکرد اشاره نمی‌کند، پرچم‌گذاری می‌شود."
+        "label": "پوشش مشکوک در شبکه ها",
+        "evidence": "{pct}% بدون هیچ تستی",
+        "rule": "پرچم گذاری زمانی که LCOV گزارش پوشش بالا اما هیچ تست مرجع عملکرد."
       }
     },
     "shortcuts": {
-      "focusFilter": "روی فیلتر ردیف تمرکز کنید",
-      "clearFilter": "فیلتر ردیف متمرکز را پاک کنید",
+      "focusFilter": "روی فیلتر ردیف تمرکز کنید.",
+      "clearFilter": "فیلتر ردیف متمرکز را پاک کنید.",
       "activateKpi": "کارت KPI متمرکز را فعال کنید",
       "activateKpiSpace": "کارت KPI متمرکز را فعال کنید",
-      "showOverlay": "این روکش میانبر را نشان دهید"
+      "showOverlay": "این shortcut overlay را نشان دهید."
     },
     "script": {
-      "activeFiltersLabel": "فیلترهای فعال:",
+      "activeFiltersLabel": "فیلترهای فعال: فیلتر های فعال",
       "searchChip": "جستجو: \"{q}\"",
       "flagChip": "پرچم: {flag}",
-      "removeAria": "{key} را حذف کنید",
-      "clearAll": "همه را پاک کنید",
+      "removeAria": "{key} را حذف کنید.",
+      "clearAll": "همه چیز را پاک کنید.",
       "rowsVisible": "{visible} از {total} ردیف قابل مشاهده است",
-      "neverRun": "هرگز اجرا نکنید"
+      "neverRun": "هرگز نروید، فرار نکنید."
     },
     "freshness": {
-      "justNow": "همین الان",
+      "justNow": "همین الان، درست در این لحظه.",
       "minutesAgo": "{min} دقیقه پیش",
       "hoursAgo": "{hr} ساعت پیش",
       "daysAgo": "{day} روز پیش",
@@ -1154,221 +1173,235 @@
     }
   },
   "suppressionsStrip": {
-    "noData": "هنوز violations.json وجود ندارد - تجزیه و تحلیل را برای پر کردن عکس فوری سرکوب اجرا کنید.",
-    "zeroTotal": "0 سرکوب تحلیلگر در آخرین صادرات.",
-    "noKindBreakdown": "هیچ گونه تفکیک در این صادرات وجود ندارد.",
-    "title": "سرکوب (صادرات)",
-    "readOnlyNote": "(فقط خواندنی؛ Findings را برای مرور و عمل باز کنید.)",
-    "openFindings": "داشبورد یافته ها را باز کنید"
+    "noData": "هنوز violations.json وجود ندارد  ⁇  برای پر کردن عکس فوری سرکوب، تجزیه و تحلیل را اجرا کنید.",
+    "zeroTotal": "0 سرکوب آنالیزور در آخرین صادرات.",
+    "noKindBreakdown": "هیچ گونه تجزیه و تحلیل بر حسب نوع در این صادرات وجود ندارد.",
+    "title": "حذف (صادرات)",
+    "readOnlyNote": "(فقط برای خواندن؛ یافته ها را باز کنید تا مرور و عمل شود.)",
+    "openFindings": "باز کردن Dashboard یافته ها"
   },
   "configMirrors": {
-    "noFileRisk": "بدون تجزیه ریسک در هر فایل (بدون نقض در محدوده).",
-    "suppressionNote": "منطبق بر خلاصه violations.json، نه ضامن‌های سرکوب نوار کناری زنده.",
-    "noSuppression": "بدون تجمع سرکوب در این صادرات (آنالیزور قدیمی تر یا سرکوب صفر).",
+    "noFileRisk": "هیچ تجزیه و تحلیل ریسک در هر پرونده (هیچ نقض در محدوده) وجود ندارد.",
+    "suppressionNote": "با خلاصه violations.json مطابقت دارد، نه با سوئیچ های سرکوب نوار کناری زنده.",
+    "noSuppression": "هیچ مجموعه ای برای سرکوب در این صادرات وجود ندارد (آنالیزور قدیمی تر یا صفر سرکوب).",
     "owaspSignal": "{count} نقض در این خروجی شامل نگاشت موبایل/وب OWASP است — برای مشاهده ماتریس کامل و صدور آن Security Posture را باز کنید.",
-    "summarySuppressions": "سرکوب ها (صادرات عکس فوری)",
+    "summarySuppressions": "حذف (تصویر فوری صادرات)",
     "summaryOwasp": "وضعیت امنیتی (سیگنال OWASP)",
-    "summaryFileRisk": "ریسک فایل (فایل های برتر)"
+    "summaryFileRisk": "ریسک فایل (فایل های بالا)"
   },
   "telemetry": {
-    "heroTitle": "قوانین مرتبط تله متری",
-    "skipToCounters": "به شمارنده های تله متری پرش کنید",
+    "heroTitle": "قانون مرتبط: تله متری",
+    "skipToCounters": "به شمارنده های تله متری بروید.",
     "lastEvent": "آخرین رویداد {relative}",
-    "noEvents": "هیچ رویدادی ثبت نشده است",
+    "noEvents": "هیچ رویدادی ثبت نشده است.",
     "totalEventOne": "{count} رویداد کل",
     "totalEventOther": "{count} رویداد کل",
-    "noCountersTitle": "شمارنده برای بازنشانی وجود ندارد.",
-    "resetTitle": "همه شمارنده ها را بازنشانی کنید",
-    "refreshTitle": "بارگیری مجدد شمارنده های تله متری از دیسک",
-    "refresh": "تازه کردن",
-    "copyTitle": "عکس فوری را به صورت JSON کپی کنید",
-    "copyJson": "JSON را کپی کنید",
-    "resetCounters": "تنظیم مجدد شمارنده ها",
-    "countersAria": "شمارنده ها",
-    "countersHeading": "شمارنده های رویداد",
-    "thEvent": "رویداد",
-    "thCount": "بشمار",
-    "emptyMessage": "هیچ رویداد تله‌متری هنوز ثبت نشده است - یک قانون از داشبورد یافته‌ها برای شروع ضبط شمارنده باز کنید.",
-    "openFindingsTitle": "داشبورد Saropa Findings را باز کنید.",
-    "openFindings": "داشبورد یافته ها را باز کنید",
-    "lastPropsHeading": "ویژگی های آخرین رویداد",
-    "copiedJson": "Saropa Lints: قانون تله متری مرتبط JSON کپی شده است.",
-    "countersReset": "Saropa Lints: شمارنده های تله متری قوانین مرتبط بازنشانی می شوند."
+    "noCountersTitle": "هیچ شمارنده ای برای تنظیم مجدد وجود ندارد.",
+    "resetTitle": "همه شمارنده ها را از نو تنظیم کنید.",
+    "refreshTitle": "شمارنده های تله متری را از دیسک بارگیری مجدد کنید.",
+    "refresh": "به راحتی و با آرامش استراحت کنید.",
+    "copyTitle": "اسنپ شات را به عنوان JSON کپی کنید.",
+    "copyJson": "کپی JSON را کپی کنید",
+    "resetCounters": "شمارنده های ریست کردن را از نو تنظیم کنید.",
+    "countersAria": "- شمارنده ها:",
+    "countersHeading": "شمارنده های رویداد،",
+    "thEvent": "رویداد حوادث رخداد حوادثی که اتفاق می افتد",
+    "thCount": "شمارش و شمردن",
+    "emptyMessage": "هنوز هیچ رویدادی از طریق تله متری ثبت نشده است  ⁇  یک قانون را در داشبورد یافته ها باز کنید تا شروع به ضبط شمارنده کند.",
+    "openFindingsTitle": "صفحه نمایش Saropa Findings را باز کنید.",
+    "openFindings": "باز کردن Dashboard یافته ها",
+    "lastPropsHeading": "ویژگی های آخرین رویداد Last event",
+    "copiedJson": "Saropa Lints: کپی شده است قانون مربوطه از راه دور JSON.",
+    "countersReset": "Saropa Lints: قانون مرتبط با تنظیم مجدد شمارنده های تله متری."
   },
   "sidebarLayout": {
-    "summary": "طرح بندی نوار فعالیت",
-    "hint": "بخش‌های نوار فعالیت Saropa را در اینجا روشن یا خاموش کنید (با فضای کاری ذخیره شده، بدون خروج از داشبورد)."
+    "summary": "طرح بندی نوار فعالیت (Activity Bar)",
+    "hint": "بخش های Saropa activity-bar را در اینجا روشن یا خاموش کنید (با فضای کاری ذخیره شده، بدون ترک داشبورد)."
   },
   "securityPosture": {
     "issueOne": "{count} مشکل",
     "issueOther": "{count} مشکل",
-    "noIssues": "هیچ مشکلی وجود ندارد",
-    "showIssues": "نمایش مسائل",
+    "noIssues": "هیچ مشکلی وجود ندارد No issues",
+    "showIssues": "مسائل نمایش را نشان دهید",
     "violationTooltip": "{count} نقض در {ruleCount} قانون. برای نمایش در مشکلات کلیک کنید.",
-    "noViolationsTooltip": "هیچ تخلفی در این دسته نگاشت نشده است."
+    "noViolationsTooltip": "هیچ نقض ای در این دسته بندی مشخص نشده است."
   },
   "comparison": {
-    "title": "مقایسه بسته ها",
+    "title": "مقایسه بسته بندی",
     "actions": {
-      "addToProject": "افزودن به پروژه"
+      "addToProject": "اضافه کردن به پروژه Add to Project"
     },
     "table": {
       "row": {
-        "vibrancyGrade": "درجه سرزندگی",
-        "category": "دسته بندی",
-        "latestVersion": "آخرین نسخه",
-        "published": "منتشر شد",
-        "publisher": "ناشر",
-        "pubPoints": "امتیاز میخانه",
-        "githubStars": "ستاره های GitHub",
-        "openIssues": "مسائل را باز کنید",
-        "codeSize": "اندازه کد",
-        "bloatRating": "رتبه بندی نفخ",
-        "license": "مجوز",
-        "platforms": "پلتفرم ها",
-        "inThisProject": "در این پروژه"
+        "vibrancyGrade": "درجه ی زندگی پذیری (Vibrancy Grade)",
+        "category": "دسته بندی: Category Category دسته بندی",
+        "latestVersion": "آخرین نسخه جدیدترین نسخه",
+        "published": "منتشر شده انتشار یافته",
+        "publisher": "ناشر ناشر انتشارات",
+        "pubPoints": "پب ها (Pub Points) نقطه های شرابخانه ای هستند.",
+        "githubStars": "GitHub ستاره های ستارگان",
+        "openIssues": "مسائل باز (Open Issues)",
+        "codeSize": "کد سایز اندازه کد",
+        "bloatRating": "رتبه بندی Bloat",
+        "license": "مجوزهای مجاز:",
+        "platforms": "پلتفرم های پلی استار",
+        "inThisProject": "در این پروژه،"
       },
       "value": {
-        "unverified": "- (تأیید نشده)",
-        "allPlatforms": "همه",
-        "yes": "بله",
-        "no": "خیر"
+        "unverified": "⁇  (غیر تأیید شده)",
+        "allPlatforms": "همه، همه، همگی",
+        "yes": "بله بله بله، بله بله.",
+        "no": "نه، نه، ننه."
       },
       "badge": {
-        "inProject": "در پروژه"
+        "inProject": "در پروژه In Project"
       }
     },
     "status": {
-      "packagesSelected": "بسته های {count} انتخاب شده است",
-      "packagesCompared": "بسته های {count} مقایسه شد",
+      "packagesSelected": "{count} بسته های انتخاب شده را انتخاب می کند.",
+      "packagesCompared": "{count} بسته های مقایسه شده با هم",
       "dimensionsRankedOne": "بعد {count} رتبه بندی شد",
-      "dimensionsRankedOther": "ابعاد {count} رتبه بندی شده است",
+      "dimensionsRankedOther": "{count} ابعاد رتبه بندی شده",
       "morePackages": "+{count} بیشتر"
     },
     "empty": {
-      "ariaLabel": "بدون بسته بندی",
-      "message": "هیچ بسته ای برای مقایسه انتخاب نشده است. روی دو یا چند بسته در داشبورد Package کلیک راست کرده و {compare} را انتخاب کنید.",
-      "compareWord": "مقایسه کنید",
+      "ariaLabel": "بدون بسته بندی هیچ گونه بسته ای وجود ندارد.",
+      "message": "هیچ بسته ای برای مقایسه انتخاب نشده است. دو یا چند بسته را در داشبورد Package با کلیک راست بر روی آن ها کلیک کنید و {compare}.",
+      "compareWord": "مقایسه کنید با هم مقایسه کنید",
       "openDashboard": "داشبورد بسته را باز کنید",
-      "openDashboardTitle": "داشبورد بسته Saropa را باز کنید."
+      "openDashboardTitle": "صفحه کنترل بسته Saropa را باز کنید."
     },
     "a11y": {
-      "skipToTable": "رفتن به جدول مقایسه",
-      "recommendation": "توصیه",
-      "addingToProject": "افزودن {name} به پروژه"
+      "skipToTable": "به جدول مقایسه ای بروید.",
+      "recommendation": "توصیه سفارش توصیه",
+      "addingToProject": "اضافه کردن {name} به پروژه"
     },
     "shortcuts": {
-      "showOverlay": "این روکش میانبر را نشان دهید",
-      "closeOverlay": "پوشش میانبر صفحه کلید را ببندید"
+      "showOverlay": "این shortcut overlay را نشان دهید.",
+      "closeOverlay": "پوشش کلیدواژه های میانبر صفحه کلید را ببندید."
     },
     "kpi": {
-      "ariaLabel": "خلاصه مقایسه",
-      "leading": "پیشرو",
-      "leadingTitle": "بسته پیشرو با اکثر ابعاد برنده است.",
-      "dimensionWinsOne": "برد بعدی {count}",
-      "dimensionWinsOther": "بعد {count} برنده می شود",
-      "packages": "بسته ها",
-      "packagesTitle": "تعداد بسته ها در کنار هم مقایسه شده اند.",
-      "inComparison": "در مقایسه",
-      "dimensions": "ابعاد",
-      "dimensionsTitle": "تعداد ابعادی که برنده می تواند رتبه بندی شود.",
-      "ranked": "رتبه بندی شده است"
+      "ariaLabel": "خلاصه ای از مقایسه",
+      "leading": "رهبری پیشرو:",
+      "leadingTitle": "بسته ای که با بیشترین ابعاد پیشتاز است برنده می شود.",
+      "dimensionWinsOne": "{count} بعد برنده شدن",
+      "dimensionWinsOther": "بعد {count} برنده است",
+      "packages": "بسته های حمل و نقل",
+      "packagesTitle": "تعداد بسته ها در مقایسه با هم.",
+      "inComparison": "در مقایسه با آن.",
+      "dimensions": "ابعاد: ابعاد",
+      "dimensionsTitle": "تعداد ابعاد که در آن یک برنده می تواند رتبه بندی شود.",
+      "ranked": "رتبه بندی شده در رده بندی."
     },
     "toolbar": {
-      "ariaLabel": "مقایسه اقدامات",
-      "packageDashboard": "داشبورد بسته",
+      "ariaLabel": "اقدامات مقایسه ای:",
+      "packageDashboard": "داشبورد بسته بندی (Package Dashboard)",
       "packageDashboardTitle": "برای مقایسه بسته های بیشتر، داشبورد بسته را باز کنید."
     }
   },
   "detailView": {
     "empty": {
-      "selectPackage": "برای مشاهده جزئیات یک بسته را انتخاب کنید"
+      "selectPackage": "بسته ای را انتخاب کنید تا جزئیات آن را مشاهده کنید."
     },
     "section": {
       "version": "نسخه",
-      "update": "به روز رسانی",
-      "suggestion": "پیشنهاد",
-      "community": "جامعه",
-      "dependencies": "وابستگی ها",
-      "alerts": "هشدارها",
-      "platforms": "پلت فرم ها",
-      "directDeps": "DEPS مستقیم",
-      "readmeImages": "تصاویر را بخوانید"
+      "update": "UPDATE به روز رسانی",
+      "suggestion": "پیشنهادات: پیشنهادی است.",
+      "community": "جامعه ی جهانی:",
+      "dependencies": "وابستگی ها (Dependences)",
+      "alerts": "هشدارها: هشدارهای هشداردهنده",
+      "platforms": "پلتفرم های پلی استور",
+      "directDeps": "ذخایر مستقیم (Direct Deposits)",
+      "readmeImages": "تصاویر README"
     },
     "version": {
-      "published": "منتشر شده: {date}",
-      "codeSize": "اندازه کد",
-      "archive": "آرشیو",
+      "published": "منتشر شده توسط: {date}",
+      "codeSize": "کد سایز اندازه کد",
+      "archive": "آرشیو بایگانی",
       "sizeLabel": "{label}: {size}",
       "source": "منبع: کد {code} · نظرات {comments} · فایل های {files}",
       "replace": "جایگزین: {summary}"
     },
     "update": {
-      "upgrade": "ارتقا دهید",
-      "changelog": "تغییرات",
-      "blockedBy": "توسط {package} مسدود شده است"
+      "upgrade": "ارتقاء Upgrade به روزرسانی",
+      "changelog": "Changelog: تغییرات در ژورنال",
+      "blockedBy": "بلاک شده توسط {package}"
     },
     "suggestion": {
       "migrateTo": "مهاجرت به {package} را در نظر بگیرید.",
-      "consider": "{text} را در نظر بگیرید.",
-      "alternatives": "گزینه های جایگزین: {names}",
-      "unused": "به نظر می رسد این بسته استفاده نشده است - آن را حذف کنید."
+      "consider": "در نظر بگیرید: {text}.",
+      "alternatives": "گزینه های دیگر: {names}",
+      "unused": "به نظر می رسد این بسته استفاده نشده است  ⁇  در نظر بگیرید که آن را حذف کنید."
     },
     "community": {
       "issues": "{count} مشکل",
-      "prs": "{count} روابط عمومی",
-      "activity90d": "90d: مسائل {closed} بسته شد، {merged} PR ادغام شد",
-      "lastCommit": "آخرین تعهد: {time}",
-      "archived": "مخزن بایگانی شده است",
-      "pubPoints": "{points}/160 نقطه میخانه",
-      "latestRelease": "آخرین نسخه: {age} ago",
-      "dependents": "وابستگان {count}"
+      "prs": "{count} PRs _ PH0__ روابط عمومی",
+      "activity90d": "90d: مسائل {closed} بسته شده، روابط عمومی {merged} ادغام شده است.",
+      "lastCommit": "آخرین بار ارسال شده: {time}",
+      "archived": "مخزن بایگانی شده است.",
+      "pubPoints": "{points}/160 پب نقاط",
+      "latestRelease": "آخرین نسخه: {age} پیش از این",
+      "dependents": "{count} وابستگان وابسته"
     },
     "dormancy": {
-      "noActivity6mo": "بدون تعهد و بدون انتشار در 6+ ماه",
-      "noActivity3mo": "بدون تعهد و بدون انتشار در 3+ ماه",
-      "codeInactive": "انتشار فعال، کد غیرفعال (3+ ماه بدون تعهد)",
-      "releaseSlower": "کد فعال است، آهنگ انتشار کندتر است (3+ ماه)"
+      "noActivity6mo": "هیچ تعهد و انتشار در 6 ماه گذشته وجود نداشته است.",
+      "noActivity3mo": "هیچ تعهد و انتشار در 3+ ماه",
+      "codeInactive": "انتشار فعال، کد غیرفعال (۳+ ماه بدون تعهد)",
+      "releaseSlower": "کد فعال است، سرعت انتشار کندتر (3+ ماه) است."
     },
     "dependencies": {
-      "flagged": "({count} پرچم گذاری شده است)",
-      "transitiveCount": "بسته های انتقالی {count}",
-      "unique": "{count} منحصر به فرد",
-      "shared": "{count} به اشتراک گذاشته شده ({pct}%)",
+      "flagged": "({count} پرچم دار)",
+      "transitiveCount": "{count} بسته های انتقالی",
+      "unique": "{count} منحصر به فرد و منحصر به فردی",
+      "shared": "{count} به اشتراک گذاشته شده ({pct}٪)",
       "moreOverflow": "+{count} بیشتر",
-      "sharedList": "اشتراک گذاری شده: {names}"
+      "sharedList": "به اشتراک گذاشته شده: {names}"
     },
     "platforms": {
       "wasm": "WASM"
     },
     "links": {
-      "viewFullDetails": "مشاهده جزئیات کامل",
+      "viewFullDetails": "مشاهده جزئیات کامل View Full Details",
       "pubDev": "pub.dev",
-      "documentation": "مستندات",
-      "changelog": "تغییرات",
-      "repository": "مخزن",
-      "issues": "مسائل",
-      "reportIssue": "گزارش مسئله"
+      "documentation": "مستندات اسناد مدارک",
+      "changelog": "Changelog: تغییرات در ژورنال",
+      "repository": "مخزن اطلاعات Repository",
+      "issues": "مسائل و مسائلی که مطرح می شود",
+      "reportIssue": "گزارش موضوعی، مسئله ای"
     },
-    "logoAlt": "آرم {packageName}",
-    "readMore": "بیشتر",
-    "readmeImageAlt": "تصویر README"
+    "logoAlt": "{packageName} لوگو _ PH0__",
+    "readMore": "بیشتر بیشتر بیشتر بیش تر",
+    "readmeImageAlt": "تصویر README image را بخوانید"
   },
   "chart": {
     "toggle": {
-      "excludeShared": "اشتراک گذاری شده را حذف کنید"
+      "excludeShared": "حذف اشتراک گذاری مشترک"
     },
     "filter": {
-      "clear": "پاک کردن"
+      "clear": "صاف شفاف روشن"
     },
     "bucket": {
-      "other": "دیگر ({count} {noun})",
-      "uniqueTransitives": "گذراهای منحصر به فرد ({count})",
-      "sharedTransitives": "موارد انتقالی مشترک ({count})"
+      "other": "سایر ({count} {noun})",
+      "uniqueTransitives": "ترانزیتیو های منحصر به فرد ({count})",
+      "sharedTransitives": "ترازیتیو های مشترک ({count})"
     },
     "noun": {
-      "package": "بسته بندی",
-      "packages": "بسته ها"
+      "package": "بسته بندی پکیج، یک بسته ی بسته ای است.",
+      "packages": "بسته های حمل و نقل"
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "این قانون را توضیح دهید."
+    },
+    "enableRule": {
+      "done": "قاعده {ruleId}. فعال شده استفاده از تجزیه و تحلیل Re-run برای اعمال.",
+      "runAnalysis": "تحلیل را اجرا کنید.",
+      "noWorkspace": "یک پوشه فضای کاری را برای فعال کردن یک قاعده باز کنید."
+    },
+    "openFinding": {
+      "noWorkspace": "برای باز کردن یک یافته، پوشه ی فضای کاری را باز کنید.",
+      "notFound": "نتوانست {file} را باز کند."
     }
   }
 }

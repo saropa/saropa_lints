@@ -1,8 +1,28 @@
 # BUG: `prefer_layout_builder_for_constraints` — false positive on legitimate window-extent `MediaQuery.sizeOf` use
 
-**Status: Open**
+**Status: Fix Ready**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
+
+> **Fix applied (2026-06-13)** in `lib/src/rules/widget/widget_layout_constraints_rules.dart`:
+> - **Pattern A** — new `_isConstraintFinitenessFallback` early-return skips a
+>   `MediaQuery` read that is the then/else branch of a conditional whose
+>   condition tests `.isFinite`/`.isInfinite` on a constraint extent
+>   (`maxWidth`/`maxHeight`/`minWidth`/`minHeight`), detected via
+>   `_ConstraintFinitenessVisitor`.
+> - **Pattern B** — `_isMediaQuerySizeDimensionInLiteralScaleOrBreakpoint`
+>   renamed to `_isMediaQuerySizeDimensionScaledOrBreakpoint`; the `*`/`/` scale
+>   case no longer requires a numeric-literal factor (named fractions like
+>   `* fraction` are now exempt). Breakpoint comparisons still require a literal.
+> - Fixtures added: `OkConstraintFinitenessFallback`, `OkViewportFractionVariable`.
+>
+> **Runtime verification BLOCKED:** the package does not currently build — an
+> unrelated in-progress edit in `lib/src/rules/ui/navigation_rules.dart` leaves a
+> second caller of the class-private `_literalPathText` out of scope, which fails
+> the whole `saropa_lints` build and prevents the scan CLI and unit tests from
+> running. Re-run `dart run saropa_lints scan` against the fixture once that file
+> compiles to confirm no `prefer_layout_builder_for_constraints` diagnostics on
+> the two new GOOD cases.
 
 Created: 2026-06-13
 Rule: `prefer_layout_builder_for_constraints`

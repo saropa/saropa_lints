@@ -49,7 +49,7 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
 </head><body>
   ${buildSkipLink('findings-table', l10n('findingsDash.skipToFindings'))}
   ${buildAnnouncer()}
-  <header>${buildHero(input)}</header>
+  ${buildHero(input)}
   ${buildKpiCards(input)}
   ${buildToolbar(input)}
   ${buildAnalysisProgress()}

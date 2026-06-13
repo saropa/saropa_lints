@@ -584,3 +584,106 @@ class _AppLinksV6RenameFix extends ReplaceNodeFix {
     return node.toSource();
   }
 }
+
+// cspell:ignore myapp
+/// Warns when deep links contain sensitive parameters in URL.
+///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
+/// Alias: no_tokens_in_deep_links, secure_app_links
+///
+/// Sensitive data like tokens, passwords, or API keys should never appear
+/// in deep link URLs as they may be logged or exposed.
+///
+/// **BAD:**
+/// ```dart
+/// final link = 'myapp://auth?token=$accessToken';
+/// final link = 'myapp://reset?password=$newPassword';
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final link = 'myapp://auth?code=$oneTimeCode';
+/// // Exchange code for token server-side
+/// ```
+class AvoidAppLinksSensitiveParamsRule extends SaropaLintRule {
+  AvoidAppLinksSensitiveParamsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.error;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  static const LintCode _code = LintCode(
+    'avoid_app_links_sensitive_params',
+    '[avoid_app_links_sensitive_params] Deep link params are logged by '
+        'OS and analytics, exposing tokens in crash reports and logs. {v2}',
+    correctionMessage:
+        'Use one-time codes instead of tokens or passwords in URLs.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  static const Set<String> _sensitiveParams = <String>{
+    'token',
+    'access_token',
+    'accessToken',
+    'refresh_token',
+    'refreshToken',
+    'password',
+    'secret',
+    'api_key',
+    'apiKey',
+    'auth_token',
+    'authToken',
+    'bearer',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addStringInterpolation((StringInterpolation node) {
+      final String fullString = node.toSource();
+
+      // Check if it looks like a URL with app scheme
+      if (!fullString.contains('://')) return;
+
+      // Check for sensitive parameter names
+      for (final String param in _sensitiveParams) {
+        if (fullString.contains('$param=') ||
+            fullString.contains('$param\$') ||
+            fullString.contains('?$param')) {
+          reporter.atNode(node);
+          return;
+        }
+      }
+    });
+
+    // Also check simple string concatenation
+    context.addBinaryExpression((BinaryExpression node) {
+      if (node.operator.lexeme != '+') return;
+
+      final String source = node.toSource();
+      if (!RegExp(r'://').hasMatch(source)) return;
+
+      final paramPatterns = [
+        for (final param in _sensitiveParams)
+          RegExp(RegExp.escape(param) + r'='),
+      ];
+      for (var i = 0; i < paramPatterns.length; i++) {
+        if (paramPatterns[i].hasMatch(source)) {
+          reporter.atNode(node);
+          return;
+        }
+      }
+    });
+  }
+}

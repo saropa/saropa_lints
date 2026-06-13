@@ -104,6 +104,29 @@ class IgnoreUtils {
     return pattern.hasMatch(fileContent);
   }
 
+  /// Whether an ignore-comment's [text] names [ruleName] (or its hyphenated
+  /// form) as a whole word.
+  ///
+  /// A bare `text.contains(ruleName)` is wrong: `my_rule` is a substring of
+  /// `my_rule_extended`, so an `// ignore: my_rule_extended` directive would
+  /// wrongly suppress the shorter, distinct `my_rule`. The `\b` boundaries make
+  /// this match the same semantics as [isIgnoredForFile] (`_` is a word
+  /// character, so `\bmy_rule\b` does not match inside `my_rule_extended`).
+  static bool _commentNamesRule(
+    String text,
+    String ruleName,
+    String hyphenatedName,
+  ) {
+    final RegExp pattern = RegExp(
+      r'\b(?:'
+      '${RegExp.escape(ruleName)}'
+      '|'
+      '${RegExp.escape(hyphenatedName)}'
+      r')\b',
+    );
+    return pattern.hasMatch(text);
+  }
+
   /// Checks if a token has preceding comments containing an ignore directive
   /// for the given rule name (supports both underscore and hyphen formats).
   static bool hasIgnoreCommentOnToken(Token? token, String ruleName) {
@@ -113,7 +136,7 @@ class IgnoreUtils {
     while (comment != null) {
       final String text = comment.lexeme;
       if (text.contains('ignore:')) {
-        if (text.contains(ruleName) || text.contains(hyphenatedName)) {
+        if (_commentNamesRule(text, ruleName, hyphenatedName)) {
           return true;
         }
       }
@@ -391,7 +414,7 @@ class IgnoreUtils {
     while (comment != null) {
       final String text = comment.lexeme;
       if (text.contains('ignore:')) {
-        if (text.contains(ruleName) || text.contains(hyphenatedName)) {
+        if (_commentNamesRule(text, ruleName, hyphenatedName)) {
           // If we have line info, validate the comment is a proper leading comment
           if (lineInfo != null && nodeStartLine > 0) {
             final commentLine = lineInfo.getLocation(comment.offset).lineNumber;
@@ -522,7 +545,7 @@ class IgnoreUtils {
       if (commentLine == targetLine) {
         final String text = comment.lexeme;
         if (text.contains('ignore:')) {
-          if (text.contains(ruleName) || text.contains(hyphenatedName)) {
+          if (_commentNamesRule(text, ruleName, hyphenatedName)) {
             return _CommentCheckResult.found;
           }
         }

@@ -37,6 +37,9 @@ function getComparisonStyles(): string {
     return `
         ${getDashboardChromeStyles()}
         /* Comparison-specific overrides on top of the shared chrome. */
+        /* §4 — let the comparison matrix scroll within its own bounds on a
+         * narrow (docked) webview instead of pushing the whole page sideways. */
+        .table-scroll { max-width: 100%; overflow-x: auto; }
         .recommendation {
             background: var(--surface-3);
             border: 1px solid var(--border);
@@ -73,11 +76,13 @@ function getComparisonStyles(): string {
             text-align: center;
             font-weight: bold;
         }
+        /* §15 / WCAG 1.4.1 — links in the header text block carry an underline,
+         * not color alone, so color-blind users can tell them from plain text. */
         .pkg-header a {
             color: var(--vscode-textLink-foreground);
-            text-decoration: none;
+            text-decoration: underline;
         }
-        .pkg-header a:hover { text-decoration: underline; }
+        .pkg-header a:hover { color: var(--vscode-textLink-activeForeground); }
         .in-project {
             display: inline-block;
             background: var(--vscode-badge-background);
@@ -97,12 +102,22 @@ function getComparisonStyles(): string {
             color: var(--vscode-button-secondaryForeground);
             border: 1px solid var(--vscode-button-border, transparent);
             padding: 4px 12px;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
             font-size: 0.85em;
             margin-top: 4px;
         }
         .add-btn:hover { background: var(--vscode-button-secondaryHoverBackground, var(--vscode-button-secondaryBackground)); }
+        /* §15 — keyboard users get the same visible affordance as hover. */
+        .add-btn:focus-visible {
+            outline: 1px solid var(--vscode-focusBorder);
+            outline-offset: 2px;
+        }
+        /* §8.10 — a disabled Add button must read as inert, not silently no-op. */
+        .add-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
         .vibrant { color: var(--vscode-testing-iconPassed); }
         .stable { color: var(--vscode-editorInfo-foreground); }
         .outdated { color: var(--vscode-editorWarning-foreground); }
@@ -262,7 +277,7 @@ function buildHeaderRow(packages: readonly ComparisonData[]): string {
             : '';
         return `<th class="pkg-header"><a href="${url}">${escapeHtml(pkg.name)}</a>${inProjectBadge}${addBtn}</th>`;
     }).join('');
-    return `<tr><th class="dimension"></th>${cells}</tr>`;
+    return `<tr><th class="dimension"><span class="sr-only">${escapeHtml(l10n('a11y.comparisonDimension'))}</span></th>${cells}</tr>`;
 }
 
 function buildDataRow(
@@ -296,10 +311,10 @@ function buildComparisonTable(
     const dataRows = ROWS.map(row => buildDataRow(row, packages, winners)).join('\n');
 
     return `
-        <table>
+        <div class="table-scroll"><table>
             <thead>${headerRow}</thead>
             <tbody>${dataRows}</tbody>
-        </table>
+        </table></div>
     `;
 }
 
@@ -382,7 +397,7 @@ export function buildComparisonHtml(ranked: RankedComparison): string {
 <body>
     <a href="#comparison-table" class="skip-link">${l10n('comparison.a11y.skipToTable')}</a>
     <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
-    <header>${heroHtml}</header>
+    ${heroHtml}
     ${kpiRowHtml}
     ${toolbarHtml}
     <main id="comparison-table" tabindex="-1">

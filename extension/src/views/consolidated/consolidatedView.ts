@@ -18,6 +18,7 @@ import { l10n } from '../../i18n/runtime';
 import { buildConsolidatedModel, type ConsolidatedModel } from './consolidatedModel';
 import { getConsolidatedStyles } from './consolidatedStyles';
 import { getConsolidatedClient } from './consolidatedClient';
+import { buildSuiteEvidence, type RuleEvidence } from '../../suite/siblingEnvelopes';
 
 const VIEW_TYPE = 'saropaConsolidatedDashboard';
 // Coalesce the burst of per-file diagnostic events VS Code emits during a run
@@ -41,6 +42,10 @@ let panel: vscode.WebviewPanel | undefined;
 let listener: vscode.Disposable | undefined;
 let refreshTimer: NodeJS.Timeout | undefined;
 let lastModel: ConsolidatedModel | undefined;
+// Runtime evidence from the sibling suite mirrors (R2), rebuilt each push and
+// keyed by rule so the model message can badge a row. Empty when no sibling has
+// written a mirror referencing a Lints rule.
+let lastEvidence: Map<string, RuleEvidence> = new Map();
 
 /** Open (or focus) the consolidated dashboard. */
 export function openConsolidatedDashboard(context: vscode.ExtensionContext): void {

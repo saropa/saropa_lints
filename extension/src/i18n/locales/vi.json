@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "An ninh · Chất lượng",
+    "searchPlaceholder": "Quy tắc lọc... quy tắc lọc.",
+    "empty": "Tất cả rõ ràng  ⁇ Không có phát hiện nào.",
+    "liveTitle": "Live  ⁇  Đời sống cập nhật khi bạn chỉnh sửa.",
+    "fetching": "Lấy... lấy...",
+    "noOccurrences": "Không có sự kiện xảy ra.",
+    "summaryFindings": "{count} phát hiện",
+    "summaryRules": "{count} quy tắc",
+    "more": "+{count} nhiều hơn",
+    "wordErrors": "lỗi sai lầm error errors",
+    "wordWarnings": "cảnh báo, cảnh cáo.",
+    "wordInfo": "Thông tin thông tin thông báo thông tin",
+    "wordFiles": "File files file file file các tập tin",
+    "gradeExcellent": "Tuyệt vời, tuyệt vời.",
+    "gradeGood": "Tốt tốt tốt",
+    "gradeFair": "Fair Fair Fair là một hội chợ.",
+    "gradeWeak": "Weak weak yếu đuối",
+    "gradeSevere": "Rất nghiêm trọng rất nặng."
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇ {count} đề xuất cấu hình (s)",
+    "initMissing": {
+      "title": "Thiết lập Saropa Lints (đánh chạy init)",
+      "detail": "saropa_lints đang trong pubspec nhưng chưa có cấu hình phân tích nào được kết nối."
+    },
+    "packAvailable": {
+      "title": "Kích hoạt gói quy tắc {pack}.",
+      "detail": "{count} quy tắc cho một gói trong pubspec của bạn"
+    },
+    "enabledToast": "Kích hoạt gói quy tắc {pack} trong analysis_options.yaml",
+    "enableFailed": "Không thể kích hoạt gói quy tắc {pack}  ⁇ mở bảng điều khiển Rule Packs để kích hoạt nó."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: là một loại tế bào có thể {count} đề xuất gói quy tắc (s) áp dụng cho dự án này.",
+    "review": "Xem xét Review Review xem xét",
+    "dismiss": "Thả bỏ việc làm",
+    "reviewFailed": "Không thể mở bản xem xét gói quy tắc Saropa Lints. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION phiên bản",
@@ -35,6 +74,15 @@
       "published": "Được xuất bản Published Phát hành Published",
       "update": "Update update updates là gì",
       "blockedBy": "Blocked by: bị chặn bởi",
+      "blockedVia": "{blocker} caps {dep} {constraint} ({resolvable} có thể giải quyết, {latest} mới nhất)",
+      "blockedViaSdk": "được ghim bởi {blocker} (Flutter SDK) cho {dep} ({resolvable} có thể phân giải, {latest} mới nhất)",
+      "constrained": "Bị kiềm chế, bị ràng buộc.",
+      "constrainedBy": "Rào cản {constraint} của bạn giới hạn điều này ({resolvable} có thể giải quyết, {latest} mới nhất)",
+      "pinHeld": "Held tổ chức",
+      "pinDoNotUse": "Không được sử dụng Do not use.",
+      "drift": "Drift xuyên dự án",
+      "driftBehind": "Đằng sau: {siblings} (bạn có {own})",
+      "driftDiffers": "Khác nhau: {siblings} (bạn có {own})",
       "codeSize": "Kích thước mã Code Size",
       "archiveSize": "Kích thước tập tin Archive Size",
       "bloat": "({rating}/10 sưng)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "Toggle toàn bộ chiều rộng bố cục.",
     "sortBy": "Sort by {column} Xếp theo _PH0_",
     "expandRow": "Expand row row mở rộng hàng",
+    "copyRow": "Sao chép hàng chữ cái",
+    "comparisonDimension": "Metric là một số liệu.",
     "collapseRow": "Dòng sụp đổ hàng rào.",
     "selectAll": "Chọn tất cả các hàng.",
     "keyboardShortcuts": "Phím tắt của phím",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints Ngôn ngữ UI",
       "placeholder": "Chọn ngôn ngữ cho thanh bên và bảng điều khiển.",
-      "auto": "Tự động (theo ngôn ngữ hiển thị VS Code)"
+      "auto": "Tự động (theo ngôn ngữ hiển thị VS Code)",
+      "coverage": "{pct}% dịch  ⁇ Các chương trình nghỉ ngơi bằng tiếng Anh"
     },
     "reloadPrompt": "Ngôn ngữ được đặt thành {locale}. Tải lại cửa sổ để cập nhật thanh bên và nhãn lệnh.",
     "reloadNow": "Nạp lại bây giờ.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "Lần cuối cùng chạy, lần cuối.",
+      "updatedPrefix": "Được cập nhật Cập Nhật",
+      "refreshHint": "Nhấp vào để làm mới từ bộ phân tích.",
       "lastRunUnknown": "Chạy cuối cùng không rõ.",
       "noTimestampTitle": "Không có dấu thời gian trên violations.json.",
       "findingsAfterFilterTitle": "Tổng số phát hiện sau khi lọc rule-disabled.",
@@ -327,7 +380,7 @@
       "refreshExtension": "Phần mở rộng Refresh được bổ sung.",
       "openPackageDashboard": "Mở bảng điều khiển gói mở",
       "openCodeHealth": "Open Code Health là một nguồn mở về sức khỏe.",
-      "openLintsConfig": "Open Lints Config config có thể sử dụng.",
+      "openLintsConfig": "Quản lý Rule Packs",
       "reloadFromDisk": "Tải lại từ đĩa.",
       "reloadFromDiskTitle": "Lại tạo lại bảng điều khiển từ lần violations.json cuối cùng mà không cần chạy lại máy phân tích.",
       "reEnableDisabledRules": "Re-enable disabled rules... re-enabling disabled rule ... Đổi bật lại các quy tắc đã bị",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa Bảng điều khiển gói",
     "heroTitle": "Saropa Bảng điều khiển gói",
+    "detailPane": {
+      "aria": "Chi tiết gói hàng chi tiết",
+      "title": "Chi tiết gói hàng chi tiết",
+      "close": "Gần chi tiết chi tiết."
+    },
     "status": {
       "packagesCount": "{count} gói",
       "packagesBreakdown": "{direct} trực tiếp, {transitive} bắc cầu",
@@ -801,8 +859,8 @@
       "showTransitives": "Hiển thị các phụ thuộc chuyển tiếp.",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (chia sẻ)",
-      "tooltipHeader": "{total} phụ thuộc bắc cầu",
-      "tooltipHeaderShared": "{total} phụ thuộc bắc cầu ({shared} được chia sẻ)",
+      "tooltipHeader": "{total} deps chuyển tiếp",
+      "tooltipHeaderShared": "Các lỗi chuyển tiếp {total} (được chia sẻ {shared})",
       "sharedBadgeTitle": "{count} được chia sẻ với các gói khác.",
       "sharedBadge": "chia sẻ chung được chia sẻ.",
       "transitiveDepsHeading": "Transitive Dependencies ({count}) - Các phụ thuộc chuyển tiếp"
@@ -987,7 +1045,7 @@
       "functionOne": "{count} hàm",
       "functionOther": "{count} hàm",
       "avgFormat": "trung bình {score} ({grade})",
-      "gatesFailing": "cổng thất bại",
+      "gatesFailing": "Cổng thất bại khi không thành công.",
       "gatesPassing": "Cổng đi qua vượt qua."
     },
     "gauge": {
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "Gói gói bao bì là một gói gọn.",
       "packages": "gói hàng, bao bì."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "Giải thích quy tắc này."
+    },
+    "enableRule": {
+      "done": "Quy tắc được kích hoạt là {ruleId}. Phân tích chạy lại để áp dụng.",
+      "runAnalysis": "Chạy phân tích chạy.",
+      "noWorkspace": "Mở một thư mục workspace để kích hoạt quy tắc."
+    },
+    "openFinding": {
+      "noWorkspace": "Mở một thư mục workspace để mở tìm kiếm.",
+      "notFound": "Không thể mở {file}."
     }
   }
 }

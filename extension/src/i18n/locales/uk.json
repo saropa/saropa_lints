@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "Безпека · Якість · Кваліфікація",
+    "searchPlaceholder": "Правила фільтрації... правила фільтрування.",
+    "empty": "Все чисто  ⁇ Ніяких висновків не було.",
+    "liveTitle": "Живе  ⁇  Live  ⁇ оновлення, коли ви редагуєте.",
+    "fetching": "Приховувати... приносять.",
+    "noOccurrences": "Ніяких подій.",
+    "summaryFindings": "{count} знахідок",
+    "summaryRules": "{count} правил",
+    "more": "+{count} більше",
+    "wordErrors": "Помилки помилки помилки похибки",
+    "wordWarnings": "попередження, попередження.",
+    "wordInfo": "Інфо-інфо, інфо-Інфо - це інформація.",
+    "wordFiles": "Файли файлів файли",
+    "gradeExcellent": "Це дуже добре, відмінно.",
+    "gradeGood": "Хороший - хороший.",
+    "gradeFair": "Справедливий, справедливий і чесний.",
+    "gradeWeak": "Слабкий слабкий",
+    "gradeSevere": "Дуже важкий тяжкий"
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇ {count} конфігурація пропозиції (s)",
+    "initMissing": {
+      "title": "Налаштувати Saropa Lints (запустити init)",
+      "detail": "saropa_lints знаходиться в pubspec, але конфігурація аналізатора ще не підключена."
+    },
+    "packAvailable": {
+      "title": "Включити пакет правил {pack}.",
+      "detail": "{count} правила для пакета в вашій пабспеціфічній упаковці."
+    },
+    "enabledToast": "Включено пакет правил {pack} в analysis_options.yaml",
+    "enableFailed": "Не вдалося увімкнути пакет правил {pack}  ⁇ Відкрийте панель регулювання, щоб включити її."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: = ПХ1: {count} пропозиція пакету правил (s) застосовуються до цього проекту.",
+    "review": "Перегляд Оглянути перевірку",
+    "dismiss": "Відпустка від роботи.",
+    "reviewFailed": "Не вдалося відкрити перегляд пакету правил Saropa Lints. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "Версія версії",
@@ -35,6 +74,15 @@
       "published": "Видається Публікуються Опубліковано",
       "update": "Update Update Оновлення оновлення",
       "blockedBy": "Блокується за допомогою",
+      "blockedVia": "{blocker} капи {dep} {constraint} ({resolvable} розв'язуватися, {latest} останнє)",
+      "blockedViaSdk": "закріплено {blocker} (Flutter SDK) для {dep} ({resolvable} вирішується, {latest} останній)",
+      "constrained": "Зв'язнені, обмежені.",
+      "constrainedBy": "Ваш обмеження {constraint} обмежує це ({resolvable} вирішуваний, {latest} останній)",
+      "pinHeld": "Проведено проведеного",
+      "pinDoNotUse": "Не використовувати.",
+      "drift": "Міжпроектний дрейф",
+      "driftBehind": "Позаду: {siblings} (у вас {own})",
+      "driftDiffers": "Відрізняється: {siblings} (у вас {own})",
       "codeSize": "Розмір коду Код розміру",
       "archiveSize": "Розмір архіву.",
       "bloat": "({rating}/10 набряк)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "Перемикайте розклад повної ширини.",
     "sortBy": "Порятуйте за {column}",
     "expandRow": "Розширюйте ряд ряду.",
+    "copyRow": "Копіюйте рядки ряду.",
+    "comparisonDimension": "Метричні метрики.",
     "collapseRow": "Колапс ряду колапсу.",
     "selectAll": "Виберіть всі рядки.",
     "keyboardShortcuts": "Клавіатурні короткості.",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints Мова користувацької інтерфейсу.",
       "placeholder": "Виберіть мову для бокової панелі та приладових досок.",
-      "auto": "Автоматично (слідуйте мові відображення VS Code)"
+      "auto": "Автоматично (слідуйте мові відображення VS Code)",
+      "coverage": "{pct}% перекладено  ⁇ решту показує англійською мовою."
     },
     "reloadPrompt": "Мова встановлена на {locale}. Перезавантажуйте вікно, щоб оновити бокову панель та етикети команд.",
     "reloadNow": "Перезаряджуйте зараз.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "Останній пробіг - останнє засідання.",
+      "updatedPrefix": "Оновлено оновлене",
+      "refreshHint": "Натисніть, щоб оновити від аналізатора.",
       "lastRunUnknown": "Останній пробіг невідомий.",
       "noTimestampTitle": "Немає часової марки на violations.json.",
       "findingsAfterFilterTitle": "Загальні результати після фільтрування правила відключення.",
@@ -327,7 +380,7 @@
       "refreshExtension": "Додаток Refresh розширюється.",
       "openPackageDashboard": "Відкрийте панель управління пакетом.",
       "openCodeHealth": "Відкрити Code Health",
-      "openLintsConfig": "Open Lints Config - Конфігурація відкритих лінтів.",
+      "openLintsConfig": "Управління пакетами правил.",
       "reloadFromDisk": "Перезавантажуйте з диска.",
       "reloadFromDiskTitle": "Перепроектуйте панель приладів з останнього violations.json, не запускаючи аналізатора.",
       "reEnableDisabledRules": "Повторно включити правила... відключені.",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa Пакетний панель управління",
     "heroTitle": "Saropa Пакетний панель управління",
+    "detailPane": {
+      "aria": "Деталі упаковки.",
+      "title": "Деталі упаковки.",
+      "close": "Близька деталь, деталі."
+    },
     "status": {
       "packagesCount": "{count} пакетів",
       "packagesBreakdown": "{direct} прямих, {transitive} транзитивних",
@@ -741,7 +799,7 @@
       "likesUnavailable": "pub.dev лайки недоступні.",
       "likesCount": "{count} pub.dev любить і подобається",
       "downloadsUnavailable": "pub.dev 30-денні завантаження недоступні.",
-      "downloadsCount": "{count} завантажень за останні 30 днів",
+      "downloadsCount": "{count} завантаження в останні 30 днів.",
       "sizeUnavailable": "Розмір недоступний у pub.dev.",
       "noVulnerabilities": "Не відомо про вразливість.",
       "licenseUnspecified": "Ліцензія не зазначена на pub.dev",
@@ -801,8 +859,8 @@
       "showTransitives": "Покажіть перехідні залежності.",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (спільний)",
-      "tooltipHeader": "{total} транзитивні залежності",
-      "tooltipHeaderShared": "{total} транзитивні залежності ({shared} спільні)",
+      "tooltipHeader": "{total} перехідні депси.",
+      "tooltipHeaderShared": "Перехідні депи {total} (поділився {shared})",
       "sharedBadgeTitle": "{count} поділяється з іншими пакетами.",
       "sharedBadge": "Спільне використання спільних ресурсів.",
       "transitiveDepsHeading": "Перехідні залежності ({count})"
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "Пакет пакетів - пакетні пакети.",
       "packages": "пакети, упаковки."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "Поясніть це правило."
+    },
+    "enableRule": {
+      "done": "Включено правило {ruleId}. Використовувати повторний аналіз.",
+      "runAnalysis": "Запустити аналіз, провести аналіз.",
+      "noWorkspace": "Відкрийте папку робочої зони, щоб включити правило."
+    },
+    "openFinding": {
+      "noWorkspace": "Відкрийте папку робочої зони, щоб відкрити пошук.",
+      "notFound": "Не вдалося відкрити {file}."
     }
   }
 }

@@ -80,6 +80,16 @@ export function getViolationsDashboardStyles(): string {
        Layered above page background with a subtle tint so it reads
        as the focal element of the page (§4.1).
        ============================================================ */
+    /* §15.2 — keyboard-only skip link. This dashboard does not pull in the
+       shared chrome stylesheet, so the rule is defined locally; without it the
+       link rendered unstyled (default blue, always visible, failing contrast).
+       Hidden off-screen until focused, then pops in at the top-left corner. */
+    .skip-link {
+      position: absolute; top: -100px; inset-inline-start: 8px; z-index: 1000;
+      padding: 6px 12px; border-radius: 4px; font-size: 0.9em; text-decoration: none;
+      background: var(--vscode-button-background); color: var(--vscode-button-foreground);
+    }
+    .skip-link:focus { top: 8px; }
     .dash-hero {
       position: relative;
       display: grid;
@@ -927,7 +937,7 @@ export function getViolationsDashboardStyles(): string {
       border-radius: 4px;
       padding: 2px 10px;
       margin-inline-start: 4px;
-      color: var(--fg);
+      color: var(--vscode-foreground);
       background: var(--surface-3);
       font: inherit;
       font-size: .9em;
@@ -954,7 +964,7 @@ export function getViolationsDashboardStyles(): string {
     .top-rules-table thead th[data-sort] .arrow { opacity: .4; margin-inline-start: 4px; }
     .top-rules-table thead th[aria-sort="ascending"] .arrow,
     .top-rules-table thead th[aria-sort="descending"] .arrow { opacity: 1; }
-    .top-rules-table thead th[data-sort]:hover { color: var(--fg); }
+    .top-rules-table thead th[data-sort]:hover { color: var(--vscode-foreground); }
 
     /* Expander affordance: a chevron in the rule cell; the whole row toggles. */
     .top-rules-table tr.trow[data-expandable="true"] { cursor: pointer; }
@@ -974,7 +984,7 @@ export function getViolationsDashboardStyles(): string {
       padding: 8px 12px 12px 50px;
       background: color-mix(in srgb, var(--surface-3) 50%, transparent);
     }
-    .top-rules-table .trd-msg { margin: 0 0 8px; color: var(--fg); line-height: 1.45; }
+    .top-rules-table .trd-msg { margin: 0 0 8px; color: var(--vscode-foreground); line-height: 1.45; }
     .top-rules-table .trd-files-head {
       font-size: .82em;
       letter-spacing: .3px;
@@ -1020,7 +1030,7 @@ export function getViolationsDashboardStyles(): string {
       padding: 28px 20px;
       text-align: center;
     }
-    .empty-cta h3 { margin: 0 0 6px; font-size: 1.05em; }
+    .empty-cta h2 { margin: 0 0 6px; font-size: 1.05em; }
     .empty-cta p { margin: 0 0 14px; color: var(--muted); }
     .empty-cta .btns { display: inline-flex; gap: 8px; }
 

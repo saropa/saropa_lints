@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "سیکیورٹی · معیار · حفاظت",
+    "searchPlaceholder": "فلٹر کے قواعد...",
+    "empty": "سب صاف  ⁇ کوئی نتائج نہیں ملے۔",
+    "liveTitle": "لائیو  ⁇ اپ ڈیٹس آپ ترمیم کے طور پر آپ کو ترمیم کرتے وقت.",
+    "fetching": "آڻي رهيو آهي…",
+    "noOccurrences": "کوئی واقعات نہیں ہوا.",
+    "summaryFindings": "{count} دریافتیں",
+    "summaryRules": "{count} اصول",
+    "more": "+{count} زیادہ سے زیادہ",
+    "wordErrors": "غلطیوں کی غلطیاں غلطیوں کے بارے میں",
+    "wordWarnings": "انتباہات، تنبیہات۔",
+    "wordInfo": "معلومات کے بارے میں معلومات حاصل کریں",
+    "wordFiles": "فائلیں فائلوں کی فائلیں",
+    "gradeExcellent": "بہت عمدہ، بہترین۔",
+    "gradeGood": "اچھا اچھا اچھا اچھی",
+    "gradeFair": "Fair Fair Fair منصفانہ",
+    "gradeWeak": "کمزور، کمزور۔",
+    "gradeSevere": "شدید شدید شدید بہت زیادہ"
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇   ⁇ {count} تشکیل تجویز (s)",
+    "initMissing": {
+      "title": "Saropa Lints (run init) سیٹ اپ کریں",
+      "detail": "saropa_lints pubspec میں ہے لیکن ابھی تک کوئی تجزیہ کار کنفیگریشن وائرڈ نہیں ہے۔"
+    },
+    "packAvailable": {
+      "title": "{pack} قاعدہ پیک کو فعال کریں۔",
+      "detail": "{count} آپ کے پب اسپیک میں پیکیج کیلئے قواعد۔"
+    },
+    "enabledToast": "analysis_options.yaml میں {pack} قاعدہ پیک کو فعال کیا گیا ہے۔",
+    "enableFailed": "{pack} قاعدہ پیک  ⁇  کو فعال نہیں کیا جا سکا اس کو فعال کرنے کے لئے قاعدہ پیک ڈیش بورڈ کھولیں۔"
+  },
+  "startupNudge": {
+    "message": "Saropa Lints:۔ _PH1_: {count} قاعدہ پیک کی تجویز (s) اس منصوبے پر لاگو ہوتی ہیں۔",
+    "review": "جائزہ لینے کا جائزہ لیں Review Review",
+    "dismiss": "برطرفی۔",
+    "reviewFailed": "Saropa Lints رول پیک کا جائزہ نہیں کھول سکا۔ {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "ورژن کی اصلاح.",
@@ -35,6 +74,15 @@
       "published": "شائع شدہ شائع کردہ",
       "update": "اپ ڈیٹ کریں تازہ کاری کی تازہ ترین معلومات۔",
       "blockedBy": "بلاک کیا گیا by",
+      "blockedVia": "{blocker} کیپس {dep} {constraint} ({resolvable} قابل حل، {latest} تازہ ترین)",
+      "blockedViaSdk": "{blocker} (Flutter SDK) کے ذریعے {dep} ({resolvable} قابل حل، {latest} تازہ ترین) کے لیے پن کیا گیا",
+      "constrained": "محدود پابند کیا گیا تھا.",
+      "constrainedBy": "آپ کی رکاوٹ {constraint} اس کو محدود کرتی ہے ({resolvable} قابل حل، {latest} تازہ ترین)",
+      "pinHeld": "منعقد کیا گیا تھا",
+      "pinDoNotUse": "استعمال نہ کریں استعمال نہ کریں۔",
+      "drift": "کراس پروجیکٹ ڈرائیو بہاؤ۔",
+      "driftBehind": "پیچھے: {siblings} (آپ کے پاس {own} ہے)",
+      "driftDiffers": "فرق: {siblings} (آپ کے پاس {own} ہے)",
       "codeSize": "کوڈ سائز کا سائز",
       "archiveSize": "آرکائیو سائز فائل کا سائز",
       "bloat": "({rating}/10 پھول)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "پوري ويڪر واري لي آئوٽ ٽوگل ڪريو",
     "sortBy": "{column} موجب ترتيب ڏيو",
     "expandRow": "قطار وڌايو",
+    "copyRow": "نقل صف کاپی کریں قطار",
+    "comparisonDimension": "میٹرک میٹریک۔",
     "collapseRow": "قطار سميٽيو",
     "selectAll": "سڀ قطارون چونڊيو",
     "keyboardShortcuts": "ڪي بورڊ شارٽ ڪٽس",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints UI زبان",
       "placeholder": "سائڊ بار ۽ ڊيش بورڊز جي زبان چونڊيو",
-      "auto": "خودڪار (VS Code جي ڊسپلي زبان جي پيروي ڪريو)"
+      "auto": "خودڪار (VS Code جي ڊسپلي زبان جي پيروي ڪريو)",
+      "coverage": "{pct}% ترجمہ  ⁇ rest shows in English آرام کے پروگرام انگریزی میں دکھائے جاتے ہیں"
     },
     "reloadPrompt": "زبان کی ترتیب {locale} پر ہے۔ سائڈبار اور کمانڈ لیبلز کو اپ ڈیٹ کرنے کے لئے ونڈو کو دوبارہ لوڈ کریں۔",
     "reloadNow": "اب دوبارہ لوڈ کریں.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "آخری رن، آخری چلانے.",
+      "updatedPrefix": "تازہ کاری کی گئی۔",
+      "refreshHint": "تجزیہ کار سے تازہ کاری کرنے کے لئے کلک کریں.",
       "lastRunUnknown": "آخری رن نامعلوم نامعلوم",
       "noTimestampTitle": "violations.json پر کوئی ٹائم اسٹیمپ نہیں ہے۔",
       "findingsAfterFilterTitle": "غیر فعال قاعدہ فلٹر کے بعد مجموعی نتائج",
@@ -327,7 +380,7 @@
       "refreshExtension": "تازہ کاری کی توسیع کو اپ ڈیٹ کریں",
       "openPackageDashboard": "کھولیں پیکیج ڈیش بورڈ",
       "openCodeHealth": "اوپن کوڈ ہیلتھ صحت",
-      "openLintsConfig": "اوپن لنٹس کنفیگ Config",
+      "openLintsConfig": "قاعدہ پیک کا انتظام کریں.",
       "reloadFromDisk": "ڈسک سے دوبارہ لوڈ کریں",
       "reloadFromDiskTitle": "تجزیہ کار کو دوبارہ چلانے کے بغیر آخری violations.json سے ڈیش بورڈ کو دوبارہ پیش کریں۔",
       "reEnableDisabledRules": "غیر فعال قواعد کو دوبارہ قابل بنائیں...",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa پیکیج ڈیش بورڈ",
     "heroTitle": "Saropa پیکیج ڈیش بورڈ",
+    "detailPane": {
+      "aria": "پیکیج کی تفصیلات پیکج کی تفصیلی معلومات",
+      "title": "پیکیج کی تفصیلات پیکج کی تفصیلی معلومات",
+      "close": "قریب تفصیل سے قریبی تفصیلات."
+    },
     "status": {
       "packagesCount": "{count} پیکجز",
       "packagesBreakdown": "{direct} براہ راست، {transitive} ٹرانزیٹیو",
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "پیکیج پیکج پیکیجی پیکج",
       "packages": "پیکیجنگ پیکجز"
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "اس قاعدہ کی وضاحت کریں."
+    },
+    "enableRule": {
+      "done": "فعال کردہ قاعدہ {ruleId}. دوبارہ چلانے کا تجزیہ لاگو کرنے کے لئے.",
+      "runAnalysis": "تجزيي هلائو",
+      "noWorkspace": "کسی اصول کو فعال کرنے کے لئے ورک اسپیس فولڈر کھولیں۔"
+    },
+    "openFinding": {
+      "noWorkspace": "تلاش کو کھولنے کے لئے ورک اسپیس فولڈر کھولیں۔",
+      "notFound": "{file} نہیں کھول سکا۔"
     }
   }
 }

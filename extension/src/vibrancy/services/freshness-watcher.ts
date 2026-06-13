@@ -119,9 +119,17 @@ export class FreshnessWatcher {
 
     private _readConfig(): FreshnessWatcherConfig {
         const config = vscode.workspace.getConfiguration('saropaLints.packageVibrancy');
+        // Clamp the interval: a 0, negative, or NaN setting would make
+        // setInterval fire continuously and hammer the pub registry. Honor any
+        // positive value but floor it at 15 minutes; fall back to 6h otherwise.
+        const rawInterval = config.get<number>('watchIntervalHours', 6);
+        const intervalHours =
+            Number.isFinite(rawInterval) && rawInterval > 0
+                ? Math.max(0.25, rawInterval)
+                : 6;
         return {
             enabled: config.get<boolean>('watchEnabled', true),
-            intervalHours: config.get<number>('watchIntervalHours', 6),
+            intervalHours,
             filterMode: config.get<WatchFilterMode>('watchFilter', 'all'),
             customWatchList: config.get<string[]>('watchList', []),
         };

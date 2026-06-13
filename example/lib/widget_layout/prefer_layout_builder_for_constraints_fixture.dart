@@ -268,3 +268,43 @@ class OkBreakpointHelper extends StatelessWidget {
   }
 }
 
+// GOOD: MediaQuery is the fallback branch of a constraint-finiteness guard
+// INSIDE a LayoutBuilder. The widget already uses LayoutBuilder; MediaQuery is
+// read only when the parent passes unbounded width (constraints == Infinity),
+// where the LayoutBuilder value is unusable. No lint.
+class OkConstraintFinitenessFallback extends StatelessWidget {
+  const OkConstraintFinitenessFallback({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double maxWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.sizeOf(context).width;
+        return SizedBox(width: maxWidth, child: const Placeholder());
+      },
+    );
+  }
+}
+
+// GOOD: deliberate viewport-fraction height with a NAMED factor inside an
+// unbounded scroller. A fraction of the SCREEN is intended; LayoutBuilder here
+// yields unbounded vertical constraints (the wrong signal). No lint — scaling
+// by a variable factor is viewport-proportional sizing, same as `* 0.85`.
+class OkViewportFractionVariable extends StatelessWidget {
+  const OkViewportFractionVariable({super.key, required this.fraction});
+
+  final double fraction;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: SizedBox(
+        height: MediaQuery.sizeOf(context).height * fraction,
+        child: const Placeholder(),
+      ),
+    );
+  }
+}
+

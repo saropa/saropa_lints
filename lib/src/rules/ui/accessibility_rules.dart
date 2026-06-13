@@ -1821,9 +1821,12 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
         'Painter',
       ];
 
+      // Match visual-content patterns on PascalCase word boundaries, not as
+      // bare substrings: `contains('Custom')` wrongly flagged `Customer` /
+      // `CustomerList`, and `Status` flagged unrelated names embedding it.
       bool needsSemantics = false;
       for (final String pattern in visualPatterns) {
-        if (className.contains(pattern)) {
+        if (_classNameHasPascalWord(className, pattern)) {
           needsSemantics = true;
           break;
         }
@@ -1831,12 +1834,56 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
 
       if (!needsSemantics) return;
 
-      // Check if build method has Semantics
-      final String classSource = node.toSource();
-      if (!classSource.contains('Semantics')) {
+      // Detect a real semantics-providing widget via the AST, not a substring
+      // of `toSource()`: `contains('Semantics')` also matched the letters in a
+      // comment/variable. `ExcludeSemantics` is deliberately NOT counted — it
+      // hides a subtree from the a11y tree rather than providing a label, so a
+      // visual widget that only excludes still warrants an explicit label.
+      final _SemanticsWidgetDetector detector = _SemanticsWidgetDetector();
+      node.visitChildren(detector);
+      if (!detector.hasSemanticsWidget) {
         reporter.atToken(node.nameToken, code);
       }
     });
+  }
+}
+
+/// Whether [className] contains [word] as a PascalCase word — at the start, or
+/// followed by the end or an uppercase letter. Prevents `Custom` matching
+/// `Customer` while still matching `CustomChart`.
+bool _classNameHasPascalWord(String className, String word) {
+  int from = 0;
+  while (true) {
+    final int i = className.indexOf(word, from);
+    if (i < 0) return false;
+    final int after = i + word.length;
+    final bool boundaryAfter =
+        after >= className.length || _isUpperCaseLetter(className[after]);
+    if (boundaryAfter) return true;
+    from = i + 1;
+  }
+}
+
+bool _isUpperCaseLetter(String ch) =>
+    ch.toUpperCase() == ch && ch.toLowerCase() != ch;
+
+/// Detects a semantics-PROVIDING widget (Semantics, MergeSemantics) in a
+/// subtree by constructor type name (exact). ExcludeSemantics is intentionally
+/// excluded — it removes semantics rather than providing a label.
+class _SemanticsWidgetDetector extends RecursiveAstVisitor<void> {
+  bool hasSemanticsWidget = false;
+
+  static const Set<String> _semanticsWidgets = <String>{
+    'Semantics',
+    'MergeSemantics',
+  };
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    if (_semanticsWidgets.contains(node.constructorName.type.name.lexeme)) {
+      hasSemanticsWidget = true;
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }
 
@@ -4070,26 +4117,53 @@ class PreferFocusTraversalOrderRule extends SaropaLintRule {
       // Check for Row or Wrap containing multiple focusable widgets
       if (typeName != 'Row' && typeName != 'Wrap') return;
 
-      // Count focusable children
-      int focusableCount = 0;
-      final String nodeSource = node.toSource();
+      // Count focusable children by walking the subtree's actual widget
+      // constructors. The previous `allMatches` over `toSource()` also counted
+      // the type names where they appear in comments and string literals (e.g.
+      // a label "Switch to dark mode"), inflating the count and firing falsely.
+      final _FocusableWidgetCounter counter = _FocusableWidgetCounter();
+      node.visitChildren(counter);
 
-      // Count common focusable widgets
-      focusableCount += 'TextField'.allMatches(nodeSource).length;
-      focusableCount += 'TextFormField'.allMatches(nodeSource).length;
-      focusableCount += 'DropdownButton'.allMatches(nodeSource).length;
-      focusableCount += 'Checkbox'.allMatches(nodeSource).length;
-      focusableCount += 'Radio'.allMatches(nodeSource).length;
-      focusableCount += 'Switch'.allMatches(nodeSource).length;
-
-      // If 3+ focusable widgets and no FocusTraversalOrder, warn
-      if (focusableCount >= 3) {
-        if (!nodeSource.contains('FocusTraversalOrder') &&
-            !nodeSource.contains('FocusTraversalGroup')) {
-          reporter.atNode(node.constructorName, code);
-        }
+      if (counter.focusableCount >= 3 && !counter.hasTraversalWidget) {
+        reporter.atNode(node.constructorName, code);
       }
     });
+  }
+}
+
+/// Counts focusable input widgets and detects focus-traversal widgets within a
+/// subtree by their constructor type names (exact match — never a substring of
+/// an unrelated identifier, comment, or string literal).
+class _FocusableWidgetCounter extends RecursiveAstVisitor<void> {
+  int focusableCount = 0;
+  bool hasTraversalWidget = false;
+
+  static const Set<String> _focusable = <String>{
+    'TextField',
+    'TextFormField',
+    'DropdownButton',
+    'DropdownButtonFormField',
+    'Checkbox',
+    'CheckboxListTile',
+    'Radio',
+    'RadioListTile',
+    'Switch',
+    'SwitchListTile',
+  };
+  static const Set<String> _traversal = <String>{
+    'FocusTraversalOrder',
+    'FocusTraversalGroup',
+  };
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String name = node.constructorName.type.name.lexeme;
+    if (_focusable.contains(name)) {
+      focusableCount++;
+    } else if (_traversal.contains(name)) {
+      hasTraversalWidget = true;
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }
 
@@ -4588,12 +4662,29 @@ class PreferSemanticsSortRule extends SaropaLintRule {
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (node.constructorName.type.name.lexeme != 'Semantics') return;
+
+      bool hasSortKey = false;
+      bool explicitChildNodes = false;
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'sortKey') {
-          return;
+        if (arg is! NamedExpression) continue;
+        final String name = arg.name.label.name;
+        if (name == 'sortKey') {
+          hasSortKey = true;
+        } else if (name == 'explicitChildNodes') {
+          final Expression value = arg.expression;
+          explicitChildNodes = value is BooleanLiteral && value.value;
         }
       }
-      reporter.atNode(node);
+
+      // Only flag when child nodes are exposed individually to the a11y tree
+      // (`explicitChildNodes: true`) without a sortKey — the case where
+      // traversal order is otherwise undefined and a sortKey genuinely matters.
+      // A plain Semantics merges its subtree and needs no sortKey, so flagging
+      // every Semantics (the previous behavior) fired on the rule's own GOOD
+      // example.
+      if (explicitChildNodes && !hasSortKey) {
+        reporter.atNode(node);
+      }
     });
   }
 }

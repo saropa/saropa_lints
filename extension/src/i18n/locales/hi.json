@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "सुरक्षा · गुणवत्ता · गुणवत्ता",
+    "searchPlaceholder": "फ़िल्टर नियम ... फिल्टर नियम।",
+    "empty": "सब कुछ साफ है  ⁇ कोई निष्कर्ष नहीं मिला।",
+    "liveTitle": "लाइव  ⁇ अपडेट आपके द्वारा संपादित किए जाने के रूप में अद्यतन करता है।",
+    "fetching": "लाना ... लाने के लिए।",
+    "noOccurrences": "कोई घटना नहीं हुई।",
+    "summaryFindings": "{count} परिणाम",
+    "summaryRules": "{count} नियम",
+    "more": "+{count} अधिक से अधिक",
+    "wordErrors": "त्रुटि त्रुटियों की गलतियाँ",
+    "wordWarnings": "चेतावनी, चेतावनियां।",
+    "wordInfo": "जानकारी के लिए सूचना।",
+    "wordFiles": "फ़ाइलें फाइलें फाइलों को फ़ाइलें",
+    "gradeExcellent": "बहुत बढ़िया, उत्कृष्ट।",
+    "gradeGood": "अच्छा अच्छा अच्छा अच्छी",
+    "gradeFair": "Fair fair fair fair. . . यह तो बहुत ही अच्छा लगा।",
+    "gradeWeak": "कमजोर कमजोर कमज़ोर",
+    "gradeSevere": "गंभीर रूप से बहुत गंभीर।"
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇ {count} कॉन्फ़िग सुझाव (s)",
+    "initMissing": {
+      "title": "Saropa Lints (रून इनिश) सेट अप करें।",
+      "detail": "saropa_lints pubspec में है लेकिन अभी तक कोई विश्लेषक कॉन्फ़िगरेशन वायर्ड नहीं किया गया है।"
+    },
+    "packAvailable": {
+      "title": "{pack} नियम पैक को सक्षम करें।",
+      "detail": "आपके पबस्पेक में एक पैकेज के लिए {count} नियम।"
+    },
+    "enabledToast": "analysis_options.yaml में {pack} नियम पैक सक्षम किया गया।",
+    "enableFailed": "{pack} नियम पैक  ⁇  सक्षम नहीं कर सका इसे सक्षम करने के लिए नियम पैक डैशबोर्ड खोलें।"
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: _PH1_: {count} नियम पैक सुझाव (s) इस परियोजना पर लागू होते हैं।",
+    "review": "समीक्षा की समीक्षा करें",
+    "dismiss": "बर्खास्तगी को खारिज करें।",
+    "reviewFailed": "Saropa Lints नियम पैक समीक्षा नहीं खुल सकी. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION संस्करण",
@@ -35,6 +74,15 @@
       "published": "प्रकाशित किया गया प्रकाशित किया",
       "update": "अद्यतन अपडेट करें Update Update",
       "blockedBy": "द्वारा अवरुद्ध",
+      "blockedVia": "{blocker} कैप्स {dep} {constraint} ({resolvable} समाधान योग्य, {latest} नवीनतम)",
+      "blockedViaSdk": "{dep} के लिए {blocker} (Flutter SDK) द्वारा पिन किया गया ({resolvable} समाधान योग्य, {latest} नवीनतम)",
+      "constrained": "प्रतिबंधित, बाध्य।",
+      "constrainedBy": "आपकी बाधा {constraint} इसे कैप करती है ({resolvable} हल करने योग्य, {latest} नवीनतम) ।",
+      "pinHeld": "आयोजित किया गया था।",
+      "pinDoNotUse": "उपयोग न करें।",
+      "drift": "क्रॉस-प्रोजेक्ट ड्राफ्ट।",
+      "driftBehind": "पीछे: {siblings} (आपके पास {own} है)",
+      "driftDiffers": "अंतर: {siblings} (आपके पास {own} है)",
       "codeSize": "कोड आकार, कोड का आकार",
       "archiveSize": "संग्रह का आकार",
       "bloat": "({rating}/10 फुलाव)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "टॉगल पूर्ण-चौड़ाई लेआउट को टगल करें।",
     "sortBy": "{column} द्वारा क्रमबद्ध करें।",
     "expandRow": "विस्तार पंक्ति का विस्तार करें",
+    "copyRow": "पंक्ति की प्रतिलिपि बनाएँ",
+    "comparisonDimension": "मीट्रिक मेट्रिक।",
     "collapseRow": "पतन पंक्ति में गिरावट।",
     "selectAll": "सभी पंक्तियों का चयन करें।",
     "keyboardShortcuts": "कीबोर्ड शॉर्टकट्स",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints UI भाषा",
       "placeholder": "साइडबार और डैशबोर्ड के लिए भाषा चुनें",
-      "auto": "स्वचालित (VS Code प्रदर्शन भाषा का पालन करें)"
+      "auto": "स्वचालित (VS Code प्रदर्शन भाषा का पालन करें)",
+      "coverage": "{pct}% अनुवादित  ⁇ अंग्रेजी में आराम शो दिखाता है"
     },
     "reloadPrompt": "भाषा सेट {locale}. पर है। साइडबार और कमांड लेबल को अपडेट करने के लिए विंडो को फिर से लोड करें।",
     "reloadNow": "अब रीलोड करें।",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "अंतिम रन आखिरी चलाने।",
+      "updatedPrefix": "अद्यतन किया गया अपडेट किया गया",
+      "refreshHint": "विश्लेषक से ताज़ा करने के लिए क्लिक करें।",
       "lastRunUnknown": "अंतिम रन अज्ञात है।",
       "noTimestampTitle": "violations.json पर कोई समय-मुद्रा नहीं है।",
       "findingsAfterFilterTitle": "अक्षम-नियम फ़िल्टर के बाद कुल निष्कर्ष",
@@ -327,7 +380,7 @@
       "refreshExtension": "Refresh एक्सटेंशन को रीफ्रेश करें।",
       "openPackageDashboard": "पैकेज डैशबोर्ड खोलें",
       "openCodeHealth": "ओपन कोड हेल्थ",
-      "openLintsConfig": "ओपन लिंट्स कॉन्फ़िगर करें",
+      "openLintsConfig": "नियम पैक का प्रबंधन करें",
       "reloadFromDisk": "डिस्क से पुनः लोड करें।",
       "reloadFromDiskTitle": "विश्लेषक को फिर से चलाए बिना पिछले violations.json के डैशबोर्ड को पुनः प्रस्तुत करें।",
       "reEnableDisabledRules": "अक्षम नियमों को फिर से सक्षम करें ... निष्क्रिय नियम।",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa पैकेज डैशबोर्ड",
     "heroTitle": "Saropa पैकेज डैशबोर्ड",
+    "detailPane": {
+      "aria": "पैकेजिंग विवरण",
+      "title": "पैकेजिंग विवरण",
+      "close": "करीब से विवरण के लिए बारीकी से।"
+    },
     "status": {
       "packagesCount": "{count} पैकेज",
       "packagesBreakdown": "{direct} प्रत्यक्ष, {transitive} सकर्मक",
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "पैकेजिंग पैकेज पैकेज के रूप में।",
       "packages": "पैकेजिंग के लिए पैकेज।"
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "इस नियम की व्याख्या करें।"
+    },
+    "enableRule": {
+      "done": "सक्षम नियम {ruleId}. . पुनः चलाने के लिए विश्लेषण लागू करें।",
+      "runAnalysis": "विश्लेषण चलाएं।",
+      "noWorkspace": "एक नियम को सक्षम करने के लिए कार्यक्षेत्र फ़ोल्डर खोलें।"
+    },
+    "openFinding": {
+      "noWorkspace": "एक खोज खोलने के लिए कार्यक्षेत्र फ़ोल्डर खोलें।",
+      "notFound": "{file}. खोलने में असमर्थ।"
     }
   }
 }

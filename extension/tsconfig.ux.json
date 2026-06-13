@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "out-ux",
+    "rootDir": "src",
+    "types": ["node"],
+    "noEmit": false
+  },
+  "include": [
+    "src/test/ux/**/*.ts",
+    "src/test/vibrancy/register-vscode-mock.ts",
+    "src/test/vibrancy/vscode-mock.ts",
+    "src/test/vibrancy/vscode-mock-classes.ts"
+  ],
+  "exclude": ["node_modules", ".vscode-test", "out", "out-test", "out-ux", "dist"]
+}

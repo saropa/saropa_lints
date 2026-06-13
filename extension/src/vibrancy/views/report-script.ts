@@ -279,6 +279,15 @@ export function getReportScript(): string {
             card.addEventListener('click', function() {
                 filterByCard(card.dataset.filter);
             });
+            // KPI filter cards carry role="button"/tabindex in the markup, so
+            // keyboard users can focus them; mirror the click on Enter/Space
+            // (the native button activation keys) or the cards are mouse-only.
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    filterByCard(card.dataset.filter);
+                }
+            });
         });
 
         /* ---- Chart filter toggle (called from chart-script.ts) ---- */
@@ -1353,20 +1362,178 @@ export function getReportScript(): string {
             cell.addEventListener('click', function(e) {
                 e.stopPropagation();
                 var pkgRow = cell.closest('.pkg-row');
-                if (pkgRow) { toggleDetail(pkgRow); }
+                if (pkgRow) { openDetailPane(pkgRow.dataset.name); }
             });
         });
 
-        /* Click anywhere on the row (except links/buttons) also toggles. */
+        /* Click anywhere on the row (except links/buttons) opens the detail pane. */
         document.querySelectorAll('.pkg-row').forEach(function(row) {
             row.addEventListener('click', function(e) {
                 var tag = e.target.tagName;
-                /* Don't toggle if the user clicked a link, button, or interactive element. */
+                /* Don't open if the user clicked a link, button, or interactive element. */
                 if (tag === 'A' || tag === 'BUTTON' || e.target.classList.contains('copy-btn')
                     || e.target.classList.contains('pkg-name-link')
                     || e.target.classList.contains('ref-link')) { return; }
-                toggleDetail(row);
+                openDetailPane(row.dataset.name);
             });
+        });
+
+        /* ---- Docked detail pane (master-detail). Selecting a row asks the host
+         * to render that package's rich detail body and injects it here, so the
+         * dashboard hosts the detail instead of a separate panel tab. ---- */
+        var detailPane = document.getElementById('detail-pane');
+        var detailPaneBody = document.getElementById('detail-pane-body');
+        function openDetailPane(name) {
+            if (!name || !detailPane || !detailPaneBody) { return; }
+            document.querySelectorAll('.pkg-row.row-selected').forEach(function(r) {
+                r.classList.remove('row-selected');
+            });
+            var sel = (window.CSS && CSS.escape) ? CSS.escape(name) : name;
+            var row = document.querySelector('.pkg-row[data-name="' + sel + '"]');
+            if (row) { row.classList.add('row-selected'); }
+            detailPaneBody.innerHTML = '';
+            detailPane.hidden = false;
+            vscode.postMessage({ type: 'requestPackageDetail', package: name });
+        }
+        function closeDetailPane() {
+            if (detailPane) { detailPane.hidden = true; }
+            document.querySelectorAll('.pkg-row.row-selected').forEach(function(r) {
+                r.classList.remove('row-selected');
+            });
+        }
+        var detailPaneCloseBtn = document.getElementById('detailPaneClose');
+        if (detailPaneCloseBtn) { detailPaneCloseBtn.addEventListener('click', closeDetailPane); }
+        /* Delegated handlers for the injected detail body. Delegation on the
+         * pane (not its children) survives every re-injection the host pushes
+         * as lazy fetches land. Mirrors the standalone panel's client script. */
+        function paneCapitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+        function paneApplyGapFilters(section) {
+            if (!section) { return; }
+            var toolbar = section.querySelector('.gap-toolbar');
+            var search = toolbar ? toolbar.querySelector('.gap-search') : null;
+            var searchText = ((search && search.value) || '').toLowerCase();
+            var activeBtn = toolbar ? toolbar.querySelector('.filter-btn.active') : null;
+            var activeFilter = (activeBtn && activeBtn.dataset.filter) || 'all';
+            section.querySelectorAll('.gap-table tbody tr').forEach(function(row) {
+                var text = row.dataset.searchtext || '';
+                var type = row.dataset.type || '';
+                var rev = row.dataset.review || 'unreviewed';
+                var visible = text.indexOf(searchText) !== -1;
+                if (visible && activeFilter === 'prs') { visible = type === 'pr'; }
+                if (visible && activeFilter === 'issues') { visible = type === 'issue'; }
+                if (visible && activeFilter === 'unreviewed') { visible = rev === 'unreviewed'; }
+                row.style.display = visible ? '' : 'none';
+            });
+        }
+        function paneUpdateReviewSummary(section) {
+            if (!section) { return; }
+            var rows = section.querySelectorAll('.gap-table tbody tr');
+            var total = rows.length, triaged = 0, applicable = 0, notApplicable = 0;
+            rows.forEach(function(row) {
+                var s = row.dataset.review || 'unreviewed';
+                if (s !== 'unreviewed') { triaged++; }
+                if (s === 'applicable') { applicable++; }
+                if (s === 'not-applicable') { notApplicable++; }
+            });
+            var sm = section.querySelector('.review-summary');
+            if (sm) {
+                sm.textContent = triaged + ' of ' + total + ' triaged | ' + applicable
+                    + ' applicable | ' + notApplicable + ' N/A | ' + (total - triaged) + ' remaining';
+            }
+        }
+        function paneSortGapTable(th) {
+            var col = th.dataset.col;
+            var table = th.closest('table');
+            var tbody = table.querySelector('tbody');
+            var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr'));
+            var asc = th.dataset.sort !== 'asc';
+            th.dataset.sort = asc ? 'asc' : 'desc';
+            rows.sort(function(a, b) {
+                var ael = a.querySelector('[data-sort-' + col + ']');
+                var bel = b.querySelector('[data-sort-' + col + ']');
+                var av = ael ? (ael.dataset['sort' + paneCapitalize(col)] || '') : '';
+                var bv = bel ? (bel.dataset['sort' + paneCapitalize(col)] || '') : '';
+                var c = av.localeCompare(bv, undefined, { numeric: true });
+                return asc ? c : -c;
+            });
+            rows.forEach(function(row) { tbody.appendChild(row); });
+            table.querySelectorAll('th .sort-arrow').forEach(function(s) { s.textContent = ''; });
+            var arrow = th.querySelector('.sort-arrow');
+            if (arrow) { arrow.textContent = asc ? ' ▲' : ' ▼'; }
+        }
+        if (detailPane) {
+            detailPane.addEventListener('click', function(e) {
+                var hdr = e.target.closest('.section-header');
+                if (hdr && hdr.parentElement) { hdr.parentElement.classList.toggle('collapsed'); return; }
+                var fbtn = e.target.closest('.filter-btn');
+                if (fbtn) {
+                    var tb = fbtn.closest('.gap-toolbar');
+                    if (tb) {
+                        tb.querySelectorAll('.filter-btn').forEach(function(b) {
+                            b.classList.remove('active'); b.setAttribute('aria-checked', 'false');
+                        });
+                        fbtn.classList.add('active'); fbtn.setAttribute('aria-checked', 'true');
+                        paneApplyGapFilters(fbtn.closest('.section'));
+                    }
+                    return;
+                }
+                var sortTh = e.target.closest('.gap-table th[data-col]');
+                if (sortTh) { paneSortGapTable(sortTh); return; }
+                if (e.target.closest('#retry-fetches')) { vscode.postMessage({ type: 'retryFetches' }); return; }
+                var el = e.target.closest('[data-action]');
+                if (!el) { return; }
+                var action = el.dataset.action;
+                if (action === 'openUrl' && el.dataset.url) {
+                    e.preventDefault(); vscode.postMessage({ type: 'openUrl', url: el.dataset.url });
+                } else if (action === 'openFile' && el.dataset.path) {
+                    e.preventDefault();
+                    vscode.postMessage({ type: 'openFile', path: el.dataset.path, line: parseInt(el.dataset.line || '1', 10) });
+                } else if (action === 'upgrade') {
+                    e.preventDefault();
+                    vscode.postMessage({ type: 'upgrade', name: el.dataset.name, version: el.dataset.version });
+                } else if (action === 'changelog') {
+                    e.preventDefault();
+                    vscode.postMessage({ type: 'openUrl', url: 'https://pub.dev/packages/' + el.dataset.name + '/changelog' });
+                }
+            });
+            detailPane.addEventListener('change', function(e) {
+                var sel = e.target.closest('.review-select');
+                if (!sel) { return; }
+                var row = sel.closest('tr');
+                if (!row) { return; }
+                row.dataset.review = sel.value;
+                vscode.postMessage({ type: 'setReviewStatus', itemNumber: parseInt(row.dataset.number, 10), status: sel.value });
+                paneUpdateReviewSummary(row.closest('.section'));
+            });
+            var paneNoteTimers = {};
+            detailPane.addEventListener('input', function(e) {
+                var notes = e.target.closest('.notes-input');
+                if (notes) {
+                    var row = notes.closest('tr');
+                    if (!row) { return; }
+                    var num = parseInt(row.dataset.number, 10);
+                    clearTimeout(paneNoteTimers[num]);
+                    paneNoteTimers[num] = setTimeout(function() {
+                        vscode.postMessage({ type: 'addReviewNote', itemNumber: num, notes: notes.value });
+                    }, 500);
+                    return;
+                }
+                var search = e.target.closest('.gap-search');
+                if (search) { paneApplyGapFilters(search.closest('.section')); }
+            });
+        }
+        /* Host -> client: injected detail HTML, and reveal-from-elsewhere. */
+        window.addEventListener('message', function(event) {
+            var msg = event.data || {};
+            if (msg.type === 'packageDetailHtml' && detailPaneBody) {
+                detailPaneBody.innerHTML = msg.html;
+                if (detailPane) {
+                    detailPane.hidden = false;
+                    detailPane.scrollTop = 0;
+                }
+            } else if (msg.type === 'selectPackage' && msg.package) {
+                openDetailPane(msg.package);
+            }
         });
 
         function toggleDetail(pkgRow) {
@@ -1435,14 +1602,12 @@ export function getReportScript(): string {
                 if (typingInSearch) { return; }
                 e.preventDefault();
                 if (focusedRowIdx >= 0 && focusedRowIdx < rows.length) {
-                    toggleDetail(rows[focusedRowIdx]);
+                    openDetailPane(rows[focusedRowIdx].dataset.name);
                 }
             } else if (e.key === 'Escape') {
-                /* Collapse all expanded rows and clear focus. */
+                /* Close the detail pane and clear focus. */
                 hideNavPopover();
-                document.querySelectorAll('.pkg-row.expanded').forEach(function(row) {
-                    toggleDetail(row);
-                });
+                closeDetailPane();
                 focusedRowIdx = -1;
                 highlightRow(rows);
             } else if (e.altKey && e.key === 'ArrowLeft') {

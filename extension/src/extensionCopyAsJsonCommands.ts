@@ -9,14 +9,12 @@ import { resolveNodesForJsonExport } from './copyTreeAsJsonSelection';
 import type { FileRiskTreeProvider } from './views/fileRiskTree';
 import type { IssuesTreeProvider } from './views/issuesTree';
 import type { SecurityPostureTreeProvider } from './views/securityPostureTree';
-import type { SuggestionsTreeProvider } from './views/suggestionsTree';
 import type { SummaryTreeProvider } from './views/summaryTree';
 import {
   serializeIssueNode,
   serializeSummaryNode,
   serializeSecurityNode,
   serializeFileRiskNode,
-  serializeSuggestionNode,
 } from './treeSerializers';
 
 /** Register "Copy as JSON" commands for all lints tree views (not vibrancy — handled separately). */
@@ -27,7 +25,6 @@ export function registerCopyAsJsonCommands(
     summaryProvider: SummaryTreeProvider;
     securityProvider: SecurityPostureTreeProvider;
     fileRiskProvider: FileRiskTreeProvider;
-    suggestionsProvider: SuggestionsTreeProvider;
   },
 ): void {
   const {
@@ -35,7 +32,6 @@ export function registerCopyAsJsonCommands(
     summaryProvider,
     securityProvider,
     fileRiskProvider,
-    suggestionsProvider,
   } = providers;
 
   context.subscriptions.push(
@@ -66,10 +62,6 @@ export function registerCopyAsJsonCommands(
     vscode.commands.registerCommand('saropaLints.fileRisk.copyAsJson', (item: unknown, selected?: unknown[]) =>
       copyTreeNodesToClipboard(item, selected, serializeFileRiskNode, (n) => fileRiskProvider.getChildren(n as never), 'File Risk'),
     ),
-    vscode.commands.registerCommand('saropaLints.suggestions.copyAsJson', (item: unknown, selected?: unknown[]) =>
-      copyTreeNodesToClipboard(item, selected, serializeSuggestionNode, (n) => suggestionsProvider.getChildren(), 'Suggestions'),
-    ),
-
     // File Risk context menu: show violations for this file (filter without opening).
     vscode.commands.registerCommand('saropaLints.fileRisk.showViolations', (element: unknown) => {
       const filePath = extractFileRiskPath(element);

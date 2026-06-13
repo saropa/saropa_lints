@@ -511,14 +511,27 @@ def publish_to_pubdev_step(
         return False
 
     print_info(f"Watching workflow run {run_id}...")
-    watch_result = subprocess.run(
-        ["gh", "run", "watch", run_id, "--exit-status"],
-        cwd=project_dir,
-        capture_output=True,
-        text=True,
-        shell=use_shell,
-        timeout=300,
-    )
+    try:
+        watch_result = subprocess.run(
+            ["gh", "run", "watch", run_id, "--exit-status"],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            shell=use_shell,
+            # Aligned with the 10m run-discovery poll above. A publish workflow
+            # legitimately runs longer than 5m; the previous 300s with no
+            # handler raised TimeoutExpired and crashed the publish AFTER the
+            # tag had already been pushed, leaving a burned tag and a traceback.
+            timeout=600,
+        )
+    except subprocess.TimeoutExpired:
+        # The tag is already pushed, so a slow-but-not-failed workflow must not
+        # crash the publish. Surface the monitor URL and let the user confirm.
+        print_warning(
+            f"Publish workflow {run_id} still running after the watch window. "
+            f"Monitor: https://github.com/{repo_path}/actions"
+        )
+        return False
 
     if watch_result.returncode == 0:
         print_success(

@@ -282,6 +282,27 @@ void test() {
       test('handles null token', () {
         expect(IgnoreUtils.hasIgnoreCommentOnToken(null, 'my_rule'), isFalse);
       });
+
+      test('does not match a longer rule name as a substring', () {
+        // Regression: a bare `text.contains(ruleName)` let an ignore for the
+        // more specific `my_rule_extended` wrongly suppress `my_rule`, because
+        // `my_rule` is a substring of it. Whole-word matching must reject it,
+        // matching isIgnoredForFile's `\b`-anchored behavior.
+        final unit = _parseCode('''
+void test() {
+  // ignore: my_rule_extended
+  print('hello');
+}
+''');
+        final printInvocation = _findFirst<MethodInvocation>(unit)!;
+        expect(
+          IgnoreUtils.hasIgnoreCommentOnToken(
+            printInvocation.beginToken,
+            'my_rule',
+          ),
+          isFalse,
+        );
+      });
     });
 
     // Leading `// ignore:` honored for diagnostics reported on a declaration's
@@ -393,6 +414,19 @@ class FooState {}
 // ignore: other_rule
 class FooState {}
 '''),
+          isFalse,
+        );
+      });
+
+      test('does NOT suppress when ignore names a longer rule (substring)', () {
+        // The directive targets `my_rule_extended`; substring matching would
+        // let it wrongly suppress the shorter `my_rule`. Whole-word matching
+        // must reject it.
+        expect(
+          check('''
+// ignore: my_rule_extended
+class FooState {}
+''', rule: 'my_rule'),
           isFalse,
         );
       });

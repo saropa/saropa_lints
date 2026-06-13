@@ -190,8 +190,12 @@ class BaselineFile {
     // Exact match
     if (normA == normB) return true;
 
-    // Check if one ends with the other (handles relative vs absolute paths)
-    if (normA.endsWith(normB) || normB.endsWith(normA)) return true;
+    // Suffix match for relative-vs-absolute paths (e.g. baseline entry
+    // `lib/a/util.dart` vs analyzed `/proj/lib/a/util.dart`), but only when the
+    // suffix begins at a path-segment boundary. A bare `endsWith` wrongly
+    // matched a different file whose name is a textual suffix of another
+    // (`util.dart` matching `my_util.dart`), suppressing real violations.
+    if (normA.endsWith('/$normB') || normB.endsWith('/$normA')) return true;
 
     return false;
   }

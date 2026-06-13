@@ -209,7 +209,7 @@ export function buildSectionRows(sec: DashboardSection, pageSize: number, openBy
   const title = escapeHtml(sectionTitle(sec));
   const total = sectionCount(sec);
   const groupId = `grp-${escapeHtml(sec.kind === 'severity' ? sec.severity : sec.label)}`;
-  const expanded = openByDefault ? 'true' : 'true';
+  const expanded = openByDefault ? 'true' : 'false';
   const rows = sec.files
     .flatMap((fb) => fb.violations.slice(0, pageSize).map((v) => renderFindingRow(v, fb.filePath)))
     .join('');
@@ -253,7 +253,7 @@ export function buildFindingsEmpty(input: ViolationsDashboardHtmlInput): string 
   return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.findings.sectionAria'))}">
     <div class="findings-wrap">
       <div class="empty-cta">
-        <h3>${escapeHtml(reason)}</h3>
+        <h2>${escapeHtml(reason)}</h2>
         <p>${input.totalRawAfterDisable === 0
           ? escapeHtml(l10n('findingsDash.findings.emptyHintNoData'))
           : escapeHtml(l10n('findingsDash.findings.emptyHintFilters'))}</p>

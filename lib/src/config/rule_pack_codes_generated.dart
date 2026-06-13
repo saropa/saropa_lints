@@ -8,6 +8,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'app_links_avoid_get_initial_link_string',
     'app_links_listen_in_build',
     'app_links_uncaught_stream_error',
+    'avoid_app_links_sensitive_params',
   },
   'app_links_6': {
     'app_links_use_get_initial_link',
@@ -96,14 +97,20 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_immutable_bloc_state',
     'require_initial_state',
   },
-  'bloc_8': {'avoid_bloc_map_event_to_state'},
+  'bloc_8': {
+    'avoid_bloc_map_event_to_state',
+  },
   'cached_network_image': {
     'avoid_inline_cache_manager_construction',
     'require_cached_image_provider_dimensions',
     'require_cached_image_provider_error_listener',
   },
-  'connectivity_plus': {'connectivity_satellite_missing'},
-  'connectivity_plus_6': {'avoid_pre_v6_single_connectivity_result'},
+  'connectivity_plus': {
+    'connectivity_satellite_missing',
+  },
+  'connectivity_plus_6': {
+    'avoid_pre_v6_single_connectivity_result',
+  },
   'device_calendar': {
     'device_calendar_event_missing_calendar_id',
     'device_calendar_event_utc_timezone',
@@ -112,6 +119,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'device_calendar_retrieve_events_empty_params',
     'device_calendar_retrieve_events_missing_end_date',
     'device_calendar_unchecked_result',
+    'require_calendar_timezone_handling',
   },
   'dio': {
     'avoid_dio_debug_print_production',
@@ -129,7 +137,9 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_dio_ssl_pinning',
     'require_dio_timeout',
   },
-  'dio_5': {'avoid_dio_error'},
+  'dio_5': {
+    'avoid_dio_error',
+  },
   'drift': {
     'avoid_drift_close_streams_in_tests',
     'avoid_drift_database_on_main_isolate',
@@ -164,6 +174,9 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_drift_schema_version_bump',
     'require_drift_stream_cancel',
   },
+  'envied': {
+    'require_envied_obfuscation',
+  },
   'equatable': {
     'avoid_equatable_datetime',
     'avoid_equatable_nested_equality',
@@ -188,7 +201,9 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'file_picker_unchecked_null_result',
     'file_picker_with_data_large_files',
   },
-  'file_picker_10': {'file_picker_deprecated_allow_compression'},
+  'file_picker_10': {
+    'file_picker_deprecated_allow_compression',
+  },
   'file_picker_12': {
     'file_picker_deprecated_allow_multiple',
     'file_picker_deprecated_with_data',
@@ -213,6 +228,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'prefer_firestore_batch_write',
     'prefer_marker_clustering',
     'prefer_transaction_for_batch',
+    'require_analytics_error_handling',
     'require_background_message_handler',
     'require_crashlytics_user_id',
     'require_database_index',
@@ -231,7 +247,10 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_firestore_security_rules',
     'require_map_idle_callback',
   },
-  'flame': {'avoid_creating_vector_in_update', 'avoid_redundant_async_on_load'},
+  'flame': {
+    'avoid_creating_vector_in_update',
+    'avoid_redundant_async_on_load',
+  },
   'flutter_animate': {
     'flutter_animate_auto_play_false_no_driver',
     'flutter_animate_empty_animate_list',
@@ -247,6 +266,9 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'avoid_unnecessary_hook_widgets',
     'prefer_use_callback',
   },
+  'flutter_keyboard_visibility': {
+    'require_keyboard_visibility_dispose',
+  },
   'flutter_map': {
     'flutter_map_deprecated_polygon_label_placement',
     'flutter_map_deprecated_tile_size',
@@ -256,12 +278,15 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'flutter_map_missing_user_agent',
   },
   'flutter_svg': {
+    'require_svg_error_handler',
     'svg_missing_semantics_label',
     'svg_network_missing_error_builder',
     'svg_network_missing_placeholder',
     'svg_string_missing_error_builder',
   },
-  'flutter_svg_2': {'prefer_svg_color_filter'},
+  'flutter_svg_2': {
+    'prefer_svg_color_filter',
+  },
   'geocoding': {
     'geocoding_call_in_text_field_listener',
     'geocoding_concurrent_locale_race',
@@ -277,6 +302,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'avoid_geolocator_background_without_config',
     'prefer_geocoding_cache',
     'prefer_geolocation_coarse_location',
+    'prefer_geolocator_distance_filter',
     'require_geolocator_battery_awareness',
   },
   'get_it': {
@@ -312,7 +338,12 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_getx_permanent_cleanup',
     'require_getx_worker_dispose',
   },
-  'go_router_6': {'avoid_go_router_legacy_redirect'},
+  'go_router_6': {
+    'avoid_go_router_legacy_redirect',
+  },
+  'google_fonts': {
+    'require_google_fonts_fallback',
+  },
   'google_maps_flutter': {
     'google_maps_animate_camera_in_build',
     'google_maps_bitmap_descriptor_in_build',
@@ -327,9 +358,14 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'google_sign_in_canceled_not_handled',
     'google_sign_in_missing_exception_handler',
     'google_sign_in_unchecked_supports_authenticate',
+    'require_google_signin_error_handling',
   },
-  'google_sign_in_7': {'avoid_pre_v7_google_sign_in'},
-  'graphql': {'avoid_graphql_string_queries'},
+  'google_sign_in_7': {
+    'avoid_pre_v7_google_sign_in',
+  },
+  'graphql': {
+    'avoid_graphql_string_queries',
+  },
   'hive': {
     'avoid_hive_binary_storage',
     'avoid_hive_box_name_collision',
@@ -372,11 +408,13 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_http_package_client_close',
   },
   'image_picker': {
+    'avoid_image_picker_quick_succession',
     'image_picker_camera_source_without_support_check',
     'image_picker_invalid_image_quality',
     'image_picker_lost_data_empty_check_missing',
     'image_picker_missing_retrieve_lost_data',
     'image_picker_multi_result_unchecked_empty',
+    'prefer_image_picker_max_dimensions',
   },
   'in_app_review': {
     'in_app_review_button_callback_request',
@@ -430,26 +468,9 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'lottie_network_missing_error_builder',
     'lottie_render_cache_raster_large_risk',
   },
-  'package_specific': {
-    'avoid_app_links_sensitive_params',
-    'avoid_image_picker_quick_succession',
+  'openai': {
     'avoid_openai_key_in_code',
-    'avoid_webview_file_access',
-    'prefer_geolocator_distance_filter',
-    'prefer_image_picker_max_dimensions',
-    'prefer_uuid_v4',
-    'require_analytics_error_handling',
-    'require_apple_signin_nonce',
-    'require_calendar_timezone_handling',
-    'require_envied_obfuscation',
-    'require_google_fonts_fallback',
-    'require_google_signin_error_handling',
-    'require_keyboard_visibility_dispose',
     'require_openai_error_handling',
-    'require_speech_stop_on_dispose',
-    'require_svg_error_handler',
-    'require_url_launcher_mode',
-    'require_webview_ssl_error_handling',
   },
   'permission_handler': {
     'permission_handler_batched_request_preferred',
@@ -546,8 +567,12 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'use_ref_and_state_synchronously',
     'use_ref_read_synchronously',
   },
-  'riverpod_2': {'prefer_notifier_over_state'},
-  'riverpod_3': {'avoid_riverpod_state_notifier'},
+  'riverpod_2': {
+    'prefer_notifier_over_state',
+  },
+  'riverpod_3': {
+    'avoid_riverpod_state_notifier',
+  },
   'rxdart': {
     'avoid_behavior_subject_last_value',
     'prefer_rxdart_for_complex_streams',
@@ -557,14 +582,18 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'sensors_plus_missing_on_error',
     'sensors_plus_no_sampling_period',
   },
-  'sensors_plus_4': {'prefer_sensors_event_stream'},
+  'sensors_plus_4': {
+    'prefer_sensors_event_stream',
+  },
   'share_plus': {
     'share_plus_empty_share_params',
     'share_plus_missing_position_origin',
     'share_plus_unchecked_result',
     'share_plus_uri_and_text_conflict',
   },
-  'share_plus_11': {'prefer_shareplus_instance'},
+  'share_plus_11': {
+    'prefer_shareplus_instance',
+  },
   'shared_preferences': {
     'avoid_auth_state_in_prefs',
     'avoid_prefs_for_large_data',
@@ -586,6 +615,10 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'apple_sign_in_unchecked_credential_state',
     'apple_sign_in_unhandled_authorization_exception',
     'apple_sign_in_unhandled_cancel',
+    'require_apple_signin_nonce',
+  },
+  'speech_to_text': {
+    'require_speech_stop_on_dispose',
   },
   'sqflite': {
     'avoid_sqflite_type_mismatch',
@@ -601,8 +634,16 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'avoid_url_launcher_simulator_tests',
     'prefer_url_launcher_fallback',
     'require_url_launcher_can_launch_check',
+    'require_url_launcher_mode',
   },
-  'webview_flutter': {'avoid_pre_v4_webview_widget'},
+  'uuid': {
+    'prefer_uuid_v4',
+  },
+  'webview_flutter': {
+    'avoid_pre_v4_webview_widget',
+    'avoid_webview_file_access',
+    'require_webview_ssl_error_handling',
+  },
   'workmanager': {
     'require_workmanager_constraints',
     'require_workmanager_for_background',
@@ -633,21 +674,16 @@ const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'dio': {'dio'},
   'dio_5': {'dio'},
   'drift': {'drift', 'drift_dev'},
+  'envied': {'envied'},
   'equatable': {'equatable'},
   'file_picker': {'file_picker'},
   'file_picker_10': {'file_picker'},
   'file_picker_12': {'file_picker'},
-  'firebase': {
-    'cloud_firestore',
-    'firebase_analytics',
-    'firebase_auth',
-    'firebase_core',
-    'firebase_messaging',
-    'firebase_storage',
-  },
+  'firebase': {'cloud_firestore', 'firebase_analytics', 'firebase_auth', 'firebase_core', 'firebase_messaging', 'firebase_storage'},
   'flame': {'flame'},
   'flutter_animate': {'flutter_animate'},
   'flutter_hooks': {'flutter_hooks'},
+  'flutter_keyboard_visibility': {'flutter_keyboard_visibility'},
   'flutter_map': {'flutter_map'},
   'flutter_svg': {'flutter_svg'},
   'flutter_svg_2': {'flutter_svg'},
@@ -656,6 +692,7 @@ const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'get_it': {'get_it'},
   'getx': {'get', 'getx'},
   'go_router_6': {'go_router'},
+  'google_fonts': {'google_fonts'},
   'google_maps_flutter': {'google_maps_flutter'},
   'google_sign_in': {'google_sign_in'},
   'google_sign_in_7': {'google_sign_in'},
@@ -669,7 +706,7 @@ const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'local_auth': {'local_auth'},
   'local_auth_3': {'local_auth'},
   'lottie': {'lottie'},
-  'package_specific': {},
+  'openai': {'chat_gpt_sdk'},
   'permission_handler': {'permission_handler'},
   'provider': {'provider'},
   'qr_scanner': {'mobile_scanner', 'qr_flutter'},
@@ -685,9 +722,11 @@ const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'share_plus_11': {'share_plus'},
   'shared_preferences': {'shared_preferences'},
   'sign_in_with_apple': {'sign_in_with_apple'},
+  'speech_to_text': {'speech_to_text'},
   'sqflite': {'sqflite'},
   'supabase': {'supabase', 'supabase_flutter'},
   'url_launcher': {'url_launcher'},
+  'uuid': {'uuid'},
   'webview_flutter': {'webview_flutter'},
   'workmanager': {'workmanager'},
   'youtube_player_flutter': {'youtube_player_flutter', 'youtube_player_iframe'},

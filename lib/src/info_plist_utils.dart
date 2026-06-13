@@ -247,19 +247,42 @@ class InfoPlistChecker {
   /// Uses substring checks on the plist XML (same approach as [hasKey]).
   /// Returns `true` when plist is missing so analysis does not block unknown
   /// projects.
-  bool get hasIosBackgroundAudioConfigured {
-    final c = _infoPlistContent;
-    if (c == null) return true;
-    return c.contains('<key>UIBackgroundModes</key>') &&
-        c.contains('>audio</string>');
-  }
+  bool get hasIosBackgroundAudioConfigured => _hasIosBackgroundMode('audio');
 
   /// True when UIBackgroundModes includes `location` (background location).
-  bool get hasIosBackgroundLocationConfigured {
+  bool get hasIosBackgroundLocationConfigured =>
+      _hasIosBackgroundMode('location');
+
+  /// Whether the `UIBackgroundModes` array contains [mode].
+  ///
+  /// The two background-mode strings are checked WITHIN the `UIBackgroundModes`
+  /// `<array>` value, not as independent substrings of the whole plist: a plist
+  /// declaring background `location` only, that also contains an unrelated
+  /// `<string>audio</string>` elsewhere, previously reported audio as
+  /// configured. Returns `true` when the plist is missing so analysis does not
+  /// block unknown projects (same convention as [hasKey]).
+  bool _hasIosBackgroundMode(String mode) {
     final c = _infoPlistContent;
     if (c == null) return true;
-    return c.contains('<key>UIBackgroundModes</key>') &&
-        c.contains('>location</string>');
+
+    final keyMatch = RegExp(
+      r'<\s*key\s*>\s*UIBackgroundModes\s*<\s*/\s*key\s*>',
+    ).firstMatch(c);
+    if (keyMatch == null) return false;
+
+    // The array is the value immediately following the key in the plist dict.
+    final afterKey = c.substring(keyMatch.end);
+    final arrayMatch = RegExp(
+      r'<\s*array\s*>(.*?)<\s*/\s*array\s*>',
+      dotAll: true,
+    ).firstMatch(afterKey);
+    if (arrayMatch == null) return false;
+
+    final arrayBody = arrayMatch.group(1) ?? '';
+    final modePattern = RegExp(
+      '<\\s*string\\s*>\\s*${RegExp.escape(mode)}\\s*<\\s*/\\s*string\\s*>',
+    );
+    return modePattern.hasMatch(arrayBody);
   }
 }
 

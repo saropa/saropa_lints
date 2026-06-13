@@ -278,6 +278,54 @@ class CommentPatterns {
     return false;
   }
 
+  /// Returns true when [content] reads as a wrapped prose sentence fragment
+  /// that merely *cites* a call, rather than being a standalone statement.
+  ///
+  /// A continuation line of an English sentence starts with a lowercase word
+  /// and carries several function words, e.g.
+  /// `this, formatNumberLocale(x, decimalPlaces: 25) crashed (formatDouble in`.
+  /// Such a line trips [hasStrongCodeIndicators] because it names a call, so
+  /// the strong-code carve-out in `prefer_no_commented_out_code` would re-flag
+  /// it even though the surrounding block is prose. This is the secondary veto:
+  /// a line that begins mid-sentence (lowercase) AND contains 2+ English
+  /// function words is prose wrapping a code reference, not dead code.
+  ///
+  /// A genuine commented-out statement (`return cache.get(key);`) starts with
+  /// a keyword/identifier, carries no function words, and is paren-balanced, so
+  /// it is not matched and stays flagged. Returns false if [content] is null or
+  /// empty.
+  static bool isWrappedProseFragment(String? content) {
+    if (content == null || content.isEmpty) return false;
+    // Real statements rarely begin with a lowercase continuation word; a
+    // mid-sentence prose fragment does. This gate alone is weak (keywords like
+    // `return`/`final` are lowercase too), so it pairs with the signals below.
+    if (!_lowercaseStartPattern.hasMatch(content)) return false;
+
+    // Signal 1: several English function words. A statement carries none; a
+    // sentence fragment carries several.
+    int proseWords = 0;
+    for (final String word in content.split(RegExp(r'\s+'))) {
+      // Strip surrounding punctuation so "this," and "(formatDouble" reduce to
+      // the bare word; otherwise a trailing comma would hide the function word.
+      final String bare = word.toLowerCase().replaceAll(
+        RegExp(r'^[^a-z]+|[^a-z]+$'),
+        '',
+      );
+      if (_proseIndicators.contains(bare)) {
+        proseWords++;
+        if (proseWords >= 2) return true;
+      }
+    }
+
+    // Signal 2: unbalanced parentheses. A wrapped prose line whose opening
+    // paren closes on a later physical line ("crashed (formatDouble in") is
+    // not a complete statement — a real one-line statement is paren-balanced.
+    // One function word plus a dangling paren is enough to call it prose.
+    final int opens = '('.allMatches(content).length;
+    final int closes = ')'.allMatches(content).length;
+    return proseWords >= 1 && opens != closes;
+  }
+
   /// Returns true if the comment contains special task markers (like TO-DO or FIX-ME).
   ///
   /// [content] should be the comment text with the "//" prefix removed and trimmed.

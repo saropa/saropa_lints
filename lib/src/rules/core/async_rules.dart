@@ -64,11 +64,8 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
 
       // Check the static type if available
       final DartType? type = target.staticType;
-      if (type != null) {
-        final String typeName = type.getDisplayString();
-        if (typeName.startsWith('Future')) {
-          reporter.atNode(node);
-        }
+      if (type != null && _staticTypeIsFuture(type)) {
+        reporter.atNode(node);
       }
     });
   }
@@ -123,22 +120,16 @@ class AvoidFutureToStringRule extends SaropaLintRule {
       if (target == null) return;
 
       final DartType? type = target.staticType;
-      if (type != null) {
-        final String typeName = type.getDisplayString();
-        if (typeName.startsWith('Future')) {
-          reporter.atNode(node);
-        }
+      if (type != null && _staticTypeIsFuture(type)) {
+        reporter.atNode(node);
       }
     });
 
     context.addInterpolationExpression((InterpolationExpression node) {
       final Expression expr = node.expression;
       final DartType? type = expr.staticType;
-      if (type != null) {
-        final String typeName = type.getDisplayString();
-        if (typeName.startsWith('Future')) {
-          reporter.atNode(node);
-        }
+      if (type != null && _staticTypeIsFuture(type)) {
+        reporter.atNode(node);
       }
     });
   }
@@ -1026,8 +1017,7 @@ class PreferReturnAwaitRule extends SaropaLintRule {
       final DartType? returnType = expression.staticType;
       if (returnType == null) return;
 
-      final String typeName = returnType.getDisplayString();
-      if (typeName.startsWith('Future<') || typeName == 'Future<dynamic>') {
+      if (_staticTypeIsFuture(returnType)) {
         reporter.atNode(node);
       }
     });
@@ -3319,27 +3309,21 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
       // Check if this is a method invocation that returns a Future
       if (expr is MethodInvocation) {
         final DartType? returnType = expr.staticType;
-        if (returnType != null) {
-          final String typeName = returnType.getDisplayString();
-          if (typeName.startsWith('Future<') || typeName == 'Future') {
-            // Skip safe patterns: subscription.cancel() in dispose(),
-            // or chains ending with .catchError()/.ignore()
-            if (_isSafeFireAndForget(expr, node)) {
-              return;
-            }
-            reporter.atNode(expr);
+        if (returnType != null && _staticTypeIsFuture(returnType)) {
+          // Skip safe patterns: subscription.cancel() in dispose(),
+          // or chains ending with .catchError()/.ignore()
+          if (_isSafeFireAndForget(expr, node)) {
+            return;
           }
+          reporter.atNode(expr);
         }
       }
 
       // Also check function invocations
       if (expr is FunctionExpressionInvocation) {
         final DartType? returnType = expr.staticType;
-        if (returnType != null) {
-          final String typeName = returnType.getDisplayString();
-          if (typeName.startsWith('Future<') || typeName == 'Future') {
-            reporter.atNode(expr);
-          }
+        if (returnType != null && _staticTypeIsFuture(returnType)) {
+          reporter.atNode(expr);
         }
       }
     });
@@ -5076,6 +5060,20 @@ bool _staticTypeIsAwaitable(DartType type) {
     (DartType t) =>
         t.isDartAsyncFuture || t.isDartAsyncFutureOr || t.isDartAsyncStream,
   );
+}
+
+/// True when static analysis can tell [type] is a [Future] or a class that
+/// implements/extends [Future] (e.g. `PostgrestBuilder implements Future<T>`).
+///
+/// Use this instead of `type.getDisplayString().startsWith('Future')`: the
+/// prefix test wrongly matches `FutureOr<T>` (whose display also starts with
+/// "Future" but which is NOT a Future — it has no `.then()`/`.ignore()` and
+/// `.toString()`/interpolation on it should not be flagged as a Future leak),
+/// and it MISSES Future subtypes whose own name does not begin with "Future".
+bool _staticTypeIsFuture(DartType type) {
+  if (type.isDartAsyncFuture) return true;
+  if (type is! InterfaceType) return false;
+  return type.allSupertypes.any((DartType t) => t.isDartAsyncFuture);
 }
 
 bool _isAnimationControllerTickerAwait(Expression expression) {

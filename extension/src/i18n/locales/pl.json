@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "Bezpieczeństwo · Jakość · Jakości.",
+    "searchPlaceholder": "Zasady filtracji... zasady filtrów.",
+    "empty": "Wszystko jasne  ⁇ Brak ustaleń, brak wyników.",
+    "liveTitle": "Na żywo  ⁇  Live  ⁇ aktualizacje w miarę edycji.",
+    "fetching": "Przyniesienie... przynioscie.",
+    "noOccurrences": "Brak zdarzeń Nie ma zdarzeń.",
+    "summaryFindings": "{count} znalezisk",
+    "summaryRules": "{count} reguł",
+    "more": "+{count} więcej więcej",
+    "wordErrors": "Błędy błędy błądów",
+    "wordWarnings": "ostrzeżenia, ostrzeżenie.",
+    "wordInfo": "Informacje o informacjach info info.",
+    "wordFiles": "Pliki plików pliki plikami.",
+    "gradeExcellent": "Doskonałe, doskonałe.",
+    "gradeGood": "Dobry dobry dobry.",
+    "gradeFair": "Fair, uczciwy i sprawiedliwy.",
+    "gradeWeak": "Słabe, słabość.",
+    "gradeSevere": "Bardzo ciężkie, bardzo poważne."
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇ {count} konfiguracja sugestii (s)",
+    "initMissing": {
+      "title": "Ustaw Saropa Lints (run init)",
+      "detail": "saropa_lints jest w pubspec, ale żadna konfiguracja analizatora nie została jeszcze podłączona."
+    },
+    "packAvailable": {
+      "title": "Włącz pakiet reguł {pack}.",
+      "detail": "{count} zasady dotyczące paczki w Twoim pubspec."
+    },
+    "enabledToast": "Włączono pakiet reguł {pack} w analysis_options.yaml",
+    "enableFailed": "Nie można włączyć pakietu reguł {pack}  ⁇ otwórz pulpit Rule Packs, aby go włączyć."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: jest to grupa, która zawiera {count} reguły pakietu sugestii (s) stosują się do tego projektu.",
+    "review": "Przegląd Review Review Review.",
+    "dismiss": "Zwolnienie z pracy.",
+    "reviewFailed": "Nie można otworzyć przeglądu pakietu reguł Saropa Lints. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "Wersja wersji.",
@@ -35,6 +74,15 @@
       "published": "Opublikowane Wydawnictwo opublikowano",
       "update": "Aktualizacja aktualizacji Update Update.",
       "blockedBy": "Blokada przez:",
+      "blockedVia": "{blocker} czapki {dep} {constraint} ({resolvable} rozstrzygalne, {latest} najnowsze)",
+      "blockedViaSdk": "przypięty przez {blocker} (Flutter SDK) dla {dep} (rozwiązywalny {resolvable}, najnowszy {latest})",
+      "constrained": "Zatrzymany, ograniczony.",
+      "constrainedBy": "Twój ograniczenie {constraint} to ogranicza ({resolvable} rozwiązywalne, {latest} najnowsze)",
+      "pinHeld": "Odbył się Held Held.",
+      "pinDoNotUse": "Nie używać nie należy stosować.",
+      "drift": "Drift międzyprojektów.",
+      "driftBehind": "Z tyłu: {siblings} (macie {own})",
+      "driftDiffers": "Różnice: różni się od siebie. {siblings} (macie {own})",
       "codeSize": "Rozmiar kodu Wielkość kodu",
       "archiveSize": "Wielkość archiwum Rozmiar archiwum",
       "bloat": "({rating}/10 nadmiar)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "Wyłączanie pełnej szerokości układu.",
     "sortBy": "Sortowanie według {column}",
     "expandRow": "Rozszerz wiersz Wielkość wiersza.",
+    "copyRow": "Kopiować rzęd wiersza.",
+    "comparisonDimension": "Metryka metryczna.",
     "collapseRow": "Rząd załamania się rzędu.",
     "selectAll": "Wybierz wszystkie wiersze.",
     "keyboardShortcuts": "Skróty klawiatury.",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints Język interfejsu użytkownika.",
       "placeholder": "Wybierz język dla paska bocznego i pulpitu.",
-      "auto": "Auto (podążaj za językiem wyświetlania VS Code)"
+      "auto": "Auto (podążaj za językiem wyświetlania VS Code)",
+      "coverage": "{pct}% przetłumaczone  ⁇ Rest shows w języku angielskim"
     },
     "reloadPrompt": "Język ustawiony na {locale}. Przeładować okno, aby zaktualizować tabliczki z paska bocznego i poleceń.",
     "reloadNow": "Przeładować teraz.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "Ostatni przebieg, ostatnia kolejka.",
+      "updatedPrefix": "Zaktualizowane Uaktualnione",
+      "refreshHint": "Kliknij, aby odświeżyć z analizatora.",
       "lastRunUnknown": "Ostatni bieg nieznany.",
       "noTimestampTitle": "Brak znacznika czasowego na violations.json.",
       "findingsAfterFilterTitle": "Całkowite wyniki po wyłączeniu reguły filtracji.",
@@ -327,7 +380,7 @@
       "refreshExtension": "Rozszerzenie Refresh jest rozszerzeniem odświeżającym.",
       "openPackageDashboard": "Otwórz tablicę rozdzielczą pakietu.",
       "openCodeHealth": "Otwarte Kodeks Zdrowie Open Code Health",
-      "openLintsConfig": "Otwórz Lints Config.",
+      "openLintsConfig": "Zarządzaj pakietami reguł.",
       "reloadFromDisk": "Przeładować z dysku.",
       "reloadFromDiskTitle": "Ponownie wyświetlić deskę rozdzielczą z ostatniego violations.json bez ponownego uruchamiania analizatora.",
       "reEnableDisabledRules": "Ponownie włącz wyłączone reguły...",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa Tablica kontrolna pakietów",
     "heroTitle": "Saropa Tablica kontrolna pakietów",
+    "detailPane": {
+      "aria": "Szczegóły dotyczące opakowania.",
+      "title": "Szczegóły dotyczące opakowania.",
+      "close": "Z bliska szczegółowo."
+    },
     "status": {
       "packagesCount": "{count} pakietów",
       "packagesBreakdown": "{direct} bezpośrednich, {transitive} przechodnich",
@@ -741,7 +799,7 @@
       "likesUnavailable": "pub.dev lubienia nie są dostępne.",
       "likesCount": "{count} pub.dev lubi",
       "downloadsUnavailable": "pub.dev 30-dniowe pobieranie nie jest dostępne.",
-      "downloadsCount": "{count} pobrań w ciągu ostatnich 30 dni",
+      "downloadsCount": "{count} pobrań w ciągu ostatnich 30 dni.",
       "sizeUnavailable": "Rozmiar nie jest dostępny od pub.dev.",
       "noVulnerabilities": "Brak znanych luk w zabezpieczeniach.",
       "licenseUnspecified": "Licencja nie określona na pub.dev",
@@ -801,8 +859,8 @@
       "showTransitives": "Pokaż transytywne zależności.",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (wspólne)",
-      "tooltipHeader": "{total} zależności przechodnie",
-      "tooltipHeaderShared": "{total} zależności przechodnie ({shared} współdzielone)",
+      "tooltipHeader": "{total} przejściowe deps.",
+      "tooltipHeaderShared": "{total} przejściowe deps ({shared} wspólne)",
       "sharedBadgeTitle": "{count} udostępniany innym pakietom.",
       "sharedBadge": "Podzielił się wspólnymi doświadczeniami.",
       "transitiveDepsHeading": "Zależności przejściowe ({count})"
@@ -1261,7 +1319,7 @@
       "codeSize": "Rozmiar kodu Wielkość kodu",
       "archive": "Archiwum archiwalne",
       "sizeLabel": "{label}: {size}",
-      "source": "Źródło: kod {code} · komentarze {comments} · pliki {files}",
+      "source": "Źródło: kod {code} · Komentarze {comments} · Pliki {files}",
       "replace": "Zastąpić: {summary}"
     },
     "update": {
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "Pakiet pakietu to pakiet opakowań.",
       "packages": "opakowaniach, paczkach."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "Wyjaśnij tę regułę."
+    },
+    "enableRule": {
+      "done": "Włączona reguła {ruleId}. Wykorzystaj analizę ponownego uruchomienia.",
+      "runAnalysis": "Przeprowadź analizę, przeprowadzić analizę.",
+      "noWorkspace": "Otwórz folder przestrzeni roboczej, aby włączyć regułę."
+    },
+    "openFinding": {
+      "noWorkspace": "Aby otworzyć znalezisko, otwórz folder przestrzeni roboczej.",
+      "notFound": "Nie można otworzyć {file}."
     }
   }
 }

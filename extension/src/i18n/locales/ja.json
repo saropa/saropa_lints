@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "セキュリティー · 品質",
+    "searchPlaceholder": "フィルタールール...",
+    "empty": "オーールクリアです. 発見はなし",
+    "liveTitle": "ライブ  ⁇  生放送 編集するにつれて更新されます.",
+    "fetching": "引き寄せ...取り寄せる",
+    "noOccurrences": "発生はなし.",
+    "summaryFindings": "{count} 件の検出",
+    "summaryRules": "{count} つのルール",
+    "more": "+{count} もっともっと",
+    "wordErrors": "誤り,エラーの発生が原因です.",
+    "wordWarnings": "警告や警告が付いている.",
+    "wordInfo": "情報は情報,情報が情報.",
+    "wordFiles": "ファイルは,ファイルのファイルを",
+    "gradeExcellent": "優秀で,とても優れている.",
+    "gradeGood": "いいね!いいよ,良いこと",
+    "gradeFair": "フェア・フェア・ファール 公平",
+    "gradeWeak": "弱く,弱いから",
+    "gradeSevere": "極度に重症で,"
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇  ____ (PH1)  ⁇ {count} 設定の提案 (s) を表示する",
+    "initMissing": {
+      "title": "Saropa Lints (ラン・init) をセットアップする",
+      "detail": "saropa_lintsは pubspec に入っていますが,分析器の構成はまだワイヤレス化されていません."
+    },
+    "packAvailable": {
+      "title": "{pack} ルールパックを有効にします.",
+      "detail": "{count} パッケージのルール あなたのパブスペックに"
+    },
+    "enabledToast": "analysis_options.yaml で {pack} ルールパックを有効にしました.",
+    "enableFailed": "{pack} ルールパックを有効にできない  ⁇ ルールパックダッシュボードを開いて,それを有効にします."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: ヒトの体内にある {count} ルールパック提案は,このプロジェクトに適用されます.",
+    "review": "レビューを重ねて見直す",
+    "dismiss": "解雇処分について",
+    "reviewFailed": "Saropa Lints ルール パックのレビューを開けませんでした。 {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "バージョンバージョン",
@@ -35,6 +74,15 @@
       "published": "出版された 発行された",
       "update": "アップデートアップデートの更新",
       "blockedBy": "ブロックされた by",
+      "blockedVia": "{blocker} キャップ {dep} {constraint} ({resolvable} は解決可能、{latest} は最新)",
+      "blockedViaSdk": "{blocker} (Flutter SDK) によって {dep} 用に固定 ({resolvable} は解決可能、{latest} 最新)",
+      "constrained": "拘束された,制約されている.",
+      "constrainedBy": "あなたの制約である {constraint} はこれを制限します ({resolvable} 解決可能,{latest} 最新)",
+      "pinHeld": "開催された Held",
+      "pinDoNotUse": "使用しないでください.",
+      "drift": "プロジェクト間でのドリフト",
+      "driftBehind": "後ろ: {siblings} ({own} を持っています)",
+      "driftDiffers": "相違点: {siblings} (あなたは {own} です)",
       "codeSize": "コードサイズ コードサイズは",
       "archiveSize": "アーカイブサイズ ファイルサイズ",
       "bloat": "({rating}/10 膨らみ) となる.",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "トーグリングの全幅レイアウトをトロールします.",
     "sortBy": "{column}によってソートする.",
     "expandRow": "拡張行を展開する.",
+    "copyRow": "コピー行をコピーする.",
+    "comparisonDimension": "メトリックメトリクスのことです.",
     "collapseRow": "崩壊列の倒壊は,",
     "selectAll": "すべての行を選択します.",
     "keyboardShortcuts": "キーボードショートカットです.",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints の UI 言語",
       "placeholder": "サイドバーとダッシュボードの言語を選ぶ",
-      "auto": "自動（VS Code の表示言語に従う）"
+      "auto": "自動（VS Code の表示言語に従う）",
+      "coverage": "{pct}% 翻訳された ⁇ rest showsは英語で放送されている."
     },
     "reloadPrompt": "言語を {locale} に設定する. サイドバーとコマンドのラベルを更新するためにウィンドウを再起動します.",
     "reloadNow": "今すぐ再充電する.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "最後の走行 ランニング",
+      "updatedPrefix": "更新されました.",
+      "refreshHint": "クリックすると,分析器からリフレッシュされます.",
       "lastRunUnknown": "最後の実行は不明.",
       "noTimestampTitle": "violations.jsonにタイムスタンプが付けられていない.",
       "findingsAfterFilterTitle": "ルール不有効フィルターによる合計結果は",
@@ -327,7 +380,7 @@
       "refreshExtension": "Refreshの拡張機能は,リフレッシュに追加されています.",
       "openPackageDashboard": "パッケージのダッシュボードを開く",
       "openCodeHealth": "オープン・コードの健康",
-      "openLintsConfig": "Open Lints の設定をクリックすると,",
+      "openLintsConfig": "ルールパックを管理する",
       "reloadFromDisk": "ディスクから再ロードする.",
       "reloadFromDiskTitle": "分析機を再起動せずに,最後の violations.json からダッシュボードを再レンダーします.",
       "reEnableDisabledRules": "禁用されたルールを再有効に...",
@@ -437,7 +490,7 @@
       "viewHidesHeading": "課題のビューは,表示が隠されています.",
       "viewHidesMetaActive": "活力のあるアクティブです.",
       "viewHidesMetaNone": "どれも,何もない.",
-      "noneInExport": "現在の `violations.json` エクスポートにはアナライザーの抑制はありません。無視または設定するベースラインを編集した後に分析を実行します。",
+      "noneInExport": "現在の `violations.json` エクスポートにはアナライザーの抑制はありません。無視または入力するベースラインを編集した後に分析を実行します。",
       "totalRow": "合計  ⁇  クリアフィルターとオープン 発見",
       "byRule": "規則として ({count})",
       "byFile": "ファイル別 ({count})",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa パッケージダッシュボード",
     "heroTitle": "Saropa パッケージダッシュボード",
+    "detailPane": {
+      "aria": "パッケージの詳細は,パッケージに記載されています.",
+      "title": "パッケージの詳細は,パッケージに記載されています.",
+      "close": "細部から詳細まで,クローズアップ."
+    },
     "status": {
       "packagesCount": "{count} 個のパッケージ",
       "packagesBreakdown": "直接 {direct}、推移的 {transitive}",
@@ -741,7 +799,7 @@
       "likesUnavailable": "pub.dev 気に入った人は利用できません.",
       "likesCount": "{count} pub.dev が好き",
       "downloadsUnavailable": "pub.dev 30日間のダウンロードは利用できません.",
-      "downloadsCount": "過去30日間の{count}件のダウンロード",
+      "downloadsCount": "{count} 過去30日間のダウンロード数",
       "sizeUnavailable": "サイズ: pub.devから入手できません.",
       "noVulnerabilities": "脆弱性については,知られていない.",
       "licenseUnspecified": "pub.devで指定されていないライセンス",
@@ -800,9 +858,9 @@
       "noTransitives": "移行的依存関係がない.",
       "showTransitives": "変数依存関係を示す.",
       "tooltipDep": "• {dep}",
-      "tooltipDepShared": "• {dep} (共有)",
-      "tooltipHeader": "{total} 件の推移的依存関係",
-      "tooltipHeaderShared": "{total} 件の推移的依存関係 ({shared} 件を共有)",
+      "tooltipDepShared": "• {dep} (共有) について",
+      "tooltipHeader": "{total} 移行的なデップス",
+      "tooltipHeaderShared": "{total} 推移性デプス ({shared} 共有)",
       "sharedBadgeTitle": "{count}は他のパッケージと共有されている.",
       "sharedBadge": "共有された,共有されたもの.",
       "transitiveDepsHeading": "移行的依存関係 ({count})"
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "パッケージのパッケージパケットは,",
       "packages": "パッケージのパッケージは,"
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "このルールを説明してください."
+    },
+    "enableRule": {
+      "done": "ルール {ruleId}.を有効にした 再実行分析を適用する.",
+      "runAnalysis": "分析を実行する.",
+      "noWorkspace": "ルールを有効にするには,ワークスペースのフォルダを開きます."
+    },
+    "openFinding": {
+      "noWorkspace": "検索を開くためにワークスペースのフォルダをオープンします.",
+      "notFound": "{file}.を開けることができませんでした."
     }
   }
 }

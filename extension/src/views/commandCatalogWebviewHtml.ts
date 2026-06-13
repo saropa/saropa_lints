@@ -724,7 +724,6 @@ function getStyles(): string {
 
     .frequent-tile .frequent-count {
       font-size: 0.74em;
-      color: var(--vscode-descriptionForeground);
       background: var(--vscode-badge-background);
       color: var(--vscode-badge-foreground);
       padding: 2px 7px;
@@ -776,10 +775,14 @@ function getStyles(): string {
       border: none;
       border-bottom: 1px solid color-mix(in srgb, var(--vscode-widget-border) 70%, transparent);
       text-align: left;
-      /* Sticky to the bottom of the toolbar band so the user always knows
-       * which category they are scrolling through. */
+      /* Sticky just below the toolbar band so the user always knows which
+       * category they are scrolling through. --toolbar-h is measured at
+       * runtime (the toolbar wraps, so its height is not constant); the 0px
+       * fallback degrades to top-of-pane if the script has not run yet.
+       * Without the offset the header pinned at top:0 and slid behind the
+       * higher-z-index toolbar, hiding the very label it exists to show. */
       position: sticky;
-      top: 0;
+      top: var(--toolbar-h, 0px);
       z-index: 2;
       /* Microlabel typography per §8.1: small, uppercase, letter-spaced —
        * structural depth, not a competing headline. */
@@ -1173,6 +1176,25 @@ function getScript(): string {
       const filterChipStrip = document.getElementById('filterChips');
       const filterChipsBody = document.getElementById('filterChipsBody');
       const clearFiltersBtn = document.getElementById('clearFilters');
+
+      // The sticky category sub-headers pin at top: var(--toolbar-h). Measure
+      // the toolbar's rendered height and publish it so they sit just below the
+      // toolbar rather than behind it. The toolbar wraps on narrow panes and
+      // grows when the filter-chip strip appears, so the height is not constant;
+      // a ResizeObserver re-measures on every such change (it coalesces to one
+      // call per frame), with a window-resize fallback for hosts that lack it.
+      const toolbarWrap = document.querySelector('.toolbar-wrap');
+      function syncToolbarHeight() {
+        if (!toolbarWrap) { return; }
+        const h = Math.round(toolbarWrap.getBoundingClientRect().height);
+        document.documentElement.style.setProperty('--toolbar-h', h + 'px');
+      }
+      if (toolbarWrap && typeof ResizeObserver === 'function') {
+        new ResizeObserver(syncToolbarHeight).observe(toolbarWrap);
+      } else {
+        window.addEventListener('resize', syncToolbarHeight);
+      }
+      syncToolbarHeight();
 
       const historySection = document.getElementById('historySection');
       const historyChips = document.getElementById('historyChips');

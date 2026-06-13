@@ -171,7 +171,6 @@ Map<String, Set<String>> applyRelocatedRulePacks(
 
 /// `{stem}_rules.dart` → pack id (e.g. dio_rules → dio).
 String packIdForStem(String stem) {
-  if (stem == 'package_specific_rules') return 'package_specific';
   if (stem.endsWith('_rules')) {
     return stem.prefix(stem.length - '_rules'.length);
   }

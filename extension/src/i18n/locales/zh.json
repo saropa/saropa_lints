@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "安全 · 质量 · 品质",
+    "searchPlaceholder": "过 ⁇ 器规则...过 ⁇ 的规则是什么",
+    "empty": "现在一切都清晰了. 没有发现任何结果.",
+    "liveTitle": "现场 ⁇  在线播放 更新随着您编辑的时间进行.",
+    "fetching": "⁇ ...是为了拿来.",
+    "noOccurrences": "没有发生任何事件.",
+    "summaryFindings": "{count} 个发现",
+    "summaryRules": "{count} 个规则",
+    "more": "+{count}更多的",
+    "wordErrors": "错误的错误是因为错误.",
+    "wordWarnings": "警告和警告是可以做到的.",
+    "wordInfo": "信息的信息是关于信息.",
+    "wordFiles": "文件是指文件的文件.",
+    "gradeExcellent": "这是一本非常优秀的书,很棒.",
+    "gradeGood": "很好,非常好的",
+    "gradeFair": "公平的公平的公正,是为了",
+    "gradeWeak": "弱小的,是因为他们很软弱.",
+    "gradeSevere": "非常严重的很严重."
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇  这是一个很好的方法. {count}配置建议 (s) 的",
+    "initMissing": {
+      "title": "设置 Saropa Lints (运行 init) 的时间.",
+      "detail": "saropa_lints在pubspec中,但没有分析器配置尚未连接."
+    },
+    "packAvailable": {
+      "title": "启用 {pack} 的规则包.",
+      "detail": "{count}规则,在你的酒吧的包裹."
+    },
+    "enabledToast": "在 analysis_options.yaml 中启用了 {pack} 规则包",
+    "enableFailed": "无法启用 {pack} 规则包 ⁇ 打开规则包仪表板,启用它."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: 已经是 {count}规则包建议 (s) 适用于本项目.",
+    "review": "审查 评审 评论",
+    "dismiss": "解雇了,这是一个很好的方法.",
+    "reviewFailed": "无法打开 Saropa Lints 规则包审阅。 {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "版本的版本,可以说是.",
@@ -35,6 +74,15 @@
       "published": "出版 发表 发布",
       "update": "更新的时间: Update",
       "blockedBy": "通过被阻止.",
+      "blockedVia": "{blocker} 上限 {dep} {constraint}（{resolvable} 可解析，{latest} 最新）",
+      "blockedViaSdk": "由 {blocker} (Flutter SDK) 为 {dep} 固定（{resolvable} 可解析，{latest} 最新）",
+      "constrained": "受到限制,受制于",
+      "constrainedBy": "你的{constraint}约束限制了这个 ({resolvable}可解决, {latest}最新)",
+      "pinHeld": "举行了,举行了.",
+      "pinDoNotUse": "不要使用.",
+      "drift": "跨项目推移的漂流",
+      "driftBehind": "后面：{siblings}（你有{own}）",
+      "driftDiffers": "不同：{siblings}（您有 {own}）",
       "codeSize": "代码大小 代碼尺寸",
       "archiveSize": "档案大小 存档的大小",
       "bloat": "({rating}/10 膨胀) 这是一个很好的方法.",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "切换全宽布局的配置.",
     "sortBy": "按{column}进行排序.",
     "expandRow": "扩展行 的一行.",
+    "copyRow": "复制行列的副本",
+    "comparisonDimension": "计量法是指一个标准的.",
     "collapseRow": "崩 ⁇ 行是一个倒塌的行.",
     "selectAll": "选择所有行.",
     "keyboardShortcuts": "键盘快捷方式的方法",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints 界面语言",
       "placeholder": "选择侧边栏和仪表板的语言",
-      "auto": "自动（跟随 VS Code 显示语言）"
+      "auto": "自动（跟随 VS Code 显示语言）",
+      "coverage": "{pct}%翻译了  ⁇ 休息节目以英语进行."
     },
     "reloadPrompt": "语言设置为 {locale}. 重新加载窗口以更新侧边 ⁇ 和命令标签.",
     "reloadNow": "现在重新加载.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "最后一个运行 最后一次运行",
+      "updatedPrefix": "更新了,已经更新.",
+      "refreshHint": "点击更新从分析仪进行刷新.",
       "lastRunUnknown": "最后一次运行未知 无人知道",
       "noTimestampTitle": "在 violations.json 上没有时间 ⁇ .",
       "findingsAfterFilterTitle": "在禁用规则过 ⁇ 器后总的发现",
@@ -327,7 +380,7 @@
       "refreshExtension": "更新扩展程序的刷新",
       "openPackageDashboard": "打开\"包装仪表板\",可以使用",
       "openCodeHealth": "开放代码健康的公共卫生",
-      "openLintsConfig": "打开Lints配置程序可以使用.",
+      "openLintsConfig": "管理规则包的管理",
       "reloadFromDisk": "从磁盘重新加载.",
       "reloadFromDiskTitle": "从上一个 violations.json 重新 ⁇ 染仪表板,而不需要重新运行分析器.",
       "reEnableDisabledRules": "重新启用禁用的规则...",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa 包装仪表板 在",
     "heroTitle": "Saropa 包装仪表板 在",
+    "detailPane": {
+      "aria": "包装细节 详情",
+      "title": "包装细节 详情",
+      "close": "接近细节的近距离详情"
+    },
     "status": {
       "packagesCount": "{count} 个包",
       "packagesBreakdown": "{direct} 个直接，{transitive} 个传递",
@@ -800,8 +858,8 @@
       "noTransitives": "没有过渡性依赖关系.",
       "showTransitives": "显示过渡性依赖关系.",
       "tooltipDep": "• {dep}",
-      "tooltipDepShared": "• {dep}（共享）",
-      "tooltipHeader": "{total} 个传递依赖",
+      "tooltipDepShared": "• {dep} (共享) 的一个",
+      "tooltipHeader": "{total} 过渡式的下降",
       "tooltipHeaderShared": "{total} 传递依赖（{shared} 共享）",
       "sharedBadgeTitle": "{count}与其他包共享.",
       "sharedBadge": "共同的共享,是我们共同的.",
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "包装的方法是:一个封装.",
       "packages": "包装的东西是可以收藏的."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "解释一下这个规则."
+    },
+    "enableRule": {
+      "done": "启用规则 {ruleId}. . 在此处 应用重复运行分析.",
+      "runAnalysis": "运行分析,进行分析.",
+      "noWorkspace": "打开一个工作区文件 ⁇ ,以启用规则."
+    },
+    "openFinding": {
+      "noWorkspace": "打开一个工作区文件 ⁇ ,以打开发现.",
+      "notFound": "无法打开 {file}.没有了"
     }
   }
 }

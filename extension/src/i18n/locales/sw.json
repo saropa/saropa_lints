@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "Usalama · Ubora wa ubora.",
+    "searchPlaceholder": "Kanuni za kuchuja... sheria za kufuta.",
+    "empty": "All clear  ⁇   ⁇ hakuna matokeo ya kugundua.",
+    "liveTitle": "Live  ⁇  Kuishi updates kama wewe hariri kuhariri.",
+    "fetching": "Kuleta ... kuleta...",
+    "noOccurrences": "Hakuna matukio yoyote.",
+    "summaryFindings": "matokeo {count}",
+    "summaryRules": "sheria {count}",
+    "more": "+{count} zaidi zaidi.",
+    "wordErrors": "makosa ya kosa makosa makosa makosa.",
+    "wordWarnings": "onyo maonyo tahadhari.",
+    "wordInfo": "Habari za habari habari habari info.",
+    "wordFiles": "files file files files files faili",
+    "gradeExcellent": "Nzuri sana, nzuri sana.",
+    "gradeGood": "Nzuri nzuri nzuri nzuri.",
+    "gradeFair": "Fair, fair kwa kweli.",
+    "gradeWeak": "Weak weak dhaifu.",
+    "gradeSevere": "Kubwa sana kali Sana."
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇   ⁇ {count} config pendekezo (s)",
+    "initMissing": {
+      "title": "Weka Saropa Lints (run init) ili kuanzisha.",
+      "detail": "saropa_lints iko katika pubspec lakini hakuna config ya analyzer iliyounganishwa bado."
+    },
+    "packAvailable": {
+      "title": "Kuwezesha {pack} sheria pakiti.",
+      "detail": "{count} sheria za kifurushi katika vipimo vyako vya duka."
+    },
+    "enabledToast": "Imewezesha pakiti ya sheria {pack} katika analysis_options.yamll.",
+    "enableFailed": "Haikuweza kuwezesha pakiti ya sheria {pack}  ⁇ fungua dashibodi ya Vifurushi vya Kanuni ili kuiwezesha."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: _PH1_: - Ni aina ya kiini cha mwili. {count} mapendekezo ya pakiti za sheria (s) yanahusu mradi huu.",
+    "review": "Mapitio ya Ukaguzi wa Uhakiki.",
+    "dismiss": "Fungua kazi.",
+    "reviewFailed": "Haikuweza kufungua ukaguzi wa pakiti ya sheria ya Saropa Lints. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION Version ya maandishi.",
@@ -35,6 +74,15 @@
       "published": "Imechapishwa Ilichapishwa Iliyochapishwa.",
       "update": "Update update update ya mambo.",
       "blockedBy": "Imefungwa na Blocked by",
+      "blockedVia": "{blocker} kofia {dep} {constraint} ({resolvable} inaweza kutatuliwa, {latest} hivi karibuni zaidi)",
+      "blockedViaSdk": "imebandikwa na {blocker} (Flutter SDK) kwa {dep} ({resolvable} inayoweza kutatuliwa, {latest} ya hivi punde zaidi)",
+      "constrained": "Imefungwa kwa vizuizi.",
+      "constrainedBy": "kizuizi yako {constraint} caps hii ({resolvable} kutatuliwa, {latest} karibuni)",
+      "pinHeld": "Held held uliofanyika.",
+      "pinDoNotUse": "Usitumie Usiitumie.",
+      "drift": "Mtiririko wa mradi-msalaba unakwenda.",
+      "driftBehind": "Nyuma: {siblings} (una {own})",
+      "driftDiffers": "Inatofautiana: {siblings} (una {own})",
       "codeSize": "Kiwango cha Code Size Code Size",
       "archiveSize": "Ukubwa wa faili ya kumbukumbu ukubwa.",
       "bloat": "({rating}/10 uvimbe)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "Toggle full-width layout ya mpangilio wa upana.",
     "sortBy": "Chagua kwa {column}",
     "expandRow": "Kuongeza safu ya mstari kupanua.",
+    "copyRow": "Nakala safu ya nakala.",
+    "comparisonDimension": "Metric ya metriki.",
     "collapseRow": "Collapse row mstari wa kuanguka.",
     "selectAll": "Chagua safu zote chagua mistari yote.",
     "keyboardShortcuts": "Njia za mkato za kibodi.",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints Lugha ya UI lugha ya UI.",
       "placeholder": "Chagua lugha ya ubao wa kando na dashibodi.",
-      "auto": "Auto (kufuata VS Code lugha ya kuonyesha)"
+      "auto": "Auto (kufuata VS Code lugha ya kuonyesha)",
+      "coverage": "{pct}% kutafsiriwa  ⁇ mapumziko inaonyesha kwa Kiingereza."
     },
     "reloadPrompt": "Lugha iliyowekwa kwa {locale}. Pakia tena dirisha ili kusasisha ubao wa kando na lebo za amri.",
     "reloadNow": "Reload sasa hivi.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "Mwisho wa mwisho, last run.",
+      "updatedPrefix": "Updated Imeboreshwa.",
+      "refreshHint": "Bonyeza ili kuburudisha kutoka kwa mchanganuzi.",
       "lastRunUnknown": "Mwisho wa kukimbia haijulikani.",
       "noTimestampTitle": "Hakuna timestamp kwenye violations.json.",
       "findingsAfterFilterTitle": "Jumla ya matokeo baada ya kuzima-sheria filter filter.",
@@ -327,7 +380,7 @@
       "refreshExtension": "Refresh extension ya kutafakari upya.",
       "openPackageDashboard": "Fungua Dashibodi ya kifurushi cha Package.",
       "openCodeHealth": "Open Code Afya ya afya.",
-      "openLintsConfig": "Open Lints Config configure kwa ajili ya matumizi.",
+      "openLintsConfig": "Dhibiti Rule Packs Pack.",
       "reloadFromDisk": "Reload kutoka diski disk.",
       "reloadFromDiskTitle": "Render tena dashibodi kutoka mwisho violations.json bila kuendesha upya analyzer.",
       "reEnableDisabledRules": "Re-enable disabled rules... re-enabling disabled rule.... tena kuwezesha sheria zilizozimwa ...",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa Dashibodi ya Kifurushi cha Package",
     "heroTitle": "Saropa Dashibodi ya Kifurushi cha Package",
+    "detailPane": {
+      "aria": "Maelezo ya kifurushi Package Detail.",
+      "title": "Maelezo ya kifurushi Package Detail.",
+      "close": "Karibu sana kwa undani."
+    },
     "status": {
       "packagesCount": "vifurushi {count}",
       "packagesBreakdown": "{direct} ya moja kwa moja, {transitive} badilishi",
@@ -573,7 +631,7 @@
       "packages": "Pakiti za Package Packages",
       "projectGrade": "Kiwango cha Pakiti ya Mradi Daraja la Mfuko wa Miradi.",
       "totalSize": "Ukubwa wa Jumla*",
-      "gradeTooltip": "Mradi wa daraja la {avgGrade}\nAlama ya wastani: {avgScore}/100\nVifurushi: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
+      "gradeTooltip": "Kiwango cha mradi {avgGrade}\nAlama ya wastani: {avgScore}/100\nVifurushi: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "Vibrant hai, yenye nguvu.",
       "stableTitle": "Stable imara thabiti.",
       "outdatedTitle": "Imepitwa na wakati imepitwa kwa muda.",
@@ -588,7 +646,7 @@
       "caveatLine2": "Vipimo vya shughuli: 90d = stale, 180d = dormant (kuweka + kufungua muda)."
     },
     "breakdown": {
-      "title": "Kwa nini daraja {grade}? - {avgScore}/100 wastani katika vifurushi vya {pkgCount}",
+      "title": "Kwa nini grade {grade}?  ⁇ {avgScore}/100 wastani katika vifurushi vya {pkgCount}.",
       "hint": "Bonyeza ili kupanua.",
       "distributionHeading": "Usambazaji wa usambazaji.",
       "signalsHeading": "Ishara za hatari zinazovuta alama chini.",
@@ -625,7 +683,7 @@
       "saveUpgradeLabel": "Hifadhi Ripoti ya Upgrade Report.",
       "resetViewTitle": "Rudisha upya vichungi, chagua na uhifadhi hali ya mtazamo wa kuona.",
       "resetViewLabel": "Kuweka upya mtazamo wa kutazama upya.",
-      "rescanTitle": "Changanua tena vifurushi - hufuta kashe ya pub.dev na kuleta matoleo tena",
+      "rescanTitle": "Pakiti za skanning tena  ⁇  pakiti za rescan hufuta cache ya pub.dev na hupata matoleo tena.",
       "rescanLabel": "Rescan upya Scan tena.",
       "openOtherTitle": "Fungua mradi mwingine wa pubspec.yaml katika dirisha jipya kwa skana ya Vibrancy.",
       "openOtherLabel": "Open Project... mradi wa wazi.",
@@ -1099,7 +1157,7 @@
     },
     "script": {
       "activeFiltersLabel": "Vichungi vya kazi: vichujio vyenye nguvu:",
-      "searchChip": "tafuta: \"{q}\"",
+      "searchChip": "search: utafutaji: \"{q}\" ilitumwa zaidi ya mwaka mmoja uliopita",
       "flagChip": "bendera: {flag}",
       "removeAria": "Ondoa {key}.",
       "clearAll": "Fungua kila kitu wazi.",
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "Package ya package package.",
       "packages": "pakiti za vifurushi vya bidhaa."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "Eleza sheria hii."
+    },
+    "enableRule": {
+      "done": "Sheria iliyowezeshwa {ruleId}. . Uchambuzi wa kurudia utatumika.",
+      "runAnalysis": "Run uchambuzi kukimbia.",
+      "noWorkspace": "Fungua folda ya eneo la kazi ili kuwezesha sheria."
+    },
+    "openFinding": {
+      "noWorkspace": "Fungua folda ya eneo la kazi kufungua kutafuta.",
+      "notFound": "Haikuweza kufungua {file}."
     }
   }
 }

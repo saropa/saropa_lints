@@ -100,6 +100,10 @@ Future<void> main(List<String> args) async {
   final perfAgg = cli.performance ? PerfGravityAggregator() : null;
 
   final shard = File(p.join(outputDir, 'files.ndjson')).openWrite();
+  // Periodically flush the NDJSON sink so its buffer cannot grow with the file
+  // count on a large project — the scan awaits onRow, which gives the flush
+  // real backpressure. Flushing every row would be needlessly slow.
+  var rowsWritten = 0;
   final agg = await runSizeScan(
     SizeScanOptions(
       projectPath: cli.path,
@@ -115,7 +119,12 @@ Future<void> main(List<String> args) async {
       coupling: importCoupling,
       complexityCache: cacheIn,
       cacheSink: cacheSink,
-      onRow: (row) => shard.writeln(jsonEncode(row.toJson())),
+      onRow: (row) async {
+        shard.writeln(jsonEncode(row.toJson()));
+        if (++rowsWritten % 256 == 0) {
+          await shard.flush();
+        }
+      },
     ),
   );
   await shard.flush();

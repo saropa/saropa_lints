@@ -365,3 +365,95 @@ class PreferUrlLauncherFallbackRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when launchUrl() is called without specifying LaunchMode.
+///
+/// Since: v2.3.2 | Updated: v4.13.0 | Rule version: v2
+///
+/// Alias: url_launcher_mode, specify_launch_mode, launch_mode_explicit
+///
+/// ## Why This Matters
+///
+/// Without explicit LaunchMode, URL launching behavior varies by platform:
+/// - **iOS**: Opens in-app Safari View Controller by default
+/// - **Android**: Opens external browser by default
+/// - **Web**: Opens in same tab by default
+///
+/// Specifying mode ensures consistent, predictable behavior across all platforms.
+///
+/// ## Example
+///
+/// ### BAD:
+/// ```dart
+/// // Behavior differs between iOS, Android, and web
+/// await launchUrl(Uri.parse('https://example.com'));
+/// ```
+///
+/// ### GOOD:
+/// ```dart
+/// await launchUrl(
+///   Uri.parse('https://example.com'),
+///   mode: LaunchMode.externalApplication, // Always open external browser
+/// );
+/// ```
+///
+/// ## LaunchMode Options
+///
+/// | Mode | Behavior |
+/// |------|----------|
+/// | `platformDefault` | Platform decides (inconsistent) |
+/// | `inAppWebView` | In-app browser (keeps user in app) |
+/// | `inAppBrowserView` | In-app browser with native UI |
+/// | `externalApplication` | External browser/app |
+/// | `externalNonBrowserApplication` | External app only (not browser) |
+class RequireUrlLauncherModeRule extends SaropaLintRule {
+  RequireUrlLauncherModeRule() : super(code: _code);
+
+  /// Medium impact - inconsistent behavior, but not a crash.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_url_launcher_mode',
+    '[require_url_launcher_mode] launchUrl() without mode parameter has inconsistent behavior across platforms. Without explicit LaunchMode, URL launching behavior varies by platform: - iOS: Opens in-app Safari View Controller by default - Android: Opens external browser by default - Web: Opens in same tab by default. {v2}',
+    correctionMessage:
+        'Add mode parameter (e.g., LaunchMode.externalApplication) for consistent behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'launchUrl') return;
+
+      // Verify first argument is a Uri (url_launcher signature)
+      final NodeList<Expression> args = node.argumentList.arguments;
+      if (args.isEmpty) return;
+
+      // Check if mode is specified
+      bool hasMode = false;
+      for (final Expression arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'mode') {
+          hasMode = true;
+          break;
+        }
+      }
+
+      if (!hasMode) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}

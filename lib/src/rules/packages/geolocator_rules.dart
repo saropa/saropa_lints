@@ -484,3 +484,153 @@ class PreferGeolocationCoarseLocationRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when Geolocator location stream doesn't specify distanceFilter.
+///
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v2
+///
+/// Without distanceFilter, the location stream fires on every tiny GPS update,
+/// which drains battery and may cause performance issues. Setting a reasonable
+/// distanceFilter reduces updates to only meaningful location changes.
+///
+/// **BAD:**
+/// ```dart
+/// // Fires constantly, even for 1-meter movements - battery drain!
+/// Geolocator.getPositionStream().listen((position) {
+///   updateMap(position);
+/// });
+///
+/// Geolocator.getPositionStream(
+///   locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
+/// ).listen((position) {});
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Only fires when user moves 10+ meters
+/// Geolocator.getPositionStream(
+///   locationSettings: LocationSettings(
+///     accuracy: LocationAccuracy.high,
+///     distanceFilter: 10, // meters
+///   ),
+/// ).listen((position) {
+///   updateMap(position);
+/// });
+/// ```
+class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
+  PreferGeolocatorDistanceFilterRule() : super(code: _code);
+
+  /// High impact - affects battery life significantly.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_geolocator_distance_filter',
+    '[prefer_geolocator_distance_filter] Location stream subscription without a distanceFilter fires continuous GPS updates at the maximum sensor rate regardless of actual movement. This causes excessive battery drain, unnecessary network requests to location services, and high CPU usage from processing redundant position updates that provide no new information. {v2}',
+    correctionMessage:
+        'Add distanceFilter to LocationSettings (e.g., distanceFilter: 10) to receive updates only when the user moves a meaningful distance, reducing battery and CPU usage.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'getPositionStream') return;
+
+      // Check if it's a Geolocator call
+      final Expression? target = node.target;
+      if (target == null) return;
+
+      final String targetSource = target.toSource();
+      if (!RegExp(r'\bGeolocator\b').hasMatch(targetSource)) {
+        return;
+      }
+
+      // Look for locationSettings parameter
+      Expression? locationSettingsArg;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'locationSettings') {
+          locationSettingsArg = arg.expression;
+          break;
+        }
+      }
+
+      // No locationSettings - definitely missing distanceFilter
+      if (locationSettingsArg == null) {
+        reporter.atNode(node.methodName, code);
+        return;
+      }
+
+      // Check if LocationSettings has distanceFilter
+      if (locationSettingsArg is InstanceCreationExpression) {
+        final bool hasDistanceFilter = locationSettingsArg
+            .argumentList
+            .arguments
+            .any((arg) {
+              if (arg is NamedExpression) {
+                return arg.name.label.name == 'distanceFilter';
+              }
+              return false;
+            });
+
+        if (!hasDistanceFilter) {
+          reporter.atNode(locationSettingsArg);
+        }
+      }
+    });
+
+    // Also check for direct LocationSettings construction
+    context.addInstanceCreationExpression((node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Check for various LocationSettings types from geolocator
+      if (typeName != 'LocationSettings' &&
+          typeName != 'AndroidSettings' &&
+          typeName != 'AppleSettings') {
+        return;
+      }
+
+      // Check if parent context is a getPositionStream call
+      AstNode? current = node.parent;
+      bool inPositionStream = false;
+      while (current != null) {
+        if (current is MethodInvocation) {
+          if (current.methodName.name == 'getPositionStream') {
+            inPositionStream = true;
+            break;
+          }
+        }
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      if (!inPositionStream) return;
+
+      // Check for distanceFilter parameter
+      final bool hasDistanceFilter = node.argumentList.arguments.any((arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'distanceFilter';
+        }
+        return false;
+      });
+
+      if (!hasDistanceFilter) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+}

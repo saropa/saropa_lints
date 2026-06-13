@@ -144,11 +144,14 @@ export function l10n(
     options?: Readonly<{ locale?: string; fallback?: string }>,
 ): string {
     const locale = normalizeLocale(options?.locale ?? activeLocale);
+    // Use `!== undefined`, not truthiness: lookupKey returns `string | undefined`,
+    // so an intentionally empty translation ('') is a valid value. Truthiness
+    // discarded it and fell through to English (or the raw key) instead.
     const fromLocale = lookupKey(catalogs[locale], key);
-    if (fromLocale) return interpolate(fromLocale, params);
+    if (fromLocale !== undefined) return interpolate(fromLocale, params);
 
     const fromDefault = lookupKey(catalogs[DEFAULT_LOCALE], key);
-    if (fromDefault) return interpolate(fromDefault, params);
+    if (fromDefault !== undefined) return interpolate(fromDefault, params);
 
     return options?.fallback ?? key;
 }

@@ -544,6 +544,11 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  // Gate to Hive/Isar model files. The annotation checks below already self-gate
+  // on `@HiveType`/`@collection`, but this skips unrelated files entirely.
+  @override
+  Set<String>? get requiredPatterns => const <String>{'hive', 'isar'};
+
   static const LintCode _code = LintCode(
     'require_database_migration',
     '[require_database_migration] Database models must support versioned migrations to handle schema changes safely. Without migration logic, updates to the schema can break data, cause runtime errors, and result in data loss or corruption. Versioned migrations are required for any persistent storage solution to remain forward-compatible across releases. {v4}',
@@ -655,6 +660,13 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  // Gate to embedded-DB files. The query/source heuristics below (`.users`,
+  // `.items`, `.products`, `where(`) otherwise match ordinary in-memory
+  // collection access in projects that use no database at all.
+  @override
+  Set<String>? get requiredPatterns =>
+      const <String>{'isar', 'realm', 'objectbox'};
 
   static const LintCode _code = LintCode(
     'require_database_index',
@@ -916,6 +928,13 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  // Gate to files that reference Firebase. `logEvent(name:)` is also exposed by
+  // non-Firebase analytics SDKs (Mixpanel, Segment, Amplitude) whose naming
+  // rules differ; without this gate the rule fired at ERROR on their valid
+  // calls. Mirrors the other Firebase rules' `requiredPatterns` gate.
+  @override
+  Set<String>? get requiredPatterns => const <String>{'firebase'};
 
   static const LintCode _code = LintCode(
     'incorrect_firebase_event_name',
@@ -3402,6 +3421,114 @@ class RequireFirestoreSecurityRulesRule extends SaropaLintRule {
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (node.prefix.name != 'FirebaseFirestore') return;
       if (node.identifier.name != 'instance') return;
+      reporter.atNode(node);
+    });
+  }
+}
+
+/// Warns when analytics calls lack error handling.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Analytics SDK calls (logEvent, setUserProperty, setCurrentScreen) can
+/// throw when the SDK is not initialized, the network is unavailable, or
+/// event parameters exceed limits. Without try-catch, a failed analytics
+/// call crashes the entire app — analytics should never break the user
+/// experience.
+///
+/// **BAD:**
+/// ```dart
+/// await analytics.logEvent(name: 'purchase', parameters: data);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// try {
+///   await analytics.logEvent(name: 'purchase', parameters: data);
+/// } catch (e) {
+///   // Analytics failure should not crash the app
+/// }
+/// ```
+class RequireAnalyticsErrorHandlingRule extends SaropaLintRule {
+  RequireAnalyticsErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_analytics_error_handling',
+    '[require_analytics_error_handling] Analytics method call without error handling. Analytics SDKs (Firebase Analytics, Mixpanel, Amplitude) can throw when the SDK is not initialized, the network is unavailable, or event parameters are invalid. A failed analytics call should never crash the app or interrupt user workflows — wrap analytics calls in try-catch and silently log failures instead. {v1}',
+    correctionMessage:
+        'Wrap the analytics call in a try-catch block. Log the failure for debugging but do not rethrow — analytics errors should be silent.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  /// Common analytics method names across SDKs.
+  static const Set<String> _analyticsMethods = <String>{
+    'logEvent',
+    'setCurrentScreen',
+    'setUserProperty',
+    'setUserId',
+    'logScreenView',
+    'logPurchase',
+    'logSignUp',
+    'logLogin',
+    'logShare',
+    'logSearch',
+    'track',
+    'identify',
+    'screen',
+    'flush',
+  };
+
+  /// Target name patterns that indicate analytics instances.
+  static const Set<String> _analyticsTargets = <String>{
+    'analytics',
+    'Analytics',
+    'mixpanel',
+    'Mixpanel',
+    'amplitude',
+    'Amplitude',
+    'segment',
+    'Segment',
+    'tracker',
+    'Tracker',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_analyticsMethods.contains(node.methodName.name)) return;
+
+      // Check if target looks like an analytics instance
+      final String? targetSource = node.target?.toSource();
+      if (targetSource == null) return;
+
+      final bool isAnalytics = _analyticsTargets.any(
+        (t) => RegExp(r'\b' + RegExp.escape(t) + r'\b').hasMatch(targetSource),
+      );
+      if (!isAnalytics) return;
+
+      // Check if wrapped in try-catch
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is TryStatement) return; // Has try-catch, OK
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
       reporter.atNode(node);
     });
   }

@@ -243,6 +243,8 @@
     "toggleFullWidth": "Toggle full-width layout",
     "sortBy": "Sort by {column}",
     "expandRow": "Expand row",
+    "copyRow": "Copy row",
+    "comparisonDimension": "Metric",
     "collapseRow": "Collapse row",
     "selectAll": "Select all rows",
     "keyboardShortcuts": "Keyboard shortcuts",
@@ -378,7 +380,7 @@
       "refreshExtension": "Refresh extension",
       "openPackageDashboard": "Open Package dashboard",
       "openCodeHealth": "Open Code Health",
-      "openLintsConfig": "Open Lints Config",
+      "openLintsConfig": "Manage Rule Packs",
       "reloadFromDisk": "Reload from disk",
       "reloadFromDiskTitle": "Re-render the dashboard from the last violations.json without re-running the analyzer.",
       "reEnableDisabledRules": "Re-enable disabled rules…",
@@ -596,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa Package Dashboard",
     "heroTitle": "Saropa Package Dashboard",
+    "detailPane": {
+      "aria": "Package detail",
+      "title": "Package detail",
+      "close": "Close detail"
+    },
     "status": {
       "packagesCount": "{count} packages",
       "packagesBreakdown": "{direct} direct, {transitive} transitive",
@@ -1381,6 +1388,20 @@
     "noun": {
       "package": "package",
       "packages": "packages"
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "Explain this rule"
+    },
+    "enableRule": {
+      "done": "Enabled rule {ruleId}. Re-run analysis to apply.",
+      "runAnalysis": "Run analysis",
+      "noWorkspace": "Open a workspace folder to enable a rule."
+    },
+    "openFinding": {
+      "noWorkspace": "Open a workspace folder to open a finding.",
+      "notFound": "Could not open {file}."
     }
   }
 }

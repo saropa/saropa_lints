@@ -114,6 +114,36 @@ class TestDependencyImportStatus(unittest.TestCase):
         result = self._fn(self.root)
         self.assertEqual(result["missing"], {})
 
+    def test_dependencies_header_with_trailing_comment_is_parsed(self) -> None:
+        # Regression: a `dependencies:` header carrying a trailing comment is
+        # valid YAML, but the old exact `^dependencies:\\s*$` match missed it,
+        # so the parser found ZERO declared deps and the gate reported every
+        # shipped import as undeclared -> a false hard-block of the release.
+        (self.root / "pubspec.yaml").write_text(
+            "name: demo_pkg\n"
+            "version: 1.0.0\n"
+            "environment:\n"
+            '  sdk: ">=3.9.0 <4.0.0"\n'
+            "dependencies:  # runtime dependencies only\n"
+            "  analyzer: ^1.0.0\n"
+            "  meta: ^1.18.0\n"
+            "dev_dependencies:\n"
+            "  test: ^1.31.0\n",
+            encoding="utf-8",
+        )
+        self._write_lib(
+            "ok.dart",
+            "import 'package:analyzer/analyzer.dart';\n"
+            "import 'package:meta/meta.dart';\n\n"
+            "class Ok {}\n",
+        )
+        result = self._fn(self.root)
+        self.assertEqual(
+            result["missing"],
+            {},
+            msg="declared deps under a commented header must be recognized",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "Sicurezza · Qualità · Qualitá.",
+    "searchPlaceholder": "Regole del filtro... regole dei filtri.",
+    "empty": "Tutto chiaro  ⁇ Nessuna scoperta No findings.",
+    "liveTitle": "Live  ⁇  dal vivo. aggiornamenti man mano che si modifica.",
+    "fetching": "Portare... portare.",
+    "noOccurrences": "Nessuna occorrenza.",
+    "summaryFindings": "{count} risultati",
+    "summaryRules": "{count} regole",
+    "more": "+{count} più di PH0__",
+    "wordErrors": "Errori di errore errori di error.",
+    "wordWarnings": "avvertimenti, segnali di allarme.",
+    "wordInfo": "info info info infos",
+    "wordFiles": "file files file file file.",
+    "gradeExcellent": "Eccellente, eccellente.",
+    "gradeGood": "Buono buono buonissimo",
+    "gradeFair": "Fair, fair e giusto.",
+    "gradeWeak": "Debole debole deboli.",
+    "gradeSevere": "Severo severo."
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇   ⁇ {count} suggerimento di configurazione (s)",
+    "initMissing": {
+      "title": "Configurazione Saropa Lints (run init)",
+      "detail": "saropa_lints è in pubspec ma nessuna configurazione dell'analizzatore è ancora collegata."
+    },
+    "packAvailable": {
+      "title": "Abilitare il pacchetto di regole {pack}.",
+      "detail": "{count} regole per un pacchetto nella tua specifica di pub."
+    },
+    "enabledToast": "Abilitato il pacchetto di regole {pack} in analysis_options.yaml",
+    "enableFailed": "Non è stato possibile abilitare il pacchetto di regole {pack}  ⁇ aprire il cruscotto Rule Packs per abilitarlo."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: è il nome di una cellula che si sviluppa attraverso la crescita {count} suggerimento del pacchetto di regole (s) si applicano a questo progetto.",
+    "review": "Revisione Review Review Esaminare la revisione.",
+    "dismiss": "Scusate il licenziamento.",
+    "reviewFailed": "Impossibile aprire la revisione del pacchetto di regole Saropa Lints. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "Versione: La versione di Versione.",
@@ -35,6 +74,15 @@
       "published": "Pubblicato pubblicato.",
       "update": "Aggiornamento di aggiornamenti Update Update.",
       "blockedBy": "Bloccato da:",
+      "blockedVia": "{blocker} capsule {dep} {constraint} ({resolvable} risolvibile, {latest} più recente)",
+      "blockedViaSdk": "appuntato da {blocker} (Flutter SDK) per {dep} ({resolvable} risolvibile, {latest} più recente)",
+      "constrained": "Constretto, vincolato.",
+      "constrainedBy": "Il tuo vincolo {constraint} limita questo ({resolvable} risolvibile, {latest} ultimo)",
+      "pinHeld": "Tenuto tenuta.",
+      "pinDoNotUse": "Non usare non utilizzare.",
+      "drift": "Drift interprogetto: deriva tra progetti.",
+      "driftBehind": "Dietro: {siblings} (hai {own})",
+      "driftDiffers": "Differisce: {siblings} (hai {own})",
       "codeSize": "Codice Dimensione Code Size",
       "archiveSize": "Dimensione dell'archivio Taglia di archivio",
       "bloat": "({rating}/10 gonfiore)",
@@ -103,7 +151,7 @@
       "colTitle": "Titolo titolo titolo",
       "colAuthor": "Autore autore autrice autore",
       "colReview": "Revisione Review Review Esaminare la revisione.",
-      "summaryFooter": "{triaged} di {total} triage | {applicable} applicabile | {notApplicable} N/A | {unreviewed} rimanenti",
+      "summaryFooter": "{triaged} di {total} triage | {applicable} applicabile | {notApplicable} N/D | {unreviewed} rimanenti",
       "truncated": "I risultati sono troncati a {limit} items."
     },
     "platforms": {
@@ -195,6 +243,8 @@
     "toggleFullWidth": "Toggle layout a larghezza completa.",
     "sortBy": "Sortare per {column}",
     "expandRow": "Espandi la riga di espandere.",
+    "copyRow": "Copia la riga della fila.",
+    "comparisonDimension": "Metrica metrica è la misurazione.",
     "collapseRow": "La riga di collasso.",
     "selectAll": "Selezionare tutte le righe.",
     "keyboardShortcuts": "Scartamenti da tastiera.",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Lingua interfaccia Saropa Lints",
       "placeholder": "Scegli la lingua per barra laterale e dashboard",
-      "auto": "Automatico (segui la lingua di visualizzazione di VS Code)"
+      "auto": "Automatico (segui la lingua di visualizzazione di VS Code)",
+      "coverage": "{pct}% tradotto  ⁇ rest mostra in inglese."
     },
     "reloadPrompt": "L'impostazione della lingua è {locale}. Ricaricare la finestra per aggiornare le etichette della barra laterale e dei comandi.",
     "reloadNow": "Ricaricare ora.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "Ultima corsa, ultima corsa.",
+      "updatedPrefix": "Aggiornato aggiornato.",
+      "refreshHint": "Clicca per aggiornare dall'analizzatore.",
       "lastRunUnknown": "Ultima esecuzione sconosciuta.",
       "noTimestampTitle": "Nessuna data e ora su violations.json.",
       "findingsAfterFilterTitle": "Risultati totali dopo il filtro regola disabilitato.",
@@ -327,7 +380,7 @@
       "refreshExtension": "L'estensione Refresh è un'estesione di Refresh.",
       "openPackageDashboard": "Aprire Dashboard del pacchetto.",
       "openCodeHealth": "Open Code Health è un'azienda sanitaria.",
-      "openLintsConfig": "Configurazione Open Lints.",
+      "openLintsConfig": "Gestisci i pacchetti di regole.",
       "reloadFromDisk": "Ristringere dal disco.",
       "reloadFromDiskTitle": "Render la dashboard dall'ultimo violations.json senza ricominciare l'analizzatore.",
       "reEnableDisabledRules": "Riattivare le regole disabilitate...",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa Dashboard dei pacchetti",
     "heroTitle": "Saropa Dashboard dei pacchetti",
+    "detailPane": {
+      "aria": "Dettagli della confezione",
+      "title": "Dettagli della confezione",
+      "close": "Dettagli ravvicinati, dettagli vicini."
+    },
     "status": {
       "packagesCount": "{count} pacchetti",
       "packagesBreakdown": "{direct} diretti, {transitive} transitivi",
@@ -741,7 +799,7 @@
       "likesUnavailable": "pub.dev like non disponibili.",
       "likesCount": "A {count} pub.dev piace",
       "downloadsUnavailable": "pub.dev Non sono disponibili download di 30 giorni.",
-      "downloadsCount": "{count} download negli ultimi 30 giorni",
+      "downloadsCount": "{count} download negli ultimi 30 giorni.",
       "sizeUnavailable": "Dimensione non disponibile da pub.dev.",
       "noVulnerabilities": "Nessuna vulnerabilità nota.",
       "licenseUnspecified": "Licenza non specificata su pub.dev",
@@ -800,9 +858,9 @@
       "noTransitives": "Nessuna dipendenza transitiva.",
       "showTransitives": "Mostra le dipendenze transitive.",
       "tooltipDep": "• {dep}",
-      "tooltipDepShared": "• {dep} (condiviso)",
-      "tooltipHeader": "{total} dipendenze transitive",
-      "tooltipHeaderShared": "{total} dipendenze transitive ({shared} condivise)",
+      "tooltipDepShared": "• {dep} (condivisione)",
+      "tooltipHeader": "{total} deps transitivi",
+      "tooltipHeaderShared": "{total} punti transitivi ({shared} condiviso)",
       "sharedBadgeTitle": "{count} condiviso con altri pacchetti.",
       "sharedBadge": "condivisione di contenuti condivisi.",
       "transitiveDepsHeading": "Dipendenze transitive ({count})"
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "Il pacchetto di pacchetti è un pacchettino.",
       "packages": "pacchetti di merci, confezioni."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "Spiega questa regola."
+    },
+    "enableRule": {
+      "done": "Regola abilitata {ruleId}. Applicare l'analisi di ripresa.",
+      "runAnalysis": "Eseguire l'analisi esegui l' analisi.",
+      "noWorkspace": "Aprire una cartella di spazio di lavoro per abilitare una regola."
+    },
+    "openFinding": {
+      "noWorkspace": "Aprire una cartella di spazio di lavoro per aprire un ritrovamento.",
+      "notFound": "Non è stato possibile aprire {file}."
     }
   }
 }

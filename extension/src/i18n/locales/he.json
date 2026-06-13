@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "אבטחה · איכות · ביטחון",
+    "searchPlaceholder": "חוקי הפילטר...",
+    "empty": "הכל ברור  ⁇ לא נמצאו ממצאים.",
+    "liveTitle": "חי  ⁇  Live  ⁇ עדכונים בזמן שאתה עורך.",
+    "fetching": "להביא... לקחת.",
+    "noOccurrences": "אין אירועים לא קרו.",
+    "summaryFindings": "{count} ממצאים",
+    "summaryRules": "{count} כללים",
+    "more": "+{count} יותר",
+    "wordErrors": "שגיאות - טעויות של השגויים",
+    "wordWarnings": "אזהרות, אזהירות.",
+    "wordInfo": "אינפאו אינפאו-אינפואה",
+    "wordFiles": "קבצים קובצי תיקיות",
+    "gradeExcellent": "מעולה, מצוינת.",
+    "gradeGood": "טוב, טוב, טובים.",
+    "gradeFair": "יריד היריד הוגני.",
+    "gradeWeak": "חלש, חלש.",
+    "gradeSevere": "חמור מאוד קשה"
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇  ⁇  - מחלת הדם {count} הצעה של הגדרת התצורה (s)",
+    "initMissing": {
+      "title": "הגדרת Saropa Lints (run init)",
+      "detail": "saropa_lints נמצא ב-Pubspec אבל עדיין לא מחוברת תצורת מנתח"
+    },
+    "packAvailable": {
+      "title": "הפעל את חבילת הכללים {pack}.",
+      "detail": "{count} כללי חבילה במפרק שלך"
+    },
+    "enabledToast": "הפעלת את חבילת הכללים {pack} ב- analysis_options.yaml",
+    "enableFailed": "לא ניתן היה להפעיל את חבילת הכללים {pack}  ⁇ פתח את לוח המחוונים של Rule Packs כדי לאפשר זאת."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: - פטריוטיביות {count} הצעת חבילת כללים (s) חל על הפרויקט הזה.",
+    "review": "סקירה Review Review - ביקורת על הסקירה",
+    "dismiss": "פיטורים.",
+    "reviewFailed": "לא ניתן היה לפתוח את סקירת חבילת החוקים של Saropa Lints. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "גרסה: גירסת VersiON",
@@ -35,6 +74,15 @@
       "published": "פורסם מפורסמת פרסם",
       "update": "עדכון Update Update לעדכן",
       "blockedBy": "חסום על ידי",
+      "blockedVia": "{blocker} כובעים {dep} {constraint} ({resolvable} ניתן לפתרון, {latest} האחרון)",
+      "blockedViaSdk": "מוצמד על ידי {blocker} (Flutter SDK) עבור {dep} ({resolvable} ניתן לפתרון, {latest} האחרון)",
+      "constrained": "מוגבלים, כבויים.",
+      "constrainedBy": "המגבלה שלך {constraint} מגבה את זה ({resolvable} ניתן לפתרון, {latest} האחרון)",
+      "pinHeld": "החזיקו מחזיק",
+      "pinDoNotUse": "אל תשתמשו בו.",
+      "drift": "הנגרום בין פרויקטים נמשך.",
+      "driftBehind": "מאחור: {siblings} (יש לך {own})",
+      "driftDiffers": "שונה: {siblings} (יש לך {own})",
       "codeSize": "גודל קוד Code Size - מידת הקוד",
       "archiveSize": "גודל ארכיון - הגודל של הארכיון",
       "bloat": "({rating}/10 נפוח)",
@@ -49,7 +97,7 @@
       "openIssues": "סוגיות פתוחות בנושא.",
       "openPrs": "פתיחת יחסי ציבור פתוחים (Open PRs)",
       "activity": "פעילות (90d)",
-      "activityValue": "נושאי {closed} נסגרו, אנשי יחסי ציבור {merged} התמזגו",
+      "activityValue": "נושאי {closed} נסגרו, אנשי יחסי ציבור של {merged} התמזגו",
       "noActivity": "אין פעילות לאחרונה.",
       "lastCommit": "התחייבות אחרונה",
       "pubPoints": "פאב נקודות Pub נקודות",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "תמרון מגדל את הפריסה של רוחב מלא.",
     "sortBy": "מסדר לפי {column}",
     "expandRow": "הרחיב שורה לשורה",
+    "copyRow": "העתק שורה לשורת עותקים.",
+    "comparisonDimension": "מטריקה (Metric)",
     "collapseRow": "שורת התמוטטות השורה.",
     "selectAll": "בחר את כל השורות",
     "keyboardShortcuts": "קיצורי מקלדת מקשיבים",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints שפת ממשק משתמש של UI",
       "placeholder": "בחר שפה עבור סרגל הצד והדאשבורדים.",
-      "auto": "אוטומטי (לכו בעקבות שפת התצוגה VS Code)"
+      "auto": "אוטומטי (לכו בעקבות שפת התצוגה VS Code)",
+      "coverage": "{pct}% תרגום  ⁇ רמת המופעים באנגלית"
     },
     "reloadPrompt": "שפה מוגדרת ל {locale}. הפעל מחדש את החלון כדי לעדכן את שורת הצד ואת תוויות הפיקוד.",
     "reloadNow": "עכשיו תטעמו מחדש.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "הסיבוב האחרון, סיבוב אחרון.",
+      "updatedPrefix": "עדכון מעודכן",
+      "refreshHint": "לחץ כדי לרענן מהאנליזר.",
       "lastRunUnknown": "ריצה אחרונה לא ידועה",
       "noTimestampTitle": "אין חותמת זמן על violations.json.",
       "findingsAfterFilterTitle": "סך הממצאים לאחר מסנן חוק-החסר-תפקוד.",
@@ -327,7 +380,7 @@
       "refreshExtension": "הרחבת Refresh Extension היא רחיבה של Refresh.",
       "openPackageDashboard": "פתח לוח המחוונים של החבילה.",
       "openCodeHealth": "פתיחת תקינות קוד",
-      "openLintsConfig": "פתח Lints Config הגדרת",
+      "openLintsConfig": "ניהול חבילות כללים של Rule Packs",
       "reloadFromDisk": "להטעין מחדש מהדיסק.",
       "reloadFromDiskTitle": "להציג מחדש את לוח המחוונים מה violations.json האחרון מבלי להפעיל שוב את הניתוח.",
       "reEnableDisabledRules": "הפעל מחדש את הכללים המופרעים...",
@@ -539,12 +592,17 @@
     "noMatchingFindingsCopy": "אין תוצאות מתאימות להעתיק.",
     "couldNotOpenFile": "לא ניתן לפתוח את הקובץ: {path}",
     "saveReportNoWorkspace": "פתח תיקיית workspace לפני שמירת הדו\"ח.",
-    "savedFindings": "ממצאי {count} שנשמרו: {path}",
+    "savedFindings": "מצאה {count} שומרת: {path} זה ה- _PH1_.",
     "couldNotSaveReportJson": "לא ניתן לשמור את דוח JSON."
   },
   "packageDashboard": {
     "documentTitle": "Saropa לוח המחוונים של החבילה",
     "heroTitle": "Saropa לוח המחוונים של החבילה",
+    "detailPane": {
+      "aria": "פרטי חבילה:",
+      "title": "פרטי חבילה:",
+      "close": "פרטים מקרוב לפרט"
+    },
     "status": {
       "packagesCount": "{count} חבילות",
       "packagesBreakdown": "{direct} ישיר, {transitive} טרנזיטיבי",
@@ -573,7 +631,7 @@
       "packages": "חבילות שלחומרי הנסיעה",
       "projectGrade": "חבילת פרויקטים רמה של ציון",
       "totalSize": "גודל כולל*",
-      "gradeTooltip": "ציון הפרויקט {avgGrade}\nציון ממוצע: {avgScore}/100\nחבילות: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
+      "gradeTooltip": "ציון פרויקט {avgGrade}\nציון ממוצע: {avgScore}/100\nחבילות: {pkgCount}\nA:{a} B:{b} C:{c} E:{e} F:{f}",
       "vibrantTitle": "חי ופעיל.",
       "stableTitle": "יציב יציב.",
       "outdatedTitle": "מיושן לא מעודכן",
@@ -741,7 +799,7 @@
       "likesUnavailable": "pub.dev לא מוצא חן בעיניך אינו זמין.",
       "likesCount": "{count} pub.dev אוהב",
       "downloadsUnavailable": "pub.dev הורדות של 30 יום אינן זמינות.",
-      "downloadsCount": "{count} הורדות ב-30 הימים האחרונים",
+      "downloadsCount": "{count} הורדות ב-30 הימים האחרונים.",
       "sizeUnavailable": "גודל לא זמין מ pub.dev",
       "noVulnerabilities": "אין פגיעות ידועות.",
       "licenseUnspecified": "רישיון לא מפורט ב pub.dev",
@@ -801,8 +859,8 @@
       "showTransitives": "להראות תלותיות טרנזיטיביות.",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (משותף)",
-      "tooltipHeader": "{total} תלויות טרנזיטיביות",
-      "tooltipHeaderShared": "{total} תלויות טרנזיטיביות ({shared} משותפות)",
+      "tooltipHeader": "{total} deps מעברית deps.",
+      "tooltipHeaderShared": "{total} טרנזיטיביים ({shared} משותפים)",
       "sharedBadgeTitle": "{count} משותף עם חבילות אחרות.",
       "sharedBadge": "שיתוף משותף משותפים משותפות",
       "transitiveDepsHeading": "תלותי מעבר ({count})"
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "חבילה של חבילות",
       "packages": "חבילות של החבילה"
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "הסביר את הכלל הזה."
+    },
+    "enableRule": {
+      "done": "כלל מופעל {ruleId}. ניתוח חוזר-הריצה ייעשה.",
+      "runAnalysis": "רץ ניתוח ריצה",
+      "noWorkspace": "פתח תיקיית workspace כדי לאפשר את הכלל."
+    },
+    "openFinding": {
+      "noWorkspace": "פתח תיקיית workspace כדי לפתוח מציאה.",
+      "notFound": "לא ניתן לפתוח {file}."
     }
   }
 }

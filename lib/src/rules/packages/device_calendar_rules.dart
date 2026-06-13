@@ -700,3 +700,100 @@ class DeviceCalendarResultDataBeforeSuccessCheckRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when device_calendar Event doesn't specify time zone handling.
+///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v2
+///
+/// Alias: calendar_timezone, device_calendar_timezone
+///
+/// Calendar events without explicit time zone handling may display at wrong
+/// times when users travel or when syncing across devices.
+///
+/// **Note:** This rule specifically targets device_calendar package Events.
+/// It requires both a positional calendarId AND start/end parameters to match,
+/// reducing false positives from other Event classes.
+///
+/// **BAD:**
+/// ```dart
+/// final event = Event(
+///   calendarId,
+///   title: 'Meeting',
+///   start: TZDateTime.now(local),
+///   end: TZDateTime.now(local).add(Duration(hours: 1)),
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final event = Event(
+///   calendarId,
+///   title: 'Meeting',
+///   start: TZDateTime.now(local),
+///   end: TZDateTime.now(local).add(Duration(hours: 1)),
+///   timeZone: 'America/New_York', // or local.name
+/// );
+/// ```
+class RequireCalendarTimezoneHandlingRule extends SaropaLintRule {
+  RequireCalendarTimezoneHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_calendar_timezone_handling',
+    '[require_calendar_timezone_handling] device_calendar Event is missing an explicit timeZone. This can cause events to appear at the wrong time for users in different time zones, leading to missed or misaligned appointments. {v2}',
+    correctionMessage:
+        'Add the timeZone parameter to device_calendar Event to ensure events are scheduled and displayed correctly across different time zones. This prevents confusion and missed appointments for users in other regions.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (typeName != 'Event') return;
+
+      final ArgumentList args = node.argumentList;
+
+      // device_calendar Event requires a positional calendarId as first arg
+      // This helps distinguish it from other Event classes
+      final bool hasPositionalArg =
+          args.arguments.isNotEmpty && args.arguments.first is! NamedExpression;
+      if (!hasPositionalArg) return;
+
+      // Must have both 'start' and 'end' named parameters (device_calendar pattern)
+      bool hasStart = false;
+      bool hasEnd = false;
+      bool hasTimeZone = false;
+
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'start') hasStart = true;
+          if (name == 'end') hasEnd = true;
+          if (name == 'timeZone') hasTimeZone = true;
+        }
+      }
+
+      // Only flag if it looks like a device_calendar Event (has start AND end)
+      if (!hasStart || !hasEnd) return;
+
+      if (!hasTimeZone) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}

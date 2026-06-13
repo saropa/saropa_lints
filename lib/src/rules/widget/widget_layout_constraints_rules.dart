@@ -2545,11 +2545,16 @@ class PreferFractionalSizingRule extends SaropaLintRule {
 /// intentionally size relative to the screen (for example a dialog width as a
 /// fraction of screen width, or a `PageView` page that should leave a peek of
 /// the next page). The rule does not flag those dimension reads when used in a
-/// multiply or divide with a numeric literal (screen fraction), nor when
-/// compared to a numeric literal (responsive breakpoints), and it does not
-/// flag `MediaQueryData.viewInsets` or other non-size fields. It also skips
-/// non-build scopes such as lifecycle/setup methods and callbacks that are not
-/// builder functions taking a `BuildContext`.
+/// multiply or divide (screen fraction — the factor may be a literal or a named
+/// value), nor when compared to a numeric literal (responsive breakpoints), and
+/// it does not flag `MediaQueryData.viewInsets` or other non-size fields. It
+/// also skips non-build scopes such as lifecycle/setup methods and callbacks
+/// that are not builder functions taking a `BuildContext`. Finally, it does not
+/// flag a `MediaQuery` read that is the fallback branch of a constraint
+/// finiteness guard (`constraints.maxWidth.isFinite ? constraints.maxWidth :
+/// MediaQuery.sizeOf(context).width`): such code already uses `LayoutBuilder`
+/// and only consults `MediaQuery` when the parent passes unbounded constraints,
+/// where the LayoutBuilder constraint is `Infinity` and unusable.
 ///
 /// **Bad:**
 /// ```dart
@@ -2615,7 +2620,14 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
       if ((name == 'width' || name == 'height') &&
           (_isMediaQuerySizeAccess(target) ||
               _isMediaQuerySizeOfResult(target))) {
-        if (_isMediaQuerySizeDimensionInLiteralScaleOrBreakpoint(node)) return;
+        if (_isMediaQuerySizeDimensionScaledOrBreakpoint(node)) return;
+        // The widget already uses LayoutBuilder and only falls back to
+        // MediaQuery when the parent passes unbounded constraints (where
+        // LayoutBuilder's constraints are Infinity and unusable). Flagging that
+        // mandatory fallback is a false positive — there is no LayoutBuilder
+        // formulation to switch to. See
+        // bugs/prefer_layout_builder_for_constraints_false_positive_mediaquery_fallback_and_viewport_fraction.md.
+        if (_isConstraintFinitenessFallback(node)) return;
         // A width/height passed as a POSITIONAL argument to a call is not
         // widget sizing — it is fed to a helper that decides a layout strategy,
         // e.g. `ResponsiveLayout.isWide(MediaQuery.sizeOf(context).width)`,
@@ -2667,9 +2679,23 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
     return rec is SimpleIdentifier && rec.name == 'MediaQuery';
   }
 
-  /// True when [node] is a direct operand of `*`/`/`/`>`/`<`/`>=`/`<=` with a
-  /// numeric literal on the other side (screen fraction, division, or breakpoint).
-  static bool _isMediaQuerySizeDimensionInLiteralScaleOrBreakpoint(
+  /// True when [node] is a direct operand of a scale (`*`/`/`) or a breakpoint
+  /// comparison (`>`/`<`/`>=`/`<=`).
+  ///
+  /// Scaling the screen/window extent by a factor is viewport-proportional
+  /// sizing — the screen-relative use the rule's own dartdoc says is not
+  /// interchangeable with `LayoutBuilder` constraints (inside an
+  /// unbounded-main-axis parent such as a scroll view, `LayoutBuilder` yields
+  /// infinite constraints, the wrong signal). The factor may be a numeric
+  /// literal (`* 0.85`) OR a named value (`* fraction`); both express "a
+  /// fraction of the screen," so the scale case does not require a literal.
+  /// `prefer_fractional_sizing` owns the literal-fraction variant and steers it
+  /// to `FractionallySizedBox`; exempting it here also avoids double-flagging.
+  ///
+  /// A comparison (breakpoint) still requires a numeric literal on the other
+  /// side: comparing screen extent to a variable is ambiguous and could be
+  /// genuine constraint logic rather than a device-class breakpoint.
+  static bool _isMediaQuerySizeDimensionScaledOrBreakpoint(
     PropertyAccess node,
   ) {
     AstNode cur = node;
@@ -2682,19 +2708,78 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
       return false;
     }
     final TokenType op = p.operator.type;
-    final bool scaleOrCompare =
-        op == TokenType.STAR ||
-        op == TokenType.SLASH ||
+    if (op == TokenType.STAR || op == TokenType.SLASH) return true;
+    final bool isCompare =
         op == TokenType.GT ||
         op == TokenType.LT ||
         op == TokenType.GT_EQ ||
         op == TokenType.LT_EQ;
-    if (!scaleOrCompare) return false;
+    if (!isCompare) return false;
     final Expression sibling = identical(cur, p.leftOperand)
         ? p.rightOperand
         : p.leftOperand;
     final Expression unwrapped = _unwrapOuterParentheses(sibling);
     return unwrapped is IntegerLiteral || unwrapped is DoubleLiteral;
+  }
+
+  /// Constraint dimensions whose `.isFinite`/`.isInfinite` test marks a
+  /// conditional as a guard against unbounded parent constraints.
+  static const Set<String> _constraintExtentNames = <String>{
+    'maxWidth',
+    'maxHeight',
+    'minWidth',
+    'minHeight',
+  };
+
+  /// True when [node] sits on a value branch (`then`/`else`) of a conditional
+  /// whose condition tests constraint finiteness (e.g.
+  /// `constraints.maxWidth.isFinite ? constraints.maxWidth : MediaQuery…`).
+  ///
+  /// Such code already uses `LayoutBuilder` and reads `MediaQuery` only for the
+  /// unbounded case, where the LayoutBuilder constraint is `Infinity` and
+  /// unusable. The MediaQuery read is the mandatory fallback, not a missed
+  /// LayoutBuilder opportunity, so it must not flag.
+  static bool _isConstraintFinitenessFallback(PropertyAccess node) {
+    AstNode cur = node;
+    for (AstNode? p = cur.parent; p != null; cur = p, p = p.parent) {
+      // Only the value branches qualify; a MediaQuery read inside the condition
+      // itself is not a fallback.
+      if (p is ConditionalExpression) {
+        final bool onBranch =
+            identical(cur, p.thenExpression) ||
+            identical(cur, p.elseExpression);
+        if (onBranch && _conditionTestsConstraintFiniteness(p.condition)) {
+          return true;
+        }
+      }
+      // Stop at statement / function boundaries so an unrelated outer ternary
+      // higher in the tree cannot match.
+      if (p is Statement || p is FunctionBody) break;
+    }
+    return false;
+  }
+
+  /// True when [condition] contains an `.isFinite`/`.isInfinite` read on a
+  /// constraint extent (`maxWidth`, `maxHeight`, `minWidth`, `minHeight`).
+  static bool _conditionTestsConstraintFiniteness(Expression condition) {
+    final _ConstraintFinitenessVisitor visitor = _ConstraintFinitenessVisitor();
+    condition.accept(visitor);
+    return visitor.found;
+  }
+
+  /// True when [expr]'s final identifier names a constraint extent, i.e. the
+  /// expression reads `…maxWidth` / `…maxHeight` / `…minWidth` / `…minHeight`.
+  /// Used by [_ConstraintFinitenessVisitor] (same library) to confirm a
+  /// finiteness test targets a `BoxConstraints` dimension rather than some
+  /// unrelated `isFinite` read.
+  static bool referencesConstraintExtent(Expression expr) {
+    final String? last = switch (expr) {
+      PrefixedIdentifier(:final SimpleIdentifier identifier) => identifier.name,
+      PropertyAccess(:final SimpleIdentifier propertyName) => propertyName.name,
+      SimpleIdentifier(:final String name) => name,
+      _ => null,
+    };
+    return last != null && _constraintExtentNames.contains(last);
   }
 
   /// True when [node] is a positional argument to a call (its parent, after
@@ -2762,6 +2847,44 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
       }
     }
     return false;
+  }
+}
+
+/// Scans a conditional's condition for an `.isFinite`/`.isInfinite` test on a
+/// constraint extent (`maxWidth`/`maxHeight`/`minWidth`/`minHeight`). A match
+/// marks the conditional as a guard against unbounded parent constraints, where
+/// reading `MediaQuery` on the fallback branch is correct and must not flag in
+/// `prefer_layout_builder_for_constraints`.
+class _ConstraintFinitenessVisitor extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    _check(node.propertyName.name, node.target);
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    // `constraints.maxWidth.isFinite` reaches here as `<x>.isFinite` only when
+    // the receiver is a simple prefix; the receiver itself (`constraints`) is
+    // the prefix, so the extent name lives on the parent PropertyAccess. The
+    // common `(maxWidth).isFinite` shorthand binds as a PrefixedIdentifier.
+    _check(node.identifier.name, node.prefix);
+    super.visitPrefixedIdentifier(node);
+  }
+
+  void _check(String propertyName, Expression? receiver) {
+    if (found) return;
+    if (propertyName != 'isFinite' && propertyName != 'isInfinite') return;
+    // Library-private static is reachable here — privacy in Dart is per
+    // library, not per class, and the visitor lives in the same file.
+    if (receiver != null &&
+        PreferLayoutBuilderForConstraintsRule.referencesConstraintExtent(
+          receiver,
+        )) {
+      found = true;
+    }
   }
 }
 

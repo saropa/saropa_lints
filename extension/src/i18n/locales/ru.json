@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "Безопасность · Качество · Безопасность.",
+    "searchPlaceholder": "Правила фильтрации... правила фильтра.",
+    "empty": "Все чисто  ⁇ никаких выводов нет.",
+    "liveTitle": "В прямом эфире  ⁇ обновления по мере редактирования.",
+    "fetching": "Добывать... добывать.",
+    "noOccurrences": "Никаких событий не произошло.",
+    "summaryFindings": "{count} находок",
+    "summaryRules": "{count} правил",
+    "more": "+{count} больше, чем",
+    "wordErrors": "Ошибки ошибок ошибок.",
+    "wordWarnings": "предупреждения, предостережения.",
+    "wordInfo": "Инфо-информация - это информация, которая содержит информацию.",
+    "wordFiles": "Файлы файлов файлы файлы.",
+    "gradeExcellent": "Отличный, превосходный.",
+    "gradeGood": "Хороший хороший хорошая",
+    "gradeFair": "Ярмарка ярмарки ярмарок.",
+    "gradeWeak": "Слабый, слабой - это слабость.",
+    "gradeSevere": "Тяжелая тяжелая."
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇   ⁇  В результате этого {count} конфигурационные предложения (s)",
+    "initMissing": {
+      "title": "Настройка Saropa Lints (запуск init)",
+      "detail": "saropa_lints находится в pubspec, но конфигурация анализатора еще не подключена."
+    },
+    "packAvailable": {
+      "title": "Включить {pack} rule pack для правильного использования.",
+      "detail": "{count} правила для пакета в вашем пабспект."
+    },
+    "enabledToast": "Включил пакет правил {pack} в analysis_options.yaml",
+    "enableFailed": "Не удалось включить пакет правил {pack}  ⁇ Откройте панель Rule Packs, чтобы включить ее."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: это число, которое соответствует числу {count} rule pack suggestion (s) применимы к этому проекту.",
+    "review": "Обзор - это обзор, который рассматривает.",
+    "dismiss": "Отпустить с работы.",
+    "reviewFailed": "Не удалось открыть обзор набора правил Saropa Lints. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "Версия версии.",
@@ -35,6 +74,15 @@
       "published": "Издание Опубликовано Публикации.",
       "update": "Обновление обновления Update Update.",
       "blockedBy": "Блокированный от:",
+      "blockedVia": "{blocker} капсулы {dep} {constraint} ({resolvable} разрешимо, {latest} последнее)",
+      "blockedViaSdk": "закреплен {blocker} (Flutter SDK) для {dep} (разрешаемый {resolvable}, последняя версия {latest})",
+      "constrained": "Ограниченный, ограниченный.",
+      "constrainedBy": "Ваше ограничение {constraint} ограничивает это ({resolvable} разрешимо, {latest} последнее)",
+      "pinHeld": "Проводился, проводится.",
+      "pinDoNotUse": "Не используйте не использовать.",
+      "drift": "Дрейф между проектами.",
+      "driftBehind": "Сзади: задней части. {siblings} (у вас есть {own})",
+      "driftDiffers": "Отличия: отличается от других. {siblings} (у вас есть {own})",
       "codeSize": "Размер кода, размер кода.",
       "archiveSize": "Размер архива - размер файла.",
       "bloat": "({rating}/10 вздутие живота)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "Переключатель для полной ширины макета Toggle.",
     "sortBy": "Сортировка по {column}.",
     "expandRow": "Расширить строку \"Развернуть\".",
+    "copyRow": "Копировать строку в ряд.",
+    "comparisonDimension": "Метрическая метрика.",
     "collapseRow": "Рядом с обрушением находится строка.",
     "selectAll": "Выберите все строки.",
     "keyboardShortcuts": "Краткие пути к клавиатуре.",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Язык интерфейса Saropa Lints",
       "placeholder": "Выберите язык боковой панели и панелей",
-      "auto": "Авто (следовать языку отображения VS Code)"
+      "auto": "Авто (следовать языку отображения VS Code)",
+      "coverage": "{pct}% переведено  ⁇ шоу отдыха на английском языке."
     },
     "reloadPrompt": "Язык установлен на {locale}. Перезагрузите окно, чтобы обновить этикетки боковой панели и команды.",
     "reloadNow": "Перезагрузить сейчас.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "Последний пробег, последний запуск.",
+      "updatedPrefix": "Обновленный обновлён.",
+      "refreshHint": "Нажмите, чтобы обновить информацию с анализатора.",
       "lastRunUnknown": "Последний пробег неизвестен.",
       "noTimestampTitle": "Нет временной метки на violations.json.",
       "findingsAfterFilterTitle": "Общий результат исследований после отключения фильтра с правилами.",
@@ -327,7 +380,7 @@
       "refreshExtension": "Расширение Refresh - обновление.",
       "openPackageDashboard": "Откройте панель инструментов пакета.",
       "openCodeHealth": "Открытый код здоровья.",
-      "openLintsConfig": "Открытые линты Config.",
+      "openLintsConfig": "Управление пакетами правил.",
       "reloadFromDisk": "Перезагрузка с диска.",
       "reloadFromDiskTitle": "Переделайте приборную панель с последнего violations.json, не запуская анализер.",
       "reEnableDisabledRules": "Восстановить действие отключенных правил...",
@@ -539,12 +592,17 @@
     "noMatchingFindingsCopy": "Нет совпадающих результатов для копирования.",
     "couldNotOpenFile": "Не удалось открыть файл: {path}",
     "saveReportNoWorkspace": "Перед сохранением отчета открыть папку рабочей зоны.",
-    "savedFindings": "Сохраненные результаты {count}: {path}.",
+    "savedFindings": "Сохраненное {count} нахождение: {path} - это ________, который является основой для развития.",
     "couldNotSaveReportJson": "Не удалось сохранить JSON отчета."
   },
   "packageDashboard": {
     "documentTitle": "Saropa Пакетная панель управления",
     "heroTitle": "Saropa Пакетная панель управления",
+    "detailPane": {
+      "aria": "Детали упаковки, детали упаковок.",
+      "title": "Детали упаковки, детали упаковок.",
+      "close": "Близкие детали, деталь."
+    },
     "status": {
       "packagesCount": "{count} пакетов",
       "packagesBreakdown": "{direct} прямых, {transitive} транзитивных",
@@ -741,7 +799,7 @@
       "likesUnavailable": "pub.dev лайки недоступны.",
       "likesCount": "{count} pub.dev нравится",
       "downloadsUnavailable": "pub.dev 30-дневные загрузки недоступны.",
-      "downloadsCount": "{count} загрузок за последние 30 дней",
+      "downloadsCount": "{count} загрузок в последние 30 дней.",
       "sizeUnavailable": "Размер недоступен у pub.dev.",
       "noVulnerabilities": "Не известны уязвимости.",
       "licenseUnspecified": "Лицензия не указана на pub.dev.",
@@ -801,8 +859,8 @@
       "showTransitives": "Покажите переходные зависимости.",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (общий)",
-      "tooltipHeader": "{total} транзитивные зависимости",
-      "tooltipHeaderShared": "{total} транзитивные зависимости ({shared} общие)",
+      "tooltipHeader": "{total} переходные депессы.",
+      "tooltipHeaderShared": "Переходные отступы {total} (общие {shared})",
       "sharedBadgeTitle": "{count}, который используется совместно с другими пакетами.",
       "sharedBadge": "Общий обменный обменной обменным",
       "transitiveDepsHeading": "Переходные зависимости ({count})"
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "Пакетные пакеты - это пакетная упаковка.",
       "packages": "пакеты, упаковки."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "Объясните это правило."
+    },
+    "enableRule": {
+      "done": "Включено правило {ruleId}. Применить анализ повторного запуска.",
+      "runAnalysis": "Запустите анализ, выполните анализы.",
+      "noWorkspace": "Откройте папку рабочей зоны, чтобы включить правило."
+    },
+    "openFinding": {
+      "noWorkspace": "Откройте папку рабочей зоны, чтобы открыть поиск.",
+      "notFound": "Не удалось открыть {file}."
     }
   }
 }

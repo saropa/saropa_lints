@@ -14,9 +14,10 @@
 ///    [kRulePackPubspecMarkers] / SDK + dependency gates in `rule_packs.dart` (not only
 ///    `lib/src/rules/packages/` extraction).
 ///
-/// **[kPubspecMarkersByPack]** must contain exactly one entry per extracted pack id
-/// (empty set allowed for `package_specific`). The script prints WARN lines for mismatches
-/// but still writes files — fix warnings before committing.
+/// **[kPubspecMarkersByPack]** must contain exactly one non-empty entry per extracted
+/// pack id (every pack now gates on at least one dependency marker; the former empty-set
+/// `package_specific` catch-all was split into per-package packs). The script prints WARN
+/// lines for mismatches but still writes files — fix warnings before committing.
 ///
 /// **`collection_compat`** is appended after generated packs (semver gate + rule list);
 /// keep constraint text aligned with [kRulePackDependencyGates] in `rule_packs.dart`.
@@ -27,6 +28,7 @@ library;
 import 'dart:io';
 
 import 'package:saropa_lints/src/config/rule_packs.dart' as packs;
+import 'package:saropa_lints/src/init/stylistic_rulesets.dart' as stylistic;
 
 import 'rule_pack_audit.dart'
     show
@@ -64,7 +66,6 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
   'graphql': {'graphql'},
   'hive': {'hive', 'hive_flutter'},
   'isar': {'isar', 'isar_flutter_libs'},
-  'package_specific': {}, // mixed; user opts in explicitly
   'provider': {'provider'},
   'qr_scanner': {'mobile_scanner', 'qr_flutter'},
   'riverpod': {'riverpod', 'flutter_riverpod', 'hooks_riverpod'},
@@ -125,6 +126,17 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
   'webview_flutter': {'webview_flutter'},
   'local_auth': {'local_auth'},
   'local_auth_3': {'local_auth'},
+  // Per-package packs split out of the former catch-all `package_specific`
+  // bucket so each rule gates on its own dependency. The OpenAI error-handling
+  // rule targets the chat_gpt_sdk package's OpenAI class, so the gate marker is
+  // chat_gpt_sdk (the key-in-code rule is SDK-agnostic but ships in the same
+  // pack).
+  'openai': {'chat_gpt_sdk'},
+  'uuid': {'uuid'},
+  'envied': {'envied'},
+  'google_fonts': {'google_fonts'},
+  'flutter_keyboard_visibility': {'flutter_keyboard_visibility'},
+  'speech_to_text': {'speech_to_text'},
 };
 
 const Map<String, String> kPackUiLabels = {
@@ -145,7 +157,6 @@ const Map<String, String> kPackUiLabels = {
   'graphql': 'GraphQL',
   'hive': 'Hive',
   'isar': 'Isar',
-  'package_specific': 'Mixed packages',
   'provider': 'Provider',
   'qr_scanner': 'QR / scanner',
   'riverpod': 'Riverpod',
@@ -179,6 +190,12 @@ const Map<String, String> kPackUiLabels = {
   'local_auth': 'Local Auth',
   'local_auth_3': 'local_auth 3.x (pre-upgrade)',
   'app_links_6': 'app_links 6.x (pre-upgrade)',
+  'openai': 'OpenAI (chat_gpt_sdk)',
+  'uuid': 'uuid',
+  'envied': 'Envied',
+  'google_fonts': 'Google Fonts',
+  'flutter_keyboard_visibility': 'Keyboard Visibility',
+  'speech_to_text': 'Speech to Text',
 };
 
 String _uiLabelForPackId(String pack) {

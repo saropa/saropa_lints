@@ -61,26 +61,25 @@ function resolveNlsValue(raw: string, nls: PackageNls): string {
 }
 
 describe('UX labels in package.json', () => {
-  it('registers the six sectioned panels plus the Suggestions view in the saropaLints activity bar', () => {
+  it('registers the six sectioned panels in the saropaLints activity bar', () => {
     const pkg = loadPackageJson();
     const views = pkg.contributes.views.saropaLints;
     // Each section is its own VS Code view (collapsible panel via title bar).
     // Adding or removing a section here means updating SECTION_VIEW_IDS too.
     // Triage was merged into Settings — there is no longer a standalone
     // saropaLints.triage view. Triage rows render inside the Settings panel.
+    // The standalone config-Suggestions view was removed (its "Enable the X rule
+    // pack" list moved to the Manage Rule Packs webview + startup toast).
     const expected = [
       'saropaLints.banner',
       'saropaLints.editorDashboards',
       'saropaLints.actions',
-      // Standalone config-Suggestions view (badged via createTreeView), not a
-      // sectioned panel — sits alongside the six sections in the same container.
-      'saropaLints.suggestions',
       'saropaLints.status',
       'saropaLints.settings',
       'saropaLints.help',
     ].sort();
     const actual = views.map((v) => v.id).sort();
-    assert.deepStrictEqual(actual, expected, 'sidebar = six section panels + Suggestions');
+    assert.deepStrictEqual(actual, expected, 'sidebar = six section panels');
     assert.ok(!views.some((v) => v.id === 'saropaLints.overview'), 'monolithic overview view removed');
     assert.ok(!views.some((v) => v.id === 'saropaLints.dashboardHub'), 'dashboardHub view removed');
     assert.ok(!views.some((v) => v.id === 'saropaLints.triage'), 'triage view merged into settings');
