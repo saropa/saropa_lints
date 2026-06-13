@@ -66,6 +66,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 Sharpens roughly thirty leak, disposal, security, and package rules so they stop flagging code that is already correct, ahead of grading some of them as build-breaking errors. Resources cleaned up in a helper or handed to a caller, controllers owned by a parent widget, encrypted SharedPreferences keys, and Drift queries that do carry a `where` are no longer reported. Names are matched on whole-word and resolved-type boundaries instead of substrings, so `pin` no longer matches `shopping` and `ui.ImageFilter` is no longer mistaken for a disposable image. No action required.
 
+### Added
+
+- **New opt-in rule `prefer_us_english_spelling`.** Flags British spellings in comments and prose string literals so a project can standardize on American English, sharing the same word list as the package's own spelling audit. It is in the stylistic (opt-in) set and off by default — enable it in `analysis_options.yaml`; there is no quick fix yet.
+
 ### Changed
 
 - **`require_platform_channel_cleanup` upgraded from warning to error.** After interprocedural cleanup tracking plus an AST-based setup check (a string literal that merely mentions `setMethodCallHandler` no longer triggers it), a MethodChannel/EventChannel handler left active past `dispose()` — which fires callbacks on an unmounted widget and crashes with a setState error — now fails `dart analyze`. `require_websocket_close` and the per-method resource rules (`require_file_close_in_finally`, `require_http_client_close`, `require_native_resource_cleanup`) were re-evaluated and stay warnings: each can still false-positive on cleanup that escapes the analyzable class (a parent-owned socket, or a handle passed to a function in another file), which is acceptable for a warning but not for a build-breaking error.

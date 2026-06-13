@@ -221,9 +221,25 @@ _SKIP_DIRS = {
     "reports",
 }
 
-# Specific filenames to skip (e.g. this file's own dictionary and its tests,
-# both of which must reference British forms verbatim to verify detection).
-_SKIP_FILES = {"_us_spelling.py", "test_us_spelling.py"}
+# Specific filenames to skip. Each of these must reference British forms
+# verbatim to do its job, so the audit would otherwise flag its own inputs:
+#   - _us_spelling.py / test_us_spelling.py: this dictionary and its tests.
+#   - uk_to_us_spellings.dart: the generated Dart mirror of UK_TO_US that the
+#     prefer_us_english_spelling lint rule consumes (single source of truth).
+#   - prefer_us_english_spelling_rule.dart: the rule whose DartDoc necessarily
+#     shows British example spellings.
+#   - prefer_us_english_spelling_fixture.dart: that rule's fixture, which must
+#     contain British spellings to assert the rule fires on them.
+#   - prefer_us_english_spelling_rule_test.dart: that rule's test, which asserts
+#     specific British -> American map entries.
+_SKIP_FILES = {
+    "_us_spelling.py",
+    "test_us_spelling.py",
+    "uk_to_us_spellings.dart",
+    "prefer_us_english_spelling_rule.dart",
+    "prefer_us_english_spelling_fixture.dart",
+    "prefer_us_english_spelling_rule_test.dart",
+}
 
 # URL pattern to detect links (skip matches inside URLs)
 _URL_PATTERN = re.compile(r"https?://\S+", re.IGNORECASE)
