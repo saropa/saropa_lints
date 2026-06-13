@@ -62,7 +62,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [13.12.6]
+## [13.12.7]
 
 Sharpens roughly thirty leak, disposal, security, and package rules so they stop flagging code that is already correct, ahead of grading some of them as build-breaking errors. Resources cleaned up in a helper or handed to a caller, controllers owned by a parent widget, encrypted SharedPreferences keys, and Drift queries that do carry a `where` are no longer reported. Names are matched on whole-word and resolved-type boundaries instead of substrings, so `pin` no longer matches `shopping` and `ui.ImageFilter` is no longer mistaken for a disposable image. No action required.
 
