@@ -156,10 +156,7 @@ class PreferUsEnglishSpellingRule extends SaropaLintRule {
       final String? us = kUkToUsSpellings[word.toLowerCase()];
       if (us == null) continue;
 
-      reporter.atOffset(
-        offset: baseOffset + match.start,
-        length: word.length,
-      );
+      reporter.atOffset(offset: baseOffset + match.start, length: word.length);
     }
   }
 }
