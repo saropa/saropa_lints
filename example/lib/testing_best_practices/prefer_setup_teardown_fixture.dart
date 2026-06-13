@@ -156,6 +156,40 @@ void _goodPreferSetupTeardownParameterized() {
   });
 }
 
+class _AsyncSemaphoreUtils {
+  _AsyncSemaphoreUtils(this.permits);
+  final int permits;
+}
+
+// GOOD: SUT constructed with a per-test literal argument that varies across
+// the group (1 / 2 / 3) — parameterized arrange, not a hoistable fixture.
+// The three permits=1 tests share a signature and meet the threshold, but the
+// sibling (2)/(3) tests prove the construction is parameterized, so the
+// literal-masked carve-out must suppress. Must NOT trigger.
+void _goodPreferSetupTeardownParameterizedSut() {
+  group('AsyncSemaphoreUtils', () {
+    test('permits getter', () {
+      expect(_AsyncSemaphoreUtils(3).permits, 3);
+    });
+    test('allows up to permits concurrent holders', () {
+      final sem = _AsyncSemaphoreUtils(2);
+      expect(sem.permits, 2);
+    });
+    test('run returns the callback result', () {
+      final sem = _AsyncSemaphoreUtils(1);
+      expect(sem.permits, 1);
+    });
+    test('release without acquire throws', () {
+      final sem = _AsyncSemaphoreUtils(1);
+      expect(sem.permits, 1);
+    });
+    test('run releases the permit even when the callback throws', () {
+      final sem = _AsyncSemaphoreUtils(1);
+      expect(sem.permits, 1);
+    });
+  });
+}
+
 class _DupRepo {}
 
 class _DupSut {

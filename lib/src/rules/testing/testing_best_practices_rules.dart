@@ -3066,7 +3066,7 @@ class PreferSetupTeardownRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_setup_teardown',
-    '[prefer_setup_teardown] Duplicated test setup code. Use setUp()/tearDown(). Repeated setup code in tests violates DRY and makes maintenance harder. Use setUp() and tearDown() for common test initialization. {v7}',
+    '[prefer_setup_teardown] Duplicated test setup code. Use setUp()/tearDown(). Repeated setup code in tests violates DRY and makes maintenance harder. Use setUp() and tearDown() for common test initialization. {v8}',
     correctionMessage:
         'Move common initialization to setUp() and cleanup to tearDown(). Run the full test suite to confirm the refactored tests maintain equivalent coverage.',
     severity: DiagnosticSeverity.INFO,
@@ -3132,14 +3132,31 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   ) {
     final Map<String, int> counts = {};
 
+    // Map each literal-masked signature to the set of concrete signatures that
+    // collapse onto it. `Foo(1)`, `Foo(2)`, `Foo(3)` all share the masked form
+    // `Foo(_)` but are three distinct concrete signatures — that divergence is
+    // how we detect parameterized SUT construction below.
+    final Map<String, Set<String>> maskedVariants = {};
+
     for (final testCall in testCalls) {
       final sig = _signatureOf(testCall);
       if (sig == null) continue;
       counts[sig] = (counts[sig] ?? 0) + 1;
+      (maskedVariants[_maskLiterals(sig)] ??= <String>{}).add(sig);
     }
 
     for (final entry in counts.entries) {
       if (entry.value < threshold) continue;
+
+      // Parameterized-SUT carve-out: when the same call shape appears in this
+      // group with a different literal argument (e.g. AsyncSemaphoreUtils(1)
+      // alongside (2)/(3)), the construction is per-test arrange, not a shared
+      // fixture. Hoisting one variant into setUp() removes no duplication —
+      // the other variants must still construct locally, shadowing or ignoring
+      // the hoisted `late` field. Suppress when the masked form has >1 variant.
+      if ((maskedVariants[_maskLiterals(entry.key)]?.length ?? 0) >= 2) {
+        continue;
+      }
 
       // Report on the first test with this duplicated setup
       for (final testCall in testCalls) {
@@ -3150,6 +3167,21 @@ class PreferSetupTeardownRule extends SaropaLintRule {
       }
     }
     return false;
+  }
+
+  /// Masks literal argument values in a normalized signature so that call
+  /// shapes differing only by a literal collapse together — `Foo(1)` and
+  /// `Foo(2)` both become `Foo(_)`. Used by [_reportDuplicateSetup] to spot
+  /// parameterized SUT construction that varies per test across a group.
+  ///
+  /// Strings are masked first so digits inside them are gone before the
+  /// numeric pass runs; word boundaries keep identifiers containing digits
+  /// (e.g. `utf8`, `x1`) intact.
+  static String _maskLiterals(String signature) {
+    return signature
+        .replaceAll(RegExp('''(['"]).*?\\1'''), '_')
+        .replaceAll(RegExp(r'\b\d+(?:\.\d+)?\b'), '_')
+        .replaceAll(RegExp(r'\b(?:true|false)\b'), '_');
   }
 
   /// Returns the setup signature for a test call, or null.

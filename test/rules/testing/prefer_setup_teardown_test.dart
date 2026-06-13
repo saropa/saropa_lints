@@ -94,5 +94,27 @@ void main() {
         reason: 'Parameterized const arrange + SUT must not be flagged',
       );
     });
+
+    // Parameterized SUT construction whose literal argument varies per test
+    // across a group (Foo(1) alongside Foo(2)/Foo(3)) is arrange, not a
+    // hoistable fixture. The literal-masked carve-out (rule v8) collapses such
+    // call shapes and suppresses; this pins the GOOD fixture's presence.
+    test('fixture: GOOD parameterized-SUT group exists with no expect_lint', () {
+      final path =
+          'example/lib/testing_best_practices/${ruleName}_fixture.dart';
+      final content = File(path).readAsStringSync();
+      final start = content.indexOf(
+        'void _goodPreferSetupTeardownParameterizedSut',
+      );
+      final end = content.indexOf('class _DupRepo');
+      expect(start, greaterThan(-1));
+      expect(end, greaterThan(start));
+      final slice = content.substring(start, end);
+      expect(
+        slice.contains('expect_lint: $ruleName'),
+        isFalse,
+        reason: 'SUT constructed with a per-test varying literal must not flag',
+      );
+    });
   });
 }
