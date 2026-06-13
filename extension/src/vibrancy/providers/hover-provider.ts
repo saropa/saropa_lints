@@ -11,6 +11,7 @@ import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
+import { formatSharedDepDetail } from '../scoring/blocker-analyzer';
 import { formatSizeMB, formatSizeKB } from '../scoring/bloat-calculator';
 import { findEnvironmentRange } from '../services/pubspec-parser';
 import {
@@ -172,7 +173,11 @@ function appendHoverVersion(md: vscode.MarkdownString, r: VibrancyResult): void 
     if (r.updateInfo && r.updateInfo.updateStatus !== 'up-to-date') {
         rows.push(`| Update | ${r.updateInfo.currentVersion} → ${r.updateInfo.latestVersion} (${r.updateInfo.updateStatus}) |`);
         if (r.blocker) {
-            rows.push(`| Blocked by | ${r.blocker.blockerPackage} |`);
+            const detail = formatSharedDepDetail(r.blocker);
+            rows.push(
+                `| Blocked by | ${r.blocker.blockerPackage}`
+                + `${detail ? ` ${detail}` : ''} |`,
+            );
         }
     }
     if (r.license) {

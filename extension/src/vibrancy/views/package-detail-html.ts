@@ -209,6 +209,18 @@ function buildVersionSection(r: VibrancyResult): string {
             `${escapeHtml(r.updateInfo.currentVersion)} &rarr; ${escapeHtml(r.updateInfo.latestVersion)} (${escapeHtml(r.updateInfo.updateStatus)})`));
         if (r.blocker) {
             rows.push(row(l10n('packageDetail.version.blockedBy'), `<strong>${escapeHtml(r.blocker.blockerPackage)}</strong>`));
+            // Diamond conflict: name the shared transitive dep and the binding
+            // ceiling so the user sees WHY the sibling holds this back, not just
+            // that it does. Absent for ordinary reverse-dependency blocks.
+            if (r.blocker.sharedDependency) {
+                rows.push(row('', escapeHtml(l10n('packageDetail.version.blockedVia', {
+                    blocker: r.blocker.blockerPackage,
+                    dep: r.blocker.sharedDependency,
+                    constraint: r.blocker.blockerConstraint ?? '',
+                    resolvable: r.blocker.sharedDependencyResolvable ?? '',
+                    latest: r.blocker.sharedDependencyLatest ?? '',
+                }))));
+            }
         }
     }
     /* Prefer code size — what the package contributes to a built app.

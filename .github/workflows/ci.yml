@@ -74,6 +74,18 @@ jobs:
       - name: Refresh diagnostic baseline snapshot (if available)
         # Safe no-op when this job does not produce reports/.saropa_lints/violations.json
         run: test -f reports/.saropa_lints/violations.json && dart run saropa_lints:diagnostic_baseline || true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify dependency-import consistency
+        # Deterministic, version-independent guard: every package imported by
+        # shipped code (lib/ + bin/) must be a declared pubspec dependency.
+        # The dry-run step below also checks this, but its exit code for a
+        # missing dependency is Dart-version-dependent (warning on 3.10.x,
+        # hard reject on the publish job's stable SDK), so it let the missing
+        # `meta` dep through as a non-fatal warning and burned v13.12.6/.7.
+        # This Python gate has no such ambiguity. See scripts/check_dependency_imports.py.
+        run: python scripts/check_dependency_imports.py
       - name: Dry run (pub.dev validation)
         # Catches missing direct dependencies and other pub.dev rules; exit 65 = warnings, 66+ = errors
         run: |

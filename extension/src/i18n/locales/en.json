@@ -74,6 +74,7 @@
       "published": "Published",
       "update": "Update",
       "blockedBy": "Blocked by",
+      "blockedVia": "{blocker} caps {dep} {constraint} ({resolvable} resolvable, {latest} latest)",
       "codeSize": "Code Size",
       "archiveSize": "Archive Size",
       "bloat": "({rating}/10 bloat)",

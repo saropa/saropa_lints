@@ -38,6 +38,8 @@
     "src/test/vibrancy/scoring/vibrancy-calculator.test.ts",
     "src/test/vibrancy/scoring/bloat-calculator.test.ts",
     "src/test/vibrancy/scoring/override-analyzer.test.ts",
+    "src/test/vibrancy/scoring/blocker-analyzer.test.ts",
+    "src/test/vibrancy/scoring/shared-dep-conflict-detector.test.ts",
     "src/test/vibrancy/scoring/comparison-ranker.test.ts",
     "src/test/vibrancy/views/report-html.test.ts",
     "src/test/vibrancy/views/report-webview.test.ts",

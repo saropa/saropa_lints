@@ -64,11 +64,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Hardens the release pipeline so a missing dependency can no longer reach pub.dev. No rule or extension changes. No action required.
+Hardens the release pipeline so a missing dependency can no longer reach pub.dev, and teaches the Package Vibrancy dashboard to name the real package behind a stuck upgrade when two dependencies fight over a shared transitive dependency. No rule changes. No action required.
+
+### Added (Extension)
+
+- **Package Vibrancy now explains shared-dependency (diamond) upgrade blocks.** When a package is held back because a sibling dependency caps a shared transitive dependency it needs — for example `dart_style` stuck because another dependency pins `analyzer` low — the dashboard now names the blocking sibling, the shared dependency, and the resolvable-vs-latest gap instead of showing an unexplained block; no action required.
 
 <details><summary>Maintenance</summary>
 
 - **New publish audit gate: every package imported by shipped code must be a declared dependency.** The release audit (STEP 1, before any tag is pushed) now scans `lib/` and `bin/` for real import/export directives and fails if an imported package is absent from pubspec `dependencies`. This catches the class of defect that sank v13.12.6 and v13.12.7 (a `meta` import with no `meta` dependency): `lib/**` is in `analyzer.exclude` for plugin dogfooding, so no `dart analyze` run inspects these imports, and `dart pub publish` only rejected them on the post-tag CI job — after the tag was burned. The gate is deterministic and Dart-version-independent, and ignores `package:` URIs that appear inside rule detection patterns or DartDoc examples.
+- **The same gate now runs in CI on every push and pull request.** A new `scripts/check_dependency_imports.py` (shared logic with the release audit) runs in the `analyze` job, so a missing dependency fails at merge time rather than at release. The pre-existing `dart pub publish --dry-run` CI step could not be relied on for this: its exit code for a missing dependency is Dart-version-dependent and was treated as a non-fatal warning.
 
 </details>
 
