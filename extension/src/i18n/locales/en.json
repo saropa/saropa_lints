@@ -35,7 +35,8 @@
   "startupNudge": {
     "message": "Saropa Lints: {count} rule pack suggestion(s) apply to this project.",
     "review": "Review",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "reviewFailed": "Couldn't open the Saropa Lints rule pack review. {error}"
   },
   "packageDetail": {
     "section": {

@@ -62,6 +62,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+Hardens the release pipeline so a missing dependency can no longer reach pub.dev. No rule or extension changes. No action required.
+
+<details><summary>Maintenance</summary>
+
+- **New publish audit gate: every package imported by shipped code must be a declared dependency.** The release audit (STEP 1, before any tag is pushed) now scans `lib/` and `bin/` for real import/export directives and fails if an imported package is absent from pubspec `dependencies`. This catches the class of defect that sank v13.12.6 and v13.12.7 (a `meta` import with no `meta` dependency): `lib/**` is in `analyzer.exclude` for plugin dogfooding, so no `dart analyze` run inspects these imports, and `dart pub publish` only rejected them on the post-tag CI job — after the tag was burned. The gate is deterministic and Dart-version-independent, and ignores `package:` URIs that appear inside rule detection patterns or DartDoc examples.
+
+</details>
+
 ## [13.12.7]
 
 Sharpens roughly thirty leak, disposal, security, and package rules so they stop flagging code that is already correct, ahead of grading some of them as build-breaking errors. Resources cleaned up in a helper or handed to a caller, controllers owned by a parent widget, encrypted SharedPreferences keys, and Drift queries that do carry a `where` are no longer reported. Names are matched on whole-word and resolved-type boundaries instead of substrings, so `pin` no longer matches `shopping` and `ui.ImageFilter` is no longer mistaken for a disposable image. No action required.
@@ -96,6 +106,7 @@ Sharpens roughly thirty leak, disposal, security, and package rules so they stop
 
 ### Fixed (Extension)
 
+- **The "Review" button on the rule-pack suggestion notification now opens the Config Dashboard.** Clicking Review previously tried to focus a sidebar tree, which produced no visible change when that view was hidden or collapsed (or its sidebar was already open) and surfaced no error — so the button appeared dead. It now opens the rule-pack Config Dashboard in an editor tab, where each applicable pack can be reviewed and toggled, and any failure is shown instead of swallowed. No action required.
 - **Dashboard labels stranded in English are now localized in six languages.** The review status "not applicable", the Persian "version" section header, the French links heading, and the documentation quality badge now render in the active display language for German, Spanish, Persian, Bengali, Filipino, and French instead of showing English; acronyms and cognates that are correct as-is (WASM, PR, Repository) are kept English on purpose. No action required.
 
 <details><summary>Maintenance</summary>

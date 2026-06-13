@@ -79,9 +79,23 @@ export async function maybeShowStartupSuggestion(
     );
     if (choice !== l10n('startupNudge.review')) return;
 
-    // Reveal the Suggestions view; each pack is listed there with its own
-    // one-click enable, which is where the actual rule_packs write happens.
-    await vscode.commands.executeCommand('saropaLints.suggestions.focus');
+    // Open the Config Dashboard (rule-packs) webview in the editor area — the
+    // review-and-enable surface where every applicable pack is listed with a
+    // toggle. The previous wiring focused the standalone `saropaLints.suggestions`
+    // sidebar tree via its auto-generated `.focus` command, but focusing a view
+    // produces no visible change when that view is hidden/collapsed or its
+    // activity-bar container is already open — which read to the user as "Review
+    // does nothing". A webview panel always opens a visible editor tab. The
+    // sidebar badge stays as the durable backstop for the count.
+    try {
+      await vscode.commands.executeCommand('saropaLints.openRulePacks');
+    } catch (err) {
+      // Never fail silently again: if the command is somehow unavailable, surface
+      // it so a dead Review button is diagnosable instead of mysterious.
+      void vscode.window.showErrorMessage(
+        l10n('startupNudge.reviewFailed', { error: String(err) }),
+      );
+    }
   } finally {
     inFlight = false;
   }
