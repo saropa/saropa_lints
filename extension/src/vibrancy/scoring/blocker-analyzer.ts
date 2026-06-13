@@ -7,7 +7,7 @@
 
 import {
     PubOutdatedEntry, DepEdge, VibrancyResult,
-    BlockerInfo, UpgradeBlockStatus, ConstrainedReason,
+    BlockerInfo, UpgradeBlockStatus, ConstrainedReason, CrossProjectDrift,
 } from '../types';
 import { compareVersions } from '../services/changelog-service';
 
@@ -87,6 +87,22 @@ export function formatSharedDepDetail(blocker: BlockerInfo): string | null {
         );
     }
     return parts.join(' ');
+}
+
+/**
+ * Plain-text label for cross-project version drift, or null when there is no
+ * drift. Names the divergent siblings and their constraints so the lag is
+ * concrete: "behind — saropa_kykto on ^13.12.7 (you have ^9.7.0)".
+ */
+export function formatVersionDrift(
+    drift: CrossProjectDrift | null | undefined,
+): string | null {
+    if (!drift || drift.siblings.length === 0) { return null; }
+    const lead = drift.behind ? 'behind — ' : 'differs — ';
+    const list = drift.siblings
+        .map(s => `${s.repo} on ${s.constraint}`)
+        .join(', ');
+    return `${lead}${list} (you have ${drift.ownConstraint})`;
 }
 
 /**

@@ -11,7 +11,7 @@ import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { worstSeverity, severityEmoji, severityLabel } from '../scoring/vuln-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
-import { formatSharedDepDetail, formatConstrainedReason, managedSourceNote, formatPinIntent } from '../scoring/blocker-analyzer';
+import { formatSharedDepDetail, formatConstrainedReason, managedSourceNote, formatPinIntent, formatVersionDrift } from '../scoring/blocker-analyzer';
 import { formatSizeMB, formatSizeKB } from '../scoring/bloat-calculator';
 import { findEnvironmentRange } from '../services/pubspec-parser';
 import {
@@ -192,6 +192,10 @@ function appendHoverVersion(md: vscode.MarkdownString, r: VibrancyResult): void 
     const pin = formatPinIntent(r.pinIntent);
     if (pin) {
         rows.push(`| 🔒 Pin | ${pin} |`);
+    }
+    const drift = formatVersionDrift(r.crossProjectDrift);
+    if (drift) {
+        rows.push(`| 🔀 Drift | ${drift} |`);
     }
     if (r.license) {
         const tier = classifyLicense(r.license);

@@ -72,6 +72,7 @@ Hardens the release pipeline so a missing dependency can no longer reach pub.dev
 - **`constrained` packages now name the constraint holding them back.** A package the resolver could lift but your own pubspec caps now shows "your constraint `^x` caps this — `y` resolvable" so the line to edit is obvious, instead of a bare "constrained" label; no action required.
 - **Git, path, and SDK dependencies no longer show as stuck pub upgrades.** A version gap on an overridden or SDK dependency is annotated as managed (and its "update available" squiggle suppressed), because such deps can't be bumped by editing a constraint; no action required.
 - **Deliberately-pinned dependencies are marked as intentional holds.** A "do not bump" / "do not use" note in a dependency's pubspec comment is read and shown as a pin, and its upgrade nag suppressed, so a frozen dependency reads as a decision rather than neglect; no action required.
+- **Cross-project version drift against sibling repos.** Set `saropaLints.packageVibrancy.siblingRepoPaths` to other repo folders and a package pinned at a lower major than a sibling (e.g. `saropa_lints ^9.7.0` here vs `^13.12.7` elsewhere) is flagged as behind, surfacing a lagging consumer pub-outdated can't see; off until paths are configured.
 
 ### Fixed
 
@@ -84,6 +85,7 @@ Hardens the release pipeline so a missing dependency can no longer reach pub.dev
 - **Dashboard filters are now fully keyboard-accessible.** The Package Vibrancy summary cards focus with Tab and toggle their filter on Enter or Space, and a visible focus ring was added to the package-comparison Add buttons, the rule-triage actions, and the project-vibrancy score-threshold input, so the dashboards can be driven without a mouse; no action required.
 - **Several dashboard surfaces now follow light and high-contrast themes correctly.** Package-status badge text, the Findings dashboard top-rules text, and a few control borders and focus rings were bound to editor theme colors instead of fixed values that could wash out or disappear in the opposite theme; no action required.
 - **Command Catalog category headers stay visible while scrolling.** The sticky section label now pins just beneath the toolbar instead of sliding behind it, so you can always see which category you are scrolling through; no action required.
+- **Dashboards no longer overflow sideways in a narrow editor pane.** The Package Vibrancy, Known Issues, and package-comparison tables now scroll horizontally within their own bounds and the package-detail link strip wraps, so a docked or split-narrow webview shows the content instead of a whole-page horizontal scrollbar; no action required.
 
 <details><summary>Maintenance</summary>
 

@@ -6,7 +6,7 @@ import * as assert from 'assert';
 import {
     classifyUpgradeStatus, findBlockers, formatSharedDepDetail,
     formatConstrainedReason, managedSourceNote, isHostedUpgradeable,
-    formatPinIntent,
+    formatPinIntent, formatVersionDrift,
 } from '../../../vibrancy/scoring/blocker-analyzer';
 import { PubOutdatedEntry, DepEdge, VibrancyResult, BlockerInfo } from '../../../vibrancy/types';
 import { makeMinimalResult } from '../test-helpers';
@@ -260,6 +260,38 @@ describe('blocker-analyzer', () => {
             assert.strictEqual(
                 formatPinIntent({ reason: 'COMMERCIAL', kind: 'do-not-use' }),
                 'Do not use: COMMERCIAL',
+            );
+        });
+    });
+
+    describe('formatVersionDrift', () => {
+        it('returns null when no drift', () => {
+            assert.strictEqual(formatVersionDrift(null), null);
+            assert.strictEqual(
+                formatVersionDrift({ ownConstraint: '^1', siblings: [], behind: false }),
+                null,
+            );
+        });
+
+        it('leads with "behind" and names the siblings', () => {
+            assert.strictEqual(
+                formatVersionDrift({
+                    ownConstraint: '^9.7.0',
+                    siblings: [{ repo: 'saropa_kykto', constraint: '^13.12.7' }],
+                    behind: true,
+                }),
+                'behind — saropa_kykto on ^13.12.7 (you have ^9.7.0)',
+            );
+        });
+
+        it('leads with "differs" when not behind', () => {
+            assert.strictEqual(
+                formatVersionDrift({
+                    ownConstraint: '^4.0.0',
+                    siblings: [{ repo: 'other', constraint: '^2.0.0' }],
+                    behind: false,
+                }),
+                'differs — other on ^2.0.0 (you have ^4.0.0)',
             );
         });
     });

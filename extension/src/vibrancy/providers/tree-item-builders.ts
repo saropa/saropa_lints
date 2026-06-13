@@ -7,7 +7,7 @@ import { categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
 import { severityEmoji, severityLabel, worstSeverity } from '../scoring/vuln-classifier';
-import { formatSharedDepDetail, formatConstrainedReason, formatPinIntent } from '../scoring/blocker-analyzer';
+import { formatSharedDepDetail, formatConstrainedReason, formatPinIntent, formatVersionDrift } from '../scoring/blocker-analyzer';
 import { DetailItem, GroupItem, SourceCodeItem } from './tree-item-classes';
 
 /** Tree group/detail builders: version rows, community, licenses, dep graph items. */
@@ -153,6 +153,10 @@ function buildVersionGroup(result: VibrancyResult): GroupItem {
     const pin = formatPinIntent(result.pinIntent);
     if (pin) {
         items.push(new DetailItem('🔒 Pin', pin));
+    }
+    const drift = formatVersionDrift(result.crossProjectDrift);
+    if (drift) {
+        items.push(new DetailItem('🔀 Drift', drift));
     }
     // Collapse when on latest version — the details are less actionable
     const state = isLatest

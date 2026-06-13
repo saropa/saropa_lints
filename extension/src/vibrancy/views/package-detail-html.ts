@@ -245,6 +245,17 @@ function buildVersionSection(r: VibrancyResult): string {
             : l10n('packageDetail.version.pinHeld');
         rows.push(row(`🔒 ${pinLabel}`, escapeHtml(r.pinIntent.reason)));
     }
+    // Cross-project drift: this package lags (or differs from) a sibling repo's
+    // major — an implicit upgrade blocker pub-outdated can't see on its own.
+    if (r.crossProjectDrift) {
+        const d = r.crossProjectDrift;
+        const siblings = d.siblings.map(s => `${s.repo} ${s.constraint}`).join(', ');
+        const key = d.behind
+            ? 'packageDetail.version.driftBehind'
+            : 'packageDetail.version.driftDiffers';
+        rows.push(row(`🔀 ${l10n('packageDetail.version.drift')}`,
+            escapeHtml(l10n(key, { siblings, own: d.ownConstraint }))));
+    }
     /* Prefer code size — what the package contributes to a built app.
        Falls back to the archive total when the tarball analyzer couldn't run.
        Labels the row "Code Size" or "Archive Size" so the developer knows
