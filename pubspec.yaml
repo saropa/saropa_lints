@@ -105,6 +105,18 @@ dependencies:
   # https://pub.dev/packages/collection
   collection: ^1.19.1 # Used by bin/saropa_lints.dart, sort_imports_fix, code_quality_control_flow_rules
 
+  # Annotations (@visibleForTesting, @immutable, @internal) imported directly by
+  # 8 rule files (e.g. async_rules.dart, build_method_rules.dart). `dart pub
+  # publish` rejects a package that imports `package:meta/meta.dart` without
+  # declaring meta as a DIRECT dependency (CI Dart 3.12.2 errors with exit 65 on
+  # the 13.12.7 tag; local 3.12.1 dry-run did not flag it, which is why it slipped
+  # through). Constraint deliberately ^1.18.0, NOT ^1.18.3: Flutter stable pins
+  # meta to EXACTLY 1.18.0, so a ^1.18.3 floor would make saropa_lints
+  # unresolvable for Flutter consumers. ^1.18.0 accepts Flutter's 1.18.0 and the
+  # 1.18.3 already resolved here transitively. See the analyzer note below for the
+  # full meta-pin rationale — do NOT raise this floor.
+  meta: ^1.18.0
+
   # # https://pub.dev/packages/json2yaml/changelog
   # json2yaml: ^3.0.1 # YAML serialization for CLI tool
 

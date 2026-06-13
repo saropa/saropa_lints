@@ -98,6 +98,12 @@ Sharpens roughly thirty leak, disposal, security, and package rules so they stop
 
 - **Dashboard labels stranded in English are now localized in six languages.** The review status "not applicable", the Persian "version" section header, the French links heading, and the documentation quality badge now render in the active display language for German, Spanish, Persian, Bengali, Filipino, and French instead of showing English; acronyms and cognates that are correct as-is (WASM, PR, Repository) are kept English on purpose. No action required.
 
+<details><summary>Maintenance</summary>
+
+- **Declared `meta` as a direct dependency.** Eight rule files import `package:meta/meta.dart`; `dart pub publish` errors (exit 65) when an imported package is not in `dependencies`, which blocked the pub.dev release. Constraint is `^1.18.0` to stay compatible with Flutter stable's exact 1.18.0 meta pin (a higher floor would make the package unresolvable for Flutter consumers).
+
+</details>
+
 ## [13.13.0]
 
 Adds crash, performance, and contract rules for seventeen more packages, each active only in files that import it. Introduces version-gated migration packs that flag code which will break on a major-version upgrade, so you can prepare before bumping. The VS Code Findings Dashboard now mirrors the live Problems panel, never showing a stale grade while real warnings sit unaddressed. No action required.
