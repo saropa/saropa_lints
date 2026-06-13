@@ -185,6 +185,16 @@ function buildUpdateSection(r: VibrancyResult): string {
         parts.push(`<div class="blocker-info">🔒 ${escapeHtml(pinLabel)}: ${escapeHtml(r.pinIntent.reason)}</div>`);
     }
 
+    // Cross-project drift vs a configured sibling repo.
+    if (r.crossProjectDrift) {
+        const d = r.crossProjectDrift;
+        const siblings = d.siblings.map(s => `${s.repo} ${s.constraint}`).join(', ');
+        const key = d.behind
+            ? 'packageDetail.version.driftBehind'
+            : 'packageDetail.version.driftDiffers';
+        parts.push(`<div class="blocker-info">🔀 ${escapeHtml(l10n(key, { siblings, own: d.ownConstraint }))}</div>`);
+    }
+
     return buildSection(`⬆️ ${l10n('detailView.section.update')}`, parts);
 }
 

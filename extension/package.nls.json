@@ -219,6 +219,7 @@
   "config.property.packageVibrancy.suppressedPackages.description": "Package names to suppress from vibrancy diagnostics and hover (still scanned, shown dimmed in tree)",
   "config.property.packageVibrancy.allowlist.description": "Package names to skip during vibrancy scan (e.g. internal packages)",
   "config.property.packageVibrancy.repoOverrides.description": "Override GitHub repository URLs for packages where pub.dev data is wrong.",
+  "config.property.packageVibrancy.siblingRepoPaths.description": "Filesystem paths to sibling repos. Their pubspec dependencies are compared against this project's to flag cross-project version drift (the same package pinned at a different major elsewhere).",
   "config.property.packageVibrancy.registries.description": "Registry configuration for private Pub servers. Tokens are stored securely in VS Code Secret Storage.",
   "config.property.packageVibrancy.showLockDiffNotifications.description": "Show a notification summarizing lock file changes after each scan",
   "config.property.packageVibrancy.showInStatusBar.description": "Show package vibrancy score alongside the lint health score in the status bar",

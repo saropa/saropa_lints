@@ -75,6 +75,15 @@ export function getRepoOverrides(): Record<string, string> {
     return getConfig().get<Record<string, string>>('repoOverrides', {});
 }
 
+/**
+ * Filesystem paths to sibling repos to compare for cross-project version drift
+ * (the same package pinned at a different major elsewhere). Empty by default —
+ * the scanner has no other way to discover related repos on disk.
+ */
+export function getSiblingRepoPaths(): readonly string[] {
+    return getConfig().get<string[]>('siblingRepoPaths', []);
+}
+
 // --- Scoring Weights ---
 
 export function getScoringWeights(): ScoringWeights {

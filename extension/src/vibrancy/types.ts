@@ -259,6 +259,29 @@ export interface PinIntent {
     readonly kind: 'do-not-upgrade' | 'do-not-use';
 }
 
+/** One sibling repo's constraint on a package that diverges from this project's. */
+export interface SiblingConstraint {
+    /** Sibling repo label (its directory name). */
+    readonly repo: string;
+    /** The constraint that sibling declares for the package (e.g. "^13.12.7"). */
+    readonly constraint: string;
+}
+
+/**
+ * Cross-project version drift: the same package pinned at a different major in a
+ * configured sibling repo. Surfaces an implicit, uncommented upgrade blocker —
+ * a lagging consumer (e.g. saropa_lints `^9.7.0` here vs `^13.12.7` elsewhere)
+ * whose newer major may need a floor this project's other pins forbid.
+ */
+export interface CrossProjectDrift {
+    /** This project's constraint for the package. */
+    readonly ownConstraint: string;
+    /** Sibling repos whose major for this package differs from ours. */
+    readonly siblings: readonly SiblingConstraint[];
+    /** True when at least one sibling is on a higher major (this project lags). */
+    readonly behind: boolean;
+}
+
 /** Why a `constrained` upgrade is capped by the user's own pubspec constraint. */
 export interface ConstrainedReason {
     /** The constraint declared in the workspace pubspec (e.g. "^1.9.0"). */
@@ -387,6 +410,12 @@ export interface VibrancyResult {
      * a deliberate hold instead of reporting it as a missed upgrade.
      */
     readonly pinIntent?: PinIntent | null;
+    /**
+     * Cross-project version drift vs configured sibling repos, or null when no
+     * sibling diverges (or none configured). Surfaces a lagging consumer that
+     * pub-outdated alone cannot see.
+     */
+    readonly crossProjectDrift?: CrossProjectDrift | null;
     readonly transitiveInfo: TransitiveInfo | null;
     readonly alternatives: readonly AlternativeSuggestion[];
     /** Latest prerelease version if newer than stable (e.g., '2.0.0-dev.1'). */

@@ -61,6 +61,8 @@ import { detectFamilySplits } from './scoring/family-conflict-detector';
 import { AdoptionGateProvider } from './providers/adoption-gate';
 import { enrichWithBlockers } from './services/blocker-enricher';
 import { attachPinIntents } from './services/pin-intent-parser';
+import { attachVersionDrift } from './scoring/cross-project-drift-detector';
+import { readSiblingConstraints } from './services/sibling-constraints';
 import { buildUpgradeOrder, setOverrideAnalyses } from './scoring/upgrade-sequencer';
 import { executeUpgradePlan, formatUpgradePlan, formatUpgradeReport } from './services/upgrade-executor';
 import { fetchDepGraph, buildReverseDeps } from './services/dep-graph';
@@ -81,7 +83,7 @@ import {
     addSuppressedPackage, addSuppressedPackages, clearSuppressedPackages,
     getVulnScanEnabled, getGitHubAdvisoryEnabled, getGithubToken,
     getCacheTtlHours, getStartupScanSkipTtlMinutes,
-    getShowStartupScanSkipStatusBar,
+    getShowStartupScanSkipStatusBar, getSiblingRepoPaths,
 } from './services/config-service';
 import { queryVulnerabilities } from './services/osv-api';
 import { queryGitHubAdvisories, mergeVulnerabilities } from './services/github-advisory-api';
@@ -1107,6 +1109,13 @@ async function runScanInner(
             let results: VibrancyResult[] = attachPinIntents(
                 enrichResult.results, parsed.yamlContent,
             );
+            // Cross-project drift: compare against configured sibling repos so a
+            // package lagging a sibling's major (an implicit upgrade blocker) is
+            // surfaced. No-op when no sibling paths are configured.
+            const siblingConstraints = await readSiblingConstraints(
+                getSiblingRepoPaths(),
+            );
+            results = attachVersionDrift(results, siblingConstraints);
             lastReverseDeps = enrichResult.reverseDeps;
 
             if (signal.aborted) { return; }
