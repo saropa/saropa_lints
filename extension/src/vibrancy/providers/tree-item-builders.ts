@@ -7,6 +7,7 @@ import { categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
 import { formatRelativeTime } from '../scoring/time-formatter';
 import { severityEmoji, severityLabel, worstSeverity } from '../scoring/vuln-classifier';
+import { formatSharedDepDetail } from '../scoring/blocker-analyzer';
 import { DetailItem, GroupItem, SourceCodeItem } from './tree-item-classes';
 
 /** Tree group/detail builders: version rows, community, licenses, dep graph items. */
@@ -169,8 +170,10 @@ function buildUpdateGroup(result: VibrancyResult): GroupItem | null {
     ];
     if (result.blocker) {
         const b = result.blocker;
+        const detail = formatSharedDepDetail(b);
         items.push(new DetailItem(
-            '🔒 Blocked by', b.blockerPackage,
+            '🔒 Blocked by',
+            detail ? `${b.blockerPackage} ${detail}` : b.blockerPackage,
         ));
         /* Prefer the category-derived letter (respects EOL/trusted-publisher
            overrides); fall back to score-derived letter if only the raw score

@@ -68,9 +68,22 @@ function runDartCommand(
     });
 }
 
-/** Run `dart pub outdated --json` in the given directory. */
+/**
+ * Run `dart pub outdated --json --transitive` in the given directory.
+ *
+ * `--transitive` is required so contested SHARED transitive deps (analyzer,
+ * meta, characters, …) appear in the output with their own resolvable/latest.
+ * Diamond-conflict detection pivots on those rows: a direct dep is held back
+ * because a sibling caps a shared transitive dep below the version the direct
+ * dep needs. Without `--transitive` the pivot dep is invisible and the block
+ * looks like an unexplained "constrained" with no named blocker. Adding
+ * transitive rows is strictly more data — direct-dep classification still
+ * keys off the direct entries, so the extra rows do not change it.
+ */
 export function runDartPubOutdated(cwd: string): Promise<CommandResult> {
-    return runDartCommand(['pub', 'outdated', '--json'], cwd, 120_000);
+    return runDartCommand(
+        ['pub', 'outdated', '--json', '--transitive'], cwd, 120_000,
+    );
 }
 
 /** Run `dart pub deps --json` in the given directory. */

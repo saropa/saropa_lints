@@ -4,9 +4,10 @@
  */
 import * as assert from 'assert';
 import {
-    classifyUpgradeStatus, findBlockers,
+    classifyUpgradeStatus, findBlockers, formatSharedDepDetail,
 } from '../../../vibrancy/scoring/blocker-analyzer';
-import { PubOutdatedEntry, DepEdge, VibrancyResult } from '../../../vibrancy/types';
+import { PubOutdatedEntry, DepEdge, VibrancyResult, BlockerInfo } from '../../../vibrancy/types';
+import { makeMinimalResult } from '../test-helpers';
 
 /** Builds a [PubOutdatedEntry] with sane defaults; override fields per case. */
 function makeEntry(overrides: Partial<PubOutdatedEntry> & { package: string }): PubOutdatedEntry {
@@ -21,21 +22,11 @@ function makeEntry(overrides: Partial<PubOutdatedEntry> & { package: string }): 
 
 /** Minimal [VibrancyResult] for a direct hosted dependency with given vibrancy score. */
 function makeResult(name: string, score: number): VibrancyResult {
-    return {
-        package: {
-            name, version: '1.0.0', constraint: '^1.0.0',
-            source: 'hosted', isDirect: true, section: 'dependencies',
-        },
-        pubDev: null, github: null, knownIssue: null,
-        score, category: score >= 70 ? 'vibrant' : 'end-of-life',
-        resolutionVelocity: 0, engagementLevel: 0,
-        popularity: 0, publisherTrust: 0,
-        archiveSizeBytes: null, bloatRating: null,
-        isUnused: false, platforms: null,
-        verifiedPublisher: false, wasmReady: null, blocker: null, upgradeBlockStatus: 'up-to-date',
-        transitiveInfo: null, alternatives: [], latestPrerelease: null, prereleaseTag: null,
-        vulnerabilities: [],
-    };
+    return makeMinimalResult({
+        name,
+        score,
+        category: score >= 70 ? 'vibrant' : 'end-of-life',
+    });
 }
 
 describe('blocker-analyzer', () => {
@@ -173,6 +164,34 @@ describe('blocker-analyzer', () => {
             );
             assert.strictEqual(blockers[0].blockerVibrancyScore, null);
             assert.strictEqual(blockers[0].blockerCategory, null);
+        });
+    });
+
+    describe('formatSharedDepDetail', () => {
+        function blocker(o: Partial<BlockerInfo>): BlockerInfo {
+            return {
+                blockedPackage: 'dart_style', currentVersion: '3.1.7',
+                latestVersion: '3.1.8', blockerPackage: 'saropa_lints',
+                blockerVibrancyScore: null, blockerCategory: null, ...o,
+            };
+        }
+
+        it('returns null for an ordinary reverse-dependency blocker', () => {
+            assert.strictEqual(formatSharedDepDetail(blocker({})), null);
+        });
+
+        it('names the shared dep, ceiling, and resolvable/latest gap', () => {
+            const detail = formatSharedDepDetail(blocker({
+                sharedDependency: 'analyzer',
+                blockerConstraint: '>=9.0.0 <13.0.0',
+                sharedDependencyResolvable: '12.0.0',
+                sharedDependencyLatest: '13.1.0',
+            }));
+            assert.strictEqual(
+                detail,
+                'via analyzer — saropa_lints caps >=9.0.0 <13.0.0 '
+                + '(12.0.0 resolvable, 13.1.0 latest)',
+            );
         });
     });
 });

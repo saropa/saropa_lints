@@ -255,6 +255,24 @@ export interface BlockerInfo {
     readonly blockerPackage: string;
     readonly blockerVibrancyScore: number | null;
     readonly blockerCategory: VibrancyCategory | null;
+    /**
+     * Diamond / shared-transitive-dependency conflict detail.
+     *
+     * Set only when the block is NOT a direct reverse-dependency chain but a
+     * sibling conflict over a shared transitive dependency: `blockedPackage`
+     * and `blockerPackage` both depend on `sharedDependency`, and
+     * `blockerPackage` caps it to a range (`blockerConstraint`) that excludes
+     * the version `blockedPackage` needs at its latest. This is the class the
+     * reverse-dependency walk cannot see — e.g. `dart_style` held back because
+     * `saropa_lints` caps `analyzer <13`. Undefined for ordinary blockers.
+     */
+    readonly sharedDependency?: string | null;
+    /** Highest version of the shared dep pub can resolve under current constraints. */
+    readonly sharedDependencyResolvable?: string | null;
+    /** Latest published version of the shared dep. */
+    readonly sharedDependencyLatest?: string | null;
+    /** The constraint `blockerPackage` places on the shared dep (e.g. ">=9.0.0 <13.0.0"). */
+    readonly blockerConstraint?: string | null;
 }
 
 /** README content parsed for display: logo and inline images. */

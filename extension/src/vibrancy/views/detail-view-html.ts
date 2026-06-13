@@ -150,7 +150,18 @@ function buildUpdateSection(r: VibrancyResult): string {
     parts.push(`<div class="button-row">${buttons.join('')}</div>`);
 
     if (r.blocker) {
-        parts.push(`<div class="blocker-info">⚠️ ${l10n('detailView.update.blockedBy', { package: escapeHtml(r.blocker.blockerPackage) })}</div>`);
+        // Diamond conflict adds the shared-dep reason inline; ordinary blocks
+        // show just the blocker name as before.
+        const via = r.blocker.sharedDependency
+            ? ` — ${escapeHtml(l10n('packageDetail.version.blockedVia', {
+                blocker: r.blocker.blockerPackage,
+                dep: r.blocker.sharedDependency,
+                constraint: r.blocker.blockerConstraint ?? '',
+                resolvable: r.blocker.sharedDependencyResolvable ?? '',
+                latest: r.blocker.sharedDependencyLatest ?? '',
+            }))}`
+            : '';
+        parts.push(`<div class="blocker-info">⚠️ ${l10n('detailView.update.blockedBy', { package: escapeHtml(r.blocker.blockerPackage) })}${via}</div>`);
     }
 
     return buildSection(`⬆️ ${l10n('detailView.section.update')}`, parts);

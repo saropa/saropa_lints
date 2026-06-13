@@ -63,6 +63,28 @@ export function findBlockers(
     return blockers;
 }
 
+/**
+ * Plain-text detail for a diamond / shared-transitive-dependency block, or
+ * null for an ordinary reverse-dependency block. Names the shared dep, the
+ * constraint that binds it, and the resolvable/latest gap so the user sees
+ * WHY the sibling holds the package back — e.g. "via analyzer — saropa_lints
+ * caps >=9.0.0 <13.0.0 (12.x resolvable, 13.x latest)".
+ */
+export function formatSharedDepDetail(blocker: BlockerInfo): string | null {
+    if (!blocker.sharedDependency) { return null; }
+    const parts = [`via ${blocker.sharedDependency}`];
+    if (blocker.blockerConstraint) {
+        parts.push(`— ${blocker.blockerPackage} caps ${blocker.blockerConstraint}`);
+    }
+    if (blocker.sharedDependencyResolvable && blocker.sharedDependencyLatest) {
+        parts.push(
+            `(${blocker.sharedDependencyResolvable} resolvable, `
+            + `${blocker.sharedDependencyLatest} latest)`,
+        );
+    }
+    return parts.join(' ');
+}
+
 function findBlockerForPackage(
     entry: PubOutdatedEntry,
     reverseDeps: ReadonlyMap<string, readonly DepEdge[]>,

@@ -1098,7 +1098,7 @@ async function runScanInner(
             if (signal.aborted) { return; }
             progress.report({ message: 'Analyzing upgrade blockers...' });
             const enrichResult = await enrichWithBlockers(
-                withComplexity, workspaceRoot.fsPath, logger,
+                withComplexity, workspaceRoot, logger,
             );
             let results = enrichResult.results;
             lastReverseDeps = enrichResult.reverseDeps;

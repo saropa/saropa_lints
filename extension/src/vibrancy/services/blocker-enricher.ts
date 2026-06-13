@@ -5,11 +5,16 @@
  * Vibrancy UI experiment: scoring, providers, and webview assets.
  */
 
-import { VibrancyResult, DepEdge } from '../types';
+import * as vscode from 'vscode';
+import { VibrancyResult, DepEdge, BlockerInfo, PubOutdatedEntry } from '../types';
 import { ScanLogger } from './scan-logger';
 import { fetchPubOutdated } from './pub-outdated';
 import { fetchDepGraph, buildReverseDeps } from './dep-graph';
 import { findBlockers, classifyUpgradeStatus } from '../scoring/blocker-analyzer';
+import {
+    detectSharedDepConflicts, SharedDepConflict,
+} from '../scoring/shared-dep-conflict-detector';
+import { buildConstraintIndex } from './shared-dep-constraints';
 
 /** Result of blocker enrichment: enriched results + reverse dep graph. */
 export interface BlockerEnrichResult {
@@ -20,9 +25,10 @@ export interface BlockerEnrichResult {
 /** Enrich results with upgrade blocker info from dart pub CLI. */
 export async function enrichWithBlockers(
     results: VibrancyResult[],
-    cwd: string,
+    workspaceRoot: vscode.Uri,
     logger: ScanLogger,
 ): Promise<BlockerEnrichResult> {
+    const cwd = workspaceRoot.fsPath;
     const [outdatedResult, depGraphResult] = await Promise.all([
         fetchPubOutdated(cwd),
         fetchDepGraph(cwd),
@@ -54,6 +60,16 @@ export async function enrichWithBlockers(
     const blockerMap = new Map(
         blockers.map(b => [b.blockedPackage, b]),
     );
+
+    // Diamond-conflict pass: explains blocks the reverse-dep walk above can
+    // never see (a sibling capping a shared transitive dep). It takes priority
+    // for the packages it covers because for exactly those the reverse-dep walk
+    // returns the wrong blocker or none.
+    await mergeSharedDepConflicts(
+        outdatedResult.entries, reverseDeps, directNames,
+        results, workspaceRoot, blockerMap, logger,
+    );
+
     const outdatedMap = new Map(
         outdatedResult.entries.map(e => [e.package, e]),
     );
@@ -69,4 +85,79 @@ export async function enrichWithBlockers(
         };
     });
     return { results: enriched, reverseDeps };
+}
+
+/**
+ * Detect shared-transitive-dependency conflicts and fold them into blockerMap.
+ * Reads constrainer pubspecs only for packages that depend on a contested
+ * shared dep, keeping pub-cache I/O bounded to the relevant subgraph.
+ */
+async function mergeSharedDepConflicts(
+    outdated: readonly PubOutdatedEntry[],
+    reverseDeps: ReadonlyMap<string, readonly DepEdge[]>,
+    directNames: ReadonlySet<string>,
+    results: readonly VibrancyResult[],
+    workspaceRoot: vscode.Uri,
+    blockerMap: Map<string, BlockerInfo>,
+    logger: ScanLogger,
+): Promise<void> {
+    const candidates = collectConstrainerCandidates(outdated, reverseDeps);
+    if (candidates.size === 0) { return; }
+
+    const constraints = await buildConstraintIndex(workspaceRoot, candidates);
+    const conflicts = detectSharedDepConflicts(
+        outdated, reverseDeps, constraints, directNames,
+    );
+    if (conflicts.length === 0) { return; }
+
+    const resultMap = new Map(results.map(r => [r.package.name, r]));
+    for (const c of conflicts) {
+        blockerMap.set(c.blockedPackage, toBlockerInfo(c, resultMap));
+    }
+    logger.info(
+        `Shared-dependency conflicts detected: ${conflicts.length} `
+        + `(${conflicts.map(c => `${c.blockedPackage} via ${c.sharedDependency}`).join(', ')})`,
+    );
+}
+
+/**
+ * Packages that depend on a blocked, shared (2+ dependents) transitive dep —
+ * the only packages whose pubspec constraints can name a diamond blocker.
+ */
+function collectConstrainerCandidates(
+    outdated: readonly PubOutdatedEntry[],
+    reverseDeps: ReadonlyMap<string, readonly DepEdge[]>,
+): Set<string> {
+    const candidates = new Set<string>();
+    for (const entry of outdated) {
+        const blocked = !!entry.resolvable && !!entry.latest
+            && entry.resolvable !== entry.latest;
+        if (!blocked) { continue; }
+        const dependents = reverseDeps.get(entry.package) ?? [];
+        if (dependents.length < 2) { continue; }
+        for (const edge of dependents) {
+            candidates.add(edge.dependentPackage);
+        }
+    }
+    return candidates;
+}
+
+/** Convert a detected conflict into a BlockerInfo, enriched from scan results. */
+function toBlockerInfo(
+    conflict: SharedDepConflict,
+    resultMap: ReadonlyMap<string, VibrancyResult>,
+): BlockerInfo {
+    const constrainerResult = resultMap.get(conflict.constrainerPackage);
+    return {
+        blockedPackage: conflict.blockedPackage,
+        currentVersion: conflict.currentVersion,
+        latestVersion: conflict.latestVersion,
+        blockerPackage: conflict.constrainerPackage,
+        blockerVibrancyScore: constrainerResult?.score ?? null,
+        blockerCategory: constrainerResult?.category ?? null,
+        sharedDependency: conflict.sharedDependency,
+        sharedDependencyResolvable: conflict.sharedResolvable,
+        sharedDependencyLatest: conflict.sharedLatest,
+        blockerConstraint: conflict.constrainerConstraint,
+    };
 }
