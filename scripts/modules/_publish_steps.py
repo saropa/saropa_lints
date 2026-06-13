@@ -438,38 +438,28 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     )
 
     spelling_hits = scan_directory(project_dir)
-    # Prompt the user on hits: Retry (rescan after fix) or Ignore
-    # (continue publish). This replaces the prior auto-abort so fixes
-    # can be applied without restarting the whole audit.
-    spelling_ignored = False
+    # British spellings ALWAYS block the publish — there is no "ship with
+    # hits" path. A bypassable gate (the old [I]gnore option) is exactly
+    # why British spellings kept reaching pub.dev; see
+    # bugs/british_english_recurrence_attempts.md. The dev may Retry (fix
+    # in place, then re-scan) or Abort; either way the publish stays
+    # blocked until the tree is clean. The pre-commit hook should catch
+    # these long before here — this gate is the final hard backstop.
     while spelling_hits:
         print_spelling_report(spelling_hits, project_dir)
-        choice = _prompt_spelling_failure()
-        if choice == "retry":
-            print_info("Re-scanning for British spellings...")
-            spelling_hits = scan_directory(project_dir)
-            continue
-        # choice == "ignore": user accepts the hits; continue publish
-        print_warning(
-            f"Continuing publish with {len(spelling_hits)} "
-            f"British spelling(s) (user chose Ignore)."
-        )
-        spelling_ignored = True
-        break
+        if not _prompt_spelling_retry():
+            # Abort / non-interactive: leave hits in place so the gate blocks.
+            break
+        print_info("Re-scanning for British spellings...")
+        spelling_hits = scan_directory(project_dir)
 
-    # Only block the publish if hits remain AND user did not ignore
-    spelling_blocks = bool(spelling_hits) and not spelling_ignored
+    spelling_blocks = bool(spelling_hits)
 
     spelling_check: list[tuple[str, str, list[str]]] = []
     if spelling_hits:
-        # "warn" when ignored (visible but non-blocking), "fail" otherwise
-        status = "warn" if spelling_ignored else "fail"
-        label = f"{len(spelling_hits)} British English spelling(s) found"
-        if spelling_ignored:
-            label += " — ignored by user"
         spelling_check.append((
-            status,
-            label,
+            "fail",
+            f"{len(spelling_hits)} British English spelling(s) found",
             [f"{h.file}:{h.line_number} — {h.uk_word} → {h.us_word}"
              for h in spelling_hits[:10]],
         ))
@@ -1383,28 +1373,26 @@ def _prompt_analysis_failure() -> str:
     return "abort"
 
 
-def _prompt_spelling_failure() -> str:
-    """Ask user what to do after British spellings were found.
+def _prompt_spelling_retry() -> bool:
+    """Ask whether to re-scan after fixing British spellings.
 
-    Returns 'retry' | 'ignore'. No auto-abort: the user must choose
-    whether to fix-and-rescan (Retry) or proceed with the hits in
-    place (Ignore). Ctrl+C still aborts via KeyboardInterrupt.
-    Default (empty input) is Retry — the safer choice since
-    fixes are usually easy.
+    Returns True to Retry (the dev fixed the hits and wants a re-scan),
+    False to Abort. There is deliberately NO "ignore and ship" option:
+    British spellings always block the publish, because a bypassable gate
+    is why they kept reaching pub.dev (see
+    bugs/british_english_recurrence_attempts.md). Empty input defaults to
+    Retry since fixes are usually quick; a non-interactive stream (EOF)
+    returns False so an automated run blocks rather than looping forever.
+    Ctrl+C propagates so it aborts the whole publish.
     """
     print_warning("British English spelling(s) found. Choose an action:")
     print_colored("  [R]etry (re-scan after fixing)", Color.CYAN)
-    print_colored("  [I]gnore and continue (publish with hits)", Color.CYAN)
+    print_colored("  [A]bort publish", Color.CYAN)
     try:
-        raw = input("  Choice [r/i]: ").strip().lower() or "r"
-        if raw.startswith("i"):
-            return "ignore"
-        # default and any 'r*' → retry
-        return "retry"
-    except (EOFError, KeyboardInterrupt):
-        # Propagate interrupt by returning 'ignore' would be wrong;
-        # re-raise so the outer publish workflow can handle abort.
-        raise
+        raw = input("  Choice [r/a]: ").strip().lower() or "r"
+    except EOFError:
+        return False
+    return not raw.startswith("a")
 
 
 def run_analysis_with_prompt(

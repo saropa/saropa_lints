@@ -2,7 +2,7 @@
 
 /// file_picker package lint rules (always-on correctness / best-practice).
 ///
-/// Catch the documented file_picker footguns: using a cancelled (null) result,
+/// Catch the documented file_picker footguns: using a canceled (null) result,
 /// the web null-path crash, the FileType.custom / allowedExtensions contract,
 /// leading-dot extensions, and the multi-file in-memory hazard.
 ///
@@ -636,7 +636,7 @@ class FilePickerDeprecatedWithReadStreamRule extends SaropaLintRule {
 ///
 /// Since: v4.16.0 | Rule version: v1 | Pack: file_picker_12
 ///
-/// `allowMultiple` was deprecated in file_picker v12 in favour of the
+/// `allowMultiple` was deprecated in file_picker v12 in favor of the
 /// dedicated `pickFiles()` (multi) vs `pickFile()` (single) API split.
 /// `allowMultiple: false` should migrate to a `pickFile()` call (which also
 /// returns a non-nullable single `PlatformFile`, avoiding the `.first` dance).

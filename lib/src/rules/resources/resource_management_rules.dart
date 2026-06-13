@@ -854,7 +854,7 @@ class RequirePlatformChannelCleanupRule extends SaropaLintRule {
     r'setMethodCallHandler\s*\(\s*null\s*\)',
   );
   // Channel teardown other than nulling the handler: removeMethodCallHandler,
-  // or cancelling a broadcast-stream subscription.
+  // or canceling a broadcast-stream subscription.
   static final RegExp _channelTeardownPattern = RegExp(
     r'removeMethodCallHandler|\.cancel(?:Safe)?\s*\(',
   );
