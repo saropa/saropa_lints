@@ -237,6 +237,10 @@ export function runActivation(
     const cacheTtlMs = getCacheTtlHours() * 60 * 60 * 1000;
     const cache = new CacheService(context.globalState, cacheTtlMs);
     reviewStateService = new ReviewStateService(context.workspaceState);
+    // Wire the dashboard's docked detail pane with the same review-state +
+    // cache the standalone panel used, so it runs the lazy fetches and persists
+    // PR/issue review state (master-detail consolidation).
+    VibrancyReportPanel.configure(reviewStateService, cache);
     registryService = new RegistryService(context.secrets);
     context.subscriptions.push(registryService);
 

@@ -106,7 +106,10 @@ def get_latest_changelog_version(changelog_path: Path) -> str | None:
     if not changelog_path.exists():
         return None
     content = changelog_path.read_text(encoding="utf-8")
-    match = re.search(rf"##\s*\[?({_VERSION_RE})\]?", content)
+    # Anchor to a line-leading heading (MULTILINE), matching display_changelog.
+    # An unanchored search could match a version-like token in prose or inside a
+    # code fence before the first real `## [X.Y.Z]` heading.
+    match = re.search(rf"^##\s*\[?({_VERSION_RE})\]?", content, re.MULTILINE)
     return match.group(1) if match else None
 
 

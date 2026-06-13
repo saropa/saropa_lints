@@ -2,7 +2,26 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/packages/package_specific_rules.dart';
+// The former package_specific_rules.dart was split into per-package files. These
+// 16 files now hold the 19 rules this suite pins. Importing them directly (rather
+// than the rules barrel) keeps the suite compilable and runnable independent of
+// unrelated rule files in the package.
+import 'package:saropa_lints/src/rules/packages/app_links_rules.dart';
+import 'package:saropa_lints/src/rules/packages/device_calendar_rules.dart';
+import 'package:saropa_lints/src/rules/packages/envied_rules.dart';
+import 'package:saropa_lints/src/rules/packages/firebase_rules.dart';
+import 'package:saropa_lints/src/rules/packages/flutter_keyboard_visibility_rules.dart';
+import 'package:saropa_lints/src/rules/packages/flutter_svg_rules.dart';
+import 'package:saropa_lints/src/rules/packages/geolocator_rules.dart';
+import 'package:saropa_lints/src/rules/packages/google_fonts_rules.dart';
+import 'package:saropa_lints/src/rules/packages/google_sign_in_rules.dart';
+import 'package:saropa_lints/src/rules/packages/image_picker_rules.dart';
+import 'package:saropa_lints/src/rules/packages/openai_rules.dart';
+import 'package:saropa_lints/src/rules/packages/sign_in_with_apple_rules.dart';
+import 'package:saropa_lints/src/rules/packages/speech_to_text_rules.dart';
+import 'package:saropa_lints/src/rules/packages/url_launcher_rules.dart';
+import 'package:saropa_lints/src/rules/packages/uuid_rules.dart';
+import 'package:saropa_lints/src/rules/packages/webview_flutter_rules.dart';
 
 /// Tests for 19 Package Specific lint rules.
 ///

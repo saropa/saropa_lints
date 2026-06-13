@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "Güvenlik · Kalite · Kalitesi",
+    "searchPlaceholder": "Filtre kuralları... filtre kuralı.",
+    "empty": "Her şey temiz  ⁇ hiçbir bulgu bulunamadı",
+    "liveTitle": "Canlı  ⁇  Canlı düzenlerken güncellemeler gelir.",
+    "fetching": "Alışveriş... alım.",
+    "noOccurrences": "Hiçbir olay yaşanmadı.",
+    "summaryFindings": "{count} bulgu",
+    "summaryRules": "{count} kural",
+    "more": "+{count} daha fazla",
+    "wordErrors": "hatalar hatası hataları",
+    "wordWarnings": "uyarılar, uyarı mesajları.",
+    "wordInfo": "Bilgi, bilgi, bilgi.",
+    "wordFiles": "Dosyalar dosyaları dosyalar dosyalardır.",
+    "gradeExcellent": "Çok güzel, çok iyi.",
+    "gradeGood": "İyi iyi iyi iyi",
+    "gradeFair": "Fair, adil ve makul bir şekilde.",
+    "gradeWeak": "Zayıf, zayıf ve zayıftır.",
+    "gradeSevere": "Çok şiddetli çok ağır"
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇ {count} konfigürasyon önerisi (s)",
+    "initMissing": {
+      "title": "Saropa Lints (run init) ayarlayın.",
+      "detail": "saropa_lints pubspec'te ama henüz analizör konfigürasyonu kablolu değil."
+    },
+    "packAvailable": {
+      "title": "{pack} kural paketini etkinleştirin.",
+      "detail": "{count} pubspek içinde bir paket için kurallar."
+    },
+    "enabledToast": "analysis_options.yaml'de {pack} kural paketini etkinleştirdi.",
+    "enableFailed": "{pack} kural paketi  ⁇  etkinleştirilemedi. Bunu etkinleştirmek için Rule Packs gösterge panelini açın."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: _PH1_: -HİS'in ilk aşamas {count} kural paketi önerisi (ler) bu projeye uygulanır.",
+    "review": "Review Review Review İnceleme Gözden Geçirme",
+    "dismiss": "İşten çıkarma, işten atmak.",
+    "reviewFailed": "Saropa Lints kural paketi incelemesini açamadım. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION Versiyonu:",
@@ -35,6 +74,15 @@
       "published": "Yayınlanmış yayınlanmış yayımlanmış",
       "update": "Update Update güncelleme Güncelleştirmek",
       "blockedBy": "Blocked by tarafından engellendi",
+      "blockedVia": "{blocker} kapakları {dep} {constraint} ({resolvable} çözülebilir, {latest} en son)",
+      "blockedViaSdk": "{dep} ({resolvable} çözülebilir, {latest} en son) için {blocker} (Flutter SDK) tarafından sabitlendi",
+      "constrained": "Sınırlı, kısıtlanmış.",
+      "constrainedBy": "Sizin {constraint} kısıtlamanız bunu kapatır ({resolvable} çözülebilir, {latest} son)",
+      "pinHeld": "Held held tutuldu",
+      "pinDoNotUse": "Kullanmayın kullanmayın.",
+      "drift": "Proje çapındaki sürüklenme, proje çapında bir sürükleniştir.",
+      "driftBehind": "Arkada: {siblings} ({own}'niz var)",
+      "driftDiffers": "Farklılıklar: {siblings} ({own}'niz var)",
       "codeSize": "Kod Boyutu Kodu Ölçüsü",
       "archiveSize": "Arşiv Boyutu Arşip boyutu",
       "bloat": "({rating}/10 şişkinlik)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "Toggle full-width layout düzenini değiştirin.",
     "sortBy": "{column} tarafından sıralama",
     "expandRow": "Ekran satırını genişletin.",
+    "copyRow": "Satır satırı kopyalayın.",
+    "comparisonDimension": "Metrik metrik olarak kullanılır.",
     "collapseRow": "Çökme sırası çöküşe doğru.",
     "selectAll": "Tüm satırları seçin.",
     "keyboardShortcuts": "Klavye kısayolları (keyboard shortcuts)",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints UI dili",
       "placeholder": "Yan çubuğu ve panolar için dil seçin.",
-      "auto": "Otomatik ( VS Code görüntüleme dilini takip edin)"
+      "auto": "Otomatik ( VS Code görüntüleme dilini takip edin)",
+      "coverage": "{pct}% tercüme edildi  ⁇ rest shows in english dinlenme şovları İngilizce"
     },
     "reloadPrompt": "Dil {locale} olarak ayarlandı. Yan çubuğu ve komut etiketlerini güncellemek için pencereyi yeniden yükleyin.",
     "reloadNow": "Yeniden yükleyin şimdi.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "Son tur, son koşuşturma.",
+      "updatedPrefix": "Güncellenmiş güncellendi.",
+      "refreshHint": "Analizörden yenileme yapmak için tıklayın.",
       "lastRunUnknown": "Son çalıştırma bilinmiyor.",
       "noTimestampTitle": "violations.json'da zaman damgası yok.",
       "findingsAfterFilterTitle": "Engelli kural filtresi sonrası toplam bulgular",
@@ -327,7 +380,7 @@
       "refreshExtension": "Refresh eklentisi ile refresh yapın.",
       "openPackageDashboard": "Açın Paket gösterge panosu paket aç.",
       "openCodeHealth": "Açık Kod Sağlık Open Code Health",
-      "openLintsConfig": "Open Lints Config config'i açın ve yapılandırın.",
+      "openLintsConfig": "Yönetme Kural Paketlerini Yönetin",
       "reloadFromDisk": "Diskten yeniden yükle.",
       "reloadFromDiskTitle": "Analizatörü yeniden çalıştırmadan, son violations.json'dan panoyu tekrar görüntüleyin.",
       "reEnableDisabledRules": "Etkinleştirilmiş kuralları yeniden etkinleştir...",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa Paket Kontrol Panosu",
     "heroTitle": "Saropa Paket Kontrol Panosu",
+    "detailPane": {
+      "aria": "Paket detayı",
+      "title": "Paket detayı",
+      "close": "Yakın detaylar, yakın ayrıntılar."
+    },
     "status": {
       "packagesCount": "{count} paket",
       "packagesBreakdown": "{direct} doğrudan, {transitive} geçişli",
@@ -741,7 +799,7 @@
       "likesUnavailable": "pub.dev beğeniler mevcut değil.",
       "likesCount": "{count} pub.dev beğenileri sever.",
       "downloadsUnavailable": "pub.dev 30 günlük indirme mevcut değil.",
-      "downloadsCount": "son 30 günde {count} indirme",
+      "downloadsCount": "{count} son 30 gün içinde indirilmiş sayılar",
       "sizeUnavailable": "Boyut pub.dev'den mevcut değil.",
       "noVulnerabilities": "Bilinen güvenlik açıkları yok.",
       "licenseUnspecified": "pub.dev'da belirtilmemiş lisans",
@@ -801,8 +859,8 @@
       "showTransitives": "Geçici bağımlılıkları göster.",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (paylaşılan)",
-      "tooltipHeader": "{total} geçişli bağımlılıklar",
-      "tooltipHeaderShared": "{total} geçişli bağımlılıklar ({shared} paylaşılan)",
+      "tooltipHeader": "{total} geçişli deps",
+      "tooltipHeaderShared": "{total} geçişli deps ({shared} paylaşılan)",
       "sharedBadgeTitle": "{count} diğer paketlerle paylaşılan bir pakettir.",
       "sharedBadge": "Paylaşılan paylaşılan paylaşımlar.",
       "transitiveDepsHeading": "Geçici Bağımlılıklar ({count})"
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "Paket paket paketi, paket paket.",
       "packages": "paketler paketler."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "Bu kuralı açıklayın."
+    },
+    "enableRule": {
+      "done": "Etkinleştirilmiş kural {ruleId}. Yeniden çalıştırma analizi uygulanır.",
+      "runAnalysis": "Analiz çalıştırın.",
+      "noWorkspace": "Bir kuralı etkinleştirmek için bir çalışma alanı klasörünü açın."
+    },
+    "openFinding": {
+      "noWorkspace": "Bir bulguyu açmak için bir çalışma alanı klasörünü açın.",
+      "notFound": "{file}. açılamadı"
     }
   }
 }

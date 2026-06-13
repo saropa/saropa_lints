@@ -541,3 +541,209 @@ class ImagePickerMultiResultUncheckedEmptyRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when ImagePicker.pickImage() is called without maxWidth/maxHeight.
+///
+/// Since: v2.3.2 | Updated: v4.13.0 | Rule version: v2
+///
+/// Alias: image_picker_dimensions, limit_image_size, picker_size_limit
+///
+/// **Quick fix available:** Adds a reminder comment for manual size limit addition.
+///
+/// ## Why This Matters
+///
+/// Modern smartphone cameras capture images at 12-108 megapixels. Loading these
+/// full-resolution images into memory can easily exceed available RAM, causing:
+/// - Out-of-memory crashes on lower-end devices
+/// - UI freezes during image processing
+/// - Excessive memory pressure leading to app termination
+///
+/// ## Detection
+///
+/// This rule flags `pickImage()` and `pickMultiImage()` calls from the
+/// `image_picker` package that don't specify size constraints. Detection is
+/// based on the presence of the `source` parameter (unique to image_picker).
+///
+/// ## Example
+///
+/// ### BAD:
+/// ```dart
+/// // A 108MP image = ~12,000 x 9,000 pixels = 432MB uncompressed!
+/// final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+/// ```
+///
+/// ### GOOD:
+/// ```dart
+/// final XFile? image = await picker.pickImage(
+///   source: ImageSource.gallery,
+///   maxWidth: 1920,  // Full HD is sufficient for most uses
+///   maxHeight: 1080,
+///   imageQuality: 85, // Optional: compress JPEG quality
+/// );
+/// ```
+///
+/// ## Recommended Size Limits
+///
+/// | Use Case | maxWidth | maxHeight |
+/// |----------|----------|-----------|
+/// | Profile avatar | 512 | 512 |
+/// | List thumbnails | 256 | 256 |
+/// | Full-screen display | 1920 | 1080 |
+/// | Print quality | 3840 | 2160 |
+class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
+  PreferImagePickerMaxDimensionsRule() : super(code: _code);
+
+  /// High impact - OOM crashes affect user experience significantly.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_image_picker_max_dimensions',
+    '[prefer_image_picker_max_dimensions] pickImage() called without maxWidth or maxHeight parameters loads full-resolution camera images (12+ megapixels on modern devices). Decoding these large images into memory causes OutOfMemoryError crashes on lower-end devices, excessive memory consumption that triggers OS app kills, and slow image processing. {v2}',
+    correctionMessage:
+        'Add maxWidth and maxHeight parameters (e.g., maxWidth: 1920, maxHeight: 1080) to limit image resolution and prevent out-of-memory crashes on constrained devices.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Only check image_picker methods
+      if (methodName != 'pickImage' && methodName != 'pickMultiImage') {
+        return;
+      }
+
+      // Verify this is likely from ImagePicker (has 'source' parameter)
+      bool hasSourceParam = false;
+      bool hasMaxWidth = false;
+      bool hasMaxHeight = false;
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'source') hasSourceParam = true;
+          if (name == 'maxWidth') hasMaxWidth = true;
+          if (name == 'maxHeight') hasMaxHeight = true;
+        }
+      }
+
+      // Only flag if this looks like ImagePicker (has source param)
+      // and is missing size constraints
+      if (hasSourceParam && !hasMaxWidth && !hasMaxHeight) {
+        reporter.atNode(node.methodName, code);
+      }
+    });
+  }
+}
+
+/// Warns when pickImage or pickVideo is called without debounce protection.
+///
+/// Since: v4.15.0 | Rule version: v1
+///
+/// Calling pickImage() or pickVideo() in rapid succession causes an
+/// ALREADY_ACTIVE PlatformException on both iOS and Android. The native
+/// image picker can only handle one request at a time. Without a loading
+/// guard or debounce, a double-tap on a "Choose Photo" button crashes
+/// the app.
+///
+/// **BAD:**
+/// ```dart
+/// onPressed: () async {
+///   final image = await picker.pickImage(source: ImageSource.gallery);
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// onPressed: () async {
+///   if (_isPicking) return;
+///   _isPicking = true;
+///   try {
+///     final image = await picker.pickImage(source: ImageSource.gallery);
+///   } finally {
+///     _isPicking = false;
+///   }
+/// }
+/// ```
+class AvoidImagePickerQuickSuccessionRule extends SaropaLintRule {
+  AvoidImagePickerQuickSuccessionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_image_picker_quick_succession',
+    '[avoid_image_picker_quick_succession] Image picker method called without a loading guard. Calling pickImage() or pickVideo() while another picker is already active throws a PlatformException (ALREADY_ACTIVE) that crashes the app. Users who double-tap "Choose Photo" or press it during a slow gallery load will trigger this crash. Add a boolean loading flag that prevents concurrent picker invocations. {v1}',
+    correctionMessage:
+        'Add a boolean guard (e.g., _isPicking) that returns early if a pick operation is already in progress, and reset it in a finally block.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Method names on ImagePicker that open native UI.
+  static const Set<String> _pickerMethods = <String>{
+    'pickImage',
+    'pickVideo',
+    'pickMultiImage',
+    'pickMedia',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (!_pickerMethods.contains(node.methodName.name)) return;
+
+      // Check if target looks like an ImagePicker instance
+      final String? targetSource = node.target?.toSource();
+      if (targetSource == null) return;
+
+      final bool isImagePicker = RegExp(
+        r'\b(picker|Picker|imagePicker|ImagePicker)\b',
+      ).hasMatch(targetSource);
+
+      if (!isImagePicker) return;
+
+      final guardPattern = RegExp(
+        r'\b(picking|loading|isLoading|isPicking|_picking|_isPicking)\b',
+      );
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is IfStatement) {
+          final String condition = current.expression.toSource();
+          if (guardPattern.hasMatch(condition)) {
+            return; // Has a guard, OK
+          }
+        }
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node);
+    });
+  }
+}

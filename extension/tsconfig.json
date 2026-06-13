@@ -17,8 +17,10 @@
     "node_modules",
     ".vscode-test",
     "out",
+    "out-ux",
     "dist",
     "src/test",
+    "test-ux",
     "media/codicons",
     "scripts"
   ]

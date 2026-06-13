@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "Veiligheid · Kwaliteit · Beveiliging.",
+    "searchPlaceholder": "Filterregels... filterregels.",
+    "empty": "Alles is veilig  ⁇ geen bevindingen gevonden.",
+    "liveTitle": "Live  ⁇  Leven  ⁇ updates als je bewerkingen maakt.",
+    "fetching": "Ophalen…",
+    "noOccurrences": "Geen gebeurtenissen.",
+    "summaryFindings": "{count} bevindingen",
+    "summaryRules": "{count} regels",
+    "more": "+{count} meer meer",
+    "wordErrors": "Fouten foutenfouten foutjes",
+    "wordWarnings": "waarschuwingen en waarschuwingstekens.",
+    "wordInfo": "info info info, informatie",
+    "wordFiles": "De bestanden zijn archieven.",
+    "gradeExcellent": "Uitstekend, uitstekend.",
+    "gradeGood": "Goed goed goed goed",
+    "gradeFair": "Fair, eerlijk en billijk.",
+    "gradeWeak": "Zwak en zwak is het.",
+    "gradeSevere": "Ernstig ernstig."
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇ {count} config suggestie (s)",
+    "initMissing": {
+      "title": "Stel Saropa Lints (run init) in.",
+      "detail": "saropa_lints is in pubspec, maar er is nog geen analysatorconfig aangesloten."
+    },
+    "packAvailable": {
+      "title": "Activeer het {pack} regelpakket.",
+      "detail": "{count} regels voor een pakket in uw pubspec."
+    },
+    "enabledToast": "Het {pack} regelpakket is ingeschakeld in analysis_options.yaml.",
+    "enableFailed": "Kon het {pack} regelpakket  ⁇  niet activeren open het dashboard van de regelpakketten om deze in te schakelen."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: Het is een generieke vorm van _ph1__. {count} regelpakket suggestie (s) zijn van toepassing op dit project.",
+    "review": "Review Review Review Onderzoek en evaluatie",
+    "dismiss": "Ontslag ontslagen.",
+    "reviewFailed": "Kan de recensie van het Saropa Lints-regelpakket niet openen. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "Versies Versie versie",
@@ -35,6 +74,15 @@
       "published": "Gepubliceerd Uitgegeven",
       "update": "Update",
       "blockedBy": "Geblokkeerd door:",
+      "blockedVia": "{blocker} caps {dep} {constraint} ({resolvable} oplosbaar, {latest} nieuwste)",
+      "blockedViaSdk": "vastgemaakt door {blocker} (Flutter SDK) voor {dep} ({resolvable} oplosbaar, {latest} laatste)",
+      "constrained": "Beperkingen opgelegd.",
+      "constrainedBy": "Uw beperking {constraint} plafonds dit ({resolvable} oplosbaar, {latest} nieuwste)",
+      "pinHeld": "Held gehouden.",
+      "pinDoNotUse": "Niet gebruiken.",
+      "drift": "Cross-project drift van projecten.",
+      "driftBehind": "Achter: achterin: {siblings} (je hebt {own})",
+      "driftDiffers": "Verschilt: verschillen in de vorm van een {siblings} (je hebt {own})",
       "codeSize": "Code Grootte Code Afmeting",
       "archiveSize": "Archiefgrootte Archiveermaat",
       "bloat": "({rating}/10 opgeblazen gevoel)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "Lay-out op volledige breedte in-/uitschakelen",
     "sortBy": "Sorteren op {column}",
     "expandRow": "Rij uitvouwen",
+    "copyRow": "Kopieer rij naar rij.",
+    "comparisonDimension": "Metrische metrie.",
     "collapseRow": "Rij samenvouwen",
     "selectAll": "Alle rijen selecteren",
     "keyboardShortcuts": "Sneltoetsen",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints UI-taal",
       "placeholder": "Kies taal voor zijbalk en dashboards",
-      "auto": "Automatisch (volg de weergavetaal van VS Code)"
+      "auto": "Automatisch (volg de weergavetaal van VS Code)",
+      "coverage": "{pct}% vertaald  ⁇ rest shows in het Engels."
     },
     "reloadPrompt": "Taal ingesteld op {locale}. Herlaad het venster om de labels in de zijbalk en opdracht te updaten.",
     "reloadNow": "Nu opnieuw laden.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "Laatste run, laatste ronde.",
+      "updatedPrefix": "Geactualiseerd bijgewerkt.",
+      "refreshHint": "Klik om te vernieuwen vanaf de analysator.",
       "lastRunUnknown": "Laatste run onbekend.",
       "noTimestampTitle": "Geen tijdstempel op violations.json",
       "findingsAfterFilterTitle": "Totaal bevindingen na filter met uitgeschakelde regel.",
@@ -327,7 +380,7 @@
       "refreshExtension": "Refresh is een uitbreiding van Refresh.",
       "openPackageDashboard": "Open het Dashboard van de Package.",
       "openCodeHealth": "Open Code Gezondheidszorg",
-      "openLintsConfig": "Open Lints Config configureert de open lins.",
+      "openLintsConfig": "Regelpakketten beheren",
       "reloadFromDisk": "Herlaad vanaf de schijf.",
       "reloadFromDiskTitle": "Herhaal het dashboard van de laatste violations.json zonder opnieuw te starten met de analysator.",
       "reEnableDisabledRules": "Her-activeren uitgeschakelde regels...",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa Dashboard van het pakket",
     "heroTitle": "Saropa Dashboard van het pakket",
+    "detailPane": {
+      "aria": "Pakket detail pakket details",
+      "title": "Pakket detail pakket details",
+      "close": "Close detail details van dichtbij."
+    },
     "status": {
       "packagesCount": "{count} pakketten",
       "packagesBreakdown": "{direct} direct, {transitive} transitief",
@@ -801,8 +859,8 @@
       "showTransitives": "Toon transitieve afhankelijkheden.",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (gedeeld)",
-      "tooltipHeader": "{total} transitieve afhankelijkheden",
-      "tooltipHeaderShared": "{total} transitieve afhankelijkheden ({shared} gedeeld)",
+      "tooltipHeader": "{total} transitieve deps.",
+      "tooltipHeaderShared": "{total} transitieve deps ({shared} gedeeld)",
       "sharedBadgeTitle": "{count} gedeeld met andere pakketten.",
       "sharedBadge": "gedeelde shared shared gedeeld",
       "transitiveDepsHeading": "Transitieve afhankelijkheden ({count})"
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "Pakket pakket paket",
       "packages": "pakketten verpakkingen."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "Leg deze regel uit."
+    },
+    "enableRule": {
+      "done": "Ingestelde regel {ruleId}. Herhalingsanalyse toe te passen.",
+      "runAnalysis": "Analyse uitvoeren",
+      "noWorkspace": "Open een werkruimte map om een regel in te schakelen."
+    },
+    "openFinding": {
+      "noWorkspace": "Open een werkruimte map om een vondst te openen.",
+      "notFound": "Kon {file} niet openen."
     }
   }
 }

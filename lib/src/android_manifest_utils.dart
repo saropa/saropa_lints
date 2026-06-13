@@ -7,9 +7,17 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 /// The analyzer visits many files; this avoids repeated manifest I/O for the
 /// same project root while keeping the logic local to this package.
 class AndroidManifestChecker {
-  AndroidManifestChecker._(this._manifestContent);
+  AndroidManifestChecker._(
+    this._manifestContent,
+    this._manifestPath,
+    this._mtime,
+    this._size,
+  );
 
   final String? _manifestContent;
+  final String? _manifestPath;
+  final DateTime? _mtime;
+  final int? _size;
 
   static final Map<String, AndroidManifestChecker> _cache = {};
 
@@ -18,24 +26,63 @@ class AndroidManifestChecker {
     final projectRoot = _findProjectRoot(filePath);
     if (projectRoot == null) return null;
 
-    final cached = _cache[projectRoot];
-    if (cached != null) return cached;
-
     final candidates = <String>[
       '$projectRoot/android/app/src/main/AndroidManifest.xml',
       '$projectRoot/android/AndroidManifest.xml',
     ];
 
-    String? content;
+    // Resolve the first existing manifest and capture its mtime+size. The cache
+    // is keyed on these so manifest edits (a new permission, a foreground
+    // service) are picked up within a long-lived analysis-server session — the
+    // previous unconditional cache returned stale results until restart. This
+    // mirrors InfoPlistChecker's invalidation.
+    String? manifestPath;
+    DateTime? currentMtime;
+    int? currentSize;
     for (final path in candidates) {
-      final file = File(path);
-      if (file.existsSync()) {
-        content = file.readAsStringSync();
-        break;
+      try {
+        final file = File(path);
+        if (file.existsSync()) {
+          final st = file.statSync();
+          manifestPath = path;
+          currentMtime = st.modified;
+          currentSize = st.size;
+          break;
+        }
+      } on FileSystemException {
+        // Try the next candidate; a transient stat failure must not pin a
+        // stale entry.
       }
     }
 
-    final checker = AndroidManifestChecker._(content);
+    final cached = _cache[projectRoot];
+    if (cached != null &&
+        cached._manifestPath == manifestPath &&
+        cached._mtime == currentMtime &&
+        cached._size == currentSize) {
+      return cached;
+    }
+
+    String? content;
+    DateTime? storedMtime = currentMtime;
+    int? storedSize = currentSize;
+    if (manifestPath != null) {
+      try {
+        content = File(manifestPath).readAsStringSync();
+      } on FileSystemException {
+        content = null;
+        // Do not pin mtime/size on a transient read failure: retry next time.
+        storedMtime = null;
+        storedSize = null;
+      }
+    }
+
+    final checker = AndroidManifestChecker._(
+      content,
+      manifestPath,
+      storedMtime,
+      storedSize,
+    );
     _cache[projectRoot] = checker;
     return checker;
   }
@@ -47,7 +94,15 @@ class AndroidManifestChecker {
   bool hasPermission(String permissionName) {
     final content = _manifestContent;
     if (content == null) return false;
-    return content.contains('android.permission.$permissionName');
+    // Boundary-anchored: a bare `contains('android.permission.READ_CONTACTS')`
+    // also matched `READ_CONTACTS_EXTENDED` (and any longer permission sharing
+    // the prefix). The negative lookahead requires the name to end at a
+    // non-identifier char (the closing quote in `android:name="..."`).
+    final pattern = RegExp(
+      'android\\.permission\\.${RegExp.escape(permissionName)}'
+      r'(?![A-Za-z0-9_])',
+    );
+    return pattern.hasMatch(content);
   }
 
   /// Raw substring search in manifest XML (foreground services, metadata, etc.).

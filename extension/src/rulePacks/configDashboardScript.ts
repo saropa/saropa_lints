@@ -41,8 +41,8 @@ const SCRIPT_PREAMBLE = `
     type: 'all',
     detectedOnly: false,
     enabledOnly: false,
-    sortKey: 'rules',
-    sortDir: 'desc',
+    sortKey: 'label',
+    sortDir: 'asc',
     /** When set, rows are filtered to a single pack — used by chart-bar/donut-segment clicks. */
     barPack: null,
     /** When set, KPI preset filter is active ('enabled' or 'applicable-sdk'). */
@@ -75,11 +75,25 @@ const SCRIPT_TIER_AND_TOGGLES = `
     });
   });
 
-  document.querySelectorAll('a.rules-link').forEach(function(a) {
+  // Inline disclosure: each toggle shows/hides the sibling detail row that lists
+  // the pack's rules. No popup — the rules stay in the table context.
+  document.querySelectorAll('button.rules-toggle').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const id = btn.getAttribute('data-pack');
+      const detail = document.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(id) + '"]');
+      if (!detail) return;
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+      btn.classList.toggle('open', !open);
+      detail.hidden = open;
+    });
+  });
+
+  // Each rule code inside an expanded pack opens its explanation.
+  document.querySelectorAll('a.rule-link').forEach(function(a) {
     a.addEventListener('click', function(e) {
       e.preventDefault();
-      const id = a.getAttribute('data-pack');
-      vscode.postMessage({ type: 'showRules', packId: id });
+      vscode.postMessage({ type: 'explainRule', rule: a.getAttribute('data-rule') });
     });
   });
 `;
@@ -167,6 +181,11 @@ const SCRIPT_FILTER_APPLY = `
       if (state.kpi === 'enabled' && !enabled) show = false;
       if (state.kpi === 'applicable-sdk' && !(type === 'sdk' && detected)) show = false;
       row.style.display = show ? '' : 'none';
+      // Keep each pack's expander detail row in lockstep: force it hidden when
+      // the pack is filtered out; when shown, clear the override so the row's own
+      // hidden attribute (collapsed/expanded state) governs visibility.
+      const detail = tbody.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(pack) + '"]');
+      if (detail) detail.style.display = show ? '' : 'none';
       if (show) visible++;
     });
     renderEmptyRow(visible);
@@ -309,7 +328,14 @@ const SCRIPT_SORT = `
       }
       return state.sortDir === 'asc' ? cmp : -cmp;
     });
-    rows.forEach(function(r) { tbody.appendChild(r); });
+    // Re-append each pack row followed immediately by its expander detail row so
+    // the two stay paired (the detail row is a separate <tr>, not a child).
+    rows.forEach(function(r) {
+      tbody.appendChild(r);
+      const pack = r.getAttribute('data-pack');
+      const detail = tbody.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(pack) + '"]');
+      if (detail) tbody.appendChild(detail);
+    });
     document.querySelectorAll('th.sortable').forEach(function(h) {
       h.setAttribute('aria-sort',
         h.getAttribute('data-sort') === state.sortKey

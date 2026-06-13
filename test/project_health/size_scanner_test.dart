@@ -31,7 +31,7 @@ void main() {
   test('measures only dart files, skips non-dart and build/', () async {
     final rows = <FileHealth>[];
     final agg = await runSizeScan(
-      SizeScanOptions(projectPath: tmp.path, onRow: rows.add),
+      SizeScanOptions(projectPath: tmp.path, onRow: (row) async => rows.add(row)),
     );
     expect(agg.fileCount, 2); // a.dart + sub/b.dart
     expect(rows, hasLength(2));
@@ -40,7 +40,12 @@ void main() {
 
   test('line split is correct for a measured file', () async {
     final rows = <FileHealth>[];
-    await runSizeScan(SizeScanOptions(projectPath: tmp.path, onRow: rows.add));
+    await runSizeScan(
+      SizeScanOptions(
+        projectPath: tmp.path,
+        onRow: (row) async => rows.add(row),
+      ),
+    );
     final a = rows.firstWhere((r) => r.path == 'a.dart');
     expect(a.loc, 2);
     expect(a.codeLoc, 1);
@@ -77,7 +82,7 @@ void main() {
             busFactorPct: 0.8,
           ),
         },
-        onRow: rows.add,
+        onRow: (row) async => rows.add(row),
       ),
     );
     final a = rows.firstWhere((r) => r.path == 'a.dart');

@@ -4602,6 +4602,15 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
       if (blockIsProse && !CommentPatterns.hasStrongCodeIndicators(content)) {
         continue;
       }
+      // Secondary veto on the strong-code carve-out: a wrapped prose line that
+      // merely cites a call (lowercase continuation + several function words,
+      // e.g. "this, formatNumberLocale(x) crashed (formatDouble in") satisfies
+      // hasStrongCodeIndicators but is mid-sentence English, not dead code.
+      // Only applies inside a prose block, so a genuine commented-out statement
+      // under a prose lead-in stays flagged.
+      if (blockIsProse && CommentPatterns.isWrappedProseFragment(content)) {
+        continue;
+      }
       reporter.atToken(commentToken);
     }
   }

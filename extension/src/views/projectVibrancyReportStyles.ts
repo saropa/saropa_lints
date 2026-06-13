@@ -201,7 +201,7 @@ function reportFileRowStyles(): string {
   align-items: center;
   gap: 4px;
   padding: 2px 6px;
-  border: 1px solid var(--border, var(--vscode-input-border, #8884));
+  border: 1px solid var(--border, var(--vscode-input-border));
   border-radius: 4px;
   background: var(--vscode-input-background, transparent);
 }
@@ -219,7 +219,11 @@ function reportFileRowStyles(): string {
   text-align: right;
   padding: 0;
 }
+/* §15 — the input itself has no border (the wrapper draws it), so the native
+   focus outline is suppressed here and replaced with a focus-within ring on the
+   wrapper. Removing the outline with no replacement left keyboard users blind. */
 .score-threshold input[type="number"]:focus { outline: none; }
+.score-threshold:focus-within { border-color: var(--vscode-focusBorder); }
 .score-threshold input[type="number"]::-webkit-inner-spin-button,
 .score-threshold input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none; appearance: none; margin: 0;
@@ -233,7 +237,7 @@ function reportFileRowStyles(): string {
    foreground so several active cards read as a group, not as a momentary
    selection. */
 .kpi-card.active {
-  outline: 2px solid var(--vscode-focusBorder, var(--accent-info, #3794ff));
+  outline: 2px solid var(--vscode-focusBorder, var(--accent-info));
   outline-offset: 1px;
 }
 `;

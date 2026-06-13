@@ -37,7 +37,7 @@ At a glance:
 - **Violations view** — Violations grouped by severity and file, with Error Lens-style inline annotations; multi-select works with **Copy as JSON**
 - **Security Posture** — OWASP Top 10 coverage matrix, compliance export
 - **Triage** — Disable noisy rules from the UI; see estimated score impact before acting
-- **Rule packs / Lints Config** — Enable stack bundles (Riverpod, Drift, …) from **Saropa Lints: Open Lints Config** (editor tab: per-pack toggles, rule lists, target platforms when embedder folders exist); see [`doc/guides/rule_packs.md`](https://github.com/saropa/saropa_lints/blob/main/doc/guides/rule_packs.md)
+- **Rule packs / Manage Rule Packs** — Enable stack bundles (Riverpod, Drift, …) and per-package packs from **Saropa Lints: Manage Rule Packs** (editor tab: per-pack toggles, inline rule lists, an "Enable all recommended packs" action, target platforms when embedder folders exist); see [`doc/guides/rule_packs.md`](https://github.com/saropa/saropa_lints/blob/main/doc/guides/rule_packs.md)
 - **Package Vibrancy** — Dependency health, alerts, and optional **version-gap** PR/issue triage (enable with `saropaLints.packageVibrancy.enableVersionGap`; a GitHub token improves results)
 - **Project Vibrancy** — Project code-health scoring for your own Dart source via **Open Code Health Dashboard** (editor-area webview; same scan as the CLI JSON output); use the graph icon on **Violations**, **Overview**, **Config**, or **Package Vibrancy** view titles, or the Command Palette
 - **TODOs & Hacks** — Sidebar scan for TODO/FIXME/HACK-style markers; full-workspace scan is **opt-in** (`saropaLints.todosAndHacks.workspaceScanEnabled`; leave `false` until you need it) via **TODOs & Hacks: Enable workspace scan**

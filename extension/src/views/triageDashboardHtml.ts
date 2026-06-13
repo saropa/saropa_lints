@@ -166,6 +166,11 @@ export function buildTriageDashboardStyles(): string {
 .triage-row-actions { white-space: nowrap; text-align: right; }
 .triage-row-actions .linkish { background: none; border: none; color: var(--vscode-textLink-foreground); cursor: pointer; margin-inline-start: 8px; padding: 0; font-size: 11px; }
 .triage-row-actions .linkish:hover { text-decoration: underline; }
+/* §15 — explicit themed focus ring on both triage button styles. Native
+   buttons keep a default outline, but the rest of the dashboard standardizes
+   on focusBorder so keyboard focus reads consistently across every surface. */
+.triage-btn:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
+.triage-row-actions .linkish:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
 `;
 }
 

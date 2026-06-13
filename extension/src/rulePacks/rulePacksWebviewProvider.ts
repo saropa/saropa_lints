@@ -32,6 +32,7 @@ import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
 import { getConfigDashboardScript } from './configDashboardScript';
 import { getConfigDashboardStyles } from './configDashboardStyles';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePackYaml';
+import { computeConfigSuggestions } from '../config/configSuggestions';
 
 const CONFIG_DASHBOARD_PANEL_TYPE = 'saropaLints.configDashboard';
 const TIERS = ['essential', 'recommended', 'professional', 'comprehensive', 'pedantic'] as const;
@@ -290,8 +291,9 @@ export class RulePacksWebviewProvider {
       CONFIG_DASHBOARD_PANEL_TYPE,
       // Editor-tab title keeps the "Saropa" prefix even though the sidebar row drops it —
       // the prefix is the only signal that lets users find this tab in Quick Open / Recent
-      // Files / the editor tab dropdown when many unrelated tabs are open.
-      'Saropa Lints Config',
+      // Files / the editor tab dropdown when many unrelated tabs are open. "Manage Rule
+      // Packs" names the powerful, easily-missed package packs that are the panel's point.
+      'Saropa Lints: Manage Rule Packs',
       vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -302,12 +304,24 @@ export class RulePacksWebviewProvider {
     this._panel = panel;
 
     panel.webview.onDidReceiveMessage(
-      (msg: { type: string; packId?: string; enabled?: boolean; id?: string; tier?: string }) => {
+      (msg: {
+        type: string;
+        packId?: string;
+        enabled?: boolean;
+        id?: string;
+        tier?: string;
+        rule?: string;
+      }) => {
         if (msg.type === 'toggle' && msg.packId !== undefined && msg.enabled !== undefined) {
           void this._handleToggle(msg.packId, msg.enabled);
         }
-        if (msg.type === 'showRules' && msg.packId !== undefined) {
-          void this._showRulesList(msg.packId);
+        // A rule code clicked inside an expanded pack row opens its explanation.
+        // The name arrives over untrusted postMessage and reaches a command, so
+        // validate it as a snake_case lint id before forwarding.
+        if (msg.type === 'explainRule' && typeof msg.rule === 'string') {
+          if (/^[a-z][a-z0-9_]*$/.test(msg.rule)) {
+            void vscode.commands.executeCommand('saropaLints.explainRule', msg.rule);
+          }
         }
         if (msg.type === 'command' && typeof msg.id === 'string') {
           void this._runDashboardCommand(msg.id);
@@ -603,6 +617,8 @@ export class RulePacksWebviewProvider {
 
   private _buildPrimaryActions(): string {
     return `<div class="toolbar-row" style="gap:6px;">
+    <button class="btn tier-1" data-command="enableAllApplicablePacks"
+      title="Turn on every rule pack whose dependency or SDK gate your project already satisfies — the packs marked Recommended.">Enable all recommended packs</button>
     <button class="btn tier-1" data-command="runAnalysis"
       title="Run dart analyze and refresh the dashboard.">Run analysis</button>
     <button class="btn" data-command="openConfig"
@@ -679,8 +695,10 @@ export class RulePacksWebviewProvider {
    * primary content of the dashboard.
    */
   private _buildPackTable(ctx: DashboardContext): string {
+    // Default sort is A–Z by pack name so the list is scannable by what users
+    // recognize (the package name), not by an opaque rule count.
     const rows = [...ctx.packRows]
-      .sort((a, b) => b.rules - a.rules || a.label.localeCompare(b.label))
+      .sort((a, b) => a.label.localeCompare(b.label))
       .map((row) => this._buildPackRow(row))
       .join('\n');
     return `<details class="section expander" aria-label="Rule packs" open>
@@ -689,13 +707,13 @@ export class RulePacksWebviewProvider {
     <table class="dash-table packs" id="packs-table">
       <thead>
         <tr>
-          <th class="sortable" data-sort="label" aria-sort="none">Pack <span class="arrow">▲</span></th>
-          <th class="sortable" data-sort="type" aria-sort="none">Type <span class="arrow">▲</span></th>
-          <th class="sortable" data-sort="risk" aria-sort="none">Risk <span class="arrow">▲</span></th>
-          <th class="sortable" data-sort="detected" aria-sort="none" title="Pack gate is satisfied by this workspace's pubspec.">In pubspec <span class="arrow">▲</span></th>
-          <th class="sortable" data-sort="enabled" aria-sort="none">Enabled <span class="arrow">▲</span></th>
-          <th class="sortable num" data-sort="rules" aria-sort="descending">Rules <span class="arrow">▼</span></th>
-          <th></th>
+          <th class="sortable" data-sort="detected" aria-sort="none" title="Recommended for this project: the pack's dependency or SDK gate is satisfied by your pubspec, so its rules apply to code you actually ship. Sort to bring recommended packs together.">Recommended <span class="arrow">▲</span></th>
+          <th class="sortable" data-sort="label" aria-sort="ascending" title="The pub package or Dart/Flutter SDK version this rule pack targets. Default sort. Click to reverse.">Pack <span class="arrow">▲</span></th>
+          <th class="sortable" data-sort="type" aria-sort="none" title="SDK = Dart/Flutter version-migration rules; Package = rules for a pub dependency.">Type <span class="arrow">▲</span></th>
+          <th class="sortable" data-sort="risk" aria-sort="none" title="Breaking = the API was removed in that version; Deprecation = still works but scheduled for removal. Blank for non-migration packs.">Risk <span class="arrow">▲</span></th>
+          <th class="sortable" data-sort="enabled" aria-sort="none" title="Whether this pack is currently switched on in analysis_options.yaml.">Enabled <span class="arrow">▲</span></th>
+          <th class="sortable num" data-sort="rules" aria-sort="none" title="How many lint rules this pack adds to analysis when enabled.">Rules <span class="arrow">▲</span></th>
+          <th title="Expand a pack to see and open each of its rules."></th>
         </tr>
       </thead>
       <tbody id="packs-tbody">${rows}</tbody>
@@ -723,15 +741,28 @@ export class RulePacksWebviewProvider {
     const gateText = this._gateMethodologyText(def);
     const detectedCell = `<td class="${row.detected ? 'ok' : 'muted'}" title="${escapeHtml(gateText)}" data-detected="${row.detected ? '1' : '0'}">${row.detected ? 'Yes' : 'No'}</td>`;
     const id = escapeHtml(row.id);
+    const label = escapeHtml(def.label);
+    // Inline disclosure: clicking the toggle reveals the detail row below (built
+    // from def.ruleCodes) instead of opening a separate quick-pick popup, so the
+    // rule list stays in context and each rule is a clickable link to its doc.
+    const ruleLinks = def.ruleCodes
+      .map(
+        (code) =>
+          `<a href="#" class="rule-link" data-rule="${escapeHtml(code)}" title="Open the explanation for ${escapeHtml(code)}.">${escapeHtml(code)}</a>`,
+      )
+      .join('');
+    const toggle = `<button type="button" class="rules-toggle" data-pack="${id}" aria-expanded="false" aria-label="Show the ${row.rules} rule${row.rules === 1 ? '' : 's'} in ${label}" title="Show the ${row.rules} rule${row.rules === 1 ? '' : 's'} in this pack."><span class="chev">▸</span> View</button>`;
+    const detailRow = `<tr class="rules-detail" data-detail-for="${id}" hidden><td colspan="7"><div class="rules-detail-body">${ruleLinks}</div></td></tr>`;
     return `<tr data-pack="${id}" data-type="${isSdk ? 'sdk' : 'package'}" data-risk="${riskKind}" data-detected="${row.detected ? '1' : '0'}" data-enabled="${row.enabled ? '1' : '0'}" data-rules="${row.rules}" data-label="${escapeHtml(def.label.toLowerCase())}">
-  <td class="pack-name">${escapeHtml(def.label)}</td>
+  ${detectedCell}
+  <td class="pack-name">${label}</td>
   <td>${typeBadge}</td>
   <td>${riskBadge}</td>
-  ${detectedCell}
-  <td><label class="switch"><input type="checkbox" data-pack="${id}" ${row.enabled ? 'checked' : ''} aria-label="Enable ${escapeHtml(def.label)}" /><span class="slider"></span></label></td>
+  <td><label class="switch"><input type="checkbox" data-pack="${id}" ${row.enabled ? 'checked' : ''} aria-label="Enable ${label}" /><span class="slider"></span></label></td>
   <td class="num">${row.rules}</td>
-  <td><a href="#" class="rules-link" data-pack="${id}" title="View the ${row.rules} rule${row.rules === 1 ? '' : 's'} in this pack.">View</a></td>
-</tr>`;
+  <td>${toggle}</td>
+</tr>
+${detailRow}`;
   }
 
   /** One-line methodology text used as a tooltip on the "In pubspec" cell (§14.12). */
@@ -999,16 +1030,6 @@ export class RulePacksWebviewProvider {
     this.refresh();
   }
 
-  private async _showRulesList(packId: string): Promise<void> {
-    const def = RULE_PACK_DEFINITIONS.find((d) => d.id === packId);
-    if (!def) return;
-    const items = def.ruleCodes.map((code) => ({ label: code, description: '' }));
-    await vscode.window.showQuickPick(items, {
-      title: `${def.label} — ${def.ruleCodes.length} rules`,
-      placeHolder: 'Rule codes in this pack',
-    });
-  }
-
   private async _runDashboardCommand(id: string): Promise<void> {
     // The legacy 'setTier' id is preserved for any toolbar entry points that still post it (e.g.
     // command palette callers); the in-page tier radio control posts a typed `setTier` message
@@ -1039,6 +1060,10 @@ export class RulePacksWebviewProvider {
     }
     if (id === 'openFindingsDashboard') {
       await vscode.commands.executeCommand('saropaLints.openViolationsWideReport');
+      return;
+    }
+    if (id === 'enableAllApplicablePacks') {
+      await this._enableAllApplicablePacks();
       return;
     }
     if (id === 'enableDetectedSdkPacks') {
@@ -1171,6 +1196,69 @@ export class RulePacksWebviewProvider {
       `Saropa Lints: enabled ${added} applicable ${modeLabel} pack(s).`,
     );
     this.refresh();
+  }
+
+  /**
+   * Enable every pack that is "recommended" for this project in one click:
+   * package packs whose marker is in pubspec, SDK packs whose environment gate
+   * passes, and lockfile-resolved upgrade packs. {@link computeConfigSuggestions}
+   * is the single source of "what applies", so this button and the proactive
+   * detection agree on the set instead of drifting apart.
+   */
+  private async _enableAllApplicablePacks(): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) {
+      void vscode.window.showWarningMessage(
+        'Saropa Lints: open a workspace folder before enabling packs.',
+      );
+      return;
+    }
+    const applicableIds = computeConfigSuggestions(root)
+      .filter((s) => s.kind === 'pack-available' && s.packId)
+      .map((s) => s.packId!);
+    const currentEnabled = new Set(readRulePacksEnabled(root));
+    const toAdd = applicableIds.filter((packId) => !currentEnabled.has(packId));
+    if (toAdd.length === 0) {
+      void vscode.window.showInformationMessage(
+        'Saropa Lints: every applicable rule pack is already enabled.',
+      );
+      return;
+    }
+    const labelFor = (packId: string): string =>
+      RULE_PACK_DEFINITIONS.find((d) => d.id === packId)?.label ?? packId;
+    const preview = toAdd.slice(0, 5).map(labelFor).join(', ');
+    const suffix = toAdd.length > 5 ? `, +${toAdd.length - 5} more` : '';
+    const choice = await vscode.window.showWarningMessage(
+      `Enable ${toAdd.length} recommended pack(s)?`,
+      {
+        modal: true,
+        detail: `This updates rule_packs.enabled in analysis_options.yaml. ${preview}${suffix}`,
+      },
+      'Enable',
+    );
+    if (choice !== 'Enable') return;
+
+    for (const packId of toAdd) currentEnabled.add(packId);
+    const ok = writeRulePacksEnabled(
+      root,
+      [...currentEnabled].sort((a, b) => a.localeCompare(b)),
+    );
+    if (!ok) {
+      void vscode.window.showErrorMessage(
+        'Saropa Lints: could not write analysis_options.yaml (rule_packs).',
+      );
+      return;
+    }
+    void vscode.window.showInformationMessage(
+      `Saropa Lints: enabled ${toAdd.length} recommended pack(s).`,
+    );
+    this.refresh();
+    const run = vscode.workspace
+      .getConfiguration('saropaLints')
+      .get<boolean>('runAnalysisAfterConfigChange');
+    if (run !== false) {
+      await vscode.commands.executeCommand('saropaLints.runAnalysis');
+    }
   }
 
   private async _confirmSdkBulkEnable(

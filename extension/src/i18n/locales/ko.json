@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "보안 · 품질 · 안전성 · 품질",
+    "searchPlaceholder": "필터 규칙...필터 규칙을 따르십시오.",
+    "empty": "모든 것이 깨끗합니다. 발견은 없습니다.",
+    "liveTitle": "라이브  ⁇  Live 편집을 하면서 업데이트가 됩니다.",
+    "fetching": "가져오기... 데려오는..",
+    "noOccurrences": "발생은 없습니다.",
+    "summaryFindings": "{count}개 결과",
+    "summaryRules": "{count}개 규칙",
+    "more": "+{count} 더 많은",
+    "wordErrors": "오류는 실수라는 것을 의미합니다.",
+    "wordWarnings": "경고, 경고를 통해",
+    "wordInfo": "정보, 정보, 정보를 제공해 줍니다.",
+    "wordFiles": "파일은 파일이, 파일은 파일이다.",
+    "gradeExcellent": "훌륭하고 훌륭한, 아주 좋은",
+    "gradeGood": "좋은, 좋은, 좋음",
+    "gradeFair": "페어페어 페어 (Fair Fair) 는 공정하고 공평한 곳입니다.",
+    "gradeWeak": "약하고 약한 것은",
+    "gradeSevere": "매우 심한 중증"
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇ {count} 컨피그 제안 (s)",
+    "initMissing": {
+      "title": "Saropa Lints (run init) 을 설정합니다.",
+      "detail": "saropa_lints는 pubspec에 있지만 아직 분석기 구성 요소가 연결되지 않았습니다."
+    },
+    "packAvailable": {
+      "title": "{pack} 규칙 팩을 활성화하십시오.",
+      "detail": "{count} 당신의 술집의 패키지에 대한 규칙"
+    },
+    "enabledToast": "analysis_options.yaml에서 {pack} 규칙 팩을 활성화했습니다.",
+    "enableFailed": "{pack} 규칙  ⁇ 팩을 활성화할 수 없습니다. 규칙 팩 대시보드를 열어서 이를 활성화합니다."
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: PH1__는 {count} 규칙 패키지 제안은 이 프로젝트에 적용됩니다.",
+    "review": "검토 리뷰를 검토하십시오.",
+    "dismiss": "해고 처분",
+    "reviewFailed": "Saropa Lints 규칙 팩 검토를 열 수 없습니다. {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "버전은 VERSION입니다.",
@@ -35,6 +74,15 @@
       "published": "출판된 게시 된",
       "update": "업데이트 업데이터 Update Update",
       "blockedBy": "차단된 것은:",
+      "blockedVia": "{blocker} 캡스 {dep} {constraint} ({resolvable} 해소 가능, {latest} 최신)",
+      "blockedViaSdk": "{dep}용 {blocker}(Flutter SDK)에 의해 고정됨({resolvable} 분해 가능, {latest} 최신)",
+      "constrained": "제약된 것을 억제하는 것이다.",
+      "constrainedBy": "당신의 제약 {constraint}는 이것을 제한합니다 ({resolvable} 해결 가능, {latest} 최신)",
+      "pinHeld": "개최되었다 Held",
+      "pinDoNotUse": "사용하지 마십시오.",
+      "drift": "프로젝트 간 드립은 프로젝트를 넘나들게 됩니다.",
+      "driftBehind": "뒤쪽: 뒤에 있는 사람 {siblings} (당신은 {own}를 가지고 있습니다)",
+      "driftDiffers": "다른 것: 차이가 있다. {siblings} (당신은 {own}를 가지고 있습니다)",
       "codeSize": "코드 크기와 코드의 크기",
       "archiveSize": "아카이브 크기 파일 크기",
       "bloat": "({rating}/10 부풀어 오르는)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "전체 너비 레이아웃을 Toggle full-width layout로 전환할 수 있습니다.",
     "sortBy": "{column}로 분류합니다.",
     "expandRow": "줄 확장 행을 확대합니다.",
+    "copyRow": "복사 행을 복사하십시오.",
+    "comparisonDimension": "메트릭 (metric) 은 미터로 표현된다.",
     "collapseRow": "붕괴 행은 무너지는 줄입니다.",
     "selectAll": "모든 행을 선택합니다.",
     "keyboardShortcuts": "키보드 단축키",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints UI 언어",
       "placeholder": "사이드바와 대시보드 언어 선택",
-      "auto": "자동(VS Code 표시 언어 따름)"
+      "auto": "자동(VS Code 표시 언어 따름)",
+      "coverage": "{pct}% 번역  ⁇ 휴식 쇼는 영어로 제공됩니다."
     },
     "reloadPrompt": "언어는 {locale}로 설정되어 있습니다. 사이드바와 명령어 레이블을 업데이트하기 위해 창을 다시 로드하십시오.",
     "reloadNow": "지금 다시 로드하십시오.",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "마지막 런트, 마지막 런",
+      "updatedPrefix": "업데이트 된 최신 버전",
+      "refreshHint": "분석기에서 업데이트를 클릭하여 새로 고치십시오.",
       "lastRunUnknown": "마지막 실행은 알려지지 않았습니다.",
       "noTimestampTitle": "violations.json에 타임 스탬프가 없습니다.",
       "findingsAfterFilterTitle": "비활성화 규칙 필터링 후 전체 발견",
@@ -327,7 +380,7 @@
       "refreshExtension": "업데이트 확장 프로그램인 Refresh Extension을 사용하세요.",
       "openPackageDashboard": "패키지 대시보드를 열기",
       "openCodeHealth": "오픈 코드 건강",
-      "openLintsConfig": "오픈 린츠 구성",
+      "openLintsConfig": "규칙 팩을 관리하십시오.",
       "reloadFromDisk": "디스크에서 다시 로드하십시오.",
       "reloadFromDiskTitle": "분석기를 다시 실행하지 않고 마지막 violations.json에서 대시보드를 재 렌더링하십시오.",
       "reEnableDisabledRules": "비활성화 된 규칙을 다시 활성화하십시오 ...",
@@ -545,6 +598,11 @@
   "packageDashboard": {
     "documentTitle": "Saropa 패키지 대시보드",
     "heroTitle": "Saropa 패키지 대시보드",
+    "detailPane": {
+      "aria": "패키지 세부 사항은 패키지입니다.",
+      "title": "패키지 세부 사항은 패키지입니다.",
+      "close": "세세한 세부적인 면접을 통해 자세히 알아본다."
+    },
     "status": {
       "packagesCount": "{count}개 패키지",
       "packagesBreakdown": "직접 {direct}개, 전이 {transitive}개",
@@ -741,7 +799,7 @@
       "likesUnavailable": "pub.dev 좋아하는 것은 사용할 수 없습니다.",
       "likesCount": "{count} pub.dev가 좋아하는 것을 좋아한다.",
       "downloadsUnavailable": "pub.dev 30일 다운로드가 불가능하다.",
-      "downloadsCount": "지난 30일간 다운로드 {count}회",
+      "downloadsCount": "{count} 지난 30일 동안 다운로드한 것",
       "sizeUnavailable": "크기는 pub.dev에서 사용할 수 없습니다.",
       "noVulnerabilities": "알려진 취약점은 없습니다.",
       "licenseUnspecified": "pub.dev에 명시되지 않은 라이선스",
@@ -801,8 +859,8 @@
       "showTransitives": "과도적 의존성을 표시합니다.",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (공유)",
-      "tooltipHeader": "{total} 전이 종속성",
-      "tooltipHeaderShared": "{total} 전이 종속성 ({shared} 공유)",
+      "tooltipHeader": "{total} 과도기적 기하급수",
+      "tooltipHeaderShared": "{total} 과도기적 deps ({shared} 공유)",
       "sharedBadgeTitle": "{count}는 다른 패키지와 공유됩니다.",
       "sharedBadge": "공유된 것은 공유되는 것이지요.",
       "transitiveDepsHeading": "과도적 의존성 ({count})"
@@ -1261,7 +1319,7 @@
       "codeSize": "코드 크기와 코드의 크기",
       "archive": "아카이브 기록 보관소",
       "sizeLabel": "{label}: {size}",
-      "source": "출처: {code} 코드 · {comments} 댓글 · {files} 파일",
+      "source": "출처 : {code} 코드 · {comments} 코멘트 · {files} 파일",
       "replace": "대체: {summary}"
     },
     "update": {
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "패키지 패킷은 패키지 패키지를 구성합니다.",
       "packages": "패키지 상품을 포장하는 것을 말한다."
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "이 규칙을 설명해 주세요."
+    },
+    "enableRule": {
+      "done": "{ruleId}.라는 규칙을 활성화했습니다. 재운영 분석을 적용합니다.",
+      "runAnalysis": "분석을 실행하여 분석을 수행합니다.",
+      "noWorkspace": "규칙을 활성화하기 위해 작업 영역 폴더를 열으십시오."
+    },
+    "openFinding": {
+      "noWorkspace": "검색을 열기 위해 작업 영역 폴더를 열어보십시오.",
+      "notFound": "{file}를 열 수 없습니다."
     }
   }
 }

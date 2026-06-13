@@ -83,11 +83,16 @@ export function getPackageDetailStyles(): string {
             font-weight: 600;
         }
 
-        .badge-vibrant { background: var(--vscode-testing-iconPassed); color: #fff; }
-        .badge-quiet { background: var(--vscode-editorInfo-foreground); color: #fff; }
-        .badge-legacy { background: var(--vscode-editorWarning-foreground); color: #000; }
-        .badge-stale { background: var(--vscode-editorWarning-foreground); color: #fff; }
-        .badge-eol { background: var(--vscode-editorError-foreground); color: #fff; }
+        /* §8.15 — badges paint a semantic *-foreground token as the background,
+         * so the text must be the editor background to stay legible in BOTH
+         * light and dark themes. Hardcoded #fff/#000 failed in the opposite
+         * theme (and badge-legacy/badge-stale disagreed on #000 vs #fff over
+         * the same warning background). One derived token fixes both. */
+        .badge-vibrant { background: var(--vscode-testing-iconPassed); color: var(--vscode-editor-background); }
+        .badge-quiet { background: var(--vscode-editorInfo-foreground); color: var(--vscode-editor-background); }
+        .badge-legacy { background: var(--vscode-editorWarning-foreground); color: var(--vscode-editor-background); }
+        .badge-stale { background: var(--vscode-editorWarning-foreground); color: var(--vscode-editor-background); }
+        .badge-eol { background: var(--vscode-editorError-foreground); color: var(--vscode-editor-background); }
 
         /* §7.2 / §14.6 — sections render as inset detail cards with a
            secondary background tone so the page reads as layered surfaces
@@ -318,6 +323,10 @@ export function getPackageDetailStyles(): string {
 
         .links-row {
             display: flex;
+            /* §4 — wrap the external-link strip on a narrow (docked) webview;
+             * without this the flex row defaults to nowrap and the links push
+             * past the viewport edge instead of flowing onto a second line. */
+            flex-wrap: wrap;
             gap: 12px;
             margin-top: 16px;
             padding-top: 12px;
@@ -455,4 +464,20 @@ export function getPackageDetailStyles(): string {
             border-color: var(--vscode-focusBorder);
         }
     `;
+}
+
+/**
+ * The same detail CSS, descendant-scoped under `.pkg-detail` for embedding in
+ * the Package Dashboard's docked detail pane. CSS nesting rewrites every rule to
+ * `.pkg-detail <selector>`, so:
+ *   - the `*` reset and content rules apply only inside the pane;
+ *   - the panel-only `body` / `body[data-full-width]` / `h1` globals become
+ *     inert (no such element exists inside `.pkg-detail`), leaving the dashboard
+ *     layout untouched.
+ * Safe as a single wrap because the source has no `@keyframes` / `@media` (which
+ * cannot be nested under a selector). The standalone panel keeps using the
+ * unscoped [getPackageDetailStyles] until it is retired.
+ */
+export function getPackageDetailStylesScoped(): string {
+    return `.pkg-detail {\n${getPackageDetailStyles()}\n}`;
 }

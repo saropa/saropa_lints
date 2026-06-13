@@ -512,18 +512,26 @@ def _choose_mode(args_mode: str | None) -> str:
         return args_mode
     if not sys.stdin.isatty():
         return "gaps"
-    print(c("bold", "\nTranslation mode:"))
+    # Blank lines around the menu and before the prompt: without them the menu
+    # ran straight into the preceding audit table and the wrapper's header lines,
+    # so the whole block read as one crushed wall of text.
+    print()
+    print(c("bold", "Translation mode:"))
+    print()
     print("  [1] Close gaps only (translate untranslated strings)  [default]")
     print("  [2] Close gaps + upgrade low-quality (re-translate Google/English -> NLLB)")
     print("  [3] Re-translate everything (force; keeps manual overrides)")
     print("  [4] Audit only — write gaps + low-quality report to file, translate nothing")
     print("  [a] Abort — exit now, translate nothing, change no files")
+    print()
     try:
-        raw = input("  Choose [1/2/3/4/a]: ").strip().lower()
+        # Enter (empty input) selects [1] gaps; the default is also stated in the
+        # prompt so it is discoverable without reading the menu's "[default]" tag.
+        raw = input("  Choose [1/2/3/4/a] (default 1): ").strip().lower()
     except (EOFError, KeyboardInterrupt):
         # Treat an EOF/Ctrl-C at the prompt as an abort, not a silent default run.
         raw = "a"
-    return {"2": "upgrade", "3": "all", "4": "audit", "a": "abort"}.get(raw, "gaps")
+    return {"1": "gaps", "2": "upgrade", "3": "all", "4": "audit", "a": "abort"}.get(raw, "gaps")
 
 
 def _source_strings(root: Path) -> list[str]:
@@ -768,14 +776,9 @@ def main() -> int:
     # Graceful Ctrl-C + persistent provenance for the translation run.
     _install_sigint()
     load_provenance()
-    mode = _choose_mode(args.mode)
 
-    if mode == "abort":
-        # Interactive escape hatch ([a] at the menu): nothing translated, no cache
-        # pruned, no locale file rewritten. Exit 0 — an abort is not a failure.
-        print(c("yellow", "  Aborted — nothing translated, no files changed."))
-        return 0
-
+    # Load the source strings + cache BEFORE the menu so the pre-menu audit and
+    # the translation run share one read (moved up from after _choose_mode).
     package_en_path = root / "package.nls.json"
     runtime_en_path = root / "src" / "i18n" / "locales" / "en.json"
 
@@ -787,6 +790,21 @@ def main() -> int:
     collect_unique_strings(package_en, unique_en)
     collect_unique_strings(runtime_en, unique_en)
     sorted_unique = sorted(unique_en)
+
+    # Interactive launches preview the current gap/low-quality state with a
+    # read-only audit BEFORE the menu, so the mode choice is informed by what is
+    # actually missing. Skipped when --mode is explicit or stdout is piped (CI),
+    # where the audit would only add noise and an extra report write.
+    if args.mode is None and sys.stdin.isatty():
+        _run_audit(locales, sorted_unique, mt_cache, root)
+
+    mode = _choose_mode(args.mode)
+
+    if mode == "abort":
+        # Interactive escape hatch ([a] at the menu): nothing translated, no cache
+        # pruned, no locale file rewritten. Exit 0 — an abort is not a failure.
+        print(c("yellow", "  Aborted — nothing translated, no files changed."))
+        return 0
 
     if mode == "audit":
         # Read-only path: report gaps + low-quality entries to file and exit

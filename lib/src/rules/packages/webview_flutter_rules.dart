@@ -149,3 +149,205 @@ class AvoidPreV4WebviewWidgetRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when WebView lacks SSL error handling callback.
+///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v4
+///
+/// Alias: webview_ssl_handler, require_ssl_error_callback
+///
+/// Without SSL error handling, WebView may silently fail on certificate issues
+/// or allow insecure connections without user awareness.
+///
+/// **Note:** This rule supports both the legacy WebView constructor pattern
+/// and the modern webview_flutter 4.0+ NavigationDelegate pattern.
+///
+/// **BAD (Legacy):**
+/// ```dart
+/// WebView(
+///   initialUrl: 'https://example.com',
+/// )
+/// ```
+///
+/// **GOOD (Legacy):**
+/// ```dart
+/// WebView(
+///   initialUrl: 'https://example.com',
+///   onSslError: (controller, error) {
+///     // Handle SSL error appropriately
+///   },
+/// )
+/// ```
+///
+/// **BAD (Modern webview_flutter 4.0+):**
+/// ```dart
+/// NavigationDelegate()
+/// ```
+///
+/// **GOOD (Modern webview_flutter 4.0+):**
+/// ```dart
+/// NavigationDelegate(
+///   onSslAuthError: (SslAuthError error) async {
+///     // Handle SSL certificate error - call error.cancel() or error.proceed()
+///     await error.cancel();
+///   },
+/// )
+/// ```
+class RequireWebviewSslErrorHandlingRule extends SaropaLintRule {
+  RequireWebviewSslErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.error;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_webview_ssl_error_handling',
+    '[require_webview_ssl_error_handling] If your WebView does not handle SSL certificate errors, it may silently accept invalid or malicious certificates, exposing users to man-in-the-middle attacks. Users may unknowingly submit sensitive information (such as passwords or payment details) to attackers, resulting in account compromise, data theft, or financial loss. Proper SSL error handling is essential for secure in-app browsing. {v4}',
+    correctionMessage:
+        'Implement an onSslAuthError callback in your WebView’s NavigationDelegate to detect and handle certificate errors. Warn users about invalid certificates, block navigation to untrusted sites, and log incidents for further review. Test your WebView implementation with both valid and invalid certificates to ensure robust SSL error handling.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+
+      // Check for legacy WebView/InAppWebView constructors
+      if (typeName == 'WebView' || typeName == 'InAppWebView') {
+        final bool hasOnSslError = node.argumentList.arguments.any((arg) {
+          if (arg is NamedExpression) {
+            final String name = arg.name.label.name;
+            return name == 'onSslError' ||
+                name == 'onReceivedServerTrustAuthRequest';
+          }
+          return false;
+        });
+
+        if (!hasOnSslError) {
+          reporter.atNode(node);
+        }
+        return;
+      }
+
+      // Check for modern webview_flutter 4.0+ NavigationDelegate pattern
+      // Note: The correct callback is `onSslAuthError` (not `onSslError` which doesn't exist).
+      // `onHttpAuthRequest` is for HTTP Basic/Digest auth (401 challenges), NOT SSL errors.
+      // See: https://pub.dev/documentation/webview_flutter/latest/webview_flutter/NavigationDelegate-class.html
+      if (typeName == 'NavigationDelegate') {
+        final bool hasOnSslError = node.argumentList.arguments.any((arg) {
+          if (arg is NamedExpression) {
+            final String name = arg.name.label.name;
+            return name == 'onSslAuthError';
+          }
+          return false;
+        });
+
+        if (!hasOnSslError) {
+          reporter.atNode(node);
+        }
+      }
+    });
+  }
+}
+
+/// Warns when WebView has file access enabled.
+///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v3
+///
+/// Alias: webview_no_file_access, disable_webview_file_access
+///
+/// Enabling file access in WebView is a security risk as malicious web content
+/// could potentially access local files on the device.
+///
+/// **BAD:**
+/// ```dart
+/// WebViewController()
+///   ..setJavaScriptMode(JavaScriptMode.unrestricted)
+///   ..allowFileAccess(true);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// WebViewController()
+///   ..setJavaScriptMode(JavaScriptMode.unrestricted);
+/// // File access disabled by default
+/// ```
+class AvoidWebviewFileAccessRule extends SaropaLintRule {
+  AvoidWebviewFileAccessRule() : super(code: _code);
+
+  // WARNING severity with high impact - security concern but not crash-causing
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_webview_file_access',
+    '[avoid_webview_file_access] WebView file access enabled (allowFileAccess: true) lets malicious web content read local files including user data, cached credentials, and app configuration, then exfiltrate them to attacker-controlled servers without user consent or visible indication. {v3}',
+    correctionMessage:
+        'Remove allowFileAccess: true or explicitly set it to false. If file access is required, restrict it to specific directories and validate all file paths.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // Check for allowFileAccess method call
+      if (methodName == 'allowFileAccess' ||
+          methodName == 'setAllowFileAccess') {
+        final ArgumentList args = node.argumentList;
+        if (args.arguments.isNotEmpty) {
+          final String argValue = args.arguments.first.toSource();
+          if (argValue == 'true') {
+            reporter.atNode(node);
+          }
+        }
+      }
+    });
+
+    // Also check named parameters
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!RegExp(r'\b(WebView|Settings)\b').hasMatch(typeName)) {
+        return;
+      }
+
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
+          if (name == 'allowFileAccess' ||
+              name == 'allowFileAccessFromFileURLs') {
+            final String value = arg.expression.toSource();
+            if (value == 'true') {
+              reporter.atNode(arg);
+            }
+          }
+        }
+      }
+    });
+  }
+}

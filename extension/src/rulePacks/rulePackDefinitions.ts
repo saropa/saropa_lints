@@ -33,7 +33,19 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'app_links_avoid_get_initial_link_string',
       'app_links_listen_in_build',
       'app_links_uncaught_stream_error',
+      'avoid_app_links_sensitive_params',
     ],
+  },
+  {
+    id: 'app_links_6',
+    label: 'app_links 6.x (pre-upgrade)',
+    matchPubNames: ['app_links'],
+    ruleCodes: [
+      'app_links_use_get_initial_link',
+      'app_links_use_get_latest_link',
+      'app_links_use_uri_link_stream',
+    ],
+    dependencyGate: { package: 'app_links', constraint: '<6.0.0' },
   },
   {
     id: 'audioplayers',
@@ -231,6 +243,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'device_calendar_retrieve_events_empty_params',
       'device_calendar_retrieve_events_missing_end_date',
       'device_calendar_unchecked_result',
+      'require_calendar_timezone_handling',
     ],
   },
   {
@@ -300,6 +313,14 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'require_drift_reads_from',
       'require_drift_schema_version_bump',
       'require_drift_stream_cancel',
+    ],
+  },
+  {
+    id: 'envied',
+    label: 'Envied',
+    matchPubNames: ['envied'],
+    ruleCodes: [
+      'require_envied_obfuscation',
     ],
   },
   {
@@ -379,6 +400,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'prefer_firestore_batch_write',
       'prefer_marker_clustering',
       'prefer_transaction_for_batch',
+      'require_analytics_error_handling',
       'require_background_message_handler',
       'require_crashlytics_user_id',
       'require_database_index',
@@ -430,6 +452,14 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_misused_hooks',
       'avoid_unnecessary_hook_widgets',
       'prefer_use_callback',
+    ],
+  },
+  {
+    id: 'flutter_keyboard_visibility',
+    label: 'Keyboard Visibility',
+    matchPubNames: ['flutter_keyboard_visibility'],
+    ruleCodes: [
+      'require_keyboard_visibility_dispose',
     ],
   },
   {
@@ -577,6 +607,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     label: 'flutter_svg',
     matchPubNames: ['flutter_svg'],
     ruleCodes: [
+      'require_svg_error_handler',
       'svg_missing_semantics_label',
       'svg_network_missing_error_builder',
       'svg_network_missing_placeholder',
@@ -616,6 +647,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_geolocator_background_without_config',
       'prefer_geocoding_cache',
       'prefer_geolocation_coarse_location',
+      'prefer_geolocator_distance_filter',
       'require_geolocator_battery_awareness',
     ],
   },
@@ -672,6 +704,14 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     dependencyGate: { package: 'go_router', constraint: '>=6.0.0' },
   },
   {
+    id: 'google_fonts',
+    label: 'Google Fonts',
+    matchPubNames: ['google_fonts'],
+    ruleCodes: [
+      'require_google_fonts_fallback',
+    ],
+  },
+  {
     id: 'google_maps_flutter',
     label: 'google_maps_flutter',
     matchPubNames: ['google_maps_flutter'],
@@ -694,6 +734,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'google_sign_in_canceled_not_handled',
       'google_sign_in_missing_exception_handler',
       'google_sign_in_unchecked_supports_authenticate',
+      'require_google_signin_error_handling',
     ],
     dependencyGate: { package: 'google_sign_in', constraint: '>=7.0.0' },
   },
@@ -775,11 +816,13 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     label: 'image_picker',
     matchPubNames: ['image_picker'],
     ruleCodes: [
+      'avoid_image_picker_quick_succession',
       'image_picker_camera_source_without_support_check',
       'image_picker_invalid_image_quality',
       'image_picker_lost_data_empty_check_missing',
       'image_picker_missing_retrieve_lost_data',
       'image_picker_multi_result_unchecked_empty',
+      'prefer_image_picker_max_dimensions',
     ],
   },
   {
@@ -861,29 +904,12 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     ],
   },
   {
-    id: 'package_specific',
-    label: 'Mixed packages',
-    matchPubNames: [],
+    id: 'openai',
+    label: 'OpenAI (chat_gpt_sdk)',
+    matchPubNames: ['chat_gpt_sdk'],
     ruleCodes: [
-      'avoid_app_links_sensitive_params',
-      'avoid_image_picker_quick_succession',
       'avoid_openai_key_in_code',
-      'avoid_webview_file_access',
-      'prefer_geolocator_distance_filter',
-      'prefer_image_picker_max_dimensions',
-      'prefer_uuid_v4',
-      'require_analytics_error_handling',
-      'require_apple_signin_nonce',
-      'require_calendar_timezone_handling',
-      'require_envied_obfuscation',
-      'require_google_fonts_fallback',
-      'require_google_signin_error_handling',
-      'require_keyboard_visibility_dispose',
       'require_openai_error_handling',
-      'require_speech_stop_on_dispose',
-      'require_svg_error_handler',
-      'require_url_launcher_mode',
-      'require_webview_ssl_error_handling',
     ],
   },
   {
@@ -1107,6 +1133,15 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'apple_sign_in_unchecked_credential_state',
       'apple_sign_in_unhandled_authorization_exception',
       'apple_sign_in_unhandled_cancel',
+      'require_apple_signin_nonce',
+    ],
+  },
+  {
+    id: 'speech_to_text',
+    label: 'Speech to Text',
+    matchPubNames: ['speech_to_text'],
+    ruleCodes: [
+      'require_speech_stop_on_dispose',
     ],
   },
   {
@@ -1137,6 +1172,15 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_url_launcher_simulator_tests',
       'prefer_url_launcher_fallback',
       'require_url_launcher_can_launch_check',
+      'require_url_launcher_mode',
+    ],
+  },
+  {
+    id: 'uuid',
+    label: 'uuid',
+    matchPubNames: ['uuid'],
+    ruleCodes: [
+      'prefer_uuid_v4',
     ],
   },
   {
@@ -1145,6 +1189,8 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
     matchPubNames: ['webview_flutter'],
     ruleCodes: [
       'avoid_pre_v4_webview_widget',
+      'avoid_webview_file_access',
+      'require_webview_ssl_error_handling',
     ],
     dependencyGate: { package: 'webview_flutter', constraint: '<4.0.0' },
   },

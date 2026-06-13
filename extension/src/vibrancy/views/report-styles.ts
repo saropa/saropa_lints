@@ -371,6 +371,7 @@ export function getReportStyles(): string {
         .summary-card[data-breakdown-trigger]:hover {
             box-shadow: 0 0 0 2px var(--vscode-focusBorder);
         }
+        .summary-card[data-filter]:focus-visible,
         .summary-card[data-breakdown-trigger]:focus-visible {
             outline: 2px solid var(--vscode-focusBorder);
             outline-offset: 2px;
@@ -641,6 +642,77 @@ export function getReportStyles(): string {
         table.fp-total .size-cell .size-total { display: inline; }
 
         /* ---- Table ---- */
+        /* §4 — the wide multi-column tables cannot fit a narrow (docked) webview;
+         * a scroll wrapper lets the table scroll horizontally inside its own
+         * bounds instead of pushing the whole page sideways. At wide widths the
+         * table fits so no scrollbar appears. These tables have no sticky thead,
+         * so the overflow container does not regress a pinned header. */
+        .table-scroll { max-width: 100%; overflow-x: auto; }
+
+        /* §7 master-detail: the packages table (left, flex-grow) sits beside the
+         * docked detail pane (right, fixed). The pane is hidden until a row is
+         * selected, so the default view is the full-width table. min-width:0 on
+         * the table column lets .table-scroll shrink inside the flex row instead
+         * of forcing overflow. On a narrow webview the pane stacks below. */
+        .dash-split { display: flex; gap: 16px; align-items: flex-start; }
+        .dash-split > details,
+        .dash-split > .packages-section { flex: 1 1 auto; min-width: 0; }
+        .detail-pane {
+            box-sizing: border-box;
+            flex: 0 0 380px; max-width: 380px;
+            position: sticky; top: 8px;
+            max-height: calc(100vh - 24px); overflow: auto;
+            border: 1px solid var(--vscode-widget-border); border-radius: 8px;
+            padding: 12px 14px;
+            background: var(--vscode-editorWidget-background);
+        }
+        .detail-pane[hidden] { display: none; }
+        /* The row whose detail is open in the pane stays highlighted so the
+         * master-detail relationship is visible while scrolling the table. */
+        .pkg-row.row-selected > td {
+            background: var(--vscode-list-inactiveSelectionBackground, var(--vscode-list-hoverBackground));
+        }
+        .detail-pane-head {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .detail-pane-kicker {
+            font-size: 0.72em; text-transform: uppercase; letter-spacing: 0.08em;
+            color: var(--vscode-descriptionForeground);
+        }
+        .detail-pane-close {
+            background: none; border: none; cursor: pointer; font-size: 1.2em;
+            line-height: 1; color: var(--vscode-descriptionForeground);
+            padding: 2px 6px; border-radius: 4px;
+        }
+        .detail-pane-close:hover {
+            color: var(--vscode-foreground);
+            background: var(--vscode-list-hoverBackground);
+        }
+        .detail-pane-close:focus-visible {
+            outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px;
+        }
+        .detail-pane .pane-header {
+            display: flex; gap: 12px; align-items: flex-start; margin-bottom: 12px;
+        }
+        .detail-pane .pane-logo {
+            width: 40px; height: 40px; border-radius: 6px; object-fit: contain;
+            flex-shrink: 0;
+        }
+        .detail-pane .pane-title { font-size: 1.15em; font-weight: 600; margin-bottom: 4px; }
+        @media (max-width: 900px) {
+            /* Stack on narrow webviews. align-items:stretch (not flex-start) so
+             * the table column fills the viewport width and .table-scroll keeps
+             * the wide table contained — flex-start would let it take its
+             * content width and overflow the page. */
+            .dash-split { flex-direction: column; align-items: stretch; }
+            .dash-split > details,
+            .dash-split > .packages-section { width: 100%; }
+            .detail-pane {
+                flex-basis: auto; max-width: 100%; width: 100%;
+                position: static; max-height: none;
+            }
+        }
         table {
             width: 100%; border-collapse: collapse; margin-top: 8px;
         }

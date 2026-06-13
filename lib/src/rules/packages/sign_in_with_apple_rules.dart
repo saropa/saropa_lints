@@ -806,3 +806,101 @@ class AppleSignInUncheckedCredentialStateRule extends SaropaLintRule {
     });
   }
 }
+
+/// Warns when Apple Sign-In is used without nonce parameter.
+///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v4
+///
+/// Alias: apple_signin_nonce, require_apple_nonce
+///
+/// ## Why This Matters
+///
+/// The nonce is a critical security layer that prevents **replay attacks**.
+/// Without it, an attacker who intercepts a valid Apple ID token could reuse
+/// it to authenticate as the victim indefinitely. The nonce ensures each
+/// authentication attempt is unique and cannot be replayed.
+///
+/// ## How It Works
+///
+/// 1. Generate a cryptographically random nonce (raw nonce)
+/// 2. Hash it with SHA-256 and pass the **hash** to Apple
+/// 3. Apple embeds the hash in the ID token it returns
+/// 4. Pass the **raw nonce** to your backend (e.g., Supabase)
+/// 5. Backend hashes the raw nonce and verifies it matches the token
+///
+/// This two-step process ensures only the original requester can use the token.
+///
+/// **BAD:**
+/// ```dart
+/// // INSECURE: No nonce means tokens can be replayed by attackers
+/// final credential = await SignInWithApple.getAppleIDCredential(
+///   scopes: [AppleIDAuthorizationScopes.email],
+/// );
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// // Generate nonce using Supabase's built-in method
+/// final rawNonce = Supabase.instance.client.auth.generateRawNonce();
+/// final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+///
+/// final credential = await SignInWithApple.getAppleIDCredential(
+///   scopes: [AppleIDAuthorizationScopes.email],
+///   nonce: hashedNonce, // Hash goes to Apple
+/// );
+///
+/// // Pass raw nonce to Supabase for verification
+/// await Supabase.instance.client.auth.signInWithIdToken(
+///   provider: OAuthProvider.apple,
+///   idToken: credential.identityToken!,
+///   nonce: rawNonce, // Raw nonce goes to Supabase
+/// );
+/// ```
+///
+/// See: https://supabase.com/docs/guides/auth/social-login/auth-apple
+class RequireAppleSigninNonceRule extends SaropaLintRule {
+  RequireAppleSigninNonceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.error;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_apple_signin_nonce',
+    '[require_apple_signin_nonce] Omitting a cryptographic nonce when using Apple Sign-In exposes your app to replay attacks. Attackers can intercept a valid authorization token and reuse it to impersonate the user, gaining unauthorized access to their account and sensitive data. Apple’s security documentation strongly recommends using a unique, random nonce for every authentication request to prevent these attacks and ensure user safety. {v4}',
+    correctionMessage:
+        'Always provide a unique, random nonce parameter to getAppleIDCredential() when implementing Apple Sign-In. This binds the authentication request to a single session and prevents replay attacks. Review your authentication flows, update your code to generate and pass a secure nonce, and test thoroughly to ensure the nonce is included in every request.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      if (node.methodName.name != 'getAppleIDCredential') return;
+
+      // Check for nonce parameter
+      final ArgumentList args = node.argumentList;
+      final bool hasNonce = args.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'nonce';
+        }
+        return false;
+      });
+
+      if (!hasNonce) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}

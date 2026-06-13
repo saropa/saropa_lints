@@ -597,3 +597,85 @@ class SvgStringMissingErrorBuilderRule extends SaropaLintRule {
     return null;
   }
 }
+
+/// Warns when SvgPicture lacks errorBuilder callback.
+///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v3
+///
+/// Alias: svg_error_handler, require_svg_error_builder
+///
+/// SVG loading can fail for various reasons. Without an error builder,
+/// the UI may break or show nothing when an SVG fails to load.
+///
+/// **BAD:**
+/// ```dart
+/// SvgPicture.asset('assets/icon.svg')
+/// SvgPicture.network('https://example.com/icon.svg')
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// SvgPicture.asset(
+///   'assets/icon.svg',
+///   placeholderBuilder: (context) => CircularProgressIndicator(),
+///   errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+/// )
+/// ```
+class RequireSvgErrorHandlerRule extends SaropaLintRule {
+  RequireSvgErrorHandlerRule() : super(code: _code);
+
+  // Medium impact - UI fallback, not crash-causing
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_svg_error_handler',
+    '[require_svg_error_handler] SvgPicture without errorBuilder shows blank on invalid SVG. SVG loading can fail for various reasons. Without an error builder, the UI may break or show nothing when an SVG fails to load. {v3}',
+    correctionMessage:
+        'Add errorBuilder to handle SVG loading failures. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      // Check for SvgPicture factory constructors
+      final String? target = node.target?.toSource();
+      if (target != 'SvgPicture') return;
+
+      final String methodName = node.methodName.name;
+      if (methodName != 'asset' &&
+          methodName != 'network' &&
+          methodName != 'file' &&
+          methodName != 'memory') {
+        return;
+      }
+
+      // Check for errorBuilder parameter
+      final bool hasErrorBuilder = node.argumentList.arguments.any((
+        Expression arg,
+      ) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'errorBuilder';
+        }
+        return false;
+      });
+
+      if (!hasErrorBuilder) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}

@@ -793,3 +793,85 @@ class _InitializeCallScanner extends RecursiveAstVisitor<void> {
     super.visitMethodInvocation(node);
   }
 }
+
+/// Warns when Google Sign-In calls lack try-catch error handling.
+///
+/// Since: v2.2.0 | Updated: v4.13.0 | Rule version: v3
+///
+/// Alias: google_signin_try_catch, handle_google_signin_errors
+///
+/// Google Sign-In can fail for various reasons (network, user cancellation,
+/// configuration issues). Without error handling, the app may crash.
+///
+/// **BAD:**
+/// ```dart
+/// Future<void> signIn() async {
+///   final GoogleSignInAccount? account = await _googleSignIn.signIn();
+///   // No error handling!
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Future<void> signIn() async {
+///   try {
+///     final GoogleSignInAccount? account = await _googleSignIn.signIn();
+///   } catch (e) {
+///     // Handle sign-in failure
+///   }
+/// }
+/// ```
+class RequireGoogleSigninErrorHandlingRule extends SaropaLintRule {
+  RequireGoogleSigninErrorHandlingRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_google_signin_error_handling',
+    '[require_google_signin_error_handling] Google Sign-In call without error handling crashes when the user cancels the sign-in flow, the network is unavailable, or Google Play Services are outdated. Users see an unhandled exception crash screen instead of a friendly error message, causing frustration and potential data loss in unsaved work. {v3}',
+    correctionMessage:
+        'Wrap the signIn() call in a try-catch block that handles PlatformException and network errors, and display a user-friendly error message with a retry option.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+      if (methodName != 'signIn' && methodName != 'signInSilently') return;
+
+      // Check if it's likely a GoogleSignIn call
+      final String? targetType = node.target?.toSource();
+      if (targetType == null) return;
+
+      final bool isGoogleSignIn = RegExp(
+        r'\b(googleSignIn|GoogleSignIn|_googleSignIn)\b',
+      ).hasMatch(targetType);
+
+      if (!isGoogleSignIn) return;
+
+      // Check if wrapped in try-catch
+      AstNode? current = node.parent;
+      while (current != null) {
+        if (current is TryStatement) return; // Has try-catch, OK
+        if (current is FunctionBody) break;
+        current = current.parent;
+      }
+
+      reporter.atNode(node);
+    });
+  }
+}

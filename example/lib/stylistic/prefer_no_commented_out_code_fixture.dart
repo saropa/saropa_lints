@@ -141,6 +141,19 @@ void goodExamples() {
   // base64url omits padding, but base64Url.decode requires the length to be a
   // multiple of four - restore the stripped padding before decoding so that
   // base64Url.decode reject an otherwise-valid token.
+
+  // A wrapped prose sentence whose middle line cites a function call with
+  // arguments mid-sentence (should NOT trigger - the middle line is a lowercase
+  // continuation fragment with function words, not a statement)
+  // Clamp to 20: toStringAsFixed throws above 20 digits. Without
+  // this, formatNumberLocale(x, decimalPlaces: 25) crashed (formatDouble in
+  // double_extensions already clamps the same way).
+
+  // A wrapped prose line ending with an unbalanced parenthetical that names a
+  // call (should NOT trigger - mid-sentence prose, open paren left dangling)
+  // The fallback path is taken when the primary computeLayout(node) returns
+  // an empty result (rare in practice but observed in the
+  // overflow tests).
 }
 
 // =============================================================================

@@ -25,6 +25,8 @@ How to file, investigate, and close bugs in `saropa_lints`.
 ## Raised Reports (2026-06-13)
 
 - `prefer_layout_builder_for_constraints_false_positive_mediaquery_fallback_and_viewport_fraction.md`
+- `prefer_no_commented_out_code_false_positive_prose_sentence_with_inline_call_example.md`
+- `prefer_setup_teardown_false_positive_per_test_parameterized_sut_construction.md`
 
 ---
 

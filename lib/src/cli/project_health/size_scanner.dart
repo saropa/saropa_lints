@@ -65,7 +65,12 @@ class SizeScanOptions {
   final int topN;
 
   /// Per-file sink for streaming rows to disk (NDJSON). Null = aggregate only.
-  final void Function(FileHealth row)? onRow;
+  ///
+  /// Awaited per row so the sink can apply backpressure (e.g. periodically
+  /// `flush()` its `IOSink`). Without awaiting, a fast walk over a large project
+  /// lets the sink's buffer grow unbounded — breaking the "only one file in
+  /// memory" guarantee in this file's header.
+  final Future<void> Function(FileHealth row)? onRow;
 
   /// When true, also compute per-file complexity + Maintainability Index
   /// (one extra parse per file; opt-in so the size-only scan stays fast).
@@ -117,7 +122,7 @@ Future<HealthAggregator> runSizeScan(SizeScanOptions options) async {
     final row = await _measure(entity, rel, options);
     if (row == null) continue;
     agg.add(row);
-    options.onRow?.call(row);
+    await options.onRow?.call(row);
   }
   return agg;
 }
@@ -128,7 +133,13 @@ Future<HealthAggregator> runSizeScan(SizeScanOptions options) async {
 Future<FileHealth?> _measure(File file, String rel, SizeScanOptions o) async {
   try {
     final bytes = await file.length();
-    final content = await file.readAsString();
+    var content = await file.readAsString();
+    // Strip a leading UTF-8 BOM: kept in `content` it counts as code on line 1
+    // (countLines sees a non-blank, non-comment char) and skews parsing. `bytes`
+    // stays the raw on-disk size (the file's true disk footprint).
+    if (content.startsWith('\uFEFF')) {
+      content = content.substring(1);
+    }
     final counts = countLines(content);
     // Reuse the cached parse when content is unchanged; otherwise parse and
     // record it. Size/LOC above is always fresh, so it can never go stale.

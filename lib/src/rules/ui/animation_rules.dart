@@ -339,38 +339,113 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
       if (controllerNames.isEmpty) return;
 
-      // Find dispose method body for isFieldCleanedUp checks
-      FunctionBody? disposeMethodBody;
-      for (final ClassMember member in node.bodyMembers) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          disposeMethodBody = member.body;
-          break;
+      // Collect EVERY method body that could perform disposal, not just a
+      // method literally named `dispose`. A controller is legitimately freed
+      // in `deactivate()` (called before dispose during tree removal) or via a
+      // private helper such as `_disposeControllers()` invoked from dispose.
+      // Scanning only `dispose` produced false positives for both patterns.
+      // We gather the disposal entry points (`dispose` + `deactivate`) and any
+      // method invoked from within them (one level of indirection covers the
+      // common `dispose() => _disposeControllers()` helper), then search all of
+      // those bodies for the cleanup call.
+      final List<FunctionBody> disposalBodies = _collectDisposalBodies(node);
+      if (disposalBodies.isEmpty) {
+        // No dispose/deactivate at all — every controller is undisposed.
+        for (final String name in controllerNames) {
+          _reportUndisposedField(node, name, reporter);
         }
+        return;
       }
 
-      // Check if controllers are disposed
+      // Check if controllers are disposed in any reachable disposal body.
       for (final String name in controllerNames) {
         // Accept `.dispose()` and `.disposeSafe()` (extension). `isFieldCleanedUp`
         // matches `methodName(`, so `dispose` does not match `disposeSafe(`.
-        final bool isDisposed =
-            disposeMethodBody != null &&
-            (isFieldCleanedUp(name, 'dispose', disposeMethodBody) ||
-                isFieldCleanedUp(name, 'disposeSafe', disposeMethodBody));
+        bool isDisposed = false;
+        for (final FunctionBody body in disposalBodies) {
+          if (isFieldCleanedUp(name, 'dispose', body) ||
+              isFieldCleanedUp(name, 'disposeSafe', body)) {
+            isDisposed = true;
+            break;
+          }
+        }
 
         if (!isDisposed) {
-          for (final ClassMember member in node.bodyMembers) {
-            if (member is FieldDeclaration) {
-              for (final VariableDeclaration variable
-                  in member.fields.variables) {
-                if (variable.name.lexeme == name) {
-                  reporter.atNode(variable);
-                }
-              }
-            }
-          }
+          _reportUndisposedField(node, name, reporter);
         }
       }
     });
+  }
+
+  /// Reports the field declaration variable named [name] in [node].
+  void _reportUndisposedField(
+    ClassDeclaration node,
+    String name,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final ClassMember member in node.bodyMembers) {
+      if (member is FieldDeclaration) {
+        for (final VariableDeclaration variable in member.fields.variables) {
+          if (variable.name.lexeme == name) {
+            reporter.atNode(variable);
+          }
+        }
+      }
+    }
+  }
+
+  /// Collects the function bodies in which controller disposal may occur.
+  ///
+  /// Includes the `dispose` and `deactivate` methods themselves plus any method
+  /// of the same class invoked (by name) from within them — covering the common
+  /// `dispose() { _disposeControllers(); }` helper indirection. Without this,
+  /// disposal performed in a helper or in `deactivate()` is missed and the rule
+  /// fires on correctly-cleaned-up code.
+  List<FunctionBody> _collectDisposalBodies(ClassDeclaration node) {
+    // Index every method body by name so we can resolve helper calls.
+    final Map<String, FunctionBody> methodBodies = <String, FunctionBody>{};
+    for (final ClassMember member in node.bodyMembers) {
+      if (member is MethodDeclaration) {
+        methodBodies[member.name.lexeme] = member.body;
+      }
+    }
+
+    final List<FunctionBody> result = <FunctionBody>[];
+    // Disposal entry points: dispose() runs on permanent removal; deactivate()
+    // runs first when a widget leaves the tree and is a valid place to free.
+    for (final String entry in const ['dispose', 'deactivate']) {
+      final FunctionBody? body = methodBodies[entry];
+      if (body == null) continue;
+      result.add(body);
+
+      // Follow one level of same-class method calls (the helper pattern).
+      final _SameClassCallCollector calls = _SameClassCallCollector();
+      body.accept(calls);
+      for (final String calledName in calls.calledMethodNames) {
+        final FunctionBody? helperBody = methodBodies[calledName];
+        if (helperBody != null && !result.contains(helperBody)) {
+          result.add(helperBody);
+        }
+      }
+    }
+    return result;
+  }
+}
+
+/// Collects names of methods invoked without an explicit non-`this` target
+/// (i.e. same-instance calls like `_disposeControllers()` or
+/// `this._disposeControllers()`), so disposal helpers can be followed.
+class _SameClassCallCollector extends RecursiveAstVisitor<void> {
+  final Set<String> calledMethodNames = <String>{};
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final Expression? target = node.realTarget;
+    // Only follow calls on the current instance: no target, or `this.`.
+    if (target == null || target is ThisExpression) {
+      calledMethodNames.add(node.methodName.name);
+    }
+    super.visitMethodInvocation(node);
   }
 }
 
@@ -711,23 +786,35 @@ class RequireAnimationCurveRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
 
-      // Check if target is a Tween
-      final String targetSource = target.toSource();
-      if (!targetSource.endsWith('Tween')) return;
+      // Resolve the receiver's static type instead of matching its source on
+      // `endsWith('Tween')`. The string form misses inline-constructed tweens
+      // (`Tween<double>(begin: 0, end: 1)` whose source ends with `)`, not
+      // `Tween`) and any Tween subclass, so the rule under-reported.
+      if (!_staticTypeIsTween(target)) return;
 
-      // Check if the argument is a CurvedAnimation or has curve parameter
+      // A CurvedAnimation argument (in ANY position, including the named
+      // `parent:` slot) already supplies a curve. The old check inspected the
+      // arg SOURCE for a `CurvedAnimation` prefix/suffix, so `parent:
+      // CurvedAnimation(...)` (source `parent: CurvedAnimation(...)`) slipped
+      // through and produced a false positive. Inspect the resolved type of
+      // each argument expression instead.
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'curve') {
-          return; // Has a curve parameter
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'curve') {
+            return; // Explicit curve parameter.
+          }
+          if (_staticTypeIsCurvedAnimation(arg.expression)) {
+            return; // CurvedAnimation passed as a named argument.
+          }
+          continue;
         }
-        final String argSource = arg.toSource();
-        if (argSource.endsWith('CurvedAnimation') ||
-            argSource.startsWith('CurvedAnimation')) {
-          return; // Using CurvedAnimation
+        if (_staticTypeIsCurvedAnimation(arg)) {
+          return; // CurvedAnimation passed positionally.
         }
       }
 
-      // If argument is just a controller reference without curve
+      // If the (first) argument is just a direct Animation/Listenable reference
+      // without any curve, the animation runs linearly — flag it.
       if (node.argumentList.arguments.isNotEmpty) {
         final Expression firstArg = node.argumentList.arguments.first;
         if (firstArg is SimpleIdentifier || firstArg is PrefixedIdentifier) {
@@ -737,6 +824,34 @@ class RequireAnimationCurveRule extends SaropaLintRule {
       }
     });
   }
+}
+
+/// True when [expr] resolves to a type that is or extends [Tween].
+///
+/// Type-based so inline `Tween<T>(...)` constructions and Tween subclasses are
+/// detected; unresolved types return false (conservative — do not flag).
+bool _staticTypeIsTween(Expression expr) {
+  final DartType? type = expr.staticType;
+  if (type is! InterfaceType) return false;
+  if (type.element.name == 'Tween') return true;
+  for (final InterfaceType supertype in type.allSupertypes) {
+    if (supertype.element.name == 'Tween') return true;
+  }
+  return false;
+}
+
+/// True when [expr] resolves to a [CurvedAnimation] (or subtype).
+///
+/// Type-based so a CurvedAnimation passed via the named `parent:` argument is
+/// recognized regardless of source spelling; unresolved types return false.
+bool _staticTypeIsCurvedAnimation(Expression expr) {
+  final DartType? type = expr.staticType;
+  if (type is! InterfaceType) return false;
+  if (type.element.name == 'CurvedAnimation') return true;
+  for (final InterfaceType supertype in type.allSupertypes) {
+    if (supertype.element.name == 'CurvedAnimation') return true;
+  }
+  return false;
 }
 
 /// Warns when explicit AnimationController is used for simple transitions.
@@ -1093,40 +1208,70 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Track controllers and their listeners
-    final Set<String> controllersWithListener = <String>{};
-    final Map<String, MethodInvocation> forwardCalls =
-        <String, MethodInvocation>{};
+    // Collect and report within a single CompilationUnit pass. The previous
+    // implementation aggregated in addPostRunCallback, which is a NO-OP in the
+    // native runtime — so the rule never reported at all. Visiting the unit
+    // synchronously lets us gather every forward()/addStatusListener() call and
+    // report before returning.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _StatusListenerCollector collector = _StatusListenerCollector();
+      unit.accept(collector);
 
-    context.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-
-      if (methodName == 'addStatusListener') {
-        final Expression? target = node.target;
-        if (target != null) {
-          controllersWithListener.add(target.toSource());
-        }
-      }
-
-      if (methodName == 'forward') {
-        final Expression? target = node.target;
-        if (target != null) {
-          final String nodeSource = node.toSource();
-          if (!RegExp(r'\brepeat\b').hasMatch(nodeSource)) {
-            forwardCalls[target.toSource()] = node;
-          }
-        }
-      }
-    });
-
-    context.addPostRunCallback(() {
-      for (final MapEntry<String, MethodInvocation> entry
-          in forwardCalls.entries) {
-        if (!controllersWithListener.contains(entry.key)) {
+      for (final MapEntry<Element, MethodInvocation> entry
+          in collector.forwardCalls.entries) {
+        if (!collector.controllersWithListener.contains(entry.key)) {
           reporter.atNode(entry.value, code);
         }
       }
     });
+  }
+}
+
+/// Gathers `forward()` and `addStatusListener()` calls keyed by the RESOLVED
+/// receiver element.
+///
+/// Keying on the element (not `target.toSource()`) means `_c.forward()` and
+/// `this._c.addStatusListener(...)` collapse to the same controller — the
+/// source-string key treated those two spellings as different controllers and
+/// fired on correct code.
+class _StatusListenerCollector extends RecursiveAstVisitor<void> {
+  final Set<Element> controllersWithListener = <Element>{};
+  final Map<Element, MethodInvocation> forwardCalls =
+      <Element, MethodInvocation>{};
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+
+    if (methodName == 'addStatusListener') {
+      final Element? receiver = _receiverElement(node.realTarget);
+      if (receiver != null) {
+        controllersWithListener.add(receiver);
+      }
+    }
+
+    if (methodName == 'forward') {
+      final Element? receiver = _receiverElement(node.realTarget);
+      if (receiver != null) {
+        // Skip repeating animations: they loop and have no single completion.
+        if (!RegExp(r'\brepeat\b').hasMatch(node.toSource())) {
+          forwardCalls[receiver] = node;
+        }
+      }
+    }
+
+    super.visitMethodInvocation(node);
+  }
+
+  /// The element a receiver expression refers to (the controller field/local),
+  /// unwrapping `this.` prefixes. Returns null for unresolved receivers so the
+  /// rule stays silent rather than firing on something it cannot identify.
+  static Element? _receiverElement(Expression? target) {
+    if (target == null) return null;
+    if (target is SimpleIdentifier) return target.element;
+    if (target is PrefixedIdentifier) return target.identifier.element;
+    if (target is PropertyAccess) return target.propertyName.element;
+    return null;
   }
 }
 
@@ -1987,21 +2132,54 @@ class _WidgetCountVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Detects a `.value` read (`anim.value`, `controller.value`) anywhere in a
-/// subtree — the signal that an animated value is consumed at that node.
+/// Detects an animation `.value` read (`anim.value`, `controller.value`)
+/// anywhere in a subtree — the signal that an animated value is consumed at
+/// that node.
+///
+/// Only `.value` reads whose RECEIVER statically resolves to an Animation /
+/// AnimationController count. A bare `value` name match flagged unrelated reads
+/// (`myList.value`, an enum's `.value`, a ValueNotifier), which then suppressed
+/// the rule's widget count and produced a false negative. Unresolved receivers
+/// (null/InvalidType, e.g. the `parseString` scan path where types are absent)
+/// are treated conservatively as animation reads so that path keeps its prior
+/// behavior.
 class _AnimationValueReadVisitor extends RecursiveAstVisitor<void> {
   bool found = false;
 
   @override
   void visitPropertyAccess(PropertyAccess node) {
-    if (node.propertyName.name == 'value') found = true;
+    if (node.propertyName.name == 'value' &&
+        _receiverIsAnimationValued(node.realTarget)) {
+      found = true;
+    }
     super.visitPropertyAccess(node);
   }
 
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
-    if (node.identifier.name == 'value') found = true;
+    if (node.identifier.name == 'value' &&
+        _receiverIsAnimationValued(node.prefix)) {
+      found = true;
+    }
     super.visitPrefixedIdentifier(node);
+  }
+
+  /// True when [receiver] is an Animation/AnimationController, or its type is
+  /// unresolved (conservative for the type-less scan path).
+  static bool _receiverIsAnimationValued(Expression? receiver) {
+    if (receiver == null) return true; // Unresolved/implicit — stay conservative.
+    final DartType? type = receiver.staticType;
+    // Type-less ASTs (parseString) carry no static type — keep prior behavior.
+    if (type is! InterfaceType) return true;
+    final String? name = type.element.name;
+    if (name == 'Animation' || name == 'AnimationController') return true;
+    for (final InterfaceType supertype in type.allSupertypes) {
+      final String? superName = supertype.element.name;
+      if (superName == 'Animation' || superName == 'AnimationController') {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -2115,13 +2293,21 @@ class AvoidClipDuringAnimationRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_clipWidgets.contains(typeName)) return;
 
-      // Walk up parents (max 10 levels) looking for an animated ancestor
+      // Walk up parents (max 10 levels) looking for an animated ancestor.
       AstNode? current = node.parent;
       int depth = 0;
       while (current != null && depth < 10) {
         if (current is InstanceCreationExpression) {
           final String parentType = current.constructorName.type.name.lexeme;
-          if (_animatedWidgets.contains(parentType)) {
+          // Two guards beyond the name match: the ancestor must be a REAL
+          // Flutter animated widget (a user class merely NAMED `AnimatedX`
+          // resolves to a non-flutter library and must not match), and the clip
+          // must sit in that ancestor's rendered child subtree (`child:` /
+          // `children:`), not some unrelated argument. Token-only matching
+          // produced false positives on both counts.
+          if (_animatedWidgets.contains(parentType) &&
+              _isFlutterWidget(current) &&
+              _nodeIsInChildSubtree(node, current)) {
             reporter.atNode(node.constructorName, code);
             return;
           }
@@ -2130,6 +2316,41 @@ class AvoidClipDuringAnimationRule extends SaropaLintRule {
         depth++;
       }
     });
+  }
+
+  /// True when [creation] resolves to a type declared in `package:flutter/`,
+  /// or when the type is unresolved (the type-less scan path, where we cannot
+  /// distinguish and so stay conservative to preserve detection).
+  static bool _isFlutterWidget(InstanceCreationExpression creation) {
+    final DartType? type = creation.constructorName.type.type;
+    if (type is! InterfaceType) return true; // Unresolved — stay conservative.
+    final String uri = type.element.library.uri.toString();
+    return uri.startsWith('package:flutter/');
+  }
+
+  /// True when [clip] is reached from [ancestor] only through `child:` /
+  /// `children:` named-argument subtrees — i.e. the clip is part of what the
+  /// animated widget renders, not an unrelated argument expression.
+  static bool _nodeIsInChildSubtree(
+    AstNode clip,
+    InstanceCreationExpression ancestor,
+  ) {
+    AstNode? current = clip;
+    while (current != null && current != ancestor) {
+      final AstNode? parent = current.parent;
+      // When we step into the ancestor's argument list, the immediate wrapping
+      // NamedExpression must be a child/children slot for the clip to be in its
+      // render subtree.
+      if (parent is NamedExpression) {
+        final AstNode? grand = parent.parent;
+        if (grand is ArgumentList && grand.parent == ancestor) {
+          final String label = parent.name.label.name;
+          return label == 'child' || label == 'children';
+        }
+      }
+      current = parent;
+    }
+    return false;
   }
 }
 

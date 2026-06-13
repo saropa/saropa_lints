@@ -1,4 +1,43 @@
 {
+  "consolidated": {
+    "kicker": "ความปลอดภัย · คุณภาพ",
+    "searchPlaceholder": "กฎการกรอง ...",
+    "empty": "สถานที่ปลอดภัยทั้งหมด  ⁇ no findings ไม่มีการพบ",
+    "liveTitle": "สายสด  ⁇ อัพเดทเมื่อคุณแก้ไข",
+    "fetching": "การเอา ...",
+    "noOccurrences": "ไม่มีเหตุการณ์ที่เกิดขึ้น",
+    "summaryFindings": "{count} รายการที่พบ",
+    "summaryRules": "{count} กฎ",
+    "more": "+{count} มากขึ้น",
+    "wordErrors": "ความผิดพลาดของความผิดพลาด error errors",
+    "wordWarnings": "เตือนเตือน การเตือน",
+    "wordInfo": "ข้อมูลข้อมูล ข้อมูล",
+    "wordFiles": "การใช้งาน File files",
+    "gradeExcellent": "ดีมากครับ สุดยอด",
+    "gradeGood": "ดีดี ดีดี",
+    "gradeFair": "การจัดงาน Fair Fair",
+    "gradeWeak": "Weak weak อ่อนแออ่อนแอ",
+    "gradeSevere": "ภาวะหนักมากๆ"
+  },
+  "configSuggestions": {
+    "badgeTooltip": "Saropa Lints  ⁇  สายเลือดดํา {count} แนะนําการตั้งค่า (((s)",
+    "initMissing": {
+      "title": "การตั้ง Saropa Lints (run init)",
+      "detail": "saropa_lints อยู่ใน pubspec แต่ยังไม่มีการตั้งค่าตัววิเคราะห์ที่ติดต่อ"
+    },
+    "packAvailable": {
+      "title": "เปิดใช้งาน {pack} รูลแพค",
+      "detail": "{count} กฎสําหรับแพ็คเก็ตในพับสเปคของคุณ"
+    },
+    "enabledToast": "ทําให้ {pack} รูลแพ็คใน analysis_options.yaml สามารถใช้งานได้",
+    "enableFailed": "ไม่สามารถเปิดใช้งาน {pack} รูเล็ปแพ็ค  ⁇ เปิดดัชบอร์ด Rule Packs เพื่อเปิดใช้งาน"
+  },
+  "startupNudge": {
+    "message": "Saropa Lints: เป็นการตรวจหา {count} คําแนะนําของกติกาชุด (s) ใช้กับโครงการนี้.",
+    "review": "การตรวจสอบ Review Review",
+    "dismiss": "ขอยกเลิกการทํางาน",
+    "reviewFailed": "ไม่สามารถเปิดการตรวจสอบชุดกฎ Saropa Lints ได้ {error}"
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION การออกแบบ",
@@ -35,6 +74,15 @@
       "published": "พิมพ์ ออกไป ประกาศ",
       "update": "Update อัพเดทอัปเดต",
       "blockedBy": "Blocked โดย บล็อกโดย",
+      "blockedVia": "{blocker} ปิดกั้น {dep} {constraint} ({resolvable} สามารถแก้ไขได้, {latest} ล่าสุด)",
+      "blockedViaSdk": "พินโดย {blocker} (Flutter SDK) สําหรับ {dep} ( {resolvable} สามารถแก้ไขได้, {latest} ล่าสุด)",
+      "constrained": "การควบคุมการใช้งาน",
+      "constrainedBy": "ข้อจํากัดของคุณ {constraint} กั้นนี้ ({resolvable} สามารถแก้ไขได้, {latest} ล่าสุด)",
+      "pinHeld": "จัดการ Held",
+      "pinDoNotUse": "อย่าใช้ ไม่ต้องใช้",
+      "drift": "โครงการข้ามโครงงาน drift",
+      "driftBehind": "ด้านหลัง: {siblings} (คุณมี {own})",
+      "driftDiffers": "ความแตกต่าง: {siblings} (คุณมี {own})",
       "codeSize": "ขนาดโค้ด Code Size ขนาดรหัส",
       "archiveSize": "ขนาดอาร์คิฟ ไซส์",
       "bloat": "({rating}/10 บู๊บ)",
@@ -195,6 +243,8 @@
     "toggleFullWidth": "Toggle layout ความกว้างเต็ม",
     "sortBy": "เรียงตาม {column}",
     "expandRow": "ขยายแถว Expand Row (ขยายแถบ)",
+    "copyRow": "คลิปแถวคอพีเรียด",
+    "comparisonDimension": "เมทริกเมตริก Metric",
     "collapseRow": "รายการ Collapse Row (แถวที่ล้มละลาย)",
     "selectAll": "เลือกทุกแถว",
     "keyboardShortcuts": "คีย์บอร์ดทางลัด Keyboard Shortcuts",
@@ -204,7 +254,8 @@
     "pick": {
       "title": "Saropa Lints ภาษา UI ของ UI",
       "placeholder": "เลือกภาษาสําหรับซิดบาร์และดัสช็อบ",
-      "auto": "Auto (ตามภาษาแสดงของ VS Code)"
+      "auto": "Auto (ตามภาษาแสดงของ VS Code)",
+      "coverage": "{pct}% แปลว่า  ⁇ rest shows ในภาษาอังกฤษ"
     },
     "reloadPrompt": "การตั้งภาษาเป็น {locale}. รีโลดหน้าต่างเพื่ออัพเดทซิดบาร์และเลเบลคําสั่ง",
     "reloadNow": "โหลดใหม่ตอนนี้",
@@ -231,6 +282,8 @@
     },
     "status": {
       "lastRunPrefix": "รอบสุดท้าย ล่าสุด",
+      "updatedPrefix": "อัพเดทใหม่ ล่าสุด",
+      "refreshHint": "คลิกเพื่ออัพเดทจากเครื่องวิเคราะห์",
       "lastRunUnknown": "การทํางานล่าสุด ไม่ทราบ",
       "noTimestampTitle": "ไม่มีการประทับเวลาบน violations.json",
       "findingsAfterFilterTitle": "ผลการค้นพบทั้งหมดหลังจากกรอง disabled-rule filter",
@@ -327,7 +380,7 @@
       "refreshExtension": "ขยาย Refresh Extension การอัพเดทใหม่",
       "openPackageDashboard": "เปิด แดชบอร์ด Package ดัชเบิร์น",
       "openCodeHealth": "Open Code สุขภาพสุขภาพ",
-      "openLintsConfig": "เปิด Lints การตั้งค่า",
+      "openLintsConfig": "บริหารการใช้ Rule Packs",
       "reloadFromDisk": "โหลดใหม่จากแผ่นดิสก์",
       "reloadFromDiskTitle": "ทําการแสดงภาพ dashboard จาก violations.json ที่ผ่านมา โดยไม่ต้องเปิดตัวเครื่องวิเคราะห์ใหม่",
       "reEnableDisabledRules": "Re-enable disabled rules... กฎการใช้งานที่เสียไป",
@@ -539,12 +592,17 @@
     "noMatchingFindingsCopy": "ไม่มีการพบที่ตรงกันที่จะสําเนา.",
     "couldNotOpenFile": "ไม่สามารถเปิดไฟล์: {path}",
     "saveReportNoWorkspace": "เปิดโฟลเดอร์ workspace ก่อนที่จะบันทึกรายงาน",
-    "savedFindings": "การค้นพบ {count} ที่บันทึกไว้: {path}",
+    "savedFindings": "การบันทึกการพบ {count} (((s): {path} การรักษาโรค",
     "couldNotSaveReportJson": "ไม่สามารถบันทึกรายงาน JSON ได้"
   },
   "packageDashboard": {
     "documentTitle": "Saropa แดชบอร์ดแพคเกจ",
     "heroTitle": "Saropa แดชบอร์ดแพคเกจ",
+    "detailPane": {
+      "aria": "รายละเอียดของแพ็คเก็จ",
+      "title": "รายละเอียดของแพ็คเก็จ",
+      "close": "รายละเอียดใกล้ชิด"
+    },
     "status": {
       "packagesCount": "{count} แพ็กเกจ",
       "packagesBreakdown": "ทางตรง {direct}, ทางอ้อม {transitive}",
@@ -801,8 +859,8 @@
       "showTransitives": "แสดงความพึ่งพาแบบแปรแปลง (transitive dependencies)",
       "tooltipDep": "• {dep}",
       "tooltipDepShared": "• {dep} (แบ่งปัน)",
-      "tooltipHeader": "{total} การพึ่งพาทางอ้อม",
-      "tooltipHeaderShared": "{total} การพึ่งพาทางอ้อม ({shared} ที่ใช้ร่วมกัน)",
+      "tooltipHeader": "{total} ทันติ deps ภาวะ",
+      "tooltipHeaderShared": "{total} สกรรมกริยา deps ({shared} ที่ใช้ร่วมกัน)",
       "sharedBadgeTitle": "{count} แบ่งปันกับแพ็คเกจอื่น ๆ",
       "sharedBadge": "แบ่งปันร่วมกัน shared ลงทุน",
       "transitiveDepsHeading": "การพึ่งพาแบบผ่าน ({count})"
@@ -1330,6 +1388,20 @@
     "noun": {
       "package": "แพ็คเกจ Package package ซองประกอบด้วย",
       "packages": "สินค้าของแพ็คเกจ"
+    }
+  },
+  "suite": {
+    "fix": {
+      "explainRule": "อธิบายกฎนี้"
+    },
+    "enableRule": {
+      "done": "กฎที่เปิดใช้งาน {ruleId}. การใช้การวิเคราะห์ Re-Run",
+      "runAnalysis": "วิ่งวิเคราะห์ Run Analysis การวัด",
+      "noWorkspace": "เปิดโฟลเดอร์ workspace เพื่อเปิดใช้งานกฎ"
+    },
+    "openFinding": {
+      "noWorkspace": "เปิดโฟลเดอร์ workspace เพื่อเปิดการค้นหา",
+      "notFound": "ไม่สามารถเปิด {file}."
     }
   }
 }

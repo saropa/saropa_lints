@@ -722,6 +722,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "ru": {
+        # Manual: brand "Saropa Lints" stays untranslated; {error} placeholder preserved.
+        "Couldn't open the Saropa Lints rule pack review. {error}": "Не удалось открыть обзор набора правил Saropa Lints. {error}",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -1220,6 +1222,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "fil": {
+        # Manual: MT returned the English unchanged for this drift label.
+        "Cross-project drift": "Drift sa iba't ibang proyekto",
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "CC {cc}": "CC {cc}",
         # Curated passthrough: format-only string (two placeholders + colon) has no translatable words.
@@ -1410,6 +1414,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "id": {
+        # Manual: "info" severity label; MT left the English short form unchanged, so use the full Indonesian word.
+        "info": "informasi",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",

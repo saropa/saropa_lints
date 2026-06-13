@@ -41,8 +41,6 @@ import { showHelpHubQuickPick } from './views/helpHub';
 import { SummaryTreeProvider } from './views/summaryTree';
 import { SuppressionsTreeProvider } from './views/suppressionsTree';
 import { ConfigTreeProvider } from './views/configTree';
-import { SuggestionsTreeProvider } from './views/suggestionsTree';
-import { ConfigSuggestionsTreeProvider } from './views/configSuggestionsTree';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePacks/rulePackYaml';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
@@ -58,6 +56,8 @@ import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
 import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
+import { registerSuiteCommands } from './suite/commands';
+import { exportLintsEnvelope } from './suite/exporter';
 import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
 import { maybeShowStartupSuggestion } from './rulePacks/startupSuggestionNudge';
 import {
@@ -532,58 +532,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   }
   updateSidebarSectionContext(context.workspaceState);
 
-  const suggestionsProvider = new SuggestionsTreeProvider();
   const securityProvider = new SecurityPostureTreeProvider();
   const fileRiskProvider = new FileRiskTreeProvider(context.workspaceState);
 
-  // Dedicated, always-registered Suggestions view created via createTreeView (not
-  // registerTreeDataProvider) so we can set a numeric .badge on it — that badge is
-  // what surfaces the config-action count on the activity-bar icon, making the
-  // otherwise-hidden init step and unused-but-applicable rule packs visible
-  // without the user opening anything first.
-  const configSuggestionsProvider = new ConfigSuggestionsTreeProvider();
-  const configSuggestionsView = vscode.window.createTreeView(
-    'saropaLints.suggestions',
-    { treeDataProvider: configSuggestionsProvider },
-  );
-  context.subscriptions.push(configSuggestionsView);
-
-  const updateConfigSuggestionsBadge = (): void => {
-    const count = configSuggestionsProvider.count();
-    // Clearing the badge (undefined) when count is 0 hides the number entirely,
-    // so a fully-configured project shows no nagging "0".
-    configSuggestionsView.badge =
-      count > 0
-        ? {
-            value: count,
-            tooltip: l10n('configSuggestions.badgeTooltip', {
-              count: String(count),
-            }),
-          }
-        : undefined;
-  };
-
-  const refreshConfigSuggestions = (): void => {
-    configSuggestionsProvider.refresh();
-    updateConfigSuggestionsBadge();
-  };
-  refreshConfigSuggestions();
-
-  // The badge tracks config/dependency files, not violations: enabling a pack,
-  // running init, or editing analysis_options must re-count immediately. A light
-  // watcher keeps the count live even when no analysis has run.
-  {
-    // pubspec.lock is included because the suggestion count now folds in
-    // lockfile-resolved upgrade packs — a `pub upgrade` that brings a migration
-    // pack into range must re-count the badge, not just on the next analysis.
-    const configWatcher = vscode.workspace.createFileSystemWatcher(
-      '**/{analysis_options.yaml,analysis_options_custom.yaml,pubspec.yaml,pubspec.lock}',
-    );
-    configWatcher.onDidChange(refreshConfigSuggestions);
-    configWatcher.onDidCreate(refreshConfigSuggestions);
-    configWatcher.onDidDelete(refreshConfigSuggestions);
-    context.subscriptions.push(configWatcher);
-  }
+  // The dedicated "Suggestions" sidebar view was removed: its long
+  // "Enable the X rule pack" list was noise. Proactive pack discovery now flows
+  // through the single startup toast (maybeShowStartupSuggestion) whose action
+  // opens the Manage Rule Packs webview — the one surface that lists every
+  // applicable pack with a toggle and an "Enable all recommended packs" button.
 
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
@@ -683,8 +639,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     summaryProvider.refresh();
     suppressionsProvider.refresh();
     configProvider.refresh();
-    suggestionsProvider.refresh();
-    refreshConfigSuggestions();
     securityProvider.refresh();
     fileRiskProvider.refresh();
     rulePacksWebviewProvider.refresh();
@@ -1012,10 +966,26 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           getConfig().get<boolean>('enabled', true) ?? true,
           issuesProvider.hasViolations(),
         );
+        // R1: refresh the offline envelope mirror the sibling suite tools read
+        // (.saropa/diagnostics/lints.json). Same settled live-diagnostics source
+        // the surfaces above use, so the mirror never disagrees with the UI. A
+        // write failure (read-only tree, race) must never disrupt linting.
+        const envelopeRoot = getProjectRoot();
+        if (envelopeRoot) {
+          try {
+            exportLintsEnvelope(envelopeRoot, extVersion);
+          } catch (err) {
+            console.error('saropa_lints: could not write diagnostics envelope:', err);
+          }
+        }
       }, 400);
     }),
     { dispose: () => diagnosticsRefreshTimer && clearTimeout(diagnosticsRefreshTimer) },
   );
+
+  // R4: contribute the suite's deep-link command ids (enableRule, openFinding) as
+  // Lints' public integration surface for sibling envelope `fix.command`s.
+  registerSuiteCommands(context, getProjectRoot);
 
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.enable', async () => {
@@ -1135,16 +1105,17 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
       }
     }),
-    // One-click enable of a rule pack straight from a Suggestions item. Writes
-    // the pack into analysis_options.yaml, refreshes the badge, and confirms with
-    // a toast naming the pack — so the user sees the exact thing that changed.
+    // One-click enable of a rule pack (used by the startup toast follow-through
+    // and programmatic callers). Writes the pack into analysis_options.yaml,
+    // refreshes the Manage Rule Packs webview, and confirms with a toast naming
+    // the pack — so the user sees the exact thing that changed.
     vscode.commands.registerCommand('saropaLints.enableRulePack', async (packId?: unknown) => {
       const id = typeof packId === 'string' ? packId : '';
       const root = getProjectRoot();
       if (!id || !root) return;
       const enabled = readRulePacksEnabled(root);
       if (enabled.includes(id)) {
-        refreshConfigSuggestions();
+        rulePacksWebviewProvider.refresh();
         return;
       }
       const ok = writeRulePacksEnabled(root, [...enabled, id].sort());
@@ -1154,7 +1125,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         );
         return;
       }
-      refreshConfigSuggestions();
+      rulePacksWebviewProvider.refresh();
       void vscode.window.showInformationMessage(
         l10n('configSuggestions.enabledToast', { pack: id }),
       );
@@ -1653,6 +1624,15 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         openRuleExplainPanel({ ruleName: arg.trim() });
         return;
       }
+      // Accept the documented `{ ruleId }` object form a sibling envelope's
+      // `fix.command` passes (plan §3); the suite contract keys on `ruleId`.
+      if (arg && typeof arg === 'object' && 'ruleId' in arg) {
+        const ruleId = (arg as { ruleId: unknown }).ruleId;
+        if (typeof ruleId === 'string' && ruleId.trim().length > 0) {
+          openRuleExplainPanel({ ruleName: ruleId.trim() });
+          return;
+        }
+      }
       const node = arg as IssueTreeNode | undefined;
       if (node?.kind === 'violation' && 'violation' in node) {
         openRuleExplainPanelForViolation(node.violation);
@@ -1886,7 +1866,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     summaryProvider,
     securityProvider,
     fileRiskProvider,
-    suggestionsProvider,
   });
 
   // Package Vibrancy subsystem — registers its own views, commands, and providers

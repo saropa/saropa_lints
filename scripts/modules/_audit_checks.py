@@ -1183,7 +1183,12 @@ def _declared_dependencies(pubspec_path: Path) -> set[str]:
         return deps
     in_deps = False
     for raw in pubspec_path.read_text(encoding="utf-8").splitlines():
-        if re.match(r"^dependencies:\s*$", raw):
+        # Tolerate a trailing comment on the header (`dependencies: # runtime`).
+        # The previous exact `^dependencies:\s*$` missed that valid YAML, so
+        # in_deps stayed False, ZERO declared deps were found, and the gate then
+        # reported every shipped import as undeclared — hard-blocking the
+        # release on a perfectly valid pubspec.
+        if re.match(r"^dependencies:\s*(#.*)?$", raw):
             in_deps = True
             continue
         if in_deps:

@@ -9,11 +9,11 @@
  * the "terrible UX" this module exists to fix.
  *
  * Instead we show exactly ONE notification summarizing the count and route its
- * "Review" action to the Suggestions view, which lists every applicable pack
- * individually (init step + sdk packs + lockfile-resolved upgrade packs, all from
- * {@link computeConfigSuggestions}). The activity-bar badge on that view is the
- * durable backstop: even after the single toast collapses, the count persists
- * there, so nothing is lost.
+ * "Review" action to the Manage Rule Packs webview, which lists every applicable
+ * pack individually (init step + sdk packs + lockfile-resolved upgrade packs, all
+ * from {@link computeConfigSuggestions}) with toggles and an "Enable all
+ * recommended packs" button. This toast is now the sole proactive surface: the
+ * dedicated Suggestions sidebar view (and its badge) was removed.
  *
  * Once-gating: the set of suggestion ids already surfaced is recorded per
  * workspace, so the toast never re-nags about packs the user has already seen,
@@ -79,14 +79,11 @@ export async function maybeShowStartupSuggestion(
     );
     if (choice !== l10n('startupNudge.review')) return;
 
-    // Open the Config Dashboard (rule-packs) webview in the editor area — the
-    // review-and-enable surface where every applicable pack is listed with a
-    // toggle. The previous wiring focused the standalone `saropaLints.suggestions`
-    // sidebar tree via its auto-generated `.focus` command, but focusing a view
-    // produces no visible change when that view is hidden/collapsed or its
-    // activity-bar container is already open — which read to the user as "Review
-    // does nothing". A webview panel always opens a visible editor tab. The
-    // sidebar badge stays as the durable backstop for the count.
+    // Open the Manage Rule Packs webview in the editor area — the review-and-enable
+    // surface where every applicable pack is listed with a toggle. A webview panel
+    // always opens a visible editor tab, unlike focusing a sidebar view (which the
+    // removed Suggestions tree did) that produces no visible change when the view is
+    // hidden/collapsed — which read to the user as "Review does nothing".
     try {
       await vscode.commands.executeCommand('saropaLints.openRulePacks');
     } catch (err) {

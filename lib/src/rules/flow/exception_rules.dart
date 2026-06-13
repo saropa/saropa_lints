@@ -179,9 +179,6 @@ class AvoidThrowInCatchBlockRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
-  @override
-  Set<FileType>? get applicableFileTypes => {FileType.bloc};
-
   static const LintCode _code = LintCode(
     'avoid_throw_in_catch_block',
     '[avoid_throw_in_catch_block] Throwing a new error in a catch block without preserving the original stack trace makes debugging much harder. This can hide the root cause of failures and lead to incomplete error logs, making it difficult to diagnose and fix issues. {v6}',

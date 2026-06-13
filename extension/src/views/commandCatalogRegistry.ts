@@ -693,13 +693,6 @@ export const catalogEntries: readonly CatalogEntry[] = [
     category: 'Reporting & Export',
     icon: 'clippy',
   },
-  {
-    command: 'saropaLints.suggestions.copyAsJson',
-    title: 'Copy Suggestions as JSON',
-    description: 'Copy the suggestions tree data to the clipboard as JSON.',
-    category: 'Reporting & Export',
-    icon: 'clippy',
-  },
 
   // ── Package Vibrancy ─────────────────────────────────────────────────────
 

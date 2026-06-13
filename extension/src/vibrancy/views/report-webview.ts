@@ -7,6 +7,9 @@
 
 import * as vscode from 'vscode';
 import { ReportOptions, buildReportHtml } from './report-html';
+import { PackageDetailPaneController, PaneMessage } from './package-detail-pane-controller';
+import { ReviewStateService } from '../services/review-state';
+import { CacheService } from '../services/cache-service';
 
 /** Singleton webview panel for the vibrancy report. */
 export class VibrancyReportPanel {
@@ -17,6 +20,24 @@ export class VibrancyReportPanel {
     private readonly _panel: vscode.WebviewPanel;
     private _disposables: vscode.Disposable[] = [];
     private _pubspecUri: string | null;
+    /* Retained so the docked detail pane can look up the selected package's
+       VibrancyResult on demand (master-detail round-trip) without re-scanning. */
+    private _options: ReportOptions | null = null;
+    /* Host controller for the docked detail pane (lazy fetch + review state).
+       Null only if the extension never called configure() (defensive). */
+    private _pane: PackageDetailPaneController | null = null;
+
+    /* Services for the detail pane, injected once at activation so the panel
+       can run the same lazy fetches + review persistence the standalone panel
+       did. Static because the panel is a singleton recreated across rescans. */
+    private static _reviewState: ReviewStateService | undefined;
+    private static _cache: CacheService | undefined;
+
+    /** Wire the detail-pane services. Call once during activation. */
+    static configure(reviewState: ReviewStateService, cache?: CacheService): void {
+        VibrancyReportPanel._reviewState = reviewState;
+        VibrancyReportPanel._cache = cache;
+    }
 
     static createOrShow(options: ReportOptions): void {
         if (VibrancyReportPanel.currentPanel) {
@@ -44,6 +65,18 @@ export class VibrancyReportPanel {
 
         this._panel.onDidDispose(() => this._dispose(), null, this._disposables);
 
+        /* Detail-pane controller: pushes rendered detail bodies into the pane.
+           Only created when the host wired review-state via configure(). */
+        if (VibrancyReportPanel._reviewState) {
+            this._pane = new PackageDetailPaneController(
+                (html, packageName) => this._panel.webview.postMessage({
+                    type: 'packageDetailHtml', package: packageName, html,
+                }),
+                VibrancyReportPanel._reviewState,
+                VibrancyReportPanel._cache,
+            );
+        }
+
         /* Handle messages from the webview (e.g. "Open pubspec.yaml"). */
         this._panel.webview.onDidReceiveMessage(
             msg => this._handleMessage(msg),
@@ -54,12 +87,45 @@ export class VibrancyReportPanel {
 
     private _updateContent(options: ReportOptions): void {
         this._pubspecUri = options.pubspecUri;
+        this._options = options;
         this._panel.webview.html = buildReportHtml(options);
     }
 
+    /** Reveal the dashboard (creating it if needed) and select a package in the
+     *  docked detail pane. Entry point for "View Full Details" from hover /
+     *  sidebar / command catalog, replacing the standalone PackageDetailPanel. */
+    static revealPackage(options: ReportOptions, packageName: string): void {
+        VibrancyReportPanel.createOrShow(options);
+        VibrancyReportPanel.currentPanel?._panel.webview.postMessage({
+            type: 'selectPackage', package: packageName,
+        });
+    }
+
     private async _handleMessage(
-        msg: { type: string; package?: string; path?: string; line?: number; data?: unknown },
+        msg: { type: string; package?: string; path?: string; line?: number; url?: string; data?: unknown }
+            & PaneMessage,
     ): Promise<void> {
+        if (msg.type === 'requestPackageDetail' && msg.package) {
+            /* Master-detail: hand the selected package to the pane controller,
+               which renders its rich body and runs the lazy fetches. */
+            const result = this._options?.results.find(r => r.package.name === msg.package);
+            if (result) { this._pane?.select(result); }
+            return;
+        }
+
+        /* Pane actions (navigation, upgrade, review status/notes, retry) are
+           owned by the pane controller — it holds the selected package + review
+           state. openFile is the pane's own message; openFileRef below is the
+           dashboard table's. */
+        if (this._pane && (
+            msg.type === 'openUrl' || msg.type === 'openFile' || msg.type === 'upgrade'
+            || msg.type === 'setReviewStatus' || msg.type === 'addReviewNote'
+            || msg.type === 'retryFetches'
+        )) {
+            await this._pane.handleMessage(msg);
+            return;
+        }
+
         if (msg.type === 'openPubspec' && this._pubspecUri) {
             try {
                 const uri = vscode.Uri.parse(this._pubspecUri);
@@ -201,6 +267,8 @@ export class VibrancyReportPanel {
 
     private _dispose(): void {
         VibrancyReportPanel._currentPanel = undefined;
+        this._pane?.dispose();
+        this._pane = null;
         for (const d of this._disposables) {
             d.dispose();
         }

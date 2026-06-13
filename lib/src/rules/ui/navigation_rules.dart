@@ -9,6 +9,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -537,10 +538,14 @@ class RequireRouteGuardsRule extends SaropaLintRule {
 
       if (routePath == null || hasRedirect) return;
 
-      // Check if route path suggests protected content
-      final String pathLower = routePath.toLowerCase();
-      for (final String pattern in _protectedRoutePatterns) {
-        if (pathLower.contains(pattern)) {
+      // Match on whole path SEGMENTS, not substrings: a `contains` check made
+      // '/reorder' match 'order' and '/accounting' match 'account', flagging
+      // unprotected routes. Splitting on '/' and comparing each segment exactly
+      // (lowercased) confines the match to a real route segment named e.g.
+      // 'account' or 'admin'.
+      for (final String segment in routePath.toLowerCase().split('/')) {
+        if (segment.isEmpty) continue;
+        if (_protectedRoutePatterns.contains(segment)) {
           reporter.atNode(node.constructorName, code);
           return;
         }
@@ -718,27 +723,106 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
         return;
       }
 
-      // Check if result is used without null check
+      // The awaited push must be assigned to a variable for the result to be
+      // observable; otherwise there is nothing to null-check.
       final AstNode? parent = node.parent;
-      if (parent is VariableDeclaration) {
-        // Check if the variable is used without null check
-        final String varName = parent.name.lexeme;
+      if (parent is! VariableDeclaration) return;
 
-        // Look for usage of this variable
-        final AstNode? grandparent = parent.parent?.parent?.parent;
-        if (grandparent != null) {
-          final String remainingCode = grandparent.toSource();
-          // Very simplified check - if variable is used and no null check
-          if (remainingCode.contains(varName) &&
-              !remainingCode.contains('$varName != null') &&
-              !remainingCode.contains('$varName == null') &&
-              !remainingCode.contains('$varName!') &&
-              !remainingCode.contains('$varName?')) {
-            reporter.atNode(node);
-          }
-        }
+      // Resolve the variable's ELEMENT and compare identifier elements rather
+      // than substring-matching the name. 'remainingCode.contains(varName)'
+      // previously made the variable `result` appear "used" by an unrelated
+      // `resultValue`, and the null-check guards (`$varName != null`) likewise
+      // false-matched `resultValue`, both producing wrong verdicts.
+      final Element? varElement = parent.declaredFragment?.element;
+      if (varElement == null) return;
+
+      // Walk the smallest enclosing block/function body so the scan does not
+      // depend on a fixed 'parent.parent.parent.parent' nesting shape (which
+      // broke whenever the declaration was wrapped differently).
+      final AstNode? scope =
+          parent.thisOrAncestorOfType<Block>() ??
+          parent.thisOrAncestorOfType<FunctionBody>();
+      if (scope == null) return;
+
+      final _ResultUsageVisitor visitor = _ResultUsageVisitor(varElement);
+      scope.accept(visitor);
+
+      // Flag only when the result is actually read AND no null-aware handling
+      // (== null / != null / `!` / `?.`) is applied to that same element.
+      if (visitor.isUsed && !visitor.isNullHandled) {
+        reporter.atNode(node);
       }
     });
+  }
+}
+
+/// Scans a scope for references to one variable [element], distinguishing a
+/// bare read (the result is consumed) from null-aware handling (`== null`,
+/// `!= null`, postfix `!`, null-aware `?.`/`?[`). Element identity is used so
+/// `result` and `resultValue` are never confused.
+class _ResultUsageVisitor extends RecursiveAstVisitor<void> {
+  _ResultUsageVisitor(this._element);
+
+  final Element _element;
+
+  /// True once the variable is referenced anywhere (read or null-handled).
+  bool isUsed = false;
+
+  /// True once any null-aware handling is applied to the variable.
+  bool isNullHandled = false;
+
+  bool _isTarget(Expression? expr) {
+    if (expr is! SimpleIdentifier) return false;
+    return expr.element == _element;
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    // The declaration's own identifier resolves to the same element; ignore it
+    // so a never-used variable is not counted as "used" by its declaration.
+    if (node.element == _element && node.parent is! VariableDeclaration) {
+      isUsed = true;
+    }
+    super.visitSimpleIdentifier(node);
+  }
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    // `result == null` / `result != null` (either operand order).
+    final bool isNullCompare =
+        node.operator.lexeme == '==' || node.operator.lexeme == '!=';
+    if (isNullCompare &&
+        (_isTarget(node.leftOperand) || _isTarget(node.rightOperand))) {
+      isNullHandled = true;
+    }
+    super.visitBinaryExpression(node);
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    // `result!` null-assertion counts as the author handling nullability.
+    if (node.operator.lexeme == '!' && _isTarget(node.operand)) {
+      isNullHandled = true;
+    }
+    super.visitPostfixExpression(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    // `result?.foo` null-aware access.
+    if (node.operator.lexeme == '?.' && _isTarget(node.target)) {
+      isNullHandled = true;
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // `result?.foo()` null-aware method call.
+    if (node.operator?.lexeme == '?.' && _isTarget(node.target)) {
+      isNullHandled = true;
+    }
+    super.visitMethodInvocation(node);
   }
 }
 
@@ -2375,17 +2459,18 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  /// Route path segments that typically represent detail/item views
-  /// where push() is usually more appropriate than go().
+  /// Bare route-path segment names that typically represent detail/item views
+  /// where push() is usually more appropriate than go(). Stored without slashes
+  /// so they can be compared to whole path segments split on '/'.
   static const Set<String> _detailPathSegments = <String>{
-    '/detail',
-    '/details',
-    '/item',
-    '/view',
-    '/edit',
-    '/show',
-    '/profile',
-    '/settings/',
+    'detail',
+    'details',
+    'item',
+    'view',
+    'edit',
+    'show',
+    'profile',
+    'settings',
   };
 
   @override
@@ -2409,26 +2494,48 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
       if (args.arguments.isEmpty) return;
 
       final Expression pathArg = args.arguments.first;
-      final String pathSource = pathArg.toSource().toLowerCase();
 
-      // Only flag if path contains both:
-      // 1. A known detail-style path segment
-      // 2. A dynamic parameter (interpolation)
-      final bool hasDetailSegment = _detailPathSegments.any(
-        (String segment) => pathSource.contains(segment),
-      );
+      // Compare whole path SEGMENTS, not substrings: 'pathSource.contains(/view)'
+      // made '/viewport/$x' match the '/view' detail segment, flagging a
+      // non-detail route. Split the literal path text on '/' and require an
+      // exact segment match (the static interpolation prefix supplies the
+      // segments; the interpolated value supplies the dynamic-param signal).
+      final String literalPath = _literalPathText(pathArg).toLowerCase();
+      final bool hasDetailSegment = literalPath
+          .split('/')
+          .where((String s) => s.isNotEmpty)
+          .any(_detailPathSegments.contains);
 
-      final bool hasDynamicParam =
-          pathSource.contains(r'$') ||
-          pathSource.contains(':id') ||
-          pathSource.contains(':userid') ||
-          pathSource.contains(':itemid');
+      // A dynamic parameter is an interpolation ('$') or a go_router ':param'
+      // path placeholder; the colon-prefixed forms are matched as segments too
+      // so ':id' inside one segment does not bleed into another.
+      final bool hasInterpolation = pathArg is StringInterpolation;
+      final bool hasPathParam = literalPath
+          .split('/')
+          .any((String s) => s.startsWith(':'));
 
-      // Only warn if it's clearly a detail route with dynamic ID
-      if (hasDetailSegment && hasDynamicParam) {
+      // Only warn if it's clearly a detail route with a dynamic ID.
+      if (hasDetailSegment && (hasInterpolation || hasPathParam)) {
         reporter.atNode(node);
       }
     });
+  }
+
+  /// Returns the STATIC text of a path argument: the value of a plain string
+  /// literal, or the concatenation of the literal (non-interpolated) parts of a
+  /// string interpolation. Interpolated expressions are dropped so the segment
+  /// split sees only fixed path text (e.g. '/view/' from '/view/$id'), never an
+  /// expression's source. Non-string expressions yield ''.
+  static String _literalPathText(Expression expr) {
+    if (expr is SimpleStringLiteral) return expr.value;
+    if (expr is StringInterpolation) {
+      final StringBuffer buffer = StringBuffer();
+      for (final InterpolationElement element in expr.elements) {
+        if (element is InterpolationString) buffer.write(element.value);
+      }
+      return buffer.toString();
+    }
+    return '';
   }
 }
 
@@ -3231,20 +3338,43 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
         return;
       }
 
-      // Get the route being pushed
-      final ArgumentList args = node.argumentList;
-      for (final Expression arg in args.arguments) {
-        final String argSource = arg.toSource().toLowerCase();
-
-        // Check if route name suggests it shouldn't use replacement
-        for (final String indicator in _normalRouteIndicators) {
-          if (argSource.contains(indicator)) {
+      // Inspect only the route NAME, taken from string-literal route names
+      // (the argument to pushReplacementNamed) and from RouteSettings(name:)
+      // strings. The previous code lowercased every argument's full source and
+      // substring-matched, so `MaterialPageRoute(builder: () => ListView())`
+      // matched 'view' and an `Order...` builder matched 'order' — flagging
+      // unrelated routes. Matching whole '/'-split segments of a literal name
+      // confines detection to a route actually named e.g. 'detail' or 'edit'.
+      for (final Expression arg in node.argumentList.arguments) {
+        final String? routeName = _routeNameOf(arg);
+        if (routeName == null) continue;
+        for (final String segment in routeName.toLowerCase().split('/')) {
+          if (segment.isEmpty) continue;
+          if (_normalRouteIndicators.contains(segment)) {
             reporter.atNode(node);
             return;
           }
         }
       }
     });
+  }
+
+  /// Extracts a route NAME string from [arg]: a plain string literal (the named
+  /// route passed to pushReplacementNamed), or the `name:` value of a
+  /// RouteSettings(...) instance. Returns null for anything else (route
+  /// objects, builders, context) so only deliberate route names are inspected.
+  static String? _routeNameOf(Expression arg) {
+    if (arg is SimpleStringLiteral) return arg.value;
+    if (arg is InstanceCreationExpression &&
+        arg.constructorName.type.name.lexeme == 'RouteSettings') {
+      for (final Expression a in arg.argumentList.arguments) {
+        if (a is NamedExpression && a.name.label.name == 'name') {
+          final Expression value = a.expression;
+          if (value is SimpleStringLiteral) return value.value;
+        }
+      }
+    }
+    return null;
   }
 }
 
@@ -3428,15 +3558,44 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
               value is! IntegerLiteral &&
               value is! DoubleLiteral &&
               value is! BooleanLiteral) {
-            // Check if it looks like a model object
-            final valueSource = value.toSource();
-            if (!valueSource.contains('id:') && !valueSource.contains("'id'")) {
+            // Inspect named-argument LABELS via the AST instead of substring-
+            // matching `id:` in the source. 'valueSource.contains("id:")'
+            // matched `uuid:` and `valid:`, suppressing the warning for objects
+            // that carry no real id. An exact `id` argument label (or a literal
+            // 'id' map key) means the object passes a routable identifier.
+            if (!_carriesIdArgument(value)) {
               reporter.atNode(arg);
             }
           }
         }
       }
     });
+  }
+
+  /// True when [value] passes a routable identifier: an object construction
+  /// with a named argument whose label is EXACTLY `id`, or a map literal with a
+  /// string key of exactly `'id'`. Compares the whole argument label / key
+  /// token, so `uuid:` and `valid:` (which the old `contains('id:')` matched as
+  /// a substring) no longer count as an id — an object carrying only those is
+  /// correctly flagged for lacking a routable id.
+  static bool _carriesIdArgument(Expression value) {
+    if (value is InstanceCreationExpression) {
+      for (final Expression a in value.argumentList.arguments) {
+        if (a is NamedExpression && a.name.label.name == 'id') return true;
+      }
+      return false;
+    }
+
+    // Map literal: a string key of exactly 'id' identifies a routable param.
+    if (value is SetOrMapLiteral && value.isMap) {
+      for (final CollectionElement element in value.elements) {
+        if (element is MapLiteralEntry) {
+          final Expression key = element.key;
+          if (key is SimpleStringLiteral && key.value == 'id') return true;
+        }
+      }
+    }
+    return false;
   }
 }
 

@@ -17,9 +17,12 @@ void main() {
     );
   });
 
-  test('packs other than package_specific declare at least one marker', () {
+  // Every pack now gates on at least one pubspec marker. The former
+  // `package_specific` ("Mixed packages") pack was the sole exception (empty
+  // marker set, opt-in only); it was split into per-package gated packs, so the
+  // exemption no longer exists and the invariant is now universal.
+  test('every pack declares at least one pubspec marker', () {
     for (final entry in kRulePackPubspecMarkers.entries) {
-      if (entry.key == 'package_specific') continue;
       expect(
         entry.value,
         isNotEmpty,

@@ -2371,6 +2371,10 @@ class AvoidDriftUnsafeWebStorageRule extends SaropaLintRule {
   ) {
     // Detect WebDatabase constructor
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      // Gate on a drift import: `WebDatabase` / `unsafeIndexedDb` are generic
+      // identifiers that unrelated code can define, so without this every
+      // sibling drift rule's import guard was missing here.
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
       final typeName = node.constructorName.type.name.lexeme;
       if (typeName == 'WebDatabase') {
         reporter.atNode(node);
@@ -2379,6 +2383,7 @@ class AvoidDriftUnsafeWebStorageRule extends SaropaLintRule {
 
     // Detect unsafeIndexedDb reference
     context.addMethodInvocation((MethodInvocation node) {
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
       if (node.methodName.name == 'unsafeIndexedDb') {
         reporter.atNode(node);
       }

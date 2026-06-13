@@ -1,6 +1,12 @@
 node_modules/
 out/
 out-test/
+out-ux/
 dist/
 media/codicons/
 .watcher.log
+# UX render harness generated artifacts (pages, screenshots, axe results)
+test-ux/.pages/
+test-ux/.screens/
+test-ux/.results/
+test-results/

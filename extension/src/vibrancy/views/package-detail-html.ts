@@ -62,8 +62,33 @@ export function buildPackageDetailHtml(
     reviewSummary: ReviewSummary | null,
     fetchErrors: PackageDetailFetchErrors = NO_FETCH_ERRORS,
 ): string {
+    return wrapHtml(
+        result.package.name,
+        buildPackageDetailBody(result, reviews, reviewSummary, fetchErrors),
+    );
+}
+
+/**
+ * Render only the detail SECTIONS (no document/CSP/script wrapper) so the same
+ * content can live in two hosts: the standalone panel (via [buildPackageDetailHtml])
+ * and the dashboard's docked master-detail pane, which injects this body into a
+ * region and supplies the chrome itself. The version-gap and README-image
+ * sections degrade to empty when their lazy-fetched data is absent, so this is
+ * safe to render from a freshly-scanned VibrancyResult before any fetch lands.
+ */
+export function buildPackageDetailBody(
+    result: VibrancyResult,
+    reviews: readonly ReviewEntry[],
+    reviewSummary: ReviewSummary | null,
+    fetchErrors: PackageDetailFetchErrors = NO_FETCH_ERRORS,
+    options: { paneMode?: boolean } = {},
+): string {
+    // In the dashboard's docked pane the page already owns the hero/banner, so
+    // the detail uses a compact header instead of a second `<header>` (which
+    // would duplicate the banner landmark and surface a stray full-width toggle).
+    const header = options.paneMode ? buildPaneHeader(result) : buildHeader(result);
     const parts = [
-        buildHeader(result),
+        header,
         buildPartialFetchBanner(fetchErrors),
         buildDescriptionSection(result),
         buildTopicsSection(result),
@@ -80,7 +105,7 @@ export function buildPackageDetailHtml(
         buildLinksRow(result),
     ];
 
-    return wrapHtml(result.package.name, parts.join('\n'));
+    return parts.join('\n');
 }
 
 /**
@@ -151,6 +176,28 @@ function buildHeader(r: VibrancyResult): string {
     // Drop the header copy; the bottom band is reference content per §14.14
     // and stays the single source of truth for navigation links.
     return heroHtml;
+}
+
+/**
+ * Compact header for the dashboard's docked detail pane: package name as a
+ * section heading plus the same identity status line as the full panel, but
+ * without the `dash-hero` banner, gauge, or full-width toggle — those belong to
+ * the dashboard chrome that already surrounds the pane.
+ */
+function buildPaneHeader(r: VibrancyResult): string {
+    const grade = categoryToGrade(r.category);
+    const cat = categoryLabel(r.category);
+    const license = r.license ?? '';
+    const logo = r.readme?.logoUrl
+        ? `<img class="pane-logo" src="${escapeHtml(r.readme.logoUrl)}" alt="${escapeHtml(l10n('packageDetail.header.logoAlt', { name: r.package.name }))}" />`
+        : '';
+    const statusLineHtml = buildStatusLine([
+        { glyph: '🏆', label: l10n('packageDetail.header.grade', { grade }), title: cat, tone: gradeTone(grade) },
+        { label: `v${r.package.version}` },
+        ...(license ? [{ label: license, title: l10n('packageDetail.header.licenseTitle') }] : []),
+        ...(r.pubDev?.publishedDate ? [{ label: l10n('packageDetail.header.published', { date: r.pubDev.publishedDate.split('T')[0] }) }] : []),
+    ]);
+    return `<div class="pane-header">${logo}<div class="pane-header-text"><h2 class="pane-title">${escapeHtml(r.package.name)}</h2>${statusLineHtml}</div></div>`;
 }
 
 /** Map letter grade to status-pill tone for the hero status line. */

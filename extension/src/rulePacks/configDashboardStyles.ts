@@ -87,6 +87,77 @@ function packTableSpecifics(): string {
 .dash-table.packs td.pack-name { font-weight: 500; }
 .dash-table.packs td.ok { color: var(--status-good); }
 .dash-table.packs td.muted { color: var(--muted); }
+
+/* Type filter <select>. Native option lists ignore most CSS, but VS Code exposes
+   dropdown theme tokens; without them the open list renders low-contrast gray-on-
+   near-black and the options are unreadable (the reported defect). Bind the control
+   and its options to the dropdown tokens so contrast follows the active theme. */
+.toolbar-row select,
+#type-filter {
+  font: inherit;
+  color: var(--vscode-dropdown-foreground);
+  background: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-dropdown-border, var(--border));
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+.toolbar-row select:focus,
+#type-filter:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+.toolbar-row select option,
+#type-filter option {
+  color: var(--vscode-dropdown-foreground);
+  background: var(--vscode-dropdown-listBackground, var(--vscode-dropdown-background));
+}
+
+/* Inline rule-list expander (replaces the old quick-pick popup). The toggle in the
+   last column reveals a sibling detail row whose cell spans the full table width. */
+.rules-toggle {
+  font: inherit;
+  cursor: pointer;
+  color: var(--vscode-textLink-foreground);
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.rules-toggle:hover { text-decoration: underline; }
+.rules-toggle:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 1px;
+}
+.rules-toggle .chev {
+  display: inline-block;
+  font-size: 0.8em;
+  transition: transform 0.15s ease;
+}
+.rules-toggle.open .chev { transform: rotate(90deg); }
+.dash-table.packs tr.rules-detail > td {
+  padding: 8px 12px 12px;
+  background: var(--surface-2);
+}
+.rules-detail-body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+.rules-detail-body .rule-link {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 0.9em;
+  color: var(--vscode-textLink-foreground);
+  text-decoration: none;
+}
+.rules-detail-body .rule-link:hover { text-decoration: underline; }
+.rules-detail-body .rule-link:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
 `;
 }
 
