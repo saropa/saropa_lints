@@ -1,0 +1,37 @@
+#!/bin/sh
+# Block British spellings before they land. The publish-time spelling audit
+# runs too late (the British spellings are already committed) and used to be
+# bypassable, which is why BrE kept reaching pub.dev — see
+# bugs/british_english_recurrence_attempts.md. This is the hard,
+# non-interactive gate. Enable once per clone: git config core.hooksPath .githooks
+#
+# Scans only the staged source files via the shared guard
+# (scripts/hooks/spelling_guard.py). Non-zero exit blocks the commit.
+
+# Staged Added/Copied/Modified files with scannable extensions only.
+files=$(git diff --cached --name-only --diff-filter=ACM \
+  | grep -E '\.(dart|py|md|ya?ml)$')
+
+[ -z "$files" ] && exit 0
+
+# Resolve a Python interpreter: prefer the Windows `py -3` launcher, then
+# python3, then python. Keeps the hook working across contributor setups.
+if command -v py >/dev/null 2>&1; then
+  PY="py -3"
+elif command -v python3 >/dev/null 2>&1; then
+  PY=python3
+else
+  PY=python
+fi
+
+# Word-splitting on $files is intentional (one arg per path).
+# shellcheck disable=SC2086
+$PY scripts/hooks/spelling_guard.py $files
+status=$?
+
+if [ "$status" -ne 0 ]; then
+  echo ""
+  echo "Commit blocked: fix the British spelling(s) above, re-stage, and commit again."
+fi
+
+exit "$status"

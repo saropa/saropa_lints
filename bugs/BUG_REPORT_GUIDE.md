@@ -17,6 +17,11 @@ How to file, investigate, and close bugs in `saropa_lints`.
 - `require_cache_expiration_false_positive_bounded_lru_lfu_cache.md`
 - `require_timezone_display_false_positive_rendering_primitive_and_pattern_introspection.md`
 
+## Raised Reports (2026-06-12)
+
+- `feature_lint_rule_prefer_us_english_spelling.md`
+- `infra_us_spelling_dictionary_coverage_gaps.md`
+
 ---
 
 ## File Naming

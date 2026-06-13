@@ -104,6 +104,42 @@ UK_TO_US: dict[str, str] = {
     "mould": "mold",
     "programme": "program",
     "sceptical": "skeptical",
+    # coverage gaps closed 2026-06-12 (see
+    # plans/history/2026.06/2026.06.12/infra_us_spelling_dictionary_coverage_gaps.md)
+    # -ise / -yse -> -ize / -yze. "analyse"/"paralyse" end in "yse" so the
+    # auto-derivation (which only expands "-ise") does NOT generate their
+    # -ed/-ing forms; list those explicitly. "practise" (verb) -> "practice".
+    "realise": "realize",
+    "capitalise": "capitalize",
+    "analyse": "analyze",
+    "analysed": "analyzed",
+    "analysing": "analyzing",
+    "paralyse": "paralyze",
+    "paralysed": "paralyzed",
+    "paralysing": "paralyzing",
+    "practise": "practice",
+    # -ogue -> -og (completes the group alongside catalogue/analogue)
+    "dialogue": "dialog",
+    # doubled consonants. The derivation does not expand tense forms for
+    # these, so the -ed and -ing variants are listed explicitly.
+    "labelled": "labeled",
+    "labelling": "labeling",
+    "travelled": "traveled",
+    "fuelled": "fueled",
+    "fuelling": "fueling",
+    # other common differences
+    "aluminium": "aluminum",
+    "whilst": "while",
+    "amongst": "among",
+    "spelt": "spelled",
+    "dreamt": "dreamed",
+    "burnt": "burned",
+    "leapt": "leaped",
+    "aeroplane": "airplane",
+    "kerb": "curb",
+    "tyre": "tire",
+    "plough": "plow",
+    "storey": "story",
 }
 # cspell:enable
 
@@ -132,6 +168,18 @@ _initialize_spellings()
 
 # Optional: clean up the function itself so it can't be called again
 del _initialize_spellings
+
+# Post-derivation fixes for forms the blunt "+s" rule gets wrong. These run
+# after the derivation and before the match patterns are built below.
+#
+# "storeys" would derive to "storys"; the correct US plural is "stories".
+UK_TO_US["storeys"] = "stories"
+# "analyses" / "paralyses" are ALSO the correct American noun plurals of
+# "analysis" / "paralysis", so flagging them would false-positive on valid
+# US text. Drop the derived entries; the verb forms (analyse/analysed/
+# analysing, paralyse/...) still catch the British spellings.
+UK_TO_US.pop("analyses", None)
+UK_TO_US.pop("paralyses", None)
 
 # Modern Python is very good at cleaning up after itself; you don't actually need to "delete" these small temporary variables.
 # # Clean up module-level temp variables
@@ -354,6 +402,44 @@ def scan_directory(project_dir: Path) -> list[SpellingHit]:
         all_hits.extend(scan_file(file_path))
     all_hits.sort(key=lambda h: (str(h.file), h.line_number))
     return all_hits
+
+
+def scan_paths(
+    paths: list[str | Path], project_dir: Path
+) -> list[SpellingHit]:
+    """Scan an explicit list of files (used by the git/editor hooks).
+
+    Applies the SAME extension / skip-dir / skip-file / i18n / plan-history
+    exemptions as ``scan_directory`` so a hook can pass raw staged or
+    just-edited paths without re-implementing the exemption rules. Non-
+    existent paths (e.g. a staged deletion) and directories are silently
+    skipped so callers can forward git/editor output verbatim.
+
+    Why this exists separately from ``scan_directory``: the spelling gate
+    used to run only at publish time over the whole tree, which let British
+    spellings land in dozens of commits before anything caught them. The
+    pre-commit and PostToolUse hooks need to check just the touched files,
+    early — see ``bugs/british_english_recurrence_attempts.md``.
+    """
+    root = project_dir.resolve()
+    hits: list[SpellingHit] = []
+    for raw in paths:
+        file_path = Path(raw)
+        if file_path.suffix not in _SCAN_EXTENSIONS:
+            continue
+        if _should_skip_dir(file_path):
+            continue
+        if file_path.name in _SKIP_FILES:
+            continue
+        if _should_skip_path_for_i18n_tooling(file_path, root):
+            continue
+        if _should_skip_plans_history(file_path, root):
+            continue
+        if not file_path.is_file():
+            continue
+        hits.extend(scan_file(file_path))
+    hits.sort(key=lambda h: (str(h.file), h.line_number))
+    return hits
 
 
 # =============================================================================

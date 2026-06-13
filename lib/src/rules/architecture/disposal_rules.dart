@@ -1224,7 +1224,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
       // Whole-class source is used to confirm ownership: a single subscription
       // is only this State's responsibility if this State created it (assigned a
       // `.listen(...)` result to it). A field fed only from `widget.subscription`
-      // or a constructor parameter is externally owned — cancelling it here would
+      // or a constructor parameter is externally owned — canceling it here would
       // be wrong, and flagging the absence of a cancel is a false positive that,
       // at ERROR severity, breaks the consumer build.
       final String classSource = node.toSource();
@@ -1267,7 +1267,7 @@ class RequireStreamSubscriptionCancelRule extends SaropaLintRule {
       // `void _cleanUp() { _sub?.cancel(); }`), or cancel a subscription in
       // didChangeDependencies/deactivate before re-subscribing. A dispose-only
       // scan mis-flags all of these as leaks. At ERROR severity that breaks the
-      // consumer build, so a subscription cancelled anywhere in this State's own
+      // consumer build, so a subscription canceled anywhere in this State's own
       // methods is treated as owned-and-cleaned. The `.cancel()` call is still
       // required — setting the field to null is not cleanup.
       final Set<String> canceledFields = <String>{};

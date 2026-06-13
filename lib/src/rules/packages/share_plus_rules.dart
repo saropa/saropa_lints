@@ -79,7 +79,7 @@ class PreferSharePlusInstanceRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_shareplus_instance',
-    '[prefer_shareplus_instance] The static Share.share / Share.shareUri / Share.shareXFiles / Share.shareFiles methods were deprecated in share_plus 11.0.0 in favour of the instance-based SharePlus.instance.share(ShareParams(...)). Deprecated static methods will be removed in a future major release. Migrate now to avoid a breaking change and gain access to the richer ShareParams API, including consistent sharePositionOrigin support on all platforms. {v1}',
+    '[prefer_shareplus_instance] The static Share.share / Share.shareUri / Share.shareXFiles / Share.shareFiles methods were deprecated in share_plus 11.0.0 in favor of the instance-based SharePlus.instance.share(ShareParams(...)). Deprecated static methods will be removed in a future major release. Migrate now to avoid a breaking change and gain access to the richer ShareParams API, including consistent sharePositionOrigin support on all platforms. {v1}',
     correctionMessage:
         'Replace Share.share(text, ...) with SharePlus.instance.share(ShareParams(text: text, ...)), Share.shareUri(uri) with SharePlus.instance.share(ShareParams(uri: uri)), and Share.shareXFiles(files, ...) with SharePlus.instance.share(ShareParams(files: files, ...)). Preserve all named arguments including sharePositionOrigin.',
     severity: DiagnosticSeverity.WARNING,
@@ -293,7 +293,7 @@ class SharePlusMissingPositionOriginRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'share_plus_missing_position_origin',
-    '[share_plus_missing_position_origin] ShareParams is constructed without a sharePositionOrigin argument. On iPad, the iOS share sheet is presented as a popover anchored to a Rect; without a non-zero sharePositionOrigin UIKit throws a PlatformException and the share sheet never appears. On iOS 26+ a missing or zero Rect also triggers a crash. Always pass sharePositionOrigin derived from RenderBox.localToGlobal(Offset.zero) & size to ensure safe cross-platform behaviour. See https://pub.dev/packages/share_plus. {v1}',
+    '[share_plus_missing_position_origin] ShareParams is constructed without a sharePositionOrigin argument. On iPad, the iOS share sheet is presented as a popover anchored to a Rect; without a non-zero sharePositionOrigin UIKit throws a PlatformException and the share sheet never appears. On iOS 26+ a missing or zero Rect also triggers a crash. Always pass sharePositionOrigin derived from RenderBox.localToGlobal(Offset.zero) & size to ensure safe cross-platform behavior. See https://pub.dev/packages/share_plus. {v1}',
     correctionMessage:
         'Add sharePositionOrigin: (context.findRenderObject()! as RenderBox).localToGlobal(Offset.zero) & (context.findRenderObject()! as RenderBox).size to ShareParams. Store the RenderBox in a local variable to avoid the double lookup.',
     severity: DiagnosticSeverity.WARNING,

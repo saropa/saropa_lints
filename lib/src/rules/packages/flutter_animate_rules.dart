@@ -334,7 +334,7 @@ class FlutterAnimateNoKeyInListRule extends SaropaLintRule {
       if (parent is! NamedExpression) return;
       if (parent.name.label.name != 'children') return;
 
-      // The named arg's grandparent must be an ArgumentList of a recognised
+      // The named arg's grandparent must be an ArgumentList of a recognized
       // multi-child widget constructor.
       final AstNode? argList = parent.parent;
       if (argList is! ArgumentList) return;

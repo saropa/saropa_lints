@@ -107,6 +107,47 @@ class TestUsSpellingScanner(unittest.TestCase):
         )
         self.assertEqual(hits, [])
 
+    def test_coverage_dialogue_is_flagged(self) -> None:
+        # `dialogue` was missing while `catalogue`/`analogue` were present —
+        # the -ogue group was incomplete. Pin the gap closed.
+        hits = self._scan_text("// open the dialogue box\n")
+        self.assertEqual(hits, [("dialogue", "dialog")])
+
+    def test_coverage_realise_is_flagged(self) -> None:
+        # `realise` was missing from the -ise group. The auto-derivation
+        # also covers realised/realising from this one base entry.
+        hits = self._scan_text("// you will realise this soon\n")
+        self.assertEqual(hits, [("realise", "realize")])
+
+    def test_coverage_realised_derived_form_is_flagged(self) -> None:
+        # Pins that adding the base "realise" yields the -ed form for free.
+        hits = self._scan_text("// we realised the problem\n")
+        self.assertEqual(hits, [("realised", "realized")])
+
+    def test_coverage_labelled_is_flagged(self) -> None:
+        # Doubled-consonant tense forms are NOT auto-derived, so `labelled`
+        # had to be listed explicitly. Pin it.
+        hits = self._scan_text("// the labelled node\n")
+        self.assertEqual(hits, [("labelled", "labeled")])
+
+    def test_analyses_noun_plural_is_not_flagged(self) -> None:
+        # `analyses` is the correct American plural of `analysis`, so it must
+        # NOT fire even though the British verb `analyse` is flagged. This is
+        # the ambiguity the post-derivation pop() guards against.
+        hits = self._scan_text("// two analyses were run\n")
+        self.assertEqual(hits, [])
+
+    def test_analysed_verb_form_is_flagged(self) -> None:
+        # The unambiguous British verb form still fires (no US homograph).
+        hits = self._scan_text("// the tool analysed the file\n")
+        self.assertEqual(hits, [("analysed", "analyzed")])
+
+    def test_storeys_maps_to_stories_not_storys(self) -> None:
+        # The blunt +s derivation would suggest "storys"; the override fixes
+        # the plural to the correct "stories".
+        hits = self._scan_text("// a three storeys building\n")
+        self.assertEqual(hits, [("storeys", "stories")])
+
     def test_dedup_prevents_same_span_being_reported_twice(self) -> None:
         # ``Cancelled`` at sentence start is a word-boundary match. It is
         # ALSO matchable by the CamelCase pattern when preceded by a
@@ -119,6 +160,73 @@ class TestUsSpellingScanner(unittest.TestCase):
         # Exactly two hits: one for ``Cancelled`` (capitalized standalone)
         # and one for ``cancelled`` (lowercase standalone). No duplicates.
         self.assertEqual(uk_words, ["Cancelled", "cancelled"])
+
+
+class TestScanPaths(unittest.TestCase):
+    """Pin ``scan_paths`` — the file-scoped entry the git/editor hooks use.
+
+    The hooks pass raw staged / just-edited paths, so ``scan_paths`` must
+    apply the same extension / skip-file / plans-history exemptions as the
+    whole-tree ``scan_directory`` and must tolerate paths that aren't real
+    files (a staged deletion, a directory) without crashing.
+    """
+
+    def setUp(self) -> None:
+        from scripts.modules._us_spelling import scan_paths
+
+        self._scan_paths = scan_paths
+        self._root = Path(
+            tempfile.mkdtemp(prefix="scan_paths_test_")
+        )
+
+    def _write(self, rel: str, body: str) -> Path:
+        """Write ``body`` to ``rel`` under the temp project root."""
+        path = self._root / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(body, encoding="utf-8")
+        return path
+
+    def _uk_words(self, paths: list[Path]) -> list[str]:
+        hits = self._scan_paths(paths, self._root)
+        return sorted(h.uk_word for h in hits)
+
+    def test_dirty_dart_file_is_flagged(self) -> None:
+        # The core positive case: a British spelling in a passed file is
+        # reported. This is what both hooks rely on to block.
+        path = self._write("lib/a.dart", "// uses colour here\n")
+        self.assertEqual(self._uk_words([path]), ["colour"])
+
+    def test_clean_dart_file_is_silent(self) -> None:
+        path = self._write("lib/b.dart", "// uses color here\n")
+        self.assertEqual(self._uk_words([path]), [])
+
+    def test_non_scannable_extension_is_skipped(self) -> None:
+        # A ``.txt`` is outside _SCAN_EXTENSIONS — forwarding it from a
+        # hook must not crash or flag.
+        path = self._write("notes.txt", "favour and colour\n")
+        self.assertEqual(self._uk_words([path]), [])
+
+    def test_skip_file_name_is_exempt(self) -> None:
+        # The scanner's own dictionary file references British forms
+        # verbatim; passing it explicitly must stay silent.
+        path = self._write(
+            "_us_spelling.py", "x = 'colour'  # dictionary key\n"
+        )
+        self.assertEqual(self._uk_words([path]), [])
+
+    def test_plans_history_is_exempt(self) -> None:
+        # Archived plan docs are frozen prose; the hook must not block a
+        # commit that merely touches one.
+        path = self._write(
+            "plans/history/2026.06/note.md", "we cancelled it\n"
+        )
+        self.assertEqual(self._uk_words([path]), [])
+
+    def test_missing_path_is_skipped(self) -> None:
+        # A staged deletion / renamed-away path no longer exists on disk.
+        # scan_paths must skip it rather than raise.
+        missing = self._root / "lib" / "gone.dart"
+        self.assertEqual(self._uk_words([missing]), [])
 
 
 if __name__ == "__main__":
