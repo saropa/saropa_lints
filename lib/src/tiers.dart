@@ -171,6 +171,7 @@ const Set<String> stylisticRules = <String>{
 
   // === Quote style (conflicting pair - opt-in only) ===
   'prefer_double_quotes',
+  'prefer_us_english_spelling',
   'prefer_single_quotes',
 
   // === Apostrophe style (conflicting pair - opt-in only) ===

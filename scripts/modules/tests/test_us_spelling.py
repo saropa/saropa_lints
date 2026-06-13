@@ -229,5 +229,32 @@ class TestScanPaths(unittest.TestCase):
         self.assertEqual(self._uk_words([missing]), [])
 
 
+class TestGeneratedDartMapParity(unittest.TestCase):
+    """Guard that the generated Dart spelling map stays in sync with UK_TO_US.
+
+    The prefer_us_english_spelling lint rule consumes a Dart copy of the
+    canonical dictionary. If `UK_TO_US` changes and the generator is not
+    re-run, this test fails so the stale file cannot ship.
+    """
+
+    def test_committed_dart_file_matches_generator_output(self) -> None:
+        from pathlib import Path
+
+        from scripts.generate_us_english_rule_data import (
+            render_dart,
+            _OUTPUT_REL,
+            _REPO_ROOT,
+        )
+
+        committed = (_REPO_ROOT / _OUTPUT_REL).read_text(encoding="utf-8")
+        expected = render_dart()
+        self.assertEqual(
+            committed,
+            expected,
+            "lib/src/rules/data/uk_to_us_spellings.dart is stale. "
+            "Run: py -3 scripts/generate_us_english_rule_data.py",
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

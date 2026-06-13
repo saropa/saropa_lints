@@ -1125,6 +1125,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferInterpolationOverConcatenationRule.new,
   PreferConcatenationOverInterpolationRule.new,
   PreferDoubleQuotesRule.new,
+  PreferUsEnglishSpellingRule.new,
   PreferAbsoluteImportsRule.new,
   PreferGroupedImportsRule.new,
   PreferFlatImportsRule.new,

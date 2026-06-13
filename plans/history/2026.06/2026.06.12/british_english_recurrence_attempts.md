@@ -1,6 +1,7 @@
 # British English Keeps Shipping — Attempt History
 
-**Status:** Open (root cause unaddressed as of 2026-06-12)
+**Status:** Fixed (2026-06-12 — enforcement moved earlier and made
+non-bypassable; see Resolution below)
 
 British spellings keep reaching `lib/src/rules/**` DartDoc comments and
 `problemMessage`/`correctionMessage` strings despite repeated fixes. This
@@ -56,3 +57,26 @@ fix — they have been tried 6 times. Candidate mechanisms:
   enough."
 - **Remove the publish `[I]gnore` option for spelling** so the existing
   late gate at least cannot be waved through.
+
+## Resolution (2026-06-12)
+
+All three candidate mechanisms above shipped, plus the coverage and
+consumer-rule follow-ups:
+
+- A git `pre-commit` hook (`.githooks/pre-commit`) and a Claude
+  `PostToolUse` editor hook now scan touched files via a shared guard
+  (`scripts/hooks/spelling_guard.py` → `scan_paths`) and block before
+  British spellings can land.
+- The publish gate's `[I]gnore` option was removed; spelling now always
+  blocks (Retry or Abort only).
+- The spelling dictionary gained 22 missing words (tracked in
+  `infra_us_spelling_dictionary_coverage_gaps.md`, archived under
+  `plans/history/2026.06/2026.06.12/`).
+- A consumer-facing `prefer_us_english_spelling` lint rule exposes the same
+  check to downstream projects (tracked in
+  `feature_lint_rule_prefer_us_english_spelling.md`).
+
+The root cause — enforcement that was both too late (publish-only) and
+bypassable — is closed. This file is retained as the failure history so a
+future "attempt #7" starts from "the gate must be early and
+non-bypassable" rather than re-tuning the detector.

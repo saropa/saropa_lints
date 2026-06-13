@@ -88,6 +88,7 @@ export 'security/security_network_input_rules.dart';
 
 // Stylistic
 export 'stylistic/formatting_rules.dart';
+export 'stylistic/prefer_us_english_spelling_rule.dart';
 export 'stylistic/stylistic_additional_rules.dart';
 export 'stylistic/stylistic_control_flow_rules.dart';
 export 'stylistic/stylistic_error_testing_rules.dart';
