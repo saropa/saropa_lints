@@ -8,6 +8,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { type Violation } from '../violationsReader';
+import { l10n } from '../i18n/runtime';
 
 /** Max end character for a line when requesting code actions (range is clamped by the editor). */
 const APPLY_FIX_LINE_END = 4096;
@@ -41,7 +42,7 @@ export async function applyFixForViolation(v: Violation, root: string): Promise<
     APPLY_FIX_RESOLVE_COUNT,
   );
   if (!Array.isArray(codeActions) || codeActions.length === 0) {
-    void vscode.window.showInformationMessage('No quick fix available for this violation.');
+    void vscode.window.showInformationMessage(l10n('notify.commands.issuesNoQuickFix'));
     return false;
   }
   const rule = (v.rule ?? '').toString();
@@ -59,7 +60,7 @@ export async function applyFixForViolation(v: Violation, root: string): Promise<
     await vscode.commands.executeCommand(action.command.command, ...(action.command.arguments ?? []));
   }
   if (!action.edit && !action.command) {
-    void vscode.window.showInformationMessage('No quick fix available for this violation.');
+    void vscode.window.showInformationMessage(l10n('notify.commands.issuesNoQuickFix'));
     return false;
   }
   return true;

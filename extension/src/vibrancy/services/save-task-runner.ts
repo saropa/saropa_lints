@@ -7,6 +7,7 @@
 
 import * as vscode from 'vscode';
 import { hasDependencyChanges, getDependencyChangeSummary } from './dependency-differ';
+import { l10n } from '../../i18n/runtime';
 
 /**
  * **Pubspec save → task** bridge for Package Vibrancy. Subscribes to save/open events, tracks
@@ -169,7 +170,7 @@ export class SaveTaskRunner implements vscode.Disposable {
             this._showStatus('error', command);
             const message = error instanceof Error ? error.message : String(error);
             this._getOutputChannel().appendLine(`[SaveTask] Error: ${message}`);
-            vscode.window.showErrorMessage(`Save task failed: ${message}`);
+            vscode.window.showErrorMessage(l10n('notify.vibrancy.saveTaskFailed', { message }));
         } finally {
             this._isRunning = false;
         }

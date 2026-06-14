@@ -10,6 +10,7 @@ import { ComparisonData, RankedComparison } from '../types';
 import { buildComparisonHtml } from './comparison-html';
 import { rankPackages } from '../scoring/comparison-ranker';
 import { findPubspecYaml } from '../services/pubspec-editor';
+import { l10n } from '../../i18n/runtime';
 
 // Side-by-side package comparison webview (add package, rank, HTML from buildComparisonHtml).
 interface AddPackageMessage {
@@ -96,7 +97,7 @@ export class ComparisonPanel {
 async function addPackageToPubspec(name: string, version: string): Promise<void> {
     const yamlUri = await findPubspecYaml();
     if (!yamlUri) {
-        vscode.window.showWarningMessage('No pubspec.yaml found');
+        vscode.window.showWarningMessage(l10n('notify.vibrancy.noPubspecFound'));
         return;
     }
 
@@ -113,7 +114,7 @@ async function addPackageToPubspec(name: string, version: string): Promise<void>
     }
 
     if (depSectionIndex < 0) {
-        vscode.window.showWarningMessage('Could not find dependencies section');
+        vscode.window.showWarningMessage(l10n('notify.vibrancy.noDependenciesSection'));
         return;
     }
 
@@ -136,8 +137,8 @@ async function addPackageToPubspec(name: string, version: string): Promise<void>
     const applied = await vscode.workspace.applyEdit(edit);
     if (applied) {
         await doc.save();
-        vscode.window.showInformationMessage(`Added ${name}: ${constraint} to pubspec.yaml`);
+        vscode.window.showInformationMessage(l10n('notify.vibrancy.addedToPubspec', { name, constraint }));
     } else {
-        vscode.window.showWarningMessage(`Failed to add ${name} to pubspec.yaml`);
+        vscode.window.showWarningMessage(l10n('notify.vibrancy.failedToAddToPubspec', { name }));
     }
 }

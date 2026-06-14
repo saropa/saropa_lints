@@ -16,6 +16,7 @@
 
 import * as vscode from 'vscode';
 import { resolveNodesForJsonExport } from './copyTreeAsJsonSelection';
+import { l10n } from './i18n/runtime';
 
 /** Uniform JSON envelope for any tree node. */
 export interface JsonNode {
@@ -75,7 +76,7 @@ export async function copyTreeNodesToClipboard(
     const nodes = resolveNodesForJsonExport(item, selectedItems);
 
     if (nodes.length === 0) {
-        vscode.window.showWarningMessage('No tree item selected.');
+        vscode.window.showWarningMessage(l10n('notify.commands.copyTreeNoSelection'));
         return;
     }
 
@@ -86,7 +87,7 @@ export async function copyTreeNodesToClipboard(
     }
 
     if (results.length === 0) {
-        vscode.window.showWarningMessage('Could not serialize the selected item(s).');
+        vscode.window.showWarningMessage(l10n('notify.commands.copyTreeSerializeFailed'));
         return;
     }
 
@@ -98,7 +99,7 @@ export async function copyTreeNodesToClipboard(
     const count = results.length;
     const noun = count === 1 ? 'node' : 'nodes';
     vscode.window.showInformationMessage(
-        `Copied ${count} ${viewLabel} ${noun} to clipboard as JSON`,
+        l10n('notify.commands.copyTreeCopied', { count: String(count), viewLabel, noun }),
     );
 }
 
@@ -112,7 +113,7 @@ export async function copyWholeTreeFromProviderRoots(
 ): Promise<void> {
     const roots = await getChildren(undefined);
     if (roots.length === 0) {
-        await vscode.window.showWarningMessage('Nothing to export.');
+        await vscode.window.showWarningMessage(l10n('notify.commands.copyTreeNothingToExport'));
         return;
     }
     const results: JsonNode[] = [];
@@ -121,12 +122,17 @@ export async function copyWholeTreeFromProviderRoots(
         if (json) results.push(json);
     }
     if (results.length === 0) {
-        await vscode.window.showWarningMessage('Could not serialize tree.');
+        await vscode.window.showWarningMessage(l10n('notify.commands.copyTreeSerializeTreeFailed'));
         return;
     }
     const output = results.length === 1 ? results[0] : results;
     await vscode.env.clipboard.writeText(JSON.stringify(output, null, 2));
+    const branchNoun = roots.length === 1 ? 'root branch' : 'root branches';
     vscode.window.showInformationMessage(
-        `Copied full ${viewLabel} tree (${roots.length} root branch${roots.length === 1 ? '' : 'es'}) as JSON`,
+        l10n('notify.commands.copyTreeCopiedFull', {
+            viewLabel,
+            count: String(roots.length),
+            branchNoun,
+        }),
     );
 }

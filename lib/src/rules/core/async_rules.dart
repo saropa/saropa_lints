@@ -1390,14 +1390,6 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
     severity: DiagnosticSeverity.ERROR,
   );
 
-  static final List<RegExp> _mountedCheckPatterns = [
-    RegExp(r'\.mounted\b'),
-    RegExp(r'context\.mounted'),
-    RegExp(r'!mounted\b'),
-    RegExp(r'if\s*\(\s*mounted\s*\)'),
-    RegExp(r'if\s*\(\s*!mounted\s*\)'),
-  ];
-
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -1465,18 +1457,41 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
     return foundAwait;
   }
 
+  // Returns true when a `mounted` reference appears textually BEFORE [target].
+  //
+  // We compare AST node offsets against the ORIGINAL source directly instead of
+  // slicing `body.toSource()`. `toSource()` re-renders the body with normalized
+  // whitespace and stripped comments, so an original-source offset
+  // (`target.offset - body.offset`) does NOT map to the same position in the
+  // re-rendered string. With comments/extra whitespace before the call, the
+  // original offset runs past the matching index, so the slice wrongly captured
+  // text that is actually AFTER the pop — crediting a mounted check that comes
+  // later as if it guarded the pop, and silently missing real violations.
   bool _hasMountedCheckBefore(FunctionBody body, AstNode target) {
-    final String bodySource = body.toSource();
-    final int targetOffset = target.offset - body.offset;
+    final _MountedReferenceFinder finder = _MountedReferenceFinder(
+      target.offset,
+    );
+    body.visitChildren(finder);
+    return finder.foundBeforeTarget;
+  }
+}
 
-    // Ensure we don't exceed the string bounds - toSource() may produce
-    // a different length string than the original source
-    if (targetOffset <= 0 || targetOffset > bodySource.length) {
-      return _mountedCheckPatterns.any((p) => p.hasMatch(bodySource));
+/// Collects whether any `mounted` identifier (e.g. `mounted`, `context.mounted`,
+/// `!mounted`) appears at a source offset earlier than [targetOffset]. Offsets
+/// come from the original source via the AST, so they are comparable directly —
+/// no re-rendered-string slicing (see [_hasMountedCheckBefore]).
+class _MountedReferenceFinder extends RecursiveAstVisitor<void> {
+  _MountedReferenceFinder(this.targetOffset);
+
+  final int targetOffset;
+  bool foundBeforeTarget = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (node.name == 'mounted' && node.offset < targetOffset) {
+      foundBeforeTarget = true;
     }
-
-    final String beforeTarget = bodySource.substring(0, targetOffset);
-    return _mountedCheckPatterns.any((p) => p.hasMatch(beforeTarget));
+    super.visitSimpleIdentifier(node);
   }
 }
 
@@ -2043,7 +2058,15 @@ class PreferUtcForStorageRule extends SaropaLintRule {
         return;
       }
 
-      // Check if inside a storage-related context
+      // Check if inside a storage-related context.
+      //
+      // Scope the scan to the IMMEDIATE enclosing statement only. Walking every
+      // ancestor ran the storage regexes against each ancestor's full
+      // toSource(), which grows to the whole method/class as we ascend — so any
+      // unrelated `save(` / `insert(` / `.set...(` elsewhere in the enclosing
+      // scope marked a toIso8601String() used for a UI label as "storage
+      // context" (also quadratic). The storage call that actually receives this
+      // serialized DateTime is always within the same enclosing statement.
       AstNode? current = node.parent;
       while (current != null) {
         final String source = current.toSource();
@@ -2053,6 +2076,9 @@ class PreferUtcForStorageRule extends SaropaLintRule {
             return;
           }
         }
+        // Stop once we have scanned the enclosing statement; ancestors beyond it
+        // belong to sibling statements and are not this value's storage target.
+        if (current is Statement) return;
         current = current.parent;
       }
     });
@@ -2539,12 +2565,25 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
       final Expression? target = node.target;
       if (target == null) return;
 
-      final String? typeName = target.staticType?.element?.name;
-      // Check type or target name for stream indicators (exact/endsWith to avoid FP)
+      // Prefer the resolved static type: a real Stream (or Stream subtype).
+      final DartType? targetType = target.staticType;
+      final bool isStreamType =
+          targetType != null && _staticTypeIsStream(targetType);
+
+      // When the type is unresolved, fall back to two narrow textual signals:
+      // an explicit `.stream` property access (e.g. `bloc.stream.listen(...)`)
+      // or a target name ending in "stream". The previous `endsWith('controller')`
+      // fallback was too broad: `animationController.listen(...)` is NOT a
+      // Stream, yet was flagged for a missing onError. A bare AnimationController
+      // / TextEditingController / ScrollController is a controller, not a stream,
+      // so the name "controller" cannot stand in for a Stream type.
+      final bool isStreamAccess =
+          target is PropertyAccess && target.propertyName.name == 'stream' ||
+          target is PrefixedIdentifier && target.identifier.name == 'stream';
       final String targetNameLower = extractTargetName(target).toLowerCase();
-      if (typeName != 'Stream' &&
-          !targetNameLower.endsWith('stream') &&
-          !targetNameLower.endsWith('controller')) {
+      if (!isStreamType &&
+          !isStreamAccess &&
+          !targetNameLower.endsWith('stream')) {
         return;
       }
 
@@ -5074,6 +5113,16 @@ bool _staticTypeIsFuture(DartType type) {
   if (type.isDartAsyncFuture) return true;
   if (type is! InterfaceType) return false;
   return type.allSupertypes.any((DartType t) => t.isDartAsyncFuture);
+}
+
+/// True when static analysis can tell [type] is a [Stream] or a class that
+/// implements/extends [Stream]. Used instead of `element?.name == 'Stream'`
+/// so Stream subtypes (custom stream wrappers) are recognized, and instead of
+/// a target-name heuristic so non-Stream "controller" objects are not flagged.
+bool _staticTypeIsStream(DartType type) {
+  if (type.isDartAsyncStream) return true;
+  if (type is! InterfaceType) return false;
+  return type.allSupertypes.any((DartType t) => t.isDartAsyncStream);
 }
 
 bool _isAnimationControllerTickerAwait(Expression expression) {

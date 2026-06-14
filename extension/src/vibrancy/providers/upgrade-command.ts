@@ -5,6 +5,7 @@ import {
     findPubspecYaml, buildVersionEdit, readVersionConstraint,
 } from '../services/pubspec-editor';
 import { PackageItem } from './tree-items';
+import { l10n } from '../../i18n/runtime';
 
 /** Pubspec version bumps, pub get, and flutter test for a selected package row. */
 
@@ -34,7 +35,7 @@ interface UpgradeContext {
 /** Upgrade a package, run tests, and rollback on failure. */
 async function upgradeAndTest(item: PackageItem): Promise<void> {
     if (upgradeInProgress) {
-        vscode.window.showWarningMessage('An upgrade is already in progress');
+        vscode.window.showWarningMessage(l10n('notify.vibrancy.upgradeInProgress'));
         return;
     }
 
@@ -65,7 +66,7 @@ async function buildUpgradeContext(
     const original = readVersionConstraint(doc, item.result.package.name);
     if (!original) {
         vscode.window.showWarningMessage(
-            `Could not read constraint for ${item.result.package.name}`,
+            l10n('notify.vibrancy.couldNotReadConstraint', { name: item.result.package.name }),
         );
         return null;
     }
@@ -128,7 +129,7 @@ async function executeSteps(
 
     log(`\nUpgrade successful: ${ctx.pkgName} ${ctx.newConstraint}`);
     vscode.window.showInformationMessage(
-        `${ctx.pkgName} upgraded to ${ctx.newConstraint} — all tests pass`,
+        l10n('notify.vibrancy.upgradeSuccess', { name: ctx.pkgName, constraint: ctx.newConstraint }),
     );
 }
 
@@ -141,7 +142,7 @@ async function applyConstraint(
     const edit = buildVersionEdit(doc, pkgName, constraint);
     if (!edit) {
         vscode.window.showWarningMessage(
-            `Could not locate version constraint for ${pkgName}`,
+            l10n('notify.vibrancy.couldNotLocateConstraint', { name: pkgName }),
         );
         return false;
     }
@@ -163,7 +164,7 @@ async function rollback(ctx: UpgradeContext): Promise<void> {
 
 function showFailure(pkgName: string, phase: string): void {
     vscode.window.showWarningMessage(
-        `${pkgName} upgrade rolled back — ${phase} failed. See output for details.`,
+        l10n('notify.vibrancy.upgradeRolledBack', { name: pkgName, phase }),
     );
 }
 

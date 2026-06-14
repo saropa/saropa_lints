@@ -13,6 +13,7 @@ import * as vscode from 'vscode';
 import { getProjectRoot } from '../projectRoot';
 import { hasSaropaLintsDep } from '../pubspecReader';
 import { killProcessTree, resolveCliCwd } from './devCliRoot';
+import { l10n } from '../i18n/runtime';
 
 let panel: vscode.WebviewPanel | undefined;
 let extensionUri: vscode.Uri;
@@ -36,12 +37,12 @@ function openProjectMap(): Promise<void> {
   }
   const root = getProjectRoot();
   if (!root) {
-    void vscode.window.showErrorMessage('Saropa Lints: open a Dart project first.');
+    void vscode.window.showErrorMessage(l10n('notify.commands.projectMapNoProject'));
     return Promise.resolve();
   }
   if (!hasSaropaLintsDep(root)) {
     void vscode.window.showErrorMessage(
-      'Saropa Lints: add saropa_lints to pubspec.yaml before running the Saropa Project Map.',
+      l10n('notify.commands.projectMapMissingDep'),
     );
     return Promise.resolve();
   }
@@ -65,7 +66,7 @@ async function runAndRender(root: string): Promise<void> {
   if (!ok) return;
   const indexPath = path.join(outputDir, 'index.html');
   if (!fs.existsSync(indexPath)) {
-    void vscode.window.showWarningMessage('Saropa Project Map: report HTML was not produced.');
+    void vscode.window.showWarningMessage(l10n('notify.commands.projectMapNoHtml'));
     return;
   }
   renderPanel(indexPath);
@@ -106,13 +107,13 @@ function runScan(
     // alone orphans the dart grandchild (runaway scan).
     token.onCancellationRequested(() => killProcessTree(child));
     child.on('error', (e: Error) => {
-      void vscode.window.showErrorMessage(`Saropa Project Map failed: ${e.message}`);
+      void vscode.window.showErrorMessage(l10n('notify.commands.projectMapFailed', { message: e.message }));
       resolve(false);
     });
     child.on('close', (code: number | null) => {
       if (code !== 0) {
         const first = stderr.split('\n').find((l) => l.trim().length > 0) ?? '';
-        void vscode.window.showErrorMessage(`Saropa Project Map scan failed (exit ${code}). ${first}`);
+        void vscode.window.showErrorMessage(l10n('notify.commands.projectMapScanFailed', { code: String(code), details: first }));
         resolve(false);
         return;
       }
@@ -176,6 +177,6 @@ async function openFileFromReport(root: string, relativeFile: string): Promise<v
     const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(target));
     await vscode.window.showTextDocument(doc, { preview: true });
   } catch {
-    void vscode.window.showWarningMessage(`Saropa Project Map: could not open ${relativeFile}.`);
+    void vscode.window.showWarningMessage(l10n('notify.commands.projectMapCouldNotOpen', { file: relativeFile }));
   }
 }

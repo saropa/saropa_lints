@@ -10,6 +10,7 @@ import { ReportOptions, buildReportHtml } from './report-html';
 import { PackageDetailPaneController, PaneMessage } from './package-detail-pane-controller';
 import { ReviewStateService } from '../services/review-state';
 import { CacheService } from '../services/cache-service';
+import { l10n } from '../../i18n/runtime';
 
 /** Singleton webview panel for the vibrancy report. */
 export class VibrancyReportPanel {
@@ -158,7 +159,7 @@ export class VibrancyReportPanel {
                 await vscode.window.showTextDocument(doc);
             } catch {
                 /* File may have been moved or workspace closed since render. */
-                vscode.window.showErrorMessage('Could not open pubspec.yaml.');
+                vscode.window.showErrorMessage(l10n('notify.vibrancy.couldNotOpenPubspec'));
             }
         }
 
@@ -179,7 +180,7 @@ export class VibrancyReportPanel {
                     );
                 }
             } catch {
-                vscode.window.showErrorMessage('Could not open pubspec.yaml.');
+                vscode.window.showErrorMessage(l10n('notify.vibrancy.couldNotOpenPubspec'));
             }
         }
 
@@ -253,7 +254,7 @@ export class VibrancyReportPanel {
                 vscode.TextEditorRevealType.InCenter,
             );
         } catch {
-            vscode.window.showErrorMessage(`Could not open file reference: ${filePath}`);
+            vscode.window.showErrorMessage(l10n('notify.vibrancy.couldNotOpenFileRef', { filePath }));
         }
     }
 
@@ -284,9 +285,9 @@ export class VibrancyReportPanel {
                 file,
                 new TextEncoder().encode(content),
             );
-            vscode.window.showInformationMessage(`Saved report JSON: ${file.fsPath}`);
+            vscode.window.showInformationMessage(l10n('notify.vibrancy.savedReportJson', { path: file.fsPath }));
         } catch {
-            vscode.window.showErrorMessage('Could not save report JSON.');
+            vscode.window.showErrorMessage(l10n('notify.vibrancy.couldNotSaveReportJson'));
         }
     }
 

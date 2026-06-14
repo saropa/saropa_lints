@@ -103,7 +103,15 @@ class _AddCallVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'add') {
+    // Only an unqualified `add(event)` (null target) or `this.add(event)`
+    // dispatches an event on THIS bloc. A qualified call such as
+    // `_items.add(x)` (List), `_controller.add(x)` (StreamController), or
+    // `otherBloc.add(x)` targets a different object and must not be flagged as
+    // "adding a BLoC event in the constructor" — that was the false positive.
+    final Expression? target = node.target;
+    final bool dispatchesOnThisBloc =
+        target == null || target is ThisExpression;
+    if (dispatchesOnThisBloc && node.methodName.name == 'add') {
       reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
@@ -348,77 +356,147 @@ class RequireImmutableBlocStateRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.nameToken.lexeme;
-
-      // Check if class name ends with 'State' (BLoC convention)
-      if (!className.endsWith('State')) return;
-
-      // Skip abstract classes
-      if (node.abstractKeyword != null) return;
-
-      // Skip Flutter State subclasses and widget classes using "State" as
-      // a domain term (e.g., ButtonDeleteCountryState extends StatefulWidget)
-      final ExtendsClause? extendsClause = node.extendsClause;
-      if (extendsClause != null) {
-        final String superName = extendsClause.superclass.name.lexeme;
-        if (_flutterStateClasses.contains(superName)) return;
-        if (_flutterWidgetClasses.contains(superName)) return;
-        // A superclass ending with 'State' is likely a Flutter State
-        // subclass or custom State variant, not a BLoC state.
-        if (superName.endsWith('State')) return;
+    // A class named `...State` is only a genuine BLoC state if it participates
+    // in a Bloc/Cubit state hierarchy (referenced as a `Bloc<_, ThisState>` /
+    // `Cubit<ThisState>` type argument). The previous version reported any
+    // concrete `...State`-named class in a bloc file purely by name, so a plain
+    // domain object such as `RequestState` was a false positive. Because a
+    // Bloc/Cubit declaration may textually precede OR follow its state class,
+    // gating needs the whole unit in hand — so we visit the compilation unit
+    // once (a single visitor that the native registry supports; the v4
+    // addPostRunCallback is a no-op here and cannot be used) and run two passes
+    // over its top-level declarations.
+    context.addCompilationUnit((CompilationUnit unit) {
+      // Pass 1: collect every name used as a `Bloc<...>` / `Cubit<...>` type
+      // argument anywhere in the unit. We collect ALL type arguments (not just
+      // the state position) so the gate is robust to `Bloc<Event, State>` vs
+      // `Cubit<State>` shapes; a `...State` name only matters when it actually
+      // appears here.
+      final Set<String> blocStateTypeArgNames = <String>{};
+      for (final CompilationUnitMember member in unit.declarations) {
+        if (member is ClassDeclaration) {
+          _collectBlocStateTypeArgs(member, blocStateTypeArgNames);
+        }
       }
 
-      // Check for @immutable annotation
-      bool hasImmutable = false;
-      for (final Annotation annotation in node.metadata) {
-        final String annotationName = annotation.name.name;
-        if (annotationName == 'immutable') {
-          hasImmutable = true;
+      // Pass 2: report mutable `...State` classes that participate as a
+      // Bloc/Cubit state type argument.
+      for (final CompilationUnitMember member in unit.declarations) {
+        if (member is ClassDeclaration) {
+          _checkStateClass(member, blocStateTypeArgNames, reporter);
+        }
+      }
+    });
+  }
+
+  /// Reports [node] if it is a mutable BLoC state class participating in a
+  /// Bloc/Cubit hierarchy named in [blocStateTypeArgNames].
+  void _checkStateClass(
+    ClassDeclaration node,
+    Set<String> blocStateTypeArgNames,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final String className = node.nameToken.lexeme;
+
+    // Check if class name ends with 'State' (BLoC convention)
+    if (!className.endsWith('State')) return;
+
+    // Skip classes that are never wired to a Bloc/Cubit as its state type — a
+    // `...State`-named class with no Bloc/Cubit participation is a plain domain
+    // object, not a BLoC state. This is the false-positive guard.
+    if (!blocStateTypeArgNames.contains(className)) return;
+
+    // Skip abstract classes
+    if (node.abstractKeyword != null) return;
+
+    // Skip Flutter State subclasses and widget classes using "State" as
+    // a domain term (e.g., ButtonDeleteCountryState extends StatefulWidget)
+    final ExtendsClause? extendsClause = node.extendsClause;
+    if (extendsClause != null) {
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (_flutterStateClasses.contains(superName)) return;
+      if (_flutterWidgetClasses.contains(superName)) return;
+      // A superclass ending with 'State' is likely a Flutter State
+      // subclass or custom State variant, not a BLoC state.
+      if (superName.endsWith('State')) return;
+    }
+
+    // Check for @immutable annotation
+    bool hasImmutable = false;
+    for (final Annotation annotation in node.metadata) {
+      final String annotationName = annotation.name.name;
+      if (annotationName == 'immutable') {
+        hasImmutable = true;
+        break;
+      }
+    }
+
+    // Check for Equatable in extends clause
+    bool hasEquatable = false;
+    if (extendsClause != null) {
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (superName == 'Equatable' ||
+          superName.contains('Equatable') ||
+          superName == 'BlocState') {
+        hasEquatable = true;
+      }
+    }
+
+    // Check for Equatable in with clause (mixin)
+    final WithClause? withClause = node.withClause;
+    if (withClause != null) {
+      for (final NamedType mixin in withClause.mixinTypes) {
+        final String mixinName = mixin.name.lexeme;
+        if (mixinName == 'EquatableMixin' || mixinName.contains('Equatable')) {
+          hasEquatable = true;
           break;
         }
       }
+    }
 
-      // Check for Equatable in extends clause
-      bool hasEquatable = false;
-      if (extendsClause != null) {
-        final String superName = extendsClause.superclass.name.lexeme;
-        if (superName == 'Equatable' ||
-            superName.contains('Equatable') ||
-            superName == 'BlocState') {
+    // Check for Equatable in implements clause
+    final ImplementsClause? implementsClause = node.implementsClause;
+    if (implementsClause != null) {
+      for (final NamedType interface in implementsClause.interfaces) {
+        final String interfaceName = interface.name.lexeme;
+        if (interfaceName.contains('Equatable')) {
           hasEquatable = true;
+          break;
         }
       }
+    }
 
-      // Check for Equatable in with clause (mixin)
-      final WithClause? withClause = node.withClause;
-      if (withClause != null) {
-        for (final NamedType mixin in withClause.mixinTypes) {
-          final String mixinName = mixin.name.lexeme;
-          if (mixinName == 'EquatableMixin' ||
-              mixinName.contains('Equatable')) {
-            hasEquatable = true;
-            break;
-          }
-        }
-      }
+    if (!hasImmutable && !hasEquatable) {
+      reporter.atToken(node.nameToken, code);
+    }
+  }
 
-      // Check for Equatable in implements clause
-      final ImplementsClause? implementsClause = node.implementsClause;
-      if (implementsClause != null) {
-        for (final NamedType interface in implementsClause.interfaces) {
-          final String interfaceName = interface.name.lexeme;
-          if (interfaceName.contains('Equatable')) {
-            hasEquatable = true;
-            break;
-          }
-        }
-      }
+  /// Records the type-argument names of any `Bloc<...>` / `Cubit<...>`
+  /// superclass on [node] into [out].
+  ///
+  /// Collects EVERY type argument (not just the state position) so the gate is
+  /// robust to `Bloc<Event, State>` vs `Cubit<State>` shapes; a plain `...State`
+  /// name only matters when it actually appears here, which is what
+  /// distinguishes a real BLoC state from a domain object.
+  static void _collectBlocStateTypeArgs(
+    ClassDeclaration node,
+    Set<String> out,
+  ) {
+    final ExtendsClause? extendsClause = node.extendsClause;
+    if (extendsClause == null) return;
 
-      if (!hasImmutable && !hasEquatable) {
-        reporter.atToken(node.nameToken, code);
+    final NamedType superclass = extendsClause.superclass;
+    final String superName = superclass.name.lexeme;
+    if (superName != 'Bloc' && superName != 'Cubit') return;
+
+    final TypeArgumentList? typeArgs = superclass.typeArguments;
+    if (typeArgs == null) return;
+
+    for (final TypeAnnotation arg in typeArgs.arguments) {
+      if (arg is NamedType) {
+        out.add(arg.name.lexeme);
       }
-    });
+    }
   }
 }
 
@@ -479,9 +557,6 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  // Cached regex for performance
-  static final RegExp _onPattern = RegExp(r'on<\w+>');
-
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -494,17 +569,42 @@ class PreferCubitForSimpleRule extends SaropaLintRule {
       final String superName = extendsClause.superclass.name.lexeme;
       if (superName != 'Bloc') return;
 
-      // Count event handlers (on<Event> calls)
-      final String classSource = node.toSource();
-
-      // Count on<EventType> registrations
-      final int eventCount = _onPattern.allMatches(classSource).length;
+      // Count real `on<EventType>(...)` handler registrations via the AST.
+      // The previous `RegExp(r'on<\w+>')` over node.toSource() (a) matched
+      // `on<Foo>` tokens that appear only in comments or string literals
+      // (over-counting, masking simple blocs), and (b) missed nested generics
+      // like `on<Wrapper<int>>` because `\w+` stops at the inner `<`
+      // (under-counting, wrongly suggesting Cubit). Counting `on` invocations
+      // that carry type arguments fixes both.
+      final visitor = _OnHandlerCountVisitor();
+      node.visitChildren(visitor);
 
       // If only 1-2 simple events, suggest Cubit
-      if (eventCount <= 2) {
+      if (visitor.count <= 2) {
         reporter.atToken(node.nameToken, code);
       }
     });
+  }
+}
+
+/// Counts `on<EventType>(...)` event-handler registrations in a Bloc class.
+///
+/// A registration is an [MethodInvocation] named `on` carrying a non-empty
+/// [TypeArgumentList] (the `<EventType>`). This is the AST equivalent of the old
+/// `on<...>` regex but is immune to comment/string false matches and correctly
+/// counts nested-generic event types such as `on<Wrapper<int>>`.
+class _OnHandlerCountVisitor extends RecursiveAstVisitor<void> {
+  int count = 0;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final TypeArgumentList? typeArgs = node.typeArguments;
+    if (node.methodName.name == 'on' &&
+        typeArgs != null &&
+        typeArgs.arguments.isNotEmpty) {
+      count++;
+    }
+    super.visitMethodInvocation(node);
   }
 }
 

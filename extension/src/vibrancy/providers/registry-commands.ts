@@ -1,6 +1,7 @@
 /** * Module overview (comment coverage pass). * comment-coverage: module overview (batch). * * Vibrancy UI experiment: scoring, providers, and webview assets. */
 import * as vscode from 'vscode';
 import { RegistryService } from '../services/registry-service';
+import { l10n } from '../../i18n/runtime';
 
 // Add/remove/list private pub registry credentials in VS Code.
 /**
@@ -79,12 +80,12 @@ async function addRegistryAuth(registryService: RegistryService): Promise<void> 
 
         const displayName = name || new URL(url).hostname;
         vscode.window.showInformationMessage(
-            `✓ Added authentication for ${displayName}`,
+            l10n('notify.vibrancy.registryAuthAdded', { name: displayName }),
         );
     } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
         vscode.window.showErrorMessage(
-            `Failed to add registry: ${message}`,
+            l10n('notify.vibrancy.registryAddFailed', { message }),
         );
     }
 }
@@ -93,7 +94,7 @@ async function removeRegistryAuth(registryService: RegistryService): Promise<voi
     const registries = await registryService.listRegistries();
 
     if (registries.length === 0) {
-        vscode.window.showInformationMessage('No configured registries');
+        vscode.window.showInformationMessage(l10n('notify.vibrancy.noConfiguredRegistries'));
         return;
     }
 
@@ -113,25 +114,28 @@ async function removeRegistryAuth(registryService: RegistryService): Promise<voi
     const selectedUrl = selection.description!;
     const selectedName = selection.label.replace(/^\$\([^)]+\)\s*/, '');
 
+    // Action-button label is localized; capture it so the equality check
+    // compares against the exact string the user clicked.
+    const removeLabel = l10n('notify.vibrancy.actionRemove');
     const confirm = await vscode.window.showWarningMessage(
-        `Remove authentication for ${selectedName}?`,
+        l10n('notify.vibrancy.removeAuthPrompt', { name: selectedName }),
         { modal: true },
-        'Remove',
+        removeLabel,
     );
 
-    if (confirm !== 'Remove') { return; }
+    if (confirm !== removeLabel) { return; }
 
     try {
         await registryService.removeToken(selectedUrl);
         await registryService.removeRegistryConfig(selectedUrl);
 
         vscode.window.showInformationMessage(
-            `✓ Removed authentication for ${selectedName}`,
+            l10n('notify.vibrancy.registryAuthRemoved', { name: selectedName }),
         );
     } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
         vscode.window.showErrorMessage(
-            `Failed to remove registry: ${message}`,
+            l10n('notify.vibrancy.registryRemoveFailed', { message }),
         );
     }
 }
@@ -181,22 +185,25 @@ async function listRegistries(registryService: RegistryService): Promise<void> {
 
     if (action.label.includes('Remove')) {
         const selectedName = selection.label.replace(/^\$\([^)]+\)\s*/, '');
+        // Action-button label is localized; capture it so the equality check
+        // compares against the exact string the user clicked.
+        const removeLabel = l10n('notify.vibrancy.actionRemove');
         const confirm = await vscode.window.showWarningMessage(
-            `Remove authentication for ${selectedName}?`,
+            l10n('notify.vibrancy.removeAuthPrompt', { name: selectedName }),
             { modal: true },
-            'Remove',
+            removeLabel,
         );
 
-        if (confirm === 'Remove') {
+        if (confirm === removeLabel) {
             try {
                 await registryService.removeToken(selectedUrl);
                 await registryService.removeRegistryConfig(selectedUrl);
                 vscode.window.showInformationMessage(
-                    `✓ Removed authentication for ${selectedName}`,
+                    l10n('notify.vibrancy.registryAuthRemoved', { name: selectedName }),
                 );
             } catch (err) {
                 const message = err instanceof Error ? err.message : 'Unknown error';
-                vscode.window.showErrorMessage(`Failed to remove registry: ${message}`);
+                vscode.window.showErrorMessage(l10n('notify.vibrancy.registryRemoveFailed', { message }));
             }
         }
     } else if (action.label.includes('Update')) {
@@ -215,10 +222,10 @@ async function listRegistries(registryService: RegistryService): Promise<void> {
         if (newToken) {
             try {
                 await registryService.setToken(selectedUrl, newToken);
-                vscode.window.showInformationMessage('✓ Token updated');
+                vscode.window.showInformationMessage(l10n('notify.vibrancy.registryTokenUpdated'));
             } catch (err) {
                 const message = err instanceof Error ? err.message : 'Unknown error';
-                vscode.window.showErrorMessage(`Failed to update token: ${message}`);
+                vscode.window.showErrorMessage(l10n('notify.vibrancy.registryTokenUpdateFailed', { message }));
             }
         }
     }

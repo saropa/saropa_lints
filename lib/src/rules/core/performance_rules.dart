@@ -10,6 +10,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../async_context_utils.dart';
@@ -721,17 +722,36 @@ class _GetterCallCollector extends RecursiveAstVisitor<void> {
 
   @override
   void visitPrefixedIdentifier(PrefixedIdentifier node) {
-    // Track calls like widget.someGetter
-    final String key = node.toSource();
-    getterCalls.putIfAbsent(key, () => <AstNode>[]).add(node);
+    // Only an explicitly-declared `get` accessor can be expensive. A plain
+    // field read resolves to a SYNTHETIC getter (the implicit accessor the
+    // analyzer induces for the field) — that read is a direct memory fetch, so
+    // repeating it costs nothing and must NOT be flagged. The new element model
+    // distinguishes the two via `isOriginDeclaration` (true for a real `get`)
+    // vs `isOriginVariable` (true for a field's implicit getter).
+    if (_isDeclaredGetter(node.identifier.element)) {
+      final String key = node.toSource();
+      getterCalls.putIfAbsent(key, () => <AstNode>[]).add(node);
+    }
     super.visitPrefixedIdentifier(node);
   }
 
   @override
   void visitPropertyAccess(PropertyAccess node) {
-    final String key = node.toSource();
-    getterCalls.putIfAbsent(key, () => <AstNode>[]).add(node);
+    // Same rationale as visitPrefixedIdentifier: skip field reads (synthetic
+    // getters), only track repeated reads of an explicitly-declared getter.
+    if (_isDeclaredGetter(node.propertyName.element)) {
+      final String key = node.toSource();
+      getterCalls.putIfAbsent(key, () => <AstNode>[]).add(node);
+    }
     super.visitPropertyAccess(node);
+  }
+
+  /// True only when [element] is an explicitly-declared `get` accessor
+  /// (`isOriginDeclaration`), not the synthetic getter induced by a field
+  /// (`isOriginVariable`). Returns false for unresolved reads — a rule that
+  /// cannot prove the access is an expensive getter must stay silent.
+  static bool _isDeclaredGetter(Element? element) {
+    return element is GetterElement && element.isOriginDeclaration;
   }
 }
 
@@ -1319,11 +1339,21 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
       // Check if we're inside a loop
       if (!_isInsideLoop(node)) return;
 
-      // Check if it looks like a string operation
-      final String leftSource = node.leftHandSide.toSource();
-      if (_looksLikeStringVariable(leftSource)) {
-        reporter.atNode(node);
-      }
+      // Require the accumulator to ACTUALLY be a String. The previous
+      // variable-name heuristic ("result"/"output"/"buffer"/"message") flagged
+      // numeric accumulators like `total += count` or `resultMap[k] += n` as
+      // O(n^2) string concat — a false positive, since numeric `+=` is O(1) and
+      // StringBuffer is inapplicable. Only `String += ...` allocates a new
+      // String per iteration, which is the O(n^2) pattern this rule targets.
+      //
+      // Use `readType` (the type read back from the target before the compound
+      // op) rather than `leftHandSide.staticType`: an assignment target is in a
+      // WRITE context, so its `staticType` is often null, whereas `readType`
+      // carries the resolved String type of the accumulator being read each pass.
+      final DartType? targetType = node.readType;
+      if (targetType == null || !targetType.isDartCoreString) return;
+
+      reporter.atNode(node);
     });
   }
 
@@ -1351,16 +1381,6 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
 
   bool _looksLikeStringOperation(String source) {
     return _stringOpSourceRegex.any((re) => re.hasMatch(source));
-  }
-
-  bool _looksLikeStringVariable(String name) {
-    final String lower = name.toLowerCase();
-    return lower.contains('string') ||
-        lower.contains('text') ||
-        lower.contains('result') ||
-        lower.contains('output') ||
-        lower.contains('buffer') ||
-        lower.contains('message');
   }
 }
 

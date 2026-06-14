@@ -5,6 +5,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -312,12 +313,27 @@ class _RefAccessVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    if (node.name == 'ref') {
+    // FALSE-POSITIVE FIX: the old check reported ANY identifier named `ref`
+    // inside dispose(), with no type check — so a field/local named `ref` of an
+    // unrelated type (its own `dispose()`, an HTTP ref, etc.) was flagged.
+    // Resolve `ref` to Riverpod's WidgetRef/Ref before reporting.
+    if (node.name == 'ref' && _isRiverpodRefType(node.staticType)) {
       reporter.atNode(node);
     }
     super.visitSimpleIdentifier(node);
   }
 }
+
+/// True when [type] resolves to Riverpod's `WidgetRef` or `Ref` (the only
+/// targets whose use in `dispose()` is the documented unsafe pattern). A
+/// resolved-type check replaces matching on the identifier name `ref` so an
+/// unrelated field/local named `ref` is not flagged.
+bool _isRiverpodRefType(DartType? type) {
+  if (type is! InterfaceType) return false;
+  return _riverpodRefTypeNames.contains(type.element.name);
+}
+
+const Set<String> _riverpodRefTypeNames = {'WidgetRef', 'Ref'};
 
 /// Warns when `ref.read()` is called after an `await` in an async method.
 ///
@@ -995,34 +1011,48 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // FALSE-POSITIVE FIX: the old logic flagged `<x>.value` by NAME — when the
+    // target source text matched /\bAsyncValue\b/, ended in `async`/`Async`, or
+    // the prefix name contained `async`. That flagged any variable merely NAMED
+    // with "async" (e.g. `asyncThing.value` on an unrelated type) and missed a
+    // genuine AsyncValue whose variable name carried no such hint. Resolve the
+    // target's static type to a Riverpod `AsyncValue` instead so only real
+    // AsyncValue `.value` reads are reported.
     context.addPropertyAccess((PropertyAccess node) {
-      final String propertyName = node.propertyName.name;
-      if (propertyName != 'value') return;
-
-      final String targetSource = node.target?.toSource() ?? '';
-      if (RegExp(r'\bAsyncValue\b').hasMatch(targetSource) ||
-          targetSource.endsWith('async') ||
-          targetSource.endsWith('Async')) {
+      if (node.propertyName.name != 'value') return;
+      if (_isAsyncValueType(node.target?.staticType)) {
         reporter.atNode(node);
       }
     });
 
-    // Also check simple identifier access like asyncValue.value
+    // Simple-identifier access like `asyncValue.value` parses as a
+    // PrefixedIdentifier; resolve the prefix's static type the same way.
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
       if (node.identifier.name != 'value') return;
-
-      final String prefixName = node.prefix.name.toLowerCase();
-      if (prefixName.contains('async') ||
-          prefixName.endsWith('state') ||
-          prefixName.endsWith('provider')) {
-        // This is a heuristic - may have some false positives
-        // Only flag if the name strongly suggests AsyncValue
-        if (prefixName.contains('async')) {
-          reporter.atNode(node);
-        }
+      if (_isAsyncValueType(node.prefix.staticType)) {
+        reporter.atNode(node);
       }
     });
   }
+
+  /// True when [type] resolves to Riverpod's `AsyncValue` (or a subtype such as
+  /// `AsyncData`/`AsyncLoading`/`AsyncError`). Type-name resolution replaces the
+  /// old identifier-name heuristic so unrelated `.value` reads are not flagged.
+  static bool _isAsyncValueType(DartType? type) {
+    if (type is! InterfaceType) return false;
+    if (_asyncValueTypeNames.contains(type.element.name)) return true;
+    // Catch AsyncData/AsyncLoading/AsyncError, which extend AsyncValue.
+    return type.allSupertypes.any(
+      (InterfaceType s) => _asyncValueTypeNames.contains(s.element.name),
+    );
+  }
+
+  static const Set<String> _asyncValueTypeNames = {
+    'AsyncValue',
+    'AsyncData',
+    'AsyncLoading',
+    'AsyncError',
+  };
 }
 
 // =============================================================================
@@ -2046,8 +2076,15 @@ class _RefInDisposeVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
+    // FALSE-POSITIVE FIX: the gate accepts a plain Flutter `State` subclass (not
+    // just ConsumerState), and the old check reported any invocation whose
+    // target is an identifier named `ref` regardless of type. A field named
+    // `ref` of an unrelated type in such a State would be flagged. Resolve the
+    // target to Riverpod's WidgetRef/Ref before reporting.
     final Expression? target = node.target;
-    if (target is SimpleIdentifier && target.name == 'ref') {
+    if (target is SimpleIdentifier &&
+        target.name == 'ref' &&
+        _isRiverpodRefType(target.staticType)) {
       reporter.atNode(node);
     }
     super.visitMethodInvocation(node);

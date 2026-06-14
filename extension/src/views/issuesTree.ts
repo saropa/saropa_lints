@@ -42,6 +42,7 @@ import {
 import { normalizeOwaspId } from './securityPostureTree';
 import { getProjectRoot } from '../projectRoot';
 import { readDisabledRules } from '../configWriter';
+import { l10n } from '../i18n/runtime';
 
 const SEVERITY_ORDER = ['error', 'warning', 'info'] as const;
 const DEFAULT_PAGE_SIZE = 100;
@@ -1109,7 +1110,7 @@ async function applyFixForViolation(v: Violation, root: string): Promise<boolean
     APPLY_FIX_RESOLVE_COUNT,
   );
   if (!Array.isArray(codeActions) || codeActions.length === 0) {
-    void vscode.window.showInformationMessage('No quick fix available for this violation.');
+    void vscode.window.showInformationMessage(l10n('notify.commands.issuesNoQuickFix'));
     // D4: Return false — no fix was available.
     return false;
   }
@@ -1128,7 +1129,7 @@ async function applyFixForViolation(v: Violation, root: string): Promise<boolean
     await vscode.commands.executeCommand(action.command.command, ...(action.command.arguments ?? []));
   }
   if (!action.edit && !action.command) {
-    void vscode.window.showInformationMessage('No quick fix available for this violation.');
+    void vscode.window.showInformationMessage(l10n('notify.commands.issuesNoQuickFix'));
     // D4: Return false — code action had no edit or command.
     return false;
   }
@@ -1280,7 +1281,7 @@ export function registerIssueCommands(
       const absPath = path.join(root, fileNode.filePath);
       if (!fs.existsSync(absPath)) {
         void vscode.window.showWarningMessage(
-          `File not found: ${fileNode.filePath}. Re-run analysis to update.`,
+          l10n('notify.commands.issuesFileNotFound', { file: fileNode.filePath }),
         );
         return;
       }
@@ -1295,12 +1296,13 @@ export function registerIssueCommands(
       // D7: Confirm before bulk-fixing files with many violations.
       const fileName = path.basename(fileNode.filePath);
       if (fileViolations.length > 20) {
+        const fixAllLabel = l10n('notify.commands.actionFixAll');
         const ok = await vscode.window.showWarningMessage(
-          `Fix ${fileViolations.length} violations in ${fileName}?`,
+          l10n('notify.commands.issuesConfirmFixAll', { count: String(fileViolations.length), fileName }),
           { modal: true },
-          'Fix All',
+          fixAllLabel,
         );
-        if (ok !== 'Fix All') return;
+        if (ok !== fixAllLabel) return;
       }
 
       const result = await vscode.window.withProgress(
@@ -1312,11 +1314,16 @@ export function registerIssueCommands(
         (progress) => fixAllInFile(fileViolations, root, progress),
       );
 
-      // D7: Show result summary.
-      const fixedMsg = `Fixed ${result.fixed}` +
-        (result.skipped > 0 ? `, skipped ${result.skipped} (no fix available)` : '');
+      // D7: Show result summary. Two complete localized templates instead of
+      // concatenating English fragments — word order around the skipped count
+      // differs across languages and can't be reordered in a built string.
       void vscode.window.showInformationMessage(
-        `${fixedMsg}. Run analysis to update score.`,
+        result.skipped > 0
+          ? l10n('notify.commands.issuesBulkFixResultSkipped', {
+              fixed: String(result.fixed),
+              skipped: String(result.skipped),
+            })
+          : l10n('notify.commands.issuesBulkFixResult', { fixed: String(result.fixed) }),
       );
 
       // Report: log bulk fix result.

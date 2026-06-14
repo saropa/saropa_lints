@@ -11,6 +11,7 @@ import * as vscode from 'vscode';
 import { type GroupByMode, type IssueTreeNode, type IssuesTreeProvider } from '../views/issuesTree';
 import { type SecurityHotspotReviewState, type SecurityHotspotReviewStateService, isSecurityHotspotViolation } from '../securityHotspotReviewState';
 import { type ViolationsData } from '../violationsReader';
+import { l10n } from '../i18n/runtime';
 
 /** Injected collaborators so `registerIssuesViewCommands` stays testable and thin. */
 interface RegisterIssuesViewCommandsDeps {
@@ -89,7 +90,7 @@ export function registerIssuesViewCommands(
     vscode.commands.registerCommand('saropaLints.setIssuesFilterByRule', async () => {
       const ruleNames = issuesProvider.getRuleNamesFromData();
       if (ruleNames.length === 0) {
-        void vscode.window.showInformationMessage('No violations in current data. Run analysis first.');
+        void vscode.window.showInformationMessage(l10n('notify.commands.issuesNoViolationsRunAnalysis'));
         return;
       }
       const rulesToHide = issuesProvider.getRulesToHide();
@@ -116,7 +117,7 @@ export function registerIssuesViewCommands(
       if (!root) return;
       const data = readViolations(root);
       if (!data) {
-        void vscode.window.showInformationMessage('No violations in current data. Run analysis first.');
+        void vscode.window.showInformationMessage(l10n('notify.commands.issuesNoViolationsRunAnalysis'));
         return;
       }
 
@@ -188,7 +189,7 @@ export function registerIssuesViewCommands(
       if (!root) return;
       const data = readViolations(root);
       if (!data) {
-        void vscode.window.showInformationMessage('No analysis data. Run analysis first.');
+        void vscode.window.showInformationMessage(l10n('notify.commands.issuesNoAnalysisData'));
         return;
       }
       const node = arg as IssueTreeNode | undefined;
@@ -197,7 +198,7 @@ export function registerIssuesViewCommands(
         isSecurityHotspotViolation(violation, data.config?.ruleMetadataByRule),
       );
       if (allHotspots.length === 0) {
-        void vscode.window.showInformationMessage('No security hotspots found in current report.');
+        void vscode.window.showInformationMessage(l10n('notify.commands.issuesNoHotspots'));
         return;
       }
       let target = fromNode;
@@ -241,7 +242,7 @@ export function registerIssuesViewCommands(
       // review state is workspace memento metadata.
       issuesProvider.refresh();
       void vscode.window.showInformationMessage(
-        `Hotspot marked as ${pickedState.state}.`,
+        l10n('notify.commands.issuesHotspotMarked', { state: pickedState.state }),
       );
     }),
     vscode.commands.registerCommand('saropaLints.clearIssuesFilters', () => {

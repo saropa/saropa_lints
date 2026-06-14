@@ -69,6 +69,29 @@ def _paths_from_stdin() -> list[str]:
     return [file_path] if file_path else []
 
 
+def _within_repo(path_str: str) -> bool:
+    """Whether [path_str] resolves to a file inside this repo.
+
+    The PostToolUse hook fires on every Edit/Write, including edits to files
+    OUTSIDE this repo (e.g. the user's global ``~/.claude/CLAUDE.md``). This
+    guard enforces a repo-local policy, so scanning an external file is both
+    out of scope and a false-positive source — the global config legitimately
+    contains British words inside its own banned-spelling reference table.
+    Restricting to repo paths keeps the gate fully active for repo files while
+    leaving external edits alone. Git pre-commit only ever passes repo paths,
+    so it is unaffected.
+    """
+    try:
+        resolved = Path(path_str).resolve()
+    except OSError:
+        return False
+    try:
+        resolved.relative_to(_REPO_ROOT)
+        return True
+    except ValueError:
+        return False
+
+
 def _format_hits(hits: list[SpellingHit]) -> str:
     """Render hits as one ``path:line  uk -> us`` line each for stderr."""
     lines = [
@@ -82,6 +105,9 @@ def _format_hits(hits: list[SpellingHit]) -> str:
 def main() -> int:
     # argv wins (git hook); fall back to a stdin payload (Claude hook).
     paths = list(sys.argv[1:]) or _paths_from_stdin()
+    # Only scan files inside this repo; an Edit to an external file (e.g. the
+    # global ~/.claude/CLAUDE.md) must not be policed by this repo's gate.
+    paths = [p for p in paths if _within_repo(p)]
     if not paths:
         return 0
 

@@ -1231,7 +1231,7 @@ ${detailRow}`;
       [...next].sort((a, b) => a.localeCompare(b)),
     );
     if (!ok) {
-      void vscode.window.showErrorMessage('Saropa Lints: could not write analysis_options.yaml (rule_packs).');
+      void vscode.window.showErrorMessage(l10n('notify.vibrancy.couldNotWriteRulePacks'));
       return;
     }
     const run = vscode.workspace.getConfiguration('saropaLints').get<boolean>('runAnalysisAfterConfigChange');
@@ -1385,7 +1385,7 @@ ${detailRow}`;
   private async _copyConfigSnippet(): Promise<void> {
     const root = getProjectRoot();
     if (!root) {
-      void vscode.window.showWarningMessage('Saropa Lints: open a workspace folder before copying the config.');
+      void vscode.window.showWarningMessage(l10n('notify.vibrancy.openFolderBeforeCopyConfig'));
       return;
     }
     const tier =
@@ -1398,11 +1398,11 @@ ${detailRow}`;
       const packsLine =
         enabled.length === 0 ? 'no packs enabled' : `${enabled.length} pack${enabled.length === 1 ? '' : 's'}`;
       void vscode.window.showInformationMessage(
-        `Saropa Lints: copied config snippet (tier: ${tier}, ${packsLine}).`,
+        l10n('notify.vibrancy.copiedConfigSnippet', { tier, packsLine }),
       );
     } catch (err) {
       void vscode.window.showErrorMessage(
-        `Saropa Lints: could not copy to clipboard — ${err instanceof Error ? err.message : String(err)}.`,
+        l10n('notify.vibrancy.couldNotCopyClipboard', { message: err instanceof Error ? err.message : String(err) }),
       );
     }
   }
@@ -1435,7 +1435,7 @@ ${detailRow}`;
     try {
       pubspecContent = fs.readFileSync(pubspecPath, 'utf-8');
     } catch {
-      void vscode.window.showErrorMessage('Saropa Lints: could not read pubspec.yaml.');
+      void vscode.window.showErrorMessage(l10n('notify.vibrancy.couldNotReadPubspec'));
       return;
     }
 
@@ -1447,7 +1447,7 @@ ${detailRow}`;
     });
     const toEnable = detectedSdkDefs.filter((def) => !currentEnabled.has(def.id));
     if (toEnable.length === 0) {
-      void vscode.window.showInformationMessage('Saropa Lints: no additional applicable SDK packs to enable.');
+      void vscode.window.showInformationMessage(l10n('notify.vibrancy.noAdditionalSdkPacks'));
       return;
     }
     const confirmed = await this._confirmSdkBulkEnable(options.selection, toEnable.map((def) => def.label));
@@ -1462,7 +1462,7 @@ ${detailRow}`;
     }
     const ok = writeRulePacksEnabled(root, [...currentEnabled].sort((a, b) => a.localeCompare(b)));
     if (!ok) {
-      void vscode.window.showErrorMessage('Saropa Lints: could not write analysis_options.yaml (rule_packs).');
+      void vscode.window.showErrorMessage(l10n('notify.vibrancy.couldNotWriteRulePacks'));
       return;
     }
 
@@ -1477,7 +1477,7 @@ ${detailRow}`;
           ? 'deprecation SDK'
           : 'SDK';
     void vscode.window.showInformationMessage(
-      `Saropa Lints: enabled ${added} applicable ${modeLabel} pack(s).`,
+      l10n('notify.vibrancy.enabledApplicableSdkPacks', { added, modeLabel }),
     );
     this.refresh();
   }
@@ -1493,7 +1493,7 @@ ${detailRow}`;
     const root = getProjectRoot();
     if (!root) {
       void vscode.window.showWarningMessage(
-        'Saropa Lints: open a workspace folder before enabling packs.',
+        l10n('notify.vibrancy.openFolderBeforeEnablePacks'),
       );
       return;
     }
@@ -1504,7 +1504,7 @@ ${detailRow}`;
     const toAdd = applicableIds.filter((packId) => !currentEnabled.has(packId));
     if (toAdd.length === 0) {
       void vscode.window.showInformationMessage(
-        'Saropa Lints: every applicable rule pack is already enabled.',
+        l10n('notify.vibrancy.allApplicablePacksEnabled'),
       );
       return;
     }
@@ -1512,15 +1512,18 @@ ${detailRow}`;
       RULE_PACK_DEFINITIONS.find((d) => d.id === packId)?.label ?? packId;
     const preview = toAdd.slice(0, 5).map(labelFor).join(', ');
     const suffix = toAdd.length > 5 ? `, +${toAdd.length - 5} more` : '';
+    // Action-button label is localized; capture it in a const so the equality
+    // check below compares against the exact string the user clicked.
+    const enableLabel = l10n('notify.vibrancy.actionEnable');
     const choice = await vscode.window.showWarningMessage(
-      `Enable ${toAdd.length} recommended pack(s)?`,
+      l10n('notify.vibrancy.enableRecommendedPacksPrompt', { count: toAdd.length }),
       {
         modal: true,
-        detail: `This updates rule_packs.enabled in analysis_options.yaml. ${preview}${suffix}`,
+        detail: l10n('notify.vibrancy.enablePacksDetail', { preview: `${preview}${suffix}` }),
       },
-      'Enable',
+      enableLabel,
     );
-    if (choice !== 'Enable') return;
+    if (choice !== enableLabel) return;
 
     for (const packId of toAdd) currentEnabled.add(packId);
     const ok = writeRulePacksEnabled(
@@ -1529,12 +1532,12 @@ ${detailRow}`;
     );
     if (!ok) {
       void vscode.window.showErrorMessage(
-        'Saropa Lints: could not write analysis_options.yaml (rule_packs).',
+        l10n('notify.vibrancy.couldNotWriteRulePacks'),
       );
       return;
     }
     void vscode.window.showInformationMessage(
-      `Saropa Lints: enabled ${toAdd.length} recommended pack(s).`,
+      l10n('notify.vibrancy.enabledRecommendedPacks', { count: toAdd.length }),
     );
     this.refresh();
     const run = vscode.workspace
@@ -1557,15 +1560,18 @@ ${detailRow}`;
           : 'SDK';
     const preview = packLabels.slice(0, 5).join(', ');
     const suffix = packLabels.length > 5 ? `, +${packLabels.length - 5} more` : '';
+    // Action-button label is localized; capture it so the equality check below
+    // compares against the exact string the user clicked.
+    const enableLabel = l10n('notify.vibrancy.actionEnable');
     const choice = await vscode.window.showWarningMessage(
-      `Enable ${packLabels.length} ${modeLabel} pack(s)?`,
+      l10n('notify.vibrancy.enableModePacksPrompt', { count: packLabels.length, modeLabel }),
       {
         modal: true,
-        detail: `This updates rule_packs.enabled in analysis_options.yaml. ${preview}${suffix}`,
+        detail: l10n('notify.vibrancy.enablePacksDetail', { preview: `${preview}${suffix}` }),
       },
-      'Enable',
+      enableLabel,
     );
-    return choice === 'Enable';
+    return choice === enableLabel;
   }
 }
 

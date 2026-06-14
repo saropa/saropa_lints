@@ -1,8 +1,19 @@
 # Shared infra: `saropa-vscode-ui`
 
 **Created:** 2026-06-14
-**Status:** Plan only — no code moved. Cross-repo extraction; needs sign-off on the dependency
-mechanism (a blast-radius move) before any file leaves a repo.
+**Status:** Won't Do — rejected (see `plans/SAROPA_SUITE_INTEGRATION.md` shared-infra section and
+drift_advisor `plans/67-saropa-suite-integration.md` §7). Closed + archived 2026-06-14.
+
+## Resolution: WON'T DO (2026-06-14)
+
+Extraction rejected as over-engineering. A shared webview/dashboard kit package for three in-house
+consumers costs more in versioning, pinning surface, lockstep releases, and an untested-shared-toolkit
+maintenance burden than the duplication it removes, with no user-facing benefit. The duplication is
+accepted as a known trade-off; if the shared "fixed color washes out in high-contrast" class of bug
+recurs, a single path-dep module or a sync script is preferred over a new published unit. drift_advisor's
+Plan 67 §7 rejected the same architecture the same day, and an independent review flagged the same
+submodule consumption-surface and missing shared-package test story as the unaddressed costs. The
+original task plan is retained below as the record of what was considered.
 **Parent:** the "Shared infrastructure" section of `plans/SAROPA_SUITE_INTEGRATION.md` (and the identical
 Section 7 in the two sibling docs). This doc is the detailed extraction plan for the webview UI kit.
 

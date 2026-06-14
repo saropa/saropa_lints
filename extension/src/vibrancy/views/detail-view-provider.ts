@@ -10,6 +10,7 @@ import { VibrancyResult } from '../types';
 import { buildDetailViewHtml } from './detail-view-html';
 import { findPubspecYaml, buildVersionEdit } from '../providers/tree-commands';
 import { openFileAtLine } from './view-actions';
+import { l10n } from '../../i18n/runtime';
 
 /** View ID for the package details webview in the sidebar. */
 export const DETAIL_VIEW_ID = 'saropaLints.packageVibrancy.details';
@@ -131,7 +132,7 @@ export class DetailViewProvider implements vscode.WebviewViewProvider {
         const edit = buildVersionEdit(doc, packageName, targetVersion);
         if (!edit) {
             vscode.window.showWarningMessage(
-                `Could not locate version constraint for ${packageName}`,
+                l10n('notify.misc.detailViewConstraintNotFound', { package: packageName }),
             );
             return;
         }
@@ -142,7 +143,10 @@ export class DetailViewProvider implements vscode.WebviewViewProvider {
         await doc.save();
 
         vscode.window.showInformationMessage(
-            `Updated ${packageName} to ${targetVersion}`,
+            l10n('notify.misc.detailViewUpdated', {
+                package: packageName,
+                version: targetVersion,
+            }),
         );
     }
 }

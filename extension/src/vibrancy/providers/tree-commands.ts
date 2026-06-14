@@ -23,6 +23,7 @@ import { UpdateFromCodeLensArgs } from './codelens-provider';
 import { ComparisonPanel } from '../views/comparison-webview';
 import { resultToComparisonData } from '../scoring/comparison-ranker';
 import { resolvePackagePaths } from '../services/package-code-analyzer';
+import { l10n } from '../../i18n/runtime';
 
 // Re-export for backward compatibility
 export { findPubspecYaml, buildVersionEdit, findPackageLines, readVersionConstraint };
@@ -39,7 +40,7 @@ function requirePackageItem(
 ): item is PackageItem {
     if (item?.result?.package?.name) { return true; }
     vscode.window.showWarningMessage(
-        `${actionLabel} needs a package row from the Package Dashboard (editor tab).`,
+        l10n('notify.vibrancy.needsPackageRow', { actionLabel }),
     );
     return false;
 }
@@ -150,7 +151,7 @@ async function updateToLatest(item: PackageItem | undefined): Promise<void> {
     const edit = buildVersionEdit(doc, item.result.package.name, `^${latest}`);
     if (!edit) {
         vscode.window.showWarningMessage(
-            `Could not locate version constraint for ${item.result.package.name}`,
+            l10n('notify.vibrancy.couldNotLocateConstraint', { name: item.result.package.name }),
         );
         return;
     }
@@ -219,7 +220,7 @@ async function deleteUnused(item: PackageItem | undefined): Promise<void> {
 
     const backupName = backupUri.path.split('/').pop();
     vscode.window.showInformationMessage(
-        `Deleted ${item.result.package.name} from pubspec.yaml (backup: ${backupName})`,
+        l10n('notify.vibrancy.deletedFromPubspec', { name: item.result.package.name, backupName: backupName ?? '' }),
     );
 }
 
@@ -241,7 +242,7 @@ function logAllDetails(): void {
     if (!_detailLogger) { return; }
     const results = getLatestResults();
     if (results.length === 0) {
-        vscode.window.showWarningMessage('Run a scan first');
+        vscode.window.showWarningMessage(l10n('notify.vibrancy.runScanFirst'));
         return;
     }
     _detailLogger.clear();
@@ -260,7 +261,7 @@ async function updateFromCodeLens(args: UpdateFromCodeLensArgs): Promise<void> {
         : await resolveScannedPubspec();
 
     if (!yamlUri) {
-        vscode.window.showWarningMessage('Could not find pubspec.yaml');
+        vscode.window.showWarningMessage(l10n('notify.vibrancy.couldNotFindPubspec'));
         return;
     }
 
@@ -270,7 +271,7 @@ async function updateFromCodeLens(args: UpdateFromCodeLensArgs): Promise<void> {
 
     if (!edit) {
         vscode.window.showWarningMessage(
-            `Could not locate version constraint for ${args.packageName}`,
+            l10n('notify.vibrancy.couldNotLocateConstraint', { name: args.packageName }),
         );
         return;
     }
@@ -282,11 +283,11 @@ async function updateFromCodeLens(args: UpdateFromCodeLensArgs): Promise<void> {
     if (applied) {
         await doc.save();
         vscode.window.showInformationMessage(
-            `Updated ${args.packageName} to ${newConstraint}`,
+            l10n('notify.vibrancy.updatedPackage', { name: args.packageName, constraint: newConstraint }),
         );
     } else {
         vscode.window.showWarningMessage(
-            `Failed to update ${args.packageName}`,
+            l10n('notify.vibrancy.failedToUpdate', { name: args.packageName }),
         );
     }
 }
@@ -306,12 +307,12 @@ function compareSelected(
     const items = raw.filter((i): i is PackageItem => !!i?.result);
 
     if (items.length < 2) {
-        vscode.window.showWarningMessage('Select 2-3 packages to compare');
+        vscode.window.showWarningMessage(l10n('notify.vibrancy.selectPackagesToCompare'));
         return;
     }
 
     if (items.length > 3) {
-        vscode.window.showWarningMessage('Maximum 3 packages for comparison');
+        vscode.window.showWarningMessage(l10n('notify.vibrancy.maxPackagesToCompare'));
         return;
     }
 
@@ -337,7 +338,7 @@ async function openSourceFolder(packageName: string): Promise<void> {
 
     if (!localPath) {
         vscode.window.showWarningMessage(
-            `Could not find local source for ${packageName}`,
+            l10n('notify.vibrancy.couldNotFindLocalSource', { name: packageName }),
         );
         return;
     }

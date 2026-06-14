@@ -17,6 +17,7 @@ import type {
   VibrancyScanHandlers,
 } from './projectVibrancyTypes';
 import { killProcessTree, resolveCliCwd } from './devCliRoot';
+import { l10n } from '../i18n/runtime';
 
 export interface ProjectVibrancyScanResult {
   readonly payload: ProjectVibrancyPayload | null;
@@ -230,8 +231,8 @@ export function runProjectVibrancyScan(
       // to the user.
       void vscode.window.showErrorMessage(
         details && details.length > 0
-          ? `Code Health scan failed to start (${command}): ${details}`
-          : 'Code Health scan failed to start. Ensure Dart SDK is installed.',
+          ? l10n('notify.commands.codeHealthStartFailedDetails', { command, details })
+          : l10n('notify.commands.codeHealthStartFailed'),
       );
       resolve({ payload: null, rawStdout: '', exitCode: -1 });
     });
@@ -252,8 +253,8 @@ export function runProjectVibrancyScan(
         const details = stderr.trim();
         void vscode.window.showErrorMessage(
           details.length === 0
-            ? 'Code Health scan failed.'
-            : `Code Health scan failed: ${details}`,
+            ? l10n('notify.commands.codeHealthScanFailed')
+            : l10n('notify.commands.codeHealthScanFailedDetails', { details }),
         );
         resolve({ payload: null, rawStdout: raw, exitCode });
         return;
@@ -264,12 +265,12 @@ export function runProjectVibrancyScan(
           // Gate failures still return a valid payload; warn instead of error
           // so users can inspect violations without re-running.
           void vscode.window.showWarningMessage(
-            'Code Health: configured quality gates failed. Open Code Health settings or copy JSON to inspect gates.violations.',
+            l10n('notify.commands.codeHealthGatesFailed'),
           );
         }
         resolve({ payload, rawStdout: raw, exitCode });
       } catch {
-        void vscode.window.showErrorMessage('Code Health returned invalid JSON output.');
+        void vscode.window.showErrorMessage(l10n('notify.commands.codeHealthInvalidJson'));
         resolve({ payload: null, rawStdout: raw, exitCode });
       }
     });

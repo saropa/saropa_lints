@@ -76,22 +76,22 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
     'privateKey',
   };
 
-  /// Patterns that look sensitive but are actually safe.
-  /// These are checked before flagging to avoid false positives.
-  /// Example: "oauth" contains "auth" but is not sensitive data.
-  static const List<String> _safePatternList = <String>[
-    'oauth', // OAuth protocol name, not actual auth data
-    'authenticated', // Past tense verb, not a credential
-    'authentication', // Noun describing process, not a credential
-    'authorize', // Verb, not a credential
-    'authorization', // Noun describing process, not a credential
-    'unauthorized', // Error state, not a credential
-    'unauthenticated', // Error state, not a credential
+  /// Lowercased identifier words that embed a sensitive substring but are
+  /// themselves non-sensitive protocol/flow names. The carve-out exists for
+  /// the OAuth family: `oauthToken` contains the sensitive substring `token`
+  /// yet names an OAuth flow identifier, not a raw secret value. Each entry is
+  /// matched at the position the sensitive substring was found (see
+  /// [_isSafeMatch]); a bare `source.contains(safeWord)` is wrong because the
+  /// safe word can appear elsewhere in the same log string.
+  ///
+  /// Note: the OLD implementation tested `safeWord.contains(sensitivePattern)`
+  /// against words like `authenticated`/`authorization`. No safe word contains
+  /// any sensitive pattern (the `auth` stem is not in [_sensitivePatterns],
+  /// which deliberately starts at `apikey`/`token`/...), so that machinery was
+  /// dead and the OAuth carve-out never fired — `oauthToken` over-reported.
+  static const List<String> _safeIdentifierWords = <String>[
+    'oauthtoken', // OAuth flow identifier, not a raw secret token value
   ];
-
-  static final List<RegExp> _safePatternRegExps = _safePatternList
-      .map((p) => RegExp(RegExp.escape(p)))
-      .toList();
 
   static const Set<String> _loggingFunctions = <String>{
     'print',
@@ -101,14 +101,44 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
     'Logger',
   };
 
-  /// Checks if a sensitive pattern match is actually a false positive.
+  /// Returns true when EVERY occurrence of [sensitivePattern] in [source] sits
+  /// inside a known safe identifier word (e.g. `token` inside `oauthtoken`).
   ///
-  /// Returns true if the match is within a safe pattern (e.g., "auth" in "oauth").
+  /// Operates at the match site rather than scanning the whole argument: it
+  /// walks each occurrence of the sensitive substring and checks whether that
+  /// span is covered by a safe word anchored at the same place. If any
+  /// occurrence is NOT covered, the match is treated as a real exposure and the
+  /// method returns false so the caller still reports. [source] is already
+  /// lowercased by the caller; [_safeIdentifierWords] are lowercased too.
   static bool _isSafeMatch(String source, String sensitivePattern) {
-    for (int i = 0; i < _safePatternList.length; i++) {
-      if (_safePatternList[i].contains(sensitivePattern) &&
-          _safePatternRegExps[i].hasMatch(source)) {
+    int from = 0;
+    while (true) {
+      final int hit = source.indexOf(sensitivePattern, from);
+      if (hit < 0) {
+        // No more occurrences: every one seen so far was inside a safe word.
         return true;
+      }
+      if (!_occurrenceInsideSafeWord(source, hit, sensitivePattern.length)) {
+        return false;
+      }
+      from = hit + sensitivePattern.length;
+    }
+  }
+
+  /// Whether the [length]-char span starting at [hit] in [source] is contained
+  /// within an occurrence of one of [_safeIdentifierWords].
+  static bool _occurrenceInsideSafeWord(String source, int hit, int length) {
+    final int hitEnd = hit + length;
+    for (final String safeWord in _safeIdentifierWords) {
+      // The safe word must start at or before the sensitive match and fully
+      // cover it; scan each candidate start position of the safe word.
+      int wordStart = source.indexOf(safeWord);
+      while (wordStart >= 0) {
+        final int wordEnd = wordStart + safeWord.length;
+        if (wordStart <= hit && hitEnd <= wordEnd) {
+          return true;
+        }
+        wordStart = source.indexOf(safeWord, wordStart + 1);
       }
     }
     return false;
@@ -359,23 +389,63 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
         return;
       }
 
-      // Check for JavaScript mode
       for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          if (name == 'javascriptMode' ||
-              name == 'javaScriptEnabled' ||
-              name == 'initialSettings') {
-            final String argSource = arg.expression.toSource();
-            if (argSource.contains('unrestricted') ||
-                argSource.contains('true')) {
-              reporter.atNode(arg);
-              return;
-            }
+        if (arg is! NamedExpression) continue;
+        final String name = arg.name.label.name;
+
+        // `javascriptMode: JavascriptMode.unrestricted` enables scripting.
+        // Inspect the enum value's source, not a substring of the whole arg.
+        if (name == 'javascriptMode') {
+          if (arg.expression.toSource().contains('unrestricted')) {
+            reporter.atNode(arg);
+            return;
+          }
+          continue;
+        }
+
+        // Direct boolean toggle: read the literal VALUE, not a substring scan.
+        // A scan of the arg source would also match a `true` that belongs to an
+        // unrelated key when the value is itself an expression.
+        if (name == 'javaScriptEnabled') {
+          if (_isTrueLiteral(arg.expression)) {
+            reporter.atNode(arg);
+            return;
+          }
+          continue;
+        }
+
+        // `initialSettings: InAppWebViewSettings(javaScriptEnabled: true, ...)`
+        // nests the toggle. Read the nested `javaScriptEnabled` arg's boolean
+        // value specifically, so a `true` on a sibling key (e.g.
+        // `isInspectable: true`) does not falsely trigger.
+        if (name == 'initialSettings') {
+          if (_settingsEnableJavaScript(arg.expression)) {
+            reporter.atNode(arg);
+            return;
           }
         }
       }
     });
+  }
+
+  /// Whether [expression] is the boolean literal `true`.
+  static bool _isTrueLiteral(Expression expression) =>
+      expression is BooleanLiteral && expression.value;
+
+  /// Whether a WebView settings object passed to `initialSettings` sets
+  /// `javaScriptEnabled: true`. Reads only that named argument's boolean value
+  /// from the settings constructor; other `true` flags on the object are
+  /// ignored. Returns false for non-constructor expressions (e.g. a variable
+  /// reference) because the value cannot be statically determined here.
+  static bool _settingsEnableJavaScript(Expression expression) {
+    if (expression is! InstanceCreationExpression) return false;
+    for (final Expression arg in expression.argumentList.arguments) {
+      if (arg is NamedExpression &&
+          arg.name.label.name == 'javaScriptEnabled') {
+        return _isTrueLiteral(arg.expression);
+      }
+    }
+    return false;
   }
 }
 
