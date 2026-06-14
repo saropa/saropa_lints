@@ -88,23 +88,48 @@ export class VibrancyReportPanel {
     private _updateContent(options: ReportOptions): void {
         this._pubspecUri = options.pubspecUri;
         this._options = options;
+        /* New HTML means the script re-inits; wait for its ready signal again
+           before flushing any queued package selection. */
+        this._ready = false;
         this._panel.webview.html = buildReportHtml(options);
     }
 
-    /** Reveal the dashboard (creating it if needed) and select a package in the
-     *  docked detail pane. Entry point for "View Full Details" from hover /
-     *  sidebar / command catalog, replacing the standalone PackageDetailPanel. */
-    static revealPackage(options: ReportOptions, packageName: string): void {
-        VibrancyReportPanel.createOrShow(options);
-        VibrancyReportPanel.currentPanel?._panel.webview.postMessage({
-            type: 'selectPackage', package: packageName,
-        });
+    /** Package the pane should open once the webview is ready. */
+    private _pendingSelect: string | null = null;
+    /** True once the dashboard script signals it has wired its listeners. A
+     *  fresh webview drops messages sent before that, so a select requested
+     *  right after open is queued here and flushed on the ready signal. */
+    private _ready = false;
+
+    /** Reveal the open dashboard and select a package in the docked detail pane.
+     *  Entry point for "View Full Details" from hover / sidebar / command
+     *  catalog, replacing the standalone PackageDetailPanel. The caller must
+     *  ensure the dashboard exists first (e.g. run the showReport command). */
+    static requestSelect(packageName: string): void {
+        const p = VibrancyReportPanel.currentPanel;
+        if (!p) { return; }
+        p._panel.reveal();
+        p._pendingSelect = packageName;
+        if (p._ready) { p._flushPendingSelect(); }
+    }
+
+    private _flushPendingSelect(): void {
+        if (this._pendingSelect) {
+            this._panel.webview.postMessage({ type: 'selectPackage', package: this._pendingSelect });
+            this._pendingSelect = null;
+        }
     }
 
     private async _handleMessage(
         msg: { type: string; package?: string; path?: string; line?: number; url?: string; data?: unknown }
             & PaneMessage,
     ): Promise<void> {
+        if (msg.type === 'dashboardReady') {
+            this._ready = true;
+            this._flushPendingSelect();
+            return;
+        }
+
         if (msg.type === 'requestPackageDetail' && msg.package) {
             /* Master-detail: hand the selected package to the pane controller,
                which renders its rich body and runs the lazy fetches. */

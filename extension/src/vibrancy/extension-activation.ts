@@ -19,7 +19,6 @@ import { PrereleaseToggle } from './ui/prerelease-toggle';
 import { VibrancyReportPanel } from './views/report-webview';
 import { KnownIssuesPanel } from './views/known-issues-webview';
 import { ComparisonPanel } from './views/comparison-webview';
-import { PackageDetailPanel } from './views/package-detail-panel';
 import { ReviewStateService } from './services/review-state';
 import { DetailLogger, DETAIL_CHANNEL_NAME } from './services/detail-logger';
 import { exportReports, ReportMetadata } from './services/report-exporter';
@@ -837,10 +836,17 @@ function registerCommands(
         ),
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.showPackagePanel',
-            (packageName: string) => {
-                const result = latestResults.find(r => r.package.name === packageName);
-                if (!result || !reviewStateService) { return; }
-                PackageDetailPanel.createOrShow(result, reviewStateService, targets.cache);
+            async (packageName: string) => {
+                // Consolidated master-detail: "View Full Details" now opens the
+                // Package Dashboard's docked detail pane instead of a separate
+                // panel tab. Ensure the dashboard exists (showReport builds its
+                // options), then ask it to select the package — requestSelect
+                // queues against the dashboardReady handshake so a freshly
+                // opened webview still receives the selection.
+                if (!VibrancyReportPanel.currentPanel) {
+                    await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
+                }
+                VibrancyReportPanel.requestSelect(packageName);
             },
         ),
     );

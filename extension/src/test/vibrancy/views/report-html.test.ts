@@ -7,6 +7,7 @@
 
 import * as assert from 'assert';
 import { buildReportHtml, buildSparklineSvg, ReportOptions } from '../../../vibrancy/views/report-html';
+import { buildPackageDetailBody } from '../../../vibrancy/views/package-detail-html';
 import { VibrancyResult } from '../../../vibrancy/types';
 
 /** Default options with no overrides and no pubspec URI. */
@@ -1180,13 +1181,17 @@ describe('report: references column (renamed from files)', () => {
         assert.ok(html.includes('openFileRef'));
     });
 
-    it('should render detail file references as clickable file-link entries', () => {
+    it('renders file references as clickable openFile links in the detail pane body', () => {
+        // The inline per-row detail card was retired in favor of a single docked
+        // detail pane; package file references now render in buildPackageDetailBody
+        // (the pane content the host injects on row selection), not inline in the
+        // dashboard table HTML.
         const result = {
             ...makeResult('http', 80),
             fileUsages: [{ filePath: 'lib/components/country/flag/country_flag.dart', line: 1, isCommented: false }],
         };
-        const html = buildReportHtml(opts([result]));
-        assert.ok(html.includes('class="file-link"'));
+        const html = buildPackageDetailBody(result, [], null);
+        assert.ok(html.includes('data-action="openFile"'));
         assert.ok(html.includes('data-path="lib/components/country/flag/country_flag.dart"'));
         assert.ok(html.includes('data-line="1"'));
     });
@@ -1427,7 +1432,9 @@ describe('report: code-size semantics (v13.9.0 follow-up)', () => {
                 hasDocs: false,
             },
         };
-        const html = buildReportHtml(opts([result]));
+        // The Health Score breakdown moved from the retired inline detail card
+        // into the docked detail pane (buildPackageDetailBody, paneMode).
+        const html = buildPackageDetailBody(result, [], null, undefined, { paneMode: true });
         assert.ok(
             html.includes('>+example<'),
             'expected +example row in Health Score panel when hasExample=true',
@@ -1444,7 +1451,7 @@ describe('report: code-size semantics (v13.9.0 follow-up)', () => {
                 hasDocs: true,
             },
         };
-        const html = buildReportHtml(opts([result]));
+        const html = buildPackageDetailBody(result, [], null, undefined, { paneMode: true });
         assert.ok(html.includes('>+example<'), 'missing +example row');
         assert.ok(html.includes('>+tests<'), 'missing +tests row');
         assert.ok(html.includes('>+tools<'), 'missing +tools row');
@@ -1464,7 +1471,7 @@ describe('report: code-size semantics (v13.9.0 follow-up)', () => {
                 hasDocs: false,
             },
         };
-        const html = buildReportHtml(opts([result]));
+        const html = buildPackageDetailBody(result, [], null, undefined, { paneMode: true });
         assert.ok(!html.includes('>+example<'));
         assert.ok(!html.includes('>+tests<'));
         assert.ok(!html.includes('>+tools<'));
@@ -1474,7 +1481,7 @@ describe('report: code-size semantics (v13.9.0 follow-up)', () => {
     it('Health Score panel omits maintainer-quality rows when maintainerQuality is null', () => {
         /* Defensive case: pre-v13.9.0 scans didn't populate the field. The
            panel must not throw or render bogus rows; absence is silent. */
-        const html = buildReportHtml(opts([makeResult('http', 80)]));
+        const html = buildPackageDetailBody(makeResult('http', 80), [], null, undefined, { paneMode: true });
         assert.ok(!html.includes('>+example<'));
     });
 

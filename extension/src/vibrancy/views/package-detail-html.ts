@@ -21,6 +21,7 @@ import { getPackageDetailStyles } from './package-detail-styles';
 import { getPillButtonStyles } from './pill-button-styles';
 import { getPackageDetailScript } from './package-detail-script';
 import { getDashboardChromeStyles } from '../../views/dashboardChromeStyles';
+import { buildDetailScoreSection } from './report-html';
 import {
     buildDashboardHero,
     buildDocumentTitle,
@@ -94,6 +95,11 @@ export function buildPackageDetailBody(
         buildTopicsSection(result),
         buildVersionSection(result),
         buildCommunitySection(result),
+        // Health Score breakdown (score factors + maintainer-quality bonuses).
+        // Only in the dashboard pane, where report-styles supplies its CSS; the
+        // retired standalone panel did not load those styles. This is the one
+        // section the inline detail card rendered that the pane otherwise lacks.
+        ...(options.paneMode ? [buildDetailScoreSection(result)] : []),
         buildFileUsagesSection(result),
         buildDependenciesSection(result),
         buildAlertsSection(result),
