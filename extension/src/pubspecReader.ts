@@ -76,12 +76,23 @@ export interface PubspecInfo {
  * is already present — no files are modified.
  */
 export function hasSaropaLintsDep(workspaceRoot: string): boolean {
+  return hasPubspecDependency(workspaceRoot, 'saropa_lints');
+}
+
+/**
+ * Check whether `packageName` appears as a dependency in pubspec.yaml (under any
+ * deps block — `dependencies`, `dev_dependencies`, etc.). Matches an indented
+ * `name:` entry, the same shape {@link hasSaropaLintsDep} relied on; that getter
+ * now delegates here so the match rule lives in one place. The name is regex-
+ * escaped so a package with `.`/`-` in it cannot widen the match.
+ */
+export function hasPubspecDependency(workspaceRoot: string, packageName: string): boolean {
   const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
   if (!fs.existsSync(pubspecPath)) return false;
   try {
     const content = fs.readFileSync(pubspecPath, 'utf-8');
-    // Match "saropa_lints:" as a dependency entry (indented under a deps block).
-    return /^\s+saropa_lints:/m.test(content);
+    const escaped = packageName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`^\\s+${escaped}:`, 'm').test(content);
   } catch {
     return false;
   }

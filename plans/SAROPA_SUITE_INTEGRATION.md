@@ -147,7 +147,14 @@ deps, not a monorepo merge):
    when an observed crash family's mapped rule is disabled, firing on activation and on the crash
    mirror changing. Unit-tested in `test/suiteCrashToRule.test.ts`, which pins the signature set and
    cross-checks every mapped rule id against the bundled rule catalog.
-4. **R5 + R7** — outbound deep-links and Package Vibrancy nudge.
+4. ✅ **R5 + R7** — outbound deep-links and Package Vibrancy nudge.
+   Landed: `suite/siblingDeepLinkTargets.ts` (pure) decides the reciprocal jumps and
+   `suite/siblingDeepLinks.ts` registers a Dart code-action provider that surfaces "Show live Drift
+   issues (Drift Advisor)" on a Drift finding when `saropa.drift-viewer` is installed —
+   `driftViewer.openIssues {category:"drift"}`, the only sibling command callable correctly without a
+   table/SQL/fingerprint a static finding does not carry. `suite/suiteAwarenessNudge.ts` (gate in
+   `suiteAwarenessGate.ts`) shows a once-per-workspace toast suggesting the Log Capture extension when a
+   project dev-depends on `saropa_drift_advisor` but lacks it. Unit-tested in `test/suiteDeepLinks.test.ts`.
 5. **R6** — commit stamping for correlation.
 6. **Shared infra extraction** — see the shared Section above.
 
