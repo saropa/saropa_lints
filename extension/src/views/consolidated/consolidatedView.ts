@@ -110,7 +110,11 @@ function pushModel(): void {
   // bad build is logged and skipped, leaving the last good model on screen.
   try {
     lastModel = buildConsolidatedModel(root);
-    void panel.webview.postMessage(toModelMessage(lastModel));
+    // R2: read the sibling mirrors so a Drift rule row can carry "Advisor
+    // confirms at runtime" / "Log Capture saw N". Reads two small JSON files;
+    // absent or malformed mirrors yield an empty map (no badges), never a throw.
+    lastEvidence = buildSuiteEvidence(root);
+    void panel.webview.postMessage(toModelMessage(lastModel, lastEvidence));
   } catch (err) {
     console.error('[saropaLints] consolidated dashboard model build failed', err);
   }
@@ -146,8 +150,27 @@ function openSource(file: string, line: number): void {
   });
 }
 
+/**
+ * Build the already-localized runtime-evidence badges for one rule (R2). The
+ * webview renders strings, not raw counts, so localization stays host-side: the
+ * Advisor badge is presence-only ("confirms at runtime"); the Log Capture badge
+ * carries the occurrence count. Empty array for a rule with no sibling evidence.
+ */
+function evidenceBadges(rule: string, evidence: Map<string, RuleEvidence>): string[] {
+  const row = evidence.get(rule);
+  if (!row) return [];
+  const badges: string[] = [];
+  if (row.advisorCount > 0) {
+    badges.push(l10n('consolidated.evidence.advisor'));
+  }
+  if (row.logCaptureCount > 0) {
+    badges.push(l10n('consolidated.evidence.logCapture', { count: String(row.logCaptureCount) }));
+  }
+  return badges;
+}
+
 /** Map the model to the (already-localized) message the webview renders. */
-function toModelMessage(model: ConsolidatedModel): unknown {
+function toModelMessage(model: ConsolidatedModel, evidence: Map<string, RuleEvidence>): unknown {
   return {
     type: 'model',
     score: model.score,
@@ -164,7 +187,12 @@ function toModelMessage(model: ConsolidatedModel): unknown {
       { kind: 'info', n: model.totals.info, label: l10n('consolidated.wordInfo') },
       { kind: '', n: model.totals.files, label: l10n('consolidated.wordFiles') },
     ],
-    groups: model.groups.map((g) => ({ rule: g.rule, count: g.count, worst: g.worst })),
+    groups: model.groups.map((g) => ({
+      rule: g.rule,
+      count: g.count,
+      worst: g.worst,
+      badges: evidenceBadges(g.rule, evidence),
+    })),
   };
 }
 
