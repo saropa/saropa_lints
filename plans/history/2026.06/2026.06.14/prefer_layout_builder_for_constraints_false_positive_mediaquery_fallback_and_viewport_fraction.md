@@ -1,6 +1,6 @@
 # BUG: `prefer_layout_builder_for_constraints` — false positive on legitimate window-extent `MediaQuery.sizeOf` use
 
-**Status: Fix Ready**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -16,13 +16,16 @@
 >   `* fraction` are now exempt). Breakpoint comparisons still require a literal.
 > - Fixtures added: `OkConstraintFinitenessFallback`, `OkViewportFractionVariable`.
 >
-> **Runtime verification BLOCKED:** the package does not currently build — an
-> unrelated in-progress edit in `lib/src/rules/ui/navigation_rules.dart` leaves a
-> second caller of the class-private `_literalPathText` out of scope, which fails
-> the whole `saropa_lints` build and prevents the scan CLI and unit tests from
-> running. Re-run `dart run saropa_lints scan` against the fixture once that file
-> compiles to confirm no `prefer_layout_builder_for_constraints` diagnostics on
-> the two new GOOD cases.
+> **Runtime verification PASSED (2026-06-14):** the build blocker is resolved
+> (`navigation_rules.dart` now defines `_literalPathText` in scope; the package
+> loads 2075 rules cleanly). Scanned the fixture via `dart run saropa_lints scan`
+> at the comprehensive tier. `prefer_layout_builder_for_constraints` fires on
+> exactly the 8 BAD `expect_lint` markers (fixture lines 18, 33, 35, 47, 60, 62,
+> 112, 127) and on neither new GOOD case — line 284 (`OkConstraintFinitenessFallback`,
+> the constraint-finiteness fallback) and line 304 (`OkViewportFractionVariable`,
+> the named-factor viewport fraction) are both clean. No regression on the
+> existing GOOD cases (screen fraction, breakpoint, viewInsets, static utilities,
+> positional breakpoint helper).
 
 Created: 2026-06-13
 Rule: `prefer_layout_builder_for_constraints`
@@ -237,3 +240,30 @@ line; worth a separate look at the ignore-info computation.
 - Dart SDK version: bundled with current Flutter toolchain
 - custom_lint version: n/a (analysis_server_plugin)
 - Triggering project/file: Saropa Contacts — `in_focus_full_screen.dart`, `favorite_tab.dart`
+
+---
+
+## Finish Report (2026-06-14)
+
+### Scope
+
+(A) Dart lint rule / analyzer plugin. Touched `lib/src/rules/widget/widget_layout_constraints_rules.dart`, the rule's fixture under `example/lib/widget_layout/`, and `CHANGELOG.md`. No extension/TypeScript change.
+
+### What changed
+
+`prefer_layout_builder_for_constraints` gained two false-positive exemptions in `runWithReporter`, evaluated before the diagnostic is reported on a `MediaQuery.sizeOf(...).width/.height` (or `.of(...).size.width/.height`) read:
+
+- **Constraint-finiteness fallback (Pattern A).** `_isConstraintFinitenessFallback` walks the ancestor chain to an enclosing `ConditionalExpression`, confirms the flagged node sits on a value branch (`thenExpression`/`elseExpression`, not the condition), and that the condition tests `.isFinite`/`.isInfinite` on a constraint extent. The condition is scanned by `_ConstraintFinitenessVisitor` (a `RecursiveAstVisitor`) which matches an `.isFinite`/`.isInfinite` property read whose receiver's final identifier is `maxWidth`, `maxHeight`, `minWidth`, or `minHeight` (via the library-shared `referencesConstraintExtent`). Such code already uses `LayoutBuilder` and reads `MediaQuery` only when the parent passes unbounded constraints, where the LayoutBuilder value is `Infinity` and unusable — there is no LayoutBuilder formulation to migrate to. The walk stops at `Statement`/`FunctionBody` boundaries so an unrelated outer ternary cannot match.
+- **Viewport scaling (Pattern B).** The existing literal-scale-or-breakpoint helper was renamed from `_isMediaQuerySizeDimensionInLiteralScaleOrBreakpoint` to `_isMediaQuerySizeDimensionScaledOrBreakpoint` and its `*`/`/` branch no longer requires a numeric-literal sibling. Scaling the screen/window extent by a factor — literal (`* 0.85`) or named (`* fraction`) — is viewport-proportional sizing, which `LayoutBuilder` cannot express inside an unbounded-main-axis parent. Comparison operators (`>`/`<`/`>=`/`<=`) still require a numeric literal, because comparing screen extent to a variable is ambiguous and may be genuine constraint logic rather than a device-class breakpoint.
+
+The rule dartdoc documents both exemptions. Two GOOD fixtures were added after `OkScreenFraction` so the existing "no `expect_lint` after `OkScreenFraction`" invariant holds: `OkConstraintFinitenessFallback` (Pattern A) and `OkViewportFractionVariable` (named-factor Pattern B).
+
+### Verification
+
+- `dart run saropa_lints scan` against the fixture: `prefer_layout_builder_for_constraints` fires on the genuine sizing cases at fixture lines 18, 33, 35, 47, 60, 62, 112, 127 and on neither new GOOD case (lines ~284 and ~304 are clean). No regression on the other GOOD cases (screen fraction, breakpoint comparison, `viewInsets`, static utilities, positional breakpoint helper).
+- `dart test test/rules/widget/prefer_layout_builder_for_constraints_fixture_test.dart`: all 6 tests pass (registration, registry resolution, professional-tier membership, nine `expect_lint` markers, static-utility presence, no markers after `OkScreenFraction`).
+- `dart analyze lib/src/rules/widget/widget_layout_constraints_rules.dart`: no issues.
+
+### Out of scope (tracked separately)
+
+The "Secondary finding (suppression placement)" above — a standalone `// ignore:` placed on its own line mid-`ConditionalExpression` is not honored by the headless scanner — is a scanner ignore-line-mapping issue independent of this rule's detection logic. It is captured in `bugs/infra_scan_ignore_comment_mid_ternary_operand_not_honored.md` and is not addressed here.
