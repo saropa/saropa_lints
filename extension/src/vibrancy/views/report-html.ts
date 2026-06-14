@@ -1394,12 +1394,21 @@ function buildDepsCell(
         + `</td>`;
 }
 
-function computePublishedAgeMonths(isoDate: string | null): number | null {
+/**
+ * Whole-month age of a published date, UTC and calendar-month aware (NOT a
+ * naive `days / 365` truncation, which drifted by up to a month for older
+ * packages). The day-of-month rollback below is the crux: an age only ticks
+ * over to the next month once the day-of-month is reached, so 2024-09-29 →
+ * 2025-09-28 is 11 months, not 12.
+ *
+ * `now` is injectable so the month math can be pinned in tests against a fixed
+ * reference instant; production calls omit it and get the current time.
+ */
+export function computePublishedAgeMonths(isoDate: string | null, now: Date = new Date()): number | null {
     if (!isoDate) { return null; }
     const ms = Date.parse(isoDate);
     if (isNaN(ms)) { return null; }
     const from = new Date(ms);
-    const now = new Date();
     const years = now.getUTCFullYear() - from.getUTCFullYear();
     const monthsDelta = now.getUTCMonth() - from.getUTCMonth();
     let months = years * 12 + monthsDelta;
