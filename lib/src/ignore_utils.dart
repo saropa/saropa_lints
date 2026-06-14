@@ -312,6 +312,18 @@ class IgnoreUtils {
       }
     }
 
+    // Special case for ConditionalExpression operands (`? then` / `: else`).
+    // A standalone `// ignore:` on its own line directly above a ternary branch
+    // attaches to the `?`/`:` operator token (a comment hangs off the NEXT
+    // token in the stream), never to a token of the flagged operand. The
+    // node/parent walk only probes ancestor beginTokens, which for a
+    // ConditionalExpression is the condition's first token — far above the
+    // comment — so the suppression is otherwise dropped. See
+    // plans/history/2026.06/2026.06.14/infra_scan_ignore_comment_mid_ternary_operand_not_honored.md.
+    if (_conditionalBranchHasLeadingIgnore(node, ruleName, lineInfo)) {
+      return true;
+    }
+
     // Walk up the parent chain to find comments on ancestor expressions
     AstNode? current = node.parent;
     Statement? containingStatement;
@@ -390,6 +402,81 @@ class IgnoreUtils {
       }
     }
     return false;
+  }
+
+  /// Probes the `?`/`:` operator token of an enclosing [ConditionalExpression]
+  /// for a standalone leading `// ignore:` governing the ternary branch that
+  /// the flagged [node] begins.
+  ///
+  /// In Dart's token stream a comment placed on its own line between the
+  /// operands of a ternary attaches to the `precedingComments` of the operator
+  /// token that follows it — `?` for the then-branch, `:` for the else-branch —
+  /// never to a token of the flagged operand. The general node/parent walk in
+  /// [hasIgnoreComment] only inspects ancestor `beginToken`s, and a
+  /// `ConditionalExpression`'s `beginToken` is the condition's first token, so a
+  /// correctly-placed standalone ignore above a branch is otherwise invisible.
+  ///
+  /// Only fires when [node] begins the branch (after unwrapping surrounding
+  /// parentheses), keying the placement guard to the branch operand's own start
+  /// line. This keeps placement precise: a comment above the condition, or above
+  /// the *other* branch, does not leak onto this one. A `// ignore:` above the
+  /// condition is still handled — but by the node/ancestor walk, not here, since
+  /// that comment hangs off the condition's own begin token.
+  static bool _conditionalBranchHasLeadingIgnore(
+    AstNode node,
+    String ruleName,
+    LineInfo? lineInfo,
+  ) {
+    if (lineInfo == null) return false;
+
+    // Ascend to the nearest enclosing ConditionalExpression, remembering the
+    // direct child of that conditional we arrived through — that child is
+    // exactly one of `condition` / `thenExpression` / `elseExpression`. Stop at
+    // a Statement boundary (e.g. a closure body) so a ternary further up the
+    // tree does not spuriously govern a node nested inside a branch.
+    AstNode child = node;
+    AstNode? current = node.parent;
+    while (current != null && current is! ConditionalExpression) {
+      if (current is Statement) return false;
+      child = current;
+      current = current.parent;
+    }
+    if (current is! ConditionalExpression) return false;
+
+    // The operator token whose precedingComments would hold a standalone ignore
+    // for this branch: `?` precedes the then-expression, `:` the else.
+    final Token operatorToken;
+    final Expression branch;
+    if (identical(current.thenExpression, child)) {
+      operatorToken = current.question;
+      branch = current.thenExpression;
+    } else if (identical(current.elseExpression, child)) {
+      operatorToken = current.colon;
+      branch = current.elseExpression;
+    } else {
+      // node is in the condition — handled by the node/ancestor walk instead.
+      return false;
+    }
+
+    // Require the flagged node to start the branch so the operator-attached
+    // comment genuinely governs it (not a later sub-expression on another
+    // line). Unwrap parens so `: (flagged)` still resolves: the comment above
+    // it hangs off the `:` while the inner node starts after the `(`.
+    Expression unwrapped = branch;
+    while (unwrapped is ParenthesizedExpression) {
+      unwrapped = unwrapped.expression;
+    }
+    if (node.offset != branch.offset && node.offset != unwrapped.offset) {
+      return false;
+    }
+
+    final int operandLine = lineInfo.getLocation(branch.offset).lineNumber;
+    return _hasValidLeadingIgnoreComment(
+      operatorToken,
+      ruleName,
+      operandLine,
+      lineInfo,
+    );
   }
 
   /// Checks if a token has a valid leading ignore comment for a node.
