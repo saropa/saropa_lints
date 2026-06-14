@@ -463,6 +463,38 @@ export function getPackageDetailStyles(): string {
         .image-gallery img:hover {
             border-color: var(--vscode-focusBorder);
         }
+
+        /* ---- Changelog section ----
+           Consolidated release notes between installed and latest. The intro
+           frames it as a review aid; each release is separated by a hairline so
+           the scan reads as a vertical timeline rather than one wall of text. */
+        .changelog-intro {
+            color: var(--vscode-descriptionForeground);
+            margin-bottom: 10px;
+        }
+        .changelog-entry {
+            padding: 8px 0;
+            border-top: 1px solid var(--vscode-widget-border);
+        }
+        .changelog-entry:first-of-type { border-top: none; }
+        .changelog-version {
+            font-size: 1.05em;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--vscode-textLink-foreground);
+        }
+        /* Tighten the markdown the renderer emits so nested lists and paragraphs
+           don't inherit the page's full block spacing inside a dense changelog. */
+        .changelog-body ul { margin: 4px 0 4px 18px; }
+        .changelog-body li { margin-bottom: 2px; }
+        .changelog-body p { margin-bottom: 6px; }
+        .changelog-body h1,
+        .changelog-body h2,
+        .changelog-body h3 { font-size: 1em; font-weight: 600; margin: 6px 0 4px; }
+        .changelog-truncated {
+            color: var(--vscode-descriptionForeground);
+            margin-top: 8px;
+        }
     `;
 }
 

@@ -107,13 +107,22 @@ class _EmptyBodyStubVisitor extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     if (_testFns.contains(node.methodName.name)) {
-      final callback = node.argumentList.arguments
-          .whereType<FunctionExpression>()
-          .firstOrNull;
-      final body = callback?.body;
-      // Empty block body — `() {}` with no statements — is the unambiguous
-      // stub: it cannot assert anything yet always passes.
-      if (body is BlockFunctionBody && body.block.statements.isEmpty) stubs++;
+      // A `skip:`-ped test never executes, so an empty body cannot silently
+      // pass — it is a documented placeholder for an un-runnable case, not a
+      // stub that earns misleading coverage. Excluding it lets such cases be
+      // recorded explicitly while the gate still rejects real `() {}` stubs.
+      final isSkipped = node.argumentList.arguments
+          .whereType<NamedExpression>()
+          .any((arg) => arg.name.label.name == 'skip');
+      if (!isSkipped) {
+        final callback = node.argumentList.arguments
+            .whereType<FunctionExpression>()
+            .firstOrNull;
+        final body = callback?.body;
+        // Empty block body — `() {}` with no statements — is the unambiguous
+        // stub: it cannot assert anything yet always passes.
+        if (body is BlockFunctionBody && body.block.statements.isEmpty) stubs++;
+      }
     }
     node.visitChildren(this);
   }

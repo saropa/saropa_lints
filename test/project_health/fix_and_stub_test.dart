@@ -67,5 +67,26 @@ void main() {
         1,
       );
     });
+
+    // A skipped test never runs, so an empty body cannot silently pass — it is
+    // a documented placeholder for an un-runnable case, not a coverage-faking
+    // stub. The hard gate must not reject it.
+    test('skipped empty-body test is not counted', () {
+      expect(
+        emptyBodyStubCountIn(
+          "void main() { test('x', () {}, skip: 'why'); }",
+        ),
+        0,
+      );
+    });
+
+    // Guard against the skip-exclusion over-reaching: an empty-body test with
+    // no skip argument is still the real stub the gate exists to catch.
+    test('empty-body test without skip is still counted', () {
+      expect(
+        emptyBodyStubCountIn("void main() { test('x', () {}, timeout: t); }"),
+        1,
+      );
+    });
   });
 }

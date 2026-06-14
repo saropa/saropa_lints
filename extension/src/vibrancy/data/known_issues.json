@@ -2,6 +2,321 @@
   "$schema": "./known_issues_schema.json",
   "issues": [
     {
+      "name": "angular",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; Google handed AngularDart to the community (last release 2021).",
+      "as_of": "2026-06-14",
+      "replacement": "ngdart",
+      "migrationNotes": "Replace angular with ngdart, the community continuation with the same API.",
+      "lastUpdated": "2021-10-07"
+    },
+    {
+      "name": "angular_components",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; replaced by the community AngularDart components fork.",
+      "as_of": "2026-06-14",
+      "replacement": "ngcomponents",
+      "migrationNotes": "Swap angular_components for ngcomponents.",
+      "lastUpdated": "2021-03-23"
+    },
+    {
+      "name": "angular_router",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; replaced by the community AngularDart router.",
+      "as_of": "2026-06-14",
+      "replacement": "ngrouter",
+      "migrationNotes": "Swap angular_router for ngrouter.",
+      "lastUpdated": "2021-10-07"
+    },
+    {
+      "name": "angular_forms",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; replaced by the community AngularDart forms package.",
+      "as_of": "2026-06-14",
+      "replacement": "ngforms",
+      "migrationNotes": "Swap angular_forms for ngforms.",
+      "lastUpdated": "2021-10-07"
+    },
+    {
+      "name": "angular_test",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; replaced by the community AngularDart test runner.",
+      "as_of": "2026-06-14",
+      "replacement": "ngtest",
+      "migrationNotes": "Swap angular_test for ngtest.",
+      "lastUpdated": "2021-10-07"
+    },
+    {
+      "name": "angular_ast",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; replaced by the community AngularDart template parser.",
+      "as_of": "2026-06-14",
+      "replacement": "ngast",
+      "migrationNotes": "Swap angular_ast for ngast.",
+      "lastUpdated": "2021-10-07"
+    },
+    {
+      "name": "angular_compiler",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; replaced by the community AngularDart compiler.",
+      "as_of": "2026-06-14",
+      "replacement": "ngcompiler",
+      "migrationNotes": "Swap angular_compiler for ngcompiler.",
+      "lastUpdated": "2021-10-07"
+    },
+    {
+      "name": "super_enum",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev (last release 2020); pub.dev names freezed as the replacement.",
+      "as_of": "2026-06-14",
+      "replacement": "freezed",
+      "migrationNotes": "Replace super_enum unions with freezed @freezed sealed classes and pattern matching.",
+      "lastUpdated": "2020-10-21"
+    },
+    {
+      "name": "uni_links",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; pub.dev names app_links as the replacement.",
+      "as_of": "2026-06-14",
+      "replacement": "app_links",
+      "migrationNotes": "app_links exposes the same incoming-link API (deep links, universal links, custom schemes).",
+      "lastUpdated": "2021-04-28"
+    },
+    {
+      "name": "artemis",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; pub.dev names ferry as the GraphQL-codegen successor.",
+      "as_of": "2026-06-14",
+      "replacement": "ferry",
+      "migrationNotes": "Migrate GraphQL codegen to ferry (typed data plus gql_link network layer and cache).",
+      "lastUpdated": "2023-10-06"
+    },
+    {
+      "name": "pusher_client_fixed",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; pub.dev names pusher_client_socket as the cross-platform successor.",
+      "as_of": "2026-06-14",
+      "replacement": "pusher_client_socket",
+      "migrationNotes": "Switch to pusher_client_socket for Pusher Channels websocket connections.",
+      "lastUpdated": "2025-05-02"
+    },
+    {
+      "name": "advance_pdf_viewer",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev (uses the removed Android v1 embedding); pub.dev names pdfx.",
+      "as_of": "2026-06-14",
+      "replacement": "pdfx",
+      "migrationNotes": "Move to pdfx (PDFium-based); the viewer widget construction differs.",
+      "lastUpdated": "2022-01-04"
+    },
+    {
+      "name": "flutter_statusbarcolor",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev (last release 2019).",
+      "as_of": "2026-06-14",
+      "replacement": "flutter_statusbarcolor_ns",
+      "migrationNotes": "flutter_statusbarcolor_ns is the null-safe fork with an identical API.",
+      "lastUpdated": "2019-11-15"
+    },
+    {
+      "name": "firebase_dynamic_links",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; the Firebase Dynamic Links service was shut down on 2025-08-25.",
+      "as_of": "2026-06-14",
+      "replacement": "app_links",
+      "migrationNotes": "No full successor exists; use app_links for in-app link handling (deferred-link attribution is gone).",
+      "lastUpdated": "2025-07-21"
+    },
+    {
+      "name": "flutter_geofence",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev (last release 2022) with no successor named.",
+      "as_of": "2026-06-14",
+      "replacement": null,
+      "migrationNotes": "Migrate to native_geofence or geofence_foreground_service depending on background-reliability needs.",
+      "lastUpdated": "2022-05-15"
+    },
+    {
+      "name": "inject",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev; this Dart 1-era DI tool has not shipped since 2016.",
+      "as_of": "2026-06-14",
+      "replacement": "get_it with injectable",
+      "migrationNotes": "Use get_it as the service locator plus injectable for compile-time DI codegen.",
+      "lastUpdated": "2016-11-30"
+    },
+    {
+      "name": "observable",
+      "status": "end_of_life",
+      "reason": "Discontinued on pub.dev (last release 2021) with no successor named.",
+      "as_of": "2026-06-14",
+      "replacement": "rxdart",
+      "migrationNotes": "Replace observable values/lists with rxdart BehaviorSubject streams or a ValueNotifier.",
+      "lastUpdated": "2021-12-01"
+    },
+    {
+      "name": "get_it_mixin",
+      "status": "caution",
+      "reason": "Author declared it superseded and no longer maintained (last release 2023).",
+      "as_of": "2026-06-14",
+      "replacement": "watch_it",
+      "migrationNotes": "Migrate to watch_it, the same author streamlined rewrite of the get_it mixin.",
+      "lastUpdated": "2023-09-03"
+    },
+    {
+      "name": "flutter_cupertino_date_picker",
+      "status": "caution",
+      "reason": "Abandoned (last release 2020).",
+      "as_of": "2026-06-14",
+      "replacement": "flutter_holo_date_picker",
+      "migrationNotes": "flutter_holo_date_picker is built on it and is kept current.",
+      "lastUpdated": "2020-06-17"
+    },
+    {
+      "name": "toast",
+      "status": "caution",
+      "reason": "Abandoned (last release 2022), unverified publisher.",
+      "as_of": "2026-06-14",
+      "replacement": "fluttertoast",
+      "migrationNotes": "fluttertoast is the actively maintained, widely used toast package.",
+      "lastUpdated": "2022-04-17"
+    },
+    {
+      "name": "rflutter_alert",
+      "status": "caution",
+      "reason": "Abandoned (last release 2023); still works but unmaintained.",
+      "as_of": "2026-06-14",
+      "replacement": "awesome_dialog",
+      "migrationNotes": "awesome_dialog is a maintained alert/dialog package covering the same cases.",
+      "lastUpdated": "2023-05-24"
+    },
+    {
+      "name": "flutter_web_auth",
+      "status": "caution",
+      "reason": "Abandoned (last release 2024); the project points users to the _2 continuation.",
+      "as_of": "2026-06-14",
+      "replacement": "flutter_web_auth_2",
+      "migrationNotes": "flutter_web_auth_2 is the maintained continuation with the same OAuth flow API.",
+      "lastUpdated": "2024-10-07"
+    },
+    {
+      "name": "pusher_client",
+      "status": "caution",
+      "reason": "Abandoned (last release 2021).",
+      "as_of": "2026-06-14",
+      "replacement": "pusher_channels_flutter",
+      "migrationNotes": "Pusher official maintained pusher_channels_flutter is the supported replacement.",
+      "lastUpdated": "2021-09-01"
+    },
+    {
+      "name": "esys_flutter_share",
+      "status": "end_of_life",
+      "reason": "Unmaintained since 2019 and incompatible with current toolchains.",
+      "as_of": "2026-06-14",
+      "replacement": "share_plus",
+      "migrationNotes": "Replace file/text/image sharing with the maintained share_plus (SharePlus.instance.share).",
+      "lastUpdated": "2019-06-04"
+    },
+    {
+      "name": "dbcrypt",
+      "status": "caution",
+      "reason": "Abandoned (last release 2021).",
+      "as_of": "2026-06-14",
+      "replacement": "bcrypt",
+      "migrationNotes": "bcrypt provides the same BCrypt hash/check API and is actively maintained.",
+      "lastUpdated": "2021-02-25"
+    },
+    {
+      "name": "pdf_render",
+      "status": "caution",
+      "reason": "Author placed it in maintenance mode (no new features) in favor of pdfrx.",
+      "as_of": "2026-06-14",
+      "replacement": "pdfrx",
+      "migrationNotes": "Migrate to pdfrx for desktop support, password PDFs, and multithreaded rendering.",
+      "lastUpdated": "2024-08-26"
+    },
+    {
+      "name": "native_pdf_view",
+      "status": "end_of_life",
+      "reason": "Renamed and republished as pdfx (last release under the old name 2022).",
+      "as_of": "2026-06-14",
+      "replacement": "pdfx",
+      "migrationNotes": "Replace the dependency with pdfx; a few enums and widgets were renamed.",
+      "lastUpdated": "2022-02-10"
+    },
+    {
+      "name": "gallery_saver",
+      "status": "caution",
+      "reason": "Abandoned (last release 2021), unverified publisher.",
+      "as_of": "2026-06-14",
+      "replacement": "image_gallery_saver",
+      "migrationNotes": "image_gallery_saver saves images/videos to the device gallery with a single call.",
+      "lastUpdated": "2021-10-19"
+    },
+    {
+      "name": "image_downloader",
+      "status": "caution",
+      "reason": "Abandoned (last release 2021).",
+      "as_of": "2026-06-14",
+      "replacement": "image_gallery_saver",
+      "migrationNotes": "No single drop-in successor; download via http/dio then save with image_gallery_saver.",
+      "lastUpdated": "2021-11-15"
+    },
+    {
+      "name": "nfc_in_flutter",
+      "status": "end_of_life",
+      "reason": "Unmaintained since 2020 and incompatible with current toolchains.",
+      "as_of": "2026-06-14",
+      "replacement": "nfc_manager",
+      "migrationNotes": "nfc_manager (verified publisher) is the maintained NFC plugin; rewrite NDEF read/write against its session API.",
+      "lastUpdated": "2020-07-18"
+    },
+    {
+      "name": "disk_space",
+      "status": "caution",
+      "reason": "Abandoned (last release 2021).",
+      "as_of": "2026-06-14",
+      "replacement": "disk_space_plus",
+      "migrationNotes": "disk_space_plus is the maintained fork but requires an explicit init call before reading values.",
+      "lastUpdated": "2021-10-04"
+    },
+    {
+      "name": "wifi",
+      "status": "end_of_life",
+      "reason": "Unmaintained since 2019 and incompatible with current toolchains.",
+      "as_of": "2026-06-14",
+      "replacement": "wifi_iot",
+      "migrationNotes": "wifi_iot covers WiFi connection/hotspot management via WiFiForIoTPlugin.",
+      "lastUpdated": "2019-03-04"
+    },
+    {
+      "name": "flutter_circle_color_picker",
+      "status": "caution",
+      "reason": "Abandoned (last release 2021).",
+      "as_of": "2026-06-14",
+      "replacement": "flutter_colorpicker",
+      "migrationNotes": "flutter_colorpicker is the actively maintained picker and covers wheel/circle pickers.",
+      "lastUpdated": "2021-04-19"
+    },
+    {
+      "name": "date_range_picker",
+      "status": "caution",
+      "reason": "Abandoned (last release 2021); Flutter now ships a built-in date range picker.",
+      "as_of": "2026-06-14",
+      "replacement": "the framework showDateRangePicker() Material function",
+      "migrationNotes": "Replace with the framework built-in showDateRangePicker().",
+      "lastUpdated": "2021-03-17"
+    },
+    {
+      "name": "flutter_range_slider",
+      "status": "caution",
+      "reason": "Abandoned (last release 2020); Flutter now ships a built-in RangeSlider.",
+      "as_of": "2026-06-14",
+      "replacement": "the framework RangeSlider widget",
+      "migrationNotes": "Replace with the framework built-in Material RangeSlider.",
+      "lastUpdated": "2020-09-17"
+    },
+    {
       "name": "flutter_datetime_picker",
       "status": "end_of_life",
       "reason": "Uses deprecated Theme APIs; causes instant render crashes on Impeller.",
@@ -1835,6 +2150,20 @@
       ]
     },
     {
+      "name": "wifi_info_flutter",
+      "status": "end_of_life",
+      "reason": "Discontinued by Flutter Community; no updates since 2021 and superseded by the unified Plus plugin.",
+      "as_of": "2026-06-14",
+      "replacement": "network_info_plus",
+      "migrationNotes": "Drop-in cross-grade. Replace imports and use NetworkInfo() in place of WifiInfo(); method names map directly (getWifiName, getWifiBSSID, getWifiIP).",
+      "license": "BSD-3-Clause",
+      "platforms": [
+        "android",
+        "ios",
+        "macos"
+      ]
+    },
+    {
       "name": "charts_flutter",
       "status": "end_of_life",
       "reason": "Dart 3 incompatible; looks ancient.",
@@ -1878,8 +2207,8 @@
       "status": "end_of_life",
       "reason": "Abandoned by the creator; unpatched data corruption risks with enum evolutions and weak Wasm support.",
       "as_of": "2026-03-10",
-      "replacement": "drift",
-      "migrationNotes": "Total rewrite. Shift to a stable SQLite-backed architecture like Drift, or Realm if a NoSQL object store is strictly required.",
+      "replacement": "isar_community",
+      "migrationNotes": "Drop-in cross-grade: switch to the community fork isar_community (continues v3 with Dart 3/Wasm fixes) and swap the companion isar_flutter_libs for isar_community_flutter_libs. If leaving NoSQL entirely, rewrite to Drift (SQLite) or Realm.",
       "archiveSizeBytes": 73661,
       "archiveSizeMB": 0.07,
       "license": "Apache-2.0",
@@ -1892,6 +2221,22 @@
         "linux",
         "macos",
         "web",
+        "windows"
+      ]
+    },
+    {
+      "name": "isar_flutter_libs",
+      "status": "end_of_life",
+      "reason": "Native libs companion for the abandoned original Isar; superseded by the Community Edition binaries.",
+      "as_of": "2026-06-14",
+      "replacement": "isar_community_flutter_libs",
+      "migrationNotes": "Drop-in cross-grade. Swap alongside isar -> isar_community; bundles the maintained Isar Core binaries.",
+      "license": "Apache-2.0",
+      "platforms": [
+        "android",
+        "ios",
+        "linux",
+        "macos",
         "windows"
       ]
     },
@@ -6932,8 +7277,11 @@
     },
     {
       "name": "hive_flutter",
-      "status": "active",
-      "as_of": "2026-03-10",
+      "status": "end_of_life",
+      "reason": "Flutter companion for the abandoned original Hive; superseded by the actively-maintained Community Edition.",
+      "as_of": "2026-06-14",
+      "replacement": "hive_ce_flutter",
+      "migrationNotes": "Drop-in cross-grade. Replace hive_flutter with hive_ce_flutter (and hive with hive_ce); imports and box APIs are compatible.",
       "archiveSizeBytes": 10240,
       "archiveSizeMB": 0.01,
       "license": "unknown",

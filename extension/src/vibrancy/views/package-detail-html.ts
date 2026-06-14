@@ -22,6 +22,7 @@ import { getPillButtonStyles } from './pill-button-styles';
 import { getPackageDetailScript } from './package-detail-script';
 import { getDashboardChromeStyles } from '../../views/dashboardChromeStyles';
 import { buildDetailScoreSection } from './report-html';
+import { markdownToHtml } from '../../views/aboutView';
 import {
     buildDashboardHero,
     buildDocumentTitle,
@@ -94,6 +95,7 @@ export function buildPackageDetailBody(
         buildDescriptionSection(result),
         buildTopicsSection(result),
         buildVersionSection(result),
+        buildChangelogSection(result),
         buildCommunitySection(result),
         // Health Score breakdown (score factors + maintainer-quality bonuses).
         // Only in the dashboard pane, where report-styles supplies its CSS; the
@@ -348,6 +350,56 @@ function buildVersionSection(r: VibrancyResult): string {
         <table class="metrics-table"><tbody>${rows.join('')}</tbody></table>
         <div>${buttons.join('')}</div>
     `);
+}
+
+/**
+ * Consolidated changelog between the installed version and latest, rendered
+ * inline so adopting a newer version is a reviewed decision rather than a blind
+ * one — the reason the unsolicited one-click "Update All" was removed (a
+ * supply-chain risk). Entries are fetched during the scan (GitHub CHANGELOG.md
+ * first, pub.dev fallback) and already filtered to versions > current and
+ * <= latest, capped at 20 with `truncated` set when more exist.
+ *
+ * Bodies are external, untrusted text, so they pass through the XSS-safe
+ * `markdownToHtml` (escapes HTML, allow-lists link schemes). Renders nothing
+ * when there is no update or no parsed entries; the external "View Changelog"
+ * link in the version section stays as the fallback in that case.
+ */
+function buildChangelogSection(r: VibrancyResult): string {
+    const info = r.updateInfo;
+    if (!info || info.updateStatus === 'up-to-date') { return ''; }
+    const changelog = info.changelog;
+    if (!changelog || changelog.entries.length === 0) { return ''; }
+
+    const intro = `<p class="changelog-intro">${escapeHtml(l10n('packageDetail.changelog.intro', {
+        from: info.currentVersion,
+        to: info.latestVersion,
+    }))}</p>`;
+
+    const entries = changelog.entries.map(entry => {
+        // Date is optional in the parsed entry; only the dated form needs l10n
+        // (it interpolates two tokens), a bare version is just escaped text.
+        const heading = entry.date
+            ? l10n('packageDetail.changelog.versionDated', { version: entry.version, date: entry.date })
+            : entry.version;
+        return '<div class="changelog-entry">'
+            + `<div class="changelog-version">${escapeHtml(heading)}</div>`
+            + `<div class="changelog-body">${markdownToHtml(entry.body)}</div>`
+            + '</div>';
+    }).join('');
+
+    // Only when the 20-entry cap dropped older releases: name the count shown
+    // and link out to the full history so nothing is silently hidden.
+    let footer = '';
+    if (changelog.truncated) {
+        const changelogUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}/changelog`;
+        footer = `<p class="changelog-truncated">`
+            + escapeHtml(l10n('packageDetail.changelog.truncated', { count: String(changelog.entries.length) }))
+            + ` <a href="#" class="action-link" data-action="openUrl" data-url="${escapeHtml(changelogUrl)}">`
+            + `${escapeHtml(l10n('packageDetail.changelog.viewFull'))}</a></p>`;
+    }
+
+    return section(l10n('packageDetail.section.changelog'), `${intro}${entries}${footer}`);
 }
 
 function buildCommunitySection(r: VibrancyResult): string {

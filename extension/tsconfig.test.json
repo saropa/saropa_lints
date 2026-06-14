@@ -34,6 +34,7 @@
     "src/test/vibrancy/services/import-scanner.test.ts",
     "src/test/vibrancy/services/startup-gate.test.ts",
     "src/test/vibrancy/services/vibrancy-history.test.ts",
+    "src/test/vibrancy/services/freshness-watcher.test.ts",
     "src/test/vibrancy/scoring/status-classifier.test.ts",
     "src/test/vibrancy/state/vibrancy-state.test.ts",
     "src/test/vibrancy/scoring/vibrancy-calculator.test.ts",

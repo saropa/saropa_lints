@@ -50,6 +50,18 @@ describe('FreshnessWatcher', () => {
         latestPrerelease: null,
         prereleaseTag: null,
         vulnerabilities: [],
+        codeSizeBytes: null,
+        folderBreakdown: null,
+        maintainerQuality: null,
+        maintainerQualityBonus: 0,
+        fileUsages: [],
+        versionGap: null,
+        overrideGap: null,
+        replacementComplexity: null,
+        likes: null,
+        downloadCount30Days: null,
+        reverseDependencyCount: null,
+        readme: null,
     });
 
     beforeEach(() => {
@@ -271,11 +283,19 @@ describe('formatNotificationMessage', () => {
 });
 
 describe('createNotificationActions', () => {
-    it('should return expected actions', () => {
+    it('should offer awareness actions only', () => {
         const actions = createNotificationActions();
 
         assert.ok(actions.includes('View Details'));
-        assert.ok(actions.includes('Update All'));
         assert.ok(actions.includes('Dismiss'));
+    });
+
+    it('must NOT offer a one-click bulk "Update All"', () => {
+        // Bulk-pulling every newest version from an unsolicited toast, without
+        // reviewing each changelog, is a supply-chain attack vector. The toast
+        // is awareness-only; users upgrade per-package from the package screen.
+        const actions = createNotificationActions();
+
+        assert.ok(!actions.includes('Update All'));
     });
 });
