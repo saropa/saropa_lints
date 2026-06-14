@@ -1439,7 +1439,14 @@ function buildDetailCard(r: VibrancyResult): string {
     return `<div class="detail-card">${sections.join('')}</div>`;
 }
 
-function buildDetailScoreSection(r: VibrancyResult): string {
+/**
+ * Health Score breakdown panel (score factors + maintainer-quality bonuses).
+ * Exported so the dashboard's docked detail pane can render it: it is the one
+ * piece of the retired inline detail card the pane did not already cover, and
+ * it is styled by report-styles (.detail-section / .detail-grid), which the
+ * dashboard loads, so it renders correctly inside the pane.
+ */
+export function buildDetailScoreSection(r: VibrancyResult): string {
     const fmt = (v: number) => Math.round(v);
     const grade = categoryToGrade(r.category);
     const publishAgeDays = daysSinceIsoDate(r.pubDev?.publishedDate);
