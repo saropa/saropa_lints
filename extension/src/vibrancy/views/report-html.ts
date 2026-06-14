@@ -1489,7 +1489,7 @@ export function buildDetailScoreSection(r: VibrancyResult): string {
        header grade letter, just shown as a /10. The factor rows below stay
        because they're distinct dimensions, not the same aggregate. */
     return `<div class="detail-section">
-        <h4>${escapeHtml(l10n('packageDashboard.detail.healthScore'))} <span class="grade-badge grade-${grade}">${grade}</span></h4>
+        <h3>${escapeHtml(l10n('packageDashboard.detail.healthScore'))} <span class="grade-badge grade-${grade}">${grade}</span></h3>
         <div class="detail-grid">
             <span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.resolutionVelocity'))}</span><span>${fmt(r.resolutionVelocity)}</span>
             <span class="detail-label">${escapeHtml(l10n('packageDashboard.detail.engagementLevel'))}</span><span>${fmt(r.engagementLevel)}</span>

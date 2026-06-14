@@ -140,9 +140,11 @@ export function getViolationsDashboardStyles(): string {
       color: var(--vscode-foreground);
       font-size: .92em;
     }
-    .status-line .pill.good { color: var(--status-good); }
-    .status-line .pill.bad  { color: var(--status-bad); }
-    .status-line .pill.warn { color: var(--accent-warning); }
+    /* Small status-pill text mixed toward foreground for WCAG AA on the tinted
+       pill; tokens stay vivid for the large KPI hero numbers. */
+    .status-line .pill.good { color: color-mix(in srgb, var(--status-good) 58%, var(--vscode-foreground)); }
+    .status-line .pill.bad  { color: color-mix(in srgb, var(--status-bad) 44%, var(--vscode-foreground)); }
+    .status-line .pill.warn { color: color-mix(in srgb, var(--accent-warning) 55%, var(--vscode-foreground)); }
 
     /* Freshness pill doubles as a refresh button (role="button" +
        tabindex="0"): pointer cursor + hover tint signal it is clickable, and
@@ -256,7 +258,7 @@ export function getViolationsDashboardStyles(): string {
       gap: 8px 10px;
     }
     .toolbar-row.spread { justify-content: space-between; }
-    .toolbar-row label { color: var(--muted); font-size: .92em; display: inline-flex; align-items: center; gap: 6px; }
+    .toolbar-row label { color: color-mix(in srgb, var(--vscode-foreground) 72%, var(--muted)); font-size: .92em; display: inline-flex; align-items: center; gap: 6px; }
 
     .field {
       display: inline-flex;
@@ -316,7 +318,7 @@ export function getViolationsDashboardStyles(): string {
     }
     .seg .seg-label {
       padding: 0 8px;
-      color: var(--muted);
+      color: color-mix(in srgb, var(--vscode-foreground) 72%, var(--muted));
       font-size: .9em;
     }
     /* Inverted toggle visual model (guideline §14.15): pressed = quiet (default state),

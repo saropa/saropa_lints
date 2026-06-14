@@ -69,7 +69,7 @@ function getComparisonStyles(): string {
         th.dimension { width: 140px; }
         td.winner {
             font-weight: bold;
-            color: var(--vscode-testing-iconPassed);
+            color: color-mix(in srgb, var(--vscode-testing-iconPassed) 58%, var(--vscode-foreground));
         }
         td.loser { opacity: 0.7; }
         .pkg-header {
@@ -79,7 +79,10 @@ function getComparisonStyles(): string {
         /* §15 / WCAG 1.4.1 — links in the header text block carry an underline,
          * not color alone, so color-blind users can tell them from plain text. */
         .pkg-header a {
-            color: var(--vscode-textLink-foreground);
+            /* textLink dips under AA on the tinted header cell; nudge toward
+             * foreground for contrast while staying link-colored (the underline
+             * is the non-color cue). */
+            color: color-mix(in srgb, var(--vscode-textLink-foreground) 56%, var(--vscode-foreground));
             text-decoration: underline;
         }
         .pkg-header a:hover { color: var(--vscode-textLink-activeForeground); }
@@ -118,12 +121,15 @@ function getComparisonStyles(): string {
             opacity: 0.5;
             cursor: not-allowed;
         }
-        .vibrant { color: var(--vscode-testing-iconPassed); }
-        .stable { color: var(--vscode-editorInfo-foreground); }
-        .outdated { color: var(--vscode-editorWarning-foreground); }
-        .abandoned { color: var(--vscode-editorWarning-foreground); }
-        .eol { color: var(--vscode-editorError-foreground); }
-        .verified { color: var(--vscode-testing-iconPassed); }
+        /* Category text is normal-size, so the semantic hue is mixed toward the
+         * editor foreground to clear WCAG AA while staying recognizably
+         * green / blue / amber / red. */
+        .vibrant { color: color-mix(in srgb, var(--vscode-testing-iconPassed) 58%, var(--vscode-foreground)); }
+        .stable { color: color-mix(in srgb, var(--vscode-editorInfo-foreground) 66%, var(--vscode-foreground)); }
+        .outdated { color: color-mix(in srgb, var(--vscode-editorWarning-foreground) 55%, var(--vscode-foreground)); }
+        .abandoned { color: color-mix(in srgb, var(--vscode-editorWarning-foreground) 55%, var(--vscode-foreground)); }
+        .eol { color: color-mix(in srgb, var(--vscode-editorError-foreground) 72%, var(--vscode-foreground)); }
+        .verified { color: color-mix(in srgb, var(--vscode-testing-iconPassed) 58%, var(--vscode-foreground)); }
         .platforms { font-size: 0.9em; }
         @keyframes rec-in {
             from { opacity: 0; transform: translateY(6px); }
