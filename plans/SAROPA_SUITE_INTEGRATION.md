@@ -112,17 +112,23 @@ authors, surfaced in the dashboard as "observed in production, no static rule ye
 ## Shared infrastructure (cross-repo — identical Section in all three docs)
 
 Duplicated across the three TypeScript extensions; extract to internal shared packages (path/git
-deps, not a monorepo merge):
+deps, not a monorepo merge). Each has a detailed extraction plan (convergence evidence, what moves,
+dependency-mechanism recommendation, per-repo migration steps, risks):
 
 - **`saropa-vscode-i18n`** — NLLB-then-Google fallback, real-coverage audits, day-bucketed report
   paths, untranslated-locale notices. Lints is furthest along (24 languages) and the natural source
   of the extracted tooling. (Sharing tooling only; running a translation job stays separately
-  authorized.)
+  authorized.) Plan: `plans/SHARED_INFRA_VSCODE_I18N.md`.
 - **`saropa-vscode-ui`** — theme tokens + dashboard kit. Lints already decomposed its dashboards into
   reusable section builders (`CENTRAL_DASHBOARD_CONSOLIDATION.md`); those become the seed of the
-  shared kit.
+  shared kit. Plan: `plans/SHARED_INFRA_VSCODE_UI.md`.
 - **`saropa-release-tools`** (Python) — `publish.py` orchestrator, dependency-import gate,
   American-English write-time gate, changelog conventions. All three already converged on these.
+  Plan: `plans/SHARED_INFRA_RELEASE_TOOLS.md`.
+
+All three recommend the same dependency mechanism — a per-repo pinned **git submodule** — so the
+extraction does not introduce two patterns for the same kind of internal shared code. That mechanism
+choice is the one blast-radius decision the extraction needs signed off before any file moves.
 
 ---
 
