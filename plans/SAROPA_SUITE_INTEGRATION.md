@@ -155,7 +155,11 @@ deps, not a monorepo merge):
    table/SQL/fingerprint a static finding does not carry. `suite/suiteAwarenessNudge.ts` (gate in
    `suiteAwarenessGate.ts`) shows a once-per-workspace toast suggesting the Log Capture extension when a
    project dev-depends on `saropa_drift_advisor` but lacks it. Unit-tested in `test/suiteDeepLinks.test.ts`.
-5. **R6** — commit stamping for correlation.
+5. ✅ **R6** — commit stamping for correlation.
+   Landed: `suite/commitSha.ts` resolves the current SHA by reading `.git` directly (HEAD → branch ref →
+   loose or packed SHA, plus detached-HEAD and linked-worktree commondir handling; no git process
+   spawned on the settle tick). `exporter.ts` stamps it onto every diagnostic via the envelope builder's
+   `commitSha` field; omitted outside a git checkout. Unit-tested in `test/suiteCommitSha.test.ts`.
 6. **Shared infra extraction** — see the shared Section above.
 
 ---

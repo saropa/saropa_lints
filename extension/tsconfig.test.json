@@ -98,6 +98,8 @@
     "src/suite/siblingDeepLinkTargets.ts",
     "src/suite/suiteAwarenessGate.ts",
     "src/test/suiteDeepLinks.test.ts",
+    "src/suite/commitSha.ts",
+    "src/test/suiteCommitSha.test.ts",
     "src/suite/crashToRule.ts",
     "src/test/suiteCrashToRule.test.ts",
     "src/healthGrade.ts",

@@ -16,6 +16,7 @@ import { l10n } from '../i18n/runtime';
 import { getRuleCatalog } from '../ruleCatalog';
 import { readLiveViolations } from '../liveViolationsData';
 import { buildLintsEnvelope, writeLintsEnvelope } from './envelope';
+import { resolveCommitSha } from './commitSha';
 
 /**
  * Read the current live findings, build the `source: "lints"` envelope, and write
@@ -24,7 +25,9 @@ import { buildLintsEnvelope, writeLintsEnvelope } from './envelope';
  *
  * The fix-action label is resolved here (not in the pure builder) because §2.4
  * requires every string crossing the tool boundary to be already localized by the
- * producer — Lints owns its own i18n catalog.
+ * producer — Lints owns its own i18n catalog. The commit SHA (R6) is resolved
+ * here too and stamped on every diagnostic so the three tools can align per
+ * commit; it is omitted when `root` is not a git checkout.
  */
 export function exportLintsEnvelope(
   root: string,
@@ -37,6 +40,7 @@ export function exportLintsEnvelope(
     generatedAt,
     fixTitle: l10n('suite.fix.explainRule'),
     catalog: getRuleCatalog(),
+    commitSha: resolveCommitSha(root),
   });
   return writeLintsEnvelope(root, envelope);
 }
