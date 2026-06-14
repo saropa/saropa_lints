@@ -100,8 +100,17 @@ class CommentPatterns {
   /// - Lint ignore and expect directives
   /// - Spell checker directives
   /// - Documentation references
+  // Word boundaries (\b) are required so a marker token only matches as a
+  // standalone word, never as a substring of an identifier. Without them,
+  // `FIX` matched inside `toStringAsFixed`/`prefix`/`suffix`/`fixture` and
+  // `BUG` inside `debugger`, wrongly classifying ordinary code/prose comments
+  // as FIXME-style markers — which both hid genuine commented-out code and
+  // dropped real prose lines from the block-level prose vote in
+  // `prefer_no_commented_out_code`. The colon-suffixed directives keep their
+  // trailing `:` as the right-hand delimiter.
   static final RegExp specialMarkerPattern = RegExp(
-    r'(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK|See:|ignore:|ignore_for_file:|expect_lint:|cspell:)',
+    r'\b(TODO|FIXME|FIX|NOTE|HACK|XXX|BUG|OPTIMIZE|WARNING|CHANGED|REVIEW|DEPRECATED|IMPORTANT|MARK)\b|'
+    r'\b(See|ignore|ignore_for_file|expect_lint|cspell):',
     caseSensitive: false,
   );
 

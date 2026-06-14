@@ -473,6 +473,33 @@ void main() {
       expect(CommentPatterns.isSpecialMarker('This is regular prose'), isFalse);
     });
 
+    // Regression: marker tokens must match only as standalone words, never as
+    // substrings of an identifier. "FIX" inside "toStringAsFixed" previously
+    // misread the line as a marker, dropping it from the prose vote in
+    // prefer_no_commented_out_code and hiding genuine commented-out code.
+    test('should NOT match FIX inside toStringAsFixed', () {
+      expect(
+        CommentPatterns.isSpecialMarker('value.toStringAsFixed(2) call'),
+        isFalse,
+      );
+    });
+
+    test('should NOT match FIX inside prefix/suffix/fixture/affix', () {
+      expect(CommentPatterns.isSpecialMarker('prefix handling'), isFalse);
+      expect(CommentPatterns.isSpecialMarker('the suffix list'), isFalse);
+      expect(CommentPatterns.isSpecialMarker('the fixture is ready'), isFalse);
+      expect(CommentPatterns.isSpecialMarker('affix the label here'), isFalse);
+    });
+
+    test('should NOT match BUG inside debugger', () {
+      expect(CommentPatterns.isSpecialMarker('attach the debugger'), isFalse);
+    });
+
+    test('still detects standalone marker words', () {
+      expect(CommentPatterns.isSpecialMarker('FIX the layout'), isTrue);
+      expect(CommentPatterns.isSpecialMarker('known BUG in parser'), isTrue);
+    });
+
     test('should be case insensitive', () {
       expect(CommentPatterns.isSpecialMarker('todo: fix later'), isTrue);
     });

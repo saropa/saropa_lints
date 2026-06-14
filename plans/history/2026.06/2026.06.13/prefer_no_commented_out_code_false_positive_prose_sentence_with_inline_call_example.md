@@ -1,10 +1,11 @@
 # BUG: `prefer_no_commented_out_code` — fires on a prose sentence that embeds an inline function-call example
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
 Created: 2026-06-13
+Fixed: 2026-06-13
 Rule: `prefer_no_commented_out_code`
 File: `lib/src/rules/stylistic/stylistic_rules.dart` (line ~4592, `_reportBlock`)
 Severity: False positive
@@ -185,13 +186,52 @@ The fixture for `prefer_no_commented_out_code` should include:
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
+The reproducer had **two** root causes, not the one the report originally
+diagnosed. Both were fixed.
+
+1. **Strong-code carve-out re-flagged a prose fragment** (the report's
+   Hypothesis A + B, combined). New `CommentPatterns.isWrappedProseFragment`
+   in [comment_utils.dart](../lib/src/comment_utils.dart) recognizes a wrapped
+   mid-sentence line: it starts with a lowercase continuation word AND either
+   carries 2+ English function words OR has unbalanced parentheses (an opening
+   paren whose close is on a later physical line). `_reportBlock` in
+   [stylistic_rules.dart](../lib/src/rules/stylistic/stylistic_rules.dart#L4592)
+   now skips such a line inside a prose block, so a sentence that merely *cites*
+   a call is not treated as dead code.
+
+2. **Special-marker regex matched `FIX` as a substring.** The first comment
+   line contained `toStringAsFixed`, and the old `specialMarkerPattern` matched
+   `FIX` anywhere, so the line was misread as a FIXME marker and dropped from
+   the block-level prose vote — leaving `blockIsProse == false`, which defeats
+   the carve-out fix above. The pattern now word-bounds every bare-word token
+   (`\b(TODO|FIXME|FIX|...)\b`), so markers match only as standalone words.
+   This also stopped `prefix`/`suffix`/`fixture`/`affix`/`debugger` from being
+   misclassified as markers (a latent defect affecting both rules that use
+   `isSpecialMarker`).
+
+Fix 1 alone did not resolve the reproducer; fix 2 was required because the
+literal `toStringAsFixed` on the lead-in line suppressed the prose signal.
 
 ---
 
 ## Tests Added
 
-<!-- Fill in when a fix is written. -->
+[test/utils/comment_utils_test.dart](../test/utils/comment_utils_test.dart):
+
+- `CommentPatterns.isWrappedProseFragment` group — the reproducer middle line,
+  an unbalanced-paren prose line, and three negative cases (genuine statements
+  and a capitalized sentence start) that must NOT be treated as fragments.
+- `CommentPatterns.isSpecialMarker` — `FIX` not matched inside
+  `toStringAsFixed`/`prefix`/`suffix`/`fixture`/`affix`, `BUG` not matched
+  inside `debugger`, standalone `FIX`/`BUG` still matched.
+
+[example/lib/stylistic/prefer_no_commented_out_code_fixture.dart](../example/lib/stylistic/prefer_no_commented_out_code_fixture.dart):
+two new GOOD blocks (wrapped sentence citing a call mid-sentence; wrapped line
+with a dangling trailing paren) that must NOT trigger.
+
+Verified end-to-end by replicating `_reportBlock`'s decision against the public
+`CommentPatterns` API: the reproducer reports no line, while genuine dead code
+under a prose lead-in (`return cache.get(key);`, `foo.bar();`) still reports.
 
 ---
 
@@ -207,3 +247,103 @@ The fixture for `prefer_no_commented_out_code` should include:
 - Dart SDK version: 3.12.1 (stable)
 - custom_lint version: (transitive via saropa_lints ^13.12.7)
 - Triggering project/file: `saropa_dart_utils/lib/num/num_locale_utils.dart:32`
+
+---
+
+## Finish Report (2026-06-13)
+
+### Scope
+
+Dart analyzer-plugin change only. Touched the shared comment-classification
+helper and the `prefer_no_commented_out_code` reporting loop, plus their tests,
+fixture, and the changelog. No extension, no tier, no rule-registration change.
+
+### What was defective
+
+A wrapped prose comment whose middle physical line cites a function call with
+arguments was reported as commented-out code. The reproducer:
+
+```
+// Clamp to 20: toStringAsFixed throws a RangeError above 20 digits. Without
+// this, formatNumberLocale(x, decimalPlaces: 25) crashed (formatDouble in
+// double_extensions already clamps the same way).
+```
+
+Only the middle line was flagged, despite being mid-sentence English.
+
+Two independent defects combined to produce it. The bug report identified only
+the first; the first fix alone does not resolve the reproducer.
+
+1. **Strong-code carve-out re-flagged a prose fragment.** `_reportBlock` keeps a
+   line flagged inside a prose block when it carries "strong" code indicators (a
+   call with parentheses, an arrow, or braces). A prose sentence fragment that
+   merely names a call (`formatNumberLocale(...)`) satisfies that test and was
+   re-flagged.
+
+2. **`specialMarkerPattern` matched marker words as substrings.** The lead-in
+   line contains `toStringAsFixed`, and the pattern matched `FIX` anywhere, so
+   the line was misread as a FIXME-style marker. Marker lines are excluded from
+   the block-level prose vote, so the only remaining prose-voting line fell
+   below the prose threshold and `blockIsProse` evaluated `false` — which
+   disables the carve-out path entirely, so even a corrected carve-out never
+   runs. The same over-match misclassified `prefix`, `suffix`, `fixture`,
+   `affix`, and `debugger` everywhere, affecting both rules that consume
+   `isSpecialMarker`.
+
+### The fix
+
+In `lib/src/comment_utils.dart`:
+
+- Added `CommentPatterns.isWrappedProseFragment(content)`. It returns true when a
+  line begins with a lowercase continuation word AND either carries two or more
+  English function words or has unbalanced parentheses (an opening paren whose
+  match closes on a later physical line). A genuine one-line statement starts
+  with a keyword/identifier, carries no function words, and is paren-balanced, so
+  it is not matched.
+- Word-bounded the bare-word tokens in `specialMarkerPattern`
+  (`\b(TODO|FIXME|FIX|...)\b`), keeping the colon-suffixed directives
+  (`ignore:`, `expect_lint:`, etc.) anchored by their trailing colon. Marker
+  tokens now match only as whole words.
+
+In `lib/src/rules/stylistic/stylistic_rules.dart`, `_reportBlock` now skips a
+line that `isWrappedProseFragment` recognizes when the surrounding block is
+prose — a secondary veto on the strong-code carve-out. The veto is gated on
+`blockIsProse`, so a genuine commented-out statement under a prose lead-in
+(`return cache.get(key);`, `foo.bar();`) still reports.
+
+### Verification
+
+- `dart test test/utils/comment_utils_test.dart` — 78 pass, including new
+  `isWrappedProseFragment` cases (the reproducer line, an unbalanced-paren prose
+  line, and negative cases for real statements and capitalized sentence starts)
+  and new `isSpecialMarker` cases (`FIX` not matched inside
+  `toStringAsFixed`/`prefix`/`suffix`/`fixture`/`affix`, `BUG` not inside
+  `debugger`, standalone `FIX`/`BUG` still matched).
+- `dart test` of the rule-registration, alias, false-positive, quick-fix, and
+  defensive-coding suites that reference the rule or the changed symbols — all
+  pass; none pinned the changed detection behavior.
+- The rule's per-line decision was reproduced against the public
+  `CommentPatterns` API: the reproducer reports no line; dead code under a prose
+  lead-in still reports; an unbalanced-paren prose line reports nothing.
+- `dart analyze` of the changed source and test files — no issues.
+
+The scan CLI's `--tier` path does not load this rule because it lives in
+`stylisticRules` (opt-in, not in any tier), so verification used the unit-level
+decision replica rather than a tier scan.
+
+### Files changed
+
+- `lib/src/comment_utils.dart` — new `isWrappedProseFragment`; word-bounded
+  `specialMarkerPattern`.
+- `lib/src/rules/stylistic/stylistic_rules.dart` — prose-fragment veto in
+  `_reportBlock`.
+- `test/utils/comment_utils_test.dart` — new test groups for both changes.
+- `example/lib/stylistic/prefer_no_commented_out_code_fixture.dart` — two GOOD
+  blocks (wrapped sentence citing a call; wrapped line with a dangling paren).
+- `CHANGELOG.md` — Fixed entry under `[Unreleased]`.
+
+### Outstanding
+
+None. Both defects are fixed and verified.
+
+Finish report appended: bugs/prefer_no_commented_out_code_false_positive_prose_sentence_with_inline_call_example.md (archived path below).
