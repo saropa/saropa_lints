@@ -1648,12 +1648,15 @@ async function handleNewVersions(
         ...actions,
     );
 
+    // The new-version toast is awareness-only. A one-click "Update All" was
+    // removed deliberately: bulk-pulling every newest version without reviewing
+    // each changelog is a supply-chain attack vector (a freshly-published
+    // malicious release gets adopted across the whole graph in one tap). Users
+    // upgrade per-package from the package screen, where the consolidated
+    // changelog makes each adoption a reviewed decision.
     switch (choice) {
         case 'View Details':
             vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
-            break;
-        case 'Update All':
-            vscode.commands.executeCommand('saropaLints.packageVibrancy.planUpgrades');
             break;
         case 'Dismiss':
             break;

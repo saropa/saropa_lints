@@ -197,6 +197,16 @@ export function formatNotificationMessage(
     return `📦 ${notifications.length} new versions available: ${names}${suffix}${majorNote}${blockedNote}`;
 }
 
+/**
+ * Actions offered on the new-version toast.
+ *
+ * Intentionally awareness-only: there is NO "Update All" action. Offering a
+ * one-click bulk upgrade from an unsolicited toast is a supply-chain risk —
+ * it adopts every newest version (including a freshly-published malicious one)
+ * across the dependency graph without the user reviewing any changelog. Users
+ * open "View Details" and upgrade per-package from the package screen, where
+ * the consolidated changelog makes each adoption a reviewed decision.
+ */
 export function createNotificationActions(): readonly string[] {
-    return ['View Details', 'Update All', 'Dismiss'];
+    return ['View Details', 'Dismiss'];
 }

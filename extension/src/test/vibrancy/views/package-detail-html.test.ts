@@ -155,3 +155,62 @@ describe('Package Detail Panel HTML', () => {
         );
     });
 });
+
+describe('Package Detail Panel — consolidated changelog', () => {
+    function withChangelog(
+        entries: { version: string; date?: string; body: string }[],
+        truncated = false,
+    ): VibrancyResult {
+        const base = makeResult('http');
+        return {
+            ...base,
+            updateInfo: {
+                currentVersion: '1.0.0',
+                latestVersion: '1.2.0',
+                updateStatus: 'minor',
+                changelog: { entries, truncated },
+            },
+        };
+    }
+
+    it('renders parsed changelog entries inline so an upgrade is a reviewed decision', () => {
+        const html = buildPackageDetailHtml(
+            withChangelog([
+                { version: '1.2.0', date: '2025-06-01', body: '- Added a thing' },
+                { version: '1.1.0', body: '- Fixed a bug' },
+            ]),
+            [], null,
+        );
+        assert.ok(html.includes('CHANGELOG'), 'changelog section header should render');
+        assert.ok(html.includes('1.2.0 — 2025-06-01'), 'dated entry heading should render');
+        assert.ok(html.includes('1.1.0'), 'undated entry heading should render');
+        assert.ok(html.includes('Added a thing') && html.includes('Fixed a bug'),
+            'entry bodies should render as markdown');
+    });
+
+    it('escapes HTML in untrusted changelog bodies (no raw script injection)', () => {
+        const html = buildPackageDetailHtml(
+            withChangelog([{ version: '1.2.0', body: '<img src=x onerror=alert(1)>' }]),
+            [], null,
+        );
+        assert.ok(!html.includes('<img src=x onerror=alert(1)>'),
+            'raw HTML from an external changelog must be escaped, not rendered');
+        assert.ok(html.includes('&lt;img'), 'the angle bracket should be escaped');
+    });
+
+    it('shows a truncation note linking to the full changelog when capped', () => {
+        const html = buildPackageDetailHtml(
+            withChangelog([{ version: '1.2.0', body: 'x' }], true),
+            [], null,
+        );
+        assert.ok(html.includes('most recent releases'), 'truncation note should render');
+        assert.ok(html.includes('pub.dev/packages/http/changelog'),
+            'truncation note should link to the full changelog');
+    });
+
+    it('renders nothing when there is no update (no changelog noise on current packages)', () => {
+        const html = buildPackageDetailHtml(makeResult('http'), [], null);
+        assert.ok(!html.includes('CHANGELOG'),
+            'changelog section must be absent when updateInfo is null');
+    });
+});

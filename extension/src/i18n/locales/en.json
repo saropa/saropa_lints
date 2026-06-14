@@ -87,6 +87,7 @@
   "packageDetail": {
     "section": {
       "version": "VERSION",
+      "changelog": "CHANGELOG",
       "community": "COMMUNITY",
       "dependencies": "DEPENDENCIES",
       "alerts": "ALERTS",
@@ -135,6 +136,12 @@
       "onDisk": "On Disk",
       "upgrade": "Upgrade",
       "viewChangelog": "View Changelog"
+    },
+    "changelog": {
+      "intro": "What changed from {from} to {to} — review before upgrading.",
+      "versionDated": "{version} — {date}",
+      "truncated": "Showing the {count} most recent releases.",
+      "viewFull": "View full changelog on pub.dev"
     },
     "community": {
       "stars": "Stars",
