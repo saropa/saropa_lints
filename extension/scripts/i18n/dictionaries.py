@@ -440,6 +440,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
+        # Curated passthrough: two placeholders joined by the preposition "in", which is spelled identically in German; no translatable words remain.
+        "{detail} in {sections}": "{detail} in {sections}",
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "CC {cc}": "CC {cc}",
         "Export": "Export",
@@ -1143,6 +1145,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "fa": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "{label}: {size}": "{label}: {size}",
+        # Curated passthrough: Saropa brand (never translated) + colon + {message} placeholder; nothing translatable remains.
+        "Saropa Lints: {message}": "Saropa Lints: {message}",
         "#": "#",
         # Curated passthrough: bullet glyph + bare {dep} placeholder has no translatable content; the sibling tooltipDepShared carries the only translatable word "(shared)".
         "• {dep}": "• {dep}",
