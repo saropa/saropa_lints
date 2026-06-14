@@ -266,4 +266,4 @@ The rule dartdoc documents both exemptions. Two GOOD fixtures were added after `
 
 ### Out of scope (tracked separately)
 
-The "Secondary finding (suppression placement)" above — a standalone `// ignore:` placed on its own line mid-`ConditionalExpression` is not honored by the headless scanner — is a scanner ignore-line-mapping issue independent of this rule's detection logic. It is captured in `bugs/infra_scan_ignore_comment_mid_ternary_operand_not_honored.md` and is not addressed here.
+The "Secondary finding (suppression placement)" above — a standalone `// ignore:` placed on its own line mid-`ConditionalExpression` is not honored by the headless scanner — is a scanner ignore-line-mapping issue independent of this rule's detection logic. It is captured in `plans/history/2026.06/2026.06.14/infra_scan_ignore_comment_mid_ternary_operand_not_honored.md` (now fixed) and is not addressed by this rule's change.

@@ -890,6 +890,142 @@ C getObj() => C();
           expect(IgnoreUtils.hasIgnoreComment(prop, 'my_rule'), isTrue);
         });
       });
+
+      // Regression for infra_scan_ignore_comment_mid_ternary_operand_not_honored:
+      // a standalone `// ignore:` on its own line between a ternary's operands
+      // attaches to the `?`/`:` operator token, not to the flagged operand. The
+      // node/ancestor walk only probes ancestor beginTokens, so the suppression
+      // was silently dropped for a node reported under a `?`/`:` branch.
+      group('ConditionalExpression operands (ternary branches)', () {
+        // Resolves the `MediaQuery.sizeOf(context).width` PropertyAccess used as
+        // the flagged ternary operand across the cases below.
+        PropertyAccess widthAccess(CompilationUnit unit) =>
+            _findAll<PropertyAccess>(
+              unit,
+            ).firstWhere((p) => p.propertyName.name == 'width');
+
+        test('honors standalone ignore above the else operand', () {
+          final unit = _parseCode('''
+double pick(bool finite, double a) {
+  return finite
+      ? a
+      // ignore: my_rule
+      : MediaQuery.sizeOf(context).width;
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(widthAccess(unit), 'my_rule'),
+            isTrue,
+          );
+        });
+
+        test('honors standalone ignore above the then operand', () {
+          final unit = _parseCode('''
+double pick(bool finite, double a) {
+  return finite
+      // ignore: my_rule
+      ? MediaQuery.sizeOf(context).width
+      : a;
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(widthAccess(unit), 'my_rule'),
+            isTrue,
+          );
+        });
+
+        test('honors hyphenated standalone ignore above the else operand', () {
+          final unit = _parseCode('''
+double pick(bool finite, double a) {
+  return finite
+      ? a
+      // ignore: my-rule
+      : MediaQuery.sizeOf(context).width;
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(widthAccess(unit), 'my_rule'),
+            isTrue,
+          );
+        });
+
+        test('still honors a trailing ignore on the operand line', () {
+          // Regression guard: the trailing same-line form already worked via
+          // the trailing-comment checks; this fix must not break it.
+          final unit = _parseCode('''
+double pick(bool finite, double a) {
+  return finite
+      ? a
+      : MediaQuery.sizeOf(context).width; // ignore: my_rule
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(widthAccess(unit), 'my_rule'),
+            isTrue,
+          );
+        });
+
+        test('honors standalone ignore above a parenthesized else operand', () {
+          // Unwrapping parens: the comment hangs off `:`, the flagged node
+          // starts after `(`, so offsets differ — the unwrap branch must match.
+          final unit = _parseCode('''
+double pick(bool finite, double a) {
+  return finite
+      ? a
+      // ignore: my_rule
+      : (MediaQuery.sizeOf(context).width);
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(widthAccess(unit), 'my_rule'),
+            isTrue,
+          );
+        });
+
+        test('does NOT leak an else-operand ignore onto the then operand', () {
+          // Placement must stay precise: an ignore above the `:` branch must not
+          // suppress a diagnostic reported on the `?` branch.
+          final unit = _parseCode('''
+double pick(bool finite, double a) {
+  return finite
+      ? MediaQuery.sizeOf(context).width
+      // ignore: my_rule
+      : a;
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(widthAccess(unit), 'my_rule'),
+            isFalse,
+          );
+        });
+
+        test('does NOT suppress for an unrelated rule name', () {
+          final unit = _parseCode('''
+double pick(bool finite, double a) {
+  return finite
+      ? a
+      // ignore: other_rule
+      : MediaQuery.sizeOf(context).width;
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(widthAccess(unit), 'my_rule'),
+            isFalse,
+          );
+        });
+
+        test('does NOT suppress with no ignore comment (control)', () {
+          final unit = _parseCode('''
+double pick(bool finite, double a) {
+  return finite ? a : MediaQuery.sizeOf(context).width;
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(widthAccess(unit), 'my_rule'),
+            isFalse,
+          );
+        });
+      });
     });
   });
 }
