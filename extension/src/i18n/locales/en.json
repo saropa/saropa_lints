@@ -1,4 +1,21 @@
 {
+  "stylistic": {
+    "title": "Style & opinions",
+    "intro": "Opinionated style rules, off by default. Turn on only what your team agrees to. Conflicting choices are grouped so you pick one.",
+    "searchPlaceholder": "Search style rules…",
+    "pickOne": "Choose one",
+    "none": "None",
+    "enableAll": "Enable all",
+    "disableAll": "Disable all",
+    "noMatch": "No style rules match."
+  },
+  "packs": {
+    "forYourProject": "For your project",
+    "forYourProjectHint": "Packs whose dependency or SDK matches your pubspec. These rules apply to code you actually ship.",
+    "noneDetected": "No packs match your dependencies yet. Add a supported package, or open All packages below.",
+    "allPackages": "All packages",
+    "allPackagesHint": "Every available pack, including ones not detected in this project. Enable a pack to opt into its rules."
+  },
   "consolidated": {
     "kicker": "Security · Quality",
     "searchPlaceholder": "Filter rules…",
@@ -17,7 +34,11 @@
     "gradeGood": "Good",
     "gradeFair": "Fair",
     "gradeWeak": "Weak",
-    "gradeSevere": "Severe"
+    "gradeSevere": "Severe",
+    "evidence": {
+      "advisor": "Advisor confirms at runtime",
+      "logCapture": "Log Capture saw {count}"
+    }
   },
   "configSuggestions": {
     "badgeTooltip": "Saropa Lints — {count} config suggestion(s)",
@@ -1402,6 +1423,10 @@
     "openFinding": {
       "noWorkspace": "Open a workspace folder to open a finding.",
       "notFound": "Could not open {file}."
+    },
+    "crashNudge": {
+      "message": "Log Capture saw a crash {count} time(s) that rule {ruleId} would have caught. The rule is currently disabled.",
+      "enable": "Enable rule"
     }
   }
 }

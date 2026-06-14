@@ -57,6 +57,7 @@ import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
 import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
 import { registerSuiteCommands } from './suite/commands';
+import { maybeNudgeCrashCoveredRule } from './suite/crashCoverageNudge';
 import { exportLintsEnvelope } from './suite/exporter';
 import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
 import { maybeShowStartupSuggestion } from './rulePacks/startupSuggestionNudge';
@@ -986,6 +987,24 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // R4: contribute the suite's deep-link command ids (enableRule, openFinding) as
   // Lints' public integration surface for sibling envelope `fix.command`s.
   registerSuiteCommands(context, getProjectRoot);
+
+  // R3: crash-to-rule attribution. When Log Capture records a runtime crash whose
+  // preventing Lints rule is disabled, offer a once-only "enable rule X" toast.
+  // Fire on activation and whenever Log Capture rewrites its crash mirror; the
+  // nudge gates per-rule in globalState so a re-written mirror never re-nags.
+  {
+    const nudgeCrashCoverage = () => {
+      const root = getProjectRoot();
+      if (root) void maybeNudgeCrashCoveredRule(context, root);
+    };
+    nudgeCrashCoverage();
+    const crashMirrorWatcher = vscode.workspace.createFileSystemWatcher(
+      '**/.saropa/diagnostics/log-capture.json',
+    );
+    crashMirrorWatcher.onDidChange(nudgeCrashCoverage);
+    crashMirrorWatcher.onDidCreate(nudgeCrashCoverage);
+    context.subscriptions.push(crashMirrorWatcher);
+  }
 
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.enable', async () => {
