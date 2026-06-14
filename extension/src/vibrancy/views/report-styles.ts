@@ -86,9 +86,14 @@ export function getReportStyles(): string {
             color: var(--vscode-foreground);
             font-size: 0.95em;
         }
-        .status-line .pill.good { color: var(--vscode-testing-iconPassed); }
-        .status-line .pill.bad  { color: var(--vscode-editorError-foreground); }
-        .status-line .pill.warn { color: var(--vscode-editorWarning-foreground); }
+        /* Status pills mix the semantic hue toward the editor foreground so the
+         * text clears WCAG AA on the tinted pill background while staying clearly
+         * green / red / amber. The mix auto-adapts: it lightens on dark themes
+         * and darkens on light ones. Amber needs the heaviest lift (it is the
+         * brightest hue and fails worst on light backgrounds). */
+        .status-line .pill.good { color: color-mix(in srgb, var(--vscode-testing-iconPassed) 58%, var(--vscode-foreground)); }
+        .status-line .pill.bad  { color: color-mix(in srgb, var(--vscode-editorError-foreground) 44%, var(--vscode-foreground)); }
+        .status-line .pill.warn { color: color-mix(in srgb, var(--vscode-editorWarning-foreground) 55%, var(--vscode-foreground)); }
         /* Full-width toggle (guideline §4) — flips body[data-full-width]. */
         .full-width-toggle {
             flex: 0 0 auto;
@@ -177,8 +182,10 @@ export function getReportStyles(): string {
         .grade-breakdown-title { font-weight: 600; flex: 1; min-width: 0; }
         .grade-breakdown-hint {
             font-size: 0.85em;
-            color: var(--vscode-descriptionForeground);
-            opacity: 0.7;
+            /* The 0.7 opacity on muted text dropped this to ~2.5:1 — well under
+             * AA. Drop the opacity and lift the color toward foreground; the
+             * smaller size still reads as a secondary hint. */
+            color: color-mix(in srgb, var(--vscode-foreground) 70%, var(--vscode-descriptionForeground));
         }
         .grade-breakdown[open] > .grade-breakdown-summary .grade-breakdown-hint {
             visibility: hidden;
@@ -220,8 +227,9 @@ export function getReportStyles(): string {
         }
         .breakdown-dist-pct {
             font-variant-numeric: tabular-nums;
+            /* descriptionForeground alone clears AA on the body background; the
+               0.7 opacity that previously dimmed it pushed it under. */
             color: var(--vscode-descriptionForeground);
-            opacity: 0.7;
             min-width: 38px;
             text-align: end;
         }
@@ -311,7 +319,7 @@ export function getReportStyles(): string {
          * Now: 0.95em body for readability, descriptionForeground token for muted
          * labels (theme-aware, WCAG-correct), and h4 at full opacity since opacity
          * stacks against the card background instead of pairing cleanly. */
-        .detail-section h4 {
+        .detail-section h3 {
             margin: 0 0 6px; font-size: 0.95em; font-weight: 600;
             color: var(--vscode-foreground);
             border-bottom: 1px solid var(--vscode-widget-border);
@@ -362,7 +370,10 @@ export function getReportStyles(): string {
         .summary-card .count { font-size: 1.8em; font-weight: bold; }
         /* Summary-card label: was 0.85em + opacity 0.8 — small and washed-out.
          * descriptionForeground gives proper muted contrast in any theme. */
-        .summary-card .label { font-size: 0.9em; color: var(--vscode-descriptionForeground); min-height: 18px; }
+        /* Card labels sit on a tinted card, where plain descriptionForeground
+         * dips just under WCAG AA (~4.0:1). Mix toward foreground so the small
+         * label clears AA while staying lighter than the hero number above it. */
+        .summary-card .label { font-size: 0.9em; color: color-mix(in srgb, var(--vscode-foreground) 72%, var(--vscode-descriptionForeground)); min-height: 18px; }
         .summary-card[data-filter],
         .summary-card[data-breakdown-trigger] {
             cursor: pointer; transition: box-shadow 0.2s, background 0.2s;
@@ -602,7 +613,10 @@ export function getReportStyles(): string {
             background: var(--vscode-editor-inactiveSelectionBackground);
         }
         .footprint-toggle .toggle-label {
-            font-size: 0.75em; opacity: 0.7;
+            /* Was foreground @0.7 opacity (~4.2:1). A muted color mixed toward
+               foreground reads as a label and clears AA on the toggle band. */
+            font-size: 0.75em;
+            color: color-mix(in srgb, var(--vscode-foreground) 72%, var(--vscode-descriptionForeground));
             margin-inline-end: 4px;
             padding-inline-start: 4px;
             text-transform: uppercase;
@@ -617,7 +631,9 @@ export function getReportStyles(): string {
             cursor: pointer;
             font-size: 0.85em;
             white-space: nowrap;
-            opacity: 0.6;
+            /* Inactive footprint options read as dimmed but must still clear AA;
+               0.6 left them at ~3.3:1. 0.8 keeps the dim look above the bar. */
+            opacity: 0.8;
             transition: opacity 0.12s, background 0.12s;
         }
         .toggle-btn:hover { opacity: 1; }
@@ -776,7 +792,10 @@ export function getReportStyles(): string {
         /* ---- Badges ---- */
         .badge-unused {
             background: var(--vscode-editorWarning-foreground);
-            color: var(--vscode-editor-background);
+            /* Amber is a light color in every theme, so editor-background text
+               (white on light themes) failed AA. Fixed dark text reads on amber
+               in both themes — the same rationale as the score pill. */
+            color: #1f1f1f;
             padding: 2px 6px; border-radius: 3px; font-size: 0.85em;
         }
         .badge-dev {

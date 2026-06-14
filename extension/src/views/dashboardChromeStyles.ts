@@ -165,9 +165,12 @@ function chromeHeroAndGauge(): string {
   color: var(--vscode-foreground);
   font-size: 0.92em;
 }
-.status-line .pill.good { color: var(--status-good); }
-.status-line .pill.bad  { color: var(--status-bad); }
-.status-line .pill.warn { color: var(--accent-warning); }
+/* Small status-pill text mixes the semantic hue toward foreground for WCAG AA
+ * on the tinted pill background. The --status/--accent tokens stay vivid for the
+ * large KPI hero numbers (which meet the 3:1 large-text threshold as-is). */
+.status-line .pill.good { color: color-mix(in srgb, var(--status-good) 58%, var(--vscode-foreground)); }
+.status-line .pill.bad  { color: color-mix(in srgb, var(--status-bad) 44%, var(--vscode-foreground)); }
+.status-line .pill.warn { color: color-mix(in srgb, var(--accent-warning) 55%, var(--vscode-foreground)); }
 .help-icon {
   flex: 0 0 auto;
   width: 24px; height: 24px;
@@ -368,7 +371,9 @@ function chromeToolbarAndButtons(): string {
 }
 .seg .seg-label {
   padding: 0 8px 0 6px;
-  color: var(--muted);
+  /* Lift off plain --muted (which dips under AA on the seg band) toward
+     foreground; uppercase + letter-spacing keep it reading as a label. */
+  color: color-mix(in srgb, var(--vscode-foreground) 72%, var(--muted));
   font-size: 0.85em;
   text-transform: uppercase;
   letter-spacing: 0.4px;

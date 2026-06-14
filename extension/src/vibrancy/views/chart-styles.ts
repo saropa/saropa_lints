@@ -31,8 +31,9 @@ export function getChartStyles(): string {
         .chart-caption {
             margin: 4px 0 8px;
             font-size: 0.85em;
+            /* descriptionForeground clears AA on its own; the 0.85 opacity that
+               dimmed it dropped it under (~3.6:1). */
             color: var(--vscode-descriptionForeground);
-            opacity: 0.85;
         }
         .chart-section h2 {
             font-size: 1.1em;
