@@ -28,7 +28,19 @@ The editor-area dashboard webviews shipped without an automated way to catch vis
 ### l10n
 New source keys added to `extension/src/i18n/locales/en.json`: `packageDashboard.detailPane.{aria,title,close}`, `a11y.copyRow`, `a11y.comparisonDimension`. Translated locale catalogs are now stale for these (and for the larger concurrent additions under `stylistic`/`packs`/`consolidated`). Regeneration runs the machine-translation pipeline (`generate_translations.py`, NLLB) — not executed here; it requires its own authorization. The `languagePick` coverage test correctly flags the staleness and clears once catalogs are regenerated.
 
-### Open items (not regressions, deliberately deferred)
-- **Contrast cluster** — muted-label and semantic-color-as-text axe findings; a shared design-token recolor decision, intentionally not made here.
-- **Dead code** — `buildDetailCard` and its file/vuln/deps/links sub-builders in `report-html.ts` are unused after the inline card's retirement (`buildDetailScoreSection` is the only one revived for the pane). Left for a focused deletion pass to avoid a large interconnected removal alongside the consolidation.
-- **Unrelated build blocker** — the two `rulePacksWebviewProvider.ts` type errors block `npm run compile` until the owning change lands; not introduced here.
+### Open items
+All deferred items from the initial pass were subsequently closed — see the follow-on record below.
+
+## Follow-on (2026-06-14): contrast remediation, dead-code removal, build-memory fix
+
+### Contrast cluster resolved
+The dashboard webviews carried text below the WCAG AA minimum on light, dark, and high-contrast themes: semantic foregrounds (green/amber/red/blue) used as small text on tinted backgrounds, muted card/seg labels, the amber "Unused" badge (white on amber), and footprint/filter toggles dimmed by `opacity`. The fix mixes each semantic hue toward `--vscode-foreground` via `color-mix` — which auto-adapts per theme (lightens on dark, darkens on light) and preserves the hue — tuned per color (red needs the heaviest lift on the dark pill, amber on light). The mix is applied only to small text; the large KPI numbers, grade-letter badges, and charts keep full saturation, so the dashboards stay vivid. Muted labels are lifted toward foreground and the opacity that dimmed the footprint buttons, chart caption, and breakdown percentages is removed. The amber "Unused" badge uses fixed dark text (amber is light in every theme, so `editor-background` text failed on light). The Health Score section heading moved from `h4` to `h3` so the pane heading order (`h2` → `h3`) does not skip a level. Verified by the Playwright/axe harness: 0 color-contrast and 0 heading-order violations across every page × light/dark/high-contrast × narrow/wide, with 0 horizontal overflow. Touches `report-styles.ts`, `comparison-html.ts`, `chart-styles.ts`, `report-html.ts`, `dashboardChromeStyles.ts`, `violationsDashboardStyles.ts`.
+
+### Dead inline detail-card builders removed
+After single-package detail moved into the docked pane, `buildDetailCard` and its `buildDetailVulnSection` / `buildDetailFilesSection` / `buildDetailDepsSection` / `buildDetailLinksSection` builders were no longer called (only a comment referenced `buildDetailCard`). Removing them (~180 lines) drops dead weight from the webview bundle. `buildDetailScoreSection` is retained — the pane renders it; `buildDormancyStatus`, `activeFileUsages`, and `severityLabel` remain in use elsewhere. The harness graph compiles and 149 `report-html.test.ts` cases pass; rendering is unchanged because the removed code never executed.
+
+### Type-check memory fix
+The full-project `tsc --noEmit` exhausted the default Node heap and crashed (`Zone Allocation failed - process out of memory`) on this codebase. The `check-types`, `lint`, `watch:tsc`, and `test` scripts now invoke `tsc` through `node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc`, raising the heap ceiling cross-platform without a new dependency. `npm run check-types` passes clean afterward (`compile` and `package` call it, so both are covered).
+
+### Build blocker (formerly listed) cleared
+The two `rulePacksWebviewProvider.ts` type errors that previously blocked `npm run compile` were resolved by the owning workstream (the referenced `_handleToggleRule` / `_handleSelectStylistic` methods are now defined). The full type-check passes with 0 errors.
