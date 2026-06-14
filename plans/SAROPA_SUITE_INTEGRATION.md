@@ -139,7 +139,14 @@ deps, not a monorepo merge):
    `saropaLints.explainRule` / `enableRule` / `openFinding` with a `{ ruleId }` arg). The consolidated
    dashboard (`views/consolidated/`) badges a rule row "Advisor confirms at runtime" / "Log Capture saw
    N" from that evidence; unit-tested in `test/suiteSiblingEnvelopes.test.ts`.
-3. **R3** — crash-to-rule attribution (the novel feature).
+3. ✅ **R3** — crash-to-rule attribution (the novel feature).
+   Landed: `suite/crashToRule.ts` holds the frozen crash-family signature set (mirrored from Log
+   Capture's `crash-signature.ts`) and the signature → preventing-rule(s) map, with a tolerant reader
+   for `.saropa/diagnostics/log-capture.json` (`category === "crash"`, `crash:` prefix stripped).
+   `suite/crashCoverageNudge.ts` surfaces a once-per-rule "enable rule X" toast (gated in `globalState`)
+   when an observed crash family's mapped rule is disabled, firing on activation and on the crash
+   mirror changing. Unit-tested in `test/suiteCrashToRule.test.ts`, which pins the signature set and
+   cross-checks every mapped rule id against the bundled rule catalog.
 4. **R5 + R7** — outbound deep-links and Package Vibrancy nudge.
 5. **R6** — commit stamping for correlation.
 6. **Shared infra extraction** — see the shared Section above.
