@@ -599,6 +599,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
+        # Curated passthrough: two placeholders joined by the preposition "in", which is spelled identically in Italian; no translatable words remain.
+        "{detail} in {sections}": "{detail} in {sections}",
         "Search": "Cerca",
         "Saropa Lints UI language": "Lingua interfaccia Saropa Lints",
         "Choose language for sidebar and dashboards": "Scegli la lingua per barra laterale e dashboard",
@@ -1024,6 +1026,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{total} transitive deps": "{total} ट्रांज़िटिव डिपेंडेंसी",
         "{total} transitive deps ({shared} shared)": "{total} ट्रांज़िटिव डिपेंडेंसी ({shared} साझा)",
         "{label}: {size}": "{label}: {size}",
+        # Curated passthrough: brand name ("Saropa Lints", never translated) plus a {message} placeholder leaves no translatable words; English is the correct rendering.
+        "Saropa Lints: {message}": "Saropa Lints: {message}",
         "Search": "खोज",
         "Saropa Lints UI language": "Saropa Lints UI भाषा",
         "Choose language for sidebar and dashboards": "साइडबार और डैशबोर्ड के लिए भाषा चुनें",

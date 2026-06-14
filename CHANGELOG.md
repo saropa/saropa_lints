@@ -62,9 +62,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+---
 
-Hardens the release pipeline so a missing dependency can no longer reach pub.dev, and teaches the Package Vibrancy dashboard to name the real package behind a stuck upgrade when two dependencies fight over a shared transitive dependency. Also lays the foundation for the Saropa suite: the extension now exports its findings to a shared file the Drift Advisor and Log Capture extensions can read, and contributes stable deep-link commands so those tools can jump into a rule. Replaces the catch-all "Mixed packages" rule pack with one focused pack per package (OpenAI, uuid, Envied, Google Fonts, and others) so you can enable just the rules for packages you actually use, and reworks the rule-packs dashboard — renamed **Manage Rule Packs** — with an A–Z table, an inline rule list, a one-click "Enable all recommended packs" action, and the noisy Suggestions sidebar removed. The only action required is for projects that enabled the old `package_specific` pack (see Changed). Polishes the extension dashboards too, so their filters can be driven from the keyboard and their colors follow your editor theme under light and high-contrast modes.
+## [14.0.0]
+
+Hardens the release pipeline so a missing dependency can no longer reach pub.dev, and teaches the Package Vibrancy dashboard to name the real package behind a stuck upgrade when two dependencies fight over a shared transitive dependency. Also lays the foundation for the Saropa suite: the extension now exports its findings to a shared file the Drift Advisor and Log Capture extensions can read, and contributes stable deep-link commands so those tools can jump into a rule. Replaces the catch-all "Mixed packages" rule pack with one focused pack per package (OpenAI, uuid, Envied, Google Fonts, and others) so you can enable just the rules for packages you actually use, and reworks the rule-packs dashboard — renamed **Manage Rule Packs** — with an A–Z table, an inline rule list, a one-click "Enable all recommended packs" action, and the noisy Suggestions sidebar removed. The only action required is for projects that enabled the old `package_specific` pack (see Changed). Polishes the extension dashboards too, so their filters can be driven from the keyboard and their colors follow your editor theme under light and high-contrast modes. [log](https://github.com/saropa/saropa_lints/blob/v14.0.0/CHANGELOG.md)
 
 ### Added
 
@@ -177,6 +179,7 @@ Hardens the release pipeline so a missing dependency can no longer reach pub.dev
 
 <details><summary>Maintenance</summary>
 
+- **The publish analyze step no longer loops forever on the package's own mid-publish plugin-version error.** When `saropa_lints` dogfoods itself, `dart analyze` reports the plugin dependency as a constraint (`^14.0.0`) while `pubspec.yaml` holds the bare version (`14.0.0`); the mid-publish guard compared the two with string equality, so the caret made it fall through to the interactive [F]/[S] "fix stale cache" prompt — which can never resolve because the package's own `analysis_options.yaml` has no plugin `version:` pin to edit, so it cleared the cache, retried, and re-prompted indefinitely. The guard now strips the leading constraint operator before comparing, so the benign mid-publish state is recognized and analyze is treated as passed. Dev-only.
 - **The empty-body stub-test guard no longer fails on a deliberately skipped placeholder.** A `test(..., () {}, skip: '...')` documents an un-runnable case (e.g. a Flutter-gated rule the Flutter-less example package cannot exercise) and never executes, so its empty body cannot silently pass — yet the hard zero gate counted it and turned the guard, CI, and the publish audit red. The scanner now excludes any `test`/`testWidgets` carrying a `skip:` argument; a genuine `() {}` stub with no `skip:` is still rejected. Dev-only.
 - **Regression test pins the Package Vibrancy published-age math against `device_calendar 4.3.3`.** The whole-month age helper is now exported and accepts an injectable reference date, so a fixed-`now` test asserts the calendar-month, day-of-month-rollback, UTC-neutrality, and clamp behaviors that the old days/365 calculation got wrong. No production behavior change.
 - **New publish audit gate: every package imported by shipped code must be a declared dependency.** The release audit (STEP 1, before any tag is pushed) now scans `lib/` and `bin/` for real import/export directives and fails if an imported package is absent from pubspec `dependencies`. This catches the class of defect that sank v13.12.6 and v13.12.7 (a `meta` import with no `meta` dependency): `lib/**` is in `analyzer.exclude` for plugin dogfooding, so no `dart analyze` run inspects these imports, and `dart pub publish` only rejected them on the post-tag CI job — after the tag was burned. The gate is deterministic and Dart-version-independent, and ignores `package:` URIs that appear inside rule detection patterns or DartDoc examples.
@@ -186,6 +189,8 @@ Hardens the release pipeline so a missing dependency can no longer reach pub.dev
 - **Publish no longer crashes after the tag is pushed when the release workflow runs long.** The `gh run watch` step had a hard 5-minute timeout with no handler, so a longer publish workflow raised an uncaught timeout after the version tag was already created. It now waits up to 10 minutes (aligned with run discovery) and, on timeout, prints the Actions monitor URL instead of crashing.
 - **The dependency-import publish gate no longer false-blocks on a commented `dependencies:` header.** A `dependencies: # comment` line was not recognized, so the parser saw zero declared dependencies and reported every shipped import as undeclared. The header now tolerates a trailing comment.
 - **`get_latest_changelog_version` only matches real headings.** The version lookup was unanchored and could match a version token in prose or a code fence; it now requires a line-leading `##` heading, consistent with the changelog display path.
+- **The `[Unreleased]` publish matchers now only match real headings too.** `has_unreleased_section` and `rename_unreleased_to_version` used an unanchored regex, so a release note that quotes `## [Unreleased]` inside a backtick code-span was read as a leftover Unreleased section after the heading had already been renamed — making the publish step raise "both [Unreleased] and [version] exist" and silently bump to the next patch. Both now anchor to a line-leading heading. Dev-only.
+- **The publish prompt now offers a pre-written CHANGELOG release version instead of the stale pubspec patch.** The default version was derived only from `pubspec.yaml` plus whether an `## [Unreleased]` section exists, so hand-writing a release section that consumed the `[Unreleased]` heading (e.g. a `## [14.0.0]` major bump) left the prompt suggesting the old pubspec value. It now takes the higher of the pubspec-derived default and the latest `## [X.Y.Z]` heading. Dev-only.
 - **Project Health size scan stays memory-flat on large projects and ignores a UTF-8 BOM.** The NDJSON writer is now flushed with backpressure as the scan streams rows (its buffer no longer grows with file count), and a leading byte-order mark is stripped before line counting so a BOM-prefixed first line is not miscounted as code.
 - **New resolved-analyzer rule-test harness.** `test/support/resolved_rule_harness.dart` runs a single lint rule against inline source with full type/element resolution and returns the diagnostics it reports, so a rule's detection can be asserted to fire on a violation and stay silent on compliant code. Previously the rule tests only pinned metadata and counted `expect_lint` strings, so detection false positives/negatives shipped unverified. Dev-only; used by the new async/parse/gating regression tests.
 - **The British-English spelling guard now only scans files inside the repo.** The PostToolUse hook fired on edits to files outside the repository (e.g. a global editor config), flagging unrelated content — including reference tables that legitimately list British spellings — as violations. It now skips any path that does not resolve under the repo root; the git pre-commit path and all in-repo edits are unaffected. Dev-only.
@@ -195,51 +200,13 @@ Hardens the release pipeline so a missing dependency can no longer reach pub.dev
 - **Interactive translation menu previews the gap state first and reads cleaner.** An interactive launch of `generate_locales.py` now runs the read-only audit before the mode menu so the choice is informed by what is actually missing, adds blank lines around the menu (the block was crushed against the preceding output), and states the Enter default in the prompt (`default 1`). Dev-only.
 - **Ctrl-C on the translation generator now stops promptly instead of finishing the whole in-flight locale.** The cooperative-cancel flag was honored by the prefetch loop but not by the per-leaf mapping pass, so after a stop request the generator silently made live NLLB/Google calls for every remaining string in the current locale before exiting; the shared single-string path now also short-circuits on cancel, serving already-cached work and leaving the rest as a gap the next run resumes. Dev-only.
 - **Closed the last two extension translation gaps by hand.** The German dependency-sort detail (`{detail} in {sections}`) and the Persian command-notification brand prefix (`Saropa Lints: {message}`) came back identical to English from the MT pass — German "in" is spelled the same and the Persian string is brand-plus-placeholder with no translatable words — so each now has a curated dictionary passthrough, bringing every active locale back to full coverage. Dev-only.
+- **Closed the Italian and Hindi translation gaps by hand.** The Italian dependency-sort detail (`{detail} in {sections}`) and the Hindi command-notification brand prefix (`Saropa Lints: {message}`) returned identical to English from the MT pass — Italian "in" is spelled the same and the Hindi string is brand-plus-placeholder with no translatable words — so each now has a curated dictionary passthrough, keeping the coverage gate honest. Dev-only.
+- **Bumped the extension build's `esbuild` devDependency to 0.28.1 to clear GHSA-gv7w-rqvm-qjhr.** The advisory's RCE only affects esbuild's Deno install path via a malicious `NPM_CONFIG_REGISTRY`; the extension bundles through the Node path (which already verifies binary hashes) and esbuild never ships to users, so there was no runtime exposure. Dev-only.
+- **Resolved the `shell-quote` critical advisory (GHSA-w7jw-789q-3m8p) in the extension's dev dependency tree.** A transitive dev-only dependency was bumped via `npm audit fix`; it is build/test tooling and never ships to users. Two remaining low-severity `diff`-via-`mocha` advisories have no non-prerelease fix and stay until mocha 12 is stable. Dev-only.
 
 </details>
 
-## [13.12.7]
-
-Sharpens roughly thirty leak, disposal, security, and package rules so they stop flagging code that is already correct, ahead of grading some of them as build-breaking errors. Resources cleaned up in a helper or handed to a caller, controllers owned by a parent widget, encrypted SharedPreferences keys, and Drift queries that do carry a `where` are no longer reported. Names are matched on whole-word and resolved-type boundaries instead of substrings, so `pin` no longer matches `shopping` and `ui.ImageFilter` is no longer mistaken for a disposable image. No action required.
-
-### Added
-
-- **New opt-in rule `prefer_us_english_spelling`.** Flags British spellings in comments and prose string literals so a project can standardize on American English, sharing the same word list as the package's own spelling audit. It is in the stylistic (opt-in) set and off by default — enable it in `analysis_options.yaml`; there is no quick fix yet.
-
-### Changed
-
-- **`require_platform_channel_cleanup` upgraded from warning to error.** After interprocedural cleanup tracking plus an AST-based setup check (a string literal that merely mentions `setMethodCallHandler` no longer triggers it), a MethodChannel/EventChannel handler left active past `dispose()` — which fires callbacks on an unmounted widget and crashes with a setState error — now fails `dart analyze`. `require_websocket_close` and the per-method resource rules (`require_file_close_in_finally`, `require_http_client_close`, `require_native_resource_cleanup`) were re-evaluated and stay warnings: each can still false-positive on cleanup that escapes the analyzable class (a parent-owned socket, or a handle passed to a function in another file), which is acceptable for a warning but not for a build-breaking error.
-- **Ten high-confidence rules upgraded from warning to error.** After per-rule false-positive hardening, these rules now fail `dart analyze` instead of warning, because each fires only on a genuinely broken shape (a leak with no cleanup anywhere, a Drift `delete`/`update` with no `where`, a missing iOS permission verified against the actual `Info.plist`, a non-JSON-encodable `toJson` value, a sub-333ms seizure-risk flash): `avoid_websocket_memory_leak`, `require_dispose_implementation`, `prefer_dispose_before_new_instance`, `avoid_stream_subscription_in_field`, `avoid_not_encodable_in_to_json`, `avoid_drift_update_without_where`, `require_ios_permission_description`, `require_ios_face_id_usage_description`, `avoid_flashing_content`, `avoid_path_traversal`. If one fires on your code, it has found a real defect — fix it, or downgrade the single rule in your `analysis_options.yaml` if your project is the exception.
-
-### Changed (Extension)
-
-- **The Findings dashboard "Updated" stamp is now a live, clickable refresh.** Its status-line pill re-ticks its own age (`just now` → `5m ago`) and re-reads the analyzer's current findings when clicked or activated by keyboard, so a dashboard left open in a background tab no longer shows a frozen `just now` from its last paint. No action required.
-
-### Removed
-
-- **`prefer_returning_shorthands` removed — it duplicated `prefer_arrow_functions`.** Both flagged a block body holding a single `return`, so the stylistic tier double-reported on the same line; the convert-to-`=>` quick fix moved onto `prefer_arrow_functions` (which additionally covers lambdas). If you enabled the rule by name in `analysis_options.yaml`, switch to `prefer_arrow_functions`.
-
-### Fixed
-
-- **Five resource-cleanup rules now follow cleanup into helper methods.** A close/free/teardown performed in a method that the owner delegates to (`dispose()` → `_teardown()` → `_channel.sink.close()`, or `save()` → `_writeAndClose(sink)`) is recognized instead of flagged, via new interprocedural (cross-method) cleanup tracking that walks same-class method calls: `require_websocket_close`, `require_platform_channel_cleanup`, `require_file_close_in_finally`, `require_http_client_close`, `require_native_resource_cleanup`. This also makes them catch a real leak the previous "any private call counts as cleanup" heuristic wrongly suppressed.
-- **`require_websocket_close` skips parent-supplied sockets.** A `WebSocketChannel`/`WebSocket` field assigned from `widget.*` (owned and closed by the parent) is no longer flagged for a missing local close.
-- **Seven resource-cleanup rules no longer false-positive on ownership transfer.** `require_file_close_in_finally`, `require_http_client_close`, `require_native_resource_cleanup`, and `require_database_close` now skip a resource assigned to a field or returned to the caller (closed elsewhere), `require_native_resource_cleanup` recognizes `Arena`/`using` auto-free scopes and no longer demands a `free()` on a borrowed `Pointer.fromAddress`, and `require_platform_channel_cleanup`/`require_isolate_kill`/`require_websocket_close` recognize teardown delegated to a helper and ignore matching text in string literals. `require_platform_channel_cleanup` also no longer re-flags a class that cleans up via `removeMethodCallHandler`.
-- **Disposal and lifecycle rules respect ownership.** `avoid_websocket_memory_leak`, `require_stream_subscription_cancel`, `require_dispose_implementation`, and `require_field_dispose` now skip resources supplied by a parent (`widget.controller`) and recognize cleanup performed in any method, not just `dispose()`; `prefer_dispose_before_new_instance` no longer flags an assignment guarded by a null check.
-- **Name and type matching tightened across security and storage rules.** Key matching in `prefer_encrypted_prefs`/`avoid_auth_state_in_prefs` is now whole-word (`pin` no longer matches `shopping`, `spinner`, `mapping`), `require_secure_storage` skips objects that are not actually `SharedPreferences`, `avoid_deprecated_crypto_algorithms` no longer treats the `des` abbreviation (description) as DES, and `require_secure_password_field` inspects `obscureText` as a literal rather than matching nested children.
-- **Memory and path rules use resolved types and word boundaries.** `require_image_disposal` matches exactly `ui.Image` (not `ui.ImageFilter`/`Provider`/`Descriptor`), `avoid_expando_circular_references` requires a real `Expando` and a whole-token key, and `avoid_path_traversal`/`require_file_path_sanitization` match the tainting parameter as a whole identifier.
-- **Drift, WebView, and animation detection narrowed to real sinks.** `avoid_drift_update_without_where` walks the query's own receiver chain so an unrelated `.write()`/`.go()` no longer trips it and a query carrying `where` is cleared; `prefer_html_escape` targets only the HTML argument of a WebView sink; `avoid_flashing_content` requires a literal `repeat(reverse: true)` with a sub-333ms duration.
-- **`prefer_no_commented_out_code` no longer flags wrapped prose.** A prose comment whose final wrapped line is a single word ending a sentence (`// result.`), or a line that names an API method mid-sentence (`// base64Url.decode rejects the token.`), is no longer mistaken for commented-out code. The rule now judges each contiguous `//` run as one block rather than line by line, so the surrounding prose is taken into account; a genuine commented-out statement sitting under a prose comment is still flagged. No action required.
-
-### Fixed (Extension)
-
-- **The "Review" button on the rule-pack suggestion notification now opens the Config Dashboard.** Clicking Review previously tried to focus a sidebar tree, which produced no visible change when that view was hidden or collapsed (or its sidebar was already open) and surfaced no error — so the button appeared dead. It now opens the rule-pack Config Dashboard in an editor tab, where each applicable pack can be reviewed and toggled, and any failure is shown instead of swallowed. No action required.
-- **Dashboard labels stranded in English are now localized in six languages.** The review status "not applicable", the Persian "version" section header, the French links heading, and the documentation quality badge now render in the active display language for German, Spanish, Persian, Bengali, Filipino, and French instead of showing English; acronyms and cognates that are correct as-is (WASM, PR, Repository) are kept English on purpose. No action required.
-
-<details><summary>Maintenance</summary>
-
-- **Declared `meta` as a direct dependency.** Eight rule files import `package:meta/meta.dart`; `dart pub publish` errors (exit 65) when an imported package is not in `dependencies`, which blocked the pub.dev release. Constraint is `^1.18.0` to stay compatible with Flutter stable's exact 1.18.0 meta pin (a higher floor would make the package unresolvable for Flutter consumers).
-
-</details>
+---
 
 ## [13.13.0]
 
@@ -321,6 +288,53 @@ Adds crash, performance, and contract rules for seventeen more packages, each ac
 
 </details>
 
+---
+
+## [13.12.7]
+
+Sharpens roughly thirty leak, disposal, security, and package rules so they stop flagging code that is already correct, ahead of grading some of them as build-breaking errors. Resources cleaned up in a helper or handed to a caller, controllers owned by a parent widget, encrypted SharedPreferences keys, and Drift queries that do carry a `where` are no longer reported. Names are matched on whole-word and resolved-type boundaries instead of substrings, so `pin` no longer matches `shopping` and `ui.ImageFilter` is no longer mistaken for a disposable image. No action required.
+
+### Added
+
+- **New opt-in rule `prefer_us_english_spelling`.** Flags British spellings in comments and prose string literals so a project can standardize on American English, sharing the same word list as the package's own spelling audit. It is in the stylistic (opt-in) set and off by default — enable it in `analysis_options.yaml`; there is no quick fix yet.
+
+### Changed
+
+- **`require_platform_channel_cleanup` upgraded from warning to error.** After interprocedural cleanup tracking plus an AST-based setup check (a string literal that merely mentions `setMethodCallHandler` no longer triggers it), a MethodChannel/EventChannel handler left active past `dispose()` — which fires callbacks on an unmounted widget and crashes with a setState error — now fails `dart analyze`. `require_websocket_close` and the per-method resource rules (`require_file_close_in_finally`, `require_http_client_close`, `require_native_resource_cleanup`) were re-evaluated and stay warnings: each can still false-positive on cleanup that escapes the analyzable class (a parent-owned socket, or a handle passed to a function in another file), which is acceptable for a warning but not for a build-breaking error.
+- **Ten high-confidence rules upgraded from warning to error.** After per-rule false-positive hardening, these rules now fail `dart analyze` instead of warning, because each fires only on a genuinely broken shape (a leak with no cleanup anywhere, a Drift `delete`/`update` with no `where`, a missing iOS permission verified against the actual `Info.plist`, a non-JSON-encodable `toJson` value, a sub-333ms seizure-risk flash): `avoid_websocket_memory_leak`, `require_dispose_implementation`, `prefer_dispose_before_new_instance`, `avoid_stream_subscription_in_field`, `avoid_not_encodable_in_to_json`, `avoid_drift_update_without_where`, `require_ios_permission_description`, `require_ios_face_id_usage_description`, `avoid_flashing_content`, `avoid_path_traversal`. If one fires on your code, it has found a real defect — fix it, or downgrade the single rule in your `analysis_options.yaml` if your project is the exception.
+
+### Changed (Extension)
+
+- **The Findings dashboard "Updated" stamp is now a live, clickable refresh.** Its status-line pill re-ticks its own age (`just now` → `5m ago`) and re-reads the analyzer's current findings when clicked or activated by keyboard, so a dashboard left open in a background tab no longer shows a frozen `just now` from its last paint. No action required.
+
+### Removed
+
+- **`prefer_returning_shorthands` removed — it duplicated `prefer_arrow_functions`.** Both flagged a block body holding a single `return`, so the stylistic tier double-reported on the same line; the convert-to-`=>` quick fix moved onto `prefer_arrow_functions` (which additionally covers lambdas). If you enabled the rule by name in `analysis_options.yaml`, switch to `prefer_arrow_functions`.
+
+### Fixed
+
+- **Five resource-cleanup rules now follow cleanup into helper methods.** A close/free/teardown performed in a method that the owner delegates to (`dispose()` → `_teardown()` → `_channel.sink.close()`, or `save()` → `_writeAndClose(sink)`) is recognized instead of flagged, via new interprocedural (cross-method) cleanup tracking that walks same-class method calls: `require_websocket_close`, `require_platform_channel_cleanup`, `require_file_close_in_finally`, `require_http_client_close`, `require_native_resource_cleanup`. This also makes them catch a real leak the previous "any private call counts as cleanup" heuristic wrongly suppressed.
+- **`require_websocket_close` skips parent-supplied sockets.** A `WebSocketChannel`/`WebSocket` field assigned from `widget.*` (owned and closed by the parent) is no longer flagged for a missing local close.
+- **Seven resource-cleanup rules no longer false-positive on ownership transfer.** `require_file_close_in_finally`, `require_http_client_close`, `require_native_resource_cleanup`, and `require_database_close` now skip a resource assigned to a field or returned to the caller (closed elsewhere), `require_native_resource_cleanup` recognizes `Arena`/`using` auto-free scopes and no longer demands a `free()` on a borrowed `Pointer.fromAddress`, and `require_platform_channel_cleanup`/`require_isolate_kill`/`require_websocket_close` recognize teardown delegated to a helper and ignore matching text in string literals. `require_platform_channel_cleanup` also no longer re-flags a class that cleans up via `removeMethodCallHandler`.
+- **Disposal and lifecycle rules respect ownership.** `avoid_websocket_memory_leak`, `require_stream_subscription_cancel`, `require_dispose_implementation`, and `require_field_dispose` now skip resources supplied by a parent (`widget.controller`) and recognize cleanup performed in any method, not just `dispose()`; `prefer_dispose_before_new_instance` no longer flags an assignment guarded by a null check.
+- **Name and type matching tightened across security and storage rules.** Key matching in `prefer_encrypted_prefs`/`avoid_auth_state_in_prefs` is now whole-word (`pin` no longer matches `shopping`, `spinner`, `mapping`), `require_secure_storage` skips objects that are not actually `SharedPreferences`, `avoid_deprecated_crypto_algorithms` no longer treats the `des` abbreviation (description) as DES, and `require_secure_password_field` inspects `obscureText` as a literal rather than matching nested children.
+- **Memory and path rules use resolved types and word boundaries.** `require_image_disposal` matches exactly `ui.Image` (not `ui.ImageFilter`/`Provider`/`Descriptor`), `avoid_expando_circular_references` requires a real `Expando` and a whole-token key, and `avoid_path_traversal`/`require_file_path_sanitization` match the tainting parameter as a whole identifier.
+- **Drift, WebView, and animation detection narrowed to real sinks.** `avoid_drift_update_without_where` walks the query's own receiver chain so an unrelated `.write()`/`.go()` no longer trips it and a query carrying `where` is cleared; `prefer_html_escape` targets only the HTML argument of a WebView sink; `avoid_flashing_content` requires a literal `repeat(reverse: true)` with a sub-333ms duration.
+- **`prefer_no_commented_out_code` no longer flags wrapped prose.** A prose comment whose final wrapped line is a single word ending a sentence (`// result.`), or a line that names an API method mid-sentence (`// base64Url.decode rejects the token.`), is no longer mistaken for commented-out code. The rule now judges each contiguous `//` run as one block rather than line by line, so the surrounding prose is taken into account; a genuine commented-out statement sitting under a prose comment is still flagged. No action required.
+
+### Fixed (Extension)
+
+- **The "Review" button on the rule-pack suggestion notification now opens the Config Dashboard.** Clicking Review previously tried to focus a sidebar tree, which produced no visible change when that view was hidden or collapsed (or its sidebar was already open) and surfaced no error — so the button appeared dead. It now opens the rule-pack Config Dashboard in an editor tab, where each applicable pack can be reviewed and toggled, and any failure is shown instead of swallowed. No action required.
+- **Dashboard labels stranded in English are now localized in six languages.** The review status "not applicable", the Persian "version" section header, the French links heading, and the documentation quality badge now render in the active display language for German, Spanish, Persian, Bengali, Filipino, and French instead of showing English; acronyms and cognates that are correct as-is (WASM, PR, Repository) are kept English on purpose. No action required.
+
+<details><summary>Maintenance</summary>
+
+- **Declared `meta` as a direct dependency.** Eight rule files import `package:meta/meta.dart`; `dart pub publish` errors (exit 65) when an imported package is not in `dependencies`, which blocked the pub.dev release. Constraint is `^1.18.0` to stay compatible with Flutter stable's exact 1.18.0 meta pin (a higher floor would make the package unresolvable for Flutter consumers).
+
+</details>
+
+---
+
 ## [13.12.5]
 
 Adds one-click quick fixes for eight more lint rules, so common simplifications can be applied straight from the IDE lightbulb instead of by hand. An if/else (or if plus a following return) that returns `true` in one branch and `false` in the other collapses to a direct return of the condition, a nested `if` with no else on either level merges into a single combined condition, an explicit null-check-then-call becomes the null-aware `?.` form, and a class that holds only static members is marked `abstract final` so it can no longer be instantiated. Redundant arguments and a redundant nullable `?` are now removable in one click too. A severity recalibration moves 46 rules that flag preferences, performance, robustness gaps, or deployment-config issues (not broken or crashing code) from error down to warning, so they no longer fail a strict build; rules that mark genuine compile errors, runtime crashes, data corruption, or security holes keep error severity. No action required. [log](https://github.com/saropa/saropa_lints/blob/v13.12.5/CHANGELOG.md)
@@ -363,6 +377,8 @@ Adds one-click quick fixes for eight more lint rules, so common simplifications 
 - Closed two locale-catalog gaps the MT run left identical to English: the Bengali Package Dashboard "downloads in the last 30 days" cell now reads in Bengali, and the Persian bullet-only `• {dep}` string is registered as a curated dictionary passthrough so the coverage gate stops flagging a punctuation-plus-placeholder string that has no translatable content. Locale catalog only; no rule or runtime change.
 
 </details>
+
+---
 
 ## [13.12.4]
 
@@ -415,6 +431,8 @@ Clears a wide round of false positives across the string, exception-handling, as
 
 </details>
 
+---
+
 ## [13.12.3]
 
 Adds a family of compound performance rules that flag GPU-expensive widgets only when a parent makes their cost recur every frame or every scrolled item, leaving intentional one-off use alone, plus a Project Map panel that ranks features by rendering risk before you profile. Also clears a broad round of false positives across the async-context, logging, disposal, date-formatting, enum-map, environment-mixing, parameter-mutation, and error-widget rules, so patterns that previously forced project-local ignores now pass cleanly. No action required unless you added an ignore for one of these patterns. [log](https://github.com/saropa/saropa_lints/blob/v13.12.3/CHANGELOG.md)
@@ -451,6 +469,8 @@ Adds a family of compound performance rules that flag GPU-expensive widgets only
 
 </details>
 
+---
+
 ## [13.12.2]
 
 Fixes a `nullify_after_dispose` false positive that flagged `dispose()`/`cancel()`/`close()` calls on local variables, a `prefer_single_setstate` false positive that flagged `setState` calls sitting in mutually-exclusive branches, an `avoid_equal_expressions` false positive that flagged arithmetic with identical operands such as `1024 * 1024`, and an `avoid_variable_shadowing` false positive that flagged a name legitimately reused in disjoint sibling scopes (two collection-`for` loops in separate literals, or the same local in two separate `switch` cases). No action required unless you added a project-local ignore for these patterns. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
@@ -461,6 +481,8 @@ Fixes a `nullify_after_dispose` false positive that flagged `dispose()`/`cancel(
 - **`nullify_after_dispose` no longer flags a disposable local variable.** The rule targets nullable instance fields, but it treated any disposed `SimpleIdentifier` as a non-final nullable field, so disposing a method-local (such as a `final ui.Codec`) was falsely reported even though a local cannot be nulled and needs none. It now confirms the target is a declared field of the enclosing class before reporting. Genuine nullable fields disposed without nullification still flag. No action required.
 - **`prefer_single_setstate` no longer flags `setState` calls in mutually-exclusive branches or across an `await`.** The rule counted every `setState` in a method body together, so calls in separate `if`/`else` arms, distinct `switch` cases, a `try` body versus its `catch`, or on opposite sides of an `await` (the `setState(busy=true); await …; setState(busy=false)` loading-state idiom) were reported as mergeable even though they can never run together in one synchronous pass. It now treats each branch as its own scope and an `await` as a segment boundary, flagging only when two or more `setState` calls share one synchronous straight-line path. Genuine sequential `setState` calls still flag. No action required.
 - **`avoid_equal_expressions` no longer flags arithmetic with identical operands.** The matcher previously fired on any binary expression whose left and right source text matched, sweeping in legitimate constant math like `1024 * 1024`, `60 * 60`, `x * x`, and `1 << 1`. It now restricts the identical-operand check to comparison (`==`, `<`, `>`, `<=`, `>=`) and logical (`&&`, `||`) operators, where two identical sides always produce a constant or redundant result. Genuine copy-paste bugs (`a == a`, `w > w`, `flag && flag`) still flag. No action required.
+
+---
 
 ## [13.12.1]
 
@@ -482,6 +504,8 @@ Fixes two `prefer_value_listenable_builder` false positives: one on `State` clas
 - Fixed the publish audit's "Rules by Severity" table, which had been counting zero for every rule since the impact taxonomy collapsed because it still keyed on the retired `critical`/`high`/`medium`/`low` value set instead of `error`/`warning`/`info`.
 
 </details>
+
+---
 
 ## [13.12.0]
 

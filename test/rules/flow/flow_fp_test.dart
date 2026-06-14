@@ -17,9 +17,10 @@ void main() {
     // regardless of whether it was one of the documented read*/write* sync I/O
     // calls. `SystemEncoding.decode` (the `systemEncoding` const in dart:io) is
     // named `decode` but is NOT a documented throwing I/O call.
-    test('does NOT flag systemEncoding.decode (dart:io, not a read/write)',
-        () async {
-      const code = '''
+    test(
+      'does NOT flag systemEncoding.decode (dart:io, not a read/write)',
+      () async {
+        const code = '''
 import 'dart:io';
 
 void main() {
@@ -28,24 +29,26 @@ void main() {
   print(s);
 }
 ''';
-      final codes = await reportedRuleCodes(
-        HandleThrowingInvocationsRule(),
-        code,
-      );
-      expect(
-        codes.contains('handle_throwing_invocations'),
-        isFalse,
-        reason:
-            'systemEncoding.decode is a dart:io element named `decode` but is '
-            'not a documented read/write throwing call; the catch-all OR must '
-            'not flag it.',
-      );
-    });
+        final codes = await reportedRuleCodes(
+          HandleThrowingInvocationsRule(),
+          code,
+        );
+        expect(
+          codes.contains('handle_throwing_invocations'),
+          isFalse,
+          reason:
+              'systemEncoding.decode is a dart:io element named `decode` but is '
+              'not a documented read/write throwing call; the catch-all OR must '
+              'not flag it.',
+        );
+      },
+    );
 
     // The documented positive cases must still fire after collapsing the OR.
-    test('still flags File.readAsStringSync (documented dart:io thrower)',
-        () async {
-      const code = '''
+    test(
+      'still flags File.readAsStringSync (documented dart:io thrower)',
+      () async {
+        const code = '''
 import 'dart:io';
 
 void main() {
@@ -53,12 +56,13 @@ void main() {
   print(s);
 }
 ''';
-      final codes = await reportedRuleCodes(
-        HandleThrowingInvocationsRule(),
-        code,
-      );
-      expect(codes.contains('handle_throwing_invocations'), isTrue);
-    });
+        final codes = await reportedRuleCodes(
+          HandleThrowingInvocationsRule(),
+          code,
+        );
+        expect(codes.contains('handle_throwing_invocations'), isTrue);
+      },
+    );
 
     test('still flags int.parse (documented dart:core thrower)', () async {
       const code = '''
@@ -133,9 +137,10 @@ void main() {
       expect(codes.contains('avoid_conditions_with_boolean_literals'), isTrue);
     });
 
-    test('does NOT flag a const-bool identifier toggle (only literals fire)',
-        () async {
-      const code = '''
+    test(
+      'does NOT flag a const-bool identifier toggle (only literals fire)',
+      () async {
+        const code = '''
 void main() {
   const bool enabled = false;
   final bool other = DateTime.now().isUtc;
@@ -144,16 +149,20 @@ void main() {
   }
 }
 ''';
-      final codes = await reportedRuleCodes(
-        AvoidConditionsWithBooleanLiteralsRule(),
-        code,
-      );
-      // The rule only fires when an operand is a literal `true`/`false` token,
-      // NOT a const identifier that holds a boolean. The flagged
-      // `const enabled = false; if (enabled || other)` example therefore never
-      // fires — additional evidence the rule is already narrow and the
-      // intentional-toggle concern is a non-issue.
-      expect(codes.contains('avoid_conditions_with_boolean_literals'), isFalse);
-    });
+        final codes = await reportedRuleCodes(
+          AvoidConditionsWithBooleanLiteralsRule(),
+          code,
+        );
+        // The rule only fires when an operand is a literal `true`/`false` token,
+        // NOT a const identifier that holds a boolean. The flagged
+        // `const enabled = false; if (enabled || other)` example therefore never
+        // fires — additional evidence the rule is already narrow and the
+        // intentional-toggle concern is a non-issue.
+        expect(
+          codes.contains('avoid_conditions_with_boolean_literals'),
+          isFalse,
+        );
+      },
+    );
   });
 }

@@ -131,9 +131,11 @@ class MyState extends State<MyWidget> {
   // unrelated type in a plain Flutter `State` must not be flagged.
   // --------------------------------------------------------------------------
   group('avoid_ref_in_dispose', () {
-    test('flags Riverpod WidgetRef invocation in dispose (true positive)', () async {
-      final code =
-          '''
+    test(
+      'flags Riverpod WidgetRef invocation in dispose (true positive)',
+      () async {
+        final code =
+            '''
 $_disposeStubs
 class MyState extends ConsumerState<MyWidget> {
   @override
@@ -143,13 +145,16 @@ class MyState extends ConsumerState<MyWidget> {
   }
 }
 ''';
-      final codes = await reportedRuleCodes(AvoidRefInDisposeRule(), code);
-      expect(codes, contains('avoid_ref_in_dispose'));
-    });
+        final codes = await reportedRuleCodes(AvoidRefInDisposeRule(), code);
+        expect(codes, contains('avoid_ref_in_dispose'));
+      },
+    );
 
-    test('does NOT flag unrelated ref field in plain State.dispose (FP)', () async {
-      final code =
-          '''
+    test(
+      'does NOT flag unrelated ref field in plain State.dispose (FP)',
+      () async {
+        final code =
+            '''
 $_disposeStubs
 class MyState extends State<MyWidget> {
   final OtherRef ref = OtherRef();
@@ -166,9 +171,10 @@ class MyState extends State<MyWidget> {
   }
 }
 ''';
-      final codes = await reportedRuleCodes(AvoidRefInDisposeRule(), code);
-      expect(codes, isNot(contains('avoid_ref_in_dispose')));
-    });
+        final codes = await reportedRuleCodes(AvoidRefInDisposeRule(), code);
+        expect(codes, isNot(contains('avoid_ref_in_dispose')));
+      },
+    );
   });
 
   // --------------------------------------------------------------------------
@@ -202,12 +208,14 @@ class WidgetRef {
       expect(codes, contains('avoid_nullable_async_value_pattern'));
     });
 
-    test('does NOT flag .value on a non-AsyncValue named with async (FP)', () async {
-      // `asyncThing` is a PlainAsyncThing (NOT AsyncValue). Its name contains
-      // "async" and the old prefix heuristic flagged it. The `ref.watch(` marker
-      // opens the provider gate.
-      final code =
-          '''
+    test(
+      'does NOT flag .value on a non-AsyncValue named with async (FP)',
+      () async {
+        // `asyncThing` is a PlainAsyncThing (NOT AsyncValue). Its name contains
+        // "async" and the old prefix heuristic flagged it. The `ref.watch(` marker
+        // opens the provider gate.
+        final code =
+            '''
 $_asyncStubs
 int? read(WidgetRef ref) {
   ref.watch(0);
@@ -219,11 +227,12 @@ class WidgetRef {
   T watch<T>(Object provider) => throw 0;
 }
 ''';
-      final codes = await reportedRuleCodes(
-        AvoidNullableAsyncValuePatternRule(),
-        code,
-      );
-      expect(codes, isNot(contains('avoid_nullable_async_value_pattern')));
-    });
+        final codes = await reportedRuleCodes(
+          AvoidNullableAsyncValuePatternRule(),
+          code,
+        );
+        expect(codes, isNot(contains('avoid_nullable_async_value_pattern')));
+      },
+    );
   });
 }

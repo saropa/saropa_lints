@@ -3106,10 +3106,7 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
   /// camelCase boundaries (e.g. `_isHovered` -> {is, hovered}).
   static Iterable<String> _identifierSegments(String name) {
     return name
-        .replaceAllMapped(
-          RegExp('([a-z0-9])([A-Z])'),
-          (m) => '${m[1]}_${m[2]}',
-        )
+        .replaceAllMapped(RegExp('([a-z0-9])([A-Z])'), (m) => '${m[1]}_${m[2]}')
         .toLowerCase()
         .split('_')
         .where((s) => s.isNotEmpty);

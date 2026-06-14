@@ -22,9 +22,10 @@ import '../../support/resolved_rule_harness.dart';
 
 void main() {
   group('prefer_cached_getter', () {
-    test('does NOT flag a plain field read twice (synthetic getter, free)',
-        () async {
-      final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
+    test(
+      'does NOT flag a plain field read twice (synthetic getter, free)',
+      () async {
+        final codes = await reportedRuleCodes(PreferCachedGetterRule(), '''
 class Holder {
   final int count = 0;
 }
@@ -39,8 +40,9 @@ class C {
   }
 }
 ''');
-      expect(codes, isNot(contains('prefer_cached_getter')));
-    });
+        expect(codes, isNot(contains('prefer_cached_getter')));
+      },
+    );
 
     test('does NOT flag a plain field read twice via PropertyAccess', () async {
       // `(this.holder).count` parses as a PropertyAccess (not PrefixedIdentifier),
@@ -90,8 +92,9 @@ class C {
 
   group('avoid_string_concatenation_loop', () {
     test('does NOT flag numeric += on a result-named var in a loop', () async {
-      final codes =
-          await reportedRuleCodes(AvoidStringConcatenationLoopRule(), '''
+      final codes = await reportedRuleCodes(
+        AvoidStringConcatenationLoopRule(),
+        '''
 int sum(List<int> items) {
   var result = 0; // name matches the old heuristic but type is int
   for (final n in items) {
@@ -99,13 +102,15 @@ int sum(List<int> items) {
   }
   return result;
 }
-''');
+''',
+      );
       expect(codes, isNot(contains('avoid_string_concatenation_loop')));
     });
 
     test('does NOT flag numeric += on a total var in a loop', () async {
-      final codes =
-          await reportedRuleCodes(AvoidStringConcatenationLoopRule(), '''
+      final codes = await reportedRuleCodes(
+        AvoidStringConcatenationLoopRule(),
+        '''
 int run(List<int> items) {
   var message = 0; // 'message' matches old heuristic; type is int
   for (final n in items) {
@@ -113,13 +118,15 @@ int run(List<int> items) {
   }
   return message;
 }
-''');
+''',
+      );
       expect(codes, isNot(contains('avoid_string_concatenation_loop')));
     });
 
     test('STILL flags genuine String += in a loop', () async {
-      final codes =
-          await reportedRuleCodes(AvoidStringConcatenationLoopRule(), '''
+      final codes = await reportedRuleCodes(
+        AvoidStringConcatenationLoopRule(),
+        '''
 String build(List<String> items) {
   var result = '';
   for (final s in items) {
@@ -127,7 +134,8 @@ String build(List<String> items) {
   }
   return result;
 }
-''');
+''',
+      );
       expect(codes, contains('avoid_string_concatenation_loop'));
     });
   });

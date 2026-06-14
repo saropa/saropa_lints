@@ -394,9 +394,22 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
         final String name = arg.name.label.name;
 
         // `javascriptMode: JavascriptMode.unrestricted` enables scripting.
-        // Inspect the enum value's source, not a substring of the whole arg.
+        // Read the enum value's trailing identifier and compare it exactly
+        // rather than scanning the arg source. `.toSource().contains(...)` is
+        // this package's #1 false-positive source (and is blocked by the
+        // anti-pattern integrity test), and a substring scan would also match
+        // an unrelated identifier that merely embeds "unrestricted".
         if (name == 'javascriptMode') {
-          if (arg.expression.toSource().contains('unrestricted')) {
+          final Expression value = arg.expression;
+          String? valueName;
+          if (value is PrefixedIdentifier) {
+            valueName = value.identifier.name;
+          } else if (value is PropertyAccess) {
+            valueName = value.propertyName.name;
+          } else if (value is SimpleIdentifier) {
+            valueName = value.name;
+          }
+          if (valueName == 'unrestricted') {
             reporter.atNode(arg);
             return;
           }

@@ -181,14 +181,15 @@ class _S extends State<Widget> {
   });
 
   group('require_animation_status_listener', () {
-    test('FP: this._c.forward() with this._c.addStatusListener stays silent',
-        () async {
-      // Same controller element, different source spellings (`_c` vs
-      // `this._c`). Source-string keying treats them as two controllers and
-      // wrongly fires.
-      final codes = await reportedRuleCodes(
-        RequireAnimationStatusListenerRule(),
-        '''
+    test(
+      'FP: this._c.forward() with this._c.addStatusListener stays silent',
+      () async {
+        // Same controller element, different source spellings (`_c` vs
+        // `this._c`). Source-string keying treats them as two controllers and
+        // wrongly fires.
+        final codes = await reportedRuleCodes(
+          RequireAnimationStatusListenerRule(),
+          '''
 $_stubs
 class _S extends State<Widget> {
   AnimationController _c = AnimationController();
@@ -199,13 +200,14 @@ class _S extends State<Widget> {
   }
 }
 ''',
-      );
-      expect(
-        codes,
-        isNot(contains('require_animation_status_listener')),
-        reason: 'Listener and forward target the SAME controller element.',
-      );
-    });
+        );
+        expect(
+          codes,
+          isNot(contains('require_animation_status_listener')),
+          reason: 'Listener and forward target the SAME controller element.',
+        );
+      },
+    );
 
     test('BAD: forward() with no status listener fires', () async {
       final codes = await reportedRuleCodes(
@@ -247,17 +249,14 @@ class _S extends State<Widget> {
     test('FP: animate(parent: CurvedAnimation(...)) stays silent', () async {
       // CurvedAnimation is passed as a NAMED `parent:` arg, so its arg source
       // does not start/end with "CurvedAnimation" — old check fires wrongly.
-      final codes = await reportedRuleCodes(
-        RequireAnimationCurveRule(),
-        '''
+      final codes = await reportedRuleCodes(RequireAnimationCurveRule(), '''
 $_stubs
 Animation<double> build(AnimationController c) {
   return Tween<double>(begin: 0, end: 1).animate(
     CurvedAnimation(parent: c, curve: Curves.easeIn),
   );
 }
-''',
-      );
+''');
       expect(
         codes,
         isNot(contains('require_animation_curve')),
@@ -266,28 +265,26 @@ Animation<double> build(AnimationController c) {
     });
 
     test('BAD: Tween.animate(controller) without curve fires', () async {
-      final codes = await reportedRuleCodes(
-        RequireAnimationCurveRule(),
-        '''
+      final codes = await reportedRuleCodes(RequireAnimationCurveRule(), '''
 $_stubs
 Animation<double> build(AnimationController c) {
   return Tween<double>(begin: 0, end: 1).animate(c);
 }
-''',
-      );
+''');
       expect(codes, contains('require_animation_curve'));
     });
   });
 
   group('avoid_excessive_rebuilds_animation', () {
-    test('FP: non-Animation .value read does not suppress the warning',
-        () async {
-      // The builder has >5 static widgets. A `data.value` read where `data`
-      // is NOT an Animation must not be treated as an animation-value read
-      // (which would mark the wrapping widget hoistable and drop the count).
-      final codes = await reportedRuleCodes(
-        AvoidExcessiveRebuildsAnimationRule(),
-        '''
+    test(
+      'FP: non-Animation .value read does not suppress the warning',
+      () async {
+        // The builder has >5 static widgets. A `data.value` read where `data`
+        // is NOT an Animation must not be treated as an animation-value read
+        // (which would mark the wrapping widget hoistable and drop the count).
+        final codes = await reportedRuleCodes(
+          AvoidExcessiveRebuildsAnimationRule(),
+          '''
 $_stubs
 class Holder {
   int get value => 0;
@@ -307,13 +304,14 @@ Widget build(Animation<double> anim, Holder data) {
   );
 }
 ''',
-      );
-      expect(
-        codes,
-        contains('avoid_excessive_rebuilds_animation'),
-        reason: 'A non-Animation .value must not suppress the count.',
-      );
-    });
+        );
+        expect(
+          codes,
+          contains('avoid_excessive_rebuilds_animation'),
+          reason: 'A non-Animation .value must not suppress the count.',
+        );
+      },
+    );
 
     test('GOOD: genuine animation .value read keeps suppressing', () async {
       // The animated leaf reads anim.value; the wrapping widgets are required
@@ -348,15 +346,16 @@ Widget build(Animation<double> anim) {
     // symbols and does not conflict with the local stubs.
     const String flutterImport = "import 'package:flutter/widgets.dart';";
 
-    test('FP: user class literally named AnimatedContainer stays silent',
-        () async {
-      // A user class named `AnimatedContainer` resolves to THIS library, not
-      // package:flutter — so it must not count as the real animated widget.
-      // (BAD-fires for the genuine Flutter type is out of scope for this
-      // Flutter-less oracle; the resolved library guard handles it.)
-      final codes = await reportedRuleCodes(
-        AvoidClipDuringAnimationRule(),
-        '''
+    test(
+      'FP: user class literally named AnimatedContainer stays silent',
+      () async {
+        // A user class named `AnimatedContainer` resolves to THIS library, not
+        // package:flutter — so it must not count as the real animated widget.
+        // (BAD-fires for the genuine Flutter type is out of scope for this
+        // Flutter-less oracle; the resolved library guard handles it.)
+        final codes = await reportedRuleCodes(
+          AvoidClipDuringAnimationRule(),
+          '''
 $flutterImport
 $_stubs
 class AnimatedContainer extends Widget {
@@ -368,22 +367,22 @@ Widget build() {
   );
 }
 ''',
-      );
-      expect(
-        codes,
-        isNot(contains('avoid_clip_during_animation')),
-        reason: 'A non-flutter user type must not count as animated ancestor.',
-      );
-    });
+        );
+        expect(
+          codes,
+          isNot(contains('avoid_clip_during_animation')),
+          reason:
+              'A non-flutter user type must not count as animated ancestor.',
+        );
+      },
+    );
 
     test('FP: clip in a non-child argument stays silent', () async {
       // The clip sits in a `leading:` argument, not the animated widget's
       // rendered `child:`/`children:` subtree. Both new guards (resolved
       // library + child-subtree) independently keep this silent; verified here
       // as a regression pin against the token-only walk firing on any nesting.
-      final codes = await reportedRuleCodes(
-        AvoidClipDuringAnimationRule(),
-        '''
+      final codes = await reportedRuleCodes(AvoidClipDuringAnimationRule(), '''
 $flutterImport
 $_stubs
 class AnimatedSize extends Widget {
@@ -396,8 +395,7 @@ Widget build() {
     child: Text('body'),
   );
 }
-''',
-      );
+''');
       expect(
         codes,
         isNot(contains('avoid_clip_during_animation')),

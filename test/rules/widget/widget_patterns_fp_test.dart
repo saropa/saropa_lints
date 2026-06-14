@@ -45,7 +45,8 @@ class BuildContext {}
     // FP repro: a keyless STATELESS widget returned from itemBuilder must NOT
     // fire — the rule's own GOOD example is a stateless tile.
     test('FP: keyless StatelessWidget in itemBuilder stays silent', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Tile extends StatelessWidget { const Tile(); }
 class Home extends StatelessWidget {
@@ -61,7 +62,8 @@ class Home extends StatelessWidget {
 
     // BAD: a keyless StatefulWidget returned from itemBuilder still fires.
     test('BAD: keyless StatefulWidget in itemBuilder fires', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Counter extends StatefulWidget { const Counter(); }
 class Home extends StatelessWidget {
@@ -77,7 +79,8 @@ class Home extends StatelessWidget {
 
     // GOOD: a StatefulWidget WITH a key stays silent.
     test('GOOD: keyed StatefulWidget in itemBuilder stays silent', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Counter extends StatefulWidget { const Counter({Key? key, this.id}); final Object? id; }
 class Home extends StatelessWidget {
@@ -105,7 +108,8 @@ class Home extends StatelessWidget {
     // FP repro: distinct key TYPES with the same inner string are NOT
     // duplicates (Key('x') != ValueKey('x')).
     test('FP: different key types with same value do not collide', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Key2 { Key2(Object value); }
 class ValueKey2 { ValueKey2(Object value); }
@@ -126,7 +130,8 @@ class Home extends StatelessWidget {
 
     // BAD: SAME key type with the SAME value collides.
     test('BAD: same key type and value collide', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Key2 { Key2(Object value); }
 class Item extends StatelessWidget { const Item({Object? key}); }
@@ -146,7 +151,8 @@ class Home extends StatelessWidget {
 
     // GOOD: same key type with DIFFERENT values stays silent.
     test('GOOD: same key type different values stays silent', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Key2 { Key2(Object value); }
 class Item extends StatelessWidget { const Item({Object? key}); }
@@ -176,7 +182,8 @@ class Home extends StatelessWidget {
     // FP repro: an InkWell separated from an ancestor InkWell by a ListView
     // (a new hit-test boundary) must NOT be flagged.
     test('FP: nesting across an intervening ListView stays silent', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class InkWell extends StatelessWidget { const InkWell({Object? onTap, Object? child}); }
 class ListView extends StatelessWidget { const ListView({Object? children}); }
@@ -200,7 +207,8 @@ class Home extends StatelessWidget {
 
     // BAD: a GestureDetector directly nested inside a GestureDetector fires.
     test('BAD: directly nested GestureDetector fires', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class GestureDetector extends StatelessWidget { const GestureDetector({Object? onTap, Object? child}); }
 class Home extends StatelessWidget {
@@ -231,7 +239,8 @@ class Home extends StatelessWidget {
     // (no color) so ONLY the dismiss-callback path could trigger — isolating
     // the substring bug from the separate barrier-detection trigger.
     test('FP: populate/closest substrings do not trigger', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class GestureDetector extends StatelessWidget { const GestureDetector({Object? onTap, Object? child}); }
 class Home extends StatelessWidget {
@@ -253,7 +262,8 @@ class Home extends StatelessWidget {
     // BAD: a real Navigator.pop dismiss (non-barrier child) fires via the
     // dismiss-callback path — proving the AST method-name detection works.
     test('BAD: Navigator.pop dismiss callback fires', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Navigator { static void pop(BuildContext c) {} }
 class GestureDetector extends StatelessWidget { const GestureDetector({Object? onTap, Object? child}); }
@@ -283,7 +293,8 @@ class Home extends StatelessWidget {
     // FP repro: a runtime path under /dataset/ (no assets/ prefix) must NOT
     // fire — that is a genuine filesystem file.
     test('FP: dataset path does not trigger', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class FileImage extends StatelessWidget { const FileImage(Object f); }
 class File { File(String p); }
@@ -300,7 +311,8 @@ class Home extends StatelessWidget {
 
     // BAD: a string-literal path starting with assets/ fires.
     test('BAD: assets/ literal path fires', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class FileImage extends StatelessWidget { const FileImage(Object f); }
 class File { File(String p); }
@@ -326,9 +338,11 @@ class Home extends StatelessWidget {
 
     // FP repro: a method returning a nullable NON-Widget type whose name ends
     // in "Widget" (e.g. a data holder) must NOT fire.
-    test('FP: nullable non-Widget type ending in Widget stays silent',
-        () async {
-      final code = '''
+    test(
+      'FP: nullable non-Widget type ending in Widget stays silent',
+      () async {
+        final code =
+            '''
 $stubs
 class FooWidget {}
 class Home extends StatelessWidget {
@@ -336,13 +350,15 @@ class Home extends StatelessWidget {
   FooWidget? lookup() => null;
 }
 ''';
-      final codes = await reportedRuleCodes(rule, code);
-      expect(codes, isNot(contains(ruleName)));
-    });
+        final codes = await reportedRuleCodes(rule, code);
+        expect(codes, isNot(contains(ruleName)));
+      },
+    );
 
     // BAD: a method returning a nullable real Widget subtype fires.
     test('BAD: nullable Widget subtype return fires', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Banner extends StatelessWidget { const Banner(); }
 class Home extends StatelessWidget {
@@ -356,7 +372,8 @@ class Home extends StatelessWidget {
 
     // GOOD: a non-nullable Widget return stays silent.
     test('GOOD: non-nullable Widget return stays silent', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Banner extends StatelessWidget { const Banner(); }
 class Home extends StatelessWidget {
@@ -380,7 +397,8 @@ class Home extends StatelessWidget {
     // FP repro: a "Reorder" button (contains 'order') with no guard must NOT
     // be treated as a submit button.
     test('FP: Reorder button is not a submit button', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Text { const Text(String s); }
 class ElevatedButton extends StatelessWidget { const ElevatedButton({Object? onPressed, Object? child}); }
@@ -398,7 +416,8 @@ class Home extends StatelessWidget {
 
     // BAD: a genuine Submit button with an unguarded callback fires.
     test('BAD: unguarded Submit button fires', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Text { const Text(String s); }
 class ElevatedButton extends StatelessWidget { const ElevatedButton({Object? onPressed, Object? child}); }
@@ -523,7 +542,8 @@ class Holder extends StatelessWidget {
     // FP repro: a large Column whose children are NON-const (carry dynamic
     // args) should not be claimed as an all-const splittable subtree.
     test('FP: large Column of non-const children stays silent', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Column extends StatelessWidget { const Column({Object? children}); }
 class Text extends StatelessWidget { const Text(String s); }
@@ -544,7 +564,8 @@ class Home extends StatelessWidget {
 
     // BAD: a large Column whose children are all const-constructible fires.
     test('BAD: large Column of const children fires', () async {
-      final code = '''
+      final code =
+          '''
 $stubs
 class Column extends StatelessWidget { const Column({Object? children}); }
 class Text extends StatelessWidget { const Text(String s); }

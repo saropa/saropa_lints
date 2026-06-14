@@ -12,7 +12,7 @@ plugins:
   saropa_lints:
     # Kept in sync with pubspec.yaml at publish time — see issue #216
     # and the comment in tiers/essential.yaml for the full rationale.
-    version: "^13.0.0"
+    version: "^14.0.0"
     diagnostics:
       # =========================================================================
       # PERFORMANCE - Faster app, better battery

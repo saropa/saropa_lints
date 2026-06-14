@@ -46,9 +46,11 @@ void main() {
   // unqualified `add(event)`, not `someList.add(x)` / `controller.add(x)`.
   // --------------------------------------------------------------------------
   group('avoid_bloc_event_in_constructor', () {
-    test('flags unqualified add() in bloc constructor (true positive)', () async {
-      final code =
-          '''
+    test(
+      'flags unqualified add() in bloc constructor (true positive)',
+      () async {
+        final code =
+            '''
 $_blocStubs
 class CounterBloc extends Bloc<CounterEvent, int> {
   CounterBloc() : super(0) {
@@ -56,12 +58,13 @@ class CounterBloc extends Bloc<CounterEvent, int> {
   }
 }
 ''';
-      final codes = await reportedRuleCodes(
-        AvoidBlocEventInConstructorRule(),
-        code,
-      );
-      expect(codes, contains('avoid_bloc_event_in_constructor'));
-    });
+        final codes = await reportedRuleCodes(
+          AvoidBlocEventInConstructorRule(),
+          code,
+        );
+        expect(codes, contains('avoid_bloc_event_in_constructor'));
+      },
+    );
 
     test('does NOT flag List.add() in bloc constructor (FP)', () async {
       final code =
@@ -106,9 +109,11 @@ class CounterBloc extends Bloc<CounterEvent, int> {
   // or `Cubit<ThisState>` type argument), not any `...State`-named domain class.
   // --------------------------------------------------------------------------
   group('require_immutable_bloc_state', () {
-    test('flags mutable state used as Bloc state type arg (true positive)', () async {
-      final code =
-          '''
+    test(
+      'flags mutable state used as Bloc state type arg (true positive)',
+      () async {
+        final code =
+            '''
 $_blocStubs
 class CounterState {
   int count;
@@ -119,19 +124,22 @@ class CounterBloc extends Bloc<CounterEvent, CounterState> {
   CounterBloc() : super(CounterState(0));
 }
 ''';
-      final codes = await reportedRuleCodes(
-        RequireImmutableBlocStateRule(),
-        code,
-      );
-      expect(codes, contains('require_immutable_bloc_state'));
-    });
+        final codes = await reportedRuleCodes(
+          RequireImmutableBlocStateRule(),
+          code,
+        );
+        expect(codes, contains('require_immutable_bloc_state'));
+      },
+    );
 
-    test('does NOT flag a ...State domain class not wired to any bloc (FP)', () async {
-      // `ButtonState` ends with "State" and is mutable, but is never used as a
-      // Bloc/Cubit type argument — it is a plain domain object, not a BLoC
-      // state, so the rule must stay silent.
-      final code =
-          '''
+    test(
+      'does NOT flag a ...State domain class not wired to any bloc (FP)',
+      () async {
+        // `ButtonState` ends with "State" and is mutable, but is never used as a
+        // Bloc/Cubit type argument — it is a plain domain object, not a BLoC
+        // state, so the rule must stay silent.
+        final code =
+            '''
 $_blocStubs
 class ButtonState {
   bool pressed;
@@ -142,12 +150,13 @@ class CounterBloc extends Bloc<CounterEvent, int> {
   CounterBloc() : super(0);
 }
 ''';
-      final codes = await reportedRuleCodes(
-        RequireImmutableBlocStateRule(),
-        code,
-      );
-      expect(codes, isNot(contains('require_immutable_bloc_state')));
-    });
+        final codes = await reportedRuleCodes(
+          RequireImmutableBlocStateRule(),
+          code,
+        );
+        expect(codes, isNot(contains('require_immutable_bloc_state')));
+      },
+    );
 
     test('does NOT flag RequestState not wired to any bloc (FP)', () async {
       final code =
@@ -189,14 +198,16 @@ class CounterBloc extends Bloc<CounterEvent, int> {
       expect(codes, contains('prefer_cubit_for_simple'));
     });
 
-    test('still flags simple bloc despite fake on<X> tokens in comment/string', () async {
-      // Exactly ONE real handler, so this SHOULD suggest Cubit. The comment and
-      // string literal contain extra `on<Foo>` tokens that the old
-      // `RegExp(r'on<\\w+>')` over node.toSource() would have counted, pushing
-      // the total past 2 and silencing the rule (a false negative). The AST
-      // counter ignores comments/strings and still flags.
-      final code =
-          '''
+    test(
+      'still flags simple bloc despite fake on<X> tokens in comment/string',
+      () async {
+        // Exactly ONE real handler, so this SHOULD suggest Cubit. The comment and
+        // string literal contain extra `on<Foo>` tokens that the old
+        // `RegExp(r'on<\\w+>')` over node.toSource() would have counted, pushing
+        // the total past 2 and silencing the rule (a false negative). The AST
+        // counter ignores comments/strings and still flags.
+        final code =
+            '''
 $_blocStubs
 class CounterBloc extends Bloc<CounterEvent, int> {
   // handlers: on<Increment> on<Decrement> on<Reset> on<Pause>
@@ -206,15 +217,18 @@ class CounterBloc extends Bloc<CounterEvent, int> {
   }
 }
 ''';
-      final codes = await reportedRuleCodes(PreferCubitForSimpleRule(), code);
-      expect(codes, contains('prefer_cubit_for_simple'));
-    });
+        final codes = await reportedRuleCodes(PreferCubitForSimpleRule(), code);
+        expect(codes, contains('prefer_cubit_for_simple'));
+      },
+    );
 
-    test('counts on<Foo<Bar>> nested-generic handlers (true positive)', () async {
-      // Three handlers, one with a nested generic type argument the old
-      // `on<\\w+>` regex would have missed entirely (undercounting to 2).
-      final code =
-          '''
+    test(
+      'counts on<Foo<Bar>> nested-generic handlers (true positive)',
+      () async {
+        // Three handlers, one with a nested generic type argument the old
+        // `on<\\w+>` regex would have missed entirely (undercounting to 2).
+        final code =
+            '''
 $_blocStubs
 class Wrapper<T> extends CounterEvent {}
 
@@ -226,10 +240,11 @@ class CounterBloc extends Bloc<CounterEvent, int> {
   }
 }
 ''';
-      final codes = await reportedRuleCodes(PreferCubitForSimpleRule(), code);
-      // 3 real handlers => should NOT suggest Cubit. The old regex missed the
-      // nested-generic one and counted 2, wrongly flagging.
-      expect(codes, isNot(contains('prefer_cubit_for_simple')));
-    });
+        final codes = await reportedRuleCodes(PreferCubitForSimpleRule(), code);
+        // 3 real handlers => should NOT suggest Cubit. The old regex missed the
+        // nested-generic one and counted 2, wrongly flagging.
+        expect(codes, isNot(contains('prefer_cubit_for_simple')));
+      },
+    );
   });
 }

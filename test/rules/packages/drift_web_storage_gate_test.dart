@@ -13,19 +13,29 @@ import '../../support/resolved_rule_harness.dart';
 
 void main() {
   group('avoid_drift_unsafe_web_storage', () {
-    test('does NOT fire on WebDatabase in a file with no drift import', () async {
-      final codes = await reportedRuleCodes(AvoidDriftUnsafeWebStorageRule(), '''
+    test(
+      'does NOT fire on WebDatabase in a file with no drift import',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidDriftUnsafeWebStorageRule(),
+          '''
 class WebDatabase {
   WebDatabase(String name);
 }
 
 WebDatabase open() => WebDatabase('app.db');
-''');
-      expect(codes, isNot(contains('avoid_drift_unsafe_web_storage')));
-    });
+''',
+        );
+        expect(codes, isNot(contains('avoid_drift_unsafe_web_storage')));
+      },
+    );
 
-    test('does NOT fire on an unrelated unsafeIndexedDb() with no drift import', () async {
-      final codes = await reportedRuleCodes(AvoidDriftUnsafeWebStorageRule(), '''
+    test(
+      'does NOT fire on an unrelated unsafeIndexedDb() with no drift import',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidDriftUnsafeWebStorageRule(),
+          '''
 class Storage {
   void unsafeIndexedDb() {}
 }
@@ -33,8 +43,10 @@ class Storage {
 void main() {
   Storage().unsafeIndexedDb();
 }
-''');
-      expect(codes, isNot(contains('avoid_drift_unsafe_web_storage')));
-    });
+''',
+        );
+        expect(codes, isNot(contains('avoid_drift_unsafe_web_storage')));
+      },
+    );
   });
 }

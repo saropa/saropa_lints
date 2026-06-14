@@ -44,10 +44,12 @@ $body
       tempDir.deleteSync(recursive: true);
     });
 
-    test('location-only modes with an unrelated audio string is NOT audio-configured', () {
-      // The UIBackgroundModes array has only `location`; the `audio` string
-      // belongs to an unrelated key (the old code matched it as a substring).
-      writePlist('''
+    test(
+      'location-only modes with an unrelated audio string is NOT audio-configured',
+      () {
+        // The UIBackgroundModes array has only `location`; the `audio` string
+        // belongs to an unrelated key (the old code matched it as a substring).
+        writePlist('''
   <key>UIBackgroundModes</key>
   <array>
     <string>location</string>
@@ -55,10 +57,11 @@ $body
   <key>SomeOtherSetting</key>
   <string>audio</string>
 ''');
-      final checker = InfoPlistChecker.forFile(dartPath)!;
-      expect(checker.hasIosBackgroundLocationConfigured, isTrue);
-      expect(checker.hasIosBackgroundAudioConfigured, isFalse);
-    });
+        final checker = InfoPlistChecker.forFile(dartPath)!;
+        expect(checker.hasIosBackgroundLocationConfigured, isTrue);
+        expect(checker.hasIosBackgroundAudioConfigured, isFalse);
+      },
+    );
 
     test('audio in the UIBackgroundModes array is audio-configured', () {
       writePlist('''

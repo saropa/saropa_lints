@@ -14,44 +14,45 @@ void main() {
   // sensitive substring (`token`) appears inside a non-sensitive OAuth name.
   group('avoid_logging_sensitive_data', () {
     test('BAD: logging a raw password fires', () async {
-      final codes = await reportedRuleCodes(
-        AvoidLoggingSensitiveDataRule(),
-        '''
+      final codes = await reportedRuleCodes(AvoidLoggingSensitiveDataRule(), '''
 void f(String password) {
   print('user password: \$password');
 }
-''',
-      );
+''');
       expect(codes, contains('avoid_logging_sensitive_data'));
     });
 
-    test('GOOD: logging an OAuth flow event (oauthToken) stays silent',
-        () async {
-      // `oauthToken` embeds `token` but is an OAuth protocol identifier, not a
-      // secret credential value. The safe-pattern carve-out must suppress it.
-      final codes = await reportedRuleCodes(
-        AvoidLoggingSensitiveDataRule(),
-        '''
+    test(
+      'GOOD: logging an OAuth flow event (oauthToken) stays silent',
+      () async {
+        // `oauthToken` embeds `token` but is an OAuth protocol identifier, not a
+        // secret credential value. The safe-pattern carve-out must suppress it.
+        final codes = await reportedRuleCodes(
+          AvoidLoggingSensitiveDataRule(),
+          '''
 void f(String oauthToken) {
   print('oauthToken refreshed: \$oauthToken');
 }
 ''',
-      );
-      expect(codes, isNot(contains('avoid_logging_sensitive_data')));
-    });
+        );
+        expect(codes, isNot(contains('avoid_logging_sensitive_data')));
+      },
+    );
 
-    test('GOOD: logging a generic authentication status stays silent',
-        () async {
-      final codes = await reportedRuleCodes(
-        AvoidLoggingSensitiveDataRule(),
-        '''
+    test(
+      'GOOD: logging a generic authentication status stays silent',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidLoggingSensitiveDataRule(),
+          '''
 void f(bool authenticated) {
   print('authentication complete: \$authenticated');
 }
 ''',
-      );
-      expect(codes, isNot(contains('avoid_logging_sensitive_data')));
-    });
+        );
+        expect(codes, isNot(contains('avoid_logging_sensitive_data')));
+      },
+    );
   });
 
   // The webview rule must inspect the boolean VALUE of the relevant named arg,

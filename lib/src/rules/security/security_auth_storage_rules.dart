@@ -337,9 +337,7 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
 
   /// Class names from `local_auth` (and equivalents) whose `authenticate`
   /// resolves to the biometric API.
-  static const Set<String> _bioAuthTypeNames = <String>{
-    'LocalAuthentication',
-  };
+  static const Set<String> _bioAuthTypeNames = <String>{'LocalAuthentication'};
 
   @override
   void runWithReporter(

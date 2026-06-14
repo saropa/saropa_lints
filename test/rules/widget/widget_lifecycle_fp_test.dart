@@ -131,11 +131,12 @@ class _S extends State<Widget> {
   // avoid_expensive_did_change_dependencies — must gate on enclosing State.
   // ===========================================================================
   group('avoid_expensive_did_change_dependencies', () {
-    test('FP: didChangeDependencies in a NON-State class must not fire',
-        () async {
-      final codes = await reportedRuleCodes(
-        AvoidExpensiveDidChangeDependenciesRule(),
-        '''
+    test(
+      'FP: didChangeDependencies in a NON-State class must not fire',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidExpensiveDidChangeDependenciesRule(),
+          '''
 $_stubs
 class NotAState {
   Object fetchData() => 0;
@@ -144,19 +145,21 @@ class NotAState {
   }
 }
 ''',
-      );
-      expect(
-        codes,
-        isNot(contains('avoid_expensive_did_change_dependencies')),
-        reason: 'Only the State lifecycle callback re-runs on dep changes.',
-      );
-    });
+        );
+        expect(
+          codes,
+          isNot(contains('avoid_expensive_did_change_dependencies')),
+          reason: 'Only the State lifecycle callback re-runs on dep changes.',
+        );
+      },
+    );
 
-    test('BAD: expensive call in a real State.didChangeDependencies fires',
-        () async {
-      final codes = await reportedRuleCodes(
-        AvoidExpensiveDidChangeDependenciesRule(),
-        '''
+    test(
+      'BAD: expensive call in a real State.didChangeDependencies fires',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidExpensiveDidChangeDependenciesRule(),
+          '''
 $_stubs
 class _S extends State<Widget> {
   Object fetchData() => 0;
@@ -167,9 +170,10 @@ class _S extends State<Widget> {
   }
 }
 ''',
-      );
-      expect(codes, contains('avoid_expensive_did_change_dependencies'));
-    });
+        );
+        expect(codes, contains('avoid_expensive_did_change_dependencies'));
+      },
+    );
   });
 
   // ===========================================================================
@@ -182,9 +186,7 @@ class _S extends State<Widget> {
       // it builds a same-named `MyCard` that is a SEPARATE class. Lexeme
       // matching of the constructor type name to the enclosing class name
       // false-flagged any same-named type even when it resolves elsewhere.
-      final codes = await reportedRuleCodes(
-        AvoidRecursiveWidgetCallsRule(),
-        '''
+      final codes = await reportedRuleCodes(AvoidRecursiveWidgetCallsRule(), '''
 $_stubs
 class _OtherLib {
   static Widget make() => const _Inner();
@@ -199,8 +201,7 @@ class MyCard extends StatelessWidget {
     return _OtherLib.make();
   }
 }
-''',
-      );
+''');
       expect(
         codes,
         isNot(contains('avoid_recursive_widget_calls')),
@@ -209,9 +210,7 @@ class MyCard extends StatelessWidget {
     });
 
     test('BAD: genuine self-instantiation in build still fires', () async {
-      final codes = await reportedRuleCodes(
-        AvoidRecursiveWidgetCallsRule(),
-        '''
+      final codes = await reportedRuleCodes(AvoidRecursiveWidgetCallsRule(), '''
 $_stubs
 class Loop extends StatelessWidget {
   const Loop();
@@ -220,8 +219,7 @@ class Loop extends StatelessWidget {
     return const Loop();
   }
 }
-''',
-      );
+''');
       expect(codes, contains('avoid_recursive_widget_calls'));
     });
   });
@@ -230,14 +228,11 @@ class Loop extends StatelessWidget {
   // avoid_unsafe_setstate — `if (mounted)` else-branch is NOT a guard.
   // ===========================================================================
   group('avoid_unsafe_setstate', () {
-    test('FP-reproduction: setState in the ELSE branch of if(mounted)',
-        () async {
+    test('FP-reproduction: setState in the ELSE branch of if(mounted)', () async {
       // setState lives in the `else` of `if (mounted)`, i.e. it runs only when
       // NOT mounted — the opposite of guarded. The ancestor-walk used to treat
       // any enclosing `if (mounted)` as a guard regardless of branch.
-      final codes = await reportedRuleCodes(
-        AvoidUnsafeSetStateRule(),
-        '''
+      final codes = await reportedRuleCodes(AvoidUnsafeSetStateRule(), '''
 $_stubs
 class _S extends State<Widget> {
   void go() {
@@ -248,8 +243,7 @@ class _S extends State<Widget> {
     }
   }
 }
-''',
-      );
+''');
       expect(
         codes,
         contains('avoid_unsafe_setstate'),
@@ -257,11 +251,10 @@ class _S extends State<Widget> {
       );
     });
 
-    test('GOOD: setState in the THEN branch of if(mounted) stays silent',
-        () async {
-      final codes = await reportedRuleCodes(
-        AvoidUnsafeSetStateRule(),
-        '''
+    test(
+      'GOOD: setState in the THEN branch of if(mounted) stays silent',
+      () async {
+        final codes = await reportedRuleCodes(AvoidUnsafeSetStateRule(), '''
 $_stubs
 class _S extends State<Widget> {
   void go() {
@@ -270,51 +263,48 @@ class _S extends State<Widget> {
     }
   }
 }
-''',
-      );
-      expect(codes, isEmpty);
-    });
+''');
+        expect(codes, isEmpty);
+      },
+    );
   });
 
   // ===========================================================================
   // prefer_widget_state_mixin — whole-word interaction-state field detection.
   // ===========================================================================
   group('prefer_widget_state_mixin', () {
-    test('FP: _unfocusTimer / _focusableItems are not interaction states',
-        () async {
-      // `_unfocusTimer` contains "focus" and `_focusableItems` contains
-      // "focus"; substring matching counted both as hover/press/focus state
-      // fields and fired. Neither tracks an interaction (hover/pressed/focused)
-      // boolean.
-      final codes = await reportedRuleCodes(
-        PreferWidgetStateMixinRule(),
-        '''
+    test(
+      'FP: _unfocusTimer / _focusableItems are not interaction states',
+      () async {
+        // `_unfocusTimer` contains "focus" and `_focusableItems` contains
+        // "focus"; substring matching counted both as hover/press/focus state
+        // fields and fired. Neither tracks an interaction (hover/pressed/focused)
+        // boolean.
+        final codes = await reportedRuleCodes(PreferWidgetStateMixinRule(), '''
 $_stubs
 class _S extends State<Widget> {
   Object? _unfocusTimer;
   List<Object> _focusableItems = [];
 }
-''',
-      );
-      expect(
-        codes,
-        isNot(contains('prefer_widget_state_mixin')),
-        reason: 'Substring "focus" in unrelated names is not an interaction '
-            'state field.',
-      );
-    });
+''');
+        expect(
+          codes,
+          isNot(contains('prefer_widget_state_mixin')),
+          reason:
+              'Substring "focus" in unrelated names is not an interaction '
+              'state field.',
+        );
+      },
+    );
 
     test('BAD: two genuine interaction-state booleans still fire', () async {
-      final codes = await reportedRuleCodes(
-        PreferWidgetStateMixinRule(),
-        '''
+      final codes = await reportedRuleCodes(PreferWidgetStateMixinRule(), '''
 $_stubs
 class _S extends State<Widget> {
   bool _isHovered = false;
   bool _isPressed = false;
 }
-''',
-      );
+''');
       expect(codes, contains('prefer_widget_state_mixin'));
     });
   });
@@ -371,16 +361,15 @@ Future<void> f(Object future) async {
   // require_field_dispose — cross-statement cascade must not satisfy a field.
   // ===========================================================================
   group('require_field_dispose', () {
-    test('FN-reproduction: another field disposed INSIDE _a\'s cascade arg',
-        () async {
-      // `_a` is only added as a listener — never disposed. `_b` is disposed
-      // but nested as an argument INSIDE `_a`'s cascade section. The cross-
-      // statement regex (`_a\??(?:\.\.[^;]+)*\.\.dispose\(`) wrongly matches
-      // `_a` against the nested `_b..dispose(` because `[^;]+` swallows the
-      // whole single-statement expression, so `_a` is treated as disposed.
-      final codes = await reportedRuleCodes(
-        RequireDisposeRule(),
-        '''
+    test(
+      'FN-reproduction: another field disposed INSIDE _a\'s cascade arg',
+      () async {
+        // `_a` is only added as a listener — never disposed. `_b` is disposed
+        // but nested as an argument INSIDE `_a`'s cascade section. The cross-
+        // statement regex (`_a\??(?:\.\.[^;]+)*\.\.dispose\(`) wrongly matches
+        // `_a` against the nested `_b..dispose(` because `[^;]+` swallows the
+        // whole single-statement expression, so `_a` is treated as disposed.
+        final codes = await reportedRuleCodes(RequireDisposeRule(), '''
 $_stubs
 class _S extends State<Widget> {
   TextEditingController _a = TextEditingController();
@@ -392,20 +381,20 @@ class _S extends State<Widget> {
     super.dispose();
   }
 }
-''',
-      );
-      expect(
-        codes,
-        contains('require_field_dispose'),
-        reason: '_a is undisposed; a nested _b..dispose() must not satisfy it.',
-      );
-    });
+''');
+        expect(
+          codes,
+          contains('require_field_dispose'),
+          reason:
+              '_a is undisposed; a nested _b..dispose() must not satisfy it.',
+        );
+      },
+    );
 
-    test('GOOD: each field disposed via its own cascade stays silent',
-        () async {
-      final codes = await reportedRuleCodes(
-        RequireDisposeRule(),
-        '''
+    test(
+      'GOOD: each field disposed via its own cascade stays silent',
+      () async {
+        final codes = await reportedRuleCodes(RequireDisposeRule(), '''
 $_stubs
 class _S extends State<Widget> {
   TextEditingController _a = TextEditingController();
@@ -418,17 +407,14 @@ class _S extends State<Widget> {
     super.dispose();
   }
 }
-''',
-      );
-      expect(codes, isEmpty);
-    });
+''');
+        expect(codes, isEmpty);
+      },
+    );
 
-    test('FP: parent-owned controller (widget.controller) is skipped',
-        () async {
+    test('FP: parent-owned controller (widget.controller) is skipped', () async {
       // Mirrors the existing ownership exemption; pinned here as a regression.
-      final codes = await reportedRuleCodes(
-        RequireDisposeRule(),
-        '''
+      final codes = await reportedRuleCodes(RequireDisposeRule(), '''
 $_stubs
 class _W extends StatefulWidget {
   const _W(this.controller);
@@ -441,8 +427,7 @@ class _S extends State<Widget> {
     super.dispose();
   }
 }
-''',
-      );
+''');
       expect(codes, isNot(contains('require_field_dispose')));
     });
   });
@@ -465,7 +450,8 @@ class _S extends State<Widget> {
     test(
       'removeListener detection (Flutter-gated; not oracle-runnable)',
       () {},
-      skip: 'Rule returns early unless isFlutterProject; the Flutter-less '
+      skip:
+          'Rule returns early unless isFlutterProject; the Flutter-less '
           'example package cannot satisfy that gate. Fix verified by inspection.',
     );
   });
@@ -482,9 +468,7 @@ class _S extends State<Widget> {
   // ===========================================================================
   group('State-matched rules: genuine cases fire', () {
     test('require_super_dispose_call: missing super.dispose() fires', () async {
-      final codes = await reportedRuleCodes(
-        RequireSuperDisposeCallRule(),
-        '''
+      final codes = await reportedRuleCodes(RequireSuperDisposeCallRule(), '''
 $_stubs
 class _S extends State<Widget> {
   @override
@@ -492,16 +476,16 @@ class _S extends State<Widget> {
     // no super.dispose()
   }
 }
-''',
-      );
+''');
       expect(codes, contains('require_super_dispose_call'));
     });
 
-    test('require_super_init_state_call: missing super.initState() fires',
-        () async {
-      final codes = await reportedRuleCodes(
-        RequireSuperInitStateCallRule(),
-        '''
+    test(
+      'require_super_init_state_call: missing super.initState() fires',
+      () async {
+        final codes = await reportedRuleCodes(
+          RequireSuperInitStateCallRule(),
+          '''
 $_stubs
 class _S extends State<Widget> {
   @override
@@ -510,14 +494,13 @@ class _S extends State<Widget> {
   }
 }
 ''',
-      );
-      expect(codes, contains('require_super_init_state_call'));
-    });
+        );
+        expect(codes, contains('require_super_init_state_call'));
+      },
+    );
 
     test('avoid_set_state_in_dispose: setState in dispose fires', () async {
-      final codes = await reportedRuleCodes(
-        AvoidSetStateInDisposeRule(),
-        '''
+      final codes = await reportedRuleCodes(AvoidSetStateInDisposeRule(), '''
 $_stubs
 class _S extends State<Widget> {
   @override
@@ -526,8 +509,7 @@ class _S extends State<Widget> {
     super.dispose();
   }
 }
-''',
-      );
+''');
       expect(codes, contains('avoid_set_state_in_dispose'));
     });
   });
@@ -536,11 +518,12 @@ class _S extends State<Widget> {
   // require_scroll_controller_dispose — parent-owned controller skip.
   // ===========================================================================
   group('require_scroll_controller_dispose', () {
-    test('FP: parent-owned ScrollController (widget.controller) is skipped',
-        () async {
-      final codes = await reportedRuleCodes(
-        RequireScrollControllerDisposeRule(),
-        '''
+    test(
+      'FP: parent-owned ScrollController (widget.controller) is skipped',
+      () async {
+        final codes = await reportedRuleCodes(
+          RequireScrollControllerDisposeRule(),
+          '''
 $_stubs
 class _S extends State<Widget> {
   ScrollController _c = widget.controller;
@@ -550,19 +533,21 @@ class _S extends State<Widget> {
   }
 }
 ''',
-      );
-      expect(
-        codes,
-        isNot(contains('require_scroll_controller_dispose')),
-        reason: 'Parent owns the controller; State must not dispose it.',
-      );
-    });
+        );
+        expect(
+          codes,
+          isNot(contains('require_scroll_controller_dispose')),
+          reason: 'Parent owns the controller; State must not dispose it.',
+        );
+      },
+    );
 
-    test('BAD: locally constructed undisposed ScrollController still fires',
-        () async {
-      final codes = await reportedRuleCodes(
-        RequireScrollControllerDisposeRule(),
-        '''
+    test(
+      'BAD: locally constructed undisposed ScrollController still fires',
+      () async {
+        final codes = await reportedRuleCodes(
+          RequireScrollControllerDisposeRule(),
+          '''
 $_stubs
 class _S extends State<Widget> {
   ScrollController _c = ScrollController();
@@ -572,8 +557,9 @@ class _S extends State<Widget> {
   }
 }
 ''',
-      );
-      expect(codes, contains('require_scroll_controller_dispose'));
-    });
+        );
+        expect(codes, contains('require_scroll_controller_dispose'));
+      },
+    );
   });
 }

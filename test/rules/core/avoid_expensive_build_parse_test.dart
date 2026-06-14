@@ -13,10 +13,12 @@ import '../../support/resolved_rule_harness.dart';
 
 void main() {
   group('avoid_expensive_build parse/tryParse', () {
-    test('does NOT flag int.parse / Uri.parse / double.tryParse in build()', () async {
-      // A local StatelessWidget stub satisfies the name-based superclass gate
-      // and resolves cleanly without a Flutter dependency.
-      final codes = await reportedRuleCodes(AvoidExpensiveBuildRule(), '''
+    test(
+      'does NOT flag int.parse / Uri.parse / double.tryParse in build()',
+      () async {
+        // A local StatelessWidget stub satisfies the name-based superclass gate
+        // and resolves cleanly without a Flutter dependency.
+        final codes = await reportedRuleCodes(AvoidExpensiveBuildRule(), '''
 class StatelessWidget {}
 
 class W extends StatelessWidget {
@@ -28,8 +30,9 @@ class W extends StatelessWidget {
   }
 }
 ''');
-      expect(codes, isNot(contains('avoid_expensive_build')));
-    });
+        expect(codes, isNot(contains('avoid_expensive_build')));
+      },
+    );
 
     test('still flags jsonDecode (heavy parsing) in build()', () async {
       final codes = await reportedRuleCodes(AvoidExpensiveBuildRule(), '''

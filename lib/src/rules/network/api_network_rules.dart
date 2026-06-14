@@ -882,6 +882,7 @@ class PreferStreamingResponseRule extends SaropaLintRule {
     RegExp(r'\bhttp\b'),
     RegExp(r'\bdio\b'),
   ];
+
   /// File-write operations that, when applied to buffered bytes, are the
   /// actual OOM concern. Restricted to genuine write/save calls — NOT the bare
   /// word `file`, which previously matched any unrelated `file` identifier up

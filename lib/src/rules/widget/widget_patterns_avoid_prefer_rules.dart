@@ -4838,8 +4838,8 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
       // Check if in State<T> class. Use ancestor lookup rather than a direct
       // `node.parent` cast — a FieldDeclaration is not always the immediate
       // child of its ClassDeclaration depending on enclosing structure.
-      final ClassDeclaration? parent =
-          node.thisOrAncestorOfType<ClassDeclaration>();
+      final ClassDeclaration? parent = node
+          .thisOrAncestorOfType<ClassDeclaration>();
       if (parent == null) return;
 
       final extendsClause = parent.extendsClause;
@@ -5625,8 +5625,7 @@ class _FieldAssignmentCollector extends RecursiveAstVisitor<void> {
     final Expression target = node.leftHandSide;
     if (target is SimpleIdentifier) {
       assignedNames.add(target.name);
-    } else if (target is PrefixedIdentifier &&
-        target.prefix.name == 'this') {
+    } else if (target is PrefixedIdentifier && target.prefix.name == 'this') {
       assignedNames.add(target.identifier.name);
     } else if (target is PropertyAccess && target.target is ThisExpression) {
       assignedNames.add(target.propertyName.name);

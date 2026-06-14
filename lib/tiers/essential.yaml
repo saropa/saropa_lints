@@ -15,7 +15,7 @@ plugins:
     # ^5.0.0-beta.8 we shipped pre-v6) breaks pub resolution for any
     # consumer that also depends on a package requiring a newer analyzer.
     # See https://github.com/saropa/saropa_lints/issues/216.
-    version: "^13.0.0"
+    version: "^14.0.0"
     diagnostics:
       # =========================================================================
       # MEMORY LEAKS - Will crash your app

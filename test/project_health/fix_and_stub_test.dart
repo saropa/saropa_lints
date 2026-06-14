@@ -73,9 +73,7 @@ void main() {
     // stub. The hard gate must not reject it.
     test('skipped empty-body test is not counted', () {
       expect(
-        emptyBodyStubCountIn(
-          "void main() { test('x', () {}, skip: 'why'); }",
-        ),
+        emptyBodyStubCountIn("void main() { test('x', () {}, skip: 'why'); }"),
         0,
       );
     });
