@@ -133,7 +133,12 @@ deps, not a monorepo merge):
    `test/suiteEnvelope.test.ts`), `exporter.ts` (writes `.saropa/diagnostics/lints.json` on the
    analysis-settle tick), and `commands.ts` (`saropaLints.enableRule` / `saropaLints.openFinding`
    deep-link commands; `explainRule` extended to accept the `{ ruleId }` object form). Phases below pending.
-2. **R2** — render sibling evidence in the holistic dashboard.
+2. ✅ **R2** — render sibling evidence in the holistic dashboard.
+   Landed: `suite/siblingEnvelopes.ts` reads `.saropa/diagnostics/advisor.json` + `log-capture.json`
+   and correlates each sibling diagnostic back to the Lints rule it deep-links (`fix.command` =
+   `saropaLints.explainRule` / `enableRule` / `openFinding` with a `{ ruleId }` arg). The consolidated
+   dashboard (`views/consolidated/`) badges a rule row "Advisor confirms at runtime" / "Log Capture saw
+   N" from that evidence; unit-tested in `test/suiteSiblingEnvelopes.test.ts`.
 3. **R3** — crash-to-rule attribution (the novel feature).
 4. **R5 + R7** — outbound deep-links and Package Vibrancy nudge.
 5. **R6** — commit stamping for correlation.
