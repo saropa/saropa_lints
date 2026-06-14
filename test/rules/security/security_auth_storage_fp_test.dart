@@ -26,18 +26,21 @@ void main() {
     // Class name uses a whole-word `auth`/`session`/`token` match (the rule's
     // own gate). `Session` matches `\bsession\b`; `AuthService` would NOT (no
     // word boundary inside the identifier).
-    test('reports EXACTLY ONCE on an auth class with no refresh logic', () async {
-      const code = '''
+    test(
+      'reports EXACTLY ONCE on an auth class with no refresh logic',
+      () async {
+        const code = '''
 class Session {
   String? accessToken;
 }
 ''';
-      final diags = await runRuleResolved(RequireTokenRefreshRule(), code);
-      final refresh = diags
-          .where((d) => d.ruleName == 'require_token_refresh')
-          .toList();
-      expect(refresh, hasLength(1));
-    });
+        final diags = await runRuleResolved(RequireTokenRefreshRule(), code);
+        final refresh = diags
+            .where((d) => d.ruleName == 'require_token_refresh')
+            .toList();
+        expect(refresh, hasLength(1));
+      },
+    );
 
     test('does NOT report when refresh logic is present', () async {
       const code = '''
@@ -59,11 +62,9 @@ class Session {
       expect(codes.contains('require_token_refresh'), isFalse);
     });
 
-    test(
-      'does NOT report when a refresh method exists but no expiry check '
-      '(the duplicate-branch false positive)',
-      () async {
-        const code = '''
+    test('does NOT report when a refresh method exists but no expiry check '
+        '(the duplicate-branch false positive)', () async {
+      const code = '''
 class Session {
   String? accessToken;
   String? refreshToken;
@@ -71,10 +72,9 @@ class Session {
   Future<void> refreshAccessToken() async {}
 }
 ''';
-        final codes = await reportedRuleCodes(RequireTokenRefreshRule(), code);
-        expect(codes.contains('require_token_refresh'), isFalse);
-      },
-    );
+      final codes = await reportedRuleCodes(RequireTokenRefreshRule(), code);
+      expect(codes.contains('require_token_refresh'), isFalse);
+    });
   });
 
   // --------------------------------------------------------------------------
@@ -163,11 +163,9 @@ void check(Jwt jwt) {
   // token, no word boundary) was MISSED.
   // --------------------------------------------------------------------------
   group('require_biometric_fallback', () {
-    test(
-      'DOES report local_auth localAuth.authenticate(biometricOnly: true) '
-      '(the missed false-negative)',
-      () async {
-        const code = '''
+    test('DOES report local_auth localAuth.authenticate(biometricOnly: true) '
+        '(the missed false-negative)', () async {
+      const code = '''
 class LocalAuthentication {
   Future<bool> authenticate({
     String localizedReason = '',
@@ -183,13 +181,12 @@ Future<void> login() async {
   );
 }
 ''';
-        final codes = await reportedRuleCodes(
-          RequireBiometricFallbackRule(),
-          code,
-        );
-        expect(codes.contains('require_biometric_fallback'), isTrue);
-      },
-    );
+      final codes = await reportedRuleCodes(
+        RequireBiometricFallbackRule(),
+        code,
+      );
+      expect(codes.contains('require_biometric_fallback'), isTrue);
+    });
 
     test('does NOT report when biometricOnly is false', () async {
       const code = '''

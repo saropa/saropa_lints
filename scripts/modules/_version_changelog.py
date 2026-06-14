@@ -376,7 +376,12 @@ def has_unreleased_section(changelog_path: Path) -> bool:
     if not changelog_path.is_file():
         return False
     content = changelog_path.read_text(encoding="utf-8")
-    return bool(re.search(r"## \[Unreleased\]", content))
+    # Anchor to a line-leading heading (MULTILINE). An unanchored search matches
+    # a literal `## [Unreleased]` written inside a changelog bullet's backtick
+    # code-span (a release note describing the publish prompt itself), which
+    # made this report a phantom Unreleased section after the heading was
+    # already renamed — same hardening as get_latest_changelog_version.
+    return bool(re.search(r"^## \[Unreleased\]", content, re.MULTILINE))
 
 
 def rename_unreleased_to_version(
@@ -392,21 +397,28 @@ def rename_unreleased_to_version(
     """
     content = changelog_path.read_text(encoding="utf-8")
 
-    if not re.search(r"## \[Unreleased\]", content):
+    # Anchor every heading match to line start (MULTILINE). Unanchored patterns
+    # matched a literal `## [Unreleased]` / `## [X.Y.Z]` token written inside a
+    # changelog bullet's backtick code-span, so a release note that mentions the
+    # heading in prose made this raise the bogus "both [Unreleased] and [version]
+    # exist" error — after which the publish loop bumped to the next patch,
+    # corrupting the chosen version. Real headings always start the line.
+    if not re.search(r"^## \[Unreleased\]", content, re.MULTILINE):
         return False
 
-    version_pattern = rf"## \[{re.escape(version)}\]"
-    if re.search(version_pattern, content):
+    version_pattern = rf"^## \[{re.escape(version)}\]"
+    if re.search(version_pattern, content, re.MULTILINE):
         raise ValueError(
             f"CHANGELOG has both [Unreleased] and [{version}]. "
             f"Remove one before publishing."
         )
 
     content = re.sub(
-        r"## \[Unreleased\]",
+        r"^## \[Unreleased\]",
         f"## [{version}]",
         content,
         count=1,
+        flags=re.MULTILINE,
     )
     changelog_path.write_text(content, encoding="utf-8")
     return True

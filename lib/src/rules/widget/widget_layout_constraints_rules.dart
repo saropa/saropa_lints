@@ -4922,8 +4922,8 @@ class _BuilderBoundsCollector extends RecursiveAstVisitor<void> {
   }
 
   void _recordLengthReceiver(Expression operand) {
-    final String? receiver = AvoidBuilderIndexOutOfBoundsRule
-        ._lengthReceiverChain(operand);
+    final String? receiver =
+        AvoidBuilderIndexOutOfBoundsRule._lengthReceiverChain(operand);
     if (receiver != null) lengthGuardedReceivers.add(receiver);
   }
 

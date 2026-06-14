@@ -22,13 +22,16 @@ void main() {
       expect(b.isBaselined('lib/a/util.dart', 'avoid_print', 42), isTrue);
     });
 
-    test('matches a relative entry against an absolute path (segment suffix)', () {
-      final b = baselineFor('lib/a/util.dart');
-      expect(
-        b.isBaselined('/home/user/proj/lib/a/util.dart', 'avoid_print', 42),
-        isTrue,
-      );
-    });
+    test(
+      'matches a relative entry against an absolute path (segment suffix)',
+      () {
+        final b = baselineFor('lib/a/util.dart');
+        expect(
+          b.isBaselined('/home/user/proj/lib/a/util.dart', 'avoid_print', 42),
+          isTrue,
+        );
+      },
+    );
 
     test('does NOT match a different file sharing a filename suffix', () {
       // Regression: `endsWith` let baseline entry `util.dart` match the
@@ -38,12 +41,15 @@ void main() {
       expect(b.isBaselined('my_util.dart', 'avoid_print', 42), isFalse);
     });
 
-    test('does NOT match across directories with a shared trailing filename', () {
-      final b = baselineFor('lib/a/util.dart');
-      expect(
-        b.isBaselined('lib/b/extra_util.dart', 'avoid_print', 42),
-        isFalse,
-      );
-    });
+    test(
+      'does NOT match across directories with a shared trailing filename',
+      () {
+        final b = baselineFor('lib/a/util.dart');
+        expect(
+          b.isBaselined('lib/b/extra_util.dart', 'avoid_print', 42),
+          isFalse,
+        );
+      },
+    );
   });
 }

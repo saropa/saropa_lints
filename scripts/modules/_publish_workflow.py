@@ -86,10 +86,12 @@ from scripts.modules._tier_yaml_version import sync_tier_yamls
 from scripts.modules._timing import StepTimer
 from scripts.modules._version_changelog import (
     display_changelog,
+    get_latest_changelog_version,
     get_package_name,
     get_version_from_pubspec,
     has_unreleased_section,
     increment_version,
+    parse_version,
     prompt_version_until_valid,
     set_version_in_pubspec,
     sync_version_with_changelog,
@@ -923,6 +925,20 @@ def run_full_publish(
             if has_unreleased_section(ctx.changelog_path)
             else ctx.pubspec_version
         )
+        # The pubspec-derived default above ignores a release section the
+        # author has already written into the CHANGELOG by hand. When the
+        # top `## [X.Y.Z]` heading is AHEAD of that default — e.g. a manual
+        # major bump that also consumed the [Unreleased] heading (so the
+        # has_unreleased branch can't fire) — prefer the documented
+        # changelog version. Without this, a pre-written `## [14.0.0]`
+        # section was silently ignored and the prompt offered the stale
+        # pubspec patch (13.12.7), surprising the author. Only override
+        # upward; never let a stale changelog drag the default backward.
+        changelog_version = get_latest_changelog_version(ctx.changelog_path)
+        if changelog_version and parse_version(changelog_version) > parse_version(
+            default_version
+        ):
+            default_version = changelog_version
         version = prompt_version_until_valid(default_version)
         with timer.step("Version sync"):
             version = sync_version_with_changelog(

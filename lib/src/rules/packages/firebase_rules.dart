@@ -665,8 +665,11 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
   // `.items`, `.products`, `where(`) otherwise match ordinary in-memory
   // collection access in projects that use no database at all.
   @override
-  Set<String>? get requiredPatterns =>
-      const <String>{'isar', 'realm', 'objectbox'};
+  Set<String>? get requiredPatterns => const <String>{
+    'isar',
+    'realm',
+    'objectbox',
+  };
 
   static const LintCode _code = LintCode(
     'require_database_index',

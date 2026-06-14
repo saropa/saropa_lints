@@ -251,7 +251,18 @@ def _is_mid_publish_stale_plugin(
         pubspec_ver = get_version_from_pubspec(pubspec_path)
     except (ValueError, OSError):
         return False
-    return pubspec_ver == stale_ver
+    # The analyze error reports the dependency as a version *constraint*
+    # (e.g. "^14.0.0"), while pubspec.yaml holds a bare version
+    # ("14.0.0"). Strip any leading constraint operator before comparing
+    # so the mid-publish state (local version satisfies the plugin's own
+    # caret constraint) is recognized. Without this, the caret made the
+    # equality check fail, so the guard fell through to the [F]/[S] fix
+    # prompt — which can never resolve when the package dogfoods itself:
+    # its analysis_options.yaml has no plugin version pin to edit, so the
+    # "fix" clears the cache, retries, and loops on the same prompt
+    # forever.
+    bare_stale = stale_ver.lstrip("^~>=< ")
+    return pubspec_ver == bare_stale
 
 
 def _try_fix_stale_plugin_cache(

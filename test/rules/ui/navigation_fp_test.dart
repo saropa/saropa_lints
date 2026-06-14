@@ -125,9 +125,10 @@ final r = GoRoute(path: '/reorder', builder: null);
       expect(codes, isNot(contains(ruleName)));
     });
 
-    test('FP: /accounting does not match protected segment "account"',
-        () async {
-      const code = '''
+    test(
+      'FP: /accounting does not match protected segment "account"',
+      () async {
+        const code = '''
 class GoRoute {
   GoRoute({this.path, this.builder});
   final String? path;
@@ -135,9 +136,10 @@ class GoRoute {
 }
 final r = GoRoute(path: '/accounting', builder: null);
 ''';
-      final codes = await reportedRuleCodes(rule, code);
-      expect(codes, isNot(contains(ruleName)));
-    });
+        final codes = await reportedRuleCodes(rule, code);
+        expect(codes, isNot(contains(ruleName)));
+      },
+    );
 
     // BAD: a real protected segment with no redirect fires.
     test('BAD: /account with no redirect fires', () async {
@@ -178,9 +180,10 @@ final r = GoRoute(path: '/admin', builder: null, redirect: null);
 
     // FP repro: variable `result` whose only later use is the DIFFERENT
     // identifier `resultValue` must not be treated as "used without null check".
-    test('FP: distinct variable resultValue not seen as use of result',
-        () async {
-      const code = '''
+    test(
+      'FP: distinct variable resultValue not seen as use of result',
+      () async {
+        const code = '''
 class Navigator {
   static Future<Object?> push(Object? route) async => null;
 }
@@ -190,9 +193,10 @@ Future<void> go() async {
   print(resultValue);
 }
 ''';
-      final codes = await reportedRuleCodes(rule, code);
-      expect(codes, isNot(contains(ruleName)));
-    });
+        final codes = await reportedRuleCodes(rule, code);
+        expect(codes, isNot(contains(ruleName)));
+      },
+    );
 
     // BAD: result used directly with no null check fires.
     test('BAD: result used without null check fires', () async {

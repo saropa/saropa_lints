@@ -19,7 +19,8 @@ void main() {
     void writeManifest(List<String> permissions) {
       final entries = permissions
           .map(
-            (p) => '    <uses-permission android:name="android.permission.$p" />',
+            (p) =>
+                '    <uses-permission android:name="android.permission.$p" />',
           )
           .join('\n');
       manifest.writeAsStringSync('''
@@ -50,12 +51,15 @@ $entries
       }
     });
 
-    test('hasPermission does not match a longer permission sharing the prefix', () {
-      writeManifest(['READ_CONTACTS_EXTENDED']);
-      final checker = AndroidManifestChecker.forFile(probeFile)!;
-      expect(checker.hasPermission('READ_CONTACTS'), isFalse);
-      expect(checker.hasPermission('READ_CONTACTS_EXTENDED'), isTrue);
-    });
+    test(
+      'hasPermission does not match a longer permission sharing the prefix',
+      () {
+        writeManifest(['READ_CONTACTS_EXTENDED']);
+        final checker = AndroidManifestChecker.forFile(probeFile)!;
+        expect(checker.hasPermission('READ_CONTACTS'), isFalse);
+        expect(checker.hasPermission('READ_CONTACTS_EXTENDED'), isTrue);
+      },
+    );
 
     test('hasPermission matches an exact permission', () {
       writeManifest(['CAMERA', 'INTERNET']);

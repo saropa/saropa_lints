@@ -2167,7 +2167,8 @@ class _AnimationValueReadVisitor extends RecursiveAstVisitor<void> {
   /// True when [receiver] is an Animation/AnimationController, or its type is
   /// unresolved (conservative for the type-less scan path).
   static bool _receiverIsAnimationValued(Expression? receiver) {
-    if (receiver == null) return true; // Unresolved/implicit — stay conservative.
+    if (receiver == null)
+      return true; // Unresolved/implicit — stay conservative.
     final DartType? type = receiver.staticType;
     // Type-less ASTs (parseString) carry no static type — keep prior behavior.
     if (type is! InterfaceType) return true;

@@ -161,8 +161,10 @@ class W extends StatelessWidget {
       expect(codes, contains('prefer_fractional_sizing'));
     });
 
-    test('GOOD: unrelated user type with MediaQuery/size in its name', () async {
-      final codes = await reportedRuleCodes(PreferFractionalSizingRule(), '''
+    test(
+      'GOOD: unrelated user type with MediaQuery/size in its name',
+      () async {
+        final codes = await reportedRuleCodes(PreferFractionalSizingRule(), '''
 $_stubs
 class W extends StatelessWidget {
   const W();
@@ -172,15 +174,17 @@ class W extends StatelessWidget {
   }
 }
 ''');
-      expect(codes, isEmpty);
-    });
+        expect(codes, isEmpty);
+      },
+    );
 
     // Stronger probe: a receiver whose name contains "MediaQuery" AND a property
     // chain that literally contains ".size." but is not a MediaQuery API read.
     // This is the worst case the substring heuristic could mishandle.
-    test('GOOD: non-MediaQuery chain literally containing ".size." stays silent',
-        () async {
-      final codes = await reportedRuleCodes(PreferFractionalSizingRule(), '''
+    test(
+      'GOOD: non-MediaQuery chain literally containing ".size." stays silent',
+      () async {
+        final codes = await reportedRuleCodes(PreferFractionalSizingRule(), '''
 $_stubs
 class FakeMediaQueryHolder {
   const FakeMediaQueryHolder();
@@ -194,10 +198,11 @@ class W extends StatelessWidget {
   }
 }
 ''');
-      // After the fix this must stay silent (only real MediaQuery.of/.sizeOf
-      // reads should match). Documented as the expectation the fix must meet.
-      expect(codes, isEmpty);
-    });
+        // After the fix this must stay silent (only real MediaQuery.of/.sizeOf
+        // reads should match). Documented as the expectation the fix must meet.
+        expect(codes, isEmpty);
+      },
+    );
   });
 
   // ==========================================================================
@@ -256,9 +261,12 @@ class W extends StatelessWidget {
   // declares its own `alignment` is intentional; do not flag.
   // ==========================================================================
   group('avoid_stack_without_positioned', () {
-    test('BAD: Stack with no alignment/fit and an unpositioned child fires',
-        () async {
-      final codes = await reportedRuleCodes(AvoidStackWithoutPositionedRule(), '''
+    test(
+      'BAD: Stack with no alignment/fit and an unpositioned child fires',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidStackWithoutPositionedRule(),
+          '''
 $_stubs
 class W extends StatelessWidget {
   const W();
@@ -266,13 +274,18 @@ class W extends StatelessWidget {
     children: <Widget>[CircleAvatar(), Badge()],
   );
 }
-''');
-      expect(codes, contains('avoid_stack_without_positioned'));
-    });
+''',
+        );
+        expect(codes, contains('avoid_stack_without_positioned'));
+      },
+    );
 
-    test('GOOD: Stack with alignment (intentional overlap) stays silent',
-        () async {
-      final codes = await reportedRuleCodes(AvoidStackWithoutPositionedRule(), '''
+    test(
+      'GOOD: Stack with alignment (intentional overlap) stays silent',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidStackWithoutPositionedRule(),
+          '''
 $_stubs
 class W extends StatelessWidget {
   const W();
@@ -281,9 +294,11 @@ class W extends StatelessWidget {
     children: <Widget>[CircleAvatar(), Badge()],
   );
 }
-''');
-      expect(codes, isEmpty);
-    });
+''',
+        );
+        expect(codes, isEmpty);
+      },
+    );
   });
 
   // ==========================================================================
@@ -299,53 +314,67 @@ class W extends StatelessWidget {
   // where the dead `value > 4.0` carve-out lives.
   group('avoid_hardcoded_layout_values', () {
     test('BAD: EdgeInsets.all(13) fires (integer)', () async {
-      final codes = await reportedRuleCodes(AvoidHardcodedLayoutValuesRule(), '''
+      final codes = await reportedRuleCodes(
+        AvoidHardcodedLayoutValuesRule(),
+        '''
 $_stubs
 class W extends StatelessWidget {
   const W();
   Widget build(BuildContext context) =>
       const Padding(padding: EdgeInsets.all(13), child: Text('a'));
 }
-''');
+''',
+      );
       expect(codes, contains('avoid_hardcoded_layout_values'));
     });
 
     test('BAD: EdgeInsets.all(12.5) fires (non-integer double)', () async {
-      final codes = await reportedRuleCodes(AvoidHardcodedLayoutValuesRule(), '''
+      final codes = await reportedRuleCodes(
+        AvoidHardcodedLayoutValuesRule(),
+        '''
 $_stubs
 class W extends StatelessWidget {
   const W();
   Widget build(BuildContext context) =>
       const Padding(padding: EdgeInsets.all(12.5), child: Text('a'));
 }
-''');
+''',
+      );
       expect(codes, contains('avoid_hardcoded_layout_values'));
     });
 
     test('BAD: EdgeInsets.all(8.0) fires (integer-valued double)', () async {
-      final codes = await reportedRuleCodes(AvoidHardcodedLayoutValuesRule(), '''
+      final codes = await reportedRuleCodes(
+        AvoidHardcodedLayoutValuesRule(),
+        '''
 $_stubs
 class W extends StatelessWidget {
   const W();
   Widget build(BuildContext context) =>
       const Padding(padding: EdgeInsets.all(8.0), child: Text('a'));
 }
-''');
+''',
+      );
       expect(codes, contains('avoid_hardcoded_layout_values'));
     });
 
-    test('GOOD: small acceptable value (EdgeInsets.all(2)) stays silent',
-        () async {
-      final codes = await reportedRuleCodes(AvoidHardcodedLayoutValuesRule(), '''
+    test(
+      'GOOD: small acceptable value (EdgeInsets.all(2)) stays silent',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidHardcodedLayoutValuesRule(),
+          '''
 $_stubs
 class W extends StatelessWidget {
   const W();
   Widget build(BuildContext context) =>
       const Padding(padding: EdgeInsets.all(2), child: Text('a'));
 }
-''');
-      expect(codes, isEmpty);
-    });
+''',
+        );
+        expect(codes, isEmpty);
+      },
+    );
   });
 
   // ==========================================================================
@@ -353,9 +382,12 @@ class W extends StatelessWidget {
   // and SizedBox(height: 8.0) as distinct spacers. Compare numeric values.
   // ==========================================================================
   group('prefer_spacing_over_sizedbox', () {
-    test('BAD: numerically-equal spacers (8 vs 8.0) are one spacer => fires',
-        () async {
-      final codes = await reportedRuleCodes(PreferSpacingOverSizedBoxRule(), '''
+    test(
+      'BAD: numerically-equal spacers (8 vs 8.0) are one spacer => fires',
+      () async {
+        final codes = await reportedRuleCodes(
+          PreferSpacingOverSizedBoxRule(),
+          '''
 $_stubs
 class W extends StatelessWidget {
   const W();
@@ -373,9 +405,11 @@ class Column extends Widget {
   const Column({this.spacing, this.children});
   final double? spacing; final List<Widget>? children;
 }
-''');
-      expect(codes, contains('prefer_spacing_over_sizedbox'));
-    });
+''',
+        );
+        expect(codes, contains('prefer_spacing_over_sizedbox'));
+      },
+    );
 
     test('GOOD: genuinely different spacer heights stay silent', () async {
       final codes = await reportedRuleCodes(PreferSpacingOverSizedBoxRule(), '''
@@ -455,11 +489,12 @@ class W extends StatelessWidget {
       expect(codes, contains('avoid_builder_index_out_of_bounds'));
     });
 
-    test('GOOD: guard on the same receiver chain (widget.items) stays silent',
-        () async {
-      final codes = await reportedRuleCodes(
-        AvoidBuilderIndexOutOfBoundsRule(),
-        '''
+    test(
+      'GOOD: guard on the same receiver chain (widget.items) stays silent',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidBuilderIndexOutOfBoundsRule(),
+          '''
 $_stubs
 class W extends StatelessWidget {
   const W();
@@ -474,9 +509,10 @@ class W extends StatelessWidget {
   }
 }
 ''',
-      );
-      expect(codes, isEmpty);
-    });
+        );
+        expect(codes, isEmpty);
+      },
+    );
   });
 
   // ==========================================================================

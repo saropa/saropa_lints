@@ -28,10 +28,12 @@ void main() {
     // A guarded pop must stay silent. The mounted check sits BEFORE the pop in
     // the original source; the old offset-into-toSource() slice handled this
     // case by luck, so it is the control for the real bug below.
-    test('does NOT fire when context.mounted guards the pop (control)', () async {
-      final codes = await reportedRuleCodes(
-        AvoidDialogContextAfterAsyncRule(),
-        '''
+    test(
+      'does NOT fire when context.mounted guards the pop (control)',
+      () async {
+        final codes = await reportedRuleCodes(
+          AvoidDialogContextAfterAsyncRule(),
+          '''
 class Navigator {
   static void pop(Object? context) {}
 }
@@ -46,9 +48,10 @@ class Svc {
   }
 }
 ''',
-      );
-      expect(codes, isNot(contains('avoid_dialog_context_after_async')));
-    });
+        );
+        expect(codes, isNot(contains('avoid_dialog_context_after_async')));
+      },
+    );
 
     // THE BUG: the mounted check is AFTER the pop, so the pop is unguarded and
     // MUST be flagged. Comments + irregular whitespace before the pop make the
@@ -101,8 +104,10 @@ void persist(Db db, DateTime created) {
     // ancestor scan ran storage regexes against each ancestor's full toSource(),
     // so the enclosing method body (which contains `save(`) marked the label as
     // "storage context" -> false POSITIVE.
-    test('does NOT fire on a UI label when an unrelated save() is in scope', () async {
-      final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
+    test(
+      'does NOT fire on a UI label when an unrelated save() is in scope',
+      () async {
+        final codes = await reportedRuleCodes(PreferUtcForStorageRule(), '''
 class Db {
   void save(Object value) {}
 }
@@ -115,8 +120,9 @@ class Ui {
   }
 }
 ''');
-      expect(codes, isNot(contains('prefer_utc_for_storage')));
-    });
+        expect(codes, isNot(contains('prefer_utc_for_storage')));
+      },
+    );
   });
 
   group('require_stream_error_handling', () {
@@ -136,10 +142,12 @@ void sub(Stream<int> source) {
     // THE BUG: animationController is NOT a Stream, but its name ends with
     // "controller", so the old name fallback flagged its (unrelated) listen()
     // for a missing onError -> false POSITIVE.
-    test('does NOT fire on a non-Stream object whose name ends in "controller"', () async {
-      final codes = await reportedRuleCodes(
-        RequireStreamErrorHandlingRule(),
-        '''
+    test(
+      'does NOT fire on a non-Stream object whose name ends in "controller"',
+      () async {
+        final codes = await reportedRuleCodes(
+          RequireStreamErrorHandlingRule(),
+          '''
 class AnimationController {
   void listen(void Function() callback) {}
 }
@@ -148,9 +156,10 @@ void run(AnimationController animationController) {
   animationController.listen(() {});
 }
 ''',
-      );
-      expect(codes, isNot(contains('require_stream_error_handling')));
-    });
+        );
+        expect(codes, isNot(contains('require_stream_error_handling')));
+      },
+    );
 
     // The `.stream` access signal must still fire even when the static type of
     // the `.stream` getter is unresolved, so the property-access fallback works.

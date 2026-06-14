@@ -31,7 +31,10 @@ void main() {
   test('measures only dart files, skips non-dart and build/', () async {
     final rows = <FileHealth>[];
     final agg = await runSizeScan(
-      SizeScanOptions(projectPath: tmp.path, onRow: (row) async => rows.add(row)),
+      SizeScanOptions(
+        projectPath: tmp.path,
+        onRow: (row) async => rows.add(row),
+      ),
     );
     expect(agg.fileCount, 2); // a.dart + sub/b.dart
     expect(rows, hasLength(2));

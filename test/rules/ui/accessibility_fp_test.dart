@@ -37,13 +37,16 @@ Widget build() => const Semantics(explicitChildNodes: true, child: Text('a'));
       expect(codes, contains('prefer_semantics_sort'));
     });
 
-    test('GOOD: plain Semantics (no explicitChildNodes) stays silent', () async {
-      final codes = await reportedRuleCodes(PreferSemanticsSortRule(), '''
+    test(
+      'GOOD: plain Semantics (no explicitChildNodes) stays silent',
+      () async {
+        final codes = await reportedRuleCodes(PreferSemanticsSortRule(), '''
 $_stubs
 Widget build() => const Semantics(label: 'a', child: Text('a'));
 ''');
-      expect(codes, isEmpty);
-    });
+        expect(codes, isEmpty);
+      },
+    );
 
     test('GOOD: explicitChildNodes with sortKey stays silent', () async {
       final codes = await reportedRuleCodes(PreferSemanticsSortRule(), '''
