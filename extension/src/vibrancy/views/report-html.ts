@@ -1418,36 +1418,6 @@ export function computePublishedAgeMonths(isoDate: string | null, now: Date = ne
     return Math.max(0, months);
 }
 
-/** Expandable detail card shown when a row is expanded. Contains score
- *  breakdown, vulnerability list, file usages, and dependency tree. */
-function buildDetailCard(r: VibrancyResult): string {
-    const sections: string[] = [];
-
-    /* Score breakdown */
-    sections.push(buildDetailScoreSection(r));
-
-    /* Vulnerabilities */
-    if (r.vulnerabilities.length > 0) {
-        sections.push(buildDetailVulnSection(r));
-    }
-
-    /* File usages */
-    const active = activeFileUsages(r.fileUsages);
-    if (active.length > 0) {
-        sections.push(buildDetailFilesSection(r, active));
-    }
-
-    /* Transitive dependency tree */
-    if (r.transitiveInfo && r.transitiveInfo.transitiveCount > 0) {
-        sections.push(buildDetailDepsSection(r));
-    }
-
-    /* Links */
-    sections.push(buildDetailLinksSection(r));
-
-    return `<div class="detail-card">${sections.join('')}</div>`;
-}
-
 /**
  * Health Score breakdown panel (score factors + maintainer-quality bonuses).
  * Exported so the dashboard's docked detail pane can render it: it is the one
@@ -1567,85 +1537,6 @@ function computeActivitySignal(r: VibrancyResult): {
         ? l10n('packageDashboard.activity.withDormancy', { dormancy, grade })
         : l10n('packageDashboard.activity.healthy', { grade });
     return { score, grade, message, sortValue: String(score) };
-}
-
-function buildDetailVulnSection(r: VibrancyResult): string {
-    const rows = r.vulnerabilities.map(v => {
-        const sev = v.severity ? `<span class="vuln-${v.severity}">${severityLabel(v.severity)}</span>` : '';
-        const link = v.url ? `<a href="${escapeHtml(v.url)}">${escapeHtml(v.id)}</a>` : escapeHtml(v.id);
-        const fix = v.fixedVersion
-            ? ` ${escapeHtml(l10n('packageDashboard.detail.fixInVersion', { version: v.fixedVersion }))}`
-            : '';
-        return `<div class="vuln-row">${sev} ${link}: ${escapeHtml(v.summary ?? '')}${fix}</div>`;
-    });
-    return `<div class="detail-section">
-        <h4>${escapeHtml(l10n('packageDashboard.detail.vulnerabilitiesHeading', { count: String(r.vulnerabilities.length) }))}</h4>
-        ${rows.join('\n')}
-    </div>`;
-}
-
-function buildDetailFilesSection(
-    r: VibrancyResult,
-    active: ReturnType<typeof activeFileUsages>,
-): string {
-    const name = escapeHtml(r.package.name);
-    // Each usage is one source file after the scanner dedupe. Render a
-    // row per directive kind (import / export) that the file contains so
-    // both line locations stay visible even though the header count is
-    // now files-not-directives. Files without the split fields fall back
-    // to the pre-dedupe single-line display.
-    const fileList = active.slice(0, 20).flatMap(u => {
-        const rows: string[] = [];
-        const path = escapeHtml(u.filePath);
-        if (u.exportLine != null) {
-            rows.push(`<div class="file-row"><span class="file-link" data-path="${path}" data-line="${u.exportLine}">${path}:${u.exportLine}</span> ${escapeHtml(l10n('packageDashboard.references.reExportSuffix'))}</div>`);
-        }
-        if (u.importLine != null) {
-            rows.push(`<div class="file-row"><span class="file-link" data-path="${path}" data-line="${u.importLine}">${path}:${u.importLine}</span></div>`);
-        }
-        if (u.exportLine == null && u.importLine == null) {
-            rows.push(`<div class="file-row"><span class="file-link" data-path="${path}" data-line="${u.line}">${path}:${u.line}</span></div>`);
-        }
-        return rows;
-    }).join('\n');
-    const more = active.length > 20
-        ? `<div class="dimmed">${escapeHtml(l10n('packageDashboard.references.andMore', { count: String(active.length - 20) }))}</div>` : '';
-    return `<div class="detail-section">
-        <h4>${escapeHtml(l10n('packageDashboard.references.fileReferencesHeading', { count: String(active.length) }))} <span class="ref-link detail-search-link" data-pkg="${name}" title="${escapeHtml(l10n('packageDashboard.references.searchImports'))}">\u{1F50D}</span></h4>
-        ${fileList}${more}
-    </div>`;
-}
-
-function buildDetailDepsSection(r: VibrancyResult): string {
-    const info = r.transitiveInfo!;
-    const depItems = info.transitives.map(dep => {
-        const isShared = info.sharedDeps.includes(dep);
-        const cls = isShared ? ' class="dep-shared"' : '';
-        const badge = isShared ? ` <span class="badge-shared-sm">${escapeHtml(l10n('packageDashboard.deps.sharedBadge'))}</span>` : '';
-        return `<span${cls}>${escapeHtml(dep)}${badge}</span>`;
-    });
-    return `<div class="detail-section">
-        <h4>${escapeHtml(l10n('packageDashboard.deps.transitiveDepsHeading', { count: String(info.transitiveCount) }))}</h4>
-        <div class="dep-cloud">${depItems.join(' ')}</div>
-    </div>`;
-}
-
-function buildDetailLinksSection(r: VibrancyResult): string {
-    const name = encodeURIComponent(r.package.name);
-    const links: string[] = [
-        `<a href="https://pub.dev/packages/${name}">${escapeHtml(l10n('packageDashboard.links.pubDev'))}</a>`,
-        `<a href="https://pub.dev/packages/${name}/changelog">${escapeHtml(l10n('packageDashboard.links.changelog'))}</a>`,
-        `<a href="https://pub.dev/packages/${name}/versions">${escapeHtml(l10n('packageDashboard.links.versions'))}</a>`,
-    ];
-    const repoUrl = (r.github?.repoUrl ?? r.pubDev?.repositoryUrl)?.replace(/\/+$/, '');
-    if (repoUrl) {
-        links.push(`<a href="${escapeHtml(repoUrl)}">${escapeHtml(l10n('packageDashboard.links.repository'))}</a>`);
-        links.push(`<a href="${escapeHtml(repoUrl)}/issues">${escapeHtml(l10n('packageDashboard.links.issues'))}</a>`);
-    }
-    return `<div class="detail-section detail-links">
-        <h4>${escapeHtml(l10n('packageDashboard.links.heading'))}</h4>
-        <div class="link-list">${links.join(' \u2022 ')}</div>
-    </div>`;
 }
 
 // ---------------------------------------------------------------------------
