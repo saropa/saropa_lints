@@ -31,6 +31,7 @@ export function getConfigDashboardStyles(): string {
     tierControlStyles(),
     packTableSpecifics(),
     disabledRulesStyles(),
+    stylisticStyles(),
     diagnosticsStyles(),
     sharedAtomStyles(),
   ].join('\n');
@@ -87,6 +88,49 @@ function packTableSpecifics(): string {
 .dash-table.packs td.pack-name { font-weight: 500; }
 .dash-table.packs td.ok { color: var(--status-good); }
 .dash-table.packs td.muted { color: var(--muted); }
+
+/* Domain sub-accordions inside "All packages" — one collapsed group per problem
+   area (State management, Storage, …). Lighter weight than the section expander
+   so the two-level hierarchy reads clearly. */
+details.domain-group { margin: 4px 0 6px; padding-left: 4px; border-left: 2px solid var(--border); }
+details.domain-group > summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 0;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+details.domain-group > summary::-webkit-details-marker { display: none; }
+details.domain-group > summary::before {
+  content: '▶';
+  display: inline-block;
+  font-size: 0.65em;
+  width: 0.9em;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+details.domain-group[open] > summary::before { transform: rotate(90deg); }
+details.domain-group > summary .muted { font-size: 0.85em; font-weight: 500; color: var(--muted); }
+.domain-desc { margin: 2px 0 6px; font-size: 0.85em; color: var(--muted); line-height: 1.4; }
+/* Small domain chip beside a detected pack's name so its problem area shows in
+   the flat "For your project" list (the domain accordions carry it in headers). */
+.pack-domain {
+  font-size: 0.75em;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 6px;
+  white-space: nowrap;
+}
+details.domain-group > summary:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
 
 /* Type filter <select>. Native option lists ignore most CSS, but VS Code exposes
    dropdown theme tokens; without them the open list renders low-contrast gray-on-
@@ -254,6 +298,107 @@ details.expander > summary:focus-visible {
   outline-offset: 2px;
   border-radius: 4px;
 }
+`;
+}
+
+/**
+ * "Style & opinions" section — the opt-in stylistic rules grouped by concept.
+ * Multi-select groups list checkbox toggles; pick-one groups render as radio
+ * fieldsets with a distinct accent so the mutually-exclusive contract reads at
+ * a glance. Groups flow in a responsive grid so dozens of small groups stay
+ * scannable instead of forming one tall column.
+ */
+function stylisticStyles(): string {
+  return `
+.stylistic { margin-bottom: 14px; }
+.stylistic-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 10px;
+}
+.stylistic-search {
+  flex: 0 1 320px;
+  padding: 4px 8px;
+  font: inherit;
+  color: var(--vscode-input-foreground);
+  background: var(--vscode-input-background);
+  border: 1px solid var(--vscode-input-border, var(--border));
+  border-radius: 4px;
+}
+.stylistic-search:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+.stylistic-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  align-items: start;
+}
+.stylistic-group {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+  padding: 10px 12px;
+  margin: 0;
+}
+/* Pick-one groups carry a left accent bar so the radio (mutually-exclusive)
+   contract is visible without reading the tag. */
+.stylistic-group.pick-one {
+  border-left: 3px solid var(--vscode-textLink-foreground);
+}
+.stylistic-group-heading {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.9em;
+  font-weight: 600;
+  margin: 0 0 6px;
+  padding: 0;
+}
+.stylistic-group-heading .muted { font-weight: 500; color: var(--muted); }
+.pick-one-tag {
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--vscode-textLink-foreground);
+  font-weight: 700;
+}
+.stylistic-bulk { margin-left: auto; display: inline-flex; gap: 4px; }
+/* One-line decision-support blurb under a group heading (e.g. noisiness warning). */
+.stylistic-group-desc {
+  margin: 0 0 8px;
+  font-size: 0.85em;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.stylistic-rules-list { list-style: none; margin: 0; padding: 0; }
+.stylistic-rule-row,
+.stylistic-radio-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 4px;
+  border-radius: 4px;
+}
+.stylistic-rule-row:hover,
+.stylistic-radio-row:hover { background: var(--vscode-list-hoverBackground); }
+.stylistic-radio-row { cursor: pointer; }
+.stylistic-radio-row input[type=radio] { accent-color: var(--vscode-textLink-foreground); }
+.stylistic-none { color: var(--muted); font-style: italic; }
+.stylistic-rule-row .rule-link,
+.stylistic-radio-row .rule-link {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 0.9em;
+  color: var(--vscode-textLink-foreground);
+  text-decoration: none;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.stylistic-rule-row .rule-link:hover,
+.stylistic-radio-row .rule-link:hover { text-decoration: underline; }
 `;
 }
 

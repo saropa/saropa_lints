@@ -23,11 +23,19 @@ import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { getProjectRoot } from '../projectRoot';
-import { readDisabledRules } from '../configWriter';
+import {
+  readDisabledRules,
+  readRuleOverrides,
+  writeRuleOverrides,
+  removeRuleOverrides,
+} from '../configWriter';
 import { readPubspec, FLUTTER_EMBEDDER_PLATFORMS } from '../pubspecReader';
 import { readViolations, filterDisabledFromData } from '../violationsReader';
 import { buildSuppressionsExportSnapshotStripHtml } from '../views/configDashboardSuppressionsStrip';
 import { RULE_PACK_DEFINITIONS, isPackDetected } from './rulePackDefinitions';
+import { STYLISTIC_PACK_DEFINITIONS } from './stylisticPackDefinitions';
+import { packDomainForId, PACK_DOMAIN_ORDER } from './packDomains';
+import { l10n } from '../i18n/runtime';
 import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
 import { getConfigDashboardScript } from './configDashboardScript';
 import { getConfigDashboardStyles } from './configDashboardStyles';
@@ -77,6 +85,13 @@ interface DashboardContext {
    * banner directing readers back to the extension.
    */
   disabledRules: readonly string[];
+  /**
+   * Stylistic rule codes currently turned ON via overrides (`rule: true`).
+   * Stylistic rules are off in every tier, so an explicit `true` override is
+   * the only way one is active. Drives the checked/selected state of the
+   * Style & opinions section's toggles and radios.
+   */
+  enabledStylistic: ReadonlySet<string>;
 }
 
 export function isSdkPackId(id: string): boolean {
@@ -315,6 +330,20 @@ export class RulePacksWebviewProvider {
         if (msg.type === 'toggle' && msg.packId !== undefined && msg.enabled !== undefined) {
           void this._handleToggle(msg.packId, msg.enabled);
         }
+        // A single stylistic rule toggled on/off (multi-select groups). Enabling
+        // writes `rule: true`; disabling removes the override (back to off default).
+        if (msg.type === 'toggleRule' && typeof msg.rule === 'string' && msg.enabled !== undefined) {
+          void this._handleToggleRule(msg.rule, msg.enabled);
+        }
+        // A pick-one stylistic group choice. `packId` is the group id; `rule` is
+        // the chosen rule code, or '' to clear the whole group.
+        if (msg.type === 'selectStylistic' && typeof msg.packId === 'string' && typeof msg.rule === 'string') {
+          void this._handleSelectStylistic(msg.packId, msg.rule);
+        }
+        // Enable-all / disable-all for a multi-select stylistic group.
+        if (msg.type === 'stylisticBulk' && typeof msg.packId === 'string' && msg.enabled !== undefined) {
+          void this._handleStylisticBulk(msg.packId, msg.enabled);
+        }
         // A rule code clicked inside an expanded pack row opens its explanation.
         // The name arrives over untrusted postMessage and reaches a command, so
         // validate it as a snake_case lint id before forwarding.
@@ -383,6 +412,10 @@ export class RulePacksWebviewProvider {
       // Per §8.5 / §14.10 the strip must exist in the DOM so it can render synchronously.
       '<div class="chip-strip" id="filter-strip" hidden></div>',
       this._buildPackTable(ctx),
+      // Style & opinions: the third configuration zone. Off by default, opt-in
+      // per rule, collapsed so it never dominates the screen. Conflicting groups
+      // render as pick-one radios; the rest as independent toggles.
+      this._buildStylisticSection(ctx),
       // Disabled-rules section sits directly under the pack table because both
       // edit the same effective rule set: packs + tier set the baseline, and
       // these overrides remove individual rules from it. Users coming from
@@ -422,6 +455,12 @@ export class RulePacksWebviewProvider {
     // the underlying file (`analysis_options_custom.yaml`) carries a
     // "do not edit manually" banner pointing back to this extension.
     const disabledRules = [...readDisabledRules(root)].sort();
+    // Stylistic rules active = overrides explicitly set to true. Stylistic rules
+    // sit in no tier, so this is the complete set of opt-ins the user has made.
+    const enabledStylistic = new Set<string>();
+    for (const [rule, on] of readRuleOverrides(root)) {
+      if (on) enabledStylistic.add(rule);
+    }
     return {
       pubspecInfo: info,
       currentTier,
@@ -434,6 +473,7 @@ export class RulePacksWebviewProvider {
       analysisTimestamp: violationsRaw?.timestamp,
       suppressionsStripHtml: buildSuppressionsExportSnapshotStripHtml(violationsForStrip),
       disabledRules,
+      enabledStylistic,
     };
   }
 
@@ -695,17 +735,89 @@ export class RulePacksWebviewProvider {
    * primary content of the dashboard.
    */
   private _buildPackTable(ctx: DashboardContext): string {
-    // Default sort is A–Z by pack name so the list is scannable by what users
-    // recognize (the package name), not by an opaque rule count.
-    const rows = [...ctx.packRows]
-      .sort((a, b) => a.label.localeCompare(b.label))
-      .map((row) => this._buildPackRow(row))
-      .join('\n');
-    return `<details class="section expander" aria-label="Rule packs" open>
-  <summary><span class="expander-title">Rule packs</span> <span class="muted">(${ctx.packRows.length})</span></summary>
+    // Relevance-first split: packs whose dependency/SDK gate matches this project
+    // go in a "For your project" accordion that opens by default; everything else
+    // lands in a collapsed "All packages" accordion. This keeps the screen to a
+    // few rows on open instead of all ~86, while leaving every pack one click away.
+    // Each accordion sorts A–Z by pack name (what users recognize) within itself.
+    const byLabel = (a: PackChartRow, b: PackChartRow): number =>
+      a.label.localeCompare(b.label);
+    const detected = [...ctx.packRows].filter((r) => r.detected).sort(byLabel);
+    const rest = [...ctx.packRows].filter((r) => !r.detected).sort(byLabel);
+    const detectedRows = detected.map((row) => this._buildPackRow(row, true)).join('\n');
+    const detectedEmpty = `<tr class="packs-none"><td colspan="7" class="hint">${escapeHtml(l10n('packs.noneDetected'))}</td></tr>`;
+    return `<details class="section expander" aria-label="${escapeHtml(l10n('packs.forYourProject'))}" open>
+  <summary><span class="expander-title">${escapeHtml(l10n('packs.forYourProject'))}</span> <span class="muted">(${detected.length})</span></summary>
+  <p class="hint">${escapeHtml(l10n('packs.forYourProjectHint'))}</p>
   <div class="dash-table-wrap">
-    <table class="dash-table packs" id="packs-table">
-      <thead>
+    <table class="dash-table packs" id="packs-table-detected">
+      ${this._packTableHead()}
+      <tbody id="packs-tbody-detected" class="packs-tbody">${detected.length > 0 ? detectedRows : detectedEmpty}</tbody>
+    </table>
+  </div>
+</details>
+<details class="section expander" aria-label="${escapeHtml(l10n('packs.allPackages'))}">
+  <summary><span class="expander-title">${escapeHtml(l10n('packs.allPackages'))}</span> <span class="muted">(${rest.length})</span></summary>
+  <p class="hint">${escapeHtml(l10n('packs.allPackagesHint'))}</p>
+  ${this._buildPackDomainGroups(rest)}
+</details>`;
+  }
+
+  /**
+   * Render the non-detected packs grouped by editorial domain (State management,
+   * Networking, Storage, …). Each domain is its own collapsed sub-accordion so a
+   * user scanning by problem area (e.g. "what storage rules exist?") opens one
+   * group instead of reading all ~80 rows. Domains follow {@link PACK_DOMAIN_ORDER};
+   * empty domains are skipped. Each sub-table reuses the shared `.packs-tbody`
+   * class so the existing filter/sort logic spans every group.
+   */
+  private _buildPackDomainGroups(rows: readonly PackChartRow[]): string {
+    const byDomain = new Map<string, PackChartRow[]>();
+    for (const row of rows) {
+      const domain = packDomainForId(row.id);
+      const list = byDomain.get(domain);
+      if (list) {
+        list.push(row);
+      } else {
+        byDomain.set(domain, [row]);
+      }
+    }
+    // Render in the curated order; any domain not in the order list (defensive)
+    // is appended alphabetically so a stray group is never silently dropped.
+    const ordered = [...byDomain.keys()].sort((a, b) => {
+      const ia = PACK_DOMAIN_ORDER.indexOf(a);
+      const ib = PACK_DOMAIN_ORDER.indexOf(b);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.localeCompare(b);
+    });
+    return ordered
+      .map((domain) => this._buildPackDomainGroup(domain, byDomain.get(domain)!))
+      .join('\n');
+  }
+
+  /** One domain sub-accordion: a collapsed table of that domain's packs. */
+  private _buildPackDomainGroup(domain: string, rows: PackChartRow[]): string {
+    const slug = domain.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    const body = rows.map((row) => this._buildPackRow(row)).join('\n');
+    const rawDesc = l10n('packs.domainDesc.' + slug, undefined, { fallback: '' });
+    const descHtml = rawDesc ? `<p class="hint domain-desc">${escapeHtml(rawDesc)}</p>` : '';
+    return `<details class="domain-group">
+  <summary><span class="domain-title">${escapeHtml(domain)}</span> <span class="muted">(${rows.length})</span></summary>
+  ${descHtml}
+  <div class="dash-table-wrap">
+    <table class="dash-table packs" id="packs-table-${slug}">
+      ${this._packTableHead()}
+      <tbody id="packs-tbody-${slug}" class="packs-tbody">${body}</tbody>
+    </table>
+  </div>
+</details>`;
+  }
+
+  /** Shared column header row for both pack tables (detected / all). */
+  private _packTableHead(): string {
+    return `<thead>
         <tr>
           <th class="sortable" data-sort="detected" aria-sort="none" title="Recommended for this project: the pack's dependency or SDK gate is satisfied by your pubspec, so its rules apply to code you actually ship. Sort to bring recommended packs together.">Recommended <span class="arrow">▲</span></th>
           <th class="sortable" data-sort="label" aria-sort="ascending" title="The pub package or Dart/Flutter SDK version this rule pack targets. Default sort. Click to reverse.">Pack <span class="arrow">▲</span></th>
@@ -715,11 +827,7 @@ export class RulePacksWebviewProvider {
           <th class="sortable num" data-sort="rules" aria-sort="none" title="How many lint rules this pack adds to analysis when enabled.">Rules <span class="arrow">▲</span></th>
           <th title="Expand a pack to see and open each of its rules."></th>
         </tr>
-      </thead>
-      <tbody id="packs-tbody">${rows}</tbody>
-    </table>
-  </div>
-</details>`;
+      </thead>`;
   }
 
   /**
@@ -729,7 +837,7 @@ export class RulePacksWebviewProvider {
    * (gate package + version constraint) goes into the `title` of the *In pubspec* cell, not as a
    * second visible footnote on the row.
    */
-  private _buildPackRow(row: PackChartRow): string {
+  private _buildPackRow(row: PackChartRow, showDomain = false): string {
     const def = RULE_PACK_DEFINITIONS.find((d) => d.id === row.id)!;
     const isSdk = isSdkPackId(def.id);
     const riskKind = sdkPackRiskKind(def);
@@ -742,6 +850,12 @@ export class RulePacksWebviewProvider {
     const detectedCell = `<td class="${row.detected ? 'ok' : 'muted'}" title="${escapeHtml(gateText)}" data-detected="${row.detected ? '1' : '0'}">${row.detected ? 'Yes' : 'No'}</td>`;
     const id = escapeHtml(row.id);
     const label = escapeHtml(def.label);
+    // In the flat "For your project" table, append the domain so each detected
+    // pack still shows its problem area (the domain accordions carry it in the
+    // header instead, so it would be redundant there).
+    const domainTag = showDomain
+      ? ` <span class="pack-domain">${escapeHtml(packDomainForId(row.id))}</span>`
+      : '';
     // Inline disclosure: clicking the toggle reveals the detail row below (built
     // from def.ruleCodes) instead of opening a separate quick-pick popup, so the
     // rule list stays in context and each rule is a clickable link to its doc.
@@ -755,7 +869,7 @@ export class RulePacksWebviewProvider {
     const detailRow = `<tr class="rules-detail" data-detail-for="${id}" hidden><td colspan="7"><div class="rules-detail-body">${ruleLinks}</div></td></tr>`;
     return `<tr data-pack="${id}" data-type="${isSdk ? 'sdk' : 'package'}" data-risk="${riskKind}" data-detected="${row.detected ? '1' : '0'}" data-enabled="${row.enabled ? '1' : '0'}" data-rules="${row.rules}" data-label="${escapeHtml(def.label.toLowerCase())}">
   ${detectedCell}
-  <td class="pack-name">${label}</td>
+  <td class="pack-name">${label}${domainTag}</td>
   <td>${typeBadge}</td>
   <td>${riskBadge}</td>
   <td><label class="switch"><input type="checkbox" data-pack="${id}" ${row.enabled ? 'checked' : ''} aria-label="Enable ${label}" /><span class="slider"></span></label></td>
@@ -946,6 +1060,103 @@ ${detailRow}`;
 </details>`;
   }
 
+  /**
+   * Style & opinions section: the opt-in stylistic rules grouped by concept.
+   *
+   * Collapsed by default and placed below the ecosystem packs because these are
+   * pure preferences, not correctness or migration rules — they should never be
+   * the first thing a user reorganizes. Conflicting groups render as pick-one
+   * radios so two contradictory rules can never be enabled at once; the rest are
+   * independent toggles.
+   */
+  private _buildStylisticSection(ctx: DashboardContext): string {
+    const total = STYLISTIC_PACK_DEFINITIONS.reduce((n, p) => n + p.ruleCodes.length, 0);
+    let enabledCount = 0;
+    for (const pack of STYLISTIC_PACK_DEFINITIONS) {
+      for (const code of pack.ruleCodes) {
+        if (ctx.enabledStylistic.has(code)) enabledCount++;
+      }
+    }
+    const summary = `<summary><span class="expander-title">${escapeHtml(l10n('stylistic.title'))}</span> <span class="muted">(${enabledCount}/${total})</span></summary>`;
+    const groups = STYLISTIC_PACK_DEFINITIONS.map((pack) =>
+      this._buildStylisticGroup(pack, ctx.enabledStylistic),
+    ).join('\n');
+    return `<details class="section expander stylistic" aria-label="${escapeHtml(l10n('stylistic.title'))}">
+  ${summary}
+  <p class="hint">${escapeHtml(l10n('stylistic.intro'))}</p>
+  <div class="stylistic-toolbar">
+    <input type="search" id="stylistic-search" class="stylistic-search" placeholder="${escapeHtml(l10n('stylistic.searchPlaceholder'))}" aria-label="${escapeHtml(l10n('stylistic.searchPlaceholder'))}" autocomplete="off" spellcheck="false" />
+    <span class="muted stylistic-empty-hint" id="stylistic-empty-hint" hidden>${escapeHtml(l10n('stylistic.noMatch'))}</span>
+  </div>
+  <div class="stylistic-groups">
+    ${groups}
+  </div>
+</details>`;
+  }
+
+  /**
+   * One stylistic group. `pickOne` groups use a radio set (with a "None" option
+   * to clear the choice) so the mutually-exclusive contract is enforced in the
+   * UI, not just documented. `multi` groups use independent checkbox toggles
+   * plus enable-all / disable-all bulk actions on the group header.
+   */
+  private _buildStylisticGroup(
+    pack: (typeof STYLISTIC_PACK_DEFINITIONS)[number],
+    enabled: ReadonlySet<string>,
+  ): string {
+    const onCount = pack.ruleCodes.filter((c) => enabled.has(c)).length;
+    const id = escapeHtml(pack.id);
+    const label = escapeHtml(pack.label);
+    const countBadge = `<span class="muted">(${onCount}/${pack.ruleCodes.length})</span>`;
+    // Description is optional and lives in en.json (translatable); conflicting
+    // pick-one pairs are self-evident from their two rule names and have none.
+    const rawDesc = l10n('stylistic.desc.' + pack.id, undefined, { fallback: '' });
+    const descHtml = rawDesc ? `<p class="stylistic-group-desc">${escapeHtml(rawDesc)}</p>` : '';
+    if (pack.selectionMode === 'pickOne') {
+      const noneChecked = onCount === 0 ? 'checked' : '';
+      const noneRow = `<label class="stylistic-radio-row" data-rule="">
+        <input type="radio" name="stylistic-${id}" value="" data-pack="${id}" ${noneChecked} />
+        <span class="stylistic-none">${escapeHtml(l10n('stylistic.none'))}</span>
+      </label>`;
+      const radios = pack.ruleCodes
+        .map((code) => {
+          const codeEsc = escapeHtml(code);
+          const checked = enabled.has(code) ? 'checked' : '';
+          return `<label class="stylistic-radio-row" data-rule="${codeEsc}">
+        <input type="radio" name="stylistic-${id}" value="${codeEsc}" data-pack="${id}" ${checked} />
+        <a href="#" class="rule-link" data-rule="${codeEsc}" title="Open the explanation for ${codeEsc}.">${codeEsc}</a>
+      </label>`;
+        })
+        .join('\n');
+      return `<fieldset class="stylistic-group pick-one" data-group="${id}">
+    <legend class="stylistic-group-heading">${label} ${countBadge} <span class="pick-one-tag">${escapeHtml(l10n('stylistic.pickOne'))}</span></legend>
+    ${descHtml}
+    ${noneRow}
+    ${radios}
+  </fieldset>`;
+    }
+    const rows = pack.ruleCodes
+      .map((code) => {
+        const codeEsc = escapeHtml(code);
+        const checked = enabled.has(code) ? 'checked' : '';
+        return `<li class="stylistic-rule-row" data-rule="${codeEsc}">
+      <label class="switch"><input type="checkbox" data-stylistic-rule="${codeEsc}" ${checked} aria-label="Enable ${codeEsc}" /><span class="slider"></span></label>
+      <a href="#" class="rule-link" data-rule="${codeEsc}" title="Open the explanation for ${codeEsc}.">${codeEsc}</a>
+    </li>`;
+      })
+      .join('\n');
+    return `<div class="stylistic-group multi" data-group="${id}">
+    <div class="stylistic-group-heading">${label} ${countBadge}
+      <span class="stylistic-bulk">
+        <button type="button" class="btn tier-3" data-stylistic-bulk="enable" data-pack="${id}">${escapeHtml(l10n('stylistic.enableAll'))}</button>
+        <button type="button" class="btn tier-3" data-stylistic-bulk="disable" data-pack="${id}">${escapeHtml(l10n('stylistic.disableAll'))}</button>
+      </span>
+    </div>
+    ${descHtml}
+    <ul class="stylistic-rules-list">${rows}</ul>
+  </div>`;
+  }
+
   /** Diagnostics band: suppressions, target platforms, docs (§14.7 step 6, §14.14). */
   private _buildDiagnostics(ctx: DashboardContext): string {
     return `<section class="diagnostics" aria-label="Diagnostics and references">
@@ -1027,6 +1238,79 @@ ${detailRow}`;
     if (run !== false) {
       await vscode.commands.executeCommand('saropaLints.runAnalysis');
     }
+    this.refresh();
+  }
+
+  /** Snake_case lint-id guard for rule names arriving over untrusted postMessage. */
+  private _isValidRuleName(rule: string): boolean {
+    return /^[a-z][a-z0-9_]*$/.test(rule);
+  }
+
+  /** Re-run analysis after a config write unless the user opted out. */
+  private async _runAnalysisIfEnabled(): Promise<void> {
+    const run = vscode.workspace.getConfiguration('saropaLints').get<boolean>('runAnalysisAfterConfigChange');
+    if (run !== false) {
+      await vscode.commands.executeCommand('saropaLints.runAnalysis');
+    }
+  }
+
+  /**
+   * Toggle one stylistic rule. Enabling writes an explicit `rule: true` override;
+   * disabling removes the override so the rule returns to its off-by-default state
+   * rather than being pinned to `false` (which would clutter the overrides file).
+   */
+  private async _handleToggleRule(rule: string, enabled: boolean): Promise<void> {
+    const root = getProjectRoot();
+    if (!root || !this._isValidRuleName(rule)) return;
+    if (enabled) {
+      writeRuleOverrides(root, [{ rule, enabled: true }]);
+    } else {
+      removeRuleOverrides(root, [rule]);
+    }
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /**
+   * Apply a pick-one stylistic group choice. The chosen rule (if any) is enabled
+   * and every other rule in the same group is cleared, so the mutually-exclusive
+   * contract holds in the written config and not only in the radio UI. An empty
+   * `rule` clears the whole group.
+   */
+  private async _handleSelectStylistic(packId: string, rule: string): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+    const pack = STYLISTIC_PACK_DEFINITIONS.find((p) => p.id === packId);
+    if (!pack) return;
+    if (rule !== '' && !this._isValidRuleName(rule)) return;
+    // Reject a rule that does not belong to this group — the id pair arrives over
+    // untrusted postMessage and must not let one group write another's rules.
+    if (rule !== '' && !pack.ruleCodes.includes(rule)) return;
+    const toClear = pack.ruleCodes.filter((c) => c !== rule);
+    removeRuleOverrides(root, toClear);
+    if (rule !== '') {
+      writeRuleOverrides(root, [{ rule, enabled: true }]);
+    }
+    await this._runAnalysisIfEnabled();
+    this.refresh();
+  }
+
+  /**
+   * Enable-all / disable-all for a multi-select stylistic group. Enabling pins
+   * every rule in the group to `true`; disabling removes the overrides so they
+   * fall back to off. Only the named group's own rules are written.
+   */
+  private async _handleStylisticBulk(packId: string, enabled: boolean): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+    const pack = STYLISTIC_PACK_DEFINITIONS.find((p) => p.id === packId && p.selectionMode === 'multi');
+    if (!pack) return;
+    if (enabled) {
+      writeRuleOverrides(root, pack.ruleCodes.map((rule) => ({ rule, enabled: true })));
+    } else {
+      removeRuleOverrides(root, [...pack.ruleCodes]);
+    }
+    await this._runAnalysisIfEnabled();
     this.refresh();
   }
 
