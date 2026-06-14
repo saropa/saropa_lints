@@ -5,19 +5,14 @@
 > describes is the **Package Vibrancy report** feature in this repo
 > (`extension/src/vibrancy/`). Moved here 2026-06-13.
 
-## Status (audited 2026-06-13; updated 2026-06-14)
+## Status (audited 2026-06-13; archived 2026-06-14)
 
-Substantially shipped — 17 of 19 acceptance checks verified DONE against
-`extension/src/vibrancy/` code. Two items remain:
-
-1. **WS5 — published-age regression test (MISSING).** The age calculation
-   itself is UTC/month-aware and correct (`views/report-html.ts:1397-1410`),
-   but there is no test fixture asserting `device_calendar 4.3.3`'s reported
-   age. (The `device_calendar` files in the repo are all lint-rule fixtures,
-   unrelated to vibrancy age math.)
-2. **WS6 — graph zoom/pan (PARTIAL).** The network diagram is scroll-only
-   (`views/report-styles.ts:922`, `max-height:420px; overflow:auto`); no
-   zoom / pan / focus controls.
+**ARCHIVED RECORD.** 17 of 19 acceptance checks verified DONE against
+`extension/src/vibrancy/` code. The two items that were still open when this
+plan was archived now live in their own active plan:
+`plans/PACKAGE_VIBRANCY_REPORT_REMAINING.md` (WS5 published-age regression
+fixture; WS6 graph zoom/pan). This file is the completed record of everything
+that shipped, including the filter-sync work in the Finish Report below.
 
 Resolved 2026-06-14:
 
