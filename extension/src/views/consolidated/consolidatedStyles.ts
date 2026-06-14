@@ -187,6 +187,29 @@ body {
   text-overflow: ellipsis;
 }
 .spacer { flex: 1 1 auto; }
+/* Runtime-evidence badges (R2): a third source class — "Advisor confirms at
+ * runtime" / "Log Capture saw N" — sitting beside the rule name. Styled as a
+ * quiet outlined pill so it reads as supporting evidence, not a severity. Uses
+ * the same theme tokens as the rest of the surface so it tracks light / dark /
+ * high-contrast like every other element. */
+.suite-badges {
+  display: inline-flex;
+  flex: 0 1 auto;
+  gap: var(--s-1, 4px);
+  margin-left: var(--s-2, 8px);
+  overflow: hidden;
+}
+.suite-badge {
+  flex: 0 0 auto;
+  padding: 1px var(--s-2, 8px);
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline);
+  font-size: var(--t-micro);
+  letter-spacing: .04em;
+  white-space: nowrap;
+  color: var(--text-2);
+  background: var(--vscode-editorWidget-background, transparent);
+}
 .sev-tag {
   font-size: var(--t-micro);
   text-transform: uppercase;

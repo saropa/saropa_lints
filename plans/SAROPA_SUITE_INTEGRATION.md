@@ -164,3 +164,47 @@ deps, not a monorepo merge):
 - Internal: `CENTRAL_DASHBOARD_CONSOLIDATION.md` (the holistic dashboard that R2 extends),
   `COLLAPSE_LINT_IMPACT_TO_SEVERITY.md` (the error/warning/info model the envelope adopts),
   `TODO_rule_metadata_completeness.md` (the metadata that fills `category`/`docUri`).
+
+---
+
+## Finish Report (2026-06-14)
+
+Covers the protocol-foundation and dashboard-consumer phases (R1, R2, R4) of this plan. R3
+(crash-to-rule attribution) shipped separately in commit `ad5225e5` and is not part of this report;
+R5, R6, R7, and the shared-infra extraction remain open, so this plan stays active.
+
+**Scope.** (B) VS Code extension TypeScript only — `extension/src/suite/`,
+`extension/src/views/consolidated/`, `extension/src/extension.ts`, the extension manifest, and the
+extension i18n catalog. No Dart rules, analyzer plugin, tiers, or `example/` fixtures were touched.
+
+**What shipped.**
+- R1 (export the envelope): `suite/envelope.ts` defines the Saropa Diagnostic Envelope producer
+  (types matching the canonical Drift Advisor schema §2.1/2.2, `deriveCategory`, finding-id
+  build/parse, `buildLintsEnvelope`, `writeLintsEnvelope`) with no `vscode` dependency so it is unit
+  testable. `suite/exporter.ts` is the impure glue that reads live diagnostics and resolves the
+  localized fix label. `extension.ts` calls it on the existing debounced analysis-settle tick, writing
+  `<workspace>/.saropa/diagnostics/lints.json`; a write failure is caught and logged so linting is
+  never disrupted.
+- R4 (deep-link command ids): `suite/commands.ts` registers `saropaLints.enableRule` (writes a rule
+  override via `writeRuleOverrides` + cache invalidation, then offers a one-tap re-analysis) and
+  `saropaLints.openFinding` (round-trips a finding id back to its source line). `explainRule` was
+  extended to accept the documented `{ ruleId }` object form. All three ids are contributed in the
+  manifest, hidden from the command palette (they take args).
+- R2 (consume sibling evidence): `suite/siblingEnvelopes.ts` reads the two sibling mirrors and counts
+  only the explicit cross-references — a sibling diagnostic whose `fix.command` is a Lints deep-link id
+  carrying a `{ ruleId }` arg — bucketed by source. The consolidated dashboard
+  (`views/consolidated/`) badges a rule row "Advisor confirms at runtime" / "Log Capture saw N" from
+  that map; the badge strings are localized host-side and rendered as quiet, theme-token-driven pills.
+
+**Verification.** `tsc --noEmit` over the whole extension is clean for the suite and consolidated
+files. The suite + consolidated unit tests pass (`suiteEnvelope`, `suiteSiblingEnvelopes`,
+`consolidatedClient`, `consolidatedModel`). The R3 test (`suiteCrashToRule`) was already written but
+absent from the `npm test` glob; it is now registered so it runs in CI.
+
+**Known follow-up.** New `en.json` keys (`suite.*`, `consolidated.evidence.*`) leave the 23 translated
+locale catalogs stale. Regenerating them runs the machine-translation pipeline, which is gated behind
+its own separate authorization and was not run here; the publish coverage gate
+(`generate_locales.py --fail-on-missing`) blocks a release until they are regenerated.
+
+A pre-existing `tsc` error in `rulePacks/rulePacksWebviewProvider.ts` (`_handleStylisticBulk` missing)
+belongs to a separate in-progress workstream and is unrelated to the suite integration.

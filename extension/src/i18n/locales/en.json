@@ -7,14 +7,39 @@
     "none": "None",
     "enableAll": "Enable all",
     "disableAll": "Disable all",
-    "noMatch": "No style rules match."
+    "noMatch": "No style rules match.",
+    "desc": {
+      "ordering_sorting": "Sorts members, parameters, fields, and map keys for predictable layout. Very noisy on existing code — best on new code or small repos.",
+      "naming_conventions": "Naming for files, methods, exceptions, callbacks, and Bloc events and state. Can be noisy on large codebases; enable incrementally.",
+      "boolean_naming": "Booleans must use is/has/can/should prefixes so intent is clear in conditionals and APIs.",
+      "code_style_preferences": "How returns, conditionals, and loops are written — immediate return, for-in, getter vs method, and similar shorthands.",
+      "function_parameter_style": "Arrow functions when concise, all-named parameters, inline callbacks, and no parameter reassignment.",
+      "widget_style": "Flutter widget choices — SizedBox.square, center over align, spacing over SizedBox, and avoiding shrinkWrap in scrolls. Flutter projects only.",
+      "class_record_style": "Class vs record return types, private underscore prefixes, and explicit this where it clarifies.",
+      "formatting": "Blank-line placement, trailing commas, and literal and comment style. Can be noisy — many files may need edits.",
+      "comments_documentation": "TODO and FIXME format, sentence case, a period after doc comments, /// over //, and no commented-out code.",
+      "testing_style": "Prefer expect over assert in tests so a failure shows expected vs actual.",
+      "debug_test_utility": "Test helpers such as prefer_fail_test_case that fail loudly when a test hits an unexpected path.",
+      "opinionated_rules": "Assorted style choices — concise names, exhaustive enums, guard clauses, positive conditions, and more. Many rules; can be noisy."
+    }
   },
   "packs": {
     "forYourProject": "For your project",
     "forYourProjectHint": "Packs whose dependency or SDK matches your pubspec. These rules apply to code you actually ship.",
     "noneDetected": "No packs match your dependencies yet. Add a supported package, or open All packages below.",
     "allPackages": "All packages",
-    "allPackagesHint": "Every available pack, including ones not detected in this project. Enable a pack to opt into its rules."
+    "allPackagesHint": "Every available pack, including ones not detected in this project. Enable a pack to opt into its rules.",
+    "domainDesc": {
+      "state-management": "Bloc, Riverpod, Provider, GetX, and related state and dependency-injection libraries.",
+      "networking-apis": "HTTP clients, GraphQL, Firebase, Supabase, and connectivity.",
+      "storage-persistence": "Local databases and key-value stores — Drift, Hive, Isar, sqflite, shared_preferences.",
+      "navigation-deep-links": "Routing and deep-link handling — auto_route, go_router, app_links, url_launcher, and webview.",
+      "media-graphics": "Images, SVG, animation, audio, maps, pickers, and the Flame engine.",
+      "device-platform": "Sensors, location, permissions, biometrics, notifications, and background work.",
+      "identity-sharing": "Sign-in providers, sharing, and in-app review.",
+      "utilities-config": "Cross-cutting helpers — UUIDs, environment config, fonts, and collection compatibility.",
+      "sdk-migrations": "Dart and Flutter version-upgrade rules that flag APIs removed or deprecated in a given SDK."
+    }
   },
   "consolidated": {
     "kicker": "Security · Quality",

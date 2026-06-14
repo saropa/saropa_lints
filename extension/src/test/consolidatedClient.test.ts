@@ -215,6 +215,25 @@ describe('consolidated dashboard client (headless execution)', () => {
     assert.strictEqual(h.created[0].dataset.rule, 'avoid_print');
   });
 
+  it('renders runtime-evidence badges from the model, and none when absent (R2)', () => {
+    const withBadges = runClient();
+    const msg = modelMessage() as { data: { groups: Array<Record<string, unknown>> } };
+    msg.data.groups[0].badges = ['Advisor confirms at runtime', 'Log Capture saw 4'];
+    withBadges.messageHandlers[0](msg);
+    const badgesEl = withBadges.created[0].querySelector('.suite-badges');
+    assert.ok(badgesEl.innerHTML.includes('Advisor confirms at runtime'), 'advisor badge not rendered');
+    assert.ok(badgesEl.innerHTML.includes('Log Capture saw 4'), 'log-capture badge not rendered');
+
+    // A group with no badges field (the common case) renders an empty container.
+    const noBadges = runClient();
+    noBadges.messageHandlers[0](modelMessage());
+    assert.strictEqual(
+      noBadges.created[0].querySelector('.suite-badges').innerHTML,
+      '',
+      'badges container should be empty when the rule has no sibling evidence',
+    );
+  });
+
   it('an occurrences message renders rows into the matching group without throwing', () => {
     const h = runClient();
     h.messageHandlers[0](modelMessage());

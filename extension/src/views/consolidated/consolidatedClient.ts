@@ -62,7 +62,7 @@ function makeRow(g) {
   group.innerHTML =
     '<div class="row" role="button" tabindex="0" aria-expanded="false">' +
       '<svg class="chev" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M6 4l4 4-4 4z"/></svg>' +
-      '<span class="rule-name"></span><span class="spacer"></span>' +
+      '<span class="rule-name"></span><span class="suite-badges"></span><span class="spacer"></span>' +
       '<span class="sev-tag"></span><span class="count-badge"></span>' +
     '</div><div class="occ"></div>';
   return group;
@@ -71,6 +71,12 @@ function makeRow(g) {
 function paintRow(group, g, open) {
   group.className = 'group ' + SEV[g.worst] + (open ? ' open' : '');
   group.querySelector('.rule-name').textContent = g.rule;
+  // Runtime-evidence badges (R2): host sends already-localized strings, or an
+  // empty list for a rule no sibling confirms. Rebuilt every paint so a sibling
+  // mirror written after the rule first rendered still lights the badge.
+  const badgesEl = group.querySelector('.suite-badges');
+  const badges = Array.isArray(g.badges) ? g.badges : [];
+  badgesEl.innerHTML = badges.map((b) => '<span class="suite-badge">' + esc(b) + '</span>').join('');
   group.querySelector('.sev-tag').textContent = g.worst;
   group.querySelector('.count-badge').textContent = String(g.count);
   group.querySelector('.row').setAttribute('aria-expanded', String(open));
