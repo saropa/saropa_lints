@@ -45,6 +45,10 @@ Step 7:
 
 - **empty-body `test`/`testWidgets` (`() {}`)** — count **0**, hard `isEmpty`
   gate via `scanEmptyBodyStubTests`. This is the precise "stub" invariant.
+  A `test(..., () {}, skip: '...')` is excluded: a skipped test never runs, so
+  its empty body cannot silently pass — it is a documented placeholder for an
+  un-runnable case, not a coverage-faking stub (added 2026-06-14 after such a
+  placeholder in `widget_lifecycle_fp_test.dart` turned the gate red).
 - `expect(true, isTrue)` — **0**.
 - `expect('<literal>', isNotNull)` — **0**.
 

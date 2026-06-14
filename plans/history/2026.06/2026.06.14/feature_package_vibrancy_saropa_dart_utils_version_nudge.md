@@ -1,11 +1,40 @@
 # FEATURE: Package Vibrancy — one-time dismissible nudge to bump an out-of-date `saropa_dart_utils`
 
-**Status: Open**
+**Status: Closed (won't implement — covered by automatic surfacing)**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
 Created: 2026-06-14
 Updated: 2026-06-14 (re-scoped — detection already exists; only the nudge is missing)
+Closed: 2026-06-14 (won't implement — see Closing Note)
+
+---
+
+## Closing Note (2026-06-14)
+
+Closed without implementation. The request originates from suite-integration
+checklist item R6, which assumed Package Vibrancy had no way to detect an
+out-of-date `saropa_dart_utils`. The code disproves that assumption: the package
+is already surfaced automatically, identically to every other dependency.
+
+Verified in code:
+
+- `services/pub-outdated.ts` runs `dart pub outdated --json` and captures
+  `current` vs `latest` for every declared dependency — `saropa_dart_utils` is a
+  normal pub dependency, so it is scanned like any other.
+- `scoring/status-classifier.ts` `isUpdatable()` flags any package with a newer
+  version, feeding the package-tree "update available" badge and the status-bar
+  updatable count.
+- `services/freshness-watcher.ts` polls pub.dev and raises a "new version" toast.
+
+So a project on a stale `saropa_dart_utils` already sees it as updatable through
+the generic path. The only unbuilt piece was a *targeted, named, one-time
+dismissible* nudge singling out `saropa_dart_utils`. That adds no information the
+user does not already get from the badge + freshness toast; it only promotes one
+package above ordinary dependencies, which is a suite-cohesion preference, not a
+functional gap. Not worth the per-workspace gate-flag machinery for marginal
+value. If the suite later decides its own packages should nudge harder than
+third-party deps, reopen with that as the explicit rationale.
 Area: Package Vibrancy (not a lint rule)
 File: `extension/src/vibrancy/` (subsystem)
 Severity: Feature request (Low) — quality-of-life nudge, no correctness impact
