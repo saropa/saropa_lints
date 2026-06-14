@@ -1452,6 +1452,14 @@
     "crashNudge": {
       "message": "Log Capture saw a crash {count} time(s) that rule {ruleId} would have caught. The rule is currently disabled.",
       "enable": "Enable rule"
+    },
+    "deepLink": {
+      "showDriftIssues": "Show live Drift issues (Drift Advisor)"
+    },
+    "nudge": {
+      "message": "This project uses Drift Advisor. Install the Saropa Log Capture extension to correlate runtime SQL with these static findings.",
+      "install": "Install Log Capture",
+      "dismiss": "Dismiss"
     }
   }
 }

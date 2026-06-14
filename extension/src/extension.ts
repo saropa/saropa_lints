@@ -59,6 +59,8 @@ import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
 import { registerSuiteCommands } from './suite/commands';
 import { maybeNudgeCrashCoveredRule } from './suite/crashCoverageNudge';
 import { exportLintsEnvelope } from './suite/exporter';
+import { registerSiblingDeepLinks } from './suite/siblingDeepLinks';
+import { maybeNudgeSuiteAwareness } from './suite/suiteAwarenessNudge';
 import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
 import { maybeShowStartupSuggestion } from './rulePacks/startupSuggestionNudge';
 import {
@@ -820,6 +822,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // overlap between this timer and the watcher to a single notification.
   setTimeout(() => void maybeShowStartupSuggestion(context), 4_000);
 
+  // R7: once-per-workspace nudge — a project that dev-depends on Drift Advisor but
+  // lacks the Log Capture extension is missing the third suite lens. Deferred and
+  // self-gated so it never blocks startup and never re-nags.
+  setTimeout(() => void maybeNudgeSuiteAwareness(context), 5_000);
+
   syncRuleMetadataFromViolations(root ? readViolations(root) : null);
 
   const extVersion = (context.extension.packageJSON as { version: string }).version;
@@ -987,6 +994,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // R4: contribute the suite's deep-link command ids (enableRule, openFinding) as
   // Lints' public integration surface for sibling envelope `fix.command`s.
   registerSuiteCommands(context, getProjectRoot);
+
+  // R5: reciprocal deep-links out of a Drift finding into the sibling tools'
+  // live surfaces, shown in the editor lightbulb only when the sibling is
+  // installed (the provider self-gates on extension presence).
+  registerSiblingDeepLinks(context);
 
   // R3: crash-to-rule attribution. When Log Capture records a runtime crash whose
   // preventing Lints rule is disabled, offer a once-only "enable rule X" toast.
