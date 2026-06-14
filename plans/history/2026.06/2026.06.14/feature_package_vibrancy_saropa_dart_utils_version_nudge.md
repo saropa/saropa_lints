@@ -122,3 +122,49 @@ logic. A dismissible nudge with a "don't show again" affordance, nothing more.
 - Related: `saropa_dart_utils` R1 rule-to-remediation mapping
   (`lib/suite/rule_remediation_map.dart`) and R3 crash-coverage audit
   (`lib/suite/crash_coverage_audit.dart`) — the other built halves of the same plan.
+
+---
+
+## Finish Report (2026-06-14)
+
+### Resolution
+
+Closed without implementation; not a fix. The request (suite-integration item R6)
+presumed Package Vibrancy lacked any way to detect an out-of-date
+`saropa_dart_utils`. Source inspection refutes that premise: the package is
+already surfaced automatically through the same path as every other dependency.
+
+### Verification (code, not the doc's own claims)
+
+- `extension/src/vibrancy/services/pub-outdated.ts` runs `dart pub outdated --json`
+  and captures `current` vs `latest` for every declared dependency. As an ordinary
+  pub dependency, `saropa_dart_utils` is scanned identically to all others.
+- `extension/src/vibrancy/scoring/status-classifier.ts` `isUpdatable()` flags any
+  package with a newer version, feeding the package-tree "update available" badge
+  and the status-bar updatable count.
+- `extension/src/vibrancy/services/freshness-watcher.ts` polls pub.dev and raises
+  a "new version" toast.
+
+A grep of `extension/src/vibrancy/` for `saropa_dart_utils`, `bumpNudge`, and
+`versionNudge` returns no matches — confirming no special-cased nudge ever
+existed, while the generic surfacing above already covers the user-visible need.
+
+### Rationale for not building
+
+The single unbuilt piece was a targeted, named, one-time dismissible nudge
+singling out `saropa_dart_utils`. It conveys no information the badge plus
+freshness toast do not already deliver; its only effect is to promote one package
+above ordinary dependencies — a suite-cohesion preference, not a functional gap.
+The per-workspace gate-flag machinery it requires is not justified by that
+marginal value. Reopen only if the suite later adopts an explicit policy that its
+own packages should nudge more assertively than third-party dependencies; that
+policy decision, not a detection gap, would be the reason.
+
+### Scope and tracking
+
+- Scope: docs only. No Dart, analyzer plugin, or extension TypeScript changed.
+- Bug archived: `bugs/feature_package_vibrancy_saropa_dart_utils_version_nudge.md`
+  → `plans/history/2026.06/2026.06.14/feature_package_vibrancy_saropa_dart_utils_version_nudge.md`.
+- No CHANGELOG entry: closing an un-implemented feature request ships no
+  user-visible behavior change.
+- No tests, fixtures, or tiers affected; none reference the closed feature.
