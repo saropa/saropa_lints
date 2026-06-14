@@ -2,7 +2,283 @@
 
 <!-- cspell:disable -->
 
-Archived releases 13.10.2 and older. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+Archived releases 13.11.4 and older. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+
+---
+
+## [13.11.14]
+
+Adds `prefer_reusing_assigned_local` (Recommended), which flags an expression recomputed verbatim when a local variable already holds its result and offers a quick fix to reuse the local. It is the complement of `prefer_cached_getter`: the local already exists, so the fix swaps the recompute for the local rather than creating one. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Added
+
+- New rule `prefer_reusing_assigned_local` (Recommended, INFO): reports a pure-read expression recomputed in the same block when a local already caches it, with a quick fix to reuse the local. It only fires when the value cannot have changed — it skips non-deterministic calls, write targets, and any recompute after the receiver or local is mutated. No action required.
+
+## [13.11.13]
+
+Fixes a `prefer_value_listenable_builder` false positive on `State` classes that hold one reassigned field plus a `final` collection mutated in place, and restores line-level `// ignore:` suppression for diagnostics reported on a declaration's name (such as class-level rules). No action required unless you added a project-local ignore for either pattern below. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **`prefer_value_listenable_builder` no longer fires when a `State` mutates a `final` `List`/`Set`/`Map` field in place inside `setState` (e.g. `_selected.add(v)` or `_tally[k] = v`).** That collection is a second independent state the single-value suggestion would silently drop, so the rule now treats such a widget as multi-state and stays quiet — remove any project-local `// ignore_for_file: prefer_value_listenable_builder` added for this case. A `final` collection that is only read in `setState` still triggers the rule.
+- **A `// ignore:` on the line directly above a declaration now suppresses diagnostics reported on the declaration's name (class-level rules such as `prefer_value_listenable_builder` and `avoid_global_key_misuse`).** Previously only `// ignore_for_file:` worked for these, because the directive attaches to the declaration keyword rather than the name token the rule reports on — place the `// ignore:` on the line immediately above the declaration as usual and it now applies, including below a `///` doc block.
+
+## [13.11.12]
+
+Fixes a suppression bug where a `// ignore:` placed directly above a declaration that also carries a `///` doc comment was silently ignored. No action required. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **A `// ignore:` directly above a `///`-documented declaration is now honored.** When a doc comment preceded the declaration, the suppression silently never fired for any diagnostic reported on a child node (e.g. a map literal), so teams had no working narrow-suppression for those sites — place the `// ignore:` on the line immediately above the declaration as usual and it now applies.
+- **`pass_existing_stream_to_stream_builder` no longer fires on a private cache-method that returns a stored `Stream<...>?` field.** A `stream: _getStream(filter)` accessor that rebuilds its stream only when inputs change already satisfies the rule's own advice to store and reuse the stream, so it now mirrors the cache-method exemption its `FutureBuilder` sibling already had — remove any project-local `// ignore: pass_existing_stream_to_stream_builder` added on such accessors.
+- **`avoid_missing_enum_constant_in_map` documentation now describes the rule (its examples had been copy-pasted from an unrelated rule) and the supported escape hatch for intentionally-sparse tables.** The rule cannot see the (usually cross-file) read site, so it cannot tell a deliberate sparse lookup table whose absent keys are a null-handled default from a latent bug — for those tables suppress with a verified `// ignore: avoid_missing_enum_constant_in_map` on the line above the declaration, now honored even under a `///` doc comment.
+
+## [13.11.11]
+
+False-positive fixes for the `avoid_large_list_copy` and `prefer_single_setstate` rules. No action required unless you added a project-local ignore for the patterns below. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_large_list_copy` no longer fires on `.toList()` used as a map-entry value or a set/list-literal element.** A `toJson()` map value such as `'items': items.map((e) => e.name).toList()` must be a concrete List because a lazy Iterable is not JSON-encodable, so the copy is structurally required, not gratuitous — remove any project-local `// ignore: avoid_large_list_copy` comments added on such literal entries.
+- **`prefer_single_setstate` no longer fires on `setState` calls that live in separate closures (e.g. two buttons' `onPressed` handlers).** Such calls run on different events and can never be merged, so only multiple `setState` calls within one synchronous execution scope are now flagged — remove any project-local `// ignore: prefer_single_setstate` comments added on distinct-callback `setState` calls.
+
+## [13.11.10]
+
+False-positive fixes for the `require_file_exists_check`, `avoid_parameter_mutation`, `require_intl_date_format_locale`, and `prefer_value_listenable_builder` rules. No action required unless you added a project-local ignore for the patterns below. [log](https://github.com/saropa/saropa_lints/blob/v13.11.10/CHANGELOG.md)
+
+### Fixed
+
+- **`require_file_exists_check` no longer fires when the read is guarded by the synchronous `existsSync()` check.** Only the async `exists()` form was recognized, so the common `file.existsSync() ? await file.readAsBytes() : null` pattern was wrongly flagged — the guard is now also detected in `if` conditions, ternary conditions, and preceding statements. Remove any project-local `// ignore: require_file_exists_check` added on `existsSync()`-guarded reads.
+- **`avoid_parameter_mutation` no longer fires on `notifier.value = x` for a `ValueNotifier`/`ChangeNotifier` parameter.** Mutating a notifier passed in for that exact purpose is idiomatic Flutter, not corruption of caller-owned data, so the warning was inapplicable — remove any project-local `// ignore: avoid_parameter_mutation` comments added on such notifier writes.
+- **`require_intl_date_format_locale` no longer fires on `DateFormat.yMd(locale)` and other named constructors that already pass a locale.** Named constructors take the locale as their only positional argument, but the rule applied the unnamed-constructor rule (needs two arguments) and flagged every one — one project saw 16 false positives in a single file. Remove any project-local `// ignore: require_intl_date_format_locale` comments added on such calls.
+- **`prefer_value_listenable_builder` no longer fires when the single state field is a `Future`/`Stream` cache backing a `FutureBuilder`/`StreamBuilder`.** That field uses `setState` to invalidate-and-re-fetch (e.g. `_future = null`), which `ValueListenableBuilder` cannot express, so the suggestion was inapplicable — remove any project-local `// ignore: prefer_value_listenable_builder` added on such async-cache states.
+
+## [13.11.9]
+
+A false-positive fix for the `avoid_nullable_interpolation` rule. No action required unless you added a project-local ignore for the patterns below. [log](https://github.com/saropa/saropa_lints/blob/v13.11.9/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_nullable_interpolation` no longer fires on `${x ?? fallback}`, on syntactic `if (x != null)` / `x != null ? ... : ...` guards over chained property access, or on developer-facing log calls (`debug`, `breadcrumb`, `debugPrint`, `print`, `dart:developer log`).** Enabling the rule on a real Flutter codebase produced floods of false positives at sites where the developer had already handled null or was intentionally logging it for diagnosis (one project saw 58 raw hits across 22 sites, half of them inside `debug()` strings where seeing `null` IS the point). Remove any project-local `// ignore: avoid_nullable_interpolation` comments added for these three patterns.
+
+## [13.11.8]
+
+Identical content — re-released as `13.11.9` to repackage the VS Code extension `.vsix` for Marketplace upload. See `[13.11.9]` for the release notes.
+
+## [13.11.7]
+
+### Fixed
+
+- **`avoid_expensive_build` no longer fires on iteration primitives (`sort`, `where`, `map`, `fold`, `reduce`) inside `build()`.** These calls are the idiomatic shape of list-to-widget rendering (`Column(children: items.map(...).toList())` is the Flutter cookbook pattern) and produced noise without measurable cost on typical UI list sizes — one production project saw 45 WARNING hits on the first run, every one a small-list render. The rule now flags only genuinely heavy operations: `jsonDecode`, `jsonEncode`, `parse`, `tryParse`, `compute`, and the `readAsXxx` file-I/O family. Remove any project-local `// ignore: avoid_expensive_build` comments added for the iteration patterns above.
+
+## [13.11.6]
+
+### Fixed
+
+- **`avoid_large_list_copy` no longer fires when the `.toList()` is structurally required by a named argument, a `??` fallback, or a getter on the result.** Named arguments like `children: items.map(...).toList()`, null-coalescing chains like `source?.where(...).toList() ?? <T>[]`, and getter access like `items.map(...).toList().nonEmpty` all need a concrete `List` and have no lazy alternative — remove any `// ignore: avoid_large_list_copy` added for these three patterns.
+- **`avoid_listview_without_item_extent` no longer fires on `ListView.separated`.** The `.separated` constructor does not declare `itemExtent`, `prototypeItem`, or `itemExtentBuilder` (an extent applied to items would also apply to separators, which never share one), so the rule's correction was unfixable on `.separated`. The rule now targets `ListView.builder` only — remove any `// ignore: avoid_listview_without_item_extent` added on `.separated` call sites.
+- **`avoid_listview_without_item_extent` no longer fires on inline non-scrolling `ListView.builder`.** When the call sets both `shrinkWrap: true` and `physics: NeverScrollableScrollPhysics()` the inner list does not scroll and `shrinkWrap` already forces eager layout, so the extent-hint guidance does not apply and forcing one would clip variable-height rows — remove any `// ignore: avoid_listview_without_item_extent` that was added for this pattern.
+
+## [13.11.5]
+
+### Added
+
+- **Code Health scanner auto-skips generated files.** Filename suffixes `.g.dart`, `.freezed.dart`, `.mocks.dart`, `.gr.dart`, `.config.dart`, `.chopper.dart`, `.gen.dart`, `.drift.dart`, and the protobuf family (`.pb.dart`, `.pbenum.dart`, `.pbgrpc.dart`, `.pbjson.dart`, `.pbserver.dart`) are excluded at file-walk time; gen-l10n output (`lib/l10n/app_localizations*.dart`, `lib/l10n/intl_*.dart`) is skipped by path. A header-marker fallback (`GENERATED CODE`, `DO NOT MODIFY`, `DO NOT EDIT`, `AUTO-GENERATED FILE` in the first 1KB) catches codegen output that lands at non-standard paths. The hero band shows an `N suppressed` pill so suppression is visible, never silent.
+- **`// ignore_for_file: code_health` directive support.** Add `// ignore_for_file: code_health` at the top of a Dart file to keep it out of the Code Health scan entirely; add `// ignore_for_file: code_health:complex,undocumented` to drop only specific flags from every row in that file. The directive composes with normal analyzer ignore lists (`// ignore_for_file: avoid_print, code_health` is recognized).
+
+### Added (Extension)
+
+- **"Suppress in file" button on every issue in the Code Health Dashboard's expanded detail row.** Click writes a `// ignore_for_file: code_health:<flag>` directive at the top of the source file (merging with any existing ignore list — sorted, deduped, idempotent) and offers a one-click Rescan. Files-not-yet-saved are respected via VS Code's workspace file API.
+
+### Changed (Extension)
+
+- **Code Health Dashboard "Worst functions" rows now explain WHY each function scored low.** Flag pills (`unused`, `complex`, `undocumented`, …) used to carry only the label, so a reader had to look at four other columns to reconstruct the evidence. Each pill now reads `complex (CC 36)`, `unused (0 callers)`, `uncovered (0% tests)` etc. — the threshold the row tripped, inline. A chevron next to the score expands the row to show every issue with its threshold rule (e.g. "Flagged when cyclomatic complexity exceeds 10"), so readers can confirm what to fix without leaving the table. Expand state survives sort and filter changes. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Publish script no longer hard-aborts when the extension locale coverage gate fails. The user is now prompted Ignore / Retry (default) / Abort, so the typical recovery — edit `extension/scripts/i18n/dictionaries.py` and rerun the generator — happens in-place without restarting the whole publish.
+
+</details>
+
+---
+
+## [13.11.4]
+
+### Added (Extension)
+
+- **Saropa Package Dashboard hero now shows a "Scanned X ago" pill with the actual scan timestamp.** Hovering reveals the absolute date/time. Previously the Rescan button could feel like a no-op because the dashboard re-rendered with identical numbers and no recency indicator, so users had no way to tell whether the click triggered a fresh scan or returned cached results. The pill updates on every scan completion (including the trailing rescan that fires after a coalesced in-flight scan), so a click producing fresh data flips "5m ago" back to "just now". No action required.
+
+### Fixed (Extension)
+
+- **Package Dashboard no longer drops direct dependencies that follow a zero-indent comment.** A `# cspell:ignore foo` (or any other column-zero comment) inside `dependencies:` or `dependency_overrides:` was treated as a new top-level YAML key, exiting the active section and silently skipping every package declared after it. On the saropa contacts pubspec two `# cspell:ignore …` comments caused ~14 direct deps (`device_info_plus`, `image`, `share_plus`, `youtube_player_flutter`, …) to vanish from the dashboard and the saved `pubspec_vibrancy.json`. The parser now ignores comment and blank lines in the section-exit guard. A real top-level key still ends the section. No action required — rescan to repopulate.
+- **Package Dashboard Total Size and Size Distribution now exclude dev_dependencies.** Dev-only tooling like `saropa_lints`, `build_runner`, and `lints` was being summed into the "Total Size" card and given its own bar in the Size Distribution chart, even though dev deps never reach the APK / IPA / web bundle. On projects that use `saropa_lints` as a dev dep, the chart was assigning it ~66% of "total size" — the opposite of what either surface communicates. Both now drop dev deps unconditionally; the "Include dev" toggle still controls the package table. A new caption under the chart and updated Total Size tooltip call out the exclusion. No action required.
+
+### Fixed
+
+- **`require_error_widget` no longer fires when error handling lives in an extension method on `AsyncSnapshot`.** Centralized helpers like `snapshot.snapLoadingProgress()` (returns the loading widget or null) and `snapshot.reportErrorIfAny()` were reported as missing error handling because the substring check at the call site never saw the literal `hasError` / `.error` text — the inspection happened inside the extension. The rule now walks the builder body and treats an inline `.hasError` / `.error` / `.stackTrace` access, any method invocation on the snapshot parameter, or any helper whose name itself contains "error" as sufficient. The same change also closes a latent false negative where a local variable named `hasErrorState` suppressed the lint via raw substring match. Remove any project-local `// ignore: require_error_widget` comments added to silence the false positive.
+- **`require_late_initialization_in_init_state` no longer fires on reassignment inside `onPressed`, `onTap`, or `setState` callbacks.** Standard "View All / load more" patterns — a `late` field that is correctly initialized in `initState` and then reset to a different value inside a button or gesture callback — were incorrectly reported as build-path initialization because the rule matched the assignment via a regex over the build method's source text and could not see that the assignment was lexically nested inside a closure. The rule now walks the AST and skips assignments inside nested function expressions, and excludes any late field that `initState` already assigns. Remove any project-local `// ignore: require_late_initialization_in_init_state` comments added to silence the false positive.
+- **`pass_existing_future_to_future_builder` no longer fires on the cache-method pattern.** When the `future:` argument is a private instance method (`_getContactsFuture(...)`) on a class that declares at least one `Future<...>?` field, the rule now treats the call as a cached-future accessor rather than a fresh allocation. This is the idiomatic pattern when the cached future depends on dynamic input that a `late final` field cannot model, and the rule's own correction message ("cache the Future") already endorses it. Public methods and methods on classes without a nullable Future field still fire. Remove any project-local `// ignore: pass_existing_future_to_future_builder` comments added to silence the false positive.
+
+---
+
+## [13.11.3]
+
+### Fixed
+
+- **`function_always_returns_null` no longer fires on `@override` declarations that return null.** Overriding a nullable parent member (e.g. `@override Color? get barrierColor => null;` on a no-barrier `ModalRoute`) honors the parent's contract — the override cannot widen the return type, and returning anything other than `null` would lie about absence. The rule now skips any declaration carrying `@override`; if the parent's return type were non-nullable, the override would already be a compile error, so the annotation alone is a sufficient signal. No action required.
+- **`avoid_small_touch_targets` no longer false-fires on wide-band overlays.** A `SizedBox` or `Container` whose single small axis (e.g. `height: 38`) wrapped a `GestureDetector`, `InkWell`, or `InkResponse` — typically a dismiss-on-tap pill, list row, or `Positioned.fill` overlay — was incorrectly flagged as a small touch target even though the tap region spans the full parent width. The rule now distinguishes icon-sized targets (`IconButton`, `Checkbox`, `Radio`, `Switch`, `TextButton`, `ElevatedButton`, `OutlinedButton`) — where either axis under 44 px is a real concern — from region recognizers, which require both axes explicitly under 44 px to fire. Remove any project-local `// ignore: avoid_small_touch_targets` comments added to silence the false positive.
+- **`prefer_layout_builder_for_constraints` no longer fires inside `static` utility methods that take a `BuildContext`.** Static helpers like `MenuUtils.popupMenuConstraints(BuildContext)` compute absolute viewport-fraction dimensions for non-widget return types (`BoxConstraints`, `Size`, `EdgeInsets`); `LayoutBuilder` is structurally inapplicable to them because there is no parent constraint to consult and the return is data, not a widget. Instance methods that take `BuildContext` (the 2026-04-28 case) still fire. Remove any project-local `// ignore: prefer_layout_builder_for_constraints` comments added to silence the false positive on static utilities.
+
+<details>
+<summary>Maintenance</summary>
+
+- **Python publish-tooling tests now find the repo root.** The unittest suite was relocated to `scripts/modules/tests/` in May without updating its `parents[2]` repo-root index, leaving CI's test job red against every release commit since (including `Release v13.11.2`). No user impact.
+- **Removed post-publish auto-bump of `pubspec.yaml`.** Releases no longer auto-commit `chore: bump version to n.n.n+1`. The next publish prompt now defaults to a patch bump only when `CHANGELOG.md` has an `[Unreleased]` section, so minor or major releases no longer have to undo a pre-committed patch decision and main no longer carries phantom version-bump commits for releases that never shipped. No user impact.
+- **Stopped per-release churn of `views.help.name` across 25 locale bundles.** The static value is now the localized word "Help" alone (no version suffix); the runtime `createTreeView().title` injection in `extension/src/extension.ts` continues to display the live `(vX.Y.Z)` from `package.json`, unchanged from the user's perspective. The pre-compile sync script that stamped the version on every locale was deleted, which also fixes a long-standing duplicate-version pattern that had crept into Arabic, Persian, and Polish bundles (the stripper only matched lowercase Latin `v`, leaving translated version parens intact across releases). No user impact.
+
+</details>
+
+---
+
+## [13.11.2]
+
+### Fixed
+
+- **Analysis reports no longer pile up — one file per VS Code session, overwritten in place** — every file save was previously generating a new `*_saropa_lint_report.log` (one observed project had 6,837 trashed reports / 659 MB in `reports/.trash/`), violating the reporter's documented contract; the reporter now overwrites the same file on each debounce cycle and also prunes trashed reports older than 14 days. No action required.
+
+---
+
+## [13.11.1]
+
+Stub build for publishing. No recorded changes.
+
+---
+
+## [13.11.0]
+
+This release ships a new **Saropa Project Map** dashboard — a project-wide health scan that walks your code and ranks the worst files across complexity, coverage, dead code, churn, coupling, and import cycles, then prints a prioritized worklist (and copy-paste agent prompts) so you know what to fix first. The **Code Health Dashboard** also got a major overhaul: it opens instantly with a live progress bar, can be paused/resumed/restarted/canceled, caches per-file results so re-scans are fast, and lets you slice the worst-functions table by score, search, or any combination of flag categories — then bulk-copy what's left to the clipboard. And pubspec validation no longer pesters you about files inside the pub cache or vendored third-party packages. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Added
+
+- **Project Health scan (`dart run saropa_lints:project_health`)** — walks a Dart project and reports the largest files and folders by lines (split into code, comment, and blank) and on-disk size. Per-file results stream to a `reports/.saropa_lints/health/files.ndjson` shard while only bounded aggregates stay in memory, so it stays fast and memory-flat on very large projects. Building blocks of the Saropa Project Map dashboard.
+  - `--complexity` adds per-file cognitive and cyclomatic complexity, local-variable and boolean-condition density, nesting depth, class cohesion (LCOM), and a 0–100 Maintainability Index — all from a single parse per file (no element resolution, so memory stays flat).
+  - `--deadweight` flags unused files and dead top-level symbols (composing the existing cross-file engine); `--coverage`/`--lcov` reads line coverage; `--git` adds per-file churn, recency, and a bus-factor proxy from history (bounded for large repos).
+  - `--assets` flags pubspec assets/fonts declared but never referenced in code (heuristic — report-only, verify before deleting).
+  - `--islands` finds **transitive dead private islands** — private declarations that reference each other but are unreachable from any live root, the case Dart's `unused_element` misses.
+  - `--coupling` surfaces **change-coupled file pairs** (files that keep changing together in git history), and `--stubs` flags tests with no assertions.
+  - `--fix` (with `--deadweight`) writes a reviewable `git rm` script — never deletes in place, never comments code out.
+  - Surfaced in the extension sidebar as a new **"Saropa Project Map"** dashboard (sixth "Editor dashboards" leaf). The scan runs asynchronously with a cancellable progress notification (never freezes the editor) and renders **in-editor** with charts drawn by a vendored ECharts bundle (works offline, no CDN/network).
+  - `--format markdown` emits a prioritized, 🔥-tiered "hot spots" worklist — files bad on multiple axes at once (large, complex, low-maintainability, dead, churning, uncovered) — with checkbox actions that **name the offending functions** (file + line + cognitive score), ready to hand to an AI agent. Dead-weight items carry a "verify before deleting" caveat.
+  - `--format prompts` emits one self-contained, copy-paste-ready agent task per hot spot — the file, the exact functions to simplify (name/line/score), dead symbols, coverage, and churn, plus behavior-preserving constraints — so an AI can fix it without re-deriving the analysis.
+  - `--update-baseline` / `--baseline <path>` capture a health snapshot and compare against it, reporting what got better or worse and **exiting non-zero on regression** (CI gate on rising complexity, growing dead code, or falling coverage).
+  - Coverage runs now **warn when `lcov.info` predates the latest commit** — stale coverage is reported as unverified instead of silently trusted.
+  - Optional **`.saropa_health.yaml`** config: an allowlist that silences known false positives in the heuristic sections (dead files, dead symbols, islands, assets) plus shared `exclude` globs — so the report stays trustworthy instead of crying wolf.
+  - **Refactoring-ROI ranking** — a continuous "fix this first for maximum risk reduction" score combining complexity, size, git churn, and under-coverage. Surfaced in the text report and JSON (`topFiles.byRoi`); a better priority signal than the discrete 🔥 count.
+  - **Natural-language exec summary** + **what-if cleanup simulator** ("removing the N unused files would delete X lines, Y% of the codebase") in the text/JSON report.
+  - **Public-API doc coverage** (`%` of public declarations with `///`) and **import coupling** (fan-in/fan-out + instability, with `--deadweight`) added to the per-file metrics and summary.
+  - **Health time-machine** (`--history`) — reconstructs the trajectory of size and complexity across recent git tags (via `git archive`, never touching the working tree).
+  - Saropa Project Map webview gains **click-a-row-to-open-the-file** drill-down, **type-to-filter** search over the hot-spot table, a **hierarchical folder treemap** (click a folder to drill in, breadcrumb to go back), and an opt-in **in-editor "heat" CodeLens** (per-function complexity above functions) — off by default, toggled with "Saropa Lints: Toggle Saropa Project Map Heat CodeLens".
+  - `--cycles` lists import cycles with a **suggested cut** per cycle (the stable→volatile edge to remove); `--cache` reuses the parse for unchanged files so rescans are faster.
+  - Visual refresh of the HTML dashboard: brand-anchored orange palette (light + dark via CSS vars), a sticky banner with gradient-text title and a relative-time "scanned X ago" chip, KPI cards merged into the banner with a staggered reveal and a heat-tinted highlight on Dead files / Hot spots, a continuous orange ramp on the size treemap plus a gradient legend bar, sticky table head with a brand-colored active-sort indicator, table zebra striping, monospace path column and tabular-figure numerics, skeleton shimmer on charts until ECharts mounts, and an orange `:focus-visible` ring — all gated by `prefers-reduced-motion`.
+  - Maintainability Index ranking now uses the unclamped score internally, so the worst-of-the-worst files (which all clamp to 0) are ordered correctly.
+  - `--format html` writes a self-contained, theme-aware interactive report (Apache ECharts): a stat-card header, collapsible panels, a size treemap, a churn×complexity scatter, and a sortable 🔥 hot-spot table. Follows the OS/editor light/dark scheme and respects reduced-motion.
+  - Also supports `--format text|json`, `--top`, and `--exclude <glob>`.
+
+### Fixed
+
+- **Code Health scan no longer crashes on a file the analyzer can't fully parse** — one source file with a parse-level diagnostic (for example an `await` outside an async function, common while editing) previously aborted the whole scan with an unhandled exception; it now tolerates such files and keeps scanning the rest. No action required.
+- **Code Health scan starts faster and can't hang on symlinks** — file discovery now skips heavy directories (`build`, `.dart_tool`, `node_modules`, `Pods`, `.git`, …) and no longer follows symbolic links, so the scan reaches your `lib/` sources quickly instead of crawling generated output, and a symlink loop can't wedge it. No action required.
+- **Code Health no longer stalls on huge generated files** — files over ~512 KB (e.g. `flutter gen-l10n` `app_localizations*.dart` at multiple MB) are skipped; parsing one previously froze the progress bar for many seconds with no health value. The panel also shows the file it is *currently* processing and a per-phase time estimate, so a slow phase reads as working, not stalled. No action required.
+- **`require_https_only` no longer flags prose mentions of the `http://` scheme** — user-facing strings that name supported schemes (e.g. `'http:// or https:// URLs are supported.'`, the Korean equivalent `'http:// 또는 https:// URL만 지원됩니다.'` in a Flutter `app_localizations_*.dart` file, or a bare `'http://'` constant) are no longer reported as insecure URLs. A real URL has no whitespace between scheme and host, so strings with whitespace right after `http://` (or just the bare scheme) are descriptive text, not network requests. Hardcoded HTTP URLs (`'http://api.example.com'`, `Uri.parse('http://…')`, `http.get('http://…')`) still fire. No action required; any `// ignore:` markers added to work around this false positive can be removed.
+
+### Added (Extension)
+
+- **The Code Health Dashboard now opens immediately and fills in live while it scans** — instead of a notification that sat at "scanning…" with no movement, it shows a progress bar, the current file, running counts of files and functions, and a streaming preview of the worst functions found so far, so a long scan never looks frozen. While the scanner is compiling/starting the bar shows an animated indeterminate state rather than a dead 0%. No action required.
+- **Pause, Resume, Restart, and Cancel controls on the Code Health scan** — a long scan can now be suspended and continued, restarted, or stopped from the dashboard, and closing the panel also stops it, so the scan no longer runs unstoppably in the background. Canceling now stops the whole scanner process tree (previously a runaway scan could keep running on Windows). No action required.
+- **The scanning panel shows the extension version and the scanner-engine version** — if the project's `saropa_lints` is too old to report progress, the engine line says so instead of leaving a stuck 0%, making it obvious when the dashboard and the scanned project's package versions don't match. No action required.
+
+### Changed (Extension)
+
+- **Code Health scan readout is easier to read** — file and function counts now use thousands separators, and the elapsed/remaining times show minutes and hours (for example `1h 52m`) instead of a raw seconds count. The per-phase progress percent shows one decimal place so it visibly moves on a multi-thousand-file phase. No action required.
+- **Click a row in the live "problems found" preview to jump to that function** — each row opens the file at the function's line in the editor. No action required.
+- **File paths in the scan panel keep the filename visible** — long paths now collapse the leading directories instead of cropping the end, and the worst-functions rows line up in fixed columns. No action required.
+- **The Code Health scan no longer reports third-party code** — vendored packages under `dependency_overrides/` are skipped, so the worst-functions list stops surfacing un-actionable rows (such as a bare `==`) from code you don't own. Operator overrides in your own code are now labeled (`operator ==`) rather than shown as a bare symbol. No action required.
+- **Code Health scans are now incremental** — each file's parse is hashed and cached, so a file unchanged since the last scan is not re-parsed, and within a single scan no file is parsed twice across the parse and usage phases. The cache lives at `.saropa/project-vibrancy-cache/mvp_cache.json` and self-invalidates per-file on content change and globally on engine upgrade; delete the folder to force a cold scan. No action required.
+- **Code Health Dashboard report is the full project, not a 200-row slice** — the worst-functions table, the search filter, and the KPI tile clicks now operate on every scored function. Previously clicking "Test drift: 974" only showed the handful of test-drift rows that happened to be in the worst-200, which read as a broken filter. The row count above the table now shows `showing N of TOTAL` truthfully. No action required.
+- **Every Code Health scan is saved to a JSON file you can share** — written to `reports/<yyyymmdd>/<yyyymmdd>_<HHmmss>_saropa_code_health.json` under the project root, with a strip under the KPI cards showing the path and Copy / Open / Reveal-in-Explorer buttons. The path is also clickable to copy. No action required.
+- **Code Health Dashboard rows redesigned for readability** — the redundant grade column is gone (the grade duplicated the score axis); the score is a colored whole-number pill (red→amber→green) with readable black text instead of the previous low-contrast yellow-on-yellow grade pill; function names are clickable and open the file at the line; file paths collapse the directory and keep the basename whole; a new *Changed* column shows how long ago the file was last touched (`3d`, `5w`, `2mo`). No action required.
+- **Column sort indicators are now honest** — the active column shows an arrow in the actual sort direction; other columns show nothing. Previously every column displayed an up-arrow forever, which read as decoration rather than state. No action required.
+- **Header shows the number of problem functions** — the hero now carries a `N problems` chip (functions scoring under 50, i.e. grades D / E / F) alongside the function count and gate status; the duplicated hero gauge (which redundantly displayed the same average score with different rounding) was removed. No action required.
+- **`complex` is now a KPI tile and click-to-filter category** — alongside Unused / Uncovered / Stub-tested / Suspicious coverage / Test drift, so high-complexity functions are surfaced and filterable the same way as the other flag classes. No action required.
+- **The Code Health Dashboard no longer freezes on large projects** — function rows now ship to the webview as a JSON data block and the script renders a 500-row window into the DOM, so a project with tens of thousands of functions opens responsively and column-header sort is instant. The "Show next 500" button at the bottom of the table reveals the next chunk on demand. No action required.
+- **Hide boilerplate methods toggle (default ON)** — a new toolbar checkbox hides operator overrides (`==`, `<`, `[]`, …) and the equality / serialization / dispatch boilerplate (`hashCode`, `toString`, `noSuchMethod`, `copyWith`, `props`, `fromJson`, `toJson`, `fromMap`, `toMap`). These dominate "worst functions" lists in real projects but rarely deserve triage attention; uncheck the box to see them. No action required.
+- **Bulk-copy methods for analysis is filter-driven** — narrow the Worst Functions table with the new *Score ≤ N* threshold, the search field, the *Hide boilerplate* toggle, and the KPI tiles (multi-select — click multiple to combine flags, e.g. `unused` AND `complex`), then click *Copy filtered (N)* to send every visible row to the clipboard as `file:line  function-name  (score, flags)`, one line per row, ready to paste into a chat or issue. No per-row checkboxes; the filters are the selection. The active-filter strip lists every applied filter (search, score threshold, each flag) with its own dismiss button. No action required.
+- **The Score column now explains what it measures** — hovering the column header shows the composite formula (`40% coverage + 25% usage + 15% age + 15% complexity + 5% documentation`), and Usage / Coverage / Complexity / Changed columns gained similar tooltips so a reader doesn't have to guess what each axis means. No action required.
+
+### Fixed (Extension)
+
+- **Pubspec validation and Package Vibrancy diagnostics no longer fire on third-party packages** — opening a vendored `pubspec.yaml` under the pub cache (`Pub/Cache/hosted/…`, `~/.pub-cache/…`) or under `.dart_tool` / `node_modules` was producing `saropa-pubspec`, `saropa-sdk`, and `Package Vibrancy` diagnostics on files you can't edit, polluting the Problems panel. The listener now skips any pubspec outside the open workspace and any pubspec inside a known cache or generated directory. No action required.
+- **"Score dipped below N" toasts no longer repeat on every save when the score oscillates near a band edge, and no longer fire from one-off partial-sweep dips** — each crossing of a band (90 / 80 / 70 / 60 / 50) now fires at most once and only re-arms after the score recovers clearly above that band (5 points), and a downward crossing is held one snapshot before firing so an intermediate partial sweep that briefly skews the score (the case where the dashboard reads 93 while a stale toast had already said "below 50") is dropped quietly when the next snapshot recovers. Set `saropaLints.regressionNudge.enabled` to `false` to silence regression toasts entirely.
+- **"No errors!" celebration toast no longer repeats when the error count flickers between 0 and 1** — the toast is now persisted per workspace and only re-fires after errors return and are cleared again, so an intermediate analyzer batch that briefly drops and re-adds an error stops producing a stream of identical celebrations. No action required.
+
+<details><summary>Maintenance</summary>
+
+- When the extension runs as its own in-development build (F5 from the repo), the Code Health scan now executes the in-repo `saropa_lints` CLI against the opened project (via `--path`) instead of the project's pinned package version, so new CLI behavior can be tested without a path override. Installed builds are unaffected — they still use the project's own CLI.
+- `git blame` in the vibrancy scan now passes the scanned project as its working directory, so age scoring stays correct when the CLI process runs from a different directory than the scanned project.
+- Health time-machine (`--history`) now refuses to inherit a parent repo's tags. `git tag` climbs the directory tree, so running the scan on a subdirectory of another repo (the case that surfaces here is the publish script redirecting `TMP` into `build/test_tmp` inside this repo) silently reported the parent's tags as the project's own history. The scan now requires the scanned path to host its own `.git` entry (directory or worktree file) before asking git anything.
+- Publish-time US-English spelling audit now also flags British forms embedded in CamelCase identifiers (e.g. `_ScanCancelled`, `OnColourPicked`); the original word-boundary regex missed these because there is no `\b` between two letters of the same identifier. The audit also exempts archived plan docs under `plans/history/` so old write-ups don't keep tripping the gate after their work has shipped. <!-- cspell:ignore Cancelled Colour -->
+
+</details>
+
+---
+
+## [13.10.4]
+
+The `avoid_money_arithmetic_on_double` rule stops mistaking layout math for money — names like `trailingTotal` or `widthTotal` that add up pixel widths are no longer flagged, while genuine money totals like `totalPrice` and `invoiceTotal` still are. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_money_arithmetic_on_double` no longer flags non-financial `*Total` aggregates** — identifiers ending in `total` (`trailingTotal`, `widthTotal`, `angleTotal`, and single words like `cartTotal`) are pixel/geometry sums rather than currency, so they are now exempt unless paired with a real money word such as `totalPrice` or `invoiceTotal`. No action required; any `// ignore:` markers added to work around this false positive can be removed.
+
+---
+
+## [13.10.3]
+
+The `prefer_spread_over_addall` style hint stops nagging when you mutate a collection in place — clearing a list and re-filling it, for example — where spread syntax simply can't apply. The `avoid_large_list_copy` rule no longer warns on `.toList()` calls where a concrete list is actually required. The lint score in the status bar no longer flashes a misleading red 0% while a scan is still in progress, and a low score no longer paints the status bar red. The Findings dashboard's health gauge is steadier too — it no longer collapses to an empty dot or whiplashes from A to E while a scan is running. Its Top Rules list now shows the 10 noisiest rules, sorts on a header click, and expands each rule to reveal its full message and the files it affects. And `move_variable_closer_to_its_usage` now understands that loop accumulators and long initializers genuinely can't move, so it stays quiet on them. [log](https://github.com/saropa/saropa_lints/blob/v13.10.3/CHANGELOG.md)
+
+### Fixed
+
+- **`prefer_spread_over_addall` no longer flags in-place mutation that has no spread equivalent** — it previously fired on every `addAll` call, including `clear(); addAll(items);` on the current object (where there is no receiver to spread into) and unrelated user-defined `addAll` methods. It now reports only `addAll` on a `List`/`Set`/`Queue` receiver that exists to spread into. No action required; any `// ignore:` markers added to work around this false positive can be removed.
+- **`avoid_large_list_copy` no longer flags `.toList()` that is structurally required** — a `.toList()` used as a cascade target (`...toList()..sort()`), as a branch of a ternary assigned to a typed `List`, or bounded by `take(N)` is no longer reported, because a concrete list is unavoidable or the copy is already bounded. No action required.
+- **`move_variable_closer_to_its_usage` no longer flags variables that cannot move closer** — it now measures distance in intervening statements instead of source lines and stays silent when the first use is nested inside a loop, branch, or block the declaration must enclose, clearing false positives on loop accumulators, multi-line initializers, and values read across sibling branches. No action required; any `// ignore:` markers added to work around this can be removed.
+
+### Added (Extension)
+
+- **Each Top Rules row on the Findings dashboard now expands** to show the rule's full message and the files it affects, with each file clickable to jump straight to it — triage a noisy rule without scrolling down to the findings list. No action required.
+
+### Fixed (Extension)
+
+- **The status bar no longer shows a false 0% lint score from an in-progress scan** — the score divides violations by the files analyzed so far, so a partial editor sweep could crater it; it now appears only once a full analysis has covered enough of the project. If the tooltip says "partial scan", run a full analysis to get the score.
+- **The status-bar "updates available" count no longer over-reports** — it had counted packages whose update status was undetermined (offline / no pub.dev data) as available updates; it now counts only packages with a real newer version. No action required.
+- **The Findings dashboard health gauge no longer collapses to an empty dot** — its entrance animation restarted on every refresh and got stuck near the empty frame; the ring now paints the true score instantly on every render. No action required.
+- **The Findings dashboard "Group by" dropdown is now legible when open** — the option list inherited a low-contrast highlight; it now uses the editor's dropdown colors. No action required.
+
+### Changed (Extension)
+
+- **Saropa now uses a single status-bar item instead of two** — the score/vibrancy summary and the separate finding-count badge were merged, so a high score no longer sits next to a contradictory "⚠ N" count; the count is now appended to the one item (e.g. `Saropa: 98% ▼2 · V8/10 · ⚠ 96`) and clicking it opens the Findings Dashboard. No action required.
+- **The lint score no longer colors the status bar red** — a low score is informational, not an error, so the status-bar background now stays neutral. No action required.
+- **Suppressed packages no longer skew the vibrancy score, "updates available", or problem counts** — dismissing a package now removes it from the status-bar numbers and the tree's update/problem badges alike, while the "packages scanned" line shows how many are suppressed so the totals reconcile. No action required.
+- **The Findings dashboard health grade no longer whiplashes from A to E mid-scan** — it dims to a "computing" state while an analysis is streaming results in, then reveals the settled grade once the run finishes. No action required.
+- **The health gauge shows the score without the "/100" suffix** — the denominator was redundant next to the letter grade. No action required.
+- **The Findings dashboard Top Rules table is trimmed to the 10 noisiest rules and its Rule / Count / Severity headers are now click-to-sort** — fewer, richer rows that you can reorder for triage. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Wired the `vibrancy-state` unit tests into the test build (they had drifted out and stopped compiling) and refreshed their fixtures; added coverage for the shared `isUpdatable` predicate and suppressed-package exclusion.
+- Added a `filesExpected` field to `violations.json` (the project-file denominator) so the extension can detect a partial analysis.
+- Documented the empty `cross_file_fixture/test/*_test.dart` files as mirror-test presence markers (existence-only fixtures, not stub tests) to stop them reading as broken.
+
+</details>
 
 ---
 
