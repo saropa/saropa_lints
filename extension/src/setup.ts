@@ -12,6 +12,7 @@ import { getProjectRoot } from './projectRoot';
 import { readViolations } from './violationsReader';
 import { readInstalledVersion } from './upgrade-checker';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
+import { l10n } from './i18n/runtime';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
 const DEFAULT_VERSION = '^9.1.0';
@@ -42,10 +43,10 @@ function ensureSaropaLintsInPubspec(workspaceRoot: string): boolean {
   const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
   if (!fs.existsSync(pubspecPath)) {
     void vscode.window.showErrorMessage(
-      'Saropa Lints requires a Dart or Flutter project (no pubspec.yaml found).',
-      'Learn More',
+      l10n('notify.setup.requiresDartProject'),
+      l10n('notify.setup.actionLearnMore'),
     ).then((choice) => {
-      if (choice === 'Learn More') {
+      if (choice === l10n('notify.setup.actionLearnMore')) {
         void vscode.env.openExternal(vscode.Uri.parse('https://pub.dev/packages/saropa_lints'));
       }
     });
@@ -218,7 +219,7 @@ export async function runInWorkspaceAsync(
 export async function runEnable(context: vscode.ExtensionContext): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
-    vscode.window.showErrorMessage('No workspace folder open.');
+    vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
     return false;
   }
 
@@ -241,7 +242,7 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
       if (!pubOk) {
         logReport(`- pub get FAILED: ${pubErr || '(no details)'}`);
         flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(`Saropa Lints: pub get failed. ${pubErr || 'Check Output.'}`);
+        vscode.window.showErrorMessage(l10n('notify.setup.pubGetFailed', { details: pubErr || l10n('notify.setup.checkOutput') }));
         return;
       }
       logReport(`- Ran pub get (${pubCmd})`);
@@ -253,7 +254,7 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
         logReport('- saropa_lints not found in package_config.json after pub get');
         flushReport(workspaceRoot);
         vscode.window.showErrorMessage(
-          'Saropa Lints: pub get succeeded but saropa_lints was not resolved. Check pubspec.yaml formatting.',
+          l10n('notify.setup.pubGetNotResolved'),
         );
         return;
       }
@@ -264,7 +265,7 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
       if (!initOk) {
         logReport(`- write_config FAILED: ${initErr || '(no details)'}`);
         flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(`Saropa Lints: config write failed. ${initErr || 'Check Output.'}`);
+        vscode.window.showErrorMessage(l10n('notify.setup.configWriteFailedNs', { details: initErr || l10n('notify.setup.checkOutput') }));
         return;
       }
       logReport(`- Wrote config (tier: ${tier})`);
@@ -286,7 +287,7 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
 
 export async function runDisable(): Promise<void> {
   await vscode.workspace.getConfiguration('saropaLints').update('enabled', false, vscode.ConfigurationTarget.Workspace);
-  vscode.window.showInformationMessage('Saropa Lints is disabled. Project files were not changed.');
+  vscode.window.showInformationMessage(l10n('notify.setup.disabled'));
 }
 
 const RUN_ANALYSIS_FOR_FILES_CAP = 50;
@@ -626,7 +627,7 @@ function logSuppressionSummary(workspaceRoot: string): void {
 export async function runAnalysis(context: vscode.ExtensionContext): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
-    vscode.window.showErrorMessage('No workspace folder open.');
+    vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
     return false;
   }
   let ok = false;
@@ -649,7 +650,7 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
         const files = getOpenDartFilePaths(workspaceRoot);
         if (files.length === 0) {
           vscode.window.showInformationMessage(
-            'Saropa Lints: no open Dart files found. Re-open a Dart file or turn off the "Open editors only" setting.',
+            l10n('notify.setup.noOpenDartFiles'),
           );
           ok = false;
           return;
@@ -776,7 +777,7 @@ export async function runAnalysisForFiles(
 export async function runInitializeConfig(context: vscode.ExtensionContext, title?: string): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
-    vscode.window.showErrorMessage('No workspace folder open.');
+    vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
     return false;
   }
   const cfg = vscode.workspace.getConfiguration('saropaLints');
@@ -807,11 +808,11 @@ export async function runInitializeConfig(context: vscode.ExtensionContext, titl
       if (ok) {
         logReport(`- Config initialized (tier: ${tier})`);
         flushReport(workspaceRoot);
-        vscode.window.showInformationMessage(`Saropa Lints config updated (tier: ${tier}).`);
+        vscode.window.showInformationMessage(l10n('notify.setup.configUpdated', { tier }));
       } else {
         logReport(`- write_config FAILED: ${result.stderr || '(no details)'}`);
         flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(`Config write failed. ${result.stderr || 'Check Output.'}`);
+        vscode.window.showErrorMessage(l10n('notify.setup.configWriteFailed', { details: result.stderr || l10n('notify.setup.checkOutput') }));
       }
     },
   );
@@ -836,26 +837,23 @@ function isSafeCompositeScaffoldRelativePath(rel: string): boolean {
 export async function runEmitCompositePluginScaffold(): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
-    void vscode.window.showErrorMessage('No workspace folder open.');
+    void vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
     return false;
   }
 
   const gate = await vscode.window.showInformationMessage(
-    'Composite analyzer plugin scaffold',
+    l10n('notify.setup.scaffoldGateTitle'),
     {
-      detail:
-        'This writes a new Dart package under your workspace (pubspec.yaml, lib/main.dart, README): one custom_lint plugin that registers Saropa and leaves hooks for your own rules.\n\n' +
-        'Only use this when you ship custom analyzer rules together with Saropa. Normal Saropa-only projects can skip it—the analyzer allows a single plugin entry per context.\n\n' +
-        'Next: pick a workspace-relative folder. If that folder already exists, you are asked before anything is overwritten.',
+      detail: l10n('notify.setup.scaffoldGateDetail'),
     },
-    'Continue',
-    'Open guide',
+    l10n('notify.setup.actionContinue'),
+    l10n('notify.setup.actionOpenGuide'),
   );
-  if (gate === 'Open guide') {
+  if (gate === l10n('notify.setup.actionOpenGuide')) {
     await vscode.env.openExternal(vscode.Uri.parse(COMPOSITE_PLUGIN_SCAFFOLD_GUIDE_URL));
     return false;
   }
-  if (gate !== 'Continue') {
+  if (gate !== l10n('notify.setup.actionContinue')) {
     return false;
   }
 
@@ -880,17 +878,17 @@ export async function runEmitCompositePluginScaffold(): Promise<boolean> {
   const outAbs = path.resolve(workspaceRoot, trimmed);
   const rootResolved = path.resolve(workspaceRoot);
   if (outAbs !== rootResolved && !outAbs.startsWith(rootResolved + path.sep)) {
-    void vscode.window.showErrorMessage('Scaffold path must be inside the workspace folder.');
+    void vscode.window.showErrorMessage(l10n('notify.setup.scaffoldPathOutsideWorkspace'));
     return false;
   }
 
   if (fs.existsSync(outAbs)) {
     const pick = await vscode.window.showWarningMessage(
-      `Folder already exists: ${trimmed}. Files may be added or overwritten. Continue?`,
+      l10n('notify.setup.scaffoldFolderExists', { folder: trimmed }),
       { modal: true },
-      'Continue',
+      l10n('notify.setup.actionContinue'),
     );
-    if (pick !== 'Continue') return false;
+    if (pick !== l10n('notify.setup.actionContinue')) return false;
   }
 
   let ok = false;
@@ -916,17 +914,17 @@ export async function runEmitCompositePluginScaffold(): Promise<boolean> {
         logReport(`- Wrote scaffold under ${trimmed}`);
         flushReport(workspaceRoot);
         const action = await vscode.window.showInformationMessage(
-          'Composite plugin scaffold created. Open generated main.dart?',
-          'Open main.dart',
-          'Open README',
+          l10n('notify.setup.scaffoldCreated'),
+          l10n('notify.setup.actionOpenMainDart'),
+          l10n('notify.setup.actionOpenReadme'),
         );
-        if (action === 'Open main.dart') {
+        if (action === l10n('notify.setup.actionOpenMainDart')) {
           const mainPath = path.join(outAbs, 'lib', 'main.dart');
           if (fs.existsSync(mainPath)) {
             const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(mainPath));
             await vscode.window.showTextDocument(doc);
           }
-        } else if (action === 'Open README') {
+        } else if (action === l10n('notify.setup.actionOpenReadme')) {
           const readmePath = path.join(outAbs, 'README.md');
           if (fs.existsSync(readmePath)) {
             const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(readmePath));
@@ -937,7 +935,7 @@ export async function runEmitCompositePluginScaffold(): Promise<boolean> {
         logReport(`- scaffold FAILED: ${result.stderr || '(no details)'}`);
         flushReport(workspaceRoot);
         void vscode.window.showErrorMessage(
-          `Scaffold failed. ${result.stderr || 'Ensure saropa_lints is in dev_dependencies and run pub get.'}`,
+          l10n('notify.setup.scaffoldFailed', { details: result.stderr || l10n('notify.setup.scaffoldFailedHint') }),
         );
       }
     },
@@ -1005,7 +1003,7 @@ async function applyTierChange(
   if (!writeResult.ok) {
     logReport(`- write_config FAILED: ${writeResult.stderr || '(no details)'}`);
     flushReport(workspaceRoot);
-    vscode.window.showErrorMessage(`Config write failed. ${writeResult.stderr || 'Check Output.'}`);
+    vscode.window.showErrorMessage(l10n('notify.setup.configWriteFailed', { details: writeResult.stderr || l10n('notify.setup.checkOutput') }));
     return false;
   }
   logReport(`- Wrote config (tier: ${tier})`);
@@ -1045,13 +1043,13 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<Tier
 
   // Same-tier guard — no-op, skip the expensive init + analysis cycle.
   if (tier === previousTier) {
-    void vscode.window.showInformationMessage(`Already on ${tierLabel(tier)} tier.`);
+    void vscode.window.showInformationMessage(l10n('notify.setup.alreadyOnTier', { tier: tierLabel(tier) }));
     return null;
   }
 
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
-    vscode.window.showErrorMessage('No workspace folder open.');
+    vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
     return null;
   }
   await vscode.workspace.getConfiguration('saropaLints').update('tier', tier, vscode.ConfigurationTarget.Workspace);

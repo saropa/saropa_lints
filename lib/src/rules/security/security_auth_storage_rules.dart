@@ -320,10 +320,26 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  static final List<RegExp> _authBioTargetPatterns = [
-    RegExp(r'\bauth\b'),
-    RegExp(r'\bbio\b'),
+  /// Receiver-name substrings that indicate a biometric / local-auth receiver
+  /// when the static type is unresolved. These are plain `contains` checks (NOT
+  /// whole-word). The previous whole-word `\bauth\b` / `\bbio\b` patterns missed
+  /// the canonical local_auth call `localAuth.authenticate(...)`: the receiver
+  /// `localAuth` is a single identifier token, so there is no word boundary
+  /// before `auth`, and the rule silently produced a false negative on the one
+  /// call site it most needs to catch.
+  static const List<String> _bioReceiverNameHints = <String>[
+    'localauth',
+    'localauthentication',
+    'biometric',
+    'auth',
+    'bio',
   ];
+
+  /// Class names from `local_auth` (and equivalents) whose `authenticate`
+  /// resolves to the biometric API.
+  static const Set<String> _bioAuthTypeNames = <String>{
+    'LocalAuthentication',
+  };
 
   @override
   void runWithReporter(
@@ -334,14 +350,18 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (methodName != 'authenticate') return;
 
-      // Check if it's a biometric authentication call
       final Expression? target = node.target;
       if (target == null) return;
 
-      final String targetSource = target.toSource().toLowerCase();
-      if (!_authBioTargetPatterns.any((p) => p.hasMatch(targetSource))) {
-        return;
-      }
+      // Match the local_auth biometric API rather than a whole-word receiver
+      // substring. Prefer the resolved receiver type (`LocalAuthentication`);
+      // fall back to a plain receiver-name substring when the type is
+      // unresolved (partial analysis / no Flutter resolution). The decisive
+      // discriminator is the `biometricOnly:` named argument below, which is
+      // specific to local_auth's `authenticate` — the receiver check only
+      // filters out an unrelated `authenticate` that happens to share that
+      // parameter name.
+      if (!_isBiometricReceiver(target)) return;
 
       // Check for biometricOnly: true
       for (final Expression arg in node.argumentList.arguments) {
@@ -356,6 +376,19 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// True when [target] is (resolves to) a local_auth biometric receiver, or —
+  /// when the type is unresolved — its identifier contains a biometric-auth
+  /// name hint as a substring (not whole-word; see [_bioReceiverNameHints]).
+  static bool _isBiometricReceiver(Expression target) {
+    final DartType? type = target.staticType;
+    if (type is InterfaceType) {
+      if (_bioAuthTypeNames.contains(type.element.name)) return true;
+    }
+
+    final String targetSource = target.toSource().toLowerCase();
+    return _bioReceiverNameHints.any(targetSource.contains);
   }
 }
 
@@ -836,11 +869,24 @@ class RequireTokenRefreshRule extends SaropaLintRule {
         }
       }
 
-      // If has access token but no refresh logic, warn
-      if (hasAccessToken && !hasRefreshToken && !hasRefreshMethod) {
-        reporter.atToken(node.nameToken, code);
-      }
-      if (hasAccessToken && !hasExpiryCheck) {
+      if (!hasAccessToken) return;
+
+      // Single diagnostic per class. The class lacks refresh handling only when
+      // it has NEITHER a refresh-token field NOR a refresh method NOR an expiry
+      // check; any one of those means refresh logic is present.
+      //
+      // Previously there were TWO separate `atToken` reports — a no-refresh
+      // branch AND a standalone `!hasExpiryCheck` branch. The expiry branch
+      // fired for essentially every auth/session/token class that stores an
+      // access token even when proper refresh logic existed (e.g. a refresh
+      // token field plus a refreshAccessToken() method, but no inline
+      // `expir`/`isBefore` string in any method body). That produced a false
+      // positive, and on a bare access-token class both branches reported the
+      // same class-name token (a duplicate). Folding expiry in as one of the
+      // satisfying signals collapses both into the correct single check.
+      final bool hasRefreshLogic =
+          hasRefreshToken || hasRefreshMethod || hasExpiryCheck;
+      if (!hasRefreshLogic) {
         reporter.atToken(node.nameToken, code);
       }
     });
@@ -941,31 +987,56 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
         }
       }
 
-      // Check if result is used for authorization decisions
-      AstNode? current = node.parent;
-      while (current != null) {
-        if (current is IfStatement) {
-          final String condition = current.expression.toSource().toLowerCase();
-          if (condition.contains('role') ||
-              condition.contains('admin') ||
-              condition.contains('permission') ||
-              condition.contains('scope') ||
-              condition.contains('claim')) {
-            reporter.atNode(node);
-            return;
-          }
-        }
-        current = current.parent;
+      // Only flag when the decoded value feeds an authorization decision.
+      if (_isInAuthorizationContext(node)) {
+        reporter.atNode(node);
       }
     });
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme
           .toLowerCase();
-      if (_jwtTypePatterns.any((p) => p.hasMatch(typeName))) {
+      if (!_jwtTypePatterns.any((p) => p.hasMatch(typeName))) {
+        return;
+      }
+
+      // Require the SAME authorization-context guard as the method branch.
+      // Previously this branch reported on any JWT-named constructor (e.g.
+      // `JsonWebToken.fromMap(...)`, a plain `Jwt(...)`) regardless of how the
+      // result was used. The rule's threat model is authorization decisions
+      // made on client-decoded claims — constructing a JWT model for display,
+      // logging, or storage is not that. Gating the constructor branch behind
+      // the role/admin/permission/scope/claim context removes the false
+      // positive while still catching `if (Jwt(token).role == 'admin') ...`.
+      if (_isInAuthorizationContext(node)) {
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+
+  /// Returns true when [node] (a JWT decode/construction) sits inside an `if`
+  /// condition that tests an authorization-relevant identifier. Walks ancestors
+  /// so the node may be nested anywhere within the condition expression.
+  ///
+  /// Shared by the method-call and instance-creation branches so both apply the
+  /// identical guard — see the constructor-branch comment for why the guard is
+  /// required there.
+  static bool _isInAuthorizationContext(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is IfStatement) {
+        final String condition = current.expression.toSource().toLowerCase();
+        if (condition.contains('role') ||
+            condition.contains('admin') ||
+            condition.contains('permission') ||
+            condition.contains('scope') ||
+            condition.contains('claim')) {
+          return true;
+        }
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }
 

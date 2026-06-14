@@ -258,10 +258,8 @@ async function handlePanelMessage(msg: unknown): Promise<void> {
   if (data.type === 'copyReportPath') {
     if (!lastReportFilePath) return;
     await vscode.env.clipboard.writeText(lastReportFilePath);
-    // Inline English (not l10n) so the publish gate isn't blocked on new keys
-    // needing translation across all locales — fold into i18n in a later pass.
     void vscode.window.showInformationMessage(
-      `Copied report path: ${lastReportFilePath}`,
+      l10n('notify.misc.reportViewCopiedPath', { path: lastReportFilePath }),
     );
     return;
   }
@@ -274,7 +272,7 @@ async function handlePanelMessage(msg: unknown): Promise<void> {
       await vscode.window.showTextDocument(doc);
     } catch {
       void vscode.window.showErrorMessage(
-        `Could not open report file: ${lastReportFilePath}`,
+        l10n('notify.misc.reportViewCouldNotOpen', { path: lastReportFilePath }),
       );
     }
     return;
@@ -289,8 +287,12 @@ async function handlePanelMessage(msg: unknown): Promise<void> {
     const capped = text.length > 1_000_000 ? text.slice(0, 1_000_000) : text;
     await vscode.env.clipboard.writeText(capped);
     const lineCount = capped.split('\n').filter((l) => l.length > 0).length;
+    // Singular/plural lives in the catalog (two keys) rather than an in-code
+    // row/rows ternary, so each locale can supply its own plural form.
     void vscode.window.showInformationMessage(
-      `Copied ${lineCount} ${lineCount === 1 ? 'row' : 'rows'} to clipboard.`,
+      lineCount === 1
+        ? l10n('notify.misc.reportViewCopiedRowOne', { count: String(lineCount) })
+        : l10n('notify.misc.reportViewCopiedRowOther', { count: String(lineCount) }),
     );
     return;
   }
@@ -334,14 +336,14 @@ async function applyFileSuppression(reportFile: string, flag: string): Promise<v
     const fileName = nodePath.basename(reportFile);
     if (merged.noChange) {
       void vscode.window.showInformationMessage(
-        `'${flag}' is already suppressed in ${fileName}.`,
+        l10n('notify.misc.reportViewAlreadySuppressed', { flag, file: fileName }),
       );
       return;
     }
     await vscode.workspace.fs.writeFile(uri, new TextEncoder().encode(merged.content));
-    const rescanAction = 'Rescan';
+    const rescanAction = l10n('notify.misc.actionRescan');
     const choice = await vscode.window.showInformationMessage(
-      `Suppressed '${flag}' in ${fileName}.`,
+      l10n('notify.misc.reportViewSuppressed', { flag, file: fileName }),
       rescanAction,
     );
     if (choice === rescanAction) {
@@ -349,7 +351,11 @@ async function applyFileSuppression(reportFile: string, flag: string): Promise<v
     }
   } catch (e) {
     void vscode.window.showErrorMessage(
-      `Could not suppress '${flag}' in ${reportFile}: ${(e as Error).message ?? e}`,
+      l10n('notify.misc.reportViewCouldNotSuppress', {
+        flag,
+        file: reportFile,
+        error: String((e as Error).message ?? e),
+      }),
     );
   }
 }

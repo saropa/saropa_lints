@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:meta/meta.dart';
 
 import '../../async_context_utils.dart';
@@ -14,6 +15,51 @@ import 'state_lifecycle_dispose_scan.dart';
 /// Shared regex for detecting private method calls (e.g., `_dispose()`).
 /// Used by multiple rules to detect calls to private helper methods.
 final RegExp _privateMethodCallPattern = RegExp(r'_(\w+)\s*\(');
+
+/// True when [node] is a `State<T>` subclass declaration.
+///
+/// Resolves the superclass element (falling back to the lexeme when the type
+/// is unresolved, e.g. a Flutter `State` with no analyzed Flutter SDK) so that
+/// a method merely *named* `initState`/`didChangeDependencies`/`dispose` on a
+/// plain (non-State) class is not mistaken for a Flutter lifecycle override.
+/// The lifecycle hazards these rules detect only exist inside a real State
+/// subclass; gating here prevents firing on unrelated same-named methods.
+bool _isStateSubclass(ClassDeclaration node) {
+  final ExtendsClause? extendsClause = node.extendsClause;
+  if (extendsClause == null) return false;
+  final NamedType superclass = extendsClause.superclass;
+  // Prefer the resolved element name; fall back to the lexeme when the
+  // superclass type does not resolve (no Flutter SDK in the analysis context).
+  final String? resolvedName = superclass.element?.name;
+  if (resolvedName != null) return resolvedName == 'State';
+  return superclass.name.lexeme == 'State';
+}
+
+/// True when [initializer] reads a controller from the enclosing widget
+/// (`widget.controller`, `widget.config.controller`), meaning the PARENT owns
+/// it and is responsible for disposal. The Flutter contract is that whoever
+/// creates a controller disposes it, so a State that disposes a parent-supplied
+/// controller is the actual bug — flagging "missing disposal" here would push
+/// developers toward a double-dispose crash. Narrow on purpose: a locally
+/// constructed controller (`ScrollController()`) is NOT parent-owned and still
+/// needs disposal, so only an explicit `widget.<member>` read short-circuits.
+bool _isParentOwnedFieldInitializer(Expression initializer) {
+  // `widget.controller`
+  if (initializer is PrefixedIdentifier) {
+    return initializer.prefix.name == 'widget';
+  }
+  // `widget.config.controller` (chained) — receiver root is still `widget`.
+  if (initializer is PropertyAccess) {
+    final Expression? target = initializer.target;
+    if (target is SimpleIdentifier) {
+      return target.name == 'widget';
+    }
+    if (target is PrefixedIdentifier) {
+      return target.prefix.name == 'widget';
+    }
+  }
+  return false;
+}
 
 class AvoidContextInInitStateDisposeRule extends SaropaLintRule {
   AvoidContextInInitStateDisposeRule() : super(code: _code);
@@ -897,11 +943,11 @@ class RequireInitStateIdempotentRule extends SaropaLintRule {
 
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'initState') return;
-      final AstNode? parent = node.parent;
-      if (parent is! ClassDeclaration) return;
-      final ExtendsClause? extendsClause = parent.extendsClause;
-      if (extendsClause == null) return;
-      if (extendsClause.superclass.element?.name != 'State') return;
+      // thisOrAncestorOfType: a method's direct parent is the class body, not
+      // the ClassDeclaration. Gate on a resolved State subclass.
+      final ClassDeclaration? parent = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (parent == null || !_isStateSubclass(parent)) return;
 
       final List<MethodInvocation> registerCalls = [];
       node.body.visitChildren(
@@ -917,11 +963,17 @@ class RequireInitStateIdempotentRule extends SaropaLintRule {
           break;
         }
       }
-      final String disposeBodySource =
-          disposeMethod?.body.toSource().toLowerCase() ?? '';
-      final bool hasRemove = _removeMethods.any(
-        (m) => disposeBodySource.contains(m),
+
+      // Detect removal as a real AST invocation of removeListener/removeObserver
+      // rather than a substring of the dispose body source. A substring match
+      // counted the word "removeListener" appearing inside a comment or string
+      // literal (e.g. a log message) as a genuine removal, suppressing the
+      // warning when no listener was actually removed.
+      final List<MethodInvocation> removeCalls = [];
+      disposeMethod?.body.visitChildren(
+        _ListenerCallCollector(removeCalls, _removeMethods),
       );
+      final bool hasRemove = removeCalls.isNotEmpty;
 
       if (!hasRemove) {
         for (final call in registerCalls) {
@@ -1203,8 +1255,19 @@ class AvoidUnsafeSetStateRule extends SaropaLintRule {
       }
 
       // Check for if statement: if (mounted) { setState(...) }
-      if (current is IfStatement) {
-        if (_isMountedCheck(current.expression)) {
+      // The guard only holds in the branch that executes when mounted is true.
+      // For `if (mounted)` that is the THEN branch; for `if (!mounted)` it is
+      // the ELSE branch. setState in the opposite branch runs when NOT mounted
+      // (the opposite of guarded), so an `if (mounted)` ancestor must not be
+      // treated as a guard unless the call sits in the mounted-true branch.
+      if (current is IfStatement && _isMountedCheck(current.expression)) {
+        final bool negated = _isNegatedMountedCheck(current.expression);
+        final Statement guardedBranch = negated
+            ? (current.elseStatement ?? current.thenStatement)
+            : current.thenStatement;
+        // When negated with no else, no branch is the mounted-true guard.
+        final bool hasGuardedBranch = !negated || current.elseStatement != null;
+        if (hasGuardedBranch && _containsNode(guardedBranch, node)) {
           return true;
         }
       }
@@ -1245,6 +1308,27 @@ class AvoidUnsafeSetStateRule extends SaropaLintRule {
     final String condSource = condition.toSource();
     if (condSource == 'mounted') return true;
     if (_mountedPattern.hasMatch(condSource)) return true;
+    return false;
+  }
+
+  /// True when [condition] is a NEGATED mounted check (`!mounted` or
+  /// `mounted == false`), meaning the mounted-true guard lives in the ELSE
+  /// branch of the enclosing `if`, not the then branch.
+  bool _isNegatedMountedCheck(Expression condition) {
+    // `!mounted` (and `!(mounted)`): a prefix `!` over a mounted expression.
+    if (condition is PrefixExpression &&
+        condition.operator.type == TokenType.BANG) {
+      return _isMountedCheck(condition.operand);
+    }
+    // `mounted == false` / `false == mounted`.
+    if (condition is BinaryExpression &&
+        condition.operator.type == TokenType.EQ_EQ) {
+      final String left = condition.leftOperand.toSource();
+      final String right = condition.rightOperand.toSource();
+      final bool mentionsMounted = left == 'mounted' || right == 'mounted';
+      final bool mentionsFalse = left == 'false' || right == 'false';
+      return mentionsMounted && mentionsFalse;
+    }
     return false;
   }
 
@@ -1438,27 +1522,20 @@ class RequireDisposeRule extends SaropaLintRule {
         return;
       }
 
-      // Find the dispose method and collect all method bodies
+      // Find the dispose method and collect all method declarations so helper
+      // bodies can be searched as real AST (not concatenated source text).
       MethodDeclaration? disposeMethod;
-      final Map<String, String> methodBodies = <String, String>{};
+      final Map<String, MethodDeclaration> methodDecls =
+          <String, MethodDeclaration>{};
 
       for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
-          methodBodies[methodName] = member.body.toSource();
+          methodDecls[methodName] = member;
           if (methodName == 'dispose') {
             disposeMethod = member;
           }
         }
-      }
-
-      // Get the dispose method body and expand helper method calls
-      String disposeBody = '';
-      if (disposeMethod != null) {
-        disposeBody = _expandMethodCalls(
-          disposeMethod.body.toSource(),
-          methodBodies,
-        );
       }
 
       // Check each disposable field
@@ -1466,7 +1543,7 @@ class RequireDisposeRule extends SaropaLintRule {
         if (disposeMethod == null) {
           // No dispose method at all
           reporter.atNode(field.declaration.fields, code);
-        } else if (!_isFieldDisposed(field, disposeBody)) {
+        } else if (!_isFieldDisposedAst(field, disposeMethod, methodDecls)) {
           // Dispose method exists but doesn't dispose this field
           reporter.atNode(field.declaration.fields, code);
         }
@@ -1474,51 +1551,34 @@ class RequireDisposeRule extends SaropaLintRule {
     });
   }
 
-  /// Expand helper method calls in the body to include their implementations.
-  /// This allows detecting disposal patterns like `_cancelTimer()` that
-  /// internally call `_timer?.cancel()`.
-  String _expandMethodCalls(
-    String body,
-    Map<String, String> methodBodies, {
-    int depth = 0,
-  }) {
-    // Prevent infinite recursion
-    if (depth > 3) {
-      return body;
-    }
-
-    final StringBuffer expanded = StringBuffer(body);
-
-    // Find method calls to private methods (starting with _)
-    for (final RegExpMatch match in _privateMethodCallPattern.allMatches(
-      body,
-    )) {
-      final String methodName = '_${match.group(1)}';
-      final String? methodBody = methodBodies[methodName];
-      if (methodBody != null) {
-        // Recursively expand nested helper calls
-        final String expandedMethodBody = _expandMethodCalls(
-          methodBody,
-          methodBodies,
-          depth: depth + 1,
-        );
-        expanded.write(' $expandedMethodBody');
-      }
-    }
-
-    return expanded.toString();
+  /// AST-based disposal check. Walks the dispose method body (and any private
+  /// helper methods it transitively calls) looking for the field being disposed
+  /// as either a direct/null-aware/this-qualified invocation
+  /// (`_x.dispose()`, `_x?.dispose()`, `this._x.dispose()`) or a TOP-LEVEL
+  /// cascade section (`_x..dispose()`, `_x?..a()..dispose()`).
+  ///
+  /// Why AST instead of the prior whitespace-normalized regex: the regex
+  /// cascade pattern `name\??(?:\.\.[^;]+)*\.\.method\(` let `[^;]+` swallow a
+  /// nested expression, so a sibling field disposed INSIDE this field's cascade
+  /// argument (`_a..addListener(_b..dispose())`) wrongly satisfied `_a`. A
+  /// cascade section is a structural concept the AST models exactly, so this
+  /// cannot cross into another field's disposal.
+  static bool _isFieldDisposedAst(
+    _DisposableField field,
+    MethodDeclaration disposeMethod,
+    Map<String, MethodDeclaration> methodDecls,
+  ) {
+    final visitor = _FieldDisposalVisitor(
+      fieldName: field.name,
+      disposeMethod: field.disposeMethod,
+      methodDecls: methodDecls,
+    );
+    disposeMethod.body.accept(visitor);
+    return visitor.disposed;
   }
 
-  /// Check if a class extends `State<T>`
-  bool _isStateClass(ClassDeclaration node) {
-    final ExtendsClause? extendsClause = node.extendsClause;
-    if (extendsClause == null) {
-      return false;
-    }
-
-    final String superclassName = extendsClause.superclass.name.lexeme;
-    return superclassName == 'State';
-  }
+  /// Check if a class extends `State<T>` (resolved-element aware).
+  bool _isStateClass(ClassDeclaration node) => _isStateSubclass(node);
 
   /// Extract disposable field info from a field declaration
   /// Determines if a field is a disposable controller that requires manual disposal.
@@ -1594,61 +1654,91 @@ class RequireDisposeRule extends SaropaLintRule {
 
   /// True when [initializer] reads the controller from the enclosing widget
   /// (`widget.controller`), meaning the parent owns it and is responsible for
-  /// disposal. Narrow on purpose: a locally constructed controller
-  /// (`TextEditingController()`) is NOT parent-owned and still needs disposal,
-  /// so only an explicit `widget.<member>` read short-circuits the check.
-  static bool _isParentOwnedInitializer(Expression initializer) {
-    // `widget.controller`
-    if (initializer is PrefixedIdentifier) {
-      return initializer.prefix.name == 'widget';
+  /// disposal. Delegates to the shared [_isParentOwnedFieldInitializer].
+  static bool _isParentOwnedInitializer(Expression initializer) =>
+      _isParentOwnedFieldInitializer(initializer);
+}
+
+/// Walks a dispose method (and the private helper methods it transitively
+/// calls) to determine whether a specific field is disposed. Operates on the
+/// AST so a cascade section or invocation is matched structurally — a disposal
+/// nested inside another field's cascade argument cannot satisfy this field.
+class _FieldDisposalVisitor extends RecursiveAstVisitor<void> {
+  _FieldDisposalVisitor({
+    required this.fieldName,
+    required this.disposeMethod,
+    required this.methodDecls,
+    Set<String>? visited,
+  }) : _visited = visited ?? <String>{};
+
+  final String fieldName;
+  final String disposeMethod;
+  final Map<String, MethodDeclaration> methodDecls;
+  final Set<String> _visited;
+
+  bool disposed = false;
+
+  bool _matchesMethodName(String name) =>
+      name == disposeMethod || name == '${disposeMethod}Safe';
+
+  /// True when [target] refers to this field: a bare `_x`, or `this._x`.
+  bool _isFieldTarget(Expression? target) {
+    if (target is SimpleIdentifier) return target.name == fieldName;
+    if (target is PropertyAccess &&
+        target.target is ThisExpression &&
+        target.propertyName.name == fieldName) {
+      return true;
     }
-    // `widget.config.controller` (chained) — receiver root is still `widget`.
-    if (initializer is PropertyAccess) {
-      final Expression? target = initializer.target;
-      if (target is SimpleIdentifier) {
-        return target.name == 'widget';
-      }
-      if (target is PrefixedIdentifier) {
-        return target.prefix.name == 'widget';
-      }
+    if (target is PrefixedIdentifier &&
+        target.prefix.name == 'this' &&
+        target.identifier.name == fieldName) {
+      return true;
     }
     return false;
   }
 
-  /// Returns true if [disposeBody] shows this field being disposed (direct, ?., or cascade).
-  /// Normalizes whitespace so cascade across lines matches (e.g. "_x\n  ..dispose()").
-  bool _isFieldDisposed(_DisposableField field, String disposeBody) {
-    final String name = RegExp.escape(field.name);
-    final String method = RegExp.escape(field.disposeMethod);
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // Direct / null-aware / this-qualified call: `_x.dispose()`,
+    // `_x?.dispose()`, `this._x.dispose()`.
+    if (_matchesMethodName(node.methodName.name) &&
+        _isFieldTarget(node.realTarget)) {
+      disposed = true;
+    }
 
-    final String normalized = disposeBody.replaceAll(RegExp(r'\s+'), ' ');
-
-    // Common disposal patterns: direct call, optional chain, cascade (allowing whitespace)
-    final List<RegExp> patterns = <RegExp>[
-      RegExp('$name\\.$method\\('),
-      RegExp('$name\\?\\.$method\\('),
-      RegExp('$name\\.\\.$method\\('),
-      RegExp('$name\\.${method}Safe\\('),
-      RegExp('$name\\?\\.${method}Safe\\('),
-      RegExp('$name\\.\\.${method}Safe\\('),
-      // Cascade with optional whitespace (e.g. "_x\n  ..dispose()" or "_x ..dispose()")
-      RegExp('$name\\s+\\.\\.\\s*$method\\s*\\('),
-      // Multi-section cascade where dispose is not the first section, with an
-      // optional null-aware/assertion marker: "_x?..removeListener(f)..dispose()"
-      // or "_x!..a()..b()..dispose()". The `*` also covers the single-section
-      // null-aware form "_x?..dispose()". `[^;]+` keeps the match inside one
-      // cascade statement so it cannot span to a different field's disposal.
-      RegExp('$name\\??(?:\\.\\.[^;]+)*\\.\\.$method\\('),
-      RegExp('$name\\??(?:\\.\\.[^;]+)*\\.\\.${method}Safe\\('),
-    ];
-
-    for (final RegExp re in patterns) {
-      if (re.hasMatch(normalized)) {
-        return true;
+    // Follow private helper calls (implicit-this or `this`) so disposal inside
+    // a `_cleanup()` helper still counts. Recurse into the helper's body once.
+    final Expression? target = node.target;
+    if ((target == null || target is ThisExpression) &&
+        node.methodName.name.startsWith('_') &&
+        !_visited.contains(node.methodName.name)) {
+      final MethodDeclaration? helper = methodDecls[node.methodName.name];
+      if (helper != null) {
+        _visited.add(node.methodName.name);
+        helper.body.accept(this);
       }
     }
 
-    return false;
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitCascadeExpression(CascadeExpression node) {
+    // A cascade `_x..a()..dispose()` disposes `_x` only when the cascade TARGET
+    // is this field AND one of its TOP-LEVEL sections invokes the dispose
+    // method. Checking sections directly (not descendants) prevents a nested
+    // `..dispose()` on a different field inside a section argument from
+    // matching. The target may carry a null-aware marker (`_x?..dispose()`).
+    if (_isFieldTarget(node.target)) {
+      for (final Expression section in node.cascadeSections) {
+        if (section is MethodInvocation &&
+            _matchesMethodName(section.methodName.name)) {
+          disposed = true;
+          break;
+        }
+      }
+    }
+    super.visitCascadeExpression(node);
   }
 }
 
@@ -1807,14 +1897,8 @@ class RequireTimerCancellationRule extends SaropaLintRule {
     });
   }
 
-  /// Check if a class extends `State<T>`
-  bool _isStateClass(ClassDeclaration node) {
-    final ExtendsClause? extendsClause = node.extendsClause;
-    if (extendsClause == null) {
-      return false;
-    }
-    return extendsClause.superclass.name.lexeme == 'State';
-  }
+  /// Check if a class extends `State<T>` (resolved-element aware).
+  bool _isStateClass(ClassDeclaration node) => _isStateSubclass(node);
 
   /// Extract cancellable field info from a field declaration
   _CancellableField? _getCancellableField(FieldDeclaration node) {
@@ -2766,46 +2850,52 @@ class AvoidScaffoldMessengerAfterAwaitRule extends SaropaLintRule {
       // Check if function is async
       if (node.keyword?.keyword != Keyword.ASYNC) return;
 
-      bool hasAwait = false;
-      for (final Statement statement in node.block.statements) {
-        // Check for await expressions using shared utility
-        if (containsAwait(statement)) {
-          hasAwait = true;
-        }
-
-        // If we've seen an await, check for ScaffoldMessenger.of(context)
-        if (hasAwait && _containsScaffoldMessengerOf(statement)) {
-          // Find and report the specific usage
-          statement.visitChildren(
-            _ScaffoldMessengerFinderNew((MethodInvocation invocation) {
-              reporter.atNode(invocation);
-            }),
-          );
-        }
-      }
+      // Walk the body in strict source order so a ScaffoldMessenger.of(context)
+      // use lexically BEFORE the await is not reported as "after". The previous
+      // per-statement scan set hasAwait for the whole statement (e.g. a try
+      // block) and then flagged every ScaffoldMessenger use inside it, even
+      // ones before the inner await. Mirrors the source-order fix applied to
+      // use_setstate_synchronously (_OrderedSetStateScanner).
+      node.accept(_OrderedScaffoldMessengerScanner(reporter));
     });
-  }
-
-  bool _containsScaffoldMessengerOf(AstNode node) {
-    bool found = false;
-    node.visitChildren(_ScaffoldMessengerFinderNew((_) => found = true));
-    return found;
   }
 }
 
-class _ScaffoldMessengerFinderNew extends RecursiveAstVisitor<void> {
-  _ScaffoldMessengerFinderNew(this.onFound);
-  final void Function(MethodInvocation) onFound;
+/// Walks an async function body in source order, reporting
+/// `ScaffoldMessenger.of(...)` calls only once an `await` has been seen
+/// lexically before them. Nested function expressions have their own async
+/// scope and are skipped.
+class _OrderedScaffoldMessengerScanner extends RecursiveAstVisitor<void> {
+  _OrderedScaffoldMessengerScanner(this._reporter);
+
+  final SaropaDiagnosticReporter _reporter;
+  bool _seenAwait = false;
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Skip closures — their await state is independent of the outer function.
+  }
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    super.visitAwaitExpression(node);
+    // Set AFTER visiting children so an awaited expression that itself contains
+    // a ScaffoldMessenger.of (e.g. `await foo(ScaffoldMessenger.of(c))`) is
+    // evaluated before the await completes and is therefore not "after".
+    _seenAwait = true;
+  }
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
+    super.visitMethodInvocation(node);
+
+    if (!_seenAwait) return;
     final Expression? target = node.target;
     if (target is SimpleIdentifier &&
         target.name == 'ScaffoldMessenger' &&
         node.methodName.name == 'of') {
-      onFound(node);
+      _reporter.atNode(node);
     }
-    super.visitMethodInvocation(node);
   }
 }
 
@@ -2950,21 +3040,17 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
         }
       }
 
-      // Check for manual state tracking fields
+      // Check for manual interaction-state tracking fields.
       int stateFields = 0;
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
+          // Only boolean fields model an interaction state (hovered/pressed/
+          // focused). Restricting to bool avoids matching unrelated members
+          // like `_unfocusTimer` or `_focusableItems` that merely contain the
+          // substring "focus".
+          if (!_isBoolField(member)) continue;
           for (final VariableDeclaration field in member.fields.variables) {
-            final String name = field.name.lexeme;
-            if (name.contains('Hover') ||
-                name.contains('hover') ||
-                name.contains('Press') ||
-                name.contains('press') ||
-                name.contains('Focus') ||
-                name.contains('focus') ||
-                name == '_isHovered' ||
-                name == '_isPressed' ||
-                name == '_isFocused') {
+            if (_isInteractionStateName(field.name.lexeme)) {
               stateFields++;
             }
           }
@@ -2975,6 +3061,58 @@ class PreferWidgetStateMixinRule extends SaropaLintRule {
         reporter.atToken(node.nameToken, code);
       }
     });
+  }
+
+  /// Interaction-state terms that, as whole tokens, indicate a hover/pressed/
+  /// focused boolean state field. Whole-token matching (not substring) avoids
+  /// `_unfocusTimer` / `_focusableItems` false positives.
+  static const Set<String> _interactionStateTerms = <String>{
+    'hover',
+    'hovered',
+    'hovering',
+    'press',
+    'pressed',
+    'pressing',
+    'focus',
+    'focused',
+    'focusing',
+  };
+
+  /// True when the field declares a boolean type (`bool`/`bool?`). A nullable
+  /// or non-bool field does not model a simple interaction flag.
+  static bool _isBoolField(FieldDeclaration member) {
+    final TypeAnnotation? type = member.fields.type;
+    if (type is NamedType) return type.name.lexeme == 'bool';
+    // Untyped (inferred). Treat `_isHovered = false`-style as bool when the
+    // initializer is a boolean literal; otherwise it is not a bool flag.
+    for (final VariableDeclaration v in member.fields.variables) {
+      if (v.initializer is BooleanLiteral) return true;
+    }
+    return false;
+  }
+
+  /// True when [name] contains an interaction-state term as a WHOLE word.
+  /// Splits the identifier on `_` and camelCase boundaries and checks each
+  /// segment, so `_isHovered` matches (`hovered`) but `_unfocusTimer` does not
+  /// (`unfocus`, `timer` — neither is an interaction-state term).
+  static bool _isInteractionStateName(String name) {
+    for (final String segment in _identifierSegments(name)) {
+      if (_interactionStateTerms.contains(segment)) return true;
+    }
+    return false;
+  }
+
+  /// Lowercased word segments of an identifier, split on underscores and
+  /// camelCase boundaries (e.g. `_isHovered` -> {is, hovered}).
+  static Iterable<String> _identifierSegments(String name) {
+    return name
+        .replaceAllMapped(
+          RegExp('([a-z0-9])([A-Z])'),
+          (m) => '${m[1]}_${m[2]}',
+        )
+        .toLowerCase()
+        .split('_')
+        .where((s) => s.isNotEmpty);
   }
 }
 
@@ -3031,6 +3169,12 @@ class AvoidInheritedWidgetInInitStateRule extends SaropaLintRule {
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'initState') return;
+
+      // Only a real State.initState carries the unmounted-element-tree hazard.
+      // A method named initState on a plain class is not a lifecycle override.
+      final ClassDeclaration? enclosing = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (enclosing == null || !_isStateSubclass(enclosing)) return;
 
       // Visit the method body to find inherited widget access
       node.body.accept(_InheritedWidgetVisitor(reporter, code));
@@ -3109,12 +3253,19 @@ class AvoidRecursiveWidgetCallsRule extends SaropaLintRule {
         return;
       }
 
+      // Resolve the enclosing class element so self-instantiation is matched by
+      // element identity, not by simple-name lexeme. A different widget that
+      // merely shares the same simple name (e.g. an imported `Card` distinct
+      // from a local `Card`) resolves to a different element and is no longer
+      // false-flagged as infinite recursion.
+      final Element? classElement = node.declaredFragment?.element;
+
       // Find build method
       for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'build') {
           // Check for self-instantiation in build
           member.body.accept(
-            _RecursiveWidgetVisitor(className, reporter, code),
+            _RecursiveWidgetVisitor(className, classElement, reporter, code),
           );
         }
       }
@@ -3123,9 +3274,15 @@ class AvoidRecursiveWidgetCallsRule extends SaropaLintRule {
 }
 
 class _RecursiveWidgetVisitor extends RecursiveAstVisitor<void> {
-  _RecursiveWidgetVisitor(this.className, this.reporter, this.code);
+  _RecursiveWidgetVisitor(
+    this.className,
+    this.classElement,
+    this.reporter,
+    this.code,
+  );
 
   final String className;
+  final Element? classElement;
   final SaropaDiagnosticReporter reporter;
   final LintCode code;
 
@@ -3133,8 +3290,17 @@ class _RecursiveWidgetVisitor extends RecursiveAstVisitor<void> {
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     super.visitInstanceCreationExpression(node);
 
-    final String typeName = node.constructorName.type.name.lexeme;
-    if (typeName == className) {
+    final Element? createdElement = node.constructorName.type.element;
+    // Prefer element identity; only compare names when the enclosing class or
+    // the created type does not resolve (e.g. no Flutter SDK in context), where
+    // a lexeme match is the best available signal.
+    if (classElement != null && createdElement != null) {
+      if (identical(createdElement, classElement)) {
+        reporter.atNode(node);
+      }
+      return;
+    }
+    if (node.constructorName.type.name.lexeme == className) {
       reporter.atNode(node);
     }
   }
@@ -3869,6 +4035,17 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {
+            // Ownership transfer: a controller read from `widget.*` is owned by
+            // the parent that created it. Per the Flutter contract the creator
+            // disposes it, so requiring disposal here (at ERROR severity) would
+            // break correct code and invite a double-dispose crash. Mirrors the
+            // skip in RequireDisposeRule (_isParentOwnedFieldInitializer).
+            final Expression? initializer = variable.initializer;
+            if (initializer != null &&
+                _isParentOwnedFieldInitializer(initializer)) {
+              continue;
+            }
+
             final String? typeName = member.fields.type?.toSource();
             if (typeName == 'ScrollController' ||
                 typeName == 'ScrollController?') {
@@ -3876,7 +4053,6 @@ class RequireScrollControllerDisposeRule extends SaropaLintRule {
               continue;
             }
             // Check initializer for inferred types
-            final Expression? initializer = variable.initializer;
             if (initializer is InstanceCreationExpression) {
               final String initType =
                   initializer.constructorName.type.name.lexeme;
@@ -4213,12 +4389,13 @@ class RequireSuperDisposeCallRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'dispose') return;
 
-      final parent = node.parent;
-      if (parent is! ClassDeclaration) return;
-
-      final extendsClause = parent.extendsClause;
-      if (extendsClause == null) return;
-      if (extendsClause.superclass.name.lexeme != 'State') return;
+      // Use thisOrAncestorOfType: a MethodDeclaration's direct parent is the
+      // class BODY node, not the ClassDeclaration, so `parent is ClassDeclaration`
+      // never holds and the rule would never fire. Gate on a resolved State
+      // subclass so a `dispose` method on a non-State class is not flagged.
+      final ClassDeclaration? parent = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (parent == null || !_isStateSubclass(parent)) return;
 
       final String bodySource = node.body.toSource();
       if (!_superDisposePattern.hasMatch(bodySource)) {
@@ -4297,12 +4474,11 @@ class RequireSuperInitStateCallRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'initState') return;
 
-      final parent = node.parent;
-      if (parent is! ClassDeclaration) return;
-
-      final extendsClause = parent.extendsClause;
-      if (extendsClause == null) return;
-      if (extendsClause.superclass.name.lexeme != 'State') return;
+      // thisOrAncestorOfType: the method's direct parent is the class body, not
+      // the ClassDeclaration. Gate on a resolved State subclass.
+      final ClassDeclaration? parent = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (parent == null || !_isStateSubclass(parent)) return;
 
       final String bodySource = node.body.toSource();
       if (!_superInitStatePattern.hasMatch(bodySource)) {
@@ -4391,13 +4567,12 @@ class AvoidSetStateInDisposeRule extends SaropaLintRule {
       if (enclosingMethod == null) return;
       if (enclosingMethod.name.lexeme != 'dispose') return;
 
-      // Check if in State<T> class
-      final parent = enclosingMethod.parent;
-      if (parent is! ClassDeclaration) return;
-
-      final extendsClause = parent.extendsClause;
-      if (extendsClause == null) return;
-      if (extendsClause.superclass.name.lexeme != 'State') return;
+      // Check if in State<T> class. thisOrAncestorOfType: the method's direct
+      // parent is the class body, not the ClassDeclaration. Gate on a resolved
+      // State subclass.
+      final ClassDeclaration? parent = enclosingMethod
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (parent == null || !_isStateSubclass(parent)) return;
 
       reporter.atNode(node.methodName, code);
     });
@@ -4729,6 +4904,13 @@ class AvoidExpensiveDidChangeDependenciesRule extends SaropaLintRule {
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'didChangeDependencies') return;
+
+      // Only the State lifecycle callback re-runs on InheritedWidget dependency
+      // changes; a same-named method on a plain class does not, so it carries
+      // no jank hazard. Gate on a resolved State subclass.
+      final ClassDeclaration? enclosing = node
+          .thisOrAncestorOfType<ClassDeclaration>();
+      if (enclosing == null || !_isStateSubclass(enclosing)) return;
 
       final FunctionBody body = node.body;
       if (body is! BlockFunctionBody) return;

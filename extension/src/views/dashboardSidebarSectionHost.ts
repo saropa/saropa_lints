@@ -7,6 +7,7 @@
 
 import * as vscode from 'vscode';
 import { applySidebarSectionSetting, isSidebarSectionConfigKey } from './sidebarSectionApply';
+import { l10n } from '../i18n/runtime';
 
 let workspaceState: vscode.Memento | undefined;
 let dependentViewRefresh: (() => void) | undefined;
@@ -40,6 +41,6 @@ export async function applyDashboardSidebarSectionFromHost(
     dependentViewRefresh?.();
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    void vscode.window.showErrorMessage(`Saropa Lints: could not update activity bar section — ${msg}`);
+    void vscode.window.showErrorMessage(l10n('notify.commands.sidebarSectionUpdateFailed', { message: msg }));
   }
 }

@@ -6,6 +6,19 @@
 
 ---
 
+## FINAL STATUS (2026-06-13) — remediation COMPLETE except one blocked item
+
+Full-project `dart analyze`: **No issues found.** 238 new oracle-backed tests pass (1 documented skip). All fixes use a new reusable resolved-analyzer test oracle (`test/support/resolved_rule_harness.dart`) that runs a single rule against resolved source — closing the root cause (rules previously shipped detection bugs unverified).
+
+- **Workstreams B, C, D, E, G, H, J — DONE** (suppression/baseline, Future type checks, build-parse FP, package gating, infra caching, release robustness, docs). See per-workstream sections below.
+- **Workstream F (name→AST sweep) — DONE.** Every flagged rule file fixed + tested + analyze-clean: navigation (5), animation (5), accessibility (3), widget_patterns (11), widget_lifecycle (~10, incl. 3 silently-dead rules revived), widget_layout (7 + 1 non-issue), security_auth_storage (3), security_network_input (2), performance (2), api_network (2 + 1 cleanup), bloc (3), riverpod (3), async_rules-remaining (3 + 1 non-issue), flow (1 + 1 non-issue). Several audit-flagged items were VERIFIED NON-ISSUES and left unchanged (collection duplicates, use_ref_read_synchronously, avoid_unassigned_stream_subscriptions, avoid_conditions_with_boolean_literals, avoid_fixed_dimensions negative). Key harness insight: the oracle ENFORCES `applicableFileTypes`/`requiredPatterns`, so widget-rule fixtures must be real widget files.
+- **G5 — DONE** (version resolution by `jsonDecode`, not regex).
+- **H6 (`shell=True`) — ASSESSED, DECLINED; moved to `plans/deferred/publish_subprocess_shell_true_hardening.md`.** Blanket-removing it risks breaking the Windows publish path's `.bat`/PATH tool resolution; the interpolated values (validated semver tag, the repo's own branch) are not attacker-controlled in the publish context. Safe default kept; deferred doc has the safe approach if ever pursued.
+- **I1, I4 — DONE** (extension `l10n` empty-string, watch-interval clamp).
+- **I2/I3 — BLOCKED (own session needed).** ~104 hardcoded extension strings + notification concatenation → `l10n()`/`en.json`. Two hard blockers: (1) the required post-edit step `extension/scripts/generate_translations.py` is the **NLLB machine-translation pipeline, which is hard-prohibited** — adding keys without it leaves English placeholders that fail the publish coverage gate; (2) the extension is under concurrent edits from another session. Must be a focused session with the regeneration run by an authorized process.
+
+---
+
 ## 1. High-Level Report
 
 ### Overall health
@@ -107,7 +120,7 @@ The systemic theme. Treat as a sweep, fixture-pinned via Workstream A. Highest-v
 3. ~~`gh run watch` 300s timeout crash-after-tag~~ **FIXED** — wrapped in `try/except TimeoutExpired`, bumped to 600s (aligned with run discovery), prints monitor URL on timeout instead of crashing.
 4. ~~pubspec dep parser false hard-block~~ **FIXED** — `dependencies:` header now tolerates a trailing comment (the real false-block; non-2-space top-level deps are invalid pubspec). Regression test in `scripts/modules/tests/test_dependency_imports.py`.
 5. ~~`get_latest_changelog_version` unanchored~~ **FIXED** — anchored to `^##` (MULTILINE). Changelog Python tests green (17).
-6. **TODO (deferred, defense-in-depth)** `_git_ops.py` `shell=True` on Windows with interpolated branch/tag names. Real executables don't need a shell; low real-world risk for validated publish inputs.
+6. **MOVED to `plans/deferred/publish_subprocess_shell_true_hardening.md`** — `_git_ops.py` `shell=True` hardening. Assessed and intentionally not changed (no attacker-controlled input in publish; blanket removal risks the Windows release path). Full rationale + safe approach in the deferred doc.
 
 ### Workstream I — Extension — PARTIALLY DONE 2026-06-13 (tsc clean)
 1. ~~`runtime.ts:148,151` `l10n()` empty-string~~ **FIXED** — `!== undefined` instead of truthiness.
@@ -128,6 +141,29 @@ Authoritative count is **2300 rules / 145 categories** (`scripts/modules/_rule_m
 5. **I + J** (extension l10n + docs).
 
 ## 4. Open questions (saved for the user)
-1. `prefer_cached_getter` and `prefer_split_widget_const` have **no real cost/const signal** — fix the detection, or retire the rules?
-2. Should the name→AST sweep (Workstream F) be one large pass or split per category for reviewability?
-3. Rule-count: confirm the authoritative number should come from `_rule_metrics.py` output.
+1. `prefer_cached_getter` and `prefer_split_widget_const` have **no real cost/const signal** — fix the detection, or retire the rules? (Resolved during remediation: both narrowed to a defensible resolved signal — `prefer_cached_getter` flags only non-synthetic declared getters; `prefer_split_widget_const` counts only const-constructible widgets. Neither retired.)
+2. Should the name→AST sweep (Workstream F) be one large pass or split per category for reviewability? (Resolved: executed as file-scoped passes, one rule file at a time, each verified independently.)
+3. Rule-count: confirm the authoritative number should come from `_rule_metrics.py` output. (Resolved: yes — `count_rules`/`count_categories`; README badge auto-syncs at publish; stale prose stats in `CLAUDE.md` corrected to 2300/145.)
+
+## Finish Report (2026-06-14)
+
+**Scope:** (A) Dart lint rules + analyzer plugin + Dart tests; (B) VS Code extension localization; (C) docs/scripts (this audit plan, a deferred doc, Python publish/hook scripts).
+
+A full-codebase audit identified one dominant defect class and several discrete infrastructure bugs. The dominant class: lint rules deciding "what is this code?" by matching identifier/type names or re-rendered `toSource()` substrings rather than resolved AST types — producing false positives from substring collisions (`order` in `/reorder`, `view` in `ListView`, `Custom` in `Customer`, `parse` matching `int.parse`), false negatives when the marker sat in a comment/string, and rules that fired on their own documented GOOD example. The discrete bugs spanned suppression matching, baseline path matching, manifest/plist caching, the publish pipeline, and extension localization.
+
+**Root-cause infrastructure.** The rule tests previously only pinned metadata and counted `// expect_lint:` strings (never executed, because the package builds on `analyzer_plugin`, not `custom_lint`), so detection regressions shipped unverified. A reusable resolved-analyzer oracle was added at `test/support/resolved_rule_harness.dart`: it runs one rule against inline source with full type/element resolution (`AnalysisContextCollection.getResolvedUnit` → real `typeProvider`/`typeSystem`/`libraryElement` → `registerNodeProcessors` → `ScanWalker` → flushed `afterLibrary` callbacks) and returns the reported diagnostics. Fixtures are written to a unique temp subdirectory under `example/lib/` so they inherit the example package's resolved config and so concurrent test isolates cannot collide. The harness enforces `applicableFileTypes`/`requiredPatterns`, so widget-rule fixtures are shaped as real widget files; Flutter types are supplied as local stubs since the example package has no Flutter dependency (positive assertions for genuinely Flutter-typed detection are therefore out of reach for this oracle and are noted as a follow-up).
+
+**Detection fixes (resolved-AST, each test-pinned).** Suppression: `IgnoreUtils` inline-`// ignore:` matching switched from substring to whole-word (`\b`), matching `isIgnoredForFile`. Baseline: `_pathsMatch` suffix match now requires a `/` segment boundary. Async Future checks (`avoid_future_ignore`, `avoid_future_tostring`, `prefer_return_await`, `avoid_unawaited_future`) use a Future-or-subtype type check instead of `getDisplayString().startsWith('Future')`, removing the `FutureOr` false positive. `avoid_expensive_build` no longer flags `int.parse`/`Uri.parse`. Package gating added to `incorrect_firebase_event_name`, `require_database_index`/`migration`, `avoid_drift_unsafe_web_storage`; `avoid_throw_in_catch_block` un-gated from Bloc-only. The name→AST sweep corrected ~55 further rules across navigation, animation, accessibility, widget patterns/lifecycle/layout, security, performance, api_network, bloc, riverpod, async, and flow — including three lifecycle rules (`require_super_dispose_call`/`require_super_init_state_call`/`avoid_set_state_in_dispose`) that were silently dead because a `parent is ClassDeclaration` guard never held under the current analyzer (the method's parent is the class body). Several audit-flagged items were verified as non-issues against the oracle and intentionally left unchanged (collection list-duplicate rules, `use_ref_read_synchronously`, `avoid_unassigned_stream_subscriptions`, `avoid_conditions_with_boolean_literals`, the `avoid_fixed_dimensions` negative-literal case).
+
+**Infra/release fixes.** Android manifest checker now invalidates its per-project cache on mtime+size (was session-permanent) and boundary-anchors permission lookup; iOS background-mode detection checks membership inside the `UIBackgroundModes` array; version resolution parses `package_config.json` via `jsonDecode`. Publish robustness: `gh run watch` timeout is handled (was crashing publish after the tag was pushed); the dependency-import gate tolerates a commented `dependencies:` header (was false-blocking releases); `get_latest_changelog_version` is heading-anchored; the Project Health size scan flushes its NDJSON sink with backpressure and strips a UTF-8 BOM. The British-English spelling guard hook now scans only files inside the repository.
+
+**Extension localization.** Every `showInformationMessage`/`showWarningMessage`/`showErrorMessage` call across `extension/src` and their action-button labels were routed through `l10n()` with `{token}` interpolation — 208 keys under a new `notify.*` namespace in `en.json`. `en.json` was written by a single safe JSON-merge step; per-file key sets were produced independently and merged centrally, so the catalog stayed coherent.
+
+**Testing.** 3,044 Dart tests pass across the new oracle-backed regression files and the existing rule-test suites for every changed rule file (1 documented skip — a rule self-gated on `isFlutterProject`). Full `dart analyze` clean. Extension `tsc --noEmit` clean. Cross-check confirms all 208 `notify.*` keys referenced in code exist in `en.json` (0 missing). Python suites: dependency-import + spelling + changelog/version tests pass.
+
+**Outstanding (not code work).**
+- Extension translated-locale catalogs are stale until the NLLB translation pass is run (`generate_translations.py`); the publish coverage gate fails until then. This is a user/authorized step — the NLLB pipeline is not run from this workflow.
+- Positive assertions for genuinely Flutter-typed rules need a Flutter-resolved fixture package (the oracle currently verifies GOOD-stays-silent for them).
+- `shell=True` hardening in the publish scripts is documented as a deliberate non-change in `plans/deferred/publish_subprocess_shell_true_hardening.md`.
+
+**Finish report appended:** `plans/CODEBASE_AUDIT_2026.06.12.md` (this file). The completed plan is archived to `plans/history/2026.06/2026.06.14/`.

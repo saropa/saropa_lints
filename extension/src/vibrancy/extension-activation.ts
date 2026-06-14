@@ -6,6 +6,7 @@
  */
 
 import * as vscode from 'vscode';
+import { l10n } from '../i18n/runtime';
 import { CacheService } from './services/cache-service';
 import { VibrancyTreeProvider } from './providers/tree-data-provider';
 import { VibrancyDiagnostics } from './providers/diagnostics';
@@ -721,7 +722,7 @@ function registerCommands(
                     targets.cache.clear(),
                     clearFingerprint(targets.workspaceState),
                 ]);
-                vscode.window.showInformationMessage('Vibrancy cache cleared');
+                vscode.window.showInformationMessage(l10n('notify.activation.cacheCleared'));
             },
         ),
         vscode.commands.registerCommand(
@@ -830,7 +831,7 @@ function registerCommands(
                 if (!text) { return; }
                 await vscode.env.clipboard.writeText(text);
                 vscode.window.showInformationMessage(
-                    `Copied ${packageName} info to clipboard`,
+                    l10n('notify.activation.copiedInfo', { package: packageName }),
                 );
             },
         ),
@@ -1058,7 +1059,7 @@ async function runScanInner(
             const parsed = await findAndParseDeps();
             if (!parsed) {
                 vscode.window.showWarningMessage(
-                    'No pubspec.yaml/pubspec.lock found in workspace',
+                    l10n('notify.activation.noPubspecOrLock'),
                 );
                 return;
             }
@@ -1350,7 +1351,7 @@ async function maybeRunOneTimeHistoryBackfill(
     await workspaceState.update(HISTORY_BACKFILL_DONE_KEY, true);
     if (imported > 0) {
         vscode.window.showInformationMessage(
-            `Package Vibrancy: one-time history backfill complete (${imported} snapshots imported).`,
+            l10n('notify.activation.backfillComplete', { count: String(imported) }),
         );
     }
 }
@@ -1472,7 +1473,7 @@ let upgradeChannel: vscode.OutputChannel | null = null;
 
 async function planAndExecuteUpgrades(): Promise<void> {
     if (latestResults.length === 0) {
-        vscode.window.showWarningMessage('Run a scan first');
+        vscode.window.showWarningMessage(l10n('notify.activation.runScanFirst'));
         return;
     }
 
@@ -1488,7 +1489,7 @@ async function planAndExecuteUpgrades(): Promise<void> {
     const steps = buildUpgradeOrder(latestResults, reverseDeps);
     if (steps.length === 0) {
         vscode.window.showInformationMessage(
-            'No upgradable packages found',
+            l10n('notify.activation.noUpgradable'),
         );
         return;
     }
@@ -1496,11 +1497,14 @@ async function planAndExecuteUpgrades(): Promise<void> {
     upgradeChannel.appendLine(formatUpgradePlan(steps));
     upgradeChannel.show(true);
 
+    // Capture the localized button label so the dispatch comparison still
+    // matches what the user clicked (the label text varies by locale).
+    const executeLabel = l10n('notify.activation.actionExecute');
     const choice = await vscode.window.showInformationMessage(
-        `Proceed with ${steps.length} upgrade(s)? Failed steps roll back and the plan continues.`,
-        'Execute', 'Cancel',
+        l10n('notify.activation.proceedUpgrades', { count: String(steps.length) }),
+        executeLabel, l10n('notify.activation.actionCancel'),
     );
-    if (choice !== 'Execute') { return; }
+    if (choice !== executeLabel) { return; }
 
     const config = vscode.workspace.getConfiguration('saropaLints.packageVibrancy');
     const report = await vscode.window.withProgress(
@@ -1521,11 +1525,15 @@ async function planAndExecuteUpgrades(): Promise<void> {
 
     if (report.failedAt) {
         vscode.window.showWarningMessage(
-            `Upgrade stopped at ${report.failedAt} — ${report.completedCount}/${steps.length} completed`,
+            l10n('notify.activation.upgradeStopped', {
+                failedAt: String(report.failedAt),
+                completed: String(report.completedCount),
+                total: String(steps.length),
+            }),
         );
     } else {
         vscode.window.showInformationMessage(
-            `All ${report.completedCount} upgrades completed successfully`,
+            l10n('notify.activation.upgradeAllComplete', { count: String(report.completedCount) }),
         );
     }
 }
@@ -1535,7 +1543,7 @@ async function requireResults<T>(
     successMsg: (result: T) => string,
 ): Promise<void> {
     if (latestResults.length === 0) {
-        vscode.window.showWarningMessage('Run a scan first');
+        vscode.window.showWarningMessage(l10n('notify.activation.runScanFirst'));
         return;
     }
     const result = await action(latestResults);
@@ -1574,7 +1582,7 @@ async function openOtherProject(): Promise<void> {
     // filter is advisory on some platforms, so guard explicitly.
     if (!pubspecUri.fsPath.toLowerCase().endsWith('pubspec.yaml')) {
         vscode.window.showErrorMessage(
-            'Selected file is not a pubspec.yaml.',
+            l10n('notify.activation.notPubspec'),
         );
         return;
     }
@@ -1658,7 +1666,7 @@ async function suppressPackageByName(
 ): Promise<void> {
     await addSuppressedPackage(packageName);
     vscode.window.showInformationMessage(
-        `Suppressed "${packageName}" — diagnostics will be hidden`,
+        l10n('notify.activation.suppressedPackage', { package: packageName }),
     );
     if (lastParsedDeps) {
         updateFilteredTargets(targets, latestResults, lastParsedDeps);
@@ -1667,7 +1675,7 @@ async function suppressPackageByName(
 
 async function suppressByCategory(targets: ScanTargets): Promise<void> {
     if (latestResults.length === 0) {
-        vscode.window.showWarningMessage('Run a scan first');
+        vscode.window.showWarningMessage(l10n('notify.activation.runScanFirst'));
         return;
     }
 
@@ -1713,13 +1721,13 @@ async function suppressByCategory(targets: ScanTargets): Promise<void> {
     }
 
     if (toSuppress.length === 0) {
-        vscode.window.showInformationMessage('No packages to suppress');
+        vscode.window.showInformationMessage(l10n('notify.activation.noPackagesToSuppress'));
         return;
     }
 
     const count = await addSuppressedPackages(toSuppress);
     vscode.window.showInformationMessage(
-        `Suppressed ${count} package(s)`,
+        l10n('notify.activation.suppressedCount', { count: String(count) }),
     );
     if (lastParsedDeps) {
         updateFilteredTargets(targets, latestResults, lastParsedDeps);
@@ -1728,7 +1736,7 @@ async function suppressByCategory(targets: ScanTargets): Promise<void> {
 
 async function suppressAllProblems(targets: ScanTargets): Promise<void> {
     if (latestResults.length === 0) {
-        vscode.window.showWarningMessage('Run a scan first');
+        vscode.window.showWarningMessage(l10n('notify.activation.runScanFirst'));
         return;
     }
 
@@ -1737,12 +1745,12 @@ async function suppressAllProblems(targets: ScanTargets): Promise<void> {
         .map(r => r.package.name);
 
     if (unhealthy.length === 0) {
-        vscode.window.showInformationMessage('No unhealthy packages to suppress');
+        vscode.window.showInformationMessage(l10n('notify.activation.noUnhealthyToSuppress'));
         return;
     }
 
     const confirm = await vscode.window.showWarningMessage(
-        `Suppress all ${unhealthy.length} unhealthy packages? This will hide all diagnostics.`,
+        l10n('notify.activation.suppressAllConfirm', { count: String(unhealthy.length) }),
         { modal: true },
         'Suppress All',
     );
@@ -1750,7 +1758,7 @@ async function suppressAllProblems(targets: ScanTargets): Promise<void> {
     if (confirm !== 'Suppress All') { return; }
 
     const count = await addSuppressedPackages(unhealthy);
-    vscode.window.showInformationMessage(`Suppressed ${count} package(s)`);
+    vscode.window.showInformationMessage(l10n('notify.activation.suppressedCount', { count: String(count) }));
     if (lastParsedDeps) {
         updateFilteredTargets(targets, latestResults, lastParsedDeps);
     }
@@ -1759,10 +1767,10 @@ async function suppressAllProblems(targets: ScanTargets): Promise<void> {
 async function unsuppressAll(targets: ScanTargets): Promise<void> {
     const count = await clearSuppressedPackages();
     if (count === 0) {
-        vscode.window.showInformationMessage('No suppressed packages');
+        vscode.window.showInformationMessage(l10n('notify.activation.noSuppressedPackages'));
         return;
     }
-    vscode.window.showInformationMessage(`Unsuppressed ${count} package(s)`);
+    vscode.window.showInformationMessage(l10n('notify.activation.unsuppressedCount', { count: String(count) }));
     if (lastParsedDeps) {
         updateFilteredTargets(targets, latestResults, lastParsedDeps);
     }
@@ -1802,7 +1810,7 @@ export function stopFreshnessWatcher(): void {
 async function runSortDependencies(): Promise<void> {
     const pubspecUri = await findPubspecYaml();
     if (!pubspecUri) {
-        vscode.window.showWarningMessage('No pubspec.yaml found in workspace');
+        vscode.window.showWarningMessage(l10n('notify.activation.noPubspecWorkspace'));
         return;
     }
 
@@ -1812,7 +1820,7 @@ async function runSortDependencies(): Promise<void> {
     const result = await sortDependencies(pubspecUri, { sdkFirst });
 
     if (!result.sorted) {
-        vscode.window.showInformationMessage('Dependencies already sorted');
+        vscode.window.showInformationMessage(l10n('notify.activation.depsAlreadySorted'));
         return;
     }
 
@@ -1822,7 +1830,10 @@ async function runSortDependencies(): Promise<void> {
         ? `Sorted ${result.entriesMoved} dependencies`
         : 'Reformatted dependencies';
     vscode.window.showInformationMessage(
-        `${detail} in ${result.sectionsModified.join(', ')}`,
+        l10n('notify.activation.depsSorted', {
+            detail: detail,
+            sections: result.sectionsModified.join(', '),
+        }),
     );
 }
 
@@ -1832,12 +1843,12 @@ async function updateToPrerelease(
 ): Promise<void> {
     const pubspecUri = await findPubspecYaml();
     if (!pubspecUri) {
-        vscode.window.showWarningMessage('No pubspec.yaml found');
+        vscode.window.showWarningMessage(l10n('notify.activation.noPubspec'));
         return;
     }
 
     const confirm = await vscode.window.showWarningMessage(
-        `Update ${packageName} to prerelease ${version}? Prereleases may contain breaking changes.`,
+        l10n('notify.activation.updatePrereleaseConfirm', { package: packageName, version: version }),
         { modal: true },
         'Update',
     );
@@ -1864,13 +1875,13 @@ async function updateToPrerelease(
     }
 
     if (!found) {
-        vscode.window.showWarningMessage(`Package ${packageName} not found in pubspec.yaml`);
+        vscode.window.showWarningMessage(l10n('notify.activation.packageNotFound', { package: packageName }));
         return;
     }
 
     await vscode.workspace.applyEdit(edit);
     await doc.save();
-    vscode.window.showInformationMessage(`Updated ${packageName} to ${version}`);
+    vscode.window.showInformationMessage(l10n('notify.activation.updatedTo', { package: packageName, version: version }));
 }
 
 async function runBulkUpdate(
@@ -1878,7 +1889,7 @@ async function runBulkUpdate(
     targets: ScanTargets,
 ): Promise<void> {
     if (latestResults.length === 0) {
-        vscode.window.showWarningMessage('Run a scan first');
+        vscode.window.showWarningMessage(l10n('notify.activation.runScanFirst'));
         return;
     }
 
@@ -1893,7 +1904,7 @@ async function runBulkUpdate(
 
 async function generateCiConfig(): Promise<void> {
     if (latestResults.length === 0) {
-        vscode.window.showWarningMessage('Run a scan first to generate CI config with appropriate thresholds');
+        vscode.window.showWarningMessage(l10n('notify.activation.ciRunScanFirst'));
         return;
     }
 
@@ -1923,7 +1934,7 @@ async function generateCiConfig(): Promise<void> {
 
     const folders = vscode.workspace.workspaceFolders;
     if (!folders || folders.length === 0) {
-        vscode.window.showErrorMessage('No workspace folder open');
+        vscode.window.showErrorMessage(l10n('notify.activation.noWorkspace'));
         return;
     }
 
@@ -1932,12 +1943,15 @@ async function generateCiConfig(): Promise<void> {
     let shouldWrite = true;
     try {
         await vscode.workspace.fs.stat(targetPath);
+        // Capture the localized label so the post-dialog comparison matches
+        // the text the user actually clicked.
+        const overwriteLabel = l10n('notify.activation.actionOverwrite');
         const overwrite = await vscode.window.showWarningMessage(
-            `${defaultPath} already exists. Overwrite?`,
+            l10n('notify.activation.ciOverwriteConfirm', { path: defaultPath }),
             { modal: true },
-            'Overwrite',
+            overwriteLabel,
         );
-        shouldWrite = overwrite === 'Overwrite';
+        shouldWrite = overwrite === overwriteLabel;
     } catch {
         const parentDir = vscode.Uri.joinPath(targetPath, '..');
         try {
@@ -1955,7 +1969,7 @@ async function generateCiConfig(): Promise<void> {
     await vscode.window.showTextDocument(doc);
 
     vscode.window.showInformationMessage(
-        `CI pipeline generated: ${defaultPath}`,
+        l10n('notify.activation.ciGenerated', { path: defaultPath }),
     );
 }
 
@@ -2057,12 +2071,12 @@ async function promptThresholds(
 async function runComparePackages(cache: CacheService): Promise<void> {
     const packageNames = await promptForPackageNames();
     if (!packageNames || packageNames.length < 2) {
-        vscode.window.showWarningMessage('Select 2-3 packages to compare');
+        vscode.window.showWarningMessage(l10n('notify.activation.compareSelectCount'));
         return;
     }
 
     if (packageNames.length > 3) {
-        vscode.window.showWarningMessage('Maximum 3 packages for comparison');
+        vscode.window.showWarningMessage(l10n('notify.activation.compareMax'));
         return;
     }
 
@@ -2093,7 +2107,7 @@ async function runComparePackages(cache: CacheService): Promise<void> {
     );
 
     if (comparisonData.length < 2) {
-        vscode.window.showWarningMessage('Could not fetch enough package data');
+        vscode.window.showWarningMessage(l10n('notify.activation.compareFetchFailed'));
         return;
     }
 

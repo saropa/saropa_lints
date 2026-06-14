@@ -109,26 +109,27 @@ authors, surfaced in the dashboard as "observed in production, no static rule ye
 
 ---
 
-## Shared infrastructure (cross-repo — identical Section in all three docs)
+## Shared infrastructure (cross-repo) — WON'T DO (rejected 2026-06-14)
 
-Duplicated across the three TypeScript extensions; extract to internal shared packages (path/git
-deps, not a monorepo merge). Each has a detailed extraction plan (convergence evidence, what moves,
-dependency-mechanism recommendation, per-repo migration steps, risks):
+**Decision: not extracting shared packages.** The idea was to pull the code duplicated across the
+three TypeScript extensions into internal shared packages — `saropa-vscode-i18n`, `saropa-vscode-ui`,
+and `saropa-release-tools`. Rejected as over-engineering: three (or even one-repo-three-dir)
+publishable units for three in-house consumers cost more in versioning, pinning surface (up to nine
+submodule links), lockstep releases, and an untested-shared-toolkit maintenance burden than the
+duplication they remove — with **zero user-facing benefit**. Matches drift_advisor's Plan 67 §7, which
+rejected the same architecture the same day, and an independent review that flagged the submodule
+consumption-surface and the missing shared-package test story as the unaddressed costs.
 
-- **`saropa-vscode-i18n`** — NLLB-then-Google fallback, real-coverage audits, day-bucketed report
-  paths, untranslated-locale notices. Lints is furthest along (24 languages) and the natural source
-  of the extracted tooling. (Sharing tooling only; running a translation job stays separately
-  authorized.) Plan: `plans/SHARED_INFRA_VSCODE_I18N.md`.
-- **`saropa-vscode-ui`** — theme tokens + dashboard kit. Lints already decomposed its dashboards into
-  reusable section builders (`CENTRAL_DASHBOARD_CONSOLIDATION.md`); those become the seed of the
-  shared kit. Plan: `plans/SHARED_INFRA_VSCODE_UI.md`.
-- **`saropa-release-tools`** (Python) — `publish.py` orchestrator, dependency-import gate,
-  American-English write-time gate, changelog conventions. All three already converged on these.
-  Plan: `plans/SHARED_INFRA_RELEASE_TOOLS.md`.
+The duplication is real but accepted as a known trade-off. If a shared bug recurs and the pain
+justifies action, the lighter moves — a single internal shared module via a path dep, or a
+vendoring/sync script, scoped to the specific shared code that hurt — are preferred over new
+published units; revisit then.
 
-All three recommend the same dependency mechanism — a per-repo pinned **git submodule** — so the
-extraction does not introduce two patterns for the same kind of internal shared code. That mechanism
-choice is the one blast-radius decision the extraction needs signed off before any file moves.
+The three detailed extraction plans are retained as the record of what was considered, archived to
+`plans/history/2026.06/2026.06.14/`:
+- `SHARED_INFRA_VSCODE_I18N.md` — i18n runtime + NLLB/Google translation tooling.
+- `SHARED_INFRA_VSCODE_UI.md` — theme tokens + dashboard kit.
+- `SHARED_INFRA_RELEASE_TOOLS.md` — `publish.py` orchestrator + release gates.
 
 ---
 

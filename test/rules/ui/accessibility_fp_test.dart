@@ -91,11 +91,16 @@ class CustomChart extends StatelessWidget {
     });
   });
 
+  // prefer_focus_traversal_order has applicableFileTypes => {FileType.widget},
+  // so its fixtures must be classified as widget files (contain a widget class).
   group('prefer_focus_traversal_order', () {
     test('BAD: Row with 3 real focusable fields, no traversal fires', () async {
       final codes = await reportedRuleCodes(PreferFocusTraversalOrderRule(), '''
 $_stubs
-Widget build() => const Row(children: [TextField(), TextField(), TextField()]);
+class MyForm extends StatelessWidget {
+  const MyForm();
+  Widget build() => const Row(children: [TextField(), TextField(), TextField()]);
+}
 ''');
       expect(codes, contains('prefer_focus_traversal_order'));
     });
@@ -103,11 +108,14 @@ Widget build() => const Row(children: [TextField(), TextField(), TextField()]);
     test('GOOD: focusable names only in strings are not counted', () async {
       final codes = await reportedRuleCodes(PreferFocusTraversalOrderRule(), '''
 $_stubs
-Widget build() => const Row(children: [
-  TextField(),
-  Text('Switch to dark mode'),
-  Text('Radio silence and Checkbox tips'),
-]);
+class MyForm extends StatelessWidget {
+  const MyForm();
+  Widget build() => const Row(children: [
+    TextField(),
+    Text('Switch to dark mode'),
+    Text('Radio silence and Checkbox tips'),
+  ]);
+}
 ''');
       expect(codes, isEmpty);
     });
@@ -115,11 +123,14 @@ Widget build() => const Row(children: [
     test('GOOD: FocusTraversalOrder inside the row stays silent', () async {
       final codes = await reportedRuleCodes(PreferFocusTraversalOrderRule(), '''
 $_stubs
-Widget build() => const Row(children: [
-  FocusTraversalOrder(order: 1, child: TextField()),
-  FocusTraversalOrder(order: 2, child: TextField()),
-  FocusTraversalOrder(order: 3, child: TextField()),
-]);
+class MyForm extends StatelessWidget {
+  const MyForm();
+  Widget build() => const Row(children: [
+    FocusTraversalOrder(order: 1, child: TextField()),
+    FocusTraversalOrder(order: 2, child: TextField()),
+    FocusTraversalOrder(order: 3, child: TextField()),
+  ]);
+}
 ''');
       expect(codes, isEmpty);
     });

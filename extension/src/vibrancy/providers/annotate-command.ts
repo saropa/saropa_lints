@@ -12,6 +12,7 @@ import {
     buildSectionHeaderEdits, buildSubSectionHeaderEdits, buildOverrideMarkerEdit,
 } from './annotate-headers';
 import { SDK_PACKAGES } from '../sdk-packages';
+import { l10n } from '../../i18n/runtime';
 
 // Command: inject/refresh vibrancy section comments and dep metadata in pubspec.
 const FETCH_CONCURRENCY = 3;
@@ -33,7 +34,7 @@ export function registerAnnotateCommand(
 /** Add description comments above each dependency in pubspec.yaml. */
 async function annotatePubspec(): Promise<void> {
     if (annotateInProgress) {
-        vscode.window.showWarningMessage('Annotation already in progress');
+        vscode.window.showWarningMessage(l10n('notify.vibrancy.annotateInProgress'));
         return;
     }
     annotateInProgress = true;
@@ -56,7 +57,7 @@ async function resolveTargetPubspec(): Promise<vscode.Uri | null> {
 async function annotatePubspecInner(): Promise<void> {
     const yamlUri = await resolveTargetPubspec();
     if (!yamlUri) {
-        vscode.window.showWarningMessage('No pubspec.yaml found in workspace');
+        vscode.window.showWarningMessage(l10n('notify.vibrancy.noPubspecInWorkspace'));
         return;
     }
 
@@ -68,7 +69,7 @@ async function annotatePubspecInner(): Promise<void> {
         .filter(n => !SDK_PACKAGES.has(n));
 
     if (allDeps.length === 0) {
-        vscode.window.showInformationMessage('No dependencies to annotate');
+        vscode.window.showInformationMessage(l10n('notify.vibrancy.noDependenciesToAnnotate'));
         return;
     }
 
@@ -113,7 +114,7 @@ async function annotatePubspecInner(): Promise<void> {
 
     const applied = await vscode.workspace.applyEdit(wsEdit);
     if (!applied) {
-        vscode.window.showErrorMessage('Failed to apply annotations to pubspec.yaml');
+        vscode.window.showErrorMessage(l10n('notify.vibrancy.failedToApplyAnnotations'));
         return;
     }
     await doc.save();
@@ -127,7 +128,7 @@ async function annotatePubspecInner(): Promise<void> {
         parts.push(`${allSectionEdits.length} section headers`);
     }
     vscode.window.showInformationMessage(
-        `Annotated ${parts.join(' and ')} in ${basename}`,
+        l10n('notify.vibrancy.annotatedSummary', { parts: parts.join(' and '), basename }),
     );
 }
 

@@ -9,6 +9,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { getProjectRoot } from '../projectRoot';
+import { l10n } from '../i18n/runtime';
 
 interface FnHeat {
   name: string;
@@ -37,8 +38,12 @@ export function registerHealthCodeLens(context: vscode.ExtensionContext): void {
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const next = !cfg.get<boolean>('projectMap.codeLensHeat', false);
       await cfg.update('projectMap.codeLensHeat', next, vscode.ConfigurationTarget.Global);
+      // Distinct keys per state rather than an in-code enabled/disabled ternary
+      // so each form is translatable (word order/agreement differs by locale).
       void vscode.window.showInformationMessage(
-        `Saropa Project Map heat CodeLens ${next ? 'enabled' : 'disabled'}.`,
+        next
+          ? l10n('notify.misc.healthCodeLensEnabled')
+          : l10n('notify.misc.healthCodeLensDisabled'),
       );
       provider.refresh();
     }),

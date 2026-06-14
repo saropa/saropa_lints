@@ -16,6 +16,7 @@ import * as path from 'path';
 import { fetchWithRetry } from './vibrancy/services/fetch-retry';
 import { compareVersions } from './vibrancy/services/changelog-service';
 import { runInWorkspaceAsync, hasFlutterDep } from './setup';
+import { l10n } from './i18n/runtime';
 
 // ── Constants ────────────────────────────────────────────────────────────
 
@@ -236,20 +237,29 @@ export async function checkForUpgrade(
   await persistState(context, ANTI_THRASH_INTERVAL_MS, latestVersion);
 
   // Show notification.
-  const updateLabel = status === 'major' ? 'Major update'
-    : status === 'minor' ? 'Minor update'
-      : 'Patch update';
+  const updateLabel = status === 'major' ? l10n('notify.misc.upgradeCheckerMajorUpdate')
+    : status === 'minor' ? l10n('notify.misc.upgradeCheckerMinorUpdate')
+      : l10n('notify.misc.upgradeCheckerPatchUpdate');
 
+  // Capture action labels in consts so the post-dialog comparison stays in
+  // lock-step with the localized button text shown to the user.
+  const upgradeAction = l10n('notify.misc.actionUpgrade');
+  const viewChangelogAction = l10n('notify.misc.actionViewChangelog');
+  const dismissAction = l10n('notify.misc.actionDismiss');
   const choice = await vscode.window.showInformationMessage(
-    `Saropa Lints ${updateLabel}: ${installed.version} \u2192 ${latestVersion}`,
-    'Upgrade',
-    'View Changelog',
-    'Dismiss',
+    l10n('notify.misc.upgradeCheckerAvailable', {
+      label: updateLabel,
+      from: installed.version,
+      to: latestVersion,
+    }),
+    upgradeAction,
+    viewChangelogAction,
+    dismissAction,
   );
 
-  if (choice === 'Upgrade') {
+  if (choice === upgradeAction) {
     await performUpgrade(workspaceRoot, latestVersion);
-  } else if (choice === 'View Changelog') {
+  } else if (choice === viewChangelogAction) {
     await vscode.env.openExternal(vscode.Uri.parse(CHANGELOG_URL));
   }
 }
@@ -287,7 +297,7 @@ async function performUpgrade(
       const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
       if (!updatePubspecConstraint(pubspecPath, latestVersion)) {
         void vscode.window.showErrorMessage(
-          'Saropa Lints: Could not update pubspec.yaml \u2014 saropa_lints entry not found.',
+          l10n('notify.misc.upgradeCheckerPubspecNotFound'),
         );
         return;
       }
@@ -306,14 +316,18 @@ async function performUpgrade(
         // pubspec.yaml constraint already changed; tell the user how to recover.
         // We deliberately don't auto-revert \u2014 they may want to retry pub get.
         void vscode.window.showWarningMessage(
-          'Saropa Lints upgrade cancelled. pubspec.yaml was updated to '
-          + `^${latestVersion}; run \`${pubCmd} pub get\` to finish, or revert the change.`,
+          l10n('notify.misc.upgradeCheckerCancelled', {
+            version: latestVersion,
+            cmd: pubCmd,
+          }),
         );
         return;
       }
       if (!ok) {
         void vscode.window.showErrorMessage(
-          `Saropa Lints: pub get failed. ${stderr || 'Check Output.'}`,
+          l10n('notify.misc.upgradeCheckerPubGetFailed', {
+            detail: stderr || l10n('notify.misc.upgradeCheckerCheckOutput'),
+          }),
         );
         return;
       }
@@ -327,7 +341,7 @@ async function performUpgrade(
       await vscode.commands.executeCommand('saropaLints.initializeConfig');
 
       void vscode.window.showInformationMessage(
-        `Saropa Lints upgraded to ${latestVersion}.`,
+        l10n('notify.misc.upgradeCheckerUpgraded', { version: latestVersion }),
       );
     },
   );

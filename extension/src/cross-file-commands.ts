@@ -5,6 +5,7 @@ import * as vscode from 'vscode';
 import { runInWorkspace, getSharedOutputChannel } from './setup';
 import { getProjectRoot } from './projectRoot';
 import { hasSaropaLintsDep } from './pubspecReader';
+import { l10n } from './i18n/runtime';
 
 // Extension commands for cross_file analyzer (JSON summary, output channel).
 type CrossFileSummary = {
@@ -64,7 +65,7 @@ export function registerCrossFileCommands(context: vscode.ExtensionContext): voi
         getSharedOutputChannel().show(true);
         if (!result.ok) {
           const message = summarizeError(result.stderr);
-          void vscode.window.showErrorMessage(`Saropa Lints ${spec.title} failed: ${message}`);
+          void vscode.window.showErrorMessage(l10n('notify.commands.crossFileCommandFailed', { title: spec.title, message }));
           return;
         }
 
@@ -97,18 +98,18 @@ export function registerCrossFileCommands(context: vscode.ExtensionContext): voi
       getSharedOutputChannel().show(true);
       if (!result.ok) {
         const message = summarizeError(result.stderr);
-        void vscode.window.showErrorMessage(`Saropa Lints graph export failed: ${message}`);
+        void vscode.window.showErrorMessage(l10n('notify.commands.crossFileGraphExportFailed', { message }));
         return;
       }
 
       const dotPath = path.join(outputDir, 'import_graph.dot');
       if (!fs.existsSync(dotPath)) {
-        void vscode.window.showWarningMessage('Cross-file graph completed but no DOT file was found.');
+        void vscode.window.showWarningMessage(l10n('notify.commands.crossFileGraphNoDotFile'));
         return;
       }
       const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(dotPath));
       await vscode.window.showTextDocument(doc, { preview: false });
-      void vscode.window.showInformationMessage('Cross-file graph exported to reports/.saropa_lints/cross_file/import_graph.dot');
+      void vscode.window.showInformationMessage(l10n('notify.commands.crossFileGraphExported'));
     }),
   );
 
@@ -132,23 +133,27 @@ export function registerCrossFileCommands(context: vscode.ExtensionContext): voi
       getSharedOutputChannel().show(true);
       if (!result.ok) {
         const message = summarizeError(result.stderr);
-        void vscode.window.showErrorMessage(`Cross-file HTML report failed: ${message}`);
+        void vscode.window.showErrorMessage(l10n('notify.commands.crossFileHtmlReportFailed', { message }));
         return;
       }
 
       const indexPath = path.join(outputDir, 'index.html');
       if (!fs.existsSync(indexPath)) {
-        void vscode.window.showWarningMessage('Cross-file report completed but index.html was not found.');
+        void vscode.window.showWarningMessage(l10n('notify.commands.crossFileReportNoIndex'));
         return;
       }
 
       const uri = vscode.Uri.file(indexPath);
+      // Localized button labels are stored so the returned selection is
+      // compared against the same localized string the user clicked.
+      const openInBrowserLabel = l10n('notify.commands.actionOpenInBrowser');
+      const openFileLabel = l10n('notify.commands.actionOpenFile');
       const openExternal = await vscode.window.showInformationMessage(
-        'Cross-file HTML report generated.',
-        'Open in Browser',
-        'Open File',
+        l10n('notify.commands.crossFileHtmlReportGenerated'),
+        openInBrowserLabel,
+        openFileLabel,
       );
-      if (openExternal === 'Open in Browser') {
+      if (openExternal === openInBrowserLabel) {
         await vscode.env.openExternal(uri);
         return;
       }
@@ -177,16 +182,16 @@ export function registerCrossFileCommands(context: vscode.ExtensionContext): voi
       getSharedOutputChannel().show(true);
       if (!result.ok) {
         const message = summarizeError(result.stderr);
-        void vscode.window.showErrorMessage(`Cross-file snapshot failed: ${message}`);
+        void vscode.window.showErrorMessage(l10n('notify.commands.crossFileSnapshotFailed', { message }));
         return;
       }
       if (!fs.existsSync(outPath)) {
-        void vscode.window.showWarningMessage('Cross-file snapshot completed but JSON file was not found.');
+        void vscode.window.showWarningMessage(l10n('notify.commands.crossFileSnapshotNoJson'));
         return;
       }
       const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(outPath));
       await vscode.window.showTextDocument(doc, { preview: false });
-      void vscode.window.showInformationMessage('Cross-file snapshot written to reports/.saropa_lints/cross_file_snapshot.json');
+      void vscode.window.showInformationMessage(l10n('notify.commands.crossFileSnapshotWritten'));
     }),
   );
   // The Saropa Project Map dashboard command lives in views/projectMapView.ts — it
@@ -197,7 +202,7 @@ function getWorkspaceRootOrError(): string | null {
   const root = getProjectRoot();
   if (!root) {
     void vscode.window.showErrorMessage(
-      'Saropa Lints: no Dart/Flutter workspace found. Open a project with pubspec.yaml first.',
+      l10n('notify.commands.crossFileNoWorkspace'),
     );
     return null;
   }
@@ -207,7 +212,7 @@ function getWorkspaceRootOrError(): string | null {
 function ensureSaropaDependency(workspaceRoot: string): boolean {
   if (hasSaropaLintsDep(workspaceRoot)) return true;
   void vscode.window.showErrorMessage(
-    'Saropa Lints: add saropa_lints to pubspec.yaml before running cross-file analysis.',
+    l10n('notify.commands.crossFileMissingDep'),
   );
   return false;
 }

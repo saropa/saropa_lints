@@ -272,10 +272,11 @@ function showRegressionNudge(
     const errorSuffix = s.error === 1 ? '' : 's';
     const msg =
       s.error > 0
-        ? `${s.error} error${errorSuffix} \u2014 view.`
-        : `Score dipped below ${c.threshold} \u2014 view issues.`;
-    vscode.window.showInformationMessage(`Saropa Lints: ${msg}`, 'View Violations').then((choice) => {
-      if (choice === 'View Violations') {
+        ? l10n('notify.main.regressionErrors', { count: String(s.error), suffix: errorSuffix })
+        : l10n('notify.main.regressionScoreDipped', { threshold: String(c.threshold) });
+    const viewLabel = l10n('notify.main.actionViewViolations');
+    vscode.window.showInformationMessage(l10n('notify.main.brandPrefix', { message: msg }), viewLabel).then((choice) => {
+      if (choice === viewLabel) {
         vscode.commands.executeCommand('saropaLints.focusIssues');
       }
     });
@@ -323,7 +324,7 @@ function runCelebrationIfNeeded(
   } else if (prev.error > 0 && curr.error === 0) {
     if (state.get<boolean>(NO_ERRORS_CELEBRATED_KEY) !== true) {
       void state.update(NO_ERRORS_CELEBRATED_KEY, true);
-      vscode.window.showInformationMessage('Saropa Lints: No errors!');
+      vscode.window.showInformationMessage(l10n('notify.main.noErrors'));
     }
   }
 
@@ -1093,15 +1094,17 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const root = getProjectRoot();
       if (!root) {
         await vscode.window.showErrorMessage(
-          'Saropa Lints: no workspace folder is open. Open your Dart/Flutter project first.',
+          l10n('notify.main.noWorkspaceOpenWorkspace'),
         );
         return;
       }
       const liveness = verifyPluginLiveness(root);
       if (liveness.status === 'alive') {
         await vscode.window.showInformationMessage(
-          `Saropa Lints is alive: ${liveness.enabledRuleCount} rules enabled, ` +
-          `${liveness.filesAnalyzed} files analyzed.`,
+          l10n('notify.main.pluginAlive', {
+            rules: String(liveness.enabledRuleCount),
+            files: String(liveness.filesAnalyzed),
+          }),
         );
         return;
       }
@@ -1186,7 +1189,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         await vscode.window.showTextDocument(doc);
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        void vscode.window.showErrorMessage(`Failed to open pubspec.yaml: ${msg}`);
+        void vscode.window.showErrorMessage(l10n('notify.main.openPubspecFailed', { message: msg }));
       }
     }),
     // One-click toggle for the "Run analysis after config change" sidebar row.
@@ -1281,7 +1284,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const msg = err instanceof Error ? err.message : String(err);
         console.error(`toggleSidebarSection error for "${key}": ${msg}`);
         void vscode.window.showErrorMessage(
-          `Saropa Lints: failed to toggle sidebar section — ${msg}`,
+          l10n('notify.main.toggleSidebarSectionFailed', { message: msg }),
         );
       }
     }),
@@ -1342,7 +1345,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         placeHolder: 'Choose the project that should receive the Saropa Lints AI agent instructions',
       });
       if (!folder) {
-        void vscode.window.showErrorMessage('Open a workspace folder first.');
+        void vscode.window.showErrorMessage(l10n('notify.main.openWorkspaceFirst'));
         return;
       }
       const rulesDir = path.join(folder.uri.fsPath, '.cursor', 'rules');
@@ -1361,13 +1364,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           },
         );
         void vscode.window.showInformationMessage(
-          'Created .cursor/rules/saropa_lints_instructions.mdc for AI agents.',
+          l10n('notify.main.createInstructionsDone'),
         );
         const doc = await vscode.workspace.openTextDocument(destPath);
         void vscode.window.showTextDocument(doc);
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
-        void vscode.window.showErrorMessage(`Failed to create Saropa Lints instructions: ${msg}`);
+        void vscode.window.showErrorMessage(l10n('notify.main.createInstructionsFailed', { message: msg }));
       }
     }),
     vscode.commands.registerCommand('saropaLints.focusView', async () => {
@@ -1414,7 +1417,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const root = getProjectRoot();
       const editor = vscode.window.activeTextEditor;
       if (!root || !editor?.document?.uri) {
-        void vscode.window.showInformationMessage('Open a file to show its issues in Saropa Lints.');
+        void vscode.window.showInformationMessage(l10n('notify.main.openFileForIssues'));
         return;
       }
       const relative = path.relative(root, editor.document.uri.fsPath).replaceAll('\\', '/');
@@ -1519,7 +1522,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (server?.baseUrl) {
         void vscode.env.openExternal(vscode.Uri.parse(server.baseUrl));
       } else {
-        void vscode.window.showInformationMessage('Drift Advisor is not connected. Click Refresh after starting the server.');
+        void vscode.window.showInformationMessage(l10n('notify.main.driftAdvisorNotConnected'));
       }
     }),
     vscode.commands.registerCommand('saropaLints.driftAdvisor.enableIntegration', async () => {
@@ -1671,13 +1674,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       }
       const root = getProjectRoot();
       if (!root) {
-        void vscode.window.showInformationMessage('Open a workspace folder first.');
+        void vscode.window.showInformationMessage(l10n('notify.main.openWorkspaceFirst'));
         return;
       }
       const data = readViolations(root);
       const violations = data?.violations ?? [];
       if (violations.length === 0) {
-        void vscode.window.showInformationMessage('No violations in current data. Run analysis first.');
+        void vscode.window.showInformationMessage(l10n('notify.main.noViolationsRunAnalysis'));
         return;
       }
       const ruleNames = [...new Set(violations.map((v) => v.rule))].sort((a, b) => a.localeCompare(b));
@@ -1712,7 +1715,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.resetRelatedRuleTelemetry', () => {
       relatedRuleTelemetry.reset();
       void vscode.window.showInformationMessage(
-        'Saropa Lints: related rule telemetry counters reset.',
+        l10n('notify.main.telemetryReset'),
       );
     }),
     // "Copy Latest Report" — grabs the newest `*_saropa_lint_report.log`
@@ -1726,13 +1729,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.copyLatestReport', async () => {
       const root = getProjectRoot();
       if (!root) {
-        vscode.window.showErrorMessage('No workspace folder open.');
+        vscode.window.showErrorMessage(l10n('notify.main.noWorkspaceOpen'));
         return;
       }
       const reportPath = findLatestAnalysisReport(root);
       if (!reportPath) {
         vscode.window.showWarningMessage(
-          'Saropa Lints: no analysis report found under reports/. Run "Saropa Lints: Run Analysis" first.',
+          l10n('notify.main.noAnalysisReport'),
         );
         return;
       }
@@ -1742,11 +1745,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         // Show the resolved filename so users who have multiple runs in
         // flight can confirm which one landed on their clipboard.
         const name = path.basename(reportPath);
-        void vscode.window.showInformationMessage(`Copied ${name} to clipboard.`);
+        void vscode.window.showInformationMessage(l10n('notify.main.copiedReport', { name }));
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         void vscode.window.showErrorMessage(
-          `Saropa Lints: failed to read report — ${message}`,
+          l10n('notify.main.readReportFailed', { message }),
         );
       }
     }),
@@ -1758,13 +1761,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.openLatestReport', async () => {
       const root = getProjectRoot();
       if (!root) {
-        vscode.window.showErrorMessage('No workspace folder open.');
+        vscode.window.showErrorMessage(l10n('notify.main.noWorkspaceOpen'));
         return;
       }
       const reportPath = findLatestAnalysisReport(root);
       if (!reportPath) {
         vscode.window.showWarningMessage(
-          'Saropa Lints: no analysis report found under reports/. Run "Saropa Lints: Run Analysis" first.',
+          l10n('notify.main.noAnalysisReport'),
         );
         return;
       }
@@ -1775,7 +1778,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         void vscode.window.showErrorMessage(
-          `Saropa Lints: failed to open report — ${message}`,
+          l10n('notify.main.openReportFailed', { message }),
         );
       }
     }),
@@ -1783,12 +1786,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     vscode.commands.registerCommand('saropaLints.exportOwaspReport', async () => {
       const root = getProjectRoot();
       if (!root) {
-        vscode.window.showErrorMessage('No workspace folder open.');
+        vscode.window.showErrorMessage(l10n('notify.main.noWorkspaceOpen'));
         return;
       }
       const data = readViolations(root);
       if (!data) {
-        vscode.window.showErrorMessage('No analysis data. Run analysis first.');
+        vscode.window.showErrorMessage(l10n('notify.main.noAnalysisData'));
         return;
       }
       const report = generateOwaspReport(data, root);
@@ -1824,9 +1827,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         if (!root) return;
         // Confirm for large groups (>5 rules).
         if (rules.length > 5) {
-          const verb = isDisable ? 'Disable' : 'Enable';
+          const verb = isDisable
+            ? l10n('notify.main.actionDisable')
+            : l10n('notify.main.actionEnable');
           const ok = await vscode.window.showWarningMessage(
-            `${verb} ${rules.length} rules? This updates analysis_options_custom.yaml.`,
+            l10n('notify.main.bulkRuleToggleConfirm', { verb, count: String(rules.length) }),
             { modal: true },
             verb,
           );
@@ -1927,12 +1932,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // pubspec.yaml. The notification is the most discoverable entry point for
   // new users who don't yet know to look in the sidebar.
   if (isDartProject && root && !hasSaropaLintsDep(root)) {
+    const setUpLabel = l10n('notify.main.actionSetUpProject');
     void vscode.window.showInformationMessage(
-      'Saropa Lints detected a Dart project without saropa_lints configured. Set up now for 2100+ lint rules.',
-      'Set Up Project',
-      'Not Now',
+      l10n('notify.main.setupPrompt'),
+      setUpLabel,
+      l10n('notify.main.actionNotNow'),
     ).then((choice) => {
-      if (choice === 'Set Up Project') {
+      if (choice === setUpLabel) {
         void vscode.commands.executeCommand('saropaLints.enable');
       }
     });

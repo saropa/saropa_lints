@@ -1713,12 +1713,18 @@ class PreferSplitWidgetConstRule extends SaropaLintRule {
 
       // Check common container widgets
       if (typeName == 'Column' || typeName == 'Row' || typeName == 'Stack') {
-        // Count nested widgets
-        int widgetCount = 0;
-        node.visitChildren(_WidgetCounter((int count) => widgetCount = count));
+        // FP fix: the message claims an "all-const children" subtree, but the
+        // old counter tallied EVERY descendant creation regardless of whether
+        // any of it was const-constructible — so a Column of widgets carrying
+        // runtime values (e.g. `Text(label)`) was flagged as a static
+        // splittable subtree it is not. Count only descendant widget creations
+        // that are const-constructible (already const, or a const constructor
+        // with all-constant arguments). Only fire when the static portion of
+        // the subtree is large enough to be worth extracting.
+        final _ConstWidgetCounter counter = _ConstWidgetCounter();
+        node.visitChildren(counter);
 
-        // If more than 5 nested widgets, suggest splitting
-        if (widgetCount > 5) {
+        if (counter.constWidgetCount > 5) {
           reporter.atNode(node.constructorName, code);
         }
       }
@@ -1726,15 +1732,19 @@ class PreferSplitWidgetConstRule extends SaropaLintRule {
   }
 }
 
-class _WidgetCounter extends RecursiveAstVisitor<void> {
-  _WidgetCounter(this.onCount);
-  final void Function(int) onCount;
-  int _count = 0;
+/// Counts descendant widget creations that are const-constructible: either
+/// already const, or a const constructor whose every argument is itself a
+/// constant expression. A subtree of these can be hoisted into a const child
+/// widget; a subtree carrying runtime values cannot, which is the false
+/// positive this counter removes.
+class _ConstWidgetCounter extends RecursiveAstVisitor<void> {
+  int constWidgetCount = 0;
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    _count++;
-    onCount(_count);
+    if (_isConstConstructible(node)) {
+      constWidgetCount++;
+    }
     super.visitInstanceCreationExpression(node);
   }
 }
@@ -1885,21 +1895,21 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
     });
   }
 
+  // FP fix: key identity is (key TYPE, value) — Key('x') and ValueKey('x') are
+  // distinct keys (different runtimeType) and do not collide during element
+  // reconciliation, so compose the dedup key as `typeName:value`. The old
+  // `MethodInvocation` branch was dead: `ValueKey('x')` parses as an
+  // InstanceCreationExpression (a constructor call), never a MethodInvocation.
   String? _extractKeyString(Expression expr) {
-    if (expr is InstanceCreationExpression) {
-      final NodeList<Expression> args = expr.argumentList.arguments;
-      if (args.isNotEmpty) {
-        final first = args.first;
-        if (first is StringLiteral) return first.stringValue;
-      }
-    } else if (expr is MethodInvocation && expr.methodName.name == 'ValueKey') {
-      final NodeList<Expression> args = expr.argumentList.arguments;
-      if (args.isNotEmpty) {
-        final first = args.first;
-        if (first is StringLiteral) return first.stringValue;
-      }
-    }
-    return null;
+    if (expr is! InstanceCreationExpression) return null;
+    final NodeList<Expression> args = expr.argumentList.arguments;
+    if (args.isEmpty) return null;
+    final first = args.first;
+    if (first is! StringLiteral) return null;
+    final String? value = first.stringValue;
+    if (value == null) return null;
+    final String typeName = expr.constructorName.type.name.lexeme;
+    return '$typeName:$value';
   }
 }
 
@@ -2405,8 +2415,6 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // This would need type resolution to check if widget extends StatefulWidget
-    // For now, we'll check for common patterns
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'builder') return;
 
@@ -2424,6 +2432,14 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
             if (body is ExpressionFunctionBody) {
               final Expression expr = body.expression;
               if (expr is InstanceCreationExpression) {
+                // FP fix: the rule's claim is specifically about StatefulWidget
+                // losing its State without a stable key. A keyless STATELESS
+                // tile (the documented GOOD pattern) has no State to lose, so
+                // resolve the created type and only proceed for StatefulWidget
+                // subclasses. Unresolved types (no Flutter dep) are skipped
+                // conservatively rather than flagged on a name guess.
+                if (!_isStatefulWidgetCreation(expr)) continue;
+
                 // Check if key is provided
                 bool hasKey = false;
                 for (final Expression argExpr in expr.argumentList.arguments) {
@@ -2434,7 +2450,6 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
                   }
                 }
                 if (!hasKey) {
-                  // Warn for any widget without key in list builder
                   reporter.atNode(expr.constructorName, code);
                 }
               }
@@ -3671,13 +3686,11 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
           if (argName == 'onTap') {
             hasOnTap = true;
 
-            // Check if the callback contains dismiss-like calls
-            final Expression callback = arg.expression;
-            final String callbackSource = callback.toSource().toLowerCase();
-            if (callbackSource.contains('pop') ||
-                callbackSource.contains('dismiss') ||
-                callbackSource.contains('close') ||
-                callbackSource.contains('hide')) {
+            // FP fix: substring matching on the callback source flagged any
+            // identifier containing `pop`/`close`/`hide` (e.g. `populate()`,
+            // `closest()`). Inspect the callback AST for an actual invocation
+            // whose method name IS one of the dismiss verbs instead.
+            if (_callbackInvokesDismiss(arg.expression)) {
               hasDismissPattern = true;
             }
           }
@@ -3850,14 +3863,14 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_buttonWidgets.contains(typeName)) return;
 
-      String? childText;
+      Expression? childExpr;
       Expression? onPressedExpr;
 
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression) {
           final String argName = arg.name.label.name;
           if (argName == 'child') {
-            childText = arg.expression.toSource().toLowerCase();
+            childExpr = arg.expression;
           }
           if (argName == 'onPressed') {
             onPressedExpr = arg.expression;
@@ -3865,28 +3878,48 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
         }
       }
 
-      // Check if this looks like a submit button
-      if (childText == null) return;
-      final text = childText;
-      bool isSubmitButton = _submitKeywords.any(
-        (String keyword) => text.contains(keyword),
-      );
-      if (!isSubmitButton) return;
+      // FP fix: the old keyword test was a substring match on the child source,
+      // so `'Reorder'` matched `order`, `'Bordered'` matched `order`, etc.
+      // Extract the label words from string literals in the child and match
+      // each keyword on WORD boundaries instead.
+      if (childExpr == null) return;
+      if (!_labelHasSubmitKeyword(childExpr)) return;
 
       // Check if onPressed has any conditional logic
       if (onPressedExpr == null) return;
-      final String onPressedSource = onPressedExpr.toSource();
 
-      // If it's a simple function without null check, warn
-      if (!onPressedSource.contains('?') &&
-          !onPressedSource.contains('null') &&
-          !onPressedSource.contains('isLoading') &&
-          !onPressedSource.contains('isSubmitting') &&
-          !onPressedSource.contains('_loading') &&
-          !onPressedSource.contains('_submitting')) {
+      // FP fix: substring `'?'`/`'null'` over the source suppressed unrelated
+      // callbacks (a `?.` anywhere, a `null`-containing identifier). Walk the
+      // callback AST for a real guard signal: a conditional/null-aware
+      // expression, a `null` literal, or a known loading-flag identifier.
+      if (!_onPressedHasGuard(onPressedExpr)) {
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+
+  static bool _labelHasSubmitKeyword(Expression childExpr) {
+    final _StringLiteralWordCollector collector = _StringLiteralWordCollector();
+    childExpr.accept(collector);
+    for (final String word in collector.words) {
+      if (_submitKeywords.contains(word)) return true;
+    }
+    return false;
+  }
+
+  static const Set<String> _loadingFlagNames = <String>{
+    'isLoading',
+    'isSubmitting',
+    '_loading',
+    '_submitting',
+  };
+
+  static bool _onPressedHasGuard(Expression onPressed) {
+    final _GuardSignalDetector detector = _GuardSignalDetector(
+      _loadingFlagNames,
+    );
+    onPressed.accept(detector);
+    return detector.hasGuard;
   }
 }
 
@@ -4138,12 +4171,15 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'FileImage') return;
 
-      // Check if the file path looks like an asset path
-      if (node.argumentList.arguments.isNotEmpty) {
-        final String argSource = node.argumentList.arguments.first.toSource();
-        if (argSource.contains('assets/') || argSource.contains('asset')) {
-          reporter.atNode(node.constructorName, code);
-        }
+      // FP fix: `contains('asset')` matched any filesystem path that merely
+      // happened to include those letters (e.g. `/var/dataset/photo.png`),
+      // and `contains('assets/')` matched it mid-path too. A bundled asset is
+      // referenced by a path that STARTS with `assets/`. Look for a string
+      // literal argument (the File path) whose value begins with `assets/`.
+      if (node.argumentList.arguments.isEmpty) return;
+      final Expression first = node.argumentList.arguments.first;
+      if (_referencesBundledAssetPath(first)) {
+        reporter.atNode(node.constructorName, code);
       }
     });
   }
@@ -4290,19 +4326,19 @@ class AvoidGestureConflictRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'GestureDetector' && typeName != 'InkWell') return;
 
-      // Check if inside another GestureDetector
-      AstNode? current = node.parent;
-      int depth = 0;
-      while (current != null && depth < 20) {
-        if (current is InstanceCreationExpression) {
-          final String parentType = current.constructorName.type.name.lexeme;
-          if (parentType == 'GestureDetector' || parentType == 'InkWell') {
-            reporter.atNode(node.constructorName, code);
-            return;
-          }
-        }
-        current = current.parent;
-        depth++;
+      // FP fix: only DIRECT child-chain nesting shares a hit-test path. The old
+      // walk climbed 20 ancestors and flagged an InkWell nested inside an
+      // ancestor InkWell even when an intervening scrollable/route/list
+      // (ListView, PageRoute, builder closure, ...) breaks the chain — those
+      // are separate hit-test subtrees and do not conflict. Find the nearest
+      // ENCLOSING widget creation reached purely through child arguments; only
+      // report when that immediate parent widget is itself a gesture widget.
+      final InstanceCreationExpression? parentWidget =
+          _enclosingChildChainWidget(node);
+      if (parentWidget == null) return;
+      final String parentType = parentWidget.constructorName.type.name.lexeme;
+      if (parentType == 'GestureDetector' || parentType == 'InkWell') {
+        reporter.atNode(node.constructorName, code);
       }
     });
   }
@@ -4580,34 +4616,31 @@ class AvoidNullableWidgetMethodsRule extends SaropaLintRule {
       // Skip build method
       if (node.name.lexeme == 'build') return;
 
-      // Check return type
-      final TypeAnnotation? returnType = node.returnType;
-      if (returnType is NamedType) {
-        final String typeName = returnType.name.lexeme;
-
-        // Check if it's a Widget type
-        if (typeName == 'Widget' || typeName.endsWith('Widget')) {
-          // Check if it's nullable (has ? suffix)
-          if (returnType.question != null) {
-            reporter.atToken(node.name, code);
-          }
-        }
+      if (_isNullableWidgetReturn(node.returnType)) {
+        reporter.atToken(node.name, code);
       }
     });
 
     // Also check function declarations (top-level functions)
     context.addFunctionDeclaration((FunctionDeclaration node) {
-      final TypeAnnotation? returnType = node.returnType;
-      if (returnType is NamedType) {
-        final String typeName = returnType.name.lexeme;
-
-        if (typeName == 'Widget' || typeName.endsWith('Widget')) {
-          if (returnType.question != null) {
-            reporter.atToken(node.name, code);
-          }
-        }
+      if (_isNullableWidgetReturn(node.returnType)) {
+        reporter.atToken(node.name, code);
       }
     });
+  }
+
+  // FP fix: the old guard `typeName.endsWith('Widget')` flagged any nullable
+  // return whose type NAME ended in "Widget" — including non-widget data
+  // holders like `FooWidget?`. Resolve the return type to its element and only
+  // report when it is actually assignable to `Widget` (the type itself or a
+  // supertype-chain reaching `Widget`). Unresolved types (no Flutter dep) are
+  // skipped conservatively rather than matched on the name.
+  static bool _isNullableWidgetReturn(TypeAnnotation? returnType) {
+    if (returnType is! NamedType) return false;
+    if (returnType.question == null) return false;
+    final DartType? type = returnType.type;
+    if (type is! InterfaceType) return false;
+    return _isWidgetInterface(type);
   }
 }
 
@@ -4802,31 +4835,40 @@ class AvoidLateWithoutGuaranteeRule extends SaropaLintRule {
         }
       }
 
-      // Check if in State<T> class
-      final parent = node.parent;
-      if (parent is! ClassDeclaration) return;
+      // Check if in State<T> class. Use ancestor lookup rather than a direct
+      // `node.parent` cast — a FieldDeclaration is not always the immediate
+      // child of its ClassDeclaration depending on enclosing structure.
+      final ClassDeclaration? parent =
+          node.thisOrAncestorOfType<ClassDeclaration>();
+      if (parent == null) return;
 
       final extendsClause = parent.extendsClause;
       if (extendsClause == null) return;
       if (extendsClause.superclass.name.lexeme != 'State') return;
 
       // Check if initialized in initState
-      String? initStateBody;
+      FunctionBody? initStateBody;
       for (final member in parent.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'initState') {
-          initStateBody = member.body.toSource();
+          initStateBody = member.body;
           break;
         }
       }
 
-      // Check each late variable
+      // FP fix: the old test `initStateBody.contains('$varName =')` matched any
+      // substring — `if (foo == 0)` (the `==` operator) and `other.foo = 1`
+      // (an assignment to a DIFFERENT object's field) both falsely satisfied
+      // the guarantee for a field named `foo`. Walk the initState AST for a
+      // real assignment whose target is this field unqualified (a bare
+      // SimpleIdentifier or `this.field`), not an equality compare and not a
+      // member of some other receiver.
+      final Set<String> assignedFields = initStateBody == null
+          ? const <String>{}
+          : _fieldsAssignedIn(initStateBody);
+
       for (final variable in node.fields.variables) {
         final varName = variable.name.lexeme;
-
-        // If no initState or field not assigned in initState, warn
-        if (initStateBody == null ||
-            !initStateBody.contains('$varName =') &&
-                !initStateBody.contains('$varName=')) {
+        if (!assignedFields.contains(varName)) {
           reporter.atNode(variable);
         }
       }
@@ -4899,16 +4941,14 @@ class AvoidStaticRouteConfigRule extends SaropaLintRule {
       // Check if final
       if (node.fields.keyword?.keyword != Keyword.FINAL) return;
 
-      // Check the type
+      // FP fix: `typeStr.contains(routerType)` flagged every static final whose
+      // type name merely CONTAINED a router type as a substring (e.g.
+      // `MaterialAppConfig`, `MyGoRouterWrapper`). Match the declared type name
+      // with exact equality against the reserved router type set instead.
       final TypeAnnotation? type = node.fields.type;
-      if (type != null) {
-        final String typeStr = type.toSource();
-        for (final String routerType in _routerTypes) {
-          if (typeStr.contains(routerType)) {
-            reporter.atNode(node);
-            return;
-          }
-        }
+      if (type is NamedType && _routerTypes.contains(type.name.lexeme)) {
+        reporter.atNode(node);
+        return;
       }
 
       // Also check initializer for router creation
@@ -5325,5 +5365,272 @@ class PreferConstLiteralsToCreateImmutablesRule extends SaropaLintRule {
       return true;
     }
     return false;
+  }
+}
+
+// =============================================================================
+// Shared resolved-AST helpers for the false-positive fixes in this file.
+// These resolve element/type information rather than matching on lexemes or
+// `toSource()` substrings, so they degrade conservatively (no flag) when a type
+// is unresolved instead of guessing from a name.
+// =============================================================================
+
+/// True when [type] is `Widget` or any subtype of it (walks the supertype
+/// chain). Used to confirm a return type is actually a widget rather than a
+/// type whose NAME merely ends in "Widget".
+bool _isWidgetInterface(InterfaceType type) {
+  for (InterfaceType? t = type; t != null; t = t.superclass) {
+    if (t.element.name == 'Widget') return true;
+  }
+  return false;
+}
+
+/// True when [type] is `StatefulWidget` or a subtype of it. Used by
+/// avoid_stateful_widget_in_list to restrict to widgets that actually own
+/// State (which is what is lost without a stable key).
+bool _isStatefulWidgetInterface(InterfaceType type) {
+  for (InterfaceType? t = type; t != null; t = t.superclass) {
+    if (t.element.name == 'StatefulWidget') return true;
+  }
+  return false;
+}
+
+/// True when the widget created by [node] resolves to a StatefulWidget subtype.
+bool _isStatefulWidgetCreation(InstanceCreationExpression node) {
+  final DartType? type = node.staticType;
+  if (type is! InterfaceType) return false;
+  return _isStatefulWidgetInterface(type);
+}
+
+/// The nearest ENCLOSING widget creation reached from [node] purely through
+/// child-argument composition (the named `child:`/`children:` slots or
+/// positional arguments of a constructor call). Returns null when the climb
+/// first crosses a boundary that breaks the hit-test child chain — a function
+/// body/closure (e.g. an itemBuilder), or any non-constructor expression
+/// nesting. This is what makes avoid_gesture_conflict require DIRECT nesting
+/// rather than flagging across intervening scrollables/routes/builders.
+InstanceCreationExpression? _enclosingChildChainWidget(
+  InstanceCreationExpression node,
+) {
+  AstNode? current = node.parent;
+  while (current != null) {
+    // A function body/closure between this widget and its ancestor means the
+    // widget is built lazily in a separate subtree (builder callback) — not a
+    // direct child of the ancestor. Stop: no direct-chain parent.
+    if (current is FunctionBody || current is FunctionExpression) {
+      return null;
+    }
+    if (current is InstanceCreationExpression) {
+      return current;
+    }
+    // Allow the argument-plumbing nodes that form a direct child chain
+    // (the argument itself, its named wrapper, the argument list, and simple
+    // collection literals used for `children:`). Anything else (method calls,
+    // conditional expressions, casts, ...) is not a direct child slot.
+    if (current is NamedExpression ||
+        current is ArgumentList ||
+        current is ListLiteral ||
+        current is Expression && _isChildPlumbing(current)) {
+      current = current.parent;
+      continue;
+    }
+    return null;
+  }
+  return null;
+}
+
+/// Argument-list expressions that still count as direct child plumbing.
+bool _isChildPlumbing(Expression e) {
+  // A bare collection element wrapper or parenthesized child stays in-chain;
+  // anything with its own evaluation semantics (calls, conditionals) does not.
+  return e is ParenthesizedExpression;
+}
+
+/// True when [callbackExpr] (an onTap handler) invokes a dismiss-style method
+/// (`pop`/`dismiss`/`close`/`hide`) by ACTUAL method name. Replaces the old
+/// substring scan that matched `populate`/`closest`.
+bool _callbackInvokesDismiss(Expression callbackExpr) {
+  const Set<String> dismissNames = <String>{
+    'pop',
+    'dismiss',
+    'close',
+    'hide',
+    'maybePop',
+  };
+  final _MethodNameDetector detector = _MethodNameDetector(dismissNames);
+  callbackExpr.accept(detector);
+  return detector.matched;
+}
+
+/// True when [arg] is (or wraps) a string literal whose value begins with
+/// `assets/`. Handles the common `FileImage(File('assets/...'))` shape by
+/// scanning the argument subtree for any such literal. Replaces the old
+/// `contains('asset')` that matched paths like `/var/dataset/...`.
+bool _referencesBundledAssetPath(Expression arg) {
+  final _AssetPathLiteralDetector detector = _AssetPathLiteralDetector();
+  arg.accept(detector);
+  return detector.matched;
+}
+
+/// The set of field names assigned (unqualified or via `this.`) anywhere in
+/// [body]. Used by avoid_late_without_guarantee to confirm a real assignment
+/// to the field, not an equality compare or an assignment to another object's
+/// member.
+Set<String> _fieldsAssignedIn(FunctionBody body) {
+  final _FieldAssignmentCollector collector = _FieldAssignmentCollector();
+  body.accept(collector);
+  return collector.assignedNames;
+}
+
+/// True when [node] is const-constructible: already const, or a const
+/// constructor invocation whose every argument is itself a constant
+/// expression. Recurses through nested widget arguments.
+bool _isConstConstructible(InstanceCreationExpression node) {
+  if (node.isConst) return true;
+  final element = node.constructorName.element;
+  // No resolved constructor, or a non-const constructor, cannot be const.
+  if (element == null || !element.isConst) return false;
+  for (final Expression arg in node.argumentList.arguments) {
+    final Expression value = arg is NamedExpression ? arg.expression : arg;
+    if (!_isConstArgument(value)) return false;
+  }
+  return true;
+}
+
+/// True when [e] is a constant expression suitable as a const constructor
+/// argument: a literal, a const-constructible creation, or a const list/set/map
+/// of constant elements.
+bool _isConstArgument(Expression e) {
+  if (e is BooleanLiteral ||
+      e is IntegerLiteral ||
+      e is DoubleLiteral ||
+      e is SimpleStringLiteral ||
+      e is NullLiteral) {
+    return true;
+  }
+  if (e is InstanceCreationExpression) {
+    return _isConstConstructible(e);
+  }
+  return false;
+}
+
+/// Detects whether any invoked method/function name in a subtree is in the
+/// provided name set (resolved by lexeme of the method name token, which is the
+/// callee identifier — not a substring of the whole source).
+class _MethodNameDetector extends RecursiveAstVisitor<void> {
+  _MethodNameDetector(this.names);
+  final Set<String> names;
+  bool matched = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (names.contains(node.methodName.name)) {
+      matched = true;
+    }
+    super.visitMethodInvocation(node);
+  }
+}
+
+/// Detects a string literal whose value begins with `assets/` in a subtree.
+class _AssetPathLiteralDetector extends RecursiveAstVisitor<void> {
+  bool matched = false;
+
+  @override
+  void visitSimpleStringLiteral(SimpleStringLiteral node) {
+    if (node.value.startsWith('assets/')) {
+      matched = true;
+    }
+    super.visitSimpleStringLiteral(node);
+  }
+}
+
+/// Collects the individual words found inside string literals of a subtree,
+/// lowercased and split on non-letter boundaries. Used to match submit-button
+/// label keywords on word boundaries (so `Reorder` does not match `order`).
+class _StringLiteralWordCollector extends RecursiveAstVisitor<void> {
+  final Set<String> words = <String>{};
+
+  @override
+  void visitSimpleStringLiteral(SimpleStringLiteral node) {
+    _addWords(node.value);
+    super.visitSimpleStringLiteral(node);
+  }
+
+  @override
+  void visitInterpolationString(InterpolationString node) {
+    _addWords(node.value);
+    super.visitInterpolationString(node);
+  }
+
+  void _addWords(String text) {
+    final StringBuffer current = StringBuffer();
+    for (final int rune in text.toLowerCase().runes) {
+      // a-z only; any other character is a word separator.
+      if (rune >= 0x61 && rune <= 0x7a) {
+        current.writeCharCode(rune);
+      } else if (current.isNotEmpty) {
+        words.add(current.toString());
+        current.clear();
+      }
+    }
+    if (current.isNotEmpty) words.add(current.toString());
+  }
+}
+
+/// Detects a double-submit guard signal in an onPressed expression: a
+/// conditional/null-aware operator, a `null` literal, or a known loading-flag
+/// identifier. Replaces substring scans for `?`/`null` that fired on unrelated
+/// `?.` chains or `null`-containing identifiers.
+class _GuardSignalDetector extends RecursiveAstVisitor<void> {
+  _GuardSignalDetector(this.loadingFlagNames);
+  final Set<String> loadingFlagNames;
+  bool hasGuard = false;
+
+  @override
+  void visitConditionalExpression(ConditionalExpression node) {
+    hasGuard = true;
+    super.visitConditionalExpression(node);
+  }
+
+  @override
+  void visitNullLiteral(NullLiteral node) {
+    hasGuard = true;
+    super.visitNullLiteral(node);
+  }
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (loadingFlagNames.contains(node.name)) {
+      hasGuard = true;
+    }
+    super.visitSimpleIdentifier(node);
+  }
+
+  @override
+  void visitIfStatement(IfStatement node) {
+    hasGuard = true;
+    super.visitIfStatement(node);
+  }
+}
+
+/// Collects names of fields assigned to (unqualified `name = ...` or
+/// `this.name = ...`) within a subtree. An equality compare (`name ==`) is not
+/// an assignment, and `other.name = ...` targets a different receiver, so
+/// neither is collected.
+class _FieldAssignmentCollector extends RecursiveAstVisitor<void> {
+  final Set<String> assignedNames = <String>{};
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Expression target = node.leftHandSide;
+    if (target is SimpleIdentifier) {
+      assignedNames.add(target.name);
+    } else if (target is PrefixedIdentifier &&
+        target.prefix.name == 'this') {
+      assignedNames.add(target.identifier.name);
+    } else if (target is PropertyAccess && target.target is ThisExpression) {
+      assignedNames.add(target.propertyName.name);
+    }
+    super.visitAssignmentExpression(node);
   }
 }

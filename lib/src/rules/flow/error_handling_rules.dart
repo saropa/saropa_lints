@@ -2798,6 +2798,14 @@ class HandleThrowingInvocationsRule extends SaropaLintRule {
     final name = element.name;
     if (name == null || !_knownThrowerNames.contains(name)) return false;
     final uri = element.library?.uri.toString() ?? '';
+    // Match ONLY the documented throwing calls, qualified by both library URI
+    // and the specific method name. The previous final clause
+    // `return uri.startsWith('dart:io') || (uri.contains('convert') && ...)`
+    // re-broadened detection to ANY dart:io element whose simple name was in
+    // the thrower set (e.g. `SystemEncoding.decode`, the `systemEncoding`
+    // const), even though it is not a read*/write* sync I/O call — a false
+    // positive. The per-library checks below are exhaustive for the rule's
+    // documented intent, so a non-matching call must fall through to `false`.
     if (uri.startsWith('dart:io') &&
         (name.startsWith('read') || name.startsWith('write'))) {
       return true;
@@ -2806,8 +2814,7 @@ class HandleThrowingInvocationsRule extends SaropaLintRule {
       return true;
     }
     if (uri.startsWith('dart:core') && name == 'parse') return true;
-    return uri.startsWith('dart:io') ||
-        (uri.contains('convert') && name == 'decode');
+    return false;
   }
 
   @override

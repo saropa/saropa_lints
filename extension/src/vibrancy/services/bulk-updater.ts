@@ -12,6 +12,7 @@ import {
     IncrementFilter, VersionIncrement,
 } from '../scoring/version-increment';
 import { buildVersionEdit, findPubspecYaml } from './pubspec-editor';
+import { l10n } from '../../i18n/runtime';
 
 /** Options for bulk update operation. */
 export interface BulkUpdateOptions {
@@ -196,8 +197,14 @@ export async function bulkUpdate(
     );
 
     if (updatable.length === 0) {
+        // Two keys (any-kind vs a named increment) instead of concatenating the
+        // filter word into the sentence, so translators control word order.
         vscode.window.showInformationMessage(
-            `No ${options.incrementFilter === 'all' ? '' : options.incrementFilter + ' '}updates available`,
+            options.incrementFilter === 'all'
+                ? l10n('notify.misc.bulkUpdateNoUpdates')
+                : l10n('notify.misc.bulkUpdateNoUpdatesFiltered', {
+                    filter: options.incrementFilter,
+                }),
         );
         return { updated: [], skipped, cancelled: false };
     }
@@ -220,13 +227,17 @@ export async function bulkUpdate(
 
     if (!result.success) {
         vscode.window.showErrorMessage(
-            `Bulk update failed: ${result.error}`,
+            l10n('notify.misc.bulkUpdateFailed', { error: result.error ?? '' }),
         );
         return { updated: [], skipped, cancelled: false };
     }
 
+    // Singular/plural in the catalog (two keys) rather than an in-code package/
+    // packages suffix ternary, so each locale supplies its own plural form.
     vscode.window.showInformationMessage(
-        `Updated ${updatable.length} package${updatable.length === 1 ? '' : 's'}`,
+        updatable.length === 1
+            ? l10n('notify.misc.bulkUpdateUpdatedOne', { count: String(updatable.length) })
+            : l10n('notify.misc.bulkUpdateUpdatedOther', { count: String(updatable.length) }),
     );
 
     return { updated: updatable, skipped, cancelled: false };

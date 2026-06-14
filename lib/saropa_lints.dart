@@ -39,6 +39,7 @@
 library;
 
 import 'dart:developer' as developer;
+import 'dart:convert' show jsonDecode;
 import 'dart:io' show Directory, File, Platform, stderr;
 
 import 'package:analysis_server_plugin/registry.dart' show PluginRegistry;
@@ -148,11 +149,23 @@ String _resolveVersion() {
     final configFile = File('.dart_tool/package_config.json');
     if (!configFile.existsSync()) return 'unknown';
 
+    // Parse package_config.json properly instead of regex-scanning it: the
+    // previous `"name":...[^}]*"rootUri":` pattern could span across adjacent
+    // package objects when field ordering or whitespace varied. Look up the
+    // saropa_lints entry's rootUri in the decoded structure.
     final config = configFile.readAsStringSync();
-    final uriMatch = RegExp(
-      r'"name":\s*"saropa_lints"[^}]*"rootUri":\s*"([^"]+)"',
-    ).firstMatch(config);
-    final rootUri = uriMatch?.group(1);
+    final decoded = jsonDecode(config);
+    if (decoded is! Map<String, dynamic>) return 'unknown';
+    final packages = decoded['packages'];
+    if (packages is! List) return 'unknown';
+    String? rootUri;
+    for (final entry in packages) {
+      if (entry is Map<String, dynamic> && entry['name'] == 'saropa_lints') {
+        final uri = entry['rootUri'];
+        if (uri is String) rootUri = uri;
+        break;
+      }
+    }
     if (rootUri == null) return 'unknown';
 
     // Resolve rootUri to an absolute directory path.

@@ -7,6 +7,8 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -518,9 +520,6 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Not HTTP: we only inspect try-block source for client.get/http./dio.
-    // Presence of statusCode satisfies require_http_status_check (no real HTTP here).
-    final int? statusCode = null; // ignore: unused_local_variable
     context.addTryStatement((TryStatement node) {
       final String trySource = node.body.toSource();
 
@@ -883,20 +882,15 @@ class PreferStreamingResponseRule extends SaropaLintRule {
     RegExp(r'\bhttp\b'),
     RegExp(r'\bdio\b'),
   ];
-  static final List<RegExp> _fileContextPatterns = [
-    RegExp(r'\bwriteAsBytes\b'),
-    RegExp(r'\bwriteAsBytesSync\b'),
-    RegExp(r'\.pdf\b'),
-    RegExp(r'\.zip\b'),
-    RegExp(r'\.mp4\b'),
-    RegExp(r'\.mp3\b'),
-    RegExp(r'\.png\b'),
-    RegExp(r'\.jpg\b'),
-    RegExp(r'\.jpeg\b'),
-    RegExp(r'\bdownload\b'),
-    RegExp(r'\bDownload\b'),
-    RegExp(r'\bfile\b'),
-  ];
+  /// File-write operations that, when applied to buffered bytes, are the
+  /// actual OOM concern. Restricted to genuine write/save calls — NOT the bare
+  /// word `file`, which previously matched any unrelated `file` identifier up
+  /// to 10 ancestors away and produced false positives.
+  static const Set<String> _fileWriteMethodNames = <String>{
+    'writeAsBytes',
+    'writeAsBytesSync',
+    'pipe',
+  };
   static final List<RegExp> _fileOpPatterns = [
     RegExp(r'\bwriteAsBytes\b'),
     RegExp(r'\bFile\s*\('),
@@ -912,9 +906,11 @@ class PreferStreamingResponseRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addPropertyAccess((PropertyAccess node) {
-      final String propertyName = node.propertyName.name;
-
-      if (propertyName != 'bodyBytes' && propertyName != 'body') return;
+      // Only `bodyBytes` is the OOM concern: it materializes the whole payload
+      // as an in-memory byte buffer. `body` returns a (decoded) String and is
+      // a different, much smaller representation — flagging it produced false
+      // positives, so it is intentionally excluded.
+      if (node.propertyName.name != 'bodyBytes') return;
 
       final Expression? target = node.target;
       if (target == null) return;
@@ -924,21 +920,12 @@ class PreferStreamingResponseRule extends SaropaLintRule {
         return;
       }
 
-      AstNode? current = node.parent;
-      int depth = 0;
-      bool isFileContext = false;
-
-      while (current != null && depth < 10) {
-        final String source = current.toSource();
-        if (_fileContextPatterns.any((p) => p.hasMatch(source))) {
-          isFileContext = true;
-          break;
-        }
-        current = current.parent;
-        depth++;
-      }
-
-      if (isFileContext) {
+      // The OOM antipattern is buffering bytes and writing them to a file.
+      // Require an ACTUAL file-write call inside the same enclosing block —
+      // not the bare presence of the word `file` somewhere within 10 ancestor
+      // nodes, which previously matched any unrelated `file` parameter or
+      // variable in scope and fired on in-memory uses of bodyBytes.
+      if (_blockHasFileWrite(node)) {
         reporter.atNode(node);
       }
     });
@@ -983,6 +970,44 @@ class PreferStreamingResponseRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// True when the function body enclosing [node] contains a real file-write
+  /// call (`writeAsBytes`/`writeAsBytesSync`/`pipe`). Scoping the search to the
+  /// enclosing body — and requiring an actual write invocation rather than the
+  /// bare token `file` — is what distinguishes the OOM antipattern (buffer the
+  /// bytes, then write them to disk) from an in-memory use of `bodyBytes` that
+  /// merely happens to share a scope with an unrelated `file` variable.
+  static bool _blockHasFileWrite(AstNode node) {
+    // Climb to the nearest enclosing function/method body; a write further out
+    // than the current function is not part of this byte buffer's data flow.
+    AstNode? body = node;
+    while (body != null && body is! FunctionBody) {
+      body = body.parent;
+    }
+    if (body == null) return false;
+
+    final visitor = _FileWriteFinder();
+    body.accept(visitor);
+    return visitor.found;
+  }
+}
+
+/// Visits a subtree looking for a file-write method invocation
+/// (`writeAsBytes`, `writeAsBytesSync`, or `pipe`). Used by
+/// [PreferStreamingResponseRule] to confirm buffered bytes are actually
+/// written to disk before flagging.
+class _FileWriteFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (PreferStreamingResponseRule._fileWriteMethodNames.contains(
+      node.methodName.name,
+    )) {
+      found = true;
+    }
+    super.visitMethodInvocation(node);
   }
 }
 
@@ -1476,46 +1501,109 @@ class AvoidOverFetchingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
+  /// Method-name prefixes that denote fetching a whole object from a remote
+  /// source. Matched as a prefix so `getUser`/`fetchProfile`/`queryOrders`
+  /// count, not just the bare `get`/`fetch`/`query`.
+  static const List<String> _fetchMethodPrefixes = <String>[
+    'get',
+    'fetch',
+    'query',
+    'load',
+  ];
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // This rule requires more sophisticated analysis
-    // Detect patterns like: fetch full object, use 1-2 properties
-    context.addMethodDeclaration((MethodDeclaration node) {
-      final FunctionBody body = node.body;
-      final String bodySource = body.toSource();
-
-      // Look for API fetch followed by single property access
-      final RegExp fetchPattern = RegExp(
-        r'await\s+\w+\.(get|fetch|query)\([^)]+\)',
-      );
-
-      if (!fetchPattern.hasMatch(bodySource)) return;
-
-      // Count property accesses on result vs fields available
-      // This is a heuristic - if method is short and only accesses
-      // one or two properties after fetch, might be over-fetching
-      final int propertyAccesses = RegExp(
-        r'\.\w+(?!\()',
-      ).allMatches(bodySource).length;
-      final int apiCalls = RegExp(
-        r'\.(get|fetch|post|query)\(',
-      ).allMatches(bodySource).length;
-
-      if (apiCalls > 0 && propertyAccesses <= 3 && bodySource.length < 500) {
-        // Additional heuristic: check for .name, .id, .title only (word-boundary)
-        if (RegExp(r'\.(name|title|id)\b').hasMatch(bodySource)) {
-          final int totalProps = RegExp(
-            r'\.(name|title|id|label|text)\b',
-          ).allMatches(bodySource).length;
-          if (totalProps >= 1 && totalProps <= 2) {
-            reporter.atNode(node);
-          }
-        }
-      }
+    // Over-fetching cannot be proven statically: fetching a full object and
+    // reading one field is indistinguishable, at the AST level, from correct
+    // code (a repository that returns `result.id` is not over-fetching). The
+    // previous implementation counted property-access regexes and fired on any
+    // short method that fetched and returned one field — pure false positives.
+    //
+    // This conservative rewrite fires only on the specific, defensible shape
+    // the rule documents: a fetched object bound to a local that is used
+    // EXACTLY ONCE, and that single use is one field of the object CONSUMED by
+    // another call (e.g. `final user = await api.getUser(id); Text(user.name);`
+    // — the whole object is fetched only to feed one field into a widget/call).
+    // Returning or assigning the field (`return result.id;`) is NOT flagged,
+    // because that is ordinary value plumbing with no over-fetch signal.
+    context.addVariableDeclaration((VariableDeclaration node) {
+      _checkOverFetch(reporter, node);
     });
+  }
+
+  void _checkOverFetch(
+    SaropaDiagnosticReporter reporter,
+    VariableDeclaration node,
+  ) {
+    // The local must be initialized from `await <recv>.<fetchMethod>(...)`.
+    final Expression? initializer = node.initializer;
+    if (initializer is! AwaitExpression) return;
+    final Expression awaited = initializer.expression;
+    if (awaited is! MethodInvocation) return;
+    if (awaited.target == null) return;
+    if (!_isFetchMethod(awaited.methodName.name)) return;
+
+    // Find the function body enclosing this declaration; references outside it
+    // are not part of this object's local data flow.
+    final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
+    final localElement = node.declaredFragment?.element;
+    if (body == null || localElement == null) return;
+
+    // Collect every read of the fetched local within the body.
+    final finder = _LocalReferenceFinder(localElement);
+    body.accept(finder);
+
+    // Over-fetch shape: the object is read exactly once, that read is a single
+    // field access, and the field is consumed as an argument to another call.
+    if (finder.references.length != 1) return;
+    final SimpleIdentifier ref = finder.references.first;
+    final AstNode? access = ref.parent;
+    // The single read must be a field access (`local.field`); a bare reference
+    // (passing the whole object) is not over-fetching.
+    final bool isFieldAccess =
+        access is PrefixedIdentifier || access is PropertyAccess;
+    if (access == null || !isFieldAccess) return;
+    if (!_isConsumedAsArgument(access)) return;
+
+    reporter.atNode(node);
+  }
+
+  static bool _isFetchMethod(String name) {
+    final String lower = name.toLowerCase();
+    return _fetchMethodPrefixes.any(lower.startsWith);
+  }
+
+  /// True when [fieldAccess] (a `local.field` read) is passed directly as an
+  /// argument to another invocation/instance creation — the "fetch a whole
+  /// object just to feed one field into a call" shape. A field that is merely
+  /// returned or assigned is deliberately excluded.
+  static bool _isConsumedAsArgument(AstNode fieldAccess) {
+    final AstNode? parent = fieldAccess.parent;
+    if (parent is! ArgumentList) return false;
+    final AstNode? call = parent.parent;
+    return call is MethodInvocation || call is InstanceCreationExpression;
+  }
+}
+
+/// Counts reads of a specific local [variable] within a subtree. Used by
+/// [AvoidOverFetchingRule] to confirm a fetched object is used exactly once.
+class _LocalReferenceFinder extends RecursiveAstVisitor<void> {
+  _LocalReferenceFinder(this.variable);
+
+  final Element variable;
+  final List<SimpleIdentifier> references = <SimpleIdentifier>[];
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    // The declaration name itself is not a read; only count usages whose
+    // resolved element is the fetched local.
+    if (!node.inDeclarationContext() && node.element == variable) {
+      references.add(node);
+    }
+    super.visitSimpleIdentifier(node);
   }
 }
 
