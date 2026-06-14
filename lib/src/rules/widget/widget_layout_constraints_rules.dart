@@ -1798,7 +1798,7 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 
       if (i.isOdd) {
         // Odd-indexed: must be a spacer
-        final String? source = _getSpacerSource(element, typeName);
+        final String? source = _getSpacerKey(element, typeName);
         if (source == null) return false;
 
         if (spacerSource == null) {
@@ -1808,7 +1808,7 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
         }
       } else {
         // Even-indexed: must NOT be a spacer
-        if (_getSpacerSource(element, typeName) != null) return false;
+        if (_getSpacerKey(element, typeName) != null) return false;
       }
     }
 
@@ -1825,9 +1825,17 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
     return null;
   }
 
-  /// Returns the source text of a spacer expression for comparison,
-  /// or null if the expression is not a spacer.
-  static String? _getSpacerSource(Expression expr, String parentType) {
+  /// Returns a comparison key for a spacer expression, or null if the
+  /// expression is not a spacer. Equal keys mean "the same spacer".
+  ///
+  /// The key normalizes the spacer's relevant dimension by its numeric VALUE,
+  /// not its rendered source text. Comparing `toSource()` treated
+  /// `SizedBox(height: 8)` and `SizedBox(height: 8.0)` as different spacers
+  /// (so the alternating-spacer pattern was missed) even though both produce an
+  /// identical 8-pixel gap. Normalizing IntegerLiteral/DoubleLiteral to a single
+  /// numeric value makes `8` and `8.0` compare equal, while genuinely different
+  /// gaps (8 vs 16) still differ.
+  static String? _getSpacerKey(Expression expr, String parentType) {
     if (expr is! InstanceCreationExpression) return null;
 
     final String name = expr.constructorName.type.name.lexeme;
@@ -1840,7 +1848,7 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
     if (name == 'SizedBox') {
       // Must not have a child
       bool hasChild = false;
-      bool hasRelevantDimension = false;
+      Expression? dimensionValue;
 
       final String expectedArg = parentType == 'Column' ? 'height' : 'width';
 
@@ -1849,16 +1857,32 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
           if (arg.name.label.name == 'child') {
             hasChild = true;
           } else if (arg.name.label.name == expectedArg) {
-            hasRelevantDimension = true;
+            dimensionValue = arg.expression;
           }
         }
       }
 
-      if (hasChild || !hasRelevantDimension) return null;
+      if (hasChild || dimensionValue == null) return null;
 
-      return expr.toSource();
+      // Key by numeric value when the dimension is a numeric literal so that
+      // `8` and `8.0` collapse to the same spacer; fall back to source text for
+      // non-literal dimensions (named constants, expressions) where two equal
+      // values cannot be proven without resolution.
+      final double? numeric = _numericLiteralValue(dimensionValue);
+      if (numeric != null) {
+        return 'SizedBox:$expectedArg:$numeric';
+      }
+      return 'SizedBox:$expectedArg:${dimensionValue.toSource()}';
     }
 
+    return null;
+  }
+
+  /// Returns the numeric value of an Integer/DoubleLiteral, or null otherwise.
+  /// Integers are widened to double so `8` and `8.0` produce the same value.
+  static double? _numericLiteralValue(Expression expr) {
+    if (expr is IntegerLiteral) return expr.value?.toDouble();
+    if (expr is DoubleLiteral) return expr.value;
     return null;
   }
 }
@@ -1991,10 +2015,15 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
         reporter.atNode(expr);
       }
     } else if (expr is DoubleLiteral) {
+      // Both arms of the previous if/else-if reported identically, so the
+      // intended non-integer carve-out was dead code. The threshold for doubles
+      // is the same as for integers: any hardcoded layout value above 4.0 is
+      // flagged regardless of whether it is integer-valued (8.0) or fractional
+      // (12.5). Collapsed to a single condition so the behavior is explicit and
+      // the dead branch can never mislead a future reader into thinking
+      // fractional doubles are treated differently.
       final double value = expr.value;
-      if (value > 4.0 && value != value.roundToDouble()) {
-        reporter.atNode(expr);
-      } else if (value > 4.0) {
+      if (value > 4.0) {
         reporter.atNode(expr);
       }
     }
@@ -2140,8 +2169,7 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
 
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'key') {
-          final String keySource = arg.expression.toSource();
-          if (keySource.contains('PageStorageKey')) {
+          if (_isPageStorageKey(arg.expression)) {
             hasPageStorageKey = true;
           }
         }
@@ -2152,6 +2180,36 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+
+  /// True when [keyExpr] is a `PageStorageKey` (or subtype).
+  ///
+  /// The previous heuristic tested `toSource().contains('PageStorageKey')`,
+  /// which both (a) accepted any identifier whose NAME contained the substring,
+  /// such as `myPageStorageKeyFactory()` or a const named `notAPageStorageKey`,
+  /// treating them as a real PageStorageKey and suppressing the warning (a false
+  /// negative), and (b) could be fooled the other way. The reliable signal is
+  /// the expression's type: either a direct `PageStorageKey(...)` construction
+  /// (name match on the constructor, which holds even when the Flutter type does
+  /// not resolve in this context) or a static type that is or extends
+  /// `PageStorageKey`.
+  static bool _isPageStorageKey(Expression keyExpr) {
+    if (keyExpr is InstanceCreationExpression) {
+      if (keyExpr.constructorName.type.name.lexeme == 'PageStorageKey') {
+        return true;
+      }
+    }
+    return _isTypeOrSubtypeNamed(keyExpr.staticType, 'PageStorageKey');
+  }
+
+  /// Walks the supertype chain of [type] looking for an interface whose element
+  /// is named [targetName].
+  static bool _isTypeOrSubtypeNamed(DartType? type, String targetName) {
+    if (type is! InterfaceType) return false;
+    for (InterfaceType? t = type; t != null; t = t.element.supertype) {
+      if (t.element.name == targetName) return true;
+    }
+    return false;
   }
 }
 
@@ -2484,14 +2542,17 @@ class PreferFractionalSizingRule extends SaropaLintRule {
       // Check for multiplication with a fraction
       if (node.operator.lexeme != '*') return;
 
-      final String leftSource = node.leftOperand.toSource();
-      final String rightSource = node.rightOperand.toSource();
-
-      // Check for MediaQuery.of(context).size.width * 0.x pattern
-      if (!((leftSource.contains('MediaQuery') &&
-              leftSource.contains('.size.')) ||
-          (rightSource.contains('MediaQuery') &&
-              rightSource.contains('.size.')))) {
+      // Match the actual MediaQuery size-dimension read via the AST property
+      // chain, not substring text. The old `toSource().contains('MediaQuery')`
+      // + `.contains('.size.')` heuristic produced false positives on unrelated
+      // user code whose receiver name merely contained "MediaQuery" and whose
+      // chain literally contained ".size." (e.g. `fakeMediaQuery.size.width`),
+      // because substrings cannot distinguish a real `MediaQuery.of(context)`
+      // call from a same-named local variable. Requiring the operand to be a
+      // genuine `MediaQuery.of(context).size.{width,height}` /
+      // `MediaQuery.sizeOf(context).{width,height}` read removes that class.
+      if (!_isMediaQuerySizeDimension(node.leftOperand) &&
+          !_isMediaQuerySizeDimension(node.rightOperand)) {
         return;
       }
 
@@ -2514,6 +2575,58 @@ class PreferFractionalSizingRule extends SaropaLintRule {
   static bool _isFractionalLiteral(Expression expr) {
     if (expr is! DoubleLiteral) return false;
     return expr.value > 0 && expr.value < 1;
+  }
+
+  /// True when [expr] reads `width` or `height` off a genuine MediaQuery size,
+  /// i.e. `MediaQuery.of(context).size.width|height` or
+  /// `MediaQuery.sizeOf(context).width|height`. Matched structurally so a
+  /// same-named user variable cannot trip the rule.
+  static bool _isMediaQuerySizeDimension(Expression expr) {
+    final Expression e = _unwrapParentheses(expr);
+    if (e is! PropertyAccess) return false;
+    final String prop = e.propertyName.name;
+    if (prop != 'width' && prop != 'height') return false;
+    final Expression? target = e.target;
+    if (target == null) return false;
+    // `MediaQuery.of(context).size.width|height`
+    if (_isMediaQuerySizeAccess(target)) return true;
+    // `MediaQuery.sizeOf(context).width|height`
+    return _isMediaQuerySizeOfResult(target);
+  }
+
+  /// `MediaQuery.of(context).size` — a `.size` PropertyAccess whose target is a
+  /// `MediaQuery.of(...)` / `MediaQuery.sizeOf(...)` invocation.
+  static bool _isMediaQuerySizeAccess(Expression target) {
+    if (target is! PropertyAccess) return false;
+    if (target.propertyName.name != 'size') return false;
+    final Expression? rec = target.target;
+    return rec != null && _isMediaQueryOf(rec);
+  }
+
+  /// `MediaQuery.of(context)` or `MediaQuery.sizeOf(context)`.
+  static bool _isMediaQueryOf(Expression target) {
+    if (target is! MethodInvocation) return false;
+    final String methodName = target.methodName.name;
+    if (methodName != 'of' && methodName != 'sizeOf') return false;
+    final Expression? rec = target.target;
+    return rec is SimpleIdentifier && rec.name == 'MediaQuery';
+  }
+
+  /// `MediaQuery.sizeOf(context)` returning a `Size` directly; its `.width` /
+  /// `.height` mirror `.of(context).size.width|height`.
+  static bool _isMediaQuerySizeOfResult(Expression target) {
+    if (target is! MethodInvocation) return false;
+    if (target.methodName.name != 'sizeOf') return false;
+    final Expression? rec = target.target;
+    return rec is SimpleIdentifier && rec.name == 'MediaQuery';
+  }
+
+  static Expression _unwrapParentheses(Expression expr) {
+    Expression e = expr;
+    while (e is ParenthesizedExpression) {
+      e = e.expression;
+    }
+    return e;
   }
 
   /// Returns true if [node] is inside a collection-building context
@@ -2626,7 +2739,7 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
         // LayoutBuilder's constraints are Infinity and unusable). Flagging that
         // mandatory fallback is a false positive — there is no LayoutBuilder
         // formulation to switch to. See
-        // bugs/prefer_layout_builder_for_constraints_false_positive_mediaquery_fallback_and_viewport_fraction.md.
+        // plans/history/2026.06/2026.06.14/prefer_layout_builder_for_constraints_false_positive_mediaquery_fallback_and_viewport_fraction.md.
         if (_isConstraintFinitenessFallback(node)) return;
         // A width/height passed as a POSITIONAL argument to a call is not
         // widget sizing — it is fed to a helper that decides a layout strategy,
@@ -3090,15 +3203,18 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Opacity') return;
 
-      // Check if opacity uses a conditional (suggests animation)
+      // Animation intent is detected from the expression node type, not from
+      // string substrings. The old heuristic flagged any source containing `?`
+      // or `_` (and any non-literal), which produced false positives on static
+      // const identifiers such as `opacity: _kDisabledOpacity` — a private
+      // const that is never animated — purely because the name contains an
+      // underscore. The canonical "should be AnimatedOpacity" smell, and the
+      // rule's own documented BAD example, is a state-toggled ternary
+      // (`_isVisible ? 1.0 : 0.0`), which is a ConditionalExpression. Match that
+      // node type directly so a plain const/variable reference no longer trips.
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'opacity') {
-          final String opacitySource = arg.expression.toSource();
-          // Check for ternary or variable (not literal)
-          if (opacitySource.contains('?') ||
-              opacitySource.contains('_') ||
-              (arg.expression is! DoubleLiteral &&
-                  arg.expression is! IntegerLiteral)) {
+          if (arg.expression is ConditionalExpression) {
             reporter.atNode(node.constructorName, code);
           }
         }
@@ -4540,6 +4656,16 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Stack') return;
 
+      // A Stack that declares its own `alignment` (or `fit`) positions its
+      // unwrapped children intentionally — the canonical badge-over-avatar
+      // pattern (`Stack(alignment: Alignment.bottomRight, children: [avatar,
+      // badge])`) relies on the Stack's alignment rather than per-child
+      // Positioned wrappers. Flagging those children was a false positive: the
+      // positioning IS explicit, just at the Stack level. Only Stacks with no
+      // alignment/fit fall back to the default top-left stacking this rule
+      // warns about, so gate on their absence.
+      if (_hasAlignmentOrFit(node)) return;
+
       // Find children parameter
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'children') {
@@ -4560,6 +4686,19 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// True when the Stack declares an explicit `alignment` or `fit` argument,
+  /// signaling that its children are positioned at the Stack level rather than
+  /// via per-child Positioned wrappers.
+  static bool _hasAlignmentOrFit(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression) {
+        final String argName = arg.name.label.name;
+        if (argName == 'alignment' || argName == 'fit') return true;
+      }
+    }
+    return false;
   }
 
   void _checkStackChild(Expression child, SaropaDiagnosticReporter reporter) {
@@ -4626,17 +4765,14 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  // Matches: items[index], data[i], rows[realIndex], widget.items[idx]
-  // Captures the list variable name (group 1)
-  static final RegExp _indexAccessPattern = RegExp(
-    r'(\b[a-zA-Z_][\w.]*)\s*\[\s*(?:index|i|idx|realIndex|itemIndex)\s*\]',
-  );
-
-  static final RegExp _comparisonOpPattern = RegExp(r'>=|>|<|<=');
-
-  static final RegExp _itemCountLengthPattern = RegExp(
-    r'(\b[a-zA-Z_][\w.]*?)\.length\b',
-  );
+  // Builder-callback parameter names that conventionally hold the item index.
+  static const Set<String> _indexParamNames = <String>{
+    'index',
+    'i',
+    'idx',
+    'realIndex',
+    'itemIndex',
+  };
 
   @override
   void runWithReporter(
@@ -4649,56 +4785,35 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
       final Expression builderExpr = node.expression;
       if (builderExpr is! FunctionExpression) return;
 
-      final FunctionBody body = builderExpr.body;
-      final String bodySource = body.toSource();
-
-      // Extract all list variables being accessed with [index] or [i]
-      final Iterable<RegExpMatch> matches = _indexAccessPattern.allMatches(
-        bodySource,
+      // AST traversal replaces the previous regex-over-toSource() approach.
+      // The old code (a) matched `[index]` inside strings/comments because it
+      // scanned rendered source, and (b) compared only the BASE list name
+      // (stripping the receiver chain via `_extractListName`), so a guard on a
+      // DIFFERENT object's same-named member — `other.items.length` — was
+      // wrongly accepted as covering `widget.items[index]`. Walking the AST and
+      // comparing FULL receiver chains (`other.items` vs `items`) fixes both:
+      // subscripts in string/comment text are never AST IndexExpressions, and a
+      // guard only counts when its receiver chain matches the subscript's.
+      final _BuilderBoundsCollector collector = _BuilderBoundsCollector(
+        _indexParamNames,
       );
-      if (matches.isEmpty) return;
+      builderExpr.body.accept(collector);
 
-      // Get unique list names being accessed
-      final Set<String> accessedLists = matches
-          .map((m) => m.group(1))
-          .whereType<String>()
-          .map(_extractListName) // Get base name for property access
-          .toSet();
+      final Set<String> accessedReceivers = collector.indexedReceivers;
+      if (accessedReceivers.isEmpty) return;
 
-      // Check if itemCount is bound to any accessed list's .length.
-      // When itemCount: list.length is set, Flutter guarantees
-      // index < list.length, making explicit bounds checks redundant.
-      final Set<String> itemCountBoundLists = _getItemCountBoundLists(node);
+      // `itemCount: list.length` on the same widget makes Flutter guarantee
+      // `0 <= index < list.length`, so that exact receiver chain is bounded.
+      final Set<String> itemCountBound = _getItemCountBoundReceivers(node);
 
-      // One combined RegExp per check type (avoid_regex_in_loop).
-      final String listNameAlternation = accessedLists
-          .map(RegExp.escape)
-          .join('|');
-      if (listNameAlternation.isEmpty) return;
-      final RegExp combinedLengthPattern = RegExp(
-        r'\b(' + listNameAlternation + r')\.length\b',
-      );
-      final RegExp combinedEmptyPattern = RegExp(
-        r'\b(' + listNameAlternation + r')\.(?:isEmpty|isNotEmpty)\b',
-      );
-      final bool hasComparisonOp = _comparisonOpPattern.hasMatch(bodySource);
-      final Set<String> listsWithLengthCheck = combinedLengthPattern
-          .allMatches(bodySource)
-          .map((m) => m.group(1))
-          .whereType<String>()
-          .toSet();
-      final Set<String> listsWithEmptyCheck = combinedEmptyPattern
-          .allMatches(bodySource)
-          .map((m) => m.group(1))
-          .whereType<String>()
-          .toSet();
-
-      // Check if ANY accessed list has a proper bounds check
-      for (final String listName in accessedLists) {
-        if (itemCountBoundLists.contains(listName)) continue;
-        final hasLength =
-            hasComparisonOp && listsWithLengthCheck.contains(listName);
-        final hasEmpty = listsWithEmptyCheck.contains(listName);
+      for (final String receiver in accessedReceivers) {
+        if (itemCountBound.contains(receiver)) continue;
+        final bool hasLength = collector.lengthGuardedReceivers.contains(
+          receiver,
+        );
+        final bool hasEmpty = collector.emptyCheckedReceivers.contains(
+          receiver,
+        );
         if (!hasLength && !hasEmpty) {
           reporter.atNode(node);
           return; // Report once per itemBuilder
@@ -4707,41 +4822,117 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
     });
   }
 
-  /// Extracts the base list name from property access patterns.
-  /// 'widget.items' -> 'items', 'items' -> 'items', '_data' -> '_data'
-  String _extractListName(String fullName) {
-    final int lastDot = fullName.lastIndexOf('.');
-    return lastDot >= 0 ? fullName.substring(lastDot + 1) : fullName;
-  }
-
-  /// Extracts list names that are bound via itemCount in sibling arguments.
-  ///
-  /// When `itemCount: contacts.length` is set on the same widget,
-  /// Flutter guarantees `0 <= index < contacts.length`, so explicit
-  /// bounds checks in `itemBuilder` are redundant for that list.
-  Set<String> _getItemCountBoundLists(NamedExpression itemBuilderNode) {
+  /// Receiver chains bound via `itemCount: <receiver>.length` on the sibling
+  /// arguments. The receiver chain is compared in full (e.g. `widget.items`),
+  /// so a count on one object's member never covers a subscript on another's.
+  Set<String> _getItemCountBoundReceivers(NamedExpression itemBuilderNode) {
     final AstNode? argumentList = itemBuilderNode.parent;
     if (argumentList is! ArgumentList) return const <String>{};
 
     for (final Expression arg in argumentList.arguments) {
       if (arg is NamedExpression && arg.name.label.name == 'itemCount') {
-        final String countSource = arg.expression.toSource();
-        // Match: list.length, widget.list.length, _list.length
-        final RegExpMatch? match = _itemCountLengthPattern.firstMatch(
-          countSource,
-        );
-        final String? group1 = match?.group(1);
-        if (group1 != null) {
-          return <String>{_extractListName(group1)};
-        }
+        final String? receiver = _lengthReceiverChain(arg.expression);
+        if (receiver != null) return <String>{receiver};
         break;
       }
     }
-
     return const <String>{};
   }
 
+  /// If [expr] is a `<receiver>.length` read, returns the canonical source of
+  /// `<receiver>` (the receiver chain); otherwise null.
+  static String? _lengthReceiverChain(Expression expr) {
+    if (expr is PrefixedIdentifier && expr.identifier.name == 'length') {
+      return expr.prefix.toSource();
+    }
+    if (expr is PropertyAccess && expr.propertyName.name == 'length') {
+      return expr.target?.toSource();
+    }
+    return null;
+  }
+
   // No quick fix - bounds checking requires knowing variable names and fallback widgets
+}
+
+/// Collects, from an `itemBuilder` body, the receiver chains that are
+/// subscripted with the builder index, plus the receiver chains that carry a
+/// `.length` comparison guard or an `.isEmpty`/`.isNotEmpty` check.
+///
+/// All keys are FULL receiver-chain source text (`items`, `widget.items`,
+/// `other.items`), so guards and subscripts only match when their receivers are
+/// the same expression — not merely the same trailing member name.
+class _BuilderBoundsCollector extends RecursiveAstVisitor<void> {
+  _BuilderBoundsCollector(this._indexParamNames);
+
+  final Set<String> _indexParamNames;
+
+  /// Receiver chains subscripted with the builder index: `items[index]`.
+  final Set<String> indexedReceivers = <String>{};
+
+  /// Receiver chains whose `.length` participates in a comparison
+  /// (`index >= items.length`).
+  final Set<String> lengthGuardedReceivers = <String>{};
+
+  /// Receiver chains checked via `.isEmpty` / `.isNotEmpty`.
+  final Set<String> emptyCheckedReceivers = <String>{};
+
+  @override
+  void visitIndexExpression(IndexExpression node) {
+    final Expression index = node.index;
+    if (index is SimpleIdentifier && _indexParamNames.contains(index.name)) {
+      final Expression? target = node.realTarget;
+      if (target != null) {
+        indexedReceivers.add(target.toSource());
+      }
+    }
+    super.visitIndexExpression(node);
+  }
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    // A `.length` read on either operand of a comparison marks that receiver as
+    // length-guarded. Restricting to comparison operators avoids treating an
+    // incidental `items.length` (e.g. an assignment) as a bounds guard.
+    if (_isComparison(node.operator.type)) {
+      _recordLengthReceiver(node.leftOperand);
+      _recordLengthReceiver(node.rightOperand);
+    }
+    super.visitBinaryExpression(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    // `items.isEmpty` / `items.isNotEmpty` where `items` is a simple receiver.
+    final String name = node.identifier.name;
+    if (name == 'isEmpty' || name == 'isNotEmpty') {
+      emptyCheckedReceivers.add(node.prefix.toSource());
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    // `widget.items.isEmpty` / `a.b.isNotEmpty` where the receiver is a chain.
+    final String name = node.propertyName.name;
+    if (name == 'isEmpty' || name == 'isNotEmpty') {
+      final Expression? target = node.target;
+      if (target != null) emptyCheckedReceivers.add(target.toSource());
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  void _recordLengthReceiver(Expression operand) {
+    final String? receiver = AvoidBuilderIndexOutOfBoundsRule
+        ._lengthReceiverChain(operand);
+    if (receiver != null) lengthGuardedReceivers.add(receiver);
+  }
+
+  static bool _isComparison(TokenType type) {
+    return type == TokenType.GT ||
+        type == TokenType.LT ||
+        type == TokenType.GT_EQ ||
+        type == TokenType.LT_EQ;
+  }
 }
 
 // =============================================================================

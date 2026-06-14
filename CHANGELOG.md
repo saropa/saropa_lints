@@ -76,6 +76,8 @@ Hardens the release pipeline so a missing dependency can no longer reach pub.dev
 
 ### Fixed
 
+- **A standalone `// ignore:` placed on its own line directly above a ternary `?`/`:` branch is now honored by the headless scanner.** Previously only a trailing same-line ignore suppressed a diagnostic reported on a ternary operand, so a correctly-placed leading ignore was silently dropped; add the ignore above the branch as expected and it now applies. No action required.
+
 - **`avoid_bloc_event_in_constructor` no longer flags `list.add(...)` or `controller.add(...)` in a Bloc constructor.** It flagged every method named `add`, so populating a local list or stream controller during construction was wrongly reported as dispatching a Bloc event; it now flags only an unqualified `add(event)` on the Bloc itself. No action required.
 - **`avoid_ref_in_dispose` and `avoid_ref_inside_state_dispose` no longer flag an unrelated field or local named `ref` used in `dispose()`.** They reported any `ref` by name, so a non-Riverpod object named `ref` was wrongly flagged; they now report only when `ref` resolves to Riverpod's `WidgetRef`/`Ref`. No action required.
 - **`avoid_nullable_async_value_pattern` no longer flags `.value` on a variable merely named with "async".** It matched the variable name, so any `asyncThing.value` on an unrelated type was wrongly reported; it now flags only `.value` on a real `AsyncValue`. No action required.
