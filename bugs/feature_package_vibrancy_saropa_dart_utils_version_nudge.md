@@ -1,14 +1,13 @@
-# FEATURE: Package Vibrancy — one-time bump nudge for an out-of-date `saropa_dart_utils`
+# FEATURE: Package Vibrancy — one-time dismissible nudge to bump an out-of-date `saropa_dart_utils`
 
 **Status: Open**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
 Created: 2026-06-14
+Updated: 2026-06-14 (re-scoped — detection already exists; only the nudge is missing)
 Area: Package Vibrancy (not a lint rule)
-File: `extension/src/vibrancy/` (subsystem); version-gap detection at
-`extension/src/vibrancy/providers/sdk-diagnostics.ts`; curated package registry at
-`extension/src/vibrancy/data/known_issues.json`
+File: `extension/src/vibrancy/` (subsystem)
 Severity: Feature request (Low) — quality-of-life nudge, no correctness impact
 Source: `saropa_dart_utils` Suite Integration plan, requirement R6
 (`D:\src\saropa_dart_utils\plans\SAROPA_SUITE_INTEGRATION.md`)
@@ -18,82 +17,61 @@ Source: `saropa_dart_utils` Suite Integration plan, requirement R6
 ## Summary
 
 When a project depends on an out-of-date `saropa_dart_utils`, Package Vibrancy
-should surface a single, gated "a newer `saropa_dart_utils` is available — bump it"
-nudge. This is the dependency-version mirror of the suite-discovery install nudge
-Drift Advisor and Lints already ship (a project that dev-depends on a suite package
-but lacks the matching extension is offered the install, once). Today no such
-version nudge exists for the suite's own pub packages.
+should show a single, dismissible "a newer `saropa_dart_utils` is available — bump
+it" message, gated so it never re-nags after the user bumps or dismisses it.
 
-This is the `saropa_dart_utils`-side R6. That package owns no extension and no IDE
-surface, so the nudge cannot live there — it rides Package Vibrancy, which already
-owns the workspace `pubspec.yaml` scan and a "behind latest" comparison.
+This is the dependency-version mirror of the suite-discovery install nudge Drift
+Advisor and Lints already ship (a project that dev-depends on a suite package but
+lacks the matching extension is offered the install, once).
 
 ---
 
-## Why it belongs in Package Vibrancy (attribution)
+## What already exists (do NOT rebuild)
 
-Package Vibrancy is a `saropa_lints` extension subsystem, and the version-gap
-machinery it would extend already lives here — so the work is "apply an existing
-mechanism to one more package," not "build a new capability."
+Package Vibrancy already **detects** out-of-date dependencies, including
+`saropa_dart_utils` — it is a normal pub dependency and is already scanned:
 
-```bash
-# Subsystem registration
-grep -rn "Package Vibrancy" extension/src/extension.ts
-# extension/src/extension.ts:1907: // Package Vibrancy subsystem — registers its own views, commands, and providers
+- `services/pub-outdated.ts` runs `dart pub outdated --json` across every
+  dependency, capturing `current` vs `latest`.
+- `scoring/status-classifier.ts` (`isUpdatable`) flags any package with a newer
+  version available, feeding the status-bar count and the package-tree
+  "update available" badge.
+- `services/freshness-watcher.ts` polls pub.dev and raises a "new version" toast.
 
-# "Behind latest" version-gap detection already exists (currently SDK/Flutter-scoped)
-grep -rn "behind latest\|latestVersion\|up-to-date" extension/src/vibrancy/providers/sdk-diagnostics.ts
-# sdk-diagnostics.ts:43: /** Don't show "behind latest" when SDK minimum is already at or above this. */
-# sdk-diagnostics.ts:74:  if (!isGreaterThan(latest, min)) { return 'up-to-date'; }
+So a project on a stale `saropa_dart_utils` **already sees it surfaced** as
+updatable. This feature does NOT need new detection, does NOT need to generalize
+the SDK-constraint comparator in `providers/sdk-diagnostics.ts`, and does NOT
+belong in `data/known_issues.json` (that registry is for end-of-life / deprecated
+packages — `saropa_dart_utils` is healthy, just behind).
 
-# Curated per-package registry exists (status/replacement/migrationNotes per package)
-grep -rn "\"name\"" extension/src/vibrancy/data/known_issues.json | head -3
-```
+---
 
-**Current gap:** `saropa_dart_utils` is absent from `known_issues.json`, and the
-"behind latest" comparison in `sdk-diagnostics.ts` targets the Dart/Flutter SDK
-constraints, not arbitrary pub dependencies. So neither path nudges on a stale
-`saropa_dart_utils` today.
+## The only missing piece
 
-```bash
-grep -rn "saropa_dart_utils" extension/src/vibrancy/
-# (no matches — the package is not tracked by Package Vibrancy)
-```
+The existing surfacing is **passive**: a badge in a list and a generic freshness
+toast covering all packages at once. There is no **targeted, one-time, dismissible
+prompt** specifically inviting the user to bump `saropa_dart_utils`, gated so it
+fires once per workspace and never reappears.
+
+That gated nudge — built on top of the update signal Vibrancy already computes —
+is the whole of this request.
 
 ---
 
 ## Requested behavior
 
-1. Track `saropa_dart_utils` as a Vibrancy-watched package. When the workspace
-   `pubspec.yaml` pins a version older than the latest stable, raise an
-   informational nudge: "A newer `saropa_dart_utils` (`<latest>`) is available —
-   you are on `<current>`. Bump it."
+1. When the existing scan reports `saropa_dart_utils` as updatable (current < latest),
+   raise an informational nudge: "A newer `saropa_dart_utils` (`<latest>`) is
+   available — you are on `<current>`. Bump it." Read `current`/`latest` from the
+   update info already on the scan result; do not add a new version lookup.
 2. **Gate once** using the existing offered/dismissed pattern (the same gate the
    suite-discovery install nudge uses), keyed per workspace, so it never re-nags
    after the user bumps or dismisses.
-3. Only fire when the project actually depends on `saropa_dart_utils` (read from
-   `pubspec.yaml`), exactly as the install nudge only fires when the matching
-   suite package is present — never on unrelated projects.
+3. Only fire when the project actually depends on `saropa_dart_utils` — which the
+   existing scan already determines, since it only scans declared dependencies.
 
-Out of scope: no auto-edit of `pubspec.yaml`, no forced upgrade. A nudge with a
-"don't show again" affordance, nothing more.
-
----
-
-## Design notes / open question for the maintainer
-
-- The cleanest reuse depends on which mechanism Vibrancy prefers for the
-  "outdated, but healthy" case:
-  - **Reuse the "behind latest" comparator** (`sdk-diagnostics.ts`) generalized
-    from SDK constraints to a named pub dependency — most direct, but requires a
-    source of "latest stable" for the package (pub.dev query or a pinned table).
-  - **Extend `known_issues.json`** — but its schema models `end_of_life` /
-    deprecated packages with a `replacement`, which `saropa_dart_utils` is NOT.
-    A stale-but-healthy package needs a different status (e.g. `outdated`) or a
-    separate registry, so this path likely needs a small schema addition.
-- Recommendation: generalize the "behind latest" comparator rather than overload
-  the end-of-life registry, so a healthy-but-stale package is not mislabeled as a
-  known issue. The maintainer owns this call.
+Out of scope: no auto-edit of `pubspec.yaml`, no forced upgrade, no new detection
+logic. A dismissible nudge with a "don't show again" affordance, nothing more.
 
 ---
 
@@ -103,7 +81,8 @@ Out of scope: no auto-edit of `pubspec.yaml`, no forced upgrade. A nudge with a
 - [ ] The nudge is gated once (bump or dismiss → never reappears).
 - [ ] A project not depending on `saropa_dart_utils` never sees it.
 - [ ] No nudge when already on the latest stable.
-- [ ] `CHANGELOG.md` (Vibrancy section) records the new watched package.
+- [ ] The nudge reuses the existing update signal (no new pub.dev lookup added).
+- [ ] `CHANGELOG.md` (Vibrancy section) records the new nudge.
 
 ---
 

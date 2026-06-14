@@ -226,3 +226,148 @@ its own separate authorization and was not run here; the publish coverage gate
 
 A pre-existing `tsc` error in `rulePacks/rulePacksWebviewProvider.ts` (`_handleStylisticBulk` missing)
 belongs to a separate in-progress workstream and is unrelated to the suite integration.
+
+---
+
+## Complete Status Report (updated 2026-06-14)
+
+Consolidated state of the whole suite integration — requirements, file inventory, the rejected
+shared-infrastructure extraction, the external review of that extraction (with verification against
+the repo), cross-repo state, commits, and open decisions. Written because several parallel sessions
+edited these repos at once; this section is the single source of truth for the end state.
+
+### TL;DR
+
+- Per-requirement integration work **R1–R7 is DONE and committed** in saropa_lints.
+- The shared-infrastructure extraction (3 proposed packages) was **REJECTED — WON'T DO**. Its 3 plan
+  docs are archived; the sibling bug copies were moved to each sibling's `plans/history`.
+- A later **external review** of a consolidated shared-infra doc surfaced 2 real factual errors + 3
+  substantive gaps + a stronger alternative. The reviewed consolidated doc itself is **not on disk**
+  in any of the 4 repos — but parts of the review map to real archived files (verified below).
+
+### 1. The integration
+
+Three sibling tools, three lenses on the same Flutter/Drift app, correlated without merging:
+
+| Tool | Sees | When | Emits |
+|------|------|------|-------|
+| `saropa_lints` (this repo) | Static code (AST) | Compile-time | findings |
+| `saropa_drift_advisor` | Live DB data + schema | Debug runtime | issues |
+| `saropa-log-capture` | Behavior/telemetry (logs, crashes) | Debug + prod | signals |
+| `saropa_dart_utils` | Remediation layer (not a 4th lens) | — | safe primitives |
+
+Shared contract = the **Saropa Diagnostic Envelope** (canonical schema owned by Drift Advisor's Plan
+67 §2). Tools write/read offline mirrors at `<workspace>/.saropa/diagnostics/<source>.json`.
+
+### 2. Requirements — all DONE
+
+| Req | What it does | Status | Key files (extension/src/) |
+|-----|--------------|--------|----------------------------|
+| R1 | Export findings as envelope to `.saropa/diagnostics/lints.json` on analysis settle | ✅ | suite/envelope.ts, suite/exporter.ts |
+| R2 | Consume sibling mirrors; badge rows "Advisor confirms" / "Log Capture saw N" | ✅ | suite/siblingEnvelopes.ts, views/consolidated/* |
+| R3 | Crash-to-rule attribution; prompt to enable the rule a crash would've prevented | ✅ | suite/crashToRule.ts, suite/crashCoverageNudge.ts |
+| R4 | Public deep-link command ids: explainRule / enableRule / openFinding | ✅ | suite/commands.ts, extension.ts |
+| R5 | Reciprocal deep-link OUT: Drift finding → "Show live Drift issues (Drift Advisor)" | ✅ | suite/siblingDeepLinkTargets.ts, suite/siblingDeepLinks.ts |
+| R6 | Stamp each exported diagnostic with the current commit SHA | ✅ | suite/commitSha.ts (+ exporter.ts) |
+| R7 | Once-gated nudge: project uses Drift Advisor → suggest installing Log Capture | ✅ | suite/suiteAwarenessGate.ts, suite/suiteAwarenessNudge.ts |
+
+i18n keys present under `suite.*` (fix, enableRule, openFinding, crashNudge, deepLink, nudge) and
+`consolidated.evidence.*` in `extension/src/i18n/locales/en.json`.
+
+### 3. Source + test inventory (`extension/src/suite/`)
+
+Source (11): commands.ts, commitSha.ts, crashCoverageNudge.ts, crashToRule.ts, envelope.ts,
+exporter.ts, siblingDeepLinkTargets.ts, siblingDeepLinks.ts, siblingEnvelopes.ts, suiteAwarenessGate.ts,
+suiteAwarenessNudge.ts
+
+Tests (5, all in the npm test glob): suiteEnvelope, suiteSiblingEnvelopes, suiteCrashToRule,
+suiteDeepLinks, suiteCommitSha → ~50 cases passing. `tsc --noEmit` clean for suite files. (One
+UNRELATED tsc error in `rulePacks/rulePacksWebviewProvider.ts` is a different workstream's WIP — not
+suite code.)
+
+### 4. Shared-infrastructure extraction — REJECTED (WON'T DO)
+
+Proposed: pull duplicated code from the 3 TS extensions into shared packages `saropa-vscode-i18n`,
+`saropa-vscode-ui`, `saropa-release-tools`. Rejected as over-engineering: 3 publishable units for 3
+in-house consumers cost more (versioning, up to 9 submodule links, lockstep releases, untested
+shared-toolkit burden) than the duplication they remove — zero user-facing benefit. Matches
+drift_advisor's Plan 67 §7 (same rejection, same day) + an independent review.
+
+Disposition:
+- 3 extraction plans ARCHIVED at `plans/history/2026.06/2026.06.14/SHARED_INFRA_{VSCODE_I18N,VSCODE_UI,RELEASE_TOOLS}.md`.
+- 6 task copies in siblings' `bugs/` were MOVED to each sibling's
+  `plans/history/2026.06/2026.06.14/shared_infra_*_extraction.md`.
+- Fallback if a shared bug recurs: a single path-dep module or vendoring/sync script scoped to the
+  code that hurt — NOT new published units.
+
+### 5. External review of the shared-infra plan — findings + verification
+
+**Factual errors**
+- `generate_translations.py` path is WRONG — listed under `extension/scripts/i18n/{…}`. CONFIRMED
+  wrong; the file is at `extension/scripts/generate_translations.py` (one level up). Present at
+  `plans/history/2026.06/2026.06.14/SHARED_INFRA_VSCODE_I18N.md:37`. Real, fixable.
+- Sibling-notes path is stale — a consolidated doc reportedly says it supersedes
+  `saropa_drift_advisor/bugs/shared_infra_*.md`. CONFIRMED those are not in `bugs/` — they are
+  archived at `saropa_drift_advisor/plans/history/2026.06/2026.06.14/shared_infra_*_extraction.md`.
+
+**Substantive gaps (all valid)**
+1. Submodule decision dismisses its own biggest cost — 3 pkgs × 3 consumers = 9 pinned submodule
+   links (detached HEAD, `--recursive` footguns, CI checkout, forgotten bumps). Never engages the
+   lighter alternative: ONE repo, 3 top-level dirs = ONE submodule per consumer (3 links). Build-step
+   1 also mixes "git mv/subtree for seeding" with "submodule for consuming" — two different ops that
+   read as a contradiction; spell them out.
+2. No story for testing a shared change against all 3 consumers. Pinned SHAs make a bugfix a 3-repo
+   bump, framed as a feature — but nothing says how you know a publish-guard fix doesn't break Drift
+   Advisor before merge. No CI integration; no shared-package test suites. A shared toolkit with no
+   tests of its own regresses the moment it leaves Lints. The least-specified, real maintenance cost.
+3. Divergence discovered too late. Forks are only diffed against the shared version at the consume
+   step, after the package is shaped by whatever Lints did. Mitigation should be proactive: diff all 3
+   forks UP FRONT to define the true shared surface before extraction.
+
+**Minor** — A consolidation that supersedes `plans/SHARED_INFRA_*.md` belongs in `plans/`, not
+`bugs/`. NOTE: the consolidated doc the review describes is NOT on disk in any of the 4 repos
+(searched); only the 3 per-package plans exist, archived. So this item can't be applied to an absent
+file.
+
+**Accurate / well-captured (no action)** — NLLB ABI single-interpreter risk; snapshot-test coupling;
+theme-token regression checks; the envelope rule (ship the loader, never the strings); the non-goals.
+
+**Reviewer's recommendation (strong, endorsed)** — One shared repo, three top-level directories,
+consumed as a single submodule per consumer. Same code cohesion (3 dirs stay separate), one-third the
+pinning surface, one CI to test all three layers together. Directly answers the costs that got the
+3-package version rejected.
+
+### 6. Cross-repo state
+
+- saropa_lints: `plans/SAROPA_SUITE_INTEGRATION.md` active (shared-infra section = WON'T DO).
+- saropa_drift_advisor: `plans/67-saropa-suite-integration.md` (canonical envelope owner; §7 also rejects extraction).
+- saropa-log-capture: `plans/105_plan-saropa-suite-integration.md`.
+- saropa_dart_utils: `plans/SAROPA_SUITE_INTEGRATION.md` (remediation layer; rule-id ↔ util-symbol map).
+- No live shared-infra artifacts in any sibling `bugs/` — all archived to `plans/history/2026.06.14`.
+
+### 7. Relevant commits (saropa_lints, newest first)
+
+- `5d1d3f54` docs(bugs): dart_utils version-nudge feature request; archive the 3 shared-infra plans
+- `777da857` docs(plans): the 3 shared-infra extraction plans (later archived)
+- `1044a8be` feat(suite): R6 — stamp diagnostics with commit SHA
+- `717fb710` feat(suite): R5 + R7 — reciprocal deep-links out + pairing nudge
+- `7be84584` feat(suite): R2 — dashboard runtime-evidence badges
+- `ad5225e5` feat(suite): R3 — crash-to-rule attribution
+- `4e2aa305` (R1 + R4 envelope/exporter/commands landed here, entangled with a rule-packs commit)
+
+### 8. Open items / decisions
+
+1. **CONTRADICTION TO RESOLVE.** The decision says extraction is WON'T DO; the review treats it as
+   live. Pick one:
+   - (a) Stays WON'T DO → only fix the `generate_translations.py` path in the archived i18n doc
+     (record accuracy); the review's 3 gaps are moot.
+   - (b) Reopened → create one consolidated `plans/SHARED_INFRA_EXTRACTION.md` incorporating the full
+     review (both path fixes, the 3 gaps engaged, the one-repo-three-dirs alternative as the
+     recommended mechanism), superseding the 3 archived plans.
+2. The reviewed consolidated doc is not on disk — if a draft exists, it must be saved somewhere
+   readable before its line-13/line-100 can be edited in place.
+3. Translated locale catalogs are STALE for the new suite keys (`suite.*`, `consolidated.evidence.*`).
+   Regen runs the NLLB pipeline — NOT run (authorization-gated). The publish coverage gate blocks a
+   release until regenerated. Command when authorized: `py -3 extension\scripts\generate_translations.py`.
+4. Device verification pending — suite features verified by unit tests + type-check, not in a running
+   VS Code host (envelope file written, badges render, deep-link lightbulb, nudge toast).
