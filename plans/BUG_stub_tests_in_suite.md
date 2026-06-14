@@ -223,3 +223,58 @@ encountered.
 (new `emptyBodyStubCountIn` tests), `plans/BUG_stub_tests_in_suite.md` (this
 report). Phase 1 + gate code landed earlier in commits `b086d7d6` and
 `29d62604` (gate code swept into a concurrent session's commit `0f739a8d`).
+
+## Finish Report (2026-06-14)
+
+**Scope:** (A) Dart analyzer-plugin tooling + (C) docs. The empty-body
+stub-test gate (`scanEmptyBodyStubTests` /
+[stub_density.dart](../lib/src/cli/project_health/stub_density.dart)) was a hard
+zero gate that counted any `test`/`testWidgets` whose callback is an empty block
+(`() {}`). A deliberately-skipped placeholder —
+`test('removeListener detection (Flutter-gated; not oracle-runnable)', () {}, skip: '...')`
+in [widget_lifecycle_fp_test.dart](../test/rules/widget/widget_lifecycle_fp_test.dart)
+— documents an un-runnable case (the rule returns early unless
+`isFlutterProject`, which the Flutter-less example package cannot satisfy). A
+`skip:`-ped test never executes, so its empty body cannot silently pass, yet the
+gate counted it and turned the guard test, CI, and the publish audit gate
+(exit 11) red. No real stub had been reintroduced; the gate's definition was too
+broad. Phase 2 (writing fixture-backed tests for the removed-stub backlog)
+remains deferred and is unaffected.
+
+**Deep review:**
+- `stub_density.dart`: `_EmptyBodyStubVisitor.visitMethodInvocation` now checks
+  for a `skip:` named argument before counting an empty body. The exclusion is
+  scoped to the empty-body visitor only — `_StubVisitor` (the broader
+  assertion-free heuristic) and `_AssertionDetector` are untouched. The
+  rationale is documented inline at the check, naming the failure mode (a
+  documented placeholder turning the gate red).
+- The check reads `NamedExpression.name.label.name == 'skip'`, matching the
+  package:test `skip:` parameter on both `test` and `testWidgets`. It does not
+  attempt to evaluate the skip value (a `skip: false` would still be excluded);
+  in practice the value is always a non-empty reason string, and a `skip: false`
+  empty-body test is itself meaningless, so the simpler name-presence check is
+  correct and avoids const-evaluation in a parse-only visitor.
+
+**Testing:**
+- 4A audit: the only tests referencing `emptyBodyStubCountIn` are
+  `test/project_health/fix_and_stub_test.dart` (extended here) and
+  `test/integrity/stub_test_guard_test.dart` (the live gate). No assertion
+  pinned the pre-fix "skipped empty body counts" behavior.
+- 4B new tests: added two cases to the `emptyBodyStubCountIn` group — a skipped
+  empty-body test is not counted, and (the over-reach guard) an empty-body test
+  with a non-`skip` named argument is still counted.
+- Ran `dart test test/project_health/fix_and_stub_test.dart test/integrity/stub_test_guard_test.dart`
+  — 14 pass (the empty-body gate, formerly red, is green). The same guard run
+  was confirmed red before the fix (1 empty-body stub in
+  `widget_lifecycle_fp_test.dart`).
+- `dart analyze --fatal-infos` on the changed Dart files: no issues.
+
+**Maintenance:** CHANGELOG updated (1 Maintenance entry: the gate no longer
+fails on a skipped placeholder). README verified — no updates needed (no rule or
+test count cited). ROADMAP — N/A (no lint entry changed). Guides reviewed —
+nothing user-facing. No bug archive — task did not close a `bugs/*.md` file.
+
+**Plan disposition:** stays ACTIVE, not moved/split. This task closed none of
+the plan's remaining scope (Phase 2); it restored the already-complete Phase 1
+gate to green after a definition gap let a legitimate skipped placeholder trip
+it. Phase 2 remains the outstanding work.
