@@ -28,6 +28,7 @@ export function getConfigDashboardScript(): string {
     SCRIPT_SORT,
     SCRIPT_KPI_AND_CHART,
     SCRIPT_DISABLED_RULES_SEARCH,
+    SCRIPT_STYLISTIC,
     SCRIPT_INIT,
   ].join('\n');
 }
@@ -161,42 +162,66 @@ const SCRIPT_FILTER_STATE = `
 
 /** Apply current filter state to rows + render the active-filter chip strip. */
 const SCRIPT_FILTER_APPLY = `
+  // Packs now live across two tables (detected / all) so every row query spans
+  // all .packs-tbody bodies instead of a single #packs-tbody.
+  function allPackTbodies() {
+    return Array.from(document.querySelectorAll('tbody.packs-tbody'));
+  }
+
+  function anyPackFilterActive() {
+    return !!(state.search || state.type !== 'all' || state.detectedOnly ||
+      state.enabledOnly || state.barPack || state.kpi);
+  }
+
   function applyFilters() {
-    const tbody = document.getElementById('packs-tbody');
-    if (!tbody) return;
-    const rows = Array.from(tbody.querySelectorAll('tr[data-pack]'));
-    let visible = 0;
-    rows.forEach(function(row) {
-      const label = row.getAttribute('data-label') || '';
-      const type = row.getAttribute('data-type') || '';
-      const detected = row.getAttribute('data-detected') === '1';
-      const enabled = row.getAttribute('data-enabled') === '1';
-      const pack = row.getAttribute('data-pack') || '';
-      let show = true;
-      if (state.search && label.indexOf(state.search) === -1) show = false;
-      if (state.type !== 'all' && state.type !== type) show = false;
-      if (state.detectedOnly && !detected) show = false;
-      if (state.enabledOnly && !enabled) show = false;
-      if (state.barPack && state.barPack !== pack) show = false;
-      if (state.kpi === 'enabled' && !enabled) show = false;
-      if (state.kpi === 'applicable-sdk' && !(type === 'sdk' && detected)) show = false;
-      row.style.display = show ? '' : 'none';
-      // Keep each pack's expander detail row in lockstep: force it hidden when
-      // the pack is filtered out; when shown, clear the override so the row's own
-      // hidden attribute (collapsed/expanded state) governs visibility.
-      const detail = tbody.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(pack) + '"]');
-      if (detail) detail.style.display = show ? '' : 'none';
-      if (show) visible++;
+    const tbodies = allPackTbodies();
+    if (tbodies.length === 0) return;
+    // When a filter is active, matches hidden inside a collapsed domain group or
+    // the collapsed "All packages" section would be invisible — open the ancestor
+    // <details> of every surviving row so results are actually seen.
+    const filtering = anyPackFilterActive();
+    tbodies.forEach(function(tbody) {
+      const rows = Array.from(tbody.querySelectorAll('tr[data-pack]'));
+      let visible = 0;
+      rows.forEach(function(row) {
+        const label = row.getAttribute('data-label') || '';
+        const type = row.getAttribute('data-type') || '';
+        const detected = row.getAttribute('data-detected') === '1';
+        const enabled = row.getAttribute('data-enabled') === '1';
+        const pack = row.getAttribute('data-pack') || '';
+        let show = true;
+        if (state.search && label.indexOf(state.search) === -1) show = false;
+        if (state.type !== 'all' && state.type !== type) show = false;
+        if (state.detectedOnly && !detected) show = false;
+        if (state.enabledOnly && !enabled) show = false;
+        if (state.barPack && state.barPack !== pack) show = false;
+        if (state.kpi === 'enabled' && !enabled) show = false;
+        if (state.kpi === 'applicable-sdk' && !(type === 'sdk' && detected)) show = false;
+        row.style.display = show ? '' : 'none';
+        // Keep each pack's expander detail row in lockstep with its summary row.
+        const detail = tbody.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(pack) + '"]');
+        if (detail) detail.style.display = show ? '' : 'none';
+        if (show) visible++;
+      });
+      renderEmptyRow(tbody, visible);
+      // Reveal the group chain when a filter is active and this table has a match.
+      if (filtering && visible > 0) {
+        let node = tbody.parentNode;
+        while (node && node !== document) {
+          if (node.tagName === 'DETAILS') node.open = true;
+          node = node.parentNode;
+        }
+      }
     });
-    renderEmptyRow(visible);
     renderFilterStrip();
   }
 
-  function renderEmptyRow(visible) {
-    const tbody = document.getElementById('packs-tbody');
-    if (!tbody) return;
+  // Per-table empty state: each pack table shows its own "no matches" row so a
+  // filter that empties one table still reads clearly in the other.
+  function renderEmptyRow(tbody, visible) {
     let empty = tbody.querySelector('tr.empty-row');
-    if (visible > 0) {
+    const hasRows = tbody.querySelector('tr[data-pack]');
+    if (visible > 0 || !hasRows) {
       if (empty) empty.remove();
       return;
     }
@@ -204,9 +229,9 @@ const SCRIPT_FILTER_APPLY = `
       empty = document.createElement('tr');
       empty.className = 'empty-row';
       empty.innerHTML = '<td colspan="7">No packs match the current filters. ' +
-        '<button type="button" class="reset-link" id="reset-filters-btn">Reset filters</button></td>';
+        '<button type="button" class="reset-link">Reset filters</button></td>';
       tbody.appendChild(empty);
-      const btn = document.getElementById('reset-filters-btn');
+      const btn = empty.querySelector('.reset-link');
       if (btn) btn.addEventListener('click', resetFilters);
     }
   }
@@ -313,28 +338,29 @@ const SCRIPT_SORT = `
   });
 
   function applySort() {
-    const tbody = document.getElementById('packs-tbody');
-    if (!tbody) return;
-    const rows = Array.from(tbody.querySelectorAll('tr[data-pack]'));
     const numericKeys = { rules: true, detected: true, enabled: true };
-    rows.sort(function(a, b) {
-      const av = a.getAttribute('data-' + state.sortKey) || '';
-      const bv = b.getAttribute('data-' + state.sortKey) || '';
-      let cmp;
-      if (numericKeys[state.sortKey]) {
-        cmp = (parseInt(av, 10) || 0) - (parseInt(bv, 10) || 0);
-      } else {
-        cmp = av.localeCompare(bv);
-      }
-      return state.sortDir === 'asc' ? cmp : -cmp;
-    });
-    // Re-append each pack row followed immediately by its expander detail row so
-    // the two stay paired (the detail row is a separate <tr>, not a child).
-    rows.forEach(function(r) {
-      tbody.appendChild(r);
-      const pack = r.getAttribute('data-pack');
-      const detail = tbody.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(pack) + '"]');
-      if (detail) tbody.appendChild(detail);
+    // Sort within each table independently so detected/all stay separate groups.
+    allPackTbodies().forEach(function(tbody) {
+      const rows = Array.from(tbody.querySelectorAll('tr[data-pack]'));
+      rows.sort(function(a, b) {
+        const av = a.getAttribute('data-' + state.sortKey) || '';
+        const bv = b.getAttribute('data-' + state.sortKey) || '';
+        let cmp;
+        if (numericKeys[state.sortKey]) {
+          cmp = (parseInt(av, 10) || 0) - (parseInt(bv, 10) || 0);
+        } else {
+          cmp = av.localeCompare(bv);
+        }
+        return state.sortDir === 'asc' ? cmp : -cmp;
+      });
+      // Re-append each pack row followed immediately by its expander detail row so
+      // the two stay paired (the detail row is a separate <tr>, not a child).
+      rows.forEach(function(r) {
+        tbody.appendChild(r);
+        const pack = r.getAttribute('data-pack');
+        const detail = tbody.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(pack) + '"]');
+        if (detail) tbody.appendChild(detail);
+      });
     });
     document.querySelectorAll('th.sortable').forEach(function(h) {
       h.setAttribute('aria-sort',
@@ -378,8 +404,16 @@ const SCRIPT_KPI_AND_CHART = `
         donut.removeAttribute('data-has-active');
       }
       applyFilters();
-      const tbl = document.getElementById('packs-table');
-      if (tbl && state.barPack) tbl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // The clicked pack may live in the collapsed "All packages" accordion;
+      // open its containing <details> and scroll the row into view.
+      if (state.barPack) {
+        const row = document.querySelector('tr[data-pack="' + cssEscape(state.barPack) + '"]');
+        if (row) {
+          const det = row.closest('details');
+          if (det) det.open = true;
+          row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
     }
     target.addEventListener('click', trigger);
     target.addEventListener('keydown', function(e) {
@@ -428,6 +462,67 @@ const SCRIPT_DISABLED_RULES_SEARCH = `
     const input = document.getElementById('disabled-rules-search');
     if (!input) return;
     input.addEventListener('input', applyDisabledRulesSearch);
+  })();
+`;
+
+/**
+ * Style & opinions section wiring: per-rule toggles (multi groups), pick-one
+ * radios (conflicting groups), enable-all / disable-all bulk actions, and a
+ * local substring search. Each write posts a message; the host writes the
+ * RULE OVERRIDES section and refreshes, so we do not mutate config in the page.
+ */
+const SCRIPT_STYLISTIC = `
+  // Multi-select group: each checkbox toggles one stylistic rule.
+  document.querySelectorAll('input[type=checkbox][data-stylistic-rule]').forEach(function(el) {
+    el.addEventListener('change', function() {
+      vscode.postMessage({ type: 'toggleRule', rule: el.getAttribute('data-stylistic-rule'), enabled: el.checked });
+    });
+  });
+
+  // Pick-one group: selecting a radio (including the "None" option, value="") sets the group.
+  document.querySelectorAll('input[type=radio][data-pack][name^="stylistic-"]').forEach(function(el) {
+    el.addEventListener('change', function() {
+      if (!el.checked) return;
+      vscode.postMessage({ type: 'selectStylistic', packId: el.getAttribute('data-pack'), rule: el.value });
+    });
+  });
+
+  // Enable-all / disable-all for a multi-select group.
+  document.querySelectorAll('button[data-stylistic-bulk]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      vscode.postMessage({
+        type: 'stylisticBulk',
+        packId: btn.getAttribute('data-pack'),
+        enabled: btn.getAttribute('data-stylistic-bulk') === 'enable',
+      });
+    });
+  });
+
+  // Local search across stylistic rule rows + radio rows; hides empty groups.
+  function applyStylisticSearch() {
+    const input = document.getElementById('stylistic-search');
+    if (!input) return;
+    const q = (input.value || '').trim().toLowerCase();
+    let totalVisible = 0;
+    document.querySelectorAll('.stylistic-group').forEach(function(group) {
+      let groupVisible = 0;
+      group.querySelectorAll('.stylistic-rule-row, .stylistic-radio-row').forEach(function(row) {
+        const name = (row.getAttribute('data-rule') || '').toLowerCase();
+        // The "None" radio (empty data-rule) always shows so a filtered pick-one
+        // group can still be cleared.
+        const show = !q || name === '' || name.indexOf(q) !== -1;
+        row.style.display = show ? '' : 'none';
+        if (show && name !== '') groupVisible++;
+      });
+      group.style.display = groupVisible === 0 && q ? 'none' : '';
+      totalVisible += groupVisible;
+    });
+    const emptyHint = document.getElementById('stylistic-empty-hint');
+    if (emptyHint) emptyHint.hidden = totalVisible !== 0 || !q;
+  }
+  (function wireStylisticSearch() {
+    const input = document.getElementById('stylistic-search');
+    if (input) input.addEventListener('input', applyStylisticSearch);
   })();
 `;
 
