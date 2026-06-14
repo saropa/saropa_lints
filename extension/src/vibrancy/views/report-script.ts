@@ -147,6 +147,12 @@ export function getReportScript(): string {
             // path that changes filter state (toolbar, chip removal, card,
             // chart, search) goes through one update site.
             updateResetViewVisibility();
+            // Keep the dependency network in sync with the rows just shown/
+            // hidden. renderNetwork is hoisted, so calling it here (even from
+            // the init-time applyFilters that runs before its declaration) is
+            // safe. It reads each row's display, so it must run after the
+            // forEach above has set visibility for this pass.
+            renderNetwork();
             saveUIState();
         }
 
@@ -1191,7 +1197,11 @@ export function getReportScript(): string {
          * unique-transitive layout below renders each label exactly once
          * at a stable Y, so labels can never collide regardless of how
          * many directs reference them. */
-        (function renderNetwork() {
+        /* Re-rendered on every applyFilters() pass (plus once at init) so the
+         * graph mirrors the table instead of freezing on the page-load dataset.
+         * Hoisted declaration — applyFilters() calls it before this line is
+         * reached at init, which is fine because function declarations hoist. */
+        function renderNetwork() {
             var host = document.getElementById('dep-network');
             if (!host) { return; }
             var raw = host.dataset.network || '[]';
@@ -1199,6 +1209,35 @@ export function getReportScript(): string {
             try { nodes = JSON.parse(raw); } catch (_err) { nodes = []; }
             if (!Array.isArray(nodes) || nodes.length === 0) {
                 host.textContent = 'No dependency relationship data.';
+                return;
+            }
+
+            /* Mirror the table's current filter state: a package appears in the
+             * graph only when its table row is visible, and an edge is drawn
+             * only when BOTH endpoints are visible. The table is the source of
+             * truth (applyFilters sets row.style.display), so reading that
+             * display here is what keeps the graph in sync with the age slider,
+             * dev-deps toggle, search, presets, and chart filters. Without this
+             * the graph silently showed packages the user had filtered out. */
+            var visibleNames = Object.create(null);
+            document.querySelectorAll('#pkg-body tr.pkg-row').forEach(function(r) {
+                if (r.style.display !== 'none') {
+                    visibleNames[r.dataset.name] = true;
+                }
+            });
+            nodes = nodes
+                .filter(function(n) { return visibleNames[n.name]; })
+                .map(function(n) {
+                    var nLinks = Array.isArray(n.links) ? n.links : [];
+                    /* Drop edges to filtered-out transitives so the right column
+                     * never lists a package the table is currently hiding. */
+                    return {
+                        name: n.name,
+                        links: nLinks.filter(function(d) { return visibleNames[d]; }),
+                    };
+                });
+            if (nodes.length === 0) {
+                host.textContent = 'No dependency relationship data for the current filters.';
                 return;
             }
 
@@ -1352,7 +1391,13 @@ export function getReportScript(): string {
                     navigateToPackageRow(target, owner);
                 });
             });
-        })();
+        }
+
+        /* Initial render. restoreUIState() short-circuits (and so never calls
+         * applyFilters) on a first-ever open with no saved state, so the graph
+         * must be drawn explicitly here too — applyFilters covers every later
+         * filter change, this covers the cold start. */
+        renderNetwork();
 
         /* ---- Row expansion (chevron click toggles detail row) ---- */
 
@@ -1535,6 +1580,10 @@ export function getReportScript(): string {
                 openDetailPane(msg.package);
             }
         });
+        /* Tell the host the message listener is live so a select requested
+         * right after the dashboard opens (from hover / sidebar) is delivered
+         * rather than dropped against a not-yet-ready webview. */
+        vscode.postMessage({ type: 'dashboardReady' });
 
         function toggleDetail(pkgRow) {
             var name = pkgRow.dataset.name;
