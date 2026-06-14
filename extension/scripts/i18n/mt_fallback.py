@@ -767,6 +767,18 @@ def _translate_one(locale: str, text: str, *, cache: dict[str, str], primary: st
         _record_engine(locale, "cached")
         return cached
 
+    # Cooperative cancel: once a graceful stop is requested, never START a fresh
+    # (slow) live MT call for an uncached string. prefetch breaks between strings,
+    # but generate_locales' per-leaf mapping pass still calls this for EVERY
+    # remaining string in the in-flight locale — so without this guard a single
+    # Ctrl-C silently translates the rest of that locale before exiting, which the
+    # operator experiences as "cancel never ends". Clean cached entries above are
+    # still served (already-paid work); uncached ones become an English gap the
+    # next run resumes and fills. Not recorded in the engine/fallback tallies:
+    # these were cancelled before any attempt, not strings an engine could not do.
+    if stop_requested():
+        return text
+
     if not _mt_env_enabled():
         # MT off this run; a poisoned/absent entry can't be healed, so fall back
         # to English (the coverage gate flags it) rather than ship garbage.
