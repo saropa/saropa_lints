@@ -26,6 +26,13 @@ export function getReportScript(): string {
         var sortAsc = true;
         var isRestoringState = false;
 
+        /* Dependency-graph depth. false = collapsed at depth 1 (direct deps
+         * only) — the default so large graphs open readable; true = also show
+         * the depth-2 transitive column and edges. Held at script scope so a
+         * filter-driven re-render preserves the user's expand choice instead of
+         * snapping back to collapsed. */
+        var networkExpanded = false;
+
         /* ---- Filter state (shared across card, chart, and search filters) ---- */
         var activeCardFilter = null;
         var chartFilterPackage = null;
@@ -1197,6 +1204,75 @@ export function getReportScript(): string {
          * unique-transitive layout below renders each label exactly once
          * at a stable Y, so labels can never collide regardless of how
          * many directs reference them. */
+        /* Build the network toolbar markup (zoom, reset, depth toggle). Pure
+         * string builder — no DOM/closure deps — so it stays out of the big
+         * render function. The toggle label names the hidden depth-2 count so
+         * the user knows expanding has something to show. Strings are hardcoded
+         * to match this client script's existing convention (it has no l10n
+         * runtime — l10n() executes host-side, not in the webview). */
+        function buildNetworkToolbar(expanded, transitiveCount) {
+            var toggleLabel = expanded
+                ? 'Collapse to direct deps'
+                : 'Expand transitives (' + transitiveCount + ')';
+            return '<div class="network-toolbar">' +
+                '<button type="button" class="network-btn" data-net-act="zoom-out" title="Zoom out" aria-label="Zoom out">−</button>' +
+                '<button type="button" class="network-btn" data-net-act="zoom-in" title="Zoom in" aria-label="Zoom in">+</button>' +
+                '<button type="button" class="network-btn" data-net-act="reset" title="Reset view" aria-label="Reset view">Reset view</button>' +
+                '<button type="button" class="network-btn network-btn-toggle" data-net-act="toggle">' + toggleLabel + '</button>' +
+                '</div>';
+        }
+
+        /* Compute the SVG layout for the given visible nodes. Returns the inner
+         * markup, the natural canvas size, and a name->point map used to focus a
+         * clicked node. When collapsed (depth 1) only the direct column is drawn
+         * — no transitive column, no edges — which is what keeps a large graph
+         * readable on first open. */
+        function buildNetworkLayout(nodes, transitives, expanded) {
+            var rowH = 18, topPad = 24, botPad = 16, leftX = 12, leftColW = 220, rightColW = 220, gap = 120;
+            var rightX = leftX + leftColW + gap;
+            var posByName = Object.create(null);
+            var parts = [];
+
+            var directY = Object.create(null);
+            for (var di = 0; di < nodes.length; di++) {
+                directY[nodes[di].name] = topPad + di * rowH;
+            }
+
+            // Depth-2 column + edges only when expanded.
+            if (expanded) {
+                var transitiveY = Object.create(null);
+                for (var ti = 0; ti < transitives.length; ti++) {
+                    transitiveY[transitives[ti]] = topPad + ti * rowH;
+                }
+                // Edges first so node text renders on top of the line ends.
+                for (var ei = 0; ei < nodes.length; ei++) {
+                    var y1 = directY[nodes[ei].name];
+                    var elinks = Array.isArray(nodes[ei].links) ? nodes[ei].links : [];
+                    for (var ej = 0; ej < elinks.length; ej++) {
+                        var y2 = transitiveY[elinks[ej]];
+                        if (y2 == null) { continue; }
+                        parts.push('<line x1="' + (leftX + leftColW) + '" y1="' + (y1 - 4) + '" x2="' + rightX + '" y2="' + (y2 - 4) + '" class="network-edge network-edge-link" data-owner="' + nodes[ei].name + '" data-target="' + elinks[ej] + '" />');
+                    }
+                }
+                for (var tj = 0; tj < transitives.length; tj++) {
+                    var ty = transitiveY[transitives[tj]];
+                    posByName[transitives[tj]] = { x: rightX, y: ty };
+                    parts.push('<text x="' + rightX + '" y="' + ty + '" class="network-node transitive network-node-link" data-target="' + transitives[tj] + '" role="button" tabindex="0">' + transitives[tj] + '</text>');
+                }
+            }
+
+            for (var ni2 = 0; ni2 < nodes.length; ni2++) {
+                var dy = directY[nodes[ni2].name];
+                posByName[nodes[ni2].name] = { x: leftX, y: dy };
+                parts.push('<text x="' + leftX + '" y="' + dy + '" class="network-node direct network-node-link" data-owner="' + nodes[ni2].name + '" data-target="' + nodes[ni2].name + '" role="button" tabindex="0">' + nodes[ni2].name + '</text>');
+            }
+
+            var rowCount = expanded ? Math.max(nodes.length, transitives.length) : nodes.length;
+            var width = expanded ? (leftX + leftColW + gap + rightColW + 12) : (leftX + leftColW + 12);
+            var height = topPad + rowCount * rowH + botPad;
+            return { width: width, height: height, inner: parts.join(''), posByName: posByName };
+        }
+
         /* Re-rendered on every applyFilters() pass (plus once at init) so the
          * graph mirrors the table instead of freezing on the page-load dataset.
          * Hoisted declaration — applyFilters() calls it before this line is
@@ -1241,77 +1317,111 @@ export function getReportScript(): string {
                 return;
             }
 
-            /* Build the unique transitive list in first-seen order so the
-             * right column is at least loosely correlated with the left
-             * column (the first directs introduce the first transitives). */
+            // Unique depth-2 transitives in first-seen order (only drawn when
+            // the graph is expanded; still counted here for the toggle label).
             var seen = Object.create(null);
             var transitives = [];
             for (var ni = 0; ni < nodes.length; ni++) {
                 var nlinks = Array.isArray(nodes[ni].links) ? nodes[ni].links : [];
                 for (var li = 0; li < nlinks.length; li++) {
-                    var depName = nlinks[li];
-                    if (!seen[depName]) {
-                        seen[depName] = true;
-                        transitives.push(depName);
-                    }
+                    if (!seen[nlinks[li]]) { seen[nlinks[li]] = true; transitives.push(nlinks[li]); }
                 }
             }
 
-            var rowH = 18;
-            var topPad = 24;
-            var botPad = 16;
-            var leftX = 12;
-            var leftColW = 220;
-            var rightColW = 220;
-            var gap = 120;
-            var rightX = leftX + leftColW + gap;
-            var width = leftX + leftColW + gap + rightColW + 12;
-            var rowCount = Math.max(nodes.length, transitives.length);
-            var height = topPad + rowCount * rowH + botPad;
+            // preserveAspectRatio="xMidYMid meet" scales the content uniformly
+            // to fit the fixed-height viewport — no axis squash (the failure the
+            // old natural-pixel layout was guarding against), because the inner
+            // coordinate system is fixed and only the viewBox changes for zoom.
+            var layout = buildNetworkLayout(nodes, transitives, networkExpanded);
+            host.innerHTML =
+                buildNetworkToolbar(networkExpanded, transitives.length) +
+                '<svg class="network-svg" role="img" aria-label="Dependency network"' +
+                ' preserveAspectRatio="xMidYMid meet" viewBox="0 0 ' + layout.width + ' ' + layout.height + '">' +
+                layout.inner +
+                '</svg>';
 
-            var directY = Object.create(null);
-            for (var di = 0; di < nodes.length; di++) {
-                directY[nodes[di].name] = topPad + di * rowH;
+            var svg = host.querySelector('.network-svg');
+            if (!svg) { return; }
+
+            // viewBox is the single source of zoom + pan. Reset to fit-all on
+            // every (re)render: a filter change alters the node set, so refitting
+            // is the predictable behavior; zoom/pan/focus adjust the live view.
+            var natW = layout.width, natH = layout.height;
+            var vb = { x: 0, y: 0, w: natW, h: natH };
+            function applyViewBox() {
+                svg.setAttribute('viewBox', vb.x + ' ' + vb.y + ' ' + vb.w + ' ' + vb.h);
             }
-            var transitiveY = Object.create(null);
-            for (var ti = 0; ti < transitives.length; ti++) {
-                transitiveY[transitives[ti]] = topPad + ti * rowH;
+            // factor < 1 magnifies (smaller viewBox). Clamp 0.2x–4x of natural
+            // so the graph can't be scaled off into empty space and lost.
+            function zoomAround(cx, cy, factor) {
+                var nw = Math.max(natW * 0.2, Math.min(natW * 4, vb.w * factor));
+                var nh = Math.max(natH * 0.2, Math.min(natH * 4, vb.h * factor));
+                vb.x = cx - (cx - vb.x) * (nw / vb.w);
+                vb.y = cy - (cy - vb.y) * (nh / vb.h);
+                vb.w = nw; vb.h = nh;
+                applyViewBox();
             }
-
-            /* Fixed pixel size on the SVG (not viewBox + width:100%)
-             * because the panel was previously squashing rows on top of
-             * each other when the container was narrower than the
-             * viewBox. The .network-canvas container scrolls instead. */
-            var parts = [];
-            parts.push('<svg width="' + width + '" height="' + height + '" class="network-svg" role="img" aria-label="Dependency network">');
-
-            /* Draw edges first so node text renders on top of line ends. */
-            for (var ei = 0; ei < nodes.length; ei++) {
-                var node = nodes[ei];
-                var y1 = directY[node.name];
-                var elinks = Array.isArray(node.links) ? node.links : [];
-                for (var ej = 0; ej < elinks.length; ej++) {
-                    var depName2 = elinks[ej];
-                    var y2 = transitiveY[depName2];
-                    if (y2 == null) { continue; }
-                    parts.push('<line x1="' + (leftX + leftColW) + '" y1="' + (y1 - 4) + '" x2="' + rightX + '" y2="' + (y2 - 4) + '" class="network-edge network-edge-link" data-owner="' + node.name + '" data-target="' + depName2 + '" />');
-                }
-            }
-
-            for (var ni2 = 0; ni2 < nodes.length; ni2++) {
-                var dn = nodes[ni2];
-                var dy = directY[dn.name];
-                parts.push('<text x="' + leftX + '" y="' + dy + '" class="network-node direct network-node-link" data-owner="' + dn.name + '" data-target="' + dn.name + '" role="button" tabindex="0">' + dn.name + '</text>');
+            function zoomCenter(factor) { zoomAround(vb.x + vb.w / 2, vb.y + vb.h / 2, factor); }
+            function resetView() { vb.x = 0; vb.y = 0; vb.w = natW; vb.h = natH; applyViewBox(); }
+            function focusOn(pos) {
+                if (!pos) { return; }
+                vb.x = pos.x - vb.w / 2;
+                vb.y = pos.y - vb.h / 2;
+                applyViewBox();
             }
 
-            for (var tj = 0; tj < transitives.length; tj++) {
-                var tn = transitives[tj];
-                var ty = transitiveY[tn];
-                parts.push('<text x="' + rightX + '" y="' + ty + '" class="network-node transitive network-node-link" data-target="' + tn + '" role="button" tabindex="0">' + tn + '</text>');
-            }
+            // Toolbar: zoom, reset, and the depth toggle (re-renders flipped).
+            host.querySelectorAll('.network-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    var act = btn.getAttribute('data-net-act');
+                    if (act === 'zoom-in') { zoomCenter(0.8); }
+                    else if (act === 'zoom-out') { zoomCenter(1.25); }
+                    else if (act === 'reset') { resetView(); }
+                    else if (act === 'toggle') { networkExpanded = !networkExpanded; renderNetwork(); }
+                });
+            });
 
-            parts.push('</svg>');
-            host.innerHTML = parts.join('');
+            // Drag empty canvas to pan; wheel to zoom around the cursor. A
+            // pointerdown that lands on a node/edge is left alone so its click
+            // still fires (pointer capture would otherwise swallow it).
+            var dragging = false, startCX = 0, startCY = 0, startVBX = 0, startVBY = 0;
+            svg.addEventListener('pointerdown', function(e) {
+                if (e.button !== 0) { return; }
+                var t = e.target;
+                if (t && t.classList && (t.classList.contains('network-node-link') || t.classList.contains('network-edge-link'))) { return; }
+                dragging = true;
+                startCX = e.clientX; startCY = e.clientY;
+                startVBX = vb.x; startVBY = vb.y;
+                svg.classList.add('network-panning');
+                try { svg.setPointerCapture(e.pointerId); } catch (_e) {}
+            });
+            svg.addEventListener('pointermove', function(e) {
+                if (!dragging) { return; }
+                var rect = svg.getBoundingClientRect();
+                if (!rect.width || !rect.height) { return; }
+                // Pixel delta -> viewBox units so the grabbed point tracks the
+                // cursor at any zoom level.
+                vb.x = startVBX - (e.clientX - startCX) * (vb.w / rect.width);
+                vb.y = startVBY - (e.clientY - startCY) * (vb.h / rect.height);
+                applyViewBox();
+            });
+            function endPan(e) {
+                if (!dragging) { return; }
+                dragging = false;
+                svg.classList.remove('network-panning');
+                try { svg.releasePointerCapture(e.pointerId); } catch (_e) {}
+            }
+            svg.addEventListener('pointerup', endPan);
+            svg.addEventListener('pointercancel', endPan);
+            svg.addEventListener('wheel', function(e) {
+                e.preventDefault();
+                var rect = svg.getBoundingClientRect();
+                if (!rect.width || !rect.height) { return; }
+                var cx = vb.x + ((e.clientX - rect.left) / rect.width) * vb.w;
+                var cy = vb.y + ((e.clientY - rect.top) / rect.height) * vb.h;
+                zoomAround(cx, cy, e.deltaY > 0 ? 1.1 : 0.9);
+            });
 
             function clearNetworkSelection() {
                 host.querySelectorAll('.network-selected').forEach(function(el) {
@@ -1319,15 +1429,12 @@ export function getReportScript(): string {
                 });
             }
 
-            /* Highlight a single direct → transitive edge plus both nodes.
-             * Used when the user clicks an edge or a direct row. */
+            // Highlight a single direct → transitive edge plus both nodes.
             function highlightEdge(owner, target) {
                 clearNetworkSelection();
-                /* Direct's own row (it has data-owner === data-target). */
                 host.querySelectorAll('.network-node-link[data-owner="' + owner + '"][data-target="' + owner + '"]').forEach(function(el) {
                     el.classList.add('network-selected');
                 });
-                /* Transitive's row (no data-owner — it's a shared label). */
                 host.querySelectorAll('.network-node.transitive[data-target="' + target + '"]').forEach(function(el) {
                     el.classList.add('network-selected');
                 });
@@ -1336,10 +1443,8 @@ export function getReportScript(): string {
                 });
             }
 
-            /* Clicking a transitive highlights ALL incoming edges and
-             * every direct that depends on it. This gives the user a
-             * "who pulls in X?" view, which the per-row bundle layout
-             * couldn't surface at all. */
+            // Clicking a transitive highlights every incoming edge and each
+            // direct that pulls it in ("who depends on X?").
             function highlightTransitive(target) {
                 clearNetworkSelection();
                 host.querySelectorAll('.network-node.transitive[data-target="' + target + '"]').forEach(function(el) {
@@ -1362,17 +1467,14 @@ export function getReportScript(): string {
                     var target = nodeEl.getAttribute('data-target') || '';
                     if (!target) { return; }
                     if (owner && owner === target) {
-                        /* Direct row click — highlight self only and
-                         * navigate to its row in the table. */
                         clearNetworkSelection();
                         nodeEl.classList.add('network-selected');
-                        navigateToPackageRow(target, null);
                     } else {
-                        /* Transitive row click — show every direct that
-                         * pulls it in, then jump to its row. */
                         highlightTransitive(target);
-                        navigateToPackageRow(target, null);
                     }
+                    // Focus the clicked node in the graph, then jump to its row.
+                    focusOn(layout.posByName[target]);
+                    navigateToPackageRow(target, null);
                 }
                 nodeEl.addEventListener('click', runNavigation);
                 nodeEl.addEventListener('keydown', function(e) {
@@ -1388,6 +1490,7 @@ export function getReportScript(): string {
                     var target = edgeEl.getAttribute('data-target') || '';
                     if (!owner || !target) { return; }
                     highlightEdge(owner, target);
+                    focusOn(layout.posByName[target]);
                     navigateToPackageRow(target, owner);
                 });
             });

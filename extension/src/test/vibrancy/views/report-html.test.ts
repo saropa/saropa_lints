@@ -6,7 +6,7 @@
  */
 
 import * as assert from 'assert';
-import { buildReportHtml, buildSparklineSvg, ReportOptions } from '../../../vibrancy/views/report-html';
+import { buildReportHtml, buildSparklineSvg, computePublishedAgeMonths, ReportOptions } from '../../../vibrancy/views/report-html';
 import { buildPackageDetailBody } from '../../../vibrancy/views/package-detail-html';
 import { VibrancyResult } from '../../../vibrancy/types';
 
@@ -1604,5 +1604,72 @@ describe('report: Total Size caveat names dev_dependencies', () => {
             /summary-card total-size[^>]*title="[^"]*dev_dependencies/.test(html),
             'Total Size card tooltip should name dev_dependencies as excluded',
         );
+    });
+});
+
+describe('report: published-age math (computePublishedAgeMonths)', () => {
+    // Real pub.dev publish instant for device_calendar 4.3.3 (from the pub.dev
+    // API). Pinning a known package keeps the regression tied to a value a
+    // maintainer can re-verify, while a fixed `now` keeps the assertion
+    // deterministic — the age must not depend on wall-clock time.
+    const deviceCalendar433Published = '2024-09-29T02:43:09.550526Z';
+    const utc = (iso: string): Date => new Date(Date.parse(iso));
+
+    it('reports device_calendar 4.3.3 as exactly 12 months at its first anniversary', () => {
+        const age = computePublishedAgeMonths(
+            deviceCalendar433Published,
+            utc('2025-09-29T00:00:00Z'),
+        );
+        assert.strictEqual(age, 12);
+    });
+
+    it('rolls back a month one day before the anniversary (day-of-month aware, not days/365)', () => {
+        // 2024-09-29 → 2025-09-28 is 11 whole months, not 12. This is the exact
+        // boundary the naive days/365 calculation got wrong.
+        const age = computePublishedAgeMonths(
+            deviceCalendar433Published,
+            utc('2025-09-28T23:59:59Z'),
+        );
+        assert.strictEqual(age, 11);
+    });
+
+    it('counts whole calendar months across a year boundary', () => {
+        // 2024-09-29 → 2026-06-14: 21 months elapsed, minus one because day 14
+        // has not yet reached day 29 in the final month → 20.
+        const age = computePublishedAgeMonths(
+            deviceCalendar433Published,
+            utc('2026-06-14T00:00:00Z'),
+        );
+        assert.strictEqual(age, 20);
+    });
+
+    it('is timezone-neutral — the same UTC instant yields the same age', () => {
+        // Two Date objects for the same instant (one constructed from a +10:00
+        // offset string) must give an identical month count, proving the math
+        // reads UTC fields and is not skewed by local time.
+        const nowZ = utc('2025-09-29T00:00:00Z');
+        const nowOffset = new Date(Date.parse('2025-09-29T10:00:00+10:00'));
+        assert.strictEqual(
+            computePublishedAgeMonths(deviceCalendar433Published, nowZ),
+            computePublishedAgeMonths(deviceCalendar433Published, nowOffset),
+        );
+    });
+
+    it('returns 0 for the publish instant itself and never goes negative', () => {
+        assert.strictEqual(
+            computePublishedAgeMonths(deviceCalendar433Published, utc(deviceCalendar433Published)),
+            0,
+        );
+        // A `now` before the publish date clamps at 0 rather than reporting a
+        // negative age.
+        assert.strictEqual(
+            computePublishedAgeMonths(deviceCalendar433Published, utc('2024-01-01T00:00:00Z')),
+            0,
+        );
+    });
+
+    it('returns null for missing or unparseable dates', () => {
+        assert.strictEqual(computePublishedAgeMonths(null), null);
+        assert.strictEqual(computePublishedAgeMonths('not-a-date', utc('2025-09-29T00:00:00Z')), null);
     });
 });

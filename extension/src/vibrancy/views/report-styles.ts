@@ -932,17 +932,48 @@ export function getReportStyles(): string {
             margin-bottom: 8px;
         }
         .network-canvas {
-            /* Both axes scroll: the SVG uses natural pixel dimensions so
-             * labels never get squashed by a narrow container (which is
-             * what produced the previous overlapping-text corruption when
-             * the panel was rendered with width: 100% + height: auto). */
+            /* Fixed-height viewport. Zoom/pan is driven by the SVG viewBox, not
+             * container scroll, so overflow is hidden — preserveAspectRatio
+             * "meet" scales the content uniformly inside, which is what avoids
+             * the label-squash the old natural-pixel + width:100% layout hit. */
             margin-top: 8px;
-            overflow: auto;
-            max-height: 420px;
+            overflow: hidden;
             border-top: 1px solid var(--vscode-widget-border);
             padding-top: 8px;
         }
-        .network-svg { display: block; }
+        .network-toolbar {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+        .network-btn {
+            cursor: pointer;
+            font: inherit;
+            font-size: 0.85em;
+            min-width: 26px;
+            padding: 2px 8px;
+            color: var(--vscode-button-secondaryForeground, var(--vscode-foreground));
+            background: var(--vscode-button-secondaryBackground, var(--vscode-editor-inactiveSelectionBackground));
+            border: 1px solid var(--vscode-widget-border);
+            border-radius: 4px;
+        }
+        .network-btn:hover {
+            background: var(--vscode-button-secondaryHoverBackground, var(--vscode-toolbar-hoverBackground));
+        }
+        .network-btn-toggle { margin-left: auto; }
+        .network-svg {
+            display: block;
+            width: 100%;
+            height: 380px;
+            /* touch-action:none lets a pointer drag pan without the browser
+             * hijacking the gesture for page scroll/zoom. grab/grabbing cursor
+             * signals the canvas is draggable. */
+            touch-action: none;
+            cursor: grab;
+        }
+        .network-svg.network-panning { cursor: grabbing; }
         .network-edge {
             stroke: var(--vscode-widget-border);
             stroke-width: 1;
