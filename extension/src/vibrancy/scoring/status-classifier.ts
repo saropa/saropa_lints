@@ -93,10 +93,17 @@ export function classifyStatus(params: {
         category = 'outdated';
     }
 
-    // SDK-adjacent packages often score in the "stable" band because the formula
-    // weights GitHub churn; trusted publishers are not "low activity" risks.
-    if (category === 'stable' && isTrustedPublisher(params.pubDev?.publisher)) {
-        return 'vibrant';
+    // SDK-adjacent packages often score in the "stable"/"outdated" bands because the
+    // formula weights GitHub churn and the dormancy caps above penalize the long
+    // release gaps typical of finished, first-party packages (e.g. path_provider,
+    // which publishes rarely precisely because it is complete). Trusted publishers
+    // are not "low activity" risks, so lift one band each. Promote exactly once
+    // (not a cascade outdated -> stable -> vibrant) so a genuinely low-scoring
+    // first-party package still reads as 'stable', not 'vibrant'. 'abandoned' and
+    // the hard EOL signals handled at the top are intentionally left untouched.
+    if (isTrustedPublisher(params.pubDev?.publisher)) {
+        if (category === 'stable') { return 'vibrant'; }
+        if (category === 'outdated') { return 'stable'; }
     }
     return category;
 }

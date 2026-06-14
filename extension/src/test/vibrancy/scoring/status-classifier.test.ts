@@ -174,6 +174,43 @@ describe('status-classifier', () => {
             assert.strictEqual(cat, 'vibrant');
         });
 
+        it('should upgrade outdated to stable for flutter.dev, but not all the way to vibrant', () => {
+            // A finished first-party package (e.g. path_provider) can score into the
+            // 'outdated' band on low GitHub churn / long release gaps. Trust lifts it
+            // one band to 'stable' — not a cascade to 'vibrant'.
+            const cat = classifyStatus({
+                score: 30,
+                knownIssue: null,
+                pubDev: {
+                    name: 'path_provider', latestVersion: '2.1.5', publishedDate: '',
+                    repositoryUrl: null, isDiscontinued: false, isUnlisted: false,
+                    pubPoints: 130,
+                    publisher: 'flutter.dev',
+                    license: null,
+                    description: null,
+                    topics: [], dependencies: [],
+                },
+            });
+            assert.strictEqual(cat, 'stable');
+        });
+
+        it('should keep outdated when publisher is not trusted', () => {
+            const cat = classifyStatus({
+                score: 30,
+                knownIssue: null,
+                pubDev: {
+                    name: 'foo', latestVersion: '1.0.0', publishedDate: '',
+                    repositoryUrl: null, isDiscontinued: false, isUnlisted: false,
+                    pubPoints: 80,
+                    publisher: 'example.com',
+                    license: null,
+                    description: null,
+                    topics: [], dependencies: [],
+                },
+            });
+            assert.strictEqual(cat, 'outdated');
+        });
+
         it('should keep stable when publisher is not trusted', () => {
             const cat = classifyStatus({
                 score: 55,
