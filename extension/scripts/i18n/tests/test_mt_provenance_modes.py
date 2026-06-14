@@ -144,6 +144,36 @@ class TestStopFlag(_Base):
             mt.prefetch_machine_translations("de", ["A", "B", "C"], cache=cache, dict_table={})
         nf.assert_not_called()  # broke before the first fetch
 
+    def test_translate_one_skips_live_call_for_uncached_when_stopped(self) -> None:
+        # The per-leaf mapping pass in generate_locales calls _translate_one for
+        # EVERY remaining string in the in-flight locale after a stop. Without the
+        # cancel guard it silently translates the rest of that locale before
+        # exiting ("cancel never ends"). An uncached string must instead become an
+        # English gap with no live fetch, so the next run resumes and fills it.
+        cache: dict[str, str] = {}
+        mt.request_stop()
+        with mock.patch.object(mt, "_nllb_fetch", return_value="N") as nf, \
+                mock.patch.object(mt, "_google_fetch") as gf:
+            out = mt._translate_one("de", "Untranslated", cache=cache, primary="nllb")
+        self.assertEqual(out, "Untranslated")  # left as the English source
+        nf.assert_not_called()
+        gf.assert_not_called()
+        self.assertNotIn(mt._cache_key("de", "Untranslated", "nllb"), cache)
+
+    def test_translate_one_still_serves_clean_cache_when_stopped(self) -> None:
+        # Cancel must not discard already-paid work: a clean cached entry is still
+        # served after a stop; only fresh live calls are suppressed.
+        cache: dict[str, str] = {}
+        with mock.patch.object(mt, "_nllb_fetch", return_value="N"), \
+                mock.patch.object(mt, "_google_fetch"):
+            mt._translate_one("de", "Warm", cache=cache, primary="nllb")  # seed cache
+        mt.request_stop()
+        with mock.patch.object(mt, "_nllb_fetch") as nf, mock.patch.object(mt, "_google_fetch") as gf:
+            out = mt._translate_one("de", "Warm", cache=cache, primary="nllb")
+            nf.assert_not_called()
+            gf.assert_not_called()
+        self.assertEqual(out, "N")
+
 
 if __name__ == "__main__":
     unittest.main()
