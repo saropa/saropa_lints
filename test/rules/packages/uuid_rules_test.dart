@@ -31,11 +31,7 @@ void main() {
       });
     }
 
-    testRule(
-      'PreferUuidV4Rule',
-      'prefer_uuid_v4',
-      () => PreferUuidV4Rule(),
-    );
+    testRule('PreferUuidV4Rule', 'prefer_uuid_v4', () => PreferUuidV4Rule());
   });
 
   group('Uuid Rules - Fix Presence', () {

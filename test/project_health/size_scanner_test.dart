@@ -63,31 +63,38 @@ void main() {
     expect(agg.fileCount, 1); // only a.dart remains
   });
 
-  test('skips generated and gen-l10n files so hot spots stay actionable', () async {
-    // Generated/locale files dominate size and hot-spot rankings while being
-    // unimprovable — the scanner must drop them, matching Code Health.
-    File(p.join(tmp.path, 'model.g.dart')).writeAsStringSync('var g = 0;\n');
-    File(p.join(tmp.path, 'm.freezed.dart')).writeAsStringSync('var f = 0;\n');
-    Directory(p.join(tmp.path, 'l10n')).createSync();
-    File(
-      p.join(tmp.path, 'l10n', 'app_localizations_fr.dart'),
-    ).writeAsStringSync('var fr = 0;\n');
-    Directory(p.join(tmp.path, 'service', 'l10n')).createSync(recursive: true);
-    File(
-      p.join(tmp.path, 'service', 'l10n', 'remote_app_localizations.dart'),
-    ).writeAsStringSync('var r = 0;\n');
+  test(
+    'skips generated and gen-l10n files so hot spots stay actionable',
+    () async {
+      // Generated/locale files dominate size and hot-spot rankings while being
+      // unimprovable — the scanner must drop them, matching Code Health.
+      File(p.join(tmp.path, 'model.g.dart')).writeAsStringSync('var g = 0;\n');
+      File(
+        p.join(tmp.path, 'm.freezed.dart'),
+      ).writeAsStringSync('var f = 0;\n');
+      Directory(p.join(tmp.path, 'l10n')).createSync();
+      File(
+        p.join(tmp.path, 'l10n', 'app_localizations_fr.dart'),
+      ).writeAsStringSync('var fr = 0;\n');
+      Directory(
+        p.join(tmp.path, 'service', 'l10n'),
+      ).createSync(recursive: true);
+      File(
+        p.join(tmp.path, 'service', 'l10n', 'remote_app_localizations.dart'),
+      ).writeAsStringSync('var r = 0;\n');
 
-    final rows = <FileHealth>[];
-    final agg = await runSizeScan(
-      SizeScanOptions(
-        projectPath: tmp.path,
-        onRow: (row) async => rows.add(row),
-      ),
-    );
-    // Only the two hand-written files survive (a.dart + sub/b.dart).
-    expect(agg.fileCount, 2);
-    expect(rows.map((r) => r.path).toSet(), {'a.dart', 'sub/b.dart'});
-  });
+      final rows = <FileHealth>[];
+      final agg = await runSizeScan(
+        SizeScanOptions(
+          projectPath: tmp.path,
+          onRow: (row) async => rows.add(row),
+        ),
+      );
+      // Only the two hand-written files survive (a.dart + sub/b.dart).
+      expect(agg.fileCount, 2);
+      expect(rows.map((r) => r.path).toSet(), {'a.dart', 'sub/b.dart'});
+    },
+  );
 
   test('missing project directory yields an empty aggregate', () async {
     final agg = await runSizeScan(

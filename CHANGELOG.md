@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [14.0.1]
 
-The Project Map dashboard now hides machine-generated and localization files from its size map and hot-spot rankings, so the files it surfaces are ones you can actually improve. Previously a single generated database file or a megabyte of translation tables would dominate the list and bury the real issues.
+The Project Map dashboard now hides machine-generated and localization files from its size map and hot-spot rankings, so the files it surfaces are ones you can actually improve. Previously a single generated database file or a megabyte of translation tables would dominate the list and bury the real issues. [log](https://github.com/saropa/saropa_lints/blob/v14.0.1/CHANGELOG.md)
 
 ### Fixed
 
