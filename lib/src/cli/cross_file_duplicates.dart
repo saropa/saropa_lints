@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+import 'package:saropa_lints/src/cli/generated_dart_files.dart';
 
 /// Two or more occurrences of the same normalized [minLines]-line block.
 class DuplicateBlockFinding {
@@ -36,10 +37,7 @@ List<DuplicateBlockFinding> findDuplicateLineBlocks({
     if (!d.existsSync()) continue;
     for (final e in d.listSync(recursive: true)) {
       if (e is! File || !e.path.endsWith('.dart')) continue;
-      final lower = e.path.toLowerCase();
-      if (lower.endsWith('.g.dart') || lower.endsWith('.freezed.dart')) {
-        continue;
-      }
+      if (isGeneratedDartPath(e.path)) continue;
       files[e.path] = e.readAsLinesSync();
     }
   }

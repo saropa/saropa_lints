@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+import 'package:saropa_lints/src/cli/generated_dart_files.dart';
 import 'package:saropa_lints/src/project_context.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
@@ -117,13 +118,7 @@ List<String> libSourcesMissingMirrorTests({
 
     final afterLib = absPosix.afterPrefix(libPrefix);
     if (afterLib.isEmpty) continue;
-    final lower = afterLib.toLowerCase();
-    if (lower.endsWith('.g.dart') ||
-        lower.endsWith('.freezed.dart') ||
-        lower.endsWith('.gr.dart')) {
-      continue;
-    }
-    if (lower.contains('/generated/')) continue;
+    if (isGeneratedDartPath(afterLib)) continue;
     if (afterLib == 'main.dart') continue;
 
     final expectedSuffix =
