@@ -65,16 +65,21 @@
       "logCapture": "Log Capture {count} را مشاهده کرد."
     }
   },
+  "dashboards": {
+    "heroTitle": "داشبورد ها Dashboards",
+    "openFull": "کل صفحه را باز کنید.",
+    "pane": {
+      "projectMap": "نقشه پروژه Project Map نقشه پروژه",
+      "codeHealth": "کد سلامت بهداشت و درمان"
+    },
+    "projectMap": {
+      "scanning": "اسکن نقشه پروژه ..."
+    },
+    "codeHealth": {
+      "scanning": "اسکن کد سلامت..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇ {count} پیشنهاد config (((s)",
-    "initMissing": {
-      "title": "Saropa Lints را تنظیم کنید (run init)",
-      "detail": "saropa_lints در pubspec است اما هیچ پیکربندی آنالیزور هنوز به سیم متصل نشده است."
-    },
-    "packAvailable": {
-      "title": "فعال کردن بسته قواعد {pack}",
-      "detail": "{count} قوانین بسته بندی در پب شما"
-    },
     "enabledToast": "فعال کردن بسته قواعد {pack} در analysis_options.yaml",
     "enableFailed": "نتوانست بسته قواعد {pack} را فعال کند  ⁇ داشبورد Rule Packs را باز کنید تا آن را فعال کنید."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "نسخه",
+      "changelog": "CHANGELOGEGANGELOG تغییر در زمان",
       "community": "جامعه ی جهانی:",
       "dependencies": "وابستگی ها (Dependences)",
       "alerts": "هشدارها: هشدارهای هشداردهنده",
@@ -135,6 +141,12 @@
       "onDisk": "در دیسک روی دیسک",
       "upgrade": "ارتقاء Upgrade به روزرسانی",
       "viewChangelog": "مشاهده Changelog"
+    },
+    "changelog": {
+      "intro": "چه چیزی از {from} به {to} تغییر کرد؟ بررسی قبل از ارتقاء.",
+      "versionDated": "{version}  ⁇ {date} _فرد_منتظره",
+      "truncated": "نمایش آخرین نسخه های {count}.",
+      "viewFull": "مشاهده کل تغییرات در pub.dev"
     },
     "community": {
       "stars": "ستاره ها ستارگان ستارگان",

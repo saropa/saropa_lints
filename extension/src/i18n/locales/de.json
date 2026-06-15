@@ -65,16 +65,21 @@
       "logCapture": "Log Capture sah {count}, der die Aufnahme von Protokollen"
     }
   },
+  "dashboards": {
+    "heroTitle": "Dashboards und Dashboarden sind",
+    "openFull": "Öffnen Sie den Vollbildschirm.",
+    "pane": {
+      "projectMap": "Projektkarte Karte der Projektaufstellung",
+      "codeHealth": "Code Gesundheitscode Gesundheit"
+    },
+    "projectMap": {
+      "scanning": "Scannen Sie Projektkarte..."
+    },
+    "codeHealth": {
+      "scanning": "Scannen Sie den Code Health..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇  Das ist ein _PH1-Kern. {count} konfigurieren Vorschlag (s)",
-    "initMissing": {
-      "title": "Setzen Sie Saropa Lints (run init) ein.",
-      "detail": "saropa_lints ist in der pubspec, aber noch keine Analyzer-Konfiguration angeschlossen."
-    },
-    "packAvailable": {
-      "title": "Aktivieren Sie das {pack}-Regelpaket.",
-      "detail": "{count} Regeln für ein Paket in Ihrem Pubspec"
-    },
     "enabledToast": "Das {pack}-Regelpaket in analysis_options.yaml aktiviert",
     "enableFailed": "Das {pack}-Regelpaket  ⁇  konnte nicht aktiviert werden. öffnen Sie das Rule Packs Dashboard, um es zu aktivieren."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "VERSION",
+      "changelog": "CHANGELOG ist ein Changelog.",
       "community": "Gemeinschaft zu sein.",
       "dependencies": "Abhängigkeiten abhängen.",
       "alerts": "Warnungen sind alarmierend.",
@@ -135,6 +141,12 @@
       "onDisk": "Auf der Festplatte auf Disk On Disk",
       "upgrade": "Upgrade",
       "viewChangelog": "Anzeige des Changelog."
+    },
+    "changelog": {
+      "intro": "Was hat sich von {from} in {to}  ⁇  geändert? Überprüfung vor dem Upgrade.",
+      "versionDated": "{version}  ⁇  Ich bin ein {date} ist ein _PH1-Präparat.",
+      "truncated": "Zeigt die {count} neuesten Releases.",
+      "viewFull": "Siehe vollständige Änderungen am pub.dev."
     },
     "community": {
       "stars": "Sterne Sterne Sternen Sterne",

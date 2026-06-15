@@ -65,16 +65,21 @@
       "logCapture": "La capture de journal a été vue par {count}."
     }
   },
+  "dashboards": {
+    "heroTitle": "Les tableaux de bord et les dashboards.",
+    "openFull": "Ouvrez l'écran complet à l'ouverture.",
+    "pane": {
+      "projectMap": "Carte du projet, carte de projet.",
+      "codeHealth": "Code de santé du code sanitaire."
+    },
+    "projectMap": {
+      "scanning": "Scan du projet de carte..."
+    },
+    "codeHealth": {
+      "scanning": "Le code de santé du scan..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇  est une protéine de type 1 {count} suggestion de configuration (s)",
-    "initMissing": {
-      "title": "Configurer le Saropa Lints (exécuter init)",
-      "detail": "saropa_lints est dans pubspec mais aucune configuration d'analyseur n'est encore branchée."
-    },
-    "packAvailable": {
-      "title": "Activer le pack de règles {pack} qui est en cours d'exécution.",
-      "detail": "{count} règles pour un colis dans votre spécification de pub."
-    },
     "enabledToast": "Activer le pack de règles {pack} dans le fichier analysis_options.yaml",
     "enableFailed": "Impossible d'activer le paquet de règles {pack}  ⁇ ouvrir le tableau de bord des packs de règles pour l'activer."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "VERSION",
+      "changelog": "Il y a eu des changements dans le monde.",
       "community": "La communauté des communes.",
       "dependencies": "Les dépendances sont des dépôts.",
       "alerts": "Les alertes sont des alertes.",
@@ -135,6 +141,12 @@
       "onDisk": "Il est en disque sur disque.",
       "upgrade": "Mise à niveau de mise à jour.",
       "viewChangelog": "Afficher le journal des modifications."
+    },
+    "changelog": {
+      "intro": "Qu'est-ce qui a changé de {from} à {to}  ⁇ révision avant la mise à niveau.",
+      "versionDated": "{version}  ⁇  Il est le plus grand. {date} est une protéine.",
+      "truncated": "Affichant les versions {count} les plus récentes.",
+      "viewFull": "Voir l'intégralité du journal des changements sur pub.dev."
     },
     "community": {
       "stars": "Les étoiles sont des étoies.",

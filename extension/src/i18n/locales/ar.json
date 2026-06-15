@@ -65,16 +65,21 @@
       "logCapture": "رأى التقاط السجل {count}"
     }
   },
+  "dashboards": {
+    "heroTitle": "لوحات القيادة Dashboards",
+    "openFull": "افتح الشاشة الكاملة.",
+    "pane": {
+      "projectMap": "خريطة مشروع Project Map خريطه المشروع",
+      "codeHealth": "القانون الصحي للصحة"
+    },
+    "projectMap": {
+      "scanning": "مسح خريطة المشروع..."
+    },
+    "codeHealth": {
+      "scanning": "مسح الرمز الصحي..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇   ⁇ {count} إقتراحات التكوين (((s)",
-    "initMissing": {
-      "title": "إعداد Saropa Lints (شروع التشغيل)",
-      "detail": "saropa_lints هو في pubspec ولكن لا يوجد تحليل التحليلات التكوينية سلكي حتى الآن."
-    },
-    "packAvailable": {
-      "title": "تمكين حزمة قواعد {pack}.",
-      "detail": "{count} قواعد حزمة في المنتج الخاص بك"
-    },
     "enabledToast": "تم تفعيل حزمة قواعد {pack} في analysis_options.yaml",
     "enableFailed": "لم يتمكن من تمكين حزمة قواعد {pack}  ⁇ افتح لوحة تحكم حزم القواعد لتمكينها."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "نسخة من النسخة",
+      "changelog": "تغييرات في التغير",
       "community": "المجتمع المحلي.",
       "dependencies": "التبعية: تعتمد على الاحتياجات.",
       "alerts": "تنبيهات تحذير",
@@ -135,6 +141,12 @@
       "onDisk": "على القرص On Disk",
       "upgrade": "ترقية الترقيات الارتقاء",
       "viewChangelog": "عرض سجل التغييرات"
+    },
+    "changelog": {
+      "intro": "ما الذي تغير من {from} إلى {to}  ⁇ مراجعة قبل الترقية.",
+      "versionDated": "{version}  ⁇  ⁇ {date} هيئة البشرة.",
+      "truncated": "يظهر {count} أحدث الإصدارات.",
+      "viewFull": "عرض كامل سجل التغييرات على pub.dev"
     },
     "community": {
       "stars": "النجوم نجوم نجمة",

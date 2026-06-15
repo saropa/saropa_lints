@@ -65,16 +65,21 @@
       "logCapture": "लॉग कैप्चर ने देखा {count}"
     }
   },
+  "dashboards": {
+    "heroTitle": "डैशबोर्ड्स डैश्बोर्ड",
+    "openFull": "पूर्ण स्क्रीन खोलें।",
+    "pane": {
+      "projectMap": "प्रोजेक्ट मैप, परियोजना मानचित्र।",
+      "codeHealth": "कोड हेल्थ हेल्थ कोड"
+    },
+    "projectMap": {
+      "scanning": "स्कैनिंग परियोजना मानचित्र ..."
+    },
+    "codeHealth": {
+      "scanning": "स्कैनिंग कोड स्वास्थ्य..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇ {count} कॉन्फ़िग सुझाव (s)",
-    "initMissing": {
-      "title": "Saropa Lints (रून इनिश) सेट अप करें।",
-      "detail": "saropa_lints pubspec में है लेकिन अभी तक कोई विश्लेषक कॉन्फ़िगरेशन वायर्ड नहीं किया गया है।"
-    },
-    "packAvailable": {
-      "title": "{pack} नियम पैक को सक्षम करें।",
-      "detail": "आपके पबस्पेक में एक पैकेज के लिए {count} नियम।"
-    },
     "enabledToast": "analysis_options.yaml में {pack} नियम पैक सक्षम किया गया।",
     "enableFailed": "{pack} नियम पैक  ⁇  सक्षम नहीं कर सका इसे सक्षम करने के लिए नियम पैक डैशबोर्ड खोलें।"
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "VERSION संस्करण",
+      "changelog": "CHANGELOG के लिए परिवर्तन",
       "community": "समुदाय के लिए।",
       "dependencies": "निर्भरताएं।",
       "alerts": "अलर्ट्स अलर्ट",
@@ -135,6 +141,12 @@
       "onDisk": "डिस्क पर डिस्क में",
       "upgrade": "अपग्रेड करें उन्नयन।",
       "viewChangelog": "परिवर्तन देखें"
+    },
+    "changelog": {
+      "intro": "{from} से {to} में क्या परिवर्तन हुआ - अपग्रेड करने से पहले समीक्षा करें।",
+      "versionDated": "{version}  ⁇   ⁇ {date} _PH1_ को क्या कहते हैं?",
+      "truncated": "{count} सबसे हालिया रिलीज़ दिखा रहा है।",
+      "viewFull": "pub.dev पर पूर्ण चेंजलॉग देखें"
     },
     "community": {
       "stars": "सितारे तारे तारों के बीच",

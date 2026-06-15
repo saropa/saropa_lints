@@ -65,16 +65,21 @@
       "logCapture": "Log Capture zag {count}."
     }
   },
+  "dashboards": {
+    "heroTitle": "Dashboards dashboards zijn er.",
+    "openFull": "Open het volledige scherm.",
+    "pane": {
+      "projectMap": "Projectkaart, projectkaart.",
+      "codeHealth": "Code Gezondheidszorg code"
+    },
+    "projectMap": {
+      "scanning": "Scannen van projectkaart..."
+    },
+    "codeHealth": {
+      "scanning": "Scanningscode gezondheid..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇ {count} config suggestie (s)",
-    "initMissing": {
-      "title": "Stel Saropa Lints (run init) in.",
-      "detail": "saropa_lints is in pubspec, maar er is nog geen analysatorconfig aangesloten."
-    },
-    "packAvailable": {
-      "title": "Activeer het {pack} regelpakket.",
-      "detail": "{count} regels voor een pakket in uw pubspec."
-    },
     "enabledToast": "Het {pack} regelpakket is ingeschakeld in analysis_options.yaml.",
     "enableFailed": "Kon het {pack} regelpakket  ⁇  niet activeren open het dashboard van de regelpakketten om deze in te schakelen."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "Versies Versie versie",
+      "changelog": "CHANGELOG is een verandering.",
       "community": "Gemeenschap, de Europese Unie.",
       "dependencies": "Afhankelijkheden zijn afhankelijk.",
       "alerts": "Waarschuwingen.",
@@ -135,6 +141,12 @@
       "onDisk": "Op de schijf op disk",
       "upgrade": "Upgrade upgraden is een upgrade.",
       "viewChangelog": "Changelog bekijken"
+    },
+    "changelog": {
+      "intro": "Wat is veranderd van {from} naar {to}  ⁇ review voor het upgraden.",
+      "versionDated": "{version}  ⁇   ⁇ {date} is een genetisch gemodificeerde stof.",
+      "truncated": "Toon de {count} meest recente releases.",
+      "viewFull": "Bekijk het volledige changelog op pub.dev"
     },
     "community": {
       "stars": "Sterren sterren sterre sterren",
