@@ -137,14 +137,16 @@ VS Code binding column shows the host token each maps to.
 Rule: surfaces step **lighter in dark mode and darker in light mode** as they rise. Never use a
 drop shadow as the *only* signal of elevation — pair surface step + shadow.
 
-**Host caveat — VS Code partially collapses these steps.** The editor exposes no four-level
-surface ramp, so `--surface-0` and `--surface-1` both resolve to `--vscode-editor-background`
-and the raised steps fall back to `--vscode-editorWidget-background` /
-`--vscode-editor-inactiveSelectionBackground`. Two adjacent levels can therefore render
-identically in some themes. In webviews, lean on the **widget border** (`--border`) plus the
-available step to separate stacked surfaces; do not assume the surface token alone produces a
-visible elevation change. The full four-step ramp only materializes in the standalone fallback
-palette (§3.6) and in Flutter, where the app theme defines distinct container tones.
+**Host caveat — VS Code collapses the bottom of the ramp.** The editor exposes no four-level
+surface ramp, so `--surface-0` does not exist in a webview (it is standalone-only per the
+reference note above): the page background **and** cards are both `--surface-1`
+(`--vscode-editor-background`), separated by a `--border`, not by a tone change. The raised steps
+map to `--vscode-editorWidget-background` / `--vscode-editor-inactiveSelectionBackground`, which
+in some themes render close to the editor background. In webviews, lean on the **widget border**
+(`--border`) plus the available step to separate stacked surfaces; do not assume the surface
+token alone produces a visible elevation change. The full four-step ramp only materializes in the
+standalone fallback palette (§3.6) and in Flutter, where the app theme defines distinct container
+tones.
 
 ### 3.2 Text
 
@@ -205,7 +207,7 @@ For HTML exports with no host theme. This IS the curated brand palette; ship it 
 ```css
 :root {
   color-scheme: light dark;
-  --brand: #f97316;  --brand-2: #ea580c;  --brand-glow: rgba(249,115,22,.18);
+  --brand: #f97316;  --brand-2: #ea580c;  --brand-glow: rgba(249,115,22,.20);
   --surface-0: #fafaf9;  --surface-1: #ffffff;  --surface-2: #f5f5f4;  --surface-3: #eeeeec;
   --inset: #ffffff;
   --text: #0f172a;  --muted: #64748b;  --link: #ea580c;
@@ -259,8 +261,11 @@ In VS Code webviews, prefer the host's own widget border + `--surface` step over
 
 ### 3.10 Type scale (modular, ratio ~1.2)
 
-Sizes follow a 1.2 minor-third step from a 14px base. Pair every size with a deliberate
-line-height. Never eyeball a font size.
+Sizes follow a 1.2 minor-third step. The table below is the **14px standalone base** (HTML
+exports). **VS Code anchors at 13px** for host density (see the reference note in §3): the chrome
+carries `--text-eyebrow:11 --text-caption:11 --text-body:13 --text-label:13 --text-h3:15
+--text-h2:18 --text-h1:22 --text-kpi:28 --text-kpi-xl:40`, same ratio. Pair every size with a
+deliberate line-height. Never eyeball a font size.
 
 | Token | px / line-height | Weight | Role |
 |-------|------------------|--------|------|
@@ -386,6 +391,13 @@ banner.
   primary.
 - All tiers: `--radius`, padding `--space-2 --space-3`, `--text-label`, `--dur-fast` hover.
 - Focus: `outline: 2px solid var(--vscode-focusBorder, var(--brand)); outline-offset: 2px;`.
+- **A secondary button MUST declare a fallback fill _and_ a border.** Bind the fill to the host
+  token but fall back to a token surface — `background: var(--vscode-button-secondaryBackground,
+  var(--surface-3))` — and always give it a `1px solid var(--border)` edge. Several host themes
+  leave `--vscode-button-secondaryBackground` undefined or set it nearly equal to the surface
+  behind it; without both the fallback and the border the button renders as bare text and reads
+  as a link, not a control. This is the single most common "the buttons don't look like buttons"
+  defect.
 
 ### 5.5 Segmented control
 
@@ -440,6 +452,23 @@ The workhorse — hot spots, function lists, findings. One table contract everyw
 | `.status-pill.good/.warn/.bad` | Pass/warn/fail | Tinted bg + blended-toward-fg text (§3.2) |
 
 Grade and status colors come from the semantic tokens — never a bespoke green.
+
+**Tinted badge background** (a status pill whose fill is a wash of its own status color): use
+`color-mix(in srgb, var(--status-bad) 20%, transparent)` for the background paired with
+`var(--status-bad)` text — never an `#rrggbbaa` alpha-suffixed hex, which bakes in a fixed color
+that ignores the theme and fails in high-contrast mode.
+
+**Grade ramp**, derived from the semantic tokens so each grade reads the same hue as the matching
+severity (A=good, F=bad, C=warning at the midpoint, B/D blended) — no bespoke grade greens/reds:
+
+```css
+--grade-a: var(--status-good);
+--grade-b: color-mix(in srgb, var(--status-good) 55%, var(--accent-warning));
+--grade-c: var(--accent-warning);
+--grade-d: var(--accent-high);
+--grade-e: color-mix(in srgb, var(--accent-high) 50%, var(--status-bad)); /* only where data carries an E grade */
+--grade-f: var(--status-bad);
+```
 
 ### 5.9 Gauge / radial progress
 
@@ -556,6 +585,13 @@ Dashboard copy follows the Saropa user-copy rules:
   in Log Capture, the prepended `:root` token module in `src/ui/viewer-styles/`) for the token
   `:root` + component base. Per-surface CSS adds **only** that surface's specifics. Each project
   names its own shared module — the *token names* are shared, the file is per-project.
+- **Prefer injecting the token `:root` once at the webview choke point over a per-panel import.**
+  If every panel already passes through one shared security wrapper before display (e.g. a
+  `secureWebviewHtml` that stamps the CSP `<meta>` into `<head>`), inject `<style>` + the token
+  `:root` in that same wrapper. Every surface then resolves `var(--status-bad)` etc. with zero
+  per-panel imports, and one edit re-themes them all — no risk of a new panel shipping without the
+  tokens. `style-src 'unsafe-inline'` already permits the injected `<style>`, so it needs no nonce.
+  (Validated in drift advisor, 2026-06.)
 - **Log Capture is in scope on two fronts, not one:** its standalone HTML reports (see below) AND
   its dashboard-class webview panels (SQL query history, Crashlytics, Performance, Signal report,
   error-rate, recurring, project-state). Those panels follow this guide. Its log-viewer console is
@@ -599,3 +635,19 @@ Before a dashboard surface ships:
 _This guide is portable. Copy it into any Saropa project and bind the token table (§3) to that
 project's host theme; the components (§5), accessibility gate (§7), and checklist (§11) are
 platform-independent._
+
+---
+
+## 12. Changelog
+
+Newest first. Each entry records what changed in the guide and the project work that proved it.
+
+- **Buttons, badges, and adoption hardened from the drift advisor rollout.** Added the
+  secondary-button fallback-and-border rule to §5.4 (the concrete cause of "buttons that don't
+  look like buttons"); added the `color-mix` tinted-badge background recipe and the explicit
+  A–F grade-ramp derivation to §5.8 (replacing `#rrggbbaa` alpha hexes and bespoke grade colors);
+  added the "inject the token `:root` once at the webview choke point" adoption pattern to §10.
+  All three were validated migrating the drift advisor extension's panels onto the token system.
+- **Initial canonical guide.** One token system (§3), component contracts (§5), accessibility
+  ship gate (§7), and per-platform adoption (§10) unifying the formerly-divergent Saropa dashboard
+  surfaces.
