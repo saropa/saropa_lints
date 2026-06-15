@@ -34,21 +34,30 @@ void main() {
       expect(isGeneratedDartPath('lib/auto_generated_notes.dart'), isFalse);
     });
 
-    test('matches gen-l10n tables under any l10n directory, incl. wrappers', () {
-      expect(isGeneratedDartPath('lib/l10n/app_localizations.dart'), isTrue);
-      expect(isGeneratedDartPath('lib/l10n/app_localizations_fr.dart'), isTrue);
-      expect(isGeneratedDartPath('lib/l10n/intl_messages.dart'), isTrue);
-      expect(
-        isGeneratedDartPath('lib/service/l10n/remote_app_localizations.dart'),
-        isTrue,
-      );
-    });
+    test(
+      'matches gen-l10n tables under any l10n directory, incl. wrappers',
+      () {
+        expect(isGeneratedDartPath('lib/l10n/app_localizations.dart'), isTrue);
+        expect(
+          isGeneratedDartPath('lib/l10n/app_localizations_fr.dart'),
+          isTrue,
+        );
+        expect(isGeneratedDartPath('lib/l10n/intl_messages.dart'), isTrue);
+        expect(
+          isGeneratedDartPath('lib/service/l10n/remote_app_localizations.dart'),
+          isTrue,
+        );
+      },
+    );
 
     test('keeps hand-written code and is case-insensitive', () {
       expect(isGeneratedDartPath('lib/widgets/button.dart'), isFalse);
       expect(isGeneratedDartPath('lib/main.dart'), isFalse);
       // An `app_localizations`-named helper OUTSIDE an l10n dir is not swept up.
-      expect(isGeneratedDartPath('lib/utils/app_localizations_helper.dart'), isFalse);
+      expect(
+        isGeneratedDartPath('lib/utils/app_localizations_helper.dart'),
+        isFalse,
+      );
       // Suffix match ignores case.
       expect(isGeneratedDartPath('lib/MODEL.G.DART'), isTrue);
     });
