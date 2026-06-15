@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
+import 'package:saropa_lints/src/cli/generated_dart_files.dart';
 import 'package:yaml/yaml.dart';
 
 /// ARB keys that do not appear as Dart identifiers in project sources.
@@ -122,12 +123,7 @@ Map<String, String> _readDartSources(String projectPath) {
     if (!dir.existsSync()) continue;
     for (final e in dir.listSync(recursive: true)) {
       if (e is! File || !e.path.endsWith('.dart')) continue;
-      final lower = e.path.toLowerCase();
-      if (lower.endsWith('.g.dart') ||
-          lower.endsWith('.freezed.dart') ||
-          lower.endsWith('.gr.dart')) {
-        continue;
-      }
+      if (isGeneratedDartPath(e.path)) continue;
       out[e.path] = e.readAsStringSync();
     }
   }

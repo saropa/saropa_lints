@@ -20,6 +20,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:path/path.dart' as p;
+import 'package:saropa_lints/src/cli/generated_dart_files.dart';
 import 'package:saropa_lints/src/cli/project_vibrancy_coverage_quality.dart';
 
 /// Live progress + cooperative pause/cancel sink for [runProjectVibrancy].
@@ -657,45 +658,13 @@ List<String> _collectTargetFiles(ProjectVibrancyOptions options) {
       final path = p.normalize(entity.path);
       if (!path.endsWith('.dart')) continue;
       final posix = path.replaceAll('\\', '/');
-      // Filename-pattern exclusions for known codegen output. A single, well-
-      // known suffix is faster and more deterministic than reading the file
-      // header — every match here avoids a file-open later. Patterns covered:
-      //   .g.dart            build_runner / source_gen (json_serializable,
-      //                       freezed companions, retrofit, riverpod_generator)
-      //   .freezed.dart      Freezed
-      //   .mocks.dart        mockito
-      //   .gr.dart           auto_route
-      //   .config.dart       injectable
-      //   .chopper.dart      chopper
-      //   .gen.dart          flutter_gen
-      //   .drift.dart        drift (when generated alongside hand-written code)
-      //   .pb.dart, .pbenum.dart, .pbgrpc.dart, .pbjson.dart, .pbserver.dart
-      //                       protoc Dart plugin
-      // The header-marker fallback below catches the long tail where a project
-      // configures non-standard output paths.
-      if (posix.endsWith('.g.dart') ||
-          posix.endsWith('.freezed.dart') ||
-          posix.endsWith('.mocks.dart') ||
-          posix.endsWith('.gr.dart') ||
-          posix.endsWith('.config.dart') ||
-          posix.endsWith('.chopper.dart') ||
-          posix.endsWith('.gen.dart') ||
-          posix.endsWith('.drift.dart') ||
-          posix.endsWith('.pb.dart') ||
-          posix.endsWith('.pbenum.dart') ||
-          posix.endsWith('.pbgrpc.dart') ||
-          posix.endsWith('.pbjson.dart') ||
-          posix.endsWith('.pbserver.dart')) {
-        continue;
-      }
-      // gen-l10n emits app_localizations*.dart + intl_*.dart under lib/l10n/.
-      // These are pure ARB-derived translation tables — long, mechanical, never
-      // hand-written, and never improvable by a code-health flag.
-      if (posix.contains('/lib/l10n/') &&
-          (p.basename(posix).startsWith('app_localizations') ||
-              p.basename(posix).startsWith('intl_'))) {
-        continue;
-      }
+      // Filename-pattern exclusions for known codegen output (`.g.dart`, freezed,
+      // drift, protobuf, …) and gen-l10n translation tables — the shared
+      // predicate is the single source of truth for that list, kept in sync with
+      // the health/size scanners. A suffix match is faster and more deterministic
+      // than reading the file header, and avoids a file-open later. The
+      // header-marker fallback below still catches non-standard output paths.
+      if (isGeneratedDartPath(posix)) continue;
       // Skip pathologically large files — almost always generated (gen-l10n
       // `app_localizations_*.dart` runs to 1MB+, protobuf, etc.). Parsing and
       // visiting a 30k-line generated file stalls the scan for many seconds with

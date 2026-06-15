@@ -37,8 +37,15 @@ const Set<String> _generatedSuffixes = {
 /// emitted by a generator rather than hand-written. Pass the project-relative
 /// path, not an absolute one, so the locale-directory check below is reliable.
 bool isGeneratedDartPath(String relPosix) {
+  final lower = relPosix.toLowerCase();
   for (final suffix in _generatedSuffixes) {
-    if (relPosix.endsWith(suffix)) return true;
+    if (lower.endsWith(suffix)) return true;
+  }
+  // A `generated` path segment is the other near-universal codegen convention
+  // (`lib/generated/...`, `lib/foo/generated/...`). Match it as a whole segment
+  // so an unrelated file like `auto_generated_notes.dart` is not swept up.
+  for (final segment in lower.split('/')) {
+    if (segment == 'generated') return true;
   }
   // gen-l10n output: `app_localizations*.dart` + `intl_*.dart` under an `l10n/`
   // directory. These are pure ARB-derived translation tables — never hand-
@@ -46,8 +53,8 @@ bool isGeneratedDartPath(String relPosix) {
   // unrelated hand-written helper that merely mentions "app_localizations" from
   // being swept up, while still catching wrapper variants like
   // `remote_app_localizations.dart` under `lib/service/l10n/`.
-  if (relPosix.contains('l10n/')) {
-    final base = p.basename(relPosix);
+  if (lower.contains('l10n/')) {
+    final base = p.basename(lower);
     if (base.contains('app_localizations') || base.startsWith('intl_')) {
       return true;
     }

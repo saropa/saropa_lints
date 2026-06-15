@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_dead_imports_semantic.dart';
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
+import 'package:saropa_lints/src/cli/generated_dart_files.dart';
 import 'package:saropa_lints/src/cli/cross_file_unused_symbols_semantic.dart';
 import 'package:saropa_lints/src/project_context.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
@@ -502,13 +503,9 @@ String _relativePath(String rootPosix, String absolutePath) {
   return normalized.afterIndex(rootPosix.length).replaceFirst(RegExp('^/'), '');
 }
 
-bool _isGeneratedDart(String relativePath) {
-  final lower = relativePath.toLowerCase();
-  return lower.endsWith('.g.dart') ||
-      lower.endsWith('.freezed.dart') ||
-      lower.endsWith('.gr.dart') ||
-      lower.contains('/generated/');
-}
+// Delegates to the shared codegen/locale predicate so every cross-file pass and
+// the health/size scanners agree on what counts as generated.
+bool _isGeneratedDart(String relativePath) => isGeneratedDartPath(relativePath);
 
 void _collectTopLevelSymbols({
   required String content,
@@ -683,13 +680,7 @@ List<String> _libSourcesMissingMirrorTests({
 
     final afterLib = absPosix.afterPrefix(libPrefix);
     if (afterLib.isEmpty) continue;
-    final lower = afterLib.toLowerCase();
-    if (lower.endsWith('.g.dart') ||
-        lower.endsWith('.freezed.dart') ||
-        lower.endsWith('.gr.dart')) {
-      continue;
-    }
-    if (lower.contains('/generated/')) continue;
+    if (_isGeneratedDart(afterLib)) continue;
     if (afterLib == 'main.dart') continue;
 
     final expectedSuffix =

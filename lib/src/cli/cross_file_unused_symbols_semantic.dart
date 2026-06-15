@@ -9,6 +9,7 @@ import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
+import 'package:saropa_lints/src/cli/generated_dart_files.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
 // Cross-file “unused” via analyzer; pairs with cross_file_reporter and CLI flags.
@@ -241,10 +242,5 @@ String _relativePath(String rootPosix, String absolutePath) {
   return normalized.afterIndex(rootPosix.length).replaceFirst(RegExp('^/'), '');
 }
 
-bool _isGeneratedDart(String relativePath) {
-  final lower = relativePath.toLowerCase();
-  return lower.endsWith('.g.dart') ||
-      lower.endsWith('.freezed.dart') ||
-      lower.endsWith('.gr.dart') ||
-      lower.contains('/generated/');
-}
+// Delegates to the shared codegen/locale predicate (single source of truth).
+bool _isGeneratedDart(String relativePath) => isGeneratedDartPath(relativePath);
