@@ -1,16 +1,94 @@
-# Central Dashboard Consolidation — what folds into one dashboard
+# Central Dashboard Consolidation — design, status, and remaining work
 
-**Created:** 2026-06-12
+**Created:** 2026-06-12 · **Consolidated:** 2026-06-14
+**Supersedes:** this file now also carries the diagnostics-residuals that were tracked separately in
+`TODO_consolidated_dashboard_diagnostics.md` (folded in 2026-06-14; that file's completed
+2026-06-12 finish report is archived under `plans/history/2026.06/2026.06.14/`).
 **Question answered:** Of the items spread across the many dashboards, how many can move into one
 central dashboard — business logic (stats/detail), pop-ups, expanders, links, and more.
 **Method:** Three parallel code inventories catalogued every surfaced item across the Findings,
 Package Vibrancy, Project Map, Code Health, Rule Packs, Command Catalog, Rule Explain, Issues tree,
 TODO/HACK tree, and status bar. ~238 distinct items total.
 
-## The central dashboard today
+---
 
-The "Open Dashboard" (consolidated view) currently shows only: a grade gauge, rule groups (one row
-per rule with severity counts), and lazy-expand occurrence lists that jump to source. Minimal.
+## Status at a glance
+
+- **Live-diagnostics plumbing: shipped.** The status bar, Issues sidebar tree, code lens, inline
+  annotations, and the Issues-panel metadata filters / hotspot review all read live analyzer
+  diagnostics, and a bundled rule-metadata catalog backfills the per-rule data live diagnostics
+  lack. See **Shipped so far**.
+- **The central dashboard itself: not built.** The "Open Dashboard" consolidated view is still the
+  minimal grade-gauge + rule-groups + occurrence-lists surface. The fold/link design below (lists
+  A–D) is the plan for turning it into the hub; none of it is implemented yet.
+- **One open verification residual:** the consolidated webview needs a human render/interaction
+  pass (see **Open TODO** item 1).
+
+---
+
+## Shipped so far (record — not work to redo)
+
+From the live-diagnostics + consolidated-dashboard effort (2026-06-12):
+
+- **Status-bar score, Issues sidebar tree, `pushModel` error boundary, headless consolidated-client
+  eval test** — landed.
+- **Live-diagnostics migrations** off the batch `violations.json` path:
+  - `codeLensProvider.ts` — per-file count now live, refreshed on the debounced
+    `onDidChangeDiagnostics` tick.
+  - `inlineAnnotations.ts` — end-of-line text matches the squiggles exactly; cache invalidated on
+    the same tick.
+  - `issuesViewCommands.ts` — rule-type/status filters and security-hotspot review read live
+    findings, enriched by the rule catalog below.
+- **Rule-details catalog** (`bin/generate_rule_catalog.dart` → `extension/media/rules_catalog.json`,
+  loaded by `ruleCatalog.ts`, applied by `applyRuleCatalog` in `liveDiagnosticsModel.ts`) — gives
+  the live model the per-rule type / lifecycle / security-review metadata that raw diagnostics omit.
+  Regenerated in the publish pipeline so it never ships stale.
+
+Intentionally **not** migrated (correct as-is, do not "fix"):
+
+- `configSuggestions.ts` — reads pubspec + analysis_options, never `violations.json`. N/A.
+- `triageDashboardHtml.ts` — its job is to report the batch export's *freshness*; live diagnostics
+  are never stale, so migrating would delete its reason to exist.
+- `rulePacksWebviewProvider.ts` — uses the export *timestamp* and a disabled-rule suppressions
+  snapshot; live's timestamp is always "now", which would mislabel run age.
+
+**Closed / obsolete:** the supplementary analyzer-lints dashboard pill. The "show other analyzer
+findings" / "show analyzer TODOs" toggles were deliberately removed in 13.13.0 once the Findings
+Dashboard became holistic; rebuilding the pill would re-introduce the redundancy that removal fixed.
+
+---
+
+## Open TODO — remaining work
+
+1. **Consolidated webview: human render verification + tuning.** F5 in the Extension Development
+   Host, verify theme / layout / elevated stylesheet, then a tuning pass. Validate click / keyboard
+   interaction (DOM tree navigation the headless `consolidatedClient.test.ts` stub cannot model).
+   Leave automated event-bubbling coverage out — not worth a jsdom dependency for one webview; keep
+   it a launch-test item.
+2. **Decompose the Findings dashboard into per-section builder modules** —
+   `violationsDashboardHtml.ts` → hero, KPI cards, toolbar, top-rules table, charts, TODO/HACK,
+   drift, suppressions. These builders are the reusable building blocks list A needs. The
+   client-script extraction is already done (`violations-dashboard-script.ts`). **This is the
+   highest-value next step** and is reusable whether or not the full consolidation ships.
+3. **Fold list A (findings-domain items) into the central dashboard as real sections** — see
+   inventory A below (~13 items: top-rules triage table, severity KPI filters, segmented + text
+   filter + recent-searches popover, group-by selector, severity-mix chart, active-filter chips,
+   bulk select + copy, more-actions menu, analysis progress strip, findings meta line, TODO/HACK
+   panel, drift advisor panel, suppressions panel).
+4. **Fold list B (rule-detail items) into the rule-group expander** — see inventory B (problem +
+   how-to-fix, OWASP mapping, related rules, supersedes/migration, view-in-ROADMAP).
+5. **Add list C (summarize + deep-link cards)** — see inventory C (package health, code health,
+   project size, rule packs, quality-gates banner, disabled-rules quick re-enable).
+6. **Standardize list D shared chrome** — keyboard-shortcuts overlay, full-width toggle,
+   recent-searches popover, status-bar trend delta.
+7. **Decompose the kept-linked oversized surfaces (lower priority)** — Package Vibrancy
+   `report-html.ts` / `report-script.ts` / `report-styles.ts` / `package-detail-html.ts`; and
+   independently `projectVibrancyReportView.ts`, `commandCatalogWebviewHtml.ts`,
+   `commandCatalogRegistry.ts`, `issuesTree.ts`, `dashboardChromeStyles.ts`.
+
+Sequencing: **1 → 2 → 3 → 4 → 5 → 6**, with 7 in parallel as capacity allows. Item 2 unblocks 3.
+
+---
 
 ## The key decision: fold vs. link
 
@@ -30,7 +108,7 @@ problem inside a single scroll. So the consolidation rule is:
 ## A. Fold directly into the central dashboard — same domain (findings)
 
 These come from the existing Findings/Violations dashboard and operate on the exact data the central
-dashboard already has. ~20 items:
+dashboard already has. ~13 items:
 
 1. **Top Rules triage table** — sortable by count/severity, with per-row **Hide** (workspace) and
    **Disable** (project config) actions. The dominant noise-reduction surface.
@@ -82,7 +160,7 @@ button that opens the full surface. ~6 cards:
 
 ## Count summary
 
-- **Fold directly (A + B):** ~18 findings-domain items + ~5 rule-detail items = **~23 items become
+- **Fold directly (A + B):** ~13 findings-domain items + ~5 rule-detail items = **~18 items become
   real sections/expanders of the central dashboard.**
 - **Summarize + link (C):** **~6 cards/banners** replace four separate full dashboards on the
   landing view (the full screens remain, one click away).
@@ -110,13 +188,4 @@ dashboard core or kept linked surfaces):
 
 None of the oversized files is *deleted* by consolidation (the full screens stay reachable), so the
 earlier worry — "decomposing files we'll merge away" — is smaller than feared: only the per-dashboard
-*landing layout* changes, not the screens themselves. Decomposing the Findings dashboard into section
-builders is the highest-value next step because those builders are exactly what the central dashboard
-will compose.
-
-## Recommended next step
-
-Decompose the Findings dashboard (`violationsDashboardHtml.ts`) into per-section builder modules
-(hero, KPI cards, toolbar, top-rules table, charts, TODO/HACK, drift, suppressions), because those
-modules are the building blocks list A above needs. The client-script extraction is already done
-(`violations-dashboard-script.ts`). That work is reusable whether or not the full consolidation ships.
+*landing layout* changes, not the screens themselves.

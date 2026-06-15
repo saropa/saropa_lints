@@ -89,6 +89,7 @@ The Project Map dashboard now hides machine-generated and localization files fro
 - **Reconciled the style guide body with its VS Code reference implementation** — the surface-0 caveat, 13px type base, and standalone `--brand-glow` value now match `chromeTokens()` instead of disagreeing with it. Docs-only.
 - **Added instantiation-pin tests for six package rule packs that had none** (Envied, Keyboard Visibility, Google Fonts, OpenAI, Speech to Text, uuid), fixing the tier-integrity check that requires every rule category to carry a test and closing the gap that let a sub-standard message ship unnoticed. Dev-only.
 - **A release-commit push to `main` no longer triggers a redundant `ci` run.** The publish workflow already validates that exact tagged commit and the publish script mirrors the full gate locally, so cutting a release stops firing three overlapping workflows at once. Dev-only.
+- **Closed the stub-test tracking plan by dropping its deferred follow-up scope.** The plan's stub removal and the hard zero-gate that keeps empty-body `test`/`testWidgets` stubs out are complete and verified; the never-started "rewrite removed stubs as fixture-backed tests" backlog was removed as not needed. Docs-only.
 
 </details>
 

@@ -12,6 +12,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:path/path.dart' as p;
 
+import '../generated_dart_files.dart';
 import 'class_metrics.dart';
 import 'complexity_scanner.dart';
 import 'coupling_metrics.dart';
@@ -118,6 +119,11 @@ Future<HealthAggregator> runSizeScan(SizeScanOptions options) async {
     if (entity is! File || !entity.path.endsWith('.dart')) continue;
     final rel = p.relative(entity.path, from: root).replaceAll('\\', '/');
     if (_hasExcludedSegment(rel)) continue;
+    // Skip generator output (.g.dart, freezed, gen-l10n tables, …). These are
+    // long mechanical files no developer can improve; left in they dominate the
+    // size map and hot-spot list and bury the real issues. Mirrors the same
+    // filter Code Health (project_vibrancy) already applies.
+    if (isGeneratedDartPath(rel)) continue;
     if (excludes.any((re) => re.hasMatch(rel))) continue;
     final row = await _measure(entity, rel, options);
     if (row == null) continue;

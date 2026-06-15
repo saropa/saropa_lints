@@ -335,13 +335,14 @@ function gradeAndFlagPillStyles(): string {
   font-weight: 700;
   letter-spacing: 0.3px;
 }
-.grade-badge.grade-A { background: var(--status-good); color: var(--vscode-editor-background); }
-.grade-badge.grade-B { background: var(--accent-info); color: var(--vscode-editor-background); }
-.grade-badge.grade-C, .grade-badge.grade-D, .grade-badge.grade-E {
-  background: var(--accent-warning);
-  color: var(--vscode-editor-background);
-}
-.grade-badge.grade-F { background: var(--accent-error); color: var(--vscode-editor-background); }
+/* Letter grades drive off the shared grade ramp (guide §5.8) so each grade reads the same hue
+   as the matching severity across every surface — no bespoke grade colors. */
+.grade-badge.grade-A { background: var(--grade-a); color: var(--vscode-editor-background); }
+.grade-badge.grade-B { background: var(--grade-b); color: var(--vscode-editor-background); }
+.grade-badge.grade-C { background: var(--grade-c); color: var(--vscode-editor-background); }
+.grade-badge.grade-D { background: var(--grade-d); color: var(--vscode-editor-background); }
+.grade-badge.grade-E { background: var(--grade-e); color: var(--vscode-editor-background); }
+.grade-badge.grade-F { background: var(--grade-f); color: var(--vscode-editor-background); }
 .grade-badge.grade-X { background: var(--vscode-badge-background); color: var(--vscode-badge-foreground); }
 .flag-pills { display: inline-flex; flex-wrap: wrap; gap: 4px; }
 .flag-pill {
