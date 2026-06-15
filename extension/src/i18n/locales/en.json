@@ -77,7 +77,8 @@
     },
     "codeHealth": {
       "scanning": "Scanning code health…"
-    }
+    },
+    "scanFailed": "Scan failed. Open the full dashboard to see details and retry."
   },
   "configSuggestions": {
     "enabledToast": "Enabled the {pack} rule pack in analysis_options.yaml",

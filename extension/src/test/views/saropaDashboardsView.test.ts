@@ -1,45 +1,68 @@
 /**
- * Pins the iframe drill-down bridge for the consolidated "Saropa Dashboards" view.
+ * Pins the single-document composition contract for the consolidated "Saropa Dashboards" view.
  *
- * Each engine's report is embedded in an `<iframe srcdoc>` where the real `acquireVsCodeApi()` is
- * absent, so `injectIframeBridge` injects a shim that bubbles the report's `postMessage` calls up to
- * the host tagged with a `__src` source. The host relays them to the extension and dispatches by
- * source. These assertions guard the contract that makes the row-click drill-down reach the editor:
- * the shim is present, source-tagged, defined before the engine's body scripts run, and leaves the
- * rest of the report untouched.
+ * The view assembles both engines' real markup into ONE webview document (not iframes). Two
+ * properties make that safe and must hold: exactly one `acquireVsCodeApi()` handle is acquired and
+ * shared (the API may be acquired only once per document), and Project Map's styles stay scoped
+ * under `.pm-pane` so they cannot leak onto the shared chrome or the Code Health pane. These
+ * assertions guard both, plus that each pane's content is present and that a failed scan degrades
+ * to an inline placeholder rather than blanking the page.
  */
 import '../vibrancy/register-vscode-mock';
 
 import * as assert from 'node:assert';
-import { injectIframeBridge } from '../../views/saropaDashboardsView';
+import { buildDashboardsDocument } from '../../views/saropaDashboardsView';
+import type { ProjectMapParts } from '../../views/projectMapView';
+import type { CodeHealthFragment } from '../../views/projectVibrancyReportView';
 
-describe('saropaDashboardsView injectIframeBridge', () => {
-  const sample = '<html><head><meta charset="UTF-8"></head><body><div id="x">hi</div></body></html>';
+const pmParts: ProjectMapParts = {
+  styleHtml: '<style>.pm-pane .banner { color: red; } .pm-pane table { width: 100%; }</style>',
+  bodyHtml: '<div class="pm-pane"><div id="treemap"></div><table id="hot"></table></div>',
+  scriptHtml: 'var pmApi = acquireVsCodeApi();',
+  echartsUri: 'https://example/echarts.min.js',
+};
+const chFrag: CodeHealthFragment = {
+  body: '<header class="dash-hero"><h1>Code Health</h1></header><table id="pvTable"></table>',
+  script: '(function(){ var vscode = acquireVsCodeApi(); })();',
+};
 
-  it('defines an acquireVsCodeApi shim so the embedded report can post messages', () => {
-    const out = injectIframeBridge(sample, 'projectMap');
-    assert.ok(out.includes('window.acquireVsCodeApi'), 'shim does not define acquireVsCodeApi');
-    assert.ok(out.includes('parent.postMessage'), 'shim does not bubble to the parent host');
+describe('saropaDashboardsView buildDashboardsDocument', () => {
+  it('acquires the VS Code API once and re-exposes it for both engines', () => {
+    const out = buildDashboardsDocument('vscode-resource:', pmParts, chFrag);
+    // The shim acquires once and overrides the global so both engine scripts share the handle.
+    assert.ok(out.includes('window.acquireVsCodeApi = function () { return api; };'),
+      'host does not re-expose a shared acquireVsCodeApi handle');
+    // Exactly one real acquisition by the host (the engines call the re-exposed global, not a
+    // fresh `var ... = acquireVsCodeApi()` that VS Code would reject as a second acquisition).
+    const realAcquire = out.match(/var api = acquireVsCodeApi\(\);/g) ?? [];
+    assert.strictEqual(realAcquire.length, 1, 'expected exactly one host-side API acquisition');
   });
 
-  it('tags bubbled messages with the source so the host can dispatch by pane', () => {
-    assert.ok(injectIframeBridge(sample, 'projectMap').includes("__src: 'projectMap'"));
-    assert.ok(injectIframeBridge(sample, 'codeHealth').includes("__src: 'codeHealth'"));
+  it('embeds both engines markup and scripts in one document', () => {
+    const out = buildDashboardsDocument('vscode-resource:', pmParts, chFrag);
+    assert.ok(out.includes('<div class="pm-pane">'), 'Project Map markup missing');
+    assert.ok(out.includes('id="pvTable"'), 'Code Health markup missing');
+    assert.ok(out.includes('var pmApi = acquireVsCodeApi();'), 'Project Map script missing');
+    assert.ok(out.includes('var vscode = acquireVsCodeApi();'), 'Code Health script missing');
+    // ECharts is loaded exactly once for the Project Map pane.
+    const echarts = out.match(/echarts\.min\.js/g) ?? [];
+    assert.strictEqual(echarts.length, 1, 'expected exactly one ECharts loader');
   });
 
-  it('injects the shim before </head> so it runs before the engine body scripts', () => {
-    const out = injectIframeBridge(sample, 'projectMap');
-    const shimIdx = out.indexOf('acquireVsCodeApi');
-    const headEnd = out.indexOf('</head>');
-    const bodyStart = out.indexOf('<body>');
-    assert.ok(shimIdx > -1 && headEnd > -1, 'shim or </head> missing');
-    assert.ok(shimIdx < headEnd, 'shim must be inside <head>');
-    assert.ok(headEnd < bodyStart, 'shim must precede the body');
+  it('keeps Project Map styles scoped under .pm-pane so they cannot leak', () => {
+    const out = buildDashboardsDocument('vscode-resource:', pmParts, chFrag);
+    // Every Project Map bespoke selector that could collide is prefixed.
+    assert.ok(out.includes('.pm-pane .banner'), 'banner rule not scoped');
+    assert.ok(out.includes('.pm-pane table'), 'table rule not scoped');
+    // The host shrinks the standalone full-viewport pane back to content height.
+    assert.ok(out.includes('.dash-pane .pm-pane { min-height: 0; }'), 'pane height fixup missing');
   });
 
-  it('leaves the rest of the report document intact', () => {
-    const out = injectIframeBridge(sample, 'projectMap');
-    assert.ok(out.includes('<div id="x">hi</div>'), 'report body content was altered');
-    assert.ok(out.includes('<meta charset="UTF-8">'), 'report head content was altered');
+  it('degrades a failed scan to an inline placeholder without dropping the other pane', () => {
+    const out = buildDashboardsDocument('vscode-resource:', null, chFrag);
+    assert.ok(out.includes('pane-failed'), 'failed pane should show a placeholder');
+    assert.ok(out.includes('id="pvTable"'), 'the surviving pane must still render');
+    // No ECharts loader and no Project Map script when its scan failed.
+    assert.ok(!out.includes('echarts.min.js'), 'no ECharts when Project Map scan failed');
   });
 });

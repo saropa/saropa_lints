@@ -5,6 +5,15 @@
 /// charts until they mount, table zebra + sticky header, and a relative-time
 /// "scanned X ago" chip that refreshes every 30 s. Motion respects
 /// `prefers-reduced-motion`. The only Dart interpolation is the embedded JSON.
+///
+/// Every visual rule is scoped under a single `.pm-pane` wrapper (and the page
+/// background / fonts live on that wrapper, not on `body`). This is what lets the
+/// consolidated "Saropa Dashboards" view drop this report's markup beside the
+/// Code Health report in ONE document without the two stylesheets colliding on
+/// bare selectors (`body`, `table`, `.chip`, `.panel`) or on `:root` tokens. The
+/// standalone browser/CI export renders identically because `.pm-pane` fills the
+/// viewport. The `<!--PM_*-->` comment markers let the host extract the style,
+/// markup, and script blocks by exact boundaries instead of fragile parsing.
 library;
 
 /// Wraps the embedded [json] payload in the full HTML document.
@@ -17,14 +26,17 @@ String renderHealthDocument(String json) =>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Saropa Project Map</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<!--PM_STYLE_START-->
 <style>
   /* Brand-anchored palette = the SAROPA_DASHBOARD_STYLE_GUIDE standalone fallback
      (§3.6). This is what a browser/CI export with no host theme renders. CSS vars so
      light and dark share the same rules; the dark override below flips surfaces / text
      without rewriting components. In the VS Code webview these same token NAMES are
      rebound to the host theme by projectMapView.ts (webviewThemeOverride) — keep the
-     names stable so that override keeps matching. */
-  :root {
+     names stable so that override keeps matching. Tokens + the page background live on
+     `.pm-pane` (not `:root` / `body`) so the consolidated dashboard can host this report
+     beside Code Health without the two `:root` blocks fighting. */
+  .pm-pane {
     color-scheme: light dark;
     --brand: #f97316;
     --brand-2: #ea580c;
@@ -41,9 +53,15 @@ String renderHealthDocument(String json) =>
     --shadow-lg: 0 4px 12px rgba(15,23,42,.08), 0 10px 30px -8px rgba(15,23,42,.16);
     --radius: 12px;
     --ring: 0 0 0 3px rgba(249,115,22,.32);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
+      "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.45;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
+    .pm-pane {
       --bg: #0a0f1c;
       --surface: #0f172a;
       --surface-2: #1e293b;
@@ -57,20 +75,13 @@ String renderHealthDocument(String json) =>
       --brand-glow: rgba(249,115,22,.28);
     }
   }
-  * { box-sizing: border-box; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui,
-      "Helvetica Neue", Arial, sans-serif;
-    margin: 0; padding: 0;
-    background: var(--bg); color: var(--text);
-    line-height: 1.45;
-    -webkit-font-smoothing: antialiased;
-  }
-  .page { padding: 0 24px 32px; max-width: 1400px; margin: 0 auto; }
+  html, body { margin: 0; }
+  .pm-pane, .pm-pane * { box-sizing: border-box; }
+  .pm-pane .page { padding: 0 24px 32px; max-width: 1400px; margin: 0 auto; }
 
   /* Sticky brand banner. The 3px gradient strip on top is the brand mark;
      the soft blur keeps content underneath legible when scrolled. */
-  .banner {
+  .pm-pane .banner {
     position: sticky; top: 0; z-index: 50;
     margin: 0 -24px 22px;
     padding: 18px 24px 16px;
@@ -81,43 +92,43 @@ String renderHealthDocument(String json) =>
     border-bottom: 1px solid var(--border);
     box-shadow: var(--shadow);
   }
-  .banner::before {
+  .pm-pane .banner::before {
     content: ""; position: absolute; inset: 0 0 auto 0; height: 3px;
     background: linear-gradient(90deg, var(--brand) 0%, var(--brand-2) 55%, #0f172a 100%);
   }
-  .eyebrow {
+  .pm-pane .eyebrow {
     font-size: 11px; font-weight: 700;
     letter-spacing: .14em; text-transform: uppercase;
     color: var(--brand);
     margin: 4px 0 6px;
   }
-  .banner h1 {
+  .pm-pane .banner h1 {
     font-size: 30px; font-weight: 700; letter-spacing: -.025em;
     margin: 0; line-height: 1.1;
     display: flex; align-items: center; gap: 10px;
   }
-  .banner h1 .flame { filter: drop-shadow(0 1px 4px var(--brand-glow)); }
-  .banner h1 .title-text {
+  .pm-pane .banner h1 .flame { filter: drop-shadow(0 1px 4px var(--brand-glow)); }
+  .pm-pane .banner h1 .title-text {
     background: linear-gradient(135deg, var(--text) 0%, var(--muted) 130%);
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent;
   }
-  .meta {
+  .pm-pane .meta {
     display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
     margin-top: 10px; font-size: 12.5px; color: var(--muted);
   }
-  #sub { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  .pm-pane #sub { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
          font-size: 12px; }
-  .chip {
+  .pm-pane .chip {
     display: inline-flex; gap: 6px; align-items: center;
     padding: 3px 10px; border-radius: 999px;
     background: var(--brand-glow); color: var(--brand-2);
     font-weight: 600; font-size: 11px;
   }
   @media (prefers-color-scheme: dark) {
-    .chip { color: #fdba74; }
+    .pm-pane .chip { color: #fdba74; }
   }
-  .chip::before {
+  .pm-pane .chip::before {
     content: ""; width: 6px; height: 6px; border-radius: 50%;
     background: var(--brand);
     box-shadow: 0 0 0 3px var(--brand-glow);
@@ -125,68 +136,68 @@ String renderHealthDocument(String json) =>
 
   /* KPI chips — five inline cards inside the banner so the strip and the
      numbers read as one banner instead of two stacked rows. */
-  .kpis {
+  .pm-pane .kpis {
     display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 10px; margin-top: 14px;
   }
-  @media (max-width: 720px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
-  .kpi {
+  @media (max-width: 720px) { .pm-pane .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .pm-pane .kpi {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 12px 14px 11px;
     box-shadow: var(--shadow);
     transition: transform .18s ease, box-shadow .18s ease;
     position: relative; overflow: hidden;
-    animation: rise .45s ease both;
+    animation: pmRise .45s ease both;
   }
-  .kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
-  .kpi::after {
+  .pm-pane .kpi:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+  .pm-pane .kpi::after {
     content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
     background: var(--brand);
     transform: scaleX(0); transform-origin: left;
     transition: transform .3s ease;
   }
-  .kpi:hover::after { transform: scaleX(1); }
-  .kpi.heat::after { transform: scaleX(1); opacity: .55; }
-  .kpi .num {
+  .pm-pane .kpi:hover::after { transform: scaleX(1); }
+  .pm-pane .kpi.heat::after { transform: scaleX(1); opacity: .55; }
+  .pm-pane .kpi .num {
     font-size: 24px; font-weight: 700; letter-spacing: -.02em;
     font-variant-numeric: tabular-nums;
   }
-  .kpi.heat .num { color: var(--brand); }
-  .kpi .lbl {
+  .pm-pane .kpi.heat .num { color: var(--brand); }
+  .pm-pane .kpi .lbl {
     font-size: 10px; font-weight: 700; text-transform: uppercase;
     letter-spacing: .08em; color: var(--muted); margin-top: 2px;
   }
   /* Staggered reveal — feels alive on first paint without being theatrical. */
-  .kpi:nth-child(1){animation-delay:0ms}
-  .kpi:nth-child(2){animation-delay:55ms}
-  .kpi:nth-child(3){animation-delay:110ms}
-  .kpi:nth-child(4){animation-delay:165ms}
-  .kpi:nth-child(5){animation-delay:220ms}
-  @keyframes rise {
+  .pm-pane .kpi:nth-child(1){animation-delay:0ms}
+  .pm-pane .kpi:nth-child(2){animation-delay:55ms}
+  .pm-pane .kpi:nth-child(3){animation-delay:110ms}
+  .pm-pane .kpi:nth-child(4){animation-delay:165ms}
+  .pm-pane .kpi:nth-child(5){animation-delay:220ms}
+  @keyframes pmRise {
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: none; }
   }
 
   /* Panels — soft elevation, brand-colored chevron, hover lift. */
-  .panel {
+  .pm-pane .panel {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius); margin-bottom: 16px;
     box-shadow: var(--shadow); overflow: hidden;
     transition: box-shadow .2s ease, transform .2s ease;
-    animation: rise .5s ease both;
+    animation: pmRise .5s ease both;
   }
-  .panel:nth-of-type(1){animation-delay:280ms}
-  .panel:nth-of-type(2){animation-delay:340ms}
-  .panel:nth-of-type(3){animation-delay:400ms}
-  .panel:hover { box-shadow: var(--shadow-lg); }
-  .panel > summary {
+  .pm-pane .panel:nth-of-type(1){animation-delay:280ms}
+  .pm-pane .panel:nth-of-type(2){animation-delay:340ms}
+  .pm-pane .panel:nth-of-type(3){animation-delay:400ms}
+  .pm-pane .panel:hover { box-shadow: var(--shadow-lg); }
+  .pm-pane .panel > summary {
     cursor: pointer; padding: 14px 18px;
     font-size: 14px; font-weight: 600;
     list-style: none; user-select: none;
     display: flex; align-items: center; gap: 10px;
   }
-  .panel > summary::-webkit-details-marker { display: none; }
-  .panel > summary::before {
+  .pm-pane .panel > summary::-webkit-details-marker { display: none; }
+  .pm-pane .panel > summary::before {
     content: ""; width: 7px; height: 7px;
     border-right: 2px solid var(--brand);
     border-bottom: 2px solid var(--brand);
@@ -194,30 +205,30 @@ String renderHealthDocument(String json) =>
     transition: transform .2s ease;
     flex: 0 0 auto;
   }
-  .panel[open] > summary::before { transform: rotate(45deg); }
-  .pbody { padding: 0 18px 18px; }
-  .chart { width: 100%; height: 420px; }
+  .pm-pane .panel[open] > summary::before { transform: rotate(45deg); }
+  .pm-pane .pbody { padding: 0 18px 18px; }
+  .pm-pane .chart { width: 100%; height: 420px; }
 
   /* Skeleton shimmer — visible while the JSON is parsing and ECharts mounts.
      Removed by JS after each setOption returns. */
-  .skeleton {
+  .pm-pane .skeleton {
     background: linear-gradient(90deg,
       var(--surface-2) 0%, var(--hover) 50%, var(--surface-2) 100%);
     background-size: 200% 100%; border-radius: 8px;
-    animation: shimmer 1.4s linear infinite;
+    animation: pmShimmer 1.4s linear infinite;
   }
-  @keyframes shimmer {
+  @keyframes pmShimmer {
     0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
   }
 
   /* Treemap legend — a thin 4-stop gradient bar with labels at each end.
      Mirrors the per-leaf orange ramp applied in JS so colors are legible. */
-  .legend {
+  .pm-pane .legend {
     display: flex; align-items: center; gap: 10px;
     margin-top: 10px; font-size: 11px; color: var(--muted);
   }
-  .legend-bar {
+  .pm-pane .legend-bar {
     flex: 1; height: 6px; border-radius: 999px;
     background: linear-gradient(90deg,
       rgb(254,243,199) 0%, rgb(253,186,116) 33%,
@@ -227,19 +238,19 @@ String renderHealthDocument(String json) =>
 
   /* Hot-spot filter + table. Sticky head + tabular-figures numerics +
      monospace path column = readable scanning of a long list. */
-  .filter {
+  .pm-pane .filter {
     width: 100%; padding: 10px 12px;
     border: 1px solid var(--border); border-radius: 8px;
     background: var(--surface-2); color: var(--text);
     font-size: 13px; margin-bottom: 12px;
     transition: border-color .15s ease, box-shadow .15s ease;
   }
-  .filter:focus {
+  .pm-pane .filter:focus {
     outline: none; border-color: var(--brand); box-shadow: var(--ring);
   }
-  .filter::placeholder { color: var(--muted); }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th {
+  .pm-pane .filter::placeholder { color: var(--muted); }
+  .pm-pane table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .pm-pane thead th {
     position: sticky; top: 0;
     background: var(--surface);
     text-align: left; padding: 10px 12px;
@@ -249,44 +260,47 @@ String renderHealthDocument(String json) =>
     color: var(--muted); cursor: pointer; user-select: none;
     transition: color .15s ease;
   }
-  thead th:hover { color: var(--brand); }
-  thead th.sort-active { color: var(--brand); }
-  thead th.sort-active::after { content: " ▾"; font-size: 9px; }
-  tbody tr {
+  .pm-pane thead th:hover { color: var(--brand); }
+  .pm-pane thead th.sort-active { color: var(--brand); }
+  .pm-pane thead th.sort-active::after { content: " ▾"; font-size: 9px; }
+  .pm-pane tbody tr {
     cursor: pointer;
     transition: background .12s ease;
   }
-  tbody tr:nth-child(even) td { background: var(--zebra); }
-  tbody tr:hover td { background: var(--brand-glow); }
-  td {
+  .pm-pane tbody tr:nth-child(even) td { background: var(--zebra); }
+  .pm-pane tbody tr:hover td { background: var(--brand-glow); }
+  .pm-pane td {
     padding: 9px 12px; border-bottom: 1px solid var(--border);
     white-space: nowrap;
   }
   /* Numeric columns share a single tabular figure stack so they line up. */
-  td.n { font-variant-numeric: tabular-nums; text-align: right; }
-  td.fire { font-size: 14px; letter-spacing: -.06em; }
-  td.path {
+  .pm-pane td.n { font-variant-numeric: tabular-nums; text-align: right; }
+  .pm-pane td.fire { font-size: 14px; letter-spacing: -.06em; }
+  .pm-pane td.path {
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 12px; color: var(--text);
   }
 
   /* Keyboard a11y — orange focus ring is the brand color, so focus reads as
      intentional product polish instead of the default browser blue. */
-  :focus-visible {
+  .pm-pane :focus-visible {
     outline: none; box-shadow: var(--ring); border-radius: 6px;
   }
 
   /* Reduced motion — kill animations and hover transforms wholesale. */
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    .pm-pane *, .pm-pane *::before, .pm-pane *::after {
       animation-duration: .001ms !important;
       animation-iteration-count: 1 !important;
       transition: none !important;
     }
   }
 </style>
+<!--PM_STYLE_END-->
 </head>
 <body>
+<!--PM_BODY_START-->
+<div class="pm-pane">
 <div class="page">
 <header class="banner">
   <div class="eyebrow">Saropa Lints · Code Health</div>
@@ -326,6 +340,9 @@ String renderHealthDocument(String json) =>
     </tr></thead><tbody></tbody></table>
   </div></details>
 </div>
+</div>
+<!--PM_BODY_END-->
+<!--PM_SCRIPT_START-->
 <script>
 const DATA = $json;
 const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -628,6 +645,7 @@ ths.forEach(function(th, idx){
   });
 })();
 </script>
+<!--PM_SCRIPT_END-->
 </body>
 </html>
 ''';

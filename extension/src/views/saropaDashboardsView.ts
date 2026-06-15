@@ -1,38 +1,58 @@
 /**
  * Consolidated "Saropa Dashboards" webview: shows the Project Map and Code Health dashboards
- * together on one page, side by side, with each screen's FULL interactive content preserved.
+ * together on ONE page, side by side, with each screen's full interactive content preserved — the
+ * ECharts treemap / churn-complexity scatter / hot-spot table from Project Map, and the score
+ * status line, KPI preset filters, and sortable function table from Code Health.
  *
- * Each engine renders inside its own `<iframe srcdoc>` so its existing HTML — ECharts treemap /
- * scatter / hot-spots for Project Map, the score gauge / sortable function table for Code Health —
- * embeds byte-for-byte with no id renaming and no script surgery. An iframe is an isolated document,
- * which avoids the two hazards of dropping both full reports into one page: the once-per-document
- * `acquireVsCodeApi()` limit and DOM id collisions.
+ * It is a single composed document, NOT an iframe per pane. Both engines' real markup, styles, and
+ * scripts are assembled into one webview document. Two hazards make naive composition fail, and
+ * each is handled without rewriting either engine:
  *
- * The only glue is a message bridge: each iframe gets a tiny `acquireVsCodeApi` shim that bubbles its
- * drill-down messages up to this host (tagged with `__src`); a host-level relay forwards them to the
- * extension, and routes scan events / commands back down into the right iframe.
+ *   1. `acquireVsCodeApi()` may be called only ONCE per document. The host acquires the single
+ *      handle up front and overrides `window.acquireVsCodeApi` to return that cached handle, so
+ *      both engines' scripts (Project Map's inline data script, Code Health's IIFE) get the same
+ *      messaging channel.
+ *   2. CSS would collide on bare selectors (`body`, `table`, `.chip`, `.panel`) and `:root` tokens.
+ *      Project Map's stylesheet is scoped under `.pm-pane` (see health_html_template.dart), so it
+ *      cannot leak onto the shared chrome or the Code Health pane. The two engines' DOM ids
+ *      (`treemap`/`filter`/`hot` vs `pvTable`/`pvSearch`/…) do not overlap, so a shared document is
+ *      safe.
  *
- * This is additive — the standalone `saropaLints.openProjectHealthDashboard` and Code Health commands
- * are unchanged; this is a third entry that composes them.
+ * ECharts is loaded once in the host `<head>`; both panes' scans run to completion before the page
+ * is assembled, so the composed view shows a single loading state rather than each engine's live
+ * scan animation (those remain in the standalone panels). Drill-down clicks from either pane post
+ * to this host, which opens the file or delegates to the matching standalone command.
  *
- * Phase 1 (this file) wires the host shell + the Project Map pane. The Code Health pane is added in
- * Phase 2.
+ * This is additive — the standalone `saropaLints.openProjectHealthDashboard` and
+ * `saropaLints.openProjectVibrancyReport` commands are unchanged; this is a third entry that
+ * composes them.
  */
+import * as nodePath from 'node:path';
 import * as vscode from 'vscode';
 import { getProjectRoot } from '../projectRoot';
 import { hasSaropaLintsDep } from '../pubspecReader';
 import { l10n } from '../i18n/runtime';
-import { getDashboardChromeStyles } from './dashboardChromeStyles';
+import { getProjectVibrancyReportStyles } from './projectVibrancyReportStyles';
+import { getKeyboardShortcutsStyles } from './keyboard-shortcuts';
 import { buildDashboardHero } from './dashboardHero';
 import {
   openFileFromReport,
-  scanProjectMapToHtml,
+  pmPaneThemeTokens,
+  scanProjectMapToParts,
+  type ProjectMapParts,
 } from './projectMapView';
+import {
+  applyFileSuppression,
+  buildCodeHealthFragment,
+  type CodeHealthFragment,
+} from './projectVibrancyReportView';
+import { runProjectVibrancyScan } from './projectVibrancyCliRunner';
 
 let panel: vscode.WebviewPanel | undefined;
 let extensionUri: vscode.Uri;
-let inflight = false;
-let lastRoot: string | undefined; // resolves relative paths from iframe drill-downs
+let inflight: Promise<void> | undefined;
+let lastRoot: string | undefined; // resolves relative drill-down paths from either pane
+let lastCodeHealthStdout = ''; // backs the Code Health pane's "Copy JSON" action
 
 /** Registers the `Saropa Dashboards` command; call once at activation. */
 export function registerSaropaDashboardsCommand(context: vscode.ExtensionContext): void {
@@ -42,68 +62,64 @@ export function registerSaropaDashboardsCommand(context: vscode.ExtensionContext
   );
 }
 
-function openDashboards(): void {
+function openDashboards(): Promise<void> {
+  if (inflight) {
+    panel?.reveal(vscode.ViewColumn.One);
+    return inflight; // a scan pair is already running — share it, don't double-spawn
+  }
   const root = getProjectRoot();
   if (!root) {
     void vscode.window.showErrorMessage(l10n('notify.commands.projectMapNoProject'));
-    return;
+    return Promise.resolve();
   }
   if (!hasSaropaLintsDep(root)) {
     void vscode.window.showErrorMessage(l10n('notify.commands.projectMapMissingDep'));
-    return;
+    return Promise.resolve();
   }
-  lastRoot = root;
-  const p = getOrCreatePanel();
-  p.webview.html = buildHostHtml(p.webview);
-  p.reveal(vscode.ViewColumn.One);
-  // Kick off the Project Map pane's scan; its HTML streams into the iframe when ready.
-  if (!inflight) {
-    inflight = true;
-    void loadProjectMapPane(root, p).finally(() => {
-      inflight = false;
-    });
-  }
-}
-
-/** Runs the Project Map scan and pushes its embeddable HTML into the pane's iframe. */
-async function loadProjectMapPane(root: string, p: vscode.WebviewPanel): Promise<void> {
-  const html = await vscode.window.withProgress(
-    {
-      location: vscode.ProgressLocation.Notification,
-      title: l10n('dashboards.projectMap.scanning'),
-      cancellable: true,
-    },
-    (_progress, token) => scanProjectMapToHtml(root, p.webview, extensionUri, token),
-  );
-  if (!html) {
-    // Panel may have been disposed mid-scan, or the scan failed (its own error toast fired).
-    void p.webview.postMessage({ type: 'pmFailed' });
-    return;
-  }
-  // Embed with the drill-down shim so the report's row clicks reach this host.
-  void p.webview.postMessage({ type: 'pmContent', html: injectIframeBridge(html, 'projectMap') });
+  inflight = runAndRender(root).finally(() => {
+    inflight = undefined;
+  });
+  return inflight;
 }
 
 /**
- * Injects a tiny `acquireVsCodeApi` shim into an engine's HTML so that, inside an iframe (where the
- * real API is absent), its `postMessage` calls bubble to the parent host tagged with [source]. The
- * engine HTML is otherwise untouched. Inserted before `</head>` so it is defined before the engine's
- * body scripts run and is governed by the document's own CSP (which permits inline scripts).
+ * Renders the loading shell immediately, runs BOTH scans concurrently, then assembles the composed
+ * document once both finish. A failed pane renders an inline retry placeholder rather than blocking
+ * the other pane — one engine erroring should not blank the whole view.
  */
-export function injectIframeBridge(html: string, source: string): string {
-  const shim = `<script>
-(function () {
-  var api = {
-    postMessage: function (m) {
-      parent.postMessage(Object.assign({ __src: '${source}' }, m), '*');
+async function runAndRender(root: string): Promise<void> {
+  lastRoot = root;
+  const p = getOrCreatePanel();
+  p.webview.html = buildLoadingShell(p.webview);
+  p.reveal(vscode.ViewColumn.One);
+  const [pmParts, chFrag] = await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: l10n('dashboards.heroTitle'),
+      cancellable: true,
     },
-    getState: function () { return undefined; },
-    setState: function () {},
-  };
-  window.acquireVsCodeApi = function () { return api; };
-})();
-</script>`;
-  return html.replace('</head>', `${shim}</head>`);
+    (_progress, token) =>
+      Promise.all([
+        scanProjectMapToParts(root, p.webview, extensionUri, token),
+        scanCodeHealthFragment(root, token),
+      ]),
+  );
+  // The panel may have been disposed mid-scan.
+  if (!panel) return;
+  p.webview.html = buildDashboardsDocument(p.webview.cspSource, pmParts, chFrag);
+}
+
+/** Runs the Code Health scan and returns its embeddable fragment, or null on cancel/failure. */
+async function scanCodeHealthFragment(
+  root: string,
+  token: vscode.CancellationToken,
+): Promise<CodeHealthFragment | null> {
+  const scan = await runProjectVibrancyScan(root, token);
+  if (!scan.payload) return null;
+  lastCodeHealthStdout = scan.rawStdout;
+  // No saved-report-file row in the consolidated pane (reportFilePath omitted) — the standalone
+  // Code Health panel owns the persisted-file workflow; "Open full screen" reaches it.
+  return buildCodeHealthFragment(scan.payload);
 }
 
 function getOrCreatePanel(): vscode.WebviewPanel {
@@ -115,8 +131,7 @@ function getOrCreatePanel(): vscode.WebviewPanel {
     {
       enableScripts: true,
       retainContextWhenHidden: true,
-      // The Project Map iframe loads the vendored ECharts from media/; child frames inherit the
-      // host's resource roots.
+      // The Project Map pane loads the vendored ECharts from media/.
       localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
     },
   );
@@ -127,33 +142,175 @@ function getOrCreatePanel(): vscode.WebviewPanel {
   return panel;
 }
 
-/** Routes messages bubbled up from the panes' iframes (and the host's own chrome buttons). */
+/**
+ * Routes messages from both panes' scripts. Open-file drill-downs (Project Map posts `{file}`,
+ * Code Health posts `{file, line}`) open the target; the richer Code Health actions are handled
+ * here so its toolbar/detail buttons are not silent in the consolidated view.
+ */
 function handleHostMessage(msg: unknown): void {
-  const data = msg as { __src?: string; type?: string; file?: string };
-  // Project Map row-click drill-down → open the file, exactly as the standalone panel does.
-  if (data.__src === 'projectMap' && data.type === 'openFile' && typeof data.file === 'string' && lastRoot) {
-    void openFileFromReport(lastRoot, data.file);
-    return;
-  }
-  // "Open full screen" on a pane header opens that engine's standalone panel.
-  if (data.type === 'openProjectMapFull') {
-    void vscode.commands.executeCommand('saropaLints.openProjectHealthDashboard');
-    return;
+  const data = msg as {
+    type?: string;
+    file?: string;
+    line?: number;
+    flag?: string;
+    text?: string;
+  };
+  switch (data.type) {
+    case 'openFile':
+      if (typeof data.file === 'string' && lastRoot) {
+        void openFileAtLine(lastRoot, data.file, data.line ?? 1);
+      }
+      return;
+    case 'openProjectMapFull':
+      void vscode.commands.executeCommand('saropaLints.openProjectHealthDashboard');
+      return;
+    case 'openCodeHealthFull':
+      void vscode.commands.executeCommand('saropaLints.openProjectVibrancyReport');
+      return;
+    case 'openProjectVibrancySettings':
+      void vscode.commands.executeCommand('saropaLints.openProjectVibrancySettings');
+      return;
+    case 'rescan':
+    case 'restart':
+      if (!inflight && lastRoot) {
+        inflight = runAndRender(lastRoot).finally(() => {
+          inflight = undefined;
+        });
+      }
+      return;
+    case 'copyJson':
+      void copyCodeHealthJson();
+      return;
+    case 'copyText':
+      void copyText(data.text);
+      return;
+    case 'suppressFlag':
+      if (typeof data.file === 'string' && typeof data.flag === 'string') {
+        void applyFileSuppression(data.file, data.flag);
+      }
+      return;
+    default:
+      return;
   }
 }
 
-/** The host shell document: shared chrome + a responsive two-pane grid + the message-relay script. */
-function buildHostHtml(webview: vscode.Webview): string {
-  const cspSource = webview.cspSource;
-  // frame-src 'self' permits the per-pane srcdoc iframes; inline allowances match the embedded
-  // engine reports, which are inline-heavy.
+/** Opens a report-relative file at [line] (1-based), resolving against the project root. */
+async function openFileAtLine(root: string, relativeFile: string, line: number): Promise<void> {
+  if (line <= 1) {
+    // Project Map row clicks carry no line — reuse the shared opener (preview, line 1).
+    await openFileFromReport(root, relativeFile);
+    return;
+  }
+  const target = nodePath.isAbsolute(relativeFile)
+    ? relativeFile
+    : nodePath.join(root, relativeFile);
+  try {
+    const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(target));
+    const editor = await vscode.window.showTextDocument(doc, { preview: true });
+    const pos = new vscode.Position(Math.max(0, line - 1), 0);
+    editor.selection = new vscode.Selection(pos, pos);
+    editor.revealRange(new vscode.Range(pos, pos), vscode.TextEditorRevealType.InCenter);
+  } catch {
+    void vscode.window.showWarningMessage(
+      l10n('notify.commands.projectMapCouldNotOpen', { file: relativeFile }),
+    );
+  }
+}
+
+async function copyCodeHealthJson(): Promise<void> {
+  if (lastCodeHealthStdout.trim().length === 0) {
+    void vscode.window.showInformationMessage(l10n('codeHealth.runReportFirst'));
+    return;
+  }
+  await vscode.env.clipboard.writeText(lastCodeHealthStdout);
+  void vscode.window.showInformationMessage(l10n('codeHealth.copiedJson'));
+}
+
+async function copyText(text: string | undefined): Promise<void> {
+  if (typeof text !== 'string' || text.length === 0) return;
+  // Bound to 1 MB so a runaway selection can't paste a multi-megabyte string by accident.
+  const capped = text.length > 1_000_000 ? text.slice(0, 1_000_000) : text;
+  await vscode.env.clipboard.writeText(capped);
+}
+
+/** The loading shell shown immediately while both scans run. */
+function buildLoadingShell(webview: vscode.Webview): string {
+  const hero = buildDashboardHero({ title: l10n('dashboards.heroTitle'), showFullWidthToggle: false });
+  const pm = paneShell('projectMap', l10n('dashboards.pane.projectMap'), false,
+    `<div class="pane-status">${escapeHtml(l10n('dashboards.projectMap.scanning'))}</div>`);
+  const ch = paneShell('codeHealth', l10n('dashboards.pane.codeHealth'), false,
+    `<div class="pane-status">${escapeHtml(l10n('dashboards.codeHealth.scanning'))}</div>`);
+  return wrapDocument(webview.cspSource, '', '', `<header>${hero}</header><main class="dash-grid">${pm}${ch}</main>`);
+}
+
+/**
+ * The composed document: shared chrome + scoped Project Map styles + (once) ECharts, a two-pane
+ * grid carrying each engine's real markup, and — last in the body so the shared `acquireVsCodeApi`
+ * shim runs first — each engine's own script. Pure (no webview): the ECharts URI already lives in
+ * [pmParts] and the only host value needed is [cspSource], so unit tests can assert the composition
+ * contract (shared API shim, both panes present, Project Map styles scoped) directly.
+ */
+export function buildDashboardsDocument(
+  cspSource: string,
+  pmParts: ProjectMapParts | null,
+  chFrag: CodeHealthFragment | null,
+): string {
+  const hero = buildDashboardHero({ title: l10n('dashboards.heroTitle'), showFullWidthToggle: false });
+  const pmBody = pmParts
+    ? pmParts.bodyHtml
+    : `<div class="pane-status pane-failed">${escapeHtml(l10n('dashboards.scanFailed'))}</div>`;
+  const chBody = chFrag
+    ? chFrag.body
+    : `<div class="pane-status pane-failed">${escapeHtml(l10n('dashboards.scanFailed'))}</div>`;
+  const pm = paneShell('projectMap', l10n('dashboards.pane.projectMap'), true, pmBody);
+  const ch = paneShell('codeHealth', l10n('dashboards.pane.codeHealth'), true, chBody);
+
+  // ECharts loaded once for the Project Map pane; the engine scripts run after the shared-API shim.
+  const echarts = pmParts ? `<script src="${pmParts.echartsUri}"></script>` : '';
+  // Rebind Project Map's palette tokens to the editor theme (same as the standalone panel) so this
+  // pane matches the theme-driven Code Health pane instead of rendering in the fixed brand palette.
+  const extraStyle = pmParts
+    ? `<style>${pmParts.styleHtml}${pmPaneThemeTokens()}${pmPaneHostFixups()}</style>`
+    : '';
+  const bodyScripts =
+    `<script>${apiShimScript()}</script>` +
+    (pmParts ? `<script>${pmParts.scriptHtml}</script>` : '') +
+    (chFrag ? `<script>${chFrag.script}</script>` : '');
+
+  return wrapDocument(
+    cspSource,
+    echarts,
+    extraStyle,
+    `<header>${hero}</header><main class="dash-grid">${pm}${ch}</main>${bodyScripts}`,
+  );
+}
+
+/** One dashboard pane: a titled card with an optional "Open full screen" button and a body. */
+function paneShell(engine: string, title: string, showOpenFull: boolean, body: string): string {
+  const openFullId = engine === 'projectMap' ? 'dashOpenPmFull' : 'dashOpenChFull';
+  const openFull = showOpenFull
+    ? `<button type="button" class="btn" id="${openFullId}">${escapeHtml(l10n('dashboards.openFull'))}</button>`
+    : '';
+  return `<section class="dash-pane">
+    <div class="pane-head"><h2>${escapeHtml(title)}</h2>${openFull}</div>
+    <div class="pane-body">${body}</div>
+  </section>`;
+}
+
+/** Wraps body content in the full HTML document with the host CSP, chrome styles, and layout. */
+function wrapDocument(
+  cspSource: string,
+  headScripts: string,
+  extraStyle: string,
+  body: string,
+): string {
+  // 'unsafe-inline' (scripts): the host shim + both engines' inline scripts run inline; no nonce so
+  // a single policy covers all three. 'unsafe-eval' is intentionally absent — nothing here evals.
+  // 'unsafe-inline' (styles): Code Health score pills + Project Map cells set colour via inline
+  // style attributes. ${cspSource} (scripts): the vendored ECharts file in media/.
   const csp =
-    `default-src 'none'; frame-src 'self'; img-src ${cspSource} data:; ` +
+    `default-src 'none'; img-src ${cspSource} data:; ` +
     `style-src ${cspSource} 'unsafe-inline'; script-src ${cspSource} 'unsafe-inline';`;
-  const hero = buildDashboardHero({
-    title: l10n('dashboards.heroTitle'),
-    showFullWidthToggle: false,
-  });
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -161,97 +318,79 @@ function buildHostHtml(webview: vscode.Webview): string {
   <meta http-equiv="Content-Security-Policy" content="${csp}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saropa Dashboards</title>
-  <style>${getDashboardChromeStyles()}${hostStyles()}</style>
+  <style>${getProjectVibrancyReportStyles()}${getKeyboardShortcutsStyles()}${hostStyles()}</style>
+  ${extraStyle}
+  ${headScripts}
 </head>
 <body>
-  <header>${hero}</header>
-  <main class="dash-grid">
-    <section class="dash-pane">
-      <div class="pane-head">
-        <h2>${escapeHtml(l10n('dashboards.pane.projectMap'))}</h2>
-        <button type="button" class="btn" id="pmOpenFull">${escapeHtml(l10n('dashboards.openFull'))}</button>
-      </div>
-      <div class="pane-body">
-        <div id="pmLoading" class="pane-loading">${escapeHtml(l10n('dashboards.projectMap.scanning'))}</div>
-        <iframe id="pmFrame" class="pane-frame" title="${escapeHtml(l10n('dashboards.pane.projectMap'))}"></iframe>
-      </div>
-    </section>
-  </main>
-  <script>${bridgeScript()}</script>
+${body}
 </body>
 </html>`;
 }
 
-/** Host-specific layout on top of the shared chrome: the two-pane responsive grid. */
+/** Host layout: the responsive two-pane grid and pane chrome on top of the shared dashboard styles. */
 function hostStyles(): string {
   return `
 .dash-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
+  gap: var(--space-4, 16px);
+  align-items: start;
 }
-@media (max-width: 980px) { .dash-grid { grid-template-columns: 1fr; } }
+@media (max-width: 1100px) { .dash-grid { grid-template-columns: 1fr; } }
 .dash-pane {
   display: flex;
   flex-direction: column;
-  min-height: 72vh;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: var(--surface-1);
+  border: 1px solid var(--border, var(--vscode-widget-border));
+  border-radius: var(--radius-lg, 12px);
+  background: var(--surface-1, var(--vscode-editorWidget-background));
   overflow: hidden;
+  min-width: 0;
 }
 .pane-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--border);
-  background: var(--surface-2);
+  gap: var(--space-2, 8px);
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border-bottom: 1px solid var(--border, var(--vscode-widget-border));
+  background: var(--surface-2, var(--vscode-editor-inactiveSelectionBackground));
 }
-.pane-head h2 { margin: 0; font-size: var(--text-h3); }
-.pane-body { position: relative; flex: 1 1 auto; min-height: 0; }
-.pane-frame { width: 100%; height: 100%; border: 0; display: block; background: var(--surface-1); }
-.pane-loading {
-  position: absolute; inset: 0;
+.pane-head h2 { margin: 0; font-size: var(--text-h3, 1.05rem); }
+.pane-body { padding: var(--space-3, 12px); min-width: 0; overflow-x: auto; }
+.pane-status {
   display: flex; align-items: center; justify-content: center;
-  color: var(--muted);
+  min-height: 200px; color: var(--muted, var(--vscode-descriptionForeground));
 }
-.pane-failed { color: var(--accent-error); }
+.pane-failed { color: var(--accent-error, var(--vscode-errorForeground)); }
 `;
 }
 
 /**
- * Host relay. Owns the single `acquireVsCodeApi()`. Bubbled iframe messages (tagged `__src`) are
- * forwarded to the extension; `pmContent` from the extension is written into the pane's iframe.
+ * Project Map's `.pm-pane` fills the viewport in its standalone export (`min-height: 100vh`); inside
+ * a grid cell that would force the pane absurdly tall, so the host collapses it back to content
+ * height. Scoped to the consolidated pane only, leaving the standalone export untouched.
  */
-function bridgeScript(): string {
+function pmPaneHostFixups(): string {
+  return `.dash-pane .pm-pane { min-height: 0; }
+.dash-pane .pm-pane .page { padding: 0; }
+.dash-pane .pm-pane .banner { position: static; margin: 0 0 16px; }`;
+}
+
+/**
+ * Acquires the single VS Code API handle and re-exposes it, so both engines' scripts — which each
+ * call `acquireVsCodeApi()` — share one messaging channel (the API may be acquired only once per
+ * document). Also wires the panes' "Open full screen" buttons.
+ */
+function apiShimScript(): string {
   return `
 (function () {
-  var vscode = acquireVsCodeApi();
-  var pmFrame = document.getElementById('pmFrame');
-  var pmLoading = document.getElementById('pmLoading');
-  window.addEventListener('message', function (e) {
-    var d = e.data || {};
-    // Bubbled up from a pane iframe — forward to the extension.
-    if (d.__src) { vscode.postMessage(d); return; }
-    // From the extension: the Project Map report is ready — embed it.
-    if (d.type === 'pmContent') {
-      pmFrame.srcdoc = d.html;
-      if (pmLoading) { pmLoading.style.display = 'none'; }
-      return;
-    }
-    if (d.type === 'pmFailed') {
-      if (pmLoading) { pmLoading.textContent = ''; pmLoading.className = 'pane-loading pane-failed'; }
-      return;
-    }
-  });
-  var openFull = document.getElementById('pmOpenFull');
-  if (openFull) {
-    openFull.addEventListener('click', function () {
-      vscode.postMessage({ type: 'openProjectMapFull' });
-    });
-  }
+  var api = acquireVsCodeApi();
+  window.acquireVsCodeApi = function () { return api; };
+  var pmFull = document.getElementById('dashOpenPmFull');
+  if (pmFull) pmFull.addEventListener('click', function () { api.postMessage({ type: 'openProjectMapFull' }); });
+  var chFull = document.getElementById('dashOpenChFull');
+  if (chFull) chFull.addEventListener('click', function () { api.postMessage({ type: 'openCodeHealthFull' }); });
 })();
 `;
 }
