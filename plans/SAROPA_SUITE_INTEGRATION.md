@@ -1,5 +1,11 @@
 # Saropa Suite Integration — Lints side
 
+> **Status: Closed — reference guide, not an active plan (2026-06-14).** R1–R7 shipped, are tested,
+> and the extension is published (14.0.0). Retained in place (not moved or archived) because the
+> sibling repos reference it by absolute path. Outstanding items are not code: regenerate the stale
+> translated `suite.*` / `consolidated.evidence.*` locale catalogs (operator-run translation step, the
+> publish coverage gate enforces it) and the manual cross-tool verification.
+
 **Created:** 2026-06-13
 **Question answered:** How does `saropa_lints` link with its two sibling tools so static findings,
 live database state, and runtime behavior become one correlated picture — without any of the three
