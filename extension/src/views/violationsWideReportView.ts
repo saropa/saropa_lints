@@ -60,6 +60,18 @@ let liveDiagnosticsListener: vscode.Disposable | undefined;
 let liveRefreshTimer: NodeJS.Timeout | undefined;
 const LIVE_REFRESH_DEBOUNCE_MS = 500;
 
+// No-op guard for the live rebuild. Reassigning `panel.webview.html` reloads the
+// whole document, which replays the hero entrance animation every time — the
+// "constant header flicker" when the analyzer republishes IDENTICAL diagnostics
+// (VS Code fires onDidChangeDiagnostics even when the set is unchanged). We hash
+// the renderer's input (minus the volatile scan timestamp + the cosmetic
+// firstPaint flag) and skip the reassignment when it matches the last paint, so
+// the webview only reloads when the user-visible content actually changed.
+// Reset on dispose so a reopened panel always paints. `hasPaintedOnce` drives
+// firstPaint: only the first paint of a panel instance plays the entrance anim.
+let lastFindingsRenderSignature: string | undefined;
+let hasPaintedOnce = false;
+
 interface DashboardState {
   groupBy: GroupByMode;
   textFilter: string;
@@ -258,7 +270,7 @@ async function rebuildDashboardHtml(
   // rebuild so toggling the scanner flips its pill on the next paint.
   const scanner = buildScannerSlice(cfg);
 
-  panel.webview.html = renderViolationsDashboardHtml({
+  const input = {
     exportViolations: lastExportViolations,
     totalRawAfterDisable: totalAfterDisable,
     filteredCount,
@@ -289,7 +301,28 @@ async function rebuildDashboardHtml(
     filesAffected: countDistinctFiles(afterDisabled.violations),
     enabledRuleCount: raw.config?.enabledRuleCount,
     scanner,
-  });
+    firstPaint: !hasPaintedOnce,
+  };
+
+  // No-op guard: when nothing the user sees has changed, skip the html
+  // reassignment so the document does not reload (and the hero entrance
+  // animation does not replay). `reportTimestamp` is a fresh Date() on every
+  // build and `firstPaint` is cosmetic, so both are neutralized in the
+  // signature; the CSP nonce is generated inside the renderer and never reaches
+  // the input, so it cannot defeat the comparison.
+  const signature = JSON.stringify({ ...input, reportTimestamp: '', firstPaint: false });
+  if (signature === lastFindingsRenderSignature) {
+    // Content unchanged — skip the reload. The live listener dimmed the gauge
+    // ('gaugePending') on the diagnostic change that woke this rebuild; since we
+    // are not shipping fresh html (which carries the settled, un-dimmed gauge),
+    // clear that pending state here so the gauge does not stay dimmed forever.
+    void panel.webview.postMessage({ type: 'gaugePending', pending: false });
+    return;
+  }
+  lastFindingsRenderSignature = signature;
+  hasPaintedOnce = true;
+
+  panel.webview.html = renderViolationsDashboardHtml(input);
 
   void panel.webview.postMessage({
     type: 'hydrateRecentSearches',
@@ -545,6 +578,11 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       clearTimeout(liveRefreshTimer);
       liveRefreshTimer = undefined;
     }
+    // Reset the no-op guard so a reopened panel always paints (its fresh webview
+    // has no DOM yet — a stale matching signature would otherwise leave it
+    // blank) and replays the entrance animation on that first paint.
+    lastFindingsRenderSignature = undefined;
+    hasPaintedOnce = false;
   });
 
   // Live refresh. The Problems panel updates as analysis runs; this listener

@@ -1266,6 +1266,14 @@ export function getViolationsDashboardStyles(): string {
       font-family: var(--vscode-editor-font-family, ui-monospace, monospace);
     }
 
+    /* Live rebuilds set body[data-no-hero-anim] so the hero entrance animation
+       plays only on the first paint of a freshly-opened panel. Without this,
+       every webview.html reassignment (one per analyzer diagnostic republish)
+       reloads the document and replays the fade/slide — the constant header
+       flicker. The end-state (opacity 1, no offset) is the element's default, so
+       suppressing the animation leaves the header correctly rendered. */
+    body[data-no-hero-anim] .dash-hero { animation: none; }
+
     @keyframes hero-in   { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes card-in   { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes chip-in   { from { opacity: 0; transform: scale(.92); }      to { opacity: 1; transform: scale(1); } }

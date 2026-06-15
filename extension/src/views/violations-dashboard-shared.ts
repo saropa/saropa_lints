@@ -123,6 +123,16 @@ export interface ViolationsDashboardHtmlInput {
      */
     hasDartFiles: boolean;
   };
+  /**
+   * True only for the very first paint of a freshly-opened panel. The hero's
+   * entrance animation (`hero-in`) plays only on the first paint; subsequent
+   * live rebuilds suppress it. Each `webview.html` reassignment reloads the
+   * document and would otherwise replay the fade/slide every time the analyzer
+   * republishes — the "constant header flicker" this guards against. Defaults
+   * to animating (omitted / true) so standalone callers and tests keep the
+   * entrance animation.
+   */
+  firstPaint?: boolean;
 }
 
 export const SEVERITY_ORDER: readonly string[] = ['error', 'warning', 'info'];
