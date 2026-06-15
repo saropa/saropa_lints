@@ -73,6 +73,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Added (Extension)
 
+- **New "Saropa Lints: Open Saropa Dashboards" command shows the Project Map and Code Health dashboards side by side on one page.** Each pane keeps its full interactive content — the treemap, churn-complexity scatter, and hot-spot table, beside the score status line, KPI filters, and sortable function table — so you can compare where size and complexity concentrate against which functions score worst without switching tabs. Clicking a row opens the file; "Open full screen" on either pane reopens the standalone dashboard. The two standalone commands are unchanged. No action required.
 - **Click the "Scanned X ago" pill on the Package Dashboard to rescan and re-check for package updates.** The pill is now a button: clicking it refreshes the dashboard and re-runs the pub.dev version check, re-surfacing the "Update available" notification even after you dismissed it. The same action is available from the command palette as "Saropa Lints: Check for Package Updates Now". No action required.
 
 ---

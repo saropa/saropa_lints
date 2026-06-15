@@ -325,7 +325,7 @@ async function handlePanelMessage(msg: unknown): Promise<void> {
  * The toast uses the existing rescan command (same path the toolbar button
  * uses) so the suppression closes the loop in a single user click.
  */
-async function applyFileSuppression(reportFile: string, flag: string): Promise<void> {
+export async function applyFileSuppression(reportFile: string, flag: string): Promise<void> {
   const root = getProjectRoot();
   if (!root) return;
   try {
@@ -437,7 +437,6 @@ function buildHtml(
   const problemCount = rows.filter((r) => r.score < 50).length;
   const complexCount = rows.filter((r) => r.flags.includes('complex')).length;
   const nonce = createWebviewCspNonce();
-  const gateFailed = payload.gates?.pass === false;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -451,7 +450,35 @@ function buildHtml(
   <style nonce="${nonce}">${getProjectVibrancyReportStyles()}${getKeyboardShortcutsStyles()}</style>
 </head>
 <body>
-<a href="#pvTable" class="skip-link">${escapeHtml(l10n('codeHealth.skipToTable'))}</a>
+${buildCodeHealthBody(payload, summary, problemCount, complexCount, reportFilePath, nonce)}
+<script nonce="${nonce}">${buildClientScript()}</script>
+</body>
+</html>`;
+}
+
+/**
+ * The Code Health report's in-`<body>` content: skip link, live-region announcer, hero status
+ * line, optional gate banner, KPI preset-filter strip, saved-file row, toolbar, active-filter
+ * chip strip, the sortable function table (with its embedded row-data JSON block), and the
+ * keyboard-shortcuts overlay. Factored out of [buildHtml] so the standalone panel and the
+ * consolidated "Saropa Dashboards" pane assemble the SAME markup from one source — the only
+ * difference between them is the surrounding document (CSP, `<style>`, the client `<script>`).
+ *
+ * [nonce] is applied only to the row-data `<script type="application/json">` block; it is data,
+ * not executed code, so under the consolidated host's `'unsafe-inline'` script policy a fresh
+ * nonce here is simply ignored rather than required.
+ */
+function buildCodeHealthBody(
+  payload: ProjectVibrancyPayload,
+  summary: NonNullable<ProjectVibrancyPayload['summary']>,
+  problemCount: number,
+  complexCount: number,
+  reportFilePath: string | undefined,
+  nonce: string,
+): string {
+  const rows = [...(payload.functions ?? [])].sort((a, b) => a.score - b.score);
+  const gateFailed = payload.gates?.pass === false;
+  return `<a href="#pvTable" class="skip-link">${escapeHtml(l10n('codeHealth.skipToTable'))}</a>
 <div id="announcer" role="status" aria-live="polite" aria-atomic="true"></div>
 <header>
 ${buildHero(payload, summary, problemCount)}
@@ -470,10 +497,36 @@ ${buildKeyboardShortcutsOverlay([
   { key: 'Enter', label: l10n('codeHealth.shortcuts.activateKpi') },
   { key: 'Space', label: l10n('codeHealth.shortcuts.activateKpiSpace') },
   { key: '?', label: l10n('codeHealth.shortcuts.showOverlay') },
-])}
-<script nonce="${nonce}">${buildClientScript()}</script>
-</body>
-</html>`;
+])}`;
+}
+
+/**
+ * The two reusable pieces of the Code Health report for the consolidated dashboard: the in-body
+ * markup and the inline client script that wires it (sort, filter, KPI presets, file-link nav,
+ * row expansion). The host drops [body] into the Code Health pane and runs [script] once in the
+ * shared document, where it finds its own `pv*` ids (which do not collide with the Project Map
+ * pane's ids) and shares the single `acquireVsCodeApi()` handle.
+ */
+export interface CodeHealthFragment {
+  body: string;
+  script: string;
+}
+
+/** Builds the embeddable Code Health fragment for the consolidated dashboard host. */
+export function buildCodeHealthFragment(
+  payload: ProjectVibrancyPayload,
+  reportFilePath?: string,
+): CodeHealthFragment {
+  const summary = payload.summary ?? {};
+  const rows = [...(payload.functions ?? [])].sort((a, b) => a.score - b.score);
+  const problemCount = rows.filter((r) => r.score < 50).length;
+  const complexCount = rows.filter((r) => r.flags.includes('complex')).length;
+  // Nonce only tags the row-data JSON block; ignored under the host's inline-script policy.
+  const nonce = createWebviewCspNonce();
+  return {
+    body: buildCodeHealthBody(payload, summary, problemCount, complexCount, reportFilePath, nonce),
+    script: buildClientScript(),
+  };
 }
 
 /**

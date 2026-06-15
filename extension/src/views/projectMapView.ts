@@ -166,23 +166,62 @@ export function transformProjectMapHtml(
 }
 
 /**
- * Runs the Project Map scan for [root] and returns the transformed, embeddable HTML document, or
- * null if the scan failed / produced no output. Reuses the same scan + transform the standalone
- * panel uses, so the consolidated host renders an identical report. [token] cancels the scan (e.g.
- * when the host panel closes).
+ * The three composable pieces of the Project Map report, extracted from the generated HTML by its
+ * `<!--PM_*-->` boundary markers so the consolidated "Saropa Dashboards" view can drop the report
+ * into one shared document beside Code Health:
+ *
+ *   - [styleHtml]  — the `<style>` block. Every rule is scoped under `.pm-pane`, so it cannot leak
+ *                    onto the host chrome or the Code Health pane.
+ *   - [bodyHtml]   — the `.pm-pane` markup (banner, KPI strip, treemap/scatter chart hosts, the
+ *                    hot-spot and gravity tables). Its ids (`treemap`, `filter`, `hot`, …) do not
+ *                    collide with Code Health's `pv*` ids.
+ *   - [scriptHtml] — the inline data/render `<script>` (NOT the ECharts loader, which the host
+ *                    loads once). It calls `acquireVsCodeApi()`, satisfied by the host's shared shim.
+ *   - [echartsUri] — the vendored ECharts webview URI the host puts in a single `<script src>`.
  */
-export async function scanProjectMapToHtml(
+export interface ProjectMapParts {
+  styleHtml: string;
+  bodyHtml: string;
+  scriptHtml: string;
+  echartsUri: string;
+}
+
+const _pmStyleRe = /<!--PM_STYLE_START-->([\s\S]*?)<!--PM_STYLE_END-->/;
+const _pmBodyRe = /<!--PM_BODY_START-->([\s\S]*?)<!--PM_BODY_END-->/;
+const _pmScriptRe = /<!--PM_SCRIPT_START-->([\s\S]*?)<!--PM_SCRIPT_END-->/;
+
+/**
+ * Runs the Project Map scan for [root] and returns its composable pieces for the consolidated
+ * dashboard, or null if the scan failed, produced no output, or the report is missing its
+ * `<!--PM_*-->` markers (a template/version mismatch — fail closed rather than embed a broken
+ * fragment). [token] cancels the scan (e.g. when the host panel closes). Reuses the SAME scan the
+ * standalone panel runs, so both render identical data.
+ */
+export async function scanProjectMapToParts(
   root: string,
   webview: vscode.Webview,
   extUri: vscode.Uri,
   token: vscode.CancellationToken,
-): Promise<string | null> {
+): Promise<ProjectMapParts | null> {
   const outputDir = path.join(root, 'reports', '.saropa_lints', 'health');
   const ok = await runScan(root, outputDir, token);
   if (!ok) return null;
   const indexPath = path.join(outputDir, 'index.html');
   if (!fs.existsSync(indexPath)) return null;
-  return transformProjectMapHtml(fs.readFileSync(indexPath, 'utf8'), webview, extUri);
+  const raw = fs.readFileSync(indexPath, 'utf8');
+  const style = _pmStyleRe.exec(raw);
+  const body = _pmBodyRe.exec(raw);
+  const script = _pmScriptRe.exec(raw);
+  if (!style || !body || !script) return null;
+  const echartsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extUri, 'media', 'echarts.min.js'),
+  );
+  return {
+    styleHtml: style[1].trim(),
+    bodyHtml: body[1].trim(),
+    scriptHtml: script[1].trim(),
+    echartsUri: echartsUri.toString(),
+  };
 }
 
 /**
@@ -191,11 +230,29 @@ export async function scanProjectMapToHtml(
  * (banner, KPI chips, hot-spot table, filters, gravity panel) follows the user's theme; the
  * brand accent, radius, and shadows stay as the template defines them. The ECharts charts read
  * `prefers-color-scheme` (which tracks the theme kind in a webview), so they flip light/dark on
- * their own. Token names match `health_html_template.dart`'s `:root` exactly.
+ * their own.
+ *
+ * The override targets `.pm-pane` — the template now declares its palette tokens on that wrapper
+ * (not `:root`) so the consolidated dashboard can host this report beside Code Health without the
+ * two stylesheets' `:root` blocks fighting. A `:root` override would be shadowed: a CSS variable
+ * resolves from the nearest ancestor that defines it, and `.pm-pane` is nearer than `:root` for
+ * every report element. Token names match `health_html_template.dart`'s `.pm-pane` exactly.
  */
 function webviewThemeOverride(): string {
-  return `<style>
-:root {
+  return `<style>${pmPaneThemeTokens()}</style>`;
+}
+
+/**
+ * The `.pm-pane` palette-token rebind to the host VS Code theme, without the `<style>` wrapper.
+ * Exported so the consolidated "Saropa Dashboards" host can apply the SAME rebind to its embedded
+ * Project Map pane — otherwise the pane would render in the template's fixed brand palette while the
+ * Code Health pane follows the editor theme, and the two panes would not match (the inconsistency the
+ * consolidated view exists to remove). The brand accent / radius / shadows stay as the template
+ * defines them; only surface/text/border tokens follow the theme.
+ */
+export function pmPaneThemeTokens(): string {
+  return `
+.pm-pane {
   --bg: var(--vscode-editor-background);
   --surface: var(--vscode-editorWidget-background);
   --surface-2: var(--vscode-editor-inactiveSelectionBackground);
@@ -205,7 +262,7 @@ function webviewThemeOverride(): string {
   --hover: var(--vscode-list-hoverBackground);
   --zebra: color-mix(in srgb, var(--vscode-foreground) 4%, transparent);
 }
-</style>`;
+`;
 }
 
 function getOrCreatePanel(): vscode.WebviewPanel {
