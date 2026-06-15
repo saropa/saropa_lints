@@ -757,6 +757,14 @@ export const catalogEntries: readonly CatalogEntry[] = [
     icon: 'flame',
   },
   {
+    command: 'saropaLints.openDashboards',
+    title: 'Open Saropa Dashboards (Project Map + Code Health)',
+    description:
+      'Consolidated page showing the Project Map and Code Health dashboards side by side, each with its full interactive content.',
+    category: 'Code Health',
+    icon: 'dashboard',
+  },
+  {
     command: 'saropaLints.toggleProjectMapCodeLensHeat',
     title: 'Toggle Saropa Project Map Heat CodeLens (in-editor)',
     description:

@@ -165,6 +165,11 @@
         "icon": "$(flame)"
       },
       {
+        "command": "saropaLints.openDashboards",
+        "title": "Saropa Lints: Open Saropa Dashboards (Project Map + Code Health)",
+        "icon": "$(dashboard)"
+      },
+      {
         "command": "saropaLints.toggleProjectMapCodeLensHeat",
         "title": "Saropa Lints: Toggle Saropa Project Map Heat CodeLens (in-editor)",
         "icon": "$(flame)"

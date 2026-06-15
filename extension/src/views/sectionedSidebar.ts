@@ -223,6 +223,13 @@ function buildEditorDashboardItems(): LeafItem[] {
             new vscode.ThemeColor('charts.orange'),
         ),
         new LeafItem(
+            'Saropa Dashboards',
+            'Project Map + Code Health, side by side',
+            'saropaLints.openDashboards',
+            'dashboard',
+            new vscode.ThemeColor('charts.blue'),
+        ),
+        new LeafItem(
             'Findings Dashboard',
             'Editor tab · filters · JSON',
             'saropaLints.openViolationsWideReport',
