@@ -12,6 +12,13 @@ permissions:
 jobs:
   analyze:
     runs-on: ubuntu-latest
+    # A release commit ("Release vX.Y.Z") is pushed to main and tagged in the
+    # same publish step, so publish.yml already validates this exact commit
+    # (analyze + test + dry-run) and publish.py mirrors the full CI gate
+    # locally before tagging. Skipping the redundant main-push CI run stops
+    # three workflows firing at once on every release (this ci run, publish,
+    # and announce-release). PRs and ordinary main pushes are unaffected.
+    if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -110,6 +117,8 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    # Skip the redundant main-push run on release commits; see the analyze job.
+    if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -138,6 +147,8 @@ jobs:
 
   extension-manifest-nls:
     runs-on: ubuntu-latest
+    # Skip the redundant main-push run on release commits; see the analyze job.
+    if: ${{ github.event_name != 'push' || !startsWith(github.event.head_commit.message, 'Release v') }}
     steps:
       - uses: actions/checkout@v4
         with:

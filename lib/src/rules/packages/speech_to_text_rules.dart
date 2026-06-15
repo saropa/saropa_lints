@@ -68,8 +68,11 @@ class RequireSpeechStopOnDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_speech_stop_on_dispose',
-    '[require_speech_stop_on_dispose] Unreleased SpeechToText keeps '
-        'microphone active, draining battery and blocking other apps. {v2}',
+    '[require_speech_stop_on_dispose] A SpeechToText recognizer that is not '
+        'stopped in dispose keeps the microphone active after the screen '
+        'closes, draining the battery, leaving the operating-system recording '
+        'indicator on, and blocking other apps from capturing audio until the '
+        'session is finally released. {v2}',
     correctionMessage:
         'Add _speech.stop() in dispose() to release microphone resources.',
     severity: DiagnosticSeverity.ERROR,

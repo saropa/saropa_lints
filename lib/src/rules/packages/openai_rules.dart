@@ -52,8 +52,11 @@ class AvoidOpenaiKeyInCodeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_openai_key_in_code',
-    '[avoid_openai_key_in_code] Hardcoded OpenAI keys are extractable '
-        'from binaries, enabling API abuse charged to your account. {v2}',
+    '[avoid_openai_key_in_code] A hardcoded OpenAI API key is compiled into '
+        'the app binary as a plain string, so anyone can extract it with basic '
+        'reverse engineering and issue requests billed to your account, '
+        'exhausting quota and tripping rate limits until the leaked key is '
+        'detected and rotated. {v2}',
     correctionMessage:
         'Use environment variables or secure configuration for API keys.',
     severity: DiagnosticSeverity.ERROR,
