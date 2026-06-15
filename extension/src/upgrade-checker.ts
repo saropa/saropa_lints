@@ -264,6 +264,32 @@ export async function checkForUpgrade(
   }
 }
 
+/**
+ * Force an upgrade check now, bypassing BOTH throttles.
+ *
+ * The normal [checkForUpgrade] is gated twice: an anti-thrash time window
+ * (won't re-fetch pub.dev within the hour) and a dismiss memory (won't
+ * re-prompt for a version the user already dismissed). Both are correct for
+ * the passive background check but make it impossible to re-trigger the
+ * notification on demand — there is no way to "see the upgrade prompt again"
+ * after dismissing it once.
+ *
+ * This clears the persisted throttle state, then runs the check. With no
+ * saved state, [shouldFetchNow] and [shouldPromptForVersion] both return
+ * true, so the prompt reappears whenever a newer version genuinely exists on
+ * pub.dev. It still shows nothing when the project is already up to date —
+ * that is the honest outcome, not a bug. Wired to the "Scanned X ago" pill in
+ * the Package Dashboard and the `saropaLints.checkForUpdatesNow` command so
+ * users (and tests) have a deterministic path to re-surface the prompt.
+ */
+export async function forceUpgradeCheck(
+  context: vscode.ExtensionContext,
+  workspaceRoot: string,
+): Promise<void> {
+  await context.workspaceState.update(STATE_KEY, undefined);
+  await checkForUpgrade(context, workspaceRoot);
+}
+
 // ── Internals ────────────────────────────────────────────────────────────
 
 async function persistState(

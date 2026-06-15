@@ -1018,6 +1018,13 @@ export const catalogEntries: readonly CatalogEntry[] = [
     internal: true,
   },
   {
+    command: 'saropaLints.checkForUpdatesNow',
+    title: 'Check for Package Updates Now',
+    description: 'Re-check pub.dev for a newer saropa_lints version, re-surfacing the upgrade notification even after it was dismissed.',
+    category: 'Package Vibrancy — Updates',
+    icon: 'refresh',
+  },
+  {
     command: 'saropaLints.packageVibrancy.updateToLatest',
     title: 'Update to Latest',
     description: 'Update a selected dependency to its latest stable version.',

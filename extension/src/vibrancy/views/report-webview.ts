@@ -216,6 +216,20 @@ export class VibrancyReportPanel {
             await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
         }
 
+        else if (msg.type === 'rescanAndCheckUpdates') {
+            /* "Scanned X ago" pill: a full refresh from the user's point of view —
+               rescan the dashboard (same fresh path as the toolbar Rescan), then
+               re-run the pub.dev upgrade check so the "Update available"
+               notification re-surfaces. checkForUpdatesNow clears the upgrade
+               throttle, which is why this can re-prompt where the passive
+               background check cannot. showReport runs before the update check so
+               the dashboard repaints (resetting the pill's disabled state) without
+               waiting on the network call. */
+            await vscode.commands.executeCommand('saropaLints.packageVibrancy.rescan');
+            await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
+            await vscode.commands.executeCommand('saropaLints.checkForUpdatesNow');
+        }
+
         else if (msg.type === 'openSourceFolder' && msg.package) {
             await vscode.commands.executeCommand(
                 'saropaLints.packageVibrancy.openSourceFolder',

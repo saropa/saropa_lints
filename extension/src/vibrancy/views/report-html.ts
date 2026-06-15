@@ -196,12 +196,16 @@ export function buildReportHtml(options: ReportOptions): string {
  * render (a pill that comes and goes makes the dashboard layout jump).
  */
 function buildLastScanPill(ts?: number): StatusPill {
+    // Clicking the pill rescans the dashboard AND re-checks pub.dev for a newer
+    // saropa_lints version (re-surfacing the upgrade notification). The id is
+    // wired by getReportScript().
     if (typeof ts !== 'number' || !Number.isFinite(ts) || ts <= 0) {
         return {
             glyph: '⟳',
             label: l10n('packageDashboard.status.lastScanUnknown'),
             title: l10n('packageDashboard.status.lastScanUnknownTitle'),
             tone: 'neutral',
+            actionId: 'lastScanRescan',
         };
     }
     return {
@@ -211,6 +215,7 @@ function buildLastScanPill(ts?: number): StatusPill {
             timestamp: new Date(ts).toLocaleString(),
         }),
         tone: 'neutral',
+        actionId: 'lastScanRescan',
     };
 }
 

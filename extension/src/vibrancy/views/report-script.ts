@@ -881,6 +881,21 @@ export function getReportScript(): string {
             });
         }
 
+        /* ---- "Scanned X ago" pill -> rescan + re-check for package updates ---- */
+        /* Same fresh rescan as the toolbar button, plus it re-runs the pub.dev
+           upgrade check so the "Update available" notification re-surfaces (the
+           passive background check is throttled and won't re-prompt on its own).
+           The host rebuilds the webview HTML on completion, replacing this
+           handler, so no manual re-enable is needed on the happy path. */
+        var lastScanBtn = document.getElementById('lastScanRescan');
+        if (lastScanBtn) {
+            lastScanBtn.addEventListener('click', function() {
+                if (lastScanBtn.getAttribute('aria-disabled') === 'true') { return; }
+                lastScanBtn.setAttribute('aria-disabled', 'true');
+                vscode.postMessage({ type: 'rescanAndCheckUpdates' });
+            });
+        }
+
         /* ---- Package name click -> open pubspec.yaml at entry ---- */
 
         document.querySelectorAll('.pkg-name-link').forEach(function(el) {
