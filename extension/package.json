@@ -113,6 +113,10 @@
         "title": "%command.initializeConfig.title%"
       },
       {
+        "command": "saropaLints.checkForUpdatesNow",
+        "title": "%command.checkForUpdatesNow.title%"
+      },
+      {
         "command": "saropaLints.enableRulePack",
         "title": "%command.enableRulePack.title%"
       },

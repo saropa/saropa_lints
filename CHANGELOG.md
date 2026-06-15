@@ -64,6 +64,18 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed (Extension)
+
+- **The "Upgrading Saropa Lints to X" notification no longer hangs open after you accept an upgrade.** The upgrade ran a full project analysis on the blocking call path, which froze the extension host for the whole analysis and left the progress notification (and its Cancel button) unresponsive until VS Code was reloaded. Analysis now runs without blocking and is cancellable, so the notification closes when the upgrade finishes. No action required.
+
+### Added (Extension)
+
+- **Click the "Scanned X ago" pill on the Package Dashboard to rescan and re-check for package updates.** The pill is now a button: clicking it refreshes the dashboard and re-runs the pub.dev version check, re-surfacing the "Update available" notification even after you dismissed it. The same action is available from the command palette as "Saropa Lints: Check for Package Updates Now". No action required.
+
+---
+
 ## [14.0.1]
 
 The Project Map dashboard now hides machine-generated and localization files from its size map and hot-spot rankings, so the files it surfaces are ones you can actually improve. Previously a single generated database file or a megabyte of translation tables would dominate the list and bury the real issues. [log](https://github.com/saropa/saropa_lints/blob/v14.0.1/CHANGELOG.md)

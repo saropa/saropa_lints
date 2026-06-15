@@ -638,9 +638,16 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
     {
       location: vscode.ProgressLocation.Notification,
       title: openEditorsOnly ? 'Running analysis (open editors)' : 'Running analysis',
-      cancellable: false,
+      // Cancellable so a wedged `dart analyze` can be killed. Critical when this
+      // flow is nested inside another progress (e.g. the upgrade checker awaits
+      // initializeConfig -> runAnalysis): the old synchronous `runInWorkspace`
+      // here blocked the extension-host event loop for the FULL analyze duration,
+      // which froze the outer "Upgrading…" notification with a dead Cancel
+      // button and made it look like it never closed. The async variant below
+      // keeps the loop responsive and forwards this token to kill the child tree.
+      cancellable: true,
     },
-    async () => {
+    async (_progress, token) => {
       // Stamp the run start so the post-analysis popup can wait for the
       // plugin's fresh violations.json write (newer than this) before firing,
       // instead of racing the bare `dart analyze` exit code. See
@@ -670,7 +677,16 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
       const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
       const cmd = useFlutter ? 'flutter' : 'dart';
       logSection('Analysis');
-      const result = runInWorkspace(workspaceRoot, cmd, ['analyze']);
+      // Async + cancellable: never block the extension-host event loop (see the
+      // cancellable rationale on this progress above). The token wires the
+      // Cancel button to a process-tree kill.
+      const result = await runInWorkspaceAsync(workspaceRoot, cmd, ['analyze'], { token });
+      if (result.cancelled) {
+        logReport('- Analysis cancelled by user');
+        flushReport(workspaceRoot);
+        ok = false;
+        return;
+      }
       ok = result.ok;
       if (ok) {
         logReport('- Analysis completed clean');

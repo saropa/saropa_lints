@@ -54,6 +54,13 @@ export interface StatusPill {
   title?: string;
   /** Optional leading glyph (e.g. `⟳`). Single character; not escaped, kept raw. */
   glyph?: string;
+  /**
+   * When set, the pill renders as an interactive `<button id="{actionId}">`
+   * (still styled as a pill via `.pill.pill-action`) instead of an inert
+   * `<span>`. The surface's own script wires the click by this id. Used for the
+   * "Scanned X ago" pill so clicking it can trigger a rescan + update re-check.
+   */
+  actionId?: string;
 }
 
 import { l10n } from '../i18n/runtime';
@@ -73,7 +80,13 @@ export function buildStatusLine(pills: readonly StatusPill[]): string {
     const toneClass = p.tone && p.tone !== 'neutral' ? ` ${p.tone}` : '';
     const titleAttr = p.title ? ` title="${escape(p.title)}"` : '';
     const glyph = p.glyph ? `${p.glyph} ` : '';
-    return `<span class="pill${toneClass}"${titleAttr}>${glyph}${escape(p.label)}</span>`;
+    const body = `${glyph}${escape(p.label)}`;
+    // Interactive pills become real buttons so they are keyboard-focusable and
+    // get the native click/Enter/Space semantics; inert pills stay spans.
+    if (p.actionId) {
+      return `<button type="button" class="pill pill-action${toneClass}" id="${escape(p.actionId)}"${titleAttr}>${body}</button>`;
+    }
+    return `<span class="pill${toneClass}"${titleAttr}>${body}</span>`;
   });
   return `<p class="status-line">${parts.join('<span class="dot">·</span>')}</p>`;
 }

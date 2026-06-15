@@ -94,6 +94,20 @@ export function getReportStyles(): string {
         .status-line .pill.good { color: color-mix(in srgb, var(--vscode-testing-iconPassed) 58%, var(--vscode-foreground)); }
         .status-line .pill.bad  { color: color-mix(in srgb, var(--vscode-editorError-foreground) 44%, var(--vscode-foreground)); }
         .status-line .pill.warn { color: color-mix(in srgb, var(--vscode-editorWarning-foreground) 55%, var(--vscode-foreground)); }
+        /* Interactive "Scanned X ago" pill: reset button chrome to pill shape but
+         * keep pointer cursor, hover feedback, and a keyboard focus ring. */
+        .status-line .pill.pill-action {
+            cursor: pointer;
+            font: inherit;
+            border: 1px solid transparent;
+        }
+        .status-line .pill.pill-action:hover {
+            background: color-mix(in srgb, var(--vscode-focusBorder) 24%, var(--vscode-editor-inactiveSelectionBackground));
+        }
+        .status-line .pill.pill-action:focus-visible {
+            outline: 1px solid var(--vscode-focusBorder);
+            outline-offset: 2px;
+        }
         /* Full-width toggle (guideline §4) — flips body[data-full-width]. */
         .full-width-toggle {
             flex: 0 0 auto;

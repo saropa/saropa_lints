@@ -668,9 +668,9 @@
       "flaggedCount": "{count} flagged",
       "flaggedTitle": "Abandoned or end-of-life",
       "lastScanLabel": "Scanned {when}",
-      "lastScanTitle": "When this dashboard data was fetched — {timestamp}. Click Rescan to refresh.",
+      "lastScanTitle": "When this dashboard data was fetched — {timestamp}. Click to rescan and check for package updates.",
       "lastScanUnknown": "Scanned (time unknown)",
-      "lastScanUnknownTitle": "This scan ran before the dashboard tracked timestamps. Click Rescan to refresh."
+      "lastScanUnknownTitle": "This scan ran before the dashboard tracked timestamps. Click to rescan and check for package updates."
     },
     "time": {
       "justNow": "just now",

@@ -129,7 +129,7 @@ import {
   setDriftAdvisorServerConnected,
 } from './driftAdvisor/driftAdvisorUiState';
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
-import { checkForUpgrade } from './upgrade-checker';
+import { checkForUpgrade, forceUpgradeCheck } from './upgrade-checker';
 import { buildStatusBarLabel } from './statusBarLabel';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
@@ -1127,6 +1127,19 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const scoreMsg = health ? ` Score: ${health.score}` : '';
         vscode.window.setStatusBarMessage(`Saropa Lints: Analysis complete.${scoreMsg}`, 4000);
       }
+    }),
+    // Re-run the pub.dev upgrade check on demand, bypassing the anti-thrash and
+    // dismiss-memory throttles so the "Update available" notification can be
+    // re-surfaced (the passive background check never re-prompts for a dismissed
+    // version). Backs the "Scanned X ago" pill on the Package Dashboard and gives
+    // a deterministic test path for the upgrade flow.
+    vscode.commands.registerCommand('saropaLints.checkForUpdatesNow', async () => {
+      const root = getProjectRoot();
+      if (!root) {
+        void vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
+        return;
+      }
+      await forceUpgradeCheck(context, root);
     }),
     vscode.commands.registerCommand('saropaLints.initializeConfig', async () => {
       const success = await runInitializeConfig(context);

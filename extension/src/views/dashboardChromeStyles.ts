@@ -231,6 +231,21 @@ function chromeHeroAndGauge(): string {
 .status-line .pill.good { color: color-mix(in srgb, var(--status-good) 58%, var(--vscode-foreground)); }
 .status-line .pill.bad  { color: color-mix(in srgb, var(--status-bad) 44%, var(--vscode-foreground)); }
 .status-line .pill.warn { color: color-mix(in srgb, var(--accent-warning) 55%, var(--vscode-foreground)); }
+/* Interactive pill (e.g. "Scanned X ago" -> rescan). Reset the button chrome so
+ * it reads as a pill, but keep the affordances a button needs: pointer cursor,
+ * a hover lift, and a visible focus ring for keyboard users. */
+.status-line .pill.pill-action {
+  cursor: pointer;
+  font: inherit;
+  border: 1px solid transparent;
+}
+.status-line .pill.pill-action:hover {
+  background: color-mix(in srgb, var(--vscode-focusBorder) 22%, var(--surface-3));
+}
+.status-line .pill.pill-action:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+}
 .help-icon {
   flex: 0 0 auto;
   width: 24px; height: 24px;
