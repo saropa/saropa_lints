@@ -9,7 +9,8 @@ void main() {
   group('Stub test guard', () {
     // Hard zero gate on the unambiguous stub shape: a `test`/`testWidgets` with
     // an empty block body (`() {}`). 396 of these were removed 2026-06-10 (see
-    // plans/BUG_stub_tests_in_suite.md). This is intentionally NARROWER than
+    // plans/history/2026.06/2026.06.14/BUG_stub_tests_in_suite.md). This is
+    // intentionally NARROWER than
     // scanStubTests' "no assertion call" heuristic, which legitimately flags
     // helper-asserted and "does not throw" tests — gating that broader metric
     // to zero would force-delete real tests. Empty-body has no such ambiguity.
