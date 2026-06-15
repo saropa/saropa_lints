@@ -90,7 +90,7 @@ async function loadProjectMapPane(root: string, p: vscode.WebviewPanel): Promise
  * engine HTML is otherwise untouched. Inserted before `</head>` so it is defined before the engine's
  * body scripts run and is governed by the document's own CSP (which permits inline scripts).
  */
-function injectIframeBridge(html: string, source: string): string {
+export function injectIframeBridge(html: string, source: string): string {
   const shim = `<script>
 (function () {
   var api = {
