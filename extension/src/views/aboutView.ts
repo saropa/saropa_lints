@@ -6,6 +6,8 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import { getDashboardChromeStyles } from './dashboardChromeStyles';
+import { buildDashboardHero } from './dashboardHero';
 
 /** Re-uses an existing panel if already open; otherwise creates a new one. */
 let currentPanel: vscode.WebviewPanel | undefined;
@@ -33,9 +35,15 @@ export function showAboutPanel(extensionUri: vscode.Uri, version: string): void 
 function buildHtml(extensionUri: vscode.Uri, version: string): string {
   const bodyHtml = markdownToHtml(readMarkdown(extensionUri));
   const nonce = getNonce();
-  // About panel uses a stripped hero (title + version stamp, no status pills, no gauge,
-  // no full-width toggle since this panel runs with enableScripts:false). The Saropa
-  // prefix is satisfied by the explicit "Saropa Lints" h1 — guideline §8.1.
+  // Adopts the shared dashboard chrome (SAROPA_DASHBOARD_STYLE_GUIDE) so About reads as the
+  // same product as every other dashboard. The hero comes from the shared builder, which
+  // prepends "Saropa " to the title (guideline §8.1). The full-width toggle is suppressed:
+  // this panel runs with enableScripts:false, so a wired toggle button would be a dead control.
+  const heroHtml = buildDashboardHero({
+    title: 'Lints',
+    version,
+    showFullWidthToggle: false,
+  });
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -44,60 +52,43 @@ function buildHtml(extensionUri: vscode.Uri, version: string): string {
     content="default-src 'none'; style-src 'nonce-${nonce}';">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Saropa Lints — About</title>
-  <style nonce="${nonce}">
-    body {
-      font-family: var(--vscode-font-family);
-      font-size: var(--vscode-font-size);
-      color: var(--vscode-foreground);
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 20px 24px 28px;
-      line-height: 1.6;
-    }
-    a { color: var(--vscode-textLink-foreground); text-decoration: none; }
-    a:hover { color: var(--vscode-textLink-activeForeground); text-decoration: underline; }
-    table { border-collapse: collapse; width: 100%; margin: 12px 0; }
-    th, td {
-      padding: 6px 10px; text-align: left;
-      border: 1px solid var(--vscode-panel-border);
-    }
-    th { background: var(--vscode-editor-inactiveSelectionBackground); }
-    hr { border: none; border-top: 1px solid var(--vscode-panel-border); margin: 20px 0; }
-    /* Stripped hero — title row with a muted version stamp anchored inline. */
-    .dash-hero {
-      display: flex; align-items: baseline;
-      gap: 12px;
-      padding: 16px 20px;
-      margin-bottom: 16px;
-      border: 1px solid var(--vscode-widget-border);
-      border-radius: 12px;
-      background: var(--vscode-editorWidget-background);
-    }
-    .dash-hero h1 {
-      margin: 0;
-      font-size: 1.55em;
-      font-weight: 600;
-      letter-spacing: 0.2px;
-    }
-    .dash-hero .stamp {
-      font-size: 0.55em;
-      font-weight: 400;
-      opacity: 0.55;
-      letter-spacing: 0.4px;
-    }
-    h1 { font-size: 1.5em; margin: 0 0 4px; }
-    h2 { font-size: 1.25em; margin: 20px 0 8px; }
-    h3 { font-size: 1.1em; margin: 16px 0 6px; }
-    ul { margin: 6px 0; padding-inline-start: 22px; }
-  </style>
+  <style nonce="${nonce}">${getDashboardChromeStyles()}${getAboutPanelStyles()}</style>
 </head>
 <body>
-  <header class="dash-hero">
-    <h1>Saropa Lints<span class="stamp">v${escapeHtml(version)}</span></h1>
-  </header>
-  ${bodyHtml}
+  <header>${heroHtml}</header>
+  <main id="about-body" tabindex="-1">${bodyHtml}</main>
 </body>
 </html>`;
+}
+
+/**
+ * About-specific rules layered over the shared chrome. The chrome supplies the hero, tokens,
+ * type, and base layout; this only narrows the body to a comfortable prose measure and styles
+ * the markdown constructs the chrome has no opinion on (bare tables, rules, prose lists/links).
+ * Every color comes from a chrome token so the panel tracks the host theme.
+ */
+function getAboutPanelStyles(): string {
+  return `
+/* Prose reads better in a narrow measure than the wide dashboard column. */
+body { max-width: 820px; }
+#about-body { line-height: 1.6; }
+#about-body a { color: var(--link); text-decoration: none; }
+#about-body a:hover { color: var(--link); text-decoration: underline; }
+#about-body table { border-collapse: collapse; width: 100%; margin: var(--space-3) 0; }
+#about-body th, #about-body td {
+  padding: var(--space-1) var(--space-2); text-align: left;
+  border: 1px solid var(--border);
+}
+#about-body th { background: var(--surface-3); }
+#about-body hr { border: none; border-top: 1px solid var(--border); margin: var(--space-5) 0; }
+#about-body h2 { font-size: var(--text-h2); margin: var(--space-5) 0 var(--space-2); }
+#about-body h3 { font-size: var(--text-h3); margin: var(--space-4) 0 var(--space-1); }
+#about-body ul { margin: var(--space-1) 0; padding-inline-start: 22px; }
+#about-body code {
+  font-family: var(--vscode-editor-font-family, monospace);
+  background: var(--surface-3); border-radius: var(--radius-sm); padding: 0 4px;
+}
+`;
 }
 
 function readMarkdown(extensionUri: vscode.Uri): string {

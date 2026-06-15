@@ -17,28 +17,37 @@
  *  - No framework, no charting lib — the gauge is a pure conic-gradient.
  */
 
+import { getDashboardTokens } from '../dashboardChromeStyles';
+
 export function getConsolidatedStyles(): string {
   return `
+${getDashboardTokens()}
 /* Registering the custom property lets the conic-gradient stop transition
    smoothly (numeric interpolation) instead of snapping on each live update. */
 @property --gauge-val { syntax: '<number>'; initial-value: 0; inherits: false; }
 
+/* This surface keeps its distinctive layout (conic score gauge, calm rows, totals
+   chips) but draws every value from the shared dashboard token system: its private
+   names alias the canonical tokens above, so spacing/type/radius/severity match every
+   other dashboard and there is one source of truth. (SAROPA_DASHBOARD_STYLE_GUIDE.) */
 :root {
-  /* Spacing — 4px rhythm. */
-  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-8: 48px;
-  /* Type scale. */
-  --t-hero: 40px; --t-title: 21px; --t-body: 13px; --t-sm: 12px; --t-xs: 11px; --t-micro: 10px;
-  /* Radii. */
-  --r-sm: 6px; --r-md: 8px; --r-pill: 999px;
+  /* Spacing — aliases to the canonical 4px scale. */
+  --s-1: var(--space-1); --s-2: var(--space-2); --s-3: var(--space-3);
+  --s-4: var(--space-4); --s-5: var(--space-5); --s-6: var(--space-6); --s-8: var(--space-8);
+  /* Type — aliases to the canonical scale (--t-micro has no canonical peer; kept literal). */
+  --t-hero: var(--text-kpi-xl); --t-title: var(--text-h2); --t-body: var(--text-body);
+  --t-sm: var(--text-caption); --t-xs: var(--text-caption); --t-micro: 10px;
+  /* Radii — aliases to canonical radius tokens. */
+  --r-sm: var(--radius); --r-md: var(--radius); --r-pill: var(--radius-pill);
 
-  /* Severity — one color language, reused for accent, dot, and tag. */
-  --sev-error: var(--vscode-editorError-foreground, #f14c4c);
-  --sev-warning: var(--vscode-editorWarning-foreground, #cca700);
-  --sev-info: var(--vscode-editorInfo-foreground, var(--vscode-editorInformation-foreground, #3794ff));
+  /* Severity — one color language, now the shared semantic accents. */
+  --sev-error: var(--accent-error);
+  --sev-warning: var(--accent-warning);
+  --sev-info: var(--accent-info);
 
-  /* Secondary text — semantic token, contrast-managed by the theme. */
-  --text-2: var(--vscode-descriptionForeground, var(--vscode-foreground));
-  --hairline: var(--vscode-panel-border, var(--vscode-editorWidget-border, rgba(128,128,128,.22)));
+  /* Secondary text + hairline — shared muted/border tokens. */
+  --text-2: var(--muted);
+  --hairline: var(--border);
 }
 
 * { box-sizing: border-box; }

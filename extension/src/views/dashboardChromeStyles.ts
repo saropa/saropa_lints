@@ -37,6 +37,17 @@ export function getDashboardChromeStyles(): string {
   ].join('\n');
 }
 
+/**
+ * The canonical token `:root` ONLY — no component CSS. For surfaces that keep their own
+ * bespoke components (the rule-violations gauge, the command-catalog tiles, the package-details
+ * badges) but must draw every color/space/radius/type value from the one shared system. Lets
+ * them alias their private token names (e.g. `--s-3`) to the canonical ones (`--space-3`)
+ * without pulling in — and colliding with — the full chrome component stylesheet.
+ */
+export function getDashboardTokens(): string {
+  return chromeTokens();
+}
+
 /** Surface tokens, accent palette, motion-friendly tints. Shared across all three dashboards. */
 function chromeTokens(): string {
   return `
@@ -60,6 +71,55 @@ function chromeTokens(): string {
   --hero-tint: color-mix(in srgb, var(--vscode-textLink-foreground) 14%, transparent);
   --status-good: var(--vscode-testing-iconPassed, var(--vscode-editorInfo-foreground));
   --status-bad: var(--vscode-editorError-foreground);
+
+  /* --- Scale tokens (SAROPA_DASHBOARD_STYLE_GUIDE §3.7–3.13) ---
+     Added so every surface converges on ONE spacing/radius/type/motion system instead of
+     each hardcoding its own. Additive only: existing components keep their literal values
+     until migrated, so the established dashboards are visually unchanged. New/migrated
+     surfaces reference these names. */
+
+  /* Spacing — 4px base. */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px;  --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-8: 48px;
+
+  /* Radius. */
+  --radius-sm: 3px; --radius: 8px; --radius-lg: 12px; --radius-pill: 999px;
+
+  /* Type scale — anchored to the chrome's 13px VS Code density (host is denser than a
+     standalone report); ratio ~1.2. Pair each with the line-height below at the call site. */
+  --text-eyebrow: 11px; --text-caption: 11px; --text-body: 13px; --text-label: 13px;
+  --text-h3: 15px; --text-h2: 18px; --text-h1: 22px; --text-kpi: 28px; --text-kpi-xl: 40px;
+
+  /* Elevation. VS Code's language is flat — prefer border + surface step over shadow; these
+     are reserved for true overlays (popovers, drill-downs). */
+  --shadow: 0 1px 2px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.10);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,.18), 0 10px 30px -8px rgba(0,0,0,.28);
+
+  /* Motion. */
+  --ease: cubic-bezier(.2,.6,.2,1);
+  --dur-fast: 80ms; --dur: 160ms; --dur-slow: 300ms;
+
+  /* Z-index layers. */
+  --z-base: 0; --z-sticky: 50; --z-overlay: 100; --z-modal: 200; --z-toast: 300;
+
+  /* Letter-grade ramp (guide §5.8) — each grade reads the same hue as the matching severity
+     so a grade and a severity never disagree on color. Derived from the semantic tokens; never
+     a bespoke grade green/red. The guide ramp lists A/B/C/D/F; E sits between D and F for the
+     surfaces whose data carries an E grade. */
+  --grade-a: var(--status-good);
+  --grade-b: color-mix(in srgb, var(--status-good) 55%, var(--accent-warning));
+  --grade-c: var(--accent-warning);
+  --grade-d: var(--accent-high);
+  --grade-e: color-mix(in srgb, var(--accent-high) 50%, var(--status-bad));
+  --grade-f: var(--status-bad);
+
+  /* Saropa brand accent — the ONLY fixed colors in the system. Available for surfaces that
+     opt into the brand mark (eyebrow, top strip, focus ring); NOT applied to chrome
+     components by default, so adopting the chrome never repaints a host-themed dashboard. */
+  --brand: #f97316;
+  --brand-2: #ea580c;
+  --brand-glow: rgba(249,115,22,.20);
+  --ring: 0 0 0 3px rgba(249,115,22,.32);
 }
 `;
 }
@@ -451,8 +511,12 @@ function chromeToolbarAndButtons(): string {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 12px;
   border-radius: 999px;
-  border: 1px solid var(--vscode-button-border, transparent);
-  background: var(--vscode-button-secondaryBackground);
+  /* Guide §5.4: a secondary button MUST keep a visible edge and a fallback fill. Several host
+     themes leave button-border / button-secondaryBackground undefined or near-equal to the
+     surface behind it; without both fallbacks the control renders as bare text and reads as a
+     link, not a button. */
+  border: 1px solid var(--vscode-button-border, var(--border));
+  background: var(--vscode-button-secondaryBackground, var(--surface-3));
   color: var(--vscode-button-secondaryForeground);
   cursor: pointer;
   font: inherit; font-size: 0.95em;

@@ -140,8 +140,38 @@ function renderPanel(indexPath: string): void {
     `style-src ${p.webview.cspSource} 'unsafe-inline'; ` +
     `script-src ${p.webview.cspSource} 'unsafe-inline';">`;
   html = html.replace('<head>', `<head>${csp}`);
+  // Theme-awareness (SAROPA_DASHBOARD_STYLE_GUIDE dual-binding): the standalone
+  // export ships a fixed brand palette (the guide's fallback) since a browser/CI
+  // file has no host theme. In the editor we rebind those same token names to the
+  // host `--vscode-*` tokens so Project Map tracks the user's light/dark/high-contrast
+  // theme like every other dashboard. Injected after the template's <style> (incl. its
+  // dark @media), so this :root wins by source order; the brand accent stays fixed.
+  html = html.replace('</head>', `${webviewThemeOverride()}</head>`);
   p.webview.html = html;
   p.reveal(vscode.ViewColumn.One);
+}
+
+/**
+ * `<style>` that rebinds the Dart report's palette tokens to the host VS Code theme for the
+ * in-editor webview. Maps surface/text/border tokens to `--vscode-*` so the HTML chrome
+ * (banner, KPI chips, hot-spot table, filters, gravity panel) follows the user's theme; the
+ * brand accent, radius, and shadows stay as the template defines them. The ECharts charts read
+ * `prefers-color-scheme` (which tracks the theme kind in a webview), so they flip light/dark on
+ * their own. Token names match `health_html_template.dart`'s `:root` exactly.
+ */
+function webviewThemeOverride(): string {
+  return `<style>
+:root {
+  --bg: var(--vscode-editor-background);
+  --surface: var(--vscode-editorWidget-background);
+  --surface-2: var(--vscode-editor-inactiveSelectionBackground);
+  --text: var(--vscode-foreground);
+  --muted: var(--vscode-descriptionForeground);
+  --border: var(--vscode-widget-border);
+  --hover: var(--vscode-list-hoverBackground);
+  --zebra: color-mix(in srgb, var(--vscode-foreground) 4%, transparent);
+}
+</style>`;
 }
 
 function getOrCreatePanel(): vscode.WebviewPanel {

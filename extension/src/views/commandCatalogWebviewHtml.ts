@@ -33,6 +33,7 @@ import { catalogEntries, entriesByCategory } from './commandCatalogRegistry';
 import { buildCatalogSearchBlob } from './commandCatalogSearch';
 import type { CatalogHistoryRecord } from './commandCatalogHistory';
 import { getPillButtonStyles } from '../vibrancy/views/pill-button-styles';
+import { getDashboardTokens } from './dashboardChromeStyles';
 import {
   buildKeyboardShortcutsButton,
   buildKeyboardShortcutsOverlay,
@@ -341,6 +342,7 @@ function categorySlug(category: string): string {
 
 function getStyles(): string {
   return `
+    ${getDashboardTokens()}
     ${getPillButtonStyles()}
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -361,18 +363,19 @@ function getStyles(): string {
      * mounted with a short fade-in. Was a full-bleed gradient band; converted to a
      * centered panel so the catalog reads with the same hero visual as the rest of
      * the editor dashboards (§4.1 + §14.6 zoning). */
+    /* Values now come from the shared dashboard tokens (border-strong, hero-tint,
+     * surface-2, radius-lg) so this hero tracks the one gold-standard source instead
+     * of re-deriving the same color-mix inline. (SAROPA_DASHBOARD_STYLE_GUIDE §4.1.) */
     .hero {
       position: relative;
       max-width: 880px;
-      margin: 18px auto 14px;
+      margin: 18px auto var(--space-4);
       padding: 18px 20px;
-      border: 1px solid color-mix(in srgb, var(--vscode-focusBorder) 35%, var(--vscode-widget-border));
-      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
       background:
-        radial-gradient(900px 220px at 0% 0%,
-          color-mix(in srgb, var(--vscode-textLink-foreground) 14%, transparent),
-          transparent 60%),
-        var(--vscode-editorWidget-background);
+        radial-gradient(900px 220px at 0% 0%, var(--hero-tint), transparent 60%),
+        var(--surface-2);
       animation: hero-in 360ms ease-out;
     }
 

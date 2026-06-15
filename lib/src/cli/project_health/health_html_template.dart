@@ -18,8 +18,12 @@ String renderHealthDocument(String json) =>
 <title>Saropa Project Map</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 <style>
-  /* Brand-anchored palette. CSS vars so light and dark share the same rules;
-     the dark override below flips surfaces / text without rewriting components. */
+  /* Brand-anchored palette = the SAROPA_DASHBOARD_STYLE_GUIDE standalone fallback
+     (§3.6). This is what a browser/CI export with no host theme renders. CSS vars so
+     light and dark share the same rules; the dark override below flips surfaces / text
+     without rewriting components. In the VS Code webview these same token NAMES are
+     rebound to the host theme by projectMapView.ts (webviewThemeOverride) — keep the
+     names stable so that override keeps matching. */
   :root {
     color-scheme: light dark;
     --brand: #f97316;

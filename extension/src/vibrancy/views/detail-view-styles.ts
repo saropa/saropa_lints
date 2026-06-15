@@ -6,8 +6,11 @@
  * for de-emphasized copy. Keeps contrast sane on `sideBar-background` instead of editor background.
  */
 /** CSS styles for the package detail view. */
+import { getDashboardTokens } from '../../views/dashboardChromeStyles';
+
 export function getDetailStyles(): string {
     return `
+${getDashboardTokens()}
 :root {
     --vscode-font-family: var(--vscode-editor-font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
     --vscode-font-size: var(--vscode-editor-font-size, 13px);
@@ -66,15 +69,17 @@ h1 {
     font-size: 18px;
     font-weight: 700;
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: var(--radius-sm);
     white-space: nowrap;
 }
 
-.score.vibrant { background: var(--vscode-testing-iconPassed); color: #fff; }
-.score.stable { background: var(--vscode-editorInfo-foreground); color: #fff; }
-.score.outdated { background: var(--vscode-editorWarning-foreground); color: #000; }
-.score.abandoned { background: var(--vscode-editorWarning-foreground); color: #000; }
-.score.end-of-life { background: var(--vscode-editorError-foreground); color: #fff; }
+/* Status badges drive off the shared semantic tokens so a package's health color
+   matches severity everywhere else in the suite. (SAROPA_DASHBOARD_STYLE_GUIDE §3.5.) */
+.score.vibrant { background: var(--status-good); color: #fff; }
+.score.stable { background: var(--accent-info); color: #fff; }
+.score.outdated { background: var(--accent-medium); color: #000; }
+.score.abandoned { background: var(--accent-medium); color: #000; }
+.score.end-of-life { background: var(--accent-critical); color: #fff; }
 
 section {
     margin-bottom: 16px;

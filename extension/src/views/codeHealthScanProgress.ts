@@ -10,6 +10,7 @@
  * `webview.html` with the full report (see projectVibrancyReportView).
  */
 import { createWebviewCspNonce, escapeHtml, jsonForScriptBlock } from '../vibrancy/views/html-utils';
+import { getDashboardChromeStyles } from './dashboardChromeStyles';
 import { l10n } from '../i18n/runtime';
 
 // Injected by esbuild at build time (see esbuild.js `define`). Falls back to
@@ -65,12 +66,14 @@ export function buildCodeHealthScanningHtml(extensionVersion = 'dev'): string {
 <meta charset="UTF-8" />
 <title>${escapeHtml(l10n('codeHealth.scan.title'))}</title>
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}';">
-<style nonce="${nonce}">${scanStyles()}</style>
+<style nonce="${nonce}">${getDashboardChromeStyles()}${scanStyles()}</style>
 </head>
 <body>
-<header class="scan-hero">
-  <h1>${escapeHtml(l10n('codeHealth.scan.title'))} <span class="spinner" aria-hidden="true"></span></h1>
-  <p class="sub">${escapeHtml(l10n('codeHealth.scan.subtitle'))}</p>
+<header class="dash-hero">
+  <div class="hero-text">
+    <h1>${escapeHtml(l10n('codeHealth.scan.title'))} <span class="spinner" aria-hidden="true"></span></h1>
+    <p class="status-line"><span>${escapeHtml(l10n('codeHealth.scan.subtitle'))}</span></p>
+  </div>
 </header>
 
 <ol class="stepper" id="stepper">${stepper}</ol>
@@ -114,83 +117,89 @@ export function buildCodeHealthScanningHtml(extensionVersion = 'dev'): string {
 </html>`;
 }
 
-/** Styles: theme-aware via VS Code webview CSS variables; no external assets. */
+/**
+ * Scan-specific styles layered over the shared dashboard chrome
+ * (SAROPA_DASHBOARD_STYLE_GUIDE). The chrome owns body/base, the `.dash-hero`,
+ * `.status-line`, the `.btn`/`.btn.danger` tiers, tokens, a11y, and reduced-motion;
+ * this only styles the scanning-specific components (stepper, progress bar, counter
+ * cards, current-file, preview list, footer), every value drawn from a chrome token
+ * so the panel matches the finished Code Health report. All class/id names that the
+ * inline script and the unit test reference are preserved unchanged; selectors are
+ * scoped under scan-specific ancestors to avoid colliding with chrome classes
+ * (`.dot`, `.bar-fill`, `.pill`). Per the webview-template-literal trap, no regex
+ * backslashes appear in this string.
+ */
 function scanStyles(): string {
   return `
-:root{color-scheme:light dark;}
-body{font-family:var(--vscode-font-family);color:var(--vscode-foreground);background:var(--vscode-editor-background);margin:0;padding:24px;line-height:1.5;}
-.scan-hero h1{font-size:1.5rem;margin:0 0 4px;display:flex;align-items:center;gap:10px;}
-.sub{margin:0 0 20px;color:var(--vscode-descriptionForeground);}
-.spinner{width:16px;height:16px;border:2px solid var(--vscode-progressBar-background,#0e70c0);border-right-color:transparent;border-radius:50%;display:inline-block;animation:spin 0.8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
+.spinner{width:16px;height:16px;border:2px solid var(--vscode-progressBar-background,#0e70c0);border-right-color:transparent;border-radius:50%;display:inline-block;vertical-align:middle;margin-inline-start:var(--space-2);animation:scanspin 0.8s linear infinite;}
+@keyframes scanspin{to{transform:rotate(360deg);}}
 @media (prefers-reduced-motion:reduce){.spinner{animation:none;}}
-.stepper{list-style:none;display:flex;flex-wrap:wrap;gap:6px 18px;padding:0;margin:0 0 20px;}
-.step{display:flex;align-items:center;gap:7px;color:var(--vscode-descriptionForeground);font-size:.85rem;}
-.step .dot{width:9px;height:9px;border-radius:50%;background:var(--vscode-input-border,#5557);}
+.stepper{list-style:none;display:flex;flex-wrap:wrap;gap:var(--space-1) var(--space-5);padding:0;margin:0 0 var(--space-5);}
+.step{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:var(--text-caption);}
+.step .dot{width:9px;height:9px;border-radius:var(--radius-pill);background:var(--border);}
 .step.active{color:var(--vscode-foreground);font-weight:600;}
-.step.active .dot{background:var(--vscode-progressBar-background,#0e70c0);box-shadow:0 0 0 3px color-mix(in srgb,var(--vscode-progressBar-background,#0e70c0) 30%,transparent);}
+.step.active .dot{background:var(--accent-info);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent-info) 30%,transparent);}
 .step.done{color:var(--vscode-foreground);}
-.step.done .dot{background:var(--vscode-charts-green,#2ea043);}
-.bar-block{margin-bottom:18px;}
-.bar-head{display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:6px;}
+.step.done .dot{background:var(--status-good);}
+.bar-block{margin-bottom:var(--space-4);}
+.bar-head{display:flex;justify-content:space-between;font-size:var(--text-body);margin-bottom:var(--space-1);}
 .bar-head #phaseLabel{font-weight:600;}
-.head-right{display:flex;gap:10px;align-items:baseline;}
-.eta{font-size:.8rem;color:var(--vscode-charts-blue,#3794ff);font-variant-numeric:tabular-nums;}
+.head-right{display:flex;gap:var(--space-2);align-items:baseline;}
+.eta{font-size:var(--text-caption);color:var(--accent-info);font-variant-numeric:tabular-nums;}
 .pct{font-variant-numeric:tabular-nums;font-weight:600;color:var(--vscode-foreground);}
-.bar-track{height:12px;border-radius:7px;background:var(--vscode-input-background,#8881);overflow:hidden;box-shadow:inset 0 0 0 1px var(--vscode-widget-border,#8883);}
-.bar-fill{height:100%;width:0;border-radius:7px;background:linear-gradient(90deg,var(--vscode-charts-blue,#3794ff),var(--vscode-progressBar-background,#0e70c0));transition:width .2s ease;}
+.bar-track{height:12px;border-radius:var(--radius);background:var(--inset);overflow:hidden;box-shadow:inset 0 0 0 1px var(--border);}
+.bar-track .bar-fill{height:100%;width:0;border-radius:var(--radius);background:linear-gradient(90deg,var(--accent-info),var(--vscode-progressBar-background,#0e70c0));transition:width var(--dur) var(--ease);}
 /* Indeterminate: a sliding chunk shown while the scan is starting/compiling and
    no done/total has arrived yet, so the bar is never a dead "0%". */
-.bar-track.indeterminate .bar-fill{width:35%;animation:indeterminate 1.1s ease-in-out infinite;}
-@keyframes indeterminate{0%{margin-left:-35%;}100%{margin-left:100%;}}
+.bar-track.indeterminate .bar-fill{width:35%;animation:scanindeterminate 1.1s ease-in-out infinite;}
+@keyframes scanindeterminate{0%{margin-left:-35%;}100%{margin-left:100%;}}
 @media (prefers-reduced-motion:reduce){.bar-track.indeterminate .bar-fill{animation:none;width:100%;opacity:.4;}}
-.scan-hint{margin:8px 0 0;font-size:.8rem;color:var(--vscode-descriptionForeground);}
-.current-file{margin:8px 0 0;font-family:var(--vscode-editor-font-family,monospace);font-size:.8rem;color:var(--vscode-descriptionForeground);min-height:1.2em;display:flex;min-width:0;}
+.scan-hint{margin:var(--space-2) 0 0;font-size:var(--text-caption);color:var(--muted);}
+.current-file{margin:var(--space-2) 0 0;font-family:var(--vscode-editor-font-family,monospace);font-size:var(--text-caption);color:var(--muted);min-height:1.2em;display:flex;min-width:0;}
 /* File paths collapse the DIRECTORY (the truncatable part) and keep the basename
    fully visible: cropping the end with a plain ellipsis used to eat the filename,
    which is the one piece a reader needs to identify the file. The dir shrinks
    first (flex:0 1), the basename never shrinks (flex:0 0). */
-.path-dir{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:0 1 auto;min-width:0;}
-.path-base{white-space:nowrap;flex:0 0 auto;}
-.counters{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:20px;}
-.counter{flex:1 1 90px;background:var(--vscode-editorWidget-background,#8881);border:1px solid var(--vscode-widget-border,#8883);border-top-width:3px;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;}
-.counter .n{font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;}
-.counter .k{font-size:.75rem;color:var(--vscode-descriptionForeground);text-transform:uppercase;letter-spacing:.04em;}
-/* Each counter gets its own hue so the strip reads at a glance. */
-.c-files{border-top-color:var(--vscode-charts-blue,#3794ff);}
-.c-files .n{color:var(--vscode-charts-blue,#3794ff);}
-.c-fns{border-top-color:var(--vscode-charts-purple,#b180d7);}
-.c-fns .n{color:var(--vscode-charts-purple,#b180d7);}
-.c-prob{border-top-color:var(--vscode-charts-red,#f14c4c);}
-.counter .n.bad{color:var(--vscode-charts-red,#f14c4c);}
-.c-time{border-top-color:var(--vscode-charts-green,#2ea043);}
-.c-time .n{color:var(--vscode-charts-green,#2ea043);}
-.controls{display:flex;gap:8px;margin-bottom:24px;}
-.btn{font:inherit;padding:6px 16px;border-radius:6px;border:1px solid var(--vscode-button-border,transparent);background:var(--vscode-button-secondaryBackground,#3a3d41);color:var(--vscode-button-secondaryForeground,#fff);cursor:pointer;}
-.btn:hover{background:var(--vscode-button-secondaryHoverBackground,#45494e);}
-.btn.danger{background:var(--vscode-inputValidation-errorBackground,#5a1d1d);color:var(--vscode-foreground);}
-.btn[disabled]{opacity:.5;cursor:default;}
-.preview h2{font-size:1rem;margin:0 0 8px;}
-.prob-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px;max-height:340px;overflow:auto;}
+.current-file .path-dir,.prob-file .path-dir{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:0 1 auto;min-width:0;}
+.current-file .path-base,.prob-file .path-base{white-space:nowrap;flex:0 0 auto;}
+/* Counter cards mirror the chrome KPI cards (surface, border, radius) with a
+   per-metric colored top edge so the strip reads at a glance — re-tokened. */
+.counters{display:flex;flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-5);}
+.counter{flex:1 1 90px;background:var(--surface-2);border:1px solid var(--border);border-top-width:3px;border-radius:var(--radius);padding:var(--space-3);display:flex;flex-direction:column;gap:2px;}
+.counter .n{font-size:var(--text-kpi);font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;}
+.counter .k{font-size:var(--text-caption);color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+.c-files{border-top-color:var(--accent-info);}
+.c-files .n{color:var(--accent-info);}
+.c-fns{border-top-color:var(--accent-opinionated);}
+.c-fns .n{color:var(--vscode-foreground);}
+.c-prob{border-top-color:var(--accent-critical);}
+.counter .n.bad{color:var(--accent-critical);}
+.c-time{border-top-color:var(--status-good);}
+.c-time .n{color:var(--status-good);}
+.controls{display:flex;gap:var(--space-2);margin-bottom:var(--space-6);}
+.preview h2{font-size:var(--text-h3);margin:0 0 var(--space-2);}
+.prob-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:var(--space-1);max-height:340px;overflow:auto;}
 /* Fixed three-column grid (grade | function | path) so the columns line up at the
-   same x on every row. The previous flex + margin-left:auto layout let each row's
-   path start wherever its function name ended, which read as ragged. */
-.prob-list li{display:grid;grid-template-columns:1.6em minmax(0,1fr) minmax(0,42%);align-items:center;column-gap:12px;padding:6px 10px;border-radius:6px;background:var(--vscode-editorWidget-background,#8881);font-size:.85rem;}
-.prob-list li.empty{display:block;background:transparent;color:var(--vscode-descriptionForeground);font-style:italic;}
+   same x on every row. */
+.prob-list li{display:grid;grid-template-columns:1.6em minmax(0,1fr) minmax(0,42%);align-items:center;column-gap:var(--space-3);padding:var(--space-1) var(--space-2);border-radius:var(--radius);background:var(--surface-2);font-size:var(--text-caption);}
+.prob-list li.empty{display:block;background:transparent;color:var(--muted);font-style:italic;}
 .prob-list li.clickable{cursor:pointer;}
-.prob-list li.clickable:hover{background:var(--vscode-list-hoverBackground,#8882);}
-.grade{font-weight:700;text-align:center;border-radius:4px;padding:1px 0;}
-.grade-D,.grade-E{color:var(--vscode-charts-orange,#e2a03f);}
-.grade-F{color:var(--vscode-charts-red,#f14c4c);}
+.prob-list li.clickable:hover{background:var(--vscode-list-hoverBackground);}
+.prob-list li.clickable:focus-visible{outline:2px solid var(--vscode-focusBorder);outline-offset:1px;}
+.grade{font-weight:700;text-align:center;border-radius:var(--radius-sm);padding:1px 0;}
+/* Shared grade ramp (guide §5.8) — same hues as the finished Code Health report. */
+.grade-D{color:var(--grade-d);}
+.grade-E{color:var(--grade-e);}
+.grade-F{color:var(--grade-f);}
 .prob-name{font-family:var(--vscode-editor-font-family,monospace);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.prob-file{display:flex;min-width:0;color:var(--vscode-descriptionForeground);font-size:.78rem;}
-.ver-foot{margin-top:28px;padding-top:12px;border-top:1px solid var(--vscode-widget-border,#8883);font-size:.78rem;color:var(--vscode-descriptionForeground);display:flex;gap:8px;align-items:center;}
+.prob-file{display:flex;min-width:0;color:var(--muted);font-size:var(--text-caption);}
+.ver-foot{margin-top:var(--space-6);padding-top:var(--space-3);border-top:1px solid var(--border);font-size:var(--text-caption);color:var(--muted);display:flex;gap:var(--space-2);align-items:center;}
 .ver-brand{font-weight:600;}
-.ver-tag{font-family:var(--vscode-editor-font-family,monospace);color:var(--vscode-charts-blue,#3794ff);opacity:.85;}
+.ver-tag{font-family:var(--vscode-editor-font-family,monospace);color:var(--accent-info);opacity:.85;}
 .ver-sep{opacity:.5;}
-#engineVer.ok{color:var(--vscode-charts-green,#2ea043);font-weight:600;}
-#engineVer.legacy{color:var(--vscode-charts-orange,#e2a03f);font-weight:600;}
-body.paused .bar-fill{background:var(--vscode-charts-yellow,#cca700);}
+#engineVer.ok{color:var(--status-good);font-weight:600;}
+#engineVer.legacy{color:var(--accent-medium);font-weight:600;}
+body.paused .bar-track .bar-fill{background:var(--accent-warning);}
 body.paused .spinner{animation-play-state:paused;}
 `;
 }

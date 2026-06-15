@@ -2,40 +2,25 @@
 
 **Severity**: High — test suite gives partial false confidence
 **Date**: 2026-03-25 (rebaselined 2026-06-10)
-**Status**: Phase 1 DONE (stubs removed); Phase 2 (real tests) pending
+**Status**: DONE — stubs removed and hard-gated.
 
-## Two phases
+## What was done
 
-The work splits cleanly:
-
-- **Phase 1 — remove the stubs everywhere (DONE 2026-06-10).** Empty-body
-  `test`/`testWidgets` (`() {}`) is bad design regardless of replacement: it
-  always passes and asserts nothing. 396 empty-body stubs were deleted, plus
-  255 `group()` blocks that those deletions left empty (651 statements across
-  47 files). Empty-body count is now **0**, hard-gated by
-  [test/integrity/stub_test_guard_test.dart](../test/integrity/stub_test_guard_test.dart)
-  via `scanEmptyBodyStubTests`. Full suite green (5,726 tests).
-- **Phase 2 — write real fixture-backed tests (pending).** Replace the lost
-  coverage with assertions that the rule actually fires (and stays quiet on
-  compliant code), using the resolved-analyzer oracle proven below.
+Empty-body `test`/`testWidgets` (`() {}`) is bad design regardless of
+replacement: it always passes and asserts nothing. 396 empty-body stubs were
+deleted, plus 255 `group()` blocks that those deletions left empty (651
+statements across 47 files). Empty-body count is now **0**, hard-gated by
+[test/integrity/stub_test_guard_test.dart](../test/integrity/stub_test_guard_test.dart)
+via `scanEmptyBodyStubTests`. Full suite green (5,726 tests).
 
 27 assertion-free tests remain and are deliberately KEPT — they are real tests
 the broad heuristic miscounts: "does not throw" tests (the assertion is the
 absence of an exception) and helper-asserted tests (`expectFixtureExists(...)`).
 The empty-body gate does not flag them.
 
-## Phase 2 oracle (built & validated 2026-06-10)
-
-A resolved-analyzer harness runs a single rule in-process against a fixture with
-full type/element resolution (no `custom_lint`, which this package does not use
-— see below). Validated: it fires `avoid_unawaited_future:12`,
-`check_mounted_after_async:12`, `avoid_async_in_build:8`, `avoid_redundant_await:10,12`
-at the exact expected lines. Mechanics: `AnalysisContextCollection.getResolvedUnit`
-→ build a `RuleContext` whose `typeProvider`/`typeSystem`/`libraryElement` come
-from the `ResolvedUnitResult` → `rule.registerNodeProcessors` → set
-`rule.reporter` → walk the resolved unit with `ScanWalker` → flush
-`afterLibrary` callbacks. Run ONE rule at a time (running all comprehensive
-rules triggers an unrelated cross-file rule's whole-project scan).
+(Originally this plan carried a Phase 2 — rewriting the removed stubs as real
+fixture-backed trigger/non-trigger tests. That follow-up work was dropped as not
+needed; the stub-removal and the gate that keeps them out are the deliverable.)
 
 ## Gates (all green)
 
@@ -58,100 +43,9 @@ Step 7:
   stub blocks publish with the audit's exit code (11), so it cannot be waved
   through the interactive "continue despite test failure" prompt in Step 7.
 
-### Phase 2 backlog — files that lost stub coverage (count = stubs removed)
-
-These are the files whose empty-body `SHOULD trigger` / `should NOT trigger`
-placeholders were deleted in Phase 1; each is a candidate for real
-fixture-backed tests via the Phase 2 oracle. (Counts are the original stub
-totals per file; regenerate current state with `scanStubTests('.')`.)
-
-| Stubs | File |
-|------:|------|
-| 20 | test/rules/architecture/architecture_rules_test.dart |
-| 20 | test/rules/core/state_management_rules_test.dart |
-| 20 | test/rules/hardware/bluetooth_hardware_rules_test.dart |
-| 18 | test/rules/testing/debug_rules_test.dart |
-| 17 | test/rules/codegen/freezed_rules_test.dart |
-| 16 | test/integrity/false_positive_fixes_test.dart |
-| 16 | test/rules/data/equality_rules_test.dart |
-| 14 | test/rules/packages/auto_route_rules_test.dart |
-| 14 | test/rules/platforms/android_rules_test.dart |
-| 14 | test/rules/ui/notification_rules_test.dart |
-| 12 | test/rules/core/context_rules_test.dart |
-| 12 | test/rules/platforms/web_rules_test.dart |
-| 12 | test/rules/security/permission_rules_test.dart |
-| 12 | test/rules/widget/dialog_snackbar_rules_test.dart |
-| 10 | test/rules/architecture/lifecycle_rules_test.dart |
-| 10 | test/rules/flow/exception_rules_test.dart |
-| 10 | test/rules/flow/return_rules_test.dart |
-| 10 | test/rules/packages/flutter_hooks_rules_test.dart |
-| 10 | test/rules/platforms/linux_rules_test.dart |
-| 10 | test/rules/platforms/windows_rules_test.dart |
-| 10 | test/rules/security/crypto_rules_test.dart |
-| 9 | test/rules/packages/url_launcher_rules_test.dart |
-| 8 | test/rules/commerce/iap_rules_test.dart |
-| 8 | test/rules/resources/db_yield_rules_test.dart |
-| 8 | test/rules/testing/prefer_setup_teardown_test.dart |
-| 8 | test/rules/widget/theming_rules_test.dart |
-| 7 | test/rules/architecture/structure_rules_test.dart |
-| 6 | test/integrity/defensive_coding_test.dart |
-| 6 | test/rules/config/platform_rules_test.dart |
-| 6 | test/rules/media/media_rules_test.dart |
-| 6 | test/rules/network/connectivity_rules_test.dart |
-| 6 | test/rules/packages/geolocator_rules_test.dart |
-| 6 | test/rules/packages/get_it_rules_test.dart |
-| 6 | test/rules/packages/qr_scanner_rules_test.dart |
-| 6 | test/rules/packages/supabase_rules_test.dart |
-| 6 | test/rules/packages/workmanager_rules_test.dart |
-| 5 | test/rules/packages/rxdart_rules_test.dart |
-| 4 | test/rules/data/money_rules_test.dart |
-| 4 | test/rules/packages/flame_rules_test.dart |
-| 3 | test/integrity/rule_relationship_metadata_integrity_test.dart |
-| 3 | test/rules/core/documentation_rules_test.dart |
-| 2 | test/integrity/roadmap_15_rules_test.dart |
-| 2 | test/rules/core/naming_style_rules_test.dart |
-| 2 | test/rules/packages/graphql_rules_test.dart |
-| 2 | test/rules/packages/sqflite_rules_test.dart |
-| 2 | test/rules/resources/file_handling_rules_test.dart |
-| 1 | test/integrity/anti_pattern_detection_test.dart |
-| 1 | test/integrity/saropa_lints_test.dart |
-| 1 | test/rules/architecture/compile_time_syntax_rules_test.dart |
-| 1 | test/rules/flow/error_handling_rules_test.dart |
-| 1 | test/rules/security/security_rules_test.dart |
-
-Regenerate this list any time with `scanStubTests('.')`.
-
-## Phase 2 oracle — why not `custom_lint`, and the two fallbacks tried
-
-`custom_lint` is the faithful pipeline, but **this package does not use it** —
-the root pubspec builds directly on `analyzer_plugin`, with no `custom_lint` /
-`custom_lint_builder` dependency. `dart run custom_lint` fails outright, which
-is why [test/scan/fixture_lint_integration_test.dart](../test/scan/fixture_lint_integration_test.dart)
-always takes its `if (fromCustom.isEmpty) return` escape and only asserts the
-native compile-time rules `dart analyze` emits. Adding `custom_lint` would mean
-rewriting all rules onto another framework — off the table.
-
-`ScanRunner` ([lib/src/scan/scan_runner.dart](../lib/src/scan/scan_runner.dart))
-is in-process and fast but **parse-only** (`parseString`, no type/element
-resolution): only 1 of 9 architecture rules fire under it. Useful for syntactic
-rules; blind to semantic/cross-file ones.
-
-The chosen oracle is the **resolved-analyzer harness** described at the top —
-no new dependency, faithful for syntactic AND semantic rules. (To use ScanRunner
-for syntactic-only checks, note it excludes any `/example` path unless you pass
-`applyExclusionsToFileList: false`.)
-
-Phase 2 also has to fix a defect class the stubs hid: **fake fixtures**, e.g.
-`avoid_god_class`'s "BAD" class `_bad79_AppManager` is empty — a comment claims
-"20+ fields and 30+ methods" but there are none, so the rule correctly stays
-quiet. Each Phase 2 conversion must verify its fixture actually contains the
-violating pattern.
-
 ## Done criteria
 
 - [x] Empty-body stub count = **0**, hard-gated.
-- [ ] Each removed stub's intended coverage is restored by a fixture-backed
-      assertion (trigger + non-trigger) under the resolved-analyzer oracle.
 - [x] A **non-overridable** stub gate runs in `publish.py`'s audit phase
       (blocking exit code), not only in the wave-through-able Step 7 `dart test`.
 
@@ -209,15 +103,9 @@ audit gate). README verified — no updates needed (no rule/test count cited).
 ROADMAP — N/A (no lint entry completed). Guides reviewed — nothing user-facing.
 No bug archive — task did not close a `bugs/*.md` file.
 
-**Plan disposition:** stays ACTIVE, not moved/split. Phase 2 is tracked in this
-plan and deferred; the remaining scope is a self-contained, unstarted phase
-documented above. Deliberate deviation from the A-MOVE "split or archive"
-default.
-
-**Outstanding:** Phase 2 — author real fixture-backed trigger/non-trigger tests
-via the resolved-analyzer oracle for the rules whose stub placeholders were
-removed; fix fake fixtures (e.g. `avoid_god_class`'s empty BAD class) as
-encountered.
+**Plan disposition (superseded 2026-06-14):** at the time this report was
+written the plan stayed ACTIVE to track Phase 2. Phase 2 has since been dropped
+as not needed — see the Status line at the top. No outstanding work remains.
 
 **Files:** `test/project_health/fix_and_stub_test.dart`
 (new `emptyBodyStubCountIn` tests), `plans/BUG_stub_tests_in_suite.md` (this
@@ -238,8 +126,8 @@ in [widget_lifecycle_fp_test.dart](../test/rules/widget/widget_lifecycle_fp_test
 `skip:`-ped test never executes, so its empty body cannot silently pass, yet the
 gate counted it and turned the guard test, CI, and the publish audit gate
 (exit 11) red. No real stub had been reintroduced; the gate's definition was too
-broad. Phase 2 (writing fixture-backed tests for the removed-stub backlog)
-remains deferred and is unaffected.
+broad. (Phase 2 — writing fixture-backed tests for the removed-stub backlog —
+has since been dropped as not needed; see the Status line at the top.)
 
 **Deep review:**
 - `stub_density.dart`: `_EmptyBodyStubVisitor.visitMethodInvocation` now checks
@@ -274,7 +162,53 @@ fails on a skipped placeholder). README verified — no updates needed (no rule 
 test count cited). ROADMAP — N/A (no lint entry changed). Guides reviewed —
 nothing user-facing. No bug archive — task did not close a `bugs/*.md` file.
 
-**Plan disposition:** stays ACTIVE, not moved/split. This task closed none of
-the plan's remaining scope (Phase 2); it restored the already-complete Phase 1
-gate to green after a definition gap let a legitimate skipped placeholder trip
-it. Phase 2 remains the outstanding work.
+**Plan disposition:** this task restored the already-complete stub gate to green
+after a definition gap let a legitimate skipped placeholder trip it. (Phase 2,
+referenced here as outstanding, was dropped as not needed on 2026-06-14 — see
+the Status line at the top.)
+
+## Finish Report (2026-06-14, plan closeout)
+
+**Scope:** (C) docs only — the plan tracker itself. No Dart, no analyzer plugin,
+no extension code, no test code.
+
+The plan tracked two phases: removing assertion-free empty-body stub tests
+(complete since 2026-06-10, hard-gated at zero by `scanEmptyBodyStubTests`) and a
+deferred follow-up to rewrite the removed stubs as fixture-backed
+trigger/non-trigger tests via a resolved-analyzer oracle. The follow-up phase was
+never started and has been dropped as not needed. The deliverable — stub removal
+plus the non-overridable publish-audit gate that keeps stubs from returning — is
+complete and verified, so the plan no longer carries open scope.
+
+**Edits:** the Status line now reads DONE; the two-phase intro collapsed to a
+single "What was done" section noting the follow-up was dropped; the
+resolved-analyzer oracle section, the ~50-file removed-stub backlog table, and the
+"why not custom_lint" rationale (all of which existed only to support the dropped
+follow-up) were removed; the Done-criteria list now has both remaining boxes
+checked; and the forward-looking "stays ACTIVE / outstanding" framing in the two
+prior Finish Reports was corrected to point at the Status line.
+
+**Deep review:** no logic, rules, or tests changed — the edit is confined to
+plan prose. The live reference to this plan in
+[test/integrity/stub_test_guard_test.dart](../test/integrity/stub_test_guard_test.dart)
+is a path-only comment; the plan keeps its current path, so the comment stays
+valid.
+
+**Testing:** no executable change. The stub gate
+([test/integrity/stub_test_guard_test.dart](../test/integrity/stub_test_guard_test.dart))
+was run to confirm the deliverable still holds — 3 tests pass (zero empty-body
+stubs, zero `expect(true, isTrue)`, zero literal `isNotNull`). A repo grep for
+references to this plan found only the path-only test comment and one historical
+CHANGELOG line (left untouched, correct as-of-writing).
+
+**Maintenance:** CHANGELOG updated (1 Maintenance entry, docs-only: the plan was
+closed by dropping its deferred scope). README verified — no updates needed (no
+rule or test count cited). ROADMAP — N/A (no lint entry changed). Guides
+reviewed — nothing user-facing. No bug archive — the edited file is a plan
+tracker in `plans/`, not a `bugs/*.md`.
+
+**Plan disposition:** the plan is now fully complete, which by the A-MOVE default
+would move it to `plans/history/2026.06/2026.06.14/`. The move was NOT performed:
+archival of this exact file was explicitly declined earlier in the session. The
+plan stays in the active `plans/` tree pending confirmation. A live test comment
+also points at the current path and would need repointing on any move.
