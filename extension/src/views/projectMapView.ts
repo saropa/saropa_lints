@@ -124,31 +124,65 @@ function runScan(
 
 function renderPanel(indexPath: string): void {
   const p = getOrCreatePanel();
-  const echartsUri = p.webview.asWebviewUri(
-    vscode.Uri.joinPath(extensionUri, 'media', 'echarts.min.js'),
+  const raw = fs.readFileSync(indexPath, 'utf8');
+  p.webview.html = transformProjectMapHtml(raw, p.webview, extensionUri);
+  p.reveal(vscode.ViewColumn.One);
+}
+
+/**
+ * Applies the in-editor transforms to a raw `project_health --format html` document: swaps the CDN
+ * ECharts `<script>` for the vendored copy (webviews have no network), injects a CSP that permits
+ * the vendored script + the report's inline data/style, and rebinds the report's palette tokens to
+ * the host theme. Returns a self-contained HTML document usable either as `webview.html` (the
+ * standalone Project Map panel) or as an `<iframe srcdoc>` inside the consolidated dashboard.
+ *
+ * Exported so the consolidated "Saropa Dashboards" view can embed the EXACT same interactive report
+ * (treemap, scatter, hot-spots) without re-deriving these transforms or rebuilding the engine.
+ */
+export function transformProjectMapHtml(
+  raw: string,
+  webview: vscode.Webview,
+  extUri: vscode.Uri,
+): string {
+  const echartsUri = webview.asWebviewUri(
+    vscode.Uri.joinPath(extUri, 'media', 'echarts.min.js'),
   );
-  let html = fs.readFileSync(indexPath, 'utf8');
-  // Swap the CDN ECharts for the vendored copy (webviews have no network).
-  html = html.replace(
+  let html = raw.replace(
     /<script src="https:\/\/cdn[^"]*"><\/script>/,
     `<script src="${echartsUri.toString()}"></script>`,
   );
   // Webview CSP: allow the vendored script + the report's inline data/style.
   const csp =
     `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; ` +
-    `img-src ${p.webview.cspSource} data:; ` +
-    `style-src ${p.webview.cspSource} 'unsafe-inline'; ` +
-    `script-src ${p.webview.cspSource} 'unsafe-inline';">`;
+    `img-src ${webview.cspSource} data:; ` +
+    `style-src ${webview.cspSource} 'unsafe-inline'; ` +
+    `script-src ${webview.cspSource} 'unsafe-inline';">`;
   html = html.replace('<head>', `<head>${csp}`);
-  // Theme-awareness (SAROPA_DASHBOARD_STYLE_GUIDE dual-binding): the standalone
-  // export ships a fixed brand palette (the guide's fallback) since a browser/CI
-  // file has no host theme. In the editor we rebind those same token names to the
-  // host `--vscode-*` tokens so Project Map tracks the user's light/dark/high-contrast
-  // theme like every other dashboard. Injected after the template's <style> (incl. its
-  // dark @media), so this :root wins by source order; the brand accent stays fixed.
-  html = html.replace('</head>', `${webviewThemeOverride()}</head>`);
-  p.webview.html = html;
-  p.reveal(vscode.ViewColumn.One);
+  // Theme-awareness (SAROPA_DASHBOARD_STYLE_GUIDE dual-binding): the standalone export ships a fixed
+  // brand palette since a browser/CI file has no host theme; in the editor we rebind those same token
+  // names to `--vscode-*`. Injected after the template's <style> (incl. its dark @media) so this
+  // :root wins by source order; the brand accent stays fixed.
+  return html.replace('</head>', `${webviewThemeOverride()}</head>`);
+}
+
+/**
+ * Runs the Project Map scan for [root] and returns the transformed, embeddable HTML document, or
+ * null if the scan failed / produced no output. Reuses the same scan + transform the standalone
+ * panel uses, so the consolidated host renders an identical report. [token] cancels the scan (e.g.
+ * when the host panel closes).
+ */
+export async function scanProjectMapToHtml(
+  root: string,
+  webview: vscode.Webview,
+  extUri: vscode.Uri,
+  token: vscode.CancellationToken,
+): Promise<string | null> {
+  const outputDir = path.join(root, 'reports', '.saropa_lints', 'health');
+  const ok = await runScan(root, outputDir, token);
+  if (!ok) return null;
+  const indexPath = path.join(outputDir, 'index.html');
+  if (!fs.existsSync(indexPath)) return null;
+  return transformProjectMapHtml(fs.readFileSync(indexPath, 'utf8'), webview, extUri);
 }
 
 /**
@@ -199,7 +233,9 @@ function getOrCreatePanel(): vscode.WebviewPanel {
 }
 
 /// Opens a report-relative file path in the editor (drill-down from a row click).
-async function openFileFromReport(root: string, relativeFile: string): Promise<void> {
+/// Exported so the consolidated dashboard host can resolve Project Map row-click drill-downs the
+/// same way the standalone panel does.
+export async function openFileFromReport(root: string, relativeFile: string): Promise<void> {
   const target = path.isAbsolute(relativeFile)
     ? relativeFile
     : path.join(root, relativeFile);
