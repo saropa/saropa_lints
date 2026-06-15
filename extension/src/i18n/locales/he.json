@@ -65,16 +65,21 @@
       "logCapture": "כניסת יומן ראתה {count}"
     }
   },
+  "dashboards": {
+    "heroTitle": "לוחיות שלט Dashboards",
+    "openFull": "פתח מסך מלא.",
+    "pane": {
+      "projectMap": "מפת פרויקט, מפת הפרויקט",
+      "codeHealth": "קוד בריאותי - קוד הבריאות"
+    },
+    "projectMap": {
+      "scanning": "סריקת מפת פרויקט..."
+    },
+    "codeHealth": {
+      "scanning": "סריקת קוד בריאות..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇  ⁇  - מחלת הדם {count} הצעה של הגדרת התצורה (s)",
-    "initMissing": {
-      "title": "הגדרת Saropa Lints (run init)",
-      "detail": "saropa_lints נמצא ב-Pubspec אבל עדיין לא מחוברת תצורת מנתח"
-    },
-    "packAvailable": {
-      "title": "הפעל את חבילת הכללים {pack}.",
-      "detail": "{count} כללי חבילה במפרק שלך"
-    },
     "enabledToast": "הפעלת את חבילת הכללים {pack} ב- analysis_options.yaml",
     "enableFailed": "לא ניתן היה להפעיל את חבילת הכללים {pack}  ⁇ פתח את לוח המחוונים של Rule Packs כדי לאפשר זאת."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "גרסה: גירסת VersiON",
+      "changelog": "שינוי של הגלגול",
       "community": "קהילת הקהילה",
       "dependencies": "תלויות - תלותות",
       "alerts": "אזהרות - התראות",
@@ -135,6 +141,12 @@
       "onDisk": "על דיסק על דיסקי",
       "upgrade": "שדרוג עדכון",
       "viewChangelog": "הצפייה בלוג שינויים"
+    },
+    "changelog": {
+      "intro": "מה השתנה מ-{from} ל-{to} - סקור לפני השדרוג.",
+      "versionDated": "{version}  ⁇   ⁇  PH0__ {date} זה ה- _PH1_.",
+      "truncated": "מראה את {count} השחרורים האחרונים.",
+      "viewFull": "תצפית מלאה של רישום השינויים ב pub.dev"
     },
     "community": {
       "stars": "כוכבים כוכבי הכוכב כוכבות",

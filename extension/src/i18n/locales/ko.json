@@ -65,16 +65,21 @@
       "logCapture": "로그 캡처는 {count}를 보았고,"
     }
   },
+  "dashboards": {
+    "heroTitle": "대시보드 (Dashboard) 대시 보드를 이용합니다.",
+    "openFull": "전체 화면을 열고, 전체 화면으로 열어보세요.",
+    "pane": {
+      "projectMap": "프로젝트 지도, 프로젝트 맵",
+      "codeHealth": "건강보험법 보건복지사"
+    },
+    "projectMap": {
+      "scanning": "스캔 프로젝트 지도...스캐닝 프로젝트 맵"
+    },
+    "codeHealth": {
+      "scanning": "스캔 코드 건강..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇ {count} 컨피그 제안 (s)",
-    "initMissing": {
-      "title": "Saropa Lints (run init) 을 설정합니다.",
-      "detail": "saropa_lints는 pubspec에 있지만 아직 분석기 구성 요소가 연결되지 않았습니다."
-    },
-    "packAvailable": {
-      "title": "{pack} 규칙 팩을 활성화하십시오.",
-      "detail": "{count} 당신의 술집의 패키지에 대한 규칙"
-    },
     "enabledToast": "analysis_options.yaml에서 {pack} 규칙 팩을 활성화했습니다.",
     "enableFailed": "{pack} 규칙  ⁇ 팩을 활성화할 수 없습니다. 규칙 팩 대시보드를 열어서 이를 활성화합니다."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "버전은 VERSION입니다.",
+      "changelog": "CHANGELOG의 변화",
       "community": "커뮤니티 (Community) 는 공동체라는 뜻으로",
       "dependencies": "의존관계 (dependencies) 는 부채를 지불하는 것을 말한다.",
       "alerts": "경고: 경보를 발령합니다.",
@@ -135,6 +141,12 @@
       "onDisk": "디스크에서 디스크에",
       "upgrade": "업그레이드 업그레이드는 업그레이드를 통해 업그레이드가 됩니다.",
       "viewChangelog": "변경록을 보기"
+    },
+    "changelog": {
+      "intro": "{from}에서 {to}로 변경된 것은 무엇입니까? 업그레이드하기 전에 검토.",
+      "versionDated": "{version}  ⁇ {date}는",
+      "truncated": "{count}의 가장 최근의 릴리즈를 보여주고 있습니다.",
+      "viewFull": "전체 변경 기록을 보기 pub.dev에서"
     },
     "community": {
       "stars": "별은 별이 별은 스타는 별",

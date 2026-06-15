@@ -65,16 +65,21 @@
       "logCapture": "Log Capture nakita {count} ng log ay nakakuha."
     }
   },
+  "dashboards": {
+    "heroTitle": "Mga Dashboard ng dashboard.",
+    "openFull": "Buksan ang buong screen.",
+    "pane": {
+      "projectMap": "Proyekto Mapa Project Map Ang proyekto mapa",
+      "codeHealth": "Code Health"
+    },
+    "projectMap": {
+      "scanning": "Pag-scan ng proyekto mapa ..."
+    },
+    "codeHealth": {
+      "scanning": "Pag-scan ng code sa kalusugan ..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇  Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili {count} config suhestiyon (((s) ng mga mungkahi",
-    "initMissing": {
-      "title": "I-set up ang Saropa Lints (run init)",
-      "detail": "saropa_lints ay nasa pubspec ngunit walang analyzer config na naka-wired pa."
-    },
-    "packAvailable": {
-      "title": "Pag-enable ng {pack} rule pack na pakete.",
-      "detail": "{count} mga patakaran para sa isang pakete sa iyong specs ng pub"
-    },
     "enabledToast": "Pinaandar ang {pack} rule pack sa analysis_options.yaml",
     "enableFailed": "Hindi maaaring paganahin ang {pack} patakaran pack  ⁇ Buksan ang Rule Packs dashboard upang paganahin ito."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "VERSION",
+      "changelog": "Ang pagbabago ay nagbago.",
       "community": "Komunidad ng mga bansa.",
       "dependencies": "DEPENDENCIES Ang mga dependensiya ay nakasalalay sa pag-aari",
       "alerts": "ALERTS",
@@ -135,6 +141,12 @@
       "onDisk": "Sa Disk sa Disk On Disk",
       "upgrade": "Mag-upgrade ng Upgrade na Pagpapahusay",
       "viewChangelog": "Tingnan ang Changelog"
+    },
+    "changelog": {
+      "intro": "Ano ang nagbago mula {from} hanggang {to} — suriin bago mag-upgrade.",
+      "versionDated": "{version}  ⁇  ang mga ito ay {date} Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili.",
+      "truncated": "Ipinapakita ang pinakabagong mga release ng {count}.",
+      "viewFull": "Tingnan ang buong changelog sa pub.dev."
     },
     "community": {
       "stars": "Mga bituin Ang mga bituin ay isang star.",

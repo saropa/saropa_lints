@@ -65,16 +65,21 @@
       "logCapture": "Log Capture zobaczył {count}."
     }
   },
+  "dashboards": {
+    "heroTitle": "Tablice kontrolne, deski rozdzielcze.",
+    "openFull": "Otwórz pełny ekran.",
+    "pane": {
+      "projectMap": "Mapa projektu Project Map - mapa projektów.",
+      "codeHealth": "Kodeks zdrowia Code Health"
+    },
+    "projectMap": {
+      "scanning": "Skanowanie mapy projektu..."
+    },
+    "codeHealth": {
+      "scanning": "Skanowanie kodu zdrowia..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇ {count} konfiguracja sugestii (s)",
-    "initMissing": {
-      "title": "Ustaw Saropa Lints (run init)",
-      "detail": "saropa_lints jest w pubspec, ale żadna konfiguracja analizatora nie została jeszcze podłączona."
-    },
-    "packAvailable": {
-      "title": "Włącz pakiet reguł {pack}.",
-      "detail": "{count} zasady dotyczące paczki w Twoim pubspec."
-    },
     "enabledToast": "Włączono pakiet reguł {pack} w analysis_options.yaml",
     "enableFailed": "Nie można włączyć pakietu reguł {pack}  ⁇ otwórz pulpit Rule Packs, aby go włączyć."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "Wersja wersji.",
+      "changelog": "CHANGELOG jest bardzo ważny.",
       "community": "Wspólnota Europejska - wspólnota.",
       "dependencies": "Dependencje - zależności.",
       "alerts": "ALERTY WARUNKI ostrzeżenia",
@@ -135,6 +141,12 @@
       "onDisk": "Na dysku na dysku",
       "upgrade": "Uaktualnij aktualizację.",
       "viewChangelog": "Zobacz Changelog"
+    },
+    "changelog": {
+      "intro": "Co zmieniło się z {from} na {to}  ⁇ przegląd przed uaktualnieniem.",
+      "versionDated": "{version}  ⁇ {date} to grupa, która ma",
+      "truncated": "Pokazując najnowsze wydania {count}.",
+      "viewFull": "Zobacz pełny changelog na pub.dev"
     },
     "community": {
       "stars": "Gwiazdy gwiazdki gwiazdy Gwiezdne",

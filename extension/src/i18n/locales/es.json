@@ -65,16 +65,21 @@
       "logCapture": "La captura de registro vio {count}."
     }
   },
+  "dashboards": {
+    "heroTitle": "Tableros de control y paneles.",
+    "openFull": "Abra la pantalla completa y abra el monitor.",
+    "pane": {
+      "projectMap": "Mapa del proyecto Project Map.",
+      "codeHealth": "Código de Salud del Código Sanitario."
+    },
+    "projectMap": {
+      "scanning": "Escaneo del mapa de proyecto..."
+    },
+    "codeHealth": {
+      "scanning": "Escaneo de código salud..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇  Se encuentra en el _PH1_. {count} sugerencia de configuración (s)",
-    "initMissing": {
-      "title": "Configurar el Saropa Lints (ejecutar init)",
-      "detail": "saropa_lints está en pubspec pero aún no se ha conectado ninguna configuración del analizador."
-    },
-    "packAvailable": {
-      "title": "Habilitar el paquete de reglas {pack}.",
-      "detail": "{count} reglas para un paquete en su especificación de pub."
-    },
     "enabledToast": "Habilitado el paquete de reglas {pack} en analysis_options.yaml",
     "enableFailed": "No se pudo habilitar el paquete de reglas {pack}  ⁇ abre el panel de reglas para habilitarlo."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "Versión de la versión.",
+      "changelog": "CHANGELOG es el nombre de un cambio.",
       "community": "Comunidad Europea, es decir.",
       "dependencies": "Dependencias de las empresas.",
       "alerts": "Las alertas son de alarma.",
@@ -135,6 +141,12 @@
       "onDisk": "En el disco en el disco.",
       "upgrade": "Actualizar actualizaciones.",
       "viewChangelog": "Ver el registro de cambios."
+    },
+    "changelog": {
+      "intro": "¿Qué cambió de {from} a {to}  ⁇ ? revisión antes de la actualización.",
+      "versionDated": "{version}  ⁇  El hombre de la noche {date} es el número de células",
+      "truncated": "Mostrando las versiones más recientes de {count}.",
+      "viewFull": "Ver el registro de cambios completo en pub.dev"
     },
     "community": {
       "stars": "Las estrellas las estrellas los astros",

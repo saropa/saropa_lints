@@ -65,16 +65,21 @@
       "logCapture": "Il Log Capture ha visto {count}."
     }
   },
+  "dashboards": {
+    "heroTitle": "Dashboard, dashboard e altri strumenti.",
+    "openFull": "Aprire lo schermo intero.",
+    "pane": {
+      "projectMap": "Project Map Map Mappa del progetto",
+      "codeHealth": "Codice Sanitario del Codici Salute."
+    },
+    "projectMap": {
+      "scanning": "Scansione della mappa del progetto..."
+    },
+    "codeHealth": {
+      "scanning": "Scansione del codice salute..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇   ⁇ {count} suggerimento di configurazione (s)",
-    "initMissing": {
-      "title": "Configurazione Saropa Lints (run init)",
-      "detail": "saropa_lints è in pubspec ma nessuna configurazione dell'analizzatore è ancora collegata."
-    },
-    "packAvailable": {
-      "title": "Abilitare il pacchetto di regole {pack}.",
-      "detail": "{count} regole per un pacchetto nella tua specifica di pub."
-    },
     "enabledToast": "Abilitato il pacchetto di regole {pack} in analysis_options.yaml",
     "enableFailed": "Non è stato possibile abilitare il pacchetto di regole {pack}  ⁇ aprire il cruscotto Rule Packs per abilitarlo."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "Versione: La versione di Versione.",
+      "changelog": "CHANGELOGOLEGiocalità",
       "community": "Comunità europea, che ha",
       "dependencies": "dipendenze, che sono le dipendenze.",
       "alerts": "ALERTES: sono avvisi di allarme.",
@@ -135,6 +141,12 @@
       "onDisk": "Su disco su disco On Disk",
       "upgrade": "Aggiornare l'upgrade.",
       "viewChangelog": "Visualizza il registro delle modifiche"
+    },
+    "changelog": {
+      "intro": "Cosa è cambiato da {from} a {to}  ⁇ revisione prima dell'aggiornamento.",
+      "versionDated": "{version}  ⁇   ⁇ {date} è il nome di una cellula.",
+      "truncated": "Mostra le più recenti release di {count}.",
+      "viewFull": "Visualizza l'intero registro delle modifiche su pub.dev"
     },
     "community": {
       "stars": "Stelle stelle stellare stellestelle stelli star stars",

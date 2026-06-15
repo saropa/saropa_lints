@@ -65,16 +65,21 @@
       "logCapture": "A Captura de Registro viu {count}."
     }
   },
+  "dashboards": {
+    "heroTitle": "Painéis de controle Dashboards",
+    "openFull": "Abra o ecrã completo.",
+    "pane": {
+      "projectMap": "Mapa do projeto Mapear o mapa de projetos",
+      "codeHealth": "Código de Saúde Code Health."
+    },
+    "projectMap": {
+      "scanning": "Mapa de projeto de varredura... mapa do projeto..."
+    },
+    "codeHealth": {
+      "scanning": "Código de saúde do scanner..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇   ⁇ {count} sugestão de configuração (s)",
-    "initMissing": {
-      "title": "Configurar Saropa Lints (run init) para executar o programa.",
-      "detail": "saropa_lints está em pubspec, mas nenhuma configuração do analisador ainda está conectada."
-    },
-    "packAvailable": {
-      "title": "Ative o pacote de regras {pack}.",
-      "detail": "{count} regras para um pacote em seu pubespec."
-    },
     "enabledToast": "Ativou o pacote de regras {pack} em analysis_options.yaml",
     "enableFailed": "Não foi possível ativar o pacote de regras {pack}  ⁇ Abra o painel de Rule Packs para habilitá-lo."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "Versão Versião Version",
+      "changelog": "CHANGELOGOL é uma mudança.",
       "community": "Comunidade Europeia, a qual é o",
       "dependencies": "Dependências: dependência.",
       "alerts": "ALERTA: Alerta de emergência.",
@@ -135,6 +141,12 @@
       "onDisk": "Em disco em disco.",
       "upgrade": "Atualização de atualização.",
       "viewChangelog": "Ver Changelog (Logo de Mudanças)"
+    },
+    "changelog": {
+      "intro": "O que mudou de {from} para {to}  ⁇ revisão antes da atualização.",
+      "versionDated": "{version}  ⁇   ⁇ {date} É um tipo de vírus que se alimenta do sangue.",
+      "truncated": "Mostrando os lançamentos mais recentes do {count}.",
+      "viewFull": "Ver o registro de alterações completo em pub.dev"
     },
     "community": {
       "stars": "Estrelas estrelas estrelas estrelas.",
@@ -1464,7 +1476,7 @@
   },
   "notify": {
     "activation": {
-      "cacheCleared": "Vibrancy cache cleared",
+      "cacheCleared": "Cache de Vibrancy limpo.",
       "copiedInfo": "Copiou as informações {package} para a área de transferência.",
       "noPubspecOrLock": "Não foi encontrado nenhum pubspec.yaml/pubspec.lock na área de trabalho.",
       "backfillComplete": "Vibração do pacote: preenchimento único do histórico concluído (instantâneos {count} importados).",
@@ -1473,7 +1485,7 @@
       "proceedUpgrades": "Prosseguir com a atualização {count} ((s)? Passos falhados são revertidos e o plano continua.",
       "actionExecute": "Execute Executar Executa",
       "actionCancel": "Cancelar cancelar Cancelá-lo",
-      "upgradeStopped": "Upgrade stopped at {failedAt} — {completed}/{total} completed",
+      "upgradeStopped": "A atualização parou em {failedAt}  ⁇ {completed}/{total} concluído.",
       "upgradeAllComplete": "Todas as atualizações {count} concluídas com sucesso.",
       "notPubspec": "O arquivo selecionado não é um pubspec.yaml.",
       "suppressedPackage": "Suprimido \"{package}\"  ⁇ diagnósticos serão ocultos.",
@@ -1485,14 +1497,14 @@
       "unsuppressedCount": "Pacotes {count} não suprimidos (s)",
       "noPubspecWorkspace": "Não foi encontrado nenhum pubspec.yaml no espaço de trabalho.",
       "depsAlreadySorted": "Dependências já classificadas.",
-      "depsSorted": "{detail} in {sections}",
+      "depsSorted": "{detail} em {sections}.",
       "noPubspec": "Não foi encontrado nenhum pubspec.yaml.",
       "updatePrereleaseConfirm": "Atualizar {package} para pré-lançamento de {version}? Pré-lançamentos podem conter mudanças de ruptura.",
       "packageNotFound": "Pacote {package} não foi encontrado em pubspec.yaml.",
-      "updatedTo": "Updated {package} to {version}",
+      "updatedTo": "Atualizado {package} para {version}.",
       "ciRunScanFirst": "Execute primeiro uma varredura para gerar a configuração do CI com os limiares apropriados.",
       "noWorkspace": "Nenhuma pasta de área de trabalho aberta abrir.",
-      "ciOverwriteConfirm": "{path} already exists. Overwrite?",
+      "ciOverwriteConfirm": "{path} já existe. Escrever em cima?",
       "actionOverwrite": "Sobre-escreva sobre a sobrescrição.",
       "ciGenerated": "Pipeline de IC gerado: pipeline de CI gerado. {path} É um termo usado para descrever a",
       "compareSelectCount": "Selecione 2-3 pacotes para comparar.",
@@ -1501,9 +1513,9 @@
     },
     "main": {
       "brandPrefix": "Saropa Lints: é um tipo de células {message} É um termo usado para descrever a",
-      "regressionErrors": "{count} error{suffix} — view.",
+      "regressionErrors": "{count} erro{suffix}  ⁇ vista. visão.",
       "regressionScoreDipped": "A pontuação caiu abaixo de {threshold}  ⁇ questões de visão.",
-      "actionViewViolations": "View Violations",
+      "actionViewViolations": "Violações de Visualização",
       "noErrors": "Saropa Lints: é um número de PH0__. Sem erros, sem falhas!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: é um número de PH0__. nenhuma pasta do espaço de trabalho está aberta. Abra primeiro o seu projeto Dart/Flutter.",
       "pluginAlive": "Saropa Lints está vivo: Regras {rules} ativadas, arquivos {files} analisados.",
@@ -1524,7 +1536,7 @@
       "noAnalysisData": "Nenhum dado de análise. Execute primeiro a análise.",
       "actionDisable": "Desativar Desabilitar",
       "actionEnable": "Ativar habilitar ativar.",
-      "bulkRuleToggleConfirm": "{verb} {count} rules? This updates analysis_options_custom.yaml.",
+      "bulkRuleToggleConfirm": "Regras {verb} {count}? Isso atualiza analysis_options_custom.yaml.",
       "setupPrompt": "Saropa Lints detectou um projeto de Dart sem a configuração do saropa_lints. Configure agora para 2100+ regras de lint.",
       "actionSetUpProject": "Configurar o projeto, configurar a obra.",
       "actionNotNow": "Agora Não, Agora Não."
@@ -1608,22 +1620,22 @@
       "noDependenciesSection": "Não conseguiu encontrar dependências seção de secções.",
       "addedToPubspec": "Adicionado {name}: {constraint} para pubspec.yaml.",
       "failedToAddToPubspec": "Não consegui adicionar {name} a pubspec.yaml.",
-      "needsPackageRow": "{actionLabel} needs a package row from the Package Dashboard (editor tab).",
+      "needsPackageRow": "{actionLabel} precisa de uma linha do pacote no Painel de Pacote (aba editor).",
       "couldNotLocateConstraint": "Não foi possível localizar a restrição de versão para {name}.",
       "deletedFromPubspec": "Excluído {name} de pubspec.yaml (backup: {backupName}) é um dos principais sinais de deficiência.",
       "runScanFirst": "Execute uma varredura primeiro.",
       "couldNotFindPubspec": "Não conseguiu encontrar pubspec.yaml.",
-      "updatedPackage": "Updated {name} to {constraint}",
+      "updatedPackage": "Atualizado {name} para {constraint}.",
       "failedToUpdate": "Não conseguiu atualizar {name}.",
       "selectPackagesToCompare": "Selecione 2-3 pacotes para comparar.",
       "maxPackagesToCompare": "Máximo de 3 pacotes para comparação.",
       "couldNotFindLocalSource": "Não foi possível encontrar a fonte local para {name}.",
-      "registryAuthAdded": "✓ Added authentication for {name}",
+      "registryAuthAdded": "✓ Adicionou autenticação para {name}.",
       "registryAddFailed": "Não foi possível adicionar o registro: {message} É um termo usado para descrever a",
       "noConfiguredRegistries": "Nenhum registro configurado.",
-      "registryAuthRemoved": "✓ Removed authentication for {name}",
+      "registryAuthRemoved": "✓ Removeu a autenticação para {name}.",
       "registryRemoveFailed": "Não conseguiu remover o registro: {message} É um termo usado para descrever a",
-      "registryTokenUpdated": "✓ Token updated",
+      "registryTokenUpdated": "✓ Token atualizado.",
       "registryTokenUpdateFailed": "Falhou na atualização do token: {message} É um termo usado para descrever a",
       "actionRemove": "Remover remover Remover Removação",
       "removeAuthPrompt": "Remover a autenticação para {name}?",
@@ -1634,8 +1646,8 @@
       "annotatedSummary": "Anotado {parts} em {basename}.",
       "upgradeInProgress": "Uma atualização já está em andamento.",
       "couldNotReadConstraint": "Não foi possível ler a restrição para {name}.",
-      "upgradeSuccess": "{name} upgraded to {constraint} — all tests pass",
-      "upgradeRolledBack": "{name} upgrade rolled back — {phase} failed. See output for details.",
+      "upgradeSuccess": "{name} atualizado para {constraint}  ⁇ Todos os testes são aprovados.",
+      "upgradeRolledBack": "{name} atualização rolou para trás  ⁇ {phase} falhou. Veja a saída para detalhes.",
       "saveTaskFailed": "Save task failed: tarefa de salvamento falhou. {message} É um termo usado para descrever a",
       "openFolderBeforeCopyConfig": "Saropa Lints: é um número de PH0__. Abra uma pasta de área de trabalho antes de copiar a configuração.",
       "copiedConfigSnippet": "Saropa Lints: é um grupo de proteínas que se reproduzem em células copiado o snippet de configuração (nível: {tier}, {packsLine}). é um dos dois tipos de",
@@ -1679,9 +1691,9 @@
       "bulkUpdateNoUpdatesFiltered": "Não há atualizações {filter} disponíveis.",
       "bulkUpdateFailed": "Falha na atualização em massa: {error} É um termo usado para descrever a",
       "bulkUpdateUpdatedOne": "Atualizado o pacote {count}.",
-      "bulkUpdateUpdatedOther": "Updated {count} packages",
+      "bulkUpdateUpdatedOther": "Pacotes {count} atualizados.",
       "detailViewConstraintNotFound": "Não foi possível localizar a restrição de versão para {package}.",
-      "detailViewUpdated": "Updated {package} to {version}"
+      "detailViewUpdated": "Atualizado {package} para {version}."
     }
   }
 }

@@ -65,16 +65,21 @@
       "logCapture": "ログキャプチャは {count} を見た."
     }
   },
+  "dashboards": {
+    "heroTitle": "ダッシュボード,ダッシュボード",
+    "openFull": "フルスクリーンで開きます.",
+    "pane": {
+      "projectMap": "プロジェクトマップ,プロジェクトの地図",
+      "codeHealth": "健康コード 保健医療法"
+    },
+    "projectMap": {
+      "scanning": "スキャンプロジェクトマップ..."
+    },
+    "codeHealth": {
+      "scanning": "スキャンコードの健康..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇  ____ (PH1)  ⁇ {count} 設定の提案 (s) を表示する",
-    "initMissing": {
-      "title": "Saropa Lints (ラン・init) をセットアップする",
-      "detail": "saropa_lintsは pubspec に入っていますが,分析器の構成はまだワイヤレス化されていません."
-    },
-    "packAvailable": {
-      "title": "{pack} ルールパックを有効にします.",
-      "detail": "{count} パッケージのルール あなたのパブスペックに"
-    },
     "enabledToast": "analysis_options.yaml で {pack} ルールパックを有効にしました.",
     "enableFailed": "{pack} ルールパックを有効にできない  ⁇ ルールパックダッシュボードを開いて,それを有効にします."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "バージョンバージョン",
+      "changelog": "チェンジログの変更",
       "community": "コミュニティー (共同体)",
       "dependencies": "依存関係にあるもの",
       "alerts": "警告は,警戒を促すものである.",
@@ -135,6 +141,12 @@
       "onDisk": "ディスク オン ディスク",
       "upgrade": "アップグレードアップデート",
       "viewChangelog": "変更ログを表示する"
+    },
+    "changelog": {
+      "intro": "{from} から {to}  ⁇  に変わったのは何ですか. 更新前にレビューする.",
+      "versionDated": "{version}  ⁇  _PH0_  ⁇  は,その人の身体を {date} _ ヒトの\"つの細胞を構成する",
+      "truncated": "{count} の最新リリースが表示されています.",
+      "viewFull": "完全な変更ログを pub.dev で参照してください."
     },
     "community": {
       "stars": "星は,星の星である.",

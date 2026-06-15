@@ -65,16 +65,21 @@
       "logCapture": "লগ ক্যাপচার {count} দেখেছি।"
     }
   },
+  "dashboards": {
+    "heroTitle": "ড্যাশবোর্ডস, ড্যাশন বোর্ড",
+    "openFull": "পূর্ণ স্ক্রিন খুলুন",
+    "pane": {
+      "projectMap": "প্রকল্প মানচিত্র, প্রকল্পের মানচিত্র",
+      "codeHealth": "কোড হেলথ হেলথ কোড"
+    },
+    "projectMap": {
+      "scanning": "স্ক্যানিং প্রকল্প মানচিত্র ..."
+    },
+    "codeHealth": {
+      "scanning": "স্ক্যানিং কোড স্বাস্থ্য ..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇   ⁇ {count} কনফিগ পরামর্শ (s)",
-    "initMissing": {
-      "title": "Saropa Lints সেট আপ করুন (রান ইনিশ)",
-      "detail": "saropa_lints pubspec-এ রয়েছে কিন্তু কোন বিশ্লেষক কনফিগারেশন এখনো সংযুক্ত করা হয়নি।"
-    },
-    "packAvailable": {
-      "title": "{pack} নিয়ম প্যাক সক্ষম করুন।",
-      "detail": "{count} আপনার পাবস্পেকের একটি প্যাকেজের জন্য নিয়ম।"
-    },
     "enabledToast": "analysis_options.yaml এ {pack} রুল প্যাক সক্ষম করা হয়েছে।",
     "enableFailed": "{pack} নিয়ম প্যাক  ⁇  সক্ষম করতে পারেনি এটি সক্ষম করতে নিয়ম প্যাক ড্যাশবোর্ড খুলুন।"
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "VERSION সংস্করণ",
+      "changelog": "পরিবর্তন করুনGLOBAL",
       "community": "কমিউনিটি সম্প্রদায়ের সদস্যরা।",
       "dependencies": "ডিপেনডেন্সিগুলি",
       "alerts": "সতর্কতা Alerts",
@@ -135,6 +141,12 @@
       "onDisk": "ডিস্ক অন ডিস্কে",
       "upgrade": "আপগ্রেড করুন আপগ্রিড আপগ্রেস।",
       "viewChangelog": "চেঞ্জলগ দেখুন"
+    },
+    "changelog": {
+      "intro": "{from} থেকে {to}  ⁇  এ কি পরিবর্তন হয়েছে? আপগ্রেড করার আগে পর্যালোচনা করুন।",
+      "versionDated": "{version}  ⁇   ⁇ {date} _ PH1__ এর সাথে সম্পর্কিত",
+      "truncated": "{count} সর্বশেষ প্রকাশগুলি দেখানো হচ্ছে।",
+      "viewFull": "pub.dev এ সম্পূর্ণ পরিবর্তন লগ দেখুন"
     },
     "community": {
       "stars": "নক্ষত্র তারকা তারা",

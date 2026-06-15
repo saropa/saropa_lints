@@ -65,16 +65,21 @@
       "logCapture": "Log Capture melihat {count}."
     }
   },
+  "dashboards": {
+    "heroTitle": "Dashboard, Dasbor dan lainnya.",
+    "openFull": "Buka layar penuh untuk membuka.",
+    "pane": {
+      "projectMap": "Peta Proyek Peta Project Map",
+      "codeHealth": "Kode Kesehatan Code Health"
+    },
+    "projectMap": {
+      "scanning": "Pindai peta proyek pemindaian..."
+    },
+    "codeHealth": {
+      "scanning": "Scan kode kesehatan..."
+    }
+  },
   "configSuggestions": {
-    "badgeTooltip": "Saropa Lints  ⁇  adalah {count} saran konfigurasi (s)",
-    "initMissing": {
-      "title": "Siapkan Saropa Lints (run init)",
-      "detail": "saropa_lints berada di pubspec tetapi tidak ada konfigurasi analis yang terhubung belum."
-    },
-    "packAvailable": {
-      "title": "Aktifkan paket aturan {pack}.",
-      "detail": "{count} aturan untuk paket dalam spesifikasi pub Anda."
-    },
     "enabledToast": "Mengaktifkan paket aturan {pack} di analysis_options.yaml",
     "enableFailed": "Tidak dapat mengaktifkan paket aturan {pack}  ⁇ buka dasbor Rule Packs untuk mengaktifkannya."
   },
@@ -87,6 +92,7 @@
   "packageDetail": {
     "section": {
       "version": "Versi yang lebih baik adalah versi",
+      "changelog": "CHANGELOG adalah sebuah perubahan.",
       "community": "Komunitas ini adalah komunitas yang",
       "dependencies": "Dependensi adalah ketergantungan.",
       "alerts": "Alerts: Peringatan yang diberikan.",
@@ -135,6 +141,12 @@
       "onDisk": "Pada disk On Disk On Disk",
       "upgrade": "Upgrade adalah upgrade yang dilakukan untuk meningkatkan kualitas.",
       "viewChangelog": "Lihat Changelog."
+    },
+    "changelog": {
+      "intro": "Apa yang berubah dari {from} menjadi {to}  ⁇ review sebelum upgrade.",
+      "versionDated": "{version}  ⁇   ⁇ {date} adalah",
+      "truncated": "Menampilkan rilis terbaru {count}.",
+      "viewFull": "Lihat changelog lengkap pada pub.dev"
     },
     "community": {
       "stars": "Bintang-bintang bintang-bentang bintang-binatang bintang.",
