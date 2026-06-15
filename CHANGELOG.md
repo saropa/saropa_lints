@@ -68,6 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed (Extension)
 
+- **The Findings Dashboard header no longer flickers constantly.** The dashboard reloads itself whenever the analyzer republishes diagnostics, and each reload replayed the header's entrance animation — so in an actively-analyzing project the header strobed nonstop. It now skips the reload when nothing you can see has changed, and only animates the header on first open. No action required.
 - **The "Upgrading Saropa Lints to X" notification no longer hangs open after you accept an upgrade.** The upgrade ran a full project analysis on the blocking call path, which froze the extension host for the whole analysis and left the progress notification (and its Cancel button) unresponsive until VS Code was reloaded. Analysis now runs without blocking and is cancellable, so the notification closes when the upgrade finishes. No action required.
 
 ### Added (Extension)

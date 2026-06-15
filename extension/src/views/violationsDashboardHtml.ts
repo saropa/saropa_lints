@@ -46,7 +46,7 @@ export function renderViolationsDashboardHtml(input: ViolationsDashboardHtmlInpu
        needs this: its fill is now a static SVG stroke-dasharray attribute.) -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}' 'unsafe-inline'; script-src 'nonce-${nonce}';" />
   <style nonce="${nonce}">${getViolationsDashboardStyles()}${getKeyboardShortcutsStyles()}</style>
-</head><body>
+</head><body${input.firstPaint === false ? ' data-no-hero-anim' : ''}>
   ${buildSkipLink('findings-table', l10n('findingsDash.skipToFindings'))}
   ${buildAnnouncer()}
   ${buildHero(input)}

@@ -127,6 +127,20 @@ describe('violationsDashboardHtml', () => {
     assert.ok(html.includes('v1.2.3'));
   });
 
+  it('plays the hero entrance animation on first paint, suppresses it on live rebuilds', () => {
+    // firstPaint omitted / true = first open of the panel → animate the hero in.
+    // firstPaint:false = a live diagnostic-driven rebuild → mark the body so the
+    // CSS disables hero-in, otherwise every webview.html reassignment replays the
+    // fade/slide and the header strobes (the constant-flicker bug this guards).
+    const firstOpen = renderViolationsDashboardHtml(minimalInput({ firstPaint: true }));
+    const liveRebuild = renderViolationsDashboardHtml(minimalInput({ firstPaint: false }));
+    const omitted = renderViolationsDashboardHtml(minimalInput({}));
+
+    assert.ok(!/<body[^>]*data-no-hero-anim/.test(firstOpen), 'first paint must animate');
+    assert.ok(/<body[^>]*data-no-hero-anim/.test(liveRebuild), 'live rebuild must suppress animation');
+    assert.ok(!/<body[^>]*data-no-hero-anim/.test(omitted), 'omitted firstPaint defaults to animating');
+  });
+
   it('omits the chart card when every severity and impact slot is zero', () => {
     /* §8.16 / §14.3: do not render an empty chart frame. */
     const html = renderViolationsDashboardHtml(minimalInput({}));
