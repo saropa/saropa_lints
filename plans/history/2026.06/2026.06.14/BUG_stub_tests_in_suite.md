@@ -10,7 +10,7 @@ Empty-body `test`/`testWidgets` (`() {}`) is bad design regardless of
 replacement: it always passes and asserts nothing. 396 empty-body stubs were
 deleted, plus 255 `group()` blocks that those deletions left empty (651
 statements across 47 files). Empty-body count is now **0**, hard-gated by
-[test/integrity/stub_test_guard_test.dart](../test/integrity/stub_test_guard_test.dart)
+[test/integrity/stub_test_guard_test.dart](../../../../test/integrity/stub_test_guard_test.dart)
 via `scanEmptyBodyStubTests`. Full suite green (5,726 tests).
 
 27 assertion-free tests remain and are deliberately KEPT — they are real tests
@@ -24,7 +24,7 @@ needed; the stub-removal and the gate that keeps them out are the deliverable.)
 
 ## Gates (all green)
 
-Three regression gates in [test/integrity/stub_test_guard_test.dart](../test/integrity/stub_test_guard_test.dart),
+Three regression gates in [test/integrity/stub_test_guard_test.dart](../../../../test/integrity/stub_test_guard_test.dart),
 wired into the normal `dart test` run so they execute in CI and in publish
 Step 7:
 
@@ -116,11 +116,11 @@ report). Phase 1 + gate code landed earlier in commits `b086d7d6` and
 
 **Scope:** (A) Dart analyzer-plugin tooling + (C) docs. The empty-body
 stub-test gate (`scanEmptyBodyStubTests` /
-[stub_density.dart](../lib/src/cli/project_health/stub_density.dart)) was a hard
+[stub_density.dart](../../../../lib/src/cli/project_health/stub_density.dart)) was a hard
 zero gate that counted any `test`/`testWidgets` whose callback is an empty block
 (`() {}`). A deliberately-skipped placeholder —
 `test('removeListener detection (Flutter-gated; not oracle-runnable)', () {}, skip: '...')`
-in [widget_lifecycle_fp_test.dart](../test/rules/widget/widget_lifecycle_fp_test.dart)
+in [widget_lifecycle_fp_test.dart](../../../../test/rules/widget/widget_lifecycle_fp_test.dart)
 — documents an un-runnable case (the rule returns early unless
 `isFlutterProject`, which the Flutter-less example package cannot satisfy). A
 `skip:`-ped test never executes, so its empty body cannot silently pass, yet the
@@ -190,12 +190,12 @@ prior Finish Reports was corrected to point at the Status line.
 
 **Deep review:** no logic, rules, or tests changed — the edit is confined to
 plan prose. The live reference to this plan in
-[test/integrity/stub_test_guard_test.dart](../test/integrity/stub_test_guard_test.dart)
+[test/integrity/stub_test_guard_test.dart](../../../../test/integrity/stub_test_guard_test.dart)
 is a path-only comment; the plan keeps its current path, so the comment stays
 valid.
 
 **Testing:** no executable change. The stub gate
-([test/integrity/stub_test_guard_test.dart](../test/integrity/stub_test_guard_test.dart))
+([test/integrity/stub_test_guard_test.dart](../../../../test/integrity/stub_test_guard_test.dart))
 was run to confirm the deliverable still holds — 3 tests pass (zero empty-body
 stubs, zero `expect(true, isTrue)`, zero literal `isNotNull`). A repo grep for
 references to this plan found only the path-only test comment and one historical
