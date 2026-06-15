@@ -74,8 +74,11 @@ class RequireKeyboardVisibilityDisposeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_keyboard_visibility_dispose',
-    '[require_keyboard_visibility_dispose] Uncanceled subscription keeps '
-        'firing callbacks after dispose, causing setState errors. {v2}',
+    '[require_keyboard_visibility_dispose] A KeyboardVisibilityController '
+        'subscription that is never canceled keeps firing visibility callbacks '
+        'after the widget is disposed, so setState runs on an unmounted State '
+        'and throws, while the retained listener leaks the widget and the '
+        'subtree it closes over. {v2}',
     correctionMessage: 'Store and cancel the stream subscription in dispose().',
     severity: DiagnosticSeverity.WARNING,
   );
