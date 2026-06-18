@@ -64,6 +64,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+Turning off Lint integration now actually stops the analyzer. Previously "Lint integration: Off" only flipped an internal flag, so saropa_lints diagnostics kept appearing in the Problems pane. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- "Lint integration: Off" now comments out the `plugins:` block in analysis_options.yaml so the analyzer stops emitting saropa_lints diagnostics; toggling it back On restores the block with your rule packs and overrides intact. No action required.
+
+---
+
 ## [14.0.2]
 
 This release introduces a unified multi-pane dashboard that lets you review your project map and code health metrics side by side, alongside an on-demand shortcut to quickly re-check for package updates. It also addresses key interface stability issues, preventing extension host freezes during upgrades and stopping the primary dashboard header from flickering during active analysis. [log](https://github.com/saropa/saropa_lints/blob/v14.0.2/CHANGELOG.md)

@@ -1551,6 +1551,7 @@
       "pubGetNotResolved": "Saropa Lints: pub get succeeded but saropa_lints was not resolved. Check pubspec.yaml formatting.",
       "configWriteFailedNs": "Saropa Lints: config write failed. {details}",
       "disabled": "Saropa Lints is disabled. Project files were not changed.",
+      "disabledAnalyzer": "Saropa Lints integration turned off. Analyzer diagnostics will clear shortly; toggle Lint integration On to restore.",
       "noOpenDartFiles": "Saropa Lints: no open Dart files found. Re-open a Dart file or turn off the \"Open editors only\" setting.",
       "configUpdated": "Saropa Lints config updated (tier: {tier}).",
       "configWriteFailed": "Config write failed. {details}",

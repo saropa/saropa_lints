@@ -259,6 +259,14 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
         return;
       }
 
+      // If integration was previously turned off, the plugins block is
+      // commented out behind sentinels. Restore it first so write_config
+      // replaces the real block in place (keeping the user's rule_packs and
+      // overrides) rather than appending a duplicate below the dead one.
+      if (restorePluginsIntegration(workspaceRoot)) {
+        logReport('- Restored previously disabled plugins block');
+      }
+
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const tier = (cfg.get<string>('tier') ?? 'recommended').trim();
       const { ok: initOk, stderr: initErr } = runInWorkspace(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier));
@@ -285,9 +293,120 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
   return success;
 }
 
+const ANALYSIS_OPTIONS_FILENAME = 'analysis_options.yaml';
+
+// Sentinel lines that bracket the commented-out `plugins:` block while
+// integration is off. They let runEnable restore the block byte-for-byte
+// (preserving the user's enabled rule_packs and in-file rule overrides)
+// instead of regenerating from tier defaults and silently dropping them.
+const DISABLE_BEGIN_MARKER =
+  '# >>> saropa_lints integration turned OFF by the VS Code extension — toggle "Lint integration" On to restore >>>';
+const DISABLE_END_MARKER =
+  '# <<< saropa_lints end of disabled integration block <<<';
+
+/**
+ * Locate the top-level `plugins:` block (header line through the line before
+ * the next column-0 YAML key, or EOF). The Dart analysis server loads
+ * saropa_lints through this block, so commenting it out is the ONLY thing that
+ * actually stops the analyzer from emitting diagnostics — flipping the
+ * `saropaLints.enabled` setting alone never reaches the analyzer, which is why
+ * "Lint integration: Off" left every diagnostic in place
+ * (plans/history/2026.06/2026.06.18/BUG_cant turn off lints.md).
+ */
+function findPluginsBlock(lines: string[]): { start: number; end: number } | null {
+  const start = lines.findIndex((l) => /^plugins:\s*$/.test(l));
+  if (start === -1) return null;
+
+  // Block ends at the next top-level key (matches config_writer's
+  // topLevelKeyPattern `^\w+:`), or EOF when plugins is the last section.
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^\w[\w-]*:/.test(lines[i])) {
+      end = i;
+      break;
+    }
+  }
+  return { start, end };
+}
+
+/**
+ * Comment out the `plugins:` block so the analyzer stops loading saropa_lints.
+ *
+ * Returns 'commented' when it disabled an active block, 'already-off' when the
+ * block is already wrapped by the disable sentinels, and 'no-config' when there
+ * is no analysis_options.yaml or no plugins block (integration was never set
+ * up). Blank lines are left untouched so the restore is exact.
+ */
+export function disablePluginsIntegration(root: string): 'commented' | 'already-off' | 'no-config' {
+  const file = path.join(root, ANALYSIS_OPTIONS_FILENAME);
+  if (!fs.existsSync(file)) return 'no-config';
+
+  const content = fs.readFileSync(file, 'utf-8');
+  if (content.includes(DISABLE_BEGIN_MARKER)) return 'already-off';
+
+  const eol = content.includes('\r\n') ? '\r\n' : '\n';
+  const lines = content.split(eol);
+  const block = findPluginsBlock(lines);
+  if (!block) return 'no-config';
+
+  // Prefix '# ' onto every non-blank line in the block; restore strips it back.
+  const commented = lines
+    .slice(block.start, block.end)
+    .map((l) => (l.length === 0 ? l : `# ${l}`));
+
+  const next = [
+    ...lines.slice(0, block.start),
+    DISABLE_BEGIN_MARKER,
+    ...commented,
+    DISABLE_END_MARKER,
+    ...lines.slice(block.end),
+  ];
+  fs.writeFileSync(file, next.join(eol), 'utf-8');
+  return 'commented';
+}
+
+/**
+ * Reverse [disablePluginsIntegration]: strip the sentinels and the '# ' prefix
+ * so the live `plugins:` block returns with the user's rule_packs and overrides
+ * intact. Called by runEnable before write_config so the regeneration edits the
+ * real block in place instead of appending a duplicate below the commented one.
+ * Returns true when a disabled block was restored.
+ */
+export function restorePluginsIntegration(root: string): boolean {
+  const file = path.join(root, ANALYSIS_OPTIONS_FILENAME);
+  if (!fs.existsSync(file)) return false;
+
+  const content = fs.readFileSync(file, 'utf-8');
+  if (!content.includes(DISABLE_BEGIN_MARKER)) return false;
+
+  const eol = content.includes('\r\n') ? '\r\n' : '\n';
+  const lines = content.split(eol);
+  const begin = lines.indexOf(DISABLE_BEGIN_MARKER);
+  const end = lines.indexOf(DISABLE_END_MARKER);
+  if (begin === -1 || end === -1 || end <= begin) return false;
+
+  const restored = lines
+    .slice(begin + 1, end)
+    .map((l) => (l.startsWith('# ') ? l.slice(2) : l));
+
+  const next = [...lines.slice(0, begin), ...restored, ...lines.slice(end + 1)];
+  fs.writeFileSync(file, next.join(eol), 'utf-8');
+  return true;
+}
+
 export async function runDisable(): Promise<void> {
   await vscode.workspace.getConfiguration('saropaLints').update('enabled', false, vscode.ConfigurationTarget.Workspace);
-  vscode.window.showInformationMessage(l10n('notify.setup.disabled'));
+
+  // Setting the flag is not enough: the analyzer keeps emitting diagnostics
+  // until the plugins block is gone. Comment it out so "Off" actually clears
+  // the Problems pane (plans/history/2026.06/2026.06.18/BUG_cant turn off lints.md).
+  const root = getProjectRoot();
+  const result = root ? disablePluginsIntegration(root) : 'no-config';
+  vscode.window.showInformationMessage(
+    result === 'commented'
+      ? l10n('notify.setup.disabledAnalyzer')
+      : l10n('notify.setup.disabled'),
+  );
 }
 
 const RUN_ANALYSIS_FOR_FILES_CAP = 50;
