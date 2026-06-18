@@ -305,6 +305,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferWhenGuardOverIfRule.new,
   PreferDedicatedMediaQueryMethodRule.new,
   AvoidCascadeAfterIfNullRule.new,
+  AvoidCascadeShuffleRule.new,
   AvoidDuplicateExportsRule.new,
   NoEqualThenElseRule.new,
   AvoidGlobalStateRule.new,

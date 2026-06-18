@@ -153,6 +153,115 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
   ];
 }
 
+/// Warns when `..shuffle()` is cascaded onto an existing collection reference
+/// whose shuffled result is then consumed (e.g. `(pool..shuffle()).first`).
+///
+/// Since: v14.0.3 | Updated: v14.0.3 | Rule version: v1
+///
+/// `List.shuffle()` mutates in place and returns `void`; the cascade yields the
+/// *same* list object back. So `(pool..shuffle()).first` permanently reorders
+/// the shared `pool` just to read one element — a side effect that outlives the
+/// expression and corrupts any other reader of `pool`. The author almost always
+/// wanted a random pick from a throwaway copy, not to scramble the source.
+///
+/// Only references to existing storage (a variable, field, or property) are
+/// flagged. Fresh copies — `(List.of(pool)..shuffle())`, `([...pool]..shuffle())`,
+/// `(pool.toList()..shuffle())` — are safe because the mutation dies with the
+/// temporary, so they are left alone. A bare `pool..shuffle();` statement is
+/// also left alone: discarding the cascade value means the in-place shuffle was
+/// the intent.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// final picked = (masterPool..shuffle()).first; // mutates masterPool
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// final picked = (List.of(masterPool)..shuffle()).first; // copy is shuffled
+/// ```
+class AvoidCascadeShuffleRule extends SaropaLintRule {
+  AvoidCascadeShuffleRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  // An accidental in-place reorder of shared state is a latent bug, not just a
+  // smell — classify it as a bug so it surfaces in bug-focused reports.
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'maintainability'};
+
+  // Single cascade-node inspection with no traversal or type resolution.
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_cascade_shuffle',
+    '[avoid_cascade_shuffle] Cascading shuffle() onto an existing collection '
+        'mutates that collection in place. shuffle() returns void, so the '
+        'cascade hands back the same object you started with: reading from '
+        '(collection..shuffle()) permanently reorders the shared collection as '
+        'a side effect, corrupting every other reader of it. This is almost '
+        'never intended when the result is consumed. {v1}',
+    correctionMessage:
+        'Shuffle a throwaway copy instead: wrap the target in List.of(...) or '
+        '[...target] before the cascade, e.g. (List.of(target)..shuffle()).first.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCascadeExpression((CascadeExpression node) {
+      // Only a reference to existing storage carries the side effect across
+      // the expression. Fresh-copy targets (constructors, literals, method
+      // results) are scrubbed below, so restricting to identifier/property
+      // targets keeps the rule conservative and free of copy false positives.
+      final Expression target = node.target;
+      final bool isStoredReference =
+          target is SimpleIdentifier ||
+          target is PrefixedIdentifier ||
+          target is PropertyAccess;
+      if (!isStoredReference) return;
+
+      // Discarding the cascade value (a standalone `pool..shuffle();`) means the
+      // in-place shuffle was the goal — not a bug. Only flag when the value is
+      // consumed (assigned, returned, chained, passed as an argument, …).
+      if (_isResultDiscarded(node)) return;
+
+      // A cascade can hold several sections; flag the shuffle() one so the
+      // diagnostic points at the offending call rather than the whole chain.
+      for (final Expression section in node.cascadeSections) {
+        if (section is MethodInvocation &&
+            section.methodName.name == 'shuffle') {
+          reporter.atNode(section);
+          return;
+        }
+      }
+    });
+  }
+
+  /// Whether the cascade's resulting value is thrown away — true only when the
+  /// cascade is the direct expression of an `ExpressionStatement`. Parentheses
+  /// are climbed through so `(pool..shuffle());` still counts as discarded.
+  bool _isResultDiscarded(CascadeExpression node) {
+    AstNode current = node;
+    AstNode? parent = current.parent;
+    while (parent is ParenthesizedExpression) {
+      current = parent;
+      parent = current.parent;
+    }
+    return parent is ExpressionStatement;
+  }
+}
+
 /// Warns when arithmetic expressions are too complex.
 ///
 /// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4

@@ -1572,6 +1572,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_bottom_type_in_records',
   'avoid_build_context_in_providers',
   'avoid_cascade_after_if_null',
+  'avoid_cascade_shuffle',
   'avoid_casting_to_extension_type',
   'avoid_collection_methods_with_unrelated_types',
   'avoid_constant_assert_conditions',
