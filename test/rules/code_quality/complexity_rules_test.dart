@@ -29,6 +29,13 @@ void main() {
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
+    test('AvoidCascadeShuffleRule', () {
+      final rule = AvoidCascadeShuffleRule();
+      expect(rule.code.lowerCaseName, 'avoid_cascade_shuffle');
+      expect(rule.code.problemMessage, contains('[avoid_cascade_shuffle]'));
+      expect(rule.code.problemMessage.length, greaterThan(50));
+      expect(rule.code.correctionMessage, isNotNull);
+    });
     test('AvoidComplexArithmeticExpressionsRule', () {
       final rule = AvoidComplexArithmeticExpressionsRule();
       expect(rule.code.lowerCaseName, 'avoid_complex_arithmetic_expressions');
@@ -137,6 +144,7 @@ void main() {
     final fixtures = [
       'avoid_bitwise_operators_with_booleans',
       'avoid_cascade_after_if_null',
+      'avoid_cascade_shuffle',
       'avoid_complex_arithmetic_expressions',
       'avoid_complex_conditions',
       'avoid_duplicate_cascades',

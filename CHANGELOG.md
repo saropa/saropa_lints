@@ -66,7 +66,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Turning off Lint integration now actually stops the analyzer. Previously "Lint integration: Off" only flipped an internal flag, so saropa_lints diagnostics kept appearing in the Problems pane. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+A new `avoid_cascade_shuffle` rule catches a subtle bug where `(collection..shuffle()).first` permanently reorders a shared list just to read one element. Turning off Lint integration now actually stops the analyzer. Previously "Lint integration: Off" only flipped an internal flag, so saropa_lints diagnostics kept appearing in the Problems pane. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Added
+
+- **New `avoid_cascade_shuffle` rule (Recommended tier).** Flags `(collection..shuffle()).first` and similar, where `..shuffle()` is cascaded onto a stored list whose result is consumed, because `shuffle()` mutates in place and corrupts the shared collection for every other reader; shuffle a copy instead — `(List.of(collection)..shuffle()).first`.
 
 ### Fixed (Extension)
 
