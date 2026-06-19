@@ -64,7 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.0.4]
+
+This release introduces four thematic rule packs that bundle quality standards for UI, localization, documentation, and testing into simple opt-in groups. The standalone scanner now supports full type resolution to accurately evaluate complex rules, and it will no longer abort an entire run if a single check fails. Additionally, this update delivers significant accuracy improvements by eliminating false positives across recursion, initialization, and platform-specific code. [log](https://github.com/saropa/saropa_lints/blob/v14.0.4/CHANGELOG.md)
 
 ### Added
 

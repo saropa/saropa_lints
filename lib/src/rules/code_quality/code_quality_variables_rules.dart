@@ -1508,8 +1508,9 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
           // const-data-class pattern) is missed and the field is wrongly
           // reported as unassigned.
           for (final FormalParameter param in member.parameters.parameters) {
-            final FormalParameter inner =
-                param is DefaultFormalParameter ? param.parameter : param;
+            final FormalParameter inner = param is DefaultFormalParameter
+                ? param.parameter
+                : param;
             if (inner is FieldFormalParameter) {
               assignedFields.add(inner.name.lexeme);
             } else if (inner is SuperFormalParameter) {

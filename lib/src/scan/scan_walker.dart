@@ -13,7 +13,11 @@ import 'package:analyzer/dart/ast/visitor.dart';
 /// Reports a rule visitor that threw during the walk, so the runner can name
 /// the offending rule. Called at most once per visitor per walk.
 typedef ScanVisitorError =
-    void Function(AstVisitor<void> visitor, Object error, StackTrace stackTrace);
+    void Function(
+      AstVisitor<void> visitor,
+      Object error,
+      StackTrace stackTrace,
+    );
 
 /// Walks a [CompilationUnit] dispatching each node to all `_visitors`.
 ///

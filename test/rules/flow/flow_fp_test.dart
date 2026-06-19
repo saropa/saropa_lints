@@ -172,11 +172,13 @@ void main() {
   // useful toString(). The call returns Never, so the rule was reading Never's
   // type instead of the first argument's. The fix resolves the first argument
   // and also accepts a toString() inherited from any non-Object superclass.
-  group('avoid_throw_objects_without_tostring — throwWithStackTrace operand', () {
-    test(
-      'does NOT flag a class with toString() thrown via throwWithStackTrace',
-      () async {
-        const code = '''
+  group(
+    'avoid_throw_objects_without_tostring — throwWithStackTrace operand',
+    () {
+      test(
+        'does NOT flag a class with toString() thrown via throwWithStackTrace',
+        () async {
+          const code = '''
 final class BatchError implements Exception {
   BatchError(this.cause);
   final Object cause;
@@ -194,19 +196,19 @@ void apply() {
 
 void _run() {}
 ''';
-        final codes = await reportedRuleCodes(
-          AvoidThrowObjectsWithoutToStringRule(),
-          code,
-        );
-        expect(
-          codes.contains('avoid_throw_objects_without_tostring'),
-          isFalse,
-        );
-      },
-    );
+          final codes = await reportedRuleCodes(
+            AvoidThrowObjectsWithoutToStringRule(),
+            code,
+          );
+          expect(
+            codes.contains('avoid_throw_objects_without_tostring'),
+            isFalse,
+          );
+        },
+      );
 
-    test('does NOT flag a class with toString() thrown directly', () async {
-      const code = '''
+      test('does NOT flag a class with toString() thrown directly', () async {
+        const code = '''
 final class BatchError implements Exception {
   BatchError(this.cause);
   final Object cause;
@@ -218,15 +220,15 @@ void apply() {
   throw BatchError('boom');
 }
 ''';
-      final codes = await reportedRuleCodes(
-        AvoidThrowObjectsWithoutToStringRule(),
-        code,
-      );
-      expect(codes.contains('avoid_throw_objects_without_tostring'), isFalse);
-    });
+        final codes = await reportedRuleCodes(
+          AvoidThrowObjectsWithoutToStringRule(),
+          code,
+        );
+        expect(codes.contains('avoid_throw_objects_without_tostring'), isFalse);
+      });
 
-    test('does NOT flag a class inheriting toString() from a base', () async {
-      const code = '''
+      test('does NOT flag a class inheriting toString() from a base', () async {
+        const code = '''
 class Base {
   @override
   String toString() => 'base detail';
@@ -238,17 +240,17 @@ void apply() {
   throw Derived();
 }
 ''';
-      final codes = await reportedRuleCodes(
-        AvoidThrowObjectsWithoutToStringRule(),
-        code,
-      );
-      expect(codes.contains('avoid_throw_objects_without_tostring'), isFalse);
-    });
+        final codes = await reportedRuleCodes(
+          AvoidThrowObjectsWithoutToStringRule(),
+          code,
+        );
+        expect(codes.contains('avoid_throw_objects_without_tostring'), isFalse);
+      });
 
-    test(
-      'still flags a class without toString() via throwWithStackTrace',
-      () async {
-        const code = '''
+      test(
+        'still flags a class without toString() via throwWithStackTrace',
+        () async {
+          const code = '''
 class NoToString implements Exception {}
 
 void apply() {
@@ -261,27 +263,31 @@ void apply() {
 
 void _run() {}
 ''';
-        final codes = await reportedRuleCodes(
-          AvoidThrowObjectsWithoutToStringRule(),
-          code,
-        );
-        expect(codes.contains('avoid_throw_objects_without_tostring'), isTrue);
-      },
-    );
+          final codes = await reportedRuleCodes(
+            AvoidThrowObjectsWithoutToStringRule(),
+            code,
+          );
+          expect(
+            codes.contains('avoid_throw_objects_without_tostring'),
+            isTrue,
+          );
+        },
+      );
 
-    test('still flags a class without toString() thrown directly', () async {
-      const code = '''
+      test('still flags a class without toString() thrown directly', () async {
+        const code = '''
 class PlainBad {}
 
 void apply() {
   throw PlainBad();
 }
 ''';
-      final codes = await reportedRuleCodes(
-        AvoidThrowObjectsWithoutToStringRule(),
-        code,
-      );
-      expect(codes.contains('avoid_throw_objects_without_tostring'), isTrue);
-    });
-  });
+        final codes = await reportedRuleCodes(
+          AvoidThrowObjectsWithoutToStringRule(),
+          code,
+        );
+        expect(codes.contains('avoid_throw_objects_without_tostring'), isTrue);
+      });
+    },
+  );
 }

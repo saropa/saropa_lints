@@ -20,9 +20,10 @@ void main() {
     // Positive: a real media recorder (receiver type resolves to a recognized
     // media source, name `audiorecorder`) with no preceding permission check
     // still fires after the receiver-type gate was added.
-    test('flags media recorder startRecording without a permission check',
-        () async {
-      const code = '''
+    test(
+      'flags media recorder startRecording without a permission check',
+      () async {
+        const code = '''
 class AudioRecorder {
   void startRecording() {}
 }
@@ -34,9 +35,10 @@ class Caller {
   }
 }
 ''';
-      final codes = await reportedRuleCodes(rule, code);
-      expect(codes, contains('require_permission_status_check'));
-    });
+        final codes = await reportedRuleCodes(rule, code);
+        expect(codes, contains('require_permission_status_check'));
+      },
+    );
 
     // FP: an in-process query recorder shares the name `startRecording` but its
     // receiver type resolves to an app-domain type with no media/permission
@@ -60,9 +62,10 @@ class Caller {
 
     // FP: other gated names (startScan, getContacts) on an unrelated app-domain
     // object are the same name-collision class and must also stay silent.
-    test('does not flag gated names on an unrelated app-domain object',
-        () async {
-      const code = '''
+    test(
+      'does not flag gated names on an unrelated app-domain object',
+      () async {
+        const code = '''
 class QueryRecorder {
   List<String> getContacts() => const [];
   void startScan() {}
@@ -76,9 +79,10 @@ class Caller {
   }
 }
 ''';
-      final codes = await reportedRuleCodes(rule, code);
-      expect(codes, isNot(contains('require_permission_status_check')));
-    });
+        final codes = await reportedRuleCodes(rule, code);
+        expect(codes, isNot(contains('require_permission_status_check')));
+      },
+    );
   });
 
   group('require_api_error_mapping', () {

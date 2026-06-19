@@ -91,7 +91,12 @@ Set<String> _buildNativeOnlyTargets(String projectRoot) {
   try {
     for (final entity in libDir.listSync(recursive: true)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
-      _collectTargetsFromFile(entity.path, projectRoot, nativeOnly, unconditional);
+      _collectTargetsFromFile(
+        entity.path,
+        projectRoot,
+        nativeOnly,
+        unconditional,
+      );
       _collectSiblingStubTarget(entity.path, nativeOnly);
     }
   } on OSError catch (e, st) {
@@ -188,7 +193,8 @@ void _collectTargetsFromFile(
 void _collectSiblingStubTarget(String filePath, Set<String> nativeOnly) {
   if (!filePath.endsWith('_io.dart')) return;
 
-  final stubPath = '${filePath.prefix(filePath.length - '_io.dart'.length)}_stub.dart';
+  final stubPath =
+      '${filePath.prefix(filePath.length - '_io.dart'.length)}_stub.dart';
   if (File(stubPath).existsSync()) {
     nativeOnly.add(normalizePath(filePath));
   }
