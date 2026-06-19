@@ -349,7 +349,7 @@
       "findingOne": "{count} résultat",
       "findingOther": "{count} résultats",
       "todoHackTitle": "Des marqueurs TODO et HACK ont été trouvés dans l'espace de travail.",
-      "driftOnTitle": "Le conseiller de dérive est connecté: {label}",
+      "driftOnTitle": "Drift Advisor connecté : {label}",
       "driftOnPill": "À la dérive sur le · {count}.",
       "driftOfflineTitle": "Drift Advisor activé mais aucun serveur n'a été trouvé.",
       "driftOfflinePill": "Drift hors ligne à la dérive.",
@@ -526,22 +526,22 @@
       "hacksLabel": "Bidouilles"
     },
     "drift": {
-      "sectionAria": "Conseiller en dérive.",
-      "headingOff": "Conseiller en dérive.",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "l'intégration hors intégration.",
       "enableBlurb": "Activer l'intégration de Drift Advisor aux suggestions de base de données en surface ici.",
       "enable": "L'option Activer est activée.",
-      "headingNoServer": "Conseiller en dérive.",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Il n'y a pas de serveur, aucun serveur.",
       "noServerBlurb": "Aucun serveur Drift Advisor n'a été trouvé sur les ports configurés.",
       "retry": "Reessayer",
-      "headingConnected": "Conseiller en dérive.",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "connecté connectés connectés.",
       "noIssues": "Connecté à {label}  ⁇  pas de problèmes actuels.",
       "refresh": "Actualiser",
       "openBrowser": "Ouvrir dans le navigateur.",
-      "headingIssues": "Conseiller en dérive.",
-      "disable": "Désactiver le conseiller de dérive."
+      "headingIssues": "Drift Advisor",
+      "disable": "Désactiver le Drift Advisor."
     },
     "suppressions": {
       "sectionAria": "Suppressions",
@@ -1467,7 +1467,7 @@
       "enable": "Activer la règle de mise en œuvre."
     },
     "deepLink": {
-      "showDriftIssues": "Afficher en direct les problèmes de dérive (conseiller à la dérive)"
+      "showDriftIssues": "Afficher en direct Les problèmes de dérive (Drift Advisor)"
     },
     "nudge": {
       "message": "Ce projet utilise Drift Advisor. Installez l'extension Saropa Log Capture pour corréler le SQL en cours d'exécution avec ces résultats statiques.",
@@ -1476,7 +1476,7 @@
     },
     "driftRecommend": {
       "message": "Un serveur Drift Advisor est connecté. Installez l'extension autonome Saropa Drift Advisor pour bénéficier de toute l'accès au panneau des problèmes.",
-      "install": "Installez le conseiller de dérive.",
+      "install": "Installez le Drift Advisor dans l'appareil.",
       "dismiss": "Le licenciement est annulé."
     }
   },
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Impossible d'obtenir suffisamment de données sur le paquet."
     },
     "main": {
-      "brandPrefix": "Saropa Lints : {message}",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} erreur{suffix}  ⁇  est une erreur de calcul. vue. voir.",
       "regressionScoreDipped": "Le score est tombé en dessous de {threshold}  ⁇ voir les questions. points de vue.",
       "actionViewViolations": "Voir les violations de vue.",
@@ -1531,7 +1531,7 @@
       "createInstructionsDone": "Créé .cursor/rules/saropa_lints_instructions.mdc pour les agents d'IA.",
       "createInstructionsFailed": "Échec de la création des instructions Saropa Lints : {message}",
       "openFileForIssues": "Ouvrez un fichier pour afficher ses problèmes dans Saropa Lints.",
-      "driftAdvisorNotConnected": "Le conseiller de dérive n'est pas connecté. Cliquez sur Actualiser après le démarrage du serveur.",
+      "driftAdvisorNotConnected": "Drift Advisor n'est pas connecté. Cliquez sur Actualiser après le démarrage du serveur.",
       "noViolationsRunAnalysis": "Aucune violation dans les données actuelles. Exécutez d'abord l'analyse.",
       "telemetryReset": "Saropa Lints: réglementation connexe de réinitialisation des compteurs de télémétrie.",
       "noWorkspaceOpen": "Aucun dossier d'espace de travail n'est ouvert.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Mise à jour majeure de la mise à jour.",
       "upgradeCheckerMinorUpdate": "Mise à jour mineure de la mise à jour.",
       "upgradeCheckerPatchUpdate": "Mise à jour de la mise à jour des correctifs.",
-      "upgradeCheckerAvailable": "Saropa Lints {label} : {from} → {to}",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: est une protéine de type 2 Impossible de mettre à jour pubspec.yaml  ⁇ saropa_lints aucune entrée n'a été trouvée.",
       "upgradeCheckerCancelled": "Mise à niveau Saropa Lints annulée. pubspec.yaml a été mis à jour vers ^{version} ; exécutez `{cmd} pub get` pour terminer ou annulez la modification.",
       "upgradeCheckerPubGetFailed": "Saropa Lints : la pub a échoué. {detail}",

@@ -526,21 +526,21 @@
       "hacksLabel": "Хакс HACKS - це витягнутий з рога."
     },
     "drift": {
-      "sectionAria": "Drift Advisor - консультант з питань дріфтування.",
-      "headingOff": "Drift Advisor - консультант з питань дріфтування.",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "Інтеграція - це відключення інтеграції.",
       "enableBlurb": "Включити інтеграцію Drift Advisor з пропозиціями поверхневої бази даних тут.",
       "enable": "Включити ввімкнути включити",
-      "headingNoServer": "Drift Advisor - консультант з питань дріфтування.",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Без сервера немає ніякого сервера.",
       "noServerBlurb": "Сервер Drift Advisor не знайдений на налаштованих портах.",
       "retry": "Перепробуйте повторно.",
-      "headingConnected": "Drift Advisor - консультант з питань дріфтування.",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "Зв'язаний зв'єднані зв\"язані",
       "noIssues": "Зв'язаний з {label}  ⁇ Немає поточних питань.",
       "refresh": "Відсвіжіть, освіждайте.",
       "openBrowser": "Відкрити в браузері.",
-      "headingIssues": "Drift Advisor - консультант з питань дріфтування.",
+      "headingIssues": "Drift Advisor",
       "disable": "Виключити Drift Advisor"
     },
     "suppressions": {
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Не вдалося отримати достатньо пакетної кількості даних."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: = ПХ1: {message} _ПХО__ ПхО__",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} помилка{suffix}  ⁇ вигляд. вид.",
       "regressionScoreDipped": "Оцінка опустилася нижче {threshold}  ⁇ Вигляд питань. питання погляду.",
       "actionViewViolations": "Порушення правил перегляду.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Основне оновлення - це основна оновлена інформація.",
       "upgradeCheckerMinorUpdate": "Незначна оновлення, що є незначною.",
       "upgradeCheckerPatchUpdate": "Оновлення патчів - це оновлення пачів.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: - Пх3__ = пх3, що означає \"після\". {from} → {to} - це кількість",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: = ПФ2__, що є основним елементом. Не вдалося оновити pubspec.yaml  ⁇ saropa_lints запис не знайдено.",
       "upgradeCheckerCancelled": "Saropa Lints оновлення скасовано. pubspec.yaml було оновлено до ^{version}; запуску `{cmd} pub get゙i до кінця, або повернути зміну.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: отримати паб не вдалося. {detail}",

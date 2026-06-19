@@ -526,21 +526,21 @@
       "hacksLabel": "HACKS - szczury."
     },
     "drift": {
-      "sectionAria": "Doradca Drift Advisor",
-      "headingOff": "Doradca Drift Advisor",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "integracja off integracji off",
       "enableBlurb": "Włącz integrację doradcy Drift Advisor z sugestiami dotyczącymi baz danych powierzchniowych tutaj.",
       "enable": "Włącz Enable włączyć",
-      "headingNoServer": "Doradca Drift Advisor",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Bez serwera, bez serwerów.",
       "noServerBlurb": "Nie znaleziono żadnego serwera Drift Advisor na skonfigurowanych portach.",
       "retry": "Spróbuj ponownie.",
-      "headingConnected": "Doradca Drift Advisor",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "połączone łączące się",
       "noIssues": "Podłączony do {label}  ⁇  nie ma aktualnych problemów.",
       "refresh": "Odświeżaj i oddychaj.",
       "openBrowser": "Otwórz w przeglądarce.",
-      "headingIssues": "Doradca Drift Advisor",
+      "headingIssues": "Drift Advisor",
       "disable": "Wyłącz Drift Advisor."
     },
     "suppressions": {
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Nie można pobrać wystarczającej ilości danych pakietu."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: jest to grupa, która zawiera {message} to odmiana _PH0_.",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} błąd{suffix}  ⁇ widok. pogląd.",
       "regressionScoreDipped": "Wynik spadł poniżej {threshold}  ⁇ widok kwestii. zagadnienia.",
       "actionViewViolations": "View Violations (Przełamanie przepisów dotyczących widoków).",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Główna aktualizacja głównej aktualizacji",
       "upgradeCheckerMinorUpdate": "Niewielka aktualizacja nieznaczna.",
       "upgradeCheckerPatchUpdate": "Aktualizacja patchów.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: to jest {from} → {to}",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: jest to cząstka, która łączy się z Nie można zaktualizować pubspec.yaml  ⁇ saropa_lints nie znaleziono.",
       "upgradeCheckerCancelled": "Uaktualnienie Saropa Lints anulowane. pubspec.yaml zostało zaktualizowane na ^{version}; run `{cmd} pub get ゙ to finish, lub odwrócić zmianę.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: nie udało się uzyskać dostępu do pubu. {detail}",

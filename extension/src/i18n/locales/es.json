@@ -349,7 +349,7 @@
       "findingOne": "{count} hallazgo",
       "findingOther": "{count} hallazgos",
       "todoHackTitle": "Los marcadores TODO y HACK se encuentran en el espacio de trabajo.",
-      "driftOnTitle": "El asesor de deriva está conectado: {label}",
+      "driftOnTitle": "Drift Advisor conectado: está conectado a la red. {label} El hombre de la ciudad",
       "driftOnPill": "A la deriva en el · {count}",
       "driftOfflineTitle": "Drift Advisor habilitado pero no se encontró ningún servidor.",
       "driftOfflinePill": "Drift fuera de línea.",
@@ -526,22 +526,22 @@
       "hacksLabel": "El hacha es un garrote."
     },
     "drift": {
-      "sectionAria": "Consejero de deriva asesor.",
-      "headingOff": "Consejero de deriva asesor.",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "integración fuera de la integración.",
       "enableBlurb": "Habilitar la integración de Drift Advisor a las sugerencias de base de datos en superficie aquí.",
       "enable": "Habilitar habilitar para permitir.",
-      "headingNoServer": "Consejero de deriva asesor.",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "No hay servidor de ningún servidor.",
       "noServerBlurb": "No se encontró ningún servidor de Drift Advisor en los puertos configurados.",
       "retry": "Intentar de nuevo.",
-      "headingConnected": "Consejero de deriva asesor.",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "conectado conectado conectado.",
       "noIssues": "Conectado a {label}  ⁇  no hay problemas actuales.",
       "refresh": "Refrescarse y refrescar.",
       "openBrowser": "Abrir en el navegador.",
-      "headingIssues": "Consejero de deriva asesor.",
-      "disable": "Desactiva el asesor de deriva."
+      "headingIssues": "Drift Advisor",
+      "disable": "Desactiva el Drift Advisor."
     },
     "suppressions": {
       "sectionAria": "Las supresiones de las suposiciones.",
@@ -1476,7 +1476,7 @@
     },
     "driftRecommend": {
       "message": "Se ha conectado un servidor de asesoramiento a la deriva. Instale la extensión Saropa Drift Advisor independiente para obtener una experiencia completa en el panel de problemas.",
-      "install": "Instalar el asesor de deriva.",
+      "install": "Instala el Drift Advisor.",
       "dismiss": "Despido de trabajo."
     }
   },
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "No se pudo obtener suficientes datos de paquete."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: Es el número de células que tiene la persona. {message} El hombre de la ciudad",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} error{suffix}  ⁇  El número de los números es el mismo que en la base. vista. desde donde se ve.",
       "regressionScoreDipped": "La puntuación cayó por debajo de {threshold}  ⁇ Vea las cuestiones.",
       "actionViewViolations": "Violaciones de vistas.",
@@ -1531,7 +1531,7 @@
       "createInstructionsDone": "Creado .cursor/rules/saropa_lints_instructions.mdc para los agentes de IA.",
       "createInstructionsFailed": "No se pudo crear instrucciones Saropa Lints: {message} El hombre de la ciudad",
       "openFileForIssues": "Abra un archivo para mostrar sus problemas en Saropa Lints.",
-      "driftAdvisorNotConnected": "El asesor de deriva no está conectado. Haga clic en Actualizar después de iniciar el servidor.",
+      "driftAdvisorNotConnected": "Drift Advisor no está conectado. Haga clic en Actualizar después de iniciar el servidor.",
       "noViolationsRunAnalysis": "No hay violaciones en los datos actuales. Ejecuta primero el análisis.",
       "telemetryReset": "Saropa Lints: regla relacionada con el restablecimiento de los contadores de telemetría.",
       "noWorkspaceOpen": "No hay carpeta de espacio de trabajo abierta.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Actualización importante de la actualización.",
       "upgradeCheckerMinorUpdate": "Una actualización menor de la actualización.",
       "upgradeCheckerPatchUpdate": "Actualización de la actualización del parche.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: Es el número de la línea. {from} → {to} El número de células en el cuerpo humano es",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: es el número de células que contiene la proteína _PH2 No se pudo actualizar pubspec.yaml  ⁇ saropa_lints no se encuentra la entrada.",
       "upgradeCheckerCancelled": "Saropa Lints actualización cancelada. pubspec.yaml fue actualizado a ^{version}; ejecutar `{cmd} pub conseguir゙ terminar, o revertir el cambio.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: error en la publicación. {detail}",

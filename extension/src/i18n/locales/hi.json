@@ -349,7 +349,7 @@
       "findingOne": "{count} परिणाम",
       "findingOther": "{count} परिणाम",
       "todoHackTitle": "कार्यक्षेत्र में TODO और HACK मार्कर पाए गए।",
-      "driftOnTitle": "ड्रिफ्ट सलाहकार जुड़ा हुआ हैः {label}",
+      "driftOnTitle": "Drift Advisor कनेक्टेड: {label}",
       "driftOnPill": "पर बहती है · {count}",
       "driftOfflineTitle": "Drift Advisor सक्षम है लेकिन कोई सर्वर नहीं मिला।",
       "driftOfflinePill": "ऑफलाइन ऑफ़लाइन बहाव।",
@@ -526,22 +526,22 @@
       "hacksLabel": "HACKS हैक्स"
     },
     "drift": {
-      "sectionAria": "ड्रिफ्ट सलाहकार",
-      "headingOff": "ड्रिफ्ट सलाहकार",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "एकीकरण बंद करें, एकीकरण को हटा दें।",
-      "enableBlurb": "यहां सतह डेटाबेस सुझावों के लिए ड्रिफ्ट सलाहकार एकीकरण सक्षम करें।",
+      "enableBlurb": "यहाँ डेटाबेस सुझावों को सतह पर लाने के लिए Drift Advisor एकीकरण सक्षम करें।",
       "enable": "सक्षम करें सक्षम करें",
-      "headingNoServer": "ड्रिफ्ट सलाहकार",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "कोई सर्वर नहीं, कोई सर्वर।",
-      "noServerBlurb": "कॉन्फ़िगर किए गए पोर्ट पर कोई ड्रिफ्ट सलाहकार सर्वर नहीं मिला।",
+      "noServerBlurb": "कॉन्फ़िगर किए गए पोर्ट पर कोई Drift Advisor सर्वर नहीं मिला।",
       "retry": "पुनः प्रयास करें।",
-      "headingConnected": "ड्रिफ्ट सलाहकार",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "connected कनेक्टेड कनेक्ड कनेक्डेड",
       "noIssues": "{label} से जुड़ा हुआ  ⁇  कोई वर्तमान समस्या नहीं।",
       "refresh": "ताज़ा करें रिफ्रेश करें",
       "openBrowser": "ब्राउज़र में खोलें।",
-      "headingIssues": "ड्रिफ्ट सलाहकार",
-      "disable": "ड्रिफ्ट सलाहकार को अक्षम करें"
+      "headingIssues": "Drift Advisor",
+      "disable": "Drift Advisor को अक्षम करें।"
     },
     "suppressions": {
       "sectionAria": "दमन के लिए दबाव",
@@ -1467,7 +1467,7 @@
       "enable": "नियम सक्षम करें सक्षम करें"
     },
     "deepLink": {
-      "showDriftIssues": "लाइव दिखाएँ ड्रिफ्ट मुद्दे (ड्रिफ्ट सलाहकार)"
+      "showDriftIssues": "लाइव दिखाएँ ड्रिफ्ट मुद्दे (Drift Advisor)"
     },
     "nudge": {
       "message": "यह परियोजना Drift Advisor का उपयोग करती है। इन स्थिर निष्कर्षों के साथ रनटाइम SQL को सहसंबंधित करने के लिए Saropa लॉग कैप्चर एक्सटेंशन स्थापित करें।",
@@ -1475,8 +1475,8 @@
       "dismiss": "बर्खास्तगी को खारिज करें।"
     },
     "driftRecommend": {
-      "message": "एक ड्रिफ्ट सलाहकार सर्वर जुड़ा हुआ है। पूर्ण समस्या-पैनल अनुभव के लिए स्टैंडअलोन Saropa ड्रिफ्ट सलाहकार एक्सटेंशन स्थापित करें।",
-      "install": "ड्रिफ्ट एडवाइजर स्थापित करें",
+      "message": "एक Drift Advisor सर्वर जुड़ा हुआ है। पूर्ण समस्या-पैनल अनुभव के लिए स्टैंडअलोन Saropa Drift Advisor एक्सटेंशन स्थापित करें।",
+      "install": "Drift Advisor स्थापित करें।",
       "dismiss": "बर्खास्तगी को खारिज करें।"
     }
   },
@@ -1531,7 +1531,7 @@
       "createInstructionsDone": "बनाया .cursor/rules/saropa_lints_instructions.mdc एआई एजेंटों के लिए।",
       "createInstructionsFailed": "Saropa Lints निर्देश बनाने में विफल: {message}",
       "openFileForIssues": "Saropa Lints. में अपने मुद्दों को दिखाने के लिए एक फ़ाइल खोलें।",
-      "driftAdvisorNotConnected": "ड्रिफ्ट सलाहकार कनेक्ट नहीं है। सर्वर शुरू करने के बाद रिफ्रेश पर क्लिक करें।",
+      "driftAdvisorNotConnected": "Drift Advisor कनेक्ट नहीं है। सर्वर शुरू करने के बाद रिफ्रेश पर क्लिक करें।",
       "noViolationsRunAnalysis": "वर्तमान डेटा में कोई उल्लंघन नहीं। पहले विश्लेषण चलाएं।",
       "telemetryReset": "Saropa Lints: संबंधित नियम टेलीमेट्री काउंटर रीसेट।",
       "noWorkspaceOpen": "कोई कार्यक्षेत्र फ़ोल्डर नहीं खुला।",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "प्रमुख अद्यतन अपडेट।",
       "upgradeCheckerMinorUpdate": "मामूली अद्यतन।",
       "upgradeCheckerPatchUpdate": "पैच अपडेट को अपडेट करें।",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: _PH3_ _PH0_: _ PH3__ _PH4_: {from} → {to} _",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: _PH2_: pubspec.yaml  ⁇  को अपडेट नहीं कर सका। saropa_lints प्रविष्टि नहीं मिली।",
       "upgradeCheckerCancelled": "Saropa Lints अपग्रेड रद्द किया गया. pubspec.yaml को ^{version} में अद्यतन किया गया था; समाप्त करने के लिए `{cmd} पब गेट` चलाएँ, या परिवर्तन वापस लाएँ।",
       "upgradeCheckerPubGetFailed": "Saropa Lints: पब विफल हो गया। {detail}",

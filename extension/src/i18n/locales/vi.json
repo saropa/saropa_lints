@@ -526,21 +526,21 @@
       "hacksLabel": "HACKS Đ ⁇ I CÁC."
     },
     "drift": {
-      "sectionAria": "Drift Advisor - Cố vấn xoay quanh",
-      "headingOff": "Drift Advisor - Cố vấn xoay quanh",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "integration off hội nhập off hội tụ",
       "enableBlurb": "Chạy việc tích hợp Drift Advisor với các đề xuất cơ sở dữ liệu bề mặt ở đây.",
       "enable": "Enable enable enable cho phép",
-      "headingNoServer": "Drift Advisor - Cố vấn xoay quanh",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Không có máy chủ server nào cả.",
       "noServerBlurb": "Không tìm thấy máy chủ Drift Advisor trên các cổng được cấu hình.",
       "retry": "Retry retry thử lại",
-      "headingConnected": "Drift Advisor - Cố vấn xoay quanh",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "connected được kết nối với nhau.",
       "noIssues": "Kết nối với {label}  ⁇ không có vấn đề hiện tại.",
       "refresh": "Thức mới và làm mới",
       "openBrowser": "Mở trong trình duyệt.",
-      "headingIssues": "Drift Advisor - Cố vấn xoay quanh",
+      "headingIssues": "Drift Advisor",
       "disable": "Disable Drift Advisor - Ngăn chặn tư vấn trôi dạt"
     },
     "suppressions": {
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Không thể lấy đủ dữ liệu gói được."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: là một loại tế bào có thể {message} là Phương pháp",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} lỗi{suffix}  ⁇ view. view. xem xét.",
       "regressionScoreDipped": "Điểm số giảm xuống dưới {threshold}  ⁇ view issues. xem vấn đề.",
       "actionViewViolations": "View Violations (Vi phạm chế độ xem)",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Major update cập nhật chính",
       "upgradeCheckerMinorUpdate": "Cập nhật nhỏ cập nhật nhẹ",
       "upgradeCheckerPatchUpdate": "Patch update là bản cập nhật patch.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: là một con số {from} → {to}",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: là một dạng của các tế bào Không thể cập nhật pubspec.yaml  ⁇ saropa_lints mục không tìm thấy.",
       "upgradeCheckerCancelled": "Saropa Lints nâng cấp đã bị hủy. pubspec.yaml được cập nhật thành ^{version}; chạy `{cmd} pub get゙ để kết thúc, hoặc đảo ngược sự thay đổi.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: pub bị lỗi. {detail}",

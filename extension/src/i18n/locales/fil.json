@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Hindi maaaring kunin ang sapat na data ng pakete."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili {message} ang kanyang mga",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} error{suffix}  ⁇  Ang mga bagay na may PH ay hindi dapat gawin. view. pananaw.",
       "regressionScoreDipped": "Ang score ay bumaba sa ibaba ng {threshold}  ⁇ view issues. tingnan ang mga isyu.",
       "actionViewViolations": "Tingnan ang mga paglabag sa pagtingin.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Malaking update ng pag-update sa pag-upgrade.",
       "upgradeCheckerMinorUpdate": "Maliit na pag-update ng update.",
       "upgradeCheckerPatchUpdate": "Patch update ng pag-update sa patch.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: Ang iyong mga mata ay hindi nakikinig sa iyo. {from} → {to} Ang mga uri ng paggamot sa sakit na ito ay:",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: Ang mga bagay na may kaugnayan sa pag-aalaga ng katawan. Hindi maaaring i-update ang pubspec.yaml  ⁇ saropa_lints entry hindi natagpuan.",
       "upgradeCheckerCancelled": "Kinansela ang pag-upgrade ng Saropa Lints. Ang pubspec.yaml ay na-update sa ^{version}; patakbuhin ang `{cmd} pub get` upang matapos, o ibalik ang pagbabago.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: nabigo ang pub. {detail}",

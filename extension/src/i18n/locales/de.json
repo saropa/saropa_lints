@@ -526,21 +526,21 @@
       "hacksLabel": "Workarounds"
     },
     "drift": {
-      "sectionAria": "Drift Beraterin für die Abweichung.",
-      "headingOff": "Drift Beraterin für die Abweichung.",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "Integration aus der Integration heraus.",
       "enableBlurb": "Aktivieren Sie hier die Integration von Drift Advisor in Oberflächendatenbankvorschläge.",
       "enable": "Aktivieren Enable aktivieren",
-      "headingNoServer": "Drift Beraterin für die Abweichung.",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Kein Server, kein Server.",
       "noServerBlurb": "Auf konfigurierten Ports wurde kein Drift Advisor-Server gefunden.",
       "retry": "Versuchen Sie es erneut.",
-      "headingConnected": "Drift Beraterin für die Abweichung.",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "verbunden verbundene verbundenen verbunden",
       "noIssues": "Verbunden mit {label}  ⁇  keine aktuellen Probleme.",
       "refresh": "Erfrischen Sie und erfrischen.",
       "openBrowser": "Öffnen Sie im Browser.",
-      "headingIssues": "Drift Beraterin für die Abweichung.",
+      "headingIssues": "Drift Advisor",
       "disable": "Deaktivieren Sie den Drift Advisor."
     },
     "suppressions": {
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Es konnte nicht genügend Paketdaten abgerufen werden."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: Das ist ein _PH1-Präparat. {message} ist ein _PH0_.",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} Fehler{suffix}  ⁇ Aussicht.",
       "regressionScoreDipped": "Die Punktzahl sank unter {threshold}  ⁇ . Ansichtsausgaben.",
       "actionViewViolations": "Verstöße gegen die Ansichten anzeigen.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Wichtige Aktualisierung: Das ist ein großes Update.",
       "upgradeCheckerMinorUpdate": "Kleine Aktualisierung von Minor Update.",
       "upgradeCheckerPatchUpdate": "Patch-Updates werden aktualisiert.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: Das ist die ________. {from} → {to} ist ein",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: Das ist die ________. pubspec.yaml  ⁇  konnte nicht aktualisiert werden. saropa_lints Eintrag nicht gefunden.",
       "upgradeCheckerCancelled": "Saropa Lints Upgrade wurde abgesagt. pubspec.yaml wurde auf ^{version} aktualisiert; Laufen `{cmd} pub get゙i zu beenden, oder die Änderung rückgängig machen.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: Kneipenabruf fehlgeschlagen. {detail}",

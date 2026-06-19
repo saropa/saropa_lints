@@ -526,21 +526,21 @@
       "hacksLabel": "HACKS ตะกอก"
     },
     "drift": {
-      "sectionAria": "Drift Advisor ที่ปรึกษาด้านการลอย",
-      "headingOff": "Drift Advisor ที่ปรึกษาด้านการลอย",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "การรวมตัว off integration ออกจากการบูรณาการ",
       "enableBlurb": "เปิดให้ Drift Advisor รวมกับข้อมูลบนพื้นผิวจาก database ที่นี่",
       "enable": "Enable enable เปิดให้ใช้ได้",
-      "headingNoServer": "Drift Advisor ที่ปรึกษาด้านการลอย",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "ไม่มีเซอร์เวอร์ ไม่มีเซิร์ฟเวอร์",
       "noServerBlurb": "ไม่พบ Drift Advisor server บนพอร์ตที่กําหนดไว้",
       "retry": "Retry รีเทรนท์",
-      "headingConnected": "Drift Advisor ที่ปรึกษาด้านการลอย",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "สะดวกต่อเนื่อง",
       "noIssues": "เชื่อมต่อกับ {label}  ⁇  ไม่มีปัญหาปัจจุบัน.",
       "refresh": "สะดวกสบาย Refresh",
       "openBrowser": "เปิดใน browser ใน Browser",
-      "headingIssues": "Drift Advisor ที่ปรึกษาด้านการลอย",
+      "headingIssues": "Drift Advisor",
       "disable": "Disable Drift Advisor แนะนําการเคลื่อนไหว"
     },
     "suppressions": {
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "ไม่สามารถเอาข้อมูลแพ็กเกจได้มากพอ"
     },
     "main": {
-      "brandPrefix": "Saropa Lints: เป็นการตรวจหา {message} การตรวจสอบ",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} ความผิดพลาด{suffix}  ⁇ view.view. ภาพที่เห็น",
       "regressionScoreDipped": "คะแนนตกต่ํากว่า {threshold}  ⁇ view issues.ดูประเด็นต่างๆ.",
       "actionViewViolations": "View Violations การละเมิดความเห็น",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "การอัพเดทหลัก Major update ครับ",
       "upgradeCheckerMinorUpdate": "การอัพเดทเล็ก ๆ น้อย ๆ",
       "upgradeCheckerPatchUpdate": "การอัพเดท Patch Update ของการแก้ไขปัญหา",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: สายเลือดดํา {from} → {to} _ โรคสะเก็ดเงิน",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: สารที่ใช้ในการรักษา ไม่สามารถอัพเดท pubspec.yaml  ⁇ saropa_lints ไม่พบรายการ.",
       "upgradeCheckerCancelled": "Saropa Lints การปรับปรุงยกเลิก. pubspec.yaml ได้อัพเดทเป็น ^{version}; run `{cmd} pub get ゙ to finish, หรือย้อนกลับการเปลี่ยนแปลง.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: ผับล้มเหลว {detail}",

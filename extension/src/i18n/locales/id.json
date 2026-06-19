@@ -526,21 +526,21 @@
       "hacksLabel": "HACKS adalah sebuah hak."
     },
     "drift": {
-      "sectionAria": "Drift Advisor adalah seorang penasihat yang",
-      "headingOff": "Drift Advisor adalah seorang penasihat yang",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "integrasi off dari integrasi",
       "enableBlurb": "Aktifkan integrasi Drift Advisor dengan saran database permukaan di sini.",
       "enable": "Enable mengaktifkan.",
-      "headingNoServer": "Drift Advisor adalah seorang penasihat yang",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Tidak ada server, tidak ada server.",
       "noServerBlurb": "Tidak ada server Drift Advisor yang ditemukan pada port yang dikonfigurasi.",
       "retry": "Cobalah untuk kembali.",
-      "headingConnected": "Drift Advisor adalah seorang penasihat yang",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "Terhubung terhubung terhubung.",
       "noIssues": "Terhubung ke {label}  ⁇  tidak ada masalah saat ini.",
       "refresh": "Refreshing dan menyegarkan.",
       "openBrowser": "Buka di browser yang terbuka.",
-      "headingIssues": "Drift Advisor adalah seorang penasihat yang",
+      "headingIssues": "Drift Advisor",
       "disable": "Menonaktifkan Drift Advisor"
     },
     "suppressions": {
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Tidak dapat mengambil cukup data paket."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: adalah suatu senyawa yang {message} adalah",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} kesalahan{suffix}  ⁇ pandangan. pandang.",
       "regressionScoreDipped": "Skor turun di bawah {threshold}  ⁇ melihat isu-isu. pandangan masalah.",
       "actionViewViolations": "View Pelanggaran-pelanggaran",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Pembaruan utama pembaruan update.",
       "upgradeCheckerMinorUpdate": "Pembaruan minor update.",
       "upgradeCheckerPatchUpdate": "Pembaruan patch update.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: adalah {from} → {to} adalah",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: adalah suatu senyawa yang Tidak dapat memperbarui pubspec.yaml  ⁇ saropa_lints entri tidak ditemukan.",
       "upgradeCheckerCancelled": "Peningkatan Saropa Lints dibatalkan. pubspec.yaml telah diperbarui menjadi ^{version}; jalankan `{cmd} pub get` untuk menyelesaikan, atau kembalikan perubahan.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: adalah suatu senyawa yang pub gagal. {detail}",

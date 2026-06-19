@@ -349,7 +349,7 @@
       "findingOne": "{count} ממצא",
       "findingOther": "{count} ממצאים",
       "todoHackTitle": "סמנים TODO ו- HACK נמצאו במרחב העבודה.",
-      "driftOnTitle": "יועץ הנגרום מחובר: {label}",
+      "driftOnTitle": "Drift Advisor מחובר: {label} זה ה- PH0__.",
       "driftOnPill": "\"הדריף על · {count}\"",
       "driftOfflineTitle": "Drift Advisor מופעל אך לא נמצא שרת.",
       "driftOfflinePill": "דריפט לא מקוון",
@@ -526,21 +526,21 @@
       "hacksLabel": "פיקס HACKS"
     },
     "drift": {
-      "sectionAria": "יועץ לעיצוב ענק",
-      "headingOff": "יועץ לעיצוב ענק",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "אינטגרציה של האינטגרציות",
       "enableBlurb": "הפעל את שילוב Drift Advisor עם הצעות למסד הנתונים כאן.",
       "enable": "Enable enable אפשר את הפעלת",
-      "headingNoServer": "יועץ לעיצוב ענק",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "אין שרת, שום השרת.",
       "noServerBlurb": "לא נמצא שרת Drift Advisor על נמלונים מוגדרים.",
       "retry": "נסה שוב, נסי מחדש.",
-      "headingConnected": "יועץ לעיצוב ענק",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "קישוריות מקושרת",
       "noIssues": "מחובר ל- {label}  ⁇  אין בעיות.",
       "refresh": "מרענן ומקפיא",
       "openBrowser": "פתח בדפדפן, פתחי אותו בבראוזר.",
-      "headingIssues": "יועץ לעיצוב ענק",
+      "headingIssues": "Drift Advisor",
       "disable": "נטרל את Drift Advisor"
     },
     "suppressions": {
@@ -1467,7 +1467,7 @@
       "enable": "אפשר את הכלל Enable rule."
     },
     "deepLink": {
-      "showDriftIssues": "להראות חיים בעיות דריפט (יועץ דיריף)"
+      "showDriftIssues": "להראות חיים בעיות דריפט (Drift Advisor)"
     },
     "nudge": {
       "message": "הפרויקט הזה משתמש ב-Drift Advisor. התקנו את Saropa Log Capture כדי לקשר בין SQL בזמן הפעלה עם הממצאים הסטטיים האלה.",
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "לא ניתן היה להוציא מספיק נתוני חבילה."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: - פטריוטיביות {message} זה ה- PH0__.",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} שגיאה{suffix}  ⁇ נוף. view. מבט",
       "regressionScoreDipped": "הציון ירד מתחת ל- {threshold}  ⁇ נושאים של תצפית.",
       "actionViewViolations": "הפרות הצפייה View Violations",
@@ -1531,7 +1531,7 @@
       "createInstructionsDone": "נוצר .cursor/rules/saropa_lints_instructions.mdc עבור סוכני AI.",
       "createInstructionsFailed": "לא הצליח ליצור הוראות Saropa Lints: {message} זה ה- PH0__.",
       "openFileForIssues": "פתח קובץ כדי להציג את הבעיות שלו ב Saropa Lints.",
-      "driftAdvisorNotConnected": "יועץ הנגרום אינו מחובר. לחץ על Refresh לאחר הפעלת השרת.",
+      "driftAdvisorNotConnected": "Drift Advisor אינו מחובר. לחץ על Refresh לאחר הפעלת השרת.",
       "noViolationsRunAnalysis": "אין הפרות בנתונים הנוכחיים. ראשית, תריץ את הניתוח.",
       "telemetryReset": "Saropa Lints: קישור של חוק טלמטריה הקשור לספקי חידוש.",
       "noWorkspaceOpen": "אין תיקיית workspace פתוחה.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "עדכון גדול לעדכונים",
       "upgradeCheckerMinorUpdate": "עדכון קטן של עדכונים קטנים",
       "upgradeCheckerPatchUpdate": "עדכון פטץ'",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: זה היה חם. {from} → {to} _ PH1__",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: - PH2__ (אפקטים של ה-PH2) לא ניתן לעדכן pubspec.yaml  ⁇ saropa_lints הכניסה לא נמצאה.",
       "upgradeCheckerCancelled": "שדרוג Saropa Lints בוטל. pubspec.yaml הושנה ל- ^{version}; רץ `{cmd} pub get゙ to finish, או להחזיר את השינוי.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: הפאב נכשל. {detail}",

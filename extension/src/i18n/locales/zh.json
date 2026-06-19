@@ -349,7 +349,7 @@
       "findingOne": "{count} 个发现",
       "findingOther": "{count} 个发现",
       "todoHackTitle": "在工作空间中发现了TODO和HACK标记.",
-      "driftOnTitle": "漂流顾问连接:已连接 {label} 没有任何问题.",
+      "driftOnTitle": "Drift Advisor连接: 已经连接了 {label} 没有任何问题.",
       "driftOnPill": "在漂浮上 · {count}",
       "driftOfflineTitle": "启用了Drift Advisor,但没有找到服务器.",
       "driftOfflinePill": "漂流在线下载 在线不开机",
@@ -526,22 +526,22 @@
       "hacksLabel": "⁇ 子的小腿,是为了"
     },
     "drift": {
-      "sectionAria": "漂流顾问的建议者",
-      "headingOff": "漂流顾问的建议者",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "整合脱离了整合.",
       "enableBlurb": "在这里启用Drift Advisor集成到表面数据库建议.",
       "enable": "启用 启动 在此处.",
-      "headingNoServer": "漂流顾问的建议者",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "没有服务器,无服务器.",
-      "noServerBlurb": "在配置的端口上没有发现漂流顾问服务器.",
+      "noServerBlurb": "在配置的端口上没有找到 Drift Advisor 服务器.",
       "retry": "再次尝试,重新试.",
-      "headingConnected": "漂流顾问的建议者",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "连接的连接连接了",
       "noIssues": "连接到 {label}  ⁇  的 没有当前问题.",
       "refresh": "让人感到清爽,使自己得到新鲜感.",
       "openBrowser": "在浏览器中打开.",
-      "headingIssues": "漂流顾问的建议者",
-      "disable": "禁用漂移顾问的使用"
+      "headingIssues": "Drift Advisor",
+      "disable": "禁用 Drift Advisor 的功能"
     },
     "suppressions": {
       "sectionAria": "压抑的压制",
@@ -646,7 +646,7 @@
     "clipboardCopyFailed": "无法复制到剪贴板.",
     "copiedViolationsJson": "复制了 {count} 的违规内容 (s) 以 JSON.",
     "copiedOneViolationJson": "复制了1个违规行为作为JSON.",
-    "driftNotConnected": "漂流顾问服务器没有连接.",
+    "driftNotConnected": "Drift Advisor 服务器没有连接.",
     "copiedBulkFindings": "复制了 {count} 的选择结果 (s) 以 JSON.",
     "noMatchingFindingsCopy": "没有匹配的结果可以复制.",
     "couldNotOpenFile": "打开文件是不可能的: {path} 没有任何问题.",
@@ -1467,7 +1467,7 @@
       "enable": "启用规则的规定使得它成为可能."
     },
     "deepLink": {
-      "showDriftIssues": "显示现场漂流问题 (漂移顾问)"
+      "showDriftIssues": "显示现场漂流问题 (Drift Advisor)"
     },
     "nudge": {
       "message": "这个项目使用了Drift Advisor. 安装 Saropa 记录捕获扩展程序,以将运行时的 SQL 与这些静态结果相关联.",
@@ -1476,7 +1476,7 @@
     },
     "driftRecommend": {
       "message": "一个漂移顾问服务器连接. 安装独立的 Saropa Drift Advisor 扩展,以获得完整的问题面板体验.",
-      "install": "安装漂流顾问安装",
+      "install": "安装 Drift Advisor 的时间.",
       "dismiss": "解雇了,这是一个很好的方法."
     }
   },
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "无法获取足够多的包数据."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: 已经是 {message} 没有任何问题.",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} 错误{suffix}  ⁇  这是一个很好的方法. 视图. 在这里,看起来很好.",
       "regressionScoreDipped": "评分下降到 {threshold} 的水平以下. 查看问题.",
       "actionViewViolations": "视图违规行为",
@@ -1531,7 +1531,7 @@
       "createInstructionsDone": "创建了 .cursor/rules/saropa_lints_instructions.mdc 的一个用于人工智能代理的文件库.",
       "createInstructionsFailed": "无法创建 Saropa Lints 指令:没有成功. {message} 没有任何问题.",
       "openFileForIssues": "打开一个文件,以显示其问题在 Saropa Lints.",
-      "driftAdvisorNotConnected": "漂移顾问没有连接. 在启动服务器后,单击\"更新\".",
+      "driftAdvisorNotConnected": "Drift Advisor没有连接. 在启动服务器后,单击\"更新\".",
       "noViolationsRunAnalysis": "目前数据中没有违规行为. 首先进行分析.",
       "telemetryReset": "Saropa Lints: 没有一个人. 相关规则远程测量计数器重置.",
       "noWorkspaceOpen": "没有工作区文件 ⁇ 打开.",

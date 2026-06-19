@@ -526,21 +526,21 @@
       "hacksLabel": "Noodoplossingen"
     },
     "drift": {
-      "sectionAria": "Drift Advisor adviseur.",
-      "headingOff": "Drift Advisor adviseur.",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "Integratie van de integratie af.",
       "enableBlurb": "Hier activeer je de integratie van Drift Advisor met suggesties voor databaseoppervlak.",
       "enable": "Enable Enable is een functie die wordt ingeschakeld door de gebruiker.",
-      "headingNoServer": "Drift Advisor adviseur.",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Geen server, geen server.",
       "noServerBlurb": "Geen Drift Advisor-server gevonden op geconfigureerde poorten.",
       "retry": "Opnieuw proberen",
-      "headingConnected": "Drift Advisor adviseur.",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "verbonden verbonden aangesloten verbonden",
       "noIssues": "Verbonden met {label}  ⁇  geen actuele problemen.",
       "refresh": "Vernieuwen",
       "openBrowser": "Open in de browser.",
-      "headingIssues": "Drift Advisor adviseur.",
+      "headingIssues": "Drift Advisor",
       "disable": "Disable Drift Advisor - De driftradgeur uitschakelen"
     },
     "suppressions": {
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Kon niet genoeg pakketgegevens halen."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: Het is een generieke vorm van _ph1__. {message} is een PH0__.",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} fout{suffix}  ⁇ uitzicht. view.",
       "regressionScoreDipped": "Score daalde onder {threshold}  ⁇ View issues. bekijk problemen.",
       "actionViewViolations": "View Violaties Bekijk overtredingen",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Belangrijke update van de belangrijkste updates.",
       "upgradeCheckerMinorUpdate": "Kleine update van de Minor Update.",
       "upgradeCheckerPatchUpdate": "Patch update patch updates zijn een soort van patches.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: Het is een soort van ________. {from} → {to} is een vorm van ________.",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: Het is een van de twee Kon niet bijwerken pubspec.yaml  ⁇ saropa_lints vermelding niet gevonden.",
       "upgradeCheckerCancelled": "Saropa Lints upgrade geannuleerd. pubspec.yaml werd bijgewerkt naar ^{version}; run `{cmd} pub get゙ to finish, of de verandering terugdraaien.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: pub mislukt. {detail}",

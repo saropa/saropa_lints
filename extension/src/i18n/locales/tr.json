@@ -526,21 +526,21 @@
       "hacksLabel": "HACKS ÇENKELERİ"
     },
     "drift": {
-      "sectionAria": "Drift Danışmanı",
-      "headingOff": "Drift Danışmanı",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "entegrasyon dışı entegrasyonu kapalı",
       "enableBlurb": "Yüzey veritabanı önerilerine Drift Advisor entegrasyonunu etkinleştirin.",
       "enable": "Enable enable Etkinleştirin etkinleştir",
-      "headingNoServer": "Drift Danışmanı",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Hiçbir sunucu yok.",
       "noServerBlurb": "Ayarlanmış portlarda Drift Advisor sunucusu bulunamadı.",
       "retry": "Yeniden denemek için tekrar deneyin.",
-      "headingConnected": "Drift Danışmanı",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "Bağlantılı bağlantılı bağlanmış bağlı",
       "noIssues": "{label}'a bağlandı  ⁇  mevcut sorun yok.",
       "refresh": "Rahatlatıcı ve rahatlatıcı olsun.",
       "openBrowser": "Tarayıcıda açılır.",
-      "headingIssues": "Drift Danışmanı",
+      "headingIssues": "Drift Advisor",
       "disable": "Drift Advisor'ı devre dışı bırak"
     },
     "suppressions": {
@@ -1467,7 +1467,7 @@
       "enable": "Enable rule (Eklenti kuralını etkinleştir)"
     },
     "deepLink": {
-      "showDriftIssues": "Canlı yayınlanan Drift sorunlarını göster (Drift Danışmanı)"
+      "showDriftIssues": "Canlı yayın gösterisi Drift sorunları (Drift Advisor)"
     },
     "nudge": {
       "message": "Bu proje Drift Advisor kullanıyor. Bu statik bulgular ile SQL çalışma süresini ilişkilendirmek için Saropa Log Capture uzantısını yükleyin.",
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Yeterli sayıda paket verisi alıkonamadı."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: _PH1_: -HİS'in ilk aşamas {message} _PH0___ -Hepimiz birer insanız.",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} hata{suffix}  ⁇ bakış açısı. görünüm.",
       "regressionScoreDipped": "Skor {threshold}  ⁇ 'ın altına düştü. View issues. bakış sorunları.",
       "actionViewViolations": "View Violations İhtiyaçları ihlal edilmiştir.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Büyük güncelleme Major update.",
       "upgradeCheckerMinorUpdate": "Küçük güncelleme Uyarı",
       "upgradeCheckerPatchUpdate": "Yama güncellemesi, yama güncelleştirmesi.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: _PH3_, _PH0_ ve _PH1_ olarak adlandırılır. {from} → {to} ________ ile ilişkilidir.",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: _PH2_: - PH2__'de bulunan bir hü Güncelleme yapamadı pubspec.yaml  ⁇ saropa_lints giriş bulunamadı.",
       "upgradeCheckerCancelled": "Saropa Lints yükseltmesi iptal edildi. pubspec.yaml, ^{version} olarak güncellendi; Bitirmek için \"{cmd} pub get\" komutunu çalıştırın veya değişikliği geri alın.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: pub alma işlemi başarısız oldu. {detail}",

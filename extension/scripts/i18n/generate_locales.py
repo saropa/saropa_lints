@@ -29,6 +29,7 @@ from json_io import read_json, write_json
 from mt_fallback import (
     active_engine_name,
     cache_lookup,
+    cache_lookup_any,
     cache_set,
     cache_unset,
     count_pending_translations,
@@ -617,7 +618,12 @@ def _run_audit(
             if src and src in dict_table:
                 mapping[src] = dict_table[src]
                 continue
-            value, _prov = cache_lookup(mt_cache, locale, src)
+            # Engine-agnostic: a string translated by NLLB (py3.14 translator) is
+            # keyed nllb:* and would be invisible to this audit under py3.13 where
+            # NLLB is absent and cache_lookup falls back to the Google keyspace.
+            # cache_lookup_any probes both so coverage does not depend on which
+            # interpreter runs the gate.
+            value, _prov = cache_lookup_any(mt_cache, locale, src)
             mapping[src] = value if value is not None else src
         stats, missing = compute_stats(mapping, dict_table)
         stats_by_locale[locale] = stats

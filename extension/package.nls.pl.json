@@ -202,7 +202,7 @@
   "config.property.todosAndHacks.autoRefresh.description": "Odśwież widok TODOs & Hacks, gdy plik jest zapisywany (odwracalny).",
   "config.property.todosAndHacks.groupByTag.description": "Drzewo grupowe według tagów (TODO, FIXME,...), następnie według plików; gdy jest wyłączone, grupuj na foldery a potem pliki.",
   "config.property.todosAndHacks.customRegex.description": "Opcjonalne nadrzędne regex dla dopasowania markerów komentarza. Na podstawie linii; użyj grupy przechwytywania 1 dla tagów i opcjonalnej grupy 2 dla fragmentów. Puste = użyj domyślnych (//, #, <!-- + tagów). Nieprawidłowy regex wraca do domyślnego.",
-  "config.section.Drift.Advisor.title": "Doradca Drift Advisor",
+  "config.section.Drift.Advisor.title": "Drift Advisor",
   "config.property.driftAdvisor.integration.description": "Włącz opcjonalną integrację z Saropa Drift Advisor. Włączony rozszerzenie wykrywa działający serwer Drift Advisor (porty 8642 ⁇ 8649), pobiera sugestie dotyczące indeksu i anomalii, wyświetla je w widoku Doradca Drift oraz opcjonalnie w Problemach.",
   "config.property.driftAdvisor.portRange.description": "Zakres portów [min, max] do skanowania serwera Drift Advisor (włącznie).",
   "config.property.driftAdvisor.pollIntervalMs.description": "Jak często należy przeprowadzać ankietę na serwerze Drift Advisor w celu znalezienia problemów (milisekundy). Ustaw na 0 aby wyłączyć automatyczne głosowanie (odśwież ręcznie).",
