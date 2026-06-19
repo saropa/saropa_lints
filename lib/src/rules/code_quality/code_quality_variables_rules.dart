@@ -1500,9 +1500,20 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
               assignedFields.add(init.fieldName.name);
             }
           }
+          // A field is assigned when a constructor declares it via an
+          // initializing formal (`this.x`) or a super formal (`super.x`). For
+          // NAMED and OPTIONAL parameters the analyzer wraps the real parameter
+          // in a DefaultFormalParameter, so unwrap before the type test —
+          // otherwise a `required this.x` named parameter (the common
+          // const-data-class pattern) is missed and the field is wrongly
+          // reported as unassigned.
           for (final FormalParameter param in member.parameters.parameters) {
-            if (param is FieldFormalParameter) {
-              assignedFields.add(param.name.lexeme);
+            final FormalParameter inner =
+                param is DefaultFormalParameter ? param.parameter : param;
+            if (inner is FieldFormalParameter) {
+              assignedFields.add(inner.name.lexeme);
+            } else if (inner is SuperFormalParameter) {
+              assignedFields.add(inner.name.lexeme);
             }
           }
         }
@@ -2333,7 +2344,12 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    void checkLoopBody(Statement body) {
+    // [writtenLocals] holds every local reassigned anywhere in the loop (the
+    // updater, assignments, ++/--, the for-each variable). An initializer that
+    // reads one of these is recomputed to a different value each pass on
+    // purpose; hoisting it would freeze it at the first iteration's value and
+    // break ancestor-walk / accumulator loops, so such declarations are skipped.
+    void checkLoopBody(Statement body, Set<String> writtenLocals) {
       if (body is! Block) return;
 
       for (final Statement statement in body.statements) {
@@ -2343,9 +2359,10 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
             final Expression? initializer = variable.initializer;
             if (initializer == null) continue;
 
-            // Check if initializer is a constant expression or only uses
-            // values available outside the loop
-            if (_isLoopInvariant(initializer)) {
+            // Only "constant-shaped" initializers are candidates; among those,
+            // suppress any that read a loop-mutated local (the data-flow guard).
+            if (_isLoopInvariant(initializer) &&
+                !_readsLoopMutatedLocal(initializer, writtenLocals)) {
               reporter.atToken(variable.name, code);
             }
           }
@@ -2354,16 +2371,38 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
     }
 
     context.addForStatement((ForStatement node) {
-      checkLoopBody(node.body);
+      checkLoopBody(node.body, _collectLoopWrittenLocals(node));
     });
 
     context.addWhileStatement((WhileStatement node) {
-      checkLoopBody(node.body);
+      checkLoopBody(node.body, _collectLoopWrittenLocals(node));
     });
 
     context.addDoStatement((DoStatement node) {
-      checkLoopBody(node.body);
+      checkLoopBody(node.body, _collectLoopWrittenLocals(node));
     });
+  }
+
+  /// Names of locals written anywhere in [loop]: assignment targets, `++`/`--`
+  /// operands, the for-each loop variable, and the `for` updater. Visiting the
+  /// whole loop (body plus loop parts) over-collects into nested loops, which is
+  /// safe — extra entries can only suppress, never produce, a diagnostic.
+  Set<String> _collectLoopWrittenLocals(AstNode loop) {
+    final _LoopWrittenLocalsCollector collector = _LoopWrittenLocalsCollector();
+    loop.accept(collector);
+    return collector.writtenNames;
+  }
+
+  /// True when [initializer] reads any local that the loop reassigns, meaning
+  /// its value is not loop-invariant despite its constant-looking shape.
+  bool _readsLoopMutatedLocal(
+    Expression initializer,
+    Set<String> writtenLocals,
+  ) {
+    if (writtenLocals.isEmpty) return false;
+    final _ReadLocalsCollector collector = _ReadLocalsCollector();
+    initializer.accept(collector);
+    return collector.readNames.any(writtenLocals.contains);
   }
 
   bool _isLoopInvariant(Expression expr) {
@@ -2397,6 +2436,82 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
   bool _isConstant(Expression expr) {
     if (expr is Literal) return true;
     if (expr is NamedExpression) return _isConstant(expr.expression);
+    return false;
+  }
+}
+
+/// Collects the names of locals that are written (reassigned) within a loop.
+///
+/// Used by [MoveVariableOutsideIterationRule] to detect initializers whose
+/// value changes each iteration because they read a mutated local.
+class _LoopWrittenLocalsCollector extends RecursiveAstVisitor<void> {
+  final Set<String> writtenNames = <String>{};
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    // `x = ...`, `x += ...`, etc. — the left-hand identifier is reassigned.
+    final Expression lhs = node.leftHandSide;
+    if (lhs is SimpleIdentifier) writtenNames.add(lhs.name);
+    super.visitAssignmentExpression(node);
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    // Only `x++` / `x--` mutate; `x!` does not.
+    if (node.operator.lexeme == '++' || node.operator.lexeme == '--') {
+      final Expression operand = node.operand;
+      if (operand is SimpleIdentifier) writtenNames.add(operand.name);
+    }
+    super.visitPostfixExpression(node);
+  }
+
+  @override
+  void visitPrefixExpression(PrefixExpression node) {
+    // Only `++x` / `--x` mutate; `-x`, `!x`, `~x` do not.
+    if (node.operator.lexeme == '++' || node.operator.lexeme == '--') {
+      final Expression operand = node.operand;
+      if (operand is SimpleIdentifier) writtenNames.add(operand.name);
+    }
+    super.visitPrefixExpression(node);
+  }
+
+  @override
+  void visitDeclaredIdentifier(DeclaredIdentifier node) {
+    // The for-each loop variable takes a new value on every iteration.
+    writtenNames.add(node.name.lexeme);
+    super.visitDeclaredIdentifier(node);
+  }
+
+  @override
+  void visitForEachPartsWithIdentifier(ForEachPartsWithIdentifier node) {
+    // `for (existingVar in items)` rebinds an existing local each iteration.
+    writtenNames.add(node.identifier.name);
+    super.visitForEachPartsWithIdentifier(node);
+  }
+}
+
+/// Collects the names of locals read by an expression, ignoring property names,
+/// method names, named-argument labels, and declarations so only genuine value
+/// reads are counted.
+class _ReadLocalsCollector extends RecursiveAstVisitor<void> {
+  final Set<String> readNames = <String>{};
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (!node.inDeclarationContext() && !_isMemberOrLabel(node)) {
+      readNames.add(node.name);
+    }
+    super.visitSimpleIdentifier(node);
+  }
+
+  // The trailing identifier of `a.b`, the method name of `a.foo()`, and a named
+  // argument's label are not value reads of a local — exclude them.
+  bool _isMemberOrLabel(SimpleIdentifier node) {
+    final AstNode? parent = node.parent;
+    if (parent is PropertyAccess && parent.propertyName == node) return true;
+    if (parent is PrefixedIdentifier && parent.identifier == node) return true;
+    if (parent is MethodInvocation && parent.methodName == node) return true;
+    if (parent is Label) return true;
     return false;
   }
 }
