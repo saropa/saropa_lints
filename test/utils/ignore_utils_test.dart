@@ -1026,6 +1026,80 @@ double pick(bool finite, double a) {
           );
         });
       });
+
+      // Regression for infra_ignore_directives_not_honored_for_custom_rules:
+      // a diagnostic reported on a node nested deep inside a multi-line
+      // statement (e.g. avoid_recursive_calls flags the inner self-call, which
+      // sits on a later line than the `return` keyword) must still honor a
+      // leading `// ignore:` written above the statement. The ancestor walk
+      // previously compared every ancestor against the leaf's start line, so
+      // the directive above the statement never matched once the leaf and the
+      // statement were on different lines.
+      group('leading ignore above a multi-line enclosing statement', () {
+        // The flagged self-call sits two lines below the `// ignore:`, on a
+        // different line than the `return` it is nested under.
+        MethodInvocation selfCall(CompilationUnit unit) =>
+            _findAll<MethodInvocation>(
+              unit,
+            ).firstWhere((m) => m.methodName.name == 'recurse');
+
+        test(
+          'suppresses a node on a deeper line than the ignore directive',
+          () {
+            final unit = _parseCode('''
+int recurse(int n) {
+  // ignore: my_rule
+  return n *
+      recurse(n - 1);
+}
+''');
+            expect(
+              IgnoreUtils.hasIgnoreComment(selfCall(unit), 'my_rule'),
+              isTrue,
+            );
+          },
+        );
+
+        test('still honors the directive when the node shares its line', () {
+          final unit = _parseCode('''
+int recurse(int n) {
+  // ignore: my_rule
+  return n * recurse(n - 1);
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(selfCall(unit), 'my_rule'),
+            isTrue,
+          );
+        });
+
+        test('does NOT suppress without the directive (control)', () {
+          final unit = _parseCode('''
+int recurse(int n) {
+  return n *
+      recurse(n - 1);
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(selfCall(unit), 'my_rule'),
+            isFalse,
+          );
+        });
+
+        test('does NOT suppress for an unrelated rule name', () {
+          final unit = _parseCode('''
+int recurse(int n) {
+  // ignore: other_rule
+  return n *
+      recurse(n - 1);
+}
+''');
+          expect(
+            IgnoreUtils.hasIgnoreComment(selfCall(unit), 'my_rule'),
+            isFalse,
+          );
+        });
+      });
     });
   });
 }

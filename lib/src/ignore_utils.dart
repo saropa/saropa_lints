@@ -324,11 +324,39 @@ class IgnoreUtils {
       return true;
     }
 
-    // Walk up the parent chain to find comments on ancestor expressions
+    // Walk up the parent chain to find comments on ancestor expressions.
+    //
+    // Each ancestor is checked against ITS OWN start line, not the flagged
+    // leaf's. A diagnostic reported on a node deep inside a multi-line
+    // statement (e.g. `avoid_recursive_calls` flags the inner self-call
+    // expression, which can sit several lines below the statement keyword)
+    // must still honor a leading `// ignore:` written above the statement.
+    // Reusing the leaf's `nodeStartLine` made the `commentLine ==
+    // start - 1` guard compare against the wrong line, so the directive
+    // silently did nothing whenever the leaf and the enclosing statement
+    // were on different lines. See
+    // bugs/infra_ignore_directives_not_honored_for_custom_rules.md.
     AstNode? current = node.parent;
     Statement? containingStatement;
     while (current != null) {
-      if (_nodeHasLeadingIgnore(current, ruleName, nodeStartLine, lineInfo)) {
+      // The reference line for the "comment is immediately above" guard is the
+      // ancestor's DECLARATION line, not necessarily `current.offset`. For an
+      // AnnotatedNode `current.offset` is the `///` doc-comment token, but the
+      // leading `// ignore:` (and the `_nodeHasLeadingIgnore` post-doc probe)
+      // sits immediately above `firstTokenAfterCommentAndMetadata` — so the
+      // guard must compare against that token's line, or a doc-commented
+      // declaration regresses.
+      final int referenceOffset = current is AnnotatedNode
+          ? current.firstTokenAfterCommentAndMetadata.offset
+          : current.offset;
+      final int currentStartLine =
+          lineInfo?.getLocation(referenceOffset).lineNumber ?? nodeStartLine;
+      if (_nodeHasLeadingIgnore(
+        current,
+        ruleName,
+        currentStartLine,
+        lineInfo,
+      )) {
         return true;
       }
 
