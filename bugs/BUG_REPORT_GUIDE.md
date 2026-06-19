@@ -32,6 +32,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 - `infra_drift_advisor_integration_duplicate_diagnostics_with_standalone_extension.md`
 
+## Raised Reports (2026-06-19)
+
+- `feature_lint_group_ui_excellence.md`
+
 ---
 
 ## File Naming
