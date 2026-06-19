@@ -103,6 +103,8 @@
 // Test fixture for: move_variable_outside_iteration
 // Source: lib\src\rules\code_quality_rules.dart
 
+import 'dart:io';
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger move_variable_outside_iteration
@@ -119,5 +121,59 @@ void _good225() {
   final regex = RegExp(r'\d+');
   for (int i = 0; i < 10; i++) {
     print(regex.hasMatch('$i'));
+  }
+}
+
+// NO LINT: the initializer reads `dir`, which is reassigned at the bottom of
+// the loop, so `configFile` differs every iteration. Hoisting it would freeze
+// it at `Directory.current` and break the ancestor walk.
+void _ancestorWalkNoLint() {
+  Directory dir = Directory.current.absolute;
+  while (true) {
+    final configFile = File('${dir.path}/.dart_tool/package_config.json');
+    print(configFile.path);
+    final parent = dir.parent;
+    if (parent.path == dir.path) break;
+    dir = parent;
+  }
+}
+
+// NO LINT: reads the loop counter `i`, which the `for` updater mutates each pass.
+void _readsForCounterNoLint() {
+  for (int i = 0; i < 10; i++) {
+    final segment = File('segment$i');
+    print(segment.path);
+  }
+}
+
+// NO LINT: reads `j`, which is mutated by `j++` in the loop body.
+void _readsPostfixMutatedNoLint() {
+  int j = 0;
+  while (j < 10) {
+    final f = File('value$j');
+    print(f.path);
+    j++;
+  }
+}
+
+// LINT: constant-shaped constructor that reads no loop-mutated local — still
+// invariant, so the regression guard must keep flagging it.
+// expect_lint: move_variable_outside_iteration
+void _constConstructorLint() {
+  for (int i = 0; i < 10; i++) {
+    final buffer = StringBuffer();
+    buffer.write('$i');
+  }
+}
+
+// LINT: the interpolation reads only `base`, declared outside the loop and never
+// reassigned, so it is genuinely invariant — confirms the guard does not
+// over-suppress.
+// expect_lint: move_variable_outside_iteration
+void _invariantInterpolationLint() {
+  final String base = Directory.current.path;
+  for (int i = 0; i < 10; i++) {
+    final f = File('$base/config.json');
+    print(f.path);
   }
 }

@@ -107,24 +107,65 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic result;
 
-// BAD: Should trigger avoid_recursive_calls
+// BAD: Unguarded self-call, no base case — should trigger.
 // expect_lint: avoid_recursive_calls
-int _bad155_factorial(int n) {
-  return n * factorial(n - 1); // Missing base case check
+int badFactorial(int n) => n * badFactorial(n - 1);
+
+// BAD: Block body, single return recurses with no guard clause.
+int badFactorialBlock(int n) {
+  // expect_lint: avoid_recursive_calls
+  return n * badFactorialBlock(n - 1);
 }
 
-// GOOD: Should NOT trigger avoid_recursive_calls
-int _good155_factorial(int n) {
+// GOOD: Guard clause returns before recursing — bounded by `n`.
+int goodFactorial(int n) {
   if (n <= 1) return 1;
-  return n * factorial(n - 1);
+  return n * goodFactorial(n - 1);
 }
 
-// or use iteration
-int factorial(int n) {
-  int result = 1;
-  for (int i = 2; i <= n; i++) {
-    result *= i;
-  }
+// GOOD: Ternary whose non-recursive branch is the base case.
+int goodFactorialTernary(int n) => n <= 1 ? 1 : n * goodFactorialTernary(n - 1);
 
-  return result;
+// GOOD: Bounded structural recursion — depth-first JSON walk with three
+// terminating base cases (null/bool/num, String, unsupported fallthrough).
+// The self-calls live inside a `.map(...)` closure and a `Map` loop.
+Object? normalizeJsonValue(Object? value) {
+  if (value == null || value is bool || value is num) return value;
+  if (value is String) return value;
+  if (value is List) {
+    return value
+        .map((e) => normalizeJsonValue(e as Object?))
+        .toList(growable: false);
+  }
+  if (value is Map) {
+    final out = <String, Object?>{};
+    for (final e in value.entries) {
+      out['${e.key}'] = normalizeJsonValue(e.value as Object?);
+    }
+    return out;
+  }
+  return '[unsupported:${value.runtimeType}]';
+}
+
+// GOOD: Tree walk with an empty-children base case (the for-loop body simply
+// does not run when there are no children).
+int countNodes(TreeNode node) {
+  int total = 1;
+  for (final TreeNode child in node.children) {
+    total += countNodes(child);
+  }
+  return total;
+}
+
+// GOOD: Divide-and-conquer with a size guard before the two recursive halves.
+void quicksortRange(List<int> data, int lo, int hi) {
+  if (lo >= hi) return;
+  final int mid = (lo + hi) ~/ 2;
+  quicksortRange(data, lo, mid);
+  quicksortRange(data, mid + 1, hi);
+}
+
+class TreeNode {
+  TreeNode(this.children);
+  final List<TreeNode> children;
 }
