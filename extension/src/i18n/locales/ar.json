@@ -349,7 +349,7 @@
       "findingOne": "{count} نتيجة",
       "findingOther": "{count} نتائج",
       "todoHackTitle": "تم العثور على علامات TODO و HACK في مساحة العمل.",
-      "driftOnTitle": "مستشار الانجراف متصل: {label}",
+      "driftOnTitle": "Drift Advisor متصل: يتصل به. {label} _ PH0__ الـ (ف) = الحالة التي يمر",
       "driftOnPill": "التنجرف على · {count}",
       "driftOfflineTitle": "تم تفعيل مستشار Drift Advisor ولكن لم يتم العثور على خادم.",
       "driftOfflinePill": "الانجراف في وضع عدم الاتصال بالإنترنت.",
@@ -526,21 +526,21 @@
       "hacksLabel": "الاكس هاكس HACKS"
     },
     "drift": {
-      "sectionAria": "مستشار الانجراف Drift Advisor",
-      "headingOff": "مستشار الانجراف Drift Advisor",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "التكامل خارج الاندماج.",
       "enableBlurb": "تمكين دمج Drift Advisor في اقتراحات قاعدة البيانات السطحية هنا.",
       "enable": "تمكين Enable تمكين",
-      "headingNoServer": "مستشار الانجراف Drift Advisor",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "لا يوجد خادم للخادم.",
       "noServerBlurb": "لم يتم العثور على خادم Drift Advisor في المنافذ المهيئة.",
       "retry": "حاول إعادة المحاولة.",
-      "headingConnected": "مستشار الانجراف Drift Advisor",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "متصلة متصلة موصولة.",
       "noIssues": "متصل بـ {label}  ⁇  لا توجد مشاكل حالية.",
       "refresh": "استرخاء وترفعه.",
       "openBrowser": "افتح في متصفح المتصفح.",
-      "headingIssues": "مستشار الانجراف Drift Advisor",
+      "headingIssues": "Drift Advisor",
       "disable": "تعطيل مستشار الانجراف Drift Advisor"
     },
     "suppressions": {
@@ -1467,7 +1467,7 @@
       "enable": "تمكين قاعدة التفعيل"
     },
     "deepLink": {
-      "showDriftIssues": "عرض قضايا الانجراف على الهواء مباشرة (مستشار الانجرف)"
+      "showDriftIssues": "Show live Drift issues (Drift Advisor)"
     },
     "nudge": {
       "message": "يستخدم هذا المشروع Drift Advisor. قم بتثبيت Saropa ملحق التقاط السجلات لترتيب SQL أثناء تشغيل مع هذه النتائج الثابتة.",
@@ -1531,7 +1531,7 @@
       "createInstructionsDone": "تم إنشاء .cursor/rules/saropa_lints_instructions.mdc لعملاء الذكاء الاصطناعي.",
       "createInstructionsFailed": "فشل في إنشاء تعليمات Saropa Lints: {message} _ PH0__ الـ (ف) = الحالة التي يمر",
       "openFileForIssues": "افتح ملفًا لتظهر مشاكله في Saropa Lints.",
-      "driftAdvisorNotConnected": "مستشار الانجراف غير متصل. انقر فوق تحديث بعد بدء تشغيل الخادم.",
+      "driftAdvisorNotConnected": "Drift Advisor غير متصل. انقر فوق تحديث بعد بدء تشغيل الخادم.",
       "noViolationsRunAnalysis": "لا يوجد انتهاكات في البيانات الحالية. قم بتحليل المعلومات أولاً.",
       "telemetryReset": "Saropa Lints: قاعدة ذات الصلة تعيد ضبط عدادات القياس عن بعد.",
       "noWorkspaceOpen": "لا يوجد مجلد مساحة عمل مفتوح.",

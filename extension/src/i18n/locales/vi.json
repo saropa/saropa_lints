@@ -1473,6 +1473,11 @@
       "message": "Dự án này sử dụng Drift Advisor. Cài đặt Saropa Log Capture extension để liên hệ SQL runtime với những kết quả tĩnh này.",
       "install": "Cài đặt Log Capture",
       "dismiss": "Thả bỏ việc làm"
+    },
+    "driftRecommend": {
+      "message": "Một máy chủ Drift Advisor được kết nối. Cài đặt phần mở rộng Saropa Drift Advisor độc lập để có trải nghiệm toàn diện của bảng vấn đề.",
+      "install": "Cài đặt Drift Advisor",
+      "dismiss": "Thả bỏ việc làm"
     }
   },
   "notify": {

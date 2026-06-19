@@ -1473,6 +1473,11 @@
       "message": "这个项目使用了Drift Advisor. 安装 Saropa 记录捕获扩展程序,以将运行时的 SQL 与这些静态结果相关联.",
       "install": "安装日志捕获的安装",
       "dismiss": "解雇了,这是一个很好的方法."
+    },
+    "driftRecommend": {
+      "message": "一个漂移顾问服务器连接. 安装独立的 Saropa Drift Advisor 扩展,以获得完整的问题面板体验.",
+      "install": "安装漂流顾问安装",
+      "dismiss": "解雇了,这是一个很好的方法."
     }
   },
   "notify": {
