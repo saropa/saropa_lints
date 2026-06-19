@@ -36,6 +36,8 @@ import 'dart:developer' as developer;
 import 'package:pub_semver/pub_semver.dart';
 
 import 'package:saropa_lints/src/config/rule_pack_codes_generated.dart';
+import 'package:saropa_lints/src/tiers.dart'
+    show documentationRules, localizationRules, testingRules, uiExcellenceRules;
 
 /// Optional semver gate: pack merges only when [dependency] resolves to a
 /// version allowed by [constraint] (pub semver syntax, e.g. `>=1.19.0`).
@@ -367,6 +369,13 @@ const Map<String, Set<String>> kRulePackPubspecMarkers = {
   'flutter_sdk_3_35': {'environment'},
   'flutter_sdk_3_38': {'environment'},
   'collection_compat': {'collection'},
+  // Thematic packs are suggested by a representative dependency, but (having no
+  // dependency gate) can be enabled in any project. Markers only drive the
+  // "applicable" hint in init / the dashboard.
+  'ui_excellence': {'flutter'},
+  'localization': {'intl', 'flutter_localizations'},
+  'documentation': {'flutter'},
+  'testing': {'flutter_test', 'test'},
 };
 
 /// True when [pubspecYamlContent] declares any [kRulePackPubspecMarkers] entry.
@@ -498,4 +507,13 @@ const Map<String, Set<String>> kRulePackRuleCodes = {
   },
   'flutter_sdk_3_38': {'avoid_asset_manifest_json'},
   'collection_compat': {'avoid_collection_methods_with_unrelated_types'},
+  // Thematic ("quality standard") packs — cross-cutting rule bundles that are
+  // not tied to a package or SDK version. Rosters live in tiers.dart so they
+  // stay tier-validated; see the THEMATIC RULE-PACK ROSTERS section there. Like
+  // every pack these are opt-in (authoritative merge), surfaced in the VS Code
+  // dashboard under the "Quality standards" domain.
+  'ui_excellence': uiExcellenceRules,
+  'localization': localizationRules,
+  'documentation': documentationRules,
+  'testing': testingRules,
 };

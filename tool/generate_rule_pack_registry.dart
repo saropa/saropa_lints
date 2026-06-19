@@ -140,6 +140,11 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
 };
 
 const Map<String, String> kPackUiLabels = {
+  // Thematic ("quality standard") packs.
+  'ui_excellence': 'UX Excellence',
+  'localization': 'Localization',
+  'documentation': 'Documentation',
+  'testing': 'Testing',
   'auto_route': 'Auto Route',
   'bloc': 'Bloc',
   'bloc_8': 'Bloc 8.x',

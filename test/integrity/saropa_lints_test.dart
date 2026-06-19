@@ -268,72 +268,75 @@ void main() {
     });
   });
 
-  group('Semantic Group Validation', () {
+  group('Thematic Rule Pack Validation', () {
+    // The thematic ("quality standard") packs: pack id -> roster. Rosters live
+    // in tiers.dart; the packs are registered in rule_packs.dart.
+    final Map<String, Set<String>> thematicPacks = <String, Set<String>>{
+      'ui_excellence': uiExcellenceRules,
+      'localization': localizationRules,
+      'documentation': documentationRules,
+      'testing': testingRules,
+    };
+
     late Set<String> pluginRuleNames;
-    late Map<String, Set<String>> groupSets;
+    late Set<String> allThematicRules;
 
     setUpAll(() {
       pluginRuleNames = allSaropaRules
           .map((SaropaLintRule rule) => rule.code.lowerCaseName)
           .toSet();
-      groupSets = semanticGroupRuleSets;
+      allThematicRules = <String>{
+        for (final rules in thematicPacks.values) ...rules,
+      };
     });
 
-    // A semantic group that names a non-existent rule would silently enable
-    // nothing — catch the typo/rename here instead of in a consumer project.
-    test('all semantic group rules must exist in plugin', () {
-      final Set<String> allGroupRules = <String>{};
-      for (final rules in groupSets.values) {
-        allGroupRules.addAll(rules);
-      }
-
-      final Set<String> phantomRules = allGroupRules.difference(
-        pluginRuleNames,
-      );
-
+    // A pack that names a non-existent rule would silently enable nothing —
+    // catch the typo/rename here instead of in a consumer project.
+    test('all thematic pack rules exist in plugin', () {
+      final Set<String> phantom = allThematicRules.difference(pluginRuleNames);
       expect(
-        phantomRules,
+        phantom,
         isEmpty,
         reason:
-            'Rules in semantic groups do not exist in plugin:\n'
-            '${phantomRules.toList()..sort()}\n\n'
-            'Remove these phantom rules from semantic groups in '
+            'Thematic pack rules not found in plugin:\n'
+            '${phantom.toList()..sort()}\n\n'
+            'Fix the roster in the THEMATIC RULE-PACK ROSTERS section of '
             'lib/src/tiers.dart',
       );
     });
 
-    // Groups are overlays on tiers, not a replacement: every member must also
-    // be in a tier set so enabling a group never disables a rule for tier users.
-    test('semantic group rules must be in a tier set', () {
-      final Set<String> tierRuleNames = getAllDefinedRules();
-      final Set<String> allGroupRules = <String>{};
-      for (final rules in groupSets.values) {
-        allGroupRules.addAll(rules);
-      }
-
-      final Set<String> orphaned = allGroupRules.difference(tierRuleNames);
-
+    // Members are tier-cataloged (so they appear in exactly one tier set) even
+    // though pack ownership gates their effective enablement.
+    test('thematic pack rules are in a tier set', () {
+      final Set<String> orphaned = allThematicRules.difference(
+        getAllDefinedRules(),
+      );
       expect(
         orphaned,
         isEmpty,
         reason:
-            'Semantic group rules not in any tier set:\n'
-            '${orphaned.toList()..sort()}\n\n'
-            'Semantic groups are orthogonal to tiers. Every rule in a '
-            'group must also be in a tier set.',
+            'Thematic pack rules not in any tier set:\n'
+            '${orphaned.toList()..sort()}',
       );
     });
 
-    test('ui_excellence group is registered and non-empty', () {
-      expect(groupSets.keys, contains('ui_excellence'));
-      expect(groupSets['ui_excellence'], same(uiExcellenceRules));
-      expect(uiExcellenceRules, isNotEmpty);
+    // Stylistic-track rules are stripped when the stylistic track is enabled,
+    // which would fight pack ownership — keep thematic packs disjoint from it.
+    test('thematic pack rules are not in the stylistic track', () {
+      final Set<String> overlap = allThematicRules.intersection(stylisticRules);
+      expect(
+        overlap,
+        isEmpty,
+        reason:
+            'Thematic pack rules also in the stylistic track:\n'
+            '${overlap.toList()..sort()}\n\n'
+            'Remove these from the thematic roster (or the stylistic set).',
+      );
     });
 
-    test('uiExcellenceRules has no duplicate-collapsed entries', () {
+    test('ui_excellence roster size is pinned', () {
       // A const Set literal silently drops duplicate string entries, so a
-      // copy-paste repeat would shrink the set without erroring. Pin the count
-      // to make an accidental duplicate fail loudly.
+      // copy-paste repeat would shrink the set without erroring.
       expect(uiExcellenceRules, hasLength(32));
     });
   });

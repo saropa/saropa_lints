@@ -1,40 +1,50 @@
 # FEATURE: `ui_excellence` lint group — bundle the UX-polish rules under one toggle
 
-**Status: Investigating** (data model + validation landed; end-user toggle pending)
+**Status: Fixed** — shipped as four thematic rule packs
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
-## Implemented so far (2026-06-19)
+## Implemented (2026-06-19) — as rule packs, not an overlay set
 
-The additive data model is built and validated; the end-user "one switch" is not.
+Shipped as real rule packs (the dashboard-discoverable, opt-in mechanism), not
+the overlay set first prototyped. An earlier draft used a tier-overlay set to
+avoid the pack merge stripping members from tiers; that was reverted once it was
+confirmed that package and SDK packs work exactly this way by design — pack
+ownership making a rule opt-in is the intended behavior for an *optional* bar,
+which the doc title calls for.
 
-- `uiExcellenceRules` — curated 32-rule overlay set in `lib/src/tiers.dart`
-  (SEMANTIC GROUPS section), plus a `semanticGroupRuleSets` registry mirroring
-  `packageRuleSets`. Every member is verified to exist in the plugin and to be a
-  tier member.
-- Integrity tests in `test/integrity/saropa_lints_test.dart`
-  ("Semantic Group Validation"): members exist in plugin, members are in a tier,
-  the group is registered, and the member count is pinned (catches a
-  const-Set-literal duplicate silently collapsing the set).
-- **Chosen an overlay set, NOT a rule pack.** The rule-pack merge
-  (`mergeRulePacksIntoEnabled`) is authoritative — it strips every pack-owned
-  code from the tier-derived enable set and re-adds only enabled packs. Since all
-  32 members are existing tier rules, a pack would silently disable them for tier
-  users who don't enable the pack. The overlay set is additive and regression-free.
+Four thematic ("quality standard") packs were added:
 
-### Not yet built — the end-user toggle
+- `ui_excellence` (32 rules) — UX polish.
+- `localization` (27) — externalize strings, locale-aware `intl` formatting, plurals/RTL.
+- `documentation` (14) — public-API dartdoc completeness.
+- `testing` (68) — deterministic, isolated, well-structured tests (excludes the
+  logging rules that also live under `lib/src/rules/testing/` and the stylistic
+  `format_test_name`).
 
-There is currently no single switch that expands the group. The two existing
-enable paths are unsuitable as-is:
-1. Rule packs give a one-switch UX (`--enable-pack`, extension checkbox) but
-   authoritative-strip the members from tiers (the regression above).
-2. Manual `diagnostics: { rule: true }` × 32 is additive but not one-switch.
+Mechanism (mirrors `collection_compat`, the existing hand-added pack):
 
-A genuine additive toggle needs new wiring: an init `--enable-group <id>` flag
-that expands `semanticGroupRuleSets[id]` into `diagnostics:` enables, plus the
-matching extension affordance. That spans `cli_args.dart`, the config writer,
-help text, the extension registry, and tests — a separate change with its own
-UX decisions. Surfaced to the user as the next decision rather than bundled here.
+- Rosters live in `lib/src/tiers.dart` (THEMATIC RULE-PACK ROSTERS section) so
+  they stay tier-validated; registered in `lib/src/config/rule_packs.dart`
+  (`kRulePackRuleCodes` + `kRulePackPubspecMarkers`).
+- `dart run tool/generate_rule_pack_registry.dart` emits them into the extension
+  registry (`rulePackDefinitions.ts`); `packDomains.ts` files them under a new
+  **Quality standards** domain that sorts first in the dashboard.
+- Markers drive the "applicable" suggestion hint only (no dependency gate, so
+  any project can enable them): `flutter` for `ui_excellence`/`documentation`,
+  `intl`/`flutter_localizations` for `localization`, `test`/`flutter_test` for
+  `testing`.
+
+Tests: `test/integrity/saropa_lints_test.dart` (Thematic Rule Pack Validation —
+members exist in plugin, are tier-catalogued, are NOT in the stylistic track,
+`ui_excellence` size pinned); `test/config/rule_pack_registry_test.dart` (packs
+registered with rosters); `extension/src/test/rulePacks/rulePackDefinitions.test.ts`
+(registry + suggestion detection). Dart config + integrity suites and the
+extension rulePacks tests pass; `dart run tool/rule_pack_audit.dart` exits clean.
+
+Behavior change (see CHANGELOG **Changed**): these rules are now pack-owned, so
+they are opt-in — enable the pack to turn them on. Previously tier selection
+enabled them implicitly.
 
 Created: 2026-06-19
 Kind: Feature — new lint group / tier
@@ -210,3 +220,79 @@ These belong in a design-system doc, not as lint rules. Recorded to close the lo
   rules are toggled piecemeal — hence this grouping request.
 - No reproducer/AST section: this is a metadata/grouping feature, not a
   detection bug.
+
+---
+
+## Finish Report (2026-06-19)
+
+### Summary
+
+A request to bundle optional UX-polish rules under one toggle was delivered as
+four thematic ("quality standard") rule packs — `ui_excellence`, `localization`,
+`documentation`, `testing` — the first packs in the project that name a quality
+standard rather than a package family or SDK version. They are discoverable in
+the VS Code "Manage Rule Packs" dashboard under a new "Quality standards" domain
+and enableable via `rule_packs.enabled` in `analysis_options.yaml`.
+
+### Design decision
+
+An initial prototype modeled the group as a tier-overlay set (a const set plus a
+`semanticGroupRuleSets` registry) to avoid the rule-pack merge stripping members
+from tier-derived enables. That was reverted. Inspection of `rule_packs.dart`
+(`mergeRulePacksIntoEnabled` runs in authoritative mode) and verification that
+package-family and SDK packs are themselves tier members confirmed the strip is
+intentional: pack ownership makes a rule opt-in, which is the correct behavior
+for an *optional* bar. The packs reuse the existing marker mechanism, so no
+change to pack-applicability or merge logic was required.
+
+### Changes
+
+- `lib/src/tiers.dart` — THEMATIC RULE-PACK ROSTERS section: four curated const
+  sets (`uiExcellenceRules` 32, `localizationRules` 27, `documentationRules` 14,
+  `testingRules` 68). Testing roster excludes the logging rules that also live
+  under `lib/src/rules/testing/` (`debug_rules.dart`) and stylistic-track rules
+  (`format_test_name`, `prefer_fake_over_mock`, `prefer_test_data_builder`) —
+  pack-owning a stylistic rule would strip it when the stylistic track is on.
+- `lib/src/config/rule_packs.dart` — registered the four packs in
+  `kRulePackRuleCodes` and `kRulePackPubspecMarkers` (markers `flutter`, `intl`/
+  `flutter_localizations`, `test`/`flutter_test`; no dependency gate).
+- `tool/generate_rule_pack_registry.dart` — readable labels for the four packs.
+- `extension/src/rulePacks/rulePackDefinitions.ts` — regenerated (registry-only
+  packs emitted with rosters/markers).
+- `extension/src/rulePacks/packDomains.ts` — new `QUALITY_DOMAIN` ("Quality
+  standards"), sorted first; the four pack ids mapped to it.
+- Generated `lib/src/config/rule_pack_codes_generated.dart` — no content change
+  (thematic packs are registry-only); reformatted to canonical style.
+
+### Tests
+
+- `test/integrity/saropa_lints_test.dart` — replaced the prototype's "Semantic
+  Group Validation" with "Thematic Rule Pack Validation": members exist in the
+  plugin, are tier-catalogued, are NOT in the stylistic track, `ui_excellence`
+  size pinned.
+- `test/config/rule_pack_registry_test.dart` — the four packs are registered
+  with non-empty rosters and representative members.
+- `extension/src/test/rulePacks/rulePackDefinitions.test.ts` — packs registered;
+  `ui_excellence` suggested from a `flutter` dependency, `localization` from `intl`.
+
+### Verification
+
+- `dart test test/integrity/ test/config/` — 115 passing.
+- `dart analyze --fatal-infos` on changed Dart files — no issues found.
+- Extension `tsc -p tsconfig.test.json` clean; `rulePackDefinitions.test.js` —
+  9 passing (incl. 3 new).
+- `dart run tool/rule_pack_audit.dart` — exit 0 (four packs reported "registry
+  only", same as SDK packs).
+
+### Behavior change
+
+The ~141 rules now in these packs are pack-owned and therefore opt-in: they fire
+only when the pack is enabled, where tier selection previously enabled them
+implicitly. Documented under CHANGELOG "Changed".
+
+### Deferred
+
+An `accessibility` pack was considered and not built: making accessibility rules
+opt-in (off by default) conflicts with the project's EAA-compliance posture, so
+those rules stay tier-default. A future `logging` pack could collect the
+`debug_rules.dart` rules excluded from `testing`.

@@ -77,3 +77,30 @@ dependencies:
     assert.strictEqual(isPackDetected(def('riverpod'), pubspec), true);
   });
 });
+
+describe('rulePackDefinitions thematic packs', () => {
+  it('registers the quality-standard packs with rosters', () => {
+    for (const id of ['ui_excellence', 'localization', 'documentation', 'testing']) {
+      assert.ok(def(id).ruleCodes.length > 0, `${id} has no rule codes`);
+    }
+  });
+
+  it('suggests ui_excellence from a flutter dependency', () => {
+    const pubspec = `
+name: demo
+dependencies:
+  flutter:
+    sdk: flutter
+`;
+    assert.strictEqual(isPackDetected(def('ui_excellence'), pubspec), true);
+  });
+
+  it('suggests localization from an intl dependency', () => {
+    const pubspec = `
+name: demo
+dependencies:
+  intl: ^0.19.0
+`;
+    assert.strictEqual(isPackDetected(def('localization'), pubspec), true);
+  });
+});
