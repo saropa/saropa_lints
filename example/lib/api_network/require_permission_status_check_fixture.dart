@@ -117,3 +117,40 @@ void _good73() async {
     final position = await Geolocator.getCurrentPosition();
   }
 }
+
+// An in-process recorder that captures SQL/query events in memory — no OS
+// permission, no microphone. Shares the name `startRecording` with the media
+// API but resolves to an app-domain type, so the receiver-type gate excludes it.
+class QueryRecorder {
+  void startRecording() {}
+
+  List<String> getContacts() => const [];
+
+  void startScan() {}
+}
+
+// GOOD: app-domain method named like a gated feature — receiver type does not
+// resolve to any media/permission package, so no lint.
+void _goodQueryRecorder() {
+  final recorder = QueryRecorder();
+  recorder.startRecording();
+  recorder.getContacts();
+  recorder.startScan();
+}
+
+// A real audio recorder (mirrors the `record` package's `AudioRecorder`): its
+// type resolves to a recognized media source, so a missing permission check
+// still fires. The call sits in a class method because the rule scopes its
+// permission-check search to the enclosing MethodDeclaration.
+class AudioRecorder {
+  void startRecording() {}
+}
+
+class _AudioCaller {
+  void capture() {
+    final recorder = AudioRecorder();
+    // BAD: real media recorder without a preceding permission check.
+    // expect_lint: require_permission_status_check
+    recorder.startRecording();
+  }
+}
