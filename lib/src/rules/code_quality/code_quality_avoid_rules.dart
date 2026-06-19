@@ -566,12 +566,22 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a function calls itself directly (recursive call).
+/// Warns when a function calls itself directly with no detected base case.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v14.0.4 | Rule version: v6
 ///
 /// Recursive functions can lead to stack overflow if not properly guarded.
 /// Consider using iteration or ensuring proper base cases.
+///
+/// To avoid false positives on correct, idiomatic recursion (tree/JSON walks,
+/// divide-and-conquer, parser descent), the rule suppresses the diagnostic when
+/// the body has a terminating base case: a recursion-free `return`/`throw`
+/// guarded by a conditional (`if (n <= 1) return 1;`), or a ternary whose
+/// non-recursive branch terminates. Statically proving recursion is unbounded
+/// is undecidable, so this is a heuristic that favors correct code — it can
+/// miss genuinely-unbounded recursion that happens to contain an unrelated
+/// guard clause. See
+/// bugs/avoid_recursive_calls_false_positive_bounded_structural_recursion.md.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -613,9 +623,9 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_recursive_calls',
-    '[avoid_recursive_calls] Function contains a direct recursive call to itself. Without a guaranteed base case or depth limit, unbounded recursion exhausts the call stack and crashes the application with a StackOverflowError, which cannot be caught in Dart. {v5}',
+    '[avoid_recursive_calls] Function contains a direct recursive call to itself with no detected terminating base case (no guard clause that returns or throws on a non-recursive path before recursing). Unbounded recursion exhausts the call stack and crashes the application with a StackOverflowError, which cannot be caught in Dart. {v6}',
     correctionMessage:
-        'Verify a terminating base case exists for all input paths, or convert the recursion to an iterative approach using a loop or explicit stack.',
+        'Add a terminating base case (an early return or throw) for every input path that does not recurse, or convert the recursion to an iterative approach using a loop or explicit stack.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -644,6 +654,17 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
     String functionName,
     SaropaDiagnosticReporter reporter,
   ) {
+    // Suppress when the body has a terminating base case that guards the
+    // recursion. The rule's own documented "good" example (factorial with
+    // `if (n <= 1) return 1;`) and idiomatic structural recursion (tree/JSON
+    // walks, divide-and-conquer) are correct code; reporting the mere presence
+    // of a self-call is a high-volume false positive on healthy code.
+    final _BaseCaseVisitor baseCaseVisitor = _BaseCaseVisitor(functionName);
+    body.accept(baseCaseVisitor);
+    if (baseCaseVisitor.hasBaseCase) {
+      return;
+    }
+
     final _RecursiveCallVisitor visitor = _RecursiveCallVisitor(
       functionName,
       reporter,
@@ -651,6 +672,32 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
     );
     body.accept(visitor);
   }
+}
+
+/// True when [node] is an unqualified self-call to [functionName] (either a
+/// `foo()` method-style invocation with no target, or a `foo(...)` call through
+/// a bare identifier). Shared by the reporter and the base-case detector so the
+/// two views of "what counts as recursion" cannot drift apart.
+bool _isSelfCall(AstNode node, String functionName) {
+  if (node is MethodInvocation) {
+    return node.methodName.name == functionName && node.realTarget == null;
+  }
+  if (node is FunctionExpressionInvocation) {
+    final Expression function = node.function;
+    return function is SimpleIdentifier && function.name == functionName;
+  }
+  return false;
+}
+
+/// True when any descendant of [node] is a self-call to [functionName].
+///
+/// Descends fully (including into nested closures) so that a `return`/`throw`
+/// whose value itself recurses — e.g. `return value.map((e) => f(e)).toList();`
+/// — is NOT mistaken for a base case.
+bool _containsSelfCall(AstNode node, String functionName) {
+  final _SelfCallDetector detector = _SelfCallDetector(functionName);
+  node.accept(detector);
+  return detector.found;
 }
 
 class _RecursiveCallVisitor extends RecursiveAstVisitor<void> {
@@ -662,7 +709,7 @@ class _RecursiveCallVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == functionName && node.realTarget == null) {
+    if (_isSelfCall(node, functionName)) {
       reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
@@ -670,11 +717,167 @@ class _RecursiveCallVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
-    final Expression function = node.function;
-    if (function is SimpleIdentifier && function.name == functionName) {
+    if (_isSelfCall(node, functionName)) {
       reporter.atNode(node);
     }
     super.visitFunctionExpressionInvocation(node);
+  }
+}
+
+/// Detects whether a subtree contains a self-call. Descends everywhere.
+class _SelfCallDetector extends RecursiveAstVisitor<void> {
+  _SelfCallDetector(this.functionName);
+
+  final String functionName;
+  bool found = false;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (_isSelfCall(node, functionName)) {
+      found = true;
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    if (_isSelfCall(node, functionName)) {
+      found = true;
+    }
+    super.visitFunctionExpressionInvocation(node);
+  }
+}
+
+/// Detects a terminating base case in a function body: evidence that not every
+/// path recurses, so the recursion is plausibly bounded by the input.
+///
+/// Recognized shapes (all heuristics, favoring correct code):
+/// - a recursion-free `return`/`throw` guarded by a conditional construct
+///   (`if`, `switch`) — the guard-clause-then-recurse idiom;
+/// - a ternary (`cond ? a : b`) where exactly one branch recurses — the other
+///   branch is the base case.
+///
+/// Does not descend into nested closures / local functions: a guarded return
+/// inside a callback belongs to that callback, not to the function whose
+/// recursion is being judged, so counting it would wrongly silence genuinely
+/// unbounded recursion in the outer function.
+class _BaseCaseVisitor extends RecursiveAstVisitor<void> {
+  _BaseCaseVisitor(this.functionName);
+
+  final String functionName;
+
+  /// Set when a guarded terminating statement or a guarded ternary branch is
+  /// found (the explicit base-case shapes).
+  bool _hasGuardedTermination = false;
+
+  /// Whether the body contains at least one direct (non-closure) self-call, and
+  /// whether every such call sits inside a loop. Recursion driven solely by
+  /// iterating a finite collection (tree/graph walks) is bounded by that
+  /// collection — the empty-collection case is the implicit base case.
+  bool _anyDirectSelfCall = false;
+  bool _allDirectSelfCallsInLoop = true;
+
+  bool get hasBaseCase =>
+      _hasGuardedTermination ||
+      (_anyDirectSelfCall && _allDirectSelfCallsInLoop);
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Stop at nested closures/local functions — their bodies are out of scope
+    // for the enclosing function's base-case analysis.
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (_isSelfCall(node, functionName)) {
+      _recordDirectSelfCall(node);
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    if (_isSelfCall(node, functionName)) {
+      _recordDirectSelfCall(node);
+    }
+    super.visitFunctionExpressionInvocation(node);
+  }
+
+  @override
+  void visitReturnStatement(ReturnStatement node) {
+    // A conditionally-reachable return that does not itself recurse is a base
+    // case (e.g. `if (n <= 1) return 1;`, or `if (value is String) return ...`).
+    if (_isConditionallyGuarded(node) &&
+        !_containsSelfCall(node, functionName)) {
+      _hasGuardedTermination = true;
+    }
+    super.visitReturnStatement(node);
+  }
+
+  @override
+  void visitThrowExpression(ThrowExpression node) {
+    // A guarded throw terminates the recursion just as a return does
+    // (e.g. `if (depth > max) throw StateError(...);`).
+    if (_isConditionallyGuarded(node) &&
+        !_containsSelfCall(node, functionName)) {
+      _hasGuardedTermination = true;
+    }
+    super.visitThrowExpression(node);
+  }
+
+  @override
+  void visitConditionalExpression(ConditionalExpression node) {
+    // Ternary base case: one branch recurses, the other terminates
+    // (e.g. `n <= 1 ? 1 : n * factorial(n - 1)`).
+    final bool thenRecurses =
+        _containsSelfCall(node.thenExpression, functionName);
+    final bool elseRecurses =
+        _containsSelfCall(node.elseExpression, functionName);
+    if (thenRecurses != elseRecurses) {
+      _hasGuardedTermination = true;
+    }
+    super.visitConditionalExpression(node);
+  }
+
+  void _recordDirectSelfCall(AstNode node) {
+    _anyDirectSelfCall = true;
+    if (!_isInsideLoop(node)) {
+      _allDirectSelfCallsInLoop = false;
+    }
+  }
+
+  /// Walks ancestors up to (but not into) the enclosing function body, looking
+  /// for a conditional construct. A terminating statement directly in the body
+  /// with no conditional above it is the function's only exit, not a guard, so
+  /// it does not count as a base case.
+  bool _isConditionallyGuarded(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null && current is! FunctionBody) {
+      if (current is IfStatement ||
+          current is SwitchStatement ||
+          current is SwitchExpression ||
+          current is SwitchMember) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Walks ancestors up to (but not into) the enclosing function body, looking
+  /// for an iteration construct. A self-call reached only by iterating a finite
+  /// collection is bounded by that collection's length.
+  bool _isInsideLoop(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null && current is! FunctionBody) {
+      if (current is ForStatement ||
+          current is WhileStatement ||
+          current is DoStatement) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
   }
 }
 
