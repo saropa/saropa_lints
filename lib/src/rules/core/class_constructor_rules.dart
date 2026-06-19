@@ -2545,23 +2545,33 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a class field is never reassigned and could be final.
+/// Warns when a private class field is never reassigned and could be final.
 ///
-/// Since: v6.0.8 | Rule version: v1
+/// Since: v6.0.8 | Updated: v14.0.4 | Rule version: v2
+///
+/// Only **private** fields (`_`-prefixed) are flagged. A custom_lint rule
+/// resolves one compilation unit at a time, so it cannot observe a write to a
+/// public field that happens in another library — suggesting `final` there
+/// could produce a non-compiling fix. Private fields are library-scoped, so the
+/// whole unit is visible (the SDK's own `prefer_final_fields` is private-only
+/// for the same reason). Reassignment is matched by resolved element, so a write
+/// through any holder in the unit counts (`holder._count++` from a sibling
+/// class), not only `this`-qualified writes. Use `prefer_final_fields_always`
+/// to flag every non-final field regardless of reassignment.
 ///
 /// **Bad:**
 /// ```dart
-/// class User {
-///   String name;
-///   User(this.name);
+/// class _User {
+///   String _name;
+///   _User(this._name);
 /// }
 /// ```
 ///
 /// **Good:**
 /// ```dart
-/// class User {
-///   final String name;
-///   User(this.name);
+/// class _User {
+///   final String _name;
+///   _User(this._name);
 /// }
 /// ```
 class PreferFinalFieldsRule extends SaropaLintRule {
@@ -2591,34 +2601,54 @@ class PreferFinalFieldsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addClassDeclaration((ClassDeclaration node) {
-      final Set<String> mutableFieldNames = <String>{};
-      final Map<String, FieldDeclaration> mutableFieldByName =
+    // Scan the whole unit once (not per class): a private field can be written
+    // from a sibling class in the same library, so the search must cover every
+    // declaration in the unit, and unit-wide work is wasteful to repeat per
+    // class. Soundness requires that this unit see every possible write, so two
+    // guards apply before anything is reported (see the rule doc comment).
+    context.addCompilationUnit((CompilationUnit unit) {
+      // A part directive (this is a library's main file) or a part-of directive
+      // (this is a part) both mean the library spans units this rule cannot
+      // resolve, so a private field could be reassigned in an unseen part.
+      // Under-report rather than risk a non-compiling `final` suggestion.
+      for (final Directive d in unit.directives) {
+        if (d is PartDirective || d is PartOfDirective) return;
+      }
+
+      // Candidate = private, non-final/const/late/static instance field.
+      final Map<String, FieldDeclaration> candidateByName =
           <String, FieldDeclaration>{};
-
-      for (final ClassMember m in node.bodyMembers) {
-        if (m is! FieldDeclaration || m.isStatic) continue;
-        if (m.fields.isFinal || m.fields.isConst || m.fields.isLate) continue;
-        for (final VariableDeclaration v in m.fields.variables) {
-          final String name = v.name.lexeme;
-          mutableFieldNames.add(name);
-          mutableFieldByName[name] = m;
+      for (final CompilationUnitMember member in unit.declarations) {
+        if (member is! ClassDeclaration) continue;
+        for (final ClassMember m in member.bodyMembers) {
+          if (m is! FieldDeclaration || m.isStatic) continue;
+          if (m.fields.isFinal || m.fields.isConst || m.fields.isLate) continue;
+          for (final VariableDeclaration v in m.fields.variables) {
+            // Public fields are skipped: a write from another library is
+            // invisible to single-file analysis, so `final` may not compile.
+            if (v.name.lexeme.startsWith('_')) {
+              candidateByName[v.name.lexeme] = m;
+            }
+          }
         }
       }
 
-      if (mutableFieldNames.isEmpty) return;
+      if (candidateByName.isEmpty) return;
 
-      final Set<String> assigned = <String>{};
-      for (final ClassMember m in node.bodyMembers) {
-        if (m is ConstructorDeclaration) continue;
-        m.visitChildren(_AssignmentToFieldVisitor(mutableFieldNames, assigned));
-      }
+      // Collect the field name of every assignment / `++` / `--` target in the
+      // unit, regardless of the holder it is written through (`this._x`, `_x`,
+      // `holder._x`, `holder._x++`). Matching by name keeps the rule working
+      // under the parse-only scan CLI (no resolved elements) while still seeing
+      // cross-class writes the old `this`-only match missed. Two private fields
+      // in different classes that share a name conservatively suppress each
+      // other — that under-reports a "could be final", which is the safe
+      // direction; a wrong `final` suggestion would not compile.
+      final Set<String> assignedNames = <String>{};
+      unit.visitChildren(_FieldWriteNameVisitor(assignedNames));
 
-      for (final String name in mutableFieldNames) {
-        if (!assigned.contains(name)) {
-          final fieldNode = mutableFieldByName[name];
-          if (fieldNode != null) reporter.atNode(fieldNode);
-        }
+      for (final MapEntry<String, FieldDeclaration> entry
+          in candidateByName.entries) {
+        if (!assignedNames.contains(entry.key)) reporter.atNode(entry.value);
       }
     });
   }
@@ -2706,23 +2736,35 @@ class PreferFinalFieldsAlwaysRule extends SaropaLintRule {
   ];
 }
 
-class _AssignmentToFieldVisitor extends RecursiveAstVisitor<void> {
-  _AssignmentToFieldVisitor(this._fieldNames, this._assigned);
+/// Collects the field *name* written by any assignment or `++`/`--` anywhere in
+/// a unit, regardless of the holder it is written through (`this.x = 1`,
+/// `x = 1`, `holder.x = 1`, `holder.x++`). Name-based so it works without
+/// resolved elements (the scan CLI parses only); the declaring rule narrows to
+/// private fields so a same-name collision can only under-report, never produce
+/// a non-compiling `final` suggestion.
+class _FieldWriteNameVisitor extends RecursiveAstVisitor<void> {
+  _FieldWriteNameVisitor(this._assignedNames);
 
-  final Set<String> _fieldNames;
-  final Set<String> _assigned;
+  final Set<String> _assignedNames;
+
+  // Extract the written identifier from any of the target shapes a field write
+  // can take: a bare name (`x`), a member access (`this.x`, `holder.x`), or a
+  // prefixed identifier (`holder.x`, which the analyzer models distinctly from
+  // PropertyAccess). The old visitor handled only `x` and `this.x`, so a write
+  // through any other holder was invisible.
+  void _recordTarget(Expression target) {
+    if (target is SimpleIdentifier) {
+      _assignedNames.add(target.name);
+    } else if (target is PropertyAccess) {
+      _assignedNames.add(target.propertyName.name);
+    } else if (target is PrefixedIdentifier) {
+      _assignedNames.add(target.identifier.name);
+    }
+  }
 
   @override
   void visitAssignmentExpression(AssignmentExpression node) {
-    final Expression left = node.leftHandSide;
-    if (left is SimpleIdentifier && _fieldNames.contains(left.name)) {
-      _assigned.add(left.name);
-    } else if (left is PropertyAccess) {
-      if (left.target is ThisExpression) {
-        final String name = left.propertyName.name;
-        if (_fieldNames.contains(name)) _assigned.add(name);
-      }
-    }
+    _recordTarget(node.leftHandSide);
     super.visitAssignmentExpression(node);
   }
 
@@ -2730,14 +2772,7 @@ class _AssignmentToFieldVisitor extends RecursiveAstVisitor<void> {
   void visitPrefixExpression(PrefixExpression node) {
     if (node.operator.type == TokenType.PLUS_PLUS ||
         node.operator.type == TokenType.MINUS_MINUS) {
-      final Expression operand = node.operand;
-      if (operand is SimpleIdentifier && _fieldNames.contains(operand.name)) {
-        _assigned.add(operand.name);
-      } else if (operand is PropertyAccess &&
-          operand.target is ThisExpression &&
-          _fieldNames.contains(operand.propertyName.name)) {
-        _assigned.add(operand.propertyName.name);
-      }
+      _recordTarget(node.operand);
     }
     super.visitPrefixExpression(node);
   }
@@ -2746,14 +2781,7 @@ class _AssignmentToFieldVisitor extends RecursiveAstVisitor<void> {
   void visitPostfixExpression(PostfixExpression node) {
     if (node.operator.type == TokenType.PLUS_PLUS ||
         node.operator.type == TokenType.MINUS_MINUS) {
-      final Expression operand = node.operand;
-      if (operand is SimpleIdentifier && _fieldNames.contains(operand.name)) {
-        _assigned.add(operand.name);
-      } else if (operand is PropertyAccess &&
-          operand.target is ThisExpression &&
-          _fieldNames.contains(operand.propertyName.name)) {
-        _assigned.add(operand.propertyName.name);
-      }
+      _recordTarget(node.operand);
     }
     super.visitPostfixExpression(node);
   }
