@@ -21,6 +21,11 @@
 ///   }
 /// }
 /// ```
+///
+/// [ScanRunner.run] is a fast syntactic pass; rules on instance-creation
+/// expressions and type-based rules under-report there. Use the async
+/// [ScanRunner.runResolved] to scan with full resolution when those rules
+/// matter (slower, and the target must have had `pub get` run).
 library;
 
 export 'src/scan/scan_config.dart' show ScanConfig, loadScanConfig;

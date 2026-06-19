@@ -67,4 +67,72 @@ void main() {
       expect(result, isA<List<ScanDiagnostic>>());
     });
   });
+
+  group('ScanRunner.runResolved', () {
+    test('with tier returns non-null list', () async {
+      final runner = ScanRunner(
+        targetPath: projectRoot,
+        dartFiles: ['lib/scan.dart'],
+        tier: 'essential',
+        messageSink: (_) {},
+      );
+      final result = await runner.runResolved();
+      expect(result, isNotNull);
+      expect(result, isA<List<ScanDiagnostic>>());
+    });
+
+    test('with invalid tier returns null', () async {
+      final runner = ScanRunner(
+        targetPath: projectRoot,
+        dartFiles: ['lib/scan.dart'],
+        tier: 'invalid_tier_name',
+        messageSink: (_) {},
+      );
+      final result = await runner.runResolved();
+      expect(result, isNull);
+    });
+
+    // The core of bug infra_scan_cli_misses_instance_creation_rules: an
+    // implicit constructor call (`File('x')`) parses as a MethodInvocation in
+    // the syntactic pass, so addInstanceCreationExpression and type-based rules
+    // never fire under run(). runResolved() resolves the unit, so those rules
+    // fire — the resolved diagnostics must be a strict superset for a fixture
+    // that contains a resolution-only violation.
+    test('fires rules that the syntactic run() misses', () async {
+      const fixture =
+          'example/lib/platform/require_platform_check_fixture.dart';
+
+      final syntactic = ScanRunner(
+        targetPath: projectRoot,
+        dartFiles: [fixture],
+        tier: 'comprehensive',
+        // Fixture lives under example/, which directory discovery excludes;
+        // scan it explicitly without applying those exclusions.
+        applyExclusionsToFileList: false,
+        messageSink: (_) {},
+      ).run();
+
+      final resolved = await ScanRunner(
+        targetPath: projectRoot,
+        dartFiles: [fixture],
+        tier: 'comprehensive',
+        applyExclusionsToFileList: false,
+        messageSink: (_) {},
+      ).runResolved();
+
+      expect(syntactic, isNotNull);
+      expect(resolved, isNotNull);
+
+      final syntacticRules = syntactic!.map((d) => d.ruleName).toSet();
+      final resolvedRules = resolved!.map((d) => d.ruleName).toSet();
+
+      expect(
+        resolvedRules.difference(syntacticRules),
+        isNotEmpty,
+        reason:
+            'resolved scan should surface instance-creation / type-based rules '
+            'that the syntactic pass cannot see',
+      );
+    });
+  });
 }

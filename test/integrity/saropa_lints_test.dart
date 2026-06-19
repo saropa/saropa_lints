@@ -268,6 +268,76 @@ void main() {
     });
   });
 
+  group('Semantic Group Validation', () {
+    late Set<String> pluginRuleNames;
+    late Map<String, Set<String>> groupSets;
+
+    setUpAll(() {
+      pluginRuleNames = allSaropaRules
+          .map((SaropaLintRule rule) => rule.code.lowerCaseName)
+          .toSet();
+      groupSets = semanticGroupRuleSets;
+    });
+
+    // A semantic group that names a non-existent rule would silently enable
+    // nothing — catch the typo/rename here instead of in a consumer project.
+    test('all semantic group rules must exist in plugin', () {
+      final Set<String> allGroupRules = <String>{};
+      for (final rules in groupSets.values) {
+        allGroupRules.addAll(rules);
+      }
+
+      final Set<String> phantomRules = allGroupRules.difference(
+        pluginRuleNames,
+      );
+
+      expect(
+        phantomRules,
+        isEmpty,
+        reason:
+            'Rules in semantic groups do not exist in plugin:\n'
+            '${phantomRules.toList()..sort()}\n\n'
+            'Remove these phantom rules from semantic groups in '
+            'lib/src/tiers.dart',
+      );
+    });
+
+    // Groups are overlays on tiers, not a replacement: every member must also
+    // be in a tier set so enabling a group never disables a rule for tier users.
+    test('semantic group rules must be in a tier set', () {
+      final Set<String> tierRuleNames = getAllDefinedRules();
+      final Set<String> allGroupRules = <String>{};
+      for (final rules in groupSets.values) {
+        allGroupRules.addAll(rules);
+      }
+
+      final Set<String> orphaned = allGroupRules.difference(tierRuleNames);
+
+      expect(
+        orphaned,
+        isEmpty,
+        reason:
+            'Semantic group rules not in any tier set:\n'
+            '${orphaned.toList()..sort()}\n\n'
+            'Semantic groups are orthogonal to tiers. Every rule in a '
+            'group must also be in a tier set.',
+      );
+    });
+
+    test('ui_excellence group is registered and non-empty', () {
+      expect(groupSets.keys, contains('ui_excellence'));
+      expect(groupSets['ui_excellence'], same(uiExcellenceRules));
+      expect(uiExcellenceRules, isNotEmpty);
+    });
+
+    test('uiExcellenceRules has no duplicate-collapsed entries', () {
+      // A const Set literal silently drops duplicate string entries, so a
+      // copy-paste repeat would shrink the set without erroring. Pin the count
+      // to make an accidental duplicate fail loudly.
+      expect(uiExcellenceRules, hasLength(32));
+    });
+  });
+
   group('flutterStylisticRules Validation', () {
     test('flutterStylisticRules is a subset of stylisticRules', () {
       final notInStylistic = flutterStylisticRules.difference(stylisticRules);

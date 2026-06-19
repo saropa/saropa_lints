@@ -39,12 +39,21 @@ class ScanCliArgs {
     required this.dartFiles,
     required this.tier,
     required this.formatJson,
+    required this.resolve,
   });
 
   final String path;
   final List<String> dartFiles;
   final String? tier;
   final bool formatJson;
+
+  /// When true, the scan fully resolves each unit instead of the default
+  /// syntactic parse. Required for rules registered on
+  /// `addInstanceCreationExpression` and any type-based rule: without
+  /// resolution an implicit constructor call (`File('x')`) parses as a
+  /// `MethodInvocation`, not an `InstanceCreationExpression`, so those rules
+  /// silently never fire.
+  final bool resolve;
 }
 
 /// Parses [args] for the scan command.
@@ -67,6 +76,7 @@ ScanParseResult parseScanArgs(
   List<String> dartFiles = [];
   String? tier;
   bool formatJson = false;
+  bool resolve = false;
 
   var i = 0;
   while (i < args.length) {
@@ -96,6 +106,11 @@ ScanParseResult parseScanArgs(
       }
       continue;
     }
+    if (arg == '--resolve') {
+      resolve = true;
+      i++;
+      continue;
+    }
     if (arg == '--format') {
       i++;
       if (i < args.length) {
@@ -112,6 +127,7 @@ ScanParseResult parseScanArgs(
       dartFiles: dartFiles,
       tier: tier,
       formatJson: formatJson,
+      resolve: resolve,
     ),
   );
 }

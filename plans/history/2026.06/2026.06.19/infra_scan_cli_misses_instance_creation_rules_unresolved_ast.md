@@ -1,6 +1,6 @@
 # BUG: `scan` CLI silently misses every `InstanceCreationExpression` rule for implicit (no-`new`) constructor calls
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -95,3 +95,28 @@ Regardless of (a)/(b): the scan CLI is a syntactic-only fast pass. `InstanceCrea
 - saropa_lints version: 14.0.3 (current `main`)
 - Dart SDK: 3.12.1
 - Discovered via: `require_platform_check` conditional-import fix verification (see `plans/history/2026.06/2026.06.19/require_platform_check_false_positive_conditional_import_io_file.md`)
+
+---
+
+## Finish Report (2026-06-19)
+
+Shipped recommendation (a) — a real resolved scan behind an opt-in `--resolve` flag — plus recommendation (c) — documented the limitation. Did **not** ship (b) (the heuristic adapter), per the bug's own guidance.
+
+### What changed
+
+- **`scan --resolve` flag** — new opt-in path. `bin/scan.dart` now has an async `main` and dispatches `runResolved()` when `--resolve` is present; the default path stays the fast syntactic `run()`.
+  - `lib/src/scan/scan_cli_args.dart` — parse `--resolve` into `ScanCliArgs.resolve`.
+  - `lib/src/scan/scan_runner.dart` — new `Future<List<ScanDiagnostic>?> runResolved()`. Builds an `AnalysisContextCollection`, calls `getResolvedUnit` per file, and walks the resolved unit. Resolution rewrites implicit constructor calls (`File('x')`) into `InstanceCreationExpression` and supplies a real `typeProvider`/`typeSystem`, so the whole class of rules fires. The syntactic-vs-resolved prelude (rule-set + file-list resolution) was extracted into a shared `_prepare()`; the diagnostic-to-`ScanDiagnostic` conversion into `_collectDiagnostics()`.
+  - `lib/src/scan/scan_rule_context.dart` — added `MutableRuleContext` base (holds the per-file `currentUnit` + lib/test classification) and `ResolvedScanRuleContext` (mutable `typeProvider`/`typeSystem`/`libraryElement`, set per file via `setResolved`). `ScanRuleContext` now extends the base.
+- **Scan resilience** — `lib/src/scan/scan_walker.dart` gained an optional `onError` sink. A rule that throws mid-walk is reported by name and disabled for the rest of that file instead of aborting the entire scan. Wired into both scan paths via a visitor→rule map in `scan_runner.dart`. This was forced by verification: once instance-creation rules actually run under `--resolve`, `require_platform_check` surfaced a latent crash in `conditional_import_utils.dart` (see below) that previously could never fire under scan.
+- **Docs** — `bin/scan.dart` help text documents `--resolve` and the syntactic-scan limitation; `lib/scan.dart` library doc points at `runResolved`. CHANGELOG updated (Added + Fixed).
+
+### Verification
+
+- Programmatic check on the motivating fixture (`example/lib/platform/require_platform_check_fixture.dart`, comprehensive tier): `runResolved()` reports a rule (`avoid_ignoring_return_values`) that the syntactic `run()` does not — confirming resolution-only rules now fire.
+- `dart analyze --fatal-infos` clean on all touched lib/bin/test files.
+- `dart test test/scan/scan_runner_test.dart test/scan/scan_cli_args_test.dart` — all pass, including a new test asserting `runResolved()`'s diagnostics are a strict superset of `run()`'s on the fixture, and new `--resolve` arg-parsing tests.
+
+### Adjacent bug found, NOT fixed here (out of scope — separate file/feature)
+
+`lib/src/conditional_import_utils.dart:138` calls `parseString(content:, path:)` with `throwIfDiagnostics` defaulting to `true`, then checks `parseResult.errors.isNotEmpty` on the next line — which is unreachable, because the parse throws first on any importing file that has parse diagnostics (e.g. a fixture with `await_in_wrong_context`). This crashes `require_platform_check` whenever it inspects such a file. Under the IDE/`custom_lint` resolved path it would crash there too; under the new resolved scan it is now caught by the resilience layer (rule disabled for that file, reported to stderr). The one-line fix is `throwIfDiagnostics: false`. Left for a separate change since it is a different file/feature from this scan-engine bug.
