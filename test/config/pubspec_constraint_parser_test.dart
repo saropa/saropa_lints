@@ -135,7 +135,10 @@ dev_dependencies:
       final deps = parsePubspecConstraints(appPubspec).dependencies;
       final names = deps.map((d) => d.name).toList();
       expect(names, isNot(contains('flutter')));
-      expect(names, containsAll(<String>['http', 'collection', 'args', 'meta']));
+      expect(
+        names,
+        containsAll(<String>['http', 'collection', 'args', 'meta']),
+      );
     });
 
     test('collects inline constraints across dependency sections', () {

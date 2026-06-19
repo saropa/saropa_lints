@@ -57,6 +57,7 @@ import { discoverServer } from './driftAdvisor/discovery';
 import { fetchIssues } from './driftAdvisor/client';
 import { mapIssuesToLocations } from './driftAdvisor/mapper';
 import { DriftAdvisorTreeProvider } from './driftAdvisor/driftAdvisorTree';
+import { maybeRecommendDriftAdvisor } from './driftAdvisor/driftAdvisorRecommendNudge';
 import { registerSuiteCommands } from './suite/commands';
 import { maybeNudgeCrashCoveredRule } from './suite/crashCoverageNudge';
 import { exportLintsEnvelope } from './suite/exporter';
@@ -684,6 +685,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         if (driftAdvisorPollTimer) clearInterval(driftAdvisorPollTimer);
       },
     },
+    // The standalone Saropa Drift Advisor extension being enabled/disabled mid-session
+    // flips our duplicate-suppression decision. Re-evaluate the Problems publish from
+    // the cached issue set (no network re-fetch) so the second copy disappears the
+    // moment the standalone extension activates, and returns if it is disabled.
+    vscode.extensions.onDidChange(() => {
+      driftAdvisorProvider.reevaluateDiagnostics();
+    }),
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (!e.affectsConfiguration('saropaLints')) return;
       if (e.affectsConfiguration('saropaLints.uiLanguage')) {
@@ -1522,6 +1530,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         setDriftAdvisorServerConnected(true);
         void vscode.commands.executeCommand('setContext', 'saropaLints.driftAdvisor.connected', true);
         void vscode.window.setStatusBarMessage('Saropa Drift Advisor: connected', 3000);
+        // A server is connected through the Lints integration. If the standalone
+        // Drift Advisor extension (which owns the richer Problems-panel experience)
+        // is not installed, surface a once-per-workspace recommendation to install it.
+        void maybeRecommendDriftAdvisor(context, true);
       } catch {
         driftAdvisorProvider.setState(null, []);
         await onDriftAdvisorDisconnected(context.workspaceState);
