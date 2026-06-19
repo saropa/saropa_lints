@@ -1,5 +1,25 @@
 Status: Fixed
 
+## Finish Report (2026-06-18)
+
+### Defect
+
+Disabling "Lint integration" from the extension's settings sidebar left every saropa_lints diagnostic in the Problems pane. The toggle wrote the `saropaLints.enabled` workspace setting to `false` and showed a "Project files were not changed" toast, but that setting is consumed only by the extension UI. The diagnostics themselves are produced by the analyzer plugin, which the Dart analysis server loads from the top-level `plugins:` block in the project's `analysis_options.yaml`. Nothing in the disable path touched that file, so the analyzer kept running every rule.
+
+### Change
+
+`runDisable` (`extension/src/setup.ts`) now comments out the entire `plugins:` block, wrapping it in two sentinel lines so the operation is reversible. A commented top-level block is valid YAML the analyzer ignores, so the plugin unloads on the next analysis_options.yaml reload and diagnostics clear. `runEnable` calls the new exported `restorePluginsIntegration()` before invoking `write_config`; this strips the sentinels and the `# ` prefix so the live block returns with the user's enabled `rule_packs` and in-file rule overrides intact, and `write_config`'s `replacePluginsSection` then edits that real block in place instead of appending a duplicate below a dead one. Blank lines inside the block are left untouched so the round-trip is byte-exact (verified for both LF and CRLF). A new localized toast, `notify.setup.disabledAnalyzer`, replaces the misleading "files were not changed" message on the success path and states that diagnostics clear shortly and how to restore; the old `notify.setup.disabled` string remains for the no-op path (no plugins block, or integration never set up).
+
+### Tests
+
+`extension/src/test/disablePluginsIntegration.test.ts` (6 cases): block is commented (no live `plugins:` header survives), byte-for-byte restore preserving rule_packs and overrides, idempotent double-disable (`already-off`), `no-config` for a missing file and for a file with no plugins block, and CRLF preservation. Registered in `package.json` test glob and `tsconfig.test.json`. All pass; full `check-types` clean.
+
+### Follow-up
+
+en.json gained one key, so the translated locale catalogs are stale. Regeneration runs the machine-translation pipeline, which is gated and must be run by the maintainer: `py -3 extension\scripts\generate_translations.py`. The publish coverage gate (`--fail-on-missing`) blocks a release until this is done.
+
+---
+
 ## Root cause
 
 "Lint integration: Off" only flipped the `saropaLints.enabled` workspace setting and showed a toast (`runDisable` in `extension/src/setup.ts`). That flag is an extension-UI-only signal — the Dart analysis server never reads it. saropa_lints diagnostics come from the analyzer plugin wired through the top-level `plugins:` block in `analysis_options.yaml`, which was left untouched, so every diagnostic kept appearing.

@@ -66,11 +66,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-A new `avoid_cascade_shuffle` rule catches a subtle bug where `(collection..shuffle()).first` permanently reorders a shared list just to read one element. Turning off Lint integration now actually stops the analyzer. Previously "Lint integration: Off" only flipped an internal flag, so saropa_lints diagnostics kept appearing in the Problems pane. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+A new `avoid_cascade_shuffle` rule catches a subtle bug where `(collection..shuffle()).first` permanently reorders a shared list just to read one element. Five new pubspec rules review your version-constraint hygiene — flagging an open-ended SDK bound, dependencies pinned to `any`, and (for applications) ranges so wide the team drifts onto different versions. Turning off Lint integration now actually stops the analyzer. Previously "Lint integration: Off" only flipped an internal flag, so saropa_lints diagnostics kept appearing in the Problems pane. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Added
 
 - **New `avoid_cascade_shuffle` rule (Recommended tier).** Flags `(collection..shuffle()).first` and similar, where `..shuffle()` is cascaded onto a stored list whose result is consumed, because `shuffle()` mutates in place and corrupts the shared collection for every other reader; shuffle a copy instead — `(List.of(collection)..shuffle()).first`.
+- **Five new pubspec version-constraint rules.** `require_sdk_upper_bound` (Recommended) flags an SDK constraint with no upper bound, which lets `pub get` resolve against an untested future SDK major. `avoid_unbounded_dependency` (Recommended) flags dependencies pinned to `any`. `require_dependency_lower_bound` (Professional) flags constraints with only an upper bound. For applications only (`publish_to: none`), `prefer_caret_constraint_in_app` (Professional) suggests `^1.2.3` over the equivalent `>=1.2.3 <2.0.0`, and `avoid_overly_wide_app_constraint` (Comprehensive) flags ranges spanning two or more majors. The app-only rules stay silent for published packages, which legitimately need wide ranges.
 
 ### Fixed (Extension)
 
