@@ -461,6 +461,18 @@ def should_skip_machine_translate(text: str) -> bool:
         brandless = _BRAND_PATTERNS[term].sub("", brandless)
     if brandless != s and re.fullmatch(r"[\s·—…▶↪]*", brandless):
         return True
+    # Brand + placeholders + separators only ("Saropa Lints: {message}",
+    # "Saropa Lints {label}: {from} → {to}"): once the shielded brand AND the
+    # {tokens} are stripped, only punctuation/whitespace remains, so MT can only
+    # echo the source — yet the unchanged echo is counted as Missing forever. The
+    # pure-brand case above misses this because a placeholder survives brand
+    # stripping; the single-letter-label case below misses it because the brand
+    # leaves more than one letter once tokens are removed. Gate on "no alphanumeric
+    # remains" (any script) so a real word next to the brand still translates.
+    if brandless != s:
+        non_brand_residue = _PLACEHOLDER_FULL.sub("", brandless)
+        if not any(ch.isalnum() for ch in non_brand_residue):
+            return True
     # Single-letter label wrapping placeholders: once the {tokens} are removed
     # nothing translatable remains, and MT only renames the token ("L{line}" ->
     # "L{Linie}"). Keep the English label. Residue must be exactly one ASCII

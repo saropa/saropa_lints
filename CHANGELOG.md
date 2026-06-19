@@ -80,6 +80,12 @@ A new `avoid_cascade_shuffle` rule catches a subtle bug where `(collection..shuf
 - When a Drift Advisor server connects and the standalone Saropa Drift Advisor extension is not installed, a one-time per-workspace toast now recommends installing it for the full Problems-panel experience; it honors the existing proactive-nudge opt-out. No action required.
 - The "Drift Advisor" product name is now shielded from machine translation so it stays in English across every locale instead of being transliterated; affected catalogs correct themselves the next time locales are regenerated. No action required.
 
+<details><summary>Maintenance</summary>
+
+- The locale audit now treats strings that are entirely brand terms, `{placeholders}`, and punctuation (e.g. `Saropa Lints: {message}`) as skipped rather than missing, since machine translation can only echo them; this clears two perpetual false-positive coverage gaps.
+
+</details>
+
 ---
 
 ## [14.0.2]

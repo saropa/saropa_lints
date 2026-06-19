@@ -130,8 +130,22 @@ class TestShouldSkip(unittest.TestCase):
         # "L{line}" — MT only renames {line}->{Linie}; keep the English label.
         self.assertTrue(mt.should_skip_machine_translate("L{line}"))
 
+    def test_skips_brand_plus_placeholders_and_separators(self) -> None:
+        # Brand + {tokens} + punctuation only: nothing translatable, so MT echoes
+        # the source and the audit flags it Missing forever. Skip instead.
+        for s in ("Saropa Lints: {message}", "Saropa Lints {label}: {from} → {to}"):
+            self.assertTrue(mt.should_skip_machine_translate(s), s)
+
     def test_does_not_skip_real_phrases(self) -> None:
-        for s in ("of {total} total", "Saropa Package Dashboard", "Cannot reach {target}"):
+        # The last two carry a real word beside the brand/placeholder, so a letter
+        # survives brand+token stripping and the string must still translate.
+        for s in (
+            "of {total} total",
+            "Saropa Package Dashboard",
+            "Cannot reach {target}",
+            "Saropa Lints Dashboard",
+            "{count} Saropa packages",
+        ):
             self.assertFalse(mt.should_skip_machine_translate(s), s)
 
 
