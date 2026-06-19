@@ -13,6 +13,8 @@ import * as vscode from 'vscode';
 import * as path from 'node:path';
 import type { DriftServerInfo } from './types';
 import type { DriftIssueMapped } from './types';
+import { ADVISOR_EXTENSION_ID } from '../suite/siblingDeepLinkTargets';
+import { shouldPublishDriftProblems } from './driftProblemsGate';
 
 type DriftTreeNode =
   | { kind: 'placeholder'; message: string }
@@ -64,10 +66,34 @@ export class DriftAdvisorTreeProvider implements vscode.TreeDataProvider<DriftTr
     return this.issues.length;
   }
 
+  /**
+   * Re-publish (or suppress) Problems diagnostics from the cached issue set without
+   * re-running discovery/fetch. Called when the standalone Drift Advisor extension
+   * is enabled/disabled mid-session (via vscode.extensions.onDidChange), so the
+   * duplicate-suppression decision flips immediately rather than waiting for the
+   * next poll/refresh.
+   */
+  reevaluateDiagnostics(): void {
+    this.updateDiagnostics();
+  }
+
   private updateDiagnostics(): void {
     this.diagnosticCollection.clear();
-    const showInProblems = vscode.workspace.getConfiguration('saropaLints.driftAdvisor').get<boolean>('showInProblems', true);
-    if (!showInProblems) return;
+
+    // The standalone Saropa Drift Advisor extension (saropa.drift-viewer) is the
+    // canonical owner of these Problems-panel diagnostics. When installed AND active
+    // it publishes the same anomalies / index suggestions, so emitting our copy
+    // produces duplicate squiggles (one per extension). Check isActive — not mere
+    // presence — so an installed-but-disabled standalone extension does not suppress
+    // us. The Lints "Drift Advisor" tree view is unaffected; it does not depend on
+    // this publish.
+    const standalone = vscode.extensions.getExtension(ADVISOR_EXTENSION_ID);
+    const showInProblems = vscode.workspace
+      .getConfiguration('saropaLints.driftAdvisor')
+      .get<boolean>('showInProblems', true);
+    if (!shouldPublishDriftProblems({ standaloneActive: standalone?.isActive ?? false, showInProblems })) {
+      return;
+    }
     const byFile = new Map<string, vscode.Diagnostic[]>();
     for (const issue of this.issues) {
       if (!issue.uri?.fsPath) continue;

@@ -1473,6 +1473,11 @@
       "message": "This project uses Drift Advisor. Install the Saropa Log Capture extension to correlate runtime SQL with these static findings.",
       "install": "Install Log Capture",
       "dismiss": "Dismiss"
+    },
+    "driftRecommend": {
+      "message": "A Drift Advisor server is connected. Install the standalone Saropa Drift Advisor extension for the full Problems-panel experience.",
+      "install": "Install Drift Advisor",
+      "dismiss": "Dismiss"
     }
   },
   "notify": {

@@ -60,6 +60,7 @@ _DO_NOT_TRANSLATE = (
     "saropa_lints",
     "dart analyze",
     "dart format",
+    "Drift Advisor",
     "Saropa Lints",
     "VS Code",
     "pub.dev",

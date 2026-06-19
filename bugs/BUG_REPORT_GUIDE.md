@@ -28,6 +28,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 - `prefer_no_commented_out_code_false_positive_prose_sentence_with_inline_call_example.md`
 - `prefer_setup_teardown_false_positive_per_test_parameterized_sut_construction.md`
 
+## Raised Reports (2026-06-18)
+
+- `infra_drift_advisor_integration_duplicate_diagnostics_with_standalone_extension.md`
+
 ---
 
 ## File Naming

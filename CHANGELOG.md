@@ -64,9 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.0.3]
 
-A new `avoid_cascade_shuffle` rule catches a subtle bug where `(collection..shuffle()).first` permanently reorders a shared list just to read one element. Five new pubspec rules review your version-constraint hygiene — flagging an open-ended SDK bound, dependencies pinned to `any`, and (for applications) ranges so wide the team drifts onto different versions. Turning off Lint integration now actually stops the analyzer. Previously "Lint integration: Off" only flipped an internal flag, so saropa_lints diagnostics kept appearing in the Problems pane. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+A new `avoid_cascade_shuffle` rule catches a subtle bug where `(collection..shuffle()).first` permanently reorders a shared list just to read one element. Five new pubspec rules review your version-constraint hygiene — flagging an open-ended SDK bound, dependencies pinned to `any`, and (for applications) ranges so wide the team drifts onto different versions. Turning off Lint integration now actually stops the analyzer. Previously "Lint integration: Off" only flipped an internal flag, so saropa_lints diagnostics kept appearing in the Problems pane. [log](https://github.com/saropa/saropa_lints/blob/v14.0.3/CHANGELOG.md)
 
 ### Added
 
@@ -76,6 +76,9 @@ A new `avoid_cascade_shuffle` rule catches a subtle bug where `(collection..shuf
 ### Fixed (Extension)
 
 - "Lint integration: Off" now comments out the `plugins:` block in analysis_options.yaml so the analyzer stops emitting saropa_lints diagnostics; toggling it back On restores the block with your rule packs and overrides intact. No action required.
+- Drift Advisor anomalies and index suggestions no longer appear twice in the Problems panel when the standalone Saropa Drift Advisor extension is also installed; the Lints integration now defers the Problems publish to that extension while it is active, and resumes if you disable it. No action required.
+- When a Drift Advisor server connects and the standalone Saropa Drift Advisor extension is not installed, a one-time per-workspace toast now recommends installing it for the full Problems-panel experience; it honors the existing proactive-nudge opt-out. No action required.
+- The "Drift Advisor" product name is now shielded from machine translation so it stays in English across every locale instead of being transliterated; affected catalogs correct themselves the next time locales are regenerated. No action required.
 
 ---
 
