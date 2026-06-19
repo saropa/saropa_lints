@@ -220,7 +220,7 @@ class _ThrowVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when throwing an object that doesn't have a toString() override.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
 ///
 /// Objects without toString() will display unhelpful messages when thrown.
 ///
@@ -258,7 +258,7 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_throw_objects_without_tostring',
-    '[avoid_throw_objects_without_tostring] Thrown objects without a useful toString() method produce cryptic error logs that hinder troubleshooting. When caught in production, these errors display unhelpful messages like "Instance of MyClass" instead of actionable details, making it nearly impossible to diagnose root causes from crash reports. {v6}',
+    '[avoid_throw_objects_without_tostring] Thrown objects without a useful toString() method produce cryptic error logs that hinder troubleshooting. When caught in production, these errors display unhelpful messages like "Instance of MyClass" instead of actionable details, making it nearly impossible to diagnose root causes from crash reports. {v7}',
     correctionMessage:
         'Throw Exception or Error subclasses, or implement toString() on custom error objects. Ensure error messages are clear and actionable for maintainers and support teams.',
     severity: DiagnosticSeverity.INFO,
@@ -277,7 +277,12 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addThrowExpression((ThrowExpression node) {
-      final Expression expression = node.expression;
+      // `Error.throwWithStackTrace(obj, stack)` always returns Never, so the
+      // throw operand's own static type is Never — useless for this rule. The
+      // value actually thrown is the FIRST argument; inspect its type instead,
+      // otherwise every such throw misfires regardless of whether `obj`'s class
+      // declares a useful toString().
+      final Expression expression = _resolveThrownExpression(node.expression);
       final DartType? type = expression.staticType;
 
       if (type == null) return;
@@ -293,18 +298,60 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
       // Allow String throws (rare but valid)
       if (type.isDartCoreString) return;
 
-      // Check if the type has a custom toString
-      if (type is InterfaceType) {
-        final bool hasToString = type.element.methods.any(
-          (MethodElement e) =>
-              e.name == 'toString' &&
-              (e as Element).enclosingElement == type.element,
-        );
-        if (hasToString) return;
-      }
+      // Allow any thrown class that declares toString() anywhere in its
+      // hierarchy other than Object (directly or inherited from a real
+      // supertype) — those produce useful error messages.
+      if (type is InterfaceType && _hasUsefulToString(type)) return;
 
       reporter.atNode(node);
     });
+  }
+
+  /// Returns the expression whose static type is the value actually thrown.
+  ///
+  /// For `Error.throwWithStackTrace(obj, stack)` the throw operand's static
+  /// type is `Never`, so the genuine thrown value is the call's first argument.
+  /// Returns [operand] unchanged for ordinary throws.
+  static Expression _resolveThrownExpression(Expression operand) {
+    if (operand is! MethodInvocation ||
+        operand.methodName.name != 'throwWithStackTrace') {
+      return operand;
+    }
+
+    // Confirm the target is dart:core's Error.throwWithStackTrace, not some
+    // unrelated method that happens to share the name.
+    final Element? invoked = operand.methodName.element;
+    final Element? owner = invoked?.enclosingElement;
+    final bool isCoreError = owner is InterfaceElement &&
+        owner.name == 'Error' &&
+        owner.library.name == 'dart.core';
+    if (!isCoreError) return operand;
+
+    // Nullable-safe: an empty argument list cannot identify a thrown value, so
+    // fall back to the original operand (which resolves to Never and is skipped
+    // by the null-type guard upstream rather than misfiring).
+    final NodeList<Expression> args = operand.argumentList.arguments;
+    return args.isEmpty ? operand : args.first;
+  }
+
+  /// True when [type] (or any non-Object supertype) declares `toString()`.
+  ///
+  /// A direct override and an inherited override from a real supertype both
+  /// yield actionable error messages; only the default `Object.toString()`
+  /// ("Instance of ...") is unhelpful.
+  static bool _hasUsefulToString(InterfaceType type) {
+    final Iterable<InterfaceType> hierarchy = <InterfaceType>[
+      type,
+      ...type.allSupertypes,
+    ];
+    for (final InterfaceType current in hierarchy) {
+      if (current.isDartCoreObject) continue;
+      final bool declaresToString = current.element.methods.any(
+        (MethodElement e) => e.name == 'toString',
+      );
+      if (declaresToString) return true;
+    }
+    return false;
   }
 }
 

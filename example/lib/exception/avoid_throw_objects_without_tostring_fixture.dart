@@ -126,3 +126,58 @@ class _good367_MyError {
 void _good367_usage() {
   throw MyError('Something went wrong');
 }
+
+// GOOD: class with a direct toString() override, thrown via
+// Error.throwWithStackTrace — the rule must inspect the first argument's type,
+// not the call's Never return. Regression guard for the false positive in
+// bugs/avoid_throw_objects_without_tostring_false_positive_class_with_tostring_override.md
+final class _good367_BatchError implements Exception {
+  _good367_BatchError(this.cause);
+  final Object cause;
+  @override
+  String toString() => 'Batch failed: $cause';
+}
+
+void _good367_throwWithStackTrace() {
+  try {
+    _good367_run();
+  } on Object catch (error, stack) {
+    // No lint: _good367_BatchError declares toString().
+    throw Error.throwWithStackTrace(_good367_BatchError(error), stack);
+  }
+}
+
+void _good367_run() {}
+
+// GOOD: same class thrown directly — confirms the plain-throw path still
+// resolves the class element and finds the override.
+void _good367_throwDirect() {
+  throw _good367_BatchError('boom');
+}
+
+// GOOD: class inheriting a useful toString() from a non-Exception/Error
+// superclass, thrown directly — covers the inherited-override case.
+class _good367_Base {
+  @override
+  String toString() => 'base detail';
+}
+
+class _good367_Derived extends _good367_Base {}
+
+void _good367_throwInherited() {
+  throw _good367_Derived();
+}
+
+// BAD: class WITHOUT any toString override, thrown via Error.throwWithStackTrace
+// — confirms the new argument-resolution path still detects real violations
+// instead of blanket-suppressing throwWithStackTrace.
+class _bad367_NoToString implements Exception {}
+
+void _bad367_throwWithStackTrace() {
+  try {
+    _good367_run();
+  } on Object catch (error, stack) {
+    // expect_lint: avoid_throw_objects_without_tostring
+    throw Error.throwWithStackTrace(_bad367_NoToString(), stack);
+  }
+}

@@ -121,3 +121,51 @@ class _GoodClass200 {
   String? name;
   _GoodClass200(this.name); // Field assigned via constructor
 }
+
+// GOOD: Named required initializing formal — `required this.x` is wrapped in a
+// DefaultFormalParameter; the field IS assigned, so no lint.
+final class _GoodNamedRequired200 {
+  const _GoodNamedRequired200({required this.beforeRows, required this.afterRows});
+
+  final List<int>? beforeRows; // assigned via named required formal
+  final List<int>? afterRows; // assigned via named required formal
+}
+
+// GOOD: Named optional initializing formal — also wrapped, also assigned.
+final class _GoodNamedOptional200 {
+  const _GoodNamedOptional200({this.value});
+
+  final String? value; // assigned via named optional formal
+}
+
+// GOOD: Optional positional initializing formal — wrapped, assigned.
+final class _GoodOptionalPositional200 {
+  const _GoodOptionalPositional200([this.value]);
+
+  final String? value; // assigned via optional positional formal
+}
+
+// GOOD: Positional required initializing formal — unwrapped today; regression guard.
+final class _GoodPositionalRequired200 {
+  const _GoodPositionalRequired200(this.value);
+
+  final String? value; // assigned via positional required formal
+}
+
+// GOOD: Super formal — `super.x` forwards an inherited nullable field; assigned.
+class _GoodSuperBase200 {
+  const _GoodSuperBase200({this.value});
+
+  final String? value;
+}
+
+final class _GoodSuperFormal200 extends _GoodSuperBase200 {
+  const _GoodSuperFormal200({super.value});
+}
+
+// BAD: Genuinely unassigned nullable field — no initializer, no formal, no body
+// assignment. The fix must NOT suppress this true positive.
+class _BadUnassigned200 {
+  // expect_lint: avoid_unassigned_fields
+  String? orphan;
+}
