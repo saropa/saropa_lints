@@ -130,6 +130,96 @@ import 'package:test_package/stub.dart' if (dart.library.io) 'package:test_packa
         }
       },
     );
+
+    // Hypothesis B from the bug report: a conditional `export` is just as much
+    // a native-only branch as a conditional `import`. The scanner must collect
+    // from ExportDirective configurations too, not only ImportDirective.
+    test(
+      'returns true when file is dart.library.io conditional EXPORT target',
+      () {
+        final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+        try {
+          _createTempProject(
+            dir.path,
+            importerContent: '''
+export 'stub.dart' if (dart.library.io) 'native_impl.dart';
+''',
+          );
+          final nativePath = p.join(dir.path, 'lib', 'native_impl.dart');
+          expect(isNativeOnlyConditionalImportTarget(nativePath), isTrue);
+        } finally {
+          dir.deleteSync(recursive: true);
+        }
+      },
+    );
+
+    // Option (c) naming heuristic: a `*_io.dart` with a sibling `*_stub.dart`
+    // is native-only by convention even when no directive we parsed wires them.
+    test('returns true for *_io.dart with a sibling *_stub.dart', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+      try {
+        final libDir = Directory(p.join(dir.path, 'lib'))
+          ..createSync(recursive: true);
+        File(p.join(dir.path, 'pubspec.yaml')).writeAsStringSync('''
+name: test_package
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+''');
+        final ioPath = p.join(libDir.path, 'server_io.dart');
+        File(ioPath).writeAsStringSync('void serve() {}');
+        File(
+          p.join(libDir.path, 'server_stub.dart'),
+        ).writeAsStringSync('void serve() {}');
+        expect(isNativeOnlyConditionalImportTarget(ioPath), isTrue);
+      } finally {
+        dir.deleteSync(recursive: true);
+      }
+    });
+
+    test('returns false for *_io.dart with no sibling *_stub.dart', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+      try {
+        final libDir = Directory(p.join(dir.path, 'lib'))
+          ..createSync(recursive: true);
+        File(p.join(dir.path, 'pubspec.yaml')).writeAsStringSync('''
+name: test_package
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+''');
+        final ioPath = p.join(libDir.path, 'server_io.dart');
+        File(ioPath).writeAsStringSync('void serve() {}');
+        expect(isNativeOnlyConditionalImportTarget(ioPath), isFalse);
+      } finally {
+        dir.deleteSync(recursive: true);
+      }
+    });
+
+    // Case 5 from the bug report: a file referenced by BOTH a conditional io
+    // branch AND an unconditional import can still load on web, so it must NOT
+    // be suppressed (the kIsWeb guard is genuinely required there).
+    test(
+      'returns false when target is also imported unconditionally',
+      () {
+        final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+        try {
+          _createTempProject(
+            dir.path,
+            importerContent: '''
+import 'stub.dart' if (dart.library.io) 'native_impl.dart';
+''',
+          );
+          // A second file pulls native_impl.dart in unconditionally — this is
+          // the path that can reach it on web.
+          File(p.join(dir.path, 'lib', 'plain_importer.dart')).writeAsStringSync('''
+import 'native_impl.dart';
+''');
+          final nativePath = p.join(dir.path, 'lib', 'native_impl.dart');
+          expect(isNativeOnlyConditionalImportTarget(nativePath), isFalse);
+        } finally {
+          dir.deleteSync(recursive: true);
+        }
+      },
+    );
   });
 }
 
