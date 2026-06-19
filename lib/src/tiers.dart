@@ -4551,3 +4551,85 @@ Set<String> getRulesDisabledByPackages(Map<String, bool> packages) {
 
   return rulesToDisable;
 }
+
+// =========================================================================
+// SEMANTIC GROUPS
+// =========================================================================
+// Curated, cross-cutting rule bundles that name a *standard* rather than a
+// severity level or a package/platform target. Like the package and platform
+// sets above, a semantic group is an OVERLAY on the tiers: every member must
+// also live in exactly one tier set, so enabling a group never removes a rule
+// from anyone and never conflicts with tier selection.
+//
+// Why an overlay set and NOT a rule pack: the rule-pack merge
+// (mergeRulePacksIntoEnabled) runs in "authoritative" mode — it strips every
+// pack-owned code from the tier-derived enable set, then re-adds only the codes
+// of explicitly-enabled packs. Routing these existing tier rules through a pack
+// would therefore silently disable them for every project that selects a tier
+// but does not also enable the pack. An overlay set avoids that regression: it
+// is additive metadata that tooling (init CLI, the VS Code extension) reads to
+// offer "enable the whole bar" without touching tier semantics.
+// =========================================================================
+
+/// The "polished UI" standard: rules that each enforce one slice of
+/// user-facing UX quality (keyboard ergonomics, visible async feedback, image
+/// layout stability, formatted numbers, predictable dialogs/lists).
+///
+/// Grouped so a project can adopt the whole bar as one auditable decision and
+/// so the standard is discoverable as a cohesive unit instead of a dozen
+/// unrelated rule names. Members are independently toggleable; an explicit
+/// `false` in `diagnostics:` still wins.
+///
+/// Every id here is also a tier member (validated in
+/// `test/integrity/saropa_lints_test.dart`); this set never introduces a rule
+/// that does not already exist.
+const Set<String> uiExcellenceRules = <String>{
+  // === Keyboard & form ergonomics ===
+  'require_keyboard_dismiss_on_scroll',
+  'require_keyboard_action_type',
+  'require_keyboard_type',
+  'avoid_keyboard_overlap',
+  'avoid_multiple_autofocus',
+  'avoid_clearing_form_on_error',
+  'avoid_form_without_unfocus',
+  'prefer_autovalidate_on_interaction',
+  // === Visible feedback for async / long-running work ===
+  'require_button_loading_state',
+  'require_submit_button_state',
+  'prefer_skeleton_over_spinner',
+  'require_search_loading_indicator',
+  'require_pagination_loading_state',
+  'require_pagination_error_recovery',
+  'require_webview_progress_indicator',
+  'require_error_widget',
+  'require_empty_results_state',
+  'require_snackbar_duration',
+  'require_snackbar_action_for_undo',
+  'avoid_snackbar_queue_buildup',
+  // === Image layout stability ===
+  'require_image_dimensions',
+  'require_placeholder_for_network',
+  'require_image_error_builder',
+  'require_avatar_fallback',
+  // === Lists & scrolling ===
+  'require_refresh_indicator_on_lists',
+  // === Dialogs & platform-native modals ===
+  'require_dialog_barrier_dismissible',
+  'require_dialog_result_handling',
+  'prefer_adaptive_dialog',
+  // === Human-readable numbers ===
+  'require_number_formatting_locale',
+  'require_currency_formatting_locale',
+  // === Interaction affordance & safe layout ===
+  'require_hover_states',
+  'require_safe_area_handling',
+};
+
+/// Registry of semantic group id → member rule codes.
+///
+/// Mirrors [packageRuleSets]: keyed by the public group id used in tooling and
+/// docs. Add future curated bundles here so the integrity tests and the
+/// extension registry pick them up automatically.
+Map<String, Set<String>> get semanticGroupRuleSets => {
+  'ui_excellence': uiExcellenceRules,
+};

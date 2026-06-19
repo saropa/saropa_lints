@@ -1004,7 +1004,7 @@ dart run saropa_lints init --target /path/to/project --tier recommended
 dart run saropa_lints scan /path/to/project
 ```
 
-**CLI options:** `--tier <name>` (essential | recommended | professional | comprehensive | pedantic) overrides the project config for that run. `--files <path>...` scans only the listed Dart files; `--files-from-stdin` reads one path per line from stdin. `--format json` writes machine-readable JSON to stdout (no report file). Results are otherwise written to `reports/<date>/<timestamp>_scan_report.log` with a compact summary printed to terminal.
+**CLI options:** `--tier <name>` (essential | recommended | professional | comprehensive | pedantic) overrides the project config for that run. `--files <path>...` scans only the listed Dart files; `--files-from-stdin` reads one path per line from stdin. `--format json` writes machine-readable JSON to stdout (no report file). `--resolve` fully resolves each file (type/element resolution) instead of the default fast syntactic parse — required for rules that fire on constructor calls like `File('x')` and for type-based rules, which the syntactic pass cannot see; it is slower and the target project must have had `pub get` run. Results are otherwise written to `reports/<date>/<timestamp>_scan_report.log` with a compact summary printed to terminal.
 
 **Programmatic scan:** Import `package:saropa_lints/scan.dart` to run scans from code (e.g. from another package or script) without invoking the CLI. The public API includes `ScanRunner`, `ScanConfig`, `ScanDiagnostic`, `loadScanConfig`, `scanDiagnosticsToJson`, and `scanDiagnosticsToJsonString`. Example:
 
@@ -1023,6 +1023,8 @@ if (diagnostics != null) {
   // ...
 }
 ```
+
+`runner.run()` is the fast syntactic pass. For rules on constructor calls or that need resolved types, use the async `await runner.runResolved()` instead (slower; the target must have had `pub get` run).
 
 JSON output (from `--format json` or `scanDiagnosticsToJson`) includes `version`, `diagnostics` (each with filePath, line, column, ruleName, severity, problemMessage, correctionMessage?), and `summary` (totalCount, byFile, byRule).
 

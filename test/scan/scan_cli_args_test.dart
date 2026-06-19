@@ -33,6 +33,37 @@ void main() {
       expect((result).args.dartFiles, isEmpty);
       expect((result).args.tier, isNull);
       expect((result).args.formatJson, isFalse);
+      expect((result).args.resolve, isFalse);
+    });
+
+    test('--resolve sets resolve flag', () {
+      final result = parseScanArgs(<String>['.', '--resolve']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.resolve, isTrue);
+    });
+
+    test('--resolve combines with --tier without consuming its value', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--resolve',
+        '--tier',
+        'comprehensive',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.resolve, isTrue);
+      expect((result).args.tier, 'comprehensive');
+    });
+
+    test('--resolve is not treated as a --files path', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--files',
+        'lib/a.dart',
+        '--resolve',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.dartFiles, ['lib/a.dart']);
+      expect((result).args.resolve, isTrue);
     });
 
     test('first positional is path', () {

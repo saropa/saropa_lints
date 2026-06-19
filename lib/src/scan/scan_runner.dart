@@ -13,6 +13,8 @@ library;
 import 'dart:io' as io;
 
 import 'package:analyzer/analysis_rule/rule_context.dart';
+import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
+import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart' show AstVisitor, CompilationUnit;
 import 'package:analyzer/error/listener.dart';
@@ -23,7 +25,6 @@ import 'package:path/path.dart' as p;
 import '../config/runtime_tier_cap.dart';
 import '../init/cli_args.dart' show tierOrder;
 import '../../saropa_lints.dart';
-import '../analyzer_compat.dart';
 import 'capturing_registry.dart';
 import 'scan_config.dart';
 import 'scan_diagnostic.dart';
@@ -84,11 +85,56 @@ class ScanRunner {
     }
   }
 
-  /// Runs the scan and returns all diagnostics found.
+  /// Runs the default syntactic scan and returns all diagnostics found.
   ///
   /// Returns `null` if no configuration was found and no [tier] was set (caller should tell
   /// the user to run `init` first), or if [tier] was set to an unknown value.
+  ///
+  /// This is a purely syntactic pass (`parseString`, no resolution): it is
+  /// fast, but rules registered on `addInstanceCreationExpression` and any
+  /// type-based rule under-report — see [runResolved] for the resolved path.
   List<ScanDiagnostic>? run() {
+    final plan = _prepare();
+    if (plan == null) return null;
+    if (plan.files.isEmpty) return const [];
+
+    final registrations = _registerRules(
+      plan.rules,
+      () => ScanRuleContext(definingUnit: _dummyContextUnit()),
+    );
+    return _scanFiles(plan.files, registrations);
+  }
+
+  /// Runs the scan with full type/element resolution and returns all
+  /// diagnostics found. Returns `null` under the same no-config / unknown-tier
+  /// conditions as [run].
+  ///
+  /// Resolution rewrites implicit constructor calls (`File('x')`) into
+  /// `InstanceCreationExpression` nodes and supplies a real `typeProvider`/
+  /// `typeSystem`, so rules that [run] silently misses fire here. The cost: it
+  /// builds an [AnalysisContextCollection] and resolves each unit, which is
+  /// materially slower and requires the target project to have had `pub get`
+  /// run (otherwise units fail to resolve and are skipped with a message).
+  Future<List<ScanDiagnostic>?> runResolved() async {
+    final plan = _prepare();
+    if (plan == null) return null;
+    if (plan.files.isEmpty) return const [];
+
+    final registrations = _registerRules(
+      plan.rules,
+      () => ResolvedScanRuleContext(definingUnit: _dummyContextUnit()),
+    );
+    return _scanFilesResolved(plan.files, registrations);
+  }
+
+  /// Shared setup for both scan paths: resolves the enabled rule set and the
+  /// file list, printing the same progress messages [run] historically did.
+  ///
+  /// Returns `null` only for the exit-2 conditions (no config and no tier, or
+  /// an unknown tier). Otherwise returns the rules and files; an empty `files`
+  /// list means "nothing to scan" (all rules disabled, or no Dart files found)
+  /// and the caller returns no diagnostics.
+  ({List<SaropaLintRule> rules, List<String> files})? _prepare() {
     reloadRuntimeTierCapFromProject(p.absolute(targetPath));
     final resolved = _resolveRuleNames();
     if (resolved == null) return null;
@@ -96,7 +142,7 @@ class ScanRunner {
     final ruleNames = RuntimeTierCap.filterRuleSet(resolved);
     if (ruleNames.isEmpty) {
       _out('All rules are disabled in the configuration.');
-      return const [];
+      return (rules: const [], files: const []);
     }
 
     SaropaLintRule.enabledRules = ruleNames;
@@ -113,13 +159,14 @@ class ScanRunner {
     final filesToScan = _resolveDartFiles();
     if (filesToScan.isEmpty) {
       _out('No .dart files found in: $targetPath');
-      return const [];
+      return (rules: rules, files: const []);
     }
     _out('Scanning ${filesToScan.length} files...\n');
-
-    final registrations = _registerRules(rules);
-    return _scanFiles(filesToScan, registrations);
+    return (rules: rules, files: filesToScan);
   }
+
+  RuleContextUnit _dummyContextUnit() =>
+      _createContextUnit('', p.absolute(targetPath));
 
   /// Resolves enabled rule names: from [tier] if set (validated via [tierOrder]), otherwise from project config.
   Set<String>? _resolveRuleNames() {
@@ -181,13 +228,19 @@ class ScanRunner {
     return list;
   }
 
-  List<_RuleRegistration> _registerRules(List<SaropaLintRule> rules) {
+  /// Registers each rule's node visitors against a fresh context produced by
+  /// [contextFactory]. The factory varies by scan path ([ScanRuleContext] for
+  /// the syntactic pass, [ResolvedScanRuleContext] for `--resolve`); the rest
+  /// of the registration loop is identical.
+  List<_RuleRegistration> _registerRules(
+    List<SaropaLintRule> rules,
+    MutableRuleContext Function() contextFactory,
+  ) {
     final result = <_RuleRegistration>[];
-    final dummyUnit = _createContextUnit('', p.absolute(targetPath));
 
     for (final rule in rules) {
       final registry = CapturingRuleVisitorRegistry();
-      final context = ScanRuleContext(definingUnit: dummyUnit);
+      final context = contextFactory();
 
       try {
         rule.registerNodeProcessors(registry, context);
@@ -211,10 +264,11 @@ class ScanRunner {
   ) {
     final diagnostics = <ScanDiagnostic>[];
     final sw = Stopwatch()..start();
+    final visitorRule = _visitorRuleMap(registrations);
 
     for (var i = 0; i < files.length; i++) {
       _showProgress(i, files.length, diagnostics.length, files[i], sw);
-      _scanSingleFile(files[i], registrations, diagnostics);
+      _scanSingleFile(files[i], registrations, visitorRule, diagnostics);
     }
 
     // Clear progress line when using stderr
@@ -227,6 +281,7 @@ class ScanRunner {
   void _scanSingleFile(
     String filePath,
     List<_RuleRegistration> registrations,
+    Map<AstVisitor<void>, String> visitorRule,
     List<ScanDiagnostic> diagnostics,
   ) {
     final content = io.File(filePath).readAsStringSync();
@@ -249,9 +304,143 @@ class ScanRunner {
     }
 
     if (allVisitors.isNotEmpty) {
-      unit.accept(ScanWalker(allVisitors));
+      unit.accept(
+        ScanWalker(allVisitors, onError: _onVisitorError(visitorRule, filePath)),
+      );
     }
 
+    _collectDiagnostics(listener, unit, filePath, diagnostics);
+  }
+
+  /// Maps each registered visitor back to its rule name so a visitor that
+  /// throws mid-walk can be reported by name.
+  Map<AstVisitor<void>, String> _visitorRuleMap(
+    List<_RuleRegistration> registrations,
+  ) {
+    final map = <AstVisitor<void>, String>{};
+    for (final reg in registrations) {
+      final name = reg.rule.code.lowerCaseName;
+      for (final v in reg.visitors) {
+        map[v] = name;
+      }
+    }
+    return map;
+  }
+
+  /// Builds the per-file error sink passed to [ScanWalker]. A rule that throws
+  /// is reported (rule name + file) and disabled for the rest of that file's
+  /// walk, so one buggy rule never aborts the whole scan.
+  ScanVisitorError _onVisitorError(
+    Map<AstVisitor<void>, String> visitorRule,
+    String filePath,
+  ) {
+    return (visitor, error, stackTrace) {
+      final rule = visitorRule[visitor] ?? 'unknown_rule';
+      _err('  Rule "$rule" failed on ${p.basename(filePath)}: $error');
+    };
+  }
+
+  /// Resolves and scans [files] one at a time, returning all diagnostics.
+  ///
+  /// A single [AnalysisContextCollection] spans every file so the analyzer's
+  /// per-context caches are reused across the run. Paths are absolutized
+  /// because the analyzer requires absolute, normalized paths.
+  Future<List<ScanDiagnostic>> _scanFilesResolved(
+    List<String> files,
+    List<_RuleRegistration> registrations,
+  ) async {
+    final diagnostics = <ScanDiagnostic>[];
+    final sw = Stopwatch()..start();
+    final visitorRule = _visitorRuleMap(registrations);
+
+    final absFiles = files.map(p.absolute).map(p.normalize).toList();
+    final collection = AnalysisContextCollection(
+      includedPaths: absFiles,
+      resourceProvider: PhysicalResourceProvider.INSTANCE,
+    );
+
+    for (var i = 0; i < absFiles.length; i++) {
+      _showProgress(i, absFiles.length, diagnostics.length, absFiles[i], sw);
+      await _scanSingleFileResolved(
+        collection,
+        absFiles[i],
+        registrations,
+        visitorRule,
+        diagnostics,
+      );
+    }
+
+    // Clear progress line when using stderr
+    if (messageSink == null) {
+      io.stderr.write('\r${' ' * 79}\r');
+    }
+    return diagnostics;
+  }
+
+  Future<void> _scanSingleFileResolved(
+    AnalysisContextCollection collection,
+    String filePath,
+    List<_RuleRegistration> registrations,
+    Map<AstVisitor<void>, String> visitorRule,
+    List<ScanDiagnostic> diagnostics,
+  ) async {
+    final session = collection.contextFor(filePath).currentSession;
+    final result = await session.getResolvedUnit(filePath);
+    // A file outside the resolved package, or one whose project lacks
+    // `pub get`, resolves to an error result with no usable unit. Skip it with
+    // a message rather than crashing or silently dropping it.
+    if (result is! ResolvedUnitResult) {
+      _err('  Skipping (could not resolve): $filePath');
+      return;
+    }
+
+    final unit = result.unit;
+    final listener = RecordingDiagnosticListener();
+    final reporter = DiagnosticReporter(
+      listener,
+      StringSource(result.content, filePath),
+    );
+    final ctxUnit = RuleContextUnit(
+      file: PhysicalResourceProvider.INSTANCE.getFile(filePath),
+      content: result.content,
+      diagnosticReporter: reporter,
+      unit: unit,
+    );
+
+    final allVisitors = <AstVisitor<void>>[];
+    for (final reg in registrations) {
+      // The factory in runResolved only ever produces ResolvedScanRuleContext,
+      // so this cast is safe; updating its resolution results per file is what
+      // makes type-based rules see the current file rather than the first one.
+      final context = reg.context as ResolvedScanRuleContext;
+      context.currentUnit = ctxUnit;
+      context.setResolved(
+        typeProvider: result.typeProvider,
+        typeSystem: result.typeSystem,
+        library: result.libraryElement,
+      );
+      reg.rule.reporter = reporter;
+      allVisitors.addAll(reg.visitors);
+    }
+
+    if (allVisitors.isNotEmpty) {
+      unit.accept(
+        ScanWalker(allVisitors, onError: _onVisitorError(visitorRule, filePath)),
+      );
+    }
+
+    _collectDiagnostics(listener, unit, filePath, diagnostics);
+  }
+
+  /// Converts recorded analyzer diagnostics into [ScanDiagnostic]s, resolving
+  /// each offset to a line/column via the unit's line info. Shared by the
+  /// syntactic and resolved scan paths.
+  void _collectDiagnostics(
+    RecordingDiagnosticListener listener,
+    CompilationUnit unit,
+    String filePath,
+    List<ScanDiagnostic> diagnostics,
+  ) {
     for (final d in listener.diagnostics) {
       final loc = unit.lineInfo.getLocation(d.offset);
       diagnostics.add(
@@ -342,5 +531,9 @@ class _RuleRegistration {
   const _RuleRegistration(this.rule, this.visitors, this.context);
   final SaropaLintRule rule;
   final List<AstVisitor<void>> visitors;
-  final ScanRuleContext context;
+
+  /// The shared context for this rule. [ScanRuleContext] for the syntactic
+  /// scan, [ResolvedScanRuleContext] for `--resolve`; both are
+  /// [MutableRuleContext] so the runner can update [currentUnit] per file.
+  final MutableRuleContext context;
 }

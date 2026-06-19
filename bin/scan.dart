@@ -32,7 +32,7 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 ///   0 - No issues found
 ///   1 - Issues found
 ///   2 - No configuration found / invalid tier
-void main(List<String> args) {
+Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
     _printUsage();
 
@@ -63,7 +63,12 @@ void main(List<String> args) {
     dartFiles: dartFiles.isEmpty ? null : dartFiles,
     tier: tier,
   );
-  final diagnostics = runner.run();
+  // --resolve runs the slower, fully-resolved scan so that
+  // InstanceCreationExpression and type-based rules actually fire; the default
+  // path stays the fast syntactic parse.
+  final diagnostics = parsed.resolve
+      ? await runner.runResolved()
+      : runner.run();
 
   if (diagnostics == null) {
     exit(2);
@@ -235,8 +240,35 @@ void _printUsage() {
   );
   print('  --files-from-stdin  Read one file path per line from stdin.');
   print(
+    '  --resolve           Fully resolve each file (type/element resolution)',
+  );
+  print(
+    '                      instead of the default fast syntactic parse. Slower,',
+  );
+  print(
+    '                      and the target project must have had `pub get` run.',
+  );
+  print(
     '  --format json       Output machine-readable JSON to stdout (no report file).',
   );
+  print('');
+  print('Resolution note:');
+  print(
+    '  The default scan is syntactic only. Rules registered on instance-creation',
+  );
+  print(
+    '  expressions, and any type-based rule, under-report without --resolve: an',
+  );
+  print(
+    "  implicit constructor call like File('x') parses as a method invocation,",
+  );
+  print(
+    '  not a constructor, until the unit is resolved. Use --resolve to verify',
+  );
+  print(
+    '  those rules, or check them via the IDE / custom_lint plugin (always',
+  );
+  print('  resolved). The default fast path still covers all other rules.');
   print('');
   print('The target must have an analysis_options.yaml with saropa_lints');
   print('rules configured (or use --tier). If not, run init first:');
@@ -251,6 +283,9 @@ void _printUsage() {
   print('  dart run saropa_lints scan .                # 2. Run scan');
   print('  dart run saropa_lints scan . --tier essential');
   print('  dart run saropa_lints scan . --files lib/a.dart lib/b.dart');
+  print(
+    '  dart run saropa_lints scan . --resolve     # resolved: type-based rules',
+  );
   print(
     '  echo "lib/foo.dart" | dart run saropa_lints scan . --files-from-stdin',
   );
