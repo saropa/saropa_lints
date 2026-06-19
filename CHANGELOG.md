@@ -64,6 +64,18 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+Internal developer tooling only — no end-user-facing changes in this section yet.
+
+<details><summary>Maintenance</summary>
+
+- **The `reports/organize_reports.py` helper now runs standalone instead of requiring the contacts repo cloned alongside.** The shared move/prune organizer was imported only from `../contacts/scripts/.shared/`, so the script aborted on any checkout without the sibling repo. A vendored copy now lives at `scripts/.shared/reports_organizer.py` and the launcher loads it first, falling back to the contacts copy only when the vendored module is absent. Dev-only.
+
+</details>
+
+---
+
 ## [14.0.3]
 
 A new `avoid_cascade_shuffle` rule catches a subtle bug where `(collection..shuffle()).first` permanently reorders a shared list just to read one element. Five new pubspec rules review your version-constraint hygiene — flagging an open-ended SDK bound, dependencies pinned to `any`, and (for applications) ranges so wide the team drifts onto different versions. Turning off Lint integration now actually stops the analyzer. Previously "Lint integration: Off" only flipped an internal flag, so saropa_lints diagnostics kept appearing in the Problems pane. [log](https://github.com/saropa/saropa_lints/blob/v14.0.3/CHANGELOG.md)
