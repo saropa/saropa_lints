@@ -89,6 +89,12 @@ class RequirePlatformCheckRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (!ProjectContext.hasWebSupport(context.filePath)) return;
 
+      // File is the io/ffi branch of a conditional import/export (the web build
+      // resolves to a separate stub via `if (dart.library.io)`), so it never
+      // loads on web and the file split itself IS the platform guard. Same
+      // suppression the sibling prefer_platform_io_conditional rule applies.
+      if (isNativeOnlyConditionalImportTarget(context.filePath)) return;
+
       final String constructorName = node.constructorName.type.name.lexeme;
 
       if (!_platformSpecificClasses.contains(constructorName)) return;

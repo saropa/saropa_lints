@@ -9,14 +9,26 @@
 /// so requiring a `kIsWeb` guard inside them is a false positive.
 ///
 /// **Usage:** [isNativeOnlyConditionalImportTarget] is used by the
-/// `prefer_platform_io_conditional` rule to skip reporting in such files.
+/// `prefer_platform_io_conditional` and `require_platform_check` rules to skip
+/// reporting in such files.
 ///
 /// **How it works:** On first use per project root we scan `lib/`, parse each
-/// Dart file, and collect the URIs from `ImportDirective.configurations` whose
-/// condition is `dart.library.io` or `dart.library.ffi`. Those URIs are
-/// resolved to absolute paths (relative and same-package `package:` URIs) and
-/// cached. No recursion; single pass per file. I/O and parse errors are logged
-/// and skipped.
+/// Dart file, and collect the URIs from the `configurations` of both `import`
+/// and `export` directives whose condition is `dart.library.io` or
+/// `dart.library.ffi` (a conditional `export '...' if (dart.library.io) ...`
+/// is just as much a native-only branch as a conditional `import`). We also
+/// treat any `*_io.dart` file that has a sibling `*_stub.dart` in the same
+/// directory as native-only — the convention itself is the guard, even when
+/// the wiring directive uses an unusual form we did not resolve.
+///
+/// To avoid over-suppression we additionally collect every file reached by an
+/// UNCONDITIONAL `import`/`export` (the directive's default URI). A file that
+/// is reachable unconditionally can load on web, so it is removed from the
+/// native-only set even if some other directive references it conditionally.
+///
+/// URIs are resolved to absolute paths (relative and same-package `package:`
+/// URIs) and cached. No recursion; single pass per file. I/O and parse errors
+/// are logged and skipped.
 ///
 /// **Performance:** One lazy scan per project (cached in [_nativeOnlyTargetsByProject]).
 /// Subsequent calls for the same project are O(1) set lookups.
@@ -62,16 +74,25 @@ bool isNativeOnlyConditionalImportTarget(String? filePath) {
 }
 
 /// Build the set of file paths that are the io/ffi branch of a conditional
-/// import by scanning lib/ and parsing import directives.
+/// import/export by scanning lib/ and parsing directives. Files reachable
+/// through an unconditional import/export are excluded because they can still
+/// load on web (so a kIsWeb guard is genuinely required there).
 Set<String> _buildNativeOnlyTargets(String projectRoot) {
-  final result = <String>{};
   final libDir = Directory(p.join(projectRoot, 'lib'));
-  if (!libDir.existsSync()) return result;
+  if (!libDir.existsSync()) return <String>{};
+
+  // Native-only candidates (io/ffi-conditional targets + sibling-stub pairs)
+  // and the set of files reachable unconditionally. We subtract the latter
+  // from the former so a file that is ALSO imported unconditionally is not
+  // suppressed (it can run on web).
+  final nativeOnly = <String>{};
+  final unconditional = <String>{};
 
   try {
     for (final entity in libDir.listSync(recursive: true)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
-      _collectNativeOnlyTargetsFromFile(entity.path, projectRoot, result);
+      _collectTargetsFromFile(entity.path, projectRoot, nativeOnly, unconditional);
+      _collectSiblingStubTarget(entity.path, nativeOnly);
     }
   } on OSError catch (e, st) {
     developer.log(
@@ -81,13 +102,21 @@ Set<String> _buildNativeOnlyTargets(String projectRoot) {
       stackTrace: st,
     );
   }
-  return result;
+
+  return nativeOnly.difference(unconditional);
 }
 
-void _collectNativeOnlyTargetsFromFile(
+/// Parse one file's `import`/`export` directives, recording io/ffi-conditional
+/// targets into [nativeOnly] and unconditional default-URI targets into
+/// [unconditional]. Both `ImportDirective` and `ExportDirective` are
+/// `NamespaceDirective`s exposing `.uri` and `.configurations`, so the same
+/// pass covers a conditional `export '...' if (dart.library.io) ...` exactly
+/// like the import form.
+void _collectTargetsFromFile(
   String importingFilePath,
   String projectRoot,
-  Set<String> out,
+  Set<String> nativeOnly,
+  Set<String> unconditional,
 ) {
   final file = File(importingFilePath);
   if (!file.existsSync()) return;
@@ -113,16 +142,30 @@ void _collectNativeOnlyTargetsFromFile(
   final packageName = ProjectContext.getPackageName(projectRoot);
 
   for (final directive in unit.directives) {
-    if (directive is! ImportDirective) continue;
-    final configs = directive.configurations;
-    if (configs.isEmpty) continue;
+    if (directive is! NamespaceDirective) continue;
 
-    for (final config in configs) {
+    // The default URI (used when no configuration matches) is reachable
+    // unconditionally — it is the stub on web for a conditional directive, or
+    // the only target for a plain directive. Record it so a file imported both
+    // conditionally and unconditionally stays out of the native-only set.
+    final defaultUri = directive.uri.stringValue;
+    if (defaultUri != null && defaultUri.isNotEmpty) {
+      final resolvedDefault = _resolveUri(
+        defaultUri,
+        importingFilePath,
+        projectRoot,
+        packageName,
+      );
+      if (resolvedDefault != null) {
+        unconditional.add(normalizePath(resolvedDefault));
+      }
+    }
+
+    for (final config in directive.configurations) {
       final conditionName = config.name.toSource();
       if (!_nativeOnlyConditionNames.contains(conditionName)) continue;
 
-      final uriLiteral = config.uri;
-      final uri = uriLiteral.stringValue;
+      final uri = config.uri.stringValue;
       if (uri == null || uri.isEmpty) continue;
 
       final resolved = _resolveUri(
@@ -132,9 +175,22 @@ void _collectNativeOnlyTargetsFromFile(
         packageName,
       );
       if (resolved != null) {
-        out.add(normalizePath(resolved));
+        nativeOnly.add(normalizePath(resolved));
       }
     }
+  }
+}
+
+/// Cheap naming-convention fallback: a `*_io.dart` file with a sibling
+/// `*_stub.dart` in the same directory is the native branch of the standard
+/// stub/io split, even when the wiring directive uses a form we did not parse.
+/// Mirrors the directory-probe style used elsewhere for platform detection.
+void _collectSiblingStubTarget(String filePath, Set<String> nativeOnly) {
+  if (!filePath.endsWith('_io.dart')) return;
+
+  final stubPath = '${filePath.prefix(filePath.length - '_io.dart'.length)}_stub.dart';
+  if (File(stubPath).existsSync()) {
+    nativeOnly.add(normalizePath(filePath));
   }
 }
 
