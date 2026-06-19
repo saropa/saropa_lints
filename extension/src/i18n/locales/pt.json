@@ -526,21 +526,21 @@
       "hacksLabel": "O HACKS é um dos mais antigos."
     },
     "drift": {
-      "sectionAria": "Drift Advisor Consultor de deriva.",
-      "headingOff": "Drift Advisor Consultor de deriva.",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "integração fora da integração.",
       "enableBlurb": "Ative a integração do Drift Advisor com as sugestões de banco de dados da superfície aqui.",
       "enable": "Ativar habilitar ativar.",
-      "headingNoServer": "Drift Advisor Consultor de deriva.",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Sem servidor, sem servidor.",
       "noServerBlurb": "Não foi encontrado nenhum servidor Drift Advisor nas portas configuradas.",
       "retry": "Tente novamente.",
-      "headingConnected": "Drift Advisor Consultor de deriva.",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "Conexão conectada conectado.",
       "noIssues": "Conectado ao {label}  ⁇  não há problemas atuais.",
       "refresh": "Refrescar e refrescar.",
       "openBrowser": "Abra no navegador do navegador.",
-      "headingIssues": "Drift Advisor Consultor de deriva.",
+      "headingIssues": "Drift Advisor",
       "disable": "Desativar o Drift Advisor."
     },
     "suppressions": {
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Não foi possível obter dados de pacote suficientes."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: é um tipo de células {message} É um termo usado para descrever a",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} erro{suffix}  ⁇ vista. visão.",
       "regressionScoreDipped": "A pontuação caiu abaixo de {threshold}  ⁇ questões de visão.",
       "actionViewViolations": "Violações de Visualização",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Maior atualização de actualização.",
       "upgradeCheckerMinorUpdate": "Atualização menor de atualização.",
       "upgradeCheckerPatchUpdate": "Atualização de patch para atualizações.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: É um número de três. {from} → {to} O que é um _____?",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: é um grupo de proteínas que se reproduzem em células Não foi possível atualizar pubspec.yaml  ⁇ saropa_lints entrada não foi encontrada.",
       "upgradeCheckerCancelled": "Saropa Lints atualização cancelada. pubspec.yaml foi atualizado para ^{version}; executar `{cmd} pub get゙i para terminar, ou reverter a mudança.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: publicação falhou. {detail}",

@@ -303,6 +303,31 @@ def cache_lookup(cache: dict[str, str], locale: str, english: str) -> tuple[str 
     return cache.get(key), _provenance.get(key)
 
 
+def cache_lookup_any(
+    cache: dict[str, str], locale: str, english: str
+) -> tuple[str | None, str | None]:
+    """Engine-agnostic lookup: return a cached value from ANY engine's keyspace.
+
+    ``cache_lookup`` keys by the locale's *currently available* primary engine —
+    NLLB when its model is loaded, else Google. That makes a coverage count
+    depend on which interpreter runs it: a string NLLB translated under the
+    py3.14 translator is stored as ``nllb:locale:hash`` and is invisible to a
+    py3.13 audit where NLLB is absent and the lookup falls back to the bare
+    ``locale:hash`` (Google) keyspace. The publish coverage gate hit exactly this
+    — counting ~33k NLLB-translated strings as missing. Coverage must answer
+    "is this string translated by ANY engine," independent of what happens to be
+    loaded, so probe both real engine keyspaces (NLLB preferred, then
+    Google/legacy). Translation runs still use ``cache_lookup`` so an
+    NLLB-capable run can re-translate stale Google output.
+    """
+    for engine in ("nllb", "google"):
+        key = _cache_key(locale, english, engine)
+        value = cache.get(key)
+        if value is not None:
+            return value, _provenance.get(key)
+    return None, None
+
+
 def _cache_key(locale: str, text: str, engine: str = "google") -> str:
     # Bump prefix when MT pipeline changes (invalidate stale cache entries).
     h = hashlib.sha256(f"v2|{locale}\n{text}".encode("utf-8")).hexdigest()

@@ -202,7 +202,7 @@
   "config.property.todosAndHacks.autoRefresh.description": "อัพเดทการดู TODOs & Hacks เมื่อไฟล์ถูกบันทึก (debounced)",
   "config.property.todosAndHacks.groupByTag.description": "กลุ่มต้นไม้โดยแท็ก (TODO, FIXME ...) จากนั้นตามไฟล์; เมื่อปิดการทํางานแล้วจัดกลุ่มตามโฟลเดอร์ แล้วจากนั้นก็ต่อไฟล์",
   "config.property.todosAndHacks.customRegex.description": "ตัวเลือก regex override สําหรับการตราค่าคอมเม้นต์ที่ตรงกัน ฐานเส้น; ใช้กลุ่มการจับ 1 สําหรับแท็กและกลุ่มทางเลือก 2 สําหรับสนิปเปต. Empty = ใช้ค่าค่อนข้างเดิม (//, #, <!-- + tags) regex ที่ไม่ถูกต้องจะกลับไปที่ค่าเบี้ยม",
-  "config.section.Drift.Advisor.title": "Drift Advisor ที่ปรึกษาด้านการลอย",
+  "config.section.Drift.Advisor.title": "Drift Advisor",
   "config.property.driftAdvisor.integration.description": "เปิดให้ใช้งานการรวมตัวเลือกกับ Saropa Drift Advisor. เมื่อเปิดตัวแล้ว การต่อเติมจะค้นพบ Drift Advisor server ที่กําลังทํางาน (พอร์ต 8642 ⁇ 8649), นําเสนอแนะและความผิดปกติของดัชนีมาแสดง และแสดงให้เห็นในภาพ Drift advisor และเป็นทางเลือกใน Problems.",
   "config.property.driftAdvisor.portRange.description": "ระยะการใช้งานพอร์ต [ นาที, สูงสุด] เพื่อสแกนสําหรับ Drift Advisor เซิร์ฟเวอร์ (รวม)",
   "config.property.driftAdvisor.pollIntervalMs.description": "ความถี่ในการสํารวจ Drift Advisor server สําหรับปัญหา (มิลลิสกอนด์) ตั้งค่า 0 เพื่อปิดการเลือกตั้งอัตโนมัติ (ปรับปรุงด้วยมือ)",

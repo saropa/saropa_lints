@@ -349,7 +349,7 @@
       "findingOne": "{count} находка",
       "findingOther": "{count} находок",
       "todoHackTitle": "Маркеры TODO и HACK найдены в рабочей зоне.",
-      "driftOnTitle": "Подключен советник по дрейфу: {label}",
+      "driftOnTitle": "Drift Advisor подключен: {label} Это - ПХО.",
       "driftOnPill": "Дрейфуя по · {count}",
       "driftOfflineTitle": "Drift Advisor включен, но сервер не найден.",
       "driftOfflinePill": "Дрейф в автономном режиме.",
@@ -526,21 +526,21 @@
       "hacksLabel": "ХАКСС - это топоры."
     },
     "drift": {
-      "sectionAria": "Drift Advisor - советник по дрейфу.",
-      "headingOff": "Drift Advisor - советник по дрейфу.",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "интеграция от интеграции.",
       "enableBlurb": "Включите интеграцию Drift Advisor с предложениями по базам данных поверхности здесь.",
       "enable": "Enable - включить.",
-      "headingNoServer": "Drift Advisor - советник по дрейфу.",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Нет сервера, нет сервера.",
       "noServerBlurb": "Сервер Drift Advisor не найден на настроенных портах.",
       "retry": "Попробуйте снова и снова.",
-      "headingConnected": "Drift Advisor - советник по дрейфу.",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "соединенные соединённые соединяемые",
       "noIssues": "Подключен к {label}  ⁇  нет текущих проблем.",
       "refresh": "Освежите и освежайте.",
       "openBrowser": "Открыть в браузере.",
-      "headingIssues": "Drift Advisor - советник по дрейфу.",
+      "headingIssues": "Drift Advisor",
       "disable": "Отключить Drift Advisor от работы."
     },
     "suppressions": {
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Не удалось получить достаточное количество данных пакета."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: это число, которое соответствует числу {message} Это - ПХО.",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} ошибка{suffix}  ⁇ вид. взгляд.",
       "regressionScoreDipped": "Результат упал ниже {threshold}  ⁇ Посмотреть вопросы.",
       "actionViewViolations": "Нарушения с точки зрения просмотра.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Основные обновления основных обновлений.",
       "upgradeCheckerMinorUpdate": "Незначительные обновления - это незначительное обновление.",
       "upgradeCheckerPatchUpdate": "Обновление патчей обновления.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: это - число, которое соответствует числу {from} → {to} В результате возникает",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: это число, которое соответствует числу _PH2_. Не удалось обновить pubspec.yaml  ⁇ saropa_lints запись не найдена.",
       "upgradeCheckerCancelled": "Saropa Lints обновление отменено. pubspec.yaml было обновлено до ^{version}; бежать `{cmd} паб получать ゙, чтобы закончить или обратить вспять изменения.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: паб получить не удалось. {detail}",

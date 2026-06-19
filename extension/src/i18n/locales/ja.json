@@ -349,7 +349,7 @@
       "findingOne": "{count} 件の検出",
       "findingOther": "{count} 件の検出",
       "todoHackTitle": "作業スペースでTodoとHACKのマーカーが見つかりました.",
-      "driftOnTitle": "漂流アドバイザーに接続されている: {label}",
+      "driftOnTitle": "Drift Advisor 接続: _PH1_ で接続されている {label} フォローしている",
       "driftOnPill": "漂流する · {count}",
       "driftOfflineTitle": "Drift Advisor が有効になっているが,サーバーが見つかりませんでした.",
       "driftOfflinePill": "漂流はオフラインでドリフトする.",
@@ -526,22 +526,22 @@
       "hacksLabel": "ハックズ (HACKS) とは"
     },
     "drift": {
-      "sectionAria": "漂流アドバイザー (Drift Advisor) という名前で",
-      "headingOff": "漂流アドバイザー (Drift Advisor) という名前で",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "統合から脱却,統合から離脱.",
-      "enableBlurb": "表面データベースの提案にドリフトアドバイザーの統合をここで有効にする.",
+      "enableBlurb": "ここからデータベースの提案を表面化するために Drift Advisor 統合を有効にします.",
       "enable": "Enable 設定を有効にします.",
-      "headingNoServer": "漂流アドバイザー (Drift Advisor) という名前で",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "サーバーなし,サーバがない.",
       "noServerBlurb": "設定されたポートで Drift Advisor のサーバーが見つかりませんでした.",
       "retry": "再試行してみる.",
-      "headingConnected": "漂流アドバイザー (Drift Advisor) という名前で",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "接続された,繋がった.",
       "noIssues": "{label}に接続  ⁇  現在の問題はありません.",
       "refresh": "爽やかにリフレッシュする.",
       "openBrowser": "ブラウザで開きます.",
-      "headingIssues": "漂流アドバイザー (Drift Advisor) という名前で",
-      "disable": "漂流アドバイザーを無効にする"
+      "headingIssues": "Drift Advisor",
+      "disable": "Drift Advisor を無効にする"
     },
     "suppressions": {
       "sectionAria": "抑圧の抑制は,",
@@ -1467,7 +1467,7 @@
       "enable": "ルール有効化 (enable rule) を適用する"
     },
     "deepLink": {
-      "showDriftIssues": "ダイビングで表示するDrift問題 (ドリフトアドバイザー)"
+      "showDriftIssues": "ライブで表示するDrift問題 (Drift Advisor)"
     },
     "nudge": {
       "message": "このプロジェクトは,Drift Advisor を使用しています. Saropa Log Capture 拡張子をインストールして,実行時の SQL とこれらの静的結果と相関させてください.",
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "十分なパッケージデータを取得できませんでした."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: ヒトの体内にある {message} フォローしている",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count}エラー{suffix}  ⁇ ビュー. ビュー",
       "regressionScoreDipped": "スコアは {threshold}  ⁇  以下に低下した. ビュー・イッシュメント.",
       "actionViewViolations": "ビュー違反を表示する",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "メジャーアップデート 更新",
       "upgradeCheckerMinorUpdate": "マイナーな更新は,マイナスのアップデートです.",
       "upgradeCheckerPatchUpdate": "パッチアップデート更新は,パッチの更新です.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: 身体の部分に {from} → {to} を用いて,その",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: ヒトの体内にある pubspec.yaml  ⁇ を更新できませんでした. saropa_lints エントリーは見つかりませんでした.",
       "upgradeCheckerCancelled": "Saropa Lints アップグレードがキャンセルされました. pubspec.yaml は ^{version} に更新されました; run `{cmd} pub get ゙ を終了させるか,変更を逆行する.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: パブの取得に失敗しました。 {detail}",

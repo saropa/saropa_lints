@@ -349,9 +349,9 @@
       "findingOne": "{count}개 결과",
       "findingOther": "{count}개 결과",
       "todoHackTitle": "작업 공간에서 TODO와 HACK 마커가 발견되었습니다.",
-      "driftOnTitle": "드립 어드바이저 연결: {label}",
+      "driftOnTitle": "Drift Advisor 연결: PH1__ 접속 {label} _PH0_는 PH0__의 제곱근을 나타냅니다",
       "driftOnPill": "· {count}에 떠돌아다니는 것",
-      "driftOfflineTitle": "드립 어드바이저가 활성화되었지만 서버는 발견되지 않았습니다.",
+      "driftOfflineTitle": "Drift Advisor가 활성화되었지만 서버는 발견되지 않았습니다.",
       "driftOfflinePill": "오프라인에서 도래하는 데 몰입하십시오.",
       "enabledRulesTitle": "현재 계층에서 허용된 규칙",
       "rulesCount": "{count}개 규칙"
@@ -526,22 +526,22 @@
       "hacksLabel": "⁇ 스 (HACKS) 는 해킹을 저지한다."
     },
     "drift": {
-      "sectionAria": "드립 어드바이저 (Drift Advisor) 의 조언자",
-      "headingOff": "드립 어드바이저 (Drift Advisor) 의 조언자",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "통합을 중단하는 통합",
       "enableBlurb": "여기서 표면 데이터베이스 제안에 대한 Drift Advisor 통합을 활성화하십시오.",
       "enable": "Enable Enable를 활성화하십시오.",
-      "headingNoServer": "드립 어드바이저 (Drift Advisor) 의 조언자",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "서버가 없는 경우도 있습니다.",
       "noServerBlurb": "구성된 포트에서 Drift Advisor 서버가 발견되지 않았습니다.",
       "retry": "다시 시도해 보도록 한다.",
-      "headingConnected": "드립 어드바이저 (Drift Advisor) 의 조언자",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "연결된 연결된 연결되어있는 연결",
       "noIssues": "{label}에 연결  ⁇  현재 문제가 없습니다.",
       "refresh": "신선하고 상쾌한 느낌을 줍니다.",
       "openBrowser": "브라우저에서 열립니다.",
-      "headingIssues": "드립 어드바이저 (Drift Advisor) 의 조언자",
-      "disable": "드리프트 어드바이저를 비활성화하십시오."
+      "headingIssues": "Drift Advisor",
+      "disable": "Drift Advisor를 비활성화하십시오."
     },
     "suppressions": {
       "sectionAria": "억압을 억제하는 것",
@@ -646,7 +646,7 @@
     "clipboardCopyFailed": "클립보드에 복사할 수 없습니다.",
     "copiedViolationsJson": "{count} 위반을 JSON로 복사했습니다.",
     "copiedOneViolationJson": "1개의 위반사항을 JSON로 복사했습니다.",
-    "driftNotConnected": "드립 어드바이저 서버가 연결되지 않았습니다.",
+    "driftNotConnected": "Drift Advisor 서버가 연결되지 않았습니다.",
     "copiedBulkFindings": "복사 {count} 선택된 발견들 (~) JSON으로.",
     "noMatchingFindingsCopy": "복사할 일치하는 결과가 없습니다.",
     "couldNotOpenFile": "파일: {path}를 열 수 없습니다.",
@@ -1467,7 +1467,7 @@
       "enable": "규칙 활성화 규칙을 활성화하십시오."
     },
     "deepLink": {
-      "showDriftIssues": "라이브로 드립 이슈를 보여준다 (드립 어드바이저)"
+      "showDriftIssues": "라이브를 보여 드리다 Drift 문제 (Drift Advisor)"
     },
     "nudge": {
       "message": "이 프로젝트는 Drift Advisor를 사용합니다. Saropa Log Capture 확장 프로그램을 설치하여 실행 SQL을 이러한 정적 결과와 상관관계를 설정합니다.",
@@ -1476,7 +1476,7 @@
     },
     "driftRecommend": {
       "message": "드립 어드바이저 서버가 연결되었습니다. 전체 문제 패널 경험을 위해 독립된 Saropa Drift Advisor 확장 프로그램을 설치하십시오.",
-      "install": "드립 어드바이저를 설치하십시오.",
+      "install": "Drift Advisor를 설치합니다.",
       "dismiss": "해고 처분"
     }
   },
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "충분한 패키지 데이터를 가져오기에는 실패했습니다."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: PH1__는 {message} _PH0_는 PH0__의 제곱근을 나타냅니다",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} 오류{suffix}  ⁇ 전망.관계.",
       "regressionScoreDipped": "점수는 {threshold}  ⁇  이하로 떨어졌다. 문제점들을 보고, 이슈를 보는 것.",
       "actionViewViolations": "뷰 위반을 참조하십시오.",
@@ -1531,7 +1531,7 @@
       "createInstructionsDone": "인공지능 에이전트들을 위한 .cursor/rules/saropa_lints_instructions.mdc를 만들었습니다.",
       "createInstructionsFailed": "Saropa Lints 명령어를 생성하는 데 실패: {message} _PH0_는 PH0__의 제곱근을 나타냅니다",
       "openFileForIssues": "Saropa Lints에서 문제를 표시하기 위해 파일을 열으십시오.",
-      "driftAdvisorNotConnected": "드립 어드바이저가 연결되지 않았습니다. 서버를 시작한 후 '신축'을 클릭하십시오.",
+      "driftAdvisorNotConnected": "Drift Advisor는 연결되지 않았습니다. 서버를 시작한 후 '신축'을 클릭하십시오.",
       "noViolationsRunAnalysis": "현재 데이터에 위반이 없습니다. 먼저 분석을 실행하십시오.",
       "telemetryReset": "Saropa Lints: 관련 규칙 텔레메트리 카운터 재설정.",
       "noWorkspaceOpen": "작업 공간 폴더가 열리지 않았습니다.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "메이저 업데이트 주요 업데이트",
       "upgradeCheckerMinorUpdate": "사소한 업데이트는 작은 업데이트입니다.",
       "upgradeCheckerPatchUpdate": "패치 업데이트를 통해 팩트를 업데이트합니다.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: PH3__ _PH3_, PH0__ {from} → {to}로 구분한다.",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: PH2__는 pubspec.yaml  ⁇ 을 업데이트할 수 없습니다. saropa_lints 항목은 발견되지 않았습니다.",
       "upgradeCheckerCancelled": "Saropa Lints 업그레이드가 취소되었습니다. pubspec.yaml는 ^{version}로 업데이트 되었습니다; 실행 `{cmd} pub get゙ to finish, 또는 변경 사항을 되돌리십시오.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: 게시 실패. {detail}",

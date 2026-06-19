@@ -1467,7 +1467,7 @@
       "enable": "تمكين قاعدة التفعيل"
     },
     "deepLink": {
-      "showDriftIssues": "Show live Drift issues (Drift Advisor)"
+      "showDriftIssues": "عرض مباشر قضايا الانجراف (Drift Advisor)"
     },
     "nudge": {
       "message": "يستخدم هذا المشروع Drift Advisor. قم بتثبيت Saropa ملحق التقاط السجلات لترتيب SQL أثناء تشغيل مع هذه النتائج الثابتة.",
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "لم يتمكن من استلام بيانات حزمة كافية."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: هيئة البيانات الحيوية {message} _ PH0__ الـ (ف) = الحالة التي يمر",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} الخطأ{suffix}  ⁇ المنظر.",
       "regressionScoreDipped": "انخفضت النتيجة إلى ما دون {threshold}  ⁇ النظر في القضايا.",
       "actionViewViolations": "مشاهدة انتهاكات الرؤية",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "تحديث كبير للتحديثات الرئيسية.",
       "upgradeCheckerMinorUpdate": "تحديثات طفيفة للتحديث",
       "upgradeCheckerPatchUpdate": "تحديثات التصحيح Patch update",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: هيئة الرقابة العامة {from} → {to} _السلالة البشرية",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: هيئة البيانات الجسدية لم يتم تحديث pubspec.yaml  ⁇ saropa_lints إدخال غير موجود.",
       "upgradeCheckerCancelled": "تم إلغاء ترقية Saropa Lints. تم تحديث pubspec.yaml إلى ^{version}; تشغيل `{cmd} pub get゙ to finish، أو عكس التغيير.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: فشل الحانة. {detail}",

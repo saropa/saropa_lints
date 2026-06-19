@@ -349,9 +349,9 @@
       "findingOne": "matokeo {count}",
       "findingOther": "matokeo {count}",
       "todoHackTitle": "Vipimo vya TODO na HACK vilivyopatikana katika eneo la kazi.",
-      "driftOnTitle": "Drift Mshauri kushikamana: {label}",
+      "driftOnTitle": "Drift Advisor imeunganishwa: {label} _ PH0__ - Msaada wa kuokoa maisha.",
       "driftOnPill": "Drift on · {count} Kuendelea na safari.",
-      "driftOfflineTitle": "Mshauri wa Drift amewezeshwa lakini hakuna seva iliyopatikana.",
+      "driftOfflineTitle": "Drift Advisor imewezeshwa lakini hakuna seva iliyopatikana.",
       "driftOfflinePill": "Drift nje ya mtandao.",
       "enabledRulesTitle": "Sheria zilizowezeshwa katika kiwango cha sasa cha ngazi.",
       "rulesCount": "sheria {count}"
@@ -526,21 +526,21 @@
       "hacksLabel": "Mbinu"
     },
     "drift": {
-      "sectionAria": "Mshauri wa Drift Advisor.",
-      "headingOff": "Mshauri wa Drift Advisor.",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "integration off kuunganisha mbali",
-      "enableBlurb": "Kuwezesha ushirikiano wa Mshauri wa Drift kwa mapendekezo ya database hapa.",
+      "enableBlurb": "Kuwezesha Drift Advisor ushirikiano wa mapendekezo ya database hapa.",
       "enable": "Enable Kuwezesha kuwezesha",
-      "headingNoServer": "Mshauri wa Drift Advisor.",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Hakuna server ya seva hakuna.",
-      "noServerBlurb": "Hakuna seva ya Mshauri wa Drift iliyopatikana kwenye bandari zilizowekwa.",
+      "noServerBlurb": "Hakuna seva ya Drift Advisor iliyopatikana kwenye bandari zilizowekwa.",
       "retry": "Jaribu tena, jaribu tena.",
-      "headingConnected": "Mshauri wa Drift Advisor.",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "connected connected imeunganishwa imeunganisha",
       "noIssues": "Imeunganishwa na {label}  ⁇  hakuna masuala ya sasa.",
       "refresh": "Kufanya kazi kwa njia ya burudani.",
       "openBrowser": "Fungua katika kivinjari cha browser.",
-      "headingIssues": "Mshauri wa Drift Advisor.",
+      "headingIssues": "Drift Advisor",
       "disable": "Disable Drift Advisor Mshauri wa Uhamaji."
     },
     "suppressions": {
@@ -646,7 +646,7 @@
     "clipboardCopyFailed": "Haikuweza kunakili kwenye clipboard.",
     "copiedViolationsJson": "Nakala {count} ukiukaji (((s) kama JSON.",
     "copiedOneViolationJson": "Nilinakili ukiukaji 1 kama JSON.",
-    "driftNotConnected": "Drift Mshauri server haijaunganishwa.",
+    "driftNotConnected": "Drift Advisor server haihusiani.",
     "copiedBulkFindings": "Nakala {count} matokeo yaliyochaguliwa (((s) kama JSON.",
     "noMatchingFindingsCopy": "Hakuna matokeo yanayolingana ya kunakili.",
     "couldNotOpenFile": "Haikuweza kufungua faili: {path}",
@@ -1467,10 +1467,10 @@
       "enable": "Kuwezesha sheria ya utawala."
     },
     "deepLink": {
-      "showDriftIssues": "Onyesha masuala ya kuishi Drift (Mshauri wa Drift)"
+      "showDriftIssues": "Onyesha masuala ya kuishi Drift (Drift Advisor)"
     },
     "nudge": {
-      "message": "Mradi huu hutumia Mshauri wa Drift. Sakinisha ugani wa Saropa Log Capture ili kulinganisha SQL ya wakati wa kukimbia na matokeo haya ya tuli.",
+      "message": "Mradi huu unatumia Drift Advisor. Sakinisha ugani wa Saropa Log Capture ili kulinganisha SQL ya wakati wa kukimbia na matokeo haya ya tuli.",
       "install": "Weka Uhifadhi wa Kumbukumbu ya Kukamata.",
       "dismiss": "Fungua kazi."
     },
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Haikuweza kupata data ya kutosha ya kifurushi."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: _PH1_: - Ni aina ya kiini cha mwili. {message} _ PH0__ - Msaada wa kuokoa maisha.",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} kosa{suffix}  ⁇ view. maoni.",
       "regressionScoreDipped": "Alama ilipungua chini ya {threshold}  ⁇ masuala ya maoni. kuona maswala.",
       "actionViewViolations": "Angalia ukiukaji wa maoni.",
@@ -1531,7 +1531,7 @@
       "createInstructionsDone": "Imeundwa .cursor/rules/saropa_lints_instructions.mdc kwa mawakala wa AI.",
       "createInstructionsFailed": "Imeshindwa kuunda maagizo ya Saropa Lints: {message} _ PH0__ - Msaada wa kuokoa maisha.",
       "openFileForIssues": "Fungua faili kuonyesha masuala yake katika Saropa Lints.",
-      "driftAdvisorNotConnected": "Mshauri wa Drift hauko kwenye mtandao. Bofya Refresh baada ya kuanza server.",
+      "driftAdvisorNotConnected": "Drift Advisor haijaunganishwa. Bofya Refresh baada ya kuanza server.",
       "noViolationsRunAnalysis": "Hakuna ukiukaji katika data ya sasa. Fanya uchambuzi kwanza.",
       "telemetryReset": "Saropa Lints: kuhusiana na sheria telemetry counters reset.",
       "noWorkspaceOpen": "Hakuna folda ya eneo la kazi iliyofunguliwa.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Kubwa update ya sasisho.",
       "upgradeCheckerMinorUpdate": "Updates ndogo ni muhimu.",
       "upgradeCheckerPatchUpdate": "Patch update ya sasa ni patch.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: _ PH3__: - Kwa nini ni muhimu? {from} → {to} _ PH1__",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: _PH2_: - PH2__::: kwa ajili ya Haikuweza kusasisha pubspec.yaml  ⁇ saropa_lints hakuna kiingilio kilichopatikana.",
       "upgradeCheckerCancelled": "Saropa Lints kuboresha kufutwa. pubspec.yaml iliboreshwa kuwa ^{version}; kukimbia `{cmd} pub kupata゙ kumaliza, au kurejesha mabadiliko.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: baa imeshindwa. {detail}",

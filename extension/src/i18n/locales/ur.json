@@ -349,9 +349,9 @@
       "findingOne": "{count} دریافت",
       "findingOther": "{count} دریافتیں",
       "todoHackTitle": "کام کی جگہ میں TODO اور HACK مارکر پائے گئے۔",
-      "driftOnTitle": "ڈرفٹ ایڈوائزر منسلک: {label}",
+      "driftOnTitle": "Drift Advisor منسلک: {label}",
       "driftOnPill": "ڈریو پر · {count}",
-      "driftOfflineTitle": "ڈرفٹ ایڈوائزر فعال ہے لیکن کوئی سرور نہیں ملا۔",
+      "driftOfflineTitle": "Drift Advisor فعال ہے لیکن کوئی سرور نہیں ملا.",
       "driftOfflinePill": "آف لائن ڈرائیو کو آف لائن کریں",
       "enabledRulesTitle": "موجودہ ٹائیر میں فعال قواعد کو چالو کیا گیا ہے۔",
       "rulesCount": "{count} اصول"
@@ -526,22 +526,22 @@
       "hacksLabel": "ہیکس ہاکس۔"
     },
     "drift": {
-      "sectionAria": "ڈریف مشیر (Drift Advisor)",
-      "headingOff": "ڈریف مشیر (Drift Advisor)",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "انضمام آف انٹیگریشن آف انٹگرپمنٹ",
-      "enableBlurb": "یہاں سطح کے ڈیٹا بیس کی تجاویز میں ڈریف ایڈوائزر انضمام کو فعال کریں۔",
+      "enableBlurb": "یہاں ڈیٹا بیس کی تجاویز کو سطح پر Drift Advisor انضمام کو فعال کریں۔",
       "enable": "Enable فعال کریں چالو کریں۔",
-      "headingNoServer": "ڈریف مشیر (Drift Advisor)",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "کوئی سرور نہیں ہے، کوئی سرور نہیں۔",
-      "noServerBlurb": "کوئی ڈرفٹ ایڈوائزر سرور تشکیل شدہ بندرگاہوں پر نہیں ملا۔",
+      "noServerBlurb": "تشکیل شدہ بندرگاہوں پر کوئی Drift Advisor سرور نہیں ملا۔",
       "retry": "ٻيهر ڪوشش",
-      "headingConnected": "ڈریف مشیر (Drift Advisor)",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "connected منسلک منسلکہ منسلکات",
       "noIssues": "{label}  ⁇  سے منسلک ہے کوئی موجودہ مسائل نہیں.",
       "refresh": "ريفريش",
       "openBrowser": "براؤزر میں کھولیں",
-      "headingIssues": "ڈریف مشیر (Drift Advisor)",
-      "disable": "ڈریفٹ ایڈوائزر کو غیر فعال کریں"
+      "headingIssues": "Drift Advisor",
+      "disable": "Drift Advisor کو غیر فعال کریں۔"
     },
     "suppressions": {
       "sectionAria": "دباؤ کو ختم کرنا۔",
@@ -646,7 +646,7 @@
     "clipboardCopyFailed": "کلپ بورڈ میں کاپی نہیں کر سکا۔",
     "copiedViolationsJson": "کاپی کیا گیا {count} خلاف ورزیوں کو JSON.as کے طور پر",
     "copiedOneViolationJson": "1 خلاف ورزی کو JSON کے طور پر کاپی کیا گیا۔",
-    "driftNotConnected": "ڈریف ایڈوائزر سرور سے منسلک نہیں ہے۔",
+    "driftNotConnected": "Drift Advisor سرور سے رابطہ نہیں ہے۔",
     "copiedBulkFindings": "کاپی کیا گیا {count} منتخب شدہ تلاش (((s) JSON کے طور پر.",
     "noMatchingFindingsCopy": "نقل کرنے کے لئے کوئی مماثل نتائج نہیں ملے۔",
     "couldNotOpenFile": "فائل نہیں کھل سکی: {path}",
@@ -1467,16 +1467,16 @@
       "enable": "قاعدہ کو فعال کریں قاعدے کو چالو کریں۔"
     },
     "deepLink": {
-      "showDriftIssues": "ڈرائیف کے مسائل (ڈریفٹ ایڈوائزر) کو براہ راست دکھائیں"
+      "showDriftIssues": "براہ راست دکھائیں ڈرفٹ کے مسائل (Drift Advisor)"
     },
     "nudge": {
-      "message": "یہ پروجیکٹ ڈریف ایڈوائزر کا استعمال کرتا ہے۔ ان جامد نتائج کے ساتھ رن ٹائم SQL کو ہم آہنگ کرنے کیلئے Saropa لاگ کیپچر توسیع انسٹال کریں۔",
+      "message": "یہ پروجیکٹ Drift Advisor استعمال کرتا ہے۔ ان جامد نتائج کے ساتھ رن ٹائم SQL کو ہم آہنگ کرنے کیلئے Saropa لاگ کیپچر توسیع انسٹال کریں۔",
       "install": "لاگ کیپچر انسٹال کریں",
       "dismiss": "برطرفی۔"
     },
     "driftRecommend": {
-      "message": "ایک ڈریف ایڈوائزر سرور منسلک ہے. مکمل مسائل پینل کے تجربے کے لئے اسٹینڈ آلا Saropa ڈرفٹ ایڈوائزر توسیع انسٹال کریں۔",
-      "install": "ڈریف ایڈوائزر انسٹال کریں",
+      "message": "ایک Drift Advisor سرور منسلک ہے. مکمل مسائل پینل کے تجربے کے لئے اسٹینڈ آلا Saropa Drift Advisor توسیع انسٹال کریں۔",
+      "install": "انسٹال کریں Drift Advisor",
       "dismiss": "برطرفی۔"
     }
   },
@@ -1531,7 +1531,7 @@
       "createInstructionsDone": "تخلیق کیا گیا .cursor/rules/saropa_lints_instructions.mdc اے آئی ایجنٹوں کے لئے۔",
       "createInstructionsFailed": "Saropa Lints ہدایات بنانے میں ناکام: {message}",
       "openFileForIssues": "Saropa Lints میں اپنے مسائل کو ظاہر کرنے کے لئے ایک فائل کھولیں.",
-      "driftAdvisorNotConnected": "ڈریف ایڈوائزر منسلک نہیں ہے۔ سرور شروع کرنے کے بعد ریفریش پر کلک کریں۔",
+      "driftAdvisorNotConnected": "Drift Advisor منسلک نہیں ہے۔ سرور شروع کرنے کے بعد ریفریش پر کلک کریں۔",
       "noViolationsRunAnalysis": "موجودہ اعداد و شمار میں کوئی خلاف ورزی نہیں ہے۔ پہلے تجزیہ چلائیں۔",
       "telemetryReset": "Saropa Lints:۔ متعلقہ قاعدے ٹیلی میٹری کاؤنٹر ری سیٹ کریں۔",
       "noWorkspaceOpen": "کوئی ورک اسپیس فولڈر کھلا نہیں ہے۔",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "اہم اپ ڈیٹ کی تازہ کاری",
       "upgradeCheckerMinorUpdate": "معمولی اپ ڈیٹ کی تازہ کاری",
       "upgradeCheckerPatchUpdate": "پیچ اپ ڈیٹ کی تازہ کاری۔",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: _PH3_ _PH0_: _ PH3__ _PH4__: {from} → {to} ___ میں موجود ہے۔",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints:۔ _PH2_: pubspec.yaml  ⁇  کو اپ ڈیٹ نہیں کیا جا سکا۔ saropa_lints اندراج نہیں ملا۔",
       "upgradeCheckerCancelled": "Saropa Lints اپ گریڈ منسوخ کر دیا گیا۔ pubspec.yaml کو ^{version} میں اپ ڈیٹ کیا گیا تھا۔ ختم کرنے کے لیے `{cmd} pub get` چلائیں، یا تبدیلی کو واپس کریں۔",
       "upgradeCheckerPubGetFailed": "Saropa Lints: پب ناکام ہو گیا۔ {detail}",

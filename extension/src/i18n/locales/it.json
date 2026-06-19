@@ -526,21 +526,21 @@
       "hacksLabel": "I MUSCHIATTI SONO DIVINATI."
     },
     "drift": {
-      "sectionAria": "Drift Advisor Consulente di deriva.",
-      "headingOff": "Drift Advisor Consulente di deriva.",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "integrazione fuori dall'integrazione.",
       "enableBlurb": "Abilitare l'integrazione di Drift Advisor ai suggerimenti del database di superficie qui.",
       "enable": "Abilitare abilitare",
-      "headingNoServer": "Drift Advisor Consulente di deriva.",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "Nessun server, nessun server.",
       "noServerBlurb": "Nessun server Drift Advisor trovato sulle porte configurate.",
       "retry": "Riprova a riprovare.",
-      "headingConnected": "Drift Advisor Consulente di deriva.",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "collegato connesso connesse",
       "noIssues": "Connesso a {label}  ⁇  nessun problema attuale.",
       "refresh": "Rinfrescare e rinfrescare.",
       "openBrowser": "Aprire nel browser.",
-      "headingIssues": "Drift Advisor Consulente di deriva.",
+      "headingIssues": "Drift Advisor",
       "disable": "Disabilitare il Drift Advisor"
     },
     "suppressions": {
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "Non è stato possibile recuperare abbastanza dati del pacchetto."
     },
     "main": {
-      "brandPrefix": "Saropa Lints: è il nome di una cellula che si sviluppa attraverso la crescita {message} È il nome di un'altra versione.",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} errore{suffix}  ⁇ vista. veduta.",
       "regressionScoreDipped": "Il punteggio è sceso sotto {threshold}  ⁇ vista i problemi. punti di vista.",
       "actionViewViolations": "View Violazioni di visualizzazione.",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "Aggiornamento principale di aggiornamenti.",
       "upgradeCheckerMinorUpdate": "Aggiornamento minore di minor importance.",
       "upgradeCheckerPatchUpdate": "Aggiornamento della patch update.",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: è il nome di una delle tre persone che hanno partecipato alla manifestazione. {from} → {to} Il primo è il",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: è il numero di PH che si trova in una cellula. Non è stato possibile aggiornare pubspec.yaml  ⁇ saropa_lints voce non trovata.",
       "upgradeCheckerCancelled": "Saropa Lints aggiornamento annullato. pubspec.yaml è stato aggiornato a ^{version}; run `{cmd} pub get゙ to finish, o invertire il cambiamento.",
       "upgradeCheckerPubGetFailed": "Saropa Lints: il pub fallisce. {detail}",

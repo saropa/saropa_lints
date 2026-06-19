@@ -349,9 +349,9 @@
       "findingOne": "{count} ফাইন্ডিং",
       "findingOther": "{count} ফাইন্ডিং",
       "todoHackTitle": "কর্মক্ষেত্রে TODO এবং HACK মার্কার পাওয়া গেছে।",
-      "driftOnTitle": "ড্রিফট অ্যাডভাইজার সংযুক্তঃ {label}",
+      "driftOnTitle": "Drift Advisor সংযুক্তঃ: PH1_সংযোগ করা হয়েছে {label} _ PH0__ -এর সাথে সম্পর্কিত",
       "driftOnPill": "ড্রিফট অন · {count}",
-      "driftOfflineTitle": "ড্রিফট অ্যাডভাইজার সক্ষম করা হয়েছে কিন্তু কোন সার্ভার পাওয়া যায়নি।",
+      "driftOfflineTitle": "Drift Advisor সক্ষম করা হয়েছে কিন্তু কোন সার্ভার পাওয়া যায়নি।",
       "driftOfflinePill": "ড্রাইভ অফলাইন ড্রিফট করুন",
       "enabledRulesTitle": "বর্তমান স্তরের সক্ষম নিয়মগুলিকে সক্রিয় করা হয়েছে",
       "rulesCount": "{count} রুল"
@@ -526,22 +526,22 @@
       "hacksLabel": "হ্যাকস হ্যাচগুলি"
     },
     "drift": {
-      "sectionAria": "ড্রিফট অ্যাডভাইজার",
-      "headingOff": "ড্রিফট অ্যাডভাইজার",
+      "sectionAria": "Drift Advisor",
+      "headingOff": "Drift Advisor",
       "metaOff": "ইন্টিগ্রেশন অফ ইন্ডিগ্রেশন বন্ধ।",
-      "enableBlurb": "এখানে ডাটাবেস প্রস্তাবনাগুলির পৃষ্ঠায় ড্রিফ্ট অ্যাডভাইজার সংহতকরণ সক্ষম করুন।",
+      "enableBlurb": "এখানে ডাটাবেস প্রস্তাবনাগুলি পৃষ্ঠায় Drift Advisor ইন্টিগ্রেশন সক্ষম করুন।",
       "enable": "Enable সক্ষম করুন সক্রিয় করুন",
-      "headingNoServer": "ড্রিফট অ্যাডভাইজার",
+      "headingNoServer": "Drift Advisor",
       "metaNoServer": "কোন সার্ভার নেই, কোনও সার্ভারের প্রয়োজন নেই।",
-      "noServerBlurb": "কনফিগার করা পোর্টগুলিতে কোনও ড্রিফ্ট অ্যাডভাইজার সার্ভার পাওয়া যায় নি।",
+      "noServerBlurb": "কনফিগার করা পোর্টগুলিতে কোনও Drift Advisor সার্ভার পাওয়া যায় নি।",
       "retry": "পুনরায় চেষ্টা করুন Retry.",
-      "headingConnected": "ড্রিফট অ্যাডভাইজার",
+      "headingConnected": "Drift Advisor",
       "metaConnected": "সংযুক্ত সংযুক্ত সংযোগযুক্ত সংযুক্তিযুক্ত",
       "noIssues": "{label} এর সাথে সংযুক্ত  ⁇  কোন বর্তমান সমস্যা নেই।",
       "refresh": "সতেজতা আনুন এবং রিফ্রেশ করুন।",
       "openBrowser": "ব্রাউজারে খুলুন",
-      "headingIssues": "ড্রিফট অ্যাডভাইজার",
-      "disable": "ড্রিফট অ্যাডভাইজার অক্ষম করুন"
+      "headingIssues": "Drift Advisor",
+      "disable": "Drift Advisor নিষ্ক্রিয় করুন"
     },
     "suppressions": {
       "sectionAria": "দমন-নিরোধের কাজ।",
@@ -646,7 +646,7 @@
     "clipboardCopyFailed": "ক্লিপবোর্ডে অনুলিপি করা যায়নি।",
     "copiedViolationsJson": "JSON. হিসাবে {count} লঙ্ঘন কপি করা হয়েছে (s) ।",
     "copiedOneViolationJson": "JSON. হিসাবে 1 টি লঙ্ঘন অনুলিপি করা হয়েছে।",
-    "driftNotConnected": "ড্রিফট অ্যাডভাইজার সার্ভার সংযুক্ত নয়।",
+    "driftNotConnected": "Drift Advisor সার্ভার সংযুক্ত নয়।",
     "copiedBulkFindings": "JSON. হিসাবে {count} নির্বাচিত সন্ধানগুলি (s) অনুলিপি করা হয়েছে।",
     "noMatchingFindingsCopy": "কপি করার জন্য কোনও মিলছে না।",
     "couldNotOpenFile": "ফাইলটি খুলতে পারেনিঃ {path}",
@@ -1467,16 +1467,16 @@
       "enable": "নিয়ম সক্ষম করুন নিয়ম সক্রিয় করুন।"
     },
     "deepLink": {
-      "showDriftIssues": "লাইভ ড্রিফট সমস্যাগুলি দেখান (ড্রিফ্ট অ্যাডভাইজার)"
+      "showDriftIssues": "লাইভ দেখান ড্রিফট সমস্যা (Drift Advisor)"
     },
     "nudge": {
-      "message": "এই প্রকল্পটি ড্রিফট অ্যাডভাইজার ব্যবহার করে। এই স্ট্যাটিক ফলাফলের সাথে রানটাইম এসকিউএল সম্পর্কিত করার জন্য Saropa লগ ক্যাপচার এক্সটেনশনটি ইনস্টল করুন।",
+      "message": "এই প্রকল্পটি Drift Advisor. ব্যবহার করে। এই স্ট্যাটিক ফলাফলের সাথে রানটাইম এসকিউএল সম্পর্কিত করার জন্য Saropa লগ ক্যাপচার এক্সটেনশনটি ইনস্টল করুন।",
       "install": "লগ ক্যাপচার ইনস্টল করুন",
       "dismiss": "বরখাস্ত করা হয়।"
     },
     "driftRecommend": {
-      "message": "একটি ড্রিফট অ্যাডভাইজার সার্ভার সংযুক্ত রয়েছে। সম্পূর্ণ সমস্যা-প্যানেল অভিজ্ঞতা জন্য স্ট্যান্ডআলোন Saropa ড্রিফট অ্যাডভাইজার এক্সটেনশন ইনস্টল করুন।",
-      "install": "ড্রিফট অ্যাডভাইজার ইনস্টল করুন",
+      "message": "একটি Drift Advisor সার্ভার সংযুক্ত আছে। সম্পূর্ণ সমস্যা-প্যানেল অভিজ্ঞতা জন্য স্বতন্ত্র Saropa Drift Advisor এক্সটেনশন ইনস্টল করুন।",
+      "install": "Drift Advisor ইনস্টল করুন।",
       "dismiss": "বরখাস্ত করা হয়।"
     }
   },
@@ -1518,7 +1518,7 @@
       "compareFetchFailed": "পর্যাপ্ত প্যাকেজ ডেটা আনতে পারেনি"
     },
     "main": {
-      "brandPrefix": "Saropa Lints: PH1__ এর সাথে সম্পর্কিতঃ {message} _ PH0__ -এর সাথে সম্পর্কিত",
+      "brandPrefix": "Saropa Lints: {message}",
       "regressionErrors": "{count} ত্রুটি{suffix}  ⁇ দৃশ্য. ভিউ।",
       "regressionScoreDipped": "স্কোর {threshold}  ⁇  এর নিচে নেমে গেছে View issues. ভিউ ইস্যু।",
       "actionViewViolations": "View Violations ভিউ লঙ্ঘন দেখুন",
@@ -1531,7 +1531,7 @@
       "createInstructionsDone": "এআই এজেন্টদের জন্য .cursor/rules/saropa_lints_instructions.mdc তৈরি করা হয়েছে।",
       "createInstructionsFailed": "Saropa Lints নির্দেশনা তৈরি করতে ব্যর্থঃ {message} _ PH0__ -এর সাথে সম্পর্কিত",
       "openFileForIssues": "Saropa Lints. এ এর সমস্যাগুলি দেখানোর জন্য একটি ফাইল খুলুন।",
-      "driftAdvisorNotConnected": "ড্রিফট অ্যাডভাইজার সংযুক্ত নয়। সার্ভারটি চালু করার পরে রিফ্রেশ ক্লিক করুন।",
+      "driftAdvisorNotConnected": "Drift Advisor সংযুক্ত নয়. সার্ভারটি চালু করার পরে রিফ্রেশ ক্লিক করুন।",
       "noViolationsRunAnalysis": "বর্তমান ডেটাতে কোনও লঙ্ঘন নেই। প্রথমে বিশ্লেষণ চালান।",
       "telemetryReset": "Saropa Lints: সম্পর্কিত নিয়ম টেলিমেট্রি কাউন্টার রিসেট।",
       "noWorkspaceOpen": "কোন ওয়ার্কস্পেস ফোল্ডার খোলা নেই।",
@@ -1675,7 +1675,7 @@
       "upgradeCheckerMajorUpdate": "মেজর আপডেটঃ বড় আপডেটের জন্য।",
       "upgradeCheckerMinorUpdate": "ছোটখাট আপডেট, ক্ষুদ্রতর আপডেটের জন্য।",
       "upgradeCheckerPatchUpdate": "প্যাচ আপডেট, প্যাচের আপডেটের জন্য।",
-      "upgradeCheckerAvailable": "Saropa Lints {label}: _PH3_ এর সাথে মিলিত হয় {from} → {to} _ PH1__ এর মধ্যে পার্থক্য",
+      "upgradeCheckerAvailable": "Saropa Lints {label}: {from} → {to}",
       "upgradeCheckerPubspecNotFound": "Saropa Lints: PH2__ এর সাথে সম্পর্কিতঃ pubspec.yaml  ⁇  আপডেট করা যায়নি saropa_lints এন্ট্রি পাওয়া যায়নি।",
       "upgradeCheckerCancelled": "Saropa Lints আপগ্রেড বাতিল করা হয়েছে৷ pubspec.yaml আপডেট করা হয়েছে ^{version}; শেষ করতে `{cmd} pub get` চালান বা পরিবর্তনটি প্রত্যাবর্তন করুন।",
       "upgradeCheckerPubGetFailed": "Saropa Lints: পাব ব্যর্থ হয়েছে। {detail}",

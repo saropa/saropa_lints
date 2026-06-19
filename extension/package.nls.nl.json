@@ -202,7 +202,7 @@
   "config.property.todosAndHacks.autoRefresh.description": "Verfris de TODOs & Hacks weergave wanneer een bestand wordt opgeslagen (debounced).",
   "config.property.todosAndHacks.groupByTag.description": "Groep boom per tag (TODO, FIXME,...) dan per bestand; wanneer uit is groepeer je naar map en vervolgens naar bestand.",
   "config.property.todosAndHacks.customRegex.description": "Facultatief regex override voor overeenkomstige comment markers. Lijngebaseerd; gebruik vanggroep 1 voor tag en optionele groep 2 voor snippet. Leeg = gebruik standaard (//, #, <!-- + tags). Ongeldige regex valt terug naar standaard.",
-  "config.section.Drift.Advisor.title": "Drift Advisor adviseur.",
+  "config.section.Drift.Advisor.title": "Drift Advisor",
   "config.property.driftAdvisor.integration.description": "Optionele integratie met Saropa Drift Advisor. inschakelen Wanneer de extensie is ingeschakeld, ontdekt deze een draaiende Drift Advisor-server (poorten 8642 ⁇ 8649), haalt indexvoorstellen en anomalieën op, en toont ze in het weergavebeeld van Drift adviseur en optioneel in Problems.",
   "config.property.driftAdvisor.portRange.description": "Port range [min, max] om te scannen voor Drift Advisor server (inclusief).",
   "config.property.driftAdvisor.pollIntervalMs.description": "Hoe vaak de Drift Advisor-server moet worden gecontroleerd op problemen (milliseconden). Stel op 0 om automatische stemming uit te schakelen (handmatig vernieuwen).",
