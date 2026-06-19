@@ -1731,6 +1731,9 @@ const Set<String> recommendedOnlyRules = <String>{
   // Additional rules (plan_additional_rules_11_through_20)
   'pubspec_package_name_convention', // WARNING - package name convention
   'secure_pubspec_urls', // WARNING - insecure URLs in pubspec
+  // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
+  'require_sdk_upper_bound', // WARNING - SDK constraint missing upper bound
+  'avoid_unbounded_dependency', // WARNING - dependency pinned to `any`
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -2942,6 +2945,9 @@ const Set<String> professionalOnlyRules = <String>{
   'require_error_context_in_logs',
   // Additional rules (plan_additional_rules_11_through_20)
   'prefer_for_elements_to_map_from_iterable', // WARNING - use for-element map
+  // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
+  'require_dependency_lower_bound', // INFO - constraint missing lower bound
+  'prefer_caret_constraint_in_app', // INFO - app: caret-equivalent range
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
@@ -3208,6 +3214,8 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'uri_does_not_exist_in_doc_import', // INFO - broken @docImport URI
   'invalid_visible_outside_template_annotation', // WARNING - wrong annotation use
   'sort_pub_dependencies', // INFO - unsorted pubspec deps
+  // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
+  'avoid_overly_wide_app_constraint', // INFO - app: range spans 2+ majors
 };
 
 /// Pedantic tier rules - pedantic, highly opinionated rules.

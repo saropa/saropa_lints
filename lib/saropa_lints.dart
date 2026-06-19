@@ -3134,6 +3134,12 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PackageNamesRule.new,
   SortPubDependenciesRule.new,
   SecurePubspecUrlsRule.new,
+  // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
+  RequireSdkUpperBoundRule.new,
+  AvoidUnboundedDependencyRule.new,
+  RequireDependencyLowerBoundRule.new,
+  PreferCaretConstraintInAppRule.new,
+  AvoidOverlyWideAppConstraintRule.new,
   // Removed: `DependOnReferencedPackagesRule` — the Dart SDK already ships
   // `depend_on_referenced_packages` via `package:lints/core.yaml` (transitively
   // via `package:flutter_lints/flutter.yaml`), so duplicating it here only

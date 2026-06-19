@@ -65,7 +65,7 @@ environment:
 dependencies:
   # A framework and support code for building plugins for the analysis server.
   # https://pub.dev/packages/analysis_server_plugin
-  analysis_server_plugin: ^0.3.4
+  analysis_server_plugin: ^0.3.14
 
   # This package provides a library that performs static analysis of Dart code.
   # https://pub.dev/packages/analyzer
@@ -92,14 +92,14 @@ dependencies:
   #
   ###### Do NOT raise the cap to allow analyzer ^13 until Flutter stable ships
   # meta ^1.18.3.
-  analyzer: ">=9.0.0 <13.0.0"
+  analyzer: ^12.1.0
 
   # A framework and support code for building plugins for the analysis server.
   # https://pub.dev/packages/analyzer_plugin
   # Capped below 0.15.0: analyzer_plugin 0.14.10 pulls analyzer 13.1.0 (meta
   # ^1.18.3, breaks Flutter consumers per the analyzer note above). The pub
   # solver backtracks to the highest 0.14.x that pairs with analyzer 12.x.
-  analyzer_plugin: ">=0.11.0 <0.15.0"
+  analyzer_plugin: ^0.14.8
 
   # Collections and utilities functions and classes related to collections.
   # https://pub.dev/packages/collection
@@ -115,7 +115,7 @@ dependencies:
   # unresolvable for Flutter consumers. ^1.18.0 accepts Flutter's 1.18.0 and the
   # 1.18.3 already resolved here transitively. See the analyzer note below for the
   # full meta-pin rationale — do NOT raise this floor.
-  meta: ^1.18.0
+  meta: ^1.18.3
 
   # # https://pub.dev/packages/json2yaml/changelog
   # json2yaml: ^3.0.1 # YAML serialization for CLI tool
@@ -152,4 +152,4 @@ dependencies:
 dev_dependencies:
   # A full featured library for writing and running Dart tests across platforms.
   # https://pub.dev/packages/test
-  test: ^1.31.0 # Unit testing framework
+  test: ^1.31.1 # Unit testing framework
