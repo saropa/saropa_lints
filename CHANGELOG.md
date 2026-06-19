@@ -68,8 +68,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Added
 
-- **New `ui_excellence` semantic group bundles the UX-polish rules under one curated standard.** Thirty-two existing rules that each enforce one slice of user-facing quality — keyboard ergonomics, visible feedback for async work, image layout stability, formatted numbers, predictable dialogs and lists — are now grouped as a named, discoverable bar instead of a dozen unrelated rule names. The group is an additive overlay on the tiers (every member is also a tier rule), so it changes no existing behavior: projects on `comprehensive` already get the whole bar. Exposed as `uiExcellenceRules` / `semanticGroupRuleSets` for tooling.
+- **Four thematic rule packs group cross-cutting quality rules into one-click bundles.** `ui_excellence` (keyboard ergonomics, visible async feedback, image layout stability, formatted numbers, predictable dialogs/lists), `localization` (externalize strings, locale-aware `intl` formatting, plurals/RTL), `documentation` (public-API dartdoc completeness), and `testing` (deterministic, isolated, well-structured tests). Enable them in the VS Code **Manage Rule Packs** dashboard under the new **Quality standards** domain, or add the id under `rule_packs.enabled` in `analysis_options.yaml`. Until now every pack was tied to a package or SDK version; these are the first packs that name a quality standard.
 - **`scan --resolve` runs the standalone scanner with full type resolution.** Rules that fire on constructor calls like `File('x')` (or that need resolved types) only see violations under resolution, because the default syntactic pass parses an implicit constructor as a method call and never triggers them. The flag is slower and needs the target project's `pub get`; the default fast path is unchanged.
+
+### Changed
+
+- **The rules in the new `ui_excellence` / `localization` / `documentation` / `testing` packs are now pack-owned, so they are opt-in like every other rule pack.** A pack-owned rule fires only when its pack is enabled (in the dashboard or `rule_packs.enabled`), even though it remains catalogued in a tier. These rules were previously enabled implicitly by tier selection; to keep them on, enable the matching pack(s). An explicit `false` in `diagnostics:` still wins over pack opt-in.
 
 ### Fixed
 

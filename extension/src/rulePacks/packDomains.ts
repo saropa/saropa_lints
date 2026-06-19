@@ -18,6 +18,12 @@
 export const SDK_DOMAIN = 'SDK migrations';
 /** Fallback domain for any package pack not yet assigned below. */
 export const OTHER_DOMAIN = 'Other';
+/**
+ * Domain for thematic "quality standard" packs (ui_excellence, localization,
+ * documentation, testing) — cross-cutting bars not tied to a package or SDK.
+ * Sorts first so these curated standards lead the "All packages" section.
+ */
+export const QUALITY_DOMAIN = 'Quality standards';
 
 /**
  * Display order for domains in the "All packages" section. Domains absent from a
@@ -25,6 +31,7 @@ export const OTHER_DOMAIN = 'Other';
  * the curated package domains lead.
  */
 export const PACK_DOMAIN_ORDER: readonly string[] = [
+  QUALITY_DOMAIN,
   'State management',
   'Networking & APIs',
   'Storage & persistence',
@@ -39,6 +46,12 @@ export const PACK_DOMAIN_ORDER: readonly string[] = [
 
 /** Pack id → domain label. Versioned companions (`dio_5`) share their base domain. */
 const PACK_DOMAIN_BY_ID: Readonly<Record<string, string>> = {
+  // Quality standards (thematic, cross-cutting bars)
+  ui_excellence: QUALITY_DOMAIN,
+  localization: QUALITY_DOMAIN,
+  documentation: QUALITY_DOMAIN,
+  testing: QUALITY_DOMAIN,
+
   // State management
   bloc: 'State management',
   bloc_8: 'State management',

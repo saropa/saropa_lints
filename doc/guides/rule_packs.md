@@ -96,6 +96,25 @@ Some packs are gated by SDK constraints in `pubspec.yaml` `environment:`:
 
 These packs are considered applicable from SDK constraints (not dependency markers).
 
+## Thematic packs (quality standards)
+
+Beyond package- and SDK-gated packs, four packs bundle cross-cutting **quality
+standards** — rules that aren't tied to a dependency but that you opt into as a
+bar for a project. In the VS Code dashboard they appear under the **Quality
+standards** domain (sorted first).
+
+- `ui_excellence` — UX polish: keyboard ergonomics, visible async feedback, image
+  layout stability, formatted numbers, predictable dialogs/lists.
+- `localization` — externalize user-facing strings, locale-aware `intl`
+  formatting, plurals and RTL support.
+- `documentation` — public-API dartdoc completeness and correctness.
+- `testing` — deterministic, isolated, well-structured tests with real assertions.
+
+Like every pack these are **opt-in**: their rules fire only when the pack is
+enabled, even though each rule is also catalogued in a tier. They carry a
+representative dependency marker for the "applicable" hint (`flutter`, `intl`,
+`test`), but have no dependency gate, so you can enable them in any project.
+
 ## CLI (`dart run saropa_lints:init`)
 
 - **`--list-packs`** — prints each pack, whether `pubspec.yaml` suggests it,

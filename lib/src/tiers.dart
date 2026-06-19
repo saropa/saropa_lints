@@ -4553,36 +4553,32 @@ Set<String> getRulesDisabledByPackages(Map<String, bool> packages) {
 }
 
 // =========================================================================
-// SEMANTIC GROUPS
+// THEMATIC RULE-PACK ROSTERS
 // =========================================================================
-// Curated, cross-cutting rule bundles that name a *standard* rather than a
-// severity level or a package/platform target. Like the package and platform
-// sets above, a semantic group is an OVERLAY on the tiers: every member must
-// also live in exactly one tier set, so enabling a group never removes a rule
-// from anyone and never conflicts with tier selection.
+// Curated, cross-cutting rule rosters that name a *quality standard* rather
+// than a package or SDK-version target. Each set below is the member list of a
+// thematic rule pack registered in `lib/src/config/rule_packs.dart`
+// (kRulePackRuleCodes) and surfaced in the VS Code "Manage Rule Packs"
+// dashboard under the "Quality standards" domain.
 //
-// Why an overlay set and NOT a rule pack: the rule-pack merge
-// (mergeRulePacksIntoEnabled) runs in "authoritative" mode — it strips every
-// pack-owned code from the tier-derived enable set, then re-adds only the codes
-// of explicitly-enabled packs. Routing these existing tier rules through a pack
-// would therefore silently disable them for every project that selects a tier
-// but does not also enable the pack. An overlay set avoids that regression: it
-// is additive metadata that tooling (init CLI, the VS Code extension) reads to
-// offer "enable the whole bar" without touching tier semantics.
+// Like package-family packs (firebase, bloc, ...), a thematic pack is OPT-IN:
+// the rule-pack merge runs in authoritative mode, so a pack member is enabled
+// only when its pack is listed in `rule_packs.enabled`, even though the member
+// also appears in a tier set for cataloging. This is intentional — these are
+// optional bars a project chooses to adopt, not always-on safety rules.
+//
+// Curation invariants (validated in test/integrity/saropa_lints_test.dart):
+//   - every member exists in the plugin and is in exactly one tier set;
+//   - no member is in the stylistic track (stylistic rules are stripped when
+//     the stylistic track is enabled, which would fight pack ownership).
 // =========================================================================
 
 /// The "polished UI" standard: rules that each enforce one slice of
 /// user-facing UX quality (keyboard ergonomics, visible async feedback, image
 /// layout stability, formatted numbers, predictable dialogs/lists).
 ///
-/// Grouped so a project can adopt the whole bar as one auditable decision and
-/// so the standard is discoverable as a cohesive unit instead of a dozen
-/// unrelated rule names. Members are independently toggleable; an explicit
-/// `false` in `diagnostics:` still wins.
-///
-/// Every id here is also a tier member (validated in
-/// `test/integrity/saropa_lints_test.dart`); this set never introduces a rule
-/// that does not already exist.
+/// Pack id: `ui_excellence`. Members stay independently toggleable; an explicit
+/// `false` in `diagnostics:` still wins over pack opt-in.
 const Set<String> uiExcellenceRules = <String>{
   // === Keyboard & form ergonomics ===
   'require_keyboard_dismiss_on_scroll',
@@ -4625,11 +4621,144 @@ const Set<String> uiExcellenceRules = <String>{
   'require_safe_area_handling',
 };
 
-/// Registry of semantic group id → member rule codes.
+/// Localization-readiness standard: externalize user-facing strings, format
+/// dates/numbers/currency through `intl`, and support RTL/plural/locale rules.
 ///
-/// Mirrors [packageRuleSets]: keyed by the public group id used in tooling and
-/// docs. Add future curated bundles here so the integrity tests and the
-/// extension registry pick them up automatically.
-Map<String, Set<String>> get semanticGroupRuleSets => {
-  'ui_excellence': uiExcellenceRules,
+/// Pack id: `localization`. Suggested when a project depends on `intl` or
+/// `flutter_localizations`.
+const Set<String> localizationRules = <String>{
+  // === Externalize user-facing strings ===
+  'avoid_hardcoded_strings_in_ui',
+  'avoid_hardcoded_app_name',
+  'avoid_hardcoded_locale',
+  'avoid_hardcoded_locale_strings',
+  'avoid_text_in_images',
+  // === Build strings with parameters, not concatenation ===
+  'avoid_string_concatenation_in_ui',
+  'avoid_string_concatenation_for_l10n',
+  'avoid_string_concatenation_l10n',
+  // === Format through intl, locale-aware ===
+  'avoid_manual_date_formatting',
+  'prefer_date_format',
+  'prefer_number_format',
+  'require_number_format_locale',
+  'require_locale_aware_formatting',
+  'require_intl_currency_format',
+  'require_intl_date_format_locale',
+  'require_intl_locale_initialization',
+  // === intl message metadata correctness ===
+  'prefer_intl_name',
+  'prefer_intl_message_description',
+  'prefer_providing_intl_description',
+  'prefer_providing_intl_examples',
+  'provide_correct_intl_args',
+  'require_intl_args_match',
+  // === Plurals & RTL ===
+  'require_plural_handling',
+  'require_intl_plural_rules',
+  'require_rtl_support',
+  'require_rtl_layout_support',
+  'require_directional_widgets',
+};
+
+/// Documentation standard: public-API dartdoc completeness and correctness.
+///
+/// Pack id: `documentation`. A strict bar most useful for published packages
+/// and shared libraries; suggested for Flutter projects.
+const Set<String> documentationRules = <String>{
+  'require_public_api_documentation',
+  'require_parameter_documentation',
+  'require_return_documentation',
+  'require_exception_documentation',
+  'require_example_in_documentation',
+  'require_complex_logic_comments',
+  'require_deprecation_message',
+  'prefer_correct_throws',
+  'avoid_misleading_documentation',
+  'verify_documented_parameters_exist',
+  'deprecated_new_in_comment_reference',
+  'missing_code_block_language_in_doc_comment',
+  'unintended_html_in_doc_comment',
+  'uri_does_not_exist_in_doc_import',
+};
+
+/// Test-hygiene standard: deterministic, isolated, well-structured tests with
+/// real assertions and proper widget pumping.
+///
+/// Pack id: `testing`. Excludes the logging/debug rules that also live under
+/// `lib/src/rules/testing/` (those are a separate concern) and the stylistic
+/// `format_test_name`.
+const Set<String> testingRules = <String>{
+  // === Determinism & isolation ===
+  'avoid_flaky_tests',
+  'avoid_hardcoded_delays',
+  'avoid_hardcoded_test_delays',
+  'avoid_test_sleep',
+  'avoid_real_timer_in_widget_test',
+  'avoid_async_callback_in_fake_async',
+  'avoid_real_dependencies_in_tests',
+  'avoid_real_network_calls_in_tests',
+  'avoid_production_config_in_tests',
+  'avoid_test_coupling',
+  'avoid_stateful_test_setup',
+  'avoid_top_level_members_in_tests',
+  'require_test_isolation',
+  'require_test_cleanup',
+  'prefer_fake_platform',
+  // === Real assertions ===
+  'missing_test_assertion',
+  'require_test_assertions',
+  'avoid_duplicate_test_assertions',
+  'prefer_single_assertion',
+  'prefer_matcher_over_equals',
+  'avoid_misused_test_matchers',
+  'prefer_expect_later',
+  'require_mock_verification',
+  'prefer_mock_verify',
+  'require_mock_http_client',
+  'prefer_mock_http',
+  'prefer_mock_navigator',
+  // === Structure & naming ===
+  'require_arrange_act_assert',
+  'require_test_groups',
+  'avoid_empty_test_groups',
+  'require_test_setup_teardown',
+  'prefer_setup_teardown',
+  'require_test_description_convention',
+  'prefer_descriptive_test_name',
+  'avoid_vague_test_descriptions',
+  'prefer_unique_test_names',
+  'prefer_correct_test_file_name',
+  'avoid_test_implementation_details',
+  'prefer_test_structure',
+  'prefer_test_wrapper',
+  'prefer_test_variant',
+  'prefer_test_report',
+  'require_test_documentation',
+  // === Widget & integration testing ===
+  'require_test_widget_pump',
+  'require_pump_after_interaction',
+  'prefer_pump_and_settle',
+  'require_test_keys',
+  'prefer_test_find_by_key',
+  'prefer_symbol_over_key',
+  'avoid_find_all',
+  'avoid_find_by_text',
+  'require_dialog_tests',
+  'require_scroll_tests',
+  'require_text_input_tests',
+  'require_screen_size_tests',
+  'require_animation_tests',
+  'require_accessibility_tests',
+  'require_dispose_verification_tests',
+  'require_edge_case_tests',
+  'require_error_case_tests',
+  'require_golden_test',
+  'require_performance_test',
+  'require_integration_test_setup',
+  'require_integration_test_timeout',
+  'prefer_bloc_test_package',
+  'avoid_screenshot_in_ci',
+  'avoid_test_on_real_device',
+  'avoid_test_print_statements',
 };

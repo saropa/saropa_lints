@@ -29,5 +29,22 @@ void main() {
       );
       expect(knownRulePackIds, contains('collection_compat'));
     });
+
+    // Thematic ("quality standard") packs are hand-added to kRulePackRuleCodes
+    // (not extracted from lib/src/rules/packages/). Verify each is registered,
+    // non-empty, and carries a representative member.
+    test('thematic packs are registered with rosters', () {
+      const Map<String, String> sentinels = <String, String>{
+        'ui_excellence': 'require_keyboard_dismiss_on_scroll',
+        'localization': 'avoid_hardcoded_strings_in_ui',
+        'documentation': 'require_public_api_documentation',
+        'testing': 'require_arrange_act_assert',
+      };
+      for (final entry in sentinels.entries) {
+        expect(knownRulePackIds, contains(entry.key));
+        expect(ruleCodesForPack(entry.key), isNotEmpty);
+        expect(ruleCodesForPack(entry.key), contains(entry.value));
+      }
+    });
   });
 }
