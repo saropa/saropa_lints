@@ -6,8 +6,9 @@ empty directories.
 Run:
   python reports/organize_reports.py
 
-Imports the shared organizer from the contacts repo so move/prune logic stays
-in one place across all Saropa projects.
+Loads the organizer vendored in this repo so move/prune logic runs without the
+contacts repo present. Falls back to the contacts copy only if the vendored
+module is missing.
 """
 
 from __future__ import annotations
@@ -16,31 +17,43 @@ import importlib.util
 import sys
 from pathlib import Path
 
-# The shared organizer lives in the contacts repo — single source of truth
-# for date parsing, move logic, progress bar, and empty-dir cleanup.
-_SHARED_MODULE_PATH = (
-    Path(__file__).resolve().parent.parent.parent
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+# Primary: the copy vendored into this project — self-contained, no sibling repo
+# required. Fallback: the contacts repo, kept only so a stripped checkout that
+# lost the vendored file still works when contacts is cloned alongside.
+_VENDORED_MODULE_PATH = (
+    _PROJECT_ROOT / "scripts" / ".shared" / "reports_organizer.py"
+)
+_CONTACTS_MODULE_PATH = (
+    _PROJECT_ROOT.parent
     / "contacts"
     / "scripts"
     / ".shared"
     / "reports_organizer.py"
 )
 
+_CANDIDATE_MODULE_PATHS = (_VENDORED_MODULE_PATH, _CONTACTS_MODULE_PATH)
+
 
 def _load_shared_organizer():
-    if not _SHARED_MODULE_PATH.is_file():
+    module_path = next(
+        (path for path in _CANDIDATE_MODULE_PATHS if path.is_file()),
+        None,
+    )
+    if module_path is None:
+        searched = "\n  ".join(str(p) for p in _CANDIDATE_MODULE_PATHS)
         print(
-            f"ERROR: Shared organizer not found at {_SHARED_MODULE_PATH}\n"
-            "Make sure the contacts repo is cloned alongside this project.",
+            f"ERROR: reports organizer module not found. Searched:\n  {searched}",
             file=sys.stderr,
         )
         sys.exit(1)
     spec = importlib.util.spec_from_file_location(
         "reports_organizer",
-        _SHARED_MODULE_PATH,
+        module_path,
     )
     if spec is None or spec.loader is None:
-        raise RuntimeError(f"Unable to load shared module from {_SHARED_MODULE_PATH}")
+        raise RuntimeError(f"Unable to load shared module from {module_path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
