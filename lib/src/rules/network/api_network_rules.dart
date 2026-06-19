@@ -3181,6 +3181,22 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
     RegExp(r'\bcheckpermission\b'),
   ];
 
+  // Receiver-type / source gate so a name match like `startRecording` only
+  // fires when the call target resolves to a real media/permission API. A bare
+  // method-name match alone matches unrelated app-domain methods that merely
+  // share a name (e.g. a `QueryRecorder.startRecording()` that records SQL
+  // events in memory, not audio), forcing a misleading `// ignore:`. Tokens are
+  // word-bounded where a substring would catch an unrelated type — `\brecord\b`
+  // matches the `record` package's `Record` class but NOT `QueryRecorder`.
+  static final RegExp _gatedFeatureTypeOrSource = RegExp(
+    r'camera|geolocator|\bposition\b|imagepicker|image_picker|\bpicker\b|'
+    r'mobilescanner|mobile_scanner|barcodescanner|barcode|\bscanner\b|'
+    r'speechtotext|speech_to_text|\bspeech\b|audiorecorder|\brecord\b|'
+    r'fluttercontacts|flutter_contacts|contactsservice|contacts_service|'
+    r'permission|microphone',
+    caseSensitive: false,
+  );
+
   static const _gatedFeatures = <String>{
     'getCurrentPosition',
     'getLastKnownPosition',
@@ -3206,6 +3222,20 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
       final methodName = node.methodName.name;
 
       if (!_gatedFeatures.contains(methodName)) {
+        return;
+      }
+
+      // Require the receiver to resolve to a known media/permission API before
+      // reporting. Without this, the name-only gate above fires on any method
+      // sharing a gated name (e.g. an in-process `QueryRecorder.startRecording()`)
+      // regardless of whether a real OS permission is involved.
+      final target = node.target;
+      if (target == null) return;
+
+      final targetType = target.staticType?.toString().toLowerCase() ?? '';
+      final targetSource = target.toSource().toLowerCase();
+      if (!_gatedFeatureTypeOrSource.hasMatch(targetType) &&
+          !_gatedFeatureTypeOrSource.hasMatch(targetSource)) {
         return;
       }
 
