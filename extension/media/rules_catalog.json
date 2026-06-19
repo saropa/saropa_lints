@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2314,
+  "ruleCount": 2320,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -1356,6 +1356,21 @@
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
         "description": "Code smell default target: zero false positives."
+      }
+    },
+    "avoid_cascade_shuffle": {
+      "ruleType": "bug",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "maintainability"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Bug rule default target: zero false positives."
       }
     },
     "avoid_case_sensitive_path_comparison": {
@@ -7969,6 +7984,22 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "avoid_overly_wide_app_constraint": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "avoid_parameter_mutation": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -11021,6 +11052,22 @@
       "tags": [
         "flutter",
         "ui"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "avoid_unbounded_dependency": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
@@ -16128,6 +16175,22 @@
       "certIds": [],
       "tags": [
         "dart-core"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "prefer_caret_constraint_in_app": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
@@ -27504,6 +27567,22 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "require_dependency_lower_bound": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "require_deprecation_message": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -33115,6 +33194,22 @@
       "certIds": [],
       "tags": [
         "testing"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "require_sdk_upper_bound": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
