@@ -829,10 +829,14 @@ class _BaseCaseVisitor extends RecursiveAstVisitor<void> {
   void visitConditionalExpression(ConditionalExpression node) {
     // Ternary base case: one branch recurses, the other terminates
     // (e.g. `n <= 1 ? 1 : n * factorial(n - 1)`).
-    final bool thenRecurses =
-        _containsSelfCall(node.thenExpression, functionName);
-    final bool elseRecurses =
-        _containsSelfCall(node.elseExpression, functionName);
+    final bool thenRecurses = _containsSelfCall(
+      node.thenExpression,
+      functionName,
+    );
+    final bool elseRecurses = _containsSelfCall(
+      node.elseExpression,
+      functionName,
+    );
     if (thenRecurses != elseRecurses) {
       _hasGuardedTermination = true;
     }

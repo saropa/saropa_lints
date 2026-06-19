@@ -197,29 +197,28 @@ environment:
     // Case 5 from the bug report: a file referenced by BOTH a conditional io
     // branch AND an unconditional import can still load on web, so it must NOT
     // be suppressed (the kIsWeb guard is genuinely required there).
-    test(
-      'returns false when target is also imported unconditionally',
-      () {
-        final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
-        try {
-          _createTempProject(
-            dir.path,
-            importerContent: '''
+    test('returns false when target is also imported unconditionally', () {
+      final dir = Directory.systemTemp.createTempSync('saropa_cond_import_');
+      try {
+        _createTempProject(
+          dir.path,
+          importerContent: '''
 import 'stub.dart' if (dart.library.io) 'native_impl.dart';
 ''',
-          );
-          // A second file pulls native_impl.dart in unconditionally — this is
-          // the path that can reach it on web.
-          File(p.join(dir.path, 'lib', 'plain_importer.dart')).writeAsStringSync('''
+        );
+        // A second file pulls native_impl.dart in unconditionally — this is
+        // the path that can reach it on web.
+        File(p.join(dir.path, 'lib', 'plain_importer.dart')).writeAsStringSync(
+          '''
 import 'native_impl.dart';
-''');
-          final nativePath = p.join(dir.path, 'lib', 'native_impl.dart');
-          expect(isNativeOnlyConditionalImportTarget(nativePath), isFalse);
-        } finally {
-          dir.deleteSync(recursive: true);
-        }
-      },
-    );
+''',
+        );
+        final nativePath = p.join(dir.path, 'lib', 'native_impl.dart');
+        expect(isNativeOnlyConditionalImportTarget(nativePath), isFalse);
+      } finally {
+        dir.deleteSync(recursive: true);
+      }
+    });
   });
 }
 

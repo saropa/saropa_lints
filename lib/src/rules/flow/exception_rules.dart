@@ -322,7 +322,8 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
     // unrelated method that happens to share the name.
     final Element? invoked = operand.methodName.element;
     final Element? owner = invoked?.enclosingElement;
-    final bool isCoreError = owner is InterfaceElement &&
+    final bool isCoreError =
+        owner is InterfaceElement &&
         owner.name == 'Error' &&
         owner.library.name == 'dart.core';
     if (!isCoreError) return operand;

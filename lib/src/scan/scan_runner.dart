@@ -305,7 +305,10 @@ class ScanRunner {
 
     if (allVisitors.isNotEmpty) {
       unit.accept(
-        ScanWalker(allVisitors, onError: _onVisitorError(visitorRule, filePath)),
+        ScanWalker(
+          allVisitors,
+          onError: _onVisitorError(visitorRule, filePath),
+        ),
       );
     }
 
@@ -425,7 +428,10 @@ class ScanRunner {
 
     if (allVisitors.isNotEmpty) {
       unit.accept(
-        ScanWalker(allVisitors, onError: _onVisitorError(visitorRule, filePath)),
+        ScanWalker(
+          allVisitors,
+          onError: _onVisitorError(visitorRule, filePath),
+        ),
       );
     }
 
