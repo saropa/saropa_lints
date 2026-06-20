@@ -64,11 +64,19 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [14.0.6]
- A quick fix for honoring `// ignore`. [log](https://github.com/saropa/saropa_lints/blob/v14.0.6/CHANGELOG.md)
+## [Unreleased]
+
+ A quick fix for better honoring `// ignore`. [log](https://github.com/saropa/saropa_lints/blob/v14.0.6/CHANGELOG.md)
+
 ### Fixed
 
 - **A `// ignore:` written below a `///` doc comment and directly above the declaration is now honored on declarations the rule flags as a whole.** The conventional placement (doc comment, then `// ignore:`, then the `static`/`final`/type line) previously did nothing for rules that report the whole declaration — e.g. `avoid_global_state`, `require_http_status_check`, `require_file_close_in_finally` — forcing the directive above the doc comment or onto a trailing line. The suppression check keyed off the doc-comment line instead of the declaration line; it now matches the declaration line, consistent with how the same placement already worked for nested diagnostics. No action required; existing above-doc and trailing placements still work.
+
+<details><summary>Maintenance</summary>
+
+- Hardened the `analyzer` constraint guard in `pubspec.yaml`. The `analyzer: ^12.1.0` cap now carries a boxed HARD STOP note documenting that analyzer 13 renamed the public AST classes the package is built on (`NamedExpression` → `NamedArgument`, `SimpleFormalParameter` → `RegularFormalParameter`, `DefaultFormalParameter` removed) with no deprecated aliases — a bump is a ~912-reference source migration across ~148 files, on top of the existing `meta ^1.18.3` Flutter-stable resolution blocker. No published constraint or behavior change.
+
+</details>
 
 ---
 
