@@ -169,3 +169,42 @@ void testParameterMutation() {
     final isEmpty = items.isEmpty;
   }
 }
+
+// Render-object override exemption. The example package has no Flutter
+// dependency, so these mirror the framework signatures the rule recognizes
+// syntactically (method name + parameter shape).
+class BuildContext {}
+
+class ParentData {}
+
+class RenderObject {
+  ParentData? parentData;
+}
+
+class RenderMyBox extends RenderObject {
+  bool flag = false;
+
+  // GOOD: setupParentData's contract is to assign the child's parentData —
+  // mutating the framework-supplied object is mandatory, not caller-corruption.
+  void setupParentData(RenderObject child) {
+    child.parentData = ParentData(); // No lint - render-object override
+  }
+}
+
+class MyWidget {
+  final bool flag = true;
+
+  // GOOD: updateRenderObject pushes the widget's new config onto the live
+  // render object. There is no copy alternative; the mutation is the contract.
+  void updateRenderObject(BuildContext context, RenderMyBox renderObject) {
+    renderObject.flag = flag; // No lint - render-object override
+  }
+
+  // BAD: a same-named guard against over-broad exemption. This method mutates a
+  // passed DTO field but is NOT a render-object override (wrong signature: no
+  // BuildContext first parameter), so it must still be flagged.
+  void updateRenderObject2(User user) {
+    // expect_lint: avoid_parameter_mutation
+    user.name = 'changed';
+  }
+}
