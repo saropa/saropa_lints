@@ -507,19 +507,21 @@ void test() {
       // off the declaration token's own line rather than the doc-comment line.
       // See bugs/infra_ignore_leading_doc_commented_self_node_not_honored.md.
       group('leading comments on doc-commented declarations', () {
-        test('honors below-doc ignore on a doc-commented top-level variable',
-            () {
-          final unit = _parseCode('''
+        test(
+          'honors below-doc ignore on a doc-commented top-level variable',
+          () {
+            final unit = _parseCode('''
 /// Lazy cache built on first access.
 // ignore: avoid_global_state
 List<int>? cache;
 ''');
-          final decl = _findFirst<TopLevelVariableDeclaration>(unit)!;
-          expect(
-            IgnoreUtils.hasIgnoreComment(decl, 'avoid_global_state'),
-            isTrue,
-          );
-        });
+            final decl = _findFirst<TopLevelVariableDeclaration>(unit)!;
+            expect(
+              IgnoreUtils.hasIgnoreComment(decl, 'avoid_global_state'),
+              isTrue,
+            );
+          },
+        );
 
         test('honors below-doc ignore on a doc-commented method', () {
           final unit = _parseCode('''
@@ -549,18 +551,20 @@ List<int>? cache;
           );
         });
 
-        test('honors below-decl ignore with no doc comment (no regression)',
-            () {
-          final unit = _parseCode('''
+        test(
+          'honors below-decl ignore with no doc comment (no regression)',
+          () {
+            final unit = _parseCode('''
 // ignore: avoid_global_state
 List<int>? cache;
 ''');
-          final decl = _findFirst<TopLevelVariableDeclaration>(unit)!;
-          expect(
-            IgnoreUtils.hasIgnoreComment(decl, 'avoid_global_state'),
-            isTrue,
-          );
-        });
+            final decl = _findFirst<TopLevelVariableDeclaration>(unit)!;
+            expect(
+              IgnoreUtils.hasIgnoreComment(decl, 'avoid_global_state'),
+              isTrue,
+            );
+          },
+        );
 
         test('does NOT suppress an unrelated rule on a doc-commented decl', () {
           final unit = _parseCode('''
