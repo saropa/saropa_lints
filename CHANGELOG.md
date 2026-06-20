@@ -64,6 +64,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **`avoid_parameter_mutation` no longer fires inside Flutter render-object overrides where mutating the framework-supplied object is mandatory.** `updateRenderObject(BuildContext, RenderObject)` (pushing the widget's new config onto the render object) and `setupParentData(RenderObject child)` (assigning `child.parentData`) are now exempt — there is no copy alternative, so the in-place mutation is the framework contract, not caller-data corruption. Same render-object blind spot previously fixed for `avoid_unassigned_late_fields` and `avoid_unsafe_cast`.
+
+---
+
 ## [14.0.4]
 
 This release introduces four thematic rule packs that bundle quality standards for UI, localization, documentation, and testing into simple opt-in groups. The standalone scanner now supports full type resolution to accurately evaluate complex rules, and it will no longer abort an entire run if a single check fails. Additionally, this update delivers significant accuracy improvements by eliminating false positives across recursion, initialization, and platform-specific code. [log](https://github.com/saropa/saropa_lints/blob/v14.0.4/CHANGELOG.md)

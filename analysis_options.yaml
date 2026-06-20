@@ -100,7 +100,7 @@ plugins:
     rule_packs:
       enabled:
         - collection_compat
-    # No `version:` pin: the analyzer plugin sandbox would resolve it from
+        - testing
     # pub.dev, which fails every release because the local pubspec.yaml has
     # already been bumped to a version pub.dev hasn't seen yet. Without a
     # version, the analyzer resolves from the host project's pubspec — for

@@ -441,7 +441,7 @@ class _ParameterReassignmentVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when function parameters are mutated (object state modified).
 ///
-/// Since: v4.2.0 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.2.0 | Updated: v14.0.5 | Rule version: v3
 ///
 /// Mutating a parameter modifies the caller's object, which is a hidden
 /// side effect that can cause bugs. The caller may not expect their data
@@ -480,6 +480,13 @@ class _ParameterReassignmentVisitor extends RecursiveAstVisitor<void> {
 ///   return user.copyWith(name: 'changed');  // Return new instance
 /// }
 /// ```
+///
+/// **Exemptions:** the Flutter render-object override signatures whose entire
+/// purpose is to mutate the framework-supplied object are not flagged —
+/// `updateRenderObject(BuildContext, RenderObject ro)` (pushing config onto
+/// `ro`) and `setupParentData(RenderObject child)` (assigning `child.parentData`).
+/// There is no copy alternative; the framework owns the object and requires
+/// in-place mutation.
 class AvoidParameterMutationRule extends SaropaLintRule {
   AvoidParameterMutationRule() : super(code: _code);
 
@@ -499,7 +506,7 @@ class AvoidParameterMutationRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_parameter_mutation',
     '[avoid_parameter_mutation] Parameter object is being mutated. '
-        'This modifies the caller\'s data. {v2}',
+        'This modifies the caller\'s data. {v3}',
     correctionMessage:
         'Create a copy of the data instead of mutating the parameter.',
     severity: DiagnosticSeverity.WARNING,
@@ -519,15 +526,21 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     });
 
     context.addMethodDeclaration((MethodDeclaration node) {
-      _checkFunction(node.parameters, node.body, reporter);
+      _checkFunction(
+        node.parameters,
+        node.body,
+        reporter,
+        exemptParamNames: _renderObjectOverrideMutationTargets(node),
+      );
     });
   }
 
   void _checkFunction(
     FormalParameterList? params,
     FunctionBody body,
-    SaropaDiagnosticReporter reporter,
-  ) {
+    SaropaDiagnosticReporter reporter, {
+    Set<String> exemptParamNames = const <String>{},
+  }) {
     if (params == null) return;
 
     // Map each parameter name to its declared type name (syntactic). The
@@ -536,7 +549,11 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     final Map<String, String?> paramTypeNames = <String, String?>{};
     for (final FormalParameter param in params.parameters) {
       final Token? name = param.name;
-      if (name != null) {
+      // Skip parameters whose in-place mutation is the framework contract
+      // (the render-object the framework hands to updateRenderObject /
+      // setupParentData). Dropping them from the map means the visitor never
+      // sees them as mutation targets.
+      if (name != null && !exemptParamNames.contains(name.lexeme)) {
         paramTypeNames[name.lexeme] = _declaredTypeName(param);
       }
     }
@@ -546,6 +563,49 @@ class AvoidParameterMutationRule extends SaropaLintRule {
     body.visitChildren(
       _ParameterMutationVisitor(paramTypeNames, reporter, _code),
     );
+  }
+
+  /// Returns the names of parameters whose mutation is mandated by a Flutter
+  /// render-object override contract, so they must NOT be flagged as
+  /// caller-data mutation.
+  ///
+  /// Two override signatures exist solely to push new configuration onto the
+  /// object the framework passes in — there is no copy alternative:
+  /// - `RenderObjectWidget.updateRenderObject(BuildContext, RenderObject ro)`
+  ///   pushes the widget's new config onto the live render object (the second
+  ///   positional parameter).
+  /// - `RenderObject.setupParentData(RenderObject child)` assigns the child's
+  ///   `parentData` (the sole parameter).
+  ///
+  /// Detection is syntactic (method name + parameter shape) so it keeps working
+  /// under the syntax-only scan CLI where static types are unavailable; the
+  /// `BuildContext` first parameter on `updateRenderObject` makes the name match
+  /// specific enough that a coincidental same-named method is not exempted.
+  static Set<String> _renderObjectOverrideMutationTargets(
+    MethodDeclaration node,
+  ) {
+    final FormalParameterList? params = node.parameters;
+    if (params == null) return const <String>{};
+    final List<FormalParameter> list = params.parameters;
+    final String methodName = node.name.lexeme;
+
+    // updateRenderObject(BuildContext context, RenderObject renderObject):
+    // exempt the second parameter (the render object receiving new config).
+    if (methodName == 'updateRenderObject' &&
+        list.length == 2 &&
+        _declaredTypeName(list.first) == 'BuildContext') {
+      final Token? second = list[1].name;
+      if (second != null) return <String>{second.lexeme};
+    }
+
+    // setupParentData(RenderObject child): exempt the sole parameter (its
+    // parentData assignment is the documented contract).
+    if (methodName == 'setupParentData' && list.length == 1) {
+      final Token? only = list.first.name;
+      if (only != null) return <String>{only.lexeme};
+    }
+
+    return const <String>{};
   }
 
   /// Returns the simple name of a parameter's declared type, or null when it
