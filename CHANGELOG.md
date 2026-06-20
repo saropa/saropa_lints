@@ -64,9 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.0.7]
 
- A quick fix for better honoring `// ignore`. [log](https://github.com/saropa/saropa_lints/blob/v14.0.6/CHANGELOG.md)
+ A quick fix for better honoring `// ignore`. [log](https://github.com/saropa/saropa_lints/blob/v14.0.7/CHANGELOG.md)
 
 ### Fixed
 
