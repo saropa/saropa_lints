@@ -90,8 +90,22 @@ dependencies:
   #   - rationale: https://github.com/dart-lang/sdk/blob/main/docs/Flutter-Pinned-Packages.md
   #   - unpin effort: https://github.com/flutter/flutter/issues/158050
   #
-  ###### Do NOT raise the cap to allow analyzer ^13 until Flutter stable ships
-  # meta ^1.18.3.
+  # ====================================================================
+  # ###### HARD STOP: DO NOT bump this to analyzer ^13 (or higher) until
+  # ###### Flutter stable ships meta ^1.18.3. See the meta-pin reasoning
+  # ###### above — analyzer 13's meta ^1.18.3 floor makes the package
+  # ###### unresolvable in any Flutter-stable app.
+  #
+  # It also breaks the build outright: analyzer 13 RENAMED the public AST
+  # classes this package is built on, and the old names are gone (no
+  # deprecated aliases):
+  #     NamedExpression        -> NamedArgument
+  #     SimpleFormalParameter  -> RegularFormalParameter
+  #     DefaultFormalParameter -> removed (FormalParameter.parameter gone)
+  # That is ~912 references across ~148 files in lib/ — every rule and fix
+  # that inspects arguments or parameters. A bump here is a full source
+  # migration, not a constraint change. Leave at ^12.1.0.
+  # ====================================================================
   analyzer: ^12.1.0
 
   # A framework and support code for building plugins for the analysis server.
