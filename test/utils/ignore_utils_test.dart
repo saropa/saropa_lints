@@ -499,6 +499,83 @@ void test() {
         });
       });
 
+      // Regression coverage for the doc-commented self-node leading probe:
+      // a `// ignore:` on the line below the `///` doc comment and immediately
+      // above the declaration keyword (the conventional placement) must be
+      // honored when the diagnostic is reported on the AnnotatedNode itself.
+      // node.offset points at the `///` token, so the post-doc probe has to key
+      // off the declaration token's own line rather than the doc-comment line.
+      // See bugs/infra_ignore_leading_doc_commented_self_node_not_honored.md.
+      group('leading comments on doc-commented declarations', () {
+        test('honors below-doc ignore on a doc-commented top-level variable',
+            () {
+          final unit = _parseCode('''
+/// Lazy cache built on first access.
+// ignore: avoid_global_state
+List<int>? cache;
+''');
+          final decl = _findFirst<TopLevelVariableDeclaration>(unit)!;
+          expect(
+            IgnoreUtils.hasIgnoreComment(decl, 'avoid_global_state'),
+            isTrue,
+          );
+        });
+
+        test('honors below-doc ignore on a doc-commented method', () {
+          final unit = _parseCode('''
+class Service {
+  /// Raw-response GET wrapper; callers inspect statusCode.
+  // ignore: require_http_status_check
+  Future<int> getResponse() async => 0;
+}
+''');
+          final method = _findFirst<MethodDeclaration>(unit)!;
+          expect(
+            IgnoreUtils.hasIgnoreComment(method, 'require_http_status_check'),
+            isTrue,
+          );
+        });
+
+        test('still honors ignore above the doc comment', () {
+          final unit = _parseCode('''
+// ignore: avoid_global_state
+/// Lazy cache built on first access.
+List<int>? cache;
+''');
+          final decl = _findFirst<TopLevelVariableDeclaration>(unit)!;
+          expect(
+            IgnoreUtils.hasIgnoreComment(decl, 'avoid_global_state'),
+            isTrue,
+          );
+        });
+
+        test('honors below-decl ignore with no doc comment (no regression)',
+            () {
+          final unit = _parseCode('''
+// ignore: avoid_global_state
+List<int>? cache;
+''');
+          final decl = _findFirst<TopLevelVariableDeclaration>(unit)!;
+          expect(
+            IgnoreUtils.hasIgnoreComment(decl, 'avoid_global_state'),
+            isTrue,
+          );
+        });
+
+        test('does NOT suppress an unrelated rule on a doc-commented decl', () {
+          final unit = _parseCode('''
+/// Lazy cache built on first access.
+// ignore: other_rule
+List<int>? cache;
+''');
+          final decl = _findFirst<TopLevelVariableDeclaration>(unit)!;
+          expect(
+            IgnoreUtils.hasIgnoreComment(decl, 'avoid_global_state'),
+            isFalse,
+          );
+        });
+      });
+
       group('trailing comments on statements', () {
         test('detects trailing comment on same line as statement', () {
           final unit = _parseCode('''

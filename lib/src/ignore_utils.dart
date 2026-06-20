@@ -419,14 +419,26 @@ class IgnoreUtils {
     }
     if (node is AnnotatedNode) {
       final Token postDoc = node.firstTokenAfterCommentAndMetadata;
-      if (!identical(postDoc, node.beginToken) &&
-          _hasValidLeadingIgnoreComment(
-            postDoc,
-            ruleName,
-            nodeStartLine,
-            lineInfo,
-          )) {
-        return true;
+      if (!identical(postDoc, node.beginToken)) {
+        // The leading `// ignore:` sits immediately above the declaration
+        // keyword, NOT above the `///` doc comment. For an AnnotatedNode
+        // `node.offset` (and thus the caller's `nodeStartLine`) points at the
+        // doc-comment token, so the post-doc probe must key off the declaration
+        // token's OWN line — otherwise the guard compares the comment against
+        // `docLine - 1` and the conventional below-doc placement silently
+        // no-ops. Matches the ancestor-walk's `firstTokenAfterCommentAndMetadata`
+        // reference line and `hasLeadingIgnoreCommentBeforeToken`. See
+        // bugs/infra_ignore_leading_doc_commented_self_node_not_honored.md.
+        final int postDocLine =
+            lineInfo?.getLocation(postDoc.offset).lineNumber ?? nodeStartLine;
+        if (_hasValidLeadingIgnoreComment(
+          postDoc,
+          ruleName,
+          postDocLine,
+          lineInfo,
+        )) {
+          return true;
+        }
       }
     }
     return false;
