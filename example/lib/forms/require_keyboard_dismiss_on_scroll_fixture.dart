@@ -122,3 +122,28 @@ void _good406() {
     children: [TextField(), TextField()],
   );
 }
+
+// GOOD: pure content list, no text field anywhere — there is no keyboard to
+// dismiss, so keyboardDismissBehavior is meaningless and the rule must stay
+// quiet. This is the false-positive class the gate fixes.
+void _goodNoTextField() {
+  ListView(
+    children: [
+      ListTile(title: Text('Africa')),
+      ListTile(title: Text('Asia')),
+    ],
+  );
+}
+
+// GOOD: grid of non-editable tiles, no text field — no lint.
+void _goodGridNoTextField() {
+  GridView(
+    children: [Text('a'), Text('b')],
+  );
+}
+
+// GOOD: builder/opaque content — the children are not syntactically visible,
+// so the rule intentionally does not flag it (avoids reintroducing noise).
+void _goodOpaqueBuilder() {
+  ListView(children: children);
+}

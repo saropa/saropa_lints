@@ -1,8 +1,14 @@
 # BUG: `require_keyboard_dismiss_on_scroll` — fires on every scroll view, ignoring its own "containing text fields" precondition
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
+
+## Resolution (2026-06-19)
+
+Gated the report on the presence of an editable descendant. `RequireKeyboardDismissOnScrollRule` now runs a `RecursiveAstVisitor` (`_EditableDescendantFinder`) over the scroll view's argument subtree and warns only when it finds a `TextField`, `TextFormField`, `CupertinoTextField`, `CupertinoTextFormFieldRow`, `EditableText`, or any custom type whose name ends in `TextField` / `TextFormField`. A pure content list (no editable field) and builder/opaque content (children not syntactically visible) are left unflagged — the latter intentionally, to avoid reintroducing the noise this gate removes (the syntactic level chosen, option 1 in Suggested Fix). The doc/message "containing text fields" claim is now implemented rather than re-scoping the rule.
+
+Verified with the standalone scanner (`scan --resolve`): LINT fires on `ListView` with a `TextField` and on `ListView` with a custom `AppTextField`; no lint on a `ListTile`-only `ListView`, a `Text`-only `GridView`, an opaque `ListView(children: variable)`, or a scroll view already declaring `keyboardDismissBehavior`. `dart analyze lib/src/rules/widget/forms_rules.dart` clean. Fixture `example/lib/forms/require_keyboard_dismiss_on_scroll_fixture.dart` extended with the no-text-field, grid, and opaque-builder cases.
 
 Created: 2026-06-19
 Rule: `require_keyboard_dismiss_on_scroll`
@@ -130,3 +136,31 @@ If implementing detection is out of scope, an interim option is to drop the "con
 - saropa_lints version: 14.0.4
 - Dart SDK version: (Flutter stable, analyzer ^12)
 - Triggering project: Saropa Contacts — 41 hits across 39 files; the majority are non-form content lists (e.g. `lib/components/country/continent/contact_continent_list_widget.dart:201`, a continent `ListView` with no text field). Downstream resolution: `keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag` was added to all 41 (harmless), but the non-form sites are false positives.
+
+---
+
+## Finish Report (2026-06-19)
+
+### Defect
+
+`require_keyboard_dismiss_on_scroll` reported on every `ListView` / `GridView` / `CustomScrollView` / `SingleChildScrollView` lacking `keyboardDismissBehavior`, regardless of content. The rule's doc and diagnostic message scope it to scroll views "containing text fields", but that precondition was never implemented, so pure content lists (no editable field, hence no keyboard to dismiss) were flagged identically to real forms.
+
+### Change
+
+`RequireKeyboardDismissOnScrollRule.runWithReporter` now gates the report on an editable descendant. After confirming the scroll-view type and the absence of `keyboardDismissBehavior`, it walks the constructor's argument subtree with a new `RecursiveAstVisitor` (`_EditableDescendantFinder`) and reports only when the subtree directly creates a text-entry widget: `TextField`, `TextFormField`, `CupertinoTextField`, `CupertinoTextFormFieldRow`, `EditableText`, or any custom type whose name ends in `TextField` / `TextFormField`. The visitor short-circuits once a field is found.
+
+The syntactic detection level (option 1 in Suggested Fix) was chosen over resolved supertype checks: it keeps the standalone scanner working and is sufficient for the constructor-name match the rule already performs. Builder/opaque content — children supplied by a variable or `.builder` callback, not syntactically visible — is intentionally left unflagged; re-flagging it would reintroduce the false-positive class the gate exists to remove. The doc/message "containing text fields" claim is now satisfied rather than dropped.
+
+No tier, severity, impact, or quick-fix change. The rule remains in the comprehensive tier with `LintImpact.info`.
+
+### Verification
+
+- Standalone scanner (`scan --resolve`) on a self-contained reproducer: LINT fires on a `ListView` containing `TextField` and on a `ListView` containing a custom `AppTextField`; no lint on a `ListTile`-only `ListView`, a `Text`-only `GridView`, an opaque `ListView(children: variable)`, or a scroll view already declaring `keyboardDismissBehavior`.
+- `dart analyze lib/src/rules/widget/forms_rules.dart`: no issues.
+- `dart test test/rules/widget/forms_rules_test.dart`: all passed (instantiation pin unaffected).
+
+### Files
+
+- `lib/src/rules/widget/forms_rules.dart` — gate + `_EditableDescendantFinder`.
+- `example/lib/forms/require_keyboard_dismiss_on_scroll_fixture.dart` — added no-text-field, grid, and opaque-builder cases alongside the existing positive case.
+- `CHANGELOG.md` — Fixed entry under `[Unreleased]`.
