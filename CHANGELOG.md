@@ -64,7 +64,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.0.5]
+This release resolves two false positive scenarios to make your linting experience smoother. The keyboard dismissal rule now correctly ignores scrollable areas that do not actually contain editable text fields. We have also exempted specific Flutter render-object overrides from parameter mutation warnings, recognizing that the framework inherently requires in-place modification for these methods. [log](https://github.com/saropa/saropa_lints/blob/v14.0.5/CHANGELOG.md)
 
 ### Fixed
 
