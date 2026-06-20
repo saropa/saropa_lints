@@ -64,6 +64,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **A `// ignore:` written below a `///` doc comment and directly above the declaration is now honored on declarations the rule flags as a whole.** The conventional placement (doc comment, then `// ignore:`, then the `static`/`final`/type line) previously did nothing for rules that report the whole declaration — e.g. `avoid_global_state`, `require_http_status_check`, `require_file_close_in_finally` — forcing the directive above the doc comment or onto a trailing line. The suppression check keyed off the doc-comment line instead of the declaration line; it now matches the declaration line, consistent with how the same placement already worked for nested diagnostics. No action required; existing above-doc and trailing placements still work.
+
+---
+
 ## [14.0.5]
 This release resolves two false positive scenarios to make your linting experience smoother. The keyboard dismissal rule now correctly ignores scrollable areas that do not actually contain editable text fields. We have also exempted specific Flutter render-object overrides from parameter mutation warnings, recognizing that the framework inherently requires in-place modification for these methods. [log](https://github.com/saropa/saropa_lints/blob/v14.0.5/CHANGELOG.md)
 
