@@ -1374,10 +1374,59 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
         }
       }
 
-      if (!hasKeyboardDismissBehavior) {
-        reporter.atNode(node.constructorName, code);
-      }
+      if (hasKeyboardDismissBehavior) return;
+
+      // Only warn when the scroll view actually contains an editable text
+      // field. A pure content list (a list of contacts, a grid of avatars, a
+      // continent list) has no keyboard to dismiss, so keyboardDismissBehavior
+      // would be meaningless — flagging it produced the dominant false-positive
+      // class (41 hits across 39 files in one downstream app, mostly non-form
+      // lists). Builder/opaque content is not inspected and is intentionally
+      // left unflagged: re-flagging it would reintroduce the very noise this
+      // gate exists to remove.
+      final _EditableDescendantFinder finder = _EditableDescendantFinder();
+      node.argumentList.accept(finder);
+      if (!finder.found) return;
+
+      reporter.atNode(node.constructorName, code);
     });
+  }
+}
+
+/// Detects whether an AST subtree directly creates a text-entry widget.
+///
+/// Used by [RequireKeyboardDismissOnScrollRule] to confirm a scroll view's
+/// own argument subtree contains an editable field before warning about a
+/// missing keyboardDismissBehavior. Matches the known Material/Cupertino
+/// text-entry widgets plus any custom type whose name ends in `TextField` /
+/// `TextFormField` (e.g. `AppTextField`), since those are conventionally
+/// text-entry wrappers that open the soft keyboard.
+class _EditableDescendantFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  static const Set<String> _editableTypes = <String>{
+    'TextField',
+    'TextFormField',
+    'CupertinoTextField',
+    'CupertinoTextFormFieldRow',
+    'EditableText',
+  };
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    // Stop descending once a field is found — the rest of the subtree cannot
+    // change the result, so skip the recursive super call to avoid wasted work.
+    if (found) return;
+
+    final String name = node.constructorName.type.name.lexeme;
+    if (_editableTypes.contains(name) ||
+        name.endsWith('TextField') ||
+        name.endsWith('TextFormField')) {
+      found = true;
+      return;
+    }
+
+    super.visitInstanceCreationExpression(node);
   }
 }
 

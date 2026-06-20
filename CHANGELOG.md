@@ -68,6 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed
 
+- **`require_keyboard_dismiss_on_scroll` no longer fires on scroll views that contain no text field.** The rule now warns only when a `ListView` / `GridView` / `CustomScrollView` / `SingleChildScrollView` actually contains an editable field (`TextField`, `TextFormField`, `CupertinoTextField`, or a custom `*TextField`), matching its own "containing text fields" precondition; a pure content list (contacts, avatars, a continent list) has no keyboard to dismiss and is now left alone. Builder/opaque content with no syntactically visible children is intentionally not flagged. No action required.
 - **`avoid_parameter_mutation` no longer fires inside Flutter render-object overrides where mutating the framework-supplied object is mandatory.** `updateRenderObject(BuildContext, RenderObject)` (pushing the widget's new config onto the render object) and `setupParentData(RenderObject child)` (assigning `child.parentData`) are now exempt — there is no copy alternative, so the in-place mutation is the framework contract, not caller-data corruption. Same render-object blind spot previously fixed for `avoid_unassigned_late_fields` and `avoid_unsafe_cast`.
 
 ---
