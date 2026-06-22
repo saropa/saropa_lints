@@ -521,6 +521,9 @@ Set<String> staleVersionGatedCodes(
 /// Canonical registry: pack id → rule codes (generated from `lib/src/rules/packages/`).
 const Map<String, Set<String>> kRulePackRuleCodes = {
   ...kRulePackRuleCodesGenerated,
+  // Theme ("concern") packs (security, accessibility, performance, …) — rosters
+  // derived from the source tree by tool/generate_rule_pack_registry.dart.
+  ...kRuleThemePackCodesGenerated,
   'dart_sdk_3_2': {
     'avoid_removed_js_number_to_dart',
     'avoid_legacy_jsboolean_return_assumptions',

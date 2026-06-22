@@ -22,6 +22,12 @@ export const SDK_DOMAIN = 'SDK migrations';
  * the top with the curated standards rather than among package domains.
  */
 export const PLATFORM_DOMAIN = 'Platforms';
+/**
+ * Domain for theme ("concern") packs (Security, Performance, Accessibility, …):
+ * cross-cutting bundles grouped by what they protect rather than by a package.
+ * Rules overlap freely with package and platform packs (additive merge).
+ */
+export const CONCERN_DOMAIN = 'Concerns';
 /** Fallback domain for any package pack not yet assigned below. */
 export const OTHER_DOMAIN = 'Other';
 /**
@@ -38,6 +44,7 @@ export const QUALITY_DOMAIN = 'Quality standards';
  */
 export const PACK_DOMAIN_ORDER: readonly string[] = [
   QUALITY_DOMAIN,
+  CONCERN_DOMAIN,
   PLATFORM_DOMAIN,
   'State management',
   'Networking & APIs',
@@ -66,6 +73,22 @@ const PACK_DOMAIN_BY_ID: Readonly<Record<string, string>> = {
   windows: PLATFORM_DOMAIN,
   macos: PLATFORM_DOMAIN,
   linux: PLATFORM_DOMAIN,
+
+  // Theme ("concern") packs (cross-cutting, overlap allowed)
+  security: CONCERN_DOMAIN,
+  accessibility: CONCERN_DOMAIN,
+  performance: CONCERN_DOMAIN,
+  async_concurrency: CONCERN_DOMAIN,
+  error_handling: CONCERN_DOMAIN,
+  state_management: CONCERN_DOMAIN,
+  navigation: CONCERN_DOMAIN,
+  data_integrity: CONCERN_DOMAIN,
+  architecture: CONCERN_DOMAIN,
+  networking: CONCERN_DOMAIN,
+  media_graphics: CONCERN_DOMAIN,
+  forms: CONCERN_DOMAIN,
+  theming: CONCERN_DOMAIN,
+  code_quality: CONCERN_DOMAIN,
 
   // State management
   bloc: 'State management',

@@ -210,9 +210,101 @@ const Map<String, String> kPackUiLabels = {
   'speech_to_text': 'Speech to Text',
 };
 
+/// Theme ("concern") packs: cross-cutting bundles grouped by what they protect,
+/// not by a package, SDK, or platform. Each maps to one or more rule source
+/// paths under `lib/src/rules/` — a directory (walked recursively) or a single
+/// `*_rules.dart` file. A rule may appear in several theme packs; overlap is
+/// intentional under the additive merge. Rosters are derived at generation time
+/// from the source tree, so adding a rule to a covered file extends the pack
+/// automatically with no hand-maintained list to drift.
+const Map<String, ({String label, List<String> paths})> kThemePacks = {
+  'security': (label: 'Security', paths: ['security']),
+  'accessibility': (
+    label: 'Accessibility',
+    paths: ['ui/accessibility_rules.dart'],
+  ),
+  'performance': (
+    label: 'Performance',
+    paths: [
+      'core/performance_rules.dart',
+      'core/compound_performance_rules.dart',
+      'resources/memory_management_rules.dart',
+      'resources/db_yield_rules.dart',
+      'resources/resource_management_rules.dart',
+    ],
+  ),
+  'async_concurrency': (
+    label: 'Async & concurrency',
+    paths: ['core/async_rules.dart'],
+  ),
+  'error_handling': (
+    label: 'Error handling',
+    paths: [
+      'flow/error_handling_rules.dart',
+      'flow/exception_rules.dart',
+      'flow/return_rules.dart',
+      'flow/control_flow_rules.dart',
+    ],
+  ),
+  'state_management': (
+    label: 'State management',
+    paths: ['core/state_management_rules.dart'],
+  ),
+  'navigation': (
+    label: 'Navigation & routing',
+    paths: ['ui/navigation_rules.dart'],
+  ),
+  'data_integrity': (label: 'Data integrity', paths: ['data']),
+  'architecture': (label: 'Architecture & lifecycle', paths: ['architecture']),
+  'networking': (label: 'Networking', paths: ['network']),
+  'media_graphics': (label: 'Media & graphics', paths: ['media']),
+  'forms': (label: 'Forms & input', paths: ['widget/forms_rules.dart']),
+  'theming': (label: 'Theming', paths: ['widget/theming_rules.dart']),
+  'code_quality': (label: 'Code quality', paths: ['code_quality']),
+};
+
+/// `LintCode('name', ...)` extractor (positional first arg). Mirrors the regex in
+/// rule_pack_audit.dart; kept local so the generator has no private dependency.
+final RegExp _themeLintNameRe = RegExp(
+  r"LintCode\s*\(\s*'([a-z0-9_]+)'",
+  multiLine: true,
+);
+
+/// Build theme-pack rule rosters by scanning each theme's source paths under
+/// [rulesRoot] for `LintCode('...')` names. Directories are walked recursively;
+/// individual files are read directly. Missing paths are reported by the caller.
+Map<String, Set<String>> extractThemePacks(Directory rulesRoot) {
+  final out = <String, Set<String>>{};
+  for (final entry in kThemePacks.entries) {
+    final codes = <String>{};
+    for (final rel in entry.value.paths) {
+      final full = '${rulesRoot.path}/$rel';
+      final dir = Directory(full);
+      final file = File(full);
+      if (dir.existsSync()) {
+        for (final f in dir.listSync(recursive: true)) {
+          if (f is! File || !f.path.endsWith('_rules.dart')) continue;
+          codes.addAll(
+            _themeLintNameRe.allMatches(f.readAsStringSync()).map((m) => m.group(1)!),
+          );
+        }
+      } else if (file.existsSync()) {
+        codes.addAll(
+          _themeLintNameRe.allMatches(file.readAsStringSync()).map((m) => m.group(1)!),
+        );
+      }
+    }
+    out[entry.key] = codes;
+  }
+  return out;
+}
+
 String _uiLabelForPackId(String pack) {
   final mapped = kPackUiLabels[pack];
   if (mapped != null) return mapped;
+
+  final theme = kThemePacks[pack];
+  if (theme != null) return theme.label;
 
   const dartPrefix = 'dart_sdk_';
   if (pack.startsWith(dartPrefix)) {
@@ -305,11 +397,34 @@ void main() {
     buf.writeln('},');
   }
   buf.writeln('};');
+  buf.writeln();
+
+  // Theme ("concern") packs — rosters derived from the source tree (see kThemePacks).
+  final themePacks = extractThemePacks(Directory('${root.path}/lib/src/rules'));
+  final sortedThemeIds = themePacks.keys.toList()..sort();
+  for (final id in sortedThemeIds) {
+    if (themePacks[id]!.isEmpty) {
+      warnings.add('Theme pack "$id" matched no LintCode names — check kThemePacks paths');
+    }
+  }
+  buf.writeln(
+    '/// Theme ("concern") pack rule codes, derived from lib/src/rules/ source paths.',
+  );
+  buf.writeln('const Map<String, Set<String>> kRuleThemePackCodesGenerated = {');
+  for (final id in sortedThemeIds) {
+    buf.writeln("  '$id': {");
+    buf.write(_dartSetLiteral(themePacks[id]!));
+    buf.writeln('  },');
+  }
+  buf.writeln('};');
 
   outFile.writeAsStringSync(buf.toString());
-  print('Wrote ${outFile.path} (${sortedPacks.length} packs)');
+  print(
+    'Wrote ${outFile.path} (${sortedPacks.length} package packs, '
+    '${sortedThemeIds.length} theme packs)',
+  );
 
-  _writeRulePackDefinitionsTs(root: root);
+  _writeRulePackDefinitionsTs(root: root, themePacks: themePacks);
   _writeStylisticPackDefinitionsTs(root: root);
 
   for (final w in warnings) {
@@ -423,8 +538,22 @@ void _writeStylisticPackDefinitionsTs({required Directory root}) {
   print('Wrote ${tsFile.path} (${categories.length} stylistic packs)');
 }
 
-void _writeRulePackDefinitionsTs({required Directory root}) {
-  final sortedAllPackIds = packs.kRulePackRuleCodes.keys.toList()..sort();
+void _writeRulePackDefinitionsTs({
+  required Directory root,
+  required Map<String, Set<String>> themePacks,
+}) {
+  // Merge the runtime registry (package/sdk/platform/thematic packs, compiled)
+  // with the theme packs computed THIS run. Theme rule codes only reach
+  // packs.kRulePackRuleCodes after rule_packs.dart recompiles against the new
+  // generated const, so merging here lets a single generator run emit complete
+  // TS instead of requiring a second pass.
+  final mergedCodes = <String, Set<String>>{
+    for (final e in packs.kRulePackRuleCodes.entries) e.key: e.value.toSet(),
+  };
+  for (final e in themePacks.entries) {
+    mergedCodes.putIfAbsent(e.key, () => <String>{}).addAll(e.value);
+  }
+  final sortedAllPackIds = mergedCodes.keys.toList()..sort();
 
   final tsFile = File(
     '${root.path}/extension/src/rulePacks/rulePackDefinitions.ts',
@@ -489,8 +618,7 @@ void _writeRulePackDefinitionsTs({required Directory root}) {
     final markers =
         (packs.kRulePackPubspecMarkers[pack] ?? const <String>{}).toList()
           ..sort();
-    final codes = (packs.kRulePackRuleCodes[pack] ?? const <String>{}).toList()
-      ..sort();
+    final codes = (mergedCodes[pack] ?? const <String>{}).toList()..sort();
     final markersJs = markers.map((s) => "'$s'").join(', ');
     final depGate = packs.kRulePackDependencyGates[pack];
     final sdkGate = packs.kRulePackSdkGates[pack];

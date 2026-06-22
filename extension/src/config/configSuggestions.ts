@@ -18,7 +18,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { hasSaropaLintsDep } from '../pubspecReader';
+import { hasSaropaLintsDep, FLUTTER_EMBEDDER_PLATFORMS } from '../pubspecReader';
 import {
   RULE_PACK_DEFINITIONS,
   isPackDetected,
@@ -138,6 +138,73 @@ function upgradePackSuggestions(
   return applicableDisabledPacks(lockVersions, enabled).map(toPackSuggestion);
 }
 
+/** True when [rel] under [root] exists as a directory. */
+function hasDir(root: string, rel: string): boolean {
+  try {
+    const p = path.join(root, rel);
+    return fs.existsSync(p) && fs.statSync(p).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Platform packs (ios, android, web, …) suggested from the project's embedder
+ * folders rather than a pubspec dependency. The pack id matches the embedder
+ * folder name ({@link FLUTTER_EMBEDDER_PLATFORMS}), so a present `ios/` folder
+ * recommends the `ios` pack. This is the folder signal the pubspec-only path
+ * cannot see — a Flutter app declares its targets by which embedder folders
+ * exist, not by a dependency.
+ */
+function platformPackSuggestions(
+  root: string,
+  enabled: ReadonlySet<string>,
+): ConfigSuggestion[] {
+  const out: ConfigSuggestion[] = [];
+  for (const plat of FLUTTER_EMBEDDER_PLATFORMS) {
+    if (enabled.has(plat) || !hasDir(root, plat)) continue;
+    const def = RULE_PACK_DEFINITIONS.find((d) => d.id === plat);
+    if (def) out.push(toPackSuggestion(def));
+  }
+  return out;
+}
+
+/**
+ * Packs implied by marker FILES that prove the integration is wired even before
+ * (or without) a matching pubspec dependency line — e.g. a `google-services.json`
+ * means Firebase is configured. Hand-maintained (not in the generated registry)
+ * because the signal is a file path, not a dependency name.
+ */
+const kPackMarkerFiles: Readonly<Record<string, readonly string[]>> = {
+  firebase: [
+    'android/app/google-services.json',
+    'ios/Runner/GoogleService-Info.plist',
+    'firebase.json',
+  ],
+};
+
+/** Packs suggested because a marker file from {@link kPackMarkerFiles} exists. */
+function markerFilePackSuggestions(
+  root: string,
+  enabled: ReadonlySet<string>,
+): ConfigSuggestion[] {
+  const out: ConfigSuggestion[] = [];
+  for (const [packId, files] of Object.entries(kPackMarkerFiles)) {
+    if (enabled.has(packId)) continue;
+    const present = files.some((rel) => {
+      try {
+        return fs.existsSync(path.join(root, rel));
+      } catch {
+        return false;
+      }
+    });
+    if (!present) continue;
+    const def = RULE_PACK_DEFINITIONS.find((d) => d.id === packId);
+    if (def) out.push(toPackSuggestion(def));
+  }
+  return out;
+}
+
 /**
  * Computes the proactive config suggestions for [root].
  *
@@ -170,9 +237,20 @@ export function computeConfigSuggestions(root: string): ConfigSuggestion[] {
     (def) => !enabled.has(def.id) && isProactivelySuggestable(def, pubspecContent),
   ).map(toPackSuggestion);
 
-  // dependencyGate and other packs are disjoint (isProactivelySuggestable
-  // returns false for dependencyGate), so a simple concat cannot duplicate ids.
-  const packs = [...fromPubspec, ...upgradePackSuggestions(root, enabled)].sort(
+  // Combine every detection signal: pubspec dependency markers, lockfile-resolved
+  // upgrade packs, embedder folders (platform packs), and marker files. A pack
+  // can be flagged by more than one signal (e.g. firebase by both a dependency
+  // and google-services.json), so de-dup by id before sorting.
+  const byId = new Map<string, ConfigSuggestion>();
+  for (const s of [
+    ...fromPubspec,
+    ...upgradePackSuggestions(root, enabled),
+    ...platformPackSuggestions(root, enabled),
+    ...markerFilePackSuggestions(root, enabled),
+  ]) {
+    byId.set(s.id, s);
+  }
+  const packs = [...byId.values()].sort(
     (a, b) => (a.packLabel ?? a.id).localeCompare(b.packLabel ?? b.id),
   );
 
