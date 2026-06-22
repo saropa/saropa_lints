@@ -64,6 +64,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [14.0.8]
+
+Resolves a false positive in the color-only status indicator rule so decorative active-state bars and indicators paired with another visual cue are no longer flagged. [log](https://github.com/saropa/saropa_lints/blob/v14.0.8/CHANGELOG.md)
+
+### Fixed
+
+- **`avoid_color_only_indicators` no longer fires when the state is already conveyed by a non-color cue or when the color is just a show/hide toggle.** The rule inspected a `Container` in isolation, so a thin active-tab underline whose color toggles to `Colors.transparent` (a presence cue, not a red-vs-green hue) and a colored swatch sitting next to a sibling `Text`/`Icon` that reacts to the same state (bold weight or distinct glyph) were both reported as inaccessible. The rule now suppresses both: a branch resolving to `Colors.transparent` is treated as a visibility toggle, and a sibling Text/Icon-family widget referencing the same condition counts as the required secondary cue — which also fixes the rule's own documented GOOD example (a `Row` with a conditional `Icon` beside the colored `Container`). Genuine standalone red/green indicators with no secondary cue still warn. No action required.
+
+---
+
 ## [14.0.7]
 
  A quick fix for better honoring `// ignore`. [log](https://github.com/saropa/saropa_lints/blob/v14.0.7/CHANGELOG.md)

@@ -373,7 +373,11 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
 
 /// Warns when using color alone to convey information.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v6
+/// Since: v0.1.4 | Updated: v14.0.8 | Rule version: v7
+///
+/// Suppresses two correct patterns the v6 detector mis-flagged: a sibling
+/// Text/Icon that reacts to the same state (non-color cue present), and a color
+/// that toggles to `Colors.transparent` (a show/hide presence cue, not a hue).
 ///
 /// Users with color blindness may not be able to distinguish colors.
 /// Always provide an additional indicator (icon, text, pattern).
@@ -414,7 +418,7 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_color_only_indicators',
-    '[avoid_color_only_indicators] Color-only status indicator fails for approximately 8% of men and 0.5% of women who have color vision deficiency and cannot distinguish red from green, making the UI completely inaccessible to colorblind users. Relying solely on color to convey meaning violates WCAG 1.4.1 (Use of Color), which requires a secondary visual cue such as an icon, text label, or pattern to communicate status information. {v6}',
+    '[avoid_color_only_indicators] Color-only status indicator fails for approximately 8% of men and 0.5% of women who have color vision deficiency and cannot distinguish red from green, making the UI completely inaccessible to colorblind users. Relying solely on color to convey meaning violates WCAG 1.4.1 (Use of Color), which requires a secondary visual cue such as an icon, text label, or pattern to communicate status information. {v7}',
     correctionMessage:
         'Add a secondary visual cue alongside the color, such as Icon(isError ? Icons.error : Icons.check), a text label, or a distinct shape to convey status.',
     severity: DiagnosticSeverity.WARNING,
@@ -429,29 +433,166 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'Container') return;
 
-      // Check if color is set conditionally
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'color') {
-          if (arg.expression is ConditionalExpression) {
-            // Check if Container only has color (simple status indicator)
-            final bool hasOnlyColorAndChild = node.argumentList.arguments
-                .whereType<NamedExpression>()
-                .every(
-                  (NamedExpression na) =>
-                      na.name.label.name == 'color' ||
-                      na.name.label.name == 'child' ||
-                      na.name.label.name == 'key' ||
-                      na.name.label.name == 'width' ||
-                      na.name.label.name == 'height',
-                );
+      // Only a Container whose color is chosen by a conditional is a candidate
+      // status indicator; a constant color carries no state to mis-convey.
+      final NamedExpression? colorArg = _conditionalColorArg(node);
+      if (colorArg == null) return;
 
-            if (hasOnlyColorAndChild) {
-              reporter.atNode(arg);
-            }
-          }
-        }
-      }
+      // Treat as a status indicator only when the Container carries nothing but
+      // color/size/child/key. A richer Container is decoration handled elsewhere.
+      if (!_hasOnlyColorAndChild(node)) return;
+
+      final ConditionalExpression condition =
+          colorArg.expression as ConditionalExpression;
+
+      // A bar whose color toggles to Colors.transparent in one branch is a
+      // show/hide presence cue (active-tab underline, selection underbar), not a
+      // red-vs-green status hue. WCAG 1.4.1 is about telling two VISIBLE states
+      // apart by color; a transparent branch hides the element entirely, so a
+      // colorblind user has nothing to disambiguate.
+      if (_togglesTransparency(condition)) return;
+
+      // A status indicator is "color-only" relative to the whole control, not to
+      // one Container. When a sibling Text/Icon reacts to the SAME state (bold
+      // weight, distinct glyph), the active state already has a non-color cue and
+      // WCAG 1.4.1 is satisfied — this is the rule's own documented GOOD example
+      // (Row with a conditional Icon next to the colored Container).
+      if (_hasSiblingNonColorCue(node, condition.condition)) return;
+
+      reporter.atNode(colorArg);
     });
+  }
+
+  /// Returns the `color:` argument when it is set by a [ConditionalExpression],
+  /// or null when there is no such argument.
+  NamedExpression? _conditionalColorArg(InstanceCreationExpression node) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression &&
+          arg.name.label.name == 'color' &&
+          arg.expression is ConditionalExpression) {
+        return arg;
+      }
+    }
+    return null;
+  }
+
+  /// True when every named argument is one of color/child/key/width/height —
+  /// the shape of a bare status swatch rather than a decorated Container.
+  bool _hasOnlyColorAndChild(InstanceCreationExpression node) {
+    return node.argumentList.arguments.whereType<NamedExpression>().every(
+      (NamedExpression na) {
+        final String name = na.name.label.name;
+        return name == 'color' ||
+            name == 'child' ||
+            name == 'key' ||
+            name == 'width' ||
+            name == 'height';
+      },
+    );
+  }
+
+  /// True when either branch resolves to `Colors.transparent` (a presence
+  /// toggle), including opacity-adjusted chains like
+  /// `Colors.transparent.withOpacity(0.3)`.
+  bool _togglesTransparency(ConditionalExpression condition) {
+    return _isTransparentColor(condition.thenExpression) ||
+        _isTransparentColor(condition.elseExpression);
+  }
+
+  bool _isTransparentColor(Expression expression) {
+    // Unwrap method chains (withOpacity/withValues/withAlpha) to the base color.
+    Expression base = expression;
+    while (base is MethodInvocation && base.target != null) {
+      base = base.target!;
+    }
+    if (base is PrefixedIdentifier) {
+      return base.prefix.name == 'Colors' &&
+          base.identifier.name == 'transparent';
+    }
+    if (base is PropertyAccess) {
+      final Expression? target = base.target;
+      return base.propertyName.name == 'transparent' &&
+          target is SimpleIdentifier &&
+          target.name == 'Colors';
+    }
+    return false;
+  }
+
+  /// True when a sibling widget in the same `children` list conveys the same
+  /// state by a non-color means. Matches a Text/Icon-family widget that
+  /// references one of the identifiers used in the Container's color condition,
+  /// so an unrelated conditional elsewhere does not mask a genuine issue.
+  bool _hasSiblingNonColorCue(
+    InstanceCreationExpression container,
+    Expression conditionExpression,
+  ) {
+    final ListLiteral? siblings = _enclosingChildrenList(container);
+    if (siblings == null) return false;
+
+    final _IdentifierCollector conditionIds = _IdentifierCollector();
+    conditionExpression.accept(conditionIds);
+    if (conditionIds.names.isEmpty) return false;
+
+    for (final CollectionElement element in siblings.elements) {
+      if (identical(element, container)) continue;
+      final _SiblingCueVisitor visitor = _SiblingCueVisitor(conditionIds.names);
+      element.accept(visitor);
+      if (visitor.hasCue) return true;
+    }
+    return false;
+  }
+
+  /// Walks up to the `children` list literal that directly holds [container].
+  /// Stops at the first enclosing widget so we never cross into a different
+  /// widget's argument list.
+  ListLiteral? _enclosingChildrenList(InstanceCreationExpression container) {
+    AstNode? current = container.parent;
+    while (current != null) {
+      if (current is ListLiteral) return current;
+      if (current is InstanceCreationExpression) return null;
+      current = current.parent;
+    }
+    return null;
+  }
+}
+
+/// Collects the names of every [SimpleIdentifier] in a subtree, used to compare
+/// the state driving a color condition against the state a sibling cue reacts to.
+class _IdentifierCollector extends RecursiveAstVisitor<void> {
+  final Set<String> names = <String>{};
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    names.add(node.name);
+    super.visitSimpleIdentifier(node);
+  }
+}
+
+/// Searches a sibling subtree for a Text/Icon-family widget that reacts to the
+/// same state as the colored Container — a non-color cue (bold weight, distinct
+/// glyph) that satisfies WCAG 1.4.1 for the control as a whole.
+class _SiblingCueVisitor extends RecursiveAstVisitor<void> {
+  _SiblingCueVisitor(this._conditionNames);
+
+  final Set<String> _conditionNames;
+  bool hasCue = false;
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    if (hasCue) return;
+
+    final String? name = node.constructorName.type.element?.name;
+    // Text/Icon families (Flutter's Text/RichText/Icon/ImageIcon and project
+    // Common* wrappers) carry weight/shape state distinct from color.
+    if (name != null && (name.contains('Text') || name.contains('Icon'))) {
+      final _IdentifierCollector cueIds = _IdentifierCollector();
+      node.argumentList.accept(cueIds);
+      if (cueIds.names.intersection(_conditionNames).isNotEmpty) {
+        hasCue = true;
+        return;
+      }
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }
 

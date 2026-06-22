@@ -108,6 +108,8 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 final children = <Widget>[];
 dynamic error;
 final isError = false;
+final active = false;
+const accent = Colors.blue;
 
 // BAD: Should trigger avoid_color_only_indicators
 // expect_lint: avoid_color_only_indicators
@@ -123,6 +125,63 @@ void _good3() {
     children: [
       Icon(isError ? Icons.error : Icons.check),
       Container(color: isError ? Colors.red : Colors.green),
+    ],
+  );
+}
+
+// GOOD: thin underline bar that toggles to transparent (presence cue, not hue).
+void _goodTransparencyToggle() {
+  Column(
+    children: <Widget>[
+      Container(
+        height: 2.5,
+        color: active ? accent : Colors.transparent,
+      ),
+    ],
+  );
+}
+
+// GOOD: sibling Text reacts to the same state (bold weight = non-color cue).
+void _goodSiblingWeightCue() {
+  Column(
+    children: <Widget>[
+      Text('Email', style: TextStyle(fontWeight: active ? FontWeight.bold : FontWeight.normal)),
+      Container(
+        height: 2.5,
+        color: active ? accent : Colors.grey,
+      ),
+    ],
+  );
+}
+
+// GOOD: sibling Icon toggles glyph on the same state (shape cue) inside a Row.
+void _goodSiblingGlyphCue() {
+  Column(
+    children: <Widget>[
+      Row(
+        children: <Widget>[
+          Icon(active ? Icons.star : Icons.star_border),
+          Text('Tab'),
+        ],
+      ),
+      Container(
+        height: 2.5,
+        color: active ? accent : Colors.grey,
+      ),
+    ],
+  );
+}
+
+// BAD: standalone red/green swatch, no sibling cue, no transparent branch.
+// expect_lint: avoid_color_only_indicators
+void _badStandaloneStatus() {
+  Column(
+    children: <Widget>[
+      Container(
+        width: 12,
+        height: 12,
+        color: isError ? Colors.red : Colors.green,
+      ),
     ],
   );
 }
