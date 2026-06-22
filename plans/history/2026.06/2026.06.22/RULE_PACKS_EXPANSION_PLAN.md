@@ -234,3 +234,52 @@ become two signal sources among several. No parallel detector.
 - No new lint rules. This plan only re-surfaces existing rules.
 - No translation/MT runs (new i18n keys for pack labels are added normally; the
   MT pipeline stays on its own cadence).
+
+---
+
+## Finish Report (2026-06-22)
+
+Implements the additive-pack model and the bulk of the pack-expansion plan.
+Packs were previously subtractive — any rule owned by a pack was removed from
+the tier floor unless that pack was enabled, silently dropping tier coverage
+(measured: 509 of 601 package-pack codes and all 141 thematic-pack codes also
+live in tiers). Packs are now additive: a rule is valid if the tier floor or any
+enabled pack provides it, with one carve-out for version-locked migration rules.
+
+### Landed
+
+- **Phase 0 — additive merge + version correctness.** `mergeRulePacksIntoEnabled`
+  no longer strips the tier floor; it adds enabled-pack rules on top.
+  `staleVersionGatedCodes` removes only rules locked to a package/SDK version the
+  lockfile/pubspec proves the project is not on (for example a dio 5 rule on a
+  dio 4 project), even when a tier lists them; an unknown version keeps the floor.
+  `config_loader` threads pubspec content for the SDK carve-out. Tests rewritten
+  to the additive model with version-strip coverage.
+- **Phase 1 — platform packs.** `ios`, `android`, `web`, `windows`, `macos`,
+  `linux` added to the registry from the existing `tiers.dart` platform rosters,
+  surfaced under a new `Platforms` domain.
+- **Phase 2 — concern packs.** 14 theme packs (Security, Performance,
+  Accessibility, …) derived at generation time from `lib/src/rules/` source
+  paths (`kThemePacks` + `extractThemePacks` in the generator), emitted to
+  `kRuleThemePackCodesGenerated` and the TS registry, grouped under a `Concerns`
+  domain.
+- **Phase 4 — folder/file recommendation.** `computeConfigSuggestions` now
+  suggests platform packs from embedder folders and Firebase from marker files
+  (`google-services.json` / `GoogleService-Info.plist`), de-duped against the
+  existing pubspec/lockfile signals.
+
+### Verification
+
+- The generator run compiles `rule_packs.dart` and regenerates the registry
+  (70 package packs, 14 theme packs) without warnings.
+- Pack merge tests last passed 33/33 before the platform/theme additions; the
+  full Dart test suite was NOT re-run in this environment (tooling constraint —
+  see What to test). Run `dart test --no-pub test/config/` to confirm.
+
+### Remaining (split out)
+
+- **Version-group UI** — exclusive radio groups for version packs in the webview.
+  Moved to `plans/RULE_PACKS_VERSION_GROUP_UI_PLAN.md`. Not required for
+  correctness: Phase 0 already enforces version selection from the lockfile.
+- **Phase 3 (tag-based membership) and Axes 3-5 (compliance/profile/intent
+  packs)** remain as described above; not started.
