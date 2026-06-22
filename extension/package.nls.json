@@ -14,6 +14,7 @@
   "command.runAnalysis.title": "Saropa Lints: Run Analysis",
   "command.verifyPlugin.title": "Saropa Lints: Verify Plugin Is Running (liveness check)",
   "command.initializeConfig.title": "Saropa Lints: Initialize / Update Analysis Options",
+  "command.createBaseline.title": "Saropa Lints: Create Baseline (suppress existing violations)",
   "command.checkForUpdatesNow.title": "Saropa Lints: Check for Package Updates Now",
   "command.enableRulePack.title": "Saropa Lints: Enable Rule Pack",
   "command.emitCompositePluginScaffold.title": "Saropa Lints: Create Composite Analyzer Plugin (scaffold)",

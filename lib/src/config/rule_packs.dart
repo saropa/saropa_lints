@@ -4,9 +4,13 @@
 /// `plugins.saropa_lints.rule_packs.enabled` in analysis_options.yaml.
 ///
 /// **Config merge order:** The native plugin loads severity overrides and
-/// `diagnostics:` first; then [mergeRulePacksIntoEnabled] merges pack rule codes
-/// into [SaropaLintRule.enabledRules]. Codes in [SaropaLintRule.disabledRules]
-/// (explicit `false`) are skipped so user opt-out wins over pack opt-in.
+/// `diagnostics:` first (these seed the tier floor in [SaropaLintRule.enabledRules]);
+/// then [mergeRulePacksIntoEnabled] ADDS enabled-pack rule codes on top.
+/// Codes in [SaropaLintRule.disabledRules] (explicit `false`) are skipped so
+/// user opt-out wins over pack opt-in. Packs are additive — a rule is valid if
+/// the tier floor or any enabled pack provides it — except version-locked rules,
+/// which are dropped when the project is not on that version (see
+/// [staleVersionGatedCodes]).
 ///
 /// **Semver gates:** Packs listed in [kRulePackDependencyGates] only merge when
 /// [mergeRulePacksIntoEnabled] receives a [resolvedVersions] map and the
@@ -24,11 +28,14 @@
 /// tool applies that map when auditing. Run `dart run tool/rule_pack_audit.dart` after
 /// registry or package-rule edits to catch drift before CI.
 ///
-/// **Overlapping rules across packs:** [mergeRulePacksIntoEnabled] returns
-/// only codes newly added to [enabled]. Re-merge subtracts that set before
-/// applying the next pack list; if two enabled packs share a rule and it is
-/// removed from one pack only, toggling YAML may require an analyzer restart
-/// for a correct effective set. Prefer disjoint pack membership.
+/// **Overlapping rules across packs and tiers (additive model):** a rule may
+/// belong to several packs and/or a tier; it is valid if EITHER source enables
+/// it, and disabling one pack never removes a rule the tier or another enabled
+/// pack still provides. [mergeRulePacksIntoEnabled] returns only the codes it
+/// newly added (pack-exclusive ones not already in the floor); the incremental
+/// re-merge subtracts that set before re-applying, so a YAML toggle resolves to
+/// the correct union. Version-locked migration packs are the exception — see
+/// [staleVersionGatedCodes].
 library;
 
 import 'dart:developer' as developer;
@@ -411,10 +418,17 @@ bool isRulePackApplicable(
   return packPassesDependencyGate(packId, lockVersions);
 }
 
-/// Adds rule codes from [packIds] into [enabled], skipping any code whose
-/// lowercase name appears in [disabled] (diagnostics/severity disables).
+/// Additive pack merge: a rule is valid if the tier floor (already in [enabled])
+/// OR an enabled pack provides it. Packs only ADD; they never strip a
+/// tier-enabled rule. Codes in [disabled] (explicit `false`) are never added.
 ///
-/// Skips packs that fail [packPassesDependencyGate] when a gate exists.
+/// **Version correctness (the one carve-out).** Some rules apply only to a
+/// specific package/SDK major (e.g. `avoid_dio_error` applies to dio 5, not
+/// dio 4). For these, the resolved version wins over the tier: when the lockfile
+/// / pubspec definitively shows the project is NOT on the gated version, the
+/// gated pack's codes are removed even if a tier listed them. When the version
+/// is unknown we keep the tier floor intact (conservative — never strip on a
+/// guess). See [staleVersionGatedCodes].
 ///
 /// Returns the set of rule codes added from packs (for subtract-before-remerge).
 Set<String> mergeRulePacksIntoEnabled(
@@ -422,23 +436,76 @@ Set<String> mergeRulePacksIntoEnabled(
   Set<String>? disabled,
   Iterable<String> packIds, {
   Map<String, String>? resolvedVersions,
+  String? pubspecYamlContent,
 }) {
-  // Authoritative pack mode: pack-owned rules are removed from tier-derived
-  // enables first, then only enabled packs re-add their owned rules.
-  enabled.removeAll(allRulePackCodes());
-
   final contributed = <String>{};
   final disabledLc = <String>{
     for (final d in disabled ?? const <String>{}) d.toLowerCase(),
   };
+
+  // Additive: enabled packs (whose gate passes) add their rules on top of the
+  // tier floor. A gate-failing pack contributes nothing here.
   for (final packId in packIds) {
     if (!packPassesDependencyGate(packId, resolvedVersions)) continue;
+    if (pubspecYamlContent != null &&
+        !packPassesSdkGate(packId, pubspecYamlContent)) {
+      continue;
+    }
     for (final code in ruleCodesForPack(packId)) {
       if (disabledLc.contains(code.toLowerCase())) continue;
       if (enabled.add(code)) contributed.add(code);
     }
   }
+
+  // Version choice wins over tier: drop rules locked to a version the project is
+  // definitively not on, even when the tier floor listed them. An explicitly
+  // contributed (enabled + passing) pack rule is never stripped.
+  final stale = staleVersionGatedCodes(resolvedVersions, pubspecYamlContent)
+    ..removeAll(contributed);
+  enabled.removeAll(stale);
+
   return contributed;
+}
+
+/// Rule codes locked to a package/SDK version the project is definitively NOT
+/// on. These must not fire even when a tier lists them (version choice wins over
+/// tier). Returns empty for any gate whose version is unknown — the tier floor
+/// stays intact rather than stripping on a guess.
+Set<String> staleVersionGatedCodes(
+  Map<String, String>? resolvedVersions,
+  String? pubspecYamlContent,
+) {
+  final stale = <String>{};
+
+  // Dependency-gated version packs (dio_5, bloc_8, app_links_6, …): strip when
+  // the lockfile resolves the dependency AND the resolved version fails the gate.
+  if (resolvedVersions != null && resolvedVersions.isNotEmpty) {
+    for (final entry in kRulePackDependencyGates.entries) {
+      final raw = resolvedVersions[entry.value.dependency];
+      // Version unknown (dependency absent from lockfile) → keep the floor.
+      if (raw == null || raw.isEmpty) continue;
+      if (!packPassesDependencyGate(entry.key, resolvedVersions)) {
+        stale.addAll(ruleCodesForPack(entry.key));
+      }
+    }
+  }
+
+  // SDK-gated migration packs (flutter_sdk_*, dart_sdk_*): strip when the
+  // pubspec pins an SDK lower bound that fails the gate. No pinned bound → keep.
+  if (pubspecYamlContent != null) {
+    for (final entry in kRulePackSdkGates.entries) {
+      final lowerBound = _parseSdkLowerBoundFromPubspec(
+        pubspecYamlContent,
+        entry.value.sdkKey,
+      );
+      if (lowerBound == null) continue;
+      if (!packPassesSdkGate(entry.key, pubspecYamlContent)) {
+        stale.addAll(ruleCodesForPack(entry.key));
+      }
+    }
+  }
+
+  return stale;
 }
 
 /// Canonical registry: pack id → rule codes (generated from `lib/src/rules/packages/`).

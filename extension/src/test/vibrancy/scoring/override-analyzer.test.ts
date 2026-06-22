@@ -14,6 +14,7 @@ import {
 import { applyKnownOverrideReasons } from '../../../vibrancy/services/override-runner';
 import { OverrideEntry, PackageDependency, OverrideAnalysis } from '../../../vibrancy/types';
 import { DepGraphPackage } from '../../../vibrancy/services/dep-graph';
+import { ConstraintIndex } from '../../../vibrancy/scoring/shared-dep-conflict-detector';
 
 describe('override-analyzer', () => {
     describe('analyzeOverrides', () => {
@@ -135,6 +136,56 @@ describe('override-analyzer', () => {
             assert.strictEqual(result.length, 1);
             assert.strictEqual(result[0].status, 'active');
             assert.strictEqual(result[0].blocker, 'SDK transitive (flutter_test)');
+        });
+
+        it('names the transitive constrainer supplied by the constraint index', () => {
+            // dart_style caps analyzer ^12; overriding analyzer to 13.0.0
+            // resolves that cap. The constraint index supplies dart_style's
+            // declared range, so the analyzer reports dart_style as the active
+            // blocker. Before WS1 this was dead code: findTransitiveConstraint
+            // was a stub returning null and the override fell through to stale.
+            const overrides = [makeOverride('analyzer', '13.0.0')];
+            const deps = [
+                makeDep('analyzer', '13.0.0', '^13.0.0', false),
+                makeDep('dart_style', '3.1.8', '^3.1.8', true),
+            ];
+            const graph = [
+                makeGraphPkg('dart_style', ['analyzer']),
+                makeGraphPkg('analyzer', [], '13.0.0'),
+            ];
+            const constraints: ConstraintIndex = new Map([
+                ['dart_style', new Map([['analyzer', '^12.0.0']])],
+            ]);
+
+            const result = analyzeOverrides(
+                overrides, deps, graph, new Map(), constraints,
+            );
+
+            assert.strictEqual(result.length, 1);
+            assert.strictEqual(result[0].status, 'active');
+            assert.strictEqual(result[0].blocker, 'dart_style');
+        });
+
+        it('stays stale when no constraint index is supplied (index is the enabling input)', () => {
+            // Same diamond as above but with no constraint index. Without the
+            // declared ranges the transitive cap is invisible, so the override
+            // reads as stale — proving the index, not the graph alone, is what
+            // lets WS1 detect the conflict.
+            const overrides = [makeOverride('analyzer', '13.0.0')];
+            const deps = [
+                makeDep('analyzer', '13.0.0', '^13.0.0', false),
+                makeDep('dart_style', '3.1.8', '^3.1.8', true),
+            ];
+            const graph = [
+                makeGraphPkg('dart_style', ['analyzer']),
+                makeGraphPkg('analyzer', [], '13.0.0'),
+            ];
+
+            const result = analyzeOverrides(overrides, deps, graph, new Map());
+
+            assert.strictEqual(result.length, 1);
+            assert.strictEqual(result[0].status, 'stale');
+            assert.strictEqual(result[0].blocker, null);
         });
 
         it('should remain stale when override is not a transitive dep of any SDK package', () => {

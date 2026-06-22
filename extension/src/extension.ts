@@ -20,6 +20,7 @@ import {
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
   runInitializeConfig,
+  runCreateBaseline,
   runEmitCompositePluginScaffold,
   openConfig,
   runRepairConfig,
@@ -1148,6 +1149,18 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         return;
       }
       await forceUpgradeCheck(context, root);
+    }),
+    // Create a baseline (saropa_baseline.json) that suppresses existing
+    // violations so only new code is flagged. Backs the "Create baseline"
+    // suggestion in the Suggestions view, which previously dead-ended at the
+    // config editor. Refresh afterward so the suggestion drops off (the
+    // baseline file now exists) and suppression counts repopulate.
+    vscode.commands.registerCommand('saropaLints.createBaseline', async () => {
+      const created = await runCreateBaseline();
+      if (created) {
+        refreshAll();
+        updateAllStatusBars();
+      }
     }),
     vscode.commands.registerCommand('saropaLints.initializeConfig', async () => {
       const success = await runInitializeConfig(context);

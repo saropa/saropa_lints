@@ -433,11 +433,16 @@ void _reloadRulePacksFromRoot(String projectRoot) {
   final normalized = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
   final packIds = parseRulePacksEnabledList(normalized);
   final lockVersions = readResolvedPackageVersions(projectRoot);
+  // pubspec drives the SDK-version carve-out: a flutter_sdk_/dart_sdk_ migration
+  // rule is stripped from the floor only when the pinned SDK lower bound proves
+  // the project is not on that version. null pubspec → no SDK strip (floor kept).
+  final pubspec = _readProjectFile('pubspec.yaml', projectRoot);
   _packContributedCodes = mergeRulePacksIntoEnabled(
     enabled,
     SaropaLintRule.disabledRules,
     packIds,
     resolvedVersions: lockVersions,
+    pubspecYamlContent: pubspec,
   );
   SaropaLintRule.enabledRules = enabled.isEmpty ? null : enabled;
 }

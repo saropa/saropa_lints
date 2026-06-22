@@ -325,6 +325,15 @@ export interface BlockerInfo {
      * no readable constraint string to show.
      */
     readonly blockerIsSdkPin?: boolean;
+    /**
+     * Dependency path from a user-actionable direct dep down to `blockerPackage`
+     * (`[directDep, …, blockerPackage]`), set only when the constrainer is a
+     * deep transitive dep reached through 2+ hops. Lets the UI point at a line
+     * the user can edit — e.g. `dart_style → build_runner → analyzer` — instead
+     * of naming a constrainer absent from pubspec.yaml. Undefined/length-1 when
+     * the constrainer is itself direct.
+     */
+    readonly blockerChain?: readonly string[] | null;
 }
 
 /** README content parsed for display: logo and inline images. */

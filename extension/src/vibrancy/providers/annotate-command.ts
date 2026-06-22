@@ -4,9 +4,10 @@ import {
     parsePubspecYaml, parseDependencyOverrides,
 } from '../services/pubspec-parser';
 import { fetchPackageInfo } from '../services/pub-dev-api';
-import { getLatestResults } from '../extension-activation';
+import { getLatestResults, getLatestConstraintFindings } from '../extension-activation';
 import { findPubspecYaml } from '../services/pubspec-editor';
 import { buildAnnotationEdits } from './annotate-packages';
+import { buildConstraintNotes } from '../scoring/constraint-notes';
 import {
     SectionHeaderEdit,
     buildSectionHeaderEdits, buildSubSectionHeaderEdits, buildOverrideMarkerEdit,
@@ -74,7 +75,14 @@ async function annotatePubspecInner(): Promise<void> {
     }
 
     const descriptions = await fetchDescriptions(allDeps);
-    const edits = buildAnnotationEdits(doc, allDeps, descriptions);
+    // Constraint-explanation notes (held back / forbidden / required-by) from the
+    // last scan's findings, scoped to the deps actually written here. Empty when
+    // no scan has run yet — annotation still proceeds with descriptions only.
+    const { floors, forbiddens } = getLatestConstraintFindings();
+    const notes = buildConstraintNotes(
+        getLatestResults(), floors, forbiddens, new Set(allDeps),
+    );
+    const edits = buildAnnotationEdits(doc, allDeps, descriptions, notes);
 
     const config = vscode.workspace.getConfiguration('saropaLints.packageVibrancy');
     const insertSectionHeaders = config.get<boolean>(

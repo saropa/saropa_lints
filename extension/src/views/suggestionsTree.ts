@@ -128,7 +128,7 @@ export class SuggestionsTreeProvider implements vscode.TreeDataProvider<Suggesti
         new SuggestionItem(
           'Create baseline to suppress existing violations',
           'New code still checked',
-          'saropaLints.openConfig',
+          'saropaLints.createBaseline',
         ),
       );
     }

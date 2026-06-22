@@ -162,6 +162,23 @@ class ProjectContext {
     return getProjectInfo(filePath)?.hasPointerPlatform ?? true;
   }
 
+  /// Returns `true` when the project containing [filePath] declares a build
+  /// target for [platformId] (one of `web`, `windows`, `macos`, `linux`),
+  /// determined by the presence of the matching `flutter create` platform
+  /// directory at the project root.
+  ///
+  /// **Defaults to `false` when unknown** (no path, no pubspec, unparseable) —
+  /// the OPPOSITE of the assume-strict default used by [hasWebSupport] and
+  /// friends. Those rules warn about a hazard that exists *unless* a platform
+  /// is excluded, so unknown must assume the hazard is present. This method
+  /// instead answers "does the project positively build for X"; asserting a
+  /// package is incompatible with a target the project may not even have is the
+  /// false positive to avoid, so unknown means "do not fire".
+  static bool targetsPlatform(String? filePath, String platformId) {
+    return getProjectInfo(filePath)?.targetPlatforms.contains(platformId) ??
+        false;
+  }
+
   /// Returns `true` when the project containing [filePath] declares a
   /// Flutter SDK constraint whose **lower bound** is ≥ `major.minor.patch`.
   ///
@@ -293,6 +310,7 @@ class _ProjectInfo {
     required this.hasWebSupport,
     required this.hasNonWebPlatform,
     required this.hasPointerPlatform,
+    required this.targetPlatforms,
   });
 
   factory _ProjectInfo._fromProjectRoot(String projectRoot) {
@@ -310,6 +328,10 @@ class _ProjectInfo {
         hasWebSupport: true,
         hasNonWebPlatform: true,
         hasPointerPlatform: true,
+        // Targets unknown (no/unparseable pubspec): leave empty so
+        // avoid_platform_incompatible_dependency stays silent rather than
+        // assert "builds for X" about a project we can't read.
+        targetPlatforms: const <String>{},
       );
     }
 
@@ -408,6 +430,17 @@ class _ProjectInfo {
             hasWindowsDir ||
             hasLinuxDir ||
             !isFlutter,
+        // Concrete non-mobile build targets, from the platform directories
+        // actually present. Unlike the boolean flags above, this is NOT
+        // defaulted true for pure Dart libraries: a library has no platform
+        // directories, so it targets nothing here and the platform-support
+        // rule cannot know its consumers' targets — correctly staying silent.
+        targetPlatforms: <String>{
+          if (hasWebDir) 'web',
+          if (hasWindowsDir) 'windows',
+          if (hasMacosDir) 'macos',
+          if (hasLinuxDir) 'linux',
+        },
       );
     } on FormatException {
       return _ProjectInfo._(
@@ -418,6 +451,10 @@ class _ProjectInfo {
         hasWebSupport: true,
         hasNonWebPlatform: true,
         hasPointerPlatform: true,
+        // Targets unknown (no/unparseable pubspec): leave empty so
+        // avoid_platform_incompatible_dependency stays silent rather than
+        // assert "builds for X" about a project we can't read.
+        targetPlatforms: const <String>{},
       );
     } on IOException {
       return _ProjectInfo._(
@@ -428,6 +465,10 @@ class _ProjectInfo {
         hasWebSupport: true,
         hasNonWebPlatform: true,
         hasPointerPlatform: true,
+        // Targets unknown (no/unparseable pubspec): leave empty so
+        // avoid_platform_incompatible_dependency stays silent rather than
+        // assert "builds for X" about a project we can't read.
+        targetPlatforms: const <String>{},
       );
     }
   }
@@ -464,6 +505,16 @@ class _ProjectInfo {
   /// [ProjectContext.hasPointerPlatform] for why mobile is excluded
   /// despite technically supporting external pointer devices.
   final bool hasPointerPlatform;
+
+  /// The set of build-target platforms the project declares, restricted to the
+  /// non-mobile platforms tracked by the plugin platform-support knowledge base
+  /// (`web`, `windows`, `macos`, `linux`). Derived from the presence of the
+  /// matching `flutter create` platform directory at the project root.
+  ///
+  /// Empty when targets cannot be determined (no pubspec, parse/IO error) — see
+  /// [ProjectContext.targetsPlatform] for why this rule deliberately stays
+  /// silent on unknown targets instead of assuming all of them.
+  final Set<String> targetPlatforms;
 
   /// Check if the project has a specific dependency.
   bool hasDependency(String name) => dependencies.contains(name);

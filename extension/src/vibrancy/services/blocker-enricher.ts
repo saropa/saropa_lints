@@ -11,17 +11,27 @@ import {
 } from '../types';
 import { ScanLogger } from './scan-logger';
 import { fetchPubOutdated } from './pub-outdated';
-import { fetchDepGraph, buildReverseDeps } from './dep-graph';
+import { fetchDepGraph, buildReverseDeps, DepGraphPackage } from './dep-graph';
 import { findBlockers, classifyUpgradeStatus } from '../scoring/blocker-analyzer';
 import {
     detectSharedDepConflicts, SharedDepConflict,
 } from '../scoring/shared-dep-conflict-detector';
+import { pathToDirectDep } from '../scoring/constraint-chain';
+import { findFloorConstrainer, FloorConstraint } from '../scoring/floor-constraints';
+import {
+    detectForbiddenConstraints, ForbiddenConstraint,
+} from '../scoring/forbidden-constraints';
 import { buildConstraintIndex } from './shared-dep-constraints';
+import { extractPubConflictExplanation } from './pub-conflict-text';
 
 /** Result of blocker enrichment: enriched results + reverse dep graph. */
 export interface BlockerEnrichResult {
     readonly results: VibrancyResult[];
     readonly reverseDeps: ReadonlyMap<string, readonly DepEdge[]>;
+    /** Required-minimum constraints on direct deps (for pubspec annotation). */
+    readonly floors: readonly FloorConstraint[];
+    /** Declared constraints that conflict with an SDK pin (for annotation). */
+    readonly forbiddens: readonly ForbiddenConstraint[];
 }
 
 /** Enrich results with upgrade blocker info from dart pub CLI. */
@@ -58,7 +68,19 @@ export async function enrichWithBlockers(
         logger.error(
             `Blocker analysis skipped — CLI commands failed — ${reasons.join(' | ')}`,
         );
-        return { results, reverseDeps: new Map() };
+        // When pub failed on a version conflict, surface its own authoritative
+        // "Because … is forbidden / is required" reasoning verbatim — the
+        // reconstruction detectors cannot run without a resolved graph, so this
+        // is the only place the real cause is available.
+        const pubExplanation = extractPubConflictExplanation(
+            `${outdatedResult.errorMessage ?? ''}\n${depGraphResult.errorMessage ?? ''}`,
+        );
+        if (pubExplanation.length > 0) {
+            logger.error(
+                `pub version-solving conflict:\n${pubExplanation.join('\n')}`,
+            );
+        }
+        return { results, reverseDeps: new Map(), floors: [], forbiddens: [] };
     }
 
     const reverseDeps = buildReverseDeps(depGraphResult.packages);
@@ -103,7 +125,63 @@ export async function enrichWithBlockers(
                 : null,
         };
     });
-    return { results: enriched, reverseDeps };
+
+    // Floor (required-minimum) and forbidden (declared-vs-SDK-pin) findings for
+    // the direct deps, for the pubspec annotator. Computed here because this is
+    // where the resolved graph, reverse deps, and SDK set already live.
+    const { floors, forbiddens } = await computeConstraintFindings(
+        depGraphResult.packages, reverseDeps, directNames, deps,
+        sdkPackages, workspaceRoot,
+    );
+
+    return { results: enriched, reverseDeps, floors, forbiddens };
+}
+
+/**
+ * Floor and forbidden constraint findings for the direct dependencies.
+ *
+ * Forbidden detection is free — it reads the already-resolved versions and the
+ * declared direct constraints. Floor detection needs each constrainer's
+ * declared lower bound, so it reads the pubspecs of the packages depending on a
+ * direct dep (bounded to that set to keep pub-cache I/O off the full graph).
+ */
+async function computeConstraintFindings(
+    graphPackages: readonly DepGraphPackage[],
+    reverseDeps: ReadonlyMap<string, readonly DepEdge[]>,
+    directNames: ReadonlySet<string>,
+    deps: readonly PackageDependency[],
+    sdkPackages: ReadonlySet<string>,
+    workspaceRoot: vscode.Uri,
+): Promise<{ floors: FloorConstraint[]; forbiddens: ForbiddenConstraint[] }> {
+    const resolvedVersions = new Map(graphPackages.map(p => [p.name, p.version]));
+    const directConstraints = new Map(
+        deps.filter(d => d.isDirect).map(d => [d.name, d.constraint]),
+    );
+
+    const forbiddens = detectForbiddenConstraints(
+        directConstraints, resolvedVersions, reverseDeps, sdkPackages,
+    );
+
+    // Floor constrainers are the packages depending on a direct dep.
+    const floorCandidates = new Set<string>();
+    for (const dep of directNames) {
+        for (const edge of reverseDeps.get(dep) ?? []) {
+            floorCandidates.add(edge.dependentPackage);
+        }
+    }
+    const constraintIndex = await buildConstraintIndex(
+        workspaceRoot, floorCandidates,
+    );
+
+    const floors: FloorConstraint[] = [];
+    for (const dep of directNames) {
+        const floor = findFloorConstrainer(
+            dep, reverseDeps, constraintIndex, directNames,
+        );
+        if (floor) { floors.push(floor); }
+    }
+
+    return { floors, forbiddens };
 }
 
 /**
@@ -132,7 +210,10 @@ async function mergeSharedDepConflicts(
 
     const resultMap = new Map(results.map(r => [r.package.name, r]));
     for (const c of conflicts) {
-        blockerMap.set(c.blockedPackage, toBlockerInfo(c, resultMap));
+        blockerMap.set(
+            c.blockedPackage,
+            toBlockerInfo(c, resultMap, reverseDeps, directNames),
+        );
     }
     logger.info(
         `Shared-dependency conflicts detected: ${conflicts.length} `
@@ -166,8 +247,16 @@ function collectConstrainerCandidates(
 function toBlockerInfo(
     conflict: SharedDepConflict,
     resultMap: ReadonlyMap<string, VibrancyResult>,
+    reverseDeps: ReadonlyMap<string, readonly DepEdge[]>,
+    directDeps: ReadonlySet<string>,
 ): BlockerInfo {
     const constrainerResult = resultMap.get(conflict.constrainerPackage);
+    // When the constrainer is buried in the transitive graph, record the path
+    // up to a direct dep so the block can be explained against an editable line.
+    // Single-node chains (constrainer is itself direct) carry no extra info.
+    const chain = pathToDirectDep(
+        conflict.constrainerPackage, reverseDeps, directDeps,
+    );
     return {
         blockedPackage: conflict.blockedPackage,
         currentVersion: conflict.currentVersion,
@@ -180,5 +269,6 @@ function toBlockerInfo(
         sharedDependencyLatest: conflict.sharedLatest,
         blockerConstraint: conflict.constrainerConstraint,
         blockerIsSdkPin: conflict.viaSdk,
+        blockerChain: chain.length > 1 ? chain : null,
     };
 }

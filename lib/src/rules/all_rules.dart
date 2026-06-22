@@ -133,6 +133,7 @@ export 'platforms/ios_platform_lifecycle_rules.dart';
 export 'platforms/ios_ui_security_rules.dart';
 export 'platforms/linux_rules.dart';
 export 'platforms/macos_rules.dart';
+export 'platforms/plugin_platform_support_rules.dart';
 export 'platforms/web_rules.dart';
 export 'platforms/windows_rules.dart';
 

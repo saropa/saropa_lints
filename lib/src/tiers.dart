@@ -2954,6 +2954,12 @@ const Set<String> professionalOnlyRules = <String>{
 /// Comprehensive tier rules - stricter patterns, optimization hints, edge cases.
 /// Helpful but not critical. For quality-obsessed teams.
 const Set<String> comprehensiveOnlyRules = <String>{
+  // Cross-platform dependency compatibility (plugin_platform_support_rules.dart).
+  // Comprehensive, not Essential: detection is anchored on the import and backed
+  // by a curated list, so a project that imports a plugin but guards its calls
+  // behind a platform check can still be flagged — an acceptable trade at this
+  // tier ("thorough coverage, some false positives").
+  'avoid_platform_incompatible_dependency',
   // receive_sharing_intent (receive_sharing_intent_rules.dart)
   'rsi_unfiltered_shared_media_type',
   // sign_in_with_apple (sign_in_with_apple_rules.dart)

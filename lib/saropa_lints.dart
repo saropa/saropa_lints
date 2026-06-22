@@ -2452,6 +2452,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferPlatformWidgetAdaptiveRule.new,
   RequireDesktopWindowSetupRule.new,
   AvoidWebOnlyDependenciesRule.new,
+  AvoidPlatformIncompatibleDependencyRule.new,
   PreferJsInteropOverDartJsRule.new,
   PreferFoundationPlatformCheckRule.new,
 

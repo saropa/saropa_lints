@@ -196,6 +196,38 @@ describe('blocker-analyzer', () => {
             );
         });
 
+        it('appends the dependency chain when the constrainer is a deep transitive dep', () => {
+            const detail = formatSharedDepDetail(blocker({
+                blockerPackage: 'analyzer_plugin',
+                sharedDependency: 'analyzer',
+                blockerConstraint: '>=9.0.0 <13.0.0',
+                sharedDependencyResolvable: '12.0.0',
+                sharedDependencyLatest: '13.1.0',
+                blockerChain: ['build_runner', 'build', 'analyzer_plugin'],
+            }));
+            assert.strictEqual(
+                detail,
+                'via analyzer — analyzer_plugin caps >=9.0.0 <13.0.0 '
+                + '(12.0.0 resolvable, 13.1.0 latest) '
+                + '[via build_runner → build → analyzer_plugin]',
+            );
+        });
+
+        it('omits the chain clause for a single-node chain', () => {
+            const detail = formatSharedDepDetail(blocker({
+                sharedDependency: 'analyzer',
+                blockerConstraint: '>=9.0.0 <13.0.0',
+                sharedDependencyResolvable: '12.0.0',
+                sharedDependencyLatest: '13.1.0',
+                blockerChain: ['saropa_lints'],
+            }));
+            assert.strictEqual(
+                detail,
+                'via analyzer — saropa_lints caps >=9.0.0 <13.0.0 '
+                + '(12.0.0 resolvable, 13.1.0 latest)',
+            );
+        });
+
         it('names the SDK as pinner for an SDK-inferred block', () => {
             const detail = formatSharedDepDetail(blocker({
                 blockerPackage: 'flutter_test',

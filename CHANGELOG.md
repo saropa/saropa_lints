@@ -64,13 +64,36 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [14.0.8]
+## [Unreleased]
 
-Resolves a false positive in the color-only status indicator rule so decorative active-state bars and indicators paired with another visual cue are no longer flagged. [log](https://github.com/saropa/saropa_lints/blob/v14.0.8/CHANGELOG.md)
+Resolves a false positive in the color-only status indicator rule so decorative active-state bars and indicators paired with another visual cue are no longer flagged. The extension's "Create baseline" suggestion now actually creates the baseline. Package Vibrancy override analysis now recognizes overrides that resolve a transitive dependency cap, naming the package responsible instead of marking the override removable, and upgrade-blocker explanations trace the dependency path to a package you can act on. The "Annotate pubspec" command now writes why each pinned dependency sits where it does. [log](https://github.com/saropa/saropa_lints/blob/v14.0.8/CHANGELOG.md)
+
+### Added
+
+- **New rule `avoid_platform_incompatible_dependency` warns when you import a plugin with no implementation for a platform your project builds for.** A Flutter plugin compiles into every target even when its native side is missing, so importing, for example, `sqflite` (no web) into a project with a `web/` directory builds cleanly and then throws at runtime on web only — a failure the compiler never flags. The rule fires only when the project has the matching platform directory and the import is unconditional, and is backed by a hand-verified package list (`sqflite`, `local_auth`, `path_provider`, `firebase_messaging`, `camera`, `permission_handler`). Opt in via the Comprehensive tier; guard the import conditionally or switch packages to resolve.
+
+### Added (Extension)
+
+- **A "Create Baseline" command that suppresses your existing violations so only new code is flagged.** The Suggestions view already prompted you to baseline once findings existed, but the prompt opened the config editor and left you to run the baseline tool from a terminal yourself. The prompt — and a new command-palette entry, "Saropa Lints: Create Baseline" — now run it directly, with a cancellable progress notification, and refresh the views when it finishes. No action required.
+- **The "Annotate pubspec" command now writes why each pinned dependency sits where it does, so you no longer paste pub's conflict output by hand.** Above each affected dependency it adds a comment explaining whether the version is held back by a shared dependency (naming the path to a package you can edit), forced up to a required minimum by another package, or incompatible with a Flutter SDK pin. Re-running the command refreshes these notes in place and leaves your own hand-written comments untouched. Run "Saropa Lints: Annotate pubspec" after a scan to populate them.
+
+### Fixed (Extension)
+
+- **Package Vibrancy no longer mislabels a `dependency_overrides` entry as removable when it exists to resolve a transitive version cap.** Override analysis only checked your direct constraint and an SDK-pin heuristic, so an override pinning a dependency that a sibling package caps below the resolved version showed as "stale," inviting you to delete an override the resolver actually needs. It now reads each constrainer's declared range and names the binding package as the override's reason. No action required.
+
+### Changed (Extension)
+
+- **Upgrade-blocker explanations now trace the dependency path to a package you can edit.** When the package capping a shared dependency was buried deep in the transitive graph, the report named a constrainer absent from your pubspec.yaml, leaving you with no actionable line. The explanation now appends the chain from a direct dependency down to that constrainer (for example, `build_runner → build → analyzer_plugin`). No action required.
 
 ### Fixed
 
 - **`avoid_color_only_indicators` no longer fires when the state is already conveyed by a non-color cue or when the color is just a show/hide toggle.** The rule inspected a `Container` in isolation, so a thin active-tab underline whose color toggles to `Colors.transparent` (a presence cue, not a red-vs-green hue) and a colored swatch sitting next to a sibling `Text`/`Icon` that reacts to the same state (bold weight or distinct glyph) were both reported as inaccessible. The rule now suppresses both: a branch resolving to `Colors.transparent` is treated as a visibility toggle, and a sibling Text/Icon-family widget referencing the same condition counts as the required secondary cue — which also fixes the rule's own documented GOOD example (a `Row` with a conditional `Icon` beside the colored `Container`). Genuine standalone red/green indicators with no secondary cue still warn. No action required.
+
+<details><summary>Maintenance</summary>
+
+- When `dart pub get` / `dart pub deps` fails on a version conflict, the scan log now captures pub's own "Because … is forbidden / is required" reasoning verbatim, instead of only a generic "version solving failed". Diagnostic only.
+
+</details>
 
 ---
 

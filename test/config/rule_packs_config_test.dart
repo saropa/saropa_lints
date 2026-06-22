@@ -47,56 +47,87 @@ void main() {
       expect(enabled, equals(<String>{'x'}));
     });
 
-    test('removes pack-owned tier rule when no packs are enabled', () {
+    test('additive: a tier-provided pack rule stays when no packs enabled', () {
+      // Additive model: tier is the floor, packs only add. A rule the tier
+      // already enabled is never stripped just because its pack is off.
       final enabled = <String>{'require_provider_scope', 'x'};
       mergeRulePacksIntoEnabled(enabled, null, const <String>[]);
-      expect(enabled.contains('require_provider_scope'), isFalse);
+      expect(enabled.contains('require_provider_scope'), isTrue);
       expect(enabled.contains('x'), isTrue);
     });
 
-    test('keeps pack-owned rule only when its pack is enabled', () {
+    test('keeps pack-owned rule when its pack is enabled', () {
       final enabled = <String>{'require_provider_scope', 'x'};
       mergeRulePacksIntoEnabled(enabled, null, const <String>['riverpod']);
       expect(enabled.contains('require_provider_scope'), isTrue);
       expect(enabled.contains('x'), isTrue);
     });
 
-    test(
-      'pack-owned diagnostics true is ignored unless owning pack is enabled',
-      () {
-        // Simulates diagnostics: require_provider_scope: true with no pack
-        // selected. In authoritative pack mode, pack-owned rules are only
-        // active when their owning pack is enabled.
-        final enabled = <String>{'require_provider_scope', 'x'};
-        mergeRulePacksIntoEnabled(enabled, null, const <String>[]);
-        expect(enabled.contains('require_provider_scope'), isFalse);
-        expect(enabled.contains('x'), isTrue);
-      },
-    );
+    test('a rule in two enabled packs is added once', () {
+      final enabled = <String>{};
+      mergeRulePacksIntoEnabled(
+        enabled,
+        null,
+        const <String>['riverpod', 'riverpod'],
+      );
+      expect(
+        enabled.where((c) => c == 'require_provider_scope'),
+        hasLength(1),
+      );
+    });
 
-    test(
-      'sdk/flutter pack migration codes require an enabled pack (not tier-only)',
-      () {
-        final sdkCodes = kRulePackRuleCodes.keys
-            .where(
-              (id) =>
-                  id.startsWith('dart_sdk_') || id.startsWith('flutter_sdk_'),
-            )
-            .expand((id) => kRulePackRuleCodes[id] ?? const <String>{})
-            .toSet();
-        expect(sdkCodes, isNotEmpty);
-        for (final code in sdkCodes) {
-          final enabled = <String>{code};
-          mergeRulePacksIntoEnabled(enabled, null, const <String>[]);
-          expect(
-            enabled.contains(code),
-            isFalse,
-            reason:
-                'Pack-owned SDK migration code $code must require an enabled pack',
-          );
-        }
-      },
-    );
+    group('version choice wins over tier', () {
+      test('dio 5 rule is stripped from the tier on a dio 4 project', () {
+        // avoid_dio_error applies to dio 5 (DioError removed). On dio 4 the old
+        // type is valid, so the version wins over a tier that lists the rule.
+        final enabled = <String>{'avoid_dio_error', 'x'};
+        mergeRulePacksIntoEnabled(
+          enabled,
+          null,
+          const <String>[],
+          resolvedVersions: {'dio': '4.0.6'},
+        );
+        expect(enabled.contains('avoid_dio_error'), isFalse);
+        expect(enabled.contains('x'), isTrue);
+      });
+
+      test('dio 5 rule from the tier stays on a dio 5 project', () {
+        final enabled = <String>{'avoid_dio_error'};
+        mergeRulePacksIntoEnabled(
+          enabled,
+          null,
+          const <String>[],
+          resolvedVersions: {'dio': '5.4.3'},
+        );
+        expect(enabled.contains('avoid_dio_error'), isTrue);
+      });
+
+      test('dio 5 rule from the tier stays when dio version is unknown', () {
+        // No lockfile version → conservative: keep the floor, never strip on a guess.
+        final enabled = <String>{'avoid_dio_error'};
+        mergeRulePacksIntoEnabled(enabled, null, const <String>[]);
+        expect(enabled.contains('avoid_dio_error'), isTrue);
+      });
+
+      test('SDK migration rule stripped when pubspec proves wrong version', () {
+        // flutter_sdk_3_38 (avoid_asset_manifest_json) gates >=3.38.0.
+        final enabled = <String>{'avoid_asset_manifest_json', 'x'};
+        mergeRulePacksIntoEnabled(
+          enabled,
+          null,
+          const <String>[],
+          pubspecYamlContent: 'environment:\n  flutter: ">=3.10.0"\n',
+        );
+        expect(enabled.contains('avoid_asset_manifest_json'), isFalse);
+        expect(enabled.contains('x'), isTrue);
+      });
+
+      test('SDK migration rule from the tier stays when SDK is unknown', () {
+        final enabled = <String>{'avoid_asset_manifest_json'};
+        mergeRulePacksIntoEnabled(enabled, null, const <String>[]);
+        expect(enabled.contains('avoid_asset_manifest_json'), isTrue);
+      });
+    });
   });
 
   group('ruleCodesForPack', () {

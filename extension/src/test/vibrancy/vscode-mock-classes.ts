@@ -78,14 +78,23 @@ export class Position {
 export class Range {
     readonly start: Position;
     readonly end: Position;
+    // Mirrors the real vscode.Range overloads: (Position, Position) OR
+    // (startLine, startChar, endLine, endChar). Production code uses the
+    // Position form; without this the mock stored Positions in the line fields,
+    // so range.start.line came back as a Position instead of a number.
     constructor(
-        startLine: number,
-        startCharacter: number,
-        endLine: number,
-        endCharacter: number,
+        startOrStartLine: number | Position,
+        endOrStartChar: number | Position,
+        endLine = 0,
+        endCharacter = 0,
     ) {
-        this.start = new Position(startLine, startCharacter);
-        this.end = new Position(endLine, endCharacter);
+        if (startOrStartLine instanceof Position && endOrStartChar instanceof Position) {
+            this.start = startOrStartLine;
+            this.end = endOrStartChar;
+        } else {
+            this.start = new Position(startOrStartLine as number, endOrStartChar as number);
+            this.end = new Position(endLine, endCharacter);
+        }
     }
 }
 

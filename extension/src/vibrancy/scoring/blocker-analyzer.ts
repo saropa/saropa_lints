@@ -10,6 +10,7 @@ import {
     BlockerInfo, UpgradeBlockStatus, ConstrainedReason, CrossProjectDrift,
 } from '../types';
 import { compareVersions } from '../services/changelog-service';
+import { formatChain } from './constraint-chain';
 
 /**
  * Classify upgrade status for a single pub outdated entry.
@@ -86,6 +87,10 @@ export function formatSharedDepDetail(blocker: BlockerInfo): string | null {
             + `${blocker.sharedDependencyLatest} latest)`,
         );
     }
+    // When the constrainer is a deep transitive dep, name the path from a direct
+    // dep so the user sees which pubspec line pulls the constrainer in.
+    const chain = formatChain(blocker.blockerChain ?? []);
+    if (chain) { parts.push(`[via ${chain}]`); }
     return parts.join(' ');
 }
 

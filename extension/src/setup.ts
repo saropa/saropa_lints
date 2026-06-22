@@ -293,6 +293,69 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
   return success;
 }
 
+/**
+ * Create a baseline (saropa_baseline.json) that suppresses the project's
+ * EXISTING violations so only newly-introduced findings surface afterward.
+ *
+ * Why this exists: the Suggestions view already nudges users to baseline once
+ * findings exist, but the action used to open the config editor — leaving the
+ * user to discover and run `dart run saropa_lints:baseline` in a terminal
+ * themselves. The UI surfaced the suggestion and then dead-ended. This wires the
+ * nudge to the actual tool.
+ *
+ * Async + cancellable: the baseline tool shells out to `dart analyze`, which can
+ * run for tens of seconds on a large project. runInWorkspaceAsync keeps the
+ * extension host responsive and lets the progress UI's Cancel button kill the
+ * child (and its dart grandchild) cleanly via killProcessTree.
+ */
+export async function runCreateBaseline(): Promise<boolean> {
+  const workspaceRoot = getProjectRoot();
+  if (!workspaceRoot) {
+    void vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
+    return false;
+  }
+
+  let success = false;
+  await vscode.window.withProgress(
+    {
+      location: vscode.ProgressLocation.Notification,
+      title: l10n('notify.setup.baselineRunning'),
+      cancellable: true,
+    },
+    async (_progress, token) => {
+      logSection('Create Baseline');
+      const result = await runInWorkspaceAsync(
+        workspaceRoot,
+        'dart',
+        ['run', 'saropa_lints:baseline'],
+        { token },
+      );
+      // User-initiated cancel is not an error: leave the report quiet and skip
+      // both the success and failure toasts.
+      if (result.cancelled) {
+        logReport('- Baseline creation cancelled by user');
+        flushReport(workspaceRoot);
+        return;
+      }
+      if (!result.ok) {
+        logReport(`- baseline FAILED: ${result.stderr || '(no details)'}`);
+        flushReport(workspaceRoot);
+        void vscode.window.showErrorMessage(
+          l10n('notify.setup.baselineFailed', {
+            details: result.stderr || l10n('notify.setup.checkOutput'),
+          }),
+        );
+        return;
+      }
+      logReport('- Created saropa_baseline.json');
+      flushReport(workspaceRoot);
+      success = true;
+      void vscode.window.showInformationMessage(l10n('notify.setup.baselineCreated'));
+    },
+  );
+  return success;
+}
+
 const ANALYSIS_OPTIONS_FILENAME = 'analysis_options.yaml';
 
 // Sentinel lines that bracket the commented-out `plugins:` block while

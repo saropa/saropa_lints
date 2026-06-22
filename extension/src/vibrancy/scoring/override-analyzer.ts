@@ -8,6 +8,7 @@
 import { OverrideEntry, OverrideAnalysis, PackageDependency } from '../types';
 import { DepGraphPackage } from '../services/dep-graph';
 import { calculateAgeDays, formatAge } from '../services/override-age';
+import { ConstraintIndex } from './shared-dep-conflict-detector';
 import * as semver from 'semver';
 
 export { formatAge };
@@ -23,6 +24,11 @@ export function analyzeOverrides(
     deps: readonly PackageDependency[],
     depGraph: DepGraphPackage[],
     ages: ReadonlyMap<string, Date>,
+    // Each package's declared constraints, read from its own pubspec via the
+    // pub cache. Optional + empty-default so existing pure callers keep working;
+    // when supplied it lets findConflict name the real transitive constrainer
+    // instead of falling through to the SDK heuristic.
+    constraints: ConstraintIndex = new Map(),
 ): OverrideAnalysis[] {
     const depMap = new Map(deps.map(d => [d.name, d]));
     const graphMap = new Map(depGraph.map(p => [p.name, p]));
@@ -41,7 +47,7 @@ export function analyzeOverrides(
             };
         }
 
-        const conflict = findConflict(entry, depMap, graphMap);
+        const conflict = findConflict(entry, depMap, graphMap, constraints);
         return {
             entry,
             status: conflict ? 'active' : 'stale',
@@ -60,6 +66,7 @@ function findConflict(
     override: OverrideEntry,
     deps: Map<string, PackageDependency>,
     depGraph: Map<string, DepGraphPackage>,
+    constraints: ConstraintIndex,
 ): string | null {
     const overriddenVersion = cleanVersion(override.version);
     if (!overriddenVersion) { return null; }
@@ -74,7 +81,7 @@ function findConflict(
         const dep = deps.get(pkg.name);
         if (!dep) { continue; }
 
-        const constraint = findTransitiveConstraint(pkg.name, override.name, depGraph);
+        const constraint = findTransitiveConstraint(pkg.name, override.name, constraints);
         if (constraint && !satisfiesConstraint(parsed.version, constraint)) {
             return pkg.name;
         }
@@ -107,15 +114,25 @@ function findConflict(
 }
 
 /**
- * Find the version constraint a package applies to a dependency.
- * This is a heuristic since we don't have full constraint info in the dep graph.
+ * The version constraint `parentName` declares on `depName`, read from the
+ * constraint index (each package's own pubspec, resolved via the pub cache).
+ * Returns null when the parent's pubspec was unreadable or it declares no
+ * constraint on the dep, in which case findConflict falls back to the SDK
+ * heuristic.
+ *
+ * Previously a stub that always returned null. That left the transitive-conflict
+ * branch in findConflict dead code: an override resolving a multi-hop transitive
+ * cap (e.g. a sibling capping `analyzer <13`) was misreported as stale unless
+ * the SDK heuristic happened to catch it. `dart pub deps --json` carries no
+ * per-edge constraint ranges, so the index supplies them from the resolved
+ * pubspecs and the analyzer can name the actual binding sibling.
  */
 function findTransitiveConstraint(
-    _parentName: string,
-    _depName: string,
-    _depGraph: Map<string, DepGraphPackage>,
+    parentName: string,
+    depName: string,
+    constraints: ConstraintIndex,
 ): string | null {
-    return null;
+    return constraints.get(parentName)?.get(depName) ?? null;
 }
 
 /**

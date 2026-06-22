@@ -10,6 +10,10 @@ import { escapeRegExp } from './annotate-headers';
 
 const MAX_DESC_LENGTH = 80;
 const PUB_URL_PREFIX = '# https://pub.dev/packages/';
+// Auto constraint-explanation lines carry this lead glyph so the round-trip
+// cleanup recognizes and replaces them, while leaving hand-written `Because …`
+// / `####` conflict notes (which never start with it) untouched.
+const NOTE_MARKER = '↳';
 
 /** An edit to insert or replace an annotation block above a package. */
 export interface AnnotationEdit {
@@ -18,18 +22,29 @@ export interface AnnotationEdit {
     readonly deleteRanges: vscode.Range[];
 }
 
-/** Format annotation comment lines for a package. */
+/** Format annotation comment lines for a package: description, constraint notes, URL. */
 export function formatAnnotation(
     name: string,
     description: string | null,
+    notes: readonly string[] = [],
 ): string {
-    const url = `  ${PUB_URL_PREFIX}${name}`;
-    if (!description) { return `${url}\n`; }
+    const lines: string[] = [];
 
-    const truncated = description.length > MAX_DESC_LENGTH
-        ? description.slice(0, MAX_DESC_LENGTH - 3) + '...'
-        : description;
-    return `  # ${truncated}\n${url}\n`;
+    if (description) {
+        const truncated = description.length > MAX_DESC_LENGTH
+            ? description.slice(0, MAX_DESC_LENGTH - 3) + '...'
+            : description;
+        lines.push(`  # ${truncated}`);
+    }
+
+    // Constraint explanations sit between the description and the URL so they
+    // stay inside the URL-anchored auto block the cleanup rewrites each run.
+    for (const note of notes) {
+        lines.push(`  # ${NOTE_MARKER} ${note}`);
+    }
+
+    lines.push(`  ${PUB_URL_PREFIX}${name}`);
+    return lines.join('\n') + '\n';
 }
 
 /** Build edits to insert or replace annotations above each package. */
@@ -37,6 +52,7 @@ export function buildAnnotationEdits(
     doc: vscode.TextDocument,
     packageNames: string[],
     descriptions: Map<string, string>,
+    notes: ReadonlyMap<string, readonly string[]> = new Map(),
 ): AnnotationEdit[] {
     const edits: AnnotationEdit[] = [];
 
@@ -45,7 +61,9 @@ export function buildAnnotationEdits(
         if (lineIdx === null) { continue; }
 
         const existing = findExistingAnnotations(doc, lineIdx, name);
-        const text = formatAnnotation(name, descriptions.get(name) ?? null);
+        const text = formatAnnotation(
+            name, descriptions.get(name) ?? null, notes.get(name) ?? [],
+        );
 
         const deleteRanges = existing.map(r => new vscode.Range(
             new vscode.Position(r.start, 0),
@@ -149,6 +167,10 @@ function isAutoDescription(lineText: string): boolean {
     if (trimmed.startsWith(PUB_URL_PREFIX.trim())) { return false; }
 
     const content = trimmed.replace(/^#\s*/, '');
+
+    // Auto constraint-explanation lines are part of the managed block and must
+    // be cleaned with it; they are tagged so hand-written notes are never swept.
+    if (content.startsWith(NOTE_MARKER)) { return true; }
 
     if (content.startsWith('NOTE:')) { return false; }
     if (content.startsWith('TODO:')) { return false; }

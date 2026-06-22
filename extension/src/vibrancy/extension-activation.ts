@@ -72,7 +72,10 @@ import {
     calcTransitiveRiskPenalty,
 } from './scoring/transitive-analyzer';
 import { allKnownIssues } from './scoring/known-issues';
-import { runOverrideAnalysis } from './services/override-runner';
+import {
+    runOverrideAnalysis, overrideConstrainerCandidates,
+} from './services/override-runner';
+import { buildConstraintIndex } from './services/shared-dep-constraints';
 import { OverrideAnalysis, NewVersionNotification, PackageInsight } from './types';
 import { consolidateInsights } from './scoring/consolidate-insights';
 import {
@@ -127,6 +130,9 @@ let vibrancyScanTargets: ScanTargets | null = null;
 let lastPublishedDepGraphSummary: DepGraphSummary | null = null;
 let lastParsedDeps: ParsedDeps | null = null;
 let lastReverseDeps: ReadonlyMap<string, readonly import('./types').DepEdge[]> | null = null;
+/** Floor / forbidden constraint findings from the last scan, for the annotator. */
+let lastFloors: readonly import('./scoring/floor-constraints').FloorConstraint[] = [];
+let lastForbiddens: readonly import('./scoring/forbidden-constraints').ForbiddenConstraint[] = [];
 let lastOverrideAnalyses: OverrideAnalysis[] = [];
 let lastInsights: PackageInsight[] = [];
 let lastBudgetResults: BudgetResult[] = [];
@@ -202,6 +208,14 @@ export function getLatestResults(): readonly VibrancyResult[] {
 /** Get the pubspec.yaml URI from the last scan (used by navigation commands). */
 export function getScannedPubspecUri(): vscode.Uri | null {
     return lastParsedDeps?.yamlUri ?? null;
+}
+
+/** Floor / forbidden constraint findings from the last scan (used by the annotator). */
+export function getLatestConstraintFindings(): {
+    floors: readonly import('./scoring/floor-constraints').FloorConstraint[];
+    forbiddens: readonly import('./scoring/forbidden-constraints').ForbiddenConstraint[];
+} {
+    return { floors: lastFloors, forbiddens: lastForbiddens };
 }
 
 /** Get the latest consolidated insights (used by providers). */
@@ -1128,6 +1142,8 @@ async function runScanInner(
             );
             results = attachVersionDrift(results, siblingConstraints);
             lastReverseDeps = enrichResult.reverseDeps;
+            lastFloors = enrichResult.floors;
+            lastForbiddens = enrichResult.forbiddens;
 
             if (signal.aborted) { return; }
             progress.report({ message: 'Analyzing dependency graph...' });
@@ -1210,12 +1226,24 @@ async function runScanInner(
 
             if (signal.aborted) { return; }
             progress.report({ message: 'Analyzing overrides...' });
+            // Read the declared constraints of the override's constrainer parents
+            // so override analysis can name the binding sibling instead of only
+            // the SDK heuristic. Built here (not in the runner) because the index
+            // read needs vscode I/O the runner deliberately stays free of.
+            const overrideDepGraph = depGraph.success ? depGraph.packages : [];
+            const overrideConstraints = await buildConstraintIndex(
+                workspaceRoot,
+                overrideConstrainerCandidates(
+                    parseDependencyOverrides(parsed.yamlContent), overrideDepGraph,
+                ),
+            );
             const overrideAnalyses = await runOverrideAnalysis(
                 parsed.yamlContent,
                 deps,
-                depGraph.success ? depGraph.packages : [],
+                overrideDepGraph,
                 workspaceRoot.fsPath,
                 logger,
+                overrideConstraints,
             );
             lastOverrideAnalyses = overrideAnalyses;
             if (overrideAnalyses.length > 0) {
