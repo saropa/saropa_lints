@@ -68,6 +68,26 @@ void main() {
       'prefer_schedule_microtask_over_window_postmessage',
       () => PreferScheduleMicrotaskOverWindowPostmessageRule(),
     );
+    testRule(
+      'AvoidPackageJsForWasmRule',
+      'avoid_package_js_for_wasm',
+      () => AvoidPackageJsForWasmRule(),
+    );
+  });
+
+  group('Web - WebAssembly readiness', () {
+    test('package:js rule is in the comprehensive tier', () {
+      expect(
+        getRulesForTier('comprehensive'),
+        contains('avoid_package_js_for_wasm'),
+      );
+    });
+
+    test('message names dart:js_interop as the migration target', () {
+      final rule = AvoidPackageJsForWasmRule();
+      expect(rule.code.problemMessage, contains('WebAssembly'));
+      expect(rule.code.correctionMessage, contains('dart:js_interop'));
+    });
   });
   group('Web Rules - Fixture Verification', () {
     final fixtures = [

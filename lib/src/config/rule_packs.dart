@@ -44,7 +44,17 @@ import 'package:pub_semver/pub_semver.dart';
 
 import 'package:saropa_lints/src/config/rule_pack_codes_generated.dart';
 import 'package:saropa_lints/src/tiers.dart'
-    show documentationRules, localizationRules, testingRules, uiExcellenceRules;
+    show
+        androidPlatformRules,
+        documentationRules,
+        iosPlatformRules,
+        linuxPlatformRules,
+        localizationRules,
+        macosPlatformRules,
+        testingRules,
+        uiExcellenceRules,
+        webPlatformRules,
+        windowsPlatformRules;
 
 /// Optional semver gate: pack merges only when [dependency] resolves to a
 /// version allowed by [constraint] (pub semver syntax, e.g. `>=1.19.0`).
@@ -583,4 +593,15 @@ const Map<String, Set<String>> kRulePackRuleCodes = {
   'localization': localizationRules,
   'documentation': documentationRules,
   'testing': testingRules,
+  // Platform packs — rosters live in tiers.dart (iosPlatformRules, …) so they
+  // stay tier-validated. Recommended by embedder-folder detection (ios/, web/,
+  // …), not by a pubspec dependency, so they carry no pubspec marker; folder
+  // detection drives the suggestion (see computeConfigSuggestions). Additive
+  // like every pack: enabling adds the platform's rules on top of the tier.
+  'ios': iosPlatformRules,
+  'android': androidPlatformRules,
+  'web': webPlatformRules,
+  'windows': windowsPlatformRules,
+  'macos': macosPlatformRules,
+  'linux': linuxPlatformRules,
 };

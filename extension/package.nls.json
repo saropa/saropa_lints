@@ -205,6 +205,7 @@
   "config.property.todosAndHacks.customRegex.description": "Optional regex override for matching comment markers. Line-based; use capture group 1 for tag and optional group 2 for snippet. Empty = use default (//, #, <!-- + tags). Invalid regex falls back to default.",
   "config.section.Drift.Advisor.title": "Drift Advisor",
   "config.property.driftAdvisor.integration.description": "Enable optional integration with Saropa Drift Advisor. When on, the extension discovers a running Drift Advisor server (ports 8642–8649), fetches index suggestions and anomalies, and shows them in the Drift Advisor view and optionally in Problems.",
+  "config.property.driftAdvisor.hosts.description": "Hosts to scan for the Drift Advisor server, tried in order. Defaults to [\"127.0.0.1\"] (localhost). Add LAN IPs (e.g. \"192.168.1.151\") to reach servers running off-box, such as on phones connected over Wi-Fi debugging. Each entry is scanned across the port range above; pin an exact port with \"host:port\" (e.g. \"192.168.1.151:9000\") to probe just that endpoint.",
   "config.property.driftAdvisor.portRange.description": "Port range [min, max] to scan for Drift Advisor server (inclusive).",
   "config.property.driftAdvisor.pollIntervalMs.description": "How often to poll the Drift Advisor server for issues (milliseconds). Set to 0 to disable automatic polling (refresh manually).",
   "config.property.driftAdvisor.showInProblems.description": "Publish Drift Advisor issues as diagnostics in the Problems view (source: Saropa Drift Advisor).",

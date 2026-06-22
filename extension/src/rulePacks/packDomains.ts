@@ -16,6 +16,12 @@
 
 /** Domain shown for SDK version-migration packs. */
 export const SDK_DOMAIN = 'SDK migrations';
+/**
+ * Domain for platform packs (ios, android, web, …). These are recommended from
+ * the project's embedder folders, not a pubspec dependency, so they sort near
+ * the top with the curated standards rather than among package domains.
+ */
+export const PLATFORM_DOMAIN = 'Platforms';
 /** Fallback domain for any package pack not yet assigned below. */
 export const OTHER_DOMAIN = 'Other';
 /**
@@ -32,6 +38,7 @@ export const QUALITY_DOMAIN = 'Quality standards';
  */
 export const PACK_DOMAIN_ORDER: readonly string[] = [
   QUALITY_DOMAIN,
+  PLATFORM_DOMAIN,
   'State management',
   'Networking & APIs',
   'Storage & persistence',
@@ -51,6 +58,14 @@ const PACK_DOMAIN_BY_ID: Readonly<Record<string, string>> = {
   localization: QUALITY_DOMAIN,
   documentation: QUALITY_DOMAIN,
   testing: QUALITY_DOMAIN,
+
+  // Platform packs (recommended from embedder folders)
+  ios: PLATFORM_DOMAIN,
+  android: PLATFORM_DOMAIN,
+  web: PLATFORM_DOMAIN,
+  windows: PLATFORM_DOMAIN,
+  macos: PLATFORM_DOMAIN,
+  linux: PLATFORM_DOMAIN,
 
   // State management
   bloc: 'State management',

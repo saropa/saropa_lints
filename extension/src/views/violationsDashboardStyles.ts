@@ -1036,6 +1036,23 @@ export function getViolationsDashboardStyles(): string {
     .empty-cta p { margin: 0 0 14px; color: var(--muted); }
     .empty-cta .btns { display: inline-flex; gap: 8px; }
 
+    /* Polite live region for filter/sort/analysis announcements. This sheet
+       does not pull in dashboardChromeStyles (which hides #announcer for the
+       other dashboards), so without this rule the announcer text — e.g.
+       "Analysis started" — paints as a visible banner above the hero. Keep it
+       in the accessibility tree but off-screen. */
+    #announcer {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
     /* Analysis progress strip — shown while Run analysis is in flight. */
     .analysis-progress {
       margin: 10px 0 14px;

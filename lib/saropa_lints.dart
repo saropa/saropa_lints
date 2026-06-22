@@ -2453,6 +2453,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireDesktopWindowSetupRule.new,
   AvoidWebOnlyDependenciesRule.new,
   AvoidPlatformIncompatibleDependencyRule.new,
+  AvoidPackageJsForWasmRule.new,
   PreferJsInteropOverDartJsRule.new,
   PreferFoundationPlatformCheckRule.new,
 
@@ -2525,6 +2526,8 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireAndroidManifestEntriesRule.new,
   RequireNotificationIconKeptRule.new,
   RequireAndroidPermissionRequestRule.new,
+  RequireAndroidExactAlarmPermissionRule.new,
+  RequireAndroidPartialMediaPermissionRule.new,
   RequireBackupExclusionRule.new,
   AvoidAndroidTaskAffinityDefaultRule.new,
   RequireAndroid12SplashRule.new,

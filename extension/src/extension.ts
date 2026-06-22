@@ -1528,8 +1528,21 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const portRange = cfg.get<number[]>('portRange', [8642, 8649]);
       const portMin = Array.isArray(portRange) && portRange.length >= 1 ? Math.max(1, portRange[0]) : 8642;
       const portMax = Array.isArray(portRange) && portRange.length >= 2 ? Math.min(65535, portRange[1]) : 8649;
+      // Hosts default to localhost; users running the Drift server off-box (e.g. a
+      // phone over Wi-Fi debugging, or several devices) list each IP here. An entry
+      // may pin an exact port as "host:port"; bare hosts are scanned across the
+      // port range. Blank/whitespace entries are dropped, falling back to localhost.
+      const hostsCfg = cfg.get<string[]>('hosts', ['127.0.0.1']);
+      const hosts = (Array.isArray(hostsCfg) ? hostsCfg : [])
+        .map((h) => (h ?? '').trim())
+        .filter(Boolean);
       try {
-        const server = await discoverServer(portMin, portMax);
+        const server = await discoverServer(
+          portMin,
+          portMax,
+          undefined,
+          hosts.length > 0 ? hosts : ['127.0.0.1'],
+        );
         if (!server) {
           driftAdvisorProvider.setState(null, []);
           await onDriftAdvisorDisconnected(context.workspaceState);

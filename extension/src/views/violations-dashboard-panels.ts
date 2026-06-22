@@ -103,32 +103,41 @@ export function buildTodoHackBlock(input: ViolationsDashboardHtmlInput): string 
         <button type="button" class="link" id="btn-enable-todos-scan">${escapeHtml(l10n('findingsDash.todoHack.enableScan'))}</button></p>
     </section>`;
   }
-  const todoBody = renderTodoSubsection(l10n('findingsDash.todoHack.todosLabel'), snap.todos, snap.capped);
-  const hackBody = renderTodoSubsection(l10n('findingsDash.todoHack.hacksLabel'), snap.hacks, snap.capped);
+  const todoBody = renderTodoSubsection(l10n('findingsDash.todoHack.todosLabel'), snap.todos);
+  const hackBody = renderTodoSubsection(l10n('findingsDash.todoHack.hacksLabel'), snap.hacks);
+  // Cap note is rendered once at block level (not per subsection) so the limit
+  // warning + its action appear a single time, and it carries a clickable button
+  // that opens the relevant setting — naming the setting key in prose alone left
+  // the user with no way to act on it (user-reported dead-end).
+  const capNote = snap.capped ? buildScanCapNote() : '';
   return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.todoHack.sectionAria'))}">
     <h2>${escapeHtml(l10n('findingsDash.todoHack.heading'))} <span class="count">${snap.todos.length + snap.hacks.length}</span></h2>
     ${todoBody}
     ${hackBody}
+    ${capNote}
   </section>`;
+}
+
+
+/** Actionable "scan hit its file limit" note: plain explanation + a button that
+ * opens the maxFilesToScan setting. Wired by btn-raise-scan-cap in the script. */
+export function buildScanCapNote(): string {
+  return `<p class="footer-line">${escapeHtml(l10n('findingsDash.todoHack.capNote'))}
+    <button type="button" class="link" id="btn-raise-scan-cap">${escapeHtml(l10n('findingsDash.todoHack.raiseCap'))}</button></p>`;
 }
 
 
 export function renderTodoSubsection(
   title: string,
   items: Array<{ file: string; line: number; snippet: string }>,
-  capped: boolean,
 ): string {
   if (items.length === 0) {
     return `<p class="footer-line">${escapeHtml(l10n('findingsDash.todoHack.subsectionNone', { title }))}</p>`;
   }
   const rows = items.map(renderCompactRow).join('');
-  const cap = capped
-    ? `<p class="footer-line">${escapeHtml(l10n('findingsDash.todoHack.capNote'))}</p>`
-    : '';
   return `<div style="margin-bottom:8px">
     <h3 style="margin:6px 0;font-size:.95em;font-weight:600">${escapeHtml(title)} <span class="meta">${items.length}</span></h3>
     <div class="compact-list">${rows}</div>
-    ${cap}
   </div>`;
 }
 

@@ -1023,3 +1023,210 @@ class RequireBackupExclusionRule extends SaropaLintRule {
     SaropaContext context,
   ) {}
 }
+
+// =============================================================================
+// require_android_exact_alarm_permission
+// =============================================================================
+
+/// Requires SCHEDULE_EXACT_ALARM / USE_EXACT_ALARM when scheduling exact alarms.
+///
+/// Since: v14.1.0 | Rule version: v1
+///
+/// Android 14 (API 34) denies `SCHEDULE_EXACT_ALARM` by default. An app that
+/// schedules an exact alarm — `flutter_local_notifications.zonedSchedule(...)`
+/// with `androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle` (or
+/// `.exact` / `.alarmClock`), or `AndroidAlarmManager.oneShotAt(..., exact:
+/// true)` — must declare `SCHEDULE_EXACT_ALARM` or `USE_EXACT_ALARM` in the
+/// manifest, or the alarm is silently downgraded to inexact (fires late or not
+/// at all) on Android 14+. Inexact schedule modes are deliberately not flagged.
+///
+/// The exact-vs-inexact distinction matters: `AndroidScheduleMode.inexact*`
+/// needs no permission and is unaffected, so the rule keys on the exact-mode
+/// argument value, not merely on the scheduling call.
+class RequireAndroidExactAlarmPermissionRule extends SaropaLintRule {
+  RequireAndroidExactAlarmPermissionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'flutter', 'platform', 'android'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_android_exact_alarm_permission',
+    '[require_android_exact_alarm_permission] An exact alarm is scheduled but '
+        'AndroidManifest.xml declares neither SCHEDULE_EXACT_ALARM nor '
+        'USE_EXACT_ALARM. Android 14+ (API 34) denies the exact-alarm capability '
+        'by default, so the alarm is silently downgraded to inexact and fires '
+        'late or not at all — a timing failure with no error on screen and none '
+        'in the logs. {v1}',
+    correctionMessage:
+        'Declare <uses-permission '
+        'android:name="android.permission.USE_EXACT_ALARM"/> (calendar/alarm '
+        'apps) or SCHEDULE_EXACT_ALARM (request at runtime) in '
+        'AndroidManifest.xml, or switch to an inexact schedule mode.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  // Matches the exact-alarm schedule modes only. `inexact` / `inexactAllowWhileIdle`
+  // are excluded because the regex anchors on the literal `.` before the mode,
+  // and `AndroidScheduleMode.inexact...` has `i`, not `e`, after that dot.
+  static final RegExp _exactScheduleMode = RegExp(
+    r'AndroidScheduleMode\.(exactAllowWhileIdle|exact|alarmClock)\b',
+  );
+
+  /// `android_alarm_manager_plus` entry points that register an alarm; the
+  /// `exact:` named argument decides whether it needs the permission.
+  static const Set<String> _alarmManagerMethods = <String>{
+    'oneShotAt',
+    'oneShot',
+    'periodic',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
+    final checker = AndroidManifestChecker.forFile(context.filePath);
+    if (checker == null || !checker.hasManifest) return;
+    // Either permission satisfies the Android 14 gate; USE_EXACT_ALARM is for
+    // alarm-clock/calendar apps (auto-granted), SCHEDULE_EXACT_ALARM is the
+    // user-revocable form.
+    if (checker.hasPermission('SCHEDULE_EXACT_ALARM') ||
+        checker.hasPermission('USE_EXACT_ALARM')) {
+      return;
+    }
+
+    context.addMethodInvocation((MethodInvocation node) {
+      final String method = node.methodName.name;
+
+      if (method == 'zonedSchedule') {
+        if (_argsRequestExactSchedule(node)) reporter.atNode(node);
+        return;
+      }
+
+      // AndroidAlarmManager.oneShotAt(..., exact: true) and friends.
+      if (_alarmManagerMethods.contains(method)) {
+        final Expression? target = node.realTarget;
+        if (target is Identifier &&
+            target.name == 'AndroidAlarmManager' &&
+            _hasExactTrueArg(node)) {
+          reporter.atNode(node);
+        }
+      }
+    });
+  }
+
+  static bool _argsRequestExactSchedule(MethodInvocation node) {
+    for (final arg in node.argumentList.arguments) {
+      if (arg is NamedExpression &&
+          arg.name.label.name == 'androidScheduleMode' &&
+          _exactScheduleMode.hasMatch(arg.expression.toSource())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static bool _hasExactTrueArg(MethodInvocation node) {
+    for (final arg in node.argumentList.arguments) {
+      if (arg is NamedExpression &&
+          arg.name.label.name == 'exact' &&
+          arg.expression.toSource() == 'true') {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+// =============================================================================
+// require_android_partial_media_permission
+// =============================================================================
+
+/// Suggests READ_MEDIA_VISUAL_USER_SELECTED when broad media permissions are
+/// declared.
+///
+/// Since: v14.1.0 | Rule version: v1
+///
+/// Android 14 (API 34) added "Select photos" — partial access to the photo
+/// library via `READ_MEDIA_VISUAL_USER_SELECTED`. An app that imports a gallery
+/// plugin (`image_picker`, `photo_manager`) AND declares the broad legacy
+/// permissions (`READ_MEDIA_IMAGES` / `READ_MEDIA_VIDEO`) but omits
+/// `READ_MEDIA_VISUAL_USER_SELECTED` runs in a compatibility mode that hides the
+/// partial-access option, so users on Android 14+ cannot grant access to only
+/// some photos.
+///
+/// Deliberately gated on the broad permissions already being present: an
+/// `image_picker`-only app that relies on the system Photo Picker needs no
+/// media permission at all, so flagging it would be noise. The rule fires only
+/// once the developer has opted into the broad-access path.
+class RequireAndroidPartialMediaPermissionRule extends SaropaLintRule {
+  RequireAndroidPartialMediaPermissionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'platform', 'android'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_android_partial_media_permission',
+    '[require_android_partial_media_permission] This app declares broad media '
+        'permissions (READ_MEDIA_IMAGES / READ_MEDIA_VIDEO) and uses a gallery '
+        'plugin, but AndroidManifest.xml omits READ_MEDIA_VISUAL_USER_SELECTED. '
+        'On Android 14+ (API 34) that omission hides the "Select photos" partial '
+        'access option, forcing users to grant all-or-nothing access to their '
+        'entire library. {v1}',
+    correctionMessage:
+        'Add <uses-permission '
+        'android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"/> to '
+        'AndroidManifest.xml to support partial photo/video access on Android '
+        '14+.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    final projectInfo = ProjectContext.getProjectInfo(context.filePath);
+    if (projectInfo == null || !projectInfo.isFlutterProject) return;
+
+    final checker = AndroidManifestChecker.forFile(context.filePath);
+    if (checker == null || !checker.hasManifest) return;
+    // Only relevant once the app opted into broad media access; otherwise the
+    // system Photo Picker handles partial access and no permission is needed.
+    final bool declaresBroadMedia =
+        checker.hasPermission('READ_MEDIA_IMAGES') ||
+        checker.hasPermission('READ_MEDIA_VIDEO');
+    if (!declaresBroadMedia) return;
+    if (checker.hasPermission('READ_MEDIA_VISUAL_USER_SELECTED')) return;
+
+    context.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri == null) return;
+      if (uri.startsWith('package:image_picker/') ||
+          uri.startsWith('package:photo_manager/')) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}

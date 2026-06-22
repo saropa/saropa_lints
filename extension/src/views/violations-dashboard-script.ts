@@ -316,9 +316,10 @@ export function buildScript(): string {
   bindClick('btn-refresh-extension', function () {
     vscode.postMessage({ type: 'paletteCommand', commandId: 'saropaLints.refresh' });
   });
-  bindClick('btn-run-empty', triggerRunAnalysis);
+  // btn-run-empty / btn-refresh-empty were removed from the no-data empty panel
+  // (deduped against the toolbar Run analysis). Only the filtered-empty state's
+  // buttons remain.
   bindClick('btn-run-empty2', triggerRunAnalysis);
-  bindClick('btn-refresh-empty', function () { vscode.postMessage({ type: 'refresh' }); });
   bindClick('btn-reset-empty', function () { vscode.postMessage({ type: 'resetFilters' }); });
   bindClick('run-again', triggerRunAnalysis);
 
@@ -784,6 +785,7 @@ export function buildScript(): string {
 
   /* TODOs / Drift section action bindings */
   bindClick('btn-enable-todos-scan', function () { vscode.postMessage({ type: 'enableTodosScan' }); });
+  bindClick('btn-raise-scan-cap', function () { vscode.postMessage({ type: 'openTodosScanSetting' }); });
   bindClick('btn-drift-refresh', function () { vscode.postMessage({ type: 'driftRefresh' }); });
   bindClick('btn-drift-enable', function () { vscode.postMessage({ type: 'driftEnable' }); });
   bindClick('btn-drift-disable', function () { vscode.postMessage({ type: 'driftDisable' }); });

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-import 'package:saropa_lints/src/rules/platforms/android_rules.dart';
+import 'package:saropa_lints/saropa_lints.dart';
 
 /// Tests for Android platform lint rules.
 ///
@@ -73,6 +73,47 @@ void main() {
       'prefer_foreground_service_android',
       () => PreferForegroundServiceAndroidRule(),
     );
+
+    testRule(
+      'RequireAndroidExactAlarmPermissionRule',
+      'require_android_exact_alarm_permission',
+      () => RequireAndroidExactAlarmPermissionRule(),
+    );
+
+    testRule(
+      'RequireAndroidPartialMediaPermissionRule',
+      'require_android_partial_media_permission',
+      () => RequireAndroidPartialMediaPermissionRule(),
+    );
+  });
+
+  // These two rules cross-check AndroidManifest.xml, which the example project
+  // does not provide with the specific permissions needed to trigger them, so
+  // there is no example/lib fixture (stub fixtures are banned). Pin tier
+  // membership and message specifics instead.
+  group('Android Rules - new platform-readiness rules', () {
+    test('exact-alarm rule is in the essential cumulative tier', () {
+      expect(
+        getRulesForTier('essential'),
+        contains('require_android_exact_alarm_permission'),
+      );
+    });
+
+    test('exact-alarm message names both satisfying permissions', () {
+      final msg = RequireAndroidExactAlarmPermissionRule().code.problemMessage;
+      expect(msg, contains('SCHEDULE_EXACT_ALARM'));
+      expect(msg, contains('USE_EXACT_ALARM'));
+      expect(msg.length, greaterThan(200));
+    });
+
+    test('partial-media rule is advisory (info) and professional tier', () {
+      final rule = RequireAndroidPartialMediaPermissionRule();
+      expect(rule.impact, LintImpact.info);
+      expect(
+        getRulesForTier('professional'),
+        contains('require_android_partial_media_permission'),
+      );
+    });
   });
 
   group('Android Rules - Fixture Verification', () {

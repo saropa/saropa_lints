@@ -520,7 +520,8 @@
       "enableScan": "Enable scan",
       "heading": "TODOs & HACKS",
       "subsectionNone": "{title}: none in scan range.",
-      "capNote": "Scan hit max-file cap; raise `saropaLints.todosAndHacks.maxFilesToScan` for full coverage.",
+      "capNote": "The scan reached its file limit, so some files were skipped.",
+      "raiseCap": "Raise the limit",
       "notePill": "note",
       "todosLabel": "TODOs",
       "hacksLabel": "HACKS"

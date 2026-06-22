@@ -698,6 +698,15 @@ function getOrCreatePanel(context: vscode.ExtensionContext): vscode.WebviewPanel
       await rebuildDashboardHtml(context, currentPanel!);
       return;
     }
+    // Cap-note "Raise the limit" — open Settings focused on the maxFilesToScan
+    // key so the user can act on the scan-was-capped warning in one click.
+    if (data.type === 'openTodosScanSetting') {
+      await vscode.commands.executeCommand(
+        'workbench.action.openSettings',
+        'saropaLints.todosAndHacks.maxFilesToScan',
+      );
+      return;
+    }
     // Scanner pill click — the webview posts `{ type: 'toggleSupplementary',
     // source: 'scanner' }`. Flip the file-system TODO/HACK scanner setting and
     // invalidate its snapshot so the next rebuild re-scans (or stops). The

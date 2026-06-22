@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 import * as http from 'http';
-import { tryHealth, discoverServer } from '../../driftAdvisor/discovery';
+import { tryHealth, discoverServer, parseHostPort, expandEndpoints } from '../../driftAdvisor/discovery';
 
 function createHealthServer(json: object): Promise<{ server: http.Server; port: number }> {
   return new Promise((resolve) => {
@@ -78,6 +78,43 @@ describe('Drift Advisor discovery', () => {
     try {
       const info = await tryHealth(port, 3000);
       assert.strictEqual(info, null);
+    } finally {
+      server.close();
+    }
+  });
+
+  it('parseHostPort splits an explicit host:port and passes bare hosts through', () => {
+    assert.deepStrictEqual(parseHostPort('192.168.1.151:9000'), { host: '192.168.1.151', port: 9000 });
+    assert.strictEqual(parseHostPort('192.168.1.151'), null);
+    assert.strictEqual(parseHostPort('localhost'), null);
+    // Out-of-range / malformed ports are treated as a bare host, not a split.
+    assert.strictEqual(parseHostPort('host:0'), null);
+    assert.strictEqual(parseHostPort('host:70000'), null);
+  });
+
+  it('expandEndpoints scans bare hosts across the range and pins host:port entries', () => {
+    const eps = expandEndpoints(['127.0.0.1', '192.168.1.151:9000', '  '], 8642, 8643);
+    assert.deepStrictEqual(eps, [
+      { host: '127.0.0.1', port: 8642 },
+      { host: '127.0.0.1', port: 8643 },
+      { host: '192.168.1.151', port: 9000 },
+    ]);
+  });
+
+  it('expandEndpoints de-duplicates overlapping endpoints, keeping first-listed order', () => {
+    const eps = expandEndpoints(['127.0.0.1:8642', '127.0.0.1'], 8642, 8643);
+    assert.deepStrictEqual(eps, [
+      { host: '127.0.0.1', port: 8642 },
+      { host: '127.0.0.1', port: 8643 },
+    ]);
+  });
+
+  it('discoverServer probes a list of hosts and returns the first match', async () => {
+    const { server, port } = await createHealthServer({ ok: true, version: '2', capabilities: [] });
+    try {
+      const info = await discoverServer(port, port, 3000, ['127.0.0.1']);
+      assert.ok(info);
+      assert.strictEqual(info!.baseUrl, `http://127.0.0.1:${port}`);
     } finally {
       server.close();
     }

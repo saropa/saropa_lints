@@ -245,9 +245,13 @@ export function buildFindingsEmpty(input: ViolationsDashboardHtmlInput): string 
   const reason = input.totalRawAfterDisable === 0
     ? l10n('findingsDash.findings.emptyNoViolations')
     : l10n('findingsDash.findings.emptyNoMatch');
+  // No-data state renders NO action buttons: the toolbar's Run analysis and the
+  // progress strip sit directly above this panel, so a second blue "Run analysis"
+  // here was pure duplication (user-reported). The hint text already points at the
+  // toolbar action. The filtered-empty state keeps its buttons because "Reset
+  // filters" is unique and not offered anywhere else on the surface.
   const cta = input.totalRawAfterDisable === 0
-    ? `<button type="button" class="btn tier-1" id="btn-run-empty" data-run-analysis><span class="glyph">▶</span>${escapeHtml(l10n('toolbar.runAnalysis'))}</button>
-       <button type="button" class="btn" id="btn-refresh-empty"><span class="glyph">⟳</span>${escapeHtml(l10n('toolbar.refresh'))}</button>`
+    ? ''
     : `<button type="button" class="btn tier-1" id="btn-reset-empty"><span class="glyph">⊘</span>${escapeHtml(l10n('findingsDash.findings.resetFilters'))}</button>
        <button type="button" class="btn" id="btn-run-empty2" data-run-analysis><span class="glyph">▶</span>${escapeHtml(l10n('findingsDash.findings.reRunAnalysis'))}</button>`;
   return `<section class="section" aria-label="${escapeHtml(l10n('findingsDash.findings.sectionAria'))}">
@@ -257,7 +261,7 @@ export function buildFindingsEmpty(input: ViolationsDashboardHtmlInput): string 
         <p>${input.totalRawAfterDisable === 0
           ? escapeHtml(l10n('findingsDash.findings.emptyHintNoData'))
           : escapeHtml(l10n('findingsDash.findings.emptyHintFilters'))}</p>
-        <div class="btns">${cta}</div>
+        ${cta ? `<div class="btns">${cta}</div>` : ''}
       </div>
     </div>
   </section>`;

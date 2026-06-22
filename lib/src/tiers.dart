@@ -692,6 +692,7 @@ const Set<String> essentialRules = <String>{
   'require_notification_icon_kept', // ERROR - ProGuard must keep notification icons
   'require_env_file_gitignore', // ERROR - .env must be gitignored
   'require_android_permission_request', // ERROR - permissions must be requested at runtime
+  'require_android_exact_alarm_permission', // WARNING - Android 14 downgrades exact alarms without the permission
   'prefer_pending_intent_flags', // ERROR - PendingIntent needs FLAG_IMMUTABLE/MUTABLE
   'avoid_android_cleartext_traffic', // WARNING - cleartext traffic blocked by default
   'avoid_purchase_in_sandbox_production', // ERROR - sandbox/production environment mix
@@ -1739,6 +1740,9 @@ const Set<String> recommendedOnlyRules = <String>{
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
 /// Includes stricter naming conventions for API parameters.
 const Set<String> professionalOnlyRules = <String>{
+  // Android 14 partial photo/video access (android_rules.dart). Advisory (INFO),
+  // and only fires when broad media permissions are already declared.
+  'require_android_partial_media_permission',
   // sign_in_with_apple (sign_in_with_apple_rules.dart)
   'apple_sign_in_null_identity_token',
   // lottie (lottie_rules.dart)
@@ -2960,6 +2964,9 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // behind a platform check can still be flagged — an acceptable trade at this
   // tier ("thorough coverage, some false positives").
   'avoid_platform_incompatible_dependency',
+  // package:js blocks `flutter build web --wasm`. Comprehensive because Wasm is
+  // opt-in: projects not targeting --wasm see it as advisory.
+  'avoid_package_js_for_wasm',
   // receive_sharing_intent (receive_sharing_intent_rules.dart)
   'rsi_unfiltered_shared_media_type',
   // sign_in_with_apple (sign_in_with_apple_rules.dart)
@@ -3414,6 +3421,7 @@ const Set<String> androidPlatformRules = <String>{
   'require_notification_icon_kept',
   'require_android_manifest_entries',
   'require_android_permission_request',
+  'require_android_exact_alarm_permission',
   'prefer_pending_intent_flags',
   'avoid_android_cleartext_traffic',
 
@@ -3427,6 +3435,7 @@ const Set<String> androidPlatformRules = <String>{
   // Professional
   'avoid_android_task_affinity_default',
   'require_android_backup_rules',
+  'require_android_partial_media_permission',
 };
 
 /// Rules specific to the macOS platform.
@@ -3473,6 +3482,8 @@ const Set<String> webPlatformRules = <String>{
 
   // Comprehensive
   'avoid_isar_web_limitations',
+  'avoid_platform_incompatible_dependency',
+  'avoid_package_js_for_wasm',
 };
 
 /// Rules specific to the Windows platform.
@@ -3512,6 +3523,9 @@ const Set<String> _applePlatformRules = <String>{
 
 /// Rules shared by desktop platforms (macOS, Windows, Linux).
 const Set<String> _desktopPlatformRules = <String>{
+  // Fires on macOS/Windows/Linux targets that import a plugin with no
+  // implementation for that desktop OS (e.g. camera, firebase_messaging).
+  'avoid_platform_incompatible_dependency',
   'require_menu_bar_for_desktop',
   'require_window_close_confirmation',
   'require_window_size_constraints',

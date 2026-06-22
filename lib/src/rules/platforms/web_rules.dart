@@ -986,3 +986,84 @@ class PreferCsrfProtectionRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// avoid_package_js_for_wasm
+// =============================================================================
+
+/// Flags `package:js` imports, which block WebAssembly compilation.
+///
+/// Since: v14.1.0 | Rule version: v1
+///
+/// `flutter build web --wasm` compiles to WebAssembly, but `package:js`
+/// (`package:js/js.dart`, `package:js/js_util.dart`) is not Wasm-compatible —
+/// its presence makes the Wasm build fail. The supported replacement is the
+/// built-in `dart:js_interop` / `dart:js_interop_unsafe`. This is distinct from
+/// `avoid_web_only_dependencies` (which flags `dart:` web libraries that crash
+/// on mobile/desktop) and `prefer_js_interop_over_dart_js` (which covers the
+/// `dart:js` SDK libraries): neither touches the third-party `package:js`.
+///
+/// Detection is an exact [Set] match on the import URI — no heuristics, so a
+/// similarly named `package:js_foo` or a relative path cannot false-positive.
+///
+/// **Bad:**
+/// ```dart
+/// import 'package:js/js.dart';
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// import 'dart:js_interop';
+/// ```
+class AvoidPackageJsForWasmRule extends SaropaLintRule {
+  AvoidPackageJsForWasmRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'platform', 'web'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_package_js_for_wasm',
+    '[avoid_package_js_for_wasm] Importing package:js prevents compiling this '
+        'web app to WebAssembly (flutter build web --wasm), because package:js '
+        'has no Wasm implementation and the build fails when it is present. The '
+        'supported, Wasm-compatible replacement is the built-in dart:js_interop '
+        'library. {v1}',
+    correctionMessage:
+        'Replace package:js / package:js_util with dart:js_interop and '
+        'dart:js_interop_unsafe, then migrate @JS annotations to extension '
+        'types per the dart.dev js-interop migration guide.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static const Set<String> _packageJsImports = <String>{
+    'package:js/js.dart',
+    'package:js/js_util.dart',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Only web builds compile to Wasm; on a non-web project package:js cannot
+    // be the cause of a Wasm-build failure, so the warning would be noise.
+    if (!ProjectContext.hasWebSupport(context.filePath)) return;
+
+    context.addImportDirective((ImportDirective node) {
+      final String? uri = node.uri.stringValue;
+      if (uri == null) return;
+      if (_packageJsImports.contains(uri)) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}

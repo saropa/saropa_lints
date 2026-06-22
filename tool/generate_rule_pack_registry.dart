@@ -145,6 +145,13 @@ const Map<String, String> kPackUiLabels = {
   'localization': 'Localization',
   'documentation': 'Documentation',
   'testing': 'Testing',
+  // Platform packs (recommended by embedder-folder detection).
+  'ios': 'iOS',
+  'android': 'Android',
+  'web': 'Web',
+  'windows': 'Windows',
+  'macos': 'macOS',
+  'linux': 'Linux',
   'auto_route': 'Auto Route',
   'bloc': 'Bloc',
   'bloc_8': 'Bloc 8.x',
