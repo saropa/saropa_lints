@@ -75,6 +75,15 @@ Additive: the standalone Project Map and Code Health commands are unchanged.
 - Dart `health_html_reporter_test.dart` passes (scoped template still emits the banner / KPI strip /
   legend / chart hosts).
 
+## F5 progress
+
+- **Confirmed:** the composed document renders — host hero + both scoped panes side by side (stacked
+  below 1100px), consistent editor theme, no blank page, no style bleed in the chrome.
+- **Fixed after first F5:** the two scans ran concurrently (`Promise.all`), and two `dart run
+  saropa_lints:<tool>` against the same package from the same cwd contend on dart's build-snapshot /
+  pub lock — the pair stalled and the panes never left the loading shell ("times out"). The scans now
+  run sequentially, matching the standalone panels (one `dart run` at a time).
+
 ## Not verified — requires F5 (a webview render cannot be unit-tested)
 
 - The composed page actually rendering: both panes side by side, the treemap / scatter / hot-spot

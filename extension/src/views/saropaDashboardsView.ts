@@ -98,11 +98,20 @@ async function runAndRender(root: string): Promise<void> {
       title: l10n('dashboards.heroTitle'),
       cancellable: true,
     },
-    (_progress, token) =>
-      Promise.all([
-        scanProjectMapToParts(root, p.webview, extensionUri, token),
-        scanCodeHealthFragment(root, token),
-      ]),
+    async (progress, token) => {
+      // Run the two scans SEQUENTIALLY, not concurrently. Both are `dart run
+      // saropa_lints:<tool>` against the same package from the same cwd; spawning them
+      // together makes the second block on dart's build-snapshot / pub lock held by the
+      // first, and the pair can stall indefinitely (the consolidated view's "times out"
+      // hang). The standalone panels each run a single scan, which is why they complete —
+      // matching that here is the fix. Order is arbitrary; Project Map first.
+      progress.report({ message: l10n('dashboards.projectMap.scanning') });
+      const pm = await scanProjectMapToParts(root, p.webview, extensionUri, token);
+      if (token.isCancellationRequested) return [pm, null] as const;
+      progress.report({ message: l10n('dashboards.codeHealth.scanning') });
+      const ch = await scanCodeHealthFragment(root, token);
+      return [pm, ch] as const;
+    },
   );
   // The panel may have been disposed mid-scan.
   if (!panel) return;
