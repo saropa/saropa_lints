@@ -4,6 +4,11 @@
 /// Analyzer-backed tests for `scan_runner_test` (scan runner).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+///
+/// Tagged `slow`: runs the full scanner over the repo tree. Excluded from the
+/// publish fast test pass and run in a dedicated slow pass instead.
+@Tags(['slow'])
+library;
 
 import 'dart:io';
 

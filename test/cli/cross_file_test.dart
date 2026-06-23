@@ -3,6 +3,12 @@
 /// Mixes live analysis on the repo root (shape-only), curated fixtures under
 /// `test/fixtures/cross_file_*`, and temp dirs for HTML output. Paths are built with
 /// [p.join] for portability.
+///
+/// Tagged `slow`: runs cross-file analysis over the repo root. Excluded from the
+/// publish fast test pass and run in a dedicated slow pass instead.
+@Tags(['slow'])
+library;
+
 import 'dart:convert';
 import 'dart:io';
 

@@ -1,3 +1,12 @@
 # Global test timeout — prevents any test from hanging indefinitely.
 # Individual tests can override with a longer timeout if needed.
 timeout: 2m
+
+# Declared tags. `slow` marks integration tests that run the full scanner /
+# cross-file analysis over the whole repo tree (tens of seconds each). The
+# publish script runs a fast pass excluding them (`-x slow`) followed by a
+# dedicated slow pass (`-t slow`), so both still run on every publish but the
+# slow tail no longer gates the common case. Declaring the tag here keeps
+# `dart test` from warning about an unknown tag.
+tags:
+  slow:

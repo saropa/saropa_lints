@@ -193,6 +193,13 @@ def _test_category_alias(category: str) -> str:
         return "ios"
     if category == "repo_integrity":
         return "config"
+    # The pubspec_constraint rules are thin wrappers over the constraint parser,
+    # so their coverage lives in pubspec_constraint_parser_test.dart (the rules
+    # themselves can only be exercised via the scan CLI — custom_lint analyzes
+    # .dart, not the .yaml they target). Point the resolver at that test instead
+    # of the absent pubspec_constraint_rules_test.
+    if category == "pubspec_constraint":
+        return "pubspec_constraint_parser"
     return category
 
 

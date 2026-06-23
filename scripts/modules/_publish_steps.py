@@ -793,7 +793,9 @@ def _log_shows_windows_file_lock(log_path: Path) -> bool:
 
 
 def _run_chain_stack_traces_and_check(
-    project_dir: Path, env: dict[str, str] | None
+    project_dir: Path,
+    env: dict[str, str] | None,
+    extra_args: list[str] | None = None,
 ) -> bool:
     """Run dart test --chain-stack-traces, pipe output to a log file, then check for error lines.
 
@@ -839,7 +841,7 @@ def _run_chain_stack_traces_and_check(
         try:
             with open(log_path, "w", encoding="utf-8") as out:
                 result = subprocess.run(
-                    ["dart", "test", "--chain-stack-traces"],
+                    ["dart", "test", "--chain-stack-traces", *(extra_args or [])],
                     cwd=project_dir,
                     stdout=out,
                     stderr=subprocess.STDOUT,
@@ -925,15 +927,29 @@ def _run_dart_test_to_file(
     project_dir: Path,
     env: dict[str, str] | None,
     log_path: Path,
+    extra_args: list[str] | None = None,
 ) -> int:
     """Run dart test with stdout/stderr piped only to log_path. Returns exit code.
+
+    extra_args appends tag selectors (e.g. ['-x', 'slow'] or ['-t', 'slow']) so the
+    caller can split the suite into a fast pass and a slow pass.
 
     On non-zero exit, appends a line to the log so the file explicitly records that tests failed.
     """
     use_shell = get_shell_mode()
+    # Use all logical cores. dart test defaults to ~half the cores, which leaves
+    # the long full-repo scan integration tests (fixture_lint_integration,
+    # scan_runner, fix_application_dart_fix_dry_run) queued behind the unit tests
+    # instead of overlapping them. -j <cores> shortens the publish test step with
+    # no change to which tests run. Falls back to a sane default if the count is
+    # unavailable.
+    cores = os.cpu_count() or 8
+    cmd = ["dart", "test", "-j", str(cores)]
+    if extra_args:
+        cmd.extend(extra_args)
     with open(log_path, "w", encoding="utf-8", errors="replace") as out:
         result = subprocess.run(
-            ["dart", "test"],
+            cmd,
             cwd=project_dir,
             stdout=out,
             stderr=subprocess.STDOUT,
@@ -1009,51 +1025,47 @@ def _check_log_for_errors(log_path: Path, date_str: str, log_name: str) -> None:
         )
 
 
-def run_tests(project_dir: Path) -> bool:
-    """Step 7: Run unit tests.
+def _run_test_pass(
+    project_dir: Path,
+    env: dict[str, str] | None,
+    reports_dir: Path,
+    date_str: str,
+    time_str: str,
+    label: str,
+    extra_args: list[str] | None = None,
+) -> bool:
+    """Run one dart test pass (e.g. fast = exclude `slow`, slow = only `slow`).
 
-    All test output is written to a log file only (no test output on terminal).
-    On failure, shows log path and a short excerpt, then prompts Continue or Abort.
-    Uses a temp dir under the project so the test runner does not fill
-    the system temp drive. Full integration tests (dart analyze in example/)
-    are skipped during publish; run manually: cd example && dart analyze
+    Runs once, retries once on failure, then prompts Continue/Retry/Abort exactly
+    like the original single-pass flow. The label is woven into the log filename so
+    the fast and slow passes write distinct logs under the same timestamp.
+
+    Returns True to continue the publish (the pass passed, or the user chose
+    Continue), False to abort.
     """
-    print_header("STEP 7: RUNNING TESTS")
-
-    clear_flutter_lock()
-
-    test_dir = project_dir / "test"
-    if not test_dir.exists():
-        print_warning("No test directory found, skipping unit tests")
-        return True
-
-    env = _dart_test_env(project_dir)
-    now = datetime.now()
-    date_str = now.strftime("%Y%m%d")
-    time_str = now.strftime("%H%M%S")
-    reports_dir = project_dir / "reports" / date_str
-    reports_dir.mkdir(parents=True, exist_ok=True)
-    log_name = f"{date_str}_{time_str}_dart_test.log"
+    log_name = f"{date_str}_{time_str}_dart_test_{label}.log"
     log_path = reports_dir / log_name
 
-    print_info(f"Running unit tests (output → reports/{date_str}/{log_name})")
-    returncode = _run_dart_test_to_file(project_dir, env, log_path)
+    print_info(f"Running {label} tests (output → reports/{date_str}/{log_name})")
+    returncode = _run_dart_test_to_file(project_dir, env, log_path, extra_args)
     if returncode == 0:
-        print_success("Tests passed.")
+        print_success(f"{label.capitalize()} tests passed.")
         return True
 
     print_warning("Retrying tests once...")
-    retry_name = f"{date_str}_{time_str}_dart_test_retry.log"
+    retry_name = f"{date_str}_{time_str}_dart_test_{label}_retry.log"
     retry_path = reports_dir / retry_name
-    retry_code = _run_dart_test_to_file(project_dir, env, retry_path)
+    retry_code = _run_dart_test_to_file(project_dir, env, retry_path, extra_args)
     if retry_code == 0:
-        print_success("Tests passed on retry.")
+        print_success(f"{label.capitalize()} tests passed on retry.")
         return True
 
     # Both runs failed: show log path and short excerpt, then prompt
     last_log = retry_path
     while True:
-        print_error("Tests failed. Full output in log file (no test output was printed to this terminal).")
+        print_error(
+            f"{label.capitalize()} tests failed. Full output in log file (no test output was printed to this terminal)."
+        )
         print_colored(f"  Log: {last_log.relative_to(project_dir)}", Color.CYAN)
         excerpt = _extract_failure_excerpt(last_log, max_lines=10)
         if excerpt:
@@ -1071,17 +1083,62 @@ def run_tests(project_dir: Path) -> bool:
             # Re-run tests (user may have fixed the issue in another terminal)
             print_info("Re-running tests...")
             relog_time = datetime.now().strftime("%H%M%S")
-            relog_name = f"{date_str}_{relog_time}_dart_test_retry.log"
+            relog_name = f"{date_str}_{relog_time}_dart_test_{label}_retry.log"
             last_log = reports_dir / relog_name
-            rc = _run_dart_test_to_file(project_dir, env, last_log)
+            rc = _run_dart_test_to_file(project_dir, env, last_log, extra_args)
             if rc == 0:
-                print_success("Tests passed on retry.")
+                print_success(f"{label.capitalize()} tests passed on retry.")
                 return True
             continue
         # Abort: run chain-stack-traces so a detailed log exists, then return False
         print_info("Writing detailed trace to log (output → reports/.../chain_stack_traces.log)")
-        _run_chain_stack_traces_and_check(project_dir, env)
+        _run_chain_stack_traces_and_check(project_dir, env, extra_args)
         return False
+
+
+def run_tests(project_dir: Path) -> bool:
+    """Step 7: Run the fast unit-test pass (excludes `slow`-tagged integration tests).
+
+    The `slow` tag marks the full-repo scanner / cross-file integration tests (tens
+    of seconds each: scan_runner, fixture_lint_integration, fix_application dry-run,
+    cross_file, health_history). Excluding them here cuts the local publish test step
+    from ~157s to ~89s. They are NOT skipped overall — both ci.yml and publish.yml run
+    the full `dart test` on every push and release, so the slow integration tests are
+    verified in CI before any tag is created.
+
+    Why not run the slow tests locally too: `dart test -t slow` still compiles all 317
+    test files to discover the tag, then runs only the five — so a second local pass
+    costs ~158s on top of the fast pass (worse than one full run). Splitting only pays
+    off because CI carries the slow set. To run them locally on demand:
+        dart test -t slow
+
+    All test output is written to a log file only (no test output on terminal).
+    On failure, shows log path and a short excerpt, then prompts Continue or Abort.
+    Uses a temp dir under the project so the test runner does not fill the system
+    temp drive. Full integration tests (dart analyze in example/) are skipped during
+    publish; run manually: cd example && dart analyze
+    """
+    print_header("STEP 7: RUNNING TESTS")
+
+    clear_flutter_lock()
+
+    test_dir = project_dir / "test"
+    if not test_dir.exists():
+        print_warning("No test directory found, skipping unit tests")
+        return True
+
+    env = _dart_test_env(project_dir)
+    now = datetime.now()
+    date_str = now.strftime("%Y%m%d")
+    time_str = now.strftime("%H%M%S")
+    reports_dir = project_dir / "reports" / date_str
+    reports_dir.mkdir(parents=True, exist_ok=True)
+
+    # Fast pass only: excludes slow-tagged integration tests (run in CI instead).
+    return _run_test_pass(
+        project_dir, env, reports_dir, date_str, time_str,
+        label="fast", extra_args=["-x", "slow"],
+    )
 
 
 # Paths passed to ``dart format``. Must match CI (.github/workflows/ci.yml) and

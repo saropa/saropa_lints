@@ -1,3 +1,8 @@
+/// Tagged `slow`: runs the full scanner over the repo tree. Excluded from the
+/// publish fast test pass and run in a dedicated slow pass instead.
+@Tags(['slow'])
+library;
+
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';

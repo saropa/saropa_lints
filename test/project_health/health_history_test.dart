@@ -1,6 +1,12 @@
 /// Tests the health time-machine against this repo's own tags. Asserts
 /// well-formed, chronological points rather than exact values; skips when there
 /// are no tags / no git.
+///
+/// Tagged `slow`: walks this repo's git tags and rebuilds health per point.
+/// Excluded from the publish fast test pass and run in a dedicated slow pass.
+@Tags(['slow'])
+library;
+
 import 'dart:io';
 
 import 'package:saropa_lints/src/cli/project_health/health_history.dart';

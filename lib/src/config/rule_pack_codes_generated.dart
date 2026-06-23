@@ -1621,3 +1621,21 @@ const Map<String, Set<String>> kRuleThemePackCodesGenerated = {
     'require_semantic_colors',
   },
 };
+
+/// Pubspec markers for theme ("concern") packs — advisory `flutter` marker only.
+const Map<String, Set<String>> kRuleThemePackPubspecMarkersGenerated = {
+  'accessibility': {'flutter'},
+  'architecture': {'flutter'},
+  'async_concurrency': {'flutter'},
+  'code_quality': {'flutter'},
+  'data_integrity': {'flutter'},
+  'error_handling': {'flutter'},
+  'forms': {'flutter'},
+  'media_graphics': {'flutter'},
+  'navigation': {'flutter'},
+  'networking': {'flutter'},
+  'performance': {'flutter'},
+  'security': {'flutter'},
+  'state_management': {'flutter'},
+  'theming': {'flutter'},
+};

@@ -417,6 +417,24 @@ void main() {
     buf.writeln('  },');
   }
   buf.writeln('};');
+  buf.writeln();
+
+  // Pubspec markers for theme packs. Concern packs are cross-cutting and not tied
+  // to a package, so they carry the representative `flutter` marker (advisory only:
+  // it drives the "applicable" hint in init / the dashboard, never a hard gate —
+  // a theme pack can be enabled in any project). Without an entry here a theme pack
+  // would be absent from kRulePackPubspecMarkers and break the markers-keys ==
+  // rule-codes-keys invariant (rule_packs_pubspec_markers_test).
+  buf.writeln(
+    '/// Pubspec markers for theme ("concern") packs — advisory `flutter` marker only.',
+  );
+  buf.writeln(
+    'const Map<String, Set<String>> kRuleThemePackPubspecMarkersGenerated = {',
+  );
+  for (final id in sortedThemeIds) {
+    buf.writeln("  '$id': {'flutter'},");
+  }
+  buf.writeln('};');
 
   outFile.writeAsStringSync(buf.toString());
   print(

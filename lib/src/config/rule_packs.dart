@@ -369,6 +369,10 @@ Set<String> get knownRulePackIds => kRulePackRuleCodes.keys.toSet();
 /// Keys match [kRulePackRuleCodes]. Every pack declares at least one marker.
 const Map<String, Set<String>> kRulePackPubspecMarkers = {
   ...kRulePackPubspecMarkersGenerated,
+  // Theme ("concern") packs (accessibility, security, performance, …) carry an
+  // advisory `flutter` marker so they appear in kRulePackPubspecMarkers, keeping
+  // its key set equal to kRulePackRuleCodes (rule_packs_pubspec_markers_test).
+  ...kRuleThemePackPubspecMarkersGenerated,
   // SDK packs are primarily gated by `environment` constraints.
   'dart_sdk_3_2': {'environment'},
   'dart_sdk_3_4': {'environment'},
@@ -393,6 +397,17 @@ const Map<String, Set<String>> kRulePackPubspecMarkers = {
   'localization': {'intl', 'flutter_localizations'},
   'documentation': {'flutter'},
   'testing': {'flutter_test', 'test'},
+  // Platform packs are driven by embedder-folder detection (ios/, web/, …), not a
+  // pubspec dependency. They still carry the advisory `flutter` marker — like the
+  // thematic packs above — so the markers-keys == rule-codes-keys invariant holds
+  // (rule_packs_pubspec_markers_test). The marker only feeds the "applicable" hint;
+  // folder detection remains the real suggestion driver.
+  'ios': {'flutter'},
+  'android': {'flutter'},
+  'web': {'flutter'},
+  'windows': {'flutter'},
+  'macos': {'flutter'},
+  'linux': {'flutter'},
 };
 
 /// True when [pubspecYamlContent] declares any [kRulePackPubspecMarkers] entry.

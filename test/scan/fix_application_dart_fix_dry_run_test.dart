@@ -19,6 +19,11 @@
 /// Analyzer-backed tests for `fix_application_dart_fix_dry_run_test` (fix application dart fix dry run).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+///
+/// Tagged `slow`: spawns `dart fix --dry-run` over the example package. Excluded
+/// from the publish fast test pass and run in a dedicated slow pass instead.
+@Tags(['slow'])
+library;
 
 import 'dart:io';
 
