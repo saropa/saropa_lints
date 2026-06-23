@@ -81,3 +81,34 @@ A webview's render cannot be unit-tested. Pending an Extension Development Host 
 rendering side by side with their charts/tables interactive, drill-down from each pane opening the
 file, and `.pm-pane` scoping fully isolating the two stylesheets with no visual bleed across panes.
 The active plan `plans/PLAN_consolidated_dashboards.md` tracks this open verification gate.
+
+## Finish Report (2026-06-15) — sequential scan ordering
+
+### Problem
+
+On open, the consolidated view stayed on its loading shell indefinitely and never populated either
+pane (observed as a hang / "times out"). The composed document itself rendered correctly — host hero,
+both scoped panes, consistent theme — so the failure was in the scan orchestration, not the markup.
+
+### Cause
+
+Both panes' data comes from `dart run saropa_lints:<tool>` (project_health and project_vibrancy),
+spawned from the same working directory (`resolveCliCwd`). The host ran them with `Promise.all`, so two
+`dart run` processes started together against the same package. The second blocks on dart's
+build-snapshot / pub lock held by the first, and the pair can stall — neither scan resolves, so the
+`buildDashboardsDocument` call that replaces the loading shell never runs. The standalone Project Map
+and Code Health panels each run a single scan, which is why they complete and only the consolidated
+view hangs.
+
+### Change
+
+`runAndRender` in `saropaDashboardsView.ts` now awaits the two scans sequentially (Project Map, then
+Code Health) inside the progress callback instead of `Promise.all`. The progress notification reports
+the active scan; a cancellation between scans skips the second and assembles with whatever completed.
+This matches the one-scan-at-a-time behavior of the standalone panels and removes the lock contention.
+
+### Verification
+
+`tsc` clean (main + test); `saropaDashboardsView.test.ts` (4) still passes (the pure composition is
+unchanged). The orchestration spawns real `dart` processes and is not unit-testable; the populated
+render remains an F5 check (tracked in the active plan).
