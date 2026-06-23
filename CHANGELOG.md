@@ -64,9 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.1.1]
 
-Fixes the rule detail panel, which displayed a wall of raw JavaScript instead of the rule's documentation, and removes its dead "View in ROADMAP" button. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+Fixes the rule detail panel, which displayed a wall of raw JavaScript instead of the rule's documentation, and removes its dead "View in ROADMAP" button. [log](https://github.com/saropa/saropa_lints/blob/v14.1.1/CHANGELOG.md)
 
 ### Changed (Extension)
 

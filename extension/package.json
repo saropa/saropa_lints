@@ -2,7 +2,7 @@
   "name": "saropa-lints",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "version": "14.1.0",
+  "version": "14.1.1",
   "publisher": "saropa",
   "license": "MIT",
   "repository": {
