@@ -36,9 +36,9 @@ describe('Rule Explain panel HTML', () => {
       relatedRules: ['avoid_dynamic'],
     }));
     assert.ok(html.includes('<h4>Problem</h4>'));
-    assert.ok(html.includes('<h4>Documentation</h4>'));
+    assert.ok(html.includes('<h4>Related rules</h4>'));
     // No subsection should still be rendered as <h2> after the demotion.
-    assert.ok(!html.match(/<h2>(Problem|How to fix|Related rules|Same-tag|Migration|Documentation|OWASP)<\/h2>/));
+    assert.ok(!html.match(/<h2>(Problem|How to fix|Related rules|Same-tag|Migration|OWASP)<\/h2>/));
   });
 
   it('omits the Problem section when no message is present (§8.16, §14.3)', () => {
@@ -58,9 +58,11 @@ describe('Rule Explain panel HTML', () => {
     assert.ok(!html.includes('<p>Mobile:'));
   });
 
-  it('renders the Documentation link as a tier-2 .btn affordance (§8.10)', () => {
+  it('omits the dead "View in ROADMAP" documentation link', () => {
+    // ROADMAP.md is now a redirect stub with no per-rule content, so the link
+    // led nowhere useful. The panel must not render the button or its handler.
     const html = buildRuleExplainHtml(input());
-    assert.ok(html.includes('class="doc-link btn"'));
-    assert.ok(html.includes('View in ROADMAP'));
+    assert.ok(!html.includes('doc-link'));
+    assert.ok(!html.includes('View in ROADMAP'));
   });
 });

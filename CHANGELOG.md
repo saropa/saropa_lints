@@ -64,6 +64,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+Fixes the rule detail panel, which displayed a wall of raw JavaScript instead of the rule's documentation, and removes its dead "View in ROADMAP" button. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Changed (Extension)
+
+- **Removed the "View in ROADMAP" button from the rule detail panel.** It linked to a redirect stub that no longer holds per-rule documentation, so the link led nowhere useful. No action required.
+
+### Fixed (Extension)
+
+- **Opening a rule in the detail panel no longer dumps raw script text into the view.** A code comment in the panel's inline script contained a literal closing-script-tag sequence that terminated the script block early, so the browser parsed the rest as visible text. No action required.
+
+---
+
 ## [14.1.0]
 
 Resolves a false positive in the color-only status indicator rule so decorative active-state bars and indicators paired with another visual cue are no longer flagged. The extension's "Create baseline" suggestion now actually creates the baseline. Package Vibrancy override analysis now recognizes overrides that resolve a transitive dependency cap, naming the package responsible instead of marking the override removable, and upgrade-blocker explanations trace the dependency path to a package you can act on. The "Annotate pubspec" command now writes why each pinned dependency sits where it does. The Findings Dashboard sheds a stray analysis banner and a redundant Run analysis button, the TODO/HACK file-limit note gains a one-click way to raise the limit, and Drift Advisor can now reach a server running on another device over your network. Package Vibrancy also stops re-scanning on every restart — unchanged projects load instantly from cache and refresh quietly in the background. [log](https://github.com/saropa/saropa_lints/blob/v14.1.0/CHANGELOG.md)

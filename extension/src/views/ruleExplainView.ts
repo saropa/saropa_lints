@@ -18,7 +18,6 @@ import { Violation, OwaspData } from '../violationsReader';
 import { getRuleExplainPanelStyles } from './ruleExplainPanelStyles';
 import {
   getRelatedRules,
-  getRuleDocUrl,
   getSameTagRules,
   getSupersedesRules,
 } from '../ruleMetadata';
@@ -103,7 +102,6 @@ function buildHtml(input: RuleExplainInput): string {
   const severity = input.severity ? escapeHtml(input.severity) : '';
   const impact = input.impact ? escapeHtml(input.impact) : '';
   const location = input.location ? escapeHtml(input.location) : '';
-  const docUrl = getRuleDocUrl(input.ruleName);
   const relatedRules = (input.relatedRules ?? getRelatedRules(input.ruleName))
     .filter((r) => r !== input.ruleName);
   const sameTagRules = getSameTagRules(input.ruleName).filter((r) => r !== input.ruleName);
@@ -191,14 +189,6 @@ function buildHtml(input: RuleExplainInput): string {
 
   </main>
 
-  <section class="block" aria-label="Documentation links">
-    <h4>Documentation</h4>
-    <!-- §8.10 — Render the doc link as a tier-2 button so the panel has one
-         emphasized affordance the user's eye can land on for the likely next
-         action. The plain-text anchor previously gave the panel no visual
-         CTA at all. -->
-    <p><a href="${escapeHtml(docUrl)}" data-url="${escapeHtml(docUrl)}" class="doc-link btn">View in ROADMAP</a></p>
-  </section>
   ${buildKeyboardShortcutsOverlay([
     { key: '?', label: 'Show this shortcut overlay' },
     { key: 'Esc', label: 'Close the keyboard-shortcut overlay' },
@@ -207,15 +197,11 @@ function buildHtml(input: RuleExplainInput): string {
     (function() {
       const vscode = acquireVsCodeApi();
       // jsonForScriptBlock instead of bare JSON.stringify: a rule name containing
-      // the substring "</script>" would otherwise terminate this script block and
-      // let the rest parse as HTML. JSON.stringify does not escape that sequence.
+      // a literal closing-script-tag sequence would otherwise terminate this script
+      // block and let the rest parse as HTML. JSON.stringify does not escape it.
+      // NOTE: this comment must NOT itself contain that raw sequence — the HTML
+      // parser would terminate the block here, before jsonForScriptBlock can run.
       const sourceRuleName = ${jsonForScriptBlock(input.ruleName)};
-      document.querySelectorAll('a.doc-link[data-url]').forEach(function(link) {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          vscode.postMessage({ type: 'openUrl', url: link.dataset.url, ruleName: sourceRuleName });
-        });
-      });
       document.querySelectorAll('a.related-rule[data-rule]').forEach(function(link) {
         link.addEventListener('click', function(e) {
           e.preventDefault();
@@ -282,17 +268,10 @@ export function openRuleExplainPanel(input: RuleExplainInput): void {
   activePanel.webview.onDidReceiveMessage(
     (msg: {
       type: string;
-      url?: string;
       ruleName?: string;
       sourceRule?: string;
       section?: string;
     }) => {
-    if (msg.type === 'openUrl' && msg.url) {
-      ruleExplainTelemetry?.('docClick', {
-        ruleName: msg.ruleName ?? input.ruleName,
-      });
-      void vscode.env.openExternal(vscode.Uri.parse(msg.url));
-    }
       if (msg.type === 'openRule' && typeof msg.ruleName === 'string') {
         ruleExplainTelemetry?.('relatedClick', {
           sourceRule: msg.sourceRule ?? input.ruleName,

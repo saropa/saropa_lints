@@ -51,10 +51,7 @@ export function getRuleExplainPanelStyles(): string {
       color: var(--muted);
     }
     .owasp-dl dd { margin: 0; word-break: break-word; }
-    /* §8.2 — external links: no underline by default, underline on hover. The
-       chrome's .btn rule covers the *Documentation* CTA which now uses the
-       .btn class for §8.10 emphasis; .doc-link.btn keeps button shape but
-       still wires through the data-url postMessage. */
+    /* External links: no underline by default, underline on hover. */
     a {
       color: var(--vscode-textLink-foreground);
       text-decoration: none;
@@ -63,7 +60,6 @@ export function getRuleExplainPanelStyles(): string {
       color: var(--vscode-textLink-activeForeground);
       text-decoration: underline;
     }
-    a.doc-link.btn:hover { text-decoration: none; }
     /* Inline rule-name links inside section blocks read better as monospace
        chips than as plain text — they are rule identifiers, not prose. */
     section.block code {
