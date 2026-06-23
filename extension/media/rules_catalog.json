@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2320,
+  "ruleCount": 2324,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -8000,6 +8000,23 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "avoid_package_js_for_wasm": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "flutter",
+        "platform",
+        "web"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "avoid_parameter_mutation": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -8189,6 +8206,22 @@
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
         "description": "Code smell default target: zero false positives."
+      }
+    },
+    "avoid_platform_incompatible_dependency": {
+      "ruleType": "bug",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "flutter",
+        "platform"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Bug rule default target: zero false positives."
       }
     },
     "avoid_platform_specific_imports": {
@@ -25946,6 +25979,23 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "require_android_exact_alarm_permission": {
+      "ruleType": "bug",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "android",
+        "flutter",
+        "platform"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Bug rule default target: zero false positives."
+      }
+    },
     "require_android_manifest_entries": {
       "ruleType": "bug",
       "ruleStatus": "ready",
@@ -25961,6 +26011,23 @@
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
         "description": "Bug rule default target: zero false positives."
+      }
+    },
+    "require_android_partial_media_permission": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "android",
+        "flutter",
+        "platform"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
       }
     },
     "require_android_permission_request": {
