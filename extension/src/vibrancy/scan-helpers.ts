@@ -17,7 +17,7 @@ import { ScanLogger } from './services/scan-logger';
 import {
     getGithubToken, getAllowlistSet, getScoringWeights,
     getRepoOverrides, getPublisherTrustBonus, getIncludeDevDependencies,
-    getIncludeOverriddenPackages,
+    getIncludeOverriddenPackages, getScanConcurrency,
 } from './services/config-service';
 
 export interface ScanConfig {
@@ -38,8 +38,6 @@ export function readScanConfig(): ScanConfig {
         publisherTrustBonus: getPublisherTrustBonus(),
     };
 }
-
-const CONCURRENCY = 3;
 
 export async function scanPackages(
     deps: PackageDependency[],
@@ -73,8 +71,13 @@ export async function scanPackages(
         }
     }
 
+    // Network-bound fan-out: each package hits pub.dev + GitHub + a tarball
+    // download, so concurrency (not CPU) governs wall-clock time. User-tunable
+    // via `scanConcurrency` (default 6) — raised from the old hard-coded 3 to
+    // roughly halve cold-scan time on large projects.
+    const concurrency = getScanConcurrency();
     const workers = Array.from(
-        { length: Math.min(CONCURRENCY, deps.length) },
+        { length: Math.min(concurrency, deps.length) },
         () => next(),
     );
     await Promise.all(workers);

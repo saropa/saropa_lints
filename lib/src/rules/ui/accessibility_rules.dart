@@ -479,16 +479,16 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   /// True when every named argument is one of color/child/key/width/height —
   /// the shape of a bare status swatch rather than a decorated Container.
   bool _hasOnlyColorAndChild(InstanceCreationExpression node) {
-    return node.argumentList.arguments.whereType<NamedExpression>().every(
-      (NamedExpression na) {
-        final String name = na.name.label.name;
-        return name == 'color' ||
-            name == 'child' ||
-            name == 'key' ||
-            name == 'width' ||
-            name == 'height';
-      },
-    );
+    return node.argumentList.arguments.whereType<NamedExpression>().every((
+      NamedExpression na,
+    ) {
+      final String name = na.name.label.name;
+      return name == 'color' ||
+          name == 'child' ||
+          name == 'key' ||
+          name == 'width' ||
+          name == 'height';
+    });
   }
 
   /// True when either branch resolves to `Colors.transparent` (a presence

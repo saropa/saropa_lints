@@ -31,15 +31,52 @@ export function getScanOnOpen(): boolean {
 }
 
 /**
- * Minutes within which a previously completed scan is considered fresh
- * enough to skip a startup re-scan (provided pubspec.lock and the
- * scan-config fingerprint are unchanged).
+ * Master switch for the startup skip-gate.  Any non-zero value enables
+ * the optimisation: on restart, if pubspec.lock and the scan-config
+ * fingerprint are unchanged, the cached results are rehydrated INSTANTLY
+ * with no foreground scan — regardless of how long ago the scan ran,
+ * because an unchanged lock guarantees unchanged results.  Freshness is
+ * kept up via a separate silent background refresh
+ * (see `getBackgroundRefreshStalenessHours`).
  *
- * Returning 0 means "never skip — always run the startup scan", matching
- * the old behaviour for users who explicitly disable this optimisation.
+ * The numeric value is retained for backward compatibility with the old
+ * "skip TTL" knob, but only its sign matters now: 0 means "never skip —
+ * always run the full startup scan", restoring the legacy behaviour for
+ * users who explicitly disable the optimisation.
  */
 export function getStartupScanSkipTtlMinutes(): number {
     return getConfig().get<number>('startupScanSkipTtlMinutes', 60);
+}
+
+/**
+ * When the startup skip-gate rehydrates cached results, trigger a silent
+ * background refresh (no progress notification) if the cached data is
+ * older than this many hours.  This keeps pub.dev / GitHub numbers
+ * drifting up to date over days when the user never runs `pub get`, while
+ * never blocking them with the foreground scan.  Set to 0 to disable the
+ * background refresh entirely (rehydrate-only; data refreshes only on a
+ * real pubspec.lock change or a manual rescan).
+ *
+ * The per-package API cache (`cacheTtlHours`, default 24h) means a refresh
+ * that runs soon after its window opens is mostly cache hits and cheap.
+ */
+export function getBackgroundRefreshStalenessHours(): number {
+    return getConfig().get<number>('backgroundRefreshStalenessHours', 24);
+}
+
+/**
+ * Number of packages analysed concurrently during a scan.  The scan is
+ * network-bound (each package fans out to pub.dev + GitHub + a tarball
+ * download), so higher concurrency cuts wall-clock time on cold scans.
+ * Capped to keep within GitHub's unauthenticated rate window and to avoid
+ * hammering pub.dev; raise only when a GitHub token is configured.
+ */
+export function getScanConcurrency(): number {
+    const raw = getConfig().get<number>('scanConcurrency', 6);
+    // Clamp defensively: 0/negative would stall the scan, absurdly high
+    // values risk rate-limit bans rather than speed.
+    if (!Number.isFinite(raw) || raw < 1) { return 1; }
+    return Math.min(raw, 16);
 }
 
 /**

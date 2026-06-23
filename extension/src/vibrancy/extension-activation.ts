@@ -40,7 +40,8 @@ import {
     clearFingerprint,
     computeLockHash,
     hashConfig,
-    isFingerprintFresh,
+    isFingerprintValid,
+    fingerprintAgeMs,
     loadFingerprint,
     rehydrateParsedDeps,
     saveFingerprint,
@@ -86,6 +87,7 @@ import {
     addSuppressedPackage, addSuppressedPackages, clearSuppressedPackages,
     getVulnScanEnabled, getGitHubAdvisoryEnabled, getGithubToken,
     getCacheTtlHours, getStartupScanSkipTtlMinutes,
+    getBackgroundRefreshStalenessHours,
     getShowStartupScanSkipStatusBar, getSiblingRepoPaths,
 } from './services/config-service';
 import { queryVulnerabilities } from './services/osv-api';
@@ -893,10 +895,10 @@ async function autoScanIfPubspec(targets: ScanTargets): Promise<void> {
  * a successful skip, false when a normal scan should run.
  */
 async function tryStartupSkipGate(targets: ScanTargets): Promise<boolean> {
-    const skipTtlMinutes = getStartupScanSkipTtlMinutes();
-    // 0 disables the optimisation entirely — equivalent to the old
-    // unconditional scan-on-open behaviour.
-    if (skipTtlMinutes <= 0) { return false; }
+    // Only the sign of this knob matters now: 0 disables the optimisation
+    // entirely (always run the full foreground startup scan), restoring the
+    // legacy behaviour.  Any positive value enables instant rehydration.
+    if (getStartupScanSkipTtlMinutes() <= 0) { return false; }
 
     const fp = loadFingerprint(targets.workspaceState);
     if (!fp) { return false; }
@@ -910,7 +912,14 @@ async function tryStartupSkipGate(targets: ScanTargets): Promise<boolean> {
     if (!lockHash) { return false; }
 
     const configHash = computeCurrentConfigHash();
-    if (!isFingerprintFresh(fp, lockHash, configHash, skipTtlMinutes)) {
+    // The lock+config hash is the exact correctness signal: if both match,
+    // the dependency set hasn't changed since the last scan, so re-running
+    // the full network scan cannot produce a different result.  Skip it
+    // unconditionally — no time ceiling.  This is the fix for the
+    // "10-minute scan pops up every hour on restart" complaint: previously
+    // an arbitrary skip TTL forced a foreground re-scan once an hour even
+    // though nothing in the project had changed.
+    if (!isFingerprintValid(fp, lockHash, configHash)) {
         return false;
     }
 
@@ -928,7 +937,35 @@ async function tryStartupSkipGate(targets: ScanTargets): Promise<boolean> {
     if (getShowStartupScanSkipStatusBar()) {
         showStartupSkipStatusBar(fp.timestamp);
     }
+
+    // Freshness, decoupled from correctness: the rehydrated data is correct
+    // but may be days old (new pub.dev versions, GitHub stars drifting).
+    // When it exceeds the staleness window, kick off a SILENT background
+    // refresh — no progress toast, leaning on the warm per-package API cache
+    // — so numbers drift up to date without ever blocking the user.
+    maybeScheduleBackgroundRefresh(targets, fp);
     return true;
+}
+
+/**
+ * Fire a silent background refresh when the rehydrated scan data is older
+ * than the configured staleness window.  Fire-and-forget: the refresh runs
+ * without a progress notification and the caller does not await it, so the
+ * editor is usable immediately while fresh numbers fill in quietly.
+ */
+function maybeScheduleBackgroundRefresh(
+    targets: ScanTargets,
+    fp: LastScanFingerprint,
+): void {
+    const stalenessHours = getBackgroundRefreshStalenessHours();
+    // 0 disables background refresh — rehydrate-only mode.
+    if (stalenessHours <= 0) { return; }
+
+    if (fingerprintAgeMs(fp) < stalenessHours * 60 * 60 * 1000) { return; }
+
+    // Silent: no progress toast. Not awaited — the refresh updates the UI
+    // via publishResults when it completes.
+    void runScan(targets, { silent: true });
 }
 
 /** Compose the current scan-config fingerprint from live settings. */
@@ -998,8 +1035,13 @@ function showStartupSkipStatusBar(scanTimestamp: number): void {
 
 async function runScan(
     targets: ScanTargets,
-    opts?: { forceRefresh?: boolean },
+    opts?: { forceRefresh?: boolean; silent?: boolean },
 ): Promise<void> {
+    // A scan already in flight will produce fresh results, so a coalesced
+    // SILENT background refresh is redundant — drop it without scheduling a
+    // trailing scan (it must never escalate into a foreground progress toast).
+    if (scanInFlight && opts?.silent) { return; }
+
     // Coalesce: a scan is already running, so don't stack a parallel one.
     // Stash the latest opts; the in-flight scan's `finally` block will
     // launch exactly one trailing scan once it resolves.  forceRefresh is
@@ -1028,7 +1070,7 @@ async function runScan(
 
     targets.state.startScanning();
     try {
-        await runScanInner(targets, controller);
+        await runScanInner(targets, controller, { silent: opts?.silent ?? false });
     } finally {
         // Capture cancel state before clearing globals — if the user clicked
         // Cancel on the progress toast, that's a "stop scanning" gesture and
@@ -1051,22 +1093,25 @@ async function runScan(
     }
 }
 
+/** No-op progress sink: silent background refresh shows no UI. */
+const SILENT_PROGRESS: vscode.Progress<{ message?: string; increment?: number }> = {
+    report() { /* intentionally silent — background refresh, no toast */ },
+};
+
 async function runScanInner(
     targets: ScanTargets,
     controller: AbortController,
+    opts: { silent: boolean },
 ): Promise<void> {
     const { signal } = controller;
 
-    await vscode.window.withProgress(
-        {
-            location: vscode.ProgressLocation.Notification,
-            title: 'Scanning package vibrancy...',
-            cancellable: true,
-        },
-        async (progress, token) => {
-            // Link VS Code cancel button to our abort controller
-            token.onCancellationRequested(() => controller.abort());
-
+    // The scan body, parameterised over its progress sink so it can run
+    // either under a foreground progress notification (user-triggered or
+    // lock-change scan) or silently in the background with a no-op sink
+    // (startup staleness refresh — fresh numbers without a blocking toast).
+    const executeScan = async (
+        progress: vscode.Progress<{ message?: string; increment?: number }>,
+    ): Promise<void> => {
             const startTime = Date.now();
             const oldVersions = snapshotVersions(latestResults);
 
@@ -1349,6 +1394,26 @@ async function runScanInner(
             } catch {
                 // Log write is best-effort — never block scan results
             }
+    };
+
+    // Silent background refresh: run the body directly with no progress UI
+    // and no cancel button. Used after the startup gate rehydrates correct
+    // but aged results and wants to refresh them without interrupting work.
+    if (opts.silent) {
+        await executeScan(SILENT_PROGRESS);
+        return;
+    }
+
+    await vscode.window.withProgress(
+        {
+            location: vscode.ProgressLocation.Notification,
+            title: 'Scanning package vibrancy...',
+            cancellable: true,
+        },
+        async (progress, token) => {
+            // Link VS Code cancel button to our abort controller
+            token.onCancellationRequested(() => controller.abort());
+            await executeScan(progress);
         },
     );
 }

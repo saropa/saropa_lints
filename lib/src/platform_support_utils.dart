@@ -49,8 +49,8 @@ abstract final class PluginPlatformSupport {
   /// listed as supporting a platform is simply absent from its set; a package
   /// that supports every tracked platform (e.g. `geolocator`,
   /// `flutter_local_notifications`) is absent from the map entirely.
-  static const Map<String, Set<String>> _unsupportedPlatforms =
-      <String, Set<String>>{
+  static const Map<String, Set<String>>
+  _unsupportedPlatforms = <String, Set<String>>{
     // Core sqflite ships iOS/Android/macOS only; web needs sqflite_common_ffi_web
     // and Windows/Linux need sqflite_common_ffi. Verified: 2026-06-22.
     'sqflite': <String>{'web', 'windows', 'linux'},

@@ -191,23 +191,40 @@ export async function clearFingerprint(
 }
 
 /**
- * True when the fingerprint matches the current workspace state and
- * is still within the configured skip window.  A `skipTtlMinutes` of
- * 0 disables the gate entirely (always return false → always scan).
+ * True when the fingerprint still describes the current workspace: the
+ * pubspec.lock bytes and the scan-config inputs both match what the last
+ * scan recorded.  This is the *correctness* signal and deliberately has
+ * NO time component — if the lock and config are unchanged, the scan
+ * results are byte-identical to last time, so re-running the full network
+ * scan can never produce a different answer.  Data *freshness* (new
+ * pub.dev versions, GitHub stars drifting over days) is handled separately
+ * by an out-of-band silent background refresh, never by blocking the user
+ * with a foreground re-scan on every restart.
+ *
+ * Replaces the former `isFingerprintFresh`, whose `skipTtlMinutes` ceiling
+ * forced a 10-minute foreground re-scan every hour even when nothing in
+ * the project had changed.
  */
-export function isFingerprintFresh(
+export function isFingerprintValid(
     fp: LastScanFingerprint,
     currentLockHash: string,
     currentConfigHash: string,
-    skipTtlMinutes: number,
-    now: number = Date.now(),
 ): boolean {
-    if (skipTtlMinutes <= 0) { return false; }
     if (fp.lockHash !== currentLockHash) { return false; }
     if (fp.configHash !== currentConfigHash) { return false; }
-    const ageMs = now - fp.timestamp;
-    if (ageMs < 0) { return false; } // clock-skew safety
-    return ageMs < skipTtlMinutes * 60 * 1000;
+    return true;
+}
+
+/**
+ * Age of the fingerprint in milliseconds.  Clamped at 0 so clock skew
+ * (a fingerprint timestamp in the future) reads as "brand new" rather
+ * than negative, which would otherwise suppress the staleness refresh.
+ */
+export function fingerprintAgeMs(
+    fp: LastScanFingerprint,
+    now: number = Date.now(),
+): number {
+    return Math.max(0, now - fp.timestamp);
 }
 
 /** Convert ParsedDeps -> SerialisedParsedDeps (URI -> string). */

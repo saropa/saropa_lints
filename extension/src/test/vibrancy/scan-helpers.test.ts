@@ -74,9 +74,15 @@ describe('scanPackages', () => {
     });
 
     it('should stop workers when signal is aborted mid-scan', async () => {
+        // Deps count is kept well above the scan concurrency (default 6) so
+        // the abort can land before every package is grabbed — otherwise a
+        // single wave of workers would consume the whole list regardless of
+        // the signal, and the assertion below could not distinguish "stopped
+        // early" from "finished naturally".
         const deps = [
-            makeDep('a'), makeDep('b'), makeDep('c'),
-            makeDep('d'), makeDep('e'), makeDep('f'),
+            makeDep('a'), makeDep('b'), makeDep('c'), makeDep('d'),
+            makeDep('e'), makeDep('f'), makeDep('g'), makeDep('h'),
+            makeDep('i'), makeDep('j'), makeDep('k'), makeDep('l'),
         ];
         const controller = new AbortController();
 
@@ -92,8 +98,9 @@ describe('scanPackages', () => {
             deps, null as any, stubConfig, noopProgress, controller.signal,
         );
 
-        // Workers check signal before each iteration, so at most CONCURRENCY(3)
-        // workers may each complete one package before seeing the abort.
+        // Workers check signal before grabbing each package, so only the
+        // first in-flight wave (at most `concurrency`) completes before the
+        // abort halts the rest — far fewer than the full dep list.
         assert.ok(
             analyzeStub.callCount < deps.length,
             `Expected fewer than ${deps.length} packages analyzed, ` +

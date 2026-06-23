@@ -16,10 +16,7 @@ void main() {
   group('avoid_platform_incompatible_dependency - instantiation', () {
     test('rule metadata', () {
       final rule = AvoidPlatformIncompatibleDependencyRule();
-      expect(
-        rule.code.lowerCaseName,
-        'avoid_platform_incompatible_dependency',
-      );
+      expect(rule.code.lowerCaseName, 'avoid_platform_incompatible_dependency');
       expect(
         rule.code.problemMessage,
         contains('[avoid_platform_incompatible_dependency]'),
@@ -43,14 +40,15 @@ void main() {
     // plugin later adds support for a platform, the corresponding entry in
     // platform_support_utils.dart must be updated and this test follows.
     test('verified unsupported-platform sets', () {
-      expect(
-        PluginPlatformSupport.unsupportedPlatforms('sqflite'),
-        <String>{'web', 'windows', 'linux'},
-      );
-      expect(
-        PluginPlatformSupport.unsupportedPlatforms('local_auth'),
-        <String>{'web', 'linux'},
-      );
+      expect(PluginPlatformSupport.unsupportedPlatforms('sqflite'), <String>{
+        'web',
+        'windows',
+        'linux',
+      });
+      expect(PluginPlatformSupport.unsupportedPlatforms('local_auth'), <String>{
+        'web',
+        'linux',
+      });
       expect(
         PluginPlatformSupport.unsupportedPlatforms('path_provider'),
         <String>{'web'},
@@ -59,10 +57,11 @@ void main() {
         PluginPlatformSupport.unsupportedPlatforms('firebase_messaging'),
         <String>{'windows', 'linux'},
       );
-      expect(
-        PluginPlatformSupport.unsupportedPlatforms('camera'),
-        <String>{'windows', 'macos', 'linux'},
-      );
+      expect(PluginPlatformSupport.unsupportedPlatforms('camera'), <String>{
+        'windows',
+        'macos',
+        'linux',
+      });
       expect(
         PluginPlatformSupport.unsupportedPlatforms('permission_handler'),
         <String>{'macos', 'linux'},
@@ -72,12 +71,11 @@ void main() {
     test('fully-supported and unknown packages return empty', () {
       // geolocator and flutter_local_notifications support every tracked
       // platform, so they are absent from the map.
+      expect(PluginPlatformSupport.unsupportedPlatforms('geolocator'), isEmpty);
       expect(
-        PluginPlatformSupport.unsupportedPlatforms('geolocator'),
-        isEmpty,
-      );
-      expect(
-        PluginPlatformSupport.unsupportedPlatforms('flutter_local_notifications'),
+        PluginPlatformSupport.unsupportedPlatforms(
+          'flutter_local_notifications',
+        ),
         isEmpty,
       );
       // Conservative default: unknown packages are never reported.

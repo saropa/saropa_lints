@@ -2,7 +2,7 @@
   "name": "saropa-lints",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "version": "14.0.7",
+  "version": "14.1.0",
   "publisher": "saropa",
   "license": "MIT",
   "repository": {
@@ -1419,6 +1419,20 @@
             "minimum": 0,
             "maximum": 10080,
             "description": "%config.property.packageVibrancy.startupScanSkipTtlMinutes.description%"
+          },
+          "saropaLints.packageVibrancy.backgroundRefreshStalenessHours": {
+            "type": "number",
+            "default": 24,
+            "minimum": 0,
+            "maximum": 720,
+            "description": "%config.property.packageVibrancy.backgroundRefreshStalenessHours.description%"
+          },
+          "saropaLints.packageVibrancy.scanConcurrency": {
+            "type": "number",
+            "default": 6,
+            "minimum": 1,
+            "maximum": 16,
+            "description": "%config.property.packageVibrancy.scanConcurrency.description%"
           },
           "saropaLints.packageVibrancy.showStartupScanSkipStatusBar": {
             "type": "boolean",

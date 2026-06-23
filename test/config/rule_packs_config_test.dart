@@ -65,15 +65,11 @@ void main() {
 
     test('a rule in two enabled packs is added once', () {
       final enabled = <String>{};
-      mergeRulePacksIntoEnabled(
-        enabled,
-        null,
-        const <String>['riverpod', 'riverpod'],
-      );
-      expect(
-        enabled.where((c) => c == 'require_provider_scope'),
-        hasLength(1),
-      );
+      mergeRulePacksIntoEnabled(enabled, null, const <String>[
+        'riverpod',
+        'riverpod',
+      ]);
+      expect(enabled.where((c) => c == 'require_provider_scope'), hasLength(1));
     });
 
     group('version choice wins over tier', () {

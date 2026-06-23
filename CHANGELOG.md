@@ -64,9 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.1.0]
 
-Resolves a false positive in the color-only status indicator rule so decorative active-state bars and indicators paired with another visual cue are no longer flagged. The extension's "Create baseline" suggestion now actually creates the baseline. Package Vibrancy override analysis now recognizes overrides that resolve a transitive dependency cap, naming the package responsible instead of marking the override removable, and upgrade-blocker explanations trace the dependency path to a package you can act on. The "Annotate pubspec" command now writes why each pinned dependency sits where it does. The Findings Dashboard sheds a stray analysis banner and a redundant Run analysis button, the TODO/HACK file-limit note gains a one-click way to raise the limit, and Drift Advisor can now reach a server running on another device over your network. [log](https://github.com/saropa/saropa_lints/blob/v14.0.8/CHANGELOG.md)
+Resolves a false positive in the color-only status indicator rule so decorative active-state bars and indicators paired with another visual cue are no longer flagged. The extension's "Create baseline" suggestion now actually creates the baseline. Package Vibrancy override analysis now recognizes overrides that resolve a transitive dependency cap, naming the package responsible instead of marking the override removable, and upgrade-blocker explanations trace the dependency path to a package you can act on. The "Annotate pubspec" command now writes why each pinned dependency sits where it does. The Findings Dashboard sheds a stray analysis banner and a redundant Run analysis button, the TODO/HACK file-limit note gains a one-click way to raise the limit, and Drift Advisor can now reach a server running on another device over your network. Package Vibrancy also stops re-scanning on every restart — unchanged projects load instantly from cache and refresh quietly in the background. [log](https://github.com/saropa/saropa_lints/blob/v14.1.0/CHANGELOG.md)
 
 ### Added
 
@@ -93,6 +93,8 @@ Resolves a false positive in the color-only status indicator rule so decorative 
 
 - **Upgrade-blocker explanations now trace the dependency path to a package you can edit.** When the package capping a shared dependency was buried deep in the transitive graph, the report named a constrainer absent from your pubspec.yaml, leaving you with no actionable line. The explanation now appends the chain from a direct dependency down to that constrainer (for example, `build_runner → build → analyzer_plugin`). No action required.
 - **The TODO/HACK scan "file limit reached" note is now actionable instead of a dead end.** It previously named the setting key in prose with no way to act on it; it now offers a "Raise the limit" button that opens the relevant setting directly. No action required.
+- **Package Vibrancy no longer re-runs the full scan on every restart — when pubspec.lock and your settings are unchanged, cached results load instantly with no progress popup.** The startup gate previously expired after an hour, forcing a 10-minute network scan even though nothing had changed; it now reuses the cache as long as the lockfile is identical, and only refreshes silently in the background once the data passes a staleness window (`backgroundRefreshStalenessHours`, default 24h; set 0 to disable). No action required.
+- **Cold scans are faster on large projects: package analysis now runs 6 in parallel (was 3) and is tunable via `saropaLints.packageVibrancy.scanConcurrency`.** Raise it above the default only with a GitHub token configured, to avoid hitting unauthenticated rate limits. No action required.
 
 ### Changed
 
@@ -105,6 +107,8 @@ Resolves a false positive in the color-only status indicator rule so decorative 
 <details><summary>Maintenance</summary>
 
 - When `dart pub get` / `dart pub deps` fails on a version conflict, the scan log now captures pub's own "Because … is forbidden / is required" reasoning verbatim, instead of only a generic "version solving failed". Diagnostic only.
+- The new concern and platform rule packs now carry pubspec markers, restoring the registry invariant that every pack has a marker entry. The rule-pack generator emits the concern-pack markers so they stay in sync. Fixes a unit-test failure that blocked the build. No user-facing change.
+- Publish runs the unit-test step roughly twice as fast: it now uses all logical cores and excludes the five `slow`-tagged full-repo integration tests (scanner / cross-file / health-history), which CI still runs in full on every push and release. Run them locally with `dart test -t slow`. Developer tooling only.
 
 </details>
 

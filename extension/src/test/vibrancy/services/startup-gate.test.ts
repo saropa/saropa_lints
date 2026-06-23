@@ -13,9 +13,10 @@ import {
     FINGERPRINT_STATE_KEY,
     LastScanFingerprint,
     clearFingerprint,
+    fingerprintAgeMs,
     hashBytes,
     hashConfig,
-    isFingerprintFresh,
+    isFingerprintValid,
     loadFingerprint,
     rehydrateParsedDeps,
     saveFingerprint,
@@ -95,39 +96,44 @@ describe('startup-gate', () => {
         });
     });
 
-    describe('isFingerprintFresh', () => {
+    describe('isFingerprintValid', () => {
         const fp = makeFingerprint({
             timestamp: 1_000_000,
             lockHash: 'L',
             configHash: 'C',
         });
 
-        it('returns true when lock + config match and within TTL', () => {
-            const now = 1_000_000 + 30 * 60 * 1000; // 30 min later
-            assert.strictEqual(isFingerprintFresh(fp, 'L', 'C', 60, now), true);
+        it('returns true when lock + config both match, regardless of age', () => {
+            // No time component: an unchanged lock+config means the scan
+            // results are byte-identical, so the gate skips re-scanning even
+            // when the fingerprint is days old. This is the core fix for the
+            // "10-minute scan re-runs every hour on restart" complaint.
+            assert.strictEqual(isFingerprintValid(fp, 'L', 'C'), true);
         });
 
         it('returns false when lock hash differs', () => {
-            assert.strictEqual(isFingerprintFresh(fp, 'OTHER', 'C', 60, 1_000_000), false);
+            assert.strictEqual(isFingerprintValid(fp, 'OTHER', 'C'), false);
         });
 
         it('returns false when config hash differs', () => {
-            assert.strictEqual(isFingerprintFresh(fp, 'L', 'OTHER', 60, 1_000_000), false);
+            assert.strictEqual(isFingerprintValid(fp, 'L', 'OTHER'), false);
+        });
+    });
+
+    describe('fingerprintAgeMs', () => {
+        const fp = makeFingerprint({ timestamp: 1_000_000 });
+
+        it('returns elapsed milliseconds since the scan timestamp', () => {
+            const now = 1_000_000 + 90 * 60 * 1000; // 90 min later
+            assert.strictEqual(fingerprintAgeMs(fp, now), 90 * 60 * 1000);
         });
 
-        it('returns false when older than TTL', () => {
-            const now = 1_000_000 + 61 * 60 * 1000;
-            assert.strictEqual(isFingerprintFresh(fp, 'L', 'C', 60, now), false);
-        });
-
-        it('returns false when TTL is zero (gate disabled)', () => {
-            assert.strictEqual(isFingerprintFresh(fp, 'L', 'C', 0, 1_000_000), false);
-        });
-
-        it('returns false when clock skew makes age negative', () => {
-            // Persisted timestamp is in the future (e.g. system clock changed).
+        it('clamps to 0 under clock skew (future timestamp)', () => {
+            // A persisted timestamp in the future must read as "brand new"
+            // rather than negative, which would otherwise suppress the
+            // staleness-triggered background refresh.
             const now = 1_000_000 - 5 * 60 * 1000;
-            assert.strictEqual(isFingerprintFresh(fp, 'L', 'C', 60, now), false);
+            assert.strictEqual(fingerprintAgeMs(fp, now), 0);
         });
     });
 
