@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Dashboards dashboards zijn er.",
     "openFull": "Open het volledige scherm.",
+    "rescan": "Opnieuw scannen",
+    "retry": "Opnieuw proberen",
+    "paneFailed": "Scan mislukt.",
+    "controls": {
+      "actions": "Acties",
+      "settings": "Instellingen",
+      "help": "Help",
+      "runAnalysis": "Analyse uitvoeren",
+      "initializeConfig": "Initialiseer / Update config.",
+      "on": "Op de op de op.",
+      "off": "Uit en uit, van en naar.",
+      "yes": "Ja, ja, ja. - Dat is het wel.",
+      "no": "Nee, nee, nee. - Ik ben een man van de wereld.",
+      "lintIntegrationState": "Lint integratie: Linte integratie is een {state} is een PH0__.",
+      "tierState": "Tier: de hoogste niveau. {tier} is een PH0__.",
+      "runAfterConfigState": "Voer analyse uit na config-wijziging: {state} is een PH0__.",
+      "runAfterDependencyState": "Analyse uitvoeren na afhankelijkheidsverandering: {state} is een PH0__.",
+      "uiLanguageState": "UI taal: gebruikersinterface. {language} is een PH0__.",
+      "gettingStarted": "Om te beginnen met het starten.",
+      "about": "Over Saropa Lints gaat het.",
+      "pubDev": "Verpakking op pub.dev",
+      "aiInstructions": "Creëer AI-agentinstructies."
+    },
     "pane": {
       "projectMap": "Projectkaart, projectkaart.",
-      "codeHealth": "Code Gezondheidszorg code"
+      "codeHealth": "Code Gezondheidszorg code",
+      "lintsConfig": "Lints Config configuren",
+      "findings": "Bevindingen bevindingen.",
+      "package": "Package Dashboard van het pakket",
+      "commandCatalog": "Bevelslijst Katalogus Commando Catalogus"
     },
     "projectMap": {
       "scanning": "Scannen van projectkaart..."
     },
     "codeHealth": {
       "scanning": "Scanningscode gezondheid..."
+    },
+    "config": {
+      "tier": "Tier 1 is de hoogste tier van het niveau.",
+      "enabledRules": "De regels die zijn ingesteld, hebben de mogelijkheid om te handelen.",
+      "rulePacks": "Regelpakketten zijn regelpakketjes.",
+      "packages": "Pakkettenpakketten zijn pakketjes."
+    },
+    "package": {
+      "total": "Pakkettenpakketten zijn pakketjes.",
+      "attention": "Vereist aandacht.",
+      "blocked": "Geblokkeerd geblokkeerde",
+      "empty": "Nog geen pakket scan  ⁇ Open het dashboard om een."
+    },
+    "findings": {
+      "total": "Totaal Totale Totale",
+      "errors": "Fouten fouten foutes",
+      "warnings": "Waarschuwingen en waarschuwingssignalen.",
+      "info": "Info",
+      "empty": "Nog geen analyse uitgevoerd  ⁇ Open Findings om te starten met run 1."
+    },
+    "catalog": {
+      "commands": "Bevels Commandos Commando's",
+      "recent": "Recentelijk gebruikt Recent gebruikte recent"
     },
     "scanFailed": "Scan mislukt. Open het volledige dashboard om details te zien en probeer opnieuw."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, en {last}.",
       "message": "Sommige secties konden niet worden geladen: {list}.",
       "retry": "Opnieuw proberen",
+      "retrying": "Ik probeer het opnieuw...",
       "retryTitle": "Probeer de mislukte fetches opnieuw."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 opgeblazen gevoel)",
       "onDisk": "Op de schijf op disk",
       "upgrade": "Upgrade upgraden is een upgrade.",
+      "upgrading": "Upgraden... upgraden.",
       "viewChangelog": "Changelog bekijken"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Reglement van het reglement",
       "owasp": "OWASP",
       "ruleType": "Regel type Regeltypes",
-      "ruleStatus": "Rule status: de regelstatus van een artikel."
+      "ruleStatus": "Rule status: de regelstatus van een artikel.",
+      "tier": "Tier 1 is de hoogste tier van het niveau.",
+      "pack": "Pack (en) van de pakketten"
     },
     "seg": {
       "toggleSeverityTitle": "Schakel {v} zwaartegraad in.",
@@ -685,6 +739,10 @@
       "body1": "Saropa haalt pub.dev-metagegevens, GitHub-activiteit en afhankelijkheidsgrafieken op voor elke directe afhankelijkheid in dit project.",
       "body2": "Deze pagina zal automatisch worden vernieuwd wanneer de scan is voltooid. U kunt annuleren via de voortgangsmelding rechtsonder.",
       "versionStamp": "Saropa Dashboard van het pakket v{version}"
+    },
+    "progress": {
+      "aria": "Pakket scan voortgang van de pakkettechniek.",
+      "starting": "Start van de scan..."
     },
     "gaugeTitle": "Projectpakket Klasse: {grade}",
     "summary": {

@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Dashboard, dashboard e altri strumenti.",
     "openFull": "Aprire lo schermo intero.",
+    "rescan": "Rescan di riscanner.",
+    "retry": "Riprova a riprovare.",
+    "paneFailed": "Scansione fallita.",
+    "controls": {
+      "actions": "Azioni azioni.",
+      "settings": "Settings Settings Impostazioni",
+      "help": "Aiutare a aiutare",
+      "runAnalysis": "Eseguire l'analisi esegui l' analisi.",
+      "initializeConfig": "Inizializza / Aggiorna la configurazione di aggiornamento.",
+      "on": "Su su su su.",
+      "off": "Off Off Off off, ma non è così.",
+      "yes": "Sì, sì, sì.",
+      "no": "No, no, no. Non è vero.",
+      "lintIntegrationState": "Integrazione della linea: integrazione del Lint {state} È il nome di un'altra versione.",
+      "tierState": "Tier: livello di base. {tier} È il nome di un'altra versione.",
+      "runAfterConfigState": "Eseguire l'analisi dopo la modifica della configurazione: {state} È il nome di un'altra versione.",
+      "runAfterDependencyState": "Eseguire l'analisi dopo la modifica della dipendenza: {state} È il nome di un'altra versione.",
+      "uiLanguageState": "Lingua dell'interfaccia utente: lingua UI. {language} È il nome di un'altra versione.",
+      "gettingStarted": "Iniziare a iniziare.",
+      "about": "Circa _Saropa Lints.",
+      "pubDev": "Pacchetto su pub.dev",
+      "aiInstructions": "Creare istruzioni per l'agente AI."
+    },
     "pane": {
       "projectMap": "Project Map Map Mappa del progetto",
-      "codeHealth": "Codice Sanitario del Codici Salute."
+      "codeHealth": "Codice Sanitario del Codici Salute.",
+      "lintsConfig": "Lints Config config.",
+      "findings": "Risultati delle ricerche.",
+      "package": "Dashboard dei pacchetti.",
+      "commandCatalog": "Catalogo di comando del catalogo dei comandi."
     },
     "projectMap": {
       "scanning": "Scansione della mappa del progetto..."
     },
     "codeHealth": {
       "scanning": "Scansione del codice salute..."
+    },
+    "config": {
+      "tier": "Il Tier 1 è il livello di garanzia.",
+      "enabledRules": "Regole abilitate: regole che consentono di utilizzare le regole.",
+      "rulePacks": "Pacchetti di regole.",
+      "packages": "Pacchetti di pacchetti"
+    },
+    "package": {
+      "total": "Pacchetti di pacchetti",
+      "attention": "Ha bisogno di attenzione.",
+      "blocked": "Bloccato bloccato.",
+      "empty": "Nessuna scansione del pacchetto ancora  ⁇ aprire il cruscotto per eseguire uno."
+    },
+    "findings": {
+      "total": "Totale totale totale totale.",
+      "errors": "Errori errori Errori.",
+      "warnings": "Avvertenze di avvertimento.",
+      "info": "Informazioni informazioni informazioni.",
+      "empty": "Nessuna analisi ancora eseguita  ⁇ Apri i risultati per eseguire 1."
+    },
+    "catalog": {
+      "commands": "Comandi di comando.",
+      "recent": "Recentemente utilizzato."
     },
     "scanFailed": "Scansione fallita. Apri l'intero cruscotto per vedere i dettagli e riprova."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, e il {last}.",
       "message": "Alcune sezioni non sono riuscite a caricarsi: {list}.",
       "retry": "Riprova a riprovare.",
+      "retrying": "Riprova... riprova.",
       "retryTitle": "Riprova i fetch falliti."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 gonfiore)",
       "onDisk": "Su disco su disco On Disk",
       "upgrade": "Aggiornare l'upgrade.",
+      "upgrading": "Aggiornamento... aggiornamenti.",
       "viewChangelog": "Visualizza il registro delle modifiche"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Regolamento Regola.",
       "owasp": "OWASP",
       "ruleType": "Tipo di regola tipo di regola",
-      "ruleStatus": "Lo status della regola di regola."
+      "ruleStatus": "Lo status della regola di regola.",
+      "tier": "Il Tier 1 è il livello di garanzia.",
+      "pack": "Pacchetto (s)"
     },
     "seg": {
       "toggleSeverityTitle": "Toggle {v} gravità della gravità.",
@@ -685,6 +739,10 @@
       "body1": "Saropa sta recuperando metadati pub.dev, attività GitHub e grafici delle dipendenze per ogni dipendenza diretta in questo progetto.",
       "body2": "Questa pagina si aggiornerà automaticamente quando la scansione sarà terminata. Puoi annullare dalla notifica di avanzamento in basso a destra.",
       "versionStamp": "Saropa Dashboard dei pacchetti v{version}"
+    },
+    "progress": {
+      "aria": "Progresso della scansione dei pacchetti.",
+      "starting": "Inizio scansione..."
     },
     "gaugeTitle": "Grado del pacchetto di progetto: {grade}",
     "summary": {

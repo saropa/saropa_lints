@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Les tableaux de bord et les dashboards.",
     "openFull": "Ouvrez l'écran complet à l'ouverture.",
+    "rescan": "Relancer l'analyse",
+    "retry": "Reessayer",
+    "paneFailed": "Le scan a échoué.",
+    "controls": {
+      "actions": "Actions",
+      "settings": "Parametres",
+      "help": "Aide",
+      "runAnalysis": "Executer l'analyse",
+      "initializeConfig": "Initialiser / mettre à jour la configuration",
+      "on": "Il y a eu des coups de feu, mais pas d'explosion.",
+      "off": "Il y a des gens qui sont partis,",
+      "yes": "Oui oui, c'est vrai que ça fait du bien.",
+      "no": "Non, non, pas du tout.",
+      "lintIntegrationState": "Intégration des peluches : {state}",
+      "tierState": "Niveau : {tier}",
+      "runAfterConfigState": "Exécuter l'analyse après le changement de configuration : {state}",
+      "runAfterDependencyState": "Exécuter l'analyse après le changement de dépendance : {state}",
+      "uiLanguageState": "Langue de l'interface utilisateur : {language}",
+      "gettingStarted": "Pour commencer, il faut bien se lancer.",
+      "about": "À propos de Saropa Lints",
+      "pubDev": "Forfait sur pub.dev",
+      "aiInstructions": "Créer des instructions pour l'agent IA."
+    },
     "pane": {
       "projectMap": "Carte du projet, carte de projet.",
-      "codeHealth": "Code de santé du code sanitaire."
+      "codeHealth": "Code de santé du code sanitaire.",
+      "lintsConfig": "Lints config est en cours de configuration.",
+      "findings": "Les résultats des recherches.",
+      "package": "Le tableau de bord des paquets est le Dashboard.",
+      "commandCatalog": "Catalogue de commande du catalogue de commandes."
     },
     "projectMap": {
       "scanning": "Scan du projet de carte..."
     },
     "codeHealth": {
       "scanning": "Le code de santé du scan..."
+    },
+    "config": {
+      "tier": "Il est classé Tier Tier.",
+      "enabledRules": "Les règles activées sont des règles qui ont été mises en place.",
+      "rulePacks": "Les packs de règles sont des régles.",
+      "packages": "Les paquets sont des colis."
+    },
+    "package": {
+      "total": "Les paquets sont des colis.",
+      "attention": "Besoin d'attention.",
+      "blocked": "Bloqué bloqué.",
+      "empty": "Aucun scan de paquet pour le moment  ⁇ Ouvrez le tableau de bord pour exécuter un."
+    },
+    "findings": {
+      "total": "Le total est le total.",
+      "errors": "Les erreurs sont des erreurs.",
+      "warnings": "Les avertissements sont des mises en garde.",
+      "info": "Il est question d'informations, de renseignements.",
+      "empty": "Aucune analyse n'a encore été exécutée  ⁇ ouvrir les résultats pour exécuter un."
+    },
+    "catalog": {
+      "commands": "Les commandes de commande.",
+      "recent": "Récemment utilisé."
     },
     "scanFailed": "Le scan a échoué. Ouvrez le tableau de bord complet pour voir les détails et réessayez."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head} et {last}",
       "message": "Certaines sections n'ont pas pu être chargées: {list}.",
       "retry": "Reessayer",
+      "retrying": "Je réessaye...",
       "retryTitle": "Essayez à nouveau les appels d'urgence qui ont échoué."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 gonflement) est une forme de grossesse.",
       "onDisk": "Il est en disque sur disque.",
       "upgrade": "Mise à niveau de mise à jour.",
+      "upgrading": "Mise à niveau... mise à jour.",
       "viewChangelog": "Afficher le journal des modifications."
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Le règlement de l'assemblée",
       "owasp": "OWASP",
       "ruleType": "Le type de règle.",
-      "ruleStatus": "Le statut de la règle est le suivant:"
+      "ruleStatus": "Le statut de la règle est le suivant:",
+      "tier": "Il est classé Tier Tier.",
+      "pack": "Les paquets sont (s)"
     },
     "seg": {
       "toggleSeverityTitle": "Toggle {v} sévérité de la maladie.",
@@ -685,6 +739,10 @@
       "body1": "Saropa récupère les métadonnées pub.dev, l'activité GitHub et les graphiques de dépendances pour chaque dépendance directe de ce projet.",
       "body2": "Cette page se rafraîchira automatiquement lorsque le balayage sera terminé. Vous pouvez annuler à partir de la notification d'avancement en bas à droite.",
       "versionStamp": "Saropa Panneau de bord des paquets v{version} est le panneau du paquet."
+    },
+    "progress": {
+      "aria": "L'avancement du scan de paquets est en cours.",
+      "starting": "Commencement du balayage..."
     },
     "gaugeTitle": "Niveau de l'ensemble du projet: {grade}",
     "summary": {

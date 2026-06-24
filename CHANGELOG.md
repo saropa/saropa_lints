@@ -94,6 +94,12 @@ Adds a performance rule that flags arithmetic in a widget's `build()` whose oper
 - **Manage Rule Packs search now finds individual rules, not just pack names.** Typing a rule name (or a problem area such as "storage") surfaces the pack that owns it and expands its rule list, where previously search matched only the pack's title. No action required.
 - **Toggling several rule packs in quick succession no longer stacks multiple analyses.** Each toggle re-ran analysis without stopping the previous run, leaving several "Running analysis" notifications and overlapping analyzer processes; a new run now cancels the in-flight one so only the latest runs. No action required.
 
+<details><summary>Maintenance</summary>
+
+- Removed a redundant import from the pubspec constraint parser test that `dart analyze --fatal-infos` flagged (`unnecessary_import`), unblocking the publish analysis gate.
+
+</details>
+
 ---
 
 ## [14.1.1]

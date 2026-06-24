@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Tableros de control y paneles.",
     "openFull": "Abra la pantalla completa y abra el monitor.",
+    "rescan": "El rescan de nuevo escanear.",
+    "retry": "Intentar de nuevo.",
+    "paneFailed": "La exploración falló.",
+    "controls": {
+      "actions": "Acciones Acciones.",
+      "settings": "La configuración de las configuraciones.",
+      "help": "Ayuda ayuda ayuda.",
+      "runAnalysis": "Ejecutar el análisis de ejecución.",
+      "initializeConfig": "Inicializa / actualiza la configuración de las funciones.",
+      "on": "En el mismo lugar.",
+      "off": "Fuera fuera fuera.",
+      "yes": "Sí, sí, sí. - ¿Qué es eso?",
+      "no": "No",
+      "lintIntegrationState": "Integración de la línea: integración de líneas. {state} El hombre de la ciudad",
+      "tierState": "Tier: Nivel de nivel superior, es decir, el nivel que se encuentra por encima del {tier} El hombre de la ciudad",
+      "runAfterConfigState": "Ejecutar análisis después de cambiar la configuración: {state} El hombre de la ciudad",
+      "runAfterDependencyState": "Ejecuta el análisis después del cambio de dependencia: {state} El hombre de la ciudad",
+      "uiLanguageState": "Lenguaje de la interfaz: lenguaje de usuario. {language} El hombre de la ciudad",
+      "gettingStarted": "Cómo empezar a trabajar.",
+      "about": "Acerca de Saropa Lints",
+      "pubDev": "El paquete en el pub.dev.",
+      "aiInstructions": "Crear instrucciones para el agente de IA."
+    },
     "pane": {
       "projectMap": "Mapa del proyecto Project Map.",
-      "codeHealth": "Código de Salud del Código Sanitario."
+      "codeHealth": "Código de Salud del Código Sanitario.",
+      "lintsConfig": "Lints Config es el nombre de la configuración.",
+      "findings": "Los hallazgos de los resultados.",
+      "package": "Panel de control del paquete.",
+      "commandCatalog": "Catálogo de comandos del catálogo."
     },
     "projectMap": {
       "scanning": "Escaneo del mapa de proyecto..."
     },
     "codeHealth": {
       "scanning": "Escaneo de código salud..."
+    },
+    "config": {
+      "tier": "El nivel de las acciones Tier 1",
+      "enabledRules": "Reglas habilitadas Las reglas habilitaciones son las que permiten la aplicación",
+      "rulePacks": "Paquetes de reglas para las reglas.",
+      "packages": "Los paquetes de viaje son un conjunto de paquetes."
+    },
+    "package": {
+      "total": "Los paquetes de viaje son un conjunto de paquetes.",
+      "attention": "Necesita atención y cuidado.",
+      "blocked": "Bloqueado bloqueado.",
+      "empty": "Todavía no hay escaneo de paquetes  ⁇ Abra el tablero para ejecutar uno."
+    },
+    "findings": {
+      "total": "El total de las ganancias es el total.",
+      "errors": "Errores de errores en el tiempo.",
+      "warnings": "Advertencias y advertencias.",
+      "info": "El informe de la Comisión Europea, publicado en el Diario Oficial de las Comunidades Europeas (",
+      "empty": "Todavía no se ha ejecutado ningún análisis  ⁇ Abre los hallazgos para ejecutar uno."
+    },
+    "catalog": {
+      "commands": "Los comandos de las órdenes.",
+      "recent": "Recientemente utilizado."
     },
     "scanFailed": "La exploración falló. Abra el tablero completo para ver los detalles y vuelva a intentarlo."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, y el {last}.",
       "message": "Algunas secciones no pudieron cargarse: {list}.",
       "retry": "Intentar de nuevo.",
+      "retrying": "Volviendo a intentarlo...",
       "retryTitle": "Vuelve a intentar las búsquedas fallidas."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 hinchazón) Se ha producido una inflamación.",
       "onDisk": "En el disco en el disco.",
       "upgrade": "Actualizar actualizaciones.",
+      "upgrading": "Mejorando... la actualización.",
       "viewChangelog": "Ver el registro de cambios."
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "El artículo de la ley, el reglamento.",
       "owasp": "OWASP",
       "ruleType": "Tipo de regla tipo de regla",
-      "ruleStatus": "El estatus de la regla es el estado."
+      "ruleStatus": "El estatus de la regla es el estado.",
+      "tier": "El nivel de las acciones Tier 1",
+      "pack": "El paquete de (s)"
     },
     "seg": {
       "toggleSeverityTitle": "Intercambiar {v} severidad de la gravedad.",
@@ -685,6 +739,10 @@
       "body1": "Saropa está obteniendo metadatos de pub.dev, actividad de GitHub y gráficos de dependencia para cada dependencia directa en este proyecto.",
       "body2": "Esta página se actualizará automáticamente cuando termine el escaneo. Puede cancelar desde la notificación de progreso en el ángulo inferior derecho.",
       "versionStamp": "Saropa Panel de control del paquete v{version}"
+    },
+    "progress": {
+      "aria": "El escaneo de paquetes avanza en su proceso.",
+      "starting": "Comienzo de la exploración..."
     },
     "gaugeTitle": "Grado del paquete de proyectos: {grade}",
     "summary": {

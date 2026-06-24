@@ -13,7 +13,7 @@ import 'package:test/test.dart';
 /// the scan CLI (`dart run saropa_lints scan`) against a real web/desktop
 /// project.
 void main() {
-  group('avoid_platform_incompatible_dependency - instantiation', () {
+  group('Plugin Platform Support - Rule Instantiation', () {
     test('rule metadata', () {
       final rule = AvoidPlatformIncompatibleDependencyRule();
       expect(rule.code.lowerCaseName, 'avoid_platform_incompatible_dependency');

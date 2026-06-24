@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Dashboards und Dashboarden sind",
     "openFull": "Öffnen Sie den Vollbildschirm.",
+    "rescan": "Ein Rescan führt zu einem erneuten Scannen.",
+    "retry": "Versuchen Sie es erneut.",
+    "paneFailed": "Scan fehlgeschlagen.",
+    "controls": {
+      "actions": "Aktionen Maßnahmen.",
+      "settings": "Settings Einstellungen der Einrichtung",
+      "help": "Hilfsmittel Hilfe Hilfe",
+      "runAnalysis": "Führen Sie die Analyse durch.",
+      "initializeConfig": "Initialisieren / Aktualisieren der Konfiguration.",
+      "on": "Auf auf auf auf.",
+      "off": "Off off off off, das ist ein bisschen zu viel.",
+      "yes": "Ja, ja, ja. Sie sind ein bisschen zu groß für mich.",
+      "no": "Nein, nein, nein. Es ist ein",
+      "lintIntegrationState": "Lint-Integration: Die Verbindung mit dem Fernsehverkehr {state} ist ein _PH0_.",
+      "tierState": "Tier: Die Ebene, auf der sich die Unternehmen befinden. {tier} ist ein _PH0_.",
+      "runAfterConfigState": "Führen Sie die Analyse nach der Konfigurationsänderung aus: {state} ist ein _PH0_.",
+      "runAfterDependencyState": "Laufen Sie die Analyse nach der Abhängigkeitsänderung durch: {state} ist ein _PH0_.",
+      "uiLanguageState": "Benutzeroberflächensprache: Sprache der Benutzerausrichtung {language} ist ein _PH0_.",
+      "gettingStarted": "Um loszulegen, begann man.",
+      "about": "Über Saropa Lints",
+      "pubDev": "Paket am pub.dev ist.",
+      "aiInstructions": "Erstellen Sie Anweisungen für KI-Agenten."
+    },
     "pane": {
       "projectMap": "Projektkarte Karte der Projektaufstellung",
-      "codeHealth": "Code Gesundheitscode Gesundheit"
+      "codeHealth": "Code Gesundheitscode Gesundheit",
+      "lintsConfig": "Lints Config configure ist ein Konfigurationsmodul.",
+      "findings": "Ergebnisse der Untersuchung.",
+      "package": "Das Package Dashboard ist ein Paket-Dashboard.",
+      "commandCatalog": "Befehlskatalog, der Katalog für die Kommandoführung."
     },
     "projectMap": {
       "scanning": "Scannen Sie Projektkarte..."
     },
     "codeHealth": {
       "scanning": "Scannen Sie den Code Health..."
+    },
+    "config": {
+      "tier": "Tier 1 ist ein Tier-Tier.",
+      "enabledRules": "Ermächtigte Regeln:",
+      "rulePacks": "Regelpakete sind regelpacks.",
+      "packages": "Pakete sind ein Paket."
+    },
+    "package": {
+      "total": "Pakete sind ein Paket.",
+      "attention": "Erfordert Aufmerksamkeit.",
+      "blocked": "Blockiert blockiert Blocked",
+      "empty": "Noch kein Paketscan  ⁇ Öffnen Sie das Armaturenbrett, um eins auszuführen."
+    },
+    "findings": {
+      "total": "Die Gesamtzahl der Gesamtsumme.",
+      "errors": "Fehler Irrtümer",
+      "warnings": "Warnhinweise Warnungen",
+      "info": "Info",
+      "empty": "Noch keine Analyse ausgeführt  ⁇ Öffnen Sie Findings, um eins auszuführen."
+    },
+    "catalog": {
+      "commands": "Befehle Kommandos befiehlt.",
+      "recent": "Vor kurzem benutzt wurde."
     },
     "scanFailed": "Scan fehlgeschlagen. Öffnen Sie das gesamte Dashboard, um Details zu sehen und versuchen Sie es erneut."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, und {last}.",
       "message": "Einige Abschnitte konnten nicht geladen werden: {list}.",
       "retry": "Versuchen Sie es erneut.",
+      "retrying": "Ich versuche es noch einmal...",
       "retryTitle": "Versuchen Sie die fehlgeschlagenen Fetches erneut."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 aufgebläht)",
       "onDisk": "Auf der Festplatte auf Disk On Disk",
       "upgrade": "Upgrade",
+      "upgrading": "Upgrade... Ich habe ein Upgrade gemacht.",
       "viewChangelog": "Anzeige des Changelog."
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Artikel Regel Regeln",
       "owasp": "OWASP",
       "ruleType": "Regel-Typ Art der Regel.",
-      "ruleStatus": "Der Status der Regel ist:"
+      "ruleStatus": "Der Status der Regel ist:",
+      "tier": "Tier 1 ist ein Tier-Tier.",
+      "pack": "Packungen (S)"
     },
     "seg": {
       "toggleSeverityTitle": "Wechseln Sie {v} Schweregrad.",
@@ -685,6 +739,10 @@
       "body1": "Saropa holt die Metadaten von pub.dev, GitHub Aktivität und Abhängigkeitsgraphen für jede direkte Abhängigkeit in diesem Projekt ab.",
       "body2": "Diese Seite wird automatisch aktualisiert, wenn der Scan beendet ist. Sie können die Benachrichtigung über den Fortschritt rechts unten stornieren.",
       "versionStamp": "Saropa Package Dashboard v{version} Das ist das"
+    },
+    "progress": {
+      "aria": "Der Fortschritt der Paketscanscanung.",
+      "starting": "Start der Scan... wird gestartet."
     },
     "gaugeTitle": "Projektpaket-Klasse: {grade}",
     "summary": {

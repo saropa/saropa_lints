@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Tablice kontrolne, deski rozdzielcze.",
     "openFull": "Otwórz pełny ekran.",
+    "rescan": "Reskanuj ponownie, aby uzyskać więcej informacji.",
+    "retry": "Spróbuj ponownie.",
+    "paneFailed": "Skanowanie nie powiodło się.",
+    "controls": {
+      "actions": "Działania Działań.",
+      "settings": "Ustawienia Settings",
+      "help": "Pomoc w pomocy Help Help",
+      "runAnalysis": "Przeprowadź analizę, przeprowadzić analizę.",
+      "initializeConfig": "Inicjalizacja / Aktualizacja konfiguracji.",
+      "on": "Wciąż w dalszym ciągu.",
+      "off": "Wypuszczam, wyłączam.",
+      "yes": "Tak, tak, tak... - odparł.",
+      "no": "Nie, nie, nie. - Powiedział mu.",
+      "lintIntegrationState": "Integracja linii: integracja lintowa. {state} to odmiana _PH0_.",
+      "tierState": "Tier: poziom podstawowy. {tier} to odmiana _PH0_.",
+      "runAfterConfigState": "Przeprowadź analizę po zmianie konfiguracji: {state} to odmiana _PH0_.",
+      "runAfterDependencyState": "Przeprowadź analizę po zmianie zależności: {state} to odmiana _PH0_.",
+      "uiLanguageState": "Język interfejsu użytkownika: język UI: {language} to odmiana _PH0_.",
+      "gettingStarted": "Zaczynamy od początku.",
+      "about": "O Saropa Lints chodziło.",
+      "pubDev": "Pakiet na pub.dev",
+      "aiInstructions": "Stwórz instrukcje dla agenta sztucznej inteligencji."
+    },
     "pane": {
       "projectMap": "Mapa projektu Project Map - mapa projektów.",
-      "codeHealth": "Kodeks zdrowia Code Health"
+      "codeHealth": "Kodeks zdrowia Code Health",
+      "lintsConfig": "Lints Config konfigurować",
+      "findings": "Wyniki badań.",
+      "package": "Panel paneli pakietów (Package Dashboard)",
+      "commandCatalog": "Katalog dowodzenia katalogu poleceń."
     },
     "projectMap": {
       "scanning": "Skanowanie mapy projektu..."
     },
     "codeHealth": {
       "scanning": "Skanowanie kodu zdrowia..."
+    },
+    "config": {
+      "tier": "Poziom Tier 1 - poziom podstawowy.",
+      "enabledRules": "Zasady włączone reguły aktywowane.",
+      "rulePacks": "Pakiety reguł zawierają zasady.",
+      "packages": "Pakiety pakietowe to pakiet."
+    },
+    "package": {
+      "total": "Pakiety pakietowe to pakiet.",
+      "attention": "Potrzebuje uwagi.",
+      "blocked": "Blokada zablokowana.",
+      "empty": "Jeszcze nie skanowano paczki  ⁇ Otwórz deskę rozdzielczą, aby uruchomić jeden."
+    },
+    "findings": {
+      "total": "Całkowity sumowy łączny.",
+      "errors": "Błędy błędy",
+      "warnings": "Ostrzeżenia ostrzeżeń.",
+      "info": "Informacje o informacjach Info Info",
+      "empty": "Jeszcze nie przeprowadzono żadnej analizy  ⁇ otwarte wyniki do uruchomienia pierwszego."
+    },
+    "catalog": {
+      "commands": "Komendy polecenia.",
+      "recent": "Ostatnio używane."
     },
     "scanFailed": "Skanowanie nie powiodło się. Otwórz pełny panel kontrolny, aby zobaczyć szczegóły i spróbuj ponownie."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, oraz {last}.",
       "message": "Niektóre sekcje nie mogły się załadować: {list}.",
       "retry": "Spróbuj ponownie.",
+      "retrying": "Próbuję ponownie...",
       "retryTitle": "Spróbuj ponownie nieudanych pobieraniu."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 nadmiar)",
       "onDisk": "Na dysku na dysku",
       "upgrade": "Uaktualnij aktualizację.",
+      "upgrading": "Uaktualnianie...",
       "viewChangelog": "Zobacz Changelog"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Regulamin regulaminu",
       "owasp": "OWASP",
       "ruleType": "Rodzaj reguły Typ reguły",
-      "ruleStatus": "Status reguły - Rule status."
+      "ruleStatus": "Status reguły - Rule status.",
+      "tier": "Poziom Tier 1 - poziom podstawowy.",
+      "pack": "Pakiet (y)"
     },
     "seg": {
       "toggleSeverityTitle": "Wyłącz {v} stopnia ciężkości.",
@@ -685,6 +739,10 @@
       "body1": "Saropa pobiera metadane pub.dev, aktywność GitHub i wykresy zależności dla każdej bezpośredniej zależности w tym projekcie.",
       "body2": "Ta strona zostanie automatycznie odświeżona po zakończeniu skanowania. Możesz anulować z powiadomienia o postępie w prawym dolnym rogu.",
       "versionStamp": "Saropa Panel pakietów v{version}"
+    },
+    "progress": {
+      "aria": "Skanowanie pakietów, postęp skanowania.",
+      "starting": "Rozpoczęcie skanowania..."
     },
     "gaugeTitle": "Kategoria pakietu projektu: {grade}",
     "summary": {

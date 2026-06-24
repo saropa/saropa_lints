@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "仪表板,控制台",
     "openFull": "打开全屏幕,然后打开一个完整的画面.",
+    "rescan": "扫描重新进行,再扫描.",
+    "retry": "再次尝试,重新试.",
+    "paneFailed": "扫描失败了. 这是一个错误的结果.",
+    "controls": {
+      "actions": "行动 行动 是一个动作.",
+      "settings": "设置的设定,这是一个很好的方法.",
+      "help": "帮助帮助帮助帮忙",
+      "runAnalysis": "运行分析,进行分析.",
+      "initializeConfig": "启动 / 更新配置文件",
+      "on": "在这里,在那里.",
+      "off": "开启了,没有任何问题.",
+      "yes": "是的,是的,就是这样.",
+      "no": "没有,没有,不行.",
+      "lintIntegrationState": "连线整合:带电网的整合 {state} 没有任何问题.",
+      "tierState": "层级:是指在资本阶段中,有较高的水平. {tier} 没有任何问题.",
+      "runAfterConfigState": "在配置更改后运行分析: {state} 没有任何问题.",
+      "runAfterDependencyState": "在依赖性变化后运行分析: {state} 没有任何问题.",
+      "uiLanguageState": "界面语言:用户界面的语言 {language} 没有任何问题.",
+      "gettingStarted": "开始的过程",
+      "about": "关于Saropa Lints",
+      "pubDev": "包装在pub.dev上",
+      "aiInstructions": "创建AI代理指令的指示."
+    },
     "pane": {
       "projectMap": "项目地图,项目地圖.",
-      "codeHealth": "卫生健康规范码"
+      "codeHealth": "卫生健康规范码",
+      "lintsConfig": "林特斯配置可以使用.",
+      "findings": "发现结果的研究.",
+      "package": "包装仪表板 这些是",
+      "commandCatalog": "命令目录指令目录"
     },
     "projectMap": {
       "scanning": "扫描项目地图..."
     },
     "codeHealth": {
       "scanning": "扫描代码健康... 在线"
+    },
+    "config": {
+      "tier": "资本级别的其他类型",
+      "enabledRules": "启用规则是指允许使用的规则.",
+      "rulePacks": "规则包包括一个规则.",
+      "packages": "包装包裹是什么意思?"
+    },
+    "package": {
+      "total": "包装包裹是什么意思?",
+      "attention": "需要注意的注意力.",
+      "blocked": "封锁的 被阻止的",
+      "empty": "没有包裹扫描,但 ⁇ 打开仪表板运行一个."
+    },
+    "findings": {
+      "total": "总的来说,这是一个很大的整体.",
+      "errors": "错误的错误,是因为",
+      "warnings": "警告和警示 在线",
+      "info": "信息信息信息的信息信息是什么",
+      "empty": "没有分析运行,但 ⁇ 打开发现运行一."
+    },
+    "catalog": {
+      "commands": "命令指令是指挥的",
+      "recent": "最近使用过的 已用到"
     },
     "scanFailed": "扫描失败了. 这是一个错误的结果. 打开整个仪表板,查看详细信息并重新尝试."
   },
@@ -115,6 +165,7 @@
       "listMany": "它们是 {head} 和 {last} .",
       "message": "某些部分无法加载：{list}。",
       "retry": "再次尝试,重新试.",
+      "retrying": "再试一次... 在尝试.",
       "retryTitle": "再试一次失败的获取."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 膨胀) 这是一个很好的方法.",
       "onDisk": "在磁盘上 磁盘上的",
       "upgrade": "升级升级,是为了提高",
+      "upgrading": "升级... 在升级.",
       "viewChangelog": "查看更改日志的情况"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "规则 规章制度 在",
       "owasp": "OWASP",
       "ruleType": "规则类型 规律类型",
-      "ruleStatus": "规则的地位规则状态"
+      "ruleStatus": "规则的地位规则状态",
+      "tier": "资本级别的其他类型",
+      "pack": "包装 (s) 的意思"
     },
     "seg": {
       "toggleSeverityTitle": "切换 {v} 重度 的 转移.",
@@ -685,6 +739,10 @@
       "body1": "Saropa正在为这个项目的每个直接依赖获取 pub.dev元数据, GitHub活动和依赖图.",
       "body2": "当扫描完成时,此页面将自动更新. 您可以在右下角的进展通知中取消.",
       "versionStamp": "Saropa 包装仪表板 v{version} 的时间"
+    },
+    "progress": {
+      "aria": "包扫描进展情况",
+      "starting": "开始扫描..."
     },
     "gaugeTitle": "项目组合等级: {grade} 没有任何问题.",
     "summary": {

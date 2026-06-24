@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "แดชบอร์ด ดัชโบ๊ด",
     "openFull": "เปิดหน้าจอเต็มภาพ",
+    "rescan": "Rescan รีสแกน",
+    "retry": "Retry รีเทรนท์",
+    "paneFailed": "การสแกนล้มเหลว. scan ไม่สําเร็จ",
+    "controls": {
+      "actions": "การกระทําการดําเนินงาน Actions",
+      "settings": "การตั้งค่า Settings",
+      "help": "ช่วยเหลือ สนับสนุน",
+      "runAnalysis": "วิ่งวิเคราะห์ Run Analysis การวัด",
+      "initializeConfig": "การเริ่มต้น / อัพเดท config",
+      "on": "ในขณะที่ในขณะที่",
+      "off": "Off Off Off ออกไปออก ไป",
+      "yes": "ใช่ครับ ครับ จริงๆ",
+      "no": "ไม่ๆๆๆ ครับ",
+      "lintIntegrationState": "การบูรณาการ Lint: {state} การตรวจสอบ",
+      "tierState": "Tier: ระดับชั้น {tier} การตรวจสอบ",
+      "runAfterConfigState": "วิ่งการวิเคราะห์หลังจาก config เปลี่ยน: {state} การตรวจสอบ",
+      "runAfterDependencyState": "วิ่งวิเคราะห์หลังจากการเปลี่ยนแปลงความพึ่งพา: {state} การตรวจสอบ",
+      "uiLanguageState": "ภาษา UI: {language} การตรวจสอบ",
+      "gettingStarted": "การเริ่มต้นการเข้าใช้งาน",
+      "about": "เกี่ยวกับ Saropa Lints",
+      "pubDev": "แพ็คเกจในวันที่ pub.dev",
+      "aiInstructions": "สร้างคําสั่งของตัวแทน AI"
+    },
     "pane": {
       "projectMap": "แผนที่ Project Map โครงการแผนที่",
-      "codeHealth": "รหัสสุขภาพ Code Health"
+      "codeHealth": "รหัสสุขภาพ Code Health",
+      "lintsConfig": "Lints Config เปลี่ยนแปลงลินท์",
+      "findings": "ผลการค้นพบ รายงาน",
+      "package": "แพคเกจดัชบอร์ด (Package Dashboard) เป็น",
+      "commandCatalog": "คาตอล็อกบัญชาการ Command Catalogue การกํากับและการใช้"
     },
     "projectMap": {
       "scanning": "การสแกนแผนที่โครงการ ... แผนที่..."
     },
     "codeHealth": {
       "scanning": "การสแกนรหัสสุขภาพ ..."
+    },
+    "config": {
+      "tier": "Tier 1 หลักทรัพย์",
+      "enabledRules": "กฎกติกา Enabled Rules (กฎที่เปิดใช้)",
+      "rulePacks": "Rule Packs ปรับกฎการใช้งาน",
+      "packages": "แพ็คเกจ Packages สินค้า"
+    },
+    "package": {
+      "total": "แพ็คเกจ Packages สินค้า",
+      "attention": "ต้องการความสนใจ",
+      "blocked": "Blocked ปิดกั้น",
+      "empty": "ยังไม่มีการสแกนแพ็คเก็ตเลย  ⁇ เปิดดัชบอร์ดเพื่อเปิด 1"
+    },
+    "findings": {
+      "total": "รายการรวมทั้งสิ้น",
+      "errors": "ความผิดพลาด Errors ข้อผิดพลาด",
+      "warnings": "คําเตือน การตักเตือน",
+      "info": "ข้อมูลข้อมูล ข้อมูล",
+      "empty": "ยังไม่มีการวัดผล run  ⁇ เปิด Findings เพื่อใช้งานครั้งที่ 1"
+    },
+    "catalog": {
+      "commands": "สั่งสั่งการ Commands",
+      "recent": "ใช้งานล่าสุด"
     },
     "scanFailed": "การสแกนล้มเหลว. scan ไม่สําเร็จ เปิดแผงงานทั้งหมดเพื่อดูรายละเอียด และลองอีกครั้ง"
   },
@@ -115,6 +165,7 @@
       "listMany": "{head} และ {last}",
       "message": "บางส่วนไม่สามารถโหลด: {list}.",
       "retry": "Retry รีเทรนท์",
+      "retrying": "พยายามอีกครั้ง ...",
       "retryTitle": "ลองเอาไปอีกทีที่พลาด"
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 บู๊บ)",
       "onDisk": "ใน Disk On หน่วยงาน",
       "upgrade": "อัพเกรดอัปเดรด Upgrade",
+      "upgrading": "การอัพเกรด ...",
       "viewChangelog": "View Changelog รายการเปลี่ยนแปลง"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "กฎหมาย สังกัด",
       "owasp": "OWASP",
       "ruleType": "รูปแบบกฎ กฎประเภท",
-      "ruleStatus": "รูปแบบ Rule สถานะ"
+      "ruleStatus": "รูปแบบ Rule สถานะ",
+      "tier": "Tier 1 หลักทรัพย์",
+      "pack": "แพ็ค (((s)"
     },
     "seg": {
       "toggleSeverityTitle": "Toggle {v} ความรุนแรง",
@@ -685,6 +739,10 @@
       "body1": "Saropa กําลังหา metadata ของ pub.dev กิจกรรมของ GitHub และกราฟความพึ่งพาสําหรับทุกๆ ความพึ่งพากันโดยตรงในโครงการนี้",
       "body2": "หน้านี้จะอัพเดทใหม่โดยอัตโนมัติเมื่อการสแกนเสร็จสิ้น คุณสามารถยกเลิกได้จากแจ้งความก้าวหน้าที่ด้านล่างขวา",
       "versionStamp": "Saropa แดชบอร์ดแพคเกจ v{version}"
+    },
+    "progress": {
+      "aria": "การสแกนแพ็คเกจ ขั้นตอนการดําเนินงาน",
+      "starting": "เริ่มสแกน..."
     },
     "gaugeTitle": "กลุ่มงานโครงการ เกรด: {grade}",
     "summary": {

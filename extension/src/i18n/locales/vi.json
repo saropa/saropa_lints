@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Dashboards Bảng điều khiển",
     "openFull": "Mở toàn màn hình mở.",
+    "rescan": "Rescan lại quét lại.",
+    "retry": "Retry retry thử lại",
+    "paneFailed": "Quét không thành công.",
+    "controls": {
+      "actions": "Hành động Các hành động",
+      "settings": "Settings Settings (Thay đổi định vị)",
+      "help": "Giúp đỡ giúp đỡ",
+      "runAnalysis": "Chạy phân tích chạy.",
+      "initializeConfig": "Initialize / Update config config. (Đặt đầu tiên/ Cập nhật cấu hình)",
+      "on": "Trên, trên, trên",
+      "off": "Off off off off, đi ra ngoài.",
+      "yes": "Vâng, vâng, phải.",
+      "no": "Không, không phải là tôi.",
+      "lintIntegrationState": "Lint integration: lìnt tích hợp: {state} là Phương pháp",
+      "tierState": "Tier: cấp bậc nhất. {tier} là Phương pháp",
+      "runAfterConfigState": "Chạy phân tích sau khi thay đổi cấu hình: {state} là Phương pháp",
+      "runAfterDependencyState": "Chạy phân tích sau khi thay đổi phụ thuộc: {state} là Phương pháp",
+      "uiLanguageState": "Ngôn ngữ giao diện người dùng: UI language {language} là Phương pháp",
+      "gettingStarted": "Bắt đầu bắt đầu",
+      "about": "Về _Saropa Lints",
+      "pubDev": "Gói vào ngày pub.dev",
+      "aiInstructions": "Tạo ra các hướng dẫn cho đại lý AI."
+    },
     "pane": {
       "projectMap": "Project Map Bản đồ dự án",
-      "codeHealth": "Mã Y tế Code Sức khỏe"
+      "codeHealth": "Mã Y tế Code Sức khỏe",
+      "lintsConfig": "Lints Config Lints là một cấu hình",
+      "findings": "Những phát hiện của các nhà nghiên cứu",
+      "package": "Package Dashboard là bảng điều khiển của gói.",
+      "commandCatalog": "Command Catalogue - Danh mục chỉ huy"
     },
     "projectMap": {
       "scanning": "Quét bản đồ dự án..."
     },
     "codeHealth": {
       "scanning": "Quét mã sức khỏe..."
+    },
+    "config": {
+      "tier": "Tier Tier Tier tier tier tier",
+      "enabledRules": "Các quy tắc được kích hoạt cho phép",
+      "rulePacks": "Các gói quy tắc bao gồm các quy tắc.",
+      "packages": "Gói hàng gói"
+    },
+    "package": {
+      "total": "Gói hàng gói",
+      "attention": "Cần chú ý.",
+      "blocked": "Blocked Bị chặn",
+      "empty": "Chưa có bản quét gói nào  ⁇ mở bảng điều khiển để chạy một."
+    },
+    "findings": {
+      "total": "Tổng cộng là tổng số.",
+      "errors": "Lỗi lỗi sai lầm",
+      "warnings": "Cảnh báo cảnh báo",
+      "info": "Thông tin thông tin thông báo thông tin",
+      "empty": "Chưa có phân tích nào được chạy  ⁇ mở Findings để chạy một."
+    },
+    "catalog": {
+      "commands": "Commands Commands là những lệnh",
+      "recent": "Gần đây sử dụng gần đây"
     },
     "scanFailed": "Quét không thành công. Mở toàn bộ bảng điều khiển để xem chi tiết và thử lại."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, và {last}.",
       "message": "Một số phần không thể tải: {list}. . ph0__ .",
       "retry": "Retry retry thử lại",
+      "retrying": "Thử lại... thử lại.",
       "retryTitle": "Hãy thử lại các fetch thất bại."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 sưng)",
       "onDisk": "Trong Disk On Disk",
       "upgrade": "Nâng cấp nâng cấp Upgrade",
+      "upgrading": "Nâng cấp... nâng cấp.",
       "viewChangelog": "Xem Changelog"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Quy tắc của quy định",
       "owasp": "OWASP",
       "ruleType": "Loại quy tắc loại luật",
-      "ruleStatus": "Quy tắc về tình trạng của quy định"
+      "ruleStatus": "Quy tắc về tình trạng của quy định",
+      "tier": "Tier Tier Tier tier tier tier",
+      "pack": "Gói (s)"
     },
     "seg": {
       "toggleSeverityTitle": "Toggle {v} mức độ nghiêm trọng",
@@ -685,6 +739,10 @@
       "body1": "Saropa đang lấy siêu dữ liệu pub.dev, hoạt động GitHub và biểu đồ phụ thuộc cho mọi sự phụ thuộc trực tiếp trong dự án này.",
       "body2": "Trang này sẽ tự động làm mới khi quét xong. Bạn có thể hủy thông báo tiến độ ở phía dưới bên phải.",
       "versionStamp": "Saropa Bảng điều khiển gói v{version}"
+    },
+    "progress": {
+      "aria": "Package scan progress: Quét tiến độ của gói",
+      "starting": "Bắt đầu quét..."
     },
     "gaugeTitle": "Gói dự án: Lớp học: {grade} là Phương pháp",
     "summary": {

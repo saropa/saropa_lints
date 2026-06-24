@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Kontrol panelleri Dashboardlar",
     "openFull": "Tam ekranı açın.",
+    "rescan": "Rescan, yeniden tarama yaparak tekrar taramanın bir yoludur.",
+    "retry": "Yeniden denemek için tekrar deneyin.",
+    "paneFailed": "Tarama başarısız oldu.",
+    "controls": {
+      "actions": "Eylemler eylemleri eylemler.",
+      "settings": "Ayarlar ayarları ayarlar.",
+      "help": "Yardım yardım yardımcı yardımcı",
+      "runAnalysis": "Analiz çalıştırın.",
+      "initializeConfig": "Başlangıç / Güncelleme yapılandırmasını başlatın.",
+      "on": "Daha da daha, daha da.",
+      "off": "Off off off off Off Off Off, açıkça ifade ediliyor.",
+      "yes": "Evet, evet, evet.",
+      "no": "Hayır, hayır, hayır.",
+      "lintIntegrationState": "Lint entegrasyonu: İpler entegre edilmiştir. {state} _PH0___ -Hepimiz birer insanız.",
+      "tierState": "Tier: Seviye, seviye. {tier} _PH0___ -Hepimiz birer insanız.",
+      "runAfterConfigState": "Config değişikliğinden sonra analiz çalıştır: {state} _PH0___ -Hepimiz birer insanız.",
+      "runAfterDependencyState": "Bağımlılık değişikliğinden sonra analiz çalıştırın: {state} _PH0___ -Hepimiz birer insanız.",
+      "uiLanguageState": "UI dili: Kullanıcı arayüzü dili {language} _PH0___ -Hepimiz birer insanız.",
+      "gettingStarted": "Başlamak için başlama.",
+      "about": "Yaklaşık olarak Saropa Lints hakkında.",
+      "pubDev": "Paket pub.dev tarihinde.",
+      "aiInstructions": "AI ajanı talimatları oluşturun."
+    },
     "pane": {
       "projectMap": "Proje Haritası Projeler Haritasını",
-      "codeHealth": "Code Health Sağlık Kodları"
+      "codeHealth": "Code Health Sağlık Kodları",
+      "lintsConfig": "Lints Config'i Yapılandırın",
+      "findings": "Bulgular Bulguları",
+      "package": "Paket Tablosu (Dashboard)",
+      "commandCatalog": "Komut Kataloğu Komuta Katalogu"
     },
     "projectMap": {
       "scanning": "Proje haritasını taramak..."
     },
     "codeHealth": {
       "scanning": "Tarama kodu sağlık... tarayıcı kodları."
+    },
+    "config": {
+      "tier": "Tier Tier Tier'de yer alıyor.",
+      "enabledRules": "Etkinleştirilmiş kurallar, etkinleştirilmiş kurallardır.",
+      "rulePacks": "Kural paketleri kurallar paketi.",
+      "packages": "Paket paketler, paketler."
+    },
+    "package": {
+      "total": "Paket paketler, paketler.",
+      "attention": "Dikkat edilmesi gerekenler",
+      "blocked": "Blocked Bloklanmış",
+      "empty": "Henüz paket taraması yok  ⁇ 1. çalıştırmak için gösterge panelini açın."
+    },
+    "findings": {
+      "total": "Toplam toplam toplam",
+      "errors": "Hatalar hatalar hatası",
+      "warnings": "Uyarı Sözcükleri: Warnings",
+      "info": "Bilgi, bilgi, bilgi.",
+      "empty": "Henüz analiz çalıştırılmadı  ⁇ 1. çalıştırmak için Bulgular'ı açın."
+    },
+    "catalog": {
+      "commands": "Komutlar, komutları verir.",
+      "recent": "Son zamanlarda kullanılanlar"
     },
     "scanFailed": "Tarama başarısız oldu. Detayları görmek için tam gösterge panelini açın ve tekrar deneyin."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head} ve {last} olarak adlandırılır.",
       "message": "Bazı bölümler yüklenemedi: {list}. . . .Hı hı hımm..",
       "retry": "Yeniden denemek için tekrar deneyin.",
+      "retrying": "Tekrar deniyorum...",
       "retryTitle": "Başarısız olan fetch'leri tekrar deneyin."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 şişkinlik)",
       "onDisk": "Disk On disk On diski üzerinde",
       "upgrade": "Yükseltme Geliştirme Güncelleme",
+      "upgrading": "Yükseltme... yükseltilmek.",
       "viewChangelog": "Değişiklik Günlüğünü Görüntüle"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Kural Kanun kural",
       "owasp": "OWASP",
       "ruleType": "Kural tipi kural türü",
-      "ruleStatus": "Rule statüsü, kuralın durumudur."
+      "ruleStatus": "Rule statüsü, kuralın durumudur.",
+      "tier": "Tier Tier Tier'de yer alıyor.",
+      "pack": "Paketleme (ler)"
     },
     "seg": {
       "toggleSeverityTitle": "Toggle {v} şiddetini değiştirmek.",
@@ -685,6 +739,10 @@
       "body1": "Saropa bu projedeki her doğrudan bağımlılık için pub.dev meta verileri, GitHub etkinliği ve bağımlılıklar grafiklerini alıyor.",
       "body2": "Tarama tamamlandığında bu sayfa otomatik olarak yenilenir. Sağ altta bulunan ilerleme bildiriminden iptal edebilirsiniz.",
       "versionStamp": "Saropa Paket Kontrol Panosu v{version}"
+    },
+    "progress": {
+      "aria": "Paket taraması ilerleme kaydı",
+      "starting": "Tarama başlatılıyor... tarayıcı."
     },
     "gaugeTitle": "Proje Paketi Derecesi: {grade}",
     "summary": {

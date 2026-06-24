@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "ダッシュボード,ダッシュボード",
     "openFull": "フルスクリーンで開きます.",
+    "rescan": "再スキャンして再スキャニングします.",
+    "retry": "再試行してみる.",
+    "paneFailed": "スキャン失敗.",
+    "controls": {
+      "actions": "行動 アクション",
+      "settings": "設定セットは,設定を設定する.",
+      "help": "援助・支援をすること.",
+      "runAnalysis": "分析を実行する.",
+      "initializeConfig": "初期化 / アップデート コンフィギュレーション",
+      "on": "続けて,そしてまた.",
+      "off": "オフ・オフ・オフ オーバー・オフ",
+      "yes": "はい,はい,はい. ありがとうございました.",
+      "no": "違う,違う,いいじゃない.",
+      "lintIntegrationState": "リンツ統合:リントの統合 {state} フォローしている",
+      "tierState": "レベル: 一級. {tier} フォローしている",
+      "runAfterConfigState": "設定変更後に分析を実行: {state} フォローしている",
+      "runAfterDependencyState": "依存関係変更後の分析を実行: {state} フォローしている",
+      "uiLanguageState": "UI言語: ユーザーインターフェイスの言語 {language} フォローしている",
+      "gettingStarted": "スタートアップのやり方",
+      "about": "について _Saropa Lints",
+      "pubDev": "パッケージは pub.dev に",
+      "aiInstructions": "AIエージェントの指示を作成する."
+    },
     "pane": {
       "projectMap": "プロジェクトマップ,プロジェクトの地図",
-      "codeHealth": "健康コード 保健医療法"
+      "codeHealth": "健康コード 保健医療法",
+      "lintsConfig": "リンツはコンフィギュレーション",
+      "findings": "発見結果は,",
+      "package": "パッケージダッシュボード",
+      "commandCatalog": "コマンドカタログ コマンドカタログ"
     },
     "projectMap": {
       "scanning": "スキャンプロジェクトマップ..."
     },
     "codeHealth": {
       "scanning": "スキャンコードの健康..."
+    },
+    "config": {
+      "tier": "準額 (Tier) の基準となる.",
+      "enabledRules": "有効化された規則は,",
+      "rulePacks": "ルールパックとは,ルール・パッケージです.",
+      "packages": "パッケージパッケージは,"
+    },
+    "package": {
+      "total": "パッケージパッケージは,",
+      "attention": "注意が必要である.",
+      "blocked": "ブロックされた,遮断された",
+      "empty": "まだパッケージスキャンされていません. 1 を実行するためにダッシュボードを開きます."
+    },
+    "findings": {
+      "total": "総計は,全体として合計です.",
+      "errors": "エラー 間違い",
+      "warnings": "警告の文字が表示される",
+      "info": "情報は情報,情報が情報.",
+      "empty": "分析はまだ実行されていません. オープンファインディングを1回実行する."
+    },
+    "catalog": {
+      "commands": "コマンドはコマンドです.",
+      "recent": "最近使用した物件"
     },
     "scanFailed": "スキャン失敗. 詳細を見るためにダッシュボード全体を開いて,再試してください."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head},そして {last}",
       "message": "一部のセクションがロードできませんでした: {list}.",
       "retry": "再試行してみる.",
+      "retrying": "再試し...やってみる",
       "retryTitle": "失敗した fetch を再試してください."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 膨らみ) となる.",
       "onDisk": "ディスク オン ディスク",
       "upgrade": "アップグレードアップデート",
+      "upgrading": "アップグレードする...",
       "viewChangelog": "変更ログを表示する"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "ルール ルールはルールの規則",
       "owasp": "OWASP",
       "ruleType": "ルールタイプ ルールの種類",
-      "ruleStatus": "ルール・ステータス"
+      "ruleStatus": "ルール・ステータス",
+      "tier": "準額 (Tier) の基準となる.",
+      "pack": "パック (pack) とは"
     },
     "seg": {
       "toggleSeverityTitle": "トーグリング {v} 重度",
@@ -685,6 +739,10 @@
       "body1": "Saropa は、このプロジェクト内のすべての直接依存関係の pub.dev メタデータ、GitHub アクティビティ、および依存関係グラフをフェッチしています。",
       "body2": "このページは,スキャンが終了すると自動的に更新されます. 右下の進捗通知からキャンセルできます.",
       "versionStamp": "Saropa パッケージダッシュボード v{version}"
+    },
+    "progress": {
+      "aria": "パッケージスキャンの進捗状況",
+      "starting": "スキャン開始..."
     },
     "gaugeTitle": "プロジェクトパッケージグレード: {grade}",
     "summary": {

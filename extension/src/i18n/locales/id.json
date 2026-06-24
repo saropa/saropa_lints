@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Dashboard, Dasbor dan lainnya.",
     "openFull": "Buka layar penuh untuk membuka.",
+    "rescan": "Rescan ulang scan kembali.",
+    "retry": "Cobalah untuk kembali.",
+    "paneFailed": "Scan gagal. scan tidak berhasil.",
+    "controls": {
+      "actions": "Tindakan-tindakan Aksi",
+      "settings": "Pengaturan Settings Setelan.",
+      "help": "Bantuan yang diberikan untuk membantu",
+      "runAnalysis": "Jalankan analisis analisa.",
+      "initializeConfig": "Inisialisasi / Update config.",
+      "on": "Di atas, di atas dan di atas.",
+      "off": "Off off off off, di luar sana.",
+      "yes": "Ya, ya, ya. (tertawa)",
+      "no": "Tidak, tidak, tidak.",
+      "lintIntegrationState": "Integrasi Lint: Integrasi jalur kereta api. {state} adalah",
+      "tierState": "Tier: Tingkat yang lebih rendah. {tier} adalah",
+      "runAfterConfigState": "Jalankan analisis setelah perubahan konfigurasi: {state} adalah",
+      "runAfterDependencyState": "Jalankan analisis setelah perubahan ketergantungan: {state} adalah",
+      "uiLanguageState": "Bahasa UI: bahasa yang digunakan. {language} adalah",
+      "gettingStarted": "Memulai memulai.",
+      "about": "Tentang _Saropa Lints.",
+      "pubDev": "Paket pada pub.dev",
+      "aiInstructions": "Buat instruksi agen AI untuk membuat perintah."
+    },
     "pane": {
       "projectMap": "Peta Proyek Peta Project Map",
-      "codeHealth": "Kode Kesehatan Code Health"
+      "codeHealth": "Kode Kesehatan Code Health",
+      "lintsConfig": "Lints Config Mengkonfigurasi",
+      "findings": "Temuan-temuan yang ditemukan.",
+      "package": "Dashboard Paket adalah sebuah dashboard paket.",
+      "commandCatalog": "Katalog Komando Katalog Perintah"
     },
     "projectMap": {
       "scanning": "Pindai peta proyek pemindaian..."
     },
     "codeHealth": {
       "scanning": "Scan kode kesehatan..."
+    },
+    "config": {
+      "tier": "Tingkatkan tingkat keahlian Anda.",
+      "enabledRules": "Aturan yang diaktifkan (enabled rules)",
+      "rulePacks": "Paket aturan paket.",
+      "packages": "Paket paket yang tersedia."
+    },
+    "package": {
+      "total": "Paket paket yang tersedia.",
+      "attention": "Membutuhkan perhatian.",
+      "blocked": "Blokir, memblokir.",
+      "empty": "Belum ada pemindaian paket  ⁇ buka dasbor untuk menjalankan satu."
+    },
+    "findings": {
+      "total": "Total Jumlah total.",
+      "errors": "Kesalahan-kesalahan kesalahan",
+      "warnings": "Peringatan dan peringatan.",
+      "info": "Informasi yang diberikan adalah informasi",
+      "empty": "Belum ada analisis yang dijalankan  ⁇ buka temuan untuk menjalankan satu."
+    },
+    "catalog": {
+      "commands": "Komando Perintah-perintah",
+      "recent": "Baru-baru ini digunakan."
     },
     "scanFailed": "Scan gagal. scan tidak berhasil. Buka dasbor penuh untuk melihat detail dan coba lagi."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, dan {last}.",
       "message": "Beberapa bagian tidak bisa dimuat: {list}.",
       "retry": "Cobalah untuk kembali.",
+      "retrying": "Mencoba lagi... mencoba kembali.",
       "retryTitle": "Cobalah kembali fetch yang gagal."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 kembung)",
       "onDisk": "Pada disk On Disk On Disk",
       "upgrade": "Upgrade adalah upgrade yang dilakukan untuk meningkatkan kualitas.",
+      "upgrading": "Upgrade...meningkatkan..",
       "viewChangelog": "Lihat Changelog."
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Peraturan Pemerintah Peraturan Negara",
       "owasp": "OWASP",
       "ruleType": "Jenis aturan jenis peraturan.",
-      "ruleStatus": "Status Rule adalah status aturan."
+      "ruleStatus": "Status Rule adalah status aturan.",
+      "tier": "Tingkatkan tingkat keahlian Anda.",
+      "pack": "Paket (s)"
     },
     "seg": {
       "toggleSeverityTitle": "Toggle {v} tingkat keparahan.",
@@ -685,6 +739,10 @@
       "body1": "Saropa mengambil metadata pub.dev, aktivitas GitHub, dan grafik ketergantungan untuk setiap ketergantungan langsung dalam proyek ini.",
       "body2": "Halaman ini akan refresh secara otomatis saat scan selesai. Anda dapat membatalkan dari pemberitahuan kemajuan di kanan bawah.",
       "versionStamp": "Saropa Dashboard paket v{version}"
+    },
+    "progress": {
+      "aria": "Package scan progress Scan paket yang sedang berjalan.",
+      "starting": "Mulai scan..."
     },
     "gaugeTitle": "Kelas Paket Proyek: {grade}",
     "summary": {

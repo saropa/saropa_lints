@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "대시보드 (Dashboard) 대시 보드를 이용합니다.",
     "openFull": "전체 화면을 열고, 전체 화면으로 열어보세요.",
+    "rescan": "다시 스캔해서 재스캔하는 것입니다.",
+    "retry": "다시 시도해 보도록 한다.",
+    "paneFailed": "스캔 실패.",
+    "controls": {
+      "actions": "행동 활동은 행동을 취하는 것입니다.",
+      "settings": "설정 설정을 조정합니다.",
+      "help": "도움말 도움을 받을 수 있습니다.",
+      "runAnalysis": "분석을 실행하여 분석을 수행합니다.",
+      "initializeConfig": "초기화 / 업데이트 구성 요소를 수정합니다.",
+      "on": "그리고 또 또 또",
+      "off": "오프 오프 아웃 아웃",
+      "yes": "예, 예, 네, 예.",
+      "no": "아니, 아니, 아니야.",
+      "lintIntegrationState": "린트 통합: Lint 통합 {state} _PH0_는 PH0__의 제곱근을 나타냅니다",
+      "tierState": "Tier: 계층, 즉 수준 {tier} _PH0_는 PH0__의 제곱근을 나타냅니다",
+      "runAfterConfigState": "구성 변경 후 분석을 실행: {state} _PH0_는 PH0__의 제곱근을 나타냅니다",
+      "runAfterDependencyState": "의존성 변경 후 분석을 실행: 종속성 변화 후에 분석. {state} _PH0_는 PH0__의 제곱근을 나타냅니다",
+      "uiLanguageState": "UI 언어: 사용자 인터페이스 언어 {language} _PH0_는 PH0__의 제곱근을 나타냅니다",
+      "gettingStarted": "시작하기 시작하는 것",
+      "about": "Saropa Lints에 대해",
+      "pubDev": "패키지 pub.dev에 있습니다.",
+      "aiInstructions": "인공지능 에이전트 명령어를 생성합니다."
+    },
     "pane": {
       "projectMap": "프로젝트 지도, 프로젝트 맵",
-      "codeHealth": "건강보험법 보건복지사"
+      "codeHealth": "건강보험법 보건복지사",
+      "lintsConfig": "린츠 컨피그 (Lints Config) 는",
+      "findings": "연구결과 결과물",
+      "package": "패키지 대시보드 (Package Dashboard)",
+      "commandCatalog": "명령 카탈로그"
     },
     "projectMap": {
       "scanning": "스캔 프로젝트 지도...스캐닝 프로젝트 맵"
     },
     "codeHealth": {
       "scanning": "스캔 코드 건강..."
+    },
+    "config": {
+      "tier": "Tier 1는 Tier 2의 기본 기준이 됩니다.",
+      "enabledRules": "적성 규칙은 활성화 된 규칙을 의미합니다.",
+      "rulePacks": "규칙 패키지",
+      "packages": "패키지 상품은 패키지 제품으로 구성되어 있습니다."
+    },
+    "package": {
+      "total": "패키지 상품은 패키지 제품으로 구성되어 있습니다.",
+      "attention": "주의가 필요한 부분입니다.",
+      "blocked": "차단된, 막힌",
+      "empty": "아직 패키지 스캔이 없습니다. 1을 실행하기 위해 대시보드를 열으십시오."
+    },
+    "findings": {
+      "total": "전체적으로 합친 금액은 총액이다.",
+      "errors": "오류 실수 오류",
+      "warnings": "경고 문장 경고 문장은",
+      "info": "정보정보정보정보",
+      "empty": "아직 분석이 실행되지 않았습니다. 1번 실행에 대한 오픈 파인딩"
+    },
+    "catalog": {
+      "commands": "명령어 명령을 수행합니다.",
+      "recent": "최근에 사용된 제품"
     },
     "scanFailed": "스캔 실패. 전체 대시보드를 열어서 세부 정보를 확인하고 다시 시도하십시오."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, 그리고 {last}",
       "message": "일부 섹션이 로드되지 않았습니다: {list}.",
       "retry": "다시 시도해 보도록 한다.",
+      "retrying": "다시 시도합니다...",
       "retryTitle": "실패한 fetch를 다시 시도하십시오."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 부풀어 오르는)",
       "onDisk": "디스크에서 디스크에",
       "upgrade": "업그레이드 업그레이드는 업그레이드를 통해 업그레이드가 됩니다.",
+      "upgrading": "업그레이드... 업그레이드가 되고 있습니다.",
       "viewChangelog": "변경록을 보기"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "규칙 규정 규칙",
       "owasp": "OWASP",
       "ruleType": "규칙 유형 규칙의 종류",
-      "ruleStatus": "규칙의 지위 규정"
+      "ruleStatus": "규칙의 지위 규정",
+      "tier": "Tier 1는 Tier 2의 기본 기준이 됩니다.",
+      "pack": "패키지 (pack)"
     },
     "seg": {
       "toggleSeverityTitle": "토글 {v} 중증도 변전",
@@ -685,6 +739,10 @@
       "body1": "Saropa는 이 프로젝트의 모든 직접적인 의존성에 대해 pub.dev 메타데이터, GitHub 활동 및 종속 그래프를 가져옵니다.",
       "body2": "이 페이지는 스캔이 완료되면 자동으로 업데이트됩니다. 오른쪽 아래의 진행상황 알림에서 취소할 수 있습니다.",
       "versionStamp": "Saropa 패키지 대시보드 v{version}"
+    },
+    "progress": {
+      "aria": "패키지 스캔 진행상황",
+      "starting": "스캔 시작..."
     },
     "gaugeTitle": "프로젝트 패키지 등급: {grade}",
     "summary": {

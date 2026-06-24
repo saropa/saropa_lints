@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Mga Dashboard ng dashboard.",
     "openFull": "Buksan ang buong screen.",
+    "rescan": "Rescan muli ang iyong mga mata.",
+    "retry": "Subukan muli ang Retry.",
+    "paneFailed": "Ang scan ay nabigo.",
+    "controls": {
+      "actions": "Mga Aktibidad mga Aksyon",
+      "settings": "Mga Pag-aayos ng Settings",
+      "help": "Magbigay ng tulong sa mga taong nakakatulong.",
+      "runAnalysis": "Magpatakbo ng pagsusuri sa run analysis.",
+      "initializeConfig": "I-initialize / i-update ang config ng pag-configure.",
+      "on": "Sa pamamagitan ng pag-click sa itaas, maaari mong i-download ang mga ito.",
+      "off": "Off off off off ang mga ito.",
+      "yes": "Oo, oo, ay isang tunay na pag-ibig.",
+      "no": "Hindi, hindi, hindi na.",
+      "lintIntegrationState": "Pagsasama ng Lint: Lint integration: Ang pagsasama sa lint. {state} ang kanyang mga",
+      "tierState": "Tier: Ang antas ng pag-aari. {tier} ang kanyang mga",
+      "runAfterConfigState": "Patakbuhin ang pagsusuri pagkatapos ng config pagbabago: {state} ang kanyang mga",
+      "runAfterDependencyState": "Patakbuhin ang pagsusuri pagkatapos ng pagbabago sa dependency: {state} ang kanyang mga",
+      "uiLanguageState": "Wika ng UI: wika ng UI. {language} ang kanyang mga",
+      "gettingStarted": "Ang Pagsimula ay Nagsisimula.",
+      "about": "Tungkol sa _Saropa Lints.",
+      "pubDev": "Pakete sa pub.dev ng _PH0_.",
+      "aiInstructions": "Lumikha ng mga tagubilin sa ahente ng AI na may AI."
+    },
     "pane": {
       "projectMap": "Proyekto Mapa Project Map Ang proyekto mapa",
-      "codeHealth": "Code Health"
+      "codeHealth": "Code Health",
+      "lintsConfig": "Lints Config ay naka-config sa pamamagitan ng mga linya.",
+      "findings": "Mga Natuklasan sa Paghahanap",
+      "package": "Package Dashboard ng Pakete Ang pakete ay isang dashboard na may mga tampok.",
+      "commandCatalog": "Command Catalogue Katalogo ng Pag-uutos"
     },
     "projectMap": {
       "scanning": "Pag-scan ng proyekto mapa ..."
     },
     "codeHealth": {
       "scanning": "Pag-scan ng code sa kalusugan ..."
+    },
+    "config": {
+      "tier": "Ang Tier 1 ay ang tier 2 na antas ng pag-uuri.",
+      "enabledRules": "Ang mga pinagagawa na patakaran ay pinagana ang mga panuntunan.",
+      "rulePacks": "Mga pakete ng patakaran ay may mga pakete.",
+      "packages": "Pakete ng mga pakete ay may isang bagay na dapat gawin upang makakuha ng mas mahusay na"
+    },
+    "package": {
+      "total": "Pakete ng mga pakete ay may isang bagay na dapat gawin upang makakuha ng mas mahusay na",
+      "attention": "Kailangan ng pansin.",
+      "blocked": "Blokado, naka-block na ang mga ito.",
+      "empty": "Walang packet scan  ⁇ Buksan ang dashboard upang patakbuhin ang isa."
+    },
+    "findings": {
+      "total": "Ang kabuuan ng lahat ay sumusumpong.",
+      "errors": "Mga pagkakamali Pagkakamali",
+      "warnings": "Mga Babala ng mga babala",
+      "info": "Ang mga impormasyon ay maaaring i-access sa pamamagitan ng paghahanap.",
+      "empty": "Walang pag-aaral na tumakbo pa  ⁇ Buksan ang mga Natuklasan upang patakbuhin ang isa."
+    },
+    "catalog": {
+      "commands": "Mga Commands ng mga utos.",
+      "recent": "Kamakailan lamang ginamit na ginagamit."
     },
     "scanFailed": "Ang scan ay nabigo. Buksan ang buong dashboard upang makita ang mga detalye at subukan muli."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, at ang {last}.",
       "message": "Ang ilang mga seksyon ay hindi maaaring ma-load: {list}.",
       "retry": "Subukan muli ang Retry.",
+      "retrying": "Sinusubukan muli...",
       "retryTitle": "Subukan muli ang nabigo na mga pagkuha."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 bloat)",
       "onDisk": "Sa Disk sa Disk On Disk",
       "upgrade": "Mag-upgrade ng Upgrade na Pagpapahusay",
+      "upgrading": "Pag-upgrade... pag-update ng mga bagay.",
       "viewChangelog": "Tingnan ang Changelog"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Panuntunan ng Pamamahala sa Pamahalaan",
       "owasp": "OWASP",
       "ruleType": "Uri ng panuntunan uri ng patakaran",
-      "ruleStatus": "Rule status ng katayuan sa pag-uutos."
+      "ruleStatus": "Rule status ng katayuan sa pag-uutos.",
+      "tier": "Ang Tier 1 ay ang tier 2 na antas ng pag-uuri.",
+      "pack": "Pack (mga) pakete ng mga produkto"
     },
     "seg": {
       "toggleSeverityTitle": "I-toggle ang {v} na kasiguruhan ng kalubhaan.",
@@ -685,6 +739,10 @@
       "body1": "Kinukuha ng Saropa ang metadata ng pub.dev, aktibidad ng GitHub, at mga graph ng dependency para sa bawat direktang dependency sa proyektong ito.",
       "body2": "Ang pahinang ito ay awtomatikong mag-refresh kapag natapos ang pag-scan. Maaari kang mag-cancel mula sa notification ng progreso sa ibaba kanan.",
       "versionStamp": "Saropa Package Dashboard v{version}"
+    },
+    "progress": {
+      "aria": "Pakete pag-scan progreso ng pagsisimula",
+      "starting": "Simulan ang pag-scan ..."
     },
     "gaugeTitle": "Project Package Grade: {grade} Ang antas ng pakete ay ...",
     "summary": {

@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "לוחיות שלט Dashboards",
     "openFull": "פתח מסך מלא.",
+    "rescan": "סריקה מחדש של Rescan",
+    "retry": "נסה שוב, נסי מחדש.",
+    "paneFailed": "סריקה נכשלה.",
+    "controls": {
+      "actions": "פעולות הפעילות",
+      "settings": "התיישבות הפניות",
+      "help": "עזרה עזר סיוע",
+      "runAnalysis": "רץ ניתוח ריצה",
+      "initializeConfig": "ראשית / עדכון config.",
+      "on": "על, על, ועל.",
+      "off": "\"התחלנו\"",
+      "yes": "כן, כן, נכון.",
+      "no": "לא, לא, זה לא נכון.",
+      "lintIntegrationState": "שילוב רשתות: אינטגרציה של רשת. {state} זה ה- PH0__.",
+      "tierState": "רמה: Tier - רמת עליונה {tier} זה ה- PH0__.",
+      "runAfterConfigState": "ריצה ניתוח לאחר שינוי התצורות: {state} זה ה- PH0__.",
+      "runAfterDependencyState": "הוצא ניתוח לאחר שינוי התלות: {state} זה ה- PH0__.",
+      "uiLanguageState": "שפת ממשק המשתמש: UI language {language} זה ה- PH0__.",
+      "gettingStarted": "התחלנו בהתחלה",
+      "about": "על Saropa Lints",
+      "pubDev": "חבילה ב- pub.dev",
+      "aiInstructions": "ליצור הוראות לסוכן AI הנחיות."
+    },
     "pane": {
       "projectMap": "מפת פרויקט, מפת הפרויקט",
-      "codeHealth": "קוד בריאותי - קוד הבריאות"
+      "codeHealth": "קוד בריאותי - קוד הבריאות",
+      "lintsConfig": "לינטס Config Lints config",
+      "findings": "ממצאים הממצאים",
+      "package": "לוח המחוונים של החבילה (Package Dashboard)",
+      "commandCatalog": "קטלוג פיקוד קאטלוג"
     },
     "projectMap": {
       "scanning": "סריקת מפת פרויקט..."
     },
     "codeHealth": {
       "scanning": "סריקת קוד בריאות..."
+    },
+    "config": {
+      "tier": "רמת התוספת: Tier Tier",
+      "enabledRules": "כללים מופעלים:",
+      "rulePacks": "חבילות כללים של חבילת הכללים",
+      "packages": "חבילות שלחומרי הנסיעה"
+    },
+    "package": {
+      "total": "חבילות שלחומרי הנסיעה",
+      "attention": "דורש תשומת לב.",
+      "blocked": "חסום חוסם",
+      "empty": "עדיין אין סריקה של חבילה  ⁇ פתח את לוח המחוונים כדי להפעיל אחד."
+    },
+    "findings": {
+      "total": "סך הכל, הסכום הכולל.",
+      "errors": "שגיאות טעויות",
+      "warnings": "אזהרות ואזהרות",
+      "info": "אינפורמציה אינפורמטיבית",
+      "empty": "עדיין לא הושלמה ניתוח  ⁇ פתח תוצאות כדי להפעיל אחד."
+    },
+    "catalog": {
+      "commands": "פקודות מפקדיות",
+      "recent": "השתמשו לאחרונה"
     },
     "scanFailed": "סריקה נכשלה. פתח את לוח המחוונים מלא כדי לראות פרטים ולנסות שוב."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, ו- {last}.",
       "message": "חלק מהחלקים לא הצליחו להעלות: {list}.",
       "retry": "נסה שוב, נסי מחדש.",
+      "retrying": "מנסה שוב...",
       "retryTitle": "נסה שוב את ההזמנות הכושלות."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 נפוח)",
       "onDisk": "על דיסק על דיסקי",
       "upgrade": "שדרוג עדכון",
+      "upgrading": "שדרוג... שיפור.",
       "viewChangelog": "הצפייה בלוג שינויים"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "חוקי בית סעיף",
       "owasp": "OWASP",
       "ruleType": "סוג של כלל סוגי הכלל",
-      "ruleStatus": "סטטוס של כלל:"
+      "ruleStatus": "סטטוס של כלל:",
+      "tier": "רמת התוספת: Tier Tier",
+      "pack": "חבילה (ה)"
     },
     "seg": {
       "toggleSeverityTitle": "מתג {v} חומרת החום.",
@@ -685,6 +739,10 @@
       "body1": "Saropa מביא את הנתונים המתאולוגיים של pub.dev, פעילות GitHub וגרפי תלות עבור כל התלות הישירה בפרויקט הזה.",
       "body2": "דף זה יתחדש באופן אוטומטי כאשר הסריקה תסתיים. אתה יכול לבטל את ההודעה על התקדמות בפינה הימנית התחתונה.",
       "versionStamp": "Saropa לוח המחוונים של החבילה v{version}"
+    },
+    "progress": {
+      "aria": "סריקה של חבילות (Package Scan) - התקדמות הסריקת",
+      "starting": "התחלת סריקה..."
     },
     "gaugeTitle": "רמת חבילה של פרויקט: {grade}",
     "summary": {

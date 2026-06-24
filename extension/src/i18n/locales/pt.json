@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Painéis de controle Dashboards",
     "openFull": "Abra o ecrã completo.",
+    "rescan": "Rescan de ressonância",
+    "retry": "Tente novamente.",
+    "paneFailed": "A varredura falhou.",
+    "controls": {
+      "actions": "Ações Ações.",
+      "settings": "Configurações de configuração.",
+      "help": "Ajuda a ajudar.",
+      "runAnalysis": "Execute a análise de execução.",
+      "initializeConfig": "Inicializar / Atualizar a configuração do configurador.",
+      "on": "Em seguida, em seguida.",
+      "off": "Desliga-se, desliga-te e vai embora.",
+      "yes": "Sim, sim, sim. - Não é verdade?",
+      "no": "Não, não, não.",
+      "lintIntegrationState": "Integração da Linha: integração de Lint: {state} É um termo usado para descrever a",
+      "tierState": "Tier: Nível de nível. {tier} É um termo usado para descrever a",
+      "runAfterConfigState": "Execute a análise após a alteração da configuração: {state} É um termo usado para descrever a",
+      "runAfterDependencyState": "Execute a análise após mudança de dependência: {state} É um termo usado para descrever a",
+      "uiLanguageState": "Idioma da interface do usuário: UI language. {language} É um termo usado para descrever a",
+      "gettingStarted": "Começando a começar.",
+      "about": "Sobre o Saropa Lints.",
+      "pubDev": "Embalagem em pub.dev",
+      "aiInstructions": "Crie instruções para o agente de IA."
+    },
     "pane": {
       "projectMap": "Mapa do projeto Mapear o mapa de projetos",
-      "codeHealth": "Código de Saúde Code Health."
+      "codeHealth": "Código de Saúde Code Health.",
+      "lintsConfig": "Lints Config config.",
+      "findings": "Constatos de conclusões.",
+      "package": "Painel de painéis do pacote.",
+      "commandCatalog": "Catálogo de comando do catálogo."
     },
     "projectMap": {
       "scanning": "Mapa de projeto de varredura... mapa do projeto..."
     },
     "codeHealth": {
       "scanning": "Código de saúde do scanner..."
+    },
+    "config": {
+      "tier": "A taxa de referência é Tier Tier.",
+      "enabledRules": "Regras habilitadas: regras ativadas.",
+      "rulePacks": "Pacotes de regras packs.",
+      "packages": "Pacotes de Serviços."
+    },
+    "package": {
+      "total": "Pacotes de Serviços.",
+      "attention": "Precisa de atenção.",
+      "blocked": "Bloqueado bloqueado.",
+      "empty": "Ainda não há varredura de pacotes  ⁇ Abra o painel para executar um."
+    },
+    "findings": {
+      "total": "Total total do total.",
+      "errors": "Erros erros Errores.",
+      "warnings": "Aviso de advertências.",
+      "info": "Informações, informações, informações.",
+      "empty": "Ainda não foi executada nenhuma análise  ⁇ Abertura de Resultados para executar um."
+    },
+    "catalog": {
+      "commands": "Comando de comandos.",
+      "recent": "Recentemente usado."
     },
     "scanFailed": "A varredura falhou. Abra o painel completo para ver os detalhes e tente novamente."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, e o {last}.",
       "message": "Algumas seções não conseguiram carregar: {list}.",
       "retry": "Tente novamente.",
+      "retrying": "Re-tentando... tentando novamente.",
       "retryTitle": "Tente novamente os fetches falhados."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 inchaço)",
       "onDisk": "Em disco em disco.",
       "upgrade": "Atualização de atualização.",
+      "upgrading": "Atualização... atualização.",
       "viewChangelog": "Ver Changelog (Logo de Mudanças)"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Regra de Processo Regra do Processo",
       "owasp": "OWASP",
       "ruleType": "Tipo de regra tipo de regla",
-      "ruleStatus": "Regra status de regra."
+      "ruleStatus": "Regra status de regra.",
+      "tier": "A taxa de referência é Tier Tier.",
+      "pack": "Embalagem (s)"
     },
     "seg": {
       "toggleSeverityTitle": "Troque {v} gravidade da gravidade.",
@@ -685,6 +739,10 @@
       "body1": "Saropa está buscando metadados pub.dev, atividade GitHub e gráficos de dependência para cada dependência direta neste projeto.",
       "body2": "Esta página será atualizada automaticamente quando a varredura terminar. Você pode cancelar a partir da notificação de progresso na parte inferior direita.",
       "versionStamp": "Saropa Painel de Pacote v{version}"
+    },
+    "progress": {
+      "aria": "Pacote escanear progresso de progressão.",
+      "starting": "Começando a varredura..."
     },
     "gaugeTitle": "Pacote do Projeto Grau: {grade}",
     "summary": {

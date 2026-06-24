@@ -68,15 +68,65 @@
   "dashboards": {
     "heroTitle": "Dashibodi Dashboards Dawati.",
     "openFull": "Fungua skrini kamili ya skrini.",
+    "rescan": "Rescan upya Scan tena.",
+    "retry": "Jaribu tena, jaribu tena.",
+    "paneFailed": "Scan imeshindwa.",
+    "controls": {
+      "actions": "Matendo Matendo Vitendo.",
+      "settings": "Uwekaji wa Mipangilio ya Kuweka.",
+      "help": "Msaada wa Kusaidia Msaidizi.",
+      "runAnalysis": "Run uchambuzi kukimbia.",
+      "initializeConfig": "Initialize / Update configig kwa ajili ya kuanza.",
+      "on": "On on on kwenye kwenye kwenye",
+      "off": "Off off off off mbali mbali",
+      "yes": "Yes, yes, yes - Kinda.",
+      "no": "Hapana, hapana, hakuna kitu kama hicho.",
+      "lintIntegrationState": "Ushirikiano wa Lint: Kuunganisha Lint {state} _ PH0__ - Msaada wa kuokoa maisha.",
+      "tierState": "Tier: Kiwango cha juu zaidi. {tier} _ PH0__ - Msaada wa kuokoa maisha.",
+      "runAfterConfigState": "Tumia uchambuzi baada ya mabadiliko ya usanidi: {state} _ PH0__ - Msaada wa kuokoa maisha.",
+      "runAfterDependencyState": "Tumia uchambuzi baada ya mabadiliko ya utegemezi: {state} _ PH0__ - Msaada wa kuokoa maisha.",
+      "uiLanguageState": "Lugha ya UI: lugha ya UI. {language} _ PH0__ - Msaada wa kuokoa maisha.",
+      "gettingStarted": "Kuanza kupata kuanza.",
+      "about": "Kuhusu Saropa Lints",
+      "pubDev": "Package kwenye pub.dev.",
+      "aiInstructions": "Unda maagizo ya wakala wa AI kwa agizo la wakala."
+    },
     "pane": {
       "projectMap": "Ramani ya Mradi wa Mkakati wa Mradi.",
-      "codeHealth": "Kanuni za Afya Code Health."
+      "codeHealth": "Kanuni za Afya Code Health.",
+      "lintsConfig": "Lints Config config imewekwa.",
+      "findings": "Matokeo ya Uchunguzi.",
+      "package": "Dashibodi ya Package Dashboard.",
+      "commandCatalog": "Katalogi ya amri ya amri Catalog."
     },
     "projectMap": {
       "scanning": "Kuchunguza ramani ya mradi wa ... ramani..."
     },
     "codeHealth": {
       "scanning": "Scan code ya afya..."
+    },
+    "config": {
+      "tier": "Tier ya chini ni kiwango cha juu zaidi.",
+      "enabledRules": "Sheria zilizowezeshwa sheria zilizodhibitiwa.",
+      "rulePacks": "Sheria pakiti vifurushi.",
+      "packages": "Pakiti za Package Packages"
+    },
+    "package": {
+      "total": "Pakiti za Package Packages",
+      "attention": "Inahitaji tahadhari.",
+      "blocked": "Blocked Imefungwa imezuiwa",
+      "empty": "Hakuna Scan ya Package bado  ⁇ fungua dashibodi ili kuendesha moja."
+    },
+    "findings": {
+      "total": "Jumla ya jumla ya jumla.",
+      "errors": "Makosa Makosa makosa Makosa.",
+      "warnings": "Maonyo ya onyo Maonyo Onyo.",
+      "info": "Habari za habari habari habari taarifa.",
+      "empty": "Hakuna uchambuzi uliofanywa bado  ⁇ Fungua Matokeo ya kukimbia moja."
+    },
+    "catalog": {
+      "commands": "Amri za amri.",
+      "recent": "Hivi karibuni kutumika kutumika."
     },
     "scanFailed": "Scan imeshindwa. Fungua dashibodi kamili ili kuona maelezo na ujaribu tena."
   },
@@ -115,6 +165,7 @@
       "listMany": "{head}, na {last}.",
       "message": "Baadhi ya sehemu haingeweza kupakia: {list}.",
       "retry": "Jaribu tena, jaribu tena.",
+      "retrying": "Kujaribu tena...",
       "retryTitle": "Jaribu tena fetches zilizofeli."
     },
     "description": {
@@ -141,6 +192,7 @@
       "bloat": "({rating}/10 uvimbe)",
       "onDisk": "On disk On Disk Kwenye diski",
       "upgrade": "Upgrade Kuboresha.",
+      "upgrading": "Kuboresha... kuboresha ...",
       "viewChangelog": "Tazama Changelog"
     },
     "changelog": {
@@ -363,7 +415,9 @@
       "rule": "Kanuni ya Sheria Kanuni za sheria.",
       "owasp": "OWASP",
       "ruleType": "Aina ya sheria aina ya kanuni",
-      "ruleStatus": "Kanuni ya hali ya hadhi."
+      "ruleStatus": "Kanuni ya hali ya hadhi.",
+      "tier": "Tier ya chini ni kiwango cha juu zaidi.",
+      "pack": "Pack (((s) ya bidhaa."
     },
     "seg": {
       "toggleSeverityTitle": "Toggle {v} ukali wa uzito.",
@@ -685,6 +739,10 @@
       "body1": "Saropa inachukua metadata ya pub.dev, shughuli za GitHub na grafu za utegemezi kwa kila utegemee wa moja kwa moja katika mradi huu.",
       "body2": "Ukurasa huu utafurahisha kiotomatiki wakati skanning imekamilika. Unaweza kughairi kutoka kwa taarifa ya maendeleo katika kona ya chini kulia.",
       "versionStamp": "Saropa Dashibodi ya Kifurushi cha Package v{version}"
+    },
+    "progress": {
+      "aria": "Package scan maendeleo ya kazi.",
+      "starting": "Kuanza Scan..."
     },
     "gaugeTitle": "Kiwango cha Pakiti ya Mradi: {grade}",
     "summary": {

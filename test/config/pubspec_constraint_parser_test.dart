@@ -6,10 +6,53 @@
 /// can only be checked through the scan CLI, since custom_lint analyzes `.dart`,
 /// not `.yaml`). Both positive (violating) and negative (compliant) shapes are
 /// covered so the parser cannot regress to a defensive empty-result stub.
+import 'package:saropa_lints/saropa_lints.dart';
 import 'package:saropa_lints/src/config/pubspec_constraint_parser.dart';
 import 'package:test/test.dart';
 
 void main() {
+  // The five constraint rules can only fire through the scan CLI (they target
+  // .yaml, not .dart), so this group pins their metadata — name, prefixed
+  // problem message, correction message — the way every other category test
+  // does. Behavioral coverage lives in the parser groups below.
+  group('Pubspec Constraint - Rule Instantiation', () {
+    void expectMetadata(SaropaLintRule rule, String name) {
+      expect(rule.code.lowerCaseName, name);
+      expect(rule.code.problemMessage, contains('[$name]'));
+      // Project convention: problem messages exceed 200 chars.
+      expect(rule.code.problemMessage.length, greaterThan(200));
+      expect(rule.code.correctionMessage, isNotNull);
+    }
+
+    test('RequireSdkUpperBoundRule', () {
+      expectMetadata(RequireSdkUpperBoundRule(), 'require_sdk_upper_bound');
+    });
+    test('AvoidUnboundedDependencyRule', () {
+      expectMetadata(
+        AvoidUnboundedDependencyRule(),
+        'avoid_unbounded_dependency',
+      );
+    });
+    test('RequireDependencyLowerBoundRule', () {
+      expectMetadata(
+        RequireDependencyLowerBoundRule(),
+        'require_dependency_lower_bound',
+      );
+    });
+    test('PreferCaretConstraintInAppRule', () {
+      expectMetadata(
+        PreferCaretConstraintInAppRule(),
+        'prefer_caret_constraint_in_app',
+      );
+    });
+    test('AvoidOverlyWideAppConstraintRule', () {
+      expectMetadata(
+        AvoidOverlyWideAppConstraintRule(),
+        'avoid_overly_wide_app_constraint',
+      );
+    });
+  });
+
   group('parseConstraint', () {
     test('caret constraint has both bounds and a synthesized upper', () {
       final c = parseConstraint('^1.2.3');
