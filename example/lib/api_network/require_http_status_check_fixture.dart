@@ -104,27 +104,33 @@
 // Source: lib\src\rules\api_network_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
+// The rule gates on the file importing an HTTP client (fileImportsPackage reads
+// the import URI text, so the package need not resolve). Network calls live in
+// service/repository methods, so the bad example is a class method, not a
+// top-level function — that is the shape addMethodDeclaration actually visits.
+import 'package:http/http.dart' as http;
 
 dynamic body;
 dynamic data;
-dynamic http;
 dynamic response;
 dynamic status;
 final url = 'https://example.com';
 
-// BAD: Should trigger require_http_status_check
-// expect_lint: require_http_status_check
-void _bad44() async {
-  final response = await http.get(url);
-  final data = jsonDecode(response.body); // No status check
-}
+class _ApiClient {
+  // BAD: Should trigger require_http_status_check
+  // expect_lint: require_http_status_check
+  void fetchData() async {
+    final response = await http.get(url);
+    final data = jsonDecode(response.body); // No status check
+  }
 
-// GOOD: Should NOT trigger require_http_status_check
-void _good44() async {
-  final response = await http.get(url);
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-  } else {
-    throw HttpException('Failed: ${response.statusCode}');
+  // GOOD: Should NOT trigger require_http_status_check
+  void fetchDataChecked() async {
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+    } else {
+      throw HttpException('Failed: ${response.statusCode}');
+    }
   }
 }

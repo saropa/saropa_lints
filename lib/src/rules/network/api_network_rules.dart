@@ -146,14 +146,23 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_api_urls',
-    '[avoid_hardcoded_api_urls] Hardcoded API URLs prevent switching between development, staging, and production environments, making code inflexible and error-prone. This practice also risks leaking sensitive endpoints and complicates maintenance. Always extract API URLs to configuration constants (e.g., ApiConfig.baseUrl) to enable environment switching and improve security. {v5}',
+    '[avoid_hardcoded_api_urls] Hardcoded API URLs prevent switching between development, staging, and production environments, making code inflexible and error-prone. This practice also risks leaking sensitive endpoints and complicates maintenance. Always extract API URLs to configuration constants (e.g., ApiConfig.baseUrl) to enable environment switching and improve security. {v6}',
     correctionMessage:
         "Extract the URL to a configuration constant (e.g., ApiConfig.baseUrl) so endpoints can be switched per environment without code changes.",
     severity: DiagnosticSeverity.WARNING,
   );
 
+  // Matches a hardcoded API URL by either of two strong signals:
+  //   1. an `api.` host (e.g. https://api.example.com/users) — the subdomain
+  //      alone is a near-certain API endpoint, regardless of the path;
+  //   2. an `/api` path segment under a known TLD (e.g. https://acme.com/api/...).
+  // BUG FIX (2026-06-24): the prior pattern required `/api` in the PATH only, so
+  // it silently missed the most common shape — an `api.` host with a non-/api
+  // path. The rule failed to flag its own fixture example. The `api.` host
+  // branch is a strong signal, so widening here does not raise false positives
+  // on ordinary links (those have neither an `api.` host nor an `/api` path).
   static final RegExp _apiUrlPattern = RegExp(
-    r'https?://[a-zA-Z0-9.-]+\.(com|io|net|org|dev|app)/api',
+    r'https?://(api\.[a-zA-Z0-9.-]+|[a-zA-Z0-9.-]+\.(com|io|net|org|dev|app)/api)',
     caseSensitive: false,
   );
 

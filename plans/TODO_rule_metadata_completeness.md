@@ -72,6 +72,53 @@ the rule produced at least one diagnostic in that fixture file. A declared-but-s
 - **Follow-up (line-precise accuracy-vs-target):** still open, blocked on fixture line-precision. This is
   where `accuracyTarget`'s `expectZeroFalsePositives` / `minTruePositiveRate` would finally be enforced.
 
+### Root cause of the silent rules (2026-06-24 triage)
+
+Per-rule investigation of the silent list found the dominant cause is **inadequate fixtures, not broken
+rules**. A silent rule's fixture typically fails to satisfy the rule's real trigger:
+
+1. **Wrong code context** — the bad example is a top-level function (`void _bad44()`) while the rule only
+   visits class methods (`addMethodDeclaration`), so the rule never sees it.
+2. **Missing required import** — import-gated rules (e.g. `require_http_status_check` needs
+   `package:http`/`package:dio` via `fileImportsPackage`, which reads the import URI *text*, so the package
+   need not resolve) sit in fixtures that only stub `dynamic http;` with no import directive.
+3. **Unrealistic identifiers** — name-gated rules (e.g. `require_connectivity_check` only flags methods
+   named like `fetch*`/`upload*`) have fixtures whose bad example is named `_bad48`.
+
+The fix is to make each fixture realistic: put the bad code in a class method, add the import line the gate
+reads, and name it to match the rule's heuristic. A genuine rule bug (too-narrow detection) is fixed in the
+rule instead — done once so far for `avoid_hardcoded_api_urls`.
+
+### Done so far
+
+- `avoid_hardcoded_api_urls` — real rule bug (regex demanded `/api` path, missed `api.` hosts). Rule
+  widened, version bumped to v6, changelog Fixed entry. silent→fired.
+- `require_http_status_check` — fixture made realistic (class method + `package:http` import). silent→fired.
+- api_network cluster: 20 → 18 silent.
+
+### Remaining worklist (api_network cluster, 18 silent)
+
+Each needs its fixture made realistic per its trigger (registration shown):
+`avoid_cached_image_in_build` (addInstanceCreationExpression — CachedNetworkImage type, needs resolution or
+name match), `avoid_redundant_requests` / `prefer_api_pagination` / `prefer_http_connection_reuse` /
+`require_response_caching` / `require_retry_logic` (addMethodDeclaration — class method + http import),
+`avoid_websocket_without_heartbeat` / `require_connectivity_subscription_cancel` / `require_content_type_check`
+/ `require_geolocator_timeout` / `require_notification_handler_top_level` /
+`require_notification_permission_android13` / `require_permission_denied_handling` /
+`require_permission_rationale` (addMethodInvocation — call-site pattern), `require_api_error_mapping`
+(addTryStatement), `require_cancel_token` (addClassDeclaration), `require_connectivity_check`
+(addMethodDeclaration + name gate `fetch*`).
+
+After api_network, the same triage applies to the remaining ~700 silent rules package-wide — a corpus-quality
+program to run in batches, with the liveness report (`accuracy_report`) verifying each fix flips silent→fired.
+
+### Optional rule-widening (separate, blast-radius)
+
+The `addMethodDeclaration` network rules only catch class methods; a top-level/nested function doing
+`http.get` without a status check is real and currently unprotected. Widening these rules to also visit
+`addFunctionDeclaration` would close that gap (low FP risk — identical body analysis) but changes what fires
+in every consumer project, so it is gated on explicit approval and tracked separately from the fixture work.
+
 ## 4.2 `certIds` sparse/empty **[OPEN — verified — by design]**
 
 By design. Populate per-rule where a clear CERT/CWE mapping exists.
