@@ -25,6 +25,16 @@ surface" dashboards the consolidation plan keeps as separate screens.
   `report-html-top.ts` (535), `report-html-table.ts` (772), `report-html-data.ts` (201). View
   tests (168 across report-html / report-webview / package-detail-html) green; `check-types` clean.
   See Finish Report (2026-06-24) below.
+- **views/commandCatalogRegistry.ts** 1356 → 98-line composer + `commandCatalogTypes.ts` (47),
+  `commandCatalogEntriesProject.ts` (627), `commandCatalogEntriesVibrancy.ts` (530),
+  `commandCatalogEntriesMisc.ts` (115). Composed catalog identical (162 entries, same order);
+  `check-types` clean; 28/29 catalog tests green (the 1 failure — 3 package.json commands missing
+  from the catalog — pre-dates the split and fails identically on HEAD).
+- **views/issuesTree.ts** 1340 → 1020 (partial): extracted node types → `issuesTreeTypes.ts` (79)
+  and the command layer (hide/suppress/copy/apply-fix) → `issuesTreeCommands.ts` (296). The
+  762-line `IssuesTreeProvider` class stays in place — splitting its methods (grouping / item
+  builders / pagination) means converting stateful methods to free functions, a riskier refactor
+  deferred as a follow-up. `check-types` clean; 22/22 tree tests green.
 
 ## Remaining oversized files (by size)
 
@@ -41,9 +51,7 @@ count follows each in parentheses where it changed.
 | views/commandCatalogWebviewHtml.ts | 1881 (was 1856) | markup | none | hero / search-toolbar / frequent+recent bands / category sections / client script |
 | vibrancy/views/report-script.ts | 1876 (was 1463) | client-js | none | filters / sorting / popovers / network-render / footprint-toggle (one IIFE module each) |
 | views/projectVibrancyReportView.ts | 1369 (was 1310) | controller | none | html builder / client script / message handler / controller |
-| views/commandCatalogRegistry.ts | 1356 (was 1348) | data | yes | split the catalog entries by category group into data files |
 | views/violationsDashboardStyles.ts | 1350 (was 1297) | css | none | split by component (hero / kpi / toolbar / table / panels / chart) |
-| views/issuesTree.ts | 1340 (was 1338) | tree-logic | yes | tree-data provider / grouping / tree-item builders / pagination |
 | views/dashboardChromeStyles.ts | 1199 (was 1115) | css | none | split by component band |
 | vibrancy/views/report-styles.ts | 1152 (was 930) | css | none | split by report section |
 | views/violationsWideReportView.ts | 952 (was 905) | controller | none | html builder / message handler / controller |

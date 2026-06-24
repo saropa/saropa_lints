@@ -16,12 +16,44 @@ all shipped. These are the gaps.
 
 ---
 
-## 4.1 `accuracyTarget` null for every rule **[OPEN — verified — consumer-gated]**
+## 4.1 Accuracy measurement gate that reads `accuracyTarget` **[IN PROGRESS 2026-06-24]**
 
-The getter exists; nothing populates it. Intentional until an audit/report consumes it.
+Premise correction: `accuracyTarget` is **not** unpopulated. It is a derived getter
+([saropa_lint_rule.dart:2288](../lib/src/saropa_lint_rule.dart#L2288)) computed from `ruleType`, and
+it is already serialized into [extension/media/rules_catalog.json](../extension/media/rules_catalog.json)
+and read by the extension. So every rule with a `ruleType` already carries a target. The actual gap is
+that **nothing measures a rule's real accuracy against that target** — the `*_expect_lint_contract_test.dart`
+integrity tests only assert that a fixture *declares* an `expect_lint` marker; they never run the rule to
+confirm it fires (or that it does not over-fire).
 
-Action: do **not** bulk-populate speculatively. Populate only when a consumer (a quality report or
-gate that reads `accuracyTarget`) is built — populate as part of that consumer's work.
+The consumer to build is an accuracy report/gate, not a metadata backfill.
+
+### Design — `bin/accuracy_report.dart` (+ `lib/src/report/accuracy_report.dart` core)
+
+Mirrors the `quality_gate` split: a testable library core plus a thin CLI that exits non-zero on breach
+so CI can gate on it.
+
+1. **Targets** — enumerate `allSaropaRules`; per rule read `rule.code.name` + `rule.accuracyTarget`
+   (`expectZeroFalsePositives` for bug/codeSmell, `minTruePositiveRate` ~0.8 for vulnerability/securityHotspot).
+2. **Ground truth** — parse every `// expect_lint: <rule>` marker under `example/lib/` (1,383 markers).
+   Marker on its own line → diagnostic expected on the next line; trailing marker → same line. Comma-separated
+   rule lists supported.
+3. **Actual** — run `ScanRunner` (the [scan.dart](../lib/scan.dart) programmatic API) over the fixtures and
+   collect `(rule, file, line)` per diagnostic. Use `runResolved()` so type/instance-creation rules fire.
+4. **Per-rule tally** — TP = expected marker that fired; FN = expected marker that did not fire (under-firing);
+   FP-candidate = diagnostic with no matching marker (over-firing).
+5. **Compare to target & report** — bug/codeSmell: any FP-candidate is a target miss; vulnerability/securityHotspot:
+   `TP/(TP+FN) < minTruePositiveRate` is a miss. Emit JSON + text summary; exit 1 on breach.
+
+### FP attribution risk (decided)
+
+A fixture file holds other rules' bad examples too, so an unmarked hit is only a true FP if the fixture's
+`expect_lint` markers are exhaustive — which is not yet proven. Therefore:
+
+- **FN (missed expected lint) → hard fail.** Unambiguous: the rule was asserted to fire and did not.
+- **FP-candidate (unmarked hit) → report only, never hard-fail** until the fixture set is proven exhaustive.
+
+Controlled by `--fail-on fn|fp|none` (default `fn`).
 
 ## 4.2 `certIds` sparse/empty **[OPEN — verified — by design]**
 
