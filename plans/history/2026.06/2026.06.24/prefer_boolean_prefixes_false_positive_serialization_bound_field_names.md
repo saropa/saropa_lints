@@ -1,8 +1,33 @@
 # BUG: `prefer_boolean_prefixes` — fires on fields whose name is bound to a serialization / schema contract
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
+
+> **Fix (2026-06-24):** `PreferBooleanPrefixesRule` now skips a `bool` field when
+> its enclosing class carries a persistence annotation (`@collection`, `@embedded`,
+> `@DataClassName`) or the field itself carries `@JsonKey`. Ordinary private/state
+> booleans (`bool _resolved`) still flag. Implemented via `_isContractBoundField`
+> in `lib/src/rules/core/naming_style_rules.dart`; class lookup uses
+> `thisOrAncestorOfType<ClassDeclaration>()` because the scan CLI's syntactic parse
+> does not always expose the direct `node.parent` link. Fixture cases added to
+> `example/lib/naming_style/prefer_boolean_prefixes_fixture.dart`.
+
+## Fix (2026-06-24)
+
+`PreferBooleanPrefixesRule` now skips a `bool` field when its name is bound to a
+serialization/schema contract — implemented as `_isContractBoundField` in
+`naming_style_rules.dart`:
+
+- the enclosing class carries a persistence annotation: `@collection` / `@embedded`
+  (Isar) or `@DataClassName` (Drift row), or
+- the field itself carries `@JsonKey`.
+
+Ordinary private/state booleans (no annotation) still flag — verified: in an isolated
+scan, the Isar/Drift/JSON fields produce no lint while a plain class's `bool resolved` /
+`bool enabled` are still reported. Fixture updated at
+`example/lib/naming_style/prefer_boolean_prefixes_fixture.dart` with the four cases;
+CHANGELOG `[Unreleased] → Fixed` entry added.
 
 Created: 2026-06-24
 Rule: `prefer_boolean_prefixes`
@@ -164,3 +189,56 @@ The fixture at `example*/lib/core/prefer_boolean_prefixes_fixture.dart` should i
   hits in `bugs/issue_shrink_wrap.log`; the database-layer subset
   (`contact_db_model.dart`, `contact_group_db_model.dart`, `drift_database.dart`,
   `version_policy_model.dart`, `release_notes_catalog.dart`) is what this report covers.
+
+---
+
+## Finish Report (2026-06-24)
+
+### Defect
+
+`PreferBooleanPrefixesRule` flagged every unprefixed `bool` class field, including
+fields whose Dart name is an external persistence key (Isar property, Drift column,
+JSON wire key). Renaming such a field breaks already-persisted data or desyncs
+serialization, so the only resolutions a consumer had were a storage-breaking rename
+or a per-site `// ignore:`. The rule's only exemption was the exact name `value` plus
+the prefix/suffix whitelist; it never inspected field or class annotations.
+
+### Change
+
+Added `_isContractBoundField(FieldDeclaration)` to `PreferBooleanPrefixesRule` in
+`lib/src/rules/core/naming_style_rules.dart`. The field-declaration callback returns
+early (no diagnostic) when:
+
+- the field carries `@JsonKey` (`_persistenceFieldAnnotations`), or
+- the enclosing class carries `@collection` / `@Collection` / `@embedded` /
+  `@Embedded` (Isar) or `@DataClassName` (Drift) (`_persistenceClassAnnotations`).
+
+The enclosing class is resolved with `node.thisOrAncestorOfType<ClassDeclaration>()`
+rather than a direct `node.parent` cast. A first implementation used `node.parent`,
+which left `@collection` fields still firing under the scan CLI's syntactic parse —
+that parse does not always expose the direct parent link. The ancestor walk is robust
+to that and to nesting.
+
+Scope is deliberately narrow: only the field-checking `PreferBooleanPrefixesRule`
+reaches persisted fields, so the locals/params sibling rules were not touched. Private
+runtime flags (`bool _resolved`) carry no persistence annotation and remain true
+positives.
+
+### Verification
+
+Verified through the scan CLI with the stylistic rule enabled via a local
+`analysis_options.yaml` (`prefer_boolean_prefixes: true`), since the rule is opt-in
+and absent from every tier:
+
+| Input | Result |
+|---|---|
+| `@collection` class, `bool? deleted` | no diagnostic |
+| `@DataClassName('V')` class, `bool deleted` | no diagnostic |
+| `@JsonKey(name: 'k')` field, `bool deleted` | no diagnostic |
+| plain class, `bool _resolved` | diagnostic (true positive preserved) |
+
+Fixture cases 1–4 added to
+`example/lib/naming_style/prefer_boolean_prefixes_fixture.dart`. The rule's unit test
+(`test/rules/core/naming_style_rules_test.dart`, an instantiation pin) passes
+(`dart test --no-pub`, exit 0). CHANGELOG `[Unreleased] > Fixed` already carried the
+matching entry.

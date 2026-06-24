@@ -87,6 +87,8 @@ Consolidates four overlapping `shrinkWrap: true` rules down to one. A single scr
 - Split the extension's 1709-line Package Vibrancy report builder into a thin composer plus four focused sibling modules (shared helpers, top chrome, package table, data payloads). Behavior-preserving — the rendered report is byte-identical. No action required.
 - Split the 1356-line command-catalog registry into a types module, three per-group entry data files, and a thin composer. Behavior-preserving — the composed catalog is identical (162 entries, same order). No action required.
 - Extracted the Issues tree's node types and its command layer (hide/suppress, copy, apply-fix) out of the 1340-line `issuesTree.ts` into sibling modules, leaving the tree-data provider in place. Behavior-preserving; the tree's tests pass unchanged. No action required.
+- Split the two largest dashboard stylesheets (`dashboardChromeStyles.ts`, `violationsDashboardStyles.ts`) into per-section sibling modules behind thin composers. The generated CSS is byte-identical. No action required.
+- Added a rule-liveness report (`dart run saropa_lints:accuracy_report`) that scans the `expect_lint` fixtures and flags any rule declared in a fixture but never firing there — a gap the marker-text contract tests cannot catch. Report-only; not yet wired into CI. No action required.
 
 </details>
 
