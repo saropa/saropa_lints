@@ -2225,6 +2225,7 @@ const Set<String> professionalOnlyRules = <String>{
   'avoid_drift_replace_without_all_columns', // INFO - replace() loses data
   'avoid_drift_missing_updates_param', // INFO - streams won't update
   'prefer_drift_foreign_key_declaration', // INFO - FK column without references()
+  'require_named_for_acronym_drift_columns', // WARNING - acronym column without .named() -> surprising SQL name
   'require_sqflite_transaction',
   'prefer_sqflite_batch',
   'require_sqflite_error_handling',
@@ -3992,6 +3993,7 @@ const Set<String> driftPackageRules = <String>{
   'avoid_isar_import_with_drift',
   'prefer_drift_foreign_key_declaration',
   'require_drift_onupgrade_handler',
+  'require_named_for_acronym_drift_columns',
 };
 
 // ---------------------------------------------------------------------------

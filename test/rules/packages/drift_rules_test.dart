@@ -214,6 +214,12 @@ void main() {
       'require_drift_onupgrade_handler',
       () => RequireDriftOnUpgradeHandlerRule(),
     );
+
+    testRule(
+      'RequireNamedForAcronymDriftColumnsRule',
+      'require_named_for_acronym_drift_columns',
+      () => RequireNamedForAcronymDriftColumnsRule(),
+    );
   });
 
   group('Drift Rules - Fixture Verification', () {
@@ -250,6 +256,7 @@ void main() {
       'avoid_isar_import_with_drift',
       'prefer_drift_foreign_key_declaration',
       'require_drift_onupgrade_handler',
+      'require_named_for_acronym_drift_columns',
     ];
 
     for (final fixture in fixtures) {

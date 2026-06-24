@@ -1758,6 +1758,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidIsarImportWithDriftRule.new,
   PreferDriftForeignKeyDeclarationRule.new,
   RequireDriftOnUpgradeHandlerRule.new,
+  RequireNamedForAcronymDriftColumnsRule.new,
 
   // Part 5 - sqflite Database rules
   RequireSqfliteWhereArgsRule.new,

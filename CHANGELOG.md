@@ -66,9 +66,25 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Added
+
+- **New rule `require_named_for_acronym_drift_columns` (Professional) flags Drift column getters with an acronym that omit `.named()`.** Drift's snake_case converter inserts an underscore before every uppercase letter, so `contactSaropaUUID` becomes the SQL column `contact_saropa_u_u_i_d` — not the `contact_saropa_uuid` a human predicts — and raw SQL written against the expected name crashes with "no such column" at runtime. The rule is report-only because pinning a column that already shipped renames it and needs a migration; add `.named('snake_case')` on new acronym columns to keep source and schema in sync. No action required.
+
 ### Fixed
 
-- **`avoid_hardcoded_api_urls` now flags hardcoded URLs on an `api.` host, not just `/api` paths.** The detection pattern previously required `/api` in the URL path, so the most common shape — an `api.` subdomain with an ordinary path such as `https://api.example.com/users` — slipped through and the rule missed its own documented bad example. URLs with neither an `api.` host nor an `/api` path still pass, so ordinary links are unaffected. No action required.
+- **`avoid_hardcoded_api_urls` now flags hardcoded URLs on an `api.` host, not just `/api` paths.** The detection pattern previously required `/api` in the URL path, so the most common shape — an `api.` subdomain with an ordinary path such as `https://api.example.com/users` — slipped through and the rule missed its own documented bad example. URLs with neither an `api.` host nor an `/api` path still pass, so ordinary links are unaffected. No action required. [log](https://github.com/saropa/saropa_lints/blob/v14.2.1/CHANGELOG.md)
+
+### Added (Extension)
+
+- **Package Vibrancy detail pane adds a "Copy upgrade prompt for AI" button.** It assembles a ready-to-paste prompt from the package's changelog — the new features classified as adoption candidates, plus your project's own call sites for that package — so you can hand an AI everything it needs to suggest where the new features fit, instead of pasting a raw changelog. The button appears whenever a package has adoptable features; open a package and click it to copy. No action required.
+- **Adoption opportunities now surface for up-to-date packages, not just outdated ones.** A caret constraint quietly carries a package across releases whose new features you may never have adopted — being on the latest version does not mean you use everything it offers. The scan now mines each package's full changelog history and cross-references it against the symbols your code actually uses, so a fully up-to-date package with unused capabilities still flags features worth reviewing. No action required.
+- **Package Vibrancy table gains a sortable "Opportunities" column to find the needles across many packages.** Each package shows the count of changelog features it offers that your code does not yet use (the unused feature names are in the cell tooltip); sort by the column to bring the most under-adopted packages to the top. The column hides itself when nothing is unadopted. No action required.
+- **Toolbar adds "Copy opportunities for AI" to triage the whole project in one paste.** It bundles the AI upgrade prompts of the highest-relevance under-adopted packages into a single clipboard copy, so one AI round can review the project instead of opening each package. The button appears only when at least one package has an adoptable feature. No action required.
+- **The Package Dashboard sidebar row shows a count of packages with features worth adopting.** The "Package Dashboard" entry in the Saropa Lints sidebar (Editor dashboards section) now reads "… · N to adopt" after a scan, so under-used dependencies are visible without opening the dashboard. The count refreshes with each scan and clears when nothing is unadopted. No action required.
+
+### Fixed (Extension)
+
+- **The "Unused features" tooltip now reads cleanly in 20 non-English locales.** Machine translation had appended hallucinated text after the `{features}` placeholder (stray sentences and leaked `_PH0_` sentinel fragments), so the tooltip displayed garbage in languages such as German, Spanish, Japanese, and Russian. Each locale's value was rewritten to the plain "<unused features>: {features}" form. No action required.
 
 ### Changed (Extension)
 
@@ -77,7 +93,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 <details><summary>Maintenance</summary>
 
-- Added a changelog opportunity miner that classifies the already-fetched changelog delta into adoption candidates ("a new feature you could use") using text heuristics only — no AI — and ranks them against how heavily the project uses the package. Service layer with unit tests; not yet surfaced in the dashboard UI. No action required.
+- Added a changelog opportunity miner (engine behind the "Copy upgrade prompt for AI" button) that classifies a package's full changelog history into adoption candidates ("a new feature you could use") using text heuristics only — no AI — extracts the API names each feature introduces, and cross-references them against the symbols the project actually uses to rank what is genuinely unadopted. The project source is walked once, shared between the import scan and the symbol-usage scan. Service layer with unit tests. No action required.
 - Added a rule-liveness report (`dart run saropa_lints:accuracy_report`) that scans the `expect_lint` fixtures and flags any rule declared in a fixture but never firing there — a gap the marker-text contract tests cannot catch. Report-only; not yet wired into CI. No action required.
 - Made every api_network fixture actually exercise its rule. The bad examples were stubs — top-level functions where the rule visits class methods, or missing the package import the rule gates on — so 20 of the network rules never fired on their own fixtures. Each bad example is now a realistic class method with the required import; all 34 api_network rules now trigger. Fixtures only; no rule behavior changed. No action required.
 - Started the same fixture-adequacy pass on code_quality rules: wrapped four bad examples the rule could never see (positional/named bool params and an unnecessary override need a class method; a duplicate-const example needed top-level declarations) so the rules now trigger. Fixtures only; no rule behavior changed. No action required.
@@ -88,7 +104,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [14.2.0]
 
-Consolidates four overlapping `shrinkWrap: true` rules down to one. A single scrollable could be flagged by up to four differently-named diagnostics, so a site suppressed under one rule name was re-flagged under another; the redundant three are now deprecated and `avoid_shrink_wrap_expensive` is the canonical rule covering the whole concern. [log](https://github.com/saropa/saropa_lints/blob/v14.2.1/CHANGELOG.md)
+Consolidates four overlapping `shrinkWrap: true` rules down to one. A single scrollable could be flagged by up to four differently-named diagnostics, so a site suppressed under one rule name was re-flagged under another; the redundant three are now deprecated and `avoid_shrink_wrap_expensive` is the canonical rule covering the whole concern. [log](https://github.com/saropa/saropa_lints/blob/v14.2.0/CHANGELOG.md)
 
 ### Changed
 

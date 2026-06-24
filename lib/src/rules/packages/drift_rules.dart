@@ -3525,3 +3525,162 @@ class RequireDriftOnUpgradeHandlerRule extends SaropaLintRule {
     });
   }
 }
+
+// =============================================================================
+// require_named_for_acronym_drift_columns
+// =============================================================================
+
+/// Warns when a Drift column getter whose name contains an acronym run
+/// (2+ consecutive uppercase letters) omits an explicit `.named()` SQL name.
+///
+/// Since: v14.2.1 | Rule version: v1
+///
+/// Drift's default `snake_case` converter inserts an underscore before EVERY
+/// uppercase letter, so an acronym expands one-letter-per-underscore:
+/// `contactSaropaUUID` becomes the SQL column `contact_saropa_u_u_i_d`, not the
+/// `contact_saropa_uuid` a human reading the Dart name predicts. Any raw SQL
+/// (`customSelect` / `customStatement` / migration DDL) authored against the
+/// "obvious" name throws `no such column` at runtime — a crash that only shows
+/// up when the raw query runs, never at compile time. Pinning the SQL name with
+/// `.named('snake_case')` makes source and schema agree, eliminating the whole
+/// surprising-name mismatch class.
+///
+/// Report-only by design: adding `.named()` to a column that has ALREADY
+/// shipped renames the physical column and needs a migration, so the rule does
+/// not auto-rewrite. The value is forcing the NEXT new acronym column to pin
+/// its name, not mass-renaming live schema.
+///
+/// **BAD:**
+/// ```dart
+/// class ContactAvatars extends Table {
+///   // Generates `contact_saropa_u_u_i_d` — a magnet for `no such column`.
+///   TextColumn get contactSaropaUUID => text()();
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class ContactAvatars extends Table {
+///   TextColumn get contactSaropaUUID =>
+///       text().named('contact_saropa_uuid')();
+///   // No acronym run — default snake_case is already unsurprising.
+///   TextColumn get displayName => text()();
+/// }
+/// ```
+class RequireNamedForAcronymDriftColumnsRule extends SaropaLintRule {
+  RequireNamedForAcronymDriftColumnsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'packages'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'require_named_for_acronym_drift_columns',
+    '[require_named_for_acronym_drift_columns] Drift column getter contains an '
+        'acronym (2+ consecutive uppercase letters) but does not pin its SQL '
+        'name with .named(). The default snake_case converter inserts an '
+        'underscore before every uppercase letter, so an acronym like UUID '
+        'expands to _u_u_i_d (contactSaropaUUID -> contact_saropa_u_u_i_d) — '
+        'not the name a human predicts. Raw SQL authored against the expected '
+        'name throws "no such column" at runtime. {v1}',
+    correctionMessage:
+        'Add .named(\'<snake_case>\') to the column builder so the generated '
+        'SQL name matches the Dart name a human expects (contactSaropaUUID -> '
+        '.named(\'contact_saropa_uuid\')). Report-only: pinning a column that '
+        'already shipped renames it and needs a migration.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  /// Matches a run of 2+ consecutive uppercase letters anywhere in the
+  /// identifier. A trailing plural `s` after the run (`contactSaropaUUIDs`)
+  /// does not break the run, so it still matches.
+  static final RegExp _acronymRun = RegExp(r'[A-Z]{2,}');
+
+  /// Drift column-builder entry points — the root call of a column getter's
+  /// chain. The getter must be one of these for the SQL-name converter to
+  /// apply; ordinary getters/methods that happen to contain an acronym are
+  /// not Drift columns and must not be flagged.
+  static const Set<String> _columnBuilders = <String>{
+    'integer',
+    'int64',
+    'text',
+    'boolean',
+    'dateTime',
+    'real',
+    'blob',
+    'intEnum',
+    'textEnum',
+    'customType',
+  };
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addClassDeclaration((ClassDeclaration node) {
+      // Only Drift table definitions declare snake_case-converted columns.
+      if (!_extendsDriftTable(node)) return;
+      if (!fileImportsPackage(node, PackageImports.drift)) return;
+
+      for (final member in node.bodyMembers) {
+        if (member is! MethodDeclaration) continue;
+        if (!member.isGetter) continue;
+
+        // The acronym run is what makes the generated name surprising;
+        // a column with no run gets an unsurprising default and is fine.
+        if (!_acronymRun.hasMatch(member.name.lexeme)) continue;
+
+        final body = member.body;
+        if (body is! ExpressionFunctionBody) continue;
+
+        // Collect every method name in the builder chain so detection is
+        // independent of call order (.nullable().named() vs .named().nullable()).
+        final chainNames = <String>{};
+        _collectChainMethodNames(body.expression, chainNames);
+
+        // Confirm this getter is an actual Drift column builder, not an
+        // unrelated computed getter that happens to contain an acronym.
+        if (chainNames.intersection(_columnBuilders).isEmpty) continue;
+
+        // Already pinned — source and schema agree, nothing to warn about.
+        if (chainNames.contains('named')) continue;
+
+        reporter.atToken(member.name);
+      }
+    });
+  }
+}
+
+/// Collects the method names of every invocation in a Drift column-builder
+/// chain rooted at [expr]. Walks through the trailing build call
+/// (`FunctionExpressionInvocation`, e.g. the final `()` in `text()()`),
+/// chained method calls, and parentheses so callers can test for both the
+/// root builder (`text`/`integer`/…) and any `.named(` in one pass.
+void _collectChainMethodNames(Expression expr, Set<String> names) {
+  Expression? current = expr;
+  while (current != null) {
+    if (current is FunctionExpressionInvocation) {
+      current = current.function;
+      continue;
+    }
+    if (current is ParenthesizedExpression) {
+      current = current.expression;
+      continue;
+    }
+    if (current is MethodInvocation) {
+      names.add(current.methodName.name);
+      current = current.target;
+      continue;
+    }
+    return;
+  }
+}
