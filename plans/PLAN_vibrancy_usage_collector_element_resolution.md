@@ -4,7 +4,10 @@
 **Split from:** `TODO_vibrancy_residual_surfaces.md` §5.4 (parent TODO archived to `history/2026.06/2026.06.24/`)
 **Source plan:** `history/2026.04/2026.04.28/project_vibrancy_report.md` (§ Usage / Orphan State, § Analyzer isolation, § Two-tier cache)
 **Subsystem:** `lib/src/cli/project_vibrancy.dart` (Dart-side collector) + `extension/src/vibrancy/` (subprocess host)
-**Status:** OPEN — verified name-based as of 2026-06-24
+**Status:** Phases 1-2 LANDED 2026-06-24 (element-resolved counts + entry-point exclusions, degrade-safe;
+`lib/src/cli/project_vibrancy_resolved_usage.dart`, tests in `test/cli/project_vibrancy_resolved_usage_test.dart`).
+Phases 3-5 (tree-SHA usage cache, dedicated killable/chunked subprocess, cascading unused) still OPEN —
+deferred pending precision review of the resolved `unused` flag on real repos.
 
 ---
 

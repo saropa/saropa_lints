@@ -121,3 +121,30 @@ class _good484_MyClass {
 void myFunction() {
   bool enabled = true; // OK - local variable
 }
+
+// GOOD: field name is an Isar stored property — renaming breaks persisted data.
+// No lint despite missing prefix.
+@collection
+class _good484_IsarModel {
+  bool? deleted; // OK - @collection makes the name a storage contract
+  bool familyNameFirstOverride = false; // OK - same reason
+}
+
+// GOOD: field name is a Drift row column — bound by @DataClassName.
+@DataClassName('VersionPolicy')
+class _good484_DriftRow {
+  bool forceUpgrade = false; // OK - column-mapped field name
+}
+
+// GOOD: field is @JsonKey-bound — the Dart name mirrors the wire key.
+class _good484_JsonModel {
+  @JsonKey(name: 'force_upgrade')
+  final bool forceUpgrade = false; // OK - renaming desyncs serialization
+}
+
+// BAD: private runtime flag in a plain class — freely renamable, true positive.
+// expect_lint: prefer_boolean_prefixes
+class _bad484_PlainState {
+  bool _resolved = false; // Should be _isResolved
+  bool enabled = true; // Should be isEnabled
+}

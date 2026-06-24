@@ -75,14 +75,18 @@ Consolidates four overlapping `shrinkWrap: true` rules down to one. A single scr
 ### Fixed
 
 - **`prefer_static_final_for_session_constant` no longer flags `ThemeCommonSize` or `ThemeCommonFontSize` arithmetic.** Those getters fold the avatar-scale preference and the system text scale, so hoisting them to a `static final` would freeze a value the user can change and show a stale UI; the rule now treats only `ThemeCommonSpace` as session-constant. No action required.
+- **`prefer_boolean_prefixes` no longer flags boolean fields whose name is a serialization or schema contract.** Fields on an Isar `@collection`/`@embedded` class, a Drift `@DataClassName` row, or carrying `@JsonKey` map their Dart name to a stored property, column, or wire key, so a rename would break persisted data or desync serialization; these are now exempt while ordinary private and state booleans still flag. No action required.
 
 ### Changed (Extension)
 
+- **Code Health usage counts and the `unused` flag are now resolved per declaration, not matched by name.** Previously every function sharing a name pooled into one count, so a heavily-used `_dispose` made every other `_dispose` look used and hid true orphans; usage is now attributed to the exact declaration each reference binds to, and runtime entry points (`main`, `@pragma('vm:entry-point')`, framework `@override` lifecycle hooks) are no longer mislabeled `unused`. No action required; scans fall back to the prior name-based count when a project cannot be resolved.
 - **Manage Rule Packs treats a package's version variants as a pick-one choice.** Packs targeting different majors of the same dependency (`dio` vs `dio 5.x`, Riverpod 2 vs 3, `app_links` vs `app_links 6.x`, and similar) now carry a "Pick one version" tag and are mutually exclusive — enabling one variant turns its siblings off, and `rule_packs.enabled` can never list two versions of the same package at once. No action required; the lockfile already gates rules to the version you ship.
 
 <details><summary>Maintenance</summary>
 
 - Split the extension's 1709-line Package Vibrancy report builder into a thin composer plus four focused sibling modules (shared helpers, top chrome, package table, data payloads). Behavior-preserving — the rendered report is byte-identical. No action required.
+- Split the 1356-line command-catalog registry into a types module, three per-group entry data files, and a thin composer. Behavior-preserving — the composed catalog is identical (162 entries, same order). No action required.
+- Extracted the Issues tree's node types and its command layer (hide/suppress, copy, apply-fix) out of the 1340-line `issuesTree.ts` into sibling modules, leaving the tree-data provider in place. Behavior-preserving; the tree's tests pass unchanged. No action required.
 
 </details>
 

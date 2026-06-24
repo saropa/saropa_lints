@@ -22,6 +22,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/generated_dart_files.dart';
 import 'package:saropa_lints/src/cli/project_vibrancy_coverage_quality.dart';
+import 'package:saropa_lints/src/cli/project_vibrancy_resolved_usage.dart';
 
 /// Live progress + cooperative pause/cancel sink for [runProjectVibrancy].
 ///
@@ -343,6 +344,16 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     progress: progress,
     root: root,
   );
+  // Element-resolved usage: counts each reference against the declaration it
+  // actually binds to, and computes the runtime-invoked entry-point set. Runs
+  // AFTER the name-based pass so its result is a refinement (and a fallback
+  // source) rather than a replacement — see _mergeUsageCount. A null result
+  // (resolution unavailable) leaves the name-based counts untouched.
+  final resolvedUsage = await _collectResolvedUsage(
+    root: root,
+    targetFiles: extendedForUsage.keys.toList(growable: false),
+    progress: progress,
+  );
   final blameByFile = await _collectBlameAges(
     files,
     cache,
@@ -379,7 +390,11 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
         ? 50.0
         : effectiveCoverage * 100.0;
     final ageScore = _computeAgeScore(fn, blameByFile[fn.filePath]);
-    final usageCount = usageCounts[fn.id] ?? 0;
+    final usageCount = _mergeUsageCount(
+      id: fn.id,
+      nameBased: usageCounts[fn.id] ?? 0,
+      resolved: resolvedUsage,
+    );
     final usageScore = _usageBucket(usageCount).toDouble();
     final complexityScore = _complexityScore(fn.complexity);
     final documentationScore = _documentationScore(content, fn);
@@ -426,7 +441,13 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     final grade = _scoreToGrade(rounded);
     final category = _scoreToCategory(rounded);
     final flags = <String>[];
-    if (usageCount == 0) flags.add('unused');
+    // Entry points (main, @pragma('vm:entry-point'), framework @override
+    // lifecycle hooks) are runtime-invoked, not statically called, so a
+    // zero static-caller count is expected for them — never `unused`. The
+    // protection is only available when resolution ran; under the name-based
+    // fallback the flag keeps its prior (count==0) behavior.
+    final isEntryPoint = resolvedUsage?.entryPointIds.contains(fn.id) ?? false;
+    if (usageCount == 0 && !isEntryPoint) flags.add('unused');
     if (rawCoverage != null && rawCoverage == 0) flags.add('uncovered');
     if (stubTested) flags.add('stub_tested');
     if (suspiciousCoverage) flags.add('suspicious_coverage');
@@ -865,6 +886,59 @@ Map<String, int> _computeUsageCounts(
     counts[fn.id] = referencesByName[fn.name] ?? 0;
   }
   return counts;
+}
+
+/// Runs the element-resolved usage pass and streams its progress as `resolve`
+/// phase events, so the dashboard bar advances during what is otherwise the
+/// scan's heaviest single step. Returns null on any resolution failure; the
+/// caller then keeps the name-based counts (see [_mergeUsageCount]).
+Future<ResolvedUsage?> _collectResolvedUsage({
+  required String root,
+  required List<String> targetFiles,
+  ProjectScanProgress? progress,
+}) async {
+  progress?.onEvent(<String, Object?>{
+    'event': 'phase',
+    'phase': 'resolve',
+    'total': targetFiles.length,
+  });
+  return collectResolvedUsage(
+    projectPath: root,
+    targetFiles: targetFiles,
+    onProgress: (done, total) {
+      // Throttle like the other phases: one tick per 25 files keeps the bar
+      // moving without flooding stderr on a large project.
+      if (done % 25 == 0 || done == total) {
+        progress?.onEvent(<String, Object?>{
+          'event': 'tick',
+          'phase': 'resolve',
+          'done': done,
+          'total': total,
+        });
+      }
+    },
+  );
+}
+
+/// Reconciles the name-based count with the element-resolved count for one
+/// declaration [id], biased to never flag live code `unused`:
+///   - no resolved data -> name-based (degrade-safe).
+///   - declaration absent from the resolved set (its file failed to resolve) ->
+///     name-based, because absence is not evidence of zero callers.
+///   - resolved count > 0 -> trust it (real callers, collision-free).
+///   - resolved count == 0 -> trust the zero ONLY when the whole project
+///     resolved; otherwise a caller may live in an unresolved file, so fall back
+///     to the (over-counting, never-false-unused) name-based value.
+int _mergeUsageCount({
+  required String id,
+  required int nameBased,
+  required ResolvedUsage? resolved,
+}) {
+  if (resolved == null) return nameBased;
+  final resolvedCount = resolved.countsById[id];
+  if (resolvedCount == null) return nameBased;
+  if (resolvedCount > 0) return resolvedCount;
+  return resolved.fullyResolved ? 0 : nameBased;
 }
 
 Map<String, int> _collectReferenceCounts(

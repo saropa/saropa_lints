@@ -793,6 +793,13 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
       if (type is! NamedType) return;
       if (type.name.lexeme != 'bool') return;
 
+      // Skip fields whose name is bound to a serialization/schema contract.
+      // Renaming `bool deleted` to `bool isDeleted` on an Isar/Drift/JSON model
+      // renames the stored property/column or wire key and breaks already
+      // persisted data — a naming-convention lint must not demand that. Ordinary
+      // private/state booleans (no persistence annotation) still flag.
+      if (_isContractBoundField(node)) return;
+
       for (final VariableDeclaration variable in node.fields.variables) {
         final String name = variable.name.lexeme;
         // Strip leading underscore for checking
@@ -860,6 +867,51 @@ class PreferBooleanPrefixesRule extends SaropaLintRule {
         return true;
       }
     }
+    return false;
+  }
+
+  /// Class-level annotations that make every field name a stored contract.
+  ///
+  /// `@collection`/`@embedded` (Isar) map each property name to a stored key;
+  /// `@DataClassName` marks a Drift row class whose field names mirror columns.
+  static const Set<String> _persistenceClassAnnotations = <String>{
+    'collection',
+    'Collection',
+    'embedded',
+    'Embedded',
+    'DataClassName',
+  };
+
+  /// Field-level annotations binding the field name to an external key.
+  ///
+  /// `@JsonKey` ties the Dart identifier to a wire key; renaming desyncs
+  /// serialization. `@JsonSerializable` on the field path is covered by the
+  /// class-level check via the model class.
+  static const Set<String> _persistenceFieldAnnotations = <String>{'JsonKey'};
+
+  /// True when this field's name is bound to a serialization/schema contract,
+  /// either via a persistence annotation on its enclosing class or via a
+  /// key-binding annotation on the field itself.
+  bool _isContractBoundField(FieldDeclaration node) {
+    for (final Annotation annotation in node.metadata) {
+      if (_persistenceFieldAnnotations.contains(annotation.name.name)) {
+        return true;
+      }
+    }
+
+    // Walk to the enclosing declaration rather than assuming `node.parent` is
+    // the class: the scan CLI's syntactic parse does not always expose the
+    // direct parent link, and the field may sit inside a class/mixin/extension.
+    final ClassDeclaration? owner = node
+        .thisOrAncestorOfType<ClassDeclaration>();
+    if (owner != null) {
+      for (final Annotation annotation in owner.metadata) {
+        if (_persistenceClassAnnotations.contains(annotation.name.name)) {
+          return true;
+        }
+      }
+    }
+
     return false;
   }
 }

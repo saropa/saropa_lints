@@ -150,7 +150,7 @@ not the sidebar, so the table stays usable.
    *correctness* already lands from the lockfile via `staleVersionGatedCodes`, so a
    companion the lockfile contradicts renders inactive ("not on this version") and is
    not counted as active. Full plan:
-   [RULE_PACKS_VERSION_GROUP_UI_PLAN.md](../RULE_PACKS_VERSION_GROUP_UI_PLAN.md).
+   [RULE_PACKS_VERSION_GROUP_UI_PLAN.md](../history/2026.06/2026.06.24/RULE_PACKS_VERSION_GROUP_UI_PLAN.md).
 8. **Disabled rules** — lists every currently-disabled rule; re-enabling removes
    the override. Sits directly under the pack table because both edit the same
    effective set.
@@ -260,4 +260,4 @@ any edit that touches those lines (write-time rule), not a separate follow-up.
 5. **Version-group control not yet built** — companion packs still render as
    independent toggles; the exclusive radio grouping (§5 item 7) is open work
    tracked in
-   [RULE_PACKS_VERSION_GROUP_UI_PLAN.md](../RULE_PACKS_VERSION_GROUP_UI_PLAN.md).
+   [RULE_PACKS_VERSION_GROUP_UI_PLAN.md](../history/2026.06/2026.06.24/RULE_PACKS_VERSION_GROUP_UI_PLAN.md).

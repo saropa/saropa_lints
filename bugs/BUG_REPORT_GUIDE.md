@@ -40,6 +40,11 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 - `feature_lint_rule_prefer_static_final_for_session_constant.md`
 
+## Raised Reports (2026-06-24)
+
+- `infra_shrinkwrap_rule_overlap_four_rules_one_concern.md`
+- `prefer_boolean_prefixes_false_positive_serialization_bound_field_names.md`
+
 ---
 
 ## File Naming
