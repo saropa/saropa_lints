@@ -4,7 +4,9 @@
 
 // BAD: Positional bool parameter
 // expect_lint: avoid_positional_boolean_parameters
-void bad(bool enabled) {}
+class _PositionalBoolExample {
+  void bad(bool enabled) {}
+}
 
 // GOOD: Named bool parameter
 void good({required bool enabled}) {}

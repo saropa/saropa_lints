@@ -107,8 +107,11 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_unnecessary_overrides
 // expect_lint: avoid_unnecessary_overrides
-void _bad186_dispose() {
-  super.dispose(); // Just calls super, no additional logic
+class _UnnecessaryOverrideExample {
+  @override
+  void dispose() {
+    super.dispose(); // Just calls super, no additional logic
+  }
 }
 
 // GOOD: Should NOT trigger avoid_unnecessary_overrides

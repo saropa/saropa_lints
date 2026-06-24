@@ -109,10 +109,8 @@ dynamic value;
 
 // BAD: Should trigger avoid_duplicate_constant_values
 // expect_lint: avoid_duplicate_constant_values
-void _bad184() {
-  const errorMessage = 'Error occurred';
-  const failureMessage = 'Error occurred'; // Same value
-}
+const _errorMessage = 'Error occurred';
+const _failureMessage = 'Error occurred'; // Same duplicate const value
 
 // GOOD: Should NOT trigger avoid_duplicate_constant_values
 void _good184() {

@@ -105,6 +105,8 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+enum Status { active, inactive }
+
 // BAD: Should trigger avoid_enum_values_by_index
 // expect_lint: avoid_enum_values_by_index
 void _bad149() {

@@ -4,7 +4,9 @@
 
 // BAD: Positional bool
 // expect_lint: prefer_named_bool_params
-void bad(bool x) {}
+class _NamedBoolExample {
+  void bad(bool x) {}
+}
 
 // GOOD: Named bool
 void good({required bool x}) {}
