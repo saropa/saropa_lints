@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "रीस्कैन पैकेज (ताजा)",
   "command.packageVibrancy.openOtherProject.title": "स्कैन करें एक और परियोजना ...",
   "command.packageVibrancy.showReport.title": "पैकेज डैशबोर्ड खोलें",
+  "command.packageVibrancy.showOpportunities.title": "ओपन अपग्रेड अवसरों को खोलें।",
   "command.packageVibrancy.focus.title": "पैकेज जीवंतताः खुला डैशबोर्ड (कॉम्पैक्ट)",
   "command.packageVibrancy.clearCache.title": "कैश साफ़ करें",
   "command.packageVibrancy.exportReport.title": "निर्यात रिपोर्ट रिपोर्ट",

@@ -144,6 +144,27 @@
     "dismiss": "Despedimento de despedido.",
     "reviewFailed": "Não consegui abrir a revisão do pacote de regras Saropa Lints. {error}"
   },
+  "opportunities": {
+    "documentTitle": "Oportunidades de atualização Upgrade Opportunities.",
+    "heroTitle": "Oportunidades de atualização Upgrade Opportunities.",
+    "subtitle": "Os pacotes {count} têm recursos que seu projeto ainda não usa.",
+    "noScan": "Execute uma varredura de pacote primeiro para encontrar oportunidades de atualização.",
+    "openFileFailed": "Não consegui abrir {file}  ⁇ pode ter se movido desde a última varredura.",
+    "card": {
+      "versionUpgrade": "atualização disponível para {latest}.",
+      "versionCurrent": "sobre as últimas novidades.",
+      "featuresTitle": "Características ainda não utilizadas.",
+      "locationsTitle": "Onde o seu projeto usa este pacote.",
+      "noLocations": "Não importado na fonte do projeto  ⁇ provavelmente uma dependência dev ou transitiva.",
+      "moreFiles": "e {count} mais arquivos.",
+      "copyForAi": "Copiar o prompt de atualização para IA.",
+      "openInDashboard": "Abra no Painel de Controle do Pacote."
+    },
+    "empty": {
+      "title": "Nada para adotar nada.",
+      "body": "As funcionalidades de cada pacote digitalizado já estão sendo usadas em seu projeto, ou não foram encontradas oportunidades para fazer o registro de alterações."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "Versão Versião Version",
@@ -922,7 +943,7 @@
       "noGithub": "Não foi encontrado nenhum repositório GitHub.",
       "devBadge": "Dev dev dev, você sabe.",
       "transitiveBadge": "transitivo, transitiva é o que se faz.",
-      "opportunitiesTooltip": "Funcionalidades não utilizadas: {features}",
+      "opportunitiesTooltip": "Características não utilizadas: {features} É um termo usado para descrever a",
       "publishDateUnavailable": "Data de publicação não está disponível a partir do pub.dev.",
       "activityGradeUnavailable": "Grau de atividade indisponível (perdidos dados de commit ou release)",
       "activityFallback": "Atividade baseada em compromissos e liberações recentes.",

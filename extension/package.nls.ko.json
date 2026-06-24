@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "재스캔 패키지 (신제)",
   "command.packageVibrancy.openOtherProject.title": "스캔 다른 프로젝트...",
   "command.packageVibrancy.showReport.title": "패키지 대시보드를 열고 패키지 패치보드 (Dashboard)",
+  "command.packageVibrancy.showOpportunities.title": "오픈 업그레이드 기회",
   "command.packageVibrancy.focus.title": "패키지 활기차: 개방형 대시보드 (콤팩트)",
   "command.packageVibrancy.clearCache.title": "캐시를 닦아주세요.",
   "command.packageVibrancy.exportReport.title": "수출 보고서 수출 보고",

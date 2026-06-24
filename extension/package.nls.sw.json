@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "Pakiti za Rescan (Zipya)",
   "command.packageVibrancy.openOtherProject.title": "Scan Project nyingine...",
   "command.packageVibrancy.showReport.title": "Fungua Dashibodi ya Kifurushi cha Package Dashboard.",
+  "command.packageVibrancy.showOpportunities.title": "Fungua Fursa za Upgrades za Ufuatiliaji.",
   "command.packageVibrancy.focus.title": "Kifurushi Vibrancy: Open dashibodi (compact)",
   "command.packageVibrancy.clearCache.title": "Futa Cache ya wazi.",
   "command.packageVibrancy.exportReport.title": "Ripoti ya Usafirishaji wa nje.",

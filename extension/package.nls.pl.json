@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "Pakiety Rescan (świeże)",
   "command.packageVibrancy.openOtherProject.title": "Skanuj inny projekt...",
   "command.packageVibrancy.showReport.title": "Otwórz Panel Paczek (ang. Package Dashboard).",
+  "command.packageVibrancy.showOpportunities.title": "Otwórz możliwości aktualizacji.",
   "command.packageVibrancy.focus.title": "Pakiet Vibrancy: Otwarta deska rozdzielcza (kompaktna)",
   "command.packageVibrancy.clearCache.title": "Wyczyść Cache",
   "command.packageVibrancy.exportReport.title": "Raport o eksporcie Sprawozdanie z eksportu",

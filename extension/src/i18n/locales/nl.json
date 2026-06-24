@@ -144,6 +144,27 @@
     "dismiss": "Ontslag ontslagen.",
     "reviewFailed": "Kan de recensie van het Saropa Lints-regelpakket niet openen. {error}"
   },
+  "opportunities": {
+    "documentTitle": "Upgrade kansen op het niveau van de mogelijkheden.",
+    "heroTitle": "Upgrade kansen op het niveau van de mogelijkheden.",
+    "subtitle": "{count}-pakketten hebben functies die uw project nog niet gebruikt.",
+    "noScan": "Voer eerst een pakket-scan uit om upgrades mogelijkheden te vinden.",
+    "openFileFailed": "Kon {file}  ⁇  niet openen. Het kan verplaatst zijn sinds de laatste scan.",
+    "card": {
+      "versionUpgrade": "update beschikbaar voor {latest}.",
+      "versionCurrent": "over de laatste nieuwsberichten.",
+      "featuresTitle": "Functies die nog niet gebruikt zijn.",
+      "locationsTitle": "Waar uw project dit pakket gebruikt.",
+      "noLocations": "Niet geïmporteerd in de projectbron  ⁇ Waarschijnlijk een dev of transitieve afhankelijkheid.",
+      "moreFiles": "en {count} meer bestanden",
+      "copyForAi": "Kopieer de upgrade prompt voor AI.",
+      "openInDashboard": "Open in het Dashboard van de pakketten."
+    },
+    "empty": {
+      "title": "Niets om te aannemen.",
+      "body": "De functies van elk gescand pakket worden al gebruikt in uw project, of er zijn geen changelog-mogelijkheden gevonden."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "Versies Versie versie",
@@ -922,7 +943,7 @@
       "noGithub": "Geen GitHub repository gevonden.",
       "devBadge": "Dev dev dev, wat is dat eigenlijk?",
       "transitiveBadge": "transitieve, overgangsvormige.",
-      "opportunitiesTooltip": "Ongebruikte functies: {features}",
+      "opportunitiesTooltip": "Niet gebruikte functies: ongebruikte functie {features} is een PH0__.",
       "publishDateUnavailable": "Publicatie datum niet beschikbaar vanaf pub.dev",
       "activityGradeUnavailable": "Activiteitsklasse niet beschikbaar (ontbrekende commit- of releasegegevens)",
       "activityFallback": "Activiteit gebaseerd op recente commits en releases.",

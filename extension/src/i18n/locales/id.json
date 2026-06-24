@@ -144,6 +144,27 @@
     "dismiss": "Mengusir dari pekerjaan.",
     "reviewFailed": "Tidak dapat membuka tinjauan paket aturan Saropa Lints. {error}"
   },
+  "opportunities": {
+    "documentTitle": "Upgrade Peluang untuk meningkatkan kemampuan.",
+    "heroTitle": "Upgrade Peluang untuk meningkatkan kemampuan.",
+    "subtitle": "Paket {count} memiliki fitur yang belum digunakan oleh proyek Anda.",
+    "noScan": "Jalankan pemindaian paket terlebih dahulu untuk menemukan peluang upgrade.",
+    "openFileFailed": "Tidak dapat membuka {file}  ⁇ mungkin telah bergerak sejak pemindaian terakhir.",
+    "card": {
+      "versionUpgrade": "update yang tersedia untuk {latest}.",
+      "versionCurrent": "tentang hal terbaru.",
+      "featuresTitle": "Fitur-fitur yang belum digunakan.",
+      "locationsTitle": "Dimana proyek Anda menggunakan paket ini.",
+      "noLocations": "Tidak diimpor dalam sumber proyek  ⁇ kemungkinan ketergantungan dev atau transitif.",
+      "moreFiles": "dan {count} lebih banyak file.",
+      "copyForAi": "Salin upgrade prompt untuk AI.",
+      "openInDashboard": "Buka di Dashboard Paket."
+    },
+    "empty": {
+      "title": "Tidak ada yang harus diadopsi.",
+      "body": "Setiap fitur paket yang dipindai sudah digunakan dalam proyek Anda, atau tidak ada kesempatan changelog ditemukan."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "Versi yang lebih baik adalah versi",
@@ -922,7 +943,7 @@
       "noGithub": "Tidak ada repositori GitHub yang ditemukan.",
       "devBadge": "Dev Dev adalah dev yang berarti.",
       "transitiveBadge": "transitif yang bersifat transitif.",
-      "opportunitiesTooltip": "Fitur yang tidak digunakan: {features}",
+      "opportunitiesTooltip": "Fitur yang tidak digunakan: {features} adalah",
       "publishDateUnavailable": "Tanggal publikasi tidak tersedia dari pub.dev",
       "activityGradeUnavailable": "Kelas aktivitas tidak tersedia (data commit atau release yang hilang)",
       "activityFallback": "Kegiatan berdasarkan komitmen dan rilis baru-baru ini.",

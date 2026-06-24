@@ -144,6 +144,27 @@
     "dismiss": "İşten çıkarma, işten atmak.",
     "reviewFailed": "Saropa Lints kural paketi incelemesini açamadım. {error}"
   },
+  "opportunities": {
+    "documentTitle": "Yükseltme Fırsatları Yükle",
+    "heroTitle": "Yükseltme Fırsatları Yükle",
+    "subtitle": "{count} paketlerinde projenizin henüz kullanmadığı özellikler vardır.",
+    "noScan": "Öncelikle yükseltme fırsatları bulmak için bir paket taraması çalıştırın.",
+    "openFileFailed": "{file}  ⁇  açılamadı. Son tarama işleminden bu yana hareket etmiş olabilir.",
+    "card": {
+      "versionUpgrade": "güncelleme {latest} için mevcuttur.",
+      "versionCurrent": "En son haberler hakkında",
+      "featuresTitle": "Henüz kullanılmayan özellikler.",
+      "locationsTitle": "Projenizin bu paketi kullandığı yerler.",
+      "noLocations": "Proje kaynağında ithal edilmemiş  ⁇ Dev veya transitif bir bağımlılık olasılığı vardır.",
+      "moreFiles": "ve {count} daha fazla dosya",
+      "copyForAi": "AI için yükseltme çağrısını kopyalayın.",
+      "openInDashboard": "Paket Tablosunda Açık"
+    },
+    "empty": {
+      "title": "Hiçbir şey kabul etmek için hiçbir şey.",
+      "body": "Taranan her paketin özellikleri projenizdeki zaten kullanılmış veya hiç değişiklik günlüğü bulunamadı."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION Versiyonu:",
@@ -922,7 +943,7 @@
       "noGithub": "GitHub depo bulunamadı.",
       "devBadge": "Dev dev dev diye bir şey var.",
       "transitiveBadge": "transitif, geçişli.",
-      "opportunitiesTooltip": "Kullanılmayan özellikler: {features}",
+      "opportunitiesTooltip": "Kullanılmayan özellikler: {features} _PH0___ -Hepimiz birer insanız.",
       "publishDateUnavailable": "Yayınlama tarihi pub.dev tarihinden itibaren mevcut değil.",
       "activityGradeUnavailable": "Aktivite derecesi kullanılamıyor (komit veya serbest veri eksik)",
       "activityFallback": "Son taahhütler ve yayınlara dayanan faaliyet.",

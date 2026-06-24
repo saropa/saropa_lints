@@ -144,6 +144,27 @@
     "dismiss": "解雇了,这是一个很好的方法.",
     "reviewFailed": "无法打开 Saropa Lints 规则包审阅。 {error}"
   },
+  "opportunities": {
+    "documentTitle": "升级机会的提升",
+    "heroTitle": "升级机会的提升",
+    "subtitle": "{count} 包有您的项目尚未使用的功能.",
+    "noScan": "首先运行一个包扫描,以找到升级机会.",
+    "openFileFailed": "无法打开 {file}  ⁇  的 它可能自上次扫描以来移动了.",
+    "card": {
+      "versionUpgrade": "更新可用于 {latest} .",
+      "versionCurrent": "关于最新的新闻",
+      "featuresTitle": "功能尚未使用.",
+      "locationsTitle": "您的项目使用此包在哪里?",
+      "noLocations": "项目源中没有进口 ⁇ 可能是dev或过渡性依赖.",
+      "moreFiles": "和 {count} 更多的文件.",
+      "copyForAi": "复制升级提示符用于AI.",
+      "openInDashboard": "在包装仪表板中打开."
+    },
+    "empty": {
+      "title": "没有什么可以通过的.",
+      "body": "每个扫描的包的功能都已经在你的项目中使用,或者没有发现更改日志机会."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "版本的版本,可以说是.",
@@ -922,7 +943,7 @@
       "noGithub": "没有找到 GitHub 的存储库.",
       "devBadge": "没有了,我会发出 dev dev.",
       "transitiveBadge": "过渡的,是指一个转变性的.",
-      "opportunitiesTooltip": "未使用的功能: {features}",
+      "opportunitiesTooltip": "未使用的功能:未使用的特性 {features} 没有任何问题.",
       "publishDateUnavailable": "发布日期从 pub.dev 不提供.",
       "activityGradeUnavailable": "活动级别不可用 (缺少提交或发布数据)",
       "activityFallback": "基于最近承诺和发布的活动.",

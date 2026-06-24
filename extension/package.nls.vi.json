@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "Gói Rescan (tươi)",
   "command.packageVibrancy.openOtherProject.title": "Scan Another Project... (Quét lại một dự án khác)...",
   "command.packageVibrancy.showReport.title": "Mở bảng điều khiển gói mở",
+  "command.packageVibrancy.showOpportunities.title": "Mở cơ hội nâng cấp mở",
   "command.packageVibrancy.focus.title": "Gói Vibrancy: Sức sống mạnh mẽ: Mở bảng điều khiển (compact)",
   "command.packageVibrancy.clearCache.title": "Clear Cache: Xóa bộ nhớ cache.",
   "command.packageVibrancy.exportReport.title": "Báo cáo xuất khẩu:",

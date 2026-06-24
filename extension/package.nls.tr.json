@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "Rescan Paketleri (Taze)",
   "command.packageVibrancy.openOtherProject.title": "Scan Başka Bir Proje...",
   "command.packageVibrancy.showReport.title": "Paket Tablosunu Açın",
+  "command.packageVibrancy.showOpportunities.title": "Açık Yükseltme Fırsatları Geliştirmek",
   "command.packageVibrancy.focus.title": "Paket Vibrancy: Açık (kompakt) gösterge paneli.",
   "command.packageVibrancy.clearCache.title": "Clear Cache'i temizleyin",
   "command.packageVibrancy.exportReport.title": "İhracat Raporu, İhraç Raporu",

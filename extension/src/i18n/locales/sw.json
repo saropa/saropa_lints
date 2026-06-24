@@ -144,6 +144,27 @@
     "dismiss": "Fungua kazi.",
     "reviewFailed": "Haikuweza kufungua ukaguzi wa pakiti ya sheria ya Saropa Lints. {error}"
   },
+  "opportunities": {
+    "documentTitle": "Upgrade Fursa za fursa.",
+    "heroTitle": "Upgrade Fursa za fursa.",
+    "subtitle": "{count} vifurushi vina sifa ambazo mradi wako hautumiki bado.",
+    "noScan": "Fanya skanning ya pakiti kwanza ili kupata fursa za kuboresha.",
+    "openFileFailed": "Haikuweza kufungua {file}  ⁇ Inawezekana imehama tangu Scan ya mwisho.",
+    "card": {
+      "versionUpgrade": "update inapatikana kwa {latest}.",
+      "versionCurrent": "juu ya hivi karibuni kuhusu latest on the latest",
+      "featuresTitle": "Sifa ambazo bado hazitumiwi.",
+      "locationsTitle": "Ambapo mradi wako unatumia kifurushi hiki cha pakiti.",
+      "noLocations": "Haijaingizwa katika chanzo cha mradi  ⁇ uwezekano wa utegemezi wa dev au transitive.",
+      "moreFiles": "na {count} faili zaidi files.",
+      "copyForAi": "Nakili mwongozo wa kuboresha kwa AI.",
+      "openInDashboard": "Fungua katika Dashibodi ya Package Dashboard."
+    },
+    "empty": {
+      "title": "Hakuna kitu cha kupitisha.",
+      "body": "Kila kipengee cha pakiti iliyochunguzwa tayari kimetumika katika mradi wako, au hakuna fursa za changelog zilizopatikana."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION Version ya maandishi.",
@@ -922,7 +943,7 @@
       "noGithub": "Hakuna hazina ya GitHub iliyopatikana.",
       "devBadge": "dev dev dev Dev, kwa kweli.",
       "transitiveBadge": "transitive - mpito, wa kupita.",
-      "opportunitiesTooltip": "Vipengele visivyotumika: {features}",
+      "opportunitiesTooltip": "Sifa ambazo hazitumiwi: {features} _ PH0__ - Msaada wa kuokoa maisha.",
       "publishDateUnavailable": "Tarehe ya kuchapisha haipatikani kutoka pub.dev.",
       "activityGradeUnavailable": "Hatua ya shughuli haipatikani (data za kuagiza au kutolewa hazipo)",
       "activityFallback": "Shughuli kulingana na ahadi za hivi karibuni na matoleo.",

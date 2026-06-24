@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "再スキャンパッケージ (新品)",
   "command.packageVibrancy.openOtherProject.title": "スキャン 別のプロジェクト...",
   "command.packageVibrancy.showReport.title": "パッケージダッシュボードを開く",
+  "command.packageVibrancy.showOpportunities.title": "アップグレードの機会をオープンに",
   "command.packageVibrancy.focus.title": "パッケージ 活力:オープンダッシュボード (コンパクト)",
   "command.packageVibrancy.clearCache.title": "キャッシュをクリアする.",
   "command.packageVibrancy.exportReport.title": "輸出報告書 エクスポートレポート",

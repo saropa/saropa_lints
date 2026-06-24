@@ -144,6 +144,27 @@
     "dismiss": "Zwolnienie z pracy.",
     "reviewFailed": "Nie można otworzyć przeglądu pakietu reguł Saropa Lints. {error}"
   },
+  "opportunities": {
+    "documentTitle": "Uaktualnij możliwości Upgrade Opportunities.",
+    "heroTitle": "Uaktualnij możliwości Upgrade Opportunities.",
+    "subtitle": "Pakiety {count} mają funkcje, których projekt nie wykorzystuje jeszcze.",
+    "noScan": "Najpierw przeprowadź skanowanie pakietów, aby znaleźć możliwości uaktualnienia.",
+    "openFileFailed": "Nie można otworzyć {file}  ⁇ Może się przesunąć od ostatniego skanowania.",
+    "card": {
+      "versionUpgrade": "aktualizacja dostępna dla {latest}",
+      "versionCurrent": "o najnowszych wydarzeniach.",
+      "featuresTitle": "Funkcje, których jeszcze nie używają.",
+      "locationsTitle": "Gdzie Twój projekt używa tego pakietu?",
+      "noLocations": "Nie jest zaimportowany w źródle projektu  ⁇ prawdopodobnie uzależnienie od dev lub transitywne.",
+      "moreFiles": "i {count} więcej plików.",
+      "copyForAi": "Kopiowanie polecenia aktualizacji dla sztucznej inteligencji.",
+      "openInDashboard": "Otwórz w Dashboardie pakietu."
+    },
+    "empty": {
+      "title": "Nic do przyjęcia, nic do przyjmowania.",
+      "body": "Funkcje każdego zeskanowanego pakietu są już używane w projekcie lub nie znaleziono możliwości zmiany."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "Wersja wersji.",
@@ -922,7 +943,7 @@
       "noGithub": "Nie znaleziono repozytorium GitHub.",
       "devBadge": "dev dev dev to coś",
       "transitiveBadge": "transytywne, przejściowe.",
-      "opportunitiesTooltip": "Nieużywane funkcje: {features}",
+      "opportunitiesTooltip": "Nieużywane funkcje: niewykorzystane cechy {features} to odmiana _PH0_.",
       "publishDateUnavailable": "Data publikacji nie jest dostępna od pub.dev.",
       "activityGradeUnavailable": "Nie ma dostępnego poziomu aktywności (brak danych o komitowaniu lub uwolnieniu)",
       "activityFallback": "Działalność oparta na ostatnich zobowiązaniach i wydaniach.",

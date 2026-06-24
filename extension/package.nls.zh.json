@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "重新扫描包 (新鲜) 的使用",
   "command.packageVibrancy.openOtherProject.title": "扫描另一个项目...",
   "command.packageVibrancy.showReport.title": "打开一个包仪表板.",
+  "command.packageVibrancy.showOpportunities.title": "开放升级机会,提供升级的机会.",
   "command.packageVibrancy.focus.title": "包装活力:充满活力的 打开仪表板 (紧 ⁇ 型)",
   "command.packageVibrancy.clearCache.title": "清除缓存的时间",
   "command.packageVibrancy.exportReport.title": "导出报告 出口报告",

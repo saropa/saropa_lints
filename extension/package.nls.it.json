@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "Pacchetti di Rescan (freschi)",
   "command.packageVibrancy.openOtherProject.title": "Scansione Un altro progetto...",
   "command.packageVibrancy.showReport.title": "Aprire il Dashboard del pacchetto.",
+  "command.packageVibrancy.showOpportunities.title": "Aprire opportunità di aggiornamento.",
   "command.packageVibrancy.focus.title": "Pacchetto Vibrancy: Dashboard aperto (compatto)",
   "command.packageVibrancy.clearCache.title": "Cancellare la cache.",
   "command.packageVibrancy.exportReport.title": "Rapporto sull'esportazione Relazione sull'export",

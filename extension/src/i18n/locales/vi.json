@@ -144,6 +144,27 @@
     "dismiss": "Thả bỏ việc làm",
     "reviewFailed": "Không thể mở bản xem xét gói quy tắc Saropa Lints. {error}"
   },
+  "opportunities": {
+    "documentTitle": "Nâng cấp cơ hội nâng cấp",
+    "heroTitle": "Nâng cấp cơ hội nâng cấp",
+    "subtitle": "{count} gói có các tính năng dự án của bạn không sử dụng.",
+    "noScan": "Đầu tiên hãy chạy quét gói để tìm cơ hội nâng cấp.",
+    "openFileFailed": "Không thể mở {file}  ⁇ Nó có thể đã di chuyển kể từ lần quét cuối cùng.",
+    "card": {
+      "versionUpgrade": "cập nhật có sẵn cho {latest}.",
+      "versionCurrent": "về những điều mới nhất.",
+      "featuresTitle": "Các tính năng chưa được sử dụng.",
+      "locationsTitle": "Trường hợp dự án của bạn sử dụng gói này.",
+      "noLocations": "Không được nhập vào nguồn dự án  ⁇ có thể là một sự phụ thuộc dev hoặc chuyển tiếp.",
+      "moreFiles": "và {count} nhiều file hơn.",
+      "copyForAi": "Sao chép nhắc nâng cấp cho AI",
+      "openInDashboard": "Mở trong Package Dashboard."
+    },
+    "empty": {
+      "title": "Không có gì để thông qua.",
+      "body": "Các tính năng của mỗi gói được quét đã được sử dụng trong dự án của bạn, hoặc không tìm thấy cơ hội thay đổi."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION phiên bản",
@@ -922,7 +943,7 @@
       "noGithub": "Không tìm thấy kho lưu trữ GitHub.",
       "devBadge": "Dev Dev Dev là một người",
       "transitiveBadge": "transitive trân trọng transitive",
-      "opportunitiesTooltip": "Các tính năng chưa được sử dụng: {features}",
+      "opportunitiesTooltip": "Các tính năng chưa được sử dụng: {features} là Phương pháp",
       "publishDateUnavailable": "Ngày xuất bản không có sẵn từ pub.dev",
       "activityGradeUnavailable": "Không có cấp độ hoạt động (không có dữ liệu cam kết hoặc phát hành)",
       "activityFallback": "Hoạt động dựa trên các cam kết và phát hành gần đây.",

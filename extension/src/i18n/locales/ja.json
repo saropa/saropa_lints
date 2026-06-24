@@ -144,6 +144,27 @@
     "dismiss": "解雇処分について",
     "reviewFailed": "Saropa Lints ルール パックのレビューを開けませんでした。 {error}"
   },
+  "opportunities": {
+    "documentTitle": "機会をアップグレードする",
+    "heroTitle": "機会をアップグレードする",
+    "subtitle": "{count} パッケージには,プロジェクトがまだ使用していない機能があります.",
+    "noScan": "まず,アップグレードの機会を見つけるためにパッケージスキャンを実行します.",
+    "openFileFailed": "{file}  ⁇  を開けることができませんでした. 最後のスキャンから移動したかもしれません.",
+    "card": {
+      "versionUpgrade": "{latest}で利用できる更新プログラム",
+      "versionCurrent": "最新のニュースについて",
+      "featuresTitle": "まだ使われていない機能",
+      "locationsTitle": "あなたのプロジェクトがこのパッケージを使用している場合",
+      "noLocations": "プロジェクトソースにインポートされていない 恐らく,devまたはトランジティブ依存関係である.",
+      "moreFiles": "そして, {count} より多くのファイルが表示されます.",
+      "copyForAi": "AI のアップグレードプロンプトをコピーする",
+      "openInDashboard": "パッケージダッシュボードで開きます."
+    },
+    "empty": {
+      "title": "採択するものはなし.",
+      "body": "スキャンされたパッケージの機能は,既にプロジェクトで使用されているか,変更ログの機会が見つかりませんでした."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "バージョンバージョン",
@@ -922,7 +943,7 @@
       "noGithub": "GitHub リポジトリが見つかりませんでした.",
       "devBadge": "dev dev dev について",
       "transitiveBadge": "変形性 (トランジティブ)",
-      "opportunitiesTooltip": "未使用の機能: {features}",
+      "opportunitiesTooltip": "未使用の機能:未使用の機能を表示する {features} フォローしている",
       "publishDateUnavailable": "公開日: pub.dev から利用できません.",
       "activityGradeUnavailable": "アクティビティーグレードが利用できない (コミットまたはリリースデータが欠けている)",
       "activityFallback": "最近のコミットメントとリリースに基づく活動",

@@ -144,6 +144,27 @@
     "dismiss": "해고 처분",
     "reviewFailed": "Saropa Lints 규칙 팩 검토를 열 수 없습니다. {error}"
   },
+  "opportunities": {
+    "documentTitle": "업그레이드 기회 업그레이드의 기회를 제공합니다.",
+    "heroTitle": "업그레이드 기회 업그레이드의 기회를 제공합니다.",
+    "subtitle": "{count} 패키지는 프로젝트에서 아직 사용하지 않는 기능을 가지고 있습니다.",
+    "noScan": "우선 업그레이드 기회를 찾기 위해 패키지 스캔을 실행하십시오.",
+    "openFileFailed": "{file}  ⁇ 을 열 수 없습니다. 마지막 스캔 이후 이동했을 수도 있습니다.",
+    "card": {
+      "versionUpgrade": "{latest}에 사용할 수 있는 업데이트",
+      "versionCurrent": "최신 소식을 전하는",
+      "featuresTitle": "아직 사용되지 않은 기능",
+      "locationsTitle": "프로젝트에서 이 패키지를 사용하는 경우",
+      "noLocations": "프로젝트 소스에서 가져온 것은 아닙니다  ⁇ dev 또는 과도적 의존성이 있을 가능성이 높습니다.",
+      "moreFiles": "그리고 {count} 더 많은 파일을 저장합니다.",
+      "copyForAi": "인공지능 업그레이드 프롬프트를 복사하여 AI에 적용합니다.",
+      "openInDashboard": "패키지 대시보드에서 열립니다."
+    },
+    "empty": {
+      "title": "채택할 것이 아무것도 없다.",
+      "body": "스캔된 모든 패키지의 기능은 이미 프로젝트에서 사용되었거나, 변경록을 작성할 기회가 발견되지 않았습니다."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "버전은 VERSION입니다.",
@@ -922,7 +943,7 @@
       "noGithub": "GitHub 저장소가 발견되지 않았습니다.",
       "devBadge": "데브  ⁇  (dev dev) 은",
       "transitiveBadge": "이변적 (transitive) 은 과도한 것을 의미한다.",
-      "opportunitiesTooltip": "사용하지 않는 기능: {features}",
+      "opportunitiesTooltip": "사용하지 않는 기능: 사용되지 않은 특징 {features} _PH0_는 PH0__의 제곱근을 나타냅니다",
       "publishDateUnavailable": "게시 날짜는 pub.dev에서 사용할 수 없습니다.",
       "activityGradeUnavailable": "활동 등급이 사용 불가능하다 (컴이트 또는 릴리스 데이터가 누락)",
       "activityFallback": "최근 약속과 발표에 기반한 활동",

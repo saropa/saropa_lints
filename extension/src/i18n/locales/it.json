@@ -144,6 +144,27 @@
     "dismiss": "Scusate il licenziamento.",
     "reviewFailed": "Impossibile aprire la revisione del pacchetto di regole Saropa Lints. {error}"
   },
+  "opportunities": {
+    "documentTitle": "Opportunità di aggiornamento delle opportunità.",
+    "heroTitle": "Opportunità di aggiornamento delle opportunità.",
+    "subtitle": "I pacchetti {count} hanno funzionalità che il tuo progetto non utilizza ancora.",
+    "noScan": "Eseguire prima una scansione dei pacchetti per trovare opportunità di aggiornamento.",
+    "openFileFailed": "Non è stato possibile aprire {file}  ⁇ potrebbe essersi spostato dall'ultima scansione.",
+    "card": {
+      "versionUpgrade": "aggiornamento disponibile per {latest}.",
+      "versionCurrent": "sulle ultime notizie.",
+      "featuresTitle": "Caratteristiche non ancora utilizzate.",
+      "locationsTitle": "Dove il tuo progetto utilizza questo pacchetto.",
+      "noLocations": "Non importato nella fonte del progetto  ⁇ probabile una dipendenza dev o transitiva.",
+      "moreFiles": "e {count} più file.",
+      "copyForAi": "Copiare l'invio di aggiornamento per AI.",
+      "openInDashboard": "Aprire nella Dashboard del pacchetto."
+    },
+    "empty": {
+      "title": "Niente da adottare nulla.",
+      "body": "Le funzionalità di ogni pacchetto scansionato sono già utilizzate nel tuo progetto, o non sono state trovate opportunità per il changelog."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "Versione: La versione di Versione.",
@@ -922,7 +943,7 @@
       "noGithub": "Nessun repository GitHub trovato.",
       "devBadge": "Dev dev dev, che è un'altra cosa.",
       "transitiveBadge": "transitivo, trasitivo.",
-      "opportunitiesTooltip": "Funzionalità non utilizzate: {features}",
+      "opportunitiesTooltip": "Caratteristiche non utilizzate: {features} È il nome di un'altra versione.",
       "publishDateUnavailable": "Data di pubblicazione non disponibile da pub.dev",
       "activityGradeUnavailable": "Grado di attività non disponibile (mancano dati commit o release)",
       "activityFallback": "Attività basata su recenti impegni e rilasci.",

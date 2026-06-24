@@ -144,6 +144,27 @@
     "dismiss": "ขอยกเลิกการทํางาน",
     "reviewFailed": "ไม่สามารถเปิดการตรวจสอบชุดกฎ Saropa Lints ได้ {error}"
   },
+  "opportunities": {
+    "documentTitle": "การอัพเกรด โอกาสการปรับปรุง",
+    "heroTitle": "การอัพเกรด โอกาสการปรับปรุง",
+    "subtitle": "{count} แพ็คเกจมีคุณสมบัติที่โครงการของคุณยังไม่ได้ใช้",
+    "noScan": "วิ่งสแกนแพ็คเกจแรกเพื่อหาโอกาสในการอัพเกรด",
+    "openFileFailed": "ไม่สามารถเปิด {file}  ⁇ มันอาจย้ายไปตั้งแต่การสแกนครั้งสุดท้าย",
+    "card": {
+      "versionUpgrade": "อัพเดทที่พร้อมใช้งานใน {latest}",
+      "versionCurrent": "เรื่องล่าสุดของ ธนกร",
+      "featuresTitle": "คุณสมบัติที่ยังไม่ได้ใช้",
+      "locationsTitle": "ที่โครงการของคุณใช้แพ็กเกจนี้",
+      "noLocations": "ไม่นําเข้าในโครงการที่มา  ⁇ เป็นไปได้ว่าการพึ่งพา dev หรือ transitive.",
+      "moreFiles": "และ {count} ไฟล์เพิ่มเติม",
+      "copyForAi": "สําเนาการอัพเกรดทันทีสําหรับ AI",
+      "openInDashboard": "เปิดใน แดชบอร์ด Package Dashboard"
+    },
+    "empty": {
+      "title": "ไม่มีอะไรที่จะรับใช้ ยอมรับ",
+      "body": "คุณสมบัติของแพ็กเกจทุกชิ้นที่สแกนได้ถูกใช้ในโครงการของคุณแล้ว หรือไม่พบโอกาสในการทํารายการเปลี่ยนแปลง"
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION การออกแบบ",
@@ -922,7 +943,7 @@
       "noGithub": "ไม่พบคลัง GitHub",
       "devBadge": "dev dev dev หนังสือ",
       "transitiveBadge": "ทันติ (transitive) เป็นการเปลี่ยนแปลง",
-      "opportunitiesTooltip": "คุณสมบัติที่ไม่ได้ใช้: {features}",
+      "opportunitiesTooltip": "คุณสมบัติที่ไม่ได้ใช้: ไม่ใช้นักพนัน {features} การตรวจสอบ",
       "publishDateUnavailable": "วันที่ตีพิมพ์ไม่พร้อมจาก pub.dev",
       "activityGradeUnavailable": "ระดับกิจกรรมไม่พร้อมใช้งาน (ข้อมูลการ commit หรือ release หายไป)",
       "activityFallback": "กิจกรรมที่พัฒนาจากความมุ่งมั่นและการปล่อยข้อมูลล่าสุด",

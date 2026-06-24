@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "Пакеты с повторным сканированием (свежие)",
   "command.packageVibrancy.openOtherProject.title": "Сканирование Другой проект...",
   "command.packageVibrancy.showReport.title": "Откройте панель инструментов пакета.",
+  "command.packageVibrancy.showOpportunities.title": "Открыть возможности для обновления.",
   "command.packageVibrancy.focus.title": "Пакет Вибрация: Открытая приборная панель (компактный)",
   "command.packageVibrancy.clearCache.title": "Очистить кэш-память.",
   "command.packageVibrancy.exportReport.title": "Экспортный отчет - экспорт.",

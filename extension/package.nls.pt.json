@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "Pacotes de Rescan (Frescos)",
   "command.packageVibrancy.openOtherProject.title": "Scan Outro Projeto...",
   "command.packageVibrancy.showReport.title": "Abra o Painel de Pacote do pacote.",
+  "command.packageVibrancy.showOpportunities.title": "Abrir oportunidades de atualização abertas.",
   "command.packageVibrancy.focus.title": "Pacote Vibração: Painel aberto (compacto)",
   "command.packageVibrancy.clearCache.title": "Limpe o cache (cache) do computador.",
   "command.packageVibrancy.exportReport.title": "Relatório de Exportação Relatórios de exportação",
