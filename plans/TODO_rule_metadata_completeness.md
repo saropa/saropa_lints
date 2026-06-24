@@ -28,32 +28,49 @@ confirm it fires (or that it does not over-fire).
 
 The consumer to build is an accuracy report/gate, not a metadata backfill.
 
-### Design — `bin/accuracy_report.dart` (+ `lib/src/report/accuracy_report.dart` core)
+### Built — `bin/accuracy_report.dart` (+ `lib/src/report/accuracy_report.dart` core)
 
-Mirrors the `quality_gate` split: a testable library core plus a thin CLI that exits non-zero on breach
-so CI can gate on it.
+Mirrors the `quality_gate` split: a testable pure core plus a thin CLI that exits non-zero so CI can
+gate on it. `dart run saropa_lints:accuracy_report [--fixtures <dir>] [--tier <name>] [--fail-on silent|none] [--format json]`.
 
-1. **Targets** — enumerate `allSaropaRules`; per rule read `rule.code.name` + `rule.accuracyTarget`
-   (`expectZeroFalsePositives` for bug/codeSmell, `minTruePositiveRate` ~0.8 for vulnerability/securityHotspot).
-2. **Ground truth** — parse every `// expect_lint: <rule>` marker under `example/lib/` (1,383 markers).
-   Marker on its own line → diagnostic expected on the next line; trailing marker → same line. Comma-separated
-   rule lists supported.
-3. **Actual** — run `ScanRunner` (the [scan.dart](../lib/scan.dart) programmatic API) over the fixtures and
-   collect `(rule, file, line)` per diagnostic. Use `runResolved()` so type/instance-creation rules fire.
-4. **Per-rule tally** — TP = expected marker that fired; FN = expected marker that did not fire (under-firing);
-   FP-candidate = diagnostic with no matching marker (over-firing).
-5. **Compare to target & report** — bug/codeSmell: any FP-candidate is a target miss; vulnerability/securityHotspot:
-   `TP/(TP+FN) < minTruePositiveRate` is a miss. Emit JSON + text summary; exit 1 on breach.
+**What it measures: rule liveness, not FP/TP rate.** For every rule declared by an `// expect_lint:`
+marker, it runs a resolved scan (`ScanRunner.runResolved` via [scan.dart](../lib/scan.dart)) and checks
+the rule produced at least one diagnostic in that fixture file. A declared-but-silent rule is reported and
+(default) fails the gate. 9 unit tests cover marker parsing + the liveness tally.
 
-### FP attribution risk (decided)
+**Why liveness and not accuracy-vs-target — discovered during the build, two corpus blockers:**
 
-A fixture file holds other rules' bad examples too, so an unmarked hit is only a true FP if the fixture's
-`expect_lint` markers are exhaustive — which is not yet proven. Therefore:
+1. **Markers are not line-precise.** Many `expect_lint` markers sit above a *function* while the rule
+   fires on a statement several lines inside it (e.g. `require_request_timeout`'s marker is on the line
+   before the function; the violation is the `http.get` two lines down). Exact-line matching therefore
+   reports false negatives for correctly-firing rules — measured TP≈0 across the corpus. Measuring real
+   false-positive / true-positive *rate* against `accuracyTarget` requires re-authoring markers
+   immediately above each violation with good examples isolated in separate files. That is a corpus
+   project, deferred.
+2. **Package/platform-gated rules legitimately skip.** Rules that gate on `ProjectContext.usesPackage(...)`
+   or a platform do not fire in the example project when its pubspec lacks the package, so they appear
+   "silent" without being broken. The raw silent list therefore over-reports and must be triaged before it
+   can be a clean hard CI gate. (api_network: 20 of 34 rules silent on first run — a triage worklist, not
+   20 confirmed bugs.)
 
-- **FN (missed expected lint) → hard fail.** Unambiguous: the rule was asserted to fire and did not.
-- **FP-candidate (unmarked hit) → report only, never hard-fail** until the fixture set is proven exhaustive.
+### Decision / status
 
-Controlled by `--fail-on fn|fp|none` (default `fn`).
+- The tool is the durable deliverable: it produces the per-rule silent-list worklist the contract tests
+  cannot — they only check a marker's *text* exists, never that the rule still fires.
+- **Full-corpus result (2026-06-24, `--tier pedantic`, resolved scan of 1,738 fixtures):** 767 of 1,551
+  marker-bearing rules (~49%) fire in *none* of their fixtures. This rate is too high to be real
+  under-firing — it is dominated by the confounders below, so the raw silent list is **not an actionable
+  bug list** as-is. The tool runs correctly; the corpus + scan environment do not yet support a trustworthy
+  liveness verdict.
+- **Confounders to remove before the silent list means anything:** (1) environment gating —
+  package/platform/Flutter-gated rules cannot fire in the example project's environment; (2) scan coverage —
+  even `runResolved` does not exercise every rule shape (documented in `scan.dart`). Both must be handled
+  (run fixtures in an environment that satisfies the gates, and/or add `requiredPackages`/platform metadata
+  to exclude un-fireable rules from the silent verdict) before the gate is meaningful.
+- **Default `--fail-on silent` exits 1 on any silent rule.** Do NOT wire it into CI as a hard gate until
+  the confounders above are removed. Until then run with `--fail-on none` as a report.
+- **Follow-up (line-precise accuracy-vs-target):** still open, blocked on fixture line-precision. This is
+  where `accuracyTarget`'s `expectZeroFalsePositives` / `minTruePositiveRate` would finally be enforced.
 
 ## 4.2 `certIds` sparse/empty **[OPEN — verified — by design]**
 
