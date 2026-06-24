@@ -40,6 +40,25 @@ export class VibrancyReportPanel {
         VibrancyReportPanel._cache = cache;
     }
 
+    /** Show the in-dashboard progress bar (indeterminate) when a scan begins.
+     *  No-op if the panel is closed — the toast still covers that case. */
+    static postScanStarted(): void {
+        VibrancyReportPanel.currentPanel?._panel.webview.postMessage({ type: 'scanStarted' });
+    }
+
+    /** Drive the determinate fill + phase label from the scan's progress sink. */
+    static postScanProgress(percent: number, message: string): void {
+        VibrancyReportPanel.currentPanel?._panel.webview.postMessage({
+            type: 'scanProgress', percent, message,
+        });
+    }
+
+    /** Hide the progress bar. The happy path also rebuilds the panel HTML via
+     *  publishResults; this covers the cancel/abort path where no rebuild runs. */
+    static postScanFinished(): void {
+        VibrancyReportPanel.currentPanel?._panel.webview.postMessage({ type: 'scanFinished' });
+    }
+
     static createOrShow(options: ReportOptions): void {
         if (VibrancyReportPanel.currentPanel) {
             VibrancyReportPanel.currentPanel._panel.reveal();

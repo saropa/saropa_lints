@@ -686,6 +686,10 @@
       "body2": "This page will refresh automatically when the scan finishes. You can cancel from the progress notification in the bottom-right.",
       "versionStamp": "Saropa Package Dashboard v{version}"
     },
+    "progress": {
+      "aria": "Package scan progress",
+      "starting": "Starting scan…"
+    },
     "gaugeTitle": "Project Package Grade: {grade}",
     "summary": {
       "packages": "Packages",

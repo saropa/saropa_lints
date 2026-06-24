@@ -1954,6 +1954,10 @@ const Set<String> professionalOnlyRules = <String>{
 
   // State Management (Batch 10)
   'avoid_expensive_computation_in_build',
+  // Hoist session-constant arithmetic out of build() to a static final field.
+  // Info-level, low-noise (compound expressions only); see
+  // compound_performance_rules.dart.
+  'prefer_static_final_for_session_constant',
   'require_image_cache_management',
   'require_submit_button_state',
   'require_form_field_controller',

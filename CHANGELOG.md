@@ -64,6 +64,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+Adds a performance rule that flags arithmetic in a widget's `build()` whose operands are all fixed for the app session — number literals, constants, and design-token size getters — so the value is computed once in a `static final` field instead of on every frame. The Package Dashboard now shows a live progress bar while a rescan runs, so a refresh no longer looks like the page has frozen behind a lone notification.
+
+### Added
+
+- **New rule `prefer_static_final_for_session_constant` (Professional tier, info).** Flags compound expressions in `build()` built only from session-constant operands (literals, `const` fields, and design-token getters such as `ThemeCommonSpace.Footer.size`) that recompute on every rebuild; hoist them to a `static final` field, which—unlike `const`—works because the token getters resolve at runtime. Bare single getters and anything depending on `context`, `widget`, parameters, or locals are not flagged.
+
+### Added (Extension)
+
+- **The Package Dashboard shows a live progress bar during a rescan.** A rescan previously updated only a VS Code notification while the dashboard sat on stale data, so it read as hung; the dashboard now fills a determinate bar as each package is scanned and clears it when results refresh. No action required.
+
+---
+
 ## [14.1.1]
 
 Fixes the rule detail panel, which displayed a wall of raw JavaScript instead of the rule's documentation, and removes its dead "View in ROADMAP" button. [log](https://github.com/saropa/saropa_lints/blob/v14.1.1/CHANGELOG.md)

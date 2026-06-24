@@ -1685,6 +1685,47 @@ export function getReportScript(): string {
                 if (search) { paneApplyGapFilters(search.closest('.section')); }
             });
         }
+        /* ---- Live scan-progress bar ----
+           Driven by host postMessage during a rescan. scanStarted shows the bar
+           with an indeterminate sweep; scanProgress sets a determinate fill +
+           phase label; scanFinished hides it (the happy path also rebuilds the
+           whole panel HTML, so this mainly covers cancel/abort where no rebuild
+           occurs). Width is set via CSSOM, which the strict nonce CSP allows. */
+        var scanProgressEl = document.getElementById('scan-progress');
+        var scanFillEl = document.getElementById('scan-progress-fill');
+        var scanLabelEl = document.getElementById('scan-progress-label');
+        var scanPctEl = document.getElementById('scan-progress-pct');
+        function showScanProgress() {
+            if (!scanProgressEl) { return; }
+            scanProgressEl.hidden = false;
+            if (scanFillEl) { scanFillEl.classList.add('indeterminate'); }
+            if (scanLabelEl) {
+                scanLabelEl.textContent = scanProgressEl.dataset.starting || '';
+            }
+            if (scanPctEl) { scanPctEl.textContent = ''; }
+        }
+        function updateScanProgress(percent, message) {
+            if (!scanProgressEl) { return; }
+            scanProgressEl.hidden = false;
+            var pct = Math.max(0, Math.min(100, Math.round(percent || 0)));
+            if (scanFillEl) {
+                /* A real percent arrived — drop the indeterminate sweep and
+                   pin the fill width so the bar tracks actual progress. */
+                scanFillEl.classList.remove('indeterminate');
+                scanFillEl.style.width = pct + '%';
+            }
+            scanProgressEl.setAttribute('aria-valuenow', String(pct));
+            if (scanLabelEl && message) { scanLabelEl.textContent = message; }
+            if (scanPctEl) { scanPctEl.textContent = pct + '%'; }
+        }
+        function hideScanProgress() {
+            if (!scanProgressEl) { return; }
+            scanProgressEl.hidden = true;
+            if (scanFillEl) {
+                scanFillEl.classList.remove('indeterminate');
+                scanFillEl.style.width = '0%';
+            }
+        }
         /* Host -> client: injected detail HTML, and reveal-from-elsewhere. */
         window.addEventListener('message', function(event) {
             var msg = event.data || {};
@@ -1696,6 +1737,12 @@ export function getReportScript(): string {
                 }
             } else if (msg.type === 'selectPackage' && msg.package) {
                 openDetailPane(msg.package);
+            } else if (msg.type === 'scanStarted') {
+                showScanProgress();
+            } else if (msg.type === 'scanProgress') {
+                updateScanProgress(msg.percent, msg.message);
+            } else if (msg.type === 'scanFinished') {
+                hideScanProgress();
             }
         });
         /* Tell the host the message listener is live so a select requested

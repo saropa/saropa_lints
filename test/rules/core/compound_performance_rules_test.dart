@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/core/compound_performance_rules.dart';
 import 'package:test/test.dart';
 
-/// Tests for the 6 compound (context-aware) performance lint rules.
+/// Tests for the compound (context-aware) performance lint rules.
 ///
-/// These rules flag an expensive widget ONLY when nested inside a parent that
-/// makes the cost recur (per animation frame or per scrolled item). The
-/// instantiation pins assert rule metadata; behavior is verified against the
-/// fixtures via the scan CLI (see example/lib/performance/*).
+/// The first six flag an expensive widget ONLY when nested inside a parent that
+/// makes the cost recur (per animation frame or per scrolled item).
+/// `prefer_static_final_for_session_constant` flags session-constant arithmetic
+/// recomputed every rebuild in build(). The instantiation pins assert rule
+/// metadata; behavior is verified against the fixtures via the scan CLI (see
+/// example/lib/performance/*).
 void main() {
   group('Compound Performance Rules - Rule Instantiation', () {
     void testRule(String name, String codeName, dynamic Function() create) {
@@ -52,6 +54,11 @@ void main() {
       'avoid_clip_path_in_animated_builder',
       () => AvoidClipPathInAnimatedBuilderRule(),
     );
+    testRule(
+      'PreferStaticFinalForSessionConstantRule',
+      'prefer_static_final_for_session_constant',
+      () => PreferStaticFinalForSessionConstantRule(),
+    );
   });
 
   group('Compound Performance Rules - Fixture Verification', () {
@@ -62,6 +69,7 @@ void main() {
       'avoid_shader_mask_in_scrollable',
       'avoid_image_filter_in_scrollable',
       'avoid_clip_path_in_animated_builder',
+      'prefer_static_final_for_session_constant',
     ];
 
     for (final fixture in fixtures) {

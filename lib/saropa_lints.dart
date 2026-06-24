@@ -1489,6 +1489,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidShaderMaskInScrollableRule.new,
   AvoidImageFilterInScrollableRule.new,
   AvoidClipPathInAnimatedBuilderRule.new,
+  PreferStaticFinalForSessionConstantRule.new,
 
   // Scroll and list rules (NEW)
   AvoidShrinkWrapInScrollViewRule.new,

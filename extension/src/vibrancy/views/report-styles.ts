@@ -1061,6 +1061,68 @@ export function getReportStyles(): string {
             .bar-row { transition: none; }
             .search-clear { transition: none; }
             .footprint-toggle .toggle-btn { transition: none; }
+            /* Hold the indeterminate sweep still so reduced-motion users get a
+               static partial bar instead of a continuously sliding stripe. */
+            .scan-progress-fill.indeterminate { animation: none; }
+        }
+
+        /* ---- Live scan-progress bar ----
+           Sits directly under the header; the host drives it via postMessage
+           during a rescan so the dashboard shows determinate progress instead
+           of looking frozen behind a lone VS Code toast. Determinate fill width
+           is set from JS (CSSOM, allowed under the strict nonce CSP); the
+           indeterminate sweep covers the brief window before the first percent
+           arrives. */
+        .scan-progress {
+            margin: 0 0 12px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            background: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+            border: 1px solid var(--vscode-widget-border, transparent);
+        }
+        .scan-progress-track {
+            position: relative;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            background: var(--vscode-progressBar-background, var(--vscode-editorWidget-border));
+            opacity: 0.85;
+        }
+        .scan-progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            background: var(--vscode-progressBar-background, var(--vscode-button-background));
+            transition: width 0.25s ease;
+        }
+        /* Before the first percent: a moving stripe so the bar reads as "working"
+           rather than stuck at 0%. JS swaps this class off once a real percent
+           arrives. */
+        .scan-progress-fill.indeterminate {
+            width: 35% !important;
+            animation: scanSweep 1.1s ease-in-out infinite;
+        }
+        @keyframes scanSweep {
+            0%   { margin-left: -35%; }
+            100% { margin-left: 100%; }
+        }
+        .scan-progress-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 12px;
+            margin-top: 6px;
+            font-size: 0.85em;
+            color: var(--vscode-descriptionForeground);
+        }
+        .scan-progress-label {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .scan-progress-pct {
+            font-variant-numeric: tabular-nums;
+            flex: 0 0 auto;
         }
     `;
 }

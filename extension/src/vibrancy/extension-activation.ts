@@ -1069,9 +1069,17 @@ async function runScan(
     }
 
     targets.state.startScanning();
+    // Show the in-dashboard progress bar the moment a real scan begins (after
+    // the coalesce/abort early-returns above, so a coalesced no-op never flashes
+    // a bar). No-op when the panel is closed.
+    VibrancyReportPanel.postScanStarted();
     try {
         await runScanInner(targets, controller, { silent: opts?.silent ?? false });
     } finally {
+        // Clear the bar on every exit. On the happy path publishResults has
+        // already rebuilt the panel (bar gone); this is the kill-switch for the
+        // cancel/abort/no-pubspec paths where no rebuild occurs.
+        VibrancyReportPanel.postScanFinished();
         // Capture cancel state before clearing globals — if the user clicked
         // Cancel on the progress toast, that's a "stop scanning" gesture and
         // we drop any coalesced pending rescan.  A real pubspec.lock change
@@ -1097,6 +1105,29 @@ async function runScan(
 const SILENT_PROGRESS: vscode.Progress<{ message?: string; increment?: number }> = {
     report() { /* intentionally silent — background refresh, no toast */ },
 };
+
+/**
+ * Wrap a progress sink so every report() ALSO drives the open dashboard's
+ * in-panel progress bar.  scanPackages reports a per-package increment of
+ * `100 / deps.length`, so accumulating the increments yields a real 0..100
+ * percentage; phase-only reports (no increment) keep the last percent and just
+ * refresh the label.  This is what makes a rescan show live progress in the
+ * dashboard instead of leaving it on stale data behind a lone VS Code toast.
+ */
+function withPanelProgress(
+    base: vscode.Progress<{ message?: string; increment?: number }>,
+): vscode.Progress<{ message?: string; increment?: number }> {
+    let pct = 0;
+    return {
+        report(value) {
+            base.report(value);
+            if (typeof value.increment === 'number') {
+                pct = Math.min(100, pct + value.increment);
+            }
+            VibrancyReportPanel.postScanProgress(pct, value.message ?? '');
+        },
+    };
+}
 
 async function runScanInner(
     targets: ScanTargets,
@@ -1396,11 +1427,11 @@ async function runScanInner(
             }
     };
 
-    // Silent background refresh: run the body directly with no progress UI
-    // and no cancel button. Used after the startup gate rehydrates correct
-    // but aged results and wants to refresh them without interrupting work.
+    // Silent background refresh: no toast / no cancel button, but still drive
+    // the dashboard's in-panel progress bar if it's open — otherwise a silent
+    // refresh of stale data looks like the page is doing nothing.
     if (opts.silent) {
-        await executeScan(SILENT_PROGRESS);
+        await executeScan(withPanelProgress(SILENT_PROGRESS));
         return;
     }
 
@@ -1413,7 +1444,8 @@ async function runScanInner(
         async (progress, token) => {
             // Link VS Code cancel button to our abort controller
             token.onCancellationRequested(() => controller.abort());
-            await executeScan(progress);
+            // Forward the same progress to the open dashboard's in-panel bar.
+            await executeScan(withPanelProgress(progress));
         },
     );
 }

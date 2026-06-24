@@ -28,7 +28,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'accessibility',
     label: 'Accessibility',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_auto_play_media',
       'avoid_color_only_indicators',
@@ -85,7 +85,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'android',
     label: 'Android',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_android_cleartext_traffic',
       'avoid_android_task_affinity_default',
@@ -129,7 +129,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'architecture',
     label: 'Architecture & lifecycle',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'abstract_field_initializer',
       'avoid_barrel_files',
@@ -253,7 +253,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'async_concurrency',
     label: 'Async & concurrency',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_async_in_build',
       'avoid_dialog_context_after_async',
@@ -435,7 +435,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'code_quality',
     label: 'Code quality',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_accessing_collections_by_constant_index',
       'avoid_adjacent_strings',
@@ -643,7 +643,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'data_integrity',
     label: 'Data integrity',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'abi_specific_integer_invalid',
       'argument_must_be_native',
@@ -920,7 +920,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'error_handling',
     label: 'Error handling',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_assert_in_production',
       'avoid_assignments_as_conditions',
@@ -1277,7 +1277,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'forms',
     label: 'Forms & input',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_clearing_form_on_error',
       'avoid_form_in_alert_dialog',
@@ -1525,7 +1525,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'ios',
     label: 'iOS',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_ios_13_deprecations',
       'avoid_ios_battery_drain_patterns',
@@ -1645,7 +1645,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'linux',
     label: 'Linux',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_hardcoded_unix_paths',
       'avoid_sudo_shell_commands',
@@ -1727,7 +1727,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'macos',
     label: 'macOS',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_macos_catalyst_unsupported_apis',
       'avoid_macos_deprecated_security_apis',
@@ -1749,7 +1749,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'media_graphics',
     label: 'Media & graphics',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_audio_in_background_without_config',
       'avoid_autoplay_audio',
@@ -1783,7 +1783,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'navigation',
     label: 'Navigation & routing',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_circular_redirects',
       'avoid_context_after_navigation',
@@ -1831,7 +1831,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'networking',
     label: 'Networking',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_cached_image_in_build',
       'avoid_connectivity_equals_internet',
@@ -1895,7 +1895,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'performance',
     label: 'Performance',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_animation_in_large_list',
       'avoid_backdrop_filter_in_scrollable',
@@ -1956,6 +1956,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'prefer_native_file_dialogs',
       'prefer_pool_pattern',
       'prefer_static_const_widgets',
+      'prefer_static_final_for_session_constant',
       'prefer_using_for_temp_resources',
       'prefer_value_listenable_builder',
       'prefer_weak_references',
@@ -2143,7 +2144,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'security',
     label: 'Security',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_api_key_in_code',
       'avoid_auth_in_query_params',
@@ -2318,7 +2319,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'state_management',
     label: 'State management',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_collection_mutating_methods',
       'avoid_global_key_in_build',
@@ -2421,7 +2422,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'theming',
     label: 'Theming',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_elevation_opacity_in_dark',
       'prefer_dark_mode_colors',
@@ -2492,7 +2493,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'web',
     label: 'Web',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_gesture_only_interactions',
       'avoid_hover_only',
@@ -2523,7 +2524,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'windows',
     label: 'Windows',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_case_sensitive_path_comparison',
       'avoid_forward_slash_path_assumption',

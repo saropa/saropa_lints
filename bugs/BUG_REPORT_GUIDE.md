@@ -36,6 +36,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 - `feature_lint_group_ui_excellence.md`
 
+## Raised Reports (2026-06-23)
+
+- `feature_lint_rule_prefer_static_final_for_session_constant.md`
+
 ---
 
 ## File Naming

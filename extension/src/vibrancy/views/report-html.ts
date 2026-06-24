@@ -141,6 +141,20 @@ export function buildReportHtml(options: ReportOptions): string {
         </div>
         ${buildRadialGauge(avg)}
     </header>
+    ${/* Live scan-progress bar. Hidden until the host posts `scanStarted`; the
+        client fills it from `scanProgress` (percent + phase message) and hides
+        it on `scanFinished`. Without this the dashboard sat on stale data with
+        only a VS Code toast during a rescan, which read as "the page hung". */ ''}
+    <div id="scan-progress" class="scan-progress" hidden role="progressbar"
+         aria-label="${escapeHtml(l10n('packageDashboard.progress.aria'))}"
+         data-starting="${escapeHtml(l10n('packageDashboard.progress.starting'))}"
+         aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="scan-progress-track"><div id="scan-progress-fill" class="scan-progress-fill"></div></div>
+        <div class="scan-progress-meta">
+            <span id="scan-progress-label" class="scan-progress-label"></span>
+            <span id="scan-progress-pct" class="scan-progress-pct"></span>
+        </div>
+    </div>
     <main>
     ${buildGradeBreakdown(results, avg)}
     ${buildReportSummary(options)}

@@ -334,3 +334,269 @@ class AvoidClipPathInAnimatedBuilderRule extends _CompoundPerformanceRule {
   @override
   Set<String> get problematicParents => kAnimatedRebuilders;
 }
+
+/// Flags compound arithmetic in `build()` whose every operand is
+/// session-constant, so the value is recomputed on every rebuild instead of
+/// once.
+///
+/// Since: v14.x | Rule version: v1
+///
+/// A Flutter `build()` frequently computes a value from operands that never
+/// change for the whole app session — numeric literals, `static const` /
+/// top-level `const` fields, and device-scaled design-token getters such as
+/// `ThemeCommonSpace.Footer.size` (a `static final` map lookup resolved once at
+/// startup). The result is identical on every frame, yet it is recomputed each
+/// rebuild. Hoisting it to a lazily-initialized `static final` field computes it
+/// once.
+///
+/// **Why not `const`?** A token getter like `ThemeCommonSpace.X.size` reads a
+/// runtime `static final` cache (keyed off the device display category), so the
+/// expression is NOT a compile-time constant — `const` fails to compile and
+/// `static final` is the strongest form available. Teaching this distinction is
+/// the point of the rule: authors reach for `const`, hit the compile error, and
+/// then leave the value inline in `build()`.
+///
+/// To stay low-noise the rule fires ONLY on a compound expression (at least one
+/// operator). A bare single getter (`ThemeCommonSpace.Medium.size`) is skipped:
+/// the per-site win is a single map lookup, so hoisting one bare getter is not
+/// worth a field. Severity is `info` accordingly — the value is cumulative and
+/// pedagogical, not a hot-path emergency.
+///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   final double pad = ThemeCommonSpace.Footer.size * 2; // recomputed per frame
+///   return Padding(padding: EdgeInsets.only(bottom: pad));
+/// }
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// static final double _pad = ThemeCommonSpace.Footer.size * 2; // computed once
+///
+/// Widget build(BuildContext context) {
+///   return Padding(padding: EdgeInsets.only(bottom: _pad));
+/// }
+/// ```
+class PreferStaticFinalForSessionConstantRule extends SaropaLintRule {
+  PreferStaticFinalForSessionConstantRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'performance'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'prefer_static_final_for_session_constant',
+    '[prefer_static_final_for_session_constant] This expression combines only '
+        'session-constant values (numeric literals, const fields, and '
+        'device-scaled design-token getters that resolve once per app session), '
+        'so its result is identical on every rebuild yet is recomputed on every '
+        'frame inside build(). The token getters are not compile-time const, so '
+        'const will not compile; hoist the whole expression to a lazily computed '
+        'static final field so it is evaluated once rather than per build. {v1}',
+    correctionMessage:
+        'Move the expression to a `static final` field on the State/Widget class '
+        '(e.g. `static final double _value = <expr>;`) and reference the field '
+        'inside build(). Use static final, not const, because design-token '
+        'getters are resolved at runtime.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  /// Default design-token enum types whose value getters resolve once per app
+  /// session (a `static final` cache keyed off the device display category).
+  ///
+  /// Detection is syntactic so it works under both the resolved analyzer tree
+  /// (IDE) and the unresolved `parseString` tree (scan/health CLIs). This is the
+  /// built-in default set, matching the Saropa design-system token classes the
+  /// rule was authored against; it is intentionally narrow to keep the rule
+  /// low-noise rather than flagging every `.size` access in a codebase.
+  static const Set<String> _tokenEnumTypes = <String>{
+    'ThemeCommonSpace',
+    'ThemeCommonSize',
+    'ThemeCommonFontSize',
+    'ThemeCommonElevation',
+    'ThemeCommonRadius',
+    'ThemeCommonIconSize',
+  };
+
+  /// Getter names on a token enum value that return a session-constant scalar.
+  static const Set<String> _tokenGetters = <String>{'size'};
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addBinaryExpression((BinaryExpression node) {
+      // Report only the OUTERMOST arithmetic expression. Nested binaries
+      // (`a + b * c` contains `b * c`) have a BinaryExpression parent and would
+      // double-report the same hoist site, so skip them — the enclosing binary
+      // is the one worth extracting.
+      if (!_isOutermostArithmetic(node)) return;
+
+      // Location gate: only inside an instance `build()` method (criterion 1).
+      // Closures nested in build (LayoutBuilder/itemBuilder) still resolve to
+      // the enclosing build MethodDeclaration. initState, didChangeDependencies,
+      // field initializers, and static/top-level contexts are excluded because
+      // they already run once.
+      if (!_isInsideInstanceBuild(node)) return;
+
+      // Every leaf must be session-constant, AND at least one must be a
+      // non-trivial constant (token getter or named const). A pure
+      // literal-only expression like `2 * 2` is already const-folded by the
+      // compiler, so hoisting it buys nothing.
+      final _SessionConstResult result = _classify(node);
+      if (result.allSessionConstant && result.hasNonTrivialConstant) {
+        reporter.atNode(node);
+      }
+    });
+  }
+
+  /// True when [node] is not itself an operand of a wider arithmetic binary
+  /// (ignoring redundant parentheses), i.e. it is the top of its operator tree.
+  bool _isOutermostArithmetic(BinaryExpression node) {
+    AstNode? parent = node.parent;
+    while (parent is ParenthesizedExpression) {
+      parent = parent.parent;
+    }
+    return parent is! BinaryExpression;
+  }
+
+  /// True when the nearest enclosing method is a non-static `build`.
+  bool _isInsideInstanceBuild(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is MethodDeclaration) {
+        return current.name.lexeme == 'build' && !current.isStatic;
+      }
+      // A top-level function body means we left any widget build path.
+      if (current is FunctionDeclaration) return false;
+      current = current.parent;
+    }
+    return false;
+  }
+
+  /// Classifies the operand tree of [expr]: whether EVERY leaf is
+  /// session-constant, and whether at least one leaf is a non-trivial constant
+  /// (so an all-literal expression does not qualify).
+  _SessionConstResult _classify(Expression expr) {
+    final Expression inner = _unwrap(expr);
+
+    if (inner is IntegerLiteral || inner is DoubleLiteral) {
+      return const _SessionConstResult(
+        allSessionConstant: true,
+        hasNonTrivialConstant: false,
+      );
+    }
+
+    // Unary minus / plus on a constant operand (e.g. `-2`, `-kGap`).
+    if (inner is PrefixExpression) {
+      return _classify(inner.operand);
+    }
+
+    if (inner is BinaryExpression) {
+      final _SessionConstResult left = _classify(inner.leftOperand);
+      if (!left.allSessionConstant) return _notConstant;
+      final _SessionConstResult right = _classify(inner.rightOperand);
+      if (!right.allSessionConstant) return _notConstant;
+      return _SessionConstResult(
+        allSessionConstant: true,
+        hasNonTrivialConstant:
+            left.hasNonTrivialConstant || right.hasNonTrivialConstant,
+      );
+    }
+
+    if (_isTokenGetter(inner) || _isNamedConstant(inner)) {
+      return const _SessionConstResult(
+        allSessionConstant: true,
+        hasNonTrivialConstant: true,
+      );
+    }
+
+    // Anything else (context, widget.*, instance fields, parameters, locals,
+    // method calls) can change between rebuilds — fail the whole expression.
+    return _notConstant;
+  }
+
+  static const _SessionConstResult _notConstant = _SessionConstResult(
+    allSessionConstant: false,
+    hasNonTrivialConstant: false,
+  );
+
+  /// Strips redundant parentheses so classification sees the real expression.
+  Expression _unwrap(Expression expr) {
+    Expression current = expr;
+    while (current is ParenthesizedExpression) {
+      current = current.expression;
+    }
+    return current;
+  }
+
+  /// A session-constant design-token getter: `Enum.Value.size` where `Enum` is
+  /// in [_tokenEnumTypes] and the getter is in [_tokenGetters].
+  bool _isTokenGetter(Expression expr) {
+    if (expr is! PropertyAccess) return false;
+    if (!_tokenGetters.contains(expr.propertyName.name)) return false;
+    final Expression? target = expr.target;
+    // `ThemeCommonSpace.Footer` parses as a PrefixedIdentifier; the enum type
+    // is its prefix. `widget.foo.size` / `iconSize.size` fail here because their
+    // prefix is not a known token enum, which is exactly what we want.
+    return target is PrefixedIdentifier &&
+        _tokenEnumTypes.contains(target.prefix.name);
+  }
+
+  /// A reference to a `static const` / top-level `const` by Dart/Flutter naming
+  /// convention (`kFoo`, `_kFoo`, or SCREAMING_SNAKE_CASE).
+  ///
+  /// Detection is name-based, not element-based, so it behaves identically under
+  /// the resolved analyzer tree and the unresolved `parseString` tree the scan
+  /// and health CLIs use (where element info is absent). The k-prefix and
+  /// all-caps conventions are near-universal for Dart constants, which keeps the
+  /// false-positive risk low for an info-level rule. A volatile local that
+  /// happens to follow the convention is the only miss, and is rare.
+  bool _isNamedConstant(Expression expr) {
+    if (expr is SimpleIdentifier) return _looksLikeConstName(expr.name);
+    // `SomeClass.kField` static const access parses as a PrefixedIdentifier.
+    if (expr is PrefixedIdentifier) {
+      return _looksLikeConstName(expr.identifier.name);
+    }
+    return false;
+  }
+
+  bool _looksLikeConstName(String name) {
+    // Flutter/Dart const convention: `kName` or private `_kName`.
+    final String core = name.startsWith('_') ? name.substring(1) : name;
+    if (core.length >= 2 &&
+        core[0] == 'k' &&
+        core[1] == core[1].toUpperCase() &&
+        core[1] != core[1].toLowerCase()) {
+      return true;
+    }
+    // SCREAMING_SNAKE_CASE constants (e.g. MAX_WIDTH, _DEFAULT_GAP).
+    return RegExp(r'^_?[A-Z][A-Z0-9_]*$').hasMatch(name);
+  }
+}
+
+/// Outcome of classifying an arithmetic operand tree for
+/// [PreferStaticFinalForSessionConstantRule].
+class _SessionConstResult {
+  const _SessionConstResult({
+    required this.allSessionConstant,
+    required this.hasNonTrivialConstant,
+  });
+
+  /// Every leaf of the tree is session-constant.
+  final bool allSessionConstant;
+
+  /// At least one leaf is a token getter or named constant (not a bare literal),
+  /// so hoisting actually avoids recomputed work.
+  final bool hasNonTrivialConstant;
+}
