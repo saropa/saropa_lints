@@ -104,14 +104,17 @@
 // Source: lib\src\rules\api_network_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 dynamic status;
 
 // BAD: Should trigger require_permission_denied_handling
 // expect_lint: require_permission_denied_handling
-void _bad68() async {
-  await Permission.camera.request();
-  // Proceeds assuming permission granted!
+class _BadPermissionService {
+  Future<void> requestCamera() async {
+    await Permission.camera.request();
+    // Proceeds assuming permission granted!
+  }
 }
 
 // GOOD: Should NOT trigger require_permission_denied_handling

@@ -113,9 +113,9 @@ final url = 'https://example.com';
 
 // BAD: Should trigger prefer_http_connection_reuse
 // expect_lint: prefer_http_connection_reuse
-void _bad53() async {
+class _BadHttpService {
   Future<Data> fetchData() async {
-    final client = http.Client(); // New client each call
+    final client = Client(); // New client each call
     final response = await client.get(url);
     client.close();
     return Data.fromJson(response.body);

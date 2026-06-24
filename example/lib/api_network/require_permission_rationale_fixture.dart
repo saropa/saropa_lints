@@ -104,11 +104,14 @@
 // Source: lib\src\rules\api_network_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // BAD: Should trigger require_permission_rationale
 // expect_lint: require_permission_rationale
-void _bad72() async {
-  await Permission.camera.request();
+class _BadRationaleService {
+  Future<void> requestCamera() async {
+    await Permission.camera.request();
+  }
 }
 
 // GOOD: Should NOT trigger require_permission_rationale

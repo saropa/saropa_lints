@@ -109,8 +109,10 @@ dynamic details;
 
 // BAD: Should trigger require_notification_permission_android13
 // expect_lint: require_notification_permission_android13
-void _bad74() async {
-  await notificationsPlugin.show(0, 'Title', 'Body', details);
+class _BadNotificationService {
+  Future<void> showNotification() async {
+    await notificationsPlugin.show(0, 'Title', 'Body', details);
+  }
 }
 
 // GOOD: Should NOT trigger require_notification_permission_android13

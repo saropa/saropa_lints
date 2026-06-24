@@ -104,6 +104,7 @@
 // Source: lib\src\rules\api_network_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 dynamic point;
 dynamic service;

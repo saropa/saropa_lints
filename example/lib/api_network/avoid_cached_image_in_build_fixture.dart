@@ -112,11 +112,13 @@ final url = 'https://example.com';
 
 // BAD: Should trigger avoid_cached_image_in_build
 // expect_lint: avoid_cached_image_in_build
-Widget _bad70_build(context) {
-  return CachedNetworkImage(
-    imageUrl: url,
-    cacheKey: DateTime.now().toString(), // Changes every build!
-  );
+class _BadImageWidget {
+  Widget build(context) {
+    return CachedNetworkImage(
+      imageUrl: url,
+      cacheKey: DateTime.now().toString(), // Changes every build!
+    );
+  }
 }
 
 // GOOD: Should NOT trigger avoid_cached_image_in_build

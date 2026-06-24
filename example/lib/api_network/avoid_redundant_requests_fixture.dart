@@ -114,7 +114,7 @@ final userId = '123';
 // expect_lint: avoid_redundant_requests
 class _bad54_UserWidget extends StatelessWidget {
   Future<User> build() async {
-    return await api.getUser(userId); // Called in multiple widgets
+    return await http.get(url); // Called in multiple widgets
   }
 }
 

@@ -89,28 +89,32 @@ The fix is to make each fixture realistic: put the bad code in a class method, a
 reads, and name it to match the rule's heuristic. A genuine rule bug (too-narrow detection) is fixed in the
 rule instead — done once so far for `avoid_hardcoded_api_urls`.
 
-### Done so far
+### Done — api_network cluster: 20 → 0 silent (all 34 rules fire on their fixtures)
 
 - `avoid_hardcoded_api_urls` — real rule bug (regex demanded `/api` path, missed `api.` hosts). Rule
   widened, version bumped to v6, changelog Fixed entry. silent→fired.
-- `require_http_status_check` — fixture made realistic (class method + `package:http` import). silent→fired.
-- api_network cluster: 20 → 18 silent.
+- The other 19 silent rules were **inadequate fixtures**, fixed without touching rule behavior:
+  - **Wrong context** (bad code in a top-level/nested function, rule visits class methods) → wrapped the
+    bad example in a realistic class method: `require_http_status_check`, `require_retry_logic`,
+    `require_response_caching`, `require_connectivity_check`, `prefer_api_pagination`,
+    `prefer_http_connection_reuse`, `require_content_type_check`, `avoid_cached_image_in_build` (method
+    named `build`), `avoid_websocket_without_heartbeat`, `require_notification_permission_android13`,
+    `require_permission_denied_handling`, `require_permission_rationale`.
+  - **Body did not match the rule's pattern** → fixed the call (`api.fetchData()`→`http.get`):
+    `avoid_redundant_requests`, `require_cancel_token`, `require_api_error_mapping`.
+  - **Missing the package import the rule gates on** → added the import line (text-gate, no resolution
+    needed): `require_connectivity_subscription_cancel`, `require_geolocator_timeout`,
+    `require_notification_handler_top_level` (+ the two permission rules above).
+  - **Wrong AST node** (`response.bodyBytes` parses as a PrefixedIdentifier; rule registers on
+    PropertyAccess) → made the bad example a real property access on the call result:
+    `prefer_streaming_response`.
 
-### Remaining worklist (api_network cluster, 18 silent)
+### Remaining: the same triage across the rest of the package (~745 silent)
 
-Each needs its fixture made realistic per its trigger (registration shown):
-`avoid_cached_image_in_build` (addInstanceCreationExpression — CachedNetworkImage type, needs resolution or
-name match), `avoid_redundant_requests` / `prefer_api_pagination` / `prefer_http_connection_reuse` /
-`require_response_caching` / `require_retry_logic` (addMethodDeclaration — class method + http import),
-`avoid_websocket_without_heartbeat` / `require_connectivity_subscription_cancel` / `require_content_type_check`
-/ `require_geolocator_timeout` / `require_notification_handler_top_level` /
-`require_notification_permission_android13` / `require_permission_denied_handling` /
-`require_permission_rationale` (addMethodInvocation — call-site pattern), `require_api_error_mapping`
-(addTryStatement), `require_cancel_token` (addClassDeclaration), `require_connectivity_check`
-(addMethodDeclaration + name gate `fetch*`).
-
-After api_network, the same triage applies to the remaining ~700 silent rules package-wide — a corpus-quality
-program to run in batches, with the liveness report (`accuracy_report`) verifying each fix flips silent→fired.
+The api_network cluster proves the loop. The remaining silent rules package-wide are the same three shapes
+(wrong context / unmatched body / missing import), to be worked in clusters with `accuracy_report` verifying
+each batch flips silent→fired. Run the full-corpus report to pick the next cluster:
+`dart run saropa_lints:accuracy_report --tier pedantic --fail-on none --format json`.
 
 ### Optional rule-widening (separate, blast-radius)
 

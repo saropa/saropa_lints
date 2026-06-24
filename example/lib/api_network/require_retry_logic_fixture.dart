@@ -113,7 +113,7 @@ final users = <dynamic>[];
 
 // BAD: Should trigger require_retry_logic
 // expect_lint: require_retry_logic
-void _bad46() async {
+class _BadRetryRepository {
   Future<User> fetchUser(String id) async {
     final response = await http.get(Uri.parse('$baseUrl/users/$id'));
     return User.fromJson(jsonDecode(response.body));

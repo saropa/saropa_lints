@@ -112,7 +112,7 @@ dynamic response;
 
 // BAD: Should trigger prefer_api_pagination
 // expect_lint: prefer_api_pagination
-void _bad56() async {
+class _BadItemsRepository {
   Future<List<Item>> getAllItems() async {
     final response = await api.get('/items');
     return response.map((e) => Item.fromJson(e)).toList();

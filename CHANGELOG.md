@@ -73,6 +73,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 <details><summary>Maintenance</summary>
 
 - Added a rule-liveness report (`dart run saropa_lints:accuracy_report`) that scans the `expect_lint` fixtures and flags any rule declared in a fixture but never firing there — a gap the marker-text contract tests cannot catch. Report-only; not yet wired into CI. No action required.
+- Made every api_network fixture actually exercise its rule. The bad examples were stubs — top-level functions where the rule visits class methods, or missing the package import the rule gates on — so 20 of the network rules never fired on their own fixtures. Each bad example is now a realistic class method with the required import; all 34 api_network rules now trigger. Fixtures only; no rule behavior changed. No action required.
 
 </details>
 

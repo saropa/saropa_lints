@@ -110,7 +110,7 @@ dynamic config;
 
 // BAD: Should trigger require_response_caching
 // expect_lint: require_response_caching
-void _bad55() async {
+class _BadConfigRepository {
   Future<Config> getConfig() async {
     return await api.get('/config'); // Fetches every time
   }

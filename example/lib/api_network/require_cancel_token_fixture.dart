@@ -113,7 +113,7 @@ final mounted = true;
 // expect_lint: require_cancel_token
 class _bad58__MyWidgetState extends State<MyWidget> {
   Future<void> loadData() async {
-    final data = await api.fetchData(); // No cancellation
+    final data = await http.get(url); // No cancellation
     setState(() => _data = data);
   }
 }

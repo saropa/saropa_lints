@@ -113,7 +113,7 @@ final url = 'https://example.com';
 
 // BAD: Should trigger require_connectivity_check
 // expect_lint: require_connectivity_check
-void _bad48() async {
+class _BadSyncService {
   Future<void> syncData() async {
     final response = await http.post(url, body: data);
   }

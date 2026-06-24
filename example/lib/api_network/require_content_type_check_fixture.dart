@@ -115,9 +115,11 @@ final url = 'https://example.com';
 
 // BAD: Should trigger require_content_type_check
 // expect_lint: require_content_type_check
-void _bad60() async {
-  final response = await http.get(url);
-  final data = jsonDecode(response.body);
+class _BadContentTypeService {
+  Future<void> fetchData() async {
+    final response = await http.get(url);
+    final data = jsonDecode(response.body);
+  }
 }
 
 // GOOD: Should NOT trigger require_content_type_check

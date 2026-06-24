@@ -111,7 +111,7 @@ final id = '1';
 // expect_lint: require_api_error_mapping
 void _bad49() async {
   try {
-    await fetchUser(id);
+    await http.get(url);
   } catch (e) {
     print('Error: $e'); // Generic handling
   }

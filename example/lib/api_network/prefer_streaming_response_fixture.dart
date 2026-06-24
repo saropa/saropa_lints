@@ -115,9 +115,10 @@ dynamic stream;
 // BAD: Should trigger prefer_streaming_response
 // expect_lint: prefer_streaming_response
 void _bad52() async {
-  final response = await http.get(Uri.parse(largeFileUrl));
-  final bytes = response.bodyBytes; // Entire file in memory!
-  await file.writeAsBytes(bytes);
+  // Read the response body inline so `.bodyBytes` is a property access on the
+  // call result (a PropertyAccess node) — the shape the rule registers on.
+  final bytes = (await http.get(Uri.parse(largeFileUrl))).bodyBytes;
+  await file.writeAsBytes(bytes); // Entire file in memory!
 }
 
 // GOOD: Should NOT trigger prefer_streaming_response

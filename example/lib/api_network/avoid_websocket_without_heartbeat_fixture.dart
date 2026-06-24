@@ -111,9 +111,11 @@ dynamic stream;
 
 // BAD: Should trigger avoid_websocket_without_heartbeat
 // expect_lint: avoid_websocket_without_heartbeat
-void _bad61() {
-  final channel = WebSocketChannel.connect(Uri.parse('wss://'));
-  channel.stream.listen((data) => handleData(data));
+class _BadSocketService {
+  void connectSocket() {
+    final channel = WebSocketChannel.connect(Uri.parse('wss://'));
+    channel.stream.listen((data) => handleData(data));
+  }
 }
 
 // GOOD: Should NOT trigger avoid_websocket_without_heartbeat
