@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2324,
+  "ruleCount": 2325,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -24284,6 +24284,22 @@
       "certIds": [],
       "tags": [
         "dart-core"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "prefer_static_final_for_session_constant": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "flutter",
+        "performance"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
