@@ -144,6 +144,27 @@
     "dismiss": "Dismiss",
     "reviewFailed": "Couldn't open the Saropa Lints rule pack review. {error}"
   },
+  "opportunities": {
+    "documentTitle": "Upgrade Opportunities",
+    "heroTitle": "Upgrade Opportunities",
+    "subtitle": "{count} packages have features your project does not use yet",
+    "noScan": "Run a package scan first to find upgrade opportunities.",
+    "openFileFailed": "Could not open {file} — it may have moved since the last scan.",
+    "card": {
+      "versionUpgrade": "update available to {latest}",
+      "versionCurrent": "on latest",
+      "featuresTitle": "Features not yet used",
+      "locationsTitle": "Where your project uses this package",
+      "noLocations": "Not imported in project source — likely a dev or transitive dependency.",
+      "moreFiles": "and {count} more files",
+      "copyForAi": "Copy upgrade prompt for AI",
+      "openInDashboard": "Open in Package Dashboard"
+    },
+    "empty": {
+      "title": "Nothing to adopt",
+      "body": "Every scanned package's features are already used in your project, or no changelog opportunities were found."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION",
@@ -719,7 +740,8 @@
     "detailPane": {
       "aria": "Package detail",
       "title": "Package detail",
-      "close": "Close detail"
+      "close": "Close detail",
+      "copyForAi": "Copy upgrade prompt for AI"
     },
     "status": {
       "packagesCount": "{count} packages",
@@ -799,6 +821,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Copy report JSON (all rows + details)",
       "copyAllLabel": "Copy",
+      "copyOpportunitiesTitle": "Copy AI upgrade prompts for the top under-adopted packages into one paste",
+      "copyOpportunitiesLabel": "Copy opportunities for AI",
       "saveAllTitle": "Save report JSON to reports/YYYYMMDD/...",
       "saveAllLabel": "Save",
       "saveUpgradeTitle": "Save a report of only packages with an available update to reports/YYYYMMDD/...",
@@ -902,6 +926,10 @@
         "label": "Update",
         "tooltip": "Available version update: major, minor, or patch"
       },
+      "opportunities": {
+        "label": "Opportunities",
+        "tooltip": "Features in this package's changelog not yet used in your code — sort to find the most under-adopted packages"
+      },
       "status": {
         "label": "Status",
         "tooltip": "Usage status: whether the package appears unused in your code"
@@ -915,6 +943,7 @@
       "noGithub": "No GitHub repository found",
       "devBadge": "dev",
       "transitiveBadge": "transitive",
+      "opportunitiesTooltip": "Unused features: {features}",
       "publishDateUnavailable": "Publish date not available from pub.dev",
       "activityGradeUnavailable": "Activity grade unavailable (missing commit or release data)",
       "activityFallback": "Activity based on recent commits and releases",

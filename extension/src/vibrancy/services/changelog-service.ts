@@ -143,8 +143,15 @@ export async function fetchChangelog(
     return null;
 }
 
-/** Parse all version entries from a CHANGELOG.md string. */
-function parseAllEntries(content: string): ChangelogEntry[] {
+/**
+ * Parse all version entries from a CHANGELOG.md string.
+ *
+ * Exported so the opportunity scanner can mine a package's FULL history (every
+ * `added` feature ever shipped), not just the current→latest delta. Adoption
+ * opportunities exist even for up-to-date packages: a caret constraint quietly
+ * rides a package across many minor releases whose new APIs were never adopted.
+ */
+export function parseAllEntries(content: string): ChangelogEntry[] {
     const entries: ChangelogEntry[] = [];
     const headerPattern = /^##\s+\[?v?(\d+\.\d+\.\d+[^\]]*)\]?(?:\s*[-–]\s*(.+))?$/;
 
@@ -255,7 +262,7 @@ export async function buildUpdateInfo(
     return { currentVersion, latestVersion, updateStatus, changelog };
 }
 
-async function fetchChangelogWithFallback(
+export async function fetchChangelogWithFallback(
     repoInfo: { owner: string; repo: string; subpath: string | null } | null,
     packageName: string | undefined,
     params?: { token?: string; cache?: CacheService },

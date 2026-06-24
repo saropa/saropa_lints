@@ -29,6 +29,10 @@
     "noneDetected": "아직까지 당신의 의존도에 맞는 팩은 없습니다. 지원되는 패키지를 추가하거나 아래의 모든 패키지 문서를 열으십시오.",
     "allPackages": "모든 패키지, 모든 포장",
     "allPackagesHint": "이 프로젝트에서 검출되지 않은 것을 포함하여 모든 사용 가능한 패키지. 팩이 자신의 규칙을 선택하도록 허용하십시오.",
+    "versionGroup": {
+      "tag": "하나의 버전을 선택하여 한 가지 버전으로 변경하십시오.",
+      "tooltip": "이러한 팩은 동일한 의존성의 다른 주요 버전을 대상으로합니다. 한 번에 하나만 적용됩니다. 한 가지를 가능하게 하는 것은 다른 것을 꺼지게 한다."
+    },
     "domainDesc": {
       "state-management": "블록, 리버팟, 프로바이더, GetX 및 관련 상태와 의존성 주입 라이브러리.",
       "networking-apis": "HTTP 클라이언트, GraphQL, Firebase, Supabase 및 연결.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "패키지 세부 사항은 패키지입니다.",
       "title": "패키지 세부 사항은 패키지입니다.",
-      "close": "세세한 세부적인 면접을 통해 자세히 알아본다."
+      "close": "세세한 세부적인 면접을 통해 자세히 알아본다.",
+      "copyForAi": "인공지능 업그레이드 프롬프트를 복사하여 AI에 적용합니다."
     },
     "status": {
       "packagesCount": "{count}개 패키지",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "보고서 JSON을 복사하십시오 (모든 행 + 세부 사항)",
       "copyAllLabel": "복사, 복사.",
+      "copyOpportunitiesTitle": "가장 많이 채택되지 않은 패키지의 AI 업그레이드 프롬프트를 한 번에 복사하여 붙여넣기",
+      "copyOpportunitiesLabel": "인공지능에 대한 기회를 복사하십시오.",
       "saveAllTitle": "보고서 JSON을 reports/YYY YMMDD/...로 저장합니다.",
       "saveAllLabel": "세이브 (save) 를 저장하여 보관합니다.",
       "saveUpgradeTitle": "보고서에 대한 업데이트가 가능한 패키지들만 포함된 보고서를 저장합니다/YYY YMMDD/...",
@@ -898,6 +905,10 @@
         "label": "업데이트 업데이터 Update Update",
         "tooltip": "사용 가능한 버전 업데이트: 주요, 사소한 또는 패치."
       },
+      "opportunities": {
+        "label": "기회와 기회를 만들어주는 것이다.",
+        "tooltip": "이 패키지의 변경록의 기능은 아직 당신의 코드에 사용되지 않았습니다. 가장 적게 채택된 패키지를 찾기 위해 정렬하십시오."
+      },
       "status": {
         "label": "상태의 지위 (Status)",
         "tooltip": "사용 상태: 패키지가 코드에 사용하지 않은 상태로 표시되는지 여부."
@@ -911,6 +922,7 @@
       "noGithub": "GitHub 저장소가 발견되지 않았습니다.",
       "devBadge": "데브  ⁇  (dev dev) 은",
       "transitiveBadge": "이변적 (transitive) 은 과도한 것을 의미한다.",
+      "opportunitiesTooltip": "사용하지 않는 기능: {features}",
       "publishDateUnavailable": "게시 날짜는 pub.dev에서 사용할 수 없습니다.",
       "activityGradeUnavailable": "활동 등급이 사용 불가능하다 (컴이트 또는 릴리스 데이터가 누락)",
       "activityFallback": "최근 약속과 발표에 기반한 활동",

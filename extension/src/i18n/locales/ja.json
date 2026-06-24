@@ -29,6 +29,10 @@
     "noneDetected": "まだあなたの依存関係に一致するパックはありません. サポートされているパッケージを追加するか,以下の\"すべてのパッケージ\"を開く.",
     "allPackages": "すべてのパッケージ",
     "allPackagesHint": "このプロジェクトで検出されていないものを含む,すべての利用可能なパッケージ. 集団が規則に同意することを可能にします.",
+    "versionGroup": {
+      "tag": "1つのバージョンを選択します.",
+      "tooltip": "これらのパックは,同じ依存性の異なる主要なバージョンをターゲットにします. 適用されるのは一度に1つだけです. 片方を有効にすると,他のものは消える."
+    },
     "domainDesc": {
       "state-management": "Block,Riverpod,Provider,GetXなどに関連した状態や依存性のインジェクションライブラリ.",
       "networking-apis": "HTTP クライアント,GraphQL,Firebase,Supabase,そして接続性.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "パッケージの詳細は,パッケージに記載されています.",
       "title": "パッケージの詳細は,パッケージに記載されています.",
-      "close": "細部から詳細まで,クローズアップ."
+      "close": "細部から詳細まで,クローズアップ.",
+      "copyForAi": "AI のアップグレードプロンプトをコピーする"
     },
     "status": {
       "packagesCount": "{count} 個のパッケージ",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "レポートのJSONをコピーする (すべての行 + 詳細)",
       "copyAllLabel": "コピー・コピー・コピー した",
+      "copyOpportunitiesTitle": "AIアップグレードプロンプトをコピーして,採用されていないパッケージのトップに1つのペーストで貼り付けます.",
+      "copyOpportunitiesLabel": "AIの機会をコピーする.",
       "saveAllTitle": "レポートのJSONをレポート/YYY YMMDD/...に保存する.",
       "saveAllLabel": "保存する Save",
       "saveUpgradeTitle": "報告書の更新が利用可能なパッケージのみをレポートに保存する/YYY YMMDD/...",
@@ -898,6 +905,10 @@
         "label": "アップデートアップデートの更新",
         "tooltip": "入手可能なバージョンアップデート:メジャー,マイナーまたはパッチ"
       },
+      "opportunities": {
+        "label": "機会やチャンスが生まれます.",
+        "tooltip": "このパッケージの変更ログにある機能は,まだあなたのコードで使用されていません. 最も採用されていないパッケージをソートして探す."
+      },
       "status": {
         "label": "ステータス (Status) 状態",
         "tooltip": "使用状況: パッケージがコードで未使用の状態に表示されるかどうか"
@@ -911,6 +922,7 @@
       "noGithub": "GitHub リポジトリが見つかりませんでした.",
       "devBadge": "dev dev dev について",
       "transitiveBadge": "変形性 (トランジティブ)",
+      "opportunitiesTooltip": "未使用の機能: {features}",
       "publishDateUnavailable": "公開日: pub.dev から利用できません.",
       "activityGradeUnavailable": "アクティビティーグレードが利用できない (コミットまたはリリースデータが欠けている)",
       "activityFallback": "最近のコミットメントとリリースに基づく活動",

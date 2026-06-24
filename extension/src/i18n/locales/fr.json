@@ -29,6 +29,10 @@
     "noneDetected": "Aucun paquet ne correspond à vos dépendances pour le moment. Ajoutez un paquet pris en charge, ou ouvrez Tous les paquets ci-dessous.",
     "allPackages": "Tous les colis sont inclus.",
     "allPackagesHint": "Tous les paquets disponibles, y compris ceux qui n'ont pas été détectés dans ce projet. Permettre à une meute de choisir ses règles.",
+    "versionGroup": {
+      "tag": "Choisissez une version.",
+      "tooltip": "Ces packs ciblent différentes versions majeures d'une même dépendance. Un seul est valable à la fois  ⁇ permettant l'un éteint les autres."
+    },
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX et les bibliothèques d'état et d'injection de dépendance connexes.",
       "networking-apis": "Les clients HTTP, GraphQL, Firebase, Supabase et la connectivité.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "Détails de l'emballage détaillé.",
       "title": "Détails de l'emballage détaillé.",
-      "close": "Détails de près, détails rapprochés."
+      "close": "Détails de près, détails rapprochés.",
+      "copyForAi": "Copiez l'invite de mise à niveau pour AI."
     },
     "status": {
       "packagesCount": "{count} paquets",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Copiez le rapport JSON (toutes les lignes + détails)",
       "copyAllLabel": "Le texte est copié, copié.",
+      "copyOpportunitiesTitle": "Copiez les instructions de mise à niveau d'IA pour les paquets sous-adoptés en haut dans un seul collage.",
+      "copyOpportunitiesLabel": "Copiez les opportunités pour l'IA.",
       "saveAllTitle": "Enregistrer le JSON du rapport dans les rapports / ANN/...",
       "saveAllLabel": "Il est question de Save Save.",
       "saveUpgradeTitle": "Enregistrer un rapport de seulement des paquets avec une mise à jour disponible pour les rapports/AAAAMMDD/...",
@@ -898,6 +905,10 @@
         "label": "La mise à jour de la version actuelle est disponible.",
         "tooltip": "Mise à jour de version disponible: mise à jour majeure, mineure ou corrective."
       },
+      "opportunities": {
+        "label": "Les opportunités sont nombreuses.",
+        "tooltip": "Caractéristiques du journal des modifications de ce paquet qui n'ont pas encore été utilisées dans votre code  ⁇ trier pour trouver les paquets qui ont été le moins adoptés."
+      },
       "status": {
         "label": "Etat",
         "tooltip": "Statut d'utilisation: si le paquet apparaît inutilisé dans votre code."
@@ -911,6 +922,7 @@
       "noGithub": "Aucun référentiel GitHub n'a été trouvé.",
       "devBadge": "Il est le créateur de Dev Dev.",
       "transitiveBadge": "transitif est un terme qui désigne une situation transitive.",
+      "opportunitiesTooltip": "Fonctionnalités inutilisées : {features}",
       "publishDateUnavailable": "Date de publication non disponible à partir de pub.dev",
       "activityGradeUnavailable": "Grade d'activité non disponible (données manquantes pour l'engagement ou la libération)",
       "activityFallback": "Activité basée sur les engagements et communiqués récents.",

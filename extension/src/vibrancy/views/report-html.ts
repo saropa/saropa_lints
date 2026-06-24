@@ -156,6 +156,7 @@ export function buildReportHtml(options: ReportOptions): string {
         <div class="detail-pane-head">
             <span class="detail-pane-kicker">${escapeHtml(l10n('packageDashboard.detailPane.title'))}</span>
             <div class="detail-pane-actions">
+                <button type="button" class="detail-pane-copy" id="detailPaneCopyAi" title="${escapeHtml(l10n('packageDashboard.detailPane.copyForAi'))}" aria-label="${escapeHtml(l10n('packageDashboard.detailPane.copyForAi'))}" hidden>&#129302;</button>
                 <button type="button" class="detail-pane-copy" id="detailPaneCopy" title="${escapeHtml(l10n('packageDashboard.row.copyRowJson'))}" aria-label="${escapeHtml(l10n('packageDashboard.row.copyRowJson'))}">&#128203;</button>
                 <button type="button" class="detail-pane-close" id="detailPaneClose" title="${escapeHtml(l10n('packageDashboard.detailPane.close'))}" aria-label="${escapeHtml(l10n('packageDashboard.detailPane.close'))}">×</button>
             </div>

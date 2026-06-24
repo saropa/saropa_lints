@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "রিস্ক্যান প্যাকেজ (নতুন)",
   "command.packageVibrancy.openOtherProject.title": "স্ক্যান আরেকটি প্রকল্প ...",
   "command.packageVibrancy.showReport.title": "প্যাকেজ ড্যাশবোর্ড খুলুন",
+  "command.packageVibrancy.showOpportunities.title": "ওপেন আপগ্রেড সুযোগগুলি খুলুন",
   "command.packageVibrancy.focus.title": "প্যাকেজ প্রাণবন্ততাঃ খোলা ড্যাশবোর্ড (কমপ্যাক্ট)",
   "command.packageVibrancy.clearCache.title": "ক্যাশে সাফ করুন",
   "command.packageVibrancy.exportReport.title": "রপ্তানি প্রতিবেদন রিপোর্ট",

@@ -29,6 +29,10 @@
     "noneDetected": "Ainda não há pacotes que correspondam às suas dependências. Adicione um pacote suportado ou abra Todos os pacotes abaixo.",
     "allPackages": "Todas as embalagens.",
     "allPackagesHint": "Cada pacote disponível, incluindo os não detectados neste projeto. Permitir que um bando opte por suas regras.",
+    "versionGroup": {
+      "tag": "Escolha uma versão.",
+      "tooltip": "Esses pacotes visam diferentes versões principais da mesma dependência. Apenas uma se aplica de cada vez  ⁇ habilitando um desliga os outros."
+    },
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX e bibliotecas de injeção de dependência e estado relacionadas.",
       "networking-apis": "Clientes HTTP, GraphQL, Firebase, Supabase e conectividade.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "Detalhes da embalagem.",
       "title": "Detalhes da embalagem.",
-      "close": "Detalhes de perto, detalhes próximos."
+      "close": "Detalhes de perto, detalhes próximos.",
+      "copyForAi": "Copiar o prompt de atualização para IA."
     },
     "status": {
       "packagesCount": "{count} pacotes",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Copie o relatório JSON (todas as linhas + detalhes)",
       "copyAllLabel": "Copia, copia e replicação.",
+      "copyOpportunitiesTitle": "Copie as instruções de atualização da IA para os pacotes mais baixos em adoção em uma única pasta.",
+      "copyOpportunitiesLabel": "Copiar oportunidades para a IA.",
       "saveAllTitle": "Salvar o relatório JSON para relatórios/AAAAMMDD/...",
       "saveAllLabel": "Salvar Save Save Salvação.",
       "saveUpgradeTitle": "Salvar um relatório de apenas pacotes com uma atualização disponível para relatórios/AAAAMMDD/...",
@@ -898,6 +905,10 @@
         "label": "Atualização de atualização Update Update.",
         "tooltip": "Atualização de versão disponível: maior, menor ou patch."
       },
+      "opportunities": {
+        "label": "Oportunidades de oportunidades.",
+        "tooltip": "Características no registro de alterações deste pacote ainda não usadas em seu código  ⁇ classificar para encontrar os pacotes menos adotados."
+      },
       "status": {
         "label": "Status",
         "tooltip": "Status de uso: se o pacote aparece não usado em seu código."
@@ -911,6 +922,7 @@
       "noGithub": "Não foi encontrado nenhum repositório GitHub.",
       "devBadge": "Dev dev dev, você sabe.",
       "transitiveBadge": "transitivo, transitiva é o que se faz.",
+      "opportunitiesTooltip": "Funcionalidades não utilizadas: {features}",
       "publishDateUnavailable": "Data de publicação não está disponível a partir do pub.dev.",
       "activityGradeUnavailable": "Grau de atividade indisponível (perdidos dados de commit ou release)",
       "activityFallback": "Atividade baseada em compromissos e liberações recentes.",

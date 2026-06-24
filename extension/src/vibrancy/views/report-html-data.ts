@@ -12,6 +12,7 @@ import { formatSizeKB } from '../scoring/bloat-calculator';
 import { escapeHtml } from './html-utils';
 import { l10n } from '../../i18n/runtime';
 import { resolveRepoUrl, computeActivitySignal } from './report-html-shared';
+import { buildAiPromptBundle } from '../services/ai-prompt-bundle';
 
 export function buildNetworkSection(results: VibrancyResult[]): string {
     const direct = results.filter(r => r.package.isDirect);
@@ -106,6 +107,20 @@ function buildPackageJson(
     const activeFiles = activeFileUsages(r.fileUsages);
     const repoBase = resolveRepoUrl(r) ?? null;
     const activity = computeActivitySignal(r);
+    /* Pre-build the "Copy for AI" prompt here (extension side) so the webview
+       button only has to copy a precomputed string. Uses the FULL-history
+       opportunities (r.opportunities), so up-to-date packages with unadopted
+       features get a prompt too — not just outdated ones. Null when nothing is
+       adoptable, which hides the button. */
+    const aiPrompt = r.opportunities
+        ? buildAiPromptBundle({
+            packageName: name,
+            currentVersion: r.package.version,
+            latestVersion: r.updateInfo?.latestVersion ?? r.package.version,
+            opportunities: r.opportunities,
+            fileUsages: activeFiles,
+        })
+        : null;
     return {
         name,
         version: r.package.version,
@@ -149,6 +164,15 @@ function buildPackageJson(
             status: r.updateInfo.updateStatus,
             latestVersion: r.updateInfo.latestVersion,
         } : null,
+        /* Ready-to-paste prompt that hands an AI the classified changelog
+           opportunities plus this project's call sites. Null hides the
+           "Copy for AI" button (no opportunities to adopt). */
+        aiPrompt,
+        /* Adoption-needle signals: the 0–100 relevance score that drives the
+           Opportunities column sort and the count of unadopted features. Both
+           0 when nothing is adoptable, so the sweep button can skip them. */
+        opportunityScore: r.opportunityScore ?? 0,
+        unadoptedCount: r.unadoptedApiNames?.length ?? 0,
         isUnused: r.isUnused,
         fileCount: activeFiles.length,
         // One entry per source file. Now that the scanner dedupes by

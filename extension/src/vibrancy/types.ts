@@ -8,6 +8,7 @@
 import type { VersionGapResult } from './types-extended';
 import type { ReplacementComplexity } from './services/package-code-analyzer';
 import type { PackageUsage } from './services/import-scanner';
+import type { PackageOpportunities } from './services/changelog-opportunities';
 
 /** Status categories for package vibrancy. */
 export type VibrancyCategory = 'vibrant' | 'stable' | 'outdated' | 'abandoned' | 'end-of-life';
@@ -400,6 +401,26 @@ export interface VibrancyResult {
     readonly isUnused: boolean;
     /** Files that import this package (active + commented-out). Empty array if unused. */
     readonly fileUsages: readonly PackageUsage[];
+    /**
+     * Adoptable features mined from the package's FULL changelog history (not
+     * just the upgrade delta), so up-to-date packages with unadopted features
+     * still surface. Null when no changelog or nothing adoptable. Optional for
+     * source compatibility with result literals that predate the field.
+     */
+    readonly opportunities?: PackageOpportunities | null;
+    /**
+     * API names from `opportunities` that do NOT appear anywhere in project
+     * source — the genuinely unused features. Computed in the post-scan pass
+     * where both opportunities and the project symbol scan are available.
+     */
+    readonly unadoptedApiNames?: readonly string[];
+    /**
+     * Relevance score (0–100) ranking this package as an adoption needle:
+     * unadopted-feature count weighted by how heavily the project imports the
+     * package. Drives the dashboard "Upgrade Opportunities" sort. 0 / absent
+     * when nothing to adopt.
+     */
+    readonly opportunityScore?: number;
     readonly platforms: readonly string[] | null;
     readonly verifiedPublisher: boolean;
     readonly wasmReady: boolean | null;

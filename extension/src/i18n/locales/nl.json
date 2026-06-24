@@ -29,6 +29,10 @@
     "noneDetected": "Er zijn nog geen packs die overeenkomen met je afhankelijkheden. Voeg een ondersteund pakket toe, of open All packages hieronder.",
     "allPackages": "Alle pakketten.",
     "allPackagesHint": "Elke beschikbare verpakking, inclusief die welke niet in dit project zijn gedetecteerd. Een roedel in staat stellen om zich aan zijn regels te houden.",
+    "versionGroup": {
+      "tag": "Kies één versie uit.",
+      "tooltip": "Deze pakketten richten zich op verschillende grote versies van dezelfde afhankelijkheid. Er geldt er maar één tegelijk  ⁇ Het mogelijk maken van de ene schakelt de andere uit."
+    },
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX en gerelateerde state- en afhankelijkheidsinjectiebibliotheken.",
       "networking-apis": "HTTP-clients, GraphQL, Firebase, Supabase en connectiviteit.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "Pakket detail pakket details",
       "title": "Pakket detail pakket details",
-      "close": "Close detail details van dichtbij."
+      "close": "Close detail details van dichtbij.",
+      "copyForAi": "Kopieer de upgrade prompt voor AI."
     },
     "status": {
       "packagesCount": "{count} pakketten",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Kopieer het rapport JSON (alle rijen + details)",
       "copyAllLabel": "Kopieer kopieer, kopieër.",
+      "copyOpportunitiesTitle": "Kopieer de AI-upgrade-aanwijzingen voor de top ondergeadopteerde pakketten in één plakvorm.",
+      "copyOpportunitiesLabel": "Copy kansen voor AI.",
       "saveAllTitle": "Bewaar het rapport JSON in reports/YYY YMMDD/...",
       "saveAllLabel": "Save Save Save Bewaar het",
       "saveUpgradeTitle": "Bewaar een rapport van alleen pakketten met een beschikbare update voor rapporten/JJJMMDD/...",
@@ -898,6 +905,10 @@
         "label": "Update",
         "tooltip": "Beschikbare versie-update: grote, kleine of patch."
       },
+      "opportunities": {
+        "label": "Kansen, kansen.",
+        "tooltip": "Functies in het changelog van dit pakket die nog niet gebruikt zijn in uw code  ⁇ Sorteer om de meest ondergeadopteerde pakketten te vinden."
+      },
       "status": {
         "label": "Status",
         "tooltip": "Gebruiksstatus: of het pakket ongebruikt verschijnt in uw code."
@@ -911,6 +922,7 @@
       "noGithub": "Geen GitHub repository gevonden.",
       "devBadge": "Dev dev dev, wat is dat eigenlijk?",
       "transitiveBadge": "transitieve, overgangsvormige.",
+      "opportunitiesTooltip": "Ongebruikte functies: {features}",
       "publishDateUnavailable": "Publicatie datum niet beschikbaar vanaf pub.dev",
       "activityGradeUnavailable": "Activiteitsklasse niet beschikbaar (ontbrekende commit- of releasegegevens)",
       "activityFallback": "Activiteit gebaseerd op recente commits en releases.",

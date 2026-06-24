@@ -751,6 +751,33 @@ export function reportScriptPart5(): string {
             });
         }
 
+        /* ---- Copy a ready-to-paste AI upgrade prompt (detail pane header) ---- */
+        /* Copies the precomputed data.aiPrompt string: the classified changelog
+         * opportunities plus this project's call sites, framed as a task. The
+         * button is shown only for packages whose aiPrompt is non-null (an
+         * outdated package with adoptable changelog entries); openDetailPane
+         * toggles its visibility per package. */
+        var paneAiBtn = document.getElementById('detailPaneCopyAi');
+        if (paneAiBtn) {
+            var paneAiIcon = paneAiBtn.innerHTML;
+            paneAiBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                var pkg = paneAiBtn.dataset.pkg;
+                if (!pkg) { return; }
+                var data = packageData[pkg];
+                if (!data || !data.aiPrompt) { return; }
+                if (paneAiBtn.classList.contains('copied')) { return; }
+                navigator.clipboard.writeText(data.aiPrompt).then(function() {
+                    paneAiBtn.innerHTML = '\\u2713';
+                    paneAiBtn.classList.add('copied');
+                    setTimeout(function() {
+                        paneAiBtn.innerHTML = paneAiIcon;
+                        paneAiBtn.classList.remove('copied');
+                    }, 1500);
+                });
+            });
+        }
+
         /* ---- Copy entire table as JSON ---- */
         /* Copies an array of every package's full JSON record (same shape
            as the per-row copy, so all expander content is included). */
@@ -770,6 +797,40 @@ export function reportScriptPart5(): string {
                     setTimeout(function() {
                         copyAllBtn.innerHTML = copyAllLabel;
                         copyAllBtn.classList.remove('copied');
+                    }, 1500);
+                });
+            });
+        }
+
+        /* ---- Copy all adoption opportunities for AI (toolbar sweep) ---- */
+        /* Bundles the precomputed aiPrompt of the highest-scoring needles into
+         * one paste so a single AI round triages the whole project. Hidden
+         * unless at least one package has an adoptable feature; capped at the
+         * top N by relevance with the cap disclosed in the copied text. */
+        var copyOppBtn = document.getElementById('copy-opportunities');
+        if (copyOppBtn) {
+            var copyOppLabel = copyOppBtn.innerHTML;
+            var oppPkgs = Object.keys(packageData)
+                .map(function(k) { return packageData[k]; })
+                .filter(function(d) { return d.aiPrompt && d.opportunityScore > 0; })
+                .sort(function(a, b) { return b.opportunityScore - a.opportunityScore; });
+            if (oppPkgs.length > 0) { copyOppBtn.hidden = false; }
+            copyOppBtn.addEventListener('click', function() {
+                if (copyOppBtn.classList.contains('copied') || oppPkgs.length === 0) { return; }
+                var top = oppPkgs.slice(0, 10);
+                var header = '# Adoption opportunities across ' + oppPkgs.length + ' packages';
+                if (oppPkgs.length > top.length) {
+                    header += ' (showing the top ' + top.length + ' by relevance)';
+                }
+                var text = header + '\\n\\n' + top.map(function(d) {
+                    return d.aiPrompt;
+                }).join('\\n\\n---\\n\\n');
+                navigator.clipboard.writeText(text).then(function() {
+                    copyOppBtn.innerHTML = '\\u2713 Copied ' + top.length;
+                    copyOppBtn.classList.add('copied');
+                    setTimeout(function() {
+                        copyOppBtn.innerHTML = copyOppLabel;
+                        copyOppBtn.classList.remove('copied');
                     }, 1500);
                 });
             });
@@ -1564,6 +1625,7 @@ export function reportScriptPart7(): string {
         var detailPane = document.getElementById('detail-pane');
         var detailPaneBody = document.getElementById('detail-pane-body');
         var detailPaneCopyBtn = document.getElementById('detailPaneCopy');
+        var detailPaneAiBtn = document.getElementById('detailPaneCopyAi');
         function openDetailPane(name) {
             if (!name || !detailPane || !detailPaneBody) { return; }
             document.querySelectorAll('.pkg-row.row-selected').forEach(function(r) {
@@ -1575,6 +1637,14 @@ export function reportScriptPart7(): string {
             /* The header copy button copies the package shown in the pane, so
              * retag it with the current package on every open. */
             if (detailPaneCopyBtn) { detailPaneCopyBtn.dataset.pkg = name; }
+            /* The AI-prompt button only applies to packages with adoptable
+             * changelog entries, so retag it and show/hide per package based on
+             * whether the host precomputed a non-null aiPrompt for this row. */
+            if (detailPaneAiBtn) {
+                detailPaneAiBtn.dataset.pkg = name;
+                var paneData = packageData[name];
+                detailPaneAiBtn.hidden = !(paneData && paneData.aiPrompt);
+            }
             detailPaneBody.innerHTML = '';
             detailPane.hidden = false;
             vscode.postMessage({ type: 'requestPackageDetail', package: name });

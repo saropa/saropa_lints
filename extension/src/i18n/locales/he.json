@@ -29,6 +29,10 @@
     "noneDetected": "עדיין אין חבילות שמתאימות לתלות שלך. הוסף חבילה נתמכת, או לפתוח כל החבילות למטה.",
     "allPackages": "כל החבילות",
     "allPackagesHint": "כל חבילה זמינה, כולל אלה שלא זוהו בפרויקט זה. אפשר לחבורה לבחור את כלליה.",
+    "versionGroup": {
+      "tag": "בחרו גרסה אחת.",
+      "tooltip": "חבילות אלה מכוונות גרסאות גדולות שונות של אותו התלות. רק אחד חלה בבת אחת  ⁇ אפשרות אחת מכבה את האחרים."
+    },
     "domainDesc": {
       "state-management": "בלאק, ריברפוד, פרויידר, גטX וספריות של מצב וזרקת תלותיות קשורות.",
       "networking-apis": "לקוחות HTTP, GraphQL, Firebase, Supabase וחיבור.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "פרטי חבילה:",
       "title": "פרטי חבילה:",
-      "close": "פרטים מקרוב לפרט"
+      "close": "פרטים מקרוב לפרט",
+      "copyForAi": "העתק את הזמנת השדרוג עבור AI."
     },
     "status": {
       "packagesCount": "{count} חבילות",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "העתק דוח JSON (כל השורות + הפרטים)",
       "copyAllLabel": "העתק, עותק, העתקה.",
+      "copyOpportunitiesTitle": "העתק את ההזמנות לשיפור AI עבור החבילות המונחות ביותר לתוך דבק אחד.",
+      "copyOpportunitiesLabel": "העתק הזדמנויות עבור AI.",
       "saveAllTitle": "שמור את דוח JSON לדוחות / YYYYMMDD /...",
       "saveAllLabel": "שמור Save לשמור",
       "saveUpgradeTitle": "שמור דוח של חבילות בלבד עם עדכון זמין לדוחות/YYY YMMDD/...",
@@ -898,6 +905,10 @@
         "label": "עדכון Update Update לעדכן",
         "tooltip": "עדכון גרסה זמין: עיקר, קטן או תיקון."
       },
+      "opportunities": {
+        "label": "הזדמנויות, אפשרויות.",
+        "tooltip": "תכונות ב-changelog של החבילה הזו טרם שימשו בקוד שלך  ⁇ לסדר כדי למצוא את החבילות הכי פחות מאומץ."
+      },
       "status": {
         "label": "מצב סטטוס Status",
         "tooltip": "מצב שימוש: האם החבילה מופיעה ללא שימוש בקוד שלך."
@@ -911,6 +922,7 @@
       "noGithub": "לא נמצא מאגר GitHub.",
       "devBadge": "דב Dev dev dev הוא לא.",
       "transitiveBadge": "טרנזיטיבי - עברי.",
+      "opportunitiesTooltip": "תכונות שאינן בשימוש: {features}",
       "publishDateUnavailable": "תאריך פרסום לא זמין מ pub.dev",
       "activityGradeUnavailable": "דרגת פעילות לא זמינה (נתוני התחייבות או שחרור חסרים)",
       "activityFallback": "פעילות המבוססת על התחייבויות ופרסומים אחרונים.",

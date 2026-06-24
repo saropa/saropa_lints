@@ -28,7 +28,7 @@ function col(cid: string, part: 'label' | 'tooltip'): string {
 }
 
 /** Columns that can be auto-hidden when all values are empty or start collapsed. */
-type HidableColumn = 'transitives' | 'vulns' | 'status' | 'files' | 'license' | 'description';
+type HidableColumn = 'transitives' | 'vulns' | 'status' | 'files' | 'license' | 'description' | 'opportunities';
 
 /**
  * Wrap the package table in a collapsible <details>. Defaults open so the
@@ -60,6 +60,10 @@ function getHiddenColumns(results: VibrancyResult[]): Set<HidableColumn> {
     if (!hasUnused) { hidden.add('status'); }
     const hasFileUsages = results.some(r => r.fileUsages.length > 0);
     if (!hasFileUsages) { hidden.add('files'); }
+    // Hide the Opportunities column entirely when no package has an adoptable
+    // feature — the column is pure noise on a project that uses everything.
+    const hasOpportunities = results.some(r => (r.opportunityScore ?? 0) > 0);
+    if (!hasOpportunities) { hidden.add('opportunities'); }
     /* License and description start collapsed — no toggle UI yet. */
     hidden.add('license');
     hidden.add('description');
@@ -104,6 +108,7 @@ function buildReportTable(
         + (hidden.has('vulns') ? 0 : 1)
         + (hidden.has('license') ? 0 : 1)
         + (hidden.has('status') ? 0 : 1)
+        + (hidden.has('opportunities') ? 0 : 1)
         + (hidden.has('description') ? 0 : 1);
 
     return `<table>
@@ -125,6 +130,7 @@ function buildReportTable(
             ${thOpt('vulns', col('vulns', 'label'), col('vulns', 'tooltip'))}
             ${thOpt('license', col('license', 'label'), col('license', 'tooltip'))}
             ${th('update', col('update', 'label'), col('update', 'tooltip'))}
+            ${thOpt('opportunities', col('opportunities', 'label'), col('opportunities', 'tooltip'))}
             ${thOpt('status', col('status', 'label'), col('status', 'tooltip'))}
             ${thOpt('description', col('description', 'label'), col('description', 'tooltip'))}
         </tr></thead>
@@ -194,6 +200,7 @@ function buildRow(
         data-vulns="${vulnCount}"
         data-license="${escapeHtml(r.license ?? '')}"
         data-update="${r.updateInfo?.updateStatus ?? 'unknown'}"
+        data-opportunities="${r.opportunityScore ?? 0}"
         data-status="${r.isUnused ? 'unused' : 'ok'}"
         data-section="${r.package.section}"
         data-overridden="${isOverridden}"
@@ -216,6 +223,7 @@ function buildRow(
         ${hidden.has('vulns') ? '' : buildVulnsCell(r)}
         ${hidden.has('license') ? '' : buildLicenseCell(r)}
         ${buildUpdateCell(r)}
+        ${hidden.has('opportunities') ? '' : buildOpportunitiesCell(r)}
         ${hidden.has('status') ? '' : buildStatusCell(r)}
         ${hidden.has('description') ? '' : buildDescCell(r)}
     </tr>`;
@@ -634,6 +642,27 @@ function getUpdateClass(status: string): string {
     if (status === 'minor') { return 'update-minor'; }
     if (status === 'patch') { return 'update-patch'; }
     return '';
+}
+
+/**
+ * Opportunities cell: the count of changelog features this package offers that
+ * the project does not yet use, with the unused API names in the tooltip. This
+ * is the needle signal — a high count on a heavily-used package is a package
+ * you have under-adopted. Selecting the row opens the detail pane where the
+ * "Copy upgrade prompt for AI" button lives. Empty when nothing is unadopted.
+ */
+function buildOpportunitiesCell(r: VibrancyResult): string {
+    const unused = r.unadoptedApiNames ?? [];
+    if (unused.length === 0) {
+        return '<td class="cell-right"><span class="dimmed">–</span></td>';
+    }
+    const tooltip = escapeHtml(
+        l10n('packageDashboard.cells.opportunitiesTooltip', {
+            features: unused.slice(0, 10).join(', '),
+        }),
+    );
+    return `<td class="cell-right" title="${tooltip}">`
+        + `<span class="badge-opportunity">${unused.length}</span></td>`;
 }
 
 function buildStatusCell(r: VibrancyResult): string {

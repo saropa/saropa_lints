@@ -39,6 +39,7 @@ import {
     SecurityHotspotReviewStateService,
     countSecurityHotspotReviewStates,
 } from '../securityHotspotReviewState';
+import { getLatestResults } from '../vibrancy/extension-activation';
 
 export type SectionNode = vscode.TreeItem | ConfigTreeNode;
 
@@ -192,7 +193,28 @@ function buildBannerItems(): LeafItem[] {
     return [];
 }
 
+/**
+ * Count packages that have at least one changelog feature not yet referenced in
+ * project source — the adoption "needles" the Package Dashboard ranks. Surfaced
+ * as a badge on the sidebar row so the count is visible without opening the
+ * dashboard. Reads the latest scan results; the vibrancy status callback in
+ * extension.ts already calls refreshAllSections() on scan completion, so the
+ * badge updates itself.
+ */
+function countAdoptionNeedles(): number {
+    return getLatestResults().filter(
+        r => (r.unadoptedApiNames?.length ?? 0) > 0,
+    ).length;
+}
+
 function buildEditorDashboardItems(): LeafItem[] {
+    // Append a needle count to the Package Dashboard row when the last scan
+    // found unadopted features, so under-used dependencies are visible at a
+    // glance. Falls back to the plain description before any scan has run.
+    const needles = countAdoptionNeedles();
+    const packageDesc = needles > 0
+        ? `Dependency vibrancy report · ${needles} to adopt`
+        : 'Dependency vibrancy report';
     return [
         // Launchpad first: it consolidates every dashboard below onto one page, so it is the
         // natural entry point for the section.
@@ -212,11 +234,21 @@ function buildEditorDashboardItems(): LeafItem[] {
         ),
         new LeafItem(
             'Package Dashboard',
-            'Dependency vibrancy report',
+            packageDesc,
             'saropaLints.packageVibrancy.showReport',
             'package',
             new vscode.ThemeColor('charts.green'),
         ),
+        // Dedicated focused list of dependencies with unadopted features. Only
+        // shown once a scan has surfaced at least one, so it does not advertise
+        // an empty view.
+        ...(needles > 0 ? [new LeafItem(
+            'Upgrade Opportunities',
+            `${needles} ${needles === 1 ? 'package' : 'packages'} with features to adopt`,
+            'saropaLints.packageVibrancy.showOpportunities',
+            'rocket',
+            new vscode.ThemeColor('charts.blue'),
+        )] : []),
         new LeafItem(
             'Code Health Dashboard',
             'Function-level code health',

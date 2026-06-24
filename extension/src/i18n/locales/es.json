@@ -29,6 +29,10 @@
     "noneDetected": "Todavía no hay paquetes que coincidan con sus dependencias. Añadir un paquete soportado, o abrir Todos los paquetes a continuación.",
     "allPackages": "Todos los paquetes.",
     "allPackagesHint": "Cada paquete disponible, incluidos los que no se detectaron en este proyecto. Permitir que un paquete se adhiera a sus reglas.",
+    "versionGroup": {
+      "tag": "Elige una versión.",
+      "tooltip": "Estos paquetes se dirigen a diferentes versiones principales de la misma dependencia. Solo se aplica uno a la vez  ⁇ Habilitar uno desactiva a los otros."
+    },
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX y las bibliotecas de estado e inyección de dependencias relacionadas.",
       "networking-apis": "Clientes HTTP, GraphQL, Firebase, Supabase y conectividad.",
@@ -139,6 +143,27 @@
     "review": "El análisis de la revisión.",
     "dismiss": "Despido de trabajo.",
     "reviewFailed": "No se pudo abrir la revisión del paquete de reglas Saropa Lints. {error}"
+  },
+  "opportunities": {
+    "documentTitle": "Mejora las oportunidades de actualización.",
+    "heroTitle": "Mejora las oportunidades de actualización.",
+    "subtitle": "Los paquetes {count} tienen características que su proyecto aún no utiliza.",
+    "noScan": "Ejecuta primero un escaneo de paquetes para encontrar oportunidades de actualización.",
+    "openFileFailed": "No se pudo abrir {file}  ⁇ Puede que se haya movido desde el último escaneo.",
+    "card": {
+      "versionUpgrade": "actualización disponible para el {latest}.",
+      "versionCurrent": "sobre lo último en las últimas noticias.",
+      "featuresTitle": "Características que aún no se han utilizado.",
+      "locationsTitle": "Donde su proyecto utiliza este paquete.",
+      "noLocations": "No importado en la fuente del proyecto  ⁇ Es probable que haya una dependencia evolutiva o transitiva.",
+      "moreFiles": "y {count} más archivos.",
+      "copyForAi": "Copiar el aviso de actualización para la IA.",
+      "openInDashboard": "Abrir en el panel de control del paquete."
+    },
+    "empty": {
+      "title": "Nada para adoptar nada.",
+      "body": "Las características de cada paquete escaneado ya se utilizan en su proyecto, o no se encontraron oportunidades para el registro de cambios."
+    }
   },
   "packageDetail": {
     "section": {
@@ -715,7 +740,8 @@
     "detailPane": {
       "aria": "Detalle del paquete El detalle del empaque.",
       "title": "Detalle del paquete El detalle del empaque.",
-      "close": "Detalles muy cercanos en detalle."
+      "close": "Detalles muy cercanos en detalle.",
+      "copyForAi": "Copiar el aviso de actualización para la IA."
     },
     "status": {
       "packagesCount": "{count} paquetes",
@@ -795,6 +821,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Copia el informe JSON (todas las filas + detalles)",
       "copyAllLabel": "Copiar copiar copiado",
+      "copyOpportunitiesTitle": "Copie las instrucciones de actualización de IA para los paquetes menos adoptados en una sola pasta.",
+      "copyOpportunitiesLabel": "Copia las oportunidades para la IA.",
       "saveAllTitle": "Guardar el informe JSON en los informes / A.A.A..MMDD/...",
       "saveAllLabel": "Salvar y guardar para salvar.",
       "saveUpgradeTitle": "Guardar un informe de sólo paquetes con una actualización disponible para los informes/AAAAAMMDD/...",
@@ -898,6 +926,10 @@
         "label": "Actualización de actualizaciones.",
         "tooltip": "Actualización de la versión disponible: mayor, menor o parche."
       },
+      "opportunities": {
+        "label": "Oportunidades de oportunidades.",
+        "tooltip": "Características en el registro de cambios de este paquete que aún no se han utilizado en su código  ⁇ ordenar para encontrar los paquetes menos adoptados."
+      },
       "status": {
         "label": "El estado de la situación.",
         "tooltip": "Estado de uso: si el paquete aparece sin usar en su código."
@@ -911,6 +943,7 @@
       "noGithub": "No se encontró ningún repositorio GitHub.",
       "devBadge": "El nombre de la empresa es Dev Dev.",
       "transitiveBadge": "transitivo es el término que se utiliza para designar a los seres humanos.",
+      "opportunitiesTooltip": "Características no utilizadas: características que aún no se han utilizado. {features} El hombre de la ciudad",
       "publishDateUnavailable": "Fecha de publicación no está disponible desde pub.dev",
       "activityGradeUnavailable": "Grado de actividad no disponible (falta datos de compromiso o liberación)",
       "activityFallback": "Actividad basada en compromisos y liberaciones recientes.",

@@ -29,6 +29,10 @@
     "noneDetected": "Hakuna vifurushi vinavyolingana na utegemezi wako bado. Ongeza kifurushi kinachosaidiwa, au fungua Vifurushi vyote chini.",
     "allPackages": "Vifurushi vyote vilikuwa vimefungwa.",
     "allPackagesHint": "Kila pakiti inayopatikana, pamoja na zile ambazo hazikugunduliwa katika mradi huu. Ruhusu kundi kuchagua sheria zake.",
+    "versionGroup": {
+      "tag": "Chagua toleo moja la kuchagua.",
+      "tooltip": "Pakiti hizi zinalenga matoleo tofauti ya msingi ya utegemezi huo. Moja tu inatumika kwa wakati mmoja  ⁇ kuwezesha moja inageuza wengine mbali."
+    },
     "domainDesc": {
       "state-management": "Block, Riverpod, Provider, GetX na maktaba zinazohusiana za hali na sindano ya utegemezi.",
       "networking-apis": "Wateja wa HTTP, GraphQL, Firebase, Supabase na uunganisho.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "Maelezo ya kifurushi Package Detail.",
       "title": "Maelezo ya kifurushi Package Detail.",
-      "close": "Karibu sana kwa undani."
+      "close": "Karibu sana kwa undani.",
+      "copyForAi": "Nakili mwongozo wa kuboresha kwa AI."
     },
     "status": {
       "packagesCount": "vifurushi {count}",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Nakili ripoti JSON (safu zote + maelezo)",
       "copyAllLabel": "Nakala nakala nakala.",
+      "copyOpportunitiesTitle": "Nakili maombi ya kuboresha AI kwa vifurushi vya juu vilivyochukuliwa chini katika moja na kuweka.",
+      "copyOpportunitiesLabel": "Nakili fursa za AI kwa AI.",
       "saveAllTitle": "Hifadhi ripoti JSON kwa ripoti/YYY YMMDD/...",
       "saveAllLabel": "Save Sawa Kuokoa",
       "saveUpgradeTitle": "Hifadhi ripoti ya vifurushi tu na sasisho linalopatikana kwa ripoti/YYY YMMDD/...",
@@ -898,6 +905,10 @@
         "label": "Update update update ya mambo.",
         "tooltip": "Sasisho la toleo linalopatikana: kubwa, ndogo au patch."
       },
+      "opportunities": {
+        "label": "Fursa za fursa.",
+        "tooltip": "Vipengele katika changelog ya kifurushi hiki bado havitumiwi kwenye msimbo wako  ⁇ aina ya kupata vifurushi chini-kupitishwa zaidi."
+      },
       "status": {
         "label": "Hali ya hali ya hali Status Status",
         "tooltip": "Hali ya matumizi: ikiwa kifurushi kinaonekana kuwa hakijatumika katika nambari yako."
@@ -911,6 +922,7 @@
       "noGithub": "Hakuna hazina ya GitHub iliyopatikana.",
       "devBadge": "dev dev dev Dev, kwa kweli.",
       "transitiveBadge": "transitive - mpito, wa kupita.",
+      "opportunitiesTooltip": "Vipengele visivyotumika: {features}",
       "publishDateUnavailable": "Tarehe ya kuchapisha haipatikani kutoka pub.dev.",
       "activityGradeUnavailable": "Hatua ya shughuli haipatikani (data za kuagiza au kutolewa hazipo)",
       "activityFallback": "Shughuli kulingana na ahadi za hivi karibuni na matoleo.",

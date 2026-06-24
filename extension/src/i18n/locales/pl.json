@@ -29,6 +29,10 @@
     "noneDetected": "Jeszcze nie ma paczek pasujących do twoich zależności. Dodaj wspierany pakiet lub otwórz Wszystkie pakiety poniżej.",
     "allPackages": "Wszystkie opakowania.",
     "allPackagesHint": "Każde dostępne opakowanie, w tym te nie wykryte w ramach tego projektu. Umożliwić zbiorze, aby podpisać się do jego zasad.",
+    "versionGroup": {
+      "tag": "Wybierz jedną wersję.",
+      "tooltip": "Pakiety te są skierowane do różnych głównych wersji tego samego uzależnienia. W tym samym czasie obowiązuje tylko jeden  ⁇ umożliwiając jedno wyłącza inne."
+    },
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX i powiązane biblioteki stanu i wstrzykiwania zależności.",
       "networking-apis": "Klienci HTTP, GraphQL, Firebase, Supabase i łączność.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "Szczegóły dotyczące opakowania.",
       "title": "Szczegóły dotyczące opakowania.",
-      "close": "Z bliska szczegółowo."
+      "close": "Z bliska szczegółowo.",
+      "copyForAi": "Kopiowanie polecenia aktualizacji dla sztucznej inteligencji."
     },
     "status": {
       "packagesCount": "{count} pakietów",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Kopiować raport JSON (wszystkie wiersze + szczegóły)",
       "copyAllLabel": "Kopia kopii, kopiuj.",
+      "copyOpportunitiesTitle": "Skopiuj polecenia do aktualizacji AI dla największych pakietów niedopuszczonych w jedną pasję.",
+      "copyOpportunitiesLabel": "Kopiowanie możliwości dla sztucznej inteligencji.",
       "saveAllTitle": "Zapisz raport JSON w raportach/RRRMMDD/...",
       "saveAllLabel": "Save Save Zapisz, zapisać",
       "saveUpgradeTitle": "Zapisz raport tylko z pakietami, w którym dostępna jest aktualizacja raportów/RRRMMDD/...",
@@ -898,6 +905,10 @@
         "label": "Aktualizacja aktualizacji Update Update.",
         "tooltip": "Dostępne aktualizacje wersji: główna, niewielka lub poprawkę."
       },
+      "opportunities": {
+        "label": "Możliwości, możliwości.",
+        "tooltip": "Funkcje w dzienniku zmian tego pakietu nie zostały jeszcze użyte w twoim kodzie  ⁇ Sortuj, aby znaleźć najbardziej niedopatrzone pakiety."
+      },
       "status": {
         "label": "Status",
         "tooltip": "Status użycia: czy pakiet jest nieużywany w kodzie."
@@ -911,6 +922,7 @@
       "noGithub": "Nie znaleziono repozytorium GitHub.",
       "devBadge": "dev dev dev to coś",
       "transitiveBadge": "transytywne, przejściowe.",
+      "opportunitiesTooltip": "Nieużywane funkcje: {features}",
       "publishDateUnavailable": "Data publikacji nie jest dostępna od pub.dev.",
       "activityGradeUnavailable": "Nie ma dostępnego poziomu aktywności (brak danych o komitowaniu lub uwolnieniu)",
       "activityFallback": "Działalność oparta na ostatnich zobowiązaniach i wydaniach.",

@@ -29,6 +29,10 @@
     "noneDetected": "Belum ada paket yang cocok dengan ketergantungan Anda. Tambahkan paket yang didukung, atau buka Semua paket di bawah ini.",
     "allPackages": "Semua paket yang dikirimkan.",
     "allPackagesHint": "Setiap paket yang tersedia, termasuk yang tidak terdeteksi dalam proyek ini. Membuat sebuah kelompok untuk memilih aturan-aturannya.",
+    "versionGroup": {
+      "tag": "Pilih satu versi.",
+      "tooltip": "Paket ini menargetkan versi utama yang berbeda dari ketergantungan yang sama. Hanya satu yang berlaku pada suatu waktu  ⁇ memungkinkan satu menghidupkan yang lain off."
+    },
     "domainDesc": {
       "state-management": "Block, Riverpod, Provider, GetX dan state-related serta dependence injection libraries.",
       "networking-apis": "HTTP klien, GraphQL, Firebase, Supabase dan konektivitas.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "Detail paket yang lengkap.",
       "title": "Detail paket yang lengkap.",
-      "close": "Detail dekat detail yang sangat dekat."
+      "close": "Detail dekat detail yang sangat dekat.",
+      "copyForAi": "Salin upgrade prompt untuk AI."
     },
     "status": {
       "packagesCount": "{count} paket",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Salin laporan JSON (semua baris + detail)",
       "copyAllLabel": "Salin, salin dan tiriskan.",
+      "copyOpportunitiesTitle": "Salin ajakan upgrade AI untuk paket-paket yang paling banyak diadopsi menjadi satu paste.",
+      "copyOpportunitiesLabel": "Salin kesempatan untuk AI.",
       "saveAllTitle": "Simpan laporan JSON ke reports/YYY YMMDD/...",
       "saveAllLabel": "Save Save Save (dalam bahasa Inggris).",
       "saveUpgradeTitle": "Simpan laporan hanya paket dengan update yang tersedia untuk laporan/YYY YMMDD/...",
@@ -898,6 +905,10 @@
         "label": "Update adalah update yang dilakukan oleh orang lain.",
         "tooltip": "Update versi yang tersedia: utama, kecil, atau patch."
       },
+      "opportunities": {
+        "label": "Kesempatan-kesempatan yang ada di sana adalah kesempatan.",
+        "tooltip": "Fitur-fitur dalam changelog paket ini belum digunakan di kode Anda  ⁇ Urutkan untuk menemukan paket yang paling kurang diadopsi."
+      },
       "status": {
         "label": "Status",
         "tooltip": "Status penggunaan: apakah paket muncul tidak digunakan dalam kode Anda."
@@ -911,6 +922,7 @@
       "noGithub": "Tidak ada repositori GitHub yang ditemukan.",
       "devBadge": "Dev Dev adalah dev yang berarti.",
       "transitiveBadge": "transitif yang bersifat transitif.",
+      "opportunitiesTooltip": "Fitur yang tidak digunakan: {features}",
       "publishDateUnavailable": "Tanggal publikasi tidak tersedia dari pub.dev",
       "activityGradeUnavailable": "Kelas aktivitas tidak tersedia (data commit atau release yang hilang)",
       "activityFallback": "Kegiatan berdasarkan komitmen dan rilis baru-baru ini.",

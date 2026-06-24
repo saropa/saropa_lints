@@ -29,6 +29,10 @@
     "noneDetected": "Chưa có gói nào phù hợp với các phụ thuộc của bạn. Thêm một gói được hỗ trợ, hoặc mở Tất cả các gói dưới đây.",
     "allPackages": "Tất cả các gói hàng",
     "allPackagesHint": "Mỗi gói có sẵn, bao gồm cả những cái không được phát hiện trong dự án này. Cho phép một nhóm chọn vào các quy tắc của nó.",
+    "versionGroup": {
+      "tag": "Chọn một phiên bản.",
+      "tooltip": "Các gói này nhắm mục tiêu các phiên bản chính khác nhau của cùng một phụ thuộc. Chỉ có một ứng dụng được áp dụng tại một thời điểm  ⁇ cho phép một biến các người khác tắt."
+    },
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX và các thư viện trạng thái và tiêm phụ thuộc liên quan.",
       "networking-apis": "HTTP client, GraphQL, Firebase, Supabase và kết nối.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "Chi tiết gói hàng chi tiết",
       "title": "Chi tiết gói hàng chi tiết",
-      "close": "Gần chi tiết chi tiết."
+      "close": "Gần chi tiết chi tiết.",
+      "copyForAi": "Sao chép nhắc nâng cấp cho AI"
     },
     "status": {
       "packagesCount": "{count} gói",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Sao chép báo cáo JSON (tất cả các hàng + chi tiết)",
       "copyAllLabel": "Copy copy copy sao chép",
+      "copyOpportunitiesTitle": "Sao chép các yêu cầu nâng cấp AI cho các gói được áp dụng ít nhất lên một lần dán.",
+      "copyOpportunitiesLabel": "Sao chép các cơ hội cho AI",
       "saveAllTitle": "Lưu báo cáo JSON vào reports/YYY YMMDD/...",
       "saveAllLabel": "Save Save Save Giữ",
       "saveUpgradeTitle": "Lưu một báo cáo chỉ bao gồm các gói với bản cập nhật có sẵn cho các báo cáo/YYY YMMDD/...",
@@ -898,6 +905,10 @@
         "label": "Update update updates là gì",
         "tooltip": "Cập nhật phiên bản có sẵn: lớn, nhỏ hoặc là một mảng."
       },
+      "opportunities": {
+        "label": "Cơ hội, cơ hội.",
+        "tooltip": "Các tính năng trong bản ghi thay đổi của gói này chưa được sử dụng trong mã của bạn  ⁇ Lưu trữ để tìm các gói được áp dụng ít nhất."
+      },
       "status": {
         "label": "Tình trạng Status Status",
         "tooltip": "Tình trạng sử dụng: Usage status liệu gói hàng có xuất hiện chưa được sử dụng trong mã của bạn hay không."
@@ -911,6 +922,7 @@
       "noGithub": "Không tìm thấy kho lưu trữ GitHub.",
       "devBadge": "Dev Dev Dev là một người",
       "transitiveBadge": "transitive trân trọng transitive",
+      "opportunitiesTooltip": "Các tính năng chưa được sử dụng: {features}",
       "publishDateUnavailable": "Ngày xuất bản không có sẵn từ pub.dev",
       "activityGradeUnavailable": "Không có cấp độ hoạt động (không có dữ liệu cam kết hoặc phát hành)",
       "activityFallback": "Hoạt động dựa trên các cam kết và phát hành gần đây.",

@@ -29,6 +29,10 @@
     "noneDetected": "Walang mga pack na katumbas ng iyong mga dependency pa. Magdagdag ng isang suportadong pakete, o buksan ang Lahat ng mga pakete sa ibaba.",
     "allPackages": "Lahat ng mga pakete ay naka-package.",
     "allPackagesHint": "Lahat ng available na pack, kasama ang mga hindi nasuri sa proyektong ito. Pagbibigay-daan sa isang pack upang magpasya sa mga patakaran nito.",
+    "versionGroup": {
+      "tag": "Pumili ng isang bersyon.",
+      "tooltip": "Ang mga pakete na ito ay naka-target sa iba't ibang pangunahing bersyon ng parehong dependency. Isa lamang ang naaangkop sa isang pagkakataon  ⁇ Ang pagbibigay ng kakayahan sa isa ay nag-aalis ng iba."
+    },
     "domainDesc": {
       "state-management": "Ang Block, Riverpod, Provider, GetX at ang mga kaugnay na library ng estado at dependency-injection.",
       "networking-apis": "Mga kliyente ng HTTP, GraphQL, Firebase, Supabase at koneksyon.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "Mga detalye ng pakete sa pakete",
       "title": "Mga detalye ng pakete sa pakete",
-      "close": "Malapit na detalye ng detalyadong detalye."
+      "close": "Malapit na detalye ng detalyadong detalye.",
+      "copyForAi": "Kopyahin ang pag-upgrade ng prompt para sa AI."
     },
     "status": {
       "packagesCount": "{count} na package",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Kopyahin ang ulat JSON (lahat ng mga hilera + detalye)",
       "copyAllLabel": "Kopya kopya kopyas kopyas",
+      "copyOpportunitiesTitle": "Kopyahin ang mga pag-upgrade ng AI na prompt para sa nangungunang under-adopted packages sa isang paste.",
+      "copyOpportunitiesLabel": "Kopyahin ang mga pagkakataon para sa AI.",
       "saveAllTitle": "I-save ang JSON ng ulat sa mga ulat/YYY YMMDD/...",
       "saveAllLabel": "I-save ang mga ito sa Save.",
       "saveUpgradeTitle": "I-save ang isang ulat ng mga pakete lamang na may magagamit na pag-update sa mga ulat / YYYYMMDD/...",
@@ -898,6 +905,10 @@
         "label": "I-update",
         "tooltip": "Available na pag-update ng bersyon: pangunahing, menor de edad o patch."
       },
+      "opportunities": {
+        "label": "Mga pagkakataon ng mga oportunidad.",
+        "tooltip": "Mga tampok sa changelog ng pakete na ito ay hindi pa ginagamit sa iyong code  ⁇ Mag-sort upang mahanap ang pinaka under-adopted na mga pakete."
+      },
       "status": {
         "label": "Ang mga sumusunod ay ang status ng isang kumpanya.",
         "tooltip": "Usage status: kung ang package ay lilitaw na hindi ginagamit sa iyong code."
@@ -911,6 +922,7 @@
       "noGithub": "Walang GitHub na imbakan ang natagpuan.",
       "devBadge": "dev",
       "transitiveBadge": "transitive na may kaugalian.",
+      "opportunitiesTooltip": "Mga tampok na hindi ginagamit: {features}",
       "publishDateUnavailable": "Hindi available ang petsa ng pag-publish mula sa pub.dev.",
       "activityGradeUnavailable": "Hindi magagamit ang antas ng aktibidad (na nawawala ang data sa pag-commit o release)",
       "activityFallback": "Aktibidad batay sa mga kamakailang pangako at release.",

@@ -64,11 +64,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.2.1]
 
 ### Added
 
-- **New rule `require_named_for_acronym_drift_columns` (Professional) flags Drift column getters with an acronym that omit `.named()`.** Drift's snake_case converter inserts an underscore before every uppercase letter, so `contactSaropaUUID` becomes the SQL column `contact_saropa_u_u_i_d` — not the `contact_saropa_uuid` a human predicts — and raw SQL written against the expected name crashes with "no such column" at runtime. The rule is report-only because pinning a column that already shipped renames it and needs a migration; add `.named('snake_case')` on new acronym columns to keep source and schema in sync. No action required.
+- **New rule `require_named_for_acronym_drift_columns` (Professional) flags Drift column getters with an acronym that omit `.named()`.** Drift's snake_case converter inserts an underscore before every uppercase letter, so `contactSaropaUUID` becomes the SQL column `contact_saropa_u_u_i_d` — not the `contact_saropa_uuid` a human predicts — and raw SQL written against the expected name crashes with "no such column" at runtime. The rule is report-only because pinning a column that already shipped renames it and needs a migration; add `.named('snake_case')` on new acronym columns to keep source and schema in sync. No action required. [log](https://github.com/saropa/saropa_lints/blob/v14.2.1/CHANGELOG.md)
 
 ### Fixed
 
@@ -76,6 +76,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Added (Extension)
 
+- **New "Upgrade Opportunities" dashboard — a focused view of the dependencies you have under-adopted.** Separate from the dense Package Dashboard table, it lists only packages that have changelog features your code does not yet use, ranked by relevance, and for each shows the package, description, README logo, the unused features, the exact project files that import it (click to jump to the line), and a one-click "Copy upgrade prompt for AI". Open it from the Saropa Lints sidebar ("Upgrade Opportunities", shown once a scan finds any) or the command palette ("Open Upgrade Opportunities"). No action required.
 - **Package Vibrancy detail pane adds a "Copy upgrade prompt for AI" button.** It assembles a ready-to-paste prompt from the package's changelog — the new features classified as adoption candidates, plus your project's own call sites for that package — so you can hand an AI everything it needs to suggest where the new features fit, instead of pasting a raw changelog. The button appears whenever a package has adoptable features; open a package and click it to copy. No action required.
 - **Adoption opportunities now surface for up-to-date packages, not just outdated ones.** A caret constraint quietly carries a package across releases whose new features you may never have adopted — being on the latest version does not mean you use everything it offers. The scan now mines each package's full changelog history and cross-references it against the symbols your code actually uses, so a fully up-to-date package with unused capabilities still flags features worth reviewing. No action required.
 - **Package Vibrancy table gains a sortable "Opportunities" column to find the needles across many packages.** Each package shows the count of changelog features it offers that your code does not yet use (the unused feature names are in the cell tooltip); sort by the column to bring the most under-adopted packages to the top. The column hides itself when nothing is unadopted. No action required.

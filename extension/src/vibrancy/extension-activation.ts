@@ -18,6 +18,7 @@ import { VibrancyHoverProvider } from './providers/hover-provider';
 import { CodeLensToggle } from './ui/codelens-toggle';
 import { PrereleaseToggle } from './ui/prerelease-toggle';
 import { VibrancyReportPanel } from './views/report-webview';
+import { OpportunitiesPanel } from './views/opportunities-panel';
 import { KnownIssuesPanel } from './views/known-issues-webview';
 import { ComparisonPanel } from './views/comparison-webview';
 import { ReviewStateService } from './services/review-state';
@@ -53,7 +54,13 @@ import {
     getPackageTrend,
     readHistory,
 } from './services/vibrancy-history';
-import { scanDartImportsDetailed, activePackageNames } from './services/import-scanner';
+import {
+    readDartSources,
+    collectImportsFromSources,
+    collectSymbolUsage,
+    activePackageNames,
+} from './services/import-scanner';
+import { rankOpportunities } from './services/changelog-opportunities';
 import { enrichReplacementComplexity } from './services/package-code-analyzer';
 import { detectUnused } from './scoring/unused-detector';
 import { fetchFlutterReleases } from './services/flutter-releases';
@@ -681,6 +688,25 @@ function registerCommands(
             'saropaLints.packageVibrancy.rescan',
             () => runScan(targets, { forceRefresh: true }),
         ),
+        // Dedicated Upgrade Opportunities dashboard: a focused list of only the
+        // packages with unadopted changelog features, separate from the dense
+        // Package Dashboard table.
+        vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.showOpportunities',
+            () => {
+                const extensionVersion = (context.extension.packageJSON as { version: string }).version;
+                const root = lastParsedDeps
+                    ? vscode.Uri.joinPath(lastParsedDeps.yamlUri, '..')
+                    : vscode.workspace.workspaceFolders?.[0]?.uri;
+                if (!root) {
+                    void vscode.window.showInformationMessage(
+                        l10n('opportunities.noScan'),
+                    );
+                    return;
+                }
+                OpportunitiesPanel.createOrShow(latestResults, extensionVersion, root);
+            },
+        ),
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.showReport',
             async () => {
@@ -1129,6 +1155,28 @@ function withPanelProgress(
     };
 }
 
+/**
+ * Rank a package as an adoption needle: cross-reference its full-history
+ * opportunities against the symbols actually used in project source, yielding
+ * the unused-feature names and a 0–100 relevance score. Returns an empty object
+ * (no fields) when the package has no opportunities, so a spread leaves the
+ * result untouched.
+ */
+function rankAdoption(
+    r: VibrancyResult,
+    importFileCount: number,
+    usedSymbols: ReadonlySet<string>,
+): Partial<Pick<VibrancyResult, 'unadoptedApiNames' | 'opportunityScore'>> {
+    if (!r.opportunities) { return {}; }
+    const ranking = rankOpportunities(r.opportunities, {
+        importFileCount, usedSymbols,
+    });
+    return {
+        unadoptedApiNames: ranking.unusedApiNames,
+        opportunityScore: ranking.score,
+    };
+}
+
 async function runScanInner(
     targets: ScanTargets,
     controller: AbortController,
@@ -1175,22 +1223,38 @@ async function runScanInner(
             if (signal.aborted) { return; }
             progress.report({ message: 'Scanning imports...' });
             const workspaceRoot = vscode.Uri.joinPath(parsed.yamlUri, '..');
-            const usageMap = await scanDartImportsDetailed(workspaceRoot);
+            // Read every Dart source ONCE; both the import map and the
+            // changelog-symbol usage scan derive from the same array so a large
+            // project is walked a single time, not twice.
+            const sources = await readDartSources(workspaceRoot);
+            const usageMap = collectImportsFromSources(sources);
+            // Candidate symbols = every API name across every package's
+            // full-history opportunities. Scanning source for these tells us
+            // which changelog features are already adopted vs genuinely unused.
+            const candidateSymbols = new Set<string>();
+            for (const r of rawResults) {
+                for (const name of r.opportunities?.apiNames ?? []) {
+                    candidateSymbols.add(name);
+                }
+            }
+            const usedSymbols = collectSymbolUsage(sources, candidateSymbols);
             // Only active (non-commented) imports count for unused detection.
             // Packages with only commented-out references are still unused.
             const imported = activePackageNames(usageMap);
             const unusedNames = new Set(detectUnused(
                 deps.map(d => d.name), imported,
             ));
-            // Attach per-file usage data and mark unused packages.
+            // Attach per-file usage data, mark unused packages, and rank
+            // adoption opportunities against the symbols actually used.
             // Only mark as unused when eligible for removal; dev_dependencies are used by tooling.
             const withUnused = rawResults.map(r => {
                 const fileUsages = usageMap.get(r.package.name) ?? [];
+                const opp = rankAdoption(r, fileUsages.length, usedSymbols);
                 const isUnused = unusedNames.has(r.package.name)
                     && isUnusedRemovalEligibleSection(r.package.section);
                 return isUnused
-                    ? { ...r, fileUsages, isUnused: true, alternatives: [] }
-                    : { ...r, fileUsages };
+                    ? { ...r, ...opp, fileUsages, isUnused: true, alternatives: [] }
+                    : { ...r, ...opp, fileUsages };
             });
 
             if (signal.aborted) { return; }

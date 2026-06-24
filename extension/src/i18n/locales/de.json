@@ -29,6 +29,10 @@
     "noneDetected": "Noch keine Packungen passen zu Ihren Abhängigkeiten. Fügen Sie ein unterstütztes Paket hinzu oder öffnen Sie All Packages unten.",
     "allPackages": "Alle Pakete sind in der Packung.",
     "allPackagesHint": "Jede verfügbare Packung, einschließlich solcher, die in diesem Projekt nicht erkannt wurden. Ermöglicht einem Rudel, sich für seine Regeln zu entscheiden.",
+    "versionGroup": {
+      "tag": "Wählen Sie eine Version aus.",
+      "tooltip": "Diese Pakete zielen auf verschiedene Hauptversionen derselben Abhängigkeit ab. Nur einer gilt gleichzeitig  ⁇ Einer davon auszuschalten, schaltet die anderen aus."
+    },
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX und damit verbundene Zustand- und Abhängigkeitsinjektionsbibliotheken.",
       "networking-apis": "HTTP-Clients, GraphQL, Firebase, Supabase und Konnektivität.",
@@ -139,6 +143,27 @@
     "review": "Überprüfung Review Review Überprüfen Sie die Bewertung.",
     "dismiss": "Entlassen Sie.",
     "reviewFailed": "Die Überprüfung des Saropa Lints-Regelpakets konnte nicht geöffnet werden. {error}"
+  },
+  "opportunities": {
+    "documentTitle": "Upgrade Möglichkeiten der Verbesserung.",
+    "heroTitle": "Upgrade Möglichkeiten der Verbesserung.",
+    "subtitle": "{count}-Pakete haben Funktionen, die Ihr Projekt noch nicht verwendet.",
+    "noScan": "Führen Sie zuerst einen Paketscan durch, um Upgrade-Möglichkeiten zu finden.",
+    "openFileFailed": "{file}  ⁇  konnte nicht geöffnet werden. Es kann sich seit dem letzten Scan bewegt haben.",
+    "card": {
+      "versionUpgrade": "Update zur Verfügung zu haben, um {latest}.",
+      "versionCurrent": "über die neuesten Neuigkeiten.",
+      "featuresTitle": "Funktionen, die noch nicht genutzt werden.",
+      "locationsTitle": "Wo Ihr Projekt dieses Paket verwendet.",
+      "noLocations": "Nicht in der Projektquelle importiert  ⁇ wahrscheinlich eine dev oder transitive Abhängigkeit.",
+      "moreFiles": "und {count} mehr Dateien.",
+      "copyForAi": "Kopieren Sie die Aktualisierungs-Befehl für KI.",
+      "openInDashboard": "Öffnen Sie in der Package Dashboard."
+    },
+    "empty": {
+      "title": "Nichts zu verabschieden, nichts anzunehmen.",
+      "body": "Die Funktionen jedes gescannten Pakets werden bereits in Ihrem Projekt verwendet, oder es wurden keine Chancen für ein Changelog gefunden."
+    }
   },
   "packageDetail": {
     "section": {
@@ -715,7 +740,8 @@
     "detailPane": {
       "aria": "Paketdetails Die Packung ist detailliert.",
       "title": "Paketdetails Die Packung ist detailliert.",
-      "close": "Nähe Details in detail."
+      "close": "Nähe Details in detail.",
+      "copyForAi": "Kopieren Sie die Aktualisierungs-Befehl für KI."
     },
     "status": {
       "packagesCount": "{count} Pakete",
@@ -795,6 +821,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Kopieren Sie den Bericht JSON (alle Zeilen + Details)",
       "copyAllLabel": "Kopieren, kopieren und kopieren.",
+      "copyOpportunitiesTitle": "Kopieren Sie die AI-Upgradeaufforderungen für die am wenigsten angenommenen Pakete in eine einzige Paste.",
+      "copyOpportunitiesLabel": "Kopieren Sie Möglichkeiten für KI.",
       "saveAllTitle": "Speichern Sie den Bericht JSON in reports/YYY YMMDD/...",
       "saveAllLabel": "Save Save Schon jetzt.",
       "saveUpgradeTitle": "Speichern Sie einen Bericht nur von Paketen mit einer verfügbaren Aktualisierung der Berichte/JJJMMDD/...",
@@ -898,6 +926,10 @@
         "label": "Update Updates werden aktualisiert.",
         "tooltip": "Verfügbares Versionseinstellungs-Update: Haupt-, Neben- oder Patchupdate."
       },
+      "opportunities": {
+        "label": "Chancen und Möglichkeiten.",
+        "tooltip": "Features im Changelog dieses Pakets, die noch nicht in Ihrem Code verwendet wurden  ⁇ Sortieren Sie, um die am wenigsten angenommenen Pakete zu finden."
+      },
       "status": {
         "label": "Status",
         "tooltip": "Usage-Status: ob das Paket in Ihrem Code als unbenutzt erscheint."
@@ -911,6 +943,7 @@
       "noGithub": "Kein GitHub-Repository wurde gefunden.",
       "devBadge": "Dev dev ist ein",
       "transitiveBadge": "transitiver, übergangsorientierter",
+      "opportunitiesTooltip": "Nicht genutzte Funktionen: {features} ist ein _PH0_.",
       "publishDateUnavailable": "Veröffentlichungsdatum nicht verfügbar ab pub.dev",
       "activityGradeUnavailable": "Aktivitätsgrad nicht verfügbar (fehlende Commit- oder Release-Daten)",
       "activityFallback": "Aktivitäten basierend auf jüngsten Verpflichtungen und Veröffentlichungen.",

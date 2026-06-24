@@ -44,6 +44,7 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 - `infra_shrinkwrap_rule_overlap_four_rules_one_concern.md`
 - `prefer_boolean_prefixes_false_positive_serialization_bound_field_names.md`
+- `feature_lint_rule_require_named_for_acronym_drift_columns.md`
 
 ---
 

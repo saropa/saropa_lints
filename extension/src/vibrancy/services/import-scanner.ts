@@ -105,13 +105,20 @@ export function hasActiveReExport(usages: readonly PackageUsage[]): boolean {
     return usages.some(u => !u.isCommented && u.isExport);
 }
 
+/** One project source file: workspace-relative path plus its full text. */
+export interface DartSource {
+    readonly path: string;
+    readonly text: string;
+}
+
 /**
- * Scan Dart source files and return per-file import locations for each package.
- * Superset of scanDartImports — also collects file paths and line numbers.
+ * Read every project Dart source once. Shared by the import scan and the
+ * symbol-usage scan so the file walk + read happens a SINGLE time per scan —
+ * a package imported in hundreds of files would otherwise be walked twice.
  */
-export async function scanDartImportsDetailed(
+export async function readDartSources(
     workspaceRoot: vscode.Uri,
-): Promise<PackageUsageMap> {
+): Promise<readonly DartSource[]> {
     // Scan all standard Dart source directories — web/ and tool/ are
     // first-class entry points (like bin/) and integration_test/ is the
     // standard Flutter integration-test directory.
@@ -121,18 +128,72 @@ export async function scanDartImportsDetailed(
     const files = await vscode.workspace.findFiles(pattern);
     const rootPrefix = workspaceRoot.fsPath.replace(/\\/g, '/');
 
-    const usageMap = new Map<string, PackageUsage[]>();
-
     const contents = await Promise.all(
         files.map(f => vscode.workspace.fs.readFile(f)),
     );
-    for (let i = 0; i < files.length; i++) {
-        const filePath = toRelativePath(files[i].fsPath, rootPrefix);
-        const text = Buffer.from(contents[i]).toString('utf8');
-        collectDetailedImports(text, filePath, usageMap);
-    }
+    return files.map((f, i) => ({
+        path: toRelativePath(f.fsPath, rootPrefix),
+        text: Buffer.from(contents[i]).toString('utf8'),
+    }));
+}
 
+/**
+ * Scan Dart source files and return per-file import locations for each package.
+ * Superset of scanDartImports — also collects file paths and line numbers.
+ */
+export async function scanDartImportsDetailed(
+    workspaceRoot: vscode.Uri,
+): Promise<PackageUsageMap> {
+    return collectImportsFromSources(await readDartSources(workspaceRoot));
+}
+
+/** Build the per-package usage map from already-read sources. */
+export function collectImportsFromSources(
+    sources: readonly DartSource[],
+): PackageUsageMap {
+    const usageMap = new Map<string, PackageUsage[]>();
+    for (const source of sources) {
+        collectDetailedImports(source.text, source.path, usageMap);
+    }
     return usageMap;
+}
+
+/**
+ * Find which of the candidate symbols appear in project source.
+ *
+ * The candidates are API names extracted from package changelogs (e.g.
+ * `ReelText`, `ReelText.rich`, `runWhile`). A candidate present in source is
+ * "already adopted"; one absent is a genuinely unused feature — the signal
+ * that turns an up-to-date package into a needle.
+ *
+ * Matching uses word boundaries so `Foo` does not match `Foobar`, and tries
+ * longer candidates first so a dotted member (`ReelText.rich`) is recorded
+ * rather than its bare owner (`ReelText`) when both are candidates. Pure: takes
+ * already-read sources so it shares the single walk in `readDartSources`.
+ */
+export function collectSymbolUsage(
+    sources: readonly DartSource[],
+    candidates: ReadonlySet<string>,
+): Set<string> {
+    const found = new Set<string>();
+    if (candidates.size === 0) { return found; }
+
+    // Longest-first so `ReelText.rich` wins over `ReelText` in the alternation;
+    // escape regex metacharacters (the `.` in dotted members especially).
+    const ordered = [...candidates].sort((a, b) => b.length - a.length);
+    const escaped = ordered.map(c => c.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const re = new RegExp(`\\b(${escaped.join('|')})\\b`, 'g');
+
+    for (const source of sources) {
+        re.lastIndex = 0;
+        let match: RegExpExecArray | null;
+        while ((match = re.exec(source.text)) !== null) {
+            found.add(match[1]);
+        }
+        // Every candidate already seen — no later file can add anything.
+        if (found.size === candidates.size) { break; }
+    }
+    return found;
 }
 
 /** Convert an absolute path to a workspace-relative path with forward slashes. */

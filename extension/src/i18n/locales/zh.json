@@ -29,6 +29,10 @@
     "noneDetected": "没有包匹配你的依赖性. 添加一个支持的包,或打开下面的所有包.",
     "allPackages": "所有包装所有包裹",
     "allPackagesHint": "每个可用的包装,包括在这个项目中没有检测到的. 让一群人选择遵守它的规则.",
+    "versionGroup": {
+      "tag": "选择一个版本.",
+      "tooltip": "这些包针对的是同一依赖的不同主要版本. 只有一个适用于一次 ⁇ 启用一个关闭了其他."
+    },
     "domainDesc": {
       "state-management": "区块,Riverpod,提供者,GetX以及相关的状态和依赖注入库.",
       "networking-apis": "HTTP客户端,GraphQL,Firebase,Supabase和连接. 这是一个非常好的方法.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "包装细节 详情",
       "title": "包装细节 详情",
-      "close": "接近细节的近距离详情"
+      "close": "接近细节的近距离详情",
+      "copyForAi": "复制升级提示符用于AI."
     },
     "status": {
       "packagesCount": "{count} 个包",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "复制报告JSON (所有行+详细信息)",
       "copyAllLabel": "复制复制,复制的",
+      "copyOpportunitiesTitle": "将最少采用的包的AI升级提示复制成一个粘贴.",
+      "copyOpportunitiesLabel": "复制AI的机会,以获得更多的人工智能.",
       "saveAllTitle": "将报告的JSON保存到reports/YYY YMMDD/...中.",
       "saveAllLabel": "保存,拯救和保护一个人.",
       "saveUpgradeTitle": "仅保存一个只包含包的报告,并提供可用的更新/YYY YMMDD/...",
@@ -898,6 +905,10 @@
         "label": "更新的时间: Update",
         "tooltip": "可用版本更新:可用的版本更新 大,小或补丁的部分."
       },
+      "opportunities": {
+        "label": "机会,就是机遇.",
+        "tooltip": "这个包的更改日志中的功能尚未在您的代码中使用 ⁇ 排序以找到最少采用的包裹."
+      },
       "status": {
         "label": "状态 情况 状态",
         "tooltip": "使用状态:使用情况 包装是否在您的代码中显示未使用."
@@ -911,6 +922,7 @@
       "noGithub": "没有找到 GitHub 的存储库.",
       "devBadge": "没有了,我会发出 dev dev.",
       "transitiveBadge": "过渡的,是指一个转变性的.",
+      "opportunitiesTooltip": "未使用的功能: {features}",
       "publishDateUnavailable": "发布日期从 pub.dev 不提供.",
       "activityGradeUnavailable": "活动级别不可用 (缺少提交或发布数据)",
       "activityFallback": "基于最近承诺和发布的活动.",

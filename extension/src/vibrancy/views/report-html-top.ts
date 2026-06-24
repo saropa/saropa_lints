@@ -444,6 +444,12 @@ function buildToolbar(options: ReportOptions): string {
     // shape as the per-row copy button, just aggregated.
     const copyAllBtn =
         `<button id="copy-all" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.copyAllTitle`))}">&#128203; ${escapeHtml(l10n(`${tb}.copyAllLabel`))}</button>`;
+    // Bundles the AI upgrade prompts of the highest-scoring adoption needles
+    // into one paste, so a single AI round triages the whole project instead of
+    // opening each package. The script hides it when no package has an
+    // adoptable feature.
+    const copyOpportunitiesBtn =
+        `<button id="copy-opportunities" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.copyOpportunitiesTitle`))}" hidden>&#129302; ${escapeHtml(l10n(`${tb}.copyOpportunitiesLabel`))}</button>`;
     const saveBtn =
         `<button id="save-all" class="toolbar-btn" title="${escapeHtml(l10n(`${tb}.saveAllTitle`))}">&#128190; ${escapeHtml(l10n(`${tb}.saveAllLabel`))}</button>`;
     // Saves the same per-package JSON shape as "Save", but filtered to only
@@ -523,6 +529,7 @@ function buildToolbar(options: ReportOptions): string {
         ${openOtherBtn}
         ${resetViewBtn}
         ${copyAllBtn}
+        ${copyOpportunitiesBtn}
         ${saveBtn}
         ${saveUpgradeBtn}
         ${pubspecBtn}

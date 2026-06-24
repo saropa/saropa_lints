@@ -29,6 +29,10 @@
     "noneDetected": "Henüz hiçbir paket bağımlılıklarınızla eşleşmedi. Desteklenen bir paket ekleyin veya aşağıdaki Tüm paketleri açın.",
     "allPackages": "Tüm paketler, tüm paketler.",
     "allPackagesHint": "Bu projede tespit edilmeyenler de dahil olmak üzere, mevcut olan her paket. Bir sürünün kurallarını seçmesini sağlayın.",
+    "versionGroup": {
+      "tag": "Bir versiyon seçin.",
+      "tooltip": "Bu paketler aynı bağımlılığın farklı ana versiyonlarını hedef alıyor. Bir seferde sadece bir tane geçerlidir  ⁇ Birini etkinleştirmek diğerlerini kapatır."
+    },
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX ve ilgili durum ve bağımlılık enjeksiyon kütüphaneleri.",
       "networking-apis": "HTTP istemcileri, GraphQL, Firebase, Supabase ve bağlantı.",
@@ -715,7 +719,8 @@
     "detailPane": {
       "aria": "Paket detayı",
       "title": "Paket detayı",
-      "close": "Yakın detaylar, yakın ayrıntılar."
+      "close": "Yakın detaylar, yakın ayrıntılar.",
+      "copyForAi": "AI için yükseltme çağrısını kopyalayın."
     },
     "status": {
       "packagesCount": "{count} paket",
@@ -795,6 +800,8 @@
       "openPubspecLabel": "pubspec.yaml",
       "copyAllTitle": "Rapor JSON'u kopyalayın (tüm satırlar + ayrıntılar)",
       "copyAllLabel": "Kopya kopyasını kopyalamak.",
+      "copyOpportunitiesTitle": "En az kabul edilen paketler için AI yükseltme çağrılarını tek bir yapıştırmada kopyalayın.",
+      "copyOpportunitiesLabel": "Yapay zeka için fırsatları kopyalayın.",
       "saveAllTitle": "Rapor JSON'unu raporlara kaydet/YYY YMMDD/...",
       "saveAllLabel": "Save Save Save Kurtarma ve kurtarma",
       "saveUpgradeTitle": "Raporlara mevcut bir güncelleme ile sadece paketlerin raporunu kaydedin/YYY YMMDD/...",
@@ -898,6 +905,10 @@
         "label": "Update Update güncelleme Güncelleştirmek",
         "tooltip": "Mevcut sürüm güncellemesi: büyük, küçük veya yama."
       },
+      "opportunities": {
+        "label": "Fırsatlar, fırsatlar.",
+        "tooltip": "Bu paketin değişim günlüğündeki özellikler, kodunuzda henüz kullanılmamıştır  ⁇ En az kabul edilen paketleri bulmak için sıralayın."
+      },
       "status": {
         "label": "Status Durum Statüs Durumu",
         "tooltip": "Kullanım durumu: Kullanımı Durumu: Paketin kullanılmamış olarak kodunuzda görünmesi."
@@ -911,6 +922,7 @@
       "noGithub": "GitHub depo bulunamadı.",
       "devBadge": "Dev dev dev diye bir şey var.",
       "transitiveBadge": "transitif, geçişli.",
+      "opportunitiesTooltip": "Kullanılmayan özellikler: {features}",
       "publishDateUnavailable": "Yayınlama tarihi pub.dev tarihinden itibaren mevcut değil.",
       "activityGradeUnavailable": "Aktivite derecesi kullanılamıyor (komit veya serbest veri eksik)",
       "activityFallback": "Son taahhütler ve yayınlara dayanan faaliyet.",

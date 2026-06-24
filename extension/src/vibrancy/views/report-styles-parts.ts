@@ -838,6 +838,15 @@ export function reportStylesPart6(): string {
             padding: 1px 5px; border-radius: 3px; font-size: 0.75em;
             margin-inline-start: 6px; vertical-align: middle;
         }
+        /* Opportunities-column count: a filled pill so a high under-adoption
+           count reads as an actionable call-to-action, not a warning. Reuses
+           the dashboard's existing accent/link foreground for consistency. */
+        .badge-opportunity {
+            background: var(--vscode-charts-blue, var(--vscode-textLink-foreground));
+            color: var(--vscode-editor-background);
+            padding: 1px 6px; border-radius: 10px; font-size: 0.8em;
+            font-weight: 600; vertical-align: middle;
+        }
 
         /* ---- Dimmed placeholder text (dashes, hyphens) ---- */
         .dimmed { opacity: 0.35; }

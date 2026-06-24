@@ -13,6 +13,7 @@ import { analyzeTarball, TarballAnalysis } from './services/tarball-analyzer';
 import { calcBloatRating } from './scoring/bloat-calculator';
 import { extractGitHubRepo, fetchRepoMetrics } from './services/github-api';
 import { extractRepoSubpath, buildUpdateInfo } from './services/changelog-service';
+import { scanPackageOpportunities } from './services/opportunity-scan';
 import { findKnownIssue, isReplacementPackageName, getReplacementDisplayText } from './scoring/known-issues';
 import {
     effectiveResolutionVelocity,
@@ -120,19 +121,28 @@ export async function analyzePackage(
        folderBreakdown, and maintainerQuality flags. It can return null on
        slow networks or oversized tarballs — in that case we still have
        archiveSizeBytes as a coarse fallback so the hover doesn't go blank. */
-    const [updateInfo, archiveSizeBytes, tarballAnalysis] = await Promise.all([
-        pubDev
-            ? buildUpdateInfo(
-                { current: dep.version, latest: pubDev.latestVersion, constraint: dep.constraint },
-                repoInfo, {
-                    token: params.githubToken, cache: params.cache,
-                    packageName: dep.name,
-                },
-            )
-            : null,
-        resolveArchiveSize(dep.name, dep.version, knownIssue, params),
-        resolveTarballAnalysis(dep.name, params),
-    ]);
+    const [updateInfo, archiveSizeBytes, tarballAnalysis, opportunities] =
+        await Promise.all([
+            pubDev
+                ? buildUpdateInfo(
+                    { current: dep.version, latest: pubDev.latestVersion, constraint: dep.constraint },
+                    repoInfo, {
+                        token: params.githubToken, cache: params.cache,
+                        packageName: dep.name,
+                    },
+                )
+                : null,
+            resolveArchiveSize(dep.name, dep.version, knownIssue, params),
+            resolveTarballAnalysis(dep.name, params),
+            // Full-history opportunity scan runs for EVERY package, not just
+            // outdated ones — an up-to-date package can still have features you
+            // never adopted. Shares the cached changelog fetch with
+            // buildUpdateInfo above, so this adds no network cost when the
+            // delta path already fetched.
+            scanPackageOpportunities(repoInfo, dep.name, {
+                token: params.githubToken, cache: params.cache,
+            }),
+        ]);
 
     const codeSizeBytes = tarballAnalysis?.codeSizeBytes ?? null;
     const folderBreakdown = tarballAnalysis?.folderBreakdown ?? null;
@@ -197,6 +207,7 @@ export async function analyzePackage(
         maintainerQuality,
         maintainerQualityBonus,
         bloatRating, installedVersionDate, isUnused: false, fileUsages: [],
+        opportunities,
         platforms: merged.platforms,
         verifiedPublisher: merged.verifiedPublisher,
         wasmReady: merged.wasmReady,
