@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Consolidates four overlapping `shrinkWrap: true` rules down to one. A single scrollable could be flagged by up to four differently-named diagnostics, so a site suppressed under one rule name was re-flagged under another; the redundant three are now deprecated and `avoid_shrink_wrap_expensive` is the canonical rule covering the whole concern. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+Consolidates four overlapping `shrinkWrap: true` rules down to one. A single scrollable could be flagged by up to four differently-named diagnostics, so a site suppressed under one rule name was re-flagged under another; the redundant three are now deprecated and `avoid_shrink_wrap_expensive` is the canonical rule covering the whole concern. [log](https://github.com/saropa/saropa_lints/blob/v14.2.1/CHANGELOG.md)
 
 ### Changed
 
@@ -88,6 +88,7 @@ Consolidates four overlapping `shrinkWrap: true` rules down to one. A single scr
 - Split the 1356-line command-catalog registry into a types module, three per-group entry data files, and a thin composer. Behavior-preserving — the composed catalog is identical (162 entries, same order). No action required.
 - Extracted the Issues tree's node types and its command layer (hide/suppress, copy, apply-fix) out of the 1340-line `issuesTree.ts` into sibling modules, leaving the tree-data provider in place. Behavior-preserving; the tree's tests pass unchanged. No action required.
 - Split the two largest dashboard stylesheets (`dashboardChromeStyles.ts`, `violationsDashboardStyles.ts`) into per-section sibling modules behind thin composers. The generated CSS is byte-identical. No action required.
+- Decomposed the remaining oversized webview view files into focused sibling modules: the report stylesheet, the command-catalog webview (its CSS and client script), the Project Vibrancy / Code Health controller (its client script), the Findings wide-report stats, and the Package Vibrancy report client script. All byte-identical or test-verified. No action required.
 - Added a rule-liveness report (`dart run saropa_lints:accuracy_report`) that scans the `expect_lint` fixtures and flags any rule declared in a fixture but never firing there — a gap the marker-text contract tests cannot catch. Report-only; not yet wired into CI. No action required.
 
 </details>

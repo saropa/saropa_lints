@@ -170,3 +170,65 @@ cascade orphans. Lower priority — land Phases 1–4 first; split to its own fo
 This adds: a resolved-analyzer code path (heavier dependency on analyzer element APIs), a new CLI flag
 + child-process protocol, and a second on-disk cache tier. It is a multi-part feature, not a local fix —
 do not start without explicit go-ahead on scope and phase ordering.
+
+---
+
+## Finish Report (2026-06-24)
+
+**Scope delivered:** Phases 1 (resolved reference collection) and 2 (entry-point exclusion set). Phases 3-5
+(tree-SHA usage cache, dedicated killable/chunked subprocess, cascading unused) remain OPEN and deferred,
+pending a precision review of the resolved `unused` flag on real repositories.
+
+**Why this plan stays in `plans/` rather than moving to history:** the majority of the plan (three of five
+phases, including the headline OOM/cache hardening) is still open and this document remains their live
+tracking record. Splitting Phases 3-5 into a new file would duplicate the problem/goal/constraints framing
+verbatim for no gain. The Status line at the top records the partial-completion state.
+
+### What changed
+
+The Usage signal was name-based: `_computeUsageCounts` attributed `referencesByName[fn.name]`, so every
+occurrence of an identifier *string* rolled into one bucket keyed by name. A private `_dispose` declared in
+many files all read as heavily used (the count of every `_dispose` reference anywhere), and shadowed locals,
+parameters, and named-argument labels matching a function name inflated that function's count — hiding true
+orphans and producing wrong caller counts on collisions.
+
+A new collector, `lib/src/cli/project_vibrancy_resolved_usage.dart`, resolves the project element model via
+`AnalysisContextCollection` and counts each reference against the declaration it actually binds to:
+
+- Each reference's element is canonicalized with `Element.baseElement.nonSynthetic` (unwrapping generic
+  `Member` instantiations and synthetic accessors) so a reference and its declaration key to the same map
+  entry. Declarations are keyed by the same `filePath:name:lineStart` id the parse phase builds for
+  `_FunctionNode`, so the score loop's `countsById[fn.id]` lookup matches with no second id scheme.
+- Self/recursive references are excluded via an enclosing-declaration stack (the source plan counts only
+  references *outside* a declaration's own body).
+- An entry-point set is computed for declarations that are runtime-invoked, not statically called:
+  top-level `main`, `@pragma('vm:entry-point')`, and any `@override` member (detected from resolved
+  `Element.metadata.hasOverride`, never by method name). Overrides are reached polymorphically through the
+  supertype, so a zero static-caller count is expected for them; the set protects them from the `unused`
+  flag only (they still score on real references). Protecting *all* overrides — not just named lifecycle
+  hooks — is the deliberate false-negative bias the constraints require.
+
+Integration in `runProjectVibrancy`: the resolved pass runs after the name-based pass. `_mergeUsageCount`
+reconciles them, biased to never flag live code dead — no resolved data, or a declaration absent from the
+resolved set (its file failed to resolve), yields the name-based count; a resolved count `> 0` is trusted;
+a resolved count `0` is trusted only when every file resolved (`fullyResolved`), otherwise it falls back to
+the over-counting name-based value. The `unused` flag now also skips entry points. On any resolution failure
+the collector returns `null` and the scan keeps its prior name-based behavior unchanged.
+
+The resolved pass runs inside the existing `project_vibrancy` CLI child process (already spawned by the
+extension), so it does not load the element model in the extension host — satisfying the source plan's
+analyzer-isolation constraint for Phases 1-2 without the Phase 4 dedicated subprocess. Phase 4 remains the
+OOM guard (chunking, a killable child) for very large consumer repositories.
+
+### Verification
+
+- `test/cli/project_vibrancy_resolved_usage_test.dart` (new, 3 tests, all passing): two same-named private
+  functions in different files yield counts `1` and `0` (name-based read both as used — the Phase-1
+  "Done when"); a self-recursive function reads `0` (unused); `@override` / `@pragma('vm:entry-point')` /
+  top-level `main` with zero static callers are not flagged `unused`, while a plain private orphan still is
+  (the Phase-2 "Done when").
+- Existing `test/cli/project_vibrancy_cli_test.dart` (19 tests) and
+  `test/cli/project_vibrancy_coverage_quality_test.dart` re-run green: the caller/callee and no-caller
+  `unused` assertions agree with the resolved path on unambiguous cases, confirming no regression.
+- Command: `dart test test/cli/project_vibrancy_resolved_usage_test.dart` and
+  `dart test test/cli/project_vibrancy_cli_test.dart test/cli/project_vibrancy_coverage_quality_test.dart`.
