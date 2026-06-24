@@ -14,7 +14,9 @@ export type GroupByMode =
   | 'rule'
   | 'owasp'
   | 'ruleType'
-  | 'ruleStatus';
+  | 'ruleStatus'
+  | 'tier'
+  | 'pack';
 
 /** All supported Issues / dashboard grouping modes (single source of truth). */
 export const VIOLATIONS_GROUP_BY_MODES: readonly GroupByMode[] = [
@@ -25,4 +27,6 @@ export const VIOLATIONS_GROUP_BY_MODES: readonly GroupByMode[] = [
   'owasp',
   'ruleType',
   'ruleStatus',
+  'tier',
+  'pack',
 ];

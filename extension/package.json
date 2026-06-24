@@ -62,11 +62,6 @@
           "when": "saropaLints.isDartProject"
         },
         {
-          "id": "saropaLints.actions",
-          "name": "%views.actions.name%",
-          "when": "saropaLints.isDartProject"
-        },
-        {
           "id": "saropaLints.status",
           "name": "%views.status.name%",
           "when": "saropaLints.isDartProject && saropaLints.hasViolations"
@@ -883,7 +878,7 @@
         },
         {
           "command": "saropaLints.runAnalysis",
-          "when": "view == saropaLints.actions && saropaLints.isDartProject",
+          "when": "view == saropaLints.settings && saropaLints.isDartProject",
           "group": "navigation"
         }
       ],

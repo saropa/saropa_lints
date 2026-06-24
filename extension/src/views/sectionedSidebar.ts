@@ -12,10 +12,10 @@
  * View contents:
  *   - **Banner**          — setup banner / lint integration off (auto-hides)
  *   - **Editor dashboards** — open Saropa editor-tab dashboards
- *   - **Actions**         — run analyzer, open config, scaffold composite plugin
+ *   - **Settings**        — run analyzer + initialize config (actions), lint
+ *                           integration toggle, tier selector, UI language,
+ *                           and triage rows (volume groups / override counts)
  *   - **Status**          — health / violations / suppressions / trends / last run
- *   - **Settings**        — lint integration toggle, tier selector, etc.
- *   - **Triage**          — rules grouped by violation count and override status
  *   - **Help**            — walkthrough, About, pub.dev, AI agent template
  *
  * Each section reads the same upstream data (violations.json, pubspec, history)
@@ -194,6 +194,15 @@ function buildBannerItems(): LeafItem[] {
 
 function buildEditorDashboardItems(): LeafItem[] {
     return [
+        // Launchpad first: it consolidates every dashboard below onto one page, so it is the
+        // natural entry point for the section.
+        new LeafItem(
+            'Saropa Dashboards',
+            'All dashboards on one page',
+            'saropaLints.openDashboards',
+            'dashboard',
+            new vscode.ThemeColor('charts.blue'),
+        ),
         new LeafItem(
             'Lints Config',
             'Tiers, rule packs, SDK rollout',
@@ -223,13 +232,6 @@ function buildEditorDashboardItems(): LeafItem[] {
             new vscode.ThemeColor('charts.orange'),
         ),
         new LeafItem(
-            'Saropa Dashboards',
-            'Project Map + Code Health, side by side',
-            'saropaLints.openDashboards',
-            'dashboard',
-            new vscode.ThemeColor('charts.blue'),
-        ),
-        new LeafItem(
             'Findings Dashboard',
             'Editor tab · filters · JSON',
             'saropaLints.openViolationsWideReport',
@@ -247,14 +249,12 @@ function buildEditorDashboardItems(): LeafItem[] {
 }
 
 function buildActionItems(): LeafItem[] {
+    // "Pick UI language" is intentionally NOT here. The Settings rows below
+    // include a "UI language — <current>" row bound to the same
+    // `saropaLints.pickUiLanguage` command; it shows the current language AND
+    // is clickable, so it strictly supersedes a bare action row. Keeping both
+    // put the identical command in the sidebar twice.
     return [
-        new LeafItem(
-            'Pick UI language',
-            'Switch sidebar/dashboard language',
-            'saropaLints.pickUiLanguage',
-            'globe',
-            new vscode.ThemeColor('textLink.foreground'),
-        ),
         new LeafItem(
             'Run analysis',
             'Re-run analyzer',
@@ -488,18 +488,21 @@ function isRedundantSettingsAction(node: ConfigTreeNode): boolean {
 }
 
 /**
- * Settings + Triage rows merged into one panel. Settings come first
- * (lint integration toggle, tier, run-after-config, detected packages),
- * then triage rows (per-rule volume groups, "X rules disabled by override",
+ * Actions + Settings + Triage rows merged into one panel. Order: actions
+ * first (run analysis, initialize config), then settings (lint integration
+ * toggle, tier, run-after-config, UI language, detected packages), then
+ * triage rows (per-rule volume groups, "X rules disabled by override",
  * "X rules with zero issues") when triage data is available.
  *
- * Why merged: Settings and Triage are both "what does my project's lint
- * configuration look like" — splitting them into two panels forced the
- * user to expand twice to see the full configuration story, and many
- * triage rows now route to the Lints Config dashboard which is reached
- * from Settings as well.
+ * Why merged: the former standalone Actions panel sat directly above this
+ * one and the two read as duplicates — Actions held a handful of operations,
+ * Settings held the config those operations target. They are one story
+ * ("operate and configure my project's lints"), so they share one panel.
+ * Triage was folded in earlier for the same reason. The play-button in the
+ * panel title bar still runs analysis (view/title menu moved to this view).
  */
 function buildSettingsItems(configProvider: ConfigTreeProvider): SectionNode[] {
+    const actions = buildActionItems();
     const settings = configProvider
         .getSettingAndActionNodes()
         .filter((n) => !isRedundantSettingsAction(n));
@@ -507,7 +510,7 @@ function buildSettingsItems(configProvider: ConfigTreeProvider): SectionNode[] {
     // group nodes, but `getTreeItem` overrides it back to None so no chevrons
     // appear next to any row inside this panel.
     const triage = configProvider.getTriageNodes();
-    return [...settings, ...triage];
+    return [...actions, ...settings, ...triage];
 }
 
 // ── Provider class ────────────────────────────────────────────────────────
@@ -554,12 +557,12 @@ export class FlatSectionProvider implements vscode.TreeDataProvider<SectionNode>
 export const SECTION_VIEW_IDS = {
     banner: 'saropaLints.banner',
     editorDashboards: 'saropaLints.editorDashboards',
-    actions: 'saropaLints.actions',
     status: 'saropaLints.status',
-    // Settings now also hosts the triage rows (rules grouped by violation
-    // count, plus "X rules disabled by override" / "X rules with zero issues").
-    // The standalone Triage view was merged in: the user wanted a single panel
-    // describing the project's lint configuration in one place.
+    // Settings now also hosts the action rows (run analysis, initialize config)
+    // and the triage rows (rules grouped by violation count, plus "X rules
+    // disabled by override" / "X rules with zero issues"). The standalone
+    // Actions and Triage views were merged in: the user wanted a single panel
+    // to operate and configure the project's lints in one place.
     settings: 'saropaLints.settings',
     help: 'saropaLints.help',
 } as const;
@@ -579,9 +582,10 @@ export function createSidebarSectionProviders(
     return [
         new FlatSectionProvider(SECTION_VIEW_IDS.banner, () => buildBannerItems()),
         new FlatSectionProvider(SECTION_VIEW_IDS.editorDashboards, () => buildEditorDashboardItems()),
-        new FlatSectionProvider(SECTION_VIEW_IDS.actions, () => buildActionItems()),
-        new FlatSectionProvider(SECTION_VIEW_IDS.status, () => buildStatusItems(workspaceState)),
+        // Merged Actions + Settings + Triage panel, placed at the former Actions
+        // slot (above Status) so the run/initialize operations stay prominent.
         new FlatSectionProvider(SECTION_VIEW_IDS.settings, () => buildSettingsItems(configProvider)),
+        new FlatSectionProvider(SECTION_VIEW_IDS.status, () => buildStatusItems(workspaceState)),
         new FlatSectionProvider(SECTION_VIEW_IDS.help, () => buildHelpItems()),
     ];
 }

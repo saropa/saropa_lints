@@ -14,6 +14,7 @@ import { normalizeOwaspId } from './securityPostureTree';
 import type { Suppressions } from '../suppressionsStore';
 import { isPathHidden, isRuleHidden } from '../suppressionsStore';
 import { VIOLATIONS_GROUP_BY_MODES, type GroupByMode } from './issuesTreeGrouping';
+import { packsForRule, tierForRule } from './ruleGroupingMeta';
 
 export type { GroupByMode };
 export { VIOLATIONS_GROUP_BY_MODES };
@@ -216,7 +217,10 @@ export function violationLabel(v: Violation): string {
 }
 
 export function formatGroupLabel(mode: GroupByMode, key: string): string {
-  if (mode === 'impact') {
+  // Tier keys are lowercase tier ids ('essential', …); title-case for display.
+  // Pack keys are already human labels (RULE_PACK_DEFINITIONS.label) or the
+  // 'No pack' fallback, so they pass through unchanged.
+  if (mode === 'impact' || mode === 'tier') {
     return key.charAt(0).toUpperCase() + key.slice(1);
   }
   if (mode === 'ruleType' || mode === 'ruleStatus') {
@@ -303,6 +307,13 @@ export function extractViolationGroupKeys(v: Violation, mode: GroupByMode): stri
   }
   if (mode === 'ruleStatus') {
     return [v.metadata?.ruleStatus ?? 'ready'];
+  }
+  if (mode === 'tier') {
+    return [tierForRule(v.rule)];
+  }
+  // Pack is multi-key (a rule can live in several packs), exactly like OWASP.
+  if (mode === 'pack') {
+    return packsForRule(v.rule);
   }
   const cats = [...(v.owasp?.mobile ?? []), ...(v.owasp?.web ?? [])].map(normalizeOwaspId);
   return cats.length > 0 ? cats : ['Uncategorized'];

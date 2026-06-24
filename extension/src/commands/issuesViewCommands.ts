@@ -279,6 +279,8 @@ export function registerIssuesViewCommands(
         { label: 'OWASP Category', id: 'owasp' },
         { label: 'Rule Type', id: 'ruleType' },
         { label: 'Rule Status', id: 'ruleStatus' },
+        { label: 'Tier', description: 'Essential → Pedantic', id: 'tier' },
+        { label: 'Pack(s)', description: 'Ecosystem / platform / concern packs', id: 'pack' },
       ];
       const items: GroupByPickItem[] = baseModes.map((m) => {
         const subtitle = m.description;

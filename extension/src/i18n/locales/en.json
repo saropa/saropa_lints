@@ -68,15 +68,45 @@
   "dashboards": {
     "heroTitle": "Dashboards",
     "openFull": "Open full screen",
+    "rescan": "Rescan",
+    "retry": "Retry",
+    "paneFailed": "Scan failed.",
     "pane": {
       "projectMap": "Project Map",
-      "codeHealth": "Code Health"
+      "codeHealth": "Code Health",
+      "lintsConfig": "Lints Config",
+      "findings": "Findings",
+      "package": "Package Dashboard",
+      "commandCatalog": "Command Catalog"
     },
     "projectMap": {
       "scanning": "Scanning project map…"
     },
     "codeHealth": {
       "scanning": "Scanning code health…"
+    },
+    "config": {
+      "tier": "Tier",
+      "enabledRules": "Enabled rules",
+      "rulePacks": "Rule packs",
+      "packages": "Packages"
+    },
+    "package": {
+      "total": "Packages",
+      "attention": "Needs attention",
+      "blocked": "Blocked",
+      "empty": "No package scan yet — open the dashboard to run one."
+    },
+    "findings": {
+      "total": "Total",
+      "errors": "Errors",
+      "warnings": "Warnings",
+      "info": "Info",
+      "empty": "No analysis run yet — open Findings to run one."
+    },
+    "catalog": {
+      "commands": "Commands",
+      "recent": "Recently used"
     },
     "scanFailed": "Scan failed. Open the full dashboard to see details and retry."
   },
@@ -363,7 +393,9 @@
       "rule": "Rule",
       "owasp": "OWASP",
       "ruleType": "Rule type",
-      "ruleStatus": "Rule status"
+      "ruleStatus": "Rule status",
+      "tier": "Tier",
+      "pack": "Pack(s)"
     },
     "seg": {
       "toggleSeverityTitle": "Toggle {v} severity",

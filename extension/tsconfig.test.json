@@ -136,6 +136,7 @@
     "src/test/views/helpHub.test.ts",
     "src/test/views/violationsDashboardHtml.test.ts",
     "src/test/views/issuesTree.test.ts",
+    "src/test/views/ruleGroupingMeta.test.ts",
     "src/test/views/crossFileCommands.test.ts",
     "src/test/views/uxLabels.test.ts",
     "src/i18n/runtime.ts",

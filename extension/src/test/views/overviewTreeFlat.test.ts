@@ -90,7 +90,7 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
     sinon.restore();
   });
 
-  it('package.json declares the six section views plus the standalone Suggestions view', () => {
+  it('package.json declares exactly the section views (Actions merged into Settings)', () => {
     const pkg = loadPackageJson();
     const views = pkg.contributes.views.saropaLints;
     const ids = views.map((v) => v.id).sort();
@@ -189,8 +189,8 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
   // catalog, the CLI flag, and the guide — never as a sidebar row.
   // Asserting on the command id (not the label) keeps the guard robust
   // against future copy edits.
-  it('Actions section does not surface the composite analyzer plugin scaffold', () => {
-    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+  it('Settings section does not surface the composite analyzer plugin scaffold', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
     for (const node of actions.getChildren()) {
       const item = actions.getTreeItem(node as never);
       assert.notStrictEqual(
@@ -203,11 +203,11 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
 
   // The findings dashboard is reachable from the Dashboards section
   // ("Findings Dashboard" → openViolationsWideReport). A second row in the
-  // Actions panel that opened the same dashboard was redundant, so it was
-  // removed. Pin its absence so a future copy edit does not reintroduce the
+  // merged Settings panel that opened the same dashboard was redundant, so it
+  // was removed. Pin its absence so a future copy edit does not reintroduce the
   // duplicate.
-  it('Actions section does not duplicate the findings dashboard', () => {
-    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.actions)!;
+  it('Settings section does not duplicate the findings dashboard', () => {
+    const actions = providers.find((p) => p.viewId === SECTION_VIEW_IDS.settings)!;
     for (const node of actions.getChildren()) {
       const item = actions.getTreeItem(node as never);
       assert.notStrictEqual(

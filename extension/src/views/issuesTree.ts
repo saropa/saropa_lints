@@ -43,6 +43,8 @@ import { normalizeOwaspId } from './securityPostureTree';
 import { getProjectRoot } from '../projectRoot';
 import { readDisabledRules } from '../configWriter';
 import { l10n } from '../i18n/runtime';
+import { packsForRule, tierForRule } from './ruleGroupingMeta';
+import { VIOLATIONS_GROUP_BY_MODES, type GroupByMode } from './issuesTreeGrouping';
 
 const SEVERITY_ORDER = ['error', 'warning', 'info'] as const;
 const DEFAULT_PAGE_SIZE = 100;
@@ -75,24 +77,12 @@ function getPageSize(): number {
  * 'severity' is the default (Error/Warning/Info); other modes flatten
  * across severities and group by the chosen dimension.
  */
-export type GroupByMode =
-  | 'severity'
-  | 'file'
-  | 'impact'
-  | 'rule'
-  | 'owasp'
-  | 'ruleType'
-  | 'ruleStatus';
-
-const GROUP_BY_MODES: readonly GroupByMode[] = [
-  'severity',
-  'file',
-  'impact',
-  'rule',
-  'owasp',
-  'ruleType',
-  'ruleStatus',
-];
+// GroupByMode + the mode list live in issuesTreeGrouping (the single source of
+// truth shared with the dashboard); re-exported here so existing importers of
+// this module keep resolving the type. Adding a mode there (e.g. tier/pack)
+// flows to every consumer without editing a second list.
+export type { GroupByMode };
+const GROUP_BY_MODES = VIOLATIONS_GROUP_BY_MODES;
 
 /** Default grouping for new workspaces: impact surfaces Critical / High first. */
 export function parseViolationsGroupBy(cfg: vscode.WorkspaceConfiguration): GroupByMode {
@@ -1022,6 +1012,9 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
     if (mode === 'file') return [v.file];
     if (mode === 'ruleType') return [v.metadata?.ruleType ?? 'unspecified'];
     if (mode === 'ruleStatus') return [v.metadata?.ruleStatus ?? 'ready'];
+    if (mode === 'tier') return [tierForRule(v.rule)];
+    // Pack is multi-key (a rule can live in several packs), exactly like OWASP.
+    if (mode === 'pack') return packsForRule(v.rule);
     // OWASP: violation can map to multiple categories (e.g. both M1 and A03).
     // Use normalizeOwaspId (strip text after colon) to match the canonical IDs
     // used by securityPostureTree and owaspExport.
@@ -1035,7 +1028,9 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
 }
 
 function formatGroupLabel(mode: GroupByMode, key: string): string {
-  if (mode === 'impact') {
+  // Tier keys are lowercase tier ids; title-case them. Pack keys are already
+  // human labels (or the 'No pack' fallback) and pass through unchanged.
+  if (mode === 'impact' || mode === 'tier') {
     return key.charAt(0).toUpperCase() + key.slice(1);
   }
   if (mode === 'ruleType' || mode === 'ruleStatus') {

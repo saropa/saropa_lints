@@ -22,6 +22,8 @@ export function groupBySelectOptions(current: GroupByMode): string {
     owasp: l10n('findingsDash.groupBy.owasp'),
     ruleType: l10n('findingsDash.groupBy.ruleType'),
     ruleStatus: l10n('findingsDash.groupBy.ruleStatus'),
+    tier: l10n('findingsDash.groupBy.tier'),
+    pack: l10n('findingsDash.groupBy.pack'),
   };
   // 'impact' is filtered out: post-collapse it groups identically to 'severity'
   // so offering both is a trap. The mode value stays in the GroupByMode union
