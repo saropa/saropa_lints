@@ -89,14 +89,16 @@ function buildReportTable(
         hidden.has(col) ? '' : th(col, label, tooltip);
 
     /* Count visible columns so the detail row can span them all.
-       Base columns: expand + copy + name + version + category + published +
-       activity + likes + downloads + issues + prs + size + deps + update = 14.
+       Base columns: expand + name + version + category + published +
+       activity + likes + downloads + issues + prs + size + deps + update = 13.
+       (The per-row "copy as JSON" column was removed; that action now lives
+       in the docked detail pane's header instead of one button per row.)
        (Stars used to be a column; it was replaced by Likes because GitHub
        stars apply to the whole repo — monorepo siblings all reported the
        same number — while pub.dev likes are per-package. Downloads were
        added as a second package-specific trust signal from the same
        source.) */
-    const visibleCols = 14
+    const visibleCols = 13
         + (hidden.has('files') ? 0 : 1)
         + (hidden.has('transitives') ? 0 : 1)
         + (hidden.has('vulns') ? 0 : 1)
@@ -107,7 +109,6 @@ function buildReportTable(
     return `<table>
         <thead><tr>
             <th class="col-expand"><span class="sr-only">${escapeHtml(l10n('a11y.expandRow'))}</span></th>
-            <th class="col-copy"><span class="sr-only">${escapeHtml(l10n('a11y.copyRow'))}</span></th>
             ${th('name', col('name', 'label'), col('name', 'tooltip'))}
             ${th('version', col('version', 'label'), col('version', 'tooltip'))}
             ${th('score', col('score', 'label'), col('score', 'tooltip'))}
@@ -199,7 +200,6 @@ function buildRow(
         data-shared-transitive="${isSharedTransitive ? 'yes' : 'no'}"
         data-reexport="${isReExport}">
         <td class="expand-cell"><span class="expand-chevron" title="${escapeHtml(l10n('packageDashboard.row.expandDetails'))}">\u25B6</span></td>
-        <td class="copy-cell"><span class="copy-btn" data-pkg="${name}" title="${escapeHtml(l10n('packageDashboard.row.copyRowJson'))}">&#128203;</span></td>
         ${buildNameCell(r)}
         ${buildVersionCell(r)}
         ${buildCategoryCell(r, packageTrends?.get(r.package.name) ?? [])}

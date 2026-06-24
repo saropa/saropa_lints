@@ -1040,17 +1040,24 @@ export function reportStylesPart7(): string {
         .network-node.direct { font-weight: 700; }
         .network-node.transitive { opacity: 0.85; }
 
-        /* ---- Copy-row button ---- */
-        .col-copy { width: 28px; padding: 6px 4px; }
-        .copy-cell { text-align: center; padding: 6px 4px; width: 28px; }
-        .copy-btn {
-            cursor: pointer; opacity: 0; font-size: 0.9em;
-            transition: opacity 0.15s;
-            user-select: none;
+        /* ---- Detail-pane copy-as-JSON button ---- */
+        /* Sits beside the close button in the detail-pane header; styled to
+         * match .detail-pane-close so the two header actions read as a pair. */
+        .detail-pane-actions { display: flex; align-items: center; gap: 2px; }
+        .detail-pane-copy {
+            background: none; border: none; cursor: pointer; font-size: 1em;
+            line-height: 1; color: var(--vscode-descriptionForeground);
+            padding: 2px 6px; border-radius: 4px; user-select: none;
+            transition: color 0.15s;
         }
-        tr:hover .copy-btn { opacity: 0.5; }
-        .copy-btn:hover { opacity: 1; }
-        .copy-btn.copied { color: var(--vscode-testing-iconPassed); opacity: 1; }
+        .detail-pane-copy:hover {
+            color: var(--vscode-foreground);
+            background: var(--vscode-list-hoverBackground);
+        }
+        .detail-pane-copy:focus-visible {
+            outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px;
+        }
+        .detail-pane-copy.copied { color: var(--vscode-testing-iconPassed); }
 `;
 }
 
@@ -1077,7 +1084,7 @@ export function reportStylesPart8(): string {
                report-script.ts when this query matches — CSS can't disable
                SMIL, so the JS path is the only reliable kill-switch. */
             .expand-chevron { transition: none; }
-            .copy-btn { transition: none; }
+            .detail-pane-copy { transition: none; }
             .summary-card[data-filter] { transition: none; }
             .active-filter-chip { transition: none; }
             .bar-row { transition: none; }

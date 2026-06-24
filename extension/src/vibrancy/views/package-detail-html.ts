@@ -378,16 +378,21 @@ function buildChangelogSection(r: VibrancyResult): string {
         to: info.latestVersion,
     }))}</p>`;
 
-    const entries = changelog.entries.map(entry => {
+    const entries = changelog.entries.map((entry, index) => {
         // Date is optional in the parsed entry; only the dated form needs l10n
         // (it interpolates two tokens), a bare version is just escaped text.
         const heading = entry.date
             ? l10n('packageDetail.changelog.versionDated', { version: entry.version, date: entry.date })
             : entry.version;
-        return '<div class="changelog-entry">'
-            + `<div class="changelog-version">${escapeHtml(heading)}</div>`
+        // Each version collapses independently via native <details>. Entries
+        // arrive newest-first (CHANGELOG.md convention), so only the first —
+        // the latest version — opens by default; older releases stay folded so
+        // the section isn't a wall of every prior release's notes.
+        const open = index === 0 ? ' open' : '';
+        return `<details class="changelog-entry"${open}>`
+            + `<summary class="changelog-version">${escapeHtml(heading)}</summary>`
             + `<div class="changelog-body">${markdownToHtml(entry.body)}</div>`
-            + '</div>';
+            + '</details>';
     }).join('');
 
     // Only when the 20-entry cap dropped older releases: name the count shown

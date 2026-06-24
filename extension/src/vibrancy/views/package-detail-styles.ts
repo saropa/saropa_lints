@@ -477,11 +477,32 @@ export function getPackageDetailStyles(): string {
             border-top: 1px solid var(--vscode-widget-border);
         }
         .changelog-entry:first-of-type { border-top: none; }
+        /* <summary> is the click target that folds each version. cursor + the
+           rotating marker signal it is interactive; list-style removes the
+           browser's default triangle so the custom ▸ is the only marker. */
         .changelog-version {
             font-size: 1.05em;
             font-weight: 600;
-            margin-bottom: 4px;
             color: var(--vscode-textLink-foreground);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .changelog-version::-webkit-details-marker { display: none; }
+        .changelog-version::before {
+            content: "\\25B8";
+            font-size: 0.85em;
+            color: var(--vscode-descriptionForeground);
+            transition: transform 0.15s;
+        }
+        .changelog-entry[open] > .changelog-version::before {
+            transform: rotate(90deg);
+        }
+        .changelog-entry[open] > .changelog-version { margin-bottom: 4px; }
+        @media (prefers-reduced-motion: reduce) {
+            .changelog-version::before { transition: none; }
         }
         /* Tighten the markdown the renderer emits so nested lists and paragraphs
            don't inherit the page's full block spacing inside a dense changelog. */

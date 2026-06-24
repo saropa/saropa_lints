@@ -669,15 +669,16 @@ describe('report: version tooltip', () => {
 });
 
 describe('report: copy-as-JSON button', () => {
-    it('should include a copy button in each row', () => {
+    it('should expose the copy-as-JSON button in the detail pane header', () => {
         const html = buildReportHtml(opts([makeResult('http', 80)]));
-        assert.ok(html.includes('copy-btn'));
+        assert.ok(html.includes('id="detailPaneCopy"'));
         assert.ok(html.includes('data-pkg="http"'));
     });
 
-    it('should include copy column header', () => {
+    it('should not render a per-row copy column', () => {
         const html = buildReportHtml(opts([]));
-        assert.ok(html.includes('col-copy'));
+        assert.ok(!html.includes('col-copy'));
+        assert.ok(!html.includes('copy-cell'));
     });
 
     it('should embed packageData script variable', () => {

@@ -29,6 +29,7 @@
     "src/test/vibrancy/services/package-code-analyzer.test.ts",
     "src/test/vibrancy/services/review-state.test.ts",
     "src/test/vibrancy/services/version-comparator.test.ts",
+    "src/test/vibrancy/services/changelog-opportunities.test.ts",
     "src/test/vibrancy/services/scan-logger.test.ts",
     "src/test/vibrancy/services/github-api.test.ts",
     "src/test/vibrancy/services/import-scanner.test.ts",

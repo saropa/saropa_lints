@@ -70,8 +70,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - **`avoid_hardcoded_api_urls` now flags hardcoded URLs on an `api.` host, not just `/api` paths.** The detection pattern previously required `/api` in the URL path, so the most common shape — an `api.` subdomain with an ordinary path such as `https://api.example.com/users` — slipped through and the rule missed its own documented bad example. URLs with neither an `api.` host nor an `/api` path still pass, so ordinary links are unaffected. No action required.
 
+### Changed (Extension)
+
+- **Package Vibrancy dashboard moves "copy as JSON" out of every table row and into the detail pane header.** The per-row clipboard icon added a column to an already-dense table; the copy button now sits next to the detail pane's close button and copies whichever package is open in the pane. Open a package to copy its JSON. No action required.
+- **The package detail panel's changelog now collapses each version, with only the latest expanded.** A long upgrade gap could fill the panel with every intermediate release's notes; each version is now a fold-out, opened by default only for the newest release. Click any version to expand its notes. No action required.
+
 <details><summary>Maintenance</summary>
 
+- Added a changelog opportunity miner that classifies the already-fetched changelog delta into adoption candidates ("a new feature you could use") using text heuristics only — no AI — and ranks them against how heavily the project uses the package. Service layer with unit tests; not yet surfaced in the dashboard UI. No action required.
 - Added a rule-liveness report (`dart run saropa_lints:accuracy_report`) that scans the `expect_lint` fixtures and flags any rule declared in a fixture but never firing there — a gap the marker-text contract tests cannot catch. Report-only; not yet wired into CI. No action required.
 - Made every api_network fixture actually exercise its rule. The bad examples were stubs — top-level functions where the rule visits class methods, or missing the package import the rule gates on — so 20 of the network rules never fired on their own fixtures. Each bad example is now a realistic class method with the required import; all 34 api_network rules now trigger. Fixtures only; no rule behavior changed. No action required.
 

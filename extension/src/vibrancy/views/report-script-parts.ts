@@ -724,28 +724,32 @@ export function reportScriptPart5(): string {
             });
         }
 
-        /* ---- Copy row as JSON ---- */
-
-        document.querySelectorAll('.copy-btn').forEach(function(btn) {
-            var copyIcon = btn.textContent;
-            btn.addEventListener('click', function(e) {
+        /* ---- Copy the open package as JSON (docked detail pane header) ---- */
+        /* The copy action moved off every table row into the detail pane's
+         * header, so there is one copy button that always targets the package
+         * currently shown in the pane (openDetailPane retags its data-pkg). */
+        var paneCopyBtn = document.getElementById('detailPaneCopy');
+        if (paneCopyBtn) {
+            var paneCopyIcon = paneCopyBtn.innerHTML;
+            paneCopyBtn.addEventListener('click', function(e) {
                 e.stopPropagation();
-                var pkg = btn.dataset.pkg;
+                var pkg = paneCopyBtn.dataset.pkg;
+                if (!pkg) { return; }
                 var data = packageData[pkg];
                 if (!data) { return; }
                 /* Guard: ignore rapid re-clicks while feedback is showing */
-                if (btn.classList.contains('copied')) { return; }
+                if (paneCopyBtn.classList.contains('copied')) { return; }
                 var json = JSON.stringify(data, null, 2);
                 navigator.clipboard.writeText(json).then(function() {
-                    btn.textContent = '\\u2713';
-                    btn.classList.add('copied');
+                    paneCopyBtn.innerHTML = '\\u2713';
+                    paneCopyBtn.classList.add('copied');
                     setTimeout(function() {
-                        btn.textContent = copyIcon;
-                        btn.classList.remove('copied');
+                        paneCopyBtn.innerHTML = paneCopyIcon;
+                        paneCopyBtn.classList.remove('copied');
                     }, 1500);
                 });
             });
-        });
+        }
 
         /* ---- Copy entire table as JSON ---- */
         /* Copies an array of every package's full JSON record (same shape
@@ -1559,6 +1563,7 @@ export function reportScriptPart7(): string {
          * dashboard hosts the detail instead of a separate panel tab. ---- */
         var detailPane = document.getElementById('detail-pane');
         var detailPaneBody = document.getElementById('detail-pane-body');
+        var detailPaneCopyBtn = document.getElementById('detailPaneCopy');
         function openDetailPane(name) {
             if (!name || !detailPane || !detailPaneBody) { return; }
             document.querySelectorAll('.pkg-row.row-selected').forEach(function(r) {
@@ -1567,6 +1572,9 @@ export function reportScriptPart7(): string {
             var sel = (window.CSS && CSS.escape) ? CSS.escape(name) : name;
             var row = document.querySelector('.pkg-row[data-name="' + sel + '"]');
             if (row) { row.classList.add('row-selected'); }
+            /* The header copy button copies the package shown in the pane, so
+             * retag it with the current package on every open. */
+            if (detailPaneCopyBtn) { detailPaneCopyBtn.dataset.pkg = name; }
             detailPaneBody.innerHTML = '';
             detailPane.hidden = false;
             vscode.postMessage({ type: 'requestPackageDetail', package: name });

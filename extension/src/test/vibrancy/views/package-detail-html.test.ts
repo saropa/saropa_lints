@@ -195,6 +195,24 @@ describe('Package Detail Panel — consolidated changelog', () => {
             'entry bodies should render as markdown');
     });
 
+    it('makes each version collapsible with only the latest expanded by default', () => {
+        const html = buildPackageDetailHtml(
+            withChangelog([
+                { version: '1.2.0', date: '2025-06-01', body: '- Added a thing' },
+                { version: '1.1.0', body: '- Fixed a bug' },
+            ]),
+            [], null,
+        );
+        // Every entry is a <details> so each version folds independently.
+        const detailsCount = (html.match(/<details class="changelog-entry"/g) || []).length;
+        assert.strictEqual(detailsCount, 2, 'each version should be its own <details>');
+        // Exactly one entry — the first/latest — opens by default.
+        assert.ok(html.includes('<details class="changelog-entry" open>'),
+            'the latest version should be expanded by default');
+        const openCount = (html.match(/<details class="changelog-entry" open>/g) || []).length;
+        assert.strictEqual(openCount, 1, 'only the latest version should be open');
+    });
+
     it('renders the Upgrade button with a busy label so the pane can show progress', () => {
         // updateInfo is a minor bump with no blocker, so the Upgrade action
         // renders. data-busy-label is the localized "Upgrading…" the report
