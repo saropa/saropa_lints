@@ -144,6 +144,27 @@
     "dismiss": "Le licenciement est annulé.",
     "reviewFailed": "Impossible d'ouvrir la révision du pack de règles Saropa Lints. {error}"
   },
+  "opportunities": {
+    "documentTitle": "Améliorer les opportunités d'amélioration.",
+    "heroTitle": "Améliorer les opportunités d'amélioration.",
+    "subtitle": "Les paquets {count} ont des fonctionnalités que votre projet n'utilise pas encore.",
+    "noScan": "Exécutez d'abord un balayage de paquet pour trouver des opportunités de mise à niveau.",
+    "openFileFailed": "Impossible d'ouvrir le fichier {file}  ⁇ Il se peut qu'il ait bougé depuis le dernier balayage.",
+    "card": {
+      "versionUpgrade": "mise à jour disponible sur {latest}.",
+      "versionCurrent": "sur les dernières nouvelles.",
+      "featuresTitle": "Fonctions qui n'ont pas encore été utilisées.",
+      "locationsTitle": "Lorsque votre projet utilise ce package.",
+      "noLocations": "N'est pas importé dans la source du projet  ⁇ Il est probable qu'il s'agisse d'une dépendance dev ou transitive.",
+      "moreFiles": "et {count} plus de fichiers.",
+      "copyForAi": "Copiez l'invite de mise à niveau pour AI.",
+      "openInDashboard": "Ouvrir dans le tableau de bord du paquet."
+    },
+    "empty": {
+      "title": "Rien à adopter n'est adopté.",
+      "body": "Les fonctionnalités de chaque paquet scanné sont déjà utilisées dans votre projet, ou aucune opportunité de changelog n'a été trouvée."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION",

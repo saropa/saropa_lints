@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "Les paquets de re-scan (frais) ont été remplacés.",
   "command.packageVibrancy.openOtherProject.title": "Scanner un autre projet...",
   "command.packageVibrancy.showReport.title": "Ouvrez le tableau de bord du paquet.",
+  "command.packageVibrancy.showOpportunities.title": "Ouvrir les opportunités de mise à niveau.",
   "command.packageVibrancy.focus.title": "Le paquet est vibrant: ouvrez le tableau de bord (compact).",
   "command.packageVibrancy.clearCache.title": "Effacer le cache de l'appareil.",
   "command.packageVibrancy.exportReport.title": "Rapport sur les exportations réalisées.",

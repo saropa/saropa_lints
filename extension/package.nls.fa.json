@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "بسته های Rescan (تازه)",
   "command.packageVibrancy.openOtherProject.title": "اسکن پروژه دیگری...",
   "command.packageVibrancy.showReport.title": "داشبورد بسته را باز کنید",
+  "command.packageVibrancy.showOpportunities.title": "فرصت های ارتقاء باز را باز کنید",
   "command.packageVibrancy.focus.title": "بسته ی Vibrancy: داشبورد باز (کمپکت)",
   "command.packageVibrancy.clearCache.title": "پاک کردن کش (Cache)",
   "command.packageVibrancy.exportReport.title": "گزارش صادرات: گزارش صادراتی",

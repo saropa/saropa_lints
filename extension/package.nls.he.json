@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "חבילות סריקה מחדש (טריות)",
   "command.packageVibrancy.openOtherProject.title": "סורק פרויקט אחר...",
   "command.packageVibrancy.showReport.title": "פתח את לוח המחוונים של החבילה (Package Dashboard).",
+  "command.packageVibrancy.showOpportunities.title": "פתח הזדמנויות שדרוג פתוחה.",
   "command.packageVibrancy.focus.title": "חבילת Vibrancy: לוח-צמצומים פתוח (קומפקטי)",
   "command.packageVibrancy.clearCache.title": "לנקות את הקאש",
   "command.packageVibrancy.exportReport.title": "דוח היצוא דו\"ח ייצוא",

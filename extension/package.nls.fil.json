@@ -106,6 +106,7 @@
   "command.packageVibrancy.rescan.title": "Mga Package ng Rescan (Fresh)",
   "command.packageVibrancy.openOtherProject.title": "Scan Ang Isa Pang Proyekto...",
   "command.packageVibrancy.showReport.title": "Buksan ang Dashboard ng Package na Packet.",
+  "command.packageVibrancy.showOpportunities.title": "Buksan ang mga Oportunidad sa Pag-upgrade ng Mga Opportunity",
   "command.packageVibrancy.focus.title": "Pakete Vibrancy: Buksan ang dashboard (compact)",
   "command.packageVibrancy.clearCache.title": "I-clear ang cache ng iyong computer.",
   "command.packageVibrancy.exportReport.title": "Export Report - Pag-export ng Aklat",

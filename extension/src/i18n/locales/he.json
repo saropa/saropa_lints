@@ -144,6 +144,27 @@
     "dismiss": "פיטורים.",
     "reviewFailed": "לא ניתן היה לפתוח את סקירת חבילת החוקים של Saropa Lints. {error}"
   },
+  "opportunities": {
+    "documentTitle": "שדרוג הזדמנויות שיפור",
+    "heroTitle": "שדרוג הזדמנויות שיפור",
+    "subtitle": "{count} חבילות יש תכונות הפרויקט שלך עדיין לא משתמש.",
+    "noScan": "ראשית, תריץ סריקה של חבילה כדי למצוא הזדמנויות לשדרג.",
+    "openFileFailed": "לא ניתן לפתוח {file}  ⁇ ייתכן שהוא זז מאז הסריקה האחרונה.",
+    "card": {
+      "versionUpgrade": "עדכון זמין ל- {latest}",
+      "versionCurrent": "על העדכונים האחרונים",
+      "featuresTitle": "תכונות שטרם שימשו.",
+      "locationsTitle": "היכן הפרויקט שלך משתמש בחבילה זו?",
+      "noLocations": "לא מיובא במקור הפרויקט  ⁇ סביר להניח שתלות dev או transitive.",
+      "moreFiles": "ו-{count} קבצים נוספים",
+      "copyForAi": "העתק את הזמנת השדרוג עבור AI.",
+      "openInDashboard": "פתח בדאש-בורד החבילות (Package Dashboard)"
+    },
+    "empty": {
+      "title": "שום דבר לאמץ לאמנת.",
+      "body": "תכונות כל חבילה שנסרקה כבר משמשות בפרויקט שלך, או שלא נמצאו הזדמנויות לגיליון שינויים."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "גרסה: גירסת VersiON",
@@ -922,7 +943,7 @@
       "noGithub": "לא נמצא מאגר GitHub.",
       "devBadge": "דב Dev dev dev הוא לא.",
       "transitiveBadge": "טרנזיטיבי - עברי.",
-      "opportunitiesTooltip": "תכונות שאינן בשימוש: {features}",
+      "opportunitiesTooltip": "תכונות לא בשימוש: {features} זה ה- PH0__.",
       "publishDateUnavailable": "תאריך פרסום לא זמין מ pub.dev",
       "activityGradeUnavailable": "דרגת פעילות לא זמינה (נתוני התחייבות או שחרור חסרים)",
       "activityFallback": "פעילות המבוססת על התחייבויות ופרסומים אחרונים.",

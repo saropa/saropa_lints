@@ -221,7 +221,12 @@ class _ResolvedUsageVisitor extends RecursiveAstVisitor<void> {
       declToId[element] = id;
       _enclosing.add(element);
     }
-    if (_isEntryPoint(node: node, name: name, element: element, isTopLevel: isTopLevel)) {
+    if (_isEntryPoint(
+      node: node,
+      name: name,
+      element: element,
+      isTopLevel: isTopLevel,
+    )) {
       entryPointIds.add(id);
     }
     body();

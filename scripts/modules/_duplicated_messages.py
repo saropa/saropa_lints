@@ -51,6 +51,27 @@ def extract_message_strings(content: str) -> list[_MessageEntry]:
     return results
 
 
+# Markers that a 40-char window is a code/API example rather than English prose.
+# A windowed slice of a larger expression may capture only an open paren, so a
+# balanced-pair test is not enough; call syntax (`name(`), a method chain
+# (`.member`), or a camelCase identifier (`[a-z][A-Z]`) reliably distinguishes
+# code fragments from prose, which carries none of these.
+_CODE_MARKER_RE = re.compile(r"\w\(|\.\w|[a-z][A-Z]|=>")
+
+
+def _looks_like_code(sub: str) -> bool:
+    """True when a repeated window is a code/API example, not duplicated prose.
+
+    The inline-repeat check exists to catch a paragraph pasted twice into one
+    message. correctionMessages, however, routinely show parallel code examples
+    (method calls, casts, constructor invocations) whose connective fragments
+    recur on purpose — e.g. share_plus listing Share.share / shareUri /
+    shareXFiles all rewritten to SharePlus.instance.share(ShareParams(...)).
+    Such windows are exempt; only duplicated prose should be flagged.
+    """
+    return "! as " in sub or bool(_CODE_MARKER_RE.search(sub))
+
+
 @dataclass
 class DuplicatedMessagesResult:
     """Result of scanning rule files for duplicated/suspicious message text."""
@@ -103,7 +124,16 @@ def find_duplicated_messages(rules_dir: Path) -> DuplicatedMessagesResult:
                 found = False
                 for i in range(len(full) - length):
                     sub = full[i : i + length]
-                    if full.count(sub) >= 2 and " " in sub:
+                    # `_looks_like_code` exempts repeated API/call fragments: correctionMessages
+                    # legitimately enumerate parallel before/after migrations (e.g. share_plus
+                    # listing Share.share / shareUri / shareXFiles all rewritten to
+                    # SharePlus.instance.share(ShareParams(...))), so the connective code phrase
+                    # recurs by design. The check targets accidentally pasted PROSE, not examples.
+                    if (
+                        full.count(sub) >= 2
+                        and " " in sub
+                        and not _looks_like_code(sub)
+                    ):
                         key = (rel_str, line_no)
                         if key not in seen_inline:
                             seen_inline.add(key)

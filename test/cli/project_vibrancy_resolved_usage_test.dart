@@ -49,41 +49,38 @@ environment:
       return null;
     }
 
-    test(
-      'attributes callers per declaration, not per name '
-      '(same-named privates in different files)',
-      () async {
-        // `_shared` exists in both files. In a.dart it is called once (by
-        // `publicA`); in b.dart it is never called. Name-based counting rolls
-        // both into one bucket and reads both as used — the bug. Resolved
-        // counting must give a.dart's `_shared` 1 and b.dart's `_shared` 0.
-        File('${tempDir.path}/lib/a.dart').writeAsStringSync('''
+    test('attributes callers per declaration, not per name '
+        '(same-named privates in different files)', () async {
+      // `_shared` exists in both files. In a.dart it is called once (by
+      // `publicA`); in b.dart it is never called. Name-based counting rolls
+      // both into one bucket and reads both as used — the bug. Resolved
+      // counting must give a.dart's `_shared` 1 and b.dart's `_shared` 0.
+      File('${tempDir.path}/lib/a.dart').writeAsStringSync('''
 int _shared() => 1;
 
 int publicA() => _shared();
 ''');
-        File('${tempDir.path}/lib/b.dart').writeAsStringSync('''
+      File('${tempDir.path}/lib/b.dart').writeAsStringSync('''
 int _shared() => 1;
 
 int publicB() => 2;
 ''');
 
-        final report = await runProjectVibrancy(
-          ProjectVibrancyOptions(projectPath: tempDir.path),
-        );
+      final report = await runProjectVibrancy(
+        ProjectVibrancyOptions(projectPath: tempDir.path),
+      );
 
-        final sharedA = rowFor(report, '_shared', 'a.dart');
-        final sharedB = rowFor(report, '_shared', 'b.dart');
-        expect(sharedA, isNotNull, reason: 'a.dart _shared row missing');
-        expect(sharedB, isNotNull, reason: 'b.dart _shared row missing');
-        // The headline assertion: distinct, correct per-declaration counts.
-        expect(sharedA!.usageCount, 1);
-        expect(sharedB!.usageCount, 0);
-        // And the zero-caller one is the orphan, not the called one.
-        expect(sharedB.flags, contains('unused'));
-        expect(sharedA.flags, isNot(contains('unused')));
-      },
-    );
+      final sharedA = rowFor(report, '_shared', 'a.dart');
+      final sharedB = rowFor(report, '_shared', 'b.dart');
+      expect(sharedA, isNotNull, reason: 'a.dart _shared row missing');
+      expect(sharedB, isNotNull, reason: 'b.dart _shared row missing');
+      // The headline assertion: distinct, correct per-declaration counts.
+      expect(sharedA!.usageCount, 1);
+      expect(sharedB!.usageCount, 0);
+      // And the zero-caller one is the orphan, not the called one.
+      expect(sharedB.flags, contains('unused'));
+      expect(sharedA.flags, isNot(contains('unused')));
+    });
 
     test('does not count a function self-reference (recursion)', () async {
       // `_recurse` calls only itself; with no external caller it must read as

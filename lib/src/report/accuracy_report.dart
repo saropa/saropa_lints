@@ -75,8 +75,7 @@ class AccuracyReport {
   final List<RuleAccuracy> rules;
 
   /// Rules declared in a fixture that never fire there — the gate failures.
-  List<RuleAccuracy> get silentRules =>
-      rules.where((r) => r.isSilent).toList();
+  List<RuleAccuracy> get silentRules => rules.where((r) => r.isSilent).toList();
 
   /// Rules that fired in some but not all of their declaring fixtures.
   List<RuleAccuracy> get partiallyFiringRules => rules
@@ -131,8 +130,9 @@ AccuracyReport computeAccuracy({
     final tested = testedFilesByRule[rule] ?? const <String>{};
     // Restrict fired files to the rule's own fixtures: a hit in some other
     // rule's fixture is not evidence this rule works as specified.
-    final fired = (firedFilesByRule[rule] ?? const <String>{})
-        .intersection(tested);
+    final fired = (firedFilesByRule[rule] ?? const <String>{}).intersection(
+      tested,
+    );
 
     entries.add(
       RuleAccuracy(

@@ -144,6 +144,27 @@
     "dismiss": "Mag-dismiss na ako.",
     "reviewFailed": "Hindi mabuksan ang pagsusuri sa pack ng panuntunan ng Saropa Lints. {error}"
   },
+  "opportunities": {
+    "documentTitle": "I-upgrade ang mga pagkakataon sa pag-update ng mga oportunidad.",
+    "heroTitle": "I-upgrade ang mga pagkakataon sa pag-update ng mga oportunidad.",
+    "subtitle": "Ang mga pakete ng {count} ay may mga tampok na hindi pa ginagamit ng iyong proyekto.",
+    "noScan": "Magpatakbo ng isang pag-scan sa pakete muna upang mahanap ang mga pagkakataon sa pag-upgrade.",
+    "openFileFailed": "Hindi maaaring buksan ang {file}  ⁇ Maaaring lumipat ito mula noong huling pag-scan.",
+    "card": {
+      "versionUpgrade": "update na magagamit sa {latest}",
+      "versionCurrent": "Sa pinakabagong balita tungkol sa mga ito.",
+      "featuresTitle": "Mga tampok na hindi pa ginagamit.",
+      "locationsTitle": "Kung saan ginagamit ng iyong proyekto ang pakete na ito.",
+      "noLocations": "Hindi na-import sa project source  ⁇ malamang na isang dev o transitive dependency.",
+      "moreFiles": "at {count} higit pang mga file ng files.",
+      "copyForAi": "Kopyahin ang pag-upgrade ng prompt para sa AI.",
+      "openInDashboard": "Buksan sa Dashboard ng Package na Dashboard."
+    },
+    "empty": {
+      "title": "Walang dapat tanggapin na bagay.",
+      "body": "Ang mga tampok ng bawat na-scan na pakete ay ginagamit na sa iyong proyekto, o walang pagkakataon para sa changelog ang natagpuan."
+    }
+  },
   "packageDetail": {
     "section": {
       "version": "VERSION",
@@ -922,7 +943,7 @@
       "noGithub": "Walang GitHub na imbakan ang natagpuan.",
       "devBadge": "dev",
       "transitiveBadge": "transitive na may kaugalian.",
-      "opportunitiesTooltip": "Mga tampok na hindi ginagamit: {features}",
+      "opportunitiesTooltip": "Hindi ginagamit na mga tampok: hindi ginamit na mga katangian {features} ang kanyang mga",
       "publishDateUnavailable": "Hindi available ang petsa ng pag-publish mula sa pub.dev.",
       "activityGradeUnavailable": "Hindi magagamit ang antas ng aktibidad (na nawawala ang data sa pag-commit o release)",
       "activityFallback": "Aktibidad batay sa mga kamakailang pangako at release.",
