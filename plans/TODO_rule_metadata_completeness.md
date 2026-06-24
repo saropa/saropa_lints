@@ -123,6 +123,44 @@ The `addMethodDeclaration` network rules only catch class methods; a top-level/n
 `addFunctionDeclaration` would close that gap (low FP risk — identical body analysis) but changes what fires
 in every consumer project, so it is gated on explicit approval and tracked separately from the fixture work.
 
+### code_quality cluster (started): 36 → 32 silent
+
+Four context-fixable rules were corrected the same way as api_network and now fire:
+`avoid_positional_boolean_parameters` and `prefer_named_bool_params` (the rule skips `FunctionExpression`
+parents, so the bad example must be a class method), `avoid_unnecessary_overrides` (needs a method carrying
+`@override` that only calls super), and `avoid_duplicate_constant_values` (the rule scans top-level
+declarations, so the duplicate consts were moved out of a function body).
+
+The remaining 32 code_quality silent rules are heavier than the api_network shapes: most depend on type
+resolution and need the fixture to **define real enum/class types** rather than reference undefined
+identifiers (e.g. `avoid_enum_values_by_index` references an undeclared `Status`). Defining the enum alone
+did not flip `avoid_enum_values_by_index`, so that group needs per-rule resolution debugging, not a
+mechanical wrap. This group is deferred.
+
+## Finish Report (2026-06-24)
+
+A rule-liveness instrument was added and two fixture clusters were repaired. The instrument
+(`bin/accuracy_report.dart` + the pure core `lib/src/report/accuracy_report.dart`, 9 unit tests) pairs the
+`expect_lint` fixture markers with a resolved scan and reports any rule that is declared in a fixture but
+never fires there — a gap the `*_expect_lint_contract_test.dart` tests cannot detect because they only assert
+the marker string exists.
+
+The full-corpus run found 767 of 1,551 marker-bearing rules silent. Triage established the dominant cause is
+inadequate stub fixtures, not broken rules: a silent rule's bad example typically fails the rule's real
+trigger (wrong code context, missing required import, unrealistic identifier, or an undefined type the rule
+must resolve). One genuine rule defect surfaced and was fixed: `avoid_hardcoded_api_urls` required `/api` in
+the URL path and so missed the common `api.`-host shape — its regex was widened (rule version v5 → v6).
+
+Two clusters were brought to a measurable state. api_network reached 0 silent (all 34 rules fire): one rule
+fix plus 19 fixtures made realistic (class methods, required import lines, corrected call patterns, and one
+property-access shape). code_quality reached 32 silent from 36: four context-fixable rules corrected; the
+remaining resolution-dependent group deferred as noted above.
+
+Status of §4.1: the consumer that reads accuracy targets is partially realized as a liveness instrument.
+True false-positive / true-positive-rate measurement against `accuracyTarget` remains blocked on
+line-precise fixtures. The remaining ~745 package-wide silent rules and the code_quality resolution group are
+the open work; this TODO stays active and is not moved to history.
+
 ## 4.2 `certIds` sparse/empty **[OPEN — verified — by design]**
 
 By design. Populate per-rule where a clear CERT/CWE mapping exists.
