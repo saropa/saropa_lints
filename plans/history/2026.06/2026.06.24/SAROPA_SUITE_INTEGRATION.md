@@ -346,7 +346,7 @@ pinning surface, one CI to test all three layers together. Directly answers the 
 
 ### 6. Cross-repo state
 
-- saropa_lints: `plans/SAROPA_SUITE_INTEGRATION.md` active (shared-infra section = WON'T DO).
+- saropa_lints: archived to `plans/history/2026.06/2026.06.24/SAROPA_SUITE_INTEGRATION.md` (shared-infra section = WON'T DO).
 - saropa_drift_advisor: `plans/67-saropa-suite-integration.md` (canonical envelope owner; §7 also rejects extraction).
 - saropa-log-capture: `plans/105_plan-saropa-suite-integration.md`.
 - saropa_dart_utils: `plans/SAROPA_SUITE_INTEGRATION.md` (remediation layer; rule-id ↔ util-symbol map).
@@ -378,3 +378,34 @@ pinning surface, one CI to test all three layers together. Directly answers the 
    release until regenerated. Command when authorized: `py -3 extension\scripts\generate_translations.py`.
 4. Device verification pending — suite features verified by unit tests + type-check, not in a running
    VS Code host (envelope file written, badges render, deep-link lightbulb, nudge toast).
+
+---
+
+## Finish Report (2026-06-24)
+
+Closure pass. No code changed; this records the plan's transition from closed-in-place to archived.
+
+**Trigger.** The plan was marked Closed in-place on 2026-06-14 with two non-code leftovers: stale
+translated locale catalogs for the new `suite.*` / `consolidated.evidence.*` keys, and optional manual
+device verification. The translation leftover was the only gate on archival.
+
+**What resolved.** The locale catalogs were checked on 2026-06-24 and had nothing to translate — the
+`suite.*` / `consolidated.evidence.*` keys were already present in every translated catalog, so the
+publish coverage gate (`generate_locales.py --fail-on-missing`) is satisfied with no pipeline run. The
+status header was updated to record the cleared gate, then the file was moved from `plans/` into
+`plans/history/2026.06/2026.06.24/`.
+
+**Scope.** Docs only. No Dart rules, analyzer, tiers, `example/` fixtures, or extension TypeScript were
+touched. Feature requirements R1–R7 remain shipped, tested, and published (extension 14.0.0) exactly as
+recorded above; none were re-opened.
+
+**Known follow-up (carried, not code).**
+- Five sibling-repo references point at the former path `plans/SAROPA_SUITE_INTEGRATION.md`
+  (`saropa_dart_utils`, `saropa_drift_advisor` ×2 including one already-archived doc, `saropa-log-capture`
+  ×2). They now resolve to the archived location and must be repointed within each sibling repo
+  separately — cross-project edits are out of scope for this repo.
+- The shared-infrastructure extraction stays WON'T DO. The section-8 "contradiction" between the WON'T DO
+  decision and the external review that treated extraction as live is a documentation-bookkeeping item
+  (option a: fix one wrong `generate_translations.py` path in the archived i18n doc; option b: formally
+  reopen with a consolidated plan). It owes no code either way.
+- Manual cross-tool device verification of the suite features remains optional QA.
