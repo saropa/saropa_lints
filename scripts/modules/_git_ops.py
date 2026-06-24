@@ -144,11 +144,37 @@ def git_commit_and_push(
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
 
-    result = run_command(
-        ["git", "add", "-A"], project_dir, "Staging changes"
+    # Capture instead of run_command so git's per-file "CRLF will be replaced
+    # by LF" warnings (one stderr line per touched file — dozens on a locale
+    # regen) don't flood the log. They are not errors: core.autocrlf is set
+    # immediately below, so the normalization is intended. Collapse them to a
+    # single count line and pass through any other stderr unchanged.
+    print_info("Staging changes...")
+    result = subprocess.run(
+        ["git", "add", "-A"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
     )
     if result.returncode != 0:
+        if result.stderr.strip():
+            print_warning(result.stderr.strip())
+        print_error("Staging changes failed")
         return False
+
+    crlf_count = 0
+    other_stderr: list[str] = []
+    for line in (result.stderr or "").splitlines():
+        if "CRLF will be replaced by LF" in line:
+            crlf_count += 1
+        elif line.strip():
+            other_stderr.append(line)
+    if crlf_count:
+        print_info(f"Normalized {crlf_count} files (CRLF -> LF)")
+    for line in other_stderr:
+        print_warning(line)
+    print_success("Staging changes completed")
 
     result = subprocess.run(
         ["git", "status", "--porcelain"],

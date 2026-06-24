@@ -162,9 +162,19 @@ def audit_extension_locales(project_dir: Path) -> bool | None:
         if r.stdout:
             print_warning(r.stdout.strip())
         return False
+    # Success path: --fail-on-missing returned 0, so every locale is fully
+    # covered. The full per-locale table + coverage matrix is pure noise on a
+    # clean audit; echoing all ~80 lines buries the result. Surface only the
+    # one-line confirmation and the report path so the operator can open it if
+    # they want detail. (Gaps/low-quality lines only appear on the failure
+    # branch above, where they ARE shown as warnings.)
     if r.stdout:
-        for line in r.stdout.strip().splitlines():
-            print_info(f"  {line}")
+        for line in r.stdout.splitlines():
+            stripped = line.strip()
+            if "fully translated" in stripped or stripped.endswith(
+                "_i18n_translation_audit.md"
+            ):
+                print_info(f"  {stripped}")
     return True
 
 

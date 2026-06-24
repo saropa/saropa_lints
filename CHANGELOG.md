@@ -64,6 +64,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+<details><summary>Maintenance</summary>
+
+- Quieted the publish flow's extension locale audit on a clean pass. With every locale fully covered it printed all ~80 lines of the per-locale table and coverage matrix as info, burying the result; a passing audit now prints only the "fully translated" confirmation and the report path. Gaps and low-quality lines still surface as warnings on a failing audit. Publish tooling only. No action required.
+- Collapsed git's per-file "CRLF will be replaced by LF" warnings during the commit step into a single "Normalized N files (CRLF -> LF)" line. A locale regen touches dozens of JSON files, each emitting one such stderr warning; they are expected (`core.autocrlf` is set right after) so they are now counted rather than dumped, while any unexpected stderr still prints. Publish tooling only. No action required.
+
+</details>
+
+---
+
 ## [14.2.1]
 
 This release introduces a dedicated "Upgrade Opportunities" dashboard to help you discover unused features in your dependencies and instantly generate contextual upgrade prompts for AI assistants. It also adds a new lint rule to prevent runtime SQL crashes with Drift acronym columns, alongside smarter hardcoded API URL detection. Finally, the extension interface is polished with correctly translated tooltips, collapsible changelog histories, and cleaner table layouts. [log](https://github.com/saropa/saropa_lints/blob/v14.2.1/CHANGELOG.md)
