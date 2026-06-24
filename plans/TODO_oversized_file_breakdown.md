@@ -21,6 +21,10 @@ surface" dashboards the consolidation plan keeps as separate screens.
 
 - **violationsDashboardHtml.ts** 2155 → 136-line composer + `violations-dashboard-shared.ts` (150),
   `-script.ts` (864), `-top.ts` (506), `-tables.ts` (278), `-panels.ts` (323). Test (30) green.
+- **vibrancy/views/report-html.ts** 1709 → 182-line composer + `report-html-shared.ts` (115),
+  `report-html-top.ts` (535), `report-html-table.ts` (772), `report-html-data.ts` (201). View
+  tests (168 across report-html / report-webview / package-detail-html) green; `check-types` clean.
+  See Finish Report (2026-06-24) below.
 
 ## Remaining oversized files (by size)
 
@@ -36,7 +40,6 @@ count follows each in parentheses where it changed.
 |---|---|---|---|---|
 | views/commandCatalogWebviewHtml.ts | 1881 (was 1856) | markup | none | hero / search-toolbar / frequent+recent bands / category sections / client script |
 | vibrancy/views/report-script.ts | 1876 (was 1463) | client-js | none | filters / sorting / popovers / network-render / footprint-toggle (one IIFE module each) |
-| vibrancy/views/report-html.ts | 1709 (was 1766) | markup | yes | hero+gauge+breakdown / summary cards / chart / filters / table / detail-row / network |
 | views/projectVibrancyReportView.ts | 1369 (was 1310) | controller | none | html builder / client script / message handler / controller |
 | views/commandCatalogRegistry.ts | 1356 (was 1348) | data | yes | split the catalog entries by category group into data files |
 | views/violationsDashboardStyles.ts | 1350 (was 1297) | css | none | split by component (hero / kpi / toolbar / table / panels / chart) |
@@ -107,5 +110,62 @@ of whether the full consolidation ships.
 Behavior-preserving internal refactor; no user-facing change, no new or changed strings. The Findings
 dashboard is closed; the table above tracks the remaining oversized view files (kept linked-surface
 dashboards) for follow-up.
+
+Finish report appended: plans/TODO_oversized_file_breakdown.md
+
+---
+
+## Finish Report (2026-06-24) — Package-vibrancy report decomposition
+
+### What changed
+
+The package-vibrancy report's HTML builder (`vibrancy/views/report-html.ts`) had grown to 1709 lines
+holding the document shell, the input `ReportOptions` type, the hero/gauge/breakdown/summary chrome,
+the search-and-filter toolbar, the full package table with every per-cell builder, the copy-as-JSON
+payload, and the dependency-network payload — all in one file. It was modular by internal function
+boundary only; no section could be imported independently and a reader had to scroll the whole file
+to find any one part.
+
+`report-html.ts` is now a 182-line composer that owns only the page skeleton (CSP, styles, scripts)
+and the public export surface. Its parts moved into four focused sibling modules:
+
+- `report-html-shared.ts` (115) — the cross-cutting leaf helpers used by BOTH the table and the data
+  modules: `ReportOptions`, `resolveRepoUrl`, the age/activity math (`computeActivitySignal`,
+  `daysSinceIsoDate`, `formatAgeFromDays`, `buildDormancyStatus`). Kept separate so neither
+  consumer has to import the other.
+- `report-html-top.ts` (535) — top chrome: radial gauge, "Scanned X ago" pill, scan-in-progress
+  placeholder, "why this grade?" breakdown, summary KPI cards, and the search/filter toolbar.
+- `report-html-table.ts` (772) — the collapsible table section, column-hiding, the row builder, and
+  every per-cell builder, plus `buildDetailScoreSection` (the detail pane's health-score block, which
+  shares the cell-level formatters).
+- `report-html-data.ts` (201) — the per-package copy-as-JSON map, the GitHub-stars sub-block, and the
+  dependency-network payload.
+
+The composer re-exports `ReportOptions`, `buildSparklineSvg`, `computePublishedAgeMonths`, and
+`buildDetailScoreSection` so the external importers (`report-webview.ts`, `package-detail-html.ts`,
+the UX page generator, and the three view tests) reference them from `report-html.ts` unchanged.
+
+### Why
+
+Same rationale as the Findings split: the section builders are reusable blocks, and a 1709-line
+single file is hard to read, review, and modify safely. The shared/top/table/data split follows the
+proven approach at the top of this plan. The module boundaries were chosen to be acyclic — shared
+depends only on external modules; top/table/data each depend on shared but not on each other; the
+composer depends on all four.
+
+### Verification
+
+- Extraction was mechanical (a one-shot line-range slicer; function bodies moved byte-for-byte, no
+  transcription). Only import headers and `export` keywords were synthesized.
+- `npm run check-types` clean on the first pass after the split.
+- 168 view tests green across `report-html.test`, `report-webview.test`, and
+  `package-detail-html.test` — `report-html.test` pins the rendered markup, so byte-identical output
+  confirms the refactor is behavior-preserving. (The report tests rely on an earlier suite file
+  registering the `vscode` module mock; scope a standalone run with
+  `out-test/test/vibrancy/register-vscode-mock.js` listed first.)
+
+### Scope note
+
+Behavior-preserving internal refactor; no user-facing change, no new or changed strings.
 
 Finish report appended: plans/TODO_oversized_file_breakdown.md

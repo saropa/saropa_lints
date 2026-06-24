@@ -11,27 +11,47 @@
 /// Fixture for `prefer_static_final_for_session_constant`.
 ///
 /// LINT cases: compound arithmetic in build() whose every operand is
-/// session-constant (token getter + literal, token getter + static const,
-/// two token getters). NO-lint cases: anything that depends on a volatile
-/// input (context, widget.*, parameter, local), a bare single getter, or an
-/// expression already evaluated once (static field initializer / initState).
+/// session-constant — i.e. an ALLOWLISTED token getter (`ThemeCommonSpace.size`
+/// only) combined with literals, `static const`, or top-level `const`.
+///
+/// Regression-guard NO-lint cases: an expression that folds a NON-allowlisted
+/// token. `ThemeCommonSize.size` folds the avatar-scale user preference and
+/// `ThemeCommonFontSize.size` folds the system text scale, so both can change
+/// at runtime. Hoisting them to a `static final` would freeze a stale value —
+/// the rule must NOT fire even though the surrounding shape looks identical.
+///
+/// Other NO-lint cases: anything depending on a volatile input (context,
+/// widget.*, parameter, local), a bare single getter, or an expression already
+/// evaluated once (static field initializer / initState).
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// Mock design-token enum: `ThemeCommonSpace.Footer.size` is a runtime getter
-// (a static-final cache resolved once per session), NOT a compile-time const.
+// Mock design-token enums. Each `.size` is a runtime getter (a static-final
+// cache resolved once per session), NOT a compile-time const.
+
+// ALLOWLISTED — resolved purely from immutable device facts, safe to hoist.
 enum ThemeCommonSpace {
   Small,
   Medium,
+  Larger,
   Footer;
 
   double get size => 8;
 }
 
+// NOT allowlisted — folds the avatar-scale user preference (mutable at runtime).
 enum ThemeCommonSize {
   Small,
-  Large;
+  Large,
+  Huge;
 
   double get size => 16;
+}
+
+// NOT allowlisted — folds the system text scale (mutable at runtime).
+enum ThemeCommonFontSize {
+  Largest;
+
+  double get size => 24;
 }
 
 // Top-level const (Flutter k-convention) used in a LINT case.
@@ -43,19 +63,20 @@ class _BadState extends State {
 
   @override
   Widget build(BuildContext context) {
-    // LINT — token getter * literal, fully session-constant.
+    // LINT — allowlisted token getter * literal, fully session-constant.
     // expect_lint: prefer_static_final_for_session_constant
     final double pad = ThemeCommonSpace.Footer.size * 2;
 
-    // LINT — static const field + token getter.
+    // LINT — static const field + allowlisted token getter.
     // expect_lint: prefer_static_final_for_session_constant
     final double h = _kCard + ThemeCommonSpace.Medium.size * 2;
 
-    // LINT — two token getters combined.
+    // LINT — two allowlisted token getters combined.
     // expect_lint: prefer_static_final_for_session_constant
-    final double box = ThemeCommonSize.Small.size + ThemeCommonSpace.Small.size;
+    final double box =
+        ThemeCommonSpace.Larger.size + ThemeCommonSpace.Small.size;
 
-    // LINT — top-level const + token getter.
+    // LINT — top-level const + allowlisted token getter.
     // expect_lint: prefer_static_final_for_session_constant
     final double bar =
         kBottomNavigationBarHeight + ThemeCommonSpace.Medium.size;
@@ -67,12 +88,34 @@ class _BadState extends State {
 class _DuplicateState extends State {
   @override
   Widget build(BuildContext context) {
-    // LINT — same session-constant expression computed twice in one class.
+    // LINT — same allowlisted session-constant expression computed twice in one
+    // class (the strongest DRY + perf case). Both occurrences fire.
     // expect_lint: prefer_static_final_for_session_constant
-    final double a = ThemeCommonSize.Small.size + ThemeCommonSpace.Small.size;
+    final double a = ThemeCommonSpace.Footer.size * 2;
     // expect_lint: prefer_static_final_for_session_constant
-    final double b = ThemeCommonSize.Small.size + ThemeCommonSpace.Small.size;
+    final double b = ThemeCommonSpace.Footer.size * 2;
     return SizedBox(height: a + b);
+  }
+}
+
+/// Regression guard: a wrong hoist of these tokens would freeze a value the user
+/// can change. The rule MUST NOT fire on any of these even though the arithmetic
+/// shape matches the LINT cases above.
+class _NonAllowlistedTokenState extends State {
+  @override
+  Widget build(BuildContext context) {
+    // OK — ThemeCommonSize folds the avatar-scale pref; even mixed with an
+    // allowlisted token the whole expression must be rejected.
+    final double box =
+        ThemeCommonSize.Small.size + ThemeCommonSpace.Small.size;
+
+    // OK — ThemeCommonSize getter * literal.
+    final double huge = ThemeCommonSize.Huge.size * 2;
+
+    // OK — ThemeCommonFontSize folds the system text scale.
+    final double font = ThemeCommonFontSize.Largest.size * 1.5;
+
+    return SizedBox(height: box + huge + font);
   }
 }
 

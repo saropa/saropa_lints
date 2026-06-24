@@ -362,6 +362,13 @@ class AvoidClipPathInAnimatedBuilderRule extends _CompoundPerformanceRule {
 /// worth a field. Severity is `info` accordingly — the value is cumulative and
 /// pedagogical, not a hot-path emergency.
 ///
+/// **Token allowlist is a correctness gate.** Only `ThemeCommonSpace` is treated
+/// as session-constant. Tokens whose value folds a runtime-mutable input — the
+/// avatar-scale preference (`ThemeCommonSize`) or the system text scale
+/// (`ThemeCommonFontSize`) — are deliberately excluded, because hoisting them
+/// would freeze a value the user can change and ship a stale UI. See
+/// `_tokenEnumTypes` for the full exclusion rationale.
+///
 /// **BAD:**
 /// ```dart
 /// Widget build(BuildContext context) {
@@ -410,22 +417,30 @@ class PreferStaticFinalForSessionConstantRule extends SaropaLintRule {
     severity: DiagnosticSeverity.INFO,
   );
 
-  /// Default design-token enum types whose value getters resolve once per app
-  /// session (a `static final` cache keyed off the device display category).
+  /// Design-token enum types whose `size` getter resolves once per app session
+  /// and is therefore safe to hoist to a `static final`.
+  ///
+  /// CRITICAL: this set is restricted to `ThemeCommonSpace` ALONE, and the
+  /// restriction is a CORRECTNESS gate, not merely a noise gate. A token getter
+  /// may be hoisted only when its resolved value depends solely on immutable
+  /// device facts — the `static final` cache keyed off `DeviceDisplay.category`,
+  /// with no `forced`-recompute entry point. A token that folds a runtime-mutable
+  /// input MUST be excluded: freezing it in a `static final` would display a
+  /// stale value after the user changes that input, a real UI regression
+  /// (verified downstream in `saropa/contacts`, 2026-06-23). Deliberately
+  /// excluded:
+  ///   - `ThemeCommonSize`     — reads the avatar-scale user preference and is
+  ///                             recomputed by `initThemeCommonSize(forced:)`;
+  ///   - `ThemeCommonFontSize` — reads `MediaQuery.textScalerOf(context)` and is
+  ///                             recomputed on system-font-scale change;
+  ///   - `ThemeCommonElevation` / `ThemeCommonRadius` / `ThemeCommonIconSize`
+  ///                           — unverified, so excluded under the "when in doubt,
+  ///                             exclude" policy (a missed hoist is harmless; a
+  ///                             wrong hoist is a stale-UI bug).
   ///
   /// Detection is syntactic so it works under both the resolved analyzer tree
-  /// (IDE) and the unresolved `parseString` tree (scan/health CLIs). This is the
-  /// built-in default set, matching the Saropa design-system token classes the
-  /// rule was authored against; it is intentionally narrow to keep the rule
-  /// low-noise rather than flagging every `.size` access in a codebase.
-  static const Set<String> _tokenEnumTypes = <String>{
-    'ThemeCommonSpace',
-    'ThemeCommonSize',
-    'ThemeCommonFontSize',
-    'ThemeCommonElevation',
-    'ThemeCommonRadius',
-    'ThemeCommonIconSize',
-  };
+  /// (IDE) and the unresolved `parseString` tree (scan/health CLIs).
+  static const Set<String> _tokenEnumTypes = <String>{'ThemeCommonSpace'};
 
   /// Getter names on a token enum value that return a session-constant scalar.
   static const Set<String> _tokenGetters = <String>{'size'};

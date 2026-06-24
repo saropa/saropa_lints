@@ -231,6 +231,18 @@ details.domain-group > summary .muted { font-size: 0.85em; font-weight: 500; col
   padding: 0 6px;
   white-space: nowrap;
 }
+/* Version-group marker: signals that a pack is one of several mutually-exclusive
+   version variants (e.g. dio vs dio_5) so the user knows enabling it turns the
+   siblings off. Uses the accent link color to read as an actionable choice,
+   distinct from the muted domain pill above. */
+.pack-vgroup {
+  font-size: 0.72em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--vscode-textLink-foreground);
+  font-weight: 700;
+  white-space: nowrap;
+}
 details.domain-group > summary:focus-visible {
   outline: 1px solid var(--vscode-focusBorder);
   outline-offset: 2px;

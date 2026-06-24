@@ -60,6 +60,7 @@
     "src/test/vibrancy/providers/hover-provider.test.ts",
     "src/rulePacks/rulePackDefinitions.ts",
     "src/rulePacks/rulePackYaml.ts",
+    "src/rulePacks/versionGroups.ts",
     "src/test/rulePacks/**/*.ts",
     "src/sidebarSectionVisibility.ts",
     "src/sidebarSectionVisibilityKeys.ts",

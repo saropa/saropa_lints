@@ -72,6 +72,20 @@ Consolidates four overlapping `shrinkWrap: true` rules down to one. A single scr
 
 - **Deprecated three redundant shrinkWrap rules in favor of `avoid_shrink_wrap_expensive`.** `avoid_shrink_wrap_in_scroll`, `avoid_shrink_wrap_in_lists`, and `avoid_shrinkwrap_in_scrollview` all policed the same `shrinkWrap: true` concern, so one site drew up to four diagnostics and an acknowledgment under one rule name did not suppress the others; the canonical `avoid_shrink_wrap_expensive` flags nested and non-nested cases alike while exempting the safe `NeverScrollableScrollPhysics` pattern. Deprecated rules are dropped from freshly generated tier configs — re-run init or write-config to clear them, or remove them from `analysis_options.yaml` by hand.
 
+### Fixed
+
+- **`prefer_static_final_for_session_constant` no longer flags `ThemeCommonSize` or `ThemeCommonFontSize` arithmetic.** Those getters fold the avatar-scale preference and the system text scale, so hoisting them to a `static final` would freeze a value the user can change and show a stale UI; the rule now treats only `ThemeCommonSpace` as session-constant. No action required.
+
+### Changed (Extension)
+
+- **Manage Rule Packs treats a package's version variants as a pick-one choice.** Packs targeting different majors of the same dependency (`dio` vs `dio 5.x`, Riverpod 2 vs 3, `app_links` vs `app_links 6.x`, and similar) now carry a "Pick one version" tag and are mutually exclusive — enabling one variant turns its siblings off, and `rule_packs.enabled` can never list two versions of the same package at once. No action required; the lockfile already gates rules to the version you ship.
+
+<details><summary>Maintenance</summary>
+
+- Split the extension's 1709-line Package Vibrancy report builder into a thin composer plus four focused sibling modules (shared helpers, top chrome, package table, data payloads). Behavior-preserving — the rendered report is byte-identical. No action required.
+
+</details>
+
 ---
 
 ## [14.2.0]

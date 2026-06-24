@@ -1,6 +1,6 @@
 # FEATURE: `prefer_static_final_for_session_constant` — hoist session-constant arithmetic out of `build()`
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
@@ -269,3 +269,61 @@ rule would ship regressions. The token allowlist is mandatory, not optional.
 - saropa_lints version: (current main as of 2026-06-23)
 - Triggering project: `saropa/contacts` (d:\src\contacts)
 - Motivating site: `lib/components/home/home_section_list.dart` — `_bottomClearance` hoist (2026-06-23)
+
+---
+
+## Finish Report (2026-06-24)
+
+The rule itself shipped in v14.2.0 (prior session, 2026-06-23). This pass
+implements the CRITICAL CAVEAT added when the request was reopened: the original
+token allowlist was a correctness bug.
+
+### What was wrong
+
+`PreferStaticFinalForSessionConstantRule._tokenEnumTypes` allowlisted six token
+enums — `ThemeCommonSpace`, `ThemeCommonSize`, `ThemeCommonFontSize`,
+`ThemeCommonElevation`, `ThemeCommonRadius`, `ThemeCommonIconSize`. Per the
+caveat, `ThemeCommonSize` folds the avatar-scale user preference and
+`ThemeCommonFontSize` folds the system text scale; both are recomputed at runtime
+when the user changes those inputs. Hoisting either to a `static final` freezes
+the value and ships a stale UI. The downstream "Rejected (5 sites)" table is the
+proof. The shipped fixture compounded the error by marking
+`ThemeCommonSize.Small.size + ThemeCommonSpace.Small.size` as a LINT case.
+
+### Fix
+
+- Restricted `_tokenEnumTypes` to `{'ThemeCommonSpace'}` only, with a doc comment
+  explaining that the restriction is a correctness gate (not a noise gate) and
+  why each excluded token is unsafe. `ThemeCommonElevation`/`Radius`/`IconSize`
+  stay excluded under the "when in doubt, exclude" policy (unverified backing
+  source; a missed hoist is harmless, a wrong hoist is a stale-UI bug).
+- Added a paragraph to the rule's main dartdoc stating the allowlist is a
+  correctness gate.
+- Rewrote the fixture: the `ThemeCommonSize`/`ThemeCommonFontSize` cases are now
+  explicit NO-lint regression guards in a dedicated `_NonAllowlistedTokenState`
+  class (including a mixed expression where one allowlisted + one non-allowlisted
+  token must still be rejected). The duplicate-expression LINT case now uses
+  `ThemeCommonSpace` only.
+
+### Verification
+
+- Scan CLI (`dart run saropa_lints scan <fixture> --tier comprehensive`):
+  `prefer_static_final_for_session_constant` fires exactly 6 times — the 4
+  allowlisted `ThemeCommonSpace` expressions in `_BadState` and the 2 duplicate
+  `ThemeCommonSpace` expressions in `_DuplicateState`. Zero hits on the
+  `ThemeCommonSize`/`ThemeCommonFontSize` regression guards, the static-field
+  initializer, and `initState`.
+- `dart test test/rules/core/compound_performance_rules_test.dart` — all pass
+  (instantiation/metadata pins + fixture-exists pins).
+
+### Note on config
+
+The request floated a config-driven, opt-in-per-token allowlist. Not built: the
+default set is now correct-by-default (`ThemeCommonSpace` only) and adding
+rule-options infrastructure for one rule remains out of proportion. Other apps'
+token classes are simply not matched, which is the safe outcome.
+
+### CHANGELOG
+
+Logged under `[Unreleased] → ### Fixed` (the over-broad allowlist shipped in
+v14.2.0, so the narrowing is a fix to a released rule).
