@@ -165,6 +165,7 @@
       "listMany": "{head}, and {last}",
       "message": "Some sections couldn't load: {list}.",
       "retry": "Retry",
+      "retrying": "Retrying…",
       "retryTitle": "Retry the failed fetches."
     },
     "description": {
@@ -191,6 +192,7 @@
       "bloat": "({rating}/10 bloat)",
       "onDisk": "On Disk",
       "upgrade": "Upgrade",
+      "upgrading": "Upgrading…",
       "viewChangelog": "View Changelog"
     },
     "changelog": {

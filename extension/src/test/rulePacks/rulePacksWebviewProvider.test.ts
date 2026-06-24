@@ -9,9 +9,11 @@ import {
   computePackDashboardStats,
   formatRelativeFreshness,
   hslForCoverageScore,
+  packsAndRulesLabel,
   sdkPackMatchesSelection,
   sdkPackRiskKind,
   shouldRenderPackCoverageChart,
+  sumPackRules,
 } from '../../rulePacks/rulePacksWebviewProvider';
 
 /** Rule pack webview helpers: stats, tier control, sort order, freshness, chart visibility. */
@@ -165,6 +167,25 @@ describe('rulePacksWebviewProvider dashboard helpers', () => {
     const snippet = buildConfigSnippetYaml('not-a-tier', []);
     assert.ok(snippet.includes('tier: recommended'));
     assert.ok(snippet.includes('enabled: []'));
+  });
+
+  it('sums the rule counts across a set of pack rows for header badges', () => {
+    assert.strictEqual(
+      sumPackRules([
+        { id: 'a', label: 'A', rules: 3, enabled: false, detected: false },
+        { id: 'b', label: 'B', rules: 5, enabled: false, detected: false },
+      ]),
+      8,
+    );
+    assert.strictEqual(sumPackRules([]), 0);
+  });
+
+  it('formats a pluralized "N packs · M rules" header badge', () => {
+    assert.strictEqual(packsAndRulesLabel(12, 340), '12 packs · 340 rules');
+    // Both halves pluralize independently.
+    assert.strictEqual(packsAndRulesLabel(1, 1), '1 pack · 1 rule');
+    assert.strictEqual(packsAndRulesLabel(1, 7), '1 pack · 7 rules');
+    assert.strictEqual(packsAndRulesLabel(0, 0), '0 packs · 0 rules');
   });
 
   it('skips the pack coverage chart when no pack is enabled or detected', () => {

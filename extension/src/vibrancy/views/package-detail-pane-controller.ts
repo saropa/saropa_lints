@@ -41,12 +41,14 @@ export class PackageDetailPaneController {
     private _lastRetryAt = 0;
 
     /**
-     * @param _post  Pushes the rendered detail body to the dashboard webview.
+     * @param _post  Posts a message to the dashboard webview. Carries both the
+     *   rendered detail body (`packageDetailHtml`) and pane action status
+     *   (`paneAction` busy/done) so the pane can reflect a long upgrade in place.
      * @param _reviewState  Persists per-item PR/issue review status + notes.
      * @param _cache  Shared HTTP cache for the lazy fetches (optional).
      */
     constructor(
-        private readonly _post: (html: string, packageName: string) => void,
+        private readonly _post: (message: { type: string; [key: string]: unknown }) => void,
         private readonly _reviewState: ReviewStateService,
         private readonly _cache?: CacheService,
     ) {}
@@ -76,7 +78,7 @@ export class PackageDetailPaneController {
             ? this._reviewState.getSummary(r.package.name, r.package.version, gapItems)
             : null;
         const html = buildPackageDetailBody(r, reviews, summary, this._fetchErrors, { paneMode: true });
-        this._post(html, r.package.name);
+        this._post({ type: 'packageDetailHtml', package: r.package.name, html });
     }
 
     /** Debounce re-renders so several lazy fetches landing together don't
@@ -171,10 +173,19 @@ export class PackageDetailPaneController {
                 break;
             case 'upgrade':
                 if (msg.name && msg.version) {
-                    await vscode.commands.executeCommand(
-                        'saropaLints.packageVibrancy.updateFromCodeLens',
-                        { name: msg.name, targetVersion: msg.version },
-                    );
+                    // pub get + full test suite is multi-minute. Flag the pane's
+                    // Upgrade button busy across the whole run so it doesn't look
+                    // idle, and clear it in `finally` so a failed/rolled-back
+                    // upgrade (no dashboard rebuild) still re-enables the button.
+                    this._post({ type: 'paneAction', action: 'upgrade', state: 'busy' });
+                    try {
+                        await vscode.commands.executeCommand(
+                            'saropaLints.packageVibrancy.updateFromCodeLens',
+                            { name: msg.name, targetVersion: msg.version },
+                        );
+                    } finally {
+                        this._post({ type: 'paneAction', action: 'upgrade', state: 'done' });
+                    }
                 }
                 break;
             case 'setReviewStatus':

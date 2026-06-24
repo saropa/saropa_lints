@@ -1064,6 +1064,8 @@ export function getReportStyles(): string {
             /* Hold the indeterminate sweep still so reduced-motion users get a
                static partial bar instead of a continuously sliding stripe. */
             .scan-progress-fill.indeterminate { animation: none; }
+            /* Busy-button spinner stops spinning; the relabel still signals work. */
+            .action-btn.btn-busy::before, .btn.btn-busy::before { animation: none; }
         }
 
         /* ---- Live scan-progress bar ----
@@ -1124,5 +1126,27 @@ export function getReportStyles(): string {
             font-variant-numeric: tabular-nums;
             flex: 0 0 auto;
         }
+
+        /* ---- Busy state for pane action buttons (Upgrade / Retry) ----
+           A slow host op (pub get + test, or network re-fetches) disables the
+           button and prefixes a spinner so the pane shows it is working rather
+           than sitting idle behind a toast. */
+        .action-btn.btn-busy, .btn.btn-busy {
+            opacity: 0.85;
+            cursor: progress;
+        }
+        .action-btn.btn-busy::before, .btn.btn-busy::before {
+            content: '';
+            display: inline-block;
+            width: 0.85em;
+            height: 0.85em;
+            margin-right: 6px;
+            vertical-align: -0.12em;
+            border: 2px solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: btnSpin 0.7s linear infinite;
+        }
+        @keyframes btnSpin { to { transform: rotate(360deg); } }
     `;
 }

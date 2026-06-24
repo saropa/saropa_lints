@@ -25,6 +25,14 @@ const OUTPUT_CHANNEL_NAME = 'Saropa Lints';
 
 // Lazily-initialized singleton to avoid creating multiple channel objects.
 let _outputChannel: vscode.OutputChannel | undefined;
+
+// Cancellation source for the one in-flight full `runAnalysis`. A newer request
+// (e.g. toggling several rule packs in quick succession) cancels the previous run
+// instead of spawning a second concurrent `dart analyze` + progress notification.
+// Without this, rapid pack toggles stacked N "Running analysis" notifications and N
+// overlapping analyzer processes (reported 2026-06-23). Newest-wins is always
+// correct: two concurrent full analyses race to write the same violations.json.
+let _supersedingAnalysisCts: vscode.CancellationTokenSource | undefined;
 function getOutputChannel(): vscode.OutputChannel {
   _outputChannel ??= vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
   return _outputChannel;
@@ -816,6 +824,15 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
   const cfg = vscode.workspace.getConfiguration('saropaLints');
   const openEditorsOnly = cfg.get<boolean>('runAnalysisOpenEditorsOnly', false) ?? false;
 
+  // Supersede any previous in-flight full analysis before starting this one, so a
+  // burst of config changes (pack toggles) collapses to a single live run rather
+  // than stacking notifications and analyzer processes. The previous run's child
+  // is killed via its token; its progress notification then resolves and closes.
+  _supersedingAnalysisCts?.cancel();
+  _supersedingAnalysisCts?.dispose();
+  const supersedeCts = new vscode.CancellationTokenSource();
+  _supersedingAnalysisCts = supersedeCts;
+
   await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -830,6 +847,11 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
       cancellable: true,
     },
     async (_progress, token) => {
+      // Funnel the UI Cancel button into the supersede token so the analyzer child
+      // sees a single cancellation source whether the user clicked Cancel or a newer
+      // run superseded this one. Disposed in finally so the listener never leaks.
+      const cancelBridge = token.onCancellationRequested(() => supersedeCts.cancel());
+      try {
       // Stamp the run start so the post-analysis popup can wait for the
       // plugin's fresh violations.json write (newer than this) before firing,
       // instead of racing the bare `dart analyze` exit code. See
@@ -862,9 +884,11 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
       // Async + cancellable: never block the extension-host event loop (see the
       // cancellable rationale on this progress above). The token wires the
       // Cancel button to a process-tree kill.
-      const result = await runInWorkspaceAsync(workspaceRoot, cmd, ['analyze'], { token });
+      const result = await runInWorkspaceAsync(workspaceRoot, cmd, ['analyze'], { token: supersedeCts.token });
       if (result.cancelled) {
-        logReport('- Analysis cancelled by user');
+        // Cancelled either by the user's Cancel button or because a newer run
+        // superseded this one (rapid pack toggles). Either way: stop quietly.
+        logReport('- Analysis cancelled (user or superseded by a newer run)');
         flushReport(workspaceRoot);
         ok = false;
         return;
@@ -895,8 +919,16 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
         saropaLintsVersion: installed?.version,
         saropaLintsSource: installed?.source,
       });
+      } finally {
+        cancelBridge.dispose();
+      }
     },
   );
+  // Only clear the shared slot if this run still owns it — a newer run may have
+  // already replaced (and disposed) it. dispose() is idempotent, so the extra
+  // call when superseded is harmless.
+  if (_supersedingAnalysisCts === supersedeCts) _supersedingAnalysisCts = undefined;
+  supersedeCts.dispose();
   return ok;
 }
 

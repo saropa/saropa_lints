@@ -34,7 +34,112 @@ export function getConfigDashboardStyles(): string {
     stylisticStyles(),
     diagnosticsStyles(),
     sharedAtomStyles(),
+    gaugeAndRulesCellStyles(),
   ].join('\n');
+}
+
+/**
+ * Config-dashboard overrides for the hero coverage gauge and the merged Rules cell.
+ *
+ * Gauge: the shared chrome animates the fill with a `@keyframes` that reads
+ * `--gauge-target` at load. That only works when the var is present on first paint —
+ * but this dashboard sets `--gauge-target` from its client script (the CSP drops the
+ * inline-attribute value), so the keyframe would run against the 0 start and never
+ * re-fire. Swap the keyframe for a `transition` on stroke-dasharray: the script
+ * raises `--gauge-target` from 0 to the score on the next frame, and the transition
+ * animates that change. Scoped here (config-only stylesheet) so the other dashboards'
+ * gauges are untouched.
+ */
+function gaugeAndRulesCellStyles(): string {
+  return `
+.hero-gauge .gauge-fill {
+  animation: none;
+  transition: stroke-dasharray 1.1s ease-out, stroke 0.3s;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-gauge .gauge-fill { transition: none; }
+}
+
+/* Merged Rules column: the count IS the disclosure link (replaces the old separate
+   count cell + "View" button). Right-aligned to match the numeric header; the
+   monospace count keeps the column visually a number, the "rules" word + chevron
+   read as the action. */
+.dash-table.packs td.rules-cell { text-align: right; white-space: nowrap; }
+.dash-table.packs td.rules-cell .rules-toggle {
+  font: inherit;
+  gap: 4px;
+  justify-content: flex-end;
+}
+.dash-table.packs td.rules-cell .rules-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+/* Live "N packs · M rules" readout beside the search box. */
+.match-count {
+  font-size: 0.85em;
+  color: var(--muted);
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* Matched-substring highlight inside rule names (expanded pack lists + the finder). */
+.rules-detail-body mark,
+.rule-finder mark {
+  background: var(--vscode-editor-findMatchHighlightBackground, rgba(255, 200, 0, 0.35));
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
+/* Flat "Matching rules" finder: a card listing each matching rule code once with the
+   pack(s) that own it, so a rule is reachable by name without opening its pack. */
+.rule-finder {
+  margin: 8px 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.rule-finder-head { display: flex; align-items: baseline; gap: 6px; margin-bottom: 8px; }
+.rule-finder-title { font-weight: 600; font-size: 0.95em; }
+.rule-finder-head .muted { font-size: 0.85em; color: var(--muted); }
+.rule-finder ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 4px 16px;
+}
+.rule-finder li {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 3px 4px;
+  border-radius: 4px;
+  min-width: 0;
+}
+.rule-finder li:hover { background: var(--vscode-list-hoverBackground); }
+.rule-finder .rf-rule {
+  font-family: var(--vscode-editor-font-family, monospace);
+  font-size: 0.9em;
+  color: var(--vscode-textLink-foreground);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+.rule-finder .rf-rule:hover { text-decoration: underline; }
+.rule-finder .rf-in { color: var(--muted); font-size: 0.82em; }
+.rule-finder .rf-pack { color: var(--vscode-textLink-foreground); text-decoration: none; font-size: 0.88em; }
+.rule-finder .rf-pack:hover { text-decoration: underline; }
+.rule-finder .rf-rule:focus-visible,
+.rule-finder .rf-pack:focus-visible {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+`;
 }
 
 /** Tier segmented control — real radio buttons, active state with focus ring. */

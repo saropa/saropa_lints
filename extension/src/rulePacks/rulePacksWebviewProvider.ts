@@ -98,6 +98,22 @@ export function isSdkPackId(id: string): boolean {
   return id.startsWith('dart_sdk_') || id.startsWith('flutter_sdk_');
 }
 
+/**
+ * "12 packs · 340 rules" count label for a section or domain accordion header, so a
+ * user can see where rules concentrate before opening the group. Both halves are
+ * pluralized; the `·` separates them.
+ */
+export function packsAndRulesLabel(packCount: number, ruleCount: number): string {
+  const packs = `${packCount} pack${packCount === 1 ? '' : 's'}`;
+  const rules = `${ruleCount} rule${ruleCount === 1 ? '' : 's'}`;
+  return `${packs} · ${rules}`;
+}
+
+/** Sum the rule counts of a set of pack rows (for header count badges). */
+export function sumPackRules(rows: readonly PackChartRow[]): number {
+  return rows.reduce((acc, r) => acc + r.rules, 0);
+}
+
 export function sdkPackRiskKind(def: { id: string; ruleCodes: readonly string[] }): 'breaking' | 'deprecation' | 'none' {
   if (!isSdkPackId(def.id)) return 'none';
   return def.ruleCodes.some((code) => code.startsWith('avoid_removed_')) ? 'breaking' : 'deprecation';
@@ -411,6 +427,10 @@ export class RulePacksWebviewProvider {
       // Empty placeholder; the script populates it whenever filter state diverges from defaults.
       // Per §8.5 / §14.10 the strip must exist in the DOM so it can render synchronously.
       '<div class="chip-strip" id="filter-strip" hidden></div>',
+      // Flat "Matching rules" finder — populated by the script while searching so a
+      // rule is reachable by name without knowing which pack owns it. Empty/hidden
+      // until there is a query with rule matches.
+      '<div class="rule-finder" id="rule-finder" hidden></div>',
       this._buildPackTable(ctx),
       // Style & opinions: the third configuration zone. Off by default, opt-in
       // per rule, collapsed so it never dominates the screen. Conflicting groups
@@ -533,12 +553,20 @@ export class RulePacksWebviewProvider {
         ? `${numerator} of ${denom} detected packs are enabled.`
         : `${numerator} of ${denom} packs in the catalogue are enabled (no packs detected in this pubspec).`;
     const tooltip = `Pack coverage ${score}%. ${tooltipBase}`;
-    // pathLength="100" + `--gauge-target` / `--gauge-arc` follows the shared-chrome contract
-    // used by all three dashboards' hero gauges. `--gauge-color` carries the score-derived hue.
+    // The fill's stroke-dasharray is driven by `--gauge-target` / `--gauge-arc`.
+    // Those vars are set by the client script (`setProperty`) from the data-*
+    // attributes below, NOT from this inline style — a webview CSP that pairs a
+    // style-src nonce with 'unsafe-inline' makes the browser ignore 'unsafe-inline'
+    // for inline style ATTRIBUTES (they cannot carry a nonce), so `--gauge-target`
+    // set here was dropped and the arc rendered empty while the numeric label still
+    // showed the score. Seeding `--gauge-target:0` inline gives a definite empty
+    // start state; the script raises it to the real score and the scoped transition
+    // in configDashboardStyles animates the fill in.
     return `<div class="hero-gauge" role="img"
     aria-label="${escapeHtml(`Pack coverage ${score} percent`)}"
     title="${escapeHtml(tooltip)}"
-    style="--gauge-target:${score};--gauge-arc:100;--gauge-color:${hsl};">
+    data-gauge-target="${score}" data-gauge-arc="100" data-gauge-color="${escapeHtml(hsl)}"
+    style="--gauge-target:0;--gauge-arc:100;--gauge-color:${hsl};">
     <svg viewBox="0 0 100 100" aria-hidden="true">
       <path class="gauge-track" d="M 15 80 A 45 45 0 1 1 85 80" pathLength="100"></path>
       <path class="gauge-fill" d="M 15 80 A 45 45 0 1 1 85 80" pathLength="100"></path>
@@ -709,8 +737,9 @@ export class RulePacksWebviewProvider {
     return `<label class="field" title="Filter packs by name.">
     <span class="glyph">🔎</span>
     <label class="sr-only" for="pack-search">Search packs</label>
-    <input id="pack-search" type="search" placeholder="Search packs…" autocomplete="off" />
+    <input id="pack-search" type="search" placeholder="Search packs and rules…" autocomplete="off" />
   </label>
+  <span id="pack-match-count" class="match-count" role="status" aria-live="polite" hidden></span>
   <label class="field">
     <label class="sr-only" for="type-filter">Filter by type</label>
     <select id="type-filter" title="Filter by pack type (SDK migration vs package rule).">
@@ -745,9 +774,11 @@ export class RulePacksWebviewProvider {
     const detected = [...ctx.packRows].filter((r) => r.detected).sort(byLabel);
     const rest = [...ctx.packRows].filter((r) => !r.detected).sort(byLabel);
     const detectedRows = detected.map((row) => this._buildPackRow(row, true)).join('\n');
-    const detectedEmpty = `<tr class="packs-none"><td colspan="7" class="hint">${escapeHtml(l10n('packs.noneDetected'))}</td></tr>`;
+    const detectedEmpty = `<tr class="packs-none"><td colspan="6" class="hint">${escapeHtml(l10n('packs.noneDetected'))}</td></tr>`;
+    const detectedCount = packsAndRulesLabel(detected.length, sumPackRules(detected));
+    const restCount = packsAndRulesLabel(rest.length, sumPackRules(rest));
     return `<details class="section expander" aria-label="${escapeHtml(l10n('packs.forYourProject'))}" open>
-  <summary><span class="expander-title">${escapeHtml(l10n('packs.forYourProject'))}</span> <span class="muted">(${detected.length})</span></summary>
+  <summary><span class="expander-title">${escapeHtml(l10n('packs.forYourProject'))}</span> <span class="muted">(${detectedCount})</span></summary>
   <p class="hint">${escapeHtml(l10n('packs.forYourProjectHint'))}</p>
   <div class="dash-table-wrap">
     <table class="dash-table packs" id="packs-table-detected">
@@ -757,7 +788,7 @@ export class RulePacksWebviewProvider {
   </div>
 </details>
 <details class="section expander" aria-label="${escapeHtml(l10n('packs.allPackages'))}">
-  <summary><span class="expander-title">${escapeHtml(l10n('packs.allPackages'))}</span> <span class="muted">(${rest.length})</span></summary>
+  <summary><span class="expander-title">${escapeHtml(l10n('packs.allPackages'))}</span> <span class="muted">(${restCount})</span></summary>
   <p class="hint">${escapeHtml(l10n('packs.allPackagesHint'))}</p>
   ${this._buildPackDomainGroups(rest)}
 </details>`;
@@ -804,7 +835,7 @@ export class RulePacksWebviewProvider {
     const rawDesc = l10n('packs.domainDesc.' + slug, undefined, { fallback: '' });
     const descHtml = rawDesc ? `<p class="hint domain-desc">${escapeHtml(rawDesc)}</p>` : '';
     return `<details class="domain-group">
-  <summary><span class="domain-title">${escapeHtml(domain)}</span> <span class="muted">(${rows.length})</span></summary>
+  <summary><span class="domain-title">${escapeHtml(domain)}</span> <span class="muted">(${packsAndRulesLabel(rows.length, sumPackRules(rows))})</span></summary>
   ${descHtml}
   <div class="dash-table-wrap">
     <table class="dash-table packs" id="packs-table-${slug}">
@@ -824,8 +855,7 @@ export class RulePacksWebviewProvider {
           <th class="sortable" data-sort="type" aria-sort="none" title="SDK = Dart/Flutter version-migration rules; Package = rules for a pub dependency.">Type <span class="arrow">▲</span></th>
           <th class="sortable" data-sort="risk" aria-sort="none" title="Breaking = the API was removed in that version; Deprecation = still works but scheduled for removal. Blank for non-migration packs.">Risk <span class="arrow">▲</span></th>
           <th class="sortable" data-sort="enabled" aria-sort="none" title="Whether this pack is currently switched on in analysis_options.yaml.">Enabled <span class="arrow">▲</span></th>
-          <th class="sortable num" data-sort="rules" aria-sort="none" title="How many lint rules this pack adds to analysis when enabled.">Rules <span class="arrow">▲</span></th>
-          <th title="Expand a pack to see and open each of its rules."></th>
+          <th class="sortable num" data-sort="rules" aria-sort="none" title="How many lint rules this pack adds when enabled. Click a count to list and open each rule.">Rules <span class="arrow">▲</span></th>
         </tr>
       </thead>`;
   }
@@ -865,16 +895,24 @@ export class RulePacksWebviewProvider {
           `<a href="#" class="rule-link" data-rule="${escapeHtml(code)}" title="Open the explanation for ${escapeHtml(code)}.">${escapeHtml(code)}</a>`,
       )
       .join('');
-    const toggle = `<button type="button" class="rules-toggle" data-pack="${id}" aria-expanded="false" aria-label="Show the ${row.rules} rule${row.rules === 1 ? '' : 's'} in ${label}" title="Show the ${row.rules} rule${row.rules === 1 ? '' : 's'} in this pack."><span class="chev">▸</span> View</button>`;
-    const detailRow = `<tr class="rules-detail" data-detail-for="${id}" hidden><td colspan="7"><div class="rules-detail-body">${ruleLinks}</div></td></tr>`;
-    return `<tr data-pack="${id}" data-type="${isSdk ? 'sdk' : 'package'}" data-risk="${riskKind}" data-detected="${row.detected ? '1' : '0'}" data-enabled="${row.enabled ? '1' : '0'}" data-rules="${row.rules}" data-label="${escapeHtml(def.label.toLowerCase())}">
+    // Merged Rules column (§ feedback 2026-06-23): the count IS the disclosure
+    // control — a single "N rules" link toggles the detail row, replacing the old
+    // separate "Rules" number cell + "View" button. One column, one click target.
+    const ruleWord = row.rules === 1 ? 'rule' : 'rules';
+    const toggle = `<button type="button" class="rules-toggle" data-pack="${id}" aria-expanded="false" aria-label="Show the ${row.rules} ${ruleWord} in ${label}" title="List and open the ${row.rules} ${ruleWord} in this pack."><span class="rules-count">${row.rules}</span> ${ruleWord} <span class="chev">▸</span></button>`;
+    const detailRow = `<tr class="rules-detail" data-detail-for="${id}" hidden><td colspan="6"><div class="rules-detail-body">${ruleLinks}</div></td></tr>`;
+    // data-rules-text + data-domain make individual rule codes and the pack's
+    // problem area searchable, so typing a rule name (e.g. "avoid_print") surfaces
+    // the pack that owns it — packs were previously findable only by their label.
+    const rulesText = escapeHtml(def.ruleCodes.join(' ').toLowerCase());
+    const domainLower = escapeHtml(packDomainForId(row.id).toLowerCase());
+    return `<tr data-pack="${id}" data-type="${isSdk ? 'sdk' : 'package'}" data-risk="${riskKind}" data-detected="${row.detected ? '1' : '0'}" data-enabled="${row.enabled ? '1' : '0'}" data-rules="${row.rules}" data-label="${escapeHtml(def.label.toLowerCase())}" data-pack-label="${label}" data-rules-text="${rulesText}" data-domain="${domainLower}">
   ${detectedCell}
   <td class="pack-name">${label}${domainTag}</td>
   <td>${typeBadge}</td>
   <td>${riskBadge}</td>
   <td><label class="switch"><input type="checkbox" data-pack="${id}" ${row.enabled ? 'checked' : ''} aria-label="Enable ${label}" /><span class="slider"></span></label></td>
-  <td class="num">${row.rules}</td>
-  <td>${toggle}</td>
+  <td class="num rules-cell">${toggle}</td>
 </tr>
 ${detailRow}`;
   }

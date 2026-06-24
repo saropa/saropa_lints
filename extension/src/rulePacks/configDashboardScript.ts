@@ -27,6 +27,8 @@ export function getConfigDashboardScript(): string {
     SCRIPT_FILTER_APPLY,
     SCRIPT_SORT,
     SCRIPT_KPI_AND_CHART,
+    SCRIPT_FIND,
+    SCRIPT_GAUGE,
     SCRIPT_DISABLED_RULES_SEARCH,
     SCRIPT_STYLISTIC,
     SCRIPT_INIT,
@@ -180,6 +182,11 @@ const SCRIPT_FILTER_APPLY = `
     // the collapsed "All packages" section would be invisible — open the ancestor
     // <details> of every surviving row so results are actually seen.
     const filtering = anyPackFilterActive();
+    // Grand totals across both pack tables for the match-count readout beside the
+    // search box (idea 2): how many packs survive, and how many individual rule
+    // codes match the query.
+    let grandVisible = 0;
+    let grandRuleMatches = 0;
     tbodies.forEach(function(tbody) {
       const rows = Array.from(tbody.querySelectorAll('tr[data-pack]'));
       let visible = 0;
@@ -189,8 +196,21 @@ const SCRIPT_FILTER_APPLY = `
         const detected = row.getAttribute('data-detected') === '1';
         const enabled = row.getAttribute('data-enabled') === '1';
         const pack = row.getAttribute('data-pack') || '';
+        const rulesText = row.getAttribute('data-rules-text') || '';
+        const domain = row.getAttribute('data-domain') || '';
         let show = true;
-        if (state.search && label.indexOf(state.search) === -1) show = false;
+        // Search matches the pack name, its problem-area domain, OR any of its rule
+        // codes — so "avoid_print" surfaces the pack that contains it, not just packs
+        // whose label contains the term. Track a rule-only match so we can auto-expand
+        // the pack's rule list to reveal what matched.
+        let matchedRuleOnly = false;
+        if (state.search) {
+          const inLabel = label.indexOf(state.search) !== -1;
+          const inDomain = domain.indexOf(state.search) !== -1;
+          const inRules = rulesText.indexOf(state.search) !== -1;
+          if (!inLabel && !inDomain && !inRules) show = false;
+          else matchedRuleOnly = inRules && !inLabel && !inDomain;
+        }
         if (state.type !== 'all' && state.type !== type) show = false;
         if (state.detectedOnly && !detected) show = false;
         if (state.enabledOnly && !enabled) show = false;
@@ -200,9 +220,33 @@ const SCRIPT_FILTER_APPLY = `
         row.style.display = show ? '' : 'none';
         // Keep each pack's expander detail row in lockstep with its summary row.
         const detail = tbody.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(pack) + '"]');
-        if (detail) detail.style.display = show ? '' : 'none';
-        if (show) visible++;
+        const toggle = row.querySelector('button.rules-toggle');
+        if (detail) {
+          detail.style.display = show ? '' : 'none';
+          // Auto-open the rule list when the search hit a rule code (not the pack
+          // name) so the matching rule is actually visible. Auto-close it again once
+          // that search is cleared, but never fight a row the user expanded manually
+          // for a different reason.
+          if (show && matchedRuleOnly) {
+            detail.hidden = false;
+            if (toggle) { toggle.setAttribute('aria-expanded', 'true'); toggle.classList.add('open'); }
+          } else if (state.search) {
+            detail.hidden = true;
+            if (toggle) { toggle.setAttribute('aria-expanded', 'false'); toggle.classList.remove('open'); }
+          }
+        }
+        if (show) {
+          visible++;
+          // Count rule codes in this surviving pack that match the query (idea 2).
+          if (state.search && rulesText) {
+            const codes = rulesText.split(' ');
+            for (let i = 0; i < codes.length; i++) {
+              if (codes[i] && codes[i].indexOf(state.search) !== -1) grandRuleMatches++;
+            }
+          }
+        }
       });
+      grandVisible += visible;
       renderEmptyRow(tbody, visible);
       // Reveal the group chain when a filter is active and this table has a match.
       if (filtering && visible > 0) {
@@ -214,6 +258,9 @@ const SCRIPT_FILTER_APPLY = `
       }
     });
     renderFilterStrip();
+    renderMatchCount(grandVisible, grandRuleMatches);
+    highlightRuleLinks();
+    renderRuleFinder();
   }
 
   // Per-table empty state: each pack table shows its own "no matches" row so a
@@ -228,7 +275,7 @@ const SCRIPT_FILTER_APPLY = `
     if (!empty) {
       empty = document.createElement('tr');
       empty.className = 'empty-row';
-      empty.innerHTML = '<td colspan="7">No packs match the current filters. ' +
+      empty.innerHTML = '<td colspan="6">No packs match the current filters. ' +
         '<button type="button" class="reset-link">Reset filters</button></td>';
       tbody.appendChild(empty);
       const btn = empty.querySelector('.reset-link');
@@ -427,6 +474,128 @@ const SCRIPT_KPI_AND_CHART = `
   }
 `;
 
+/**
+ * Rule-finding aids that all key off the active search query:
+ *  - renderMatchCount: a "N packs · M rules" readout beside the search box (idea 2).
+ *  - highlightRuleLinks: wrap the matched substring in <mark> inside expanded pack
+ *    rule lists (idea 3).
+ *  - renderRuleFinder: a flat "Matching rules" panel listing each matching rule code
+ *    once with its owning pack(s), so a rule is reachable without knowing its pack
+ *    (idea 4). Clicking a code opens its explanation; clicking a pack reveals it.
+ *  - focusPack: open every ancestor accordion + the pack's own rule list and scroll
+ *    the row into view.
+ */
+const SCRIPT_FIND = `
+  // Wrap each case-insensitive occurrence of q within text in <mark>. text is a lint
+  // id ([a-z0-9_]) so escaping is defensive; q is a user substring of it.
+  function highlightMatch(text, q) {
+    if (!q) return escapeHtml(text);
+    const lower = text.toLowerCase();
+    let out = '';
+    let i = 0;
+    while (true) {
+      const idx = lower.indexOf(q, i);
+      if (idx === -1) { out += escapeHtml(text.slice(i)); break; }
+      out += escapeHtml(text.slice(i, idx));
+      out += '<mark>' + escapeHtml(text.slice(idx, idx + q.length)) + '</mark>';
+      i = idx + q.length;
+    }
+    return out;
+  }
+
+  function renderMatchCount(packs, rules) {
+    const el = document.getElementById('pack-match-count');
+    if (!el) return;
+    if (!anyPackFilterActive()) { el.hidden = true; el.textContent = ''; return; }
+    let txt = packs + ' pack' + (packs === 1 ? '' : 's');
+    // Rule count is only meaningful while text-searching; other filters act on packs.
+    if (state.search) txt += ' · ' + rules + ' rule' + (rules === 1 ? '' : 's');
+    el.textContent = txt;
+    el.hidden = false;
+  }
+
+  // Highlight the matched substring inside already-rendered pack rule lists. Reset to
+  // plain text when the code does not match (or search is cleared) so stale <mark>s do
+  // not linger.
+  function highlightRuleLinks() {
+    const q = state.search;
+    document.querySelectorAll('.rules-detail-body .rule-link').forEach(function(a) {
+      const code = a.getAttribute('data-rule') || '';
+      if (q && code.indexOf(q) !== -1) a.innerHTML = highlightMatch(code, q);
+      else a.textContent = code;
+    });
+  }
+
+  // Open a pack wherever it lives (detected table or a collapsed domain group),
+  // expand its rule list, and scroll it into view.
+  function focusPack(packId) {
+    const row = document.querySelector('tr[data-pack="' + cssEscape(packId) + '"]');
+    if (!row) return;
+    let node = row.parentNode;
+    while (node && node !== document) {
+      if (node.tagName === 'DETAILS') node.open = true;
+      node = node.parentNode;
+    }
+    const detail = document.querySelector('tr.rules-detail[data-detail-for="' + cssEscape(packId) + '"]');
+    const toggle = row.querySelector('button.rules-toggle');
+    if (detail) { detail.hidden = false; detail.style.display = ''; }
+    if (toggle) { toggle.setAttribute('aria-expanded', 'true'); toggle.classList.add('open'); }
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  const RULE_FINDER_CAP = 60;
+  function renderRuleFinder() {
+    const panel = document.getElementById('rule-finder');
+    if (!panel) return;
+    const q = state.search;
+    if (!q) { panel.hidden = true; panel.innerHTML = ''; return; }
+    // Group matching rule codes -> the pack(s) that own them. A rule can sit in
+    // several overlapping packs, so collect all of them.
+    const byCode = new Map();
+    document.querySelectorAll('tr[data-pack]').forEach(function(row) {
+      const rulesText = row.getAttribute('data-rules-text') || '';
+      if (rulesText.indexOf(q) === -1) return;
+      const packId = row.getAttribute('data-pack') || '';
+      const packLabel = row.getAttribute('data-pack-label') || packId;
+      rulesText.split(' ').forEach(function(code) {
+        if (!code || code.indexOf(q) === -1) return;
+        let entry = byCode.get(code);
+        if (!entry) { entry = []; byCode.set(code, entry); }
+        if (!entry.some(function(p) { return p.id === packId; })) entry.push({ id: packId, label: packLabel });
+      });
+    });
+    if (byCode.size === 0) { panel.hidden = true; panel.innerHTML = ''; return; }
+    const codes = Array.from(byCode.keys()).sort();
+    const shown = codes.slice(0, RULE_FINDER_CAP);
+    const html = ['<div class="rule-finder-head"><span class="rule-finder-title">Matching rules</span> <span class="muted">(' + byCode.size + ')</span></div><ul>'];
+    shown.forEach(function(code) {
+      const packLinks = byCode.get(code).map(function(p) {
+        return '<a href="#" class="rf-pack" data-pack="' + escapeHtml(p.id) + '">' + escapeHtml(p.label) + '</a>';
+      }).join(', ');
+      html.push('<li><a href="#" class="rf-rule" data-rule="' + escapeHtml(code) + '">' + highlightMatch(code, q) +
+        '</a> <span class="rf-in">in</span> ' + packLinks + '</li>');
+    });
+    html.push('</ul>');
+    if (codes.length > RULE_FINDER_CAP) {
+      html.push('<p class="hint">Showing the first ' + RULE_FINDER_CAP + ' of ' + codes.length + ' matching rules — refine your search to narrow.</p>');
+    }
+    panel.innerHTML = html.join('');
+    panel.hidden = false;
+    panel.querySelectorAll('.rf-rule').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        vscode.postMessage({ type: 'explainRule', rule: a.getAttribute('data-rule') });
+      });
+    });
+    panel.querySelectorAll('.rf-pack').forEach(function(a) {
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        focusPack(a.getAttribute('data-pack'));
+      });
+    });
+  }
+`;
+
 /** Initial render. */
 /**
  * Live-filter the Disabled rules section by rule name (substring match, case-insensitive).
@@ -523,6 +692,42 @@ const SCRIPT_STYLISTIC = `
   (function wireStylisticSearch() {
     const input = document.getElementById('stylistic-search');
     if (input) input.addEventListener('input', applyStylisticSearch);
+  })();
+`;
+
+/**
+ * Animate the hero coverage gauge. The arc fill is driven by the `--gauge-target`
+ * / `--gauge-arc` custom properties read by the shared `.gauge-fill` stroke-dasharray
+ * rule. Those vars are set HERE (not from the element's inline style attribute):
+ * the webview CSP pairs a style-src nonce with 'unsafe-inline', which makes the
+ * browser ignore 'unsafe-inline' for inline style ATTRIBUTES, so a `--gauge-target`
+ * written into the HTML style="" was dropped and the arc rendered empty. Setting it
+ * via setProperty from a nonce'd script always applies. The element starts at
+ * --gauge-target:0; raising it on the next frame lets the scoped transition in
+ * configDashboardStyles animate the fill in (0 -> score).
+ */
+const SCRIPT_GAUGE = `
+  (function initCoverageGauge() {
+    const gauge = document.querySelector('.hero-gauge[data-gauge-target]');
+    if (!gauge) return;
+    const target = gauge.getAttribute('data-gauge-target') || '0';
+    const arc = gauge.getAttribute('data-gauge-arc') || '100';
+    const color = gauge.getAttribute('data-gauge-color');
+    gauge.style.setProperty('--gauge-arc', arc);
+    if (color) gauge.style.setProperty('--gauge-color', color);
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      // No animation: jump straight to the resting fill.
+      gauge.style.setProperty('--gauge-target', target);
+      return;
+    }
+    // Double rAF so the 0 start state is committed to a paint before we raise the
+    // value — a single frame can be coalesced and the transition would not fire.
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        gauge.style.setProperty('--gauge-target', target);
+      });
+    });
   })();
 `;
 

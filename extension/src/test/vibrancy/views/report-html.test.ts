@@ -529,6 +529,19 @@ describe('report: toolbar', () => {
         assert.ok(html.includes('Rescan'));
     });
 
+    it('should include the live scan-progress bar (hidden until a scan starts)', () => {
+        // The host drives this bar via postMessage during a rescan so the
+        // dashboard shows determinate progress instead of looking frozen behind
+        // a lone VS Code toast. It renders hidden; the client reveals it.
+        const html = buildReportHtml(opts([]));
+        assert.ok(html.includes('id="scan-progress"'), 'scan-progress container should render');
+        assert.ok(html.includes('id="scan-progress-fill"'), 'scan-progress fill should render');
+        assert.ok(
+            /id="scan-progress"[^>]*\bhidden\b/.test(html),
+            'scan-progress bar should start hidden',
+        );
+    });
+
     it('should include open-other-project button', () => {
         const html = buildReportHtml(opts([]));
         assert.ok(html.includes('id="open-other"'));

@@ -149,6 +149,13 @@ describe('Package Detail Panel HTML', () => {
             html.includes('id="retry-fetches"'),
             'retry button should be wired so the script can postMessage retryFetches',
         );
+        // The busy label is server-rendered (localized) and read by the report
+        // script to relabel the button to "Retrying…" while the re-fetch runs;
+        // without it the button gives no in-pane busy signal.
+        assert.ok(
+            /id="retry-fetches"[^>]*data-busy-label="/.test(html),
+            'retry button should carry data-busy-label for the in-pane busy state',
+        );
         assert.ok(
             html.includes('README and logo'),
             'banner should name the failed fetch in user-facing language',
@@ -186,6 +193,22 @@ describe('Package Detail Panel — consolidated changelog', () => {
         assert.ok(html.includes('1.1.0'), 'undated entry heading should render');
         assert.ok(html.includes('Added a thing') && html.includes('Fixed a bug'),
             'entry bodies should render as markdown');
+    });
+
+    it('renders the Upgrade button with a busy label so the pane can show progress', () => {
+        // updateInfo is a minor bump with no blocker, so the Upgrade action
+        // renders. data-busy-label is the localized "Upgrading…" the report
+        // script swaps in while pub get + the test suite run (multi-minute), so
+        // the pane button does not look idle behind a lone toast.
+        const html = buildPackageDetailHtml(withChangelog([]), [], null);
+        assert.ok(
+            html.includes('data-action="upgrade"'),
+            'upgrade action button should render for an available minor update',
+        );
+        assert.ok(
+            /data-action="upgrade"[^>]*data-busy-label="/.test(html),
+            'upgrade button should carry data-busy-label for the in-pane busy state',
+        );
     });
 
     it('escapes HTML in untrusted changelog bodies (no raw script injection)', () => {

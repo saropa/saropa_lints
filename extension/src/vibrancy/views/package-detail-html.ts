@@ -139,6 +139,7 @@ function buildPartialFetchBanner(errors: PackageDetailFetchErrors): string {
         <span class="glyph" aria-hidden="true">⚠</span>
         <span class="partial-msg">${escapeHtml(l10n('packageDetail.partialBanner.message', { list }))}</span>
         <button type="button" class="btn tier-2" id="retry-fetches"
+            data-busy-label="${escapeHtml(l10n('packageDetail.partialBanner.retrying'))}"
             title="${l10n('packageDetail.partialBanner.retryTitle')}">${l10n('packageDetail.partialBanner.retry')}</button>
     </div>`;
 }
@@ -336,7 +337,8 @@ function buildVersionSection(r: VibrancyResult): string {
         buttons.push(
             `<button class="action-btn" data-action="upgrade" `
             + `data-name="${escapeHtml(r.package.name)}" `
-            + `data-version="${escapeHtml(r.updateInfo.latestVersion)}">${l10n('packageDetail.version.upgrade')}</button>`,
+            + `data-version="${escapeHtml(r.updateInfo.latestVersion)}" `
+            + `data-busy-label="${escapeHtml(l10n('packageDetail.version.upgrading'))}">${l10n('packageDetail.version.upgrade')}</button>`,
         );
     }
     const changelogUrl = `https://pub.dev/packages/${encodeURIComponent(r.package.name)}/changelog`;

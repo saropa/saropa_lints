@@ -1642,7 +1642,12 @@ export function getReportScript(): string {
                 }
                 var sortTh = e.target.closest('.gap-table th[data-col]');
                 if (sortTh) { paneSortGapTable(sortTh); return; }
-                if (e.target.closest('#retry-fetches')) { vscode.postMessage({ type: 'retryFetches' }); return; }
+                var retryBtn = e.target.closest('#retry-fetches');
+                if (retryBtn) {
+                    setPaneBtnBusy(retryBtn);
+                    vscode.postMessage({ type: 'retryFetches' });
+                    return;
+                }
                 var el = e.target.closest('[data-action]');
                 if (!el) { return; }
                 var action = el.dataset.action;
@@ -1653,6 +1658,7 @@ export function getReportScript(): string {
                     vscode.postMessage({ type: 'openFile', path: el.dataset.path, line: parseInt(el.dataset.line || '1', 10) });
                 } else if (action === 'upgrade') {
                     e.preventDefault();
+                    setPaneBtnBusy(el);
                     vscode.postMessage({ type: 'upgrade', name: el.dataset.name, version: el.dataset.version });
                 } else if (action === 'changelog') {
                     e.preventDefault();
@@ -1726,6 +1732,28 @@ export function getReportScript(): string {
                 scanFillEl.style.width = '0%';
             }
         }
+        /* ---- Detail-pane action busy state ----
+           A pane button (Upgrade / Retry) that kicks off a slow host operation
+           (pub get + full test suite, or network re-fetches) gets disabled and
+           relabelled with its data-busy-label so the pane doesn't look idle.
+           setPaneBtnBusy is optimistic on click; the host also drives it via the
+           'paneAction' message so an externally-triggered upgrade or a failed
+           run (no pane re-render) leaves the button in the right state. */
+        function setPaneBtnBusy(btn) {
+            if (!btn || btn.disabled) { return; }
+            if (!btn.dataset.origLabel) { btn.dataset.origLabel = btn.textContent; }
+            btn.disabled = true;
+            btn.setAttribute('aria-busy', 'true');
+            btn.classList.add('btn-busy');
+            btn.textContent = btn.dataset.busyLabel || btn.dataset.origLabel;
+        }
+        function clearPaneBtnBusy(btn) {
+            if (!btn) { return; }
+            if (btn.dataset.origLabel) { btn.textContent = btn.dataset.origLabel; }
+            btn.disabled = false;
+            btn.removeAttribute('aria-busy');
+            btn.classList.remove('btn-busy');
+        }
         /* Host -> client: injected detail HTML, and reveal-from-elsewhere. */
         window.addEventListener('message', function(event) {
             var msg = event.data || {};
@@ -1743,6 +1771,12 @@ export function getReportScript(): string {
                 updateScanProgress(msg.percent, msg.message);
             } else if (msg.type === 'scanFinished') {
                 hideScanProgress();
+            } else if (msg.type === 'paneAction' && msg.action === 'upgrade') {
+                var upBtn = detailPane
+                    ? detailPane.querySelector('[data-action="upgrade"]')
+                    : null;
+                if (msg.state === 'busy') { setPaneBtnBusy(upBtn); }
+                else if (msg.state === 'done') { clearPaneBtnBusy(upBtn); }
             }
         });
         /* Tell the host the message listener is live so a select requested

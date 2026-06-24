@@ -89,9 +89,7 @@ export class VibrancyReportPanel {
            Only created when the host wired review-state via configure(). */
         if (VibrancyReportPanel._reviewState) {
             this._pane = new PackageDetailPaneController(
-                (html, packageName) => this._panel.webview.postMessage({
-                    type: 'packageDetailHtml', package: packageName, html,
-                }),
+                message => this._panel.webview.postMessage(message),
                 VibrancyReportPanel._reviewState,
                 VibrancyReportPanel._cache,
             );

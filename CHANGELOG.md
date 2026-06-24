@@ -64,9 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.2.0]
 
-Adds a performance rule that flags arithmetic in a widget's `build()` whose operands are all fixed for the app session — number literals, constants, and design-token size getters — so the value is computed once in a `static final` field instead of on every frame. The Package Dashboard now shows a live progress bar while a rescan runs, so a refresh no longer looks like the page has frozen behind a lone notification. The Rule Packs sidebar gains a wave of new concern packs so every rule now belongs to a selectable pack, including cross-cutting "lens" packs that group rules by task — memory leaks, UI polish, release readiness — rather than by category.
+Adds a performance rule that flags arithmetic in a widget's `build()` whose operands are all fixed for the app session — number literals, constants, and design-token size getters — so the value is computed once in a `static final` field instead of on every frame. The Package Dashboard now shows a live progress bar while a rescan runs, so a refresh no longer looks like the page has frozen behind a lone notification. The Rule Packs sidebar gains a wave of new concern packs so every rule now belongs to a selectable pack, including cross-cutting "lens" packs that group rules by task — memory leaks, UI polish, release readiness — rather than by category. [log](https://github.com/saropa/saropa_lints/blob/v14.2.0/CHANGELOG.md)
 
 ### Added
 
@@ -75,18 +75,24 @@ Adds a performance rule that flags arithmetic in a widget's `build()` whose oper
 ### Added (Extension)
 
 - **The Package Dashboard shows a live progress bar during a rescan.** A rescan previously updated only a VS Code notification while the dashboard sat on stale data, so it read as hung; the dashboard now fills a determinate bar as each package is scanned and clears it when results refresh. No action required.
+- **The package detail pane's Upgrade and Retry buttons now show a busy state.** An upgrade runs `pub get` plus the full test suite (minutes) and a retry re-fetches over the network, but the buttons gave no in-pane signal; they now disable, show a spinner, and relabel ("Upgrading…" / "Retrying…") until the work finishes. No action required.
 - **The Saropa Dashboards launchpad now carries the full Actions, Settings, and Help controls.** A control band under the hero exposes run analysis, initialize config, the lint-integration / tier / run-after / UI-language settings (each showing its current value), and the help links, so the launchpad is a complete entry point rather than only a dashboard-of-dashboards; toggling a setting updates its label in place without restarting the scans. No action required.
 - **Findings can now be grouped by Tier and by Pack(s).** The Findings dashboard "Group by" dropdown and the Issues view group-by picker gain two dimensions: Tier (Essential → Pedantic) and Pack(s) (ecosystem, platform, and concern packs). Pack grouping is multi-key like OWASP — a rule belonging to several packs appears under each — and findings whose rule is in no pack collect under "No pack". Both resolve from bundled rule metadata, so they work on an existing report without re-running analysis.
+- **Manage Rule Packs gains rule-finding aids.** Searching now lists every matching rule in a "Matching rules" panel (each linking to its explanation and to its owning pack), shows a live "N packs · M rules" count beside the box, and highlights the matched text in rule names; section and domain headers read "12 packs · 340 rules" so you can see where rules concentrate before opening a group. No action required.
 - **16 new concern packs broaden Rule Packs coverage and overlap.** Thirteen coverage packs give every previously-unpacked rule file a home — Widgets & build, Layout & scrolling, Animation & motion, Dialogs & overlays, Notifications, Naming & conventions, Class & constructor design, BuildContext safety, In-app purchase, Hardware & sensors, Freezed (codegen), File I/O & handles, and Project config & integrity — and three cross-cutting "lens" packs (Memory & resource leaks, UI polish & UX, Release readiness) deliberately span categories so the same rules can be opted into through a task-shaped lens. Packs are additive, so enabling several never double-flags a shared rule.
 
 ### Changed (Extension)
 
 - **The sidebar Actions panel merged into Settings.** The Actions and Settings panels sat directly adjacent and read as duplicates, so run-analysis and initialize-config now lead the Settings panel (the title-bar play button still runs analysis); the duplicate "Pick UI language" action was dropped because the Settings "UI language" row already shows the current language and changes it on click. No action required.
 - **"Saropa Dashboards" is now a launchpad for all six dashboards.** It opens instantly with the page chrome and live summary cards for Lints Config, Findings, Package, and Command Catalog (each with an "Open full screen" link), then streams Project Map and Code Health in as their scans finish instead of blocking on both. Each heavy pane has its own Rescan and an inline Retry when a scan fails. The "Saropa Dashboards" row now leads the sidebar's Editor dashboards list as its entry point. No action required.
+- **Manage Rule Packs merges each pack's rule count and "View" link into one "N rules" link.** The table previously carried a separate count column and a separate "View" button that did the same thing; clicking the "N rules" link now both shows the count and expands the pack's rule list. No action required.
 
 ### Fixed (Extension)
 
 - **The consolidated dashboard no longer hangs on a blank "Scanning…" screen or renders corrupted CSS.** Both scans ran behind one all-or-nothing gate, and Project Map's stylesheet was double-wrapped so its theme CSS spilled onto the page as visible text and the treemap rendered blank; panes now load independently and the stylesheet is injected verbatim. No action required.
+- **The Manage Rule Packs coverage gauge now fills its arc instead of showing the percentage over an empty ring.** The gauge's fill level was delivered through an inline style attribute the webview's content-security policy silently dropped, so the arc stayed empty; it is now set from the page script and animates up to the score. No action required.
+- **Manage Rule Packs search now finds individual rules, not just pack names.** Typing a rule name (or a problem area such as "storage") surfaces the pack that owns it and expands its rule list, where previously search matched only the pack's title. No action required.
+- **Toggling several rule packs in quick succession no longer stacks multiple analyses.** Each toggle re-ran analysis without stopping the previous run, leaving several "Running analysis" notifications and overlapping analyzer processes; a new run now cancels the in-flight one so only the latest runs. No action required.
 
 ---
 
