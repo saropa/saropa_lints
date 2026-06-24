@@ -217,6 +217,15 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
   ];
   AvoidShrinkWrapInListsRule() : super(code: _code);
 
+  // Deprecated: this rule flags shrinkWrap: true on a scrollable nested in
+  // another scrollable but does NOT exempt physics: NeverScrollableScrollPhysics,
+  // so it false-positives on the safe nested-with-NeverScrollable pattern that
+  // avoid_shrink_wrap_expensive correctly stays quiet on. It is a strictly
+  // worse duplicate of the canonical avoid_shrink_wrap_expensive. Deprecation
+  // excludes it from freshly generated tier configs (see lifecycleFilteredRules).
+  @override
+  RuleStatus get ruleStatus => RuleStatus.deprecated;
+
   static const LintCode _code = LintCode(
     'avoid_shrink_wrap_in_lists',
     "[avoid_shrink_wrap_in_lists] Using 'shrinkWrap: true' inside a nested scrollable (such as a ListView within another scrollable) can cause significant performance issues. It forces the inner list to compute the size of all its children, leading to poor scroll performance and increased memory usage, especially with large or dynamic lists. {v4}",
@@ -1691,6 +1700,17 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
         ReplaceShrinkWrapTrueWithFalseFix(context: context),
   ];
   AvoidShrinkWrapInScrollRule() : super(code: _code);
+
+  // Deprecated: this rule fires on EVERY shrinkWrap: true with no exemption,
+  // including the safe ListView(shrinkWrap: true, physics:
+  // NeverScrollableScrollPhysics()) inside a Column pattern. That produced
+  // repeated low-value suppression churn for code already acknowledged under
+  // another shrinkWrap rule name. avoid_shrink_wrap_expensive is the canonical
+  // successor: it covers the same concern (nested and non-nested) while
+  // exempting the NeverScrollableScrollPhysics pattern. Deprecation excludes
+  // this rule from freshly generated tier configs (see lifecycleFilteredRules).
+  @override
+  RuleStatus get ruleStatus => RuleStatus.deprecated;
 
   /// Stylistic preference. Large counts are acceptable.
   @override

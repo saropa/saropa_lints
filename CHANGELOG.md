@@ -64,6 +64,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+Consolidates four overlapping `shrinkWrap: true` rules down to one. A single scrollable could be flagged by up to four differently-named diagnostics, so a site suppressed under one rule name was re-flagged under another; the redundant three are now deprecated and `avoid_shrink_wrap_expensive` is the canonical rule covering the whole concern. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Changed
+
+- **Deprecated three redundant shrinkWrap rules in favor of `avoid_shrink_wrap_expensive`.** `avoid_shrink_wrap_in_scroll`, `avoid_shrink_wrap_in_lists`, and `avoid_shrinkwrap_in_scrollview` all policed the same `shrinkWrap: true` concern, so one site drew up to four diagnostics and an acknowledgment under one rule name did not suppress the others; the canonical `avoid_shrink_wrap_expensive` flags nested and non-nested cases alike while exempting the safe `NeverScrollableScrollPhysics` pattern. Deprecated rules are dropped from freshly generated tier configs — re-run init or write-config to clear them, or remove them from `analysis_options.yaml` by hand.
+
+---
+
 ## [14.2.0]
 
 Adds a performance rule that flags arithmetic in a widget's `build()` whose operands are all fixed for the app session — number literals, constants, and design-token size getters — so the value is computed once in a `static final` field instead of on every frame. The Package Dashboard now shows a live progress bar while a rescan runs, so a refresh no longer looks like the page has frozen behind a lone notification. The Rule Packs sidebar gains a wave of new concern packs so every rule now belongs to a selectable pack, including cross-cutting "lens" packs that group rules by task — memory leaks, UI polish, release readiness — rather than by category. [log](https://github.com/saropa/saropa_lints/blob/v14.2.0/CHANGELOG.md)

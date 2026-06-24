@@ -25,20 +25,29 @@ surface" dashboards the consolidation plan keeps as separate screens.
 ## Remaining oversized files (by size)
 
 Each is a kept linked-surface dashboard; decompose with the approach above. Tested ones are lower
-risk (the test pins output); untested ones need a render spot-check after.
+risk (the test pins output); untested ones need a render spot-check after. Paths are relative to
+`extension/src/`.
+
+**Line counts refreshed 2026-06-24** — none of these had been decomposed since the Findings
+dashboard, and most grew. The table below is re-sorted by current size; the original (2026-06-12)
+count follows each in parentheses where it changed.
 
 | File | Lines | Kind | Test | Suggested split |
 |---|---|---|---|---|
-| commandCatalogWebviewHtml.ts | 1856 | markup | none | hero / search-toolbar / frequent+recent bands / category sections / client script |
-| vibrancy/views/report-html.ts | 1766 | markup | yes | hero+gauge+breakdown / summary cards / chart / filters / table / detail-row / network |
-| vibrancy/views/report-script.ts | 1463 | client-js | none | filters / sorting / popovers / network-render / footprint-toggle (one IIFE module each) |
-| commandCatalogRegistry.ts | 1348 | data | yes | split the catalog entries by category group into data files |
-| issuesTree.ts | 1338 | tree-logic | yes | tree-data provider / grouping / tree-item builders / pagination |
-| projectVibrancyReportView.ts | 1310 | controller | none | html builder / client script / message handler / controller |
-| violationsDashboardStyles.ts | 1297 | css | none | split by component (hero / kpi / toolbar / table / panels / chart) |
-| dashboardChromeStyles.ts | 1115 | css | none | split by component band |
-| vibrancy/views/report-styles.ts | 930 | css | none | split by report section |
-| violationsWideReportView.ts | 905 | controller | none | html builder / message handler / controller |
+| views/commandCatalogWebviewHtml.ts | 1881 (was 1856) | markup | none | hero / search-toolbar / frequent+recent bands / category sections / client script |
+| vibrancy/views/report-script.ts | 1876 (was 1463) | client-js | none | filters / sorting / popovers / network-render / footprint-toggle (one IIFE module each) |
+| vibrancy/views/report-html.ts | 1709 (was 1766) | markup | yes | hero+gauge+breakdown / summary cards / chart / filters / table / detail-row / network |
+| views/projectVibrancyReportView.ts | 1369 (was 1310) | controller | none | html builder / client script / message handler / controller |
+| views/commandCatalogRegistry.ts | 1356 (was 1348) | data | yes | split the catalog entries by category group into data files |
+| views/violationsDashboardStyles.ts | 1350 (was 1297) | css | none | split by component (hero / kpi / toolbar / table / panels / chart) |
+| views/issuesTree.ts | 1340 (was 1338) | tree-logic | yes | tree-data provider / grouping / tree-item builders / pagination |
+| views/dashboardChromeStyles.ts | 1199 (was 1115) | css | none | split by component band |
+| vibrancy/views/report-styles.ts | 1152 (was 930) | css | none | split by report section |
+| views/violationsWideReportView.ts | 952 (was 905) | controller | none | html builder / message handler / controller |
+
+> **Path correction (2026-06-24):** the controller `projectVibrancyReportView.ts` lives at
+> `views/projectVibrancyReportView.ts`, NOT under `vibrancy/views/`. Only the three `report-*.ts`
+> files are under `vibrancy/views/`.
 
 ## Notes
 

@@ -33,6 +33,7 @@ import { readPubspec, FLUTTER_EMBEDDER_PLATFORMS } from '../pubspecReader';
 import { readViolations, filterDisabledFromData } from '../violationsReader';
 import { buildSuppressionsExportSnapshotStripHtml } from '../views/configDashboardSuppressionsStrip';
 import { RULE_PACK_DEFINITIONS, isPackDetected } from './rulePackDefinitions';
+import { enforceSingleVersion, versionGroupIndex } from './versionGroups';
 import { STYLISTIC_PACK_DEFINITIONS } from './stylisticPackDefinitions';
 import { packDomainForId, PACK_DOMAIN_ORDER } from './packDomains';
 import { l10n } from '../i18n/runtime';
@@ -44,6 +45,11 @@ import { computeConfigSuggestions } from '../config/configSuggestions';
 
 const CONFIG_DASHBOARD_PANEL_TYPE = 'saropaLints.configDashboard';
 const TIERS = ['essential', 'recommended', 'professional', 'comprehensive', 'pedantic'] as const;
+
+// Pack id → version-group dependency, computed once from the static registry.
+// Packs in a multi-version group (dio+dio_5, riverpod+riverpod_2+riverpod_3, …)
+// render an exclusive control so only one version of a package can be enabled.
+const VERSION_GROUP_INDEX = versionGroupIndex(RULE_PACK_DEFINITIONS);
 
 type TierName = (typeof TIERS)[number];
 
@@ -906,12 +912,24 @@ export class RulePacksWebviewProvider {
     // the pack that owns it — packs were previously findable only by their label.
     const rulesText = escapeHtml(def.ruleCodes.join(' ').toLowerCase());
     const domainLower = escapeHtml(packDomainForId(row.id).toLowerCase());
-    return `<tr data-pack="${id}" data-type="${isSdk ? 'sdk' : 'package'}" data-risk="${riskKind}" data-detected="${row.detected ? '1' : '0'}" data-enabled="${row.enabled ? '1' : '0'}" data-rules="${row.rules}" data-label="${escapeHtml(def.label.toLowerCase())}" data-pack-label="${label}" data-rules-text="${rulesText}" data-domain="${domainLower}">
+    // Version-group membership: dio+dio_5, riverpod+riverpod_2+riverpod_3, …
+    // share one dependency and are mutually exclusive — only one version of a
+    // package's rules can apply. `data-vgroup` ties the row + its toggle to its
+    // siblings so the client clears the others when this one is enabled, and a
+    // "pick one version" tag tells the user the choice is exclusive. The written
+    // config is also de-duplicated server-side (see _handleToggle), so the
+    // single-version contract holds even if the UI is out of sync.
+    const vgroup = VERSION_GROUP_INDEX.get(row.id);
+    const vgroupAttr = vgroup ? ` data-vgroup="${escapeHtml(vgroup)}"` : '';
+    const vgroupTag = vgroup
+      ? ` <span class="pack-vgroup" title="${escapeHtml(l10n('packs.versionGroup.tooltip'))}">${escapeHtml(l10n('packs.versionGroup.tag'))}</span>`
+      : '';
+    return `<tr data-pack="${id}"${vgroupAttr} data-type="${isSdk ? 'sdk' : 'package'}" data-risk="${riskKind}" data-detected="${row.detected ? '1' : '0'}" data-enabled="${row.enabled ? '1' : '0'}" data-rules="${row.rules}" data-label="${escapeHtml(def.label.toLowerCase())}" data-pack-label="${label}" data-rules-text="${rulesText}" data-domain="${domainLower}">
   ${detectedCell}
-  <td class="pack-name">${label}${domainTag}</td>
+  <td class="pack-name">${label}${domainTag}${vgroupTag}</td>
   <td>${typeBadge}</td>
   <td>${riskBadge}</td>
-  <td><label class="switch"><input type="checkbox" data-pack="${id}" ${row.enabled ? 'checked' : ''} aria-label="Enable ${label}" /><span class="slider"></span></label></td>
+  <td><label class="switch"><input type="checkbox" data-pack="${id}"${vgroupAttr} ${row.enabled ? 'checked' : ''} aria-label="Enable ${label}" /><span class="slider"></span></label></td>
   <td class="num rules-cell">${toggle}</td>
 </tr>
 ${detailRow}`;
@@ -1264,9 +1282,16 @@ ${detailRow}`;
     } else {
       next.delete(packId);
     }
+    // Version groups are mutually exclusive: enabling one variant (e.g. dio_5)
+    // drops the package's other variants so rule_packs.enabled never carries two
+    // versions of the same dependency. Enforced here, not only in the UI, so a
+    // stale config or an out-of-sync client cannot leave both enabled.
+    const deduped = enabled
+      ? enforceSingleVersion(RULE_PACK_DEFINITIONS, [...next], packId)
+      : [...next];
     const ok = writeRulePacksEnabled(
       root,
-      [...next].sort((a, b) => a.localeCompare(b)),
+      deduped.sort((a, b) => a.localeCompare(b)),
     );
     if (!ok) {
       void vscode.window.showErrorMessage(l10n('notify.vibrancy.couldNotWriteRulePacks'));

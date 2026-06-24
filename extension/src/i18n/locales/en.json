@@ -29,6 +29,10 @@
     "noneDetected": "No packs match your dependencies yet. Add a supported package, or open All packages below.",
     "allPackages": "All packages",
     "allPackagesHint": "Every available pack, including ones not detected in this project. Enable a pack to opt into its rules.",
+    "versionGroup": {
+      "tag": "Pick one version",
+      "tooltip": "These packs target different major versions of the same dependency. Only one applies at a time — enabling one turns the others off."
+    },
     "domainDesc": {
       "state-management": "Bloc, Riverpod, Provider, GetX, and related state and dependency-injection libraries.",
       "networking-apis": "HTTP clients, GraphQL, Firebase, Supabase, and connectivity.",

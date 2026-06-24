@@ -66,13 +66,16 @@ already satisfied. Evidence per item:
 
 No feature work remained. See the Finish Report below.
 
-## 5.4 Cross-file semantic Usage collector **[OPEN — needs per-item confirm]**
+## 5.4 Cross-file semantic Usage collector **[SPLIT 2026-06-24 → own plan — confirmed name-based]**
 
-The plan specifies analyzer element-resolution. Unconfirmed whether the shipped collector is still
-name-based.
+Triaged 2026-06-24: the shipped Usage collector in `lib/src/cli/project_vibrancy.dart` is still
+name-based — `_ReferenceVisitor` collects raw `SimpleIdentifier.name` text (no `staticElement`), and
+`_computeUsageCounts` attributes counts via a bare `referencesByName[fn.name]` lookup. The
+element-resolution upgrade is real outstanding work.
 
-Action: read the current Usage collector — if name-based, the element-resolution upgrade is the
-work; if already element-resolved, mark done.
+Split into its own detailed plan: `plans/PLAN_vibrancy_usage_collector_element_resolution.md`
+(resolved reference collection, entry-point exclusions, tree-SHA usage cache, subprocess isolation +
+NDJSON streaming, optional cascading-unused).
 
 ---
 

@@ -74,6 +74,20 @@ const SCRIPT_TIER_AND_TOGGLES = `
 
   document.querySelectorAll('input[type=checkbox][data-pack]').forEach(function(el) {
     el.addEventListener('change', function() {
+      // Version groups are mutually exclusive (dio vs dio_5, riverpod 2 vs 3, …).
+      // Enabling one variant visually clears its siblings immediately so the
+      // pick-one contract is obvious; the host de-duplicates the written config
+      // as well, so this is feedback, not the source of truth.
+      var vgroup = el.getAttribute('data-vgroup');
+      if (el.checked && vgroup) {
+        document.querySelectorAll('input[type=checkbox][data-vgroup="' + cssEscape(vgroup) + '"]').forEach(function(sib) {
+          if (sib !== el && sib.checked) {
+            sib.checked = false;
+            var sibRow = sib.closest('tr[data-pack]');
+            if (sibRow) sibRow.setAttribute('data-enabled', '0');
+          }
+        });
+      }
       vscode.postMessage({ type: 'toggle', packId: el.getAttribute('data-pack'), enabled: el.checked });
     });
   });

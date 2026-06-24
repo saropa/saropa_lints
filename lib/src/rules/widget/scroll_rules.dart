@@ -45,6 +45,16 @@ import '../../fixes/scroll/replace_sliver_to_box_adapter_fix.dart';
 class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   AvoidShrinkWrapInScrollViewRule() : super(code: _code);
 
+  // Deprecated: this rule targets only the nested-scrollable case, which is a
+  // strict subset of the canonical avoid_shrink_wrap_expensive (that rule
+  // covers nested AND non-nested shrinkWrap while applying the same
+  // NeverScrollableScrollPhysics exemption). Keeping both made one
+  // shrinkWrap: true double-report under two names, forcing per-rule-name
+  // suppression churn downstream. Deprecation excludes this rule from freshly
+  // generated tier configs (see lifecycleFilteredRules).
+  @override
+  RuleStatus get ruleStatus => RuleStatus.deprecated;
+
   @override
   LintImpact get impact => LintImpact.warning;
 
@@ -934,6 +944,18 @@ class RequireRefreshIndicatorOnListsRule extends SaropaLintRule {
 /// ```
 class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
   AvoidShrinkWrapExpensiveRule() : super(code: _code);
+
+  // Canonical shrinkWrap rule. It is the superset of the three deprecated
+  // duplicates: it flags shrinkWrap: true on any scrollable (nested or not)
+  // while exempting the safe physics: NeverScrollableScrollPhysics pattern, so
+  // a single acknowledgment covers the concern instead of one site being
+  // re-flagged under four different rule names.
+  @override
+  List<String> get supersedesRules => const <String>[
+    'avoid_shrink_wrap_in_scroll',
+    'avoid_shrink_wrap_in_lists',
+    'avoid_shrinkwrap_in_scrollview',
+  ];
 
   @override
   LintImpact get impact => LintImpact.warning;

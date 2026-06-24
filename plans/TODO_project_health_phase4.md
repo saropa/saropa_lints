@@ -21,12 +21,6 @@ were **never screenshot / runtime-verified against the design**.
 Action: render both, screenshot, compare to the Phase-4 design in the source plan, tune. This is a
 `/verify`-style task, not new feature code — confirm the shipped render matches intent.
 
-## 3.4 SQLite store **[DEFERRED]**
-
-NDJSON shards shipped. SQLite is deferred until full-set interactive arbitrary-filter querying is
-actually needed. No code blocker — a capability choice. Build only when interactive cross-shard
-filtering is requested.
-
 ---
 
 ## Already split out (do not duplicate here)
@@ -35,3 +29,6 @@ filtering is requested.
   parallelism; throughput-only, would destabilize the verified core for unmeasured gain).
 - **§3.3 Adaptive huge-workspace auto-defaults** → `deferred/PROJECT_HEALTH_adaptive_huge_workspace.md`
   (auto-aggregate above a file-count threshold; no real-user trigger yet).
+- **§3.4 SQLite results store** → `deferred/PROJECT_HEALTH_sqlite_store.md` (interactive full-set
+  arbitrary-filter querying; NDJSON shards shipped, no code blocker — a capability choice gated on a
+  real consumer + profiling + dependency approval).
