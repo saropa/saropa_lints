@@ -262,6 +262,108 @@ const Map<String, ({String label, List<String> paths})> kThemePacks = {
   'forms': (label: 'Forms & input', paths: ['widget/forms_rules.dart']),
   'theming': (label: 'Theming', paths: ['widget/theming_rules.dart']),
   'code_quality': (label: 'Code quality', paths: ['code_quality']),
+  // --- Coverage packs: each gathers a previously unpacked concern so every
+  // non-package rule file belongs to at least one selectable pack. Rosters are
+  // still derived from the source tree, so they extend automatically.
+  'widgets': (
+    label: 'Widgets & build',
+    paths: [
+      'widget/build_method_rules.dart',
+      'widget/widget_patterns_avoid_prefer_rules.dart',
+      'widget/widget_patterns_require_rules.dart',
+      'widget/widget_patterns_ux_rules.dart',
+      'widget/ui_ux_rules.dart',
+      'widget/widget_lifecycle_rules.dart',
+      'widget/flutter_migration_widget_rules.dart',
+      'widget/image_filter_quality_migration_rules.dart',
+    ],
+  ),
+  'layout': (
+    label: 'Layout & scrolling',
+    paths: [
+      'widget/widget_layout_constraints_rules.dart',
+      'widget/widget_layout_flex_scroll_rules.dart',
+      'widget/scroll_rules.dart',
+    ],
+  ),
+  'animation': (label: 'Animation & motion', paths: ['ui/animation_rules.dart']),
+  'dialogs': (
+    label: 'Dialogs & overlays',
+    paths: ['widget/dialog_snackbar_rules.dart'],
+  ),
+  'notifications': (
+    label: 'Notifications',
+    paths: ['ui/notification_rules.dart'],
+  ),
+  'naming': (
+    label: 'Naming & conventions',
+    paths: ['core/naming_style_rules.dart'],
+  ),
+  'class_design': (
+    label: 'Class & constructor design',
+    paths: ['core/class_constructor_rules.dart'],
+  ),
+  'build_context': (
+    label: 'BuildContext safety',
+    paths: ['core/context_rules.dart'],
+  ),
+  'in_app_purchase': (
+    label: 'In-app purchase',
+    paths: ['commerce/iap_rules.dart'],
+  ),
+  'hardware': (
+    label: 'Hardware & sensors',
+    paths: ['hardware/bluetooth_hardware_rules.dart'],
+  ),
+  'freezed': (label: 'Freezed (codegen)', paths: ['codegen/freezed_rules.dart']),
+  'file_io': (
+    label: 'File I/O & handles',
+    paths: ['resources/file_handling_rules.dart'],
+  ),
+  'project_config': (
+    label: 'Project config & integrity',
+    paths: [
+      'config/config_rules.dart',
+      'config/pubspec_constraint_rules.dart',
+      'config/repo_integrity_rules.dart',
+      'config/migration_rules.dart',
+    ],
+  ),
+  // --- Overlapping ("lens") packs: cross-cutting bundles that deliberately
+  // span the taxonomy above. A rule here also lives in a category pack; under
+  // the additive merge that overlap is intentional — each lens is a different
+  // way to opt into the same underlying rules.
+  'leak_prevention': (
+    label: 'Memory & resource leaks',
+    paths: [
+      'architecture/disposal_rules.dart',
+      'architecture/lifecycle_rules.dart',
+      'resources/memory_management_rules.dart',
+      'resources/resource_management_rules.dart',
+      'resources/file_handling_rules.dart',
+      'widget/widget_lifecycle_rules.dart',
+    ],
+  ),
+  'ui_polish': (
+    label: 'UI polish & UX',
+    paths: [
+      'widget/ui_ux_rules.dart',
+      'widget/widget_patterns_ux_rules.dart',
+      'widget/dialog_snackbar_rules.dart',
+      'ui/animation_rules.dart',
+      'ui/accessibility_rules.dart',
+      'widget/theming_rules.dart',
+    ],
+  ),
+  'release_readiness': (
+    label: 'Release readiness',
+    paths: [
+      'testing/debug_rules.dart',
+      'flow/error_handling_rules.dart',
+      'security/security_auth_storage_rules.dart',
+      'security/security_network_input_rules.dart',
+    ],
+  ),
 };
 
 /// `LintCode('name', ...)` extractor (positional first arg). Mirrors the regex in

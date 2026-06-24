@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Adds a performance rule that flags arithmetic in a widget's `build()` whose operands are all fixed for the app session — number literals, constants, and design-token size getters — so the value is computed once in a `static final` field instead of on every frame. The Package Dashboard now shows a live progress bar while a rescan runs, so a refresh no longer looks like the page has frozen behind a lone notification.
+Adds a performance rule that flags arithmetic in a widget's `build()` whose operands are all fixed for the app session — number literals, constants, and design-token size getters — so the value is computed once in a `static final` field instead of on every frame. The Package Dashboard now shows a live progress bar while a rescan runs, so a refresh no longer looks like the page has frozen behind a lone notification. The Rule Packs sidebar gains a wave of new concern packs so every rule now belongs to a selectable pack, including cross-cutting "lens" packs that group rules by task — memory leaks, UI polish, release readiness — rather than by category.
 
 ### Added
 
@@ -77,6 +77,7 @@ Adds a performance rule that flags arithmetic in a widget's `build()` whose oper
 - **The Package Dashboard shows a live progress bar during a rescan.** A rescan previously updated only a VS Code notification while the dashboard sat on stale data, so it read as hung; the dashboard now fills a determinate bar as each package is scanned and clears it when results refresh. No action required.
 - **The Saropa Dashboards launchpad now carries the full Actions, Settings, and Help controls.** A control band under the hero exposes run analysis, initialize config, the lint-integration / tier / run-after / UI-language settings (each showing its current value), and the help links, so the launchpad is a complete entry point rather than only a dashboard-of-dashboards; toggling a setting updates its label in place without restarting the scans. No action required.
 - **Findings can now be grouped by Tier and by Pack(s).** The Findings dashboard "Group by" dropdown and the Issues view group-by picker gain two dimensions: Tier (Essential → Pedantic) and Pack(s) (ecosystem, platform, and concern packs). Pack grouping is multi-key like OWASP — a rule belonging to several packs appears under each — and findings whose rule is in no pack collect under "No pack". Both resolve from bundled rule metadata, so they work on an existing report without re-running analysis.
+- **16 new concern packs broaden Rule Packs coverage and overlap.** Thirteen coverage packs give every previously-unpacked rule file a home — Widgets & build, Layout & scrolling, Animation & motion, Dialogs & overlays, Notifications, Naming & conventions, Class & constructor design, BuildContext safety, In-app purchase, Hardware & sensors, Freezed (codegen), File I/O & handles, and Project config & integrity — and three cross-cutting "lens" packs (Memory & resource leaks, UI polish & UX, Release readiness) deliberately span categories so the same rules can be opted into through a task-shaped lens. Packs are additive, so enabling several never double-flags a shared rule.
 
 ### Changed (Extension)
 
