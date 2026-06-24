@@ -35,6 +35,7 @@ import * as vscode from 'vscode';
 import { getProjectRoot } from '../projectRoot';
 import { hasSaropaLintsDep } from '../pubspecReader';
 import { l10n } from '../i18n/runtime';
+import { formatLanguageChoiceLabel } from '../i18n/languagePick';
 import { getProjectVibrancyReportStyles } from './projectVibrancyReportStyles';
 import { getKeyboardShortcutsStyles } from './keyboard-shortcuts';
 import { buildDashboardHero } from './dashboardHero';
@@ -74,6 +75,36 @@ const OPEN_COMMAND_ALLOWLIST: ReadonlySet<string> = new Set<string>([
   SUMMARY_OPEN_COMMANDS.package,
   SUMMARY_OPEN_COMMANDS.findings,
   SUMMARY_OPEN_COMMANDS.commandCatalog,
+  // Controls band — Actions / Settings / Help. The launchpad surfaces the full
+  // sidebar command set so it is a complete entry point, not just a
+  // dashboard-of-dashboards. The webview can only post a command from this set,
+  // so a buggy/compromised script cannot drive arbitrary VS Code commands.
+  'saropaLints.runAnalysis',
+  'saropaLints.initializeConfig',
+  'saropaLints.enable',
+  'saropaLints.disable',
+  'saropaLints.toggleRunAnalysisAfterConfigChange',
+  'saropaLints.toggleRunAnalysisAfterDependencyChange',
+  'saropaLints.pickUiLanguage',
+  'saropaLints.openWalkthrough',
+  'saropaLints.showAbout',
+  'saropaLints.openPubDevSaropaLints',
+  'saropaLints.createSaropaInstructions',
+]);
+
+/**
+ * Control commands whose effect changes the Settings rows' displayed state
+ * (lint integration on/off, run-after toggles, UI language). After executing
+ * one, the host recomputes the band and posts `controlsUpdated` so the label
+ * reflects the new value without a full re-render (a re-render would restart
+ * the two heavy scans).
+ */
+const CONTROL_STATE_COMMANDS: ReadonlySet<string> = new Set<string>([
+  'saropaLints.enable',
+  'saropaLints.disable',
+  'saropaLints.toggleRunAnalysisAfterConfigChange',
+  'saropaLints.toggleRunAnalysisAfterDependencyChange',
+  'saropaLints.pickUiLanguage',
 ]);
 
 /** Registers the `Saropa Dashboards` command; call once at activation. */
@@ -113,12 +144,17 @@ function openDashboards(): Promise<void> {
 async function renderAndLoad(root: string): Promise<void> {
   lastRoot = root;
   const p = getOrCreatePanel();
-  p.webview.html = buildShell(p.webview.cspSource, echartsUriString(p.webview), {
-    config: buildConfigSummary(root),
-    package: buildPackageSummary(),
-    findings: buildFindingsSummary(root),
-    catalog: buildCatalogSummary(extensionContext),
-  });
+  p.webview.html = buildShell(
+    p.webview.cspSource,
+    echartsUriString(p.webview),
+    {
+      config: buildConfigSummary(root),
+      package: buildPackageSummary(),
+      findings: buildFindingsSummary(root),
+      catalog: buildCatalogSummary(extensionContext),
+    },
+    readControlsState(),
+  );
   p.reveal(vscode.ViewColumn.One);
   await loadHeavyPanes(root);
 }
@@ -246,7 +282,7 @@ function handleHostMessage(msg: unknown): void {
       return;
     case 'openCommand':
       if (typeof data.command === 'string' && OPEN_COMMAND_ALLOWLIST.has(data.command)) {
-        void vscode.commands.executeCommand(data.command);
+        void runControlCommand(data.command);
       }
       return;
     case 'rescanPane':
@@ -268,6 +304,34 @@ function handleHostMessage(msg: unknown): void {
     default:
       return;
   }
+}
+
+/**
+ * Executes an allowlisted control command, then — for the stateful Settings
+ * toggles — recomputes the controls band and patches it in place so the row's
+ * label shows the new value. A full re-render is avoided on purpose: it would
+ * restart the two heavy `dart run` scans.
+ */
+async function runControlCommand(command: string): Promise<void> {
+  await vscode.commands.executeCommand(command);
+  if (CONTROL_STATE_COMMANDS.has(command) && panel) {
+    void panel.webview.postMessage({
+      type: 'controlsUpdated',
+      html: buildControlsBand(readControlsState()),
+    });
+  }
+}
+
+/** Reads the live config backing the launchpad's Settings controls. */
+function readControlsState(): ControlsState {
+  const cfg = vscode.workspace.getConfiguration('saropaLints');
+  return {
+    lintEnabled: cfg.get<boolean>('enabled', true) ?? true,
+    tier: cfg.get<string>('tier', 'recommended') ?? 'recommended',
+    runAfterConfig: cfg.get<boolean>('runAnalysisAfterConfigChange', true) ?? true,
+    runAfterDependency: cfg.get<boolean>('runAnalysisAfterDependencyChange', true) ?? true,
+    uiLanguageLabel: formatLanguageChoiceLabel(cfg.get<string>('uiLanguage', 'auto') ?? 'auto'),
+  };
 }
 
 /** Opens a report-relative file at [line] (1-based), resolving against the project root. */
@@ -323,6 +387,28 @@ export interface ShellSummaries {
 }
 
 /**
+ * Live config backing the launchpad's Settings controls. Plain data so
+ * [buildShell] / [buildControlsBand] stay pure and unit-testable; the host
+ * fills it from `saropaLints.*` configuration via [readControlsState].
+ */
+export interface ControlsState {
+  lintEnabled: boolean;
+  tier: string;
+  runAfterConfig: boolean;
+  runAfterDependency: boolean;
+  uiLanguageLabel: string;
+}
+
+/** Default control state for tests / callers that do not pass live config. */
+const DEFAULT_CONTROLS_STATE: ControlsState = {
+  lintEnabled: true,
+  tier: 'recommended',
+  runAfterConfig: true,
+  runAfterDependency: true,
+  uiLanguageLabel: 'English',
+};
+
+/**
  * Builds the full launchpad document, set once as the webview HTML. Pure (no webview): the only host
  * values are [cspSource] and [echartsUri], so unit tests can assert the shell contract — six panes,
  * one ECharts loader, one shared API shim, the four summaries embedded, and the two heavy panes in
@@ -332,6 +418,7 @@ export function buildShell(
   cspSource: string,
   echartsUri: string,
   summaries: ShellSummaries,
+  controls: ControlsState = DEFAULT_CONTROLS_STATE,
 ): string {
   const hero = buildDashboardHero({
     title: l10n('dashboards.heroTitle'),
@@ -385,6 +472,7 @@ export function buildShell(
 </head>
 <body>
   <header>${hero}</header>
+  ${buildControlsBand(controls)}
   <main class="dash-grid">${panes}</main>
   <script>window.SD = ${clientStrings};</script>
   <script>${clientScript()}</script>
@@ -423,9 +511,100 @@ function paneShell(
   </section>`;
 }
 
+/**
+ * The Actions / Settings / Help control band rendered under the hero. Pure
+ * (state in → HTML out). Buttons carry their command in `data-command`; the
+ * client delegates clicks to the host, which runs the (allowlisted) command.
+ * Settings buttons show the current value in their label and re-render via a
+ * `controlsUpdated` message after a toggle. The container id lets the client
+ * patch just this band without a full re-render.
+ */
+export function buildControlsBand(state: ControlsState): string {
+  const onOff = (on: boolean): string =>
+    on ? l10n('dashboards.controls.on') : l10n('dashboards.controls.off');
+  const yesNo = (yes: boolean): string =>
+    yes ? l10n('dashboards.controls.yes') : l10n('dashboards.controls.no');
+
+  const actions =
+    controlBtn('saropaLints.runAnalysis', l10n('dashboards.controls.runAnalysis')) +
+    controlBtn('saropaLints.initializeConfig', l10n('dashboards.controls.initializeConfig'));
+
+  // The lint-integration button toggles, so its command flips with current state.
+  const settings =
+    controlBtn(
+      state.lintEnabled ? 'saropaLints.disable' : 'saropaLints.enable',
+      l10n('dashboards.controls.lintIntegrationState', { state: onOff(state.lintEnabled) }),
+    ) +
+    controlBtn(
+      'saropaLints.openConfigDashboard',
+      l10n('dashboards.controls.tierState', { tier: state.tier }),
+    ) +
+    controlBtn(
+      'saropaLints.toggleRunAnalysisAfterConfigChange',
+      l10n('dashboards.controls.runAfterConfigState', { state: yesNo(state.runAfterConfig) }),
+    ) +
+    controlBtn(
+      'saropaLints.toggleRunAnalysisAfterDependencyChange',
+      l10n('dashboards.controls.runAfterDependencyState', { state: yesNo(state.runAfterDependency) }),
+    ) +
+    controlBtn(
+      'saropaLints.pickUiLanguage',
+      l10n('dashboards.controls.uiLanguageState', { language: state.uiLanguageLabel }),
+    );
+
+  const help =
+    controlBtn('saropaLints.openWalkthrough', l10n('dashboards.controls.gettingStarted')) +
+    controlBtn('saropaLints.showAbout', l10n('dashboards.controls.about')) +
+    controlBtn('saropaLints.openPubDevSaropaLints', l10n('dashboards.controls.pubDev')) +
+    controlBtn('saropaLints.createSaropaInstructions', l10n('dashboards.controls.aiInstructions'));
+
+  return `<div id="dashControls" class="dash-controls">
+    ${controlGroup(l10n('dashboards.controls.actions'), actions)}
+    ${controlGroup(l10n('dashboards.controls.settings'), settings)}
+    ${controlGroup(l10n('dashboards.controls.help'), help)}
+  </div>`;
+}
+
+/** One titled group of control buttons in the band. */
+function controlGroup(title: string, buttons: string): string {
+  return `<section class="ctl-group">
+    <h2 class="ctl-title">${escapeHtml(title)}</h2>
+    <div class="ctl-buttons">${buttons}</div>
+  </section>`;
+}
+
+/** One control button. The full label is escaped — it may carry a config value. */
+function controlBtn(command: string, label: string): string {
+  return `<button type="button" class="btn ctl-btn" data-command="${escapeHtml(command)}">${escapeHtml(label)}</button>`;
+}
+
 /** Host layout: the responsive grid, pane chrome, and summary-card styling on the shared tokens. */
 function hostStyles(): string {
   return `
+.dash-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4, 16px);
+  margin-bottom: var(--space-4, 16px);
+}
+.ctl-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  flex: 1 1 240px;
+  min-width: 0;
+  padding: var(--space-3, 12px);
+  border: 1px solid var(--border, var(--vscode-widget-border));
+  border-radius: var(--radius-lg, 12px);
+  background: var(--surface-1, var(--vscode-editorWidget-background));
+}
+.ctl-title {
+  margin: 0;
+  font-size: var(--text-h3, 1.05rem);
+  color: var(--muted, var(--vscode-descriptionForeground));
+}
+.ctl-buttons { display: flex; flex-wrap: wrap; gap: var(--space-2, 8px); }
+.ctl-btn { white-space: nowrap; }
 .dash-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -575,6 +754,16 @@ function clientScript(): string {
     if (m.type === 'paneReady') { applyPane(m.engine, m.style, m.body, m.script); }
     else if (m.type === 'paneLoading') { showScanning(m.engine); }
     else if (m.type === 'paneError') { showError(m.engine); }
+    // Patch only the controls band after a settings toggle — the html is host-built
+    // and escaped, and click handling is delegated on document so it survives the swap.
+    else if (m.type === 'controlsUpdated') {
+      var ctl = document.getElementById('dashControls');
+      // BUG FIX (2026-06-23): replace the whole #dashControls element (outerHTML), not its
+      // children. buildControlsBand returns the wrapper div with id dashControls, so assigning it
+      // to innerHTML nested a second #dashControls inside the first (duplicate id + an extra flex
+      // wrapper). outerHTML swaps the element in place, keeping a single #dashControls.
+      if (ctl && typeof m.html === 'string') { ctl.outerHTML = m.html; }
+    }
   });
 })();
 `;

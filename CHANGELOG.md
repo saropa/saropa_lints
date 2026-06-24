@@ -75,12 +75,13 @@ Adds a performance rule that flags arithmetic in a widget's `build()` whose oper
 ### Added (Extension)
 
 - **The Package Dashboard shows a live progress bar during a rescan.** A rescan previously updated only a VS Code notification while the dashboard sat on stale data, so it read as hung; the dashboard now fills a determinate bar as each package is scanned and clears it when results refresh. No action required.
+- **The Saropa Dashboards launchpad now carries the full Actions, Settings, and Help controls.** A control band under the hero exposes run analysis, initialize config, the lint-integration / tier / run-after / UI-language settings (each showing its current value), and the help links, so the launchpad is a complete entry point rather than only a dashboard-of-dashboards; toggling a setting updates its label in place without restarting the scans. No action required.
 - **Findings can now be grouped by Tier and by Pack(s).** The Findings dashboard "Group by" dropdown and the Issues view group-by picker gain two dimensions: Tier (Essential → Pedantic) and Pack(s) (ecosystem, platform, and concern packs). Pack grouping is multi-key like OWASP — a rule belonging to several packs appears under each — and findings whose rule is in no pack collect under "No pack". Both resolve from bundled rule metadata, so they work on an existing report without re-running analysis.
 
 ### Changed (Extension)
 
 - **The sidebar Actions panel merged into Settings.** The Actions and Settings panels sat directly adjacent and read as duplicates, so run-analysis and initialize-config now lead the Settings panel (the title-bar play button still runs analysis); the duplicate "Pick UI language" action was dropped because the Settings "UI language" row already shows the current language and changes it on click. No action required.
-- **"Saropa Dashboards" is now a launchpad for all six dashboards.** It opens instantly with the page chrome and live summary cards for Lints Config, Findings, Package, and Command Catalog (each with an "Open full screen" link), then streams Project Map and Code Health in as their scans finish instead of blocking on both. Each heavy pane has its own Rescan and an inline Retry when a scan fails. No action required.
+- **"Saropa Dashboards" is now a launchpad for all six dashboards.** It opens instantly with the page chrome and live summary cards for Lints Config, Findings, Package, and Command Catalog (each with an "Open full screen" link), then streams Project Map and Code Health in as their scans finish instead of blocking on both. Each heavy pane has its own Rescan and an inline Retry when a scan fails. The "Saropa Dashboards" row now leads the sidebar's Editor dashboards list as its entry point. No action required.
 
 ### Fixed (Extension)
 

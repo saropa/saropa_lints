@@ -83,6 +83,52 @@ describe('saropaDashboardsView buildShell', () => {
     }
   });
 
+  it('surfaces the Actions / Settings / Help controls in the band', () => {
+    const out = buildShell('vscode-resource:', ECHARTS, summaries);
+    // The launchpad is a full entry point: every merged-sidebar command appears
+    // in the controls band so users do not have to leave it to operate or configure.
+    for (const cmd of [
+      // Actions
+      'saropaLints.runAnalysis',
+      'saropaLints.initializeConfig',
+      // Settings
+      'saropaLints.openConfigDashboard',
+      'saropaLints.toggleRunAnalysisAfterConfigChange',
+      'saropaLints.toggleRunAnalysisAfterDependencyChange',
+      'saropaLints.pickUiLanguage',
+      // Help
+      'saropaLints.openWalkthrough',
+      'saropaLints.showAbout',
+      'saropaLints.openPubDevSaropaLints',
+      'saropaLints.createSaropaInstructions',
+    ]) {
+      assert.ok(out.includes(`data-command="${cmd}"`), `control command ${cmd} missing from band`);
+    }
+    // The lint-integration button toggles, so its command flips with state.
+    const enabled = buildShell('vscode-resource:', ECHARTS, summaries, {
+      lintEnabled: true,
+      tier: 'recommended',
+      runAfterConfig: true,
+      runAfterDependency: true,
+      uiLanguageLabel: 'English',
+    });
+    assert.ok(enabled.includes('data-command="saropaLints.disable"'), 'enabled state must offer disable');
+    const disabled = buildShell('vscode-resource:', ECHARTS, summaries, {
+      lintEnabled: false,
+      tier: 'recommended',
+      runAfterConfig: true,
+      runAfterDependency: true,
+      uiLanguageLabel: 'English',
+    });
+    assert.ok(disabled.includes('data-command="saropaLints.enable"'), 'disabled state must offer enable');
+  });
+
+  it('patches only the controls band on a settings toggle (no full re-render)', () => {
+    const out = buildShell('vscode-resource:', ECHARTS, summaries);
+    assert.ok(out.includes('id="dashControls"'), 'controls band needs an id to patch');
+    assert.ok(out.includes("m.type === 'controlsUpdated'"), 'client must handle controlsUpdated');
+  });
+
   it('keeps Project Map theme tokens + height fixups in the static head, scoped under .pm-pane', () => {
     const out = buildShell('vscode-resource:', ECHARTS, summaries);
     assert.ok(out.includes('.dash-pane .pm-pane { min-height: 0; }'), 'pane height fixup missing');
