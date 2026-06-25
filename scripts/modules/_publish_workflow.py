@@ -572,8 +572,8 @@ def _prompt_extension_install_and_publish(
     Returns:
         True if user chose to publish.
     """
-    response = input("  Install extension locally? [Y/n] ").strip().lower()
-    if not response.startswith("n"):
+    response = input("  Install extension locally? [y/N] ").strip().lower()
+    if response.startswith("y"):
         install_extension(vsix)
     response = (
         input("  Publish extension to Marketplace and Open VSX? [Y/n] ")

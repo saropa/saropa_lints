@@ -433,6 +433,12 @@ void main() {
     );
 
     testRule(
+      'AvoidAnimatedSizeInWrapRule',
+      'avoid_animated_size_in_wrap',
+      () => AvoidAnimatedSizeInWrapRule(),
+    );
+
+    testRule(
       'AvoidScrollableInIntrinsicRule',
       'avoid_scrollable_in_intrinsic',
       () => AvoidScrollableInIntrinsicRule(),

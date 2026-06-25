@@ -2509,6 +2509,129 @@ class AvoidSpacerInWrapRule extends SaropaLintRule {
 }
 
 // =========================================================================
+// Rule: avoid_animated_size_in_wrap
+// =========================================================================
+
+/// Flags `AnimatedSize` placed as a *direct* child of `Wrap` (or `Flow`).
+///
+/// Since: v14.3.0 | Rule version: v1
+///
+/// `RenderWrap` lays every child out during its own measurement pass
+/// (`_computeRuns` calls `layoutChild(..., parentUsesSize: true)`). When a
+/// wrapped child's size changes, `RenderAnimatedSize.performLayout` restarts
+/// its animation, whose controller listener calls `markNeedsLayout()` on the
+/// same render object while it is still mid-layout. The framework then asserts
+/// every frame: "A RenderAnimatedSize was mutated in its own performLayout
+/// implementation." `Column`/`ListView`/`Flex` lay each child out exactly once,
+/// so the restart defers to the next frame and is safe.
+///
+/// Placing a bounded box (`SizedBox`/`ConstrainedBox`) between the `Wrap` and
+/// the `AnimatedSize` fixes the crash, so an intervening widget is a valid
+/// escape hatch and is NOT flagged.
+///
+/// **BAD:**
+/// ```dart
+/// Wrap(
+///   children: [
+///     AnimatedSize(duration: d, child: card), // throws once the size animates
+///   ],
+/// )
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// Column(
+///   children: [
+///     AnimatedSize(duration: d, child: card), // Column lays out once — safe
+///   ],
+/// )
+/// ```
+class AvoidAnimatedSizeInWrapRule extends SaropaLintRule {
+  AvoidAnimatedSizeInWrapRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.error;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'avoid_animated_size_in_wrap',
+    '[avoid_animated_size_in_wrap] AnimatedSize cannot be a direct child of '
+        'Wrap/Flow — it re-dirties itself during the parent layout pass and '
+        'throws "RenderAnimatedSize was mutated in its own performLayout" at '
+        'runtime, every frame, once its size animates. {v1}',
+    correctionMessage:
+        'Use Column / ListView, or place a bounded box '
+        '(SizedBox/ConstrainedBox) between the Wrap and the AnimatedSize.',
+    severity: DiagnosticSeverity.ERROR,
+  );
+
+  // Parents that lay a child out within their own measurement pass, re-entering
+  // it when the child re-dirties — the specific incompatibility with
+  // AnimatedSize. Flex-based parents (Column/Row/Flex) and slivers are safe.
+  static const Set<String> _unsafeParents = <String>{'Wrap', 'Flow'};
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      if (node.constructorName.type.name.lexeme != 'AnimatedSize') return;
+
+      if (_isDirectChildOfUnsafeParent(node)) {
+        reporter.atNode(node.constructorName, code);
+      }
+    });
+  }
+
+  // Walk up from the AnimatedSize node through collection elements
+  // (ForElement/IfElement/SpreadElement) and the enclosing ListLiteral to the
+  // owning `children:` argument. Flag only when the immediate enclosing widget
+  // is Wrap/Flow with no intervening widget: the first InstanceCreationExpression
+  // ancestor would be the intervening box (escape hatch), and a non-`children`
+  // NamedExpression (e.g. `child:` of a SizedBox) means it is not a direct
+  // child either.
+  static bool _isDirectChildOfUnsafeParent(InstanceCreationExpression node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      // An intervening widget (e.g. SizedBox via a positional child) sits
+      // between the AnimatedSize and any children list — bounded parent, safe.
+      if (current is InstanceCreationExpression) return false;
+
+      if (current is NamedExpression) {
+        // Reached an argument boundary. Only a `children:` list of Wrap/Flow
+        // qualifies; `child:`/other names mean an intervening single-child
+        // widget, which is the escape hatch.
+        if (current.name.label.name != 'children') return false;
+        final AstNode? argList = current.parent;
+        if (argList is! ArgumentList) return false;
+        final AstNode? owner = argList.parent;
+        if (owner is! InstanceCreationExpression) return false;
+        return _unsafeParents.contains(owner.constructorName.type.name.lexeme);
+      }
+
+      // Stop at function/declaration boundaries: beyond these the call site
+      // controls the parent, so the relationship is indeterminate.
+      if (current is FunctionBody || current is Declaration) return false;
+
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+// =========================================================================
 // Rule: avoid_scrollable_in_intrinsic
 // =========================================================================
 

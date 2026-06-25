@@ -1998,6 +1998,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidTableCellOutsideTableRule.new,
   AvoidPositionedOutsideStackRule.new,
   AvoidSpacerInWrapRule.new,
+  AvoidAnimatedSizeInWrapRule.new,
   AvoidScrollableInIntrinsicRule.new,
   RequireBaselineTextBaselineRule.new,
   AvoidUnconstrainedDialogColumnRule.new,

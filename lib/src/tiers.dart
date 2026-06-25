@@ -580,6 +580,7 @@ const Set<String> essentialRules = <String>{
   'avoid_table_cell_outside_table', // ERROR - ParentData crash
   'avoid_positioned_outside_stack', // ERROR - ParentData crash
   'avoid_spacer_in_wrap', // ERROR - flex paradox crash
+  'avoid_animated_size_in_wrap', // ERROR - AnimatedSize re-dirty crash in Wrap/Flow
   'avoid_scrollable_in_intrinsic', // ERROR - geometry loop crash
   'require_baseline_text_baseline', // ERROR - assertion failure
   'avoid_unconstrained_dialog_column', // WARNING - probable dialog overflow

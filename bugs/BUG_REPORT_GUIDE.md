@@ -46,6 +46,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 - `prefer_boolean_prefixes_false_positive_serialization_bound_field_names.md`
 - `feature_lint_rule_require_named_for_acronym_drift_columns.md`
 
+## Raised Reports (2026-06-25)
+
+- `feature_lint_rule_avoid_animated_size_in_wrap.md`
+
 ---
 
 ## File Naming
