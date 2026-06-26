@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2326,
+  "ruleCount": 2327,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -486,6 +486,22 @@
       "tags": [
         "flutter",
         "platform"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "avoid_animated_size_in_wrap": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "flutter",
+        "ui"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,

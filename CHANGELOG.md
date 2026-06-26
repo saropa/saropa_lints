@@ -66,9 +66,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [14.2.2]
 
+This release adds an Essential lint rule that catches a common Flutter layout crash: animating a widget's size directly inside a wrapping or flowing layout, which throws a render error on every frame once the animation starts. The rule points you to the safe alternatives so the problem is caught in the editor instead of on a device. [log](https://github.com/saropa/saropa_lints/blob/v14.2.2/CHANGELOG.md)
+
 ### Added
 
-- **New rule `avoid_animated_size_in_wrap` (Essential) flags `AnimatedSize` placed directly inside a `Wrap` or `Flow`.** That combination throws "RenderAnimatedSize was mutated in its own performLayout" every frame once the size animates, because `Wrap`/`Flow` lay each child out within their own measurement pass while `AnimatedSize` re-dirties itself. Move the `AnimatedSize` into a `Column`/`ListView`, or put a bounded box (`SizedBox`/`ConstrainedBox`) between the two. [log](https://github.com/saropa/saropa_lints/blob/v14.2.2/CHANGELOG.md)
+- **New rule `avoid_animated_size_in_wrap` (Essential) flags `AnimatedSize` placed directly inside a `Wrap` or `Flow`.** That combination throws "RenderAnimatedSize was mutated in its own performLayout" every frame once the size animates, because `Wrap`/`Flow` lay each child out within their own measurement pass while `AnimatedSize` re-dirties itself. Move the `AnimatedSize` into a `Column`/`ListView`, or put a bounded box (`SizedBox`/`ConstrainedBox`) between the two.
 
 <details><summary>Maintenance</summary>
 
