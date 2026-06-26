@@ -64,7 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.2.3]
+
+This is a maintenance release with no changes to lint rules or analysis behavior. It fixes the release process so the VS Code extension reliably reaches the Marketplace alongside Open VSX, and slims the published extension by dropping development-only files that were never used at runtime, so the download is smaller. [log](https://github.com/saropa/saropa_lints/blob/v14.2.3/CHANGELOG.md)
 
 <details><summary>Maintenance</summary>
 
