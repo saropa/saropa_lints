@@ -116,7 +116,32 @@ void _bad45() async {
   final response = await http.get(Uri.parse('https://api.example.com/users'));
 }
 
+// BAD: mutable/non-const local is NOT "extracted to a config constant".
+void _bad46() async {
+  // expect_lint: avoid_hardcoded_api_urls
+  final url = 'https://api.example.com';
+  final response = await http.get(Uri.parse(url));
+}
+
 // GOOD: Should NOT trigger avoid_hardcoded_api_urls
 void _good45() async {
   final response = await http.get(Uri.parse('${ApiConfig.baseUrl}/users'));
+}
+
+// GOOD: already extracted to a named static const — the rule's GOOD pattern.
+abstract final class _ServiceConfig {
+  static const String baseUrl = 'https://api.example.com';
+}
+
+// GOOD: const collection entry is a centralized config map.
+const Map<int, String> _avatarUrls = <int, String>{
+  0: 'https://api.example.com/x',
+};
+
+// GOOD: env-config enum default sits in an implicitly-const constructor call.
+enum _EnvType {
+  systemUrlApi(defaultValue: 'https://api.example.com');
+
+  const _EnvType({required this.defaultValue});
+  final String defaultValue;
 }

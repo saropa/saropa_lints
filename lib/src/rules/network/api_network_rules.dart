@@ -113,7 +113,11 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
 
 /// Warns when API endpoint URLs are hardcoded.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v5
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v7
+///
+/// Skips literals already extracted to a named config constant (const /
+/// static const var, const collection entry, const-context enum default);
+/// fires only on inline call-site URLs not bound to a constant.
 ///
 /// API URLs should come from configuration for different environments.
 ///
@@ -146,7 +150,7 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_api_urls',
-    '[avoid_hardcoded_api_urls] Hardcoded API URLs prevent switching between development, staging, and production environments, making code inflexible and error-prone. This practice also risks leaking sensitive endpoints and complicates maintenance. Always extract API URLs to configuration constants (e.g., ApiConfig.baseUrl) to enable environment switching and improve security. {v6}',
+    '[avoid_hardcoded_api_urls] Hardcoded API URLs prevent switching between development, staging, and production environments, making code inflexible and error-prone. This practice also risks leaking sensitive endpoints and complicates maintenance. Always extract API URLs to configuration constants (e.g., ApiConfig.baseUrl) to enable environment switching and improve security. {v7}',
     correctionMessage:
         "Extract the URL to a configuration constant (e.g., ApiConfig.baseUrl) so endpoints can be switched per environment without code changes.",
     severity: DiagnosticSeverity.WARNING,
@@ -178,10 +182,46 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
       final String value = node.value;
 
-      if (_apiUrlPattern.hasMatch(value)) {
-        reporter.atNode(node);
-      }
+      if (!_apiUrlPattern.hasMatch(value)) return;
+
+      // The rule's own remediation is "extract the URL to a configuration
+      // constant", so a literal that is ALREADY the value of a const / static
+      // const declaration, a const collection entry, or a const-context enum
+      // default has satisfied the rule — flagging it forces ignores on the very
+      // files that are the correct home for these endpoints. Only fire on URLs
+      // that are not bound to a constant (inline call-site literals, mutable
+      // locals). See bugs/avoid_hardcoded_api_urls_false_positive_*.md.
+      if (_isAlreadyExtractedToConstant(node)) return;
+
+      reporter.atNode(node);
     });
+  }
+
+  /// Walks the literal's ancestors to decide whether it is already extracted
+  /// into a named configuration constant (the rule's desired end state).
+  ///
+  /// Returns true when the literal sits inside any const context that binds it
+  /// to a name: a `const` / `static const` variable declaration (Shape 2's
+  /// `static const _baseUrl`, Shape 3's top-level `const` map), a const
+  /// collection literal, a const constructor invocation, or an enum constant's
+  /// arguments (Shape 1's enum `defaultValue:`, whose constructor is implicitly
+  /// const). The walk stops at the nearest [FunctionBody]: a literal reached
+  /// only through executable code (e.g. inline `Uri.parse('https://api...')`)
+  /// is a genuine call-site URL and must still be flagged.
+  static bool _isAlreadyExtractedToConstant(AstNode literal) {
+    for (AstNode? current = literal.parent;
+        current != null;
+        current = current.parent) {
+      if (current is VariableDeclarationList && current.isConst) return true;
+      if (current is TypedLiteral && current.isConst) return true;
+      if (current is InstanceCreationExpression && current.isConst) return true;
+      if (current is EnumConstantDeclaration) return true;
+
+      // Hitting executable code before any const binding means the literal is
+      // inline at a call site, not a centralized config constant.
+      if (current is FunctionBody) return false;
+    }
+    return false;
   }
 }
 

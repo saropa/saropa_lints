@@ -64,6 +64,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+Fixes a false positive in the hardcoded-API-URL rule so it no longer flags endpoints you have already moved into a named configuration constant — the exact fix the rule asks for. [log](https://github.com/saropa/saropa_lints/blob/v14.2.4/CHANGELOG.md)
+
+### Fixed
+
+- `avoid_hardcoded_api_urls` no longer fires on a URL that is already the value of a `const`/`static const` field, a const collection entry, or an environment-config enum default; it now flags only inline URLs at call sites. No action required — any `// ignore:` you added on a config file can be removed.
+
+---
+
 ## [14.2.3]
 
 This is a maintenance release with no changes to lint rules or analysis behavior. It fixes the release process so the VS Code extension reliably reaches the Marketplace alongside Open VSX, and slims the published extension by dropping development-only files that were never used at runtime, so the download is smaller. [log](https://github.com/saropa/saropa_lints/blob/v14.2.3/CHANGELOG.md)
