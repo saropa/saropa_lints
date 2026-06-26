@@ -50,6 +50,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 - `feature_lint_rule_avoid_animated_size_in_wrap.md`
 
+## Raised Reports (2026-06-26)
+
+- `avoid_hardcoded_api_urls_false_positive_url_already_extracted_to_config_constant.md`
+
 ---
 
 ## File Naming

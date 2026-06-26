@@ -209,9 +209,11 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
   /// only through executable code (e.g. inline `Uri.parse('https://api...')`)
   /// is a genuine call-site URL and must still be flagged.
   static bool _isAlreadyExtractedToConstant(AstNode literal) {
-    for (AstNode? current = literal.parent;
-        current != null;
-        current = current.parent) {
+    for (
+      AstNode? current = literal.parent;
+      current != null;
+      current = current.parent
+    ) {
       if (current is VariableDeclarationList && current.isConst) return true;
       if (current is TypedLiteral && current.isConst) return true;
       if (current is InstanceCreationExpression && current.isConst) return true;

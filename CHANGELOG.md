@@ -64,7 +64,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.2.4]
 
 Fixes a false positive in the hardcoded-API-URL rule so it no longer flags endpoints you have already moved into a named configuration constant — the exact fix the rule asks for. [log](https://github.com/saropa/saropa_lints/blob/v14.2.4/CHANGELOG.md)
 
