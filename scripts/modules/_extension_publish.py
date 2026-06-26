@@ -362,18 +362,67 @@ def _prompt_for_vsce_pat() -> str:
     return token
 
 
+def _read_extension_publisher(project_dir: Path) -> str:
+    """Return the `publisher` id from extension/package.json (e.g. "saropa").
+
+    vsce authenticates per-publisher; the stored-credential check below needs
+    the exact publisher id, which is distinct from the package `name`.
+    """
+    pkg = _extension_dir(project_dir) / "package.json"
+    try:
+        data = json.loads(pkg.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return ""
+    publisher = data.get("publisher", "")
+    return publisher if isinstance(publisher, str) else ""
+
+
+def _has_stored_vsce_credential(publisher: str) -> bool:
+    """Return True if vsce already holds a valid login for *publisher*.
+
+    vsce authenticates from EITHER the VSCE_PAT env var OR a stored
+    `vsce login` credential (a PAT or a Microsoft Entra browser login — vsce 3.x
+    needs no PAT). `verify-pat` is read-only — it checks the stored
+    credential without publishing — so we can tell whether a publish will
+    succeed before attempting it. Without this fallback the script skipped
+    every Marketplace publish on a machine that authenticates via `vsce login`
+    (the sibling saropa_workspace publish script, which calls `vsce publish`
+    directly, succeeds that way), silently leaving the Marketplace a version
+    behind while Open VSX advanced.
+    """
+    if not publisher:
+        return False
+    # verify-pat queries the gallery; it does not package, so cwd is irrelevant.
+    r = run_command(
+        ["npx", "@vscode/vsce", "verify-pat", publisher],
+        Path.cwd(),
+        "Check stored VS Code Marketplace credential",
+        capture_output=True,
+        allow_failure=True,
+    )
+    return r.returncode == 0
+
+
 def publish_extension_to_marketplace(
     project_dir: Path, vsix_path: Path
 ) -> bool:
     """Publish .vsix to VS Code Marketplace via vsce. Returns True on success or skip."""
-    # vsce reads VSCE_PAT from the environment. Check it up front and prompt when
-    # missing, so the failure names the real cause instead of an opaque vsce error.
+    # vsce authenticates from the VSCE_PAT env var OR a stored `vsce login`
+    # credential. Prefer the env var, but when it is absent fall through to a
+    # stored credential rather than skipping — skipping on an empty env var
+    # (while vsce was logged in) is exactly what left the Marketplace behind.
     vsce_pat = os.environ.get("VSCE_PAT", "").strip()
     if not vsce_pat:
-        vsce_pat = _prompt_for_vsce_pat()
-        if not vsce_pat:
-            print_info("Skipping VS Code Marketplace publish.")
-            return True
+        publisher = _read_extension_publisher(project_dir)
+        if _has_stored_vsce_credential(publisher):
+            print_info(
+                f"VSCE_PAT not set; using the stored vsce login for '{publisher}'."
+            )
+        else:
+            vsce_pat = _prompt_for_vsce_pat()
+            if not vsce_pat:
+                print_info("Skipping VS Code Marketplace publish.")
+                return True
     ext_dir = _extension_dir(project_dir)
     r = run_command(
         [

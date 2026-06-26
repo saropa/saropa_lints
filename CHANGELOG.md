@@ -64,6 +64,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+<details><summary>Maintenance</summary>
+
+- Trimmed the VS Code extension package from 1200 files (17.7 MB) to the runtime set by excluding dev-only fixtures and outputs from `.vscodeignore`: UX test screenshots (`test-ux/`), the i18n translation-audit reports (`reports/`), and source maps (`**/*.map`). The bare `*.md` rule only matched the package root, so nested `reports/*.md` had been shipping; it is now `**/*.md` with the README and CHANGELOG re-included. Packaging only. No action required.
+- Fixed the publish script silently skipping the VS Code Marketplace when `VSCE_PAT` was unset, even though vsce held a valid stored `vsce login` credential. The Marketplace step now falls back to the stored credential (verified read-only with `vsce verify-pat`) instead of skipping, so a logged-in machine publishes to the Marketplace as well as Open VSX. Publish tooling only. No action required.
+
+</details>
+
+---
+
 ## [14.2.2]
 
 This release adds an Essential lint rule that catches a common Flutter layout crash: animating a widget's size directly inside a wrapping or flowing layout, which throws a render error on every frame once the animation starts. The rule points you to the safe alternatives so the problem is caught in the editor instead of on a device. [log](https://github.com/saropa/saropa_lints/blob/v14.2.2/CHANGELOG.md)

@@ -2,6 +2,15 @@
 src/**
 test/**
 out/**
+# Dev-only fixtures and outputs that bloated the .vsix to 1200 files / 17.7 MB:
+# test-ux ships ~10 MB of UX screenshots, and reports/ ships dozens of 1 MB+
+# i18n translation-audit .md files. Neither is loaded at runtime, and the audit
+# reports carry the same high-entropy translated strings that already tripped
+# Open VSX's secret scanner via scripts/ (below).
+test-ux/**
+reports/**
+# Bundled output ships as dist/extension.js; the matching source map is dev-only.
+**/*.map
 # Build-time tooling only (i18n MT pipeline + caches). Never loaded at runtime —
 # runtime locales live in src/i18n/locales and are bundled into out/ by esbuild.
 # Shipping scripts/ also leaked the MT cache (mt_strings.json), whose high-entropy
@@ -13,7 +22,10 @@ node_modules/**
 package-lock.json
 esbuild.js
 *.vsix
-*.md
+# Bare *.md only matches the package root; nested reports/*.md leaked into the
+# .vsix until reports/** (above) excluded them. Use **/*.md to drop docs at any
+# depth, then re-include the two top-level files the Marketplace listing needs.
+**/*.md
 !README.md
 !CHANGELOG.md
 !media/**
