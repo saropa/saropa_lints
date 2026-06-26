@@ -10,6 +10,27 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/project_vibrancy.dart';
 import 'package:test/test.dart';
 
+/// Deletes a test temp dir, tolerating the transient Windows file lock.
+///
+/// On Windows the analyzer keeps file handles open for a brief moment after a
+/// scan completes; an immediate `deleteSync` then fails with PathAccessException
+/// (OS errno 32, "being used by another process"). Retrying a few times with a
+/// short blocking pause lets those handles close. If the lock genuinely outlives
+/// the retries we swallow the error rather than fail an otherwise-passing test —
+/// the OS reaps `systemTemp` entries later, so a leaked dir is harmless.
+void _deleteTempDirWithRetry(Directory tempDir) {
+  if (!tempDir.existsSync()) return;
+  for (var attempt = 0; attempt < 5; attempt++) {
+    try {
+      tempDir.deleteSync(recursive: true);
+      return;
+    } on FileSystemException {
+      if (attempt == 4) return;
+      sleep(const Duration(milliseconds: 50));
+    }
+  }
+}
+
 /// Entry point: `group` blocks mirror MVP scenarios (happy path, filters, edge lcov).
 void main() {
   // Each scenario seeds a minimal pub package + synthetic lcov so grading stays deterministic.
@@ -41,9 +62,7 @@ end_of_record
     });
 
     tearDown(() {
-      if (tempDir.existsSync()) {
-        tempDir.deleteSync(recursive: true);
-      }
+      _deleteTempDirWithRetry(tempDir);
     });
 
     test('generates JSON report with function entries', () async {
@@ -293,7 +312,7 @@ int square(int n) => n * n;
     });
 
     tearDown(() {
-      if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+      _deleteTempDirWithRetry(tempDir);
     });
 
     test(
@@ -364,7 +383,7 @@ int bad() {
     });
 
     tearDown(() {
-      if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+      _deleteTempDirWithRetry(tempDir);
     });
 
     test(
