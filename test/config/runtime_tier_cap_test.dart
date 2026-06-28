@@ -79,4 +79,73 @@ plugins:
       expect(RuntimeTierCap.ruleAllowedByCap('avoid_debug_print'), isFalse);
     });
   });
+
+  // The in-process analyzer plugin must NOT run the full enabled rule set, or the
+  // analysis server retains the whole project's resolved model and grows to a
+  // multi-GB OOM hang. These tests pin the fix: the plugin path defaults to the
+  // essential cap when nothing is configured, an explicit tier still overrides
+  // that default, and the out-of-process scan path stays uncapped.
+  group('in-process plugin tier cap (memory fix)', () {
+    Directory makeProject(String? optionsYaml) {
+      final tmp = Directory.systemTemp.createTempSync('saropa_plugin_cap_');
+      addTearDown(() {
+        try {
+          tmp.deleteSync(recursive: true);
+        } on Object {
+          // Best-effort cleanup.
+        }
+      });
+      if (optionsYaml != null) {
+        File('${tmp.path}/analysis_options.yaml').writeAsStringSync(optionsYaml);
+      }
+      return tmp;
+    }
+
+    // reloadRuntimeTierCapForPlugin reads Platform.environment directly and has no
+    // env-override parameter, so an ambient SAROPA_TIER would mask the default it
+    // is meant to verify. Assert the precondition loudly rather than pass silently.
+    final ambientTier = Platform.environment['SAROPA_TIER']?.trim();
+    final ambientUnset = ambientTier == null || ambientTier.isEmpty;
+
+    test('plugin path defaults to essential when no tier is configured', () {
+      expect(
+        ambientUnset,
+        isTrue,
+        reason: 'unset SAROPA_TIER in the test environment to run this test',
+      );
+      final tmp = makeProject(null);
+
+      reloadRuntimeTierCapForPlugin(tmp.path);
+
+      expect(RuntimeTierCap.activeCap, RuleTier.essential);
+      expect(RuntimeTierCap.activeCapLabel, 'essential');
+      expect(RuntimeTierCap.ruleAllowedByCap(tiers.pedanticOnlyRules.first), isFalse);
+      expect(RuntimeTierCap.ruleAllowedByCap(tiers.essentialRules.first), isTrue);
+    });
+
+    test('explicit yaml tier overrides the plugin default', () {
+      expect(ambientUnset, isTrue, reason: 'unset SAROPA_TIER to run this test');
+      final tmp = makeProject('''
+plugins:
+  saropa_lints:
+    runtime_tier: comprehensive
+''');
+
+      reloadRuntimeTierCapForPlugin(tmp.path);
+
+      // The configured tier wins over the essential in-process default.
+      expect(RuntimeTierCap.activeCap, RuleTier.comprehensive);
+    });
+
+    test('scan path stays uncapped when no tier is configured', () {
+      final tmp = makeProject(null);
+
+      // Empty env override = deterministic; the scan path passes no default cap,
+      // so an unconfigured project runs full coverage out-of-process.
+      reloadRuntimeTierCapFromProject(tmp.path, {});
+
+      expect(RuntimeTierCap.activeCap, isNull);
+      expect(RuntimeTierCap.ruleAllowedByCap(tiers.pedanticOnlyRules.first), isTrue);
+    });
+  });
 }

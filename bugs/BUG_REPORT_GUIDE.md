@@ -56,7 +56,7 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 ## Raised Reports (2026-06-28)
 
-- `infra_native_plugin_analysis_server_memory_growth_10gb.md`
+- `infra_native_plugin_analysis_server_memory_growth_10gb.md` — Fixed in 14.3.0; archived to `plans/history/2026.06/2026.06.28/`.
 
 ---
 

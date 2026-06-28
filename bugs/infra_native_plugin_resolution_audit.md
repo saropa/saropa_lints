@@ -1,7 +1,8 @@
 # Resolution-call audit — native plugin (APPENDIX, demoted)
 
-Companion to `infra_native_plugin_analysis_server_memory_growth_10gb.md` — read
-that consolidated report first; it is the source of truth.
+Companion to the memory-growth bug, fixed in 14.3.0 and archived to
+`../plans/history/2026.06/2026.06.28/infra_native_plugin_analysis_server_memory_growth_10gb.md`
+— read that consolidated report first; it is the source of truth.
 Created: 2026-06-28.
 
 > **DEMOTED 2026-06-28.** Direct measurement this session showed resolution

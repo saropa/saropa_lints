@@ -1,9 +1,46 @@
 # BUG: saropa_lints native plugin — analysis server RSS grows to ~10 GB
 
-**Status: Open — confirmed, root cause narrowed, fix written but UNVERIFIED (could not be loaded into a live analyzer for testing).**
+**Status: Fixed — verified on the live contacts analyzer after the 14.3.0 publish.**
 
 Created: 2026-06-28
-Last updated: 2026-06-28 (consolidated; supersedes the separate measurements/hypotheses)
+Last updated: 2026-06-28 (FIXED — 14.3.0 in-editor essential cap confirmed loaded and RSS controlled)
+
+---
+
+## Resolution (verified)
+
+Shipped in **14.3.0**. The native plugin now defaults to the **essential** tier
+in-editor when no tier is configured (`reloadRuntimeTierCapForPlugin` →
+`RuntimeTierCap._reload(..., RuleTier.essential)`), plus a hard RSS valve
+(`MemoryPressureHandler.isOverHardLimit`) that short-circuits rule callbacks and
+evicts caches past the limit. Full coverage still runs out-of-process via
+`dart run saropa_lints scan`.
+
+**Why earlier in-place verification failed:** the analyzer caches a *compiled*
+plugin build keyed by source path. Source edits, version bumps, pub.dev→path
+switches, and clearing `.plugin_manager` all reused the stale build (a deeper
+incremental-compile kernel cache survives the directory clear). Only a
+brand-new published version in a fresh pub-cache location forces a clean rebuild
+— which is why this could not be confirmed until 14.3.0 was published and
+installed.
+
+**Verification (contacts analyzer, post-14.3.0 install + VS Code restart):**
+
+```
+plugin.log 2026-06-28T17:20:11Z:
+  Runtime tier cap: essential (from default in-process cap ...)
+  Runtime tier cap applied: enabled rule count 1135 → 281.
+  Config loaded from D:/src/contacts — enabledRules: 281
+```
+
+- Enabled rules in-editor dropped 1135 → 281 (essential band).
+- Post-restart `dart language-server` RSS settled at **1.79 GB** — inside the
+  plugin-OFF base range (1.6–2.3 GB), no longer climbing toward the 10 GB hang.
+- The pre-restart 6.7 GB orphan process was a leftover, killed manually.
+
+---
+
+### Original investigation (kept for history)
 Severity: Critical — saturates RAM, hangs the IDE / VS Code extension host. Makes large projects undevelopable with the plugin enabled.
 Plugin model: native `analysis_server_plugin` (in-process; NOT custom_lint).
 
@@ -151,3 +188,68 @@ here. This blocks both shipping AND in-dev verification of the fixes above.
 - Plugin model: native `analysis_server_plugin`.
 - Triggering projects: saropa_lints itself; Saropa Contacts (`D:\src\contacts`, ~3957 files).
 - OS: Windows 11 Pro (10.0.22631).
+
+---
+
+## Finish Report (2026-06-28)
+
+### Defect
+
+With the native `analysis_server_plugin` enabled, the Dart analysis server
+(`dart.exe language-server`) grew to multiple GB over an editing session and
+saturated RAM, hanging the editor on large projects. Because the plugin runs
+in-process, executing a rule requires the analysis server to hold the file's
+fully resolved element + AST model resident; running the full enabled rule set
+across a large project (e.g. Saropa Contacts at ~3957 files, 1135 enabled rules)
+kept the whole project's resolved model in the editor's own process. Base Dart
+analysis measured 1.6–2.3 GB; the plugin added 1.5–3.4 GB and climbed toward a
+~10 GB hang. The rule logic itself is cheap — the full set run out-of-process
+(syntactic `parseString`, no resolution) peaks at ~46 MB — so the cost is the
+in-process retention of resolved state, not the rules.
+
+### Fix (shipped in 14.3.0)
+
+Three changes bound the in-process footprint while preserving full coverage
+out-of-process:
+
+1. **In-editor tier default.** A new `reloadRuntimeTierCapForPlugin(projectRoot)`
+   wraps `RuntimeTierCap._reload(..., RuleTier.essential)`; the config loader
+   calls it on the plugin path. When a project has configured no explicit tier
+   (no `SAROPA_TIER`, no `saropa_tier`/`runtime_tier` in
+   `analysis_options*.yaml`), the in-process plugin caps to the essential set
+   instead of resolving and running every enabled rule. An explicit tier always
+   overrides the default. The out-of-process scan path
+   (`reloadRuntimeTierCapFromProject`, no default cap) stays uncapped, so
+   `dart run saropa_lints scan` still runs full coverage.
+2. **RSS safety valve.** `MemoryPressureHandler.isOverHardLimit` (in
+   `project_context_throttle_memory.dart`) reads real RSS via
+   `ProcessInfo.currentRss`, self-throttled every 200 files with a 512 MB
+   recovery hysteresis and a default 6144 MB limit
+   (`SAROPA_LINTS_MAX_RSS_MB` override). Rule callbacks short-circuit while over
+   the limit, so the plugin stops adding work before the server saturates.
+3. **Cache eviction wired up.** The previously inert cache-management path is
+   now started from `Plugin.start()`, registering evictable caches (e.g. the
+   import-graph tracker) with priorities so pressure events reclaim them.
+
+### Verification
+
+Unit tests: `test/config/runtime_tier_cap_test.dart` extended with three cases
+pinning the fix (plugin path defaults to essential when unconfigured; explicit
+yaml tier overrides the default; scan path stays uncapped). All 8 tests pass.
+
+Live: in-editor verification was impossible until publish because the analyzer
+caches a compiled plugin build keyed by source path — source edits, version
+bumps, pub.dev→path switches, and clearing `.plugin_manager` all reused a stale
+build (a deeper incremental-compile kernel cache survives the directory clear).
+After publishing 14.3.0 and installing it into Saropa Contacts, the contacts
+analyzer log at `2026-06-28T17:20:11Z` showed
+`Runtime tier cap: essential (from default in-process cap ...)` and
+`enabled rule count 1135 → 281`, and the post-restart language-server RSS
+settled at 1.79 GB — inside the plugin-OFF base range, no longer climbing.
+
+### Companion / follow-up
+
+`infra_native_plugin_resolution_audit.md` remains an open CPU/code-hygiene
+work-list (per-site `.element`/`.staticType` narrowing). It was demoted this
+investigation: resolution reduction is not the memory lever, so it does not
+block this bug and is tracked separately.

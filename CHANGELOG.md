@@ -64,6 +64,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+---
+
 ## [14.3.0]
 
 Stops the analyzer plugin from driving the Dart analysis server to a multi-GB out-of-memory hang on large projects. Because the plugin runs inside the analysis server, running rules there forces the editor to hold the project's resolved model in memory. A real-memory safety valve now pauses rule execution before the server saturates RAM, previously-inert cache eviction bounds the plugin's own footprint, and a project that has enabled no rules at all defaults to the essential set in-editor. Rules you have explicitly enabled always run as configured. [log](https://github.com/saropa/saropa_lints/blob/v14.3.0/CHANGELOG.md)
