@@ -54,6 +54,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 - `avoid_hardcoded_api_urls_false_positive_url_already_extracted_to_config_constant.md`
 
+## Raised Reports (2026-06-28)
+
+- `infra_native_plugin_analysis_server_memory_growth_10gb.md`
+
 ---
 
 ## File Naming

@@ -498,6 +498,14 @@ class ProgressTracker {
 
     if (wasNew) {
       _handleNewFile(path, now);
+      // Drive memory-pressure auto-relief once per newly-seen file. Wired at
+      // the genuine new-file boundary (guarded by `wasNew`) rather than in the
+      // per-rule skip check, which fires rules×files times and would massively
+      // over-count the file counter. No-op until Plugin.start() arms
+      // auto-relief via initializeCacheManagement(); when armed, this triggers
+      // a cache-size check every N files and sheds low-priority plugin caches
+      // if the estimate crosses the threshold.
+      MemoryPressureHandler.recordFileProcessed();
     }
 
     final fileCount = _seenFiles.length;

@@ -47,7 +47,22 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 /// launched from). For that path, see [loadNativePluginConfigFromProjectRoot],
 /// triggered lazily from `SaropaContext` once the real project root can be
 /// derived from an analyzed file path.
+/// True once the in-process analyzer plugin has started (i.e. the no-arg
+/// [loadNativePluginConfig] ran from `Plugin.start`). Gates the in-process
+/// essential default cap: only the real analysis-server plugin reduces its
+/// own footprint by defaulting to essential. Tests and the `dart run
+/// saropa_lints scan` CLI reach [_loadFromRoot] via
+/// [loadNativePluginConfigFromProjectRoot] (or the lazy `SaropaContext`
+/// reload) WITHOUT starting the plugin, so they must run full coverage — an
+/// essential default there silently gated every non-essential rule and broke
+/// the rule test harness. Left false in those paths.
+bool _nativePluginStarted = false;
+
 void loadNativePluginConfig() {
+  // Marks the in-process plugin path. Only set here because Plugin.start() is
+  // the sole no-arg caller (plus the composite-plugin scaffold, which is also
+  // a real plugin entry); tests/CLI never call this variant.
+  _nativePluginStarted = true;
   _loadFromRoot(null);
 }
 
@@ -88,7 +103,31 @@ void _loadFromRoot(String? projectRoot) {
     _loadOutputConfig(content);
     _loadDiagnosticStatisticsConfig(content, projectRoot);
 
-    reloadRuntimeTierCapFromProject(projectRoot);
+    // Tier cap. The in-process essential DEFAULT applies only when BOTH:
+    //
+    //  1. The real analysis-server plugin started ([_nativePluginStarted]).
+    //     Tests and the scan CLI reach here without starting the plugin and
+    //     must run full coverage — an essential default in those paths silently
+    //     gated every non-essential rule (broke the resolved-rule test harness,
+    //     since it triggers this lazy reload from `example/`).
+    //
+    //  2. The consumer enabled NO rules explicitly (diagnostics `true` +
+    //     severity-implied + rule packs all empty). When the consumer opted
+    //     rules in, honor them EXACTLY — the memory default must never silently
+    //     strip an enabled rule (e.g. `diagnostics: avoid_debug_print: true`
+    //     above essential). Only an explicit SAROPA_TIER / yaml tier caps an
+    //     explicitly-enabled set. (User decision 2026-06-28: respect explicit
+    //     enables — the RSS safety valve, not rule-count capping, is the real
+    //     analysis-server protection.)
+    //
+    // Otherwise use the plain reload, which caps only when an explicit tier is
+    // configured and never defaults.
+    final hasExplicitEnables = SaropaLintRule.enabledRules?.isNotEmpty ?? false;
+    if (_nativePluginStarted && !hasExplicitEnables) {
+      reloadRuntimeTierCapForPlugin(projectRoot);
+    } else {
+      reloadRuntimeTierCapFromProject(projectRoot);
+    }
     RuntimeTierCap.applyCapToEnabledRuleSet();
 
     // Success telemetry — visible in reports/.saropa_lints/plugin.log once

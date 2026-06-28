@@ -1012,6 +1012,96 @@ class MemoryPressureHandler {
   static int _relieveCount = 0;
   static DateTime? _lastRelieve;
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // Hard RSS safety valve
+  // ─────────────────────────────────────────────────────────────────────────
+  // The soft auto-relief above estimates memory from the plugin's OWN cache
+  // sizes — it has no visibility into the analyzer's resolved element/AST model,
+  // which is where the bulk of analysis-server memory lives on large projects.
+  // This valve reads the REAL process RSS (ProcessInfo.currentRss) and, when it
+  // crosses a hard cap, trips a flag that makes every rule callback a no-op
+  // (see SaropaContext._wrapCallback). Rule callbacks are the plugin's only
+  // ongoing work and the trigger for lazy cross-library element resolution
+  // (allSupertypes / .library reaches), so halting them caps the plugin's
+  // contribution and stops the server being driven to an OOM/hang. Recovers
+  // automatically once RSS falls back below the cap (hysteresis).
+
+  /// Hard cap on analysis-server process RSS, in MB. 0 disables the valve.
+  ///
+  /// Defaults to 0 (DISABLED) so the valve is inert in every process that
+  /// merely loads this library — the scan CLI and, critically, the `dart test`
+  /// suite, whose process RSS legitimately exceeds any per-project cap while
+  /// resolving thousands of fixtures concurrently. An armed-by-default valve
+  /// tripped there and silenced every rule callback (see
+  /// SaropaContext._wrapCallback), making all "rule fires" tests fail. The
+  /// valve is the in-process plugin's protection only, so it is armed solely by
+  /// [initializeCacheManagement] (called from `Plugin.start()`), which sets the
+  /// real cap — 6144 MB by default, overridable via `SAROPA_LINTS_MAX_RSS_MB`.
+  static int _hardLimitMb = 0;
+
+  /// True once RSS has crossed [_hardLimitMb]; cleared when it drops below the
+  /// recovery watermark. Read by [isOverHardLimit].
+  static bool _hardLimitTripped = false;
+
+  /// Gate-call counter — [isOverHardLimit] is read per rule-node (very hot), so
+  /// the real RSS syscall is throttled to once per [_rssСheckInterval] calls.
+  static int _callsSinceRssCheck = 0;
+  static const int _rssCheckInterval = 200;
+
+  /// Hysteresis band below the cap before the valve re-opens, in MB. Prevents
+  /// flapping when RSS hovers at the threshold.
+  static const int _rssRecoveryMarginMb = 512;
+
+  /// Set the hard RSS cap (MB). 0 or negative disables the valve.
+  static void setHardRssLimitMb(int mb) {
+    _hardLimitMb = mb;
+  }
+
+  /// Whether the process RSS is currently over the hard cap, meaning rule
+  /// execution should pause. Self-samples the real RSS on a throttle so callers
+  /// can invoke it on the hot per-node path without a syscall every time.
+  static bool get isOverHardLimit {
+    if (_hardLimitMb <= 0) return false;
+    if (_callsSinceRssCheck++ >= _rssCheckInterval) {
+      _callsSinceRssCheck = 0;
+      _refreshHardLimit();
+    }
+    return _hardLimitTripped;
+  }
+
+  /// Read the real process RSS and update [_hardLimitTripped] with hysteresis.
+  static void _refreshHardLimit() {
+    final rss = _currentRssMb();
+    if (rss <= 0) return; // RSS unavailable on this platform — leave flag as-is
+    if (!_hardLimitTripped && rss >= _hardLimitMb) {
+      _hardLimitTripped = true;
+      // Shed the plugin's own caches immediately to give back what we can.
+      relieve(clearAll: true);
+      stderr.writeln(
+        '[saropa_lints] Memory guard tripped: RSS ${rss}MB >= ${_hardLimitMb}MB '
+        'cap. Pausing rule execution to protect the analysis server. Set '
+        'SAROPA_LINTS_MAX_RSS_MB to adjust the cap (0 disables it).',
+      );
+    } else if (_hardLimitTripped && rss < _hardLimitMb - _rssRecoveryMarginMb) {
+      _hardLimitTripped = false;
+      stderr.writeln(
+        '[saropa_lints] Memory guard released: RSS ${rss}MB. '
+        'Resuming rule execution.',
+      );
+    }
+  }
+
+  /// Current process resident-set size in MB, or -1 if unavailable.
+  static int _currentRssMb() {
+    try {
+      return ProcessInfo.currentRss ~/ (1 << 20);
+    } on Object {
+      // ProcessInfo.currentRss can throw on platforms without RSS support;
+      // returning -1 makes the valve inert rather than crashing the plugin.
+      return -1;
+    }
+  }
+
   /// Register a cache to be cleared under memory pressure.
   ///
   /// [priority] - Lower values are cleared first (0-100).
@@ -1172,6 +1262,7 @@ void initializeCacheManagement({
   int maxSymbolCache = 1000,
   int maxCompilationUnitCache = 1000,
   int memoryThresholdMb = 512,
+  int hardRssLimitMb = 6144,
 }) {
   // Register caches with priorities (lower = clear first when under pressure)
   // Content caches are expensive to rebuild, so clear last
@@ -1231,4 +1322,14 @@ void initializeCacheManagement({
     thresholdMb: memoryThresholdMb,
     checkIntervalFiles: 50,
   );
+
+  // Arm the hard RSS safety valve. This is the real protection against the
+  // analysis server growing to ~10 GB on very large projects: when actual
+  // process RSS crosses the cap, rule execution pauses. The soft relief above
+  // only sees the plugin's own caches; this reads the true process size. The
+  // env override lets a consumer tune the cap (or disable it with 0) without a
+  // plugin release.
+  final envCap = Platform.environment['SAROPA_LINTS_MAX_RSS_MB'];
+  final parsedCap = envCap == null ? null : int.tryParse(envCap.trim());
+  MemoryPressureHandler.setHardRssLimitMb(parsedCap ?? hardRssLimitMb);
 }

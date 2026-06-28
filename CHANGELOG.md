@@ -64,6 +64,21 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [14.3.0]
+
+Stops the analyzer plugin from driving the Dart analysis server to a multi-GB out-of-memory hang on large projects. Because the plugin runs inside the analysis server, running rules there forces the editor to hold the project's resolved model in memory. A real-memory safety valve now pauses rule execution before the server saturates RAM, previously-inert cache eviction bounds the plugin's own footprint, and a project that has enabled no rules at all defaults to the essential set in-editor. Rules you have explicitly enabled always run as configured. [log](https://github.com/saropa/saropa_lints/blob/v14.3.0/CHANGELOG.md)
+
+### Changed
+
+- The in-editor analyzer plugin defaults to the **essential** rule set only when a project has configured no rules at all, so an unconfigured editor session stays light. Rules you explicitly enable (via `dart run saropa_lints:init`, a `diagnostics:` entry, or a severity override) always run in-editor exactly as configured — the memory default never silently drops an opted-in rule. An explicit `SAROPA_TIER` (or `saropa_tier` / `runtime_tier`) still caps as before; full coverage runs anytime out-of-process with `dart run saropa_lints scan`.
+
+### Fixed
+
+- The plugin now pauses rule execution when the analysis-server process crosses a memory cap and resumes when it recovers, a backstop against the server saturating RAM and hanging the editor. Set `SAROPA_LINTS_MAX_RSS_MB` to tune the cap (0 disables it).
+- The native plugin now bounds and evicts its internal caches under memory pressure instead of retaining them for the entire analysis-server session. No action required.
+
+---
+
 ## [14.2.4]
 
 Fixes a false positive in the hardcoded-API-URL rule so it no longer flags endpoints you have already moved into a named configuration constant — the exact fix the rule asks for. [log](https://github.com/saropa/saropa_lints/blob/v14.2.4/CHANGELOG.md)

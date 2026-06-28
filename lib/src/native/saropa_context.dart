@@ -22,7 +22,8 @@ import 'package:analyzer/source/line_info.dart';
 
 import '../config/runtime_tier_cap.dart';
 import '../init/project_info.dart' show getPackageVersion;
-import '../project_context.dart' show FileTypeDetector, ProjectContext;
+import '../project_context.dart'
+    show FileTypeDetector, MemoryPressureHandler, ProjectContext;
 import '../report/analysis_reporter.dart' show AnalysisReporter, ReportConfig;
 import '../report/import_graph_tracker.dart' show ImportGraphTracker;
 import '../analyzer_compat.dart';
@@ -231,6 +232,17 @@ class SaropaContext {
   void Function(T) _wrapCallback<T extends AstNode>(void Function(T) callback) {
     if (_saropaRule == null) return callback;
     return (T node) {
+      // Hard memory safety valve (checked first, before any other work). If the
+      // analysis-server process RSS has crossed the configured cap, stop running
+      // rules entirely — every callback becomes a no-op. Rule callbacks are the
+      // plugin's only ongoing work and the trigger for lazy cross-library
+      // element resolution, so halting them caps the plugin's contribution to
+      // process memory and prevents the server being driven to an OOM/hang on
+      // very large projects. The check self-throttles the RSS syscall, so it is
+      // cheap on this hot per-node path, and recovers automatically when RSS
+      // drops back below the cap. Configure via SAROPA_LINTS_MAX_RSS_MB.
+      if (MemoryPressureHandler.isOverHardLimit) return;
+
       _ensureConfigLoadedFromProjectRoot();
       final rule = _saropaRule;
       if (!RuntimeTierCap.ruleAllowedByCap(rule.code.lowerCaseName)) {

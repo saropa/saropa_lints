@@ -133,6 +133,23 @@ void reloadRuntimeTierCapFromProject(
   RuntimeTierCap._reload(projectRoot, environmentOverride);
 }
 
+/// Plugin-path reload: identical to [reloadRuntimeTierCapFromProject] but, when
+/// the consumer has set **no** explicit tier (env or yaml), defaults the cap to
+/// [RuleTier.essential].
+///
+/// Why this exists: saropa_lints is a native, in-process analyzer plugin. To
+/// run a rule the analysis server must hold the file's fully resolved element +
+/// AST model resident, so running the full enabled rule set across a large
+/// project keeps the whole project's resolved model in the editor's own
+/// process — the cause of the multi-GB analysis-server growth. Capping the
+/// IN-PROCESS plugin to essential keeps the editor light; full coverage is run
+/// out-of-process via `dart run saropa_lints scan` (which uses the plain reload
+/// above, so it is never capped by this default). An explicit `SAROPA_TIER` /
+/// yaml tier always overrides the default.
+void reloadRuntimeTierCapForPlugin(String? projectRoot) {
+  RuntimeTierCap._reload(projectRoot, null, RuleTier.essential);
+}
+
 /// Mutable runtime tier cap state and rule checks.
 abstract final class RuntimeTierCap {
   static RuleTier? _cap;
@@ -147,6 +164,7 @@ abstract final class RuntimeTierCap {
   static void _reload(
     String? projectRoot, [
     Map<String, String>? environmentOverride,
+    RuleTier? defaultCapWhenUnset,
   ]) {
     _cap = null;
     _capLabel = null;
@@ -204,7 +222,17 @@ abstract final class RuntimeTierCap {
       }
     }
 
-    if (resolved == null) return;
+    // No explicit tier configured. The in-process plugin passes
+    // [defaultCapWhenUnset] = essential so the analysis server does not resolve
+    // and run the full enabled rule set across the whole project (the cause of
+    // multi-GB growth); the scan CLI passes null and stays at full coverage.
+    if (resolved == null) {
+      if (defaultCapWhenUnset == null) return;
+      resolved = defaultCapWhenUnset;
+      source =
+          'default in-process cap (set SAROPA_TIER to raise it; '
+          'full coverage runs via `dart run saropa_lints scan`)';
+    }
 
     final tier = resolved;
     _cap = tier;

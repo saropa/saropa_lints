@@ -19,6 +19,7 @@ import 'package:analysis_server_plugin/registry.dart';
 
 import 'saropa_lints.dart';
 import 'src/native/plugin_logger.dart' show PluginLogger;
+import 'src/report/import_graph_tracker.dart' show ImportGraphTracker;
 
 // ---------------------------------------------------------------------------
 // Plugin discovery: analysis server loads this file and reads [plugin].
@@ -57,6 +58,43 @@ class SaropaLintsPlugin extends Plugin {
         stackTrace: st,
       );
       // Defensive: plugin still registers with defaults
+    }
+
+    // Arm the memory-relief subsystem. Before this call,
+    // initializeCacheManagement() was defined but never invoked anywhere, so
+    // MemoryPressureHandler stayed disabled: none of the plugin's own caches
+    // (compilation-unit, file-content, metrics, source-location, semantic
+    // tokens, import-graph, string interner, …) were ever registered for
+    // eviction, and auto-relief never armed. They therefore grew for the
+    // entire analysis-server process lifetime. Wiring it here bounds the
+    // plugin's OWN footprint and sheds it under pressure.
+    //
+    // Scope honesty: this caps the plugin's caches only (sub-GB on a large
+    // project). It does NOT bound the analyzer's resolved element/AST model,
+    // which is the dominant cost when many element-resolving rules run over a
+    // large codebase under strict modes — that is reduced by doing less
+    // resolution, not by cache relief.
+    try {
+      initializeCacheManagement();
+      // initializeCacheManagement registers the project_context caches but not
+      // the report-layer ImportGraphTracker, which holds a per-file set of
+      // import/export URIs for every analyzed file and is never evicted across
+      // the server lifetime. Register it for pressure relief at clear-late
+      // priority (rebuilding the graph requires re-walking files, so shed it
+      // only after cheaper caches). Non-destructive in normal operation — it
+      // is cleared only when the memory estimate crosses the threshold, and
+      // repopulates as files are re-analyzed.
+      MemoryPressureHandler.registerCache(
+        'importGraphTracker',
+        ImportGraphTracker.reset,
+        priority: 85,
+      );
+    } on Object catch (e, st) {
+      PluginLogger.log(
+        'initializeCacheManagement failed in Plugin.start()',
+        error: e,
+        stackTrace: st,
+      );
     }
   }
 
