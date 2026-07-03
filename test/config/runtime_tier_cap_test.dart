@@ -96,7 +96,9 @@ plugins:
         }
       });
       if (optionsYaml != null) {
-        File('${tmp.path}/analysis_options.yaml').writeAsStringSync(optionsYaml);
+        File(
+          '${tmp.path}/analysis_options.yaml',
+        ).writeAsStringSync(optionsYaml);
       }
       return tmp;
     }
@@ -119,12 +121,22 @@ plugins:
 
       expect(RuntimeTierCap.activeCap, RuleTier.essential);
       expect(RuntimeTierCap.activeCapLabel, 'essential');
-      expect(RuntimeTierCap.ruleAllowedByCap(tiers.pedanticOnlyRules.first), isFalse);
-      expect(RuntimeTierCap.ruleAllowedByCap(tiers.essentialRules.first), isTrue);
+      expect(
+        RuntimeTierCap.ruleAllowedByCap(tiers.pedanticOnlyRules.first),
+        isFalse,
+      );
+      expect(
+        RuntimeTierCap.ruleAllowedByCap(tiers.essentialRules.first),
+        isTrue,
+      );
     });
 
     test('explicit yaml tier overrides the plugin default', () {
-      expect(ambientUnset, isTrue, reason: 'unset SAROPA_TIER to run this test');
+      expect(
+        ambientUnset,
+        isTrue,
+        reason: 'unset SAROPA_TIER to run this test',
+      );
       final tmp = makeProject('''
 plugins:
   saropa_lints:
@@ -145,7 +157,10 @@ plugins:
       reloadRuntimeTierCapFromProject(tmp.path, {});
 
       expect(RuntimeTierCap.activeCap, isNull);
-      expect(RuntimeTierCap.ruleAllowedByCap(tiers.pedanticOnlyRules.first), isTrue);
+      expect(
+        RuntimeTierCap.ruleAllowedByCap(tiers.pedanticOnlyRules.first),
+        isTrue,
+      );
     });
   });
 }

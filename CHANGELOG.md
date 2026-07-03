@@ -64,7 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.3.1]
+
+Fix for raised issue: https://github.com/saropa/saropa_lints/issues/269  [log](https://github.com/saropa/saropa_lints/blob/v14.3.1/CHANGELOG.md)
 
 ### Fixed
 
