@@ -66,6 +66,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Fixed
+
+- The baseline generator (`dart run saropa_lints:baseline`) parsed `dart analyze` output with the wrong format matcher and so reported **every** project as clean, generating an empty baseline. It now reads the analyzer's diagnostic format correctly and captures real violations. Re-run the command to regenerate an accurate baseline.
+- The baseline generator no longer reports a false "clean codebase" success and exits 0 when the underlying analysis fails to run — for example when an analyzer plugin crashes and produces no output. It now detects the failed analysis, prints the error, and exits non-zero so CI cannot mistake a crash for a clean pass. No action required.
+
 ---
 
 ## [14.3.0]

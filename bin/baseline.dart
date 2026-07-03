@@ -24,6 +24,7 @@ library;
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:saropa_lints/src/baseline/analysis_failure.dart';
 import 'package:saropa_lints/src/baseline/baseline_file.dart';
 import 'package:saropa_lints/src/violation_parser.dart';
 
@@ -93,16 +94,59 @@ Future<void> main(List<String> args) async {
   final output = result.stdout.toString();
   final stderr = result.stderr.toString();
 
-  // Check for errors (but ignore "Analyzing" messages)
-  if (result.exitCode != 0 && !stderr.contains('Analyzing')) {
-    if (stderr.isNotEmpty) {
-      print('Warning: dart analyze returned errors:');
-      print(stderr);
+  // Parse violations. This command runs `dart analyze`, whose diagnostics use
+  // the hyphen-delimited human format ("info - file:line:col - msg - code"), so
+  // it must use the matching parser. The bullet-delimited parseViolations() is
+  // for custom_lint / scan CLI output ("file:line:col • msg • code •") and
+  // silently returns zero rows on dart analyze output — which previously made
+  // this tool report every real project as clean (issue #269).
+  final violations = parseDartAnalyzeHumanOutput(output);
+
+  // Guard against a false "clean codebase" verdict when the analyzer never
+  // actually completed. A crashed analysis server (e.g. a plugin that fails
+  // to AOT-compile, exit code 255) emits no parseable violation lines, so an
+  // empty result set is ambiguous: it means EITHER "genuinely zero
+  // violations" OR "analysis aborted before it could report anything".
+  // Treating the crash case as clean would silently ship an empty baseline
+  // over an unchecked codebase. Distinguish them by the process exit state:
+  // a clean run exits 0; a run with real violations parses at least one line.
+  // Anything else (non-zero exit with nothing parsed, or a known fatal
+  // analyzer signature) is an execution failure we must surface, not swallow.
+  final failure = detectAnalysisFailure(
+    exitCode: result.exitCode,
+    parsedViolationCount: violations.length,
+    stdout: output,
+    stderr: stderr,
+  );
+
+  if (failure != null) {
+    _printError('ERROR: Lint analysis did not complete successfully.');
+    _printError(failure);
+    if (stderr.trim().isNotEmpty) {
+      _printError('');
+      _printError('dart analyze stderr:');
+      _printError(stderr.trimRight());
     }
+    _printError('');
+    _printError(
+      'No baseline was generated. Resolve the analysis failure above and '
+      're-run this command.',
+    );
+    // Non-zero exit so CI and scripts treat this as a hard failure instead of
+    // a clean pass.
+    exitCode = 1;
+
+    return;
   }
 
-  // Parse violations
-  final violations = parseViolations(output);
+  // Surface non-fatal analyzer stderr (progress noise aside) for visibility,
+  // but only after we have confirmed analysis actually completed.
+  if (result.exitCode != 0 &&
+      stderr.trim().isNotEmpty &&
+      !stderr.contains('Analyzing')) {
+    print('Warning: dart analyze returned errors:');
+    print(stderr);
+  }
 
   if (violations.isEmpty) {
     print('No violations found!');
@@ -213,6 +257,12 @@ Future<void> main(List<String> args) async {
   print('');
   print('As you fix violations, run `dart run saropa_lints:baseline --update`');
   print('to remove fixed items from the baseline.');
+}
+
+/// Writes an error line to stderr. A local variable named `stderr` shadows the
+/// `dart:io` top-level stream in `main`, so error output is funneled here.
+void _printError(String message) {
+  stderr.writeln(message);
 }
 
 /// Update analysis_options.yaml to include baseline configuration.
