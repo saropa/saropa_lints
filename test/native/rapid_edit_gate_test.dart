@@ -39,15 +39,18 @@ void main() {
       expect(SaropaLintRule.deferForRapidEdit(path, 3), isTrue);
     });
 
-    test('inert in batch/CLI runs (isAnalysisServer false) — full fidelity', () {
-      SaropaLintRule.isAnalysisServer = false;
-      final path = uniquePath('batch_');
+    test(
+      'inert in batch/CLI runs (isAnalysisServer false) — full fidelity',
+      () {
+        SaropaLintRule.isAnalysisServer = false;
+        final path = uniquePath('batch_');
 
-      // Even far past the threshold, batch runs never defer a rule.
-      for (var pass = 0; pass < 10; pass++) {
-        expect(SaropaLintRule.deferForRapidEdit(path, pass), isFalse);
-      }
-    });
+        // Even far past the threshold, batch runs never defer a rule.
+        for (var pass = 0; pass < 10; pass++) {
+          expect(SaropaLintRule.deferForRapidEdit(path, pass), isFalse);
+        }
+      },
+    );
 
     test('empty path never defers (no resolvable file)', () {
       expect(SaropaLintRule.deferForRapidEdit('', 1), isFalse);
