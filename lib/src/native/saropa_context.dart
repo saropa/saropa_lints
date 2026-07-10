@@ -55,6 +55,15 @@ class SaropaContext {
   /// [SaropaLintRule] (e.g. the PoC rules used [SaropaAnalysisRule]).
   final SaropaLintRule? _saropaRule;
 
+  /// Memoized rapid-edit deferral decision for the current analysis pass, keyed
+  /// on the pass's resolved-unit identity. The per-node hot path fires thousands
+  /// of times per pass; caching the decision here means the shared rapid-edit
+  /// gate is consulted (and a timestamp recorded) only once per file per pass.
+  /// The `identityHashCode(node.root)` compare still runs per node, but only
+  /// inside the interactive server — the whole block is skipped in batch runs.
+  int? _rapidPassUnitId;
+  bool _rapidPassDefer = false;
+
   // Keep timing overhead opt-in: only measure callback execution when
   // profiling or report generation was explicitly enabled by the user.
   // Explicit defaults silence avoid_string_env_parsing: when neither
@@ -249,6 +258,24 @@ class SaropaContext {
         return;
       }
       if (_shouldSkipCurrentFile()) return;
+
+      // In-flux relief: while the interactive server rapidly re-analyzes a file
+      // being edited, defer ALL saropa_lints rules until edits settle. Running
+      // any rule on code still in flux just pins CPU recomputing diagnostics the
+      // next keystroke discards; the Dart analyzer still reports compile errors
+      // live regardless. Guarded by isAnalysisServer so batch/CLI runs never even
+      // pay the per-node root walk below — they must report every rule at full
+      // fidelity. Decision is memoized per pass (keyed on resolved-unit identity)
+      // so the gate is consulted once per file per pass, not per node. See
+      // SaropaLintRule.deferForRapidEdit.
+      if (SaropaLintRule.isAnalysisServer) {
+        final unitId = identityHashCode(node.root);
+        if (unitId != _rapidPassUnitId) {
+          _rapidPassUnitId = unitId;
+          _rapidPassDefer = SaropaLintRule.deferForRapidEdit(filePath, unitId);
+        }
+        if (_rapidPassDefer) return;
+      }
 
       // Guard: analyzer v9 with useDeclaringConstructorsAst disabled throws
       // UnsupportedError when rules access newer AST properties (.body,

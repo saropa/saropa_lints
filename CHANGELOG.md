@@ -64,6 +64,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [14.3.2]
+
+Cuts sustained editor CPU while you type. The analyzer plugin runs inside the Dart analysis server, which re-analyzes a file on nearly every keystroke; until now each pass re-ran the entire configured tier over code that was still in flux. During rapid editing the plugin now defers all of its rules until editing settles — the Dart analyzer still reports compile errors live. Full-fidelity batch analysis is unchanged. [log](https://github.com/saropa/saropa_lints/blob/v14.3.2/CHANGELOG.md)
+
+### Fixed
+
+- While a file is being rapidly edited in the editor, the analyzer plugin now defers all of its rules until editing settles, instead of re-running the configured tier on every keystroke-triggered pass over code still in flux — cutting sustained CPU during active development. Batch and CLI analysis (`dart run saropa_lints scan`, `dart analyze`) still run every rule at full fidelity, and the Dart analyzer keeps reporting compile errors live while you type. No action required; saropa_lints diagnostics reappear once editing pauses.
+
+---
+
 ## [14.3.1]
 
 Fix for raised issue: https://github.com/saropa/saropa_lints/issues/269  [log](https://github.com/saropa/saropa_lints/blob/v14.3.1/CHANGELOG.md)

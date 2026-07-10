@@ -26,7 +26,6 @@ import 'report/import_graph_tracker.dart';
 import 'owasp/owasp.dart';
 import 'project_context.dart';
 import 'rule_metadata.dart';
-import 'tiers.dart' show essentialRules;
 export 'package:analyzer/error/error.dart' show DiagnosticSeverity, LintCode;
 export 'analyzer_compat.dart';
 export 'rule_metadata.dart' show AccuracyTarget, RuleStatus, RuleType;
@@ -2885,15 +2884,39 @@ abstract class SaropaLintRule extends AnalysisRule {
     return false;
   }
 
+  /// True only inside the interactive analysis-server process. Armed once by
+  /// [SaropaLintsPlugin.start] (`lib/main.dart`), which no `bin/` CLI runs.
+  ///
+  /// Gates the rapid-edit relief below: batch runners (scan / baseline / health
+  /// CLIs and `dart analyze`) route through the SAME per-node hot path
+  /// (`SaropaContext._wrapCallback`, via `scan_runner`), and they walk each file
+  /// once and MUST report every rule at full fidelity. Leaving this `false`
+  /// outside the server keeps the gate inert there, so it can never drop a
+  /// non-essential diagnostic from a batch run. (The 3-analyses-in-2s threshold
+  /// is a second, independent safeguard — a one-shot walk never meets it.)
+  static bool isAnalysisServer = false;
+
   // Track edit frequency per file for adaptive tier switching
   // Maps file path to list of recent analysis timestamps
   static final Map<String, List<DateTime>> _fileEditHistory = {};
   static const Duration _rapidEditWindow = Duration(seconds: 2);
   static const int _rapidEditThreshold = 3;
 
+  /// Last resolved-unit identity seen per file, so an analysis pass is recorded
+  /// exactly once even though the per-node hot path consults the gate thousands
+  /// of times per pass. Keyed by path; value is `identityHashCode(unit root)`.
+  static final Map<String, int> _lastPassUnitId = {};
+
+  /// Cached rapid-edit decision for the current pass of each file, so rules
+  /// after the first in a pass read the memoized result instead of re-recording
+  /// a timestamp (which would instantly and permanently trip rapid mode).
+  static final Map<String, bool> _fileRapidMode = {};
+
   /// Check if a file is being rapidly edited (3+ analyses in 2 seconds).
   ///
   /// During rapid editing, only essential-tier rules run for faster feedback.
+  /// Appends one timestamp per call, so callers MUST invoke it once per analysis
+  /// pass (see [_rapidModeForPass]), never per AST node.
   static bool _isRapidEditMode(String path) {
     final now = DateTime.now();
     final history = _fileEditHistory[path];
@@ -2919,17 +2942,53 @@ abstract class SaropaLintRule extends AnalysisRule {
         final lastTime = times.elementAt(times.length - 1);
         return lastTime.isBefore(oldCutoff);
       });
+      // Keep the pass-tracking maps aligned with the edit-history keyset so they
+      // are pruned together and never outgrow it.
+      _lastPassUnitId.removeWhere((k, _) => !_fileEditHistory.containsKey(k));
+      _fileRapidMode.removeWhere((k, _) => !_fileEditHistory.containsKey(k));
     }
 
     // Rapid mode if 3+ edits in the window
     return history.length >= _rapidEditThreshold;
   }
 
-  /// Check if this rule belongs to the essential tier.
+  /// Records one analysis pass for [path] when a new resolved unit ([unitId])
+  /// is seen, and returns whether the file is currently being rapidly edited.
   ///
-  /// Essential-tier rules run even during rapid editing.
-  bool _isEssentialTierRule() {
-    return essentialRules.contains(code.lowerCaseName);
+  /// Keyed on [unitId] (`identityHashCode` of the pass's `CompilationUnit`) so
+  /// the per-node hot path — which calls this once per rule per node — records a
+  /// timestamp and recomputes exactly once per pass. Every rule visiting the
+  /// same file in the same pass sees the same unit identity, so only the first
+  /// records; the rest read the cached decision.
+  static bool _rapidModeForPass(String path, int unitId) {
+    if (_lastPassUnitId[path] != unitId) {
+      _lastPassUnitId[path] = unitId;
+      _fileRapidMode[path] = _isRapidEditMode(path);
+    }
+    return _fileRapidMode[path] ?? false;
+  }
+
+  /// Whether ALL saropa_lints rules should be deferred for [path] on the current
+  /// analysis pass ([unitId]) because the file is being rapidly edited (in flux).
+  ///
+  /// Deferring EVERY rule (not just non-essential ones) is deliberate: the
+  /// essential tier alone is ~330 element-resolving rules, so running "just the
+  /// essentials" on each keystroke pass still pins CPU on code that is still
+  /// changing. There is no value in linting a file that is mid-edit — the Dart
+  /// analyzer still surfaces compile/resolution errors live regardless.
+  ///
+  /// Rule-independent (hence static): the decision is per file+pass, not per
+  /// rule. Inert unless [isAnalysisServer] — batch/one-shot runners must report
+  /// at full fidelity (see [isAnalysisServer]).
+  ///
+  /// Tradeoff: while typing, saropa_lints diagnostics are deferred and briefly
+  /// disappear, returning on the next settled pass once the 2s window clears and
+  /// the server re-analyzes. The plugin cannot force a settle-pass; it relies on
+  /// the server's normal idle re-analysis to restore diagnostics after edits
+  /// stop. This is the intended "no lint work on code in flux" behavior.
+  static bool deferForRapidEdit(String path, int unitId) {
+    if (!isAnalysisServer || path.isEmpty) return false;
+    return _rapidModeForPass(path, unitId);
   }
 
   // =========================================================================

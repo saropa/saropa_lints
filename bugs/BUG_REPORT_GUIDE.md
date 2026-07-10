@@ -58,6 +58,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 - `infra_native_plugin_analysis_server_memory_growth_10gb.md` — Fixed in 14.3.0; archived to `plans/history/2026.06/2026.06.28/`.
 
+## Raised Reports (2026-07-10)
+
+- `infra_native_plugin_full_tier_runs_on_files_in_flux.md` — rapid-edit gate is dead code; full tier re-runs on every keystroke pass. Fixed in 14.3.2 (server-only gate defers all rules while a file is in flux); archived to `plans/history/2026.07/2026.07.10/`.
+
 ---
 
 ## File Naming

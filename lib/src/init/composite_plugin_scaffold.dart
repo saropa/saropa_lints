@@ -74,6 +74,10 @@ class SaropaCompositePlugin extends Plugin {
 
   @override
   FutureOr<void> start() {
+    // Runs only inside the interactive analysis server, so it is the safe place
+    // to arm the rapid-edit gate (defers saropa_lints rules while a file is
+    // being edited). Batch/CLI runs never call start(), so they stay full-fidelity.
+    SaropaLintRule.isAnalysisServer = true;
     loadNativePluginConfig();
   }
 

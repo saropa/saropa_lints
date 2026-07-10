@@ -49,6 +49,14 @@ class SaropaLintsPlugin extends Plugin {
   @override
   FutureOr<void> start() {
     PluginLogger.log('Plugin.start() — loading initial config');
+
+    // Arm the rapid-edit gate: this runs ONLY inside the interactive analysis
+    // server (no bin/ CLI instantiates the plugin), so it is the reliable signal
+    // that in-flux relief is safe. Batch runners (scan/baseline/health, `dart
+    // analyze`) leave this false and therefore report every rule at full
+    // fidelity. See SaropaLintRule.deferForRapidEdit / isAnalysisServer.
+    SaropaLintRule.isAnalysisServer = true;
+
     try {
       loadNativePluginConfig();
     } on Object catch (e, st) {
