@@ -257,6 +257,11 @@
       "reexportTitle": "पुनः निर्यात किया गया  ⁇  इस लाइब्रेरी के सार्वजनिक एपीआई का हिस्सा",
       "reexportBadge": "पुनः निर्यात-पुनः निर्यात।"
     },
+    "opportunities": {
+      "header": "अवसर ({count})",
+      "viewCode": "कोड देखें",
+      "viewDocs": "डॉक्स देखें"
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇  रिपॉजिटरी केवल पढ़ने के लिए है।",
       "knownIssue": "ज्ञात मुद्दाः {reason}",

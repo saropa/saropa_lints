@@ -257,6 +257,11 @@
       "reexportTitle": "Được tái xuất khẩu  ⁇ là một phần của API công khai thư viện này.",
       "reexportBadge": "tái xuất khẩu - re-export"
     },
+    "opportunities": {
+      "header": "Cơ hội ({count})",
+      "viewCode": "Xem mã code xem code",
+      "viewDocs": "Xem các tài liệu xem docs"
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇   ⁇ kho lưu trữ chỉ đọc là read-only.",
       "knownIssue": "Vấn đề được biết đến: {reason} là Phương pháp",

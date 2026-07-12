@@ -257,6 +257,11 @@
       "reexportTitle": "دوبارہ برآمد شدہ  ⁇ اس لائبریری کا حصہ ہے عوامی API اس لائبريري کے",
       "reexportBadge": "دوبارہ برآمد - ایکسپورٹ۔"
     },
+    "opportunities": {
+      "header": "مواقع ({count})",
+      "viewCode": "کوڈ دیکھیں View code",
+      "viewDocs": "دستاویزات دیکھیں"
+    },
     "alerts": {
       "archived": "آرکائیو  ⁇ ریپوزٹری صرف پڑھنے کے قابل ہے۔",
       "knownIssue": "معلوم مسئلہ: {reason}",

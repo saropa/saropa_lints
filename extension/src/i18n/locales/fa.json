@@ -257,6 +257,11 @@
       "reexportTitle": "باز صادر شده  ⁇  بخشی از API عمومی این کتابخانه است.",
       "reexportBadge": "صادرات مجدد - بازآفرینی"
     },
+    "opportunities": {
+      "header": "فرصت ها ({count})",
+      "viewCode": "کد را مشاهده کنید View code",
+      "viewDocs": "View docs (دستورها را مشاهده کنید)"
+    },
     "alerts": {
       "archived": "آرشیو شده  ⁇  مخزن فقط برای خواندن است.",
       "knownIssue": "مسئله شناخته شده: {reason}",

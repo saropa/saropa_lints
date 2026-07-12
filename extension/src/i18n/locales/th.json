@@ -257,6 +257,11 @@
       "reexportTitle": "การส่งออกใหม่  ⁇  ส่วนหนึ่งของห้องสมุดนี้ API ประชาชน",
       "reexportBadge": "การส่งออกใหม่ - re-export"
     },
+    "opportunities": {
+      "header": "โอกาส ({count})",
+      "viewCode": "ดูโค้ด View Code (ดูรหัส)",
+      "viewDocs": "ดู Docs รายการ"
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇  Repository เป็นการอ่านเท่านั้น",
       "knownIssue": "ปัญหาที่ทราบ: {reason}",

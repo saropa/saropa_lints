@@ -257,6 +257,11 @@
       "reexportTitle": "재수출된 이 라이브러리의 공개 API의 일부입니다.",
       "reexportBadge": "재 수출을 통한 재수출"
     },
+    "opportunities": {
+      "header": "기회 ({count})",
+      "viewCode": "코드를 보기 View code",
+      "viewDocs": "문서들을 보기"
+    },
     "alerts": {
       "archived": "아카이브  ⁇  저장소는 읽기 전용입니다.",
       "knownIssue": "알려진 문제: {reason}",

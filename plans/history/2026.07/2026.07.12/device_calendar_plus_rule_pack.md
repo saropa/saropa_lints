@@ -147,6 +147,48 @@ produces no diagnostic; and a real data-op call with an unrelated local
 `autoPermissions` variable and no real permission call still fires (proving
 the fix, not just a null result).
 
+## Follow-up 2: regression coverage for the receiver-type fix, and a style fix
+
+A second independent review of the receiver-type commit (a fresh subagent, no
+memory of the first review) confirmed `_isDeviceCalendarCall` and the
+`PropertyAccess`/`PrefixedIdentifier` receiver checks are correct — verified
+directly against `device_calendar_plus 0.7.1`'s source, including cascade and
+null-aware-access shapes. It surfaced two findings worth acting on:
+
+- `_isUtcTaintedExpression`'s new `DateTime.parse(...)` branch read
+  `expr.target` instead of `expr.realTarget`, inconsistent with every other
+  receiver check added in the same commit (cascades are not a realistic shape
+  for a static `DateTime.parse` call, so this was style, not a functional
+  bug). Changed to `realTarget` for consistency.
+- None of the new logic — the receiver-type guard on all three rules, the
+  `autoPermissions` fix, or the two new UTC shapes — had any fixture or test
+  coverage. The prior round's verification was a one-off manual run against a
+  throwaway pub package, not a durable, reproducible check. Fixed by adding
+  false-positive-guard cases to all three fixtures (an unrelated class
+  exposing a same-named method with the exact argument shape each rule looks
+  for, which must NOT trigger; an unrelated local `autoPermissions` variable,
+  which must NOT suppress the missing-permission-check diagnostic) and two
+  additional `expect_lint`-marked BAD cases plus a non-tainted `DateTime.parse`
+  GOOD case to the all-day-event fixture, covering the two newly-detected UTC
+  shapes.
+
+The review also named two accepted, non-blocking gaps, left as-is and
+recorded here for a future reader: (1) `DateTime.parse`'s receiver is still
+checked by bare identifier name (`target.name == 'DateTime'`), not resolved
+type, matching the pre-existing `DateTime.utc(...)` lexeme check — a project
+that shadowed `dart:core`'s `DateTime` would false-positive; (2) all three
+rules are now resolution-dependent end to end, so this project's own `scan`
+CLI under its default (non-`--resolve`) fast path will under-report them —
+consistent with the custom_lint IDE plugin always resolving, and with the
+same tradeoff three sibling rules (`local_auth`, `in_app_review`,
+`quick_actions`) already carry.
+
+Re-verified against a fresh throwaway pub package with `device_calendar_plus`
+actually fetched (0.7.1) and `--resolve`: all three fixtures fire at their
+exact `expect_lint`-marked lines and stay silent on every `good()`/OK case,
+including the two new receiver-type FP guards proving (not just asserting)
+the fix. Unit test re-run: pass.
+
 ## Outcome
 
 Shipped. Both packages' rule packs remain fully independent — enabling

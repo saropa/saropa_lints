@@ -257,6 +257,11 @@
       "reexportTitle": "Réexporté  ⁇  fait partie de l'API publique de cette bibliothèque.",
       "reexportBadge": "ré-exportation de l'export."
     },
+    "opportunities": {
+      "header": "Les opportunités ({count})",
+      "viewCode": "Afficher le code d'affichage.",
+      "viewDocs": "Voir les documents."
+    },
     "alerts": {
       "archived": "ARCHIVÉ  ⁇  le référentiel est en lecture seule.",
       "knownIssue": "Problème connu: {reason}.",

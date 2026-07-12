@@ -257,6 +257,11 @@
       "reexportTitle": "أعيد تصدير  ⁇  جزء من هذه المكتبة ⁇  عامة API.",
       "reexportBadge": "إعادة التصدير - إعادة تصدير."
     },
+    "opportunities": {
+      "header": "الفرص ({count})",
+      "viewCode": "عرض رمز العرض",
+      "viewDocs": "عرض المستندات."
+    },
     "alerts": {
       "archived": "أرشفت  ⁇  مستودع القراءة فقط.",
       "knownIssue": "المسألة المعروفة: {reason}",

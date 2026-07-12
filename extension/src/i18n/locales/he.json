@@ -257,6 +257,11 @@
       "reexportTitle": "יצוא מחדש  ⁇  חלק מה-API הציבורי של הספרייה הזאת.",
       "reexportBadge": "ייצוא חוזר - יצוא מחדש"
     },
+    "opportunities": {
+      "header": "הזדמנויות ({count})",
+      "viewCode": "הצג קוד View Code",
+      "viewDocs": "תצוגה של מסמכים View docs"
+    },
     "alerts": {
       "archived": "ארכיון  ⁇  מאגר הוא קריאה בלבד.",
       "knownIssue": "בעיה ידועה: {reason}",

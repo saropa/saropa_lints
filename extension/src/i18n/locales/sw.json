@@ -257,6 +257,11 @@
       "reexportTitle": "Imehamishwa tena  ⁇  sehemu ya API ya umma ya maktaba hii.",
       "reexportBadge": "kuuza nje tena - re-export."
     },
+    "opportunities": {
+      "header": "Fursa ({count})",
+      "viewCode": "Tazama msimbo wa kuona",
+      "viewDocs": "Tazama docs tazama docks."
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇  hazina ni ya kusoma tu.",
       "knownIssue": "Suala linalojulikana: {reason}",

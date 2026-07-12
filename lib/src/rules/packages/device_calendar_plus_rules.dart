@@ -97,7 +97,7 @@ bool _isDeviceCalendarCall(MethodInvocation node) {
 bool _isUtcTaintedExpression(Expression expr) {
   if (expr is MethodInvocation) {
     if (expr.methodName.name == 'toUtc') return true;
-    final Expression? target = expr.target;
+    final Expression? target = expr.realTarget;
     if (expr.methodName.name == 'parse' &&
         target is SimpleIdentifier &&
         target.name == 'DateTime') {

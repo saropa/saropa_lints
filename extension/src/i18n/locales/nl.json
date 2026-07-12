@@ -257,6 +257,11 @@
       "reexportTitle": "Heruitgevoerd  ⁇  deel van deze bibliotheek's openbare API.",
       "reexportBadge": "wederuitvoer naar de andere landen."
     },
+    "opportunities": {
+      "header": "Mogelijkheden ({count})",
+      "viewCode": "Code bekijken Bekijk code",
+      "viewDocs": "Documents bekijken."
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇  het repository is alleen-lezen.",
       "knownIssue": "Bekende probleem: {reason}",

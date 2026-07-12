@@ -257,6 +257,11 @@
       "reexportTitle": "পুনরায় রফতানি করা হয়েছে এই লাইব্রেরির পাবলিক এপিআই এর অংশ।",
       "reexportBadge": "রিকোস্ট-এক্সপোর্ট পুনরায় রপ্তানি"
     },
+    "opportunities": {
+      "header": "সুযোগগুলি ({count})",
+      "viewCode": "কোড দেখুন View code",
+      "viewDocs": "ডকুমেন্টস দেখুন"
+    },
     "alerts": {
       "archived": "আর্কাইভ করা  ⁇  সংগ্রহস্থলটি কেবল পঠনযোগ্য।",
       "knownIssue": "পরিচিত ইস্যুঃ {reason}",

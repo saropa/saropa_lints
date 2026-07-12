@@ -257,6 +257,11 @@
       "reexportTitle": "Diekspor kembali  ⁇  bagian dari API publik perpustakaan ini.",
       "reexportBadge": "ekspor kembali-ekspor."
     },
+    "opportunities": {
+      "header": "Peluang ({count})",
+      "viewCode": "Lihat kode tampilan.",
+      "viewDocs": "Lihat dokumen."
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇  repositori hanya bisa dibaca.",
       "knownIssue": "Masalah yang diketahui: {reason}",

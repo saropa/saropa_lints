@@ -19,3 +19,15 @@ Future<void> good(String eventId) async {
     title: 'New title',
   );
 }
+
+// OK: an unrelated class's same-named, eventId-only call is not a
+// DeviceCalendar call — the rule requires the resolved receiver type to be
+// DeviceCalendar, so this must not trigger even though the shape matches.
+class EventFactory {
+  Future<void> updateEvent({required String eventId}) async {}
+}
+
+Future<void> unrelatedSameNamedMethod(String eventId) async {
+  final factory = EventFactory();
+  await factory.updateEvent(eventId: eventId);
+}

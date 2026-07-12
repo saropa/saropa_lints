@@ -257,6 +257,11 @@
       "reexportTitle": "Re-exported  ⁇  bahagi ng library na ito's public API",
       "reexportBadge": "muling pag-export ng re-eksport."
     },
+    "opportunities": {
+      "header": "Mga Oportunidad ({count})",
+      "viewCode": "Tingnan ang code ng view.",
+      "viewDocs": "Tingnan ang mga dokumento ng View docs."
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇  ang repository ay read-only.",
       "knownIssue": "Kilalang Isyu: {reason}",

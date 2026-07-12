@@ -257,6 +257,11 @@
       "reexportTitle": "Reexportiert  ⁇  Teil dieser Bibliothek ⁇  öffentliche API.",
       "reexportBadge": "Wiederausfuhr - Wiedererhebung"
     },
+    "opportunities": {
+      "header": "Möglichkeiten ({count})",
+      "viewCode": "Code anzeigen Code ansehen.",
+      "viewDocs": "Dokumente anzeigen."
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇  das Repository ist nur-lesen.",
       "knownIssue": "Bekanntes Problem: {reason}",

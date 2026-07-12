@@ -257,6 +257,11 @@
       "reexportTitle": "Ponowny eksport  ⁇  część publicznego API tej biblioteki.",
       "reexportBadge": "reeksportowy - ponowny wywóz."
     },
+    "opportunities": {
+      "header": "SZCHANI ({count}) Szczęście",
+      "viewCode": "Wyświetlanie kodu",
+      "viewDocs": "Zobacz dokumenty"
+    },
     "alerts": {
       "archived": "ARCHIW  ⁇  repozytorium jest tylko do odczytu.",
       "knownIssue": "Znane zagadnienie: {reason}",
