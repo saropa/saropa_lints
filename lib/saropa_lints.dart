@@ -2661,6 +2661,11 @@ _allRuleFactories = <SaropaLintRule Function()>[
   DeviceCalendarEventUtcTimezoneRule.new,
   DeviceCalendarResultDataBeforeSuccessCheckRule.new,
 
+  // device_calendar_plus rules (device_calendar_plus_rules.dart)
+  DeviceCalendarPlusMissingPermissionCheckRule.new,
+  DeviceCalendarPlusAllDayEventUtcConversionRule.new,
+  DeviceCalendarPlusEmptyUpdateEventRule.new,
+
   // HomeWidget rules (home_widget_rules.dart)
   HomeWidgetCallbackMissingPragmaRule.new,
   HomeWidgetCallbackNotTopLevelRule.new,

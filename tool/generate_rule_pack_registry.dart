@@ -90,6 +90,7 @@ const Map<String, Set<String>> kPubspecMarkersByPack = {
   'audioplayers': {'audioplayers'},
   'cached_network_image': {'cached_network_image'},
   'device_calendar': {'device_calendar'},
+  'device_calendar_plus': {'device_calendar_plus'},
   'flutter_map': {'flutter_map'},
   'geocoding': {'geocoding'},
   'google_maps_flutter': {'google_maps_flutter'},

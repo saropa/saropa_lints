@@ -257,6 +257,11 @@
       "reexportTitle": "Re-exported — part of this library’s public API",
       "reexportBadge": "re-export"
     },
+    "opportunities": {
+      "header": "OPPORTUNITIES ({count})",
+      "viewCode": "View code",
+      "viewDocs": "View docs"
+    },
     "alerts": {
       "archived": "ARCHIVED — repository is read-only",
       "knownIssue": "Known Issue: {reason}",

@@ -64,6 +64,19 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+Adds a rule pack for device_calendar_plus, a maintained replacement for the abandoned device_calendar plugin with a different API (no relation to the existing device_calendar rule pack, which stays as-is). Also fixes the Package Dashboard's Opportunities detection so document files like README.md are never counted as an adoptable API, and adds an Opportunities section to the Package Detail sidebar with per-feature links to the package's source code and documentation. No action required — the new rules and the Opportunities fixes take effect automatically.
+
+### Added
+
+- **New device_calendar_plus rule pack (3 rules).** Flags data operations (create/update/delete/list) called with no permission check anywhere in the file; flags all-day events (`isAllDay: true`) given a UTC-converted date, which can shift the event to the wrong calendar day; and flags `updateEvent` calls that change no field, a no-op the package treats as silently harmless. No action required — rules run automatically wherever `device_calendar_plus` is imported.
+- **(Extension) Opportunities section in the Package Detail sidebar.** Each unadopted changelog feature now lists its introducing bullet plus, per named API, a link to search the package's source repository and a link to its online documentation, so you can review a feature without leaving the sidebar. No action required — the section appears automatically for any package with unadopted features.
+
+### Fixed
+
+- **(Extension) Opportunities detection no longer treats document files as adoptable APIs.** A changelog bullet mentioning `README.md`, `CHANGELOG.md`, or `pubspec.yaml` was being extracted as if it were a dotted API reference (like `ReelText.rich`), so the Package Dashboard's Opportunities column and count could include filenames instead of real code. Extraction now excludes filename-shaped tokens. No action required — rescanning drops the false entries.
+
 ## [14.3.2]
 
 Cuts sustained editor CPU while you type. The analyzer plugin runs inside the Dart analysis server, which re-analyzes a file on nearly every keystroke; until now each pass re-ran the entire configured tier over code that was still in flux. During rapid editing the plugin now defers all of its rules until editing settles — the Dart analyzer still reports compile errors live. Full-fidelity batch analysis is unchanged. [log](https://github.com/saropa/saropa_lints/blob/v14.3.2/CHANGELOG.md)

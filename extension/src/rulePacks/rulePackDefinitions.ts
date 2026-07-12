@@ -107,7 +107,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'animation',
     label: 'Animation & motion',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_animation_in_build',
       'avoid_animation_rebuild_waste',
@@ -456,7 +456,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'build_context',
     label: 'BuildContext safety',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_context_across_async',
       'avoid_context_after_await_in_static',
@@ -482,7 +482,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'class_design',
     label: 'Class & constructor design',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_accessing_other_classes_private_members',
       'avoid_declaring_call_method',
@@ -881,7 +881,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'dialogs',
     label: 'Dialogs & overlays',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_snackbar_queue_buildup',
       'prefer_adaptive_dialog',
@@ -1091,7 +1091,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'file_io',
     label: 'File I/O & handles',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_loading_full_pdf_in_memory',
       'avoid_sqflite_read_all_columns',
@@ -1426,7 +1426,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'freezed',
     label: 'Freezed (codegen)',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_freezed_any_map_issue',
       'avoid_freezed_for_logic_classes',
@@ -1577,7 +1577,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'hardware',
     label: 'Hardware & sensors',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_bluetooth_scan_without_timeout',
       'prefer_ble_mtu_negotiation',
@@ -1664,7 +1664,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'in_app_purchase',
     label: 'In-app purchase',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_entitlement_without_server',
       'avoid_purchase_in_sandbox_production',
@@ -1808,9 +1808,10 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'layout',
     label: 'Layout & scrolling',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_absorb_pointer_misuse',
+      'avoid_animated_size_in_wrap',
       'avoid_border_all',
       'avoid_builder_index_out_of_bounds',
       'avoid_deep_widget_nesting',
@@ -1910,7 +1911,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'leak_prevention',
     label: 'Memory & resource leaks',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'always_remove_listener',
       'avoid_build_context_in_providers',
@@ -2160,7 +2161,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'naming',
     label: 'Naming & conventions',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_non_ascii_symbols',
       'match_class_name_pattern',
@@ -2304,7 +2305,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'notifications',
     label: 'Notifications',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_notification_payload_sensitive',
       'avoid_notification_same_id',
@@ -2438,7 +2439,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'project_config',
     label: 'Project config & integrity',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_asset_manifest_json',
       'avoid_deprecated_animated_list_typedefs',
@@ -2549,7 +2550,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'release_readiness',
     label: 'Release readiness',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_api_key_in_code',
       'avoid_assert_in_production',
@@ -3062,7 +3063,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'ui_polish',
     label: 'UI polish & UX',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'avoid_animation_in_build',
       'avoid_animation_rebuild_waste',
@@ -3237,7 +3238,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
   {
     id: 'widgets',
     label: 'Widgets & build',
-    matchPubNames: [],
+    matchPubNames: ['flutter'],
     ruleCodes: [
       'always_remove_listener',
       'avoid_analytics_in_build',

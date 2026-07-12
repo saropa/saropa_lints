@@ -436,6 +436,32 @@ export function getPackageDetailStyles(): string {
             text-decoration: none;
         }
 
+        /* ---- Opportunities section ---- */
+        .opp-item {
+            padding: 6px 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            border-inline-start: 3px solid var(--vscode-charts-blue, var(--vscode-textLink-foreground));
+        }
+        .opp-item-text { margin-bottom: 4px; }
+        .opp-item-version {
+            color: var(--vscode-descriptionForeground);
+            font-size: 0.85em;
+        }
+        .opp-item-api {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 0;
+            font-size: 0.9em;
+        }
+        .opp-item-chip {
+            padding: 1px 6px;
+            border-radius: 10px;
+            background: var(--vscode-charts-blue, var(--vscode-textLink-foreground));
+            color: var(--vscode-editor-background);
+        }
+
         /* ---- Package logo in header ---- */
         .package-logo {
             width: 48px;

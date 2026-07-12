@@ -140,6 +140,23 @@ describe('changelog-opportunities', () => {
         it('ignores all-caps acronyms like RTL', () => {
             assert.deepStrictEqual(extractApiNames('Fixed RTL alignment.'), []);
         });
+
+        it('ignores README.md referenced via dotted member access shape', () => {
+            const names = extractApiNames('See README.md for migration notes.');
+            assert.ok(!names.includes('README.md'), `README.md leaked in: ${JSON.stringify(names)}`);
+        });
+
+        it('ignores documentation filenames inside backtick spans', () => {
+            const names = extractApiNames('Updated `CHANGELOG.md` and `pubspec.yaml`.');
+            assert.ok(!names.includes('CHANGELOG.md'), `CHANGELOG.md leaked in: ${JSON.stringify(names)}`);
+            assert.ok(!names.includes('pubspec.yaml'), `pubspec.yaml leaked in: ${JSON.stringify(names)}`);
+        });
+
+        it('still captures a real dotted API name alongside a filename reference', () => {
+            const names = extractApiNames('ReelText.rich now supports this; see README.md.');
+            assert.ok(names.includes('ReelText.rich'));
+            assert.ok(!names.includes('README.md'));
+        });
     });
 
     describe('rankOpportunities', () => {

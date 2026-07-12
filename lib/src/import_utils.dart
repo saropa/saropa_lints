@@ -134,6 +134,14 @@ class PackageImports {
   /// Device Calendar package imports.
   static const Set<String> deviceCalendar = {'package:device_calendar/'};
 
+  /// device_calendar_plus package imports. Kept separate from [deviceCalendar]:
+  /// device_calendar_plus is a from-scratch rewrite (DeviceCalendar.instance
+  /// singleton, exception-based errors, no Result/TZDateTime), not a fork, so
+  /// the two packages' rules must not share a gate.
+  static const Set<String> deviceCalendarPlus = {
+    'package:device_calendar_plus/',
+  };
+
   /// Google Maps Flutter package imports.
   static const Set<String> googleMapsFlutter = {'package:google_maps_flutter/'};
 
