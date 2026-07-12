@@ -103,9 +103,7 @@ bool _isUtcTaintedExpression(Expression expr) {
         target.name == 'DateTime') {
       final List<Expression> args = expr.argumentList.arguments;
       final Expression? first = args.isEmpty ? null : args.first;
-      final String? value = first is StringLiteral
-          ? first.stringValue
-          : null;
+      final String? value = first is StringLiteral ? first.stringValue : null;
       return value != null && value.trim().toUpperCase().endsWith('Z');
     }
     return false;

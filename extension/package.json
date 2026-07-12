@@ -2,7 +2,7 @@
   "name": "saropa-lints",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "version": "14.3.2",
+  "version": "14.3.3",
   "publisher": "saropa",
   "license": "MIT",
   "repository": {
@@ -54,27 +54,32 @@
         {
           "id": "saropaLints.banner",
           "name": "%views.banner.name%",
-          "when": "saropaLints.needsBanner || !saropaLints.isDartProject"
+          "when": "saropaLints.needsBanner || !saropaLints.isDartProject",
+          "icon": "$(info)"
         },
         {
           "id": "saropaLints.editorDashboards",
           "name": "%views.editorDashboards.name%",
-          "when": "saropaLints.isDartProject"
+          "when": "saropaLints.isDartProject",
+          "icon": "$(graph)"
         },
         {
           "id": "saropaLints.status",
           "name": "%views.status.name%",
-          "when": "saropaLints.isDartProject && saropaLints.hasViolations"
+          "when": "saropaLints.isDartProject && saropaLints.hasViolations",
+          "icon": "$(warning)"
         },
         {
           "id": "saropaLints.settings",
           "name": "%views.settings.name%",
-          "when": "saropaLints.isDartProject"
+          "when": "saropaLints.isDartProject",
+          "icon": "$(gear)"
         },
         {
           "id": "saropaLints.help",
           "name": "%views.help.name%",
-          "when": "saropaLints.isDartProject"
+          "when": "saropaLints.isDartProject",
+          "icon": "$(question)"
         }
       ]
     },

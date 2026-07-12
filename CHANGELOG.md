@@ -64,16 +64,6 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
-
-<details>
-<summary>Maintenance</summary>
-
-- Added false-positive-guard fixtures and additional UTC-shape cases for the device_calendar_plus all-day-event rule, closing a regression-coverage gap where the resolved-receiver-type check shipped in 14.3.3 had no fixture or test exercising it.
-- Fixed an inconsistent `target`/`realTarget` accessor in the device_calendar_plus UTC-taint helper's `DateTime.parse` branch (no behavior change — not a realistic cascade shape).
-
-</details>
-
 ## [14.3.3]
 
 Adds a rule pack for device_calendar_plus, a maintained replacement for the abandoned device_calendar plugin with a different API (no relation to the existing device_calendar rule pack, which stays as-is). Also fixes the Package Dashboard's Opportunities detection so document files like README.md are never counted as an adoptable API, and adds an Opportunities section to the Package Detail sidebar with per-feature links to the package's source code and documentation. No action required — the new rules and the Opportunities fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.3/CHANGELOG.md)
@@ -86,6 +76,17 @@ Adds a rule pack for device_calendar_plus, a maintained replacement for the aban
 ### Fixed
 
 - **(Extension) Opportunities detection no longer treats document files as adoptable APIs.** A changelog bullet mentioning `README.md`, `CHANGELOG.md`, or `pubspec.yaml` was being extracted as if it were a dotted API reference (like `ReelText.rich`), so the Package Dashboard's Opportunities column and count could include filenames instead of real code. Extraction now excludes filename-shaped tokens. No action required — rescanning drops the false entries.
+- **(Extension) Sidebar views now show an icon.** The Banner, Editor Dashboards, Status, Settings, and Help views in the activity bar panel were missing an icon, so they rendered as unlabeled entries when moved to another panel. No action required — icons appear automatically.
+
+<details>
+<summary>Maintenance</summary>
+
+- Added false-positive-guard fixtures and additional UTC-shape cases for the device_calendar_plus all-day-event rule, closing a regression-coverage gap where the resolved-receiver-type check shipped in 14.3.3 had no fixture or test exercising it.
+- Fixed an inconsistent `target`/`realTarget` accessor in the device_calendar_plus UTC-taint helper's `DateTime.parse` branch (no behavior change — not a realistic cascade shape).
+
+</details>
+
+---
 
 ## [14.3.2]
 
