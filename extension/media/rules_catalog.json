@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2327,
+  "ruleCount": 2330,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -12809,6 +12809,51 @@
       }
     },
     "device_calendar_missing_permission_check": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "packages"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "device_calendar_plus_all_day_event_utc_conversion": {
+      "ruleType": "bug",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "packages"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Bug rule default target: zero false positives."
+      }
+    },
+    "device_calendar_plus_empty_update_event": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "packages"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "device_calendar_plus_missing_permission_check": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
