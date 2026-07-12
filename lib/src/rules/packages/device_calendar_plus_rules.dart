@@ -67,8 +67,8 @@ bool _isTestFilePath(String path) {
   return normalized.endsWith('_test.dart') || normalized.contains('/test/');
 }
 
-Expression? _namedArg(MethodInvocation node, String name) {
-  for (final Expression arg in node.argumentList.arguments) {
+Expression? _namedArg(ArgumentList args, String name) {
+  for (final Expression arg in args.arguments) {
     if (arg is NamedExpression && arg.name.label.name == name) {
       return arg.expression;
     }
@@ -76,25 +76,59 @@ Expression? _namedArg(MethodInvocation node, String name) {
   return null;
 }
 
-/// True when [expr] is `<dateTime>.toUtc()` or `DateTime.utc(...)` — either
-/// shape produces a UTC-normalized instant that all-day events must not use.
+/// The `DeviceCalendar` class name. Every data-op / permission-method /
+/// autoPermissions match below requires the receiver to resolve to this
+/// type — without it, an unrelated same-named method or field elsewhere in
+/// the file (e.g. a hand-rolled `EventFactory.createEvent(...)`, or a local
+/// `bool autoPermissions` flag) would count too.
+const String _deviceCalendarType = 'DeviceCalendar';
+
+/// True when [node]'s receiver resolves to the `DeviceCalendar` singleton
+/// type — covers both `DeviceCalendar.instance.xxx()` and a variable holding
+/// that instance (`final dc = DeviceCalendar.instance; dc.xxx()`).
+bool _isDeviceCalendarCall(MethodInvocation node) {
+  return node.realTarget?.staticType?.element?.name == _deviceCalendarType;
+}
+
+/// True when [expr] produces a UTC-normalized `DateTime`, which all-day
+/// events must not use: `.toUtc()`, `DateTime.utc(...)`,
+/// `DateTime.from{Milli,Micro}secondsSinceEpoch(..., isUtc: true)`, or
+/// `DateTime.parse(...)` of a `Z`-suffixed (UTC) ISO-8601 string literal.
 bool _isUtcTaintedExpression(Expression expr) {
-  if (expr is MethodInvocation && expr.methodName.name == 'toUtc') {
-    return true;
+  if (expr is MethodInvocation) {
+    if (expr.methodName.name == 'toUtc') return true;
+    final Expression? target = expr.target;
+    if (expr.methodName.name == 'parse' &&
+        target is SimpleIdentifier &&
+        target.name == 'DateTime') {
+      final List<Expression> args = expr.argumentList.arguments;
+      final Expression? first = args.isEmpty ? null : args.first;
+      final String? value = first is StringLiteral
+          ? first.stringValue
+          : null;
+      return value != null && value.trim().toUpperCase().endsWith('Z');
+    }
+    return false;
   }
   if (expr is InstanceCreationExpression &&
-      expr.constructorName.type.name.lexeme == 'DateTime' &&
-      expr.constructorName.name?.name == 'utc') {
-    return true;
+      expr.constructorName.type.name.lexeme == 'DateTime') {
+    final String? ctorName = expr.constructorName.name?.name;
+    if (ctorName == 'utc') return true;
+    if (ctorName == 'fromMillisecondsSinceEpoch' ||
+        ctorName == 'fromMicrosecondsSinceEpoch') {
+      final Expression? isUtcValue = _namedArg(expr.argumentList, 'isUtc');
+      return isUtcValue is BooleanLiteral && isUtcValue.value;
+    }
   }
   return false;
 }
 
-/// Collects method invocations and every simple identifier name in a
-/// compilation unit, in one traversal, for the file-wide permission scan.
-class _InvocationAndIdentifierScan extends RecursiveAstVisitor<void> {
+/// Collects `DeviceCalendar`-receiver method invocations and
+/// `DeviceCalendar`-receiver `autoPermissions` access, in one traversal, for
+/// the file-wide permission scan.
+class _InvocationAndAutoPermissionsScan extends RecursiveAstVisitor<void> {
   final List<MethodInvocation> invocations = <MethodInvocation>[];
-  final Set<String> simpleIdentifierNames = <String>{};
+  bool hasAutoPermissionsAccess = false;
 
   @override
   void visitMethodInvocation(MethodInvocation node) {
@@ -103,9 +137,21 @@ class _InvocationAndIdentifierScan extends RecursiveAstVisitor<void> {
   }
 
   @override
-  void visitSimpleIdentifier(SimpleIdentifier node) {
-    simpleIdentifierNames.add(node.name);
-    super.visitSimpleIdentifier(node);
+  void visitPropertyAccess(PropertyAccess node) {
+    if (node.propertyName.name == 'autoPermissions' &&
+        node.realTarget.staticType?.element?.name == _deviceCalendarType) {
+      hasAutoPermissionsAccess = true;
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (node.identifier.name == 'autoPermissions' &&
+        node.prefix.staticType?.element?.name == _deviceCalendarType) {
+      hasAutoPermissionsAccess = true;
+    }
+    super.visitPrefixedIdentifier(node);
   }
 }
 
@@ -173,25 +219,29 @@ class DeviceCalendarPlusMissingPermissionCheckRule extends SaropaLintRule {
       }
       if (_isTestFilePath(context.filePath)) return;
 
-      final _InvocationAndIdentifierScan scan = _InvocationAndIdentifierScan();
+      final _InvocationAndAutoPermissionsScan scan =
+          _InvocationAndAutoPermissionsScan();
       unit.accept(scan);
 
       final List<MethodInvocation> dataCalls = scan.invocations
           .where(
-            (MethodInvocation inv) => _dataOps.contains(inv.methodName.name),
+            (MethodInvocation inv) =>
+                _dataOps.contains(inv.methodName.name) &&
+                _isDeviceCalendarCall(inv),
           )
           .toList();
       if (dataCalls.isEmpty) return;
 
       final bool hasPermissionCall = scan.invocations.any(
         (MethodInvocation inv) =>
-            _permissionMethods.contains(inv.methodName.name),
+            _permissionMethods.contains(inv.methodName.name) &&
+            _isDeviceCalendarCall(inv),
       );
       if (hasPermissionCall) return;
 
       // autoPermissions prompts automatically, so a file that configures it
       // needs no explicit hasPermissions/requestPermissions call.
-      if (scan.simpleIdentifierNames.contains('autoPermissions')) return;
+      if (scan.hasAutoPermissionsAccess) return;
 
       // Report once, at the first data operation, to avoid file-wide noise.
       reporter.atNode(dataCalls.first.methodName);
@@ -271,12 +321,16 @@ class DeviceCalendarPlusAllDayEventUtcConversionRule extends SaropaLintRule {
       if (!fileImportsPackage(node, PackageImports.deviceCalendarPlus)) {
         return;
       }
+      if (!_isDeviceCalendarCall(node)) return;
 
-      final Expression? isAllDayValue = _namedArg(node, 'isAllDay');
+      final Expression? isAllDayValue = _namedArg(
+        node.argumentList,
+        'isAllDay',
+      );
       if (isAllDayValue is! BooleanLiteral || !isAllDayValue.value) return;
 
       for (final String argName in dateArgs) {
-        final Expression? value = _namedArg(node, argName);
+        final Expression? value = _namedArg(node.argumentList, argName);
         if (value != null && _isUtcTaintedExpression(value)) {
           reporter.atNode(value);
         }
@@ -345,6 +399,7 @@ class DeviceCalendarPlusEmptyUpdateEventRule extends SaropaLintRule {
       if (!fileImportsPackage(node, PackageImports.deviceCalendarPlus)) {
         return;
       }
+      if (!_isDeviceCalendarCall(node)) return;
 
       bool hasEventId = false;
       bool hasChange = false;

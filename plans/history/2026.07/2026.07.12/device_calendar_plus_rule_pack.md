@@ -100,17 +100,52 @@ gaps before this was considered complete:
   `RecursiveAstVisitor` traversal even with zero calendar operations. Added
   `requiredPatterns => _dataOps`.
 
-Other findings from the review were left as-is, matching either an accepted
-existing tradeoff in the sibling `device_calendar_rules.dart` (bare
-method-name matching with no receiver-type check; narrow UTC-shape detection
-covering only `.toUtc()`/`DateTime.utc(...)`) or a project-wide accepted
-duplication convention (each `lib/src/rules/packages/*_rules.dart` file
-carries its own private `_isTestFilePath`/`_namedArg` helpers rather than
-sharing a util — 14+ files already do this).
+The review's remaining findings (bare method-name matching with no
+receiver-type check; narrow UTC-shape detection covering only
+`.toUtc()`/`DateTime.utc(...)`) were initially left as-is, matching an
+accepted existing tradeoff in the sibling `device_calendar_rules.dart` — see
+the Follow-up section below for why that changed. The private
+`_isTestFilePath`/`_namedArg`-per-file duplication was left alone; it matches
+a project-wide accepted convention (14+ `lib/src/rules/packages/*_rules.dart`
+files already do this).
 
 All 3 rules re-verified against their fixtures after the review fixes; the
 new unit test and the pre-existing `test/integrity/saropa_lints_test.dart`
 and `test/config/rule_packs_*` tests all pass.
+
+## Follow-up: receiver-type checks and wider UTC-shape detection
+
+A follow-up request asked for the two false-positive risks left open above to
+be addressed, plus the missing `DateTime.fromMillisecondsSinceEpoch(...,
+isUtc: true)` / `DateTime.parse('...Z')` UTC shapes the review flagged as
+undetected. Three changes to `lib/src/rules/packages/device_calendar_plus_rules.dart`:
+
+- Added `_isDeviceCalendarCall`, mirroring the established
+  `node.realTarget?.staticType?.element?.name == _typeName` idiom already used
+  by `local_auth_rules.dart`, `in_app_review_rules.dart`, and
+  `quick_actions_rules.dart`. All three rules now require their `MethodInvocation`
+  matches to resolve to a `DeviceCalendar` receiver, so a same-named method on
+  an unrelated class in the same file no longer counts.
+- Replaced the bare `simpleIdentifierNames.contains('autoPermissions')` check
+  with a resolved-receiver check on `PropertyAccess`/`PrefixedIdentifier`
+  nodes, so an unrelated local variable/field named `autoPermissions` no
+  longer suppresses the missing-permission-check diagnostic.
+- Extended `_isUtcTaintedExpression` to also match
+  `DateTime.fromMillisecondsSinceEpoch`/`fromMicrosecondsSinceEpoch` with
+  `isUtc: true`, and `DateTime.parse(...)` of a string literal ending in `Z`.
+
+These checks require full type resolution (the same requirement the three
+sibling-pattern rules above already carry), which cannot be exercised against
+an ad hoc scratch file with no real dependency — an ad hoc verification
+attempt against files with no real `device_calendar_plus` dependency returned
+zero diagnostics because `staticType` never resolves without one. Verification
+was instead done against a throwaway pub package with `device_calendar_plus:
+any` actually fetched via `dart pub get` (resolved to 0.7.1) and scanned with
+`--resolve`. Confirmed: all 3 original fixtures still fire at their marked
+lines; both new UTC shapes fire; a same-named method on an unrelated class
+produces no diagnostic; and a real data-op call with an unrelated local
+`autoPermissions` variable and no real permission call still fires (proving
+the fix, not just a null result).
 
 ## Outcome
 
