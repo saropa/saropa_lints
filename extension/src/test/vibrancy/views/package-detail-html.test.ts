@@ -255,3 +255,85 @@ describe('Package Detail Panel — consolidated changelog', () => {
             'changelog section must be absent when updateInfo is null');
     });
 });
+
+describe('Package Detail Panel — opportunities section', () => {
+    function withOpportunities(
+        unadoptedApiNames: readonly string[],
+        bulletApiNames: readonly string[] = unadoptedApiNames,
+        text = 'Added a new feature',
+    ): VibrancyResult {
+        return {
+            ...makeResult('http'),
+            unadoptedApiNames,
+            opportunityScore: unadoptedApiNames.length > 0 ? 20 : 0,
+            opportunities: {
+                opportunities: [
+                    { text, version: '2.0.0', category: 'added', apiNames: bulletApiNames },
+                ],
+                all: [],
+                opportunityCount: 1,
+                apiNames: bulletApiNames,
+            },
+        };
+    }
+
+    it('renders nothing when there are no unadopted API names', () => {
+        const html = buildPackageDetailHtml(withOpportunities([]), [], null);
+        assert.ok(!html.includes('OPPORTUNITIES'),
+            'opportunities section must be absent with nothing unadopted');
+    });
+
+    it('renders the bullet, version, and count when a feature is unadopted', () => {
+        const html = buildPackageDetailHtml(withOpportunities(['Http.get']), [], null);
+        assert.ok(html.includes('OPPORTUNITIES (1)'), 'section header should count the bullet');
+        assert.ok(html.includes('Added a new feature'), 'bullet text should render');
+        assert.ok(html.includes('v2.0.0'), 'bullet version should render');
+        assert.ok(html.includes('Http.get'), 'unadopted API name should render');
+    });
+
+    it('links "View code" to a repo search and "View docs" to pub.dev docs, both scoped to the API name', () => {
+        const html = buildPackageDetailHtml(withOpportunities(['Http.get']), [], null);
+        assert.ok(
+            html.includes('https://github.com/example/pkg/search?q=Http.get'),
+            'View code should search the resolved repo for the API name',
+        );
+        assert.ok(
+            html.includes('https://pub.dev/documentation/http/latest/?search=Http.get'),
+            'View docs should search pub.dev documentation for the API name',
+        );
+    });
+
+    it('omits "View code" but keeps "View docs" when the package has no resolvable repo URL', () => {
+        const result = withOpportunities(['Http.get']);
+        const noRepo: VibrancyResult = {
+            ...result,
+            github: null,
+            pubDev: result.pubDev ? { ...result.pubDev, repositoryUrl: null } : null,
+        };
+        const html = buildPackageDetailHtml(noRepo, [], null);
+        assert.ok(!html.includes('/search?q=Http.get" data-action="openUrl"') || !html.includes('github.com'),
+            'no GitHub code-search link should render without a repo URL');
+        assert.ok(
+            html.includes('https://pub.dev/documentation/http/latest/?search=Http.get'),
+            'docs link should still render without a repo URL',
+        );
+    });
+
+    it('drops a bullet once every API name it introduced has been adopted', () => {
+        // apiNames on the bullet is ['Http.get'], but unadoptedApiNames is
+        // empty — the symbol is already used in project source, so the
+        // bullet is no longer an "opportunity" even though it was mined.
+        const html = buildPackageDetailHtml(withOpportunities([], ['Http.get']), [], null);
+        assert.ok(!html.includes('OPPORTUNITIES'),
+            'a fully-adopted bullet must not render as an opportunity');
+    });
+
+    it('escapes HTML in the bullet text and API name (untrusted changelog content)', () => {
+        const html = buildPackageDetailHtml(
+            withOpportunities(['<img src=x onerror=alert(1)>'], undefined, '<script>alert(1)</script>'),
+            [], null,
+        );
+        assert.ok(!html.includes('<script>alert(1)</script>'), 'bullet text must be escaped');
+        assert.ok(!html.includes('<img src=x onerror=alert(1)>'), 'API name must be escaped');
+    });
+});
