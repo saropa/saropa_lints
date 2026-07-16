@@ -1,5 +1,15 @@
 # Saropa Lints — sidebar & affordance inventory
 
+> **ARCHIVED 2026-07-16.** Snapshot of 2026-05-04; every count below is stale
+> (manifest at archive time: 166 commands, 5 views, 41 palette entries, and the
+> `copyAsJson` family is down to 4 — `suggestions.copyAsJson` and its provider
+> were removed). The doc's refresh expectation was not being honored and all
+> data is regenerable from `extension/package.json` + `sectionedSidebar.ts`, so
+> the hand-maintained copy was closed rather than refreshed. The one durable
+> decision — the copyAsJson tree providers are intentionally constructed but
+> never registered as views — now lives as a comment at their construction site
+> in `extension/src/extension.ts`.
+
 **Activity-bar view slots** in `package.json` → `contributes.views.saropaLints` are **six** in the current manifest (banner + Editor dashboards + Actions + Status + Settings + Help). The product surface also includes **154 contributed commands**; menu wiring is now minimal (most commands are reached via tree leaves, the command palette, or the dashboards).
 
 ## Snapshot metadata

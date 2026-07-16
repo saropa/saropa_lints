@@ -24,3 +24,7 @@ Searchable index of all files in `plans/history/`. Search this file instead of s
 
 - [avoid_stream_subscription_in_field_false_positive_conditional_listen](2026.04/20260413/avoid_stream_subscription_in_field_false_positive_conditional_listen.md) — false positive when StreamSubscription field is conditionally assigned in a listen callback
 - [project_vibrancy_report](2026.04/2026.04.28/project_vibrancy_report.md) — Project Vibrancy scoring, collectors, gates, MVP slice, and UI/extension roadmap
+
+### 2026.07
+
+- [sidebar_view_inventory](2026.07/2026.07.16/sidebar_view_inventory.md) — snapshot inventory of extension sidebar views, contributed commands, menu wiring, and the palette-only copyAsJson command family

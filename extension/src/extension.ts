@@ -523,6 +523,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     ),
   );
 
+  // Deliberate: issuesProvider, summaryProvider, securityProvider, and
+  // fileRiskProvider are constructed but NEVER registered as VS Code tree
+  // views (only the sectioned-sidebar providers below get
+  // registerTreeDataProvider). They exist as in-memory data sources for the
+  // Findings Dashboard and the palette-only `saropaLints.*.copyAsJson`
+  // export commands. Do not "fix" this by registering them or deleting them
+  // as dead code — product decision, flagged in the (now archived)
+  // plans/history sidebar_view_inventory audit.
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
   const hotspotReviewState = new SecurityHotspotReviewStateService(context.workspaceState);
   const summaryProvider = new SummaryTreeProvider(context.workspaceState);
