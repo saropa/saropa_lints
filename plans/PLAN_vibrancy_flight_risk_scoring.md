@@ -168,3 +168,34 @@ the plan's own rule. Conditions under which the gate may be re-attempted:
    formula + same corpus is not a valid attempt 2.
 
 Until then: no churn collector, no author-count collector, no score, no UI surface.
+
+---
+
+## Finish Report (2026-07-16)
+
+The research spike (Sequence step 1) and gate review (step 2) were executed; the build phase
+(step 3) was not entered because the gate failed. No production code was written — the
+instrument was a scratch script outside the project tree per the plan's mandate.
+
+**What was done:**
+- Incident corpus mined from this repo's git history: 292 candidate `fix` commits touching
+  `lib/src/rules/`, filtered and sampled to 30, of which 16 yielded a locatable offending
+  function. Corpus definition, skip reasons, and limitations recorded in the Findings section.
+- Candidate formula prototyped offline (`d:\tmp\flight_risk_spike.py`) with all five factors
+  computed per function from `git show`/`git blame` at each incident's parent commit; the
+  offending function ranked against pools of ~1,030–1,730 functions per incident.
+- Baseline comparison run: the multiplicative candidate (59.4 median percentile, 0 top-decile
+  hits) lost to complexity-alone (67.5, 4 hits), churn-alone (65.2, 4), and its own
+  weighted-sum variant (63.3, 4). Full table and per-incident rows in the Findings section
+  and `d:\tmp\flight_risk_results.json`.
+- Gate deliverable 2 (multiplicative vs weighted-sum) is decided by the data: multiplication
+  is disqualified — a near-zero age factor on young offenders zeroes the product. Deliverable 3
+  (surface) is moot while the gate is unpassed.
+- Negative result recorded in this plan's Findings section with explicit re-attempt conditions
+  (multi-author consumer-project corpus; re-specified weighted-sum formula with the age factor
+  dropped or inverted to recency). The research-frontier skill's Frontier 3 entry and the
+  CHANGELOG Maintenance section were updated in the same change.
+
+**Outcome:** gate FAILED on this corpus; plan remains OPEN — RESEARCH-GATED. No churn
+collector, no author-count collector, no score, no UI surface may be built until a
+mechanistically different gate attempt passes.
