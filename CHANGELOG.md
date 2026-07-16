@@ -72,6 +72,13 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 
 - **(Extension) `getDailySummary(date)` on the extension's public API.** Sibling Saropa Suite tools can now read this project's current health score, violation counts, and error-level trouble items for a given day via `getExtension('saropa.saropa-lints').exports.getDailySummary('YYYY-MM-DD')`, which resolves to a documented `DailySummary` (or `undefined` before any analysis has run). No action required — the summary is built lazily on call, reads only local analysis output, and transmits nothing.
 
+<details>
+<summary>Maintenance</summary>
+
+- Split the Issues tree provider's ~220-line tree-item renderer into a sibling module so the provider class carries only its stateful filter/index logic. Behavior-identical; the tree-item tests pin the render output.
+
+</details>
+
 ---
 
 ## [14.3.3]

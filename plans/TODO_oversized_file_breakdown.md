@@ -30,11 +30,15 @@ surface" dashboards the consolidation plan keeps as separate screens.
   `commandCatalogEntriesMisc.ts` (115). Composed catalog identical (162 entries, same order);
   `check-types` clean; 28/29 catalog tests green (the 1 failure — 3 package.json commands missing
   from the catalog — pre-dates the split and fails identically on HEAD).
-- **views/issuesTree.ts** 1340 → 1020 (partial): extracted node types → `issuesTreeTypes.ts` (79)
-  and the command layer (hide/suppress/copy/apply-fix) → `issuesTreeCommands.ts` (296). The
-  762-line `IssuesTreeProvider` class stays in place — splitting its methods (grouping / item
-  builders / pagination) means converting stateful methods to free functions, a riskier refactor
-  deferred as a follow-up. `check-types` clean; 22/22 tree tests green.
+- **views/issuesTree.ts** 1340 → 783 (partial): extracted node types → `issuesTreeTypes.ts` (79),
+  the command layer (hide/suppress/copy/apply-fix) → `issuesTreeCommands.ts` (296), and the
+  ~220-line `getTreeItem` renderer (plus its `severityThemeIcon` / `violationLabel` /
+  stale-icon helpers) → `issuesTreeItemBuilder.ts` (288). `getTreeItem` is a pure function of the
+  node plus a small render context (root, collapse state, fix set, hotspot service), so the move is
+  behavior-identical. The remaining `IssuesTreeProvider` class (~525 lines) holds the stateful
+  filter/suppression/index machinery and `getChildren`. `check-types` clean; 22/22 tree tests green
+  (they pin `getTreeItem` collapse states, file open-command, and violation tooltip). See Finish
+  Report (2026-07-16) below.
 - **views/dashboardChromeStyles.ts** 1199 → 72-line composer + `dashboardChromeStylesTokens.ts`
   (133), `dashboardChromeStylesComponents.ts` (731), `dashboardChromeStylesSystem.ts` (307). The
   14 `chrome*()` band functions relocated verbatim; `check-types` clean; generated CSS byte-identical
@@ -71,7 +75,7 @@ has no test), deliberately deferred rather than attempted in this behavior-prese
 
 | Partial file | Now | What remains |
 |---|---|---|
-| views/issuesTree.ts | 1020 | the 762-line `IssuesTreeProvider` class (grouping / item builders / pagination) |
+| views/issuesTree.ts | 783 | the ~525-line `IssuesTreeProvider` class — stateful filter/suppression/index machinery + `getChildren` grouping (`getTreeItem` now extracted) |
 | views/violationsWideReportView.ts | 832 | the ~320-line `getOrCreatePanel` controller + message handler |
 
 > **Path correction (2026-06-24):** the controller `projectVibrancyReportView.ts` lives at
@@ -252,3 +256,46 @@ those two deferred items rather than fragmenting them into a separate file.
 
 Behavior-preserving internal refactors only; no user-facing change, no new or changed l10n strings
 (all `l10n()` calls moved verbatim with their keys).
+
+---
+
+## Finish Report (2026-07-16) — issuesTree.ts getTreeItem extraction
+
+### What changed
+
+`views/issuesTree.ts` was the first of the two deferred partial files. Its bulk is the stateful
+`IssuesTreeProvider` class, but ~220 of those lines were `getTreeItem` — a large `switch` on node
+kind that renders a `vscode.TreeItem`. It reads no mutable provider state beyond four values, so it
+is effectively pure.
+
+Moved `getTreeItem` (plus its only consumers `severityThemeIcon`, `violationLabel`, and the
+`STALE_ICON` / `STALE_LABEL` / `MESSAGE_LABEL_LEN` constants) into a new sibling
+`views/issuesTreeItemBuilder.ts` (288 lines) as a free function `buildIssueTreeItem(element, ctx)`.
+The provider's `getTreeItem` is now an 11-line delegator that supplies the render context: workspace
+root, collapse state (`collapsedOrExpanded`, which already respects the expand-all override), the
+fix-availability set, and the hotspot-review service. `issuesTree.ts` dropped 1020 → 783; the
+provider class dropped 762 → ~525.
+
+This clears the "item builders" portion of the deferred issuesTree work. The remaining ~525-line
+class is the stateful filter/suppression/index machinery and `getChildren` — a genuine behavior-risk
+split (converting stateful methods to free functions), left for a later pass.
+
+### Why
+
+Same rationale as the rest of this sweep: a large file mixing distinct concerns is hard to read and
+review. `getTreeItem` is a self-contained rendering concern that no longer needs to live inside the
+class, and extracting it is provably safe because the method is a pure function of its inputs.
+
+### Verification
+
+- `npm run check-types` clean.
+- 22/22 `issuesTree.test` cases green. The suite pins exactly the extracted surface — severity/folder
+  collapse states (default + expand-all override), the file-row `vscode.open` command (present when
+  the file exists, absent when moved/deleted), and the violation tooltip's related-rules block — so a
+  green run confirms the render output is behavior-identical.
+
+### Scope note
+
+Behavior-preserving internal refactor; no user-facing change, no new or changed l10n strings.
+
+Finish report appended: plans/TODO_oversized_file_breakdown.md
