@@ -231,7 +231,7 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_map_keys_contains',
-    '[avoid_map_keys_contains] Calling .keys.contains() allocates an iterable of all keys and performs a linear search, while .containsKey() uses the map hash table for O(1) lookup. This wastes memory and CPU cycles on every call. {v5}',
+    '[avoid_map_keys_contains] Calling .keys.contains() allocates an iterable of all keys and performs a linear search, while .containsKey() uses the map hash table for O(1) lookup. This wastes memory and CPU cycles on every call. {v6}',
     correctionMessage:
         'Replace map.keys.contains(key) with map.containsKey(key) to use the efficient hash-based lookup.',
     severity: DiagnosticSeverity.INFO,
@@ -245,10 +245,16 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'contains') return;
 
+      // The `.keys` access takes two AST shapes depending on the receiver:
+      // `map.keys` on a simple identifier is a PrefixedIdentifier, while
+      // `this.map.keys` / `getMap().keys` is a PropertyAccess. Handling only
+      // PropertyAccess missed the canonical `map.keys.contains(k)` on a plain
+      // variable — the most common shape (BUG FIX 2026-07-16).
       final Expression? target = node.target;
-      if (target is! PropertyAccess) return;
-
-      if (target.propertyName.name == 'keys') {
+      final bool onKeys =
+          (target is PropertyAccess && target.propertyName.name == 'keys') ||
+          (target is PrefixedIdentifier && target.identifier.name == 'keys');
+      if (onKeys) {
         reporter.atNode(node);
       }
     });
@@ -300,7 +306,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_collections',
-    '[avoid_unnecessary_collections] Wrapping an existing collection literal with List.of() or Set.of() creates a redundant copy, wasting memory and adding unnecessary overhead. The literal itself already produces the correct collection type. {v4}',
+    '[avoid_unnecessary_collections] Wrapping an existing collection literal with List.of() or Set.of() creates a redundant copy, wasting memory and adding unnecessary overhead. The literal itself already produces the correct collection type. {v5}',
     correctionMessage:
         'Remove the List.of() or Set.of() wrapper and use the collection literal directly to eliminate the extra allocation.',
     severity: DiagnosticSeverity.INFO,
@@ -315,25 +321,46 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Syntactic path (no resolution): the parser cannot tell `List.of(...)` is
+    // a constructor, so it presents as a MethodInvocation with a SimpleIdentifier
+    // target.
     context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
 
-      final String typeName = target.name;
-      final String methodName = node.methodName.name;
-
-      if (_collectionTypes.contains(typeName) &&
-          _unnecessaryMethods.contains(methodName)) {
-        final ArgumentList args = node.argumentList;
-        if (args.arguments.length == 1) {
-          final Expression arg = args.arguments.first;
-          // Check if argument is already a literal
-          if (arg is ListLiteral || arg is SetOrMapLiteral) {
-            reporter.atNode(node);
-          }
-        }
+      if (_collectionTypes.contains(target.name) &&
+          _unnecessaryMethods.contains(node.methodName.name) &&
+          _wrapsCollectionLiteral(node.argumentList)) {
+        reporter.atNode(node);
       }
     });
+
+    // Resolved path: `List.of([...])` / `Set.of(...)` / `Map.of(...)` are factory
+    // constructors, so under resolution they become InstanceCreationExpression,
+    // not MethodInvocation — the method-invocation handler above never saw them
+    // in a resolved analysis (the real analyzer's mode), missing every case
+    // (BUG FIX 2026-07-16).
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String? name = constructorName.name?.name;
+      final String typeName = constructorName.type.name.lexeme;
+
+      if (_collectionTypes.contains(typeName) &&
+          name != null &&
+          _unnecessaryMethods.contains(name) &&
+          _wrapsCollectionLiteral(node.argumentList)) {
+        reporter.atNode(node);
+      }
+    });
+  }
+
+  /// True when [args] is a single collection-literal argument, the redundant
+  /// wrapping this rule flags (`List.of([1, 2, 3])`). Shared by the syntactic
+  /// and resolved detection paths.
+  bool _wrapsCollectionLiteral(ArgumentList args) {
+    if (args.arguments.length != 1) return false;
+    final Expression arg = args.arguments.first;
+    return arg is ListLiteral || arg is SetOrMapLiteral;
   }
 
   @override
@@ -1758,7 +1785,7 @@ class PreferContainsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_list_contains',
-    '[prefer_list_contains] Using indexOf() with a comparison to -1 or 0 to check element presence is verbose and error-prone. The contains() method expresses intent directly, improving readability and reducing off-by-one mistakes. {v2}',
+    '[prefer_list_contains] Using indexOf() with a comparison to -1 or 0 to check element presence is verbose and error-prone. The contains() method expresses intent directly, improving readability and reducing off-by-one mistakes. {v3}',
     correctionMessage:
         'Replace the indexOf() comparison with contains() to express the presence check directly and clearly.',
     severity: DiagnosticSeverity.INFO,
@@ -1774,11 +1801,30 @@ class PreferContainsRule extends SaropaLintRule {
       if (left is! MethodInvocation) return;
       if (left.methodName.name != 'indexOf') return;
 
-      final Expression right = node.rightOperand;
-      if (right is IntegerLiteral && (right.value == -1 || right.value == 0)) {
+      // Dart has no negative-integer-literal token: `-1` parses as a unary-minus
+      // PrefixExpression over the literal `1`, never an IntegerLiteral. Matching
+      // only IntegerLiteral therefore missed the canonical presence check
+      // `indexOf(x) != -1` entirely (BUG FIX 2026-07-16), so unwrap the negation
+      // before comparing. `0` still arrives as a bare literal.
+      final int? rightValue = _sentinelIntValue(node.rightOperand);
+      if (rightValue == -1 || rightValue == 0) {
         reporter.atNode(node);
       }
     });
+  }
+
+  /// Returns the integer value of [expr] when it is an integer literal or a
+  /// unary-minus applied to one (`-1`), else null. Needed because Dart has no
+  /// negative-integer-literal token — `-1` is `PrefixExpression('-', 1)`.
+  int? _sentinelIntValue(Expression expr) {
+    if (expr is IntegerLiteral) return expr.value;
+    if (expr is PrefixExpression &&
+        expr.operator.type == TokenType.MINUS &&
+        expr.operand is IntegerLiteral) {
+      final int? v = (expr.operand as IntegerLiteral).value;
+      return v == null ? null : -v;
+    }
+    return null;
   }
 }
 

@@ -63,6 +63,24 @@ blast-radius change gated on approval — distinct from the mechanical fixture w
 assumed. `prefer_asmap_over_indexed_iteration` and `require_key_for_collection` in this dir are not yet
 categorized.
 
+#### Done 2026-07-16 (user-approved) — collection rule bugs fixed: 5 → 2 silent
+
+All three genuine under-firing bugs above were fixed in the rule (not the fixture), version-bumped, with
+changelog Fixed entries; `accuracy_report --fixtures example/lib/collection` confirms each flipped
+silent→fired and 69 collection unit tests still pass:
+
+- `prefer_list_contains` v2→v3 — added a helper that unwraps a unary-minus `PrefixExpression`, so
+  `indexOf(x) != -1` now matches.
+- `avoid_map_keys_contains` v5→v6 — now accepts a `PrefixedIdentifier` `.keys` target (plain
+  `map.keys.contains`), not only `PropertyAccess`. Its quick fix already handled exactly this shape (the
+  rule and fix were previously mismatched), so the fix now applies where it never could before.
+- `avoid_unnecessary_collections` v4→v5 — added an `InstanceCreationExpression` handler (shared literal
+  check) so the resolved `List.of([...])`/`Set.of`/`Map.of` constructor forms are caught, not just the
+  syntactic method-invocation shape.
+
+Remaining silent in `example/lib/collection`: `prefer_asmap_over_indexed_iteration` and
+`require_key_for_collection` (a widget rule) — still uncategorized, next if this cluster is resumed.
+
 
 Premise correction: `accuracyTarget` is **not** unpopulated. It is a derived getter
 ([saropa_lint_rule.dart:2288](../lib/src/saropa_lint_rule.dart#L2288)) computed from `ruleType`, and
