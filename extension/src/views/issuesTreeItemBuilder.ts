@@ -284,5 +284,14 @@ export function buildIssueTreeItem(
     item.contextValue = 'group';
     return item;
   }
+  // Exhaustiveness guard: every IssueTreeNode kind is handled above, so `element`
+  // is `never` here. If a new kind is added to the union without a branch, this
+  // stops compiling — converting "silently renders a blank row" into a build error.
+  return assertUnhandledNode(element);
+}
+
+/** Compile-time exhaustiveness check; preserves the original blank-row fallback at runtime. */
+function assertUnhandledNode(element: never): vscode.TreeItem {
+  void element;
   return new vscode.TreeItem('', vscode.TreeItemCollapsibleState.None);
 }
