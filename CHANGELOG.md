@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, and fixes five collection rules that were silently missing their most common bad-code shape. No action required — the API is opt-in and read by other extensions, and the rule fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, and fixes five collection rules that were silently missing their most common bad-code shape. No action required — the API is opt-in and read by other extensions, and the rule fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.4/CHANGELOG.md)
 
 ### Added
 
@@ -86,6 +86,7 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 - Fixed the rule-liveness report (`accuracy_report`) so it exercises stylistic rules. No tier — not even pedantic — contains the stylistic rules, so the previous tier-scoped scan never enabled them and falsely reported stylistic rules with fixtures as silent; correcting it flipped 80 previously-false-silent rules to firing (the silent worklist dropped from 744 to 664). The report now defaults to all defined rules (`--tier <name>` narrows it), via a new optional explicit rule-set on the scan runner.
 - Split the Issues tree provider's ~220-line tree-item renderer into a sibling module so the provider class carries only its stateful filter/index logic. Behavior-identical; the tree-item tests pin the render output.
 - Closed the oversized view-file breakdown plan and archived it to plan history — all ten tracked files are decomposed, and the two residual stateful controllers are accepted as cohesive final-state modules.
+- Ran the flight-risk scoring research gate (predictive-score validation) and recorded a negative result: on a 16-incident corpus mined from this repo's fix history, the candidate composite formula lost to the complexity-alone baseline, so the feature stays unbuilt and its plan stays open with the findings and re-attempt conditions documented.
 - Closed the sidebar-and-affordance inventory snapshot and archived it to plan history — every count had drifted from the manifest, and the one durable decision (the palette-only JSON-export tree providers are intentionally never registered as views) now lives as a comment at their construction site.
 
 </details>

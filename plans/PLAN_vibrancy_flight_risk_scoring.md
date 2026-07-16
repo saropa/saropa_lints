@@ -5,6 +5,8 @@
 **Source plan:** `history/2026.04/2026.04.28/project_vibrancy_report.md` (§ Phase 5 — Flight-Risk)
 **Subsystem:** `lib/src/cli/project_vibrancy.dart` (collectors + score) + `extension/src/vibrancy/` (surface)
 **Status:** OPEN — RESEARCH-GATED. No production code until the scoring model is validated.
+Gate attempted 2026-07-16: the candidate formula FAILED the baseline comparison on the in-repo
+incident corpus (see Findings below). Negative result recorded; the gate remains unpassed.
 
 ---
 
@@ -80,3 +82,89 @@ Age, complexity, and documentation factors reuse existing collectors — no new 
 Two new history-walking collectors + a new score + a new UI surface. Multi-part feature. The research
 spike is cheap and self-contained; everything past the gate needs explicit go-ahead. Do not begin the
 build phase on the strength of the candidate formula alone — the validation report is the precondition.
+
+---
+
+## Findings — research spike, gate attempt 1 (2026-07-16)
+
+**Verdict: the candidate formula does NOT beat the naive baselines. Gate FAILED on this corpus.
+Feature stays unbuilt; plan stays OPEN.**
+
+### Method
+
+- **Corpus:** `fix` commits since 2026-01-01 touching `lib/src/rules/*.dart` in this repo, treated
+  as incidents. The offending function is the function containing the first changed pre-fix line.
+  292 candidate commits; commits touching >5 rule files (mass sweeps) excluded; 30 sampled evenly
+  across the period; **16 scored** (14 skipped — changed line fell outside a parseable function,
+  e.g. `LintCode` field declarations or doc comments).
+- **Scoring:** at each incident's PARENT commit, the offending function was ranked against every
+  function (span ≥5 lines) in the offending file plus a seeded random sample of 40 other rule
+  files — pools of ~1,030–1,730 functions per incident.
+- **Factors (all 0–1):** age = median blame line age /365d; complexity = decision-point count /20;
+  churn = distinct blame commits in span authored within 90 days /5; lone-author = 1/distinct
+  authors in span; documentation = contiguous `///` lines above declaration /5.
+- **Metric:** percentile rank (midrank ties) of the offending function under each score; aggregated
+  as median percentile and top-decile hit count. Higher = better prediction.
+- **Instrument:** scratch script `d:\tmp\flight_risk_spike.py` (per the plan's no-production-code
+  mandate); raw per-incident rows in `d:\tmp\flight_risk_results.json`.
+
+### Prediction (written before the run)
+
+Composite would beat age-alone clearly but be marginal against complexity-alone, because two
+factors are confounded on this corpus: the repo is effectively single-author (lone-author ≈
+constant 1.0) and rule files are uniformly documented (doc factor compressed). Expected medians:
+composite 60–75th percentile, complexity-alone 60–70th, age-alone ≈50th.
+
+### Results (n = 16 incidents)
+
+| Score | Median percentile | Mean | Top-decile hits |
+|---|---|---|---|
+| Candidate composite (multiplicative) | 59.4 | 56.1 | 0 |
+| Composite (equal-weight sum) | 63.3 | 59.0 | 4 |
+| **Complexity-alone (baseline)** | **67.5** | **62.9** | **4** |
+| Churn-alone (hotspot-SOTA proxy) | 65.2 | 59.9 | 4 |
+| Age-alone (baseline) | 25.5 | 26.8 | 0 |
+
+### What the numbers say
+
+1. **The multiplicative composite is the WORST predictive form tested** (59.4 median, zero
+   top-decile hits) — worse than complexity-alone, churn-alone, and its own weighted-sum variant.
+   The plan's stated concern about multiplication ("punishes any single low factor heavily") is
+   confirmed: offending functions in RECENT code get a near-zero age factor that drags the whole
+   product down regardless of how complex or churned they are (e.g. incident `08769351`: sum
+   percentile 100.0, multiplicative 86.2, age 1.4).
+2. **The age factor is directionally WRONG on this corpus.** Age-alone median 25.5 means offending
+   functions are markedly YOUNGER than the pool — incidents live in recently written/edited code,
+   the opposite of the "old code is risky" assumption baked into `age_factor`. Multiplying by age
+   actively subtracts predictive power.
+3. **Complexity-alone — the naive baseline the composite must beat — is the best predictor
+   tested** (67.5 median). Churn-alone is second. A composite that loses to its own ingredient
+   fails the plan's gate by definition.
+4. **Two factors were non-discriminating as predicted:** lone-author ≈ constant (single-author
+   repo) and documentation compressed (rules are uniformly doc-commented). Neither confirmed nor
+   refuted as signals — this corpus cannot test them.
+
+### Corpus limitations (why this is a corpus-scoped negative, not a universal one)
+
+- Incidents are lint-rule bug fixes in THIS repo, not production incidents in a consumer app.
+  Rule bugs are usually born-broken (bug present since the rule was written), which mechanically
+  favors young code and penalizes the age factor — a consumer-app corpus with regression-style
+  incidents could behave differently.
+- Single-author history makes the bus-factor signal untestable here.
+- Instrument approximations: regex function parser (no AST), keyword-count complexity,
+  blame-visible churn (history overwritten by later edits is invisible), and file-sampled pools.
+
+### Gate decision (per Sequence step 2)
+
+The validated score does not beat the naive baseline → **stop; do not build**. Recorded here per
+the plan's own rule. Conditions under which the gate may be re-attempted:
+
+1. A **multi-author, consumer-project incident corpus** (e.g. Saropa Contacts regressions with
+   identifiable offending functions) — the only way to test lone-author and documentation factors
+   and to remove the born-broken age confound.
+2. A **re-specified candidate formula**: drop or invert the age factor (recency, not age, predicted
+   incidents here) and use a weighted-sum form — multiplication is disqualified by result 1 above.
+   Per the failed-attempts convention, any re-attempt must be mechanistically different: same
+   formula + same corpus is not a valid attempt 2.
+
+Until then: no churn collector, no author-count collector, no score, no UI surface.

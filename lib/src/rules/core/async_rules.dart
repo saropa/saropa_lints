@@ -743,7 +743,7 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_commenting_future_delayed',
     '[prefer_commenting_future_delayed] Unexplained delay is a code smell '
-        'that often hides race conditions or timing bugs. {v4}',
+        'that often hides race conditions or timing bugs. {v5}',
     correctionMessage: 'Add a comment before the delay explaining its purpose.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -775,15 +775,22 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
     });
   }
 
-  /// Reports [node] when no comment precedes it — the "unexplained delay" the
-  /// rule flags. `precedingComments` on the begin token is the reliable AST
-  /// signal for a leading comment. Shared by both detection paths.
+  /// Reports [node] when no comment precedes the delay — the "unexplained
+  /// delay" the rule flags. Shared by both detection paths.
+  ///
+  /// The leading comment lives on the begin token of the enclosing STATEMENT,
+  /// not of the `Future.delayed` node itself: in `await Future.delayed(...)` the
+  /// `await` token owns the leading comment, so checking the node's own begin
+  /// token (`Future`) always saw null and would fire even on a commented delay
+  /// (BUG FIX 2026-07-16 — checking the statement token both lets the rule fire
+  /// under resolution and stops it flagging genuinely-commented delays).
   void _reportIfUncommented(
     AstNode node,
     SaropaDiagnosticReporter reporter,
   ) {
-    final Token firstToken = node.beginToken;
-    if (firstToken.precedingComments == null) {
+    final Statement? statement = node.thisOrAncestorOfType<Statement>();
+    final Token begin = (statement ?? node).beginToken;
+    if (begin.precedingComments == null) {
       reporter.atNode(node);
     }
   }

@@ -108,10 +108,15 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 dynamic api;
 dynamic future;
 
+// The rule finds the Completer's enclosing MethodDeclaration, so the bad code
+// must live in a class method, not a top-level or nested function.
+
 // BAD: Should trigger require_completer_error_handling
-// expect_lint: require_completer_error_handling
-void _bad111() async {
-  Future<String> fetch() {
+class BadCompleterService {
+  dynamic api;
+
+  // expect_lint: require_completer_error_handling
+  Future<String> fetch() async {
     final completer = Completer<String>();
     try {
       completer.complete(await api.get());
@@ -123,8 +128,10 @@ void _bad111() async {
 }
 
 // GOOD: Should NOT trigger require_completer_error_handling
-void _good111() async {
-  Future<String> fetch() {
+class GoodCompleterService {
+  dynamic api;
+
+  Future<String> fetch() async {
     final completer = Completer<String>();
     try {
       completer.complete(await api.get());

@@ -106,12 +106,16 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger avoid_stream_tostring
+// The rule gates on a real Stream static type, so the toString() receiver must
+// be a typed stream (StreamController.stream), not an undeclared identifier.
 // expect_lint: avoid_stream_tostring
 void _bad91() {
+  final myStream = StreamController<int>().stream;
   print(myStream.toString());
 }
 
 // GOOD: Should NOT trigger avoid_stream_tostring
 void _good91() {
+  final myStream = StreamController<int>().stream;
   myStream.listen((event) => print(event)); // Listen to stream events directly
 }

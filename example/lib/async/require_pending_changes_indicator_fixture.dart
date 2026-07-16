@@ -105,23 +105,37 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+// The rule visits class methods (addMethodDeclaration) and matches a
+// pending-changes marker (`_dirty` / `_unsaved` / `_pending`) in the body while
+// the notification patterns (notifyListeners/setState/emit(/add(/state=) are
+// absent. Note `.add(` itself matches the notification exclusion, so the marker
+// must be a bare field, not a `.add()` call.
+
 // BAD: Should trigger require_pending_changes_indicator
-// expect_lint: require_pending_changes_indicator
-void _bad116() {
-  // Silent save with no indication
+class BadEditor {
+  bool _dirty = false;
+
+  // expect_lint: require_pending_changes_indicator
   void save() {
-    _pendingChanges.add(change);
+    _dirty = true; // marked unsaved, but nothing tells the user
     _syncLater();
   }
+
+  void _syncLater() {}
 }
 
 // GOOD: Should NOT trigger require_pending_changes_indicator
-void _good116_save() {
-  void _topLevel119() {
-    _pendingChanges.add(change);
+class GoodEditor {
+  bool _dirty = false;
+
+  void save() {
+    _dirty = true;
     notifyListeners(); // Shows pending indicator
     _syncLater();
   }
+
+  void _syncLater() {}
+  void notifyListeners() {}
 }
 
 // In UI:

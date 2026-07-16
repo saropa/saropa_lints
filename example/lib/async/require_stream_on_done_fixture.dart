@@ -109,16 +109,20 @@ dynamic data;
 dynamic stream;
 
 // BAD: Should trigger require_stream_on_done
+// The rule gates on a real Stream static type, so the subscription target must
+// be a typed stream (StreamController.stream), not an untyped `dynamic`.
 // expect_lint: require_stream_on_done
 void _bad110() {
-  stream.listen((data) {
+  final controller = StreamController<int>();
+  controller.stream.listen((data) {
     updateUI(data);
   });
 }
 
 // GOOD: Should NOT trigger require_stream_on_done
 void _good110() {
-  stream.listen(
+  final controller = StreamController<int>();
+  controller.stream.listen(
     (data) => updateUI(data),
     onDone: () => showCompleted(),
     onError: (e) => showError(e),
