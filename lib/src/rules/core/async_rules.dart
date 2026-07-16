@@ -753,22 +753,39 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Syntactic path: unresolved, `Future.delayed(...)` presents as a
+    // MethodInvocation with a `Future` SimpleIdentifier target.
     context.addMethodInvocation((MethodInvocation node) {
-      // Check for Future.delayed
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'Future') return;
       if (node.methodName.name != 'delayed') return;
-
-      // Check preceding comments attached to the token
-      // This is the reliable way to check for comments in Dart AST
-      final Token firstToken = node.beginToken;
-      final bool hasComment = firstToken.precedingComments != null;
-
-      if (!hasComment) {
-        reporter.atNode(node);
-      }
+      _reportIfUncommented(node, reporter);
     });
+
+    // Resolved path: `Future.delayed` is a named constructor, so under
+    // resolution it is an InstanceCreationExpression, not a MethodInvocation —
+    // the handler above never saw it in a resolved analysis (the real analyzer's
+    // mode), so the rule never fired (BUG FIX 2026-07-16).
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName cn = node.constructorName;
+      if (cn.type.name.lexeme != 'Future') return;
+      if (cn.name?.name != 'delayed') return;
+      _reportIfUncommented(node, reporter);
+    });
+  }
+
+  /// Reports [node] when no comment precedes it — the "unexplained delay" the
+  /// rule flags. `precedingComments` on the begin token is the reliable AST
+  /// signal for a leading comment. Shared by both detection paths.
+  void _reportIfUncommented(
+    AstNode node,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    final Token firstToken = node.beginToken;
+    if (firstToken.precedingComments == null) {
+      reporter.atNode(node);
+    }
   }
 }
 

@@ -1,7 +1,7 @@
 # PLAN: Consolidated "Saropa Dashboards" — Project Map + Code Health on one page
 
-**Status:** Active — both panes built as a single composed document; pending an Extension Development
-Host (F5) render check.
+**Status:** Closed 2026-07-16 — implementation complete and code-verified; the manual Extension
+Development Host (F5) render check is dropped as a closing gate (see Finish Report).
 
 ## Context
 
@@ -91,3 +91,46 @@ Additive: the standalone Project Map and Code Health commands are unchanged.
 - A Project Map hot-spot row click and a Code Health function-link click both opening the file.
 - The shared `acquireVsCodeApi` handle working for both panes (drill-down from each).
 - That `.pm-pane` scoping fully isolates the two stylesheets in the live webview (no visual bleed).
+
+## Finish Report (2026-07-16)
+
+Scope: (C) extension TypeScript + Dart HTML template — VS Code extension code.
+
+### Work completed
+
+- Consolidated `saropaLints.openDashboards` command composing Project Map and Code Health into one
+  webview document (no iframes, no eval, no shadow DOM).
+- Single shared `acquireVsCodeApi` handle via `apiShimScript`; Project Map CSS scoped under `.pm-pane`
+  with palette tokens on the wrapper; one ECharts loader in the host head.
+- `scanProjectMapToParts`, `buildCodeHealthFragment`/`buildCodeHealthBody`, `applyFileSuppression`
+  exported and wired; full message routing (openFile, open*Full, settings, rescan/restart, copyJson,
+  copyText, suppressFlag). Standalone Project Map and Code Health commands unchanged (additive).
+- Sequential scan execution fix: two concurrent `dart run saropa_lints:<tool>` against the same package
+  contended on dart's build-snapshot / pub lock and stalled the panes; scans now run one at a time.
+
+### Work still to do
+
+None blocking. Remaining item is manual visual QA only (below).
+
+### Verification
+
+- `tsc` clean (`tsconfig.json` + `tsconfig.test.json`).
+- `saropaDashboardsView.test.ts` (4 cases: single API acquisition, both panes present, PM styles scoped
+  under `.pm-pane`, one failed pane degrades without dropping the other).
+- `projectVibrancyReportHtml.test.ts` + `projectVibrancyInflight.test.ts` pass (body refactor preserved
+  output). Dart `health_html_reporter_test.dart` passes (scoped template emits banner / KPI strip /
+  legend / chart hosts).
+- Confirmed at first F5: composed document renders — host hero + both scoped panes side by side, no
+  blank page, no chrome style bleed.
+
+### SKIPPED
+
+- SKIPPED [Manual-QA] — live-webview interaction sweep (treemap/scatter/hot-spot + Code Health
+  sortable table across light/dark/high-contrast, drill-down file-open from each pane, full `.pm-pane`
+  isolation in the running webview). A webview render cannot be unit-tested; the render itself was
+  confirmed at F5. Dropped as a closing gate rather than held open indefinitely, matching the
+  disposition of the sibling TESTING_AND_RELEASE plan (manual IDE sign-off dropped as a gate).
+
+### Done confirmation
+
+Implementation and all automated checks complete. Plan closed and archived.

@@ -27,5 +27,6 @@ Searchable index of all files in `plans/history/`. Search this file instead of s
 
 ### 2026.07
 
+- [PLAN_consolidated_dashboards](2026.07/2026.07.16/PLAN_consolidated_dashboards.md) — consolidated saropaLints.openDashboards webview composing Project Map and Code Health into one document; shared acquireVsCodeApi shim, .pm-pane CSS scoping, sequential dart-run scans
 - [sidebar_view_inventory](2026.07/2026.07.16/sidebar_view_inventory.md) — snapshot inventory of extension sidebar views, contributed commands, menu wiring, and the palette-only copyAsJson command family
 - [TESTING_AND_RELEASE](2026.07/2026.07.16/TESTING_AND_RELEASE.md) — closed testing/release gating plan; quick-fix proof met by tests, fixture coverage accepted at 92.5%, manual IDE sign-off dropped as a gate
