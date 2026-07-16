@@ -75,6 +75,7 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 <details>
 <summary>Maintenance</summary>
 
+- Fixed the rule-liveness report (`accuracy_report`) so it exercises stylistic rules. No tier — not even pedantic — contains the stylistic rules, so the previous tier-scoped scan never enabled them and falsely reported stylistic rules with fixtures as silent; correcting it flipped 80 previously-false-silent rules to firing (the silent worklist dropped from 744 to 664). The report now defaults to all defined rules (`--tier <name>` narrows it), via a new optional explicit rule-set on the scan runner.
 - Split the Issues tree provider's ~220-line tree-item renderer into a sibling module so the provider class carries only its stateful filter/index logic. Behavior-identical; the tree-item tests pin the render output.
 - Closed the oversized view-file breakdown plan and archived it to plan history — all ten tracked files are decomposed, and the two residual stateful controllers are accepted as cohesive final-state modules.
 - Closed the sidebar-and-affordance inventory snapshot and archived it to plan history — every count had drifted from the manifest, and the one durable decision (the palette-only JSON-export tree providers are intentionally never registered as views) now lives as a comment at their construction site.

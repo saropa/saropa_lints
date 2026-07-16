@@ -18,10 +18,50 @@ all shipped. These are the gaps.
 
 ## 4.1 Accuracy measurement gate that reads `accuracyTarget` **[IN PROGRESS — paused since 2026-06-24, reviewed 2026-07-16]**
 
-> **Status as of 2026-07-16:** No further fixture-adequacy work has landed since 2026-06-24 (last
+> **Status as of 2026-07-16:** No further fixture-adequacy work had landed since 2026-06-24 (last
 > relevant commits: `a5c2dc2c` liveness tool + `avoid_hardcoded_api_urls` fix, `b9eddd7e` api_network
 > 20→0, `d724edff` code_quality 36→32). The instrument ships and works; the corpus cleanup is stalled.
 > **Next action → see "Next action" block at the end of §4.1.**
+
+### Tool confounder removed 2026-07-16 — stylistic rules were 133 false silents
+
+The full-corpus run was scoped `--tier pedantic`, but **no tier — not even pedantic — contains the
+stylistic rules** (`getRulesForTier('pedantic')` unions essential→pedantic, never `stylisticRules`; and
+`stylistic` was not even a valid `tierOrder` entry). So the scan never enabled any stylistic rule, and the
+report marked every stylistic rule that has an `expect_lint` fixture as silent. That was **133 of the 744**
+reported silents (18%) — pure measurement error, not fixture bugs.
+
+Fix (this session): `ScanRunner` gained an optional `enabledRuleNames` set that bypasses tier/config, and
+`accuracy_report` now defaults to `getAllDefinedRules()` (pedantic ∪ stylistic) so every marker-bearing rule
+is actually exercised; `--tier <name>` still narrows when wanted. Verified on `example/lib/collection`: the
+three stylistic rules there (`prefer_list_first`, `prefer_list_last`, `map_keys_ordering`) plus
+`prefer_fold_over_reduce` flipped silent→fired with no fixture change. 9 `accuracy_report` unit tests still
+pass.
+
+**True silent count with all rules enabled (2026-07-16 full-corpus re-run): 664** (was 744 under
+`--tier pedantic`). Enabling stylistic exercised 80 rules that had been false silents. **53 stylistic rules
+are still genuinely silent** even with all rules on — those are real fixture/rule gaps, not the confounder.
+So the corrected worklist is 664, of which 611 are non-stylistic and 53 are stylistic.
+
+### Collection cluster: silents here are genuine RULE bugs, not fixture inadequacy
+
+Unlike api_network (mostly inadequate fixtures), the remaining collection silents are rules that fail to
+detect their own correct canonical bad example. Verified by the silent report (the fixtures show the right
+bad code; the rules do not fire on it under resolved analysis):
+
+- **`prefer_list_contains`** — checks `right is IntegerLiteral && value == -1`, but `!= -1` parses as a
+  `PrefixExpression` (unary minus over `1`), never an `IntegerLiteral`, so the canonical
+  `list.indexOf(x) != -1` is missed. Needs to handle negated-literal right operands.
+- **`avoid_map_keys_contains`** — only handles a `PropertyAccess` target, but `map.keys` on a
+  simple-identifier receiver is a `PrefixedIdentifier`, so the canonical `map.keys.contains(k)` is missed.
+- **`avoid_unnecessary_collections`** — registers on `MethodInvocation`, but `List.of([...])` /
+  `Set.of(...)` / `Map.of(...)` resolve to `InstanceCreationExpression` under resolution, so the rule
+  never sees them in a resolved scan (and, by the same token, in the real analyzer).
+
+These are production under-firing bugs (each affects every consumer project), so fixing them is a
+blast-radius change gated on approval — distinct from the mechanical fixture wraps the api_network loop
+assumed. `prefer_asmap_over_indexed_iteration` and `require_key_for_collection` in this dir are not yet
+categorized.
 
 
 Premise correction: `accuracyTarget` is **not** unpopulated. It is a derived getter
