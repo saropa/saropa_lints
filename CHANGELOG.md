@@ -64,6 +64,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot. No action required — the API is opt-in and read by other extensions, not shown in the UI. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+
+### Added
+
+- **(Extension) `getDailySummary(date)` on the extension's public API.** Sibling Saropa Suite tools can now read this project's current health score, violation counts, and error-level trouble items for a given day via `getExtension('saropa.saropa-lints').exports.getDailySummary('YYYY-MM-DD')`, which resolves to a documented `DailySummary` (or `undefined` before any analysis has run). No action required — the summary is built lazily on call, reads only local analysis output, and transmits nothing.
+
+---
+
 ## [14.3.3]
 
 Adds a rule pack for device_calendar_plus, a maintained replacement for the abandoned device_calendar plugin with a different API (no relation to the existing device_calendar rule pack, which stays as-is). Also fixes the Package Dashboard's Opportunities detection so document files like README.md are never counted as an adoptable API, and adds an Opportunities section to the Package Detail sidebar with per-feature links to the package's source code and documentation. No action required — the new rules and the Opportunities fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.3/CHANGELOG.md)

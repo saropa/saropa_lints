@@ -31,6 +31,7 @@ import {
 } from './setup';
 import { verifyPluginLiveness, surfaceLivenessResult } from './pluginLiveness';
 import type { SaropaLintsApi } from './api';
+import { buildDailySummary } from './dailySummary';
 import { invalidateCodeLenses, registerCodeLensProvider } from './codeLensProvider';
 import { IssuesTreeProvider, parseViolationsGroupBy, registerIssueCommands, type IssueTreeNode } from './views/issuesTree';
 import {
@@ -423,6 +424,26 @@ function syncRuleMetadataFromViolations(data: ViolationsData | null): void {
   setConflictingRulesMetadata(data?.config?.conflictingRulesByRule);
   setSupersedesRulesMetadata(data?.config?.supersedesRulesByRule);
   setRuleTagsMetadata(data?.config?.ruleMetadataByRule);
+}
+
+/**
+ * Count direct dependencies with an available upgrade from the in-memory
+ * Package Vibrancy scan. Returns undefined when no scan has run this session
+ * (never triggers one — the daily-summary API must not do network work), so
+ * the count is omitted rather than reported as a misleading zero.
+ */
+function countOutdatedPackages(): number | undefined {
+  const results = getLatestResults();
+  if (results.length === 0) return undefined;
+  return results.filter((r) => {
+    // Direct deps only — the packages the developer controls in pubspec.yaml.
+    // Transitive/dev entries the scan also carries are not directly actionable
+    // and would inflate the daily "outdated" count with things the user can't
+    // bump on their own.
+    if (!r.package.isDirect) return false;
+    const status = r.updateInfo?.updateStatus;
+    return status === 'patch' || status === 'minor' || status === 'major';
+  }).length;
 }
 
 export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
@@ -1999,6 +2020,20 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   // Public API for other extensions (e.g. Saropa Log Capture). See api.ts and extension README.
   const api: SaropaLintsApi = {
+    apiVersion: 1,
+    async getDailySummary(date: string) {
+      const r = getProjectRoot();
+      const data = r ? readViolations(r) : null;
+      // Undefined (not an empty summary) before any analysis exists, so the
+      // Suite omits this tool's section entirely.
+      if (!data) return undefined;
+      return buildDailySummary({
+        date,
+        data,
+        history: loadHistory(context.workspaceState),
+        outdatedPackages: countOutdatedPackages(),
+      });
+    },
     getViolationsData(): ViolationsData | null {
       const r = getProjectRoot();
       return r ? readViolations(r) : null;
