@@ -2660,9 +2660,16 @@ class PreferAsmapOverIndexedIterationRule extends SaropaLintRule {
       final condition = parts.condition;
       if (condition is! BinaryExpression) return;
       if (condition.operator.type != TokenType.LT) return;
+      // `list.length` on a simple-identifier receiver is a PrefixedIdentifier,
+      // not a PropertyAccess; matching only PropertyAccess missed the canonical
+      // `i < list.length` loop bound on a plain variable (BUG FIX 2026-07-16).
       final rightOperand = condition.rightOperand;
-      if (rightOperand is! PropertyAccess) return;
-      if (rightOperand.propertyName.name != 'length') return;
+      final bool boundIsLength =
+          (rightOperand is PropertyAccess &&
+              rightOperand.propertyName.name == 'length') ||
+          (rightOperand is PrefixedIdentifier &&
+              rightOperand.identifier.name == 'length');
+      if (!boundIsLength) return;
       if (parts.updaters.length != 1) return;
       if (!_bodyUsesIndex(node.body, indexName)) return;
       reporter.atNode(node);
@@ -3331,7 +3338,7 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_key_for_collection',
-    '[require_key_for_collection] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve child widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter widget tree issues. {v4}',
+    '[require_key_for_collection] List items in dynamic collections (ListView, GridView, etc.) must have a Key to preserve child widget state (e.g., TextField input, animations) when the list reorders or updates. Missing keys can cause UI bugs, loss of user input, broken animations, and confusing user experiences. This is a common source of hard-to-debug Flutter widget tree issues. {v5}',
     correctionMessage:
         'Add a Key (such as ValueKey, ObjectKey, or UniqueKey) to each list item. Ensure the key is unique and stable for each item, especially when items are reordered or updated. Document key usage in your builder methods to prevent state loss.',
     severity: DiagnosticSeverity.WARNING,
@@ -3360,46 +3367,61 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Syntactic path: unresolved, `ListView.builder(...)` presents as a
+    // MethodInvocation with a SimpleIdentifier target.
     context.addMethodInvocation((MethodInvocation node) {
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
 
-      final String widgetName = target.name;
-      final String methodName = node.methodName.name;
-
-      // Check for ListView.builder, GridView.builder, etc.
-      if (!_listBuilderWidgets.contains(widgetName)) return;
-      if (!_builderMethods.contains(methodName)) return;
-
-      // Find the itemBuilder argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
-          final Expression builderExpr = arg.expression;
-          if (builderExpr is FunctionExpression) {
-            _checkBuilderForKey(builderExpr, reporter);
-          }
-        }
+      if (_listBuilderWidgets.contains(target.name) &&
+          _builderMethods.contains(node.methodName.name)) {
+        _scanItemBuilderArg(node.argumentList, reporter);
       }
     });
 
-    // Also check for ReorderableListView and AnimatedList constructors
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String? typeName = node.constructorName.type.element?.name;
-      if (typeName == null) return;
+      final ConstructorName cn = node.constructorName;
+      final String typeName = cn.type.name.lexeme;
+      final String? ctorName = cn.name?.name;
 
-      if (typeName == 'ReorderableListView' ||
+      // Resolved path: `ListView.builder` / `GridView.builder` are named
+      // constructors, so under resolution they become InstanceCreationExpression
+      // and the MethodInvocation handler above never sees them — missing the
+      // primary case in a resolved scan (BUG FIX 2026-07-16). Read the type
+      // syntactically (`name.lexeme`) so the check does not depend on the widget
+      // type resolving.
+      final bool isBuilderConstructor =
+          _listBuilderWidgets.contains(typeName) &&
+          ctorName != null &&
+          _builderMethods.contains(ctorName);
+
+      // Unnamed constructors that take an itemBuilder directly.
+      final bool isDirectBuilderWidget =
+          typeName == 'ReorderableListView' ||
           typeName == 'AnimatedList' ||
-          typeName == 'SliverAnimatedList') {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
-            final Expression builderExpr = arg.expression;
-            if (builderExpr is FunctionExpression) {
-              _checkBuilderForKey(builderExpr, reporter);
-            }
-          }
-        }
+          typeName == 'SliverAnimatedList';
+
+      if (isBuilderConstructor || isDirectBuilderWidget) {
+        _scanItemBuilderArg(node.argumentList, reporter);
       }
     });
+  }
+
+  /// Runs the missing-key check on the `itemBuilder:` argument of [args], when
+  /// present. Shared by the syntactic (method-invocation) and resolved
+  /// (instance-creation) detection paths.
+  void _scanItemBuilderArg(
+    ArgumentList args,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    for (final Expression arg in args.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
+        final Expression builderExpr = arg.expression;
+        if (builderExpr is FunctionExpression) {
+          _checkBuilderForKey(builderExpr, reporter);
+        }
+      }
+    }
   }
 
   void _checkBuilderForKey(

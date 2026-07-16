@@ -81,6 +81,24 @@ silent→fired and 69 collection unit tests still pass:
 Remaining silent in `example/lib/collection`: `prefer_asmap_over_indexed_iteration` and
 `require_key_for_collection` (a widget rule) — still uncategorized, next if this cluster is resumed.
 
+#### Done 2026-07-16 (continued) — collection cluster now 0 silent (all 27 fire)
+
+The last two were the same two bug classes already seen in this cluster:
+
+- `prefer_asmap_over_indexed_iteration` — required the `for` bound to be a `PropertyAccess`, but
+  `list.length` on a plain variable is a `PrefixedIdentifier`, so the canonical
+  `for (i = 0; i < list.length; i++)` never fired. Now accepts both shapes. (Message carries no `{vN}`
+  marker, so no in-message bump.)
+- `require_key_for_collection` v4→v5 — `ListView.builder` / `GridView.builder` are named constructors, so
+  under resolution they are `InstanceCreationExpression`, not the `MethodInvocation` the primary handler
+  matched; the instance-creation handler covered only Reorderable/Animated. Extended it to the `.builder`
+  constructors (reading the type name syntactically so it does not depend on the widget type resolving),
+  and factored the shared `itemBuilder:` scan into one helper.
+
+`accuracy_report --fixtures example/lib/collection` = 27/27 fire; 69 collection unit tests pass. The
+collection cluster (`example/lib/collection`) is fully green. Five genuine under-firing rule bugs were fixed
+in this cluster total (three approved + these two of the same classes).
+
 
 Premise correction: `accuracyTarget` is **not** unpopulated. It is a derived getter
 ([saropa_lint_rule.dart:2288](../lib/src/saropa_lint_rule.dart#L2288)) computed from `ruleType`, and

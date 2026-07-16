@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, and fixes three collection rules that were silently missing their most common bad-code shape. No action required — the API is opt-in and read by other extensions, and the rule fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
+Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, and fixes five collection rules that were silently missing their most common bad-code shape. No action required — the API is opt-in and read by other extensions, and the rule fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md)
 
 ### Added
 
@@ -77,6 +77,8 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 - **`prefer_list_contains` now flags `indexOf(x) != -1`.** The rule only recognized a bare `0` or `-1` on the right of the comparison, but `-1` is written as a negation, not a plain number, so the most common presence check — `list.indexOf(x) != -1` — was never flagged. It now is. No action required.
 - **`avoid_map_keys_contains` now flags `map.keys.contains(k)` on a plain variable.** The rule previously matched only chained receivers (like `this.map.keys.contains(k)`) and missed the ordinary `map.keys.contains(k)` on a simple map variable — the usual shape. Its quick fix (`map.containsKey(k)`) now applies to those cases too. No action required.
 - **`avoid_unnecessary_collections` now flags `List.of([...])`/`Set.of(...)`/`Map.of(...)`.** The rule missed these wrapped-literal constructors during full analysis because they are constructor calls, which analysis represents differently from the method-call shape the rule looked for. Both shapes are now flagged. No action required.
+- **`prefer_asmap_over_indexed_iteration` now flags `for (i = 0; i < list.length; i++)`.** The rule required the loop bound to be a chained property read and missed the ordinary `list.length` on a plain list variable — the usual shape — so it effectively never fired. It now does. No action required.
+- **`require_key_for_collection` now flags `ListView.builder`/`GridView.builder` during full analysis.** These are constructor calls, which full analysis represents differently from the method-call shape the rule looked for, so keyless items in the most common list builders went unflagged; only a few less-common widgets were caught. All shapes are now flagged. No action required.
 
 <details>
 <summary>Maintenance</summary>
