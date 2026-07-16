@@ -6,8 +6,15 @@
 **Subsystem:** `lib/src/cli/project_vibrancy.dart` (Dart-side collector) + `extension/src/vibrancy/` (subprocess host)
 **Status:** Phases 1-2 LANDED 2026-06-24 (element-resolved counts + entry-point exclusions, degrade-safe;
 `lib/src/cli/project_vibrancy_resolved_usage.dart`, tests in `test/cli/project_vibrancy_resolved_usage_test.dart`).
-Phases 3-5 (tree-SHA usage cache, dedicated killable/chunked subprocess, cascading unused) still OPEN —
-deferred pending precision review of the resolved `unused` flag on real repos.
+Phases 3-5 (tree-SHA usage cache, dedicated killable/chunked subprocess, cascading unused) BLOCKED —
+the precision review this plan gated on (Verification section, Phase-2 "Done when") ran 2026-07-16 and
+FAILED. On this repo 326 `lib/` functions flag `unused`, ~50%+ false positives: 147 `@override` methods
+and the entire `bin/`-called CLI surface. Root cause: the resolved pass builds one
+`AnalysisContextCollection` over the repo root, which contains nested package roots (`self_check/`,
+`example*/`, `packages/`, `build/test_tmp/…`); `contextFor` fails for `lib/` files, they are skipped, and
+skipped files fall back to name-based counts with no entry-point protection. Filed as
+`bugs/infra_vibrancy_unused_false_positives_context_fragmentation.md`. Fix the context construction and
+`bin/`-scope defects (Phase 1-2 correctness), re-run the precision review, THEN decide Phases 3-5.
 
 ---
 

@@ -62,6 +62,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 - `infra_native_plugin_full_tier_runs_on_files_in_flux.md` — rapid-edit gate is dead code; full tier re-runs on every keystroke pass. Fixed in 14.3.2 (server-only gate defers all rules while a file is in flux); archived to `plans/history/2026.07/2026.07.10/`.
 
+## Raised Reports (2026-07-16)
+
+- `infra_vibrancy_unused_false_positives_context_fragmentation.md` — project vibrancy `unused` flag: the element-resolved usage pass degrades on multi-package repos (nested pubspec roots fail `contextFor`), so skipped files fall back to name-based counts with no entry-point protection; 147 `@override` methods + the `bin/`-called CLI surface flagged dead on this repo. Blocks Phases 3-5 of `plans/PLAN_vibrancy_usage_collector_element_resolution.md`.
+
 ---
 
 ## File Naming
