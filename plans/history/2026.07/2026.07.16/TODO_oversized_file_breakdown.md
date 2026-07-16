@@ -1,6 +1,7 @@
 # TODO — Oversized view-file breakdown
 
 **Created:** 2026-06-12
+**Closed:** 2026-07-16 — all ten files decomposed; see the closure note at the bottom.
 **Context:** The extension's webview screens are modular by concern (per-screen html/script/styles/
 controller split), but a handful of individual files are large. This tracks breaking each one into
 focused modules. The **Findings dashboard is done** (it is the central-dashboard core — see
@@ -299,3 +300,23 @@ class, and extracting it is provably safe because the method is a pure function 
 Behavior-preserving internal refactor; no user-facing change, no new or changed l10n strings.
 
 Finish report appended: plans/TODO_oversized_file_breakdown.md
+
+---
+
+## Closed (2026-07-16)
+
+All ten files in the original list are decomposed. The two files previously tracked as "partial"
+are ACCEPTED as final state, not deferred work:
+
+- **views/issuesTree.ts** — now **714 lines** (was 1340 at plan start, 783 at last report; other
+  refactors shrank it further). The remaining bulk is the `IssuesTreeProvider` class: one cohesive
+  stateful unit (filter/suppression/index state + `getChildren`). Everything separable — node types,
+  command layer, `getTreeItem` renderer — is already extracted.
+- **views/violationsWideReportView.ts** — now **786 lines** (was 952). The remaining bulk is the
+  `getOrCreatePanel` controller + its message handler: one cohesive stateful unit. The pure stats
+  helpers are already extracted, and the file has no test to guarantee a byte-identical further split.
+
+Both are below the plan's own oversized bar — the smallest file that qualified for the original
+list was 952 lines. Splitting a single stateful class into free functions purely to shrink a
+line count would be fragmentation with behavior risk and no readability gain, so the plan is
+closed rather than kept open for it. If either file grows past ~1000 lines again, open a new plan.

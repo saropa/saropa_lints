@@ -76,6 +76,7 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 <summary>Maintenance</summary>
 
 - Split the Issues tree provider's ~220-line tree-item renderer into a sibling module so the provider class carries only its stateful filter/index logic. Behavior-identical; the tree-item tests pin the render output.
+- Closed the oversized view-file breakdown plan and archived it to plan history — all ten tracked files are decomposed, and the two residual stateful controllers are accepted as cohesive final-state modules.
 
 </details>
 
