@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, and fixes five collection rules that were silently missing their most common bad-code shape. No action required — the API is opt-in and read by other extensions, and the rule fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.4/CHANGELOG.md)
+Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, and fixes six lint rules (five collection, one async) that were silently missing their most common bad-code shape. No action required — the API is opt-in and read by other extensions, and the rule fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.4/CHANGELOG.md)
 
 ### Added
 
@@ -79,11 +79,13 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 - **`avoid_unnecessary_collections` now flags `List.of([...])`/`Set.of(...)`/`Map.of(...)`.** The rule missed these wrapped-literal constructors during full analysis because they are constructor calls, which analysis represents differently from the method-call shape the rule looked for. Both shapes are now flagged. No action required.
 - **`prefer_asmap_over_indexed_iteration` now flags `for (i = 0; i < list.length; i++)`.** The rule required the loop bound to be a chained property read and missed the ordinary `list.length` on a plain list variable — the usual shape — so it effectively never fired. It now does. No action required.
 - **`require_key_for_collection` now flags `ListView.builder`/`GridView.builder` during full analysis.** These are constructor calls, which full analysis represents differently from the method-call shape the rule looked for, so keyless items in the most common list builders went unflagged; only a few less-common widgets were caught. All shapes are now flagged. No action required.
+- **`prefer_commenting_future_delayed` now works during full analysis and stops flagging already-commented delays.** `Future.delayed` is a constructor call (represented differently from a method call during full analysis), so the rule never fired for anyone; and it looked for the explanatory comment on the wrong token, so an `await Future.delayed(...)` with a comment above it was treated as uncommented. Both are fixed: the rule fires on uncommented delays and stays quiet when a comment precedes the statement. No action required.
 
 <details>
 <summary>Maintenance</summary>
 
 - Fixed the rule-liveness report (`accuracy_report`) so it exercises stylistic rules. No tier — not even pedantic — contains the stylistic rules, so the previous tier-scoped scan never enabled them and falsely reported stylistic rules with fixtures as silent; correcting it flipped 80 previously-false-silent rules to firing (the silent worklist dropped from 744 to 664). The report now defaults to all defined rules (`--tier <name>` narrows it), via a new optional explicit rule-set on the scan runner.
+- Repaired the collection and async rule fixtures so the liveness instrument exercises the rules that were correct but sitting on inadequate fixtures. Collection reached full coverage (all 27 rules fire). Async went from 13 silent to 4: eight fixtures made realistic (typed streams/futures, class-method context, matching heuristic identifiers, a real `WebSocketChannel`). The four remaining are two rules whose fixtures resolve to zero diagnostics under the full-corpus scan (cause not yet isolated with per-file tooling) and two `expect_lint` markers naming rules that were never implemented.
 - Split the Issues tree provider's ~220-line tree-item renderer into a sibling module so the provider class carries only its stateful filter/index logic. Behavior-identical; the tree-item tests pin the render output.
 - Closed the oversized view-file breakdown plan and archived it to plan history — all ten tracked files are decomposed, and the two residual stateful controllers are accepted as cohesive final-state modules.
 - Ran the flight-risk scoring research gate (predictive-score validation) and recorded a negative result: on a 16-incident corpus mined from this repo's fix history, the candidate composite formula lost to the complexity-alone baseline, so the feature stays unbuilt and its plan stays open with the findings and re-attempt conditions documented.

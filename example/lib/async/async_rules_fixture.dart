@@ -380,22 +380,25 @@ class FutureBuilder<T> extends Widget {
 // =========================================================================
 
 // BAD: WebSocket without reconnection handling
+// The rule matches a bounded `WebSocketChannel` / `WebSocket` token in the class
+// source (toSource(), so comments do not count), so the channel type must be a
+// real WebSocketChannel, not `WebSocketChannel` (no word boundary after WebSocket).
 class BadWebSocketService {
   // expect_lint: require_websocket_reconnection
-  WebSocketDemo? _channel;
+  WebSocketChannel? _channel;
 
   void connect() {
-    _channel = WebSocketDemo.connect('wss://example.com');
+    _channel = WebSocketChannel.connect('wss://example.com');
   }
 }
 
 // GOOD: WebSocket with reconnection logic
 class GoodWebSocketService {
-  WebSocketDemo? _channel;
+  WebSocketChannel? _channel;
   int _reconnectAttempts = 0;
 
   void connect() {
-    _channel = WebSocketDemo.connect('wss://example.com');
+    _channel = WebSocketChannel.connect('wss://example.com');
     _channel!.stream.listen(
       (data) {},
       onDone: _handleReconnect,
@@ -458,9 +461,9 @@ class GoodCacheService {
 }
 
 // Mock classes
-class WebSocketDemo {
-  static WebSocketDemo connect(String url) => WebSocketDemo._();
-  WebSocketDemo._();
+class WebSocketChannel {
+  static WebSocketChannel connect(String url) => WebSocketChannel._();
+  WebSocketChannel._();
   StreamDemo get stream => StreamDemo();
 }
 

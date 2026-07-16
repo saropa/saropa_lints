@@ -99,6 +99,41 @@ The last two were the same two bug classes already seen in this cluster:
 collection cluster (`example/lib/collection`) is fully green. Five genuine under-firing rule bugs were fixed
 in this cluster total (three approved + these two of the same classes).
 
+#### Done 2026-07-16 (continued) — async cluster: 13 → 4 silent (user-approved)
+
+Nine of the 13 async silents fixed; 92 async unit tests pass. This cluster was a mix, not one class:
+
+- **Rule bug (same InstanceCreation-vs-MethodInvocation class as collection):** `prefer_commenting_future_delayed`
+  (v4→v5). `Future.delayed` is a named constructor → `InstanceCreationExpression` under resolution, so the
+  MethodInvocation-only handler never fired for anyone. Also fixed a second real bug: it checked the leading
+  comment on the `Future` token, but in `await Future.delayed(...)` the `await` token owns the comment, so it
+  could not tell a commented delay from an uncommented one (would FP on commented code). Now checks the
+  enclosing statement's token and added an InstanceCreation handler. This is the only user-facing async fix.
+- **Typed-fixture (dynamic/undefined → real type):** `require_stream_on_done`, `avoid_stream_tostring`
+  (use `StreamController<int>().stream` for a real `Stream` static type), `prefer_return_await` (declare a
+  real `Future`-returning helper).
+- **Wrong-context (nested/top-level fn → class method):** `require_completer_error_handling`,
+  `avoid_stream_in_build` (needs a method literally named `build`), `require_pending_changes_indicator`
+  (also its identifier had to match `\b_dirty\b` and avoid `.add(`, which the rule's own patterns treat as a
+  notification).
+- **Name/heuristic-gated fixtures:** `require_future_timeout` (rule matches only exact long-running method
+  names like `download`; `expensiveOperation` never matched), `require_websocket_reconnection` (rule matches
+  a bounded `\bWebSocketChannel\b`/`\bWebSocket\b` in the class source; the fixture's mock `WebSocketDemo` has
+  no boundary, so it was renamed to `WebSocketChannel`).
+
+**Remaining 4 async silents (deferred):**
+
+1. `avoid_sequential_awaits` and `avoid_sync_on_every_change` — rule logic AND fixture both look correct on
+   inspection, yet both fixtures produce **zero** diagnostics from *all* 2106 rules under the full-corpus
+   resolved scan (so the whole unit yields nothing, not a per-rule miss). Could not isolate the cause: the
+   scan CLI's `--files`/single-file `dartFiles` path does not resolve isolated files (returns zero even for a
+   known-firing control), so per-file diagnosis needs a faithful full-dir repro harness that filters by path
+   — not yet built. Deferred with this note.
+2. `prefer_isolate_for_heavy_compute` and `require_cache_ttl` — **phantom markers**: `expect_lint` comments
+   in `async_rules_fixture.dart` naming rules that exist **nowhere** in `lib/`. They can never fire because
+   there is no rule. Decision needed: remove the markers (the rules were never built) or implement the rules
+   (new feature). Left untouched pending that decision — see the suggestion in the session summary.
+
 
 Premise correction: `accuracyTarget` is **not** unpopulated. It is a derived getter
 ([saropa_lint_rule.dart:2288](../lib/src/saropa_lint_rule.dart#L2288)) computed from `ruleType`, and
