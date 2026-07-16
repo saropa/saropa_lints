@@ -1,8 +1,24 @@
 # Testing & Release Plan
 
+**Status:** CLOSED 2026-07-16 (archived by decision — see "Closure record" below).  
 **Last updated:** 2026-05-08  
 **Scope:** All lint rules in `lib/src/rules/`, tests in `test/`, and v5 release readiness.  
 **Goal:** Expand behavioral fixture integration tests, close remaining fixture gaps, verify IDE integration, prove quick-fix application end-to-end.
+
+---
+
+## Closure record (2026-07-16)
+
+Closed by decision at project version 14.3.3 (the plan predates it — it still references the retired 12.x framing). The gates that carried real signal are met; the rest are accepted at their current state rather than left as an indefinitely-open plan.
+
+| Gate | Disposition | Basis |
+|------|-------------|-------|
+| **REL-02** Quick-fix application proof (D1–D5) | **MET** | 6 assertions in `test/scan/fix_application_smoke_test.dart`; dry-run path in `test/scan/fix_application_dart_fix_dry_run_test.dart`; D5 contract documented in CONTRIBUTING.md § "Test contract for new fix producers". The migration claim in §3 is now backed by executable tests, not just structure. |
+| **REL-01** Fixture coverage | **ACCEPTED at 92.5%** | 1993 / 2154 category rule-slots (snapshot 2026-05-08). Remaining delta is real missing fixtures plus `_FIXTURE_EXEMPT_CATEGORIES`. 92.5% is the accepted bar; the publish coverage gate continues to report it. Not treated as a release blocker. |
+| **REL-04** Regression / perf baseline | **ACCEPTED (stale, non-blocking)** | F1–F4 captured at v12.8.4 (`plans/history/2026.05/2026.05.01/perf/`). Refresh is mechanical when a release-class cut needs it (recipe in that doc); not gating routine releases. |
+| **REL-03** IDE integration sign-off (E1–E5) | **DROPPED as a gate** | Requires a human at an interactive VS Code session; cannot run headless. The shipping extension demonstrates squiggles / lightbulb / fix-apply in normal use, so the manual box-ticking added no signal beyond what production already shows. Scaffold retained at `plans/history/2026.05/2026.05.01/ide_integration/` for anyone who wants to run it. |
+
+The body below is preserved as the historical record of the workstream.
 
 ## Execution snapshot
 

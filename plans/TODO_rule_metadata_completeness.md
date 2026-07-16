@@ -16,7 +16,13 @@ all shipped. These are the gaps.
 
 ---
 
-## 4.1 Accuracy measurement gate that reads `accuracyTarget` **[IN PROGRESS 2026-06-24]**
+## 4.1 Accuracy measurement gate that reads `accuracyTarget` **[IN PROGRESS — paused since 2026-06-24, reviewed 2026-07-16]**
+
+> **Status as of 2026-07-16:** No further fixture-adequacy work has landed since 2026-06-24 (last
+> relevant commits: `a5c2dc2c` liveness tool + `avoid_hardcoded_api_urls` fix, `b9eddd7e` api_network
+> 20→0, `d724edff` code_quality 36→32). The instrument ships and works; the corpus cleanup is stalled.
+> **Next action → see "Next action" block at the end of §4.1.**
+
 
 Premise correction: `accuracyTarget` is **not** unpopulated. It is a derived getter
 ([saropa_lint_rule.dart:2288](../lib/src/saropa_lint_rule.dart#L2288)) computed from `ruleType`, and
@@ -160,6 +166,34 @@ Status of §4.1: the consumer that reads accuracy targets is partially realized 
 True false-positive / true-positive-rate measurement against `accuracyTarget` remains blocked on
 line-precise fixtures. The remaining ~745 package-wide silent rules and the code_quality resolution group are
 the open work; this TODO stays active and is not moved to history.
+
+## Next action (§4.1) — what to do next, in order
+
+1. **Regenerate the silent-list worklist** (the count below is from 2026-06-24; confirm it is still ~745):
+   `dart run saropa_lints:accuracy_report --tier pedantic --fail-on none --format json`.
+2. **Pick the next cluster and repeat the api_network loop.** For each silent rule, the fix is almost always
+   the fixture, not the rule — apply the three-shape triage: (a) move the bad example into a class method if
+   the rule visits `addMethodDeclaration`; (b) add the `package:` import line if the rule gates on an import
+   URI; (c) rename the bad example to match the rule's name heuristic. Re-run `accuracy_report` on that
+   cluster to confirm silent→fired. Fix a rule only when its detection is genuinely too narrow (as with
+   `avoid_hardcoded_api_urls`), and bump its version + add a changelog Fixed entry when you do.
+3. **Defer the code_quality resolution group** (~32 rules) — these need the fixture to define real
+   enum/class types and then per-rule resolution debugging; not a mechanical wrap. Do the easy clusters first.
+4. **Do NOT wire `--fail-on silent` into CI yet.** The raw silent list over-reports because
+   package/platform/Flutter-gated rules cannot fire in the example project. Removing those confounders
+   (run fixtures in a gate-satisfying environment, and/or add `requiredPackages`/platform metadata to
+   exclude un-fireable rules) is prerequisite to a hard gate.
+5. **Blocked follow-up:** line-precise accuracy-vs-target (enforcing `expectZeroFalsePositives` /
+   `minTruePositiveRate`) stays blocked on re-authoring markers immediately above each violation. A separate
+   corpus project; do not start it before the liveness silent-list is clean.
+
+## Overall §4 status (2026-07-16)
+
+- **§4.1 accuracy gate** — IN PROGRESS, paused. Instrument done; ~745 silent-rule fixtures remain. See above.
+- **§4.2 `certIds`** — OPEN by design. Opportunistic only; no bulk pass.
+- **§4.3 rule-lifecycle enforcement** — DONE 2026-06-12.
+
+This TODO stays active until §4.1's silent list is cleared (or explicitly closed as consumer-gated).
 
 ## 4.2 `certIds` sparse/empty **[OPEN — verified — by design]**
 

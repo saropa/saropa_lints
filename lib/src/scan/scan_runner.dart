@@ -42,6 +42,7 @@ class ScanRunner {
     required this.targetPath,
     this.dartFiles,
     this.tier,
+    this.enabledRuleNames,
     this.messageSink,
     this.applyExclusionsToFileList = true,
   });
@@ -54,6 +55,14 @@ class ScanRunner {
 
   /// Optional tier name (e.g. `essential`, `recommended`, `pedantic`). When set, the rule set is taken from this tier and the project's `diagnostics:` section is not used.
   final String? tier;
+
+  /// Optional explicit set of rule names to enable, bypassing both [tier] and
+  /// the project config. Takes precedence over [tier] when both are set. Lets a
+  /// caller exercise a rule set that no single tier expresses — notably the
+  /// union of every defined rule *including* stylistic rules, which no tier
+  /// (not even `pedantic`) contains. Used by the accuracy report so that
+  /// stylistic-tier rules are actually run and not falsely reported as silent.
+  final Set<String>? enabledRuleNames;
 
   /// Optional sink for all messages. When null, messages go to stdout and progress to stderr.
   final ScanMessageSink? messageSink;
@@ -170,6 +179,11 @@ class ScanRunner {
 
   /// Resolves enabled rule names: from [tier] if set (validated via [tierOrder]), otherwise from project config.
   Set<String>? _resolveRuleNames() {
+    // An explicit rule set wins over tier/config: it is the only way to run a
+    // set no tier expresses (e.g. all rules including stylistic).
+    final explicit = enabledRuleNames;
+    if (explicit != null) return explicit;
+
     // Copy nullable to local for field promotion (avoid_nullable_interpolation).
     final tierLabel = tier;
     if (tierLabel != null) {
