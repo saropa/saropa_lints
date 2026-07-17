@@ -13,9 +13,9 @@ import 'package:test/test.dart';
 ///      chars containing the canonical `[rule_name]` prefix. This
 ///      catches typos in either the constructor or the message string
 ///      that would otherwise only fail at user-facing analysis time.
-///   2. Fixture-presence checks — each rule has a corresponding
-///      `example/lib/performance/<rule>_fixture.dart` that the analyzer
-///      uses for golden tests. Missing fixture = silent regression.
+///   2. Fixture-presence checks — auto-discovered from disk by scanning
+///      `example/lib/performance/*_fixture.dart`. New fixtures are
+///      verified automatically; no manual list to maintain.
 ///
 /// Length 50 chars is intentional: the registry's `[rule_name]` prefix
 /// alone is around 25 chars, so requiring 50+ guarantees a meaningful
@@ -288,65 +288,23 @@ void main() {
     );
   });
   group('Performance Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_keys_in_animated_lists',
-      'avoid_expensive_build',
-      'avoid_synchronous_file_io',
-      'prefer_compute_for_heavy_work',
-      'prefer_disk_cache_for_persistence',
-      'avoid_object_creation_in_hot_loops',
-      'prefer_cached_getter',
-      'avoid_excessive_widget_depth',
-      'require_item_extent_for_large_lists',
-      'prefer_image_precache',
-      'avoid_controller_in_build',
-      'avoid_setstate_in_build',
-      'avoid_string_concatenation_loop',
-      'avoid_scroll_listener_in_build',
-      'prefer_value_listenable_builder',
-      'avoid_global_key_misuse',
-      'require_repaint_boundary',
-      'avoid_text_span_in_build',
-      'avoid_large_list_copy',
-      'prefer_const_widgets',
-      'avoid_expensive_computation_in_build',
-      'avoid_widget_creation_in_loop',
-      'avoid_calling_of_in_build',
-      'require_image_cache_management',
-      'avoid_memory_intensive_operations',
-      'avoid_closure_memory_leak',
-      'prefer_static_const_widgets',
-      'require_dispose_pattern',
-      'require_list_preallocate',
-      'prefer_builder_for_conditional',
-      'require_widget_key_strategy',
-      'require_menu_bar_for_desktop',
-      'require_window_close_confirmation',
-      'prefer_native_file_dialogs',
-      'prefer_inherited_widget_cache',
-      'prefer_layout_builder_over_media_query',
-      'avoid_blocking_database_ui',
-      'avoid_money_arithmetic_on_double',
-      'avoid_rebuild_on_scroll',
-      'avoid_animation_in_large_list',
-      'prefer_lazy_loading_images',
-      'prefer_element_rebuild',
-      'require_isolate_for_heavy',
-      'avoid_finalizer_misuse',
-      'avoid_json_in_main',
-      'avoid_blocking_main_thread',
-      'avoid_full_sync_on_every_launch',
-      'prefer_binary_format',
-      'prefer_pool_pattern',
-      'avoid_backdrop_filter_in_scrollable',
-      'avoid_cache_stampede',
-      'avoid_clip_path_in_animated_builder',
-      'avoid_image_filter_in_scrollable',
-      'avoid_opacity_in_animated_builder',
-      'avoid_opacity_in_scrollable',
-      'avoid_shader_mask_in_scrollable',
-      'prefer_static_final_for_session_constant',
-    ];
+    final fixtureDir = Directory('example/lib/performance');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to drift out of sync.
+    final fixtures = fixtureDir
+        .listSync()
+        .whereType<File>()
+        .map((f) => f.uri.pathSegments.last)
+        .where((name) => name.endsWith('_fixture.dart'))
+        .map((name) => name.replaceAll('_fixture.dart', ''))
+        .toList()
+      ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

@@ -103,6 +103,7 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 - Fixed the `loadHealthHistory` test so it asserts real behavior instead of silently passing on empty results. The test had `if (points.isEmpty) return`, which meant a completely broken function still produced a green test. It now requires non-empty results (this repo has tags), asserts `codeLoc > 0`, the `codeLoc <= loc` invariant, and distinct tags when two points are returned.
 - Added `HistoryPoint.toMarkdownRow()` and `HistoryPoint.markdownHeader` for rendering health trajectory tables in markdown reports.
 - Fixed the performance-rules fixture verification test: renamed `require_window_close_confirmation_desktop_fixture.dart` to match the rule-name convention, and added 8 fixture files that existed on disk but were missing from the verification list.
+- Replaced the hardcoded fixture list in the performance test with a directory scan, so new fixture files are verified automatically without manual list maintenance. Also renamed the stale `require_window_close_confirmation_desktop_good.dart` to drop the `_desktop` suffix.
 
 </details>
 

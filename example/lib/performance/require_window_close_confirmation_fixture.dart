@@ -110,7 +110,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 // didRequestAppExit. It is a whole-file rule (any didRequestAppExit in the file
 // clears the flag) and only runs on desktop paths — hence the _desktop file
 // name and the compliant observer living in its own file
-// (require_window_close_confirmation_desktop_good.dart).
+// (require_window_close_confirmation_good.dart).
 // expect_lint: require_window_close_confirmation
 class BadLifecycleObserver extends WidgetsBindingObserver {
   void onStart() {
