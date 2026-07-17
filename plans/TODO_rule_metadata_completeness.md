@@ -136,10 +136,13 @@ Nine of the 13 async silents fixed; 92 async unit tests pass. This cluster was a
    - **`avoid_sequential_awaits`** (v2→v3): registered via `context.addFunctionBody`, which is a **no-op stub**
      in the native engine (`saropa_context.dart:1002` — FunctionBody is not a visitable node), so the rule
      never fired for anyone. Switched to `addBlockFunctionBody` (the real registration; the rule already
-     narrowed to BlockFunctionBody). **Engine finding: `addFunctionBody` is a silent no-op used by 4 more
-     call sites in 3 other rule files — `get_it_rules.dart:172`, `hive_rules.dart:1163`, and
-     `stylistic_control_flow_rules.dart:267 & 389` — so those rules are also dead. Out of this cluster's
-     scope; flagged for follow-up.**
+     narrowed to BlockFunctionBody). **Engine finding (RESOLVED 2026-07-16, user-approved): `addFunctionBody`
+     is a silent no-op used by 4 more call sites in 3 other rule files, so those rules were also dead —
+     `require_getit_registration_order` (get_it), `require_hive_adapter_registration_order` (hive),
+     `prefer_single_exit_point` and `prefer_guard_clauses` (stylistic_control_flow). All four switched to
+     `addBlockFunctionBody` and version-bumped. Verified with throwaway marker fixtures (accuracy_report: all
+     4 fire); the scratch fixtures were removed after verifying — these 4 rules still have NO permanent
+     fixtures, a pre-existing gap worth a later dedicated fixture pass.**
 2. `prefer_isolate_for_heavy_compute` and `require_cache_ttl` — **phantom markers** (RESOLVED 2026-07-16,
    user-approved): `expect_lint` comments in `async_rules_fixture.dart` named rules that exist **nowhere** in
    `lib/`, so they could never fire. The two marker lines were removed (replaced with a `NOTE:` explaining no
