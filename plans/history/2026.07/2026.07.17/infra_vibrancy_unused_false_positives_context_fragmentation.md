@@ -1,6 +1,6 @@
 # BUG: project vibrancy `unused` flag — resolved-usage pass degrades on multi-package repos, reintroducing false positives
 
-**Status: Fix Ready**
+**Status: Fixed**
 
 <!-- Status values: Open → Investigating → Fix Ready → Closed -->
 
