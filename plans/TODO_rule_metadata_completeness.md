@@ -140,9 +140,12 @@ Nine of the 13 async silents fixed; 92 async unit tests pass. This cluster was a
      is a silent no-op used by 4 more call sites in 3 other rule files, so those rules were also dead —
      `require_getit_registration_order` (get_it), `require_hive_adapter_registration_order` (hive),
      `prefer_single_exit_point` and `prefer_guard_clauses` (stylistic_control_flow). All four switched to
-     `addBlockFunctionBody` and version-bumped. Verified with throwaway marker fixtures (accuracy_report: all
-     4 fire); the scratch fixtures were removed after verifying — these 4 rules still have NO permanent
-     fixtures, a pre-existing gap worth a later dedicated fixture pass.**
+     `addBlockFunctionBody` and version-bumped. **Permanent fixtures added** for all four (they previously had
+     none, which is how their deadness went unnoticed): `stylistic_control_flow/prefer_single_exit_point_fixture.dart`,
+     `stylistic_control_flow/prefer_guard_clauses_fixture.dart`,
+     `dependency_injection/require_getit_registration_order_fixture.dart`, and
+     `db_yield/require_hive_adapter_registration_order_fixture.dart`. accuracy_report confirms each is measured
+     and fires (1/1 fixtures).**
 2. `prefer_isolate_for_heavy_compute` and `require_cache_ttl` — **phantom markers** (RESOLVED 2026-07-16,
    user-approved): `expect_lint` comments in `async_rules_fixture.dart` named rules that exist **nowhere** in
    `lib/`, so they could never fire. The two marker lines were removed (replaced with a `NOTE:` explaining no
