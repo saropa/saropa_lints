@@ -1870,6 +1870,12 @@ class HttpClient {
 
 class StateProvider<T> {
   StateProvider(T Function(dynamic) create);
+
+  // Riverpod factory constructors — needed by fixture tests.
+  static StateProvider<T> autoDispose<T>(T Function(dynamic) create) =>
+      StateProvider<T>(create);
+  static StateProvider<T> family<T>(T Function(dynamic) create) =>
+      StateProvider<T>(create);
 }
 
 class ConsumerWidget extends Widget {

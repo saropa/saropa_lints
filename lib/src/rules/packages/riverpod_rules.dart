@@ -2856,23 +2856,32 @@ class _StateProviderVisitor extends RecursiveAstVisitor<void> {
     super.visitTopLevelVariableDeclaration(node);
   }
 
-  /// True when [expr] is a `StateProvider(...)` or
-  /// `StateProvider.autoDispose(...)` (or any `.xyz(...)` prefixed form).
+  /// Riverpod factory names that create a StateProvider.
+  /// Unchecked target names (e.g. `StateProvider.somethingElse()`) would
+  /// false-positive; restrict to the known Riverpod API surface.
+  static const _stateProviderFactories = {'autoDispose', 'family'};
+
+  /// True when [expr] is a `StateProvider(...)`,
+  /// `StateProvider.autoDispose(...)`, or `StateProvider.family(...)`.
   static bool _isStateProviderCreation(Expression expr) {
-    // Covers `StateProvider(...)` and `StateProvider.autoDispose(...)`.
+    // `StateProvider.autoDispose(...)` / `StateProvider.family(...)` parse as
+    // MethodInvocation with target=StateProvider, methodName=autoDispose|family.
     if (expr is MethodInvocation) {
       final target = expr.target;
-      if (target is SimpleIdentifier && target.name == 'StateProvider') {
+      if (target is SimpleIdentifier &&
+          target.name == 'StateProvider' &&
+          _stateProviderFactories.contains(expr.methodName.name)) {
         return true;
       }
     }
-    // Covers `StateProvider(...)` when parsed as a constructor call.
+    // `StateProvider(...)` / `StateProvider<int>(...)` — constructor call.
     if (expr is InstanceCreationExpression) {
       final name = expr.constructorName.type.name.lexeme;
       return name == 'StateProvider';
     }
-    // Covers bare function-reference `StateProvider<T>(...)` parsed as
-    // a FunctionExpressionInvocation with a SimpleIdentifier function.
+    // Defensive: `StateProvider<T>(...)` can parse as a
+    // FunctionExpressionInvocation with a SimpleIdentifier function when
+    // the analyzer can't resolve the type.
     if (expr is FunctionExpressionInvocation) {
       final fn = expr.function;
       if (fn is SimpleIdentifier && fn.name == 'StateProvider') return true;
