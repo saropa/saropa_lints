@@ -20,12 +20,14 @@ void main() {
         Directory.current.path,
         maxTags: 2,
       );
-      // No tags / git unavailable — nothing to assert.
-      if (points.isEmpty) return;
+      // This repo has tags; an empty result means the function is broken.
+      expect(points, isNotEmpty);
       expect(points.length, lessThanOrEqualTo(2));
       for (final p in points) {
         expect(p.tag, isNotEmpty);
         expect(p.loc, greaterThan(0));
+        expect(p.codeLoc, greaterThan(0));
+        expect(p.codeLoc, lessThanOrEqualTo(p.loc));
         expect(p.fileCount, greaterThan(0));
         expect(p.maxCognitive, greaterThanOrEqualTo(0));
       }

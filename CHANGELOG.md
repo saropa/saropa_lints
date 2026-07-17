@@ -75,6 +75,7 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 
 ### Fixed
 
+- **`prefer_notifier_over_state` false positives eliminated.** The rule matched `StateProvider` by scanning serialized source text, which could match unrelated identifiers containing that substring; it now checks the constructor/invocation name directly via the AST. No action required.
 - **Code Health age scores were stuck at zero.** A broken decay formula scored every function with git history as maximally stale, so the age component contributed nothing to health rankings; ages now decay correctly from 100 (touched today) toward 0 over years. Overall scores rise slightly on recently maintained code — no action required.
 - **`prefer_list_contains` now flags `indexOf(x) != -1`.** The rule only recognized a bare `0` or `-1` on the right of the comparison, but `-1` is written as a negation, not a plain number, so the most common presence check — `list.indexOf(x) != -1` — was never flagged. It now is. No action required.
 - **`avoid_map_keys_contains` now flags `map.keys.contains(k)` on a plain variable.** The rule previously matched only chained receivers (like `this.map.keys.contains(k)`) and missed the ordinary `map.keys.contains(k)` on a simple map variable — the usual shape. Its quick fix (`map.containsKey(k)`) now applies to those cases too. No action required.
@@ -99,6 +100,8 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 - Closed the oversized view-file breakdown plan and archived it to plan history — all ten tracked files are decomposed, and the two residual stateful controllers are accepted as cohesive final-state modules.
 - Ran the flight-risk scoring research gate (predictive-score validation) and recorded a negative result: on a 16-incident corpus mined from this repo's fix history, the candidate composite formula lost to the complexity-alone baseline, so the feature stays unbuilt and its plan stays open with the findings and re-attempt conditions documented.
 - Closed the sidebar-and-affordance inventory snapshot and archived it to plan history — every count had drifted from the manifest, and the one durable decision (the palette-only JSON-export tree providers are intentionally never registered as views) now lives as a comment at their construction site.
+- Fixed the `loadHealthHistory` test so it asserts real behavior instead of silently passing on empty results. The test had `if (points.isEmpty) return`, which meant a completely broken function still produced a green test. It now requires non-empty results (this repo has tags), asserts `codeLoc > 0` and the `codeLoc <= loc` invariant.
+- Fixed the performance-rules fixture verification test: renamed `require_window_close_confirmation_desktop_fixture.dart` to match the rule-name convention, and added 8 fixture files that existed on disk but were missing from the verification list.
 
 </details>
 
