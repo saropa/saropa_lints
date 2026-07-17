@@ -784,10 +784,7 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
   /// token (`Future`) always saw null and would fire even on a commented delay
   /// (BUG FIX 2026-07-16 — checking the statement token both lets the rule fire
   /// under resolution and stops it flagging genuinely-commented delays).
-  void _reportIfUncommented(
-    AstNode node,
-    SaropaDiagnosticReporter reporter,
-  ) {
+  void _reportIfUncommented(AstNode node, SaropaDiagnosticReporter reporter) {
     final Statement? statement = node.thisOrAncestorOfType<Statement>();
     final Token begin = (statement ?? node).beginToken;
     if (begin.precedingComments == null) {

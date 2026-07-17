@@ -39,7 +39,8 @@ void main() {
 
       stubCallPatterns.forEach((String method, RegExp pattern) {
         for (final match in pattern.allMatches(content)) {
-          final line = '\n'.allMatches(content.substring(0, match.start)).length + 1;
+          final line =
+              '\n'.allMatches(content.substring(0, match.start)).length + 1;
           offenders.add('$normalizedPath:$line — .$method(');
         }
       });

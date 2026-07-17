@@ -1235,8 +1235,10 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
     // slot silently dropped the first handler. Both are fixed by scanning the
     // unit once with a single visitor and reporting at its end.
     context.addCompilationUnit((CompilationUnit unit) {
-      final _IntlUsageVisitor visitor =
-          _IntlUsageVisitor(_intlTypes, _intlMethods);
+      final _IntlUsageVisitor visitor = _IntlUsageVisitor(
+        _intlTypes,
+        _intlMethods,
+      );
       unit.accept(visitor);
 
       if (!visitor.hasLocaleInit && visitor.intlUsages.isNotEmpty) {

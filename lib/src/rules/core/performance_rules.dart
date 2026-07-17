@@ -3699,7 +3699,8 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
     context.addCompilationUnit((CompilationUnit unit) {
       // Only report for desktop platforms.
       final String path = context.filePath;
-      final bool isDesktop = path.contains('_desktop') ||
+      final bool isDesktop =
+          path.contains('_desktop') ||
           path.contains('_macos') ||
           path.contains('_windows') ||
           path.contains('_linux');

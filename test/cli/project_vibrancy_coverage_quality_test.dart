@@ -69,29 +69,17 @@ void main() {
 
   group('computeFreshCodeFlag', () {
     test('flags complex code rewritten within the 90-day window', () {
-      expect(
-        computeFreshCodeFlag(medianAgeDays: 10, complexity: 15),
-        isTrue,
-      );
+      expect(computeFreshCodeFlag(medianAgeDays: 10, complexity: 15), isTrue);
       // Boundary: exactly 90 days is still inside the window.
-      expect(
-        computeFreshCodeFlag(medianAgeDays: 90, complexity: 11),
-        isTrue,
-      );
+      expect(computeFreshCodeFlag(medianAgeDays: 90, complexity: 11), isTrue);
     });
 
     test('false when the code is old, however complex', () {
-      expect(
-        computeFreshCodeFlag(medianAgeDays: 91, complexity: 40),
-        isFalse,
-      );
+      expect(computeFreshCodeFlag(medianAgeDays: 91, complexity: 40), isFalse);
     });
 
     test('false when fresh but simple (complexity at or below 10)', () {
-      expect(
-        computeFreshCodeFlag(medianAgeDays: 1, complexity: 10),
-        isFalse,
-      );
+      expect(computeFreshCodeFlag(medianAgeDays: 1, complexity: 10), isFalse);
     });
 
     test('null age (no git history) never flags', () {

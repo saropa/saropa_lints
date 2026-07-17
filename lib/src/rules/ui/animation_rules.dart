@@ -934,8 +934,9 @@ class PreferImplicitAnimationsRule extends SaropaLintRule {
     // addPostRunCallback that deferred this is a no-op on the native engine, so
     // collect in one compilation-unit pass and report at its end instead.
     context.addCompilationUnit((CompilationUnit unit) {
-      final _ImplicitAnimationVisitor visitor =
-          _ImplicitAnimationVisitor(_transitionToImplicit);
+      final _ImplicitAnimationVisitor visitor = _ImplicitAnimationVisitor(
+        _transitionToImplicit,
+      );
       unit.accept(visitor);
 
       // Only single-transition classes benefit from an implicit-animation
@@ -955,8 +956,7 @@ class _ImplicitAnimationVisitor extends RecursiveAstVisitor<void> {
   _ImplicitAnimationVisitor(this._transitionToImplicit);
 
   final Map<String, String> _transitionToImplicit;
-  final Map<ClassDeclaration, int> transitionCounts =
-      <ClassDeclaration, int>{};
+  final Map<ClassDeclaration, int> transitionCounts = <ClassDeclaration, int>{};
   final List<_TransitionNode> pendingReports = <_TransitionNode>[];
 
   @override

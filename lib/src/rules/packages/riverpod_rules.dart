@@ -2810,15 +2810,18 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
     // is a no-op on the native engine, so gather declarations and mutations in
     // one compilation-unit pass and report at its end instead.
     context.addCompilationUnit((CompilationUnit unit) {
-      final _StateProviderVisitor visitor =
-          _StateProviderVisitor(_notifierStatePattern);
+      final _StateProviderVisitor visitor = _StateProviderVisitor(
+        _notifierStatePattern,
+      );
       unit.accept(visitor);
 
       // Report StateProviders whose state is mutated at 3+ sites.
       visitor.stateProviderDecls.forEach((String name, AstNode decl) {
         final int mutations = visitor.mutationSources
-            .where((String source) =>
-                RegExp(r'\b' + RegExp.escape(name) + r'\b').hasMatch(source))
+            .where(
+              (String source) =>
+                  RegExp(r'\b' + RegExp.escape(name) + r'\b').hasMatch(source),
+            )
             .length;
         if (mutations >= 3) {
           reporter.atNode(decl);

@@ -2677,8 +2677,9 @@ class RequireTestCleanupRule extends SaropaLintRule {
     // The v4 addPostRunCallback that deferred the report is a no-op on the
     // native engine, so scan the unit once and report at its end instead.
     context.addCompilationUnit((CompilationUnit unit) {
-      final _TestCleanupVisitor visitor =
-          _TestCleanupVisitor(_createsTestResources);
+      final _TestCleanupVisitor visitor = _TestCleanupVisitor(
+        _createsTestResources,
+      );
       unit.accept(visitor);
 
       final MethodInvocation? test = visitor.testWithResourceCreation;

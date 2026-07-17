@@ -883,7 +883,6 @@ double? _medianBlameAgeDays(_FunctionNode fn, Map<int, int>? blame) {
       86400.0;
 }
 
-
 double? _computeCoverage(_FunctionNode fn, Set<int>? hitLines) {
   if (hitLines == null) return null;
   final totalLines = (fn.lineEnd - fn.lineStart + 1).clamp(1, 100000);

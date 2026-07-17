@@ -2797,8 +2797,9 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
     // no-op on the native engine, so scan the whole unit once and report at its
     // end instead.
     context.addCompilationUnit((CompilationUnit unit) {
-      final _ErrorCaseTestVisitor visitor =
-          _ErrorCaseTestVisitor(_errorCaseKeywords);
+      final _ErrorCaseTestVisitor visitor = _ErrorCaseTestVisitor(
+        _errorCaseKeywords,
+      );
       unit.accept(visitor);
 
       final FunctionDeclaration? mainFunction = visitor.mainFunction;
