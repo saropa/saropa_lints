@@ -60,6 +60,35 @@ void main() {
     expect(rowPipes, headerPipes);
   });
 
+  test('toMarkdownTable combines header and rows', () {
+    const a = HistoryPoint(
+      tag: 'v1.0.0',
+      fileCount: 10,
+      loc: 500,
+      codeLoc: 400,
+      maxCognitive: 8,
+    );
+    const b = HistoryPoint(
+      tag: 'v2.0.0',
+      fileCount: 20,
+      loc: 1000,
+      codeLoc: 800,
+      maxCognitive: 12,
+    );
+
+    final table = HistoryPoint.toMarkdownTable([a, b]);
+    final lines = table.split('\n');
+    // Header row + separator + 2 data rows.
+    expect(lines, hasLength(4));
+    expect(lines[0], startsWith('| Tag'));
+    expect(lines[1], startsWith('| ---'));
+    expect(lines[2], a.toMarkdownRow());
+    expect(lines[3], b.toMarkdownRow());
+
+    // Empty list returns empty string, not a header-only table.
+    expect(HistoryPoint.toMarkdownTable([]), isEmpty);
+  });
+
   test('a non-git directory yields no history', () async {
     final tmp = Directory.systemTemp.createTempSync('saropa_nohist_');
     addTearDown(() => tmp.deleteSync(recursive: true));

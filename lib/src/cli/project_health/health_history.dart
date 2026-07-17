@@ -46,6 +46,20 @@ class HistoryPoint {
   static const markdownHeader =
       '| Tag | Files | LoC | Code LoC | Max Cognitive |\n'
       '| --- | ----: | --: | -------: | ------------: |';
+
+  /// Combines [markdownHeader] with [toMarkdownRow] for every point into a
+  /// complete markdown table. Returns empty string when [points] is empty so
+  /// callers don't emit a header-only table.
+  static String toMarkdownTable(List<HistoryPoint> points) {
+    if (points.isEmpty) return '';
+    final buf = StringBuffer(markdownHeader);
+    for (final p in points) {
+      buf
+        ..write('\n')
+        ..write(p.toMarkdownRow());
+    }
+    return buf.toString();
+  }
 }
 
 /// Builds the trajectory across the most recent [maxTags] tags (chronological).
