@@ -1067,7 +1067,7 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'pass_correct_accepted_type',
-    '[pass_correct_accepted_type] Argument type does not match the parameter type declared by the @Accept annotation. Passing an incompatible type circumvents the annotation contract, which may cause runtime cast failures or incorrect behavior in the called function. {v4}',
+    '[pass_correct_accepted_type] Argument type does not match the parameter type declared by the @Accept annotation. Passing an incompatible type circumvents the annotation contract, which may cause runtime cast failures or incorrect behavior in the called function. {v5}',
     correctionMessage:
         'Change the argument to match the type declared in the @Accept annotation, or update the annotation if the accepted type has intentionally changed.',
     severity: DiagnosticSeverity.WARNING,
@@ -1078,7 +1078,11 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addFormalParameter((FormalParameter node) {
+    // addFormalParameter is a no-op stub in the native engine (FormalParameter
+    // is not a visitable node), so this rule never fired. This rule only ever
+    // acted on SimpleFormalParameter (it read `.type`), so addSimpleFormalParameter
+    // is the correct real registration (BUG FIX 2026-07-16).
+    context.addSimpleFormalParameter((SimpleFormalParameter node) {
       // Check for Accept-style annotations
       for (final Annotation annotation in node.metadata) {
         final String annotationName = annotation.name.name;
@@ -1091,9 +1095,7 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
               final String expectedTypeName = firstArg.type.toSource();
 
               // Get actual parameter type
-              final TypeAnnotation? paramType = node is SimpleFormalParameter
-                  ? node.type
-                  : null;
+              final TypeAnnotation? paramType = node.type;
 
               if (paramType != null) {
                 final String actualTypeName = paramType.toSource();
