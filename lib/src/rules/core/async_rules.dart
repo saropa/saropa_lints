@@ -4883,7 +4883,7 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_sequential_awaits',
     '[avoid_sequential_awaits] Multiple sequential awaits on independent '
-        'operations. Total time is sum of all; could run in parallel. {v2}',
+        'operations. Total time is sum of all; could run in parallel. {v3}',
     correctionMessage:
         'Use Future.wait([...]) to run independent futures concurrently.',
     severity: DiagnosticSeverity.INFO,
@@ -4894,9 +4894,11 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addFunctionBody((FunctionBody body) {
-      if (body is! BlockFunctionBody) return;
-
+    // addFunctionBody is a no-op stub in the native engine (FunctionBody is not
+    // a visitable node there), so this rule never fired for anyone.
+    // addBlockFunctionBody is the real registration and hands us the
+    // BlockFunctionBody directly (BUG FIX 2026-07-16).
+    context.addBlockFunctionBody((BlockFunctionBody body) {
       // Find all await expressions in the body
       final List<AwaitExpression> awaits = <AwaitExpression>[];
       body.accept(_AwaitCollector(awaits));

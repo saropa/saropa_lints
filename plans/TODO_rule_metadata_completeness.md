@@ -121,14 +121,25 @@ Nine of the 13 async silents fixed; 92 async unit tests pass. This cluster was a
   a bounded `\bWebSocketChannel\b`/`\bWebSocket\b` in the class source; the fixture's mock `WebSocketDemo` has
   no boundary, so it was renamed to `WebSocketChannel`).
 
-**Remaining 4 async silents (deferred):**
+**Async cluster: now 0 silent (all 4 remaining resolved 2026-07-16).**
 
-1. `avoid_sequential_awaits` and `avoid_sync_on_every_change` — rule logic AND fixture both look correct on
-   inspection, yet both fixtures produce **zero** diagnostics from *all* 2106 rules under the full-corpus
-   resolved scan (so the whole unit yields nothing, not a per-rule miss). Could not isolate the cause: the
-   scan CLI's `--files`/single-file `dartFiles` path does not resolve isolated files (returns zero even for a
-   known-firing control), so per-file diagnosis needs a faithful full-dir repro harness that filters by path
-   — not yet built. Deferred with this note.
+1. `avoid_sequential_awaits` and `avoid_sync_on_every_change` — **both diagnosed and fixed** (my earlier
+   "could not isolate" was wrong; the diagnosis method was flawed, not the rules). The reliable repro is a
+   full-dir resolved JSON scan (`dart run saropa_lints scan <dir> --resolve --format json`) filtered by file
+   path — NOT the `--files`/single-file path, which fails to resolve isolated files and returns zero even for
+   a known-firing control. Using it, a minimal clean fixture showed both rules silent while sibling rules
+   examining the same nodes fired, proving the rules (not fixtures) were at fault. Root causes:
+   - **`avoid_sync_on_every_change`**: `applicableFileTypes => {FileType.widget}`, so it only runs on files
+     containing `extends StatelessWidget`/`StatefulWidget`. The fixture used a bare `TextField` in a
+     top-level function → not a widget file → gated out. Fixed the fixture (TextField now lives in a
+     `StatelessWidget.build`).
+   - **`avoid_sequential_awaits`** (v2→v3): registered via `context.addFunctionBody`, which is a **no-op stub**
+     in the native engine (`saropa_context.dart:1002` — FunctionBody is not a visitable node), so the rule
+     never fired for anyone. Switched to `addBlockFunctionBody` (the real registration; the rule already
+     narrowed to BlockFunctionBody). **Engine finding: `addFunctionBody` is a silent no-op used by 4 more
+     call sites in 3 other rule files — `get_it_rules.dart:172`, `hive_rules.dart:1163`, and
+     `stylistic_control_flow_rules.dart:267 & 389` — so those rules are also dead. Out of this cluster's
+     scope; flagged for follow-up.**
 2. `prefer_isolate_for_heavy_compute` and `require_cache_ttl` — **phantom markers** (RESOLVED 2026-07-16,
    user-approved): `expect_lint` comments in `async_rules_fixture.dart` named rules that exist **nowhere** in
    `lib/`, so they could never fire. The two marker lines were removed (replaced with a `NOTE:` explaining no

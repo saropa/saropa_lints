@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, adds a validated `fresh_code` risk flag to the Code Health report, and fixes six lint rules (five collection, one async) that were silently missing their most common bad-code shape plus a broken age signal that scored every function as maximally stale. No action required — the API is opt-in and the new flag and fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.4/CHANGELOG.md)
+Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, adds a validated `fresh_code` risk flag to the Code Health report, and fixes seven lint rules (five collection, two async) that were silently missing their most common bad-code shape plus a broken age signal that scored every function as maximally stale. No action required — the API is opt-in and the new flag and fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.4/CHANGELOG.md)
 
 ### Added
 
@@ -82,6 +82,7 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 - **`prefer_asmap_over_indexed_iteration` now flags `for (i = 0; i < list.length; i++)`.** The rule required the loop bound to be a chained property read and missed the ordinary `list.length` on a plain list variable — the usual shape — so it effectively never fired. It now does. No action required.
 - **`require_key_for_collection` now flags `ListView.builder`/`GridView.builder` during full analysis.** These are constructor calls, which full analysis represents differently from the method-call shape the rule looked for, so keyless items in the most common list builders went unflagged; only a few less-common widgets were caught. All shapes are now flagged. No action required.
 - **`prefer_commenting_future_delayed` now works during full analysis and stops flagging already-commented delays.** `Future.delayed` is a constructor call (represented differently from a method call during full analysis), so the rule never fired for anyone; and it looked for the explanatory comment on the wrong token, so an `await Future.delayed(...)` with a comment above it was treated as uncommented. Both are fixed: the rule fires on uncommented delays and stays quiet when a comment precedes the statement. No action required.
+- **`avoid_sequential_awaits` now fires.** The rule registered for a callback the analysis engine silently ignores, so three or more independent sequential awaits (which could run together with `Future.wait`) were never flagged for anyone. It now registers correctly and reports. No action required.
 
 <details>
 <summary>Maintenance</summary>
