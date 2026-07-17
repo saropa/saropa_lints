@@ -136,7 +136,7 @@ void main() {
     });
 
     for (final fixture in fixtures) {
-      test('\$fixture fixture exists', () {
+      test('$fixture fixture exists', () {
         final file = File(
           'example/lib/stylistic_whitespace_constructor/${fixture}_fixture.dart',
         );

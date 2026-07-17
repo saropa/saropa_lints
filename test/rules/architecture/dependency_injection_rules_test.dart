@@ -134,7 +134,7 @@ void main() {
     });
 
     for (final fixture in fixtures) {
-      test('\$fixture fixture exists', () {
+      test('$fixture fixture exists', () {
         final file = File(
           'example/lib/dependency_injection/${fixture}_fixture.dart',
         );

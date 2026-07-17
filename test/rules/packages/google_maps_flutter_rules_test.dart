@@ -75,7 +75,7 @@ void main() {
     });
 
     for (final fixture in fixtures) {
-      test('\$fixture fixture exists', () {
+      test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/google_maps_flutter/${fixture}_fixture.dart',
         );

@@ -155,7 +155,7 @@ void main() {
     });
 
     for (final fixture in fixtures) {
-      test('\$fixture fixture exists', () {
+      test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/google_sign_in/${fixture}_fixture.dart',
         );

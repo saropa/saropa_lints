@@ -100,7 +100,7 @@ void main() {
     });
 
     for (final fixture in fixtures) {
-      test('\$fixture fixture exists', () {
+      test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/flutter_svg/${fixture}_fixture.dart',
         );

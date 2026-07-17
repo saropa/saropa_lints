@@ -169,7 +169,7 @@ void main() {
     });
 
     for (final fixture in fixtures) {
-      test('\$fixture fixture exists', () {
+      test('$fixture fixture exists', () {
         final file = File(
           'example/lib/class_constructor/${fixture}_fixture.dart',
         );

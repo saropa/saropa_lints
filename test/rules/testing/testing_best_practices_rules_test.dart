@@ -251,7 +251,7 @@ void main() {
     });
 
     for (final fixture in fixtures) {
-      test('\$fixture fixture exists', () {
+      test('$fixture fixture exists', () {
         final file = File(
           'example/lib/testing_best_practices/${fixture}_fixture.dart',
         );

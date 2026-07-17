@@ -74,7 +74,7 @@ void main() {
     });
 
     for (final fixture in fixtures) {
-      test('\$fixture fixture exists', () {
+      test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/quick_actions/${fixture}_fixture.dart',
         );

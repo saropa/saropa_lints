@@ -156,7 +156,7 @@ void main() {
     });
 
     for (final fixture in fixtures) {
-      test('\$fixture fixture exists', () {
+      test('$fixture fixture exists', () {
         final file = File(
           'example/lib/memory_management/${fixture}_fixture.dart',
         );

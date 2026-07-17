@@ -34,7 +34,7 @@ void main() {
     });
 
     for (final fixture in fixtures) {
-      test('\$fixture fixture exists', () {
+      test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/auto_route/${fixture}_fixture.dart',
         );
