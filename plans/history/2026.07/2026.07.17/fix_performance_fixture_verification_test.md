@@ -53,6 +53,10 @@ The phase-2 conversion left 128 test files still using hardcoded fixture name li
 
 `dart test test/` — 6774 tests passed, 1 skipped, 0 failures.
 
+### Post-review fix
+
+The migration script escaped `$fixture` as `\$fixture` in the Dart `test()` call string, so 125 of the 126 converted files printed the literal `$fixture fixture exists` instead of interpolating the fixture name. Tests still passed (name is cosmetic for pass/fail), but failure attribution in test output was destroyed — a failing fixture would show `$fixture` instead of the actual rule name. Fixed by removing the backslash in all 125 files.
+
 ### Remaining
 
 The 2 excluded files (`roadmap_15_rules_test.dart`, `migration_rules_test.dart`) retain manual fixture references. Both have single fixtures at the `example/lib/` root level with no per-category subdirectory, and their tests validate fixture content, not just existence.
