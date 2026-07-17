@@ -1302,6 +1302,11 @@
         "label": "chanjo ya habari inayoshukiwa.",
         "evidence": "{pct}% bila mtihani wowote.",
         "rule": "Imewekwa alama wakati LCOV inaripoti chanjo kubwa lakini hakuna jaribio linalorejelea kazi."
+      },
+      "fresh_code": {
+        "label": "Fresh code mpya ya kificho.",
+        "evidence": "CC {cc}, imeandikwa upya hivi karibuni.",
+        "rule": "Inaonyeshwa wakati utata wa cyclomatic unazidi 10 na mwili wa kazi uliandikwa au kuandikwa tena ndani ya siku 90 zilizopita. Hivi karibuni, maandishi ya kificho yaliyoandikwa upya yalisababisha matukio mengi zaidi kuliko nambari za zamani wakati wa uthibitisho."
       }
     },
     "shortcuts": {

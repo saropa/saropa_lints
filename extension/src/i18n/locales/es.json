@@ -1302,6 +1302,11 @@
         "label": "cobertura de una señal sospechosa.",
         "evidence": "{pct}% sin ninguna prueba.",
         "rule": "Se señala cuando LCOV informa de una alta cobertura pero ninguna prueba hace referencia a la función."
+      },
+      "fresh_code": {
+        "label": "código nuevo",
+        "evidence": "CC {cc}, reescrito recientemente",
+        "rule": "Se marca cuando la complejidad ciclomática supera 10 y el cuerpo de la función se escribió o reescribió en los últimos 90 días. El código complejo recientemente reescrito causó incidentes con mucha más frecuencia que el código antiguo en la validación."
       }
     },
     "shortcuts": {

@@ -1302,6 +1302,11 @@
         "label": "verdächtige Berichterstattung zu erhalten.",
         "evidence": "{pct}% ohne einen Test.",
         "rule": "Flagged, wenn LCOV eine hohe Abdeckung meldet, aber kein Test auf die Funktion verweist."
+      },
+      "fresh_code": {
+        "label": "frischer Code",
+        "evidence": "CC {cc}, kürzlich neu geschrieben",
+        "rule": "Wird markiert, wenn die zyklomatische Komplexität 10 überschreitet und der Funktionskörper innerhalb der letzten 90 Tage geschrieben oder umgeschrieben wurde. Kürzlich umgeschriebener komplexer Code verursachte bei der Validierung weitaus häufiger Vorfälle als alter Code."
       }
     },
     "shortcuts": {

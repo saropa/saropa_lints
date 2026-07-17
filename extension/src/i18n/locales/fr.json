@@ -1302,6 +1302,11 @@
         "label": "couverture de la couverture suspecte.",
         "evidence": "{pct}% sans aucun test à effectuer.",
         "rule": "Marqué lorsque LCOV signale une couverture élevée mais aucun test ne fait référence à la fonction."
+      },
+      "fresh_code": {
+        "label": "nouveau code",
+        "evidence": "CC {cc}, récemment réécrit",
+        "rule": "Signalé lorsque la complexité cyclomatique dépasse 10 et que le corps de la fonction a été écrit ou réécrit au cours des 90 derniers jours. Le code complexe récemment réécrit a provoqué des incidents beaucoup plus souvent que l'ancien code lors de la validation."
       }
     },
     "shortcuts": {

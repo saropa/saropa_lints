@@ -1302,6 +1302,11 @@
         "label": "sinyal yang mencurigakan.",
         "evidence": "{pct}% tanpa tes apapun.",
         "rule": "Ditandai ketika LCOV melaporkan cakupan tinggi tetapi tidak ada tes yang merujuk fungsi."
+      },
+      "fresh_code": {
+        "label": "kode baru",
+        "evidence": "CC {cc}, baru-baru ini ditulis ulang",
+        "rule": "Ditandai ketika kompleksitas siklomatik melebihi 10 dan isi fungsi ditulis atau ditulis ulang dalam 90 hari terakhir. Kode kompleks yang baru ditulis ulang menyebabkan insiden jauh lebih sering daripada kode lama dalam validasi."
       }
     },
     "shortcuts": {
