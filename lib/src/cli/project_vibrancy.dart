@@ -389,7 +389,8 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     final coverageScore = effectiveCoverage == null
         ? 50.0
         : effectiveCoverage * 100.0;
-    final ageScore = _computeAgeScore(fn, blameByFile[fn.filePath]);
+    final medianAgeDays = _medianBlameAgeDays(fn, blameByFile[fn.filePath]);
+    final ageScore = ageScoreFromDays(medianAgeDays);
     final usageCount = _mergeUsageCount(
       id: fn.id,
       nameBased: usageCounts[fn.id] ?? 0,
@@ -455,6 +456,16 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     if (fn.complexity > 10) flags.add('complex');
     if (documentationScore < 20 && fn.complexity > 10) {
       flags.add('undocumented');
+    }
+    // Recency-weighted risk flag: complex code whose blame lines are young.
+    // Validated signal (see computeFreshCodeFlag doc): in the flight-risk
+    // corpus, incident functions were young + complex; the elaborate composite
+    // score lost to exactly this pair and stays behind its research gate.
+    if (computeFreshCodeFlag(
+      medianAgeDays: medianAgeDays,
+      complexity: fn.complexity,
+    )) {
+      flags.add('fresh_code');
     }
     // Apply per-file flag suppressions parsed at file-read time. A row whose
     // suppression set covers a flag has that flag dropped — the row still
@@ -840,8 +851,11 @@ Future<Map<String, Map<int, int>>> _collectBlameAges(
   return result;
 }
 
-double _computeAgeScore(_FunctionNode fn, Map<int, int>? blame) {
-  if (blame == null || blame.isEmpty) return 50.0;
+/// Median age in days of the function's blame lines, or null when no blame
+/// data covers the span (no git history, file outside the repo). Shared by
+/// the age score and the fresh_code flag so both read the same signal.
+double? _medianBlameAgeDays(_FunctionNode fn, Map<int, int>? blame) {
+  if (blame == null || blame.isEmpty) return null;
   final epochs = <int>[];
   for (var line = fn.lineStart; line <= fn.lineEnd; line++) {
     final ts = blame[line];
@@ -849,14 +863,13 @@ double _computeAgeScore(_FunctionNode fn, Map<int, int>? blame) {
       epochs.add(ts);
     }
   }
-  if (epochs.isEmpty) return 50.0;
+  if (epochs.isEmpty) return null;
   epochs.sort();
   final medianEpoch = epochs[epochs.length ~/ 2];
-  final days =
-      (DateTime.now().millisecondsSinceEpoch ~/ 1000 - medianEpoch) / 86400.0;
-  final score = 100.0 * (2.718281828459045 * -days / 365.0).clamp(0.0, 1.0);
-  return score.clamp(0.0, 100.0);
+  return (DateTime.now().millisecondsSinceEpoch ~/ 1000 - medianEpoch) /
+      86400.0;
 }
+
 
 double? _computeCoverage(_FunctionNode fn, Set<int>? hitLines) {
   if (hitLines == null) return null;

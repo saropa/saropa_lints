@@ -5,8 +5,12 @@
 **Source plan:** `history/2026.04/2026.04.28/project_vibrancy_report.md` (§ Phase 5 — Flight-Risk)
 **Subsystem:** `lib/src/cli/project_vibrancy.dart` (collectors + score) + `extension/src/vibrancy/` (surface)
 **Status:** OPEN — RESEARCH-GATED. No production code until the scoring model is validated.
-Gate attempted 2026-07-16: the candidate formula FAILED the baseline comparison on the in-repo
-incident corpus (see Findings below). Negative result recorded; the gate remains unpassed.
+Gate attempted 2026-07-16 (twice: initial + hardened instrument): the candidate formula FAILED
+the baseline comparison on the in-repo incident corpus — under the hardened instrument it is
+statistically significantly WORSE than complexity-alone (p ≈ 0.046, n = 29). Negative result
+recorded; the gate remains unpassed. The validated residue (recency+complexity) shipped
+separately as the `fresh_code` vibrancy flag — a threshold flag on existing signals, not the
+gated composite score.
 
 ---
 
@@ -199,3 +203,72 @@ instrument was a scratch script outside the project tree per the plan's mandate.
 **Outcome:** gate FAILED on this corpus; plan remains OPEN — RESEARCH-GATED. No churn
 collector, no author-count collector, no score, no UI surface may be built until a
 mechanistically different gate attempt passes.
+
+---
+
+## Findings — hardened instrument re-run (gate attempt 1b, 2026-07-16)
+
+**Verdict: the gate failure is CONFIRMED and now statistically significant. The candidate
+composite is significantly WORSE than complexity-alone (Wilcoxon signed-rank z = −2.0,
+p ≈ 0.046, n = 29). Separately, the recency+complexity pair validated well enough to ship as
+the `fresh_code` flag (see below) — it is the equal-best predictor tested, not a composite.**
+
+### What was hardened (each answers a weakness recorded in attempt 1's reflection)
+
+1. **Corpus definition:** only `fix(rules...)` commits qualify (rule-behavior fixes by repo
+   convention), dropping refactor-adjacent `fix:` commits — 47 qualifying, 30 sampled, 29 scored
+   (one skip: changed lines outside parseable functions; v1 skipped 14 of 30).
+2. **Offender location:** all hunks in all changed files are mapped; the offending function is
+   the one containing the most changed pre-fix lines (v1 used only the first hunk).
+3. **Parser:** comments and string-literal contents stripped before declaration matching and
+   brace counting.
+4. **Complexity:** aligned with the production `_ComplexityVisitor` term set
+   (if/for/while/do/case/catch, `&&`/`||`, ternary proxy).
+5. **Churn:** max of blame-surviving span churn AND file-level `git log` commit count in the
+   window walked from the parent — overwritten history can no longer hide churn.
+6. **Pool:** 100 sampled rule files + changed files per incident (~2,600–2,900 functions ranked
+   per incident, ~2.5× v1).
+7. **Significance:** paired Wilcoxon signed-rank (tie-corrected normal approximation).
+
+### Results (n = 29; percentile rank of the offending function, higher = better)
+
+| Score | Median | Mean | Top-decile hits |
+|---|---|---|---|
+| fresh (recency + complexity, equal-weight sum) | **80.4** | 66.4 | 9 |
+| fresh (recency × complexity) | 67.9 | 65.3 | 9 |
+| Recency-alone (1 − age) | 66.1 | 62.4 | 9 |
+| **Complexity-alone (baseline to beat)** | 65.3 | 64.2 | 9 |
+| Churn-alone | 54.5 | 48.6 | 0 |
+| Candidate composite (equal-weight sum) | 43.1 | 47.2 | 7 |
+| Candidate composite (multiplicative) | 38.6 | 42.3 | 5 |
+| Age-alone | 33.9 | 37.6 | 2 |
+
+Significance (paired, two-sided): composite-multiplicative vs complexity-alone z = −2.0,
+p ≈ 0.046 (composite significantly worse); recency vs complexity p ≈ 0.71; fresh-multiplicative
+vs complexity p ≈ 0.48 (indistinguishable). Instrument: `d:\tmp\flight_risk_spike_v2.py`,
+raw rows in `d:\tmp\flight_risk_results_v2.json`.
+
+### What changed vs attempt 1 and why
+
+- The composite got WORSE under the better instrument (median 59.4 → 38.6). Attempt 1's
+  looser corpus and first-hunk offender location had flattered it; with the offending function
+  located by majority-of-changed-lines and refactor commits excluded, the age factor's wrong
+  direction dominates.
+- Churn-alone dropped (65.2 → 54.5): v1's blame-only churn partly measured recency, not
+  instability. With the dual estimate, churn adds little on this corpus.
+- The age factor is confirmed directionally wrong (median 33.9 — offending functions are young).
+
+### The shippable residue: the `fresh_code` flag
+
+The recency+complexity pair — both signals already collected by the vibrancy CLI — is the
+equal-best predictor tested (most top-decile hits, highest medians) and requires no new
+history-walking collectors. It shipped 2026-07-16 as the `fresh_code` flag
+(`computeFreshCodeFlag` in `lib/src/cli/project_vibrancy_coverage_quality.dart`: median blame
+age ≤ 90 days AND cyclomatic complexity > 10), with the honest claim recorded in its doc
+comment: as good as the best naive baseline, not proven better (p ≈ 0.48 at n = 29). This is a
+threshold FLAG on two existing validated signals, not the gated composite SCORE — the gate
+above still bans the flight-risk composite, its new collectors, and any numeric risk score.
+
+The same run fixed a latent production defect found while wiring the flag: the vibrancy age
+score's decay formula (`e * -days / 365`, clamped) evaluated to 0 for every function with git
+history; it now computes the intended `exp(-days/365)` (see `ageScoreFromDays`).

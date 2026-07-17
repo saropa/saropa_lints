@@ -66,14 +66,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, and fixes six lint rules (five collection, one async) that were silently missing their most common bad-code shape. No action required — the API is opt-in and read by other extensions, and the rule fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.4/CHANGELOG.md)
+Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, adds a validated `fresh_code` risk flag to the Code Health report, and fixes six lint rules (five collection, one async) that were silently missing their most common bad-code shape plus a broken age signal that scored every function as maximally stale. No action required — the API is opt-in and the new flag and fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.4/CHANGELOG.md)
 
 ### Added
 
+- **`fresh_code` flag in the Code Health (vibrancy) report.** Functions with cyclomatic complexity above 10 whose body was written or rewritten within the last 90 days are now flagged, because validation against real bug-fix history showed recently rewritten complex code causes incidents far more often than old code. No action required — the flag appears in the CLI report and as a filterable pill in the extension's Code Health view.
 - **(Extension) `getDailySummary(date)` on the extension's public API.** Sibling Saropa Suite tools can now read this project's current health score, violation counts, and error-level trouble items for a given day via `getExtension('saropa.saropa-lints').exports.getDailySummary('YYYY-MM-DD')`, which resolves to a documented `DailySummary` (or `undefined` before any analysis has run). No action required — the summary is built lazily on call, reads only local analysis output, and transmits nothing.
 
 ### Fixed
 
+- **Code Health age scores were stuck at zero.** A broken decay formula scored every function with git history as maximally stale, so the age component contributed nothing to health rankings; ages now decay correctly from 100 (touched today) toward 0 over years. Overall scores rise slightly on recently maintained code — no action required.
 - **`prefer_list_contains` now flags `indexOf(x) != -1`.** The rule only recognized a bare `0` or `-1` on the right of the comparison, but `-1` is written as a negation, not a plain number, so the most common presence check — `list.indexOf(x) != -1` — was never flagged. It now is. No action required.
 - **`avoid_map_keys_contains` now flags `map.keys.contains(k)` on a plain variable.** The rule previously matched only chained receivers (like `this.map.keys.contains(k)`) and missed the ordinary `map.keys.contains(k)` on a simple map variable — the usual shape. Its quick fix (`map.containsKey(k)`) now applies to those cases too. No action required.
 - **`avoid_unnecessary_collections` now flags `List.of([...])`/`Set.of(...)`/`Map.of(...)`.** The rule missed these wrapped-literal constructors during full analysis because they are constructor calls, which analysis represents differently from the method-call shape the rule looked for. Both shapes are now flagged. No action required.

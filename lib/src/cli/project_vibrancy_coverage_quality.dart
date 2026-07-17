@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
@@ -116,6 +117,46 @@ bool computeTestDriftFlag({
 }) {
   if (prodDaysSinceCommit < 1 || prodDaysSinceCommit > 30) return false;
   return newestLinkedTestDaysSinceCommit >= prodDaysSinceCommit * 6;
+}
+
+/// Age score from a function's median blame-line age: 100 for code touched
+/// today decaying exponentially to ~37 at one year; 50 when no git history
+/// covers the span (unknown age is scored neutral, not fresh or stale).
+///
+/// BUG FIX (2026-07-16): the previous in-place formula was `e * -days / 365`
+/// — a hand-rolled exponential decay written as multiplication BY the
+/// constant e, which is negative for every positive age and clamped to 0, so
+/// ageScore was uniformly 0 on any project with git history.
+double ageScoreFromDays(double? days) {
+  if (days == null) return 50.0;
+  return (100.0 * math.exp(-days / 365.0)).clamp(0.0, 100.0);
+}
+
+/// Flags recently rewritten complex code — the validated "fresh_code" signal.
+///
+/// Validated against a 29-incident corpus of rule-bug fixes mined from this
+/// repo's own history (plans/PLAN_vibrancy_flight_risk_scoring.md, Findings,
+/// hardened instrument 2026-07-16): offending functions were markedly YOUNGER
+/// than the surrounding pool (age-alone median percentile 33.9 — below 50
+/// means young code, not old, caused incidents), and recency-times-complexity
+/// was the equal-best predictor tested (median percentile 67.9 vs 65.3 for
+/// complexity-alone, with the most top-decile hits, 9/29 — the difference is
+/// not statistically significant at n=29, so the claim is "as good as the
+/// best baseline while carrying recency information complexity misses", not
+/// "proven better"). The elaborate multiplicative flight-risk composite was
+/// significantly WORSE than complexity-alone (p ~ 0.05) and stays unshipped
+/// behind its research gate.
+///
+/// Thresholds: 90 days matches the churn window the validation used;
+/// complexity > 10 matches the existing `complex` flag so the pair reads as
+/// "complex AND fresh". Null age (no git history for the span) never flags —
+/// absence of history is not evidence of freshness.
+bool computeFreshCodeFlag({
+  required double? medianAgeDays,
+  required int complexity,
+}) {
+  if (medianAgeDays == null) return false;
+  return medianAgeDays <= 90 && complexity > 10;
 }
 
 Set<String> _resolvedLibImports({
