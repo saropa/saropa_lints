@@ -856,7 +856,7 @@ bool _staticTypeIsCurvedAnimation(Expression expr) {
 
 /// Warns when explicit AnimationController is used for simple transitions.
 ///
-/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v2
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Alias: use_animated_widgets, prefer_animated_opacity, implicit_vs_explicit_animation
 ///
@@ -908,7 +908,7 @@ class PreferImplicitAnimationsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_implicit_animations',
-    '[prefer_implicit_animations] Simple animations such as opacity, size, or color changes are implemented with explicit AnimationController and transition widgets. This adds unnecessary complexity and increases the risk of memory leaks if disposal is missed. Prefer using implicit animation widgets like AnimatedOpacity or AnimatedContainer, which are simpler, auto-dispose, and improve code maintainability and reliability. {v2}',
+    '[prefer_implicit_animations] Simple animations such as opacity, size, or color changes are implemented with explicit AnimationController and transition widgets. This adds unnecessary complexity and increases the risk of memory leaks if disposal is missed. Prefer using implicit animation widgets like AnimatedOpacity or AnimatedContainer, which are simpler, auto-dispose, and improve code maintainability and reliability. {v3}',
     correctionMessage:
         'Implicit animations are simpler and auto-dispose. Use for single-property changes.',
     severity: DiagnosticSeverity.INFO,
@@ -929,37 +929,50 @@ class PreferImplicitAnimationsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Track transitions per class to avoid O(n^2) complexity
-    final Map<ClassDeclaration, int> transitionCounts =
-        <ClassDeclaration, int>{};
-    final List<_TransitionNode> pendingReports = <_TransitionNode>[];
+    // The rule only reports a class with exactly ONE explicit transition, so
+    // every transition in every class must be counted before reporting. The v4
+    // addPostRunCallback that deferred this is a no-op on the native engine, so
+    // collect in one compilation-unit pass and report at its end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _ImplicitAnimationVisitor visitor =
+          _ImplicitAnimationVisitor(_transitionToImplicit);
+      unit.accept(visitor);
 
-    context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String? typeName = node.constructorName.type.element?.name;
-      if (typeName == null) return;
-
-      if (!_transitionToImplicit.containsKey(typeName)) return;
-
-      // Find parent class
-      AstNode? current = node.parent;
-      while (current != null && current is! ClassDeclaration) {
-        current = current.parent;
-      }
-
-      if (current is ClassDeclaration) {
-        transitionCounts[current] = (transitionCounts[current] ?? 0) + 1;
-        pendingReports.add(_TransitionNode(current, node));
-      }
-    });
-
-    // Report only single-transition classes after all nodes are visited
-    context.addPostRunCallback(() {
-      for (final _TransitionNode item in pendingReports) {
-        if (transitionCounts[item.classDecl] == 1) {
+      // Only single-transition classes benefit from an implicit-animation
+      // rewrite; classes coordinating several transitions legitimately use an
+      // explicit controller.
+      for (final _TransitionNode item in visitor.pendingReports) {
+        if (visitor.transitionCounts[item.classDecl] == 1) {
           reporter.atNode(item.node.constructorName, code);
         }
       }
     });
+  }
+}
+
+/// Counts explicit transition widgets per enclosing class.
+class _ImplicitAnimationVisitor extends RecursiveAstVisitor<void> {
+  _ImplicitAnimationVisitor(this._transitionToImplicit);
+
+  final Map<String, String> _transitionToImplicit;
+  final Map<ClassDeclaration, int> transitionCounts =
+      <ClassDeclaration, int>{};
+  final List<_TransitionNode> pendingReports = <_TransitionNode>[];
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String? typeName = node.constructorName.type.element?.name;
+    if (typeName != null && _transitionToImplicit.containsKey(typeName)) {
+      AstNode? current = node.parent;
+      while (current != null && current is! ClassDeclaration) {
+        current = current.parent;
+      }
+      if (current is ClassDeclaration) {
+        transitionCounts[current] = (transitionCounts[current] ?? 0) + 1;
+        pendingReports.add(_TransitionNode(current, node));
+      }
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }
 

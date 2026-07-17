@@ -6,6 +6,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../target_matcher_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -695,7 +696,7 @@ class RequireAppleSignInRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_apple_sign_in',
     '[require_apple_sign_in] Third-party login detected without Sign in with Apple. '
-        'iOS apps with social login must offer Sign in with Apple. {v2}',
+        'iOS apps with social login must offer Sign in with Apple. {v3}',
     correctionMessage:
         'Add Sign in with Apple using the sign_in_with_apple package '
         'per App Store Guidelines 4.8.',
@@ -734,42 +735,62 @@ class RequireAppleSignInRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Track if file has third-party sign-in and Apple sign-in
-    bool hasThirdPartySignIn = false;
-    bool hasAppleSignIn = false;
-    MethodInvocation? firstThirdPartyNode;
-
-    // Check file source for Apple sign-in presence
+    // Apple sign-in may be implemented anywhere in the file, so the "third-party
+    // login without Apple" verdict needs the whole file scanned first. The v4
+    // addPostRunCallback that deferred the report is a no-op on the native
+    // engine, so scan the unit once and report at its end instead.
     final String fileSource = context.fileContent;
-    for (final String indicator in _appleSignInIndicators) {
-      if (fileSource.contains(indicator)) {
-        hasAppleSignIn = true;
-        break;
+    final bool hasAppleSignIn = _appleSignInIndicators.any(fileSource.contains);
+    if (hasAppleSignIn) return;
+
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _AppleSignInVisitor visitor = _AppleSignInVisitor(
+        _thirdPartySignInMethods,
+        _thirdPartySignInClasses,
+      );
+      unit.accept(visitor);
+
+      final MethodInvocation? node = visitor.firstThirdPartyNode;
+      if (node != null) {
+        reporter.atNode(node, code);
+      }
+    });
+  }
+}
+
+/// Finds the first third-party sign-in call in a unit.
+class _AppleSignInVisitor extends RecursiveAstVisitor<void> {
+  _AppleSignInVisitor(this._methods, this._classes);
+
+  final Set<String> _methods;
+  final Set<String> _classes;
+  MethodInvocation? firstThirdPartyNode;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (firstThirdPartyNode == null &&
+        _methods.contains(node.methodName.name)) {
+      final Expression? target = node.target;
+      if (target != null && _isThirdPartyTarget(target)) {
+        firstThirdPartyNode = node;
       }
     }
+    super.visitMethodInvocation(node);
+  }
 
-    context.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-
-      // Check for third-party sign-in methods
-      if (_thirdPartySignInMethods.contains(methodName)) {
-        // Verify it's from a third-party sign-in class
-        final Expression? target = node.target;
-        if (target != null && isExactTarget(target, _thirdPartySignInClasses)) {
-          hasThirdPartySignIn = true;
-          firstThirdPartyNode ??= node;
-        }
-      }
-    });
-
-    // Report after all nodes processed
-    context.addPostRunCallback(() {
-      if (hasThirdPartySignIn &&
-          !hasAppleSignIn &&
-          firstThirdPartyNode != null) {
-        reporter.atNode(firstThirdPartyNode!, code);
-      }
-    });
+  /// True when the receiver is one of the known third-party sign-in classes,
+  /// either as a bare reference (`GoogleSignIn.signIn()` / a variable) or as a
+  /// direct constructor call (`GoogleSignIn().signIn()`). isExactTarget only
+  /// recognizes identifier receivers, so the constructor-call form — which is
+  /// the actual google_sign_in / facebook_auth API and the rule's own
+  /// documented bad example — must be matched explicitly or the rule never
+  /// fires on real usage.
+  bool _isThirdPartyTarget(Expression target) {
+    if (isExactTarget(target, _classes)) return true;
+    if (target is InstanceCreationExpression) {
+      return _classes.contains(target.constructorName.type.name.lexeme);
+    }
+    return false;
   }
 }
 

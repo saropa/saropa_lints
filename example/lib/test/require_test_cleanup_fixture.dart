@@ -108,32 +108,15 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 dynamic data;
 dynamic file;
 
-// BAD: Should trigger require_test_cleanup
+// BAD: Should trigger require_test_cleanup.
+// The rule is whole-file: a tearDown / tearDownAll anywhere in the file clears
+// the flag, so the compliant example (which uses tearDown) lives in its own
+// file — require_test_cleanup_good.dart.
 // expect_lint: require_test_cleanup
 void _bad1181() async {
   test('saves file', () async {
     await File('test.txt').writeAsString('data');
     expect(await File('test.txt').exists(), isTrue);
     // File left on disk!
-  });
-}
-
-// GOOD: Should NOT trigger require_test_cleanup
-void _good1181() async {
-  late File testFile;
-
-  setUp(() {
-    testFile = File('test.txt');
-  });
-
-  tearDown(() async {
-    if (await testFile.exists()) {
-      await testFile.delete();
-    }
-  });
-
-  test('saves file', () async {
-    await testFile.writeAsString('data');
-    expect(await testFile.exists(), isTrue);
   });
 }

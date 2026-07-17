@@ -337,6 +337,15 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
       extendedForUsage[testPath] = tf.readAsStringSync();
     }
   }
+  // bin/ entry points call into lib/ functions; without these in the usage
+  // set, functions whose only caller is a CLI script score 0 references and
+  // are falsely flagged `unused`.
+  for (final binPath in listProjectBinDartPaths(root)) {
+    final bf = File(binPath);
+    if (bf.existsSync()) {
+      extendedForUsage[binPath] = bf.readAsStringSync();
+    }
+  }
   final usageCounts = _computeUsageCounts(
     extendedForUsage,
     declaredFunctions,
@@ -444,11 +453,15 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     final flags = <String>[];
     // Entry points (main, @pragma('vm:entry-point'), framework @override
     // lifecycle hooks) are runtime-invoked, not statically called, so a
-    // zero static-caller count is expected for them — never `unused`. The
-    // protection is only available when resolution ran; under the name-based
-    // fallback the flag keeps its prior (count==0) behavior.
+    // zero static-caller count is expected — never `unused`.
+    // Primary path: element-resolved entryPointIds (accurate, from the
+    // analyzer's metadata). Fallback: syntactic @override from the parse
+    // phase, which protects polymorphic methods even when the resolved pass
+    // degrades (context fragmentation, SDK mismatch).
     final isEntryPoint = resolvedUsage?.entryPointIds.contains(fn.id) ?? false;
-    if (usageCount == 0 && !isEntryPoint) flags.add('unused');
+    if (usageCount == 0 && !isEntryPoint && !fn.isOverride) {
+      flags.add('unused');
+    }
     if (rawCoverage != null && rawCoverage == 0) flags.add('uncovered');
     if (stubTested) flags.add('stub_tested');
     if (suspiciousCoverage) flags.add('suspicious_coverage');
@@ -1067,6 +1080,8 @@ class _FunctionCollector extends RecursiveAstVisitor<void> {
       node: node,
       body: body,
       hasDocComment: node.documentationComment != null,
+      // Top-level functions can't be overrides; skip the metadata scan.
+      isOverride: false,
     );
     super.visitFunctionDeclaration(node);
   }
@@ -1078,6 +1093,7 @@ class _FunctionCollector extends RecursiveAstVisitor<void> {
       node: node,
       body: node.body,
       hasDocComment: node.documentationComment != null,
+      isOverride: _hasOverrideAnnotation(node.metadata),
     );
     super.visitMethodDeclaration(node);
   }
@@ -1087,6 +1103,7 @@ class _FunctionCollector extends RecursiveAstVisitor<void> {
     required AstNode node,
     required FunctionBody body,
     required bool hasDocComment,
+    required bool isOverride,
   }) {
     final start = _lineOf(node.offset);
     final end = _lineOf(node.end);
@@ -1101,6 +1118,7 @@ class _FunctionCollector extends RecursiveAstVisitor<void> {
         lineEnd: end,
         complexity: complexity,
         hasDocComment: hasDocComment,
+        isOverride: isOverride,
       ),
     );
   }
@@ -1112,6 +1130,15 @@ class _FunctionCollector extends RecursiveAstVisitor<void> {
     }
     return line;
   }
+}
+
+/// Syntactic check for `@override` — no element resolution needed. Reliable
+/// because `override` is a language built-in, not a user-defined annotation.
+bool _hasOverrideAnnotation(NodeList<Annotation> metadata) {
+  for (final annotation in metadata) {
+    if (annotation.name.name == 'override') return true;
+  }
+  return false;
 }
 
 class _ComplexityVisitor extends RecursiveAstVisitor<void> {
@@ -1188,6 +1215,7 @@ class _FunctionNode {
     required this.lineEnd,
     required this.complexity,
     required this.hasDocComment,
+    required this.isOverride,
   });
 
   final String id;
@@ -1197,6 +1225,11 @@ class _FunctionNode {
   final int lineEnd;
   final int complexity;
   final bool hasDocComment;
+
+  /// Syntactic `@override` detected in the parse phase (no resolution needed).
+  /// Safety net: protects polymorphic methods from `unused` even when the
+  /// element-resolved pass degrades (context fragmentation, SDK mismatch).
+  final bool isOverride;
 }
 
 class _ReferenceVisitor extends RecursiveAstVisitor<void> {
@@ -1242,7 +1275,9 @@ String _stableHash(String input) {
 /// `_FunctionNode` field, a different complexity formula), so a stale on-disk
 /// parse cache is discarded rather than trusted. Per-file content hashing only
 /// catches *file* changes; this catches *engine* changes.
-const int _parseCacheVersion = 1;
+// Bump when _FunctionNode's serialized shape changes — stale caches are
+// rebuilt on the next run. v2: added isOverride field.
+const int _parseCacheVersion = 2;
 
 /// Per-file parse output, reused across phases and runs: the collected functions
 /// and the per-occurrence reference counts (`name -> times referenced in this
@@ -1395,11 +1430,13 @@ class _ProjectVibrancyCache {
       final end = f['lineEnd'];
       final complexity = f['complexity'];
       final hasDoc = f['hasDocComment'];
+      final isOvr = f['isOverride'];
       if (name is! String ||
           start is! int ||
           end is! int ||
           complexity is! int ||
-          hasDoc is! bool) {
+          hasDoc is! bool ||
+          isOvr is! bool) {
         return null;
       }
       functions.add(
@@ -1411,6 +1448,7 @@ class _ProjectVibrancyCache {
           lineEnd: end,
           complexity: complexity,
           hasDocComment: hasDoc,
+          isOverride: isOvr,
         ),
       );
     }
@@ -1436,6 +1474,7 @@ class _ProjectVibrancyCache {
               'lineEnd': f.lineEnd,
               'complexity': f.complexity,
               'hasDocComment': f.hasDocComment,
+              'isOverride': f.isOverride,
             },
           )
           .toList(growable: false),

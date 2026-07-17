@@ -1109,7 +1109,7 @@ class RequireInitialStateRule extends SaropaLintRule {
 
 /// Warns when BLoC state sealed class doesn't include an error state.
 ///
-/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v3
+/// Since: v1.7.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// States should include an error variant. Without it, errors are either
 /// swallowed or crash the app instead of showing error UI.
@@ -1150,7 +1150,7 @@ class RequireErrorStateRule extends SaropaLintRule {
   /// Alias: require_error_state_context
   static const LintCode _code = LintCode(
     'require_error_state',
-    '[require_error_state] If your BLoC state hierarchy does not include an error state, failures will be unhandled, leading to crashes or missing error UI. This makes your app less robust and harder to debug. {v3}',
+    '[require_error_state] If your BLoC state hierarchy does not include an error state, failures will be unhandled, leading to crashes or missing error UI. This makes your app less robust and harder to debug. {v4}',
     correctionMessage:
         'Add an Error state class (e.g., UserError) to your BLoC state hierarchy to handle failures gracefully and display error messages to users.',
     // SEV-01: a missing error-state class is incomplete error handling
@@ -1163,37 +1163,48 @@ class RequireErrorStateRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    final Map<String, ClassDeclaration> stateClasses =
-        <String, ClassDeclaration>{};
-    final Set<String> sealedBases = <String>{};
+    // The rule needs every `...State` class in the file before it can tell
+    // whether the sealed base is missing an error variant — the error class may
+    // be declared after the sealed base. The v4 addPostRunCallback that used to
+    // defer this is a no-op on the native engine, so collect all state classes
+    // in one compilation-unit pass and report at its end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _ErrorStateVisitor visitor = _ErrorStateVisitor();
+      unit.accept(visitor);
 
-    context.addClassDeclaration((ClassDeclaration node) {
-      final String className = node.nameToken.lexeme;
-      if (className.endsWith('State')) {
-        stateClasses[className] = node;
-        if (node.sealedKeyword != null) {
-          sealedBases.add(className);
+      // A single Error/Failure class satisfies every sealed base in the file
+      // (states typically share one hierarchy), matching the prior behavior.
+      final bool hasErrorState = visitor.stateClasses.keys.any(
+        (String name) => name.contains('Error') || name.contains('Failure'),
+      );
+      if (hasErrorState) return;
+
+      for (final String baseName in visitor.sealedBases) {
+        final ClassDeclaration? stateClass = visitor.stateClasses[baseName];
+        if (stateClass != null) {
+          reporter.atNode(stateClass, code);
         }
       }
     });
+  }
+}
 
-    context.addPostRunCallback(() {
-      for (final String baseName in sealedBases) {
-        bool hasErrorState = false;
-        for (final String className in stateClasses.keys) {
-          if (className.contains('Error') || className.contains('Failure')) {
-            hasErrorState = true;
-            break;
-          }
-        }
-        if (!hasErrorState) {
-          final stateClass = stateClasses[baseName];
-          if (stateClass != null) {
-            reporter.atNode(stateClass, code);
-          }
-        }
+/// Collects every `...State` class and which of them are sealed bases.
+class _ErrorStateVisitor extends RecursiveAstVisitor<void> {
+  final Map<String, ClassDeclaration> stateClasses =
+      <String, ClassDeclaration>{};
+  final Set<String> sealedBases = <String>{};
+
+  @override
+  void visitClassDeclaration(ClassDeclaration node) {
+    final String className = node.nameToken.lexeme;
+    if (className.endsWith('State')) {
+      stateClasses[className] = node;
+      if (node.sealedKeyword != null) {
+        sealedBases.add(className);
       }
-    });
+    }
+    super.visitClassDeclaration(node);
   }
 }
 

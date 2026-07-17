@@ -255,7 +255,10 @@ void main() {
       'avoid_find_all',
       'require_integration_test_setup',
       'avoid_hardcoded_delays',
-      'require_error_case_tests',
+      // require_error_case_tests is a whole-file rule needing a /test/ path, so
+      // its fixture lives at example/lib/test/require_error_case_tests_fixture.dart
+      // (BAD) + _good.dart (GOOD) and is verified by
+      // require_error_case_tests_test.dart, not this directory's existence loop.
       'prefer_test_find_by_key',
       'prefer_setup_teardown',
       'require_test_description_convention',

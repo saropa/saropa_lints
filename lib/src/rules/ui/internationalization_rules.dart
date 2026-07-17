@@ -1145,7 +1145,7 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
 
 /// Warns when intl package is used without initializing Intl.defaultLocale.
 ///
-/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.3.7 | Updated: v4.13.0 | Rule version: v4
 ///
 /// The intl package requires Intl.defaultLocale to be set for proper locale
 /// handling. Without initialization, date/number formatting and pluralization
@@ -1201,7 +1201,7 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_intl_locale_initialization',
-    '[require_intl_locale_initialization] Intl package used without Intl.defaultLocale initialization. The intl package requires Intl.defaultLocale to be set for proper locale handling. Without initialization, date/number formatting and pluralization may use unexpected system defaults, causing inconsistent behavior across platforms and devices. {v3}',
+    '[require_intl_locale_initialization] Intl package used without Intl.defaultLocale initialization. The intl package requires Intl.defaultLocale to be set for proper locale handling. Without initialization, date/number formatting and pluralization may use unexpected system defaults, causing inconsistent behavior across platforms and devices. {v4}',
     correctionMessage:
         'Initialize Intl.defaultLocale in main() before using DateFormat, NumberFormat, or Intl.message.',
     severity: DiagnosticSeverity.INFO,
@@ -1227,62 +1227,73 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Track if we've seen Intl.defaultLocale assignment in this file
-    bool hasLocaleInit = false;
-    final List<AstNode> intlUsages = <AstNode>[];
+    // Locale init (Intl.defaultLocale = ... / initializeDateFormatting) may
+    // appear after the intl usage it justifies, so the "used without init"
+    // verdict needs the whole file. The v4 addPostRunCallback that deferred it
+    // is a no-op on the native engine — and the old code also registered
+    // addMethodInvocation twice, so the native engine's single method-invocation
+    // slot silently dropped the first handler. Both are fixed by scanning the
+    // unit once with a single visitor and reporting at its end.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _IntlUsageVisitor visitor =
+          _IntlUsageVisitor(_intlTypes, _intlMethods);
+      unit.accept(visitor);
 
-    // First pass: check for Intl.defaultLocale assignment
-    context.addAssignmentExpression((AssignmentExpression node) {
-      final String leftSource = node.leftHandSide.toSource();
-      if (leftSource == 'Intl.defaultLocale' ||
-          leftSource.endsWith('.defaultLocale')) {
-        hasLocaleInit = true;
+      if (!visitor.hasLocaleInit && visitor.intlUsages.isNotEmpty) {
+        // Report only the first usage to avoid noise.
+        reporter.atNode(visitor.intlUsages.first, code);
       }
     });
+  }
+}
 
-    // Check for initializeDateFormatting call (also indicates proper setup)
-    context.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-      if (methodName == 'initializeDateFormatting') {
-        hasLocaleInit = true;
-        return;
-      }
+/// Collects intl usages and whether locale initialization is present anywhere
+/// in the unit.
+class _IntlUsageVisitor extends RecursiveAstVisitor<void> {
+  _IntlUsageVisitor(this._intlTypes, this._intlMethods);
 
-      // Track Intl.message, Intl.plural, etc. usage
-      final Expression? target = node.target;
-      if (target is SimpleIdentifier && target.name == 'Intl') {
-        if (_intlMethods.contains(methodName)) {
-          intlUsages.add(node);
-        }
-      }
-    });
+  final Set<String> _intlTypes;
+  final Set<String> _intlMethods;
+  bool hasLocaleInit = false;
+  final List<AstNode> intlUsages = <AstNode>[];
 
-    // Check for DateFormat, NumberFormat constructor usage
-    context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (_intlTypes.contains(typeName)) {
-        intlUsages.add(node);
-      }
-    });
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final String leftSource = node.leftHandSide.toSource();
+    if (leftSource == 'Intl.defaultLocale' ||
+        leftSource.endsWith('.defaultLocale')) {
+      hasLocaleInit = true;
+    }
+    super.visitAssignmentExpression(node);
+  }
 
-    // Check for DateFormat.xxx() or NumberFormat.xxx() factory constructors
-    context.addMethodInvocation((MethodInvocation node) {
-      final Expression? target = node.target;
-      if (target is SimpleIdentifier) {
-        final String targetName = target.name;
-        if (targetName == 'DateFormat' || targetName == 'NumberFormat') {
-          intlUsages.add(node);
-        }
-      }
-    });
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+    final Expression? target = node.target;
 
-    // Report at the end of file processing if intl is used without init
-    context.addPostRunCallback(() {
-      if (!hasLocaleInit && intlUsages.isNotEmpty) {
-        // Report only the first usage to avoid noise
-        reporter.atNode(intlUsages.first, code);
-      }
-    });
+    if (methodName == 'initializeDateFormatting') {
+      hasLocaleInit = true;
+    } else if (target is SimpleIdentifier &&
+        target.name == 'Intl' &&
+        _intlMethods.contains(methodName)) {
+      // Intl.message / plural / select / gender.
+      intlUsages.add(node);
+    } else if (target is SimpleIdentifier &&
+        (target.name == 'DateFormat' || target.name == 'NumberFormat')) {
+      // DateFormat.yMd() / NumberFormat.currency() factory constructors.
+      intlUsages.add(node);
+    }
+
+    super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    if (_intlTypes.contains(node.constructorName.type.name.lexeme)) {
+      intlUsages.add(node);
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }
 

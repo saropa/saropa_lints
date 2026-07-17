@@ -111,30 +111,13 @@ dynamic locale;
 final message = 'Message';
 
 // BAD: Should trigger require_intl_locale_initialization
+// This is a whole-file rule (any Intl.defaultLocale / initializeDateFormatting
+// anywhere in the file marks it initialized), so the compliant example lives in
+// its own file — require_intl_locale_initialization_good.dart — or its init call
+// would mask this.
 // expect_lint: require_intl_locale_initialization
 void _bad448() {
   // Using intl without initialization
-  void main() {
-    runApp(MyApp());
-  }
-
-  // Later in the code
   final formatted = DateFormat.yMd().format(date); // Uses unpredictable default
   final message = Intl.message('Hello'); // Locale unknown
-}
-
-// GOOD: Should NOT trigger require_intl_locale_initialization
-
-void main() async {
-  Intl.defaultLocale = 'en_US';
-  await initializeDateFormatting('en_US');
-  runApp(MyApp());
-}
-
-// Or with locale from device
-void main() async {
-  final deviceLocale = Platform.localeName;
-  Intl.defaultLocale = deviceLocale;
-  await initializeDateFormatting(deviceLocale);
-  runApp(MyApp());
 }

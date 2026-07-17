@@ -1184,6 +1184,24 @@ class MaterialPageRoute<T> {
   });
 }
 
+// Additional route types so require_route_transition_consistency can see more
+// than one resolvable route class in a single file (the rule reports only when
+// two or more distinct route types are mixed).
+class CupertinoPageRoute<T> {
+  CupertinoPageRoute({required Widget Function(BuildContext) builder});
+}
+
+class FadeTransitionRoute<T> {
+  FadeTransitionRoute({required Widget Function(BuildContext) builder});
+}
+
+// Mock for require_apple_sign_in: the real google_sign_in API is
+// `GoogleSignIn().signIn()`, so the rule needs GoogleSignIn to resolve as a
+// class (otherwise the call parses as a plain function invocation).
+class GoogleSignIn {
+  Future<void> signIn() async {}
+}
+
 class RouteSettings {
   const RouteSettings({String? name});
 }

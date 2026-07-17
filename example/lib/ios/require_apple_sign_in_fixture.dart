@@ -106,16 +106,11 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger require_apple_sign_in
+// This is a whole-file rule (any Apple sign-in indicator ANYWHERE in the file
+// suppresses the report), so the compliant example lives in its own file —
+// require_apple_sign_in_good.dart — or its SignInWithApple call would mask this.
 // expect_lint: require_apple_sign_in
 void _bad846() async {
   // Only Google sign-in without Apple
   await GoogleSignIn().signIn();
-}
-
-// GOOD: Should NOT trigger require_apple_sign_in
-void _good846() async {
-  // Offer both options
-  await GoogleSignIn().signIn();
-  //elsewhere in app
-  await SignInWithApple.getAppleIDCredential();
 }

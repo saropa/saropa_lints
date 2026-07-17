@@ -105,86 +105,19 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-final email = 'test@example.com';
-final name = 'example';
-final password = 'secret';
-final path = '/path';
 dynamic service;
 dynamic user;
 
-// BAD: Should trigger require_error_case_tests
+// BAD: Should trigger require_error_case_tests.
+// The rule reports a test file's `main` when the file has NO error-case test.
+// It is whole-file (any throwsA / isA<Exception> / error-keyword test name
+// anywhere in the file clears the flag), so this file must contain ONLY a
+// happy-path test — the compliant examples with error assertions live in
+// require_error_case_tests_good.dart.
 // expect_lint: require_error_case_tests
-void _bad1213() async {
-  // user_service_test.dart - only happy path
-  void main() {
-    test('login returns user', () async {
-      final user = await service.login('valid@email.com', 'password');
-      expect(user.name, isNotEmpty);
-    });
-  }
-}
-
-// GOOD: Should NOT trigger — throwsA matcher detected
-void _good1213_throwsA() async {
+void main() {
   test('login returns user', () async {
     final user = await service.login('valid@email.com', 'password');
     expect(user.name, isNotEmpty);
-  });
-
-  test('login throws on invalid credentials', () async {
-    expect(
-      () => service.login('invalid@email.com', 'wrong'),
-      throwsA(isA<AuthException>()),
-    );
-  });
-
-  test('returns null for missing user', () async {
-    final user = await service.findUser('nonexistent');
-    expect(user, isNull);
-  });
-}
-
-// GOOD: Should NOT trigger — 'safely' keyword in test name
-// (defensive try-catch source code that never throws to caller)
-void _good1213_safely() async {
-  test('returns zero when unattached', () {
-    expect(service.safeOffset, 0.0);
-  });
-
-  test('handles multiple positions safely', () async {
-    expect(service.jumpTop(), completion(isFalse));
-  });
-}
-
-// GOOD: Should NOT trigger — 'timeout' keyword in test name
-void _good1213_timeout() async {
-  test('completes normally', () async {
-    expect(await service.fetchData(), isNotNull);
-  });
-
-  test('returns fallback on timeout', () async {
-    expect(await service.fetchData(), isEmpty);
-  });
-}
-
-// GOOD: Should NOT trigger — 'dispose' keyword in test name
-void _good1213_dispose() async {
-  test('creates controller', () {
-    expect(service.controller, isNotNull);
-  });
-
-  test('returns safely after dispose', () {
-    expect(service.safeOffset, 0.0);
-  });
-}
-
-// GOOD: Should NOT trigger — 'default' keyword in test name
-void _good1213_default() async {
-  test('processes valid input', () {
-    expect(service.process('hello'), isNotNull);
-  });
-
-  test('returns default when config missing', () {
-    expect(service.getTheme(), equals('light'));
   });
 }

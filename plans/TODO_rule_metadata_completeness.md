@@ -152,6 +152,47 @@ Nine of the 13 async silents fixed; 92 async unit tests pass. This cluster was a
    such rule exists); the BAD/GOOD example code was left in place. If those rules are ever wanted, they are
    new-feature work, tracked separately. After removal the async cluster has **2 silent** (the undiagnosed
    pair above), down from 13.
+3. **`addPostRunCallback` no-op stub — a third dead-rule family (RESOLVED 2026-07-16, user-approved "fix all").**
+   The same class of bug as `addFunctionBody`: `SaropaContext.addPostRunCallback` (`saropa_context.dart:996`)
+   accepts a callback and silently discards it. Rules that aggregate whole-file state during the main pass and
+   report at the end via this callback never fired for anyone. A full grep of the rules tree found **14** such
+   rules (the first inventory of 9 was incomplete). All were restructured to gather state in a single
+   `addCompilationUnit` pass and report at its end, version-bumped, and documented in
+   `plans/history/2026.07/2026.07.16/dead_rules_from_noop_stub_registrations.md` (`Status: Fixed`, with the full table). Two extra
+   defects were fixed in passing: `ios_ui_security_rules.dart` was missing the `ast/visitor.dart` import, and
+   `require_intl_locale_initialization` registered `addMethodInvocation` twice (the native engine keeps one
+   slot, so the first handler was dropped) — merged into a single visitor. **Recurrence guard added:**
+   `test/integrity/no_op_stub_registration_guard_test.dart` fails the build if any rule calls any of the three
+   no-op stubs. The three stubs stay in place so v4-ported rules still compile. Revived rules:
+   `require_menu_bar_for_desktop`, `require_window_close_confirmation`, `require_error_state`,
+   `avoid_circular_provider_deps`, `prefer_notifier_over_state`, `require_apple_sign_in`,
+   `require_error_case_tests`, `avoid_test_coupling`, `require_test_cleanup`, `prefer_test_variant`,
+   `require_route_transition_consistency`, `prefer_shell_route_for_persistent_ui`,
+   `require_intl_locale_initialization`, `prefer_implicit_animations`.
+   **Verification (accuracy_report):** engine fix proven — five fire against a triggering
+   input (`prefer_shell_route_for_persistent_ui`, `prefer_implicit_animations` on committed
+   fixtures; `require_menu_bar_for_desktop`, `require_intl_locale_initialization`,
+   `require_apple_sign_in` on isolated single-case fixtures). The remaining committed
+   fixtures cannot yet show firing: these are whole-file rules, and each fixture puts a BAD
+   and a GOOD example in the SAME file, so the GOOD example's file-wide "satisfied" flag
+   (menu bar present / locale initialized / tearDown present / throwsA present) masks the
+   BAD case; a few also fail a path gate or lack a mock type. Repairing those fixtures
+   (isolate the BAD case per file; add the missing desktop/`/test/` paths and the
+   `GoogleSignIn` / second route mock class) is the remaining §4.1 silent-list work and does
+   not affect real user code. An extra rule-logic bug was fixed in passing:
+   `require_apple_sign_in` matched only identifier receivers, so `GoogleSignIn().signIn()`
+   (constructor-call receiver — its own documented bad example) never matched; now handled.
+   **Fixture repair completed (all 14 confirmed firing):** the whole-file fixtures were
+   repaired — the masking GOOD example moved to a sibling `*_good.dart`, `window_close`
+   renamed to a `_desktop` path with a real violating observer, `error_case_tests` moved to
+   a `/test/` path, `avoid_test_coupling` tests moved into `main()`, mock classes
+   (`GoogleSignIn`, `CupertinoPageRoute`, `FadeTransitionRoute`) added, and fixtures authored
+   for the three that had none (`require_error_state`, `avoid_circular_provider_deps`,
+   `prefer_notifier_over_state`). Six fire in the full corpus scan; the other eight fire in
+   isolated / small-dir scans but show silent in the full scan of the 32-file
+   `example/lib/test` directory — the same "fires per-file, zero under full-corpus scan"
+   tooling limitation already recorded above for the async cluster. Isolating THAT scan
+   behavior is separate work; it does not affect the rules on real user code.
 
 
 Premise correction: `accuracyTarget` is **not** unpopulated. It is a derived getter

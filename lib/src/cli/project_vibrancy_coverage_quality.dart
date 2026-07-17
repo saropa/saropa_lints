@@ -61,6 +61,23 @@ ProjectCoverageQualityIndex buildProjectCoverageQualityIndex({
 List<String> listProjectTestDartPaths(String root) =>
     _collectTestDartFiles(root);
 
+/// Dart files under `bin/` (absolute paths). CLI entry points call into
+/// lib/ functions; without these in the usage set, functions whose only
+/// caller is a bin/ script are falsely flagged `unused`.
+List<String> listProjectBinDartPaths(String root) {
+  final dir = Directory(p.join(root, 'bin'));
+  if (!dir.existsSync()) return const <String>[];
+  final out = <String>[];
+  for (final entity in dir.listSync(recursive: true)) {
+    if (entity is! File) continue;
+    final path = p.normalize(entity.path);
+    if (!path.endsWith('.dart')) continue;
+    out.add(path);
+  }
+  out.sort();
+  return out;
+}
+
 List<String> _collectTestDartFiles(String root) {
   final out = <String>[];
   for (final dirName in const ['test', 'integration_test']) {
