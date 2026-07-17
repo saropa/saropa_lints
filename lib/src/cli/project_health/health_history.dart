@@ -35,6 +35,17 @@ class HistoryPoint {
     'codeLoc': codeLoc,
     'maxCognitive': maxCognitive,
   };
+
+  /// Formats this point as a markdown table row matching the header from
+  /// [markdownHeader]. Example output:
+  /// `| v14.3.3 | 145 | 12340 | 9870 | 42 |`
+  String toMarkdownRow() =>
+      '| $tag | $fileCount | $loc | $codeLoc | $maxCognitive |';
+
+  /// Column header row + separator for a table of [toMarkdownRow] entries.
+  static const markdownHeader =
+      '| Tag | Files | LoC | Code LoC | Max Cognitive |\n'
+      '| --- | ----: | --: | -------: | ------------: |';
 }
 
 /// Builds the trajectory across the most recent [maxTags] tags (chronological).

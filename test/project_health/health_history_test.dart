@@ -31,9 +31,34 @@ void main() {
         expect(p.fileCount, greaterThan(0));
         expect(p.maxCognitive, greaterThanOrEqualTo(0));
       }
+
+      // _recentTags returns oldest-first; verify the contract holds.
+      if (points.length == 2) {
+        expect(
+          points.first.tag,
+          isNot(equals(points.last.tag)),
+          reason: 'two points should come from distinct tags',
+        );
+      }
     },
     timeout: const Timeout(Duration(minutes: 2)),
   );
+
+  test('toMarkdownRow formats a pipe-delimited table row', () {
+    const point = HistoryPoint(
+      tag: 'v1.0.0',
+      fileCount: 42,
+      loc: 1000,
+      codeLoc: 800,
+      maxCognitive: 15,
+    );
+    expect(point.toMarkdownRow(), '| v1.0.0 | 42 | 1000 | 800 | 15 |');
+    // Header has the same column count as the row.
+    final headerPipes =
+        HistoryPoint.markdownHeader.split('\n').first.split('|').length;
+    final rowPipes = point.toMarkdownRow().split('|').length;
+    expect(rowPipes, headerPipes);
+  });
 
   test('a non-git directory yields no history', () async {
     final tmp = Directory.systemTemp.createTempSync('saropa_nohist_');
