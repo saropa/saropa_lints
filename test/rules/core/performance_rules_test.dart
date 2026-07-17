@@ -338,6 +338,14 @@ void main() {
       'avoid_full_sync_on_every_launch',
       'prefer_binary_format',
       'prefer_pool_pattern',
+      'avoid_backdrop_filter_in_scrollable',
+      'avoid_cache_stampede',
+      'avoid_clip_path_in_animated_builder',
+      'avoid_image_filter_in_scrollable',
+      'avoid_opacity_in_animated_builder',
+      'avoid_opacity_in_scrollable',
+      'avoid_shader_mask_in_scrollable',
+      'prefer_static_final_for_session_constant',
     ];
 
     for (final fixture in fixtures) {

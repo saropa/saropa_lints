@@ -2846,11 +2846,38 @@ class _StateProviderVisitor extends RecursiveAstVisitor<void> {
       final Expression? initializer = variable.initializer;
       if (initializer == null) continue;
 
-      if (initializer.toSource().contains('StateProvider')) {
+      // Check constructor name directly instead of .toSource().contains()
+      // to avoid false positives on identifiers that happen to contain
+      // 'StateProvider' as a substring.
+      if (_isStateProviderCreation(initializer)) {
         stateProviderDecls[variable.name.lexeme] = variable;
       }
     }
     super.visitTopLevelVariableDeclaration(node);
+  }
+
+  /// True when [expr] is a `StateProvider(...)` or
+  /// `StateProvider.autoDispose(...)` (or any `.xyz(...)` prefixed form).
+  static bool _isStateProviderCreation(Expression expr) {
+    // Covers `StateProvider(...)` and `StateProvider.autoDispose(...)`.
+    if (expr is MethodInvocation) {
+      final target = expr.target;
+      if (target is SimpleIdentifier && target.name == 'StateProvider') {
+        return true;
+      }
+    }
+    // Covers `StateProvider(...)` when parsed as a constructor call.
+    if (expr is InstanceCreationExpression) {
+      final name = expr.constructorName.type.name.lexeme;
+      return name == 'StateProvider';
+    }
+    // Covers bare function-reference `StateProvider<T>(...)` parsed as
+    // a FunctionExpressionInvocation with a SimpleIdentifier function.
+    if (expr is FunctionExpressionInvocation) {
+      final fn = expr.function;
+      if (fn is SimpleIdentifier && fn.name == 'StateProvider') return true;
+    }
+    return false;
   }
 
   @override
