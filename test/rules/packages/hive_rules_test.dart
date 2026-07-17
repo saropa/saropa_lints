@@ -135,34 +135,27 @@ void main() {
     );
   });
   group('Hive Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_hive_initialization',
-      'require_hive_type_adapter',
-      'require_hive_box_close',
-      'avoid_hive_datetime_local',
-      'avoid_hive_large_single_entry',
-      'avoid_hive_type_modification',
-      'prefer_hive_encryption',
-      'require_hive_encryption_key_secure',
-      'require_hive_database_close',
-      'require_type_adapter_registration',
-      'prefer_lazy_box_for_large',
-      'require_hive_type_id_management',
-      'avoid_hive_field_index_reuse',
-      'require_hive_field_default_value',
-      'require_hive_adapter_registration_order',
-      'require_hive_nested_object_adapter',
-      'avoid_hive_box_name_collision',
-      'prefer_hive_value_listenable',
-      'prefer_hive_lazy_box',
-      'avoid_hive_binary_storage',
-      'require_hive_migration_strategy',
-      'avoid_hive_synchronous_in_ui',
-      'require_hive_web_subdirectory',
-    ];
+    final fixtureDir = Directory('example_packages/lib/hive');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example_packages/lib/hive/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

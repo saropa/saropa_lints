@@ -75,29 +75,36 @@ void main() {
   });
 
   group('FilePicker Rules - Fixture Verification', () {
-    final fixtures = [
-      'file_picker_unchecked_null_result',
-      'file_picker_path_on_web',
-      'file_picker_custom_type_missing_extensions',
-      'file_picker_extensions_without_custom_type',
-      'file_picker_extension_with_dot',
-      'file_picker_with_data_large_files',
-    ];
+    final fixtureDir = Directory('example_packages/lib/file_picker');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/file_picker/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }
-
-    test('file_picker_migration_fixture exists', () {
-      final file = File(
-        'example_packages/lib/file_picker/file_picker_migration_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
   });
 }

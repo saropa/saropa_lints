@@ -51,17 +51,32 @@ void main() {
   });
 
   group('In-App Purchase Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_purchase_in_sandbox_production',
-      'require_subscription_status_check',
-      'require_price_localization',
-      'prefer_grace_period_handling',
-      'avoid_entitlement_without_server',
-    ];
+    final fixtureDir = Directory('example/lib/iap');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/iap/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

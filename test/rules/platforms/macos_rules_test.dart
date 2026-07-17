@@ -111,27 +111,32 @@ void main() {
   });
 
   group('macOS Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_macos_menu_bar_integration',
-      'prefer_macos_keyboard_shortcuts',
-      'require_macos_window_size_constraints',
-      'require_macos_file_access_intent',
-      'avoid_macos_deprecated_security_apis',
-      'require_macos_hardened_runtime',
-      'avoid_macos_catalyst_unsupported_apis',
-      'require_macos_window_restoration',
-      'avoid_macos_full_disk_access',
-      'require_macos_sandbox_entitlements',
-      'require_macos_sandbox_exceptions',
-      'avoid_macos_hardened_runtime_violations',
-      'require_macos_app_transport_security',
-      'require_macos_notarization_ready',
-      'require_macos_entitlements',
-    ];
+    final fixtureDir = Directory('example/lib/macos');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/macos/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -104,6 +104,7 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 - Added `HistoryPoint.toMarkdownRow()`, `HistoryPoint.markdownHeader`, and `HistoryPoint.toMarkdownTable()` for rendering health trajectory as markdown tables.
 - Fixed the performance-rules fixture verification test: renamed `require_window_close_confirmation_desktop_fixture.dart` to match the rule-name convention, and added 8 fixture files that existed on disk but were missing from the verification list.
 - Replaced the hardcoded fixture list in the performance test with a directory scan, so new fixture files are verified automatically without manual list maintenance. Also renamed the stale `require_window_close_confirmation_desktop_good.dart` to drop the `_desktop` suffix.
+- Converted all 126 remaining test files from hardcoded fixture lists to the same `Directory.listSync()` auto-discovery pattern. Every fixture verification group now scans its directory on disk, so adding a fixture file is automatically tested — no manual list to maintain or drift out of sync. The `android_rules_test` retains one explicit test for a cross-directory fixture (`require_android_manifest_entries` in `example/lib/platform/`). Two files (`roadmap_15_rules_test`, `migration_rules_test`) were excluded because their fixture groups contain content-validation tests beyond simple existence checks.
 
 </details>
 

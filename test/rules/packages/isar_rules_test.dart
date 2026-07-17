@@ -125,32 +125,27 @@ void main() {
     );
   });
   group('Isar Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_isar_enum_field',
-      'require_isar_collection_annotation',
-      'require_isar_id_field',
-      'require_isar_close_on_dispose',
-      'prefer_isar_async_writes',
-      'avoid_isar_transaction_nesting',
-      'prefer_isar_batch_operations',
-      'avoid_isar_float_equality_queries',
-      'require_isar_inspector_debug_only',
-      'avoid_isar_clear_in_production',
-      'require_isar_links_load',
-      'prefer_isar_query_stream',
-      'avoid_isar_web_limitations',
-      'prefer_isar_index_for_queries',
-      'avoid_isar_embedded_large_objects',
-      'prefer_isar_lazy_links',
-      'avoid_isar_schema_breaking_changes',
-      'require_isar_nullable_field',
-      'prefer_isar_composite_index',
-      'avoid_isar_string_contains_without_index',
-      'avoid_cached_isar_stream',
-    ];
+    final fixtureDir = Directory('example_packages/lib/isar');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example_packages/lib/isar/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

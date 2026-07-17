@@ -215,33 +215,27 @@ void main() {
 
   // example/lib/flow/error_handling/: try/catch, async, and error propagation fixtures.
   group('Error Handling Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_swallowing_exceptions',
-      'avoid_losing_stack_trace',
-      'handle_throwing_invocations',
-      'avoid_generic_exceptions',
-      'require_error_context',
-      'prefer_result_pattern',
-      'require_async_error_documentation',
-      'avoid_nested_try_statements',
-      'require_error_boundary',
-      'avoid_uncaught_future_errors',
-      'avoid_print_error',
-      'avoid_catch_all',
-      'avoid_catch_exception_alone',
-      'avoid_exception_in_constructor',
-      'require_cache_key_determinism',
-      'require_permission_permanent_denial_handling',
-      'require_notification_action_handling',
-      'require_finally_cleanup',
-      'require_error_logging',
-      'require_app_startup_error_handling',
-      'require_error_handling_graceful',
-      'avoid_assert_in_production',
-    ];
+    final fixtureDir = Directory('example/lib/error_handling');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/error_handling/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

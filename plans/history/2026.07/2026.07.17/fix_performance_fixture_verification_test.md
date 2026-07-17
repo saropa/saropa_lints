@@ -32,6 +32,27 @@ Additionally, the handoff reflection flagged a stale `_desktop` suffix on `requi
 
 `dart test test/rules/core/performance_rules_test.dart` — 108 tests passed (0 failures). The extra test is the new directory guard.
 
-### Scope limitation
+### ~~Scope limitation~~ Resolved — Phase 3
 
-128 other test files use the same hardcoded fixture list pattern and remain vulnerable to the same drift. Converting them is a mechanical but large change (129 files total) and was not requested.
+~~128 other test files use the same hardcoded fixture list pattern and remain vulnerable to the same drift. Converting them is a mechanical but large change (129 files total) and was not requested.~~
+
+## Finish Report — Phase 3 (2026-07-17)
+
+### Problem
+
+The phase-2 conversion left 128 test files still using hardcoded fixture name lists vulnerable to the same drift the performance test had. Every new fixture file required a manual list update across whichever test file owned that category, and omissions silently passed.
+
+### Changes
+
+- **126 test files converted to auto-discovery.** A Python migration script (`d:\tmp\migrate_fixture_tests.py`, one-shot, not committed) replaced every hardcoded fixture list and individual fixture-existence test with the `Directory.listSync()` scan pattern established in phase 2. Each converted file gains a guard test (`fixture directory exists and is not empty`) and a `for` loop that auto-discovers `*_fixture.dart` files.
+- **`android_rules_test.dart` handled specially.** The auto-discovery scans `example/lib/android/`, but one fixture (`require_android_manifest_entries`) lives in `example/lib/platform/` because it covers a cross-platform concern. That fixture is verified by a separate explicit test alongside the auto-discovery loop.
+- **2 files excluded.** `roadmap_15_rules_test.dart` and `migration_rules_test.dart` have fixture groups with content-validation tests beyond simple existence checks (expect_lint presence, deferred-rule exclusion), so the auto-discovery pattern does not apply.
+- **`dart format` applied** to all 127 changed test files (126 converted + 1 reformatted from phase 2).
+
+### Verification
+
+`dart test test/` — 6774 tests passed, 1 skipped, 0 failures.
+
+### Remaining
+
+The 2 excluded files (`roadmap_15_rules_test.dart`, `migration_rules_test.dart`) retain manual fixture references. Both have single fixtures at the `example/lib/` root level with no per-category subdirectory, and their tests validate fixture content, not just existence.

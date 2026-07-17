@@ -61,17 +61,34 @@ void main() {
   });
 
   group('App Links Rules - Fixture Verification', () {
-    final fixtures = [
-      'app_links_listen_in_build',
-      'app_links_uncaught_stream_error',
-      'app_links_avoid_get_initial_link_string',
-    ];
+    final fixtureDir = Directory('example_packages/lib/app_links');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/app_links/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

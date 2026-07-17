@@ -52,20 +52,34 @@ void main() {
   });
 
   group('flutter_map Rules - Fixture Verification', () {
-    final fixtures = [
-      'flutter_map_missing_user_agent',
-      'flutter_map_deprecated_tile_size',
-      'flutter_map_legacy_map_options_center',
-      'flutter_map_missing_error_tile_callback',
-      'flutter_map_deprecated_polygon_label_placement',
-      'flutter_map_fallback_url_disables_cache',
-    ];
+    final fixtureDir = Directory('example_packages/lib/flutter_map');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/flutter_map/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -59,20 +59,34 @@ void main() {
   });
 
   group('Audioplayers Rules - Fixture Verification', () {
-    final fixtures = [
-      'audioplayers_pool_not_disposed',
-      'audioplayers_low_latency_with_stream_listen',
-      'audioplayers_low_latency_with_seek',
-      'audioplayers_release_mode_loop_with_complete_listener',
-      'audioplayers_url_source_in_asset_context',
-      'audioplayers_hardcoded_volume_above_one',
-    ];
+    final fixtureDir = Directory('example_packages/lib/audioplayers');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/audioplayers/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

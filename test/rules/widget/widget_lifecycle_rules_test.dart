@@ -200,47 +200,27 @@ void main() {
     );
   });
   group('Widget Lifecycle Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_context_in_initstate_dispose',
-      'avoid_empty_setstate',
-      'avoid_late_context',
-      'avoid_mounted_in_setstate',
-      'avoid_state_constructors',
-      'avoid_stateless_widget_initialized_fields',
-      'avoid_unnecessary_setstate',
-      'require_init_state_idempotent',
-      'avoid_unnecessary_stateful_widgets',
-      'avoid_unremovable_callbacks_in_listeners',
-      'avoid_unsafe_setstate',
-      'require_field_dispose',
-      'require_timer_cancellation',
-      'nullify_after_dispose',
-      'use_setstate_synchronously',
-      'always_remove_listener',
-      'require_animation_disposal',
-      'avoid_scaffold_messenger_after_await',
-      'avoid_build_context_in_providers',
-      'prefer_widget_state_mixin',
-      'avoid_inherited_widget_in_initstate',
-      'avoid_recursive_widget_calls',
-      'avoid_undisposed_instances',
-      'avoid_unnecessary_overrides_in_state',
-      'dispose_widget_fields',
-      'pass_existing_future_to_future_builder',
-      'pass_existing_stream_to_stream_builder',
-      'require_scroll_controller_dispose',
-      'require_focus_node_dispose',
-      'require_should_rebuild',
-      'require_super_dispose_call',
-      'require_super_init_state_call',
-      'avoid_set_state_in_dispose',
-      'require_widgets_binding_callback',
-      'avoid_global_keys_in_state',
-      'avoid_expensive_did_change_dependencies',
-    ];
+    final fixtureDir = Directory('example/lib/widget_lifecycle');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/widget_lifecycle/${fixture}_fixture.dart',
         );

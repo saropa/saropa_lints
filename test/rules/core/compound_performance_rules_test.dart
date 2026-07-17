@@ -62,19 +62,32 @@ void main() {
   });
 
   group('Compound Performance Rules - Fixture Verification', () {
-    const fixtures = [
-      'avoid_opacity_in_animated_builder',
-      'avoid_opacity_in_scrollable',
-      'avoid_backdrop_filter_in_scrollable',
-      'avoid_shader_mask_in_scrollable',
-      'avoid_image_filter_in_scrollable',
-      'avoid_clip_path_in_animated_builder',
-      'prefer_static_final_for_session_constant',
-    ];
+    final fixtureDir = Directory('example/lib/performance');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/performance/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

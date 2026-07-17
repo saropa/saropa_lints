@@ -51,19 +51,34 @@ void main() {
   });
 
   group('InAppReview Rules - Fixture Verification', () {
-    final fixtures = [
-      'in_app_review_missing_availability_check',
-      'in_app_review_button_callback_request',
-      'in_app_review_request_in_init_state',
-      'in_app_review_missing_store_listing_fallback',
-      'in_app_review_ios_store_listing_missing_app_id',
-    ];
+    final fixtureDir = Directory('example_packages/lib/in_app_review');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/in_app_review/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

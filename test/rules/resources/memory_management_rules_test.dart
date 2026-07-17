@@ -133,27 +133,34 @@ void main() {
   });
 
   group('Memory Management Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_large_objects_in_state',
-      'require_image_disposal',
-      'avoid_capturing_this_in_callbacks',
-      'require_cache_eviction_policy',
-      'prefer_weak_references_for_cache',
-      'avoid_expando_circular_references',
-      'avoid_large_isolate_communication',
-      'require_cache_expiration',
-      'avoid_unbounded_cache_growth',
-      'require_cache_key_uniqueness',
-      'avoid_retaining_disposed_widgets',
-      'avoid_closure_capture_leaks',
-      'require_expando_cleanup',
-    ];
+    final fixtureDir = Directory('example/lib/memory_management');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/memory_management/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

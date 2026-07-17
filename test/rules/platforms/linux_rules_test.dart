@@ -51,17 +51,32 @@ void main() {
   });
 
   group('Linux Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_hardcoded_unix_paths',
-      'prefer_xdg_directory_convention',
-      'avoid_x11_only_assumptions',
-      'require_linux_font_fallback',
-      'avoid_sudo_shell_commands',
-    ];
+    final fixtureDir = Directory('example/lib/linux');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/linux/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

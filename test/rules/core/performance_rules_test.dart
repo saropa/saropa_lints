@@ -292,14 +292,15 @@ void main() {
 
     // Auto-discover fixtures from disk so new files are verified
     // automatically — no manual list to drift out of sync.
-    final fixtures = fixtureDir
-        .listSync()
-        .whereType<File>()
-        .map((f) => f.uri.pathSegments.last)
-        .where((name) => name.endsWith('_fixture.dart'))
-        .map((name) => name.replaceAll('_fixture.dart', ''))
-        .toList()
-      ..sort();
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
 
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);

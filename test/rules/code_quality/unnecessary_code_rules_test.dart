@@ -101,29 +101,34 @@ void main() {
   });
 
   group('Unnecessary Code Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_empty_spread',
-      'avoid_unnecessary_null_aware_elements',
-      'avoid_unnecessary_block',
-      'avoid_unnecessary_call',
-      'avoid_unnecessary_constructor',
-      'avoid_unnecessary_enum_arguments',
-      'avoid_unnecessary_enum_prefix',
-      'avoid_unnecessary_extends',
-      'avoid_unnecessary_getter',
-      'avoid_unnecessary_length_check',
-      'avoid_unnecessary_negations',
-      'avoid_unnecessary_super',
-      'no_empty_block',
-      'no_empty_string',
-      'prefer_reusing_assigned_local',
-    ];
+    final fixtureDir = Directory('example/lib/unnecessary_code');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/unnecessary_code/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

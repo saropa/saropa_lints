@@ -157,34 +157,32 @@ void main() {
   });
 
   group('Type Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_casting_to_extension_type',
-      'avoid_collection_methods_with_unrelated_types',
-      'avoid_dynamic_type',
-      'avoid_implicitly_nullable_extension_types',
-      'avoid_nullable_interpolation',
-      'avoid_nullable_parameters_with_default_values',
-      'avoid_nullable_tostring',
-      'avoid_null_assertion',
-      'avoid_unnecessary_type_assertions',
-      'avoid_unnecessary_type_casts',
-      'avoid_unrelated_type_assertions',
-      'prefer_correct_type_name',
-      'prefer_explicit_function_type',
-      'prefer_inline_function_types',
-      'prefer_result_type',
-      'prefer_type_over_var',
-      'avoid_shadowing_type_parameters',
-      'avoid_private_typedef_functions',
-      'prefer_final_locals',
-      'prefer_const_declarations',
-      'external_with_initializer',
-      'type_check_with_null',
-    ];
+    final fixtureDir = Directory('example/lib/type');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/type/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

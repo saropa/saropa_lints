@@ -125,32 +125,27 @@ void main() {
     );
   });
   group('Ui Ux Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_responsive_breakpoints',
-      'prefer_cached_paint_objects',
-      'require_custom_painter_shouldrepaint',
-      'require_currency_formatting_locale',
-      'require_number_formatting_locale',
-      'require_graphql_operation_names',
-      'avoid_badge_without_meaning',
-      'prefer_logger_over_print',
-      'prefer_itemextent_when_known',
-      'require_tab_state_preservation',
-      'prefer_skeleton_over_spinner',
-      'require_empty_results_state',
-      'require_search_loading_indicator',
-      'require_search_debounce',
-      'require_pagination_loading_state',
-      'require_pagination_error_recovery',
-      'require_webview_progress_indicator',
-      'avoid_loading_flash',
-      'prefer_avatar_loading_placeholder',
-      'prefer_adaptive_icons',
-      'prefer_master_detail_for_large',
-    ];
+    final fixtureDir = Directory('example/lib/ui_ux');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/ui_ux/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

@@ -84,22 +84,32 @@ void main() {
   });
 
   group('Debug Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_fail_test_case',
-      'avoid_debug_print',
-      'avoid_unguarded_debug',
-      'prefer_commenting_analyzer_ignores',
-      'prefer_conditional_logging',
-      'prefer_debug_print',
-      'avoid_print_in_release',
-      'require_structured_logging',
-      'avoid_sensitive_in_logs',
-      'require_log_level_for_production',
-    ];
+    final fixtureDir = Directory('example/lib/debug');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/debug/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

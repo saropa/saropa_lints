@@ -85,23 +85,27 @@ void main() {
     );
   });
   group('Documentation Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_public_api_documentation',
-      'prefer_correct_throws',
-      'avoid_misleading_documentation',
-      'require_deprecation_message',
-      'require_complex_logic_comments',
-      'require_parameter_documentation',
-      'require_return_documentation',
-      'require_exception_documentation',
-      'require_example_in_documentation',
-      'verify_documented_parameters_exist',
-      'missing_code_block_language_in_doc_comment',
-      'unintended_html_in_doc_comment',
-    ];
+    final fixtureDir = Directory('example/lib/documentation');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/documentation/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

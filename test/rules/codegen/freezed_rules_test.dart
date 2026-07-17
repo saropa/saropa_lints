@@ -76,23 +76,27 @@ void main() {
     );
   });
   group('Freezed Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_freezed_json_serializable_conflict',
-      'avoid_freezed_invalid_annotation_target',
-      'require_freezed_arrow_syntax',
-      'require_freezed_private_constructor',
-      'require_freezed_explicit_json',
-      'prefer_freezed_default_values',
-      'prefer_freezed_union_types',
-      'require_freezed_json_converter',
-      'require_freezed_lint_package',
-      'avoid_freezed_for_logic_classes',
-      'prefer_freezed_for_data_classes',
-      'avoid_freezed_any_map_issue',
-    ];
+    final fixtureDir = Directory('example_packages/lib/freezed');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/freezed/${fixture}_fixture.dart',
         );

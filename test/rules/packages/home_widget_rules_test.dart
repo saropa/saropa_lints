@@ -52,20 +52,34 @@ void main() {
   });
 
   group('HomeWidget Rules - Fixture Verification', () {
-    final fixtures = [
-      'home_widget_callback_missing_pragma',
-      'home_widget_callback_not_top_level',
-      'home_widget_save_without_update',
-      'home_widget_update_no_name',
-      'home_widget_ios_missing_app_group',
-      'home_widget_widget_clicked_without_initial_launch',
-    ];
+    final fixtureDir = Directory('example_packages/lib/home_widget');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/home_widget/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

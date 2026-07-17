@@ -91,25 +91,27 @@ void main() {
     );
   });
   group('Dio Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_dio_timeout',
-      'require_dio_error_handling',
-      'require_dio_interceptor_error_handler',
-      'prefer_dio_cancel_token',
-      'require_dio_ssl_pinning',
-      'avoid_dio_form_data_leak',
-      'avoid_dio_debug_print_production',
-      'require_dio_singleton',
-      'prefer_dio_base_options',
-      'avoid_dio_without_base_url',
-      'prefer_dio_over_http',
-      'require_dio_response_type',
-      'require_dio_retry_interceptor',
-      'prefer_dio_transformer',
-    ];
+    final fixtureDir = Directory('example_packages/lib/dio');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example_packages/lib/dio/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

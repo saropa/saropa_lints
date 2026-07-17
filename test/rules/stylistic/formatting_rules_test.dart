@@ -100,25 +100,32 @@ void main() {
   });
 
   group('Formatting Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_blank_line_before_case',
-      'prefer_blank_line_before_constructor',
-      'prefer_blank_line_before_method',
-      'prefer_blank_line_before_return',
-      'prefer_blank_line_before_else',
-      'prefer_blank_line_after_loop',
-      'prefer_trailing_comma',
-      'unnecessary_trailing_comma',
-      'format_comment_style',
-      'require_ignore_comment_spacing',
-      'prefer_member_ordering',
-      'enforce_parameters_ordering',
-      'enum_constants_ordering',
-    ];
+    final fixtureDir = Directory('example/lib/formatting');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/formatting/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

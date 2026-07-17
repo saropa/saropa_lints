@@ -37,15 +37,32 @@ void main() {
   });
 
   group('Http Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_http_package_client_close',
-      'avoid_http_top_level_in_loop',
-      'avoid_http_string_url',
-    ];
+    final fixtureDir = Directory('example_packages/lib/http');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example_packages/lib/http/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

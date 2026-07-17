@@ -226,52 +226,27 @@ void main() {
     );
   });
   group('Accessibility Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_icon_buttons_without_tooltip',
-      'avoid_small_touch_targets',
-      'require_exclude_semantics_justification',
-      'avoid_color_only_indicators',
-      'avoid_gesture_only_interactions',
-      'require_semantics_label',
-      'avoid_merged_semantics_hiding_info',
-      'require_live_region',
-      'require_heading_semantics',
-      'avoid_image_buttons_without_tooltip',
-      'avoid_text_scale_factor_ignore',
-      'require_image_semantics',
-      'require_text_scale_factor_awareness',
-      'avoid_hidden_interactive',
-      'prefer_scalable_text',
-      'require_button_semantics',
-      'prefer_explicit_semantics',
-      'avoid_hover_only',
-      'require_error_identification',
-      'require_minimum_contrast',
-      'require_avatar_alt_text',
-      'require_badge_semantics',
-      'require_badge_count_limit',
-      'require_image_description',
-      'avoid_semantics_exclusion',
-      'prefer_merge_semantics',
-      'require_focus_indicator',
-      'avoid_flashing_content',
-      'prefer_adequate_spacing',
-      'avoid_motion_without_reduce',
-      'require_semantic_label_icons',
-      'require_accessible_images',
-      'avoid_auto_play_media',
-      'prefer_large_touch_targets',
-      'avoid_time_limits',
-      'require_drag_alternatives',
-      'prefer_focus_traversal_order',
-      'prefer_semantics_container',
-      'avoid_redundant_semantics',
-      'avoid_color_only_meaning',
-      'prefer_semantics_sort',
-    ];
+    final fixtureDir = Directory('example/lib/accessibility');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/accessibility/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

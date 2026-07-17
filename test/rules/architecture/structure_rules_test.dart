@@ -296,66 +296,27 @@ void main() {
     );
   });
   group('Structure Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_barrel_files',
-      'avoid_importing_entrypoint_exports',
-      'avoid_double_slash_imports',
-      'avoid_duplicate_exports',
-      'avoid_duplicate_mixins',
-      'avoid_duplicate_named_imports',
-      'avoid_global_state',
-      'prefer_small_length_files',
-      'avoid_medium_length_files',
-      'avoid_long_length_files',
-      'avoid_very_long_length_files',
-      'prefer_small_length_test_files',
-      'avoid_medium_length_test_files',
-      'avoid_long_length_test_files',
-      'avoid_very_long_length_test_files',
-      'avoid_long_functions',
-      'avoid_long_parameter_list',
-      'avoid_local_functions',
-      'limit_max_imports',
-      'prefer_sorted_parameters',
-      'prefer_named_boolean_parameters',
-      'prefer_named_imports',
-      'prefer_named_parameters',
-      'prefer_static_class',
-      'avoid_unnecessary_local_variable',
-      'avoid_unnecessary_reassignment',
-      'prefer_static_method',
-      'prefer_abstract_final_static_class',
-      'avoid_hardcoded_colors',
-      'avoid_unused_generics',
-      'prefer_trailing_underscore_for_unused',
-      'avoid_unnecessary_futures',
-      'avoid_throw_in_finally',
-      'avoid_unnecessary_nullable_return_type',
-      'avoid_classes_with_only_static_members',
-      'avoid_setters_without_getters',
-      'prefer_getters_before_setters',
-      'prefer_static_before_instance',
-      'prefer_mixin_over_abstract',
-      'prefer_record_over_tuple_class',
-      'prefer_sealed_classes',
-      'prefer_sealed_for_state',
-      'prefer_constructors_first',
-      'prefer_factory_before_named',
-      'prefer_overrides_last',
-      'prefer_constructors_over_static_methods',
-      'prefer_function_over_static_method',
-      'prefer_static_method_over_function',
-      'prefer_import_over_part',
-      'prefer_extension_methods',
-      'prefer_extension_over_utility_class',
-      'prefer_extension_type_for_wrapper',
-      'illegal_enum_values',
-      'wrong_number_of_parameters_for_setter',
-      'unnecessary_library_name',
-    ];
+    final fixtureDir = Directory('example/lib/structure');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/structure/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

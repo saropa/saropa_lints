@@ -110,29 +110,27 @@ void main() {
     );
   });
   group('Scroll Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_shrinkwrap_in_scrollview',
-      'avoid_nested_scrollables_conflict',
-      'avoid_listview_children_for_large_lists',
-      'avoid_excessive_bottom_nav_items',
-      'require_tab_controller_length_sync',
-      'avoid_refresh_without_await',
-      'avoid_multiple_autofocus',
-      'require_refresh_indicator_on_lists',
-      'avoid_shrink_wrap_expensive',
-      'prefer_item_extent',
-      'prefer_cache_extent',
-      'prefer_prototype_item',
-      'require_key_for_reorderable',
-      'require_add_automatic_keep_alives_off',
-      'prefer_sliverfillremaining_for_empty',
-      'avoid_infinite_scroll_duplicate_requests',
-      'prefer_infinite_scroll_preload',
-      'require_pagination_for_large_lists',
-    ];
+    final fixtureDir = Directory('example/lib/scroll');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/scroll/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

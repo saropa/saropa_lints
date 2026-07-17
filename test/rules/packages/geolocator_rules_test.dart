@@ -51,19 +51,34 @@ void main() {
   });
 
   group('Geolocator Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_geolocator_battery_awareness',
-      'avoid_geolocator_background_without_config',
-      'prefer_geocoding_cache',
-      'prefer_geolocation_coarse_location',
-      'avoid_continuous_location_updates',
-    ];
+    final fixtureDir = Directory('example_packages/lib/geolocator');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/geolocator/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

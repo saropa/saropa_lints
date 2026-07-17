@@ -183,30 +183,32 @@ void main() {
   });
 
   group('Disposal Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_media_player_dispose',
-      'require_tab_controller_dispose',
-      'require_text_editing_controller_dispose',
-      'require_page_controller_dispose',
-      'require_lifecycle_observer',
-      'avoid_websocket_memory_leak',
-      'require_video_player_controller_dispose',
-      'require_stream_subscription_cancel',
-      'require_change_notifier_dispose',
-      'require_receive_port_close',
-      'require_socket_close',
-      'require_debouncer_cancel',
-      'require_interval_timer_cancel',
-      'require_file_handle_close',
-      'require_dispose_implementation',
-      'prefer_deactivate_for_cleanup',
-      'prefer_dispose_before_new_instance',
-      'dispose_class_fields',
-    ];
+    final fixtureDir = Directory('example/lib/disposal');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/disposal/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

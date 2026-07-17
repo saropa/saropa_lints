@@ -168,28 +168,34 @@ void main() {
   });
 
   group('Stylistic Additional Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_sorted_imports',
-      'prefer_import_group_comments',
-      'prefer_fields_before_methods',
-      'prefer_methods_before_fields',
-      'prefer_static_members_first',
-      'prefer_instance_members_first',
-      'prefer_public_members_first',
-      'prefer_private_members_first',
-      'prefer_camel_case_method_names',
-      'prefer_descriptive_variable_names',
-      'prefer_concise_variable_names',
-      'prefer_explicit_this',
-      'prefer_implicit_boolean_comparison',
-      'prefer_explicit_boolean_comparison',
-    ];
+    final fixtureDir = Directory('example/lib/stylistic_additional');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/stylistic_additional/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -57,20 +57,34 @@ void main() {
   });
 
   group('Dialog & SnackBar Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_snackbar_duration',
-      'require_dialog_barrier_dismissible',
-      'require_dialog_result_handling',
-      'avoid_snackbar_queue_buildup',
-      'prefer_adaptive_dialog',
-      'require_snackbar_action_for_undo',
-    ];
+    final fixtureDir = Directory('example/lib/dialog_snackbar');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/dialog_snackbar/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

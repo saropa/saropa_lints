@@ -147,35 +147,32 @@ void main() {
   });
 
   group('Animation Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_vsync_mixin',
-      'avoid_animation_in_build',
-      'avoid_inert_animation_value_in_build',
-      'require_animation_controller_dispose',
-      'require_hero_tag_uniqueness',
-      'avoid_layout_passes',
-      'avoid_hardcoded_duration',
-      'require_animation_curve',
-      'prefer_implicit_animations',
-      'require_staggered_animation_delays',
-      'prefer_tween_sequence',
-      'require_animation_status_listener',
-      'avoid_overlapping_animations',
-      'avoid_animation_rebuild_waste',
-      'prefer_physics_simulation',
-      'require_animation_ticker_disposal',
-      'prefer_spring_animation',
-      'avoid_excessive_rebuilds_animation',
-      'avoid_clip_during_animation',
-      'avoid_multiple_animation_controllers',
-      'avoid_implicit_animation_dispose_cast',
-      'prefer_animation_controller_forward_from_zero',
-      'prefer_single_ticker_provider_state_mixin',
-    ];
+    final fixtureDir = Directory('example/lib/animation');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/animation/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

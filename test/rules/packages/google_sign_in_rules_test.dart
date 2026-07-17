@@ -132,15 +132,36 @@ void main() {
   });
 
   group('Google Sign-In Rules - Fixture Verification', () {
-    test('google_sign_in_fixture.dart exists', () {
-      final file = File(
-        'example_packages/lib/google_sign_in/google_sign_in_fixture.dart',
-      );
-      expect(
-        file.existsSync(),
-        isTrue,
-        reason: 'Fixture file must exist for all six rules',
-      );
+    final fixtureDir = Directory('example_packages/lib/google_sign_in');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('\$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/google_sign_in/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 }

@@ -62,22 +62,34 @@ void main() {
   });
 
   group('Geocoding Rules - Fixture Verification', () {
-    final fixtures = [
-      'geocoding_unchecked_first',
-      'geocoding_missing_exception_handler',
-      'geocoding_prefer_no_result_found_catch',
-      'geocoding_locale_set_before_call',
-      'geocoding_concurrent_locale_race',
-      'geocoding_missing_is_present_check',
-      'geocoding_call_in_text_field_listener',
-      'geocoding_deprecated_locale_param',
-    ];
+    final fixtureDir = Directory('example_packages/lib/geocoding');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/geocoding/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

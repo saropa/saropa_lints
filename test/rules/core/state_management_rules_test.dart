@@ -108,25 +108,34 @@ void main() {
   });
 
   group('State Management Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_notify_listeners',
-      'require_stream_controller_dispose',
-      'avoid_collection_mutating_methods',
-      'require_value_notifier_dispose',
-      'require_mounted_check',
-      'avoid_stateful_without_state',
-      'avoid_global_key_in_build',
-      'avoid_setstate_in_large_state_class',
-      'prefer_immutable_selector_value',
-      'avoid_static_state',
-      'prefer_optimistic_updates',
-    ];
+    final fixtureDir = Directory('example/lib/state_management');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/state_management/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

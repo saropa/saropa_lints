@@ -79,25 +79,34 @@ void main() {
   });
 
   group('Numeric Literal Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_inconsistent_digit_separators',
-      'avoid_unnecessary_digit_separators',
-      'double_literal_format',
-      'no_magic_number',
-      'no_magic_string',
-      'prefer_addition_subtraction_assignments',
-      'prefer_compound_assignment_operators',
-      'prefer_digit_separators',
-      'avoid_digit_separators',
-      'no_magic_number_in_tests',
-      'no_magic_string_in_tests',
-    ];
+    final fixtureDir = Directory('example/lib/numeric_literal');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/numeric_literal/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

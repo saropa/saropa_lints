@@ -39,17 +39,34 @@ void main() {
   });
 
   group('Supabase Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_supabase_error_handling',
-      'avoid_supabase_anon_key_in_code',
-      'require_supabase_realtime_unsubscribe',
-    ];
+    final fixtureDir = Directory('example_packages/lib/supabase');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/supabase/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

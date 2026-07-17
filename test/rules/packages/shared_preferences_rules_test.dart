@@ -92,26 +92,34 @@ void main() {
   });
 
   group('Shared Preferences Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_prefs_for_large_data',
-      'require_shared_prefs_prefix',
-      'prefer_shared_prefs_async_api',
-      'avoid_shared_prefs_in_isolate',
-      'prefer_typed_prefs_wrapper',
-      'avoid_auth_state_in_prefs',
-      'prefer_encrypted_prefs',
-      'avoid_shared_prefs_sensitive_data',
-      'require_shared_prefs_null_handling',
-      'require_shared_prefs_key_constants',
-      'avoid_shared_prefs_large_data',
-      'avoid_shared_prefs_sync_race',
-    ];
+    final fixtureDir = Directory('example_packages/lib/shared_preferences');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/shared_preferences/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

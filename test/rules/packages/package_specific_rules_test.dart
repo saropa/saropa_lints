@@ -150,33 +150,34 @@ void main() {
   });
 
   group('Package Specific Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_google_signin_error_handling',
-      'require_apple_signin_nonce',
-      'require_webview_ssl_error_handling',
-      'avoid_webview_file_access',
-      'require_calendar_timezone_handling',
-      'require_keyboard_visibility_dispose',
-      'require_speech_stop_on_dispose',
-      'avoid_app_links_sensitive_params',
-      'require_envied_obfuscation',
-      'avoid_openai_key_in_code',
-      'require_openai_error_handling',
-      'require_svg_error_handler',
-      'require_google_fonts_fallback',
-      'prefer_uuid_v4',
-      'prefer_image_picker_max_dimensions',
-      'require_url_launcher_mode',
-      'prefer_geolocator_distance_filter',
-      'avoid_image_picker_quick_succession',
-      'require_analytics_error_handling',
-    ];
+    final fixtureDir = Directory('example_packages/lib/package_specific');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/package_specific/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

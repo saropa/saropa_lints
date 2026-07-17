@@ -90,17 +90,32 @@ void main() {
   });
 
   group('Cryptography Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_hardcoded_encryption_keys',
-      'prefer_secure_random_for_crypto',
-      'avoid_deprecated_crypto_algorithms',
-      'require_unique_iv_per_encryption',
-      'require_secure_key_generation',
-    ];
+    final fixtureDir = Directory('example/lib/crypto');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/crypto/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

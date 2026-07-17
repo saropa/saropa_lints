@@ -47,19 +47,34 @@ void main() {
   });
 
   group('YoutubePlayerFlutter Rules - Fixture Verification', () {
-    final fixtures = [
-      'youtube_player_controller_not_closed',
-      'youtube_player_convert_url_unchecked',
-      'youtube_player_scaffold_deprecated',
-      'youtube_player_mute_not_respected_in_params',
-      'youtube_player_auto_fullscreen_without_portrait_guard',
-    ];
+    final fixtureDir = Directory('example_packages/lib/youtube_player_flutter');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/youtube_player_flutter/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

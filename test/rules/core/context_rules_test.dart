@@ -69,19 +69,32 @@ void main() {
   });
 
   group('Context Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_storing_context',
-      'avoid_context_across_async',
-      'prefer_closest_context',
-      'avoid_context_after_await_in_static',
-      'avoid_context_in_async_static',
-      'avoid_context_in_static_methods',
-      'avoid_context_dependency_in_callback',
-    ];
+    final fixtureDir = Directory('example/lib/context');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/context/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

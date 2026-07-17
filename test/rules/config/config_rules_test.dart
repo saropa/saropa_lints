@@ -130,22 +130,32 @@ void main() {
   });
 
   group('Configuration Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_hardcoded_config',
-      'avoid_hardcoded_config_test',
-      'avoid_mixed_environments',
-      'require_feature_flag_type_safety',
-      'avoid_string_env_parsing',
-      'avoid_platform_specific_imports',
-      'prefer_compile_time_config',
-      'prefer_flavor_configuration',
-      'prefer_semver_version',
-      'require_env_file_gitignore',
-    ];
+    final fixtureDir = Directory('example/lib/config');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/config/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

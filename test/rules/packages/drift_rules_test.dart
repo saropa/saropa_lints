@@ -223,45 +223,32 @@ void main() {
   });
 
   group('Drift Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_drift_enum_index_reorder',
-      'avoid_drift_insert_missing_conflict_target',
-      'require_drift_database_close',
-      'avoid_drift_update_without_where',
-      'require_await_in_drift_transaction',
-      'require_drift_foreign_key_pragma',
-      'avoid_drift_raw_sql_interpolation',
-      'prefer_drift_batch_operations',
-      'require_drift_stream_cancel',
-      'avoid_drift_database_on_main_isolate',
-      'avoid_drift_log_statements_production',
-      'avoid_drift_get_single_without_unique',
-      'prefer_drift_use_columns_false',
-      'avoid_drift_lazy_database',
-      'prefer_drift_isolate_sharing',
-      'avoid_drift_query_in_migration',
-      'require_drift_schema_version_bump',
-      'avoid_drift_foreign_key_in_migration',
-      'require_drift_reads_from',
-      'avoid_drift_unsafe_web_storage',
-      'avoid_drift_close_streams_in_tests',
-      'avoid_drift_nullable_converter_mismatch',
-      'avoid_drift_value_null_vs_absent',
-      'require_drift_equals_value',
-      'require_drift_read_table_or_null',
-      'require_drift_create_all_in_oncreate',
-      'avoid_drift_validate_schema_production',
-      'avoid_drift_replace_without_all_columns',
-      'avoid_drift_missing_updates_param',
-      'avoid_isar_import_with_drift',
-      'prefer_drift_foreign_key_declaration',
-      'require_drift_onupgrade_handler',
-      'require_named_for_acronym_drift_columns',
-    ];
+    final fixtureDir = Directory('example_packages/lib/drift');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example_packages/lib/drift/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

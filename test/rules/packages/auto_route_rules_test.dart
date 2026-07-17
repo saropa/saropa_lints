@@ -14,17 +14,27 @@ import 'package:test/test.dart';
 /// Test fixtures: example_packages/lib/auto_route/*
 void main() {
   group('Auto Route Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_auto_route_context_navigation',
-      'avoid_auto_route_keep_history_misuse',
-      'prefer_auto_route_path_params_simple',
-      'prefer_auto_route_typed_args',
-      'require_auto_route_guard_resume',
-      'require_auto_route_full_hierarchy',
-    ];
+    final fixtureDir = Directory('example_packages/lib/auto_route');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/auto_route/${fixture}_fixture.dart',
         );

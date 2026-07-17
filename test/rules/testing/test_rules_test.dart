@@ -214,40 +214,32 @@ void main() {
   });
 
   group('Test Rules Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_duplicate_test_assertions',
-      'avoid_empty_test_groups',
-      'avoid_top_level_members_in_tests',
-      'avoid_test_on_real_device',
-      'prefer_descriptive_test_name',
-      'format_test_name',
-      'prefer_expect_later',
-      'prefer_unique_test_names',
-      'require_test_groups',
-      'avoid_test_coupling',
-      'require_test_isolation',
-      'avoid_real_dependencies_in_tests',
-      'require_scroll_tests',
-      'require_text_input_tests',
-      'prefer_fake_over_mock',
-      'require_edge_case_tests',
-      'prefer_test_data_builder',
-      'avoid_test_implementation_details',
-      'avoid_async_callback_in_fake_async',
-      'require_test_cleanup',
-      'prefer_test_variant',
-      'require_accessibility_tests',
-      'require_animation_tests',
-      'avoid_test_print_statements',
-      'require_mock_http_client',
-      'require_test_widget_pump',
-      'require_integration_test_timeout',
-      'avoid_misused_test_matchers',
-    ];
+    final fixtureDir = Directory('example/lib/test');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/test/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

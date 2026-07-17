@@ -345,61 +345,27 @@ void main() {
     );
   });
   group('Security Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_api_key_in_code',
-      'avoid_auth_in_query_params',
-      'avoid_clipboard_sensitive',
-      'avoid_dynamic_code_loading',
-      'avoid_dynamic_sql',
-      'avoid_eval_like_patterns',
-      'avoid_external_storage_sensitive',
-      'avoid_generic_key_in_url',
-      'avoid_hardcoded_credentials',
-      'avoid_hardcoded_signing_config',
-      'avoid_jwt_decode_client',
-      'avoid_logging_sensitive_data',
-      'avoid_path_traversal',
-      'avoid_redirect_injection',
-      'avoid_screenshot_sensitive',
-      'avoid_storing_passwords',
-      'avoid_storing_sensitive_unencrypted',
-      'avoid_token_in_url',
-      'avoid_unnecessary_to_list',
-      'avoid_unverified_native_library',
-      'avoid_webview_insecure_content',
-      'avoid_webview_javascript_enabled',
-      'prefer_data_masking',
-      'prefer_html_escape',
-      'prefer_local_auth',
-      'prefer_secure_random',
-      'prefer_typed_data',
-      'prefer_webview_javascript_disabled',
-      'prefer_webview_sandbox',
-      'require_auth_check',
-      'require_biometric_fallback',
-      'require_certificate_pinning',
-      'require_clipboard_paste_validation',
-      'require_data_encryption',
-      'require_deep_link_validation',
-      'require_https_only',
-      'require_https_only_test',
-      'require_input_validation',
-      'require_input_sanitization',
-      'require_logout_cleanup',
-      'require_secure_password_field',
-      'require_secure_storage',
-      'require_secure_storage_auth_data',
-      'require_secure_storage_for_auth',
-      'prefer_biometric_protection',
-      'require_token_refresh',
-      'require_url_validation',
-      'require_webview_error_handling',
-      'avoid_stack_trace_in_production',
-      'avoid_webview_cors_issues',
-    ];
+    final fixtureDir = Directory('example/lib/security');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/security/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

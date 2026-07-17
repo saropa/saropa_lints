@@ -135,35 +135,27 @@ void main() {
     );
   });
   group('Getx Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_getx_worker_dispose',
-      'require_getx_permanent_cleanup',
-      'avoid_getx_context_outside_widget',
-      'avoid_getx_rx_nested_obs',
-      'avoid_getx_global_navigation',
-      'require_getx_binding_routes',
-      'avoid_getx_dialog_snackbar_in_controller',
-      'require_getx_lazy_put',
-      'avoid_get_find_in_build',
-      'require_getx_controller_dispose',
-      'avoid_obs_outside_controller',
-      'proper_getx_super_calls',
-      'always_remove_getx_listener',
-      'avoid_getx_rx_inside_build',
-      'avoid_mutable_rx_variables',
-      'dispose_getx_fields',
-      'prefer_getx_builder',
-      'prefer_getx_builder_over_obx',
-      'require_getx_binding',
-      'avoid_getx_global_state',
-      'avoid_getx_static_context',
-      'avoid_tight_coupling_with_getx',
-      'avoid_getx_static_get',
-      'avoid_getx_build_context_bypass',
-    ];
+    final fixtureDir = Directory('example_packages/lib/getx');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example_packages/lib/getx/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });

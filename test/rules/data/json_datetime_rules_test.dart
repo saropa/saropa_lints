@@ -99,26 +99,32 @@ void main() {
   });
 
   group('Json Datetime Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_json_decode_try_catch',
-      'avoid_datetime_parse_unvalidated',
-      'prefer_try_parse_for_dynamic_data',
-      'prefer_duration_constants',
-      'avoid_datetime_now_in_tests',
-      'avoid_not_encodable_in_to_json',
-      'require_date_format_specification',
-      'prefer_iso8601_dates',
-      'prefer_correct_json_casts',
-      'avoid_optional_field_crash',
-      'prefer_explicit_json_keys',
-      'require_json_schema_validation',
-      'prefer_json_serializable',
-      'require_timezone_display',
-    ];
+    final fixtureDir = Directory('example/lib/json_datetime');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/json_datetime/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

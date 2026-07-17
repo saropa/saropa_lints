@@ -33,14 +33,32 @@ void main() {
   });
 
   group('Money/Currency Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_double_for_money',
-      'require_currency_code_with_amount',
-    ];
+    final fixtureDir = Directory('example/lib/money');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/money/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

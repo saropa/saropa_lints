@@ -99,27 +99,34 @@ void main() {
   });
 
   group('Stylistic Widget Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_sizedbox_over_container',
-      'prefer_container_over_sizedbox',
-      'prefer_text_rich_over_richtext',
-      'prefer_richtext_over_text_rich',
-      'prefer_edgeinsets_symmetric',
-      'prefer_edgeinsets_only',
-      'prefer_borderradius_circular',
-      'prefer_expanded_over_flexible',
-      'prefer_flexible_over_expanded',
-      'prefer_material_theme_colors',
-      'prefer_explicit_colors',
-      'prefer_clip_r_superellipse',
-      'prefer_clip_r_superellipse_clipper',
-    ];
+    final fixtureDir = Directory('example/lib/stylistic_widget');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/stylistic_widget/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

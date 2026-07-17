@@ -165,44 +165,32 @@ void main() {
   });
 
   group('Collection Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_collection_equality_checks',
-      'avoid_duplicate_map_keys',
-      'avoid_map_keys_contains',
-      'avoid_unnecessary_collections',
-      'avoid_unsafe_collection_methods',
-      'avoid_unsafe_reduce',
-      'prefer_fold_over_reduce',
-      'prefer_for_in_over_foreach',
-      'prefer_foreach_over_map_entries',
-      'prefer_constructor_over_literals',
-      'avoid_unsafe_where_methods',
-      'prefer_where_or_null',
-      'map_keys_ordering',
-      'prefer_list_contains',
-      'prefer_list_first',
-      'prefer_iterable_of',
-      'prefer_list_last',
-      'prefer_add_all',
-      'prefer_asmap_over_indexed_iteration',
-      'require_const_list_items',
-      'avoid_duplicate_number_elements',
-      'avoid_duplicate_string_elements',
-      'avoid_duplicate_object_elements',
-      'prefer_set_for_lookup',
-      'prefer_correct_for_loop_increment',
-      'avoid_unreachable_for_loop',
-      'prefer_null_aware_elements',
-      'prefer_iterable_operations',
-      'require_key_for_collection',
-      'avoid_function_literals_in_foreach_calls',
-      'prefer_inlined_adds',
-      'prefer_for_elements_to_map_from_iterable',
-    ];
+    final fixtureDir = Directory('example/lib/collection');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/collection/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

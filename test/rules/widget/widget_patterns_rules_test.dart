@@ -676,114 +676,27 @@ void main() {
 
   // example/lib/: BAD lines must trigger; OK/false-positive blocks stay clean under analysis.
   group('Widget Patterns Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_bool_in_widget_constructors',
-      'avoid_brightness_check_for_theme',
-      'avoid_catching_generic_exception',
-      'avoid_double_tap_submit',
-      'avoid_duplicate_widget_keys',
-      'avoid_empty_text_widgets',
-      'avoid_find_child_in_build',
-      'avoid_fitted_box_for_text',
-      'avoid_font_weight_as_number',
-      'avoid_form_without_key',
-      'avoid_gesture_conflict',
-      'avoid_gesture_without_behavior',
-      'avoid_hardcoded_asset_paths',
-      'avoid_hardcoded_text_styles',
-      'avoid_icon_size_override',
-      'avoid_image_repeat',
-      'avoid_image_without_cache',
-      'avoid_incorrect_image_opacity',
-      'avoid_large_images_in_memory',
-      'avoid_late_without_guarantee',
-      'avoid_material2_fallback',
-      'avoid_mediaquery_in_build',
-      'avoid_missing_image_alt',
-      'avoid_multiple_material_apps',
-      'avoid_navigation_in_build',
-      'avoid_navigator_push_without_route_name',
-      'avoid_print_in_production',
-      'avoid_nullable_widget_methods',
-      'avoid_opacity_animation',
-      'avoid_raw_keyboard_listener',
-      'avoid_regex_in_loop',
-      'avoid_static_route_config',
-      'avoid_returning_widgets',
-      'avoid_service_locator_overuse',
-      'avoid_stateful_widget_in_list',
-      'avoid_text_scale_factor',
-      'avoid_uncontrolled_text_field',
-      'avoid_unnecessary_gesture_detector',
-      'avoid_unrestricted_text_field_length',
-      'avoid_unnecessary_containers',
-      'avoid_unused_callback_parameters',
-      'prefer_action_button_tooltip',
-      'prefer_actions_and_shortcuts',
-      'prefer_asset_image_for_local',
-      'prefer_cached_network_image',
-      'prefer_carousel_view',
-      'prefer_color_scheme_from_seed',
-      'prefer_const_literals_to_create_immutables',
-      'prefer_cupertino_for_ios_feel',
-      'prefer_cursor_for_buttons',
-      'prefer_define_hero_tag',
-      'prefer_extracting_callbacks',
-      'prefer_feature_folder_structure',
-      'prefer_fit_cover_for_background',
-      'prefer_getter_over_method',
-      'prefer_inkwell_over_gesture',
-      'prefer_keyboard_shortcuts',
-      'prefer_overlay_portal',
-      'prefer_rich_text_for_complex',
-      'prefer_safe_area_consumer',
-      'prefer_scaffold_messenger_maybeof',
-      'prefer_search_anchor',
-      'prefer_selectable_text',
-      'prefer_semantic_widget_names',
-      'prefer_single_widget_per_file',
-      'prefer_split_widget_const',
-      'prefer_system_theme_default',
-      'prefer_tap_region_for_dismiss',
-      'prefer_text_rich',
-      'prefer_text_theme',
-      'prefer_utc_datetimes',
-      'prefer_void_callback',
-      'prefer_widget_private_members',
-      'require_animated_builder_child',
-      'require_button_loading_state',
-      'require_default_text_style',
-      'require_disabled_state',
-      'require_drag_feedback',
-      'require_error_widget',
-      'require_form_validation',
-      'require_hover_states',
-      'require_https_over_http',
-      'require_image_dimensions',
-      'require_image_error_builder',
-      'require_image_picker_permission_android',
-      'require_image_picker_permission_ios',
-      'require_long_press_callback',
-      'require_orientation_handling',
-      'require_permission_manifest_android',
-      'require_permission_plist_ios',
-      'require_placeholder_for_network',
-      'require_refresh_indicator',
-      'require_rethrow_preserve_stack',
-      'require_locale_for_text',
-      'require_safe_area_handling',
-      'require_text_form_field_in_form',
-      'require_text_overflow_handling',
-      'require_theme_color_from_scheme',
-      'require_url_launcher_queries_android',
-      'require_url_launcher_schemes_ios',
-      'require_webview_navigation_delegate',
-      'require_window_size_constraints',
-      'require_wss_over_ws',
-    ];
+    final fixtureDir = Directory('example/lib/widget_patterns');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/widget_patterns/${fixture}_fixture.dart',
         );

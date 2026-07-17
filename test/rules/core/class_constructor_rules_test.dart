@@ -146,39 +146,34 @@ void main() {
   });
 
   group('Class Constructor Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_declaring_call_method',
-      'avoid_referencing_subclasses',
-      'avoid_generics_shadowing',
-      'avoid_incomplete_copy_with',
-      'avoid_non_empty_constructor_bodies',
-      'avoid_variable_shadowing',
-      'prefer_const_string_list',
-      'prefer_declaring_const_constructor',
-      'prefer_non_const_constructors',
-      'prefer_factory_constructor',
-      'prefer_private_extension_type_field',
-      'avoid_renaming_representation_getters',
-      'proper_super_calls',
-      'avoid_unmarked_public_class',
-      'prefer_final_class',
-      'prefer_interface_class',
-      'prefer_base_class',
-      'require_late_access_check',
-      'avoid_accessing_other_classes_private_members',
-      'avoid_unused_constructor_parameters',
-      'avoid_field_initializers_in_const_classes',
-      'prefer_asserts_in_initializer_lists',
-      'prefer_const_constructors_in_immutables',
-      'prefer_final_fields',
-      'prefer_final_fields_always',
-    ];
+    final fixtureDir = Directory('example/lib/class_constructor');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/class_constructor/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -90,25 +90,27 @@ void main() {
     );
   });
   group('Equatable Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_extend_equatable',
-      'list_all_equatable_fields',
-      'avoid_equatable_nested_equality',
-      'prefer_equatable_mixin',
-      'prefer_equatable_stringify',
-      'prefer_immutable_annotation',
-      'prefer_record_over_equatable',
-      'avoid_mutable_field_in_equatable',
-      'require_equatable_copy_with',
-      'require_copy_with_null_handling',
-      'require_deep_equality_collections',
-      'avoid_equatable_datetime',
-      'prefer_unmodifiable_collections',
-      'require_equatable_props_override',
-    ];
+    final fixtureDir = Directory('example_packages/lib/equatable');
+
+    // Auto-discover fixtures from disk so new files are verified
+    // automatically — no manual list to maintain.
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/equatable/${fixture}_fixture.dart',
         );

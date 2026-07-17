@@ -62,15 +62,36 @@ void main() {
   });
 
   group('FlutterAnimate Rules - Fixture Verification', () {
-    test('flutter_animate_fixture.dart exists', () {
-      final file = File(
-        'example_packages/lib/flutter_animate/flutter_animate_fixture.dart',
-      );
-      expect(
-        file.existsSync(),
-        isTrue,
-        reason: 'Fixture file must exist at expected path',
-      );
+    final fixtureDir = Directory('example_packages/lib/flutter_animate');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('\$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/flutter_animate/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 }

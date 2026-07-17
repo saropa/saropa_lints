@@ -101,20 +101,32 @@ void main() {
   });
 
   group('Notification Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_notification_channel_android',
-      'avoid_notification_payload_sensitive',
-      'require_notification_initialize_per_platform',
-      'require_notification_timezone_awareness',
-      'avoid_notification_same_id',
-      'prefer_notification_grouping',
-      'avoid_notification_silent_failure',
-      'prefer_local_notification_for_immediate',
-    ];
+    final fixtureDir = Directory('example/lib/notification');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/notification/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

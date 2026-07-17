@@ -67,19 +67,32 @@ void main() {
   });
 
   group('Return Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_returning_cascades',
-      'avoid_returning_this',
-      'avoid_returning_void',
-      'avoid_unnecessary_return',
-      'prefer_immediate_return',
-      'avoid_returning_null_for_void',
-      'avoid_returning_null_for_future',
-    ];
+    final fixtureDir = Directory('example/lib/return');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/return/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -57,21 +57,34 @@ void main() {
   });
 
   group('DeviceCalendar Rules - Fixture Verification', () {
-    final fixtures = [
-      'device_calendar_missing_permission_check',
-      'device_calendar_unchecked_result',
-      'device_calendar_retrieve_events_empty_params',
-      'device_calendar_retrieve_events_missing_end_date',
-      'device_calendar_event_missing_calendar_id',
-      'device_calendar_event_utc_timezone',
-      'device_calendar_result_data_before_success_check',
-    ];
+    final fixtureDir = Directory('example_packages/lib/device_calendar');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/device_calendar/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

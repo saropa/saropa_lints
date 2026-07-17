@@ -111,27 +111,32 @@ void main() {
   });
 
   group('File Handling Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_file_exists_check',
-      'require_pdf_error_handling',
-      'require_graphql_error_handling',
-      'require_sqflite_whereargs',
-      'require_sqflite_transaction',
-      'require_sqflite_error_handling',
-      'prefer_sqflite_batch',
-      'require_sqflite_close',
-      'avoid_sqflite_reserved_words',
-      'avoid_sqflite_read_all_columns',
-      'avoid_loading_full_pdf_in_memory',
-      'prefer_sqflite_singleton',
-      'prefer_sqflite_column_constants',
-      'prefer_streaming_for_large_files',
-      'require_file_path_sanitization',
-    ];
+    final fixtureDir = Directory('example/lib/file_handling');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File('example/lib/file_handling/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

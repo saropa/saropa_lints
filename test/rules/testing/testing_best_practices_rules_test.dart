@@ -228,52 +228,34 @@ void main() {
   });
 
   group('Testing Best Practices Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_test_assertions',
-      'avoid_vague_test_descriptions',
-      'avoid_real_network_calls_in_tests',
-      'avoid_hardcoded_test_delays',
-      'require_test_setup_teardown',
-      'require_pump_after_interaction',
-      'avoid_production_config_in_tests',
-      'prefer_pump_and_settle',
-      'avoid_test_sleep',
-      'avoid_find_by_text',
-      'require_test_keys',
-      'require_arrange_act_assert',
-      'prefer_mock_navigator',
-      'avoid_real_timer_in_widget_test',
-      'require_mock_verification',
-      'prefer_matcher_over_equals',
-      'prefer_test_wrapper',
-      'require_screen_size_tests',
-      'avoid_stateful_test_setup',
-      'prefer_mock_http',
-      'require_golden_test',
-      'avoid_flaky_tests',
-      'prefer_single_assertion',
-      'avoid_find_all',
-      'require_integration_test_setup',
-      'avoid_hardcoded_delays',
-      // require_error_case_tests is a whole-file rule needing a /test/ path, so
-      // its fixture lives at example/lib/test/require_error_case_tests_fixture.dart
-      // (BAD) + _good.dart (GOOD) and is verified by
-      // require_error_case_tests_test.dart, not this directory's existence loop.
-      'prefer_test_find_by_key',
-      'prefer_setup_teardown',
-      'require_test_description_convention',
-      'prefer_bloc_test_package',
-      'prefer_mock_verify',
-      'require_dialog_tests',
-      'prefer_fake_platform',
-      'require_test_documentation',
-    ];
+    final fixtureDir = Directory('example/lib/testing_best_practices');
+
+    // Auto-discover fixtures from disk so new files are verified
+
+    // automatically — no manual list to maintain.
+
+    final fixtures =
+        fixtureDir
+            .listSync()
+            .whereType<File>()
+            .map((f) => f.uri.pathSegments.last)
+            .where((name) => name.endsWith('_fixture.dart'))
+            .map((name) => name.replaceAll('_fixture.dart', ''))
+            .toList()
+          ..sort();
+
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
-      test('$fixture fixture exists', () {
+      test('\$fixture fixture exists', () {
         final file = File(
           'example/lib/testing_best_practices/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }
