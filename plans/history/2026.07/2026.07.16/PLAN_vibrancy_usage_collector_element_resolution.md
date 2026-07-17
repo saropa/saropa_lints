@@ -239,3 +239,34 @@ OOM guard (chunking, a killable child) for very large consumer repositories.
   `unused` assertions agree with the resolved path on unambiguous cases, confirming no regression.
 - Command: `dart test test/cli/project_vibrancy_resolved_usage_test.dart` and
   `dart test test/cli/project_vibrancy_cli_test.dart test/cli/project_vibrancy_coverage_quality_test.dart`.
+
+---
+
+## Finish Report (2026-07-16) — plan retired
+
+**Disposition:** RETIRED. Phases 1-2 shipped (2026-06-24). Phases 3-5 are deferred to
+`plans/deferred/vibrancy_usage_cache_subprocess_cascading.md` and this plan is archived. The plan is
+no longer a live tracking record.
+
+**Why retired rather than continued.** The plan gated Phases 3-5 (tree-SHA cache, killable/chunked
+subprocess, cascading unused) on a precision review of the resolved `unused` flag on a real repo. The
+review ran 2026-07-16 against this repo and failed: of 326 `lib/` functions flagged `unused`, at least
+~50% are false positives — 147 `@override` methods plus the entire `bin/`-called CLI surface. A
+single-file probe confirmed the entry-point predicate itself is correct (`hasOverride` true, ids align)
+when a file resolves; the defect is upstream, in how the resolved pass builds its analysis context.
+
+**Root cause (filed as a bug).** `collectResolvedUsage` builds one `AnalysisContextCollection` over the
+repo root, which contains nested package roots (`self_check/`, `example*/`, `packages/`,
+`build/test_tmp/…`). `contextFor` fails for `lib/` files; they are skipped; skipped files fall back to
+name-based counting with no entry-point protection, so polymorphic-only methods count to `0` and flag
+dead. Full detail, reproduction, and fix direction in
+`bugs/infra_vibrancy_unused_false_positives_context_fragmentation.md`.
+
+**Decision.** Phases 3-5 all harden or extend this signal; building them on a 50%-false-positive base
+adds no value. Rather than keep the plan open behind a blocked dependency, the remaining work is
+recorded in the deferred graveyard with per-item rationale and the parent plan is archived. To resume:
+fix the bug, re-run the precision review clean, then re-open Phases 3-5 from the deferred record.
+
+**What ships unchanged:** Phases 1-2 stay in production
+(`lib/src/cli/project_vibrancy_resolved_usage.dart`); their tests pass. The `unused` flag's known
+false positives on multi-package repos are now tracked by the bug, not hidden.
