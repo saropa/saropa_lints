@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/url_launcher_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 URL launcher lint rules.
 ///
@@ -43,21 +44,7 @@ void main() {
 
   group('URL Launcher Rules - Fixture Verification', () {
     final fixtureDir = Directory('example_packages/lib/url_launcher');
-
-    // Auto-discover fixtures from disk so new files are verified
-
-    // automatically — no manual list to maintain.
-
-    final fixtures =
-        fixtureDir
-            .listSync()
-            .whereType<File>()
-            .map((f) => f.uri.pathSegments.last)
-            .where((name) => name.endsWith('_fixture.dart'))
-            .map((name) => name.replaceAll('_fixture.dart', ''))
-            .toList()
-          ..sort();
-
+    final fixtures = discoverFixtures(fixtureDir);
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);
 

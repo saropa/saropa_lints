@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/saropa_lints.dart' show RuleType;
 import 'package:saropa_lints/src/rules/security/crypto_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 5 Cryptography lint rules.
 ///
@@ -91,21 +92,7 @@ void main() {
 
   group('Cryptography Rules - Fixture Verification', () {
     final fixtureDir = Directory('example/lib/crypto');
-
-    // Auto-discover fixtures from disk so new files are verified
-
-    // automatically — no manual list to maintain.
-
-    final fixtures =
-        fixtureDir
-            .listSync()
-            .whereType<File>()
-            .map((f) => f.uri.pathSegments.last)
-            .where((name) => name.endsWith('_fixture.dart'))
-            .map((name) => name.replaceAll('_fixture.dart', ''))
-            .toList()
-          ..sort();
-
+    final fixtures = discoverFixtures(fixtureDir);
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);
 

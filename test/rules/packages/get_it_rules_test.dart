@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/get_it_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 GetIt lint rules.
 ///
@@ -36,19 +37,7 @@ void main() {
   });
   group('GetIt Rules - Fixture Verification', () {
     final fixtureDir = Directory('example_packages/lib/get_it');
-
-    // Auto-discover fixtures from disk so new files are verified
-    // automatically — no manual list to maintain.
-    final fixtures =
-        fixtureDir
-            .listSync()
-            .whereType<File>()
-            .map((f) => f.uri.pathSegments.last)
-            .where((name) => name.endsWith('_fixture.dart'))
-            .map((name) => name.replaceAll('_fixture.dart', ''))
-            .toList()
-          ..sort();
-
+    final fixtures = discoverFixtures(fixtureDir);
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);
       expect(fixtures, isNotEmpty);

@@ -8,6 +8,7 @@ import 'package:test/test.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_avoid_prefer_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_ux_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 104 widget pattern lint rules.
 ///
@@ -677,19 +678,7 @@ void main() {
   // example/lib/: BAD lines must trigger; OK/false-positive blocks stay clean under analysis.
   group('Widget Patterns Rules - Fixture Verification', () {
     final fixtureDir = Directory('example/lib/widget_patterns');
-
-    // Auto-discover fixtures from disk so new files are verified
-    // automatically — no manual list to maintain.
-    final fixtures =
-        fixtureDir
-            .listSync()
-            .whereType<File>()
-            .map((f) => f.uri.pathSegments.last)
-            .where((name) => name.endsWith('_fixture.dart'))
-            .map((name) => name.replaceAll('_fixture.dart', ''))
-            .toList()
-          ..sort();
-
+    final fixtures = discoverFixtures(fixtureDir);
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);
       expect(fixtures, isNotEmpty);

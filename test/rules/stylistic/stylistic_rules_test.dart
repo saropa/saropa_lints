@@ -7,6 +7,7 @@ import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/stylistic/stylistic_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 28 Stylistic lint rules.
 ///
@@ -282,19 +283,7 @@ void main() {
   // example/lib/stylistic/: formatting and style rules with fixture-backed expectations.
   group('Stylistic Rules - Fixture Verification', () {
     final fixtureDir = Directory('example/lib/stylistic');
-
-    // Auto-discover fixtures from disk so new files are verified
-    // automatically — no manual list to maintain.
-    final fixtures =
-        fixtureDir
-            .listSync()
-            .whereType<File>()
-            .map((f) => f.uri.pathSegments.last)
-            .where((name) => name.endsWith('_fixture.dart'))
-            .map((name) => name.replaceAll('_fixture.dart', ''))
-            .toList()
-          ..sort();
-
+    final fixtures = discoverFixtures(fixtureDir);
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);
       expect(fixtures, isNotEmpty);

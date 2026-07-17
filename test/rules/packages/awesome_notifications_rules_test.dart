@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/awesome_notifications_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Instantiation-pin tests for the 7 awesome_notifications lint rules.
 ///
@@ -134,21 +135,7 @@ void main() {
 
   group('AwesomeNotifications Rules - Fixture Verification', () {
     final fixtureDir = Directory('example_packages/lib/awesome_notifications');
-
-    // Auto-discover fixtures from disk so new files are verified
-
-    // automatically — no manual list to maintain.
-
-    final fixtures =
-        fixtureDir
-            .listSync()
-            .whereType<File>()
-            .map((f) => f.uri.pathSegments.last)
-            .where((name) => name.endsWith('_fixture.dart'))
-            .map((name) => name.replaceAll('_fixture.dart', ''))
-            .toList()
-          ..sort();
-
+    final fixtures = discoverFixtures(fixtureDir);
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);
 

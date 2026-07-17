@@ -22,6 +22,7 @@ import 'package:saropa_lints/src/rules/packages/speech_to_text_rules.dart';
 import 'package:saropa_lints/src/rules/packages/url_launcher_rules.dart';
 import 'package:saropa_lints/src/rules/packages/uuid_rules.dart';
 import 'package:saropa_lints/src/rules/packages/webview_flutter_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 19 Package Specific lint rules.
 ///
@@ -151,21 +152,7 @@ void main() {
 
   group('Package Specific Rules - Fixture Verification', () {
     final fixtureDir = Directory('example_packages/lib/package_specific');
-
-    // Auto-discover fixtures from disk so new files are verified
-
-    // automatically — no manual list to maintain.
-
-    final fixtures =
-        fixtureDir
-            .listSync()
-            .whereType<File>()
-            .map((f) => f.uri.pathSegments.last)
-            .where((name) => name.endsWith('_fixture.dart'))
-            .map((name) => name.replaceAll('_fixture.dart', ''))
-            .toList()
-          ..sort();
-
+    final fixtures = discoverFixtures(fixtureDir);
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);
 

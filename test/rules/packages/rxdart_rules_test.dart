@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/rxdart_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 1 RxDart lint rule.
 ///
@@ -12,19 +13,7 @@ import 'package:test/test.dart';
 void main() {
   group('RxDart Rules - Fixture Verification', () {
     final fixtureDir = Directory('example_packages/lib/rxdart');
-
-    // Auto-discover fixtures from disk so new files are verified
-    // automatically — no manual list to maintain.
-    final fixtures =
-        fixtureDir
-            .listSync()
-            .whereType<File>()
-            .map((f) => f.uri.pathSegments.last)
-            .where((name) => name.endsWith('_fixture.dart'))
-            .map((name) => name.replaceAll('_fixture.dart', ''))
-            .toList()
-          ..sort();
-
+    final fixtures = discoverFixtures(fixtureDir);
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);
       expect(fixtures, isNotEmpty);

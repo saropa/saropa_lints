@@ -64,7 +64,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.3.4]
 
 Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, adds a validated `fresh_code` risk flag to the Code Health report, and revives a batch of lint rules that never fired for anyone: seven that were missing their most common bad-code shape, and fourteen whole-file rules (desktop, BLoC, Riverpod, iOS, testing, navigation, i18n, and animation checks) that reported through an end-of-file step the analysis engine ignored. Also fixes a broken age signal that scored every function as maximally stale. No action required — the API is opt-in and the new flag and fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.4/CHANGELOG.md)
 
@@ -105,6 +105,8 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 - Fixed the performance-rules fixture verification test: renamed `require_window_close_confirmation_desktop_fixture.dart` to match the rule-name convention, and added 8 fixture files that existed on disk but were missing from the verification list.
 - Replaced the hardcoded fixture list in the performance test with a directory scan, so new fixture files are verified automatically without manual list maintenance. Also renamed the stale `require_window_close_confirmation_desktop_good.dart` to drop the `_desktop` suffix.
 - Converted all 126 remaining test files from hardcoded fixture lists to the same `Directory.listSync()` auto-discovery pattern. Every fixture verification group now scans its directory on disk, so adding a fixture file is automatically tested — no manual list to maintain or drift out of sync. The `android_rules_test` retains one explicit test for a cross-directory fixture (`require_android_manifest_entries` in `example/lib/platform/`). Two files (`roadmap_15_rules_test`, `migration_rules_test`) were excluded because their fixture groups contain content-validation tests beyond simple existence checks.
+- Extracted fixture auto-discovery into a shared `discoverFixtures()` helper (`test/helpers/fixture_discovery.dart`) and migrated all 127 fixture-verification test files to use it. The helper returns an empty list when the directory is missing, so the guard test fails with a clear assertion instead of a `FileSystemException` aborting the group. Removes ~7 lines of duplicated `listSync` chain per file.
+- Added a fixture-vs-tiers integrity test (`test/integrity/fixture_integrity_test.dart`) that cross-references every `*_fixture.dart` on disk against `getAllDefinedRules()`. Catches stale or misspelled fixture files whose names don't match any registered rule. Group/category fixtures (covering multiple rules) are logged but not failed. Includes a regression floor at >2300 exact-match fixtures.
 
 </details>
 

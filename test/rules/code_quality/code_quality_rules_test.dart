@@ -9,6 +9,7 @@ import 'package:saropa_lints/src/rules/code_quality/code_quality_avoid_rules.dar
 import 'package:saropa_lints/src/rules/code_quality/code_quality_control_flow_rules.dart';
 import 'package:saropa_lints/src/rules/code_quality/code_quality_prefer_rules.dart';
 import 'package:saropa_lints/src/rules/code_quality/code_quality_variables_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 101 code quality lint rules.
 ///
@@ -667,19 +668,7 @@ void main() {
   // example/lib/code_quality/: fixtures drive real analyzer diagnostics per rule.
   group('Code Quality Rules - Fixture Verification', () {
     final fixtureDir = Directory('example/lib/code_quality');
-
-    // Auto-discover fixtures from disk so new files are verified
-    // automatically — no manual list to maintain.
-    final fixtures =
-        fixtureDir
-            .listSync()
-            .whereType<File>()
-            .map((f) => f.uri.pathSegments.last)
-            .where((name) => name.endsWith('_fixture.dart'))
-            .map((name) => name.replaceAll('_fixture.dart', ''))
-            .toList()
-          ..sort();
-
+    final fixtures = discoverFixtures(fixtureDir);
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);
       expect(fixtures, isNotEmpty);

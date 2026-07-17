@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/widget/dialog_snackbar_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 6 Dialog & SnackBar lint rules.
 ///
@@ -58,21 +59,7 @@ void main() {
 
   group('Dialog & SnackBar Rules - Fixture Verification', () {
     final fixtureDir = Directory('example/lib/dialog_snackbar');
-
-    // Auto-discover fixtures from disk so new files are verified
-
-    // automatically — no manual list to maintain.
-
-    final fixtures =
-        fixtureDir
-            .listSync()
-            .whereType<File>()
-            .map((f) => f.uri.pathSegments.last)
-            .where((name) => name.endsWith('_fixture.dart'))
-            .map((name) => name.replaceAll('_fixture.dart', ''))
-            .toList()
-          ..sort();
-
+    final fixtures = discoverFixtures(fixtureDir);
     test('fixture directory exists and is not empty', () {
       expect(fixtureDir.existsSync(), isTrue);
 

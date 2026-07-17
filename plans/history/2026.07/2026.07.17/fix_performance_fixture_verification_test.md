@@ -60,3 +60,24 @@ The migration script escaped `$fixture` as `\$fixture` in the Dart `test()` call
 ### Remaining
 
 The 2 excluded files (`roadmap_15_rules_test.dart`, `migration_rules_test.dart`) retain manual fixture references. Both have single fixtures at the `example/lib/` root level with no per-category subdirectory, and their tests validate fixture content, not just existence.
+
+## Finish Report — Phase 4 (2026-07-17)
+
+### Problem
+
+Two hardening gaps from the phase-3 handoff reflection:
+
+1. **`Directory.listSync()` throws `FileSystemException` during group setup when a fixture directory is missing.** The guard test (`expect(dir.existsSync(), isTrue)`) never runs because the exception aborts the entire `group()` callback. The user sees a raw `FileSystemException` instead of a clear test failure.
+2. **No cross-validation between fixture filenames and registered rule names.** A stale or misspelled fixture file silently passes its existence test while testing nothing, because no test verifies that the fixture name corresponds to a real rule.
+
+### Changes
+
+- **Shared `discoverFixtures()` helper** (`test/helpers/fixture_discovery.dart`): extracts the `Directory.listSync()` → filter → sort chain into one function that returns an empty list when the directory doesn't exist. All 127 fixture-verification test files now call this helper instead of inlining the 7-line chain.
+- **Fixture-vs-tiers integrity test** (`test/integrity/fixture_integrity_test.dart`): scans all `*_fixture.dart` files under `example/lib/` and `example_packages/lib/`, cross-references each name against `getAllDefinedRules()`, and fails if a rule-specific fixture doesn't match any registered rule. Group/category fixtures (multi-rule) are classified separately and logged without failing. A regression floor at >2300 exact-match fixtures catches mass breakage.
+
+### Verification
+
+- `dart test test/integrity/fixture_integrity_test.dart` — 2346 tests passed (0 failures).
+- `dart test test/rules/core/async_rules_test.dart` — all tests passed (spot-check of migrated file).
+- `dart test test/rules/platforms/android_rules_test.dart` — all tests passed (special-case file).
+- Full suite (`dart test test/`) — pending at time of writing.
