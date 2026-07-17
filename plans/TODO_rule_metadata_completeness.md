@@ -129,10 +129,12 @@ Nine of the 13 async silents fixed; 92 async unit tests pass. This cluster was a
    scan CLI's `--files`/single-file `dartFiles` path does not resolve isolated files (returns zero even for a
    known-firing control), so per-file diagnosis needs a faithful full-dir repro harness that filters by path
    — not yet built. Deferred with this note.
-2. `prefer_isolate_for_heavy_compute` and `require_cache_ttl` — **phantom markers**: `expect_lint` comments
-   in `async_rules_fixture.dart` naming rules that exist **nowhere** in `lib/`. They can never fire because
-   there is no rule. Decision needed: remove the markers (the rules were never built) or implement the rules
-   (new feature). Left untouched pending that decision — see the suggestion in the session summary.
+2. `prefer_isolate_for_heavy_compute` and `require_cache_ttl` — **phantom markers** (RESOLVED 2026-07-16,
+   user-approved): `expect_lint` comments in `async_rules_fixture.dart` named rules that exist **nowhere** in
+   `lib/`, so they could never fire. The two marker lines were removed (replaced with a `NOTE:` explaining no
+   such rule exists); the BAD/GOOD example code was left in place. If those rules are ever wanted, they are
+   new-feature work, tracked separately. After removal the async cluster has **2 silent** (the undiagnosed
+   pair above), down from 13.
 
 
 Premise correction: `accuracyTarget` is **not** unpopulated. It is a derived getter

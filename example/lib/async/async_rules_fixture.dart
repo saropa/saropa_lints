@@ -415,8 +415,9 @@ class GoodWebSocketService {
 }
 
 // BAD: Heavy computation on main isolate
+// NOTE: no `prefer_isolate_for_heavy_compute` rule exists yet; the expect_lint
+// marker that used to be here asserted a non-existent rule (removed 2026-07-16).
 void processLargeDataBad(List<int> data) {
-  // expect_lint: prefer_isolate_for_heavy_compute
   for (var i = 0; i < 1000000; i++) {
     // Heavy computation
   }
@@ -432,8 +433,9 @@ Future<void> processLargeDataGood(List<int> data) async {
 }
 
 // BAD: Caching without TTL
+// NOTE: no `require_cache_ttl` rule exists yet; the expect_lint marker that used
+// to be here asserted a non-existent rule (removed 2026-07-16).
 class BadCacheService {
-  // expect_lint: require_cache_ttl
   final Map<String, Object> _cache = {};
 
   void set(String key, Object value) {
