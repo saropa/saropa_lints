@@ -5244,6 +5244,21 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
       // PostgrestBuilder implements Future<T>).
       if (_staticTypeIsAwaitable(type)) return;
 
+      // Fallback: when staticType fails to resolve as awaitable for
+      // invocations (e.g. static methods across files), check the invoked
+      // method signature's return type via staticInvokeType.
+      final Expression expr = node.expression;
+      if (expr is MethodInvocation || expr is FunctionExpressionInvocation) {
+        final DartType? invokeType =
+            expr is MethodInvocation
+                ? expr.staticInvokeType
+                : (expr as FunctionExpressionInvocation).staticInvokeType;
+        if (invokeType is FunctionType &&
+            _staticTypeIsAwaitable(invokeType.returnType)) {
+          return;
+        }
+      }
+
       // Skip type parameters — T could be a Future at runtime
       if (type is TypeParameterType) return;
 

@@ -70,6 +70,11 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 - `require_image_semantics_false_positive_package_image_class.md` — Fixed; archived to `plans/history/2026.07/2026.07.19/`.
 
+## Raised Reports (2026-07-20)
+
+- ~~`avoid_redundant_await_false_positive_static_future_returning_methods.md`~~ — Fixed; archived to `plans/history/2026.07/2026.07.20/`.
+- ~~`avoid_redundant_null_check_false_positive_nullable_variables.md`~~ — Fixed; archived to `plans/history/2026.07/2026.07.20/`.
+
 ---
 
 ## File Naming

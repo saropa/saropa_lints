@@ -312,6 +312,18 @@ void main() {
       expect(source, contains('await controller.fling();'));
       expect(source, contains('await someInt'));
     });
+
+    test('fixture keeps static Future-returning method regression', () {
+      final source = File(
+        'example/lib/async/avoid_redundant_await_fixture.dart',
+      ).readAsStringSync();
+      expect(source, contains('_StaticFutureIO'));
+      expect(source, contains('goodStaticFutureReturning'));
+      expect(source, contains('await _StaticFutureIO.loadByKey('));
+      expect(source, contains('await _StaticFutureIO.loadAll()'));
+      expect(source, contains('await _StaticFutureIO.update('));
+      expect(source, contains('await _StaticFutureIO.delete('));
+    });
   });
 
   // Stub-only behavior tests were removed from this file. Keep rule metadata,

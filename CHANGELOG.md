@@ -62,6 +62,24 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+---
+
+---
+
+## [Unreleased]
+
+### Removed
+
+- **`avoid_debug_print` rule deleted.** The rule contradicted `prefer_debug_print` — one said "use debugPrint," the other said "don't" — leaving no valid console output function for projects without a custom logging wrapper. `prefer_debug_print` remains and covers the `print()` → `debugPrint()` upgrade path. No action required unless your config explicitly enabled `avoid_debug_print`; if so, remove the entry.
+- **`CommentOutDebugPrintFix` quick fix deleted** (was the only fix for the removed rule). No action required.
+
+### Fixed
+
+- `avoid_redundant_null_check` no longer fires on variables declared with a nullable type (`Type?`). The rule now cross-checks the element's declared type against the resolved `staticType`, preventing false positives from plugin type-resolution edge cases in cross-package contexts.
+- `avoid_redundant_await` no longer fires on `await` of static methods returning `Future<T>`. When the analyzer's `staticType` fails to resolve as a Future for cross-file static invocations, the rule now falls back to checking the invoked method signature's return type via `staticInvokeType`.
+
+---
+
 ## [14.3.5]
 
 This update improves the precision of our accessibility lints by isolating Flutter UI components from lower-level graphics classes. Projects utilizing external image processing libraries alongside Flutter will no longer experience irrelevant warnings. [log](https://github.com/saropa/saropa_lints/blob/v14.3.5/CHANGELOG.md)
