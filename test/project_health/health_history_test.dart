@@ -54,8 +54,11 @@ void main() {
     );
     expect(point.toMarkdownRow(), '| v1.0.0 | 42 | 1000 | 800 | 15 |');
     // Header has the same column count as the row.
-    final headerPipes =
-        HistoryPoint.markdownHeader.split('\n').first.split('|').length;
+    final headerPipes = HistoryPoint.markdownHeader
+        .split('\n')
+        .first
+        .split('|')
+        .length;
     final rowPipes = point.toMarkdownRow().split('|').length;
     expect(rowPipes, headerPipes);
   });

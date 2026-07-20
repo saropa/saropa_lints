@@ -62,7 +62,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
-## [Unreleased]
+## [14.3.5]
+
+This update improves the precision of our accessibility lints by isolating Flutter UI components from lower-level graphics classes. Projects utilizing external image processing libraries alongside Flutter will no longer experience irrelevant warnings. [log](https://github.com/saropa/saropa_lints/blob/v14.3.5/CHANGELOG.md)
 
 ### Added
 
@@ -71,8 +73,6 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Fixed
 
 - `require_image_semantics`, `require_image_description`, `require_accessible_images` no longer fire on non-Flutter classes named `Image` (e.g. `package:image`'s pixel-buffer `Image` or `dart:ui`'s `Image`). All three rules now verify the declaring library is `package:flutter/` before reporting, with `TypeAliasElement` unwrapping for typedef'd widget references.
-
- [log](https://github.com/saropa/saropa_lints/blob/v14.3.5/CHANGELOG.md)
 
 ---
 
