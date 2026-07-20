@@ -10,22 +10,13 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../element_identifier_utils.dart';
+import '../../flutter_widget_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/accessibility/increase_animation_duration_fix.dart';
 import '../../fixes/accessibility/unwrap_redundant_semantics_fix.dart';
-
-// package:image and dart:ui both export a class named `Image` that has no
-// widget tree or semantics surface. Only Flutter's Image widget should trigger
-// accessibility rules.
-bool _isFlutterImageElement(Element? element) {
-  if (element == null || element.name != 'Image') return false;
-  return element.library?.uri.toString().startsWith('package:flutter/') ??
-      false;
-}
 
 /// Warns when IconButton is used without a tooltip for accessibility.
 ///
@@ -1492,7 +1483,7 @@ class RequireImageSemanticsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!_isFlutterImageElement(node.constructorName.type.element)) return;
+      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image')) return;
 
       bool hasSemanticLabel = false;
       bool isExcludedFromSemantics = false;
@@ -1524,7 +1515,7 @@ class RequireImageSemanticsRule extends SaropaLintRule {
 
       if (target is! SimpleIdentifier || target.name != 'Image') return;
 
-      if (!_isFlutterImageElement(elementFromAstIdentifier(target))) return;
+      if (!isFlutterWidgetNamed(elementFromAstIdentifier(target), 'Image')) return;
 
       if (!<String>{
         'network',
@@ -2776,7 +2767,7 @@ class RequireImageDescriptionRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!_isFlutterImageElement(node.constructorName.type.element)) return;
+      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image')) return;
 
       bool hasSemanticLabel = false;
       bool hasExclude = false;
@@ -3574,7 +3565,7 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
   ) {
     // Check Image constructor calls
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!_isFlutterImageElement(node.constructorName.type.element)) return;
+      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image')) return;
 
       if (!_hasAccessibilityHandling(node.argumentList.arguments)) {
         reporter.atNode(node.constructorName, code);
@@ -3587,7 +3578,7 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
       final Expression? target = node.target;
 
       if (target is! SimpleIdentifier || target.name != 'Image') return;
-      if (!_isFlutterImageElement(elementFromAstIdentifier(target))) return;
+      if (!isFlutterWidgetNamed(elementFromAstIdentifier(target), 'Image')) return;
 
       if (!<String>{
         'network',
