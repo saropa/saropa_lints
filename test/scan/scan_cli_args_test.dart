@@ -166,5 +166,35 @@ void main() {
       expect(result, isA<ScanParseOk>());
       expect((result as ScanParseOk).args.formatJson, isFalse);
     });
+
+    test('--debug-rule parses rule name', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--debug-rule',
+        'avoid_redundant_await',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.debugRule, 'avoid_redundant_await');
+    });
+
+    test('--debug-rule with no value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--debug-rule']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--debug-rule requires a rule name'),
+      );
+    });
+
+    test('--debug-rule with next option as value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--debug-rule', '--format']);
+      expect(result, isA<ScanParseInvalid>());
+    });
+
+    test('--debug-rule null by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.debugRule, isNull);
+    });
   });
 }

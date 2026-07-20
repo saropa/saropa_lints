@@ -5236,6 +5236,10 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
       // awaited to coordinate animation flow.
       if (_isAnimationControllerTickerAwait(node.expression)) return;
 
+      // Skip unresolvable types — the analyzer couldn't determine the type,
+      // so we can't know whether it's a Future.
+      if (type is InvalidType) return;
+
       // Skip dynamic and Object — could be a Future at runtime
       if (type is DynamicType) return;
       if (type.isDartCoreObject) return;
@@ -5249,10 +5253,9 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
       // method signature's return type via staticInvokeType.
       final Expression expr = node.expression;
       if (expr is MethodInvocation || expr is FunctionExpressionInvocation) {
-        final DartType? invokeType =
-            expr is MethodInvocation
-                ? expr.staticInvokeType
-                : (expr as FunctionExpressionInvocation).staticInvokeType;
+        final DartType? invokeType = expr is MethodInvocation
+            ? expr.staticInvokeType
+            : (expr as FunctionExpressionInvocation).staticInvokeType;
         if (invokeType is FunctionType &&
             _staticTypeIsAwaitable(invokeType.returnType)) {
           return;

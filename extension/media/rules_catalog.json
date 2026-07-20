@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2330,
+  "ruleCount": 2329,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",

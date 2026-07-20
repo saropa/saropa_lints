@@ -40,6 +40,7 @@ class ScanCliArgs {
     required this.tier,
     required this.formatJson,
     required this.resolve,
+    this.debugRule,
   });
 
   final String path;
@@ -54,6 +55,12 @@ class ScanCliArgs {
   /// `MethodInvocation`, not an `InstanceCreationExpression`, so those rules
   /// silently never fire.
   final bool resolve;
+
+  /// When set, emits per-node diagnostic trace output for the named rule,
+  /// showing type resolution details (staticType, staticInvokeType, returnType)
+  /// at each visited node. Used to diagnose false positives caused by
+  /// type-resolution divergence in the analyzer plugin context.
+  final String? debugRule;
 }
 
 /// Parses [args] for the scan command.
@@ -75,6 +82,7 @@ ScanParseResult parseScanArgs(
 
   List<String> dartFiles = [];
   String? tier;
+  String? debugRule;
   bool formatJson = false;
   bool resolve = false;
 
@@ -111,6 +119,18 @@ ScanParseResult parseScanArgs(
       i++;
       continue;
     }
+    if (arg == '--debug-rule') {
+      i++;
+      if (i < args.length && !args[i].startsWith('--')) {
+        debugRule = args[i];
+        i++;
+      } else {
+        return ScanParseInvalid(
+          '--debug-rule requires a rule name (e.g. avoid_redundant_await).',
+        );
+      }
+      continue;
+    }
     if (arg == '--format') {
       i++;
       if (i < args.length) {
@@ -128,6 +148,7 @@ ScanParseResult parseScanArgs(
       tier: tier,
       formatJson: formatJson,
       resolve: resolve,
+      debugRule: debugRule,
     ),
   );
 }

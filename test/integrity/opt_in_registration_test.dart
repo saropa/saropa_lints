@@ -23,7 +23,10 @@ void main() {
 
   group('getRulesFromRegistry (opt-in filtering)', () {
     test('returns only rules in the requested set', () {
-      final requested = <String>{'avoid_unguarded_debug', 'avoid_null_assertion'};
+      final requested = <String>{
+        'avoid_unguarded_debug',
+        'avoid_null_assertion',
+      };
       final rules = getRulesFromRegistry(requested);
 
       expect(rules, isNotEmpty);

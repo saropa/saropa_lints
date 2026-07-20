@@ -149,7 +149,10 @@ void main() {
         SaropaLintRule.disabledRules = null;
         final cap = _CaptureRegistry();
         registerSaropaLintRules(cap);
-        expect(cap.lintRules.any((r) => r.name == 'avoid_unguarded_debug'), isTrue);
+        expect(
+          cap.lintRules.any((r) => r.name == 'avoid_unguarded_debug'),
+          isTrue,
+        );
         expect(
           cap.lintRules.any((r) => r.name == 'nonexistent_rule_xyz_12345'),
           isFalse,

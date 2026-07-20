@@ -66,17 +66,24 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.3.6]
+
+Removes the `avoid_debug_print` rule, which contradicted the existing `prefer_debug_print` and left no valid console output path. Also fixes false positives in `avoid_redundant_null_check` and `avoid_redundant_await` when types are nullable or resolve across package boundaries. A new `--debug-rule` flag on the scan CLI traces type resolution for any named rule, making it easier to diagnose false positives.
+[log](https://github.com/saropa/saropa_lints/blob/v14.3.6/CHANGELOG.md)
 
 ### Removed
 
 - **`avoid_debug_print` rule deleted.** The rule contradicted `prefer_debug_print` — one said "use debugPrint," the other said "don't" — leaving no valid console output function for projects without a custom logging wrapper. `prefer_debug_print` remains and covers the `print()` → `debugPrint()` upgrade path. No action required unless your config explicitly enabled `avoid_debug_print`; if so, remove the entry.
 - **`CommentOutDebugPrintFix` quick fix deleted** (was the only fix for the removed rule). No action required.
 
+### Added
+
+- **`--debug-rule <name>` flag for the scan CLI.** Emits per-node type-resolution trace output (staticType, staticInvokeType, returnType) for the named rule during a scan. Use with `--resolve` for full type information. Designed for diagnosing false positives caused by type-resolution divergence in the analyzer plugin context. No action required.
+
 ### Fixed
 
 - `avoid_redundant_null_check` no longer fires on variables, parameters, fields, or getters declared with a nullable type (`Type?`). The rule cross-checks the element's declared type against the resolved `staticType` and guards against `InvalidType` from failed type resolution, preventing false positives in cross-package contexts.
-- `avoid_redundant_await` no longer fires on `await` of static methods returning `Future<T>`. When the analyzer's `staticType` fails to resolve as a Future for cross-file static invocations, the rule now falls back to checking the invoked method signature's return type via `staticInvokeType`.
+- `avoid_redundant_await` no longer fires on `await` of static methods returning `Future<T>`. The rule now guards against `InvalidType` (unresolvable types) and falls back to checking the invoked method signature's return type via `staticInvokeType` when `staticType` fails to resolve for cross-file static invocations.
 
 ---
 

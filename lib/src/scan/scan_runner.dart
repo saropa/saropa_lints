@@ -29,6 +29,7 @@ import 'capturing_registry.dart';
 import 'scan_config.dart';
 import 'scan_diagnostic.dart';
 import 'scan_rule_context.dart';
+import 'scan_rule_tracer.dart';
 import 'scan_walker.dart';
 
 /// Optional sink for progress and error messages. When null, output goes
@@ -45,6 +46,7 @@ class ScanRunner {
     this.enabledRuleNames,
     this.messageSink,
     this.applyExclusionsToFileList = true,
+    this.debugRule,
   });
 
   /// Project root: config is loaded from here and relative [dartFiles] are resolved against it.
@@ -69,6 +71,10 @@ class ScanRunner {
 
   /// When [dartFiles] is provided, whether to apply the same exclusions as directory discovery (e.g. `.g.dart`, `build/`). Default true.
   final bool applyExclusionsToFileList;
+
+  /// When set, emits per-node trace output for the named rule, showing type
+  /// resolution details at each visited AST node.
+  final String? debugRule;
 
   void _out(String message) {
     if (messageSink != null) {
@@ -263,7 +269,20 @@ class ScanRunner {
         continue;
       }
 
-      final visitors = registry.capturedVisitors;
+      var visitors = registry.capturedVisitors;
+      if (visitors.isEmpty) continue;
+
+      final dbg = debugRule;
+      if (dbg != null && rule.code.lowerCaseName == dbg) {
+        _out(
+          'DEBUG: tracing rule "$dbg" '
+          '(${visitors.length} visitor(s))',
+        );
+        visitors = visitors
+            .map((v) => TracingVisitorWrapper(v as AstVisitor<void>, _out, dbg))
+            .toList();
+      }
+
       if (visitors.isNotEmpty) {
         result.add(_RuleRegistration(rule, visitors.cast(), context));
       }
