@@ -1616,7 +1616,7 @@ class AvoidRedundantNullCheckRule extends SaropaLintRule {
       }
 
       final DartType? type = nonNullSide.staticType;
-      if (type == null) return;
+      if (type == null || type is InvalidType) return;
 
       // Skip dynamic, Object, and type parameters
       if (type is DynamicType) return;
@@ -1625,9 +1625,9 @@ class AvoidRedundantNullCheckRule extends SaropaLintRule {
 
       if (type.nullabilitySuffix != NullabilitySuffix.none) return;
 
-      // Cross-check: if the identifier's element was declared as nullable,
-      // trust the declaration — staticType can disagree due to plugin
-      // type-resolution edge cases in cross-package contexts.
+      // Cross-check: if the element was declared as nullable, trust the
+      // declaration — staticType can disagree due to plugin type-resolution
+      // edge cases in cross-package contexts.
       if (_declaredTypeIsNullable(nonNullSide)) return;
 
       reporter.atNode(node);
@@ -1641,16 +1641,25 @@ class AvoidRedundantNullCheckRule extends SaropaLintRule {
   ];
 }
 
-/// True when [expr] is an identifier whose element was declared with a
-/// nullable type (e.g. `ContactModel? a`). This catches false positives
-/// where [Expression.staticType] misresolves to non-nullable in the
-/// custom_lint plugin context despite an explicit nullable annotation.
+/// True when the element backing [expr] was declared with a nullable type.
+/// Covers local variables, parameters, fields, getters, and top-level
+/// variables — both bare identifiers (`x`) and property access (`obj.x`).
 bool _declaredTypeIsNullable(Expression expr) {
-  if (expr is! SimpleIdentifier) return false;
-  final Element? element = expr.element;
-  if (element is LocalVariableElement || element is FormalParameterElement) {
-    final DartType declaredType = (element as VariableElement).type;
-    return declaredType.nullabilitySuffix == NullabilitySuffix.question;
+  final Element? element = _resolveElement(expr);
+  if (element == null) return false;
+
+  if (element is VariableElement) {
+    return element.type.nullabilitySuffix == NullabilitySuffix.question;
+  }
+  if (element is GetterElement) {
+    return element.returnType.nullabilitySuffix == NullabilitySuffix.question;
   }
   return false;
+}
+
+Element? _resolveElement(Expression expr) {
+  if (expr is SimpleIdentifier) return expr.element;
+  if (expr is PrefixedIdentifier) return expr.identifier.element;
+  if (expr is PropertyAccess) return expr.propertyName.element;
+  return null;
 }

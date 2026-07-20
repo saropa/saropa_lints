@@ -35,6 +35,26 @@ void goodNullableFromMethod() {
 }
 
 // ---------------------------------------------------------------------------
+// GOOD — nullable fields/getters: null check is valid, must NOT lint
+// ---------------------------------------------------------------------------
+
+class _NullableFieldHolder {
+  String? name;
+  int? get age => _maybeInt();
+}
+
+void goodNullableField(_NullableFieldHolder obj) {
+  if (obj.name == null) return;
+  print(obj.name);
+}
+
+void goodNullableGetter(_NullableFieldHolder obj) {
+  if (obj.age != null) {
+    print(obj.age);
+  }
+}
+
+// ---------------------------------------------------------------------------
 // BAD — non-nullable variables: null check is redundant, MUST lint
 // ---------------------------------------------------------------------------
 

@@ -75,7 +75,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed
 
-- `avoid_redundant_null_check` no longer fires on variables declared with a nullable type (`Type?`). The rule now cross-checks the element's declared type against the resolved `staticType`, preventing false positives from plugin type-resolution edge cases in cross-package contexts.
+- `avoid_redundant_null_check` no longer fires on variables, parameters, fields, or getters declared with a nullable type (`Type?`). The rule cross-checks the element's declared type against the resolved `staticType` and guards against `InvalidType` from failed type resolution, preventing false positives in cross-package contexts.
 - `avoid_redundant_await` no longer fires on `await` of static methods returning `Future<T>`. When the analyzer's `staticType` fails to resolve as a Future for cross-file static invocations, the rule now falls back to checking the invoked method signature's return type via `staticInvokeType`.
 
 ---
