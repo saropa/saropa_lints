@@ -1658,8 +1658,13 @@ bool _declaredTypeIsNullable(Expression expr) {
 }
 
 Element? _resolveElement(Expression expr) {
-  if (expr is SimpleIdentifier) return expr.element;
-  if (expr is PrefixedIdentifier) return expr.identifier.element;
-  if (expr is PropertyAccess) return expr.propertyName.element;
+  // Unwrap parentheses: `(obj.field) == null`
+  Expression unwrapped = expr;
+  while (unwrapped is ParenthesizedExpression) {
+    unwrapped = unwrapped.expression;
+  }
+  if (unwrapped is SimpleIdentifier) return unwrapped.element;
+  if (unwrapped is PrefixedIdentifier) return unwrapped.identifier.element;
+  if (unwrapped is PropertyAccess) return unwrapped.propertyName.element;
   return null;
 }

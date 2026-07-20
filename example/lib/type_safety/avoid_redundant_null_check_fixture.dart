@@ -54,6 +54,21 @@ void goodNullableGetter(_NullableFieldHolder obj) {
   }
 }
 
+void goodNullableParenthesized(String? s) {
+  if ((s) == null) return;
+  print(s);
+}
+
+void goodNullableFieldParenthesized(_NullableFieldHolder obj) {
+  if ((obj.name) == null) return;
+  print(obj.name);
+}
+
+void goodNullableConditionalAccess(_NullableFieldHolder? obj) {
+  if (obj?.name == null) return;
+  print(obj!.name);
+}
+
 // ---------------------------------------------------------------------------
 // BAD — non-nullable variables: null check is redundant, MUST lint
 // ---------------------------------------------------------------------------
