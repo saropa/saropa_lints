@@ -19,7 +19,7 @@ plugins:
     path: packages/acme_saropa_plugin
     version: "0.0.1" # or pub version for your meta-plugin
     diagnostics:
-      avoid_debug_print: true
+      avoid_unguarded_debug: true
       # … other Saropa rule ids …
     rule_packs:
       enabled:

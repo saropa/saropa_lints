@@ -114,7 +114,7 @@ void _loadFromRoot(String? projectRoot) {
     //  2. The consumer enabled NO rules explicitly (diagnostics `true` +
     //     severity-implied + rule packs all empty). When the consumer opted
     //     rules in, honor them EXACTLY — the memory default must never silently
-    //     strip an enabled rule (e.g. `diagnostics: avoid_debug_print: true`
+    //     strip an enabled rule (e.g. `diagnostics: avoid_unguarded_debug: true`
     //     above essential). Only an explicit SAROPA_TIER / yaml tier caps an
     //     explicitly-enabled set. (User decision 2026-06-28: respect explicit
     //     enables — the RSS safety valve, not rule-count capping, is the real
@@ -289,7 +289,7 @@ void loadOutputConfigFromProjectRoot(String projectRoot) {
 /// Supported formats:
 /// ```yaml
 /// severities:
-///   avoid_debug_print: ERROR
+///   avoid_unguarded_debug: ERROR
 ///   no_magic_number: false
 ///   prefer_const: INFO
 /// ```

@@ -4,7 +4,7 @@ import 'package:saropa_lints/src/rules/testing/debug_rules.dart';
 import 'package:test/test.dart';
 import '../../helpers/fixture_discovery.dart';
 
-/// Tests for 9 Debug lint rules.
+/// Tests for 11 Debug lint rules.
 ///
 /// Test fixtures: example/lib/debug/*
 // Test-only print/debug patterns and fail helpers in example fixtures.
@@ -14,13 +14,6 @@ void main() {
       final rule = AlwaysFailRule();
       expect(rule.code.lowerCaseName, 'prefer_fail_test_case');
       expect(rule.code.problemMessage, contains('[prefer_fail_test_case]'));
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
-    });
-    test('AvoidDebugPrintRule (avoid_debug_print)', () {
-      final rule = AvoidDebugPrintRule();
-      expect(rule.code.lowerCaseName, 'avoid_debug_print');
-      expect(rule.code.problemMessage, contains('[avoid_debug_print]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

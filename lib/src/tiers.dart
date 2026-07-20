@@ -1582,7 +1582,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_context_in_initstate_dispose',
   'avoid_contradictory_expressions',
   'avoid_controller_in_build',
-  'avoid_debug_print',
   'prefer_debug_print',
   'avoid_double_slash_imports',
   'avoid_duplicate_number_elements',

@@ -4,7 +4,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
-import '../../fixes/comment_out_debug_print_fix.dart';
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/debug/replace_with_debug_print_fix.dart';
@@ -63,106 +62,6 @@ class AlwaysFailRule extends SaropaLintRule {
 
 // NOTE: AvoidCommentedOutCodeRule moved to stylistic_rules.dart (v4.2.0)
 // The rule now reports at actual comment locations and has a quick fix.
-
-/// Warns when debugPrint is used.
-///
-/// Since: v1.5.1 | Updated: v4.13.0 | Rule version: v4
-///
-/// debugPrint should not be used in production code. Use a proper logging
-/// solution instead that can be configured per environment.
-///
-/// Example of **bad** code:
-/// ```dart
-/// debugPrint('User logged in: $userId');
-/// ```
-///
-/// Example of **good** code:
-/// ```dart
-/// logger.info('User logged in: $userId');
-/// ```
-///
-/// **Quick fix available:** Comments out the debugPrint statement.
-class AvoidDebugPrintRule extends SaropaLintRule {
-  AvoidDebugPrintRule() : super(code: _code);
-
-  /// Style/consistency. Large counts acceptable in legacy code.
-  @override
-  LintImpact get impact => LintImpact.info;
-
-  @override
-  RuleType? get ruleType => RuleType.codeSmell;
-
-  @override
-  Set<String> get tags => const {'testing'};
-
-  @override
-  RuleCost get cost => RuleCost.low;
-
-  @override
-  List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        CommentOutDebugPrintFix(context: context),
-  ];
-
-  static const LintCode _code = LintCode(
-    'avoid_debug_print',
-    '[avoid_debug_print] debugPrint bypasses structured logging, making it impossible to filter, search, or disable output per environment. '
-        'Debug statements left in production code expose internal state to device logs, degrade performance through I/O overhead, and create noise that obscures real issues during troubleshooting. {v4}',
-    correctionMessage:
-        'Replace debugPrint with a structured logging package (e.g., logger, logging, or a custom Logger class) that supports log levels, filtering, and environment-aware output. '
-        'This ensures debug output is suppressed in production while remaining available during development.',
-    severity: DiagnosticSeverity.WARNING,
-  );
-
-  @override
-  void runWithReporter(
-    SaropaDiagnosticReporter reporter,
-    SaropaContext context,
-  ) {
-    context.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'debugPrint') return;
-
-      // The correction tells callers to route through structured logging
-      // (debug() / debugException() / breadcrumb()). Those primitives are
-      // themselves implemented on top of debugPrint — the terminal sink. A
-      // debugPrint inside the sink's own body cannot route through itself
-      // without recursing, so flagging it is circular. Exempt enclosing
-      // debug*/_debug*/breadcrumb functions, matching the sibling
-      // avoid_unguarded_debug rule's logging-helper exemption.
-      if (isInsideLoggingSink(node)) return;
-
-      reporter.atNode(node);
-    });
-  }
-}
-
-/// Returns true when [node] is inside a logging-primitive implementation —
-/// a function/method named `debug*`, `_debug*`, `breadcrumb`, or `_breadcrumb`.
-///
-/// These are the terminal sinks that the debug/print rules redirect callers to.
-/// Their bodies must call `debugPrint`/`print` directly (routing back through
-/// the sink would recurse), so the rules must not flag those sites.
-bool isInsideLoggingSink(AstNode node) {
-  AstNode? current = node.parent;
-  while (current != null) {
-    String? name;
-    if (current is MethodDeclaration) {
-      name = current.name.lexeme;
-    } else if (current is FunctionDeclaration) {
-      name = current.name.lexeme;
-    }
-    if (name != null) {
-      if (name.startsWith('debug') ||
-          name.startsWith('_debug') ||
-          name == 'breadcrumb' ||
-          name == '_breadcrumb') {
-        return true;
-      }
-    }
-    current = current.parent;
-  }
-  return false;
-}
 
 /// Warns when `debugPrint()` calls are not guarded by a debug check.
 ///

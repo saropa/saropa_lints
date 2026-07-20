@@ -67,7 +67,7 @@ Replace the old `custom_lint:` section with a tier include:
 include: package:saropa_lints/tiers/recommended.yaml
 custom_lint:
   rules:
-    avoid_debug_print: true
+    avoid_unguarded_debug: true
 
 # AFTER (v5):
 include: package:saropa_lints/tiers/recommended.yaml
@@ -99,7 +99,7 @@ Replace the `custom_lint:` section with `plugins:`:
 custom_lint:
   enable_all_lint_rules: false
   rules:
-    - avoid_debug_print: true
+    - avoid_unguarded_debug: true
     - require_dispose: true
     - no_magic_number: false
 
@@ -107,7 +107,7 @@ custom_lint:
 plugins:
   saropa_lints:
     diagnostics:
-      avoid_debug_print: true
+      avoid_unguarded_debug: true
       require_dispose: true
       no_magic_number: false
 ```
@@ -123,10 +123,10 @@ Key format changes:
 
 ```dart
 // BEFORE (v4):
-// ignore: avoid_debug_print
+// ignore: avoid_unguarded_debug
 
 // AFTER (v5):
-// ignore: saropa_lints/avoid_debug_print
+// ignore: saropa_lints/avoid_unguarded_debug
 ```
 
 The native system namespaces diagnostics with the plugin name.
@@ -148,7 +148,7 @@ Per-project settings in `analysis_options_custom.yaml` continue to work:
 ```yaml
 # Severity overrides
 severities:
-  avoid_debug_print: ERROR
+  avoid_unguarded_debug: ERROR
   no_magic_number: false
 
 # Baseline suppression

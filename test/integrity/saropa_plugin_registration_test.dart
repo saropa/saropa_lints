@@ -102,7 +102,7 @@ void main() {
     });
 
     test('skips rule listed in disabledRules by canonical name', () {
-      const ruleName = 'avoid_debug_print';
+      const ruleName = 'avoid_unguarded_debug';
       SaropaLintRule.enabledRules = null;
       SaropaLintRule.disabledRules = {ruleName};
       final cap = _CaptureRegistry();
@@ -143,13 +143,13 @@ void main() {
         // Unknown names in the set are simply never matched; they have no
         // effect at register time.
         SaropaLintRule.enabledRules = {
-          'avoid_debug_print',
+          'avoid_unguarded_debug',
           'nonexistent_rule_xyz_12345',
         };
         SaropaLintRule.disabledRules = null;
         final cap = _CaptureRegistry();
         registerSaropaLintRules(cap);
-        expect(cap.lintRules.any((r) => r.name == 'avoid_debug_print'), isTrue);
+        expect(cap.lintRules.any((r) => r.name == 'avoid_unguarded_debug'), isTrue);
         expect(
           cap.lintRules.any((r) => r.name == 'nonexistent_rule_xyz_12345'),
           isFalse,

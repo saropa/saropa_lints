@@ -23,7 +23,7 @@ void main() {
 
   group('getRulesFromRegistry (opt-in filtering)', () {
     test('returns only rules in the requested set', () {
-      final requested = <String>{'avoid_debug_print', 'avoid_null_assertion'};
+      final requested = <String>{'avoid_unguarded_debug', 'avoid_null_assertion'};
       final rules = getRulesFromRegistry(requested);
 
       expect(rules, isNotEmpty);
@@ -64,7 +64,7 @@ void main() {
 
   group('disabledRules takes precedence over enabledRules', () {
     test('rule in both sets is effectively disabled', () {
-      const ruleName = 'avoid_debug_print';
+      const ruleName = 'avoid_unguarded_debug';
       SaropaLintRule.enabledRules = <String>{ruleName};
       SaropaLintRule.disabledRules = <String>{ruleName};
 
@@ -77,7 +77,7 @@ void main() {
     });
 
     test('rule only in enabledRules is not disabled', () {
-      const ruleName = 'avoid_debug_print';
+      const ruleName = 'avoid_unguarded_debug';
       SaropaLintRule.enabledRules = <String>{ruleName};
       SaropaLintRule.disabledRules = null;
 
@@ -88,7 +88,7 @@ void main() {
 
     test('disabledRules null means nothing is disabled', () {
       SaropaLintRule.disabledRules = null;
-      final rules = getRulesFromRegistry(<String>{'avoid_debug_print'});
+      final rules = getRulesFromRegistry(<String>{'avoid_unguarded_debug'});
       expect(rules, hasLength(1));
       expect(rules.first.isDisabled, isFalse);
     });
@@ -96,25 +96,25 @@ void main() {
 
   group('false positive: unrelated rules are not affected', () {
     test('enabling one rule does not enable others', () {
-      SaropaLintRule.enabledRules = <String>{'avoid_debug_print'};
+      SaropaLintRule.enabledRules = <String>{'avoid_unguarded_debug'};
       final rules = getRulesFromRegistry(SaropaLintRule.enabledRules!);
 
       expect(rules, hasLength(1));
-      expect(rules.first.code.lowerCaseName, 'avoid_debug_print');
+      expect(rules.first.code.lowerCaseName, 'avoid_unguarded_debug');
     });
 
     test('disabling one rule does not disable others', () {
       SaropaLintRule.enabledRules = <String>{
-        'avoid_debug_print',
+        'avoid_unguarded_debug',
         'avoid_null_assertion',
       };
-      SaropaLintRule.disabledRules = <String>{'avoid_debug_print'};
+      SaropaLintRule.disabledRules = <String>{'avoid_unguarded_debug'};
 
       final rules = getRulesFromRegistry(SaropaLintRule.enabledRules!);
       expect(rules, hasLength(2));
 
       final debugPrint = rules.firstWhere(
-        (r) => r.code.lowerCaseName == 'avoid_debug_print',
+        (r) => r.code.lowerCaseName == 'avoid_unguarded_debug',
       );
       final dispose = rules.firstWhere(
         (r) => r.code.lowerCaseName == 'avoid_null_assertion',

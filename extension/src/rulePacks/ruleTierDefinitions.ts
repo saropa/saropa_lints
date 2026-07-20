@@ -151,7 +151,6 @@ export const RULE_TIER_BY_CODE: Readonly<Record<string, string>> = {
   'avoid_datetime_comparison_without_precision': 'professional',
   'avoid_datetime_now_in_tests': 'essential',
   'avoid_datetime_parse_unvalidated': 'recommended',
-  'avoid_debug_print': 'recommended',
   'avoid_declaring_call_method': 'professional',
   'avoid_deep_link_sensitive_params': 'essential',
   'avoid_deep_nesting': 'professional',

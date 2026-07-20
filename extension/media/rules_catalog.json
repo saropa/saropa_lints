@@ -2172,21 +2172,6 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_debug_print": {
-      "ruleType": "codeSmell",
-      "ruleStatus": "ready",
-      "requiresReview": false,
-      "defaultReviewState": null,
-      "cweIds": [],
-      "certIds": [],
-      "tags": [
-        "testing"
-      ],
-      "accuracyTarget": {
-        "expectZeroFalsePositives": true,
-        "description": "Code smell default target: zero false positives."
-      }
-    },
     "avoid_declaring_call_method": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",

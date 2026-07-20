@@ -61,7 +61,7 @@ plugins:
   saropa_lints:
     version: "12.2.1"
     diagnostics:
-      avoid_debug_print: true
+      avoid_unguarded_debug: true
       avoid_hardcoded_credentials: true
       prefer_const_constructors: false
 ''',
@@ -78,7 +78,7 @@ plugins:
         expect(
           SaropaLintRule.enabledRules,
           containsAll(<String>[
-            'avoid_debug_print',
+            'avoid_unguarded_debug',
             'avoid_hardcoded_credentials',
           ]),
         );

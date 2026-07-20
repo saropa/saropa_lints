@@ -67,9 +67,6 @@
 void debugPrintExample() {
   final value = 42;
 
-  // expect_lint: avoid_debug_print
-  debugPrint('Debug value: $value');
-
   // expect_lint: avoid_print_in_production
   print('Production print: $value');
 }

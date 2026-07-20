@@ -2558,7 +2558,6 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'avoid_catch_all',
       'avoid_catch_exception_alone',
       'avoid_clipboard_sensitive',
-      'avoid_debug_print',
       'avoid_dynamic_code_loading',
       'avoid_dynamic_sql',
       'avoid_encryption_key_in_memory',
