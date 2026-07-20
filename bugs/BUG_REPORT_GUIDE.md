@@ -66,6 +66,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 
 - `infra_vibrancy_unused_false_positives_context_fragmentation.md` — project vibrancy `unused` flag: the element-resolved usage pass degrades on multi-package repos (nested pubspec roots fail `contextFor`), so skipped files fall back to name-based counts with no entry-point protection; 147 `@override` methods + the `bin/`-called CLI surface flagged dead on this repo. Blocks Phases 3-5 of `plans/PLAN_vibrancy_usage_collector_element_resolution.md`.
 
+## Raised Reports (2026-07-19)
+
+- `require_image_semantics_false_positive_package_image_class.md` — Fixed; archived to `plans/history/2026.07/2026.07.19/`.
+
 ---
 
 ## File Naming

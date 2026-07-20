@@ -62,6 +62,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- `require_image_semantics`, `require_image_description`, `require_accessible_images` no longer fire on non-Flutter classes named `Image` (e.g. `package:image`'s pixel-buffer `Image` or `dart:ui`'s `Image`). All three rules now verify the declaring library is `package:flutter/` before reporting.
+
+ [log](https://github.com/saropa/saropa_lints/blob/v14.3.5/CHANGELOG.md)
+
 ---
 
 ## [14.3.4]
