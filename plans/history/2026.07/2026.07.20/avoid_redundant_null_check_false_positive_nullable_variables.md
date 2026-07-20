@@ -119,3 +119,37 @@ The fixture should include:
 - saropa_lints version: 14.3.5
 - Dart SDK version: 3.12.2
 - Triggering project/file: `d:\src\contacts\lib\components\contact_issues\audit_panel_import_review.dart` (line 151), `audit_panel_linked_contacts.dart` (line 90), `audit_panel_job_title_missing_organization.dart` (line 102)
+
+---
+
+## Finish Report (2026-07-20)
+
+### Defect
+
+`AvoidRedundantNullCheckRule` relied solely on `Expression.staticType.nullabilitySuffix` to determine whether a null comparison was redundant. In the custom_lint plugin context, `staticType` can misresolve to non-nullable for variables explicitly declared as `Type?`, particularly when the initializer involves cross-package static method calls or extension methods. This caused false positives on common null-guard patterns (`if (x == null) return;`).
+
+### Fix
+
+Added `_declaredTypeIsNullable(Expression)` helper in `type_safety_rules.dart`. After `staticType` indicates non-nullable, the rule cross-checks the identifier's element declared type via `LocalVariableElement.type` or `FormalParameterElement.type`. If the declaration carries `NullabilitySuffix.question`, the rule skips the diagnostic.
+
+### Trade-off
+
+The cross-check suppresses the lint for variables declared nullable even after flow-analysis promotion (e.g., `if (x != null && x == null)` where the second check IS redundant post-promotion). This is an acceptable loss — that pattern is vanishingly rare and the FP cost on common null-guard patterns is far higher.
+
+### Scope limitation
+
+The fix covers `LocalVariableElement` and `FormalParameterElement` only. Field, getter, and top-level variable false positives from the same class of type-resolution bug are not addressed. No reports of those cases exist yet.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `lib/src/rules/data/type_safety_rules.dart` | Added `element.dart` import, `_declaredTypeIsNullable()` helper, cross-check guard in `runWithReporter()` |
+| `example/lib/type_safety/avoid_redundant_null_check_fixture.dart` | Expanded: nullable param, local, `!=`, `||` chain (GOOD), non-nullable param/local (BAD) |
+| `CHANGELOG.md` | Entry under `[Unreleased] > Fixed` |
+| `bugs/BUG_REPORT_GUIDE.md` | Reference updated to archived path |
+| `test/rules/testing/debug_rules_test.dart` | Fixed stale rule count docstring (9 -> 11), fixed indentation on `AvoidUnguardedDebugRule` test |
+
+### Tests
+
+All 35 `type_safety_rules_test.dart` tests pass. All `debug_rules_test.dart` tests pass.

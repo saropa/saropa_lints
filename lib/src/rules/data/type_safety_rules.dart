@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
@@ -1622,10 +1623,14 @@ class AvoidRedundantNullCheckRule extends SaropaLintRule {
       if (type.isDartCoreObject) return;
       if (type is TypeParameterType) return;
 
-      // Flag if the type is non-nullable
-      if (type.nullabilitySuffix == NullabilitySuffix.none) {
-        reporter.atNode(node);
-      }
+      if (type.nullabilitySuffix != NullabilitySuffix.none) return;
+
+      // Cross-check: if the identifier's element was declared as nullable,
+      // trust the declaration — staticType can disagree due to plugin
+      // type-resolution edge cases in cross-package contexts.
+      if (_declaredTypeIsNullable(nonNullSide)) return;
+
+      reporter.atNode(node);
     });
   }
 
@@ -1634,4 +1639,18 @@ class AvoidRedundantNullCheckRule extends SaropaLintRule {
     ({required CorrectionProducerContext context}) =>
         ReplaceRedundantNullCheckFix(context: context),
   ];
+}
+
+/// True when [expr] is an identifier whose element was declared with a
+/// nullable type (e.g. `ContactModel? a`). This catches false positives
+/// where [Expression.staticType] misresolves to non-nullable in the
+/// custom_lint plugin context despite an explicit nullable annotation.
+bool _declaredTypeIsNullable(Expression expr) {
+  if (expr is! SimpleIdentifier) return false;
+  final Element? element = expr.element;
+  if (element is LocalVariableElement || element is FormalParameterElement) {
+    final DartType declaredType = (element as VariableElement).type;
+    return declaredType.nullabilitySuffix == NullabilitySuffix.question;
+  }
+  return false;
 }
