@@ -128,28 +128,34 @@ The fixture should include:
 
 `AvoidRedundantNullCheckRule` relied solely on `Expression.staticType.nullabilitySuffix` to determine whether a null comparison was redundant. In the custom_lint plugin context, `staticType` can misresolve to non-nullable for variables explicitly declared as `Type?`, particularly when the initializer involves cross-package static method calls or extension methods. This caused false positives on common null-guard patterns (`if (x == null) return;`).
 
-### Fix
+### Fix (initial)
 
 Added `_declaredTypeIsNullable(Expression)` helper in `type_safety_rules.dart`. After `staticType` indicates non-nullable, the rule cross-checks the identifier's element declared type via `LocalVariableElement.type` or `FormalParameterElement.type`. If the declaration carries `NullabilitySuffix.question`, the rule skips the diagnostic.
+
+### Fix (hardening follow-up)
+
+Three additional guards:
+
+1. **`InvalidType` guard** — when the analyzer fails to resolve a type entirely, `staticType` returns `InvalidType` with `nullabilitySuffix == .none`. The rule now skips `InvalidType` alongside the existing `null` guard, preventing false positives from unresolvable cross-package types.
+
+2. **Broadened `_declaredTypeIsNullable` to all element kinds** — replaced the `LocalVariableElement || FormalParameterElement` check with `VariableElement` (the shared base class covering locals, params, fields, and top-level variables) plus `GetterElement` (explicit getter declarations whose `returnType` carries the nullability). This closes the gap for `obj.field == null` and `obj.getter == null` patterns.
+
+3. **Extracted `_resolveElement(Expression)`** — resolves the backing element from `SimpleIdentifier` (bare `x`), `PrefixedIdentifier` (`prefix.x`), and `PropertyAccess` (`obj.x`), so `_declaredTypeIsNullable` works for property access expressions, not just bare identifiers.
 
 ### Trade-off
 
 The cross-check suppresses the lint for variables declared nullable even after flow-analysis promotion (e.g., `if (x != null && x == null)` where the second check IS redundant post-promotion). This is an acceptable loss — that pattern is vanishingly rare and the FP cost on common null-guard patterns is far higher.
 
-### Scope limitation
-
-The fix covers `LocalVariableElement` and `FormalParameterElement` only. Field, getter, and top-level variable false positives from the same class of type-resolution bug are not addressed. No reports of those cases exist yet.
-
 ### Files changed
 
 | File | Change |
 |------|--------|
-| `lib/src/rules/data/type_safety_rules.dart` | Added `element.dart` import, `_declaredTypeIsNullable()` helper, cross-check guard in `runWithReporter()` |
-| `example/lib/type_safety/avoid_redundant_null_check_fixture.dart` | Expanded: nullable param, local, `!=`, `||` chain (GOOD), non-nullable param/local (BAD) |
+| `lib/src/rules/data/type_safety_rules.dart` | Added `element.dart` import, `InvalidType` guard, `_declaredTypeIsNullable()` with `VariableElement`/`GetterElement` coverage, `_resolveElement()` for `SimpleIdentifier`/`PrefixedIdentifier`/`PropertyAccess` |
+| `example/lib/type_safety/avoid_redundant_null_check_fixture.dart` | Expanded: nullable param, local, `!=`, `||` chain, nullable field/getter property access (GOOD), non-nullable param/local (BAD) |
 | `CHANGELOG.md` | Entry under `[Unreleased] > Fixed` |
 | `bugs/BUG_REPORT_GUIDE.md` | Reference updated to archived path |
 | `test/rules/testing/debug_rules_test.dart` | Fixed stale rule count docstring (9 -> 11), fixed indentation on `AvoidUnguardedDebugRule` test |
 
 ### Tests
 
-All 35 `type_safety_rules_test.dart` tests pass. All `debug_rules_test.dart` tests pass.
+All 35 `type_safety_rules_test.dart` tests pass.
