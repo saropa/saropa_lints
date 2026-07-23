@@ -66,6 +66,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+<details><summary>Maintenance</summary>
+
+- Rewrote `require_dio_singleton` vs `avoid_singleton_pattern` bug report with correct API references and actionable fix proposal ([#274](https://github.com/saropa/saropa_lints/issues/274)).
+- Filed bug report for blocked Dependabot PR #271 (js-yaml 4.1.1 to 4.3.0, merge conflict in `analysis_options.yaml`).
+
+</details>
+
 ## [14.3.6]
 
 Removes the `avoid_debug_print` rule, which contradicted the existing `prefer_debug_print` and left no valid console output path. Also fixes false positives in `avoid_redundant_null_check` and `avoid_redundant_await` when types are nullable or resolve across package boundaries. A new `--debug-rule` flag on the scan CLI traces type resolution for any named rule, making it easier to diagnose false positives.
