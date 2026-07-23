@@ -907,7 +907,7 @@ export const RULE_PACK_DEFINITIONS: readonly RulePackDefinition[] = [
       'require_dio_interceptor_error_handler',
       'require_dio_response_type',
       'require_dio_retry_interceptor',
-      'require_dio_singleton',
+      'require_dio_factory',
       'require_dio_ssl_pinning',
       'require_dio_timeout',
     ],

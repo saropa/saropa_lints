@@ -1,8 +1,9 @@
 // ignore_for_file: unused_local_variable, unused_element
 
-/// Fixture for `require_dio_singleton` lint rule.
+/// Fixture for `require_dio_factory` lint rule (renamed from
+/// `require_dio_singleton`).
 
-// NOTE: require_dio_singleton requires specific framework types
+// NOTE: require_dio_factory requires specific framework types
 // and widget/package context to trigger.
 // See rule documentation for bad/good examples.
 

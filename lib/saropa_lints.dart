@@ -2827,7 +2827,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   RequireConnectivitySubscriptionCancelRule.new,
   RequireDatabaseCloseRule.new,
   RequireDebouncerCancelRule.new,
-  RequireDioSingletonRule.new,
+  RequireDioFactoryRule.new,
   RequireDisposeImplementationRule.new,
   RequireEnumUnknownValueRule.new,
   RequireEquatablePropsOverrideRule.new,

@@ -592,33 +592,46 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
   }
 }
 
-/// Warns when multiple Dio instances are created instead of using singleton.
+/// Warns when Dio instances are created in static fields or top-level
+/// variables instead of using factory/DI patterns.
 ///
-/// Since: v2.3.9 | Updated: v4.13.0 | Rule version: v2
+/// Since: v2.3.9 | Updated: v14.4.0 | Rule version: v3
 ///
-/// Alias: dio_multiple_instances, dio_no_singleton
+/// Alias: dio_multiple_instances, require_dio_singleton (deprecated)
 ///
-/// Creating multiple Dio instances wastes resources and makes interceptor
-/// configuration inconsistent.
+/// Static Dio singletons cause untestable code (no DI/mocking), resource
+/// leaks (no `dispose` path for `dio.close()`), and state contamination
+/// when multiple clients are needed (auth vs public).
 ///
 /// **BAD:**
-/// ```dart
-/// class ApiService {
-///   Future<Response> get() => Dio().get('/endpoint');
-/// }
-/// class OtherService {
-///   Future<Response> get() => Dio().get('/other');  // Another instance!
-/// }
-/// ```
-///
-/// **GOOD:**
 /// ```dart
 /// class DioClient {
 ///   static final Dio instance = Dio()..interceptors.add(...);
 /// }
 /// ```
-class RequireDioSingletonRule extends SaropaLintRule {
-  RequireDioSingletonRule() : super(code: _code);
+///
+/// ```dart
+/// final globalDio = Dio();
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// class DioFactory {
+///   DioFactory(this._logger);
+///   final Logger _logger;
+///   Dio create() => Dio(BaseOptions())..interceptors.add(...);
+/// }
+/// ```
+///
+/// ```dart
+/// // DI container registration
+/// getIt.registerLazySingleton<Dio>(
+///   () => Dio(BaseOptions(connectTimeout: Duration(seconds: 35))),
+///   dispose: (d) => d.close(),
+/// );
+/// ```
+class RequireDioFactoryRule extends SaropaLintRule {
+  RequireDioFactoryRule() : super(code: _code);
 
   @override
   LintImpact get impact => LintImpact.info;
@@ -633,10 +646,15 @@ class RequireDioSingletonRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    'require_dio_singleton',
-    '[require_dio_singleton] Use a singleton Dio instance. Creating multiple Dio instances wastes resources and makes interceptor configuration inconsistent. {v2}',
+    'require_dio_factory',
+    '[require_dio_factory] Create Dio instances via factory methods or DI '
+        'containers, not static fields or top-level variables. Static '
+        'singletons prevent testing, leak resources, and cause state '
+        'contamination. {v3}',
     correctionMessage:
-        'Create a shared Dio instance with consistent configuration. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+        'Move Dio construction into a factory method, constructor, or DI '
+        'registration callback. Verify the change works correctly with '
+        'existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -649,25 +667,36 @@ class RequireDioSingletonRule extends SaropaLintRule {
       final typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Dio') return;
 
-      // Check if it's being assigned to a static final field
       AstNode? current = node.parent;
       while (current != null) {
         if (current is VariableDeclaration) {
           final parent = current.parent;
           if (parent is VariableDeclarationList) {
             final grandParent = parent.parent;
-            if (grandParent is FieldDeclaration &&
-                grandParent.isStatic &&
-                parent.isFinal) {
-              return; // Singleton pattern - OK
+            // Flag static fields and top-level variables
+            if (grandParent is FieldDeclaration && grandParent.isStatic) {
+              reporter.atNode(node.constructorName, code);
+              return;
+            }
+            if (grandParent is TopLevelVariableDeclaration) {
+              reporter.atNode(node.constructorName, code);
+              return;
             }
           }
         }
-        if (current is MethodInvocation ||
-            current is ExpressionStatement ||
-            current is ReturnStatement) {
-          // Inline Dio() usage
+        // Static getter: `static Dio get client => Dio();`
+        if (current is MethodDeclaration &&
+            current.isStatic &&
+            current.isGetter) {
           reporter.atNode(node.constructorName, code);
+          return;
+        }
+        // Dio() inside a method body, constructor, closure, or argument
+        // list is the factory/DI pattern — allowed
+        if (current is MethodDeclaration ||
+            current is ConstructorDeclaration ||
+            current is FunctionExpression ||
+            current is FunctionDeclaration) {
           return;
         }
         current = current.parent;

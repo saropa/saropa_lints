@@ -100,22 +100,33 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: require_dio_singleton
+// Test fixture for: require_dio_factory
 // Source: lib\src\rules\packages\dio_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger require_dio_singleton
-// expect_lint: require_dio_singleton
-class _bad596_ApiService {
-  Future<Response> get() => Dio().get('/endpoint');
-}
-
-class OtherService {
-  Future<Response> get() => Dio().get('/other'); // Another instance!
-}
-
-// GOOD: Should NOT trigger require_dio_singleton
-class _good596_DioClient {
+// BAD: Static field singleton — should trigger require_dio_factory
+// expect_lint: require_dio_factory
+class _bad596_DioClient {
   static final Dio instance = Dio()..interceptors.add();
+}
+
+// BAD: Top-level variable — should trigger require_dio_factory
+// expect_lint: require_dio_factory
+final globalDio = Dio();
+
+// GOOD: Factory method — should NOT trigger require_dio_factory
+class _good596_DioFactory {
+  Dio create() => Dio()..interceptors.add();
+}
+
+// GOOD: Constructor parameter — should NOT trigger
+class _good596_ApiService {
+  _good596_ApiService(this._dio);
+  final Dio _dio;
+}
+
+// GOOD: Dio() inside a method body
+class _good596_MethodBody {
+  Future<Response> get() => Dio().get('/endpoint');
 }

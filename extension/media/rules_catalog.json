@@ -27897,7 +27897,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "require_dio_singleton": {
+    "require_dio_factory": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,

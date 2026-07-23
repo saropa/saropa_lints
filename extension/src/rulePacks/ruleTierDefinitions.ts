@@ -1830,7 +1830,7 @@ export const RULE_TIER_BY_CODE: Readonly<Record<string, string>> = {
   'require_dio_interceptor_error_handler': 'professional',
   'require_dio_response_type': 'recommended',
   'require_dio_retry_interceptor': 'professional',
-  'require_dio_singleton': 'comprehensive',
+  'require_dio_factory': 'comprehensive',
   'require_dio_ssl_pinning': 'professional',
   'require_dio_timeout': 'essential',
   'require_directional_widgets': 'professional',

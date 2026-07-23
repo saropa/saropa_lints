@@ -56,9 +56,9 @@ void main() {
       () => AvoidDioDebugPrintProductionRule(),
     );
     testRule(
-      'RequireDioSingletonRule',
-      'require_dio_singleton',
-      () => RequireDioSingletonRule(),
+      'RequireDioFactoryRule',
+      'require_dio_factory',
+      () => RequireDioFactoryRule(),
     );
     testRule(
       'PreferDioBaseOptionsRule',
