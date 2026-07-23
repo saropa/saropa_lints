@@ -30,6 +30,7 @@ from scripts.modules._audit_checks import (
     find_duplicate_rules,
     find_orphan_rules,
     get_contains_audit_status,
+    get_dangling_bug_references,
     get_dependency_import_status,
     get_file_stats,
     get_implemented_rules,
@@ -813,6 +814,27 @@ def run_full_audit(
             [],
         ))
     dependency_imports_ok = not dep_missing
+
+    # Dangling bugs/ references (archived bug still referenced by old path)
+    dangling_bugs = get_dangling_bug_references(project_dir)
+    if dangling_bugs:
+        bug_details = [
+            f"{ref} (in {src})" for ref, src in dangling_bugs[:10]
+        ]
+        if len(dangling_bugs) > 10:
+            bug_details.append(f"+{len(dangling_bugs) - 10} more")
+        checks.append((
+            _WARN,
+            f"{len(dangling_bugs)} dangling bugs/ reference(s) "
+            f"(file moved or deleted)",
+            bug_details,
+        ))
+    else:
+        checks.append((
+            _PASS,
+            "No dangling bugs/ references",
+            [],
+        ))
 
     if extra_checks:
         checks.extend(extra_checks)

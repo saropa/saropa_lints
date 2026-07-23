@@ -68,10 +68,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Changed
+
+- **Breaking:** Renamed `require_dio_singleton` to `require_dio_factory` — the rule now flags `Dio()` in static fields and top-level variables (the singleton anti-pattern) instead of recommending them. `Dio()` inside methods, constructors, closures, and DI callbacks is allowed. Resolves the architectural contradiction with `avoid_singleton_pattern` ([#274](https://github.com/saropa/saropa_lints/issues/274)). No action required if already using factory/DI patterns.
+
 <details><summary>Maintenance</summary>
 
-- Rewrote `require_dio_singleton` vs `avoid_singleton_pattern` bug report with correct API references, verified rule behavior, and clarified the contradiction is architectural (not a direct rule collision) ([#274](https://github.com/saropa/saropa_lints/issues/274)).
 - Closed Dependabot PR #271 bug (js-yaml 4.1.1 → 4.3.0): lock file already resolves to 4.3.0 via mocha; archived as fixed.
+- Publish audit now detects dangling `bugs/*.md` references in active documents (skips frozen `plans/history/`).
 
 </details>
 

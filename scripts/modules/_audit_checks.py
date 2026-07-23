@@ -1243,3 +1243,49 @@ def get_dependency_import_status(project_dir: Path) -> dict:
                 rel = path.relative_to(project_dir).as_posix()
                 missing.setdefault(pkg, []).append(rel)
     return {"declared": declared, "missing": missing}
+
+
+def get_dangling_bug_references(project_dir: Path) -> list[tuple[str, str]]:
+    """Find references to bugs/*.md files that no longer exist.
+
+    Scans active documents (root .md files, plans/, bugs/) for
+    ``bugs/<name>.md`` paths and checks whether each referenced file
+    exists on disk. Skips plans/history/ — those are frozen records
+    that legitimately reference pre-archival paths. Returns
+    [(ref_path, source_file), ...] for missing files.
+    """
+    bug_ref_re = re.compile(r"bugs/[\w.-]+\.md")
+    history_dir = project_dir / "plans" / "history"
+
+    scan_files: list[Path] = []
+    for name in ("CHANGELOG.md", "ROADMAP.md", "CLAUDE.md",
+                 "CONTRIBUTING.md"):
+        p = project_dir / name
+        if p.exists():
+            scan_files.append(p)
+
+    for scan_dir in ("plans", "bugs"):
+        base = project_dir / scan_dir
+        if base.is_dir():
+            for md in sorted(base.rglob("*.md")):
+                # Skip frozen history files
+                try:
+                    md.relative_to(history_dir)
+                    continue
+                except ValueError:
+                    pass
+                scan_files.append(md)
+
+    dangling: list[tuple[str, str]] = []
+    for path in scan_files:
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        for match in bug_ref_re.finditer(text):
+            ref = match.group(0)
+            if not (project_dir / ref).exists():
+                rel = path.relative_to(project_dir).as_posix()
+                dangling.append((ref, rel))
+
+    return sorted(set(dangling))
