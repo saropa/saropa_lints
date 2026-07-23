@@ -6,9 +6,11 @@
 
 ## Problem
 
-`require_dio_singleton` demands `Dio` as a `static final` singleton. `avoid_singleton_pattern` correctly flags that exact pattern. The two rules contradict each other, and `require_dio_singleton` is architecturally wrong: resource-holding instances like `Dio` (connection pools, sockets) need lifecycle management that static singletons prevent.
+`require_dio_singleton` flags inline `Dio()` calls and accepts `static final Dio instance = Dio()` as the correct pattern (see its GOOD example in `dio_rules.dart:616-618`). `avoid_singleton_pattern` flags classes that use the full GoF singleton (static instance field + factory constructor + private constructor) — it does NOT fire on a bare `static final` field alone.
 
-Static `Dio` singletons cause:
+The contradiction is architectural, not a direct rule collision: `require_dio_singleton` steers users toward `static final` singletons, and when users follow that advice to its logical conclusion (wrapping in a proper singleton class), they trigger `avoid_singleton_pattern`. Both rules agree singletons are bad in their correction messages — but `require_dio_singleton` recommends one.
+
+More fundamentally, `require_dio_singleton` recommends the wrong architecture for resource-holding types. Static `Dio` singletons cause:
 - Untestable code (no DI, no mocking without hacks)
 - Resource leaks (no `dispose` path for `dio.close()`)
 - State contamination when multiple clients are needed (auth vs public)

@@ -70,8 +70,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 <details><summary>Maintenance</summary>
 
-- Rewrote `require_dio_singleton` vs `avoid_singleton_pattern` bug report with correct API references and actionable fix proposal ([#274](https://github.com/saropa/saropa_lints/issues/274)).
-- Filed bug report for blocked Dependabot PR #271 (js-yaml 4.1.1 to 4.3.0, merge conflict in `analysis_options.yaml`).
+- Rewrote `require_dio_singleton` vs `avoid_singleton_pattern` bug report with correct API references, verified rule behavior, and clarified the contradiction is architectural (not a direct rule collision) ([#274](https://github.com/saropa/saropa_lints/issues/274)).
+- Filed bug report for Dependabot PR #271 (js-yaml 4.1.1 to 4.3.0); PR is now closed unmerged, dependency remains at 4.1.1.
 
 </details>
 
