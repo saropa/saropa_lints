@@ -8,7 +8,7 @@ Two bug reports in `bugs/` needed revision: one used the retired `custom_lint_bu
 
 1. **`bugs/require_dio_singleton_vs_avoid_singleton_pattern.md`** — Restructured into an actionable bug report. Removed code examples referencing the retired `custom_lint_builder` API (`DartLintRule`, `CustomLintResolver`, `ErrorReporter`, `CustomLintContext`). Added correct API references (`SaropaLintRule`, `SaropaDiagnosticReporter`). Clarified the contradiction: `avoid_singleton_pattern` requires the full GoF singleton (static instance + factory constructor + private constructor), so a bare `static final Dio` field does not trigger it directly — the conflict is architectural, not a direct rule collision. `require_dio_singleton` steers toward an anti-pattern that, fully implemented, triggers `avoid_singleton_pattern`. Added AST edge cases and linked to actual rule source files.
 
-2. **`bugs/update_deps.md`** — Structured as a proper bug report. Updated status to Closed (unmerged) after verifying PR #271 state via `gh pr view`. The `js-yaml` dependency remains at 4.1.1.
+2. **`bugs/update_deps.md`** — Structured as a proper bug report. Updated status to Closed (unmerged) after verifying PR #271 state via `gh pr view`. Later confirmed js-yaml already at 4.3.0 in lock file (transitive via mocha); marked Fixed and archived to `plans/history/2026.07/2026.07.23/`.
 
 3. **`CHANGELOG.md`** — Added `[Unreleased]` section with Maintenance entries.
 
