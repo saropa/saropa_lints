@@ -1149,7 +1149,7 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_hive_adapter_registration_order',
     '[require_hive_adapter_registration_order] Opening box before registering '
-        'adapters throws HiveError. Adapters must be registered first. {v2}',
+        'adapters throws HiveError. Adapters must be registered first. {v3}',
     correctionMessage:
         'Ensure all Hive.registerAdapter() calls appear before Hive.openBox().',
     severity: DiagnosticSeverity.ERROR,
@@ -1160,9 +1160,10 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addFunctionBody((FunctionBody body) {
-      if (body is! BlockFunctionBody) return;
-
+    // addFunctionBody is a no-op stub in the native engine (FunctionBody is not
+    // a visitable node), so this rule never fired; addBlockFunctionBody is the
+    // real registration (BUG FIX 2026-07-16).
+    context.addBlockFunctionBody((BlockFunctionBody body) {
       int? firstOpenBoxLine;
       int? lastRegisterAdapterLine;
       MethodInvocation? openBoxNode;

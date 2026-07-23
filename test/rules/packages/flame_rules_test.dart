@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/flame_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 2 Flame Engine lint rules.
 ///
@@ -33,14 +34,18 @@ void main() {
   });
 
   group('Flame Engine Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_creating_vector_in_update',
-      'avoid_redundant_async_on_load',
-    ];
+    final fixtureDir = Directory('example_packages/lib/flame');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example_packages/lib/flame/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

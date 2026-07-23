@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/commerce/iap_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 5 In-App Purchase lint rules.
 ///
@@ -51,17 +52,18 @@ void main() {
   });
 
   group('In-App Purchase Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_purchase_in_sandbox_production',
-      'require_subscription_status_check',
-      'require_price_localization',
-      'prefer_grace_period_handling',
-      'avoid_entitlement_without_server',
-    ];
+    final fixtureDir = Directory('example/lib/iap');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/iap/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

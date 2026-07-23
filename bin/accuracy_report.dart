@@ -25,7 +25,8 @@ import 'dart:convert' show JsonEncoder;
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
-import 'package:saropa_lints/saropa_lints.dart' show AccuracyTarget, allSaropaRules;
+import 'package:saropa_lints/saropa_lints.dart'
+    show AccuracyTarget, allSaropaRules, getAllDefinedRules;
 import 'package:saropa_lints/scan.dart';
 import 'package:saropa_lints/src/report/accuracy_report.dart';
 
@@ -36,7 +37,11 @@ Future<void> main(List<String> args) async {
   }
 
   final fixturesDir = _readOption(args, '--fixtures') ?? 'example/lib';
-  final tier = _readOption(args, '--tier') ?? 'pedantic';
+  // Default: measure EVERY defined rule, including stylistic. No tier — not even
+  // pedantic — contains the stylistic rules, so a tier-scoped scan cannot fire
+  // them and would report every stylistic rule with a fixture as falsely
+  // "silent". `--tier <name>` narrows the measurement to one tier when wanted.
+  final tier = _readOption(args, '--tier');
   final failOn = _readOption(args, '--fail-on') ?? 'silent';
   final asJson = args.contains('--format') &&
       (_readOption(args, '--format') == 'json');
@@ -55,7 +60,7 @@ Future<void> main(List<String> args) async {
   final expected = _collectExpectedLints(dir);
   final diagnostics = await _runScan(fixturesDir, tier);
   if (diagnostics == null) {
-    print('Error: scan failed for $fixturesDir (tier: $tier).');
+    print('Error: scan failed for $fixturesDir (tier: ${tier ?? 'all'}).');
     exit(2);
   }
 
@@ -90,10 +95,16 @@ List<LintLocation> _collectExpectedLints(Directory dir) {
 
 /// Runs a fully-resolved scan so type-based and instance-creation rules fire
 /// (the default syntactic pass under-reports them — see scan.dart).
-Future<List<ScanDiagnostic>?> _runScan(String path, String tier) {
+///
+/// When [tier] is null the scan enables every defined rule via
+/// [getAllDefinedRules] (pedantic ∪ stylistic), because no tier alone contains
+/// the stylistic rules; a tier-scoped scan would report every stylistic rule
+/// with a fixture as falsely silent. A non-null [tier] narrows to that tier.
+Future<List<ScanDiagnostic>?> _runScan(String path, String? tier) {
   final runner = ScanRunner(
     targetPath: path,
     tier: tier,
+    enabledRuleNames: tier == null ? getAllDefinedRules() : null,
     // Suppress the scanner's own progress chatter; this CLI prints its report.
     messageSink: (_) {},
   );
@@ -192,7 +203,10 @@ void _printUsage() {
   print('');
   print('Options:');
   print('  --fixtures <dir>   Fixtures tree to scan (default: example/lib)');
-  print('  --tier <name>      Tier to enable for the scan (default: pedantic)');
+  print('  --tier <name>      Narrow measurement to one tier. Default: all');
+  print('                       defined rules, including stylistic (no tier');
+  print('                       contains stylistic, so a tier scan would');
+  print('                       falsely report stylistic rules as silent).');
   print('  --fail-on <mode>   silent | none (default: silent)');
   print('                       silent = exit 1 if any rule never fires');
   print('                       none   = always exit 0 (report only)');

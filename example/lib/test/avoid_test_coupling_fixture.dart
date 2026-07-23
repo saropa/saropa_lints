@@ -109,9 +109,12 @@ dynamic state;
 dynamic user;
 final userId = '123';
 
-// BAD: Should trigger avoid_test_coupling
+// BAD: Should trigger avoid_test_coupling.
+// The rule only analyzes tests declared inside a top-level `main()` (that is
+// where a test-file's tests live), so the coupled tests must sit in `main`.
+// The compliant example is in avoid_test_coupling_good.dart.
 // expect_lint: avoid_test_coupling
-void _bad1169() async {
+void main() async {
   late String userId;
 
   test('creates user', () async {
@@ -121,14 +124,5 @@ void _bad1169() async {
 
   test('deletes user', () async {
     await deleteUser(userId); // Depends on previous test!
-  });
-}
-
-// GOOD: Should NOT trigger avoid_test_coupling
-void _good1169() async {
-  test('creates and deletes user', () async {
-    final userId = await createUser('test');
-    expect(userId, isNotNull);
-    await deleteUser(userId);
   });
 }

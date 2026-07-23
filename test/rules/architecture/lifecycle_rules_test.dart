@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/architecture/lifecycle_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 6 Lifecycle lint rules.
 ///
@@ -75,18 +76,18 @@ void main() {
   });
 
   group('Lifecycle Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_work_in_paused_state',
-      'require_resume_state_refresh',
-      'require_did_update_widget_check',
-      'require_late_initialization_in_init_state',
-      'require_app_lifecycle_handling',
-      'require_conflict_resolution_strategy',
-    ];
+    final fixtureDir = Directory('example/lib/lifecycle');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/lifecycle/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

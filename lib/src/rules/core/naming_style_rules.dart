@@ -1752,7 +1752,7 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_correct_identifier_length',
-    '[prefer_correct_identifier_length] Very short (1-2 char) or very long (>30 char) identifiers measurably impact code comprehension speed. Optimal readability is achieved with 8-20 character names. {v6}',
+    '[prefer_correct_identifier_length] Very short (1-2 char) or very long (>30 char) identifiers measurably impact code comprehension speed. Optimal readability is achieved with 8-20 character names. {v7}',
     correctionMessage:
         'Use names between 2 and 40 characters long. Single-character names (except i, j, k, x, y, z, e, n) reduce readability; overly long names hinder scanning.',
     severity: DiagnosticSeverity.INFO,
@@ -1792,7 +1792,14 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
       _checkIdentifier(node.name.lexeme, node, reporter);
     });
 
-    context.addFormalParameter((FormalParameter node) {
+    // addFormalParameter is a no-op stub in the native engine (FormalParameter
+    // is not a visitable node), so the parameter-name branch of this rule never
+    // fired. addSimpleFormalParameter is the real registration and covers
+    // regular, optional, and named parameters (a default-valued param wraps a
+    // SimpleFormalParameter, which the visitor still reaches). Field/super/
+    // function-typed params are not length-checked — a minor, acceptable gap
+    // versus the previous total deadness (BUG FIX 2026-07-16).
+    context.addSimpleFormalParameter((SimpleFormalParameter node) {
       final String? name = node.name?.lexeme;
       if (name != null) {
         _checkIdentifier(name, node, reporter);

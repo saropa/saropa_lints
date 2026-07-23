@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/auto_route_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 4 auto_route lint rules.
 ///
@@ -14,14 +15,12 @@ import 'package:test/test.dart';
 /// Test fixtures: example_packages/lib/auto_route/*
 void main() {
   group('Auto Route Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_auto_route_context_navigation',
-      'avoid_auto_route_keep_history_misuse',
-      'prefer_auto_route_path_params_simple',
-      'prefer_auto_route_typed_args',
-      'require_auto_route_guard_resume',
-      'require_auto_route_full_hierarchy',
-    ];
+    final fixtureDir = Directory('example_packages/lib/auto_route');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

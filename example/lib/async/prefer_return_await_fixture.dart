@@ -105,6 +105,10 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+// The rule gates on the returned expression's static type being a Future, so
+// the returned call must resolve to a real Future, not an undeclared function.
+Future<int> fetchData() async => 0;
+
 // BAD: Should trigger prefer_return_await
 // expect_lint: prefer_return_await
 void _bad99() async {

@@ -4,6 +4,7 @@ import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/google_sign_in_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Instantiation-pin tests for the six google_sign_in lint rules.
 ///
@@ -132,15 +133,22 @@ void main() {
   });
 
   group('Google Sign-In Rules - Fixture Verification', () {
-    test('google_sign_in_fixture.dart exists', () {
-      final file = File(
-        'example_packages/lib/google_sign_in/google_sign_in_fixture.dart',
-      );
-      expect(
-        file.existsSync(),
-        isTrue,
-        reason: 'Fixture file must exist for all six rules',
-      );
+    final fixtureDir = Directory('example_packages/lib/google_sign_in');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/google_sign_in/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 }

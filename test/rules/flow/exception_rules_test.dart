@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/flow/exception_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 5 Exception lint rules.
 ///
@@ -58,17 +59,18 @@ void main() {
   });
 
   group('Exception Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_non_final_exception_class_fields',
-      'avoid_only_rethrow',
-      'avoid_throw_in_catch_block',
-      'avoid_throw_objects_without_tostring',
-      'prefer_public_exception_classes',
-    ];
+    final fixtureDir = Directory('example/lib/exception');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/exception/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

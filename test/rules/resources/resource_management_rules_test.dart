@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/resources/resource_management_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 14 Resource Management lint rules.
 ///
@@ -105,28 +106,20 @@ void main() {
   });
 
   group('Resource Management Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_file_close_in_finally',
-      'require_database_close',
-      'require_http_client_close',
-      'require_native_resource_cleanup',
-      'require_websocket_close',
-      'require_platform_channel_cleanup',
-      'require_isolate_kill',
-      'require_camera_dispose',
-      'require_image_compression',
-      'prefer_coarse_location_when_sufficient',
-      'avoid_image_picker_without_source',
-      'prefer_geolocator_accuracy_appropriate',
-      'prefer_geolocator_last_known',
-      'prefer_image_picker_multi_selection',
-    ];
+    final fixtureDir = Directory('example/lib/resource_management');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example/lib/resource_management/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

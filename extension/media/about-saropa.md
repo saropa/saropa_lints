@@ -4,7 +4,35 @@
 
 Established in 2010, **Saropa Pty Limited** is a technology firm rooted in the high-stakes worlds of financial services and online security. We don't just build apps; we build digital safeguards. Our philosophy is simple: technology should cut through the noise, manage risk automatically, and—above all—never lose your data.
 
-From developer extensions that "just work" to a crisis management platform trusted by over 50,000 users, Saropa creates software for those who value reliability over hype.
+From developer extensions that "just work" to a crisis management platform trusted by over 100,000 users, Saropa creates software for those who value reliability over hype.
+
+---
+
+## 📱 Mission
+
+The core mission of **Saropa Contacts** focuses on safety, connectivity, and digital readiness. Because the company operates both as an intelligent address book app and a broader crisis-preparedness platform, they express their mission in two tightly connected ways:
+
+*   **For the Saropa Contacts App:**
+    > "Our mission is to make sure the right information is always at hand, for everyone."
+*   **For the Saropa Safety Network & Platform:**
+    > "To reduce the impact of crises everywhere."
+
+---
+
+<!-- cspell:ignore siropa -->
+
+### The Philosophy Behind the Mission
+
+Saropa was founded by a team with a background in financial technology and online security who noticed how unprepared people often are when disaster strikes. They believe that a standard address book should do far more than just store a passive list of names and numbers.
+
+To bring their mission to life, they build their tools around a few core pillars:
+
+*   **Crisis-Grade Reliability:** Ensuring that when it matters most, you can find the exact people or local emergency services you need (offering offline access to emergency numbers across 195+ countries).
+*   **Data Quality & Accessibility:** Providing automated audits to clean up duplicate contacts, fill in missing information, and map out your network so your data is actually functional in an emergency.
+*   **Privacy-First Transparency:** Ensuring your personal network data remains yours, kept securely on your device by default rather than being sold or heavily monetized.
+
+> **What's in a Name?**
+> The word **Saropa** (or *siropa*) refers to a ceremonial robe or sash presented by leaders of the Sikh community to individuals who have done extraordinary good deeds. The company chose this name to reflect its mandate to aid communities worldwide with disaster readiness and recovery.
 
 ---
 
@@ -23,12 +51,13 @@ Standard contacts apps store data; Saropa helps you use it. It is an "Intelligen
   - **Crisis Ready:** Access to 252+ medical tips, a condition finder, and global emergency numbers for 195+ countries.
   - **Digital Safeguard:** Biometric locking for sensitive contacts and automatic business detection.
 - **Platform:** iOS, Android, Web
-- **Trust:** 50,000+ Downloads | ★ 4.8/5 Rating
+- **Trust:** 100,000+ Downloads | ★ 4.8/5 Rating
 - **Link:** [saropa.com](https://saropa.com/)
 
 ---
 
 ### Kykto
+<!-- cspell:ignore kyks -->
 
 **Writing solves problems.**
 
@@ -65,6 +94,8 @@ _Production-hardened tools for VS Code, Dart, and Flutter._
   - _Companion to the saropa_lints package:_ ships the **Findings Dashboard**, **Code Health Dashboard**, and **Package Vibrancy** scoring for Flutter/Dart projects. Surfaces all 2134 rules in the sidebar and exports `reports/.saropa_lints/violations.json` for CI.
 - **[Saropa Log Capture](https://marketplace.visualstudio.com/items?itemName=Saropa.saropa-log-capture)**
   - _The Debugger's Safety Net:_ Automatically saves all Debug Console output to persistent log files. The log viewer ships with a read-only severity gutter, dedicated expand/collapse controls, dedup-fold pills, and within-line text selection. No setup required—hit F5 and your logs are safe.
+- **[Saropa Workspace](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-workspace)**
+  - _File and script shortcuts:_ Pin any file as a favorite—single-click opens it, double-click runs it. Pins are project-scoped (shareable via the repo) or global, with a per-pin command prefix, CLI args, working directory, and environment. Seeds auto-pins and imports existing favorites.
 - **[Saropa Suite](https://marketplace.visualstudio.com/items?itemName=saropa.saropa-suite)**
   - _One-click install_ for the full Saropa developer toolkit: Log Capture + Drift Advisor + Lints. Cross-extension integrations: bug reports embed lint findings, OWASP executive summaries, and project health scores; debug sessions carry query performance and schema context; right-click any SQL line in your logs to "Open in Drift Advisor."
 

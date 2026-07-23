@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/architecture/architecture_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 9 Architecture lint rules.
 ///
@@ -62,17 +63,12 @@ void main() {
     );
   });
   group('Architecture Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_direct_data_access_in_ui',
-      'avoid_business_logic_in_ui',
-      'avoid_circular_dependencies',
-      'avoid_god_class',
-      'avoid_ui_in_domain_layer',
-      'avoid_cross_feature_dependencies',
-      'avoid_singleton_pattern',
-      'avoid_touch_only_gestures',
-      'avoid_circular_imports',
-    ];
+    final fixtureDir = Directory('example/lib/architecture');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

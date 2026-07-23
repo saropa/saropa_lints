@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/geolocator_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 Geolocator lint rules.
 ///
@@ -51,19 +52,20 @@ void main() {
   });
 
   group('Geolocator Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_geolocator_battery_awareness',
-      'avoid_geolocator_background_without_config',
-      'prefer_geocoding_cache',
-      'prefer_geolocation_coarse_location',
-      'avoid_continuous_location_updates',
-    ];
+    final fixtureDir = Directory('example_packages/lib/geolocator');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/geolocator/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

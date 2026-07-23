@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/sqflite_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 2 Sqflite lint rules.
 ///
@@ -28,16 +29,20 @@ void main() {
   });
 
   group('Sqflite Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_sqflite_type_mismatch',
-      'prefer_sqflite_encryption',
-    ];
+    final fixtureDir = Directory('example_packages/lib/sqflite');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/sqflite/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

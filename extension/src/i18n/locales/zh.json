@@ -257,6 +257,11 @@
       "reexportTitle": "再出口  ⁇  在此之前, 这本库的公共API的一部分.",
       "reexportBadge": "转出口是指重新出口的情况."
     },
+    "opportunities": {
+      "header": "机会 ({count}) 的时间",
+      "viewCode": "查看代码 查阅代码",
+      "viewDocs": "查看文档的文件"
+    },
     "alerts": {
       "archived": "档案的 ⁇ ,这是一个很好的方法. 存储库是只读的",
       "knownIssue": "已知问题:已知的问题 {reason} 没有任何问题.",
@@ -1297,6 +1302,11 @@
         "label": "任何可疑的报道都会被覆盖.",
         "evidence": "{pct}%没有测试.",
         "rule": "当LCOV报告高覆盖率但没有测试引用该功能时,会标记."
+      },
+      "fresh_code": {
+        "label": "新鲜的代码 代码",
+        "evidence": "CC {cc},最近重新写的",
+        "rule": "当周期复杂度超过10并且函数体在过去90天内被写或重写时,会标记. 最近重写的复杂代码比验证中的旧代码更频繁地导致事件."
       }
     },
     "shortcuts": {

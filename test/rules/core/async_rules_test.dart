@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/core/async_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 46 async lint rules.
 ///
@@ -263,49 +264,12 @@ void main() {
     );
   });
   group('Async Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_dialog_context_after_async',
-      'avoid_redundant_await',
-      'avoid_void_async',
-      'avoid_future_ignore',
-      'avoid_future_tostring',
-      'avoid_multiple_stream_listeners',
-      'avoid_nested_futures',
-      'avoid_nested_streams_and_futures',
-      'avoid_passing_async_when_sync_expected',
-      'avoid_redundant_async',
-      'avoid_sequential_awaits',
-      'avoid_stream_in_build',
-      'avoid_stream_subscription_in_field',
-      'avoid_stream_sync_events',
-      'avoid_stream_tostring',
-      'avoid_sync_on_every_change',
-      'avoid_unassigned_stream_subscriptions',
-      'prefer_assigning_await_expressions',
-      'prefer_async_await',
-      'prefer_async_callback',
-      'prefer_async_init_state',
-      'prefer_cancellation_token_pattern',
-      'prefer_commenting_future_delayed',
-      'prefer_correct_future_return_type',
-      'prefer_correct_stream_return_type',
-      'prefer_future_void_function_over_async_callback',
-      'prefer_return_await',
-      'prefer_specifying_future_value_type',
-      'prefer_utc_for_storage',
-      'require_completer_error_handling',
-      'require_feature_flag_default',
-      'require_future_timeout',
-      'require_future_wait_error_handling',
-      'require_location_timeout',
-      'require_network_status_check',
-      'require_pending_changes_indicator',
-      'require_stream_controller_close',
-      'require_stream_error_handling',
-      'require_stream_on_done',
-      'require_websocket_message_validation',
-      'use_setstate_synchronously',
-    ];
+    final fixtureDir = Directory('example/lib/async');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
@@ -347,6 +311,18 @@ void main() {
       expect(source, contains('await controller.repeat();'));
       expect(source, contains('await controller.fling();'));
       expect(source, contains('await someInt'));
+    });
+
+    test('fixture keeps static Future-returning method regression', () {
+      final source = File(
+        'example/lib/async/avoid_redundant_await_fixture.dart',
+      ).readAsStringSync();
+      expect(source, contains('_StaticFutureIO'));
+      expect(source, contains('goodStaticFutureReturning'));
+      expect(source, contains('await _StaticFutureIO.loadByKey('));
+      expect(source, contains('await _StaticFutureIO.loadAll()'));
+      expect(source, contains('await _StaticFutureIO.update('));
+      expect(source, contains('await _StaticFutureIO.delete('));
     });
   });
 

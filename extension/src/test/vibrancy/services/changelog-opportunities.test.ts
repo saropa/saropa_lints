@@ -140,6 +140,38 @@ describe('changelog-opportunities', () => {
         it('ignores all-caps acronyms like RTL', () => {
             assert.deepStrictEqual(extractApiNames('Fixed RTL alignment.'), []);
         });
+
+        it('ignores README.md referenced via dotted member access shape', () => {
+            const names = extractApiNames('See README.md for migration notes.');
+            assert.ok(!names.includes('README.md'), `README.md leaked in: ${JSON.stringify(names)}`);
+        });
+
+        it('ignores documentation filenames inside backtick spans', () => {
+            const names = extractApiNames('Updated `CHANGELOG.md` and `pubspec.yaml`.');
+            assert.ok(!names.includes('CHANGELOG.md'), `CHANGELOG.md leaked in: ${JSON.stringify(names)}`);
+            assert.ok(!names.includes('pubspec.yaml'), `pubspec.yaml leaked in: ${JSON.stringify(names)}`);
+        });
+
+        it('still captures a real dotted API name alongside a filename reference', () => {
+            const names = extractApiNames('ReelText.rich now supports this; see README.md.');
+            assert.ok(names.includes('ReelText.rich'));
+            assert.ok(!names.includes('README.md'));
+        });
+
+        it('does not drop Logger.log — "log" collides with the .log document extension', () => {
+            const names = extractApiNames('Added a severity level to `Logger.log`.');
+            assert.ok(names.includes('Logger.log'), `Logger.log dropped: ${JSON.stringify(names)}`);
+        });
+
+        it('does not drop Mutex.lock — "lock" collides with the .lock lockfile extension', () => {
+            const names = extractApiNames('Mutex.lock now accepts a timeout.');
+            assert.ok(names.includes('Mutex.lock'), `Mutex.lock dropped: ${JSON.stringify(names)}`);
+        });
+
+        it('ignores a source-file reference like MyWidget.dart', () => {
+            const names = extractApiNames('See MyWidget.dart for a full migration example.');
+            assert.ok(!names.includes('MyWidget.dart'), `MyWidget.dart leaked in: ${JSON.stringify(names)}`);
+        });
     });
 
     describe('rankOpportunities', () => {

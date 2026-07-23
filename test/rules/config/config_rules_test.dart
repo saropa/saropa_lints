@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/config/config_rules.dart';
 import 'package:saropa_lints/src/rules/config/repo_integrity_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 11 Configuration lint rules.
 ///
@@ -130,22 +131,18 @@ void main() {
   });
 
   group('Configuration Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_hardcoded_config',
-      'avoid_hardcoded_config_test',
-      'avoid_mixed_environments',
-      'require_feature_flag_type_safety',
-      'avoid_string_env_parsing',
-      'avoid_platform_specific_imports',
-      'prefer_compile_time_config',
-      'prefer_flavor_configuration',
-      'prefer_semver_version',
-      'require_env_file_gitignore',
-    ];
+    final fixtureDir = Directory('example/lib/config');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/config/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

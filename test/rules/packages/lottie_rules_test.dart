@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/lottie_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Instantiation-pin tests for 5 lottie lint rules.
 ///
@@ -54,9 +55,22 @@ void main() {
   });
 
   group('Lottie Rules - Fixture Verification', () {
-    test('lottie_fixture exists', () {
-      final file = File('example_packages/lib/lottie/lottie_fixture.dart');
-      expect(file.existsSync(), isTrue);
+    final fixtureDir = Directory('example_packages/lib/lottie');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/lottie/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 }

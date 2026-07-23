@@ -257,6 +257,11 @@
       "reexportTitle": "Heruitgevoerd  ⁇  deel van deze bibliotheek's openbare API.",
       "reexportBadge": "wederuitvoer naar de andere landen."
     },
+    "opportunities": {
+      "header": "Mogelijkheden ({count})",
+      "viewCode": "Code bekijken Bekijk code",
+      "viewDocs": "Documents bekijken."
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇  het repository is alleen-lezen.",
       "knownIssue": "Bekende probleem: {reason}",
@@ -1297,6 +1302,11 @@
         "label": "verdachte dekking van de berichten.",
         "evidence": "{pct}% zonder test.",
         "rule": "Gekennemde wanneer LCOV meldt hoge dekking, maar geen test verwijst naar de functie."
+      },
+      "fresh_code": {
+        "label": "Fresh code vers, de nieuwe code.",
+        "evidence": "CC {cc}, onlangs herschreven.",
+        "rule": "Gekennummerd wanneer de cyclomatische complexiteit meer dan 10 bedraagt en het functiekorps is geschreven of herschreven binnen de laatste 90 dagen. Recentelijk herschreven complexe code veroorzaakte veel vaker incidenten dan oude code tijdens validatie."
       }
     },
     "shortcuts": {

@@ -157,7 +157,7 @@ class RequireGetItRegistrationOrderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_getit_registration_order',
-    '[require_getit_registration_order] GetIt registration uses a dependency not yet registered at this point in the setup sequence. This causes runtime errors when the service locator attempts to resolve an unregistered type, resulting in app crashes during startup or lazy initialization that are difficult to reproduce and debug in production. {v3}',
+    '[require_getit_registration_order] GetIt registration uses a dependency not yet registered at this point in the setup sequence. This causes runtime errors when the service locator attempts to resolve an unregistered type, resulting in app crashes during startup or lazy initialization that are difficult to reproduce and debug in production. {v4}',
     correctionMessage:
         'Register dependencies before services that depend on them, or use registerLazySingleton.',
     severity: DiagnosticSeverity.WARNING,
@@ -168,10 +168,11 @@ class RequireGetItRegistrationOrderRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Track registered types in the current function scope
-    context.addFunctionBody((FunctionBody body) {
-      if (body is! BlockFunctionBody) return;
-
+    // Track registered types in the current function scope.
+    // addFunctionBody is a no-op stub in the native engine (FunctionBody is not
+    // a visitable node), so this rule never fired; addBlockFunctionBody is the
+    // real registration (BUG FIX 2026-07-16).
+    context.addBlockFunctionBody((BlockFunctionBody body) {
       final Set<String> registeredTypes = <String>{};
       final List<(MethodInvocation, Set<String>)> registrations = [];
 

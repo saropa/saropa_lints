@@ -257,6 +257,11 @@
       "reexportTitle": "Yeniden ihraç edilen  ⁇  bu kütüphanenin bir parçası ⁇  kamu API'si",
       "reexportBadge": "Yeniden ihracat yeniden ihraç"
     },
+    "opportunities": {
+      "header": "FERHİM ({count}) fırsatları",
+      "viewCode": "View code Kod görüntüle",
+      "viewDocs": "View docs (dokümanları görüntüle)"
+    },
     "alerts": {
       "archived": "ARŞIVLAN  ⁇  depo sadece okunur.",
       "knownIssue": "Bilinen Sorun: {reason}",
@@ -1297,6 +1302,11 @@
         "label": "Şüpheli bir haberin kapsamı hakkında şüphe duyulur.",
         "evidence": "{pct}% test edilmemiş bir şekilde.",
         "rule": "LCOV yüksek kapsama rapor ederken, ancak testin işlevi referansları olmadığı zaman işaretlenir."
+      },
+      "fresh_code": {
+        "label": "Fresh Code Yeni Kod",
+        "evidence": "CC {cc}, son zamanlarda yeniden yazılmış.",
+        "rule": "Siklomatik karmaşıklık 10'u geçtiğinde ve fonksiyon gövdesinin son 90 gün içinde yazıldığı veya yeniden yazıldığında işaretlenir. Son zamanlarda yeniden yazılmış karmaşık kod, doğrulama sırasında eski koddan çok daha sık olaylara neden oldu."
       }
     },
     "shortcuts": {

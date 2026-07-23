@@ -31,7 +31,7 @@ function codeHealthScriptStrings(): Record<string, string> {
 function codeHealthFlagDescriptors(): Record<string, { label: string; evidence: string; rule: string }> {
   const keys = [
     'unused', 'uncovered', 'complex', 'undocumented',
-    'test_drift', 'stub_tested', 'suspicious_coverage',
+    'test_drift', 'stub_tested', 'suspicious_coverage', 'fresh_code',
   ];
   const out: Record<string, { label: string; evidence: string; rule: string }> = {};
   for (const k of keys) {

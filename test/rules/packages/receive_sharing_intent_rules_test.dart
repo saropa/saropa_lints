@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/receive_sharing_intent_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Instantiation-pin tests for the 3 receive_sharing_intent lint rules.
 ///
@@ -37,12 +38,22 @@ void main() {
   });
 
   group('ReceiveSharingIntent Rules - Fixture Verification', () {
-    test('receive_sharing_intent fixture exists', () {
-      final file = File(
-        'example_packages/lib/receive_sharing_intent/'
-        'receive_sharing_intent_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
+    final fixtureDir = Directory('example_packages/lib/receive_sharing_intent');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/receive_sharing_intent/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 }

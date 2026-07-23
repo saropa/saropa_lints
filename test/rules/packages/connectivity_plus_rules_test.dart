@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/connectivity_plus_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Instantiation-pin tests for connectivity_plus lint rules.
 ///
@@ -70,15 +71,22 @@ void main() {
   });
 
   group('ConnectivityPlus Rules - Fixture Verification', () {
-    test('connectivity_plus fixture exists', () {
-      final file = File(
-        'example_packages/lib/connectivity_plus/connectivity_plus_fixture.dart',
-      );
-      expect(
-        file.existsSync(),
-        isTrue,
-        reason: 'fixture file must exist at expected path',
-      );
+    final fixtureDir = Directory('example_packages/lib/connectivity_plus');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/connectivity_plus/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 }

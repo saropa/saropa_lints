@@ -4,6 +4,7 @@ import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/widget/widget_layout_constraints_rules.dart';
 import 'package:saropa_lints/src/rules/widget/widget_layout_flex_scroll_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 73 widget layout lint rules.
 ///
@@ -487,68 +488,18 @@ void main() {
   });
 
   group('Widget Layout Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_absorb_pointer_misuse',
-      'avoid_border_all',
-      'avoid_deep_widget_nesting',
-      'avoid_deeply_nested_widgets',
-      'avoid_expanded_as_spacer',
-      'avoid_fixed_dimensions',
-      'avoid_flexible_outside_flex',
-      'avoid_gesture_detector_in_scrollview',
-      'avoid_hardcoded_layout_values',
-      'avoid_layout_builder_in_scrollable',
-      'avoid_layout_builder_misuse',
-      'avoid_listview_without_item_extent',
-      'avoid_misnamed_padding',
-      'avoid_nested_scaffolds',
-      'avoid_nested_scrollables',
-      'avoid_opacity_misuse',
-      'avoid_repaint_boundary_misuse',
-      'avoid_shrink_wrap_in_lists',
-      'avoid_shrink_wrap_in_scroll',
-      'avoid_singlechildscrollview_with_column',
-      'avoid_sized_box_expand',
-      'avoid_unconstrained_box_misuse',
-      'avoid_unconstrained_images',
-      'avoid_wrapping_in_padding',
-      'check_for_equals_in_render_object_setters',
-      'consistent_update_render_object',
-      'prefer_clip_behavior',
-      'prefer_const_border_radius',
-      'prefer_const_widgets_in_lists',
-      'prefer_correct_edge_insets_constructor',
-      'prefer_custom_single_child_layout',
-      'prefer_find_child_index_callback',
-      'prefer_flex_for_complex_layout',
-      'prefer_fractional_sizing',
-      'prefer_layout_builder_for_constraints',
-      'prefer_ignore_pointer',
-      'prefer_intrinsic_dimensions',
-      'prefer_keep_alive',
-      'prefer_listview_builder',
-      'prefer_opacity_widget',
-      'prefer_page_storage_key',
-      'prefer_positioned_directional',
-      'prefer_safe_area_aware',
-      'prefer_sized_box_for_whitespace',
-      'prefer_sliver_app_bar',
-      'prefer_sliver_list',
-      'prefer_sliver_list_delegate',
-      'prefer_sliver_prefix',
-      'prefer_spacing_over_sizedbox',
-      'prefer_transform_over_container',
-      'prefer_using_list_view',
-      'prefer_wrap_over_overflow',
-      'require_overflow_box_rationale',
-      'require_physics_for_nested_scroll',
-      'require_scroll_controller',
-      'require_scroll_physics',
-    ];
+    final fixtureDir = Directory('example/lib/widget_layout');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/widget_layout/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

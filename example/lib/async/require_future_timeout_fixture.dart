@@ -108,12 +108,14 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 dynamic result;
 
 // BAD: Should trigger require_future_timeout
+// The rule matches long-running method names (download/fetch/load/...), so the
+// awaited call must be named one of them, not `expensiveOperation`.
 // expect_lint: require_future_timeout
 void _bad108() async {
-  final result = await expensiveOperation();
+  final result = await download();
 }
 
 // GOOD: Should NOT trigger require_future_timeout
 void _good108() async {
-  final result = await expensiveOperation().timeout(Duration(seconds: 30));
+  final result = await download().timeout(Duration(seconds: 30));
 }

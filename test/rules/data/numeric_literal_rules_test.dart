@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/data/numeric_literal_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 11 Numeric Literal lint rules.
 ///
@@ -79,25 +80,20 @@ void main() {
   });
 
   group('Numeric Literal Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_inconsistent_digit_separators',
-      'avoid_unnecessary_digit_separators',
-      'double_literal_format',
-      'no_magic_number',
-      'no_magic_string',
-      'prefer_addition_subtraction_assignments',
-      'prefer_compound_assignment_operators',
-      'prefer_digit_separators',
-      'avoid_digit_separators',
-      'no_magic_number_in_tests',
-      'no_magic_string_in_tests',
-    ];
+    final fixtureDir = Directory('example/lib/numeric_literal');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example/lib/numeric_literal/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

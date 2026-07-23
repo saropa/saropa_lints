@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/workmanager_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 WorkManager lint rules.
 ///
@@ -39,17 +40,20 @@ void main() {
   });
 
   group('WorkManager Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_workmanager_constraints',
-      'require_workmanager_result_return',
-      'require_workmanager_for_background',
-    ];
+    final fixtureDir = Directory('example_packages/lib/workmanager');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/workmanager/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/security/permission_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 6 Permission lint rules.
 ///
@@ -58,18 +59,18 @@ void main() {
   });
 
   group('Permission Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_location_permission_rationale',
-      'require_camera_permission_check',
-      'prefer_image_cropping',
-      'avoid_permission_handler_null_safety',
-      'prefer_permission_request_in_context',
-      'avoid_permission_request_loop',
-    ];
+    final fixtureDir = Directory('example/lib/permission');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/permission/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

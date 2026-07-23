@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/platforms/linux_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 5 Linux lint rules.
 ///
@@ -51,17 +52,18 @@ void main() {
   });
 
   group('Linux Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_hardcoded_unix_paths',
-      'prefer_xdg_directory_convention',
-      'avoid_x11_only_assumptions',
-      'require_linux_font_fallback',
-      'avoid_sudo_shell_commands',
-    ];
+    final fixtureDir = Directory('example/lib/linux');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/linux/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

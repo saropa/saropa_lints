@@ -125,6 +125,8 @@
     "src/test/violationsReader.test.ts",
     "src/test/violationsReaderFilter.test.ts",
     "src/test/healthScore.test.ts",
+    "src/dailySummary.ts",
+    "src/test/dailySummary.test.ts",
     "src/configWriter.ts",
     "src/test/configWriterDisabledRules.test.ts",
     "src/views/fileRiskTree.ts",

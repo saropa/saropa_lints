@@ -266,7 +266,7 @@ class _NavigationContextVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when different page route transition types are mixed in the same app.
 ///
-/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v4
+/// Since: v1.6.0 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Alias: consistent_transitions, mixed_page_routes, page_transition_theme
 ///
@@ -311,7 +311,7 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_route_transition_consistency',
-    '[require_route_transition_consistency] Multiple route transition types (MaterialPageRoute, CupertinoPageRoute, PageRouteBuilder) are mixed in the same file. Mixing slide, fade, and zoom transitions within a single app produces a jarring, unprofessional navigation experience that disorients users and undermines perceived app quality. {v4}',
+    '[require_route_transition_consistency] Multiple route transition types (MaterialPageRoute, CupertinoPageRoute, PageRouteBuilder) are mixed in the same file. Mixing slide, fade, and zoom transitions within a single app produces a jarring, unprofessional navigation experience that disorients users and undermines perceived app quality. {v5}',
     correctionMessage:
         'Define a unified transition strategy in ThemeData.pageTransitionsTheme and use a single route type throughout the app to ensure all page transitions are visually consistent.',
     severity: DiagnosticSeverity.INFO,
@@ -331,34 +331,44 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Track route types found in this file
-    final Set<String> foundRouteTypes = <String>{};
-    final List<AstNode> routeNodes = <AstNode>[];
+    // Inconsistency can only be judged once every route construction in the
+    // file has been seen (the "first" type is whatever appears first). The v4
+    // addPostRunCallback that deferred this is a no-op on the native engine, so
+    // collect in one compilation-unit pass and report at its end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _RouteTypeVisitor visitor = _RouteTypeVisitor(_routeTypes);
+      unit.accept(visitor);
 
-    context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String? typeName = node.constructorName.type.element?.name;
-      if (typeName != null && _routeTypes.contains(typeName)) {
-        foundRouteTypes.add(typeName);
-        routeNodes.add(node);
-      }
-    });
+      if (visitor.foundRouteTypes.length <= 1) return;
 
-    // After visiting all nodes, check for inconsistency
-    context.addPostRunCallback(() {
-      // If multiple different route types are used, flag them
-      if (foundRouteTypes.length > 1) {
-        // Report on all route usages except the first type found
-        final String firstType = foundRouteTypes.first;
-        for (final AstNode node in routeNodes) {
-          if (node is InstanceCreationExpression) {
-            final String? typeName = node.constructorName.type.element?.name;
-            if (typeName != firstType) {
-              reporter.atNode(node.constructorName, code);
-            }
-          }
+      // Report every route usage whose type differs from the first found.
+      final String firstType = visitor.foundRouteTypes.first;
+      for (final InstanceCreationExpression node in visitor.routeNodes) {
+        if (node.constructorName.type.element?.name != firstType) {
+          reporter.atNode(node.constructorName, code);
         }
       }
     });
+  }
+}
+
+/// Collects route-construction nodes and the distinct route types used.
+class _RouteTypeVisitor extends RecursiveAstVisitor<void> {
+  _RouteTypeVisitor(this._routeTypes);
+
+  final Set<String> _routeTypes;
+  final Set<String> foundRouteTypes = <String>{};
+  final List<InstanceCreationExpression> routeNodes =
+      <InstanceCreationExpression>[];
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String? typeName = node.constructorName.type.element?.name;
+    if (typeName != null && _routeTypes.contains(typeName)) {
+      foundRouteTypes.add(typeName);
+      routeNodes.add(node);
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }
 
@@ -828,7 +838,7 @@ class _ResultUsageVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when persistent UI elements aren't using ShellRoute.
 ///
-/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v2
+/// Since: v1.7.2 | Updated: v4.13.0 | Rule version: v3
 ///
 /// Bottom navigation bars, sidebars, and other persistent UI should
 /// use ShellRoute to avoid rebuilding on navigation.
@@ -889,7 +899,7 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_shell_route_for_persistent_ui',
-    '[prefer_shell_route_for_persistent_ui] Multiple GoRoute builders duplicate the same bottomNavigationBar, drawer, or NavigationRail instead of sharing a single wrapper. Each route rebuilds the persistent UI independently, causing duplicated code, inconsistent selection state across tabs, visual flicker during navigation, and increased memory usage from redundant widget trees. {v2}',
+    '[prefer_shell_route_for_persistent_ui] Multiple GoRoute builders duplicate the same bottomNavigationBar, drawer, or NavigationRail instead of sharing a single wrapper. Each route rebuilds the persistent UI independently, causing duplicated code, inconsistent selection state across tabs, visual flicker during navigation, and increased memory usage from redundant widget trees. {v3}',
     correctionMessage:
         'Wrap related routes in a ShellRoute to share persistent UI elements like bottomNavigationBar or drawer. This ensures consistent UI state, reduces code duplication, and improves navigation reliability across your app.',
     severity: DiagnosticSeverity.INFO,
@@ -900,15 +910,35 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Track routes with bottomNavigationBar/drawer
-    final List<InstanceCreationExpression> routesWithPersistentUi =
-        <InstanceCreationExpression>[];
+    // The suggestion only fires when 2+ routes each duplicate persistent UI, so
+    // the whole file must be scanned before reporting. The v4 addPostRunCallback
+    // that deferred this is a no-op on the native engine, so collect in one
+    // compilation-unit pass and report at its end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _PersistentUiRouteVisitor visitor = _PersistentUiRouteVisitor();
+      unit.accept(visitor);
 
-    context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String? typeName = node.constructorName.type.element?.name;
-      if (typeName != 'GoRoute') return;
+      // Only worth suggesting a ShellRoute once the duplication exists.
+      if (visitor.routesWithPersistentUi.length > 1) {
+        for (final InstanceCreationExpression node
+            in visitor.routesWithPersistentUi) {
+          reporter.atNode(node.constructorName, code);
+        }
+      }
+    });
+  }
+}
 
-      // Check if builder has Scaffold with bottomNavigationBar
+/// Collects GoRoute constructions whose builder embeds persistent UI.
+class _PersistentUiRouteVisitor extends RecursiveAstVisitor<void> {
+  final List<InstanceCreationExpression> routesWithPersistentUi =
+      <InstanceCreationExpression>[];
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    if (node.constructorName.type.element?.name == 'GoRoute') {
+      // A GoRoute whose builder embeds a nav bar / drawer / rail is duplicating
+      // persistent UI that a ShellRoute could share.
       for (final Expression arg in node.argumentList.arguments) {
         if (arg is NamedExpression && arg.name.label.name == 'builder') {
           final String builderSource = arg.expression.toSource();
@@ -919,16 +949,8 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
           }
         }
       }
-    });
-
-    context.addPostRunCallback(() {
-      // If multiple routes have persistent UI, suggest ShellRoute
-      if (routesWithPersistentUi.length > 1) {
-        for (final InstanceCreationExpression node in routesWithPersistentUi) {
-          reporter.atNode(node.constructorName, code);
-        }
-      }
-    });
+    }
+    super.visitInstanceCreationExpression(node);
   }
 }
 

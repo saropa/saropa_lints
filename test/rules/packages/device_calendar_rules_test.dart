@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/device_calendar_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 7 device_calendar lint rules.
 ///
@@ -57,21 +58,20 @@ void main() {
   });
 
   group('DeviceCalendar Rules - Fixture Verification', () {
-    final fixtures = [
-      'device_calendar_missing_permission_check',
-      'device_calendar_unchecked_result',
-      'device_calendar_retrieve_events_empty_params',
-      'device_calendar_retrieve_events_missing_end_date',
-      'device_calendar_event_missing_calendar_id',
-      'device_calendar_event_utc_timezone',
-      'device_calendar_result_data_before_success_check',
-    ];
+    final fixtureDir = Directory('example_packages/lib/device_calendar');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/device_calendar/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

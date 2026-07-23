@@ -115,6 +115,11 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'device_calendar_unchecked_result',
     'require_calendar_timezone_handling',
   },
+  'device_calendar_plus': {
+    'device_calendar_plus_all_day_event_utc_conversion',
+    'device_calendar_plus_empty_update_event',
+    'device_calendar_plus_missing_permission_check',
+  },
   'dio': {
     'avoid_dio_debug_print_production',
     'avoid_dio_form_data_leak',
@@ -165,6 +170,7 @@ const Map<String, Set<String>> kRulePackRuleCodesGenerated = {
     'require_drift_reads_from',
     'require_drift_schema_version_bump',
     'require_drift_stream_cancel',
+    'require_named_for_acronym_drift_columns',
   },
   'envied': {'require_envied_obfuscation'},
   'equatable': {
@@ -629,6 +635,7 @@ const Map<String, Set<String>> kRulePackPubspecMarkersGenerated = {
   'connectivity_plus': {'connectivity_plus'},
   'connectivity_plus_6': {'connectivity_plus'},
   'device_calendar': {'device_calendar'},
+  'device_calendar_plus': {'device_calendar_plus'},
   'dio': {'dio'},
   'dio_5': {'dio'},
   'drift': {'drift', 'drift_dev'},
@@ -1431,6 +1438,7 @@ const Map<String, Set<String>> kRuleThemePackCodesGenerated = {
   },
   'layout': {
     'avoid_absorb_pointer_misuse',
+    'avoid_animated_size_in_wrap',
     'avoid_border_all',
     'avoid_builder_index_out_of_bounds',
     'avoid_deep_widget_nesting',
@@ -1940,7 +1948,6 @@ const Map<String, Set<String>> kRuleThemePackCodesGenerated = {
     'avoid_catch_all',
     'avoid_catch_exception_alone',
     'avoid_clipboard_sensitive',
-    'avoid_debug_print',
     'avoid_dynamic_code_loading',
     'avoid_dynamic_sql',
     'avoid_encryption_key_in_memory',

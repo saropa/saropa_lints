@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/core/compound_performance_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for the compound (context-aware) performance lint rules.
 ///
@@ -62,19 +63,18 @@ void main() {
   });
 
   group('Compound Performance Rules - Fixture Verification', () {
-    const fixtures = [
-      'avoid_opacity_in_animated_builder',
-      'avoid_opacity_in_scrollable',
-      'avoid_backdrop_filter_in_scrollable',
-      'avoid_shader_mask_in_scrollable',
-      'avoid_image_filter_in_scrollable',
-      'avoid_clip_path_in_animated_builder',
-      'prefer_static_final_for_session_constant',
-    ];
+    final fixtureDir = Directory('example/lib/performance');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/performance/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

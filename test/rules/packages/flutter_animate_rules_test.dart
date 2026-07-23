@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/flutter_animate_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Instantiation-pin tests for the 6 flutter_animate lint rules.
 ///
@@ -62,15 +63,22 @@ void main() {
   });
 
   group('FlutterAnimate Rules - Fixture Verification', () {
-    test('flutter_animate_fixture.dart exists', () {
-      final file = File(
-        'example_packages/lib/flutter_animate/flutter_animate_fixture.dart',
-      );
-      expect(
-        file.existsSync(),
-        isTrue,
-        reason: 'Fixture file must exist at expected path',
-      );
+    final fixtureDir = Directory('example_packages/lib/flutter_animate');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/flutter_animate/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 }

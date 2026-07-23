@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/flow/control_flow_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 31 Control Flow lint rules.
 ///
@@ -177,43 +178,18 @@ void main() {
   });
 
   group('Control Flow Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_assignments_as_conditions',
-      'avoid_collapsible_if',
-      'avoid_conditions_with_boolean_literals',
-      'avoid_constant_assert_conditions',
-      'avoid_constant_switches',
-      'avoid_double_and_int_checks',
-      'prefer_no_continue_statement',
-      'avoid_duplicate_switch_case_conditions',
-      'avoid_if_with_many_branches',
-      'avoid_inverted_boolean_checks',
-      'avoid_negated_conditions',
-      'avoid_nested_assignments',
-      'avoid_nested_conditional_expressions',
-      'avoid_nested_switches',
-      'avoid_nested_switch_expressions',
-      'avoid_nested_try',
-      'avoid_redundant_else',
-      'avoid_unconditional_break',
-      'avoid_unnecessary_conditionals',
-      'avoid_unnecessary_continue',
-      'avoid_unnecessary_if',
-      'no_equal_conditions',
-      'no_equal_then_else',
-      'prefer_conditional_expressions',
-      'prefer_correct_switch_length',
-      'prefer_returning_conditionals',
-      'prefer_returning_condition',
-      'prefer_when_guard_over_if',
-      'prefer_simpler_boolean_expressions',
-      'prefer_if_elements_to_conditional_expressions',
-      'prefer_null_aware_method_calls',
-    ];
+    final fixtureDir = Directory('example/lib/control_flow');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/control_flow/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

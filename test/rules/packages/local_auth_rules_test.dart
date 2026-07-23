@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/local_auth_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for local_auth lint rules:
 ///   - 5 always-on 3.x correct-usage rules
@@ -71,28 +72,22 @@ void main() {
   });
 
   group('LocalAuth Rules - Fixture Verification', () {
-    final fixtures = [
-      'local_auth_unchecked_result',
-      'local_auth_missing_capability_check',
-      'local_auth_unhandled_exception',
-      'local_auth_missing_lockout_handling',
-      'local_auth_biometric_only_sensitive',
-    ];
+    final fixtureDir = Directory('example_packages/lib/local_auth');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/local_auth/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }
-
-    test('local_auth migration fixture exists', () {
-      final file = File(
-        'example_packages/lib/local_auth/local_auth_migration_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
   });
 }

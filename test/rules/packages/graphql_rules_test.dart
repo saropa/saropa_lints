@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/graphql_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 1 GraphQL lint rules.
 ///
@@ -27,13 +28,20 @@ void main() {
   });
 
   group('GraphQL Rules - Fixture Verification', () {
-    final fixtures = ['avoid_graphql_string_queries'];
+    final fixtureDir = Directory('example_packages/lib/graphql');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/graphql/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

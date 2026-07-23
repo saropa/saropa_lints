@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/stylistic/stylistic_error_testing_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 13 Stylistic Error Testing lint rules.
 ///
@@ -99,24 +100,20 @@ void main() {
   });
 
   group('Stylistic Error Testing Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_specific_exceptions',
-      'prefer_exception_suffix',
-      'prefer_error_suffix',
-      'prefer_catch_over_on',
-      'prefer_given_when_then_comments',
-      'prefer_self_documenting_tests',
-      'prefer_single_expectation_per_test',
-      'prefer_grouped_expectations',
-      'prefer_test_name_should_when',
-      'prefer_test_name_descriptive',
-    ];
+    final fixtureDir = Directory('example/lib/stylistic_error_testing');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example/lib/stylistic_error_testing/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

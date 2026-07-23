@@ -106,9 +106,9 @@
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
 // BAD: Should trigger prefer_commenting_future_delayed
+// expect_lint: prefer_commenting_future_delayed
 Future<void> _bad95() async {
-  // expect_lint: prefer_commenting_future_delayed
-  await Future.delayed(Duration(seconds: 1)); // no explanation
+  await Future.delayed(Duration(seconds: 1));
 }
 
 // GOOD: Should NOT trigger prefer_commenting_future_delayed

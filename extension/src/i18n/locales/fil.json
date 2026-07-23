@@ -257,6 +257,11 @@
       "reexportTitle": "Re-exported  ⁇  bahagi ng library na ito's public API",
       "reexportBadge": "muling pag-export ng re-eksport."
     },
+    "opportunities": {
+      "header": "Mga Oportunidad ({count})",
+      "viewCode": "Tingnan ang code ng view.",
+      "viewDocs": "Tingnan ang mga dokumento ng View docs."
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇  ang repository ay read-only.",
       "knownIssue": "Kilalang Isyu: {reason}",
@@ -1297,6 +1302,11 @@
         "label": "ang mga suspek na saklaw ng ulat.",
         "evidence": "{pct}% na walang pagsubok.",
         "rule": "Flagged kapag LCOV ulat mataas na saklaw ngunit walang pagsubok ay tumutukoy sa function."
+      },
+      "fresh_code": {
+        "label": "bagong code",
+        "evidence": "CC {cc}, kamakailang muling isinulat",
+        "rule": "Na-flag kapag ang cyclomatic complexity ay lumampas sa 10 at ang function body ay isinulat o muling isinulat sa loob ng huling 90 araw. Ang kamakailang muling isinulat na kumplikadong code ay nagdulot ng mga insidente nang mas madalas kaysa sa lumang code sa pagpapatunay."
       }
     },
     "shortcuts": {

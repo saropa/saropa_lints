@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/resources/file_handling_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 15 File Handling lint rules.
 ///
@@ -111,27 +112,18 @@ void main() {
   });
 
   group('File Handling Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_file_exists_check',
-      'require_pdf_error_handling',
-      'require_graphql_error_handling',
-      'require_sqflite_whereargs',
-      'require_sqflite_transaction',
-      'require_sqflite_error_handling',
-      'prefer_sqflite_batch',
-      'require_sqflite_close',
-      'avoid_sqflite_reserved_words',
-      'avoid_sqflite_read_all_columns',
-      'avoid_loading_full_pdf_in_memory',
-      'prefer_sqflite_singleton',
-      'prefer_sqflite_column_constants',
-      'prefer_streaming_for_large_files',
-      'require_file_path_sanitization',
-    ];
+    final fixtureDir = Directory('example/lib/file_handling');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/file_handling/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

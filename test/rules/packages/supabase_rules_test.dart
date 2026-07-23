@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/supabase_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 Supabase lint rules.
 ///
@@ -39,17 +40,20 @@ void main() {
   });
 
   group('Supabase Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_supabase_error_handling',
-      'avoid_supabase_anon_key_in_code',
-      'require_supabase_realtime_unsubscribe',
-    ];
+    final fixtureDir = Directory('example_packages/lib/supabase');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/supabase/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

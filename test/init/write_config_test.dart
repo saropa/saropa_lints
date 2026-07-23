@@ -74,7 +74,7 @@ plugins:
       enabled:
         - drift
     diagnostics:
-      avoid_debug_print: true
+      avoid_unguarded_debug: true
 ''');
 
           final result = runWriteConfig(
@@ -110,7 +110,7 @@ plugins:
         - "riverpod"
         - drift # db
     diagnostics:
-      avoid_debug_print: true
+      avoid_unguarded_debug: true
 ''');
 
           final before = outputFile.readAsStringSync();

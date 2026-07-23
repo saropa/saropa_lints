@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/cached_network_image_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 cached_network_image lint rules (provider-form + inline manager).
 ///
@@ -37,17 +38,20 @@ void main() {
   });
 
   group('CachedNetworkImage Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_cached_image_provider_dimensions',
-      'require_cached_image_provider_error_listener',
-      'avoid_inline_cache_manager_construction',
-    ];
+    final fixtureDir = Directory('example_packages/lib/cached_network_image');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/cached_network_image/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/testing/debug_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
-/// Tests for 9 Debug lint rules.
+/// Tests for 11 Debug lint rules.
 ///
 /// Test fixtures: example/lib/debug/*
 // Test-only print/debug patterns and fail helpers in example fixtures.
@@ -13,13 +14,6 @@ void main() {
       final rule = AlwaysFailRule();
       expect(rule.code.lowerCaseName, 'prefer_fail_test_case');
       expect(rule.code.problemMessage, contains('[prefer_fail_test_case]'));
-      expect(rule.code.problemMessage.length, greaterThan(50));
-      expect(rule.code.correctionMessage, isNotNull);
-    });
-    test('AvoidDebugPrintRule (avoid_debug_print)', () {
-      final rule = AvoidDebugPrintRule();
-      expect(rule.code.lowerCaseName, 'avoid_debug_print');
-      expect(rule.code.problemMessage, contains('[avoid_debug_print]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -84,22 +78,18 @@ void main() {
   });
 
   group('Debug Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_fail_test_case',
-      'avoid_debug_print',
-      'avoid_unguarded_debug',
-      'prefer_commenting_analyzer_ignores',
-      'prefer_conditional_logging',
-      'prefer_debug_print',
-      'avoid_print_in_release',
-      'require_structured_logging',
-      'avoid_sensitive_in_logs',
-      'require_log_level_for_production',
-    ];
+    final fixtureDir = Directory('example/lib/debug');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/debug/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

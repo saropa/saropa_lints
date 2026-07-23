@@ -86,10 +86,23 @@ Future<ResolvedUsage?> collectResolvedUsage({
   final pathContext = provider.pathContext;
   final absRoot = pathContext.normalize(Directory(projectPath).absolute.path);
 
-  // One shared collection over the project root; every target file resolves
-  // through it so cross-file references share canonical Element instances.
+  // Scope to concrete package directories (lib/, test/, bin/) instead of
+  // the project root. A root-level includedPaths discovers nested package
+  // roots (example/, self_check/, build/test_tmp/…) and splits the
+  // collection into multiple analysis contexts — contextFor() then fails
+  // for lib/ files, silently degrading every function to name-based
+  // counting and reintroducing the false positives this pass exists to fix.
+  // Using the actual package dirs means the analyzer finds only the root
+  // pubspec.yaml and creates one context that resolves every target file.
+  final packageDirs = <String>[
+    for (final dir in const <String>['lib', 'test', 'bin'])
+      pathContext.join(absRoot, dir),
+  ].where((d) => Directory(d).existsSync()).toList();
+  // Fallback: if none of the standard dirs exist, use the root (the caller
+  // likely has a non-standard layout — degrade-safe catches the rest).
+  if (packageDirs.isEmpty) packageDirs.add(absRoot);
   final collection = AnalysisContextCollection(
-    includedPaths: <String>[absRoot],
+    includedPaths: packageDirs,
     resourceProvider: provider,
   );
   try {

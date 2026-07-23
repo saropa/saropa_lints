@@ -2485,7 +2485,7 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
 
 /// Warns when Riverpod providers reference each other in a cycle.
 ///
-/// Since: v4.13.0 | Rule version: v1
+/// Since: v4.13.0 | Rule version: v2
 ///
 /// Circular dependencies between providers cause runtime errors or infinite
 /// loops. Analyze your dependency graph to break cycles.
@@ -2531,7 +2531,7 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_circular_provider_deps',
-    '[avoid_circular_provider_deps] Circular dependencies between providers cause stack overflows, infinite loops, and unpredictable initialization order. This leads to runtime crashes, hard-to-debug errors, and broken state management. If not fixed, your app may crash or behave unpredictably in production. Always design provider graphs to be acyclic for reliability and maintainability. {v1}',
+    '[avoid_circular_provider_deps] Circular dependencies between providers cause stack overflows, infinite loops, and unpredictable initialization order. This leads to runtime crashes, hard-to-debug errors, and broken state management. If not fixed, your app may crash or behave unpredictably in production. Always design provider graphs to be acyclic for reliability and maintainability. {v2}',
     correctionMessage:
         'Analyze the provider dependency graph and break cycles by extracting shared logic, refactoring providers, or using ref.read in callbacks instead of ref.watch. Ensure no provider directly or indirectly depends on itself. Use tools or diagrams to visualize dependencies if needed.',
     severity: DiagnosticSeverity.ERROR,
@@ -2542,37 +2542,21 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Track provider definitions and their dependencies
-    final Map<String, Set<String>> providerDeps = <String, Set<String>>{};
-    final Map<String, AstNode> providerNodes = <String, AstNode>{};
+    // Cycle detection needs the whole provider graph before it can report:
+    // provider B may be declared before the provider A it depends on. The v4
+    // addPostRunCallback that used to run the check after collection is a no-op
+    // on the native engine, so build the graph in one compilation-unit pass and
+    // report at its end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final Map<String, Set<String>> providerDeps = <String, Set<String>>{};
+      final Map<String, AstNode> providerNodes = <String, AstNode>{};
 
-    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
-      for (final VariableDeclaration variable in node.variables.variables) {
-        final String providerName = variable.name.lexeme;
-        final Expression? initializer = variable.initializer;
-
-        if (initializer == null) continue;
-
-        // Check if this is a provider
-        final String initSource = initializer.toSource();
-        if (!initSource.contains('Provider') &&
-            !initSource.contains('Notifier')) {
-          continue;
-        }
-
-        providerNodes[providerName] = variable;
-        providerDeps[providerName] = <String>{};
-
-        // Find ref.watch and ref.read calls to identify dependencies
-        final _ProviderDepVisitor depVisitor = _ProviderDepVisitor();
-        initializer.visitChildren(depVisitor);
-
-        providerDeps[providerName]?.addAll(depVisitor.dependencies);
+      for (final CompilationUnitMember member in unit.declarations) {
+        if (member is! TopLevelVariableDeclaration) continue;
+        _collectProvider(member, providerDeps, providerNodes);
       }
-    });
 
-    context.addPostRunCallback(() {
-      // Check for circular dependencies
+      // Check for circular dependencies once the full graph is known.
       for (final String provider in providerDeps.keys) {
         final Set<String> visited = <String>{};
         if (_hasCircularDep(provider, provider, providerDeps, visited)) {
@@ -2583,6 +2567,36 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// Records each provider variable in [node] and the providers it watches.
+  void _collectProvider(
+    TopLevelVariableDeclaration node,
+    Map<String, Set<String>> providerDeps,
+    Map<String, AstNode> providerNodes,
+  ) {
+    for (final VariableDeclaration variable in node.variables.variables) {
+      final String providerName = variable.name.lexeme;
+      final Expression? initializer = variable.initializer;
+
+      if (initializer == null) continue;
+
+      // Only track providers/notifiers; other top-level vars are irrelevant.
+      final String initSource = initializer.toSource();
+      if (!initSource.contains('Provider') &&
+          !initSource.contains('Notifier')) {
+        continue;
+      }
+
+      providerNodes[providerName] = variable;
+      providerDeps[providerName] = <String>{};
+
+      // Find ref.watch and ref.read calls to identify dependencies.
+      final _ProviderDepVisitor depVisitor = _ProviderDepVisitor();
+      initializer.visitChildren(depVisitor);
+
+      providerDeps[providerName]?.addAll(depVisitor.dependencies);
+    }
   }
 
   bool _hasCircularDep(
@@ -2730,7 +2744,7 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
 
 /// Warns when StateProvider is used instead of StateNotifierProvider/Notifier.
 ///
-/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v2
+/// Since: v4.9.0 | Updated: v4.13.0 | Rule version: v3
 ///
 /// StateProvider is fine for simple state but Notifier provides:
 /// - Encapsulated business logic
@@ -2777,7 +2791,7 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_notifier_over_state',
-    '[prefer_notifier_over_state] StateProvider exposes raw state to uncontrolled mutation. StateProvider is fine for simple state but Notifier provides: - Encapsulated business logic - Methods instead of raw state mutation - Better testability. {v2}',
+    '[prefer_notifier_over_state] StateProvider exposes raw state to uncontrolled mutation. StateProvider is fine for simple state but Notifier provides: - Encapsulated business logic - Methods instead of raw state mutation - Better testability. {v3}',
     correctionMessage:
         'Use NotifierProvider for encapsulated business logic and testability. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,
@@ -2790,52 +2804,98 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Track StateProvider usages
-    final Map<String, int> stateProviderMutations = <String, int>{};
-    final Map<String, AstNode> stateProviderDecls = <String, AstNode>{};
+    // Counting a StateProvider's mutation sites requires every `.notifier.state`
+    // assignment in the file, which may textually precede or follow the provider
+    // declaration. The v4 addPostRunCallback that tallied this after collection
+    // is a no-op on the native engine, so gather declarations and mutations in
+    // one compilation-unit pass and report at its end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _StateProviderVisitor visitor = _StateProviderVisitor(
+        _notifierStatePattern,
+      );
+      unit.accept(visitor);
 
-    context.addTopLevelVariableDeclaration((TopLevelVariableDeclaration node) {
-      for (final VariableDeclaration variable in node.variables.variables) {
-        final Expression? initializer = variable.initializer;
-        if (initializer == null) continue;
-
-        final String initSource = initializer.toSource();
-        if (initSource.contains('StateProvider')) {
-          final String name = variable.name.lexeme;
-          stateProviderMutations[name] = 0;
-          stateProviderDecls[name] = variable;
+      // Report StateProviders whose state is mutated at 3+ sites.
+      visitor.stateProviderDecls.forEach((String name, AstNode decl) {
+        final int mutations = visitor.mutationSources
+            .where(
+              (String source) =>
+                  RegExp(r'\b' + RegExp.escape(name) + r'\b').hasMatch(source),
+            )
+            .length;
+        if (mutations >= 3) {
+          reporter.atNode(decl);
         }
-      }
+      });
     });
+  }
+}
 
-    // Count .notifier.state mutations
-    context.addAssignmentExpression((AssignmentExpression node) {
-      final String source = node.leftHandSide.toSource();
-      if (!_notifierStatePattern.hasMatch(source)) return;
-      final Map<String, RegExp> nameRegExps = <String, RegExp>{
-        for (final String n in stateProviderMutations.keys)
-          n: RegExp(r'\b' + RegExp.escape(n) + r'\b'),
-      };
-      for (final MapEntry<String, RegExp> e in nameRegExps.entries) {
-        if (e.value.hasMatch(source)) {
-          stateProviderMutations[e.key] =
-              (stateProviderMutations[e.key] ?? 0) + 1;
-        }
-      }
-    });
+/// Collects StateProvider declarations and `.notifier.state` assignment
+/// sources so mutations can be counted per provider after the full pass.
+class _StateProviderVisitor extends RecursiveAstVisitor<void> {
+  _StateProviderVisitor(this._notifierStatePattern);
 
-    context.addPostRunCallback(() {
-      // Report StateProviders with multiple mutation sites
-      for (final MapEntry<String, int> entry
-          in stateProviderMutations.entries) {
-        if (entry.value >= 3) {
-          final AstNode? decl = stateProviderDecls[entry.key];
-          if (decl != null) {
-            reporter.atNode(decl);
-          }
-        }
+  final RegExp _notifierStatePattern;
+  final Map<String, AstNode> stateProviderDecls = <String, AstNode>{};
+  final List<String> mutationSources = <String>[];
+
+  @override
+  void visitTopLevelVariableDeclaration(TopLevelVariableDeclaration node) {
+    for (final VariableDeclaration variable in node.variables.variables) {
+      final Expression? initializer = variable.initializer;
+      if (initializer == null) continue;
+
+      // Check constructor name directly instead of .toSource().contains()
+      // to avoid false positives on identifiers that happen to contain
+      // 'StateProvider' as a substring.
+      if (_isStateProviderCreation(initializer)) {
+        stateProviderDecls[variable.name.lexeme] = variable;
       }
-    });
+    }
+    super.visitTopLevelVariableDeclaration(node);
+  }
+
+  /// Riverpod factory names that create a StateProvider.
+  /// Unchecked target names (e.g. `StateProvider.somethingElse()`) would
+  /// false-positive; restrict to the known Riverpod API surface.
+  static const _stateProviderFactories = {'autoDispose', 'family'};
+
+  /// True when [expr] is a `StateProvider(...)`,
+  /// `StateProvider.autoDispose(...)`, or `StateProvider.family(...)`.
+  static bool _isStateProviderCreation(Expression expr) {
+    // `StateProvider.autoDispose(...)` / `StateProvider.family(...)` parse as
+    // MethodInvocation with target=StateProvider, methodName=autoDispose|family.
+    if (expr is MethodInvocation) {
+      final target = expr.target;
+      if (target is SimpleIdentifier &&
+          target.name == 'StateProvider' &&
+          _stateProviderFactories.contains(expr.methodName.name)) {
+        return true;
+      }
+    }
+    // `StateProvider(...)` / `StateProvider<int>(...)` — constructor call.
+    if (expr is InstanceCreationExpression) {
+      final name = expr.constructorName.type.name.lexeme;
+      return name == 'StateProvider';
+    }
+    // Defensive: `StateProvider<T>(...)` can parse as a
+    // FunctionExpressionInvocation with a SimpleIdentifier function when
+    // the analyzer can't resolve the type.
+    if (expr is FunctionExpressionInvocation) {
+      final fn = expr.function;
+      if (fn is SimpleIdentifier && fn.name == 'StateProvider') return true;
+    }
+    return false;
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final String source = node.leftHandSide.toSource();
+    if (_notifierStatePattern.hasMatch(source)) {
+      mutationSources.add(source);
+    }
+    super.visitAssignmentExpression(node);
   }
 }
 

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/data/type_safety_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 17 Type Safety lint rules.
 ///
@@ -105,25 +106,12 @@ void main() {
     );
   });
   group('Type Safety Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_unsafe_cast',
-      'prefer_constrained_generics',
-      'require_covariant_documentation',
-      'require_safe_json_parsing',
-      'require_null_safe_extensions',
-      'prefer_specific_numeric_types',
-      'avoid_non_null_assertion',
-      'avoid_type_casts',
-      'require_futureor_documentation',
-      'prefer_explicit_type_arguments',
-      'avoid_unrelated_type_casts',
-      'avoid_dynamic_json_access',
-      'require_null_safe_json_access',
-      'avoid_dynamic_json_chains',
-      'require_enum_unknown_value',
-      'require_validator_return_null',
-      'avoid_redundant_null_check',
-    ];
+    final fixtureDir = Directory('example/lib/type_safety');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

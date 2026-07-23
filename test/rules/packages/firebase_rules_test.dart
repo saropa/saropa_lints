@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/firebase_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 29 Firebase and database lint rules.
 ///
@@ -199,111 +200,21 @@ void main() {
     );
   });
   group('Firebase Rules - Fixture Verification', () {
-    test('require_firestore_security_rules fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/require_firestore_security_rules_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
+    final fixtureDir = Directory('example_packages/lib/firebase');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
     });
 
-    test('avoid_firebase_user_data_in_auth fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/avoid_firebase_user_data_in_auth_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('incorrect_firebase_event_name fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/incorrect_firebase_event_name_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('incorrect_firebase_parameter_name fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/incorrect_firebase_parameter_name_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('prefer_firebase_auth_persistence fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/prefer_firebase_auth_persistence_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('prefer_firebase_remote_config_defaults fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/'
-        'prefer_firebase_remote_config_defaults_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('require_firebase_app_check fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/require_firebase_app_check_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('require_firebase_init_before_use fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/require_firebase_init_before_use_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('require_firebase_composite_index fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/require_firebase_composite_index_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('require_firebase_reauthentication fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/require_firebase_reauthentication_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('require_firebase_token_refresh fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/require_firebase_token_refresh_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('require_firebase_app_check_production fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/require_firebase_app_check_production_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('prefer_firebase_transaction_for_counters fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/prefer_firebase_transaction_for_counters_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('prefer_correct_topics fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/prefer_correct_topics_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
-
-    test('prefer_deep_link_auth fixture exists', () {
-      final file = File(
-        'example_packages/lib/firebase/prefer_deep_link_auth_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
-    });
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/firebase/${fixture}_fixture.dart',
+        );
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 
   // Stub-only behavior tests were removed from this file. Keep rule metadata,

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/core/documentation_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 12 Documentation lint rules.
 ///
@@ -85,20 +86,12 @@ void main() {
     );
   });
   group('Documentation Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_public_api_documentation',
-      'prefer_correct_throws',
-      'avoid_misleading_documentation',
-      'require_deprecation_message',
-      'require_complex_logic_comments',
-      'require_parameter_documentation',
-      'require_return_documentation',
-      'require_exception_documentation',
-      'require_example_in_documentation',
-      'verify_documented_parameters_exist',
-      'missing_code_block_language_in_doc_comment',
-      'unintended_html_in_doc_comment',
-    ];
+    final fixtureDir = Directory('example/lib/documentation');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

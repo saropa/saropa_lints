@@ -270,7 +270,6 @@ plugins:
       avoid_unnecessary_nullable_parameters: true
       avoid_unnecessary_nullable_return_type: true
       avoid_hardcoded_colors: true
-      avoid_debug_print: true
       avoid_unguarded_debug: true
       match_lib_folder_structure: true
       prefer_utc_datetimes: true

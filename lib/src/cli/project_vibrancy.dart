@@ -337,6 +337,15 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
       extendedForUsage[testPath] = tf.readAsStringSync();
     }
   }
+  // bin/ entry points call into lib/ functions; without these in the usage
+  // set, functions whose only caller is a CLI script score 0 references and
+  // are falsely flagged `unused`.
+  for (final binPath in listProjectBinDartPaths(root)) {
+    final bf = File(binPath);
+    if (bf.existsSync()) {
+      extendedForUsage[binPath] = bf.readAsStringSync();
+    }
+  }
   final usageCounts = _computeUsageCounts(
     extendedForUsage,
     declaredFunctions,
@@ -389,7 +398,8 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     final coverageScore = effectiveCoverage == null
         ? 50.0
         : effectiveCoverage * 100.0;
-    final ageScore = _computeAgeScore(fn, blameByFile[fn.filePath]);
+    final medianAgeDays = _medianBlameAgeDays(fn, blameByFile[fn.filePath]);
+    final ageScore = ageScoreFromDays(medianAgeDays);
     final usageCount = _mergeUsageCount(
       id: fn.id,
       nameBased: usageCounts[fn.id] ?? 0,
@@ -443,11 +453,15 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     final flags = <String>[];
     // Entry points (main, @pragma('vm:entry-point'), framework @override
     // lifecycle hooks) are runtime-invoked, not statically called, so a
-    // zero static-caller count is expected for them — never `unused`. The
-    // protection is only available when resolution ran; under the name-based
-    // fallback the flag keeps its prior (count==0) behavior.
+    // zero static-caller count is expected — never `unused`.
+    // Primary path: element-resolved entryPointIds (accurate, from the
+    // analyzer's metadata). Fallback: syntactic @override from the parse
+    // phase, which protects polymorphic methods even when the resolved pass
+    // degrades (context fragmentation, SDK mismatch).
     final isEntryPoint = resolvedUsage?.entryPointIds.contains(fn.id) ?? false;
-    if (usageCount == 0 && !isEntryPoint) flags.add('unused');
+    if (usageCount == 0 && !isEntryPoint && !fn.isOverride) {
+      flags.add('unused');
+    }
     if (rawCoverage != null && rawCoverage == 0) flags.add('uncovered');
     if (stubTested) flags.add('stub_tested');
     if (suspiciousCoverage) flags.add('suspicious_coverage');
@@ -455,6 +469,16 @@ Future<ProjectVibrancyReport> runProjectVibrancy(
     if (fn.complexity > 10) flags.add('complex');
     if (documentationScore < 20 && fn.complexity > 10) {
       flags.add('undocumented');
+    }
+    // Recency-weighted risk flag: complex code whose blame lines are young.
+    // Validated signal (see computeFreshCodeFlag doc): in the flight-risk
+    // corpus, incident functions were young + complex; the elaborate composite
+    // score lost to exactly this pair and stays behind its research gate.
+    if (computeFreshCodeFlag(
+      medianAgeDays: medianAgeDays,
+      complexity: fn.complexity,
+    )) {
+      flags.add('fresh_code');
     }
     // Apply per-file flag suppressions parsed at file-read time. A row whose
     // suppression set covers a flag has that flag dropped — the row still
@@ -840,8 +864,11 @@ Future<Map<String, Map<int, int>>> _collectBlameAges(
   return result;
 }
 
-double _computeAgeScore(_FunctionNode fn, Map<int, int>? blame) {
-  if (blame == null || blame.isEmpty) return 50.0;
+/// Median age in days of the function's blame lines, or null when no blame
+/// data covers the span (no git history, file outside the repo). Shared by
+/// the age score and the fresh_code flag so both read the same signal.
+double? _medianBlameAgeDays(_FunctionNode fn, Map<int, int>? blame) {
+  if (blame == null || blame.isEmpty) return null;
   final epochs = <int>[];
   for (var line = fn.lineStart; line <= fn.lineEnd; line++) {
     final ts = blame[line];
@@ -849,13 +876,11 @@ double _computeAgeScore(_FunctionNode fn, Map<int, int>? blame) {
       epochs.add(ts);
     }
   }
-  if (epochs.isEmpty) return 50.0;
+  if (epochs.isEmpty) return null;
   epochs.sort();
   final medianEpoch = epochs[epochs.length ~/ 2];
-  final days =
-      (DateTime.now().millisecondsSinceEpoch ~/ 1000 - medianEpoch) / 86400.0;
-  final score = 100.0 * (2.718281828459045 * -days / 365.0).clamp(0.0, 1.0);
-  return score.clamp(0.0, 100.0);
+  return (DateTime.now().millisecondsSinceEpoch ~/ 1000 - medianEpoch) /
+      86400.0;
 }
 
 double? _computeCoverage(_FunctionNode fn, Set<int>? hitLines) {
@@ -1054,6 +1079,8 @@ class _FunctionCollector extends RecursiveAstVisitor<void> {
       node: node,
       body: body,
       hasDocComment: node.documentationComment != null,
+      // Top-level functions can't be overrides; skip the metadata scan.
+      isOverride: false,
     );
     super.visitFunctionDeclaration(node);
   }
@@ -1065,6 +1092,7 @@ class _FunctionCollector extends RecursiveAstVisitor<void> {
       node: node,
       body: node.body,
       hasDocComment: node.documentationComment != null,
+      isOverride: _hasOverrideAnnotation(node.metadata),
     );
     super.visitMethodDeclaration(node);
   }
@@ -1074,6 +1102,7 @@ class _FunctionCollector extends RecursiveAstVisitor<void> {
     required AstNode node,
     required FunctionBody body,
     required bool hasDocComment,
+    required bool isOverride,
   }) {
     final start = _lineOf(node.offset);
     final end = _lineOf(node.end);
@@ -1088,6 +1117,7 @@ class _FunctionCollector extends RecursiveAstVisitor<void> {
         lineEnd: end,
         complexity: complexity,
         hasDocComment: hasDocComment,
+        isOverride: isOverride,
       ),
     );
   }
@@ -1099,6 +1129,15 @@ class _FunctionCollector extends RecursiveAstVisitor<void> {
     }
     return line;
   }
+}
+
+/// Syntactic check for `@override` — no element resolution needed. Reliable
+/// because `override` is a language built-in, not a user-defined annotation.
+bool _hasOverrideAnnotation(NodeList<Annotation> metadata) {
+  for (final annotation in metadata) {
+    if (annotation.name.name == 'override') return true;
+  }
+  return false;
 }
 
 class _ComplexityVisitor extends RecursiveAstVisitor<void> {
@@ -1175,6 +1214,7 @@ class _FunctionNode {
     required this.lineEnd,
     required this.complexity,
     required this.hasDocComment,
+    required this.isOverride,
   });
 
   final String id;
@@ -1184,6 +1224,11 @@ class _FunctionNode {
   final int lineEnd;
   final int complexity;
   final bool hasDocComment;
+
+  /// Syntactic `@override` detected in the parse phase (no resolution needed).
+  /// Safety net: protects polymorphic methods from `unused` even when the
+  /// element-resolved pass degrades (context fragmentation, SDK mismatch).
+  final bool isOverride;
 }
 
 class _ReferenceVisitor extends RecursiveAstVisitor<void> {
@@ -1229,7 +1274,9 @@ String _stableHash(String input) {
 /// `_FunctionNode` field, a different complexity formula), so a stale on-disk
 /// parse cache is discarded rather than trusted. Per-file content hashing only
 /// catches *file* changes; this catches *engine* changes.
-const int _parseCacheVersion = 1;
+// Bump when _FunctionNode's serialized shape changes — stale caches are
+// rebuilt on the next run. v2: added isOverride field.
+const int _parseCacheVersion = 2;
 
 /// Per-file parse output, reused across phases and runs: the collected functions
 /// and the per-occurrence reference counts (`name -> times referenced in this
@@ -1382,11 +1429,13 @@ class _ProjectVibrancyCache {
       final end = f['lineEnd'];
       final complexity = f['complexity'];
       final hasDoc = f['hasDocComment'];
+      final isOvr = f['isOverride'];
       if (name is! String ||
           start is! int ||
           end is! int ||
           complexity is! int ||
-          hasDoc is! bool) {
+          hasDoc is! bool ||
+          isOvr is! bool) {
         return null;
       }
       functions.add(
@@ -1398,6 +1447,7 @@ class _ProjectVibrancyCache {
           lineEnd: end,
           complexity: complexity,
           hasDocComment: hasDoc,
+          isOverride: isOvr,
         ),
       );
     }
@@ -1423,6 +1473,7 @@ class _ProjectVibrancyCache {
               'lineEnd': f.lineEnd,
               'complexity': f.complexity,
               'hasDocComment': f.hasDocComment,
+              'isOverride': f.isOverride,
             },
           )
           .toList(growable: false),

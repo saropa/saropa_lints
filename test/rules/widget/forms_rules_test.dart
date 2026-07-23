@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/widget/forms_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 26 Forms lint rules.
 ///
@@ -156,35 +157,12 @@ void main() {
     );
   });
   group('Forms Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_autovalidate_on_interaction',
-      'require_keyboard_type',
-      'require_text_overflow_in_row',
-      'require_secure_keyboard',
-      'require_error_message_context',
-      'require_form_key',
-      'avoid_validation_in_build',
-      'require_submit_button_state',
-      'avoid_form_without_unfocus',
-      'require_form_restoration',
-      'avoid_clearing_form_on_error',
-      'require_form_field_controller',
-      'avoid_form_in_alert_dialog',
-      'require_keyboard_action_type',
-      'require_keyboard_dismiss_on_scroll',
-      'avoid_keyboard_overlap',
-      'require_form_auto_validate_mode',
-      'require_autofill_hints',
-      'prefer_on_field_submitted',
-      'prefer_form_bloc_for_complex',
-      'require_text_input_type',
-      'prefer_text_input_action',
-      'require_form_key_in_stateful_widget',
-      'prefer_regex_validation',
-      'prefer_input_formatters',
-      'require_stepper_state_management',
-      'avoid_form_validation_on_change',
-    ];
+    final fixtureDir = Directory('example/lib/forms');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

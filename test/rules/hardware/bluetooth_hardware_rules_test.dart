@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/hardware/bluetooth_hardware_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 10 Bluetooth Hardware lint rules.
 ///
@@ -81,24 +82,20 @@ void main() {
   });
 
   group('Bluetooth Hardware Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_bluetooth_scan_without_timeout',
-      'require_bluetooth_state_check',
-      'require_ble_disconnect_handling',
-      'require_audio_focus_handling',
-      'require_qr_permission_check',
-      'require_geolocator_permission_check',
-      'require_geolocator_service_enabled',
-      'require_geolocator_stream_cancel',
-      'require_geolocator_error_handling',
-      'prefer_ble_mtu_negotiation',
-    ];
+    final fixtureDir = Directory('example/lib/bluetooth_hardware');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example/lib/bluetooth_hardware/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

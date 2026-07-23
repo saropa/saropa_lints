@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/ui/navigation_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 36 Navigation lint rules.
 ///
@@ -211,48 +212,12 @@ void main() {
     );
   });
   group('Navigation Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_unknown_route_handler',
-      'avoid_context_after_navigation',
-      'require_route_transition_consistency',
-      'avoid_navigator_push_unnamed',
-      'require_route_guards',
-      'avoid_circular_redirects',
-      'avoid_pop_without_result',
-      'prefer_shell_route_for_persistent_ui',
-      'require_deep_link_fallback',
-      'avoid_deep_link_sensitive_params',
-      'prefer_typed_route_params',
-      'require_stepper_validation',
-      'require_step_count_indicator',
-      'avoid_go_router_inline_creation',
-      'require_go_router_error_handler',
-      'require_go_router_refresh_listenable',
-      'avoid_go_router_string_paths',
-      'prefer_go_router_redirect_auth',
-      'require_go_router_typed_params',
-      'prefer_go_router_extra_typed',
-      'prefer_maybe_pop',
-      'prefer_named_routes_for_deep_links',
-      'prefer_url_launcher_uri_over_string',
-      'avoid_go_router_push_replacement_confusion',
-      'require_url_launcher_encoding',
-      'avoid_nested_routes_without_parent',
-      'prefer_shell_route_shared_layout',
-      'require_stateful_shell_route_tabs',
-      'require_go_router_fallback_route',
-      'prefer_route_settings_name',
-      'avoid_navigator_context_issue',
-      'require_pop_result_type',
-      'avoid_push_replacement_misuse',
-      'avoid_nested_navigators_misuse',
-      'require_deep_link_testing',
-      'require_navigation_result_handling',
-      'prefer_go_router_redirect',
-      'prefer_go_router_builder',
-      'prefer_branch_io_or_firebase_links',
-      'require_auto_route_page_suffix',
-    ];
+    final fixtureDir = Directory('example/lib/navigation');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

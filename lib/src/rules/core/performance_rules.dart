@@ -3640,7 +3640,7 @@ class _KeyConsistencyVisitor extends RecursiveAstVisitor<void> {
 
 /// Warns when desktop app lacks menu bar.
 ///
-/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Desktop apps should have a menu bar for keyboard shortcuts and
 /// standard desktop interactions.
@@ -3679,7 +3679,7 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_menu_bar_for_desktop',
-    '[require_menu_bar_for_desktop] Desktop app without PlatformMenuBar lacks standard keyboard shortcuts. Desktop apps must have a menu bar for keyboard shortcuts and standard desktop interactions. {v4}',
+    '[require_menu_bar_for_desktop] Desktop app without PlatformMenuBar lacks standard keyboard shortcuts. Desktop apps must have a menu bar for keyboard shortcuts and standard desktop interactions. {v5}',
     correctionMessage:
         'Add PlatformMenuBar for standard desktop experience. Profile the affected code path to confirm the improvement under realistic workloads.',
     severity: DiagnosticSeverity.INFO,
@@ -3690,39 +3690,57 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    bool hasPlatformMenuBar = false;
-    InstanceCreationExpression? materialApp;
-
-    context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name.lexeme;
-
-      if (typeName == 'PlatformMenuBar' || typeName == 'MenuBar') {
-        hasPlatformMenuBar = true;
-      }
-
-      if (typeName == 'MaterialApp' || typeName == 'CupertinoApp') {
-        materialApp = node;
-      }
-    });
-
-    context.addPostRunCallback(() {
-      // Only report for desktop platforms
+    // This rule aggregates whole-file state (does a MaterialApp/CupertinoApp
+    // exist, and is any menu bar present anywhere in the unit?) before it can
+    // decide to report — a per-node callback cannot know the menu bar is
+    // missing until the whole file has been seen. The v4 addPostRunCallback
+    // that used to gather this is a no-op on the native engine, so aggregate in
+    // a single compilation-unit pass and report at its end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      // Only report for desktop platforms.
       final String path = context.filePath;
-      if (path.contains('_desktop') ||
+      final bool isDesktop =
+          path.contains('_desktop') ||
           path.contains('_macos') ||
           path.contains('_windows') ||
-          path.contains('_linux')) {
-        if (materialApp != null && !hasPlatformMenuBar) {
-          reporter.atNode(materialApp!.constructorName, code);
-        }
+          path.contains('_linux');
+      if (!isDesktop) return;
+
+      final _MenuBarVisitor visitor = _MenuBarVisitor();
+      unit.accept(visitor);
+
+      final InstanceCreationExpression? materialApp = visitor.materialApp;
+      if (materialApp != null && !visitor.hasPlatformMenuBar) {
+        reporter.atNode(materialApp.constructorName, code);
       }
     });
   }
 }
 
+/// Collects whether the unit contains a menu bar and the first app widget.
+class _MenuBarVisitor extends RecursiveAstVisitor<void> {
+  bool hasPlatformMenuBar = false;
+  InstanceCreationExpression? materialApp;
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    final String typeName = node.constructorName.type.name.lexeme;
+
+    if (typeName == 'PlatformMenuBar' || typeName == 'MenuBar') {
+      hasPlatformMenuBar = true;
+    }
+
+    if (typeName == 'MaterialApp' || typeName == 'CupertinoApp') {
+      materialApp ??= node;
+    }
+
+    super.visitInstanceCreationExpression(node);
+  }
+}
+
 /// Warns when desktop app lacks window close confirmation.
 ///
-/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Desktop apps with unsaved data should confirm before closing to
 /// prevent data loss.
@@ -3768,7 +3786,7 @@ class RequireWindowCloseConfirmationRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_window_close_confirmation',
-    '[require_window_close_confirmation] Desktop app should handle window close confirmation. Desktop apps with unsaved data should confirm before closing to prevent data loss. This introduces unnecessary computational overhead that degrades responsiveness and increases battery drain on mobile. {v3}',
+    '[require_window_close_confirmation] Desktop app should handle window close confirmation. Desktop apps with unsaved data should confirm before closing to prevent data loss. This introduces unnecessary computational overhead that degrades responsiveness and increases battery drain on mobile. {v4}',
     correctionMessage:
         'Implement didRequestAppExit for save confirmation. Profile the affected code path to confirm the improvement under realistic workloads.',
     severity: DiagnosticSeverity.INFO,
@@ -3791,30 +3809,45 @@ class RequireWindowCloseConfirmationRule extends SaropaLintRule {
       return;
     }
 
-    bool hasAppExitHandler = false;
-    ClassDeclaration? observerClass;
+    // A WidgetsBindingObserver subclass and its didRequestAppExit override may
+    // appear in either order, and the override can be nested anywhere in the
+    // class body, so the decision needs the whole file. The v4
+    // addPostRunCallback that gathered this is a no-op on the native engine;
+    // aggregate in one compilation-unit pass and report at its end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _WindowCloseVisitor visitor = _WindowCloseVisitor();
+      unit.accept(visitor);
 
-    context.addMethodDeclaration((MethodDeclaration node) {
-      if (node.name.lexeme == 'didRequestAppExit') {
-        hasAppExitHandler = true;
+      final ClassDeclaration? observerClass = visitor.observerClass;
+      if (observerClass != null && !visitor.hasAppExitHandler) {
+        reporter.atNode(observerClass, code);
       }
     });
+  }
+}
 
-    context.addClassDeclaration((ClassDeclaration node) {
-      final ExtendsClause? extendsClause = node.extendsClause;
-      if (extendsClause != null) {
-        final String superName = extendsClause.superclass.name.lexeme;
-        if (superName == 'WidgetsBindingObserver') {
-          observerClass = node;
-        }
-      }
-    });
+/// Collects the WidgetsBindingObserver subclass and whether an app-exit
+/// handler is declared anywhere in the unit.
+class _WindowCloseVisitor extends RecursiveAstVisitor<void> {
+  bool hasAppExitHandler = false;
+  ClassDeclaration? observerClass;
 
-    context.addPostRunCallback(() {
-      if (observerClass != null && !hasAppExitHandler) {
-        reporter.atNode(observerClass!, code);
-      }
-    });
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    if (node.name.lexeme == 'didRequestAppExit') {
+      hasAppExitHandler = true;
+    }
+    super.visitMethodDeclaration(node);
+  }
+
+  @override
+  void visitClassDeclaration(ClassDeclaration node) {
+    final ExtendsClause? extendsClause = node.extendsClause;
+    if (extendsClause != null &&
+        extendsClause.superclass.name.lexeme == 'WidgetsBindingObserver') {
+      observerClass ??= node;
+    }
+    super.visitClassDeclaration(node);
   }
 }
 

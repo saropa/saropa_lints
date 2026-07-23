@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/architecture/dependency_injection_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 15 Dependency Injection lint rules.
 ///
@@ -111,29 +112,20 @@ void main() {
   });
 
   group('Dependency Injection Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_service_locator_in_widgets',
-      'avoid_too_many_dependencies',
-      'avoid_internal_dependency_creation',
-      'prefer_abstract_dependencies',
-      'avoid_singleton_for_scoped_dependencies',
-      'avoid_circular_di_dependencies',
-      'prefer_null_object_pattern',
-      'require_typed_di_registration',
-      'avoid_functions_in_register_singleton',
-      'require_default_config',
-      'prefer_constructor_injection',
-      'require_di_scope_awareness',
-      'avoid_di_in_widgets',
-      'prefer_abstraction_injection',
-      'prefer_lazy_singleton_registration',
-    ];
+    final fixtureDir = Directory('example/lib/dependency_injection');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example/lib/dependency_injection/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

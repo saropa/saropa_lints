@@ -257,6 +257,11 @@
       "reexportTitle": "Ri-esportato  ⁇  parte di questa libreria API pubblica.",
       "reexportBadge": "Ri-esportazione di re-esportazioni."
     },
+    "opportunities": {
+      "header": "Opportunità ({count})",
+      "viewCode": "Visualizza il codice per visualizzare il codice.",
+      "viewDocs": "Visualizza i documenti."
+    },
     "alerts": {
       "archived": "ARCHIVATO  ⁇  il repository è in sola lettura.",
       "knownIssue": "Problema noto: {reason}",
@@ -1297,6 +1302,11 @@
         "label": "copertura sospetta di una rete.",
         "evidence": "{pct}% senza alcun test.",
         "rule": "Segnalato quando LCOV riporta una copertura elevata ma nessun test fa riferimento alla funzione."
+      },
+      "fresh_code": {
+        "label": "codice fresco",
+        "evidence": "CC {cc}, recentemente riscritto",
+        "rule": "Contrassegnato quando la complessità ciclomatica supera 10 e il corpo della funzione è stato scritto o riscritto negli ultimi 90 giorni. Il codice complesso riscritto di recente ha causato incidenti molto più spesso rispetto al vecchio codice in fase di convalida."
       }
     },
     "shortcuts": {

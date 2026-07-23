@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/media/media_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 Media lint rules.
 ///
@@ -45,16 +46,18 @@ void main() {
   });
 
   group('Media Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_autoplay_audio',
-      'avoid_audio_in_background_without_config',
-      'prefer_camera_resolution_selection',
-      'prefer_audio_session_config',
-    ];
+    final fixtureDir = Directory('example/lib/media');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/media/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -257,6 +257,11 @@
       "reexportTitle": "Reexportado  ⁇  parte da API pública desta biblioteca.",
       "reexportBadge": "reexportação de exportação."
     },
+    "opportunities": {
+      "header": "Oportunidades ({count})",
+      "viewCode": "Ver código de visualização",
+      "viewDocs": "Veja os documentos."
+    },
     "alerts": {
       "archived": "ARQUIVADO  ⁇  o repositório é somente leitura.",
       "knownIssue": "Questão conhecida: {reason}",
@@ -1297,6 +1302,11 @@
         "label": "cobertura de suspeita em uma rede.",
         "evidence": "{pct}% sem nenhum teste.",
         "rule": "Marcado quando o LCOV relata alta cobertura, mas nenhum teste faz referência à função."
+      },
+      "fresh_code": {
+        "label": "Código fresco código novo.",
+        "evidence": "CC {cc}, recentemente reescrito.",
+        "rule": "Marcado quando a complexidade ciclomática excede 10 e o corpo da função foi escrito ou reescrito nos últimos 90 dias. Código complexo recentemente reescrito causou incidentes muito mais frequentemente do que o código antigo em validação."
       }
     },
     "shortcuts": {

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/flutter_svg_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Instantiation-pin tests for 5 flutter_svg lint rules.
 ///
@@ -77,12 +78,23 @@ void main() {
   });
 
   group('FlutterSvg Rules - Fixture Verification', () {
-    test('flutter_svg_fixture exists', () {
-      final file = File(
-        'example_packages/lib/flutter_svg/flutter_svg_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
+    final fixtureDir = Directory('example_packages/lib/flutter_svg');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/flutter_svg/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 
   group('FlutterSvg Rules - Metadata', () {

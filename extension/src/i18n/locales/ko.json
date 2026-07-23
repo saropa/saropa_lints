@@ -257,6 +257,11 @@
       "reexportTitle": "재수출된 이 라이브러리의 공개 API의 일부입니다.",
       "reexportBadge": "재 수출을 통한 재수출"
     },
+    "opportunities": {
+      "header": "기회 ({count})",
+      "viewCode": "코드를 보기 View code",
+      "viewDocs": "문서들을 보기"
+    },
     "alerts": {
       "archived": "아카이브  ⁇  저장소는 읽기 전용입니다.",
       "knownIssue": "알려진 문제: {reason}",
@@ -1297,6 +1302,11 @@
         "label": "의심스러운 커버리지를 포함합니다.",
         "evidence": "{pct}% 테스트가 없는 상태에서",
         "rule": "LCOV가 높은 커버리지를 보고하지만 테스트에서 해당 기능을 참조하지 않을 때 표시됩니다."
+      },
+      "fresh_code": {
+        "label": "신선한 코드",
+        "evidence": "CC {cc}, 최근 재작성됨",
+        "rule": "순환 복잡도가 10을 초과하고 함수 본문이 지난 90일 이내에 작성되거나 재작성된 경우 플래그가 지정됩니다. 최근에 다시 작성된 복잡한 코드로 인해 유효성 검사에서 이전 코드보다 훨씬 더 자주 사고가 발생했습니다."
       }
     },
     "shortcuts": {

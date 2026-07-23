@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/network/connectivity_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 Connectivity lint rules.
 ///
@@ -41,16 +42,18 @@ void main() {
   });
 
   group('Connectivity Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_connectivity_error_handling',
-      'avoid_connectivity_equals_internet',
-      'prefer_connectivity_debounce',
-      'require_connectivity_timeout',
-    ];
+    final fixtureDir = Directory('example/lib/connectivity');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/connectivity/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

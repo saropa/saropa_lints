@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/google_maps_flutter_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 6 google_maps_flutter lint rules.
 ///
@@ -52,20 +53,20 @@ void main() {
   });
 
   group('Google Maps Flutter Rules - Fixture Verification', () {
-    final fixtures = [
-      'google_maps_markers_rebuilt_in_build',
-      'google_maps_cloud_map_id_deprecated',
-      'google_maps_set_map_style_deprecated',
-      'google_maps_bitmap_descriptor_in_build',
-      'google_maps_unknown_map_id_error_unchecked',
-      'google_maps_animate_camera_in_build',
-    ];
+    final fixtureDir = Directory('example_packages/lib/google_maps_flutter');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/google_maps_flutter/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

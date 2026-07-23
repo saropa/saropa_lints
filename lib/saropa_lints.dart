@@ -33,7 +33,7 @@
 /// plugins:
 ///   saropa_lints:
 ///     diagnostics:
-///       avoid_debug_print: false  # disable a rule
+///       avoid_unguarded_debug: false  # disable a rule
 ///       no_magic_number: true     # enable a rule
 /// ```
 library;
@@ -221,7 +221,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   // Core rules
   AlwaysFailRule.new,
   AvoidNullAssertionRule.new,
-  AvoidDebugPrintRule.new,
   PreferConditionalLoggingRule.new,
   PreferLogLevelsRule.new,
   PreferLogTimestampRule.new,
@@ -2660,6 +2659,11 @@ _allRuleFactories = <SaropaLintRule Function()>[
   DeviceCalendarEventMissingCalendarIdRule.new,
   DeviceCalendarEventUtcTimezoneRule.new,
   DeviceCalendarResultDataBeforeSuccessCheckRule.new,
+
+  // device_calendar_plus rules (device_calendar_plus_rules.dart)
+  DeviceCalendarPlusMissingPermissionCheckRule.new,
+  DeviceCalendarPlusAllDayEventUtcConversionRule.new,
+  DeviceCalendarPlusEmptyUpdateEventRule.new,
 
   // HomeWidget rules (home_widget_rules.dart)
   HomeWidgetCallbackMissingPragmaRule.new,

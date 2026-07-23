@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
@@ -1615,17 +1616,21 @@ class AvoidRedundantNullCheckRule extends SaropaLintRule {
       }
 
       final DartType? type = nonNullSide.staticType;
-      if (type == null) return;
+      if (type == null || type is InvalidType) return;
 
       // Skip dynamic, Object, and type parameters
       if (type is DynamicType) return;
       if (type.isDartCoreObject) return;
       if (type is TypeParameterType) return;
 
-      // Flag if the type is non-nullable
-      if (type.nullabilitySuffix == NullabilitySuffix.none) {
-        reporter.atNode(node);
-      }
+      if (type.nullabilitySuffix != NullabilitySuffix.none) return;
+
+      // Cross-check: if the element was declared as nullable, trust the
+      // declaration — staticType can disagree due to plugin type-resolution
+      // edge cases in cross-package contexts.
+      if (_declaredTypeIsNullable(nonNullSide)) return;
+
+      reporter.atNode(node);
     });
   }
 
@@ -1634,4 +1639,32 @@ class AvoidRedundantNullCheckRule extends SaropaLintRule {
     ({required CorrectionProducerContext context}) =>
         ReplaceRedundantNullCheckFix(context: context),
   ];
+}
+
+/// True when the element backing [expr] was declared with a nullable type.
+/// Covers local variables, parameters, fields, getters, and top-level
+/// variables — both bare identifiers (`x`) and property access (`obj.x`).
+bool _declaredTypeIsNullable(Expression expr) {
+  final Element? element = _resolveElement(expr);
+  if (element == null) return false;
+
+  if (element is VariableElement) {
+    return element.type.nullabilitySuffix == NullabilitySuffix.question;
+  }
+  if (element is GetterElement) {
+    return element.returnType.nullabilitySuffix == NullabilitySuffix.question;
+  }
+  return false;
+}
+
+Element? _resolveElement(Expression expr) {
+  // Unwrap parentheses: `(obj.field) == null`
+  Expression unwrapped = expr;
+  while (unwrapped is ParenthesizedExpression) {
+    unwrapped = unwrapped.expression;
+  }
+  if (unwrapped is SimpleIdentifier) return unwrapped.element;
+  if (unwrapped is PrefixedIdentifier) return unwrapped.identifier.element;
+  if (unwrapped is PropertyAccess) return unwrapped.propertyName.element;
+  return null;
 }

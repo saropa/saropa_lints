@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/webview_flutter_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Instantiation-pin tests for the webview_flutter migration lint rule.
 ///
@@ -42,12 +43,23 @@ void main() {
   });
 
   group('WebviewFlutter Rules - Fixture Verification', () {
-    test('webview_flutter_fixture exists', () {
-      final file = File(
-        'example_packages/lib/webview_flutter/webview_flutter_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
+    final fixtureDir = Directory('example_packages/lib/webview_flutter');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/webview_flutter/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 
   group('WebviewFlutter Rules - Metadata', () {

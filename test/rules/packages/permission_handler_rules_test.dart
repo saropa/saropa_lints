@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/permission_handler_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 5 permission_handler lint rules.
 ///
@@ -47,19 +48,20 @@ void main() {
   });
 
   group('Permission Handler Rules - Fixture Verification', () {
-    final fixtures = [
-      'permission_handler_request_in_build',
-      'permission_handler_location_always_before_when_in_use',
-      'permission_handler_deprecated_calendar',
-      'permission_handler_status_without_request',
-      'permission_handler_batched_request_preferred',
-    ];
+    final fixtureDir = Directory('example_packages/lib/permission_handler');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/permission_handler/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

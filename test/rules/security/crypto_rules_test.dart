@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/saropa_lints.dart' show RuleType;
 import 'package:saropa_lints/src/rules/security/crypto_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 5 Cryptography lint rules.
 ///
@@ -90,17 +91,18 @@ void main() {
   });
 
   group('Cryptography Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_hardcoded_encryption_keys',
-      'prefer_secure_random_for_crypto',
-      'avoid_deprecated_crypto_algorithms',
-      'require_unique_iv_per_encryption',
-      'require_secure_key_generation',
-    ];
+    final fixtureDir = Directory('example/lib/crypto');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/crypto/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

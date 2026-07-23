@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/widget/theming_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 6 Theming lint rules.
 ///
@@ -56,18 +57,18 @@ void main() {
   });
 
   group('Theming Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_dark_mode_testing',
-      'avoid_elevation_opacity_in_dark',
-      'prefer_dark_mode_colors',
-      'prefer_high_contrast_mode',
-      'prefer_theme_extensions',
-      'require_semantic_colors',
-    ];
+    final fixtureDir = Directory('example/lib/theming');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/theming/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

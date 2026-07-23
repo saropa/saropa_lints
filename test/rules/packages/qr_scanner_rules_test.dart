@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/qr_scanner_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 QR Scanner lint rules.
 ///
@@ -39,17 +40,20 @@ void main() {
   });
 
   group('QR Scanner Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_qr_scan_feedback',
-      'avoid_qr_scanner_always_active',
-      'require_qr_content_validation',
-    ];
+    final fixtureDir = Directory('example_packages/lib/qr_scanner');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/qr_scanner/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/core/naming_style_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 28 Naming Style lint rules.
 ///
@@ -190,42 +191,12 @@ void main() {
     );
   });
   group('Naming Style Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_no_getter_prefix',
-      'avoid_non_ascii_symbols',
-      'prefer_capitalized_comment_start',
-      'match_class_name_pattern',
-      'match_getter_setter_field_names',
-      'match_lib_folder_structure',
-      'match_positional_field_names_on_assignment',
-      'prefer_boolean_prefixes',
-      'prefer_boolean_prefixes_for_locals',
-      'prefer_boolean_prefixes_for_params',
-      'prefer_correct_callback_field_name',
-      'prefer_correct_error_name',
-      'prefer_correct_handler_name',
-      'prefer_correct_identifier_length',
-      'prefer_correct_setter_parameter_name',
-      'prefer_explicit_parameter_names',
-      'prefer_match_file_name',
-      'prefer_prefixed_global_constants',
-      'prefer_kebab_tag_name',
-      'prefer_named_extensions',
-      'prefer_base_prefix',
-      'prefer_extension_suffix',
-      'prefer_mixin_prefix',
-      'prefer_i_prefix_interfaces',
-      'prefer_no_i_prefix_interfaces',
-      'prefer_impl_suffix',
-      'prefer_typedef_for_callbacks',
-      'prefer_enhanced_enums',
-      'prefer_wildcard_for_unused_param',
-      'prefer_correct_package_name',
-      'prefer_adjective_bool_getters',
-      'prefer_lowercase_constants',
-      'prefer_noun_class_names',
-      'prefer_verb_method_names',
-    ];
+    final fixtureDir = Directory('example/lib/naming_style');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

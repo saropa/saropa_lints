@@ -62,6 +62,7 @@ Future<void> main(List<String> args) async {
     targetPath: path,
     dartFiles: dartFiles.isEmpty ? null : dartFiles,
     tier: tier,
+    debugRule: parsed.debugRule,
   );
   // --resolve runs the slower, fully-resolved scan so that
   // InstanceCreationExpression and type-based rules actually fire; the default
@@ -250,6 +251,18 @@ void _printUsage() {
   );
   print(
     '  --format json       Output machine-readable JSON to stdout (no report file).',
+  );
+  print(
+    '  --debug-rule <name> Emit per-node type-resolution trace for the named',
+  );
+  print(
+    '                      rule. Shows staticType, staticInvokeType, and',
+  );
+  print(
+    '                      returnType at each visited node. Use with --resolve',
+  );
+  print(
+    '                      for full type information.',
   );
   print('');
   print('Resolution note:');

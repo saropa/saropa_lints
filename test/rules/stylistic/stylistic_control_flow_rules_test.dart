@@ -7,6 +7,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/stylistic/stylistic_control_flow_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 14 Stylistic Control Flow lint rules.
 ///
@@ -140,26 +141,20 @@ void main() {
   });
 
   group('Stylistic Control Flow Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_early_return',
-      'prefer_positive_conditions_first',
-      'prefer_switch_statement',
-      'prefer_cascade_over_chained',
-      'avoid_cascade_notation',
-      'prefer_await_over_then',
-      'prefer_sync_over_async_where_possible',
-      'prefer_then_catcherror',
-      'prefer_fire_and_forget',
-      'prefer_separate_assignments',
-      'prefer_if_else_over_guards',
-      'prefer_cascade_assignments',
-    ];
+    final fixtureDir = Directory('example/lib/stylistic_control_flow');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example/lib/stylistic_control_flow/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

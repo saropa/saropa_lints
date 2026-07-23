@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/data/record_pattern_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 19 Record Pattern lint rules.
 ///
@@ -141,32 +142,18 @@ void main() {
   });
 
   group('Record Pattern Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_bottom_type_in_patterns',
-      'avoid_bottom_type_in_records',
-      'avoid_explicit_pattern_field_name',
-      'avoid_extensions_on_records',
-      'avoid_function_type_in_records',
-      'avoid_keywords_in_wildcard_pattern',
-      'avoid_long_records',
-      'avoid_mixing_named_and_positional_fields',
-      'avoid_nested_records',
-      'avoid_one_field_records',
-      'avoid_positional_record_field_access',
-      'avoid_redundant_positional_field_name',
-      'avoid_single_field_destructuring',
-      'move_records_to_typedefs',
-      'prefer_class_destructuring',
-      'prefer_sorted_pattern_fields',
-      'prefer_simpler_patterns_null_check',
-      'prefer_wildcard_pattern',
-      'prefer_sorted_record_fields',
-      'prefer_pattern_destructuring',
-    ];
+    final fixtureDir = Directory('example/lib/record_pattern');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/record_pattern/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

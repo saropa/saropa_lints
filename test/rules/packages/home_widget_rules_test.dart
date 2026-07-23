@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/home_widget_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 6 home_widget lint rules.
 ///
@@ -52,20 +53,20 @@ void main() {
   });
 
   group('HomeWidget Rules - Fixture Verification', () {
-    final fixtures = [
-      'home_widget_callback_missing_pragma',
-      'home_widget_callback_not_top_level',
-      'home_widget_save_without_update',
-      'home_widget_update_no_name',
-      'home_widget_ios_missing_app_group',
-      'home_widget_widget_clicked_without_initial_launch',
-    ];
+    final fixtureDir = Directory('example_packages/lib/home_widget');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/home_widget/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

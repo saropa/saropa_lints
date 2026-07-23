@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/widget/build_method_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 11 Build Method lint rules.
 ///
@@ -87,23 +88,18 @@ void main() {
   });
 
   group('Build Method Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_gradient_in_build',
-      'avoid_dialog_in_build',
-      'avoid_snackbar_in_build',
-      'avoid_analytics_in_build',
-      'avoid_json_encode_in_build',
-      'avoid_canvas_operations_in_build',
-      'avoid_hardcoded_feature_flags',
-      'prefer_single_setstate',
-      'prefer_compute_over_isolate_run',
-      'prefer_for_loop_in_children',
-      'prefer_single_container',
-    ];
+    final fixtureDir = Directory('example/lib/build_method');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/build_method/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

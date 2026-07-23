@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/saropa_lints.dart' show LintImpact;
 import 'package:saropa_lints/src/rules/stylistic/formatting_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 10 Formatting lint rules.
 ///
@@ -100,25 +101,18 @@ void main() {
   });
 
   group('Formatting Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_blank_line_before_case',
-      'prefer_blank_line_before_constructor',
-      'prefer_blank_line_before_method',
-      'prefer_blank_line_before_return',
-      'prefer_blank_line_before_else',
-      'prefer_blank_line_after_loop',
-      'prefer_trailing_comma',
-      'unnecessary_trailing_comma',
-      'format_comment_style',
-      'require_ignore_comment_spacing',
-      'prefer_member_ordering',
-      'enforce_parameters_ordering',
-      'enum_constants_ordering',
-    ];
+    final fixtureDir = Directory('example/lib/formatting');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/formatting/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

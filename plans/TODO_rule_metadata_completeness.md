@@ -16,7 +16,184 @@ all shipped. These are the gaps.
 
 ---
 
-## 4.1 Accuracy measurement gate that reads `accuracyTarget` **[IN PROGRESS 2026-06-24]**
+## 4.1 Accuracy measurement gate that reads `accuracyTarget` **[IN PROGRESS — paused since 2026-06-24, reviewed 2026-07-16]**
+
+> **Status as of 2026-07-16:** No further fixture-adequacy work had landed since 2026-06-24 (last
+> relevant commits: `a5c2dc2c` liveness tool + `avoid_hardcoded_api_urls` fix, `b9eddd7e` api_network
+> 20→0, `d724edff` code_quality 36→32). The instrument ships and works; the corpus cleanup is stalled.
+> **Next action → see "Next action" block at the end of §4.1.**
+
+### Tool confounder removed 2026-07-16 — stylistic rules were 133 false silents
+
+The full-corpus run was scoped `--tier pedantic`, but **no tier — not even pedantic — contains the
+stylistic rules** (`getRulesForTier('pedantic')` unions essential→pedantic, never `stylisticRules`; and
+`stylistic` was not even a valid `tierOrder` entry). So the scan never enabled any stylistic rule, and the
+report marked every stylistic rule that has an `expect_lint` fixture as silent. That was **133 of the 744**
+reported silents (18%) — pure measurement error, not fixture bugs.
+
+Fix (this session): `ScanRunner` gained an optional `enabledRuleNames` set that bypasses tier/config, and
+`accuracy_report` now defaults to `getAllDefinedRules()` (pedantic ∪ stylistic) so every marker-bearing rule
+is actually exercised; `--tier <name>` still narrows when wanted. Verified on `example/lib/collection`: the
+three stylistic rules there (`prefer_list_first`, `prefer_list_last`, `map_keys_ordering`) plus
+`prefer_fold_over_reduce` flipped silent→fired with no fixture change. 9 `accuracy_report` unit tests still
+pass.
+
+**True silent count with all rules enabled (2026-07-16 full-corpus re-run): 664** (was 744 under
+`--tier pedantic`). Enabling stylistic exercised 80 rules that had been false silents. **53 stylistic rules
+are still genuinely silent** even with all rules on — those are real fixture/rule gaps, not the confounder.
+So the corrected worklist is 664, of which 611 are non-stylistic and 53 are stylistic.
+
+### Collection cluster: silents here are genuine RULE bugs, not fixture inadequacy
+
+Unlike api_network (mostly inadequate fixtures), the remaining collection silents are rules that fail to
+detect their own correct canonical bad example. Verified by the silent report (the fixtures show the right
+bad code; the rules do not fire on it under resolved analysis):
+
+- **`prefer_list_contains`** — checks `right is IntegerLiteral && value == -1`, but `!= -1` parses as a
+  `PrefixExpression` (unary minus over `1`), never an `IntegerLiteral`, so the canonical
+  `list.indexOf(x) != -1` is missed. Needs to handle negated-literal right operands.
+- **`avoid_map_keys_contains`** — only handles a `PropertyAccess` target, but `map.keys` on a
+  simple-identifier receiver is a `PrefixedIdentifier`, so the canonical `map.keys.contains(k)` is missed.
+- **`avoid_unnecessary_collections`** — registers on `MethodInvocation`, but `List.of([...])` /
+  `Set.of(...)` / `Map.of(...)` resolve to `InstanceCreationExpression` under resolution, so the rule
+  never sees them in a resolved scan (and, by the same token, in the real analyzer).
+
+These are production under-firing bugs (each affects every consumer project), so fixing them is a
+blast-radius change gated on approval — distinct from the mechanical fixture wraps the api_network loop
+assumed. `prefer_asmap_over_indexed_iteration` and `require_key_for_collection` in this dir are not yet
+categorized.
+
+#### Done 2026-07-16 (user-approved) — collection rule bugs fixed: 5 → 2 silent
+
+All three genuine under-firing bugs above were fixed in the rule (not the fixture), version-bumped, with
+changelog Fixed entries; `accuracy_report --fixtures example/lib/collection` confirms each flipped
+silent→fired and 69 collection unit tests still pass:
+
+- `prefer_list_contains` v2→v3 — added a helper that unwraps a unary-minus `PrefixExpression`, so
+  `indexOf(x) != -1` now matches.
+- `avoid_map_keys_contains` v5→v6 — now accepts a `PrefixedIdentifier` `.keys` target (plain
+  `map.keys.contains`), not only `PropertyAccess`. Its quick fix already handled exactly this shape (the
+  rule and fix were previously mismatched), so the fix now applies where it never could before.
+- `avoid_unnecessary_collections` v4→v5 — added an `InstanceCreationExpression` handler (shared literal
+  check) so the resolved `List.of([...])`/`Set.of`/`Map.of` constructor forms are caught, not just the
+  syntactic method-invocation shape.
+
+Remaining silent in `example/lib/collection`: `prefer_asmap_over_indexed_iteration` and
+`require_key_for_collection` (a widget rule) — still uncategorized, next if this cluster is resumed.
+
+#### Done 2026-07-16 (continued) — collection cluster now 0 silent (all 27 fire)
+
+The last two were the same two bug classes already seen in this cluster:
+
+- `prefer_asmap_over_indexed_iteration` — required the `for` bound to be a `PropertyAccess`, but
+  `list.length` on a plain variable is a `PrefixedIdentifier`, so the canonical
+  `for (i = 0; i < list.length; i++)` never fired. Now accepts both shapes. (Message carries no `{vN}`
+  marker, so no in-message bump.)
+- `require_key_for_collection` v4→v5 — `ListView.builder` / `GridView.builder` are named constructors, so
+  under resolution they are `InstanceCreationExpression`, not the `MethodInvocation` the primary handler
+  matched; the instance-creation handler covered only Reorderable/Animated. Extended it to the `.builder`
+  constructors (reading the type name syntactically so it does not depend on the widget type resolving),
+  and factored the shared `itemBuilder:` scan into one helper.
+
+`accuracy_report --fixtures example/lib/collection` = 27/27 fire; 69 collection unit tests pass. The
+collection cluster (`example/lib/collection`) is fully green. Five genuine under-firing rule bugs were fixed
+in this cluster total (three approved + these two of the same classes).
+
+#### Done 2026-07-16 (continued) — async cluster: 13 → 4 silent (user-approved)
+
+Nine of the 13 async silents fixed; 92 async unit tests pass. This cluster was a mix, not one class:
+
+- **Rule bug (same InstanceCreation-vs-MethodInvocation class as collection):** `prefer_commenting_future_delayed`
+  (v4→v5). `Future.delayed` is a named constructor → `InstanceCreationExpression` under resolution, so the
+  MethodInvocation-only handler never fired for anyone. Also fixed a second real bug: it checked the leading
+  comment on the `Future` token, but in `await Future.delayed(...)` the `await` token owns the comment, so it
+  could not tell a commented delay from an uncommented one (would FP on commented code). Now checks the
+  enclosing statement's token and added an InstanceCreation handler. This is the only user-facing async fix.
+- **Typed-fixture (dynamic/undefined → real type):** `require_stream_on_done`, `avoid_stream_tostring`
+  (use `StreamController<int>().stream` for a real `Stream` static type), `prefer_return_await` (declare a
+  real `Future`-returning helper).
+- **Wrong-context (nested/top-level fn → class method):** `require_completer_error_handling`,
+  `avoid_stream_in_build` (needs a method literally named `build`), `require_pending_changes_indicator`
+  (also its identifier had to match `\b_dirty\b` and avoid `.add(`, which the rule's own patterns treat as a
+  notification).
+- **Name/heuristic-gated fixtures:** `require_future_timeout` (rule matches only exact long-running method
+  names like `download`; `expensiveOperation` never matched), `require_websocket_reconnection` (rule matches
+  a bounded `\bWebSocketChannel\b`/`\bWebSocket\b` in the class source; the fixture's mock `WebSocketDemo` has
+  no boundary, so it was renamed to `WebSocketChannel`).
+
+**Async cluster: now 0 silent (all 4 remaining resolved 2026-07-16).**
+
+1. `avoid_sequential_awaits` and `avoid_sync_on_every_change` — **both diagnosed and fixed** (my earlier
+   "could not isolate" was wrong; the diagnosis method was flawed, not the rules). The reliable repro is a
+   full-dir resolved JSON scan (`dart run saropa_lints scan <dir> --resolve --format json`) filtered by file
+   path — NOT the `--files`/single-file path, which fails to resolve isolated files and returns zero even for
+   a known-firing control. Using it, a minimal clean fixture showed both rules silent while sibling rules
+   examining the same nodes fired, proving the rules (not fixtures) were at fault. Root causes:
+   - **`avoid_sync_on_every_change`**: `applicableFileTypes => {FileType.widget}`, so it only runs on files
+     containing `extends StatelessWidget`/`StatefulWidget`. The fixture used a bare `TextField` in a
+     top-level function → not a widget file → gated out. Fixed the fixture (TextField now lives in a
+     `StatelessWidget.build`).
+   - **`avoid_sequential_awaits`** (v2→v3): registered via `context.addFunctionBody`, which is a **no-op stub**
+     in the native engine (`saropa_context.dart:1002` — FunctionBody is not a visitable node), so the rule
+     never fired for anyone. Switched to `addBlockFunctionBody` (the real registration; the rule already
+     narrowed to BlockFunctionBody). **Engine finding (RESOLVED 2026-07-16, user-approved): `addFunctionBody`
+     is a silent no-op used by 4 more call sites in 3 other rule files, so those rules were also dead —
+     `require_getit_registration_order` (get_it), `require_hive_adapter_registration_order` (hive),
+     `prefer_single_exit_point` and `prefer_guard_clauses` (stylistic_control_flow). All four switched to
+     `addBlockFunctionBody` and version-bumped. **Permanent fixtures added** for all four (they previously had
+     none, which is how their deadness went unnoticed): `stylistic_control_flow/prefer_single_exit_point_fixture.dart`,
+     `stylistic_control_flow/prefer_guard_clauses_fixture.dart`,
+     `dependency_injection/require_getit_registration_order_fixture.dart`, and
+     `db_yield/require_hive_adapter_registration_order_fixture.dart`. accuracy_report confirms each is measured
+     and fires (1/1 fixtures).**
+2. `prefer_isolate_for_heavy_compute` and `require_cache_ttl` — **phantom markers** (RESOLVED 2026-07-16,
+   user-approved): `expect_lint` comments in `async_rules_fixture.dart` named rules that exist **nowhere** in
+   `lib/`, so they could never fire. The two marker lines were removed (replaced with a `NOTE:` explaining no
+   such rule exists); the BAD/GOOD example code was left in place. If those rules are ever wanted, they are
+   new-feature work, tracked separately. After removal the async cluster has **2 silent** (the undiagnosed
+   pair above), down from 13.
+3. **`addPostRunCallback` no-op stub — a third dead-rule family (RESOLVED 2026-07-16, user-approved "fix all").**
+   The same class of bug as `addFunctionBody`: `SaropaContext.addPostRunCallback` (`saropa_context.dart:996`)
+   accepts a callback and silently discards it. Rules that aggregate whole-file state during the main pass and
+   report at the end via this callback never fired for anyone. A full grep of the rules tree found **14** such
+   rules (the first inventory of 9 was incomplete). All were restructured to gather state in a single
+   `addCompilationUnit` pass and report at its end, version-bumped, and documented in
+   `plans/history/2026.07/2026.07.16/dead_rules_from_noop_stub_registrations.md` (`Status: Fixed`, with the full table). Two extra
+   defects were fixed in passing: `ios_ui_security_rules.dart` was missing the `ast/visitor.dart` import, and
+   `require_intl_locale_initialization` registered `addMethodInvocation` twice (the native engine keeps one
+   slot, so the first handler was dropped) — merged into a single visitor. **Recurrence guard added:**
+   `test/integrity/no_op_stub_registration_guard_test.dart` fails the build if any rule calls any of the three
+   no-op stubs. The three stubs stay in place so v4-ported rules still compile. Revived rules:
+   `require_menu_bar_for_desktop`, `require_window_close_confirmation`, `require_error_state`,
+   `avoid_circular_provider_deps`, `prefer_notifier_over_state`, `require_apple_sign_in`,
+   `require_error_case_tests`, `avoid_test_coupling`, `require_test_cleanup`, `prefer_test_variant`,
+   `require_route_transition_consistency`, `prefer_shell_route_for_persistent_ui`,
+   `require_intl_locale_initialization`, `prefer_implicit_animations`.
+   **Verification (accuracy_report):** engine fix proven — five fire against a triggering
+   input (`prefer_shell_route_for_persistent_ui`, `prefer_implicit_animations` on committed
+   fixtures; `require_menu_bar_for_desktop`, `require_intl_locale_initialization`,
+   `require_apple_sign_in` on isolated single-case fixtures). The remaining committed
+   fixtures cannot yet show firing: these are whole-file rules, and each fixture puts a BAD
+   and a GOOD example in the SAME file, so the GOOD example's file-wide "satisfied" flag
+   (menu bar present / locale initialized / tearDown present / throwsA present) masks the
+   BAD case; a few also fail a path gate or lack a mock type. Repairing those fixtures
+   (isolate the BAD case per file; add the missing desktop/`/test/` paths and the
+   `GoogleSignIn` / second route mock class) is the remaining §4.1 silent-list work and does
+   not affect real user code. An extra rule-logic bug was fixed in passing:
+   `require_apple_sign_in` matched only identifier receivers, so `GoogleSignIn().signIn()`
+   (constructor-call receiver — its own documented bad example) never matched; now handled.
+   **Fixture repair completed (all 14 confirmed firing):** the whole-file fixtures were
+   repaired — the masking GOOD example moved to a sibling `*_good.dart`, `window_close`
+   renamed to a `_desktop` path with a real violating observer, `error_case_tests` moved to
+   a `/test/` path, `avoid_test_coupling` tests moved into `main()`, mock classes
+   (`GoogleSignIn`, `CupertinoPageRoute`, `FadeTransitionRoute`) added, and fixtures authored
+   for the three that had none (`require_error_state`, `avoid_circular_provider_deps`,
+   `prefer_notifier_over_state`). Six fire in the full corpus scan; the other eight fire in
+   isolated / small-dir scans but show silent in the full scan of the 32-file
+   `example/lib/test` directory — the same "fires per-file, zero under full-corpus scan"
+   tooling limitation already recorded above for the async cluster. Isolating THAT scan
+   behavior is separate work; it does not affect the rules on real user code.
+
 
 Premise correction: `accuracyTarget` is **not** unpopulated. It is a derived getter
 ([saropa_lint_rule.dart:2288](../lib/src/saropa_lint_rule.dart#L2288)) computed from `ruleType`, and
@@ -160,6 +337,34 @@ Status of §4.1: the consumer that reads accuracy targets is partially realized 
 True false-positive / true-positive-rate measurement against `accuracyTarget` remains blocked on
 line-precise fixtures. The remaining ~745 package-wide silent rules and the code_quality resolution group are
 the open work; this TODO stays active and is not moved to history.
+
+## Next action (§4.1) — what to do next, in order
+
+1. **Regenerate the silent-list worklist** (the count below is from 2026-06-24; confirm it is still ~745):
+   `dart run saropa_lints:accuracy_report --tier pedantic --fail-on none --format json`.
+2. **Pick the next cluster and repeat the api_network loop.** For each silent rule, the fix is almost always
+   the fixture, not the rule — apply the three-shape triage: (a) move the bad example into a class method if
+   the rule visits `addMethodDeclaration`; (b) add the `package:` import line if the rule gates on an import
+   URI; (c) rename the bad example to match the rule's name heuristic. Re-run `accuracy_report` on that
+   cluster to confirm silent→fired. Fix a rule only when its detection is genuinely too narrow (as with
+   `avoid_hardcoded_api_urls`), and bump its version + add a changelog Fixed entry when you do.
+3. **Defer the code_quality resolution group** (~32 rules) — these need the fixture to define real
+   enum/class types and then per-rule resolution debugging; not a mechanical wrap. Do the easy clusters first.
+4. **Do NOT wire `--fail-on silent` into CI yet.** The raw silent list over-reports because
+   package/platform/Flutter-gated rules cannot fire in the example project. Removing those confounders
+   (run fixtures in a gate-satisfying environment, and/or add `requiredPackages`/platform metadata to
+   exclude un-fireable rules) is prerequisite to a hard gate.
+5. **Blocked follow-up:** line-precise accuracy-vs-target (enforcing `expectZeroFalsePositives` /
+   `minTruePositiveRate`) stays blocked on re-authoring markers immediately above each violation. A separate
+   corpus project; do not start it before the liveness silent-list is clean.
+
+## Overall §4 status (2026-07-16)
+
+- **§4.1 accuracy gate** — IN PROGRESS, paused. Instrument done; ~745 silent-rule fixtures remain. See above.
+- **§4.2 `certIds`** — OPEN by design. Opportunistic only; no bulk pass.
+- **§4.3 rule-lifecycle enforcement** — DONE 2026-06-12.
+
+This TODO stays active until §4.1's silent list is cleared (or explicitly closed as consumer-gated).
 
 ## 4.2 `certIds` sparse/empty **[OPEN — verified — by design]**
 

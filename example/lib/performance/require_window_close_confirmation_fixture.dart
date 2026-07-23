@@ -105,24 +105,15 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger require_window_close_confirmation
+// BAD: Should trigger require_window_close_confirmation.
+// The rule reports a WidgetsBindingObserver subclass that does NOT override
+// didRequestAppExit. It is a whole-file rule (any didRequestAppExit in the file
+// clears the flag) and only runs on desktop paths — hence the _desktop file
+// name and the compliant observer living in its own file
+// (require_window_close_confirmation_good.dart).
 // expect_lint: require_window_close_confirmation
-void _bad808_main() {
-  runApp(MyApp());
-}
-
-// GOOD: Should NOT trigger require_window_close_confirmation
-void _good808_main() {
-  WidgetsBinding.instance.addObserver(AppLifecycleObserver());
-  runApp(MyApp());
-}
-
-class AppLifecycleObserver extends WidgetsBindingObserver {
-  @override
-  Future<bool> didRequestAppExit() async {
-    if (hasUnsavedChanges) {
-      return showSaveDialog();
-    }
-    return true;
+class BadLifecycleObserver extends WidgetsBindingObserver {
+  void onStart() {
+    runApp(MyApp());
   }
 }

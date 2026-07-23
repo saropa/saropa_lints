@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/provider_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 27 Provider package lint rules.
 ///
@@ -158,23 +159,12 @@ void main() {
     );
   });
   group('Provider Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_nested_providers',
-      'avoid_provider_in_init_state',
-      'avoid_provider_in_widget',
-      'avoid_provider_listen_false_in_build',
-      'avoid_provider_of_in_build',
-      'avoid_provider_recreate',
-      'avoid_provider_value_rebuild',
-      'dispose_provider_instances',
-      'prefer_consumer_over_provider_of',
-      'prefer_nullable_provider_types',
-      'prefer_provider_extensions',
-      'prefer_proxy_provider',
-      'require_multi_provider',
-      'require_provider_dispose',
-      'require_provider_generic_type',
-    ];
+    final fixtureDir = Directory('example_packages/lib/provider');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

@@ -109,23 +109,32 @@ dynamic api;
 dynamic user;
 dynamic value;
 
+// The rule only runs on widget files (those declaring a StatelessWidget /
+// StatefulWidget — see applicableFileTypes: {FileType.widget}), so the TextField
+// examples must live inside a widget for the rule to be enabled on this file.
+
 // BAD: Should trigger avoid_sync_on_every_change
-// expect_lint: avoid_sync_on_every_change
-void _bad115() async {
-  TextField(
-    onChanged: (value) async {
-      await api.saveNote(value); // Syncs on every keystroke!
-    },
-  );
+class BadNoteField extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // expect_lint: avoid_sync_on_every_change
+    return TextField(
+      onChanged: (value) async {
+        await api.saveNote(value); // Syncs on every keystroke!
+      },
+    );
+  }
 }
 
 // GOOD: Should NOT trigger avoid_sync_on_every_change
-void _good115() {
-  TextField(
-    onChanged: (value) {
-      _pendingValue = value;
-      _debouncer.run(() => api.saveNote(_pendingValue));
-    },
-  );
-  // Or sync when user stops typing or leaves screen
+class GoodNoteField extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      onChanged: (value) {
+        _pendingValue = value;
+        _debouncer.run(() => api.saveNote(_pendingValue));
+      },
+    );
+  }
 }

@@ -8,14 +8,15 @@ import 'package:test/test.dart';
 /// patterns (e.g. "returns zero when unattached", "handles safely")
 /// without missing genuine happy-path-only test files.
 ///
-/// Test fixture:
-/// - example/lib/testing_best_practices/require_error_case_tests_fixture.dart
+/// Test fixtures (this is a whole-file rule, so the BAD happy-path-only case
+/// and the compliant error-case examples must live in separate files):
+/// - example/lib/test/require_error_case_tests_fixture.dart (BAD)
+/// - example/lib/test/require_error_case_tests_good.dart (GOOD)
 void main() {
   group('require_error_case_tests', () {
     test('fixture file exists', () {
       final file = File(
-        'example/lib/testing_best_practices/'
-        'require_error_case_tests_fixture.dart',
+        'example/lib/test/require_error_case_tests_fixture.dart',
       );
       expect(file.existsSync(), isTrue);
     });
@@ -137,11 +138,16 @@ void main() {
     });
 
     group('false positive scenarios (fixture)', () {
+      // BAD (happy-path-only) and GOOD (has error-case tests) are separate
+      // files because this is a whole-file rule.
       late String fixtureSource;
+      late String goodSource;
       setUp(() {
         fixtureSource = File(
-          'example/lib/testing_best_practices/'
-          'require_error_case_tests_fixture.dart',
+          'example/lib/test/require_error_case_tests_fixture.dart',
+        ).readAsStringSync();
+        goodSource = File(
+          'example/lib/test/require_error_case_tests_good.dart',
         ).readAsStringSync();
       });
 
@@ -155,7 +161,7 @@ void main() {
 
       test('GOOD case exists for throwsA matcher', () {
         expect(
-          fixtureSource.contains('_good1213_throwsA'),
+          goodSource.contains('_good1213_throwsA'),
           isTrue,
           reason: 'Fixture should have a GOOD case with throwsA matcher',
         );
@@ -163,7 +169,7 @@ void main() {
 
       test('GOOD case exists for "safely" keyword', () {
         expect(
-          fixtureSource.contains('_good1213_safely'),
+          goodSource.contains('_good1213_safely'),
           isTrue,
           reason:
               'Fixture should have a GOOD case for defensive '
@@ -173,7 +179,7 @@ void main() {
 
       test('GOOD case exists for "timeout" keyword', () {
         expect(
-          fixtureSource.contains('_good1213_timeout'),
+          goodSource.contains('_good1213_timeout'),
           isTrue,
           reason: 'Fixture should have a GOOD case for "timeout" keyword',
         );
@@ -181,7 +187,7 @@ void main() {
 
       test('GOOD case exists for "dispose" keyword', () {
         expect(
-          fixtureSource.contains('_good1213_dispose'),
+          goodSource.contains('_good1213_dispose'),
           isTrue,
           reason: 'Fixture should have a GOOD case for "dispose" keyword',
         );
@@ -189,7 +195,7 @@ void main() {
 
       test('GOOD case exists for "default" keyword', () {
         expect(
-          fixtureSource.contains('_good1213_default'),
+          goodSource.contains('_good1213_default'),
           isTrue,
           reason: 'Fixture should have a GOOD case for "default" keyword',
         );

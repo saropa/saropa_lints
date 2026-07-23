@@ -82,4 +82,24 @@ Future<void> goodAnimationControllerAwaits() async {
   await controller.fling();
 }
 
+// Regression: static methods returning Future<T> must not fire.
+// The rule's staticType can fail to resolve for static invocations; the
+// fallback through staticInvokeType.returnType must catch these.
+class _StaticFutureIO {
+  _StaticFutureIO._();
+  static Future<String?> loadByKey(String key) async => null;
+  static Future<List<int>> loadAll() async => [];
+  static Future<bool> update({required String id}) async => true;
+  static Future<void> delete(String id) async {}
+}
+
+// OK: await on static methods returning Future<T>
+Future<void> goodStaticFutureReturning() async {
+  final String? a = await _StaticFutureIO.loadByKey('x');
+  final List<int> b = await _StaticFutureIO.loadAll();
+  final bool c = await _StaticFutureIO.update(id: 'a');
+  await _StaticFutureIO.delete('a');
+  print('$a $b $c');
+}
+
 void main() {}

@@ -5,6 +5,7 @@ import 'package:test/test.dart';
 import 'package:saropa_lints/src/rules/platforms/ios_capabilities_permissions_rules.dart';
 import 'package:saropa_lints/src/rules/platforms/ios_platform_lifecycle_rules.dart';
 import 'package:saropa_lints/src/rules/platforms/ios_ui_security_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 89 iOS platform lint rules.
 ///
@@ -545,100 +546,12 @@ void main() {
 
   // example/lib/ios/: each rule's BAD/OK examples under real analyzer + custom_lint.
   group('iOS Rules - Fixture Verification', () {
-    // All 89 rules in ios_rules.dart have fixtures in example/lib/ios/.
-    // Some rules are not ios-prefixed (e.g. require_apple_sign_in).
-    final fixtures = [
-      'avoid_ios_13_deprecations',
-      'avoid_ios_background_fetch_abuse',
-      'avoid_ios_battery_drain_patterns',
-      'avoid_ios_continuous_location_tracking',
-      'avoid_ios_debug_code_in_release',
-      'avoid_ios_deprecated_uikit',
-      'avoid_ios_force_unwrap_in_callbacks',
-      'avoid_ios_hardcoded_bundle_id',
-      'avoid_ios_hardcoded_device_model',
-      'avoid_ios_hardcoded_keyboard_height',
-      'avoid_ios_hardcoded_status_bar',
-      'avoid_ios_in_app_browser_for_auth',
-      'avoid_ios_misleading_push_notifications',
-      'avoid_ios_simulator_only_code',
-      'avoid_ios_wifi_only_assumption',
-      'avoid_long_running_isolates',
-      'avoid_notification_spam',
-      'prefer_background_sync',
-      'prefer_cupertino_for_ios',
-      'prefer_delayed_permission_prompt',
-      'prefer_ios_app_intents_framework',
-      'prefer_ios_context_menu',
-      'prefer_ios_handoff_support',
-      'prefer_ios_haptic_feedback',
-      'prefer_ios_safe_area',
-      'prefer_ios_spotlight_indexing',
-      'prefer_ios_storekit2',
-      'require_apple_sign_in',
-      'require_https_for_ios',
-      'require_ios_accessibility_labels',
-      'require_ios_accessibility_large_text',
-      'require_ios_age_rating_consideration',
-      'require_ios_app_clip_size_limit',
-      'require_ios_app_group_capability',
-      'require_ios_app_review_prompt_timing',
-      'require_ios_app_tracking_transparency',
-      'require_ios_ats_exception_documentation',
-      'require_ios_background_audio_capability',
-      'require_ios_background_mode',
-      'require_ios_background_refresh_declaration',
-      'require_ios_biometric_fallback',
-      'require_ios_callkit_integration',
-      'require_ios_carplay_setup',
-      'require_ios_certificate_pinning',
-      'require_ios_data_protection',
-      'require_ios_database_conflict_resolution',
-      'require_ios_deployment_target_consistency',
-      'require_ios_dynamic_island_safe_zones',
-      'require_ios_entitlements',
-      'require_ios_face_id_usage_description',
-      'require_ios_focus_mode_awareness',
-      'require_ios_healthkit_authorization',
-      'require_ios_icloud_kvstore_limitations',
-      'require_ios_keychain_accessibility',
-      'require_ios_keychain_for_credentials',
-      'require_ios_keychain_sync_awareness',
-      'require_ios_launch_storyboard',
-      'require_ios_live_activities_setup',
-      'require_ios_local_notification_permission',
-      'require_ios_info_plist_entries',
-      'require_ios_low_power_mode_handling',
-      'require_ios_method_channel_cleanup',
-      'require_ios_minimum_version_check',
-      'require_ios_multitasking_support',
-      'require_ios_nfc_capability_check',
-      'require_ios_orientation_handling',
-      'require_ios_pasteboard_privacy_handling',
-      'require_ios_permission_description',
-      'require_ios_photo_library_add_usage',
-      'require_ios_photo_library_limited_access',
-      'require_ios_platform_check',
-      'require_ios_privacy_manifest',
-      'require_ios_promotion_display_support',
-      'require_ios_push_notification_capability',
-      'require_ios_quick_note_awareness',
-      'require_ios_receipt_validation',
-      'require_ios_review_prompt_frequency',
-      'require_ios_scene_delegate_awareness',
-      'require_ios_share_sheet_uti_declaration',
-      'require_ios_siri_intent_definition',
-      'require_ios_universal_links_domain_matching',
-      'require_ios_version_check',
-      'require_ios_voiceover_gesture_compatibility',
-      'require_ios_widget_extension_capability',
-      'require_method_channel_error_handling',
-      'require_notification_for_long_tasks',
-      'require_purchase_restoration',
-      'require_purchase_verification',
-      'require_sync_error_recovery',
-      'require_universal_link_validation',
-    ];
+    final fixtureDir = Directory('example/lib/ios');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

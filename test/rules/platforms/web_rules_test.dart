@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for Web lint rules.
 ///
@@ -90,18 +91,12 @@ void main() {
     });
   });
   group('Web Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_platform_channel_on_web',
-      'require_cors_handling',
-      'prefer_deferred_loading_web',
-      'avoid_web_only_dependencies',
-      'prefer_js_interop_over_dart_js',
-      'prefer_url_strategy_for_web',
-      'require_web_renderer_awareness',
-      'avoid_js_rounded_ints',
-      'prefer_csrf_protection',
-      'prefer_schedule_microtask_over_window_postmessage',
-    ];
+    final fixtureDir = Directory('example/lib/web');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

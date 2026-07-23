@@ -257,6 +257,11 @@
       "reexportTitle": "Được tái xuất khẩu  ⁇ là một phần của API công khai thư viện này.",
       "reexportBadge": "tái xuất khẩu - re-export"
     },
+    "opportunities": {
+      "header": "Cơ hội ({count})",
+      "viewCode": "Xem mã code xem code",
+      "viewDocs": "Xem các tài liệu xem docs"
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇   ⁇ kho lưu trữ chỉ đọc là read-only.",
       "knownIssue": "Vấn đề được biết đến: {reason} là Phương pháp",
@@ -1297,6 +1302,11 @@
         "label": "Các tin tức đáng ngờ được đưa ra.",
         "evidence": "{pct}% không có thử nghiệm.",
         "rule": "Được đánh dấu khi LCOV báo cáo độ bao phủ cao nhưng không có thử nghiệm nào tham chiếu chức năng."
+      },
+      "fresh_code": {
+        "label": "Fresh code mã mới",
+        "evidence": "CC {cc}, gần đây đã được viết lại.",
+        "rule": "Được đánh dấu khi độ phức tạp của cyclomatic vượt quá 10 và cơ thể chức năng đã được viết hoặc viết lại trong vòng 90 ngày qua. Mã phức tạp được viết lại gần đây gây ra sự cố thường xuyên hơn nhiều so với mã cũ trong quá trình xác nhận."
       }
     },
     "shortcuts": {

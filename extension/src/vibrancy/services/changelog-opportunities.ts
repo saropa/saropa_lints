@@ -194,6 +194,43 @@ function inferCategoryFromText(text: string): OpportunityCategory {
 }
 
 /**
+ * File extensions changelog prose commonly references (`README.md`,
+ * `CHANGELOG.md`, `pubspec.yaml`, `LICENSE.txt`, `MyWidget.dart`) that are
+ * files, not adoptable API surface. The dotted-member-access and backtick
+ * extraction signals below match any `word.word` span by shape alone, so
+ * "see README.md for details" is indistinguishable from `ReelText.rich`
+ * without checking the extension — this is what let README.md surface as an
+ * adoptable "opportunity".
+ *
+ * Deliberately EXCLUDES `log`, `lock`, and `doc` despite being common
+ * document/lockfile extensions (`pubspec.lock`, `CHANGELOG.log`): those three
+ * collide with real Dart API member names (`Logger.log`, `Mutex.lock`,
+ * `Lock.lock`), so including them would silently drop genuine opportunities
+ * whenever a changelog bullet named one. `docx` stays — no such collision —
+ * as does `yaml`/`yml`/`json`, which only match via the case-insensitive
+ * backtick path since the dotted-access regex requires an uppercase owner.
+ */
+const NON_CODE_EXTENSIONS = new Set([
+    'md', 'markdown', 'txt', 'json', 'yaml', 'yml', 'html', 'htm', 'css',
+    'xml', 'csv', 'pdf', 'toml', 'ini', 'rst', 'adoc', 'docx', 'zip',
+    'png', 'jpg', 'jpeg', 'svg', 'gif',
+    // Source-file extensions: a changelog mentioning `MyWidget.dart` or
+    // `index.ts` names a file location, not a callable API — same shape
+    // ambiguity as the document extensions above, no real-API collision risk.
+    'dart', 'js', 'ts', 'jsx', 'tsx', 'py', 'rb', 'java', 'kt', 'swift',
+    'go', 'rs', 'c', 'cpp', 'h', 'sh', 'gradle', 'podspec', 'plist',
+]);
+
+/** True when `name` is shaped like a filename (`README.md`) rather than a
+ * dotted API reference (`ReelText.rich`) — only the extension tells them
+ * apart, since both are `Word.word` by shape. */
+function looksLikeFilename(name: string): boolean {
+    const dot = name.lastIndexOf('.');
+    if (dot === -1) { return false; }
+    return NON_CODE_EXTENSIONS.has(name.slice(dot + 1).toLowerCase());
+}
+
+/**
  * Extract candidate API symbol names from a bullet.
  *
  * Three complementary signals, in priority order:
@@ -203,6 +240,10 @@ function inferCategoryFromText(text: string): OpportunityCategory {
  *     not captured.
  *  3. Dotted member access off a PascalCase owner (`ReelText.rich`) and
  *     trailing-paren call forms (`runWhile()`).
+ *
+ * A final pass drops anything shaped like a filename (`looksLikeFilename`) —
+ * documents named in changelog prose are never adoptable API surface, even
+ * when they happen to match one of the three signals above.
  *
  * Results are deduped preserving first-seen order.
  */
@@ -232,7 +273,7 @@ export function extractApiNames(text: string): string[] {
         names.push(m[0]);
     }
 
-    return dedupe(names);
+    return dedupe(names).filter(n => !looksLikeFilename(n));
 }
 
 /**

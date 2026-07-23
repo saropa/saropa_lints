@@ -2675,7 +2675,7 @@ class AvoidHardcodedDelaysRule extends SaropaLintRule {
 
 /// Warns when test files don't include error case or boundary tests.
 ///
-/// Since: v4.1.1 | Updated: v4.13.0 | Rule version: v4
+/// Since: v4.1.1 | Updated: v4.13.0 | Rule version: v5
 ///
 /// Happy-path-only tests miss critical edge cases. Tests should verify
 /// error handling, boundary conditions, or defensive behavior. The rule
@@ -2750,7 +2750,7 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_error_case_tests',
-    '[require_error_case_tests] Test file has no error case tests. Consider adding tests for exceptions. {v4}',
+    '[require_error_case_tests] Test file has no error case tests. Consider adding tests for exceptions. {v5}',
     correctionMessage:
         'Add tests using throwsA(), throwsException, or expect(..., isA<Exception>()). '
         'If the source code has no error-throwing paths (e.g. pure enums, '
@@ -2791,63 +2791,82 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
       return;
     }
 
-    // Track whether this file has any error case assertions
-    bool hasErrorCaseTest = false;
-    FunctionDeclaration? mainFunction;
+    // Whether the file tests any error case can only be known after scanning
+    // every test invocation, and the `main` it flags may be declared before
+    // those tests. The v4 addPostRunCallback that deferred the verdict is a
+    // no-op on the native engine, so scan the whole unit once and report at its
+    // end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _ErrorCaseTestVisitor visitor = _ErrorCaseTestVisitor(
+        _errorCaseKeywords,
+      );
+      unit.accept(visitor);
 
-    context.addFunctionDeclaration((FunctionDeclaration node) {
-      if (node.name.lexeme == 'main') {
-        mainFunction = node;
+      final FunctionDeclaration? mainFunction = visitor.mainFunction;
+      if (!visitor.hasErrorCaseTest && mainFunction != null) {
+        reporter.atToken(mainFunction.name, code);
       }
     });
+  }
+}
 
-    context.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
+/// Collects the `main` test entry point and whether any error-case assertion
+/// is present anywhere in the unit.
+class _ErrorCaseTestVisitor extends RecursiveAstVisitor<void> {
+  _ErrorCaseTestVisitor(this._errorCaseKeywords);
 
-      // Check for error-related test patterns
-      if (methodName == 'throwsA' ||
-          methodName == 'throwsException' ||
-          methodName == 'throwsArgumentError' ||
-          methodName == 'throwsStateError' ||
-          methodName == 'throwsFormatException' ||
-          methodName == 'throwsUnsupportedError' ||
-          methodName == 'throwsNoSuchMethodError' ||
-          methodName == 'throwsRangeError') {
+  final Set<String> _errorCaseKeywords;
+  bool hasErrorCaseTest = false;
+  FunctionDeclaration? mainFunction;
+
+  static const Set<String> _throwMatchers = <String>{
+    'throwsA',
+    'throwsException',
+    'throwsArgumentError',
+    'throwsStateError',
+    'throwsFormatException',
+    'throwsUnsupportedError',
+    'throwsNoSuchMethodError',
+    'throwsRangeError',
+  };
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    if (node.name.lexeme == 'main') {
+      mainFunction = node;
+    }
+    super.visitFunctionDeclaration(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+
+    // Error-related test matchers directly assert on failure.
+    if (_throwMatchers.contains(methodName)) {
+      hasErrorCaseTest = true;
+    } else if (methodName == 'expect') {
+      // expect(..., isA<...Exception/Error>()) or a throwsA matcher.
+      final String source = node.toSource();
+      if ((RegExp(r'isA\s*<').hasMatch(source) &&
+              RegExp(r'\bException\b').hasMatch(source)) ||
+          (RegExp(r'isA\s*<').hasMatch(source) &&
+              RegExp(r'\bError\b').hasMatch(source)) ||
+          RegExp(r'\bthrowsA\b').hasMatch(source)) {
         hasErrorCaseTest = true;
-        return;
       }
-
-      // Check for expect with isA<*Exception> (word-boundary regex)
-      if (methodName == 'expect') {
-        final String source = node.toSource();
-        if ((RegExp(r'isA\s*<').hasMatch(source) &&
-                RegExp(r'\bException\b').hasMatch(source)) ||
-            (RegExp(r'isA\s*<').hasMatch(source) &&
-                RegExp(r'\bError\b').hasMatch(source)) ||
-            RegExp(r'\bthrowsA\b').hasMatch(source)) {
+    } else if (methodName == 'test' || methodName == 'testWidgets') {
+      // A test name that names an error/boundary condition counts too.
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.isNotEmpty) {
+        final String firstArg = args.arguments.first.toSource().toLowerCase();
+        if (_errorCaseKeywords.any(firstArg.contains)) {
           hasErrorCaseTest = true;
-          return;
         }
       }
+    }
 
-      // Check for test names that suggest error or boundary testing
-      if (methodName == 'test' || methodName == 'testWidgets') {
-        final ArgumentList args = node.argumentList;
-        if (args.arguments.isNotEmpty) {
-          final String firstArg = args.arguments.first.toSource().toLowerCase();
-          if (_errorCaseKeywords.any(firstArg.contains)) {
-            hasErrorCaseTest = true;
-          }
-        }
-      }
-    });
-
-    // Use a post-analysis callback to check if we found any error tests
-    context.addPostRunCallback(() {
-      if (!hasErrorCaseTest && mainFunction != null) {
-        reporter.atToken(mainFunction!.name, code);
-      }
-    });
+    super.visitMethodInvocation(node);
   }
 }
 

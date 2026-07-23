@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/saropa_lints.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for Android platform lint rules.
 ///
@@ -117,26 +118,27 @@ void main() {
   });
 
   group('Android Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_android_permission_request',
-      'require_android_manifest_entries',
-      'require_notification_icon_kept',
-      'avoid_android_task_affinity_default',
-      'require_android_12_splash',
-      'prefer_pending_intent_flags',
-      'avoid_android_cleartext_traffic',
-      'require_android_backup_rules',
-      'prefer_foreground_service_android',
-    ];
+    final fixtureDir = Directory('example/lib/android');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
-        final relativePath = fixture == 'require_android_manifest_entries'
-            ? 'example/lib/platform/${fixture}_fixture.dart'
-            : 'example/lib/android/${fixture}_fixture.dart';
-        final file = File(relativePath);
+        final file = File('example/lib/android/${fixture}_fixture.dart');
         expect(file.existsSync(), isTrue);
       });
     }
+
+    // This fixture lives in example/lib/platform/ because it covers a
+    // cross-platform manifest concern, not an Android-only rule.
+    test('require_android_manifest_entries fixture exists', () {
+      final file = File(
+        'example/lib/platform/require_android_manifest_entries_fixture.dart',
+      );
+      expect(file.existsSync(), isTrue);
+    });
   });
 }

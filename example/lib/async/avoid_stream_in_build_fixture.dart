@@ -110,10 +110,15 @@ dynamic controller;
 dynamic stream;
 
 // BAD: Should trigger avoid_stream_in_build
-// expect_lint: avoid_stream_in_build
-Widget _bad105_build(BuildContext context) {
-  final controller = StreamController<int>(); // Recreated every build!
-  return StreamBuilder(stream: controller.stream);
+// The rule walks up to a MethodDeclaration named `build`, so the controller
+// must be created inside an actual build method, not a top-level function.
+class BadStreamWidget extends StatelessWidget {
+  @override
+  // expect_lint: avoid_stream_in_build
+  Widget build(BuildContext context) {
+    final controller = StreamController<int>(); // Recreated every build!
+    return StreamBuilder(stream: controller.stream);
+  }
 }
 
 // GOOD: Should NOT trigger avoid_stream_in_build

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/code_quality/complexity_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 14 Complexity lint rules.
 ///
@@ -141,27 +142,18 @@ void main() {
   });
 
   group('Complexity Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_bitwise_operators_with_booleans',
-      'avoid_cascade_after_if_null',
-      'avoid_cascade_shuffle',
-      'avoid_complex_arithmetic_expressions',
-      'avoid_complex_conditions',
-      'avoid_duplicate_cascades',
-      'avoid_excessive_expressions',
-      'avoid_immediately_invoked_functions',
-      'avoid_nested_shorthands',
-      'avoid_multi_assignment',
-      'binary_expression_operand_order',
-      'prefer_moving_to_variable',
-      'prefer_parentheses_with_if_null',
-      'avoid_deep_nesting',
-      'avoid_high_cyclomatic_complexity',
-    ];
+    final fixtureDir = Directory('example/lib/complexity');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/complexity/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

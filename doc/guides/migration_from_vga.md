@@ -107,7 +107,7 @@ Many VGA rules have Saropa Lints equivalents that go deeper:
 |----------|------------------------|-------------|
 | `cancel_subscriptions` | `avoid_unassigned_stream_subscriptions`, `require_stream_controller_dispose` | Catches more patterns |
 | `close_sinks` | `require_dispose`, `dispose_fields` | Full disposal tracking |
-| `avoid_print` | `avoid_print_in_production`, `avoid_debug_print` | Context-aware |
+| `avoid_print` | `avoid_print_in_production`, `avoid_unguarded_debug` | Context-aware |
 | `use_key_in_widget_constructors` | `avoid_duplicate_widget_keys`, `require_keys_in_animated_lists` | More specific cases |
 | `unawaited_futures` | `avoid_uncaught_future_errors`, `avoid_async_call_in_sync_function` | Error handling focus |
 

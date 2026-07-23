@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/share_plus_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Instantiation-pin tests for 5 share_plus lint rules.
 ///
@@ -66,12 +67,23 @@ void main() {
   });
 
   group('SharePlus Rules - Fixture Verification', () {
-    test('share_plus_fixture exists', () {
-      final file = File(
-        'example_packages/lib/share_plus/share_plus_fixture.dart',
-      );
-      expect(file.existsSync(), isTrue);
+    final fixtureDir = Directory('example_packages/lib/share_plus');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/share_plus/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 
   group('SharePlus Rules - Metadata', () {

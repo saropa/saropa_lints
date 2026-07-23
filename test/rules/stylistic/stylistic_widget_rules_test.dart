@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/stylistic/stylistic_widget_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 13 Stylistic Widget lint rules.
 ///
@@ -99,27 +100,20 @@ void main() {
   });
 
   group('Stylistic Widget Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_sizedbox_over_container',
-      'prefer_container_over_sizedbox',
-      'prefer_text_rich_over_richtext',
-      'prefer_richtext_over_text_rich',
-      'prefer_edgeinsets_symmetric',
-      'prefer_edgeinsets_only',
-      'prefer_borderradius_circular',
-      'prefer_expanded_over_flexible',
-      'prefer_flexible_over_expanded',
-      'prefer_material_theme_colors',
-      'prefer_explicit_colors',
-      'prefer_clip_r_superellipse',
-      'prefer_clip_r_superellipse_clipper',
-    ];
+    final fixtureDir = Directory('example/lib/stylistic_widget');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example/lib/stylistic_widget/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/http_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 http lint rules.
 ///
@@ -37,15 +38,18 @@ void main() {
   });
 
   group('Http Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_http_package_client_close',
-      'avoid_http_top_level_in_loop',
-      'avoid_http_string_url',
-    ];
+    final fixtureDir = Directory('example_packages/lib/http');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example_packages/lib/http/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

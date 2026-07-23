@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/stylistic/stylistic_null_collection_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 14 Stylistic Null Collection lint rules.
 ///
@@ -105,28 +106,20 @@ void main() {
   });
 
   group('Stylistic Null Collection Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_null_aware_assignment',
-      'prefer_explicit_null_assignment',
-      'prefer_if_null_over_ternary',
-      'prefer_ternary_over_if_null',
-      'prefer_late_over_nullable',
-      'prefer_nullable_over_late',
-      'prefer_spread_over_addall',
-      'prefer_addall_over_spread',
-      'prefer_collection_if_over_ternary',
-      'prefer_ternary_over_collection_if',
-      'prefer_wheretype_over_where_is',
-      'prefer_map_entries_iteration',
-      'prefer_keys_with_lookup',
-      'prefer_mutable_collections',
-    ];
+    final fixtureDir = Directory('example/lib/stylistic_null_collection');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example/lib/stylistic_null_collection/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

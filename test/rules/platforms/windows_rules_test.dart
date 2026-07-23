@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/platforms/windows_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 5 Windows lint rules.
 ///
@@ -51,17 +52,18 @@ void main() {
   });
 
   group('Windows Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_hardcoded_drive_letters',
-      'avoid_forward_slash_path_assumption',
-      'avoid_case_sensitive_path_comparison',
-      'require_windows_single_instance_check',
-      'avoid_max_path_risk',
-    ];
+    final fixtureDir = Directory('example/lib/windows');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/windows/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

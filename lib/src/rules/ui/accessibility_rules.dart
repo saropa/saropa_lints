@@ -12,6 +12,8 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../element_identifier_utils.dart';
+import '../../flutter_widget_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/accessibility/increase_animation_duration_fix.dart';
 import '../../fixes/accessibility/unwrap_redundant_semantics_fix.dart';
@@ -1481,8 +1483,8 @@ class RequireImageSemanticsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'Image') return;
+      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image'))
+        return;
 
       bool hasSemanticLabel = false;
       bool isExcludedFromSemantics = false;
@@ -1513,6 +1515,10 @@ class RequireImageSemanticsRule extends SaropaLintRule {
       final Expression? target = node.target;
 
       if (target is! SimpleIdentifier || target.name != 'Image') return;
+
+      if (!isFlutterWidgetNamed(elementFromAstIdentifier(target), 'Image'))
+        return;
+
       if (!<String>{
         'network',
         'asset',
@@ -2763,8 +2769,8 @@ class RequireImageDescriptionRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String typeName = node.constructorName.type.name.lexeme;
-      if (typeName != 'Image') return;
+      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image'))
+        return;
 
       bool hasSemanticLabel = false;
       bool hasExclude = false;
@@ -3562,8 +3568,8 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
   ) {
     // Check Image constructor calls
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      final String? constructorName = node.constructorName.type.element?.name;
-      if (constructorName != 'Image') return;
+      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image'))
+        return;
 
       if (!_hasAccessibilityHandling(node.argumentList.arguments)) {
         reporter.atNode(node.constructorName, code);
@@ -3576,6 +3582,9 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
       final Expression? target = node.target;
 
       if (target is! SimpleIdentifier || target.name != 'Image') return;
+      if (!isFlutterWidgetNamed(elementFromAstIdentifier(target), 'Image'))
+        return;
+
       if (!<String>{
         'network',
         'asset',

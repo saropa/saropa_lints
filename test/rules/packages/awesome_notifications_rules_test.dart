@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/awesome_notifications_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Instantiation-pin tests for the 7 awesome_notifications lint rules.
 ///
@@ -133,16 +134,22 @@ void main() {
   });
 
   group('AwesomeNotifications Rules - Fixture Verification', () {
-    test('fixture file exists', () {
-      final file = File(
-        'example_packages/lib/awesome_notifications/'
-        'awesome_notifications_fixture.dart',
-      );
-      expect(
-        file.existsSync(),
-        isTrue,
-        reason: 'Fixture file must exist for scan-CLI verification',
-      );
+    final fixtureDir = Directory('example_packages/lib/awesome_notifications');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
     });
+
+    for (final fixture in fixtures) {
+      test('$fixture fixture exists', () {
+        final file = File(
+          'example_packages/lib/awesome_notifications/${fixture}_fixture.dart',
+        );
+
+        expect(file.existsSync(), isTrue);
+      });
+    }
   });
 }

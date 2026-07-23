@@ -253,7 +253,7 @@ class PreferSingleExitPointRule extends SaropaLintRule {
   /// Alias: prefer_single_exit
   static const LintCode _code = LintCode(
     'prefer_single_exit_point',
-    '[prefer_single_exit_point] Multiple return statements (early exits) make it harder to ensure cleanup, logging, and consistent resource management at the end of a function. This can lead to missed cleanup, inconsistent state, and bugs that are difficult to trace. Refactor to a single exit point so all cleanup and logging happens reliably before returning. {v1}',
+    '[prefer_single_exit_point] Multiple return statements (early exits) make it harder to ensure cleanup, logging, and consistent resource management at the end of a function. This can lead to missed cleanup, inconsistent state, and bugs that are difficult to trace. Refactor to a single exit point so all cleanup and logging happens reliably before returning. {v2}',
     correctionMessage:
         'Refactor to a single exit point: move cleanup and logging to the end, and return once.',
     severity: DiagnosticSeverity.INFO,
@@ -264,9 +264,10 @@ class PreferSingleExitPointRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addFunctionBody((node) {
-      if (node is! BlockFunctionBody) return;
-
+    // addFunctionBody is a no-op stub in the native engine (FunctionBody is not
+    // a visitable node), so this rule never fired; addBlockFunctionBody is the
+    // real registration (BUG FIX 2026-07-16).
+    context.addBlockFunctionBody((node) {
       int returnCount = 0;
       for (final stmt in node.block.statements) {
         _countReturns(stmt, (count) => returnCount += count);
@@ -375,7 +376,7 @@ class PreferGuardClausesRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_guard_clauses',
-    '[prefer_guard_clauses] Wrapping the entire function body in an if block obscures preconditions and increases nesting. Guard clauses make preconditions explicit and help prevent bugs. {v3}',
+    '[prefer_guard_clauses] Wrapping the entire function body in an if block obscures preconditions and increases nesting. Guard clauses make preconditions explicit and help prevent bugs. {v4}',
     correctionMessage:
         'Extract the condition as a guard clause with early return at the top to make preconditions explicit and reduce nesting.',
     severity: DiagnosticSeverity.INFO,
@@ -386,9 +387,10 @@ class PreferGuardClausesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addFunctionBody((node) {
-      if (node is! BlockFunctionBody) return;
-
+    // addFunctionBody is a no-op stub in the native engine (FunctionBody is not
+    // a visitable node), so this rule never fired; addBlockFunctionBody is the
+    // real registration (BUG FIX 2026-07-16).
+    context.addBlockFunctionBody((node) {
       final statements = node.block.statements;
       if (statements.isEmpty) return;
 

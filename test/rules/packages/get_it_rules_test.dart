@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/get_it_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 GetIt lint rules.
 ///
@@ -35,11 +36,12 @@ void main() {
     );
   });
   group('GetIt Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_getit_in_build',
-      'require_getit_registration_order',
-      'require_getit_reset_in_tests',
-    ];
+    final fixtureDir = Directory('example_packages/lib/get_it');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

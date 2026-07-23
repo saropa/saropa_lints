@@ -103,7 +103,7 @@ All 16 solid_lints custom rules are mapped below. saropa_lints implements 15 of 
 | `newline_before_return`             | `newline_before_return`             | ✅ Implemented                          |
 | `no_empty_block`                    | `no_empty_block`                    | ✅ Implemented                          |
 | `no_magic_number`                   | `no_magic_number`                   | ✅ Implemented                          |
-| `avoid_debug_print_in_release`      | `avoid_debug_print`                 | ✅ Implemented                          |
+| `avoid_debug_print_in_release`      | `avoid_unguarded_debug`             | ✅ Implemented (guards debugPrint with kDebugMode check) |
 
 ### The Missing Rule: avoid_using_api
 

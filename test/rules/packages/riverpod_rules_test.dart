@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/riverpod_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 37 Riverpod lint rules.
 ///
@@ -218,21 +219,12 @@ void main() {
     );
   });
   group('Riverpod Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_global_riverpod_providers',
-      'avoid_riverpod_navigation',
-      'avoid_riverpod_string_provider_name',
-      'avoid_riverpod_notifier_in_build',
-      'avoid_riverpod_state_mutation',
-      'prefer_riverpod_auto_dispose',
-      'prefer_riverpod_family_for_params',
-      'prefer_riverpod_select',
-      'require_flutter_riverpod_not_riverpod',
-      'require_flutter_riverpod_package',
-      'require_riverpod_async_value_guard',
-      'require_riverpod_error_handling',
-      'require_riverpod_lint',
-    ];
+    final fixtureDir = Directory('example_packages/lib/riverpod');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

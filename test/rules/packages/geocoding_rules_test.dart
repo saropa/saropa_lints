@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/geocoding_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 8 geocoding lint rules.
 ///
@@ -62,22 +63,20 @@ void main() {
   });
 
   group('Geocoding Rules - Fixture Verification', () {
-    final fixtures = [
-      'geocoding_unchecked_first',
-      'geocoding_missing_exception_handler',
-      'geocoding_prefer_no_result_found_catch',
-      'geocoding_locale_set_before_call',
-      'geocoding_concurrent_locale_race',
-      'geocoding_missing_is_present_check',
-      'geocoding_call_in_text_field_listener',
-      'geocoding_deprecated_locale_param',
-    ];
+    final fixtureDir = Directory('example_packages/lib/geocoding');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/geocoding/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

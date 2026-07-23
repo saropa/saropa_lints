@@ -257,6 +257,11 @@
       "reexportTitle": "Ponowny eksport  ⁇  część publicznego API tej biblioteki.",
       "reexportBadge": "reeksportowy - ponowny wywóz."
     },
+    "opportunities": {
+      "header": "SZCHANI ({count}) Szczęście",
+      "viewCode": "Wyświetlanie kodu",
+      "viewDocs": "Zobacz dokumenty"
+    },
     "alerts": {
       "archived": "ARCHIW  ⁇  repozytorium jest tylko do odczytu.",
       "knownIssue": "Znane zagadnienie: {reason}",
@@ -1297,6 +1302,11 @@
         "label": "podejrzanej transmisji.",
         "evidence": "{pct}% bez badania.",
         "rule": "Flagowane, gdy LCOV zgłasza wysoki poziom pokrycia, ale żaden test nie odnosi się do tej funkcji."
+      },
+      "fresh_code": {
+        "label": "Fresh Code - świeży kod.",
+        "evidence": "CC {cc}, ostatnio przepisana.",
+        "rule": "Zastrzeżony, gdy złożoność cyklomatyczna przekracza 10 i ciało funkcji zostało napisane lub przepisane w ciągu ostatnich 90 dni. Niedawno przepisanie złożonego kodu spowodowało incydenty znacznie częściej niż stary kod w walidacji."
       }
     },
     "shortcuts": {

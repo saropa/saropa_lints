@@ -7,6 +7,7 @@ import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/stylistic/stylistic_rules.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 28 Stylistic lint rules.
 ///
@@ -281,39 +282,12 @@ void main() {
 
   // example/lib/stylistic/: formatting and style rules with fixture-backed expectations.
   group('Stylistic Rules - Fixture Verification', () {
-    final fixtures = [
-      'prefer_trailing_comma_always',
-      'prefer_widget_methods_over_classes',
-      'prefer_class_over_record_return',
-      'prefer_single_quotes',
-      'prefer_todo_format',
-      'prefer_hack_format',
-      'prefer_fixme_format',
-      'no_runtimetype_tostring',
-      'use_truncating_division',
-      'prefer_period_after_doc',
-      'prefer_descriptive_bool_names',
-      'prefer_descriptive_bool_names_strict',
-      'prefer_doc_comments_over_regular',
-      'prefer_straight_apostrophe',
-      'prefer_doc_curly_apostrophe',
-      'prefer_doc_straight_apostrophe',
-      'prefer_curly_apostrophe',
-      'prefer_no_commented_out_code',
-      'avoid_escaping_inner_quotes',
-      'avoid_single_cascade_in_expression_statements',
-      'avoid_types_on_closure_parameters',
-      'avoid_explicit_type_declaration',
-      'prefer_explicit_null_checks',
-      'prefer_adjacent_strings',
-      'prefer_block_body_setters',
-      'prefer_expression_body_getters',
-      'prefer_interpolation_to_compose',
-      'prefer_raw_strings',
-      'prefer_optional_named_params',
-      'prefer_optional_positional_params',
-      'prefer_positional_bool_params',
-    ];
+    final fixtureDir = Directory('example/lib/stylistic');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

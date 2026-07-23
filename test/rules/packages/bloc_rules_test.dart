@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/bloc_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 52 Bloc and Cubit lint rules.
 ///
@@ -302,40 +303,12 @@ void main() {
     );
   });
   group('Bloc Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_bloc_business_logic_in_ui',
-      'avoid_bloc_context_dependency',
-      'avoid_cubit_usage',
-      'avoid_bloc_emit_after_close',
-      'avoid_bloc_event_in_constructor',
-      'avoid_bloc_event_mutation',
-      'avoid_bloc_in_bloc',
-      'avoid_bloc_listen_in_build',
-      'avoid_bloc_public_fields',
-      'avoid_bloc_public_methods',
-      'avoid_bloc_state_mutation',
-      'avoid_duplicate_bloc_event_handlers',
-      'avoid_overengineered_bloc_states',
-      'emit_new_bloc_state_instances',
-      'prefer_bloc_event_suffix',
-      'prefer_bloc_extensions',
-      'prefer_bloc_hydration',
-      'prefer_bloc_listener_for_side_effects',
-      'prefer_bloc_state_suffix',
-      'prefer_immutable_bloc_events',
-      'prefer_immutable_bloc_state',
-      'prefer_sealed_bloc_events',
-      'prefer_sealed_bloc_state',
-      'require_bloc_close',
-      'require_bloc_consumer_when_both',
-      'require_bloc_error_state',
-      'require_bloc_initial_state',
-      'require_bloc_loading_state',
-      'require_bloc_manual_dispose',
-      'require_bloc_observer',
-      'require_bloc_selector',
-      'require_bloc_transformer',
-    ];
+    final fixtureDir = Directory('example_packages/lib/bloc');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

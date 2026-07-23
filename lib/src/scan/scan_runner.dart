@@ -29,6 +29,7 @@ import 'capturing_registry.dart';
 import 'scan_config.dart';
 import 'scan_diagnostic.dart';
 import 'scan_rule_context.dart';
+import 'scan_rule_tracer.dart';
 import 'scan_walker.dart';
 
 /// Optional sink for progress and error messages. When null, output goes
@@ -42,8 +43,10 @@ class ScanRunner {
     required this.targetPath,
     this.dartFiles,
     this.tier,
+    this.enabledRuleNames,
     this.messageSink,
     this.applyExclusionsToFileList = true,
+    this.debugRule,
   });
 
   /// Project root: config is loaded from here and relative [dartFiles] are resolved against it.
@@ -55,11 +58,23 @@ class ScanRunner {
   /// Optional tier name (e.g. `essential`, `recommended`, `pedantic`). When set, the rule set is taken from this tier and the project's `diagnostics:` section is not used.
   final String? tier;
 
+  /// Optional explicit set of rule names to enable, bypassing both [tier] and
+  /// the project config. Takes precedence over [tier] when both are set. Lets a
+  /// caller exercise a rule set that no single tier expresses — notably the
+  /// union of every defined rule *including* stylistic rules, which no tier
+  /// (not even `pedantic`) contains. Used by the accuracy report so that
+  /// stylistic-tier rules are actually run and not falsely reported as silent.
+  final Set<String>? enabledRuleNames;
+
   /// Optional sink for all messages. When null, messages go to stdout and progress to stderr.
   final ScanMessageSink? messageSink;
 
   /// When [dartFiles] is provided, whether to apply the same exclusions as directory discovery (e.g. `.g.dart`, `build/`). Default true.
   final bool applyExclusionsToFileList;
+
+  /// When set, emits per-node trace output for the named rule, showing type
+  /// resolution details at each visited AST node.
+  final String? debugRule;
 
   void _out(String message) {
     if (messageSink != null) {
@@ -170,6 +185,11 @@ class ScanRunner {
 
   /// Resolves enabled rule names: from [tier] if set (validated via [tierOrder]), otherwise from project config.
   Set<String>? _resolveRuleNames() {
+    // An explicit rule set wins over tier/config: it is the only way to run a
+    // set no tier expresses (e.g. all rules including stylistic).
+    final explicit = enabledRuleNames;
+    if (explicit != null) return explicit;
+
     // Copy nullable to local for field promotion (avoid_nullable_interpolation).
     final tierLabel = tier;
     if (tierLabel != null) {
@@ -249,7 +269,20 @@ class ScanRunner {
         continue;
       }
 
-      final visitors = registry.capturedVisitors;
+      var visitors = registry.capturedVisitors;
+      if (visitors.isEmpty) continue;
+
+      final dbg = debugRule;
+      if (dbg != null && rule.code.lowerCaseName == dbg) {
+        _out(
+          'DEBUG: tracing rule "$dbg" '
+          '(${visitors.length} visitor(s))',
+        );
+        visitors = visitors
+            .map((v) => TracingVisitorWrapper(v as AstVisitor<void>, _out, dbg))
+            .toList();
+      }
+
       if (visitors.isNotEmpty) {
         result.add(_RuleRegistration(rule, visitors.cast(), context));
       }

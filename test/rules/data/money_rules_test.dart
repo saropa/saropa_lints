@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/data/money_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 2 Money/Currency lint rules.
 ///
@@ -33,14 +34,18 @@ void main() {
   });
 
   group('Money/Currency Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_double_for_money',
-      'require_currency_code_with_amount',
-    ];
+    final fixtureDir = Directory('example/lib/money');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/money/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

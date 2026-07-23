@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/image_picker_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 5 image_picker lint rules (new coverage only).
 ///
@@ -50,19 +51,20 @@ void main() {
   });
 
   group('ImagePicker Rules - Fixture Verification', () {
-    final fixtures = [
-      'image_picker_missing_retrieve_lost_data',
-      'image_picker_invalid_image_quality',
-      'image_picker_camera_source_without_support_check',
-      'image_picker_lost_data_empty_check_missing',
-      'image_picker_multi_result_unchecked_empty',
-    ];
+    final fixtureDir = Directory('example_packages/lib/image_picker');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/image_picker/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

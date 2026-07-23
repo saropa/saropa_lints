@@ -257,6 +257,11 @@
       "reexportTitle": "Imehamishwa tena  ⁇  sehemu ya API ya umma ya maktaba hii.",
       "reexportBadge": "kuuza nje tena - re-export."
     },
+    "opportunities": {
+      "header": "Fursa ({count})",
+      "viewCode": "Tazama msimbo wa kuona",
+      "viewDocs": "Tazama docs tazama docks."
+    },
     "alerts": {
       "archived": "ARCHIVED  ⁇  hazina ni ya kusoma tu.",
       "knownIssue": "Suala linalojulikana: {reason}",
@@ -1297,6 +1302,11 @@
         "label": "chanjo ya habari inayoshukiwa.",
         "evidence": "{pct}% bila mtihani wowote.",
         "rule": "Imewekwa alama wakati LCOV inaripoti chanjo kubwa lakini hakuna jaribio linalorejelea kazi."
+      },
+      "fresh_code": {
+        "label": "Fresh code mpya ya kificho.",
+        "evidence": "CC {cc}, imeandikwa upya hivi karibuni.",
+        "rule": "Inaonyeshwa wakati utata wa cyclomatic unazidi 10 na mwili wa kazi uliandikwa au kuandikwa tena ndani ya siku 90 zilizopita. Hivi karibuni, maandishi ya kificho yaliyoandikwa upya yalisababisha matukio mengi zaidi kuliko nambari za zamani wakati wa uthibitisho."
       }
     },
     "shortcuts": {

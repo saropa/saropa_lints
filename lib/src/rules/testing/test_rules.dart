@@ -1046,7 +1046,7 @@ class AvoidTestCouplingRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_test_coupling',
-    '[avoid_test_coupling] Test appears to depend on shared mutable state from other tests. Tests must be independent and run in any order. Depending on state from previous tests creates fragile, unreliable tests. {v2}',
+    '[avoid_test_coupling] Test appears to depend on shared mutable state from other tests. Tests must be independent and run in any order. Depending on state from previous tests creates fragile, unreliable tests. {v3}',
     correctionMessage:
         'Make tests independent. Use setUp/tearDown for shared state, '
         'or combine dependent tests. Update related tests to reflect the new structure and verify they still pass.',
@@ -1094,10 +1094,12 @@ class AvoidTestCouplingRule extends SaropaLintRule {
           );
         }
       }
-    });
 
-    // Report tests that read variables assigned by other tests
-    context.addPostRunCallback(() {
+      // Report tests that read variables assigned by other tests. The manual
+      // visitChildren above is synchronous, so `tests`/`assignedInTests` are
+      // fully populated here — this must run inside the compilation-unit pass
+      // because the v4 addPostRunCallback that once deferred it is a no-op on
+      // the native engine (it silently dropped every diagnostic).
       for (final _TestInfo test in tests) {
         for (final String readVar in test.readsVars) {
           if (assignedInTests.contains(readVar) &&
@@ -2599,7 +2601,7 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
 
 /// Warns when test creates files/data without tearDown cleanup.
 ///
-/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Tests that create files, directories, or database entries should clean
 /// up in tearDown to prevent test pollution and disk space issues.
@@ -2652,7 +2654,7 @@ class RequireTestCleanupRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_test_cleanup',
-    '[require_test_cleanup] Test creates resources without tearDown cleanup. Tests that create files, directories, or database entries should clean up in tearDown to prevent test pollution and disk space issues. {v3}',
+    '[require_test_cleanup] Test creates resources without tearDown cleanup. Tests that create files, directories, or database entries should clean up in tearDown to prevent test pollution and disk space issues. {v4}',
     correctionMessage:
         'Add tearDown to clean up created files or data. Update related tests to reflect the new structure and verify they still pass.',
     severity: DiagnosticSeverity.INFO,
@@ -2670,36 +2672,19 @@ class RequireTestCleanupRule extends SaropaLintRule {
       return;
     }
 
-    bool hasTearDown = false;
-    MethodInvocation? testWithResourceCreation;
+    // A tearDown may be declared after the test that creates resources, so the
+    // "creates resources but no tearDown" verdict needs the whole file first.
+    // The v4 addPostRunCallback that deferred the report is a no-op on the
+    // native engine, so scan the unit once and report at its end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _TestCleanupVisitor visitor = _TestCleanupVisitor(
+        _createsTestResources,
+      );
+      unit.accept(visitor);
 
-    context.addMethodInvocation((MethodInvocation node) {
-      final String methodName = node.methodName.name;
-
-      if (methodName == 'tearDown' || methodName == 'tearDownAll') {
-        hasTearDown = true;
-      }
-
-      if (methodName == 'test' || methodName == 'testWidgets') {
-        final ArgumentList args = node.argumentList;
-        if (args.arguments.length >= 2) {
-          final Expression callback = args.arguments[1];
-          if (callback is FunctionExpression) {
-            final String bodySource = callback.body.toSource();
-
-            // Check for resource creation patterns
-            // Use specific patterns to avoid false positives like createWidget()
-            if (_createsTestResources(bodySource)) {
-              testWithResourceCreation = node;
-            }
-          }
-        }
-      }
-    });
-
-    context.addPostRunCallback(() {
-      if (testWithResourceCreation != null && !hasTearDown) {
-        reporter.atNode(testWithResourceCreation!, code);
+      final MethodInvocation? test = visitor.testWithResourceCreation;
+      if (test != null && !visitor.hasTearDown) {
+        reporter.atNode(test, code);
       }
     });
   }
@@ -2750,9 +2735,40 @@ class RequireTestCleanupRule extends SaropaLintRule {
   }
 }
 
+/// Collects whether a unit has a tearDown and the first test that creates a
+/// resource, so the "no cleanup" verdict can be made after the full pass.
+class _TestCleanupVisitor extends RecursiveAstVisitor<void> {
+  _TestCleanupVisitor(this._createsTestResources);
+
+  final bool Function(String) _createsTestResources;
+  bool hasTearDown = false;
+  MethodInvocation? testWithResourceCreation;
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    final String methodName = node.methodName.name;
+
+    if (methodName == 'tearDown' || methodName == 'tearDownAll') {
+      hasTearDown = true;
+    } else if (methodName == 'test' || methodName == 'testWidgets') {
+      final ArgumentList args = node.argumentList;
+      if (args.arguments.length >= 2) {
+        final Expression callback = args.arguments[1];
+        // Specific patterns avoid false positives like createWidget().
+        if (callback is FunctionExpression &&
+            _createsTestResources(callback.body.toSource())) {
+          testWithResourceCreation ??= node;
+        }
+      }
+    }
+
+    super.visitMethodInvocation(node);
+  }
+}
+
 /// Warns when tests could use variant for different configurations.
 ///
-/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v3
+/// Since: v2.0.0 | Updated: v4.13.0 | Rule version: v4
 ///
 /// Duplicate tests for different screen sizes, locales, or themes should
 /// use testVariants for cleaner code and better coverage reporting.
@@ -2799,7 +2815,7 @@ class PreferTestVariantRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_test_variant',
-    '[prefer_test_variant] Similar tests could use variant for different configurations. Duplicate tests for different screen sizes, locales, or themes should use testVariants for cleaner code and better coverage reporting. {v3}',
+    '[prefer_test_variant] Similar tests could use variant for different configurations. Duplicate tests for different screen sizes, locales, or themes should use testVariants for cleaner code and better coverage reporting. {v4}',
     correctionMessage:
         'Use testWidgets variant parameter for configuration testing. Update related tests to reflect the new structure and verify they still pass.',
     severity: DiagnosticSeverity.INFO,
@@ -2817,18 +2833,37 @@ class PreferTestVariantRule extends SaropaLintRule {
       return;
     }
 
-    final List<MethodInvocation> sizeTests = <MethodInvocation>[];
+    // The rule only fires when the file has 2+ size-configured tests, so it
+    // must count them all before reporting any. The v4 addPostRunCallback that
+    // deferred the report is a no-op on the native engine, so collect in one
+    // compilation-unit pass and report at its end instead.
+    context.addCompilationUnit((CompilationUnit unit) {
+      final _SizeTestVisitor visitor = _SizeTestVisitor();
+      unit.accept(visitor);
 
-    context.addMethodInvocation((MethodInvocation node) {
-      if (node.methodName.name != 'testWidgets') return;
+      // Only worth suggesting a variant once duplicate size tests exist.
+      if (visitor.sizeTests.length >= 2) {
+        for (final MethodInvocation test in visitor.sizeTests) {
+          reporter.atNode(test.methodName, code);
+        }
+      }
+    });
+  }
+}
 
+/// Collects testWidgets calls that configure a screen size / scaling.
+class _SizeTestVisitor extends RecursiveAstVisitor<void> {
+  final List<MethodInvocation> sizeTests = <MethodInvocation>[];
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    if (node.methodName.name == 'testWidgets') {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length >= 2) {
         final Expression callback = args.arguments[1];
         if (callback is FunctionExpression) {
           final String bodySource = callback.body.toSource();
-
-          // Check for screen size configuration (word-boundary to avoid FP)
+          // Word-boundary matches avoid false positives.
           if (RegExp(r'\bphysicalSizeTestValue\b').hasMatch(bodySource) ||
               RegExp(r'\bdevicePixelRatio\b').hasMatch(bodySource) ||
               RegExp(r'\btextScaleFactor\b').hasMatch(bodySource)) {
@@ -2836,16 +2871,8 @@ class PreferTestVariantRule extends SaropaLintRule {
           }
         }
       }
-    });
-
-    context.addPostRunCallback(() {
-      // If there are multiple size-related tests, suggest variant
-      if (sizeTests.length >= 2) {
-        for (final MethodInvocation test in sizeTests) {
-          reporter.atNode(test.methodName, code);
-        }
-      }
-    });
+    }
+    super.visitMethodInvocation(node);
   }
 }
 

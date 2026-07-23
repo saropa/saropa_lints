@@ -257,6 +257,11 @@
       "reexportTitle": "Re-exported — part of this library’s public API",
       "reexportBadge": "re-export"
     },
+    "opportunities": {
+      "header": "OPPORTUNITIES ({count})",
+      "viewCode": "View code",
+      "viewDocs": "View docs"
+    },
     "alerts": {
       "archived": "ARCHIVED — repository is read-only",
       "knownIssue": "Known Issue: {reason}",
@@ -1297,6 +1302,11 @@
         "label": "suspicious coverage",
         "evidence": "{pct}% with no test",
         "rule": "Flagged when LCOV reports high coverage but no test references the function."
+      },
+      "fresh_code": {
+        "label": "fresh code",
+        "evidence": "CC {cc}, recently rewritten",
+        "rule": "Flagged when cyclomatic complexity exceeds 10 and the function body was written or rewritten within the last 90 days. Recently rewritten complex code caused incidents far more often than old code in validation."
       }
     },
     "shortcuts": {

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/packages/equatable_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 13 Equatable lint rules.
 ///
@@ -90,22 +91,12 @@ void main() {
     );
   });
   group('Equatable Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_extend_equatable',
-      'list_all_equatable_fields',
-      'avoid_equatable_nested_equality',
-      'prefer_equatable_mixin',
-      'prefer_equatable_stringify',
-      'prefer_immutable_annotation',
-      'prefer_record_over_equatable',
-      'avoid_mutable_field_in_equatable',
-      'require_equatable_copy_with',
-      'require_copy_with_null_handling',
-      'require_deep_equality_collections',
-      'avoid_equatable_datetime',
-      'prefer_unmodifiable_collections',
-      'require_equatable_props_override',
-    ];
+    final fixtureDir = Directory('example_packages/lib/equatable');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

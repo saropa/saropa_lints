@@ -65,7 +65,7 @@ plugins:
 plugins:
   saropa_lints:
     diagnostics:
-      avoid_debug_print: true
+      avoid_unguarded_debug: true
 ''');
 
       final pedanticOnly = tiers.pedanticOnlyRules.first;
@@ -76,7 +76,7 @@ plugins:
       expect(RuntimeTierCap.activeCap, RuleTier.essential);
       expect(RuntimeTierCap.ruleAllowedByCap(pedanticOnly), isFalse);
       expect(RuntimeTierCap.ruleAllowedByCap(essentialRule), isTrue);
-      expect(RuntimeTierCap.ruleAllowedByCap('avoid_debug_print'), isFalse);
+      expect(RuntimeTierCap.ruleAllowedByCap('avoid_unguarded_debug'), isFalse);
     });
   });
 

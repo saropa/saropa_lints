@@ -1582,7 +1582,6 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_context_in_initstate_dispose',
   'avoid_contradictory_expressions',
   'avoid_controller_in_build',
-  'avoid_debug_print',
   'prefer_debug_print',
   'avoid_double_slash_imports',
   'avoid_duplicate_number_elements',
@@ -3049,6 +3048,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'device_calendar_event_missing_calendar_id',
   'device_calendar_event_utc_timezone',
   'device_calendar_result_data_before_success_check',
+  // device_calendar_plus (device_calendar_plus_rules.dart)
+  'device_calendar_plus_missing_permission_check',
+  'device_calendar_plus_all_day_event_utc_conversion',
+  'device_calendar_plus_empty_update_event',
   // HomeWidget (home_widget_rules.dart)
   'home_widget_callback_missing_pragma',
   'home_widget_callback_not_top_level',
@@ -4329,6 +4332,16 @@ const Set<String> deviceCalendarPackageRules = <String>{
   'device_calendar_result_data_before_success_check',
 };
 
+/// Rules specific to the device_calendar_plus package. Kept separate from
+/// [deviceCalendarPackageRules]: device_calendar_plus is a from-scratch
+/// rewrite, not a fork, and shares no method or class names with
+/// device_calendar.
+const Set<String> deviceCalendarPlusPackageRules = <String>{
+  'device_calendar_plus_missing_permission_check',
+  'device_calendar_plus_all_day_event_utc_conversion',
+  'device_calendar_plus_empty_update_event',
+};
+
 /// Rules specific to the home_widget package.
 const Set<String> homeWidgetPackageRules = <String>{
   'home_widget_callback_missing_pragma',
@@ -4398,6 +4411,7 @@ Map<String, Set<String>> get packageRuleSets => {
   'in_app_review': inAppReviewPackageRules,
   'home_widget': homeWidgetPackageRules,
   'device_calendar': deviceCalendarPackageRules,
+  'device_calendar_plus': deviceCalendarPlusPackageRules,
   'file_picker': filePickerPackageRules,
   'local_auth': localAuthPackageRules,
   'geocoding': geocodingPackageRules,
@@ -4451,6 +4465,7 @@ const List<String> allPackages = <String>[
   'in_app_review',
   'home_widget',
   'device_calendar',
+  'device_calendar_plus',
   'file_picker',
   'local_auth',
   'geocoding',
@@ -4508,6 +4523,7 @@ const Map<String, bool> defaultPackages = <String, bool>{
   'in_app_review': true,
   'home_widget': true,
   'device_calendar': true,
+  'device_calendar_plus': true,
   'file_picker': true,
   'local_auth': true,
   'geocoding': true,

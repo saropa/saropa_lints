@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:saropa_lints/src/rules/config/platform_rules.dart';
 import 'package:saropa_lints/src/rules/platforms/android_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 3 Platform lint rules.
 ///
@@ -61,17 +62,18 @@ void main() {
   });
 
   group('Platform Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_android_manifest_entries',
-      'require_desktop_window_setup',
-      'require_platform_check',
-      'prefer_platform_io_conditional',
-      'prefer_foundation_platform_check',
-    ];
+    final fixtureDir = Directory('example/lib/platform');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/platform/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

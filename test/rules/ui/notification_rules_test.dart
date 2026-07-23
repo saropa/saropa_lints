@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/ui/notification_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 8 Notification lint rules.
 ///
@@ -101,20 +102,18 @@ void main() {
   });
 
   group('Notification Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_notification_channel_android',
-      'avoid_notification_payload_sensitive',
-      'require_notification_initialize_per_platform',
-      'require_notification_timezone_awareness',
-      'avoid_notification_same_id',
-      'prefer_notification_grouping',
-      'avoid_notification_silent_failure',
-      'prefer_local_notification_for_immediate',
-    ];
+    final fixtureDir = Directory('example/lib/notification');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File('example/lib/notification/${fixture}_fixture.dart');
+
         expect(file.existsSync(), isTrue);
       });
     }

@@ -743,7 +743,7 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'prefer_commenting_future_delayed',
     '[prefer_commenting_future_delayed] Unexplained delay is a code smell '
-        'that often hides race conditions or timing bugs. {v4}',
+        'that often hides race conditions or timing bugs. {v5}',
     correctionMessage: 'Add a comment before the delay explaining its purpose.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -753,22 +753,43 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Syntactic path: unresolved, `Future.delayed(...)` presents as a
+    // MethodInvocation with a `Future` SimpleIdentifier target.
     context.addMethodInvocation((MethodInvocation node) {
-      // Check for Future.delayed
       final Expression? target = node.target;
       if (target is! SimpleIdentifier) return;
       if (target.name != 'Future') return;
       if (node.methodName.name != 'delayed') return;
-
-      // Check preceding comments attached to the token
-      // This is the reliable way to check for comments in Dart AST
-      final Token firstToken = node.beginToken;
-      final bool hasComment = firstToken.precedingComments != null;
-
-      if (!hasComment) {
-        reporter.atNode(node);
-      }
+      _reportIfUncommented(node, reporter);
     });
+
+    // Resolved path: `Future.delayed` is a named constructor, so under
+    // resolution it is an InstanceCreationExpression, not a MethodInvocation —
+    // the handler above never saw it in a resolved analysis (the real analyzer's
+    // mode), so the rule never fired (BUG FIX 2026-07-16).
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName cn = node.constructorName;
+      if (cn.type.name.lexeme != 'Future') return;
+      if (cn.name?.name != 'delayed') return;
+      _reportIfUncommented(node, reporter);
+    });
+  }
+
+  /// Reports [node] when no comment precedes the delay — the "unexplained
+  /// delay" the rule flags. Shared by both detection paths.
+  ///
+  /// The leading comment lives on the begin token of the enclosing STATEMENT,
+  /// not of the `Future.delayed` node itself: in `await Future.delayed(...)` the
+  /// `await` token owns the leading comment, so checking the node's own begin
+  /// token (`Future`) always saw null and would fire even on a commented delay
+  /// (BUG FIX 2026-07-16 — checking the statement token both lets the rule fire
+  /// under resolution and stops it flagging genuinely-commented delays).
+  void _reportIfUncommented(AstNode node, SaropaDiagnosticReporter reporter) {
+    final Statement? statement = node.thisOrAncestorOfType<Statement>();
+    final Token begin = (statement ?? node).beginToken;
+    if (begin.precedingComments == null) {
+      reporter.atNode(node);
+    }
   }
 }
 
@@ -4859,7 +4880,7 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_sequential_awaits',
     '[avoid_sequential_awaits] Multiple sequential awaits on independent '
-        'operations. Total time is sum of all; could run in parallel. {v2}',
+        'operations. Total time is sum of all; could run in parallel. {v3}',
     correctionMessage:
         'Use Future.wait([...]) to run independent futures concurrently.',
     severity: DiagnosticSeverity.INFO,
@@ -4870,9 +4891,11 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addFunctionBody((FunctionBody body) {
-      if (body is! BlockFunctionBody) return;
-
+    // addFunctionBody is a no-op stub in the native engine (FunctionBody is not
+    // a visitable node there), so this rule never fired for anyone.
+    // addBlockFunctionBody is the real registration and hands us the
+    // BlockFunctionBody directly (BUG FIX 2026-07-16).
+    context.addBlockFunctionBody((BlockFunctionBody body) {
       // Find all await expressions in the body
       final List<AwaitExpression> awaits = <AwaitExpression>[];
       body.accept(_AwaitCollector(awaits));
@@ -5213,6 +5236,10 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
       // awaited to coordinate animation flow.
       if (_isAnimationControllerTickerAwait(node.expression)) return;
 
+      // Skip unresolvable types — the analyzer couldn't determine the type,
+      // so we can't know whether it's a Future.
+      if (type is InvalidType) return;
+
       // Skip dynamic and Object — could be a Future at runtime
       if (type is DynamicType) return;
       if (type.isDartCoreObject) return;
@@ -5220,6 +5247,20 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
       // Allow Future, FutureOr, Stream, and types that implement them (e.g.
       // PostgrestBuilder implements Future<T>).
       if (_staticTypeIsAwaitable(type)) return;
+
+      // Fallback: when staticType fails to resolve as awaitable for
+      // invocations (e.g. static methods across files), check the invoked
+      // method signature's return type via staticInvokeType.
+      final Expression expr = node.expression;
+      if (expr is MethodInvocation || expr is FunctionExpressionInvocation) {
+        final DartType? invokeType = expr is MethodInvocation
+            ? expr.staticInvokeType
+            : (expr as FunctionExpressionInvocation).staticInvokeType;
+        if (invokeType is FunctionType &&
+            _staticTypeIsAwaitable(invokeType.returnType)) {
+          return;
+        }
+      }
 
       // Skip type parameters — T could be a Future at runtime
       if (type is TypeParameterType) return;

@@ -380,22 +380,25 @@ class FutureBuilder<T> extends Widget {
 // =========================================================================
 
 // BAD: WebSocket without reconnection handling
+// The rule matches a bounded `WebSocketChannel` / `WebSocket` token in the class
+// source (toSource(), so comments do not count), so the channel type must be a
+// real WebSocketChannel, not `WebSocketChannel` (no word boundary after WebSocket).
 class BadWebSocketService {
   // expect_lint: require_websocket_reconnection
-  WebSocketDemo? _channel;
+  WebSocketChannel? _channel;
 
   void connect() {
-    _channel = WebSocketDemo.connect('wss://example.com');
+    _channel = WebSocketChannel.connect('wss://example.com');
   }
 }
 
 // GOOD: WebSocket with reconnection logic
 class GoodWebSocketService {
-  WebSocketDemo? _channel;
+  WebSocketChannel? _channel;
   int _reconnectAttempts = 0;
 
   void connect() {
-    _channel = WebSocketDemo.connect('wss://example.com');
+    _channel = WebSocketChannel.connect('wss://example.com');
     _channel!.stream.listen(
       (data) {},
       onDone: _handleReconnect,
@@ -412,8 +415,9 @@ class GoodWebSocketService {
 }
 
 // BAD: Heavy computation on main isolate
+// NOTE: no `prefer_isolate_for_heavy_compute` rule exists yet; the expect_lint
+// marker that used to be here asserted a non-existent rule (removed 2026-07-16).
 void processLargeDataBad(List<int> data) {
-  // expect_lint: prefer_isolate_for_heavy_compute
   for (var i = 0; i < 1000000; i++) {
     // Heavy computation
   }
@@ -429,8 +433,9 @@ Future<void> processLargeDataGood(List<int> data) async {
 }
 
 // BAD: Caching without TTL
+// NOTE: no `require_cache_ttl` rule exists yet; the expect_lint marker that used
+// to be here asserted a non-existent rule (removed 2026-07-16).
 class BadCacheService {
-  // expect_lint: require_cache_ttl
   final Map<String, Object> _cache = {};
 
   void set(String key, Object value) {
@@ -458,9 +463,9 @@ class GoodCacheService {
 }
 
 // Mock classes
-class WebSocketDemo {
-  static WebSocketDemo connect(String url) => WebSocketDemo._();
-  WebSocketDemo._();
+class WebSocketChannel {
+  static WebSocketChannel connect(String url) => WebSocketChannel._();
+  WebSocketChannel._();
   StreamDemo get stream => StreamDemo();
 }
 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/widget/dialog_snackbar_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 6 Dialog & SnackBar lint rules.
 ///
@@ -57,20 +58,20 @@ void main() {
   });
 
   group('Dialog & SnackBar Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_snackbar_duration',
-      'require_dialog_barrier_dismissible',
-      'require_dialog_result_handling',
-      'avoid_snackbar_queue_buildup',
-      'prefer_adaptive_dialog',
-      'require_snackbar_action_for_undo',
-    ];
+    final fixtureDir = Directory('example/lib/dialog_snackbar');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example/lib/dialog_snackbar/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

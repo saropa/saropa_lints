@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 import 'package:saropa_lints/src/rules/packages/audioplayers_rules.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 6 audioplayers lint rules.
 ///
@@ -59,20 +60,20 @@ void main() {
   });
 
   group('Audioplayers Rules - Fixture Verification', () {
-    final fixtures = [
-      'audioplayers_pool_not_disposed',
-      'audioplayers_low_latency_with_stream_listen',
-      'audioplayers_low_latency_with_seek',
-      'audioplayers_release_mode_loop_with_complete_listener',
-      'audioplayers_url_source_in_asset_context',
-      'audioplayers_hardcoded_volume_above_one',
-    ];
+    final fixtureDir = Directory('example_packages/lib/audioplayers');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {
         final file = File(
           'example_packages/lib/audioplayers/${fixture}_fixture.dart',
         );
+
         expect(file.existsSync(), isTrue);
       });
     }

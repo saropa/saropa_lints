@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/codegen/freezed_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 10 Freezed lint rules.
 ///
@@ -76,20 +77,12 @@ void main() {
     );
   });
   group('Freezed Rules - Fixture Verification', () {
-    final fixtures = [
-      'avoid_freezed_json_serializable_conflict',
-      'avoid_freezed_invalid_annotation_target',
-      'require_freezed_arrow_syntax',
-      'require_freezed_private_constructor',
-      'require_freezed_explicit_json',
-      'prefer_freezed_default_values',
-      'prefer_freezed_union_types',
-      'require_freezed_json_converter',
-      'require_freezed_lint_package',
-      'avoid_freezed_for_logic_classes',
-      'prefer_freezed_for_data_classes',
-      'avoid_freezed_any_map_issue',
-    ];
+    final fixtureDir = Directory('example_packages/lib/freezed');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

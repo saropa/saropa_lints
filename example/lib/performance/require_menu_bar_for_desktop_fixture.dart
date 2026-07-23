@@ -110,20 +110,12 @@ dynamic child;
 final context = BuildContext();
 
 // BAD: Should trigger require_menu_bar_for_desktop
+// This is a whole-file rule (it reports a MaterialApp only when NO PlatformMenuBar
+// appears anywhere in the file), so the compliant example must live in its own
+// file — require_menu_bar_for_desktop_good.dart — or its menu bar would mask this.
 // expect_lint: require_menu_bar_for_desktop
 void _bad807() {
   MaterialApp(
-    home: Scaffold(),
-  );
-}
-
-// GOOD: Should NOT trigger require_menu_bar_for_desktop
-void _good807() {
-  MaterialApp(
-    builder: (context, child) => PlatformMenuBar(
-      menus: [],
-      child: child!,
-    ),
     home: Scaffold(),
   );
 }

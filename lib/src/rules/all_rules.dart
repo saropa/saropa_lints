@@ -143,6 +143,7 @@ export 'packages/audioplayers_rules.dart';
 export 'packages/bloc_rules.dart';
 export 'packages/cached_network_image_rules.dart';
 export 'packages/device_calendar_rules.dart';
+export 'packages/device_calendar_plus_rules.dart';
 export 'packages/http_rules.dart';
 export 'packages/permission_handler_rules.dart';
 export 'packages/flutter_map_rules.dart';

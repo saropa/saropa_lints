@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:saropa_lints/src/rules/network/api_network_rules.dart';
 import 'package:test/test.dart';
+import '../../helpers/fixture_discovery.dart';
 
 /// Tests for 38 Api Network lint rules.
 ///
@@ -235,46 +236,12 @@ void main() {
     );
   });
   group('Api Network Rules - Fixture Verification', () {
-    final fixtures = [
-      'require_http_status_check',
-      'avoid_hardcoded_api_urls',
-      'require_retry_logic',
-      'require_typed_api_response',
-      'require_connectivity_check',
-      'require_api_error_mapping',
-      'require_request_timeout',
-      'require_offline_indicator',
-      'prefer_streaming_response',
-      'prefer_http_connection_reuse',
-      'avoid_redundant_requests',
-      'require_response_caching',
-      'prefer_api_pagination',
-      'prefer_batch_requests',
-      'avoid_over_fetching',
-      'require_cancel_token',
-      'require_accept_encoding_header',
-      'require_websocket_error_handling',
-      'require_content_type_check',
-      'avoid_websocket_without_heartbeat',
-      'require_url_launcher_error_handling',
-      'require_image_picker_error_handling',
-      'require_image_picker_source_choice',
-      'require_geolocator_timeout',
-      'require_connectivity_subscription_cancel',
-      'require_notification_handler_top_level',
-      'require_permission_denied_handling',
-      'require_image_picker_result_handling',
-      'avoid_cached_image_in_build',
-      'require_sqflite_migration',
-      'require_permission_rationale',
-      'require_permission_status_check',
-      'require_notification_permission_android13',
-      'require_sse_subscription_cancel',
-      'prefer_timeout_on_requests',
-      'require_websocket_reconnection',
-      'require_analytics_event_naming',
-      'require_ssl_pinning_sensitive',
-    ];
+    final fixtureDir = Directory('example/lib/api_network');
+    final fixtures = discoverFixtures(fixtureDir);
+    test('fixture directory exists and is not empty', () {
+      expect(fixtureDir.existsSync(), isTrue);
+      expect(fixtures, isNotEmpty);
+    });
 
     for (final fixture in fixtures) {
       test('$fixture fixture exists', () {

@@ -8,6 +8,7 @@
 import {
     VibrancyResult, VersionGapResult, ReviewEntry, activeFileUsages, PackageUsage,
 } from '../types';
+import type { ChangelogBullet } from '../services/changelog-opportunities';
 import { ReviewSummary } from '../services/review-state';
 import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
 import { formatSizeMB } from '../scoring/bloat-calculator';
@@ -96,6 +97,7 @@ export function buildPackageDetailBody(
         buildTopicsSection(result),
         buildVersionSection(result),
         buildChangelogSection(result),
+        buildOpportunitiesSection(result),
         buildCommunitySection(result),
         // Health Score breakdown (score factors + maintainer-quality bonuses).
         // Only in the dashboard pane, where report-styles supplies its CSS; the
@@ -407,6 +409,78 @@ function buildChangelogSection(r: VibrancyResult): string {
     }
 
     return section(l10n('packageDetail.section.changelog'), `${intro}${entries}${footer}`);
+}
+
+/**
+ * Adoption opportunities: changelog features this package already ships that
+ * the project has not started using (`unadoptedApiNames`, computed during the
+ * scan by cross-referencing `opportunities` against project symbol usage —
+ * see `rankAdoption` in extension-activation.ts). Distinct from the Changelog
+ * section above: that lists everything between current→latest; this narrows
+ * to the subset genuinely worth a second look. Renders nothing when nothing
+ * is unadopted, which is the common case.
+ */
+function buildOpportunitiesSection(r: VibrancyResult): string {
+    const unused = new Set(r.unadoptedApiNames ?? []);
+    if (unused.size === 0) { return ''; }
+
+    // A bullet only stays an opportunity while at least one of its named
+    // APIs remains unused — once every symbol it introduced shows up in
+    // project source, it has been adopted and drops out of this list.
+    const bullets = (r.opportunities?.opportunities ?? [])
+        .filter(b => b.apiNames.some(n => unused.has(n)));
+    if (bullets.length === 0) { return ''; }
+
+    const repoUrl = resolveRepoUrl(r.github?.repoUrl, r.pubDev?.repositoryUrl);
+    const docUrl = `https://pub.dev/documentation/${encodeURIComponent(r.package.name)}/latest/`;
+
+    const items = bullets
+        .map(b => buildOpportunityItem(b, unused, repoUrl, docUrl))
+        .join('');
+    return section(
+        l10n('packageDetail.opportunities.header', { count: String(bullets.length) }),
+        items,
+    );
+}
+
+/**
+ * One unadopted feature: the changelog bullet that introduced it, the
+ * version it shipped in, and — per named API still unused — a code-search
+ * link into the package repository and a documentation-search link, so
+ * deciding whether to adopt it doesn't require leaving the sidebar.
+ */
+function buildOpportunityItem(
+    bullet: ChangelogBullet,
+    unused: ReadonlySet<string>,
+    repoUrl: string,
+    docUrl: string,
+): string {
+    const apiRows = bullet.apiNames
+        .filter(n => unused.has(n))
+        .map(name => {
+            const links: string[] = [];
+            if (repoUrl) {
+                links.push(actionLink(
+                    `${repoUrl}/search?q=${encodeURIComponent(name)}`,
+                    l10n('packageDetail.opportunities.viewCode'),
+                ));
+            }
+            links.push(actionLink(
+                `${docUrl}?search=${encodeURIComponent(name)}`,
+                l10n('packageDetail.opportunities.viewDocs'),
+            ));
+            return `<div class="opp-item-api">`
+                + `<code class="opp-item-chip">${escapeHtml(name)}</code> `
+                + links.join(' &middot; ')
+                + `</div>`;
+        })
+        .join('');
+
+    const version = `<span class="opp-item-version">v${escapeHtml(bullet.version)}</span>`;
+    return `<div class="opp-item">
+        <div class="opp-item-text">${escapeHtml(bullet.text)} ${version}</div>
+        ${apiRows}
+    </div>`;
 }
 
 function buildCommunitySection(r: VibrancyResult): string {
