@@ -64,6 +64,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+<details><summary>Maintenance</summary>
+
+- **CI: fetch tags for test job** — the `health_history_test` needs git tags; shallow CI clones lacked them. Added `fetch-tags: true` to checkout and a skip guard for tag-less environments.
+
+</details>
+
 ## [14.3.8]
 
 Fixes an issue where the analysis server repeatedly restarted the plugin isolate, causing IDE diagnostic results to clear continuously. Automatically excludes common non-Dart output directories during initialization to prevent file-watcher feedback loops. Adds restart-rate telemetry, log rotation, and a configurable `log_level` setting to control plugin log verbosity. [log](https://github.com/saropa/saropa_lints/blob/v14.3.8/CHANGELOG.md)
