@@ -27852,6 +27852,21 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "require_dio_factory": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "packages"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "require_dio_interceptor_error_handler": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -27883,21 +27898,6 @@
       }
     },
     "require_dio_retry_interceptor": {
-      "ruleType": "codeSmell",
-      "ruleStatus": "ready",
-      "requiresReview": false,
-      "defaultReviewState": null,
-      "cweIds": [],
-      "certIds": [],
-      "tags": [
-        "packages"
-      ],
-      "accuracyTarget": {
-        "expectZeroFalsePositives": true,
-        "description": "Code smell default target: zero false positives."
-      }
-    },
-    "require_dio_factory": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
