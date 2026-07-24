@@ -60,3 +60,19 @@ Added `_rotateIfNeeded()` — caps `plugin.log` at 512 KB (`_maxLogFileBytes`) b
 
 - `test/native/plugin_logger_test.dart` — 14 tests (7 new: restart-rate warning above threshold, below threshold, all-old-entries, corrupted log file, log rotation above cap, single-huge-line truncation; 1 existing: pubspec.yaml rejection; 4 updated for pubspec.yaml in temp dirs; 2 original unchanged).
 - `test/init/ensure_non_dart_excludes_test.dart` — 11 tests (5 new: flow-style under analyzer with blank line separator, flow-style under non-analyzer key, flow-style guard, trailing comment, partial dedup).
+
+## Finish Report (2026-07-24) — Log Level and Final Hardening
+
+### Changes
+
+**`lib/src/native/plugin_logger.dart`** — Added `PluginLogLevel` enum (`off`, `error`, `warning`, `info`, `debug`) with `tryParse` for config deserialization. `PluginLogger.log()` now accepts an optional `level` parameter (default: `info`). Messages below `minLevel` are sent to `developer.log` but skip the user-visible log file and memory buffer. Session headers and restart-rate warnings bypass the level check (they use `_appendToFile` directly). `resetForTesting()` resets `minLevel` to `info`. CRLF and UTF-8 safety of `_rotateIfNeeded` documented in comments (0x0A cannot appear as a UTF-8 continuation byte; CRLF `\r\n` places `0x0D` before `0x0A` so cutting after `0x0A` never orphans `\r`).
+
+**`lib/src/native/config_loader.dart`** — Added `_loadLogLevel(content)` which parses `log_level:` under `plugins > saropa_lints` in `analysis_options.yaml`. Scoped to the `saropa_lints:` section body to avoid matching a `log_level:` key under an unrelated top-level section. Called before the `diagnostics:` section check so a valid `log_level:` setting is honored even when the `diagnostics:` block is absent. Two catch blocks (`loadNativePluginConfig failed`, `_readProjectFile failed`) tagged with `level: PluginLogLevel.error`.
+
+**`lib/src/init/config_writer.dart`** — `generatePluginsYaml` now emits `log_level: info` after `version:`, so all new and regenerated configs include the setting with a comment listing valid values.
+
+### Tests
+
+- `test/native/plugin_logger_test.dart` — 19 tests total. New: 3 `PluginLogLevel.tryParse` tests (valid names, case-insensitive, invalid input), 2 level-filtering tests (error-only filter, off suppresses all), 1 CRLF rotation test.
+- `test/init/write_config_test.dart` — existing test extended with `log_level: info` assertion.
+- `test/native/config_loader_project_root_test.dart` — 5 tests pass (unchanged).

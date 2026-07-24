@@ -29,7 +29,7 @@ import '../config/rule_packs.dart';
 import '../config/runtime_tier_cap.dart';
 import '../report/diagnostic_statistics.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
-import 'plugin_logger.dart' show PluginLogger;
+import 'plugin_logger.dart' show PluginLogLevel, PluginLogger;
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Loads all plugin configuration from yaml and environment variables.
@@ -146,7 +146,12 @@ void _loadFromRoot(String? projectRoot) {
       'enabledRules: $enabledCount',
     );
   } on Object catch (e, st) {
-    PluginLogger.log('loadNativePluginConfig failed', error: e, stackTrace: st);
+    PluginLogger.log(
+      'loadNativePluginConfig failed',
+      level: PluginLogLevel.error,
+      error: e,
+      stackTrace: st,
+    );
     // Defensive: ensure plugin can still register with defaults
   }
 }
@@ -265,7 +270,12 @@ String? _readProjectFile(String filename, [String? projectRoot]) {
     if (!file.existsSync()) return null;
     return file.readAsStringSync();
   } on Object catch (e, st) {
-    PluginLogger.log('_readProjectFile failed', error: e, stackTrace: st);
+    PluginLogger.log(
+      '_readProjectFile failed',
+      level: PluginLogLevel.error,
+      error: e,
+      stackTrace: st,
+    );
     // I/O or path error; return null so config steps use defaults
     return null;
   }
@@ -393,6 +403,10 @@ void _loadDiagnosticsConfig([String? projectRoot]) {
     return;
   }
 
+  // Parse log_level before the diagnostics-section check — it is a sibling
+  // key under `plugins > saropa_lints`, not nested under `diagnostics:`.
+  _loadLogLevel(content);
+
   final sectionMatch = RegExp(
     r'^\s+diagnostics:\s*$',
     multiLine: true,
@@ -434,6 +448,34 @@ void _loadDiagnosticsConfig([String? projectRoot]) {
 
   SaropaLintRule.enabledRules = enabled.isEmpty ? null : enabled;
   SaropaLintRule.disabledRules = disabled.isEmpty ? null : disabled;
+}
+
+/// Parses `log_level:` under `plugins > saropa_lints` in
+/// `analysis_options.yaml`. Valid values: off, error, warning, info, debug.
+/// Unrecognized values leave [PluginLogger.minLevel] at its default (info).
+///
+/// Scoped to the `saropa_lints:` section so a `log_level:` key under an
+/// unrelated top-level section is not matched.
+void _loadLogLevel(String content) {
+  // Find the saropa_lints section first.
+  final saropaMatch = RegExp(
+    r'^\s+saropa_lints:\s*$',
+    multiLine: true,
+  ).firstMatch(content);
+  if (saropaMatch == null) return;
+
+  final afterSaropa = content.substring(saropaMatch.end);
+  // Match log_level at 4-space indent (same level as version:, diagnostics:).
+  final match = RegExp(
+    r'^    log_level:\s*(\S+)',
+    multiLine: true,
+  ).firstMatch(afterSaropa);
+  if (match == null) return;
+
+  final parsed = PluginLogLevel.tryParse(match.group(1));
+  if (parsed != null) {
+    PluginLogger.minLevel = parsed;
+  }
 }
 
 /// Rule codes last merged from `rule_packs.enabled` (subtract before re-merge).

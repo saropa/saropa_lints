@@ -33,6 +33,28 @@ void main() {
     PluginLogger.resetForTesting();
   });
 
+  group('PluginLogLevel.tryParse', () {
+    test('parses valid level names', () {
+      expect(PluginLogLevel.tryParse('off'), PluginLogLevel.off);
+      expect(PluginLogLevel.tryParse('error'), PluginLogLevel.error);
+      expect(PluginLogLevel.tryParse('warning'), PluginLogLevel.warning);
+      expect(PluginLogLevel.tryParse('info'), PluginLogLevel.info);
+      expect(PluginLogLevel.tryParse('debug'), PluginLogLevel.debug);
+    });
+
+    test('is case-insensitive', () {
+      expect(PluginLogLevel.tryParse('INFO'), PluginLogLevel.info);
+      expect(PluginLogLevel.tryParse('Debug'), PluginLogLevel.debug);
+    });
+
+    test('returns null for invalid input', () {
+      expect(PluginLogLevel.tryParse(null), isNull);
+      expect(PluginLogLevel.tryParse(''), isNull);
+      expect(PluginLogLevel.tryParse('verbose'), isNull);
+      expect(PluginLogLevel.tryParse('trace'), isNull);
+    });
+  });
+
   group('PluginLogger', () {
     test('buffers entries before setProjectRoot is called', () {
       PluginLogger.log('early entry one');
@@ -303,6 +325,35 @@ void main() {
       }
     });
 
+    test('rotates CRLF log file without orphaned carriage returns', () {
+      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        final logDir = Directory(
+          p.join(tempDir.path, 'reports', '.saropa_lints'),
+        )..createSync(recursive: true);
+        final logFile = File(p.join(logDir.path, 'plugin.log'));
+
+        // Write >512KB of CRLF-terminated lines with a marker at the start.
+        final buf = StringBuffer()..writeln('CRLF_OLD_MARKER');
+        for (var i = 0; i < 7000; i++) {
+          buf.write('${'y' * 70} line $i\r\n');
+        }
+        logFile.writeAsStringSync(buf.toString());
+        expect(logFile.lengthSync(), greaterThan(512 * 1024));
+
+        PluginLogger.setProjectRoot(tempDir.path);
+
+        final contents = logFile.readAsStringSync();
+        expect(contents, isNot(contains('CRLF_OLD_MARKER')));
+        // First kept line must not start with \r.
+        expect(contents.startsWith('\r'), isFalse);
+        expect(contents, contains('session started'));
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
     test('rotates single huge line by truncating entirely', () {
       final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
       File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
@@ -322,6 +373,47 @@ void main() {
         // the new session header.
         expect(contents, contains('session started'));
         expect(contents.length, lessThan(600 * 1024));
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('log level filters messages below minLevel from disk', () {
+      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        PluginLogger.setProjectRoot(tempDir.path);
+        PluginLogger.minLevel = PluginLogLevel.error;
+
+        PluginLogger.log('info message', level: PluginLogLevel.info);
+        PluginLogger.log('debug message', level: PluginLogLevel.debug);
+        PluginLogger.log('error message', level: PluginLogLevel.error);
+
+        final contents = File(
+          PluginLogger.logFilePathForTesting!,
+        ).readAsStringSync();
+        expect(contents, contains('error message'));
+        expect(contents, isNot(contains('info message')));
+        expect(contents, isNot(contains('debug message')));
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('log level off suppresses all messages from disk', () {
+      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        PluginLogger.setProjectRoot(tempDir.path);
+        PluginLogger.minLevel = PluginLogLevel.off;
+
+        PluginLogger.log('should not appear', level: PluginLogLevel.error);
+
+        final contents = File(
+          PluginLogger.logFilePathForTesting!,
+        ).readAsStringSync();
+        expect(contents, isNot(contains('should not appear')));
+        expect(contents, contains('session started'));
       } finally {
         tempDir.deleteSync(recursive: true);
       }

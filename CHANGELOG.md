@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [14.3.8]
 
-Fixes an issue where the analysis server repeatedly restarted the plugin isolate, causing IDE diagnostic results to clear continuously. Automatically excludes common non-Dart output directories during initialization to prevent file-watcher feedback loops and adds restart-rate telemetry to flag instability. Also improves configuration parsing during project setup to safely support inline list structures. [log](https://github.com/saropa/saropa_lints/blob/v14.3.8/CHANGELOG.md)
+Fixes an issue where the analysis server repeatedly restarted the plugin isolate, causing IDE diagnostic results to clear continuously. Automatically excludes common non-Dart output directories during initialization to prevent file-watcher feedback loops. Adds restart-rate telemetry, log rotation, and a configurable `log_level` setting to control plugin log verbosity. [log](https://github.com/saropa/saropa_lints/blob/v14.3.8/CHANGELOG.md)
 
 ### Fixed
 
@@ -75,6 +75,10 @@ Fixes an issue where the analysis server repeatedly restarted the plugin isolate
 - **Plugin logger: restart-rate telemetry** — after each isolate spawn, `PluginLogger` counts recent "session started" entries in the log file. When the rate exceeds 10 restarts in 10 minutes, a `WARNING` line is emitted with remediation advice. The log file itself is the durable counter since statics reset per isolate.
 - **Init command: flow-style YAML guard** — `ensureNonDartExcludes` now detects flow-style `exclude: [...]` under the `analyzer:` section and leaves it unchanged instead of inserting a duplicate `exclude:` key. Trailing comments after `exclude:` are also handled correctly.
 - **Plugin logger: log rotation** — `plugin.log` is now capped at 512 KB; oldest content is discarded at each isolate start, bounding the cost of the restart-rate telemetry read and preventing unbounded disk growth. No action required.
+
+### Added
+
+- **Plugin logger: configurable log level** — new `log_level:` key under `plugins > saropa_lints` in `analysis_options.yaml` controls which messages are written to `plugin.log`. Valid values: `off`, `error`, `warning`, `info` (default), `debug`. Messages below the configured level are still sent to the analysis server's developer log but skip the user-visible file. The init command writes `log_level: info` by default.
 
 ---
 

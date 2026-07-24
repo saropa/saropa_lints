@@ -30,6 +30,33 @@ library;
 import 'dart:developer' as developer;
 import 'dart:io' show Directory, File, FileMode, Platform;
 
+/// Controls which messages [PluginLogger] writes to the user-visible log.
+///
+/// Ordered by verbosity — lower index = less output. [off] silences all
+/// disk writes (developer.log still fires). The default is [info], matching
+/// the current behavior before log-level was configurable.
+///
+/// Configurable via `log_level:` under `plugins > saropa_lints` in
+/// `analysis_options.yaml`.
+enum PluginLogLevel {
+  off,
+  error,
+  warning,
+  info,
+  debug;
+
+  /// Parses a string from `analysis_options.yaml`. Returns null on
+  /// unrecognized input so the caller can fall back to the default.
+  static PluginLogLevel? tryParse(String? value) {
+    if (value == null || value.isEmpty) return null;
+    final lower = value.trim().toLowerCase();
+    for (final level in values) {
+      if (level.name == lower) return level;
+    }
+    return null;
+  }
+}
+
 /// Writes plugin diagnostics to a user-visible file alongside `violations.json`.
 ///
 /// All methods are static — a single shared logger for the whole plugin.
@@ -64,10 +91,27 @@ final class PluginLogger {
   /// Null means entries still go into `_buffer`.
   static String? _logFilePath;
 
+  /// Minimum level for messages written to the user-visible log file.
+  /// Messages below this level are still sent to `developer.log` (analysis-
+  /// server log) but not written to disk. Default: [PluginLogLevel.info].
+  ///
+  /// Set by [config_loader] after parsing `log_level:` from
+  /// `analysis_options.yaml`. Session headers and restart-rate warnings
+  /// bypass this check — they are operational, not diagnostic.
+  static PluginLogLevel minLevel = PluginLogLevel.info;
+
   /// Records a log event. Always mirrors to `developer.log` (for analysis-
   /// server log continuity), then either appends to the user-visible log
   /// file or buffers the entry for later flush.
-  static void log(String message, {Object? error, StackTrace? stackTrace}) {
+  ///
+  /// Messages whose [level] exceeds [minLevel] are sent to `developer.log`
+  /// only — they are not written to the user-visible file or buffered.
+  static void log(
+    String message, {
+    PluginLogLevel level = PluginLogLevel.info,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
     // Always send to developer.log so it still shows in the analysis server
     // log file for advanced users / CI log harvesting.
     developer.log(
@@ -76,6 +120,11 @@ final class PluginLogger {
       error: error,
       stackTrace: stackTrace,
     );
+
+    // Messages below minLevel are developer.log-only — skip disk/buffer.
+    if (minLevel == PluginLogLevel.off || level.index > minLevel.index) {
+      return;
+    }
 
     final entry = _LogEntry(
       // Fix: prefer_utc_for_storage — log entries are persisted to file and
@@ -222,6 +271,12 @@ final class PluginLogger {
   /// Uses byte-level I/O so the size cap is measured in actual bytes, not
   /// Dart string code units. Called once per isolate start, before the
   /// session header is written.
+  ///
+  /// Safe for CRLF: `\r\n` has `0x0D` before `0x0A`, so cutting after
+  /// `0x0A` leaves no orphaned `\r` at the start of the kept content.
+  /// Safe for UTF-8: `0x0A` is a single-byte ASCII codepoint and cannot
+  /// appear as a continuation byte (those are 0x80–0xBF), so the cut
+  /// never splits a multi-byte character.
   static void _rotateIfNeeded(String path) {
     try {
       final file = File(path);
@@ -307,6 +362,7 @@ final class PluginLogger {
   static void resetForTesting() {
     _logFilePath = null;
     _buffer.clear();
+    minLevel = PluginLogLevel.info;
   }
 
   /// Exposes the resolved log file path for assertions. Null when

@@ -37,6 +37,7 @@ void main() {
         expect(content, contains('plugins:'));
         expect(content, contains('saropa_lints:'));
         expect(content, contains('diagnostics:'));
+        expect(content, contains('log_level: info'));
       } finally {
         dir.deleteSync(recursive: true);
       }

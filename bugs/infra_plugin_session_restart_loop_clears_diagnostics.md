@@ -330,17 +330,32 @@ oldest bytes at each isolate start. Uses byte-level I/O so the cap is
 measured in actual bytes, not Dart string code units. Cuts at newline
 boundaries; truncates entirely when no newline exists (single huge line).
 
+Added `PluginLogLevel` enum and `minLevel` static field. `log()` now takes
+an optional `level` parameter; messages below `minLevel` skip disk/buffer.
+Default `info` matches pre-change behavior. Configurable via `log_level:`
+under `plugins > saropa_lints` in `analysis_options.yaml`.
+
+### File 9: `lib/src/native/config_loader.dart` (line ~448)
+
+Added `_loadLogLevel(content)` — parses `log_level:` scoped to the
+`saropa_lints:` section body. Called before the `diagnostics:` section
+check so it is honored even when `diagnostics:` is absent.
+
+### File 10: `lib/src/init/config_writer.dart` (line ~39)
+
+`generatePluginsYaml` now emits `log_level: info` after `version:`.
+
 ---
 
 ## Tests Added
 
-- `test/native/plugin_logger_test.dart` — 14 tests (7 new: restart-rate
-  warning above/below threshold, all-old-entries case, corrupted log file,
-  log rotation above cap, single-huge-line truncation; 1 existing:
-  pubspec.yaml rejection; 4 updated for pubspec.yaml in temp dirs)
+- `test/native/plugin_logger_test.dart` — 19 tests (12 new including
+  PluginLogLevel.tryParse, level filtering, CRLF rotation, restart-rate,
+  corrupted log, rotation, single-huge-line)
 - `test/init/ensure_non_dart_excludes_test.dart` — 11 tests (5 new:
   flow-style YAML guard, trailing comment, flow-style under non-analyzer
   key, flow-style after blank line in analyzer section)
+- `test/init/write_config_test.dart` — `log_level: info` assertion added
 
 ---
 

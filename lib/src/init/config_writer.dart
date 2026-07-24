@@ -36,6 +36,7 @@ String generatePluginsYaml({
   } else {
     buffer.writeln('    # version: unknown — run dart pub get to resolve');
   }
+  buffer.writeln('    log_level: info # off | error | warning | info | debug');
   if (rulePacksEnabled.isNotEmpty) {
     final sorted = List<String>.of(rulePacksEnabled)..sort();
     buffer.writeln('    rule_packs:');
