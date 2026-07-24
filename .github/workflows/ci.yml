@@ -125,7 +125,7 @@ jobs:
           # Same ref/token as analyze job so both jobs see identical code
           ref: ${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-tags: true
+          fetch-depth: 0
       - uses: dart-lang/setup-dart@v1
         with:
           sdk: '3.10.8'

@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 <details><summary>Maintenance</summary>
 
-- **CI: fetch tags for test job** — the `health_history_test` needs git tags; shallow CI clones lacked them. Added `fetch-tags: true` to checkout and a skip guard for tag-less environments.
+- **CI: full clone for test job** — the `health_history_test` needs git tags; shallow CI clones lacked them. Changed to `fetch-depth: 0` (full clone) so tags and history are always available.
 
 </details>
 

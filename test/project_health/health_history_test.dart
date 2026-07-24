@@ -20,11 +20,8 @@ void main() {
         Directory.current.path,
         maxTags: 2,
       );
-      // CI shallow clones may lack tags — skip rather than false-fail.
-      if (points.isEmpty) {
-        markTestSkipped('no git tags available (shallow clone?)');
-        return;
-      }
+      // CI uses fetch-depth: 0 (full clone) so tags are always present.
+      expect(points, isNotEmpty);
       expect(points.length, lessThanOrEqualTo(2));
       for (final p in points) {
         expect(p.tag, isNotEmpty);

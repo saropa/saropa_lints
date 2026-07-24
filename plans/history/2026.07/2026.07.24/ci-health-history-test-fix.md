@@ -8,8 +8,8 @@ The `health_history_test` ("builds well-formed trajectory points from git tags")
 
 | File | Change |
 |------|--------|
-| `test/project_health/health_history_test.dart` | Replaced `expect(points, isNotEmpty)` with `markTestSkipped` when `loadHealthHistory` returns an empty list, so tag-less environments skip instead of fail. |
-| `.github/workflows/ci.yml` | Added `fetch-tags: true` to the test job's `actions/checkout` step so tags are fetched when available. |
+| `test/project_health/health_history_test.dart` | Restored `expect(points, isNotEmpty)` hard assertion — CI now does a full clone so tags are always present. |
+| `.github/workflows/ci.yml` | Changed test job checkout to `fetch-depth: 0` (full clone) so git tags and history are available for `health_history_test`. |
 | `CHANGELOG.md` | Added `[Unreleased]` maintenance entry. |
 
 ### Verification
