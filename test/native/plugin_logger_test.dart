@@ -123,9 +123,9 @@ void main() {
       final secondRoot = Directory.systemTemp.createTempSync(
         'plugin_logger_2_',
       );
-      File(p.join(secondRoot.path, 'pubspec.yaml')).writeAsStringSync(
-        'name: b',
-      );
+      File(
+        p.join(secondRoot.path, 'pubspec.yaml'),
+      ).writeAsStringSync('name: b');
       try {
         PluginLogger.setProjectRoot(firstRoot.path);
         final firstPath = PluginLogger.logFilePathForTesting;

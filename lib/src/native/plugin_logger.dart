@@ -95,7 +95,7 @@ final class PluginLogger {
   /// Messages below this level are still sent to `developer.log` (analysis-
   /// server log) but not written to disk. Default: [PluginLogLevel.info].
   ///
-  /// Set by [config_loader] after parsing `log_level:` from
+  /// Set by `config_loader` after parsing `log_level:` from
   /// `analysis_options.yaml`. Session headers and restart-rate warnings
   /// bypass this check — they are operational, not diagnostic.
   static PluginLogLevel minLevel = PluginLogLevel.info;
@@ -159,11 +159,7 @@ final class PluginLogger {
 
   /// Logs at [PluginLogLevel.error]. Accepts optional [error] and
   /// [stackTrace] for structured error reporting.
-  static void error(
-    String message, {
-    Object? error,
-    StackTrace? stackTrace,
-  }) =>
+  static void error(String message, {Object? error, StackTrace? stackTrace}) =>
       log(
         message,
         level: PluginLogLevel.error,

@@ -326,10 +326,7 @@ String ensureNonDartExcludes(String content) {
   for (final exclude in _nonDartExcludes) {
     final dirName = exclude.replaceAll('/**', '');
     // Block-style: `- "reports/**"` or `- reports/**`
-    final pattern = RegExp(
-      '''\\s+-\\s+['"]?$dirName/''',
-      multiLine: true,
-    );
+    final pattern = RegExp('''\\s+-\\s+['"]?$dirName/''', multiLine: true);
     if (!pattern.hasMatch(content)) {
       missing.add(exclude);
     }
@@ -359,9 +356,10 @@ String ensureNonDartExcludes(String content) {
   if (analyzerMatch == null) return content;
 
   final afterAnalyzer = content.afterIndex(analyzerMatch.end);
-  final firstLine = RegExp(r'^(\s+\S)', multiLine: true).firstMatch(
-    afterAnalyzer,
-  );
+  final firstLine = RegExp(
+    r'^(\s+\S)',
+    multiLine: true,
+  ).firstMatch(afterAnalyzer);
   if (firstLine == null) return content;
 
   final insertAt = analyzerMatch.end + firstLine.start;

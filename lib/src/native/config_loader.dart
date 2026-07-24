@@ -269,11 +269,7 @@ String? _readProjectFile(String filename, [String? projectRoot]) {
     if (!file.existsSync()) return null;
     return file.readAsStringSync();
   } on Object catch (e, st) {
-    PluginLogger.error(
-      '_readProjectFile failed',
-      error: e,
-      stackTrace: st,
-    );
+    PluginLogger.error('_readProjectFile failed', error: e, stackTrace: st);
     // I/O or path error; return null so config steps use defaults
     return null;
   }
