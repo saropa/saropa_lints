@@ -110,3 +110,4 @@ bugs/FINISH_GUIDE.md
 # Saropa Log Capture (index & cache)
 .saropa/
 *.vsix
+/docs/handover
