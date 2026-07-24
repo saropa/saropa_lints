@@ -79,6 +79,7 @@ Fixes an issue where the analysis server repeatedly restarted the plugin isolate
 ### Added
 
 - **Plugin logger: configurable log level** — new `log_level:` key under `plugins > saropa_lints` in `analysis_options.yaml` controls which messages are written to `plugin.log`. Valid values: `off`, `error`, `warning`, `info` (default), `debug`. Messages below the configured level are still sent to the analysis server's developer log but skip the user-visible file. The init command writes `log_level: info` by default.
+- **Plugin logger: convenience API** — `PluginLogger.debug()`, `.warning()`, and `.error()` replace the `level:` named parameter pattern, making log call sites more concise. Unrecognized `log_level` values now emit a warning instead of silently falling back to `info`. Tab-indented configs are now parsed correctly.
 
 ---
 

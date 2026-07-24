@@ -146,9 +146,8 @@ void _loadFromRoot(String? projectRoot) {
       'enabledRules: $enabledCount',
     );
   } on Object catch (e, st) {
-    PluginLogger.log(
+    PluginLogger.error(
       'loadNativePluginConfig failed',
-      level: PluginLogLevel.error,
       error: e,
       stackTrace: st,
     );
@@ -270,9 +269,8 @@ String? _readProjectFile(String filename, [String? projectRoot]) {
     if (!file.existsSync()) return null;
     return file.readAsStringSync();
   } on Object catch (e, st) {
-    PluginLogger.log(
+    PluginLogger.error(
       '_readProjectFile failed',
-      level: PluginLogLevel.error,
       error: e,
       stackTrace: st,
     );
@@ -293,7 +291,7 @@ void loadOutputConfigFromProjectRoot(String projectRoot) {
     );
     if (content != null) _loadOutputConfig(content);
   } on Object catch (e, st) {
-    PluginLogger.log(
+    PluginLogger.error(
       'loadOutputConfigFromProjectRoot failed',
       error: e,
       stackTrace: st,
@@ -394,7 +392,7 @@ void _loadSeverityOverrides(String? content) {
 void _loadDiagnosticsConfig([String? projectRoot]) {
   final content = _readProjectFile('analysis_options.yaml', projectRoot);
   if (content == null) {
-    PluginLogger.log(
+    PluginLogger.warning(
       'analysis_options.yaml not found at '
       '${projectRoot ?? Directory.current.path} — saropa_lints will not '
       'enable any rules until config is reloaded from the project root.',
@@ -412,7 +410,7 @@ void _loadDiagnosticsConfig([String? projectRoot]) {
     multiLine: true,
   ).firstMatch(content);
   if (sectionMatch == null) {
-    PluginLogger.log(
+    PluginLogger.warning(
       'analysis_options.yaml found at '
       '${projectRoot ?? Directory.current.path} but no '
       '`plugins > saropa_lints > diagnostics:` block present. '
@@ -465,16 +463,24 @@ void _loadLogLevel(String content) {
   if (saropaMatch == null) return;
 
   final afterSaropa = content.substring(saropaMatch.end);
-  // Match log_level at 4-space indent (same level as version:, diagnostics:).
+  // Match log_level at the same nesting level as version:/diagnostics:.
+  // Accept spaces or tabs — some projects use tab indentation.
   final match = RegExp(
-    r'^    log_level:\s*(\S+)',
+    r'^[ \t]+log_level:\s*(\S+)',
     multiLine: true,
   ).firstMatch(afterSaropa);
   if (match == null) return;
 
-  final parsed = PluginLogLevel.tryParse(match.group(1));
+  final raw = match.group(1);
+  final parsed = PluginLogLevel.tryParse(raw);
   if (parsed != null) {
     PluginLogger.minLevel = parsed;
+  } else {
+    PluginLogger.warning(
+      'Unrecognized log_level "$raw" in analysis_options.yaml — '
+      'valid values: off, error, warning, info, debug. '
+      'Keeping current level (${PluginLogger.minLevel.name}).',
+    );
   }
 }
 
@@ -635,7 +641,7 @@ void _loadOutputConfig(String? content) {
       outputFromEnv = true;
     }
   } on Object catch (e, st) {
-    PluginLogger.log(
+    PluginLogger.error(
       '_loadOutputConfig env read failed',
       error: e,
       stackTrace: st,

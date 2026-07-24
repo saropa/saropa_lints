@@ -179,7 +179,7 @@ abstract final class RuntimeTierCap {
       resolved = _parseTierLabel(envRaw);
       source = 'SAROPA_TIER';
       if (resolved == null) {
-        PluginLogger.log(
+        PluginLogger.warning(
           'Ignoring invalid SAROPA_TIER="$envRaw" '
           '(use essential, recommended, professional, comprehensive, pedantic).',
         );
@@ -195,7 +195,7 @@ abstract final class RuntimeTierCap {
         if (!f.existsSync()) return null;
         return f.readAsStringSync();
       } on Object catch (e, st) {
-        PluginLogger.log(
+        PluginLogger.error(
           'RuntimeTierCap: read $name failed',
           error: e,
           stackTrace: st,

@@ -76,3 +76,26 @@ Added `_rotateIfNeeded()` — caps `plugin.log` at 512 KB (`_maxLogFileBytes`) b
 - `test/native/plugin_logger_test.dart` — 19 tests total. New: 3 `PluginLogLevel.tryParse` tests (valid names, case-insensitive, invalid input), 2 level-filtering tests (error-only filter, off suppresses all), 1 CRLF rotation test.
 - `test/init/write_config_test.dart` — existing test extended with `log_level: info` assertion.
 - `test/native/config_loader_project_root_test.dart` — 5 tests pass (unchanged).
+
+## Finish Report (2026-07-24) — Convenience API and Log-Level Hardening
+
+### Changes
+
+**`lib/src/native/plugin_logger.dart`** — Added `debug()`, `warning()`, and `error()` convenience methods wrapping `log()` with the corresponding `PluginLogLevel`. The `error()` method preserves the `error` and `stackTrace` parameters. The underlying `log()` method and its `level:` named parameter remain available for edge cases.
+
+**`lib/src/native/config_loader.dart`** — `_loadLogLevel` regex broadened from `r'^    log_level:\s*(\S+)'` (4-space only) to `r'^[ \t]+log_level:\s*(\S+)'` so tab-indented configs are parsed. When `PluginLogLevel.tryParse` returns null for a non-empty `log_level:` value, a warning is logged naming the unrecognized value and the retained level (previously silent fallback). Warning text uses the live `minLevel.name` rather than hardcoding "info" so it remains accurate on config reloads within the same isolate. All `PluginLogger.log(..., level: PluginLogLevel.error/warning)` calls replaced with `.error()` / `.warning()`. Two config-missing messages (`analysis_options.yaml not found`, `no diagnostics block`) retagged from `.log()` to `.warning()`. Three error catch blocks retagged from `.log()` to `.error()`.
+
+**`lib/main.dart`** — Two error catch blocks retagged to `.error()`. The "cwd is not a Dart project" startup message retagged from `.log()` (info) to `.debug()` — it is noisy startup telemetry, not user-actionable.
+
+**`lib/saropa_lints.dart`** — `registerSaropaLintRules` catch block retagged to `.error()`. Unknown rule-reference log retagged to `.warning()`.
+
+**`lib/src/config/runtime_tier_cap.dart`** — Invalid `SAROPA_TIER` env value retagged to `.warning()`. File-read catch block retagged to `.error()`.
+
+### Tests
+
+- `test/native/plugin_logger_test.dart` — 19 tests pass (unchanged).
+- `test/native/config_loader_project_root_test.dart` — 8 tests total (3 new): `log_level is honored even without a diagnostics block` verifies `_loadLogLevel` runs before the diagnostics-section early return; `unrecognized log_level logs a warning and keeps default` verifies both the warning text and that `minLevel` stays at `info`; `tab-indented log_level is parsed correctly` verifies tab indentation is accepted.
+
+### Known Limitations
+
+- `_loadLogLevel` matches `log_level:` in the substring after the `saropa_lints:` key through end-of-file, not bounded to the `saropa_lints:` block's indentation extent. A `log_level:` key under a later, unrelated plugin section could be picked up. This is a pre-existing scope issue (present since the scoped-to-saropa_lints change), not introduced by this diff. Follow-up: bound the match to the next unindented or less-indented line.

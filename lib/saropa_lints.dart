@@ -3437,7 +3437,7 @@ void registerSaropaLintRules(PluginRegistry registry) {
       '(${rules.length} candidates, ${rules.length - registered} disabled)',
     );
   } on Object catch (e, st) {
-    PluginLogger.log(
+    PluginLogger.error(
       'registerSaropaLintRules failed',
       error: e,
       stackTrace: st,
@@ -3492,7 +3492,7 @@ void _logUnknownRuleReferences(
       final pair = '$sourceRuleName->$normalized';
       if (!loggedUnknownPairs.add(pair)) continue;
 
-      PluginLogger.log(
+      PluginLogger.warning(
         'Unknown $label rule reference "$normalized" declared by "$sourceRuleName".',
       );
     }

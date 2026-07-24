@@ -76,7 +76,7 @@ class SaropaLintsPlugin extends Plugin {
       try {
         loadNativePluginConfig();
       } on Object catch (e, st) {
-        PluginLogger.log(
+        PluginLogger.error(
           'loadNativePluginConfig failed in Plugin.start()',
           error: e,
           stackTrace: st,
@@ -84,7 +84,7 @@ class SaropaLintsPlugin extends Plugin {
         // Defensive: plugin still registers with defaults
       }
     } else {
-      PluginLogger.log(
+      PluginLogger.debug(
         'Plugin.start() — cwd is not a Dart project '
         '(${Directory.current.path}), deferring config to project root',
       );
@@ -120,7 +120,7 @@ class SaropaLintsPlugin extends Plugin {
         priority: 85,
       );
     } on Object catch (e, st) {
-      PluginLogger.log(
+      PluginLogger.error(
         'initializeCacheManagement failed in Plugin.start()',
         error: e,
         stackTrace: st,

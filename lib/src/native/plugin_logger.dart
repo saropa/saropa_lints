@@ -149,6 +149,28 @@ final class PluginLogger {
     _appendToFile(path, entry);
   }
 
+  /// Logs at [PluginLogLevel.debug].
+  static void debug(String message) =>
+      log(message, level: PluginLogLevel.debug);
+
+  /// Logs at [PluginLogLevel.warning].
+  static void warning(String message) =>
+      log(message, level: PluginLogLevel.warning);
+
+  /// Logs at [PluginLogLevel.error]. Accepts optional [error] and
+  /// [stackTrace] for structured error reporting.
+  static void error(
+    String message, {
+    Object? error,
+    StackTrace? stackTrace,
+  }) =>
+      log(
+        message,
+        level: PluginLogLevel.error,
+        error: error,
+        stackTrace: stackTrace,
+      );
+
   /// Initializes the log file path from a discovered [projectRoot] and
   /// flushes any buffered entries. Idempotent — subsequent calls with a
   /// different root are ignored (the first real root wins, matching the

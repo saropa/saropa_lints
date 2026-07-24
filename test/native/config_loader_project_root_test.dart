@@ -30,23 +30,30 @@ import 'package:saropa_lints/src/native/config_loader.dart'
     show
         loadNativePluginConfigFromProjectRoot,
         loadRulePacksConfigFromProjectRoot;
+import 'package:saropa_lints/src/native/plugin_logger.dart';
 import 'package:test/test.dart';
 
 void main() {
   Set<String>? savedEnabled;
   Set<String>? savedDisabled;
 
+  late PluginLogLevel savedLogLevel;
+
   setUp(() {
     savedEnabled = SaropaLintRule.enabledRules;
     savedDisabled = SaropaLintRule.disabledRules;
+    savedLogLevel = PluginLogger.minLevel;
     // Reset to null so we can verify the loader actually populated them.
     SaropaLintRule.enabledRules = null;
     SaropaLintRule.disabledRules = null;
+    PluginLogger.resetForTesting();
   });
 
   tearDown(() {
     SaropaLintRule.enabledRules = savedEnabled;
     SaropaLintRule.disabledRules = savedDisabled;
+    PluginLogger.minLevel = savedLogLevel;
+    PluginLogger.resetForTesting();
   });
 
   group('loadNativePluginConfigFromProjectRoot', () {
@@ -121,6 +128,93 @@ plugins:
           SaropaLintRule.enabledRules,
           isNull,
           reason: 'Missing diagnostics block must fail closed, not open',
+        );
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('log_level is honored even without a diagnostics block', () {
+      final tempDir = Directory.systemTemp.createTempSync('saropa_lints_root_');
+      try {
+        File(p.join(tempDir.path, 'analysis_options.yaml')).writeAsStringSync(
+          '''
+plugins:
+  saropa_lints:
+    version: "14.3.8"
+    log_level: debug
+''',
+        );
+
+        loadNativePluginConfigFromProjectRoot(tempDir.path);
+
+        expect(
+          PluginLogger.minLevel,
+          PluginLogLevel.debug,
+          reason: 'log_level must be parsed even without diagnostics block',
+        );
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('unrecognized log_level logs a warning and keeps default', () {
+      final tempDir = Directory.systemTemp.createTempSync('saropa_lints_root_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        File(p.join(tempDir.path, 'analysis_options.yaml')).writeAsStringSync(
+          '''
+plugins:
+  saropa_lints:
+    version: "14.3.8"
+    log_level: verbose
+    diagnostics:
+      avoid_hardcoded_credentials: true
+''',
+        );
+
+        PluginLogger.setProjectRoot(tempDir.path);
+        loadNativePluginConfigFromProjectRoot(tempDir.path);
+
+        expect(
+          PluginLogger.minLevel,
+          PluginLogLevel.info,
+          reason: 'Unrecognized value must not change the default',
+        );
+
+        final logFile = File(PluginLogger.logFilePathForTesting!);
+        final contents = logFile.readAsStringSync();
+        expect(
+          contents,
+          contains('Unrecognized log_level "verbose"'),
+          reason: 'Must warn about the bad value',
+        );
+        expect(
+          contents,
+          contains('Keeping current level (info)'),
+          reason: 'Must state the retained level, not hardcode "falling back"',
+        );
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('tab-indented log_level is parsed correctly', () {
+      final tempDir = Directory.systemTemp.createTempSync('saropa_lints_root_');
+      try {
+        File(p.join(tempDir.path, 'analysis_options.yaml')).writeAsStringSync(
+          'plugins:\n'
+          '\tsaropa_lints:\n'
+          '\t\tversion: "14.3.8"\n'
+          '\t\tlog_level: error\n',
+        );
+
+        loadNativePluginConfigFromProjectRoot(tempDir.path);
+
+        expect(
+          PluginLogger.minLevel,
+          PluginLogLevel.error,
+          reason: 'Tab-indented log_level must be parsed',
         );
       } finally {
         tempDir.deleteSync(recursive: true);
