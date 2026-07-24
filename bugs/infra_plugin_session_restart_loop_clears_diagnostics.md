@@ -322,15 +322,25 @@ existing log file and counts "session started" entries in the last 10 minutes.
 When the count exceeds 10, emits a `WARNING` line with remediation advice.
 The log file itself is the durable counter since statics reset per isolate.
 
+Session header string extracted to `_sessionHeader` constant, shared between
+the writer (`setProjectRoot`) and reader (`_checkRestartRate`).
+
+Added `_rotateIfNeeded()` — caps `plugin.log` at 512 KB by discarding the
+oldest bytes at each isolate start. Uses byte-level I/O so the cap is
+measured in actual bytes, not Dart string code units. Cuts at newline
+boundaries; truncates entirely when no newline exists (single huge line).
+
 ---
 
 ## Tests Added
 
-- `test/native/plugin_logger_test.dart` — 9 tests (2 new: restart-rate warning
-  above threshold, no warning below threshold; 1 existing: pubspec.yaml
-  rejection; 4 updated for pubspec.yaml in temp dirs)
-- `test/init/ensure_non_dart_excludes_test.dart` — 8 tests (2 new: flow-style
-  YAML guard, trailing comment handling)
+- `test/native/plugin_logger_test.dart` — 14 tests (7 new: restart-rate
+  warning above/below threshold, all-old-entries case, corrupted log file,
+  log rotation above cap, single-huge-line truncation; 1 existing:
+  pubspec.yaml rejection; 4 updated for pubspec.yaml in temp dirs)
+- `test/init/ensure_non_dart_excludes_test.dart` — 11 tests (5 new:
+  flow-style YAML guard, trailing comment, flow-style under non-analyzer
+  key, flow-style after blank line in analyzer section)
 
 ---
 

@@ -45,6 +45,18 @@ final class PluginLogger {
   /// the most recent failure modes.
   static const int _maxBufferSize = 500;
 
+  /// Marker written at each isolate start and read back by [_checkRestartRate].
+  /// Single source of truth — changing this string automatically updates both
+  /// the writer and the reader.
+  static const String _sessionHeader =
+      '--- saropa_lints plugin session started ---';
+
+  /// Log file size cap in bytes. When exceeded, the oldest content is
+  /// discarded to keep the file under this limit. 512 KB is enough for
+  /// weeks of normal operation while bounding the cost of the
+  /// [_checkRestartRate] full-file read.
+  static const int _maxLogFileBytes = 512 * 1024;
+
   /// In-memory buffer for log entries recorded before [setProjectRoot] runs.
   static final List<_LogEntry> _buffer = [];
 
@@ -113,6 +125,8 @@ final class PluginLogger {
       final path = '$dirPath${sep}plugin.log';
       _logFilePath = path;
 
+      _rotateIfNeeded(path);
+
       // Write a session header so multiple sessions are visually separable
       // in the (append-only) log file when tailing.
       _appendToFile(
@@ -120,7 +134,7 @@ final class PluginLogger {
         _LogEntry(
           // Fix: prefer_utc_for_storage — session header persists to the log.
           timestamp: DateTime.now().toUtc(),
-          message: '--- saropa_lints plugin session started ---',
+          message: _sessionHeader,
         ),
       );
 
@@ -203,6 +217,36 @@ final class PluginLogger {
     }
   }
 
+  /// Truncates the log file to roughly [_maxLogFileBytes] by discarding the
+  /// oldest content. Cuts at a newline boundary so no partial lines remain.
+  /// Uses byte-level I/O so the size cap is measured in actual bytes, not
+  /// Dart string code units. Called once per isolate start, before the
+  /// session header is written.
+  static void _rotateIfNeeded(String path) {
+    try {
+      final file = File(path);
+      if (!file.existsSync()) return;
+
+      final bytes = file.readAsBytesSync();
+      if (bytes.length <= _maxLogFileBytes) return;
+
+      final discardUpTo = bytes.length - _maxLogFileBytes;
+      // 0x0A = newline. Cut at the first line boundary after the discard
+      // point so no partial line remains at the start of the rotated file.
+      final newlinePos = bytes.indexOf(0x0A, discardUpTo);
+      if (newlinePos < 0 || newlinePos >= bytes.length - 1) {
+        // No newline found — one huge line or nearly so. Truncate entirely
+        // rather than leaving it to grow unbounded.
+        file.writeAsBytesSync(<int>[]);
+        return;
+      }
+
+      file.writeAsBytesSync(bytes.sublist(newlinePos + 1));
+    } on Object catch (_) {
+      // Best-effort rotation — never crash the plugin.
+    }
+  }
+
   /// Reads the existing log file and counts "session started" entries in the
   /// last [_restartWindowMinutes] minutes. When the count exceeds
   /// [_restartRateThreshold], emits a warning line — visible evidence of an
@@ -226,7 +270,7 @@ final class PluginLogger {
 
       final sessionPattern = RegExp(
         r'(\d{4}-\d{2}-\d{2}T[\d:.]+Z) \| '
-        '--- saropa_lints plugin session started ---',
+        '${RegExp.escape(_sessionHeader)}',
       );
 
       var recentCount = 0;

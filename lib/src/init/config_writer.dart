@@ -303,10 +303,22 @@ const List<String> _nonDartExcludes = [
 String ensureNonDartExcludes(String content) {
   if (content.isEmpty) return content;
 
-  // Flow-style exclude (e.g. `exclude: ["a/**"]`) — leave unchanged.
+  // Flow-style exclude under `analyzer:` (e.g. `exclude: ["a/**"]`).
   // Inserting block entries after a flow line creates invalid YAML.
-  if (RegExp(r'^\s+exclude:\s*\[', multiLine: true).hasMatch(content)) {
-    return content;
+  // Scoped to the analyzer section so an unrelated `exclude: [...]`
+  // under another top-level key does not cause a false early-return.
+  // Capture indented lines AND blank lines under `analyzer:` so a
+  // visual separator (blank line) inside the section doesn't terminate
+  // the match early and hide a flow-style exclude below it.
+  final analyzerSection = RegExp(
+    r'^analyzer:\s*\n((?:(?:[ \t]+.*|)\n)*)',
+    multiLine: true,
+  ).firstMatch(content);
+  if (analyzerSection != null) {
+    final body = analyzerSection.group(1) ?? '';
+    if (RegExp(r'^\s+exclude:\s*\[', multiLine: true).hasMatch(body)) {
+      return content;
+    }
   }
 
   final missing = <String>[];

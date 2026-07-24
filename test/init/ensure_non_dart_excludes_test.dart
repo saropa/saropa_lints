@@ -79,6 +79,31 @@ analyzer:
       expect(result, contains('**/*.g.dart'));
     });
 
+    test('leaves flow-style exclude after blank line in analyzer', () {
+      const input = '''
+analyzer:
+  errors:
+    todo: ignore
+
+  exclude: ["**/*.g.dart"]
+''';
+      final result = ensureNonDartExcludes(input);
+      expect(result, input);
+    });
+
+    test('ignores flow-style exclude under non-analyzer key', () {
+      const input = '''
+other_tool:
+  exclude: ["something/**"]
+analyzer:
+  errors:
+    todo: ignore
+''';
+      final result = ensureNonDartExcludes(input);
+      expect(result, contains('exclude:'));
+      expect(result, contains('reports/**'));
+    });
+
     test('adds only missing excludes when some already present', () {
       const input = '''
 analyzer:

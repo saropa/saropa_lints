@@ -66,14 +66,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [14.3.8]
 
-[log](https://github.com/saropa/saropa_lints/blob/v14.3.8/CHANGELOG.md)
+Fixes an issue where the analysis server repeatedly restarted the plugin isolate, causing IDE diagnostic results to clear continuously. Automatically excludes common non-Dart output directories during initialization to prevent file-watcher feedback loops and adds restart-rate telemetry to flag instability. Also improves configuration parsing during project setup to safely support inline list structures. [log](https://github.com/saropa/saropa_lints/blob/v14.3.8/CHANGELOG.md)
 
 ### Fixed
 
 - **Plugin isolate restart storm** — the analysis server respawned the plugin isolate hundreds of times per day (13,660 over 91 days on the `contacts` project), clearing all diagnostics from the Problems tab each time. Two causes addressed: (1) `Plugin.start()` now skips config loading when the working directory is not a Dart project (e.g. the VS Code install directory), eliminating the 0-rules phase and noisy log entries; (2) `PluginLogger.setProjectRoot()` now validates that the root contains `pubspec.yaml` before writing log files, preventing log writes into non-project directories that could trigger file-watcher restarts.
 - **Init command: non-Dart directories now excluded from analyzer** — `dart run saropa_lints:init` and the headless config writer now ensure common non-Dart directories (`reports/**`, `docs/**`, `bugs/**`, `plans/**`, `doc/**`, `output/**`, `tmp/**`) are in the `analyzer > exclude` list. Without this, plugin log writes to `reports/.saropa_lints/` could trigger the analysis server's file watcher and restart the plugin isolate in a feedback loop.
 - **Plugin logger: restart-rate telemetry** — after each isolate spawn, `PluginLogger` counts recent "session started" entries in the log file. When the rate exceeds 10 restarts in 10 minutes, a `WARNING` line is emitted with remediation advice. The log file itself is the durable counter since statics reset per isolate.
-- **Init command: flow-style YAML guard** — `ensureNonDartExcludes` now detects flow-style `exclude: [...]` and leaves it unchanged instead of inserting a duplicate `exclude:` key. Trailing comments after `exclude:` are also handled correctly.
+- **Init command: flow-style YAML guard** — `ensureNonDartExcludes` now detects flow-style `exclude: [...]` under the `analyzer:` section and leaves it unchanged instead of inserting a duplicate `exclude:` key. Trailing comments after `exclude:` are also handled correctly.
+- **Plugin logger: log rotation** — `plugin.log` is now capped at 512 KB; oldest content is discarded at each isolate start, bounding the cost of the restart-rate telemetry read and preventing unbounded disk growth. No action required.
 
 ---
 

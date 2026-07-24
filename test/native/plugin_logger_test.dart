@@ -182,6 +182,36 @@ void main() {
       }
     });
 
+    test('no restart-rate warning when all entries are old', () {
+      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        final logDir = Directory(
+          p.join(tempDir.path, 'reports', '.saropa_lints'),
+        )..createSync(recursive: true);
+        final logFile = File(p.join(logDir.path, 'plugin.log'));
+
+        // Seed with 15 entries all older than 10 minutes.
+        final now = DateTime.now().toUtc();
+        final buf = StringBuffer();
+        for (var i = 0; i < 15; i++) {
+          final ts = now.subtract(Duration(minutes: 20 + i));
+          buf.writeln(
+            '${ts.toIso8601String()} | '
+            '--- saropa_lints plugin session started ---',
+          );
+        }
+        logFile.writeAsStringSync(buf.toString());
+
+        PluginLogger.setProjectRoot(tempDir.path);
+
+        final contents = logFile.readAsStringSync();
+        expect(contents, isNot(contains('WARNING:')));
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
     test('no restart-rate warning when below threshold', () {
       final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
       File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
@@ -207,6 +237,91 @@ void main() {
 
         final contents = logFile.readAsStringSync();
         expect(contents, isNot(contains('WARNING:')));
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('handles corrupted log file without crashing', () {
+      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        final logDir = Directory(
+          p.join(tempDir.path, 'reports', '.saropa_lints'),
+        )..createSync(recursive: true);
+        final logFile = File(p.join(logDir.path, 'plugin.log'));
+
+        // Write garbage — partial lines, no valid timestamps.
+        logFile.writeAsStringSync(
+          'corrupted\x00binary\ntruncated-2024-01-01T | partial\n'
+          '--- saropa_lints plugin session started ---\n',
+        );
+
+        PluginLogger.setProjectRoot(tempDir.path);
+
+        expect(PluginLogger.logFilePathForTesting, isNotNull);
+        final contents = logFile.readAsStringSync();
+        expect(contents, contains('session started'));
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('rotates log file when exceeding size cap', () {
+      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        final logDir = Directory(
+          p.join(tempDir.path, 'reports', '.saropa_lints'),
+        )..createSync(recursive: true);
+        final logFile = File(p.join(logDir.path, 'plugin.log'));
+
+        // Write >512KB of content with a recognizable old marker at the start.
+        final oldMarker = 'OLD_MARKER_LINE_SHOULD_BE_ROTATED_AWAY';
+        final buf = StringBuffer()..writeln(oldMarker);
+        // Each line ~80 chars, need ~6500 lines to exceed 512KB.
+        for (var i = 0; i < 7000; i++) {
+          buf.writeln('${'x' * 70} line $i');
+        }
+        logFile.writeAsStringSync(buf.toString());
+        final sizeBefore = logFile.lengthSync();
+        expect(sizeBefore, greaterThan(512 * 1024));
+
+        PluginLogger.setProjectRoot(tempDir.path);
+
+        final sizeAfter = logFile.lengthSync();
+        expect(sizeAfter, lessThan(sizeBefore));
+        final contents = logFile.readAsStringSync();
+        expect(
+          contents,
+          isNot(contains(oldMarker)),
+          reason: 'Old content at the start should be rotated away',
+        );
+        expect(contents, contains('session started'));
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('rotates single huge line by truncating entirely', () {
+      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        final logDir = Directory(
+          p.join(tempDir.path, 'reports', '.saropa_lints'),
+        )..createSync(recursive: true);
+        final logFile = File(p.join(logDir.path, 'plugin.log'));
+
+        // Write >512KB as a single line with no newlines.
+        logFile.writeAsStringSync('x' * (600 * 1024));
+
+        PluginLogger.setProjectRoot(tempDir.path);
+
+        final contents = logFile.readAsStringSync();
+        // The single huge line should have been truncated, leaving only
+        // the new session header.
+        expect(contents, contains('session started'));
+        expect(contents.length, lessThan(600 * 1024));
       } finally {
         tempDir.deleteSync(recursive: true);
       }
