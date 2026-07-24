@@ -1,6 +1,6 @@
 # BUG: Plugin session restart loop clears diagnostics from Problems tab
 
-**Status: Investigating**
+**Status: Fixed**
 
 Created: 2026-07-24
 Rule: N/A (infrastructure — affects all rules)
