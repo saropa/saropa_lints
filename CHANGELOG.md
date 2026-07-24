@@ -64,13 +64,18 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
----
+## [14.3.7]
 
-## [Unreleased]
+Updates the Dio linting behavior to favor dependency injection and factory patterns over static singletons. The updated rule flags top-level and static `Dio` declarations while permitting instantiation inside methods, constructors, and callbacks, resolving an architectural contradiction with anti-singleton guidelines.[log](https://github.com/saropa/saropa_lints/blob/v14.3.7/CHANGELOG.md)
 
 ### Changed
 
 - **Breaking:** Renamed `require_dio_singleton` to `require_dio_factory` — the rule now flags `Dio()` in static fields and top-level variables (the singleton anti-pattern) instead of recommending them. `Dio()` inside methods, constructors, closures, and DI callbacks is allowed. Resolves the architectural contradiction with `avoid_singleton_pattern` ([#274](https://github.com/saropa/saropa_lints/issues/274)). No action required if already using factory/DI patterns.
+- **`require_dio_factory` config alias:** Projects using `require_dio_singleton` in `analysis_options.yaml` continue working via `configAliases` — no config migration required on upgrade.
+
+### Added
+
+- **Hardened `require_dio_factory` detection:** Added coverage for `late static final Dio` fields, static getters, nested closures, and mixin method bodies. No action required.
 
 <details><summary>Maintenance</summary>
 
@@ -78,6 +83,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Publish audit now detects dangling `bugs/*.md` references in active documents (skips frozen `plans/history/`).
 
 </details>
+
+---
 
 ## [14.3.6]
 

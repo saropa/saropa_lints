@@ -126,7 +126,31 @@ class _good596_ApiService {
   final Dio _dio;
 }
 
+// BAD: Late static final — should still trigger require_dio_factory
+// expect_lint: require_dio_factory
+class _bad596_LateStatic {
+  static late final Dio client = Dio();
+}
+
+// BAD: Static getter returning Dio() — should trigger require_dio_factory
+// expect_lint: require_dio_factory
+class _bad596_StaticGetter {
+  static Dio get client => Dio();
+}
+
 // GOOD: Dio() inside a method body
 class _good596_MethodBody {
   Future<Response> get() => Dio().get('/endpoint');
+}
+
+// GOOD: Dio() inside a nested closure (DI registration pattern)
+class _good596_NestedClosure {
+  void register() {
+    final factory = () => () => Dio();
+  }
+}
+
+// GOOD: Dio() inside a mixin method body
+mixin _good596_DioMixin {
+  Dio createDio() => Dio();
 }

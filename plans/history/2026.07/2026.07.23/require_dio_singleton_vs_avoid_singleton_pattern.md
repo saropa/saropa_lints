@@ -104,7 +104,7 @@ The ancestor walk order ensures static getters are checked before the generic `M
 
 - Fixture files retain the old `require_dio_singleton_fixture.dart` filename (discovery is filename-agnostic, so tests pass).
 - Caching top-level functions (`Dio? _cached; Dio get() => _cached ??= Dio();`) are allowed because `Dio()` appears inside a `FunctionDeclaration` body — these create de-facto singletons but are not flagged. Documented in the bug report's AST Edge Cases section as a known gap.
-- The `Alias: ... require_dio_singleton (deprecated)` line in the doc comment is inert documentation — no alias-resolution mechanism exists, so old `analysis_options.yaml` configs referencing `require_dio_singleton` will silently stop matching.
+- ~~The `Alias: ... require_dio_singleton (deprecated)` line in the doc comment was initially inert documentation.~~ **Corrected:** `configAliases => const ['require_dio_singleton']` was added in the hardening pass, so old `analysis_options.yaml` configs continue working via the existing `SaropaLintRule.configAliases` mechanism.
 
 ### Test results
 

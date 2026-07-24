@@ -634,6 +634,9 @@ class RequireDioFactoryRule extends SaropaLintRule {
   RequireDioFactoryRule() : super(code: _code);
 
   @override
+  List<String> get configAliases => const ['require_dio_singleton'];
+
+  @override
   LintImpact get impact => LintImpact.info;
 
   @override
