@@ -58,10 +58,17 @@ import 'package:saropa_lints/src/string_slice_utils.dart';
 /// the rule test harness. Left false in those paths.
 bool _nativePluginStarted = false;
 
+/// Marks that the real analysis-server plugin has started. Call from
+/// Plugin.start() BEFORE the cwd check so the essential-tier default
+/// applies on the lazy config reload even when the initial load is skipped
+/// (non-project cwd).
+void markNativePluginStarted() {
+  _nativePluginStarted = true;
+}
+
 void loadNativePluginConfig() {
-  // Marks the in-process plugin path. Only set here because Plugin.start() is
-  // the sole no-arg caller (plus the composite-plugin scaffold, which is also
-  // a real plugin entry); tests/CLI never call this variant.
+  // Also set by markNativePluginStarted() in Plugin.start() before the cwd
+  // check, so the flag is armed even when the initial config load is skipped.
   _nativePluginStarted = true;
   _loadFromRoot(null);
 }

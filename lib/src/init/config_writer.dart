@@ -278,3 +278,75 @@ String replacePluginsSection(String existingContent, String newPlugins) {
 
   return '$beforePlugins$newPlugins\n$afterPlugins';
 }
+
+/// Non-Dart directories that the analysis server should not watch.
+///
+/// The plugin writes logs and reports to `reports/.saropa_lints/`. Without
+/// excluding these, the analysis server's file watcher may see those writes
+/// and restart the plugin isolate, creating a feedback loop that clears
+/// diagnostics from the Problems tab hundreds of times per day.
+const List<String> _nonDartExcludes = [
+  'bugs/**',
+  'doc/**',
+  'docs/**',
+  'output/**',
+  'plans/**',
+  'reports/**',
+  'tmp/**',
+];
+
+/// Ensures common non-Dart directories are in the `analyzer > exclude` list.
+///
+/// Returns the content unchanged if all excludes are already present or if
+/// no `analyzer:` section exists (we don't create one from scratch — the
+/// user or `dart create` manages that).
+String ensureNonDartExcludes(String content) {
+  if (content.isEmpty) return content;
+
+  final missing = <String>[];
+  for (final exclude in _nonDartExcludes) {
+    final dirName = exclude.replaceAll('/**', '');
+    final pattern = RegExp(
+      '''\\s+-\\s+['"]?$dirName/''',
+      multiLine: true,
+    );
+    if (!pattern.hasMatch(content)) {
+      missing.add(exclude);
+    }
+  }
+  if (missing.isEmpty) return content;
+
+  final excludeMatch = RegExp(
+    r'^(\s+exclude:\s*)$',
+    multiLine: true,
+  ).firstMatch(content);
+
+  if (excludeMatch != null) {
+    final insertAt = excludeMatch.end;
+    final lines = missing.map((e) => '    - "$e"').join('\n');
+    return '${content.prefix(insertAt)}\n'
+        '$lines\n'
+        '${content.afterIndex(insertAt)}';
+  }
+
+  // No exclude section — look for `analyzer:` and add one
+  final analyzerMatch = RegExp(
+    r'^analyzer:\s*$',
+    multiLine: true,
+  ).firstMatch(content);
+
+  if (analyzerMatch == null) return content;
+
+  final afterAnalyzer = content.afterIndex(analyzerMatch.end);
+  final firstLine = RegExp(r'^(\s+\S)', multiLine: true).firstMatch(
+    afterAnalyzer,
+  );
+  if (firstLine == null) return content;
+
+  final insertAt = analyzerMatch.end + firstLine.start;
+  final lines = missing.map((e) => '    - "$e"').join('\n');
+  return '${content.prefix(insertAt)}'
+      '  exclude:\n'
+      '$lines\n'
+      '${content.afterIndex(insertAt)}';
+}

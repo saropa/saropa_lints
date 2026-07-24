@@ -13,6 +13,7 @@
 library;
 
 import 'dart:async' show FutureOr;
+import 'dart:io' show Directory, File, Platform;
 
 import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
@@ -57,15 +58,36 @@ class SaropaLintsPlugin extends Plugin {
     // fidelity. See SaropaLintRule.deferForRapidEdit / isAnalysisServer.
     SaropaLintRule.isAnalysisServer = true;
 
-    try {
-      loadNativePluginConfig();
-    } on Object catch (e, st) {
+    // Mark the plugin as started BEFORE the cwd check so the essential-tier
+    // default applies on the lazy config reload from the real project root.
+    markNativePluginStarted();
+
+    // Skip initial config load when cwd is not a Dart project (e.g. when the
+    // analysis server sets cwd to the VS Code install dir). The real config
+    // will load from the project root on the first analyzed file via
+    // SaropaContext._ensureConfigLoadedFromProjectRoot(). Loading from a
+    // non-project cwd produces a noisy 0-rules phase in the log.
+    final sep = Platform.pathSeparator;
+    final cwdHasPubspec = File(
+      '${Directory.current.path}${sep}pubspec.yaml',
+    ).existsSync();
+
+    if (cwdHasPubspec) {
+      try {
+        loadNativePluginConfig();
+      } on Object catch (e, st) {
+        PluginLogger.log(
+          'loadNativePluginConfig failed in Plugin.start()',
+          error: e,
+          stackTrace: st,
+        );
+        // Defensive: plugin still registers with defaults
+      }
+    } else {
       PluginLogger.log(
-        'loadNativePluginConfig failed in Plugin.start()',
-        error: e,
-        stackTrace: st,
+        'Plugin.start() — cwd is not a Dart project '
+        '(${Directory.current.path}), deferring config to project root',
       );
-      // Defensive: plugin still registers with defaults
     }
 
     // Arm the memory-relief subsystem. Before this call,

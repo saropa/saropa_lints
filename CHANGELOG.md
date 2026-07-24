@@ -64,6 +64,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **Plugin isolate restart storm** — the analysis server respawned the plugin isolate hundreds of times per day (13,660 over 91 days on the `contacts` project), clearing all diagnostics from the Problems tab each time. Two causes addressed: (1) `Plugin.start()` now skips config loading when the working directory is not a Dart project (e.g. the VS Code install directory), eliminating the 0-rules phase and noisy log entries; (2) `PluginLogger.setProjectRoot()` now validates that the root contains `pubspec.yaml` before writing log files, preventing log writes into non-project directories that could trigger file-watcher restarts.
+- **Init command: non-Dart directories now excluded from analyzer** — `dart run saropa_lints:init` and the headless config writer now ensure common non-Dart directories (`reports/**`, `docs/**`, `bugs/**`, `plans/**`, `doc/**`, `output/**`, `tmp/**`) are in the `analyzer > exclude` list. Without this, plugin log writes to `reports/.saropa_lints/` could trigger the analysis server's file watcher and restart the plugin isolate in a feedback loop.
+
+---
+
 ## [14.3.7]
 
 Updates the Dio linting behavior to favor dependency injection and factory patterns over static singletons. The updated rule flags top-level and static `Dio` declarations while permitting instantiation inside methods, constructors, and callbacks, resolving an architectural contradiction with anti-singleton guidelines.[log](https://github.com/saropa/saropa_lints/blob/v14.3.7/CHANGELOG.md)

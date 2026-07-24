@@ -100,6 +100,13 @@ final class PluginLogger {
 
     try {
       final sep = Platform.pathSeparator;
+
+      // Reject non-Dart-project roots (e.g. VS Code install dir). Writing
+      // logs into arbitrary directories pollutes the filesystem and can
+      // trigger analysis-server file-watcher restarts that cause an
+      // isolate-respawn feedback loop.
+      if (!File('$projectRoot${sep}pubspec.yaml').existsSync()) return;
+
       final dirPath = '$projectRoot${sep}reports$sep.saropa_lints';
       Directory(dirPath).createSync(recursive: true);
 

@@ -46,6 +46,8 @@ void main() {
       'setProjectRoot creates the log file and flushes buffered entries',
       () {
         final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+        // setProjectRoot requires pubspec.yaml to identify a Dart project.
+        File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
         try {
           PluginLogger.log('pre-root entry one');
           PluginLogger.log('pre-root entry two');
@@ -74,6 +76,7 @@ void main() {
 
     test('log entries after setProjectRoot bypass the buffer and hit disk', () {
       final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
       try {
         PluginLogger.setProjectRoot(tempDir.path);
         expect(PluginLogger.bufferSizeForTesting, 0);
@@ -94,8 +97,12 @@ void main() {
 
     test('setProjectRoot is idempotent — first root wins', () {
       final firstRoot = Directory.systemTemp.createTempSync('plugin_logger_1_');
+      File(p.join(firstRoot.path, 'pubspec.yaml')).writeAsStringSync('name: a');
       final secondRoot = Directory.systemTemp.createTempSync(
         'plugin_logger_2_',
+      );
+      File(p.join(secondRoot.path, 'pubspec.yaml')).writeAsStringSync(
+        'name: b',
       );
       try {
         PluginLogger.setProjectRoot(firstRoot.path);
@@ -126,8 +133,26 @@ void main() {
       expect(PluginLogger.logFilePathForTesting, isNull);
     });
 
+    test('setProjectRoot rejects directories without pubspec.yaml', () {
+      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      try {
+        PluginLogger.log('should stay buffered');
+        PluginLogger.setProjectRoot(tempDir.path);
+
+        expect(
+          PluginLogger.logFilePathForTesting,
+          isNull,
+          reason: 'Non-Dart directory must be rejected',
+        );
+        expect(PluginLogger.bufferSizeForTesting, 1);
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
     test('log entries include error and stack trace when provided', () {
       final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
       try {
         PluginLogger.setProjectRoot(tempDir.path);
 

@@ -600,6 +600,23 @@ Future<void> runInit(List<String> args) async {
     }
   }
 
+  // Ensure non-Dart directories are excluded from the analyzer's file watcher.
+  // Without this, plugin log/report writes to reports/.saropa_lints/ can
+  // trigger isolate restarts that clear diagnostics from the Problems tab.
+  try {
+    final currentContent = outputFile.readAsStringSync();
+    final patched = ensureNonDartExcludes(currentContent);
+    if (patched != currentContent) {
+      outputFile.writeAsStringSync(patched);
+      log.terminal(
+        '${InitColors.green}✓ Added non-Dart directory excludes to '
+        'analyzer section${InitColors.reset}',
+      );
+    }
+  } on Object catch (e, st) {
+    dev.log('ensureNonDartExcludes failed', error: e, stackTrace: st);
+  }
+
   // Validate the written file has the critical sections
   validateWrittenConfig(log, resolvedOutput, allRules.length);
   await runPostWriteActions(

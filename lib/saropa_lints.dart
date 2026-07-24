@@ -118,7 +118,8 @@ export 'package:saropa_lints/src/native/config_loader.dart'
         loadNativePluginConfig,
         loadNativePluginConfigFromProjectRoot,
         loadOutputConfigFromProjectRoot,
-        loadRulePacksConfigFromProjectRoot;
+        loadRulePacksConfigFromProjectRoot,
+        markNativePluginStarted;
 
 /// All available Saropa lint rules.
 ///

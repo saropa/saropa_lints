@@ -75,6 +75,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 - ~~`avoid_redundant_await_false_positive_static_future_returning_methods.md`~~ — Fixed; archived to `plans/history/2026.07/2026.07.20/`.
 - ~~`avoid_redundant_null_check_false_positive_nullable_variables.md`~~ — Fixed; archived to `plans/history/2026.07/2026.07.20/`.
 
+## Raised Reports (2026-07-24)
+
+- `infra_plugin_session_restart_loop_clears_diagnostics.md` — analysis server respawns plugin isolate 150+/day (13,660 over 91 days), invalidating all diagnostics each time; likely caused by plugin log writes to `reports/.saropa_lints/` triggering file-watcher restarts (consumer `analysis_options.yaml` does not exclude `reports/`). Includes wrong-working-directory symptom (VS Code install dir, 1,636 occurrences).
+
 ---
 
 ## File Naming

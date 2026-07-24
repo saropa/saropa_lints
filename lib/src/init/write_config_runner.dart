@@ -196,9 +196,10 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
   );
 
   final newContent = replacePluginsSection(existingContent, pluginsYaml);
+  final patchedContent = ensureNonDartExcludes(newContent);
 
   try {
-    outputFile.writeAsStringSync(newContent);
+    outputFile.writeAsStringSync(patchedContent);
     return const WriteConfigResult(ok: true);
   } on Exception catch (e) {
     return WriteConfigResult(ok: false, error: e.toString());
