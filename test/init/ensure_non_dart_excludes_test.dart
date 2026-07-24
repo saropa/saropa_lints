@@ -58,6 +58,27 @@ analyzer:
       expect(ensureNonDartExcludes(''), '');
     });
 
+    test('leaves flow-style exclude unchanged', () {
+      const input = '''
+analyzer:
+  exclude: ["**/*.g.dart", "**/*.freezed.dart"]
+''';
+      final result = ensureNonDartExcludes(input);
+      expect(result, input);
+    });
+
+    test('handles trailing comment after exclude:', () {
+      const input = '''
+analyzer:
+  exclude: # non-Dart directories
+    - "**/*.g.dart"
+''';
+      final result = ensureNonDartExcludes(input);
+      expect(result, contains('reports/**'));
+      expect(result, contains('bugs/**'));
+      expect(result, contains('**/*.g.dart'));
+    });
+
     test('adds only missing excludes when some already present', () {
       const input = '''
 analyzer:

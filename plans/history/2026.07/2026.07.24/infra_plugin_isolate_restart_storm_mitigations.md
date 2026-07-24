@@ -42,5 +42,19 @@ Updated `bugs/infra_plugin_session_restart_loop_clears_diagnostics.md`:
 ### Known Limitations
 
 - `ensureNonDartExcludes` is a no-op when no `analyzer:` key exists in the YAML. This is by design (the init tool manages only the `plugins:` section), but new projects that have never run `dart create` or similar tooling will not get the excludes until they add an `analyzer:` section.
-- The exclude regex matches block-style YAML only. Flow-style `exclude: ["a/**"]` would cause a duplicate key insertion. Flow-style is extremely rare in Dart projects.
+- Flow-style `exclude: [...]` is detected and left unchanged (no insertion attempted). The function does not merge entries into flow-style lists — flow-style is extremely rare in Dart projects.
 - The feedback-loop hypothesis (Hypothesis B) still requires verification: adding `reports/**` to the contacts project's `analysis_options.yaml` excludes and observing whether the restart storm stops.
+- `_checkRestartRate` reads the entire log file on every isolate start. No log rotation exists, so in a sustained restart storm the read cost is linear per spawn and cumulative quadratic over the storm's duration. A follow-up adding log rotation or windowed reads (last N KB) would cap this cost.
+
+## Finish Report (2026-07-24) — Hardening Pass
+
+### Changes
+
+**`lib/src/init/config_writer.dart`** — `ensureNonDartExcludes()` hardened with two guards: (1) an early-return when flow-style `exclude: [...]` is detected, preventing insertion of a duplicate `exclude:` YAML key that would produce invalid YAML; (2) the block-style exclude regex widened from `r'^(\s+exclude:\s*)$'` to `r'^(\s+exclude:\s*)(?:#.*)?$'` so trailing comments after `exclude:` (e.g. `exclude: # my excludes`) are matched instead of falling through to the "create exclude section" branch.
+
+**`lib/src/native/plugin_logger.dart`** — Added `_checkRestartRate()`, called after writing the session header in `setProjectRoot()`. Reads the existing log file, counts "session started" entries whose timestamps fall within the last 10 minutes, and emits a `WARNING` line when the count reaches 10 or more. The warning includes remediation advice (check `analysis_options.yaml` excludes for non-Dart directories). Statics reset per isolate, so the log file itself serves as the durable cross-isolate counter. The method is wrapped in `on Object catch` to maintain the "never crash the plugin" contract.
+
+### Tests
+
+- `test/native/plugin_logger_test.dart` — 9 tests (2 new: `emits restart-rate warning when threshold exceeded` seeds 12 recent session headers and asserts the WARNING line appears; `no restart-rate warning when below threshold` seeds 3 recent sessions and asserts no WARNING).
+- `test/init/ensure_non_dart_excludes_test.dart` — 8 tests (2 new: `leaves flow-style exclude unchanged` asserts input returned verbatim; `handles trailing comment after exclude:` asserts entries are inserted below the commented exclude line).

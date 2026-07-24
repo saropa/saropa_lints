@@ -150,6 +150,68 @@ void main() {
       }
     });
 
+    test('emits restart-rate warning when threshold exceeded', () {
+      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        final logDir = Directory(
+          p.join(tempDir.path, 'reports', '.saropa_lints'),
+        )..createSync(recursive: true);
+        final logFile = File(p.join(logDir.path, 'plugin.log'));
+
+        // Seed the log with 12 recent "session started" entries — above the
+        // threshold of 10 within 10 minutes.
+        final now = DateTime.now().toUtc();
+        final buf = StringBuffer();
+        for (var i = 0; i < 12; i++) {
+          final ts = now.subtract(Duration(minutes: i));
+          buf.writeln(
+            '${ts.toIso8601String()} | '
+            '--- saropa_lints plugin session started ---',
+          );
+        }
+        logFile.writeAsStringSync(buf.toString());
+
+        PluginLogger.setProjectRoot(tempDir.path);
+
+        final contents = logFile.readAsStringSync();
+        expect(contents, contains('WARNING:'));
+        expect(contents, contains('plugin restarts in last'));
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('no restart-rate warning when below threshold', () {
+      final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        final logDir = Directory(
+          p.join(tempDir.path, 'reports', '.saropa_lints'),
+        )..createSync(recursive: true);
+        final logFile = File(p.join(logDir.path, 'plugin.log'));
+
+        // Seed with only 3 recent sessions — below threshold.
+        final now = DateTime.now().toUtc();
+        final buf = StringBuffer();
+        for (var i = 0; i < 3; i++) {
+          final ts = now.subtract(Duration(minutes: i));
+          buf.writeln(
+            '${ts.toIso8601String()} | '
+            '--- saropa_lints plugin session started ---',
+          );
+        }
+        logFile.writeAsStringSync(buf.toString());
+
+        PluginLogger.setProjectRoot(tempDir.path);
+
+        final contents = logFile.readAsStringSync();
+        expect(contents, isNot(contains('WARNING:')));
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
     test('log entries include error and stack trace when provided', () {
       final tempDir = Directory.systemTemp.createTempSync('plugin_logger_');
       File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');

@@ -303,9 +303,16 @@ const List<String> _nonDartExcludes = [
 String ensureNonDartExcludes(String content) {
   if (content.isEmpty) return content;
 
+  // Flow-style exclude (e.g. `exclude: ["a/**"]`) — leave unchanged.
+  // Inserting block entries after a flow line creates invalid YAML.
+  if (RegExp(r'^\s+exclude:\s*\[', multiLine: true).hasMatch(content)) {
+    return content;
+  }
+
   final missing = <String>[];
   for (final exclude in _nonDartExcludes) {
     final dirName = exclude.replaceAll('/**', '');
+    // Block-style: `- "reports/**"` or `- reports/**`
     final pattern = RegExp(
       '''\\s+-\\s+['"]?$dirName/''',
       multiLine: true,
@@ -316,8 +323,9 @@ String ensureNonDartExcludes(String content) {
   }
   if (missing.isEmpty) return content;
 
+  // Match block-style `exclude:` with optional trailing whitespace or comment
   final excludeMatch = RegExp(
-    r'^(\s+exclude:\s*)$',
+    r'^(\s+exclude:\s*)(?:#.*)?$',
     multiLine: true,
   ).firstMatch(content);
 

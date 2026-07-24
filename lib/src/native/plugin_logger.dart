@@ -124,6 +124,8 @@ final class PluginLogger {
         ),
       );
 
+      _checkRestartRate(path);
+
       // Flush everything buffered before the root was known.
       for (final entry in _buffer) {
         _appendToFile(path, entry);
@@ -198,6 +200,56 @@ final class PluginLogger {
         error: e,
         stackTrace: st,
       );
+    }
+  }
+
+  /// Reads the existing log file and counts "session started" entries in the
+  /// last [_restartWindowMinutes] minutes. When the count exceeds
+  /// [_restartRateThreshold], emits a warning line — visible evidence of an
+  /// isolate-respawn storm that the user can act on.
+  ///
+  /// Statics reset per isolate, so in-memory counters cannot track cross-
+  /// isolate restart rate. The log file IS the durable counter.
+  static const int _restartWindowMinutes = 10;
+  static const int _restartRateThreshold = 10;
+
+  static void _checkRestartRate(String path) {
+    try {
+      final file = File(path);
+      if (!file.existsSync()) return;
+
+      final content = file.readAsStringSync();
+      final now = DateTime.now().toUtc();
+      final cutoff = now.subtract(
+        const Duration(minutes: _restartWindowMinutes),
+      );
+
+      final sessionPattern = RegExp(
+        r'(\d{4}-\d{2}-\d{2}T[\d:.]+Z) \| '
+        '--- saropa_lints plugin session started ---',
+      );
+
+      var recentCount = 0;
+      for (final match in sessionPattern.allMatches(content)) {
+        final ts = DateTime.tryParse(match.group(1)!);
+        if (ts != null && ts.isAfter(cutoff)) recentCount++;
+      }
+
+      if (recentCount >= _restartRateThreshold) {
+        _appendToFile(
+          path,
+          _LogEntry(
+            timestamp: now,
+            message:
+                'WARNING: $recentCount plugin restarts in last '
+                '$_restartWindowMinutes minutes — possible isolate-respawn '
+                'storm. Check analysis_options.yaml excludes for non-Dart '
+                'directories (reports/, docs/, bugs/, etc.)',
+          ),
+        );
+      }
+    } on Object catch (_) {
+      // Best-effort telemetry — never crash the plugin.
     }
   }
 

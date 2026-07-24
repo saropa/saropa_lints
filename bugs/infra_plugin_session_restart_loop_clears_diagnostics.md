@@ -301,7 +301,9 @@ Exported `markNativePluginStarted` from `config_loader.dart`.
 
 Added `ensureNonDartExcludes()` — ensures common non-Dart directories
 (`reports/**`, `docs/**`, `bugs/**`, `plans/**`, `doc/**`, `output/**`,
-`tmp/**`) are in the `analyzer > exclude` list.
+`tmp/**`) are in the `analyzer > exclude` list. Hardened to detect and skip
+flow-style `exclude: [...]` (avoids inserting a duplicate YAML key) and to
+handle trailing comments after `exclude:`.
 
 ### File 6: `lib/src/init/init_runner.dart` (line ~560)
 
@@ -313,17 +315,28 @@ config file.
 Wired `ensureNonDartExcludes()` into the headless config writer (used by the
 VS Code extension).
 
+### File 8: `lib/src/native/plugin_logger.dart` (line ~160)
+
+Added `_checkRestartRate()` — after writing the session header, reads the
+existing log file and counts "session started" entries in the last 10 minutes.
+When the count exceeds 10, emits a `WARNING` line with remediation advice.
+The log file itself is the durable counter since statics reset per isolate.
+
 ---
 
 ## Tests Added
 
-None yet.
+- `test/native/plugin_logger_test.dart` — 9 tests (2 new: restart-rate warning
+  above threshold, no warning below threshold; 1 existing: pubspec.yaml
+  rejection; 4 updated for pubspec.yaml in temp dirs)
+- `test/init/ensure_non_dart_excludes_test.dart` — 8 tests (2 new: flow-style
+  YAML guard, trailing comment handling)
 
 ---
 
 ## Commits
 
-None yet.
+See git log for this branch.
 
 ---
 

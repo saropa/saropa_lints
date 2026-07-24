@@ -64,18 +64,22 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.3.8]
+
+[log](https://github.com/saropa/saropa_lints/blob/v14.3.8/CHANGELOG.md)
 
 ### Fixed
 
 - **Plugin isolate restart storm** — the analysis server respawned the plugin isolate hundreds of times per day (13,660 over 91 days on the `contacts` project), clearing all diagnostics from the Problems tab each time. Two causes addressed: (1) `Plugin.start()` now skips config loading when the working directory is not a Dart project (e.g. the VS Code install directory), eliminating the 0-rules phase and noisy log entries; (2) `PluginLogger.setProjectRoot()` now validates that the root contains `pubspec.yaml` before writing log files, preventing log writes into non-project directories that could trigger file-watcher restarts.
 - **Init command: non-Dart directories now excluded from analyzer** — `dart run saropa_lints:init` and the headless config writer now ensure common non-Dart directories (`reports/**`, `docs/**`, `bugs/**`, `plans/**`, `doc/**`, `output/**`, `tmp/**`) are in the `analyzer > exclude` list. Without this, plugin log writes to `reports/.saropa_lints/` could trigger the analysis server's file watcher and restart the plugin isolate in a feedback loop.
+- **Plugin logger: restart-rate telemetry** — after each isolate spawn, `PluginLogger` counts recent "session started" entries in the log file. When the rate exceeds 10 restarts in 10 minutes, a `WARNING` line is emitted with remediation advice. The log file itself is the durable counter since statics reset per isolate.
+- **Init command: flow-style YAML guard** — `ensureNonDartExcludes` now detects flow-style `exclude: [...]` and leaves it unchanged instead of inserting a duplicate `exclude:` key. Trailing comments after `exclude:` are also handled correctly.
 
 ---
 
 ## [14.3.7]
 
-Updates the Dio linting behavior to favor dependency injection and factory patterns over static singletons. The updated rule flags top-level and static `Dio` declarations while permitting instantiation inside methods, constructors, and callbacks, resolving an architectural contradiction with anti-singleton guidelines.[log](https://github.com/saropa/saropa_lints/blob/v14.3.7/CHANGELOG.md)
+Updates the Dio linting behavior to favor dependency injection and factory patterns over static singletons. The updated rule flags top-level and static `Dio` declarations while permitting instantiation inside methods, constructors, and callbacks, resolving an architectural contradiction with anti-singleton guidelines. [log](https://github.com/saropa/saropa_lints/blob/v14.3.7/CHANGELOG.md)
 
 ### Changed
 
@@ -515,80 +519,8 @@ This release introduces four thematic rule packs that bundle quality standards f
 
 ---
 
-## [14.0.3]
-
-A new `avoid_cascade_shuffle` rule catches a subtle bug where `(collection..shuffle()).first` permanently reorders a shared list just to read one element. Five new pubspec rules review your version-constraint hygiene — flagging an open-ended SDK bound, dependencies pinned to `any`, and (for applications) ranges so wide the team drifts onto different versions. Turning off Lint integration now actually stops the analyzer. Previously "Lint integration: Off" only flipped an internal flag, so saropa_lints diagnostics kept appearing in the Problems pane. [log](https://github.com/saropa/saropa_lints/blob/v14.0.3/CHANGELOG.md)
-
-### Added
-
-- **New `avoid_cascade_shuffle` rule (Recommended tier).** Flags `(collection..shuffle()).first` and similar, where `..shuffle()` is cascaded onto a stored list whose result is consumed, because `shuffle()` mutates in place and corrupts the shared collection for every other reader; shuffle a copy instead — `(List.of(collection)..shuffle()).first`.
-- **Five new pubspec version-constraint rules.** `require_sdk_upper_bound` (Recommended) flags an SDK constraint with no upper bound, which lets `pub get` resolve against an untested future SDK major. `avoid_unbounded_dependency` (Recommended) flags dependencies pinned to `any`. `require_dependency_lower_bound` (Professional) flags constraints with only an upper bound. For applications only (`publish_to: none`), `prefer_caret_constraint_in_app` (Professional) suggests `^1.2.3` over the equivalent `>=1.2.3 <2.0.0`, and `avoid_overly_wide_app_constraint` (Comprehensive) flags ranges spanning two or more majors. The app-only rules stay silent for published packages, which legitimately need wide ranges.
-
-### Fixed (Extension)
-
-- "Lint integration: Off" now comments out the `plugins:` block in analysis_options.yaml so the analyzer stops emitting saropa_lints diagnostics; toggling it back On restores the block with your rule packs and overrides intact. No action required.
-- Drift Advisor anomalies and index suggestions no longer appear twice in the Problems panel when the standalone Saropa Drift Advisor extension is also installed; the Lints integration now defers the Problems publish to that extension while it is active, and resumes if you disable it. No action required.
-- When a Drift Advisor server connects and the standalone Saropa Drift Advisor extension is not installed, a one-time per-workspace toast now recommends installing it for the full Problems-panel experience; it honors the existing proactive-nudge opt-out. No action required.
-- The "Drift Advisor" product name is now shielded from machine translation so it stays in English across every locale instead of being transliterated; affected catalogs correct themselves the next time locales are regenerated. No action required.
-
-<details><summary>Maintenance</summary>
-
-- The locale audit now treats strings that are entirely brand terms, `{placeholders}`, and punctuation (e.g. `Saropa Lints: {message}`) as skipped rather than missing, since machine translation can only echo them; this clears two perpetual false-positive coverage gaps.
-
-</details>
-
----
-
-## [14.0.2]
-
-This release introduces a unified multi-pane dashboard that lets you review your project map and code health metrics side by side, alongside an on-demand shortcut to quickly re-check for package updates. It also addresses key interface stability issues, preventing extension host freezes during upgrades and stopping the primary dashboard header from flickering during active analysis. [log](https://github.com/saropa/saropa_lints/blob/v14.0.2/CHANGELOG.md)
-
-### Fixed (Extension)
-
-- **The Findings Dashboard header no longer flickers constantly.** The dashboard reloads itself whenever the analyzer republishes diagnostics, and each reload replayed the header's entrance animation — so in an actively-analyzing project the header strobed nonstop. It now skips the reload when nothing you can see has changed, and only animates the header on first open. No action required.
-- **The "Upgrading Saropa Lints to X" notification no longer hangs open after you accept an upgrade.** The upgrade ran a full project analysis on the blocking call path, which froze the extension host for the whole analysis and left the progress notification (and its Cancel button) unresponsive until VS Code was reloaded. Analysis now runs without blocking and is cancellable, so the notification closes when the upgrade finishes. No action required.
-
-### Added (Extension)
-
-- **New "Saropa Lints: Open Saropa Dashboards" command shows the Project Map and Code Health dashboards side by side on one page.** Each pane keeps its full interactive content — the treemap, churn-complexity scatter, and hot-spot table, beside the score status line, KPI filters, and sortable function table — so you can compare where size and complexity concentrate against which functions score worst without switching tabs. Clicking a row opens the file; "Open full screen" on either pane reopens the standalone dashboard. The two standalone commands are unchanged. No action required.
-- **Click the "Scanned X ago" pill on the Package Dashboard to rescan and re-check for package updates.** The pill is now a button: clicking it refreshes the dashboard and re-runs the pub.dev version check, re-surfacing the "Update available" notification even after you dismissed it. The same action is available from the command palette as "Saropa Lints: Check for Package Updates Now". No action required.
-
----
-
-## [14.0.1]
-
-The Project Map dashboard now hides machine-generated and localization files from its size map and hot-spot rankings, so the files it surfaces are ones you can actually improve. Previously a single generated database file or a megabyte of translation tables would dominate the list and bury the real issues. [log](https://github.com/saropa/saropa_lints/blob/v14.0.1/CHANGELOG.md)
-
-### Fixed
-
-- **The Project Map dashboard no longer ranks generated and localization files in its size map and hot spots.** Files emitted by code generators (`.g.dart`, freezed, drift, auto_route, injectable, protobuf, and similar) and the `app_localizations*` / `intl_*` translation tables now stay out of the rankings, matching the Code Health dashboard's existing behavior. These files are long, mechanical, and unimprovable, so they crowded out the hand-written code that hot spots are meant to highlight. No action required.
-
-### Changed
-
-- **The warnings for `require_keyboard_visibility_dispose`, `avoid_openai_key_in_code`, and `require_speech_stop_on_dispose` now spell out the failure each prevents.** The three messages were far shorter than the rest of the catalog and stopped at the symptom; they now describe the leaked widget, the billable key abuse, and the held microphone in full. No action required.
-
-- **The Saropa dashboards now share one consistent visual style, and the Project Map follows your editor theme.** The Project Map dashboard previously rendered a fixed palette that ignored your light / dark / high-contrast theme; it now tracks the active theme in the editor (while standalone HTML reports keep their styled palette). The Code Health scanning screen, the About panel, the rule-violations dashboard, the command catalog, and the package-details sidebar were all brought onto the shared design system, so colors, spacing, and type match across every surface. No action required.
-
-<details><summary>Maintenance</summary>
-
-- **Removed three orphaned localization keys left by the Suggestions sidebar removal.** `configSuggestions.packAvailable`, `configSuggestions.initMissing`, and `configSuggestions.badgeTooltip` were only ever read by the deleted Suggestions tree provider; no code referenced them after that view was removed. Dev-only.
-- **Generated-file detection is now one shared predicate, used by every CLI.** The list of code-generator suffixes plus gen-l10n table detection lived inline in several scanners; it is now a single `isGeneratedDartPath` helper the analysis CLIs share, so extending the list updates every consumer at once. The cross-file analyzers (unused symbols, duplicates, unused l10n, missing mirror tests), `project_vibrancy`, and the Project Map size scanner all delegate to it; the predicate also recognizes a `generated` path segment and the full codegen-suffix set, so each consumer now agrees on what counts as generated. Dev-only.
-- **Added a cross-project dashboard style guide.** A canonical design-system document (`docs/design/SAROPA_DASHBOARD_STYLE_GUIDE.md`) defines one token set, component contract, and accessibility gate for every Saropa dashboard surface, so the extension's dashboards stop diverging into separate visual styles. Docs-only.
-- **The shared dashboard chrome now carries the full token scale, and the six non-conforming surfaces adopt it.** `dashboardChromeStyles.ts` gained the spacing / radius / type / elevation / motion / z-index tokens (plus an exported `getDashboardTokens()` for surfaces that keep bespoke components), and the About panel, Code Health scan screen, Project Map, rule-violations dashboard, command catalog, and package-details sidebar were re-tokened onto it — bespoke layouts (the score gauge, command tiles, package badges, scan stepper) kept, only their values converged. Dev-only.
-- **Clarified the dashboard style guide's scope after first adoption.** Added an explicit exemption for high-density log/terminal consoles, a note that VS Code collapses the four-step surface ramp onto two host backgrounds, and brought Saropa Log Capture's dashboard webview panels into the per-platform adoption section. Docs-only.
-- **Adopted the style guide's button, badge, and grade-color hardening rules.** Secondary buttons in the shared chrome now carry a fallback fill and a guaranteed border, so host themes that leave `--vscode-button-secondaryBackground` undefined no longer render buttons as bare text; and letter grades across the Code Health report and the scan screen now drive off one shared A–F ramp derived from the semantic tokens instead of per-surface grade colors. Dev-only.
-- **Reconciled the style guide body with its VS Code reference implementation** — the surface-0 caveat, 13px type base, and standalone `--brand-glow` value now match `chromeTokens()` instead of disagreeing with it. Docs-only.
-- **Began a consolidated "Saropa Dashboards" view that shows Project Map and Code Health on one page.** A new `saropaLints.openDashboards` command opens a host webview that embeds each dashboard's full interactive report in its own iframe, side by side, preserving every chart and interaction (no summarizing). The Project Map pane plus the iframe drill-down message bridge are in place; the Code Health pane follows once the iframe mechanism is confirmed in the Extension Development Host. The standalone Project Map and Code Health commands are unchanged. Dev-only until complete.
-- **Added instantiation-pin tests for six package rule packs that had none** (Envied, Keyboard Visibility, Google Fonts, OpenAI, Speech to Text, uuid), fixing the tier-integrity check that requires every rule category to carry a test and closing the gap that let a sub-standard message ship unnoticed. Dev-only.
-- **A release-commit push to `main` no longer triggers a redundant `ci` run.** The publish workflow already validates that exact tagged commit and the publish script mirrors the full gate locally, so cutting a release stops firing three overlapping workflows at once. Dev-only.
-- **Closed the stub-test tracking plan by dropping its deferred follow-up scope.** The plan's stub removal and the hard zero-gate that keeps empty-body `test`/`testWidgets` stubs out are complete and verified; the never-started "rewrite removed stubs as fixture-backed tests" backlog was removed as not needed. Docs-only.
-
-</details>
-
----
-
 ## Historical Changelog Archive
 
 > **Looking for older changes?**
-> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for version 14.0.0 and older.
+> See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for version 14.0.3 and older.
 
