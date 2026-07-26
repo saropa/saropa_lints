@@ -111,3 +111,4 @@ bugs/FINISH_GUIDE.md
 .saropa/
 *.vsix
 /docs/handover
+self_check/pubspec.lock
