@@ -2462,6 +2462,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 
   // MethodChannel instrumentation (method_channel_rules.dart)
   RequireMethodChannelInstrumentedRule.new,
+  PreferMethodChannelNoteIfSlowRule.new,
 
   // JSON/API rules (json_datetime_rules.dart)
   RequireDateFormatSpecificationRule.new,

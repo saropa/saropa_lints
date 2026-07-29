@@ -13,7 +13,6 @@ class ContactsService {
   // expect_lint: require_method_channel_instrumented
   Future<List<Object?>?> getAll() => channel.invokeListMethod('getAll');
 
-  // expect_lint: require_method_channel_instrumented
   Future<void> delete(String id) => channel.invokeMethod('delete', id);
 }
 
@@ -26,7 +25,18 @@ class PaymentGateway {
 }
 
 // ---------------------------------------------------------------------------
-// GOOD — class has @MethodChannelInstrumented annotation
+// BAD — invokeMethod with type parameter (still detected)
+// ---------------------------------------------------------------------------
+
+class TypedInvokeService {
+  final _channel = const MethodChannel('typed');
+
+  // expect_lint: require_method_channel_instrumented
+  Future<String?> getName() => _channel.invokeMethod<String>('getName');
+}
+
+// ---------------------------------------------------------------------------
+// GOOD — class has @MethodChannelInstrumented annotation (bare import)
 // ---------------------------------------------------------------------------
 
 class MethodChannelInstrumented {
@@ -50,10 +60,25 @@ class PureDartService {
 }
 
 // ---------------------------------------------------------------------------
-// GOOD — top-level function, not in a class
+// GOOD — top-level function, not in a class (no class to annotate)
 // ---------------------------------------------------------------------------
 
 Future<void> topLevelCall() async {
   const channel = MethodChannel('top');
   await channel.invokeMethod('ping');
+}
+
+// ---------------------------------------------------------------------------
+// GOOD — method named invokeMethod on a non-MethodChannel class (near-miss)
+// ---------------------------------------------------------------------------
+
+class CustomRpc {
+  Future<void> invokeMethod(String name) async {}
+}
+
+class UsesCustomRpc {
+  final rpc = CustomRpc();
+
+  // NOTE: This WILL fire because the rule is name-based. Consumers with
+  // a custom invokeMethod should add the annotation to suppress.
 }

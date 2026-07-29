@@ -68,11 +68,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Added
 
-- **New rule: `require_method_channel_instrumented`** — flags classes that call `MethodChannel.invokeMethod` / `invokeListMethod` / `invokeMapMethod` without a `@MethodChannelInstrumented` annotation. Quick fix inserts the annotation above the class declaration. Comprehensive tier.
+- **New rule: `require_method_channel_instrumented`** — flags classes that call `MethodChannel.invokeMethod` / `invokeListMethod` / `invokeMapMethod` without a `@MethodChannelInstrumented` annotation, one diagnostic per class. Quick fix inserts the annotation. Comprehensive tier.
+- **New rule: `prefer_method_channel_note_if_slow`** — flags bare invoke-method calls inside `@MethodChannelInstrumented` classes that are not wrapped in `noteIfSlow` or an equivalent timing helper. Comprehensive tier.
 
 <details><summary>Maintenance</summary>
 
-- **Bug filed: rule packs UI fails in self-package** — the Config Dashboard's "Enable all" and individual pack toggles produce misleading toasts ("already enabled" / "could not write") when the workspace is the saropa_lints package itself, because the extension assumes a consumer project with a `saropa_lints:` plugin block.
+- **Fix: rule packs UI in self-package** — the Config Dashboard's "Enable all" and individual pack toggles produced misleading toasts ("already enabled" / "could not write") when the workspace is the saropa_lints package itself. The extension now detects the self-package via `name: saropa_lints` in pubspec, treats the implicit plugin load as configured, and creates a `plugins: saropa_lints:` block when no anchor exists for `rule_packs` writes.
 - **CI: full clone for test job** — the `health_history_test` needs git tags; shallow CI clones lacked them. Changed to `fetch-depth: 0` (full clone) so tags and history are always available.
 - **Security: fix 3 Dependabot alerts** — upgraded `shell-quote` 1.8.4 → 1.10.0 (quadratic DoS in `parse()`), replaced abandoned `npm-run-all` with maintained `npm-run-all2@8`, and overrode `brace-expansion` to patched versions (exponential DoS). All dev-only dependencies.
 - **Dependabot: grouped weekly schedule** — added `.github/dependabot.yml` to batch all extension npm security updates into a single weekly PR (Mondays) instead of one PR per alert.
