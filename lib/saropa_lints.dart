@@ -2460,6 +2460,9 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferJsInteropOverDartJsRule.new,
   PreferFoundationPlatformCheckRule.new,
 
+  // MethodChannel instrumentation (method_channel_rules.dart)
+  RequireMethodChannelInstrumentedRule.new,
+
   // JSON/API rules (json_datetime_rules.dart)
   RequireDateFormatSpecificationRule.new,
   PreferIso8601DatesRule.new,

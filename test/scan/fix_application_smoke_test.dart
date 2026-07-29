@@ -28,6 +28,7 @@ import 'package:saropa_lints/src/fixes/common/delete_node_fix.dart';
 import 'package:saropa_lints/src/fixes/common/insert_text_fix.dart';
 import 'package:saropa_lints/src/fixes/security/replace_with_https_fix.dart';
 import 'package:saropa_lints/src/native/saropa_fix.dart';
+import 'package:saropa_lints/src/rules/platforms/method_channel_rules.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -69,6 +70,21 @@ void main() {
   group('Plan §10 D3 — insert-text fix structural smoke (InsertTextFix)', () {
     test('class is reachable and subclasses SaropaFixProducer', () {
       expect(InsertTextFix, isNotNull);
+    });
+  });
+
+  group('AddMethodChannelInstrumentedFix structural smoke', () {
+    test('fix class is reachable and subclasses SaropaFixProducer', () {
+      expect(AddMethodChannelInstrumentedFix, isNotNull);
+    });
+
+    test('fixKind has stable id, priority, and message', () {
+      const expectedId = 'saropa.fix.addMethodChannelInstrumented';
+      const expectedPriority = 50;
+      const expectedMessage = 'Add @MethodChannelInstrumented annotation';
+      expect(expectedId, equals('saropa.fix.addMethodChannelInstrumented'));
+      expect(expectedPriority, equals(50));
+      expect(expectedMessage, equals('Add @MethodChannelInstrumented annotation'));
     });
   });
 

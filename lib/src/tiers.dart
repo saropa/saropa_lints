@@ -2972,6 +2972,9 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // package:js blocks `flutter build web --wasm`. Comprehensive because Wasm is
   // opt-in: projects not targeting --wasm see it as advisory.
   'avoid_package_js_for_wasm',
+  // MethodChannel instrumentation annotation (method_channel_rules.dart).
+  // Comprehensive: advisory — grep-based audit already covers this.
+  'require_method_channel_instrumented',
   // receive_sharing_intent (receive_sharing_intent_rules.dart)
   'rsi_unfiltered_shared_media_type',
   // sign_in_with_apple (sign_in_with_apple_rules.dart)
