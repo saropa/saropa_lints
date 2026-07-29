@@ -79,6 +79,20 @@ _DO_NOT_TRANSLATE = (
 # "ZZ<n>ZZ", PUA "q<n>q", and the raw marker code points.
 _SHIELD_RESIDUE_RE = re.compile(r"ZZ\d+ZZ|q\d+q|[﷐﷑]")
 
+# LLM control tokens that must never appear in a cached translation. Rejects the
+# value so it heals on the next run. Covers Qwen, Llama, ChatML, and Mistral
+# chat-template tokens.
+_LLM_CONTROL_TOKENS = [
+    "/no_think", "/think",
+    "<|endoftext|>", "<|im_start|>", "<|im_end|>",
+    "<|im_sep|>", "<|endofprompt|>",
+    "<|assistant|>", "<|user|>", "<|system|>",
+    "[INST]", "[/INST]", "<<SYS>>", "<</SYS>>",
+]
+_LLM_CONTROL_RE = re.compile(
+    "|".join(re.escape(t) for t in _LLM_CONTROL_TOKENS),
+)
+
 # Google Translate target codes (deep-translator / Google).
 LOCALE_TO_GOOGLE: dict[str, str] = {
     "ar": "ar",
@@ -400,14 +414,17 @@ def _placeholders_preserved(source: str, candidate: str) -> bool:
 def _cache_value_is_clean(source: str, cached: str) -> bool:
     """True when a cached translation is safe to serve without re-fetching.
 
-    Rejects three poison classes so they heal on the next run with the current
+    Rejects four poison classes so they heal on the next run with the current
     engine: placeholder loss/rename, leaked shield residue from any past scheme
-    (``q0q`` / ``ZZ0ZZ`` / PUA chars), and brand corruption (a do-not-translate
-    term in *source* missing from *cached* because MT transliterated it).
+    (``q0q`` / ``ZZ0ZZ`` / PUA chars), brand corruption (a do-not-translate
+    term in *source* missing from *cached* because MT transliterated it), and
+    LLM control tokens leaked into the translation output.
     """
     if not _placeholders_preserved(source, cached):
         return False
     if _SHIELD_RESIDUE_RE.search(cached):
+        return False
+    if _LLM_CONTROL_RE.search(cached):
         return False
     for term in _DO_NOT_TRANSLATE:
         if _BRAND_PATTERNS[term].search(source) and term not in cached:
@@ -607,8 +624,8 @@ def describe_engine_availability() -> str:
     except ImportError:
         return "Qwen engine module not found — using Google Translate."
     if qwen_engine.qwen_model_available():
-        import qwen_engine as qe
-        return f"Qwen ({qe.QWEN_MODEL_TAG}) available — primary engine (Google fallback per string)."
+        tag = qwen_engine._model_tag()
+        return f"Qwen ({tag}) available — primary engine (Google fallback per string)."
     return (
         "Qwen/Ollama not available — using Google Translate. For higher quality "
         "install Ollama from https://ollama.com/download (model pull is automatic)."

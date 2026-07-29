@@ -37,6 +37,26 @@ from collections import deque
 _OLLAMA_BASE = "http://localhost:11434"
 
 # ---------------------------------------------------------------------------
+# LLM output sanitization — strips control tokens that leak into translations
+# ---------------------------------------------------------------------------
+_LLM_DIRECTIVES = [
+    "/no_think", "/think", "/end", "/start",
+    "/reset", "/continue", "/stop", "/system",
+]
+_LLM_DIRECTIVE_RE = re.compile(
+    r"\s*(?:" + "|".join(re.escape(d) for d in _LLM_DIRECTIVES) + r")\b",
+)
+_LLM_CONTROL_TAGS = [
+    "<|endoftext|>", "<|im_start|>", "<|im_end|>",
+    "<|im_sep|>", "<|endofprompt|>",
+    "<|assistant|>", "<|user|>", "<|system|>",
+    "[INST]", "[/INST]", "<<SYS>>", "<</SYS>>",
+]
+_LLM_TAG_RE = re.compile(
+    "|".join(re.escape(t) for t in _LLM_CONTROL_TAGS),
+)
+
+# ---------------------------------------------------------------------------
 # Model ladder — GPU-aware selection
 # ---------------------------------------------------------------------------
 _QWEN_MODEL_LADDER: list[tuple[str, str, str, float]] = [
@@ -142,9 +162,31 @@ def _select_qwen_model() -> tuple[str, str, str, str]:
     )
 
 
-QWEN_MODEL_TAG, QWEN_STAMP, QWEN_MODEL_PULL_SIZE, QWEN_MODEL_SELECTION_NOTE = (
-    _select_qwen_model()
-)
+_qwen_model_cache: tuple[str, str, str, str] | None = None
+
+
+def _get_qwen_model() -> tuple[str, str, str, str]:
+    """Lazy model selection — defers nvidia-smi subprocess until first use."""
+    global _qwen_model_cache
+    if _qwen_model_cache is None:
+        _qwen_model_cache = _select_qwen_model()
+    return _qwen_model_cache
+
+
+def _model_tag() -> str:
+    return _get_qwen_model()[0]
+
+
+def _model_stamp() -> str:
+    return _get_qwen_model()[1]
+
+
+def _model_pull_size() -> str:
+    return _get_qwen_model()[2]
+
+
+def _model_selection_note() -> str:
+    return _get_qwen_model()[3]
 
 
 # ---------------------------------------------------------------------------
@@ -253,7 +295,7 @@ def _has_model(timeout_s: float = 5.0) -> bool:
     models = data.get("models", [])
     if not isinstance(models, list):
         return False
-    return any(str(m.get("name", "")) == QWEN_MODEL_TAG for m in models)
+    return any(str(m.get("name", "")) == _model_tag() for m in models)
 
 
 def _kill_all_ollama() -> None:
@@ -290,7 +332,7 @@ def restart_ollama(*, log=print) -> bool:
 
     try:
         subprocess.run(
-            [ollama, "stop", QWEN_MODEL_TAG],
+            [ollama, "stop", _model_tag()],
             capture_output=True, timeout=10, check=False,
         )
     except subprocess.TimeoutExpired:
@@ -363,7 +405,7 @@ def _ensure_ready() -> tuple[bool, str]:
         )
 
     sys.stderr.write(
-        f"[Ollama/Qwen] model selection: {QWEN_MODEL_SELECTION_NOTE}\n"
+        f"[Ollama/Qwen] model selection: {_model_selection_note()}\n"
     )
 
     if not _endpoint_up():
@@ -399,21 +441,21 @@ def _ensure_ready() -> tuple[bool, str]:
 
     if not _has_model():
         sys.stderr.write(
-            f"[Ollama/Qwen] model {QWEN_MODEL_TAG} not found "
-            f"— pulling ({QWEN_MODEL_PULL_SIZE}, one-time)...\n"
+            f"[Ollama/Qwen] model {_model_tag()} not found "
+            f"— pulling ({_model_pull_size()}, one-time)...\n"
         )
         try:
             result = subprocess.run(
-                [ollama, "pull", QWEN_MODEL_TAG], check=False  # noqa: S603
+                [ollama, "pull", _model_tag()], check=False  # noqa: S603
             )
         except Exception as exc:  # noqa: BLE001
-            return False, f"`ollama pull {QWEN_MODEL_TAG}` failed: {exc}"
+            return False, f"`ollama pull {_model_tag()}` failed: {exc}"
         if result.returncode != 0:
-            return False, f"`ollama pull {QWEN_MODEL_TAG}` exited {result.returncode}"
+            return False, f"`ollama pull {_model_tag()}` exited {result.returncode}"
         if not _has_model():
-            return False, f"Pull completed but {QWEN_MODEL_TAG} not found in tags"
+            return False, f"Pull completed but {_model_tag()} not found in tags"
 
-    return True, f"Ollama ready, {QWEN_MODEL_TAG} loaded"
+    return True, f"Ollama ready, {_model_tag()} loaded"
 
 
 # ---------------------------------------------------------------------------
@@ -472,7 +514,7 @@ def _call_ollama(prompt: str, timeout_s: float) -> str | None:
             return None
 
     req_data = {
-        "model": QWEN_MODEL_TAG,
+        "model": _model_tag(),
         "messages": [{"role": "user", "content": prompt}],
         "think": False,
         "stream": False,
@@ -514,8 +556,9 @@ def _call_ollama(prompt: str, timeout_s: float) -> str | None:
     translated = re.sub(r"(?s)<think>.*?</think>", "", translated)
     translated = re.sub(r"(?s)<think>.*\Z", "", translated).strip()
 
-    # Strip Qwen3 chat-template directives that leak into output
-    translated = re.sub(r"\s*/no_think\b", "", translated).strip()
+    # Strip LLM chat-template directives / control tokens that leak into output
+    translated = _LLM_DIRECTIVE_RE.sub("", translated).strip()
+    translated = _LLM_TAG_RE.sub("", translated).strip()
 
     if translated.startswith('"') and translated.endswith('"'):
         translated = translated[1:-1].strip()
@@ -596,9 +639,9 @@ def reset_long_inputs() -> None:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    print(f"Model tag:      {QWEN_MODEL_TAG}")
-    print(f"Provenance:     {QWEN_STAMP}")
-    print(f"Selection note: {QWEN_MODEL_SELECTION_NOTE}")
+    print(f"Model tag:      {_model_tag()}")
+    print(f"Provenance:     {_model_stamp()}")
+    print(f"Selection note: {_model_selection_note()}")
     print(f"Ollama on PATH: {shutil.which('ollama') is not None}")
     print(f"Endpoint up:    {_endpoint_up()}")
     if _endpoint_up():

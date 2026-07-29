@@ -120,6 +120,18 @@ class TestCacheValueIsClean(unittest.TestCase):
     def test_accepts_brand_preserved(self) -> None:
         self.assertTrue(mt._cache_value_is_clean("Run Saropa Lints", "تشغيل Saropa Lints"))
 
+    def test_rejects_leaked_no_think_directive(self) -> None:
+        self.assertFalse(mt._cache_value_is_clean("run", "تشغيل /no_think"))
+
+    def test_rejects_leaked_endoftext_token(self) -> None:
+        self.assertFalse(mt._cache_value_is_clean("run", "실행 <|endoftext|>"))
+
+    def test_rejects_leaked_inst_tag(self) -> None:
+        self.assertFalse(mt._cache_value_is_clean("run", "[INST] exécuter"))
+
+    def test_rejects_leaked_im_start(self) -> None:
+        self.assertFalse(mt._cache_value_is_clean("run", "<|im_start|>запуск"))
+
 
 class TestShouldSkip(unittest.TestCase):
     def test_skips_pure_brand(self) -> None:

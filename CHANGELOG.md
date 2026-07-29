@@ -80,6 +80,7 @@ Two new comprehensive rules help monitor native bridge performance by requiring 
 - **Security: fix 3 Dependabot alerts** — upgraded `shell-quote` 1.8.4 → 1.10.0 (quadratic DoS in `parse()`), replaced abandoned `npm-run-all` with maintained `npm-run-all2@8`, and overrode `brace-expansion` to patched versions (exponential DoS). All dev-only dependencies.
 - **Dependabot: grouped weekly schedule** — added `.github/dependabot.yml` to batch all extension npm security updates into a single weekly PR (Mondays) instead of one PR per alert.
 - **i18n engine: NLLB → Qwen** — the extension's machine-translation pipeline now uses Qwen 3 via local Ollama as the primary engine, with Google Translate as the per-string fallback. NLLB is deprecated; existing NLLB-provenance translations are treated as low-quality and re-translated on the next `--mode upgrade` run. No user action required.
+- **i18n: LLM control-token rejection** — the translation cache validator now rejects cached strings containing leaked LLM control tokens (`/no_think`, `<|endoftext|>`, `[INST]`, etc.). Contaminated entries auto-heal on the next translation run. GPU detection is deferred to first use so importing the engine no longer runs `nvidia-smi`.
 
 </details>
 
