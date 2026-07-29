@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2329,
+  "ruleCount": 2331,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -21360,6 +21360,23 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "prefer_method_channel_note_if_slow": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "flutter",
+        "performance",
+        "platform"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "prefer_methods_before_fields": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -31986,6 +32003,23 @@
       "certIds": [],
       "tags": [
         "dart-core"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "require_method_channel_instrumented": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "flutter",
+        "performance",
+        "platform"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
