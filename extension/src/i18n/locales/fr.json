@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: est une protéine de type 2 {added} est activé, les packs de {modeLabel} sont applicables.",
       "openFolderBeforeEnablePacks": "Saropa Lints: Il s'agit de la réponse à une question. ouvrir un dossier d'espace de travail avant d'activer les packs.",
       "allApplicablePacksEnabled": "Saropa Lints: Il s'agit de la réponse à une question. chaque paquet de règles applicable est déjà activé.",
+      "noApplicablePacksDetected": "Saropa Lints : aucun paquet de règles applicable détecté pour ce projet. Activez les paquets individuellement dans le tableau de bord de configuration.",
       "actionEnable": "L'option Activer est activée.",
       "enableRecommendedPacksPrompt": "Activer {count} (l'emballage recommandé)",
       "enablePacksDetail": "Cela met à jour Rule_packs.enabled dans analysis_options.yaml. {preview}",

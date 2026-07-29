@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: é um grupo de proteínas que se reproduzem em células habilitado {added} aplicável pacotes de {modeLabel} .",
       "openFolderBeforeEnablePacks": "Saropa Lints: é um número de PH0__. Abra uma pasta de área de trabalho antes de habilitar packs.",
       "allApplicablePacksEnabled": "Saropa Lints: é um número de PH0__. todos os pacotes de regras aplicáveis já estão habilitados.",
+      "noApplicablePacksDetected": "Saropa Lints: nenhum pacote de regras aplicável detectado para esse projeto. Ative os pacotes individualmente no Painel de Configuração.",
       "actionEnable": "Ativar habilitar ativar.",
       "enableRecommendedPacksPrompt": "Ativar {count} pacotes recomendados?",
       "enablePacksDetail": "Isso atualiza rule_packs.enabled em analysis_options.yaml. {preview}",

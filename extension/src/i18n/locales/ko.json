@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: PH2__는 {added}가 활성화되어있는 경우 해당되는 {modeLabel} 팩을 사용하십시오.",
       "openFolderBeforeEnablePacks": "Saropa Lints: PH0__:::  ⁇ PH0_: packs.packs를 활성화하기 전에 작업 영역 폴더를 열으십시오.",
       "allApplicablePacksEnabled": "Saropa Lints: PH0__:::  ⁇ PH0_: 모든 적용 가능한 규칙 팩이 이미 활성화되어 있습니다.",
+      "noApplicablePacksDetected": "Saropa Lints: 이 프로젝트에 적용 가능한 룰 팩이 없습니다. 설정 대시보드에서 팩을 개별적으로 전환하세요.",
       "actionEnable": "Enable Enable를 활성화하십시오.",
       "enableRecommendedPacksPrompt": "{count} 추천 패키지 (s) 을 활성화합니까?",
       "enablePacksDetail": "이는 analysis_options.yaml에서 rule_packs.enabled를 업데이트합니다. {preview}",

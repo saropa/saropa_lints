@@ -64,7 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.3.9]
+
+Two new comprehensive rules help monitor native bridge performance by requiring the `@MethodChannelInstrumented` annotation on channel classes and ensuring those calls are wrapped in timing helpers like `noteIfSlow`. [log](https://github.com/saropa/saropa_lints/blob/v14.3.9/CHANGELOG.md)
 
 ### Added
 
@@ -77,6 +79,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - **CI: full clone for test job** — the `health_history_test` needs git tags; shallow CI clones lacked them. Changed to `fetch-depth: 0` (full clone) so tags and history are always available.
 - **Security: fix 3 Dependabot alerts** — upgraded `shell-quote` 1.8.4 → 1.10.0 (quadratic DoS in `parse()`), replaced abandoned `npm-run-all` with maintained `npm-run-all2@8`, and overrode `brace-expansion` to patched versions (exponential DoS). All dev-only dependencies.
 - **Dependabot: grouped weekly schedule** — added `.github/dependabot.yml` to batch all extension npm security updates into a single weekly PR (Mondays) instead of one PR per alert.
+- **i18n engine: NLLB → Qwen** — the extension's machine-translation pipeline now uses Qwen 3 via local Ollama as the primary engine, with Google Translate as the per-string fallback. NLLB is deprecated; existing NLLB-provenance translations are treated as low-quality and re-translated on the next `--mode upgrade` run. No user action required.
 
 </details>
 

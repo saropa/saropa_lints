@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: สารที่ใช้ในการรักษา เปิดตัว {added} ใช้ได้กับแพ็คของ {modeLabel} .",
       "openFolderBeforeEnablePacks": "Saropa Lints: เป็นการประกอบของ เปิดโฟลเดอร์ workspace ก่อนเปิด packs.packs ให้ใช้งาน",
       "allApplicablePacksEnabled": "Saropa Lints: เป็นการประกอบของ ทุกแพ็คกติกาที่ใช้ได้ถูกเปิดให้ใช้แล้ว",
+      "noApplicablePacksDetected": "Saropa Lints: ไม่พบชุดกฎที่ใช้ได้สำหรับโปรเจกต์นี้ ให้เปิดใช้งานชุดกฎแต่ละชุดในแดชบอร์ดการตั้งค่าแยกกัน",
       "actionEnable": "Enable enable เปิดให้ใช้ได้",
       "enableRecommendedPacksPrompt": "เปิดตัว {count} แนะนําแพ็ค (((s)?",
       "enablePacksDetail": "สิ่งนี้จะอัปเดต rule_packs.enabled ใน analysis_options.yaml {preview}",

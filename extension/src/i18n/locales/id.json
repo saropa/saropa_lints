@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: adalah suatu senyawa yang diaktifkan {added} berlaku untuk paket {modeLabel}.",
       "openFolderBeforeEnablePacks": "Saropa Lints: adalah suatu bentuk dari _PH0_. buka folder workspace sebelum mengaktifkan pack.",
       "allApplicablePacksEnabled": "Saropa Lints: adalah suatu bentuk dari _PH0_. setiap paket aturan yang berlaku sudah diaktifkan.",
+      "noApplicablePacksDetected": "Saropa Lints: tidak ada paket aturan yang cocok terdeteksi untuk proyek ini. Aktifkan paket secara individu di Dashboard Konfigurasi.",
       "actionEnable": "Enable mengaktifkan.",
       "enableRecommendedPacksPrompt": "Membuat {count} recommended pack (s) bisa?",
       "enablePacksDetail": "Ini memperbarui rule_packs.enabled di analysis_options.yaml. {preview}",

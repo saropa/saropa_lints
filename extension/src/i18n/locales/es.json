@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: es el número de células que contiene la proteína _PH2 habilitado {added} aplicable para el paquete {modeLabel}.",
       "openFolderBeforeEnablePacks": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin abrir una carpeta de área de trabajo antes de habilitar los packs.",
       "allApplicablePacksEnabled": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin todos los paquetes de reglas aplicables ya están habilitados.",
+      "noApplicablePacksDetected": "Saropa Lints: no se detectaron paquetes de reglas aplicables para este proyecto. Active los paquetes individualmente en el Dashboard de Configuración.",
       "actionEnable": "Habilitar habilitar para permitir.",
       "enableRecommendedPacksPrompt": "¿Habilitar {count} en el paquete recomendado?",
       "enablePacksDetail": "Esto actualiza rule_packs.enabled en analysis_options.yaml. {preview}",

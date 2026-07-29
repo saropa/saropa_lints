@@ -99,7 +99,7 @@ def parse_args() -> argparse.Namespace:
         default=None,
         help=(
             "What to translate: 'gaps' = only untranslated strings; 'upgrade' = "
-            "gaps PLUS re-translate low-quality (Google/English) strings to NLLB; "
+            "gaps PLUS re-translate low-quality (Google/English/NLLB) strings to Qwen; "
             "'all' = force re-translate everything except manual overrides; "
             "'audit' = translate nothing, only write the gaps + low-quality report "
             "to file. Omit on a terminal to choose from a menu (which also offers "
@@ -280,20 +280,19 @@ def _append_paste_ready_section(lines: list[str], missing_by_locale: dict[str, l
 def _append_low_quality_section(
     lines: list[str], low_quality_by_locale: dict[str, list[str]]
 ) -> None:
-    """List cached entries that rank below NLLB (Google/English/legacy provenance)
-    and would be re-translated by mode `[2] upgrade`. A locale whose primary engine
-    is not NLLB has nothing better to upgrade to, so it never appears here."""
+    """List cached entries that rank below Qwen (Google/English/NLLB/legacy
+    provenance) and would be re-translated by mode `[2] upgrade`."""
     lines.append("## Low-quality translations (upgrade candidates)")
     lines.append("")
     affected = {k: v for k, v in low_quality_by_locale.items() if v}
     if not affected:
-        lines.append("- None — no cached entry ranks below NLLB for the requested locales.")
+        lines.append("- None — no cached entry ranks below Qwen for the requested locales.")
         lines.append("")
         return
     lines.append(
-        "These came from the Google/English/legacy engines and would be "
-        "re-translated via NLLB by mode `[2] upgrade`. Each row is a source "
-        "string still served by a sub-NLLB translation."
+        "These came from the Google/English/NLLB/legacy engines and would be "
+        "re-translated via Qwen by mode `[2] upgrade`. Each row is a source "
+        "string still served by a sub-Qwen translation."
     )
     lines.append("")
     for locale, entries in affected.items():
@@ -333,7 +332,7 @@ def write_audit_report(
     """Write the full audit (counts + every missing string + actionable stubs) to a markdown file.
 
     When *low_quality_by_locale* is supplied (audit-only mode), an extra section
-    lists the sub-NLLB cached entries an 'upgrade' run would re-translate. Regular
+    lists the sub-Qwen cached entries an 'upgrade' run would re-translate. Regular
     translation runs pass None and omit that section.
     """
     lines: list[str] = []
@@ -438,30 +437,22 @@ def write_coverage_json(stats_by_locale: dict[str, LocaleStats], root: Path) -> 
 
 
 def write_fallback_report(report_path: Path) -> int:
-    """Write the per-string NLLB-fallback report and return its entry count.
+    """Write the per-string fallback report and return its entry count.
 
-    Names every string NLLB could not translate (served by Google, or left
-    English) plus the over-gate inputs it could not split. This is the visibility
-    the silent fallback lacked: a human can act on each — add a dictionary
-    override, reword the source, or accept the Google value — instead of a count.
+    Names every string the primary engine could not translate (served by Google,
+    or left English) so the operator can act on each.
     """
     served = fallback_log()
-    try:
-        import nllb_engine
-        unsplittable = nllb_engine.long_inputs()
-    except ImportError:
-        unsplittable = []
-    if not served and not unsplittable:
+    if not served:
         report_path.parent.mkdir(parents=True, exist_ok=True)
-        report_path.write_text("# NLLB fallback report\n\nNo fallbacks — NLLB translated every string.\n", encoding="utf-8")
+        report_path.write_text("# MT fallback report\n\nNo fallbacks — primary engine translated every string.\n", encoding="utf-8")
         return 0
 
-    lines = ["# NLLB fallback report", ""]
+    lines = ["# MT fallback report", ""]
     google = [(loc, t) for loc, eng, t in served if eng == "google"]
     english = [(loc, t) for loc, eng, t in served if eng == "english"]
-    lines.append(f"- Served by Google (NLLB declined): {len(google)}")
+    lines.append(f"- Served by Google (Qwen declined): {len(google)}")
     lines.append(f"- Left English (no engine produced a translation): {len(english)}")
-    lines.append(f"- Over the token gate and unsplittable: {len(unsplittable)}")
     lines.append("")
 
     def _block(title: str, rows: list[tuple]) -> None:
@@ -480,12 +471,11 @@ def write_fallback_report(report_path: Path) -> int:
         lines.append("")
 
     _block("Left English — fix these first", english)
-    _block("Over token gate, unsplittable", unsplittable)
     _block("Served by Google fallback", google)
 
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return len(served) + len(unsplittable)
+    return len(served)
 
 
 def _install_sigint() -> None:
@@ -520,7 +510,7 @@ def _choose_mode(args_mode: str | None) -> str:
     print(c("bold", "Translation mode:"))
     print()
     print("  [1] Close gaps only (translate untranslated strings)  [default]")
-    print("  [2] Close gaps + upgrade low-quality (re-translate Google/English -> NLLB)")
+    print("  [2] Close gaps + upgrade low-quality (re-translate Google/English/NLLB -> Qwen)")
     print("  [3] Re-translate everything (force; keeps manual overrides)")
     print("  [4] Audit only — write gaps + low-quality report to file, translate nothing")
     print("  [a] Abort — exit now, translate nothing, change no files")
@@ -618,11 +608,8 @@ def _run_audit(
             if src and src in dict_table:
                 mapping[src] = dict_table[src]
                 continue
-            # Engine-agnostic: a string translated by NLLB (py3.14 translator) is
-            # keyed nllb:* and would be invisible to this audit under py3.13 where
-            # NLLB is absent and cache_lookup falls back to the Google keyspace.
-            # cache_lookup_any probes both so coverage does not depend on which
-            # interpreter runs the gate.
+            # Engine-agnostic: probes all engine keyspaces (qwen, nllb, google)
+            # so coverage does not depend on which engine is currently available.
             value, _prov = cache_lookup_any(mt_cache, locale, src)
             mapping[src] = value if value is not None else src
         stats, missing = compute_stats(mapping, dict_table)
@@ -695,7 +682,7 @@ def _fmt_duration(seconds: float) -> str:
 class _TranslationProgress:
     """Live per-locale throughput + ETA reporter, driven by the prefetch loop.
 
-    The MT phase is otherwise silent for minutes — NLLB runs ~1-3 strings/sec, so
+    The MT phase is otherwise silent for minutes, so
     a 1000+ string locale shows nothing between "translating N strings" and the
     final "wrote" line. This redraws one carriage-return line with words-per-minute
     and a remaining-time estimate so the operator can see the run is alive and how
@@ -820,11 +807,11 @@ def main() -> int:
             locales, sorted_unique, mt_cache, root, fail_on_missing=args.fail_on_missing
         )
 
-    # Announce the active MT engine up front so a silent Google downgrade (NLLB
-    # model not installed) is visible before a multi-hour run starts.
+    # Announce the active MT engine up front so a silent Google downgrade is
+    # visible before a long run starts.
     print(f"[{c('blue', 'i18n')}] {describe_engine_availability()}", flush=True)
     mode_label = {
-        "gaps": "gaps only", "upgrade": "gaps + upgrade low-quality to NLLB",
+        "gaps": "gaps only", "upgrade": "gaps + upgrade low-quality to Qwen",
         "all": "force re-translate all",
     }[mode]
     print(f"[{c('blue', 'i18n')}] mode: {c('cyan', mode_label)}  (Ctrl-C to stop gracefully)", flush=True)
@@ -832,8 +819,8 @@ def main() -> int:
     # Fresh engine tally + over-gate input log so the report reflects only this run.
     reset_engine_stats()
     try:
-        import nllb_engine
-        nllb_engine.reset_long_inputs()
+        import qwen_engine
+        qwen_engine.reset_run_state()
     except ImportError:
         pass
     stats_by_locale: dict[str, LocaleStats] = {}
@@ -849,7 +836,7 @@ def main() -> int:
                 break
             dict_table = TRANSLATIONS.get(locale, {})
             # Apply the chosen mode by pruning the cache before counting gaps:
-            # 'upgrade' drops low-quality (Google/English) entries so NLLB redoes
+            # 'upgrade' drops low-quality (Google/English/NLLB) entries so Qwen redoes
             # them; 'all' drops everything except manual overrides. 'gaps' prunes
             # nothing. Each pruned entry becomes a gap the prefetch below refills.
             if mode == "upgrade":
@@ -871,7 +858,7 @@ def main() -> int:
                 phase = c("gray", "all cached, mapping…")
             else:
                 engine = active_engine_name(locale)
-                engine_label = {"nllb": "NLLB", "google": "Google"}.get(engine or "", "MT")
+                engine_label = {"qwen": "Qwen", "google": "Google"}.get(engine or "", "MT")
                 phase = c("gray", f"translating {pending} new strings via {engine_label}…")
             print(f"[{c('blue', 'i18n')}] {c('cyan', locale)}: {phase}", flush=True)
 
@@ -886,9 +873,7 @@ def main() -> int:
                 dict_table=dict_table,
                 progress=progress,
             )
-            # Engine mix for the strings this run actually translated — makes a
-            # silent NLLB->Google fallback visible instead of hidden behind the
-            # "NLLB ready" banner. ('cached' here = warmed earlier this same run.)
+            # Engine mix for the strings this run actually translated.
             mix = engine_stats_for(locale)
             real = {k: v for k, v in mix.items() if k != "cached"}
             if real:
@@ -953,14 +938,11 @@ def main() -> int:
         print(f"    {c('blue', str(report_path))}")
         print(c("gray", "    Sections: cross-locale rollup -> paste-ready stubs -> per-locale lists."))
 
-        # Per-string NLLB-fallback report: names exactly what NLLB could not do
-        # (Google-served, English-left, unsplittable) so fallbacks are visible and
-        # actionable instead of hidden behind the engine-mix counts.
-        fb_path = timestamped_report_path(root, "i18n_nllb_fallbacks.md")
+        fb_path = timestamped_report_path(root, "i18n_mt_fallbacks.md")
         fb_count = write_fallback_report(fb_path)
         if fb_count:
             print()
-            print(c("bold", f"  NLLB fallback report ({fb_count} string(s) NLLB did not translate):"))
+            print(c("bold", f"  MT fallback report ({fb_count} string(s) primary engine did not translate):"))
             print(f"    {c('blue', str(fb_path))}")
 
     if interrupted_locale is not None:

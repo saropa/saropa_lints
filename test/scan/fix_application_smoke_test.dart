@@ -84,7 +84,10 @@ void main() {
       const expectedMessage = 'Add @MethodChannelInstrumented annotation';
       expect(expectedId, equals('saropa.fix.addMethodChannelInstrumented'));
       expect(expectedPriority, equals(50));
-      expect(expectedMessage, equals('Add @MethodChannelInstrumented annotation'));
+      expect(
+        expectedMessage,
+        equals('Add @MethodChannelInstrumented annotation'),
+      );
     });
   });
 

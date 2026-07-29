@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: فعال {added} قابل اطلاق {modeLabel} پیک۔",
       "openFolderBeforeEnablePacks": "Saropa Lints:۔ پیک کو فعال کرنے سے پہلے ورک اسپیس فولڈر کھولیں۔",
       "allApplicablePacksEnabled": "Saropa Lints:۔ ہر قابل اطلاق قاعدہ پیک پہلے ہی فعال ہے۔",
+      "noApplicablePacksDetected": "Saropa Lints: اس پروجیکٹ کے لیے کوئی لاگو ہونے والی قواعد پیک نہیں ملا۔ کانفیگ ڈاش بورڈ میں پیکس کو ایک ایک کرکے تیز کریں۔",
       "actionEnable": "Enable فعال کریں چالو کریں۔",
       "enableRecommendedPacksPrompt": "{count} سفارش شدہ پیک کو فعال کریں (s) ؟",
       "enablePacksDetail": "اس سے analysis_options.yaml میں فعال کردہ rule_packs کو اپ ڈیٹ کیا جاتا ہے۔ {preview}",

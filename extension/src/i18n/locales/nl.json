@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: Het is een van de twee {added} is ingeschakeld toepasselijke {modeLabel} pack.",
       "openFolderBeforeEnablePacks": "Saropa Lints: Het is een _PH0_. open een werkruimte map voordat u packs.packs inschakelt",
       "allApplicablePacksEnabled": "Saropa Lints: Het is een _PH0_. elke toepasselijke regelpakket is al ingeschakeld.",
+      "noApplicablePacksDetected": "Saropa Lints: geen toepasbare regelpakketten gedetecteerd voor dit project. Schakel pakketten individueel in de Config Dashboard in.",
       "actionEnable": "Enable Enable is een functie die wordt ingeschakeld door de gebruiker.",
       "enableRecommendedPacksPrompt": "Enable {count} aanbevolen pakketten?",
       "enablePacksDetail": "Dit is een update van rule_packs.enabled in analysis_options.yaml. {preview}",

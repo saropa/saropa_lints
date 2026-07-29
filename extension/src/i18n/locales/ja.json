@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: ヒトの体内にある {added}が有効になっている場合,適用可能な {modeLabel} パック (pack) を選択してください.",
       "openFolderBeforeEnablePacks": "Saropa Lints: フォローしている pack. enabling を有効にする前に,ワークスペースのフォルダーを開きます.",
       "allApplicablePacksEnabled": "Saropa Lints: フォローしている すべての適用可能なルールパックは既に有効です.",
+      "noApplicablePacksDetected": "Saropa Lints: このプロジェクトには適用可能なルールパックが検出されませんでした。設定ダッシュボードでパックを個別に切り替えてください。",
       "actionEnable": "Enable 設定を有効にします.",
       "enableRecommendedPacksPrompt": "{count} 推奨パックを有効にする (s)?",
       "enablePacksDetail": "これにより、analysis_options.yaml の rules_packs.enabled が更新されます。 {preview}",

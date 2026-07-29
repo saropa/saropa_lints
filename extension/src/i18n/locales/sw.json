@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: _PH2_: - PH2__::: kwa ajili ya kuwezeshwa {added} husika pakiti za {modeLabel} .",
       "openFolderBeforeEnablePacks": "Saropa Lints:: kwa hiyo ni sawa. fungua folda ya eneo la kazi kabla ya kuwezesha vifurushi.",
       "allApplicablePacksEnabled": "Saropa Lints:: kwa hiyo ni sawa. kila kifurushi cha sheria kinachotumika tayari kimewezeshwa.",
+      "noApplicablePacksDetected": "Saropa Lints: hakuna kilele kipaka ya kifundishwa kwa project hili. Tumia kifundishwa kipaka kwa kipaka kwenye Dashboard ya Config.",
       "actionEnable": "Enable Kuwezesha kuwezesha",
       "enableRecommendedPacksPrompt": "Enable {count} recommended pack ((s))?",
       "enablePacksDetail": "Hii inasasisha rule_packs.enabled katika analysis_options.yaml. {preview}",

@@ -56,9 +56,9 @@ class TestPrefetchProgressCallback(unittest.TestCase):
         texts = ["one two", "three", "four five six"]
         calls: list[tuple[int, int, str]] = []
 
-        # Stub the actual translation so nothing loads/network-calls; force NLLB
+        # Stub the actual translation so nothing loads/network-calls; force Qwen
         # primary and MT enabled so every text counts as pending.
-        with mock.patch.object(mt, "_primary_engine", return_value="nllb"), \
+        with mock.patch.object(mt, "_primary_engine", return_value="qwen"), \
              mock.patch.object(mt, "_mt_env_enabled", return_value=True), \
              mock.patch.object(mt, "_translate_one", return_value="x"):
             mt.prefetch_machine_translations(
@@ -73,7 +73,7 @@ class TestPrefetchProgressCallback(unittest.TestCase):
 
     def test_no_callback_when_progress_is_none(self) -> None:
         # Backward-compatible: the parameter is optional and defaults to no-op.
-        with mock.patch.object(mt, "_primary_engine", return_value="nllb"), \
+        with mock.patch.object(mt, "_primary_engine", return_value="qwen"), \
              mock.patch.object(mt, "_mt_env_enabled", return_value=True), \
              mock.patch.object(mt, "_translate_one", return_value="x"):
             mt.prefetch_machine_translations("ar", ["a b"], cache={}, dict_table={})

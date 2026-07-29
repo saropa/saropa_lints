@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: это число, которое соответствует числу _PH2_. включен {added} применимость пакетов {modeLabel}.",
       "openFolderBeforeEnablePacks": "Saropa Lints: это - _PH0_. Перед тем, как включить пакеты.pack, откройте папку рабочей зоны.",
       "allApplicablePacksEnabled": "Saropa Lints: это - _PH0_. каждый применимый пакет правил уже включен.",
+      "noApplicablePacksDetected": "Saropa Lints: для этого проекта не найдены применимые наборы правил. Включите наборы правил отдельно в панели настроек.",
       "actionEnable": "Enable - включить.",
       "enableRecommendedPacksPrompt": "Включить {count} рекомендуемые пакеты?",
       "enablePacksDetail": "Это обновляет rule_packs.enabled в analysis_options.yaml. {preview}",

@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: jest to cząstka, która łączy się z włączony {added} stosowny pakiet {modeLabel} .",
       "openFolderBeforeEnablePacks": "Saropa Lints: to znaczy, że jest przed włączeniem pakietów.pack otwórz folder przestrzeni roboczej.",
       "allApplicablePacksEnabled": "Saropa Lints: to znaczy, że jest każdy obowiązujący pakiet reguł jest już włączony.",
+      "noApplicablePacksDetected": "Saropa Lints: nie wykryto stosowalnych pakietów reguł dla tego projektu. Włącz poszczególne pakiety w Panelu Konfiguracji.",
       "actionEnable": "Włącz Enable włączyć",
       "enableRecommendedPacksPrompt": "Włącz {count} polecany pakiet?",
       "enablePacksDetail": "To aktualizuje plik rule_packs.enabled w pliku analysis_options.yaml. {preview}",

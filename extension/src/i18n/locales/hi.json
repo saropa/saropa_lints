@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: सक्षम {added} लागू {modeLabel} पैक।",
       "openFolderBeforeEnablePacks": "Saropa Lints: _PH0_: पैक सक्षम करने से पहले एक कार्यक्षेत्र फ़ोल्डर खोलें।",
       "allApplicablePacksEnabled": "Saropa Lints: _PH0_: प्रत्येक लागू नियम पैक पहले से ही सक्षम है।",
+      "noApplicablePacksDetected": "Saropa Lints: इस प्रोजेक्ट के लिए कोई लागू नियम पैक नहीं खोजा गया। कॉन्फ़िग डैशबोर्ड में पैक को अलग-अलग स्विच करें।",
       "actionEnable": "सक्षम करें सक्षम करें",
       "enableRecommendedPacksPrompt": "{count} अनुशंसित पैक सक्षम करें?",
       "enablePacksDetail": "यह नियम_पैक को analysis_options.yaml में अद्यतन करता है। {preview}",

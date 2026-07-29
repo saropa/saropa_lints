@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: PH2__ এর সাথে সম্পর্কিতঃ {added} সক্ষম করা হয়েছে প্রযোজ্য {modeLabel} প্যাকগুলি।",
       "openFolderBeforeEnablePacks": "Saropa Lints: PH0__::: -PH0_: =PH0 প্যাকগুলি সক্ষম করার আগে একটি ওয়ার্কস্পেস ফোল্ডার খুলুন।",
       "allApplicablePacksEnabled": "Saropa Lints: PH0__::: -PH0_: =PH0 প্রতিটি প্রযোজ্য নিয়ম প্যাক ইতিমধ্যে সক্ষম করা হয়।",
+      "noApplicablePacksDetected": "Saropa Lints: এই প্রকল্পে অ্যাপ্লিকেবল রুল প্যাক নেই। কনফিগ ড্যাশবোর্ডে প্যাকগুলি ব্যক্তিগতভাবে টুগেল করুন।",
       "actionEnable": "Enable সক্ষম করুন সক্রিয় করুন",
       "enableRecommendedPacksPrompt": "{count} সুপারিশ প্যাকগুলি সক্ষম করুন?",
       "enablePacksDetail": "এটি analysis_options.yaml-এ rule_packs.enabled আপডেট করে। {preview}",

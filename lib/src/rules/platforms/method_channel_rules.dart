@@ -12,11 +12,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Method names on MethodChannel that cross the Dart-to-native boundary.
-const _invokeNames = {
-  'invokeMethod',
-  'invokeListMethod',
-  'invokeMapMethod',
-};
+const _invokeNames = {'invokeMethod', 'invokeListMethod', 'invokeMapMethod'};
 
 const _annotationName = 'MethodChannelInstrumented';
 
@@ -200,8 +196,9 @@ class PreferMethodChannelNoteIfSlowRule extends SaropaLintRule {
   bool get requiresClassDeclaration => true;
 
   @override
-  List<String> get relatedRules =>
-      const ['require_method_channel_instrumented'];
+  List<String> get relatedRules => const [
+    'require_method_channel_instrumented',
+  ];
 
   static const _timingHelpers = {
     'noteIfSlow',

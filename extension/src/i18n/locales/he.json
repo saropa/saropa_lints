@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: - PH2__ (אפקטים של ה-PH2) מופעל {added} תקף חבילות {modeLabel} .",
       "openFolderBeforeEnablePacks": "Saropa Lints: זה היה חרא. פתח תיקיית workspace לפני שמאפשר את pack.",
       "allApplicablePacksEnabled": "Saropa Lints: זה היה חרא. כל חבילת הכללים המתאימה כבר מופעלת.",
+      "noApplicablePacksDetected": "Saropa Lints: לא נמצאו חבילות כלליות רלוונטיות לפרויקט זה. הפעל חבילות בודדות בלוח הבקרה.",
       "actionEnable": "Enable enable אפשר את הפעלת",
       "enableRecommendedPacksPrompt": "אפשר {count} חבילות מומלצות ((s)?",
       "enablePacksDetail": "זה מעדכן את rule_packs.enabled ב-analysis_options.yaml. {preview}",

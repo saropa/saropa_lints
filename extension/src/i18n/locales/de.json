@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: Das ist die ________. aktiviert {added} anwendbares {modeLabel} Paket.",
       "openFolderBeforeEnablePacks": "Saropa Lints: Das ist ein _PH0_. Öffnen Sie einen Arbeitsbereich Ordner, bevor Packs.",
       "allApplicablePacksEnabled": "Saropa Lints: Das ist ein _PH0_. alle anwendbaren Regelpakete bereits aktiviert sind.",
+      "noApplicablePacksDetected": "Saropa Lints: Keine anwendbaren Regelsets für dieses Projekt erkannt. Schalten Sie die Sets einzeln im Konfigurationsdashboard ein.",
       "actionEnable": "Aktivieren Enable aktivieren",
       "enableRecommendedPacksPrompt": "Aktivieren Sie {count} empfohlene Packungen?",
       "enablePacksDetail": "Dadurch wird Rule_packs.enabled in analysis_options.yaml aktualisiert. {preview}",

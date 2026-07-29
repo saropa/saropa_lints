@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: là một dạng của các tế bào kích hoạt {added} áp dụng gói {modeLabel} .",
       "openFolderBeforeEnablePacks": "Saropa Lints: là người có thể mở một thư mục workspace trước khi kích hoạt pack.",
       "allApplicablePacksEnabled": "Saropa Lints: là người có thể mọi gói quy tắc có thể áp dụng đã được kích hoạt.",
+      "noApplicablePacksDetected": "Saropa Lints: không có gói quy tắc nào phù hợp được phát hiện cho dự án này. Chuyển đổi các gói riêng lẻ trong bảng điều khiển Cấu hình.",
       "actionEnable": "Enable enable enable cho phép",
       "enableRecommendedPacksPrompt": "Enable {count} recommended pack (s)?",
       "enablePacksDetail": "Điều này cập nhật rule_packs.enabled trong analysis_options.yaml. {preview}",

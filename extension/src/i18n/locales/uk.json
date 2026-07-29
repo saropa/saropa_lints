@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: = ПФ2__, що є основним елементом. увімкнено {added} застосовуватися пакетів {modeLabel} .",
       "openFolderBeforeEnablePacks": "Saropa Lints: = ПХ0__ (по-моєму, це є Перед тим, як дозволити пакети.pack відкрити папку робочої зони.",
       "allApplicablePacksEnabled": "Saropa Lints: = ПХ0__ (по-моєму, це є кожен відповідний пакет правил вже включений.",
+      "noApplicablePacksDetected": "Saropa Lints: не виявлено застосовних пакетів правил для цього проекту. Вимкніть пакети окремо в панелі налаштувань.",
       "actionEnable": "Включити ввімкнути включити",
       "enableRecommendedPacksPrompt": "Включити {count} рекомендовані пакети (((s)?",
       "enablePacksDetail": "Це оновлює rule_packs.enabled в analysis_options.yaml. {preview}",

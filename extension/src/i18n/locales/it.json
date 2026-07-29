@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: è il numero di PH che si trova in una cellula. abilitato {added} applicabile pacchetto {modeLabel} .",
       "openFolderBeforeEnablePacks": "Saropa Lints: è il nome di una delle sue compagne. aprire una cartella di spazio di lavoro prima di abilitare pack.",
       "allApplicablePacksEnabled": "Saropa Lints: è il nome di una delle sue compagne. ogni pacchetto di regole applicabile è già abilitato.",
+      "noApplicablePacksDetected": "Saropa Lints: nessun pacchetto di regole applicabile rilevato per questo progetto. Attiva i pacchetti individualmente nel Dashboard Config.",
       "actionEnable": "Abilitare abilitare",
       "enableRecommendedPacksPrompt": "Abilitare {count} confezioni raccomandate?",
       "enablePacksDetail": "Questo aggiorna rule_packs.enabled in analysis_options.yaml. {preview}",

@@ -44,15 +44,15 @@ class TestTimestampedReportPath(unittest.TestCase):
             self.assertTrue(out.parent.is_dir())
 
     def test_filename_suffix_is_preserved(self) -> None:
-        # A second report type (the NLLB fallback log) shares the helper; its
+        # A second report type (the MT fallback log) shares the helper; its
         # basename must survive intact so the two outputs stay distinguishable.
         fixed = datetime(2026, 6, 11, 1, 2, 3)
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             with mock.patch.object(g, "datetime") as dt:
                 dt.now.return_value = fixed
-                out = g.timestamped_report_path(root, "i18n_nllb_fallbacks.md")
-            self.assertEqual(out.name, "20260611_010203_i18n_nllb_fallbacks.md")
+                out = g.timestamped_report_path(root, "i18n_mt_fallbacks.md")
+            self.assertEqual(out.name, "20260611_010203_i18n_mt_fallbacks.md")
 
 
 if __name__ == "__main__":

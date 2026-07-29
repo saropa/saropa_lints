@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: _PH2_: - PH2__'de bulunan bir hü etkin {added} geçerli {modeLabel} paketi .",
       "openFolderBeforeEnablePacks": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. packs.packs etkinleştirmeden önce bir çalışma alanı klasörünü açın.",
       "allApplicablePacksEnabled": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. her geçerli kural paketi zaten etkinleştirilmiştir.",
+      "noApplicablePacksDetected": "Saropa Lints: Bu projeye uygulanabilir kural paketleri tespit edilemedi. Yapılandırma Panelinde paketleri ayrı ayrı açın.",
       "actionEnable": "Enable enable Etkinleştirin etkinleştir",
       "enableRecommendedPacksPrompt": "{count} önerilen paketleri etkinleştirmek için (((s)?",
       "enablePacksDetail": "Bu, analysis_options.yaml'daki rule_packs.enabled dosyasını günceller. {preview}",

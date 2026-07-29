@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: Ang mga bagay na may kaugnayan sa pag-aalaga ng katawan. pinaandar {added} naaangkop na {modeLabel} pack.",
       "openFolderBeforeEnablePacks": "Saropa Lints: ang mga ito ay may _ph0__. buksan ang isang folder ng workspace bago paganahin ang mga pack.",
       "allApplicablePacksEnabled": "Saropa Lints: ang mga ito ay may _ph0__. lahat ng naaangkop na pakete ng patakaran ay pinagana.",
+      "noApplicablePacksDetected": "Saropa Lints: walang nakakapagawa na mga rule pack para sa proyekto. I-toggle ang mga pack nang isa-isa sa Config Dashboard.",
       "actionEnable": "Pagbibigay-daan sa paganahin ay pinapayagan.",
       "enableRecommendedPacksPrompt": "Pagbibigay ng {count} inirerekomenda na pack (s)?",
       "enablePacksDetail": "Ina-update nito ang rule_packs.enabled sa analysis_options.yaml. {preview}",

@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: 它们的基因是 启用了 {added} 的适用的 {modeLabel} 包.",
       "openFolderBeforeEnablePacks": "Saropa Lints: 没有一个人. 在启用 pack.spacks 之前,打开一个工作区文件 ⁇ .",
       "allApplicablePacksEnabled": "Saropa Lints: 没有一个人. 每个适用的规则包都已经启用.",
+      "noApplicablePacksDetected": "Saropa Lints：此项目未检测到适用的规则包。在配置仪表板中单独切换各个包。",
       "actionEnable": "启用 启动 在此处.",
       "enableRecommendedPacksPrompt": "启用 {count} 的推 ⁇ 包 (s)?",
       "enablePacksDetail": "这会更新 analysis_options.yaml 中的rule_packs.enabled。 {preview}",

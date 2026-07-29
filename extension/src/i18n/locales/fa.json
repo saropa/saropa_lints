@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: _ PH2__::: به صورت یکپارچه و در کنار {added} قابل اجراست. {modeLabel} بسته های .",
       "openFolderBeforeEnablePacks": "Saropa Lints: _PH0_: = PH0__::: -پای قبل از فعال کردن بسته ها یک پوشه workspace را باز کنید.",
       "allApplicablePacksEnabled": "Saropa Lints: _PH0_: = PH0__::: -پای هر بسته قاعده قابل اجرا در حال حاضر فعال است.",
+      "noApplicablePacksDetected": "Saropa Lints: هیچ قاعده ای برای پروژه ای که انتخاب کردید پیدا نشد. هر قاعده را به طور جداگانه در پنجره تنظیمات فعال یا غیرفعال کنید.",
       "actionEnable": "فعال کردن enable Enable امکان پذیر ساختن",
       "enableRecommendedPacksPrompt": "{count} بسته توصیه شده را فعال کنید؟",
       "enablePacksDetail": "این rule_packs.enabled را در analysis_options.yaml به روز می کند. {preview}",
