@@ -159,6 +159,31 @@ plugins:
     }
   });
 
+  it('round-trip: fallback create → toggle OFF → toggle ON', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-rule-packs-'));
+    try {
+      const analysisPath = path.join(root, 'analysis_options.yaml');
+      fs.writeFileSync(analysisPath, 'analyzer:\n  errors:\n    todo: ignore\n', 'utf-8');
+
+      // ON: creates plugins block via final fallback.
+      assert.strictEqual(writeRulePacksEnabled(root, ['riverpod']), true);
+      assert.deepStrictEqual(parseRulePacksEnabled(fs.readFileSync(analysisPath, 'utf-8')), ['riverpod']);
+
+      // OFF: RULE_PACK_BLOCK regex must match the fallback-created block.
+      assert.strictEqual(writeRulePacksEnabled(root, []), true);
+      assert.deepStrictEqual(parseRulePacksEnabled(fs.readFileSync(analysisPath, 'utf-8')), []);
+
+      // ON again: bare saropa_lints: key remains; pluginKey regex re-anchors.
+      assert.strictEqual(writeRulePacksEnabled(root, ['drift']), true);
+      assert.deepStrictEqual(parseRulePacksEnabled(fs.readFileSync(analysisPath, 'utf-8')), ['drift']);
+
+      const final = fs.readFileSync(analysisPath, 'utf-8');
+      assert.strictEqual(final.includes('analyzer:'), true, 'original content preserved');
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   // Regression: the saropa_lints package's own dev config omits the version
   // pin (plugin loads from workspace source). The writer must still find an
   // anchor; previously it returned false and surfaced "could not write

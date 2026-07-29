@@ -77,7 +77,16 @@ export interface PubspecInfo {
  * extension runs in the plugin's own workspace during development.
  */
 export function hasSaropaLintsDep(workspaceRoot: string): boolean {
-  return isSaropaLintsPackage(workspaceRoot) || hasPubspecDependency(workspaceRoot, 'saropa_lints');
+  const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
+  if (!fs.existsSync(pubspecPath)) return false;
+  try {
+    const content = fs.readFileSync(pubspecPath, 'utf-8');
+    // Single read: self-package OR listed as a dependency.
+    return /^name:\s+saropa_lints\s*$/m.test(content)
+      || /^\s+saropa_lints:/m.test(content);
+  } catch {
+    return false;
+  }
 }
 
 /**

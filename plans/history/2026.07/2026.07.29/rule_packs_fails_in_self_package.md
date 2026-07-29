@@ -91,6 +91,11 @@ consumer and should not pretend to support consumer features.
 - `configSuggestions.test.ts`: `treats self-package as configured without a plugin block`.
 - `isSaropaLintsPackage` suite (4 tests): true for self-package, false for consumer, false for missing pubspec, false for `saropa_lints_something`.
 
-**Known limitation:** `isSaropaLintsPackage` and `hasPubspecDependency` each read `pubspec.yaml` independently, causing a double read in the common consumer-project case. Low impact (small file, cached by OS), flagged for future consolidation.
-
 **l10n:** One new `en.json` key (`noApplicablePacksDetected`). Non-English locale catalogs require regeneration before publish.
+
+### Hardening pass (2026-07-29)
+
+- **Double pubspec read eliminated:** `hasSaropaLintsDep` now reads `pubspec.yaml` once and checks both `name: saropa_lints` and the dependency regex in the same read, instead of calling `isSaropaLintsPackage` (one read) then `hasPubspecDependency` (second read). `isSaropaLintsPackage` remains a separate export for callers that need the self-package check alone.
+- **Caller audit (8 call sites):** All callers of `hasSaropaLintsDep` reviewed — none assume consumer-project structure downstream. `hasSaropaLintsConfigured` has one caller (`computeConfigSuggestions`), already handled.
+- **Startup nudge verified safe:** The self-package pubspec contains no consumer dependencies that match any pack definition, so `computeConfigSuggestions` returns `[]` and no spurious toast fires.
+- **Round-trip test added:** New test exercises the full cycle: fallback-create `plugins: saropa_lints:` block → toggle OFF (RULE_PACK_BLOCK regex removal) → toggle ON again (pluginKey regex re-anchor). Confirms the bare `saropa_lints:` key left after removal is a valid anchor for re-insertion.
