@@ -1563,6 +1563,12 @@ ${detailRow}`;
     const applicableIds = computeConfigSuggestions(root)
       .filter((s) => s.kind === 'pack-available' && s.packId)
       .map((s) => s.packId!);
+    if (applicableIds.length === 0) {
+      void vscode.window.showInformationMessage(
+        l10n('notify.vibrancy.noApplicablePacksDetected'),
+      );
+      return;
+    }
     const currentEnabled = new Set(readRulePacksEnabled(root));
     const toAdd = applicableIds.filter((packId) => !currentEnabled.has(packId));
     if (toAdd.length === 0) {

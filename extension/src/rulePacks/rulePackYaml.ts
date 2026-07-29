@@ -143,6 +143,16 @@ function insertRulePacksAfterVersion(content: string, blockBody: string): string
   // match: they require `saropa_lints:` at the line's leading indent followed
   // by end-of-line, not `:init`.
   const pluginKey = /^[ \t]*saropa_lints:[ \t]*\n/m.exec(content);
-  if (!pluginKey) return null;
-  return content.replace(pluginKey[0], `${pluginKey[0]}${blockBody}`);
+  if (pluginKey) {
+    return content.replace(pluginKey[0], `${pluginKey[0]}${blockBody}`);
+  }
+  // Final fallback: no `saropa_lints:` key at all (e.g. the plugin's own
+  // workspace). Create the entire `plugins: saropa_lints:` block. Append
+  // after a `plugins:` key if one exists, otherwise append at end of file.
+  const pluginsKey = /^plugins:[ \t]*\n/m.exec(content);
+  if (pluginsKey) {
+    return content.replace(pluginsKey[0], `${pluginsKey[0]}  saropa_lints:\n${blockBody}`);
+  }
+  const trailing = content.endsWith('\n') ? '' : '\n';
+  return `${content}${trailing}\nplugins:\n  saropa_lints:\n${blockBody}`;
 }

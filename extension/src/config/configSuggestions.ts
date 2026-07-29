@@ -18,7 +18,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-import { hasSaropaLintsDep, FLUTTER_EMBEDDER_PLATFORMS } from '../pubspecReader';
+import { hasSaropaLintsDep, isSaropaLintsPackage, FLUTTER_EMBEDDER_PLATFORMS } from '../pubspecReader';
 import {
   RULE_PACK_DEFINITIONS,
   isPackDetected,
@@ -78,6 +78,9 @@ function readPubspecLock(root: string): string {
  * "init is a hidden command I never see".
  */
 function hasSaropaLintsConfigured(root: string): boolean {
+  // The self-package loads the plugin implicitly from workspace source —
+  // no explicit `plugins: saropa_lints:` block is needed or expected.
+  if (isSaropaLintsPackage(root)) return true;
   const p = readAnalysisOptionsPath(root);
   if (!fs.existsSync(p)) return false;
   try {

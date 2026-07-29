@@ -9,6 +9,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { computeConfigSuggestions, countConfigSuggestions } from '../config/configSuggestions';
+import { isSaropaLintsPackage } from '../pubspecReader';
 
 /** Creates a fresh temp workspace dir and returns its path. */
 function makeWorkspace(): string {
@@ -120,6 +121,14 @@ describe('computeConfigSuggestions', () => {
     assert.ok(!out.some((s) => s.packId === 'dio_5'));
   });
 
+  it('treats self-package (name: saropa_lints) as configured without a plugin block', () => {
+    const root = makeWorkspace();
+    write(root, 'pubspec.yaml', 'name: saropa_lints\nversion: 14.3.8\n');
+    write(root, 'analysis_options.yaml', 'analyzer:\n  errors:\n    todo: ignore\n');
+    const out = computeConfigSuggestions(root);
+    assert.ok(!out.some((s) => s.kind === 'init-missing'), 'self-package must not suggest init');
+  });
+
   it('countConfigSuggestions matches the array length', () => {
     const root = makeWorkspace();
     write(
@@ -132,5 +141,30 @@ describe('computeConfigSuggestions', () => {
       countConfigSuggestions(root),
       computeConfigSuggestions(root).length,
     );
+  });
+});
+
+describe('isSaropaLintsPackage', () => {
+  it('returns true when pubspec name is saropa_lints', () => {
+    const root = makeWorkspace();
+    write(root, 'pubspec.yaml', 'name: saropa_lints\nversion: 14.3.8\n');
+    assert.strictEqual(isSaropaLintsPackage(root), true);
+  });
+
+  it('returns false for a consumer project', () => {
+    const root = makeWorkspace();
+    write(root, 'pubspec.yaml', 'name: app\ndev_dependencies:\n  saropa_lints: ^13.0.0\n');
+    assert.strictEqual(isSaropaLintsPackage(root), false);
+  });
+
+  it('returns false when pubspec is missing', () => {
+    const root = makeWorkspace();
+    assert.strictEqual(isSaropaLintsPackage(root), false);
+  });
+
+  it('does not false-match saropa_lints_something', () => {
+    const root = makeWorkspace();
+    write(root, 'pubspec.yaml', 'name: saropa_lints_something\n');
+    assert.strictEqual(isSaropaLintsPackage(root), false);
   });
 });

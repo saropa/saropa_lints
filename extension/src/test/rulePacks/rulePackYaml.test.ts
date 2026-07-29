@@ -117,6 +117,48 @@ plugins:
     }
   });
 
+  it('writeRulePacksEnabled creates plugins block when no saropa_lints key exists', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-rule-packs-'));
+    try {
+      const analysisPath = path.join(root, 'analysis_options.yaml');
+      fs.writeFileSync(
+        analysisPath,
+        `analyzer:\n  errors:\n    todo: ignore\nlinter:\n  rules:\n    - curly_braces_in_flow_control_structures\n`,
+        'utf-8',
+      );
+
+      assert.strictEqual(writeRulePacksEnabled(root, ['riverpod']), true);
+      const content = fs.readFileSync(analysisPath, 'utf-8');
+      assert.strictEqual(content.includes('plugins:'), true);
+      assert.strictEqual(content.includes('saropa_lints:'), true);
+      assert.strictEqual(content.includes('rule_packs:'), true);
+      assert.deepStrictEqual(parseRulePacksEnabled(content), ['riverpod']);
+      assert.strictEqual(content.includes('analyzer:'), true, 'original content preserved');
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('writeRulePacksEnabled inserts under existing plugins key without saropa_lints', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-rule-packs-'));
+    try {
+      const analysisPath = path.join(root, 'analysis_options.yaml');
+      fs.writeFileSync(
+        analysisPath,
+        `plugins:\n  other_plugin:\n    enabled: true\n`,
+        'utf-8',
+      );
+
+      assert.strictEqual(writeRulePacksEnabled(root, ['drift']), true);
+      const content = fs.readFileSync(analysisPath, 'utf-8');
+      assert.strictEqual(content.includes('saropa_lints:'), true);
+      assert.strictEqual(content.includes('other_plugin:'), true, 'other plugin preserved');
+      assert.deepStrictEqual(parseRulePacksEnabled(content), ['drift']);
+    } finally {
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
   // Regression: the saropa_lints package's own dev config omits the version
   // pin (plugin loads from workspace source). The writer must still find an
   // anchor; previously it returned false and surfaced "could not write

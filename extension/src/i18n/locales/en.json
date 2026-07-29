@@ -1770,6 +1770,7 @@
       "enabledApplicableSdkPacks": "Saropa Lints: enabled {added} applicable {modeLabel} pack(s).",
       "openFolderBeforeEnablePacks": "Saropa Lints: open a workspace folder before enabling packs.",
       "allApplicablePacksEnabled": "Saropa Lints: every applicable rule pack is already enabled.",
+      "noApplicablePacksDetected": "Saropa Lints: no applicable rule packs detected for this project. Toggle packs individually in the Config Dashboard.",
       "actionEnable": "Enable",
       "enableRecommendedPacksPrompt": "Enable {count} recommended pack(s)?",
       "enablePacksDetail": "This updates rule_packs.enabled in analysis_options.yaml. {preview}",

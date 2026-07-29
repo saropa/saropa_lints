@@ -72,11 +72,27 @@ export interface PubspecInfo {
 
 /**
  * Check whether saropa_lints appears in pubspec.yaml dependencies or
- * dev_dependencies. Used to auto-enable the extension when the package
- * is already present — no files are modified.
+ * dev_dependencies, OR the workspace IS the saropa_lints package itself
+ * (`name: saropa_lints`). The self-package case matters because the
+ * extension runs in the plugin's own workspace during development.
  */
 export function hasSaropaLintsDep(workspaceRoot: string): boolean {
-  return hasPubspecDependency(workspaceRoot, 'saropa_lints');
+  return isSaropaLintsPackage(workspaceRoot) || hasPubspecDependency(workspaceRoot, 'saropa_lints');
+}
+
+/**
+ * True when the workspace root's pubspec.yaml declares `name: saropa_lints`,
+ * i.e. we are developing the plugin itself rather than consuming it.
+ */
+export function isSaropaLintsPackage(workspaceRoot: string): boolean {
+  const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
+  if (!fs.existsSync(pubspecPath)) return false;
+  try {
+    const content = fs.readFileSync(pubspecPath, 'utf-8');
+    return /^name:\s+saropa_lints\s*$/m.test(content);
+  } catch {
+    return false;
+  }
 }
 
 /**
