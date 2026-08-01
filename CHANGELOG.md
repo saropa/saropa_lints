@@ -64,9 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [14.3.11]
+## [14.3.12]
 
-Re-release of v14.3.10 with a build fix — no rule or extension changes. [log](https://github.com/saropa/saropa_lints/blob/v14.3.11/CHANGELOG.md)
+Re-release of v14.3.10 with a build fix — no rule or extension changes. [log](https://github.com/saropa/saropa_lints/blob/v14.3.12/CHANGELOG.md)
 
 <details>
 <summary>Maintenance</summary>
@@ -75,6 +75,12 @@ Re-release of v14.3.10 with a build fix — no rule or extension changes. [log](
 - Extract shared `parseMethodBody` test helper and add CI guard against `childEntities` usage on class-like declarations. No action required.
 
 </details>
+
+---
+
+## [14.3.12]
+
+**Skipped**: Internal build only.
 
 ---
 

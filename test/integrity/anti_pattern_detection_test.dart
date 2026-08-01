@@ -151,8 +151,11 @@ void main() {
       final testDir = Directory('test');
       expect(testDir.existsSync(), isTrue);
 
-      final selfPath = p.join('test', 'integrity',
-          'anti_pattern_detection_test.dart');
+      final selfPath = p.join(
+        'test',
+        'integrity',
+        'anti_pattern_detection_test.dart',
+      );
       final testFiles = testDir
           .listSync(recursive: true)
           .whereType<File>()
