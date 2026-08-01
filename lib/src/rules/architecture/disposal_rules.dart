@@ -511,11 +511,7 @@ bool _isFieldDisposed(
   if (_disposeCallOnReceiver(fieldName, disposeBody)) return true;
 
   if (bodyNode != null &&
-      hasCascadeCleanupWhere(
-        fieldName,
-        _isDisposeName,
-        bodyNode,
-      )) {
+      hasCascadeCleanupWhere(fieldName, _isDisposeName, bodyNode)) {
     return true;
   }
 

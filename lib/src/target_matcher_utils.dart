@@ -73,22 +73,16 @@ bool isFieldCleanedUp(String fieldName, String methodName, FunctionBody body) {
 RegExp _directCallPattern(String fieldName, String methodName) {
   final f = RegExp.escape(fieldName);
   final m = RegExp.escape(methodName);
-  return RegExp('$f\\s*(?:\\?\\.|\\.)'
-      '\\s*$m\\s*\\(');
+  return RegExp(
+    '$f\\s*(?:\\?\\.|\\.)'
+    '\\s*$m\\s*\\(',
+  );
 }
 
 /// AST-based cascade detection: walks [body] for `CascadeExpression` nodes
 /// whose target is [fieldName] and one section calls [methodName].
-bool hasCascadeCleanup(
-  String fieldName,
-  String methodName,
-  FunctionBody body,
-) {
-  return hasCascadeCleanupWhere(
-    fieldName,
-    (name) => name == methodName,
-    body,
-  );
+bool hasCascadeCleanup(String fieldName, String methodName, FunctionBody body) {
+  return hasCascadeCleanupWhere(fieldName, (name) => name == methodName, body);
 }
 
 /// Like [hasCascadeCleanup] but accepts a [methodMatcher] predicate for

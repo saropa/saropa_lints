@@ -1,22 +1,7 @@
-import 'package:analyzer/dart/analysis/utilities.dart';
-import 'package:analyzer/dart/ast/ast.dart';
 import 'package:saropa_lints/src/target_matcher_utils.dart';
 import 'package:test/test.dart';
 
-FunctionBody _parseDisposeBody(String classSource) {
-  final unit =
-      parseString(content: classSource, throwIfDiagnostics: false).unit;
-  for (final decl in unit.declarations) {
-    if (decl is ClassDeclaration) {
-      for (final member in decl.childEntities) {
-        if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          return member.body;
-        }
-      }
-    }
-  }
-  throw StateError('No dispose() found');
-}
+import '../helpers/parse_class_method.dart';
 
 void main() {
   group('isFieldCleanedUpInSource - regex path', () {
@@ -58,11 +43,7 @@ void main() {
 
     test('cascade close', () {
       expect(
-        isFieldCleanedUpInSource(
-          '_sub',
-          'cancel',
-          '_sub..pause()..cancel();',
-        ),
+        isFieldCleanedUpInSource('_sub', 'cancel', '_sub..pause()..cancel();'),
         isTrue,
       );
     });
@@ -106,7 +87,7 @@ void main() {
 
   group('hasCascadeCleanup - AST path', () {
     test('single cascade section: field..dispose()', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _ctrl..dispose();
@@ -117,7 +98,7 @@ class S {
     });
 
     test('multi-section cascade: field..removeListener(f)..dispose()', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _ctrl..removeListener(f)..dispose();
@@ -128,7 +109,7 @@ class S {
     });
 
     test('three sections', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _ctrl..removeListener(a)..removeListener(b)..dispose();
@@ -139,7 +120,7 @@ class S {
     });
 
     test('cascade without dispose returns false', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _ctrl..removeListener(f);
@@ -150,7 +131,7 @@ class S {
     });
 
     test('different field returns false', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _other..dispose();
@@ -161,7 +142,7 @@ class S {
     });
 
     test('cascade with closure containing semicolons', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _ctrl..addListener(() { doSomething(); })..dispose();
@@ -172,7 +153,7 @@ class S {
     });
 
     test('PropertyAccess target: this._ctrl..dispose()', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     this._ctrl..removeListener(f)..dispose();
@@ -183,7 +164,7 @@ class S {
     });
 
     test('does not match dispose on a nested cascade target', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _other..addListener(() { _ctrl..dispose(); });
@@ -196,7 +177,7 @@ class S {
 
   group('hasCascadeCleanupWhere - predicate matching', () {
     test('matches disposeSafe via predicate', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _ctrl..removeListener(f)..disposeSafe();
@@ -216,7 +197,7 @@ class S {
 
   group('isFieldCleanedUp - combined regex + AST', () {
     test('direct call via regex', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _ctrl.dispose();
@@ -227,7 +208,7 @@ class S {
     });
 
     test('cascade via AST', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _ctrl..removeListener(f)..dispose();
@@ -238,7 +219,7 @@ class S {
     });
 
     test('no cleanup returns false', () {
-      final body = _parseDisposeBody('''
+      final body = parseMethodBody('''
 class S {
   void dispose() {
     _ctrl..removeListener(f);

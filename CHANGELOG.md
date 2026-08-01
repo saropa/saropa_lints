@@ -73,6 +73,13 @@ Resolves false positives across matrix scaling operations and resource disposal 
 - **Fix: `no_equal_arguments` false positive on Matrix4 uniform scaling** — `scaleByDouble(s, s, 1, 1)`, `scale(s, s, 1)`, and `diagonal3Values(s, s, 1)` no longer flag the repeated factor as a copy-paste error. The `scale` exemption is receiver-type-guarded to Matrix4 only, so `myWidget.scale(x, x)` still fires.
 - **Fix: disposal rules false positive on cascade syntax** — all disposal/cleanup rules (`require_text_editing_controller_dispose`, `require_page_controller_dispose`, stream/timer cancel rules, etc.) now recognize `_field..dispose()` and `_field..close()` cascade expressions as valid cleanup. Previously only `_field.dispose()` and `_field?.dispose()` were matched.
 
+<details>
+<summary>Maintenance</summary>
+
+- Fix cascade cleanup test helper to use `ClassDeclaration.body.members` instead of `childEntities`, which stopped exposing `MethodDeclaration` in analyzer 12.1.0.
+
+</details>
+
 ---
 
 ## [14.3.9]

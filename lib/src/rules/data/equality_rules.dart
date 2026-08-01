@@ -474,8 +474,8 @@ class NoEqualArgumentsRule extends SaropaLintRule {
   /// Generic names that need a receiver-type guard to avoid false exemptions.
   static const Map<String, Set<String>> _guardedIdiomaticCallees =
       <String, Set<String>>{
-    'scale': <String>{'Matrix4'},
-  };
+        'scale': <String>{'Matrix4'},
+      };
 
   static bool _isIdiomaticCallee(AstNode? parent) {
     final String? name = _calleeName(parent);
