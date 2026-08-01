@@ -12,13 +12,17 @@ The `_parseDisposeBody` helper in `target_matcher_utils_test.dart` used `ClassDe
 
 1. Extracted `_parseDisposeBody` into a shared test helper `test/helpers/parse_class_method.dart` as `parseMethodBody(methodName, classSource)`, using the existing `bodyMembers` extension from `analyzer_compat.dart` for cross-version safety.
 2. Updated `target_matcher_utils_test.dart` to import and use the shared helper.
-3. Audited all other `childEntities` usage in the codebase — 14 production call sites all operate on generic `AstNode` subtypes (not `ClassDeclaration`), so they are unaffected.
+3. Audited all other `childEntities` usage in the codebase — 14 production call sites all operate on generic `AstNode` subtypes (not `ClassDeclaration`), so they are unaffected. Zero remaining `childEntities` usage in `test/`.
+
+### Hardening
+
+- Added CI guard test in `anti_pattern_detection_test.dart` that scans all test files for `ClassDeclaration.childEntities` / `EnumDeclaration.childEntities` / `MixinDeclaration.childEntities` usage and fails with guidance to use `bodyMembers` instead. Prevents this class of breakage from recurring on future analyzer upgrades.
 
 ### Verification
 
 - `dart test test/utils/target_matcher_utils_test.dart` — 21/21 pass.
+- `dart test test/integrity/anti_pattern_detection_test.dart` — 5/5 pass (including new guard).
 - No production code changes required; the visitor in `target_matcher_utils.dart` already uses the correct `visitCascadeExpression` API.
-- Other diffs in this changeset are formatting-only (dart format adjustments to `disposal_rules.dart`, `equality_rules.dart`, `target_matcher_utils.dart`).
 
 ### Other Test Failures in the Publish Run
 

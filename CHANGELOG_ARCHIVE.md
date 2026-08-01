@@ -2,7 +2,68 @@
 
 <!-- cspell:disable -->
 
-Archived releases 14.0.3 and older. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+Archived releases 14.0.7 and older. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+
+---
+
+## [14.0.7]
+
+ A quick fix for better honoring `// ignore`. [log](https://github.com/saropa/saropa_lints/blob/v14.0.7/CHANGELOG.md)
+
+### Fixed
+
+- **A `// ignore:` written below a `///` doc comment and directly above the declaration is now honored on declarations the rule flags as a whole.** The conventional placement (doc comment, then `// ignore:`, then the `static`/`final`/type line) previously did nothing for rules that report the whole declaration — e.g. `avoid_global_state`, `require_http_status_check`, `require_file_close_in_finally` — forcing the directive above the doc comment or onto a trailing line. The suppression check keyed off the doc-comment line instead of the declaration line; it now matches the declaration line, consistent with how the same placement already worked for nested diagnostics. No action required; existing above-doc and trailing placements still work.
+
+<details><summary>Maintenance</summary>
+
+- Hardened the `analyzer` constraint guard in `pubspec.yaml`. The `analyzer: ^12.1.0` cap now carries a boxed HARD STOP note documenting that analyzer 13 renamed the public AST classes the package is built on (`NamedExpression` → `NamedArgument`, `SimpleFormalParameter` → `RegularFormalParameter`, `DefaultFormalParameter` removed) with no deprecated aliases — a bump is a ~912-reference source migration across ~148 files, on top of the existing `meta ^1.18.3` Flutter-stable resolution blocker. No published constraint or behavior change.
+
+</details>
+
+---
+
+## [14.0.5]
+
+This release resolves two false positive scenarios to make your linting experience smoother. The keyboard dismissal rule now correctly ignores scrollable areas that do not actually contain editable text fields. We have also exempted specific Flutter render-object overrides from parameter mutation warnings, recognizing that the framework inherently requires in-place modification for these methods. [log](https://github.com/saropa/saropa_lints/blob/v14.0.5/CHANGELOG.md)
+
+### Fixed
+
+- **`require_keyboard_dismiss_on_scroll` no longer fires on scroll views that contain no text field.** The rule now warns only when a `ListView` / `GridView` / `CustomScrollView` / `SingleChildScrollView` actually contains an editable field (`TextField`, `TextFormField`, `CupertinoTextField`, or a custom `*TextField`), matching its own "containing text fields" precondition; a pure content list (contacts, avatars, a continent list) has no keyboard to dismiss and is now left alone. Builder/opaque content with no syntactically visible children is intentionally not flagged. No action required.
+- **`avoid_parameter_mutation` no longer fires inside Flutter render-object overrides where mutating the framework-supplied object is mandatory.** `updateRenderObject(BuildContext, RenderObject)` (pushing the widget's new config onto the render object) and `setupParentData(RenderObject child)` (assigning `child.parentData`) are now exempt — there is no copy alternative, so the in-place mutation is the framework contract, not caller-data corruption. Same render-object blind spot previously fixed for `avoid_unassigned_late_fields` and `avoid_unsafe_cast`.
+
+---
+
+## [14.0.4]
+
+This release introduces four thematic rule packs that bundle quality standards for UI, localization, documentation, and testing into simple opt-in groups. The standalone scanner now supports full type resolution to accurately evaluate complex rules, and it will no longer abort an entire run if a single check fails. Additionally, this update delivers significant accuracy improvements by eliminating false positives across recursion, initialization, and platform-specific code. [log](https://github.com/saropa/saropa_lints/blob/v14.0.4/CHANGELOG.md)
+
+### Added
+
+- **Four thematic rule packs group cross-cutting quality rules into one-click bundles.** `ui_excellence` (keyboard ergonomics, visible async feedback, image layout stability, formatted numbers, predictable dialogs/lists), `localization` (externalize strings, locale-aware `intl` formatting, plurals/RTL), `documentation` (public-API dartdoc completeness), and `testing` (deterministic, isolated, well-structured tests). Enable them in the VS Code **Manage Rule Packs** dashboard under the new **Quality standards** domain, or add the id under `rule_packs.enabled` in `analysis_options.yaml`. Until now every pack was tied to a package or SDK version; these are the first packs that name a quality standard.
+- **`scan --resolve` runs the standalone scanner with full type resolution.** Rules that fire on constructor calls like `File('x')` (or that need resolved types) only see violations under resolution, because the default syntactic pass parses an implicit constructor as a method call and never triggers them. The flag is slower and needs the target project's `pub get`; the default fast path is unchanged.
+
+### Changed
+
+- **The rules in the new `ui_excellence` / `localization` / `documentation` / `testing` packs are now pack-owned, so they are opt-in like every other rule pack.** A pack-owned rule fires only when its pack is enabled (in the dashboard or `rule_packs.enabled`), even though it remains catalogued in a tier. These rules were previously enabled implicitly by tier selection; to keep them on, enable the matching pack(s). An explicit `false` in `diagnostics:` still wins over pack opt-in.
+
+### Fixed
+
+- **The `scan` CLI no longer silently under-reports instance-creation and type-based rules.** The default scan is syntactic, where an implicit constructor (`File('x')`) is not yet an instance-creation node, so every rule on that channel quietly never fired; run `scan --resolve` (or check via the IDE/`custom_lint` plugin, which is always resolved) to evaluate those rules. The default fast pass still covers all other rules and is unchanged.
+- **A misbehaving rule can no longer abort the whole `scan` run.** A rule that throws while visiting one file is now reported by name and skipped for that file, instead of crashing the scanner and losing every result; the remaining files and rules still run. No action required.
+- **`avoid_recursive_calls` no longer fires on recursion that has a terminating base case.** It now suppresses the warning when a guard clause returns or throws before recursing, when a ternary's other branch terminates, or when every self-call is bounded by a loop over a collection (tree/JSON walks, divide-and-conquer) — instead of flagging every direct self-call. No action required.
+- **`avoid_unassigned_fields` no longer fires on a field initialized by a `required this.field` (or optional `this.field` / `super.field`) named parameter.** Named and optional parameters wrap the initializing formal in a `DefaultFormalParameter`, which the constructor scan did not unwrap, so the common const-data-class pattern (`const C({required this.x})`) was wrongly reported as unassigned. Only positional `this.field` parameters were recognized before; now named, optional-positional, and super formals are all treated as assigning the field.
+- **`avoid_throw_objects_without_tostring` no longer fires on `throw Error.throwWithStackTrace(obj, stack)` when `obj`'s class has a useful `toString()`.** That call always returns `Never`, so the rule was checking `Never` instead of the actually-thrown object and flagging every such throw. It now inspects the first argument's type, and recognizes a `toString()` override inherited from any non-`Object` superclass (not only one declared directly on the thrown class). Genuine violations — a thrown class with no `toString()` — are still reported, including when thrown via `throwWithStackTrace`.
+- **`prefer_final_fields` no longer suggests `final` for a field that is reassigned from another class, and is now limited to private fields.** It previously counted only `this`-qualified writes inside the declaring class, so a field mutated through an instance held elsewhere (`entry.count++`, `ctx.flag = x`) was wrongly reported as never reassigned — and applying the fix failed to compile. Writes are now matched by resolved element across the whole file, and only private (`_`-prefixed) fields are flagged, because a write to a public field in another library cannot be seen by single-file analysis. Use `prefer_final_fields_always` to flag every non-final field.
+- **`move_variable_outside_iteration` no longer suggests hoisting a loop variable whose value changes each iteration.** It now suppresses the warning when the declaration's initializer reads a local that is reassigned elsewhere in the loop (an ancestor walk's `dir = dir.parent`, a `for` counter, a `j++`), since hoisting would freeze it at the first iteration's value and break the loop. Genuinely invariant declarations are still flagged. No action required.
+- **`require_platform_check` no longer fires on `dart:io` usage inside the native branch of a conditional import or export (the `*_io.dart` file selected by `if (dart.library.io)`).** Such files never load on web — the web build resolves to a separate stub — so the file split itself is the platform guard and no `kIsWeb` check is needed. The rule now applies the same conditional-import suppression the sibling `prefer_platform_io_conditional` rule already used; the underlying scanner additionally recognizes conditional `export` directives (not only `import`) and the `*_io.dart`/`*_stub.dart` naming pair. A file that is also reached by an unconditional import can still load on web, so it is still flagged. No action required.
+- **`require_permission_status_check` no longer fires on methods that merely share a gated name (`startRecording`, `startScan`, `getContacts`, and similar) when the receiver is an unrelated app-domain type.** It now requires the call target to resolve to a recognized media/permission source (camera, geolocator, image picker, scanner, speech, audio recorder, contacts, permission) before flagging, instead of matching the bare method name — so a plain in-process recorder or scanner is no longer reported. Genuine camera, location, or microphone calls without a permission check still are. No action required.
+- **A leading `// ignore:` now suppresses a diagnostic reported on a node nested inside a multi-line statement.** When a rule flagged an expression that sat on a later line than the statement it belonged to — for example `avoid_recursive_calls` pointing at the inner self-call of a multi-line `return` — an `// ignore:` written directly above the statement was silently ignored, because the suppression check compared the directive against the flagged expression's line rather than the statement's. The directive above the statement now works, matching how `// ignore:` behaves for single-line statements. No action required.
+
+<details><summary>Maintenance</summary>
+
+- **The `reports/organize_reports.py` helper now runs standalone instead of requiring the contacts repo cloned alongside.** The shared move/prune organizer was imported only from `../contacts/scripts/.shared/`, so the script aborted on any checkout without the sibling repo. A vendored copy now lives at `scripts/.shared/reports_organizer.py` and the launcher loads it first, falling back to the contacts copy only when the vendored module is absent. Dev-only.
+
+</details>
 
 ---
 

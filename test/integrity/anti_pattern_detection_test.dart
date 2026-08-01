@@ -147,6 +147,49 @@ void main() {
       }
     });
 
+    test('no .childEntities on class-like declarations in test files', () {
+      final testDir = Directory('test');
+      expect(testDir.existsSync(), isTrue);
+
+      final selfPath = p.join('test', 'integrity',
+          'anti_pattern_detection_test.dart');
+      final testFiles = testDir
+          .listSync(recursive: true)
+          .whereType<File>()
+          .where((f) => f.path.endsWith('.dart'))
+          .where((f) => !f.path.endsWith(p.basename(selfPath)))
+          .toList();
+
+      final violations = <String>[];
+      final pattern = RegExp(
+        r'(?:ClassDeclaration|EnumDeclaration|MixinDeclaration)'
+        r'\s*\)?\s*\.\s*childEntities',
+      );
+
+      for (final file in testFiles) {
+        final lines = file.readAsLinesSync();
+        for (var i = 0; i < lines.length; i++) {
+          final line = lines[i].trim();
+          if (line.startsWith('//') || line.startsWith('*')) continue;
+          if (pattern.hasMatch(line)) {
+            violations.add('${file.path}:${i + 1}: $line');
+          }
+        }
+      }
+
+      expect(
+        violations,
+        isEmpty,
+        reason:
+            'Use .bodyMembers (from analyzer_compat.dart) or .body.members '
+            'instead of .childEntities on class-like declarations.\n'
+            'childEntities is a low-level CST iterator that stopped exposing '
+            'MethodDeclaration in analyzer 12.1.0.\n'
+            'See: test/helpers/parse_class_method.dart\n\n'
+            '${violations.join('\n')}',
+      );
+    });
+
     test(
       'dangerous pattern count matches audit (Dart and publish script in sync)',
       () {
