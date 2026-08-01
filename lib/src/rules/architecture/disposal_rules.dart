@@ -429,23 +429,32 @@ bool _initStateAssignsFieldOfType(
 
 /// Helper to get the dispose method body as a string.
 String? _getDisposeMethodBody(ClassDeclaration node) {
+  return _getDisposeBodyNode(node)?.toSource();
+}
+
+/// Returns the dispose method's [FunctionBody] AST node, if present.
+FunctionBody? _getDisposeBodyNode(ClassDeclaration node) {
   for (final ClassMember member in node.bodyMembers) {
     if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-      return member.body.toSource();
+      return member.body;
     }
   }
-
   return null;
 }
 
 // cspell:ignore xxxDisposezzz ispose
 
 /// True if [disposeBody] calls a *dispose* method on [receiver] (`r.dispose(`,
-/// `r?.dispose(`, `.disposeSafe(`, etc.).
+/// `r?.dispose(`, `r..dispose(`, `r..other()..dispose(`, etc.).
 bool _disposeCallOnReceiver(String receiver, String disposeBody) {
+  final r = RegExp.escape(receiver);
+  const d = r'\w*[Dd]ispose\w*\(';
   final RegExp disposePattern = RegExp(
-    '${RegExp.escape(receiver)}\\??\\.'
-    r'\w*[Dd]ispose\w*\(',
+    '$r\\??\\.$d'
+    '|'
+    '$r\\.\\.'
+    '(?:[^;]*?\\.\\.)*'
+    '$d',
   );
   return disposePattern.hasMatch(disposeBody);
 }
@@ -488,13 +497,27 @@ Set<String> _localVariableAliasesOfField(String fieldName, String disposeBody) {
 /// Helper to check if a field is disposed in the dispose body.
 ///
 /// Recognizes direct `.dispose()` calls and method names containing "dispose"
-/// (e.g., `.disposeSafe()`, `.safeDispose()`), with both `.` and `?.` syntax.
+/// (e.g., `.disposeSafe()`, `.safeDispose()`), with both `.` and `?.` syntax,
+/// plus cascade expressions (`field..removeListener(f)..dispose()`).
 /// Also recognizes disposal on locals initialized from the field
 /// (`final c = _field; c.dispose();`).
-bool _isFieldDisposed(String fieldName, String? disposeBody) {
+bool _isFieldDisposed(
+  String fieldName,
+  String? disposeBody, {
+  FunctionBody? bodyNode,
+}) {
   if (disposeBody == null) return false;
 
   if (_disposeCallOnReceiver(fieldName, disposeBody)) return true;
+
+  if (bodyNode != null &&
+      hasCascadeCleanupWhere(
+        fieldName,
+        _isDisposeName,
+        bodyNode,
+      )) {
+    return true;
+  }
 
   for (final String alias in _localVariableAliasesOfField(
     fieldName,
@@ -505,6 +528,10 @@ bool _isFieldDisposed(String fieldName, String? disposeBody) {
   return false;
 }
 
+bool _isDisposeName(String name) {
+  return name.toLowerCase().contains('dispose');
+}
+
 /// Helper to report undisposed fields.
 void _reportUndisposedFields(
   ClassDeclaration node,
@@ -513,8 +540,9 @@ void _reportUndisposedFields(
   SaropaDiagnosticReporter reporter,
   LintCode code,
 ) {
+  final FunctionBody? bodyNode = _getDisposeBodyNode(node);
   for (final String name in fieldNames) {
-    if (!_isFieldDisposed(name, disposeBody)) {
+    if (!_isFieldDisposed(name, disposeBody, bodyNode: bodyNode)) {
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
           for (final VariableDeclaration variable in member.fields.variables) {

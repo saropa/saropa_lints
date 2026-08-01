@@ -10,6 +10,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 /// Extracts the final identifier name from a method invocation target.
 ///
@@ -62,29 +63,103 @@ bool isExactTarget(Expression target, Set<String> targets) {
 /// }
 /// ```
 bool isFieldCleanedUp(String fieldName, String methodName, FunctionBody body) {
-  return _fieldCleanedUpPattern(
-    fieldName,
-    methodName,
-  ).hasMatch(body.toSource());
+  if (_directCallPattern(fieldName, methodName).hasMatch(body.toSource())) {
+    return true;
+  }
+  return hasCascadeCleanup(fieldName, methodName, body);
 }
 
-/// Pattern for [fieldName].[methodName]( or [fieldName]?.[methodName](.
-RegExp _fieldCleanedUpPattern(String fieldName, String methodName) {
-  return RegExp(
-    '${RegExp.escape(fieldName)}\\s*(\\.|\\?\\.)\\s*${RegExp.escape(methodName)}\\s*\\(',
+/// Regex for direct calls only: `field.method(` or `field?.method(`.
+RegExp _directCallPattern(String fieldName, String methodName) {
+  final f = RegExp.escape(fieldName);
+  final m = RegExp.escape(methodName);
+  return RegExp('$f\\s*(?:\\?\\.|\\.)'
+      '\\s*$m\\s*\\(');
+}
+
+/// AST-based cascade detection: walks [body] for `CascadeExpression` nodes
+/// whose target is [fieldName] and one section calls [methodName].
+bool hasCascadeCleanup(
+  String fieldName,
+  String methodName,
+  FunctionBody body,
+) {
+  return hasCascadeCleanupWhere(
+    fieldName,
+    (name) => name == methodName,
+    body,
   );
+}
+
+/// Like [hasCascadeCleanup] but accepts a [methodMatcher] predicate for
+/// flexible method-name matching (e.g. names containing "dispose").
+bool hasCascadeCleanupWhere(
+  String fieldName,
+  bool Function(String methodName) methodMatcher,
+  FunctionBody body,
+) {
+  final visitor = _CascadeCleanupVisitor(fieldName, methodMatcher);
+  body.accept(visitor);
+  return visitor.found;
+}
+
+class _CascadeCleanupVisitor extends RecursiveAstVisitor<void> {
+  _CascadeCleanupVisitor(this._fieldName, this._methodMatcher);
+
+  final String _fieldName;
+  final bool Function(String) _methodMatcher;
+  bool found = false;
+
+  @override
+  void visitCascadeExpression(CascadeExpression node) {
+    if (found) return;
+    final target = node.target;
+    final String? name = switch (target) {
+      SimpleIdentifier() => target.name,
+      PrefixedIdentifier() => target.identifier.name,
+      _ => null,
+    };
+    if (name == _fieldName) {
+      for (final section in node.cascadeSections) {
+        if (section is MethodInvocation &&
+            _methodMatcher(section.methodName.name)) {
+          found = true;
+          return;
+        }
+      }
+    }
+    super.visitCascadeExpression(node);
+  }
 }
 
 /// Same as [isFieldCleanedUp] but checks arbitrary [source] (e.g. full method).
 ///
 /// Use when [body].toSource() may omit the call (e.g. mixin/override layout).
 /// Callers can pass [MethodDeclaration].toSource() as fallback.
+///
+/// Cascade detection uses regex with `[^;]` statement boundary guard. For
+/// cascades with closures containing semicolons, prefer [isFieldCleanedUp]
+/// (AST-based, no edge cases).
 bool isFieldCleanedUpInSource(
   String fieldName,
   String methodName,
   String source,
 ) {
-  return _fieldCleanedUpPattern(fieldName, methodName).hasMatch(source);
+  return _fieldCleanedUpInSourcePattern(fieldName, methodName).hasMatch(source);
+}
+
+/// Pattern for direct calls and cascade calls (regex-only, for string sources).
+RegExp _fieldCleanedUpInSourcePattern(String fieldName, String methodName) {
+  final f = RegExp.escape(fieldName);
+  final m = RegExp.escape(methodName);
+  return RegExp(
+    '$f\\s*(?:\\?\\.|\\.)'
+    '\\s*$m\\s*\\('
+    '|'
+    '$f\\s*\\.\\.'
+    '(?:[^;]*?\\.\\.)*'
+    '\\s*$m\\s*\\(',
+  );
 }
 
 /// Walks up the AST from [node] to check if a chained method call with

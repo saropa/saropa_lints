@@ -64,7 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.3.10]
+
+Resolves false positives across matrix scaling operations and resource disposal lints. Uniform scaling factors in matrix transformations are no longer incorrectly flagged as duplicate arguments, and cleanup rules now properly recognize cascade syntax when disposing of controllers, streams, and timers. [log](https://github.com/saropa/saropa_lints/blob/v14.3.10/CHANGELOG.md)
 
 ### Fixed
 
