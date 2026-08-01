@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/equality/remove_self_assignment_fix.dart';
@@ -427,9 +428,7 @@ class NoEqualArgumentsRule extends SaropaLintRule {
       // R==G==B, a point-anchor rect needs left==right and top==bottom, a
       // square Size/Offset needs both components equal. Flagging these forced
       // meaningless ignores on every such call site.
-      final String? calleeName = _calleeName(node.parent);
-      if (calleeName != null &&
-          _equalArgIdiomaticCallees.contains(calleeName)) {
+      if (_isIdiomaticCallee(node.parent)) {
         return;
       }
 
@@ -461,19 +460,33 @@ class NoEqualArgumentsRule extends SaropaLintRule {
     });
   }
 
-  /// Constructors/factories where repeating a positional argument is the
-  /// documented idiom rather than a copy-paste error.
-  static const Set<String> _equalArgIdiomaticCallees = <String>{
+  /// Names unique enough that matching the callee alone is safe.
+  static const Set<String> _unconditionalIdiomaticCallees = <String>{
     'fromRGBO', // Color.fromRGBO(r, g, b, opacity) — grayscale: r==g==b
     'fromARGB', // Color.fromARGB(a, r, g, b)        — grayscale: r==g==b
     'fromLTRB', // RelativeRect/Rect.fromLTRB        — point anchor: l==r, t==b
     'Size', // Size(w, h)                        — square: w==h
     'Offset', // Offset(dx, dy)                    — diagonal: dx==dy
+    'scaleByDouble', // Matrix4..scaleByDouble(sx, sy, sz, sw)
+    'diagonal3Values', // Matrix4.diagonal3Values(x, y, z)
   };
 
-  /// Resolves the callee name of an argument list's parent call, covering both
-  /// the parse-only form (`Color.fromRGBO(...)` parses as a [MethodInvocation])
-  /// and the resolved/`const` form (an [InstanceCreationExpression]).
+  /// Generic names that need a receiver-type guard to avoid false exemptions.
+  static const Map<String, Set<String>> _guardedIdiomaticCallees =
+      <String, Set<String>>{
+    'scale': <String>{'Matrix4'},
+  };
+
+  static bool _isIdiomaticCallee(AstNode? parent) {
+    final String? name = _calleeName(parent);
+    if (name == null) return false;
+    if (_unconditionalIdiomaticCallees.contains(name)) return true;
+    final Set<String>? receivers = _guardedIdiomaticCallees[name];
+    if (receivers == null) return false;
+    final String? receiver = _receiverName(parent);
+    return receiver != null && receivers.contains(receiver);
+  }
+
   static String? _calleeName(AstNode? parent) {
     if (parent is MethodInvocation) {
       return parent.methodName.name;
@@ -481,6 +494,33 @@ class NoEqualArgumentsRule extends SaropaLintRule {
     if (parent is InstanceCreationExpression) {
       final ConstructorName ctor = parent.constructorName;
       return ctor.name?.name ?? ctor.type.name.lexeme;
+    }
+    return null;
+  }
+
+  /// Extracts the receiver type name for a method call, handling cascades.
+  static String? _receiverName(AstNode? parent) {
+    if (parent is! MethodInvocation) return null;
+
+    Expression? target = parent.target;
+    if (target == null) {
+      // Cascade: walk up to the CascadeExpression's target.
+      final AstNode? cascade = parent.parent;
+      if (cascade is CascadeExpression) {
+        target = cascade.target;
+      }
+    }
+    if (target == null) return null;
+
+    final DartType? type = target.staticType;
+    if (type is InterfaceType) return type.element.name;
+
+    // Syntactic fallback for unresolved contexts.
+    if (target is SimpleIdentifier) return target.name;
+    if (target is PrefixedIdentifier) return target.identifier.name;
+    if (target is MethodInvocation) return target.methodName.name;
+    if (target is InstanceCreationExpression) {
+      return target.constructorName.type.name.lexeme;
     }
     return null;
   }

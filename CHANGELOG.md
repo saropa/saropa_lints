@@ -64,6 +64,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- **Fix: `no_equal_arguments` false positive on Matrix4 uniform scaling** — `scaleByDouble(s, s, 1, 1)`, `scale(s, s, 1)`, and `diagonal3Values(s, s, 1)` no longer flag the repeated factor as a copy-paste error. The `scale` exemption is receiver-type-guarded to Matrix4 only, so `myWidget.scale(x, x)` still fires.
+- **Fix: disposal rules false positive on cascade syntax** — all disposal/cleanup rules (`require_text_editing_controller_dispose`, `require_page_controller_dispose`, stream/timer cancel rules, etc.) now recognize `_field..dispose()` and `_field..close()` cascade expressions as valid cleanup. Previously only `_field.dispose()` and `_field?.dispose()` were matched.
+
+---
+
 ## [14.3.9]
 
 Two new comprehensive rules help monitor native bridge performance by requiring the `@MethodChannelInstrumented` annotation on channel classes and ensuring those calls are wrapped in timing helpers like `noteIfSlow`. [log](https://github.com/saropa/saropa_lints/blob/v14.3.9/CHANGELOG.md)

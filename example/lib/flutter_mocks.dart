@@ -2966,6 +2966,13 @@ class Offset {
   static const zero = Offset(0, 0);
 }
 
+class Matrix4 {
+  Matrix4.identity();
+  Matrix4.diagonal3Values(double x, double y, double z);
+  void scale(dynamic x, [double? y, double? z]) {}
+  void scaleByDouble(double sx, double sy, double sz, double sw) {}
+}
+
 class Rect {
   const Rect.fromLTWH(double left, double top, double width, double height);
   static const zero = Rect.fromLTWH(0, 0, 0, 0);

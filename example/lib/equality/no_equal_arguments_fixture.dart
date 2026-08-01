@@ -125,9 +125,26 @@ void _goodIdiomatic(int gray, double x, double y, double d) {
   Offset(d, d); // diagonal dx==dy
 }
 
+// GOOD: Matrix4 uniform-scale callees — equal args are semantically required.
+void _goodMatrix4Scale(double s) {
+  Matrix4.identity()..scaleByDouble(s, s, 1, 1); // uniform 2D scale
+  Matrix4.identity()..scale(s, s, 1); // uniform 2D scale (Object overload)
+  Matrix4.diagonal3Values(s, s, 1); // uniform diagonal
+}
+
+// BAD: non-Matrix4 scale — guard ensures only Matrix4.scale is exempt.
+// expect_lint: no_equal_arguments
+void _badNonMatrix4Scale(double s) {
+  _FakeWidget().scale(s, s);
+}
+
 // BAD: non-allowlisted callee with a repeated identifier — still a copy-paste
 // smell.
 // expect_lint: no_equal_arguments
 void _badIdentifier(int value) {
   setPosition(value, value);
+}
+
+class _FakeWidget {
+  void scale(double x, double y) {}
 }
