@@ -7,7 +7,7 @@ import 'package:saropa_lints/src/analyzer_compat.dart';
 ///
 /// Uses [bodyMembers] from analyzer_compat.dart for cross-version safety.
 /// Throws [StateError] if no matching method is found.
-FunctionBody parseMethodBody(String classSource, String methodName) {
+FunctionBody parseMethodBody(String methodName, String classSource) {
   final unit = parseString(
     content: classSource,
     throwIfDiagnostics: false,

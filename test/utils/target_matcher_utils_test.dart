@@ -87,7 +87,7 @@ void main() {
 
   group('hasCascadeCleanup - AST path', () {
     test('single cascade section: field..dispose()', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _ctrl..dispose();
@@ -98,7 +98,7 @@ class S {
     });
 
     test('multi-section cascade: field..removeListener(f)..dispose()', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _ctrl..removeListener(f)..dispose();
@@ -109,7 +109,7 @@ class S {
     });
 
     test('three sections', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _ctrl..removeListener(a)..removeListener(b)..dispose();
@@ -120,7 +120,7 @@ class S {
     });
 
     test('cascade without dispose returns false', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _ctrl..removeListener(f);
@@ -131,7 +131,7 @@ class S {
     });
 
     test('different field returns false', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _other..dispose();
@@ -142,7 +142,7 @@ class S {
     });
 
     test('cascade with closure containing semicolons', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _ctrl..addListener(() { doSomething(); })..dispose();
@@ -153,7 +153,7 @@ class S {
     });
 
     test('PropertyAccess target: this._ctrl..dispose()', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     this._ctrl..removeListener(f)..dispose();
@@ -164,7 +164,7 @@ class S {
     });
 
     test('does not match dispose on a nested cascade target', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _other..addListener(() { _ctrl..dispose(); });
@@ -177,7 +177,7 @@ class S {
 
   group('hasCascadeCleanupWhere - predicate matching', () {
     test('matches disposeSafe via predicate', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _ctrl..removeListener(f)..disposeSafe();
@@ -197,7 +197,7 @@ class S {
 
   group('isFieldCleanedUp - combined regex + AST', () {
     test('direct call via regex', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _ctrl.dispose();
@@ -208,7 +208,7 @@ class S {
     });
 
     test('cascade via AST', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _ctrl..removeListener(f)..dispose();
@@ -219,7 +219,7 @@ class S {
     });
 
     test('no cleanup returns false', () {
-      final body = parseMethodBody('''
+      final body = parseMethodBody('dispose', '''
 class S {
   void dispose() {
     _ctrl..removeListener(f);

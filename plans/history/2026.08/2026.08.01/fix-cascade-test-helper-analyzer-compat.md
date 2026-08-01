@@ -6,12 +6,13 @@ The `_parseDisposeBody` helper in `target_matcher_utils_test.dart` used `ClassDe
 
 ### Root Cause
 
-`ClassDeclaration.childEntities` is a low-level CST iterator inherited from `AstNode`. The correct typed API for accessing class members is `ClassDeclaration.body.members`, which returns `NodeList<ClassMember>`. The analyzer 12.1.0 upgrade changed what `childEntities` yields, breaking the test helper while production code (which already used `body.members` or the visitor pattern) was unaffected.
+`ClassDeclaration.childEntities` is a low-level CST iterator inherited from `AstNode`. The correct typed API for accessing class members is `ClassDeclaration.body.members` (or the cross-version-safe `bodyMembers` extension from `analyzer_compat.dart`). The analyzer 12.1.0 upgrade changed what `childEntities` yields, breaking the test helper while production code (which already used `bodyMembers` or the visitor pattern) was unaffected.
 
 ### Fix
 
-Single-line change in `test/utils/target_matcher_utils_test.dart:13`:
-`decl.childEntities` → `decl.body.members`
+1. Extracted `_parseDisposeBody` into a shared test helper `test/helpers/parse_class_method.dart` as `parseMethodBody(methodName, classSource)`, using the existing `bodyMembers` extension from `analyzer_compat.dart` for cross-version safety.
+2. Updated `target_matcher_utils_test.dart` to import and use the shared helper.
+3. Audited all other `childEntities` usage in the codebase — 14 production call sites all operate on generic `AstNode` subtypes (not `ClassDeclaration`), so they are unaffected.
 
 ### Verification
 
