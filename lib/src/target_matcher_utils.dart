@@ -117,6 +117,7 @@ class _CascadeCleanupVisitor extends RecursiveAstVisitor<void> {
     final String? name = switch (target) {
       SimpleIdentifier() => target.name,
       PrefixedIdentifier() => target.identifier.name,
+      PropertyAccess() => target.propertyName.name,
       _ => null,
     };
     if (name == _fieldName) {

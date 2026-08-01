@@ -32,6 +32,14 @@ Two-layer approach:
 
 The `isFieldCleanedUp` fix propagates to all 20+ callers across `disposal_rules.dart`, `bloc_rules.dart`, `animation_rules.dart`, `state_management_rules.dart`, `image_rules.dart`, `resource_management_rules.dart`, `drift_rules.dart`, `isar_rules.dart`, `speech_to_text_rules.dart`, and `getx_rules.dart`. The `_isFieldDisposed` AST enhancement covers `RequireTextEditingControllerDisposeRule`, `RequirePageControllerDisposeRule`, and other controller-specific rules using the `_reportUndisposedFields` helper.
 
+### Hardening (follow-up commit)
+
+1. **AST visitor handles `PropertyAccess` targets** — `this._ctrl..dispose()` now resolved via `PropertyAccess.propertyName`, not just `SimpleIdentifier`/`PrefixedIdentifier`.
+2. **Alias + cascade path** — `_isFieldDisposed` now checks aliases (e.g., `final c = _ctrl; c..removeListener(f)..dispose()`) via the AST cascade visitor, not just regex.
+3. **`_isDisposeName` tightened** — uses compiled `RegExp('[Dd]ispose')` instead of `toLowerCase().contains('dispose')`.
+4. **Test suite expanded** — 22 tests total: 9 regex-path tests, 8 AST-path tests (including closures-with-semicolons, `this._ctrl`, nested cascade rejection), 2 predicate-matcher tests, 3 combined regex+AST tests.
+5. **Migration assessment** — only one caller uses `isFieldCleanedUpInSource` (timer cancel rule at line 1902), already behind an `isFieldCleanedUp` primary check. No migration needed.
+
 ### Remaining Limitation
 
-`isFieldCleanedUpInSource` (string-only path) still uses regex with `[^;]` boundary guard. Cascades containing closures with semicolons (e.g., `_ctrl..addListener(() { doSomething(); })..dispose()`) are not handled by this path. The AST-based `isFieldCleanedUp` path has no such limitation. Callers using `isFieldCleanedUpInSource` should prefer the AST variant when a `FunctionBody` is available.
+`isFieldCleanedUpInSource` (string-only path, one caller) still uses regex with `[^;]` boundary guard. Cascades containing closures with semicolons are not handled by this path. The AST-based `isFieldCleanedUp` path has no such limitation.

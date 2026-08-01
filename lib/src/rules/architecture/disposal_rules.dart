@@ -524,13 +524,18 @@ bool _isFieldDisposed(
     disposeBody,
   )) {
     if (_disposeCallOnReceiver(alias, disposeBody)) return true;
+    if (bodyNode != null &&
+        hasCascadeCleanupWhere(alias, _isDisposeName, bodyNode)) {
+      return true;
+    }
   }
   return false;
 }
 
-bool _isDisposeName(String name) {
-  return name.toLowerCase().contains('dispose');
-}
+final RegExp _disposeNamePattern = RegExp('[Dd]ispose');
+
+/// Matches method names like `dispose`, `disposeSafe`, `safeDispose`.
+bool _isDisposeName(String name) => _disposeNamePattern.hasMatch(name);
 
 /// Helper to report undisposed fields.
 void _reportUndisposedFields(
