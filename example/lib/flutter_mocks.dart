@@ -3914,3 +3914,21 @@ class BehaviorSubject<T> {
   void add(T value) {}
   Future<void> close() async {}
 }
+
+// ============================================================================
+// Bluetooth mocks
+// ============================================================================
+
+class FlutterBluePlus {
+  static Stream<dynamic> startScan({Duration? timeout}) =>
+      const Stream.empty();
+  static Stream<dynamic> scan({Duration? timeout}) => const Stream.empty();
+  static Future<void> stopScan() async {}
+}
+
+class FlutterBlue {
+  Stream<dynamic> startScan({Duration? timeout}) => const Stream.empty();
+  Stream<dynamic> scan({Duration? timeout}) => const Stream.empty();
+}
+
+final FlutterBlue flutterBlue = FlutterBlue();

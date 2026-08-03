@@ -64,6 +64,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [14.3.13]
+
+Fix false positive in `avoid_bluetooth_scan_without_timeout` — the rule no longer fires on non-Bluetooth `scan()` calls. [log](https://github.com/saropa/saropa_lints/blob/v14.3.13/CHANGELOG.md)
+
+### Fixed
+
+- `avoid_bluetooth_scan_without_timeout` no longer flags `scan().listen()` on non-Bluetooth receivers (e.g. dedup scanners, port scanners). No action required.
+- `require_bluetooth_state_check` now recognizes additional Bluetooth package types (`flutter_reactive_ble`, `bluetooth_low_energy`). No action required.
+
+---
+
 ## [14.3.12]
 
 Re-release of v14.3.10 with a build fix — no rule or extension changes. [log](https://github.com/saropa/saropa_lints/blob/v14.3.12/CHANGELOG.md)
@@ -78,7 +89,7 @@ Re-release of v14.3.10 with a build fix — no rule or extension changes. [log](
 
 ---
 
-## [14.3.12]
+## [14.3.11]
 
 **Skipped**: Internal build only.
 

@@ -166,6 +166,14 @@ class PackageImports {
     'package:awesome_notifications/',
   };
 
+  /// Bluetooth packages (flutter_blue_plus, flutter_reactive_ble, etc.).
+  static const Set<String> bluetooth = {
+    'package:flutter_blue_plus/',
+    'package:flutter_reactive_ble/',
+    'package:flutter_blue/',
+    'package:bluetooth_low_energy/',
+  };
+
   /// app_links package imports.
   static const Set<String> appLinks = {'package:app_links/'};
 

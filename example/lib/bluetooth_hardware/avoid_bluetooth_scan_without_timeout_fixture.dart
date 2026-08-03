@@ -112,7 +112,30 @@ void _bad119() {
   flutterBlue.startScan(); // Legacy API, same issue
 }
 
+// BAD: Bluetooth scan() without timeout
+// expect_lint: avoid_bluetooth_scan_without_timeout
+void _bad119b() {
+  FlutterBluePlus.scan(); // No timeout via scan() method
+}
+
 // GOOD: Should NOT trigger avoid_bluetooth_scan_without_timeout
 void _good119() {
   FlutterBluePlus.startScan(timeout: const Duration(seconds: 10));
+}
+
+// GOOD: Non-Bluetooth scan() must NOT trigger (false positive guard)
+class DuplicatesScanRunner {
+  static Stream<dynamic> scan({double? threshold}) => const Stream.empty();
+}
+
+void _good119b() {
+  DuplicatesScanRunner.scan(threshold: 0.8).listen((_) {});
+}
+
+class _PortScanner {
+  Stream<dynamic> scan({int? port}) => const Stream.empty();
+}
+
+void _good119c() {
+  _PortScanner().scan(port: 8080).listen((_) {});
 }

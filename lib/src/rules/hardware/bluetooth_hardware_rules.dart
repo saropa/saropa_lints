@@ -1,7 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:saropa_lints/src/import_utils.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
+import 'package:saropa_lints/src/target_matcher_utils.dart';
 
 /// Warns when Bluetooth scan is started without timeout parameter.
 ///
@@ -13,12 +15,13 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart';
 /// **BAD:**
 /// ```dart
 /// FlutterBluePlus.startScan(); // No timeout - drains battery!
-/// flutterBlue.startScan(); // Legacy API, same issue
+/// FlutterBluePlus.scan(); // Also flagged when receiver is Bluetooth
 /// ```
 ///
 /// **GOOD:**
 /// ```dart
 /// FlutterBluePlus.startScan(timeout: const Duration(seconds: 10));
+/// DuplicatesScanRunner.scan(); // Non-Bluetooth scan() is not flagged
 /// ```
 class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
   AvoidBluetoothScanWithoutTimeoutRule() : super(code: _code);
@@ -50,6 +53,15 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
     'startBluetoothScan',
     'scan',
   };
+
+  static const Set<String> _bluetoothTargets = <String>{
+    'FlutterBluePlus',
+    'FlutterBlue',
+    'FlutterReactiveBle',
+    'CentralManager',
+    'PeripheralManager',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -58,6 +70,12 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       final String methodName = node.methodName.name;
       if (!_scanMethods.contains(methodName)) return;
+
+      // startScan/startBluetoothScan are Bluetooth-specific names; only
+      // the generic 'scan' collides with non-Bluetooth APIs.
+      if (methodName == 'scan') {
+        if (!_isBluetoothReceiver(node)) return;
+      }
 
       // Check for timeout parameter
       bool hasTimeout = false;
@@ -72,6 +90,21 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
         reporter.atNode(node.methodName, code);
       }
     });
+  }
+
+  static bool _isBluetoothReceiver(MethodInvocation node) {
+    final Expression? target = node.target;
+    if (target == null) return false;
+
+    final String? typeName = target.staticType?.element?.name;
+    if (typeName != null && _bluetoothTargets.contains(typeName)) return true;
+
+    if (isExactTarget(target, _bluetoothTargets)) return true;
+
+    // Last resort: if the file imports a Bluetooth package, assume the
+    // unresolved scan() is Bluetooth-related. Narrow FP surface remains
+    // in files mixing BLE with other scan APIs — acceptable trade-off.
+    return fileImportsPackage(node, PackageImports.bluetooth);
   }
 }
 
@@ -129,6 +162,9 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
     'BluetoothDevice',
     'FlutterBluePlus',
     'FlutterBlue',
+    'FlutterReactiveBle',
+    'CentralManager',
+    'PeripheralManager',
     'BluetoothCharacteristic',
     'BluetoothService',
   };
