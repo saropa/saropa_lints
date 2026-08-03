@@ -71,7 +71,8 @@ Fix false positive in `avoid_bluetooth_scan_without_timeout` — the rule no lon
 ### Fixed
 
 - `avoid_bluetooth_scan_without_timeout` no longer flags `scan().listen()` on non-Bluetooth receivers (e.g. dedup scanners, port scanners). No action required.
-- `require_bluetooth_state_check` now recognizes additional Bluetooth package types (`flutter_reactive_ble`, `bluetooth_low_energy`). No action required.
+- `require_bluetooth_state_check` now recognizes additional Bluetooth package types (`flutter_reactive_ble`, `bluetooth_low_energy`, `quick_blue`, `universal_ble`). No action required.
+- `avoid_bluetooth_scan_without_timeout` skips files without scan-related strings via `requiredPatterns` pre-filter, reducing unnecessary AST traversal. No action required.
 
 ---
 

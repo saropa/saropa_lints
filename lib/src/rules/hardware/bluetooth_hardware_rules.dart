@@ -60,6 +60,15 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
     'FlutterReactiveBle',
     'CentralManager',
     'PeripheralManager',
+    'QuickBlue',
+    'UniversalBle',
+  };
+
+  @override
+  Set<String>? get requiredPatterns => const <String>{
+    'startScan',
+    'startBluetoothScan',
+    'scan',
   };
 
   @override
@@ -165,6 +174,8 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
     'FlutterReactiveBle',
     'CentralManager',
     'PeripheralManager',
+    'QuickBlue',
+    'UniversalBle',
     'BluetoothCharacteristic',
     'BluetoothService',
   };

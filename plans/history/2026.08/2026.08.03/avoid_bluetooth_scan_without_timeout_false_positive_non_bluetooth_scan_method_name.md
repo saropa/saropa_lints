@@ -62,6 +62,13 @@ Files that import a Bluetooth package but also contain non-Bluetooth `scan()` ca
 - Extended `RequireBluetoothStateCheckRule._bleTypeNames` with `FlutterReactiveBle`, `CentralManager`, `PeripheralManager` — previously only recognized `flutter_blue_plus` types.
 - Added comments documenting: why `startScan`/`startBluetoothScan` are ungated (Bluetooth-specific names), and the known residual FP surface of the file-import fallback.
 
+### Additional hardening (post-reflection)
+
+- Added `QuickBlue` and `UniversalBle` to `_bluetoothTargets` and `_bleTypeNames` — discovered via pub.dev search as additional popular Flutter BLE packages with `startScan()` methods.
+- Added `package:quick_blue/` and `package:universal_ble/` to `PackageImports.bluetooth`.
+- Added `requiredPatterns` override (`{'startScan', 'startBluetoothScan', 'scan'}`) to `AvoidBluetoothScanWithoutTimeoutRule` — files without these strings skip AST traversal entirely.
+- Confirmed `flutter_reactive_ble` uses `scanForDevices()` not `scan()` — no collision risk, but keeping `FlutterReactiveBle` in the target set is correct for the state-check rule's `startScan`/`connect`/`discoverServices` detection.
+
 ### Downstream action
 
 Remove `// ignore: avoid_bluetooth_scan_without_timeout` from `d:\src\contacts\lib\views\contact\contact_duplicates_screen.dart:292` after upgrading saropa_lints.

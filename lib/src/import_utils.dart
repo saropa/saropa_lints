@@ -172,6 +172,8 @@ class PackageImports {
     'package:flutter_reactive_ble/',
     'package:flutter_blue/',
     'package:bluetooth_low_energy/',
+    'package:quick_blue/',
+    'package:universal_ble/',
   };
 
   /// app_links package imports.
