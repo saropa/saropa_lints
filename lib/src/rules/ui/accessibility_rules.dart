@@ -1483,8 +1483,9 @@ class RequireImageSemanticsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image'))
+      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image')) {
         return;
+      }
 
       bool hasSemanticLabel = false;
       bool isExcludedFromSemantics = false;
@@ -1516,8 +1517,9 @@ class RequireImageSemanticsRule extends SaropaLintRule {
 
       if (target is! SimpleIdentifier || target.name != 'Image') return;
 
-      if (!isFlutterWidgetNamed(elementFromAstIdentifier(target), 'Image'))
+      if (!isFlutterWidgetNamed(elementFromAstIdentifier(target), 'Image')) {
         return;
+      }
 
       if (!<String>{
         'network',
@@ -2769,8 +2771,9 @@ class RequireImageDescriptionRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image'))
+      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image')) {
         return;
+      }
 
       bool hasSemanticLabel = false;
       bool hasExclude = false;
@@ -3568,8 +3571,9 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
   ) {
     // Check Image constructor calls
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image'))
+      if (!isFlutterWidgetNamed(node.constructorName.type.element, 'Image')) {
         return;
+      }
 
       if (!_hasAccessibilityHandling(node.argumentList.arguments)) {
         reporter.atNode(node.constructorName, code);
@@ -3582,8 +3586,9 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
       final Expression? target = node.target;
 
       if (target is! SimpleIdentifier || target.name != 'Image') return;
-      if (!isFlutterWidgetNamed(elementFromAstIdentifier(target), 'Image'))
+      if (!isFlutterWidgetNamed(elementFromAstIdentifier(target), 'Image')) {
         return;
+      }
 
       if (!<String>{
         'network',

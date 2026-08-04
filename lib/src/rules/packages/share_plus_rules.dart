@@ -684,7 +684,6 @@ class SharePlusUriAndTextConflictRule extends SaropaLintRule {
       // NullabilitySuffix.question = nullable (String?, Uri?).
       final dartType = value.staticType;
       if (dartType != null) {
-        // ignore: deprecated_member_use
         final suffix = dartType.nullabilitySuffix;
         // NullabilitySuffix.none means the type is non-nullable.
         if (suffix.name == 'none') return true;

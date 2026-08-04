@@ -3085,9 +3085,6 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
   ) {
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       final primaryCtor = node.primaryConstructor;
-      if (primaryCtor == null) return;
-      // Primary constructor's first parameter is the representation field;
-      // may be empty in malformed code during editing
       final params = primaryCtor.formalParameters.parameters;
       if (params.isEmpty) return;
       final param = params.first;

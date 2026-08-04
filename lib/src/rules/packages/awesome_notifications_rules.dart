@@ -271,9 +271,6 @@ class AwesomeNotificationsHandlerWrongParameterTypeRule extends SaropaLintRule {
         // For action/dismiss slots the first param must be ReceivedAction.
         // For created/displayed slots it must be ReceivedNotification.
         final bool isActionSlot = _actionArgNames.contains(argName);
-        final String expectedType = isActionSlot
-            ? 'ReceivedAction'
-            : 'ReceivedNotification';
         final String wrongType = isActionSlot
             ? 'ReceivedNotification'
             : 'ReceivedAction';

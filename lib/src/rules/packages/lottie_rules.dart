@@ -54,13 +54,7 @@ bool _isLottieFactory(MethodInvocation node, Set<String> methodNames) {
   // Static-type path (resolved AST): confirm the element's library is lottie.
   final staticType = target.staticType;
   if (staticType != null) {
-    // ignore: deprecated_member_use
-    final libraryId =
-        staticType
-            .element
-            ?.library
-            ?.identifier ?? // ignore: deprecated_member_use
-        '';
+    final libraryId = staticType.element?.library?.identifier ?? '';
     if (libraryId.startsWith('package:lottie/')) return true;
   }
 

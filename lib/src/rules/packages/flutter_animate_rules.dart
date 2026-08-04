@@ -24,7 +24,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../import_utils.dart';
-import '../../project_context.dart' show RuleCost;
 import '../../saropa_lint_rule.dart';
 
 // =============================================================================

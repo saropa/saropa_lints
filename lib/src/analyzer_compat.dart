@@ -209,6 +209,7 @@ extension SafeExtensionDeclMembers on ExtensionDeclaration {
 extension DiagnosticCodeLowerCaseCompat on DiagnosticCode {
   /// Canonical snake_case rule name used in config keys and reports.
   String get lowerCaseName {
+    // ignore: deprecated_member_use
     final name = this.name;
     if (name.isEmpty) return '';
     // analyzer 9 exposes camelCase names for many lints.

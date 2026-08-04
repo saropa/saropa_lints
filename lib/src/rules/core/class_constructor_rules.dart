@@ -1018,10 +1018,7 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
-      // Primary constructor's first parameter is the representation field;
-      // may be empty in malformed code during editing
       final primaryCtor = node.primaryConstructor;
-      if (primaryCtor == null) return;
       final params = primaryCtor.formalParameters.parameters;
       if (params.isEmpty) return;
       final param = params.first;
@@ -1103,10 +1100,7 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
-      // Primary constructor's first parameter is the representation field;
-      // may be empty in malformed code during editing
       final primaryCtor = node.primaryConstructor;
-      if (primaryCtor == null) return;
       final params = primaryCtor.formalParameters.parameters;
       if (params.isEmpty) return;
       final repParam = params.first;

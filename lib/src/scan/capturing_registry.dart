@@ -82,11 +82,7 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   // dropped addEnumBody. The package supports analyzer 9-12, so all three are
   // implemented: addEnumBody satisfies the 9-11 interface, the split pair
   // satisfies the 12 interface. The unused override on each version is an
-  // override_on_non_overriding_member warning, suppressed by the lib/**
-  // analyzer exclude. addEmptyEnumBody lives in its alphabetical slot below.
-  @override
   void addBlockEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  @override
   void addEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addBlockFunctionBody(AbstractAnalysisRule r, AstVisitor v) =>
@@ -306,7 +302,6 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addLibraryDirective(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   // analyzer 11 keeps addLibraryIdentifier (LibraryDirective.name typed as
   // LibraryIdentifier?). analyzer 12 dropped this in favor of addDottedName.
-  @override
   void addLibraryIdentifier(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override
@@ -516,10 +511,8 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addWildcardPattern(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addWithClause(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
-  @override
   void addRepresentationConstructorName(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
-  @override
   void addRepresentationDeclaration(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override

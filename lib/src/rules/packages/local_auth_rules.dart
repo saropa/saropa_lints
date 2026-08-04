@@ -18,7 +18,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../fixes/common/replace_node_fix.dart';
 import '../../import_utils.dart';
-import '../../native/saropa_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 /// The local_auth facade type whose `authenticate` the call rules key on.

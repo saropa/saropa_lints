@@ -171,8 +171,9 @@ class YoutubePlayerControllerNotClosedRule extends SaropaLintRule {
     if (_isTestFilePath(context.filePath)) return;
 
     context.addFieldDeclaration((FieldDeclaration node) {
-      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter))
+      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter)) {
         return;
+      }
 
       // Only the controller type is relevant; check the declared type, and fall
       // back to the initializer constructor name when the field is `final foo = ...`.
@@ -272,8 +273,9 @@ class YoutubePlayerConvertUrlUncheckedRule extends SaropaLintRule {
       // Static call: receiver is the controller type name.
       final Expression? target = node.target;
       if (target is! SimpleIdentifier || target.name != _controllerType) return;
-      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter))
+      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter)) {
         return;
+      }
 
       final AstNode? parent = node.parent;
 
@@ -356,8 +358,9 @@ class YoutubePlayerScaffoldDeprecatedRule extends SaropaLintRule {
       if (node.constructorName.type.name.lexeme != 'YoutubePlayerScaffold') {
         return;
       }
-      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter))
+      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter)) {
         return;
+      }
       reporter.atNode(node.constructorName);
     });
   }
@@ -425,8 +428,9 @@ class YoutubePlayerMuteNotRespectedInParamsRule extends SaropaLintRule {
       // fromVideoId is a named constructor on YoutubePlayerController.
       if (node.constructorName.type.name.lexeme != _controllerType) return;
       if (node.constructorName.name?.name != 'fromVideoId') return;
-      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter))
+      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter)) {
         return;
+      }
 
       final Expression? autoPlay = _namedArg(node.argumentList, 'autoPlay');
       if (autoPlay is! BooleanLiteral || !autoPlay.value) return;
@@ -510,8 +514,9 @@ class YoutubePlayerAutoFullscreenWithoutPortraitGuardRule
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       if (node.constructorName.type.name.lexeme != 'YoutubePlayer') return;
-      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter))
+      if (!fileImportsPackage(node, PackageImports.youtubePlayerFlutter)) {
         return;
+      }
 
       // autoFullScreen: false is explicitly safe; absence relies on the true default.
       final Expression? autoFullScreen = _namedArg(

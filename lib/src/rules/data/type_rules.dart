@@ -388,7 +388,6 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 
       if (!implementsObject) {
         final primaryCtor = node.primaryConstructor;
-        if (primaryCtor == null) return;
         reporter.atToken(primaryCtor.typeName, code);
       }
     });
@@ -2375,7 +2374,6 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
 
     context.addExtensionTypeDeclaration((ExtensionTypeDeclaration node) {
       final primaryCtor = node.primaryConstructor;
-      if (primaryCtor == null) return;
       checkName(primaryCtor.typeName);
     });
 

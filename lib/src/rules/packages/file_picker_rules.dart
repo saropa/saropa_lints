@@ -206,7 +206,7 @@ class FilePickerPathOnWebRule extends SaropaLintRule {
       if (property != 'path') return;
 
       // Receiver must resolve to PlatformFile (nullable or not).
-      final String? type = receiver?.staticType?.getDisplayString();
+      final String? type = receiver.staticType?.getDisplayString();
       if (type != 'PlatformFile' && type != 'PlatformFile?') return;
 
       // Best-effort: an enclosing `if` whose condition references kIsWeb is a
@@ -872,8 +872,9 @@ class FilePickerWithDataLargeFilesRule extends SaropaLintRule {
 
       // Only explicit boolean true on both flags — variables / expressions are
       // not statically decidable and are not flagged.
-      if (!_isLiteralTrue(_namedArgValue(node.argumentList, 'withData')))
+      if (!_isLiteralTrue(_namedArgValue(node.argumentList, 'withData'))) {
         return;
+      }
       if (!_isLiteralTrue(_namedArgValue(node.argumentList, 'allowMultiple'))) {
         return;
       }

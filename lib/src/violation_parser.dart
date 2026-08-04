@@ -1,6 +1,5 @@
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:saropa_lints/src/models/violation.dart';
-import 'package:saropa_lints/src/analyzer_compat.dart';
 
 /// Rule name to impact level mapping.
 /// Generated from the rule definitions.

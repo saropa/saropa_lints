@@ -405,8 +405,9 @@ class ReceiveSharingIntentUnfilteredTypeRule extends SaropaLintRule {
       // types is not required.
       final String calledMethod = node.methodName.name;
       if (calledMethod != 'listen' && calledMethod != 'then') return;
-      if (!fileImportsPackage(node, PackageImports.receiveSharingIntent))
+      if (!fileImportsPackage(node, PackageImports.receiveSharingIntent)) {
         return;
+      }
 
       // Verify the immediate receiver is getMediaStream() or getInitialMedia().
       if (!_isRsiDataCall(node.realTarget)) return;

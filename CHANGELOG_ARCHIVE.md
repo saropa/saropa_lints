@@ -2,7 +2,71 @@
 
 <!-- cspell:disable -->
 
-Archived releases 14.0.7 and older. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+Archived releases 14.1.1 and older. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
+
+---
+
+## [14.1.1]
+
+Fixes the rule detail panel, which displayed a wall of raw JavaScript instead of the rule's documentation, and removes its dead "View in ROADMAP" button. [log](https://github.com/saropa/saropa_lints/blob/v14.1.1/CHANGELOG.md)
+
+### Changed (Extension)
+
+- **Removed the "View in ROADMAP" button from the rule detail panel.** It linked to a redirect stub that no longer holds per-rule documentation, so the link led nowhere useful. No action required.
+
+### Fixed (Extension)
+
+- **Opening a rule in the detail panel no longer dumps raw script text into the view.** A code comment in the panel's inline script contained a literal closing-script-tag sequence that terminated the script block early, so the browser parsed the rest as visible text. No action required.
+
+---
+
+## [14.1.0]
+
+Resolves a false positive in the color-only status indicator rule so decorative active-state bars and indicators paired with another visual cue are no longer flagged. The extension's "Create baseline" suggestion now actually creates the baseline. Package Vibrancy override analysis now recognizes overrides that resolve a transitive dependency cap, naming the package responsible instead of marking the override removable, and upgrade-blocker explanations trace the dependency path to a package you can act on. The "Annotate pubspec" command now writes why each pinned dependency sits where it does. The Findings Dashboard sheds a stray analysis banner and a redundant Run analysis button, the TODO/HACK file-limit note gains a one-click way to raise the limit, and Drift Advisor can now reach a server running on another device over your network. Package Vibrancy also stops re-scanning on every restart — unchanged projects load instantly from cache and refresh quietly in the background. [log](https://github.com/saropa/saropa_lints/blob/v14.1.0/CHANGELOG.md)
+
+### Added
+
+- **New rule `require_android_exact_alarm_permission` flags exact-alarm scheduling when the manifest declares neither `SCHEDULE_EXACT_ALARM` nor `USE_EXACT_ALARM`.** Android 14 (API 34) denies the exact-alarm capability by default, so a `zonedSchedule(..., androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle)` (or `AndroidAlarmManager.oneShotAt(..., exact: true)`) is silently downgraded to inexact and fires late or never, with no error anywhere. Inexact schedule modes are not flagged. Essential tier; declare the permission or switch to an inexact mode.
+- **New rule `require_android_partial_media_permission` suggests `READ_MEDIA_VISUAL_USER_SELECTED` when broad media permissions are declared.** When the manifest already declares `READ_MEDIA_IMAGES`/`READ_MEDIA_VIDEO` and the app uses a gallery plugin, omitting the partial-access permission hides Android 14's "Select photos" option and forces all-or-nothing library access. Advisory (Professional tier); it fires only once the broad permissions are present, so it stays quiet for Photo Picker apps.
+- **New rule `avoid_package_js_for_wasm` flags `package:js` imports, which break `flutter build web --wasm`.** `package:js` has no WebAssembly implementation, so its presence fails the Wasm build; the supported replacement is the built-in `dart:js_interop`. Distinct from the existing `dart:js`/`dart:html` rules, which do not cover the third-party `package:js`. Comprehensive tier (Wasm is opt-in).
+- **New rule `avoid_platform_incompatible_dependency` warns when you import a plugin with no implementation for a platform your project builds for.** A Flutter plugin compiles into every target even when its native side is missing, so importing, for example, `sqflite` (no web) into a project with a `web/` directory builds cleanly and then throws at runtime on web only — a failure the compiler never flags. The rule fires only when the project has the matching platform directory and the import is unconditional, and is backed by a hand-verified package list (`sqflite`, `local_auth`, `path_provider`, `firebase_messaging`, `camera`, `permission_handler`). Opt in via the Comprehensive tier; guard the import conditionally or switch packages to resolve.
+- **Platform rule packs — iOS, Android, Web, Windows, macOS, and Linux — group each target's rules so you can enable a platform's checks without raising your whole tier.** Each is recommended automatically when its embedder folder (`ios/`, `web/`, …) is present, and enabling a pack only adds rules on top of your tier. Open Manage Rule Packs and toggle the platforms you ship.
+- **Concern rule packs — Security, Performance, Accessibility, Networking, Error handling, and nine more — group existing rules by what they protect rather than by package.** They surface a whole problem area (for example every security rule) that would otherwise stay buried behind the Professional tier, and a rule may belong to several packs at once. Opt in from Manage Rule Packs under the Concerns section.
+
+### Added (Extension)
+
+- **A "Create Baseline" command that suppresses your existing violations so only new code is flagged.** The Suggestions view already prompted you to baseline once findings existed, but the prompt opened the config editor and left you to run the baseline tool from a terminal yourself. The prompt — and a new command-palette entry, "Saropa Lints: Create Baseline" — now run it directly, with a cancellable progress notification, and refresh the views when it finishes. No action required.
+- **The "Annotate pubspec" command now writes why each pinned dependency sits where it does, so you no longer paste pub's conflict output by hand.** Above each affected dependency it adds a comment explaining whether the version is held back by a shared dependency (naming the path to a package you can edit), forced up to a required minimum by another package, or incompatible with a Flutter SDK pin. Re-running the command refreshes these notes in place and leaves your own hand-written comments untouched. Run "Saropa Lints: Annotate pubspec" after a scan to populate them.
+- **Drift Advisor can now connect to servers running off-box, via a new `saropaLints.driftAdvisor.hosts` setting.** Discovery previously scanned localhost only, so a Drift server running on a phone reached over Wi-Fi debugging was never found. List one or more LAN IPs (for example `192.168.1.151`) to probe in order; each is scanned across the port range, or pin an exact endpoint with `host:port`. Defaults to `["127.0.0.1"]`, so no action is required unless a server is remote.
+- **Pack recommendations now read your project's folders and config files, not just pubspec dependencies.** The Config dashboard suggests platform packs from the embedder folders you build for (`ios/`, `web/`, …) and Firebase from a `google-services.json` / `GoogleService-Info.plist`, so a pack is offered even when the signal is a folder or file rather than a dependency line. Review and enable from the startup suggestion or Manage Rule Packs.
+
+### Fixed (Extension)
+
+- **Package Vibrancy no longer mislabels a `dependency_overrides` entry as removable when it exists to resolve a transitive version cap.** Override analysis only checked your direct constraint and an SDK-pin heuristic, so an override pinning a dependency that a sibling package caps below the resolved version showed as "stale," inviting you to delete an override the resolver actually needs. It now reads each constrainer's declared range and names the binding package as the override's reason. No action required.
+- **The Findings Dashboard no longer shows a stray "Analysis started" banner above the header or a second blue "Run analysis" button in the empty state.** The accessibility announcer rendered visibly because this view's stylesheet omitted the rule that hides it, and the no-data panel duplicated the toolbar's Run analysis and Refresh; the announcer is hidden again and the empty panel now relies on the toolbar action. No action required.
+
+### Changed (Extension)
+
+- **Upgrade-blocker explanations now trace the dependency path to a package you can edit.** When the package capping a shared dependency was buried deep in the transitive graph, the report named a constrainer absent from your pubspec.yaml, leaving you with no actionable line. The explanation now appends the chain from a direct dependency down to that constrainer (for example, `build_runner → build → analyzer_plugin`). No action required.
+- **The TODO/HACK scan "file limit reached" note is now actionable instead of a dead end.** It previously named the setting key in prose with no way to act on it; it now offers a "Raise the limit" button that opens the relevant setting directly. No action required.
+- **Package Vibrancy no longer re-runs the full scan on every restart — when pubspec.lock and your settings are unchanged, cached results load instantly with no progress popup.** The startup gate previously expired after an hour, forcing a 10-minute network scan even though nothing had changed; it now reuses the cache as long as the lockfile is identical, and only refreshes silently in the background once the data passes a staleness window (`backgroundRefreshStalenessHours`, default 24h; set 0 to disable). No action required.
+- **Cold scans are faster on large projects: package analysis now runs 6 in parallel (was 3) and is tunable via `saropaLints.packageVibrancy.scanConcurrency`.** Raise it above the default only with a GitHub token configured, to avoid hitting unauthenticated rate limits. No action required.
+
+### Changed
+
+- **Rule packs are now additive: enabling a pack adds its rules on top of your tier instead of replacing tier coverage.** Previously any rule that belonged to a pack was switched off unless that pack was enabled, so a tier could silently lose rules it should have kept; now a rule is active when your tier or an enabled pack includes it. Version-specific migration rules remain the exception — a rule for a package or SDK major you are not on (for example a dio 5 rule on a dio 4 project) stays off even if your tier lists it. Expect more rules to fire on projects that use packaged dependencies; no action required.
+
+### Fixed
+
+- **`avoid_color_only_indicators` no longer fires when the state is already conveyed by a non-color cue or when the color is just a show/hide toggle.** The rule inspected a `Container` in isolation, so a thin active-tab underline whose color toggles to `Colors.transparent` (a presence cue, not a red-vs-green hue) and a colored swatch sitting next to a sibling `Text`/`Icon` that reacts to the same state (bold weight or distinct glyph) were both reported as inaccessible. The rule now suppresses both: a branch resolving to `Colors.transparent` is treated as a visibility toggle, and a sibling Text/Icon-family widget referencing the same condition counts as the required secondary cue — which also fixes the rule's own documented GOOD example (a `Row` with a conditional `Icon` beside the colored `Container`). Genuine standalone red/green indicators with no secondary cue still warn. No action required.
+
+<details><summary>Maintenance</summary>
+
+- When `dart pub get` / `dart pub deps` fails on a version conflict, the scan log now captures pub's own "Because … is forbidden / is required" reasoning verbatim, instead of only a generic "version solving failed". Diagnostic only.
+- The new concern and platform rule packs now carry pubspec markers, restoring the registry invariant that every pack has a marker entry. The rule-pack generator emits the concern-pack markers so they stay in sync. Fixes a unit-test failure that blocked the build. No user-facing change.
+- Publish runs the unit-test step roughly twice as fast: it now uses all logical cores and excludes the five `slow`-tagged full-repo integration tests (scanner / cross-file / health-history), which CI still runs in full on every push and release. Run them locally with `dart test -t slow`. Developer tooling only.
+
+</details>
 
 ---
 
