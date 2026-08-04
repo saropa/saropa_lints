@@ -11,9 +11,10 @@ import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
-import '../../fixes/json_datetime/use_try_parse_fix.dart';
-import '../../fixes/json_datetime/use_date_time_try_parse_fix.dart';
 import '../../fixes/json_datetime/add_null_aware_access_fix.dart';
+import '../../fixes/json_datetime/replace_datetime_constructor_fix.dart';
+import '../../fixes/json_datetime/use_date_time_try_parse_fix.dart';
+import '../../fixes/json_datetime/use_try_parse_fix.dart';
 
 /// Warns when jsonDecode is used without try-catch.
 ///
@@ -1884,6 +1885,123 @@ class PreferJsonCodegenRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+}
+
+// =============================================================================
+// avoid_datetime_constructor
+// =============================================================================
+
+/// Warns when the `DateTime()` or `DateTime.utc()` constructor is used directly.
+///
+/// Since: v14.3.14 | Updated: v14.3.14 | Rule version: v1
+///
+/// The `DateTime` constructor silently rolls over out-of-range values:
+/// `DateTime(2026, 13, 1)` produces `2027-01-01` with no error. This makes
+/// it impossible to detect invalid date components at the call site.
+/// `DateTime.parse()` throws on invalid input and `DateTime.tryParse()`
+/// returns null, making them safer alternatives.
+///
+/// **BAD:**
+/// ```dart
+/// final date = DateTime(year, month, day);
+/// final utc = DateTime.utc(year, month, day);
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final date = DateTime.tryParse('$year-$month-$day');
+/// final date = DateTime.parse(iso8601String);
+/// ```
+///
+/// **Quick fix available:** Replace with DateTime.tryParse().
+class AvoidDateTimeConstructorRule extends SaropaLintRule {
+  AvoidDateTimeConstructorRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  @override
+  Set<String> get requiredPatterns => const {'DateTime'};
+
+  @override
+  List<String> get relatedRules => const [
+    'avoid_datetime_parse_unvalidated',
+    'avoid_datetime_now_in_tests',
+  ];
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ReplaceDateTimeConstructorFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'avoid_datetime_constructor',
+    '[avoid_datetime_constructor] The DateTime constructor silently rolls '
+        'over out-of-range values — DateTime(2026, 13, 1) quietly produces '
+        '2027-01-01 with no error, warning, or exception. Code that builds '
+        'dates from variables (user input, API responses, computed fields) '
+        'has no way to detect invalid components after construction. '
+        'All-literal calls with in-range values are allowed. Use '
+        'DateTime.tryParse() or DateTime.parse() for validated date '
+        'creation. {v1}',
+    correctionMessage:
+        'Use DateTime.tryParse() (returns null on invalid input) or '
+        'DateTime.parse() (throws FormatException). For component-based '
+        'construction, validate ranges before calling the constructor.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+      if (typeName != 'DateTime') return;
+
+      final String? namedConstructor = constructorName.name?.name;
+      if (namedConstructor != null && namedConstructor != 'utc') return;
+
+      if (_allLiteralsInRange(node.argumentList.arguments)) return;
+
+      reporter.atNode(node);
+    });
+  }
+
+  /// Returns true when every positional argument is an integer literal
+  /// within the valid range for its position in the DateTime constructor.
+  /// Day upper bound is 31 (not calendar-aware — Feb 31 passes).
+  static bool _allLiteralsInRange(NodeList<Expression> args) {
+    if (args.isEmpty) return false;
+
+    // DateTime constructor takes up to 8 positional int args, no named args.
+    // Position:  0=year  1=month  2=day  3=hour  4=min  5=sec  6=ms  7=us
+    const List<int> maxValues = [9999, 12, 31, 23, 59, 59, 999, 999];
+    const List<int> minValues = [0, 1, 0, 0, 0, 0, 0, 0];
+
+    for (int i = 0; i < args.length; i++) {
+      final Expression arg = args[i];
+      if (arg is! IntegerLiteral) return false;
+      final int? value = arg.value;
+      if (value == null) return false;
+      if (i < minValues.length) {
+        if (value < minValues[i] || value > maxValues[i]) return false;
+      }
+    }
+    return true;
   }
 }
 

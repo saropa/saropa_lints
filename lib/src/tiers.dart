@@ -1008,6 +1008,7 @@ const Set<String> recommendedOnlyRules = <String>{
   // JSON/DateTime Error Handling
   'require_json_decode_try_catch',
   'avoid_datetime_parse_unvalidated',
+  'avoid_datetime_constructor',
   'require_websocket_error_handling',
 
   // Accessibility

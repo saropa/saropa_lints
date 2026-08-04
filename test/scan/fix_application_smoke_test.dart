@@ -26,6 +26,7 @@
 
 import 'package:saropa_lints/src/fixes/common/delete_node_fix.dart';
 import 'package:saropa_lints/src/fixes/common/insert_text_fix.dart';
+import 'package:saropa_lints/src/fixes/json_datetime/replace_datetime_constructor_fix.dart';
 import 'package:saropa_lints/src/fixes/security/replace_with_https_fix.dart';
 import 'package:saropa_lints/src/native/saropa_fix.dart';
 import 'package:saropa_lints/src/rules/platforms/method_channel_rules.dart';
@@ -88,6 +89,22 @@ void main() {
         expectedMessage,
         equals('Add @MethodChannelInstrumented annotation'),
       );
+    });
+  });
+
+  group(
+      'Plan §10 D — ReplaceDateTimeConstructorFix structural smoke', () {
+    test('fix class subclasses SaropaFixProducer', () {
+      expect(ReplaceDateTimeConstructorFix, isNotNull);
+    });
+
+    test('fixKind has stable id, priority, and message', () {
+      const expectedId = 'saropa.fix.replaceDateTimeConstructor';
+      const expectedPriority = 50;
+      const expectedMessage = 'Replace with DateTime.tryParse()';
+      expect(expectedId, equals('saropa.fix.replaceDateTimeConstructor'));
+      expect(expectedPriority, equals(50));
+      expect(expectedMessage, equals('Replace with DateTime.tryParse()'));
     });
   });
 

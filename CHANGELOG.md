@@ -64,6 +64,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [14.4.0]
+
+Introduces a new lint rule to catch invalid date initializations that would otherwise silently roll over into incorrect dates. Developers are now guided toward strict parsing methods to make date handling safer across Dart and Flutter projects. [log](https://github.com/saropa/saropa_lints/blob/v14.4.0/CHANGELOG.md)
+
+### Added
+
+- `avoid_datetime_constructor` — flags `DateTime()` and `DateTime.utc()` constructors, which silently roll over out-of-range values (e.g. month 13 becomes January of the next year). All-literal in-range calls are allowed. Quick fix available: replace with `DateTime.tryParse()`. No action required.
+
+---
+
 ## [14.3.13]
 
 Fix false positive in `avoid_bluetooth_scan_without_timeout` — the rule no longer fires on non-Bluetooth `scan()` calls. [log](https://github.com/saropa/saropa_lints/blob/v14.3.13/CHANGELOG.md)

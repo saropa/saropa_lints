@@ -3271,6 +3271,9 @@ _allRuleFactories = <SaropaLintRule Function()>[
   GoogleSignInCanceledNotHandledRule.new,
   GoogleSignInAuthenticateBeforeInitializeRule.new,
 
+  // json_datetime rules (json_datetime_rules.dart)
+  AvoidDateTimeConstructorRule.new,
+
   // webview_flutter rules (webview_flutter_rules.dart) — the base webview_flutter
   // pack is whole-gated < 4.0.0 (pre-upgrade), so no relocation is needed.
   AvoidPreV4WebviewWidgetRule.new,
