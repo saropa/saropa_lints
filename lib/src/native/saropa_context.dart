@@ -26,7 +26,6 @@ import '../project_context.dart'
     show FileTypeDetector, MemoryPressureHandler, ProjectContext;
 import '../report/analysis_reporter.dart' show AnalysisReporter, ReportConfig;
 import '../report/import_graph_tracker.dart' show ImportGraphTracker;
-import '../analyzer_compat.dart';
 import '../saropa_lint_rule.dart'
     show ProgressTracker, ReportWriter, RuleTimingTracker, SaropaLintRule;
 import 'compat_visitor.dart';

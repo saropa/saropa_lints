@@ -193,7 +193,7 @@ extension SafeExtensionDeclMembers on ExtensionDeclaration {
   /// Members declared inside this extension.
   List<ClassMember> get bodyMembers {
     try {
-      return body?.members ?? const [];
+      return body.members;
     } on UnsupportedError {
       try {
         return (this as dynamic).members as List<ClassMember>;
