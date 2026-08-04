@@ -1,4 +1,4 @@
-# avoid_datetime_constructor — new lint rule
+# avoid_datetime_constructor — new lint rule pair
 
 The `DateTime()` and `DateTime.utc()` constructors silently roll over out-of-range values (month 13 becomes January of the following year) with no error, warning, or exception. This makes it impossible to detect invalid date components at the call site when arguments come from variables.
 
@@ -6,37 +6,56 @@ The `DateTime()` and `DateTime.utc()` constructors silently roll over out-of-ran
 
 ### What changed
 
-A new WARNING-severity lint rule `avoid_datetime_constructor` was added to flag direct `DateTime()` and `DateTime.utc()` constructor calls that could silently roll over invalid date components.
+Two new WARNING-severity lint rules for DateTime constructor safety, plus a quick fix.
 
-**Detection**: `addInstanceCreationExpression` callback checks `constructorName.type.name.lexeme == 'DateTime'` and allows only the unnamed and `utc` named constructors through. Other named constructors (`fromMillisecondsSinceEpoch`, `fromMicrosecondsSinceEpoch`) are skipped. `DateTime.now()`, `.parse()`, `.tryParse()` are static methods, not constructors, so they never reach the callback.
+#### avoid_datetime_constructor
 
-**False-positive mitigation**: An `_allLiteralsInRange` allowlist skips calls where every argument is an `IntegerLiteral` within valid ranges (month 1-12, day 0-31, hour 0-23, minute/second 0-59, ms/us 0-999). Day 0 is allowed because `DateTime(year, month, 0)` is a documented Dart idiom for "last day of previous month." Day upper bound is 31 (not calendar-aware — `DateTime(2026, 2, 31)` passes the allowlist). Negative integer literals are `PrefixExpression` nodes, not `IntegerLiteral`, so they are correctly flagged.
+Flags all `DateTime()` and `DateTime.utc()` constructor calls with variable arguments or out-of-range literals. All-literal in-range calls are allowed via `allLiteralsInRange` (month 1-12, day 0-31, hour 0-23, minute/second 0-59, ms/us 0-999). Day 0 is permitted for the last-day-of-month idiom. Day upper bound is 31 (not calendar-aware). Negative integer literals are `PrefixExpression` nodes, not `IntegerLiteral`, so they are correctly flagged.
 
-**Quick fix**: `ReplaceDateTimeConstructorFix` converts `DateTime(y, m, d)` to `DateTime.tryParse('$y-$m-$d')`, building an ISO 8601 interpolated string from the constructor arguments. Handles optional time components and appends `Z` for `DateTime.utc()` calls. Smoke-tested in `test/scan/fix_application_smoke_test.dart`.
+#### avoid_datetime_constructor_unvalidated
 
-**Registration**: factory reference in `_allRuleFactories` (lib/saropa_lints.dart), rule name in `recommendedOnlyRules` (lib/src/tiers.dart), class in `lib/src/rules/data/json_datetime_rules.dart`.
+Companion rule that only fires when the DateTime constructor result is consumed inline — returned directly, passed as a function argument, used in a named expression (widget parameter), assigned to a field, or embedded in a ternary/binary expression — without being assigned to a local variable where post-construction range checks could follow. Uses the same `allLiteralsInRange` allowlist as the parent rule. This is a narrower, higher-confidence rule for teams that find `avoid_datetime_constructor` too broad.
 
-**Tests**: instantiation pin added to `test/rules/data/json_datetime_rules_test.dart`. Fix smoke test added to `test/scan/fix_application_smoke_test.dart`. Integrity test (24 tests) and anti-pattern detection test both pass. Rule count comment updated from 13 to 14.
+#### Quick fix: ReplaceDateTimeConstructorFix
 
-**Fixture**: `example/lib/json_datetime/avoid_datetime_constructor_fixture.dart` — 10 BAD cases (variable args, mixed, out-of-range literals including negative and 60-minute) and 9 GOOD near-miss cases (in-range literals, day-0 idiom, year-only, tryParse, parse, now, fromMillisecondsSinceEpoch, fromMicrosecondsSinceEpoch).
+Converts `DateTime(y, m, d, h, min, sec, ms, us)` to `DateTime.tryParse('$y-$m-$d T$h:$min:$sec.$ms$us')`. Hardened against unsafe interpolation: bails out when any argument is a ternary, await, cascade, string literal, or other expression containing quotes/braces. Handles millisecond/microsecond as ISO 8601 fractional seconds. Appends `Z` for `DateTime.utc()`. Integer literals pass through directly; simple identifiers use `$name`; complex expressions use `${expr}`.
+
+### Detection mechanism
+
+Both rules use `addInstanceCreationExpression` callback, check `constructorName.type.name.lexeme == 'DateTime'`, and filter to unnamed and `utc` named constructors only. `DateTime.now()`, `.parse()`, `.tryParse()` are static methods (not constructors) so they never reach the callback. `fromMillisecondsSinceEpoch` and `fromMicrosecondsSinceEpoch` are named constructors filtered by the guard.
+
+### Registration
+
+Both rules: factory reference in `_allRuleFactories` (lib/saropa_lints.dart), rule name in `recommendedOnlyRules` (lib/src/tiers.dart), class in `lib/src/rules/data/json_datetime_rules.dart`.
+
+### Tests
+
+Instantiation pins for both rules in `test/rules/data/json_datetime_rules_test.dart` (count updated to 15). Fix smoke test entry in `test/scan/fix_application_smoke_test.dart`. Integrity (24), anti-pattern detection, json_datetime rules, and fix smoke tests all pass (70 total).
+
+### Fixtures
+
+- `avoid_datetime_constructor_fixture.dart` — 10 BAD cases, 9 GOOD near-miss cases
+- `avoid_datetime_constructor_unvalidated_fixture.dart` — 4 BAD cases (return, argument, named parameter, field initializer), 2 GOOD cases (local variable with validation, all-literal in-range)
 
 ### Files changed
 
-- `lib/src/rules/data/json_datetime_rules.dart` — new `AvoidDateTimeConstructorRule` class with `fixGenerators`
-- `lib/src/fixes/json_datetime/replace_datetime_constructor_fix.dart` — new quick fix
-- `lib/saropa_lints.dart` — factory registration
-- `lib/src/tiers.dart` — tier assignment (recommendedOnlyRules)
-- `test/rules/data/json_datetime_rules_test.dart` — instantiation pin, count update
+- `lib/src/rules/data/json_datetime_rules.dart` — two rule classes, `allLiteralsInRange` made public
+- `lib/src/fixes/json_datetime/replace_datetime_constructor_fix.dart` — hardened quick fix with interpolation safety, ms/us support
+- `lib/saropa_lints.dart` — factory registration for both rules
+- `lib/src/tiers.dart` — tier assignment for both rules
+- `test/rules/data/json_datetime_rules_test.dart` — two instantiation pins, count update
 - `test/scan/fix_application_smoke_test.dart` — fix smoke test entry
-- `example/lib/json_datetime/avoid_datetime_constructor_fixture.dart` — new fixture
-- `CHANGELOG.md` — entry under [14.4.0]
+- `example/lib/json_datetime/avoid_datetime_constructor_fixture.dart` — fixture with hardened edge cases
+- `example/lib/json_datetime/avoid_datetime_constructor_unvalidated_fixture.dart` — new fixture
+- `CHANGELOG.md` — entries under [14.4.0]
 - `bugs/BUG_REPORT_GUIDE.md` — reference repointed
 
 ### Known limitations
 
-- Day upper bound is 31, not calendar-aware: `DateTime(2026, 2, 31)` passes the allowlist despite February never having 31 days. Adding month+leap-year logic would add complexity disproportionate to the benefit.
-- The quick fix produces `DateTime.tryParse(...)` which returns `DateTime?` — callers need null handling. The fix does not insert null checks.
-- Millisecond and microsecond arguments are not included in the ISO 8601 string produced by the fix (ISO 8601 supports fractional seconds but the interpolation would be complex).
+- Day upper bound is 31, not calendar-aware: `DateTime(2026, 2, 31)` passes the allowlist
+- Quick fix produces `DateTime?` — callers need null handling
+- Quick fix bails out on complex expressions (ternary, await, cascade, strings with quotes)
+- `avoid_datetime_constructor_unvalidated` does not verify that a local-variable assignment is ACTUALLY followed by validation — it only checks that the opportunity exists
 
 ### Closes bug
 

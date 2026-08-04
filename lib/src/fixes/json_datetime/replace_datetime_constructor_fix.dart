@@ -6,6 +6,11 @@ import 'package:analyzer/source/source_range.dart';
 import '../../native/saropa_fix.dart';
 
 /// Quick fix: Replace DateTime constructor with DateTime.tryParse.
+///
+/// Produces `DateTime.tryParse('$year-$month-$day')` from
+/// `DateTime(year, month, day)`. Bails out when any argument contains
+/// syntax that would break inside a string interpolation (quotes,
+/// braces, await, ternary, cascade).
 class ReplaceDateTimeConstructorFix extends SaropaFixProducer {
   ReplaceDateTimeConstructorFix({required super.context});
 
@@ -31,38 +36,47 @@ class ReplaceDateTimeConstructorFix extends SaropaFixProducer {
     final args = creation.argumentList.arguments;
     if (args.isEmpty) return;
 
-    final bool isUtc =
-        creation.constructorName.name?.name == 'utc';
+    for (final Expression arg in args) {
+      if (!_isSafeForInterpolation(arg)) return;
+    }
+
+    final bool isUtc = creation.constructorName.name?.name == 'utc';
     final List<String> parts = <String>[];
     for (final Expression arg in args) {
       parts.add(arg.toSource());
     }
 
-    // Pad to at least year, month, day for a valid ISO string.
     while (parts.length < 3) {
-      parts.add(parts.length == 1 ? '1' : '1');
+      parts.add('1');
     }
 
-    final String year = parts[0];
-    final String month = parts[1];
-    final String day = parts[2];
+    final StringBuffer iso = StringBuffer("'");
+    iso.write(_pad(parts[0]));
+    iso.write('-');
+    iso.write(_pad(parts[1]));
+    iso.write('-');
+    iso.write(_pad(parts[2]));
 
-    final StringBuffer iso = StringBuffer();
-    iso.write("'\$${_brace(year)}-\$${_brace(month)}-\$${_brace(day)}");
     if (parts.length > 3) {
-      iso.write('T\$${_brace(parts[3])}');
-      if (parts.length > 4) {
-        iso.write(':\$${_brace(parts[4])}');
-      }
-      if (parts.length > 5) {
-        iso.write(':\$${_brace(parts[5])}');
+      iso.write('T');
+      iso.write(_pad(parts[3]));
+      iso.write(':');
+      iso.write(parts.length > 4 ? _pad(parts[4]) : '00');
+      iso.write(':');
+      iso.write(parts.length > 5 ? _pad(parts[5]) : '00');
+
+      if (parts.length > 6) {
+        final String ms = parts[6];
+        final String us = parts.length > 7 ? parts[7] : '0';
+        iso.write('.');
+        iso.write(_pad3(ms));
+        iso.write(_pad3(us));
       }
     }
     if (isUtc) iso.write('Z');
     iso.write("'");
 
-    final String replacement =
-        'DateTime.tryParse($iso)';
+    final String replacement = 'DateTime.tryParse($iso)';
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(
@@ -72,14 +86,53 @@ class ReplaceDateTimeConstructorFix extends SaropaFixProducer {
     });
   }
 
-  static String _brace(String expr) {
-    if (_isSimpleIdentifier(expr)) return expr;
-    return '{$expr}';
+  static bool _isSafeForInterpolation(Expression arg) {
+    if (arg is IntegerLiteral) return true;
+    if (arg is SimpleIdentifier) return true;
+    if (arg is PrefixedIdentifier) return true;
+    if (arg is PropertyAccess) {
+      final src = arg.toSource();
+      return !src.contains("'") && !src.contains('"') && !src.contains('}');
+    }
+    if (arg is ParenthesizedExpression) {
+      return _isSafeForInterpolation(arg.expression);
+    }
+    return false;
+  }
+
+  /// Wraps expression in `\${expr}` if not a simple identifier,
+  /// or returns `\$name` for plain identifiers.
+  /// Integer literals are returned as-is (already padded by caller).
+  static String _pad(String expr) {
+    if (_isIntLiteral(expr)) return expr;
+    if (_isSimpleIdentifier(expr)) {
+      return '\$$expr';
+    }
+    return '\${$expr}';
+  }
+
+  static String _pad3(String expr) {
+    if (_isIntLiteral(expr)) {
+      return expr.padLeft(3, '0');
+    }
+    if (_isSimpleIdentifier(expr)) {
+      return '\$$expr';
+    }
+    return '\${$expr}';
+  }
+
+  static bool _isIntLiteral(String s) {
+    if (s.isEmpty) return false;
+    for (int i = 0; i < s.length; i++) {
+      if (!_isDigit(s.codeUnitAt(i))) return false;
+    }
+    return true;
   }
 
   static bool _isSimpleIdentifier(String s) {
     if (s.isEmpty) return false;
-    if (!_isLetter(s.codeUnitAt(0)) && s.codeUnitAt(0) != 0x5F) return false;
+    final int first = s.codeUnitAt(0);
+    if (!_isLetter(first) && first != 0x5F) return false;
     for (int i = 1; i < s.length; i++) {
       final int c = s.codeUnitAt(i);
       if (!_isLetter(c) && !_isDigit(c) && c != 0x5F) return false;

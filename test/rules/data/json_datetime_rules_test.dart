@@ -5,7 +5,7 @@ import 'package:test/test.dart';
 import 'package:saropa_lints/src/rules/data/json_datetime_rules.dart';
 import '../../helpers/fixture_discovery.dart';
 
-/// Tests for 14 Json Datetime lint rules.
+/// Tests for 15 Json Datetime lint rules.
 ///
 /// Test fixtures: example/lib/json_datetime/*
 void main() {
@@ -102,6 +102,12 @@ void main() {
       'AvoidDateTimeConstructorRule',
       'avoid_datetime_constructor',
       () => AvoidDateTimeConstructorRule(),
+    );
+
+    testRule(
+      'AvoidDateTimeConstructorUnvalidatedRule',
+      'avoid_datetime_constructor_unvalidated',
+      () => AvoidDateTimeConstructorUnvalidatedRule(),
     );
   });
 

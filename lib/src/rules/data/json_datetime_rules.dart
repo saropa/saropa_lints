@@ -1935,6 +1935,7 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
 
   @override
   List<String> get relatedRules => const [
+    'avoid_datetime_constructor_unvalidated',
     'avoid_datetime_parse_unvalidated',
     'avoid_datetime_now_in_tests',
   ];
@@ -1975,7 +1976,7 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
       final String? namedConstructor = constructorName.name?.name;
       if (namedConstructor != null && namedConstructor != 'utc') return;
 
-      if (_allLiteralsInRange(node.argumentList.arguments)) return;
+      if (allLiteralsInRange(node.argumentList.arguments)) return;
 
       reporter.atNode(node);
     });
@@ -1984,7 +1985,7 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
   /// Returns true when every positional argument is an integer literal
   /// within the valid range for its position in the DateTime constructor.
   /// Day upper bound is 31 (not calendar-aware — Feb 31 passes).
-  static bool _allLiteralsInRange(NodeList<Expression> args) {
+  static bool allLiteralsInRange(NodeList<Expression> args) {
     if (args.isEmpty) return false;
 
     // DateTime constructor takes up to 8 positional int args, no named args.
@@ -2002,6 +2003,132 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
       }
     }
     return true;
+  }
+}
+
+// =============================================================================
+// avoid_datetime_constructor_unvalidated
+// =============================================================================
+
+/// Warns when a `DateTime()` or `DateTime.utc()` constructor result is used
+/// directly without the opportunity to validate.
+///
+/// Since: v14.4.0 | Updated: v14.4.0 | Rule version: v1
+///
+/// Unlike `avoid_datetime_constructor` (which flags all variable-arg
+/// constructor calls), this rule only fires when the constructed DateTime
+/// is consumed immediately — passed as an argument, returned, used in a
+/// field initializer, or embedded in an expression — without being
+/// assigned to a local variable where range checks could follow.
+///
+/// **BAD:**
+/// ```dart
+/// return DateTime(year, month, day);
+/// schedule(DateTime(year, month, day));
+/// final Widget w = DateWidget(date: DateTime(year, month, day));
+/// ```
+///
+/// **GOOD:**
+/// ```dart
+/// final date = DateTime(year, month, day);
+/// if (date.month != month || date.day != day) throw ArgumentError();
+/// return date;
+/// ```
+class AvoidDateTimeConstructorUnvalidatedRule extends SaropaLintRule {
+  AvoidDateTimeConstructorUnvalidatedRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.bug;
+
+  @override
+  Set<String> get tags => const {'reliability', 'type-safety'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<String> get requiredPatterns => const {'DateTime'};
+
+  @override
+  List<String> get relatedRules => const [
+    'avoid_datetime_constructor',
+    'avoid_datetime_parse_unvalidated',
+  ];
+
+  static const LintCode _code = LintCode(
+    'avoid_datetime_constructor_unvalidated',
+    '[avoid_datetime_constructor_unvalidated] This DateTime constructor '
+        'result is consumed directly without being assigned to a local '
+        'variable where its components (month, day, hour) could be '
+        'validated against the input values. The constructor silently rolls '
+        'over out-of-range values, so without a post-construction check '
+        'the caller has no way to detect invalid input. Assign the result '
+        'to a local variable and verify the components match the input '
+        'before using it. {v1}',
+    correctionMessage:
+        'Assign the DateTime to a local variable, then verify '
+        'date.month == month && date.day == day before using it. '
+        'Or use DateTime.tryParse() which returns null on invalid input.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final ConstructorName constructorName = node.constructorName;
+      final String typeName = constructorName.type.name.lexeme;
+      if (typeName != 'DateTime') return;
+
+      final String? named = constructorName.name?.name;
+      if (named != null && named != 'utc') return;
+
+      if (AvoidDateTimeConstructorRule.allLiteralsInRange(
+        node.argumentList.arguments,
+      )) {
+        return;
+      }
+
+      if (_isConsumedInline(node)) {
+        reporter.atNode(node);
+      }
+    });
+  }
+
+  static bool _isConsumedInline(InstanceCreationExpression node) {
+    final AstNode? parent = node.parent;
+    if (parent == null) return false;
+
+    // Passed as a function/constructor argument.
+    if (parent is ArgumentList) return true;
+
+    // Returned directly.
+    if (parent is ReturnStatement) return true;
+
+    // Used in a named expression (widget parameter).
+    if (parent is NamedExpression) return true;
+
+    // Field initializer (not a local variable).
+    if (parent is VariableDeclaration) {
+      final AstNode? grandparent = parent.parent?.parent;
+      if (grandparent is FieldDeclaration) return true;
+      // Local variable assignment — opportunity to validate.
+      return false;
+    }
+
+    // Ternary branch, null-coalescing, cascade — consumed inline.
+    if (parent is ConditionalExpression) return true;
+    if (parent is BinaryExpression) return true;
+    if (parent is AssignmentExpression) {
+      return parent.leftHandSide != node;
+    }
+
+    return false;
   }
 }
 

@@ -1009,6 +1009,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'require_json_decode_try_catch',
   'avoid_datetime_parse_unvalidated',
   'avoid_datetime_constructor',
+  'avoid_datetime_constructor_unvalidated',
   'require_websocket_error_handling',
 
   // Accessibility

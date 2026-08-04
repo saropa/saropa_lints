@@ -71,6 +71,7 @@ Introduces a new lint rule to catch invalid date initializations that would othe
 ### Added
 
 - `avoid_datetime_constructor` — flags `DateTime()` and `DateTime.utc()` constructors, which silently roll over out-of-range values (e.g. month 13 becomes January of the next year). All-literal in-range calls are allowed. Quick fix available: replace with `DateTime.tryParse()`. No action required.
+- `avoid_datetime_constructor_unvalidated` — flags `DateTime()` calls whose result is consumed directly (returned, passed as argument, used in field initializer) without being assigned to a local variable where components can be validated. No action required.
 
 ---
 
