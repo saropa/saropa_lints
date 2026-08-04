@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2331,
+  "ruleCount": 2333,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -2138,6 +2138,38 @@
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
         "description": "Code smell default target: zero false positives."
+      }
+    },
+    "avoid_datetime_constructor": {
+      "ruleType": "bug",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "reliability",
+        "type-safety"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Bug rule default target: zero false positives."
+      }
+    },
+    "avoid_datetime_constructor_unvalidated": {
+      "ruleType": "bug",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "reliability",
+        "type-safety"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Bug rule default target: zero false positives."
       }
     },
     "avoid_datetime_now_in_tests": {

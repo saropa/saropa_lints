@@ -92,8 +92,7 @@ void main() {
     });
   });
 
-  group(
-      'Plan §10 D — ReplaceDateTimeConstructorFix structural smoke', () {
+  group('Plan §10 D — ReplaceDateTimeConstructorFix structural smoke', () {
     test('fix class subclasses SaropaFixProducer', () {
       expect(ReplaceDateTimeConstructorFix, isNotNull);
     });
