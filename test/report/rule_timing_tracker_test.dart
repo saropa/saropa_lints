@@ -4,6 +4,7 @@
 /// Analyzer-backed tests for `rule_timing_tracker_test` (rule timing tracker).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
 import 'dart:convert' show jsonDecode;
 
 import 'package:saropa_lints/saropa_lints.dart';

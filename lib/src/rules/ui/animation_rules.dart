@@ -3252,7 +3252,7 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
   static String? _receiverName(Expression receiver) {
     if (receiver is SimpleIdentifier) return receiver.name;
     if (receiver is PropertyAccess) {
-      final Expression? target = receiver.realTarget;
+      final Expression target = receiver.realTarget;
       if (target is ThisExpression) return receiver.propertyName.name;
     }
     return null;

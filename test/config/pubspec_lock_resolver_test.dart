@@ -4,6 +4,7 @@
 /// Analyzer-backed tests for `pubspec_lock_resolver_test` (pubspec lock resolver).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

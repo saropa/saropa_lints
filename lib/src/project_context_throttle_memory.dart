@@ -829,8 +829,8 @@ class _LruNode<K, V> {
   /// on the node itself rather than mutating a parameter externally.
   void linkAsHead(_LruNode<K, V>? currentHead) {
     // Explicit `this.` so the lint engine sees instance-field mutation.
-    this.prev = null;
-    this.next = currentHead;
+    prev = null;
+    next = currentHead;
   }
 }
 

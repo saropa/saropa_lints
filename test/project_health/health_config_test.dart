@@ -1,4 +1,5 @@
 /// Tests `.saropa_health.yaml` parsing and the allowlist filters.
+library;
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

@@ -3294,7 +3294,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
 // This allows tier filtering without keeping all 2100+ rules in memory.
 
 /// Lazy name→factory map, built once on first access.
-late final Map<String, SaropaLintRule Function()> _ruleFactories =
+final Map<String, SaropaLintRule Function()> _ruleFactories =
     _buildRuleFactoriesMap();
 
 /// Rule names that have at least one quick-fix generator.

@@ -4778,8 +4778,7 @@ class PreferElementRebuildRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
-      final FunctionBody? body = node.body;
-      if (body == null) return;
+      final FunctionBody body = node.body;
 
       // Collect all return statements in the build method
       final List<ReturnStatement> returns = <ReturnStatement>[];

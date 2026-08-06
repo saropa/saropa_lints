@@ -82,6 +82,7 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   // dropped addEnumBody. The package supports analyzer 9-12, so all three are
   // implemented: addEnumBody satisfies the 9-11 interface, the split pair
   // satisfies the 12 interface. The unused override on each version is an
+  @override
   void addBlockEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   void addEnumBody(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override

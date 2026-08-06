@@ -4,6 +4,7 @@
 /// Analyzer-backed tests for `project_info_root_uri_test` (project info root uri).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
 
 import 'dart:io';
 

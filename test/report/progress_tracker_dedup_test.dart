@@ -4,6 +4,7 @@
 /// Analyzer-backed tests for `progress_tracker_dedup_test` (progress tracker dedup).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
 import 'dart:io' show Directory, Platform;
 
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show ProgressTracker;

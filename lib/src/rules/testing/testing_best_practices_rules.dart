@@ -1277,8 +1277,7 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression? bodyArg = args.arguments[1];
-      if (bodyArg == null) return;
+      final Expression bodyArg = args.arguments[1];
 
       final String bodySource = bodyArg.toSource();
 
@@ -1885,7 +1884,7 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
       if (args.arguments.length < 2) return;
 
       // Get the test name
-      final Expression? nameArg = args.arguments.first;
+      final Expression nameArg = args.arguments.first;
       if (nameArg is! StringLiteral) return;
       final String? testName = nameArg.stringValue?.toLowerCase();
       if (testName == null) return;
@@ -2122,7 +2121,7 @@ class RequireGoldenTestRule extends SaropaLintRule {
       if (args.arguments.isEmpty) return;
 
       // Get the test name
-      final Expression? nameArg = args.arguments.first;
+      final Expression nameArg = args.arguments.first;
       if (nameArg is! StringLiteral) return;
       final String? testName = nameArg.stringValue?.toLowerCase();
       if (testName == null) return;

@@ -23,6 +23,8 @@
 /// Analyzer-backed tests for `fix_application_smoke_test` (fix application smoke).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
+
 
 import 'package:saropa_lints/src/fixes/common/delete_node_fix.dart';
 import 'package:saropa_lints/src/fixes/common/insert_text_fix.dart';

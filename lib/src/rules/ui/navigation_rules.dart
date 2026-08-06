@@ -1121,8 +1121,7 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
         return;
       }
 
-      final FunctionBody? body = node.body;
-      if (body == null) return;
+      final FunctionBody body = node.body;
 
       final String bodySource = body.toSource();
 
@@ -1558,8 +1557,7 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (node.name.lexeme != 'build') return;
 
-      final FunctionBody? body = node.body;
-      if (body == null) return;
+      final FunctionBody body = node.body;
 
       final String bodySource = body.toSource();
 

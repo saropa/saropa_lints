@@ -1033,10 +1033,8 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
                     typeSource.startsWith('Set') ||
                     typeSource.startsWith('Map') ||
                     typeSource.startsWith('Iterable'))) {
-              final String? fieldName = field.name.lexeme;
-              if (fieldName != null) {
-                collectionFields.add(fieldName);
-              }
+              final String fieldName = field.name.lexeme;
+              collectionFields.add(fieldName);
             }
           }
         }
@@ -1140,10 +1138,8 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
           if (typeSource != null &&
               RegExp(r'\bDateTime\b').hasMatch(typeSource)) {
             for (final VariableDeclaration field in member.fields.variables) {
-              final String? fieldName = field.name.lexeme;
-              if (fieldName != null) {
-                dateTimeFields.add(fieldName);
-              }
+              final String fieldName = field.name.lexeme;
+              dateTimeFields.add(fieldName);
             }
           }
         }
@@ -1274,11 +1270,10 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
             for (final ClassMember constructor in node.bodyMembers) {
               if (constructor is ConstructorDeclaration) {
-                final String? initSource = constructor.initializers
+                final String initSource = constructor.initializers
                     .map((e) => e.toSource())
                     .join();
-                if (initSource != null &&
-                    unmodifiablePattern.hasMatch(initSource)) {
+                if (unmodifiablePattern.hasMatch(initSource)) {
                   madeUnmodifiable = true;
                   break;
                 }

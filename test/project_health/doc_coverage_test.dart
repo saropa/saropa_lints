@@ -1,5 +1,6 @@
 /// Tests public-API documentation coverage (private API ignored, null when no
 /// public surface).
+library;
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:saropa_lints/src/cli/project_health/doc_coverage.dart';
 import 'package:test/test.dart';

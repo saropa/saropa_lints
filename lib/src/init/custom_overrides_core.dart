@@ -297,10 +297,7 @@ output: both
 
   if (headerEndMatch != null) {
     final insertPos = headerEndMatch.end;
-    return content.prefix(insertPos) +
-        '\n' +
-        settingBlock +
-        content.afterIndex(insertPos);
+    return '${content.prefix(insertPos)}\n$settingBlock${content.afterIndex(insertPos)}';
   }
 
   return settingBlock + content;

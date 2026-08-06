@@ -4880,10 +4880,8 @@ class _BuilderBoundsCollector extends RecursiveAstVisitor<void> {
   void visitIndexExpression(IndexExpression node) {
     final Expression index = node.index;
     if (index is SimpleIdentifier && _indexParamNames.contains(index.name)) {
-      final Expression? target = node.realTarget;
-      if (target != null) {
-        indexedReceivers.add(target.toSource());
-      }
+      final Expression target = node.realTarget;
+      indexedReceivers.add(target.toSource());
     }
     super.visitIndexExpression(node);
   }

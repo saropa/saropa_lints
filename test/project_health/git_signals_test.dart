@@ -1,5 +1,6 @@
 /// Tests for git signals. Runs against this repo's own history (a git repo),
 /// asserting well-formed churn/recency/bus-factor rather than exact values.
+library;
 import 'dart:io';
 
 import 'package:saropa_lints/src/cli/project_health/git_signals.dart';

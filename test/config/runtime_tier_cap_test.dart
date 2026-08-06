@@ -4,6 +4,7 @@
 /// Analyzer-backed tests for `runtime_tier_cap_test` (runtime tier cap).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
 import 'dart:io';
 
 import 'package:saropa_lints/src/config/runtime_tier_cap.dart';

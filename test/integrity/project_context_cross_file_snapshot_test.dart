@@ -2,6 +2,7 @@
 ///
 /// Ensures bad on-disk JSON never throws into callers and that [clearCrossFileSnapshotCache]
 /// resets state between runs so one test cannot mask another via cached null/values.
+library;
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

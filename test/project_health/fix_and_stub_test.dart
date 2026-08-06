@@ -1,4 +1,5 @@
 /// Tests for the fix-workflow removal script and stub-test detection.
+library;
 import 'package:saropa_lints/src/cli/project_health/fix_workflow.dart';
 import 'package:saropa_lints/src/cli/project_health/stub_density.dart';
 import 'package:test/test.dart';

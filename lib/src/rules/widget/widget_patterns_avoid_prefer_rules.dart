@@ -5239,8 +5239,8 @@ class AvoidUnnecessaryContainersRule extends SaropaLintRule {
       final DartType? type = node.staticType;
       if (type is! InterfaceType) return;
       if (type.element.name != 'Container') return;
-      final String? uri = type.element.library.uri.toString();
-      if (uri == null || !uri.contains('flutter')) return;
+      final String uri = type.element.library.uri.toString();
+      if (!uri.contains('flutter')) return;
 
       final Set<String> namedArgNames = <String>{};
       for (final Expression arg in node.argumentList.arguments) {

@@ -1720,13 +1720,11 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
           for (final Expression arg in args.arguments) {
             if (arg is SimpleIdentifier) {
               // Check if the identifier matches a constructor parameter
-              final FormalParameterList? params = node.parameters;
-              if (params != null) {
-                for (final FormalParameter param in params.parameters) {
-                  if (param.name?.lexeme == arg.name) {
-                    reporter.atNode(init);
-                    return;
-                  }
+              final FormalParameterList params = node.parameters;
+              for (final FormalParameter param in params.parameters) {
+                if (param.name?.lexeme == arg.name) {
+                  reporter.atNode(init);
+                  return;
                 }
               }
             }

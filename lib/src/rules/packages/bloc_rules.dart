@@ -4099,8 +4099,7 @@ class AvoidBlocContextDependencyRule extends SaropaLintRule {
       // Check constructors for BuildContext parameter
       for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
-          final FormalParameterList? params = member.parameters;
-          if (params == null) continue;
+          final FormalParameterList params = member.parameters;
 
           for (final FormalParameter param in params.parameters) {
             final String paramSource = param.toSource();

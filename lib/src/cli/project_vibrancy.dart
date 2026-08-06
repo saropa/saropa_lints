@@ -135,8 +135,7 @@ class ProjectVibrancyFunctionResult {
     'coveragePercent': coveragePercent,
     'complexity': complexity,
     'flags': flags,
-    if (lastChangedEpochSec != null)
-      'lastChangedEpochSec': lastChangedEpochSec!,
+    'lastChangedEpochSec': ?lastChangedEpochSec,
   };
 }
 

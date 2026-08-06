@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:test/test.dart';
 
 /// Contract: each rule listed in plan/TESTING_AND_RELEASE.md §10 C1-C24 has a
-/// fixture file under example/lib/<category>/ that declares an
+/// fixture file under `example/lib/<category>/` that declares an
 /// `// expect_lint: <rule>` marker. This is the "today" safety net for the
 /// fixture_lint_integration_test additions, which only assert when
 /// `dart run custom_lint` is reachable in the example package.

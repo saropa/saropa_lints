@@ -4,6 +4,7 @@
 /// Analyzer-backed tests for `import_graph_tracker_perf_test` (import graph tracker perf).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
 
 import 'dart:io' show Directory, Platform, stdout;
 
@@ -37,7 +38,7 @@ void main() {
       // This gives a single root for PROJECT STRUCTURE traversal.
       for (var i = 0; i < fileCount; i++) {
         final filePath =
-            '${projectRoot}${Platform.pathSeparator}lib${Platform.pathSeparator}file_$i.dart';
+            '$projectRoot${Platform.pathSeparator}lib${Platform.pathSeparator}file_$i.dart';
         final content = i + 1 < fileCount
             ? "import 'package:$packageName/file_${i + 1}.dart';\n"
             : '';
@@ -68,7 +69,7 @@ void main() {
       for (var i = 0; i < violationCount; i++) {
         final fileIndex = i % fileCount;
         final filePath =
-            '${projectRoot}${Platform.pathSeparator}lib${Platform.pathSeparator}file_$fileIndex.dart';
+            '$projectRoot${Platform.pathSeparator}lib${Platform.pathSeparator}file_$fileIndex.dart';
         violations.add(
           ViolationRecord(
             rule: 'perf_rule',

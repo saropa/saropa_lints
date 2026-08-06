@@ -3586,7 +3586,7 @@ class PreferConstructorsOverStaticMethodsRule extends SaropaLintRule {
       if (!node.isStatic) return;
       final body = node.body;
       if (body is! ExpressionFunctionBody) return;
-      final Expression? expr = body.expression;
+      final Expression expr = body.expression;
       if (expr is! InstanceCreationExpression) return;
       final AstNode? parent = node.parent;
       if (parent is! ClassDeclaration) return;
@@ -4321,8 +4321,8 @@ class IllegalEnumValuesRule extends SaropaLintRule {
           reporter.atNode(member);
         } else if (member is FieldDeclaration && !member.isStatic) {
           for (final VariableDeclaration v in member.fields.variables) {
-            final Token? nameToken = v.name;
-            if (nameToken != null && nameToken.lexeme == 'values') {
+            final Token nameToken = v.name;
+            if (nameToken.lexeme == 'values') {
               reporter.atNode(v);
             }
           }

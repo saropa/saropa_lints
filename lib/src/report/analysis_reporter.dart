@@ -388,7 +388,7 @@ class AnalysisReporter {
     _writePrioritizedViolations(buf, data.violations);
     _writeProjectStructure(buf);
 
-    buf.writeln('${'=' * 70}');
+    buf.writeln('=' * 70);
     buf.writeln('Total: ${data.total} issues');
 
     File(path).writeAsStringSync(buf.toString());
@@ -626,7 +626,7 @@ class AnalysisReporter {
     if (batchCount > 1) {
       buf.writeln('Batches: $batchCount isolates contributed');
     }
-    buf.writeln('${'=' * 70}');
+    buf.writeln('=' * 70);
     buf.writeln();
   }
 
@@ -760,13 +760,13 @@ class AnalysisReporter {
       if (!customFile.existsSync()) return;
 
       final content = customFile.readAsStringSync().trimRight();
-      buf.writeln('${'─' * 70}');
+      buf.writeln('─' * 70);
       buf.writeln('  analysis_options_custom.yaml:');
-      buf.writeln('${'─' * 70}');
+      buf.writeln('─' * 70);
       for (final line in content.split('\n')) {
         buf.writeln('  | $line');
       }
-      buf.writeln('${'─' * 70}');
+      buf.writeln('─' * 70);
       buf.writeln();
     } catch (e, st) {
       developer.log(
@@ -972,12 +972,12 @@ class AnalysisReporter {
         ? _maxInlineViolations
         : all.length;
 
-    buf.writeln('${'=' * 70}');
+    buf.writeln('=' * 70);
     buf.writeln(
       'FIX PRIORITY (${all.length} violations, '
       'sorted by priority = impact * importance * layer)',
     );
-    buf.writeln('${'=' * 70}');
+    buf.writeln('=' * 70);
     buf.writeln();
     buf.writeln(
       '  ${'Priority'.padLeft(8)} | '
@@ -1013,12 +1013,12 @@ class AnalysisReporter {
     final files = ImportGraphTracker.allFiles;
     if (files.isEmpty) return;
 
-    buf.writeln('${'=' * 70}');
+    buf.writeln('=' * 70);
     buf.writeln(
       'PROJECT STRUCTURE '
       '(${files.length} files, ${ImportGraphTracker.totalEdges} edges)',
     );
-    buf.writeln('${'=' * 70}');
+    buf.writeln('=' * 70);
     buf.writeln();
 
     // Find entry points: files with no importers and at least one import

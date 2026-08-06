@@ -2965,7 +2965,7 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
     }
 
     collectRelevantComments(node.beginToken);
-    final Statement? body = node.body;
+    final Statement body = node.body;
     if (body is Block) {
       collectRelevantComments(body.beginToken);
     }

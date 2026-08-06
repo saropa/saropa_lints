@@ -4,6 +4,7 @@
 /// Analyzer-backed tests for `rule_pack_registry_test` (rule pack registry).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
 import 'package:saropa_lints/src/config/rule_packs.dart';
 import 'package:test/test.dart';
 

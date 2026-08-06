@@ -13,6 +13,8 @@
 /// Analyzer-backed tests for `report_synthesis_test` (report synthesis).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
+
 
 import 'dart:io' show Directory, File, Platform;
 

@@ -4,6 +4,7 @@
 /// Analyzer-backed tests for `rule_tags_test` (rule tags).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
 import 'package:saropa_lints/src/rule_tags.dart';
 import 'package:test/test.dart';
 

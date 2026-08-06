@@ -1522,14 +1522,14 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
     // Check for conditional with null
     // Pattern: condition ? 'error' : null
     final ternaryWithNullPattern = RegExp(
-      r"\?\s*['" + r'"' + r"][^'" + r'"' + r"]+['" + r'"' + r"]\s*:\s*null",
+      r"\?\s*['" r'"' r"][^'" r'"' r"]+['" r'"' r"]\s*:\s*null",
     );
     if (ternaryWithNullPattern.hasMatch(source)) {
       return true;
     }
 
     // Pattern: condition ? null : 'error'
-    final nullThenStringPattern = RegExp(r"\?\s*null\s*:\s*['" + r'"' + r"]");
+    final nullThenStringPattern = RegExp(r"\?\s*null\s*:\s*['" r'"' r"]");
     if (nullThenStringPattern.hasMatch(source)) {
       return true;
     }

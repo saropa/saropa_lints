@@ -6,6 +6,7 @@
 /// full fidelity.
 ///
 /// Bug: plans/history/2026.07/2026.07.10/infra_native_plugin_full_tier_runs_on_files_in_flux.md
+library;
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 

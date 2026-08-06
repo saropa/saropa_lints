@@ -957,7 +957,7 @@ class PreferFactoryConstructorRule extends SaropaLintRule {
       if (!node.isStatic) return;
       final body = node.body;
       if (body is! ExpressionFunctionBody) return;
-      final Expression? expr = body.expression;
+      final Expression expr = body.expression;
       if (expr is! InstanceCreationExpression) return;
       final AstNode? parent = node.parent;
       if (parent is! ClassDeclaration) return;
@@ -1858,8 +1858,7 @@ class AvoidUnusedConstructorParametersRule extends SaropaLintRule {
       // Skip redirecting constructors (factory Foo(int x) = _Foo)
       if (node.redirectedConstructor != null) return;
 
-      final FormalParameterList? params = node.parameters;
-      if (params == null) return;
+      final FormalParameterList params = node.parameters;
 
       // Collect body source for reference checking
       final String bodySource = node.body.toSource();

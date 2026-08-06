@@ -342,9 +342,7 @@ String ensureNonDartExcludes(String content) {
   if (excludeMatch != null) {
     final insertAt = excludeMatch.end;
     final lines = missing.map((e) => '    - "$e"').join('\n');
-    return '${content.prefix(insertAt)}\n'
-        '$lines\n' +
-        content.afterIndex(insertAt);
+    return '${content.prefix(insertAt)}\n$lines\n${content.afterIndex(insertAt)}';
   }
 
   // No exclude section — look for `analyzer:` and add one
@@ -364,8 +362,5 @@ String ensureNonDartExcludes(String content) {
 
   final insertAt = analyzerMatch.end + firstLine.start;
   final lines = missing.map((e) => '    - "$e"').join('\n');
-  return content.prefix(insertAt) +
-      '  exclude:\n'
-      '$lines\n' +
-      content.afterIndex(insertAt);
+  return '${content.prefix(insertAt)}  exclude:\n$lines\n${content.afterIndex(insertAt)}';
 }

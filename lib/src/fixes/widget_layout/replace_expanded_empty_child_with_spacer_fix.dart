@@ -36,7 +36,7 @@ class ReplaceExpandedEmptyChildWithSpacerFix extends SaropaFixProducer {
         if (name == 'child') {
           childArg = arg;
         } else if (name == 'flex' || name == 'key') {
-          parts.add('${name}: ${arg.expression.toSource()}');
+          parts.add('$name: ${arg.expression.toSource()}');
         }
       }
     }

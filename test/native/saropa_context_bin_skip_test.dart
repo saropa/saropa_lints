@@ -20,6 +20,8 @@
 /// Analyzer-backed tests for `saropa_context_bin_skip_test` (saropa context bin skip).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
+
 
 import 'dart:io';
 

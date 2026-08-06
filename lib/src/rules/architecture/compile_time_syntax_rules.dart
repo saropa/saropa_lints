@@ -50,8 +50,7 @@ bool _isPackageMetaTopLevelVariable(Annotation ann, String expectedName) {
   }
   if (variable == null) return false;
   if (variable.name != expectedName) return false;
-  final LibraryElement? lib = variable.library;
-  if (lib == null) return false;
+  final LibraryElement lib = variable.library;
   final Uri uri = lib.uri;
   return uri.isScheme('package') &&
       uri.pathSegments.isNotEmpty &&
@@ -308,8 +307,8 @@ class ConflictingConstructorAndStaticMemberRule extends SaropaLintRule {
       final Set<String> staticNames = <String>{};
       for (final ClassMember m in members) {
         if (m is MethodDeclaration && m.isStatic) {
-          final Token? n = m.name;
-          if (n != null) staticNames.add(n.lexeme);
+          final Token n = m.name;
+          staticNames.add(n.lexeme);
         } else if (m is FieldDeclaration && m.isStatic) {
           for (final VariableDeclaration v in m.fields.variables) {
             staticNames.add(v.name.lexeme);
@@ -538,7 +537,7 @@ class InvalidLiteralAnnotationRule extends SaropaLintRule {
   ) {
     context.addAnnotation((Annotation node) {
       if (!_isPackageMetaTopLevelVariable(node, 'literal')) return;
-      final AstNode? parent = node.parent;
+      final AstNode parent = node.parent;
       if (parent is! ConstructorDeclaration) {
         reporter.atNode(node, code);
         return;
@@ -585,7 +584,7 @@ class InvalidNonVirtualAnnotationRule extends SaropaLintRule {
   ) {
     context.addAnnotation((Annotation node) {
       if (!_isPackageMetaTopLevelVariable(node, 'nonVirtual')) return;
-      final AstNode? parent = node.parent;
+      final AstNode parent = node.parent;
 
       if (parent is MethodDeclaration) {
         if (parent.isStatic ||

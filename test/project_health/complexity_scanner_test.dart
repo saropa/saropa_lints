@@ -1,5 +1,6 @@
 /// Tests for the parsed-AST complexity scanner: cyclomatic, cognitive
 /// (nesting-weighted), variable/parameter counts, boolean density, exits.
+library;
 import 'package:saropa_lints/src/cli/project_health/complexity_scanner.dart';
 import 'package:saropa_lints/src/cli/project_health/metrics_model.dart';
 import 'package:test/test.dart';

@@ -1,4 +1,5 @@
 /// Tests that the HTML report is well-formed and embeds the data + chart hosts.
+library;
 import 'package:saropa_lints/src/cli/project_health/health_aggregator.dart';
 import 'package:saropa_lints/src/cli/project_health/health_html_reporter.dart';
 import 'package:saropa_lints/src/cli/project_health/health_model.dart';

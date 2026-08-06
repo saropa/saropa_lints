@@ -134,7 +134,7 @@ abstract final class ImageFilterQualityLowDetection {
     final Element? callee = elementFromAstIdentifier(node.methodName);
 
     if (callee is ConstructorElement) {
-      final Element? enc = callee.enclosingElement;
+      final Element enc = callee.enclosingElement;
       final InterfaceElement? iface = enc is InterfaceElement ? enc : null;
       if (iface == null || iface.name != method) {
         return null;
@@ -176,7 +176,7 @@ abstract final class ImageFilterQualityLowDetection {
     if (lowId == null) return false;
     final Element? el = elementFromAstIdentifier(lowId);
     if (el is FieldElement && el.name == 'low') {
-      final Element? enc = el.enclosingElement;
+      final Element enc = el.enclosingElement;
       if (enc is InterfaceElement && enc.name == 'FilterQuality') {
         final String u = enc.library.uri.toString();
         if (u == 'dart:ui' || u.startsWith('package:flutter/')) {

@@ -105,8 +105,6 @@ class PreferNullAwareCallFix extends SaropaFixProducer {
     if (operator.offset < expr.offset || operator.offset >= expr.end) {
       return null;
     }
-    return content.substring(expr.offset, operator.offset) +
-        '?' +
-        content.substring(operator.offset, expr.end);
+    return '${content.substring(expr.offset, operator.offset)}?${content.substring(operator.offset, expr.end)}';
   }
 }

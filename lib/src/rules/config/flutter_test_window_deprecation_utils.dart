@@ -23,7 +23,7 @@ bool isFlutterTestSdkTestWindowElement(Element? element) {
   if (element is InterfaceElement && element.name == 'TestWindow') {
     iface = element;
   } else if (element is ConstructorElement) {
-    final Element? enc = element.enclosingElement;
+    final Element enc = element.enclosingElement;
     if (enc is InterfaceElement && enc.name == 'TestWindow') {
       iface = enc;
     }
@@ -40,7 +40,7 @@ bool isFlutterTestSdkTestWindowElement(Element? element) {
 bool isFlutterTestSdkTestWidgetsFlutterBindingWindowGetter(Element? element) {
   if (element is! GetterElement) return false;
   if (element.name != 'window') return false;
-  final Element? enc = element.enclosingElement;
+  final Element enc = element.enclosingElement;
   if (enc is! ClassElement) return false;
   if (enc.name != 'TestWidgetsFlutterBinding') return false;
   return isFlutterTestPackageUri(enc.library.uri);

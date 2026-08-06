@@ -362,7 +362,7 @@ bool _classElementIsStateForDropdownMenuItemButton(ClassElement classElement) {
 
 bool _fieldIsOpacityOnDropdownMenuState(FieldElement element) {
   if (element.name != 'opacityAnimation') return false;
-  final Element? enc = element.enclosingElement;
+  final Element enc = element.enclosingElement;
   if (enc is! ClassElement) return false;
   return _classElementIsStateForDropdownMenuItemButton(enc);
 }
@@ -375,8 +375,7 @@ void _reportOpacityAnimationBangIfLegacy(
   final Expression operand = node.operand;
   if (operand is PropertyAccess) {
     if (operand.propertyName.name != 'opacityAnimation') return;
-    final Expression? target = operand.realTarget;
-    if (target == null) return;
+    final Expression target = operand.realTarget;
     if (!_dartTypeIsOrExtendsDropdownMenuItemButton(target.staticType)) return;
     reporter.atNode(node);
 

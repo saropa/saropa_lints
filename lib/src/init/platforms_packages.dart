@@ -44,19 +44,13 @@ platforms:
   if (maxIssuesMatch != null) {
     final insertPos = maxIssuesMatch.end;
     newContent =
-        content.prefix(insertPos) +
-        '\n' +
-        settingBlock +
-        content.afterIndex(insertPos);
+        '${content.prefix(insertPos)}\n$settingBlock${content.afterIndex(insertPos)}';
   } else {
     final headerEndMatch = RegExp(r'╚[═]+╝\n*').firstMatch(content);
     if (headerEndMatch != null) {
       final insertPos = headerEndMatch.end;
       newContent =
-          content.prefix(insertPos) +
-          '\n' +
-          settingBlock +
-          content.afterIndex(insertPos);
+          '${content.prefix(insertPos)}\n$settingBlock${content.afterIndex(insertPos)}';
     } else {
       newContent = settingBlock + content;
     }
@@ -116,20 +110,14 @@ $packageEntries
   if (platformsEndMatch != null) {
     final insertPos = platformsEndMatch.end;
     newContent =
-        content.prefix(insertPos) +
-        '\n' +
-        settingBlock +
-        content.afterIndex(insertPos);
+        '${content.prefix(insertPos)}\n$settingBlock${content.afterIndex(insertPos)}';
   } else {
     // Fallback: insert after max_issues
     final maxIssuesMatch = RegExp(r'max_issues:\s*\d+\n*').firstMatch(content);
     if (maxIssuesMatch != null) {
       final insertPos = maxIssuesMatch.end;
       newContent =
-          content.prefix(insertPos) +
-          '\n' +
-          settingBlock +
-          content.afterIndex(insertPos);
+          '${content.prefix(insertPos)}\n$settingBlock${content.afterIndex(insertPos)}';
     } else {
       newContent = settingBlock + content;
     }

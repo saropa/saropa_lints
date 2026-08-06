@@ -2416,11 +2416,9 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
         if (member is MethodDeclaration) {
           final methodName = member.name.lexeme;
           if (methodName == 'dispose' || methodName == 'close') {
-            final String? bodySource = member.body.toSource();
-            if (bodySource != null) {
-              hasClose = hasClose || closePattern.hasMatch(bodySource);
-              hasDispose = hasDispose || disposePattern.hasMatch(bodySource);
-            }
+            final String bodySource = member.body.toSource();
+            hasClose = hasClose || closePattern.hasMatch(bodySource);
+            hasDispose = hasDispose || disposePattern.hasMatch(bodySource);
           }
         }
       }

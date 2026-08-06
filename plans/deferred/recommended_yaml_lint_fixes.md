@@ -1,9 +1,9 @@
 # Plan: Fix recommended.yaml Lint Issues in lib/
 
-**Status:** In progress — Phase 1 complete, Phase 2a reviewed (no action), Phase 2b+3 pending
+**Status:** Complete — all fixable issues resolved; 5 remaining are unfixable architectural constraints
 **Created:** 2026-08-04
 **Updated:** 2026-08-06
-**Estimated scope:** ~127 issues across lib/ (from dart analyze with recommended.yaml)
+**Final result:** 7 issues found → 2 fixed, 5 unfixable (2 implementation_imports, 2 library_private_types_in_public_api, 1 raw-string prefer_interpolation_to_compose_strings)
 **Purpose:** Future-proof against pana baseline upgrades; cleaner codebase
 
 ---

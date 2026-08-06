@@ -1514,8 +1514,7 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addConstructorDeclaration((ConstructorDeclaration node) {
-      final FormalParameterList? params = node.parameters;
-      if (params == null) return;
+      final FormalParameterList params = node.parameters;
 
       for (final FormalParameter param in params.parameters) {
         String? typeStr;

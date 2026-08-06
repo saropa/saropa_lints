@@ -853,8 +853,8 @@ class PreferVoidCallbackRule extends SaropaLintRule {
       if (returnTypeName != 'void') return;
 
       // Should have no parameters
-      final FormalParameterList? params = node.parameters;
-      if (params == null || params.parameters.isNotEmpty) return;
+      final FormalParameterList params = node.parameters;
+      if (params.parameters.isNotEmpty) return;
 
       // Should have no type parameters
       if (node.typeParameters != null) return;

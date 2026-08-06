@@ -2507,7 +2507,7 @@ class PreferInlineFunctionTypesRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addGenericTypeAlias((GenericTypeAlias node) {
-      final TypeAnnotation? type = node.type;
+      final TypeAnnotation type = node.type;
       if (type is! GenericFunctionType) return;
       reporter.atNode(node);
     });
@@ -2679,8 +2679,8 @@ class ExternalWithInitializerRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addVariableDeclarationList((VariableDeclarationList node) {
-      final Token? first = node.firstTokenAfterCommentAndMetadata;
-      if (first?.lexeme != 'external') return;
+      final Token first = node.firstTokenAfterCommentAndMetadata;
+      if (first.lexeme != 'external') return;
 
       for (final VariableDeclaration v in node.variables) {
         if (v.initializer != null) {
@@ -2823,7 +2823,7 @@ class AvoidPrivateTypedefFunctionsRule extends SaropaLintRule {
   ) {
     context.addGenericTypeAlias((GenericTypeAlias node) {
       if (!node.name.lexeme.startsWith('_')) return;
-      final TypeAnnotation? type = node.type;
+      final TypeAnnotation type = node.type;
       if (type is! GenericFunctionType) return;
       reporter.atToken(node.name);
     });

@@ -53,20 +53,20 @@ void main() {
     'prefer_scrollbar_theme_of',
   };
 
-  const _flutterSdkMigrationFixturePaths = <String>[
+  const flutterSdkMigrationFixturePaths = <String>[
     'example/lib/flutter_sdk_migration_rules_fixture.dart',
     'example/lib/flutter_sdk_js_interop_migration_fixture.dart',
   ];
 
   group('flutter_sdk_migration fixture', () {
     test('fixture files exist', () {
-      for (final path in _flutterSdkMigrationFixturePaths) {
+      for (final path in flutterSdkMigrationFixturePaths) {
         expect(File(path).existsSync(), isTrue, reason: path);
       }
     });
 
     test('fixtures document an expect_lint marker for every rule', () {
-      final merged = _flutterSdkMigrationFixturePaths
+      final merged = flutterSdkMigrationFixturePaths
           .map((p) => File(p).readAsStringSync())
           .join('\n');
       for (final name in flutterSdkMigrationRuleNames) {

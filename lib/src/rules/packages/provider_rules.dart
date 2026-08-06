@@ -1383,7 +1383,7 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
         if (body is ExpressionFunctionBody) {
           final Expression expr = body.expression;
           if (expr is InstanceCreationExpression) {
-            final String? createdType =
+            final String createdType =
                 expr.constructorName.type.element?.name ??
                 expr.constructorName.type.name.lexeme;
             if (_disposableTypes.contains(createdType)) {

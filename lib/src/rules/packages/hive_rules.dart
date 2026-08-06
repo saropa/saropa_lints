@@ -306,9 +306,8 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
 
       for (final member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
-          final String? bodySource = member.body.toSource();
-          if (bodySource != null &&
-              RegExp(r'\.close\s*\(').hasMatch(bodySource)) {
+          final String bodySource = member.body.toSource();
+          if (RegExp(r'\.close\s*\(').hasMatch(bodySource)) {
             hasClose = true;
             break;
           }
@@ -866,7 +865,7 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
       if (annotationName != 'HiveType') return;
 
       // Check if there's a comment above documenting the typeId
-      final AstNode? parent = node.parent;
+      final AstNode parent = node.parent;
       if (parent is ClassDeclaration) {
         final String? docComment = parent.documentationComment?.toSource();
         if (docComment != null &&

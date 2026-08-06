@@ -1,5 +1,6 @@
 /// Tests for hot-spot ranking (multi-axis fire counts, deterministic order)
 /// and the Markdown AI-fix worklist export.
+library;
 import 'package:saropa_lints/src/cli/project_health/health_aggregator.dart';
 import 'package:saropa_lints/src/cli/project_health/health_export_markdown.dart';
 import 'package:saropa_lints/src/cli/project_health/health_model.dart';

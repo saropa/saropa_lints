@@ -76,8 +76,7 @@ class LogWriter {
     final padded = label.padRight(4);
     final spaces = ' ' * indent;
     terminal(
-      '$spaces${InitColors.bold}$colorCode$padded:${InitColors.reset} ' +
-      lines[0],
+      '$spaces${InitColors.bold}$colorCode$padded:${InitColors.reset} ${lines[0]}',
     );
     if (lines.length > 1) {
       final contIndent = ' ' * (indent + padded.length + 2);

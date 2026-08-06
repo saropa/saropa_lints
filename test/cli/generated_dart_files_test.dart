@@ -1,6 +1,7 @@
 /// Pins the shared codegen/locale predicate that the cross-file analyzers and the
 /// health/size scanners all delegate to, so the single source of truth cannot drift
 /// or silently narrow.
+library;
 import 'package:saropa_lints/src/cli/generated_dart_files.dart';
 import 'package:test/test.dart';
 

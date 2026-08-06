@@ -32,7 +32,7 @@ class ReplaceNullAwareSpreadFix extends SaropaFixProducer {
     final source = target.toSource();
     if (!source.startsWith('...?')) return;
 
-    final replacement = '...' + source.substring(3);
+    final replacement = '...${source.substring(3)}';
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(
         SourceRange(target.offset, target.length),

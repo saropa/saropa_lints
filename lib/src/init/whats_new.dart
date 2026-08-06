@@ -124,7 +124,7 @@ List<_Cat> _parseCategories(String sectionText) {
         categories.add(_Cat(currentName, items));
       }
       final group1 = catMatch.group(1);
-      currentName = group1 != null ? group1.trim() : null;
+      currentName = group1?.trim();
       items = [];
       continue;
     }

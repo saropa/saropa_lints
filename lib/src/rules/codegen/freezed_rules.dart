@@ -140,7 +140,7 @@ class AvoidFreezedInvalidAnnotationTargetRule extends SaropaLintRule {
   ) {
     context.addAnnotation((Annotation node) {
       if (node.name.name != 'freezed') return;
-      final AstNode? parent = node.parent;
+      final AstNode parent = node.parent;
       if (parent is ClassDeclaration) return;
       reporter.atNode(node);
     });
@@ -709,8 +709,7 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
       // Check factory constructors for types needing converters
       for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration && member.factoryKeyword != null) {
-          final FormalParameterList? params = member.parameters;
-          if (params == null) continue;
+          final FormalParameterList params = member.parameters;
 
           for (final FormalParameter param in params.parameters) {
             String? typeSource;

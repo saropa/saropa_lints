@@ -66,10 +66,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix undefined `ruleContext` reference in `SaropaLintRule.registerNodeProcessors` — the diagnostic reporter was receiving an unresolved identifier instead of the method's `RuleContext` parameter, which could cause ignore-comment and dedup checks to fail at runtime. No action required.
+
 <details>
 <summary>Maintenance</summary>
 
-- Resolve `unnecessary_string_interpolations` and `unnecessary_string_escapes` lint issues across lib/ to future-proof against pana baseline upgrades to `package:lints/recommended.yaml`. No action required.
+- Resolve `unnecessary_string_interpolations`, `unnecessary_string_escapes`, and `prefer_adjacent_string_concatenation` lint issues across lib/ to future-proof against pana baseline upgrades to `package:lints/recommended.yaml`. No action required.
+- Resolve 209 dart analyzer lint issues across lib/ and test/: nullable final variables, string interpolation style, dangling library doc comments, unnecessary `this`/`late`, missing `@override`, `prefer_contains`, `use_super_parameters`, `prefer_collection_literals`, and parameter naming alignment with base class signatures.
 
 </details>
 

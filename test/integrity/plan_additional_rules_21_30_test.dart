@@ -22,6 +22,8 @@
 /// Analyzer-backed tests for `plan_additional_rules_21_30_test` (plan additional rules 21 30).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
+
 
 import 'dart:io';
 

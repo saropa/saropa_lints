@@ -3,6 +3,7 @@
 /// Focuses on the ambiguous cases the dashboard relies on being correct:
 /// comment markers inside string literals, nested/multiline block comments,
 /// and trailing-newline line counting.
+library;
 import 'package:saropa_lints/src/cli/project_health/line_metrics.dart';
 import 'package:test/test.dart';
 

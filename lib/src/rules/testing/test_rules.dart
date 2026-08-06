@@ -2014,8 +2014,7 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
       if (argCount < _maxConstructorArgs) return;
 
       // Get type name safely - name may be null for complex types
-      final Token? typeToken = node.constructorName.type.name;
-      if (typeToken == null) return;
+      final Token typeToken = node.constructorName.type.name;
 
       // Skip mock objects
       final String typeName = typeToken.lexeme;

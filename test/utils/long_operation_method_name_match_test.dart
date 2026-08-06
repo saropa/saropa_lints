@@ -4,6 +4,7 @@
 /// Analyzer-backed tests for `long_operation_method_name_match_test` (long operation method name match).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
 import 'package:saropa_lints/src/long_operation_method_name_match.dart';
 import 'package:test/test.dart';
 

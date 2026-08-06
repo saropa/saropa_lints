@@ -1,5 +1,6 @@
 /// Tests baseline comparison: regressions (worse) vs improvements (better),
 /// and JSON round-trip.
+library;
 import 'dart:convert';
 
 import 'package:saropa_lints/src/cli/project_health/health_baseline.dart';

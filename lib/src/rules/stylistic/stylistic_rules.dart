@@ -331,8 +331,8 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
 
     // Check method declarations
     context.addMethodDeclaration((MethodDeclaration node) {
-      final FunctionBody? body = node.body;
-      if (body != null && _shouldBeArrowFunction(body)) {
+      final FunctionBody body = node.body;
+      if (_shouldBeArrowFunction(body)) {
         reporter.atToken(node.name, code);
       }
     });
@@ -436,8 +436,7 @@ class PreferExpressionBodyGettersRule extends SaropaLintRule {
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.isGetter) return;
-      final FunctionBody? body = node.body;
-      if (body == null) return;
+      final FunctionBody body = node.body;
       if (body is ExpressionFunctionBody) return;
       if (body is! BlockFunctionBody) return;
       final Block block = body.block;
@@ -912,8 +911,7 @@ class PreferBlockBodySettersRule extends SaropaLintRule {
   ) {
     context.addMethodDeclaration((MethodDeclaration node) {
       if (!node.isSetter) return;
-      final FunctionBody? body = node.body;
-      if (body == null) return;
+      final FunctionBody body = node.body;
       if (body is! ExpressionFunctionBody) return;
       reporter.atNode(node);
     });
@@ -1154,8 +1152,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
       if (_lastArgIsBlockFormatted(node.arguments)) return;
 
       final Token rightParen = node.rightParenthesis;
-      final Token? lastToken = node.arguments.last.endToken;
-      if (lastToken == null) return;
+      final Token lastToken = node.arguments.last.endToken;
 
       // Check if there's a comma before the closing paren
       final Token? tokenAfterLast = lastToken.next;
@@ -1171,8 +1168,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
       if (node.elements.last is FunctionExpression) return;
 
       final Token rightBracket = node.rightBracket;
-      final Token? lastToken = node.elements.last.endToken;
-      if (lastToken == null) return;
+      final Token lastToken = node.elements.last.endToken;
 
       final Token? tokenAfterLast = lastToken.next;
       if (tokenAfterLast?.type != TokenType.COMMA) {
@@ -1187,8 +1183,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
       if (node.elements.last is FunctionExpression) return;
 
       final Token rightBracket = node.rightBracket;
-      final Token? lastToken = node.elements.last.endToken;
-      if (lastToken == null) return;
+      final Token lastToken = node.elements.last.endToken;
 
       final Token? tokenAfterLast = lastToken.next;
       if (tokenAfterLast?.type != TokenType.COMMA) {
@@ -1203,8 +1198,7 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
 
       final Token rightParen = node.rightParenthesis;
       final FormalParameter lastParam = node.parameters.last;
-      final Token? lastToken = lastParam.endToken;
-      if (lastToken == null) return;
+      final Token lastToken = lastParam.endToken;
 
       final Token? tokenAfterLast = lastToken.next;
       if (tokenAfterLast?.type != TokenType.COMMA) {
@@ -2266,9 +2260,9 @@ class PreferFixmeFormatRule extends SaropaLintRule {
 /// - [PreferSentenceCaseCommentsRelaxedRule]: skips ≤4 words, enforces on 5+
 abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
   _SentenceCaseCommentsBase({
-    required LintCode code,
+    required super.code,
     required this.maxShortCommentWords,
-  }) : super(code: code);
+  });
 
   /// Comments with this many words or fewer are skipped.
   final int maxShortCommentWords;
@@ -4527,8 +4521,7 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
   void _scanUnit(SaropaDiagnosticReporter reporter, CompilationUnit unit) {
     // lineInfo is guarded nullable to match the rest of this file; adjacency
     // detection is impossible without it, so bail rather than misgroup lines.
-    final LineInfo? lineInfo = unit.lineInfo;
-    if (lineInfo == null) return;
+    final LineInfo lineInfo = unit.lineInfo;
 
     Token? token = unit.beginToken;
     while (token != null && !token.isEof) {
@@ -5166,9 +5159,8 @@ class DuplicateIgnoreRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addCompilationUnit((CompilationUnit unit) {
-      final LineInfo? lineInfo = unit.lineInfo;
+      final LineInfo lineInfo = unit.lineInfo;
       final String content = context.fileContent;
-      if (lineInfo == null) return;
 
       final List<String> lines = content.split('\n');
       for (int i = 0; i < lines.length; i++) {
@@ -5383,8 +5375,7 @@ class DocumentIgnoresRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addCompilationUnit((CompilationUnit unit) {
-      final LineInfo? lineInfo = unit.lineInfo;
-      if (lineInfo == null) return;
+      final LineInfo lineInfo = unit.lineInfo;
       final List<String> lines = context.fileContent.split('\n');
       for (int i = 0; i < lines.length; i++) {
         final String line = lines[i];

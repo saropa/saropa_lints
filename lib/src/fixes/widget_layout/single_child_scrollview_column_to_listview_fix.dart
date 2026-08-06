@@ -58,7 +58,7 @@ class SingleChildScrollViewColumnToListViewFix extends SaropaFixProducer {
       if (arg is! NamedExpression) continue;
       final n = arg.name.label.name;
       if (n == 'child' || n == 'children') continue;
-      otherArgs.add('${n}: ${arg.expression.toSource()}');
+      otherArgs.add('$n: ${arg.expression.toSource()}');
     }
     final prefix = otherArgs.isEmpty ? '' : '${otherArgs.join(', ')}, ';
     final replacement =

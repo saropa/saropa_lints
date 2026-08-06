@@ -1325,7 +1325,7 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
       if (node.name?.lexeme != 'fromJson') return;
 
       // Check for manual key mapping pattern
-      final FunctionBody? body = node.body;
+      final FunctionBody body = node.body;
       if (body is! ExpressionFunctionBody) return;
 
       final Expression expr = body.expression;

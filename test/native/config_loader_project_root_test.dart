@@ -21,6 +21,8 @@
 /// Analyzer-backed tests for `config_loader_project_root_test` (config loader project root).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
+
 
 import 'dart:io';
 

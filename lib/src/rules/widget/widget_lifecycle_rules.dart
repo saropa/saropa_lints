@@ -4777,10 +4777,8 @@ class AvoidGlobalKeysInStateRule extends SaropaLintRule {
             final FormalParameter effectiveParam =
                 param is DefaultFormalParameter ? param.parameter : param;
             if (effectiveParam is FieldFormalParameter) {
-              final Token? name = effectiveParam.name;
-              if (name != null) {
-                constructorFieldParams.add(name.lexeme);
-              }
+              final Token name = effectiveParam.name;
+              constructorFieldParams.add(name.lexeme);
             }
           }
         }

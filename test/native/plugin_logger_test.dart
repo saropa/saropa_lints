@@ -17,6 +17,8 @@
 /// Analyzer-backed tests for `plugin_logger_test` (plugin logger).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
+
 
 import 'dart:io';
 

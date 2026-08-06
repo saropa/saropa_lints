@@ -449,12 +449,10 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
       final Set<String> initStateAssigned = <String>{};
       for (final ClassMember member in node.bodyMembers) {
         if (member is MethodDeclaration && member.name.lexeme == 'initState') {
-          final FunctionBody? initStateBody = member.body;
-          if (initStateBody != null) {
-            final _AssignmentTargetCollector collector =
-                _AssignmentTargetCollector(initStateAssigned);
-            initStateBody.visitChildren(collector);
-          }
+          final FunctionBody initStateBody = member.body;
+          final _AssignmentTargetCollector collector =
+              _AssignmentTargetCollector(initStateAssigned);
+          initStateBody.visitChildren(collector);
         }
       }
       lateFields.removeAll(initStateAssigned);
@@ -475,8 +473,7 @@ class RequireLateInitializationInInitStateRule extends SaropaLintRule {
     Set<String> lateFields,
     SaropaDiagnosticReporter reporter,
   ) {
-    final FunctionBody? body = buildMethod.body;
-    if (body == null) return;
+    final FunctionBody body = buildMethod.body;
 
     // Walk the AST for direct (non-closure) assignments to late fields.
     // Assignments inside nested FunctionExpression closures — onPressed,

@@ -876,9 +876,8 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
         if (member is MethodDeclaration) {
           final String methodName = member.name.lexeme;
           if (methodName == 'dispose' || methodName == 'close') {
-            final String? bodySource = member.body.toSource();
-            if (bodySource != null &&
-                _closeCallInBodyPattern.hasMatch(bodySource)) {
+            final String bodySource = member.body.toSource();
+            if (_closeCallInBodyPattern.hasMatch(bodySource)) {
               hasClose = true;
               break;
             }

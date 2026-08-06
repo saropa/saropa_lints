@@ -4,6 +4,7 @@
 /// Analyzer-backed tests for `diagnostic_dedup_tracker_test` (diagnostic dedup tracker).
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
+library;
 import 'package:saropa_lints/src/saropa_lint_rule.dart'
     show DiagnosticDedupTracker;
 import 'package:test/test.dart';

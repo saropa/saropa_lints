@@ -1737,10 +1737,10 @@ class ImpactTracker {
   // and the user-facing summary text. The prior 5-bucket taxonomy
   // (critical/high/medium/low/opinionated) collapsed into these on
   // 2026-05-03; see plan/COLLAPSE_LINT_IMPACT_TO_SEVERITY.md.
-  static final Map<LintImpact, LinkedHashSet<ViolationRecord>> _violations = {
-    LintImpact.error: LinkedHashSet<ViolationRecord>(),
-    LintImpact.warning: LinkedHashSet<ViolationRecord>(),
-    LintImpact.info: LinkedHashSet<ViolationRecord>(),
+  static final Map<LintImpact, Set<ViolationRecord>> _violations = {
+    LintImpact.error: <ViolationRecord>{},
+    LintImpact.warning: <ViolationRecord>{},
+    LintImpact.info: <ViolationRecord>{},
   };
 
   /// Record a violation. Duplicates (same file + line + rule) are ignored.
@@ -2839,7 +2839,7 @@ abstract class SaropaLintRule extends AnalysisRule {
   // ============================================================
 
   // Track if we've initialized the project root for disk persistence
-  static bool _isProjectRootInitialized = false;
+  static final bool _isProjectRootInitialized = false;
 
   // Track recent analysis for throttling: "path:contentHash" -> timestamp
   // Prevents duplicate analysis of identical content within short windows
@@ -3004,17 +3004,17 @@ abstract class SaropaLintRule extends AnalysisRule {
   @override
   void registerNodeProcessors(
     RuleVisitorRegistry registry,
-    RuleContext ruleContext,
+    RuleContext context,
   ) {
     if (isDisabled) return;
 
-    final saropaContext = SaropaContext(registry, this, ruleContext);
+    final saropaContext = SaropaContext(registry, this, context);
     final reporter = SaropaDiagnosticReporter(
       this,
       code.lowerCaseName,
       impact: impact,
       lintCode: _lintCode,
-      ruleContext: ruleContext,
+      ruleContext: context,
     );
     runWithReporter(reporter, saropaContext);
   }

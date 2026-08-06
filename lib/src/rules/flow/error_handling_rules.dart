@@ -1373,7 +1373,7 @@ class _UiErrorDisplayVisitor extends RecursiveAstVisitor<void> {
     AstNode? current = node.parent;
     while (current != null) {
       if (current is InstanceCreationExpression) {
-        final String? name =
+        final String name =
             current.constructorName.type.element?.name ??
             current.constructorName.type.name.lexeme;
         if (uiWidgets.contains(name)) return true;
