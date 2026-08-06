@@ -708,8 +708,7 @@ class RequireWebSocketCloseRule extends SaropaLintRule {
       if (init != null && _readsWidget(init)) return true;
       // Assigned from `widget.*` elsewhere in the class (e.g. in initState).
       final RegExp assignedFromWidget = RegExp(
-        '${RegExp.escape(v.name.lexeme)}'
-        r'\s*=\s*widget\.',
+        RegExp.escape(v.name.lexeme) + r'\s*=\s*widget\.',
       );
       if (assignedFromWidget.hasMatch(classSource)) return true;
     }

@@ -196,9 +196,7 @@ void migrateToMinimalFormat(
   final stylisticCount = enabledStylistic.length;
   final overrideCount = existingOverrides.length;
   report(
-    '${InitColors.green}✓ Migrated to minimal config${InitColors.reset}'
-    '${stylisticCount > 0 ? ' ($stylisticCount stylistic → overrides)' : ''}'
-    '${overrideCount > 0 ? ' ($overrideCount existing overrides kept)' : ''}',
+    '${InitColors.green}✓ Migrated to minimal config${InitColors.reset}${stylisticCount > 0 ? ' ($stylisticCount stylistic → overrides)' : ''}${overrideCount > 0 ? ' ($overrideCount existing overrides kept)' : ''}',
   );
 }
 

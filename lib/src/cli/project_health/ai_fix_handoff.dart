@@ -32,8 +32,8 @@ String buildFixPrompts(
   for (var i = 0; i < shown.length; i++) {
     buffer
       ..writeln(
-        '## Task ${i + 1} — ${shown[i].file.path} '
-        '${fireEmoji(shown[i].fire)}',
+        '## Task ${i + 1} — ${shown[i].file.path} ' +
+            fireEmoji(shown[i].fire),
       )
       ..writeln()
       ..writeln('```')

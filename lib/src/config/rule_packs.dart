@@ -419,12 +419,9 @@ bool isRulePackSuggestedByPubspec(String packId, String pubspecYamlContent) {
   final markers = kRulePackPubspecMarkers[packId];
   if (markers == null) return false;
   for (final name in markers) {
-    // Fix: avoid_missing_interpolation — interpolate the raw-string segments
-    // into one literal instead of + concatenation for clarity and consistency.
     final re = RegExp(
       r'^\s+'
-      '${RegExp.escape(name)}'
-      r'\s*:',
+      '${RegExp.escape(name)}\\s*:',
       multiLine: true,
     );
     if (re.hasMatch(pubspecYamlContent)) return true;

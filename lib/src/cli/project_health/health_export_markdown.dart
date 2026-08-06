@@ -46,7 +46,7 @@ String buildHealthMarkdown(
     buffer
       ..writeln('### ${fireEmoji(spot.fire)} ${spot.file.path}')
       ..writeln()
-      ..writeln('${_metricsLine(spot)}')
+      ..writeln(_metricsLine(spot))
       ..writeln();
     for (final action in _actions(spot)) {
       buffer.writeln('- [ ] $action');

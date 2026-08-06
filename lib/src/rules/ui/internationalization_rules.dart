@@ -523,7 +523,7 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_locale',
-    "[avoid_hardcoded_locale] Hardcoded locale ignores user's device settings. Apps should respect the user\'s device locale settings. {v6}",
+    "[avoid_hardcoded_locale] Hardcoded locale ignores user's device settings. Apps should respect the user's device locale settings. {v6}",
     correctionMessage:
         'Use Localizations.localeOf(context).toString() to get device locale. Verify the change works correctly with existing tests and add coverage for the new behavior.',
     severity: DiagnosticSeverity.INFO,

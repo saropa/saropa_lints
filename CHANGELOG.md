@@ -64,6 +64,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+<details>
+<summary>Maintenance</summary>
+
+- Resolve `unnecessary_string_interpolations` and `unnecessary_string_escapes` lint issues across lib/ to future-proof against pana baseline upgrades to `package:lints/recommended.yaml`. No action required.
+
+</details>
+
+---
+
 ## [14.4.2]
 
 Static analysis fixes. [log](https://github.com/saropa/saropa_lints/blob/v14.4.2/CHANGELOG.md)

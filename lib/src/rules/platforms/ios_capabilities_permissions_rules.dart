@@ -124,8 +124,8 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
   static LintCode _codeWithMissingKeys(List<String> missingKeys) {
     return LintCode(
       'require_ios_permission_description',
-      '[require_ios_permission_description] Permission-requiring API used. Missing Info.plist key(s): '
-          '${missingKeys.join(", ")}',
+      '[require_ios_permission_description] Permission-requiring API used. '
+          'Missing Info.plist key(s): ${missingKeys.join(", ")}',
       correctionMessage:
           'Add ${missingKeys.join(" and ")} to ios/Runner/Info.plist.',
       // SEV-01 (upgraded to ERROR): mirrors the static _code severity; this is

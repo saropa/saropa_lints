@@ -76,8 +76,8 @@ class LogWriter {
     final padded = label.padRight(4);
     final spaces = ' ' * indent;
     terminal(
-      '$spaces${InitColors.bold}$colorCode$padded:${InitColors.reset} '
-      '${lines[0]}',
+      '$spaces${InitColors.bold}$colorCode$padded:${InitColors.reset} ' +
+      lines[0],
     );
     if (lines.length > 1) {
       final contIndent = ' ' * (indent + padded.length + 2);
@@ -93,9 +93,9 @@ class LogWriter {
   /// the report, after any analysis output.
   void appendSummary(RunSummary s) {
     buffer.writeln('');
-    buffer.writeln('${'=' * 80}');
+    buffer.writeln('=' * 80);
     buffer.writeln('SUMMARY');
-    buffer.writeln('${'=' * 80}');
+    buffer.writeln('=' * 80);
     buffer.writeln('Version:  ${s.version}');
     buffer.writeln('Tier:     ${s.tier}');
     buffer.writeln('Enabled:  ${s.enabled} rules');
@@ -111,7 +111,7 @@ class LogWriter {
     } else {
       buffer.writeln('Warnings: none');
     }
-    buffer.writeln('${'=' * 80}');
+    buffer.writeln('=' * 80);
   }
 
   /// Write [buffer] to a timestamped report file.

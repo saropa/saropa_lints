@@ -43,9 +43,9 @@ void appendDetailedReport({
   final allRules = [...enabledRules, ...disabledRules]..sort();
 
   log.buffer.writeln('');
-  log.buffer.writeln('${'=' * 80}');
+  log.buffer.writeln('=' * 80);
   log.buffer.writeln('DETAILED RULE REPORT (${allRules.length} rules)');
-  log.buffer.writeln('${'=' * 80}');
+  log.buffer.writeln('=' * 80);
   log.buffer.writeln('');
 
   for (final rule in allRules) {
@@ -64,7 +64,7 @@ void appendDetailedReport({
 
   log.buffer.writeln('');
   log.buffer.writeln('Legend: + enabled, - disabled');
-  log.buffer.writeln('${'=' * 80}');
+  log.buffer.writeln('=' * 80);
 }
 
 /// Display "what's new" from CHANGELOG.md (non-blocking, fail-safe).

@@ -42,7 +42,7 @@ class AvoidGetterPrefixRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'prefer_no_getter_prefix',
-    "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it. Formerly: avoid_getter_prefix. A getter name starts with \'get\'. {v2}",
+    "[prefer_no_getter_prefix] Getter with 'get' prefix is redundant. Dart convention omits it. Formerly: avoid_getter_prefix. A getter name starts with 'get'. {v2}",
     correctionMessage:
         "Remove the 'get' prefix from the getter name. For example, rename getName to name, or getValue to value.",
     severity: DiagnosticSeverity.INFO,

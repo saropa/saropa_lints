@@ -250,15 +250,13 @@ void logRemovedStylisticRules(String content) {
 
   if (stdin.hasTerminal) {
     stdout.write(
-      '${InitColors.cyan}Move to STYLISTIC RULES section? [y/N]: '
-      '${InitColors.reset}',
+      '${InitColors.cyan}Move to STYLISTIC RULES section? [y/N]: ${InitColors.reset}',
     );
     final response = stdin.readLineSync()?.toLowerCase().trim() ?? '';
     shouldMove = response == 'y' || response == 'yes';
   } else {
     log.terminal(
-      '${InitColors.dim}  Non-interactive: keeping in RULE OVERRIDES'
-      '${InitColors.reset}',
+      '${InitColors.dim}  Non-interactive: keeping in RULE OVERRIDES${InitColors.reset}',
     );
   }
 

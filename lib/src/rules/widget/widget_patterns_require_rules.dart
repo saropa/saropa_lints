@@ -1357,7 +1357,7 @@ class RequireFormValidationRule extends SaropaLintRule {
     'require_form_validation',
     '[require_form_validation] TextFormField inside a Form without a validator function bypasses the form validation pipeline entirely. Calling formKey.currentState.validate() will always return true for this field, allowing invalid or empty input to reach the backend, causing data integrity issues and poor user feedback. {v3}',
     correctionMessage:
-        'Add a validator parameter (e.g. validator: (value) => value?.isEmpty ?? true ? \"Required field\" : null) to participate in Form.validate() calls.',
+        'Add a validator parameter (e.g. validator: (value) => value?.isEmpty ?? true ? "Required field" : null) to participate in Form.validate() calls.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -2139,9 +2139,9 @@ class RequireRethrowPreserveStackRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_rethrow_preserve_stack',
-    '[require_rethrow_preserve_stack] Using \"throw e\" in a catch block creates a new stack trace starting from the throw site, discarding the original stack trace that shows where the error actually occurred. This makes debugging significantly harder because the error origin is lost. The rethrow keyword preserves the original stack trace. {v2}',
+    '[require_rethrow_preserve_stack] Using "throw e" in a catch block creates a new stack trace starting from the throw site, discarding the original stack trace that shows where the error actually occurred. This makes debugging significantly harder because the error origin is lost. The rethrow keyword preserves the original stack trace. {v2}',
     correctionMessage:
-        'Replace \"throw e\" with \"rethrow\" to preserve the original stack trace. If you need to wrap the error, throw a new exception with the original as the cause.',
+        'Replace "throw e" with "rethrow" to preserve the original stack trace. If you need to wrap the error, throw a new exception with the original as the cause.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -2767,7 +2767,7 @@ class RequireLocaleForTextRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_locale_for_text',
-    '[require_locale_for_text] Text formatting methods (toUpperCase, toLowerCase, number formatting) without an explicit locale use the device default, producing different results across regions. For example, Turkish locale uppercases \"i\" to \"I\" (with a dot), breaking string comparisons and identifiers unexpectedly. {v2}',
+    '[require_locale_for_text] Text formatting methods (toUpperCase, toLowerCase, number formatting) without an explicit locale use the device default, producing different results across regions. For example, Turkish locale uppercases "i" to "I" (with a dot), breaking string comparisons and identifiers unexpectedly. {v2}',
     correctionMessage:
         'Pass an explicit locale parameter to text formatting calls, or use toUpperCase() only on ASCII-known strings. Use intl package for locale-aware number and date formatting.',
     severity: DiagnosticSeverity.INFO,

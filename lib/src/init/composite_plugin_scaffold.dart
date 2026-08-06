@@ -70,7 +70,7 @@ final plugin = SaropaCompositePlugin();
 
 class SaropaCompositePlugin extends Plugin {
   @override
-  String get name => '$pluginKey';
+  String get name => pluginKey;
 
   @override
   FutureOr<void> start() {

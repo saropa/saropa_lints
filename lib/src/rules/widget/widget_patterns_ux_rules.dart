@@ -749,7 +749,7 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
     'prefer_action_button_tooltip',
     '[prefer_action_button_tooltip] IconButton without a tooltip is inaccessible to screen reader users who cannot see the icon and have no text description of the button action. Tooltips also appear on long-press (mobile) and hover (desktop), providing discoverability for all users, not just those using assistive technology. {v2}',
     correctionMessage:
-        'Add tooltip: \"Description of action\" to the IconButton so screen readers can announce the button purpose and hover/long-press shows a label.',
+        'Add tooltip: "Description of action" to the IconButton so screen readers can announce the button purpose and hover/long-press shows a label.',
     severity: DiagnosticSeverity.INFO,
   );
 

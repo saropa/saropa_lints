@@ -510,8 +510,7 @@ class ScanRunner {
     final name = p.basename(filePath);
     _progress(
       '\r  Files: $index/$total | ${elapsed.toStringAsFixed(1)}s'
-      ' | $rate/s | Issues: $issues | $name'
-      '${' ' * 20}',
+      ' | $rate/s | Issues: $issues | $name${' ' * 20}',
     );
   }
 

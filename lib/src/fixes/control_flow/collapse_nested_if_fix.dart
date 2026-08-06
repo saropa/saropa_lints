@@ -66,8 +66,7 @@ class CollapseNestedIfFix extends SaropaFixProducer {
     );
 
     final String replacement =
-        'if (($outerSource) && ($innerSource)) '
-        '$bodySource';
+        'if (($outerSource) && ($innerSource)) $bodySource';
 
     await builder.addDartFileEdit(file, (b) {
       b.addSimpleReplacement(

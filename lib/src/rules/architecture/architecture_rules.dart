@@ -845,8 +845,8 @@ class AvoidCircularImportsRule extends SaropaLintRule {
             node,
             LintCode(
               'avoid_circular_imports',
-              '[avoid_circular_imports] Circular import detected: '
-                  '${_formatCycle(cycle)}',
+              '[avoid_circular_imports] Circular import detected: ' +
+                  _formatCycle(cycle),
               correctionMessage:
                   'Extract shared types to break the cycle, or use dependency '
                   'injection.',

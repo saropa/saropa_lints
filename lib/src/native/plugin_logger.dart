@@ -342,8 +342,8 @@ final class PluginLogger {
       );
 
       final sessionPattern = RegExp(
-        r'(\d{4}-\d{2}-\d{2}T[\d:.]+Z) \| '
-        '${RegExp.escape(_sessionHeader)}',
+        r'(\d{4}-\d{2}-\d{2}T[\d:.]+Z) \| ' +
+            RegExp.escape(_sessionHeader),
       );
 
       var recentCount = 0;

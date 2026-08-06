@@ -96,9 +96,7 @@ class IgnoreUtils {
     // (e.g., `avoid_print` must not match `avoid_print_in_production`).
     final pattern = RegExp(
       r'//\s*ignore_for_file\s*:[^\n]*\b(?:'
-      '${RegExp.escape(ruleName)}'
-      '|'
-      '${RegExp.escape(hyphenatedName)}'
+      '${RegExp.escape(ruleName)}|${RegExp.escape(hyphenatedName)}'
       r')\b',
     );
     return pattern.hasMatch(fileContent);
@@ -119,9 +117,7 @@ class IgnoreUtils {
   ) {
     final RegExp pattern = RegExp(
       r'\b(?:'
-      '${RegExp.escape(ruleName)}'
-      '|'
-      '${RegExp.escape(hyphenatedName)}'
+      '${RegExp.escape(ruleName)}|${RegExp.escape(hyphenatedName)}'
       r')\b',
     );
     return pattern.hasMatch(text);

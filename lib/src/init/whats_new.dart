@@ -73,11 +73,9 @@ List<String> formatWhatsNew({
   String version,
 ) {
   var isUnreleased = false;
-  // Fix: avoid_missing_interpolation — interpolate the escaped version into
-  // the pattern literal rather than concatenating raw-string halves.
   var match = RegExp(
-    r'^## \['
-    '${RegExp.escape(version)}'
+    r'^## \[' +
+    RegExp.escape(version) +
     r'\]',
     multiLine: true,
   ).firstMatch(content);
