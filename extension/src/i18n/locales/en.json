@@ -54,7 +54,6 @@
       "noFeatures": "A changelog was found, but no features could be extracted from it.",
       "linkPubDev": "pub.dev",
       "linkDocs": "Documentation",
-      "linkHomepage": "Homepage",
       "linkRepository": "Repository"
     },
     "category": {

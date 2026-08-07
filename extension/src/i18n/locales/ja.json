@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "最初にパッケージスキャンを実行してください — オッポチュニティーレポートはスキャン結果から構築されます。",
+      "noWorkspace": "最初にプロジェクトフォルダを開いてください — オピニオンズレポートはそのpubspecの横に書かれています。",
+      "progress": "フルな機会レポートの作成中…",
+      "noFolder": "レポートフォルダが作成できなかったため、レポートを書くことができませんでした。",
+      "failed": "レポートの作成に失敗しました: {error}",
+      "large": "レポートは{megabytes}MBであり、閲覧が遅くなる可能性があります。その隣接するJSONファイルはツール用に同じデータを保持しています。",
+      "done": "機会レポートが{path}に書かれました"
+    },
+    "sidebar": {
+      "label": "フル・オポチュニティーズ・レポート",
+      "description": "すべてのパッケージと機能、使用回数"
+    },
+    "documentTitle": "パッケージ機能在庫",
+    "heroTitle": "パッケージ機能在庫",
+    "meta": "生成済み {timestamp} · 拡張機能 v{version} · {packages} パッケージ",
+    "caveats": {
+      "title": "測定限界",
+      "intro": "以下の数値から結論を導く前に読みましょう。",
+      "none": "この実行では制限が記録されていません。"
+    },
+    "controls": {
+      "filterLabel": "フィルタ機能",
+      "filterPlaceholder": "フィルタリング: 特徴テキスト、シンボル、またはバージョン…",
+      "unusedOnly": "未使用のみ",
+      "usedOnly": "使用のみ",
+      "deprecatedOnly": "非推奨のみ",
+      "expandAll": "Expand all を拡張する",
+      "collapseAll": "すべてが崩壊する.",
+      "indexLabel": "パッケージインデックス"
+    },
+    "summary": {
+      "title": "パッケージサマリー",
+      "sortHint": "この列で並べ替えるを選択",
+      "colPackage": "パッケージパッケージは,",
+      "colVersion": "版はバージョンのバージョン",
+      "colFeatures": "機能",
+      "colAdopted": "採用済み",
+      "colUnadopted": "未採用",
+      "colUsages": "使用方法",
+      "colScore": "スコアを記録する."
+    },
+    "packages": {
+      "title": "パッケージパッケージは,"
+    },
+    "empty": {
+      "body": "スキャンされたパッケージがありませんので、表示する機能はありません。"
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} の {total} 機能が採用されました",
+      "noChangelog": "このパッケージのチェンジログが見つからなかったため、機能の一覧を表示できません。これはチェンジログから導出された機能ソースの制限であり、パッケージに機能がないことを示すものではありません。",
+      "noFeatures": "変更履歴は見つかったが、その中から機能は抽出できなかった。",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "文書化 ドキュメント",
+      "linkRepository": "データベースのリポジトリ"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "追加されました",
+      "changed": "変更されました",
+      "deprecated": "非推奨",
+      "removed": "削除されました",
+      "security": "セキュリティ",
+      "fixed": "修正済み",
+      "other": "その他"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "API名が ではありません",
+      "usages": "{count}の使用状況",
+      "usagesOne": "{count}の使用",
+      "usagesUnknown": "使用状況は測定可能ではありません",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "コードを表示する",
+      "viewDocs": "ドキュメントを表示する",
+      "noUsages": "プロジェクトソース内で使用されていません。",
+      "moreUsages": "{count} さらに多くの使用例",
+      "moreUsagesOne": "{count} より多くの使用法"
+    },
+    "chip": {
+      "adopted": "採用済み",
+      "partial": "一部採用",
+      "unused": "未使用",
+      "unmeasurable": "測定可能ではない"
+    }
+  },
   "stylistic": {
     "title": "スタイルと意見",
     "intro": "意見のスタイルルール,デフォルトでオフ. チームが同意したものをのみ起動します. 矛盾する選択はグループ化され,あなたが1つを選ぶようにします.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "{from} から {to}  ⁇  に変わったのは何ですか. 更新前にレビューする.",
-      "versionDated": "{version}  ⁇  _PH0_  ⁇  は,その人の身体を {date} _ ヒトの\"つの細胞を構成する",
+      "versionDated": "{version} — {date}",
       "truncated": "{count} の最新リリースが表示されています.",
       "viewFull": "完全な変更ログを pub.dev で参照してください."
     },

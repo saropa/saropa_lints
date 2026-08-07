@@ -52,11 +52,11 @@ function renderPackageBody(record: PackageFeatureRecord): string {
         .join('\n');
 }
 
+/** Matches the HTML renderer's link set; `homepage` is unrenderable there too. */
 function renderLinks(record: PackageFeatureRecord): string {
     const entries: ReadonlyArray<readonly [string | null, string]> = [
         [record.links.pubDev, 'featureInventory.package.linkPubDev'],
         [record.links.docs, 'featureInventory.package.linkDocs'],
-        [record.links.homepage, 'featureInventory.package.linkHomepage'],
         [record.links.repository, 'featureInventory.package.linkRepository'],
     ];
     const links = entries

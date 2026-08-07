@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Exécutez d'abord un scan de package — le rapport des opportunités est construit à partir des résultats du scan.",
+      "noWorkspace": "Ouvrez d'abord un dossier de projet — le rapport des opportunités est écrit à côté de son pubspec.",
+      "progress": "Construction du rapport complet des opportunités…",
+      "noFolder": "Aucun dossier de rapports ne pouvait être créé, donc le rapport n'a pas été écrit.",
+      "failed": "Le rapport des opportunités ne peut pas être écrit : {error}",
+      "large": "Le rapport est de {megabytes} Mo et peut être lent à parcourir. Le fichier JSON accompagnant celui-ci contient les mêmes données pour les outils.",
+      "done": "Rapport sur les opportunités rédigé pour {path}"
+    },
+    "sidebar": {
+      "label": "Rapport complet des opportunités",
+      "description": "Chaque package et fonctionnalité, avec les compteurs d'utilisation"
+    },
+    "documentTitle": "Inventaire des fonctionnalités du package",
+    "heroTitle": "Inventaire des fonctionnalités du package",
+    "meta": "Généré {timestamp} · extension v{version} · {packages} packages",
+    "caveats": {
+      "title": "Limites de mesure",
+      "intro": "Lisez ces informations avant de tirer une conclusion à partir de tout compte ci-dessous.",
+      "none": "Aucune limite n'a été enregistrée pour cette exécution."
+    },
+    "controls": {
+      "filterLabel": "Filtre de fonctionnalités",
+      "filterPlaceholder": "Filtre par texte de fonctionnalité, symbole ou version…",
+      "unusedOnly": "Inutilisé uniquement",
+      "usedOnly": "Utilisé uniquement",
+      "deprecatedOnly": "Déprécié uniquement",
+      "expandAll": "Expand all, qui est une extension de tous les autres.",
+      "collapseAll": "Tout s'effondre, tout s'écroule.",
+      "indexLabel": "Index des packages"
+    },
+    "summary": {
+      "title": "Aperçu du package",
+      "sortHint": "Trier par cette colonne",
+      "colPackage": "Le paquet de colis est un ensemble.",
+      "colVersion": "Version",
+      "colFeatures": "Fonctionnalités",
+      "colAdopted": "Adopté",
+      "colUnadopted": "Non adopté",
+      "colUsages": "Utilisations",
+      "colScore": "Score"
+    },
+    "packages": {
+      "title": "Les paquets sont des colis."
+    },
+    "empty": {
+      "body": "Aucun package n'a été analysé, donc il n'y a aucune fonctionnalité à lister."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} sur {total} fonctionnalités adoptées",
+      "noChangelog": "Aucun changelog n'a été trouvé pour ce package, donc ses fonctionnalités ne peuvent pas être listées. C'est une limite de la source des fonctionnalités dérivée du changelog, et non un signe que le package n'a pas de fonctionnalités.",
+      "noFeatures": "Un changelog a été trouvé, mais aucun fonctionnalité n'a pu être extraite.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Documentation",
+      "linkRepository": "Le référentiel de données."
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Ajouté",
+      "changed": "Modifié",
+      "deprecated": "Déprécié",
+      "removed": "Supprimé",
+      "security": "Sécurité",
+      "fixed": "Corrigé",
+      "other": "Autre"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Aucune API nommée",
+      "usages": "Utilisations {count}",
+      "usagesOne": "Utilisation {count}",
+      "usagesUnknown": "utilisation non mesurable",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Afficher le code d'affichage.",
+      "viewDocs": "Voir les documents.",
+      "noUsages": "Aucune utilisation trouvée dans la source du projet.",
+      "moreUsages": "{count} plus d'utilisations",
+      "moreUsagesOne": "{count} plus d'utilisation"
+    },
+    "chip": {
+      "adopted": "Adopté",
+      "partial": "Partiellement adopté",
+      "unused": "Jamais utilisé",
+      "unmeasurable": "Pas mesurable"
+    }
+  },
   "stylistic": {
     "title": "Style et opinions personnelles.",
     "intro": "Règles de style avisées, désactivé par défaut. N'allumez que ce à quoi votre équipe est d'accord. Les choix en conflit sont regroupés de sorte que vous choisissez un.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "Qu'est-ce qui a changé de {from} à {to}  ⁇ révision avant la mise à niveau.",
-      "versionDated": "{version}  ⁇  Il est le plus grand. {date} est une protéine.",
+      "versionDated": "{version} — {date}",
       "truncated": "Affichant les versions {count} les plus récentes.",
       "viewFull": "Voir l'intégralité du journal des changements sur pub.dev."
     },
@@ -1528,7 +1615,7 @@
       "published": "Publié par: {date}",
       "codeSize": "Taille du code La taille du code.",
       "archive": "Archive",
-      "sizeLabel": "{label}: Il s'agit de la réponse à une question. {size} est une protéine.",
+      "sizeLabel": "{label}: {size}",
       "source": "Source : code {code} · Commentaires {comments} · Fichiers {files}",
       "replace": "Remplacer par: {summary}"
     },

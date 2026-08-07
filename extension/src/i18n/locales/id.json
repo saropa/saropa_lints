@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Jalankan pemindaian paket terlebih dahulu — laporan peluang dibangun dari hasil pemindaian.",
+      "noWorkspace": "Buka dulu folder proyek — laporan peluang ditulis di samping pubspec-nya.",
+      "progress": "Membangun laporan kesempatan lengkap…",
+      "noFolder": "Tidak dapat dibuat folder laporan, sehingga laporan tidak ditulis.",
+      "failed": "Laporan peluang tidak dapat ditulis: {error}",
+      "large": "Laporan ini berukuran {megabytes} MB dan mungkin lambat untuk dibuka. File JSON yang berada di sampingnya menyimpan data yang sama untuk alat bantu.",
+      "done": "Laporan Kesempatan ditulis untuk {path}"
+    },
+    "sidebar": {
+      "label": "Laporan Kesempatan Penuh",
+      "description": "Setiap package dan fitur, dengan jumlah penggunaan"
+    },
+    "documentTitle": "Inventory Fitur Paket",
+    "heroTitle": "Inventory Fitur Paket",
+    "meta": "Terbentuk {timestamp} · ekstensi v{version} · {packages} paket",
+    "caveats": {
+      "title": "Batas pengukuran",
+      "intro": "Baca ini sebelum menarik kesimpulan dari jumlah apa pun di bawah ini.",
+      "none": "Tidak ada batasan yang dicatat untuk jalannya ini."
+    },
+    "controls": {
+      "filterLabel": "Filter fitur",
+      "filterPlaceholder": "Filter berdasarkan teks fitur, simbol, atau versi…",
+      "unusedOnly": "Hanya digunakan",
+      "usedOnly": "Hanya digunakan",
+      "deprecatedOnly": "Hanya diperlakukan sebagai deprecated",
+      "expandAll": "Expand all memperluas semua.",
+      "collapseAll": "Semua runtuh semua.",
+      "indexLabel": "Indeks paket"
+    },
+    "summary": {
+      "title": "Ringkasan paket",
+      "sortHint": "Pilih untuk mengurutkan berdasarkan kolom ini",
+      "colPackage": "Paket paket yang tersedia.",
+      "colVersion": "Versi versi versi versi",
+      "colFeatures": "Fitur",
+      "colAdopted": "Diterapkan",
+      "colUnadopted": "Tidak diadopsi",
+      "colUsages": "Penggunaan",
+      "colScore": "Skor skor skor yang diperoleh."
+    },
+    "packages": {
+      "title": "Paket paket yang tersedia."
+    },
+    "empty": {
+      "body": "Tidak ada paket yang di-scan, sehingga tidak ada fitur yang dapat dicantumkan."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} dari {total} fitur yang diadopsi",
+      "noChangelog": "Tidak ditemukan changelog untuk paket ini, sehingga fiturnya tidak dapat dicantumkan. Ini adalah batasan dari sumber fitur yang berasal dari changelog, bukan tanda bahwa paket tersebut tidak memiliki fitur.",
+      "noFeatures": "Sebuah changelog ditemukan, tetapi tidak ada fitur yang dapat diekstraksi darinya.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Dokumentasi Dokumen Dokumentasi",
+      "linkRepository": "Repository adalah repositori yang berisi informasi tentang"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Ditambahkan",
+      "changed": "Diubah",
+      "deprecated": "Ketinggalan Waktu",
+      "removed": "Dihapus",
+      "security": "Keamanan",
+      "fixed": "Diperbaiki",
+      "other": "Lainnya"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Tidak ada API bernama",
+      "usages": "{count} penggunaan",
+      "usagesOne": "Penggunaan {count}",
+      "usagesUnknown": "penggunaan tidak dapat diukur",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Lihat kode tampilan.",
+      "viewDocs": "Lihat dokumen.",
+      "noUsages": "Tidak ditemukan penggunaan dalam sumber proyek.",
+      "moreUsages": "{count} lebih banyak penggunaan",
+      "moreUsagesOne": "{count} lebih banyak penggunaan"
+    },
+    "chip": {
+      "adopted": "Diterapkan",
+      "partial": "Sebagian diterapkan",
+      "unused": "Tidak pernah digunakan",
+      "unmeasurable": "Tidak terukur"
+    }
+  },
   "stylistic": {
     "title": "Gaya & opini gaya dan pendapat",
     "intro": "Opiniated style rules, off secara default. Hanya mengaktifkan apa yang disetujui tim Anda. Pilihan yang bertentangan dikelompokkan sehingga Anda memilih satu.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "Apa yang berubah dari {from} menjadi {to}  ⁇ review sebelum upgrade.",
-      "versionDated": "{version}  ⁇   ⁇ {date} adalah",
+      "versionDated": "{version} — {date}",
       "truncated": "Menampilkan rilis terbaru {count}.",
       "viewFull": "Lihat changelog lengkap pada pub.dev"
     },

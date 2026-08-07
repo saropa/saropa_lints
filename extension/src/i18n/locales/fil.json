@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "I-run muna ang isang package scan — ang report ng oportunidad ay binubuo mula sa mga resulta ng scan.",
+      "noWorkspace": "I-unlock muna ang folder ng proyekto — ang report ng mga oportunidad ay isusulat sa tabi ng pubspec nito.",
+      "progress": "Paggawa ng buong report ng mga oportunidad...",
+      "noFolder": "Hindi makapagluwa ng folder ng mga ulat, kaya hindi nakasulat ang ulat.",
+      "failed": "Ang report ng mga oportunidad ay hindi maitala: {error}",
+      "large": "Ang report ay {megabytes} MB at maaaring maslow ang pagbasa nito. Ang JSON file na kasama nito ay naglalaman ng parehong data para sa tooling.",
+      "done": "Report ng mga oportunidad na isulat para sa {path}"
+    },
+    "sidebar": {
+      "label": "Buong Ulat sa Mga Pagkakataon",
+      "description": "Bawat package at feature, kasama ang bilang ng paggamit"
+    },
+    "documentTitle": "Inventory ng mga Feature ng Package",
+    "heroTitle": "Inventory ng mga Feature ng Package",
+    "meta": "Nag-generated {timestamp} · extension v{version} · {packages} packages",
+    "caveats": {
+      "title": "Limits sa Pagmamana",
+      "intro": "Basahin ito bago magawa ang isang konklusyon mula sa anumang bilang sa ibaba.",
+      "none": "Walang mga limita na narekord para sa panayam na ito."
+    },
+    "controls": {
+      "filterLabel": "Mga tampok ng filter",
+      "filterPlaceholder": "Filipino/Tagalog: Filter by feature text, symbol, or version…",
+      "unusedOnly": "Hindi ginagamit lamang",
+      "usedOnly": "Gamit lamang",
+      "deprecatedOnly": "Naglalaban lamang",
+      "expandAll": "Palawakin ang lahat ng mga ito.",
+      "collapseAll": "Bumagsak lahat ng mga ito.",
+      "indexLabel": "Index ng package"
+    },
+    "summary": {
+      "title": "Summary ng package",
+      "sortHint": "Piliin upang isara ngayon ayon sa kolum na ito",
+      "colPackage": "Package",
+      "colVersion": "Ang bersyon ng bersyon ay isang bersyon na may mga tampok.",
+      "colFeatures": "Mga Punong Kagawian",
+      "colAdopted": "Nakatanggap",
+      "colUnadopted": "Di na inilagay",
+      "colUsages": "Gamit",
+      "colScore": "Skor ng puntos na may marka."
+    },
+    "packages": {
+      "title": "Pakete ng mga pakete ay may isang bagay na dapat gawin upang makakuha ng mas mahusay na"
+    },
+    "empty": {
+      "body": "Walang mga package na in-scan, kaya walang mga feature na i-listahan."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} ng {total} mga tampok na inilapat",
+      "noChangelog": "Wala nang changelog na naitala para sa package na ito, kaya hindi maitatala ang mga kanyang mga tampok. Ito ay isang limitasyon ng source ng mga tampok na nanggaling sa changelog, hindi isang simbolo na walang mga tampok ang package.",
+      "noFeatures": "Nakita ang changelog, ngunit walang mga feature ang maitutulong mula dito.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Dokumento Pagpapadala ng dokumento",
+      "linkRepository": "Repository ng mga talaan."
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Nagdagdag",
+      "changed": "Nagbago",
+      "deprecated": "Nag-iisip",
+      "removed": "Nakaraan",
+      "security": "Seguridad",
+      "fixed": "Nakatakdang",
+      "other": "Iba pang"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Walang API na tinatawag",
+      "usages": "{count} gamit",
+      "usagesOne": "Paggamit ng {count}",
+      "usagesUnknown": "paggamit ay hindi maaaring i-measure",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Tingnan ang code ng view.",
+      "viewDocs": "Tingnan ang mga dokumento ng View docs.",
+      "noUsages": "Walang paggamit na nakita sa source code ng proyekto.",
+      "moreUsages": "{count} pangangalap pa",
+      "moreUsagesOne": "{count} pangangalap ng mas maraming paggamit"
+    },
+    "chip": {
+      "adopted": "Nakatanggap",
+      "partial": "Sama-samang inilapat",
+      "unused": "Hindi pa ginamit",
+      "unmeasurable": "Hindi maaaring sukatin"
+    }
+  },
   "stylistic": {
     "title": "Style & mga opinyon",
     "intro": "Opiniated style rules, off sa pamamagitan ng default. I-on lamang kung ano ang sumang-ayon sa iyong koponan. Ang mga salungatan sa pagpili ay pinagsama-sama upang pumili ka ng isa.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "Ano ang nagbago mula {from} hanggang {to} — suriin bago mag-upgrade.",
-      "versionDated": "{version}  ⁇  ang mga ito ay {date} Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili.",
+      "versionDated": "{version} — {date}",
       "truncated": "Ipinapakita ang pinakabagong mga release ng {count}.",
       "viewFull": "Tingnan ang buong changelog sa pub.dev."
     },

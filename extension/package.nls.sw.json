@@ -107,6 +107,7 @@
   "command.packageVibrancy.openOtherProject.title": "Scan Project nyingine...",
   "command.packageVibrancy.showReport.title": "Fungua Dashibodi ya Kifurushi cha Package Dashboard.",
   "command.packageVibrancy.showOpportunities.title": "Fungua Fursa za Upgrades za Ufuatiliaji.",
+  "command.packageVibrancy.exportOpportunitiesReport.title": "Unganisha Raporti ya Vipengele Vya Kutoa Kwa Binafsi",
   "command.packageVibrancy.focus.title": "Kifurushi Vibrancy: Open dashibodi (compact)",
   "command.packageVibrancy.clearCache.title": "Futa Cache ya wazi.",
   "command.packageVibrancy.exportReport.title": "Ripoti ya Usafirishaji wa nje.",

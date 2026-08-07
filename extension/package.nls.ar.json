@@ -107,6 +107,7 @@
   "command.packageVibrancy.openOtherProject.title": "مسح مشروع آخر...",
   "command.packageVibrancy.showReport.title": "افتح لوحة تحكم الحزمة.",
   "command.packageVibrancy.showOpportunities.title": "فتح فرص الترقية المفتوحة.",
+  "command.packageVibrancy.exportOpportunitiesReport.title": "تقرير الفرص الكاملة للتصدير",
   "command.packageVibrancy.focus.title": "حزمة النشاط: فتح لوحة القيادة (مدمجة)",
   "command.packageVibrancy.clearCache.title": "مسح ذاكرة التخزين المؤقت Clear Cache",
   "command.packageVibrancy.exportReport.title": "تقرير صادرات التصدير",

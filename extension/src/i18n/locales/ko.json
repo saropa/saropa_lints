@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "패키지 스캔을 먼저 실행하세요 — 기회 보고서는 스캔 결과에서 생성됩니다.",
+      "noWorkspace": "프로젝트 폴더를 먼저 열고 — opportunities 보고서는 pubspec 옆에 작성됩니다.",
+      "progress": "전체 기회 보고서 생성 중…",
+      "noFolder": "보고서 폴더를 생성할 수 없어서 보고서가 작성되지 않았습니다.",
+      "failed": "오퍼티니티 리포트를 작성할 수 없습니다: {error}",
+      "large": "보고서는 {megabytes} MB이며 브라우징 시 느릴 수 있습니다. 해당 파일과 함께 제공된 JSON 파일에는 도구용으로 동일한 데이터가 포함되어 있습니다.",
+      "done": "기회 보고서 작성됨 {path}"
+    },
+    "sidebar": {
+      "label": "전체 기회 보고서",
+      "description": "모든 패키지 및 기능, 사용 횟수"
+    },
+    "documentTitle": "패키지 기능 인벤토리",
+    "heroTitle": "패키지 기능 인벤토리",
+    "meta": "생성됨 {timestamp} · 확장기능 v{version} · {packages} 패키지",
+    "caveats": {
+      "title": "측정 한계",
+      "intro": "위 계산값을 바탕으로 결론을 내리기 전에 이 내용을 읽어주세요.",
+      "none": "이런 실행에서는 제한이 기록되지 않았습니다."
+    },
+    "controls": {
+      "filterLabel": "필터 기능",
+      "filterPlaceholder": "특징 텍스트, 기호, 또는 버전으로 필터링…",
+      "unusedOnly": "사용되지 않는 것만",
+      "usedOnly": "사용만 가능",
+      "deprecatedOnly": "사용 중단됨만",
+      "expandAll": "모든 것을 확장합니다.",
+      "collapseAll": "모든 것이 무너져 내립니다.",
+      "indexLabel": "패키지 인덱스"
+    },
+    "summary": {
+      "title": "패키지 요약",
+      "sortHint": "이 열로 정렬 선택",
+      "colPackage": "패키지 패키지는 패키지입니다.",
+      "colVersion": "버전 버젼 버젼",
+      "colFeatures": "기능",
+      "colAdopted": "수용됨",
+      "colUnadopted": "미수용",
+      "colUsages": "사용법",
+      "colScore": "점수 스코어"
+    },
+    "packages": {
+      "title": "패키지 상품은 패키지 제품으로 구성되어 있습니다."
+    },
+    "empty": {
+      "body": "스캔된 패키지가 없으므로 기능을 나열할 것이 없습니다."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} 개 {total} 기능 채택",
+      "noChangelog": "이 패키지에 대한 변경 이력이 발견되지 않았기 때문에 기능을 나열할 수 없습니다. 이는 변경 이력 기반의 기능 소스의 한계이며, 패키지가 기능이 없는 것을 나타내는 것이 아닙니다.",
+      "noFeatures": "변경로그가 발견되었지만, 그로부터 기능을 추출할 수 없습니다.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "문서화 문헌문서 작성",
+      "linkRepository": "리포지토리 레퍼시티"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "추가됨",
+      "changed": "변경됨",
+      "deprecated": "사용 중지됨",
+      "removed": "제거됨",
+      "security": "보안",
+      "fixed": "수정됨",
+      "other": "기타"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "API 이름 없음",
+      "usages": "{count} 사용법",
+      "usagesOne": "{count} 사용법",
+      "usagesUnknown": "사용량 측정 불가능",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "코드를 보기 View code",
+      "viewDocs": "문서들을 보기",
+      "noUsages": "프로젝트 소스에서 사용 사례가 발견되지 않았습니다.",
+      "moreUsages": "{count} 더 많은 사용법",
+      "moreUsagesOne": "{count} 더 많은 사용법"
+    },
+    "chip": {
+      "adopted": "수용됨",
+      "partial": "부분적으로 채택",
+      "unused": "사용되지 않음",
+      "unmeasurable": "측정 불가능"
+    }
+  },
   "stylistic": {
     "title": "스타일과 의견은 스타일이 됩니다.",
     "intro": "의견형 스타일 규칙, 기본적으로 비활성화. 팀에서 동의하는 것만을 켜십시오. 충돌하는 선택들은 그룹화되어 있어, 당신은 하나를 선택할 수 있습니다.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "{from}에서 {to}로 변경된 것은 무엇입니까? 업그레이드하기 전에 검토.",
-      "versionDated": "{version}  ⁇ {date}는",
+      "versionDated": "{version} — {date}",
       "truncated": "{count}의 가장 최근의 릴리즈를 보여주고 있습니다.",
       "viewFull": "전체 변경 기록을 보기 pub.dev에서"
     },
@@ -415,7 +502,7 @@
     },
     "notification": {
       "critical": "Dart 프로세스는 {size}를 사용하여 {orphaned} 오라phan 데몬을 실행 중입니다. 정리하시겠습니까?",
-      "result": "Killed {count} orphaned daemons, freed ~{size}"
+      "result": "종료된 {count} 오로지 데몬 프로세스를 종료하고 ~{size} /no_think을 해제했습니다."
     },
     "action": {
       "cleanUp": "정리하기",

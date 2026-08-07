@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Esegui prima uno scan del package — il report delle opportunità è costruito dai risultati dello scan.",
+      "noWorkspace": "Apri prima una cartella del progetto — il report delle opportunità viene scritto accanto al suo pubspec.",
+      "progress": "Costruzione del report completo delle opportunità...",
+      "noFolder": "Nessuna cartella reports potrebbe essere creata, quindi il report non è stato scritto.",
+      "failed": "Il report delle opportunità non può essere scritto: {error}",
+      "large": "Il report è {megabytes} MB e potrebbe essere lento da navigare. Il file JSON accanto a esso contiene i dati uguali per gli strumenti.",
+      "done": "Rapporto sulle opportunità redatto per {path}"
+    },
+    "sidebar": {
+      "label": "Rapporto Completo delle Opportunità",
+      "description": "Ogni pacchetto e funzionalità, con conti di utilizzo"
+    },
+    "documentTitle": "Inventario delle Funzionalità del Pacchetto",
+    "heroTitle": "Inventario delle Funzionalità del Pacchetto",
+    "meta": "Generato {timestamp} · estensione v{version} · {packages} pacchetti",
+    "caveats": {
+      "title": "Limiti di misurazione",
+      "intro": "Leggi questi prima di trarre una conclusione da qualsiasi conteggio sotto.",
+      "none": "Nessun limite è stato registrato per questa esecuzione."
+    },
+    "controls": {
+      "filterLabel": "Filtrare funzionalità",
+      "filterPlaceholder": "Filtrare per testo della funzione, simbolo o versione…",
+      "unusedOnly": "Solo inutilizzato",
+      "usedOnly": "Usato solo",
+      "deprecatedOnly": "Deprecato solo",
+      "expandAll": "Espandi tutto.",
+      "collapseAll": "Collassare tutto.",
+      "indexLabel": "Indice package"
+    },
+    "summary": {
+      "title": "Riepilogo package",
+      "sortHint": "Seleziona per ordinare per questa colonna",
+      "colPackage": "Pacchetto di pacchetti:",
+      "colVersion": "Versione versione versione.",
+      "colFeatures": "Funzionalità",
+      "colAdopted": "Adottato",
+      "colUnadopted": "Non adottato",
+      "colUsages": "Utilizzo",
+      "colScore": "Score del punteggio."
+    },
+    "packages": {
+      "title": "Pacchetti di pacchetti"
+    },
+    "empty": {
+      "body": "Nessun package è stato scansionato, quindi non ci sono funzionalità da elencare."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} di {total} funzionalità adottate",
+      "noChangelog": "Non è stato trovato un changelog per questo package, quindi le sue funzionalità non possono essere elencate. Questo è un limite della sorgente delle funzionalità derivata dal changelog, non un segno che il package non abbia funzionalità.",
+      "noFeatures": "Un changelog è stato trovato, ma non è stato possibile estrarre alcuna funzionalità da esso.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Documentazione documentazione.",
+      "linkRepository": "Repository del repertorio."
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Aggiunto",
+      "changed": "Modificato",
+      "deprecated": "Obsoleto",
+      "removed": "Rimosso",
+      "security": "Sicurezza",
+      "fixed": "Corretto",
+      "other": "Altro"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Nessuna API denominata",
+      "usages": "Utilizzo di {count}",
+      "usagesOne": "Utilizzo di {count}",
+      "usagesUnknown": "uso non misurabile",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Visualizza il codice per visualizzare il codice.",
+      "viewDocs": "Visualizza i documenti.",
+      "noUsages": "Nessun utilizzo trovato nel codice sorgente del progetto.",
+      "moreUsages": "{count} più usaggi",
+      "moreUsagesOne": "{count} più utilizzo"
+    },
+    "chip": {
+      "adopted": "Adottato",
+      "partial": "Parzialmente adottato",
+      "unused": "Mai utilizzato",
+      "unmeasurable": "Non misurabile"
+    }
+  },
   "stylistic": {
     "title": "Stile e opinioni.",
     "intro": "Regole di stile con opinione, disattivate per impostazione predefinita. Accendi solo ciò che il tuo team accetta. Le scelte contrastanti sono raggruppate in modo da poterne scegliere una.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "Cosa è cambiato da {from} a {to}  ⁇ revisione prima dell'aggiornamento.",
-      "versionDated": "{version}  ⁇   ⁇ {date} è il nome di una cellula.",
+      "versionDated": "{version} — {date}",
       "truncated": "Mostra le più recenti release di {count}.",
       "viewFull": "Visualizza l'intero registro delle modifiche su pub.dev"
     },

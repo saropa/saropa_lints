@@ -107,6 +107,7 @@
   "command.packageVibrancy.openOtherProject.title": "สแกนอีกโครงการ...",
   "command.packageVibrancy.showReport.title": "เปิด แดชบอร์ด Package Dashboard โดยเปิด",
   "command.packageVibrancy.showOpportunities.title": "เปิดโอกาสในการอัพเกรด",
+  "command.packageVibrancy.exportOpportunitiesReport.title": "ส่งออกรายงานโอกาสทั้งหมด",
   "command.packageVibrancy.focus.title": "แพ็คเกจ Vibrancy: เปิดแผงดัชเบอร์ (คอมแพ็ก)",
   "command.packageVibrancy.clearCache.title": "Clear Cache คลิกการเคลียร์แคช",
   "command.packageVibrancy.exportReport.title": "รายงานการส่งออก Export Report",

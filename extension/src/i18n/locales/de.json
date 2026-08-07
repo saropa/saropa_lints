@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Zuerst einen Paket-Scan durchführen — der Opportunities-Report wird aus den Scan-Ergebnissen erstellt.",
+      "noWorkspace": "Zuerst ein Projektordner öffnen — der Opportunities-Report wird neben seinem pubspec erstellt.",
+      "progress": "Vollständiger Bericht über Chancen wird erstellt…",
+      "noFolder": "Kein Reports-Ordner konnte erstellt werden, daher wurde der Bericht nicht geschrieben.",
+      "failed": "Der Bericht über die Chancen konnte nicht geschrieben werden: {error}",
+      "large": "Der Bericht beträgt {megabytes} MB und kann langsam zu durchsuchen sein. Die JSON-Datei daneben enthält dieselben Daten für die Tooling-Tools.",
+      "done": "Bericht über Chancen erstellt für {path}"
+    },
+    "sidebar": {
+      "label": "Vollständiger Chancenbericht",
+      "description": "Jeder Paket und Feature mit Verwendungszahlen"
+    },
+    "documentTitle": "Paketfunktionsinventar",
+    "heroTitle": "Paketfunktionsinventar",
+    "meta": "Generiert {timestamp} · Erweiterung v{version} · {packages} Pakete",
+    "caveats": {
+      "title": "Messgrenzen",
+      "intro": "Diese Informationen lesen, bevor Sie eine Schlussfolgerung aus irgendeiner der unten stehenden Zahlen ziehen.",
+      "none": "Keine Grenzen wurden für diese Ausführung erfasst."
+    },
+    "controls": {
+      "filterLabel": "Filterfunktionen",
+      "filterPlaceholder": "Filtern nach Feature-Text, Symbol oder Version…",
+      "unusedOnly": "Nicht verwendet nur",
+      "usedOnly": "Nur zur Verwendung",
+      "deprecatedOnly": "Veraltet nur",
+      "expandAll": "Expandieren Sie alle.",
+      "collapseAll": "Alles zusammenbrechen.",
+      "indexLabel": "Package-Index"
+    },
+    "summary": {
+      "title": "Paketübersicht",
+      "sortHint": "Sortieren Sie nach dieser Spalte",
+      "colPackage": "Paket-Paket ist ein Paket.",
+      "colVersion": "Version",
+      "colFeatures": "Funktionen",
+      "colAdopted": "Angenommen",
+      "colUnadopted": "Nicht angenommen",
+      "colUsages": "Verwendung",
+      "colScore": "Punktzahl erzielen."
+    },
+    "packages": {
+      "title": "Pakete sind ein Paket."
+    },
+    "empty": {
+      "body": "Keine Pakete wurden gescannt, daher gibt es keine Features zur Auflistung."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} von {total} Features übernommen",
+      "noChangelog": "Kein Changelog wurde für dieses Paket gefunden, daher können seine Funktionen nicht aufgelistet werden. Dies ist eine Grenze der Changelog-abgeleiteten Funktionen-Quelle, nicht ein Zeichen dafür, dass das Paket keine Funktionen hat.",
+      "noFeatures": "Ein Changelog wurde gefunden, aber keine Features konnten daraus extrahiert werden.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Dokumentation Dokumentierung",
+      "linkRepository": "Repository"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Hinzugefügt",
+      "changed": "Geändert",
+      "deprecated": "Veraltet",
+      "removed": "Entfernt",
+      "security": "Sicherheit",
+      "fixed": "Gefixed",
+      "other": "Weitere"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Keine API mit dem Namen",
+      "usages": "{count}-Anwendungen",
+      "usagesOne": "{count}-Nutzung",
+      "usagesUnknown": "Nutzung nicht messbar",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Code anzeigen Code ansehen.",
+      "viewDocs": "Dokumente anzeigen.",
+      "noUsages": "Keine Verwendung im Projektquellcode gefunden.",
+      "moreUsages": "{count} mehr Verwendungen",
+      "moreUsagesOne": "{count} mehr Verwendung"
+    },
+    "chip": {
+      "adopted": "Angenommen",
+      "partial": "Teilweise übernommen",
+      "unused": "Nie verwendet",
+      "unmeasurable": "nicht messbar"
+    }
+  },
   "stylistic": {
     "title": "Stil & Meinungen sind wichtig.",
     "intro": "Gutachten-Stilregeln, standardmäßig ausgeschaltet. Schalten Sie nur das ein, was Ihr Team zustimmt. Konfliktreiche Entscheidungen werden gruppiert, so dass Sie eine auswählen.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "Was hat sich von {from} in {to}  ⁇  geändert? Überprüfung vor dem Upgrade.",
-      "versionDated": "{version}  ⁇  Ich bin ein {date} ist ein _PH1-Präparat.",
+      "versionDated": "{version} — {date}",
       "truncated": "Zeigt die {count} neuesten Releases.",
       "viewFull": "Siehe vollständige Änderungen am pub.dev."
     },

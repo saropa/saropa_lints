@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Bir paket taraması yapın — fırsat raporu tarama sonuçlarından oluşturulur.",
+      "noWorkspace": "İlk olarak bir proje klasörü açın — fırsat raporu pubspec'in yanına yazılır.",
+      "progress": "Tam fırsatlar raporunu oluşturma...",
+      "noFolder": "Raporlar klasörü oluşturulamadığı için rapor yazılamadı.",
+      "failed": "Rapor yazılamadı: {error}",
+      "large": "Rapor {megabytes} MB ve taranması yavaş olabilir. Aynı verileri araçlar için tutan JSON dosyası bu raporla birlikte yer alıyor.",
+      "done": "Fırsat raporu {path}'a yazıldı"
+    },
+    "sidebar": {
+      "label": "Tam Fırsatlar Raporu",
+      "description": "Her paket ve özellik, kullanım sayıları"
+    },
+    "documentTitle": "Paket Özellikleri Stokları",
+    "heroTitle": "Paket Özellikleri Stokları",
+    "meta": "Oluşturuldu {timestamp} · uzantı v{version} · {packages} paketler",
+    "caveats": {
+      "title": "Ölçüm sınırları",
+      "intro": "Bu altındaki herhangi bir sayının sonucunu çıkarmadan önce bunları okuyun.",
+      "none": "Bu çalışmadan için sınırlar kaydedilmemiştir."
+    },
+    "controls": {
+      "filterLabel": "Filtreleme özellikleri",
+      "filterPlaceholder": "Özellik metni, sembol veya sürümle filtrele...",
+      "unusedOnly": "Kullanılmayan sadece",
+      "usedOnly": "Sadece kullanılır",
+      "deprecatedOnly": "İptal edildi sadece",
+      "expandAll": "Tümünü genişlet.",
+      "collapseAll": "Hepsi çöküyor, hepsi yıkılıyor.",
+      "indexLabel": "Paket index"
+    },
+    "summary": {
+      "title": "Paket özeti",
+      "sortHint": "Bu sütuna göre sırala seç",
+      "colPackage": "Paket paketi, paketlerin tamamını içerir.",
+      "colVersion": "Versiyon Sürüm Sürüm",
+      "colFeatures": "Özellikler",
+      "colAdopted": "Kabul Edildi",
+      "colUnadopted": "Kabul edilmemiş",
+      "colUsages": "Kullanımalar",
+      "colScore": "Skor puanı, skor sayısı."
+    },
+    "packages": {
+      "title": "Paket paketler, paketler."
+    },
+    "empty": {
+      "body": "Tarayıcıda paket bulunamadığı için özellikler listelenemedi."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} of {total} özellikler kabul edildi",
+      "noChangelog": "Bu pakete ait bir changelog bulunamadığı için özellikleri listelenemiyor. Bu, changelog'dan türetilen özellik kaynaklarının bir sınırlamasıdır, paketin özelliklerinin olmadığını göstermez.",
+      "noFeatures": "Bir değişiklik günlüğü bulundu, ancak bunundan özellikler çıkarılamadı.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Dokümantasyon Belgelendirme",
+      "linkRepository": "Depolama Kaynağı Repositoriy"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Eklendi",
+      "changed": "Değiştirildi",
+      "deprecated": "İptal edildi",
+      "removed": "Kaldırıldı",
+      "security": "Güvenlik",
+      "fixed": "Düzeltilmiş",
+      "other": "Diğer"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Hiçbir API adı",
+      "usages": "{count} kullanımaları",
+      "usagesOne": "{count} kullanımı",
+      "usagesUnknown": "kullanımölçülemez",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "View code Kod görüntüle",
+      "viewDocs": "View docs (dokümanları görüntüle)",
+      "noUsages": "Proje kaynaklarında kullanım bulunamadı.",
+      "moreUsages": "{count} daha fazla kullanım",
+      "moreUsagesOne": "{count} daha fazla kullanım"
+    },
+    "chip": {
+      "adopted": "Kabul Edildi",
+      "partial": "Kısmen benzer",
+      "unused": "Asla kullanılmadı",
+      "unmeasurable": "Ölçülemez"
+    }
+  },
   "stylistic": {
     "title": "Stil ve görüşler.",
     "intro": "Opinionated style rules, varsayılan olarak kapalı. Sadece ekibinin kabul ettiği şeyleri aç. Çelişkili seçimler gruplandırılır, böylece birini seçersiniz.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "{from}'dan {to}  ⁇ 'e ne değişti? yükseltmeden önce gözden geçirme.",
-      "versionDated": "{version}  ⁇   ⁇ {date} _PH1_ = PH1__ (Hücre Basıncı",
+      "versionDated": "{version} — {date}",
       "truncated": "En son çıkanları gösteriliyor. {count} en yeni sürümleri gösterir.",
       "viewFull": "pub.dev'da tam değişim günlüğünü görüntüle"
     },

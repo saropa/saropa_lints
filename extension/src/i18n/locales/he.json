@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "החלף ס캔 של פאקדג'ה תחילה — דוח האפשרויות נבנה מהنتائج של הס캔.",
+      "noWorkspace": "פתח תיקון פרויקט קודם — דוח האפשרויות כתוב לצדו של pubspec שלו.",
+      "progress": "בניה של דוח האפשרויות המלא...",
+      "noFolder": "לא ניתן היה ליצור תיקיית דוחות, ולכן הדוח לא נכתב.",
+      "failed": "הדוח על האפשרויות לא יכול להיות כתוב: {error}",
+      "large": "הדוח הוא {megabytes} MB ויכולים להיות איטיים לגלישה. הקובץ JSON לצדו מכיל את אותם הנתונים עבור כלי הפיתוח.",
+      "done": "דוח הזדמנויות כתוב ל {path}"
+    },
+    "sidebar": {
+      "label": "דוח הזדמנויות מלאות",
+      "description": "כל חزمة ותכונה, עם ספירת שימושים"
+    },
+    "documentTitle": "רשימת תכונות חבילת הפקט",
+    "heroTitle": "רשימת תכונות חבילת הפקט",
+    "meta": "נוצר {timestamp} · הרחבת v{version} · {packages} חבילות",
+    "caveats": {
+      "title": "حدود מדידה",
+      "intro": "קראו את אלו לפני שמסיקים מסקנה מה считаים שמתחת.",
+      "none": "לא נרשמו הגבלות עבור הריצה הזו."
+    },
+    "controls": {
+      "filterLabel": "סינון תכונות",
+      "filterPlaceholder": "סנן לפי טקסט תכונה, סמל, או גרסה…",
+      "unusedOnly": "לא בשימוש רק",
+      "usedOnly": "נעשה שימוש רק",
+      "deprecatedOnly": "הערה: מומלץ רק",
+      "expandAll": "הרחיב את כל הכל",
+      "collapseAll": "כולם מתמוטטים.",
+      "indexLabel": "índекс פאקטה"
+    },
+    "summary": {
+      "title": "סיכום חבילות",
+      "sortHint": "החלף כדי למיין לפי העמודה הזו",
+      "colPackage": "חבילה של חבילות",
+      "colVersion": "גרסה גרסה הגרסה",
+      "colFeatures": "תכונות",
+      "colAdopted": "הושגה",
+      "colUnadopted": "לא מומלץ",
+      "colUsages": "שימושים",
+      "colScore": "תוצאה של התוצאות"
+    },
+    "packages": {
+      "title": "חבילות שלחומרי הנסיעה"
+    },
+    "empty": {
+      "body": "לא נבדעו חבילות, לכן אין תכונות להצגתן."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} מתוך {total} תכונות אופקיות",
+      "noChangelog": "לא נמצאו תיעוד שינויים עבור החבילה הזו, ולכן לא ניתן לרשום את הפונקציות שלה. זהו הגבול של המקור של הפונקציות הנובעות מהתיעוד השינויים, ולא סימן שהחבילה אינה מכילה פונקציות.",
+      "noFeatures": "נמצא תיעוד שינויי, אך לא ניתן להפיק תכונות ממנו.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "תיעוד, מסמכים",
+      "linkRepository": "מאגר מידע Repository"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "הוסף",
+      "changed": "שונה",
+      "deprecated": "הערה: שגיאה - הפקודה אינה נתמכת.",
+      "removed": "נמחק",
+      "security": "אבטחת מידע",
+      "fixed": "נערך",
+      "other": "אחרי"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "אין אפיי נקרא",
+      "usages": "שימושים ב{count}",
+      "usagesOne": "שימוש ב{count}",
+      "usagesUnknown": "שימוש לא ניתן למדוד",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "הצג קוד View Code",
+      "viewDocs": "תצוגה של מסמכים View docs",
+      "noUsages": "אין שימוש נמצא בקוד המקור של הפרויקט.",
+      "moreUsages": "{count} יותר שימושים",
+      "moreUsagesOne": "{count} יותר שימוש"
+    },
+    "chip": {
+      "adopted": "הושגה",
+      "partial": "חלקי אופק",
+      "unused": "לעולם לא השתמש",
+      "unmeasurable": "לא מדידית"
+    }
+  },
   "stylistic": {
     "title": "סגנון ודעות",
     "intro": "כללי סגנון דעות, כבויים ברירת מחדל. הפעל רק את מה שהצוות שלך מסכים. בחירות סותרות מאוגדות כך שאתה בוחר אחת.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "מה השתנה מ-{from} ל-{to} - סקור לפני השדרוג.",
-      "versionDated": "{version}  ⁇   ⁇  PH0__ {date} זה ה- _PH1_.",
+      "versionDated": "{version} — {date}",
       "truncated": "מראה את {count} השחרורים האחרונים.",
       "viewFull": "תצפית מלאה של רישום השינויים ב pub.dev"
     },
@@ -434,7 +521,7 @@
       "title": "健全性 análise",
       "empty": "אין תהליכי Dart פעילים.",
       "processes": "תהליכי תהליך",
-      "totalRss": "total RSS",
+      "totalRss": "סה\"כ RSS",
       "orphaned": "מְיוּתָם",
       "refresh": "מרענן ומקפיא",
       "colPid": "PID",

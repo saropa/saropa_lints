@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Chạy quét gói trước — báo cáo cơ hội được xây dựng từ kết quả quét.",
+      "noWorkspace": "Mở một thư mục dự án trước — báo cáo cơ hội sẽ được viết bên cạnh pubspec của nó.",
+      "progress": "Đang xây dựng báo cáo cơ hội đầy đủ…",
+      "noFolder": "Không thể tạo thư mục báo cáo, do đó báo cáo không được viết.",
+      "failed": "Báo cáo cơ hội không thể được viết: {error}",
+      "large": "Báo cáo có kích thước {megabytes} MB và có thể chậm khi duyệt. Tệp JSON đi kèm chứa dữ liệu giống nhau cho công cụ.",
+      "done": "Báo cáo cơ hội được viết cho {path}"
+    },
+    "sidebar": {
+      "label": "Báo cáo Cơ hội Toàn diện",
+      "description": "Mỗi package và tính năng, với số lần sử dụng"
+    },
+    "documentTitle": "Inventory Tính năng Gói",
+    "heroTitle": "Inventory Tính năng Gói",
+    "meta": "Đã tạo {timestamp} · mở rộng v{version} · {packages} gói",
+    "caveats": {
+      "title": "Giới hạn đo lường",
+      "intro": "Đọc những điều này trước khi rút ra kết luận từ bất kỳ con số nào dưới đây.",
+      "none": "Không có giới hạn nào được ghi lại cho lần chạy này."
+    },
+    "controls": {
+      "filterLabel": "Lọc tính năng",
+      "filterPlaceholder": "Lọc theo văn bản tính năng, biểu tượng hoặc phiên bản…",
+      "unusedOnly": "Không sử dụng chỉ",
+      "usedOnly": "Chỉ sử dụng",
+      "deprecatedOnly": "Đã lỗi thời chỉ",
+      "expandAll": "Expand all mở rộng tất cả",
+      "collapseAll": "Tất cả đều sụp đổ.",
+      "indexLabel": "Chỉ mục gói"
+    },
+    "summary": {
+      "title": "Tóm tắt gói",
+      "sortHint": "Chọn để sắp xếp theo cột này",
+      "colPackage": "Gói gói hàng là bao gồm các sản phẩm",
+      "colVersion": "Phiên bản Version Version",
+      "colFeatures": "Tính năng",
+      "colAdopted": "Đã áp dụng",
+      "colUnadopted": "Chưa được nhận nuôi",
+      "colUsages": "Sử dụng",
+      "colScore": "Điểm số điểm số"
+    },
+    "packages": {
+      "title": "Gói hàng gói"
+    },
+    "empty": {
+      "body": "Không có gói nào được quét, do đó không có tính năng nào để liệt kê."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} của {total} tính năng được thông qua",
+      "noChangelog": "Không tìm thấy changelog cho gói này, do đó không thể liệt kê các tính năng của nó. Đây là giới hạn của nguồn thông tin tính năng được rút ra từ changelog, không phải là dấu hiệu cho thấy gói không có tính năng nào.",
+      "noFeatures": "Một changelog đã được tìm thấy, nhưng không thể trích xuất bất kỳ tính năng nào từ nó.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Tài liệu tài liệu Documentation",
+      "linkRepository": "Repository (thư viện)"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Đã thêm",
+      "changed": "Đã thay đổi",
+      "deprecated": "Đã lỗi thời",
+      "removed": "Đã xóa",
+      "security": "An toàn bảo mật",
+      "fixed": "Đã sửa",
+      "other": "Khác"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Không có API tên là",
+      "usages": "Sử dụng {count}",
+      "usagesOne": "Sử dụng {count}",
+      "usagesUnknown": "sử dụng không thể đo lường",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Xem mã code xem code",
+      "viewDocs": "Xem các tài liệu xem docs",
+      "noUsages": "Không tìm thấy sử dụng trong nguồn mã dự án.",
+      "moreUsages": "{count} hơn usages",
+      "moreUsagesOne": "{count} thêm cách sử dụng"
+    },
+    "chip": {
+      "adopted": "Đã áp dụng",
+      "partial": "Được áp dụng một phần",
+      "unused": "Chưa bao giờ sử dụng",
+      "unmeasurable": "Không thể đo lường"
+    }
+  },
   "stylistic": {
     "title": "Phong cách & ý kiến",
     "intro": "Opinionated style rules, off by default. (các quy tắc kiểu cách được đưa ra ý kiến), Chỉ bật những gì mà nhóm của bạn đồng ý. Những lựa chọn mâu thuẫn được nhóm lại để bạn có thể chọn một trong số chúng.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "Điều gì đã thay đổi từ {from} sang {to}  ⁇ xem xét trước khi nâng cấp.",
-      "versionDated": "{version}  ⁇   ⁇ {date} là một loại tế bào có thể",
+      "versionDated": "{version} — {date}",
       "truncated": "Hiển thị các bản phát hành {count} gần đây nhất.",
       "viewFull": "Xem toàn bộ bản ghi thay đổi trên pub.dev"
     },

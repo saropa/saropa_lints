@@ -56,12 +56,19 @@ function buildPackageBody(record: PackageFeatureRecord): string {
     return `${description}${links}${sections}`;
 }
 
-/** Outbound package links; each is omitted when the model has no URL for it. */
+/**
+ * Outbound package links; each is omitted when the model has no URL for it.
+ *
+ * `links.homepage` is deliberately absent: pub.dev collapses `pubspec.homepage`
+ * into the repository URL at fetch time, so the model has no distinct value to
+ * render and never will without an upstream change. Rendering a branch that
+ * cannot execute meant shipping a label for translation into every locale to
+ * describe a link nobody can see.
+ */
 function buildPackageLinks(record: PackageFeatureRecord): string {
     const entries: ReadonlyArray<readonly [string | null, string]> = [
         [record.links.pubDev, 'featureInventory.package.linkPubDev'],
         [record.links.docs, 'featureInventory.package.linkDocs'],
-        [record.links.homepage, 'featureInventory.package.linkHomepage'],
         [record.links.repository, 'featureInventory.package.linkRepository'],
     ];
     const links = entries

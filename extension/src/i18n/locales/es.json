@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Ejecute primero un escaneo de paquetes — el informe de oportunidades se construye a partir de los resultados del escaneo.",
+      "noWorkspace": "Abra primero una carpeta de proyecto — el informe de oportunidades se escribe junto a su pubspec.",
+      "progress": "Construyendo el informe completo de oportunidades…",
+      "noFolder": "No se pudo crear una carpeta de informes, por lo tanto el informe no fue escrito.",
+      "failed": "El informe de oportunidades no pudo ser escrito: {error}",
+      "large": "El informe es de {megabytes} MB y puede tardar en navegarse. El archivo JSON junto con él contiene los mismos datos para herramientas.",
+      "done": "Informe de oportunidades escrito para {path}"
+    },
+    "sidebar": {
+      "label": "Informe de Oportunidades Completo",
+      "description": "Cada paquete y característica, con conteos de uso"
+    },
+    "documentTitle": "Inventario de características del paquete",
+    "heroTitle": "Inventario de características del paquete",
+    "meta": "Generado {timestamp} · extensión v{version} · {packages} paquetes",
+    "caveats": {
+      "title": "Límites de medición",
+      "intro": "Lee esto antes de sacar una conclusión sobre cualquier conteo a continuación.",
+      "none": "No se registraron límites para esta ejecución."
+    },
+    "controls": {
+      "filterLabel": "Filtrar características",
+      "filterPlaceholder": "Filtrar por texto de característica, símbolo o versión…",
+      "unusedOnly": "Solo no utilizados",
+      "usedOnly": "Solo utilizado",
+      "deprecatedOnly": "Solo desactivado",
+      "expandAll": "Expanda todo y extienda todos.",
+      "collapseAll": "Todo se derrumba.",
+      "indexLabel": "Índice de paquetes"
+    },
+    "summary": {
+      "title": "Resumen del paquete",
+      "sortHint": "Seleccionar para ordenar por esta columna",
+      "colPackage": "El paquete de la caja",
+      "colVersion": "La versión de la versión.",
+      "colFeatures": "Características",
+      "colAdopted": "Adoptado",
+      "colUnadopted": "No adoptado",
+      "colUsages": "Usos",
+      "colScore": "El resultado de la puntuación."
+    },
+    "packages": {
+      "title": "Los paquetes de viaje son un conjunto de paquetes."
+    },
+    "empty": {
+      "body": "No se han escaneado paquetes, por lo tanto no hay características para listar."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} de {total} características adoptadas",
+      "noChangelog": "No se encontró un changelog para este paquete, por lo tanto sus características no pueden ser listadas. Esto es un límite de la fuente de características derivada del changelog, no un indicativo de que el paquete no tenga características.",
+      "noFeatures": "Se encontró un changelog, pero no se pudieron extraer características de él.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Documentación de la documentación La documentación es el conjunto de los documentos que contiene",
+      "linkRepository": "El repositorio de datos."
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Agregado",
+      "changed": "Cambiar",
+      "deprecated": "Deprecado",
+      "removed": "Eliminado",
+      "security": "Seguridad",
+      "fixed": "Corregido",
+      "other": "Otro"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Ninguna API llamada",
+      "usages": "Uso de {count}",
+      "usagesOne": "Uso de {count}",
+      "usagesUnknown": "uso no medible",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Ver código de visualización",
+      "viewDocs": "Ver los documentos de las pruebas.",
+      "noUsages": "No se encontró uso en la fuente del proyecto.",
+      "moreUsages": "{count} más usos",
+      "moreUsagesOne": "{count} más uso"
+    },
+    "chip": {
+      "adopted": "Adoptado",
+      "partial": "Parcialmente adoptado",
+      "unused": "Nunca usado",
+      "unmeasurable": "No medible"
+    }
+  },
   "stylistic": {
     "title": "Estilo y opiniones.",
     "intro": "Reglas de estilo con dictamen, desactivado por defecto. Activa sólo lo que tu equipo está de acuerdo. Las opciones en conflicto se agrupan para que usted elija una.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "¿Qué cambió de {from} a {to}  ⁇ ? revisión antes de la actualización.",
-      "versionDated": "{version}  ⁇  El hombre de la noche {date} es el número de células",
+      "versionDated": "{version} — {date}",
       "truncated": "Mostrando las versiones más recientes de {count}.",
       "viewFull": "Ver el registro de cambios completo en pub.dev"
     },

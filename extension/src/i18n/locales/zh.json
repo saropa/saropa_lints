@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "先运行一个包扫描 —— 机会报告是基于扫描结果构建的。",
+      "noWorkspace": "首先打开一个项目文件夹 —— 机会报告将写在其pubspec旁边。",
+      "progress": "构建完整的机遇报告...",
+      "noFolder": "无法创建报告文件夹，因此未生成报告。",
+      "failed": "机会报告无法生成：{error}",
+      "large": "报告大小为 {megabytes} MB，浏览可能会比较慢。与之配套的 JSON 文件包含相同的数据，供工具使用。",
+      "done": "机会报告撰写给 {path}"
+    },
+    "sidebar": {
+      "label": "完整机会报告",
+      "description": "每个包和功能，使用次数"
+    },
+    "documentTitle": "包功能清单",
+    "heroTitle": "包功能清单",
+    "meta": "生成 {timestamp} · 扩展 v{version} · {packages} 包",
+    "caveats": {
+      "title": "测量限制",
+      "intro": "在查看以下任何计数得出结论之前，请先阅读这些内容。",
+      "none": "本次运行未记录任何限制。"
+    },
+    "controls": {
+      "filterLabel": "过滤功能",
+      "filterPlaceholder": "按功能文本、符号或版本筛选…",
+      "unusedOnly": "未使用仅",
+      "usedOnly": "仅用于",
+      "deprecatedOnly": "已弃用仅",
+      "expandAll": "扩展所有",
+      "collapseAll": "所有的崩 ⁇ 都会发生.",
+      "indexLabel": "包索引"
+    },
+    "summary": {
+      "title": "包概要",
+      "sortHint": "按此列排序",
+      "colPackage": "包装方式 一个套餐",
+      "colVersion": "版本版本版本的版本",
+      "colFeatures": "功能",
+      "colAdopted": "采用",
+      "colUnadopted": "未采纳",
+      "colUsages": "用法",
+      "colScore": "获得分数的得分"
+    },
+    "packages": {
+      "title": "包装包裹是什么意思?"
+    },
+    "empty": {
+      "body": "没有包被扫描，因此没有功能可以列出。"
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} of {total} 特性被采用",
+      "noChangelog": "未找到此包的变更日志，因此无法列出其功能。这是由变更日志衍生的功能来源的限制，而不是该包没有功能的标志。",
+      "noFeatures": "发现了一个变更日志，但无法从中提取任何功能。",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "文件化 文档化 记录",
+      "linkRepository": "信息库存储器 的"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "已添加",
+      "changed": "已更改",
+      "deprecated": "已弃用",
+      "removed": "已移除",
+      "security": "安全",
+      "fixed": "已修复",
+      "other": "其他"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "没有名为 的 API",
+      "usages": "{count} 使用情况",
+      "usagesOne": "{count} 使用",
+      "usagesUnknown": "使用不可测量",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "查看代码 查阅代码",
+      "viewDocs": "查看文档的文件",
+      "noUsages": "项目源代码中未找到使用情况。",
+      "moreUsages": "{count} 更多用法",
+      "moreUsagesOne": "{count} 更多用法"
+    },
+    "chip": {
+      "adopted": "采用",
+      "partial": "部分采用",
+      "unused": "从未使用过",
+      "unmeasurable": "不可测量"
+    }
+  },
   "stylistic": {
     "title": "风格和意见的形式",
     "intro": "发表意见的风格规则,默认关闭. 只有你的团队同意的东西才打开. 相互冲突的选择被分组在一起,所以你只能选一个.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "从{from}变成了{to}  ⁇ ,是什么变化? 在升级之前进行审查.",
-      "versionDated": "{version}  ⁇  在这个问题上. {date} 已经成为一种",
+      "versionDated": "{version} — {date}",
       "truncated": "显示最新的 {count} 版本.",
       "viewFull": "查看完整的更改记录 在 pub.dev ."
     },

@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "أعد تنفيذ مسح حزمة أولاً — تُبنى تقرير الفرص من نتائج المسح.",
+      "noWorkspace": "افتح أولاً مجلد مشروع — يتم كتابة تقرير الفرص بجانب pubspec الخاص به.",
+      "progress": "بناء تقرير الفرص الكامل...",
+      "noFolder": "لا يمكن إنشاء مجلد التقارير، لذلك لم يتم كتابة التقرير.",
+      "failed": "لم يتم إنشاء تقرير الفرص: {error}",
+      "large": "ال报告显示 {megabytes} ميغا بايت وربما يكون بطيئًا في التصفح. ملف JSON المرفق به يحتوي على نفس البيانات للاستخدام.",
+      "done": "تقرير الفرص مكتوب إلى {path}"
+    },
+    "sidebar": {
+      "label": "تقرير الفرص الكامل",
+      "description": "كل حزمة ووظيفة مع عدد الاستخدامات"
+    },
+    "documentTitle": "معرض ميزات الحزمة",
+    "heroTitle": "معرض ميزات الحزمة",
+    "meta": "تم إنشاء {timestamp} · توسعة v{version} · {packages} حزمات",
+    "caveats": {
+      "title": "حدود القياس",
+      "intro": "اقرأ هذه قبل استنتاج أي عدد أدناه.",
+      "none": "لم يتم تسجيل أي حدود لهذا التشغيل."
+    },
+    "controls": {
+      "filterLabel": "فلتر الميزات",
+      "filterPlaceholder": "فلتر حسب النص الخاص بالميزة، أو الرمز، أو الإصدار...",
+      "unusedOnly": "غير مستخدم فقط",
+      "usedOnly": "يُستخدم فقط",
+      "deprecatedOnly": "القديمة فقط",
+      "expandAll": "توسيع جميع التوسع.",
+      "collapseAll": "إنهيار كل شيء.",
+      "indexLabel": "مؤشر الحزمة"
+    },
+    "summary": {
+      "title": "ملخص الحزمة",
+      "sortHint": "اختر لفرز حسب هذه العمود",
+      "colPackage": "حزمة الحزمة",
+      "colVersion": "النسخة Version نسخة",
+      "colFeatures": "الميزات",
+      "colAdopted": "تم الاقتباس",
+      "colUnadopted": "غير مُعتمد",
+      "colUsages": "الاستخدامات",
+      "colScore": "النتيجة تسجيل النتائج."
+    },
+    "packages": {
+      "title": "حزمة الطلبات الحمولة"
+    },
+    "empty": {
+      "body": "لم يتم مسح أي حزم، لذلك لا توجد ميزات لعرضها."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} من {total} ميزات مُعتمدة",
+      "noChangelog": "لم يتم العثور على changelog لهذا الحزمة، وبالتالي لا يمكن إدراج ميزاتها. هذا هو حدود مصدر ميزات مشتق من changelog، وليس إشارة إلى أن الحزمة لا تحتوي على ميزات.",
+      "noFeatures": "تم العثور على سجل التغييرات، ولكن لم يتم استخراج أي ميزات منه.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "الوثائق التوثيقية وثائق",
+      "linkRepository": "مخزن البيانات Repository"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "تمت الإضافة",
+      "changed": "تم التغيير",
+      "deprecated": "القديم",
+      "removed": "تم إزالة",
+      "security": "الأمان",
+      "fixed": "مُسَوَّغَة",
+      "other": "آخر"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "لا يوجد واجهة برمجة تطبيقي مسمى",
+      "usages": "استخدامات {count}",
+      "usagesOne": "استخدام {count}",
+      "usagesUnknown": "استخدام غير قابل للقياس",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "عرض رمز العرض",
+      "viewDocs": "عرض المستندات.",
+      "noUsages": "لم يتم العثور على استخدام في مصدر المشروع.",
+      "moreUsages": "{count} أكثر استخدامات",
+      "moreUsagesOne": "{count} أكثر استخدام"
+    },
+    "chip": {
+      "adopted": "تم الاقتباس",
+      "partial": "تم تبنيه جزئيًا",
+      "unused": "لم يُستخدم أبدًا",
+      "unmeasurable": "غير قابل للقياس"
+    }
+  },
   "stylistic": {
     "title": "الأسلوب والآراء",
     "intro": "قواعد الأسلوب المختلفة ، غير فعالة افتراضيًا. قم بتشغيل ما يوافق فريقك عليه فقط. يتم تجميع الخيارات المتضاربة حتى تختار واحدة.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "ما الذي تغير من {from} إلى {to}  ⁇ مراجعة قبل الترقية.",
-      "versionDated": "{version}  ⁇  ⁇ {date} هيئة البشرة.",
+      "versionDated": "{version} — {date}",
       "truncated": "يظهر {count} أحدث الإصدارات.",
       "viewFull": "عرض كامل سجل التغييرات على pub.dev"
     },

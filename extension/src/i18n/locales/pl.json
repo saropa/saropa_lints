@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Uruchom najpierw skan pakietu — raport o możliwościach jest budowany na podstawie wyników skanu.",
+      "noWorkspace": "Otwórz najpierw folder projektu — raport możliwości jest zapisany obok jego pubspec.",
+      "progress": "Tworzenie pełnego raportu możliwości…",
+      "noFolder": "Nie można było utworzyć folderu raportów, więc raport nie został zapisany.",
+      "failed": "Zgłoś raport o możliwościach nie można zapisać: {error}",
+      "large": "Zgłoś jest {megabytes} MB i może być wolny w przeglądaniu. Plik JSON obok niego zawiera te same dane dla narzędzi.",
+      "done": "Sprawozdanie z możliwości napisane dla {path}"
+    },
+    "sidebar": {
+      "label": "Sprawozdanie z pełnych możliwości",
+      "description": "Każdy pakiet i funkcja, z liczbami użycia"
+    },
+    "documentTitle": "Inwentarz funkcji pakietu",
+    "heroTitle": "Inwentarz funkcji pakietu",
+    "meta": "Wygenerowane {timestamp} · rozszerzenie v{version} · {packages} pakietów",
+    "caveats": {
+      "title": "Granice pomiarowe",
+      "intro": "Przeczytaj te przed wywnioskowaniem jakikolwiek wniosku na podstawie liczb poniżej.",
+      "none": "Brak ograniczeń zarejestrowano dla tego uruchomienia."
+    },
+    "controls": {
+      "filterLabel": "Filtry funkcji",
+      "filterPlaceholder": "Filtruj według tekstu funkcji, symbolu lub wersji…",
+      "unusedOnly": "Nie używany tylko",
+      "usedOnly": "Wykorzystywany tylko",
+      "deprecatedOnly": "Zastarzały się tylko",
+      "expandAll": "Rozszerz wszystko.",
+      "collapseAll": "Wszystko się zawali.",
+      "indexLabel": "Indeks pakietów"
+    },
+    "summary": {
+      "title": "Podsumowanie pakietu",
+      "sortHint": "Wybierz, aby posortować według tej kolumny",
+      "colPackage": "Pakiet pakietowy - Package package.",
+      "colVersion": "Wersja wersja wersji",
+      "colFeatures": "Funkcje",
+      "colAdopted": "Zastosowane",
+      "colUnadopted": "Nie zaadoptowano",
+      "colUsages": "Użycia",
+      "colScore": "Wynik wyniku:"
+    },
+    "packages": {
+      "title": "Pakiety pakietowe to pakiet."
+    },
+    "empty": {
+      "body": "Brak pakietów do skanowania, więc nie ma żadnych funkcji do wyświetlenia."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} z {total} funkcji zaakceptowanych",
+      "noChangelog": "Nie znaleziono pliku z historią zmian dla tego pakietu, więc jego funkcje nie mogą być wymienione. To ograniczenie źródła funkcji opartego na historii zmian, a nie oznaka, że pakiet nie ma żadnych funkcji.",
+      "noFeatures": "Znaleziono plik z logami zmian, ale nie można było z niego wyodrębnić funkcji.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Dokumentacja Dokumenty Dokuumentacja",
+      "linkRepository": "Repozytorium repozytoryjne"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Dodano",
+      "changed": "Zmieniono",
+      "deprecated": "Zastarzały się",
+      "removed": "Usunięto",
+      "security": "Bezpieczeństwo",
+      "fixed": "Ustawione",
+      "other": "Inne"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Brak interfejsu o nazwie",
+      "usages": "Użycia {count}",
+      "usagesOne": "Użycie {count}",
+      "usagesUnknown": "użycie nie mierzalne",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Wyświetlanie kodu",
+      "viewDocs": "Zobacz dokumenty",
+      "noUsages": "Brak użycia w źródle projektu.",
+      "moreUsages": "{count} więcej użycia",
+      "moreUsagesOne": "{count} więcej użycia"
+    },
+    "chip": {
+      "adopted": "Zastosowane",
+      "partial": "Częściowo zaadoptowane",
+      "unused": "Nikdy nie używany",
+      "unmeasurable": "Nie mierzalny"
+    }
+  },
   "stylistic": {
     "title": "Styl i opinie - styl i opinia.",
     "intro": "Opinionowane zasady stylu, domyślnie wyłączone. Włącz tylko to, na co zgadza się twoja drużyna. Sprzeczne wybory są pogrupowane, więc wybierz jeden.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "Co zmieniło się z {from} na {to}  ⁇ przegląd przed uaktualnieniem.",
-      "versionDated": "{version}  ⁇ {date} to grupa, która ma",
+      "versionDated": "{version} — {date}",
       "truncated": "Pokazując najnowsze wydania {count}.",
       "viewFull": "Zobacz pełny changelog na pub.dev"
     },

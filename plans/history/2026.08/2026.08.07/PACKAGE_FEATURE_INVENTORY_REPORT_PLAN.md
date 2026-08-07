@@ -406,3 +406,23 @@ ran from the repository root and created a stray root `package.json`,
 The remaining unverified surface is narrow: the report has still never been
 opened by a real browser, so CSS layout and the theme media query are unproven.
 Behavior, data, and structure are covered.
+
+### Locale coverage closed, and one label deleted rather than translated
+
+The translation run left exactly one gap: Filipino had no rendering of
+`featureInventory.package.linkHomepage`, the label for a package's homepage
+link.
+
+That link can never appear. `buildLinks` sets `homepage` to null
+unconditionally, because pub.dev folds `pubspec.homepage` into the repository
+URL at fetch time, so the model has no distinct value to offer and will not have
+one without an upstream change to the pub.dev client.
+
+Translating the label would have paid 24 locales to describe a link nobody can
+see. The render branch was removed from both artifacts and the key deleted from
+every catalog instead. Coverage is now complete at 63 keys across 25 locales
+with zero missing — the honest way, by having less to translate rather than more.
+
+`links.homepage` stays on the model and in the JSON artifact, still null, with
+the comment explaining why. Restoring the link is an upstream change to
+`pub-dev-api`, not a renderer change.

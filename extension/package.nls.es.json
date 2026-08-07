@@ -107,6 +107,7 @@
   "command.packageVibrancy.openOtherProject.title": "Escanear Otro Proyecto...",
   "command.packageVibrancy.showReport.title": "Abra el panel de control del paquete.",
   "command.packageVibrancy.showOpportunities.title": "Abrir oportunidades de actualización abiertas.",
+  "command.packageVibrancy.exportOpportunitiesReport.title": "Exportar Informe de Oportunidades Completo",
   "command.packageVibrancy.focus.title": "Paquete Vibrabilidad: Tablero abierto (compacto)",
   "command.packageVibrancy.clearCache.title": "Eliminar el caché en la memoria.",
   "command.packageVibrancy.exportReport.title": "Informe de exportación.",

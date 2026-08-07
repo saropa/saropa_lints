@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Eerst een package scan uitvoeren — het opportunities rapport wordt opgebouwd uit scanresultaten.",
+      "noWorkspace": "Eerst een projectmap openen — de opportunities report wordt geschreven naast het pubspec.",
+      "progress": "Volledig opportunities rapport bouwen…",
+      "noFolder": "Geen rapportenmap kon worden gemaakt, dus het rapport is niet geschreven.",
+      "failed": "De rapportage over de kansen kon niet worden geschreven: {error}",
+      "large": "De rapportage is {megabytes} MB en kan langzaam zijn om te bladeren. De JSON-bestand naast het bevat dezelfde gegevens voor tooling.",
+      "done": "Opportunities report geschreven voor {path}"
+    },
+    "sidebar": {
+      "label": "Volledig Opportunities Rapport",
+      "description": "Elke package en feature, met gebruikstellingen"
+    },
+    "documentTitle": "Pakketfunctie-inventaris",
+    "heroTitle": "Pakketfunctie-inventaris",
+    "meta": "Geen {timestamp} gegenereerd · extensie v{version} · {packages} pakketten",
+    "caveats": {
+      "title": "Meetingslimieten",
+      "intro": "Lees deze vooraf voordat je een conclusie trekt op basis van welke dan ook tellen hieronder.",
+      "none": "Geen beperkingen zijn opgenomen voor deze run."
+    },
+    "controls": {
+      "filterLabel": "Filter functies",
+      "filterPlaceholder": "Filter op basis van feature tekst, symbool of versie…",
+      "unusedOnly": "Niet gebruikt alleen",
+      "usedOnly": "Alleen gebruikt",
+      "deprecatedOnly": "Verouderd alleen",
+      "expandAll": "Uitbreiden van alles.",
+      "collapseAll": "Alles instort, alles stort in.",
+      "indexLabel": "Pakketindex"
+    },
+    "summary": {
+      "title": "Package-overzicht",
+      "sortHint": "Selecteer om te sorteren op deze kolom",
+      "colPackage": "Pakketpakket pakket",
+      "colVersion": "Versie versie versia",
+      "colFeatures": "Functies",
+      "colAdopted": "Geadopteerd",
+      "colUnadopted": "Niet aangenomen",
+      "colUsages": "Gebruiksen",
+      "colScore": "Score score is het resultaat van een"
+    },
+    "packages": {
+      "title": "Pakkettenpakketten zijn pakketjes."
+    },
+    "empty": {
+      "body": "Geen pakketten zijn gescand, dus er zijn geen functies om te lijsten."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} of {total} features aangegaan",
+      "noChangelog": "Geen changelog is gevonden voor deze package, dus zijn functies kunnen niet worden gelijst. Dit is een beperking van de functiebron die afkomstig is van de changelog, niet een teken dat de package geen functies heeft.",
+      "noFeatures": "Een changelog is gevonden, maar geen functies konden daaruit worden geëxtraheerd.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Documentatie Documentatie documentatie.",
+      "linkRepository": "Repositorium voor gegevensbestanden."
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Toegevoegd",
+      "changed": "Geen wijzigingen",
+      "deprecated": "Verouderd",
+      "removed": "Verwijderd",
+      "security": "Beveiliging",
+      "fixed": "Vastgelegd",
+      "other": "Andere"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Geen API genaamd",
+      "usages": "{count} gebruiken",
+      "usagesOne": "{count} gebruik",
+      "usagesUnknown": "gebruik niet meetbaar",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Code bekijken Bekijk code",
+      "viewDocs": "Documents bekijken.",
+      "noUsages": "Geen gebruik gevonden in projectbron.",
+      "moreUsages": "{count} meer gebruiken",
+      "moreUsagesOne": "{count} meer gebruik"
+    },
+    "chip": {
+      "adopted": "Geadopteerd",
+      "partial": "Gedeeltelijk aangenomen",
+      "unused": "Nooit gebruikt",
+      "unmeasurable": "Niet meetbaar"
+    }
+  },
   "stylistic": {
     "title": "Stijl & meningen",
     "intro": "Opinionated stijlregels, standaard uitgeschakeld. Zet alleen aan wat je team ermee instemt. Tegenstrijdige keuzes worden gegroepeerd, zodat je er een kiest.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "Wat is veranderd van {from} naar {to}  ⁇ review voor het upgraden.",
-      "versionDated": "{version}  ⁇   ⁇ {date} is een genetisch gemodificeerde stof.",
+      "versionDated": "{version} — {date}",
       "truncated": "Toon de {count} meest recente releases.",
       "viewFull": "Bekijk het volledige changelog op pub.dev"
     },

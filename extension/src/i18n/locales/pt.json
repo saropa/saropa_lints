@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Execute primeiro uma varredura de pacote — o relatório de oportunidades é construído com base nos resultados da varredura.",
+      "noWorkspace": "Abra primeiro uma pasta de projeto — o relatório de oportunidades é escrito ao lado do seu pubspec.",
+      "progress": "Construindo o relatório completo de oportunidades...",
+      "noFolder": "Nenhum diretório de relatórios poderia ser criado, então o relatório não foi escrito.",
+      "failed": "O relatório de oportunidades não pode ser escrito: {error}",
+      "large": "O relatório é de {megabytes} MB e pode ser lento para navegar. O arquivo JSON ao lado contém os mesmos dados para ferramentas.",
+      "done": "Relatório de oportunidades escrito para {path}"
+    },
+    "sidebar": {
+      "label": "Relatório de Oportunidades Completo",
+      "description": "Todo pacote e recurso, com contagens de uso"
+    },
+    "documentTitle": "Inventário de Recursos do Pacote",
+    "heroTitle": "Inventário de Recursos do Pacote",
+    "meta": "Gerado {timestamp} · extensão v{version} · {packages} pacotes",
+    "caveats": {
+      "title": "Limites de medição",
+      "intro": "Leia essas antes de tirar uma conclusão com base em qualquer contagem abaixo.",
+      "none": "Nenhum limite foi registrado para esta execução."
+    },
+    "controls": {
+      "filterLabel": "Filtrar recursos",
+      "filterPlaceholder": "Filtrar por texto da feature, símbolo ou versão…",
+      "unusedOnly": "Apenas inutilizado",
+      "usedOnly": "Usado apenas",
+      "deprecatedOnly": "Descontinuado apenas",
+      "expandAll": "Expandir tudo.",
+      "collapseAll": "Todos desmoronam.",
+      "indexLabel": "Índice de pacotes"
+    },
+    "summary": {
+      "title": "Resumo do pacote",
+      "sortHint": "Selecione para ordenar por esta coluna",
+      "colPackage": "Pacote de Serviços",
+      "colVersion": "Versão versão versões versão",
+      "colFeatures": "Funcionalidades",
+      "colAdopted": "Adotado",
+      "colUnadopted": "Não adotado",
+      "colUsages": "Usos",
+      "colScore": "Pontuação da pontuação."
+    },
+    "packages": {
+      "title": "Pacotes de Serviços."
+    },
+    "empty": {
+      "body": "Nenhum pacote foi escaneado, então não há recursos para listar."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} de {total} recursos adotados",
+      "noChangelog": "Nenhum changelog foi encontrado para este pacote, portanto, suas funcionalidades não podem ser listadas. Isso é um limite da fonte de funcionalidades derivada do changelog, não um sinal de que o pacote não possui funcionalidades.",
+      "noFeatures": "Um changelog foi encontrado, mas nenhuma funcionalidade pode ser extraída dele.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Documentação Documentos de documentação.",
+      "linkRepository": "Repositório de dados."
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Adicionado",
+      "changed": "Alterado",
+      "deprecated": "Obsoleto",
+      "removed": "Removido",
+      "security": "Segurança",
+      "fixed": "Corrigido",
+      "other": "Outro"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Nenhuma API chamada",
+      "usages": "Usos de {count}",
+      "usagesOne": "Uso de {count}",
+      "usagesUnknown": "uso não mensurável",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Ver código de visualização",
+      "viewDocs": "Veja os documentos.",
+      "noUsages": "Nenhum uso encontrado nas fontes do projeto.",
+      "moreUsages": "{count} mais usos",
+      "moreUsagesOne": "{count} mais uso"
+    },
+    "chip": {
+      "adopted": "Adotado",
+      "partial": "Parcialmente adotado",
+      "unused": "Nunca usado",
+      "unmeasurable": "Não mensurável"
+    }
+  },
   "stylistic": {
     "title": "Estilo e opiniões.",
     "intro": "Regras de estilo com opinião, desativado por padrão. Ligue apenas o que sua equipe concorda. Escolhas conflitantes são agrupadas para que você escolha uma.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "O que mudou de {from} para {to}  ⁇ revisão antes da atualização.",
-      "versionDated": "{version}  ⁇   ⁇ {date} É um tipo de vírus que se alimenta do sangue.",
+      "versionDated": "{version} — {date}",
       "truncated": "Mostrando os lançamentos mais recentes do {count}.",
       "viewFull": "Ver o registro de alterações completo em pub.dev"
     },

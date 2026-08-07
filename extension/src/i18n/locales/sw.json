@@ -1,4 +1,91 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Tumia kujaribu kujifunza package — raporti ya matokeo inatoa kwa kujifunza matokeo.",
+      "noWorkspace": "Openda jumla ya folder ya project — raporti ya matokeo inaonyesha jumla ya pubspec.",
+      "progress": "Kushangaza raporti ya matokeo ya kati...",
+      "noFolder": "Hakuna jumla ya michezo ya michezo, kwa sababu michezo hakupatikana.",
+      "failed": "Raporti ya matokeo hakifanyikiwa: {error}",
+      "large": "Raporti ina {megabytes} MB na inaweza kubeba kifichwa. Faili JSON ya kati ina data ya jina sawa kwa kifichwa.",
+      "done": "Ripoti ya matokeo lilisoma kwa {path}"
+    },
+    "sidebar": {
+      "label": "Ripoti ya Mwaka Mpya",
+      "description": "Kila paketi na mfumo, na idadi ya kuzalishia"
+    },
+    "documentTitle": "Inventari ya Mipango ya Paki",
+    "heroTitle": "Inventari ya Mipango ya Paki",
+    "meta": "Mzikiwa {timestamp} · extension v{version} · {packages} packages",
+    "caveats": {
+      "title": "Safu ya kusafisha",
+      "intro": "Tafuta hizi kabla kutambua matokeo ya kila idadi ya kati.",
+      "none": "Hakuna matokeo ya kipato kwa kipato hiki."
+    },
+    "controls": {
+      "filterLabel": "Fitera mchakato",
+      "filterPlaceholder": "Tafuta kwa matokeo ya maelezo, simboli au version…",
+      "unusedOnly": "Isiyotumika pekee",
+      "usedOnly": "Ilifunguka kwa makosa ya kwanza",
+      "deprecatedOnly": "Mefuata kwa kifupi",
+      "expandAll": "Kuongeza wote kupanua yote.",
+      "collapseAll": "Kuanguka wote kuporomoka.",
+      "indexLabel": "Index ya package"
+    },
+    "summary": {
+      "title": "Matokeo ya paketi",
+      "sortHint": "Chagua kujazalia kwa mfano hili",
+      "colPackage": "Pakiti ya Package Package",
+      "colVersion": "Toleo toleo tolelo",
+      "colFeatures": "Mipango ya Kifungu",
+      "colAdopted": "Imeandika",
+      "colUnadopted": "Haijapitishwa",
+      "colUsages": "Matokeo",
+      "colScore": "Skor ya alama alama."
+    },
+    "packages": {
+      "title": "Pakiti za Package Packages"
+    },
+    "empty": {
+      "body": "Hakuna paketi ambayo iliyotambulika, kwa hiyo hakuna kifungu kuzungumza."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} ya {total} matokeo ya kutoa",
+      "noChangelog": "Hakuna changelog iliyotoleka kwa package hili, kwa saba features ya kwenye hukufanikia kushereheka. Hiki ni matokeo ya changelog ya kuzungumza features, haukufanikia kama package hili hakuna features.",
+      "noFeatures": "Jina la changelog ilifunguka, lakini haukupatikana makosa yango.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Documentation Uandishi wa hati.",
+      "linkRepository": "Repository ya kumbukumbu."
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Imeongezwa",
+      "changed": "Unganisha",
+      "deprecated": "Mefuatao",
+      "removed": "Elimina",
+      "security": "Unganishaji",
+      "fixed": "Mefikisa",
+      "other": "Laini"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "Hakikisha API inayotamaniwa",
+      "usages": "{count} matokeo",
+      "usagesOne": "Kutambua {count}",
+      "usagesUnknown": "matokeo ya kuzalisha sio kwanza",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "Tazama msimbo wa kuona",
+      "viewDocs": "Tazama docs tazama docks.",
+      "noUsages": "Hakuna ujumla wa kuzungumza katika jumla ya michezo ya project.",
+      "moreUsages": "{count} usages ya kwanza",
+      "moreUsagesOne": "{count} kwa kubadilisha kwa kuzalisha"
+    },
+    "chip": {
+      "adopted": "Imeandika",
+      "partial": "Mefuata kwa makosa mimi",
+      "unused": "Hakuna iliyotumika",
+      "unmeasurable": "Hakuna kujitambulika"
+    }
+  },
   "stylistic": {
     "title": "Mtindo & maoni.",
     "intro": "Maoni ya kanuni za mtindo, mbali kwa default. Weka tu kile ambacho timu yako inakubali. Chaguzi zinazopingana zimewekwa pamoja ili uweze kuchagua moja.",
@@ -222,7 +309,7 @@
     },
     "changelog": {
       "intro": "Ni nini kilichobadilika kutoka {from} hadi {to}  ⁇ mapitio kabla ya kuboresha.",
-      "versionDated": "{version}  ⁇   ⁇ {date} _ PH1__ ni aina ya virusi vya kuambukiza.",
+      "versionDated": "{version} — {date}",
       "truncated": "Inaonyesha {count} matoleo ya hivi karibuni.",
       "viewFull": "Tazama changelog kamili kwenye pub.dev."
     },
