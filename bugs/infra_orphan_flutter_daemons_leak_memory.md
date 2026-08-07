@@ -1,6 +1,6 @@
 # BUG: Infrastructure — Orphaned flutter daemon processes accumulate and leak memory
 
-**Status: Open**
+**Status: Mitigated — scheduled task deployed, permanent fix requires flutter_agent_lens change**
 
 Created: 2026-08-07
 Rule: N/A (infrastructure — Flutter tooling, not a lint rule)
@@ -126,27 +126,29 @@ previous daemon is not killed on restart.
 **Immediate mitigation (manual):**
 
 ```powershell
-# Kill all orphaned flutter daemon processes
-# Matches both dart.exe and dartvm.exe (SDK uses either depending on version).
-# Uses flutter_tools.snapshot filter to avoid killing tooling-daemon processes.
-# PID reuse guard: cross-checks CreationDate — if the process occupying the
-# parent PID was created AFTER the daemon, it's a recycled PID, not the real
-# parent. WMI CreationDate has ~100ns resolution; using strict -lt (not -le)
-# so a same-second parent is treated as alive (false negative is safer than
-# false positive here).
-Get-CimInstance Win32_Process -Filter "Name = 'dart.exe' OR Name = 'dartvm.exe'" |
-  Where-Object { $_.CommandLine -like '*flutter_tools.snapshot*daemon*' } |
-  ForEach-Object {
-    $daemon = $_
-    $orphaned = $true
-    try {
-      $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($daemon.ParentProcessId)" -ErrorAction Stop
-      if ($parent -and $parent.CreationDate -lt $daemon.CreationDate) {
-        $orphaned = $false
-      }
-    } catch {}
-    if ($orphaned) { Stop-Process -Id $daemon.ProcessId -Force }
-  }
+# Kill all orphaned flutter daemon processes (two-pass to avoid errors
+# from parent-child chain deaths).
+# Matches dart.exe and dartvm.exe. Uses flutter_tools.snapshot filter to
+# avoid killing tooling-daemon processes. PID reuse guard: cross-checks
+# CreationDate — strict -lt so same-second parents are treated as alive.
+$daemons = Get-CimInstance Win32_Process -Filter "Name = 'dart.exe' OR Name = 'dartvm.exe'" |
+  Where-Object { $_.CommandLine -like '*flutter_tools.snapshot*daemon*' }
+
+$orphanPids = @()
+foreach ($daemon in $daemons) {
+  $orphaned = $true
+  try {
+    $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($daemon.ParentProcessId)" -ErrorAction Stop
+    if ($parent -and $parent.CreationDate -lt $daemon.CreationDate) {
+      $orphaned = $false
+    }
+  } catch {}
+  if ($orphaned) { $orphanPids += $daemon.ProcessId }
+}
+
+foreach ($pid in $orphanPids) {
+  try { Stop-Process -Id $pid -Force -ErrorAction Stop } catch {}
+}
 ```
 
 **Diagnostic: test whether orphans accept graceful shutdown:**
@@ -187,19 +189,24 @@ issues in the task registration):
 # Step 1: Save cleanup script
 $scriptPath = "$env:USERPROFILE\.flutter_daemon_cleanup.ps1"
 @'
-Get-CimInstance Win32_Process -Filter "Name = 'dart.exe' OR Name = 'dartvm.exe'" |
-  Where-Object { $_.CommandLine -like '*flutter_tools.snapshot*daemon*' } |
-  ForEach-Object {
-    $daemon = $_
-    $orphaned = $true
-    try {
-      $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($daemon.ParentProcessId)" -ErrorAction Stop
-      if ($parent -and $parent.CreationDate -lt $daemon.CreationDate) {
-        $orphaned = $false
-      }
-    } catch {}
-    if ($orphaned) { Stop-Process -Id $daemon.ProcessId -Force }
-  }
+$daemons = Get-CimInstance Win32_Process -Filter "Name = 'dart.exe' OR Name = 'dartvm.exe'" |
+  Where-Object { $_.CommandLine -like '*flutter_tools.snapshot*daemon*' }
+
+$orphanPids = @()
+foreach ($daemon in $daemons) {
+  $orphaned = $true
+  try {
+    $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($daemon.ParentProcessId)" -ErrorAction Stop
+    if ($parent -and $parent.CreationDate -lt $daemon.CreationDate) {
+      $orphaned = $false
+    }
+  } catch {}
+  if ($orphaned) { $orphanPids += $daemon.ProcessId }
+}
+
+foreach ($pid in $orphanPids) {
+  try { Stop-Process -Id $pid -Force -ErrorAction Stop } catch {}
+}
 '@ | Set-Content -Path $scriptPath -Encoding UTF8
 
 # Step 2: Register the task
@@ -212,7 +219,7 @@ Register-ScheduledTask -TaskName 'Kill Orphaned Flutter Daemons' `
   -Description 'Prevents orphaned flutter daemon accumulation (see infra_orphan_flutter_daemons_leak_memory.md)'
 ```
 
-**Permanent fixes to investigate:**
+**Permanent fix (local — upstream will not act on this):**
 
 1. **flutter_agent_lens — Job Object wrapper**: On Windows, assign spawned
    daemon processes to a Win32 Job Object with
@@ -228,11 +235,10 @@ Register-ScheduledTask -TaskName 'Kill Orphaned Flutter Daemons' `
    `ref-napi` calling the Win32 API.
 2. **flutter_agent_lens**: Should it also reuse an existing daemon instead
    of spawning a new one? Should it send `daemon.shutdown` on its own exit?
-3. **VS Code Dart extension**: File upstream issue if daemon reuse is
-   broken on Windows after extension host restarts.
-4. **Flutter SDK upstream**: Report that `flutter daemon` doesn't detect
-   parent death on Windows (broken stdin pipe not detected when blocked
-   on event loop).
+
+**Status:** The scheduled task mitigation is deployed and running. The
+Job Object wrapper is the correct permanent fix — it belongs in the
+flutter_agent_lens MCP server repo, not here.
 
 ---
 
