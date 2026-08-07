@@ -402,6 +402,55 @@
     "reloadNow": "Reload now",
     "reloadLater": "Later"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart processes: {count} ({size} RSS)",
+      "daemonCount": "Flutter daemons: {total} ({orphaned} orphaned)",
+      "warningHint": "Memory usage is high — click for details",
+      "criticalHint": "Memory usage is critical — clean up recommended"
+    },
+    "notification": {
+      "critical": "Dart processes are using {size} with {orphaned} orphaned daemons. Clean up?",
+      "result": "Killed {count} orphaned daemons, freed ~{size}"
+    },
+    "action": {
+      "cleanUp": "Clean Up",
+      "dontShowAgain": "Don’t Show Again"
+    },
+    "cleanup": {
+      "noOrphans": "No orphaned Flutter daemons found.",
+      "confirm": "Found {count} orphaned Flutter daemon processes using {size}. Kill them?",
+      "killButton": "Kill Orphans",
+      "cancelButton": "Cancel"
+    },
+    "command": {
+      "killOrphans": "Kill Orphaned Flutter Daemons"
+    },
+    "panel": {
+      "title": "Process Health",
+      "empty": "No Dart processes running.",
+      "processes": "processes",
+      "totalRss": "total RSS",
+      "orphaned": "orphaned",
+      "refresh": "Refresh",
+      "colPid": "PID",
+      "colParent": "Parent",
+      "colRss": "RSS",
+      "colType": "Type",
+      "colCommand": "Command",
+      "colAction": "Action",
+      "typeOrphan": "Orphan",
+      "typeDaemon": "Daemon",
+      "typeProcess": "Process",
+      "kill": "Kill",
+      "killed": "Killed",
+      "killFailed": "Failed"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

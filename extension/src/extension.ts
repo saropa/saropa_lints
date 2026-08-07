@@ -134,6 +134,12 @@ import {
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
 import { checkForUpgrade, forceUpgradeCheck } from './upgrade-checker';
 import { buildStatusBarLabel } from './statusBarLabel';
+import { ProcessMonitor } from './systemHealth/processMonitor';
+import { formatBytes } from './systemHealth/processQuery';
+import { registerCleanupCommand } from './systemHealth/cleanupCommand';
+import { HealthPanel } from './systemHealth/healthPanel';
+import { HealthLevel } from './systemHealth/types';
+import type { DartProcessSnapshot } from './systemHealth/types';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
@@ -878,6 +884,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Vibrancy data pushed from the vibrancy subsystem via callback.
   let vibrancyData: VibrancyStatusData | null = null;
 
+  // System health snapshot pushed from the process monitor.
+  let systemHealthSnapshot: DartProcessSnapshot | null = null;
+  let systemHealthLevel: HealthLevel = HealthLevel.Healthy;
+
   /** Build tooltip lines for the status bar (version, tier, score, vibrancy details). */
   function buildStatusBarTooltipLines(
     tier: string,
@@ -941,6 +951,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       // Finding count folded into this single item (was a separate ⚠ entry).
       const badge = findingsBadge(data);
       const badgeSuffix = badge?.suffix ?? '';
+
+      // System health suffix for the status bar label.
+      let sysHealthSuffix: string | undefined;
+      if (systemHealthSnapshot && systemHealthLevel !== HealthLevel.Healthy) {
+        const size = formatBytes(systemHealthSnapshot.totalRssBytes);
+        sysHealthSuffix = systemHealthLevel === HealthLevel.Critical
+          ? l10n('systemHealth.statusBar.critical', { size })
+          : l10n('systemHealth.statusBar.warning', { size });
+      }
+
       if (health) {
         const history = loadHistory(context.workspaceState);
         const prevScore = findPreviousScore(history);
@@ -952,11 +972,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           tier,
           showVibrancy,
           vibrancyLabel,
+          systemHealthSuffix: sysHealthSuffix,
         });
         statusBarItem.text = `$(checklist) Saropa: ${detailLabel}${badgeSuffix}`;
-        // Never paint the score onto a colored (esp. red) status-bar
-        // background — a low lint score is informational, not an error, and a
-        // red fill reads as "broken". The number alone carries the signal.
         statusBarItem.backgroundColor = undefined;
       } else {
         statusBarItem.text = `$(checklist) ${buildStatusBarLabel({
@@ -964,6 +982,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           tier,
           showVibrancy,
           vibrancyLabel,
+          systemHealthSuffix: sysHealthSuffix,
         })}${badgeSuffix}`;
         statusBarItem.backgroundColor = undefined;
       }
@@ -978,6 +997,21 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         scorePending,
       );
       if (badge) tooltipLines.push(badge.tooltip);
+      if (systemHealthSnapshot) {
+        const sSize = formatBytes(systemHealthSnapshot.totalRssBytes);
+        const sCount = String(systemHealthSnapshot.processCount);
+        const sTotal = String(systemHealthSnapshot.legitimateDaemonCount + systemHealthSnapshot.orphanedDaemonPids.length);
+        const sOrphaned = String(systemHealthSnapshot.orphanedDaemonPids.length);
+        tooltipLines.push(
+          l10n('systemHealth.tooltip.processCount', { count: sCount, size: sSize }),
+          l10n('systemHealth.tooltip.daemonCount', { total: sTotal, orphaned: sOrphaned }),
+        );
+        if (systemHealthLevel === HealthLevel.Warning) {
+          tooltipLines.push(l10n('systemHealth.tooltip.warningHint'));
+        } else if (systemHealthLevel === HealthLevel.Critical) {
+          tooltipLines.push(l10n('systemHealth.tooltip.criticalHint'));
+        }
+      }
       statusBarItem.tooltip = tooltipLines.join('\n');
       // Click opens the Findings Dashboard (the most actionable destination)
       // now that this item also carries the finding count.
@@ -991,6 +1025,34 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     statusBarItem.show();
   };
   updateAllStatusBars();
+
+  // System health monitor: polls Dart/Flutter process memory and orphan count.
+  const processMonitor = new ProcessMonitor();
+  context.subscriptions.push(processMonitor);
+  processMonitor.onSnapshot((snapshot, level) => {
+    systemHealthSnapshot = snapshot;
+    systemHealthLevel = level;
+    updateAllStatusBars();
+  });
+  processMonitor.start();
+  registerCleanupCommand(context);
+  context.subscriptions.push(
+    vscode.commands.registerCommand('saropaLints.showProcessHealth', () => {
+      HealthPanel.createOrShow(context);
+    }),
+  );
+
+  // Restart monitor only when polling-relevant settings change.
+  const pollingSettings = ['enabled', 'pollIntervalSeconds'].map(
+    (k) => `saropaLints.systemHealth.${k}`,
+  );
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (pollingSettings.some((k) => e.affectsConfiguration(k))) {
+        processMonitor.start();
+      }
+    }),
+  );
 
   // The status-bar score and Issues tree now read live diagnostics, so they must
   // refresh when the analyzer updates them — otherwise they would only move on an

@@ -2,7 +2,7 @@
 
 **Created:** 2026-08-07
 **Subsystem:** `extension/src/` (new `systemHealth/` module) + existing status bar
-**Status:** OPEN
+**Status:** COMPLETE
 **Related bugs:**
 - `bugs/infra_orphan_flutter_daemons_leak_memory.md` (mitigated, scheduled task deployed)
 - `bugs/infra_analysis_server_7gb_memory_with_plugin.md` (open)
@@ -215,3 +215,63 @@ systemHealth.settings.criticalGB      — "Show critical alert when total Dart R
 5. Polling does not visibly impact extension performance (< 200ms per poll)
 6. No processes killed without explicit user consent (notification button or command palette)
 7. Works correctly when no Dart processes are running (healthy state, no errors)
+
+---
+
+## Finish Report (2026-08-07)
+
+### Implementation summary
+
+All five phases of the system health monitor were implemented across two sessions. The feature adds a background process monitor to the saropa_lints VS Code extension that polls Dart/Flutter processes via WMI on Windows, tracks total RSS and orphaned daemon count, and surfaces health status through the existing status bar item.
+
+### Files created
+
+- `extension/src/systemHealth/types.ts` — `DartProcessInfo`, `DartProcessSnapshot` interfaces, `HealthLevel` const enum
+- `extension/src/systemHealth/processQuery.ts` — WMI query, JSON parsing, orphan detection via full OS process table lookup, snapshot builder
+- `extension/src/systemHealth/processMonitor.ts` — `ProcessMonitor` class with configurable polling, snapshot listeners, rate-limited critical notifications
+- `extension/src/systemHealth/cleanupCommand.ts` — `saropaLints.killOrphanedDaemons` command with live re-query before kill and modal confirmation
+
+### Files modified
+
+- `extension/src/statusBarLabel.ts` — added optional `systemHealthSuffix` parameter to `buildStatusBarLabel()`
+- `extension/src/extension.ts` — wired ProcessMonitor lifecycle, snapshot listener, cleanup command registration, config change restart
+- `extension/src/i18n/locales/en.json` — 23 keys under `systemHealth` namespace
+- `extension/package.json` — 1 command, 7 settings under "System Health" configuration section
+- `extension/package.nls.json` — 9 NLS strings for manifest
+- `CHANGELOG.md` — `[Unreleased]` entry under `### Added`
+- `extension/src/test/sidebarToggleLabel.test.ts` — 2 new tests for systemHealthSuffix branch
+
+### Review findings addressed
+
+1. **Orphan detection was fundamentally broken.** The original `isParentAlive()` searched only the dart-filtered process list for the parent PID. Since daemon parents are typically `cmd.exe`, `Code.exe`, or `node.exe`, every live daemon was classified as orphaned. Fixed by introducing `queryProcessById()` which queries the full OS process table for a specific PID, with unique parent PIDs batched via `Promise.all`.
+2. **Stale-snapshot kill risk.** The cleanup command used `monitor.getLastSnapshot()` which could be up to 600 seconds old. PID reuse on Windows meant a cached PID could refer to a different process. Fixed by removing the monitor dependency from `registerCleanupCommand()` and re-querying live processes immediately before presenting the kill dialog.
+3. **Inconsistent threshold operators.** `classifyHealth` used `>` for critical RSS but `>=` for warning RSS. Normalized both to `>=`.
+4. **7 dead en.json keys.** The `systemHealth.settings.*` block duplicated the NLS strings already in `package.nls.json`. Removed.
+5. **Dead imports.** `classifyHealth` and `readSystemHealthConfig` were imported into `extension.ts` but never used. Removed.
+6. **Unnecessary re-export indirection.** `processMonitor.ts` re-exported `formatBytes` from `processQuery.ts`. Consumers now import directly from `processQuery.ts`.
+7. **Added `maxBuffer: 4MB`** to all `execFile` calls to prevent silent failures on large process lists.
+
+### Hardening pass (reflection gate)
+
+8. **CIM_DATETIME parsing.** WMI `ConvertTo-Json` emits DateTime as `/Date(1234567890000)/` which `new Date()` cannot parse. Added `parseCimDate()` that extracts epoch milliseconds from the .NET JSON date format, falling back to `Date.parse()` for ISO strings, and returning 0 (triggering "assume alive" safe default) for unparseable values.
+9. **`isDaemonProcess` word-boundary regex.** Changed from `cmd.includes('daemon')` to `/\bdaemon\b/.test(cmd)` so `dart_tooling_daemon` is not falsely classified as a Flutter daemon.
+10. **Config-change restart scoped.** The `onDidChangeConfiguration` handler now only restarts the monitor when `enabled` or `pollIntervalSeconds` change, not on `showNotifications` or threshold changes that don't affect the poll timer.
+
+### Process Health webview panel (unrequested feature)
+
+Created `extension/src/systemHealth/healthPanel.ts` (controller), `healthPanel-html.ts` (HTML builder), `healthPanel-script.ts` (client JS), `healthPanel-styles.ts` (CSS). Registered command `saropaLints.showProcessHealth` in `package.json` and `extension.ts`. Panel shows a live table of all Dart/Flutter processes with PID, parent PID, RSS, type classification (process/daemon/orphan pills), command line, and per-process kill buttons for orphaned daemons.
+
+### Second review findings addressed
+
+11. **Dispose race condition.** `HealthPanel.refresh()` and `killAndNotify()` now check a `disposed` flag before touching `this.panel.webview` after awaiting async work.
+12. **CSP blocks inline onclick.** Replaced all `onclick="..."` attribute handlers with `data-action` attributes and a delegated `document.addEventListener('click', ...)` in the script, which is authorized by the nonce-only CSP.
+13. **Duplicated `isDaemonProcess`.** Exported from `processQuery.ts`; `healthPanel-html.ts` now imports it instead of reimplementing inline.
+14. **Duplicated `killProcess`.** Extracted to `processQuery.ts` as a shared export; `cleanupCommand.ts` and `healthPanel.ts` both import from there.
+15. **Hardcoded "Killed"/"Failed" strings.** Added `systemHealth.panel.killed` and `systemHealth.panel.killFailed` keys to `en.json`. Labels are passed into the webview via `data-label-killed`/`data-label-failed` attributes and read by the client script.
+
+### Verification
+
+- TypeScript compilation: 0 errors (`npx tsc --noEmit`)
+- NLS key parity: OK (321 keys)
+- Unit tests: 9/9 passing (including 2 new tests for systemHealthSuffix)
+- Locale regeneration: deferred — MT pipeline in transition (NLLB→Qwen); publish gate enforces

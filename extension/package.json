@@ -878,6 +878,16 @@
         "command": "saropaLints.showCommandCatalog",
         "title": "%command.showCommandCatalog.title%",
         "icon": "$(list-flat)"
+      },
+      {
+        "command": "saropaLints.killOrphanedDaemons",
+        "title": "%command.killOrphanedDaemons.title%",
+        "icon": "$(trash)"
+      },
+      {
+        "command": "saropaLints.showProcessHealth",
+        "title": "%command.showProcessHealth.title%",
+        "icon": "$(pulse)"
       }
     ],
     "menus": {
@@ -1819,6 +1829,56 @@
               "%config.property.packageVibrancy.vulnSeverityThreshold.enumDescription.4%"
             ],
             "description": "%config.property.packageVibrancy.vulnSeverityThreshold.description%"
+          }
+        }
+      },
+      {
+        "title": "%config.section.System.Health.title%",
+        "properties": {
+          "saropaLints.systemHealth.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "%config.property.systemHealth.enabled.description%"
+          },
+          "saropaLints.systemHealth.pollIntervalSeconds": {
+            "type": "number",
+            "default": 60,
+            "minimum": 10,
+            "maximum": 600,
+            "description": "%config.property.systemHealth.pollIntervalSeconds.description%"
+          },
+          "saropaLints.systemHealth.warningThresholdGB": {
+            "type": "number",
+            "default": 4,
+            "minimum": 1,
+            "maximum": 32,
+            "description": "%config.property.systemHealth.warningThresholdGB.description%"
+          },
+          "saropaLints.systemHealth.criticalThresholdGB": {
+            "type": "number",
+            "default": 6,
+            "minimum": 2,
+            "maximum": 64,
+            "description": "%config.property.systemHealth.criticalThresholdGB.description%"
+          },
+          "saropaLints.systemHealth.warningOrphanCount": {
+            "type": "number",
+            "default": 1,
+            "minimum": 1,
+            "maximum": 20,
+            "description": "%config.property.systemHealth.warningOrphanCount.description%"
+          },
+          "saropaLints.systemHealth.criticalOrphanCount": {
+            "type": "number",
+            "default": 4,
+            "minimum": 1,
+            "maximum": 50,
+            "description": "%config.property.systemHealth.criticalOrphanCount.description%"
+          },
+          "saropaLints.systemHealth.showNotifications": {
+            "type": "boolean",
+            "default": true,
+            "description": "%config.property.systemHealth.showNotifications.description%"
           }
         }
       }

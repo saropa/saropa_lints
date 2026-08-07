@@ -57,4 +57,30 @@ describe('buildStatusBarLabel', () => {
         });
         assert.strictEqual(label, 'Saropa Lints · V4/10');
     });
+
+    it('appends system health suffix when present', () => {
+        const label = buildStatusBarLabel({
+            hasHealth: true,
+            healthScore: 85,
+            delta: '',
+            tier: 'recommended',
+            showVibrancy: false,
+            vibrancyLabel: null,
+            systemHealthSuffix: '⚠ 4.2G',
+        });
+        assert.strictEqual(label, '85% · recommended · ⚠ 4.2G');
+    });
+
+    it('omits system health suffix when undefined', () => {
+        const label = buildStatusBarLabel({
+            hasHealth: true,
+            healthScore: 85,
+            delta: '',
+            tier: 'recommended',
+            showVibrancy: false,
+            vibrancyLabel: null,
+            systemHealthSuffix: undefined,
+        });
+        assert.strictEqual(label, '85% · recommended');
+    });
 });
