@@ -12,18 +12,43 @@ import subprocess
 import sys
 
 
+_FIX_PATTERNS = [
+    re.compile(r'(\d+)\s+fix(?:es)?\s+(?:made|available)'),
+    re.compile(r'(\d+)\s+fix(?:es)?\s+in\s+\d+\s+file'),
+    re.compile(r'found\s+(\d+)\s+fix'),
+]
+
+
+def _parse_fix_count(output: str) -> int:
+    for pattern in _FIX_PATTERNS:
+        match = pattern.search(output)
+        if match:
+            return int(match.group(1))
+
+    per_file = re.findall(r'-\s+(\d+)\s+fix', output)
+    if per_file:
+        return sum(int(n) for n in per_file)
+
+    return 0
+
+
 def main() -> int:
-    result = subprocess.run(
-        ['dart', 'fix', '--dry-run'],
-        capture_output=True,
-        text=True,
-        timeout=300,
-    )
+    try:
+        result = subprocess.run(
+            ['dart', 'fix', '--dry-run'],
+            capture_output=True,
+            text=True,
+            timeout=300,
+        )
+    except FileNotFoundError:
+        print('ERROR: dart not found on PATH.')
+        return 2
+    except subprocess.TimeoutExpired:
+        print('ERROR: dart fix --dry-run timed out after 300s.')
+        return 2
 
     output = result.stdout + result.stderr
-
-    match = re.search(r'(\d+)\s+fix(?:es)?\s+(?:made|available)', output)
-    fix_count = int(match.group(1)) if match else 0
+    fix_count = _parse_fix_count(output)
 
     if fix_count == 0:
         print('No fixable dart issues found.')

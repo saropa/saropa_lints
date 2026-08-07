@@ -429,6 +429,27 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     else:
         print_success("No pub.dev doc issues found")
 
+    # --- AUTO-FIX: Apply dart fix for auto-fixable lint issues ---
+    dart_fix_result = subprocess.run(
+        ['dart', 'fix', '--dry-run'],
+        capture_output=True, text=True, timeout=300,
+        cwd=str(project_dir),
+    )
+    dart_fix_output = dart_fix_result.stdout + dart_fix_result.stderr
+    fix_match = re.search(r'(\d+)\s+fix', dart_fix_output)
+    if fix_match and int(fix_match.group(1)) > 0:
+        print_warning(
+            f"{fix_match.group(1)} auto-fixable dart issue(s) found, applying..."
+        )
+        subprocess.run(
+            ['dart', 'fix', '--apply'],
+            capture_output=True, text=True, timeout=300,
+            cwd=str(project_dir),
+        )
+        print_success("Auto-fixed dart lint issues")
+    else:
+        print_success("No auto-fixable dart issues")
+
     # --- AUTO-FIX: Remove roadmap task files for implemented rules ---
     from scripts.modules._roadmap_implemented import check_and_fix_roadmap_implemented
 

@@ -26,7 +26,9 @@
 ### Hardening Pass
 
 - Removed dead field `_isProjectRootInitialized` from `saropa_lint_rule.dart` — declared but never read or reassigned.
-- Added `scripts/check_dart_fix.py` — CI/pre-push script that runs `dart fix --dry-run` and fails non-zero if fixable issues exist, preventing future lint report accumulation.
+- Added `scripts/check_dart_fix.py` — CI/pre-push script that runs `dart fix --dry-run` and fails non-zero if fixable issues exist, preventing future lint report accumulation. Hardened with multiple regex patterns and error handling for missing `dart` or timeout.
+- Integrated `dart fix` into publish pipeline (`_publish_steps.py` `run_pre_publish_audits`) — auto-applies fixable lint issues before blocking checks run.
+- Verified ALL ~40 `unnecessary_null_comparison` removals against analyzer 12.1.0 source — every removed null check corresponds to a genuinely non-nullable API in the pinned analyzer version.
 
 ### Verification
 
