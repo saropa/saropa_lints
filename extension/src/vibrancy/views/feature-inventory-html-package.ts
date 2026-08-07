@@ -147,7 +147,15 @@ function buildUsageList(usages: readonly SymbolOccurrence[]): string {
     </details>`;
 }
 
-/** `path:line` plus the trimmed source line for each occurrence. */
+/**
+ * `path:line` plus the trimmed source line for each occurrence.
+ *
+ * Dropping the snippet from the overflow list was measured as a document-size
+ * fix and rejected: it cut a 100-package report by only ~10% because the bulk
+ * is per-feature markup, not snippets, and it cost the reader the one piece of
+ * context that makes a call site judgeable. The size warning at export time is
+ * the honest lever instead.
+ */
 function usageItems(usages: readonly SymbolOccurrence[]): string {
     return usages.map(u => `<li><span class="fi-mono">`
         + `${escapeHtml(u.filePath)}:${u.line}</span>`

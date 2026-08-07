@@ -528,6 +528,32 @@ describe('collectSymbolOccurrences', () => {
         assert.strictEqual(result.get('rich')?.[0].column, 18);
     });
 
+    it('excludes symbols across the directive shapes dart format emits', () => {
+        // Each shape below is one dart format produces for a long directive.
+        // A miss on any of them counts a `show`/`hide` name as adoption.
+        const sources = [src('lib/a.dart', [
+            "import 'package:reel/reel.dart'",
+            '    show ReelText',
+            '    hide ReelBox;',
+            "import 'package:reel/two.dart' as two",
+            '    show ReelText;',
+            "export 'package:reel/reel.dart'",
+            '    show ReelBox;',
+            "import 'package:reel/three.dart' deferred as three",
+            '    show ReelText;',
+            '  final w = ReelText();',
+        ].join('\n'))];
+        const result = collectSymbolOccurrences(
+            sources, new Set(['ReelText', 'ReelBox']),
+        );
+        assert.strictEqual(result.get('ReelText')?.length, 1);
+        assert.strictEqual(result.get('ReelText')?.[0].line, 10);
+        assert.strictEqual(
+            result.get('ReelBox'), undefined,
+            'a name only ever hidden or re-exported is not a usage',
+        );
+    });
+
     it('returns correct counts with a large candidate set', () => {
         // Correctness at scale only. A wall-clock assertion was tried and
         // removed: the alternation implementation this replaced cleared the

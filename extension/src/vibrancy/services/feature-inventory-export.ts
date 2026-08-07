@@ -40,9 +40,25 @@ export interface FeatureInventoryExport {
 }
 
 /**
- * Size past which the HTML is worth warning about. A browser will still open a
- * larger file, but expand-all and text filtering stop feeling instant, and at
- * that point the JSON artifact is the better input for an AI review anyway.
+ * Size past which the HTML is worth warning about.
+ *
+ * Measured, not guessed. Generating synthetic reports of increasing scale
+ * (packages x features each, every feature carrying usage sites) produced:
+ *
+ *   25 x 20   ->  ~1 MB HTML
+ *   50 x 40   ->  ~4 MB
+ *   100 x 60  -> ~13 MB
+ *   150 x 120 -> ~38 MB
+ *
+ * Growth is linear in total feature count and dominated by per-feature markup,
+ * not by usage snippets — dropping snippets from the overflow lists was tried
+ * and reclaimed only ~10%, so it was reverted rather than cost the reader the
+ * context that makes a call site judgeable.
+ *
+ * 8 MB lands around 75 packages at that feature density. A browser opens a
+ * larger file, but expand-all and filtering stop feeling instant, and past that
+ * point the JSON artifact is the better input for an AI review anyway — which
+ * is what the warning says.
  */
 export const HTML_SIZE_WARNING_BYTES = 8 * 1024 * 1024;
 

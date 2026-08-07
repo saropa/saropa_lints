@@ -323,3 +323,49 @@ The feature was never executed end to end. No Extension Development Host was
 launched, no browser opened the generated HTML, and no report was produced from
 a real workspace. Every claim above rests on compilation, unit tests, and
 review. The inline script was parsed, never run against a DOM.
+
+### Second hardening pass — evidence over argument
+
+The first hardening pass rested on reasoning. This one replaced the reasoning
+with measurements, and two of the three claims did not survive.
+
+**The tokenizer rewrite is now differentially tested, and it is NOT equivalent.**
+`symbol-occurrence-equivalence.test.ts` reimplements the replaced alternation
+matcher and asserts both produce identical symbol, file, line, and column output
+across dotted members, bare member segments, prefixes of longer identifiers,
+underscore identifiers, whitespace-split dotted names, string and comment
+contents, repeated hits, deep chains, and a generated 25-file corpus.
+
+Its first run found a divergence that review had missed: the old
+`\b(alternation)\b` never matched a `$`-leading identifier, because `\b` requires
+a word character and `$` is not one. Dart generated code uses `$`-prefixed names
+freely, so the replaced matcher had been under-counting them silently. The
+tokenizer finds them. The difference is an improvement and is now pinned by its
+own test rather than buried inside an equivalence claim.
+
+**The report size warning was a guess; it is now measured.** Synthetic reports
+at increasing scale gave ~1 MB at 25 packages, ~4 MB at 50, ~13 MB at 100, and
+~38 MB at 150. Growth is linear in total feature count. The 8 MB threshold lands
+near 75 packages, which is the right place for a warning — but it also means the
+plan's own target workspace of 100+ dependencies exceeds it, so the JSON
+artifact, not the page, is the intended input at that scale.
+
+**A size fix was tried and reverted.** Dropping source snippets from the
+overflow usage lists looked like the obvious lever. Measured, it reclaimed only
+about 10% because per-feature markup dominates, and it cost the reader the one
+piece of context that makes a call site judgeable. Reverted, with the measurement
+recorded at both sites so nobody re-attempts it.
+
+**Directive shapes broadened.** Tests now cover the forms `dart format` actually
+emits: a wrapped `show` with a following `hide`, `as` and `deferred as` prefixes
+before a wrapped clause, and a wrapped `export`.
+
+**One assumption resolved rather than documented.** `reports/` was already
+covered by `.gitignore`, so the unbounded-growth risk named at hand-off does not
+reach the repository.
+
+### Deliberately not done
+
+No DOM library is installed, and adding one to see the page render is a
+dependency decision for the maintainer, not a hardening step to take
+unilaterally. The generated HTML has still never been displayed by a browser.

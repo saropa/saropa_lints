@@ -34,6 +34,7 @@
     "src/test/vibrancy/services/symbol-usage.test.ts",
     "src/test/vibrancy/views/opportunities-html.test.ts",
     "src/test/vibrancy/services/feature-inventory-model.test.ts",
+    "src/test/vibrancy/services/symbol-occurrence-equivalence.test.ts",
     "src/test/vibrancy/views/feature-inventory-fixture.ts",
     "src/test/vibrancy/views/feature-inventory-html.test.ts",
     "src/test/vibrancy/views/feature-inventory-markdown.test.ts",
