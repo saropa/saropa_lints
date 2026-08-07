@@ -33,28 +33,42 @@ force-kill.
 
 ### Hardening pass
 
-5. **PID reuse guard** — The orphan-detection logic now cross-checks
+5. **PID reuse guard** — The orphan-detection logic cross-checks
    `CreationDate`: if the process occupying the parent PID was created
    *after* the daemon, it is a recycled PID and the daemon is orphaned.
-   Applied to both the manual script and the scheduled task script.
+   Uses strict `-lt` (not `-le`) so same-second parents are treated as
+   alive — false negative is safer than false positive.
 
-6. **Scheduled task escaping** — Replaced inline PowerShell one-liner
+6. **Process name coverage** — Filter widened from `dart.exe` only to
+   `dart.exe OR dartvm.exe`. Live process inspection confirmed both
+   executables run flutter daemons depending on SDK version.
+
+7. **Command-line pattern tightened** — Changed from `*daemon*` to
+   `*flutter_tools.snapshot*daemon*` to avoid matching unrelated
+   `tooling-daemon` processes (also confirmed live).
+
+8. **Scheduled task escaping** — Replaced inline PowerShell one-liner
    with a two-step approach: save the cleanup script to
    `$env:USERPROFILE\.flutter_daemon_cleanup.ps1`, then register the
    task with `-File` instead of `-Command`. Eliminates nested quote
    escaping that could break across PowerShell versions.
 
-7. **daemon.shutdown verified** — Confirmed `daemon.shutdown` is the
-   correct JSON-RPC method name in Flutter SDK source
-   (`packages/flutter_tools/lib/src/commands/daemon.dart`).
+9. **daemon.shutdown diagnostic rewritten** — The original diagnostic
+   started a *new* daemon instead of connecting to an existing orphan.
+   Replaced with a stdin-close test that confirms whether Hypothesis A
+   (broken pipe not detected) is the root cause. Documented that
+   orphaned daemons cannot receive stdin commands from another process,
+   so graceful shutdown is not a viable cleanup path.
 
-8. **Dart SDK version confirmed** — `dart --version` returns 3.12.2
-   stable, matching the Environment section.
+10. **Job Object npm package corrected** — `win32-job-object` does not
+    exist on npm. Replaced with `electron-job-addon` (verified on npm,
+    native N-API bindings) and `ffi-napi` + `ref-napi` as alternatives.
 
-9. **Job Object concept documented** — Added
-   `JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE` as the recommended permanent
-   fix for flutter_agent_lens, with implementation pointers (Win32 API
-   calls, Node.js packages).
+11. **daemon.shutdown verified** — Confirmed as the correct JSON-RPC
+    method name in Flutter SDK source.
+
+12. **Dart SDK version confirmed** — `dart --version` returns 3.12.2
+    stable, matching the Environment section.
 
 ### Scope
 

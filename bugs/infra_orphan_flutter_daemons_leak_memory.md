@@ -30,10 +30,11 @@ rule bug. Filed here because the impact is observed in the saropa_lints
 development environment and the daemon accumulation may be triggered by
 the Dart extension's interaction with custom_lint plugin workspaces.
 
-```bash
+```powershell
 # Confirm daemons are flutter_tools.snapshot processes
-Get-CimInstance Win32_Process -Filter "Name = 'dart.exe'" |
-  Where-Object { $_.CommandLine -like '*daemon*' } |
+# NOTE: the executable may be dart.exe OR dartvm.exe depending on SDK version
+Get-CimInstance Win32_Process -Filter "Name = 'dart.exe' OR Name = 'dartvm.exe'" |
+  Where-Object { $_.CommandLine -like '*flutter_tools.snapshot*daemon*' } |
   Select-Object ProcessId, ParentProcessId, CommandLine
 # All match: flutter_tools.snapshot "daemon"
 ```
@@ -126,17 +127,21 @@ previous daemon is not killed on restart.
 
 ```powershell
 # Kill all orphaned flutter daemon processes
-# NOTE: Windows reuses PIDs, so a live process with the parent's PID may not
-# be the original parent. We cross-check CreationDate: if the "parent" was
-# created AFTER the daemon, it is a recycled PID, not the real parent.
-Get-CimInstance Win32_Process -Filter "Name = 'dart.exe'" |
-  Where-Object { $_.CommandLine -like '*daemon*' } |
+# Matches both dart.exe and dartvm.exe (SDK uses either depending on version).
+# Uses flutter_tools.snapshot filter to avoid killing tooling-daemon processes.
+# PID reuse guard: cross-checks CreationDate — if the process occupying the
+# parent PID was created AFTER the daemon, it's a recycled PID, not the real
+# parent. WMI CreationDate has ~100ns resolution; using strict -lt (not -le)
+# so a same-second parent is treated as alive (false negative is safer than
+# false positive here).
+Get-CimInstance Win32_Process -Filter "Name = 'dart.exe' OR Name = 'dartvm.exe'" |
+  Where-Object { $_.CommandLine -like '*flutter_tools.snapshot*daemon*' } |
   ForEach-Object {
     $daemon = $_
     $orphaned = $true
     try {
       $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($daemon.ParentProcessId)" -ErrorAction Stop
-      if ($parent -and $parent.CreationDate -le $daemon.CreationDate) {
+      if ($parent -and $parent.CreationDate -lt $daemon.CreationDate) {
         $orphaned = $false
       }
     } catch {}
@@ -147,15 +152,28 @@ Get-CimInstance Win32_Process -Filter "Name = 'dart.exe'" |
 **Diagnostic: test whether orphans accept graceful shutdown:**
 
 The `daemon.shutdown` method is confirmed in Flutter SDK source
-(`packages/flutter_tools/lib/src/commands/daemon.dart`). To test whether
-an orphaned daemon still accepts commands on stdin:
+(`packages/flutter_tools/lib/src/commands/daemon.dart`). However, an
+*existing* orphaned daemon cannot be reached via stdin from another
+process — its stdin handle belongs to the dead parent. To test whether
+the shutdown mechanism works at all:
 
 ```powershell
-# Connect to an orphaned daemon's stdin and send shutdown
-# Replace <PID> with an orphaned daemon's PID from the list above
-# If it exits, graceful shutdown works and the fix is a signal, not a kill
-'[{"id":0,"method":"daemon.shutdown"}]' | & D:\tools\flutter\bin\flutter daemon
+# Start a NEW daemon and immediately send shutdown to verify the protocol
+$proc = Start-Process -FilePath 'D:\tools\flutter\bin\flutter.bat' `
+  -ArgumentList 'daemon' -PassThru -NoNewWindow -RedirectStandardInput 'NUL'
+Start-Sleep -Seconds 2
+# If the daemon exits within a few seconds of stdin closing, it detects
+# broken pipes and self-terminates. If it persists, Hypothesis A is confirmed.
+if (-not $proc.HasExited) {
+  Write-Host "CONFIRMED: daemon does NOT exit when stdin closes (Hypothesis A)"
+  Stop-Process -Id $proc.Id -Force
+} else {
+  Write-Host "Daemon exited on stdin close — Hypothesis A is NOT the cause"
+}
 ```
+
+Since orphaned daemons cannot receive stdin commands, graceful shutdown
+is not a viable cleanup path. Force-kill is the only option for orphans.
 
 **Immediate mitigation (scheduled — breaks the feedback loop):**
 
@@ -169,14 +187,14 @@ issues in the task registration):
 # Step 1: Save cleanup script
 $scriptPath = "$env:USERPROFILE\.flutter_daemon_cleanup.ps1"
 @'
-Get-CimInstance Win32_Process -Filter "Name = 'dart.exe'" |
-  Where-Object { $_.CommandLine -like '*daemon*' } |
+Get-CimInstance Win32_Process -Filter "Name = 'dart.exe' OR Name = 'dartvm.exe'" |
+  Where-Object { $_.CommandLine -like '*flutter_tools.snapshot*daemon*' } |
   ForEach-Object {
     $daemon = $_
     $orphaned = $true
     try {
       $parent = Get-CimInstance Win32_Process -Filter "ProcessId = $($daemon.ParentProcessId)" -ErrorAction Stop
-      if ($parent -and $parent.CreationDate -le $daemon.CreationDate) {
+      if ($parent -and $parent.CreationDate -lt $daemon.CreationDate) {
         $orphaned = $false
       }
     } catch {}
@@ -205,8 +223,9 @@ Register-ScheduledTask -TaskName 'Kill Orphaned Flutter Daemons' `
    process trees that must die together (used by Chrome, VS Code, Docker).
    Implementation: call `CreateJobObject` + `SetInformationJobObject`
    (with `JOBOBJECT_EXTENDED_LIMIT_INFORMATION`) + `AssignProcessToJobObject`
-   before spawning the daemon. Node.js: use `win32-job-object` npm package
-   or FFI via `ffi-napi`.
+   before spawning the daemon. Node.js options: `electron-job-addon` (npm,
+   native addon with N-API bindings) or direct FFI via `ffi-napi` +
+   `ref-napi` calling the Win32 API.
 2. **flutter_agent_lens**: Should it also reuse an existing daemon instead
    of spawning a new one? Should it send `daemon.shutdown` on its own exit?
 3. **VS Code Dart extension**: File upstream issue if daemon reuse is

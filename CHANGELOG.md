@@ -64,6 +64,22 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- Register 25+ internal caches for eviction under memory pressure — previously only 10 of ~70 were managed, causing unbounded memory growth on large projects (7.8 GB observed on a 3,900-file codebase). No action required.
+- Fix memory estimator to measure actual per-file cache sizes instead of flat approximations that understated real usage by ~25×. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Add infrastructure bug report for orphaned `flutter daemon` processes accumulating on Windows and exhausting system RAM. Includes hardened cleanup scripts with PID-reuse detection, a scheduled task to break the OOM feedback loop, and a Win32 Job Object permanent fix concept.
+
+</details>
+
+---
+
 ## [14.4.3]
 
 Resolves a runtime error in the lint diagnostic reporter that could prevent ignore-comments and deduplication checks from functioning correctly. This release also hardens internal code quality with broad static analysis improvements and introduces new automated CI gates to prevent future regressions. [log](https://github.com/saropa/saropa_lints/blob/v14.4.3/CHANGELOG.md)
