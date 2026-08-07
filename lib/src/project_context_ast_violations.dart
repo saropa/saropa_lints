@@ -149,6 +149,7 @@ class ViolationBatch {
   /// Flush all pending violations.
   ///
   /// Call this at the end of each file analysis or when switching files.
+  // ignore: library_private_types_in_public_api -- package-internal, no external consumers
   static List<_BatchedViolation> flush() {
     if (_pending.isEmpty) return [];
 

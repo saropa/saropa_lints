@@ -1009,6 +1009,7 @@ class AvoidWebsocketMemoryLeakRule extends SaropaLintRule {
     }
 
     // Assigned a channel constructor result somewhere in the class.
+    // ignore: prefer_interpolation_to_compose_strings -- raw-string regex, escaping cost exceeds lint benefit
     final RegExp assignsChannel = RegExp(
       r'(?:this\.)?' +
           RegExp.escape(fieldName) +

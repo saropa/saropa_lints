@@ -1,6 +1,6 @@
 # Bug: undefined_identifier `ruleContext` in SaropaLintRule.registerNodeProcessors
 
-**Status:** Open
+**Status:** Fixed
 **Severity:** Error (flagged by dart analyze)
 **File:** lib/src/saropa_lint_rule.dart:3017
 

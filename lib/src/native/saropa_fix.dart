@@ -41,11 +41,13 @@ library;
 import 'dart:developer' as developer;
 
 import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
+// ignore: implementation_imports -- no public API for fix generator registration
 import 'package:analysis_server_plugin/src/correction/fix_generators.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 
 export 'package:analysis_server_plugin/edit/dart/correction_producer.dart'
     show CorrectionApplicability, CorrectionProducerContext;
+// ignore: implementation_imports -- no public API for ProducerGenerator
 export 'package:analysis_server_plugin/src/correction/fix_generators.dart'
     show ProducerGenerator;
 export 'package:analyzer_plugin/utilities/change_builder/change_builder_core.dart'

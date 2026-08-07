@@ -214,3 +214,25 @@ One entry under `[Unreleased]` in the Maintenance details expander:
 - Phase 3: ~30 min (depends on dart analyze output)
 - Verify + test: ~15 min
 - **Total: ~2 hours**
+
+---
+
+## Finish Report (2026-08-06)
+
+Three commits resolved all fixable `package:lints/recommended.yaml` lint issues in `lib/` and `test/`, plus an incidentally discovered runtime bug.
+
+**Phase 1 (commit `b6af748f`):** Removed `unnecessary_string_interpolations` (~20 sites across 18 files) and `unnecessary_string_escapes` (17 sites across 4 files). Pure mechanical — merged standalone interpolations into adjacent strings, removed redundant escape backslashes.
+
+**Phase 2a decision:** All 60+ `prefer_interpolation_to_compose_strings` sites use raw-string regex concatenation (`r'\b' + RegExp.escape(word) + r'\b'`). Converting to interpolation would require switching from raw to regular strings and re-escaping all regex metacharacters. Left as-is — escaping cost exceeds lint benefit.
+
+**Phase 2b+3 (commit `229852db`):** Ran `dart analyze lib/` with `recommended.yaml` — only 7 issues remained (not the estimated ~127). Fixed `prefer_adjacent_string_concatenation` in `type_safety_rules.dart:1525`. The `undefined_identifier: ruleContext` error at `saropa_lint_rule.dart:3017` was a real bug: `registerNodeProcessors` received parameter `context` but passed nonexistent `ruleContext` to `SaropaDiagnosticReporter`. Fixed to `ruleContext: context`. Tests never caught this because the method is only invoked by the analysis server at plugin load time.
+
+**Commit `3273a217`:** Resolved 209 additional dart analyzer lint issues across `lib/` and `test/` — nullable finals, string interpolation style, dangling library doc comments, unnecessary `this`/`late`, missing `@override`, `prefer_contains`, `use_super_parameters`, `prefer_collection_literals`, and parameter naming alignment. Removed dead field `_isProjectRootInitialized` from `SaropaLintRule`.
+
+**Residual suppressions:** The 5 remaining issues (2 `implementation_imports`, 2 `library_private_types_in_public_api`, 1 `prefer_interpolation_to_compose_strings`) now have `// ignore:` comments with verified rationale. `dart analyze lib/` with recommended.yaml should show 0 issues.
+
+**CI gate:** `scripts/check_recommended_yaml.py` temporarily enables recommended.yaml analysis and asserts zero unsuppressed issues, catching regressions from future code.
+
+**Verification:** `dart analyze lib/` with recommended.yaml shows 0 issues (all suppressed). All tests pass.
+
+Closes bug: plans/history/2026.08/2026.08.06/20260806_undefined_ruleContext_saropa_lint_rule.md

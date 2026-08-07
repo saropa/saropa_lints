@@ -22,6 +22,7 @@ class ProjectContext {
   /// Finds the project root (directory containing pubspec.yaml) and caches
   /// the parsed project information for subsequent calls.
   /// Returns null if [filePath] is null/empty or no project root is found.
+  // ignore: library_private_types_in_public_api -- package-internal, no external consumers
   static _ProjectInfo? getProjectInfo(String? filePath) {
     if (filePath == null || filePath.isEmpty) return null;
     final projectRoot = findProjectRoot(filePath);

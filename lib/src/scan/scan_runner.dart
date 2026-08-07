@@ -19,6 +19,7 @@ import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart' show AstVisitor, CompilationUnit;
 import 'package:analyzer/error/listener.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
+// ignore: implementation_imports -- no public API for StringSource
 import 'package:analyzer/src/string_source.dart';
 import 'package:path/path.dart' as p;
 
