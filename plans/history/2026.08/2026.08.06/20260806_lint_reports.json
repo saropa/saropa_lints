@@ -1,0 +1,3514 @@
+[{
+	"resource": "/d:/src/saropa_lints/lib/saropa_lints.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_late",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_late",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary 'late' modifier.\nTry removing the 'late'.",
+	"source": "dart",
+	"startLineNumber": 3297,
+	"startColumn": 1,
+	"endLineNumber": 3297,
+	"endColumn": 5,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/cli/project_health/ai_fix_handoff.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 35,
+	"startColumn": 9,
+	"endLineNumber": 36,
+	"endColumn": 37,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/cli/project_vibrancy.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "use_null_aware_elements",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/use_null_aware_elements",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use the null-aware marker '?' rather than a null check via an 'if'.\nTry using '?'.",
+	"source": "dart",
+	"startLineNumber": 138,
+	"startColumn": 5,
+	"endLineNumber": 138,
+	"endColumn": 7,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/comment_utils.dart",
+	"owner": "dartAnalysisLSP",
+	"code": "fixme",
+	"severity": 2,
+	"message": "FIXME-style markers — which both hid genuine commented-out code and",
+	"source": "dart",
+	"startLineNumber": 107,
+	"startColumn": 9,
+	"endLineNumber": 107,
+	"endColumn": 76,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/fixes/control_flow/prefer_null_aware_call_fix.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 108,
+	"startColumn": 12,
+	"endLineNumber": 109,
+	"endColumn": 12,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/fixes/unnecessary_code/replace_null_aware_spread_fix.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 35,
+	"startColumn": 25,
+	"endLineNumber": 35,
+	"endColumn": 52,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/fixes/widget_layout/replace_expanded_empty_child_with_spacer_fix.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_brace_in_string_interps",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_brace_in_string_interps",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary braces in a string interpolation.\nTry removing the braces.",
+	"source": "dart",
+	"startLineNumber": 39,
+	"startColumn": 22,
+	"endLineNumber": 39,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/fixes/widget_layout/single_child_scrollview_column_to_listview_fix.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_brace_in_string_interps",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_brace_in_string_interps",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary braces in a string interpolation.\nTry removing the braces.",
+	"source": "dart",
+	"startLineNumber": 61,
+	"startColumn": 22,
+	"endLineNumber": 61,
+	"endColumn": 26,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/init/config_writer.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 345,
+	"startColumn": 12,
+	"endLineNumber": 347,
+	"endColumn": 37,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/init/config_writer.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 367,
+	"startColumn": 10,
+	"endLineNumber": 369,
+	"endColumn": 17,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/init/custom_overrides_core.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 300,
+	"startColumn": 12,
+	"endLineNumber": 301,
+	"endColumn": 13,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/init/log_writer.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 79,
+	"startColumn": 7,
+	"endLineNumber": 80,
+	"endColumn": 15,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/init/platforms_packages.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 47,
+	"startColumn": 9,
+	"endLineNumber": 48,
+	"endColumn": 13,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/init/platforms_packages.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 56,
+	"startColumn": 11,
+	"endLineNumber": 57,
+	"endColumn": 15,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/init/platforms_packages.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 119,
+	"startColumn": 9,
+	"endLineNumber": 120,
+	"endColumn": 13,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/init/platforms_packages.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 129,
+	"startColumn": 11,
+	"endLineNumber": 130,
+	"endColumn": 15,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/init/whats_new.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_null_aware_operators",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_null_aware_operators",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use the null-aware operator '?.' rather than an explicit 'null' comparison.\nTry using '?.'.",
+	"source": "dart",
+	"startLineNumber": 127,
+	"startColumn": 21,
+	"endLineNumber": 127,
+	"endColumn": 58,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/native/saropa_fix.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "implementation_imports",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/implementation_imports",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Import of a library in the 'lib/src' directory of another package.\nTry importing a public library that exports this library, or removing the import.",
+	"source": "dart",
+	"startLineNumber": 44,
+	"startColumn": 8,
+	"endLineNumber": 44,
+	"endColumn": 75,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/project_context_ast_violations.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "library_private_types_in_public_api",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/library_private_types_in_public_api",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Invalid use of a private type in a public API.\nTry making the private type public, or making the API that uses the private type also be private.",
+	"source": "dart",
+	"startLineNumber": 152,
+	"startColumn": 15,
+	"endLineNumber": 152,
+	"endColumn": 32,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/project_context_project_file.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "library_private_types_in_public_api",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/library_private_types_in_public_api",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Invalid use of a private type in a public API.\nTry making the private type public, or making the API that uses the private type also be private.",
+	"source": "dart",
+	"startLineNumber": 25,
+	"startColumn": 10,
+	"endLineNumber": 25,
+	"endColumn": 22,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/project_context_throttle_memory.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_this",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_this",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary 'this.' qualifier.\nTry removing 'this.'.",
+	"source": "dart",
+	"startLineNumber": 832,
+	"startColumn": 5,
+	"endLineNumber": 832,
+	"endColumn": 9,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/project_context_throttle_memory.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_this",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_this",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary 'this.' qualifier.\nTry removing 'this.'.",
+	"source": "dart",
+	"startLineNumber": 833,
+	"startColumn": 5,
+	"endLineNumber": 833,
+	"endColumn": 9,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/report/analysis_reporter.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_string_interpolations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_string_interpolations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of string interpolation.\nTry replacing the string literal with the variable name.",
+	"source": "dart",
+	"startLineNumber": 391,
+	"startColumn": 17,
+	"endLineNumber": 391,
+	"endColumn": 30,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/report/analysis_reporter.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_string_interpolations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_string_interpolations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of string interpolation.\nTry replacing the string literal with the variable name.",
+	"source": "dart",
+	"startLineNumber": 629,
+	"startColumn": 17,
+	"endLineNumber": 629,
+	"endColumn": 30,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/report/analysis_reporter.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_string_interpolations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_string_interpolations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of string interpolation.\nTry replacing the string literal with the variable name.",
+	"source": "dart",
+	"startLineNumber": 763,
+	"startColumn": 19,
+	"endLineNumber": 763,
+	"endColumn": 32,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/report/analysis_reporter.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_string_interpolations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_string_interpolations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of string interpolation.\nTry replacing the string literal with the variable name.",
+	"source": "dart",
+	"startLineNumber": 765,
+	"startColumn": 19,
+	"endLineNumber": 765,
+	"endColumn": 32,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/report/analysis_reporter.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_string_interpolations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_string_interpolations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of string interpolation.\nTry replacing the string literal with the variable name.",
+	"source": "dart",
+	"startLineNumber": 769,
+	"startColumn": 19,
+	"endLineNumber": 769,
+	"endColumn": 32,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/report/analysis_reporter.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_string_interpolations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_string_interpolations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of string interpolation.\nTry replacing the string literal with the variable name.",
+	"source": "dart",
+	"startLineNumber": 975,
+	"startColumn": 17,
+	"endLineNumber": 975,
+	"endColumn": 30,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/report/analysis_reporter.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_string_interpolations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_string_interpolations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of string interpolation.\nTry replacing the string literal with the variable name.",
+	"source": "dart",
+	"startLineNumber": 980,
+	"startColumn": 17,
+	"endLineNumber": 980,
+	"endColumn": 30,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/report/analysis_reporter.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_string_interpolations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_string_interpolations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of string interpolation.\nTry replacing the string literal with the variable name.",
+	"source": "dart",
+	"startLineNumber": 1016,
+	"startColumn": 17,
+	"endLineNumber": 1016,
+	"endColumn": 30,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/report/analysis_reporter.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_string_interpolations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_string_interpolations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of string interpolation.\nTry replacing the string literal with the variable name.",
+	"source": "dart",
+	"startLineNumber": 1021,
+	"startColumn": 17,
+	"endLineNumber": 1021,
+	"endColumn": 30,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/architecture_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 848,
+	"startColumn": 15,
+	"endLineNumber": 849,
+	"endColumn": 38,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/architecture_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_underscores",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_underscores",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of multiple underscores.\nTry using '_'.",
+	"source": "dart",
+	"startLineNumber": 891,
+	"startColumn": 42,
+	"endLineNumber": 891,
+	"endColumn": 44,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/compile_time_syntax_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 53,
+	"startColumn": 25,
+	"endLineNumber": 53,
+	"endColumn": 28,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/compile_time_syntax_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 311,
+	"startColumn": 24,
+	"endLineNumber": 311,
+	"endColumn": 25,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/compile_time_syntax_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 541,
+	"startColumn": 22,
+	"endLineNumber": 541,
+	"endColumn": 28,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/compile_time_syntax_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 588,
+	"startColumn": 22,
+	"endLineNumber": 588,
+	"endColumn": 28,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/dependency_injection_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1517,
+	"startColumn": 34,
+	"endLineNumber": 1517,
+	"endColumn": 40,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/disposal_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_interpolation_to_compose_strings",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_interpolation_to_compose_strings",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Use interpolation to compose strings and values.\nTry using string interpolation to build the composite string.",
+	"source": "dart",
+	"startLineNumber": 1014,
+	"startColumn": 11,
+	"endLineNumber": 1016,
+	"endColumn": 46,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/lifecycle_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 452,
+	"startColumn": 31,
+	"endLineNumber": 452,
+	"endColumn": 44,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/lifecycle_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 478,
+	"startColumn": 25,
+	"endLineNumber": 478,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/structure_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 3589,
+	"startColumn": 25,
+	"endLineNumber": 3589,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/architecture/structure_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 4324,
+	"startColumn": 26,
+	"endLineNumber": 4324,
+	"endColumn": 35,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/code_quality/code_quality_prefer_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1723,
+	"startColumn": 42,
+	"endLineNumber": 1723,
+	"endColumn": 48,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/codegen/freezed_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 143,
+	"startColumn": 22,
+	"endLineNumber": 143,
+	"endColumn": 28,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/codegen/freezed_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 712,
+	"startColumn": 38,
+	"endLineNumber": 712,
+	"endColumn": 44,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/config/flutter_test_window_deprecation_utils.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 26,
+	"startColumn": 20,
+	"endLineNumber": 26,
+	"endColumn": 23,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/config/flutter_test_window_deprecation_utils.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 43,
+	"startColumn": 18,
+	"endLineNumber": 43,
+	"endColumn": 21,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/config/migration_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 365,
+	"startColumn": 18,
+	"endLineNumber": 365,
+	"endColumn": 21,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/config/migration_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 378,
+	"startColumn": 23,
+	"endLineNumber": 378,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/core/async_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 2419,
+	"startColumn": 27,
+	"endLineNumber": 2419,
+	"endColumn": 37,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/core/class_constructor_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 960,
+	"startColumn": 25,
+	"endLineNumber": 960,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/core/class_constructor_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1861,
+	"startColumn": 34,
+	"endLineNumber": 1861,
+	"endColumn": 40,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/core/performance_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 4781,
+	"startColumn": 27,
+	"endLineNumber": 4781,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/data/collection_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 2968,
+	"startColumn": 22,
+	"endLineNumber": 2968,
+	"endColumn": 26,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/data/json_datetime_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1328,
+	"startColumn": 27,
+	"endLineNumber": 1328,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/data/type_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 2510,
+	"startColumn": 29,
+	"endLineNumber": 2510,
+	"endColumn": 33,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/data/type_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 2682,
+	"startColumn": 20,
+	"endLineNumber": 2682,
+	"endColumn": 25,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/data/type_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 2826,
+	"startColumn": 29,
+	"endLineNumber": 2826,
+	"endColumn": 33,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/data/type_safety_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_adjacent_string_concatenation",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_adjacent_string_concatenation",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "String literals shouldn't be concatenated by the '+' operator.\nTry removing the operator to use adjacent strings.",
+	"source": "dart",
+	"startLineNumber": 1525,
+	"startColumn": 18,
+	"endLineNumber": 1525,
+	"endColumn": 19,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/data/type_safety_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_adjacent_string_concatenation",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_adjacent_string_concatenation",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "String literals shouldn't be concatenated by the '+' operator.\nTry removing the operator to use adjacent strings.",
+	"source": "dart",
+	"startLineNumber": 1532,
+	"startColumn": 64,
+	"endLineNumber": 1532,
+	"endColumn": 65,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/flow/error_handling_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1376,
+	"startColumn": 23,
+	"endLineNumber": 1376,
+	"endColumn": 27,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/packages/bloc_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 4102,
+	"startColumn": 38,
+	"endLineNumber": 4102,
+	"endColumn": 44,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/packages/envied_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 74,
+	"startColumn": 24,
+	"endLineNumber": 74,
+	"endColumn": 33,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/packages/equatable_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1036,
+	"startColumn": 29,
+	"endLineNumber": 1036,
+	"endColumn": 38,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/packages/equatable_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1143,
+	"startColumn": 29,
+	"endLineNumber": 1143,
+	"endColumn": 38,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/packages/equatable_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1277,
+	"startColumn": 31,
+	"endLineNumber": 1277,
+	"endColumn": 41,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/packages/hive_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 309,
+	"startColumn": 25,
+	"endLineNumber": 309,
+	"endColumn": 35,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/packages/hive_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 869,
+	"startColumn": 22,
+	"endLineNumber": 869,
+	"endColumn": 28,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/packages/provider_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1386,
+	"startColumn": 27,
+	"endLineNumber": 1386,
+	"endColumn": 38,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/resources/file_handling_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 879,
+	"startColumn": 27,
+	"endLineNumber": 879,
+	"endColumn": 37,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/resources/resource_management_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_contains",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_contains",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of 'indexOf' to test for containment.\nTry using 'contains'.",
+	"source": "dart",
+	"startLineNumber": 252,
+	"startColumn": 11,
+	"endLineNumber": 252,
+	"endColumn": 52,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/resources/resource_management_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_contains",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_contains",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary use of 'indexOf' to test for containment.\nTry using 'contains'.",
+	"source": "dart",
+	"startLineNumber": 253,
+	"startColumn": 11,
+	"endLineNumber": 253,
+	"endColumn": 48,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 334,
+	"startColumn": 27,
+	"endLineNumber": 334,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 439,
+	"startColumn": 27,
+	"endLineNumber": 439,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 915,
+	"startColumn": 27,
+	"endLineNumber": 915,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1157,
+	"startColumn": 20,
+	"endLineNumber": 1157,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1174,
+	"startColumn": 20,
+	"endLineNumber": 1174,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1190,
+	"startColumn": 20,
+	"endLineNumber": 1190,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1206,
+	"startColumn": 20,
+	"endLineNumber": 1206,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "use_super_parameters",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/use_super_parameters",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Parameter 'code' could be a super parameter.\nTrying converting 'code' to a super parameter.",
+	"source": "dart",
+	"startLineNumber": 2268,
+	"startColumn": 3,
+	"endLineNumber": 2268,
+	"endColumn": 28,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 4530,
+	"startColumn": 21,
+	"endLineNumber": 4530,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 5169,
+	"startColumn": 23,
+	"endLineNumber": 5169,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/stylistic/stylistic_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 5386,
+	"startColumn": 23,
+	"endLineNumber": 5386,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/testing/test_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 2017,
+	"startColumn": 20,
+	"endLineNumber": 2017,
+	"endColumn": 29,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/testing/testing_best_practices_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1280,
+	"startColumn": 25,
+	"endLineNumber": 1280,
+	"endColumn": 32,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/testing/testing_best_practices_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1888,
+	"startColumn": 25,
+	"endLineNumber": 1888,
+	"endColumn": 32,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/testing/testing_best_practices_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 2125,
+	"startColumn": 25,
+	"endLineNumber": 2125,
+	"endColumn": 32,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/ui/animation_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 3255,
+	"startColumn": 25,
+	"endLineNumber": 3255,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/ui/navigation_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1124,
+	"startColumn": 27,
+	"endLineNumber": 1124,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/ui/navigation_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 1561,
+	"startColumn": 27,
+	"endLineNumber": 1561,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/widget/image_filter_quality_detection.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 137,
+	"startColumn": 22,
+	"endLineNumber": 137,
+	"endColumn": 25,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/widget/image_filter_quality_detection.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 179,
+	"startColumn": 22,
+	"endLineNumber": 179,
+	"endColumn": 25,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/widget/widget_layout_constraints_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 4883,
+	"startColumn": 25,
+	"endLineNumber": 4883,
+	"endColumn": 31,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/widget/widget_lifecycle_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 4780,
+	"startColumn": 28,
+	"endLineNumber": 4780,
+	"endColumn": 32,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/widget/widget_patterns_avoid_prefer_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 5242,
+	"startColumn": 21,
+	"endLineNumber": 5242,
+	"endColumn": 24,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/rules/widget/widget_patterns_ux_rules.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_nullable_for_final_variable_declarations",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_nullable_for_final_variable_declarations",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Type could be non-nullable.\nTry changing the type to be non-nullable.",
+	"source": "dart",
+	"startLineNumber": 856,
+	"startColumn": 34,
+	"endLineNumber": 856,
+	"endColumn": 40,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/saropa_lint_rule.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_collection_literals",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_collection_literals",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary constructor invocation.\nTry using a collection literal.",
+	"source": "dart",
+	"startLineNumber": 1741,
+	"startColumn": 23,
+	"endLineNumber": 1741,
+	"endColumn": 55,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/saropa_lint_rule.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_collection_literals",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_collection_literals",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary constructor invocation.\nTry using a collection literal.",
+	"source": "dart",
+	"startLineNumber": 1742,
+	"startColumn": 25,
+	"endLineNumber": 1742,
+	"endColumn": 57,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/saropa_lint_rule.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_collection_literals",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_collection_literals",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary constructor invocation.\nTry using a collection literal.",
+	"source": "dart",
+	"startLineNumber": 1743,
+	"startColumn": 22,
+	"endLineNumber": 1743,
+	"endColumn": 54,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/saropa_lint_rule.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "prefer_final_fields",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/prefer_final_fields",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "The private field _isProjectRootInitialized could be 'final'.\nTry making the field 'final'.",
+	"source": "dart",
+	"startLineNumber": 2842,
+	"startColumn": 15,
+	"endLineNumber": 2842,
+	"endColumn": 48,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/saropa_lint_rule.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "avoid_renaming_method_parameters",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/avoid_renaming_method_parameters",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "The parameter name 'ruleContext' doesn't match the name 'context' in the overridden method.\nTry changing the name to 'context'.",
+	"source": "dart",
+	"startLineNumber": 3007,
+	"startColumn": 17,
+	"endLineNumber": 3007,
+	"endColumn": 28,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/scan/capturing_registry.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "annotate_overrides",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/annotate_overrides",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "The member 'addBlockEnumBody' overrides an inherited member but isn't annotated with '@override'.\nTry adding the '@override' annotation.",
+	"source": "dart",
+	"startLineNumber": 85,
+	"startColumn": 8,
+	"endLineNumber": 85,
+	"endColumn": 24,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/lib/src/scan/scan_runner.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "implementation_imports",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/implementation_imports",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Import of a library in the 'lib/src' directory of another package.\nTry importing a public library that exports this library, or removing the import.",
+	"source": "dart",
+	"startLineNumber": 22,
+	"startColumn": 8,
+	"endLineNumber": 22,
+	"endColumn": 49,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/cli/cross_file_unused_l10n_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 92,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/cli/generated_dart_files_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 83,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/cli/project_vibrancy_coverage_quality_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/config/analysis_options_rule_packs_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/config/pubspec_constraint_parser_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 67,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/config/pubspec_lock_resolver_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/config/rule_pack_registry_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/config/rule_packs_config_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/config/rule_packs_migration_membership_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 2,
+	"startColumn": 1,
+	"endLineNumber": 2,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/config/rule_packs_pubspec_markers_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/config/rule_packs_semver_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/config/runtime_tier_cap_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/init/init_composite_plugin_scaffold_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/init/project_info_root_uri_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/init/write_config_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 97,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/integrity/plan_additional_rules_21_30_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 19,
+	"startColumn": 1,
+	"endLineNumber": 19,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/integrity/plan_c_fixture_expect_lint_contract_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unintended_html_in_doc_comment",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unintended_html_in_doc_comment",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Angle brackets will be interpreted as HTML.\nTry using backticks around the content with angle brackets, or try replacing `<` with `&lt;` and `>` with `&gt;`.",
+	"source": "dart",
+	"startLineNumber": 6,
+	"startColumn": 36,
+	"endLineNumber": 6,
+	"endColumn": 46,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/integrity/project_context_cross_file_snapshot_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 76,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/integrity/rule_relationship_metadata_integrity_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/integrity/rule_tags_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/integrity/security_rule_metadata_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/native/config_loader_project_root_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 18,
+	"startColumn": 1,
+	"endLineNumber": 18,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/native/plugin_logger_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 14,
+	"startColumn": 1,
+	"endLineNumber": 14,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/native/rapid_edit_gate_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 59,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/native/saropa_context_bin_skip_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 17,
+	"startColumn": 1,
+	"endLineNumber": 17,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/native/saropa_context_tool_skip_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 14,
+	"startColumn": 1,
+	"endLineNumber": 14,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/ai_fix_handoff_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 81,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/asset_scanner_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 77,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/class_metrics_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 54,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/complexity_scanner_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 71,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/coupling_metrics_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 56,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/coverage_rollup_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 40,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/cycle_cut_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 71,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/dead_islands_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 81,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/deadweight_integration_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 76,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/doc_coverage_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 79,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/fix_and_stub_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 71,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/folder_tree_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 69,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/git_signals_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 78,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/health_aggregator_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 80,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/health_baseline_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 77,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/health_cache_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 75,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/health_config_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 67,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/health_html_reporter_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 81,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/health_summary_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 79,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/hotspot_ranking_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 77,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/line_metrics_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 50,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/maintainability_index_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 61,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/roi_ranking_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 80,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/size_scanner_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 76,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/project_health/temporal_coupling_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 77,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/report/diagnostic_dedup_tracker_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/report/diagnostic_statistics_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/report/import_graph_tracker_perf_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/report/import_graph_tracker_perf_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_brace_in_string_interps",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_brace_in_string_interps",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary braces in a string interpolation.\nTry removing the braces.",
+	"source": "dart",
+	"startLineNumber": 40,
+	"startColumn": 14,
+	"endLineNumber": 40,
+	"endColumn": 28,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/report/import_graph_tracker_perf_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unnecessary_brace_in_string_interps",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unnecessary_brace_in_string_interps",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Unnecessary braces in a string interpolation.\nTry removing the braces.",
+	"source": "dart",
+	"startLineNumber": 71,
+	"startColumn": 14,
+	"endLineNumber": 71,
+	"endColumn": 28,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/report/import_graph_tracker_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/report/progress_tracker_dedup_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/report/report_consolidator_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 96,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/report/report_synthesis_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 10,
+	"startColumn": 1,
+	"endLineNumber": 10,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/report/rule_timing_tracker_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/config/flutter_sdk_migration_rules_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "no_leading_underscores_for_local_identifiers",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/no_leading_underscores_for_local_identifiers",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "The local variable '_flutterSdkMigrationFixturePaths' starts with an underscore.\nTry renaming the variable to not start with an underscore.",
+	"source": "dart",
+	"startLineNumber": 56,
+	"startColumn": 9,
+	"endLineNumber": 56,
+	"endColumn": 41,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/ui/avoid_inert_animation_value_in_build_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 87,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/ui/navigation_fp_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 70,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_nested_scrollables_conflict_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 82,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/state_lifecycle_dispose_scan_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 84,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/scan/fix_application_smoke_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 20,
+	"startColumn": 1,
+	"endLineNumber": 20,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/scan/scan_cli_args_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 90,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/utils/conditional_import_utils_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 58,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/utils/element_identifier_utils_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/utils/info_plist_utils_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"origin": "extHost1"
+},{
+	"resource": "/d:/src/saropa_lints/test/utils/long_operation_method_name_match_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dangling_library_doc_comments",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dangling_library_doc_comments",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 2,
+	"message": "Dangling library doc comment.\nAdd a 'library' directive after the library comment.",
+	"source": "dart",
+	"startLineNumber": 1,
+	"startColumn": 1,
+	"endLineNumber": 1,
+	"endColumn": 45,
+	"modelVersionId": 1,
+	"origin": "extHost1"
+}]

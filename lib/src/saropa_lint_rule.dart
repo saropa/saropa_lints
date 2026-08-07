@@ -2838,9 +2838,6 @@ abstract class SaropaLintRule extends AnalysisRule {
   // Core Implementation
   // ============================================================
 
-  // Track if we've initialized the project root for disk persistence
-  static final bool _isProjectRootInitialized = false;
-
   // Track recent analysis for throttling: "path:contentHash" -> timestamp
   // Prevents duplicate analysis of identical content within short windows
   static final Map<String, DateTime> _recentAnalysis = {};

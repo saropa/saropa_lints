@@ -75,6 +75,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - Resolve `unnecessary_string_interpolations`, `unnecessary_string_escapes`, and `prefer_adjacent_string_concatenation` lint issues across lib/ to future-proof against pana baseline upgrades to `package:lints/recommended.yaml`. No action required.
 - Resolve 209 dart analyzer lint issues across lib/ and test/: nullable final variables, string interpolation style, dangling library doc comments, unnecessary `this`/`late`, missing `@override`, `prefer_contains`, `use_super_parameters`, `prefer_collection_literals`, and parameter naming alignment with base class signatures.
+- Remove dead field `_isProjectRootInitialized` from `SaropaLintRule`.
+- Add `scripts/check_dart_fix.py` — CI gate that fails if fixable dart issues exist.
 
 </details>
 
