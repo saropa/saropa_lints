@@ -510,11 +510,16 @@ def should_skip_machine_translate(text: str) -> bool:
         non_brand_residue = _PLACEHOLDER_FULL.sub("", brandless)
         if not any(ch.isalnum() for ch in non_brand_residue):
             return True
+    # Placeholders + punctuation/whitespace only ("{category} ({count})",
+    # "{symbol} ({count})"): once {tokens} are stripped, no translatable word
+    # remains — MT can only echo or corrupt the template. Copy verbatim.
+    residue = re.sub(r"[\s\W_]+", "", _PLACEHOLDER_FULL.sub("", s), flags=re.UNICODE)
+    if _PLACEHOLDER_FULL.search(s) and not any(ch.isalnum() for ch in residue):
+        return True
     # Single-letter label wrapping placeholders: once the {tokens} are removed
     # nothing translatable remains, and MT only renames the token ("L{line}" ->
     # "L{Linie}"). Keep the English label. Residue must be exactly one ASCII
     # letter so real phrases ("of {total}") are unaffected.
-    residue = re.sub(r"[\s\W_]+", "", _PLACEHOLDER_FULL.sub("", s), flags=re.UNICODE)
     if _PLACEHOLDER_FULL.search(s) and len(residue) == 1 and residue.isascii() and residue.isalpha():
         return True
     return False

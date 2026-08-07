@@ -215,23 +215,49 @@ class ImportGraphTracker {
     return _importedBy[key ?? path] ?? const <String>{};
   }
 
-  /// Files whose raw import URIs reference [changedPath] (pre-compute reverse
-  /// lookup). Used by [FileContentCache] to invalidate pass records for
-  /// dependents when a file changes, without waiting for [compute].
-  static Iterable<String> rawImportersOf(String changedPath) sync* {
+  /// All files that transitively import [changedPath] (pre-compute reverse
+  /// lookup using raw URIs). Used by [FileContentCache] to invalidate pass
+  /// records for the full dependency fan-out when a file changes, without
+  /// waiting for [compute].
+  ///
+  /// Basename-suffix matching is used because raw URIs are unresolved.
+  /// Over-matching (two files with the same basename) is safe — it causes
+  /// extra re-analysis, not missed violations.
+  static Set<String> transitiveImportersOf(String changedPath) {
+    if (_rawImports.isEmpty) return const {};
     final normalized = changedPath.replaceAll('\\', '/');
     final basename = normalized.contains('/')
         ? normalized.substring(normalized.lastIndexOf('/') + 1)
         : normalized;
-    if (basename.isEmpty) return;
-    for (final entry in _rawImports.entries) {
-      for (final uri in entry.value) {
-        if (uri.endsWith(basename)) {
-          yield entry.key;
-          break;
+    if (basename.isEmpty) return const {};
+
+    final result = <String>{};
+    final queue = <String>[basename];
+    final visited = <String>{basename};
+
+    while (queue.isNotEmpty) {
+      final target = queue.removeLast();
+      for (final entry in _rawImports.entries) {
+        if (result.contains(entry.key)) continue;
+        for (final uri in entry.value) {
+          if (uri.endsWith(target)) {
+            result.add(entry.key);
+            final depBasename = _basename(entry.key);
+            if (depBasename.isNotEmpty && visited.add(depBasename)) {
+              queue.add(depBasename);
+            }
+            break;
+          }
         }
       }
     }
+    return result;
+  }
+
+  static String _basename(String path) {
+    final normalized = path.replaceAll('\\', '/');
+    final lastSlash = normalized.lastIndexOf('/');
+    return lastSlash >= 0 ? normalized.substring(lastSlash + 1) : normalized;
   }
 
   /// Computed importance score for [path] (relative or absolute file path).

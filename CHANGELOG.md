@@ -69,7 +69,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Added
 
 - **Full Opportunities Report** — a new export (sidebar, or `Saropa Lints: Export Full Opportunities Report`) that consolidates every dependency and every changelog feature into one HTML, Markdown, and JSON report under `reports/`. Unlike the Upgrade Opportunities panel, it keeps fully-adopted packages and every changelog category, and counts each feature's usage from zero upward with the exact project file and line of every reference. Built to hand to an AI for a dependency-usage review.
-- **Balanced memory mode** — new `memory_mode: balanced` setting (default) that skips type-heavy rules on unchanged files during incremental analysis, reducing analyzer RSS by ~7 GB on large projects. When a dependency changes, direct importers are automatically re-analyzed; transitive dependents may need a file edit or analysis server restart. Set `memory_mode: full` in `analysis_options_custom.yaml` or `SAROPA_MEMORY_MODE=full` to restore previous behavior. No action required.
+- **Balanced memory mode** — new `memory_mode: balanced` setting (default) that skips type-heavy rules on unchanged files during incremental analysis, reducing analyzer RSS by ~7 GB on large projects. When a dependency changes, all transitive importers are automatically re-analyzed via import-graph invalidation. Set `memory_mode: full` in `analysis_options_custom.yaml` or `SAROPA_MEMORY_MODE=full` to restore previous behavior. No action required.
 
 <details>
 <summary>Maintenance</summary>

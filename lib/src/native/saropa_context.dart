@@ -290,10 +290,8 @@ class SaropaContext {
       // previously passed. Avoids triggering lazy cross-library type resolution
       // in the analyzer, which is the dominant cause of RSS growth (~7.8 GB on
       // large projects). When a dependency changes, hasChanged() cascades
-      // invalidation to direct importers via ImportGraphTracker.rawImportersOf,
-      // so dependents are re-analyzed. Transitive dependents (A imports B
-      // imports C, C changes) may still see stale diagnostics until B is
-      // re-analyzed and its own pass records are cleared.
+      // invalidation to all transitive importers via
+      // ImportGraphTracker.transitiveImportersOf.
       if (MemoryModeConfig.shouldApplyBalancedFiltering &&
           !_fileContentChanged &&
           rule.usesTypeResolution &&

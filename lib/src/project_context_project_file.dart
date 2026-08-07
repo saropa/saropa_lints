@@ -586,11 +586,12 @@ class FileContentCache {
     return false;
   }
 
-  /// Clear pass records for files that import [changedPath], so type-heavy
-  /// rules re-run on dependents whose resolved semantics may have changed
-  /// even though their source text is identical.
+  /// Clear pass records for all transitive importers of [changedPath], so
+  /// type-heavy rules re-run on dependents whose resolved semantics may have
+  /// changed even though their source text is identical.
   static void _invalidateDependents(String changedPath) {
-    for (final dependent in ImportGraphTracker.rawImportersOf(changedPath)) {
+    final dependents = ImportGraphTracker.transitiveImportersOf(changedPath);
+    for (final dependent in dependents) {
       _passedRules.remove(normalizePath(dependent));
     }
   }

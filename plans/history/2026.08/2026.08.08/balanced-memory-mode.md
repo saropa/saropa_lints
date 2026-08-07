@@ -30,19 +30,21 @@ The Dart analysis server's RSS grew to 11 GB on large projects (~3,900 files) be
 
 ### Hardening pass
 
-- **Import-graph invalidation**: `ImportGraphTracker.rawImportersOf()` added — a lightweight pre-`compute()` reverse lookup using raw import URIs. `FileContentCache.hasChanged()` now cascades pass-record invalidation to direct importers of a changed file. This eliminates the cross-file staleness gap for direct dependencies.
+- **Transitive import-graph invalidation**: `ImportGraphTracker.transitiveImportersOf()` walks the raw import graph recursively using a BFS queue and visited set, collecting all files that transitively import a changed file. `FileContentCache.hasChanged()` cascades pass-record invalidation to the full transitive fan-out, eliminating the cross-file staleness gap entirely (not just direct importers).
 - **`_isCli` reset**: `MemoryModeConfig.resetForTest()` added to clear both mode and CLI flag, preventing state leakage between tests.
 - **Bookkeeping gated**: `recordRulePassed`/`revokeRulePassed` calls are now gated behind `shouldApplyBalancedFiltering`, so `full` mode incurs zero new overhead.
+- **Selection criteria enforcement**: `test/integrity/uses_type_resolution_test.dart` greps all rule files for resolved-type API usage (`.staticType`, `.allSupertypes`, `.declaredElement`, etc.) and asserts they have `usesTypeResolution => true`. Catches future rules added without the override.
+- **Empty graph guard**: `transitiveImportersOf` returns immediately when `_rawImports` is empty (first analysis pass before any files are collected).
 
 ### Known limitations
 
-- **Transitive staleness**: if file C changes and file B imports C, B's pass records are cleared. But if file A imports B (not C directly), A's pass records remain — A is re-analyzed only when B's source text also changes. Restart the analysis server to force full re-evaluation.
 - **LRU eviction**: the `_passedRules` cache is capped at 500 files. Projects with more hot files silently fall back to always-run for evicted entries (safe but reduces savings).
 - **Initial peak unaffected**: the optimization only applies to re-analysis passes. The first full analysis still peaks high.
-- **Basename matching heuristic**: `rawImportersOf` matches import URIs by basename suffix, which could over-invalidate if two different files share the same basename (e.g., `models/user.dart` and `views/user.dart`). Over-invalidation is safe (extra re-analysis, not missed violations).
+- **Basename matching heuristic**: `transitiveImportersOf` matches import URIs by basename suffix, which could over-invalidate if two different files share the same basename (e.g., `models/user.dart` and `views/user.dart`). Over-invalidation is safe (extra re-analysis, not missed violations).
 
 ### Test evidence
 
 - `resolved_rule_harness_self_test.dart`: 54 tests pass (all rules compile and fire correctly).
 - `defensive_coding_test.dart`: 52 tests pass (no regressions in defensive helpers).
 - `test/config/memory_mode_test.dart`: 11 new tests covering `MemoryModeConfig` defaults/full/CLI/reset states and `FileContentCache` record/revoke/invalidate lifecycle.
+- `test/integrity/uses_type_resolution_test.dart`: 1 test enforcing selection criteria for `usesTypeResolution` override.

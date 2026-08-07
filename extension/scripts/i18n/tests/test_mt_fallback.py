@@ -156,12 +156,16 @@ class TestShouldSkip(unittest.TestCase):
         for s in ("⚠ {size}", "🔴 {size}"):
             self.assertTrue(mt.should_skip_machine_translate(s), s)
 
+    def test_skips_placeholder_punctuation_only(self) -> None:
+        for s in ("{category} ({count})", "{symbol} ({count})", "{a} / {b}", "{x}-{y}"):
+            self.assertTrue(mt.should_skip_machine_translate(s), s)
+
     def test_does_not_skip_emoji_with_words(self) -> None:
         self.assertFalse(mt.should_skip_machine_translate("✓ Added authentication for {name}"))
 
-    def test_does_not_skip_ascii_symbol_placeholder(self) -> None:
+    def test_skips_ascii_symbol_placeholder(self) -> None:
         for s in ("* {count}", "# {items}", "+ {name}"):
-            self.assertFalse(mt.should_skip_machine_translate(s), s)
+            self.assertTrue(mt.should_skip_machine_translate(s), s)
 
     def test_does_not_skip_real_phrases(self) -> None:
         for s in (
@@ -172,6 +176,8 @@ class TestShouldSkip(unittest.TestCase):
             "{count} Saropa packages",
             "Kill Orphaned Flutter Daemons",
             "Dart processes: {count} ({size} RSS)",
+            "(from {source})",
+            "v{version} or later",
         ):
             self.assertFalse(mt.should_skip_machine_translate(s), s)
 
