@@ -37,6 +37,7 @@
     "src/test/vibrancy/services/symbol-occurrence-equivalence.test.ts",
     "src/test/vibrancy/views/feature-inventory-fixture.ts",
     "src/test/vibrancy/views/feature-inventory-html.test.ts",
+    "src/test/vibrancy/views/feature-inventory-dom.test.ts",
     "src/test/vibrancy/views/feature-inventory-markdown.test.ts",
     "src/test/vibrancy/services/scan-logger.test.ts",
     "src/test/vibrancy/services/github-api.test.ts",

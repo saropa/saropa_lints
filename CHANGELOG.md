@@ -77,6 +77,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Moved `.vsix` output from `extension/` to the project root for easier access after packaging.
 - Translation skip logic now recognizes placeholder-only templates (`{category} ({count})`) as untranslatable, eliminating 48 false-positive missing-translation reports.
 - Pinned the opportunities report's symbol matcher against the implementation it replaced with a differential test, which found that the previous matcher silently never counted `$`-prefixed identifiers.
+- Added a headless-DOM test harness (`jsdom`) that executes the opportunities report's inline script, so its filter, mode toggles, expand/collapse, and column sort are verified to work rather than merely to be present.
 - Marked 68 rule files as type-resolution-heavy (`usesTypeResolution`) to support balanced memory mode filtering.
 
 </details>

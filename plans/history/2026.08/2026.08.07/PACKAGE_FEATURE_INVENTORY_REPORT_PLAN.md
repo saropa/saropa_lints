@@ -369,3 +369,40 @@ reach the repository.
 No DOM library is installed, and adding one to see the page render is a
 dependency decision for the maintainer, not a hardening step to take
 unilaterally. The generated HTML has still never been displayed by a browser.
+
+### Third pass — the report's behavior is now executed
+
+The gap carried through two hand-offs was that the generated page had never
+run. Every test asserted on the HTML string: that a control appeared, that the
+script parsed. None proved a control worked. A runtime error inside the inline
+script would have left the filter, the mode toggles, expand-all, and the column
+sort dead while the whole suite stayed green.
+
+`jsdom` was added as a devDependency (a maintainer decision, taken with explicit
+approval) and `feature-inventory-dom.test.ts` now renders the report, evaluates
+the document with scripts enabled, and drives each control: expand and collapse
+across every disclosure, text filtering with group hiding, the changelog-less
+package that must survive a query it cannot match, filter clearing, the three
+mutually exclusive mode toggles including toggle-off, category selection, column
+sort with direction reversal, and hash navigation opening a linked package's
+ancestors.
+
+**The harness was mutation-tested before being trusted.** Three deliberate
+defects were injected into the script and each was caught: pointing the filter
+at a non-existent class failed 4 tests, dropping the sort's direction term
+failed the sort test, and removing the `total > 0` guard failed exactly the
+changelog-less-package test written to protect it. The script was then restored
+and verified byte-identical to the committed version. A green suite that cannot
+fail proves nothing, which is the lesson the deleted wall-clock test taught.
+
+The script needed no fixes — it was correct as written. That is now evidence
+rather than assumption.
+
+**Collateral, recorded because it was self-inflicted:** the first `npm install`
+ran from the repository root and created a stray root `package.json`,
+`package-lock.json`, and `node_modules`. Removed; jsdom belongs only to
+`extension/package.json`.
+
+The remaining unverified surface is narrow: the report has still never been
+opened by a real browser, so CSS layout and the theme media query are unproven.
+Behavior, data, and structure are covered.

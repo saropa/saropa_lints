@@ -157,7 +157,10 @@ class TestShouldSkip(unittest.TestCase):
             self.assertTrue(mt.should_skip_machine_translate(s), s)
 
     def test_skips_placeholder_punctuation_only(self) -> None:
-        for s in ("{category} ({count})", "{symbol} ({count})", "{a} / {b}", "{x}-{y}"):
+        for s in (
+            "{category} ({count})", "{symbol} ({count})", "{a} / {b}",
+            "{x}-{y}", "({label})", "{label}: {size}", "{version} — {date}",
+        ):
             self.assertTrue(mt.should_skip_machine_translate(s), s)
 
     def test_does_not_skip_emoji_with_words(self) -> None:
@@ -178,6 +181,9 @@ class TestShouldSkip(unittest.TestCase):
             "Dart processes: {count} ({size} RSS)",
             "(from {source})",
             "v{version} or later",
+            "添加 {name}",
+            "إضافة {name}",
+            "항목 ({count})",
         ):
             self.assertFalse(mt.should_skip_machine_translate(s), s)
 
