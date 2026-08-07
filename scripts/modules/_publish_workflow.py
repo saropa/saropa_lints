@@ -479,7 +479,7 @@ def run_publish_existing_vsix_mode(
     project_dir: Path,
 ) -> int | None:
     """If mode is publish_existing_vsix, skip packaging and publish the newest
-    .vsix already in extension/ to Marketplace + Open VSX. Returns exit code;
+    .vsix already in the project root to Marketplace + Open VSX. Returns exit code;
     else None.
 
     Rationale: publish.py auto-bumps pubspec.yaml / extension/package.json
@@ -496,16 +496,15 @@ def run_publish_existing_vsix_mode(
             f"Extension directory not found: {project_dir / 'extension'}",
             ExitCode.PREREQUISITES_FAILED,
         )
-    ext_dir = project_dir / "extension"
     # Newest .vsix first so the most recently packaged one is the default.
     vsix_files = sorted(
-        ext_dir.glob("*.vsix"),
+        project_dir.glob("*.vsix"),
         key=lambda p: p.stat().st_mtime,
         reverse=True,
     )
     if not vsix_files:
         exit_with_error(
-            f"No .vsix found in {ext_dir}. Run mode 6 to package one first.",
+            f"No .vsix found in {project_dir}. Run mode 6 to package one first.",
             ExitCode.PREREQUISITES_FAILED,
         )
     print_header("EXTENSION: PUBLISH EXISTING .VSIX")

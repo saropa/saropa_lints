@@ -158,7 +158,7 @@ def _prompt_publish_mode() -> str:
     print("  4) Publish without audit (skip audit; format \u2192 analysis \u2192 tests \u2192 release)")
     print("  5) Analyze only (run dart analyze, write log; then exit)")
     print("  6) Extension only (package .vsix, optionally publish to Marketplace/Open VSX)")
-    print("  7) Publish existing .vsix (skip packaging; newest in extension/)")
+    print("  7) Publish existing .vsix (skip packaging; newest in project root)")
     print("  8) CI fallback playbook (manual publish URLs, commands, upload files)")
     try:
         raw = input("  Choice [1]: ").strip() or "1"

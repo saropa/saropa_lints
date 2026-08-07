@@ -73,7 +73,7 @@ def extension_exists(project_dir: Path) -> bool:
 
 def extension_vsix_path(project_dir: Path, version: str) -> Path:
     """Path to the packaged VSIX for this version (saropa-lints-x.y.z.vsix)."""
-    return _extension_dir(project_dir) / f"saropa-lints-{version}.vsix"
+    return project_dir / f"saropa-lints-{version}.vsix"
 
 
 def copy_changelog_to_extension(project_dir: Path) -> bool:
@@ -259,15 +259,15 @@ def run_extension_package(project_dir: Path, version: str) -> Path | None:
     version (root cause of 9.1.0/9.2.0 never reaching the Marketplace).
     """
     ext_dir = _extension_dir(project_dir)
+    vsix_name = f"saropa-lints-{version}.vsix"
+    out_path = project_dir / vsix_name
 
-    # Remove stale .vsix files so the post-package glob only finds the
-    # newly created file.  Without this, next(glob("*.vsix")) could
-    # return an older .vsix that sorts before the new one alphabetically.
-    for old_vsix in ext_dir.glob("*.vsix"):
+    for old_vsix in project_dir.glob("*.vsix"):
         old_vsix.unlink()
 
     r = run_command(
-        ["npx", "@vscode/vsce", "package", "--no-dependencies"],
+        ["npx", "@vscode/vsce", "package", "--no-dependencies",
+         "--out", str(out_path)],
         ext_dir,
         "Package .vsix",
         capture_output=True,
@@ -280,14 +280,10 @@ def run_extension_package(project_dir: Path, version: str) -> Path | None:
             print_error(r.stdout.strip())
         return None
 
-    # Use the expected filename so we never accidentally pick up the
-    # wrong file even if something else created a .vsix.
-    expected = ext_dir / f"saropa-lints-{version}.vsix"
-    if expected.is_file():
-        return expected
+    if out_path.is_file():
+        return out_path
 
-    # Fallback: grab whatever vsce created (name may differ).
-    return next(ext_dir.glob("*.vsix"), None)
+    return next(project_dir.glob("*.vsix"), None)
 
 
 def install_extension(vsix_path: Path) -> bool:
@@ -564,7 +560,12 @@ def package_extension(project_dir: Path, version: str) -> Path | None:
         return None
     vsix = run_extension_package(project_dir, version)
     if vsix:
-        print_success(f"Packaged: {vsix.name}")
+        size_kb = vsix.stat().st_size / 1024
+        if size_kb >= 1024:
+            size_str = f"{size_kb / 1024:.1f} MB"
+        else:
+            size_str = f"{size_kb:.0f} KB"
+        print_success(f"Packaged: {vsix} ({size_str})")
     return vsix
 
 

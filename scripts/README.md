@@ -33,7 +33,7 @@ runs `npm ci` when `extension/package-lock.json` exists, then launches VS Code (
 | 4 | Skip audit | Full publish minus the audit step |
 | 5 | Analyze only | Run `dart analyze`, write log, exit |
 | 6 | Extension only | Package .vsix, optionally publish to stores |
-| 7 | Publish existing .vsix | Publish newest `extension/*.vsix` without re-packaging |
+| 7 | Publish existing .vsix | Publish newest `*.vsix` from project root without re-packaging |
 | 8 | CI fallback playbook | Print manual release commands, URLs, and upload file paths |
 
 ## Architecture

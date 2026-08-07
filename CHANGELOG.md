@@ -64,6 +64,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+<details>
+<summary>Maintenance</summary>
+
+- Moved `.vsix` output from `extension/` to the project root for easier access after packaging.
+
+</details>
+
+---
+
 ## [14.5.0]
 
 This release introduces comprehensive system health monitoring to track memory usage and safely terminate orphaned background processes. It also resolves severe memory retention issues during analysis of large codebases and refines localization workflows by preventing false-positive translation warnings. Developers will experience a significantly more stable and responsive environment with highly accurate diagnostic results during extended coding sessions. [log](https://github.com/saropa/saropa_lints/blob/v14.5.0/CHANGELOG.md)
