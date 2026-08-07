@@ -22,6 +22,10 @@ ANALYSIS_OPTIONS = Path('analysis_options.yaml')
 INCLUDE_LINE = 'include: package:lints/recommended.yaml\n'
 
 
+_YAML_DOC_MARKER = re.compile(r'^(---|\.\.\.)\s*$')
+_LIB_EXCLUDE = re.compile(r'^(\s*-\s*)["\']?lib/\*\*["\']?\s*$')
+
+
 def _patch(original: str) -> str:
     """Insert recommended.yaml include and remove lib/** exclude."""
     lines = original.splitlines(keepends=True)
@@ -31,12 +35,17 @@ def _patch(original: str) -> str:
     for line in lines:
         stripped = line.strip()
 
-        if not include_inserted and stripped and not stripped.startswith('#'):
+        if (
+            not include_inserted
+            and stripped
+            and not stripped.startswith('#')
+            and not _YAML_DOC_MARKER.match(stripped)
+        ):
             patched.append(INCLUDE_LINE)
             patched.append('\n')
             include_inserted = True
 
-        if re.match(r'^\s*-\s*["\']?lib/\*\*["\']?\s*$', line):
+        if _LIB_EXCLUDE.match(line):
             continue
 
         patched.append(line)

@@ -35,29 +35,22 @@ if [ "$status" -ne 0 ]; then
   exit "$status"
 fi
 
-# ── dart-dependent gates (skip if dart is not on PATH) ──
-if command -v dart >/dev/null 2>&1; then
+# ── dart fix dry-run gate (exit 2 = dart missing, skip gracefully) ──
+$PY scripts/check_dart_fix.py
+fix_status=$?
+if [ "$fix_status" -eq 1 ]; then
+  echo ""
+  echo "Commit blocked: fixable dart issues found. Run 'dart fix --apply' and re-stage."
+  exit 1
+fi
 
-  # dart fix dry-run gate
-  $PY scripts/check_dart_fix.py
-  fix_status=$?
-  if [ "$fix_status" -eq 1 ]; then
-    echo ""
-    echo "Commit blocked: fixable dart issues found. Run 'dart fix --apply' and re-stage."
-    exit 1
-  fi
-
-  # recommended.yaml regression gate
-  $PY scripts/check_recommended_yaml.py
-  rec_status=$?
-  if [ "$rec_status" -eq 1 ]; then
-    echo ""
-    echo "Commit blocked: recommended.yaml lint regressions found. Add // ignore: with rationale or fix the issue."
-    exit 1
-  fi
-
-else
-  echo "Note: dart not on PATH — skipping dart fix and recommended.yaml checks."
+# ── recommended.yaml regression gate (exit 2 = dart missing, skip gracefully) ──
+$PY scripts/check_recommended_yaml.py
+rec_status=$?
+if [ "$rec_status" -eq 1 ]; then
+  echo ""
+  echo "Commit blocked: recommended.yaml lint regressions found. Add // ignore: with rationale or fix the issue."
+  exit 1
 fi
 
 exit 0
