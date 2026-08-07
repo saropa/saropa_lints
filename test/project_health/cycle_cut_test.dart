@@ -1,6 +1,7 @@
 /// Tests cycle-cut selection: picks the stable→volatile edge (highest
 /// fanIn(from) - fanIn(to)) and dedups equivalent cycles.
 library;
+
 import 'package:saropa_lints/src/cli/project_health/cycle_cut.dart';
 import 'package:test/test.dart';
 

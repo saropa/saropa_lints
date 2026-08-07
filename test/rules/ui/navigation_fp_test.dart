@@ -8,6 +8,7 @@
 /// stubbed locally where the rule's detection actually needs resolution; rules
 /// that key off method names / string-literal paths work directly.
 library;
+
 import 'package:saropa_lints/src/rules/ui/navigation_rules.dart';
 import 'package:test/test.dart';
 

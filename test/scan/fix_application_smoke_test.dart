@@ -25,7 +25,6 @@
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
 
-
 import 'package:saropa_lints/src/fixes/common/delete_node_fix.dart';
 import 'package:saropa_lints/src/fixes/common/insert_text_fix.dart';
 import 'package:saropa_lints/src/fixes/json_datetime/replace_datetime_constructor_fix.dart';

@@ -3,6 +3,7 @@
 /// The process test shells out to `dart run` so flag errors match real CLI behavior;
 /// pure parser cases stay in-memory for speed.
 library;
+
 import 'dart:io';
 
 import 'package:saropa_lints/src/scan/scan_cli_args.dart';

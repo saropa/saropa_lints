@@ -5,6 +5,7 @@
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
+
 import 'dart:convert' show JsonEncoder;
 import 'dart:io' show Directory, File;
 

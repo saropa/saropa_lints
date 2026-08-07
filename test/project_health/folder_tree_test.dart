@@ -1,5 +1,6 @@
 /// Tests the nested folder-tree builder for the drill-down treemap.
 library;
+
 import 'package:saropa_lints/src/cli/project_health/folder_tree.dart';
 import 'package:saropa_lints/src/cli/project_health/health_aggregator.dart';
 import 'package:saropa_lints/src/cli/project_health/health_model.dart';

@@ -1,5 +1,6 @@
 /// Tests for Halstead volume and the Maintainability Index.
 library;
+
 import 'package:saropa_lints/src/cli/project_health/maintainability_index.dart';
 import 'package:test/test.dart';
 

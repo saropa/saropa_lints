@@ -5,6 +5,7 @@
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
+
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:saropa_lints/src/element_identifier_utils.dart';

@@ -1,6 +1,7 @@
 /// Tests for the bounded streaming aggregator: folder rollups, project totals,
 /// and deterministic top-N selection.
 library;
+
 import 'package:saropa_lints/src/cli/project_health/health_aggregator.dart';
 import 'package:saropa_lints/src/cli/project_health/health_model.dart';
 import 'package:test/test.dart';

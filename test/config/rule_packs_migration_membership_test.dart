@@ -3,7 +3,6 @@
 /// comment-coverage: module overview (batch).
 library;
 
-
 ///
 /// Analyzer-backed tests for `rule_packs_migration_membership_test` (rule packs migration membership).
 

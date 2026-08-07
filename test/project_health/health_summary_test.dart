@@ -1,5 +1,6 @@
 /// Tests the natural-language exec summary and the what-if cleanup simulator.
 library;
+
 import 'package:saropa_lints/src/cli/project_health/health_aggregator.dart';
 import 'package:saropa_lints/src/cli/project_health/health_model.dart';
 import 'package:saropa_lints/src/cli/project_health/health_summary.dart';

@@ -1,6 +1,7 @@
 /// Tests temporal coupling against this repo's history: asserts well-formed
 /// pairs (ratio in 0..1, shared >= minShared) rather than exact values.
 library;
+
 import 'dart:io';
 
 import 'package:saropa_lints/src/cli/project_health/temporal_coupling.dart';

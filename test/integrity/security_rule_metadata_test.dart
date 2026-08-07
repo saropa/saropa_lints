@@ -5,6 +5,7 @@
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
+
 import 'package:saropa_lints/saropa_lints.dart' show RuleType;
 import 'package:saropa_lints/src/rules/security/security_auth_storage_rules.dart';
 import 'package:saropa_lints/src/rules/security/security_network_input_rules.dart';

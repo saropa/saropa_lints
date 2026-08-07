@@ -3,6 +3,7 @@
 /// Uses a temp directory as `projectRoot`; [tearDown] calls [ReportConsolidator.cleanupSession]
 /// and deletes the tree so session files never leak between tests.
 library;
+
 import 'dart:io' show Directory, Platform;
 
 import 'package:saropa_lints/src/report/batch_data.dart';

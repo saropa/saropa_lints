@@ -1,5 +1,6 @@
 /// Tests for the dead-asset scanner: declared-but-unreferenced and missing.
 library;
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

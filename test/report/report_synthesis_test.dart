@@ -15,7 +15,6 @@
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
 
-
 import 'dart:io' show Directory, File, Platform;
 
 import 'package:saropa_lints/src/report/report_synthesis.dart';

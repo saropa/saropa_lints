@@ -1,5 +1,6 @@
 /// Tests for the lcov coverage parser.
 library;
+
 import 'package:saropa_lints/src/cli/project_health/coverage_rollup.dart';
 import 'package:test/test.dart';
 

@@ -1,5 +1,6 @@
 /// Tests for transitive dead-island detection (the case unused_element misses).
 library;
+
 import 'package:saropa_lints/src/cli/project_health/dead_islands.dart';
 import 'package:test/test.dart';
 

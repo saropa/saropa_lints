@@ -5,6 +5,7 @@
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
+
 import 'dart:io' show Directory, Platform;
 
 import 'package:saropa_lints/src/report/import_graph_tracker.dart';

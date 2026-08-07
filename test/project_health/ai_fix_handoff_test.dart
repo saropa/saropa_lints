@@ -1,6 +1,7 @@
 /// Tests that complexity carries the worst functions (pinpointing) and that the
 /// AI-fix prompts name them with lines + scores.
 library;
+
 import 'package:saropa_lints/src/cli/project_health/ai_fix_handoff.dart';
 import 'package:saropa_lints/src/cli/project_health/complexity_scanner.dart';
 import 'package:saropa_lints/src/cli/project_health/health_aggregator.dart';

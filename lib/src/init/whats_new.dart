@@ -74,9 +74,7 @@ List<String> formatWhatsNew({
 ) {
   var isUnreleased = false;
   var match = RegExp(
-    r'^## \[' +
-    RegExp.escape(version) +
-    r'\]',
+    r'^## \[' + RegExp.escape(version) + r'\]',
     multiLine: true,
   ).firstMatch(content);
 

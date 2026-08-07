@@ -1,6 +1,7 @@
 /// Tests the refactoring-ROI score and ranking: complex + churning + uncovered
 /// files outrank quiet, covered ones, and the score is deterministic.
 library;
+
 import 'package:saropa_lints/src/cli/project_health/health_aggregator.dart';
 import 'package:saropa_lints/src/cli/project_health/health_model.dart';
 import 'package:saropa_lints/src/cli/project_health/metrics_model.dart';

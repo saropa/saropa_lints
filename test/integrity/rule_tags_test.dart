@@ -5,6 +5,7 @@
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
+
 import 'package:saropa_lints/src/rule_tags.dart';
 import 'package:test/test.dart';
 

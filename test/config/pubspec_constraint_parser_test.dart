@@ -7,6 +7,7 @@
 /// not `.yaml`). Both positive (violating) and negative (compliant) shapes are
 /// covered so the parser cannot regress to a defensive empty-result stub.
 library;
+
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:saropa_lints/src/config/pubspec_constraint_parser.dart';
 import 'package:test/test.dart';

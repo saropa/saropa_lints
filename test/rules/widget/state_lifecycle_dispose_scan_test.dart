@@ -3,6 +3,7 @@
 /// Stubs Flutter types in-parse string so the helper sees realistic dispose / alias /
 /// helper-call patterns without depending on the Flutter SDK in the analyzer session.
 library;
+
 import 'package:analyzer/dart/analysis/features.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';

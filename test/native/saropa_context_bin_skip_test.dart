@@ -22,7 +22,6 @@
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
 
-
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

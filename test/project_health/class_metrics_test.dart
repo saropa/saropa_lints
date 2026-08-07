@@ -1,5 +1,6 @@
 /// Tests for LCOM* cohesion and class member counts.
 library;
+
 import 'package:saropa_lints/src/cli/project_health/class_metrics.dart';
 import 'package:test/test.dart';
 

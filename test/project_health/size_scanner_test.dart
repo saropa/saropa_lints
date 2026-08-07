@@ -2,6 +2,7 @@
 /// measured, build/VCS dirs are skipped, exclude globs apply, paths are posix,
 /// and rows stream to the sink.
 library;
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

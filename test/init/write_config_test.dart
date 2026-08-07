@@ -2,6 +2,7 @@
 ///
 /// Each case uses a fresh temp directory; `finally` blocks remove it after assertions.
 library;
+
 import 'dart:io';
 
 import 'package:saropa_lints/src/config/analysis_options_rule_packs.dart';

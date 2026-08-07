@@ -2,6 +2,7 @@
 /// package: it must flag an unimported file and spare an imported one. Exercises
 /// the actual cross_file composition, not just the per-file threading.
 library;
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;

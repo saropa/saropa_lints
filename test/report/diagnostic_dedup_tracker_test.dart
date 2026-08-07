@@ -5,6 +5,7 @@
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
+
 import 'package:saropa_lints/src/saropa_lint_rule.dart'
     show DiagnosticDedupTracker;
 import 'package:test/test.dart';

@@ -5,6 +5,7 @@
 ///
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
+
 import 'package:saropa_lints/src/cli/project_vibrancy_coverage_quality.dart';
 import 'package:test/test.dart';
 

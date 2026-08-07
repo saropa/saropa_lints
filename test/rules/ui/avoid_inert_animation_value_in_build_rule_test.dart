@@ -4,6 +4,7 @@
 /// must not carry `expect_lint` for this rule so benign `AnimatedBuilder` reads
 /// are not accidentally classified as inert `Animation` value access in `build`.
 library;
+
 import 'dart:io';
 
 import 'package:saropa_lints/saropa_lints.dart';

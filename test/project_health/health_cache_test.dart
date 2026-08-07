@@ -1,5 +1,6 @@
 /// Tests the incremental cache: stable hashing and entry JSON round-trip.
 library;
+
 import 'package:saropa_lints/src/cli/project_health/health_cache.dart';
 import 'package:saropa_lints/src/cli/project_health/metrics_model.dart';
 import 'package:test/test.dart';

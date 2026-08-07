@@ -1,5 +1,6 @@
 /// Tests the instability calculation (fan-in/fan-out).
 library;
+
 import 'package:saropa_lints/src/cli/project_health/coupling_metrics.dart';
 import 'package:test/test.dart';
 
