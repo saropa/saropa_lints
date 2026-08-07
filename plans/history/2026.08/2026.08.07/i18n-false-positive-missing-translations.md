@@ -31,7 +31,7 @@ These strings passed through to the MT engine, which returned them unchanged (co
    - Extended `test_does_not_skip_real_phrases` — added `"Kill Orphaned Flutter Daemons"` and `"Dart processes: {count} ({size} RSS)"` as false-positive guards.
 
 4. **`CHANGELOG.md`**
-   - Added maintenance entry under `[14.5.1]`.
+   - Added maintenance entry under `[14.5.0]`.
 
 ### Verification
 
