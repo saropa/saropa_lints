@@ -402,6 +402,55 @@
     "reloadNow": "अब रीलोड करें।",
     "reloadLater": "बाद में बाद में फिर बाद में"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart प्रक्रियाएं: {count} ({size} RSS)",
+      "daemonCount": "Flutter डेमोन्स: {total} ({orphaned} अकेला)",
+      "warningHint": "मेमरी उपयोग उच्च है — क्लिक करें विवरण के लिए",
+      "criticalHint": "मेमरी का उपयोग महत्वपूर्ण है — सुधार के लिए सावधानीपूर्वक साफ करें"
+    },
+    "notification": {
+      "critical": "Dart प्रक्रियाएं {size} का उपयोग करती हैं जिनमें {orphaned} अकेले डेमॉन हैं। साफ करें?",
+      "result": "मार दिया गया है {count} अकेले डेमोन, ~{size} मुक्त किया गया"
+    },
+    "action": {
+      "cleanUp": "साफ करें",
+      "dontShowAgain": "फिर से नहीं दिखाएँ"
+    },
+    "cleanup": {
+      "noOrphans": "कोई अकेला Flutter डेमोन नहीं मिला।",
+      "confirm": "{count} से अकेले Flutter डेमोन प्रोसेस ज्ञात किये गए हैं जो {size} का उपयोग कर रहे हैं। उन्हें मार दें?",
+      "killButton": "किल ऑर्फ़न्स",
+      "cancelButton": "रद्द करें रद्द करें"
+    },
+    "command": {
+      "killOrphans": "अनाथ Flutter राक्षसों को मार डालो"
+    },
+    "panel": {
+      "title": "प्रोसेस हेल्थ",
+      "empty": "कोई Dart प्रक्रिया चल रही नहीं है।",
+      "processes": "प्रक्रियाएं",
+      "totalRss": "कुल RSS",
+      "orphaned": "अकालिक",
+      "refresh": "ताज़ा करें रिफ्रेश करें",
+      "colPid": "PID",
+      "colParent": "पेरेंट",
+      "colRss": "RSS",
+      "colType": "प्रकार प्रकार का प्रकार प्रकार प्रकार",
+      "colCommand": "कमांड",
+      "colAction": "कार्यविधि",
+      "typeOrphan": "अकेला",
+      "typeDaemon": "Daemon",
+      "typeProcess": "प्रक्रिया",
+      "kill": "किल्ल",
+      "killed": "मार दिया",
+      "killFailed": "असफल"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

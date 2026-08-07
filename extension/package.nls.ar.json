@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "أكثر من 115 أمرًا مرتبة حسب الفئة مع البحث. العثور على التحليل والأمن وصحة الحزمة وأوامر الإبلاغ في مكان واحد. [تصفح جميع الأوامر]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "حول Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  بناء الحماية الرقمية منذ عام 2010. Dart حزم, VS Code ملحقات, وتطبيقات المستهلك للمطورين الذين يقدرون الاعتماد. [زيارة saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK مساحة العمل المسح الضوئي."
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK مساحة العمل المسح الضوئي.",
+  "command.killOrphanedDaemons.title": "Saropa Lints: قتل العمال Flutter المهجورين",
+  "command.showProcessHealth.title": "Saropa Lints: صحة العمليات",
+  "config.section.System.Health.title": "صحة النظام",
+  "config.property.systemHealth.enabled.description": "مراقبة ذاكرة عملية Dart وخدمات Flutter المهجورة (Windows فقط)",
+  "config.property.systemHealth.pollIntervalSeconds.description": "كم مرة لفحص صحة العملية (الثواني). الحد الأدنى 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "أظهر تحذير عند تجاوز القيمة الإجمالية Dart RSS هذه القيمة (GB).",
+  "config.property.systemHealth.criticalThresholdGB.description": "أظهر تنبيهًا حرجًا عندما تتجاوز القيمة الإجمالية Dart RSS هذه القيمة (جيجابايت)",
+  "config.property.systemHealth.warningOrphanCount.description": "أظهر تحذير عندما يصل عدد الزومان Flutter المهجور إلى هذه القيمة.",
+  "config.property.systemHealth.criticalOrphanCount.description": "أظهر تنبيهًا حرجًا عندما يصل عدد دايموند Flutter المهجور إلى هذه القيمة.",
+  "config.property.systemHealth.showNotifications.description": "أظهر إشعارًا عندما تصل صحة النظام إلى مستوى حرجة."
 }

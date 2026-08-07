@@ -402,6 +402,55 @@
     "reloadNow": "Перезаряджуйте зараз.",
     "reloadLater": "Пізніше пізніше пізніше"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart процеси: {count} ({size} RSS)",
+      "daemonCount": "Flutter демони: {total} ({orphaned} відокремлений)",
+      "warningHint": "Використання пам'яті високе — натисніть для деталей",
+      "criticalHint": "Використання пам'яті критичне — очистити рекомендується"
+    },
+    "notification": {
+      "critical": "Dart процеси використовують {size} з {orphaned} орфанізованими демонами. Очищати?",
+      "result": "Вбито {count} орфанів демонів, звільнено ~{size}"
+    },
+    "action": {
+      "cleanUp": "Очистити",
+      "dontShowAgain": "Не Показувати Опять"
+    },
+    "cleanup": {
+      "noOrphans": "Не знайдено орфанів Flutter.",
+      "confirm": "Знайдено {count} орфанів Flutter демонів процесів використання {size}. Забити їх?",
+      "killButton": "Кіль аборігінів",
+      "cancelButton": "Відкласти скасувати"
+    },
+    "command": {
+      "killOrphans": "Видалити Забитих Flutter Демонів"
+    },
+    "panel": {
+      "title": "Стан процесу",
+      "empty": "Немає процесів Dart, які виконуються.",
+      "processes": "процеси",
+      "totalRss": "загальна RSS",
+      "orphaned": "орфанізовані",
+      "refresh": "Відсвіжіть, освіждайте.",
+      "colPid": "PID",
+      "colParent": "Батьківство",
+      "colRss": "RSS",
+      "colType": "Тип Вид Тип Тип",
+      "colCommand": "Команда",
+      "colAction": "Дія",
+      "typeOrphan": "Орфан",
+      "typeDaemon": "Daemon",
+      "typeProcess": "Процес",
+      "kill": "Видалити",
+      "killed": "Забито",
+      "killFailed": "Помилка"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

@@ -402,6 +402,55 @@
     "reloadNow": "Nu opnieuw laden.",
     "reloadLater": "Later"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart processen: {count} ({size} RSS)",
+      "daemonCount": "Flutter daemonen: {total} ({orphaned} orphane)",
+      "warningHint": "Geheugengebruik is hoog — klik voor details",
+      "criticalHint": "Geheugengebruik is kritisch — maak het schoon zoals aangeraden"
+    },
+    "notification": {
+      "critical": "Dart processen gebruiken {size} met {orphaned} orphanged daemonen. Verwijderen?",
+      "result": "Killed {count} orphelen daemonen, vrijgemaakt ~{size}"
+    },
+    "action": {
+      "cleanUp": "Reinigen",
+      "dontShowAgain": "Niet Opnieuw Toon"
+    },
+    "cleanup": {
+      "noOrphans": "Geen gescheiden Flutter daemonen gevonden.",
+      "confirm": "Gevonden {count} orphane Flutter daemon processen met {size}. Verwijderen?",
+      "killButton": "Kil Orphans",
+      "cancelButton": "Annuleren"
+    },
+    "command": {
+      "killOrphans": "Kil Orphane Flutter Daemonen"
+    },
+    "panel": {
+      "title": "Project Gezondheid",
+      "empty": "Geen Dart processen draaien.",
+      "processes": "processen",
+      "totalRss": "totaal RSS",
+      "orphaned": "wees",
+      "refresh": "Vernieuwen",
+      "colPid": "PID",
+      "colParent": "Ouder",
+      "colRss": "RSS",
+      "colType": "Type type type type soort",
+      "colCommand": "Commando",
+      "colAction": "Actie",
+      "typeOrphan": "Wees",
+      "typeDaemon": "Daemon",
+      "typeProcess": "Proces",
+      "kill": "Kil",
+      "killed": "Gedood",
+      "killFailed": "Mislukt"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

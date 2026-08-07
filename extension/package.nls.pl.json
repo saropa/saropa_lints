@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ poleceń zorganizowanych według kategorii z wyszukiwaniem. Znajdź polecenia dotyczące analizy, bezpieczeństwa, stanu pakietów i raportowania w jednym miejscu. [Browse All Commands]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "O Saropa chodziło.",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  buduje cyfrowe zabezpieczenia od 2010 roku. Dart pakiety, rozszerzenia VS Code i aplikacje konsumenckie dla deweloperów ceniących niezawodność. [Zobacz saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Skanalizator przestrzeni roboczej TODO/HACK"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Skanalizator przestrzeni roboczej TODO/HACK",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Zabij Orfane Flutter Demony",
+  "command.showProcessHealth.title": "Saropa Lints: Stan procesu",
+  "config.section.System.Health.title": "Stan systemu",
+  "config.property.systemHealth.enabled.description": "Monitoruj pamięć procesu Dart oraz niezarejestrowane daemony Flutter (tylko Windows).",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Jak często sprawdzać stan procesu (sekundy). Minimalna wartość 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Pokaż ostrzeżenie, gdy łączna Dart RSS przekracza tę wartość (GB).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Pokaż ostrzeżenie krytyczne, gdy łączna wartość Dart RSS przekracza tę wartość (GB).",
+  "config.property.systemHealth.warningOrphanCount.description": "Pokaż ostrzeżenie, gdy liczba niezależnych daemonów Flutter osiągnie tę wartość.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Pokaż ostrzeżenie krytyczne, gdy liczba niezależnych daemonów Flutter osiągnie tę wartość.",
+  "config.property.systemHealth.showNotifications.description": "Pokaż powiadomienie, gdy poziom zdrowia systemu osiągnie krytyczny poziom."
 }

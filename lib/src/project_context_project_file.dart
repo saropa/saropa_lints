@@ -548,8 +548,9 @@ class FileContentCache {
   // Without a cap this grows to O(files * rules) — e.g. 3,900 files x 790
   // rules = ~3.1M entries (~150 MB). The LRU evicts the oldest files first,
   // bounding memory to _maxPassedRulesFiles * avgRulesPerFile * ~48 bytes.
-  static LruCache<String, Set<String>> _passedRules =
-      LruCache(maxSize: _defaultMaxFiles);
+  static LruCache<String, Set<String>> _passedRules = LruCache(
+    maxSize: _defaultMaxFiles,
+  );
 
   static const int _defaultMaxFiles = 500;
 

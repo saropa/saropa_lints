@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ comandi organizzati per categoria con ricerca. Trova comandi di analisi, sicurezza, salute del pacchetto e reporting in un unico posto. [Browse All Commands]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Circa _Saropa.",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  costruisce salvaguardie digitali dal 2010. pacchetti Dart, estensioni VS Code e app consumer per sviluppatori che apprezzano l'affidabilità. [Visita saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner per lo scanner degli spazi di lavoro."
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner per lo scanner degli spazi di lavoro.",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Elimina Daemon Flutter Orfani",
+  "command.showProcessHealth.title": "Saropa Lints: Salute del processo",
+  "config.section.System.Health.title": "Salute del Sistema",
+  "config.property.systemHealth.enabled.description": "Monitora la memoria del processo Dart e i daemon Flutter orfani (solo Windows).",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Quanto spesso verificare lo stato del processo (secondi). Minimo 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Mostra avviso quando il totale Dart RSS supera questo valore (GB).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Mostra allerta critica quando il totale Dart RSS supera questo valore (GB).",
+  "config.property.systemHealth.warningOrphanCount.description": "Mostra avviso quando il numero di daemon Flutter abbandonati raggiunge questo valore.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Mostra allerta critica quando il numero di daemon Flutter orfani raggiunge questo valore.",
+  "config.property.systemHealth.showNotifications.description": "Mostra una notifica quando lo stato del sistema raggiunge un livello critico."
 }

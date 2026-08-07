@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ komut kategorilere göre aramaya uygun şekilde düzenlenmiştir. Analiz, güvenlik, paket sağlığı ve raporlama komutlarını tek bir yerde bulun. [Browse All Commands]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Yaklaşık olarak Saropa hakkında.",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  (Büyükşehir) 2010 yılından bu yana dijital korumalar oluşturmak.\n\nGüvenilirliğe değer veren geliştiriciler için Dart paketleri, VS Code uzantıları ve tüketici uygulamaları.\n\n[Vizit saropa.com] (https://saropa. com/)",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Toggle TODO/HACK Çalışma Alanı Tarayıcı"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Toggle TODO/HACK Çalışma Alanı Tarayıcı",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Ölü Flutter İstemcileri Sonlandır",
+  "command.showProcessHealth.title": "Saropa Lints: İşlem Sağlığı",
+  "config.section.System.Health.title": "Sistem Sağlığı",
+  "config.property.systemHealth.enabled.description": "Dart işleminin bellek kullanımını ve atılmış Flutter daemon'larını (Windows sadece) izleyin.",
+  "config.property.systemHealth.pollIntervalSeconds.description": "İşlem sağlığına ne sıklıkla bakılacağını belirt (saniye). Minimum 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Toplam Dart RSS bu değeri (GB) aşırsa uyarı göster.",
+  "config.property.systemHealth.criticalThresholdGB.description": "Toplam Dart RSS bu değerden (GB) fazla olduğunda kritik uyarı göster.",
+  "config.property.systemHealth.warningOrphanCount.description": "Orphaned Flutter daemon sayısının bu değere ulaşması durumunda uyarı göster.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Orphaned Flutter daemon sayısının bu değere ulaşması durumunda kritik uyarı göster.",
+  "config.property.systemHealth.showNotifications.description": "Sistem sağlığı kritik seviyeye ulaştığında bir bildirim göster."
 }

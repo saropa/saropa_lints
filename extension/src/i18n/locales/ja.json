@@ -402,6 +402,55 @@
     "reloadNow": "今すぐ再充電する.",
     "reloadLater": "後 遅い 後になって"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart プロセス: {count} ({size} RSS)",
+      "daemonCount": "Flutter デーモン: {total} ({orphaned} 遺棄)",
+      "warningHint": "メモリ使用量は高い — クリックして詳細を表示",
+      "criticalHint": "メモリ使用量は重要です — 推奨されるクリーンアップを行ってください"
+    },
+    "notification": {
+      "critical": "Dartプロセスは{size}を使用して{orphaned}の孤児デーモンを使用しています。クリーンアップ？",
+      "result": "{count}の孤児デーモンを終了し、~{size}を解放しました"
+    },
+    "action": {
+      "cleanUp": "クリーンアップ",
+      "dontShowAgain": "もう一度表示しない"
+    },
+    "cleanup": {
+      "noOrphans": "孤立した Flutter デーモンは見つかりませんでした。",
+      "confirm": "{count}の孤立したFlutterデーモンプロセスを{size}で見つけました。終了しますか？",
+      "killButton": "orphansを削除",
+      "cancelButton": "キャンセル キャンセル"
+    },
+    "command": {
+      "killOrphans": "孤立した Flutter デーモンを終了する"
+    },
+    "panel": {
+      "title": "プロセスヘルス",
+      "empty": "Dartプロセスが実行中ではありません。",
+      "processes": "プロセス",
+      "totalRss": "トータル RSS",
+      "orphaned": "孤児",
+      "refresh": "爽やかにリフレッシュする.",
+      "colPid": "PID",
+      "colParent": "親",
+      "colRss": "RSS",
+      "colType": "タイプ 種類型 タイプ",
+      "colCommand": "コマンド",
+      "colAction": "アクション",
+      "typeOrphan": "孤児",
+      "typeDaemon": "Daemon",
+      "typeProcess": "プロセス",
+      "kill": "キル",
+      "killed": "殺された",
+      "killFailed": "失敗"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

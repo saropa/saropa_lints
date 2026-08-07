@@ -402,6 +402,55 @@
     "reloadNow": "Ricaricare ora.",
     "reloadLater": "Più tardi Piu' tardi Più tardi"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.\n\nTesto: Dart processi: {count} ({size} RSS)",
+      "daemonCount": "Flutter daemon: {total} ({orphaned} orfani)",
+      "warningHint": "Utilizzo della memoria è elevato — clicca per i dettagli",
+      "criticalHint": "L'uso della memoria è critico — pulisci consigliato"
+    },
+    "notification": {
+      "critical": "I processi Dart stanno utilizzando {size} con {orphaned} daemon orfani. Pulire?",
+      "result": "Processi {count} terminati, ~{size} liberati"
+    },
+    "action": {
+      "cleanUp": "Pulisci",
+      "dontShowAgain": "Non Mostra di Nuovo"
+    },
+    "cleanup": {
+      "noOrphans": "Nessun daemon Flutter orfano trovato.",
+      "confirm": "Processi daemon orfani {count} trovati utilizzando {size}: Flutter. Eliminare?",
+      "killButton": "Elimina Orfani",
+      "cancelButton": "Annulla annulla cancella"
+    },
+    "command": {
+      "killOrphans": "Elimina Processi Flutter Orfani"
+    },
+    "panel": {
+      "title": "Salute del processo",
+      "empty": "Nessun processo Dart in esecuzione.",
+      "processes": "processi",
+      "totalRss": "RSS totale",
+      "orphaned": "orfanato",
+      "refresh": "Rinfrescare e rinfrescare.",
+      "colPid": "PID",
+      "colParent": "Padre",
+      "colRss": "RSS",
+      "colType": "Tipo di tipo Tipo di modello",
+      "colCommand": "Comando",
+      "colAction": "Azione",
+      "typeOrphan": "Orfano",
+      "typeDaemon": "Daemon",
+      "typeProcess": "Processo",
+      "kill": "Elimina",
+      "killed": "Ucciso",
+      "killFailed": "Fallito"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

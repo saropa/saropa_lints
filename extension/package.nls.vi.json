@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "Hơn 115 lệnh được sắp xếp theo loại với tìm kiếm. Tìm các lệnh phân tích, bảo mật, sức khỏe gói và báo cáo ở một nơi.\n\n[Thiết lập tất cả các lệnh]{command:saropaLints.showCommandCatalog}",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Về _Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇ xây dựng các biện pháp bảo vệ kỹ thuật số từ năm 2010.\n\nDart gói, VS Code mở rộng và ứng dụng tiêu dùng cho các nhà phát triển đánh giá cao độ tin cậy.\n\n[Visit saropa.com] (https://saropa. com/)",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: là người có thể Toggle TODO/HACK Workspace Scanner (Xe máy quét không gian làm việc)"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: là người có thể Toggle TODO/HACK Workspace Scanner (Xe máy quét không gian làm việc)",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Tiêu diệt Daemon Flutter mồ côi",
+  "command.showProcessHealth.title": "Saropa Lints: Trạng thái tiến trình",
+  "config.section.System.Health.title": "Sức Khỏe Hệ Thống",
+  "config.property.systemHealth.enabled.description": "Theo dõi bộ nhớ quy trình Dart và các daemon Flutter bị bỏ rơi (chỉ dành cho Windows).",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Tần suất kiểm tra sức khỏe tiến trình (giây). Tối thiểu 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Hiển thị cảnh báo khi tổng Dart RSS vượt quá giá trị này (GB).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Hiển thị cảnh báo quan trọng khi tổng Dart RSS vượt quá giá trị này (GB).",
+  "config.property.systemHealth.warningOrphanCount.description": "Hiển thị cảnh báo khi số lượng daemon Flutter bị bỏ rơi đạt đến giá trị này.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Hiển thị cảnh báo quan trọng khi số lượng daemon Flutter bị bỏ rơi đạt đến giá trị này.",
+  "config.property.systemHealth.showNotifications.description": "Hiển thị thông báo khi trạng thái hệ thống đạt mức nguy hiểm."
 }

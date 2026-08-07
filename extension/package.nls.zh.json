@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115多个命令按类别进行搜索. 在一个地方找到分析,安全,包装健康和报告命令.\n\n[浏览所有命令] (指令:saropaLints.显示CommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "关于Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited — 自 2010 年起建立数字保障措施。\n\nDart 软件包、VS Code 扩展以及面向重视可靠性的开发人员的消费者应用程序。\n\n[访问 saropa.com](https://saropa.com/)",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: 没有一个人. 切换TODO/HACK工作空间扫描仪"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: 没有一个人. 切换TODO/HACK工作空间扫描仪",
+  "command.killOrphanedDaemons.title": "Saropa Lints：终止孤立的 Flutter 守护进程",
+  "command.showProcessHealth.title": "Saropa Lints: 项目健康",
+  "config.section.System.Health.title": "系统健康",
+  "config.property.systemHealth.enabled.description": "监控 Dart 进程内存和孤立的 Flutter 守护进程（仅限 Windows）",
+  "config.property.systemHealth.pollIntervalSeconds.description": "多久检查一次进程健康状况（秒）。最小值 10。",
+  "config.property.systemHealth.warningThresholdGB.description": "当总 Dart RSS 超过此值（GB）时显示警告",
+  "config.property.systemHealth.criticalThresholdGB.description": "当总 Dart RSS 超过此值（GB）时显示关键警报",
+  "config.property.systemHealth.warningOrphanCount.description": "当孤立的 Flutter 守护进程数量达到此值时显示警告。",
+  "config.property.systemHealth.criticalOrphanCount.description": "当孤立的 Flutter 守护进程数量达到此值时显示关键警报。",
+  "config.property.systemHealth.showNotifications.description": "当系统健康达到严重级别时显示通知。"
 }

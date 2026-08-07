@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ команд, організованих за категоріями з пошуком. Знайдіть команди з аналізу, безпеки, здоров'я пакетів і звітування в одному місці.\n\n[Проглянути всі команди] (команда:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Про _Saropa.",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇ будуючи цифрові гарантії з 2010 року.\n\nDart пакети, VS Code розширення та споживацькі додатки для розробників, які цінують надійність.\n\n[Повітайте saropa.com] (https://saropa. com/)",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Toggle TODO/HACK Workpace Scanner Сканер робочого простору"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Toggle TODO/HACK Workpace Scanner Сканер робочого простору",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Забити Орфанів Flutter Демони",
+  "command.showProcessHealth.title": "Saropa Lints: Процес Підтримка Здоров'я",
+  "config.section.System.Health.title": "Системний стан",
+  "config.property.systemHealth.enabled.description": "Відстежуйте пам'ять процесу Dart та відкиданих Flutter демонів (тільки Windows)",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Як часто перевіряти стан процесу (секунди). Мінімум 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Показувати попередження, коли загальна Dart RSS перевищує це значення (ГБ).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Показувати критичну тривогу, коли загальна Dart RSS перевищує це значення (ГБ).",
+  "config.property.systemHealth.warningOrphanCount.description": "Показувати попередження, коли кількість орфанізованих Flutter демонів досягає цієї вартості.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Показувати критичну алерт, коли кількість орфанізованих Flutter демонів досягає цієї вартості.",
+  "config.property.systemHealth.showNotifications.description": "Показати повідомлення про те, що система досягла критичного рівня."
 }

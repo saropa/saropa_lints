@@ -890,15 +890,17 @@ class ProgressTracker {
       '(${memStats['registeredCaches']} registered)',
     );
     if (rssMb != null) {
-      final rssColor = rssMb > 4096 ? red : rssMb > 2048 ? yellow : dim;
+      final rssColor = rssMb > 4096
+          ? red
+          : rssMb > 2048
+          ? yellow
+          : dim;
       buf.writeln('    Process RSS:   $rssColor${rssMb}MB$reset');
     } else {
       buf.writeln('    $dim Process RSS:   unavailable$reset');
     }
     if (relieveCount > 0) {
-      buf.writeln(
-        '    $yellow Cache evictions: $relieveCount$reset',
-      );
+      buf.writeln('    $yellow Cache evictions: $relieveCount$reset');
     }
 
     buf.writeln();

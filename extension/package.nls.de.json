@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ Befehle, organisiert nach Kategorien mit Suche. Finden Sie Analysen, Sicherheit, Paketgesundheit und Berichterstattungskommandos an einem Ort. [Browse All Commands] (command:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Über Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  baut seit 2010 digitale Sicherheitsvorkehrungen auf. Dart Pakete, VS Code Erweiterungen und Consumer Apps für Entwickler, die Zuverlässigkeit schätzen. [Besuchen Sie saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Wechselbare TODO/HACK-Arbeitsplatzscanner mit Schaltfläche"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Wechselbare TODO/HACK-Arbeitsplatzscanner mit Schaltfläche",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Kill Orphane Flutter Daemons",
+  "command.showProcessHealth.title": "Saropa Lints: Prozessgesundheit",
+  "config.section.System.Health.title": "System Gesundheit",
+  "config.property.systemHealth.enabled.description": "Überwache den Prozessspeicher von Dart und verwaiste Flutter-Deamon (nur Windows)",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Wie oft der Prozessgesundheitsstatus überprüft werden soll (Sekunden). Mindestens 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Warnen, wenn der gesamte Dart RSS diesen Wert (GB) überschreitet.",
+  "config.property.systemHealth.criticalThresholdGB.description": "Zeige kritischen Alarm, wenn der gesamte Dart RSS diesen Wert (GB) überschreitet.",
+  "config.property.systemHealth.warningOrphanCount.description": "Warnen, wenn die Anzahl der verwaisten Flutter-Deamon erreicht diesen Wert.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Kritischen Alarm anzeigen, wenn die Anzahl der verwaisten Flutter-Deamon erreicht diesen Wert.",
+  "config.property.systemHealth.showNotifications.description": "Benachrichtige bei Erreichen kritischer Systemgesundheitsstufe."
 }

@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ mga utos na inorganisa ayon sa kategorya na may paghahanap. Hanapin ang mga command sa analysis, security, package health at reporting sa iisang lugar. [Browse All Commands]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Tungkol sa _Saropa.",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  pagbuo ng digital na mga proteksyon mula noong 2010. Dart packages, VS Code extensions, at consumer apps para sa mga developer na pinahahalagahan ang pagiging maaasahan. [Bisitahin ang saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner na maaaring i-tool ng lahat."
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner na maaaring i-tool ng lahat.",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Ipagbansag ang mga Flutter Daemon na walang magulang",
+  "command.showProcessHealth.title": "Saropa Lints: Kalusugan ng Pagproseso",
+  "config.section.System.Health.title": "Sistema ng Kalusugan",
+  "config.property.systemHealth.enabled.description": "Monitor Dart process memory at mga orphaned Flutter daemons (solo para Windows).",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Sakyan ang proseso ng kalusugan (segundo). Minimum 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Ipakita ang palagay kapag ang kabuuang Dart RSS ay lumampas sa halaga na ito (GB).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Ipakita ang kritikal na alerta kapag ang kabuuang Dart RSS ay lumampas sa halaga na ito (GB).",
+  "config.property.systemHealth.warningOrphanCount.description": "Ipakita ang palatandaan kapag ang bilang ng daemon na Flutter na walang ama ay umabot sa halagang ito.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Ipakita ang kritikal na alerta kapag ang bilang ng orphaned Flutter daemon ay umabot sa halagang ito.",
+  "config.property.systemHealth.showNotifications.description": "Ipakita ang abiso kapag ang antas ng kalusugan ng sistema ay umabot sa kritikal."
 }

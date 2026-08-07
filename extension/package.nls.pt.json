@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "Mais de 115 comandos organizados por categoria com pesquisa. Encontre comandos de análise, segurança, saúde do pacote e relatórios em um só lugar. [Browse All Commands]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Sobre o Saropa.",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇   ⁇ construindo salvaguardas digitais desde 2010.\n\nPacotes Dart, extensões VS Code e aplicativos de consumo para desenvolvedores que valorizam a confiabilidade.\n\n[Visita saropa.com] (https://saropa. com/)",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Scanner de Espaço de Trabalho."
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Scanner de Espaço de Trabalho.",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Matar Flutter Demônios Orfãos",
+  "command.showProcessHealth.title": "Saropa Lints: Saúde do Processo",
+  "config.section.System.Health.title": "Saúde do Sistema",
+  "config.property.systemHealth.enabled.description": "Monitorar a memória do processo Dart e demônios Flutter abandonados (somente Windows).",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Como frequentemente verificar a saúde do processo (segundos). Mínimo 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Mostre aviso quando o total Dart RSS ultrapassar este valor (GB).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Mostre alerta crítico quando o total Dart RSS ultrapassar este valor (GB).",
+  "config.property.systemHealth.warningOrphanCount.description": "Mostre aviso quando o número de daemon Flutter abandonado atingir este valor.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Mostre alerta crítico quando o número de daemon Flutter órfãos atingir este valor.",
+  "config.property.systemHealth.showNotifications.description": "Mostre uma notificação quando o nível de saúde do sistema atingir o nível crítico."
 }

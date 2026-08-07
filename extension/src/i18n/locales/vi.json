@@ -402,6 +402,55 @@
     "reloadNow": "Nạp lại bây giờ.",
     "reloadLater": "Sau này sau đó sau này sau này"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart quy trình: {count} ({size} RSS)",
+      "daemonCount": "Flutter daemon: {total} ({orphaned} bị bỏ rơi)",
+      "warningHint": "Sử dụng bộ nhớ cao — click để xem chi tiết",
+      "criticalHint": "Sử dụng bộ nhớ là rất quan trọng — dọn dẹp được khuyến nghị"
+    },
+    "notification": {
+      "critical": "Các quy trình Dart đang sử dụng {size} với các daemon bị bỏ rơi {orphaned}. Dọn dẹp?",
+      "result": "Đã giết {count} tiến trình daemon bị bỏ rơi, giải phóng ~{size}"
+    },
+    "action": {
+      "cleanUp": "Làm Sạch",
+      "dontShowAgain": "Không Hiển Thị Lại"
+    },
+    "cleanup": {
+      "noOrphans": "Không tìm thấy daemon Flutter nào bị bỏ rơi.",
+      "confirm": "Đã tìm thấy {count} tiến trình daemon bị bỏ rơi Flutter sử dụng {size}. Có giết chúng không?",
+      "killButton": "Giết trẻ mồ côi",
+      "cancelButton": "Hủy bỏ hủy bỏ"
+    },
+    "command": {
+      "killOrphans": "Tiêu diệt Daemon Flutter mồ côi"
+    },
+    "panel": {
+      "title": "Trạng thái dự án",
+      "empty": "Không có quy trình Dart nào đang chạy.",
+      "processes": "quá trình",
+      "totalRss": "tổng RSS",
+      "orphaned": "mồ côi",
+      "refresh": "Thức mới và làm mới",
+      "colPid": "PID",
+      "colParent": "Cha mẹ",
+      "colRss": "RSS",
+      "colType": "Loại loại Type Type",
+      "colCommand": "Lệnh",
+      "colAction": "Hành động",
+      "typeOrphan": "mồ côi",
+      "typeDaemon": "Daemon",
+      "typeProcess": "Quy trình",
+      "kill": "Giết",
+      "killed": "bị giết",
+      "killFailed": "Thất bại"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

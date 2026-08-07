@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "Plus de 115 commandes organisées par catégorie avec recherche. Trouvez les commandes d'analyse, de sécurité, de santé des paquets et de rapport en un seul endroit. [Examiner toutes les commands]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "À propos de Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  est une société de droit public. construire des garanties numériques depuis 2010.\n\nDes packages Dart, des extensions VS Code et des applications grand public pour les développeurs qui accordent de la valeur à la fiabilité.\n\n[Visitez le site saropa.com] (https://saropa. com/)",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Scanner d'espace de travail à bascule"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Scanner d'espace de travail à bascule",
+  "command.killOrphanedDaemons.title": "Saropa Lints : Tuer les Flutter démons orphelins",
+  "command.showProcessHealth.title": "Saropa Lints : Process Health",
+  "config.section.System.Health.title": "Santé du système",
+  "config.property.systemHealth.enabled.description": "Surveiller la mémoire du processus Dart et les daemons Flutter orphelins (seulement Windows).",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Fréquence d'inspection de la santé du processus (en secondes). Minimum 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Afficher un avertissement lorsque la valeur totale Dart RSS dépasse cette valeur (Go).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Afficher l'alerte critique lorsque la valeur totale Dart RSS dépasse cette valeur (Go).",
+  "config.property.systemHealth.warningOrphanCount.description": "Afficher un avertissement lorsque le nombre de daemons Flutter orphelins atteint cette valeur.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Afficher l'alerte critique lorsque le nombre de daemons Flutter orphelins atteint cette valeur.",
+  "config.property.systemHealth.showNotifications.description": "Afficher une notification lorsque le niveau de santé du système atteint le niveau critique."
 }

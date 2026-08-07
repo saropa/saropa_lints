@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ कमांड्स को खोज के साथ श्रेणी द्वारा व्यवस्थित किया गया। विश्लेषण, सुरक्षा, पैकेज स्वास्थ्य और रिपोर्टिंग कमांड को एक ही स्थान पर खोजें।",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Saropa के बारे में",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited 2010 से डिजिटल सुरक्षा उपायों का निर्माण कर रहा है _ विश्वसनीयता को महत्व देने वाले डेवलपर्स के लिए Dart पैकेज, VS Code एक्सटेंशन और उपभोक्ता ऐप।",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: टॉगल TODO/HACK वर्कस्पेस स्कैनर को टग करें।"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: टॉगल TODO/HACK वर्कस्पेस स्कैनर को टग करें।",
+  "command.killOrphanedDaemons.title": "Saropa Lints: किल ऑर्फेनेड Flutter डेमोन्स",
+  "command.showProcessHealth.title": "Saropa Lints: प्रोसेस स्वास्थ्य",
+  "config.section.System.Health.title": "सिस्टम स्वास्थ्य",
+  "config.property.systemHealth.enabled.description": "Dart प्रक्रिया मेमोरी और अनाथ Flutter डेमॉन (केवल विंडोज़) की निगरानी करें।",
+  "config.property.systemHealth.pollIntervalSeconds.description": "कितनी आवृत्ति पर प्रक्रिया स्वास्थ्य की जांच करें (सेकंड में)। न्यूनतम 10।",
+  "config.property.systemHealth.warningThresholdGB.description": "कुल Dart RSS के मूल्य के ऊपर होने पर चेतावनी दिखाएं (जीबी)",
+  "config.property.systemHealth.criticalThresholdGB.description": "कुल Dart RSS के मूल्य के अतिरिक्त अलर्ट दिखाएं (जीबी)",
+  "config.property.systemHealth.warningOrphanCount.description": "जब अकेले Flutter डेमोन की संख्या इस मान तक पहुँचती है तब चेतावनी दिखाएं।",
+  "config.property.systemHealth.criticalOrphanCount.description": "जब अकेले Flutter डेमोन काउंट इस मूल्य तक पहुँचता है तब गंभीर अलर्ट दिखाएं।",
+  "config.property.systemHealth.showNotifications.description": "सिस्टम हेल्थ के क्रिटिकल स्तर तक पहुँचने पर एक सूचना दिखाएं"
 }

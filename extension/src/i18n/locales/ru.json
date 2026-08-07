@@ -402,6 +402,55 @@
     "reloadNow": "Перезагрузить сейчас.",
     "reloadLater": "Позже позднее позже"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart процессов: {count} ({size} RSS)",
+      "daemonCount": "Flutter демоны: {total} ({orphaned} орфанованных)",
+      "warningHint": "Использование памяти высокое — нажмите для деталей",
+      "criticalHint": "Использование памяти критично — очистите рекомендовано"
+    },
+    "notification": {
+      "critical": "Dart процессы используют {size} с {orphaned} орфанными демонами. Очистить?",
+      "result": "Убиты {count} орфанные демоны, освобождено ~{size}"
+    },
+    "action": {
+      "cleanUp": "Очистить",
+      "dontShowAgain": "Не показывать снова"
+    },
+    "cleanup": {
+      "noOrphans": "Нет найденных орфанов Flutter демонов.",
+      "confirm": "Найдены {count} орфанных Flutter процессов демона с использованием {size}. Убить их?",
+      "killButton": "Убить Орфанов",
+      "cancelButton": "Отменить отменить."
+    },
+    "command": {
+      "killOrphans": "Убить Орфанные Flutter Демоны"
+    },
+    "panel": {
+      "title": "Здоровье процесса",
+      "empty": "Нет запущенных процессов Dart.",
+      "processes": "процессы",
+      "totalRss": "общий RSS",
+      "orphaned": "орфанед",
+      "refresh": "Освежите и освежайте.",
+      "colPid": "PID",
+      "colParent": "Родитель",
+      "colRss": "RSS",
+      "colType": "Тип типа тип тип",
+      "colCommand": "Команда",
+      "colAction": "Действие",
+      "typeOrphan": "Орфан",
+      "typeDaemon": "Daemon",
+      "typeProcess": "Обработка",
+      "kill": "Убить",
+      "killed": "Убит",
+      "killFailed": "Ошибка"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

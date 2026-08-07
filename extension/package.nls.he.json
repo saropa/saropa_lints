@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ פקודות מאורגנות לפי קטגוריה עם חיפוש. מצא פקודות ניתוח, אבטחה, בריאות חבילה ודיווח במקום אחד. [תצפי בכל הפקודות]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "על Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  - מחברת פרטיות מוגבלת בניית אמצעי הגנה דיגיטליים מאז 2010.\n\nחבילות Dart, הרחבות VS Code ואפליקציות צרכניות עבור מפתחים שמעריכים אמינות.\n\n[בקרו saropa.com] (https://saropa.co/)",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: סורק שטח עבודה TODO/HACK מתג."
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: סורק שטח עבודה TODO/HACK מתג.",
+  "command.killOrphanedDaemons.title": "Saropa Lints: תןף דמונים Flutter שמאוחדים",
+  "command.showProcessHealth.title": "Saropa Lints: תהליך בריאות",
+  "config.section.System.Health.title": "健全",
+  "config.property.systemHealth.enabled.description": "עקוב אחר זיכרון תהליך Dart ודמוני Flutter יתומים (Windows בלבד).",
+  "config.property.systemHealth.pollIntervalSeconds.description": "איך often לבדוק את健全ת התהליך (שניות). מינימום 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "הצגת 경고 כאשר סך כל Dart RSS עולה על ערך זה (ג'יגה)",
+  "config.property.systemHealth.criticalThresholdGB.description": "הצגת אזהרה קריטית כאשר סך Dart RSS עולה מעבר לערך זה (ג'יגה)",
+  "config.property.systemHealth.warningOrphanCount.description": "הצגת 경고 כאשר מספר דמוניס Flutter המורדים לבד themselves מגיע לערך זה.",
+  "config.property.systemHealth.criticalOrphanCount.description": "הצגת אזהרה קריטית כאשר מספר דמוניס Flutter שונאים מגיע לערך זה.",
+  "config.property.systemHealth.showNotifications.description": "הצגתifying הודעה כאשר מצב המערכת מגיע לרמת חירום."
 }

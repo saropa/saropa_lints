@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "Más de 115 comandos organizados por categoría con búsqueda. Encuentre comandos de análisis, seguridad, salud del paquete y informes en un solo lugar. [Browse All Commands]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Acerca de Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  construye salvaguardas digitales desde 2010. paquetes Dart, extensiones VS Code y aplicaciones de consumo para desarrolladores que valoran la confiabilidad. [Visita saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Escaner de espacio de trabajo para el área de trabajo."
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Escaner de espacio de trabajo para el área de trabajo.",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Eliminar Flutter Demonios Orfános",
+  "command.showProcessHealth.title": "Saropa Lints: Salud del proceso",
+  "config.section.System.Health.title": "Salud del Sistema",
+  "config.property.systemHealth.enabled.description": "Monitorear la memoria del proceso Dart y los daemons Flutter abandonados (solo Windows).",
+  "config.property.systemHealth.pollIntervalSeconds.description": "¿Con qué frecuencia comprobar la salud del proceso (segundos). Mínimo 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Muestra advertencia cuando el total Dart RSS exceda este valor (GB).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Muestra alerta crítica cuando el total Dart RSS exceda este valor (GB).",
+  "config.property.systemHealth.warningOrphanCount.description": "Muestra una advertencia cuando el conteo de daemon Flutter abandonado alcanza este valor.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Muestra alerta crítica cuando el conteo de daemon Flutter abandonado alcanza este valor.",
+  "config.property.systemHealth.showNotifications.description": "Muestra una notificación cuando el nivel de salud del sistema alcance el nivel crítico."
 }

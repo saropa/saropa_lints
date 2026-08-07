@@ -402,6 +402,55 @@
     "reloadNow": "I-reload ngayon.",
     "reloadLater": "Sa huli sa susunod na mga araw, mas maaga."
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart proseso: {count} ({size} RSS)",
+      "daemonCount": "Flutter daemon: {total} ({orphaned} na walang magulang)",
+      "warningHint": "Mataas ang paggamit ng memorya — click para sa detalye",
+      "criticalHint": "Ang paggamit ng memorya ay kritikal — i-clear ang mga inirerekomendang bagay"
+    },
+    "notification": {
+      "critical": "Ang mga proseso Dart ay gumagamit ng {size} kasama ang mga orphaned daemon na {orphaned}. I-clear up?",
+      "result": "Nagpatay sa {count} mga daemon na walang ama, naglibos ng ~{size}"
+    },
+    "action": {
+      "cleanUp": "Maglinis",
+      "dontShowAgain": "Hindi Mo Iwanan Nang Magkakaroon Nang Paliwanag"
+    },
+    "cleanup": {
+      "noOrphans": "Walang nakakalat na Flutter daemon.",
+      "confirm": "Nakita ang {count} na walang-kaugnayan na Flutter daemon processes gamit ang {size}. I-kill ba ang mga ito?",
+      "killButton": "Iwanan ang mga Orphan",
+      "cancelButton": "Kanselahin I-cancel ang pagkansela"
+    },
+    "command": {
+      "killOrphans": "Iwanan Ang Mga Flutter Daemon Na Walang Ama"
+    },
+    "panel": {
+      "title": "Kalusugan ng Proseso",
+      "empty": "Walang Dart processes na nagtatrabaho.",
+      "processes": "proseso",
+      "totalRss": "kabuuang RSS",
+      "orphaned": "ulila",
+      "refresh": "Magpahinga at mag-refresh.",
+      "colPid": "PID",
+      "colParent": "Magulang",
+      "colRss": "RSS",
+      "colType": "Ang uri ng uri ay ang uri ng klase na may mga bagay.",
+      "colCommand": "Utos",
+      "colAction": "Aksyon",
+      "typeOrphan": "Ulila",
+      "typeDaemon": "Daemon",
+      "typeProcess": "Proseso",
+      "kill": "Iwan",
+      "killed": "Pinatay",
+      "killFailed": "Nagkabigo"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

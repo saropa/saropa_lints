@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115以上のコマンドをカテゴリー別で検索して整理しています. 分析,セキュリティ,パッケージヘルス,およびレポートコマンドを1つの場所で検索します. [すべてのコマンドを探索]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "について _Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  2010年以来,デジタルセキュリティー構築. Dart パッケージ, VS Code エクステンション,信頼性を重視する開発者向けのコンシューマーアプリを制作しています. [saropa.com を訪問]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: トーグルTODO/HACKワークスペーススキャナー"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: トーグルTODO/HACKワークスペーススキャナー",
+  "command.killOrphanedDaemons.title": "Saropa Lints: キル オーファンド Flutter デーモン",
+  "command.showProcessHealth.title": "Saropa Lints: プロセスヘルス",
+  "config.section.System.Health.title": "システムヘルス",
+  "config.property.systemHealth.enabled.description": "Dartプロセスのメモリを監視し、Flutterの孤児デーモンを検出（Windows専用）",
+  "config.property.systemHealth.pollIntervalSeconds.description": "プロセスの健康状態を確認する頻度（秒）。最小値10。",
+  "config.property.systemHealth.warningThresholdGB.description": "合計 Dart RSS がこの値（GB）を超えた場合、警告を表示する",
+  "config.property.systemHealth.criticalThresholdGB.description": "合計Dart RSSがこの値（GB）を超えた場合、重要なアラートを表示する",
+  "config.property.systemHealth.warningOrphanCount.description": "孤立したFlutterデーモンの数がこの値に達したときに警告を表示する",
+  "config.property.systemHealth.criticalOrphanCount.description": "孤立したFlutterデーモンの数がこの値に達したときに重大なアラートを表示する",
+  "config.property.systemHealth.showNotifications.description": "システムのヘルスが危急レベルに達したときに通知を表示する"
 }

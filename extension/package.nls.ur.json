@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "تلاش کے ساتھ زمرے کے لحاظ سے منظم 115+ کمانڈز۔ تجزیہ ، سیکیورٹی ، پیکیج کی صحت اور رپورٹنگ کمانڈز کو ایک جگہ پر تلاش کریں۔\n\n[تمام کمانڈز براؤز کریں] (کمانڈ:ساروپالینٹس۔ شو کمانڈ کیٹلاگ)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "کے بارے میں _Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  پی ایچ 2 پائی لمیٹڈ 2010 سے ڈیجیٹل حفاظتی اقدامات کی تعمیر۔\n\nDart پیکجوں ، VS Code توسیعات اور صارفین کی ایپس جو قابل اعتماد ہونے پر قدر رکھتے ہیں۔\n\n[saropa.com ملاحظہ کریں]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints:۔ ٹوگل TODO/HACK ورک اسپیس اسکینر۔"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints:۔ ٹوگل TODO/HACK ورک اسپیس اسکینر۔",
+  "command.killOrphanedDaemons.title": "Saropa Lints: قتل چھوڑے گئے Flutter ڈیمنز",
+  "command.showProcessHealth.title": "Saropa Lints: پروسس ہیلتھ",
+  "config.section.System.Health.title": "سسٹم ہیلتھ",
+  "config.property.systemHealth.enabled.description": "مُنیٹر Dart پروسس میموری اور چھوڑے گئے Flutter ڈیمُنز (وینڈوز کے لیے)",
+  "config.property.systemHealth.pollIntervalSeconds.description": "پروسس ہیلتھ کی چیک کرنے کی تواتر (سیکنڈز)۔ минیمم 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "اگر کل Dart RSS اس قدر سے زیادہ ہو تو چेतاوں (GB)",
+  "config.property.systemHealth.criticalThresholdGB.description": "کل Dart RSS کے مجموعہ کو اس قیمت (GB) سے زیادہ ہونے پر اہم ا警告 دکھائیں",
+  "config.property.systemHealth.warningOrphanCount.description": "اگر چھوڑے گئے Flutter ڈیمون کی تعداد اس قیمت تک پہنچ جاتی ہے تو چेतاوں۔",
+  "config.property.systemHealth.criticalOrphanCount.description": "اگر چھوڑے گئے Flutter ڈیمون کی تعداد اس قیمت تک پہنچ جاتی ہے تو اہم ا警告 دکھائیں۔",
+  "config.property.systemHealth.showNotifications.description": "سسٹم ہیلتھ کریٹیکل سطح پر پہنچ جاتا ہے تو ایک نوٹیفکیشن دکھائیں"
 }

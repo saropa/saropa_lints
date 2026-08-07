@@ -402,6 +402,55 @@
     "reloadNow": "โหลดใหม่ตอนนี้",
     "reloadLater": "ภายหลัง ต่อไป ล่าสุด"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "กระบวนการ Dart: {count} ({size} RSS)",
+      "daemonCount": "Flutter ผู้ดูแลระบบ: {total} ({orphaned} ทิ้งไว้)",
+      "warningHint": "การใช้งานหน่วยความจำสูง — คลิกเพื่อดูรายละเอียด",
+      "criticalHint": "การใช้งานหน่วยความจำเป็นสิ่งสำคัญ — ทำความสะอาดตามที่แนะนำ"
+    },
+    "notification": {
+      "critical": "กระบวนการ Dart กำลังใช้ {size} กับ daemon ที่ถูกทอดทิ้ง {orphaned} ทำความสะอาดหรือ?",
+      "result": "กำจัด {count} กระบวนการที่ไม่มีผู้ปกครอง ปลดปล่อย ~{size}"
+    },
+    "action": {
+      "cleanUp": "ทำความสะอาด",
+      "dontShowAgain": "อย่าแสดงอีกต่อไป"
+    },
+    "cleanup": {
+      "noOrphans": "ไม่พบ daemon Flutter ที่ถูกทอดทิ้ง",
+      "confirm": "พบกระบวนการ daemon ที่ถูกทอดทิ้ง {count} จำนวน Flutter ใช้ {size} ต้องการจะสั่งปิดหรือไม่?",
+      "killButton": "ลบล้างผู้ลูกหลานที่ไม่มีพ่อแม่",
+      "cancelButton": "ยกเลิก Cancel เลิก"
+    },
+    "command": {
+      "killOrphans": "กำจัด Daemon Flutter ที่ไม่มีผู้ปกครอง"
+    },
+    "panel": {
+      "title": "สุขภาพกระบวนการ",
+      "empty": "ไม่มีกระบวนการ Dart ที่ทำงานอยู่",
+      "processes": "กระบวนการ",
+      "totalRss": "รวม RSS",
+      "orphaned": "เด็กกำพร้า",
+      "refresh": "สะดวกสบาย Refresh",
+      "colPid": "PID",
+      "colParent": "ผู้ปกครอง",
+      "colRss": "RSS",
+      "colType": "ประเภท Type แบบประเภทนี้นํา",
+      "colCommand": "คำสั่ง",
+      "colAction": "การกระทำ",
+      "typeOrphan": "เด็กกำพรับ",
+      "typeDaemon": "Daemon",
+      "typeProcess": "กระบวนการ",
+      "kill": "ลบ",
+      "killed": "ถูกสังหาร",
+      "killFailed": "ล้มเหลว"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

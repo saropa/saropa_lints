@@ -402,6 +402,55 @@
     "reloadNow": "Yeniden yükleyin şimdi.",
     "reloadLater": "Daha sonra Sonra Daha sonra Sonradan"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart işleme: {count} ({size} RSS)",
+      "daemonCount": "Flutter daemonları: {total} ({orphaned} izole)",
+      "warningHint": "Hafıza kullanımı yüksek — detaylar için tıklayınız",
+      "criticalHint": "Hafıza kullanımı kritik — temizleme önerilir"
+    },
+    "notification": {
+      "critical": "Dart süreçleri {size} ile {orphaned} izole edilmiş daemon'ları kullanıyor. Temizle?",
+      "result": "{count} ölü daemon öldürdüm, ~{size} serbest bırakıldı"
+    },
+    "action": {
+      "cleanUp": "Temizle",
+      "dontShowAgain": "Yine Gösterme"
+    },
+    "cleanup": {
+      "noOrphans": "Hiçbir Flutter soykırım daemonu bulunamadı.",
+      "confirm": "{count} adet {size} kullanılarak izole Flutter daemon süreci bulundu. Onları sonlandırmanı istiyor musun?",
+      "killButton": "Ölçülen Çocuklar",
+      "cancelButton": "İptal Et iptal et"
+    },
+    "command": {
+      "killOrphans": "Ölümü Orphaned Flutter Daemonları"
+    },
+    "panel": {
+      "title": "Proje Sağlığı",
+      "empty": "Hiçbir Dart işlemi çalışmadı.",
+      "processes": "işlemler",
+      "totalRss": "toplam RSS",
+      "orphaned": "yetim",
+      "refresh": "Rahatlatıcı ve rahatlatıcı olsun.",
+      "colPid": "PID",
+      "colParent": "Ebeveyn",
+      "colRss": "RSS",
+      "colType": "Tip: Tür, tip tipi.",
+      "colCommand": "Komut",
+      "colAction": "Eylem",
+      "typeOrphan": "Yetim",
+      "typeDaemon": "Daemon",
+      "typeProcess": "İşlem",
+      "kill": "Öldür",
+      "killed": "Öldürüldü",
+      "killFailed": "Başarısız"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

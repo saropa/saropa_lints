@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ commando's georganiseerd per categorie met zoekfunctie. Zoek opdrachten voor analyse, beveiliging, pakketgezondheid en rapportage in één plaats. [Browse All Commands]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Over Saropa gaat het.",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  bouwt sinds 2010 aan digitale beveiligingen. Dart-pakketten, VS Code-uitbreidingen en consumentenapps voor ontwikkelaars die waarde hechten aan betrouwbaarheid. [Bekijk saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Werkplek Scanner"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Werkplek Scanner",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Kill Orfaniseerde Flutter Daemonen",
+  "command.showProcessHealth.title": "Saropa Lints: Process Gezondheid",
+  "config.section.System.Health.title": "Systeem Gezondheid",
+  "config.property.systemHealth.enabled.description": "Monitor Dart procesgeheugen en gescheiden Flutter daemonen (alleen Windows)",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Hoe vaak moet de process-health worden gecontroleerd (seconden). Minimum 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Toon waarschuwing wanneer het totale Dart RSS boven deze waarde (GB) uitkomt.",
+  "config.property.systemHealth.criticalThresholdGB.description": "Toon kritieke waarschuwing wanneer het totale Dart RSS boven deze waarde (GB) ligt.",
+  "config.property.systemHealth.warningOrphanCount.description": "Toon waarschuwing wanneer het aantal orphanded Flutter daemonen dit waarde bereikt.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Toon kritieke waarschuwing wanneer het aantal orphanded Flutter daemonen dit waarde bereikt.",
+  "config.property.systemHealth.showNotifications.description": "Notificatie tonen wanneer systeemgezondheid kritiek is."
 }

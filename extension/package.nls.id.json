@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ perintah yang disusun menurut kategori dengan pencarian. Temukan perintah analisis, keamanan, kesehatan paket dan pelaporan di satu tempat. [Browse All Commands]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Tentang _Saropa.",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇ membangun perlindungan digital sejak 2010.\n\npaket Dart, ekstensi VS Code dan aplikasi konsumen untuk pengembang yang menghargai keandalan.\n\n[Belajar saropa.com] (https://saropa. com/)",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner yang dapat diputar kembali."
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner yang dapat diputar kembali.",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Matikan Flutter Daemon Yang Tidak Berguna",
+  "command.showProcessHealth.title": "Saropa Lints: Kesehatan Proses",
+  "config.section.System.Health.title": "Kesehatan Sistem",
+  "config.property.systemHealth.enabled.description": "Monitor memori proses Dart dan daemon Flutter yang terlantar (hanya Windows)",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Seberapa sering memeriksa kesehatan proses (detik). Minimum 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Tampilkan peringatan ketika total Dart RSS melebihi nilai ini (GB).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Tampilkan peringatan kritis ketika total Dart RSS melebihi nilai ini (GB).",
+  "config.property.systemHealth.warningOrphanCount.description": "Tampilkan peringatan ketika jumlah daemon Flutter yang terlantar mencapai nilai ini.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Tampilkan peringatan kritis saat jumlah daemon Flutter yang terlantar mencapai nilai ini.",
+  "config.property.systemHealth.showNotifications.description": "Tampilkan notifikasi ketika kesehatan sistem mencapai tingkat kritis."
 }

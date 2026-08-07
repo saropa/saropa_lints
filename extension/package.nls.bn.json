@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ কমান্ডগুলি অনুসন্ধানের সাথে বিভাগ অনুসারে সংগঠিত। বিশ্লেষণ, সুরক্ষা, প্যাকেজ স্বাস্থ্য এবং প্রতিবেদন কমান্ডগুলি এক জায়গায় সন্ধান করুন।",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Saropa সম্পর্কে",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa পিটি লিমিটেড ২০১০ সাল থেকে ডিজিটাল সুরক্ষা তৈরি করছে। Dart প্যাকেজ, VS Code এক্সটেনশন এবং ভোক্তা অ্যাপ্লিকেশনগুলি এমন বিকাশকারীদের জন্য যারা নির্ভরযোগ্যতার মূল্য দেয়।",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: টগল টুডো/হ্যাক ওয়ার্কস্পেস স্ক্যানার"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: টগল টুডো/হ্যাক ওয়ার্কস্পেস স্ক্যানার",
+  "command.killOrphanedDaemons.title": "Saropa Lints: কিল অরফান ডেমন এর Flutter",
+  "command.showProcessHealth.title": "Saropa Lints: প্রক্রিয়া স্বাস্থ্য",
+  "config.section.System.Health.title": "সিস্টেম স্বাস্থ্য",
+  "config.property.systemHealth.enabled.description": "Dart প্রক্রিয়া মেমরি ও অপসারণ করা হয়নি Flutter ডেমন মনিটর করুন (কেবলমাত্র ওয়াইন্ডোজ)",
+  "config.property.systemHealth.pollIntervalSeconds.description": "প্রক্রিয়া স্বাস্থ্য পরীক্ষা করার পর কত সময় হবে (সেকেন্ডে)। কমপক্ষে ১০।",
+  "config.property.systemHealth.warningThresholdGB.description": "মোট Dart RSS মান এই মান (GB) ছাড়া হলে চেতাবনি দেখানো হবে।",
+  "config.property.systemHealth.criticalThresholdGB.description": "মোট Dart RSS এর মান এই মান ছাড়ি থাকলে গুরুতর বিজ্ঞপ্তি দেখান (জিবি)",
+  "config.property.systemHealth.warningOrphanCount.description": "অরফান হওয়া Flutter ডেমন গণনা এই মানে পৌঁছায় তখন একটি বার্তা দেখানো হবে।",
+  "config.property.systemHealth.criticalOrphanCount.description": "অরফান হওয়া Flutter ডেমন গণনা এই মান পৌঁছায় ক্রিটিক্যাল অ্যালার্ট দেখানো হবে।",
+  "config.property.systemHealth.showNotifications.description": "সিস্টেম হিলথ ক্রিটিক্যাল স্তর পৌঁছায় যখন একটি নোটিফিকেশন দেখানো হবে।"
 }

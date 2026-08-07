@@ -69,8 +69,11 @@ _DO_NOT_TRANSLATE = (
     "GitHub",
     "Flutter",
     "OWASP",
+    "Daemon",
     "SPDX",
     "Dart",
+    "RSS",
+    "PID",
     "OSV",
     "Saropa",
 )
@@ -459,9 +462,18 @@ def _translate_masked_with_timeout(
     return out[0]
 
 
+_SKIP_EXACT: frozenset[str] = frozenset({
+    "Daemon",
+    "PID",
+    "RSS",
+})
+
+
 def should_skip_machine_translate(text: str) -> bool:
     s = text.strip()
     if not s:
+        return True
+    if s in _SKIP_EXACT:
         return True
     # Letter-grade badges (vibrancy summary); MT would turn "A" into words.
     if len(s) == 1 and s.isalpha() and s.isupper():
@@ -471,6 +483,11 @@ def should_skip_machine_translate(text: str) -> bool:
         return True
     # Pure placeholder lines (rare) — keep English shape.
     if re.fullmatch(r"(\{[A-Za-z0-9_]+\})+", s):
+        return True
+    # Emoji/symbol + placeholder only ("⚠ {size}", "🔴 {size}").
+    # Require at least one non-ASCII char so ASCII-only prefixes like "* {x}"
+    # are not silently skipped.
+    if re.fullmatch(r"[^\w{}]+\s*(\{[A-Za-z0-9_]+\}\s*)+", s) and re.search(r"[^\x00-\x7f]", s):
         return True
     # Pure brand: the whole string is a do-not-translate term plus spacing /
     # separators. MT can only echo or transliterate it, so keep English

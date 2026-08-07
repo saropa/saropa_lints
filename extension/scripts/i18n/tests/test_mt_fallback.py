@@ -148,15 +148,30 @@ class TestShouldSkip(unittest.TestCase):
         for s in ("Saropa Lints: {message}", "Saropa Lints {label}: {from} → {to}"):
             self.assertTrue(mt.should_skip_machine_translate(s), s)
 
+    def test_skips_exact_technical_terms(self) -> None:
+        for s in ("PID", "RSS", "Daemon"):
+            self.assertTrue(mt.should_skip_machine_translate(s), s)
+
+    def test_skips_emoji_placeholder_only(self) -> None:
+        for s in ("⚠ {size}", "🔴 {size}"):
+            self.assertTrue(mt.should_skip_machine_translate(s), s)
+
+    def test_does_not_skip_emoji_with_words(self) -> None:
+        self.assertFalse(mt.should_skip_machine_translate("✓ Added authentication for {name}"))
+
+    def test_does_not_skip_ascii_symbol_placeholder(self) -> None:
+        for s in ("* {count}", "# {items}", "+ {name}"):
+            self.assertFalse(mt.should_skip_machine_translate(s), s)
+
     def test_does_not_skip_real_phrases(self) -> None:
-        # The last two carry a real word beside the brand/placeholder, so a letter
-        # survives brand+token stripping and the string must still translate.
         for s in (
             "of {total} total",
             "Saropa Package Dashboard",
             "Cannot reach {target}",
             "Saropa Lints Dashboard",
             "{count} Saropa packages",
+            "Kill Orphaned Flutter Daemons",
+            "Dart processes: {count} ({size} RSS)",
         ):
             self.assertFalse(mt.should_skip_machine_translate(s), s)
 

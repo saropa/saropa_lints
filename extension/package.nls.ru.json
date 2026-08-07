@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ команд, организованных по категориям с поиском. Найдите команды анализа, безопасности, состояния пакетов и отчетности в одном месте. [Просмотр всех команд] (command:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "О Saropa приблизительно.",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  создает цифровые защитные системы с 2010 года. Dart пакеты, VS Code расширения и потребительские приложения для разработчиков, которые ценят надежность. [Посетите saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Переключатель TODO/HACK Сканер рабочей зоны."
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Переключатель TODO/HACK Сканер рабочей зоны.",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Убить Орфанные Flutter Демоны",
+  "command.showProcessHealth.title": "Saropa Lints: Состояние процесса",
+  "config.section.System.Health.title": "Системное состояние",
+  "config.property.systemHealth.enabled.description": "Мониторинг памяти процесса Dart и орфанных Flutter демонов (только Windows)",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Частота проверки состояния процесса (секунды). Минимум 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Показывать предупреждение, когда общее Dart RSS превышает это значение (ГБ).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Показывать критическое предупреждение, когда общее Dart RSS превышает это значение (ГБ).",
+  "config.property.systemHealth.warningOrphanCount.description": "Показывать предупреждение, когда количество орфанных Flutter демонов достигает этого значения.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Показывать критическое предупреждение, когда количество орфанных Flutter демонов достигает этого значения.",
+  "config.property.systemHealth.showNotifications.description": "Показывать уведомление при достижении системным здоровьем критического уровня."
 }

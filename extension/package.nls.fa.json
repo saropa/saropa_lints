@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "بیش از 115 فرمان که بر اساس دسته بندی با جستجو سازماندهی شده اند. پیدا کردن تجزیه و تحلیل، امنیت، سلامت بسته ها و دستورات گزارش در یک مکان. [بروی همه فرمانها]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "درباره Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  از سال 2010، در حال ساخت محافظهای دیجیتال است. Dart بسته ها، VS Code افزونه ها و برنامه های مصرفی برای توسعه دهندگان که به قابلیت اطمینان ارزش می دهند. [Visit saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK اسکنر فضای کاری"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK اسکنر فضای کاری",
+  "command.killOrphanedDaemons.title": "Saropa Lints: قتل یا خارج کردن Flutter دمئون‌های معلق",
+  "command.showProcessHealth.title": "Saropa Lints: سلامت فرآیند",
+  "config.section.System.Health.title": "سیستم سلامت",
+  "config.property.systemHealth.enabled.description": "процیس یادگیری Dart را نظرا گرفته و مموری آن را نظرا گرفته و دمئن های گم شده Flutter را (فقط ویندوز) نظرا گرفته است",
+  "config.property.systemHealth.pollIntervalSeconds.description": "چه تعدادی از ثانیه برای چک کردن سلامت فرایند. حداقل ۱۰.",
+  "config.property.systemHealth.warningThresholdGB.description": "ارواد اخطار نمایش دهید وقتی مقدار کل Dart RSS از این مقدار (GB) بیشتر باشد.",
+  "config.property.systemHealth.criticalThresholdGB.description": "ارجاع به اعلان بحرانی زمانی که مقدار کل Dart RSS این مقدار (GB) را تجاوز کند.",
+  "config.property.systemHealth.warningOrphanCount.description": "هشدار نمایش دهید وقتی شمارش دمون Flutter تنهایی به این مقدار می رسد.",
+  "config.property.systemHealth.criticalOrphanCount.description": "ارندهٔ اعلان مهم را نمایش دهید وقتی تعداد دمون Flutter تخلیه شده به این مقدار می‌رسد.",
+  "config.property.systemHealth.showNotifications.description": "هشداری نمایش دهید زمانی که سلامت سیستم به سطح بحرانی رسید."
 }

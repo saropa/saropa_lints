@@ -402,6 +402,55 @@
     "reloadNow": "এখনই পুনরায় লোড করুন।",
     "reloadLater": "পরে পরবর্তীতে পরে পরে"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart প্রক্রিয়া: {count} ({size} RSS)",
+      "daemonCount": "Flutter ডেমন: {total} ({orphaned} অপসারিত)",
+      "warningHint": "মেমরি ব্যবহার উচ্চ — ক্লিক করুন বিস্তারিত জন্য",
+      "criticalHint": "মেমরি ব্যবহার গুরুত্বপূর্ণ — পরামর্শ দেওয়া হয়েছে পরিষ্কার করুন"
+    },
+    "notification": {
+      "critical": "Dart প্রক্রিয়াগুলো ব্যবহার করছে {size} এবং {orphaned} অরফান ডেমন। পরিষ্কার করুন?",
+      "result": "{count} অর্থাত মৃত ডেমন কিল করা হয়েছে, ~{size} ফ্রিড করা হয়েছে"
+    },
+    "action": {
+      "cleanUp": "পরিষ্কার করুন",
+      "dontShowAgain": "আবার দেখাও না"
+    },
+    "cleanup": {
+      "noOrphans": "কোনও অপ্রয়োজনীয় Flutter ডেমন খুঁজে পাওয়া যায়নি।",
+      "confirm": "{count} থেকে Flutter এর মধ্যে {size} ব্যবহার করে অপসারিত ডেমন প্রক্রিয়া খুঁজে পাওয়া গেল। তাদের মারা কি?",
+      "killButton": "অপরাধী মারা যাওয়া",
+      "cancelButton": "বাতিল করুন Cancel"
+    },
+    "command": {
+      "killOrphans": "অনাথ Flutter ডেমনকে হত্যা করুন"
+    },
+    "panel": {
+      "title": "প্রক্রিয়া স্বাস্থ্য",
+      "empty": "কোন Dart প্রক্রিয়া চলছে না।",
+      "processes": "প্রক্রিয়াগুলি",
+      "totalRss": "total RSS",
+      "orphaned": "অরফানেড",
+      "refresh": "সতেজতা আনুন এবং রিফ্রেশ করুন।",
+      "colPid": "PID",
+      "colParent": "পিতা",
+      "colRss": "RSS",
+      "colType": "টাইপ প্রকারের ধরণ",
+      "colCommand": "কমান্ড",
+      "colAction": "অ্যাকশন",
+      "typeOrphan": "অরফান",
+      "typeDaemon": "Daemon",
+      "typeProcess": "প্রক্রিয়া",
+      "kill": "ঘুলাইয়ে দাও",
+      "killed": "মারা গেছে",
+      "killFailed": "ব্যর্থ"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

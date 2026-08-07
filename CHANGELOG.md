@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [14.5.0]
 
-[log](https://github.com/saropa/saropa_lints/blob/v14.5.0/CHANGELOG.md)
+This release introduces comprehensive system health monitoring to track memory usage and safely terminate orphaned background processes. It also resolves severe memory retention issues during analysis of large codebases and refines localization workflows by preventing false-positive translation warnings. Developers will experience a significantly more stable and responsive environment with highly accurate diagnostic results during extended coding sessions. [log](https://github.com/saropa/saropa_lints/blob/v14.5.0/CHANGELOG.md)
 
 ### Added
 
@@ -86,6 +86,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 <summary>Maintenance</summary>
 
 - Add infrastructure bug report for orphaned `flutter daemon` processes accumulating on Windows and exhausting system RAM. Includes hardened cleanup scripts with PID-reuse detection, a scheduled task to break the OOM feedback loop, and a Win32 Job Object permanent fix concept.
+- Add `PID`, `RSS`, `Daemon` to MT do-not-translate list and expand skip logic for emoji+placeholder patterns (`⚠ {size}`, `🔴 {size}`), resolving 71 false-positive missing-translation entries across 24 locales. No action required.
 
 </details>
 

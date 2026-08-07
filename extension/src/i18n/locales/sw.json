@@ -402,6 +402,55 @@
     "reloadNow": "Reload sasa hivi.",
     "reloadLater": "Baadaye baadaye baadaye baadaye"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Mipangilio ya Dart: {count} ({size} RSS)",
+      "daemonCount": "Daemons Flutter: {total} ({orphaned} yatima)",
+      "warningHint": "Unganisha wa matokeo ni kubwa — klikika kwa detali",
+      "criticalHint": "Unganisho wa memory ni kifaa — tume kuchapisha kutoa"
+    },
+    "notification": {
+      "critical": "Mipaka ya Dart ina kuzungumza na {size} kulingana na mipaka ya daemons ya {orphaned}. Kupata kushindua?",
+      "result": "Killed {count} daemons ya mwalimu, freed ~{size}"
+    },
+    "action": {
+      "cleanUp": "Tuzalisha",
+      "dontShowAgain": "Hakikisha Upeleka Tumia Kwa Muda Mmoja"
+    },
+    "cleanup": {
+      "noOrphans": "Hakuna daemons Flutter ya kihofu.",
+      "confirm": "Pozozo ya {count} ya daemon ya Flutter iliyotambulika kwa kuzunguka {size}. Uzalishia wanao?",
+      "killButton": "Kifungu Kifungu Kifungu",
+      "cancelButton": "Cancel cancel kufuta"
+    },
+    "command": {
+      "killOrphans": "Kifungu Ya Flutter Ya Daemons Ya Kifungu"
+    },
+    "panel": {
+      "title": "Unganisha Moyo ya Mlango",
+      "empty": "Hakuna michezo ya Dart ya kucheza.",
+      "processes": "prosesi",
+      "totalRss": "jumla RSS",
+      "orphaned": "yatima",
+      "refresh": "Kufanya kazi kwa njia ya burudani.",
+      "colPid": "PID",
+      "colParent": "Mwana",
+      "colRss": "RSS",
+      "colType": "Aina ya aina Aina ya Aina Aina Aina.",
+      "colCommand": "Kipengele",
+      "colAction": "Moto ya Ujumla",
+      "typeOrphan": "Yatima",
+      "typeDaemon": "Daemon",
+      "typeProcess": "Mipangilio",
+      "kill": "Kifungua",
+      "killed": "Kuuawa",
+      "killFailed": "Mwisho"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

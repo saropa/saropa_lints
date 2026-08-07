@@ -402,6 +402,55 @@
     "reloadNow": "עכשיו תטעמו מחדש.",
     "reloadLater": "מאוחר יותר אחר כך"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "תהליכי Dart: {count} ({size} RSS)",
+      "daemonCount": "Flutter דמונים: {total} ({orphaned} אובד)",
+      "warningHint": "שימוש ב pamięć הוא גבוה — לחץ כדי לראות פרטים",
+      "criticalHint": "שימוש ב pamięć הוא קריטי — ניקוי מומלץ"
+    },
+    "notification": {
+      "critical": "תהליכי Dart משתמשים ב-{size} עם דמונים מוזרים {orphaned}. לנקות?",
+      "result": "הרגתי {count} דמונים אבויים, שחררתי ~{size}"
+    },
+    "action": {
+      "cleanUp": "נקה",
+      "dontShowAgain": "אל תציג שוב"
+    },
+    "cleanup": {
+      "noOrphans": "לא נמצאו דמונים Flutter אובדנים.",
+      "confirm": "מצוין {count} תהליכים Flutter חסרי אב using {size}. למחוק אותם?",
+      "killButton": "הרג ילדים זוכרים",
+      "cancelButton": "ביטול לבטל"
+    },
+    "command": {
+      "killOrphans": "הרג דמונים מיותרים Flutter"
+    },
+    "panel": {
+      "title": "健全性 análise",
+      "empty": "אין תהליכי Dart פעילים.",
+      "processes": "תהליכי תהליך",
+      "totalRss": "total RSS",
+      "orphaned": "מְיוּתָם",
+      "refresh": "מרענן ומקפיא",
+      "colPid": "PID",
+      "colParent": "والد",
+      "colRss": "RSS",
+      "colType": "סוג של טיפוס סוג סוג",
+      "colCommand": "명령",
+      "colAction": "פעולה",
+      "typeOrphan": "יָתוֹם",
+      "typeDaemon": "Daemon",
+      "typeProcess": "תהליך",
+      "kill": "הכבה",
+      "killed": "מתווך",
+      "killFailed": "נכשל"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

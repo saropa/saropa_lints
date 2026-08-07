@@ -402,6 +402,55 @@
     "reloadNow": "Reload sekarang.",
     "reloadLater": "Kemudian, kemudian, selanjutnya."
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart proses: {count} ({size} RSS)",
+      "daemonCount": "Flutter daemon: {total} ({orphaned} terlantar)",
+      "warningHint": "Penggunaan memori tinggi — klik untuk detail",
+      "criticalHint": "Penggunaan memori kritis — bersihkan rekomendasi"
+    },
+    "notification": {
+      "critical": "Proses Dart menggunakan {size} dengan daemons {orphaned} yang terlantar. Bersihkan?",
+      "result": "Killed {count} daemon yang terlantar, freed ~{size}"
+    },
+    "action": {
+      "cleanUp": "Pembersihan",
+      "dontShowAgain": "Jangan Tampilkan Lagi"
+    },
+    "cleanup": {
+      "noOrphans": "Tidak ditemukan daemon Flutter yang terlantar.",
+      "confirm": "Ditemukan {count} proses daemon yang terlantar menggunakan Flutter dengan {size}. Bunuh mereka?",
+      "killButton": "Hancurkan Anak Yatim",
+      "cancelButton": "Batalkan Batal."
+    },
+    "command": {
+      "killOrphans": "Matikan Flutter Daemon Yang Tidak Berguna"
+    },
+    "panel": {
+      "title": "Kesehatan Proses",
+      "empty": "Tidak ada proses Dart yang berjalan.",
+      "processes": "proseses",
+      "totalRss": "jumlah RSS",
+      "orphaned": "yatim piatu",
+      "refresh": "Refreshing dan menyegarkan.",
+      "colPid": "PID",
+      "colParent": "Induk",
+      "colRss": "RSS",
+      "colType": "Jenis-jenis tipe yang bisa dibilang",
+      "colCommand": "Perintah",
+      "colAction": "Aksi",
+      "typeOrphan": "Yatim piatu",
+      "typeDaemon": "Daemon",
+      "typeProcess": "Proses",
+      "kill": "Matikan",
+      "killed": "Dibunuh",
+      "killFailed": "Gagal"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

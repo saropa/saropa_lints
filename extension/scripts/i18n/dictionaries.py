@@ -177,6 +177,7 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Search Packages": "Rechercher",
         "Search Packages...": "Rechercher",
         "Editor dashboards": "Tableaux de bord editeur",
+        "Action": "Action",
         "Actions": "Actions",
         "Status": "Etat",
         "Settings": "Parametres",

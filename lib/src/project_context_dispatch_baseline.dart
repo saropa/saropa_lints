@@ -264,8 +264,9 @@ class DiffBasedAnalysis {
   // this retains the full content of every analyzed file (~5 KB avg × 3,900
   // files = ~19.5 MB). Evicted files are treated as "first time" on the next
   // pass, triggering a full-file diff — correct behavior, linear cost.
-  static LruCache<String, String> _previousContent =
-      LruCache(maxSize: _defaultMaxFiles);
+  static LruCache<String, String> _previousContent = LruCache(
+    maxSize: _defaultMaxFiles,
+  );
 
   static const int _defaultMaxFiles = 200;
 
@@ -351,7 +352,7 @@ class DiffBasedAnalysis {
   /// Invalidate cache for a file.
   static void invalidate(String filePath) {
     _changedRegions.remove(filePath);
-    _previousContent.remove(filePath);  // LruCache.remove
+    _previousContent.remove(filePath); // LruCache.remove
   }
 
   /// Clear all cached data.

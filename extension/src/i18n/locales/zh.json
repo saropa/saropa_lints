@@ -402,6 +402,55 @@
     "reloadNow": "现在重新加载.",
     "reloadLater": "后来 后来的 之后的"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart进程: {count} ({size} RSS)",
+      "daemonCount": "Flutter 守护进程：{total}（{orphaned} 孤儿）",
+      "warningHint": "内存使用率高 — 点击查看详情",
+      "criticalHint": "内存使用是关键 —— 建议清理"
+    },
+    "notification": {
+      "critical": "Dart进程正在使用{size}带有{orphaned}孤儿守护进程。清理一下？",
+      "result": "已终止 {count} 个孤儿守护进程，释放了 ~{size} 空间"
+    },
+    "action": {
+      "cleanUp": "清理",
+      "dontShowAgain": "不再显示"
+    },
+    "cleanup": {
+      "noOrphans": "未发现孤立的 Flutter 守护进程。",
+      "confirm": "发现使用 {size} 的 {count} 个孤立的 Flutter 守护进程。是否终止它们？",
+      "killButton": "杀死孤儿",
+      "cancelButton": "取消 取缔 在此之前,请注销."
+    },
+    "command": {
+      "killOrphans": "杀死孤立的 Flutter 守护进程"
+    },
+    "panel": {
+      "title": "进程健康",
+      "empty": "没有 Dart 进程正在运行。",
+      "processes": "进程",
+      "totalRss": "总 RSS",
+      "orphaned": "孤立的",
+      "refresh": "让人感到清爽,使自己得到新鲜感.",
+      "colPid": "PID",
+      "colParent": "父级",
+      "colRss": "RSS",
+      "colType": "类型 类别 是一个类型.",
+      "colCommand": "命令",
+      "colAction": "操作",
+      "typeOrphan": "孤儿",
+      "typeDaemon": "Daemon",
+      "typeProcess": "处理",
+      "kill": "杀死",
+      "killed": "已终止",
+      "killFailed": "失败"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

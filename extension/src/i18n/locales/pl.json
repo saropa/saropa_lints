@@ -402,6 +402,55 @@
     "reloadNow": "Przeładować teraz.",
     "reloadLater": "Później Późniejszy Późniejsze Późne"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart procesy: {count} ({size} RSS)",
+      "daemonCount": "Flutter daemony: {total} ({orphaned} orfany)",
+      "warningHint": "Użycie pamięci jest wysokie — kliknij aby zobaczyć szczegóły",
+      "criticalHint": "Użycie pamięci jest krytyczne — oczyszczenie zalecane"
+    },
+    "notification": {
+      "critical": "Procesy Dart używają {size} z orfankami {orphaned}. Czy czyszczyć?",
+      "result": "Zabito {count} daemonów orfankich, zwolniono ~{size}"
+    },
+    "action": {
+      "cleanUp": "Czysta Przestrzeń",
+      "dontShowAgain": "Nie Pokazuj Ponownie"
+    },
+    "cleanup": {
+      "noOrphans": "Brak znalezionych niezwiązanych daemonów Flutter.",
+      "confirm": "Znaleziono {count} procesów daemon Flutter używając {size}. Zabij je?",
+      "killButton": "Zabij Orfany",
+      "cancelButton": "Odwołaj Anulować"
+    },
+    "command": {
+      "killOrphans": "Zabij Orfane Flutter Demony"
+    },
+    "panel": {
+      "title": "Stan procesu",
+      "empty": "Brak procesów Dart w działaniu.",
+      "processes": "procesy",
+      "totalRss": "całkowity RSS",
+      "orphaned": "osierocony",
+      "refresh": "Odświeżaj i oddychaj.",
+      "colPid": "PID",
+      "colParent": "Rodzic",
+      "colRss": "RSS",
+      "colType": "Typ typ typ typ rodzaj",
+      "colCommand": "Polecenie",
+      "colAction": "Akcja",
+      "typeOrphan": "Orfan",
+      "typeDaemon": "Daemon",
+      "typeProcess": "Proces",
+      "kill": "Zabij",
+      "killed": "Zabity",
+      "killFailed": "Niepowodzenie"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

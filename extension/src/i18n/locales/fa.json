@@ -402,6 +402,55 @@
     "reloadNow": "حالا بارگیری مجدد کنید.",
     "reloadLater": "بعد بعداً بعدها"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart فرآیند ها: {count} ({size} RSS)",
+      "daemonCount": "Flutter نیمکت‌ها: {total} ({orphaned} بدون والد)",
+      "warningHint": "استفاده از حافظه بالا است — کلیک کنید تا جزئیات را ببینید",
+      "criticalHint": "استفاده از حافظه مهم است — تمیز کردن پیشنهاد می‌شود"
+    },
+    "notification": {
+      "critical": "Dart فرآیندها در حال استفاده از {size} با {orphaned} دمین نابود هستند. تمیز کنید؟",
+      "result": "کیلدد {count} دمئون های تکلیف شده را از بین برده، ~{size} را آزاد کرد"
+    },
+    "action": {
+      "cleanUp": "کلی نمایی",
+      "dontShowAgain": "باز نشان نده"
+    },
+    "cleanup": {
+      "noOrphans": "هیچ چرakan Flutter گم شده ای پیدا نشد.",
+      "confirm": "{count} فرآیند Flutter مونیتور غیر مرتبط با استفاده از {size} پیدا شد. آنها را خاتمه بدهید؟",
+      "killButton": "کیل یاورفان",
+      "cancelButton": "لغو کن لغو کنید"
+    },
+    "command": {
+      "killOrphans": "کیل یا دمین اورفان شده Flutter"
+    },
+    "panel": {
+      "title": "سلامت پردازش",
+      "empty": "هیچ فرآیند Dartی در حال اجرا نیست.",
+      "processes": "پروسیس‌ها",
+      "totalRss": "کل RSS",
+      "orphaned": "孤儿",
+      "refresh": "به راحتی و با آرامش استراحت کنید.",
+      "colPid": "PID",
+      "colParent": "والد",
+      "colRss": "RSS",
+      "colType": "نوع: نوع نوع نوع",
+      "colCommand": "کامند",
+      "colAction": "عملیات",
+      "typeOrphan": "孤儿",
+      "typeDaemon": "Daemon",
+      "typeProcess": "پردازش",
+      "kill": "کیل کردن",
+      "killed": "کیلدد",
+      "killFailed": "ناموفق"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

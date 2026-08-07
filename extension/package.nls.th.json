@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ คําสั่งจัดเรียงตามหมวดหมู่พร้อมการค้นหา ค้นหาคําสั่งการวิเคราะห์, ความปลอดภัย, สุขภาพแพ็คเกจ และรายงานในที่เดียว [บราวซ์ทุกคําสั่ง]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "เกี่ยวกับ Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  การสร้างระบบป้องกันทางดิจิตอลตั้งแต่ปี 2010 _ แพ็กเกจ Dart, VS Code Extensions และแอปโฟมูลกินค้าสําหรับนักพัฒนาที่ให้ความคุ้มค่ากับความน่าเชื่อถือ [เข้าชม saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: เปลี่ยน TODO/HACK สแกนเนอร์พื้นที่ทํางาน"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: เปลี่ยน TODO/HACK สแกนเนอร์พื้นที่ทํางาน",
+  "command.killOrphanedDaemons.title": "Saropa Lints: กำจัด Daemon Flutter ที่ไม่มีผู้ปกครอง",
+  "command.showProcessHealth.title": "Saropa Lints: ความแข็งแรงของกระบวนการ",
+  "config.section.System.Health.title": "ระบบสุขภาพ",
+  "config.property.systemHealth.enabled.description": "ตรวจสอบกระบวนการ Dart ด้านความจำและ daemon ที่ถูกทอดทิ้ง Flutter (เฉพาะ Windows)",
+  "config.property.systemHealth.pollIntervalSeconds.description": "ตรวจสอบความแข็งแรงของกระบวนการบ่อยแค่ไหน (วินาที) ขั้นต่ำ 10",
+  "config.property.systemHealth.warningThresholdGB.description": "แสดงเตือนภัยเมื่อค่ารวม Dart RSS เกินค่าที่กำหนด (กิกะไบต์)",
+  "config.property.systemHealth.criticalThresholdGB.description": "แสดงแจ้งเตือนข้อมูลสำคัญเมื่อค่ารวม Dart RSS เกินค่าที่กำหนด (GB)",
+  "config.property.systemHealth.warningOrphanCount.description": "แสดงเตือนภัยเมื่อจำนวน daemon Flutter ที่ถูกทอดทิ้งถึงค่าที่กำหนด",
+  "config.property.systemHealth.criticalOrphanCount.description": "แสดงแจ้งเตือนข้อมูลสำคัญเมื่อจำนวน daemon Flutter ที่ถูกทิ้งไว้ถึงค่าที่กำหนด",
+  "config.property.systemHealth.showNotifications.description": "แจ้งเตือนเมื่อสถานะระบบถึงระดับวิกฤต"
 }

@@ -402,6 +402,55 @@
     "reloadNow": "지금 다시 로드하십시오.",
     "reloadLater": "나중에 나중에는 후기"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart 처리 중: {count} ({size} RSS)",
+      "daemonCount": "Flutter 데몬: {total} ({orphaned} 버려짐)",
+      "warningHint": "메모리 사용량이 높습니다 — 자세한 정보를 클릭하세요",
+      "criticalHint": "메모리 사용량은 중요합니다 — 정리 권장"
+    },
+    "notification": {
+      "critical": "Dart 프로세스는 {size}를 사용하여 {orphaned} 오라phan 데몬을 실행 중입니다. 정리하시겠습니까?",
+      "result": "Killed {count} orphaned daemons, freed ~{size}"
+    },
+    "action": {
+      "cleanUp": "정리하기",
+      "dontShowAgain": "다시 보지 않기"
+    },
+    "cleanup": {
+      "noOrphans": "orphaned Flutter daemon 없음.",
+      "confirm": "{count}로 부터 Flutter 개의 {size} 오버헤드 프로세스 발견됨. 종료하시겠습니까?",
+      "killButton": "죽은 자식 프로세스 제거",
+      "cancelButton": "취소 취소합니다."
+    },
+    "command": {
+      "killOrphans": "사망한 Flutter 데몬 종료"
+    },
+    "panel": {
+      "title": "프로세스 건강",
+      "empty": "Dart 프로세스가 실행 중이지 않습니다.",
+      "processes": "프로세스",
+      "totalRss": "총 RSS",
+      "orphaned": "무단으로 생성된",
+      "refresh": "신선하고 상쾌한 느낌을 줍니다.",
+      "colPid": "PID",
+      "colParent": "부모",
+      "colRss": "RSS",
+      "colType": "종류 타입 유형",
+      "colCommand": "명령",
+      "colAction": "작동",
+      "typeOrphan": "무리",
+      "typeDaemon": "Daemon",
+      "typeProcess": "프로세스",
+      "kill": "죽이다",
+      "killed": "죽음",
+      "killFailed": "실패"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

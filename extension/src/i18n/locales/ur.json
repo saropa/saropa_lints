@@ -402,6 +402,55 @@
     "reloadNow": "اب دوبارہ لوڈ کریں.",
     "reloadLater": "بعد میں بعد میں اس کے بعد"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "Dart پرکریس: {count} ({size} RSS)",
+      "daemonCount": "Flutter ڈیمینس: {total} ({orphaned} چھوڑے گئے)",
+      "warningHint": "یاد کرنے کی استعمال زیادہ ہے — کلک کریں تفصیلات کے لئے",
+      "criticalHint": "ذہبی استعمال اہم ہے — سفارش کی گئی صفائی کریں"
+    },
+    "notification": {
+      "critical": "Dart پروسسز {size} کے ساتھ {orphaned} کے اورفان ڈیمنز کا استعمال کر رہے ہیں۔ سیل کریں؟",
+      "result": "کیلڈ {count} بے والد ڈیمنز کو مار دیا، ~{size} آزاد کر دیا"
+    },
+    "action": {
+      "cleanUp": "کلین اپ",
+      "dontShowAgain": "دوبارہ نہ دکھائیں"
+    },
+    "cleanup": {
+      "noOrphans": "کوئی چھوڑے گئے Flutter ڈیمُن نہیں ملا۔",
+      "confirm": "{count} Flutter دیمون پروسس کا پتہ لگا {size} سے۔ انہیں ہٹا دیں؟",
+      "killButton": "کل کریکس",
+      "cancelButton": "منسوخ"
+    },
+    "command": {
+      "killOrphans": "کل کریکٹر ہیں Flutter ڈیمنز"
+    },
+    "panel": {
+      "title": "پروسس ہیلتھ",
+      "empty": "کوئی Dart پروسس چل رہا ہے۔",
+      "processes": "پروسیسز",
+      "totalRss": "کل RSS",
+      "orphaned": "孤儿",
+      "refresh": "ريفريش",
+      "colPid": "PID",
+      "colParent": "والد",
+      "colRss": "RSS",
+      "colType": "قسم کی قسم ٹائپ کریں",
+      "colCommand": "کمینڈ",
+      "colAction": "کارروائی",
+      "typeOrphan": "孤儿",
+      "typeDaemon": "Daemon",
+      "typeProcess": "پروسس",
+      "kill": "کلیک /نومتھنک",
+      "killed": "مروی",
+      "killFailed": "ناکام"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

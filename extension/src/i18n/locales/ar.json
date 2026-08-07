@@ -402,6 +402,55 @@
     "reloadNow": "أعد تحميل الآن.",
     "reloadLater": "في وقت لاحق لاحقاً"
   },
+  "systemHealth": {
+    "statusBar": {
+      "warning": "⚠ {size}",
+      "critical": "🔴 {size}"
+    },
+    "tooltip": {
+      "processCount": "الإجراءات Dart: {count} ({size} RSS)",
+      "daemonCount": "Flutter مُساعدين: {total} ({orphaned} مهجور)",
+      "warningHint": "استخدام الذاكرة مرتفع — انقر للحصول على التفاصيل",
+      "criticalHint": "استخدام الذاكرة هو أمر حيوي — تنظيف موصى به"
+    },
+    "notification": {
+      "critical": "تُعالج Dart العمليات {size} مع {orphaned} أوامر مهجورة. تنظيف؟",
+      "result": "تم قتل {count} من الدايمونز المهجورة، وتم تحرير ~{size}"
+    },
+    "action": {
+      "cleanUp": "تنظيف",
+      "dontShowAgain": "لا تظهر مرة أخرى"
+    },
+    "cleanup": {
+      "noOrphans": "لم يتم العثور على أي دايمونز Flutter مهجورة.",
+      "confirm": "تم العثور على {count} عمليات خدمة Flutter مهجورة باستخدام {size}. هل ترغب في إنهاؤها؟",
+      "killButton": "قتل الأبناء غير المرتبطين",
+      "cancelButton": "إلغاء الإلغاء"
+    },
+    "command": {
+      "killOrphans": "القضاء على الديمونز الميتة Flutter"
+    },
+    "panel": {
+      "title": "صحة العملية",
+      "empty": "لا توجد عمليات Dart تعمل.",
+      "processes": "الإجراءات",
+      "totalRss": "إجمالي RSS",
+      "orphaned": "مهجور",
+      "refresh": "استرخاء وترفعه.",
+      "colPid": "PID",
+      "colParent": "الوالد",
+      "colRss": "RSS",
+      "colType": "نوع النوع نوع النموذج",
+      "colCommand": "التعليمات",
+      "colAction": "الإجراء",
+      "typeOrphan": "أُرَفَّه",
+      "typeDaemon": "Daemon",
+      "typeProcess": "العملية",
+      "kill": "القتل",
+      "killed": "تم القتل",
+      "killFailed": "فشل"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },
@@ -1082,7 +1131,7 @@
       "hintStrongTitle": "عنوان العنوان عنوان اللقب",
       "hintStrongDesc": "وصف الوصف التوضيح",
       "hintStrongId": "هوية المستخدم id",
-      "hintLine2": "(أوامر التعريف متباعدة أكثر — اكتب",
+      "hintLine2": "(توكينات id متباعدة أكثر — نوع",
       "hintLine2kbd": "تحليل تشغيل التحليل.",
       "hintLine2End": "بدون نقاط)."
     },

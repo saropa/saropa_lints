@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "검색이 가능한 카테고리별로 구성된 115개 이상의 명령어. 분석, 보안, 패키지 건강 및 보고 명령어를 한 곳에서 찾아보세요. [모든 명령을 탐색] (command:saropaLints.showCommandCatalog)",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Saropa에 대해",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited는 2010년부터 디지털 안전장치를 구축해오고 있으며, 신뢰성을 중요시하는 개발자들을 위한 Dart 패키지, VS Code 확장 프로그램 및 소비자용 앱을 제공하고 있습니다.",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: 토글 TODO/HACK 작업 공간 스캐너"
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: 토글 TODO/HACK 작업 공간 스캐너",
+  "command.killOrphanedDaemons.title": "Saropa Lints: 죽이기 Flutter 데몬",
+  "command.showProcessHealth.title": "Saropa Lints: 프로세스 건강",
+  "config.section.System.Health.title": "시스템 건강",
+  "config.property.systemHealth.enabled.description": "Dart 프로세스 메모리 및 오레孤儿 Flutter 데몬 모니터링 (Windows 전용)",
+  "config.property.systemHealth.pollIntervalSeconds.description": "프로세스 건강을 확인하는 빈도(초). 최소 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "총 Dart RSS가 이 값(GB)을 초과할 때 경고 표시",
+  "config.property.systemHealth.criticalThresholdGB.description": "총 Dart RSS가 이 값(GB)을 초과할 때 심각한 경고 표시",
+  "config.property.systemHealth.warningOrphanCount.description": "orphaned Flutter daemon count이 이 값에 도달할 때 경고 표시.",
+  "config.property.systemHealth.criticalOrphanCount.description": "orphaned Flutter daemon count이 이 값에 도달할 때 심각한 경고 표시.",
+  "config.property.systemHealth.showNotifications.description": "시스템 건강이 위험 수준에 도달할 때 알림을 표시합니다."
 }

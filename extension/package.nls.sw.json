@@ -310,5 +310,15 @@
   "walkthrough.step.walkthrough.commandCatalog.description": "115+ amri zilizoandaliwa kwa kategoria na utafutaji. Pata amri za uchambuzi, usalama, afya ya kifurushi na ripoti katika sehemu moja. [Browse All Commands]",
   "walkthrough.step.walkthrough.aboutSaropa.title": "Kuhusu Saropa",
   "walkthrough.step.walkthrough.aboutSaropa.description": "Saropa Pty Limited  ⁇  kujenga ulinzi wa dijiti tangu 2010. Dart vifurushi, upanuzi wa VS Code na programu za watumiaji kwa watengenezaji ambao wanathamini kuegemea. [Tembelea saropa.com]",
-  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner Scan ya eneo la kazi."
+  "command.toggleTodosAndHacksScanner.title": "Saropa Lints: Toggle TODO/HACK Workspace Scanner Scan ya eneo la kazi.",
+  "command.killOrphanedDaemons.title": "Saropa Lints: Ondoa Daemons Ya Flutter Ya Mwaka Mlima",
+  "command.showProcessHealth.title": "Saropa Lints: Urafiki wa Mwongozo",
+  "config.section.System.Health.title": "Sistema ya Uzalishaji",
+  "config.property.systemHealth.enabled.description": "Kuandika matokeo ya Dart ya memory na daemons ya Flutter ya kipasifika (kwa Windows bonye).",
+  "config.property.systemHealth.pollIntervalSeconds.description": "Kila muda mlewa kujaribu matokeo ya kujifunza (sani). Kimoja 10.",
+  "config.property.systemHealth.warningThresholdGB.description": "Tumia chini kwa muda mwingi kama kiasi kati ya Dart RSS inapata kiasi hii (GB).",
+  "config.property.systemHealth.criticalThresholdGB.description": "Onyesha tahadhari muhimu wakati jumla ya Dart RSS inapozidi thamani hii (GB).",
+  "config.property.systemHealth.warningOrphanCount.description": "Tumeza msaada kama idadi ya daemon Flutter ya kuchapishwa inapata kifupi hiki.",
+  "config.property.systemHealth.criticalOrphanCount.description": "Tazama alarami kubadilishwa wakati idadi ya daemon Flutter ya kufungua inapata kipengele hiki.",
+  "config.property.systemHealth.showNotifications.description": "Tuma mstanaa kama system health inapata level ya kritikal."
 }
