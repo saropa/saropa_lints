@@ -1,6 +1,6 @@
 # BUG: Infrastructure — Dart analysis server consumes 7.8 GB with saropa_lints plugin
 
-**Status: Open — Root cause identified**
+**Status: Fixed — Phases 1-3 complete, Phase 4 (control experiment) deferred to `plans/deferred/memory_pressure_control_experiment.md`**
 
 Created: 2026-08-07
 Rule: N/A (infrastructure / performance — affects the plugin as a whole)

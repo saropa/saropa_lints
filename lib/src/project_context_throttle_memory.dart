@@ -1288,8 +1288,9 @@ void initializeCacheManagement({
   int memoryThresholdMb = 512,
   int hardRssLimitMb = 6144,
 }) {
-  // Cap the LRU on FileContentCache._passedRules — the single largest cache.
+  // Cap the LRU on the two largest unbounded caches.
   FileContentCache.setMaxPassedRulesFiles(maxFileContentCache);
+  DiffBasedAnalysis.setMaxPreviousContentFiles(maxFileContentCache ~/ 2);
 
   // Register caches with priorities (lower = clear first when under pressure)
   // Content caches are expensive to rebuild, so clear last

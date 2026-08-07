@@ -260,8 +260,26 @@ class DiffBasedAnalysis {
   // Map of file path -> list of changed line ranges
   static final Map<String, List<LineRange>> _changedRegions = {};
 
-  // Map of file path -> previous content (for diff computation)
-  static final Map<String, String> _previousContent = {};
+  // LRU-capped cache of file path -> previous source text. Without a cap
+  // this retains the full content of every analyzed file (~5 KB avg × 3,900
+  // files = ~19.5 MB). Evicted files are treated as "first time" on the next
+  // pass, triggering a full-file diff — correct behavior, linear cost.
+  static LruCache<String, String> _previousContent =
+      LruCache(maxSize: _defaultMaxFiles);
+
+  static const int _defaultMaxFiles = 200;
+
+  /// Resize the LRU cap on `_previousContent`.
+  static void setMaxPreviousContentFiles(int maxFiles) {
+    if (maxFiles <= 0) return;
+    if (maxFiles == _previousContent.maxSize) return;
+    final old = _previousContent;
+    _previousContent = LruCache(maxSize: maxFiles);
+    for (final key in old.keys) {
+      final value = old.get(key);
+      if (value != null) _previousContent.put(key, value);
+    }
+  }
 
   /// Record changed regions in a file.
   static void recordChanges(String filePath, List<LineRange> changes) {
@@ -279,8 +297,8 @@ class DiffBasedAnalysis {
     String filePath,
     String currentContent,
   ) {
-    final previous = _previousContent[filePath];
-    _previousContent[filePath] = currentContent;
+    final previous = _previousContent.get(filePath);
+    _previousContent.put(filePath, currentContent);
 
     if (previous == null) {
       // First time seeing this file - consider all lines changed
@@ -333,7 +351,7 @@ class DiffBasedAnalysis {
   /// Invalidate cache for a file.
   static void invalidate(String filePath) {
     _changedRegions.remove(filePath);
-    _previousContent.remove(filePath);
+    _previousContent.remove(filePath);  // LruCache.remove
   }
 
   /// Clear all cached data.

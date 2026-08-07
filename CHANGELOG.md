@@ -68,7 +68,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Added
 
-- System health monitor in the VS Code extension: polls Dart/Flutter process memory and orphaned daemon count every 60 seconds (Windows). Status bar shows a warning or critical suffix when memory exceeds configurable thresholds or orphaned daemons accumulate. One-click "Kill Orphaned Flutter Daemons" command cleans up orphans with user permission. All thresholds configurable via extension settings under "System Health".
+- System health monitor in the VS Code extension: polls Dart/Flutter process memory and orphaned daemon count every 60 seconds (Windows). Status bar shows a warning or critical suffix when memory exceeds configurable thresholds or orphaned daemons accumulate. One-click "Kill Orphaned Flutter Daemons" command re-queries live processes before killing, avoiding stale-PID risks. All thresholds configurable via extension settings under "System Health".
+- Process Health panel (Command Palette → "Process Health"): live table of all Dart/Flutter processes with PID, parent, RSS, type classification (process/daemon/orphan), and per-process kill buttons for orphaned daemons.
 
 ---
 
@@ -81,6 +82,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Register 25+ internal caches for eviction under memory pressure — previously only 10 of ~70 were managed, causing unbounded memory growth on large projects (7.8 GB observed on a 3,900-file codebase). No action required.
 - Fix memory estimator to measure actual per-file cache sizes instead of flat approximations that understated real usage by ~25×. No action required.
 - Cap the per-file passed-rules cache with LRU eviction (default 500 files) — the single largest memory consumer at O(files × rules), previously unbounded. No action required.
+- Cap the per-file diff cache with LRU eviction (default 250 files) — retained full source text of every analyzed file (~19.5 MB on a 3,900-file project), now bounded. No action required.
+- Release per-file tracking maps after the analysis summary is reported — previously retained indefinitely, wasting memory for the rest of the session. No action required.
 - Fix VS Code integrated terminal color detection on Windows — ANSI escape sequences now render correctly when `TERM_PROGRAM` is set. No action required.
 
 <details>

@@ -908,6 +908,24 @@ class ProgressTracker {
 
     // Write log file
     _writeLogFile(buf.toString(), elapsed);
+
+    // Release per-file maps — summary is reported, this data is dead weight.
+    // Scalar counters (_violationsFound, _errorCount, etc.) are kept for
+    // re-analysis detection and limit tracking.
+    _releasePerFileMaps();
+  }
+
+  /// Free per-file tracking maps after the summary has been reported.
+  ///
+  /// Scalar counters (_violationsFound, _errorCount, etc.) are kept — they
+  /// cost nothing and _clearFileData references them if a file is re-analyzed.
+  /// _seenFiles is kept — it drives ongoing progress and re-analysis detection.
+  static void _releasePerFileMaps() {
+    _issuesByFile.clear();
+    _issuesByFileBySeverity.clear();
+    _issuesByFileByRule.clear();
+    _fileViolationKeys.clear();
+    _slowFiles.clear();
   }
 
   /// Write detailed log to reports directory.
