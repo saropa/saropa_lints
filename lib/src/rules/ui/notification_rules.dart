@@ -73,6 +73,9 @@ class RequireNotificationChannelAndroidRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_notification_channel_android',
     '[require_notification_channel_android] Android notification is missing a channel ID or description. Without these, notifications may not appear or may be grouped incorrectly on Android 8.0+ devices, reducing reliability and user engagement. {v2}',
@@ -170,6 +173,9 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_notification_payload_sensitive',
@@ -343,6 +349,9 @@ class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_notification_initialize_per_platform',
     '[require_notification_initialize_per_platform] Missing platform-specific initialization settings (android: or iOS: parameters) causes notifications to fail silently, breaking critical app functionality. Users on the unconfigured platform will never receive time-sensitive alerts, security notifications, or important updates. {v4}',
@@ -433,6 +442,9 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_notification_timezone_awareness',
@@ -581,6 +593,9 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_notification_same_id',
     '[avoid_notification_same_id] Static or hardcoded notification ID causes newer notifications to silently replace older ones using the same identifier. Users will miss important alerts, messages, and time-sensitive updates without any indication that previous notifications were overwritten, leading to lost information and degraded communication reliability. {v3}',
@@ -699,6 +714,9 @@ class PreferNotificationGroupingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_notification_grouping',
     '[prefer_notification_grouping] Multiple notifications shown in loop '
@@ -801,6 +819,9 @@ class AvoidNotificationSilentFailureRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_notification_silent_failure',
@@ -906,6 +927,9 @@ class PreferLocalNotificationForImmediateRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_local_notification_for_immediate',
     '[prefer_local_notification_for_immediate] FCM is for server-triggered messages. '
@@ -968,6 +992,9 @@ class PreferNotificationCustomSoundRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_notification_custom_sound',

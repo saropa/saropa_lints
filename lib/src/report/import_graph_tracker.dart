@@ -215,6 +215,25 @@ class ImportGraphTracker {
     return _importedBy[key ?? path] ?? const <String>{};
   }
 
+  /// Files whose raw import URIs reference [changedPath] (pre-compute reverse
+  /// lookup). Used by [FileContentCache] to invalidate pass records for
+  /// dependents when a file changes, without waiting for [compute].
+  static Iterable<String> rawImportersOf(String changedPath) sync* {
+    final normalized = changedPath.replaceAll('\\', '/');
+    final basename = normalized.contains('/')
+        ? normalized.substring(normalized.lastIndexOf('/') + 1)
+        : normalized;
+    if (basename.isEmpty) return;
+    for (final entry in _rawImports.entries) {
+      for (final uri in entry.value) {
+        if (uri.endsWith(basename)) {
+          yield entry.key;
+          break;
+        }
+      }
+    }
+  }
+
   /// Computed importance score for [path] (relative or absolute file path).
   static double getImportance(String path) {
     final key = _canonicalTrackedPath(path);

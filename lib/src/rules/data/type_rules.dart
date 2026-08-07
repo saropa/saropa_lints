@@ -52,6 +52,10 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_casting_to_extension_type',
@@ -119,6 +123,10 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_collection_methods_with_unrelated_types',
@@ -246,6 +254,10 @@ class AvoidDynamicRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_dynamic_type',
@@ -358,6 +370,10 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_implicitly_nullable_extension_types',
@@ -429,6 +445,10 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_nullable_interpolation',
@@ -605,6 +625,10 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_nullable_parameters_with_default_values',
@@ -679,6 +703,10 @@ class AvoidNullableToStringRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_nullable_tostring',
@@ -767,6 +795,10 @@ class AvoidNullAssertionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_null_assertion',
@@ -1853,6 +1885,10 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_type_assertions',
@@ -1932,6 +1968,10 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_type_casts',
@@ -2011,6 +2051,10 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_unrelated_type_assertions',
@@ -2097,6 +2141,10 @@ class TypeCheckWithNullRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'type_check_with_null',
@@ -2153,6 +2201,10 @@ class InvalidRuntimeCheckWithJsInteropTypesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => {'is ', 'is! '};
@@ -2224,6 +2276,10 @@ class ArgumentMustBeNativeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => {'Native.addressOf', 'dart:ffi'};
@@ -2328,6 +2384,10 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_correct_type_name',
@@ -2432,6 +2492,10 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_explicit_function_type',
@@ -2484,6 +2548,10 @@ class PreferInlineFunctionTypesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   String get exampleBad =>
@@ -2539,6 +2607,10 @@ class PreferResultTypeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_result_type',
@@ -2587,6 +2659,9 @@ class PreferTypeOverVarRule extends SaropaLintRule {
   /// Stylistic preference only. Conflicts with prefer_var_over_explicit_type.
   @override
   LintImpact get impact => LintImpact.info;
+  @override
+  bool get usesTypeResolution => true;
+
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2665,6 +2740,10 @@ class ExternalWithInitializerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'external_with_initializer',
@@ -2729,6 +2808,10 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   bool get requiresClassDeclaration => true;
@@ -2807,6 +2890,10 @@ class AvoidPrivateTypedefFunctionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_private_typedef_functions',
@@ -2856,6 +2943,10 @@ class PreferFinalLocalsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_final_locals',
@@ -3001,6 +3092,10 @@ class PreferConstDeclarationsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_const_declarations',
@@ -3096,6 +3191,10 @@ class InvalidVisibleOutsideTemplateAnnotationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'invalid_visible_outside_template_annotation',
@@ -3194,6 +3293,10 @@ class DuplicateRecordFieldNameRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'duplicate_field_name',
@@ -3273,6 +3376,10 @@ class InvalidRecordFieldNameRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'invalid_field_name',
@@ -3342,6 +3449,10 @@ class InvalidExtensionArgumentCountRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'invalid_extension_argument_count',
@@ -3396,6 +3507,10 @@ class SubtypeOfDisallowedTypeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'subtype_of_disallowed_type',
@@ -3494,6 +3609,10 @@ class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'abi_specific_integer_invalid',

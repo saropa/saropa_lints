@@ -69,12 +69,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Added
 
 - **Full Opportunities Report** — a new export (sidebar, or `Saropa Lints: Export Full Opportunities Report`) that consolidates every dependency and every changelog feature into one HTML, Markdown, and JSON report under `reports/`. Unlike the Upgrade Opportunities panel, it keeps fully-adopted packages and every changelog category, and counts each feature's usage from zero upward with the exact project file and line of every reference. Built to hand to an AI for a dependency-usage review.
-- **Balanced memory mode** — new `memory_mode: balanced` setting (default) that skips type-heavy rules on unchanged files during incremental analysis, reducing analyzer RSS by ~7 GB on large projects. Tradeoff: if a dependency's API changes without editing the dependent file, diagnostics may be stale until the file is next edited or the analysis server is restarted. Set `memory_mode: full` in `analysis_options_custom.yaml` or `SAROPA_MEMORY_MODE=full` to restore previous behavior. No action required.
+- **Balanced memory mode** — new `memory_mode: balanced` setting (default) that skips type-heavy rules on unchanged files during incremental analysis, reducing analyzer RSS by ~7 GB on large projects. When a dependency changes, direct importers are automatically re-analyzed; transitive dependents may need a file edit or analysis server restart. Set `memory_mode: full` in `analysis_options_custom.yaml` or `SAROPA_MEMORY_MODE=full` to restore previous behavior. No action required.
 
 <details>
 <summary>Maintenance</summary>
 
 - Moved `.vsix` output from `extension/` to the project root for easier access after packaging.
+- Translation skip logic now recognizes placeholder-only templates (`{category} ({count})`) as untranslatable, eliminating 48 false-positive missing-translation reports.
 - Pinned the opportunities report's symbol matcher against the implementation it replaced with a differential test, which found that the previous matcher silently never counted `$`-prefixed identifiers.
 - Marked 68 rule files as type-resolution-heavy (`usesTypeResolution`) to support balanced memory mode filtering.
 

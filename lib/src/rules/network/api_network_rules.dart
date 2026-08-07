@@ -56,6 +56,9 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_http_status_check',
     '[require_http_status_check] HTTP response body is used without first checking the status code. This can result in undetected failures, silent data corruption, or security issues if error responses are parsed as valid data. Always check if (response.statusCode == 200) before parsing response.body to ensure only successful responses are processed and errors are handled appropriately. {v5}',
@@ -147,6 +150,9 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_api_urls',
@@ -269,6 +275,9 @@ class RequireRetryLogicRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_retry_logic',
     '[require_retry_logic] Network call does not implement retry logic, so transient failures (e.g., temporary network loss, server hiccups) will not recover automatically. This can lead to poor reliability and frustrated users. Always wrap network calls with retry() or implement exponential backoff for SocketException/TimeoutException to improve robustness. {v6}',
@@ -352,6 +361,9 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_typed_api_response',
@@ -460,6 +472,9 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_connectivity_check',
     '[require_connectivity_check] Network calls without connectivity check '
@@ -558,6 +573,9 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_api_error_mapping',
     '[require_api_error_mapping] Raw API exceptions are exposed to users, leaking implementation details and providing unhelpful error messages. This can confuse users and expose sensitive information such as server paths, stack traces, or internal status codes. Always catch specific exceptions and map them to domain errors with clear, actionable messages to protect against information disclosure and improve error recovery. {v4}',
@@ -646,6 +664,9 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_request_timeout',
@@ -828,6 +849,9 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_offline_indicator',
     '[require_offline_indicator] Connectivity is checked, but there is no offline indicator shown to users. Without a clear indicator, users may not understand why features are unavailable or why requests fail. Always show a banner, snackbar, or icon when connectivity is lost to improve transparency and user experience. {v4}',
@@ -918,6 +942,9 @@ class PreferStreamingResponseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_streaming_response',
@@ -1109,6 +1136,9 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_http_connection_reuse',
     '[prefer_http_connection_reuse] HTTP client created inside method. Connection overhead on every call. Each new HTTP client requires DNS lookup, TCP handshake, and TLS negotiation. Reusing connections is much more efficient. {v4}',
@@ -1230,6 +1260,9 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_redundant_requests',
     '[avoid_redundant_requests] API call in build() or similar may cause redundant requests. Multiple widgets or methods requesting the same data simultaneously wastes bandwidth and server resources. Deduplicate concurrent requests. {v5}',
@@ -1333,6 +1366,9 @@ class RequireResponseCachingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_response_caching',
@@ -1442,6 +1478,9 @@ class PreferPaginationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_api_pagination',
     '[prefer_api_pagination] API fetches all items without pagination. May cause memory issues. Loading thousands of items at once is slow and memory-intensive. Use pagination with limit/offset or cursor-based pagination. {v2}',
@@ -1544,6 +1583,9 @@ class AvoidOverFetchingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_over_fetching',
@@ -1709,6 +1751,9 @@ class RequireCancelTokenRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_cancel_token',
     '[require_cancel_token] Async request without cancellation continues after a StatefulWidget disposes its State, wasting bandwidth and causing setState errors. Not canceling can lead to memory leaks, wasted network connections, and crashes from calling setState on a disposed State object after the parent removes the child from the widget tree. {v4}',
@@ -1813,6 +1858,9 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_websocket_error_handling',
@@ -1952,6 +2000,9 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_content_type_check',
     '[require_content_type_check] Parsing response without Content-Type check. May fail on error responses. APIs may return different content types on error. Parsing JSON without checking Content-Type may fail unexpectedly. {v4}',
@@ -2050,6 +2101,9 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_websocket_without_heartbeat',
@@ -2155,6 +2209,9 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_url_launcher_error_handling',
     '[require_url_launcher_error_handling] Calling launchUrl without error handling can cause your app to crash or leave users stranded if the URL cannot be opened (e.g., missing browser, invalid URL, or platform restrictions). This results in a poor user experience and can break critical app flows. {v2}',
@@ -2245,6 +2302,9 @@ class RequireImagePickerErrorHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_image_picker_error_handling',
     '[require_image_picker_error_handling] Using pickImage, pickVideo, or pickMultiImage without null checks or error handling can result in null dereference errors or unhandled exceptions if the user cancels the picker or a platform error occurs. This can crash your app or cause unpredictable UI states. {v2}',
@@ -2320,6 +2380,9 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_image_picker_source_choice',
@@ -2406,6 +2469,9 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_geolocator_timeout',
@@ -2504,6 +2570,9 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_connectivity_subscription_cancel',
     '[require_connectivity_subscription_cancel] If you do not cancel your connectivity subscription, your app will leak memory and system resources. This can cause crashes, slowdowns, and unpredictable behavior, especially after repeated hot reloads or navigation. {v3}',
@@ -2598,6 +2667,9 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_notification_handler_top_level',
     '[require_notification_handler_top_level] If your notification handler is not a top-level function, background messages will be silently dropped when the app is terminated or in the background. Users will miss important notifications and your app may fail compliance checks. {v3}',
@@ -2690,6 +2762,9 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_permission_denied_handling',
@@ -2826,6 +2901,9 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_image_picker_result_handling',
     '[require_image_picker_result_handling] pickImage returns null when '
@@ -2938,6 +3016,9 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_cached_image_in_build',
     '[avoid_cached_image_in_build] Variable cacheKey in build method defeats caching. Using a changing cacheKey in build causes the image to reload on every rebuild, defeating the purpose of caching. {v2}',
@@ -3027,6 +3108,9 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_sqflite_migration',
@@ -3125,6 +3209,9 @@ class RequirePermissionRationaleRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_permission_rationale',
     '[require_permission_rationale] Permission request without checking shouldShowRequestRationale. Android established convention is to explain why the app needs a permission before requesting it using shouldShowRequestRationale. {v3}',
@@ -3213,6 +3300,9 @@ class RequirePermissionStatusCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_permission_status_check',
@@ -3339,6 +3429,9 @@ class RequireNotificationPermissionAndroid13Rule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_notification_permission_android13',
@@ -3494,6 +3587,9 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_sse_subscription_cancel',
@@ -3658,6 +3754,9 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_timeout_on_requests',
@@ -3824,6 +3923,9 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_websocket_reconnection',
     '[require_websocket_reconnection] WebSocket connection without reconnection logic will stay permanently disconnected after network interruptions, server restarts, or mobile network handoffs. Users will see stale data, miss real-time updates, and have no indication that the live connection has dropped until they manually refresh or restart the app. {v4}',
@@ -3903,6 +4005,9 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_analytics_event_naming',
@@ -4007,6 +4112,9 @@ class PreferBatchRequestsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_batch_requests',
     '[prefer_batch_requests] Multiple await calls in a loop. Consider a batch endpoint to reduce network overhead.',
@@ -4067,6 +4175,9 @@ class RequireCompressionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_accept_encoding_header',
@@ -4167,6 +4278,9 @@ class RequireSslPinningSensitiveRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ssl_pinning_sensitive',
@@ -4275,6 +4389,9 @@ class PreferStaleWhileRevalidateRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_stale_while_revalidate',
@@ -4462,6 +4579,9 @@ class RequireApiResponseValidationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_api_response_validation',
     '[require_api_response_validation] API response used without validation. Validate shape before use.',
@@ -4511,6 +4631,9 @@ class RequireApiVersionHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_api_version_handling',
@@ -4636,6 +4759,9 @@ class RequireContentTypeValidationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_content_type_validation',

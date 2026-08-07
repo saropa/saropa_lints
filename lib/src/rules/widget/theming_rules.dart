@@ -49,6 +49,9 @@ class RequireDarkModeTestingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_dark_mode_testing',
     '[require_dark_mode_testing] MaterialApp missing darkTheme. App won\'t adapt to dark mode. Apps should support dark mode for accessibility and user preference. Without darkTheme, the app won\'t adapt when the user enables dark mode. {v2}',
@@ -136,6 +139,9 @@ class AvoidElevationOpacityInDarkRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_elevation_opacity_in_dark',
@@ -229,6 +235,9 @@ class PreferThemeExtensionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_theme_extensions',
@@ -347,6 +356,9 @@ class RequireSemanticColorsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_semantic_colors',
     '[require_semantic_colors] Color variable is named by its visual appearance (e.g., redColor, blueBackground) rather than its semantic purpose (e.g., errorColor, primaryBackground). Appearance-based color names become misleading when themes change, dark mode inverts colors, or branding updates alter the palette. Developers reading the code assume the color is literally red, leading to confusion when it is actually orange after a theme update, and making it impossible to safely refactor theme colors without auditing every usage site. {v2}',
@@ -449,6 +461,9 @@ class PreferDarkModeColorsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_dark_mode_colors',
     '[prefer_dark_mode_colors] Prefer theme-aware colors (e.g. '
@@ -502,6 +517,9 @@ class PreferHighContrastModeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_high_contrast_mode',

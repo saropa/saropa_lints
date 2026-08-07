@@ -61,6 +61,9 @@ class AvoidCollectionEqualityChecksRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.high;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_collection_equality_checks',
     '[avoid_collection_equality_checks] Comparing collections with == uses reference equality. This can cause false positives/negatives, leading to logic errors and unexpected app behavior. Collections (List, Set, Map) use reference equality by default, not value equality. Use listEquals, setEquals, or mapEquals instead. {v5}',
@@ -159,6 +162,9 @@ class AvoidDuplicateMapKeysRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_duplicate_map_keys',
     '[avoid_duplicate_map_keys] Duplicate key in map literal silently overwrites the earlier value, causing data loss and unpredictable behavior. Only the last value assigned to the key will persist in the resulting map. {v4}',
@@ -228,6 +234,9 @@ class AvoidMapKeysContainsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_map_keys_contains',
@@ -303,6 +312,9 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_collections',
@@ -409,6 +421,9 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unsafe_collection_methods',
@@ -1168,6 +1183,9 @@ class AvoidUnsafeReduceRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.high;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_unsafe_reduce',
     '[avoid_unsafe_reduce] Calling reduce() on an empty collection throws a StateError at runtime, crashing the app. Unlike fold(), reduce() has no initial value and requires at least one element to operate. {v7}',
@@ -1243,6 +1261,9 @@ class PreferFoldOverReduceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'final sum = numbers.reduce((a, b) => a + b);';
 
   @override
@@ -1312,6 +1333,9 @@ class PreferForeachRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'items.forEach((x) => print(x));';
 
   @override
@@ -1378,6 +1402,9 @@ class PreferForeachOverMapEntriesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'map.forEach((k, v) => doSomething(k, v));';
 
   @override
@@ -1438,6 +1465,9 @@ class PreferConstructorOverLiteralsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'final list = [];';
@@ -1508,6 +1538,9 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unsafe_where_methods',
@@ -1600,6 +1633,9 @@ class PreferWhereOrNullRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_where_or_null',
@@ -1700,6 +1736,9 @@ class MapKeysOrderingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => "final map = {'zebra': 1, 'apple': 2};";
 
   @override
@@ -1776,6 +1815,9 @@ class PreferContainsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1869,6 +1911,9 @@ class PreferFirstRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'final first = list[0];';
@@ -2016,6 +2061,9 @@ class PreferIterableOfRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_iterable_of',
     '[prefer_iterable_of] Using .from() performs a runtime cast on each element, which can silently succeed with wrong types and throw later. The .of() constructor enforces type safety at the call site, catching type mismatches immediately. {v4}',
@@ -2094,6 +2142,9 @@ class PreferLastRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'final last = list[list.length - 1];';
@@ -2202,6 +2253,9 @@ class PreferAddAllRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_add_all',
@@ -2326,6 +2380,9 @@ class AvoidDuplicateNumberElementsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_duplicate_number_elements',
     '[avoid_duplicate_number_elements] Duplicate numeric element in collection literal typically indicates a copy-paste error or logic mistake. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
@@ -2407,6 +2464,9 @@ class AvoidDuplicateStringElementsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_duplicate_string_elements',
     '[avoid_duplicate_string_elements] Duplicate string element in collection literal typically indicates a copy-paste error or incomplete refactoring. In Sets, the duplicate is silently ignored, producing a smaller collection than expected. {v2}',
@@ -2486,6 +2546,9 @@ class AvoidDuplicateObjectElementsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_duplicate_object_elements',
@@ -2574,6 +2637,9 @@ class RequireConstListItemsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_const_list_items',
     '[require_const_list_items] List item could be const. Prefer const for static constructor calls in list literals when possible.',
@@ -2636,6 +2702,9 @@ class PreferAsmapOverIndexedIterationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_asmap_over_indexed_iteration',
@@ -2809,6 +2878,9 @@ class PreferSetForLookupRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.high;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_set_for_lookup',
     '[prefer_set_for_lookup] Calling contains() on a List performs a linear O(n) scan through every element, while a Set uses hash-based O(1) lookup. For collections used primarily for membership testing, this causes unnecessary performance degradation. {v5}',
@@ -2882,6 +2954,9 @@ class PreferCorrectForLoopIncrementRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_correct_for_loop_increment',
@@ -3015,6 +3090,9 @@ class AvoidUnreachableForLoopRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unreachable_for_loop',
@@ -3157,6 +3235,9 @@ class PreferNullAwareElementsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_null_aware_elements',
     '[prefer_null_aware_elements] Explicit null check with if (x != null) x in collection literals is verbose. Dart 3 supports the ?element syntax, which eliminates the boilerplate and expresses nullable inclusion more concisely. {v5}',
@@ -3251,6 +3332,9 @@ class PreferIterableOperationsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_iterable_operations',
     '[prefer_iterable_operations] Calling .toList() at the end of an iterable chain inside a for-in loop forces eager evaluation and allocates an intermediate list that is iterated once and then discarded. This wastes memory and CPU cycles. {v2}',
@@ -3335,6 +3419,9 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_key_for_collection',
@@ -3496,6 +3583,9 @@ class AvoidFunctionLiteralsInForeachCallsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad =>
       'items.forEach((e) { process(e); });  // function literal';
 
@@ -3557,6 +3647,9 @@ class PreferInlinedAddsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_inlined_adds',
@@ -3646,6 +3739,9 @@ class PreferForElementsToMapFromIterableRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_for_elements_to_map_from_iterable',
@@ -3751,6 +3847,9 @@ class NonConstantMapElementRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'non_constant_map_element',

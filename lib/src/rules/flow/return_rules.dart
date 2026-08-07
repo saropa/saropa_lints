@@ -58,6 +58,9 @@ class AvoidReturningCascadesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_returning_cascades',
     '[avoid_returning_cascades] Return statement contains a cascade expression (..operator), which obscures the actual return value and can confuse readers about whether the returned object is the cascade target or the result of the last cascade operation. Separating the cascade from the return makes the control flow explicit and easier to debug. {v4}',
@@ -118,6 +121,9 @@ class AvoidReturningThisRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -197,6 +203,9 @@ class AvoidReturningVoidRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_returning_void',
     '[avoid_returning_void] Explicit void return is redundant and can mask accidental side-effect returns. '
@@ -272,6 +281,9 @@ class AvoidUnnecessaryReturnRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -361,6 +373,9 @@ class PreferImmediateReturnRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -464,6 +479,9 @@ class AvoidReturningNullForVoidRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_returning_null_for_void',
     '[avoid_returning_null_for_void] Returning null from a void function is '
@@ -544,6 +562,9 @@ class AvoidReturningNullForFutureRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_returning_null_for_future',

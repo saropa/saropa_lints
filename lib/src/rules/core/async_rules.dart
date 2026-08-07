@@ -41,6 +41,11 @@ class AvoidFutureIgnoreRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_future_ignore',
@@ -99,6 +104,11 @@ class AvoidFutureToStringRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_future_tostring',
@@ -173,6 +183,11 @@ class AvoidNestedFuturesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_nested_futures',
@@ -233,6 +248,11 @@ class AvoidNestedStreamsAndFuturesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_nested_streams_and_futures',
@@ -295,6 +315,11 @@ class AvoidPassingAsyncWhenSyncExpectedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -386,6 +411,11 @@ class AvoidRedundantAsyncRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -482,6 +512,11 @@ class AvoidStreamToStringRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   // cspell:ignore tostring
   static const LintCode _code = LintCode(
@@ -538,6 +573,11 @@ class AvoidUnassignedStreamSubscriptionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_unassigned_stream_subscriptions',
@@ -603,6 +643,11 @@ class PreferAsyncAwaitRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_async_await',
@@ -659,6 +704,11 @@ class PreferAssigningAwaitExpressionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_assigning_await_expressions',
@@ -739,6 +789,11 @@ class PreferCommentingFutureDelayedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_commenting_future_delayed',
@@ -808,6 +863,10 @@ class PreferCorrectFutureReturnTypeRule extends SaropaLintRule {
     correctionMessage: 'Add explicit Future<T> return type.',
     severity: DiagnosticSeverity.INFO,
   );
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   void runWithReporter(
@@ -869,6 +928,11 @@ class PreferCorrectStreamReturnTypeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_correct_stream_return_type',
@@ -936,6 +1000,11 @@ class PreferSpecifyingFutureValueTypeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_specifying_future_value_type',
@@ -1007,6 +1076,11 @@ class PreferReturnAwaitRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_return_await',
@@ -1152,6 +1226,11 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1329,6 +1408,11 @@ class PreferFutureVoidFunctionOverAsyncCallbackRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1402,6 +1486,11 @@ class AvoidDialogContextAfterAsyncRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_dialog_context_after_async',
@@ -1585,6 +1674,11 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'check_mounted_after_async',
@@ -1799,6 +1893,11 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_websocket_message_validation',
@@ -1890,6 +1989,11 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_feature_flag_default',
@@ -1996,6 +2100,11 @@ class PreferUtcForStorageRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -2141,6 +2250,11 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_location_timeout',
@@ -2285,6 +2399,11 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_stream_in_build',
@@ -2366,6 +2485,11 @@ class RequireStreamControllerCloseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_stream_controller_close',
@@ -2476,6 +2600,11 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_multiple_stream_listeners',
@@ -2563,6 +2692,11 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_stream_error_handling',
@@ -2653,6 +2787,11 @@ class RequireFutureTimeoutRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_future_timeout',
@@ -2761,6 +2900,11 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_future_wait_error_handling',
@@ -2834,6 +2978,11 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_stream_on_done',
@@ -2921,6 +3070,11 @@ class RequireCompleterErrorHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_completer_error_handling',
@@ -3023,6 +3177,11 @@ class AvoidStreamSubscriptionInFieldRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3227,6 +3386,11 @@ class AvoidFutureThenInAsyncRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_future_then_in_async',
@@ -3336,6 +3500,11 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -3614,6 +3783,11 @@ class PreferFutureWaitRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_future_wait',
@@ -3766,6 +3940,11 @@ class PreferStreamDistinctRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_stream_distinct',
@@ -3869,6 +4048,11 @@ class PreferBroadcastStreamRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_broadcast_stream',
@@ -3978,6 +4162,11 @@ class AvoidFutureInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_future_in_build',
@@ -4088,6 +4277,11 @@ class RequireMountedCheckAfterAwaitRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_mounted_check_after_await',
@@ -4215,6 +4409,11 @@ class AvoidAsyncInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_async_in_build',
@@ -4295,6 +4494,11 @@ class PreferAsyncInitStateRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_async_init_state',
@@ -4391,6 +4595,11 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_network_status_check',
@@ -4541,6 +4750,11 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4639,6 +4853,11 @@ class RequirePendingChangesIndicatorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_pending_changes_indicator',
@@ -4734,6 +4953,11 @@ class AvoidStreamSyncEventsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_stream_sync_events',
@@ -4874,6 +5098,11 @@ class AvoidSequentialAwaitsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_sequential_awaits',
@@ -5035,6 +5264,11 @@ class AvoidVoidAsyncRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_void_async',
@@ -5209,6 +5443,11 @@ class AvoidRedundantAwaitRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_redundant_await',
@@ -5293,6 +5532,11 @@ class PreferCancellationTokenPatternRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_cancellation_token_pattern',
@@ -5330,6 +5574,11 @@ class PreferStreamTransformerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_stream_transformer',
@@ -5374,6 +5623,11 @@ class PreferStreamsOverPollingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_streams_over_polling',
@@ -5415,6 +5669,11 @@ class RequireCancellableOperationsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_cancellable_operations',
@@ -5449,6 +5708,11 @@ class RequireStreamCancelOnErrorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_stream_cancel_on_error',
@@ -5482,6 +5746,11 @@ class RequireSubscriptionCompositeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'require_subscription_composite',

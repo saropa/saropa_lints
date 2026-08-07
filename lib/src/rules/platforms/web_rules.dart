@@ -74,6 +74,9 @@ class AvoidPlatformChannelOnWebRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_platform_channel_on_web',
     '[avoid_platform_channel_on_web] MethodChannel throws '
@@ -170,6 +173,9 @@ class RequireCorsHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_cors_handling',
     '[require_cors_handling] HTTP calls from a Flutter web app fail silently without proper CORS headers from the server. The browser blocks cross-origin requests by default, causing network errors that prevent data loading, authentication, and API communication. Users see blank screens or broken functionality with no clear error message. {v3}',
@@ -265,6 +271,9 @@ class PreferDeferredLoadingWebRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_deferred_loading_web',
     '[prefer_deferred_loading_web] Large package imported eagerly increases initial bundle size. Web apps should defer loading large libraries to improve initial load time. Use deferred loading for heavy packages. {v4}',
@@ -355,6 +364,9 @@ class AvoidWebOnlyDependenciesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_web_only_dependencies',
     '[avoid_web_only_dependencies] Importing web-only libraries such as dart:html, dart:js, or dart:indexed_db in a Flutter or Dart app that targets mobile or desktop platforms will cause the app to crash with UnsupportedError at startup. This makes the app completely unusable for non-web users and can result in poor user experience, negative reviews, and lost users. Web-only dependencies must be isolated to web-specific code. {v3}',
@@ -444,6 +456,9 @@ class PreferJsInteropOverDartJsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_js_interop_over_dart_js',
     '[prefer_js_interop_over_dart_js] Use stable dart:js_interop (Dart 3.5) instead of deprecated dart:js or dart:js_util. {v1}',
@@ -514,6 +529,9 @@ class PreferUrlStrategyForWebRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -604,6 +622,9 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -698,6 +719,9 @@ class AvoidJsRoundedIntsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_js_rounded_ints',
@@ -829,6 +853,9 @@ class PreferScheduleMicrotaskOverWindowPostmessageRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'postMessage'};
 
   static const LintCode _code = LintCode(
@@ -903,6 +930,9 @@ class PreferCsrfProtectionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{
@@ -1029,6 +1059,9 @@ class AvoidPackageJsForWasmRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_package_js_for_wasm',

@@ -82,6 +82,9 @@ class AvoidDeprecatedFileSystemDeleteEventIsDirectoryRule
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'isDirectory'};
 
   static const LintCode _code = LintCode(

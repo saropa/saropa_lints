@@ -67,6 +67,9 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_unknown_route_handler',
     '[require_unknown_route_handler] MaterialApp or CupertinoApp defines routes or onGenerateRoute but does not provide an onUnknownRoute handler. When a user navigates to an undefined route path via deep link, push notification, or programmatic navigation, the app throws an unhandled exception and crashes instead of showing a helpful error screen. {v4}',
@@ -155,6 +158,9 @@ class AvoidContextAfterNavigationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -309,6 +315,9 @@ class RequireRouteTransitionConsistencyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_route_transition_consistency',
     '[require_route_transition_consistency] Multiple route transition types (MaterialPageRoute, CupertinoPageRoute, PageRouteBuilder) are mixed in the same file. Mixing slide, fade, and zoom transitions within a single app produces a jarring, unprofessional navigation experience that disorients users and undermines perceived app quality. {v5}',
@@ -410,6 +419,9 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_navigator_push_unnamed',
     '[avoid_navigator_push_unnamed] Navigator.push used with an inline route constructor instead of a named route. Inline routes prevent deep linking, break URL-based navigation, and make route management unmaintainable. Users cannot share or bookmark specific screens, and analytics tools cannot track page views accurately. {v3}',
@@ -496,6 +508,9 @@ class RequireRouteGuardsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_route_guards',
@@ -611,6 +626,9 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_circular_redirects',
     '[avoid_circular_redirects] GoRoute redirect callback always returns a path and never returns null, creating an unconditional redirect that forms an infinite loop. The router exhausts the redirect limit and throws an exception, crashing the app or permanently locking users out of all navigation when the redirect chain has no termination condition. {v2}',
@@ -699,6 +717,9 @@ class AvoidPopWithoutResultRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_pop_without_result',
@@ -897,6 +918,9 @@ class PreferShellRouteForPersistentUiRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_shell_route_for_persistent_ui',
     '[prefer_shell_route_for_persistent_ui] Multiple GoRoute builders duplicate the same bottomNavigationBar, drawer, or NavigationRail instead of sharing a single wrapper. Each route rebuilds the persistent UI independently, causing duplicated code, inconsistent selection state across tabs, visual flicker during navigation, and increased memory usage from redundant widget trees. {v3}',
@@ -1024,6 +1048,9 @@ class RequireDeepLinkFallbackRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_deep_link_fallback',
@@ -1256,6 +1283,9 @@ class AvoidDeepLinkSensitiveParamsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_deep_link_sensitive_params',
     '[avoid_deep_link_sensitive_params] Deep link query parameter contains sensitive data (password, token, secret, API key, or credential), creating a security breach. Deep link URLs are recorded in system logs, browser history, HTTP referrer headers, and analytics platforms, permanently exposing credentials to attackers who gain access to those logs or the device history. {v4}',
@@ -1350,6 +1380,9 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_typed_route_params',
@@ -1449,6 +1482,9 @@ class RequireStepperValidationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_stepper_validation',
     '[require_stepper_validation] Stepper onStepContinue callback does not validate form input before proceeding. This can allow users to advance with incomplete or invalid data, leading to errors or inconsistent state. {v3}',
@@ -1531,6 +1567,9 @@ class RequireStepCountIndicatorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_step_count_indicator',
@@ -1616,6 +1655,9 @@ class AvoidGoRouterInlineCreationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_go_router_inline_creation',
     '[avoid_go_router_inline_creation] GoRouter instance created inside build() is destroyed and recreated on every widget rebuild. This resets all navigation state including the current route stack, destroys in-flight transitions, breaks hot reload during development, and causes users to lose their navigation position whenever the parent widget rebuilds. {v3}',
@@ -1681,6 +1723,9 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_go_router_error_handler',
@@ -1759,6 +1804,9 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_go_router_refresh_listenable',
     '[require_go_router_refresh_listenable] GoRouter has a redirect callback but no refreshListenable. When authentication state changes (login, logout, token expiry), the router does not re-evaluate redirects, leaving users stranded on protected pages after logout or blocked from authenticated pages after login. {v3}',
@@ -1829,6 +1877,9 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_go_router_string_paths',
@@ -1936,6 +1987,9 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_go_router_redirect_auth',
     '[prefer_go_router_redirect_auth] Authentication check detected inside a GoRoute builder instead of the router-level redirect callback. Scattering auth logic across individual page builders duplicates code, creates inconsistent enforcement, and allows new routes to accidentally skip authentication. {v3}',
@@ -2024,6 +2078,9 @@ class RequireGoRouterTypedParamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_go_router_typed_params',
@@ -2138,6 +2195,9 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_go_router_extra_typed',
@@ -2272,6 +2332,9 @@ class PreferMaybePopRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         ReplaceWithMaybePopFix(context: context),
@@ -2399,6 +2462,9 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_url_launcher_uri_over_string',
     '[prefer_url_launcher_uri_over_string] launchUrl called with Uri.parse() on a string literal instead of constructing a Uri object directly. Uri.parse() defers validation to runtime, where malformed strings throw FormatException and crash the app. {v2}',
@@ -2470,6 +2536,9 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_go_router_push_replacement_confusion',
@@ -2601,6 +2670,9 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_url_launcher_encoding',
     '[require_url_launcher_encoding] URL passed to launchUrl or canLaunchUrl contains string interpolation without Uri.encodeComponent(). Unencoded special characters (spaces, ampersands, Unicode) produce malformed URLs that fail to open, display incorrect content, or enable URL injection attacks where user input manipulates the destination path or query parameters. {v2}',
@@ -2691,6 +2763,9 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_nested_routes_without_parent',
     '[avoid_nested_routes_without_parent] context.go() navigates to a path with 3+ segments, which places users deep in the route hierarchy without parent routes on the stack. The back button skips intermediate screens, breaking expected navigation flow and disorienting users. {v2}',
@@ -2774,6 +2849,9 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_shell_route_shared_layout',
     '[prefer_shell_route_shared_layout] GoRoute with Scaffold builder may duplicate layout code. Multiple routes with the same Scaffold layout cause code duplication and inconsistent behavior. ShellRoute provides a shared wrapper. {v2}',
@@ -2850,6 +2928,9 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2931,6 +3012,9 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_go_router_fallback_route',
@@ -3027,6 +3111,9 @@ class PreferRouteSettingsNameRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_route_settings_name',
     '[prefer_route_settings_name] MaterialPageRoute without RouteSettings.name. '
@@ -3112,6 +3199,9 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_navigator_context_issue',
@@ -3236,6 +3326,9 @@ class RequirePopResultTypeRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_pop_result_type',
     '[require_pop_result_type] Awaited route push without type parameter. '
@@ -3321,6 +3414,9 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_push_replacement_misuse',
@@ -3455,6 +3551,9 @@ class AvoidNestedNavigatorsMisuseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -3549,6 +3648,9 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_deep_link_testing',
@@ -3663,6 +3765,9 @@ class RequireNavigationResultHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         AddAwaitToNavigatorPushFix(context: context),
@@ -3757,6 +3862,9 @@ class PreferGoRouterRedirectRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_go_router_redirect',
     '[prefer_go_router_redirect] GoRouter created without a redirect callback. Without redirect, authentication and authorization checks must happen in build(), which briefly shows the protected page before redirecting. Users see a flash of content they should not access, and crawlers or screen readers may capture protected information. Use the redirect callback to intercept navigation before any UI renders. {v1}',
@@ -3821,6 +3929,9 @@ class PreferGoRouterBuilderRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_go_router_builder',
     '[prefer_go_router_builder] GoRoute is defined with a hand-written path '
@@ -3876,6 +3987,9 @@ class PreferBranchIoOrFirebaseLinksRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_branch_io_or_firebase_links',
     '[prefer_branch_io_or_firebase_links] Prefer Branch.io or Firebase '
@@ -3922,6 +4036,9 @@ class RequireAutoRoutePageSuffixRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -4002,6 +4119,9 @@ class PreferNamedRoutesForDeepLinksRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_named_routes_for_deep_links',
     '[prefer_named_routes_for_deep_links] Anonymous route construction '
@@ -4065,6 +4185,9 @@ class RequireWillPopScopeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_will_pop_scope',

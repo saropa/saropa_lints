@@ -64,6 +64,10 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'require_keys_in_animated_lists',
@@ -201,6 +205,10 @@ class AvoidExpensiveBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_expensive_build',
@@ -348,6 +356,10 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_synchronous_file_io',
@@ -422,6 +434,10 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_compute_for_heavy_work',
@@ -546,6 +562,10 @@ class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_object_creation_in_hot_loops',
@@ -662,6 +682,10 @@ class PreferCachedGetterRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_cached_getter',
@@ -803,6 +827,10 @@ class AvoidExcessiveWidgetDepthRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -905,6 +933,10 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'require_item_extent_for_large_lists',
@@ -999,6 +1031,10 @@ class PreferImagePrecacheRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_image_precache',
@@ -1089,6 +1125,10 @@ class AvoidControllerInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_controller_in_build',
@@ -1184,6 +1224,10 @@ class AvoidSetStateInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1279,6 +1323,10 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_string_concatenation_loop',
@@ -1430,6 +1478,10 @@ class AvoidScrollListenerInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_scroll_listener_in_build',
@@ -1516,6 +1568,10 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_value_listenable_builder',
@@ -1926,6 +1982,10 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_global_key_misuse',
@@ -2029,6 +2089,10 @@ class RequireRepaintBoundaryRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'require_repaint_boundary',
@@ -2148,6 +2212,10 @@ class AvoidTextSpanInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_text_span_in_build',
@@ -2242,6 +2310,10 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_large_list_copy',
@@ -2441,6 +2513,10 @@ class PreferConstWidgetsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2548,6 +2624,10 @@ class AvoidExpensiveComputationInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_expensive_computation_in_build',
@@ -2636,6 +2716,10 @@ class AvoidWidgetCreationInLoopRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2731,6 +2815,10 @@ class AvoidCallingOfInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_calling_of_in_build',
@@ -2837,6 +2925,10 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'require_image_cache_management',
@@ -2921,6 +3013,10 @@ class AvoidMemoryIntensiveOperationsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_memory_intensive_operations',
@@ -3023,6 +3119,10 @@ class AvoidClosureMemoryLeakRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_closure_memory_leak',
@@ -3107,6 +3207,10 @@ class PreferStaticConstWidgetsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3168,6 +3272,9 @@ class PreferStaticConstWidgetsRule extends SaropaLintRule {
 /// ```
 class RequireDisposePatternRule extends SaropaLintRule {
   RequireDisposePatternRule() : super(code: _code);
+  @override
+  bool get usesTypeResolution => true;
+
 
   static const LintCode _code = LintCode(
     'require_dispose_pattern',
@@ -3288,6 +3395,10 @@ class RequireListPreallocateRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'require_list_preallocate',
@@ -3446,6 +3557,10 @@ class PreferBuilderForConditionalRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_builder_for_conditional',
@@ -3548,6 +3663,10 @@ class RequireWidgetKeyStrategyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3676,6 +3795,10 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'require_menu_bar_for_desktop',
@@ -3783,6 +3906,10 @@ class RequireWindowCloseConfirmationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'require_window_close_confirmation',
@@ -3885,6 +4012,10 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_native_file_dialogs',
@@ -3967,6 +4098,10 @@ class PreferInheritedWidgetCacheRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4064,6 +4199,10 @@ class PreferLayoutBuilderOverMediaQueryRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_layout_builder_over_media_query',
@@ -4165,6 +4304,10 @@ class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
@@ -4254,6 +4397,10 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_money_arithmetic_on_double',
@@ -4427,6 +4574,10 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_rebuild_on_scroll',
@@ -4536,6 +4687,10 @@ class AvoidAnimationInLargeListRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4661,6 +4816,10 @@ class PreferLazyLoadingImagesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4758,6 +4917,10 @@ class PreferElementRebuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4854,6 +5017,10 @@ class RequireIsolateForHeavyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'require_isolate_for_heavy',
@@ -4938,6 +5105,10 @@ class AvoidFinalizerMisuseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_finalizer_misuse',
@@ -5029,6 +5200,10 @@ class AvoidJsonInMainRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_json_in_main',
@@ -5095,6 +5270,10 @@ class AvoidBlockingMainThreadRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'avoid_blocking_main_thread',
@@ -5193,6 +5372,10 @@ class AvoidFullSyncOnEveryLaunchRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -5320,6 +5503,10 @@ class AvoidCacheStampedeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   bool get requiresAsync => true;
@@ -5455,6 +5642,10 @@ class PreferBinaryFormatRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_binary_format',
@@ -5518,6 +5709,10 @@ class PreferPoolPatternRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_pool_pattern',
@@ -5577,6 +5772,10 @@ class PreferDiskCacheForPersistenceRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   static const LintCode _code = LintCode(
     'prefer_disk_cache_for_persistence',

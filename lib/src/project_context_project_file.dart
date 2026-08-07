@@ -579,10 +579,20 @@ class FileContentCache {
     if (oldHash == null || oldHash != newHash) {
       _contentHashes[normalizedPath] = newHash;
       _passedRules.remove(normalizedPath);
+      _invalidateDependents(filePath);
       return true;
     }
 
     return false;
+  }
+
+  /// Clear pass records for files that import [changedPath], so type-heavy
+  /// rules re-run on dependents whose resolved semantics may have changed
+  /// even though their source text is identical.
+  static void _invalidateDependents(String changedPath) {
+    for (final dependent in ImportGraphTracker.rawImportersOf(changedPath)) {
+      _passedRules.remove(normalizePath(dependent));
+    }
   }
 
   /// Record that a rule passed (no violations) on a file.
@@ -604,6 +614,12 @@ class FileContentCache {
   static bool rulePreviouslyPassed(String filePath, String ruleName) {
     final normalizedPath = normalizePath(filePath);
     return _passedRules.get(normalizedPath)?.contains(ruleName) ?? false;
+  }
+
+  /// Revoke a previously recorded pass (called when a violation is reported).
+  static void revokeRulePassed(String filePath, String ruleName) {
+    final normalizedPath = normalizePath(filePath);
+    _passedRules.get(normalizedPath)?.remove(ruleName);
   }
 
   /// Clear cache for a specific file.

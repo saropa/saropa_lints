@@ -38,6 +38,9 @@ class AvoidLateFinalReassignmentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_late_final_reassignment',
     '[avoid_late_final_reassignment] Late final field has multiple assignment paths, which throws a LateInitializationError at runtime on the second write. The compiler cannot catch this statically, so the crash only surfaces during execution of the specific code path that triggers the duplicate assignment. {v4}',
@@ -190,6 +193,9 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
@@ -335,6 +341,9 @@ class AvoidParameterReassignmentRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -502,6 +511,9 @@ class AvoidParameterMutationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_parameter_mutation',
@@ -826,6 +838,9 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_unnecessary_nullable_parameters',
     '[avoid_unnecessary_nullable_parameters] Parameter declared as nullable but null is never passed at any call site. The unnecessary nullable type forces every usage within the function body to handle a null case that cannot occur, adding defensive checks and reducing code clarity. {v4}',
@@ -918,6 +933,9 @@ class FunctionAlwaysReturnsNullRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'function_always_returns_null',
@@ -1096,6 +1114,9 @@ class _ReturnCollector extends RecursiveAstVisitor<void> {
 /// ```
 class AvoidUnusedAssignmentRule extends SaropaLintRule {
   AvoidUnusedAssignmentRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unused_assignment',
@@ -1302,6 +1323,9 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   /// Types whose constructors are intentionally used for side effects
   /// without needing to capture the returned instance.
   static const Set<String> _fireAndForgetTypes = <String>{'Future', 'Timer'};
@@ -1343,6 +1367,9 @@ class AvoidUnusedInstancesRule extends SaropaLintRule {
 /// ```
 class AvoidUnusedAfterNullCheckRule extends SaropaLintRule {
   AvoidUnusedAfterNullCheckRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unused_after_null_check',
@@ -1433,6 +1460,9 @@ class FunctionAlwaysReturnsSameValueRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'function_always_returns_same_value',
     '[function_always_returns_same_value] Function returns the same value on every code path regardless of input. The function body adds complexity without varying the output, suggesting the logic branches are incomplete or the function can be replaced by a constant. {v5}',
@@ -1519,6 +1549,9 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unassigned_fields',
@@ -1651,6 +1684,9 @@ class AvoidUnassignedLateFieldsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_unassigned_late_fields',
     '[avoid_unassigned_late_fields] Late field has no assignment in any constructor, initializer, or lifecycle method. Accessing an unassigned late field throws a LateInitializationError at runtime, crashing the app at a point that the compiler cannot check statically. {v4}',
@@ -1752,6 +1788,9 @@ class AvoidUnnecessaryLateFieldsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_late_fields',
@@ -1861,6 +1900,9 @@ class AvoidUnnecessaryNullableFieldsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_nullable_fields',
@@ -1986,6 +2028,9 @@ class AvoidUnnecessaryPatternsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.high;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_unnecessary_patterns',
     '[avoid_unnecessary_patterns] Pattern matching syntax used where it does not narrow types or destructure values. The pattern adds syntactic complexity without any type-safety benefit, making the code harder to read compared to a plain variable declaration or assignment. {v5}',
@@ -2049,6 +2094,9 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_local_late',
@@ -2115,6 +2163,9 @@ class AvoidUnnecessaryLocalLateRule extends SaropaLintRule {
 /// ```
 class MatchBaseClassDefaultValueRule extends SaropaLintRule {
   MatchBaseClassDefaultValueRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'match_base_class_default_value',
@@ -2247,6 +2298,9 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'move_variable_closer_to_its_usage',
@@ -2391,6 +2445,9 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'move_variable_outside_iteration',
@@ -2608,6 +2665,9 @@ class UseExistingDestructuringRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'use_existing_destructuring',
@@ -2891,6 +2951,9 @@ class UseExistingVariableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'use_existing_variable',
     '[use_existing_variable] New variable created with the same value as an existing in-scope variable. The duplicate adds an unnecessary name to the scope, increases cognitive load, and risks divergence if one copy is later modified while the other is not. {v4}',
@@ -2991,6 +3054,9 @@ class PreferLateFinalRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_late_final',
@@ -3261,6 +3327,9 @@ class AvoidLateForNullableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_late_for_nullable',
     '[avoid_late_for_nullable] Nullable type declared with late keyword. Since the type already accepts null, the late keyword adds no initialization safety and instead introduces a hidden crash path: accessing the variable before assignment throws LateInitializationError rather than returning null. {v4}',
@@ -3345,6 +3414,9 @@ class PreferLateLazyInitializationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_late_lazy_initialization',

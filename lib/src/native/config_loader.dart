@@ -26,6 +26,7 @@ import '../baseline/baseline_manager.dart';
 import '../config/analysis_options_rule_packs.dart';
 import '../config/pubspec_lock_resolver.dart';
 import '../config/rule_packs.dart';
+import '../config/memory_mode.dart' show MemoryMode, MemoryModeConfig;
 import '../config/runtime_tier_cap.dart';
 import '../report/diagnostic_statistics.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
@@ -108,6 +109,7 @@ void _loadFromRoot(String? projectRoot) {
     _loadBaselineConfig(content);
     loadBannedUsageConfig(content);
     _loadOutputConfig(content);
+    _loadMemoryMode(content);
     _loadDiagnosticStatisticsConfig(content, projectRoot);
 
     // Tier cap. The in-process essential DEFAULT applies only when BOTH:
@@ -478,6 +480,67 @@ void _loadLogLevel(String content) {
       'Keeping current level (${PluginLogger.minLevel.name}).',
     );
   }
+}
+
+/// Parses `memory_mode:` under `plugins > saropa_lints` in
+/// `analysis_options.yaml` or the `SAROPA_MEMORY_MODE` env var.
+/// Valid values: `balanced` (default), `full`. Env var takes precedence.
+///
+/// Scoped to the `saropa_lints:` section so a `memory_mode:` key under an
+/// unrelated top-level section is not matched.
+void _loadMemoryMode(String? content) {
+  try {
+    final envValue = Platform.environment['SAROPA_MEMORY_MODE'];
+    if (envValue != null) {
+      final parsed = _parseMemoryMode(envValue);
+      if (parsed != null) {
+        MemoryModeConfig.mode = parsed;
+      } else {
+        PluginLogger.warning(
+          'Unrecognized SAROPA_MEMORY_MODE "$envValue" — '
+          'valid values: balanced, full. '
+          'Keeping current mode (${MemoryModeConfig.mode.name}).',
+        );
+      }
+      return;
+    }
+  } on Object {
+    // Platform.environment may throw on some platforms
+  }
+
+  if (content == null) return;
+
+  final saropaMatch = RegExp(
+    r'^\s+saropa_lints:\s*$',
+    multiLine: true,
+  ).firstMatch(content);
+  if (saropaMatch == null) return;
+
+  final afterSaropa = content.substring(saropaMatch.end);
+  final match = RegExp(
+    r'^[ \t]+memory_mode:\s*(\S+)',
+    multiLine: true,
+  ).firstMatch(afterSaropa);
+  if (match == null) return;
+
+  final raw = match.group(1);
+  final parsed = _parseMemoryMode(raw);
+  if (parsed != null) {
+    MemoryModeConfig.mode = parsed;
+  } else {
+    PluginLogger.warning(
+      'Unrecognized memory_mode "$raw" in analysis_options.yaml — '
+      'valid values: balanced, full. '
+      'Keeping current mode (${MemoryModeConfig.mode.name}).',
+    );
+  }
+}
+
+MemoryMode? _parseMemoryMode(String? raw) {
+  final normalized = raw?.toLowerCase().trim();
+  if (normalized == 'full') return MemoryMode.full;
+  if (normalized == 'balanced') return MemoryMode.balanced;
+  return null;
 }
 
 /// Rule codes last merged from `rule_packs.enabled` (subtract before re-merge).

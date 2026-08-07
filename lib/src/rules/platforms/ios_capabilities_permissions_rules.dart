@@ -36,6 +36,9 @@ class RequireIosInfoPlistEntriesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_info_plist_entries',
     '[require_ios_info_plist_entries] iOS permission-gated API detected but the matching Info.plist usage-description key is missing. Apps can crash or be rejected during App Store review. {v1}',
@@ -100,6 +103,9 @@ class RequireIosPermissionDescriptionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_permission_description',
@@ -317,6 +323,9 @@ class RequireIosPrivacyManifestRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_privacy_manifest',
     '[require_ios_privacy_manifest] API requires an iOS Privacy Manifest entry (iOS 17+). Missing PrivacyInfo.xcprivacy declarations for required-reason APIs will cause automatic App Store rejection during review, block new releases, and may trigger runtime permission failures on user devices. {v3}',
@@ -439,6 +448,9 @@ class RequireIosBackgroundModeRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_background_mode',
     '[require_ios_background_mode] Background task pattern detected. iOS requires specific capabilities '
@@ -545,6 +557,9 @@ class RequireIosAppTrackingTransparencyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_app_tracking_transparency',
@@ -685,6 +700,9 @@ class RequireIosFaceIdUsageDescriptionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_face_id_usage_description',
     '[require_ios_face_id_usage_description] Biometric authentication detected. iOS requires '
@@ -809,6 +827,9 @@ class RequireIosPhotoLibraryAddUsageRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_photo_library_add_usage',
     '[require_ios_photo_library_add_usage] Photo saving detected. iOS requires NSPhotoLibraryAddUsageDescription '
@@ -907,6 +928,9 @@ class RequireIosPushNotificationCapabilityRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_push_notification_capability',
@@ -1027,6 +1051,9 @@ class RequireIosLocalNotificationPermissionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_local_notification_permission',
     '[require_ios_local_notification_permission] Local notification scheduling detected. Ensure iOS notification '
@@ -1132,6 +1159,9 @@ class RequireIosAppGroupCapabilityRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_app_group_capability',
@@ -1248,6 +1278,9 @@ class RequireIosHealthKitAuthorizationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_healthkit_authorization',
     '[require_ios_healthkit_authorization] HealthKit data access detected. Ensure authorization is requested '
@@ -1348,6 +1381,9 @@ class RequireIosSiriIntentDefinitionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_siri_intent_definition',
@@ -1458,6 +1494,9 @@ class RequireIosWidgetExtensionCapabilityRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1572,6 +1611,9 @@ class RequireIosBackgroundAudioCapabilityRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_background_audio_capability',
     '[require_ios_background_audio_capability] Audio playback detected. If audio should play in background, '
@@ -1654,6 +1696,9 @@ class RequireIosAppClipSizeLimitRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_app_clip_size_limit',
@@ -1753,6 +1798,9 @@ class RequireIosShareSheetUtiDeclarationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_share_sheet_uti_declaration',
     '[require_ios_share_sheet_uti_declaration] File sharing with custom type detected. Ensure UTI is declared '
@@ -1819,6 +1867,9 @@ class RequireIosAccessibilityLabelsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_accessibility_labels',
@@ -1893,6 +1944,9 @@ class RequireIosNfcCapabilityCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_nfc_capability_check',
@@ -1985,6 +2039,9 @@ class RequireIosCallkitIntegrationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_callkit_integration',
@@ -2102,6 +2159,9 @@ class RequireIosCarplaySetupRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_carplay_setup',
     '[require_ios_carplay_setup] CarPlay-related code detected. CarPlay requires Apple approval '
@@ -2172,6 +2232,9 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_live_activities_setup',
@@ -2255,6 +2318,9 @@ class RequireIosPromotionDisplaySupportRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_promotion_display_support',
     '[require_ios_promotion_display_support] Manual frame timing detected. ProMotion displays run at 120Hz. '
@@ -2311,6 +2377,9 @@ class RequireIosPhotoLibraryLimitedAccessRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_photo_library_limited_access',
@@ -2402,6 +2471,9 @@ class RequireIosPasteboardPrivacyHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_pasteboard_privacy_handling',
     '[require_ios_pasteboard_privacy_handling] Clipboard access detected. On iOS 16+, users see a notification '
@@ -2462,6 +2534,9 @@ class RequireIosBackgroundRefreshDeclarationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_background_refresh_declaration',
@@ -2537,6 +2612,9 @@ class RequireIosBiometricFallbackRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_biometric_fallback',
     '[require_ios_biometric_fallback] Biometric authentication detected. Ensure fallback authentication '
@@ -2597,6 +2675,9 @@ class RequireIosAccessibilityLargeTextRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_accessibility_large_text',
@@ -2717,6 +2798,9 @@ class RequireIosQuickNoteAwarenessRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ios_quick_note_awareness',
     '[require_ios_quick_note_awareness] Document viewing detected. Consider implementing NSUserActivity '
@@ -2810,6 +2894,9 @@ class RequireIosVoiceoverGestureCompatibilityRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_ios_voiceover_gesture_compatibility',

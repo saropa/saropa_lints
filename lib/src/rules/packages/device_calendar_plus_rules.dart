@@ -196,6 +196,9 @@ class DeviceCalendarPlusMissingPermissionCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => _dataOps;
 
   static const LintCode _code = LintCode(
@@ -296,6 +299,9 @@ class DeviceCalendarPlusAllDayEventUtcConversionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'isAllDay'};
 
   static const LintCode _code = LintCode(
@@ -373,6 +379,9 @@ class DeviceCalendarPlusEmptyUpdateEventRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'updateEvent'};

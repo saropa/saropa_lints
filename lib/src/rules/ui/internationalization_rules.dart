@@ -46,6 +46,9 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_hardcoded_strings_in_ui',
     '[avoid_hardcoded_strings_in_ui] Hardcoded user-facing string. Cannot be translated to other languages. User-facing strings should use localization (l10n) instead of hardcoded text for proper internationalization. {v4}',
@@ -229,6 +232,9 @@ class RequireLocaleAwareFormattingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_locale_aware_formatting',
     '[require_locale_aware_formatting] Manual date/number formatting ignores locale. Will display wrong format for users. Dates, numbers, and currencies should use locale-aware formatting. {v4}',
@@ -307,6 +313,9 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -410,6 +419,9 @@ class RequirePluralHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_plural_handling',
@@ -521,6 +533,9 @@ class AvoidHardcodedLocaleRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_hardcoded_locale',
     "[avoid_hardcoded_locale] Hardcoded locale ignores user's device settings. Apps should respect the user's device locale settings. {v6}",
@@ -605,6 +620,9 @@ class AvoidStringConcatenationInUiRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_string_concatenation_in_ui',
     '[avoid_string_concatenation_in_ui] String concatenation breaks internationalization. Word order varies by language, so concatenation breaks i18n. {v4}',
@@ -681,6 +699,9 @@ class AvoidTextInImagesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_text_in_images',
@@ -765,6 +786,9 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_hardcoded_app_name',
     '[avoid_hardcoded_app_name] App name must not be hardcoded in UI. App names may need to vary by market or locale. App name or branding is hardcoded. {v4}',
@@ -838,6 +862,9 @@ class PreferDateFormatRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_date_format',
@@ -921,6 +948,9 @@ class PreferIntlNameRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_intl_name',
     '[prefer_intl_name] Intl.message without name parameter. Message extraction tools require the name parameter to identify and track translatable strings across the codebase. {v4}',
@@ -1003,6 +1033,9 @@ class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_providing_intl_description',
@@ -1091,6 +1124,9 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_providing_intl_examples',
@@ -1198,6 +1234,9 @@ class RequireIntlLocaleInitializationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_intl_locale_initialization',
@@ -1334,6 +1373,9 @@ class RequireIntlDateFormatLocaleRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_intl_date_format_locale',
     '[require_intl_date_format_locale] DateFormat created without an explicit locale parameter. The format output varies unpredictably across devices and platforms because each uses a different system default locale. Users in different regions see dates in unexpected formats (e.g., MM/DD/YYYY vs DD/MM/YYYY), leading to confusion about whether 01/02 means January 2nd or February 1st. {v2}',
@@ -1460,6 +1502,9 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_number_format_locale',
     '[require_number_format_locale] NumberFormat without explicit locale. 1,234.56 vs 1.234,56 varies by device. Consequence: Numbers may be formatted incorrectly for users in different locales, leading to misinterpretation. {v3}',
@@ -1577,6 +1622,9 @@ class AvoidManualDateFormattingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_manual_date_formatting',
@@ -1778,6 +1826,9 @@ class RequireIntlCurrencyFormatRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_intl_currency_format',
     '[require_intl_currency_format] Currency value formatted manually using string interpolation with currency symbols. Symbol placement (prefix vs suffix), decimal separator (period vs comma), and digit grouping vary by locale. Manual formatting produces incorrect output for international users, causing financial confusion and misread amounts that undermine trust. {v3}',
@@ -1975,6 +2026,9 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_intl_plural_rules',
     '[require_intl_plural_rules] Manual pluralization logic using if/else or ternary expressions on count values. Languages such as Russian, Arabic, and Polish have complex plural categories (zero, one, two, few, many, other) that simple singular/plural branching cannot handle. This produces grammatically incorrect text for international users and breaks translation workflows. {v2}',
@@ -2118,6 +2172,9 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_intl_args_match',
     '[require_intl_args_match] The placeholders in your Intl.message string do not match the arguments provided in the args list. Missing, extra, or mismatched arguments cause runtime errors, broken translations, and can result in untranslated or incorrect messages in production. This is a common source of i18n bugs and can break localization workflows. {v3}',
@@ -2218,6 +2275,9 @@ class AvoidStringConcatenationForL10nRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_string_concatenation_for_l10n',
     '[avoid_string_concatenation_for_l10n] String concatenation may break word order in other languages. HEURISTIC: String concatenation breaks word order in RTL languages and languages with different grammatical structures. {v2}',
@@ -2296,6 +2356,9 @@ class PreferNumberFormatRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_number_format',
@@ -2400,6 +2463,9 @@ class ProvideCorrectIntlArgsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'provide_correct_intl_args',
     '[provide_correct_intl_args] Intl.message args count does not match '
@@ -2502,6 +2568,9 @@ class AvoidStringConcatenationL10nRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -2602,6 +2671,9 @@ class PreferIntlMessageDescriptionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_intl_message_description',
     '[prefer_intl_message_description] Intl.message missing description (desc). Translators lack context, leading to poor or incorrect translations. {v2}',
@@ -2671,6 +2743,9 @@ class AvoidHardcodedLocaleStringsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2793,6 +2868,9 @@ class RequireRtlLayoutSupportRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -2908,6 +2986,9 @@ class RequireRtlSupportRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_rtl_support',

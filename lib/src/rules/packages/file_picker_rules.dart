@@ -104,6 +104,9 @@ class FilePickerUncheckedNullResultRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'file_picker_unchecked_null_result',
     '[file_picker_unchecked_null_result] A FilePickerResult member (files/paths/xFiles/...) is accessed on a still-nullable result. pickFiles()/pickFile() return null when the user cancels the picker on Android/iOS/desktop, so using the result without a null check is a runtime null dereference. A preceding if (result == null) return; narrows the type and clears this report. {v1}',
@@ -173,6 +176,9 @@ class FilePickerPathOnWebRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'file_picker_path_on_web',
@@ -287,6 +293,9 @@ class FilePickerCustomTypeMissingExtensionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'FileType.custom'};
 
   static const LintCode _code = LintCode(
@@ -355,6 +364,9 @@ class FilePickerExtensionsWithoutCustomTypeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'allowedExtensions'};
@@ -427,6 +439,9 @@ class FilePickerExtensionWithDotRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'allowedExtensions'};
@@ -530,6 +545,9 @@ class FilePickerDeprecatedWithDataRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'withData'};
 
   static const LintCode _code = LintCode(
@@ -597,6 +615,9 @@ class FilePickerDeprecatedWithReadStreamRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'withReadStream'};
@@ -670,6 +691,9 @@ class FilePickerDeprecatedAllowMultipleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'allowMultiple'};
 
   static const LintCode _code = LintCode(
@@ -741,6 +765,9 @@ class FilePickerDeprecatedAllowCompressionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'allowCompression'};
@@ -849,6 +876,9 @@ class FilePickerWithDataLargeFilesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'withData'};

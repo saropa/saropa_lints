@@ -66,6 +66,9 @@ class RequireVsyncMixinRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_vsync_mixin',
     '[require_vsync_mixin] AnimationController is missing a vsync parameter. Without vsync, animations run without frame synchronization, causing visual tearing, wasted CPU cycles, and degraded user experience. This can lead to janky motion and battery drain, especially on mobile devices. Always provide vsync: this and mix in SingleTickerProviderStateMixin to ensure smooth, efficient animations and proper animation controller lifecycle management. {v4}',
@@ -144,6 +147,9 @@ class AvoidAnimationInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_animation_in_build',
@@ -278,6 +284,9 @@ class RequireAnimationControllerDisposeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -489,6 +498,9 @@ class RequireHeroTagUniquenessRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_hero_tag_uniqueness',
     '[require_hero_tag_uniqueness] Using duplicate Hero tags within the same navigation context causes Hero animations to fail, resulting in visual glitches and confusing user experiences. This can break navigation transitions and reduce the perceived quality of your app. Ensure each Hero tag is unique within a given Navigator to maintain smooth and predictable animations. See https://docs.flutter.dev/ui/animations/hero-animations#the-hero-tag. {v3}',
@@ -593,6 +605,9 @@ class AvoidLayoutPassesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_layout_passes',
     '[avoid_layout_passes] Using IntrinsicWidth or IntrinsicHeight causes Flutter to perform two layout passes for affected child widgets in the build tree, which significantly hurts performance, especially in complex UIs or lists. This can lead to dropped frames, laggy animations, and poor user experience. Prefer using CrossAxisAlignment.stretch, Expanded, or fixed dimensions to avoid extra layout computation. {v2}',
@@ -662,6 +677,9 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_duration',
@@ -765,6 +783,9 @@ class RequireAnimationCurveRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_animation_curve',
@@ -906,6 +927,9 @@ class PreferImplicitAnimationsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_implicit_animations',
     '[prefer_implicit_animations] Simple animations such as opacity, size, or color changes are implemented with explicit AnimationController and transition widgets. This adds unnecessary complexity and increases the risk of memory leaks if disposal is missed. Prefer using implicit animation widgets like AnimatedOpacity or AnimatedContainer, which are simpler, auto-dispose, and improve code maintainability and reliability. {v3}',
@@ -1033,6 +1057,9 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_staggered_animation_delays',
     '[require_staggered_animation_delays] List item animations are not staggered, resulting in all items animating simultaneously. This creates a chaotic and unnatural cascade effect, making it hard for users to follow the UI changes. Use index-based delays (e.g., Interval(index * 0.1, ..)) to stagger animations for a smooth, visually appealing transition. {v2}',
@@ -1133,6 +1160,9 @@ class PreferTweenSequenceRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_tween_sequence',
     '[prefer_tween_sequence] Multiple chained animations are implemented without using TweenSequence, which can lead to complex, error-prone code and unpredictable animation timing. TweenSequence simplifies sequential animations, making them easier to manage and ensuring smooth transitions. Use TweenSequence for sequential property changes to improve maintainability and user experience. {v2}',
@@ -1207,6 +1237,9 @@ class RequireAnimationStatusListenerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_animation_status_listener',
@@ -1374,6 +1407,9 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   bool get requiresWidgets => true;
 
   @override
@@ -1515,6 +1551,9 @@ class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_animation_rebuild_waste',
     '[avoid_animation_rebuild_waste] AnimatedBuilder wraps too much of the widget tree, causing unnecessary rebuilds and wasted CPU cycles. This can degrade animation performance, increase battery usage, and make your app feel sluggish, especially on lower-end devices. {v3}',
@@ -1602,6 +1641,9 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_physics_simulation',
@@ -1720,6 +1762,9 @@ class RequireAnimationTickerDisposalRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_animation_ticker_disposal',
@@ -1843,6 +1888,9 @@ class PreferSpringAnimationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_spring_animation',
     '[prefer_spring_animation] CurvedAnimation with a physics-like curve (bounceOut, elasticOut, bounceIn, elasticIn, etc.) is being used where a SpringSimulation would produce smoother, more natural-feeling motion. CurvedAnimation uses a fixed duration that cannot respond to user input velocity, causing disconnects between gesture speed and animation behavior that feel artificial and jarring to users. {v2}',
@@ -1947,6 +1995,9 @@ class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_excessive_rebuilds_animation',
@@ -2249,6 +2300,9 @@ class AvoidClipDuringAnimationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   bool get requiresWidgets => true;
 
   @override
@@ -2422,6 +2476,9 @@ class AvoidMultipleAnimationControllersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -2547,6 +2604,9 @@ class PreferSingleTickerProviderStateMixinRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2766,6 +2826,9 @@ class AvoidImplicitAnimationDisposeCastRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   @override
@@ -2865,6 +2928,9 @@ class PreferListenableBuilderRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3027,6 +3093,9 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3518,6 +3587,9 @@ class PreferAnimationControllerForwardFromZeroRule extends SaropaLintRule {
   /// callback.
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

@@ -63,6 +63,9 @@ class AvoidAssetManifestJsonRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_asset_manifest_json',
     "[avoid_asset_manifest_json] The 'AssetManifest.json' file was removed in Flutter 3.38.0 (PR #172594). Code that loads this path at runtime — such as rootBundle.loadString('AssetManifest.json') — will throw a FlutterError because the file no longer exists in the built app bundle. Migrate to the typed AssetManifest API (AssetManifest.loadFromAssetBundle) or use 'AssetManifest.bin' for the binary format. {v1}",
@@ -150,6 +153,9 @@ class PreferDropdownInitialValueRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -281,6 +287,9 @@ class PreferDropdownMenuItemButtonOpacityAnimationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => false;
@@ -440,6 +449,9 @@ class PreferOnPopWithResultRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   bool get requiresFlutterImport => true;
 
   @override
@@ -585,6 +597,9 @@ class PreferTabbarThemeIndicatorColorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -762,6 +777,9 @@ class PreferPlatformMenuBarChildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   bool get requiresFlutterImport => true;
 
   @override
@@ -879,6 +897,9 @@ class PreferKeepaliveDisposeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -1009,6 +1030,9 @@ class PreferContextMenuBuilderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   bool get requiresFlutterImport => true;
 
   @override
@@ -1099,6 +1123,9 @@ class PreferPanAxisRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -1194,6 +1221,9 @@ class PreferButtonStyleIconAlignmentRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -1298,6 +1328,9 @@ class PreferKeyEventRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -1425,6 +1458,9 @@ class PreferM3TextThemeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -1644,6 +1680,9 @@ class PreferOverflowBarOverButtonBarRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -1897,6 +1936,9 @@ class AvoidDeprecatedFlutterTestWindowRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'package:flutter_test/'};
 
   static const LintCode _code = LintCode(
@@ -1994,6 +2036,9 @@ class AvoidRemovedRenderObjectElementMethodsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -2165,6 +2210,9 @@ class AvoidDeprecatedAnimatedListTypedefsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   bool get requiresFlutterImport => true;
 
   @override
@@ -2284,6 +2332,9 @@ class AvoidDeprecatedUseMaterial3CopyWithRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -2427,6 +2478,9 @@ class AvoidDeprecatedOnSurfaceDestroyedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;

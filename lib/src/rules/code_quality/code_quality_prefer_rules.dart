@@ -31,6 +31,9 @@ import '../../fixes/code_quality/simplify_redundant_null_aware_spread_fix.dart';
 
 class PreferBothInliningAnnotationsRule extends SaropaLintRule {
   PreferBothInliningAnnotationsRule() : super(code: _code);
+  @override
+  bool get usesTypeResolution => true;
+
 
   static const LintCode _code = LintCode(
     'prefer_both_inlining_annotations',
@@ -39,6 +42,7 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
         'Add the missing counterpart annotation: use @pragma(dart2js:tryInline) alongside @pragma(vm:prefer-inline), or vice versa.',
     severity: DiagnosticSeverity.INFO,
   );
+
 
   @override
   void runWithReporter(
@@ -123,6 +127,11 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_dedicated_media_query_method',
@@ -202,6 +211,11 @@ class PreferEnumsByNameRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_enums_by_name',
@@ -283,6 +297,11 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_extracting_function_callbacks',
@@ -354,6 +373,11 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_null_aware_spread',
@@ -451,6 +475,11 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_visible_for_testing_on_members',
@@ -549,6 +578,11 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_any_or_every',
@@ -621,6 +655,11 @@ class PreferForInRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   String get exampleBad =>
@@ -726,6 +765,11 @@ class PreferBytesBuilderRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_bytes_builder',
@@ -787,6 +831,11 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   String get exampleBad => 'condition ? foo(1, 2) : foo(1, 3);';
@@ -870,6 +919,11 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_shorthands_with_constructors',
@@ -944,6 +998,11 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_shorthands_with_enums',
@@ -1008,6 +1067,11 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_shorthands_with_static_fields',
@@ -1072,6 +1136,10 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
         'Change the argument to match the type declared in the @Accept annotation, or update the annotation if the accepted type has intentionally changed.',
     severity: DiagnosticSeverity.WARNING,
   );
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   void runWithReporter(
@@ -1139,6 +1207,11 @@ class PassOptionalArgumentRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'pass_optional_argument',
@@ -1199,6 +1272,9 @@ class PassOptionalArgumentRule extends SaropaLintRule {
 /// ```
 class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
   PreferSingleDeclarationPerFileRule() : super(code: _code);
+  @override
+  bool get usesTypeResolution => true;
+
 
   static const LintCode _code = LintCode(
     'prefer_single_declaration_per_file',
@@ -1207,6 +1283,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
         'Split each top-level declaration into its own file, named after the declaration (e.g. my_class.dart for MyClass), to improve discoverability and reduce merge conflicts.',
     severity: DiagnosticSeverity.INFO,
   );
+
 
   @override
   void runWithReporter(
@@ -1310,6 +1387,11 @@ class PreferTestMatchersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_test_matchers',
@@ -1424,6 +1506,11 @@ class PreferUnwrappingFutureOrRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_unwrapping_future_or',
@@ -1515,6 +1602,10 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
         'Call super == other as part of the equality check, or explicitly compare all parent fields alongside the subclass fields to ensure consistent equality behavior.',
     severity: DiagnosticSeverity.WARNING,
   );
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   void runWithReporter(
@@ -1635,6 +1726,11 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_typedefs_for_callbacks',
@@ -1695,6 +1791,11 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_redirecting_superclass_constructor',
@@ -1770,6 +1871,11 @@ class PreferUsePrefixRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   String get exampleBad =>
@@ -1906,6 +2012,11 @@ class PreferDotShorthandRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   String get exampleBad => 'TextAlign align = TextAlign.center;';
@@ -2014,6 +2125,11 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   String get exampleBad => 'if (isEnabled == true) { }';
@@ -2122,6 +2238,11 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   @override
   String get exampleBad =>
@@ -2226,6 +2347,11 @@ class PreferNamedBoolParamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_named_bool_params',

@@ -43,6 +43,9 @@ class AvoidMisnamedPaddingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -186,6 +189,9 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -263,6 +269,9 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
 /// ```
 class CheckForEqualsInRenderObjectSettersRule extends SaropaLintRule {
   CheckForEqualsInRenderObjectSettersRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'check_for_equals_in_render_object_setters',
@@ -419,6 +428,9 @@ class ConsistentUpdateRenderObjectRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -552,6 +564,9 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -619,6 +634,9 @@ class PreferConstBorderRadiusRule extends SaropaLintRule {
 /// ```
 class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
   PreferCorrectEdgeInsetsConstructorRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_correct_edge_insets_constructor',
@@ -758,6 +776,9 @@ class AvoidBorderAllRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -835,6 +856,9 @@ class AvoidDeeplyNestedWidgetsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -946,6 +970,9 @@ class _WidgetDepthVisitor extends RecursiveAstVisitor<void> {
 /// ```
 class PreferConstWidgetsInListsRule extends SaropaLintRule {
   PreferConstWidgetsInListsRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_const_widgets_in_lists',
@@ -1123,6 +1150,9 @@ class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -1217,6 +1247,9 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -1291,6 +1324,9 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1373,6 +1409,9 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -1452,6 +1491,9 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1554,6 +1596,9 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -1620,6 +1665,9 @@ class AvoidNestedScaffoldsRule extends SaropaLintRule {
 /// ```
 class AvoidSizedBoxExpandRule extends SaropaLintRule {
   AvoidSizedBoxExpandRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_sized_box_expand',
@@ -1717,6 +1765,9 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1931,6 +1982,9 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -2075,6 +2129,9 @@ class PreferIgnorePointerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -2137,6 +2194,9 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2257,6 +2317,9 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -2351,6 +2414,9 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2521,6 +2587,9 @@ class PreferFractionalSizingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2698,6 +2767,9 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3030,6 +3102,9 @@ class _ConstraintFinitenessVisitor extends RecursiveAstVisitor<void> {
 class AvoidUnconstrainedBoxMisuseRule extends SaropaLintRule {
   AvoidUnconstrainedBoxMisuseRule() : super(code: _code);
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_unconstrained_box_misuse',
     '[avoid_unconstrained_box_misuse] UnconstrainedBox in constrained parent may cause overflow. UnconstrainedBox removes constraints which can cause overflow. UnconstrainedBox is used improperly causing overflow. {v5}',
@@ -3109,6 +3184,9 @@ class PreferSliverAppBarRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -3182,6 +3260,9 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3258,6 +3339,9 @@ class PreferClipBehaviorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3339,6 +3423,9 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3425,6 +3512,9 @@ class AvoidDeepWidgetNestingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3522,6 +3612,9 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3644,6 +3737,9 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -3737,6 +3833,9 @@ class AvoidAbsorbPointerMisuseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -3796,6 +3895,9 @@ class RequireOverflowBoxRationaleRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3888,6 +3990,9 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4059,6 +4164,9 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         PreferSizedBoxSquareFix(context: context),
@@ -4162,6 +4270,9 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         PreferCenterOverAlignFix(context: context),
@@ -4255,6 +4366,9 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -4354,6 +4468,9 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         PreferPaddingOverContainerFix(context: context),
@@ -4447,6 +4564,9 @@ class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -4544,6 +4664,9 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -4627,6 +4750,9 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4753,6 +4879,9 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4977,6 +5106,9 @@ class PreferCustomSingleChildLayoutRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -5303,6 +5435,9 @@ class AvoidTableCellOutsideTableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -5373,6 +5508,9 @@ class AvoidPositionedOutsideStackRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -5459,6 +5597,9 @@ class RequireBaselineTextBaselineRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -5557,6 +5698,9 @@ class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -5660,6 +5804,9 @@ class AvoidTextfieldInRowRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -5778,6 +5925,9 @@ class AvoidFixedSizeInScaffoldBodyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

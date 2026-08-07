@@ -61,6 +61,9 @@ class AvoidAdjacentStringsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_adjacent_strings',
     '[avoid_adjacent_strings] Adjacent string literals detected without an explicit concatenation operator. Dart implicitly joins adjacent strings, which can mask accidental line breaks or missing commas in list literals, leading to silently merged values that are difficult to debug. {v4}',
@@ -104,6 +107,9 @@ class AvoidEnumValuesByIndexRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_enum_values_by_index',
@@ -176,6 +182,9 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_incorrect_uri',
@@ -277,6 +286,9 @@ class AvoidLateKeywordRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_late_keyword',
     "[avoid_late_keyword] Field declared with the 'late' keyword defers initialization checking to runtime. If the field is accessed before assignment, Dart throws a LateInitializationError that crashes the app, bypassing the null safety guarantees the type system provides at compile time. {v7}",
@@ -343,6 +355,9 @@ class AvoidMissedCallsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_missed_calls',
@@ -451,6 +466,9 @@ class AvoidMisusedSetLiteralsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.high;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_misused_set_literals',
     '[avoid_misused_set_literals] Set literal may be misused. '
@@ -529,6 +547,9 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_passing_self_as_argument',
@@ -620,6 +641,9 @@ class AvoidRecursiveCallsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_recursive_calls',
@@ -921,6 +945,9 @@ class AvoidRecursiveToStringRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_recursive_tostring',
     '[avoid_recursive_tostring] toString() method references itself through \$this or this.toString(), creating infinite recursion. The runtime repeatedly invokes toString() until the call stack overflows, crashing the application with an unrecoverable StackOverflowError. {v5}',
@@ -1016,6 +1043,9 @@ class AvoidReferencingDiscardedVariablesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_referencing_discarded_variables',
     '[avoid_referencing_discarded_variables] Variable prefixed with underscore is referenced after declaration. The underscore prefix signals that the value is intentionally discarded, so reading it later contradicts the naming convention and confuses developers who expect underscore-prefixed variables to be unused. {v5}',
@@ -1103,6 +1133,9 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_redundant_pragma_inline',
@@ -1194,6 +1227,9 @@ class AvoidSubstringRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_string_substring',
@@ -1552,6 +1588,9 @@ class AvoidSubstringRule extends SaropaLintRule {
 class AvoidUnknownPragmaRule extends SaropaLintRule {
   AvoidUnknownPragmaRule() : super(code: _code);
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_unknown_pragma',
     '[avoid_unknown_pragma] Unrecognized pragma annotation detected. Unknown pragmas are silently ignored by the Dart compiler, which means the intended optimization or behavior hint has no effect and may mislead developers into thinking the code is optimized when it is not. {v3}',
@@ -1644,6 +1683,9 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unused_parameters',
@@ -1762,6 +1804,9 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_weak_cryptographic_algorithms',
     '[avoid_weak_cryptographic_algorithms] Weak or deprecated cryptographic algorithm detected (e.g. MD5, SHA-1). These algorithms have known collision vulnerabilities that allow attackers to forge hashes, compromising data integrity verification, password storage, and digital signature validation. {v5}',
@@ -1801,6 +1846,9 @@ class AvoidWeakCryptographicAlgorithmsRule extends SaropaLintRule {
 /// Since: v4.9.5 | Updated: v4.13.0 | Rule version: v5
 class MissingUseResultAnnotationRule extends SaropaLintRule {
   MissingUseResultAnnotationRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'missing_use_result_annotation',
@@ -1897,6 +1945,9 @@ class NoObjectDeclarationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'no_object_declaration',
     '[no_object_declaration] Member declared with type Object, which erases all type information. Accessing any property or method requires an unsafe downcast, bypassing compile-time type checking and risking runtime cast errors that could have been prevented with a more specific type. {v4}',
@@ -1968,6 +2019,9 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_always_null_parameters',
     '[avoid_always_null_parameters] Parameter is explicitly passed as null at every call site. Passing null as a constant argument adds noise, makes the call site harder to read, and defeats the purpose of optional parameters, which default to null when omitted. {v4}',
@@ -2023,6 +2077,9 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
 /// ```
 class AvoidAssigningToStaticFieldRule extends SaropaLintRule {
   AvoidAssigningToStaticFieldRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_assigning_to_static_field',
@@ -2139,6 +2196,9 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_async_call_in_sync_function',
@@ -2280,6 +2340,9 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
 class AvoidContradictoryExpressionsRule extends SaropaLintRule {
   AvoidContradictoryExpressionsRule() : super(code: _code);
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_contradictory_expressions',
     '[avoid_contradictory_expressions] Contradictory conditions detected where two expressions cannot both be true simultaneously. This creates unreachable code paths that silently skip intended logic, indicating a logic error that may cause incorrect behavior or missed edge cases. {v3}',
@@ -2420,6 +2483,9 @@ class AvoidIdenticalExceptionHandlingBlocksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
   static const LintCode _code = LintCode(
@@ -2484,6 +2550,9 @@ class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_missing_completer_stack_trace',
     '[avoid_missing_completer_stack_trace] Completer.completeError() called without passing the stack trace as the second argument. Without the original stack trace, error reports show only the completeError() call site instead of the actual failure origin, making debugging asynchronous errors significantly harder. {v4}',
@@ -2533,6 +2602,9 @@ class AvoidSimilarNamesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_similar_names',
@@ -2664,6 +2736,9 @@ class AvoidAccessingCollectionsByConstantIndexRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_accessing_collections_by_constant_index',
     '[avoid_accessing_collections_by_constant_index] Collection accessed by a constant index inside a loop body. This retrieves the same element on every iteration, which is wasteful and usually indicates a logic error where the loop variable was intended as the index instead. {v5}',
@@ -2735,6 +2810,9 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_default_tostring',
     '[avoid_default_tostring] Class relies on default toString() implementation which returns unhelpful output like "Instance of \'ClassName\'". During debugging, logging, or error messages, developers see meaningless object identifiers instead of the actual state values needed to diagnose issues. {v5}',
@@ -2786,6 +2864,9 @@ class AvoidDefaultToStringRule extends SaropaLintRule {
 /// ```
 class AvoidDuplicateConstantValuesRule extends SaropaLintRule {
   AvoidDuplicateConstantValuesRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_duplicate_constant_values',
@@ -2852,6 +2933,9 @@ class AvoidDuplicateInitializersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_duplicate_initializers',
@@ -2921,6 +3005,9 @@ class AvoidUnnecessaryOverridesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_overrides',
@@ -3011,6 +3098,9 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_unnecessary_statements',
     '[avoid_unnecessary_statements] Statement produces a value or expression result that is never used and has no side effects. Dead statements clutter the code, mislead readers into thinking meaningful work is being done, and may indicate a missing assignment or function call. {v4}',
@@ -3069,6 +3159,9 @@ class AvoidUnnecessaryStatementsRule extends SaropaLintRule {
 /// ```
 class AvoidNestedExtensionTypesRule extends SaropaLintRule {
   AvoidNestedExtensionTypesRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_nested_extension_types',
@@ -3131,6 +3224,9 @@ class AvoidSlowCollectionMethodsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_slow_collection_methods',
@@ -3215,6 +3311,9 @@ class AvoidInferrableTypeArgumentsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => "final list = <String>['a', 'b'];";
@@ -3322,6 +3421,9 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_passing_default_values',
     '[avoid_passing_default_values] Argument explicitly passes a value that matches the parameter default (e.g. empty list, false, 0). Passing the default adds noise to the call site without changing behavior, and if the library updates its default, this call site will not benefit from the change. {v4}',
@@ -3391,6 +3493,9 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
 /// ```
 class AvoidShadowedExtensionMethodsRule extends SaropaLintRule {
   AvoidShadowedExtensionMethodsRule() : super(code: _code);
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_shadowed_extension_methods',
@@ -3471,6 +3576,9 @@ class AvoidDuplicateStringLiteralsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_duplicate_string_literals',
@@ -3609,6 +3717,9 @@ class AvoidDuplicateStringLiteralsPairRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_duplicate_string_literals_pair',
     '[avoid_duplicate_string_literals_pair] String literal appears 2+ times in this file. Consider extracting '
@@ -3717,6 +3828,9 @@ class AvoidExpensiveLogStringConstructionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_expensive_log_string_construction',
     '[avoid_expensive_log_string_construction] Log call uses string interpolation; the string is built even when the log level would not print it. Add a level guard or use a lazy message. {v1}',
@@ -3773,6 +3887,9 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_empty_build_when',
@@ -3860,6 +3977,9 @@ class AvoidMissingInterpolationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_missing_interpolation',
@@ -3958,6 +4078,9 @@ class AvoidIgnoringReturnValuesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_ignoring_return_values',
@@ -4109,6 +4232,9 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_deprecated_usage',
     '[avoid_deprecated_usage] Using a deprecated API from another package. '
@@ -4235,6 +4361,9 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_positional_boolean_parameters',
     '[avoid_positional_boolean_parameters] Positional bool parameter makes call sites unreadable. Use named parameters for clarity.',
@@ -4310,6 +4439,9 @@ class BannedUsageRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'banned_identifier_usage',
     '[banned_identifier_usage] Usage of this identifier is banned. See analysis_options_custom.yaml banned_usage for the configured reason.',
@@ -4371,6 +4503,9 @@ class UseSpecificDeprecationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'use_specific_deprecation',

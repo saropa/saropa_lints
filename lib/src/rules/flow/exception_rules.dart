@@ -31,6 +31,9 @@ class AvoidNonFinalExceptionClassFieldsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_non_final_exception_class_fields',
     '[avoid_non_final_exception_class_fields] Mutable exception fields '
@@ -108,6 +111,9 @@ class AvoidOnlyRethrowRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_only_rethrow',
     '[avoid_only_rethrow] Catch-rethrow with no handling is dead code that '
@@ -178,6 +184,9 @@ class AvoidThrowInCatchBlockRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_throw_in_catch_block',
@@ -255,6 +264,9 @@ class AvoidThrowObjectsWithoutToStringRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_throw_objects_without_tostring',
@@ -374,6 +386,9 @@ class PreferPublicExceptionClassesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_public_exception_classes',

@@ -37,6 +37,9 @@ class AvoidLoggingSensitiveDataRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m6},
     web: <OwaspWeb>{OwaspWeb.a09},
@@ -240,6 +243,9 @@ class RequireInputSanitizationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m4},
     web: <OwaspWeb>{OwaspWeb.a03},
@@ -361,6 +367,9 @@ class AvoidWebViewJavaScriptEnabledRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[79];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -508,6 +517,9 @@ class AvoidEvalLikePatternsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m4, OwaspMobile.m7},
     web: <OwaspWeb>{OwaspWeb.a03},
@@ -605,6 +617,9 @@ class AvoidDynamicCodeLoadingRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[94];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp =>
@@ -761,6 +776,9 @@ class AvoidUnverifiedNativeLibraryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp =>
       const OwaspMapping(mobile: <OwaspMobile>{OwaspMobile.m2});
 
@@ -854,6 +872,9 @@ class AvoidHardcodedSigningConfigRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[798];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp =>
@@ -986,6 +1007,9 @@ class RequireCertificatePinningRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m5},
     web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a05},
@@ -1066,6 +1090,9 @@ class AvoidTokenInUrlRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -1149,6 +1176,9 @@ class AvoidClipboardSensitiveRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -1242,6 +1272,9 @@ class AvoidDynamicSqlRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[89];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -1395,6 +1428,9 @@ class AvoidGenericKeyInUrlRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m1},
     web: <OwaspWeb>{OwaspWeb.a07},
@@ -1473,6 +1509,9 @@ class PreferSecureRandomRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[330];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1610,6 +1649,9 @@ class PreferTypedDataRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_typed_data',
     '[prefer_typed_data] List<int> for binary data wastes memory. Use Uint8List instead. Uint8List is more memory-efficient for binary data and provides better interoperability with native code and I/O operations. List<int> uses 8 bytes per element vs 1 byte for Uint8List. {v3}',
@@ -1693,6 +1735,9 @@ class AvoidUnnecessaryToListRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_to_list',
@@ -1809,6 +1854,9 @@ class RequireDeepLinkValidationRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[601];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -1966,6 +2014,9 @@ class PreferDataMaskingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m6},
     web: <OwaspWeb>{OwaspWeb.a04},
@@ -2090,6 +2141,9 @@ class AvoidScreenshotSensitiveRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -2226,6 +2280,9 @@ class AvoidPathTraversalRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[22];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -2402,6 +2459,9 @@ class PreferHtmlEscapeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m4},
     web: <OwaspWeb>{OwaspWeb.a03},
@@ -2549,6 +2609,9 @@ class RequireUrlValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m4},
     web: <OwaspWeb>{OwaspWeb.a03, OwaspWeb.a10},
@@ -2668,6 +2731,9 @@ class AvoidRedirectInjectionRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[601];
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -2852,6 +2918,9 @@ class AvoidExternalStorageSensitiveRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m9},
     web: <OwaspWeb>{OwaspWeb.a01},
@@ -2984,6 +3053,9 @@ class PreferWebViewJavaScriptDisabledRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m8},
     web: <OwaspWeb>{OwaspWeb.a05, OwaspWeb.a06},
@@ -3097,6 +3169,9 @@ class AvoidWebViewInsecureContentRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[319];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -3223,6 +3298,9 @@ class RequireWebViewErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m8},
     web: <OwaspWeb>{OwaspWeb.a05},
@@ -3332,6 +3410,9 @@ class AvoidApiKeyInCodeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -3485,6 +3566,9 @@ class AvoidIgnoringSslErrorsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m5},
     web: <OwaspWeb>{OwaspWeb.a05},
@@ -3630,6 +3714,9 @@ class RequireHttpsOnlyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -3891,6 +3978,9 @@ class RequireHttpsOnlyTestRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => const <FileType>{FileType.test};
 
   static const LintCode _code = LintCode(
@@ -3987,6 +4077,9 @@ class AvoidUnsafeDeserializationRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[502];
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -4182,6 +4275,9 @@ class AvoidUserControlledUrlsRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[601];
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -4440,6 +4536,9 @@ class RequireCatchLoggingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m8},
     web: <OwaspWeb>{OwaspWeb.a09},
@@ -4630,6 +4729,9 @@ class AvoidStackTraceInProductionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_stack_trace_in_production',
     '[avoid_stack_trace_in_production] Stack trace exposed to user-visible '
@@ -4783,6 +4885,9 @@ class AvoidWebViewCorsIssuesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m8},
     web: <OwaspWeb>{OwaspWeb.a05},
@@ -4875,6 +4980,9 @@ class RequireInputValidationRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[20];
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{

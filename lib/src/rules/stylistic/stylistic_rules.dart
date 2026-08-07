@@ -83,6 +83,9 @@ class PreferRelativeImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => "import 'package:my_app/src/utils.dart';";
 
   @override
@@ -184,6 +187,9 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -303,6 +309,9 @@ class PreferArrowFunctionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'int add(int a, int b) { return a + b; }';
 
   @override
@@ -410,6 +419,9 @@ class PreferExpressionBodyGettersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'int get value { return _x; }';
 
   @override
@@ -475,6 +487,9 @@ class AvoidTypesOnClosureParametersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'list.map((int x) => x + 1);';
@@ -549,6 +564,9 @@ class AvoidExplicitTypeDeclarationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => "final String name = 'x';  // redundant type";
 
   @override
@@ -607,6 +625,9 @@ class PreferExplicitNullChecksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'return value!;  // crashes if null';
 
   @override
@@ -658,6 +679,9 @@ class PreferOptionalNamedParamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'void f([int x, int y = 0]) {}  // positional';
@@ -725,6 +749,9 @@ class PreferOptionalPositionalParamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'void f({bool verbose = false}) {}  // named';
@@ -805,6 +832,9 @@ class PreferPositionalBoolParamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -892,6 +922,9 @@ class PreferBlockBodySettersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'set value(int x) => _x = x;  // expression body';
 
   @override
@@ -973,6 +1006,9 @@ class PreferAllNamedParametersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -1107,6 +1143,9 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -1285,6 +1324,9 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad =>
       'class MyClass {\n'
       '  String name;  // public field\n'
@@ -1437,6 +1479,9 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad =>
       'class _MyIcon extends StatelessWidget {\n'
       '  Widget build(ctx) => Icon(Icons.star);  // class boilerplate\n'
@@ -1578,6 +1623,9 @@ class PreferExplicitTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad =>
       "var name = 'John';  // var hides type\n"
       'final count = 42;';
@@ -1686,6 +1734,9 @@ class PreferClassOverRecordReturnRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -1800,6 +1851,9 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad =>
       'onPressed: _handlePress,  // must jump to definition';
 
@@ -1908,6 +1962,9 @@ class PreferSingleQuotesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<String> get conflictingRules => const <String>['prefer_double_quotes'];
@@ -2027,6 +2084,9 @@ class PreferTodoFormatRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => '// TODO fix this later';
 
   @override
@@ -2100,6 +2160,9 @@ class PreferHackFormatRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_hack_format',
@@ -2190,6 +2253,9 @@ class PreferFixmeFormatRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => '// FIXME: this is broken';
 
   @override
@@ -2278,6 +2344,9 @@ abstract class _SentenceCaseCommentsBase extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -2650,6 +2719,9 @@ class PreferPeriodAfterDocRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => "/// Returns the user's name";
 
   @override
@@ -2803,6 +2875,9 @@ class PreferScreamingCaseConstantsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'const maxRetries = 3;';
 
   @override
@@ -2936,6 +3011,9 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_descriptive_bool_names',
@@ -3129,6 +3207,9 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad =>
       'bool flag = true;  // no prefix\n'
       'bool processData = true;  // verb, not a question';
@@ -3307,6 +3388,9 @@ class PreferSnakeCaseFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'UserService.dart  // PascalCase';
 
   @override
@@ -3476,6 +3560,9 @@ class AvoidSmallTextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad =>
       "Text('Small', style: TextStyle(fontSize: 10));  // < 12";
 
@@ -3595,6 +3682,9 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -3844,6 +3934,9 @@ class PreferStraightApostropheRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<String> get conflictingRules => const <String>[
     'prefer_curly_apostrophe',
   ];
@@ -3948,6 +4041,9 @@ class PreferDocCurlyApostropheRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -4084,6 +4180,9 @@ class PreferDocStraightApostropheRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<String> get conflictingRules => const <String>[
     'prefer_doc_curly_apostrophe',
   ];
@@ -4209,6 +4308,9 @@ class PreferCurlyApostropheRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -4342,6 +4444,9 @@ class ArgumentsOrderingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad =>
       "Foo(width: 100, color: blue,\n"
       "    child: x);  // unsorted args";
@@ -4473,6 +4578,9 @@ class AvoidCommentedOutCodeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -4662,6 +4770,9 @@ class AvoidEscapingInnerQuotesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => "final msg = 'It\\'s a beautiful day';  // escaped";
 
   @override
@@ -4737,6 +4848,9 @@ class AvoidSingleCascadeInExpressionStatementsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'list..add(item);  // single cascade';
 
   @override
@@ -4803,6 +4917,9 @@ class PreferAdjacentStringsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad =>
       "final sql = 'SELECT * ' + 'FROM users';  // + concat";
 
@@ -4858,6 +4975,9 @@ class PreferInterpolationToComposeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => "final greet = 'Hello, ' + name + '!';  // + concat";
@@ -4928,6 +5048,9 @@ class PreferRawStringsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => "final re = RegExp('\\\\d+');  // double backslash";
 
   @override
@@ -4991,6 +5114,9 @@ class NoRuntimeTypeToStringRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => "final name = user.runtimeType.toString();";
@@ -5060,6 +5186,9 @@ class UseTruncatingDivisionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'final pages = (items / pageSize).toInt();';
@@ -5141,6 +5270,9 @@ class DuplicateIgnoreRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'duplicate_ignore_comment',
@@ -5232,6 +5364,9 @@ class AnnotateRedeclaresRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'annotate_inherited_member_redeclaration',
@@ -5356,6 +5491,9 @@ class DocumentIgnoresRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static final RegExp _bareIgnoreLine = RegExp(
     r'^\s*//\s*ignore(?:_for_file)?:\s*((?:[^\s,]+)(?:\s*,\s*[^\s,]+)*)\s*$',

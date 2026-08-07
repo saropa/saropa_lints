@@ -54,6 +54,9 @@ class AvoidFirestoreUnboundedQueryRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_firestore_unbounded_query',
     '[avoid_firestore_unbounded_query] Firestore query without limit() returns unbounded data from the entire collection. This triggers excessive bandwidth consumption, inflated Firestore read costs, slow UI rendering, and out-of-memory crashes on low-end devices when the collection grows large. {v3}',
@@ -204,6 +207,9 @@ class AvoidDatabaseInBuildRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_database_in_build',
     '[avoid_database_in_build] Running database queries inside build() causes the query to execute on every rebuild, leading to repeated database hits, slow UI, increased backend load, and degraded app performance. This can also cause inconsistent data, race conditions, and higher costs for cloud databases. {v4}',
@@ -328,6 +334,9 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_secure_storage_on_web',
     '[avoid_secure_storage_on_web] flutter_secure_storage uses localStorage on web, which is not secure. Sensitive data stored in localStorage may be exposed to attackers, browser extensions, or other scripts, violating user privacy and security requirements. This can lead to credential theft, data breaches, and app store rejection. {v4}',
@@ -429,6 +438,9 @@ class RequireFirebaseInitBeforeUseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_firebase_init_before_use',
@@ -543,6 +555,9 @@ class RequireDatabaseMigrationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   // Gate to Hive/Isar model files. The annotation checks below already self-gate
   // on `@HiveType`/`@collection`, but this skips unrelated files entirely.
@@ -660,6 +675,9 @@ class RequireDatabaseIndexRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   // Gate to embedded-DB files. The query/source heuristics below (`.users`,
   // `.items`, `.products`, `where(`) otherwise match ordinary in-memory
@@ -784,6 +802,9 @@ class PreferTransactionForBatchRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_transaction_for_batch',
@@ -932,6 +953,9 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   // Gate to files that reference Firebase. `logEvent(name:)` is also exposed by
   // non-Firebase analytics SDKs (Mixpanel, Segment, Amplitude) whose naming
   // rules differ; without this gate the rule fired at ERROR on their valid
@@ -1045,6 +1069,9 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'incorrect_firebase_parameter_name',
@@ -1203,6 +1230,9 @@ class PreferFirestoreBatchWriteRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static final RegExp _docParen = RegExp(r'\.doc\s*\(');
   static final RegExp _documentReference = RegExp(r'\bDocumentReference\b');
   static final RegExp _firestoreWord = RegExp(r'\bFirestore\b');
@@ -1297,6 +1327,9 @@ class AvoidFirestoreInWidgetBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1402,6 +1435,9 @@ class PreferFirebaseRemoteConfigDefaultsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_firebase_remote_config_defaults',
     '[prefer_firebase_remote_config_defaults] Missing defaults cause '
@@ -1487,6 +1523,9 @@ class RequireFcmTokenRefreshHandlerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_fcm_token_refresh_handler',
@@ -1575,6 +1614,9 @@ class RequireBackgroundMessageHandlerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_background_message_handler',
@@ -1667,6 +1709,9 @@ class AvoidMapMarkersInBuildRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_map_markers_in_build',
     '[avoid_map_markers_in_build] Creating map markers in build() causes flickering. Creating markers in build() causes recreation on every rebuild, leading to flickering and performance issues. Cache markers. {v3}',
@@ -1744,6 +1789,9 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_map_idle_callback',
@@ -1827,6 +1875,9 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_marker_clustering',
     '[prefer_marker_clustering] Many markers cause frame drops and memory issues. Displaying hundreds of markers individually causes performance issues. Use marker clustering to improve performance and UX. {v3}',
@@ -1895,6 +1946,9 @@ class RequireCrashlyticsUserIdRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_crashlytics_user_id',
@@ -1993,6 +2047,9 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_firebase_app_check',
@@ -2093,6 +2150,9 @@ class AvoidStoringUserDataInAuthRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_storing_user_data_in_auth',
@@ -2198,6 +2258,9 @@ class PreferFirebaseAuthPersistenceRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_firebase_auth_persistence',
@@ -2318,6 +2381,9 @@ class RequireFirebaseErrorHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_firebase_error_handling',
@@ -2458,6 +2524,9 @@ class AvoidFirebaseRealtimeInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -2566,6 +2635,9 @@ class RequireFirestoreIndexRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_firestore_index',
@@ -2715,6 +2787,9 @@ class RequireFirebaseCompositeIndexRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_firebase_composite_index',
     '[require_firebase_composite_index] Firebase Realtime Database query '
@@ -2826,6 +2901,9 @@ class AvoidFirebaseUserDataInAuthRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'firebase'};
 
   static const int _maxClaims = 5;
@@ -2918,6 +2996,9 @@ class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'firebase'};
 
   static const LintCode _code = LintCode(
@@ -2988,6 +3069,9 @@ class RequireFirebaseReauthenticationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{
@@ -3107,6 +3191,9 @@ class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{
     'getIdToken',
     'idTokenChanges',
@@ -3215,6 +3302,9 @@ class PreferFirebaseTransactionForCountersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'firebase'};
 
   static const LintCode _code = LintCode(
@@ -3253,6 +3343,9 @@ class PreferCorrectTopicsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_correct_topics',
     '[prefer_correct_topics] Use valid FCM topic format (e.g. /topics/name) '
@@ -3287,6 +3380,9 @@ class PreferDeepLinkAuthRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_deep_link_auth',
@@ -3324,6 +3420,9 @@ class RequireFirebaseEmailEnumerationProtectionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'firebase_auth'};
 
   static const LintCode _code = LintCode(
@@ -3358,6 +3457,9 @@ class RequireFirebaseOfflinePersistenceRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'cloud_firestore'};
@@ -3400,6 +3502,9 @@ class RequireFirestoreSecurityRulesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_firestore_security_rules',
@@ -3466,6 +3571,9 @@ class RequireAnalyticsErrorHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_analytics_error_handling',

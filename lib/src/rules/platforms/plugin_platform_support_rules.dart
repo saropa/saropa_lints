@@ -61,6 +61,9 @@ class AvoidPlatformIncompatibleDependencyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_platform_incompatible_dependency',
     '[avoid_platform_incompatible_dependency] This package has no native '

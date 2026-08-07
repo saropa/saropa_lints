@@ -132,6 +132,9 @@ class LocalAuthUncheckedResultRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'authenticate'};
 
   @override
@@ -202,6 +205,9 @@ class LocalAuthMissingCapabilityCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'authenticate'};
@@ -279,6 +285,9 @@ class LocalAuthUnhandledExceptionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'authenticate'};
@@ -374,6 +383,9 @@ class LocalAuthMissingLockoutHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'authenticate'};
 
   static const LintCode _code = LintCode(
@@ -446,6 +458,9 @@ class LocalAuthBiometricOnlySensitiveRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'authenticate'};
@@ -583,6 +598,9 @@ class LocalAuthDeprecatedOptionsClassRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'local_auth_deprecated_options_class',
     '[local_auth_deprecated_options_class] AuthenticationOptions is constructed here, but the class was removed in local_auth 3.0. Its fields (biometricOnly, sensitiveTransaction, stickyAuth) were promoted to direct named parameters on authenticate(); useErrorDialogs was removed entirely. Continuing to use AuthenticationOptions will cause a compile error after upgrading. Inline each field as a named argument on authenticate() instead, and build your own error UI to replace useErrorDialogs. {v1}',
@@ -653,6 +671,9 @@ class LocalAuthUseErrorDialogsRemovedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'local_auth_use_error_dialogs_removed',
@@ -729,6 +750,9 @@ class LocalAuthStickyAuthRenamedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'local_auth_sticky_auth_renamed',
@@ -843,6 +867,9 @@ class LocalAuthPlatformExceptionCatchRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'local_auth_platform_exception_catch',

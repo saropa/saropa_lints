@@ -57,6 +57,9 @@ class RequireNotifyListenersRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_notify_listeners',
     '[require_notify_listeners] ChangeNotifier method modifies state properties but does not call notifyListeners(). Widgets listening to this notifier will not rebuild to reflect the updated state, displaying stale data to the user. This creates silent data synchronization bugs that are difficult to diagnose because the state appears correct in debug tools. {v5}',
@@ -190,6 +193,9 @@ class RequireStreamControllerDisposeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -340,6 +346,9 @@ class RequireValueNotifierDisposeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -647,6 +656,9 @@ class RequireMountedCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         AddMountedCheckFix(context: context),
@@ -830,6 +842,9 @@ class AvoidStatefulWithoutStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -964,6 +979,9 @@ class AvoidGlobalKeyInBuildRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_global_key_in_build',
     '[avoid_global_key_in_build] Creating a GlobalKey inside the build() method causes it to be recreated on every rebuild, which results in lost widget state, broken references, and unpredictable UI behavior. This can cause your app to lose user input or fail to maintain state across rebuilds. {v4}',
@@ -1077,6 +1095,9 @@ class AvoidSetStateInLargeStateClassRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -1187,6 +1208,9 @@ class PreferImmutableSelectorValueRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_immutable_selector_value',
     '[prefer_immutable_selector_value] Selector uses mutable type that may cause incorrect rebuilds. Selector values must be immutable to ensure proper comparisons. Mutable values are used in Provider Selector. {v2}',
@@ -1264,6 +1288,9 @@ class AvoidStaticStateRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_static_state',
@@ -1384,6 +1411,9 @@ class PreferOptimisticUpdatesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   @override
@@ -1496,6 +1526,9 @@ class AvoidCollectionMutatingMethodsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresWidgets => true;

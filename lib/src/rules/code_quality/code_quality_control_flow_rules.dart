@@ -39,6 +39,9 @@ class AvoidComplexLoopConditionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_complex_loop_conditions',
     '[avoid_complex_loop_conditions] Loop condition contains too many operators or nested expressions, making it difficult to reason about when the loop terminates. Complex conditions increase the risk of off-by-one errors and infinite loops that are hard to diagnose. {v4}',
@@ -124,6 +127,9 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_constant_conditions',
     '[avoid_constant_conditions] Condition evaluates to a compile-time constant, making one branch unreachable dead code. This usually indicates a logic error where the condition was intended to be dynamic, or leftover debugging code that was never cleaned up. {v4}',
@@ -196,6 +202,9 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_wildcard_cases_with_enums',
@@ -273,6 +282,9 @@ class NoEqualNestedConditionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'no_equal_nested_conditions',
@@ -388,6 +400,9 @@ class NoEqualSwitchCaseRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'no_equal_switch_case',
     '[no_equal_switch_case] Multiple switch cases contain identical body code. Duplicated case logic increases maintenance cost because changes must be applied to every copy, and missed updates cause inconsistent behavior across cases that are meant to be equivalent. {v4}',
@@ -461,6 +476,9 @@ class AvoidDuplicatePatternsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_duplicate_patterns',
     '[avoid_duplicate_patterns] Same pattern appears multiple times in a switch or if-case chain. Duplicate patterns mean the second occurrence is unreachable dead code because the first match always wins, indicating a copy-paste error or incomplete refactoring. {v4}',
@@ -532,6 +550,9 @@ class AvoidWildcardCasesWithSealedClassesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_wildcard_cases_with_sealed_classes',
@@ -611,6 +632,9 @@ class RequireExhaustiveSealedSwitchRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_exhaustive_sealed_switch',
     '[require_exhaustive_sealed_switch] Switch on a sealed class uses a default or wildcard case, suppressing exhaustiveness checking. Add explicit cases for every sealed subtype so the compiler reports an error when new subtypes are introduced. {v1}',
@@ -687,6 +711,9 @@ class NoEqualSwitchExpressionCasesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'no_equal_switch_expression_cases',
     '[no_equal_switch_expression_cases] Multiple switch expression cases produce identical result values. Duplicate results increase maintenance cost because changes must be applied to every copy, and they obscure whether the cases were truly intended to behave the same. {v4}',
@@ -749,6 +776,9 @@ class PreferSwitchExpressionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_switch_expression',
@@ -888,6 +918,9 @@ class PreferSwitchWithEnumsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_switch_with_enums',
     '[prefer_switch_with_enums] Enum compared using if-else chain instead of switch statement. Without exhaustiveness checking, adding new enum values will not trigger compile errors in this code location, allowing silent bugs where new cases are unhandled. {v4}',
@@ -1015,6 +1048,9 @@ class PreferSwitchWithSealedClassesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_switch_with_sealed_classes',
     '[prefer_switch_with_sealed_classes] Sealed class handled with if-else or type checks instead of switch. Missing exhaustiveness verification allows unhandled subtypes to silently pass through, causing runtime errors or incorrect behavior when new subtypes are added. {v5}',
@@ -1095,6 +1131,9 @@ class PreferSpecificCasesFirstRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_specific_cases_first',

@@ -20,10 +20,15 @@ import 'package:analyzer/analysis_rule/rule_visitor_registry.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/line_info.dart';
 
+import '../config/memory_mode.dart' show MemoryModeConfig;
 import '../config/runtime_tier_cap.dart';
 import '../init/project_info.dart' show getPackageVersion;
 import '../project_context.dart'
-    show FileTypeDetector, MemoryPressureHandler, ProjectContext;
+    show
+        FileContentCache,
+        FileTypeDetector,
+        MemoryPressureHandler,
+        ProjectContext;
 import '../report/analysis_reporter.dart' show AnalysisReporter, ReportConfig;
 import '../report/import_graph_tracker.dart' show ImportGraphTracker;
 import '../saropa_lint_rule.dart'
@@ -213,6 +218,11 @@ class SaropaContext {
   String? _lastCheckedPath;
   bool _wasLastFileSkipped = false;
 
+  /// Whether the current file's content changed since the last analysis pass.
+  /// Set once per file in [_shouldSkipCurrentFile]; defaults to `true` (treat
+  /// new/unknown files as changed so rules always run on them).
+  bool _fileContentChanged = true;
+
   /// Wraps a callback with per-file filtering based on rule metadata.
   ///
   /// The wrapped callback checks the current file against the rule's
@@ -274,6 +284,21 @@ class SaropaContext {
           _rapidPassDefer = SaropaLintRule.deferForRapidEdit(filePath, unitId);
         }
         if (_rapidPassDefer) return;
+      }
+
+      // Balanced memory mode: skip type-heavy rules on unchanged files that
+      // previously passed. Avoids triggering lazy cross-library type resolution
+      // in the analyzer, which is the dominant cause of RSS growth (~7.8 GB on
+      // large projects). When a dependency changes, hasChanged() cascades
+      // invalidation to direct importers via ImportGraphTracker.rawImportersOf,
+      // so dependents are re-analyzed. Transitive dependents (A imports B
+      // imports C, C changes) may still see stale diagnostics until B is
+      // re-analyzed and its own pass records are cleared.
+      if (MemoryModeConfig.shouldApplyBalancedFiltering &&
+          !_fileContentChanged &&
+          rule.usesTypeResolution &&
+          FileContentCache.rulePreviouslyPassed(filePath, rule.code.lowerCaseName)) {
+        return;
       }
 
       // Guard: analyzer v9 with useDeclaringConstructorsAst disabled throws
@@ -414,6 +439,7 @@ class SaropaContext {
     if (path.isEmpty) return false;
     if (path == _lastCheckedPath) return _wasLastFileSkipped;
     _lastCheckedPath = path;
+    _fileContentChanged = FileContentCache.hasChanged(path, fileContent);
     ProgressTracker.recordFile(path);
     // Populate import graph for report FILE IMPORTANCE / FIX PRIORITY /
     // PROJECT STRUCTURE (idempotent per path; see ImportGraphTracker).
@@ -478,6 +504,17 @@ class SaropaContext {
     }
     if (rule.maximumLineCount > 0 && lineCount > rule.maximumLineCount) {
       return _wasLastFileSkipped = true;
+    }
+
+    // Optimistic pass recording for balanced memory mode: when a changed
+    // file will be analyzed by a type-heavy rule, tentatively mark it as
+    // "passed". If _trackViolation fires, it revokes this via
+    // FileContentCache.revokeRulePassed. After all nodes are visited, only
+    // rules that truly produced zero violations remain marked.
+    if (MemoryModeConfig.shouldApplyBalancedFiltering &&
+        _fileContentChanged &&
+        rule.usesTypeResolution) {
+      FileContentCache.recordRulePassed(path, rule.code.lowerCaseName);
     }
 
     return _wasLastFileSkipped = false;

@@ -51,6 +51,9 @@ class RequireJsonDecodeTryCatchRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_json_decode_try_catch',
     '[require_json_decode_try_catch] jsonDecode throws on malformed JSON. Unhandled exceptions can crash the app, cause silent data loss, and make debugging difficult. This is a common source of runtime errors in networked and user-input scenarios. {v2}',
@@ -139,6 +142,9 @@ class AvoidDateTimeParseUnvalidatedRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         UseTryParseFix(context: context),
@@ -218,6 +224,9 @@ class PreferTryParseForDynamicDataRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_try_parse_for_dynamic_data',
@@ -649,6 +658,9 @@ class PreferDurationConstantsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'Duration(seconds: 60);';
 
   @override
@@ -737,6 +749,9 @@ class AvoidDatetimeNowInTestsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_datetime_now_in_tests',
     '[avoid_datetime_now_in_tests] DateTime.now() in tests produces non-deterministic values that vary between runs, causing flaky assertions that pass locally but fail in CI, making test failures impossible to reproduce reliably. {v2}',
@@ -820,6 +835,9 @@ class AvoidNotEncodableInToJsonRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_not_encodable_in_to_json',
@@ -1067,6 +1085,9 @@ class RequireDateFormatSpecificationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         UseDateTimeTryParseFix(context: context),
@@ -1137,6 +1158,9 @@ class PreferIso8601DatesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_iso8601_dates',
@@ -1209,6 +1233,9 @@ class AvoidOptionalFieldCrashRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1305,6 +1332,9 @@ class PreferExplicitJsonKeysRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_explicit_json_keys',
@@ -1416,6 +1446,9 @@ class RequireJsonSchemaValidationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_json_schema_validation',
@@ -1540,6 +1573,9 @@ class PreferJsonSerializableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_json_serializable',
     '[prefer_json_serializable] Data class with manual JSON serialization. '
@@ -1642,6 +1678,9 @@ class RequireTimezoneDisplayRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_timezone_display',
@@ -1782,6 +1821,9 @@ class PreferCorrectJsonCastsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_correct_json_casts',
     '[prefer_correct_json_casts] JSON map access cast to non-nullable type '
@@ -1833,6 +1875,9 @@ class PreferJsonCodegenRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_json_codegen',
@@ -1929,6 +1974,9 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.trivial;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String> get requiredPatterns => const {'DateTime'};
@@ -2050,6 +2098,9 @@ class AvoidDateTimeConstructorUnvalidatedRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String> get requiredPatterns => const {'DateTime'};
 
   @override
@@ -2150,6 +2201,9 @@ class RequireJsonDateFormatConsistencyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_json_date_format_consistency',

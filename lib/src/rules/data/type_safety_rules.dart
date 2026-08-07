@@ -60,6 +60,9 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_unsafe_cast',
     '[avoid_unsafe_cast] Direct cast with "as" may throw at runtime. Direct casting with as can throw if the value is null or wrong type. Prefer is check first or use as? for nullable result. {v5}',
@@ -306,6 +309,9 @@ class PreferConstrainedGenericsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_constrained_generics',
     '[prefer_constrained_generics] Generic type parameter has no constraint. Unconstrained type parameters accept any type including null, which can lead to unexpected behavior. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
@@ -368,6 +374,9 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_covariant_documentation',
@@ -447,6 +456,9 @@ class RequireSafeJsonParsingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_safe_json_parsing',
     '[require_safe_json_parsing] JSON parsing may throw on missing keys. JSON parsing should handle missing or null values gracefully to avoid runtime exceptions. This weakens type safety, allowing errors to reach runtime where they crash instead of being caught at compile time. {v4}',
@@ -523,6 +535,9 @@ class RequireNullSafeExtensionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_null_safe_extensions',
     '[require_null_safe_extensions] Extension method on a nullable type does not handle null receivers. This can cause runtime exceptions. Extension methods on nullable types should check for null. {v4}',
@@ -585,6 +600,9 @@ class PreferSpecificNumericTypesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_specific_numeric_types',
@@ -655,6 +673,9 @@ class AvoidNonNullAssertionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_non_null_assertion',
     '[avoid_non_null_assertion] Non-null assertion operator (!) throws a runtime exception if the value is null, crashing the app. '
@@ -717,6 +738,9 @@ class AvoidTypeCastsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_type_casts',
     '[avoid_type_casts] Type cast with "as" may throw at runtime. Type casts with as can throw at runtime. Prefer is checks or pattern matching for safer type narrowing. {v2}',
@@ -767,6 +791,9 @@ class RequireFutureOrDocumentationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_futureor_documentation',
@@ -830,6 +857,9 @@ class PreferExplicitTypeArgumentsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'final list = []; final map = {};';
@@ -965,6 +995,9 @@ class AvoidUnrelatedTypeCastsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.high;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_unrelated_type_casts',
     '[avoid_unrelated_type_casts] Casting between unrelated types (such as String to int) will always throw a runtime error, leading to crashes and unpredictable behavior. This often indicates a logic error or misunderstanding of the type system. Always ensure types are compatible before casting to prevent runtime failures and improve code safety. {v3}',
@@ -1071,6 +1104,9 @@ class AvoidDynamicJsonAccessRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_dynamic_json_access',
     '[avoid_dynamic_json_access] Chained dynamic JSON access without null checks throws NoSuchMethodError at runtime when any intermediate key is missing or null. This causes unhandled crashes in production when API responses deviate from the expected schema, with no compile-time safety net. {v6}',
@@ -1165,6 +1201,9 @@ class RequireNullSafeJsonAccessRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_null_safe_json_access',
@@ -1265,6 +1304,9 @@ class AvoidDynamicJsonChainsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_dynamic_json_chains',
     '[avoid_dynamic_json_chains] Deep dynamic access throws NoSuchMethodError '
@@ -1355,6 +1397,9 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_enum_unknown_value',
@@ -1479,6 +1524,9 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_validator_return_null',
     '[require_validator_return_null] Non-null return on valid input shows '
@@ -1589,6 +1637,9 @@ class AvoidRedundantNullCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_redundant_null_check',

@@ -47,6 +47,9 @@ class RequireSecureStorageRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m9},
     web: <OwaspWeb>{OwaspWeb.a02},
@@ -184,6 +187,9 @@ class AvoidHardcodedCredentialsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m1},
     web: <OwaspWeb>{OwaspWeb.a07},
@@ -305,6 +311,9 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[287];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -436,6 +445,9 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m1},
     web: <OwaspWeb>{OwaspWeb.a07},
@@ -532,6 +544,9 @@ class RequireAuthCheckRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[285];
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -793,6 +808,9 @@ class RequireTokenRefreshRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m3},
     web: <OwaspWeb>{OwaspWeb.a07},
@@ -937,6 +955,9 @@ class AvoidJwtDecodeClientRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[345];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -1088,6 +1109,9 @@ class RequireLogoutCleanupRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m3},
     web: <OwaspWeb>{OwaspWeb.a07},
@@ -1192,6 +1216,9 @@ class AvoidAuthInQueryParamsRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[598];
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -1320,6 +1347,9 @@ class RequireDataEncryptionRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[311];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -1564,6 +1594,9 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m1, OwaspMobile.m9},
     web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
@@ -1711,6 +1744,9 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m3, OwaspMobile.m9},
     web: <OwaspWeb>{OwaspWeb.a02, OwaspWeb.a07},
@@ -1827,6 +1863,9 @@ class PreferLocalAuthRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   OwaspMapping get owasp => const OwaspMapping(
     mobile: <OwaspMobile>{OwaspMobile.m3},
     web: <OwaspWeb>{OwaspWeb.a07},
@@ -1931,6 +1970,9 @@ class RequireSecureStorageAuthDataRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[311];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -2071,6 +2113,9 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[311];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -2239,6 +2284,9 @@ class RequireSecureStorageErrorHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_secure_storage_error_handling',
     '[require_secure_storage_error_handling] Secure storage operation '
@@ -2348,6 +2396,9 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_secure_storage_large_data',
     '[avoid_secure_storage_large_data] `[HEURISTIC]` Storing large data in '
@@ -2454,6 +2505,9 @@ class PreferBiometricProtectionRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[287];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(
@@ -2565,6 +2619,9 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_sensitive_data_in_clipboard',
     '[avoid_sensitive_data_in_clipboard] Copying sensitive data such as passwords, tokens, or personal information to the clipboard exposes users to data theft, as other apps or malicious actors can access clipboard contents. This is a significant privacy and security risk, especially on shared or compromised devices. See https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure.html and https://api.flutter.dev/flutter/services/Clipboard-class.html. {v3}',
@@ -2652,6 +2709,9 @@ class RequireClipboardPasteValidationRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[20];
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_clipboard_paste_validation',
@@ -2823,6 +2883,9 @@ class AvoidEncryptionKeyInMemoryRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_encryption_key_in_memory',
     '[avoid_encryption_key_in_memory] Encryption key stored as a persistent class field remains in process memory for the lifetime of the object. Memory dumps, debugging tools, or memory-scanning malware can extract the key, compromising all data encrypted with it. Keys in memory survive garbage collection and are visible in heap snapshots. {v2}',
@@ -2907,6 +2970,9 @@ class PreferOauthPkceRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[345];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_oauth_pkce',
@@ -3044,6 +3110,9 @@ class RequireSessionTimeoutRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[613];
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'signIn', 'signUp'};
@@ -3216,6 +3285,9 @@ class PreferRootDetectionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_root_detection',
     '[prefer_root_detection] Sensitive storage or APIs used. Consider '
@@ -3292,6 +3364,9 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[284];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{
@@ -3446,6 +3521,9 @@ class PreferWhitelistValidationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_whitelist_validation',
     '[prefer_whitelist_validation] Prefer allowlist over blocklist for input validation.',
@@ -3485,6 +3563,9 @@ class RequireKeychainAccessRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[522];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_keychain_access',
@@ -3528,6 +3609,9 @@ class RequireWebviewUserAgentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_webview_user_agent',
     '[require_webview_user_agent] Set a custom user agent on WebView when needed for compatibility.',
@@ -3568,6 +3652,9 @@ class RequireMultiFactorRule extends SaropaLintRule {
   List<int> get cweIds => const <int>[287];
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_multi_factor',

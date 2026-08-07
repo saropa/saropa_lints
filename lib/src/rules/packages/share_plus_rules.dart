@@ -77,6 +77,9 @@ class PreferSharePlusInstanceRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_shareplus_instance',
     '[prefer_shareplus_instance] The static Share.share / Share.shareUri / Share.shareXFiles / Share.shareFiles methods were deprecated in share_plus 11.0.0 in favor of the instance-based SharePlus.instance.share(ShareParams(...)). Deprecated static methods will be removed in a future major release. Migrate now to avoid a breaking change and gain access to the richer ShareParams API, including consistent sharePositionOrigin support on all platforms. {v1}',
@@ -291,6 +294,9 @@ class SharePlusMissingPositionOriginRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'share_plus_missing_position_origin',
     '[share_plus_missing_position_origin] ShareParams is constructed without a sharePositionOrigin argument. On iPad, the iOS share sheet is presented as a popover anchored to a Rect; without a non-zero sharePositionOrigin UIKit throws a PlatformException and the share sheet never appears. On iOS 26+ a missing or zero Rect also triggers a crash. Always pass sharePositionOrigin derived from RenderBox.localToGlobal(Offset.zero) & size to ensure safe cross-platform behavior. See https://pub.dev/packages/share_plus. {v1}',
@@ -370,6 +376,9 @@ class SharePlusUncheckedResultRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'share_plus_unchecked_result',
@@ -480,6 +489,9 @@ class SharePlusEmptyShareParamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'share_plus_empty_share_params',
@@ -610,6 +622,9 @@ class SharePlusUriAndTextConflictRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'share_plus_uri_and_text_conflict',

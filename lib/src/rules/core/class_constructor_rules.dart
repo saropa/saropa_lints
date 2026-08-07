@@ -45,6 +45,9 @@ class AvoidDeclaringCallMethodRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_declaring_call_method',
     '[avoid_declaring_call_method] call() method makes class callable but hides intent. Code reads ambiguously. A class declares a call() method. {v5}',
@@ -98,6 +101,9 @@ class AvoidGenericsShadowingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_generics_shadowing',
@@ -198,6 +204,9 @@ class AvoidIncompleteCopyWithRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_incomplete_copy_with',
     '[avoid_incomplete_copy_with] copyWith() is missing fields. Copied objects will lose data for those fields. All non-final fields must be included in copyWith for complete copying. {v4}',
@@ -291,6 +300,9 @@ class AvoidNonEmptyConstructorBodiesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_non_empty_constructor_bodies',
@@ -397,6 +409,9 @@ class AvoidShadowingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   /// Alias: avoid_shadowing
   static const LintCode _code = LintCode(
@@ -647,6 +662,9 @@ class PreferConstStringListRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         PreferConstStringListFix(context: context),
@@ -777,6 +795,9 @@ class PreferDeclaringConstConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         PreferDeclaringConstConstructorFix(context: context),
@@ -868,6 +889,9 @@ class PreferNonConstConstructorsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad =>
       'class Cfg {\n'
       '  const Cfg();  // flags any const constructor\n'
@@ -927,6 +951,9 @@ class PreferFactoryConstructorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -1003,6 +1030,9 @@ class PreferPrivateExtensionTypeFieldRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_private_extension_type_field',
@@ -1084,6 +1114,9 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_renaming_representation_getters',
@@ -1188,6 +1221,9 @@ class ProperSuperCallsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'proper_super_calls',
     '[proper_super_calls] Super lifecycle method called in wrong order. In State classes, super.initState() must be called first, and super.dispose() must be called last. {v5}',
@@ -1288,6 +1324,9 @@ class AvoidUnmarkedPublicClassRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_unmarked_public_class',
     '[avoid_unmarked_public_class] Public class lacks an explicit class modifier. Dart 3.0 introduced class modifiers (base, final, interface, sealed). For API stability, public classes should declare their inheritance intent. {v3}',
@@ -1373,6 +1412,9 @@ class PreferFinalClassRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1478,6 +1520,9 @@ class PreferInterfaceClassRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_interface_class',
@@ -1587,6 +1632,9 @@ class PreferBaseClassRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_base_class',
@@ -1705,6 +1753,9 @@ class AvoidAccessingOtherClassesPrivateMembersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresClassDeclaration => true;
@@ -1834,6 +1885,9 @@ class AvoidUnusedConstructorParametersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   bool get requiresClassDeclaration => true;
 
   static const LintCode _code = LintCode(
@@ -1933,6 +1987,9 @@ class AvoidFieldInitializersInConstClassesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_field_initializers_in_const_classes',
@@ -2035,6 +2092,9 @@ class RequireLateAccessCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => {'late '};
@@ -2181,6 +2241,9 @@ class PreferAssertsInInitializerListsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_asserts_in_initializer_lists',
     '[prefer_asserts_in_initializer_lists] assert() in constructor body could be moved to the initializer list. Initializer list asserts run at construction time and work in const constructors.',
@@ -2312,6 +2375,9 @@ class PreferConstConstructorsInImmutablesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_const_constructors_in_immutables',
     '[prefer_const_constructors_in_immutables] @immutable class has no const constructor. Add a const constructor so call sites can use const and reduce allocations.',
@@ -2417,6 +2483,9 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_const_constructor_declarations',
@@ -2582,6 +2651,9 @@ class PreferFinalFieldsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_final_fields',
     '[prefer_final_fields] Field is never reassigned and could be final. Marking it final makes immutability explicit and enables compiler optimizations.',
@@ -2689,6 +2761,9 @@ class PreferFinalFieldsAlwaysRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -2812,6 +2887,9 @@ class AvoidReferencingSubclassesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_referencing_subclasses',

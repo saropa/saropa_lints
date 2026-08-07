@@ -16,6 +16,7 @@ import 'package:analyzer/error/error.dart'
 
 import 'analyzer_compat.dart';
 import 'baseline/baseline_manager.dart';
+import 'config/memory_mode.dart';
 import 'ignore_utils.dart';
 import 'native/config_loader.dart'
     show loadOutputConfigFromProjectRoot, loadRulePacksConfigFromProjectRoot;
@@ -2264,6 +2265,19 @@ abstract class SaropaLintRule extends AnalysisRule {
   RuleCost get cost => RuleCost.medium;
 
   // ============================================================
+  // Type Resolution (Memory Mode)
+  // ============================================================
+
+  /// Whether this rule triggers lazy cross-library type resolution in the
+  /// analyzer (e.g. `.staticType`, `.library`, `.allSupertypes`,
+  /// `.enclosingElement`).
+  ///
+  /// In `memory_mode: balanced`, type-heavy rules skip unchanged files
+  /// during incremental analysis to reduce analyzer RSS. Override to
+  /// `true` in rules that access resolved type information.
+  bool get usesTypeResolution => false;
+
+  // ============================================================
   // CLI Walkthrough Examples
   // ============================================================
 
@@ -3300,6 +3314,12 @@ class SaropaDiagnosticReporter {
   void _trackViolation(int offset, {AstNode? node}) {
     final loc = _resolveLocation(offset, node);
     if (loc == null) return;
+
+    // Revoke optimistic "passed" record so balanced mode doesn't skip this
+    // rule on the next pass for this file.
+    if (MemoryModeConfig.shouldApplyBalancedFiltering) {
+      FileContentCache.revokeRulePassed(loc.path, _ruleName);
+    }
 
     ImpactTracker.record(
       impact: impact,

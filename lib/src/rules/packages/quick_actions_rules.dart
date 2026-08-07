@@ -119,6 +119,9 @@ class QuickActionsSetBeforeInitializeRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   // Perf: only walk members in files that actually call setShortcutItems.
   @override
   Set<String>? get requiredPatterns => const <String>{'setShortcutItems'};
@@ -210,6 +213,9 @@ class QuickActionsMissingInitializeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'setShortcutItems'};
 
   static const LintCode _code = LintCode(
@@ -291,6 +297,9 @@ class QuickActionsEmptyShortcutTypeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{_shortcutItemType};
@@ -382,6 +391,9 @@ class QuickActionsEmptyLocalizedTitleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{_shortcutItemType};
 
   static const LintCode _code = LintCode(
@@ -447,6 +459,9 @@ class QuickActionsFlutterAssetIconRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{_shortcutItemType};

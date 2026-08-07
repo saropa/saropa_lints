@@ -47,6 +47,11 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_bitwise_operators_with_booleans',
@@ -122,6 +127,11 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_cascade_after_if_null',
@@ -199,6 +209,11 @@ class AvoidCascadeShuffleRule extends SaropaLintRule {
   // Single cascade-node inspection with no traversal or type resolution.
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_cascade_shuffle',
@@ -297,6 +312,11 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const int _maxOperators = 4;
 
@@ -383,6 +403,11 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const int _maxOperators = 3;
 
@@ -477,6 +502,11 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_duplicate_cascades',
@@ -550,6 +580,11 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const int _maxOperators = 5;
 
@@ -715,6 +750,11 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_immediately_invoked_functions',
@@ -768,6 +808,11 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_nested_shorthands',
@@ -844,6 +889,11 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'avoid_multi_assignment',
@@ -881,6 +931,10 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
   /// Stylistic preference only. No performance or correctness benefit.
   @override
   LintImpact get impact => LintImpact.info;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -947,6 +1001,11 @@ class PreferMovingToVariableRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_moving_to_variable',
@@ -1042,6 +1101,11 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const LintCode _code = LintCode(
     'prefer_parentheses_with_if_null',
@@ -1145,6 +1209,11 @@ class AvoidDeepNestingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const int _maxDepth = 5;
 
@@ -1251,6 +1320,11 @@ class AvoidHighCyclomaticComplexityRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.high;
+  @override
+  bool get usesTypeResolution => true;
+
+
+
 
   static const int _threshold = 15;
 

@@ -23,6 +23,7 @@ import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:analyzer/src/string_source.dart';
 import 'package:path/path.dart' as p;
 
+import '../config/memory_mode.dart' show MemoryModeConfig;
 import '../config/runtime_tier_cap.dart';
 import '../init/cli_args.dart' show tierOrder;
 import '../../saropa_lints.dart';
@@ -151,6 +152,7 @@ class ScanRunner {
   /// list means "nothing to scan" (all rules disabled, or no Dart files found)
   /// and the caller returns no diagnostics.
   ({List<SaropaLintRule> rules, List<String> files})? _prepare() {
+    MemoryModeConfig.markCli();
     reloadRuntimeTierCapFromProject(p.absolute(targetPath));
     final resolved = _resolveRuleNames();
     if (resolved == null) return null;

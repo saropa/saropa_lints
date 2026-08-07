@@ -45,6 +45,9 @@ class RequireFileExistsCheckRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_file_exists_check',
     '[require_file_exists_check] File read operation should check exists() or use try-catch. File operations on non-existent files throw exceptions. Always verify the file exists or wrap in try-catch to handle missing files gracefully. {v3}',
@@ -202,6 +205,9 @@ class RequirePdfErrorHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_pdf_error_handling',
     '[require_pdf_error_handling] PDF loading operation lacks try-catch error handling. PDF files can be corrupted, missing, or have invalid format. Without error handling, failures crash the application instead of showing user-friendly error messages. {v3}',
@@ -304,6 +310,9 @@ class RequireGraphqlErrorHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_graphql_error_handling',
     '[require_graphql_error_handling] GraphQL query and mutation results must check hasException before accessing data. Failing to check for errors can cause runtime crashes, display incomplete or misleading data, and make debugging difficult. This is a common source of silent failures and poor user experience in apps using GraphQL. {v3}',
@@ -404,6 +413,9 @@ class RequireSqfliteWhereArgsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_sqflite_whereargs',
@@ -524,6 +536,9 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_sqflite_transaction',
     '[require_sqflite_transaction] Multiple sequential writes should use transaction for atomicity. Multiple sequential writes should use transactions for atomicity and better performance. {v2}',
@@ -640,6 +655,9 @@ class RequireSqfliteErrorHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_sqflite_error_handling',
     '[require_sqflite_error_handling] All database operations (insert, update, query, etc.) must handle errors such as disk full, corruption, or constraint violations. Unhandled database errors will crash the app, cause data loss, and make recovery difficult. {v5}',
@@ -731,6 +749,9 @@ class PreferSqfliteBatchRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_sqflite_batch',
@@ -830,6 +851,9 @@ class RequireSqfliteCloseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_sqflite_close',
@@ -943,6 +967,9 @@ class AvoidSqfliteReservedWordsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_sqflite_reserved_words',
@@ -1200,6 +1227,9 @@ class AvoidSqfliteReadAllColumnsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_sqflite_read_all_columns',
     '[avoid_sqflite_read_all_columns] SELECT * fetches unnecessary columns, wasting memory and bandwidth. Using SELECT * fetches all columns from the database, which: - Wastes memory by loading unused data - Increases network/disk bandwidth - Breaks when table schema changes (new columns appear unexpectedly) - Prevents SQLite query optimization. {v2}',
@@ -1305,6 +1335,9 @@ class AvoidLoadingFullPdfInMemoryRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_loading_full_pdf_in_memory',
@@ -1429,6 +1462,9 @@ class PreferSqfliteSingletonRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_sqflite_singleton',
     '[prefer_sqflite_singleton] openDatabase called directly. May create multiple connections. Calling openDatabase repeatedly creates connection overhead and may cause locking issues. Use a singleton pattern. {v2}',
@@ -1521,6 +1557,9 @@ class PreferSqfliteColumnConstantsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_sqflite_column_constants',
@@ -1628,6 +1667,9 @@ class PreferStreamingForLargeFilesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_streaming_for_large_files',
@@ -1757,6 +1799,9 @@ class RequireFilePathSanitizationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   OwaspMapping get owasp => const OwaspMapping(

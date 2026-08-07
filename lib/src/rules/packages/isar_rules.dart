@@ -62,6 +62,9 @@ class AvoidIsarEnumFieldRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_isar_enum_field',
     '[avoid_isar_enum_field] Storing enums directly in Isar collections is dangerous: renaming or reordering enum values will silently corrupt your data, breaking existing records and causing unpredictable bugs. {v3}',
@@ -242,6 +245,9 @@ class RequireIsarCollectionAnnotationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_isar_collection_annotation',
     '[require_isar_collection_annotation] This class is missing the @collection annotation, so Isar will not generate an adapter for it. As a result, any attempt to persist or query this type will fail at runtime, and your build will break with missing adapter errors. {v1}',
@@ -327,6 +333,9 @@ class RequireIsarIdFieldRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_isar_id_field',
@@ -423,6 +432,9 @@ class RequireIsarCloseOnDisposeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -515,6 +527,9 @@ class PreferIsarAsyncWritesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_isar_async_writes',
     '[prefer_isar_async_writes] Using writeTxnSync in build methods will block the UI thread, causing your app to freeze, stutter, or become unresponsive. This leads to poor user experience and can trigger platform watchdogs to kill your app. {v1}',
@@ -585,6 +600,9 @@ class AvoidIsarTransactionNestingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_isar_transaction_nesting',
@@ -674,6 +692,9 @@ class PreferIsarBatchOperationsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_isar_batch_operations',
     '[prefer_isar_batch_operations] Using put() in a loop for many records is extremely slow: each call triggers a separate database write. This can make your app hang or take minutes to save data. Batch operations like putAll() are up to 100x faster and prevent UI freezes. {v1}',
@@ -741,6 +762,9 @@ class AvoidIsarFloatEqualityQueriesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_isar_float_equality_queries',
     '[avoid_isar_float_equality_queries] Querying floats for exact equality is unreliable: due to rounding errors, you may miss matching records or get inconsistent results. This can break features that depend on accurate data retrieval. {v1}',
@@ -805,6 +829,9 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_isar_inspector_debug_only',
@@ -878,6 +905,9 @@ class AvoidIsarClearInProductionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_isar_clear_in_production',
@@ -954,6 +984,9 @@ class RequireIsarLinksLoadRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_isar_links_load',
@@ -1042,6 +1075,9 @@ class PreferIsarQueryStreamRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_isar_query_stream',
     '[prefer_isar_query_stream] Using Timer.periodic or manual polling for reactive queries is inefficient and can drain battery, waste CPU, and miss real-time updates. Isar watch() streams are event-driven and update instantly when data changes. {v1}',
@@ -1110,6 +1146,9 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_isar_web_limitations',
@@ -1188,6 +1227,9 @@ class PreferIsarIndexForQueriesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_isar_index_for_queries',
     '[prefer_isar_index_for_queries] Querying fields without an @Index annotation forces Isar to scan the entire collection, resulting in slow queries and poor performance as your data grows. Indexed fields enable fast lookups and scalable apps. {v1}',
@@ -1263,6 +1305,9 @@ class AvoidIsarEmbeddedLargeObjectsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_isar_embedded_large_objects',
@@ -1343,6 +1388,9 @@ class PreferIsarLazyLinksRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_isar_lazy_links',
     '[prefer_isar_lazy_links] Using IsarLinks<T>() for large linked collections loads all linked records at once, which can slow down your app and waste memory. IsarLinks.lazy() loads records on demand for better performance. {v1}',
@@ -1396,6 +1444,9 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_isar_schema_breaking_changes',
@@ -1465,6 +1516,9 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 
 //   @override
 //   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
 //   static const LintCode _code = LintCode(
 //     'require_isar_non_nullable_migration',
@@ -1554,6 +1608,9 @@ class RequireIsarNullableFieldRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1658,6 +1715,9 @@ class PreferIsarCompositeIndexRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_isar_composite_index',
     '[prefer_isar_composite_index] Querying multiple fields together without a composite index will force Isar to scan every record, making queries slow and unscalable as your data grows. Composite indexes enable fast, efficient lookups for multi-field queries. {v1}',
@@ -1730,6 +1790,9 @@ class AvoidIsarStringContainsWithoutIndexRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_isar_string_contains_without_index',
@@ -1832,6 +1895,9 @@ class AvoidCachedIsarStreamRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   /// Prevents caching of Isar query streams (must be created inline).
   AvoidCachedIsarStreamRule() : super(code: _code);
 
@@ -1893,6 +1959,9 @@ class PreferIsarForComplexQueriesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_isar_for_complex_queries',

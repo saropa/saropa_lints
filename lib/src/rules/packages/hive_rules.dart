@@ -93,6 +93,9 @@ class RequireHiveInitializationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_hive_initialization',
     '[require_hive_initialization] Hive.openBox() or Hive.openLazyBox() was called without a visible Hive.init() or Hive.initFlutter() call in this file. Opening a box before initialization throws a HiveError at runtime. {v4}',
@@ -166,6 +169,9 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_hive_type_adapter',
@@ -269,6 +275,9 @@ class RequireHiveBoxCloseRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_hive_box_close',
     '[require_hive_box_close] Hive database box opened but not closed in dispose. This leaves file handles open, prevents database compaction, causes memory leaks, and can lead to data corruption or app crashes over time. Unclosed boxes may also block updates and degrade device performance. {v3}',
@@ -361,6 +370,9 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_hive_encryption',
     '[prefer_hive_encryption] Unencrypted Hive box stores data in plaintext. '
@@ -448,6 +460,9 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_hive_encryption_key_secure',
@@ -540,6 +555,9 @@ class RequireHiveDatabaseCloseRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_hive_database_close',
     '[require_hive_database_close] Database opened but no close() method found. This creates a resource leak risk, leading to memory exhaustion, file locks, and possible data loss. Unclosed databases can prevent compaction and degrade app reliability. {v4}',
@@ -619,6 +637,9 @@ class RequireTypeAdapterRegistrationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_type_adapter_registration',
@@ -720,6 +741,9 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_lazy_box_for_large',
@@ -847,6 +871,9 @@ class RequireHiveTypeIdManagementRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_hive_type_id_management',
     '[require_hive_type_id_management] @HiveType found. Ensure typeId is unique and documented in a central registry. Hive typeIds must be unique and stable. Changing or duplicating typeIds corrupts stored data. Track typeIds in a central registry. {v2}',
@@ -933,6 +960,9 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_hive_field_index_reuse',
@@ -1051,6 +1081,9 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_hive_field_default_value',
     '[require_hive_field_default_value] @HiveField on nullable field without defaultValue. This can cause existing data to fail to load, trigger runtime exceptions, and break migrations. Missing defaults may result in silent data loss or corrupted records after schema changes. {v2}',
@@ -1144,6 +1177,9 @@ class RequireHiveAdapterRegistrationOrderRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_hive_adapter_registration_order',
@@ -1267,6 +1303,9 @@ class RequireHiveNestedObjectAdapterRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_hive_nested_object_adapter',
     '[require_hive_nested_object_adapter] Nested custom type without adapter '
@@ -1358,6 +1397,9 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_hive_box_name_collision',
@@ -1456,6 +1498,9 @@ class PreferHiveValueListenableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_hive_value_listenable',
     '[prefer_hive_value_listenable] Manual setState after Hive changes is error-prone. Manually calling setState after Hive updates is error-prone. Use ValueListenableBuilder with box.listenable() for reactive updates. {v3}',
@@ -1528,6 +1573,9 @@ class PreferHiveLazyBoxRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1653,6 +1701,9 @@ class AvoidHiveBinaryStorageRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_hive_binary_storage',
     '[avoid_hive_binary_storage] Storing Uint8List/binary data in Hive. '
@@ -1763,6 +1814,9 @@ class RequireHiveMigrationStrategyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_hive_migration_strategy',
@@ -1893,6 +1947,9 @@ class AvoidHiveSynchronousInUiRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_hive_synchronous_in_ui',
     '[avoid_hive_synchronous_in_ui] Synchronous Hive box operation (get, put, delete, add) is called inside a build() or initState() method. These operations perform disk I/O on the main isolate, blocking frame rendering and causing visible UI jank. On slower devices or with large boxes, this can trigger ANR (Application Not Responding) dialogs, force-close the app, and create a poor user experience that leads to negative app store reviews. {v2}',
@@ -1987,6 +2044,9 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         AddHiveSubDirFix(context: context),
@@ -2074,6 +2134,9 @@ class AvoidHiveDatetimeLocalRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'hive'};
@@ -2169,6 +2232,9 @@ class AvoidHiveTypeModificationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'hive'};
@@ -2267,6 +2333,9 @@ class AvoidHiveLargeSingleEntryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'hive'};
 
   static const LintCode _code = LintCode(
@@ -2362,6 +2431,9 @@ class PreferHiveCompactPeriodicallyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'hive'};
 
   static const LintCode _code = LintCode(
@@ -2414,6 +2486,9 @@ class PreferHiveCompactRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'hive'};
@@ -2508,6 +2583,9 @@ class PreferHiveWebAwareRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'hive'};

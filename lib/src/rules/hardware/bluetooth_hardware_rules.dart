@@ -39,6 +39,9 @@ class AvoidBluetoothScanWithoutTimeoutRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_bluetooth_scan_without_timeout',
     '[avoid_bluetooth_scan_without_timeout] Infinite Bluetooth scan drains '
@@ -157,6 +160,9 @@ class RequireBluetoothStateCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_bluetooth_state_check',
@@ -279,6 +285,9 @@ class RequireBleDisconnectHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_ble_disconnect_handling',
     '[require_ble_disconnect_handling] BLE connections must handle disconnect events to maintain app stability and resource management. Ignoring disconnects can lead to stale UI (showing devices as connected when they are not), resource leaks (unreleased connections or streams), and user confusion when devices unexpectedly disappear or fail to reconnect. This can also cause battery drain and degraded reliability, especially in apps that manage multiple devices. {v3}',
@@ -378,6 +387,9 @@ class RequireAudioFocusHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_audio_focus_handling',
@@ -488,6 +500,9 @@ class RequireQrPermissionCheckRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_qr_permission_check',
     '[require_qr_permission_check] If you open the QR scanner without first requesting camera permission, your app will show a black screen on iOS or crash on some Android devices. This breaks user experience and can cause app store rejection. {v2}',
@@ -585,6 +600,9 @@ class RequireGeolocatorPermissionCheckRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_geolocator_permission_check',
     '[require_geolocator_permission_check] Accessing location without checking permission will crash your app on iOS and may cause unpredictable behavior on Android. This can result in app store rejection and poor user experience. {v2}',
@@ -667,6 +685,9 @@ class RequireGeolocatorServiceEnabledRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_geolocator_service_enabled',
@@ -751,6 +772,9 @@ class RequireGeolocatorStreamCancelRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_geolocator_stream_cancel',
     '[require_geolocator_stream_cancel] Position stream subscriptions must be canceled when no longer needed. Failing to cancel subscriptions leads to battery drain, memory leaks, and background location updates that persist after the UI is disposed. This can degrade device performance and violate privacy expectations. {v3}',
@@ -821,6 +845,9 @@ class RequireGeolocatorErrorHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_geolocator_error_handling',
@@ -899,6 +926,9 @@ class PreferBleMtuNegotiationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_ble_mtu_negotiation',

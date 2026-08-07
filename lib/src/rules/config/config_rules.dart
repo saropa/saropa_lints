@@ -53,6 +53,9 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_hardcoded_config',
     '[avoid_hardcoded_config] Hardcoded configuration value detected. Embedding URLs, ports, API keys, or feature flags directly in source code makes the app inflexible across environments (dev, staging, production) and forces a rebuild for every configuration change, increasing deployment risk. {v5}',
@@ -194,6 +197,9 @@ class AvoidHardcodedConfigTestRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => const <FileType>{FileType.test};
 
   static const LintCode _code = LintCode(
@@ -304,6 +310,9 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   // Performance: Only run on files with class declarations
   @override
@@ -464,6 +473,9 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_feature_flag_type_safety',
     '[require_feature_flag_type_safety] Feature flag accessed with a '
@@ -590,6 +602,9 @@ class AvoidStringEnvParsingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.trivial;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_string_env_parsing',
     '[avoid_string_env_parsing] fromEnvironment() called without a '
@@ -676,6 +691,9 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_platform_specific_imports',
@@ -766,6 +784,9 @@ class PreferSemverVersionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_semver_version',
     '[prefer_semver_version] pubspec.yaml version should follow semantic versioning (major.minor.patch).',
@@ -831,6 +852,9 @@ class PreferCompileTimeConfigRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_compile_time_config',
     '[prefer_compile_time_config] Prefer compile-time configuration '
@@ -868,6 +892,9 @@ class PreferFlavorConfigurationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_flavor_configuration',
     '[prefer_flavor_configuration] Prefer flavor-based configuration '
@@ -903,6 +930,9 @@ class RequireConfigValidationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_config_validation',
@@ -947,6 +977,9 @@ class PackageNamesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'pubspec_package_name_convention',
@@ -1052,6 +1085,9 @@ class SortPubDependenciesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'sort_pub_dependencies',
@@ -1198,6 +1234,9 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'secure_pubspec_urls',

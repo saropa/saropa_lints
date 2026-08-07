@@ -54,6 +54,9 @@ class AvoidBehaviorSubjectLastValueRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'BehaviorSubject'};
 
   static const LintCode _code = LintCode(
@@ -154,6 +157,9 @@ class PreferRxdartForComplexStreamsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_rxdart_for_complex_streams',

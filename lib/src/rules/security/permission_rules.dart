@@ -70,6 +70,9 @@ class RequireLocationPermissionRationaleRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_location_permission_rationale',
     '[require_location_permission_rationale] Location permission requested '
@@ -195,6 +198,9 @@ class RequireCameraPermissionCheckRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -355,6 +361,9 @@ class PreferImageCroppingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -537,6 +546,9 @@ class AvoidPermissionHandlerNullSafetyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_permission_handler_null_safety',
     '[avoid_permission_handler_null_safety] Deprecated pre-null-safety '
@@ -657,6 +669,9 @@ class PreferPermissionRequestInContextRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_permission_request_in_context',
     '[prefer_permission_request_in_context] Permission requested at app startup (main or initState) instead of in response to user action. Users see permission dialogs before understanding why the app needs access, leading to higher denial rates and a confusing first-launch experience. Platform guidelines (Apple, Google) recommend requesting permissions just-in-time when the user performs a relevant action. {v1}',
@@ -764,6 +779,9 @@ class AvoidPermissionRequestLoopRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_permission_request_loop',
     '[avoid_permission_request_loop] Permission.request() called inside a '
@@ -839,6 +857,9 @@ class PreferPermissionMinimalRequestRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_permission_minimal_request',
     '[prefer_permission_minimal_request] Request only permissions that are '
@@ -885,6 +906,9 @@ class RequirePermissionLifecycleObserverRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_permission_lifecycle_observer',

@@ -164,6 +164,10 @@ class AvoidDeprecatedListConstructorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'List('};
@@ -262,6 +266,10 @@ class AvoidRemovedProxyAnnotationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'@proxy'};
@@ -312,6 +320,10 @@ class AvoidRemovedProvisionalAnnotationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'Provisional'};
@@ -412,6 +424,10 @@ class AvoidDeprecatedExpiresGetterRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'.expires'};
@@ -497,6 +513,10 @@ class AvoidRemovedCastErrorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'CastError'};
@@ -547,6 +567,10 @@ class AvoidRemovedFallThroughErrorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'FallThroughError'};
@@ -590,6 +614,10 @@ class AvoidRemovedAbstractClassInstantiationErrorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{
@@ -638,6 +666,10 @@ class AvoidRemovedCyclicInitializationErrorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{
@@ -686,6 +718,10 @@ class AvoidRemovedNoSuchMethodErrorDefaultConstructorRule
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'NoSuchMethodError('};
@@ -733,6 +769,10 @@ class AvoidRemovedBidirectionalIteratorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'BidirectionalIterator'};
@@ -778,6 +818,10 @@ class AvoidRemovedDeferredLibraryRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'DeferredLibrary'};
@@ -855,6 +899,10 @@ class AvoidDeprecatedHasNextIteratorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'HasNextIterator'};
@@ -915,6 +963,10 @@ class AvoidRemovedMaxUserTagsConstantRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'MAX_USER_TAGS'};
@@ -1011,6 +1063,10 @@ class AvoidRemovedDartDeveloperMetricsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{
@@ -1081,6 +1137,10 @@ class AvoidDeprecatedNetworkInterfaceListSupportedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'listSupported'};
@@ -1148,6 +1208,10 @@ class AvoidRemovedNullThrownErrorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+  @override
+  bool get usesTypeResolution => true;
+
+
 
   @override
   Set<String>? get requiredPatterns => const <String>{'NullThrownError'};

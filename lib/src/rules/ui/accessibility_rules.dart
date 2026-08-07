@@ -59,6 +59,9 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_icon_buttons_without_tooltip',
     '[avoid_icon_buttons_without_tooltip] This IconButton does not provide a tooltip, making it inaccessible to screen readers and users with visual impairments. Without a tooltip, users cannot understand the button’s purpose, which reduces usability and fails accessibility standards. Tooltips are essential for describing the action of icon-only buttons. {v5}',
@@ -137,6 +140,9 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_small_touch_targets',
@@ -306,6 +312,9 @@ class RequireExcludeSemanticsJustificationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_exclude_semantics_justification',
     '[require_exclude_semantics_justification] ExcludeSemantics without '
@@ -417,6 +426,9 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_color_only_indicators',
@@ -625,6 +637,9 @@ class RequireTextScaleFactorAwarenessRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -727,6 +742,9 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_gesture_only_interactions',
     '[avoid_gesture_only_interactions] GestureDetector is used without providing keyboard or accessibility support, making the interaction inaccessible to users with motor disabilities or those relying on switch control. This excludes users who cannot use touch input and fails to meet accessibility standards for interactive elements. {v6}',
@@ -821,6 +839,9 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_semantics_label',
@@ -919,6 +940,9 @@ class AvoidMergedSemanticsHidingInfoRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_merged_semantics_hiding_info',
@@ -1020,6 +1044,9 @@ class RequireLiveRegionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_live_region',
@@ -1141,6 +1168,9 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_heading_semantics',
     '[require_heading_semantics] Missing header semantics prevents screen '
@@ -1255,6 +1285,9 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_image_buttons_without_tooltip',
@@ -1374,6 +1407,9 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_text_scale_factor_ignore',
     '[avoid_text_scale_factor_ignore] Setting textScaleFactor to 1.0 on a text child element overrides user accessibility settings, preventing users from increasing text size for readability. This excludes users with low vision and fails accessibility standards. Respecting user-configured text scaling in the widget tree is essential for inclusive design. {v3}',
@@ -1468,6 +1504,9 @@ class RequireImageSemanticsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_image_semantics',
@@ -1599,6 +1638,9 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_hidden_interactive',
@@ -1737,6 +1779,9 @@ class PreferScalableTextRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_scalable_text',
     '[prefer_scalable_text] Text uses a fixed font size and does not respect user accessibility settings. This prevents users who rely on larger text for readability from accessing your content. All text should scale with the system text scale factor for accessibility compliance. {v2}',
@@ -1821,6 +1866,9 @@ class RequireButtonSemanticsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_button_semantics',
@@ -1930,6 +1978,9 @@ class PreferExplicitSemanticsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_explicit_semantics',
@@ -2084,6 +2135,9 @@ class AvoidHoverOnlyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_hover_only',
     '[avoid_hover_only] Interactive elements respond only to hover events, excluding mobile and touch users as well as people with motor disabilities. All actionable child elements in the widget tree must support both pointer and touch interactions for universal accessibility. {v3}',
@@ -2192,6 +2246,9 @@ class RequireErrorIdentificationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_error_identification',
@@ -2342,6 +2399,9 @@ class RequireMinimumContrastRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_minimum_contrast',
@@ -2518,6 +2578,9 @@ class RequireAvatarAltTextRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_avatar_alt_text',
     '[require_avatar_alt_text] Avatar or profile image is missing a semanticLabel or alt text. Screen readers cannot describe the image, making it inaccessible to users who rely on assistive technology. All meaningful images must have a descriptive label. {v2}',
@@ -2591,6 +2654,9 @@ class RequireBadgeSemanticsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_badge_semantics',
@@ -2670,6 +2736,9 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_badge_count_limit',
@@ -2755,6 +2824,9 @@ class RequireImageDescriptionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_image_description',
     '[require_image_description] Image without semanticLabel is announced '
@@ -2830,6 +2902,9 @@ class AvoidSemanticsExclusionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_semantics_exclusion',
@@ -2908,6 +2983,9 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_merge_semantics',
@@ -3020,6 +3098,9 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_focus_indicator',
     '[require_focus_indicator] GestureDetector or InkWell lacks visible focus indicator. Keyboard and assistive technology users cannot determine which element currently has focus, preventing effective navigation and interaction with your application. {v4}',
@@ -3122,6 +3203,9 @@ class AvoidFlashingContentRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -3264,6 +3348,9 @@ class PreferAdequateSpacingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_adequate_spacing',
     '[prefer_adequate_spacing] Adjacent interactive buttons detected without spacing. Users may accidentally tap the wrong button, especially those with motor impairments or using touch interfaces where precision is limited. {v2}',
@@ -3357,6 +3444,9 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_motion_without_reduce',
     '[avoid_motion_without_reduce] Animation should respect disableAnimations preference. Users with vestibular disorders may have enabled "Reduce Motion" in their accessibility settings. Respect this preference for non-essential animations. {v2}',
@@ -3443,6 +3533,9 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_semantic_label_icons',
@@ -3555,6 +3648,9 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_accessible_images',
@@ -3672,6 +3768,9 @@ class AvoidAutoPlayMediaRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_auto_play_media',
@@ -3816,6 +3915,9 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3993,6 +4095,9 @@ class AvoidTimeLimitsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -4142,6 +4247,9 @@ class RequireDragAlternativesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -4248,6 +4356,9 @@ class PreferFocusTraversalOrderRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4370,6 +4481,9 @@ class PreferSemanticsContainerRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_semantics_container',
     '[prefer_semantics_container] Semantics widget wraps a multi-child layout (Column, Row, Wrap, ListView) without container: true. Screen readers navigate each child individually rather than treating the group as a single logical unit, confusing users who expect related content to be announced together. Set container: true to group related semantic information. {v1}',
@@ -4460,6 +4574,9 @@ class AvoidRedundantSemanticsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_redundant_semantics',
@@ -4568,6 +4685,9 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_color_only_meaning',
@@ -4801,6 +4921,9 @@ class PreferSemanticsSortRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_semantics_sort',
     '[prefer_semantics_sort] Complex layout may need Semantics sortKey for '
@@ -4863,6 +4986,9 @@ class RequireFocusOrderRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_focus_order',
     '[require_focus_order] Consider focusOrder for keyboard and screen reader navigation.',
@@ -4897,6 +5023,9 @@ class RequireHeadingHierarchyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_heading_hierarchy',
     '[require_heading_hierarchy] Use semantic heading levels for screen readers.',
@@ -4929,6 +5058,9 @@ class RequireReducedMotionSupportRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_reduced_motion_support',
@@ -4964,6 +5096,9 @@ class AvoidSemanticsInAnimationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_semantics_in_animation',
     '[avoid_semantics_in_animation] Avoid semantics that change during animation; can confuse screen readers.',
@@ -4997,6 +5132,9 @@ class PreferAnnounceForChangesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_announce_for_changes',
@@ -5032,6 +5170,9 @@ class PreferShowHideRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_show_hide',
     '[prefer_show_hide] Prefer semantics show/hide for conditional content for screen readers.',
@@ -5065,6 +5206,9 @@ class RequireLinkDistinctionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_link_distinction',
@@ -5100,6 +5244,9 @@ class RequireSwitchControlRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_switch_control',
     '[require_switch_control] Support switch control / external input for key actions.',
@@ -5133,6 +5280,9 @@ class PreferExternalKeyboardRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_external_keyboard',

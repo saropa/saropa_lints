@@ -61,6 +61,9 @@ class AvoidSwallowingExceptionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_swallowing_exceptions',
     '[avoid_swallowing_exceptions] Catch block swallows exception without logging, rethrowing, or handling it. Silent failures hide production bugs, break monitoring and alerting systems, and make it impossible to diagnose issues reported by users. Every caught exception must be acknowledged. {v5}',
@@ -189,6 +192,9 @@ class AvoidLosingStackTraceRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_losing_stack_trace',
     '[avoid_losing_stack_trace] Rethrowing without preserving the stack trace loses the original error location and call chain. Production debugging becomes impossible because crash reports show only the rethrow site, not where the error actually originated. Always capture and forward the full stack trace. {v2}',
@@ -277,6 +283,9 @@ class AvoidGenericExceptionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_generic_exceptions',
     '[avoid_generic_exceptions] Generic Exception thrown instead of a specific error type. This prevents callers from distinguishing between different failure modes, forces broad catch-all blocks, and makes error traceability across services impossible. Specific exception types enable targeted recovery and clearer crash reports. {v4}',
@@ -335,6 +344,9 @@ class RequireErrorContextRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_error_context',
@@ -417,6 +429,9 @@ class PreferResultPatternRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_result_pattern',
@@ -509,6 +524,9 @@ class RequireAsyncErrorDocumentationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_async_error_documentation',
@@ -627,6 +645,9 @@ class AvoidNestedTryStatementsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_nested_try_statements',
     '[avoid_nested_try_statements] Nested try statements found. Deeply nested error handling is hard to read and maintain. Nested try-catch blocks make code harder to read and maintain. Extract nested logic into separate functions. {v2}',
@@ -695,6 +716,9 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_error_boundary',
@@ -837,6 +861,9 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_uncaught_future_errors',
@@ -1090,6 +1117,9 @@ class AvoidPrintErrorRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_print_error',
     '[avoid_print_error] Using print() for error logging in a catch block. In production, print() output is not captured by crash reporting services like Crashlytics or Sentry, making errors invisible to monitoring dashboards. Errors logged only via print() are effectively lost and cannot trigger alerts or be tracked over time. {v2}',
@@ -1242,6 +1272,9 @@ class RequireErrorHandlingGracefulRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_error_handling_graceful',
@@ -1454,6 +1487,9 @@ class AvoidCatchAllRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_catch_all',
     '[avoid_catch_all] Bare catch clause without an on-type hides the specific error type being caught and silently swallows critical failures like OutOfMemoryError and StackOverflowError. This can mask fatal programming bugs, making them impossible to detect in crash reports or monitoring systems. {v3}',
@@ -1580,6 +1616,9 @@ class AvoidCatchExceptionAloneRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         ChangeExceptionToObjectFix(context: context),
@@ -1694,6 +1733,9 @@ class AvoidExceptionInConstructorRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_exception_in_constructor',
     '[avoid_exception_in_constructor] Throwing in a constructor creates a partially constructed object that can leak resources and leave dependent fields uninitialized. Callers cannot easily recover because the constructor has already failed midway through initialization. {v3}',
@@ -1766,6 +1808,9 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_cache_key_determinism',
@@ -2076,6 +2121,9 @@ class RequirePermissionPermanentDenialHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_permission_permanent_denial_handling',
     '[require_permission_permanent_denial_handling] Permission request does not handle permanent denial. Users who permanently deny a permission are stuck with no way to re-enable it from within the app, causing frustration and feature abandonment. {v3}',
@@ -2168,6 +2216,9 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_notification_action_handling',
     '[require_notification_action_handling] Notification with action buttons lacks an onDidReceiveNotificationResponse handler. Users who tap notification action buttons will see no response, breaking the expected interaction flow and frustrating users who may abandon the feature or uninstall the app entirely. {v2}',
@@ -2253,6 +2304,9 @@ class RequireFinallyCleanupRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_finally_cleanup',
@@ -2351,6 +2405,9 @@ class RequireErrorLoggingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_error_logging',
@@ -2532,6 +2589,9 @@ class RequireAppStartupErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   bool get requiresMainFunction => true;
 
   static const LintCode _code = LintCode(
@@ -2654,6 +2714,9 @@ class AvoidAssertInProductionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_assert_in_production',
     '[avoid_assert_in_production] assert() is compiled out of release builds by the Dart compiler. Any validation, input checking, or security enforcement using assert() will silently stop running in production, allowing invalid data, unauthorized access, or corrupted state to pass through unchecked. {v2}',
@@ -2745,6 +2808,9 @@ class HandleThrowingInvocationsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'handle_throwing_invocations',
@@ -2864,6 +2930,9 @@ class RequireErrorContextInLogsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_error_context_in_logs',
     '[require_error_context_in_logs] Error logged without context. Include user/request id for debugging.',
@@ -2898,6 +2967,9 @@ class RequireErrorMessageClarityRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_error_message_clarity',
@@ -2934,6 +3006,9 @@ class RequireErrorRecoveryRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_error_recovery',
     '[require_error_recovery] Provide a recovery path when errors occur (retry, fallback).',
@@ -2966,6 +3041,9 @@ class PreferZoneErrorHandlerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_zone_error_handler',

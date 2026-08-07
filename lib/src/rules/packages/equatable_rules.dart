@@ -86,6 +86,9 @@ class ExtendEquatableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   /// Alias: extend_equatable
   static const LintCode _code = LintCode(
     'require_extend_equatable',
@@ -196,6 +199,9 @@ class ListAllEquatableFieldsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'list_all_equatable_fields',
@@ -335,6 +341,9 @@ class PreferEquatableMixinRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   /// Alias: prefer_equatable_mixin_pattern
   static const LintCode _code = LintCode(
     'prefer_equatable_mixin',
@@ -429,6 +438,9 @@ class PreferEquatableStringifyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_equatable_stringify',
     '[prefer_equatable_stringify] Equatable class does not override stringify to true. Overriding stringify to true provides better debugging output by including field values in toString() instead of just the class name. {v2}',
@@ -514,6 +526,9 @@ class PreferImmutableAnnotationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_immutable_annotation',
     '[prefer_immutable_annotation] Equatable class is not annotated with @immutable. Equatable classes must be immutable to ensure correct equality behavior. The @immutable annotation documents this intent and enables additional static analysis. {v2}',
@@ -593,6 +608,9 @@ class PreferRecordOverEquatableRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -731,6 +749,9 @@ class AvoidMutableFieldInEquatableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_mutable_field_in_equatable',
     '[avoid_mutable_field_in_equatable] Equatable classes should only have final fields. Mutable fields break value equality, causing bugs in collections, state management, and UI updates. Changing a field after object creation makes == and hashCode unreliable. {v4}',
@@ -815,6 +836,9 @@ class RequireEquatableCopyWithRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_equatable_copy_with',
     '[require_equatable_copy_with] Equatable class lacks copyWith method. Without copyWith, creating modified copies requires manually constructing new instances with all fields, leading to verbose code and errors when fields are added or removed from the class. {v2}',
@@ -891,6 +915,9 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_copy_with_null_handling',
@@ -1001,6 +1028,9 @@ class RequireDeepEqualityCollectionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_deep_equality_collections',
     '[require_deep_equality_collections] Collections (List, Map, Set) in Equatable props are compared by reference, not by contents. This causes false negatives in equality checks, leading to subtle bugs, missed UI updates, broken state management, and wasted rebuilds. In production, this can result in persistent UI glitches, incorrect state restoration, and hard-to-diagnose logic errors. Collections with identical contents but different references will not compare as equal, undermining the reliability of Equatable-based state classes. {v3}',
@@ -1109,6 +1139,9 @@ class AvoidEquatableDatetimeRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_equatable_datetime',
     '[avoid_equatable_datetime] DateTime in Equatable props may cause flaky equality checks. DateTime comparisons can fail due to microsecond differences. Compare truncated or formatted values instead. {v2}',
@@ -1215,6 +1248,9 @@ class PreferUnmodifiableCollectionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_unmodifiable_collections',
@@ -1333,6 +1369,9 @@ class RequireEquatablePropsOverrideRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_equatable_props_override',
     '[require_equatable_props_override] Without props override, equality '
@@ -1411,6 +1450,9 @@ class AvoidEquatableNestedEqualityRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'Equatable'};

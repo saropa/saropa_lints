@@ -132,6 +132,9 @@ class LottieControllerMissingOnLoadedRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'lottie_controller_missing_on_loaded',
     '[lottie_controller_missing_on_loaded] A Lottie factory call supplies controller: but no onLoaded: callback. The lottie package delegates all tick-driving to the provided AnimationController, whose duration defaults to Duration.zero. Without onLoaded: the composition duration is never read from the decoded JSON, so the animation is stuck at frame 0. The official full-control example always pairs controller: with onLoaded: (composition) { controller.duration = composition.duration; }. This produces a frozen widget with no runtime error. {v1}',
@@ -207,6 +210,9 @@ class LottieNetworkMissingErrorBuilderRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'lottie_network_missing_error_builder',
     '[lottie_network_missing_error_builder] Lottie.network(...) is called without an errorBuilder: argument. The URL may be unreachable, return a non-200 status, or deliver malformed JSON; without errorBuilder the widget silently renders nothing — a blank space — leaving users with no feedback and developers with no diagnostic path. errorBuilder is the same ImageErrorWidgetBuilder typedef as Image.errorBuilder, providing access to the exception and stack trace. The .asset/.file/.memory variants load from deterministic local sources and are intentionally excluded from this rule. {v1}',
@@ -275,6 +281,9 @@ class LottieFrameRateMaxWithoutRenderCacheRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'lottie_frame_rate_max_without_render_cache',
@@ -355,6 +364,9 @@ class LottieRenderCacheRasterLargeRiskRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'lottie_render_cache_raster_large_risk',
     '[lottie_render_cache_raster_large_risk] A Lottie factory call uses renderCache: RenderCache.raster. The official package documentation explicitly warns this value should only be used for very short and very small animations. Memory consumption scales as rendered_width * rendered_height * frame_count, with a 50 MB default cap; a full-screen 60 FPS animation for 3 seconds at 390x844 px requires approximately 280 MB before eviction kicks in, defeating the cache. Suppress with a one-line justification comment if the animation is genuinely tiny and short. {v1}',
@@ -434,6 +446,9 @@ class LottieNetworkMissingBackgroundLoadingRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'lottie_network_missing_background_loading',

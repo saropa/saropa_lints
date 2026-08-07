@@ -201,6 +201,9 @@ class DuplicateConstructorRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'duplicate_constructor_declarations',
     '[duplicate_constructor_declarations] Class or enum declares more than one constructor with the same name (including more than one unnamed constructor). Duplicate constructors are invalid Dart and prevent compilation. {v1}',
@@ -280,6 +283,9 @@ class ConflictingConstructorAndStaticMemberRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'conflicting_constructor_and_static_member',
@@ -371,6 +377,9 @@ class FieldInitializerRedirectingConstructorRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'field_initializer_redirecting_constructor',
     '[field_initializer_redirecting_constructor] A redirecting constructor cannot initialize instance fields or invoke a super constructor; it may only forward to another constructor of the same class. {v1}',
@@ -426,6 +435,9 @@ class InvalidSuperFormalParameterLocationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'invalid_super_formal_parameter_location',
     '[invalid_super_formal_parameter_location] Super parameters (super.x) are only allowed on non-redirecting generative constructors. They cannot be used on factory constructors or constructors that redirect. {v1}',
@@ -467,6 +479,9 @@ class IllegalConcreteEnumMemberRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'illegal_concrete_enum_member',
@@ -523,6 +538,9 @@ class InvalidLiteralAnnotationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'invalid_literal_annotation',
     '[invalid_literal_annotation] The package:meta `literal` annotation is only meaningful on const constructors. Applying it elsewhere is invalid. {v1}',
@@ -568,6 +586,9 @@ class InvalidNonVirtualAnnotationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'invalid_non_virtual_annotation',
@@ -660,6 +681,9 @@ class AbstractFieldInitializerRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'abstract_field_initializer',
     '[abstract_field_initializer] Abstract fields cannot have initializers. Remove the initializer or drop the abstract modifier so the declaration matches valid Dart semantics. {v1}',
@@ -717,6 +741,9 @@ class UndefinedEnumConstructorRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'undefined_enum_constructor',

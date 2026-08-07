@@ -54,6 +54,9 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_watch_in_callbacks',
     '[avoid_watch_in_callbacks] Using watch in callbacks (like onPressed or onTap) creates new subscriptions on every call, leading to memory leaks, redundant widget rebuilds, and degraded app performance. This can cause your app to slow down or even crash over time. {v4}',
@@ -124,6 +127,9 @@ class RequireUpdateShouldNotifyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   /// Alias: require_update_should_notify_context
   static const LintCode _code = LintCode(
@@ -217,6 +223,9 @@ class AvoidProviderOfInBuildRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -331,6 +340,9 @@ class AvoidProviderRecreateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
@@ -437,6 +449,9 @@ class AvoidProviderInWidgetRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -548,6 +563,9 @@ class AvoidChangeNotifierInWidgetRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -653,6 +671,9 @@ class RequireProviderDisposeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -752,6 +773,9 @@ class RequireMultiProviderRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -856,6 +880,9 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -992,6 +1019,9 @@ class PreferMultiProviderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
@@ -1087,6 +1117,9 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
@@ -1174,6 +1207,9 @@ class DisposeProvidersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
@@ -1254,6 +1290,9 @@ class PreferProviderExtensionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
@@ -1326,6 +1365,9 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1434,6 +1476,9 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   /// Alias: prefer_nullable_provider_types_pattern
@@ -1539,6 +1584,9 @@ class PreferConsumerOverProviderOfRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
@@ -1606,6 +1654,9 @@ class RequireProviderGenericTypeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -1679,6 +1730,9 @@ class AvoidProviderInInitStateRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1778,6 +1832,9 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_context_read_in_callbacks',
@@ -1879,6 +1936,9 @@ class PreferProxyProviderRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -2012,6 +2072,9 @@ class RequireUpdateCallbackRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_update_callback',
@@ -2161,6 +2224,9 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static final RegExp _selectCallRegex = RegExp(r'\.select\s*\(');
@@ -2264,6 +2330,9 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
   static const LintCode _code = LintCode(
@@ -2349,6 +2418,9 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_change_notifier_proxy',
@@ -2493,6 +2565,9 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   /// Alias: prefer_selector_widget_pattern
@@ -2602,6 +2677,9 @@ class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_change_notifier_proxy_provider',
     '[prefer_change_notifier_proxy_provider] ChangeNotifierProvider.create '
@@ -2686,6 +2764,9 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         RemoveListenFalseFix(context: context),
@@ -2756,6 +2837,9 @@ class RequireProviderUpdateShouldNotifyRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_provider_update_should_notify',

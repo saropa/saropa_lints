@@ -120,6 +120,9 @@ class InAppReviewMissingAvailabilityCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'requestReview'};
 
   static const LintCode _code = LintCode(
@@ -201,6 +204,9 @@ class InAppReviewButtonCallbackRequestRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'requestReview'};
 
   static const LintCode _code = LintCode(
@@ -271,6 +277,9 @@ class InAppReviewRequestInInitStateRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'requestReview'};
@@ -348,6 +357,9 @@ class InAppReviewMissingStoreListingFallbackRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'requestReview'};
@@ -431,6 +443,9 @@ class InAppReviewIosStoreListingMissingAppIdRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'openStoreListing'};

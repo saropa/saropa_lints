@@ -52,6 +52,9 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_large_objects_in_state',
     '[avoid_large_objects_in_state] Unbounded List, Map, Set, or ByteData field declared in a State class grows without limit as data accumulates. Without pagination or size constraints, this allocates excessive memory that degrades scroll performance, increases garbage collection pressure, and eventually crashes the app with an out-of-memory error on devices with limited RAM. {v4}',
@@ -150,6 +153,9 @@ class RequireImageDisposalRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_image_disposal',
@@ -301,6 +307,9 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_capturing_this_in_callbacks',
     '[avoid_capturing_this_in_callbacks] Closure callback captures a reference to the entire enclosing object instance via implicit this. This prevents garbage collection of the object and all its fields for as long as the callback exists. Long-lived callbacks such as stream listeners, timers, or global event handlers create memory leaks that accumulate over the app session lifetime. {v4}',
@@ -400,6 +409,9 @@ class RequireCacheEvictionPolicyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_cache_eviction_policy',
     '[require_cache_eviction_policy] Unbounded cache consumes memory until '
@@ -483,6 +495,9 @@ class PreferWeakReferencesForCacheRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_weak_references_for_cache',
     '[prefer_weak_references_for_cache] Strong cache references prevent garbage collection under memory pressure. Strong references to large objects prevent garbage collection. Use WeakReference for caches that should yield to memory pressure. {v5}',
@@ -565,6 +580,9 @@ class AvoidExpandoCircularReferencesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_expando_circular_references',
@@ -669,6 +687,9 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_large_isolate_communication',
@@ -846,6 +867,9 @@ class RequireCacheExpirationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_cache_expiration',
     '[require_cache_expiration] Cache implementation lacks expiration logic. Caches without TTL serve stale data indefinitely. Implement expiration to ensure data freshness. Unreleased memory grows over time, increasing garbage collection pressure and risking out-of-memory crashes. {v3}',
@@ -961,6 +985,9 @@ class AvoidUnboundedCacheGrowthRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   /// Pattern to detect mutation method signatures.
   static final RegExp _mutationMethodPattern = RegExp(
@@ -1167,6 +1194,9 @@ class RequireCacheKeyUniquenessRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_cache_key_uniqueness',
     '[require_cache_key_uniqueness] Cache key type may have unstable hashCode. Cache keys must be deterministic. Using objects without stable hashCode/equality as cache keys causes missed cache hits. {v2}',
@@ -1278,6 +1308,9 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_retaining_disposed_widgets',
@@ -1404,6 +1437,9 @@ class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresWidgets => true;
@@ -1556,6 +1592,9 @@ class RequireExpandoCleanupRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_expando_cleanup',
     '[require_expando_cleanup] Expando field has entries added but no cleanup (expando[key] = null). Remove entries when done to avoid unbounded growth.',
@@ -1611,6 +1650,9 @@ class PreferLruCacheRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_lru_cache',
     '[prefer_lru_cache] Map used with put() without eviction. '
@@ -1656,6 +1698,9 @@ class PreferWeakReferencesRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_weak_references',

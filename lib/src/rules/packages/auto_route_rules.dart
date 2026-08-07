@@ -53,6 +53,9 @@ class AvoidAutoRouteContextNavigationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'auto_route'};
 
   static const LintCode _code = LintCode(
@@ -159,6 +162,9 @@ class AvoidAutoRouteKeepHistoryMisuseRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'auto_route'};
@@ -310,6 +316,9 @@ class RequireAutoRouteGuardResumeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'auto_route'};
 
   static const LintCode _code = LintCode(
@@ -394,6 +403,9 @@ class RequireAutoRouteFullHierarchyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'auto_route'};
 
   static const LintCode _code = LintCode(
@@ -467,6 +479,9 @@ class PreferAutoRoutePathParamsSimpleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'auto_route'};
 
   static const LintCode _code = LintCode(
@@ -535,6 +550,9 @@ class PreferAutoRouteTypedArgsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'auto_route'};
 
   static const LintCode _code = LintCode(
@@ -592,6 +610,9 @@ class RequireAutoRouteDeepLinkConfigRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'auto_route'};

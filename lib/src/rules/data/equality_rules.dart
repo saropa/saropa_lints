@@ -53,6 +53,9 @@ class AvoidEqualExpressionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_equal_expressions',
     '[avoid_equal_expressions] Both sides of a comparison or logical binary expression are identical, meaning the result is always constant (true for ==, false for >, <) or redundant (for && and ||). This is almost always a copy-paste bug where the developer intended to compare two different values, and the redundant comparison masks the real logic error in the code. Arithmetic operators (N * N, N + N, ...) are excluded because identical operands there form a legitimate value. {v6}',
@@ -136,6 +139,9 @@ class AvoidNegationsInEqualityChecksRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_negations_in_equality_checks',
     '[avoid_negations_in_equality_checks] Equality check is wrapped in a negation operator !(a == b) instead of using the direct != operator. The negated form adds unnecessary cognitive overhead, increases nesting depth, and is harder to scan during code review. The != operator expresses the same intent more clearly and concisely. {v4}',
@@ -202,6 +208,9 @@ class AvoidSelfAssignmentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_self_assignment',
     '[avoid_self_assignment] Variable is assigned to itself (x = x), which has no effect and indicates a copy-paste error or incomplete refactor. The assignment executes at runtime but produces no state change, wasting CPU cycles and obscuring the developer\'s actual intent. This dead code makes maintenance harder because readers must determine whether the assignment was intentional. {v5}',
@@ -266,6 +275,9 @@ class AvoidSelfCompareRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_self_compare',
     '[avoid_self_compare] Variable is compared to itself (x == x, x > x, etc.), which always produces a constant result (true for ==, false for inequality operators) unless the value is NaN. This is almost always a copy-paste bug where the developer intended to compare two distinct values, and the redundant comparison hides the real logic error in the code. {v4}',
@@ -326,6 +338,9 @@ class AvoidUnnecessaryCompareToRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_compare_to',
@@ -405,6 +420,9 @@ class NoEqualArgumentsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'no_equal_arguments',
@@ -563,6 +581,9 @@ class AvoidDatetimeComparisonWithoutPrecisionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [

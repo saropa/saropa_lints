@@ -18,6 +18,8 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_snapshot.dart'
     show crossFileSnapshotFormatVersion;
+import 'package:saropa_lints/src/report/import_graph_tracker.dart'
+    show ImportGraphTracker;
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
 part 'project_context_path_bloom_git.dart';

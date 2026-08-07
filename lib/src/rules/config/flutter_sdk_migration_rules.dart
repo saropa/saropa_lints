@@ -81,6 +81,9 @@ class PreferIterableCastRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'castFrom'};
 
   static const LintCode _code = LintCode(
@@ -235,6 +238,9 @@ class AvoidDeprecatedUseInheritedMediaQueryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   bool get requiresFlutterImport => true;
 
   @override
@@ -364,6 +370,9 @@ class PreferUtf8EncodeRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'Utf8Encoder'};
@@ -504,6 +513,9 @@ class AvoidRemovedAppbarBackwardsCompatibilityRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -651,6 +663,9 @@ class PreferTypeSyncOverIsLinkSyncRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'isLinkSync'};
 
   static const LintCode _code = LintCode(
@@ -792,6 +807,9 @@ class AvoidRemovedJsNumberToDartRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{'toDart'};
 
   static const LintCode _code = LintCode(
@@ -871,6 +889,9 @@ class PreferScrollbarThemeOfRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   bool get requiresFlutterImport => true;
@@ -1017,6 +1038,9 @@ class AvoidLegacyJsBooleanReturnAssumptionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   Set<String>? get requiredPatterns => const <String>{
     'typeofEquals',
     'instanceof',
@@ -1093,6 +1117,9 @@ class PreferStringForTypeofEqualsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'typeofEquals'};
@@ -1174,6 +1201,9 @@ class PreferIntForJsarrayWithLengthRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<String>? get requiredPatterns => const <String>{'withLength'};

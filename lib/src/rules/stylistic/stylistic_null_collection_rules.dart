@@ -64,6 +64,9 @@ class PreferNullAwareAssignmentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => "if (name == null) name = 'default';";
 
   @override
@@ -161,6 +164,9 @@ class PreferExplicitNullAssignmentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => "name ??= 'default';";
 
   @override
@@ -228,6 +234,9 @@ class PreferIfNullOverTernaryRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => "x != null ? x : 'default'";
@@ -341,6 +350,9 @@ class PreferTernaryOverIfNullRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => "x ?? 'default'";
 
   @override
@@ -418,6 +430,9 @@ class PreferLateOverNullableRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'String? name; // always set in initState';
@@ -511,6 +526,9 @@ class PreferNullableOverLateRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'late String _name;';
@@ -621,6 +639,9 @@ class PreferSpreadOverAddAllRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'list.addAll([3, 4]);';
 
   @override
@@ -713,6 +734,9 @@ class PreferAddAllOverSpreadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'final all = [...list1, ...list2];';
 
   @override
@@ -785,6 +809,9 @@ class PreferCollectionIfOverTernaryRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => '...(show ? [widget] : [])';
@@ -874,6 +901,9 @@ class PreferTernaryOverCollectionIfRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'if (show) widget';
 
   @override
@@ -939,6 +969,9 @@ class PreferWhereTypeOverWhereIsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'list.where((e) => e is String)';
@@ -1035,6 +1068,9 @@ class PreferMapEntriesIterationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -1138,6 +1174,9 @@ class PreferKeysIterationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  bool get usesTypeResolution => true;
+
+  @override
   String get exampleBad => 'for (final e in map.entries) { ... }';
 
   @override
@@ -1209,6 +1248,9 @@ class PreferMutableCollectionsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
