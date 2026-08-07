@@ -1165,24 +1165,33 @@ class MemoryPressureHandler {
 
   /// Clear caches to relieve memory pressure.
   ///
-  /// If [clearAll] is false, only clears low-priority caches.
-  /// If [clearAll] is true, clears everything.
+  /// If [clearAll] is false, only clears caches with priority >= 50 (large
+  /// per-file caches that hold the most memory). Caches with priority < 50
+  /// (small stats, expensive-to-rebuild registries) are spared.
+  /// If [clearAll] is true, clears everything (hard RSS valve trip).
   static void relieve({bool clearAll = false}) {
     _relieveCount++;
-    // Fix: prefer_utc_for_storage — lastRelieve is serialized to JSON in
-    // getStatus() for cross-process inspection; UTC avoids timezone drift.
     _lastRelieve = DateTime.now().toUtc();
 
-    // Sort by priority (low priority = clear first)
     final sorted = _caches.values.toList()
       ..sort((a, b) => a.priority.compareTo(b.priority));
 
-    // Clear caches by priority
+    final cleared = <String>[];
     for (final cache in sorted) {
       if (clearAll || cache.priority >= 50) {
         cache.clear();
+        cleared.add(cache.name);
       }
     }
+
+    final estimateAfter = _estimateMemoryUsageMb();
+    final rss = _currentRssMb();
+    stderr.writeln(
+      '[saropa_lints] Memory relief: cleared ${cleared.length}/'
+      '${_caches.length} caches (${cleared.join(', ')}). '
+      'Estimated plugin usage: ${estimateAfter}MB. '
+      '${rss > 0 ? 'Process RSS: ${rss}MB.' : 'RSS unavailable.'}',
+    );
   }
 
   /// Force clear all registered caches.
@@ -1194,47 +1203,64 @@ class MemoryPressureHandler {
 
   /// Estimate current memory usage from known cache sizes.
   static int _estimateMemoryUsageMb() {
-    // Rough estimation based on typical cache entry sizes
     var estimatedBytes = 0;
 
-    // File content cache: ~1KB per file (hash + rules set)
-    estimatedBytes += FileContentCache._contentHashes.length * 1024;
+    // FileContentCache: hash map + _passedRules (Set<String> per file).
+    // Each set entry is ~48 bytes (hash bucket + string ref). The old
+    // estimate of 1KB/file massively understated this — with 790 rules
+    // passing on each of 3,900 files, the real cost is ~150 MB.
+    estimatedBytes += FileContentCache._contentHashes.length * 64;
+    for (final ruleSet in FileContentCache._passedRules.values) {
+      estimatedBytes += ruleSet.length * 48;
+    }
 
-    // Metrics cache: ~200 bytes per entry
     estimatedBytes += FileMetricsCache._cache.length * 200;
-
-    // Source location cache: ~1KB per file (line starts array)
     estimatedBytes += SourceLocationCache._lineStarts.length * 1024;
 
-    // Semantic token cache: ~500 bytes per symbol
     for (final symbols in SemanticTokenCache._symbols.values) {
       estimatedBytes += symbols.length * 500;
     }
 
-    // Compilation unit cache: ~2KB per file
     estimatedBytes += CompilationUnitCache._cache.length * 2048;
-
-    // Import graph: ~500 bytes per node
     estimatedBytes += ImportGraphCache._graph.length * 500;
 
-    // String intern pool: actual string sizes
     for (final s in StringInterner._pool.keys) {
-      estimatedBytes += s.length * 2; // UTF-16
+      estimatedBytes += s.length * 2;
     }
 
-    const bytesPerMb = 1 << 20; // 1024 * 1024
+    // DiffBasedAnalysis._previousContent: full source text per file.
+    for (final content in DiffBasedAnalysis._previousContent.values) {
+      estimatedBytes += content.length * 2;
+    }
+
+    // IncrementalAnalysisTracker: per-file state objects.
+    estimatedBytes += IncrementalAnalysisTracker._state.length * 256;
+
+    // ParallelAnalyzer: cached analysis results per file.
+    estimatedBytes += ParallelAnalyzer._resultCache.length * 512;
+
+    // HotPathProfiler: duration lists per rule.
+    for (final durations in HotPathProfiler._measurements.values) {
+      estimatedBytes += durations.length * 16;
+    }
+
+    const bytesPerMb = 1 << 20;
     return estimatedBytes ~/ bytesPerMb;
   }
 
-  /// Get statistics.
+  /// Get statistics including process RSS and cache breakdown.
   static Map<String, dynamic> getStats() {
+    final rss = _currentRssMb();
     return {
       'registeredCaches': _caches.length,
       'autoReliefEnabled': _autoReliefEnabled,
       'thresholdMb': _thresholdMb,
       'estimatedUsageMb': _estimateMemoryUsageMb(),
+      'processRssMb': rss > 0 ? rss : null,
+      'rssAvailable': rss > 0,
+      'hardLimitMb': _hardLimitMb,
+      'hardLimitTripped': _hardLimitTripped,
       'relieveCount': _relieveCount,
-      // Fix: prefer_utc_for_storage — explicit .toUtc() at serialization.
       'lastRelieve': _lastRelieve?.toUtc().toIso8601String(),
     };
   }
@@ -1317,6 +1343,95 @@ void initializeCacheManagement({
     priority: 90, // Very expensive - clear last
   );
 
+  // --- Caches NOT previously registered (unbounded per-file growth) ---
+  //
+  // Priority semantics (pre-existing — see relieve()):
+  //   >= 50: cleared on SOFT relief (memory estimate exceeds threshold)
+  //   <  50: cleared only on HARD relief (RSS valve trips at 6 GB)
+  // Assign >= 50 to large per-file caches; < 50 to small stats or
+  // expensive-to-rebuild registries.
+
+  // Large per-file caches — clear on soft relief (>= 50).
+  MemoryPressureHandler.registerCache(
+    'diffBasedAnalysis',
+    DiffBasedAnalysis.clearCache,
+    priority: 65, // Stores full source text per file
+  );
+  MemoryPressureHandler.registerCache(
+    'incrementalAnalysisTracker',
+    IncrementalAnalysisTracker.clearCache,
+    priority: 55,
+  );
+  MemoryPressureHandler.registerCache(
+    'parallelAnalyzer',
+    ParallelAnalyzer.clearCache,
+    priority: 55,
+  );
+  MemoryPressureHandler.registerCache(
+    'baselineAwareEarlyExit',
+    BaselineAwareEarlyExit.clearCache,
+    priority: 50,
+  );
+
+  // Small stats / cheap caches — hard relief only (< 50).
+  MemoryPressureHandler.registerCache(
+    'throttledAnalysis',
+    ThrottledAnalysis.clearAll,
+    priority: 35,
+  );
+  MemoryPressureHandler.registerCache(
+    'speculativeAnalysis',
+    SpeculativeAnalysis.clearAll,
+    priority: 35,
+  );
+  MemoryPressureHandler.registerCache(
+    'hotPathProfiler',
+    HotPathProfiler.clear,
+    priority: 30,
+  );
+  MemoryPressureHandler.registerCache(
+    'ruleExecutionStats',
+    RuleExecutionStats.clearStats,
+    priority: 25,
+  );
+  MemoryPressureHandler.registerCache(
+    'violationBatch',
+    ViolationBatch.clear,
+    priority: 20,
+  );
+  MemoryPressureHandler.registerCache(
+    'gitAwarePriority',
+    GitAwarePriority.clear,
+    priority: 30,
+  );
+  MemoryPressureHandler.registerCache(
+    'rulePriorityQueue',
+    RulePriorityQueue.clear,
+    priority: 25,
+  );
+  MemoryPressureHandler.registerCache(
+    'ruleBatchExecutor',
+    RuleBatchExecutor.clear,
+    priority: 30,
+  );
+  MemoryPressureHandler.registerCache(
+    'ruleGroupExecutor',
+    RuleGroupExecutor.clear,
+    priority: 30,
+  );
+
+  // Expensive to rebuild — hard relief only (< 50).
+  MemoryPressureHandler.registerCache(
+    'consolidatedVisitorDispatch',
+    ConsolidatedVisitorDispatch.clear,
+    priority: 15,
+  );
+  MemoryPressureHandler.registerCache(
+    'ruleDependencyGraph',
+    RuleDependencyGraph.clear,
+    priority: 15,
+  );
+
   // Enable automatic relief
   MemoryPressureHandler.enableAutoRelief(
     thresholdMb: memoryThresholdMb,
@@ -1331,5 +1446,24 @@ void initializeCacheManagement({
   // plugin release.
   final envCap = Platform.environment['SAROPA_LINTS_MAX_RSS_MB'];
   final parsedCap = envCap == null ? null : int.tryParse(envCap.trim());
-  MemoryPressureHandler.setHardRssLimitMb(parsedCap ?? hardRssLimitMb);
+  final effectiveCap = parsedCap ?? hardRssLimitMb;
+  MemoryPressureHandler.setHardRssLimitMb(effectiveCap);
+
+  // Diagnostic: verify ProcessInfo.currentRss works on this platform.
+  final startupRss = MemoryPressureHandler._currentRssMb();
+  if (startupRss > 0) {
+    stderr.writeln(
+      '[saropa_lints] Memory management armed: '
+      '${MemoryPressureHandler._caches.length} caches registered, '
+      'soft relief at ${memoryThresholdMb}MB estimated, '
+      'hard RSS cap at ${effectiveCap}MB. '
+      'Current RSS: ${startupRss}MB.',
+    );
+  } else {
+    stderr.writeln(
+      '[saropa_lints] WARNING: ProcessInfo.currentRss unavailable on this '
+      'platform — hard RSS safety valve is INERT. Only heuristic cache-size '
+      'relief is active (threshold: ${memoryThresholdMb}MB).',
+    );
+  }
 }

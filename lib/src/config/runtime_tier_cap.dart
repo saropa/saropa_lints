@@ -161,6 +161,11 @@ abstract final class RuntimeTierCap {
   /// Human-readable label for reports (e.g. `recommended`, or null).
   static String? get activeCapLabel => _capLabel;
 
+  /// Clear the cached tier-allowed decisions (for memory pressure relief).
+  static void clearCache() {
+    _allowedCache.clear();
+  }
+
   static void _reload(
     String? projectRoot, [
     Map<String, String>? environmentOverride,

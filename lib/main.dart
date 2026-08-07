@@ -19,6 +19,7 @@ import 'package:analysis_server_plugin/plugin.dart';
 import 'package:analysis_server_plugin/registry.dart';
 
 import 'saropa_lints.dart';
+import 'src/config/runtime_tier_cap.dart' show RuntimeTierCap;
 import 'src/native/plugin_logger.dart' show PluginLogger;
 import 'src/report/import_graph_tracker.dart' show ImportGraphTracker;
 
@@ -118,6 +119,35 @@ class SaropaLintsPlugin extends Plugin {
         'importGraphTracker',
         ImportGraphTracker.reset,
         priority: 85,
+      );
+
+      // Register saropa_lint_rule.dart caches (separate library, not
+      // reachable from initializeCacheManagement's project_context library).
+      //
+      // NOTE: ProgressTracker, ImpactTracker, ReportWriter, and
+      // SuppressionTracker are NOT registered — they are forward-accumulating
+      // session counters (issue counts, severity totals, suppression records),
+      // not recomputable caches. Clearing them mid-session silently truncates
+      // the analysis summary.
+      //
+      // NOTE: BaselineManager is NOT registered — its reset() nulls _config,
+      // permanently disabling baseline suppression with no lazy re-init path.
+      MemoryPressureHandler.registerCache(
+        'ruleTimingTracker',
+        RuleTimingTracker.reset,
+        priority: 55,
+      );
+
+      // Baseline date cache and config caches are recomputable.
+      MemoryPressureHandler.registerCache(
+        'baselineDate',
+        BaselineDate.clearCache,
+        priority: 55,
+      );
+      MemoryPressureHandler.registerCache(
+        'runtimeTierCap',
+        RuntimeTierCap.clearCache,
+        priority: 60,
       );
     } on Object catch (e, st) {
       PluginLogger.error(
