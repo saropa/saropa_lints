@@ -166,7 +166,11 @@ bool get _supportsColor {
     final term = Platform.environment['TERM'];
     final wtSession = Platform.environment['WT_SESSION'];
     final conEmu = Platform.environment['ConEmuANSI'];
-    return wtSession != null || conEmu == 'ON' || term == 'xterm';
+    final termProgram = Platform.environment['TERM_PROGRAM'];
+    return wtSession != null ||
+        conEmu == 'ON' ||
+        term == 'xterm' ||
+        termProgram != null;
   }
 
   return true;

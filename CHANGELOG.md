@@ -64,6 +64,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- System health monitor in the VS Code extension: polls Dart/Flutter process memory and orphaned daemon count every 60 seconds (Windows). Status bar shows a warning or critical suffix when memory exceeds configurable thresholds or orphaned daemons accumulate. One-click "Kill Orphaned Flutter Daemons" command cleans up orphans with user permission. All thresholds configurable via extension settings under "System Health".
+
+---
+
 ## [14.5.0]
 
 [log](https://github.com/saropa/saropa_lints/blob/v14.5.0/CHANGELOG.md)
@@ -72,6 +80,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - Register 25+ internal caches for eviction under memory pressure — previously only 10 of ~70 were managed, causing unbounded memory growth on large projects (7.8 GB observed on a 3,900-file codebase). No action required.
 - Fix memory estimator to measure actual per-file cache sizes instead of flat approximations that understated real usage by ~25×. No action required.
+- Cap the per-file passed-rules cache with LRU eviction (default 500 files) — the single largest memory consumer at O(files × rules), previously unbounded. No action required.
+- Fix VS Code integrated terminal color detection on Windows — ANSI escape sequences now render correctly when `TERM_PROGRAM` is set. No action required.
 
 <details>
 <summary>Maintenance</summary>

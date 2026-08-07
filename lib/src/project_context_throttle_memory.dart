@@ -1205,10 +1205,8 @@ class MemoryPressureHandler {
   static int _estimateMemoryUsageMb() {
     var estimatedBytes = 0;
 
-    // FileContentCache: hash map + _passedRules (Set<String> per file).
-    // Each set entry is ~48 bytes (hash bucket + string ref). The old
-    // estimate of 1KB/file massively understated this — with 790 rules
-    // passing on each of 3,900 files, the real cost is ~150 MB.
+    // FileContentCache: hash map + _passedRules (LRU-capped Set<String> per
+    // file). Each set entry is ~48 bytes (hash bucket + string ref).
     estimatedBytes += FileContentCache._contentHashes.length * 64;
     for (final ruleSet in FileContentCache._passedRules.values) {
       estimatedBytes += ruleSet.length * 48;
@@ -1290,6 +1288,9 @@ void initializeCacheManagement({
   int memoryThresholdMb = 512,
   int hardRssLimitMb = 6144,
 }) {
+  // Cap the LRU on FileContentCache._passedRules — the single largest cache.
+  FileContentCache.setMaxPassedRulesFiles(maxFileContentCache);
+
   // Register caches with priorities (lower = clear first when under pressure)
   // Content caches are expensive to rebuild, so clear last
   MemoryPressureHandler.registerCache(
@@ -1352,10 +1353,13 @@ void initializeCacheManagement({
   // expensive-to-rebuild registries.
 
   // Large per-file caches — clear on soft relief (>= 50).
+  // Clearing _previousContent forces one full re-analysis pass (all lines
+  // treated as changed), but that's a linear-time cost vs the OOM that
+  // prompted the eviction. The cache repopulates on the very next pass.
   MemoryPressureHandler.registerCache(
     'diffBasedAnalysis',
     DiffBasedAnalysis.clearCache,
-    priority: 65, // Stores full source text per file
+    priority: 65,
   );
   MemoryPressureHandler.registerCache(
     'incrementalAnalysisTracker',

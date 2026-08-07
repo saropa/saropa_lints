@@ -544,8 +544,27 @@ class FileContentCache {
   // Map of file path -> content hash
   static final Map<String, int> _contentHashes = {};
 
-  // Map of file path -> set of rules that passed on this file
-  static final Map<String, Set<String>> _passedRules = {};
+  // LRU-capped cache of file path -> set of rules that passed.
+  // Without a cap this grows to O(files * rules) — e.g. 3,900 files x 790
+  // rules = ~3.1M entries (~150 MB). The LRU evicts the oldest files first,
+  // bounding memory to _maxPassedRulesFiles * avgRulesPerFile * ~48 bytes.
+  static LruCache<String, Set<String>> _passedRules =
+      LruCache(maxSize: _defaultMaxFiles);
+
+  static const int _defaultMaxFiles = 500;
+
+  /// Resize the LRU cap on `_passedRules`. Call from
+  /// [initializeCacheManagement] to tune the limit. Values ≤ 0 are ignored.
+  static void setMaxPassedRulesFiles(int maxFiles) {
+    if (maxFiles <= 0) return;
+    if (maxFiles == _passedRules.maxSize) return;
+    final old = _passedRules;
+    _passedRules = LruCache(maxSize: maxFiles);
+    for (final key in old.keys) {
+      final value = old.get(key);
+      if (value != null) _passedRules.put(key, value);
+    }
+  }
 
   /// Check if file content has changed since last analysis.
   ///
@@ -557,7 +576,6 @@ class FileContentCache {
     final oldHash = _contentHashes[normalizedPath];
 
     if (oldHash == null || oldHash != newHash) {
-      // File is new or changed - update cache and clear passed rules
       _contentHashes[normalizedPath] = newHash;
       _passedRules.remove(normalizedPath);
       return true;
@@ -571,7 +589,12 @@ class FileContentCache {
   /// Call this after a rule completes with no violations.
   static void recordRulePassed(String filePath, String ruleName) {
     final normalizedPath = normalizePath(filePath);
-    _passedRules.putIfAbsent(normalizedPath, () => {}).add(ruleName);
+    var ruleSet = _passedRules.get(normalizedPath);
+    if (ruleSet == null) {
+      ruleSet = {};
+      _passedRules.put(normalizedPath, ruleSet);
+    }
+    ruleSet.add(ruleName);
   }
 
   /// Check if a rule previously passed on an unchanged file.
@@ -579,7 +602,7 @@ class FileContentCache {
   /// Returns `true` if the file is unchanged AND the rule passed before.
   static bool rulePreviouslyPassed(String filePath, String ruleName) {
     final normalizedPath = normalizePath(filePath);
-    return _passedRules[normalizedPath]?.contains(ruleName) ?? false;
+    return _passedRules.get(normalizedPath)?.contains(ruleName) ?? false;
   }
 
   /// Clear cache for a specific file.
