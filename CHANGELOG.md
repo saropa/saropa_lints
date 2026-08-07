@@ -80,6 +80,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Integrate `dart fix --dry-run` / `--apply` into the publish pipeline as an auto-fix step before blocking checks.
 - Add `// ignore:` suppressions for 5 unfixable recommended.yaml issues (implementation_imports, library_private_types_in_public_api, prefer_interpolation_to_compose_strings) with verified rationale comments.
 - Add `scripts/check_recommended_yaml.py` — CI gate that temporarily enables recommended.yaml analysis and asserts zero unsuppressed issues.
+- Add `dart fix` and recommended.yaml checks to pre-commit hook — regressions are now caught before push.
 
 </details>
 
