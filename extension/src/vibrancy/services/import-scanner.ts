@@ -196,6 +196,203 @@ export function collectSymbolUsage(
     return found;
 }
 
+/**
+ * Any line whose trimmed form is an `import`/`export` directive, commented or
+ * not. IMPORT_PATTERN / COMMENTED_IMPORT_PATTERN only recognize `package:`
+ * URIs because their job is naming the package; occurrence counting needs the
+ * broader shape (relative and `dart:` directives too) because a `show ReelText`
+ * clause on ANY directive names the symbol without using it.
+ */
+const DIRECTIVE_LINE_PATTERN = /^\s*(?:\/\/\s*)?(?:import|export)\s+['"]/;
+
+/** Snippet cap — enough to read the call in context, short enough to store per occurrence. */
+const SNIPPET_MAX_LENGTH = 200;
+
+/** One textual appearance of a candidate symbol in project source. */
+export interface SymbolOccurrence {
+    /** Workspace-relative path of the file containing the match. */
+    readonly filePath: string;
+    /** 1-based line number, matching editor and `path:line` link conventions. */
+    readonly line: number;
+    /**
+     * 1-based column of the match start in the RAW source line — the value an
+     * editor jump needs. Deliberately not an offset into `snippet`, which is
+     * trimmed and so loses the leading indentation this counts.
+     */
+    readonly column: number;
+    /** The trimmed source line, capped at {@link SNIPPET_MAX_LENGTH} characters. */
+    readonly snippet: string;
+}
+
+/**
+ * Locate and count every appearance of the candidate symbols in project source.
+ *
+ * Sibling of {@link collectSymbolUsage}, not a replacement: that function answers
+ * "is this adopted at all?" and stops as soon as every candidate has been seen,
+ * which is why it stays untouched. This one deliberately has NO early break —
+ * counts and call sites are the entire product, so a candidate first seen in file
+ * one must still accumulate its occurrences in every later file.
+ *
+ * Import and export directive lines are skipped: `show ReelText` names the symbol
+ * to the compiler but is not a use of it, and counting directives would report
+ * adoption for a package that is merely imported.
+ *
+ * CEILING — this is textual matching, not resolved references. A local variable
+ * named `Duration`, or a same-named symbol from an unrelated package, is counted.
+ * Callers presenting these numbers must disclose that; treating them as resolved
+ * reference counts would overstate adoption of common names (`Text`, `State`).
+ *
+ * Symbols with no match are absent from the map rather than mapped to an empty
+ * array, so `map.get(name) === undefined` and "used zero times" are one case.
+ */
+export function collectSymbolOccurrences(
+    sources: readonly DartSource[],
+    candidates: ReadonlySet<string>,
+): ReadonlyMap<string, readonly SymbolOccurrence[]> {
+    const found = new Map<string, SymbolOccurrence[]>();
+    if (candidates.size === 0) { return found; }
+
+    for (const source of sources) {
+        collectFileOccurrences(source, candidates, found);
+    }
+    return found;
+}
+
+/**
+ * A dotted identifier chain: `ReelText`, `ReelText.rich`, `a.b.c`.
+ *
+ * Deliberately NOT a giant alternation of the candidate names. That shape costs
+ * O(candidates) at every source position, and the candidate set is the union of
+ * API names across every dependency's full changelog history, so it grows with
+ * the project. Tokenizing once and looking each chain up in the candidate Set
+ * is O(tokens) with hashed lookups, independent of candidate count.
+ *
+ * Honest accounting: this removes a growth term, it did not fix a measured
+ * bottleneck. The alternation it replaced handled 5000 candidates across 2000
+ * lines in single-digit milliseconds. Do not cite this as a performance win.
+ */
+const IDENTIFIER_CHAIN_PATTERN = /[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*/g;
+
+/**
+ * Longest candidate that starts at `from` within a dotted chain, or null.
+ *
+ * Longest-first is what lets `ReelText.rich` win over its bare owner
+ * `ReelText`, matching the leftmost-longest behavior a length-ordered
+ * alternation gave.
+ */
+function longestCandidateAt(
+    chain: string, from: number, candidates: ReadonlySet<string>,
+): string | null {
+    let slice = chain.slice(from);
+    while (slice.length > 0) {
+        if (candidates.has(slice)) { return slice; }
+        const dot = slice.lastIndexOf('.');
+        if (dot < 0) { return null; }
+        slice = slice.slice(0, dot);
+    }
+    return null;
+}
+
+/**
+ * Every candidate hit inside one dotted chain, as offsets into it.
+ *
+ * Walks segment starts rather than only the chain start, so a candidate that is
+ * a member name (`rich` in `foo.rich`) is still found — the word-boundary
+ * regex this replaced treated `.` as a boundary and matched there too.
+ */
+function chainHits(
+    chain: string, candidates: ReadonlySet<string>,
+): ReadonlyArray<{ offset: number; name: string }> {
+    const hits: Array<{ offset: number; name: string }> = [];
+    let pos = 0;
+    while (pos < chain.length) {
+        const hit = longestCandidateAt(chain, pos, candidates);
+        if (hit !== null) {
+            hits.push({ offset: pos, name: hit });
+            pos += hit.length + 1;
+            continue;
+        }
+        const nextDot = chain.indexOf('.', pos);
+        if (nextDot < 0) { break; }
+        pos = nextDot + 1;
+    }
+    return hits;
+}
+
+/**
+ * Scan one file line by line. Line-at-a-time rather than whole-text matching
+ * because the line number and column ARE the deliverable; deriving them from a
+ * whole-text offset would mean a second pass to count newlines.
+ */
+function collectFileOccurrences(
+    source: DartSource,
+    candidates: ReadonlySet<string>,
+    out: Map<string, SymbolOccurrence[]>,
+): void {
+    const lines = source.text.split('\n');
+    // A directive runs until its terminating `;`. dart format wraps long `show`
+    // clauses onto continuation lines, so matching only the opening line would
+    // count every symbol in a wrapped clause as a usage — the precise
+    // false positive the directive skip exists to prevent.
+    let inDirective = false;
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        if (inDirective || DIRECTIVE_LINE_PATTERN.test(line)) {
+            inDirective = directiveContinues(line);
+            continue;
+        }
+        const snippet = line.trim().substring(0, SNIPPET_MAX_LENGTH);
+        IDENTIFIER_CHAIN_PATTERN.lastIndex = 0;
+        let chain: RegExpExecArray | null;
+        while ((chain = IDENTIFIER_CHAIN_PATTERN.exec(line)) !== null) {
+            for (const hit of chainHits(chain[0], candidates)) {
+                appendOccurrence(out, hit.name, {
+                    filePath: source.path,
+                    line: i + 1,
+                    column: chain.index + hit.offset + 1,
+                    snippet,
+                });
+            }
+        }
+    }
+}
+
+/**
+ * True when a directive line does NOT terminate, so the following line is a
+ * continuation and must be skipped too.
+ *
+ * The trailing line comment is stripped first: `import 'x'  // TODO drop;` ends
+ * in a semicolon that belongs to prose, and treating it as the terminator would
+ * expose the wrapped `show` clause underneath as usages.
+ *
+ * A blank line also closes the run. An unterminated directive means malformed
+ * source, and without that stop a single missing semicolon would swallow every
+ * remaining line in the file.
+ */
+function directiveContinues(line: string): boolean {
+    const trimmed = line.trim();
+    // A commented-out directive opens with `//`; that marker is part of the
+    // directive here, not a trailing comment, so drop it before looking for one.
+    const body = trimmed.startsWith('//') ? trimmed.slice(2) : trimmed;
+    const commentAt = body.indexOf('//');
+    const code = commentAt < 0 ? body : body.slice(0, commentAt);
+    return !code.includes(';') && trimmed.length > 0;
+}
+
+/** Append to the symbol's list, creating it on first sight so zero-match symbols stay absent. */
+function appendOccurrence(
+    out: Map<string, SymbolOccurrence[]>,
+    symbol: string,
+    occurrence: SymbolOccurrence,
+): void {
+    const list = out.get(symbol);
+    if (list) {
+        list.push(occurrence);
+        return;
+    }
+    out.set(symbol, [occurrence]);
+}
+
 /** Convert an absolute path to a workspace-relative path with forward slashes. */
 function toRelativePath(absolute: string, rootPrefix: string): string {
     const normalized = absolute.replace(/\\/g, '/');

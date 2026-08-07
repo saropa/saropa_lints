@@ -114,6 +114,13 @@ export const vibrancyCatalogEntries: readonly CatalogEntry[] = [
     icon: 'export',
   },
   {
+    command: 'saropaLints.packageVibrancy.exportOpportunitiesReport',
+    title: 'Export Full Opportunities Report',
+    description: 'Write every package and changelog feature, with usage counts and call sites, to reports/ as HTML, Markdown, and JSON.',
+    category: 'Package Vibrancy',
+    icon: 'export',
+  },
+  {
     command: 'saropaLints.packageVibrancy.browseKnownIssues',
     title: 'Browse Known Issues',
     description: 'Open the known issues database for common package problems.',

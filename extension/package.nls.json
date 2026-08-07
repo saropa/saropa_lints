@@ -107,6 +107,7 @@
   "command.packageVibrancy.openOtherProject.title": "Scan Another Project...",
   "command.packageVibrancy.showReport.title": "Open Package Dashboard",
   "command.packageVibrancy.showOpportunities.title": "Open Upgrade Opportunities",
+  "command.packageVibrancy.exportOpportunitiesReport.title": "Export Full Opportunities Report",
   "command.packageVibrancy.focus.title": "Package Vibrancy: Open dashboard (compat)",
   "command.packageVibrancy.clearCache.title": "Clear Cache",
   "command.packageVibrancy.exportReport.title": "Export Report",

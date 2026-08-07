@@ -1,4 +1,92 @@
 {
+  "featureInventory": {
+    "export": {
+      "noScan": "Run a package scan first — the opportunities report is built from scan results.",
+      "noWorkspace": "Open a project folder first — the opportunities report is written next to its pubspec.",
+      "progress": "Building the full opportunities report…",
+      "noFolder": "No reports folder could be created, so the report was not written.",
+      "failed": "The opportunities report could not be written: {error}",
+      "large": "The report is {megabytes} MB and may be slow to browse. The JSON file alongside it holds the same data for tooling.",
+      "done": "Opportunities report written to {path}"
+    },
+    "sidebar": {
+      "label": "Full Opportunities Report",
+      "description": "Every package and feature, with usage counts"
+    },
+    "documentTitle": "Package Feature Inventory",
+    "heroTitle": "Package Feature Inventory",
+    "meta": "Generated {timestamp} · extension v{version} · {packages} packages",
+    "caveats": {
+      "title": "Measurement limits",
+      "intro": "Read these before drawing a conclusion from any count below.",
+      "none": "No limits were recorded for this run."
+    },
+    "controls": {
+      "filterLabel": "Filter features",
+      "filterPlaceholder": "Filter by feature text, symbol, or version…",
+      "unusedOnly": "Unused only",
+      "usedOnly": "Used only",
+      "deprecatedOnly": "Deprecated only",
+      "expandAll": "Expand all",
+      "collapseAll": "Collapse all",
+      "indexLabel": "Package index"
+    },
+    "summary": {
+      "title": "Package summary",
+      "sortHint": "Select to sort by this column",
+      "colPackage": "Package",
+      "colVersion": "Version",
+      "colFeatures": "Features",
+      "colAdopted": "Adopted",
+      "colUnadopted": "Unadopted",
+      "colUsages": "Usages",
+      "colScore": "Score"
+    },
+    "packages": {
+      "title": "Packages"
+    },
+    "empty": {
+      "body": "No packages were scanned, so there are no features to list."
+    },
+    "package": {
+      "summary": "{name} {version} — {adopted} of {total} features adopted",
+      "noChangelog": "No changelog was found for this package, so its features cannot be listed. This is a limit of the changelog-derived feature source, not a sign that the package has no features.",
+      "noFeatures": "A changelog was found, but no features could be extracted from it.",
+      "linkPubDev": "pub.dev",
+      "linkDocs": "Documentation",
+      "linkHomepage": "Homepage",
+      "linkRepository": "Repository"
+    },
+    "category": {
+      "heading": "{category} ({count})",
+      "added": "Added",
+      "changed": "Changed",
+      "deprecated": "Deprecated",
+      "removed": "Removed",
+      "security": "Security",
+      "fixed": "Fixed",
+      "other": "Other"
+    },
+    "feature": {
+      "summary": "{symbols} · {usages} · v{version}",
+      "noApiNamed": "No API named",
+      "usages": "{count} usages",
+      "usagesOne": "{count} usage",
+      "usagesUnknown": "usage not measurable",
+      "apiHeading": "{symbol} ({count})",
+      "viewCode": "View code",
+      "viewDocs": "View docs",
+      "noUsages": "No usage found in project source.",
+      "moreUsages": "{count} more usages",
+      "moreUsagesOne": "{count} more usage"
+    },
+    "chip": {
+      "adopted": "Adopted",
+      "partial": "Partly adopted",
+      "unused": "Never used",
+      "unmeasurable": "Not measurable"
+    }
+  },
   "stylistic": {
     "title": "Style & opinions",
     "intro": "Opinionated style rules, off by default. Turn on only what your team agrees to. Conflicting choices are grouped so you pick one.",

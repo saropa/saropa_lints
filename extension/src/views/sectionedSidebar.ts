@@ -35,6 +35,7 @@ import type { ConfigTreeNode } from './triageTree';
 import { renderTreeItem } from './triageTree';
 import { OVERVIEW_EMBEDDED_CONFIG_KINDS } from '../overviewEmbeddedConfigKinds';
 import { loadSuppressions, isPathHidden, isRuleHidden } from '../suppressionsStore';
+import { l10n } from '../i18n/runtime';
 import {
     SecurityHotspotReviewStateService,
     countSecurityHotspotReviewStates,
@@ -249,6 +250,16 @@ function buildEditorDashboardItems(): LeafItem[] {
             'rocket',
             new vscode.ThemeColor('charts.blue'),
         )] : []),
+        // The exhaustive export: every package and every changelog feature with
+        // usage counted from zero upward. Unlike the panel above it is not gated
+        // on unadopted features — a fully-adopted project is a valid report.
+        new LeafItem(
+            l10n('featureInventory.sidebar.label'),
+            l10n('featureInventory.sidebar.description'),
+            'saropaLints.packageVibrancy.exportOpportunitiesReport',
+            'export',
+            new vscode.ThemeColor('charts.blue'),
+        ),
         new LeafItem(
             'Code Health Dashboard',
             'Function-level code health',

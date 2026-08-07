@@ -13,6 +13,8 @@ import {
     activePackageNames,
     activeFileUsages,
     hasActiveReExport,
+    collectSymbolOccurrences,
+    DartSource,
     PackageUsage,
 } from '../../../vibrancy/services/import-scanner';
 
@@ -419,6 +421,183 @@ describe('activePackageNames', () => {
     it('should return empty set for empty map', () => {
         const names = activePackageNames(new Map());
         assert.strictEqual(names.size, 0);
+    });
+});
+
+describe('collectSymbolOccurrences', () => {
+    function src(path: string, text: string): DartSource {
+        return { path, text };
+    }
+
+    it('aggregates counts and locations across multiple files', () => {
+        const sources = [
+            src('lib/a.dart', 'final t = ReelText();\nReelText other;'),
+            src('lib/b.dart', '// note\nvar x = ReelText();'),
+        ];
+        const result = collectSymbolOccurrences(sources, new Set(['ReelText']));
+        const hits = result.get('ReelText');
+        assert.ok(hits);
+        assert.strictEqual(hits.length, 3);
+        assert.deepStrictEqual(
+            hits.map(h => `${h.filePath}:${h.line}`),
+            ['lib/a.dart:1', 'lib/a.dart:2', 'lib/b.dart:2'],
+        );
+    });
+
+    it('records the dotted member rather than its bare owner', () => {
+        // Longest-first alternation: `ReelText.rich` must win, otherwise the
+        // report credits the owner class for a member that is never called.
+        const sources = [src('lib/a.dart', 'ReelText.rich(spans);')];
+        const result = collectSymbolOccurrences(
+            sources, new Set(['ReelText', 'ReelText.rich']),
+        );
+        assert.strictEqual(result.get('ReelText.rich')?.length, 1);
+        assert.strictEqual(result.get('ReelText'), undefined);
+    });
+
+    it('excludes import and export directive lines, commented or not', () => {
+        // A `show` clause names the symbol without using it; counting it would
+        // report adoption for a package that is merely imported.
+        const sources = [src('lib/a.dart', [
+            "import 'package:reel/reel.dart' show ReelText;",
+            "export 'package:reel/reel.dart' show ReelText;",
+            "// import 'package:reel/reel.dart' show ReelText;",
+            "// export 'package:reel/reel.dart' show ReelText;",
+            '  final w = ReelText();',
+        ].join('\n'))];
+        const result = collectSymbolOccurrences(sources, new Set(['ReelText']));
+        const hits = result.get('ReelText');
+        assert.strictEqual(hits?.length, 1, 'only the real call site counts');
+        assert.strictEqual(hits?.[0].line, 5);
+    });
+
+    it('excludes wrapped show clauses on directive continuation lines', () => {
+        // dart format wraps a long `show` clause onto its own line, which does
+        // not itself start with `import` — matching only the opening line would
+        // count every wrapped symbol as a usage.
+        const sources = [src('lib/a.dart', [
+            "import 'package:reel/reel.dart'",
+            '    show ReelText, ReelTextController;',
+            '',
+            '  final w = ReelText();',
+        ].join('\n'))];
+        const result = collectSymbolOccurrences(
+            sources, new Set(['ReelText', 'ReelTextController']),
+        );
+        assert.strictEqual(
+            result.get('ReelText')?.length, 1, 'only the real call site counts',
+        );
+        assert.strictEqual(result.get('ReelText')?.[0].line, 4);
+        assert.strictEqual(
+            result.get('ReelTextController'), undefined,
+            'a symbol only ever named in a wrapped show clause is unused',
+        );
+    });
+
+    it('stops skipping at a blank line when a directive never terminates', () => {
+        // Malformed source must not let a missing semicolon swallow the file.
+        const sources = [src('lib/a.dart', [
+            "import 'package:reel/reel.dart'",
+            '',
+            '  final w = ReelText();',
+        ].join('\n'))];
+        const result = collectSymbolOccurrences(sources, new Set(['ReelText']));
+        assert.strictEqual(result.get('ReelText')?.length, 1);
+        assert.strictEqual(result.get('ReelText')?.[0].line, 3);
+    });
+
+    it('ignores a semicolon inside a directive line comment', () => {
+        // The `;` belongs to prose, so the wrapped show clause below it is
+        // still part of the directive and must not count as usage.
+        const sources = [src('lib/a.dart', [
+            "import 'package:reel/reel.dart' // keep; drop later",
+            '    show ReelText;',
+            '  final w = ReelText();',
+        ].join('\n'))];
+        const result = collectSymbolOccurrences(sources, new Set(['ReelText']));
+        assert.strictEqual(result.get('ReelText')?.length, 1);
+        assert.strictEqual(result.get('ReelText')?.[0].line, 3);
+    });
+
+    it('counts a member name used off an unrelated owner', () => {
+        // `.` is a boundary: a candidate that is a member name is a hit even
+        // when the owner is not itself a candidate.
+        const sources = [src('lib/a.dart', 'final v = config.rich;')];
+        const result = collectSymbolOccurrences(sources, new Set(['rich']));
+        assert.strictEqual(result.get('rich')?.length, 1);
+        assert.strictEqual(result.get('rich')?.[0].column, 18);
+    });
+
+    it('returns correct counts with a large candidate set', () => {
+        // Correctness at scale only. A wall-clock assertion was tried and
+        // removed: the alternation implementation this replaced cleared the
+        // same 5000-candidate corpus in single-digit milliseconds, so any
+        // threshold loose enough not to flake also passes for the old code and
+        // pins nothing.
+        const big = new Set<string>(['ReelText']);
+        for (let i = 0; i < 5000; i++) { big.add(`Sym${i}Name`); }
+        const line = '  final w = ReelText(child: Text("x"), key: key);';
+        const sources = [src('lib/a.dart', Array(2000).fill(line).join('\n'))];
+        const result = collectSymbolOccurrences(sources, big);
+        assert.strictEqual(result.get('ReelText')?.length, 2000);
+        assert.strictEqual(result.size, 1, 'no phantom hits from the filler set');
+    });
+
+    it('omits zero-match candidates instead of mapping them to empty arrays', () => {
+        const sources = [src('lib/a.dart', 'ReelText();')];
+        const result = collectSymbolOccurrences(
+            sources, new Set(['ReelText', 'NeverUsed']),
+        );
+        assert.strictEqual(result.size, 1);
+        assert.strictEqual(result.has('NeverUsed'), false);
+    });
+
+    it('returns an empty map for an empty candidate set', () => {
+        const sources = [src('lib/a.dart', 'ReelText();')];
+        const result = collectSymbolOccurrences(sources, new Set<string>());
+        assert.strictEqual(result.size, 0);
+    });
+
+    it('does NOT stop early once every candidate has been seen', () => {
+        // collectSymbolUsage breaks out of the file loop the moment every
+        // candidate has a hit. This function must not: file 3's occurrences
+        // are still part of the count even though files 1-2 already covered
+        // the whole candidate set.
+        const sources = [
+            src('lib/one.dart', 'ReelText();'),
+            src('lib/two.dart', 'runWhile();'),
+            src('lib/three.dart', 'ReelText();\nrunWhile();'),
+        ];
+        const result = collectSymbolOccurrences(
+            sources, new Set(['ReelText', 'runWhile']),
+        );
+        assert.strictEqual(result.get('ReelText')?.length, 2);
+        assert.strictEqual(result.get('runWhile')?.length, 2);
+        assert.strictEqual(result.get('ReelText')?.[1].filePath, 'lib/three.dart');
+        assert.strictEqual(result.get('runWhile')?.[1].filePath, 'lib/three.dart');
+    });
+
+    it('reports 1-based line and column', () => {
+        const sources = [src('lib/a.dart', 'line one\n  final w = ReelText();')];
+        const hits = collectSymbolOccurrences(sources, new Set(['ReelText']))
+            .get('ReelText');
+        assert.strictEqual(hits?.[0].line, 2);
+        // 'ReelText' starts at index 12 of "  final w = ReelText();" -> column 13.
+        assert.strictEqual(hits?.[0].column, 13);
+    });
+
+    it('trims the snippet and caps it at 200 characters', () => {
+        const long = `    ReelText(${'a'.repeat(400)});   `;
+        const hits = collectSymbolOccurrences(
+            [src('lib/a.dart', long)], new Set(['ReelText']),
+        ).get('ReelText');
+        assert.strictEqual(hits?.[0].snippet.length, 200);
+        assert.ok(hits?.[0].snippet.startsWith('ReelText('), 'leading space trimmed');
+    });
+
+    it('returns an empty map when there are no sources', () => {
+        const result = collectSymbolOccurrences([], new Set(['ReelText']));
+        assert.strictEqual(result.size, 0);
     });
 });
 

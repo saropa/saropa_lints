@@ -61,6 +61,9 @@ import {
     activePackageNames,
 } from './services/import-scanner';
 import { rankOpportunities } from './services/changelog-opportunities';
+import {
+    exportFeatureInventory, HTML_SIZE_WARNING_BYTES,
+} from './services/feature-inventory-export';
 import { enrichReplacementComplexity } from './services/package-code-analyzer';
 import { detectUnused } from './scoring/unused-detector';
 import { fetchFlutterReleases } from './services/flutter-releases';
@@ -708,6 +711,14 @@ function registerCommands(
             },
         ),
         vscode.commands.registerCommand(
+            'saropaLints.packageVibrancy.exportOpportunitiesReport',
+            async () => {
+                await runOpportunitiesExport(
+                    (context.extension.packageJSON as { version: string }).version,
+                );
+            },
+        ),
+        vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.showReport',
             async () => {
                 const extensionVersion = (context.extension.packageJSON as { version: string }).version;
@@ -1175,6 +1186,99 @@ function rankAdoption(
         unadoptedApiNames: ranking.unusedApiNames,
         opportunityScore: ranking.score,
     };
+}
+
+/**
+ * Export the consolidated opportunities report (HTML + Markdown + JSON) under
+ * `reports/`, then open the HTML.
+ *
+ * Requires scan results: the report consolidates per-package metadata the scan
+ * produced. With none, offering the export would write a file listing nothing,
+ * so the user is pointed at the scan instead.
+ */
+async function runOpportunitiesExport(extensionVersion: string): Promise<void> {
+    // The two preconditions fail for different reasons and need different
+    // remedies — folding them into one message told a user with no folder open
+    // to run a scan they cannot run.
+    //
+    // The scanned pubspec's folder wins. Only when no scan has parsed one does
+    // this fall back to the first workspace folder, which in a multi-root
+    // workspace is an arbitrary pick — hence the guard above requiring results,
+    // so in practice the fallback is unreachable and the report is always
+    // written beside the pubspec it describes.
+    const root = lastParsedDeps
+        ? vscode.Uri.joinPath(lastParsedDeps.yamlUri, '..')
+        : vscode.workspace.workspaceFolders?.[0]?.uri;
+    if (!root) {
+        void vscode.window.showInformationMessage(
+            l10n('featureInventory.export.noWorkspace'),
+        );
+        return;
+    }
+    if (latestResults.length === 0) {
+        void vscode.window.showInformationMessage(
+            l10n('featureInventory.export.noScan'),
+        );
+        return;
+    }
+
+    // The symbol scan re-reads every project source, so a large workspace takes
+    // long enough that a silent command would look like nothing happened.
+    const written = await vscode.window.withProgress(
+        {
+            location: vscode.ProgressLocation.Notification,
+            title: l10n('featureInventory.export.progress'),
+        },
+        () => exportFeatureInventory(latestResults, root, { extensionVersion })
+            // An unwritable reports/ folder or a disk-full mid-triplet must not
+            // become an unhandled rejection that dismisses the progress
+            // notification with no explanation. Report and return null.
+            .catch((err: unknown) => {
+                void vscode.window.showErrorMessage(l10n(
+                    'featureInventory.export.failed',
+                    { error: err instanceof Error ? err.message : String(err) },
+                ));
+                // Distinguishable from the null the export returns for an
+                // unresolvable folder, which needs its own message below.
+                return undefined;
+            }),
+    );
+
+    // Already reported by the catch above.
+    if (written === undefined) { return; }
+    if (written === null) {
+        void vscode.window.showWarningMessage(
+            l10n('featureInventory.export.noFolder'),
+        );
+        return;
+    }
+    if (written.htmlBytes > HTML_SIZE_WARNING_BYTES) {
+        void vscode.window.showWarningMessage(l10n(
+            'featureInventory.export.large',
+            { megabytes: (written.htmlBytes / (1024 * 1024)).toFixed(1) },
+        ));
+    }
+    await revealReport(written.htmlPath);
+}
+
+/**
+ * Open the generated report in the system browser, not a VS Code editor.
+ *
+ * The HTML ships its own palette and an inline script for filtering and
+ * sorting; a text editor would render the markup as source with every control
+ * dead. If the browser handoff fails, fall back to the editor so the user still
+ * reaches the file rather than getting nothing.
+ */
+async function revealReport(htmlPath: string): Promise<void> {
+    const uri = vscode.Uri.file(htmlPath);
+    const opened = await vscode.env.openExternal(uri);
+    if (!opened) {
+        const doc = await vscode.workspace.openTextDocument(uri);
+        await vscode.window.showTextDocument(doc, { preview: false });
+    }
+    void vscode.window.showInformationMessage(
+        l10n('featureInventory.export.done', { path: htmlPath }),
+    );
 }
 
 async function runScanInner(
