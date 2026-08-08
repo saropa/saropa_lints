@@ -65,9 +65,6 @@ class AvoidRefReadInsideBuildRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -157,9 +154,6 @@ class AvoidRefWatchOutsideBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -302,9 +296,6 @@ class AvoidRefInsideStateDisposeRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -402,9 +393,6 @@ class UseRefReadSynchronouslyRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -497,9 +485,6 @@ class UseRefAndStateSynchronouslyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -598,9 +583,6 @@ class AvoidAssigningNotifiersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -767,9 +749,6 @@ class AvoidNotifierConstructorsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -867,9 +846,6 @@ class PreferImmutableProviderArgumentsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -935,9 +911,6 @@ class AvoidUnnecessaryConsumerWidgetsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -1039,9 +1012,6 @@ class AvoidNullableAsyncValuePatternRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -1146,9 +1116,6 @@ class RequireRiverpodErrorHandlingRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -1229,9 +1196,6 @@ class AvoidRiverpodStateMutationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -1327,9 +1291,6 @@ class PreferRiverpodSelectRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -1408,9 +1369,6 @@ class RequireFlutterRiverpodPackageRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -1479,9 +1437,6 @@ class PreferRiverpodAutoDisposeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -1578,9 +1533,6 @@ class PreferRiverpodFamilyForParamsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -1659,9 +1611,6 @@ class AvoidGlobalRiverpodProvidersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -1766,9 +1715,6 @@ class PreferConsumerWidgetRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -1860,9 +1806,6 @@ class RequireAutoDisposeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1970,9 +1913,6 @@ class AvoidRiverpodStringProviderNameRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -2073,9 +2013,6 @@ class AvoidRefInBuildBodyRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -2140,8 +2077,6 @@ class AvoidRefInDisposeRule extends SaropaLintRule {
   AvoidRefInDisposeRule() : super(code: _code);
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_ref_in_dispose',
@@ -2242,9 +2177,6 @@ class RequireProviderScopeRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -2338,9 +2270,6 @@ class PreferSelectForPartialRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   /// Alias: prefer_select_for_partial_state
   static const LintCode _code = LintCode(
@@ -2480,9 +2409,6 @@ class PreferFamilyForParamsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   /// Alias: prefer_family_for_params_pattern
   static const LintCode _code = LintCode(
     'prefer_family_for_params',
@@ -2567,9 +2493,6 @@ class PreferRefWatchOverReadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -2656,9 +2579,6 @@ class AvoidCircularProviderDepsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -2828,9 +2748,6 @@ class RequireErrorHandlingInAsyncRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'require_error_handling_in_async',
     '[require_error_handling_in_async] Async provider without error handling allows exceptions to propagate unhandled. Unhandled errors in FutureProvider or StreamProvider surface as uncaught exceptions that crash the app or leave the UI in a permanent loading state with no recovery path. {v3}',
@@ -2929,9 +2846,6 @@ class PreferNotifierOverStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_notifier_over_state',
@@ -3085,9 +2999,6 @@ class RequireRiverpodLintRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -3196,9 +3107,6 @@ class AvoidListenInAsyncRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'avoid_listen_in_async',
     '[avoid_listen_in_async] Using context.watch() inside an async callback triggers widget rebuilds during asynchronous execution, creating stale closures that capture outdated state. This causes data races where async operations complete with wrong values, leading to corrupted state or duplicate side effects. {v4}',
@@ -3287,9 +3195,6 @@ class RequireAsyncValueOrderRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'require_async_value_order',
     '[require_async_value_order] AsyncValue.when() has non-standard parameter order. The standard order is data, error, loading. Incorrect order makes code harder to read and may indicate confusion about the API. {v2}',
@@ -3365,9 +3270,6 @@ class PreferSelectorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_context_selector',
@@ -3449,9 +3351,6 @@ class AvoidRiverpodNotifierInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -3552,9 +3451,6 @@ class RequireRiverpodAsyncValueGuardRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
 
@@ -3646,9 +3542,6 @@ class RequireFlutterRiverpodNotRiverpodRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'require_flutter_riverpod_not_riverpod',
     '[require_flutter_riverpod_not_riverpod] Flutter apps should use '
@@ -3725,9 +3618,6 @@ class AvoidRiverpodNavigationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'avoid_riverpod_navigation',
@@ -3868,9 +3758,6 @@ class AvoidRiverpodForNetworkOnlyRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'avoid_riverpod_for_network_only',
     '[avoid_riverpod_for_network_only] Provider adds unnecessary indirection for a simple network client. Harder to debug. Using Riverpod just to access a network layer when direct injection would suffice adds unnecessary complexity. {v2}',
@@ -3941,9 +3828,6 @@ class PreferRiverpodCodeGenRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -4023,9 +3907,6 @@ class PreferRiverpodKeepAliveRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.provider};
@@ -4110,9 +3991,6 @@ class AvoidRiverpodStateNotifierRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   // Legacy provider/base-class names this rule flags.
   static const Set<String> _legacyTypes = <String>{

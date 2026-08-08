@@ -50,9 +50,6 @@ class AvoidBitwiseOperatorsWithBooleansRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'avoid_bitwise_operators_with_booleans',
     '[avoid_bitwise_operators_with_booleans] Bitwise operator on boolean. Unlike &&/||, this does not short-circuit. Using & or | with booleans is likely a mistake; use && or || instead. Bitwise operators don\'t short-circuit and can cause unexpected behavior. {v4}',
@@ -129,9 +126,6 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'avoid_cascade_after_if_null',
@@ -211,9 +205,6 @@ class AvoidCascadeShuffleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'avoid_cascade_shuffle',
@@ -315,9 +306,6 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const int _maxOperators = 4;
 
   static const LintCode _code = LintCode(
@@ -405,9 +393,6 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const int _maxOperators = 3;
 
@@ -505,9 +490,6 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'avoid_duplicate_cascades',
     '[avoid_duplicate_cascades] Duplicate cascade operation detected on the same target. Identical cascade members are likely copy-paste errors that produce redundant side effects and increase maintenance risk. {v4}',
@@ -582,9 +564,6 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const int _maxOperators = 5;
 
@@ -753,9 +732,6 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'avoid_immediately_invoked_functions',
     '[avoid_immediately_invoked_functions] Function is immediately invoked after definition. Immediately invoked function expressions (IIFE) can be confusing and usually indicate the code must be refactored. {v4}',
@@ -810,9 +786,6 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'avoid_nested_shorthands',
@@ -892,9 +865,6 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'avoid_multi_assignment',
     '[avoid_multi_assignment] Multiple chained assignments detected. Chained assignments reduce readability and can be confusing. This excessive complexity makes the code harder to understand, test, and maintain. {v4}',
@@ -933,8 +903,6 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.info;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -1003,9 +971,6 @@ class PreferMovingToVariableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_moving_to_variable',
@@ -1103,9 +1068,6 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_parentheses_with_if_null',
@@ -1211,9 +1173,6 @@ class AvoidDeepNestingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const int _maxDepth = 5;
 
@@ -1322,9 +1281,6 @@ class AvoidHighCyclomaticComplexityRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const int _threshold = 15;
 

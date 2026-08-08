@@ -295,7 +295,10 @@ class SaropaContext {
       if (MemoryModeConfig.shouldApplyBalancedFiltering &&
           !_fileContentChanged &&
           rule.usesTypeResolution &&
-          FileContentCache.rulePreviouslyPassed(filePath, rule.code.lowerCaseName)) {
+          FileContentCache.rulePreviouslyPassed(
+            filePath,
+            rule.code.lowerCaseName,
+          )) {
         return;
       }
 

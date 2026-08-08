@@ -1517,8 +1517,8 @@ class AvoidIsarSchemaBreakingChangesRule extends SaropaLintRule {
 //   @override
 //   RuleCost get cost => RuleCost.medium;
 
-  @override
-  bool get usesTypeResolution => true;
+//   @override
+//   bool get usesTypeResolution => true;
 
 //   static const LintCode _code = LintCode(
 //     'require_isar_non_nullable_migration',

@@ -67,8 +67,6 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'require_keys_in_animated_lists',
     '[require_keys_in_animated_lists] Without keys, AnimatedList animations '
@@ -207,8 +205,6 @@ class AvoidExpensiveBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_expensive_build',
@@ -359,8 +355,6 @@ class AvoidSynchronousFileIoRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_synchronous_file_io',
     '[avoid_synchronous_file_io] Synchronous file I/O blocks the main '
@@ -436,8 +430,6 @@ class PreferComputeForHeavyWorkRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'prefer_compute_for_heavy_work',
@@ -565,8 +557,6 @@ class AvoidObjectCreationInHotLoopsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_object_creation_in_hot_loops',
     '[avoid_object_creation_in_hot_loops] Creating objects inside hot loops triggers frequent garbage collection pauses that freeze the UI thread. Each allocation adds GC pressure proportionally to iteration count, causing visible jank, dropped frames during animations, and degraded scrolling performance on lower-end devices. {v5}',
@@ -684,8 +674,6 @@ class PreferCachedGetterRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'prefer_cached_getter',
@@ -830,8 +818,6 @@ class AvoidExcessiveWidgetDepthRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -936,8 +922,6 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'require_item_extent_for_large_lists',
     '[require_item_extent_for_large_lists] ListView with many items but no itemExtent, itemExtentBuilder, or prototypeItem forces Flutter to lay out every child widget to calculate scroll extent. This causes expensive initial rendering, prevents efficient jump-to-index operations, and degrades scroll bar accuracy, resulting in slow list initialization and janky scrolling. {v6}',
@@ -1034,8 +1018,6 @@ class PreferImagePrecacheRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'prefer_image_precache',
     '[prefer_image_precache] Large images without precaching cause visible '
@@ -1127,8 +1109,6 @@ class AvoidControllerInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_controller_in_build',
@@ -1227,8 +1207,6 @@ class AvoidSetStateInBuildRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -1325,8 +1303,6 @@ class AvoidStringConcatenationLoopRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_string_concatenation_loop',
@@ -1481,8 +1457,6 @@ class AvoidScrollListenerInBuildRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_scroll_listener_in_build',
     '[avoid_scroll_listener_in_build] Scroll listener registered in build() accumulates duplicate subscriptions on every widget rebuild. Each rebuild adds another listener that is never removed, causing memory leaks, duplicate callback executions, and progressively degrading scroll performance as listeners compound over the widget lifecycle. {v2}',
@@ -1570,8 +1544,6 @@ class PreferValueListenableBuilderRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'prefer_value_listenable_builder',
@@ -1985,8 +1957,6 @@ class AvoidGlobalKeyMisuseRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_global_key_misuse',
     '[avoid_global_key_misuse] Multiple GlobalKey instances in a single class indicate overuse of an expensive mechanism. Each GlobalKey prevents Flutter from efficiently diffing the widget tree, forces cross-tree reference tracking, and can cause unexpected widget reparenting that corrupts state and degrades rendering performance. {v2}',
@@ -2091,8 +2061,6 @@ class RequireRepaintBoundaryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'require_repaint_boundary',
@@ -2215,8 +2183,6 @@ class AvoidTextSpanInBuildRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_text_span_in_build',
     '[avoid_text_span_in_build] TextSpan recreated inside the build() method forces the Flutter rendering pipeline to recalculate expensive text layout metrics on every widget rebuild. This includes glyph positioning, line breaking, and paragraph layout. The repeated computation causes visible jank during scrolling and animations, especially for RichText with multiple styled spans. {v4}',
@@ -2312,8 +2278,6 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_large_list_copy',
@@ -2516,8 +2480,6 @@ class PreferConstWidgetsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -2627,8 +2589,6 @@ class AvoidExpensiveComputationInBuildRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_expensive_computation_in_build',
     '[avoid_expensive_computation_in_build] Expensive computation detected inside build() method. Build runs on every frame during animations and on every state change, so heavy operations here cause jank, dropped frames, and sluggish UI responsiveness. Users will experience visible stuttering especially during transitions and scrolling. {v2}',
@@ -2718,8 +2678,6 @@ class AvoidWidgetCreationInLoopRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2817,8 +2775,6 @@ class AvoidCallingOfInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_calling_of_in_build',
@@ -2928,8 +2884,6 @@ class RequireImageCacheManagementRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'require_image_cache_management',
     '[require_image_cache_management] Loading many images without cache management causes unbounded memory growth. The default ImageCache retains decoded images indefinitely, and without explicit eviction, memory usage climbs until the OS kills the app. Users on devices with limited RAM will experience crashes and degraded multitasking. {v3}',
@@ -3015,8 +2969,6 @@ class AvoidMemoryIntensiveOperationsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_memory_intensive_operations',
@@ -3122,8 +3074,6 @@ class AvoidClosureMemoryLeakRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_closure_memory_leak',
     '[avoid_closure_memory_leak] Closure capturing setState retains a strong reference to the State object, preventing garbage collection after the widget is disposed. The entire parent widget subtree leaks memory, and calling setState on an unmounted widget throws a framework error that crashes the app during subsequent navigation. {v3}',
@@ -3210,8 +3160,6 @@ class PreferStaticConstWidgetsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -3274,7 +3222,6 @@ class RequireDisposePatternRule extends SaropaLintRule {
   RequireDisposePatternRule() : super(code: _code);
   @override
   bool get usesTypeResolution => true;
-
 
   static const LintCode _code = LintCode(
     'require_dispose_pattern',
@@ -3397,8 +3344,6 @@ class RequireListPreallocateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'require_list_preallocate',
@@ -3560,8 +3505,6 @@ class PreferBuilderForConditionalRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'prefer_builder_for_conditional',
     '[prefer_builder_for_conditional] Complex widget in ternary conditional. Prefer if/return for readability. This introduces unnecessary computational overhead that degrades responsiveness and increases battery drain on mobile. {v1}',
@@ -3665,8 +3608,6 @@ class RequireWidgetKeyStrategyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3798,8 +3739,6 @@ class RequireMenuBarForDesktopRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'require_menu_bar_for_desktop',
     '[require_menu_bar_for_desktop] Desktop app without PlatformMenuBar lacks standard keyboard shortcuts. Desktop apps must have a menu bar for keyboard shortcuts and standard desktop interactions. {v5}',
@@ -3909,8 +3848,6 @@ class RequireWindowCloseConfirmationRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'require_window_close_confirmation',
     '[require_window_close_confirmation] Desktop app should handle window close confirmation. Desktop apps with unsaved data should confirm before closing to prevent data loss. This introduces unnecessary computational overhead that degrades responsiveness and increases battery drain on mobile. {v4}',
@@ -4015,8 +3952,6 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'prefer_native_file_dialogs',
     '[prefer_native_file_dialogs] Use native file dialogs on desktop. Desktop platforms have native file dialogs that users expect. Using custom dialogs creates inconsistent UX. {v2}',
@@ -4100,8 +4035,6 @@ class PreferInheritedWidgetCacheRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4201,8 +4134,6 @@ class PreferLayoutBuilderOverMediaQueryRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'prefer_layout_builder_over_media_query',
@@ -4307,8 +4238,6 @@ class AvoidBlockingDatabaseUiRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.bloc};
 
@@ -4399,8 +4328,6 @@ class AvoidMoneyArithmeticOnDoubleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_money_arithmetic_on_double',
@@ -4577,8 +4504,6 @@ class AvoidRebuildOnScrollRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_rebuild_on_scroll',
     '[avoid_rebuild_on_scroll] Scroll listener registered inside build() is re-added on every widget rebuild without removing the previous one. Duplicate listeners accumulate over time, firing multiple callbacks per scroll event, causing memory leaks, compounding performance degradation, and eventually crashes from excessive callback execution. {v3}',
@@ -4689,8 +4614,6 @@ class AvoidAnimationInLargeListRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -4819,8 +4742,6 @@ class PreferLazyLoadingImagesRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -4920,8 +4841,6 @@ class PreferElementRebuildRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -5020,8 +4939,6 @@ class RequireIsolateForHeavyRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'require_isolate_for_heavy',
     '[require_isolate_for_heavy] Heavy computation such as JSON decoding, image processing, or data parsing runs on the main thread, blocking the UI event loop. This prevents frame rendering, freezes animations, and makes the app unresponsive to user input. On lower-end devices, operations exceeding 16ms per frame cause visible stutter and dropped frames that degrade the user experience. {v2}',
@@ -5107,8 +5024,6 @@ class AvoidFinalizerMisuseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_finalizer_misuse',
@@ -5203,8 +5118,6 @@ class AvoidJsonInMainRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_json_in_main',
     '[avoid_json_in_main] jsonDecode on main thread blocks UI for large payloads (100KB+). jsonDecode() for large payloads (>100KB) blocks the main thread. Use compute() to parse JSON in a background isolate. {v2}',
@@ -5272,8 +5185,6 @@ class AvoidBlockingMainThreadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_blocking_main_thread',
@@ -5374,8 +5285,6 @@ class AvoidFullSyncOnEveryLaunchRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -5505,8 +5414,6 @@ class AvoidCacheStampedeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   bool get requiresAsync => true;
@@ -5645,8 +5552,6 @@ class PreferBinaryFormatRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'prefer_binary_format',
     '[prefer_binary_format] jsonDecode in a hot path (timer/stream). Consider protobuf or MessagePack for better performance.',
@@ -5712,8 +5617,6 @@ class PreferPoolPatternRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'prefer_pool_pattern',
     '[prefer_pool_pattern] Non-const object creation in a hot path (timer/animation). Consider an object pool to reduce GC pressure.',
@@ -5774,8 +5677,6 @@ class PreferDiskCacheForPersistenceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'prefer_disk_cache_for_persistence',

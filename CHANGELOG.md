@@ -64,7 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.5.1]
+
+This release introduces a new balanced memory mode to drastically reduce RAM consumption during incremental analysis, alongside a Full Opportunities Report designed specifically for AI-driven dependency reviews. It also refines localization workflows by eliminating false-positive translation warnings on placeholder-only templates. Developers will experience a significantly lighter background footprint on large projects and gain deeper, exportable insights into their codebase's dependency utilization. [log](https://github.com/saropa/saropa_lints/blob/v14.5.1/CHANGELOG.md)
 
 ### Added
 

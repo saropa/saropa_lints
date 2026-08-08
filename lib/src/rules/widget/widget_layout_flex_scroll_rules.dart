@@ -54,9 +54,6 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -149,9 +146,6 @@ class AvoidFlexibleOutsideFlexRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -228,8 +222,6 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
   AvoidShrinkWrapInListsRule() : super(code: _code);
   @override
   bool get usesTypeResolution => true;
-
-
 
   // Deprecated: this rule flags shrinkWrap: true on a scrollable nested in
   // another scrollable but does NOT exempt physics: NeverScrollableScrollPhysics,
@@ -328,9 +320,6 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -427,9 +416,6 @@ class PreferSliverPrefixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -541,7 +527,6 @@ class PreferUsingListViewRule extends SaropaLintRule {
   ];
   PreferUsingListViewRule() : super(code: _code);
 
-
   static const LintCode _code = LintCode(
     'prefer_using_list_view',
     '[prefer_using_list_view] Column inside SingleChildScrollView. A "Column" is being used inside a "SingleChildScrollView" Flutter to pre-render the entire list, bypassing "Lazy Loading" optimizations. This layout configuration can also trigger RenderFlex overflow errors or unexpected visual behavior at runtime. {v6}',
@@ -551,7 +536,6 @@ class PreferUsingListViewRule extends SaropaLintRule {
   );
   @override
   bool get usesTypeResolution => true;
-
 
   @override
   void runWithReporter(
@@ -624,8 +608,6 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
   AvoidListViewWithoutItemExtentRule() : super(code: _code);
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_listview_without_item_extent',
@@ -852,9 +834,6 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -935,9 +914,6 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1036,9 +1012,6 @@ class PreferListViewBuilderRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -1124,9 +1097,6 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1247,9 +1217,6 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -1342,9 +1309,6 @@ class PreferSliverListRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -1434,9 +1398,6 @@ class PreferKeepAliveRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1539,9 +1500,6 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -1633,9 +1591,6 @@ class AvoidLayoutBuilderInScrollableRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -1712,7 +1667,6 @@ class RequireScrollControllerRule extends SaropaLintRule {
   ];
   RequireScrollControllerRule() : super(code: _code);
 
-
   static const LintCode _code = LintCode(
     'require_scroll_controller',
     '[require_scroll_controller] Add ScrollController for scroll tracking. ScrollController is needed for infinite scroll and scroll position tracking. Scrollable lists must have a ScrollController. {v3}',
@@ -1722,7 +1676,6 @@ class RequireScrollControllerRule extends SaropaLintRule {
   );
   @override
   bool get usesTypeResolution => true;
-
 
   @override
   void runWithReporter(
@@ -1807,9 +1760,6 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -1924,9 +1874,6 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2101,9 +2048,6 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2314,9 +2258,6 @@ class PreferExpandedAtCallSiteRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => <FileType>{FileType.widget};
@@ -2565,9 +2506,6 @@ class AvoidSpacerInWrapRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -2668,9 +2606,6 @@ class AvoidAnimatedSizeInWrapRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -2787,9 +2722,6 @@ class AvoidScrollableInIntrinsicRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -2887,9 +2819,6 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -3030,9 +2959,6 @@ class PreferFlexForComplexLayoutRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'prefer_flex_for_complex_layout',
     '[prefer_flex_for_complex_layout] Prefer Row/Column (Flex) with '
@@ -3075,9 +3001,6 @@ class PreferFindChildIndexCallbackRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_find_child_index_callback',

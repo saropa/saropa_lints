@@ -77,8 +77,6 @@ class RequireTestAssertionsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -184,8 +182,6 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -301,8 +297,6 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -422,8 +416,6 @@ class AvoidHardcodedTestDelaysRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -517,8 +509,6 @@ class RequireTestSetupTeardownRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -610,8 +600,6 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -751,8 +739,6 @@ class AvoidProductionConfigInTestsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -852,8 +838,6 @@ class PreferPumpAndSettleRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -975,8 +959,6 @@ class AvoidTestSleepRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -1073,8 +1055,6 @@ class AvoidFindByTextRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -1178,8 +1158,6 @@ class RequireTestKeysRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -1293,8 +1271,6 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -1396,8 +1372,6 @@ class PreferMockNavigatorRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -1484,8 +1458,6 @@ class AvoidRealTimerInWidgetTestRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -1575,8 +1547,6 @@ class RequireMockVerificationRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -1664,8 +1634,6 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -1775,8 +1743,6 @@ class PreferTestWrapperRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -1923,8 +1889,6 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -2017,8 +1981,6 @@ class AvoidStatefulTestSetupRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -2107,8 +2069,6 @@ class PreferMockHttpRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -2174,7 +2134,6 @@ class RequireGoldenTestRule extends SaropaLintRule {
   RequireGoldenTestRule() : super(code: _code);
   @override
   bool get usesTypeResolution => true;
-
 
   static const LintCode _code = LintCode(
     'require_golden_test',
@@ -2276,8 +2235,6 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -2449,8 +2406,6 @@ class PreferSingleAssertionRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -2535,8 +2490,6 @@ class AvoidFindAllRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -2652,8 +2605,6 @@ class RequireIntegrationTestSetupRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -2737,8 +2688,6 @@ class AvoidHardcodedDelaysRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -2848,8 +2797,6 @@ class RequireErrorCaseTestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -3053,8 +3000,6 @@ class PreferTestFindByKeyRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -3191,8 +3136,6 @@ class PreferSetupTeardownRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -3528,8 +3471,6 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -3646,8 +3587,6 @@ class PreferBlocTestPackageRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -3739,8 +3678,6 @@ class PreferMockVerifyRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
 
@@ -3831,8 +3768,6 @@ class RequireDialogTestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -3963,8 +3898,6 @@ class PreferFakePlatformRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
@@ -4102,8 +4035,6 @@ class RequireTestDocumentationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};

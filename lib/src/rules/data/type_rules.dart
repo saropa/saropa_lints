@@ -55,8 +55,6 @@ class AvoidCastingToExtensionTypeRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_casting_to_extension_type',
     '[avoid_casting_to_extension_type] Cast to extension type bypasses the constructor invariants and type safety guarantees. '
@@ -125,8 +123,6 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_collection_methods_with_unrelated_types',
@@ -257,8 +253,6 @@ class AvoidDynamicRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_dynamic_type',
     "[avoid_dynamic_type] 'dynamic' type disables static type checking, hiding errors until runtime. "
@@ -373,8 +367,6 @@ class AvoidImplicitlyNullableExtensionTypesRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_implicitly_nullable_extension_types',
     '[avoid_implicitly_nullable_extension_types] Extension type is implicitly nullable. Extension types that don\'t implement Object can be implicitly nullable, which may lead to unexpected behavior. {v4}',
@@ -447,8 +439,6 @@ class AvoidNullableInterpolationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_nullable_interpolation',
@@ -628,8 +618,6 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_nullable_parameters_with_default_values',
     '[avoid_nullable_parameters_with_default_values] Parameter with default value must not be nullable. If a parameter has a default value, it doesn\'t need to be nullable. Quick fix available: Adds a comment to flag for manual review. {v5}',
@@ -705,8 +693,6 @@ class AvoidNullableToStringRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_nullable_tostring',
@@ -797,8 +783,6 @@ class AvoidNullAssertionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_null_assertion',
@@ -1888,8 +1872,6 @@ class AvoidUnnecessaryTypeAssertionsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_unnecessary_type_assertions',
     '[avoid_unnecessary_type_assertions] Unnecessary type assertion. '
@@ -1971,8 +1953,6 @@ class AvoidUnnecessaryTypeCastsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_unnecessary_type_casts',
     '[avoid_unnecessary_type_casts] Unnecessary type cast. '
@@ -2053,8 +2033,6 @@ class AvoidUnrelatedTypeAssertionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.high;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'avoid_unrelated_type_assertions',
@@ -2144,8 +2122,6 @@ class TypeCheckWithNullRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'type_check_with_null',
     '[type_check_with_null] Prefer "x == null" or "x != null" instead of "x is Null" or "x is! Null".',
@@ -2203,8 +2179,6 @@ class InvalidRuntimeCheckWithJsInteropTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<String>? get requiredPatterns => {'is ', 'is! '};
@@ -2278,8 +2252,6 @@ class ArgumentMustBeNativeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   Set<String>? get requiredPatterns => {'Native.addressOf', 'dart:ffi'};
@@ -2387,8 +2359,6 @@ class PreferCorrectTypeNameRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'prefer_correct_type_name',
     '[prefer_correct_type_name] Type name is not UpperCamelCase. Nonstandard type names reduce code readability and break Dart conventions. Quick fix available: Adds a comment to flag for manual review. {v4}',
@@ -2495,8 +2465,6 @@ class PreferExplicitFunctionTypeRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'prefer_explicit_function_type',
     '[prefer_explicit_function_type] Use explicit function type instead of bare "Function". The bare \'Function\' type is too permissive and loses type information. Using bare \'Function\' type instead of specific function type. {v5}',
@@ -2550,8 +2518,6 @@ class PreferInlineFunctionTypesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   String get exampleBad =>
@@ -2610,8 +2576,6 @@ class PreferResultTypeRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'prefer_result_type',
     '[prefer_result_type] Prefer explicit return type on function declarations for clarity.',
@@ -2661,7 +2625,6 @@ class PreferTypeOverVarRule extends SaropaLintRule {
   LintImpact get impact => LintImpact.info;
   @override
   bool get usesTypeResolution => true;
-
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -2743,8 +2706,6 @@ class ExternalWithInitializerRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'external_with_initializer',
     '[external_with_initializer] An external field or variable must not have an initializer; external declarations have no Dart implementation.',
@@ -2810,8 +2771,6 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   bool get requiresClassDeclaration => true;
@@ -2893,8 +2852,6 @@ class AvoidPrivateTypedefFunctionsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'avoid_private_typedef_functions',
     '[avoid_private_typedef_functions] Private typedef that defines a function type. Prefer using the inline function type at each usage site.',
@@ -2945,8 +2902,6 @@ class PreferFinalLocalsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'prefer_final_locals',
@@ -3095,8 +3050,6 @@ class PreferConstDeclarationsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'prefer_const_declarations',
     '[prefer_const_declarations] Variable with constant initializer could be declared const for better performance and clarity.',
@@ -3193,8 +3146,6 @@ class InvalidVisibleOutsideTemplateAnnotationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'invalid_visible_outside_template_annotation',
@@ -3296,8 +3247,6 @@ class DuplicateRecordFieldNameRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'duplicate_field_name',
     '[duplicate_field_name] Record literal or record type declares the same field name more than once. Duplicate record fields are invalid Dart. {v1}',
@@ -3379,8 +3328,6 @@ class InvalidRecordFieldNameRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'invalid_field_name',
     '[invalid_field_name] Record field name is not a valid Dart identifier (for example a reserved keyword). {v1}',
@@ -3452,8 +3399,6 @@ class InvalidExtensionArgumentCountRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
   static const LintCode _code = LintCode(
     'invalid_extension_argument_count',
     '[invalid_extension_argument_count] An extension override must supply exactly one argument: the receiver value for the extension. The Dart analyzer reports the same issue natively; this rule aligns messaging within saropa_lints. {v1}',
@@ -3509,8 +3454,6 @@ class SubtypeOfDisallowedTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'subtype_of_disallowed_type',
@@ -3611,8 +3554,6 @@ class AbiSpecificIntegerInvalidRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
 
   static const LintCode _code = LintCode(
     'abi_specific_integer_invalid',

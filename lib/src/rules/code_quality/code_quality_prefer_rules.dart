@@ -34,7 +34,6 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
   static const LintCode _code = LintCode(
     'prefer_both_inlining_annotations',
     '[prefer_both_inlining_annotations] Only one inlining pragma is present, but the Dart VM and dart2js compilers use different annotations. Without both vm:prefer-inline and dart2js:tryInline, the function is only inlined on one platform, leaving the other without the intended optimization. {v3}',
@@ -42,7 +41,6 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
         'Add the missing counterpart annotation: use @pragma(dart2js:tryInline) alongside @pragma(vm:prefer-inline), or vice versa.',
     severity: DiagnosticSeverity.INFO,
   );
-
 
   @override
   void runWithReporter(
@@ -130,9 +128,6 @@ class PreferDedicatedMediaQueryMethodRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'prefer_dedicated_media_query_method',
     '[prefer_dedicated_media_query_method] MediaQuery.of(context) accessed for a single property. This registers a dependency on the entire MediaQueryData object, causing the widget to rebuild whenever any media query value changes (orientation, padding, text scale), even if only one property is needed. {v6}',
@@ -213,9 +208,6 @@ class PreferEnumsByNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_enums_by_name',
@@ -300,9 +292,6 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'prefer_extracting_function_callbacks',
     '[prefer_extracting_function_callbacks] Large inline callback detected spanning 10+ lines. Inline callbacks make code harder to read, test in isolation, and reuse across multiple call sites, reducing code maintainability and increasing complexity. {v4}',
@@ -375,9 +364,6 @@ class PreferNullAwareSpreadRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_null_aware_spread',
@@ -477,9 +463,6 @@ class PreferVisibleForTestingOnMembersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_visible_for_testing_on_members',
@@ -581,9 +564,6 @@ class PreferAnyOrEveryRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'prefer_any_or_every',
     '[prefer_any_or_every] Collection filtered with where() only to check isEmpty/isNotEmpty. The where() call creates an intermediate lazy iterable and allocates a closure, while any() and every() short-circuit on the first matching element without creating intermediate objects. {v5}',
@@ -657,9 +637,6 @@ class PreferForInRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   String get exampleBad =>
@@ -768,9 +745,6 @@ class PreferBytesBuilderRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'prefer_bytes_builder',
     '[prefer_bytes_builder] List<int> with repeated addAll operations detected. Each addAll call may trigger memory reallocation and copying, causing O(n²) performance when building large byte arrays, resulting in slow processing and excessive memory churn. {v5}',
@@ -833,9 +807,6 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   String get exampleBad => 'condition ? foo(1, 2) : foo(1, 3);';
@@ -922,9 +893,6 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'prefer_shorthands_with_constructors',
     '[prefer_shorthands_with_constructors] Lambda wraps a constructor call without adding any logic (e.g. (x) => MyClass(x)). The closure allocates an extra function object on each evaluation and obscures the simple delegation, making the code harder to read at a glance. {v4}',
@@ -1001,9 +969,6 @@ class PreferShorthandsWithEnumsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'prefer_shorthands_with_enums',
     '[prefer_shorthands_with_enums] Enum accessed using verbose qualification (EnumType.enumValue) where shorthand (.enumValue) is available. This adds unnecessary repetition, makes code harder to read, and increases the chance of errors when refactoring enum names. {v4}',
@@ -1070,9 +1035,6 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'prefer_shorthands_with_static_fields',
     '[prefer_shorthands_with_static_fields] Static field accessed through unnecessary collection search (firstWhere, where) when direct access is available. This wastes CPU cycles iterating through values and makes code less efficient and harder to understand. {v4}',
@@ -1138,8 +1100,6 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
   );
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   void runWithReporter(
@@ -1210,9 +1170,6 @@ class PassOptionalArgumentRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'pass_optional_argument',
     '[pass_optional_argument] Function call omits important optional parameter, relying on default value. Future readers must hunt for the function definition to understand the omitted behavior, making code harder to comprehend and maintain at the call site. {v4}',
@@ -1275,7 +1232,6 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
   static const LintCode _code = LintCode(
     'prefer_single_declaration_per_file',
     '[prefer_single_declaration_per_file] File contains multiple top-level class, enum, or extension declarations. Combining unrelated declarations in one file makes it harder to locate definitions, increases merge conflicts when multiple developers edit the same file, and breaks the convention of one-declaration-per-file. {v3}',
@@ -1283,7 +1239,6 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
         'Split each top-level declaration into its own file, named after the declaration (e.g. my_class.dart for MyClass), to improve discoverability and reduce merge conflicts.',
     severity: DiagnosticSeverity.INFO,
   );
-
 
   @override
   void runWithReporter(
@@ -1389,9 +1344,6 @@ class PreferTestMatchersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_test_matchers',
@@ -1509,9 +1461,6 @@ class PreferUnwrappingFutureOrRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'prefer_unwrapping_future_or',
     '[prefer_unwrapping_future_or] FutureOr type detected requiring manual type checking and unwrapping. This forces runtime type inspection (is Future checks) and adds branching complexity, making the code harder to understand and more error-prone. {v4}',
@@ -1604,8 +1553,6 @@ class PreferOverridingParentEqualityRule extends SaropaLintRule {
   );
   @override
   bool get usesTypeResolution => true;
-
-
 
   @override
   void runWithReporter(
@@ -1729,9 +1676,6 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   static const LintCode _code = LintCode(
     'prefer_typedefs_for_callbacks',
     '[prefer_typedefs_for_callbacks] Inline function type could be a typedef. Inline function types are harder to read and reuse. Suggests using typedefs for callback function types. {v2}',
@@ -1793,9 +1737,6 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_redirecting_superclass_constructor',
@@ -1873,9 +1814,6 @@ class PreferUsePrefixRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   String get exampleBad =>
@@ -2015,9 +1953,6 @@ class PreferDotShorthandRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   String get exampleBad => 'TextAlign align = TextAlign.center;';
 
@@ -2127,9 +2062,6 @@ class NoBooleanLiteralCompareRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   @override
   String get exampleBad => 'if (isEnabled == true) { }';
@@ -2241,9 +2173,6 @@ class PreferReturningConditionalExpressionsRule extends SaropaLintRule {
   @override
   bool get usesTypeResolution => true;
 
-
-
-
   @override
   String get exampleBad =>
       'if (condition) {\n'
@@ -2349,9 +2278,6 @@ class PreferNamedBoolParamsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
-
-
-
 
   static const LintCode _code = LintCode(
     'prefer_named_bool_params',

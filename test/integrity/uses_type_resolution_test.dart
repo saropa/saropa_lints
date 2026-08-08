@@ -28,7 +28,8 @@ void main() {
     expect(
       missing,
       isEmpty,
-      reason: 'These rule files use resolved-type APIs but lack '
+      reason:
+          'These rule files use resolved-type APIs but lack '
           '`@override bool get usesTypeResolution => true;`:\n'
           '${missing.join('\n')}',
     );
