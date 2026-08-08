@@ -66,6 +66,8 @@ import { exportLintsEnvelope } from './suite/exporter';
 import { registerSiblingDeepLinks } from './suite/siblingDeepLinks';
 import { maybeNudgeSuiteAwareness } from './suite/suiteAwarenessNudge';
 import { RulePacksWebviewProvider } from './rulePacks/rulePacksWebviewProvider';
+import { AnalysisOptimizerWebviewProvider } from './analysisOptimizer/analysisOptimizerWebviewProvider';
+import { registerAnalyzerExcludeDiffProvider } from './analysisOptimizer/analyzerExcludeDiffProvider';
 import { maybeShowStartupSuggestion } from './rulePacks/startupSuggestionNudge';
 import {
   openRuleExplainPanelForViolation,
@@ -608,9 +610,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   );
 
   const rulePacksWebviewProvider = new RulePacksWebviewProvider(context.extensionUri);
+  registerAnalyzerExcludeDiffProvider(context);
+  const analysisOptimizerProvider = new AnalysisOptimizerWebviewProvider(context.extensionUri);
   const reloadOpenDashboardsForLocale = (): void => {
     refreshFindingsDashboardIfOpen(context);
     rulePacksWebviewProvider.refresh();
+    analysisOptimizerProvider.refresh();
     if (VibrancyReportPanel.currentPanel) {
       void vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');
     }
@@ -633,6 +638,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         invalidateDisabledRulesCache();
         if (base.endsWith('/analysis_options.yaml')) {
           rulePacksWebviewProvider.refresh();
+          analysisOptimizerProvider.refresh();
         }
       }
       const cfg = vscode.workspace.getConfiguration('saropaLints.todosAndHacks');
@@ -1420,6 +1426,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
     vscode.commands.registerCommand('saropaLints.openConfigDashboard', () => {
       rulePacksWebviewProvider.openEditorPanel();
+    }),
+    vscode.commands.registerCommand('saropaLints.openAnalysisOptimizer', () => {
+      analysisOptimizerProvider.openEditorPanel();
     }),
     vscode.commands.registerCommand('saropaLints.openPackageVibrancy', async () => {
       await vscode.commands.executeCommand('saropaLints.packageVibrancy.showReport');

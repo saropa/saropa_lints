@@ -64,6 +64,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Added (Extension)
+
+- **Analysis Optimizer** — new dashboard (sidebar, command palette, or memory warning toast) that scans the workspace, identifies high-cost files and folders, and recommends `analyzer: exclude:` patterns to reduce Dart analyzer memory usage. Applying a pattern opens a diff preview of the resulting `analysis_options.yaml` before writing; multi-pattern applies require confirmation. Generated code patterns (`*.g.dart`, `*.freezed.dart`, etc.) are recommended by default. No action required.
+- The critical-memory toast now includes an "Optimize Analysis" button alongside "Clean Up" to surface the optimizer when the analyzer is consuming excessive memory.
+
+---
+
 ## [14.5.1]
 
 This release introduces a new balanced memory mode to drastically reduce RAM consumption during incremental analysis, alongside a Full Opportunities Report designed specifically for AI-driven dependency reviews. It also refines localization workflows by eliminating false-positive translation warnings on placeholder-only templates. Developers will experience a significantly lighter background footprint on large projects and gain deeper, exportable insights into their codebase's dependency utilization. [log](https://github.com/saropa/saropa_lints/blob/v14.5.1/CHANGELOG.md)
@@ -71,7 +80,7 @@ This release introduces a new balanced memory mode to drastically reduce RAM con
 ### Added
 
 - **Full Opportunities Report** — a new export (sidebar, or `Saropa Lints: Export Full Opportunities Report`) that consolidates every dependency and every changelog feature into one HTML, Markdown, and JSON report under `reports/`. Unlike the Upgrade Opportunities panel, it keeps fully-adopted packages and every changelog category, and counts each feature's usage from zero upward with the exact project file and line of every reference. Built to hand to an AI for a dependency-usage review.
-- **Balanced memory mode** — new `memory_mode: balanced` setting (default) that skips type-heavy rules on unchanged files during incremental analysis, reducing analyzer RSS by ~7 GB on large projects. When a dependency changes, all transitive importers are automatically re-analyzed via import-graph invalidation. Set `memory_mode: full` in `analysis_options_custom.yaml` or `SAROPA_MEMORY_MODE=full` to restore previous behavior. No action required.
+- **Balanced memory mode** — new `memory_mode: balanced` setting (default) that skips type-heavy rules on unchanged files during incremental analysis, reducing CPU work on re-analysis passes. When a dependency changes, all transitive importers are automatically re-analyzed via import-graph invalidation. Set `memory_mode: full` in `analysis_options_custom.yaml` or `SAROPA_MEMORY_MODE=full` to restore previous behavior. No action required.
 
 <details>
 <summary>Maintenance</summary>

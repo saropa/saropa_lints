@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "Clean Up",
+      "optimizeAnalysis": "Optimize Analysis",
       "dontShowAgain": "Don’t Show Again"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "Could not locate version constraint for {package}",
       "detailViewUpdated": "Updated {package} to {version}"
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: Analysis Optimizer",
+    "title": "Analysis Optimizer",
+    "subtitle": "Reduce analyzer memory by excluding non-essential files from analysis",
+    "emptyDescription": "Scan your workspace to identify high-cost files and folders that can be excluded from the Dart analyzer to reduce memory usage.",
+    "scanButton": "Scan Workspace",
+    "rescanButton": "Rescan",
+    "scanning": "Scanning workspace…",
+    "openConfig": "Open analysis_options.yaml",
+    "lastScan": "Last scan: {time}",
+    "sidebar": {
+      "label": "Analysis Optimizer",
+      "description": "Reduce analyzer memory"
+    },
+    "kpi": {
+      "filesInScope": "Files in scope",
+      "lines": "lines",
+      "files": "files",
+      "estimatedCost": "Estimated analysis cost",
+      "costUnits": "cost units",
+      "potentialSavings": "Potential savings",
+      "recommendations": "recommendations"
+    },
+    "costHeavy": "Heavy",
+    "costModerate": "Moderate",
+    "costLight": "Light",
+    "currentExclusions": "Current exclusions",
+    "noExclusions": "No exclusions configured in analysis_options.yaml",
+    "recommendations": "Recommended exclusions",
+    "noRecommendations": "No exclusion recommendations — the workspace is already well-scoped",
+    "applyAll": "Apply all",
+    "applySelected": "Apply selected",
+    "apply": "Apply",
+    "remove": "Remove",
+    "selectAll": "Select all",
+    "defaultLabel": "Default",
+    "col": {
+      "pattern": "Pattern",
+      "files": "Files",
+      "cost": "Est. cost",
+      "priority": "Priority"
+    },
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "activeFilesWarning": "This folder contains recently edited files",
+    "folderHeatMap": "Folder analysis cost",
+    "hints": {
+      "title": "How it works",
+      "body": "The optimizer scans every Dart file in your workspace and estimates analysis cost based on file complexity (line count, classes, functions, imports). It then recommends exclusion patterns to reduce the number of files the Dart analyzer loads into memory.",
+      "generated": "Generated code (*.g.dart, *.freezed.dart, etc.) is safe to exclude — it is always regenerated from source.",
+      "build": "Build output (build/, .dart_tool/) contains intermediate artifacts not needed for live analysis.",
+      "inactive": "Folders with no recent git activity may contain dead or archived code.",
+      "protected": "Core source folders (lib/, lib/src/, bin/) are never recommended for exclusion."
+    },
+    "notify": {
+      "applied": "Applied {count} exclusion pattern(s) to analysis_options.yaml",
+      "removed": "Removed exclusion pattern from analysis_options.yaml",
+      "writeFailed": "Could not write to analysis_options.yaml — the file may be missing"
+    },
+    "confirmBulk": {
+      "prompt": "Apply {count} exclusion patterns to analysis_options.yaml?",
+      "detail": "Patterns: {preview}"
+    },
+    "diffTitle": "Analysis Optimizer: Proposed Exclusions"
   }
 }

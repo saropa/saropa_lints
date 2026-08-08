@@ -110,11 +110,14 @@ export class ProcessMonitor implements vscode.Disposable {
     const orphaned = String(snapshot.orphanedDaemonPids.length);
     const msg = l10n('systemHealth.notification.critical', { size, orphaned });
     const cleanUp = l10n('systemHealth.action.cleanUp');
+    const optimize = l10n('systemHealth.action.optimizeAnalysis');
     const dontShow = l10n('systemHealth.action.dontShowAgain');
 
-    void vscode.window.showWarningMessage(msg, cleanUp, dontShow).then((choice) => {
+    void vscode.window.showWarningMessage(msg, cleanUp, optimize, dontShow).then((choice) => {
       if (choice === cleanUp) {
         void vscode.commands.executeCommand('saropaLints.killOrphanedDaemons');
+      } else if (choice === optimize) {
+        void vscode.commands.executeCommand('saropaLints.openAnalysisOptimizer');
       } else if (choice === dontShow) {
         void vscode.workspace
           .getConfiguration('saropaLints.systemHealth')

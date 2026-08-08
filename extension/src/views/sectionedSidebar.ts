@@ -234,6 +234,13 @@ function buildEditorDashboardItems(): LeafItem[] {
             new vscode.ThemeColor('activityBarBadge.foreground'),
         ),
         new LeafItem(
+            l10n('analysisOptimizer.sidebar.label'),
+            l10n('analysisOptimizer.sidebar.description'),
+            'saropaLints.openAnalysisOptimizer',
+            'zap',
+            new vscode.ThemeColor('charts.yellow'),
+        ),
+        new LeafItem(
             'Package Dashboard',
             packageDesc,
             'saropaLints.packageVibrancy.showReport',
