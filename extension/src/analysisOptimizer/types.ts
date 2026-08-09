@@ -20,7 +20,7 @@ export interface FolderAnalysisCost {
   excludePattern: string;
 }
 
-export interface ExclusionRecommendation {
+export interface ExclusionRow {
   pattern: string;
   reason: string;
   estimatedFilesExcluded: number;
@@ -28,6 +28,7 @@ export interface ExclusionRecommendation {
   hasActiveFiles: boolean;
   priority: 'high' | 'medium' | 'low';
   isDefault: boolean;
+  isApplied: boolean;
 }
 
 export interface AnalysisOptimizerResult {
@@ -35,7 +36,6 @@ export interface AnalysisOptimizerResult {
   totalLines: number;
   totalCost: number;
   folders: FolderAnalysisCost[];
-  recommendations: ExclusionRecommendation[];
-  currentExclusions: string[];
+  exclusions: ExclusionRow[];
   scanTimestamp: string;
 }

@@ -12,64 +12,126 @@ export function readAnalyzerExcludes(root: string): string[] {
   return parseAnalyzerExcludes(content);
 }
 
-export function parseAnalyzerExcludes(content: string): string[] {
-  const lines = content.split('\n');
-  const excludes: string[] = [];
-  let inAnalyzer = false;
-  let inExclude = false;
-  let analyzerIndent = -1;
-  let excludeIndent = -1;
+/**
+ * Strips an inline `# comment` and any leading/trailing quote characters from
+ * a raw YAML list-item value. Handles the common hand-edited case where a
+ * pattern was typed as an unquoted scalar but still closed with a trailing
+ * quote out of habit: an unquoted scalar followed by `" # comment` is, per
+ * YAML's rules, a literal value ending in a stray quote character, followed
+ * by a comment — without stripping that, the value never string-equals the
+ * clean pattern the optimizer generates, so an already-excluded pattern
+ * looks unrecognized and gets re-added as a duplicate on the next write.
+ */
+function cleanExcludeValue(raw: string): string {
+  // YAML only starts a comment at a `#` preceded by whitespace, so this is
+  // safe even though glob patterns can't contain `#` themselves.
+  const commentIdx = raw.search(/\s#/);
+  let value = (commentIdx >= 0 ? raw.slice(0, commentIdx) : raw).trim();
+  if ((value.startsWith('"') && value.endsWith('"') && value.length >= 2)
+    || (value.startsWith("'") && value.endsWith("'") && value.length >= 2)) {
+    value = value.slice(1, -1);
+  } else {
+    if (value.startsWith('"') || value.startsWith("'")) value = value.slice(1);
+    if (value.endsWith('"') || value.endsWith("'")) value = value.slice(0, -1);
+  }
+  return value.trim();
+}
 
-  for (const line of lines) {
-    const stripped = line.replace(/\r$/, '');
+interface ExcludeLine {
+  pattern: string;
+  /** Raw text after `- `, comment and stray quoting intact, for write-back preservation. */
+  raw: string;
+}
+
+/** Locates the `analyzer: exclude:` block and returns its list items in file order, raw. */
+function findExcludeLines(lines: string[]): {
+  analyzerIdx: number;
+  analyzerIndent: number;
+  indentUnit: string;
+  excludeStart: number;
+  excludeEnd: number;
+  inlineItems: ExcludeLine[] | null;
+  items: ExcludeLine[];
+} {
+  const analyzerIdx = lines.findIndex(l => /^analyzer\s*:/.test(l));
+  const result = {
+    analyzerIdx,
+    analyzerIndent: -1,
+    indentUnit: '  ',
+    excludeStart: -1,
+    excludeEnd: -1,
+    inlineItems: null as ExcludeLine[] | null,
+    items: [] as ExcludeLine[],
+  };
+  if (analyzerIdx < 0) return result;
+
+  result.analyzerIndent = lines[analyzerIdx].length - lines[analyzerIdx].trimStart().length;
+  let indentUnitFound = false;
+  let excludeIndent = -1;
+  let inExclude = false;
+
+  for (let i = analyzerIdx + 1; i < lines.length; i++) {
+    const stripped = lines[i].replace(/\r$/, '');
     if (/^\s*#/.test(stripped) || stripped.trim() === '') {
       if (inExclude) continue;
       continue;
     }
-
     const indent = stripped.length - stripped.trimStart().length;
 
-    if (/^analyzer\s*:/.test(stripped)) {
-      inAnalyzer = true;
-      analyzerIndent = indent;
-      inExclude = false;
-      continue;
+    if (!inExclude && indent <= result.analyzerIndent) break;
+
+    if (!indentUnitFound && indent > result.analyzerIndent) {
+      result.indentUnit = stripped.slice(result.analyzerIndent, indent);
+      indentUnitFound = true;
     }
 
-    if (inAnalyzer && indent <= analyzerIndent && stripped.trim() !== '') {
-      inAnalyzer = false;
-      inExclude = false;
-      continue;
-    }
-
-    if (inAnalyzer && /^\s+exclude\s*:/.test(stripped)) {
+    if (!inExclude && /^\s+exclude\s*:/.test(stripped)) {
       const inlineMatch = stripped.match(/^\s+exclude\s*:\s*\[(.*)\]\s*$/);
       if (inlineMatch) {
-        for (const item of inlineMatch[1].split(',')) {
-          const trimmedItem = item.trim().replace(/^['"]|['"]$/g, '');
-          if (trimmedItem) excludes.push(trimmedItem);
-        }
-        continue;
+        result.excludeStart = i;
+        result.excludeEnd = i + 1;
+        result.inlineItems = inlineMatch[1]
+          .split(',')
+          .map(item => item.trim())
+          .filter(item => item.length > 0)
+          .map(item => ({ pattern: cleanExcludeValue(item), raw: item }));
+        return result;
       }
-      inExclude = true;
+      result.excludeStart = i;
       excludeIndent = indent;
+      inExclude = true;
       continue;
     }
 
     if (inExclude) {
-      if (indent <= excludeIndent && stripped.trim() !== '') {
-        inExclude = false;
-        if (indent <= analyzerIndent) inAnalyzer = false;
-        continue;
+      if (indent <= excludeIndent) {
+        result.excludeEnd = i;
+        break;
       }
       const match = stripped.match(/^\s+-\s+(.+)/);
       if (match) {
-        excludes.push(match[1].trim().replace(/^['"]|['"]$/g, ''));
+        result.items.push({ pattern: cleanExcludeValue(match[1]), raw: match[1].trim() });
       }
     }
   }
 
-  return excludes;
+  if (result.excludeStart >= 0 && result.excludeEnd < 0) {
+    result.excludeEnd = lines.length;
+  }
+  return result;
+}
+
+export function parseAnalyzerExcludes(content: string): string[] {
+  const found = findExcludeLines(content.split('\n'));
+  const rawItems = found.inlineItems ?? found.items;
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const item of rawItems) {
+    if (!item.pattern || seen.has(item.pattern)) continue;
+    seen.add(item.pattern);
+    result.push(item.pattern);
+  }
+  return result;
 }
 
 /**
@@ -122,52 +184,30 @@ function replaceOrInsertExcludes(
   patterns: string[],
 ): string | null {
   const lines = content.split('\n');
-  const analyzerIdx = lines.findIndex(l => /^analyzer\s*:/.test(l));
+  const found = findExcludeLines(lines);
 
-  if (analyzerIdx >= 0) {
-    let excludeStart = -1;
-    let excludeEnd = -1;
-    const analyzerIndent = lines[analyzerIdx].length - lines[analyzerIdx].trimStart().length;
-    // Infer this file's existing indent unit from the first child of `analyzer:`
-    // rather than assuming 2 spaces — a mismatched unit would make the new
-    // `exclude:` key a sibling with a different indent than its neighbors,
-    // which most YAML parsers reject.
-    let indentUnit = '  ';
-    let indentUnitFound = false;
-
-    for (let i = analyzerIdx + 1; i < lines.length; i++) {
-      const line = lines[i];
-      const stripped = line.replace(/\r$/, '');
-      if (/^\s*#/.test(stripped) || stripped.trim() === '') continue;
-      const indent = stripped.length - stripped.trimStart().length;
-      if (indent <= analyzerIndent) break;
-
-      if (!indentUnitFound) {
-        indentUnit = stripped.slice(analyzerIndent, indent);
-        indentUnitFound = true;
-      }
-
-      if (/^\s+exclude\s*:/.test(stripped)) {
-        excludeStart = i;
-        for (let j = i + 1; j < lines.length; j++) {
-          const eLine = lines[j].replace(/\r$/, '');
-          if (/^\s*#/.test(eLine) || eLine.trim() === '') continue;
-          const eIndent = eLine.length - eLine.trimStart().length;
-          if (eIndent <= indent) { excludeEnd = j; break; }
-        }
-        if (excludeEnd < 0) excludeEnd = lines.length;
-        break;
+  if (found.analyzerIdx >= 0) {
+    // Reuse each pattern's original raw line (comment and all) where one
+    // exists, so applying a new exclusion doesn't wipe out the user's
+    // hand-written explanations for every other entry in the block.
+    const rawByPattern = new Map<string, string>();
+    for (const item of found.inlineItems ?? found.items) {
+      if (item.pattern && !rawByPattern.has(item.pattern)) {
+        rawByPattern.set(item.pattern, item.raw);
       }
     }
 
+    const indentUnit = found.indentUnit;
     const excludeBlock = patterns.length > 0
-      ? `${indentUnit}exclude:\n${patterns.map(p => `${indentUnit}${indentUnit}- ${p}`).join('\n')}`
+      ? `${indentUnit}exclude:\n${patterns
+        .map(p => `${indentUnit}${indentUnit}- ${rawByPattern.get(p) ?? p}`)
+        .join('\n')}`
       : `${indentUnit}exclude: []`;
 
-    if (excludeStart >= 0) {
-      lines.splice(excludeStart, excludeEnd - excludeStart, excludeBlock);
+    if (found.excludeStart >= 0) {
+      lines.splice(found.excludeStart, found.excludeEnd - found.excludeStart, excludeBlock);
     } else {
-      lines.splice(analyzerIdx + 1, 0, excludeBlock);
+      lines.splice(found.analyzerIdx + 1, 0, excludeBlock);
     }
   } else {
     const excludeBlock = patterns.length > 0

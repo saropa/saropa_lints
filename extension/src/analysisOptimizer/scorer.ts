@@ -1,7 +1,7 @@
 import type {
   FileAnalysisMetrics,
   FolderAnalysisCost,
-  ExclusionRecommendation,
+  ExclusionRow,
 } from './types';
 
 const PROTECTED_FOLDERS = new Set(['lib', 'lib/src', 'bin']);
@@ -75,72 +75,93 @@ export function aggregateByFolder(
   return result;
 }
 
-function isPatternCovered(
+/**
+ * Estimates how many scanned files a glob pattern would remove from analysis
+ * and their combined cost. Understands the two glob shapes the optimizer
+ * itself generates (`**\/*.ext` suffix globs, `dir/**` directory globs) plus
+ * an exact-path fallback for arbitrary hand-written patterns (e.g. a single
+ * excluded file) — good enough to size an already-applied exclusion the
+ * optimizer didn't generate, without a full glob-matching dependency.
+ */
+export function matchExclusionPattern(
+  files: FileAnalysisMetrics[],
   pattern: string,
-  existing: string[],
-): boolean {
-  return existing.some(e => e === pattern || pattern.startsWith(e.replace('/**', '/')));
+): { filesMatched: number; costMatched: number; hasActiveFiles: boolean } {
+  const suffixMatch = /^\*\*\/\*(\.[\w.]+)$/.exec(pattern);
+  const dirPrefix = pattern.endsWith('/**') ? pattern.slice(0, -3) : null;
+
+  let filesMatched = 0;
+  let costMatched = 0;
+  let hasActiveFiles = false;
+
+  for (const f of files) {
+    const matches = suffixMatch
+      ? f.relativePath.endsWith(suffixMatch[1])
+      : dirPrefix !== null
+        ? f.relativePath === dirPrefix || f.relativePath.startsWith(`${dirPrefix}/`)
+        : f.relativePath === pattern;
+    if (matches) {
+      filesMatched++;
+      costMatched += computeFileCost(f);
+      if (f.daysSinceLastEdit !== undefined && f.daysSinceLastEdit <= 7) {
+        hasActiveFiles = true;
+      }
+    }
+  }
+
+  return { filesMatched, costMatched, hasActiveFiles };
 }
 
-export function generateRecommendations(
+const PRIORITY_RANK = { high: 0, medium: 1, low: 2 } as const;
+
+/**
+ * Builds the unified exclusions table: every pattern the optimizer would
+ * recommend (default generated-code/build patterns plus folder-based
+ * candidates), each tagged with whether it's already applied, PLUS any
+ * currently-applied pattern that doesn't match a generated candidate at all
+ * (a hand-added entry in analysis_options.yaml) so nothing in the file is
+ * hidden from the table.
+ */
+export function buildExclusionRows(
   folders: FolderAnalysisCost[],
   files: FileAnalysisMetrics[],
   currentExclusions: string[],
-): ExclusionRecommendation[] {
-  const recs: ExclusionRecommendation[] = [];
+): ExclusionRow[] {
+  const appliedSet = new Set(currentExclusions);
+  const rows: ExclusionRow[] = [];
+  const seenPatterns = new Set<string>();
 
   for (const def of DEFAULT_EXCLUSION_PATTERNS) {
-    if (isPatternCovered(def.pattern, currentExclusions)) continue;
+    const { filesMatched, costMatched, hasActiveFiles } = matchExclusionPattern(files, def.pattern);
+    const isApplied = appliedSet.has(def.pattern);
+    if (filesMatched === 0 && !isApplied) continue;
 
-    const isGlob = def.pattern.startsWith('**/*.');
-    const suffix = isGlob ? def.pattern.replace('**/*/','').replace('**/*.', '.') : null;
-    const isDirGlob = def.pattern.endsWith('/**');
-    const dirPrefix = isDirGlob ? def.pattern.replace('/**', '') : null;
-
-    let matchCount = 0;
-    let matchCost = 0;
-    let hasActive = false;
-
-    for (const f of files) {
-      const matches = suffix
-        ? f.relativePath.endsWith(suffix)
-        : dirPrefix
-          ? f.relativePath.startsWith(dirPrefix + '/')
-          : false;
-      if (matches) {
-        matchCount++;
-        matchCost += computeFileCost(f);
-        if (f.daysSinceLastEdit !== undefined && f.daysSinceLastEdit <= 7) {
-          hasActive = true;
-        }
-      }
-    }
-
-    if (matchCount > 0) {
-      recs.push({
-        pattern: def.pattern,
-        reason: def.reason,
-        estimatedFilesExcluded: matchCount,
-        estimatedCostReduction: matchCost,
-        hasActiveFiles: hasActive,
-        priority: 'high',
-        isDefault: true,
-      });
-    }
+    seenPatterns.add(def.pattern);
+    rows.push({
+      pattern: def.pattern,
+      reason: def.reason,
+      estimatedFilesExcluded: filesMatched,
+      estimatedCostReduction: costMatched,
+      hasActiveFiles,
+      priority: 'high',
+      isDefault: true,
+      isApplied,
+    });
   }
 
   for (const folder of folders) {
     if (PROTECTED_FOLDERS.has(folder.folderPath)) continue;
-    if (isPatternCovered(folder.excludePattern, currentExclusions)) continue;
-    if (recs.some(r => r.pattern === folder.excludePattern)) continue;
+    if (seenPatterns.has(folder.excludePattern)) continue;
     if (folder.fileCount < 3) continue;
 
+    const isApplied = appliedSet.has(folder.excludePattern);
     const isInactive = folder.recentEditRatio < 0.1;
     const isMostlyGenerated = folder.generatedFileCount / folder.fileCount > 0.5;
 
-    if (!isInactive && !isMostlyGenerated) continue;
+    if (!isApplied && !isInactive && !isMostlyGenerated) continue;
 
-    recs.push({
+    seenPatterns.add(folder.excludePattern);
+    rows.push({
       pattern: folder.excludePattern,
       reason: isMostlyGenerated
         ? `${folder.generatedFileCount}/${folder.fileCount} files are generated code`
@@ -150,14 +171,37 @@ export function generateRecommendations(
       hasActiveFiles: folder.recentEditRatio > 0,
       priority: isMostlyGenerated ? 'high' : isInactive ? 'medium' : 'low',
       isDefault: false,
+      isApplied,
     });
   }
 
-  recs.sort((a, b) => {
-    const pri = { high: 0, medium: 1, low: 2 };
-    if (pri[a.priority] !== pri[b.priority]) return pri[a.priority] - pri[b.priority];
+  // Any applied pattern that isn't one of the optimizer's own generated
+  // candidates (a hand-added entry in analysis_options.yaml) still belongs
+  // in the table — the consolidated view must never hide an existing
+  // exclusion just because the optimizer didn't think to suggest it.
+  for (const pattern of currentExclusions) {
+    if (seenPatterns.has(pattern)) continue;
+    seenPatterns.add(pattern);
+    const { filesMatched, costMatched, hasActiveFiles } = matchExclusionPattern(files, pattern);
+    rows.push({
+      pattern,
+      reason: 'Existing exclusion in analysis_options.yaml',
+      estimatedFilesExcluded: filesMatched,
+      estimatedCostReduction: costMatched,
+      hasActiveFiles,
+      priority: 'low',
+      isDefault: false,
+      isApplied: true,
+    });
+  }
+
+  rows.sort((a, b) => {
+    if (a.isApplied !== b.isApplied) return a.isApplied ? 1 : -1;
+    if (PRIORITY_RANK[a.priority] !== PRIORITY_RANK[b.priority]) {
+      return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
+    }
     return b.estimatedCostReduction - a.estimatedCostReduction;
   });
 
-  return recs;
+  return rows;
 }

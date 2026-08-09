@@ -64,6 +64,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed (Extension)
+
+- **Analysis Optimizer failed to detect existing exclusions** — patterns with an inline `# comment` or a stray trailing quote (`- **/*.g.dart" # ...`) were never recognized as already excluded, so the dashboard kept recommending them and applying created a duplicate line. The reader now strips comments and malformed quoting before comparing, and the writer preserves each pattern's original comment on write. No action required.
+- **Analysis Optimizer's "Current exclusions" and "Recommended exclusions" are now one deduplicated "Exclusions" table**, with an Applied/Recommended status column, sortable columns, and the chosen sort order preserved across Apply/Remove actions. No action required.
+
+---
+
 ## [14.5.3]
 
 This release fixes a test-suite timeout in the health-history archival path and completes Filipino and Dutch translation coverage across the extension UI. No action required. [log](https://github.com/saropa/saropa_lints/blob/v14.5.3/CHANGELOG.md)

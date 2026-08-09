@@ -70,6 +70,62 @@ analyzer:
     assert.deepStrictEqual(parseAnalyzerExcludes(yaml), ['build/**', '**/*.g.dart']);
   });
 
+  it('parseAnalyzerExcludes strips an inline comment after a quoted pattern', () => {
+    const yaml = 'analyzer:\n  exclude:\n    - "**/*.g.dart" # Exclude generated files\n';
+    assert.deepStrictEqual(parseAnalyzerExcludes(yaml), ['**/*.g.dart']);
+  });
+
+  it('parseAnalyzerExcludes strips a stray trailing quote before an inline comment', () => {
+    // Real-world malformed entry: no opening quote, but a trailing `"` before
+    // the comment. Per YAML's rules this is the literal scalar `**/*.g.dart"`
+    // followed by a comment — the trailing quote must be stripped for this
+    // to compare equal to the clean pattern the optimizer generates.
+    const yaml = 'analyzer:\n  exclude:\n    - **/*.g.dart" # Exclude generated files (frozen Isar)\n';
+    assert.deepStrictEqual(parseAnalyzerExcludes(yaml), ['**/*.g.dart']);
+  });
+
+  it('parseAnalyzerExcludes dedupes a pattern that appears twice with different comments', () => {
+    const yaml = `
+analyzer:
+  exclude:
+    - **/*.g.dart
+    - **/*.g.dart" # Exclude generated files (frozen Isar)
+    - build/**
+`;
+    assert.deepStrictEqual(parseAnalyzerExcludes(yaml), ['**/*.g.dart', 'build/**']);
+  });
+
+  it('writeAnalyzerExcludes recognizes a comment-decorated existing pattern and does not duplicate it', () => {
+    withTempProject(
+      'analyzer:\n  exclude:\n    - **/*.g.dart" # Exclude generated files (frozen Isar)\n    - .dart_tool/**\n',
+      (root) => {
+        const existing = readAnalyzerExcludes(root);
+        assert.deepStrictEqual(existing, ['**/*.g.dart', '.dart_tool/**']);
+        // Simulates applying the same already-present pattern again, as the
+        // optimizer would if it failed to detect the existing entry.
+        const merged = mergeExclusions(existing, ['**/*.g.dart']);
+        const ok = writeAnalyzerExcludes(root, merged);
+        assert.strictEqual(ok, true);
+        const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+        const occurrences = content.match(/\*\*\/\*\.g\.dart/g) ?? [];
+        assert.strictEqual(occurrences.length, 1, 'pattern must not be duplicated on write');
+      },
+    );
+  });
+
+  it('writeAnalyzerExcludes preserves the original comment for an unchanged pattern', () => {
+    withTempProject(
+      'analyzer:\n  exclude:\n    - "**/*.g.dart" # Exclude generated files\n',
+      (root) => {
+        const existing = readAnalyzerExcludes(root);
+        const merged = mergeExclusions(existing, ['build/**']);
+        writeAnalyzerExcludes(root, merged);
+        const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+        assert.match(content, /# Exclude generated files/);
+      },
+    );
+  });
+
   it('mergeExclusions dedupes and sorts', () => {
     const result = mergeExclusions(['build/**'], ['build/**', 'lib/gen/**']);
     assert.deepStrictEqual(result, ['build/**', 'lib/gen/**']);

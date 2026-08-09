@@ -58,6 +58,81 @@ export function getOptimizerScript(): string {
     var count = document.querySelectorAll('.rec-cb:checked').length;
     btn.disabled = count === 0;
   }
+
+  var exclusionsTable = document.getElementById('exclusions-table');
+  if (exclusionsTable) {
+    // Uses the webview's own getState/setState (not localStorage) because
+    // that's the API VS Code guarantees persists across a webview.html
+    // reassignment — this panel re-renders its full HTML on every Apply /
+    // Remove, so without this the user's chosen sort would silently reset
+    // each time.
+    function loadSortState() {
+      var state = vscode.getState() || {};
+      return { key: state.sortKey || null, dir: state.sortDir === -1 ? -1 : 1 };
+    }
+
+    function saveSortState(sortState) {
+      var state = vscode.getState() || {};
+      state.sortKey = sortState.key;
+      state.sortDir = sortState.dir;
+      vscode.setState(state);
+    }
+
+    var sortState = loadSortState();
+    var headers = exclusionsTable.querySelectorAll('th.sortable');
+
+    function applySort(key, dir) {
+      var tbody = exclusionsTable.querySelector('tbody');
+      var rows = Array.from(tbody.querySelectorAll('tr'));
+      var attr = 'data-' + key;
+      var numeric = key === 'files' || key === 'cost' || key === 'priority' || key === 'status';
+
+      rows.sort(function(a, b) {
+        var av = a.getAttribute(attr) || '';
+        var bv = b.getAttribute(attr) || '';
+        if (numeric) {
+          return (parseFloat(av) - parseFloat(bv)) * dir;
+        }
+        return av.localeCompare(bv) * dir;
+      });
+
+      for (var k = 0; k < rows.length; k++) {
+        tbody.appendChild(rows[k]);
+      }
+    }
+
+    function markActiveHeader(key, dir) {
+      for (var j = 0; j < headers.length; j++) {
+        headers[j].classList.remove('sort-asc', 'sort-desc');
+        if (headers[j].dataset.sort === key) {
+          headers[j].classList.add(dir === 1 ? 'sort-asc' : 'sort-desc');
+        }
+      }
+    }
+
+    for (var h = 0; h < headers.length; h++) {
+      headers[h].addEventListener('click', function() {
+        var key = this.dataset.sort;
+        if (sortState.key === key) {
+          sortState.dir = -sortState.dir;
+        } else {
+          sortState.key = key;
+          sortState.dir = 1;
+        }
+        applySort(sortState.key, sortState.dir);
+        markActiveHeader(sortState.key, sortState.dir);
+        saveSortState(sortState);
+      });
+    }
+
+    // Re-applies the sort the user last chose so it survives the full-HTML
+    // re-render every Apply/Remove triggers (the panel has no partial DOM
+    // update path — the server always redraws the whole table from scratch).
+    if (sortState.key) {
+      applySort(sortState.key, sortState.dir);
+      markActiveHeader(sortState.key, sortState.dir);
+    }
+  }
 })();
 `;
 }

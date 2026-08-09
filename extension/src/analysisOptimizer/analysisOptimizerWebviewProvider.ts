@@ -4,7 +4,7 @@ import { createWebviewCspNonce, escapeHtml } from '../vibrancy/views/html-utils'
 import { getDashboardChromeStyles } from '../views/dashboardChromeStyles';
 import { l10n } from '../i18n/runtime';
 import { scanWorkspace } from './scanner';
-import { computeFileCost, aggregateByFolder, generateRecommendations } from './scorer';
+import { computeFileCost, aggregateByFolder, buildExclusionRows } from './scorer';
 import {
   readAnalyzerExcludes,
   writeAnalyzerExcludes,
@@ -14,13 +14,15 @@ import {
 } from './analyzerExcludeYaml';
 import { showAnalyzerExcludeDiff } from './analyzerExcludeDiffProvider';
 import { getOptimizerScript } from './analysisOptimizerScript';
-import type { AnalysisOptimizerResult, ExclusionRecommendation } from './types';
+import type { AnalysisOptimizerResult, ExclusionRow, FileAnalysisMetrics } from './types';
 
 const PANEL_TYPE = 'saropaLints.analysisOptimizer';
+const PRIORITY_RANK: Record<ExclusionRow['priority'], number> = { high: 0, medium: 1, low: 2 };
 
 export class AnalysisOptimizerWebviewProvider {
   private _panel?: vscode.WebviewPanel;
   private _result?: AnalysisOptimizerResult;
+  private _scannedFiles: FileAnalysisMetrics[] = [];
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -97,7 +99,8 @@ export class AnalysisOptimizerWebviewProvider {
     }
     const root = getProjectRoot();
     if (root) {
-      this._result.currentExclusions = readAnalyzerExcludes(root);
+      const currentExclusions = readAnalyzerExcludes(root);
+      this._result.exclusions = buildExclusionRows(this._result.folders, this._scannedFiles, currentExclusions);
     }
     this._renderPanel();
   }
@@ -129,15 +132,15 @@ export class AnalysisOptimizerWebviewProvider {
 
     const currentExclusions = readAnalyzerExcludes(root);
     const folders = aggregateByFolder(files);
-    const recommendations = generateRecommendations(folders, files, currentExclusions);
+    const exclusions = buildExclusionRows(folders, files, currentExclusions);
 
+    this._scannedFiles = files;
     this._result = {
       totalFiles: files.length,
       totalLines,
       totalCost,
       folders,
-      recommendations,
-      currentExclusions,
+      exclusions,
       scanTimestamp: new Date().toISOString(),
     };
 
@@ -177,7 +180,7 @@ export class AnalysisOptimizerWebviewProvider {
 
   private async _applyAllRecommendations(): Promise<void> {
     if (!this._result) return;
-    const patterns = this._result.recommendations.map(r => r.pattern);
+    const patterns = this._result.exclusions.filter(r => !r.isApplied).map(r => r.pattern);
     await this._applySelected(patterns);
   }
 
@@ -264,9 +267,10 @@ export class AnalysisOptimizerWebviewProvider {
 
   private _buildResultView(): string {
     const r = this._result!;
+    const notApplied = r.exclusions.filter(e => !e.isApplied);
     const savingsPercent = r.totalCost > 0
       ? Math.round(
-        r.recommendations.reduce((sum, rec) => sum + rec.estimatedCostReduction, 0)
+        notApplied.reduce((sum, rec) => sum + rec.estimatedCostReduction, 0)
         / r.totalCost * 100
       )
       : 0;
@@ -283,9 +287,8 @@ export class AnalysisOptimizerWebviewProvider {
   <p class="hero-meta">${escapeHtml(l10n('analysisOptimizer.lastScan', { time: new Date(r.scanTimestamp).toLocaleTimeString() }))}</p>
 </div>
 
-${this._buildKpiStrip(r, costLabel, savingsPercent)}
-${this._buildCurrentExclusions(r)}
-${this._buildRecommendations(r)}
+${this._buildKpiStrip(r, costLabel, savingsPercent, notApplied.length)}
+${this._buildExclusionsTable(r)}
 ${this._buildFolderHeatMap(r)}
 ${this._buildHints()}
 
@@ -299,6 +302,7 @@ ${this._buildHints()}
     r: AnalysisOptimizerResult,
     costLabel: string,
     savingsPercent: number,
+    recommendedCount: number,
   ): string {
     return `
 <div class="kpi-row">
@@ -315,61 +319,39 @@ ${this._buildHints()}
   <div class="kpi-card${savingsPercent > 20 ? ' kpi-highlight' : ''}">
     <span class="kpi-k">${escapeHtml(l10n('analysisOptimizer.kpi.potentialSavings'))}</span>
     <span class="kpi-v">${savingsPercent}%</span>
-    <span class="kpi-sub">${r.recommendations.length} ${escapeHtml(l10n('analysisOptimizer.kpi.recommendations'))}</span>
+    <span class="kpi-sub">${recommendedCount} ${escapeHtml(l10n('analysisOptimizer.kpi.recommendations'))}</span>
   </div>
 </div>`;
   }
 
-  private _buildCurrentExclusions(r: AnalysisOptimizerResult): string {
-    if (r.currentExclusions.length === 0) {
+  private _buildExclusionsTable(r: AnalysisOptimizerResult): string {
+    if (r.exclusions.length === 0) {
       return `
 <section class="opt-section">
-  <h2>${escapeHtml(l10n('analysisOptimizer.currentExclusions'))}</h2>
+  <h2>${escapeHtml(l10n('analysisOptimizer.exclusions'))}</h2>
   <p class="hint">${escapeHtml(l10n('analysisOptimizer.noExclusions'))}</p>
 </section>`;
     }
 
-    const rows = r.currentExclusions.map(p => `
-  <div class="exclusion-tag">
-    <code>${escapeHtml(p)}</code>
-    <button class="btn btn-sm remove-btn" data-pattern="${escapeHtml(p)}"
-      title="${escapeHtml(l10n('analysisOptimizer.remove'))}">&times;</button>
-  </div>`).join('');
+    const rows = r.exclusions.map((row, i) => this._buildExclusionRow(row, i)).join('');
+    const sortLabel = l10n('analysisOptimizer.sortHint');
 
     return `
 <section class="opt-section">
-  <h2>${escapeHtml(l10n('analysisOptimizer.currentExclusions'))}</h2>
-  <div class="exclusion-tags">${rows}
-  </div>
-</section>`;
-  }
-
-  private _buildRecommendations(r: AnalysisOptimizerResult): string {
-    if (r.recommendations.length === 0) {
-      return `
-<section class="opt-section">
-  <h2>${escapeHtml(l10n('analysisOptimizer.recommendations'))}</h2>
-  <p class="hint">${escapeHtml(l10n('analysisOptimizer.noRecommendations'))}</p>
-</section>`;
-    }
-
-    const rows = r.recommendations.map((rec, i) => this._buildRecRow(rec, i)).join('');
-
-    return `
-<section class="opt-section">
-  <h2>${escapeHtml(l10n('analysisOptimizer.recommendations'))}</h2>
+  <h2>${escapeHtml(l10n('analysisOptimizer.exclusions'))}</h2>
   <div class="toolbar-row" style="margin-bottom:8px">
     <button class="btn tier-1" id="apply-all-btn">${escapeHtml(l10n('analysisOptimizer.applyAll'))}</button>
     <button class="btn" id="apply-selected-btn" disabled>${escapeHtml(l10n('analysisOptimizer.applySelected'))}</button>
   </div>
-  <table class="dash-table">
+  <table class="dash-table" id="exclusions-table">
     <thead>
       <tr>
         <th><input type="checkbox" id="select-all-cb" title="${escapeHtml(l10n('analysisOptimizer.selectAll'))}"></th>
-        <th>${escapeHtml(l10n('analysisOptimizer.col.pattern'))}</th>
-        <th>${escapeHtml(l10n('analysisOptimizer.col.files'))}</th>
-        <th>${escapeHtml(l10n('analysisOptimizer.col.cost'))}</th>
-        <th>${escapeHtml(l10n('analysisOptimizer.col.priority'))}</th>
+        <th class="sortable" data-sort="status" title="${escapeHtml(sortLabel)}">${escapeHtml(l10n('analysisOptimizer.col.status'))}<span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="pattern" title="${escapeHtml(sortLabel)}">${escapeHtml(l10n('analysisOptimizer.col.pattern'))}<span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="files" title="${escapeHtml(sortLabel)}">${escapeHtml(l10n('analysisOptimizer.col.files'))}<span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="cost" title="${escapeHtml(sortLabel)}">${escapeHtml(l10n('analysisOptimizer.col.cost'))}<span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="priority" title="${escapeHtml(sortLabel)}">${escapeHtml(l10n('analysisOptimizer.col.priority'))}<span class="sort-indicator"></span></th>
         <th></th>
       </tr>
     </thead>
@@ -378,24 +360,42 @@ ${this._buildHints()}
 </section>`;
   }
 
-  private _buildRecRow(rec: ExclusionRecommendation, index: number): string {
-    const priorityClass = `priority-${rec.priority}`;
-    const warning = rec.hasActiveFiles
+  private _buildExclusionRow(row: ExclusionRow, index: number): string {
+    const priorityClass = `priority-${row.priority}`;
+    const warning = row.hasActiveFiles
       ? ` <span class="warning-badge" title="${escapeHtml(l10n('analysisOptimizer.activeFilesWarning'))}">⚠</span>`
       : '';
+    const statusLabel = row.isApplied
+      ? l10n('analysisOptimizer.status.applied')
+      : l10n('analysisOptimizer.status.recommended');
+    const statusClass = row.isApplied ? 'status-applied' : 'status-recommended';
+    const priorityRank = PRIORITY_RANK[row.priority];
+
+    const checkboxCell = row.isApplied
+      ? '<td></td>'
+      : `<td><input type="checkbox" class="rec-cb" data-index="${index}" data-pattern="${escapeHtml(row.pattern)}"></td>`;
+    const actionCell = row.isApplied
+      ? `<td><button class="btn btn-sm remove-btn" data-pattern="${escapeHtml(row.pattern)}">${escapeHtml(l10n('analysisOptimizer.remove'))}</button></td>`
+      : `<td><button class="btn btn-sm apply-one-btn" data-pattern="${escapeHtml(row.pattern)}">${escapeHtml(l10n('analysisOptimizer.apply'))}</button></td>`;
 
     return `
-    <tr class="rec-row ${priorityClass}">
-      <td><input type="checkbox" class="rec-cb" data-index="${index}" data-pattern="${escapeHtml(rec.pattern)}"></td>
+    <tr class="rec-row ${priorityClass}"
+      data-status="${row.isApplied ? 1 : 0}"
+      data-pattern="${escapeHtml(row.pattern)}"
+      data-files="${row.estimatedFilesExcluded}"
+      data-cost="${row.estimatedCostReduction}"
+      data-priority="${priorityRank}">
+      ${checkboxCell}
+      <td><span class="chip ${statusClass}">${escapeHtml(statusLabel)}</span></td>
       <td>
-        <code>${escapeHtml(rec.pattern)}</code>${warning}
-        ${rec.isDefault ? `<span class="chip default-chip">${escapeHtml(l10n('analysisOptimizer.defaultLabel'))}</span>` : ''}
-        <br><span class="hint">${escapeHtml(rec.reason)}</span>
+        <code>${escapeHtml(row.pattern)}</code>${warning}
+        ${row.isDefault ? `<span class="chip default-chip">${escapeHtml(l10n('analysisOptimizer.defaultLabel'))}</span>` : ''}
+        <br><span class="hint">${escapeHtml(row.reason)}</span>
       </td>
-      <td>${rec.estimatedFilesExcluded.toLocaleString()}</td>
-      <td>${rec.estimatedCostReduction.toLocaleString()}</td>
-      <td><span class="chip ${priorityClass}">${escapeHtml(l10n(`analysisOptimizer.priority.${rec.priority}`))}</span></td>
-      <td><button class="btn btn-sm apply-one-btn" data-pattern="${escapeHtml(rec.pattern)}">${escapeHtml(l10n('analysisOptimizer.apply'))}</button></td>
+      <td>${row.estimatedFilesExcluded.toLocaleString()}</td>
+      <td>${row.estimatedCostReduction.toLocaleString()}</td>
+      <td><span class="chip ${priorityClass}">${escapeHtml(l10n(`analysisOptimizer.priority.${row.priority}`))}</span></td>
+      ${actionCell}
     </tr>`;
   }
 
@@ -465,12 +465,6 @@ function getOptimizerStyles(): string {
 .opt-section { margin:16px 0; }
 .opt-section h2 { font-size:14px; font-weight:600; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em; color:var(--vscode-foreground); }
 
-.exclusion-tags { display:flex; flex-wrap:wrap; gap:8px; }
-.exclusion-tag { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:4px; background:var(--vscode-badge-background); color:var(--vscode-badge-foreground); }
-.exclusion-tag code { font-size:12px; }
-.exclusion-tag .btn-sm { padding:0 4px; font-size:14px; line-height:1; border:none; background:transparent; color:var(--vscode-badge-foreground); cursor:pointer; opacity:0.7; }
-.exclusion-tag .btn-sm:hover { opacity:1; }
-
 .rec-row { border-left:3px solid transparent; }
 .rec-row.priority-high { border-left-color:var(--vscode-charts-red, #e45649); }
 .rec-row.priority-medium { border-left-color:var(--vscode-charts-yellow, #c18401); }
@@ -481,8 +475,16 @@ function getOptimizerStyles(): string {
 .chip.priority-medium { background:var(--vscode-charts-yellow, #c18401); color:#fff; }
 .chip.priority-low { background:var(--vscode-charts-green, #50a14f); color:#fff; }
 .chip.default-chip { background:var(--vscode-badge-background); color:var(--vscode-badge-foreground); margin-left:6px; }
+.chip.status-applied { background:var(--vscode-charts-green, #50a14f); color:#fff; }
+.chip.status-recommended { background:var(--vscode-charts-blue, #4078c0); color:#fff; }
 
 .warning-badge { color:var(--vscode-charts-yellow, #c18401); cursor:help; }
+
+.dash-table th.sortable { cursor:pointer; user-select:none; }
+.dash-table th.sortable:hover { color:var(--vscode-textLink-foreground); }
+.sort-indicator { display:inline-block; width:1em; margin-left:2px; opacity:0.6; }
+.dash-table th.sort-asc .sort-indicator::after { content:'▲'; }
+.dash-table th.sort-desc .sort-indicator::after { content:'▼'; }
 
 .heat-map { display:flex; flex-direction:column; gap:4px; }
 .bar-row { display:flex; align-items:center; gap:8px; }
@@ -508,4 +510,3 @@ function getOptimizerStyles(): string {
 }
 `;
 }
-

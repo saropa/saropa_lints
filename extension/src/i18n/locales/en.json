@@ -1972,21 +1972,25 @@
     "costHeavy": "Heavy",
     "costModerate": "Moderate",
     "costLight": "Light",
-    "currentExclusions": "Current exclusions",
-    "noExclusions": "No exclusions configured in analysis_options.yaml",
-    "recommendations": "Recommended exclusions",
-    "noRecommendations": "No exclusion recommendations — the workspace is already well-scoped",
+    "exclusions": "Exclusions",
+    "noExclusions": "No exclusions applied or recommended — the workspace is already well-scoped",
     "applyAll": "Apply all",
     "applySelected": "Apply selected",
     "apply": "Apply",
     "remove": "Remove",
     "selectAll": "Select all",
     "defaultLabel": "Default",
+    "sortHint": "Click to sort",
     "col": {
+      "status": "Status",
       "pattern": "Pattern",
       "files": "Files",
       "cost": "Est. cost",
       "priority": "Priority"
+    },
+    "status": {
+      "applied": "Applied",
+      "recommended": "Recommended"
     },
     "priority": {
       "high": "High",

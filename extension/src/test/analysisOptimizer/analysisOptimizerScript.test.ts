@@ -37,6 +37,22 @@ function fixtureHtml(recCount: number): string {
 </body></html>`;
 }
 
+interface FakeVsCodeApi {
+  postMessage: (m: unknown) => void;
+  getState: () => unknown;
+  setState: (s: unknown) => void;
+}
+
+/** A stub matching the real webview API's getState/setState contract, backed by a plain JS variable — the same durability model VS Code uses across a webview.html reassignment (persisted by the extension host, not the DOM). */
+function makeFakeVsCodeApi(messages: unknown[], initialState: unknown = undefined): FakeVsCodeApi {
+  let state = initialState;
+  return {
+    postMessage: (m: unknown) => messages.push(JSON.parse(JSON.stringify(m))),
+    getState: () => state,
+    setState: (s: unknown) => { state = JSON.parse(JSON.stringify(s)); },
+  };
+}
+
 /**
  * Renders the fixture and stubs acquireVsCodeApi to capture posted messages.
  * Messages are JSON round-tripped before storage — objects constructed inside
@@ -48,13 +64,57 @@ function render(recCount = 3): { doc: Document; messages: unknown[] } {
   const dom = new JSDOM(fixtureHtml(recCount), {
     runScripts: 'dangerously',
     beforeParse(window) {
-      (window as unknown as { acquireVsCodeApi: () => { postMessage: (m: unknown) => void } })
-        .acquireVsCodeApi = () => ({
-          postMessage: (m: unknown) => messages.push(JSON.parse(JSON.stringify(m))),
-        });
+      (window as unknown as { acquireVsCodeApi: () => FakeVsCodeApi })
+        .acquireVsCodeApi = () => makeFakeVsCodeApi(messages);
     },
   });
   return { doc: dom.window.document, messages };
+}
+
+/** Minimal fixture mirroring the sortable exclusions table markup. */
+function sortableTableHtml(): string {
+  const rows = [
+    { pattern: 'zebra/**', files: 5, cost: 100, priority: 2 },
+    { pattern: 'alpha/**', files: 50, cost: 900, priority: 0 },
+    { pattern: 'mid/**', files: 20, cost: 400, priority: 1 },
+  ];
+  const trs = rows.map(r => `
+    <tr data-pattern="${r.pattern}" data-files="${r.files}" data-cost="${r.cost}" data-priority="${r.priority}">
+      <td>${r.pattern}</td><td>${r.files}</td><td>${r.cost}</td><td>${r.priority}</td>
+    </tr>`).join('');
+
+  return `<!DOCTYPE html>
+<html><body>
+  <table id="exclusions-table">
+    <thead>
+      <tr>
+        <th class="sortable" data-sort="pattern">Pattern<span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="files">Files<span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="cost">Cost<span class="sort-indicator"></span></th>
+        <th class="sortable" data-sort="priority">Priority<span class="sort-indicator"></span></th>
+      </tr>
+    </thead>
+    <tbody>${trs}</tbody>
+  </table>
+  <script>${getOptimizerScript()}</script>
+</body></html>`;
+}
+
+function renderSortableTable(initialState: unknown = undefined): { doc: Document; api: FakeVsCodeApi } {
+  const api = makeFakeVsCodeApi([], initialState);
+  const dom = new JSDOM(sortableTableHtml(), {
+    runScripts: 'dangerously',
+    beforeParse(window) {
+      (window as unknown as { acquireVsCodeApi: () => FakeVsCodeApi }).acquireVsCodeApi = () => api;
+    },
+  });
+  return { doc: dom.window.document, api };
+}
+
+function rowPatterns(doc: Document): string[] {
+  return [...doc.querySelectorAll('#exclusions-table tbody tr')].map(
+    (tr) => tr.getAttribute('data-pattern') ?? '',
+  );
 }
 
 describe('analysisOptimizerScript (executed against a real DOM)', () => {
@@ -129,5 +189,58 @@ describe('analysisOptimizerScript (executed against a real DOM)', () => {
     const { doc, messages } = render(2);
     doc.getElementById('apply-selected-btn')!.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
     assert.deepStrictEqual(messages, []);
+  });
+
+  describe('sortable exclusions table', () => {
+    it('sorts numerically ascending on first click of a numeric column', () => {
+      const { doc } = renderSortableTable();
+      const filesHeader = doc.querySelector('th[data-sort="files"]')!;
+      filesHeader.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
+      assert.deepStrictEqual(rowPatterns(doc), ['zebra/**', 'mid/**', 'alpha/**']);
+      assert.ok(filesHeader.classList.contains('sort-asc'));
+    });
+
+    it('reverses to descending on a second click of the same column', () => {
+      const { doc } = renderSortableTable();
+      const costHeader = doc.querySelector('th[data-sort="cost"]')!;
+      costHeader.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
+      costHeader.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
+      assert.deepStrictEqual(rowPatterns(doc), ['alpha/**', 'mid/**', 'zebra/**']);
+      assert.ok(costHeader.classList.contains('sort-desc'));
+    });
+
+    it('sorts the pattern column alphabetically as text, not numerically', () => {
+      const { doc } = renderSortableTable();
+      const patternHeader = doc.querySelector('th[data-sort="pattern"]')!;
+      patternHeader.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
+      assert.deepStrictEqual(rowPatterns(doc), ['alpha/**', 'mid/**', 'zebra/**']);
+    });
+
+    it('clears the previous header sort indicator when a different column is clicked', () => {
+      const { doc } = renderSortableTable();
+      const filesHeader = doc.querySelector('th[data-sort="files"]')!;
+      const costHeader = doc.querySelector('th[data-sort="cost"]')!;
+      filesHeader.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
+      costHeader.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
+      assert.strictEqual(filesHeader.classList.contains('sort-asc'), false);
+      assert.ok(costHeader.classList.contains('sort-asc'));
+    });
+
+    it('persists the chosen sort via vscode.setState so it survives a full-HTML re-render', () => {
+      const { doc: doc1, api } = renderSortableTable();
+      const filesHeader = doc1.querySelector('th[data-sort="files"]')!;
+      filesHeader.dispatchEvent(new doc1.defaultView!.MouseEvent('click', { bubbles: true }));
+
+      const persisted = api.getState();
+      assert.deepStrictEqual(persisted, { sortKey: 'files', sortDir: 1 });
+
+      // Simulates the extension calling webview.html = ... again: a brand
+      // new document/script instance, but the SAME persisted state (which in
+      // the real webview survives that reassignment via the extension host).
+      const { doc: doc2 } = renderSortableTable(persisted);
+      assert.deepStrictEqual(rowPatterns(doc2), ['zebra/**', 'mid/**', 'alpha/**']);
+      const filesHeader2 = doc2.querySelector('th[data-sort="files"]')!;
+      assert.ok(filesHeader2.classList.contains('sort-asc'));
+    });
   });
 });
