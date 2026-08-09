@@ -64,6 +64,21 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- `loadHealthHistory` test timeout — complexity parsing every Dart file across archived tags exceeded the 2-minute test budget. The function now accepts an optional `withComplexity` parameter (defaults `true`; test passes `false`).
+
+<details>
+<summary>Maintenance</summary>
+
+- `loadHealthHistory` now caches each tag's computed `HistoryPoint` on disk (`.dart_tool/saropa_lints/health_history_cache.json`), keyed by the tag's resolved commit SHA. Repeat calls against unchanged tags skip re-archiving and re-scanning entirely.
+
+</details>
+
+---
+
 ## [14.5.2]
 
 This release introduces the Analysis Optimizer to help developers proactively manage their Dart analyzer's resource footprint. The extension now identifies memory-intensive files and provides an interactive dashboard for safely previewing and applying workspace exclusion patterns. By intelligently filtering out generated code and high-cost directories, users can easily maintain editor performance and swiftly resolve critical memory warnings. [log](https://github.com/saropa/saropa_lints/blob/v14.5.2/CHANGELOG.md)

@@ -19,6 +19,7 @@ void main() {
       final points = await loadHealthHistory(
         Directory.current.path,
         maxTags: 2,
+        withComplexity: false,
       );
       // CI uses fetch-depth: 0 (full clone) so tags are always present.
       expect(points, isNotEmpty);

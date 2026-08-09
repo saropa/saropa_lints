@@ -64,27 +64,42 @@ class HistoryPoint {
 
 /// Builds the trajectory across the most recent [maxTags] tags (chronological).
 /// Returns empty when not a git repo or there are no tags.
+///
+/// Each tag's point is cached on disk keyed by the tag's resolved commit SHA
+/// (tags are immutable in normal use, so a SHA hit is reused verbatim without
+/// re-archiving or re-scanning). This makes repeat calls — e.g. re-running the
+/// test suite locally — near-instant after the first run.
 Future<List<HistoryPoint>> loadHealthHistory(
   String projectPath, {
   int maxTags = 6,
+  bool withComplexity = true,
 }) async {
+  final cache = _HistoryCache.load(projectPath);
   final points = <HistoryPoint>[];
   for (final tag in _recentTags(projectPath, maxTags)) {
+    final sha = _resolveTagSha(projectPath, tag);
+    final cacheKey = sha == null ? null : '${sha}_$withComplexity';
+    final cached = cacheKey == null ? null : cache.get(cacheKey);
+    if (cached != null) {
+      points.add(cached);
+      continue;
+    }
+
     final dir = Directory.systemTemp.createTempSync('saropa_hist_');
     try {
       if (!_archive(projectPath, tag, dir.path)) continue;
       final agg = await runSizeScan(
-        SizeScanOptions(projectPath: dir.path, withComplexity: true),
+        SizeScanOptions(projectPath: dir.path, withComplexity: withComplexity),
       );
-      points.add(
-        HistoryPoint(
-          tag: tag,
-          fileCount: agg.fileCount,
-          loc: agg.totalLoc,
-          codeLoc: agg.totalCodeLoc,
-          maxCognitive: agg.maxCognitiveSeen,
-        ),
+      final point = HistoryPoint(
+        tag: tag,
+        fileCount: agg.fileCount,
+        loc: agg.totalLoc,
+        codeLoc: agg.totalCodeLoc,
+        maxCognitive: agg.maxCognitiveSeen,
       );
+      points.add(point);
+      if (cacheKey != null) cache.put(cacheKey, point);
     } finally {
       try {
         dir.deleteSync(recursive: true);
@@ -93,7 +108,81 @@ Future<List<HistoryPoint>> loadHealthHistory(
       }
     }
   }
+  cache.persist();
   return points;
+}
+
+/// Resolves [tag] to its commit SHA, or null if resolution fails (e.g. the
+/// tag was deleted between `_recentTags` and this call).
+String? _resolveTagSha(String projectPath, String tag) {
+  final r = Process.runSync('git', [
+    '-C',
+    projectPath,
+    'rev-list',
+    '-n',
+    '1',
+    tag,
+  ], stdoutEncoding: utf8);
+  if (r.exitCode != 0) return null;
+  final sha = (r.stdout as String).trim();
+  return sha.isEmpty ? null : sha;
+}
+
+/// On-disk cache of [HistoryPoint]s keyed by `<commitSha>_<withComplexity>`,
+/// stored under `.dart_tool/saropa_lints/` so it survives across process runs
+/// but stays out of version control (matches `.dart_tool`'s existing
+/// gitignore treatment).
+class _HistoryCache {
+  _HistoryCache(this._file, this._entries);
+
+  factory _HistoryCache.load(String projectPath) {
+    final file = File(
+      p.join(projectPath, '.dart_tool', 'saropa_lints', 'health_history_cache.json'),
+    );
+    if (!file.existsSync()) return _HistoryCache(file, {});
+    try {
+      final decoded = jsonDecode(file.readAsStringSync());
+      if (decoded is! Map<String, Object?>) return _HistoryCache(file, {});
+      final entries = <String, HistoryPoint>{};
+      for (final entry in decoded.entries) {
+        final v = entry.value;
+        if (v is! Map<String, Object?>) continue;
+        entries[entry.key] = HistoryPoint(
+          tag: v['tag'] as String? ?? '',
+          fileCount: v['fileCount'] as int? ?? 0,
+          loc: v['loc'] as int? ?? 0,
+          codeLoc: v['codeLoc'] as int? ?? 0,
+          maxCognitive: v['maxCognitive'] as int? ?? 0,
+        );
+      }
+      return _HistoryCache(file, entries);
+    } on FormatException {
+      return _HistoryCache(file, {});
+    }
+  }
+
+  final File _file;
+  final Map<String, HistoryPoint> _entries;
+  bool _dirty = false;
+
+  HistoryPoint? get(String key) => _entries[key];
+
+  void put(String key, HistoryPoint point) {
+    _entries[key] = point;
+    _dirty = true;
+  }
+
+  void persist() {
+    if (!_dirty) return;
+    try {
+      _file.parent.createSync(recursive: true);
+      _file.writeAsStringSync(
+        jsonEncode({for (final e in _entries.entries) e.key: e.value.toJson()}),
+      );
+    } on FileSystemException {
+      // Best-effort cache write; a missing cache just costs a re-scan.
+    }
+  }
 }
 
 /// Most recent [maxTags] tags, returned oldest-first (chronological).
