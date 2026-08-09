@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Napalagay ang pattern ng pag-ihiwalay {count} sa analysis_options.yaml",
       "removed": "Nakaraan ang pattern ng pag-ihiwalay mula sa analysis_options.yaml",
-      "writeFailed": "Hindi maaaring i-write sa analysis_options.yaml — ang file ay maaaring nawala"
+      "writeFailed": "Hindi maaaring i-write sa analysis_options.yaml — ang file ay maaaring nawala",
+      "syntaxFixed": "Nakatagumpay ang pagbabago ng walang kahulugan na YAML sintaksis sa analysis_options.yaml exclusions",
+      "syntaxFixedWithDuplicates": "Nakatagumpay akong magamit ng wastong sintaksyon ng YAML at nakuha ang mga pattern ng pag-Exclude na duplikado ({count})"
+    },
+    "syntaxWarning": {
+      "message": "Ang file na ito ay may isang exclude pattern na isulat sa paraan na naglalaban sa Dart analyzer (isang walang quot na pattern na nagsisimula sa * ay hindi wasto YAML).",
+      "fixButton": "Iayos ang Syntax"
     },
     "confirmBulk": {
       "prompt": "Pangalawang pagtatapon ng mga pattern ng {count} sa analysis_options.yaml?",

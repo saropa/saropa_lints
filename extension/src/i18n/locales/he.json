@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "התבנית (ות) של {count} של איסור הופקה ל analysis_options.yaml",
       "removed": "הוסר דפוס אי הכללה מ-analysis_options.yaml",
-      "writeFailed": "לא ניתן לכתוב ל-analysis_options.yaml — הקובץ עשוי להיות חסר"
+      "writeFailed": "לא ניתן לכתוב ל-analysis_options.yaml — הקובץ עשוי להיות חסר",
+      "syntaxFixed": "תקן תחביר YAML לא חוקי ב-analysis_options.yaml איסключения",
+      "syntaxFixedWithDuplicates": "תקן שגיאת סינטаксיס YAML לא חוקית וסיפק דפוסי הימנעות כפולים {count}"
+    },
+    "syntaxWarning": {
+      "message": "הקובץ מכיל mẫu שגיאה שכתובת בצורה ששבירת את האנליטיקס Dart (מuster ללא ציטוט שמתחיל ב-* אינו חוקי YAML).",
+      "fixButton": "תקן סינטקס"
     },
     "confirmBulk": {
       "prompt": "החלף {count} mẫuות חסימה על analysis_options.yaml?",

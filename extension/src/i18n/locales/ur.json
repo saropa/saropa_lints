@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "آپلائیڈ {count} اِکسْچُوزن پَتْرن(s) analysis_options.yaml",
       "removed": "حذف کردہ اِکسِلوشن پَتْرن سے analysis_options.yaml",
-      "writeFailed": "analysis_options.yaml کو لکھنا ممکن نہیں رہا — فائل غائب ہو سکتی ہے"
+      "writeFailed": "analysis_options.yaml کو لکھنا ممکن نہیں رہا — فائل غائب ہو سکتی ہے",
+      "syntaxFixed": "غلط YAML سینٹکس کو analysis_options.yaml اکسپلیشن میں ترمیم کر دیا گیا",
+      "syntaxFixedWithDuplicates": "غلط YAML سینٹکس کو ترمیم کر دیا گیا اور {count} تکراری اکثریتی نظریہ (pattern) حذف کر دیا گیا۔"
+    },
+    "syntaxWarning": {
+      "message": "یہ فائل ایک اسٹرینگ کے ذریعے لکھا ہوا اکسپلڈ پٹرن ہے جو Dart اینالائزر کو تباہ کر دیتا ہے (ایک نا منقول پٹرن جو * سے شروع ہوتا ہے یہ ایک غلط ییمل ہے)",
+      "fixButton": "سائنٹکس تصحیح کریں"
     },
     "confirmBulk": {
       "prompt": "{count} اکسچیوزن پٹرن کو analysis_options.yaml پر لاگو کریں؟",

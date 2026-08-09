@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "已应用 {count} 排除模式到 analysis_options.yaml",
       "removed": "从 analysis_options.yaml 中移除了排除模式",
-      "writeFailed": "无法写入 analysis_options.yaml —— 文件可能缺失"
+      "writeFailed": "无法写入 analysis_options.yaml —— 文件可能缺失",
+      "syntaxFixed": "修复了 analysis_options.yaml 排除项中的无效 YAML 语法",
+      "syntaxFixedWithDuplicates": "修复了无效的YAML语法并移除了{count}重复排除模式（s）"
+    },
+    "syntaxWarning": {
+      "message": "此文件中的排除模式以一种破坏 Dart 分析器的方式编写（以 * 开头且未加引号的模式是无效的 YAML）。",
+      "fixButton": "修复语法"
     },
     "confirmBulk": {
       "prompt": "应用 {count} 排除模式到 analysis_options.yaml?",

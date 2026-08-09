@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "適用された {count} 排除パターンを analysis_options.yaml に",
       "removed": "analysis_options.yaml から除外パターンを削除しました",
-      "writeFailed": "analysis_options.yaml に書き込めません — ファイルが存在しない可能性があります"
+      "writeFailed": "analysis_options.yaml に書き込めません — ファイルが存在しない可能性があります",
+      "syntaxFixed": "analysis_options.yaml 除外の無効な YAML 構文を修正しました",
+      "syntaxFixedWithDuplicates": "不正なYAML構文を修正し、{count}の重複する除外パターンを削除しました"
+    },
+    "syntaxWarning": {
+      "message": "このファイルは、Dart解析器を破壊するように書かれた除外パターンを含んでいます（*で始まる未クォートのパターンは無効なYAMLです）。",
+      "fixButton": "構文を修正"
     },
     "confirmBulk": {
       "prompt": "{count}の除外パターンをanalysis_options.yamlに適用しますか？",

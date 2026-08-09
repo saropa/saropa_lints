@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "الگوی ({count}) استثناء اعمال شد / analysis_options.yaml",
       "removed": "الگوی حذف از analysis_options.yaml حذف شد",
-      "writeFailed": "نمی توان به analysis_options.yaml نوشت — فایل ممکن است از بین رفته باشد"
+      "writeFailed": "نمی توان به analysis_options.yaml نوشت — فایل ممکن است از بین رفته باشد",
+      "syntaxFixed": "خطای YAML غیر معتبر در analysis_options.yaml اکسکلوژن‌ها به صورت ثابت شد",
+      "syntaxFixedWithDuplicates": "سیستم یکنوع اشکال یکنوع YAML را اصلاح کرد و الگوی تکراری {count} را حذف کرد"
+    },
+    "syntaxWarning": {
+      "message": "این فایل الگوی exclude ایجاد شده به گونه ای است که به تحلیلگر Dart خطا می‌دهد (الگویی بدون جزئیات که با * شروع می‌شود معتبر YAML نیست).",
+      "fixButton": "اصلاح سینتکس"
     },
     "confirmBulk": {
       "prompt": "الPattern های استثناء {count} را به analysis_options.yaml اعمال کنید؟",

@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Toepasselijke {count} uitsluitingspatroon(s) op analysis_options.yaml",
       "removed": "Exclusiepatroon verwijderd uit analysis_options.yaml",
-      "writeFailed": "Kon niet schrijven naar analysis_options.yaml — het bestand kan ontbreken"
+      "writeFailed": "Kon niet schrijven naar analysis_options.yaml — het bestand kan ontbreken",
+      "syntaxFixed": "Ongeldige YAML-syntaxis in analysis_options.yaml exclusies hersteld",
+      "syntaxFixedWithDuplicates": "Ongeldige YAML-syntaxis is gecorrigeerd en de {count} herhalingsexclusiepatronen zijn verwijderd"
+    },
+    "syntaxWarning": {
+      "message": "Deze bestand heeft een exclude patroon geschreven op een manier die het Dart analyzer breekt (een ongequote patroon dat begint met * is ongeldig YAML).",
+      "fixButton": "Syntax herstellen"
     },
     "confirmBulk": {
       "prompt": "Toepassen van {count} uitsluitingspatronen op analysis_options.yaml?",

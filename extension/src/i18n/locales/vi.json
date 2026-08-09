@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Đã áp dụng mẫu loại trừ {count} cho analysis_options.yaml",
       "removed": "Loại bỏ mẫu trừ ngoại lệ từ analysis_options.yaml",
-      "writeFailed": "Không thể ghi vào analysis_options.yaml — tệp có thể bị thiếu"
+      "writeFailed": "Không thể ghi vào analysis_options.yaml — tệp có thể bị thiếu",
+      "syntaxFixed": "Sửa lỗi cú pháp YAML không hợp lệ trong analysis_options.yaml exclusions",
+      "syntaxFixedWithDuplicates": "Đã sửa lỗi cú pháp YAML không hợp lệ và loại bỏ mẫu loại trừ trùng lặp {count}"
+    },
+    "syntaxWarning": {
+      "message": "Tệp này có một mẫu loại trừ được viết theo cách làm hỏng phân tích Dart (mẫu không được đặt trong dấu nháy và bắt đầu bằng * là không hợp lệ YAML).",
+      "fixButton": "Sửa cú pháp"
     },
     "confirmBulk": {
       "prompt": "Áp dụng mẫu loại trừ {count} vào analysis_options.yaml?",

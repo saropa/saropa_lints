@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Pola pengecualian {count} diterapkan ke analysis_options.yaml",
       "removed": "Pola pengecualian dihapus dari analysis_options.yaml",
-      "writeFailed": "Tidak dapat menulis ke analysis_options.yaml — file mungkin hilang"
+      "writeFailed": "Tidak dapat menulis ke analysis_options.yaml — file mungkin hilang",
+      "syntaxFixed": "Perbaikan sintaks YAML yang tidak valid dalam analysis_options.yaml exclusions",
+      "syntaxFixedWithDuplicates": "Mengoreksi sintaks YAML yang tidak valid dan menghapus pola pengeluaran duplikat {count}"
+    },
+    "syntaxWarning": {
+      "message": "File ini memiliki pola exclude yang ditulis dalam cara yang membuat analyzer Dart gagal (pola yang dimulai dengan * tanpa tanda kutip tidak valid YAML).",
+      "fixButton": "Perbaiki Sintaks"
     },
     "confirmBulk": {
       "prompt": "Terapkan pola pengecualian {count} ke analysis_options.yaml?",

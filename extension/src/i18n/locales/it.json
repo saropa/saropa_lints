@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Patternes di esclusione {count} applicati a analysis_options.yaml",
       "removed": "Esclusione della pattern rimossa da analysis_options.yaml",
-      "writeFailed": "Non è stato possibile scrivere in analysis_options.yaml — il file potrebbe mancare"
+      "writeFailed": "Non è stato possibile scrivere in analysis_options.yaml — il file potrebbe mancare",
+      "syntaxFixed": "Corretto sintassi YAML non valida in analysis_options.yaml esclusioni",
+      "syntaxFixedWithDuplicates": "Corretto sintassi YAML non valida e rimosso(i) modello(i) di esclusione duplicati {count}"
+    },
+    "syntaxWarning": {
+      "message": "Questo file contiene un pattern di esclusione scritto in un modo che rompe l'analizzatore Dart (un pattern non racchiuso in virgolette che inizia con * è invalido YAML).",
+      "fixButton": "Correggi sintassi"
     },
     "confirmBulk": {
       "prompt": "Applica i pattern di esclusione {count} al file analysis_options.yaml?",

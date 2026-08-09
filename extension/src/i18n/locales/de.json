@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Zur Anwendung gebracht wird das Muster {count} zur Ausschluss von analysis_options.yaml",
       "removed": "Exklusionsmuster aus analysis_options.yaml entfernt",
-      "writeFailed": "Konnte nicht in analysis_options.yaml schreiben — die Datei könnte fehlen"
+      "writeFailed": "Konnte nicht in analysis_options.yaml schreiben — die Datei könnte fehlen",
+      "syntaxFixed": "Gültigen YAML-Syntax in analysis_options.yaml Ausnahmen korrigiert",
+      "syntaxFixedWithDuplicates": "Gültigen YAML-Syntax korrigiert und {count}-Duplikat-Ausnahme-Muster(e) entfernt"
+    },
+    "syntaxWarning": {
+      "message": "Diese Datei enthält ein Exclude-Pattern, das auf eine Art geschrieben ist, die den Dart-Analyser bricht (ein ungezitertes Muster, das mit * beginnt, ist ungültiges YAML).",
+      "fixButton": "Syntax korrigieren"
     },
     "confirmBulk": {
       "prompt": "{count}-Ausklingsmuster auf analysis_options.yaml anwenden?",

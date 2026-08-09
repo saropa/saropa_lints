@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Zastosowano wzorzec(wzorce) wykluczenia {count} do analysis_options.yaml",
       "removed": "Usunięto wzorzec wykluczenia z analysis_options.yaml",
-      "writeFailed": "Nie można zapisać do analysis_options.yaml — plik może brakować"
+      "writeFailed": "Nie można zapisać do analysis_options.yaml — plik może brakować",
+      "syntaxFixed": "Ustawiono nieprawidłowy składnię YAML w analysis_options.yaml wykluczeniach",
+      "syntaxFixedWithDuplicates": "Zmieniono nieprawidłowe składanie YAML i usunięto wzorce wykluczenia {count} duplikatów"
+    },
+    "syntaxWarning": {
+      "message": "Ten plik zawiera wzorzec wykluczenia napisany w sposób, który łamie analizator Dart (wzorzec bez cudzysłowa zaczynający się od * jest nieprawidłowy YAML).",
+      "fixButton": "Popraw składnię"
     },
     "confirmBulk": {
       "prompt": "Zastosuj wzorce wykluczenia {count} do analysis_options.yaml?",

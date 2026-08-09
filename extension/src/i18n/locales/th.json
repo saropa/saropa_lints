@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "ใช้รูปแบบการยกเว้น {count} บน analysis_options.yaml",
       "removed": "ลบรูปแบบการยกเว้นออกจาก analysis_options.yaml",
-      "writeFailed": "ไม่สามารถเขียนข้อมูลไปยัง analysis_options.yaml ได้ — ไฟล์อาจไม่มีอยู่"
+      "writeFailed": "ไม่สามารถเขียนข้อมูลไปยัง analysis_options.yaml ได้ — ไฟล์อาจไม่มีอยู่",
+      "syntaxFixed": "แก้ไข YAML ที่มีไวยากรณ์ผิดใน analysis_options.yaml สำหรับการยกเว้น",
+      "syntaxFixedWithDuplicates": "แก้ไข YAML ที่มีไวยากรณ์ผิดและลบรูปแบบการยกเว้นที่ซ้ำกัน {count}"
+    },
+    "syntaxWarning": {
+      "message": "ไฟล์นี้มีรูปแบบการยกเว้นที่เขียนในลักษณะที่ทำให้เครื่องมือวิเคราะห์ Dart ทำงานผิดพลาด (รูปแบบที่ไม่มีเครื่องหมายอัญประกาศและเริ่มต้นด้วย * ถือว่าเป็น YAML ที่ไม่ถูกต้อง)",
+      "fixButton": "แก้ไขไวยากรณ์"
     },
     "confirmBulk": {
       "prompt": "ใช้รูปแบบการยกเว้น {count} บน analysis_options.yaml?",

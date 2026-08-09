@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "অ্যাপ্লাইড এক্সক্লুসন প্যাটার্ন ({count}) এ এক্সক্লুসন প্যাটার্ন (analysis_options).yaml এ প্রয়োগ করা হয়েছে",
       "removed": "analysis_options.yaml থেকে বাদ দেওয়া বাদ দেওয়া ধরণ অপসারণ করা হয়েছে",
-      "writeFailed": "analysis_options.yaml কে লিখতে পারিনি — ফাইলটি অনুপস্থিত হতে পারে"
+      "writeFailed": "analysis_options.yaml কে লিখতে পারিনি — ফাইলটি অনুপস্থিত হতে পারে",
+      "syntaxFixed": "analysis_options.yaml এক্সক্লুসিয়নস এ বৈধ YAML সিনট্যাক্স সংশোধন করা হয়েছে",
+      "syntaxFixedWithDuplicates": "অবৈধ YAML সিনট্যাক্স সংশোধন করা হয়েছে এবং {count} ডুপ্লিকেট এক্সক্লুসন প্যাটার্ন (গুলি) অপসারণ করা হয়েছে"
+    },
+    "syntaxWarning": {
+      "message": "এই ফাইলটি এমন একটি এক্সক্লুড প্যাটার্ন রয়েছে যা Dart এনালাইজারকে ভাঙে (একটি উদ্ধৃত ছাড়া শুরু করে * একটি বৈধ নয় YAML প্যাটার্ন)",
+      "fixButton": "সিনট্যাক্স ফিকস করুন"
     },
     "confirmBulk": {
       "prompt": "{count} এক্সক্লুসন প্যাটার্ন কে analysis_options.yaml এ প্রয়োগ করবেন?",

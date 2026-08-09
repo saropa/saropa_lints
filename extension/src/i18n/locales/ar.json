@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "تم تطبيق نمط استثناء {count} على analysis_options.yaml",
       "removed": "أُزيلت نمط الاستثناء من analysis_options.yaml",
-      "writeFailed": "لم يتم إمكانية الكتابة إلى analysis_options.yaml — قد يكون الملف مفقودًا"
+      "writeFailed": "لم يتم إمكانية الكتابة إلى analysis_options.yaml — قد يكون الملف مفقودًا",
+      "syntaxFixed": "إصلاح سوء صياغة YAML غير صحيح في analysis_options.yaml للاستثناءات",
+      "syntaxFixedWithDuplicates": "أصلاح خطأ في تركيب YAML وحذف نمط(s) التهيئة المكرر {count}"
+    },
+    "syntaxWarning": {
+      "message": "هذا الملف يحتوي على نمط استثناء مكتوب بطريقة تؤدي إلى تعطيل مُحلِّل Dart (نمط غير مُقوّى يبدأ بـ * غير صحيح في YAML).",
+      "fixButton": "إصلاح القواعد اللغوية"
     },
     "confirmBulk": {
       "prompt": "هل تريد تطبيق نماذج استثناء {count} على analysis_options.yaml؟",

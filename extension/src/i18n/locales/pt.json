@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Padrão(s) de exclusão {count} aplicado(s) a analysis_options.yaml",
       "removed": "Padrão de exclusão removido do analysis_options.yaml",
-      "writeFailed": "Não foi possível escrever em analysis_options.yaml — o arquivo pode estar faltando"
+      "writeFailed": "Não foi possível escrever em analysis_options.yaml — o arquivo pode estar faltando",
+      "syntaxFixed": "Corrigido sintaxe inválida de YAML em analysis_options.yaml exclusões",
+      "syntaxFixedWithDuplicates": "Corrigido sintaxe inválida do YAML e removido padrões de exclusão duplicados {count}"
+    },
+    "syntaxWarning": {
+      "message": "Este arquivo tem um padrão de exclusão escrito de uma forma que quebra o analisador Dart (um padrão não entre aspas que começa com * é inválido YAML).",
+      "fixButton": "Corrija a sintaxe"
     },
     "confirmBulk": {
       "prompt": "Aplicar padrões de exclusão {count} ao analysis_options.yaml?",

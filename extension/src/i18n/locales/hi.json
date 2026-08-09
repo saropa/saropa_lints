@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "आवेदित {count} अपवाद पैटर्न(s) को analysis_options.yaml",
       "removed": "अपवाद पैटर्न को analysis_options.yaml से हटा दिया गया",
-      "writeFailed": "analysis_options.yaml लिखने में असमर्थ रहा — फ़ाइल गायब हो सकती है"
+      "writeFailed": "analysis_options.yaml लिखने में असमर्थ रहा — फ़ाइल गायब हो सकती है",
+      "syntaxFixed": "अवैध YAML सिंटैक्स को analysis_options.yaml छूट के लिए सुधर दिया गया",
+      "syntaxFixedWithDuplicates": "अमान्य YAML सिंटैक्स को सुधर दिया गया और {count} डुप्लिकेट एक्स्क्लुजन पैटर्न (s) को हटा दिया गया"
+    },
+    "syntaxWarning": {
+      "message": "इस फ़ाइल में एक exclude पैटर्न लिखा गया है जो Dart एनालाइजर को तोड़ देता है (एक अग्रलिखित * से शुरू होने वाला पैटर्न अमान्य YAML है)",
+      "fixButton": "सिंटैक्स ठीक करें"
     },
     "confirmBulk": {
       "prompt": "{count} के अपवाद पैटर्न को analysis_options.yaml में लागू करें?",

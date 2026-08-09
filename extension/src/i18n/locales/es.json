@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Patrón(es) de exclusión {count} aplicado(s) a analysis_options.yaml",
       "removed": "Patrón de exclusión eliminado de analysis_options.yaml",
-      "writeFailed": "No se pudo escribir en analysis_options.yaml — el archivo puede estar faltando"
+      "writeFailed": "No se pudo escribir en analysis_options.yaml — el archivo puede estar faltando",
+      "syntaxFixed": "Corrección de sintaxis YAML inválida en exclusiones analysis_options.yaml",
+      "syntaxFixedWithDuplicates": "Se corrigió la sintaxis YAML inválida y se eliminaron los patrones de exclusión duplicados {count}"
+    },
+    "syntaxWarning": {
+      "message": "Este archivo tiene un patrón de exclusión escrito de una manera que rompe al analizador Dart (un patrón no citado que comienza con * es inválido YAML).",
+      "fixButton": "Corrige la sintaxis"
     },
     "confirmBulk": {
       "prompt": "Aplicar patrones de exclusión {count} a analysis_options.yaml?",

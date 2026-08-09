@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Modèle(s) d'exclusion {count} appliqué(s) à analysis_options.yaml",
       "removed": "Pattern d'exclusion supprimé de analysis_options.yaml",
-      "writeFailed": "Impossible d'écrire dans analysis_options.yaml — le fichier peut être manquant"
+      "writeFailed": "Impossible d'écrire dans analysis_options.yaml — le fichier peut être manquant",
+      "syntaxFixed": "Corrigé la syntaxe YAML invalide dans analysis_options.yaml exclusions",
+      "syntaxFixedWithDuplicates": "Corrigé la syntaxe YAML invalide et supprimé les motifs d'exclusion {count} en doublons"
+    },
+    "syntaxWarning": {
+      "message": "Ce fichier contient un motif d'exclusion écrit de manière à briser l'analyseur Dart (un motif non entre guillemets commençant par * est invalide YAML).",
+      "fixButton": "Corriger la syntaxe"
     },
     "confirmBulk": {
       "prompt": "Appliquer les motifs d'exclusion {count} au fichier analysis_options.yaml?",

@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Uygulanan {count} dışlama deseni(leri) analysis_options.yaml",
       "removed": "analysis_options.yaml'dan hariç tutma desenini kaldırıldı",
-      "writeFailed": "analysis_options.yaml yazamadım — dosya olmayabilir"
+      "writeFailed": "analysis_options.yaml yazamadım — dosya olmayabilir",
+      "syntaxFixed": "analysis_options.yaml dışlamalarında geçersiz YAML sintaksısını düzeltilmesi",
+      "syntaxFixedWithDuplicates": "Geçersiz YAML sintaksisini düzeltilmiş ve {count} tekrar eden hariç tutma deseni(ler)i kaldırılmıştır"
+    },
+    "syntaxWarning": {
+      "message": "Bu dosyanın, Dart analizörünü bozan bir şekilde yazılan bir dışlama deseni vardır (yıldız ile başlayan ve tırnak içinde olmayan bir desen geçersiz YAML'dır).",
+      "fixButton": "Yapısal Hata düzelt"
     },
     "confirmBulk": {
       "prompt": "{count} hariç tutma desenlerini analysis_options.yaml'a uygula?",

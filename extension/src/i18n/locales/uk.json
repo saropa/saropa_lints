@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Використано шаблон(и) виключення {count} для analysis_options.yaml",
       "removed": "Видалено шаблон виключення з analysis_options.yaml",
-      "writeFailed": "Не вдалося записати в analysis_options.yaml — файл може відсутній"
+      "writeFailed": "Не вдалося записати в analysis_options.yaml — файл може відсутній",
+      "syntaxFixed": "Виправлено недійсну синтаксис YAML у analysis_options.yaml виключень",
+      "syntaxFixedWithDuplicates": "Виправлено недійсну синтаксис YAML та видалено шаблон(и) виключення {count} повторюваний"
+    },
+    "syntaxWarning": {
+      "message": "Цей файл містить виключну шаблон, написаний у вигляді, що порушує аналізатор Dart (шаблон без лапок, що починається з * є недійсним YAML).",
+      "fixButton": "Виправ Синтаксис"
     },
     "confirmBulk": {
       "prompt": "Застосувати шаблони виключення {count} до analysis_options.yaml?",

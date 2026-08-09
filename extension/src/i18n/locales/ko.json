@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "적용된 {count} 제외 패턴(s)을 analysis_options.yaml에",
       "removed": "analysis_options.yaml에서 제외 패턴 제거",
-      "writeFailed": "analysis_options.yaml에 쓸 수 없습니다 — 파일이 누락되었을 수 있습니다"
+      "writeFailed": "analysis_options.yaml에 쓸 수 없습니다 — 파일이 누락되었을 수 있습니다",
+      "syntaxFixed": "analysis_options.yaml 제외 항목에서 잘못된 YAML 문법 수정",
+      "syntaxFixedWithDuplicates": "잘못된 YAML 문법을 수정하고 {count} 중복 제외 패턴을 제거했습니다"
+    },
+    "syntaxWarning": {
+      "message": "이 파일은 Dart 분석기를 깨뜨리는 방식으로 제외 패턴이 작성되어 있습니다 (문자열로 묶지 않은 패턴으로 시작하는 *는 유효하지 않은 YAML입니다).",
+      "fixButton": "문법 수정"
     },
     "confirmBulk": {
       "prompt": "{count} 제외 패턴을 analysis_options.yaml에 적용하시겠습니까?",

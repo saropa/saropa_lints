@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Применены шаблоны {count} исключения к analysis_options.yaml",
       "removed": "Удалён шаблон исключения из analysis_options.yaml",
-      "writeFailed": "Не удалось записать в analysis_options.yaml — файл может отсутствовать"
+      "writeFailed": "Не удалось записать в analysis_options.yaml — файл может отсутствовать",
+      "syntaxFixed": "Исправлено неверный синтаксис YAML в analysis_options.yaml исключения",
+      "syntaxFixedWithDuplicates": "Исправлены ошибки синтаксиса YAML и удалены паттерны исключения {count} (дублированные)"
+    },
+    "syntaxWarning": {
+      "message": "Этот файл имеет исключительный шаблон, написанный таким образом, что нарушает анализатор Dart (шаблон без кавычек, начинающийся с * является недопустимым YAML).",
+      "fixButton": "Исправить синтаксис"
     },
     "confirmBulk": {
       "prompt": "Применить паттерны исключения {count} к analysis_options.yaml?",

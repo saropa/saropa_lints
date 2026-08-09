@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Mipango ya kufuta {count} iliyobadilishwa kwa analysis_options.yaml",
       "removed": "Kufuta kipengele cha kufuta kutokawa analysis_options.yaml",
-      "writeFailed": "Hakikisha unaweza kushirikisha kwenye analysis_options.yaml — faili ina kuhusika kushika"
+      "writeFailed": "Hakikisha unaweza kushirikisha kwenye analysis_options.yaml — faili ina kuhusika kushika",
+      "syntaxFixed": "Unganisha YAML syntax ya kati ya analysis_options.yaml exclusions",
+      "syntaxFixedWithDuplicates": "Unganisha YAML syntax ya kati na kusilisisha kipengele ya kuvuti kwa kuzalisha {count} kipengele ya kuvuti kwa kuzalisha"
+    },
+    "syntaxWarning": {
+      "message": "Faili hii ina mchoro wa kutenga ulioandikwa kwa njia ambayo huvunja kichanganuzi cha Dart (mchoro ambao haujanukuliwa unaoanza na * ni YAML batili).",
+      "fixButton": "Tuzaliwa Syntax"
     },
     "confirmBulk": {
       "prompt": "Tumezalisha {count} miongoni ya kufungua kwenye analysis_options.yaml?",
