@@ -4,6 +4,9 @@ import * as path from 'path';
 /** Matches a flow-sequence `exclude: [a, b]` line, capturing the bracket contents. */
 const INLINE_EXCLUDE_PATTERN = /^\s+exclude\s*:\s*\[(.*)\]\s*$/;
 
+/** `-`, `?`, `:` are YAML indicators only when followed by whitespace/EOL; `*&!|>%@` always. */
+const INDICATOR_START = /^[*&!|>%@]|^[-?:](\s|$)/;
+
 export function readAnalysisOptionsPath(root: string): string {
   return path.join(root, 'analysis_options.yaml');
 }
@@ -61,6 +64,8 @@ interface ExcludeLine {
   pattern: string;
   /** Trailing `# comment` text, verbatim, or '' if the entry has none. */
   comment: string;
+  /** Index into the source `lines` array for a block-list item, or -1 for an inline-array item. */
+  lineIndex: number;
 }
 
 /** Locates the `analyzer: exclude:` block and returns its list items in file order, raw. */
@@ -114,7 +119,7 @@ function findExcludeLines(lines: string[]): {
           .split(',')
           .map(item => item.trim())
           .filter(item => item.length > 0)
-          .map(item => splitPatternAndComment(item));
+          .map(item => ({ ...splitPatternAndComment(item), lineIndex: -1 }));
         return result;
       }
       result.excludeStart = i;
@@ -130,7 +135,7 @@ function findExcludeLines(lines: string[]): {
       }
       const match = stripped.match(/^\s+-\s+(.+)/);
       if (match) {
-        result.items.push(splitPatternAndComment(match[1]));
+        result.items.push({ ...splitPatternAndComment(match[1]), lineIndex: i });
       }
     }
   }
@@ -152,6 +157,20 @@ export function parseAnalyzerExcludes(content: string): string[] {
     result.push(item.pattern);
   }
   return result;
+}
+
+/**
+ * True if `pattern` is already excluded by `existing` — either an exact
+ * match, or a narrower path already covered by a broader `dir/**` entry
+ * (e.g. `dependency_overrides/flutter_contacts/**` is covered by an existing
+ * `dependency_overrides/**`). Without the coverage check, a folder-level
+ * recommendation for an already-excluded subtree would show as
+ * "Recommended" forever, since its exact string never appears in the file.
+ */
+export function isPatternCovered(pattern: string, existing: readonly string[]): boolean {
+  return existing.some(e =>
+    e === pattern
+    || (e.endsWith('/**') && pattern.startsWith(e.slice(0, -2))));
 }
 
 /**
@@ -178,8 +197,6 @@ export function hasMalformedExcludeSyntax(root: string): boolean {
   const found = findExcludeLines(lines);
   if (found.excludeStart < 0) return false;
 
-  const indicatorStart = /^[*&!|>%@]|^[-?:](\s|$)/;
-
   if (found.inlineItems !== null) {
     // Flow-sequence scalars (`exclude: [a, b]`) follow the same plain-scalar
     // rules as block-list items — an unquoted `*`-leading value inside `[...]`
@@ -190,7 +207,7 @@ export function hasMalformedExcludeSyntax(root: string): boolean {
       .split(',')
       .map(item => item.trim())
       .filter(item => item.length > 0)
-      .some(item => !item.startsWith('"') && !item.startsWith("'") && indicatorStart.test(item));
+      .some(item => !item.startsWith('"') && !item.startsWith("'") && INDICATOR_START.test(item));
   }
 
   for (let i = found.excludeStart; i < found.excludeEnd && i < lines.length; i++) {
@@ -199,27 +216,72 @@ export function hasMalformedExcludeSyntax(root: string): boolean {
     if (!match) continue;
     const rawValue = match[1].trim();
     if (rawValue.startsWith('"') || rawValue.startsWith("'")) continue;
-    if (indicatorStart.test(rawValue)) return true;
+    if (INDICATOR_START.test(rawValue)) return true;
   }
   return false;
 }
 
 /**
- * Re-quotes every existing exclude pattern in place. Also collapses any
- * literal duplicate pattern down to one entry, since `readAnalyzerExcludes`
- * dedupes — a duplicate line is itself a symptom of the same malformed-entry
- * class this exists to fix, so that's a feature of the fix, not a side effect.
- * `duplicatesRemoved` lets the caller surface that count rather than silently
- * dropping data the user might not expect to lose.
+ * Re-quotes only the specific lines that are actually malformed, and deletes
+ * only the exact line(s) that are a literal duplicate of an earlier pattern.
+ * Every other line — comments, blank lines, already-correct entries, their
+ * order — is left byte-for-byte untouched. This is a surgical repair, not a
+ * block rebuild: earlier versions of this tool regenerated the entire
+ * exclude block from a flat pattern list on every write, which silently
+ * discarded section-header comments and blank-line grouping that aren't
+ * attached to any single pattern, and re-sorted everything alphabetically.
  */
 export function fixMalformedExcludeSyntax(root: string): { success: boolean; duplicatesRemoved: number } {
   const filePath = readAnalysisOptionsPath(root);
   if (!fs.existsSync(filePath)) return { success: false, duplicatesRemoved: 0 };
-  const found = findExcludeLines(fs.readFileSync(filePath, 'utf8').split('\n'));
-  const rawCount = (found.inlineItems ?? found.items).filter(item => item.pattern).length;
-  const cleanPatterns = readAnalyzerExcludes(root);
-  const success = writeAnalyzerExcludes(root, cleanPatterns);
-  return { success, duplicatesRemoved: success ? Math.max(0, rawCount - cleanPatterns.length) : 0 };
+  const lines = fs.readFileSync(filePath, 'utf8').split('\n');
+  const found = findExcludeLines(lines);
+  if (found.excludeStart < 0) return { success: true, duplicatesRemoved: 0 };
+
+  if (found.inlineItems !== null) {
+    const seen = new Set<string>();
+    const rebuilt: string[] = [];
+    let duplicatesRemoved = 0;
+    for (const item of found.inlineItems) {
+      if (!item.pattern) continue;
+      if (seen.has(item.pattern)) { duplicatesRemoved++; continue; }
+      seen.add(item.pattern);
+      rebuilt.push(quoteYamlPattern(item.pattern));
+    }
+    lines[found.excludeStart] = lines[found.excludeStart].replace(/\[(.*)\]/, `[${rebuilt.join(', ')}]`);
+    fs.writeFileSync(filePath, lines.join('\n'), 'utf8');
+    return { success: true, duplicatesRemoved };
+  }
+
+  const seenPatterns = new Set<string>();
+  const deleteIndices: number[] = [];
+  let duplicatesRemoved = 0;
+
+  for (const item of found.items) {
+    if (!item.pattern) continue;
+    if (seenPatterns.has(item.pattern)) {
+      deleteIndices.push(item.lineIndex);
+      duplicatesRemoved++;
+      continue;
+    }
+    seenPatterns.add(item.pattern);
+
+    const stripped = lines[item.lineIndex].replace(/\r$/, '');
+    const match = stripped.match(/^(\s+-\s+)(.+)/);
+    if (!match) continue;
+    const rawValue = match[2].trim();
+    if (rawValue.startsWith('"') || rawValue.startsWith("'")) continue;
+    if (!INDICATOR_START.test(rawValue)) continue;
+
+    lines[item.lineIndex] = `${match[1]}${quoteYamlPattern(item.pattern)}${item.comment ? ` ${item.comment}` : ''}`;
+  }
+
+  for (const idx of deleteIndices.sort((a, b) => b - a)) {
+    lines.splice(idx, 1);
+  }
+
+  fs.writeFileSync(filePath, lines.join('\n'), 'utf8');
+  return { success: true, duplicatesRemoved };
 }
 
 /**
@@ -267,6 +329,15 @@ export function mergeExclusions(
   });
 }
 
+/**
+ * Rewrites the exclude block to contain exactly `patterns`, editing MINIMALLY:
+ * lines for patterns being removed are deleted, lines for brand-new patterns
+ * are appended, and every line for a pattern that's staying is left
+ * completely untouched — same quoting, same comment, same position. This
+ * means unrelated content (section-header comments, blank-line grouping,
+ * manual ordering) survives every Apply/Remove, not just the pattern lines
+ * this specific action changes.
+ */
 function replaceOrInsertExcludes(
   content: string,
   patterns: string[],
@@ -274,22 +345,27 @@ function replaceOrInsertExcludes(
   const lines = content.split('\n');
   const found = findExcludeLines(lines);
 
-  if (found.analyzerIdx >= 0) {
-    // Reuse each pattern's original comment where one exists, so applying a
-    // new exclusion doesn't wipe out the user's hand-written explanations for
-    // every other entry in the block. The pattern itself is always re-quoted
-    // (see quoteYamlPattern) rather than preserved verbatim — an existing
-    // entry may be exactly the malformed unquoted-`**` form that caused the
-    // parse error in the first place, and blindly preserving it would leave
-    // that error in place forever.
+  if (found.analyzerIdx < 0) {
+    const excludeBlock = patterns.length > 0
+      ? `  exclude:\n${patterns.map(p => `    - ${quoteYamlPattern(p)}`).join('\n')}`
+      : '  exclude: []';
+    lines.unshift(`analyzer:\n${excludeBlock}`, '');
+    return lines.join('\n');
+  }
+
+  const indentUnit = found.indentUnit;
+
+  // Wiping to zero, or an inline-array source: a full-block rebuild is
+  // acceptable here — inline arrays are single-line so there's no
+  // structure (comments/grouping) to lose, and wiping to zero patterns
+  // has nothing left worth preserving either way.
+  if (patterns.length === 0 || found.inlineItems !== null) {
     const commentByPattern = new Map<string, string>();
     for (const item of found.inlineItems ?? found.items) {
       if (item.pattern && !commentByPattern.has(item.pattern)) {
         commentByPattern.set(item.pattern, item.comment);
       }
     }
-
-    const indentUnit = found.indentUnit;
     const excludeBlock = patterns.length > 0
       ? `${indentUnit}exclude:\n${patterns
         .map((p) => {
@@ -304,11 +380,47 @@ function replaceOrInsertExcludes(
     } else {
       lines.splice(found.analyzerIdx + 1, 0, excludeBlock);
     }
-  } else {
-    const excludeBlock = patterns.length > 0
-      ? `  exclude:\n${patterns.map(p => `    - ${quoteYamlPattern(p)}`).join('\n')}`
-      : '  exclude: []';
-    lines.unshift(`analyzer:\n${excludeBlock}`, '');
+    return lines.join('\n');
+  }
+
+  if (found.excludeStart < 0) {
+    const excludeBlock = `${indentUnit}exclude:\n${patterns
+      .map(p => `${indentUnit}${indentUnit}- ${quoteYamlPattern(p)}`)
+      .join('\n')}`;
+    lines.splice(found.analyzerIdx + 1, 0, excludeBlock);
+    return lines.join('\n');
+  }
+
+  // Block-list, non-empty target: minimal surgical edit. Known limitation:
+  // a standalone section-header comment (`# === Generated Code ===`) isn't
+  // tracked as belonging to any specific pattern below it, so removing the
+  // last pattern under a header leaves that header orphaned with nothing
+  // beneath it. Still strictly better than the prior full-rebuild behavior,
+  // which discarded the header entirely on every write.
+  const desired = new Set(patterns);
+  const seenDesired = new Set<string>();
+  const deleteIndices: number[] = [];
+  const existingPatterns = new Set<string>();
+  for (const item of found.items) {
+    if (!item.pattern) continue;
+    existingPatterns.add(item.pattern);
+    if (!desired.has(item.pattern) || seenDesired.has(item.pattern)) {
+      deleteIndices.push(item.lineIndex);
+    } else {
+      seenDesired.add(item.pattern);
+    }
+  }
+
+  let insertionPoint = found.excludeEnd;
+  for (const idx of deleteIndices.slice().sort((a, b) => b - a)) {
+    lines.splice(idx, 1);
+    if (idx < insertionPoint) insertionPoint--;
+  }
+
+  const newPatterns = patterns.filter(p => !existingPatterns.has(p));
+  if (newPatterns.length > 0) {
+    const newLines = newPatterns.map(p => `${indentUnit}${indentUnit}- ${quoteYamlPattern(p)}`);
+    lines.splice(insertionPoint, 0, ...newLines);
   }
 
   return lines.join('\n');

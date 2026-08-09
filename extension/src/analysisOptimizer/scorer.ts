@@ -3,6 +3,7 @@ import type {
   FolderAnalysisCost,
   ExclusionRow,
 } from './types';
+import { isPatternCovered } from './analyzerExcludeYaml';
 
 const PROTECTED_FOLDERS = new Set(['lib', 'lib/src', 'bin']);
 
@@ -153,6 +154,11 @@ export function buildExclusionRows(
     if (PROTECTED_FOLDERS.has(folder.folderPath)) continue;
     if (seenPatterns.has(folder.excludePattern)) continue;
     if (folder.fileCount < 3) continue;
+    // A broader already-applied pattern (e.g. dependency_overrides/**)
+    // already covers this narrower one — recommending it would be a no-op,
+    // and it would otherwise never show as Applied since its own exact
+    // string never appears in the file.
+    if (isPatternCovered(folder.excludePattern, currentExclusions) && !appliedSet.has(folder.excludePattern)) continue;
 
     const isApplied = appliedSet.has(folder.excludePattern);
     const isInactive = folder.recentEditRatio < 0.1;

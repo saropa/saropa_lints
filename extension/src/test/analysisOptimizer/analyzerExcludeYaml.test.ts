@@ -9,6 +9,7 @@ import {
   writeAnalyzerExcludes,
   hasMalformedExcludeSyntax,
   fixMalformedExcludeSyntax,
+  isPatternCovered,
 } from '../../analysisOptimizer/analyzerExcludeYaml';
 
 function withTempProject(analysisOptionsContent: string, fn: (root: string) => void): void {
@@ -128,6 +129,25 @@ analyzer:
     );
   });
 
+  it('isPatternCovered treats an exact match as covered', () => {
+    assert.strictEqual(isPatternCovered('build/**', ['build/**']), true);
+  });
+
+  it('isPatternCovered treats a narrower path as covered by a broader dir glob', () => {
+    assert.strictEqual(
+      isPatternCovered('dependency_overrides/flutter_contacts/**', ['dependency_overrides/**']),
+      true,
+    );
+  });
+
+  it('isPatternCovered does not match an unrelated pattern', () => {
+    assert.strictEqual(isPatternCovered('lib/l10n/**', ['build/**', '.dart_tool/**']), false);
+  });
+
+  it('isPatternCovered does not treat a suffix glob as covering an unrelated dir pattern', () => {
+    assert.strictEqual(isPatternCovered('lib/gen/**', ['**/*.g.dart']), false);
+  });
+
   it('mergeExclusions dedupes and sorts', () => {
     const result = mergeExclusions(['build/**'], ['build/**', 'lib/gen/**']);
     assert.deepStrictEqual(result, ['build/**', 'lib/gen/**']);
@@ -211,12 +231,11 @@ analyzer:
     });
   });
 
-  it('writeAnalyzerExcludes re-quotes a malformed unquoted-star entry instead of preserving the parse error', () => {
-    // Reproduces a real hand-edited file: an existing entry with no opening
-    // quote and a stray trailing quote before its comment. Simply preserving
-    // this verbatim (as an earlier version of the writer did, to keep the
-    // comment) would leave the underlying "Undefined alias" YAML error in
-    // place forever, even after the user applies a change through the tool.
+  it('writeAnalyzerExcludes leaves an unrelated malformed entry untouched — Fix Syntax owns re-quoting, not every write', () => {
+    // Applying/removing a specific pattern must never silently rewrite OTHER
+    // entries' formatting. Repairing malformed syntax is Fix Syntax's job
+    // (see fixMalformedExcludeSyntax below); a normal write only ever touches
+    // the lines for patterns actually being added or removed.
     withTempProject(
       'analyzer:\n  exclude:\n    - **/*.bak" # Exclude backups\n',
       (root) => {
@@ -224,10 +243,64 @@ analyzer:
         assert.deepStrictEqual(existing, ['**/*.bak']);
         writeAnalyzerExcludes(root, mergeExclusions(existing, ['build/**']));
         const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
-        assert.match(content, /- "\*\*\/\*\.bak" # Exclude backups/);
-        assert.doesNotMatch(content, /^\s*-\s+\*\*\/\*\.bak"/m);
+        assert.match(content, /- \*\*\/\*\.bak" # Exclude backups/);
+        assert.match(content, /- "build\/\*\*"/);
       },
     );
+  });
+
+  describe('surgical minimal-edit writes (comments, grouping, and order must survive)', () => {
+    const ORGANIZED_FILE = `analyzer:
+  exclude:
+    # === Generated Code ===
+    - "bugs/**"
+    - "doc/**"
+
+    - "**/*.g.dart" # Exclude generated files
+    - "**/*.freezed.dart" # Exclude generated files
+
+    # === Build & Cache ===
+    - ".dart_tool/**"
+    - "build/**" # Exclude Flutter build output directory
+  language:
+    strict-casts: true
+`;
+
+    it('applying one new pattern leaves every existing line, comment, and blank line untouched', () => {
+      withTempProject(ORGANIZED_FILE, (root) => {
+        const existing = readAnalyzerExcludes(root);
+        writeAnalyzerExcludes(root, mergeExclusions(existing, ['lib/l10n/**']));
+        const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+        assert.match(content, /# === Generated Code ===/);
+        assert.match(content, /# === Build & Cache ===/);
+        assert.match(content, /- "bugs\/\*\*"\n {4}- "doc\/\*\*"\n\n {4}- "\*\*\/\*\.g\.dart"/);
+        assert.match(content, /- "lib\/l10n\/\*\*"/);
+      });
+    });
+
+    it('removing one pattern deletes only its own line, leaving section comments and ordering intact', () => {
+      withTempProject(ORGANIZED_FILE, (root) => {
+        const existing = readAnalyzerExcludes(root);
+        const filtered = existing.filter(p => p !== 'doc/**');
+        writeAnalyzerExcludes(root, filtered);
+        const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+        assert.match(content, /# === Generated Code ===/);
+        assert.doesNotMatch(content, /"doc\/\*\*"/);
+        assert.match(content, /- "bugs\/\*\*"\n\n {4}- "\*\*\/\*\.g\.dart"/);
+      });
+    });
+
+    it('does not alphabetically resort the block — existing order is preserved', () => {
+      withTempProject(ORGANIZED_FILE, (root) => {
+        const existing = readAnalyzerExcludes(root);
+        writeAnalyzerExcludes(root, mergeExclusions(existing, ['zzz/**']));
+        const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+        const bugsIdx = content.indexOf('"bugs/**"');
+        const docIdx = content.indexOf('"doc/**"');
+        const gDartIdx = content.indexOf('**/*.g.dart');
+        assert.ok(bugsIdx < docIdx && docIdx < gDartIdx, 'original relative order must be preserved');
+      });
+    });
   });
 
   it('parseAnalyzerExcludes takes the first exclude: block and does not crash on a duplicate key', () => {

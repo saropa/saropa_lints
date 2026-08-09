@@ -25,6 +25,12 @@ export class AnalysisOptimizerWebviewProvider {
   private _panel?: vscode.WebviewPanel;
   private _result?: AnalysisOptimizerResult;
   private _scannedFiles: FileAnalysisMetrics[] = [];
+  // Guards against stacking concurrent workspace walks: a scan now runs
+  // automatically after every Apply/Remove/Fix-Syntax, so a user clicking
+  // several per-row Apply buttons in quick succession would otherwise queue
+  // up multiple full rescans (each with its own progress notification).
+  private _scanInFlight = false;
+  private _scanQueued = false;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -91,6 +97,9 @@ export class AnalysisOptimizerWebviewProvider {
     });
 
     this._renderPanel();
+    if (!this._result) {
+      void this._runScan();
+    }
   }
 
   refresh(): void {
@@ -111,6 +120,26 @@ export class AnalysisOptimizerWebviewProvider {
   }
 
   private async _runScan(): Promise<void> {
+    if (this._scanInFlight) {
+      // A scan is already running — record that another one was requested
+      // and let the in-flight scan's completion trigger it, rather than
+      // starting a second concurrent workspace walk right now.
+      this._scanQueued = true;
+      return;
+    }
+    this._scanInFlight = true;
+    try {
+      await this._doScan();
+    } finally {
+      this._scanInFlight = false;
+      if (this._scanQueued) {
+        this._scanQueued = false;
+        void this._runScan();
+      }
+    }
+  }
+
+  private async _doScan(): Promise<void> {
     const root = getProjectRoot();
     if (!root) return;
 
@@ -162,7 +191,7 @@ export class AnalysisOptimizerWebviewProvider {
       void vscode.window.showInformationMessage(
         l10n('analysisOptimizer.notify.applied', { count: '1' }),
       );
-      this._refreshExclusions();
+      void this._runScan();
     } else {
       void vscode.window.showErrorMessage(l10n('analysisOptimizer.notify.writeFailed'));
     }
@@ -177,7 +206,7 @@ export class AnalysisOptimizerWebviewProvider {
       void vscode.window.showInformationMessage(
         l10n('analysisOptimizer.notify.removed'),
       );
-      this._refreshExclusions();
+      void this._runScan();
     } else {
       void vscode.window.showErrorMessage(l10n('analysisOptimizer.notify.writeFailed'));
     }
@@ -203,7 +232,7 @@ export class AnalysisOptimizerWebviewProvider {
       void vscode.window.showInformationMessage(
         l10n('analysisOptimizer.notify.applied', { count: String(patterns.length) }),
       );
-      this._refreshExclusions();
+      void this._runScan();
     } else {
       void vscode.window.showErrorMessage(l10n('analysisOptimizer.notify.writeFailed'));
     }
@@ -255,7 +284,7 @@ export class AnalysisOptimizerWebviewProvider {
           ? l10n('analysisOptimizer.notify.syntaxFixedWithDuplicates', { count: String(duplicatesRemoved) })
           : l10n('analysisOptimizer.notify.syntaxFixed'),
       );
-      this._refreshExclusions();
+      void this._runScan();
     } else {
       void vscode.window.showErrorMessage(l10n('analysisOptimizer.notify.writeFailed'));
     }
