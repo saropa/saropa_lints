@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: Toggle Run Analysis Setelah Dependency Change",
   "command.pickUiLanguage.title": "Saropa Lints: Bahasa / Langue / Sprache / 言語 / 语言 bahasa",
   "command.openConfigDashboard.title": "Saropa Lints: adalah suatu bentuk dari _PH0_. Mengelola Rule Packs.",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: Optimizer Analisis",
   "command.openPackageVibrancy.title": "Saropa Lints: Paket Terbuka Vibransi yang Bersemangat",
   "command.openProjectVibrancyReport.title": "Saropa Lints: Dashboard Kesehatan Kode Terbuka",
   "command.openProjectVibrancySettings.title": "Saropa Lints: Kode Terbuka Pengaturan Kesehatan.",

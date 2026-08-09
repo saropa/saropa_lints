@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "クリーンアップ",
+      "optimizeAnalysis": "分析を最適化",
       "dontShowAgain": "もう一度表示しない"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "{package} のバージョンの制約が見つかりませんでした.",
       "detailViewUpdated": "{package} を {version} に更新しました."
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: 分析最適化",
+    "title": "分析最適化",
+    "subtitle": "不要なファイルを分析から除外して、アナライザのメモリ使用量を減らす",
+    "emptyDescription": "ワークスペースをスキャンして、Dart分析機から除外することでメモリ使用量を減らすことができる高コストのファイルとフォルダを特定します。",
+    "scanButton": "ワークスペースをスキャン",
+    "rescanButton": "再スキャンして再スキャニングします.",
+    "scanning": "ワークスペースのスキャン中…",
+    "openConfig": "analysis_options.yamlを開く",
+    "lastScan": "最終スキャン: {time}",
+    "sidebar": {
+      "label": "分析最適化",
+      "description": "メモリ使用量を減らす"
+    },
+    "kpi": {
+      "filesInScope": "スコープ内のファイル",
+      "lines": "ライン",
+      "files": "ファイルは,ファイルのファイルを",
+      "estimatedCost": "推定分析コスト",
+      "costUnits": "コスト単位",
+      "potentialSavings": "潜在的な節約",
+      "recommendations": "推奨事項"
+    },
+    "costHeavy": "重い",
+    "costModerate": "中程度",
+    "costLight": "ライト",
+    "currentExclusions": "現在の除外項目",
+    "noExclusions": "analysis_options.yaml に除外設定がありません",
+    "recommendations": "推奨される除外項目",
+    "noRecommendations": "推奨される除外設定はありません — ワークスペースはすでに適切にスコープが設定されています",
+    "applyAll": "すべて適用する",
+    "applySelected": "選択されたを適用する",
+    "apply": "適用する",
+    "remove": "削除する Remove remove",
+    "selectAll": "すべて選択",
+    "defaultLabel": "デフォルト",
+    "col": {
+      "pattern": "パターン",
+      "files": "ファイルは,ファイルのことです.",
+      "cost": "概算費用",
+      "priority": "優先度"
+    },
+    "priority": {
+      "high": "ハイ",
+      "medium": "中程度",
+      "low": "低"
+    },
+    "activeFilesWarning": "このフォルダには最近編集したファイルが含まれています",
+    "folderHeatMap": "フォルダ分析コスト",
+    "hints": {
+      "title": "どのように動作する",
+      "body": "オプティマイザは、ワークスペース内のすべてのDartファイルをスキャンし、ファイルの複雑さ（行数、クラス、関数、インポート）に基づいて分析コストを推定します。その後、Dartアナライザがメモリにロードするファイル数を減らすために除外パターンを推奨します。",
+      "generated": "生成されたコード（*.g.dart、*.freezed.dart など）は除外しても安全です — これは常にソースから再生成されます。",
+      "build": "ビルド出力(build/, .dart_tool/)は、ライブ分析に必要なものではない中間アーティファクトを含みます。",
+      "inactive": "最近のgit活動がないフォルダは、死んだコードまたはアーカイブされたコードを含んでいる可能性があります。",
+      "protected": "コアソースフォルダ(lib/, lib/src/, bin/)は常に除外を推奨しません。"
+    },
+    "notify": {
+      "applied": "適用された {count} 排除パターンを analysis_options.yaml に",
+      "removed": "analysis_options.yaml から除外パターンを削除しました",
+      "writeFailed": "analysis_options.yaml に書き込めません — ファイルが存在しない可能性があります"
+    },
+    "confirmBulk": {
+      "prompt": "{count}の除外パターンをanalysis_options.yamlに適用しますか？",
+      "detail": "パターン: {preview}"
+    },
+    "diffTitle": "分析最適化: 提案された除外項目"
   }
 }

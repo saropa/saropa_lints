@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "נקה",
+      "optimizeAnalysis": "שפר ניתוח",
       "dontShowAgain": "אל תציג שוב"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "לא ניתן היה למצוא את מגבלות הגרסה עבור {package}.",
       "detailViewUpdated": "עדכון {package} ל- {version}"
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: אופטימיזר ניתוח",
+    "title": "מotifyר ניתוח",
+    "subtitle": "הקטין את זיכרון האנליטיקס על ידי הימנעות מניתוח קבצים שאינם חובה",
+    "emptyDescription": "סרוק את סביבת העבודה שלך כדי לזהות קבצים וכתובות עם עלויות גבוהות שניתן להוציא מהאנליזר Dart כדי להפחית את שימוש הזיכרון.",
+    "scanButton": "סרוק מרחב העבודה",
+    "rescanButton": "סריקה מחדש של Rescan",
+    "scanning": "סריקה של סביבת העבודה...",
+    "openConfig": "פתח analysis_options.yaml",
+    "lastScan": "סריקה אחרונה: {time}",
+    "sidebar": {
+      "label": "מotifyר ניתוח",
+      "description": "הקטין את זיכרון האנליטיקס"
+    },
+    "kpi": {
+      "filesInScope": "קבצים בטווח",
+      "lines": "שורות",
+      "files": "קבצים קובצי תיקיות",
+      "estimatedCost": "הערכה של עלות ניתוח",
+      "costUnits": "יחידות ערך",
+      "potentialSavings": "חסכונות אפשריות",
+      "recommendations": "המלצות"
+    },
+    "costHeavy": "גמיש",
+    "costModerate": "בינוני",
+    "costLight": "הבהירות",
+    "currentExclusions": "החלות נוכחיות",
+    "noExclusions": "אין הימנעות מוגדרת ב analysis_options.yaml",
+    "recommendations": "הסרות מומלצות",
+    "noRecommendations": "אין מומלצות להוציא מחוץ לתחום — הפרויקט כבר מוגדר היטב",
+    "applyAll": "החלף כל",
+    "applySelected": "החלף שנבחר",
+    "apply": "הפעלה",
+    "remove": "הסר את הוצאתו של Remove remove",
+    "selectAll": "בחר הכל",
+    "defaultLabel": "ברירת מחדל",
+    "col": {
+      "pattern": "תבנית",
+      "files": "קבצים קובצי תיקון.",
+      "cost": "הערכה של הוצאה",
+      "priority": "עדיפות"
+    },
+    "priority": {
+      "high": "גבוה",
+      "medium": "בינוני",
+      "low": "נמוך"
+    },
+    "activeFilesWarning": "הספרייה הזו מכילה קבצים שédיטו לאחרונה",
+    "folderHeatMap": "ניתוח תיקיה - עלות",
+    "hints": {
+      "title": "איך זה עובד",
+      "body": "כלי האופטימיזציה סורק כל קובץ Dart בסביבת העבודה שלך ומעריך את עלות הניתוח על סמך מורכבות הקובץ (ספירת שורות, מחלקות, פונקציות, ייבוא). לאחר מכן, הוא ממליץ על דפוסי אי הכללה כדי להפחית את מספר הקבצים שמנתח Dart טוען לזיכרון.",
+      "generated": "קוד שנוצר אוטומטית (*.g.dart, *.freezed.dart וכו') ניתן לשלוח אותו — הוא תמיד נוצר מחדש מהקוד המקור.",
+      "build": "הפלט של הבנייה (build/, .dart_tool/) מכיל אрטייקטים עת过ים שאינם נדרשים לניתוח בזמן אמת.",
+      "inactive": "תיקיות ללא פעילות git עדכנית עשויות להכיל קוד מת או מאrchיב.",
+      "protected": "תיקיות המקור הראשיות (lib/, lib/src/, bin/) אינן מומלצות להשממה."
+    },
+    "notify": {
+      "applied": "התבנית (ות) של {count} של איסור הופקה ל analysis_options.yaml",
+      "removed": "הוסר דפוס אי הכללה מ-analysis_options.yaml",
+      "writeFailed": "לא ניתן לכתוב ל-analysis_options.yaml — הקובץ עשוי להיות חסר"
+    },
+    "confirmBulk": {
+      "prompt": "החלף {count} mẫuות חסימה על analysis_options.yaml?",
+      "detail": "תבניות: {preview}"
+    },
+    "diffTitle": "מotify תحليل: הצעות היעדרויות"
   }
 }

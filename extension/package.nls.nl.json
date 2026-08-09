@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: Schakel Run Analysis Na Afhankelijkheid Verandering.",
   "command.pickUiLanguage.title": "Saropa Lints: Taal / taal / sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Het is een _PH0_. Regelpakketten beheren",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: Analyse Optimaliseer",
   "command.openPackageVibrancy.title": "Saropa Lints: Het is een _PH0_. Open Package Vibrancy is een open pakket.",
   "command.openProjectVibrancyReport.title": "Saropa Lints: Open Code Gezondheid Dashboard.",
   "command.openProjectVibrancySettings.title": "Saropa Lints: Open Code Gezondheidsinstellingen.",

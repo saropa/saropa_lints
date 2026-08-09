@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: टोगल रन एनालिसिस डिपेंडेंसी चेंज के बाद टॉगल करें।",
   "command.pickUiLanguage.title": "Saropa Lints: भाषा / लैंग्वेज / स्प्रेचे / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: _PH0_: नियम पैक का प्रबंधन करें",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: विश्लेषण उत्कृष्टक",
   "command.openPackageVibrancy.title": "Saropa Lints: ओपन पैकेज वाइब्रेंसी",
   "command.openProjectVibrancyReport.title": "Saropa Lints: ओपन कोड हेल्थ डैशबोर्ड",
   "command.openProjectVibrancySettings.title": "Saropa Lints: ओपन कोड हेल्थ सेटिंग्स",

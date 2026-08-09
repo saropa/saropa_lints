@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "Maglinis",
+      "optimizeAnalysis": "I-optimize ang Pagsusuri",
       "dontShowAgain": "Hindi Mo Iwanan Nang Magkakaroon Nang Paliwanag"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "Hindi mahanap ang mga paghihigpit ng bersyon para sa {package}.",
       "detailViewUpdated": "Na-update ang {package} sa {version}."
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: Optimizer ng Paglalaro",
+    "title": "Pagsusuri Optimizer",
+    "subtitle": "Pangalawang pagtatanggal ng memorya ng analizer sa pamamagitan ng pag-iwas sa mga file na hindi pangunahing kailangan sa pagtatala",
+    "emptyDescription": "I-scan ang iyong workspace upang makilala ang mga file at folder na may mataas na gastos na maaaring i-exclude sa Dart analyzer upang mapabawasan ang paggamit ng memorya.",
+    "scanButton": "I-scan ang Workspace",
+    "rescanButton": "Rescan muli ang iyong mga mata.",
+    "scanning": "Nag-scan ng workspace…",
+    "openConfig": "I-Open analysis_options.yaml",
+    "lastScan": "Huling pag-scan: {time}",
+    "sidebar": {
+      "label": "Pagsusuri Optimizer",
+      "description": "Ibaan ang memorya ng analyzer"
+    },
+    "kpi": {
+      "filesInScope": "Mga file sa scope",
+      "lines": "mga linya",
+      "files": "Ang mga file ay mga file ng files na file.",
+      "estimatedCost": "Estimado gastos sa analisis",
+      "costUnits": "unit ng gastos",
+      "potentialSavings": "Mga posibleng pagkakapareho",
+      "recommendations": "rekomendasyon"
+    },
+    "costHeavy": "Mabigat",
+    "costModerate": "Moderado",
+    "costLight": "Liwanag",
+    "currentExclusions": "Kasalungat na pag-Exclude",
+    "noExclusions": "Walang mga eksklusyon na nakakonfigura sa analysis_options.yaml",
+    "recommendations": "Rekomendadong pag-iexclude",
+    "noRecommendations": "Walang mga rekomendasyon sa eksklusyon — ang workspace ay nangangahulugan na maayos na scope",
+    "applyAll": "Pangalawang Paggamit: Ang lahat ng mga patakaran ay dapat i-apply.",
+    "applySelected": "Pangkatin ang napiling",
+    "apply": "Pangkatin",
+    "remove": "Alisin ang alisan ng pag-alis",
+    "selectAll": "Piliin lahat",
+    "defaultLabel": "Default",
+    "col": {
+      "pattern": "Pattern",
+      "files": "Mga file ng mga file.",
+      "cost": "Est. gastos",
+      "priority": "Prioridad"
+    },
+    "priority": {
+      "high": "Mataas",
+      "medium": "Katamtaman",
+      "low": "Mababa"
+    },
+    "activeFilesWarning": "Ito ang folder na naglalaman ng mga binago kaharapang file",
+    "folderHeatMap": "Kostong pagbabase sa folder",
+    "hints": {
+      "title": "Paano ito gumagana",
+      "body": "Ang optimizer ay nag-scan sa bawat Dart file sa workspace mo at nag-estimate ng analysis cost ayon sa komplikasyon ng file (line count, classes, functions, imports). Pagkatapos nito, ito ay nagrerekomenda ng mga pattern na pag-iexclude upang mapababa ang bilang ng mga file na inilalagay ng Dart analyzer sa memorya.",
+      "generated": "Nagawa na code (*.g.dart, *.freezed.dart, etc.) ay ligtas na i-exclude — ito ay palaging binubuo mula sa source.",
+      "build": "Naglalabas ng output (build/, .dart_tool/) ang mga intermediate artifacts na hindi kinakailangan para sa live analysis.",
+      "inactive": "Mga folder na walang pinakabagong git activity ay maaaring makalikha ng dead o archived code.",
+      "protected": "Ang mga pangunahing folder ng source (lib/, lib/src/, bin/) ay hindi kailanman inirerekomenda na i-exclude."
+    },
+    "notify": {
+      "applied": "Napalagay ang pattern ng pag-ihiwalay {count} sa analysis_options.yaml",
+      "removed": "Nakaraan ang pattern ng pag-ihiwalay mula sa analysis_options.yaml",
+      "writeFailed": "Hindi maaaring i-write sa analysis_options.yaml — ang file ay maaaring nawala"
+    },
+    "confirmBulk": {
+      "prompt": "Pangalawang pagtatapon ng mga pattern ng {count} sa analysis_options.yaml?",
+      "detail": "Mga Pattern: {preview}"
+    },
+    "diffTitle": "Analysis Optimizer: Mga Iminungkahing Pagbubukod"
   }
 }

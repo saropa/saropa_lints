@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: Troque de Análise de Execução após Mudança da Dependência.",
   "command.pickUiLanguage.title": "Saropa Lints: Língua / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: é um número de PH0__. Gerenciar Pacotes de Regras para Gerir",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: Analisador de Otimização",
   "command.openPackageVibrancy.title": "Saropa Lints: Pacote aberto Vibração de pacote.",
   "command.openProjectVibrancyReport.title": "Saropa Lints: Painel de Controle da Saúde em Código Aberto.",
   "command.openProjectVibrancySettings.title": "Saropa Lints: Código Aberto de Configurações de Saúde.",

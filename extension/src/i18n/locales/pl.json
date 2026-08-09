@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "Czysta Przestrzeń",
+      "optimizeAnalysis": "Optymalizuj Analizę",
       "dontShowAgain": "Nie Pokazuj Ponownie"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "Nie można znaleźć ograniczenia wersji dla {package}.",
       "detailViewUpdated": "Zaktualizowano {package} na {version}."
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: Optymalizacja Analizy",
+    "title": "Optymalizator Analizy",
+    "subtitle": "Zmniejsz zużycie pamięci analizatora, wykluczając nieistotne pliki z analizy",
+    "emptyDescription": "Przeskanuj swój obszar roboczy, aby zidentyfikować kosztowne pliki i foldery, które można wykluczyć z analizatora Dart, aby zmniejszyć zużycie pamięci.",
+    "scanButton": "Skanuj Przestrzeń Pracy",
+    "rescanButton": "Reskanuj ponownie, aby uzyskać więcej informacji.",
+    "scanning": "Analizowanie przestrzeni roboczej…",
+    "openConfig": "Otwórz analysis_options.yaml",
+    "lastScan": "Ostatnia skan: {time}",
+    "sidebar": {
+      "label": "Optymalizator Analizy",
+      "description": "Zmniejsz zużycie pamięci analizatora"
+    },
+    "kpi": {
+      "filesInScope": "Pliki w zakresie",
+      "lines": "linie",
+      "files": "Pliki plików pliki plikami.",
+      "estimatedCost": "Szacowana koszt analizy",
+      "costUnits": "jednostki kosztów",
+      "potentialSavings": "Potencjalne oszczędności",
+      "recommendations": "rekomendacje"
+    },
+    "costHeavy": "Ciężki",
+    "costModerate": "Średnie",
+    "costLight": "Światło",
+    "currentExclusions": "Obecne wykluczenia",
+    "noExclusions": "Brak wykluczeń skonfigurowanych w analysis_options.yaml",
+    "recommendations": "Rekomendowane wykluczenia",
+    "noRecommendations": "Brak rekomendacji wykluczenia — przestrzeń robocza jest już dobrze zdefiniowana",
+    "applyAll": "Zastosuj wszystko",
+    "applySelected": "Zastosuj wybrany",
+    "apply": "Zastosuj",
+    "remove": "Remove Usunąć Usuń usunięcie",
+    "selectAll": "Zaznacz wszystko",
+    "defaultLabel": "Domyślny",
+    "col": {
+      "pattern": "Wzorzec",
+      "files": "Pliki plików.",
+      "cost": "Szac. koszt",
+      "priority": "Priorytet"
+    },
+    "priority": {
+      "high": "Wysoki",
+      "medium": "Średnie",
+      "low": "Niski"
+    },
+    "activeFilesWarning": "Ten folder zawiera ostatnio edytowane pliki",
+    "folderHeatMap": "Koszt analizy folderu",
+    "hints": {
+      "title": "Jak to działa",
+      "body": "Optymalizator analizuje każdy plik Dart w Twoim obszarze roboczym i szacuje koszt analizy na podstawie złożoności pliku (liczba linii, klasy, funkcje, importy). Następnie zaleca wzorce wykluczenia, aby zmniejszyć liczbę plików, które analizator Dart wczytuje do pamięci.",
+      "generated": "Kod wygenerowany (*.g.dart, *.freezed.dart, itp.) można bezpiecznie wykluczyć — zawsze jest ponownie wygenerowany z źródeł.",
+      "build": "Wynik kompilacji (build/, .dart_tool/) zawiera pośrednie artefakty niepotrzebne do analizy w czasie rzeczywistym.",
+      "inactive": "Foldery bez ostatniej aktywności w git mogą zawierać martwe lub archiwizowane kod.",
+      "protected": "Kluczowe foldery źródłowe (lib/, lib/src/, bin/) nigdy nie zaleca się wyklucia."
+    },
+    "notify": {
+      "applied": "Zastosowano wzorzec(wzorce) wykluczenia {count} do analysis_options.yaml",
+      "removed": "Usunięto wzorzec wykluczenia z analysis_options.yaml",
+      "writeFailed": "Nie można zapisać do analysis_options.yaml — plik może brakować"
+    },
+    "confirmBulk": {
+      "prompt": "Zastosuj wzorce wykluczenia {count} do analysis_options.yaml?",
+      "detail": "Wzorce: {preview}"
+    },
+    "diffTitle": "Optymalizator Analizy: Zalecane Wykluczenia"
   }
 }

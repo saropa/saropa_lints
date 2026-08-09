@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: টগল রান বিশ্লেষণ নির্ভরতা পরিবর্তনের পরে পরিবর্তন করুন",
   "command.pickUiLanguage.title": "Saropa Lints: ভাষা / ল্যাঙ্গুয়েজ / স্প্রেচে / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: PH0__::: -PH0_: =PH0 নিয়ম প্যাকগুলি পরিচালনা করুন",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: বিশ্লেষণ অপ্টিমাইজার",
   "command.openPackageVibrancy.title": "Saropa Lints: ওপেন প্যাকেজ ভাইব্র্যান্সিটি",
   "command.openProjectVibrancyReport.title": "Saropa Lints: ওপেন কোড হেলথ ড্যাশবোর্ড",
   "command.openProjectVibrancySettings.title": "Saropa Lints: ওপেন কোড স্বাস্থ্য সেটিংসে",

@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: bascule analyse d'exécution après changement de dépendance.",
   "command.pickUiLanguage.title": "Saropa Lints: Langue / langue / langage / langue de la bouche ou du nez.",
   "command.openConfigDashboard.title": "Saropa Lints: Il s'agit de la réponse à une question. Gérer les packs de règles.",
+  "command.openAnalysisOptimizer.title": "Saropa Lints : Optimiseur d'analyse",
   "command.openPackageVibrancy.title": "Saropa Lints: Vibrance du paquet ouvert.",
   "command.openProjectVibrancyReport.title": "Saropa Lints: Tableau de bord santé en code ouvert.",
   "command.openProjectVibrancySettings.title": "Saropa Lints: Code ouvert sur les établissements de santé.",

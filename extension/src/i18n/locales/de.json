@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "Aufräumen",
+      "optimizeAnalysis": "Analyse optimieren",
       "dontShowAgain": "Nicht wieder zeigen"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "Versionsbeschränkung für {package} nicht gefunden werden konnte.",
       "detailViewUpdated": "Aktualisiert {package} auf {version}."
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: Analyse-Optimizer",
+    "title": "Analyse-Optimizer",
+    "subtitle": "Speicherplatz des Analyzers reduzieren, indem nicht notwendige Dateien von der Analyse ausgeschlossen werden",
+    "emptyDescription": "Scannen Sie Ihr Arbeitsbereich, um hochkostenintensive Dateien und Ordner zu identifizieren, die von dem Dart-Analyser ausgeschlossen werden können, um den Speicherbedarf zu reduzieren.",
+    "scanButton": "Arbeitsbereich scannen",
+    "rescanButton": "Ein Rescan führt zu einem erneuten Scannen.",
+    "scanning": "Arbeitsbereich wird gescannt…",
+    "openConfig": "Öffnen Sie analysis_options.yaml",
+    "lastScan": "Letzte Scan: {time}",
+    "sidebar": {
+      "label": "Analyse-Optimizer",
+      "description": "Analyser-Speicher reduzieren"
+    },
+    "kpi": {
+      "filesInScope": "Dateien im Bereich",
+      "lines": "Zeilen",
+      "files": "Dateien sind Datei-Dateien.",
+      "estimatedCost": "Schätzung der Analyse-Kosten",
+      "costUnits": "Kostenstellen",
+      "potentialSavings": "Potenzielle Einsparungen",
+      "recommendations": "Empfehlungen"
+    },
+    "costHeavy": "Schwer",
+    "costModerate": "Mäßig",
+    "costLight": "Licht",
+    "currentExclusions": "Aktuelle Ausnahmen",
+    "noExclusions": "Keine Ausnahmen konfiguriert in analysis_options.yaml",
+    "recommendations": "Empfohlene Ausnahmen",
+    "noRecommendations": "Keine Ausschlussempfehlungen — der Workspace ist bereits gut befristet",
+    "applyAll": "Alle anwenden",
+    "applySelected": "Ausgewählte anwenden",
+    "apply": "Anwenden",
+    "remove": "Entfernen Sie entfernen Entferne",
+    "selectAll": "Alles auswählen",
+    "defaultLabel": "Standard",
+    "col": {
+      "pattern": "Muster",
+      "files": "Dateien Datei-Dateien",
+      "cost": "Schätzung",
+      "priority": "Priorität"
+    },
+    "priority": {
+      "high": "Hoch",
+      "medium": "Mittlere",
+      "low": "Niedrig /keine_überlegung"
+    },
+    "activeFilesWarning": "Dieser Ordner enthält kürzlich bearbeitete Dateien",
+    "folderHeatMap": "Ordneranalyse-Kosten",
+    "hints": {
+      "title": "Wie es funktioniert",
+      "body": "Der Optimierer analysiert jede Dart-Datei in Ihrem Arbeitsbereich und schätzt die Analyse-Kosten anhand der Dateikomplexität (Zeilenanzahl, Klassen, Funktionen, Imports). Anschließend empfiehlt er Ausschlussmuster, um die Anzahl der Dateien zu reduzieren, die der Dart-Analyzer in den Speicher lädt.",
+      "generated": "Generierter Code (*.g.dart, *.freezed.dart, etc.) kann sicher ausgeschlossen werden – er wird immer aus den Quellen wiedergegeneriert.",
+      "build": "Build-Ausgabe (build/, .dart_tool/) enthält Zwischenergebnisse, die für die Live-Analyse nicht benötigt werden.",
+      "inactive": "Ordner mit keiner kürzlichen Git-Aktivität können tote oder archivierte Code enthalten.",
+      "protected": "Strenge Regeln:  \n1. Übersetzen Sie lediglich den Text.  \n2. Erklärungen, Einführung, Markdown-Notation oder Anführungszeichen sind nicht erlaubt.  \n3. Der Text kann Platzhalter enthalten: Platzhalter. Kopieren Sie jeden Platzhalter exakt so, wie er geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals einen Platzhalter.  \n4. Die Ausgabe muss das richtige Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.  \n\nText: Core-Quellordner (lib/, lib/src/, bin/) werden nie empfohlen, auszuschließen."
+    },
+    "notify": {
+      "applied": "Zur Anwendung gebracht wird das Muster {count} zur Ausschluss von analysis_options.yaml",
+      "removed": "Exklusionsmuster aus analysis_options.yaml entfernt",
+      "writeFailed": "Konnte nicht in analysis_options.yaml schreiben — die Datei könnte fehlen"
+    },
+    "confirmBulk": {
+      "prompt": "{count}-Ausklingsmuster auf analysis_options.yaml anwenden?",
+      "detail": "Muster: {preview}"
+    },
+    "diffTitle": "Analyse-Optimizer: Vorgeschlagene Ausnahmen"
   }
 }

@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: là người có thể Toggle Run Analysis After Dependency Change chuyển đổi phụ thuộc",
   "command.pickUiLanguage.title": "Saropa Lints: là người có thể Ngôn ngữ / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: là người có thể Quản lý Rule Packs",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: Bộ Tối Ưu Hóa Phân Tích",
   "command.openPackageVibrancy.title": "Saropa Lints: là người có thể Open Package Vibrancy (Mở gói)",
   "command.openProjectVibrancyReport.title": "Saropa Lints: là người có thể Open Code Health Dashboard (Bảng điều khiển sức khỏe mã nguồn mở)",
   "command.openProjectVibrancySettings.title": "Saropa Lints: là người có thể Mã mở Các thiết lập sức khỏe",

@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: 종속성 변경 후 토글 실행 분석",
   "command.pickUiLanguage.title": "Saropa Lints: 언어 / 랭귀지 / 스프라체 / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: PH0__:::  ⁇ PH0_: 규칙 팩을 관리하십시오.",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: 분석 최적화",
   "command.openPackageVibrancy.title": "Saropa Lints: 오픈 패키지 진동성",
   "command.openProjectVibrancyReport.title": "Saropa Lints: 오픈 코드 건강 대시보드",
   "command.openProjectVibrancySettings.title": "Saropa Lints: 오픈 코드 건강 설정",

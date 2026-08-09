@@ -90,6 +90,10 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "HACKS": "Noodoplossingen",
         "Info": "Info",
         "Later": "Later",
+        # Manual: MT returned English unchanged; "Gemiddeld" is the standard Dutch for medium priority.
+        "Medium": "Gemiddeld",
+        # Curated passthrough: Dutch imperative "Open" is identical to English; file name is untranslatable.
+        "Open analysis_options.yaml": "Open analysis_options.yaml",
         "OWASP": "OWASP",
         "Open pubspec.yaml": "Open pubspec.yaml",
         "Recent": "Recent",
@@ -1279,11 +1283,15 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "reverse dependency count": "reverse dependency count",
         "Drift Advisor": "Drift Advisor",
         "Drift offline": "Drift offline",
+        # Manual: MT returned English unchanged; "Karaniwan" is the standard Filipino for a default/standard setting.
+        "Default": "Karaniwan",
         "Function": "Function",
         "Grade": "Grade",
         "OWASP": "OWASP",
         "Open Source Folder": "Buksan ang Source Folder",
         "Package": "Package",
+        # Manual: MT returned English unchanged; "Padron" is the standard Filipino for a pattern/template.
+        "Pattern": "Padron",
         "Package Health": "Package Health",
         "Package Vibrancy": "Package Vibrancy",
         "Preset": "Preset",

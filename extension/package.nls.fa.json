@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: Toggle Run Analysis After Dependency Change (تحلیل اجرای تغییر پس از وابستگی)",
   "command.pickUiLanguage.title": "Saropa Lints: Language / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: _PH0_: = PH0__::: -پای مدیریت Rule Packs بسته های قاعده",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: بهینه سازی تحلیل",
   "command.openPackageVibrancy.title": "Saropa Lints: باز کردن پویایی بسته",
   "command.openProjectVibrancyReport.title": "Saropa Lints: باز کردن داشبورد سلامت کد",
   "command.openProjectVibrancySettings.title": "Saropa Lints: کد باز تنظیمات بهداشتی",

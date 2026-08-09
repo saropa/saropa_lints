@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Перемикач Запустити аналіз після зміни залежності",
   "command.pickUiLanguage.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Мова / Langue / Sprache / 言語 / 语言 мова / Sprace / 語言",
   "command.openConfigDashboard.title": "Saropa Lints: Управління пакетами правил.",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: Оптимізатор аналізу",
   "command.openPackageVibrancy.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Відкритий пакет Vibrancy.",
   "command.openProjectVibrancyReport.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Відкритий код Health Dashboard.",
   "command.openProjectVibrancySettings.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Відкритий код Медичні установи",

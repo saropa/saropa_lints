@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: التبديل تشغيل التحليل بعد تغيير الاعتماد.",
   "command.pickUiLanguage.title": "Saropa Lints: اللغة / Langue / Sprache / 言語 / 语言 لغة / لغه / لغات / لغة",
   "command.openConfigDashboard.title": "Saropa Lints: هيئة إدارة المعلومات إدارة حزم القواعد",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: مُحسّن التحليل",
   "command.openPackageVibrancy.title": "Saropa Lints: حزمة مفتوحة النشاط الحيوي",
   "command.openProjectVibrancyReport.title": "Saropa Lints: لوحة تحكم الصحة مفتوحة الشفرة.",
   "command.openProjectVibrancySettings.title": "Saropa Lints: مفتوحة الشفرة الإعدادات الصحية.",

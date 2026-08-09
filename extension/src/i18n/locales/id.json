@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "Pembersihan",
+      "optimizeAnalysis": "Optimalkan Analisis",
       "dontShowAgain": "Jangan Tampilkan Lagi"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "Tidak dapat menemukan kendala versi untuk {package}.",
       "detailViewUpdated": "Diupdate dari {package} menjadi {version}."
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: Optimizer Analisis",
+    "title": "Analisis Optimizer",
+    "subtitle": "Reduced memory analyzer dengan mengecualikan file non-esensial dari analisis",
+    "emptyDescription": "Scan workspace Anda untuk mengidentifikasi file dan folder yang memiliki biaya tinggi dan dapat dikecualikan dari analisis Dart untuk mengurangi penggunaan memori.",
+    "scanButton": "Pindai Ruang Kerja",
+    "rescanButton": "Rescan ulang scan kembali.",
+    "scanning": "Mengamati workspace…",
+    "openConfig": "Buka analysis_options.yaml",
+    "lastScan": "Scan terakhir: {time}",
+    "sidebar": {
+      "label": "Analisis Optimizer",
+      "description": "Reduksi memori analyzer"
+    },
+    "kpi": {
+      "filesInScope": "File dalam scope",
+      "lines": "baris",
+      "files": "file yang berisi data.",
+      "estimatedCost": "Biaya analisis yang diestimasi",
+      "costUnits": "satuan biaya",
+      "potentialSavings": "Potensi penghematan",
+      "recommendations": "rekomendasi"
+    },
+    "costHeavy": "Berat",
+    "costModerate": "Moderat",
+    "costLight": "Ringan",
+    "currentExclusions": "Eksploitasi Saat Ini",
+    "noExclusions": "Tidak ada pengecualian yang dikonfigurasi dalam analysis_options.yaml",
+    "recommendations": "Rekomendasi eksklusi",
+    "noRecommendations": "Tidak ada rekomendasi eksklusi — workspace sudah cukup terbatas",
+    "applyAll": "Terapkan semua",
+    "applySelected": "Terapkan yang dipilih",
+    "apply": "Terapkan",
+    "remove": "Remove Menghilangkan Hapus",
+    "selectAll": "Pilih semuanya",
+    "defaultLabel": "Bawaan",
+    "col": {
+      "pattern": "Pol a",
+      "files": "File-file yang ada di dalamnya.",
+      "cost": "Biaya estimasi",
+      "priority": "Prioritas"
+    },
+    "priority": {
+      "high": "Tinggi",
+      "medium": "Sedang",
+      "low": "Rendah"
+    },
+    "activeFilesWarning": "Folder ini berisi file yang baru saja diedit",
+    "folderHeatMap": "Biaya analisis folder",
+    "hints": {
+      "title": "Bagaimana cara kerjanya",
+      "body": "Optimizer memindai setiap file Dart di workspace Anda dan memperkirakan biaya analisis berdasarkan kompleksitas file (jumlah baris, kelas, fungsi, impor). Lalu, ia merekomendasikan pola pengecualian untuk mengurangi jumlah file yang diunggah Dart analyzer ke dalam memori.",
+      "generated": "Kode yang dihasilkan (*.g.dart, *.freezed.dart, dll.) aman untuk dikecualikan — selalu dihasilkan kembali dari sumber.",
+      "build": "Build output (build/, .dart_tool/) mengandung artefak sementara yang tidak diperlukan untuk analisis langsung.",
+      "inactive": "Folder yang tidak memiliki aktivitas git baru mungkin berisi kode yang mati atau arsip.",
+      "protected": "Folder sumber inti (lib/, lib/src/, bin/) tidak pernah direkomendasikan untuk dikecualikan."
+    },
+    "notify": {
+      "applied": "Pola pengecualian {count} diterapkan ke analysis_options.yaml",
+      "removed": "Pola pengecualian dihapus dari analysis_options.yaml",
+      "writeFailed": "Tidak dapat menulis ke analysis_options.yaml — file mungkin hilang"
+    },
+    "confirmBulk": {
+      "prompt": "Terapkan pola pengecualian {count} ke analysis_options.yaml?",
+      "detail": "Pola: {preview}"
+    },
+    "diffTitle": "Analisis Optimizer: Rekomendasi Pengeluaran"
   }
 }

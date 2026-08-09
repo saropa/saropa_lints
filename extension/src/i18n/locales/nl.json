@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "Reinigen",
+      "optimizeAnalysis": "Analyse optimaliseren",
       "dontShowAgain": "Niet Opnieuw Toon"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "Kon geen versiebeperking vinden voor {package}.",
       "detailViewUpdated": "Bijgewerkt {package} naar {version}."
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: Analyse Optimaliseer",
+    "title": "Analyse Optimaliseer",
+    "subtitle": "Gebruik exclusies om niet-essentiële bestanden uit de analyse te verwijderen en de analyseramgeheugen te verminderen",
+    "emptyDescription": "Scan je werkruimte om hoge kosten bestanden en mappen te identificeren die kunnen worden uitgesloten uit de Dart analyzer om de geheugenverbruik te verminderen.",
+    "scanButton": "Scan Werkruimte",
+    "rescanButton": "Opnieuw scannen",
+    "scanning": "Werkruimte scannen…",
+    "openConfig": "Open analysis_options.yaml",
+    "lastScan": "Laatste scan: {time}",
+    "sidebar": {
+      "label": "Analyse Optimaliseer",
+      "description": "Analyseer geheugen verminderen"
+    },
+    "kpi": {
+      "filesInScope": "Bestanden in scope",
+      "lines": "lijnen",
+      "files": "De bestanden zijn archieven.",
+      "estimatedCost": "Gebruikte analysekosten",
+      "costUnits": "kosten eenheden",
+      "potentialSavings": "Potentiële besparingen",
+      "recommendations": "aanbevelingen"
+    },
+    "costHeavy": "Zwaar",
+    "costModerate": "Matig",
+    "costLight": "Licht",
+    "currentExclusions": "Huidige uitsluitingen",
+    "noExclusions": "Geen uitsluitingen geconfigureerd in analysis_options.yaml",
+    "recommendations": "Aanbevolen uitsluitingen",
+    "noRecommendations": "Geen uitsluitingsaanbevelingen — het werkruimte is al goed in de focus",
+    "applyAll": "Alle toepassen",
+    "applySelected": "Geselecteerde toepassen",
+    "apply": "Toepassen",
+    "remove": "Verwijderen",
+    "selectAll": "Alles selecteren",
+    "defaultLabel": "Standaard",
+    "col": {
+      "pattern": "Patroon",
+      "files": "Bestanden bestandenbestanden.",
+      "cost": "Est. kosten",
+      "priority": "Prioriteit"
+    },
+    "priority": {
+      "high": "Hoog",
+      "medium": "Medium",
+      "low": "Laag"
+    },
+    "activeFilesWarning": "Deze map bevat recent gewijzigde bestanden",
+    "folderHeatMap": "Folder analyse kost",
+    "hints": {
+      "title": "Hoe het werkt",
+      "body": "De optimizer scant elke Dart bestand in uw werkruimte en schat de analyse kosten op basis van bestandscomplexiteit (regellengte, klassen, functies, imports). Daarna stelt het exclusiepatronen voor om het aantal bestanden te verminderen dat de Dart analyzer in het geheugen laadt.",
+      "generated": "Genereerde code (*.g.dart, *.freezed.dart, etc.) is veilig om te uitsluiten — het wordt altijd opnieuw gegenereerd vanuit de bron.",
+      "build": "Build output (build/, .dart_tool/) bevat tussentijdse artikelen die niet nodig zijn voor live analyse.",
+      "inactive": "Mappen zonder recente git-activiteit kunnen dood of gearchiveerde code bevatten.",
+      "protected": "Strict Regels:\n1. Kern bronmappen (lib/, lib/src/, bin/) worden nooit aanbevolen voor uitsluiting."
+    },
+    "notify": {
+      "applied": "Toepasselijke {count} uitsluitingspatroon(s) op analysis_options.yaml",
+      "removed": "Exclusiepatroon verwijderd uit analysis_options.yaml",
+      "writeFailed": "Kon niet schrijven naar analysis_options.yaml — het bestand kan ontbreken"
+    },
+    "confirmBulk": {
+      "prompt": "Toepassen van {count} uitsluitingspatronen op analysis_options.yaml?",
+      "detail": "Patronen: {preview}"
+    },
+    "diffTitle": "Analyse Optimaliseerder: Aangevoerde Uitsluitingen"
   }
 }

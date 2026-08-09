@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: 没有一个人. 在依赖性更改后切换运行分析.",
   "command.pickUiLanguage.title": "Saropa Lints: 没有一个人. 语言 / 语种 / Sprache / 言語 / 语言的语言.",
   "command.openConfigDashboard.title": "Saropa Lints: 没有一个人. 管理规则包的管理",
+  "command.openAnalysisOptimizer.title": "Saropa Lints：分析优化器",
   "command.openPackageVibrancy.title": "Saropa Lints: 没有一个人. 打开包装振动的活力",
   "command.openProjectVibrancyReport.title": "Saropa Lints: 没有一个人. 开放代码健康仪表板",
   "command.openProjectVibrancySettings.title": "Saropa Lints: 没有一个人. 开放代码健康设置",

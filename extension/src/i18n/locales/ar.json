@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "تنظيف",
+      "optimizeAnalysis": "تحسين التحليل",
       "dontShowAgain": "لا تظهر مرة أخرى"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "لم يتمكن من تحديد موقع قيود الإصدار لـ {package}.",
       "detailViewUpdated": "تم تحديث {package} إلى {version}"
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: مُحسّن التحليل",
+    "title": "مُحسّن تحليل",
+    "subtitle": "تقليل ذاكرة المُحلّل عن طريق استبعاد الملفات غير الضرورية من التحليل",
+    "emptyDescription": "اذهب إلى مساحة العمل الخاصة بك لتحديد الملفات والملفات التي تكلفك تكاليف عالية ويمكن استبعادها من مُحلل Dart لتقليل استخدام الذاكرة.",
+    "scanButton": "مسح مساحة العمل",
+    "rescanButton": "إعادة مسح الماسح الضوئي.",
+    "scanning": "مسح المساحة العاملة...",
+    "openConfig": "فتح analysis_options.yaml",
+    "lastScan": "المسح الأخير: {time}",
+    "sidebar": {
+      "label": "مُحسّن تحليل",
+      "description": "تقليل ذاكرة المدقق"
+    },
+    "kpi": {
+      "filesInScope": "ملفات في نطاق الاهتمام",
+      "lines": "خطوط",
+      "files": "ملفات الملفات files",
+      "estimatedCost": "التكلفة المقدرة للتحليل",
+      "costUnits": "وحدات التكلفة",
+      "potentialSavings": "الاقتصاد المحتمل",
+      "recommendations": "التوصيات"
+    },
+    "costHeavy": "كثيرة",
+    "costModerate": "متوسط",
+    "costLight": "خفيف",
+    "currentExclusions": "الاستثناءات الحالية",
+    "noExclusions": "لا توجد استثناءات مُحدَّدة في analysis_options.yaml",
+    "recommendations": "الاستثناءات المقترحة",
+    "noRecommendations": "لا توصيات بخصوص الاستثناء — الفضاء العمل مُحدد بالفعل بشكل جيد",
+    "applyAll": "تطبيق جميع",
+    "applySelected": "تطبيق المحدد",
+    "apply": "تطبيق",
+    "remove": "إزالة Remove إزالت remove",
+    "selectAll": "اختر كلها",
+    "defaultLabel": "الافتراضي",
+    "col": {
+      "pattern": "نمط",
+      "files": "ملفات الملفات.",
+      "cost": "التكاليف المقدرة",
+      "priority": "ال우선순위"
+    },
+    "priority": {
+      "high": "عالي",
+      "medium": "متوسط",
+      "low": "منخفض"
+    },
+    "activeFilesWarning": "هذه المجلد تحتوي على الملفات المُحرَّرة مؤخراً",
+    "folderHeatMap": "تحليل المجلد تكلفة",
+    "hints": {
+      "title": "كيف يعمل",
+      "body": "يقوم المُحسّن بمسح كل ملف Dart في مساحة العمل الخاصة بك ويتوقع تكلفة التحليل بناءً على تعقيد الملف (عدد السطور، الأصناف، الدوال، الاستيرادات). ثم يوصي بقوالب استثناء لتقليل عدد الملفات التي يحمّلها Dart المُحلّل إلى الذاكرة.",
+      "generated": "الكود المُولد (*.g.dart، *.freezed.dart، إلخ) آمن إستبعاده — فإنه يتم إعادة إنتاجه دائمًا من المصدر.",
+      "build": "تُنتج المخرجات (build/, .dart_tool/) أجهزة وسط غير مطلوبة لتحليل الوقت الحقيقي.",
+      "inactive": "المجلدات التي لا تحتوي على نشاط git حديث قد تحتوي على كود ميت أو محفوظ.",
+      "protected": "المجلدات المصدرية الأساسية (lib/، lib/src/، bin/) لا يُنصح بتجاهلهما أبداً."
+    },
+    "notify": {
+      "applied": "تم تطبيق نمط استثناء {count} على analysis_options.yaml",
+      "removed": "أُزيلت نمط الاستثناء من analysis_options.yaml",
+      "writeFailed": "لم يتم إمكانية الكتابة إلى analysis_options.yaml — قد يكون الملف مفقودًا"
+    },
+    "confirmBulk": {
+      "prompt": "هل تريد تطبيق نماذج استثناء {count} على analysis_options.yaml؟",
+      "detail": "الأنماط: {preview}"
+    },
+    "diffTitle": "مُحسّن تحليل: المقترحات التبعية"
   }
 }

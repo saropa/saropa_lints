@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: Toggle Run Analysis หลังจากการเปลี่ยนแปลงความพึ่งพา",
   "command.pickUiLanguage.title": "Saropa Lints: ภาษา / Langue / Sprache / 言語 / 语言 เป็นภาษาที่ใช้ในการเขียน",
   "command.openConfigDashboard.title": "Saropa Lints: เป็นการประกอบของ บริหารการใช้ Rule Packs",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: ตัวปรับแต่งการวิเคราะห์",
   "command.openPackageVibrancy.title": "Saropa Lints: เปิดแพ็คเก็ต Vibrancy ความกระชับ",
   "command.openProjectVibrancyReport.title": "Saropa Lints: เปิดรหัส ดัชบอร์ดสุขภาพ",
   "command.openProjectVibrancySettings.title": "Saropa Lints: รหัสเปิด การตั้งค่าสุขภาพ",

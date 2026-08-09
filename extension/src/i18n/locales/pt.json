@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "Limpar",
+      "optimizeAnalysis": "Otimizar Análise",
       "dontShowAgain": "Não Mostrar Novamente"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "Não foi possível localizar a restrição de versão para {package}.",
       "detailViewUpdated": "Atualizado {package} para {version}."
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: Analisador de Otimização",
+    "title": "Otimizador de Análise",
+    "subtitle": "Reduzir a memória do analisador excluindo arquivos não essenciais da análise",
+    "emptyDescription": "Varre seu workspace para identificar arquivos e pastas de alto custo que podem ser excluídos do analisador Dart para reduzir o uso de memória.",
+    "scanButton": "Varredura do Workspace",
+    "rescanButton": "Rescan de ressonância",
+    "scanning": "Varredura do workspace…",
+    "openConfig": "Abrir analysis_options.yaml",
+    "lastScan": "Última verificação: {time}",
+    "sidebar": {
+      "label": "Otimizador de Análise",
+      "description": "Reduzir a memória do analisador"
+    },
+    "kpi": {
+      "filesInScope": "Arquivos em escopo",
+      "lines": "linhas",
+      "files": "Arquivos arquivos de arquivamento arquives arquivas.",
+      "estimatedCost": "Custo estimado da análise",
+      "costUnits": "custo por unidade",
+      "potentialSavings": "Economia potencial",
+      "recommendations": "recomendações"
+    },
+    "costHeavy": "Pesado",
+    "costModerate": "Moderado",
+    "costLight": "Claro",
+    "currentExclusions": "Exclusões atuais",
+    "noExclusions": "Nenhuma exclusão configurada no analysis_options.yaml",
+    "recommendations": "Excluições recomendadas",
+    "noRecommendations": "Nenhuma recomendação de exclusão — o workspace já está bem escopado",
+    "applyAll": "Aplicar todos",
+    "applySelected": "Aplicar selecionado",
+    "apply": "Aplicar",
+    "remove": "Remover remover Remover Removação",
+    "selectAll": "Selecione tudo",
+    "defaultLabel": "Padrão",
+    "col": {
+      "pattern": "Padrão",
+      "files": "Arquivos arquivos.",
+      "cost": "Est. custo",
+      "priority": "Prioridade"
+    },
+    "priority": {
+      "high": "Alto",
+      "medium": "Médio",
+      "low": "Baixo"
+    },
+    "activeFilesWarning": "Este diretório contém arquivos editados recentemente",
+    "folderHeatMap": "Custo da análise da pasta",
+    "hints": {
+      "title": "Como funciona",
+      "body": "O otimizador analisa cada arquivo Dart em seu workspace e estima o custo da análise com base na complexidade do arquivo (quantidade de linhas, classes, funções, imports). Em seguida, recomenda padrões de exclusão para reduzir o número de arquivos que o analisador Dart carrega na memória.",
+      "generated": "Código gerado (*.g.dart, *.freezed.dart, etc.) é seguro para excluir — é sempre regenerado a partir da fonte.",
+      "build": "Build output (build/, .dart_tool/) contém artefatos intermediários não necessários para análise em tempo real.",
+      "inactive": "Pastas sem atividade git recente podem conter código morto ou arquivado.",
+      "protected": "Pastas de origem principal (lib/, lib/src/, bin/) nunca são recomendadas para exclusão."
+    },
+    "notify": {
+      "applied": "Padrão(s) de exclusão {count} aplicado(s) a analysis_options.yaml",
+      "removed": "Padrão de exclusão removido do analysis_options.yaml",
+      "writeFailed": "Não foi possível escrever em analysis_options.yaml — o arquivo pode estar faltando"
+    },
+    "confirmBulk": {
+      "prompt": "Aplicar padrões de exclusão {count} ao analysis_options.yaml?",
+      "detail": "Padrões: {preview}"
+    },
+    "diffTitle": "Analizador de Otimização: Exclusões Propostas"
   }
 }

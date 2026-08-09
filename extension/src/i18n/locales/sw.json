@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "Tuzalisha",
+      "optimizeAnalysis": "Tambua Analizi",
       "dontShowAgain": "Hakikisha Upeleka Tumia Kwa Muda Mmoja"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "Haikuweza kupata kizuizi cha toleo kwa {package}.",
       "detailViewUpdated": "Updated {package} to {version} ilitumwa zaidi ya mwaka mmoja uliopita"
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: Mwongozo wa Analisisi",
+    "title": "Analizi ya Optimizer",
+    "subtitle": "Kuruhisa maelezo ya analyzer na kuzunguka faili za kipato kwenye analizi",
+    "emptyDescription": "Tafuta kila mifumo yako ili kuzingatia faili na mifumo ya kuanzisha ya kuchanganya kwa analyzer Dart ili kuzingatia kiasi cha mifumo ya kuanzisha.",
+    "scanButton": "Tafuta Kipengele ya Workspace",
+    "rescanButton": "Rescan upya Scan tena.",
+    "scanning": "Kusimamia kipengele...",
+    "openConfig": "Openda analysis_options.yaml",
+    "lastScan": "Scan ya mwisho: {time}",
+    "sidebar": {
+      "label": "Analizi ya Optimizer",
+      "description": "Kuruhisa mifano ya analyzer"
+    },
+    "kpi": {
+      "filesInScope": "Faili katikati",
+      "lines": "moto",
+      "files": "files file files files files faili",
+      "estimatedCost": "Ungatambua ujumbe wa analizi",
+      "costUnits": "uniti ya kati",
+      "potentialSavings": "Matokeo ya kuanza",
+      "recommendations": "matokeo ya kutoa"
+    },
+    "costHeavy": "Mfumo wa kifedha",
+    "costModerate": "Wastani",
+    "costLight": "Mwanga",
+    "currentExclusions": "Exclusions ya sasa",
+    "noExclusions": "Hakikisha kuzalishia kwa analysis_options.yaml",
+    "recommendations": "Matokeo ya kushinda mazungumzaji",
+    "noRecommendations": "Hakuna matokeo ya kusimamia — workspace inaonekani kwa makosa yoyote",
+    "applyAll": "Tuma kila",
+    "applySelected": "Tuma matokeo ya kuchagua",
+    "apply": "Tuma",
+    "remove": "Remove remove Kuondoa",
+    "selectAll": "Chagua wote",
+    "defaultLabel": "Mfumo wa Kati",
+    "col": {
+      "pattern": "Patterna",
+      "files": "Files files faili.",
+      "cost": "Sisimua ya kati",
+      "priority": "Unganisho"
+    },
+    "priority": {
+      "high": "Kubadilisha",
+      "medium": "Moyoni",
+      "low": "Kisimba"
+    },
+    "activeFilesWarning": "Kifundo hiki inaonyesha faili zilizopangwa kwa muda mlima",
+    "folderHeatMap": "Analizi ya folderi ya kati",
+    "hints": {
+      "title": "Kama ndefu kuzalisha",
+      "body": "Optimizer inakimba kila faili Dart kwenye kampuni yako na inakwama ujumla wa kuanza kwa kuzungumza kwa kipengele cha faili (idadi ya linu, klasa, funtsheni, na kuzungumza). Baada ya huo, inaonyesha kipengele ya kuzungumza kwa kutumia kuzungumza idadi ya faili kwenye kipengele ya Dart kwenye memory.",
+      "generated": "Kodi ya kuzalishwa (*.g.dart, *.freezed.dart, etc.) inaweza kuzungumzika - ina kuzalishwa kwa matokeo ya kipengele kila muda.",
+      "build": "Mipango ya kuzalishia (build/, .dart_tool/) ina mabadiliko ya kati ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzal, kwa kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalish, ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalishia ya kwanza ya kuzalish\n<>\n\nIt seems like your message is incomplete or contains a repeating pattern. Could you clarify what you're asking or provide more context? For example, are you looking for help with a specific task, explanation of a concept, or something else? Let me know so I can assist you better!",
+      "inactive": "Makosa ambayo hama na uchunguzi wa git mwingi inaweza kuzunguka au kuzalishia kodi.",
+      "protected": "Makutano ya michezo ya kipengele (lib/, lib/src/, bin/) huzungumzika kufanikisa."
+    },
+    "notify": {
+      "applied": "Mipango ya kufuta {count} iliyobadilishwa kwa analysis_options.yaml",
+      "removed": "Kufuta kipengele cha kufuta kutokawa analysis_options.yaml",
+      "writeFailed": "Hakikisha unaweza kushirikisha kwenye analysis_options.yaml — faili ina kuhusika kushika"
+    },
+    "confirmBulk": {
+      "prompt": "Tumezalisha {count} miongoni ya kufungua kwenye analysis_options.yaml?",
+      "detail": "Mipango: {preview}"
+    },
+    "diffTitle": "Analizi Optimizer: Matokeo ya Kusimamia"
   }
 }

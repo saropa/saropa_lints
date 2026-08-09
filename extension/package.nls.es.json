@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: Intercambiar Ejecución Análisis después de cambio en dependencia.",
   "command.pickUiLanguage.title": "Saropa Lints: Lenguaje / lengua / lenguaje / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin Gestionar los paquetes de reglas.",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: Optimizador de análisis",
   "command.openPackageVibrancy.title": "Saropa Lints: Vibrabilidad de paquete abierto.",
   "command.openProjectVibrancyReport.title": "Saropa Lints: Tablero de control de salud de código abierto.",
   "command.openProjectVibrancySettings.title": "Saropa Lints: Código abierto de los entornos sanitarios.",

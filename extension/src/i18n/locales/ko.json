@@ -502,10 +502,11 @@
     },
     "notification": {
       "critical": "Dart 프로세스는 {size}를 사용하여 {orphaned} 오라phan 데몬을 실행 중입니다. 정리하시겠습니까?",
-      "result": "종료된 {count} 오로지 데몬 프로세스를 종료하고 ~{size} /no_think을 해제했습니다."
+      "result": "{count}를 종료하고, {size}개의 오레孤儿 데몬을 해제했습니다."
     },
     "action": {
       "cleanUp": "정리하기",
+      "optimizeAnalysis": "분석 최적화",
       "dontShowAgain": "다시 보지 않기"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "{package}의 버전 제약을 찾을 수 없습니다.",
       "detailViewUpdated": "{package}를 {version}로 업데이트했습니다."
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: 분석 최적화",
+    "title": "분석 최적화",
+    "subtitle": "분석 대상에서 필수적이지 않은 파일을 제외하여 분석기 메모리 사용을 줄이기",
+    "emptyDescription": "작업 공간을 스캔하여 Dart 분석기에서 제외할 수 있는 고비용 파일 및 폴더를 식별하여 메모리 사용량을 줄입니다.",
+    "scanButton": "워크스페이스 스캔",
+    "rescanButton": "다시 스캔해서 재스캔하는 것입니다.",
+    "scanning": "워크스페이스 스캔 중…",
+    "openConfig": "analysis_options.yaml 열기",
+    "lastScan": "마지막 스캔: {time}",
+    "sidebar": {
+      "label": "분석 최적화",
+      "description": "분석기 메모리 줄이기"
+    },
+    "kpi": {
+      "filesInScope": "범위 내 파일",
+      "lines": "라인",
+      "files": "파일은 파일이, 파일은 파일이다.",
+      "estimatedCost": "예상 분석 비용",
+      "costUnits": "비용 단위",
+      "potentialSavings": "잠재적 절약 가능 금액",
+      "recommendations": "추천사항"
+    },
+    "costHeavy": "중량",
+    "costModerate": "중간",
+    "costLight": "가벼운",
+    "currentExclusions": "현재 제외항목",
+    "noExclusions": "analysis_options.yaml에 제외 설정이 없습니다",
+    "recommendations": "추천 제외 항목",
+    "noRecommendations": "제안된 제외 항목 없음 — 작업 영역은 이미 적절하게 범위가 설정됨",
+    "applyAll": "모든 규칙 적용",
+    "applySelected": "선택된 규칙 적용",
+    "apply": "적용",
+    "remove": "제거 삭제 제거",
+    "selectAll": "모두 선택",
+    "defaultLabel": "기본값",
+    "col": {
+      "pattern": "패턴",
+      "files": "파일 파일이 파일을 저장합니다.",
+      "cost": "예산",
+      "priority": "우선순위"
+    },
+    "priority": {
+      "high": "고급",
+      "medium": "중간",
+      "low": "저작권"
+    },
+    "activeFilesWarning": "이 폴더는 최근에 수정한 파일을 포함합니다",
+    "folderHeatMap": "폴더 분석 비용",
+    "hints": {
+      "title": "어떻게 작동하는가",
+      "body": "최적화기는 작업 공간 내 모든 Dart 파일을 스캔하고, 파일 복잡도(라인 수, 클래스, 함수, 임포트)에 기반하여 분석 비용을 추정합니다. 그런 다음 Dart 분석기가 메모리에 로드하는 파일 수를 줄이기 위해 제외 패턴을 추천합니다.",
+      "generated": "생성된 코드 (*.g.dart, *.freezed.dart 등)는 제외해도 무방합니다 — 항상 소스에서 다시 생성됩니다.",
+      "build": "빌드 출력물 (build/, .dart_tool/)은 실시간 분석에 필요하지 않은 중간 아티팩트를 포함합니다.",
+      "inactive": "최근 git 활동이 없는 폴더는 죽은 코드나 아카이브된 코드를 포함할 수 있습니다.",
+      "protected": "핵심 소스 폴더(lib/, lib/src/, bin/)는 배제하는 것이 권장되지 않습니다."
+    },
+    "notify": {
+      "applied": "적용된 {count} 제외 패턴(s)을 analysis_options.yaml에",
+      "removed": "analysis_options.yaml에서 제외 패턴 제거",
+      "writeFailed": "analysis_options.yaml에 쓸 수 없습니다 — 파일이 누락되었을 수 있습니다"
+    },
+    "confirmBulk": {
+      "prompt": "{count} 제외 패턴을 analysis_options.yaml에 적용하시겠습니까?",
+      "detail": "패턴: {preview}"
+    },
+    "diffTitle": "분석 최적화: 제안된 제외항"
   }
 }

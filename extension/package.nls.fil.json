@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: Toggle Run Analysis Pagkatapos ng Pagbabago sa Dependency",
   "command.pickUiLanguage.title": "Saropa Lints: Wika / wika / Sprache / 言語 / 语言 ng mga tao.",
   "command.openConfigDashboard.title": "Saropa Lints: ang mga ito ay may _ph0__. Pamamahala ng mga patakaran Pack",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: Optimizer ng Paglalaro",
   "command.openPackageVibrancy.title": "Saropa Lints: Buksan ang Package Vibrancy",
   "command.openProjectVibrancyReport.title": "Saropa Lints: Open Code Health Dashboard (Mga Pangkalahatang Panuntunan sa Kalusugan)",
   "command.openProjectVibrancySettings.title": "Saropa Lints: Open Code Mga Setting ng Kalusugan sa Kalusugan",

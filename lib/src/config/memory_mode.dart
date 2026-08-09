@@ -1,5 +1,7 @@
 /// Controls whether type-heavy rules skip unchanged files to reduce
 /// analyzer memory retention during incremental analysis.
+library;
+
 enum MemoryMode {
   /// Skip type-heavy rules on unchanged files during incremental analysis.
   /// Reduces analyzer RSS by avoiding lazy cross-library type resolution

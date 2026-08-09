@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: ניתוח ריצה מתגבר לאחר שינוי התלות",
   "command.pickUiLanguage.title": "Saropa Lints: שפה / Langue / Sprache / 言語 / 语言 השפה / הלשון",
   "command.openConfigDashboard.title": "Saropa Lints: זה היה חרא. ניהול חבילות כללים של Rule Packs",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: אופטימיזר ניתוח",
   "command.openPackageVibrancy.title": "Saropa Lints: פתיחת חיוניות חבילות",
   "command.openProjectVibrancyReport.title": "Saropa Lints: פתח קוד בריאותי לוח המחוונים.",
   "command.openProjectVibrancySettings.title": "Saropa Lints: קוד פתוח התנאים הבריאותיים.",

@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: 依存関係変更後のトーグリング・ラン分析",
   "command.pickUiLanguage.title": "Saropa Lints: 言語 / Langue / Sprache / 言語/ 言語の言葉について",
   "command.openConfigDashboard.title": "Saropa Lints: フォローしている ルールパックを管理する",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: 分析最適化",
   "command.openPackageVibrancy.title": "Saropa Lints:オープンパッケージ 活力",
   "command.openProjectVibrancyReport.title": "Saropa Lints: オープンソースの健康ダッシュボード",
   "command.openProjectVibrancySettings.title": "Saropa Lints: オープンソースの健康施設",

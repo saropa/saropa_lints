@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "Làm Sạch",
+      "optimizeAnalysis": "Tối ưu Hóa Phân Tích",
       "dontShowAgain": "Không Hiển Thị Lại"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "Không thể xác định được ràng buộc phiên bản cho {package}.",
       "detailViewUpdated": "Cập nhật {package} thành {version}"
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: Bộ Tối Ưu Hóa Phân Tích",
+    "title": "Trình tối ưu hóa phân tích",
+    "subtitle": "Giảm bộ nhớ phân tích bằng cách loại bỏ các tệp không cần thiết khỏi phân tích",
+    "emptyDescription": "Quét không gian làm việc của bạn để xác định các tệp và thư mục chi phí cao có thể được loại trừ khỏi phân tích Dart để giảm sử dụng bộ nhớ.",
+    "scanButton": "Quét Không Gian Làm Việc",
+    "rescanButton": "Rescan lại quét lại.",
+    "scanning": "Đang quét không gian làm việc…",
+    "openConfig": "Mở analysis_options.yaml",
+    "lastScan": "Quét cuối cùng: {time}",
+    "sidebar": {
+      "label": "Trình tối ưu hóa phân tích",
+      "description": "Giảm bộ nhớ phân tích"
+    },
+    "kpi": {
+      "filesInScope": "Tập tin trong phạm vi",
+      "lines": "dòng",
+      "files": "File files file file file các tập tin",
+      "estimatedCost": "Chi phí phân tích ước tính",
+      "costUnits": "đơn vị chi phí",
+      "potentialSavings": "Tiết kiệm tiềm năng",
+      "recommendations": "khuyến nghị"
+    },
+    "costHeavy": "Nặng",
+    "costModerate": "Trung bình",
+    "costLight": "Sáng",
+    "currentExclusions": "Hiện tại các loại trừ",
+    "noExclusions": "Không có các ngoại lệ được cấu hình trong analysis_options.yaml",
+    "recommendations": "Khuyến nghị loại trừ",
+    "noRecommendations": "Không có khuyến nghị loại trừ — không gian làm việc đã được xác định rõ ràng",
+    "applyAll": "Áp dụng tất cả",
+    "applySelected": "Áp dụng đã chọn",
+    "apply": "Áp dụng",
+    "remove": "Remove remove loại bỏ",
+    "selectAll": "Chọn tất cả",
+    "defaultLabel": "Mặc định",
+    "col": {
+      "pattern": "Mẫu",
+      "files": "Các tập tin File Files",
+      "cost": "Chi phí ước tính",
+      "priority": "Ưu tiên"
+    },
+    "priority": {
+      "high": "Cao",
+      "medium": "Trung bình",
+      "low": "Thấp /không_tư_duy"
+    },
+    "activeFilesWarning": "Thư mục này chứa các tệp đã chỉnh sửa gần đây",
+    "folderHeatMap": "Phân tích thư mục chi phí",
+    "hints": {
+      "title": "Cách hoạt động",
+      "body": "Optimizer quét qua từng tệp Dart trong không gian làm việc của bạn và ước tính chi phí phân tích dựa trên độ phức tạp của tệp (số dòng, lớp, hàm, nhập khẩu). Sau đó, nó đề xuất các mẫu loại trừ để giảm số lượng tệp mà phân tích viên Dart tải vào bộ nhớ.",
+      "generated": "Mã nguồn được sinh ra (*.g.dart, *.freezed.dart, v.v.) có thể an toàn để loại trừ — nó luôn được tái sinh từ mã nguồn gốc.",
+      "build": "Build output (build/, .dart_tool/) chứa các sản phẩm trung gian không cần thiết cho phân tích trực tiếp.",
+      "inactive": "Các thư mục không có hoạt động git gần đây có thể chứa mã chết hoặc đã lưu trữ.",
+      "protected": "Các thư mục nguồn chính (lib/, lib/src/, bin/) không bao giờ được khuyến nghị để loại trừ."
+    },
+    "notify": {
+      "applied": "Đã áp dụng mẫu loại trừ {count} cho analysis_options.yaml",
+      "removed": "Loại bỏ mẫu trừ ngoại lệ từ analysis_options.yaml",
+      "writeFailed": "Không thể ghi vào analysis_options.yaml — tệp có thể bị thiếu"
+    },
+    "confirmBulk": {
+      "prompt": "Áp dụng mẫu loại trừ {count} vào analysis_options.yaml?",
+      "detail": "Mẫu: {preview}"
+    },
+    "diffTitle": "Trình tối ưu hóa phân tích: Loại trừ được đề xuất"
   }
 }

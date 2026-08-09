@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "کلی نمایی",
+      "optimizeAnalysis": "بهینه سازی تحلیل",
       "dontShowAgain": "باز نشان نده"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "نتوانست محدودیت نسخه را برای {package} پیدا کند.",
       "detailViewUpdated": "{package} به {version} بروزرسانی شد."
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: بهینه سازی تحلیل",
+    "title": "بهینه ساز تحلیل",
+    "subtitle": "حافظه تحلیل کننده را کاهش دهید با استثناء کردن فایل‌های غیرضروری از تحلیل",
+    "emptyDescription": "فضای کار خود را اسکن کنید تا فایل‌ها و پوشه‌هایی که می‌توانند از تحلیلگر Dart استثناء داده شوند و استفاده از حافظه را کاهش دهند شناسایی شوند.",
+    "scanButton": "اسکن ورکسپیس",
+    "rescanButton": "اسکن مجدد Rescan",
+    "scanning": "اسکن کردن فضای کار...",
+    "openConfig": "فایل analysis_options.yaml را باز کنید",
+    "lastScan": "آخرین اسکن: {time}",
+    "sidebar": {
+      "label": "بهینه ساز تحلیل",
+      "description": "حافظه تحلیلگر را کاهش دهید"
+    },
+    "kpi": {
+      "filesInScope": "فایل های در دامنۀ بررسی",
+      "lines": "خطوط",
+      "files": "فایل های فايل ها را به صورت",
+      "estimatedCost": "هزینه تخمینی تحلیل",
+      "costUnits": "واحد هزینه",
+      "potentialSavings": "میزان پسندشده",
+      "recommendations": "پیشنهادات"
+    },
+    "costHeavy": "سنگین",
+    "costModerate": "متوسط",
+    "costLight": "نور",
+    "currentExclusions": "محدودیت‌های جاری",
+    "noExclusions": "هیچ استثنا ایجاد شده است در analysis_options.yaml",
+    "recommendations": "نکات استثناء پیشنهادی",
+    "noRecommendations": "هیچ پیشنهادی برای استثناء وجود ندارد — فضا کار به طور کامل مشخص شده است",
+    "applyAll": "همه را اعمال کنید",
+    "applySelected": "اعمال انتخاب شده",
+    "apply": "اعمال",
+    "remove": "حذف remove از بین بردن",
+    "selectAll": "همه را انتخاب کنید",
+    "defaultLabel": "پیش‌فرض",
+    "col": {
+      "pattern": "ال mẫu",
+      "files": "فایل ها و فایلها",
+      "cost": "هزینه تخمینی",
+      "priority": "اولویت"
+    },
+    "priority": {
+      "high": "بالا",
+      "medium": "متوسط",
+      "low": "کم /هیچ"
+    },
+    "activeFilesWarning": "این پوشه فایل‌های ویرایش شده اخیر را حاوی می‌کند",
+    "folderHeatMap": "تحلیل پوشه ها هزینه",
+    "hints": {
+      "title": "چگونه کار می کند",
+      "body": "بهینه ساز هر فایل Dart در فضای کاری شما را اسکن می کند و هزینه تحلیل را بر اساس پیچیدگی فایل (تعداد خط، کلاس، تابع، واردات) تخمین می زند. سپس الگوی های استثناء ایجاد می کند تا تعداد فایل هایی که تحلیلگر Dart به حافظه بارگذاری می کند را کاهش دهد.",
+      "generated": "کد تولید شده (*.g.dart، *.freezed.dart، و غیره) قابل حذف است — همیشه از کد منبع بازگردانی می‌شود.",
+      "build": "خروجی ساخت (build/, .dart_tool/) شامل اسناد میانی است که برای تحلیل زنده نیاز نیست.",
+      "inactive": "پوشه‌هایی که فعالیت گیت اخیری ندارند ممکن است کد مرده یا آرشیو شده‌ای را حاوی باشند.",
+      "protected": "پوشه‌های منبع اصلی (lib/, lib/src/, bin/) هرگز برای استثناء پیشنهاد نمی‌شوند."
+    },
+    "notify": {
+      "applied": "الگوی ({count}) استثناء اعمال شد / analysis_options.yaml",
+      "removed": "الگوی حذف از analysis_options.yaml حذف شد",
+      "writeFailed": "نمی توان به analysis_options.yaml نوشت — فایل ممکن است از بین رفته باشد"
+    },
+    "confirmBulk": {
+      "prompt": "الPattern های استثناء {count} را به analysis_options.yaml اعمال کنید؟",
+      "detail": "ال mẫu: {preview}"
+    },
+    "diffTitle": "بهینه ساز تحلیل: پیشنهادهای استثناء"
   }
 }

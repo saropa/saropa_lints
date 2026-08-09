@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "Temizle",
+      "optimizeAnalysis": "Analiz Optimizasyonu",
       "dontShowAgain": "Yine Gösterme"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "{package} için sürüm kısıtlaması bulunamadı.",
       "detailViewUpdated": "{package}'ı {version} olarak güncelledi."
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints: Analiz Optimizasyonu",
+    "title": "Analiz Optimizörü",
+    "subtitle": "Analizden gerek dışı dosyaları hariç tutarak analizör belleğini azaltın",
+    "emptyDescription": "Çalışma alanınızı tarayın ve Dart analizcisi tarafından dahil edilmemesiyle bellek kullanımını azaltmak için yüksek maliyetli dosyaları ve klasörleri belirleyin.",
+    "scanButton": "Çalışma Alanını Tarayın",
+    "rescanButton": "Rescan, yeniden tarama yaparak tekrar taramanın bir yoludur.",
+    "scanning": "Çalışma alanı taranıyor…",
+    "openConfig": "analysis_options.yaml'ı aç",
+    "lastScan": "Son tarama: {time}",
+    "sidebar": {
+      "label": "Analiz Optimizörü",
+      "description": "Analizör belleğini azalt"
+    },
+    "kpi": {
+      "filesInScope": "Alanında bulunan dosyalar",
+      "lines": "satırlar",
+      "files": "Dosyalar dosyaları dosyalar dosyalardır.",
+      "estimatedCost": "Tahmini analiz maliyeti",
+      "costUnits": "maliyet birimleri",
+      "potentialSavings": "Potansiyel tasarruflar",
+      "recommendations": "öneriler"
+    },
+    "costHeavy": "Ağır",
+    "costModerate": "Orta",
+    "costLight": "Aydınlık",
+    "currentExclusions": "Geçerli dışlamalar",
+    "noExclusions": "analysis_options.yaml'da hariç bırakmalar yapılmamış",
+    "recommendations": "Önerilen hariç tutmalar",
+    "noRecommendations": "Hiçbir dışlama önerisi yok — çalışma alanı zaten iyi tanımlanmış",
+    "applyAll": "Tümünü uygula",
+    "applySelected": "Seçileni uygula",
+    "apply": "Uygula",
+    "remove": "Remove remove kaldırmak",
+    "selectAll": "Tümünü seç",
+    "defaultLabel": "Varsayılan",
+    "col": {
+      "pattern": "Desen",
+      "files": "Dosyalar dosyaları.",
+      "cost": "Tahmini maliyet",
+      "priority": "Öncelik"
+    },
+    "priority": {
+      "high": "Yüksek",
+      "medium": "Orta",
+      "low": "Düşük"
+    },
+    "activeFilesWarning": "Bu klasör, sonunda düzenlenmiş dosyaları içerir",
+    "folderHeatMap": "Klasör analizi maliyeti",
+    "hints": {
+      "title": "Nasıl çalışır",
+      "body": "Optimizer, çalışma alanınızda bulunan her Dart dosyasını tarar ve dosya karmaşıklığına (satır sayısı, sınıflar, fonksiyonlar, importlar) göre analiz maliyetini tahmin eder. Daha sonra Dart analizcisi belleğe yükleyeceği dosya sayısını azaltmak için hariç tutulacak desenleri önerir.",
+      "generated": "Oluşturulan kod (*.g.dart, *.freezed.dart vb.) hariç tutulabilir — her zaman kaynaklardan yeniden oluşturulur.",
+      "build": "Derleme çıktısı (build/, .dart_tool/) canlı analiz için gerekli olmayan geçici ürünler içerir.",
+      "inactive": "Son git etkinliği olmayan klasörler, ölü veya arşivlenmiş kod içerebilir.",
+      "protected": "Temel kaynak klasörler (lib/, lib/src/, bin/) hariç tutulmamalıdır."
+    },
+    "notify": {
+      "applied": "Uygulanan {count} dışlama deseni(leri) analysis_options.yaml",
+      "removed": "analysis_options.yaml'dan hariç tutma desenini kaldırıldı",
+      "writeFailed": "analysis_options.yaml yazamadım — dosya olmayabilir"
+    },
+    "confirmBulk": {
+      "prompt": "{count} hariç tutma desenlerini analysis_options.yaml'a uygula?",
+      "detail": "Desenler: {preview}"
+    },
+    "diffTitle": "Analiz Optimizasyonu: Önerilen İndirgenmeler"
   }
 }

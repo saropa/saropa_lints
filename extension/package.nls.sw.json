@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: Toggle Run Analysis Baada ya Mabadiliko ya Utegemezi",
   "command.pickUiLanguage.title": "Saropa Lints: Lugha / Langue / Sprache / 言語 / 语言 lugha / lugha ya lugha",
   "command.openConfigDashboard.title": "Saropa Lints:: kwa hiyo ni sawa. Dhibiti Rule Packs Pack.",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: Mwongozo wa Analisisi",
   "command.openPackageVibrancy.title": "Saropa Lints: Open Package Vibrancy ya Uhuishaji.",
   "command.openProjectVibrancyReport.title": "Saropa Lints: Open Code Health Dashboard (Dashibodi ya Afya iliyo wazi).",
   "command.openProjectVibrancySettings.title": "Saropa Lints: Open Code Mazingira ya Afya",

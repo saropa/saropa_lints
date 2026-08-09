@@ -506,6 +506,7 @@
     },
     "action": {
       "cleanUp": "清理",
+      "optimizeAnalysis": "优化分析",
       "dontShowAgain": "不再显示"
     },
     "cleanup": {
@@ -1944,5 +1945,73 @@
       "detailViewConstraintNotFound": "无法找到 {package} 的版本约束.",
       "detailViewUpdated": "将 {package} 更新为 {version}"
     }
+  },
+  "analysisOptimizer": {
+    "tabTitle": "Saropa Lints：分析优化器",
+    "title": "分析优化器",
+    "subtitle": "通过排除非必要的文件来减少分析器内存占用",
+    "emptyDescription": "扫描您的工作区以识别高成本文件和文件夹，可将其排除在Dart分析器之外以减少内存使用。",
+    "scanButton": "扫描工作区",
+    "rescanButton": "扫描重新进行,再扫描.",
+    "scanning": "扫描工作区…",
+    "openConfig": "打开 analysis_options.yaml",
+    "lastScan": "上次扫描：{time}",
+    "sidebar": {
+      "label": "分析优化器",
+      "description": "减少分析器内存"
+    },
+    "kpi": {
+      "filesInScope": "作用域内的文件",
+      "lines": "行数",
+      "files": "文件是指文件的文件.",
+      "estimatedCost": "预估分析成本",
+      "costUnits": "成本单位",
+      "potentialSavings": "潜在节省",
+      "recommendations": "推荐建议"
+    },
+    "costHeavy": "重度",
+    "costModerate": "中等",
+    "costLight": "轻量",
+    "currentExclusions": "当前排除项",
+    "noExclusions": "未在 analysis_options.yaml 中配置排除项",
+    "recommendations": "推荐排除项",
+    "noRecommendations": "无排除建议 — 工作区已经定位良好",
+    "applyAll": "全部应用",
+    "applySelected": "应用所选",
+    "apply": "应用",
+    "remove": "删除 去掉 移除",
+    "selectAll": "全选",
+    "defaultLabel": "默认",
+    "col": {
+      "pattern": "模式",
+      "files": "文件的档案,是我们所做的.",
+      "cost": "预估成本",
+      "priority": "优先级"
+    },
+    "priority": {
+      "high": "高",
+      "medium": "中等",
+      "low": "低"
+    },
+    "activeFilesWarning": "此文件夹包含最近编辑的文件",
+    "folderHeatMap": "文件夹分析成本",
+    "hints": {
+      "title": "如何运作",
+      "body": "优化器会扫描您工作区中的每一个Dart文件，并根据文件复杂度（行数、类、函数、导入）来估算分析成本。然后它会推荐排除模式，以减少Dart分析器加载到内存中的文件数量。",
+      "generated": "生成的代码（*.g.dart, *.freezed.dart 等）可以安全地排除 — 它始终从源代码重新生成。",
+      "build": "构建输出（build/，.dart_tool/）包含用于实时分析不需要的中间产物。",
+      "inactive": "没有近期git活动的文件夹可能包含已废弃或归档的代码。",
+      "protected": "核心源码文件夹（lib/，lib/src/，bin/）不建议排除。"
+    },
+    "notify": {
+      "applied": "已应用 {count} 排除模式到 analysis_options.yaml",
+      "removed": "从 analysis_options.yaml 中移除了排除模式",
+      "writeFailed": "无法写入 analysis_options.yaml —— 文件可能缺失"
+    },
+    "confirmBulk": {
+      "prompt": "应用 {count} 排除模式到 analysis_options.yaml?",
+      "detail": "模式：{preview}"
+    },
+    "diffTitle": "分析优化器：建议排除项"
   }
 }

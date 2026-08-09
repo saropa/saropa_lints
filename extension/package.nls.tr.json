@@ -24,6 +24,7 @@
   "command.toggleRunAnalysisAfterDependencyChange.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Değişiklikler sonrası analizi çalıştırın",
   "command.pickUiLanguage.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Dil / Langue / Sprache / 言語 / 语言 dilinde yazılır.",
   "command.openConfigDashboard.title": "Saropa Lints: Kural Paketlerini Yönetin",
+  "command.openAnalysisOptimizer.title": "Saropa Lints: Analiz Optimizasyonu",
   "command.openPackageVibrancy.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Açık Paket Vibrancy",
   "command.openProjectVibrancyReport.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Açık Kodlu Sağlık Tablosu (Open Code Health Dashboard)",
   "command.openProjectVibrancySettings.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Açık Kodlu Sağlık Ayarları Sağlık Kurulumları",

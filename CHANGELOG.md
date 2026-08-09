@@ -64,7 +64,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.5.2]
+
+This release introduces the Analysis Optimizer to help developers proactively manage their Dart analyzer's resource footprint. The extension now identifies memory-intensive files and provides an interactive dashboard for safely previewing and applying workspace exclusion patterns. By intelligently filtering out generated code and high-cost directories, users can easily maintain editor performance and swiftly resolve critical memory warnings. [log](https://github.com/saropa/saropa_lints/blob/v14.5.2/CHANGELOG.md)
+
 
 ### Added (Extension)
 
