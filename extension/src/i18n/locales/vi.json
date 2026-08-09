@@ -1972,21 +1972,28 @@
     "costHeavy": "Nặng",
     "costModerate": "Trung bình",
     "costLight": "Sáng",
-    "currentExclusions": "Hiện tại các loại trừ",
-    "noExclusions": "Không có các ngoại lệ được cấu hình trong analysis_options.yaml",
-    "recommendations": "Khuyến nghị loại trừ",
-    "noRecommendations": "Không có khuyến nghị loại trừ — không gian làm việc đã được xác định rõ ràng",
+    "exclusions": "Loại trừ",
+    "noExclusions": "Không có bất kỳ sự loại trừ nào được áp dụng hoặc khuyến nghị — không gian làm việc đã được xác định rõ ràng",
     "applyAll": "Áp dụng tất cả",
     "applySelected": "Áp dụng đã chọn",
     "apply": "Áp dụng",
     "remove": "Remove remove loại bỏ",
     "selectAll": "Chọn tất cả",
     "defaultLabel": "Mặc định",
+    "sortHint": "Nhấp để sắp xếp",
+    "previewToggle": "Tiền xem",
+    "previewLine": "Xem trước dòng chính xác sẽ được thêm",
+    "previewApprox": "Gần đúng — định dạng lề và vị trí chú thích phù hợp với tệp của bạn khi áp dụng",
     "col": {
+      "status": "Tình trạng Status Status",
       "pattern": "Mẫu",
       "files": "Các tập tin File Files",
       "cost": "Chi phí ước tính",
       "priority": "Ưu tiên"
+    },
+    "status": {
+      "applied": "Áp dụng",
+      "recommended": "Khuyến nghị"
     },
     "priority": {
       "high": "Cao",

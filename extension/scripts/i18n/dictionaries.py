@@ -167,6 +167,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Dimensions": "Dimensions",
         "Documentation": "Documentation",
         "Excellent": "Excellent",
+        # Curated passthrough: French cognate spelled identically to English.
+        "Exclusions": "Exclusions",
         "Links": "Liens",
         "SUGGESTION": "SUGGESTION",
         "SUGGESTIONS": "SUGGESTIONS",

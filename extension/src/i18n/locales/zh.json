@@ -1972,21 +1972,28 @@
     "costHeavy": "重度",
     "costModerate": "中等",
     "costLight": "轻量",
-    "currentExclusions": "当前排除项",
-    "noExclusions": "未在 analysis_options.yaml 中配置排除项",
-    "recommendations": "推荐排除项",
-    "noRecommendations": "无排除建议 — 工作区已经定位良好",
+    "exclusions": "排除项",
+    "noExclusions": "无排除项应用或推荐 — 工作区已经足够聚焦",
     "applyAll": "全部应用",
     "applySelected": "应用所选",
     "apply": "应用",
     "remove": "删除 去掉 移除",
     "selectAll": "全选",
     "defaultLabel": "默认",
+    "sortHint": "点击排序",
+    "previewToggle": "预览",
+    "previewLine": "预览将要添加的确切行",
+    "previewApprox": "近似 — 应用时，精确缩进和注释位置与您的文件匹配",
     "col": {
+      "status": "状态 情况 状态",
       "pattern": "模式",
       "files": "文件的档案,是我们所做的.",
       "cost": "预估成本",
       "priority": "优先级"
+    },
+    "status": {
+      "applied": "已应用",
+      "recommended": "推荐"
     },
     "priority": {
       "high": "高",
