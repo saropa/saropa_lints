@@ -230,8 +230,11 @@ Map<String, int> convertIgnoreComments(
 
 /// Matches a full ignore directive: `// ignore: rule_a, rule_b, rule_c`
 /// or `// ignore_for_file: rule_a, rule_b`.
+///
+/// Includes `-` so hyphenated rule names (`avoid-null-assertion`) are
+/// captured whole rather than truncated at the first hyphen.
 final RegExp _ignoreDirectivePattern = RegExp(
-  r'(//\s*ignore(?:_for_file)?\s*:\s*)([\w_/,\s]+)',
+  r'(//\s*ignore(?:_for_file)?\s*:\s*)([\w/,\s-]+)',
 );
 
 /// Converts ignore comments in a single file. Returns count of conversions.
@@ -249,12 +252,16 @@ int convertIgnoreCommentsInFile(File file, Set<String> allRules, bool dryRun) {
     if (prefix == null || ruleList == null) return match.group(0) ?? '';
 
     final String converted = ruleList.splitMapJoin(
-      RegExp(r'[\w_/]+'),
+      RegExp(r'[\w/-]+'),
       onMatch: (Match m) {
         final name = m.group(0);
         if (name == null) return '';
         if (name.startsWith('saropa_lints/')) return name;
-        if (allRules.contains(name)) {
+        // Normalize hyphens for the lookup only — the inserted prefix goes
+        // before the original (possibly hyphenated) name text, matching the
+        // rule/fix's own bare-name normalization.
+        final bare = name.replaceAll('-', '_');
+        if (allRules.contains(bare)) {
           count++;
           return 'saropa_lints/$name';
         }

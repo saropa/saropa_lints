@@ -32,13 +32,19 @@ class RequireIgnoreCommentPluginPrefixFix extends SaropaFixProducer {
     final content = unitResult.content;
     if (content.isEmpty) return;
 
-    final node = coveringNode;
+    // diagnosticOffset/Length is the exact `// ignore: ...` comment token
+    // range reported by the rule (reporter.atToken(comment)) — using it
+    // directly, rather than coveringNode's AST-node span, guarantees the
+    // slice contains only this one comment even when other ignore comments
+    // sit nearby in the file.
+    final start = diagnosticOffset;
+    final len = diagnosticLength;
     List<int>? insertions;
-    if (node != null && node.length > 0 && node.length < 200) {
+    if (start != null && len != null && len > 0) {
       insertions = _findInsertionsInSlice(
         content,
-        node.offset,
-        (node.offset + node.length).clamp(0, content.length),
+        start,
+        (start + len).clamp(0, content.length),
       );
     }
     insertions ??= _findFirstBareLineInsertions(content);

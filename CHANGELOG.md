@@ -73,6 +73,11 @@ This release introduces a new rule to ensure lint suppression comments work corr
 - **New rule `require_ignore_comment_plugin_prefix`** (Essential tier, WARNING) — flags `// ignore: rule_name` and `// ignore_for_file: rule_name` comments that reference a saropa_lints rule without the required `saropa_lints/` prefix, which causes the suppression to silently fail in the IDE. A quick fix inserts the prefix. No action required.
 - **`dart run saropa_lints scan --fix-ignores`** — bulk-converts bare `// ignore: rule_name` to `// ignore: saropa_lints/rule_name` for all known saropa_lints rules across `lib/`, `test/`, and `bin/`.
 
+### Fixed
+
+- **`require_ignore_comment_plugin_prefix`'s quick fix could insert the prefix into the wrong `// ignore:` comment** when another ignore comment sat nearby in the file. It now targets the exact flagged comment. No action required.
+- **`--fix-ignores` skipped hyphenated rule names** (e.g. `avoid-null-assertion`), leaving them unprefixed. It now converts them correctly. No action required.
+
 ---
 
 ## [14.5.5]
