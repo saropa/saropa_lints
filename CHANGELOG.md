@@ -64,9 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.5.4] - unreleased
 
-This release fixes the Analysis Optimizer's exclusion detection, which previously missed patterns already present in analysis_options.yaml and duplicated them on apply. The dashboard's two separate exclusion lists are now one sortable table with clearer status and impact indicators, plus a quick line preview before applying. [log](https://github.com/saropa/saropa_lints/blob/v14.5.3/CHANGELOG.md)
+This release fixes the Analysis Optimizer's exclusion detection, which previously missed patterns already present in analysis_options.yaml and duplicated them on apply. The dashboard's two separate exclusion lists are now one sortable table with clearer status and impact indicators, plus a quick line preview before applying. [log](https://github.com/saropa/saropa_lints/blob/v14.5.4/CHANGELOG.md)
 
 ### Fixed (Extension)
 
