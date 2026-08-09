@@ -137,7 +137,12 @@ class _HistoryCache {
 
   factory _HistoryCache.load(String projectPath) {
     final file = File(
-      p.join(projectPath, '.dart_tool', 'saropa_lints', 'health_history_cache.json'),
+      p.join(
+        projectPath,
+        '.dart_tool',
+        'saropa_lints',
+        'health_history_cache.json',
+      ),
     );
     if (!file.existsSync()) return _HistoryCache(file, {});
     try {
