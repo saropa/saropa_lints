@@ -2008,7 +2008,8 @@
       "generated": "Generated code (*.g.dart, *.freezed.dart, etc.) is safe to exclude — it is always regenerated from source.",
       "build": "Build output (build/, .dart_tool/) contains intermediate artifacts not needed for live analysis.",
       "inactive": "Folders with no recent git activity may contain dead or archived code.",
-      "protected": "Core source folders (lib/, lib/src/, bin/) are never recommended for exclusion."
+      "protected": "Core source folders (lib/, lib/src/, bin/) are never recommended for exclusion.",
+      "backup": "A copy of analysis_options.yaml is saved as analysis_options.yaml.bak before every change made here."
     },
     "notify": {
       "applied": "Applied {count} exclusion pattern(s) to analysis_options.yaml",

@@ -11,6 +11,26 @@ export function readAnalysisOptionsPath(root: string): string {
   return path.join(root, 'analysis_options.yaml');
 }
 
+export function readAnalysisOptionsBackupPath(root: string): string {
+  return `${readAnalysisOptionsPath(root)}.bak`;
+}
+
+/**
+ * Copies the current on-disk content to `analysis_options.yaml.bak` before a
+ * write touches the file — a cheap, always-available one-step-back recovery
+ * path for a config file that has no other undo history if the user isn't
+ * using git for it directly. Overwrites any previous backup rather than
+ * keeping history; this is a safety net for the immediately-preceding write,
+ * not a version log.
+ */
+function backupAnalysisOptions(root: string, currentContent: string): void {
+  try {
+    fs.writeFileSync(readAnalysisOptionsBackupPath(root), currentContent, 'utf8');
+  } catch {
+    // Best-effort — a failed backup must never block the actual write.
+  }
+}
+
 export function readAnalyzerExcludes(root: string): string[] {
   const filePath = readAnalysisOptionsPath(root);
   if (!fs.existsSync(filePath)) return [];
@@ -234,7 +254,8 @@ export function hasMalformedExcludeSyntax(root: string): boolean {
 export function fixMalformedExcludeSyntax(root: string): { success: boolean; duplicatesRemoved: number } {
   const filePath = readAnalysisOptionsPath(root);
   if (!fs.existsSync(filePath)) return { success: false, duplicatesRemoved: 0 };
-  const lines = fs.readFileSync(filePath, 'utf8').split('\n');
+  const originalContent = fs.readFileSync(filePath, 'utf8');
+  const lines = originalContent.split('\n');
   const found = findExcludeLines(lines);
   if (found.excludeStart < 0) return { success: true, duplicatesRemoved: 0 };
 
@@ -248,7 +269,16 @@ export function fixMalformedExcludeSyntax(root: string): { success: boolean; dup
       seen.add(item.pattern);
       rebuilt.push(quoteYamlPattern(item.pattern));
     }
-    lines[found.excludeStart] = lines[found.excludeStart].replace(/\[(.*)\]/, `[${rebuilt.join(', ')}]`);
+    const originalLine = lines[found.excludeStart];
+    const rewrittenLine = originalLine.replace(/\[(.*)\]/, `[${rebuilt.join(', ')}]`);
+    if (rewrittenLine === originalLine) {
+      // Same reasoning as the block-list no-op path below: nothing was
+      // actually malformed or duplicated, so don't overwrite the backup
+      // with an identical snapshot.
+      return { success: true, duplicatesRemoved: 0 };
+    }
+    lines[found.excludeStart] = rewrittenLine;
+    backupAnalysisOptions(root, originalContent);
     fs.writeFileSync(filePath, lines.join('\n'), 'utf8');
     return { success: true, duplicatesRemoved };
   }
@@ -256,6 +286,7 @@ export function fixMalformedExcludeSyntax(root: string): { success: boolean; dup
   const seenPatterns = new Set<string>();
   const deleteIndices: number[] = [];
   let duplicatesRemoved = 0;
+  let anyLineRequoted = false;
 
   for (const item of found.items) {
     if (!item.pattern) continue;
@@ -274,12 +305,21 @@ export function fixMalformedExcludeSyntax(root: string): { success: boolean; dup
     if (!INDICATOR_START.test(rawValue)) continue;
 
     lines[item.lineIndex] = `${match[1]}${quoteYamlPattern(item.pattern)}${item.comment ? ` ${item.comment}` : ''}`;
+    anyLineRequoted = true;
+  }
+
+  // Nothing was actually wrong — leave the file (and any prior backup) alone
+  // rather than writing an identical copy and needlessly overwriting the
+  // one-step-back safety net with a no-op snapshot.
+  if (!anyLineRequoted && deleteIndices.length === 0) {
+    return { success: true, duplicatesRemoved: 0 };
   }
 
   for (const idx of deleteIndices.sort((a, b) => b - a)) {
     lines.splice(idx, 1);
   }
 
+  backupAnalysisOptions(root, originalContent);
   fs.writeFileSync(filePath, lines.join('\n'), 'utf8');
   return { success: true, duplicatesRemoved };
 }
@@ -310,6 +350,7 @@ export function writeAnalyzerExcludes(
   const content = fs.readFileSync(filePath, 'utf8');
   const updated = replaceOrInsertExcludes(content, patterns);
   if (updated === null) return false;
+  backupAnalysisOptions(root, content);
   fs.writeFileSync(filePath, updated, 'utf8');
   return true;
 }

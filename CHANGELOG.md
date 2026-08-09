@@ -72,6 +72,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - **Folder exclusion recommendations kept showing as "Recommended" even when already covered by a broader applied pattern** (e.g. individual `dependency_overrides/<package>/**` entries never matched as "Applied" despite a `dependency_overrides/**` already excluding them). These redundant recommendations no longer appear. No action required.
 - The dashboard now automatically scans on open and rescans after every Apply/Remove/Fix Syntax, instead of requiring a manual "Scan Workspace" click to see current status. No action required.
 
+### Added (Extension)
+
+- Every Analysis Optimizer write now saves a one-step-back copy of `analysis_options.yaml` to `analysis_options.yaml.bak` first, so a change can always be manually reverted. No action required.
+
 ---
 
 ## [14.5.4]

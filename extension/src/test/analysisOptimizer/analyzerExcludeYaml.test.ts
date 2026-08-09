@@ -10,6 +10,7 @@ import {
   hasMalformedExcludeSyntax,
   fixMalformedExcludeSyntax,
   isPatternCovered,
+  readAnalysisOptionsBackupPath,
 } from '../../analysisOptimizer/analyzerExcludeYaml';
 
 function withTempProject(analysisOptionsContent: string, fn: (root: string) => void): void {
@@ -299,6 +300,115 @@ analyzer:
         const docIdx = content.indexOf('"doc/**"');
         const gDartIdx = content.indexOf('**/*.g.dart');
         assert.ok(bugsIdx < docIdx && docIdx < gDartIdx, 'original relative order must be preserved');
+      });
+    });
+
+    // Reconstructs the reported real-world file's exact organizational shape
+    // (multiple comment-headed groups, blank-line separators, a mix of
+    // already-quoted and malformed entries) and exercises a REALISTIC
+    // sequence of operations against it, the way a user actually interacts
+    // with the dashboard across a session — not just one isolated write.
+    const REALISTIC_FILE = `analyzer:
+  # Custom lint rules - CANNOT DISABLED to speed up analysis
+  exclude:
+    # === Generated Code ===
+    - "bugs/**"
+    - "doc/**"
+    - "docs/**"
+    - "output/**"
+    - "plans/**"
+    - "reports/**"
+    - "tmp/**"
+
+    - "**/*.g.dart" # Exclude generated files (includes frozen Isar .g.dart)
+    - "**/*.freezed.dart" # Exclude generated files
+    - "lib/generated_plugin_registrant.dart" # Exclude generated plugin registration
+    - "lib/l10n/**" # Exclude flutter_gen-l10n output
+
+    - **/*.bak" # Exclude backups
+    - "**/*.old" # Exclude history
+
+    # === Build & Cache ===
+    - ".crashlytics/**"
+    - ".dart_tool/**" # Exclude Dart tool cache/generated files
+  language:
+    strict-casts: true
+`;
+
+    it('survives a realistic sequence of apply, remove, and fix-syntax operations', () => {
+      withTempProject(REALISTIC_FILE, (root) => {
+        // 1. Apply one new recommendation.
+        let current = readAnalyzerExcludes(root);
+        writeAnalyzerExcludes(root, mergeExclusions(current, ['lib/data/**']));
+
+        // 2. Remove one existing exclusion the user decided against.
+        current = readAnalyzerExcludes(root);
+        writeAnalyzerExcludes(root, current.filter(p => p !== 'output/**'));
+
+        // 3. Apply another new recommendation.
+        current = readAnalyzerExcludes(root);
+        writeAnalyzerExcludes(root, mergeExclusions(current, ['test/data/**']));
+
+        // 4. Fix the one malformed pre-existing entry.
+        fixMalformedExcludeSyntax(root);
+
+        const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+
+        // Every section header and blank-line group survives the whole sequence.
+        assert.match(content, /# === Generated Code ===/);
+        assert.match(content, /# === Build & Cache ===/);
+        assert.match(content, /"tmp\/\*\*"\n\n {4}- "\*\*\/\*\.g\.dart"/);
+        assert.match(content, /"lib\/l10n\/\*\*"[^\n]*\n\n {4}- "\*\*\/\*\.bak"/);
+
+        // The removed pattern is gone; nothing else in its group shifted oddly.
+        assert.doesNotMatch(content, /"output\/\*\*"/);
+        assert.match(content, /"docs\/\*\*"\n {4}- "plans\/\*\*"/);
+
+        // Both newly-applied patterns landed.
+        assert.match(content, /"lib\/data\/\*\*"/);
+        assert.match(content, /"test\/data\/\*\*"/);
+
+        // The malformed entry is now quoted, with its comment intact.
+        assert.match(content, /- "\*\*\/\*\.bak" # Exclude backups/);
+        assert.strictEqual(hasMalformedExcludeSyntax(root), false);
+
+        // The analyzer: sibling key is completely unaffected throughout.
+        assert.match(content, /strict-casts: true/);
+      });
+    });
+  });
+
+  describe('backup safety net', () => {
+    it('writeAnalyzerExcludes saves the pre-write content to a .bak file', () => {
+      withTempProject('analyzer:\n  exclude:\n    - "build/**"\n', (root) => {
+        const before = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+        writeAnalyzerExcludes(root, ['build/**', 'lib/gen/**']);
+        const backup = fs.readFileSync(readAnalysisOptionsBackupPath(root), 'utf8');
+        assert.strictEqual(backup, before);
+      });
+    });
+
+    it('fixMalformedExcludeSyntax saves the pre-fix content to a .bak file', () => {
+      withTempProject('analyzer:\n  exclude:\n    - **/*.bak" # comment\n', (root) => {
+        const before = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+        fixMalformedExcludeSyntax(root);
+        const backup = fs.readFileSync(readAnalysisOptionsBackupPath(root), 'utf8');
+        assert.strictEqual(backup, before);
+      });
+    });
+
+    it('does not create a backup when there is nothing to fix', () => {
+      withTempProject('analyzer:\n  exclude:\n    - "build/**"\n', (root) => {
+        fixMalformedExcludeSyntax(root);
+        assert.strictEqual(fs.existsSync(readAnalysisOptionsBackupPath(root)), false);
+      });
+    });
+
+    it('does not create a backup for an already-clean inline array either', () => {
+      withTempProject('analyzer:\n  exclude: ["build/**", "**/*.g.dart"]\n', (root) => {
+        const result = fixMalformedExcludeSyntax(root);
+        assert.strictEqual(result.duplicatesRemoved, 0);
+        assert.strictEqual(fs.existsSync(readAnalysisOptionsBackupPath(root)), false);
       });
     });
   });

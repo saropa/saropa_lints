@@ -513,6 +513,7 @@ ${this._buildHints()}
       <li>${escapeHtml(l10n('analysisOptimizer.hints.build'))}</li>
       <li>${escapeHtml(l10n('analysisOptimizer.hints.inactive'))}</li>
       <li>${escapeHtml(l10n('analysisOptimizer.hints.protected'))}</li>
+      <li>${escapeHtml(l10n('analysisOptimizer.hints.backup'))}</li>
     </ul>
   </div>
 </details>`;
