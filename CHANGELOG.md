@@ -64,6 +64,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [14.5.6]
+
+This release introduces a new rule to ensure lint suppression comments work correctly in your IDE. The `require_ignore_comment_plugin_prefix` rule flags ignore comments referencing saropa_lints rules that lack the required package prefix, preventing suppressions from failing silently. An automated quick fix is included to instantly apply the missing prefix. [log](https://github.com/saropa/saropa_lints/blob/v14.5.6/CHANGELOG.md)
+
+### Added
+
+- **New rule `require_ignore_comment_plugin_prefix`** (Essential tier, WARNING) — flags `// ignore: rule_name` and `// ignore_for_file: rule_name` comments that reference a saropa_lints rule without the required `saropa_lints/` prefix, which causes the suppression to silently fail in the IDE. A quick fix inserts the prefix. No action required.
+- **`dart run saropa_lints scan --fix-ignores`** — bulk-converts bare `// ignore: rule_name` to `// ignore: saropa_lints/rule_name` for all known saropa_lints rules across `lib/`, `test/`, and `bin/`.
+
+---
+
 ## [14.5.5]
 
 The Analysis Optimizer now makes changes safely: it surgically updates only the patterns you're modifying while preserving your file structure, comments, and ordering, and backs up your configuration before every write for easy manual recovery. The dashboard excludes redundant recommendations when patterns are already covered and automatically rescans to keep the status current. [log](https://github.com/saropa/saropa_lints/blob/v14.5.5/CHANGELOG.md)

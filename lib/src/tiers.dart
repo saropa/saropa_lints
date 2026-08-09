@@ -765,6 +765,8 @@ const Set<String> essentialRules = <String>{
   'subtype_of_disallowed_type',
   'undefined_enum_constructor',
   'yield_in_non_generator',
+  // Ignore-comment infrastructure
+  'require_ignore_comment_plugin_prefix', // WARNING - bare ignore silently ineffective in IDE
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.

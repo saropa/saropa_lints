@@ -14,8 +14,10 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/scan.dart';
+import 'package:saropa_lints/src/init/migration.dart';
 import 'package:saropa_lints/src/scan/scan_cli_args.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
+import 'package:saropa_lints/src/tiers.dart';
 
 /// Standalone lint scanner that runs saropa_lints rules against any Dart
 /// project without requiring it as a dependency.
@@ -57,6 +59,11 @@ Future<void> main(List<String> args) async {
   final dartFiles = parsed.dartFiles;
   final tier = parsed.tier;
   final formatJson = parsed.formatJson;
+
+  if (parsed.fixIgnores) {
+    _runFixIgnores(path);
+    exit(0);
+  }
 
   final runner = ScanRunner(
     targetPath: path,
@@ -217,6 +224,24 @@ void _printSummary(List<ScanDiagnostic> diagnostics) {
   print('');
 }
 
+void _runFixIgnores(String targetPath) {
+  final allRules = getAllDefinedRules();
+  final results = convertIgnoreComments(
+    allRules,
+    false,
+    targetDir: p.canonicalize(targetPath),
+  );
+  if (results.isEmpty) {
+    print('No bare ignore comments found.');
+    return;
+  }
+  final total = results.values.fold(0, (s, c) => s + c);
+  print('Converted $total ignore comments in ${results.length} files:');
+  for (final entry in results.entries) {
+    print('  ${entry.value} in ${p.relative(entry.key)}');
+  }
+}
+
 void _printUsage() {
   print('saropa_lints scan - Standalone lint scanner');
   print('');
@@ -248,6 +273,12 @@ void _printUsage() {
   );
   print(
     '                      and the target project must have had `pub get` run.',
+  );
+  print(
+    '  --fix-ignores       Bulk-convert bare // ignore: rule_name to',
+  );
+  print(
+    '                      // ignore: saropa_lints/rule_name for all known rules.',
   );
   print(
     '  --format json       Output machine-readable JSON to stdout (no report file).',

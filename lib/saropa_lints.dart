@@ -940,6 +940,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidDigitSeparatorsRule.new,
   FormatCommentFormattingRule.new,
   RequireIgnoreCommentSpacingRule.new,
+  RequireIgnoreCommentPluginPrefixRule.new,
   MemberOrderingFormattingRule.new,
   ParametersOrderingConventionRule.new,
 

@@ -82,6 +82,12 @@ void main() {
     );
 
     testRule(
+      'RequireIgnoreCommentPluginPrefixRule',
+      'require_ignore_comment_plugin_prefix',
+      () => RequireIgnoreCommentPluginPrefixRule(),
+    );
+
+    testRule(
       'MemberOrderingFormattingRule',
       'prefer_member_ordering',
       () => MemberOrderingFormattingRule(),
@@ -124,6 +130,7 @@ void main() {
       'lib/src/fixes/formatting/add_blank_line_after_declarations_fix.dart',
       'lib/src/fixes/formatting/add_blank_line_before_return_fix.dart',
       'lib/src/fixes/formatting/require_ignore_comment_spacing_fix.dart',
+      'lib/src/fixes/formatting/require_ignore_comment_plugin_prefix_fix.dart',
     ];
 
     for (final fixFile in fixFiles) {

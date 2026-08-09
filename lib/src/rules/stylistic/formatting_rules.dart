@@ -9,8 +9,10 @@ import '../../fixes/formatting/add_blank_line_before_return_fix.dart';
 import '../../fixes/formatting/add_blank_line_fix.dart';
 import '../../fixes/formatting/add_trailing_comma_fix.dart';
 import '../../fixes/formatting/remove_unnecessary_trailing_comma_fix.dart';
+import '../../fixes/formatting/require_ignore_comment_plugin_prefix_fix.dart';
 import '../../fixes/formatting/require_ignore_comment_spacing_fix.dart';
 import '../../fixes/stylistic/capitalize_comment_fix.dart';
+import '../../tiers.dart' as tiers;
 
 /// Warns when case clauses don't have newlines before them.
 ///
@@ -1111,6 +1113,134 @@ class RequireIgnoreCommentSpacingRule extends SaropaLintRule {
       }
       comment = comment.next;
     }
+  }
+}
+
+/// Warns when `// ignore:` or `// ignore_for_file:` references a saropa_lints
+/// rule without the required `saropa_lints/` prefix.
+///
+/// Since: v14.5.6 | Rule version: v1
+///
+/// The Dart analyzer's native-plugin pipeline requires diagnostics from
+/// plugins to be suppressed with a namespaced form
+/// (`// ignore: saropa_lints/rule_name`). A bare `// ignore: rule_name` is
+/// silently ineffective for IDE-surfaced diagnostics — the comment is
+/// accepted without error, but the diagnostic keeps reappearing.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// // ignore: avoid_null_assertion
+/// final x = value!;
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// // ignore: saropa_lints/avoid_null_assertion
+/// final x = value!;
+/// ```
+class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
+  RequireIgnoreCommentPluginPrefixRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  @override
+  String get exampleBad =>
+      '// ignore: avoid_null_assertion  // bare — silently ignored by IDE';
+
+  @override
+  String get exampleGood => '// ignore: saropa_lints/avoid_null_assertion';
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RequireIgnoreCommentPluginPrefixFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'require_ignore_comment_plugin_prefix',
+    '[require_ignore_comment_plugin_prefix] This // ignore: comment references '
+        'a saropa_lints rule without the required saropa_lints/ prefix — the '
+        'IDE and analyzer will not suppress this diagnostic. Prefix each '
+        'saropa_lints rule name with saropa_lints/ so the suppression works.',
+    correctionMessage:
+        'Add the saropa_lints/ prefix before the rule name.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  static final Set<String> _allSaropaRuleNames = tiers.getAllDefinedRules();
+
+  static const _prefix = 'saropa_lints/';
+
+  static const List<String> _ignorePrefixes = <String>[
+    'ignore:',
+    'ignore_for_file:',
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit node) {
+      Token? token = node.beginToken;
+      final end = node.endToken;
+      while (token != null && token != end) {
+        _checkPrecedingComments(token, reporter);
+        token = token.next;
+      }
+      // endToken's own precedingComments are skipped by the loop above.
+      _checkPrecedingComments(end, reporter);
+    });
+  }
+
+  void _checkPrecedingComments(
+    Token token,
+    SaropaDiagnosticReporter reporter,
+  ) {
+    Token? comment = token.precedingComments;
+    while (comment != null) {
+      final String lexeme = comment.lexeme;
+      if (lexeme.startsWith('//') && !lexeme.startsWith('///')) {
+        final String content = lexeme.substring(2).trimLeft();
+        for (final prefix in _ignorePrefixes) {
+          if (content.startsWith(prefix)) {
+            final ruleList = content.substring(prefix.length).trimLeft();
+            if (_hasBareRuleName(ruleList)) {
+              reporter.atToken(comment);
+            }
+            break;
+          }
+        }
+      }
+      comment = comment.next;
+    }
+  }
+
+  bool _hasBareRuleName(String ruleList) {
+    final trailingComment = ruleList.indexOf('--');
+    final effective =
+        trailingComment >= 0 ? ruleList.substring(0, trailingComment) : ruleList;
+
+    for (final part in effective.split(',')) {
+      final name = part.trim();
+      if (name.isEmpty) continue;
+      if (name.startsWith(_prefix)) continue;
+      final bare = name.replaceAll('-', '_');
+      if (_allSaropaRuleNames.contains(bare)) return true;
+    }
+    return false;
   }
 }
 

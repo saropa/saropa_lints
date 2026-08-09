@@ -41,6 +41,7 @@ class ScanCliArgs {
     required this.formatJson,
     required this.resolve,
     this.debugRule,
+    this.fixIgnores = false,
   });
 
   final String path;
@@ -61,6 +62,10 @@ class ScanCliArgs {
   /// at each visited node. Used to diagnose false positives caused by
   /// type-resolution divergence in the analyzer plugin context.
   final String? debugRule;
+
+  /// When true, bulk-convert bare `// ignore: rule_name` comments to
+  /// `// ignore: saropa_lints/rule_name` for all known saropa_lints rules.
+  final bool fixIgnores;
 }
 
 /// Parses [args] for the scan command.
@@ -86,9 +91,16 @@ ScanParseResult parseScanArgs(
   bool formatJson = false;
   bool resolve = false;
 
+  bool fixIgnores = false;
+
   var i = 0;
   while (i < args.length) {
     final arg = args[i];
+    if (arg == '--fix-ignores') {
+      fixIgnores = true;
+      i++;
+      continue;
+    }
     if (arg == '--files') {
       i++;
       while (i < args.length && !args[i].startsWith('--')) {
@@ -149,6 +161,7 @@ ScanParseResult parseScanArgs(
       formatJson: formatJson,
       resolve: resolve,
       debugRule: debugRule,
+      fixIgnores: fixIgnores,
     ),
   );
 }
