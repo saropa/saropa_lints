@@ -195,4 +195,18 @@ analyzer:
       fs.rmSync(root, { recursive: true, force: true });
     }
   });
+
+  it('parseAnalyzerExcludes takes the first exclude: block and does not crash on a duplicate key', () => {
+    // Invalid YAML (a mapping key repeated) but real files sometimes end up
+    // this way from a bad manual merge — must degrade gracefully, not throw.
+    const yaml = `
+analyzer:
+  exclude:
+    - first/**
+  exclude:
+    - second/**
+`;
+    assert.doesNotThrow(() => parseAnalyzerExcludes(yaml));
+    assert.deepStrictEqual(parseAnalyzerExcludes(yaml), ['first/**']);
+  });
 });

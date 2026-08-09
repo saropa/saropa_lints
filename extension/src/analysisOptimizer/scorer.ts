@@ -185,7 +185,9 @@ export function buildExclusionRows(
     const { filesMatched, costMatched, hasActiveFiles } = matchExclusionPattern(files, pattern);
     rows.push({
       pattern,
-      reason: 'Existing exclusion in analysis_options.yaml',
+      reason: filesMatched > 0
+        ? 'Existing exclusion in analysis_options.yaml'
+        : 'Existing exclusion — no scanned Dart file matches this pattern',
       estimatedFilesExcluded: filesMatched,
       estimatedCostReduction: costMatched,
       hasActiveFiles,

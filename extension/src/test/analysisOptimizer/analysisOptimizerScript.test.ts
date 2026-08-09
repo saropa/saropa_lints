@@ -33,6 +33,14 @@ function fixtureHtml(recCount: number): string {
   <table><tbody>${rows}</tbody></table>
   <button class="apply-one-btn" data-pattern="single/**">Apply</button>
   <button class="remove-btn" data-pattern="removeme/**">&times;</button>
+  <table id="preview-demo-table">
+    <tbody>
+      <tr id="owner-row">
+        <td><button class="preview-toggle-btn" data-target="preview-0">Preview</button></td>
+      </tr>
+      <tr class="preview-row" id="preview-0" hidden><td>- demo/**</td></tr>
+    </tbody>
+  </table>
   <script>${getOptimizerScript()}</script>
 </body></html>`;
 }
@@ -146,6 +154,33 @@ describe('analysisOptimizerScript (executed against a real DOM)', () => {
     const { doc, messages } = render();
     doc.querySelector('.remove-btn')!.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
     assert.deepStrictEqual(messages, [{ type: 'removeExclusion', pattern: 'removeme/**' }]);
+  });
+
+  it('preview-toggle button reveals then hides its target preview row without posting a message', () => {
+    const { doc, messages } = render();
+    const toggle = doc.querySelector('.preview-toggle-btn')!;
+    const previewRow = doc.getElementById('preview-0') as HTMLTableRowElement;
+    assert.strictEqual(previewRow.hidden, true);
+
+    toggle.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
+    assert.strictEqual(previewRow.hidden, false);
+
+    toggle.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
+    assert.strictEqual(previewRow.hidden, true);
+
+    assert.deepStrictEqual(messages, []);
+  });
+
+  it('preview-toggle re-anchors the preview row immediately after its owning row', () => {
+    const { doc } = render();
+    const ownerRow = doc.getElementById('owner-row')!;
+    const previewRow = doc.getElementById('preview-0')!;
+    // Simulate a prior sort having detached the preview row elsewhere in the DOM.
+    doc.getElementById('preview-demo-table')!.querySelector('tbody')!.prepend(previewRow);
+    assert.notStrictEqual(ownerRow.nextElementSibling, previewRow);
+
+    doc.querySelector('.preview-toggle-btn')!.dispatchEvent(new doc.defaultView!.MouseEvent('click', { bubbles: true }));
+    assert.strictEqual(ownerRow.nextElementSibling, previewRow);
   });
 
   it('select-all toggles every recommendation checkbox and enables apply-selected', () => {

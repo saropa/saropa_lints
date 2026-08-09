@@ -70,6 +70,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - **Analysis Optimizer failed to detect existing exclusions** — patterns with an inline `# comment` or a stray trailing quote (`- **/*.g.dart" # ...`) were never recognized as already excluded, so the dashboard kept recommending them and applying created a duplicate line. The reader now strips comments and malformed quoting before comparing, and the writer preserves each pattern's original comment on write. No action required.
 - **Analysis Optimizer's "Current exclusions" and "Recommended exclusions" are now one deduplicated "Exclusions" table**, with an Applied/Recommended status column, sortable columns, and the chosen sort order preserved across Apply/Remove actions. No action required.
+- An already-applied Analysis Optimizer exclusion that matches zero scanned Dart files (e.g. a non-Dart tool reference) now shows a dash and an explanatory reason instead of a misleading "0". No action required.
+
+### Added (Extension)
+
+- Each Analysis Optimizer recommendation now has a "Preview" toggle showing the approximate line that would be added to `analysis_options.yaml`, without leaving the table. No action required.
 
 ---
 

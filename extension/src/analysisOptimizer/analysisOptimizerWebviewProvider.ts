@@ -371,12 +371,26 @@ ${this._buildHints()}
     const statusClass = row.isApplied ? 'status-applied' : 'status-recommended';
     const priorityRank = PRIORITY_RANK[row.priority];
 
+    const zeroImpact = row.isApplied && row.estimatedFilesExcluded === 0;
+    const filesDisplay = zeroImpact ? '—' : row.estimatedFilesExcluded.toLocaleString();
+    const costDisplay = zeroImpact ? '—' : row.estimatedCostReduction.toLocaleString();
+
     const checkboxCell = row.isApplied
       ? '<td></td>'
       : `<td><input type="checkbox" class="rec-cb" data-index="${index}" data-pattern="${escapeHtml(row.pattern)}"></td>`;
+    const previewToggle = row.isApplied
+      ? ''
+      : ` <button class="btn-sm preview-toggle-btn" data-target="preview-${index}" title="${escapeHtml(l10n('analysisOptimizer.previewLine'))}">${escapeHtml(l10n('analysisOptimizer.previewToggle'))}</button>`;
     const actionCell = row.isApplied
       ? `<td><button class="btn btn-sm remove-btn" data-pattern="${escapeHtml(row.pattern)}">${escapeHtml(l10n('analysisOptimizer.remove'))}</button></td>`
       : `<td><button class="btn btn-sm apply-one-btn" data-pattern="${escapeHtml(row.pattern)}">${escapeHtml(l10n('analysisOptimizer.apply'))}</button></td>`;
+    // Approximate preview only — the authoritative diff (matching the file's
+    // real indentation and preserving neighboring comments) is the vscode.diff
+    // tab opened when Apply is actually clicked.
+    const previewRow = row.isApplied ? '' : `
+    <tr class="preview-row" id="preview-${index}" hidden>
+      <td colspan="7"><code class="preview-line">    - ${escapeHtml(row.pattern)}</code> <span class="hint">${escapeHtml(l10n('analysisOptimizer.previewApprox'))}</span></td>
+    </tr>`;
 
     return `
     <tr class="rec-row ${priorityClass}"
@@ -388,15 +402,15 @@ ${this._buildHints()}
       ${checkboxCell}
       <td><span class="chip ${statusClass}">${escapeHtml(statusLabel)}</span></td>
       <td>
-        <code>${escapeHtml(row.pattern)}</code>${warning}
+        <code>${escapeHtml(row.pattern)}</code>${warning}${previewToggle}
         ${row.isDefault ? `<span class="chip default-chip">${escapeHtml(l10n('analysisOptimizer.defaultLabel'))}</span>` : ''}
         <br><span class="hint">${escapeHtml(row.reason)}</span>
       </td>
-      <td>${row.estimatedFilesExcluded.toLocaleString()}</td>
-      <td>${row.estimatedCostReduction.toLocaleString()}</td>
+      <td>${filesDisplay}</td>
+      <td>${costDisplay}</td>
       <td><span class="chip ${priorityClass}">${escapeHtml(l10n(`analysisOptimizer.priority.${row.priority}`))}</span></td>
       ${actionCell}
-    </tr>`;
+    </tr>${previewRow}`;
   }
 
   private _buildFolderHeatMap(r: AnalysisOptimizerResult): string {
@@ -469,6 +483,11 @@ function getOptimizerStyles(): string {
 .rec-row.priority-high { border-left-color:var(--vscode-charts-red, #e45649); }
 .rec-row.priority-medium { border-left-color:var(--vscode-charts-yellow, #c18401); }
 .rec-row.priority-low { border-left-color:var(--vscode-charts-green, #50a14f); }
+
+.preview-toggle-btn { padding:0 4px; font-size:11px; border:none; background:transparent; color:var(--vscode-textLink-foreground); cursor:pointer; }
+.preview-toggle-btn:hover { text-decoration:underline; }
+.preview-row td { background:var(--vscode-textCodeBlock-background, var(--vscode-editor-background)); padding:6px 12px; }
+.preview-line { color:var(--vscode-charts-green, #50a14f); }
 
 .chip { display:inline-block; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:500; }
 .chip.priority-high { background:var(--vscode-charts-red, #e45649); color:#fff; }

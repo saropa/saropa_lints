@@ -1981,6 +1981,9 @@
     "selectAll": "Select all",
     "defaultLabel": "Default",
     "sortHint": "Click to sort",
+    "previewToggle": "Preview",
+    "previewLine": "Preview the exact line that would be added",
+    "previewApprox": "Approximate — exact indentation and comment placement matches your file when applied",
     "col": {
       "status": "Status",
       "pattern": "Pattern",

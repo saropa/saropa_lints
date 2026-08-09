@@ -154,6 +154,15 @@ describe('scorer', () => {
       assert.strictEqual(custom?.isApplied, true);
     });
 
+    it('gives a hand-added exclusion with zero matched files a distinct reason instead of a bare zero', () => {
+      const files = [file({ relativePath: 'lib/main.dart' })];
+      const folders = aggregateByFolder(files);
+      const rows = buildExclusionRows(folders, files, ['ktlint']);
+      const custom = rows.find((r) => r.pattern === 'ktlint');
+      assert.strictEqual(custom?.estimatedFilesExcluded, 0);
+      assert.match(custom?.reason ?? '', /no scanned Dart file matches/i);
+    });
+
     it('flags a folder with no recent edits as medium priority', () => {
       const files = Array.from({ length: 5 }, (_, i) =>
         file({ relativePath: `lib/legacy/file${i}.dart`, lineCount: 200, daysSinceLastEdit: 400 }),

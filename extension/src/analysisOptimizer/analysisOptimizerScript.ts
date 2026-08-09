@@ -35,6 +35,20 @@ export function getOptimizerScript(): string {
       vscode.postMessage({ type: 'removeExclusion', pattern: target.dataset.pattern });
       return;
     }
+    if (target.classList.contains('preview-toggle-btn')) {
+      var previewRow = document.getElementById(target.dataset.target);
+      if (previewRow) {
+        // Re-anchor immediately after the owning row every time — a prior
+        // column sort can leave the preview row's DOM position stale
+        // relative to its (now reordered) parent row.
+        var ownerRow = target.closest('tr');
+        if (ownerRow && ownerRow.nextSibling !== previewRow) {
+          ownerRow.after(previewRow);
+        }
+        previewRow.hidden = !previewRow.hidden;
+      }
+      return;
+    }
   });
 
   var selectAll = document.getElementById('select-all-cb');
@@ -83,7 +97,14 @@ export function getOptimizerScript(): string {
 
     function applySort(key, dir) {
       var tbody = exclusionsTable.querySelector('tbody');
-      var rows = Array.from(tbody.querySelectorAll('tr'));
+      // Preview rows (toggled via preview-toggle-btn) have no sort data and
+      // are visually anchored under one specific data row — collapse them
+      // and exclude them from the reorder so a sort can never leave one
+      // sitting under the wrong row.
+      var previewRows = tbody.querySelectorAll('.preview-row');
+      for (var p = 0; p < previewRows.length; p++) { previewRows[p].hidden = true; }
+
+      var rows = Array.from(tbody.querySelectorAll('tr:not(.preview-row)'));
       var attr = 'data-' + key;
       var numeric = key === 'files' || key === 'cost' || key === 'priority' || key === 'status';
 
