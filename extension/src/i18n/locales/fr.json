@@ -1972,21 +1972,28 @@
     "costHeavy": "Lourd",
     "costModerate": "Modéré",
     "costLight": "Lumière",
-    "currentExclusions": "Exclusions actuelles",
-    "noExclusions": "Aucune exclusion configurée dans analysis_options.yaml",
-    "recommendations": "Exclusions recommandées",
-    "noRecommendations": "Aucune recommandation d'exclusion — l'espace de travail est déjà bien ciblé",
+    "exclusions": "Exclusions",
+    "noExclusions": "Aucune exclusion n'est appliquée ou recommandée — l'espace de travail est déjà bien ciblé",
     "applyAll": "Appliquer tous",
     "applySelected": "Appliquer sélectionné",
     "apply": "Appliquer",
     "remove": "Supprimer",
     "selectAll": "Sélectionner tout",
     "defaultLabel": "Défaut",
+    "sortHint": "Cliquez pour trier",
+    "previewToggle": "Aperçu",
+    "previewLine": "Prévisualiser la ligne exacte qui serait ajoutée",
+    "previewApprox": "Approximatif — l'indentation exacte et la position des commentaires correspondent à votre fichier lors de l'application",
     "col": {
+      "status": "Etat",
       "pattern": "Modèle",
       "files": "Les fichiers sont des dossiers.",
       "cost": "Coût estimé",
       "priority": "Priorité"
+    },
+    "status": {
+      "applied": "Appliqué",
+      "recommended": "Recommandé"
     },
     "priority": {
       "high": "Haute",

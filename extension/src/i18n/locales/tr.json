@@ -1972,21 +1972,28 @@
     "costHeavy": "Ağır",
     "costModerate": "Orta",
     "costLight": "Aydınlık",
-    "currentExclusions": "Geçerli dışlamalar",
-    "noExclusions": "analysis_options.yaml'da hariç bırakmalar yapılmamış",
-    "recommendations": "Önerilen hariç tutmalar",
-    "noRecommendations": "Hiçbir dışlama önerisi yok — çalışma alanı zaten iyi tanımlanmış",
+    "exclusions": "İndirgenmeler",
+    "noExclusions": "Kapsam dışı bırakmalar uygulanmamış veya önerilmemiştir — çalışma alanı zaten iyi tanımlanmıştır",
     "applyAll": "Tümünü uygula",
     "applySelected": "Seçileni uygula",
     "apply": "Uygula",
     "remove": "Remove remove kaldırmak",
     "selectAll": "Tümünü seç",
     "defaultLabel": "Varsayılan",
+    "sortHint": "Tıkla sırala",
+    "previewToggle": "Önizleme",
+    "previewLine": "Eklenecek tam satırı ön izle",
+    "previewApprox": "Yaklaşık — uygulandığında, tam girinti ve yorum konumları dosyanızla eşleşir",
     "col": {
+      "status": "Status Durum Statüs Durumu",
       "pattern": "Desen",
       "files": "Dosyalar dosyaları.",
       "cost": "Tahmini maliyet",
       "priority": "Öncelik"
+    },
+    "status": {
+      "applied": "Uygulandı",
+      "recommended": "Tavsiye Edilir"
     },
     "priority": {
       "high": "Yüksek",

@@ -1972,21 +1972,28 @@
     "costHeavy": "גמיש",
     "costModerate": "בינוני",
     "costLight": "הבהירות",
-    "currentExclusions": "החלות נוכחיות",
-    "noExclusions": "אין הימנעות מוגדרת ב analysis_options.yaml",
-    "recommendations": "הסרות מומלצות",
-    "noRecommendations": "אין מומלצות להוציא מחוץ לתחום — הפרויקט כבר מוגדר היטב",
+    "exclusions": "הסרות",
+    "noExclusions": "אין התרעות מותאמות או מומלצות — המרחב כבר מוגדר היטב",
     "applyAll": "החלף כל",
     "applySelected": "החלף שנבחר",
     "apply": "הפעלה",
     "remove": "הסר את הוצאתו של Remove remove",
     "selectAll": "בחר הכל",
     "defaultLabel": "ברירת מחדל",
+    "sortHint": "לחץ כדי לסדר",
+    "previewToggle": "הצגת תצוגה",
+    "previewLine": "הצגת השורה המדויקת שתתווסף",
+    "previewApprox": "הערכה — תצורה מדויקת ותיעוד מדויקת מתאימות לקובץ שלך כאשר הן מופעלות",
     "col": {
+      "status": "מצב סטטוס Status",
       "pattern": "תבנית",
       "files": "קבצים קובצי תיקון.",
       "cost": "הערכה של הוצאה",
       "priority": "עדיפות"
+    },
+    "status": {
+      "applied": "המרוכז",
+      "recommended": "מומלץ"
     },
     "priority": {
       "high": "גבוה",

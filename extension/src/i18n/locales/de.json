@@ -1972,21 +1972,28 @@
     "costHeavy": "Schwer",
     "costModerate": "Mäßig",
     "costLight": "Licht",
-    "currentExclusions": "Aktuelle Ausnahmen",
-    "noExclusions": "Keine Ausnahmen konfiguriert in analysis_options.yaml",
-    "recommendations": "Empfohlene Ausnahmen",
-    "noRecommendations": "Keine Ausschlussempfehlungen — der Workspace ist bereits gut befristet",
+    "exclusions": "Ausschlüsse",
+    "noExclusions": "Keine Ausnahmen angewendet oder empfohlen – der Workspace ist bereits gut befristet",
     "applyAll": "Alle anwenden",
     "applySelected": "Ausgewählte anwenden",
     "apply": "Anwenden",
     "remove": "Entfernen Sie entfernen Entferne",
     "selectAll": "Alles auswählen",
     "defaultLabel": "Standard",
+    "sortHint": "Klicken, um zu sortieren",
+    "previewToggle": "Vorschau",
+    "previewLine": "Vorschau der exakten Zeile, die hinzugefügt werden würde",
+    "previewApprox": "Etwaig — exakte Einrückung und Kommentarplatzierung entsprechen Ihrer Datei, wenn sie angewendet wird",
     "col": {
+      "status": "Status",
       "pattern": "Muster",
       "files": "Dateien Datei-Dateien",
       "cost": "Schätzung",
       "priority": "Priorität"
+    },
+    "status": {
+      "applied": "Angewendet",
+      "recommended": "Empfohlen"
     },
     "priority": {
       "high": "Hoch",

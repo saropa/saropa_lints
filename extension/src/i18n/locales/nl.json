@@ -1972,21 +1972,28 @@
     "costHeavy": "Zwaar",
     "costModerate": "Matig",
     "costLight": "Licht",
-    "currentExclusions": "Huidige uitsluitingen",
-    "noExclusions": "Geen uitsluitingen geconfigureerd in analysis_options.yaml",
-    "recommendations": "Aanbevolen uitsluitingen",
-    "noRecommendations": "Geen uitsluitingsaanbevelingen — het werkruimte is al goed in de focus",
+    "exclusions": "Uitsluitingen",
+    "noExclusions": "Geen uitsluitingen toegepast of aanbevolen — het werkruimte is al goed beperkt",
     "applyAll": "Alle toepassen",
     "applySelected": "Geselecteerde toepassen",
     "apply": "Toepassen",
     "remove": "Verwijderen",
     "selectAll": "Alles selecteren",
     "defaultLabel": "Standaard",
+    "sortHint": "Klik om te sorteren",
+    "previewToggle": "Voorbeeld",
+    "previewLine": "Bekijk de exacte regel die zou worden toegevoegd",
+    "previewApprox": "Ongeveer — exacte inkteling en opmerkingenplaatsing matchen je bestand wanneer ze worden toegepast",
     "col": {
+      "status": "Status",
       "pattern": "Patroon",
       "files": "Bestanden bestandenbestanden.",
       "cost": "Est. kosten",
       "priority": "Prioriteit"
+    },
+    "status": {
+      "applied": "Toepassen",
+      "recommended": "Aanbevolen"
     },
     "priority": {
       "high": "Hoog",

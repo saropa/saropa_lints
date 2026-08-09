@@ -1972,21 +1972,28 @@
     "costHeavy": "Ciężki",
     "costModerate": "Średnie",
     "costLight": "Światło",
-    "currentExclusions": "Obecne wykluczenia",
-    "noExclusions": "Brak wykluczeń skonfigurowanych w analysis_options.yaml",
-    "recommendations": "Rekomendowane wykluczenia",
-    "noRecommendations": "Brak rekomendacji wykluczenia — przestrzeń robocza jest już dobrze zdefiniowana",
+    "exclusions": "Wykluczenia",
+    "noExclusions": "Brak wykluczeń zastosowanych ani zalecanych — przestrzeń robocza jest już dobrze zdefiniowana",
     "applyAll": "Zastosuj wszystko",
     "applySelected": "Zastosuj wybrany",
     "apply": "Zastosuj",
     "remove": "Remove Usunąć Usuń usunięcie",
     "selectAll": "Zaznacz wszystko",
     "defaultLabel": "Domyślny",
+    "sortHint": "Kliknij, aby posortować",
+    "previewToggle": "Podgląd",
+    "previewLine": "Podglądaj dokładnie linię, która zostanie dodana",
+    "previewApprox": "Przybliżone — dokładne wcięcie i umieszczenie komentarzy odpowiada Twojemu plikowi po zastosowaniu",
     "col": {
+      "status": "Status",
       "pattern": "Wzorzec",
       "files": "Pliki plików.",
       "cost": "Szac. koszt",
       "priority": "Priorytet"
+    },
+    "status": {
+      "applied": "Zastosowano",
+      "recommended": "Rekomendowane"
     },
     "priority": {
       "high": "Wysoki",

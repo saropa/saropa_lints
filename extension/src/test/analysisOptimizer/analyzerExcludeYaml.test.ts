@@ -181,7 +181,7 @@ analyzer:
         assert.strictEqual(ok, true);
         const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
         assert.match(content, /^ {4}exclude:$/m);
-        assert.match(content, /^ {8}- build\/\*\*$/m);
+        assert.match(content, /^ {8}- "build\/\*\*"$/m);
         assert.deepStrictEqual(readAnalyzerExcludes(root), ['build/**']);
       },
     );
@@ -194,6 +194,38 @@ analyzer:
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
+  });
+
+  it('writeAnalyzerExcludes always quotes patterns that start with **, avoiding YAML alias syntax', () => {
+    // An unquoted list item starting with `*` is a YAML alias reference, not
+    // a literal string — a real YAML parser rejects `- **/*.g.dart` with
+    // "Undefined alias". Every written pattern must be quoted regardless of
+    // whether it's brand new or an unchanged existing entry.
+    withTempProject('linter:\n  rules:\n    - avoid_print\n', (root) => {
+      writeAnalyzerExcludes(root, ['**/*.g.dart', 'build/**']);
+      const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+      assert.match(content, /- "\*\*\/\*\.g\.dart"/);
+      assert.doesNotMatch(content, /^\s*-\s+\*\*/m);
+    });
+  });
+
+  it('writeAnalyzerExcludes re-quotes a malformed unquoted-star entry instead of preserving the parse error', () => {
+    // Reproduces a real hand-edited file: an existing entry with no opening
+    // quote and a stray trailing quote before its comment. Simply preserving
+    // this verbatim (as an earlier version of the writer did, to keep the
+    // comment) would leave the underlying "Undefined alias" YAML error in
+    // place forever, even after the user applies a change through the tool.
+    withTempProject(
+      'analyzer:\n  exclude:\n    - **/*.bak" # Exclude backups\n',
+      (root) => {
+        const existing = readAnalyzerExcludes(root);
+        assert.deepStrictEqual(existing, ['**/*.bak']);
+        writeAnalyzerExcludes(root, mergeExclusions(existing, ['build/**']));
+        const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+        assert.match(content, /- "\*\*\/\*\.bak" # Exclude backups/);
+        assert.doesNotMatch(content, /^\s*-\s+\*\*\/\*\.bak"/m);
+      },
+    );
   });
 
   it('parseAnalyzerExcludes takes the first exclude: block and does not crash on a duplicate key', () => {

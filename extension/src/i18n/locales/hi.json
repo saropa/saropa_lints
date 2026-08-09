@@ -1972,21 +1972,28 @@
     "costHeavy": "भारी",
     "costModerate": "मध्यम",
     "costLight": "प्रकाश",
-    "currentExclusions": "वर्तमान छोड़े गए वस्तुएँ",
-    "noExclusions": "analysis_options.yaml में कोई छूट नहीं निर्धारित किया गया है",
-    "recommendations": "अनुशोधनीय छोड़े जाने वाले तत्व",
-    "noRecommendations": "कोई छोड़ने के सुझाव नहीं — वर्कस्पेस पहले से ही अच्छी तरह से सीमित है",
+    "exclusions": "अपवाद",
+    "noExclusions": "कोई छूट लागू नहीं किया गया या सिफारिश नहीं की गई — वर्कस्पेस पहले से ही अच्छी तरह से सीमित है",
     "applyAll": "सभी लागू करें",
     "applySelected": "चयनित लागू करें",
     "apply": "अनुप्रयोग",
     "remove": "Remove remove हटाना निकालना",
     "selectAll": "सभी चयन करें",
     "defaultLabel": "डिफ़ॉल्ट",
+    "sortHint": "क्लिक करें ताकि तारीख के अनुसार व्यवस्थित करें",
+    "previewToggle": "प्रीव्यू",
+    "previewLine": "अतिरिक्त लाइन को देखें जो जोड़ा जाएगा",
+    "previewApprox": "अनुमानित — आवेदन के द्वारा आपके फ़ाइल में सटीक डेंटिंग और टिप्पणी स्थान के साथ मेल खाता है",
     "col": {
+      "status": "स्थिति की स्थिति Status",
       "pattern": "पैटर्न",
       "files": "फ़ाइलें फाइलें",
       "cost": "अनुमानित लागत",
       "priority": "प्राथमिकता"
+    },
+    "status": {
+      "applied": "आवेदित",
+      "recommended": "अनुशोधन किया गया"
     },
     "priority": {
       "high": "उच्च",

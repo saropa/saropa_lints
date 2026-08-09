@@ -1972,21 +1972,28 @@
     "costHeavy": "重い",
     "costModerate": "中程度",
     "costLight": "ライト",
-    "currentExclusions": "現在の除外項目",
-    "noExclusions": "analysis_options.yaml に除外設定がありません",
-    "recommendations": "推奨される除外項目",
-    "noRecommendations": "推奨される除外設定はありません — ワークスペースはすでに適切にスコープが設定されています",
+    "exclusions": "除外",
+    "noExclusions": "適用または推奨される除外はありません — ワークスペースはすでに十分に限定されています",
     "applyAll": "すべて適用する",
     "applySelected": "選択されたを適用する",
     "apply": "適用する",
     "remove": "削除する Remove remove",
     "selectAll": "すべて選択",
     "defaultLabel": "デフォルト",
+    "sortHint": "クリックで並び替え",
+    "previewToggle": "プレビュー",
+    "previewLine": "表示される正確な行をプレビュー",
+    "previewApprox": "概算 — 適用すると、インデントとコメントの位置がファイルと正確に一致します",
     "col": {
+      "status": "ステータス (Status) 状態",
       "pattern": "パターン",
       "files": "ファイルは,ファイルのことです.",
       "cost": "概算費用",
       "priority": "優先度"
+    },
+    "status": {
+      "applied": "適用済み",
+      "recommended": "推奨"
     },
     "priority": {
       "high": "ハイ",

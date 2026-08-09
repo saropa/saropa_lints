@@ -1972,21 +1972,28 @@
     "costHeavy": "Berat",
     "costModerate": "Moderat",
     "costLight": "Ringan",
-    "currentExclusions": "Eksploitasi Saat Ini",
-    "noExclusions": "Tidak ada pengecualian yang dikonfigurasi dalam analysis_options.yaml",
-    "recommendations": "Rekomendasi eksklusi",
-    "noRecommendations": "Tidak ada rekomendasi eksklusi — workspace sudah cukup terbatas",
+    "exclusions": "Pengecualian",
+    "noExclusions": "Tidak ada pengecualian yang diterapkan atau dianjurkan — workspace sudah cukup terbatas",
     "applyAll": "Terapkan semua",
     "applySelected": "Terapkan yang dipilih",
     "apply": "Terapkan",
     "remove": "Remove Menghilangkan Hapus",
     "selectAll": "Pilih semuanya",
     "defaultLabel": "Bawaan",
+    "sortHint": "Klik untuk mengurutkan",
+    "previewToggle": "Pratinjau",
+    "previewLine": "Tinjau baris yang akan ditambahkan secara tepat",
+    "previewApprox": "Aproksimatif — indentasi dan penempatan komentar tepat sesuai dengan file Anda saat diterapkan",
     "col": {
+      "status": "Status",
       "pattern": "Pol a",
       "files": "File-file yang ada di dalamnya.",
       "cost": "Biaya estimasi",
       "priority": "Prioritas"
+    },
+    "status": {
+      "applied": "Diterapkan",
+      "recommended": "Rekomendasi"
     },
     "priority": {
       "high": "Tinggi",

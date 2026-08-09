@@ -1972,21 +1972,28 @@
     "costHeavy": "Mabigat",
     "costModerate": "Moderado",
     "costLight": "Liwanag",
-    "currentExclusions": "Kasalungat na pag-Exclude",
-    "noExclusions": "Walang mga eksklusyon na nakakonfigura sa analysis_options.yaml",
-    "recommendations": "Rekomendadong pag-iexclude",
-    "noRecommendations": "Walang mga rekomendasyon sa eksklusyon — ang workspace ay nangangahulugan na maayos na scope",
+    "exclusions": "Pang-exclude",
+    "noExclusions": "Walang mga pag-ihiin ginawa o inirerekomenda — ang workspace ay nangangahulugan na maayos na naka-target.",
     "applyAll": "Pangalawang Paggamit: Ang lahat ng mga patakaran ay dapat i-apply.",
     "applySelected": "Pangkatin ang napiling",
     "apply": "Pangkatin",
     "remove": "Alisin ang alisan ng pag-alis",
     "selectAll": "Piliin lahat",
     "defaultLabel": "Karaniwan",
+    "sortHint": "Click para sort",
+    "previewToggle": "Silipin",
+    "previewLine": "Silipin ang eksaktong linya na idadagdag",
+    "previewApprox": "Pangkalahatan — ang tamang pag-ayos ng indentation at pag-iimbita ng komento ay sumasalungat sa iyong file kapag inilapat",
     "col": {
+      "status": "Ang mga sumusunod ay ang status ng isang kumpanya.",
       "pattern": "Pattern",
       "files": "Mga file ng mga file.",
       "cost": "Est. gastos",
       "priority": "Prioridad"
+    },
+    "status": {
+      "applied": "Napalagay",
+      "recommended": "Rekomendado"
     },
     "priority": {
       "high": "Mataas",

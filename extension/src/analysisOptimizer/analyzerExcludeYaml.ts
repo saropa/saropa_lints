@@ -13,19 +13,22 @@ export function readAnalyzerExcludes(root: string): string[] {
 }
 
 /**
- * Strips an inline `# comment` and any leading/trailing quote characters from
- * a raw YAML list-item value. Handles the common hand-edited case where a
- * pattern was typed as an unquoted scalar but still closed with a trailing
- * quote out of habit: an unquoted scalar followed by `" # comment` is, per
- * YAML's rules, a literal value ending in a stray quote character, followed
- * by a comment — without stripping that, the value never string-equals the
- * clean pattern the optimizer generates, so an already-excluded pattern
- * looks unrecognized and gets re-added as a duplicate on the next write.
+ * Splits a raw YAML list-item value into its clean pattern and its inline
+ * comment (if any), stripping quote characters from the pattern.
+ *
+ * Handles the common hand-edited case where a pattern was typed as an
+ * unquoted scalar but still closed with a trailing quote out of habit: an
+ * unquoted scalar followed by `" # comment` is, per YAML's rules, a literal
+ * value ending in a stray quote character, followed by a comment — without
+ * stripping that, the value never string-equals the clean pattern the
+ * optimizer generates, so an already-excluded pattern looks unrecognized and
+ * gets re-added as a duplicate on the next write.
  */
-function cleanExcludeValue(raw: string): string {
+function splitPatternAndComment(raw: string): { pattern: string; comment: string } {
   // YAML only starts a comment at a `#` preceded by whitespace, so this is
   // safe even though glob patterns can't contain `#` themselves.
   const commentIdx = raw.search(/\s#/);
+  const comment = commentIdx >= 0 ? raw.slice(commentIdx).trim() : '';
   let value = (commentIdx >= 0 ? raw.slice(0, commentIdx) : raw).trim();
   if ((value.startsWith('"') && value.endsWith('"') && value.length >= 2)
     || (value.startsWith("'") && value.endsWith("'") && value.length >= 2)) {
@@ -34,13 +37,27 @@ function cleanExcludeValue(raw: string): string {
     if (value.startsWith('"') || value.startsWith("'")) value = value.slice(1);
     if (value.endsWith('"') || value.endsWith("'")) value = value.slice(0, -1);
   }
-  return value.trim();
+  return { pattern: value.trim(), comment };
+}
+
+/**
+ * Double-quotes a pattern for YAML output, escaping backslashes and quotes.
+ * Every written pattern is quoted unconditionally — glob patterns routinely
+ * start with a double star, and an UNQUOTED scalar starting with `*` is YAML
+ * alias syntax (a reference to an anchor), not a literal string. An unquoted
+ * double-star glob is invalid YAML ("Undefined alias") the moment a real
+ * parser reads it, even though this module's own line-scanner is lenient
+ * enough to read it back. Quoting sidesteps every other YAML indicator
+ * character (`&`, `!`, `|`, `>`, `%`, `@`, leading `-`/`?`/`:`) too.
+ */
+function quoteYamlPattern(pattern: string): string {
+  return `"${pattern.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`;
 }
 
 interface ExcludeLine {
   pattern: string;
-  /** Raw text after `- `, comment and stray quoting intact, for write-back preservation. */
-  raw: string;
+  /** Trailing `# comment` text, verbatim, or '' if the entry has none. */
+  comment: string;
 }
 
 /** Locates the `analyzer: exclude:` block and returns its list items in file order, raw. */
@@ -94,7 +111,7 @@ function findExcludeLines(lines: string[]): {
           .split(',')
           .map(item => item.trim())
           .filter(item => item.length > 0)
-          .map(item => ({ pattern: cleanExcludeValue(item), raw: item }));
+          .map(item => splitPatternAndComment(item));
         return result;
       }
       result.excludeStart = i;
@@ -110,7 +127,7 @@ function findExcludeLines(lines: string[]): {
       }
       const match = stripped.match(/^\s+-\s+(.+)/);
       if (match) {
-        result.items.push({ pattern: cleanExcludeValue(match[1]), raw: match[1].trim() });
+        result.items.push(splitPatternAndComment(match[1]));
       }
     }
   }
@@ -187,20 +204,27 @@ function replaceOrInsertExcludes(
   const found = findExcludeLines(lines);
 
   if (found.analyzerIdx >= 0) {
-    // Reuse each pattern's original raw line (comment and all) where one
-    // exists, so applying a new exclusion doesn't wipe out the user's
-    // hand-written explanations for every other entry in the block.
-    const rawByPattern = new Map<string, string>();
+    // Reuse each pattern's original comment where one exists, so applying a
+    // new exclusion doesn't wipe out the user's hand-written explanations for
+    // every other entry in the block. The pattern itself is always re-quoted
+    // (see quoteYamlPattern) rather than preserved verbatim — an existing
+    // entry may be exactly the malformed unquoted-`**` form that caused the
+    // parse error in the first place, and blindly preserving it would leave
+    // that error in place forever.
+    const commentByPattern = new Map<string, string>();
     for (const item of found.inlineItems ?? found.items) {
-      if (item.pattern && !rawByPattern.has(item.pattern)) {
-        rawByPattern.set(item.pattern, item.raw);
+      if (item.pattern && !commentByPattern.has(item.pattern)) {
+        commentByPattern.set(item.pattern, item.comment);
       }
     }
 
     const indentUnit = found.indentUnit;
     const excludeBlock = patterns.length > 0
       ? `${indentUnit}exclude:\n${patterns
-        .map(p => `${indentUnit}${indentUnit}- ${rawByPattern.get(p) ?? p}`)
+        .map((p) => {
+          const comment = commentByPattern.get(p);
+          return `${indentUnit}${indentUnit}- ${quoteYamlPattern(p)}${comment ? ` ${comment}` : ''}`;
+        })
         .join('\n')}`
       : `${indentUnit}exclude: []`;
 
@@ -211,7 +235,7 @@ function replaceOrInsertExcludes(
     }
   } else {
     const excludeBlock = patterns.length > 0
-      ? `  exclude:\n${patterns.map(p => `    - ${p}`).join('\n')}`
+      ? `  exclude:\n${patterns.map(p => `    - ${quoteYamlPattern(p)}`).join('\n')}`
       : '  exclude: []';
     lines.unshift(`analyzer:\n${excludeBlock}`, '');
   }

@@ -1972,21 +1972,28 @@
     "costHeavy": "Mfumo wa kifedha",
     "costModerate": "Wastani",
     "costLight": "Mwanga",
-    "currentExclusions": "Exclusions ya sasa",
-    "noExclusions": "Hakikisha kuzalishia kwa analysis_options.yaml",
-    "recommendations": "Matokeo ya kushinda mazungumzaji",
-    "noRecommendations": "Hakuna matokeo ya kusimamia — workspace inaonekani kwa makosa yoyote",
+    "exclusions": "Matokeo ya kusimamia",
+    "noExclusions": "Hakuna vitendo vya kufuta au vya kuchapisha — workspace inaonekani kwa makosa yoyote ya kutosha",
     "applyAll": "Tuma kila",
     "applySelected": "Tuma matokeo ya kuchagua",
     "apply": "Tuma",
     "remove": "Remove remove Kuondoa",
     "selectAll": "Chagua wote",
     "defaultLabel": "Mfumo wa Kati",
+    "sortHint": "Bofya ili kupanga",
+    "previewToggle": "Hakiki",
+    "previewLine": "Tazama linia ya kwanza ambayo inaonekana kuzalishwa",
+    "previewApprox": "Moto ya kati — kuzunguka kati kati na kuzunguka kwa kutoa kati kati kama inapakia kwenye faili wako",
     "col": {
+      "status": "Hali ya hali ya hali Status Status",
       "pattern": "Patterna",
       "files": "Files files faili.",
       "cost": "Sisimua ya kati",
       "priority": "Unganisho"
+    },
+    "status": {
+      "applied": "Kati ya kujaribu",
+      "recommended": "Mazungumzo ya kuchapisha"
     },
     "priority": {
       "high": "Kubadilisha",

@@ -66,8 +66,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+This release fixes the Analysis Optimizer's exclusion detection, which previously missed patterns already present in analysis_options.yaml and duplicated them on apply. The dashboard's two separate exclusion lists are now one sortable table with clearer status and impact indicators, plus a quick line preview before applying. [log](https://github.com/saropa/saropa_lints/blob/v14.5.3/CHANGELOG.md)
+
 ### Fixed (Extension)
 
+- **Analysis Optimizer could write invalid YAML that broke Dart analysis entirely** — an unquoted exclude pattern starting with `**` (routine for Dart globs) is YAML alias syntax, not a literal string, and caused a real `Undefined alias` parse error the moment the analyzer read the file. Every written pattern is now quoted, and previously-malformed unquoted entries are automatically re-quoted the next time any change is applied through the dashboard. No action required.
 - **Analysis Optimizer failed to detect existing exclusions** — patterns with an inline `# comment` or a stray trailing quote (`- **/*.g.dart" # ...`) were never recognized as already excluded, so the dashboard kept recommending them and applying created a duplicate line. The reader now strips comments and malformed quoting before comparing, and the writer preserves each pattern's original comment on write. No action required.
 - **Analysis Optimizer's "Current exclusions" and "Recommended exclusions" are now one deduplicated "Exclusions" table**, with an Applied/Recommended status column, sortable columns, and the chosen sort order preserved across Apply/Remove actions. No action required.
 - An already-applied Analysis Optimizer exclusion that matches zero scanned Dart files (e.g. a non-Dart tool reference) now shows a dash and an explanatory reason instead of a misleading "0". No action required.

@@ -1972,21 +1972,28 @@
     "costHeavy": "หนัก",
     "costModerate": "ระดับปานกลาง",
     "costLight": "แสง",
-    "currentExclusions": "การยกเว้นปัจจุบัน",
-    "noExclusions": "ไม่มีการตั้งค่าการยกเว้นใน analysis_options.yaml",
-    "recommendations": "การยกเว้นที่แนะนำ",
-    "noRecommendations": "ไม่มีคำแนะนำในการยกเว้น — งานที่ทำงานนี้ได้รับการกำหนดขอบเขตอย่างดีแล้ว",
+    "exclusions": "การยกเว้น",
+    "noExclusions": "ไม่มีการยกเว้นใด ๆ ที่ใช้หรือแนะนำ — โครงการทำงานได้ดีอยู่แล้ว",
     "applyAll": "ใช้ทุกข้อ",
     "applySelected": "ใช้การเลือก",
     "apply": "ใช้",
     "remove": "Remove remove ถอดออก",
     "selectAll": "เลือกทั้งหมด",
     "defaultLabel": "ค่าเริ่มต้น",
+    "sortHint": "คลิกเพื่อเรียงลำดับ",
+    "previewToggle": "ตัวอย่าง",
+    "previewLine": "แสดงบรรทัดที่จะถูกเพิ่มขึ้นอย่างแน่นอน",
+    "previewApprox": "ประมาณ — การย่อหน้าและตำแหน่งของคอมเมนต์ตรงกับไฟล์ของคุณเมื่อใช้งาน",
     "col": {
+      "status": "สถานะ Status ฐานะ",
       "pattern": "รูปแบบ",
       "files": "ไฟล์ไฟล์ File",
       "cost": "ค่าใช้จ่ายประมาณ",
       "priority": "ลำดับความสำคัญ"
+    },
+    "status": {
+      "applied": "ใช้แล้ว",
+      "recommended": "แนะนำ"
     },
     "priority": {
       "high": "สูง",

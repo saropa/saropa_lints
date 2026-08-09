@@ -1972,21 +1972,28 @@
     "costHeavy": "سنگین",
     "costModerate": "متوسط",
     "costLight": "نور",
-    "currentExclusions": "محدودیت‌های جاری",
-    "noExclusions": "هیچ استثنا ایجاد شده است در analysis_options.yaml",
-    "recommendations": "نکات استثناء پیشنهادی",
-    "noRecommendations": "هیچ پیشنهادی برای استثناء وجود ندارد — فضا کار به طور کامل مشخص شده است",
+    "exclusions": "استثنا ها",
+    "noExclusions": "هیچ استثناء اعمال یا توصیه نشده است — فضای کاری قبلاً به خوبی مشخص شده است",
     "applyAll": "همه را اعمال کنید",
     "applySelected": "اعمال انتخاب شده",
     "apply": "اعمال",
     "remove": "حذف remove از بین بردن",
     "selectAll": "همه را انتخاب کنید",
     "defaultLabel": "پیش‌فرض",
+    "sortHint": "کلیک کنید تا مرتب کنید",
+    "previewToggle": "پیش نمایش",
+    "previewLine": "خط دقیقی که افزوده می‌شود را پیش نمایش دهید",
+    "previewApprox": "تقریبی — ترکیب دقیق ا-indentation و قرار گیری نظریه ها با فایل شما هنگام اعمال مطابقت دارد",
     "col": {
+      "status": "وضعیت Status موقعیت وضعیت",
       "pattern": "ال mẫu",
       "files": "فایل ها و فایلها",
       "cost": "هزینه تخمینی",
       "priority": "اولویت"
+    },
+    "status": {
+      "applied": "اعمال شده",
+      "recommended": "توصیه شده"
     },
     "priority": {
       "high": "بالا",

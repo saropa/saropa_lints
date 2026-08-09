@@ -1972,21 +1972,28 @@
     "costHeavy": "كثيرة",
     "costModerate": "متوسط",
     "costLight": "خفيف",
-    "currentExclusions": "الاستثناءات الحالية",
-    "noExclusions": "لا توجد استثناءات مُحدَّدة في analysis_options.yaml",
-    "recommendations": "الاستثناءات المقترحة",
-    "noRecommendations": "لا توصيات بخصوص الاستثناء — الفضاء العمل مُحدد بالفعل بشكل جيد",
+    "exclusions": "الاستثناءات",
+    "noExclusions": "لا توجد استثناءات مطبقة أو موصى بها — الفضاء العمل هو بالفعل محدد جيدًا",
     "applyAll": "تطبيق جميع",
     "applySelected": "تطبيق المحدد",
     "apply": "تطبيق",
     "remove": "إزالة Remove إزالت remove",
     "selectAll": "اختر كلها",
     "defaultLabel": "الافتراضي",
+    "sortHint": "اضغط للترتيب",
+    "previewToggle": "معاينة",
+    "previewLine": "معاينة السطر المحدد الذي سيتم إضافته",
+    "previewApprox": "تقريبية — تطابق التخفيض الدقيق والوضع المعلمة مع ملفك عندما تُطبق",
     "col": {
+      "status": "الوضع الحالي Status",
       "pattern": "نمط",
       "files": "ملفات الملفات.",
       "cost": "التكاليف المقدرة",
       "priority": "ال우선순위"
+    },
+    "status": {
+      "applied": "التطبيق",
+      "recommended": "مُوصى به"
     },
     "priority": {
       "high": "عالي",
