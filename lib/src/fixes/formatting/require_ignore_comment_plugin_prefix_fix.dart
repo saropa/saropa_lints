@@ -58,11 +58,7 @@ class RequireIgnoreCommentPluginPrefixFix extends SaropaFixProducer {
     });
   }
 
-  static List<int>? _findInsertionsInSlice(
-    String content,
-    int start,
-    int end,
-  ) {
+  static List<int>? _findInsertionsInSlice(String content, int start, int end) {
     if (start >= end || start < 0) return null;
     final slice = content.substring(start, end);
     return _extractInsertions(slice, start);
@@ -90,8 +86,9 @@ class RequireIgnoreCommentPluginPrefixFix extends SaropaFixProducer {
       if (idx > 0) {
         final before = text.substring(0, idx);
         final lastNewline = before.lastIndexOf('\n');
-        final lineStart =
-            lastNewline >= 0 ? before.substring(lastNewline + 1) : before;
+        final lineStart = lastNewline >= 0
+            ? before.substring(lastNewline + 1)
+            : before;
         if (lineStart.trimLeft().isNotEmpty) continue;
       }
 

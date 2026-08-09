@@ -1174,8 +1174,7 @@ class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
         'a saropa_lints rule without the required saropa_lints/ prefix — the '
         'IDE and analyzer will not suppress this diagnostic. Prefix each '
         'saropa_lints rule name with saropa_lints/ so the suppression works.',
-    correctionMessage:
-        'Add the saropa_lints/ prefix before the rule name.',
+    correctionMessage: 'Add the saropa_lints/ prefix before the rule name.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -1205,10 +1204,7 @@ class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
     });
   }
 
-  void _checkPrecedingComments(
-    Token token,
-    SaropaDiagnosticReporter reporter,
-  ) {
+  void _checkPrecedingComments(Token token, SaropaDiagnosticReporter reporter) {
     Token? comment = token.precedingComments;
     while (comment != null) {
       final String lexeme = comment.lexeme;
@@ -1230,8 +1226,9 @@ class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
 
   bool _hasBareRuleName(String ruleList) {
     final trailingComment = ruleList.indexOf('--');
-    final effective =
-        trailingComment >= 0 ? ruleList.substring(0, trailingComment) : ruleList;
+    final effective = trailingComment >= 0
+        ? ruleList.substring(0, trailingComment)
+        : ruleList;
 
     for (final part in effective.split(',')) {
       final name = part.trim();

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2333,
+  "ruleCount": 2334,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -29937,6 +29937,21 @@
       "tags": [
         "flutter",
         "ui"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "require_ignore_comment_plugin_prefix": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "convention"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
