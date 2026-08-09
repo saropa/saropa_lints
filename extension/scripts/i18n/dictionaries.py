@@ -92,8 +92,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Later": "Later",
         # Manual: MT returned English unchanged; "Gemiddeld" is the standard Dutch for medium priority.
         "Medium": "Gemiddeld",
-        # Curated passthrough: Dutch imperative "Open" is identical to English; file name is untranslatable.
-        "Open analysis_options.yaml": "Open analysis_options.yaml",
+        # Manual: verb-final Dutch order, matching the sibling "Saropa Lints: Open pubspec.yaml" -> "... pubspec.yaml openen" entry.
+        "Open analysis_options.yaml": "analysis_options.yaml openen",
         "OWASP": "OWASP",
         "Open pubspec.yaml": "Open pubspec.yaml",
         "Recent": "Recent",
@@ -1290,8 +1290,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "OWASP": "OWASP",
         "Open Source Folder": "Buksan ang Source Folder",
         "Package": "Package",
-        # Manual: MT returned English unchanged; "Padron" is the standard Filipino for a pattern/template.
-        "Pattern": "Padron",
+        # Curated passthrough: this locale already keeps "pattern" as an English loanword for the same file-pattern-cost feature (see "{count} file pattern(s)" -> "{count} na file pattern"); translating this column header to "Padron" would be inconsistent.
+        "Pattern": "Pattern",
         "Package Health": "Package Health",
         "Package Vibrancy": "Package Vibrancy",
         "Preset": "Preset",

@@ -1954,7 +1954,7 @@
     "scanButton": "Scan Werkruimte",
     "rescanButton": "Opnieuw scannen",
     "scanning": "Werkruimte scannen…",
-    "openConfig": "Open analysis_options.yaml",
+    "openConfig": "analysis_options.yaml openen",
     "lastScan": "Laatste scan: {time}",
     "sidebar": {
       "label": "Analyse Optimaliseer",
@@ -1990,7 +1990,7 @@
     },
     "priority": {
       "high": "Hoog",
-      "medium": "Medium",
+      "medium": "Gemiddeld",
       "low": "Laag"
     },
     "activeFilesWarning": "Deze map bevat recent gewijzigde bestanden",
