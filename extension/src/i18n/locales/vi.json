@@ -2008,7 +2008,8 @@
       "generated": "Mã nguồn được sinh ra (*.g.dart, *.freezed.dart, v.v.) có thể an toàn để loại trừ — nó luôn được tái sinh từ mã nguồn gốc.",
       "build": "Build output (build/, .dart_tool/) chứa các sản phẩm trung gian không cần thiết cho phân tích trực tiếp.",
       "inactive": "Các thư mục không có hoạt động git gần đây có thể chứa mã chết hoặc đã lưu trữ.",
-      "protected": "Các thư mục nguồn chính (lib/, lib/src/, bin/) không bao giờ được khuyến nghị để loại trừ."
+      "protected": "Các thư mục nguồn chính (lib/, lib/src/, bin/) không bao giờ được khuyến nghị để loại trừ.",
+      "backup": "Một bản sao của analysis_options.yaml được lưu dưới dạng analysis_options.yaml.bak trước mỗi lần thay đổi được thực hiện ở đây."
     },
     "notify": {
       "applied": "Đã áp dụng mẫu loại trừ {count} cho analysis_options.yaml",

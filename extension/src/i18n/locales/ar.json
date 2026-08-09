@@ -2008,7 +2008,8 @@
       "generated": "الكود المُولد (*.g.dart، *.freezed.dart، إلخ) آمن إستبعاده — فإنه يتم إعادة إنتاجه دائمًا من المصدر.",
       "build": "تُنتج المخرجات (build/, .dart_tool/) أجهزة وسط غير مطلوبة لتحليل الوقت الحقيقي.",
       "inactive": "المجلدات التي لا تحتوي على نشاط git حديث قد تحتوي على كود ميت أو محفوظ.",
-      "protected": "المجلدات المصدرية الأساسية (lib/، lib/src/، bin/) لا يُنصح بتجاهلهما أبداً."
+      "protected": "المجلدات المصدرية الأساسية (lib/، lib/src/، bin/) لا يُنصح بتجاهلهما أبداً.",
+      "backup": "نسخة من analysis_options.yaml تم حفظها كـ analysis_options.yaml.bak قبل كل تغيير يتم هنا."
     },
     "notify": {
       "applied": "تم تطبيق نمط استثناء {count} على analysis_options.yaml",

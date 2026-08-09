@@ -2008,7 +2008,8 @@
       "generated": "Oluşturulan kod (*.g.dart, *.freezed.dart vb.) hariç tutulabilir — her zaman kaynaklardan yeniden oluşturulur.",
       "build": "Derleme çıktısı (build/, .dart_tool/) canlı analiz için gerekli olmayan geçici ürünler içerir.",
       "inactive": "Son git etkinliği olmayan klasörler, ölü veya arşivlenmiş kod içerebilir.",
-      "protected": "Temel kaynak klasörler (lib/, lib/src/, bin/) hariç tutulmamalıdır."
+      "protected": "Temel kaynak klasörler (lib/, lib/src/, bin/) hariç tutulmamalıdır.",
+      "backup": "Bu yerde yapılan her değişiklikten önce analysis_options.yaml bir kopyası analysis_options.yaml.bak olarak kaydedilir."
     },
     "notify": {
       "applied": "Uygulanan {count} dışlama deseni(leri) analysis_options.yaml",

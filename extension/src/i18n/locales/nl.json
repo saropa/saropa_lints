@@ -2008,7 +2008,8 @@
       "generated": "Genereerde code (*.g.dart, *.freezed.dart, etc.) is veilig om te uitsluiten — het wordt altijd opnieuw gegenereerd vanuit de bron.",
       "build": "Build output (build/, .dart_tool/) bevat tussentijdse artikelen die niet nodig zijn voor live analyse.",
       "inactive": "Mappen zonder recente git-activiteit kunnen dood of gearchiveerde code bevatten.",
-      "protected": "Strict Regels:\n1. Kern bronmappen (lib/, lib/src/, bin/) worden nooit aanbevolen voor uitsluiting."
+      "protected": "Strict Regels:\n1. Kern bronmappen (lib/, lib/src/, bin/) worden nooit aanbevolen voor uitsluiting.",
+      "backup": "Een kopie van analysis_options.yaml wordt opgeslagen als analysis_options.yaml.bak voor elke wijziging die hier wordt gemaakt."
     },
     "notify": {
       "applied": "Toepasselijke {count} uitsluitingspatroon(s) op analysis_options.yaml",

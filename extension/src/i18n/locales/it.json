@@ -2008,7 +2008,8 @@
       "generated": "Il codice generato (*.g.dart, *.freezed.dart, ecc.) è sicuro da escludere — viene sempre rigenerato dalle sorgenti.",
       "build": "Output della compilazione (build/, .dart_tool/) contiene artefatti intermedi non necessari per l'analisi in tempo reale.",
       "inactive": "Cartelle senza attività git recenti potrebbero contenere codice morto o archiviato.",
-      "protected": "Cartelle di origine principale (lib/, lib/src/, bin/) non sono mai consigliate per l'esclusione."
+      "protected": "Cartelle di origine principale (lib/, lib/src/, bin/) non sono mai consigliate per l'esclusione.",
+      "backup": "Una copia di analysis_options.yaml è salvata come analysis_options.yaml.bak prima di ogni modifica effettuata qui."
     },
     "notify": {
       "applied": "Patternes di esclusione {count} applicati a analysis_options.yaml",

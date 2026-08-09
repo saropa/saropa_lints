@@ -702,27 +702,45 @@ def maybe_bump_for_tag_clash(
         f"Bumping to {next_version} and promoting top CHANGELOG section."
     )
     set_version_in_pubspec(pubspec_path, next_version)
-    promoted_from = _promote_top_section_to_version(
-        changelog_path, version_to_sync, next_version,
-    )
-    if promoted_from is None:
-        # Refuse to insert a stub — the top section is something the script
-        # can't safely repurpose (e.g. a manually-edited future version or
-        # no version section at all). The user must add real [next_version]
-        # notes by hand so the .vsix filename matches the CHANGELOG.
-        exit_with_error(
-            f"Cannot publish [{next_version}]: top CHANGELOG section is "
-            f"neither [{version_to_sync}] nor [Unreleased], so the script "
-            f"won't auto-rename it. The published version, .vsix filename, "
-            f"and top CHANGELOG section MUST be in sync. Manually add a "
-            f"[{next_version}] section above the current top section with "
-            f"real release notes, then re-run.",
-            ExitCode.CHANGELOG_FAILED,
+    while True:
+        promoted_from = _promote_top_section_to_version(
+            changelog_path, version_to_sync, next_version,
         )
-    print_success(
-        f"Updated pubspec.yaml to {next_version} and renamed top CHANGELOG "
-        f"section [{promoted_from}] → [{next_version}]."
-    )
+        if promoted_from is not None:
+            break
+        # The top section is something the script can't safely repurpose.
+        # Let the user fix it in-place instead of killing the whole run.
+        print_warning(
+            f"Cannot publish [{next_version}]: top CHANGELOG section is "
+            f"neither [{version_to_sync}] nor [Unreleased] nor "
+            f"[{next_version}], so the script won't auto-rename it. "
+            f"The published version, .vsix filename, and top CHANGELOG "
+            f"section MUST be in sync."
+        )
+        print_colored(
+            f"  Fix CHANGELOG.md now (add or rename the top section to "
+            f"[{next_version}]), then press Enter to retry — or type "
+            f"'q' to abort.",
+            Color.CYAN,
+        )
+        try:
+            response = input("  ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            response = "q"
+        if response == "q":
+            exit_with_error(
+                "Aborted by user.", ExitCode.CHANGELOG_FAILED,
+            )
+    if promoted_from == next_version:
+        print_success(
+            f"Updated pubspec.yaml to {next_version} (CHANGELOG already "
+            f"has [{next_version}])."
+        )
+    else:
+        print_success(
+            f"Updated pubspec.yaml to {next_version} and renamed top "
+            f"CHANGELOG section [{promoted_from}] → [{next_version}]."
+        )
     return next_version
 
 
@@ -732,8 +750,9 @@ def _promote_top_section_to_version(
     """Rename the top `## [X]` heading to `## [next_version]` when X is the
     expected colliding version or [Unreleased].
 
-    Returns the original heading label on success, None when the top section
-    is something else (caller should abort rather than guess).
+    Returns the original heading label on success (or ``next_version`` itself
+    when the section already carries that version — no file write needed),
+    None when the top section is something else (caller should retry or abort).
     """
     content = changelog_path.read_text(encoding="utf-8")
     # Match the first ## [...] heading anywhere in the file — there are no
@@ -743,10 +762,12 @@ def _promote_top_section_to_version(
     if not match:
         return None
     label = match.group(1)
+    if label == next_version:
+        return label
     if label != expected_version and label != "Unreleased":
         return None
-    # Refuse if the target version already has its own section — caller's
-    # abort path is safer than silently merging two histories.
+    # Refuse if the target version already has its own *separate* section —
+    # silently merging two histories is unsafe.
     if re.search(rf"## \[{re.escape(next_version)}\]", content):
         return None
     new_content = (

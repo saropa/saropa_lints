@@ -2008,7 +2008,8 @@
       "generated": "קוד שנוצר אוטומטית (*.g.dart, *.freezed.dart וכו') ניתן לשלוח אותו — הוא תמיד נוצר מחדש מהקוד המקור.",
       "build": "הפלט של הבנייה (build/, .dart_tool/) מכיל אрטייקטים עת过ים שאינם נדרשים לניתוח בזמן אמת.",
       "inactive": "תיקיות ללא פעילות git עדכנית עשויות להכיל קוד מת או מאrchיב.",
-      "protected": "תיקיות המקור הראשיות (lib/, lib/src/, bin/) אינן מומלצות להשממה."
+      "protected": "תיקיות המקור הראשיות (lib/, lib/src/, bin/) אינן מומלצות להשממה.",
+      "backup": "העתקה של analysis_options.yaml נשמרת כ analysis_options.yaml.bak לפני כל שינוי שנעשה כאן."
     },
     "notify": {
       "applied": "התבנית (ות) של {count} של איסור הופקה ל analysis_options.yaml",

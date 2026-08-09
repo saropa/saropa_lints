@@ -2008,7 +2008,8 @@
       "generated": "Generierter Code (*.g.dart, *.freezed.dart, etc.) kann sicher ausgeschlossen werden – er wird immer aus den Quellen wiedergegeneriert.",
       "build": "Build-Ausgabe (build/, .dart_tool/) enthält Zwischenergebnisse, die für die Live-Analyse nicht benötigt werden.",
       "inactive": "Ordner mit keiner kürzlichen Git-Aktivität können tote oder archivierte Code enthalten.",
-      "protected": "Strenge Regeln:  \n1. Übersetzen Sie lediglich den Text.  \n2. Erklärungen, Einführung, Markdown-Notation oder Anführungszeichen sind nicht erlaubt.  \n3. Der Text kann Platzhalter enthalten: Platzhalter. Kopieren Sie jeden Platzhalter exakt so, wie er geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals einen Platzhalter.  \n4. Die Ausgabe muss das richtige Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.  \n\nText: Core-Quellordner (lib/, lib/src/, bin/) werden nie empfohlen, auszuschließen."
+      "protected": "Strenge Regeln:  \n1. Übersetzen Sie lediglich den Text.  \n2. Erklärungen, Einführung, Markdown-Notation oder Anführungszeichen sind nicht erlaubt.  \n3. Der Text kann Platzhalter enthalten: Platzhalter. Kopieren Sie jeden Platzhalter exakt so, wie er geschrieben ist, in die grammatikalisch richtige Position. Übersetzen, entfernen oder umbenennen Sie niemals einen Platzhalter.  \n4. Die Ausgabe muss das richtige Schreibsystem für die Zielsprache verwenden; wechseln Sie nicht mitten im Satz zu einer anderen Sprache.  \n\nText: Core-Quellordner (lib/, lib/src/, bin/) werden nie empfohlen, auszuschließen.",
+      "backup": "Eine Kopie von analysis_options.yaml wird vor jeder Änderung hier als analysis_options.yaml.bak gespeichert."
     },
     "notify": {
       "applied": "Zur Anwendung gebracht wird das Muster {count} zur Ausschluss von analysis_options.yaml",

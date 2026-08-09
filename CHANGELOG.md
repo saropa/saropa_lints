@@ -64,7 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-### [Unreleased]
+## [14.5.5]
+
+The Analysis Optimizer now makes changes safely: it surgically updates only the patterns you're modifying while preserving your file structure, comments, and ordering, and backs up your configuration before every write for easy manual recovery. The dashboard excludes redundant recommendations when patterns are already covered and automatically rescans to keep the status current. [log](https://github.com/saropa/saropa_lints/blob/v14.5.5/CHANGELOG.md)
 
 ### Fixed (Extension)
 

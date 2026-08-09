@@ -2008,7 +2008,8 @@
       "generated": "Le code généré (*.g.dart, *.freezed.dart, etc.) est sûr d'être exclu — il est toujours régénéré à partir des sources.",
       "build": "Sortie de construction (build/, .dart_tool/) contient des artefacts intermédiaires non nécessaires pour l'analyse en temps réel.",
       "inactive": "Les dossiers sans activité git récente peuvent contenir du code mort ou archivé.",
-      "protected": "Règles strictes :\n1. Les dossiers sources principaux (lib/, lib/src/, bin/) ne sont jamais recommandés pour être exclus."
+      "protected": "Règles strictes :\n1. Les dossiers sources principaux (lib/, lib/src/, bin/) ne sont jamais recommandés pour être exclus.",
+      "backup": "Une copie de analysis_options.yaml est sauvegardée sous le nom de analysis_options.yaml.bak avant chaque modification effectuée ici."
     },
     "notify": {
       "applied": "Modèle(s) d'exclusion {count} appliqué(s) à analysis_options.yaml",

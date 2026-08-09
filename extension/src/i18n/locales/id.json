@@ -2008,7 +2008,8 @@
       "generated": "Kode yang dihasilkan (*.g.dart, *.freezed.dart, dll.) aman untuk dikecualikan — selalu dihasilkan kembali dari sumber.",
       "build": "Build output (build/, .dart_tool/) mengandung artefak sementara yang tidak diperlukan untuk analisis langsung.",
       "inactive": "Folder yang tidak memiliki aktivitas git baru mungkin berisi kode yang mati atau arsip.",
-      "protected": "Folder sumber inti (lib/, lib/src/, bin/) tidak pernah direkomendasikan untuk dikecualikan."
+      "protected": "Folder sumber inti (lib/, lib/src/, bin/) tidak pernah direkomendasikan untuk dikecualikan.",
+      "backup": "Salinan analysis_options.yaml disimpan sebagai analysis_options.yaml.bak sebelum setiap perubahan yang dilakukan di sini."
     },
     "notify": {
       "applied": "Pola pengecualian {count} diterapkan ke analysis_options.yaml",

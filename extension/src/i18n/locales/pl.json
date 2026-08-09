@@ -2008,7 +2008,8 @@
       "generated": "Kod wygenerowany (*.g.dart, *.freezed.dart, itp.) można bezpiecznie wykluczyć — zawsze jest ponownie wygenerowany z źródeł.",
       "build": "Wynik kompilacji (build/, .dart_tool/) zawiera pośrednie artefakty niepotrzebne do analizy w czasie rzeczywistym.",
       "inactive": "Foldery bez ostatniej aktywności w git mogą zawierać martwe lub archiwizowane kod.",
-      "protected": "Kluczowe foldery źródłowe (lib/, lib/src/, bin/) nigdy nie zaleca się wyklucia."
+      "protected": "Kluczowe foldery źródłowe (lib/, lib/src/, bin/) nigdy nie zaleca się wyklucia.",
+      "backup": "Kopia analysis_options.yaml jest zapisywana jako analysis_options.yaml.bak przed każdą zmianą dokonaną tutaj."
     },
     "notify": {
       "applied": "Zastosowano wzorzec(wzorce) wykluczenia {count} do analysis_options.yaml",

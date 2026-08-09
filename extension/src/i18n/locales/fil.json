@@ -2008,7 +2008,8 @@
       "generated": "Nagawa na code (*.g.dart, *.freezed.dart, etc.) ay ligtas na i-exclude — ito ay palaging binubuo mula sa source.",
       "build": "Naglalabas ng output (build/, .dart_tool/) ang mga intermediate artifacts na hindi kinakailangan para sa live analysis.",
       "inactive": "Mga folder na walang pinakabagong git activity ay maaaring makalikha ng dead o archived code.",
-      "protected": "Ang mga pangunahing folder ng source (lib/, lib/src/, bin/) ay hindi kailanman inirerekomenda na i-exclude."
+      "protected": "Ang mga pangunahing folder ng source (lib/, lib/src/, bin/) ay hindi kailanman inirerekomenda na i-exclude.",
+      "backup": "Isang kopya ng analysis_options.yaml ay sinagot bilang analysis_options.yaml.bak bago ang bawat pagbabago dito."
     },
     "notify": {
       "applied": "Napalagay ang pattern ng pag-ihiwalay {count} sa analysis_options.yaml",

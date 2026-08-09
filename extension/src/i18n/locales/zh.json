@@ -2008,7 +2008,8 @@
       "generated": "生成的代码（*.g.dart, *.freezed.dart 等）可以安全地排除 — 它始终从源代码重新生成。",
       "build": "构建输出（build/，.dart_tool/）包含用于实时分析不需要的中间产物。",
       "inactive": "没有近期git活动的文件夹可能包含已废弃或归档的代码。",
-      "protected": "核心源码文件夹（lib/，lib/src/，bin/）不建议排除。"
+      "protected": "核心源码文件夹（lib/，lib/src/，bin/）不建议排除。",
+      "backup": "在每次此处进行更改之前，都会将analysis_options.yaml的副本保存为analysis_options.yaml.bak。"
     },
     "notify": {
       "applied": "已应用 {count} 排除模式到 analysis_options.yaml",

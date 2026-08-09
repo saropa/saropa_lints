@@ -2008,7 +2008,8 @@
       "generated": "Código gerado (*.g.dart, *.freezed.dart, etc.) é seguro para excluir — é sempre regenerado a partir da fonte.",
       "build": "Build output (build/, .dart_tool/) contém artefatos intermediários não necessários para análise em tempo real.",
       "inactive": "Pastas sem atividade git recente podem conter código morto ou arquivado.",
-      "protected": "Pastas de origem principal (lib/, lib/src/, bin/) nunca são recomendadas para exclusão."
+      "protected": "Pastas de origem principal (lib/, lib/src/, bin/) nunca são recomendadas para exclusão.",
+      "backup": "Uma cópia de analysis_options.yaml é salva como analysis_options.yaml.bak antes de qualquer alteração feita aqui."
     },
     "notify": {
       "applied": "Padrão(s) de exclusão {count} aplicado(s) a analysis_options.yaml",

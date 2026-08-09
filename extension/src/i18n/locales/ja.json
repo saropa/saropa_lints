@@ -2008,7 +2008,8 @@
       "generated": "生成されたコード（*.g.dart、*.freezed.dart など）は除外しても安全です — これは常にソースから再生成されます。",
       "build": "ビルド出力(build/, .dart_tool/)は、ライブ分析に必要なものではない中間アーティファクトを含みます。",
       "inactive": "最近のgit活動がないフォルダは、死んだコードまたはアーカイブされたコードを含んでいる可能性があります。",
-      "protected": "コアソースフォルダ(lib/, lib/src/, bin/)は常に除外を推奨しません。"
+      "protected": "コアソースフォルダ(lib/, lib/src/, bin/)は常に除外を推奨しません。",
+      "backup": "ここでの変更の前には、analysis_options.yaml のコピーが analysis_options.yaml.bak として保存されます。"
     },
     "notify": {
       "applied": "適用された {count} 排除パターンを analysis_options.yaml に",
