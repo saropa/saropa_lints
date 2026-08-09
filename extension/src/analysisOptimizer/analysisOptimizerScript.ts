@@ -15,6 +15,10 @@ export function getOptimizerScript(): string {
       vscode.postMessage({ type: 'openConfig' });
       return;
     }
+    if (target.id === 'fix-syntax-btn') {
+      vscode.postMessage({ type: 'fixSyntax' });
+      return;
+    }
     if (target.id === 'apply-all-btn') {
       vscode.postMessage({ type: 'applyAll' });
       return;

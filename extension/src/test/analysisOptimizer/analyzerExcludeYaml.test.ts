@@ -7,6 +7,8 @@ import {
   mergeExclusions,
   readAnalyzerExcludes,
   writeAnalyzerExcludes,
+  hasMalformedExcludeSyntax,
+  fixMalformedExcludeSyntax,
 } from '../../analysisOptimizer/analyzerExcludeYaml';
 
 function withTempProject(analysisOptionsContent: string, fn: (root: string) => void): void {
@@ -240,5 +242,97 @@ analyzer:
 `;
     assert.doesNotThrow(() => parseAnalyzerExcludes(yaml));
     assert.deepStrictEqual(parseAnalyzerExcludes(yaml), ['first/**']);
+  });
+
+  describe('hasMalformedExcludeSyntax / fixMalformedExcludeSyntax', () => {
+    it('detects an unquoted block-list entry starting with **', () => {
+      withTempProject('analyzer:\n  exclude:\n    - **/*.bak" # Exclude backups\n', (root) => {
+        assert.strictEqual(hasMalformedExcludeSyntax(root), true);
+      });
+    });
+
+    it('detects an unquoted flow-sequence (inline array) entry starting with **', () => {
+      withTempProject('analyzer:\n  exclude: [build/**, **/*.g.dart]\n', (root) => {
+        assert.strictEqual(hasMalformedExcludeSyntax(root), true);
+      });
+    });
+
+    it('does not flag a properly quoted exclude block', () => {
+      withTempProject('analyzer:\n  exclude:\n    - "**/*.g.dart"\n    - build/**\n', (root) => {
+        assert.strictEqual(hasMalformedExcludeSyntax(root), false);
+      });
+    });
+
+    it('does not flag an unquoted pattern that merely starts with -, ?, or : followed by more text', () => {
+      // -, ?, and : are only YAML indicators when followed by whitespace or
+      // end-of-value (block-sequence / explicit-key / mapping-value syntax).
+      // A pattern like "-legacy/**" is a perfectly valid unquoted scalar and
+      // must not be flagged, or "Fix Syntax" would offer to fix a file that
+      // was never broken.
+      withTempProject(
+        'analyzer:\n  exclude:\n    - -legacy/**\n    - :generated/**\n    - ?maybe/**\n',
+        (root) => {
+          assert.strictEqual(hasMalformedExcludeSyntax(root), false);
+        },
+      );
+    });
+
+    it('does not flag a quoted inline array', () => {
+      withTempProject('analyzer:\n  exclude: ["build/**", "**/*.g.dart"]\n', (root) => {
+        assert.strictEqual(hasMalformedExcludeSyntax(root), false);
+      });
+    });
+
+    it('returns false when there is no exclude block at all', () => {
+      withTempProject('analyzer:\n  language:\n    strict-casts: true\n', (root) => {
+        assert.strictEqual(hasMalformedExcludeSyntax(root), false);
+      });
+    });
+
+    it('returns false when analysis_options.yaml is missing', () => {
+      const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-analyzer-exclude-missing-'));
+      try {
+        assert.strictEqual(hasMalformedExcludeSyntax(root), false);
+      } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+      }
+    });
+
+    it('fixMalformedExcludeSyntax re-quotes everything and clears the malformed flag', () => {
+      withTempProject(
+        'analyzer:\n  exclude:\n    - **/*.bak" # Exclude backups\n    - **/*.g.dart\n',
+        (root) => {
+          assert.strictEqual(hasMalformedExcludeSyntax(root), true);
+          const result = fixMalformedExcludeSyntax(root);
+          assert.strictEqual(result.success, true);
+          assert.strictEqual(result.duplicatesRemoved, 0);
+          assert.strictEqual(hasMalformedExcludeSyntax(root), false);
+          assert.deepStrictEqual(readAnalyzerExcludes(root), ['**/*.bak', '**/*.g.dart']);
+        },
+      );
+    });
+
+    it('fixMalformedExcludeSyntax collapses a literal duplicate pattern to one entry and reports the count', () => {
+      withTempProject(
+        'analyzer:\n  exclude:\n    - **/*.g.dart\n    - **/*.g.dart" # Exclude generated files (frozen Isar)\n',
+        (root) => {
+          const result = fixMalformedExcludeSyntax(root);
+          assert.strictEqual(result.success, true);
+          assert.strictEqual(result.duplicatesRemoved, 1);
+          const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf8');
+          const occurrences = content.match(/\*\*\/\*\.g\.dart/g) ?? [];
+          assert.strictEqual(occurrences.length, 1);
+        },
+      );
+    });
+
+    it('fixMalformedExcludeSyntax returns success:false and no count when the file is missing', () => {
+      const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-analyzer-exclude-missing-'));
+      try {
+        assert.deepStrictEqual(fixMalformedExcludeSyntax(root), { success: false, duplicatesRemoved: 0 });
+      } finally {
+        fs.rmSync(root, { recursive: true, force: true });
+      }
+    });
   });
 });

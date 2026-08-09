@@ -11,6 +11,8 @@ import {
   mergeExclusions,
   computeAnalyzerExcludesContent,
   readAnalysisOptionsPath,
+  hasMalformedExcludeSyntax,
+  fixMalformedExcludeSyntax,
 } from './analyzerExcludeYaml';
 import { showAnalyzerExcludeDiff } from './analyzerExcludeDiffProvider';
 import { getOptimizerScript } from './analysisOptimizerScript';
@@ -77,6 +79,9 @@ export class AnalysisOptimizerWebviewProvider {
           break;
         case 'refresh':
           this._refreshExclusions();
+          break;
+        case 'fixSyntax':
+          void this._fixSyntax();
           break;
       }
     });
@@ -240,6 +245,33 @@ export class AnalysisOptimizerWebviewProvider {
     void vscode.window.showTextDocument(uri);
   }
 
+  private async _fixSyntax(): Promise<void> {
+    const root = getProjectRoot();
+    if (!root) return;
+    const { success, duplicatesRemoved } = fixMalformedExcludeSyntax(root);
+    if (success) {
+      void vscode.window.showInformationMessage(
+        duplicatesRemoved > 0
+          ? l10n('analysisOptimizer.notify.syntaxFixedWithDuplicates', { count: String(duplicatesRemoved) })
+          : l10n('analysisOptimizer.notify.syntaxFixed'),
+      );
+      this._refreshExclusions();
+    } else {
+      void vscode.window.showErrorMessage(l10n('analysisOptimizer.notify.writeFailed'));
+    }
+  }
+
+  private _buildSyntaxWarningBanner(): string {
+    const root = getProjectRoot();
+    if (!root || !hasMalformedExcludeSyntax(root)) return '';
+    return `
+<div class="syntax-warning-banner">
+  <span class="warning-badge">⚠</span>
+  <span>${escapeHtml(l10n('analysisOptimizer.syntaxWarning.message'))}</span>
+  <button class="btn btn-sm tier-1" id="fix-syntax-btn">${escapeHtml(l10n('analysisOptimizer.syntaxWarning.fixButton'))}</button>
+</div>`;
+  }
+
   private _renderPanel(): void {
     const webview = this._panel?.webview;
     if (!webview) return;
@@ -259,6 +291,7 @@ export class AnalysisOptimizerWebviewProvider {
   <h1>${escapeHtml(l10n('analysisOptimizer.title'))}</h1>
   <p class="hero-sub">${escapeHtml(l10n('analysisOptimizer.subtitle'))}</p>
 </div>
+${this._buildSyntaxWarningBanner()}
 <div class="empty-cta">
   <p>${escapeHtml(l10n('analysisOptimizer.emptyDescription'))}</p>
   <button class="btn tier-1" id="scan-btn">${escapeHtml(l10n('analysisOptimizer.scanButton'))}</button>
@@ -286,6 +319,7 @@ export class AnalysisOptimizerWebviewProvider {
   <p class="hero-sub">${escapeHtml(l10n('analysisOptimizer.subtitle'))}</p>
   <p class="hero-meta">${escapeHtml(l10n('analysisOptimizer.lastScan', { time: new Date(r.scanTimestamp).toLocaleTimeString() }))}</p>
 </div>
+${this._buildSyntaxWarningBanner()}
 
 ${this._buildKpiStrip(r, costLabel, savingsPercent, notApplied.length)}
 ${this._buildExclusionsTable(r)}
@@ -473,6 +507,9 @@ ${this._buildHints()}
 
 function getOptimizerStyles(): string {
   return `
+.syntax-warning-banner { display:flex; align-items:center; gap:10px; margin-top:12px; padding:10px 14px; border-radius:4px; background:var(--vscode-inputValidation-warningBackground, rgba(196,146,0,0.15)); border:1px solid var(--vscode-inputValidation-warningBorder, #c18401); }
+.syntax-warning-banner .btn { margin-left:auto; }
+
 .empty-cta { text-align:center; padding:48px 24px; }
 .empty-cta p { margin-bottom:24px; max-width:480px; margin-inline:auto; color:var(--vscode-descriptionForeground); }
 

@@ -1,6 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+/** Matches a flow-sequence `exclude: [a, b]` line, capturing the bracket contents. */
+const INLINE_EXCLUDE_PATTERN = /^\s+exclude\s*:\s*\[(.*)\]\s*$/;
+
 export function readAnalysisOptionsPath(root: string): string {
   return path.join(root, 'analysis_options.yaml');
 }
@@ -103,7 +106,7 @@ function findExcludeLines(lines: string[]): {
     }
 
     if (!inExclude && /^\s+exclude\s*:/.test(stripped)) {
-      const inlineMatch = stripped.match(/^\s+exclude\s*:\s*\[(.*)\]\s*$/);
+      const inlineMatch = stripped.match(INLINE_EXCLUDE_PATTERN);
       if (inlineMatch) {
         result.excludeStart = i;
         result.excludeEnd = i + 1;
@@ -149,6 +152,74 @@ export function parseAnalyzerExcludes(content: string): string[] {
     result.push(item.pattern);
   }
   return result;
+}
+
+/**
+ * True if the `analyzer: exclude:` block contains at least one list item
+ * written as an unquoted scalar starting with a YAML indicator character —
+ * the same shape that produces a real "Undefined alias" (or similar) parse
+ * error the moment the Dart analyzer reads the file, even though this
+ * module's own line-scanner reads such lines back without complaint. Used
+ * to proactively flag files with a syntax problem before the user changes
+ * any exclusion.
+ *
+ * `*`, `&`, `!`, `|`, `>`, `%`, `@` are unsafe as the first character of a
+ * plain scalar unconditionally. `-`, `?`, `:` are YAML indicators ONLY when
+ * followed by whitespace or end-of-value (`- `/`- `/`? `/`: ` are
+ * block-sequence / explicit-key / mapping-value syntax) — a pattern that
+ * merely starts with one of those characters immediately followed by more
+ * text (`-legacy/**`) is a perfectly valid unquoted scalar and must not be
+ * flagged, or "Fix Syntax" would claim to fix files that were never broken.
+ */
+export function hasMalformedExcludeSyntax(root: string): boolean {
+  const filePath = readAnalysisOptionsPath(root);
+  if (!fs.existsSync(filePath)) return false;
+  const lines = fs.readFileSync(filePath, 'utf8').split('\n');
+  const found = findExcludeLines(lines);
+  if (found.excludeStart < 0) return false;
+
+  const indicatorStart = /^[*&!|>%@]|^[-?:](\s|$)/;
+
+  if (found.inlineItems !== null) {
+    // Flow-sequence scalars (`exclude: [a, b]`) follow the same plain-scalar
+    // rules as block-list items — an unquoted `*`-leading value inside `[...]`
+    // is just as much an alias reference in YAML's flow context.
+    const inlineMatch = lines[found.excludeStart].match(INLINE_EXCLUDE_PATTERN);
+    if (!inlineMatch) return false;
+    return inlineMatch[1]
+      .split(',')
+      .map(item => item.trim())
+      .filter(item => item.length > 0)
+      .some(item => !item.startsWith('"') && !item.startsWith("'") && indicatorStart.test(item));
+  }
+
+  for (let i = found.excludeStart; i < found.excludeEnd && i < lines.length; i++) {
+    const stripped = lines[i].replace(/\r$/, '');
+    const match = stripped.match(/^\s+-\s+(.+)/);
+    if (!match) continue;
+    const rawValue = match[1].trim();
+    if (rawValue.startsWith('"') || rawValue.startsWith("'")) continue;
+    if (indicatorStart.test(rawValue)) return true;
+  }
+  return false;
+}
+
+/**
+ * Re-quotes every existing exclude pattern in place. Also collapses any
+ * literal duplicate pattern down to one entry, since `readAnalyzerExcludes`
+ * dedupes — a duplicate line is itself a symptom of the same malformed-entry
+ * class this exists to fix, so that's a feature of the fix, not a side effect.
+ * `duplicatesRemoved` lets the caller surface that count rather than silently
+ * dropping data the user might not expect to lose.
+ */
+export function fixMalformedExcludeSyntax(root: string): { success: boolean; duplicatesRemoved: number } {
+  const filePath = readAnalysisOptionsPath(root);
+  if (!fs.existsSync(filePath)) return { success: false, duplicatesRemoved: 0 };
+  const found = findExcludeLines(fs.readFileSync(filePath, 'utf8').split('\n'));
+  const rawCount = (found.inlineItems ?? found.items).filter(item => item.pattern).length;
+  const cleanPatterns = readAnalyzerExcludes(root);
+  const success = writeAnalyzerExcludes(root, cleanPatterns);
+  return { success, duplicatesRemoved: success ? Math.max(0, rawCount - cleanPatterns.length) : 0 };
 }
 
 /**

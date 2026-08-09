@@ -2013,7 +2013,13 @@
     "notify": {
       "applied": "Applied {count} exclusion pattern(s) to analysis_options.yaml",
       "removed": "Removed exclusion pattern from analysis_options.yaml",
-      "writeFailed": "Could not write to analysis_options.yaml — the file may be missing"
+      "writeFailed": "Could not write to analysis_options.yaml — the file may be missing",
+      "syntaxFixed": "Fixed invalid YAML syntax in analysis_options.yaml exclusions",
+      "syntaxFixedWithDuplicates": "Fixed invalid YAML syntax and removed {count} duplicate exclusion pattern(s)"
+    },
+    "syntaxWarning": {
+      "message": "This file has an exclude pattern written in a way that breaks the Dart analyzer (an unquoted pattern starting with * is invalid YAML).",
+      "fixButton": "Fix Syntax"
     },
     "confirmBulk": {
       "prompt": "Apply {count} exclusion patterns to analysis_options.yaml?",

@@ -78,6 +78,7 @@ This release fixes the Analysis Optimizer's exclusion detection, which previousl
 ### Added (Extension)
 
 - Each Analysis Optimizer recommendation now has a "Preview" toggle showing the approximate line that would be added to `analysis_options.yaml`, without leaving the table. No action required.
+- Analysis Optimizer now proactively warns when `analysis_options.yaml` already has invalid exclude syntax and offers a one-click "Fix Syntax" that re-quotes every entry, so a broken file can be repaired without needing to apply or remove a specific pattern first. No action required.
 
 ---
 
