@@ -122,7 +122,7 @@ class TestCheckChangelogOverview(unittest.TestCase):
         repo_root = Path(__file__).resolve().parents[3]
         changelog = repo_root / "CHANGELOG.md"
         # A real published section with a correct v-tag link passes clean.
-        self.assertEqual(self._check(changelog, "13.12.3"), [])
+        self.assertEqual(self._check(changelog, "14.5.5"), [])
 
 
 if __name__ == "__main__":
