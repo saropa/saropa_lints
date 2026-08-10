@@ -763,6 +763,10 @@ def _promote_top_section_to_version(
         return None
     label = match.group(1)
     if label == next_version:
+        # If expected_version still has its own section, this heading
+        # was NOT promoted from it — two separate histories exist.
+        if re.search(rf"## \[{re.escape(expected_version)}\]", content):
+            return None
         return label
     if label != expected_version and label != "Unreleased":
         return None
