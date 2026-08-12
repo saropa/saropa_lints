@@ -1,0 +1,23 @@
+# Plan: npm audit CI gate for the extension
+
+## Problem
+
+`extension/package-lock.json` dependencies are currently only checked by GitHub's weekly Dependabot digest (the js-yaml GHSA-5p4m-2wfm-xmqj alert on 2026-08-12 was caught this way). There is no `.github/workflows/` directory in this repo at all — no automated check runs `npm audit` on PRs that touch `extension/`, so a newly introduced vulnerable transitive dependency would not surface until the next weekly digest.
+
+## Proposal
+
+Add a new GitHub Actions workflow, `.github/workflows/npm-audit.yml`, that:
+
+- Triggers on `pull_request` (and optionally `push` to `main`) when files under `extension/**` change.
+- Runs `npm ci` in `extension/` (fails the job if the lockfile doesn't install cleanly).
+- Runs `npm audit --audit-level=high` in `extension/`, failing the job on any high/critical finding. Low/moderate findings (e.g. the current `jsdiff`/mocha DoS advisory, GHSA-73rr-hh4g-fpgx) are logged but do not block, to avoid blocking PRs on dev-tooling-only issues with no fix yet available.
+
+## Open questions before implementing
+
+- **New CI infrastructure.** This repo has no existing `.github/workflows/`, so this would be the first GitHub Actions workflow — needs explicit confirmation before creating (blast-radius: new shared infrastructure).
+- Should this also gate the root Dart package's `pubspec.yaml`/`pubspec.lock` (no Dart-side equivalent exists today), or stay scoped to the VS Code extension's npm dependencies only?
+- Audit level threshold: `high` (matches the js-yaml alert severity) vs. `moderate` (would have also caught the jsdiff advisory found during this task's verification pass).
+
+## Estimated size
+
+Small — one new workflow file, ~15-20 lines of YAML. No code changes required.

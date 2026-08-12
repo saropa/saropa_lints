@@ -64,6 +64,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+<details>
+<summary>Maintenance</summary>
+
+- Bumped `js-yaml` (extension dev dependency, via `mocha`) from 4.3.0 to 4.3.1, resolving GHSA-5p4m-2wfm-xmqj.
+
+</details>
+
+---
+
 ## [14.5.6]
 
 This release introduces a new rule to ensure lint suppression comments work correctly in your IDE. The `require_ignore_comment_plugin_prefix` rule flags ignore comments referencing saropa_lints rules that lack the required package prefix, preventing suppressions from failing silently. An automated quick fix is included to instantly apply the missing prefix. [log](https://github.com/saropa/saropa_lints/blob/v14.5.6/CHANGELOG.md)
