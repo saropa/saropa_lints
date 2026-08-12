@@ -96,6 +96,7 @@ dependencies:
   # for removal upstream:
   #   - rationale: https://github.com/dart-lang/sdk/blob/main/docs/Flutter-Pinned-Packages.md
   #   - unpin effort: https://github.com/flutter/flutter/issues/158050
+  # Re-verified 2026-08-12: Flutter stable 3.44.9 still pins meta EXACTLY 1.18.0 (checked packages/flutter/pubspec.yaml); analyzer 14.1.0 requires meta ^1.18.3 -> still unresolvable for Flutter consumers.
   #
   # ====================================================================
   # ###### HARD STOP: DO NOT bump this to analyzer ^13 (or higher) until
