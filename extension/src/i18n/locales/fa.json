@@ -1763,6 +1763,7 @@
       "actionViewViolations": "نقض دیدگاه ها View Violations",
       "noErrors": "Saropa Lints: _PH0_: = PH0__::: -پای بدون خطا!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: _PH0_: = PH0__::: -پای هیچ پوشه ای از فضای کاری باز نیست. ابتدا پروژه Dart/Flutter خود را باز کنید.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: ادغام لینت غیر فعال است. قبل از اجرای تحلیل آن را فعال کنید.",
       "pluginAlive": "Saropa Lints زنده است: {rules} قوانین فعال شده، فایل های {files} تجزیه و تحلیل شدند.",
       "openPubspecFailed": "pubspec.yaml باز نشد: {message}",
       "toggleSidebarSectionFailed": "Saropa Lints: تغییر بخش نوار کناری - {message} انجام نشد",

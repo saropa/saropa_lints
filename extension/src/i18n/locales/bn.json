@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Violations ভিউ লঙ্ঘন দেখুন",
       "noErrors": "Saropa Lints: PH0__::: -PH0_: =PH0 কোন ভুল নেই!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: PH0__::: -PH0_: =PH0 কোন ওয়ার্কস্পেস ফোল্ডার খোলা নেই। প্রথমে আপনার Dart/Flutter প্রকল্পটি খুলুন।",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: লিন্ট ইন্টিগ্রেশন অফ করা হয়েছে। বিশ্লেষণ চালানোর আগে এটি সক্রিয় করুন।",
       "pluginAlive": "Saropa Lints জীবিতঃ {rules} নিয়ম সক্ষম, {files} ফাইল বিশ্লেষণ করা হয়েছে।",
       "openPubspecFailed": "pubspec.yaml খুলতে ব্যর্থঃ {message} _ PH0__ -এর সাথে সম্পর্কিত",
       "toggleSidebarSectionFailed": "Saropa Lints: PH1__ এর সাথে সম্পর্কিতঃ সাইডবার বিভাগ টগল করতে ব্যর্থ হয়েছে  ⁇ {message} _ PH0__ -এর সাথে সম্পর্কিত",

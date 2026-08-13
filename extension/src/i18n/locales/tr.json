@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Violations İhtiyaçları ihlal edilmiştir.",
       "noErrors": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Hata yok, hata yok!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. hiçbir çalışma alanı klasörü açılmamıştır. Öncelikle Dart/Flutter projenizi açın.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: lint entegrasyonu devre dışı. Analiz çalıştırmadan önce etkinleştirin.",
       "pluginAlive": "Saropa Lints yaşıyor: {rules} kuralları etkinleştirildi, {files} dosyaları analiz edildi.",
       "openPubspecFailed": "pubspec.yaml açılamadı: {message} _PH0___ -Hepimiz birer insanız.",
       "toggleSidebarSectionFailed": "Saropa Lints: _PH1_: -HİS'in ilk aşamas yan çubuğu bölümünü geçirme başarısız oldu  ⁇ {message} _PH0___ -Hepimiz birer insanız.",

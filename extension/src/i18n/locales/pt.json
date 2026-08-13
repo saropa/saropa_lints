@@ -1763,6 +1763,7 @@
       "actionViewViolations": "Violações de Visualização",
       "noErrors": "Saropa Lints: é um número de PH0__. Sem erros, sem falhas!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: é um número de PH0__. nenhuma pasta do espaço de trabalho está aberta. Abra primeiro o seu projeto Dart/Flutter.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: integração de lint está desativada. Ative-a antes de executar a análise.",
       "pluginAlive": "Saropa Lints está vivo: Regras {rules} ativadas, arquivos {files} analisados.",
       "openPubspecFailed": "Não conseguiu abrir pubspec.yaml: {message} É um termo usado para descrever a",
       "toggleSidebarSectionFailed": "Saropa Lints: é um tipo de células falhou em alternar a seção da barra lateral  ⁇ {message} É um termo usado para descrever a",

@@ -1763,6 +1763,7 @@
       "actionViewViolations": "Verstöße gegen die Ansichten anzeigen.",
       "noErrors": "Saropa Lints: Das ist ein _PH0_. Keine Fehler, keine Fehler!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: Das ist ein _PH0_. kein Arbeitsplatzordner ist geöffnet. Öffnen Sie zuerst Ihr Dart/Flutter Projekt.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints:Lint-Integration ist deaktiviert. Aktivieren Sie sie, bevor Sie die Analyse durchführen.",
       "pluginAlive": "Saropa Lints lebt: Er ist am Leben. {rules} Regeln aktiviert, {files} Dateien analysiert.",
       "openPubspecFailed": "Es gelang nicht, pubspec.yaml zu öffnen: {message} ist ein _PH0_.",
       "toggleSidebarSectionFailed": "Saropa Lints: Das ist ein _PH1-Präparat. Es ist nicht gelungen, den Bereich der Seitenleiste zu wechseln  ⁇ {message} ist ein _PH0_.",

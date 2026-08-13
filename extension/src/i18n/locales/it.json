@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Violazioni di visualizzazione.",
       "noErrors": "Saropa Lints: è il nome di una delle sue compagne. Nessun errore!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: è il nome di una delle sue compagne. nessuna cartella dello spazio di lavoro è aperta. Apri prima il tuo progetto Dart/Flutter.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: l'integrazione del lint è disattivata. Abilitala prima di eseguire l'analisi.",
       "pluginAlive": "Saropa Lints è vivo: Regole {rules} attivate, file {files} analizzati.",
       "openPubspecFailed": "Non è riuscito ad aprire pubspec.yaml: {message} È il nome di un'altra versione.",
       "toggleSidebarSectionFailed": "Saropa Lints: è il nome di una cellula che si sviluppa attraverso la crescita non è riuscito a togliere la sezione della barra laterale  ⁇ {message} È il nome di un'altra versione.",

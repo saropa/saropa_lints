@@ -1763,6 +1763,7 @@
       "actionViewViolations": "הפרות הצפייה View Violations",
       "noErrors": "Saropa Lints: זה היה חרא. בלי שגיאות!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: זה היה חרא. אין תיקיית workspace פתוחה. פתח את הפרויקט שלך Dart/Flutter קודם.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: אינטגרציה של לינט מוטה. הפעל אותה לפני הרצת ניתוח.",
       "pluginAlive": "Saropa Lints חי: {rules} כללים מופעלים, קבצי {files} ניתחו.",
       "openPubspecFailed": "לא הצליח לפתוח את pubspec.yaml: {message} זה ה- PH0__.",
       "toggleSidebarSectionFailed": "Saropa Lints: - פטריוטיביות לא הצליח להזיז את סעיף ה-Sidebar  ⁇ {message} זה ה- PH0__.",

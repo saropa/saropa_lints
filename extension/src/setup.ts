@@ -291,6 +291,7 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
         workspaceRoot,
         '- Ran analysis',
         '- Ran analysis',
+        { skipEnabledCheck: true },
       );
       success = true;
       flushReport(workspaceRoot);
@@ -533,8 +534,14 @@ async function runAnalysisAfterConfigChangeScoped(
   workspaceRoot: string,
   fullOkMessage: string,
   fullFailMessage: string,
+  // The `saropaLints.enable` command calls this mid-transition, before it flips
+  // `enabled` to true, so that specific call site opts out of the check below —
+  // every other caller (e.g. a tier change while integration is off) must not
+  // bypass it.
+  options?: { skipEnabledCheck?: boolean },
 ): Promise<void> {
   const cfg = vscode.workspace.getConfiguration('saropaLints');
+  if (!options?.skipEnabledCheck && !(cfg.get<boolean>('enabled', true) ?? true)) return;
   const runAnalysisAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true);
   if (!runAnalysisAfter) return;
 
@@ -822,6 +829,12 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
   }
   let ok = false;
   const cfg = vscode.workspace.getConfiguration('saropaLints');
+  // "Lint integration: Off" must stop every analyze run this function can be
+  // reached from — manual command, dependency-change watcher, config-change
+  // auto-run, enableRulePack — not just diagnostics rendering. Silent no-op:
+  // the auto-trigger callers should not pop a message on every save while
+  // disabled; the manual command surfaces its own message before calling in.
+  if (!(cfg.get<boolean>('enabled', true) ?? true)) return false;
   const openEditorsOnly = cfg.get<boolean>('runAnalysisOpenEditorsOnly', false) ?? false;
 
   // Supersede any previous in-flight full analysis before starting this one, so a
@@ -945,6 +958,8 @@ export async function runAnalysisForFiles(
 ): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot || !files.length) return false;
+  const enabled = vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true;
+  if (!enabled) return false;
 
   const normalized = new Set<string>();
   for (const f of files) {

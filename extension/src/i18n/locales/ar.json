@@ -1763,6 +1763,7 @@
       "actionViewViolations": "مشاهدة انتهاكات الرؤية",
       "noErrors": "Saropa Lints: هيئة إدارة المعلومات لا أخطاء، ولا خطأ!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: هيئة إدارة المعلومات لا يوجد مجلد مساحة عمل مفتوح. افتح مشروعك Dart/Flutter أولاً.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: إнтِكْرُونْتِ لِنْت مُشَغَّل. تَمكَّنْ مِنْهُ قَبْلَ إِنْفَادِ التَّنَافُس.",
       "pluginAlive": "Saropa Lints على قيد الحياة: تم تفعيل قواعد {rules} ، وتم تحليل ملفات {files}.",
       "openPubspecFailed": "فشل في فتح pubspec.yaml: {message} _ PH0__ الـ (ف) = الحالة التي يمر",
       "toggleSidebarSectionFailed": "Saropa Lints: هيئة البيانات الحيوية فشل في تبديل قسم الشريط الجانبي  ⁇ {message} _ PH0__ الـ (ف) = الحالة التي يمر",

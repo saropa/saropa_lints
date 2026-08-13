@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Pelanggaran-pelanggaran",
       "noErrors": "Saropa Lints: adalah suatu bentuk dari _PH0_. Tidak ada kesalahan!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: adalah suatu bentuk dari _PH0_. tidak ada folder workspace yang terbuka. Buka proyek Dart/Flutter Anda terlebih dahulu.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: integrasi lint dinonaktifkan. Aktifkan sebelum menjalankan analisis.",
       "pluginAlive": "Saropa Lints masih hidup: {rules} aturan diaktifkan, file {files} dianalisis.",
       "openPubspecFailed": "Gagal membuka pubspec.yaml: {message} adalah",
       "toggleSidebarSectionFailed": "Saropa Lints: adalah suatu senyawa yang gagal untuk toggle bagian sidebar  ⁇ {message} adalah",

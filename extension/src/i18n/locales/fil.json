@@ -1763,6 +1763,7 @@
       "actionViewViolations": "Tingnan ang mga paglabag sa pagtingin.",
       "noErrors": "Saropa Lints: ang mga ito ay may _ph0__. Walang pagkakamali!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: walang folder ng workspace na bukas. Buksan muna ang iyong proyektong Dart/Flutter.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: ang integrasyon ng lint ay naka-off. I-enable ito bago mag-async analysis.",
       "pluginAlive": "Saropa Lints ay buhay: {rules} mga patakaran na pinagana, {files} file sinusuri.",
       "openPubspecFailed": "Hindi nakabukas ng pubspec.yaml: {message} ang kanyang mga",
       "toggleSidebarSectionFailed": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili nabigo upang i-toggle ang seksyon ng sidebar  ⁇ {message} ang kanyang mga",

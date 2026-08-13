@@ -1763,6 +1763,7 @@
       "actionViewViolations": "Angalia ukiukaji wa maoni.",
       "noErrors": "Saropa Lints:: kwa hiyo ni sawa. Hakuna makosa!",
       "noWorkspaceOpenWorkspace": "Saropa Lints:: kwa hiyo ni sawa. hakuna folda ya eneo la kazi iliyo wazi. Fungua mradi wako wa Dart/Flutter kwanza.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: uchunguzi wa lint inaofanya. Angalia kwenye kuchangia kila wakati kuchangisha.",
       "pluginAlive": "Saropa Lints yuko hai: {rules} sheria kuwezeshwa, faili za {files} kuchambuliwa.",
       "openPubspecFailed": "Imeshindwa kufungua pubspec.yaml: {message} _ PH0__ - Msaada wa kuokoa maisha.",
       "toggleSidebarSectionFailed": "Saropa Lints: _PH1_: - Ni aina ya kiini cha mwili. imeshindwa kugeuza sehemu ya sidebar  ⁇ {message} _ PH0__ - Msaada wa kuokoa maisha.",

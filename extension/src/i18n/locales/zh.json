@@ -1763,6 +1763,7 @@
       "actionViewViolations": "视图违规行为",
       "noErrors": "Saropa Lints: 没有一个人. 没有错误!",
       "noWorkspaceOpenWorkspace": "Saropa Lints：没有打开工作区文件夹。首先打开您的 Dart/Flutter 项目。",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints：lint集成已关闭。在运行分析前请启用它。",
       "pluginAlive": "Saropa Lints 处于活动状态：启用 {rules} 规则，分析 {files} 文件。",
       "openPubspecFailed": "打开 pubspec.yaml 的失败: {message} 没有任何问题.",
       "toggleSidebarSectionFailed": "Saropa Lints: 已经是 无法切换侧面 ⁇ 部分 {message} 没有任何问题.",

@@ -54,6 +54,10 @@ export async function maybeNudgeCrashCoveredRule(
   context: vscode.ExtensionContext,
   root: string,
 ): Promise<void> {
+  // Lint integration off means off — suggesting a rule to enable makes no
+  // sense while the plugin itself is disabled.
+  const enabled = vscode.workspace.getConfiguration('saropaLints').get<boolean>('enabled', true) ?? true;
+  if (!enabled) return;
   const disabled = readDisabledRules(root);
   const suggestions = findCrashCoveredDisabledRules(root, disabled);
   const pick = pickSuggestion(context, suggestions);

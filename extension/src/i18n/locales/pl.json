@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Violations (Przełamanie przepisów dotyczących widoków).",
       "noErrors": "Saropa Lints: to znaczy, że jest Żadnych błędów!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: to znaczy, że jest nie ma otwartych folderów w przestrzeni roboczej. Najpierw otwórz swój projekt Dart/Flutter.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: integracja lintera jest wyłączona. Włącz ją przed uruchomieniem analizy.",
       "pluginAlive": "Saropa Lints żyje: {rules} zasady włączone, pliky {files} analizowane.",
       "openPubspecFailed": "Nie udało się otworzyć pubspec.yaml: {message} to odmiana _PH0_.",
       "toggleSidebarSectionFailed": "Saropa Lints: jest to grupa, która zawiera nie udało się przełączyć sekcji paska bocznego  ⁇ {message} to odmiana _PH0_.",

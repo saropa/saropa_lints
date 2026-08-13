@@ -1763,6 +1763,7 @@
       "actionViewViolations": "뷰 위반을 참조하십시오.",
       "noErrors": "Saropa Lints: PH0__:::  ⁇ PH0_: 오류가 없으니!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: PH0__:::  ⁇ PH0_: 작업 공간 폴더가 열리지 않았습니다. 먼저 Dart/Flutter 프로젝트를 열으십시오.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: lint 통합은 꺼져 있습니다. 분석을 실행하기 전에 활성화하십시오.",
       "pluginAlive": "Saropa Lints는 살아있다: {rules} 규칙이 활성화되고, {files} 파일이 분석됩니다.",
       "openPubspecFailed": "pubspec.yaml를 열지 못했습니다: {message} _PH0_는 PH0__의 제곱근을 나타냅니다",
       "toggleSidebarSectionFailed": "Saropa Lints: PH1__는 사이드바 섹션  ⁇  toggle sidebar section을 전환하는 데 실패했습니다. {message} _PH0_는 PH0__의 제곱근을 나타냅니다",

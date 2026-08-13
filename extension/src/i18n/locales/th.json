@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Violations การละเมิดความเห็น",
       "noErrors": "Saropa Lints: เป็นการประกอบของ ไม่มีความผิดพลาด!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: เป็นการประกอบของ ไม่มีโฟลเดอร์ workspace ที่เปิดอยู่ เปิดโครงการ Dart/Flutter ของคุณก่อน",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: การบูรณาการ lint ถูกปิดอยู่ ให้เปิดใช้งานก่อนการวิเคราะห์",
       "pluginAlive": "Saropa Lints ยังมีชีวิตอยู่: {rules} กฎเปิดใช้งาน, {files} ไฟล์วิเคราะห์.",
       "openPubspecFailed": "ไม่สามารถเปิด pubspec.yaml: {message} การตรวจสอบ",
       "toggleSidebarSectionFailed": "Saropa Lints: เป็นการตรวจหา ไม่สามารถเปลี่ยนส่วน Sidebar ได้  ⁇ {message} การตรวจสอบ",

@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Violations خلاف ورزیوں کو دیکھیں",
       "noErrors": "Saropa Lints:۔ کوئی غلطی نہیں!",
       "noWorkspaceOpenWorkspace": "Saropa Lints:۔ کوئی ورک اسپیس فولڈر کھلا نہیں ہے۔ پہلے اپنا _Dart/_Flutter پروجیکٹ کھولیں۔",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: لینٹ اندراج غیر فعال ہے۔ تحلیل کے پہلے اسے فعال کریں۔",
       "pluginAlive": "Saropa Lints زندہ ہے: {rules} قواعد فعال، {files} فائلوں کا تجزیہ کیا گیا۔",
       "openPubspecFailed": "pubspec.yaml کھولنے میں ناکام: {message}",
       "toggleSidebarSectionFailed": "Saropa Lints: سائڈبار سیکشن - {message} ٹوگل کرنے میں ناکام",

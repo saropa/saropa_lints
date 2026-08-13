@@ -64,6 +64,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [14.5.8]
+
+Fixed the extension running lint analysis in the background while "Lint integration" was turned off. Disabling the integration now stops every automatic analysis trigger and background suggestion, not just the editor diagnostics. [log](https://github.com/saropa/saropa_lints/blob/v14.5.8/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- Turning off "Lint integration" now also stops analysis triggered by saving files, changing dependencies, changing tier, changing config, and enabling a rule pack, along with the crash-coverage rule suggestion. Previously only in-editor diagnostics were suppressed. No action required.
+
+### Changed (Extension)
+
+- The "Run Analysis" toolbar button is hidden while "Lint integration" is off, instead of appearing clickable and doing nothing useful. No action required.
+
+---
+
 ## [14.5.7]
 
 Dependency maintenance release — no rule or extension changes. [log](https://github.com/saropa/saropa_lints/blob/v14.5.7/CHANGELOG.md)

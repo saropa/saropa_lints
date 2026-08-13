@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Violations (Vi phạm chế độ xem)",
       "noErrors": "Saropa Lints: là người có thể Không có lỗi!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: là người có thể không có thư mục workspace nào được mở. Mở dự án Dart/Flutter của bạn trước.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: tích hợp lint đã bị tắt. Vui lòng bật nó trước khi chạy phân tích.",
       "pluginAlive": "Saropa Lints còn sống: {rules} quy tắc được kích hoạt, tập tin {files} phân tích.",
       "openPubspecFailed": "Không thể mở pubspec.yaml: {message} là Phương pháp",
       "toggleSidebarSectionFailed": "Saropa Lints: là một loại tế bào có thể failed to toggle sidebar section  ⁇  không thể chuyển đổi phần thanh bên {message} là Phương pháp",

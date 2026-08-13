@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Violations",
       "noErrors": "Saropa Lints: No errors!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: no workspace folder is open. Open your Dart/Flutter project first.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: lint integration is off. Enable it before running analysis.",
       "pluginAlive": "Saropa Lints is alive: {rules} rules enabled, {files} files analyzed.",
       "openPubspecFailed": "Failed to open pubspec.yaml: {message}",
       "toggleSidebarSectionFailed": "Saropa Lints: failed to toggle sidebar section — {message}",

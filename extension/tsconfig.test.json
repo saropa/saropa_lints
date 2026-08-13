@@ -105,6 +105,7 @@
     "src/setup.ts",
     "src/test/setupCompositeScaffoldGate.test.ts",
     "src/test/disablePluginsIntegration.test.ts",
+    "src/test/runAnalysisEnabledGate.test.ts",
     "src/pluginLiveness.ts",
     "src/test/pluginLiveness.test.ts",
     "src/upgrade-checker.ts",

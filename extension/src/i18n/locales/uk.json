@@ -1763,6 +1763,7 @@
       "actionViewViolations": "Порушення правил перегляду.",
       "noErrors": "Saropa Lints: = ПХ0__ (по-моєму, це є Без помилок!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: = ПХ0__ (по-моєму, це є жодна папка робочої зони не відкрита. Спочатку відкрийте свій проект Dart/Flutter.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: інтеграція лінта вимкнена. Увімкніть її перед виконанням аналізу.",
       "pluginAlive": "Saropa Lints живий: {rules} правила ввімкнені, файли {files} проаналізовані.",
       "openPubspecFailed": "Не вдалося відкрити pubspec.yaml: {message} _ПХО__ ПхО__",
       "toggleSidebarSectionFailed": "Saropa Lints: = ПХ1: Не вдалося перемикати розділ бокової панелі  ⁇ {message} _ПХО__ ПхО__",

@@ -1219,6 +1219,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       await surfaceLivenessResult(liveness, getSharedOutputChannel());
     }),
     vscode.commands.registerCommand('saropaLints.runAnalysis', async () => {
+      if (!(getConfig().get<boolean>('enabled', true) ?? true)) {
+        void vscode.window.showInformationMessage(l10n('notify.main.lintIntegrationOffCannotAnalyze'));
+        return;
+      }
       const ok = await runAnalysisCommand(context);
       if (ok) {
         refreshAll();

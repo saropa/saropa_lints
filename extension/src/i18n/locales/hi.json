@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Violations देखें उल्लंघन",
       "noErrors": "Saropa Lints: _PH0_: कोई त्रुटि नहीं!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: कोई कार्यस्थान फ़ोल्डर खुला नहीं है. सबसे पहले अपना Dart/Flutter प्रोजेक्ट खोलें।",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: लिंट एक्सटेंशन बंद है। विश्लेषण करने से पहले इसे सक्षम करें।",
       "pluginAlive": "Saropa Lints जीवित है: {rules} नियम सक्षम, {files} फ़ाइलों का विश्लेषण किया गया।",
       "openPubspecFailed": "pubspec.yaml: {message} खोलने में विफल",
       "toggleSidebarSectionFailed": "Saropa Lints: साइडबार अनुभाग को टॉगल करने में विफल - {message}",

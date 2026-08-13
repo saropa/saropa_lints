@@ -1763,6 +1763,7 @@
       "actionViewViolations": "Violaciones de vistas.",
       "noErrors": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin ¡Sin errores! ¿Qué es esto?",
       "noWorkspaceOpenWorkspace": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin ninguna carpeta del espacio de trabajo está abierta. Abra su proyecto Dart/Flutter primero.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: la integración de lint está desactivada. Actívala antes de ejecutar el análisis.",
       "pluginAlive": "Saropa Lints está vivo: Reglas {rules} habilitadas, archivos {files} analizados.",
       "openPubspecFailed": "No se pudo abrir pubspec.yaml: {message} El hombre de la ciudad",
       "toggleSidebarSectionFailed": "Saropa Lints: Es el número de células que tiene la persona. no pudo cambiar la sección de barra lateral  ⁇ {message} El hombre de la ciudad",

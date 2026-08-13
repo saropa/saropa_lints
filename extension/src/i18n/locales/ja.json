@@ -1763,6 +1763,7 @@
       "actionViewViolations": "ビュー違反を表示する",
       "noErrors": "Saropa Lints: フォローしている 間違いなし! エラーがない!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: 開いているワークスペース フォルダーがありません。まず Dart/Flutter プロジェクトを開きます。",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: ライント統合はオフです。分析を実行する前に有効にしてください。",
       "pluginAlive": "Saropa Lintsは生きている: {rules}ルールが有効になり, {files}ファイルが解析されました.",
       "openPubspecFailed": "pubspec.yaml を開くのに失敗しました: {message} フォローしている",
       "toggleSidebarSectionFailed": "Saropa Lints: ヒトの体内にある サイドバーのセクションを切り替えることができませんでした. {message} フォローしている",

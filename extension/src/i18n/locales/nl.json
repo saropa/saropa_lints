@@ -1763,6 +1763,7 @@
       "actionViewViolations": "View Violaties Bekijk overtredingen",
       "noErrors": "Saropa Lints: Het is een _PH0_. Geen fouten, geen foutjes!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: Het is een _PH0_. geen werkruimte map is open. Open eerst je Dart/Flutter project.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: lint integratie is uitgeschakeld. Schakel het in voordat u de analyse uitvoert.",
       "pluginAlive": "Saropa Lints leeft: {rules} regels ingeschakeld, {files} bestanden geanalyseerd.",
       "openPubspecFailed": "Kon niet openen pubspec.yaml: {message} is een PH0__.",
       "toggleSidebarSectionFailed": "Saropa Lints: Het is een generieke vorm van _ph1__. is het niet gelukt om de sectie zijbalk te schakelen  ⁇ {message} is een PH0__.",

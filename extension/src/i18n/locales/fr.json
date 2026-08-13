@@ -1763,6 +1763,7 @@
       "actionViewViolations": "Voir les violations de vue.",
       "noErrors": "Saropa Lints: Il s'agit de la réponse à une question. Pas d'erreur !",
       "noWorkspaceOpenWorkspace": "Saropa Lints: Il s'agit de la réponse à une question. aucun dossier d'espace de travail n'est ouvert. Ouvrez d'abord votre projet Dart/Flutter.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints : l'intégration de l'analyse est désactivée. Activez-la avant d'exécuter l'analyse.",
       "pluginAlive": "Saropa Lints est vivant: {rules} règles activées, les fichiers {files} analysés.",
       "openPubspecFailed": "Échec de l'ouverture de pubspec.yaml : {message}",
       "toggleSidebarSectionFailed": "Saropa Lints : impossible de basculer la section de la barre latérale – {message}",

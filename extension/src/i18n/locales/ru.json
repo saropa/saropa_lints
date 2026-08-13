@@ -1763,6 +1763,7 @@
       "actionViewViolations": "Нарушения с точки зрения просмотра.",
       "noErrors": "Saropa Lints: это - _PH0_. Никаких ошибок!",
       "noWorkspaceOpenWorkspace": "Saropa Lints: это - _PH0_. ни одна папка рабочей зоны не открыта. Сначала откройте свой проект Dart/Flutter.",
+      "lintIntegrationOffCannotAnalyze": "Saropa Lints: интеграция линта отключена. Включите её перед запуском анализа.",
       "pluginAlive": "Saropa Lints жив: он живет. {rules} правила включены, {files} файлы проанализированы.",
       "openPubspecFailed": "Не удалось открыть pubspec.yaml: {message} Это - ПХО.",
       "toggleSidebarSectionFailed": "Saropa Lints: это число, которое соответствует числу не удалось переключить раздел боковой панели  ⁇ {message} Это - ПХО.",
