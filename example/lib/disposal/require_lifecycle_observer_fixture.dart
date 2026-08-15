@@ -147,3 +147,41 @@ class _good326__ClockState extends State<Clock> with WidgetsBindingObserver {
     super.dispose();
   }
 }
+
+// GOOD: Timer created in initState and canceled in dispose() — a
+// foreground-only ticker torn down with the widget does not need
+// WidgetsBindingObserver either.
+// See plans/history/2026.08/2026.08.15/require_app_lifecycle_handling_false_positive_dispose_cancels_timer.md
+class _good326b__DisposeCanceledState extends State<Clock> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}
+
+// BAD: Timer created in initState, dispose() present but does NOT cancel
+// it — the leak this rule exists to catch must still fire.
+// expect_lint: require_lifecycle_observer
+class _bad326b__LeakyDisposeState extends State<Clock> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+}

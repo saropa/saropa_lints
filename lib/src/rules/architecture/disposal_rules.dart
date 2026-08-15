@@ -729,7 +729,11 @@ class RequirePageControllerDisposeRule extends SaropaLintRule {
 
 /// Warns when Timer.periodic is used without WidgetsBindingObserver lifecycle handling.
 ///
-/// Since: v1.8.2 | Updated: v4.13.0 | Rule version: v4
+/// Since: v1.8.2 | Updated: v14.5.10 | Rule version: v5
+///
+/// A Timer.periodic whose field is canceled in the class's own dispose() is
+/// also accepted — a foreground-only ticker torn down with the widget does
+/// not additionally need to pause/resume via WidgetsBindingObserver.
 ///
 /// Alias: pause_timer_on_background, timer_lifecycle
 ///
@@ -798,9 +802,9 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'require_lifecycle_observer',
-    '[require_lifecycle_observer] Long-running timers, streams, or background tasks must be paused or stopped when the app is backgrounded. Failing to observe lifecycle changes can drain battery, consume CPU, and cause stale callbacks to execute when the app resumes, leading to inconsistent state and poor user experience. This may also violate platform guidelines and result in app store rejection. {v4}',
+    '[require_lifecycle_observer] Long-running timers, streams, or background tasks must be paused or stopped when the app is backgrounded, or canceled/closed in dispose() if they are a foreground-only ticker. Failing to observe lifecycle changes can drain battery, consume CPU, and cause stale callbacks to execute when the app resumes, leading to inconsistent state and poor user experience. This may also violate platform guidelines and result in app store rejection. {v5}',
     correctionMessage:
-        'Implement WidgetsBindingObserver and handle didChangeAppLifecycleState to pause, stop, or clean up background tasks when the app is not active. Document lifecycle handling to ensure resources are managed correctly and the app remains responsive.',
+        'Implement WidgetsBindingObserver and handle didChangeAppLifecycleState to pause, stop, or clean up background tasks when the app is not active, or cancel/close the field in dispose() if the app-lifecycle state does not matter for this work.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -839,9 +843,14 @@ class RequireLifecycleObserverRule extends SaropaLintRule {
           classSource.contains('WidgetsBindingObserver') &&
           classSource.contains('didChangeAppLifecycleState');
 
-      if (!hasLifecycleObserver) {
-        reporter.atNode(node.methodName, code);
-      }
+      if (hasLifecycleObserver) return;
+
+      // "Canceled in dispose()" is independently sufficient: a Timer.periodic
+      // torn down alongside the widget doesn't also need to pause/resume.
+      // See plans/history/2026.08/2026.08.15/require_app_lifecycle_handling_false_positive_dispose_cancels_timer.md
+      if (isBackgroundWorkCanceledInDispose(node, enclosingClass)) return;
+
+      reporter.atNode(node.methodName, code);
     });
   }
 }
