@@ -12,6 +12,65 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import 'analyzer_compat.dart';
+
+/// Extracts the field name an [AssignmentExpression] targets, handling both
+/// bare identifiers (`_field = ...`) and explicit-`this` access
+/// (`this._field = ...`). Returns null for any other LHS shape (indexed
+/// assignment, cascade, property access on a non-this target).
+String? assignmentTargetFieldName(AssignmentExpression node) {
+  final Expression lhs = node.leftHandSide;
+  if (lhs is SimpleIdentifier) {
+    return lhs.name;
+  }
+  if (lhs is PropertyAccess && lhs.target is ThisExpression) {
+    return lhs.propertyName.name;
+  }
+  return null;
+}
+
+/// Returns true when [expr] — a `Timer(...)`, `Timer.periodic(...)`,
+/// `Stream.periodic(...)`, or `.listen(...)` result — is assigned to a class
+/// field (directly or via an inline field initializer) that [enclosingClass]
+/// cancels/closes inside its own `dispose()` method.
+///
+/// Used by lifecycle rules to treat "created and torn down within the same
+/// State's initState()/dispose() pair" as sufficient, alongside app-level
+/// lifecycle-observer handling: a foreground-only ticker doesn't need to
+/// pause on backgrounding if it simply stops existing when disposed.
+///
+/// Conservative by design: if [expr] isn't assigned to a field we can name
+/// (a local variable, a fire-and-forget call), or [enclosingClass] has no
+/// `dispose()` method, this returns false — the caller should still flag.
+bool isBackgroundWorkCanceledInDispose(
+  Expression expr,
+  ClassDeclaration enclosingClass,
+) {
+  final AstNode? parent = expr.parent;
+  String? fieldName;
+  if (parent is AssignmentExpression && parent.rightHandSide == expr) {
+    fieldName = assignmentTargetFieldName(parent);
+  } else if (parent is VariableDeclaration &&
+      parent.initializer == expr &&
+      parent.parent?.parent is FieldDeclaration) {
+    fieldName = parent.name.lexeme;
+  }
+  if (fieldName == null) return false;
+
+  MethodDeclaration? disposeMethod;
+  for (final ClassMember member in enclosingClass.bodyMembers) {
+    if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+      disposeMethod = member;
+      break;
+    }
+  }
+  if (disposeMethod == null) return false;
+
+  final FunctionBody disposeBody = disposeMethod.body;
+  return isFieldCleanedUp(fieldName, 'cancel', disposeBody) ||
+      isFieldCleanedUp(fieldName, 'close', disposeBody);
+}
+
 /// Extracts the final identifier name from a method invocation target.
 ///
 /// Handles the three common target expression types:

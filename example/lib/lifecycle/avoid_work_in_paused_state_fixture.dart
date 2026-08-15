@@ -132,3 +132,41 @@ class _good460__MyState extends State<MyWidget> with WidgetsBindingObserver {
     }
   }
 }
+
+// GOOD: Timer created in initState and canceled in dispose() — a
+// foreground-only ticker torn down with the widget does not need to pause
+// on backgrounding either.
+// See plans/history/2026.08/2026.08.15/require_app_lifecycle_handling_false_positive_dispose_cancels_timer.md
+class _good460b__DisposeCanceledState extends State<MyWidget> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => refresh());
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}
+
+// BAD: Timer created in initState, dispose() present but does NOT cancel
+// it — the leak this rule exists to catch must still fire.
+// expect_lint: avoid_work_in_paused_state
+class _bad460b__LeakyDisposeState extends State<MyWidget> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => refresh());
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+}

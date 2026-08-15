@@ -14,10 +14,12 @@ import '../../target_matcher_utils.dart';
 
 /// Warns when Timer or periodic work runs without AppLifecycleState check.
 ///
-/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+/// Since: v2.1.0 | Updated: v14.5.10 | Rule version: v3
 ///
 /// Timers and periodic callbacks should pause when the app is backgrounded
-/// to save battery and avoid unexpected behavior.
+/// to save battery and avoid unexpected behavior — OR the field they are
+/// assigned to must be canceled/closed in dispose(), which is independently
+/// sufficient for a foreground-only ticker torn down with the widget.
 ///
 /// **BAD:**
 /// ```dart
@@ -29,6 +31,7 @@ import '../../target_matcher_utils.dart';
 ///     super.initState();
 ///     _timer = Timer.periodic(Duration(seconds: 1), (_) => refresh());
 ///   }
+///   // No dispose() cancellation and no lifecycle observer.
 /// }
 /// ```
 ///
@@ -44,6 +47,23 @@ import '../../target_matcher_utils.dart';
 ///     } else if (state == AppLifecycleState.resumed) {
 ///       _startTimer();
 ///     }
+///   }
+/// }
+/// ```
+///
+/// **Also Good:** foreground-only ticker, canceled in dispose():
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   Timer? _timer;
+///   @override
+///   void initState() {
+///     super.initState();
+///     _timer = Timer.periodic(Duration(seconds: 1), (_) => setState(() {}));
+///   }
+///   @override
+///   void dispose() {
+///     _timer?.cancel();
+///     super.dispose();
 ///   }
 /// }
 /// ```
@@ -65,9 +85,9 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_work_in_paused_state',
-    '[avoid_work_in_paused_state] Timer.periodic without lifecycle handling. Will run when app is backgrounded. Timers and periodic callbacks should pause when the app is backgrounded to save battery and avoid unexpected behavior. {v2}',
+    '[avoid_work_in_paused_state] Timer.periodic or Stream.periodic without lifecycle handling or a matching dispose() cancellation. Will run when app is backgrounded. Timers and periodic callbacks should pause when the app is backgrounded to save battery, or be canceled/closed in dispose() if they are a foreground-only ticker. {v3}',
     correctionMessage:
-        'Add WidgetsBindingObserver and pause timer in didChangeAppLifecycleState. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+        'Add WidgetsBindingObserver and pause timer in didChangeAppLifecycleState, or cancel/close the field in dispose() if the app-lifecycle state does not matter for this work.',
     severity: DiagnosticSeverity.WARNING,
   );
 
@@ -110,6 +130,11 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
         return;
       }
 
+      // "Canceled in dispose()" is independently sufficient: a Timer.periodic
+      // torn down alongside the widget doesn't also need to pause/resume.
+      // See plans/history/2026.08/2026.08.15/require_app_lifecycle_handling_false_positive_dispose_cancels_timer.md
+      if (isBackgroundWorkCanceledInDispose(node, enclosingClass)) return;
+
       reporter.atNode(node);
     });
 
@@ -144,6 +169,8 @@ class AvoidWorkInPausedStateRule extends SaropaLintRule {
           classSource.contains('didChangeAppLifecycleState')) {
         return;
       }
+
+      if (isBackgroundWorkCanceledInDispose(node, enclosingClass)) return;
 
       reporter.atNode(node);
     });
@@ -545,20 +572,11 @@ class _BuildLateAssignmentVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Extracts the field name an [AssignmentExpression] targets, handling both
-/// bare identifiers (`_field = ...`) and explicit-`this` access
-/// (`this._field = ...`). Returns null for any other LHS shape (indexed
-/// assignment, cascade, property access on a non-this target).
-String? _assignmentTargetFieldName(AssignmentExpression node) {
-  final Expression lhs = node.leftHandSide;
-  if (lhs is SimpleIdentifier) {
-    return lhs.name;
-  }
-  if (lhs is PropertyAccess && lhs.target is ThisExpression) {
-    return lhs.propertyName.name;
-  }
-  return null;
-}
+/// Delegates to the canonical implementation in `target_matcher_utils.dart`
+/// so this file's several visitors share one source of truth for how a
+/// field-assignment target is extracted.
+String? _assignmentTargetFieldName(AssignmentExpression node) =>
+    assignmentTargetFieldName(node);
 
 /// Warns when State subclasses use Timer or stream subscriptions without
 ///
