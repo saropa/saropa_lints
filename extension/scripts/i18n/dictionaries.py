@@ -444,6 +444,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "de": {
+        # Manual: cached MT output only bolded "on" (not "off"), breaking the source's
+        # **on**/**off** bold pairing, and dropped the code-literal backtick styling
+        # around `saropa_lints`/`analysis_options`. Curated here — checked before
+        # cache/MT on every mode — so a future `upgrade`/`all` run cannot regress it.
+        "When **on** (default), Saropa Lints scans Dart files on save and shows findings as squiggles and Problems panel entries. Turn **off** to stop scanning, pause integration notifications, and clear the status-bar score—without hiding sidebar options. Use **Saropa Lints: Set Up Project** when you need to add `saropa_lints` to pubspec and write `analysis_options`.": "Bei **ein** (Standard) durchsucht Saropa Lints Dart-Dateien beim Speichern und zeigt Befunde als Wellenlinien und Einträge im Problembereich an. Bei **aus** wird das Scannen gestoppt, werden Integrationsbenachrichtigungen pausiert und die Bewertung in der Statusleiste gelöscht – ohne die Optionen in der Seitenleiste auszublenden. Verwenden Sie **Saropa Lints: Projekt einrichten**, um `saropa_lints` zur pubspec hinzuzufügen und `analysis_options` zu schreiben.",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",
@@ -1553,6 +1558,17 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "sw": {
+        # Manual: cached MT output for these five degenerated (repetition-loop garbage, one
+        # ending in a leaked English fragment resembling a translation-run prompt artifact,
+        # and one that mistranslated the literal `--resolve` CLI flag into `--suluhisha`).
+        # Curated here — checked before cache/MT on every mode — so a future `upgrade`/`all`
+        # run can never regenerate the same corruption from a poisoned cache entry.
+        "Saropa: scan failed": "Saropa: uchanganuzi umeshindwa",
+        "Scan on save failed.": "Uchanganuzi wakati wa kuhifadhi umeshindwa.",
+        "The scan process stopped recently and is waiting to restart. Save again in a moment.": "Mchakato wa uchanganuzi umesimama hivi karibuni na unasubiri kuanza upya. Hifadhi tena baada ya muda mfupi.",
+        "The scan process returned an unrecognized response.": "Mchakato wa uchanganuzi ulirudisha jibu lisilotambulika.",
+        "The scan process stopped unexpectedly. It will restart on the next save.": "Mchakato wa uchanganuzi umesimama bila kutarajiwa. Utaanza tena wakati wa uhifadhi ujao.",
+        "When **on** (default), scan-on-save fully resolves each file's types (`--resolve`), so type-based rules fire correctly. Slower per save than the syntactic-only fast path; turn off only if save latency matters more than catching type-based findings.": "Ikiwa **imewashwa** (chaguo-msingi), uchanganuzi-wakati-wa-kuhifadhi hutatua kikamilifu aina za kila faili (`--resolve`), hivyo sheria zinazotegemea aina hufanya kazi ipasavyo. Ni polepole zaidi kwa kila uhifadhi kuliko njia ya haraka ya kisintaksia pekee; izime tu ikiwa muda wa uhifadhi ni muhimu zaidi kuliko kupata matokeo yanayotegemea aina.",
         # Curated passthrough: "CC" is the universal abbreviation for Cyclomatic Complexity in code metrics; keeping it untranslated preserves recognition.
         "CC {cc}": "CC {cc}",
         # Curated passthrough: format-only string (two placeholders + colon) has no translatable words.
