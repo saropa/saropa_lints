@@ -15,6 +15,7 @@ import 'package:analyzer/dart/element/element.dart';
 import '../../analyzer_metadata_compat_utils.dart';
 import '../../catch_body_logging_utils.dart';
 import '../../saropa_lint_rule.dart';
+import '../../fixes/error_handling/add_debug_print_in_catch_fix.dart';
 import '../../fixes/error_handling/add_rethrow_in_catch_fix.dart';
 import '../../fixes/error_handling/change_exception_to_object_fix.dart';
 
@@ -758,17 +759,28 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
         // (runApp), is the fallback UI shown after that bootstrap failed —
         // not the app's normal entry point. Demanding it also carry an
         // error-boundary builder is recursive — it can only run after the
-        // one real failure path already terminated. The runApp(...) check on
-        // the try body (not just "any logged catch") keeps this scoped to
-        // genuine startup-fallback patterns, so an unrelated logged catch
-        // elsewhere that happens to build a MaterialApp is still flagged.
+        // one real failure path already terminated.
+        //
+        // Three conditions, all required, keep this narrowly scoped to that
+        // one genuine pattern rather than exempting logged catches in
+        // general:
+        //  1. catchBodyHasLoggingCall — the error was actually reported.
+        //  2. _tryBodyCallsRunApp — the try body was itself attempting to
+        //     bootstrap the app, not doing unrelated work that happens to
+        //     also build a MaterialApp.
+        //  3. _isInsideMainFunction — the whole try/catch lives directly in
+        //     a top-level `main()`, the only place a "the app failed to
+        //     start" catch can legitimately sit. Without this, a try/catch
+        //     buried in an unrelated helper that both logs and coincidentally
+        //     calls runApp (e.g. a test harness) would also be exempted.
         final CatchClause? enclosingCatch = node
             .thisOrAncestorOfType<CatchClause>();
         final AstNode? enclosingTry = enclosingCatch?.parent;
         if (enclosingCatch != null &&
             enclosingTry is TryStatement &&
             catchBodyHasLoggingCall(enclosingCatch.body) &&
-            _tryBodyCallsRunApp(enclosingTry.body)) {
+            _tryBodyCallsRunApp(enclosingTry.body) &&
+            _isInsideMainFunction(enclosingTry)) {
           return;
         }
 
@@ -784,6 +796,21 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
   /// construct a MaterialApp.
   bool _tryBodyCallsRunApp(Block body) {
     return RegExp(r'\brunApp\s*\(').hasMatch(body.toSource());
+  }
+
+  /// Returns true if [node] sits inside a top-level function literally named
+  /// `main` — the only place a "the app itself failed to start" try/catch
+  /// can legitimately live. Deliberately does not attempt to trace calls
+  /// into a helper `main()` delegates to (e.g. `_bootstrap()`): that would
+  /// require call-graph analysis this AST-local rule doesn't have, so a
+  /// bootstrap split across functions still requires a `builder:` — a
+  /// stricter, safer default than guessing at the call graph.
+  bool _isInsideMainFunction(AstNode node) {
+    final FunctionDeclaration? enclosingFunction = node
+        .thisOrAncestorOfType<FunctionDeclaration>();
+    return enclosingFunction != null &&
+        enclosingFunction.name.lexeme == 'main' &&
+        enclosingFunction.parent is CompilationUnit;
   }
 }
 
@@ -2469,6 +2496,12 @@ class RequireErrorLoggingRule extends SaropaLintRule {
       }
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddDebugPrintInCatchFix(context: context),
+  ];
 }
 
 // =============================================================================

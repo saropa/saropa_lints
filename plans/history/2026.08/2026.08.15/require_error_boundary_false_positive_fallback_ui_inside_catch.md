@@ -286,6 +286,28 @@ whose `try` body does **not** call `runApp`, which must remain flagged.
 `dart test test/rules/flow/error_handling_rules_test.dart` re-run after
 each edit, 50/50 passing throughout.
 
+### Second hardening pass (same day) — scope to `main()`
+
+Even with the `runApp`-in-try-body condition, the exemption still applied
+to any try/catch shaped like the bootstrap idiom anywhere in the codebase —
+a helper function unrelated to app startup that happens to log and also
+call `runApp` (e.g. a test harness spinning up a second Flutter engine)
+would still have been silently exempted. Added a third, required condition:
+`_isInsideMainFunction` walks up to the nearest enclosing
+`FunctionDeclaration` and requires it to be a top-level function literally
+named `main`. The rule deliberately does not attempt to trace calls into a
+helper `main()` delegates to (e.g. `_bootstrap()`) — that needs call-graph
+analysis this AST-local rule doesn't have — so a bootstrap split across
+functions still requires an explicit `builder:`; this is a stricter,
+false-negative-safe default over guessing at the call graph.
+
+Fixture: `_good360`/`_good362` moved into the file's one legitimate
+top-level `main()` (as two independent try/catch blocks — Dart permits only
+one `main()` per file); `_bad363` added — the same logged-catch/`runApp`-in-try
+shape as the exemption, but in a non-`main()` helper function, and must
+still be flagged. `dart test test/rules/flow/error_handling_rules_test.dart`
+re-run, 50/50 passing.
+
 
 
 - saropa_lints version: (repo HEAD at filing time)

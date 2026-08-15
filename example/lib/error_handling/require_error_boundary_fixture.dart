@@ -127,10 +127,13 @@ void _good359() {
 }
 
 // GOOD: MaterialApp built inside a catch clause that already logged the
-// caught error, where the try body attempted runApp, is the app's
-// crash-recovery fallback UI, not its normal entry point — demanding a
-// builder: here is recursive.
-void _good360() {
+// caught error, where the try body attempted runApp, inside main() itself —
+// the app's crash-recovery fallback UI, not its normal entry point.
+// Demanding a builder: here is recursive. The exemption only applies inside
+// main() (see _isInsideMainFunction), so this and the receiver-logger case
+// below both have to live in the one real top-level main() this file can
+// have.
+void main() {
   try {
     runApp(MyHomePage());
   } on Object catch (error, stack) {
@@ -139,12 +142,10 @@ void _good360() {
       home: MyHomePage(),
     );
   }
-}
 
-// GOOD: same shape as _good360, but the logging call is a receiver-based
-// logger (analytics.track) rather than a recognized method name — exercises
-// the catchBodyLoggerReceiverNames branch instead of the method-name branch.
-void _good362() {
+  // GOOD: same shape, but the logging call is a receiver-based logger
+  // (analytics.track) rather than a recognized method name — exercises the
+  // catchBodyLoggerReceiverNames branch instead of the method-name branch.
   try {
     runApp(MyHomePage());
   } on Object catch (error, stack) {
@@ -163,6 +164,22 @@ void _good362() {
 void _bad361() {
   try {
     doSomethingUnrelated();
+  } on Object catch (error, stack) {
+    debugException(error, stack);
+    MaterialApp(
+      home: MyHomePage(),
+    );
+  }
+}
+
+// BAD: same shape as the genuine main()-only exemption (logged catch, try
+// body calls runApp) but NOT inside main() — a helper function that starts
+// some other Flutter engine/isolate is not the app's own startup boundary,
+// so it must still be flagged.
+// expect_lint: require_error_boundary
+void _bad363() {
+  try {
+    runApp(MyHomePage());
   } on Object catch (error, stack) {
     debugException(error, stack);
     MaterialApp(
