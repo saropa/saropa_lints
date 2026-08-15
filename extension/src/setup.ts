@@ -273,6 +273,10 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
       // overrides) rather than appending a duplicate below the dead one.
       if (restorePluginsIntegration(workspaceRoot)) {
         logReport('- Restored previously disabled plugins block');
+        // Symmetric with the disable path: force the analysis server to pick
+        // up the restored plugins block now rather than on its next natural
+        // restart, so re-enabling takes effect immediately.
+        await restartDartAnalysisServer();
       }
 
       const cfg = vscode.workspace.getConfiguration('saropaLints');
@@ -466,6 +470,20 @@ export function restorePluginsIntegration(root: string): boolean {
   return true;
 }
 
+// Editing analysis_options.yaml only changes what the Dart analysis server
+// will load on its NEXT start — the already-running plugin host process (a
+// separate long-lived `dart.exe`, several GB once warmed up) keeps running
+// until the server actually restarts. `dart.restartAnalysisServer` is owned
+// by the official Dart extension; guarded because that extension is not a
+// hard dependency here and the command may not exist in every host.
+async function restartDartAnalysisServer(): Promise<void> {
+  try {
+    await vscode.commands.executeCommand('dart.restartAnalysisServer');
+  } catch {
+    // Dart extension not installed/active — nothing to restart.
+  }
+}
+
 export async function runDisable(): Promise<void> {
   await vscode.workspace.getConfiguration('saropaLints').update('enabled', false, vscode.ConfigurationTarget.Workspace);
 
@@ -474,6 +492,12 @@ export async function runDisable(): Promise<void> {
   // the Problems pane (plans/history/2026.06/2026.06.18/BUG_cant turn off lints.md).
   const root = getProjectRoot();
   const result = root ? disablePluginsIntegration(root) : 'no-config';
+  if (result === 'commented') {
+    // The commented-out block only stops future loads — restart now so the
+    // already-running plugin host process actually exits and its memory is
+    // freed, instead of surviving until the user manually reloads/restarts.
+    await restartDartAnalysisServer();
+  }
   vscode.window.showInformationMessage(
     result === 'commented'
       ? l10n('notify.setup.disabledAnalyzer')

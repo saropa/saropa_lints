@@ -88,3 +88,43 @@ errors), not by a dedicated unit test. Flagged here for anyone adding
 
 Ran `tsc --noEmit` across the full extension source after all edits: 0
 errors.
+
+## Follow-up: memory not actually freed until the extension was disabled
+
+The gating fix above stops this extension's own `dart analyze` invocations,
+but did not address the report's second half: `dart.exe` stayed at 4-5GB
+after toggling "Lint integration: Off" and only dropped to ~2GB once the
+user disabled the whole extension. That is a different mechanism — the
+long-lived Dart analysis server's plugin host process (spawned by the
+official Dart extension when it loads the `plugins:` block in
+`analysis_options.yaml`), not a process this extension spawns directly.
+
+`runDisable()` already comments out the `plugins:` block
+(`disablePluginsIntegration()`), but editing the YAML only changes what the
+analysis server loads on its *next* start — it does not tell the
+already-running server to reload, so the already-spawned plugin host kept
+running (and holding its memory) until something else restarted the
+server (e.g. disabling the whole extension, which VS Code implements by
+tearing down and relaunching the extension host).
+
+Added `restartDartAnalysisServer()` in `setup.ts`, which calls the official
+Dart extension's `dart.restartAnalysisServer` command (guarded with a
+try/catch — that extension is not a hard dependency here and the command
+may not exist if it's absent or inactive). Wired into both directions:
+- `runDisable()` — after `disablePluginsIntegration()` actually comments
+  out the block, so the plugin host process exits immediately.
+- `runEnable()` — after `restorePluginsIntegration()` actually restores a
+  previously-commented block, so re-enabling takes effect immediately
+  instead of waiting for a manual reload.
+
+**Unverified:** whether `dart.restartAnalysisServer` actually terminates
+the plugin host's OS process (vs. only detaching from it and leaving it to
+exit on its own, or leaving it running as an unreferenced orphan) was not
+confirmed against a live VS Code + Dart extension session — no such
+session was available in this environment. If the user still sees the
+memory not freed after this change, the next step is to check
+`saropaLints.showProcessHealth` for lingering `dart.exe` processes with no
+live parent immediately after toggling off, and if the plugin host
+survives the restart command, fall back to explicitly `taskkill`-ing it by
+PID (the codebase already has `killProcess()` in `systemHealth/processQuery.ts`
+for an unrelated orphaned-daemon class and the pattern could be reused).

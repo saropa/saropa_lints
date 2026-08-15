@@ -64,6 +64,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+
+---
+
 ## [14.5.8]
 
 Fixed the extension running lint analysis in the background while "Lint integration" was turned off. Disabling the integration now stops every automatic analysis trigger and background suggestion, not just the editor diagnostics. [log](https://github.com/saropa/saropa_lints/blob/v14.5.8/CHANGELOG.md)
@@ -71,6 +76,7 @@ Fixed the extension running lint analysis in the background while "Lint integrat
 ### Fixed (Extension)
 
 - Turning off "Lint integration" now also stops analysis triggered by saving files, changing dependencies, changing tier, changing config, and enabling a rule pack, along with the crash-coverage rule suggestion. Previously only in-editor diagnostics were suppressed. No action required.
+- Turning off "Lint integration" now restarts the Dart analysis server immediately, so the plugin's background process actually exits instead of continuing to run (and hold onto several GB of memory) until the next manual reload. No action required.
 
 ### Changed (Extension)
 
