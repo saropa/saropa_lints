@@ -3932,3 +3932,25 @@ class FlutterBlue {
 }
 
 final FlutterBlue flutterBlue = FlutterBlue();
+
+// ============================================================================
+// CommonButton / CommonButtonWait (saropa_contacts design-system buttons)
+// ============================================================================
+
+class CommonButton extends Widget {
+  const CommonButton({
+    super.key,
+    String? text,
+    String? subtitleText,
+    void Function()? onPressed,
+  });
+}
+
+class CommonButtonWait extends Widget {
+  const CommonButtonWait({
+    super.key,
+    String? text,
+    String? subtitleText,
+    void Function()? onPressed,
+  });
+}

@@ -673,6 +673,12 @@ void main() {
       'prefer_const_literals_to_create_immutables',
       () => PreferConstLiteralsToCreateImmutablesRule(),
     );
+
+    testRule(
+      'AvoidParenthesizedButtonCaptionRule',
+      'avoid_parenthesized_button_caption',
+      () => AvoidParenthesizedButtonCaptionRule(),
+    );
   });
 
   // example/lib/: BAD lines must trigger; OK/false-positive blocks stay clean under analysis.

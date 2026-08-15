@@ -5759,3 +5759,123 @@ class _FieldAssignmentCollector extends RecursiveAstVisitor<void> {
     super.visitAssignmentExpression(node);
   }
 }
+
+/// Flags CommonButton / CommonButtonWait calls where `text:` contains
+/// parenthesized text that should be in `subtitleText:` instead.
+///
+/// Since: v14.5.9 | Rule version: v1
+///
+/// Buttons with a `text` and `subtitleText` parameter pair should use
+/// `subtitleText` for secondary detail. Embedding parenthesized
+/// clarifications inside `text` clutters the primary label, breaks
+/// visual hierarchy, and bypasses the dimmer subtitle styling.
+///
+/// Example of **bad** code:
+/// ```dart
+/// CommonButton(
+///   text: 'Delete All Contacts (User & Imported)',
+///   onPressed: () {},
+/// )
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// CommonButton(
+///   text: 'Delete All Contacts',
+///   subtitleText: 'User & Imported',
+///   onPressed: () {},
+/// )
+/// ```
+class AvoidParenthesizedButtonCaptionRule extends SaropaLintRule {
+  AvoidParenthesizedButtonCaptionRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'flutter', 'ui', 'ux'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  static const LintCode _code = LintCode(
+    'avoid_parenthesized_button_caption',
+    '[avoid_parenthesized_button_caption] CommonButton or CommonButtonWait '
+        '`text:` parameter contains parenthesized text that belongs in '
+        '`subtitleText:` instead. Inline parentheses clutter the primary '
+        'button label, break visual hierarchy, and bypass the dimmer subtitle '
+        'styling that subtitleText provides. {v1}',
+    correctionMessage:
+        'Move the parenthesized portion to the subtitleText: parameter '
+        'and remove it from text:.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  static const Set<String> _targetTypes = <String>{
+    'CommonButton',
+    'CommonButtonWait',
+  };
+
+  static final RegExp _parenPattern = RegExp(r'\(.*\)');
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addInstanceCreationExpression((InstanceCreationExpression node) {
+      final String typeName = node.constructorName.type.name.lexeme;
+      if (!_targetTypes.contains(typeName)) return;
+
+      final Expression? textArg = _findNamedArgValue(node, 'text');
+      if (textArg == null) return;
+
+      final String? literal = _extractStringValue(textArg);
+      if (literal == null) return;
+
+      if (_parenPattern.hasMatch(literal)) {
+        reporter.atNode(textArg);
+      }
+    });
+  }
+
+  static Expression? _findNamedArgValue(
+    InstanceCreationExpression node,
+    String name,
+  ) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == name) {
+        return arg.expression;
+      }
+    }
+    return null;
+  }
+
+  static String? _extractStringValue(Expression expr) {
+    if (expr is SimpleStringLiteral) return expr.value;
+    if (expr is AdjacentStrings) {
+      final StringBuffer buf = StringBuffer();
+      for (final StringLiteral part in expr.strings) {
+        if (part is SimpleStringLiteral) {
+          buf.write(part.value);
+        } else {
+          return null;
+        }
+      }
+      return buf.toString();
+    }
+    if (expr is BinaryExpression && expr.operator.lexeme == '+') {
+      final String? left = _extractStringValue(expr.leftOperand);
+      final String? right = _extractStringValue(expr.rightOperand);
+      if (left == null || right == null) return null;
+      return left + right;
+    }
+    return null;
+  }
+}

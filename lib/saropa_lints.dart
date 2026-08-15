@@ -751,6 +751,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferImageFilterQualityMediumRule.new,
   PreferSuperKeyRule.new,
   AvoidChipDeleteInkWellCircleBorderRule.new,
+  AvoidParenthesizedButtonCaptionRule.new,
 
   // Accessibility rules (NEW)
   AvoidIconButtonsWithoutTooltipRule.new,

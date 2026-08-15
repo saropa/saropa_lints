@@ -3246,6 +3246,8 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'sort_pub_dependencies', // INFO - unsorted pubspec deps
   // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
   'avoid_overly_wide_app_constraint', // INFO - app: range spans 2+ majors
+  // CommonButton/CommonButtonWait caption hygiene (widget_patterns_avoid_prefer_rules.dart)
+  'avoid_parenthesized_button_caption',
 };
 
 /// Pedantic tier rules - pedantic, highly opinionated rules.

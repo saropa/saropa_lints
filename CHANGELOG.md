@@ -64,8 +64,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [14.5.9]
 
+This release adds a rule catching a common button-labeling mistake: cramming extra detail into a button's main text using parentheses instead of the dedicated subtitle line. Buttons that mix primary and secondary information this way are harder to scan and lose the visual hierarchy the subtitle styling provides. [log](https://github.com/saropa/saropa_lints/blob/v14.5.9/CHANGELOG.md)
+
+### Added
+
+- New rule `avoid_parenthesized_button_caption` (Comprehensive tier): flags `CommonButton` / `CommonButtonWait` calls where the `text:` parameter contains parenthesized text that belongs in `subtitleText:` instead. No action required.
 
 ---
 
@@ -493,27 +498,6 @@ Adds a rule pack for device_calendar_plus, a maintained replacement for the aban
 - Fixed an inconsistent `target`/`realTarget` accessor in the device_calendar_plus UTC-taint helper's `DateTime.parse` branch (no behavior change — not a realistic cascade shape).
 
 </details>
-
----
-
-## [14.3.2]
-
-Cuts sustained editor CPU while you type. The analyzer plugin runs inside the Dart analysis server, which re-analyzes a file on nearly every keystroke; until now each pass re-ran the entire configured tier over code that was still in flux. During rapid editing the plugin now defers all of its rules until editing settles — the Dart analyzer still reports compile errors live. Full-fidelity batch analysis is unchanged. [log](https://github.com/saropa/saropa_lints/blob/v14.3.2/CHANGELOG.md)
-
-### Fixed
-
-- While a file is being rapidly edited in the editor, the analyzer plugin now defers all of its rules until editing settles, instead of re-running the configured tier on every keystroke-triggered pass over code still in flux — cutting sustained CPU during active development. Batch and CLI analysis (`dart run saropa_lints scan`, `dart analyze`) still run every rule at full fidelity, and the Dart analyzer keeps reporting compile errors live while you type. No action required; saropa_lints diagnostics reappear once editing pauses.
-
----
-
-## [14.3.1]
-
-Fix for raised issue: https://github.com/saropa/saropa_lints/issues/269  [log](https://github.com/saropa/saropa_lints/blob/v14.3.1/CHANGELOG.md)
-
-### Fixed
-
-- The baseline generator (`dart run saropa_lints:baseline`) parsed `dart analyze` output with the wrong format matcher and so reported **every** project as clean, generating an empty baseline. It now reads the analyzer's diagnostic format correctly and captures real violations. Re-run the command to regenerate an accurate baseline.
-- The baseline generator no longer reports a false "clean codebase" success and exits 0 when the underlying analysis fails to run — for example when an analyzer plugin crashes and produces no output. It now detects the failed analysis, prints the error, and exits non-zero so CI cannot mistake a crash for a clean pass. No action required.
 
 ---
 

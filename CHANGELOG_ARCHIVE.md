@@ -6,6 +6,27 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [14.3.2]
+
+Cuts sustained editor CPU while you type. The analyzer plugin runs inside the Dart analysis server, which re-analyzes a file on nearly every keystroke; until now each pass re-ran the entire configured tier over code that was still in flux. During rapid editing the plugin now defers all of its rules until editing settles — the Dart analyzer still reports compile errors live. Full-fidelity batch analysis is unchanged. [log](https://github.com/saropa/saropa_lints/blob/v14.3.2/CHANGELOG.md)
+
+### Fixed
+
+- While a file is being rapidly edited in the editor, the analyzer plugin now defers all of its rules until editing settles, instead of re-running the configured tier on every keystroke-triggered pass over code still in flux — cutting sustained CPU during active development. Batch and CLI analysis (`dart run saropa_lints scan`, `dart analyze`) still run every rule at full fidelity, and the Dart analyzer keeps reporting compile errors live while you type. No action required; saropa_lints diagnostics reappear once editing pauses.
+
+---
+
+## [14.3.1]
+
+Fix for raised issue: https://github.com/saropa/saropa_lints/issues/269  [log](https://github.com/saropa/saropa_lints/blob/v14.3.1/CHANGELOG.md)
+
+### Fixed
+
+- The baseline generator (`dart run saropa_lints:baseline`) parsed `dart analyze` output with the wrong format matcher and so reported **every** project as clean, generating an empty baseline. It now reads the analyzer's diagnostic format correctly and captures real violations. Re-run the command to regenerate an accurate baseline.
+- The baseline generator no longer reports a false "clean codebase" success and exits 0 when the underlying analysis fails to run — for example when an analyzer plugin crashes and produces no output. It now detects the failed analysis, prints the error, and exits non-zero so CI cannot mistake a crash for a clean pass. No action required.
+
+---
+
 ## [14.3.0]
 
 Stops the analyzer plugin from driving the Dart analysis server to a multi-GB out-of-memory hang on large projects. Because the plugin runs inside the analysis server, running rules there forces the editor to hold the project's resolved model in memory. A real-memory safety valve now pauses rule execution before the server saturates RAM, previously-inert cache eviction bounds the plugin's own footprint, and a project that has enabled no rules at all defaults to the essential set in-editor. Rules you have explicitly enabled always run as configured. [log](https://github.com/saropa/saropa_lints/blob/v14.3.0/CHANGELOG.md)
