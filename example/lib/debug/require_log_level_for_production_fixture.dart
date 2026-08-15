@@ -134,3 +134,37 @@ void _fp310_objectDebug() {
 void _fp310_objectTrace() {
   openTelemetry.trace('span-name');
 }
+
+enum _DebugLevel { info, verbose }
+
+// Locally-declared wrapper whose `level` parameter already defaults to a
+// safe value — bare calls should NOT lint even without a debug-mode guard,
+// since demanding an explicit `level:` argument would be a no-op.
+void debug(String message, {_DebugLevel level = _DebugLevel.info}) {}
+
+// FALSE POSITIVE: callee's `level` parameter already defaults safely.
+void _fp310_safeLevelDefault() {
+  debug('waiting up to 5s');
+}
+
+// Locally-declared wrapper spelling its log-level parameter `logLevel`
+// instead of `level` — still recognized, since real-world wrappers use
+// several different names for this concept.
+void trace(String message, {_DebugLevel logLevel = _DebugLevel.info}) {}
+
+// FALSE POSITIVE: `logLevel` (not `level`) still defaults safely.
+void _fp310_logLevelParamName() {
+  trace('connecting to peer');
+}
+
+// Locally-declared wrapper whose `level` parameter has a bare numeric
+// default (no qualified enum-constant name to check for safety) — treated
+// as unsafe, since there is nothing to prove the default isn't verbose.
+void finest(String message, {int level = 5}) {}
+
+// BAD: Should trigger require_log_level_for_production — numeric default
+// has no enum-constant name to verify as safe, so it must still be flagged.
+// expect_lint: require_log_level_for_production
+void _bad310_numericLevelDefault() {
+  finest('polling status');
+}

@@ -3,6 +3,7 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -937,10 +938,14 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
 
 /// Warns when verbose logging methods are used without a debug-mode guard.
 ///
-/// Since: v4.14.0 | Rule version: v1
+/// Since: v4.14.0 | Updated: v14.5.10 | Rule version: v3
 ///
 /// `[HEURISTIC]` - Detects verbose log calls (log, fine, finer, finest, debug,
 /// trace, verbose) outside kDebugMode/kReleaseMode guards or assert blocks.
+/// Skipped when the resolved callee already defaults its log-level parameter
+/// (`level`/`logLevel`/`severity`/`verbosity`) to a non-verbose value, since
+/// demanding an explicit `level:` argument would be a no-op; a callee whose
+/// own default is itself verbose is still flagged.
 ///
 /// Verbose logging in production builds exposes internal state, degrades
 /// performance, and may leak sensitive information to device logs.
@@ -974,15 +979,21 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
   @override
   Set<String> get tags => const {'testing'};
 
+  // Bumped from RuleCost.low: resolving the callee's element and formal
+  // parameters (to check for a safe `level` default) requires cross-library
+  // type resolution, which is no longer a single cheap AST node inspection.
   @override
-  RuleCost get cost => RuleCost.low;
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_log_level_for_production',
     '[require_log_level_for_production] Verbose log method called without '
         'a debug-mode guard. In production builds, verbose logging exposes '
         'internal application state, degrades performance, and may leak '
-        'sensitive information to device logs accessible by other apps. {v1}',
+        'sensitive information to device logs accessible by other apps. {v3}',
     correctionMessage:
         'Wrap verbose logging in if (kDebugMode) { ... } or use '
         'a log-level-aware logger that suppresses verbose output in release.',
@@ -1028,6 +1039,11 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
       // Skip if already inside a debug guard
       if (_isInsideDebugContext(node)) return;
 
+      // Skip if the resolved callee already defaults its `level` parameter
+      // to a safe value (e.g. a project-level `debug()` wrapper) — demanding
+      // an explicit `level:` argument would be a no-op.
+      if (_hasSafeLevelDefault(node.methodName.element)) return;
+
       reporter.atNode(node);
     });
 
@@ -1038,9 +1054,9 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
       final Expression function = node.function;
       if (function is SimpleIdentifier &&
           _verboseLogMethods.contains(function.name)) {
-        if (!_isInsideDebugContext(node)) {
-          reporter.atNode(node);
-        }
+        if (_isInsideDebugContext(node)) return;
+        if (_hasSafeLevelDefault(function.element)) return;
+        reporter.atNode(node);
       }
     });
   }
@@ -1055,6 +1071,59 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
       }
       if (current is AssertStatement) return true;
       current = current.parent;
+    }
+    return false;
+  }
+
+  /// Parameter names (lower-cased, exact match) that signal "this is the
+  /// log-level knob" on a logging wrapper. Not just `level` — real-world
+  /// wrappers also spell this `logLevel`, `severity`, or `verbosity`; a rule
+  /// checking only `level` gives those callees no benefit from this fix and
+  /// keeps flagging their already-safe defaults.
+  static const Set<String> _levelParameterNames = <String>{
+    'level',
+    'loglevel',
+    'severity',
+    'verbosity',
+  };
+
+  /// Enum-constant names (lower-cased, exact match — not substring) that
+  /// signal the callee's own default is itself a verbose level. A default
+  /// of e.g. `Level.trace` means the callee did NOT make a safe choice, so
+  /// the diagnostic must still fire for it.
+  static const Set<String> _verboseDefaultValueNames = <String>{
+    'verbose',
+    'trace',
+    'finest',
+    'finer',
+    'fine',
+    'debug',
+    'all',
+  };
+
+  /// True when the resolved callee declares a log-level-shaped parameter
+  /// (see [_levelParameterNames]) whose own default value is safe (i.e. not
+  /// itself a verbose level), meaning the callee already made the safety
+  /// decision (e.g. `void debug(Object? msg, {DebugLevels level =
+  /// DebugLevels.Info})`) and an explicit `level:` argument at the call site
+  /// would change nothing.
+  ///
+  /// A default with no qualified enum-constant reference (no `.` in
+  /// `defaultValueCode` — e.g. a bare numeric literal `int level = 3`) is
+  /// deliberately treated as UNSAFE rather than safe: there is no name to
+  /// check against [_verboseDefaultValueNames], and guessing "no name means
+  /// safe" would silently stop flagging a genuinely verbose numeric default.
+  bool _hasSafeLevelDefault(Element? callee) {
+    if (callee is! ExecutableElement) return false;
+    for (final FormalParameterElement param in callee.formalParameters) {
+      final String? paramName = param.name?.toLowerCase();
+      if (!_levelParameterNames.contains(paramName) || !param.hasDefaultValue) {
+        continue;
+      }
+      final String? defaultCode = param.defaultValueCode;
+      if (defaultCode == null || !defaultCode.contains('.')) return false;
+      final String constantName = defaultCode.split('.').last.toLowerCase();
+      return !_verboseDefaultValueNames.contains(constantName);
     }
     return false;
   }
