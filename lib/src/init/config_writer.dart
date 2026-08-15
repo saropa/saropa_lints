@@ -184,7 +184,9 @@ String generatePluginsYaml({
     buffer.writeln(
       '    # Code extension\'s scan-on-save (out-of-process, ~3 GB fixed) covers',
     );
-    buffer.writeln('    # the same diagnostics for a fraction of the cost — see');
+    buffer.writeln(
+      '    # the same diagnostics for a fraction of the cost — see',
+    );
     buffer.writeln(
       '    # plans/PLAN_scan_only_diagnostics.md. New projects get this block',
     );
@@ -202,7 +204,9 @@ String generatePluginsYaml({
   // Section 1: User customizations (always at top, preserved)
   if (userCustomizations.isNotEmpty) {
     if (compact) {
-      buffer.writeln('      # USER CUSTOMIZATIONS (preserved; --reset discards)');
+      buffer.writeln(
+        '      # USER CUSTOMIZATIONS (preserved; --reset discards)',
+      );
     } else {
       buffer.writeln(sectionHeader('USER CUSTOMIZATIONS', '~'));
       buffer.writeln(
@@ -286,7 +290,9 @@ String generatePluginsYaml({
 
   if (stylisticEnabled.isNotEmpty) {
     if (compact) {
-      buffer.writeln('      # STYLISTIC RULES (opt-in, ${stylisticEnabled.length} rules)');
+      buffer.writeln(
+        '      # STYLISTIC RULES (opt-in, ${stylisticEnabled.length} rules)',
+      );
     } else {
       buffer.writeln(sectionHeader('STYLISTIC RULES (opt-in)', '~'));
       buffer.writeln('      # Formatting, ordering, naming conventions.');
