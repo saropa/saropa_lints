@@ -2085,10 +2085,12 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
           break;
         }
         if (current is FunctionDeclaration) {
-          // Check function body
+          // Check function body, then fall back to the whole file — App
+          // Check activation is commonly deferred to a separate function
+          // (e.g. a queued startup task) so it doesn't block first frame.
           final funcSource = current.toSource();
-          if (funcSource.contains('FirebaseAppCheck') &&
-              funcSource.contains('activate')) {
+          if (_containsAppCheckActivation(funcSource) ||
+              _containsAppCheckActivation(context.fileContent)) {
             return;
           }
           reporter.atNode(node);
@@ -2103,9 +2105,10 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
 
       final methodSource = enclosingMethod.toSource();
 
-      // Check if App Check is activated
-      if (!methodSource.contains('FirebaseAppCheck') ||
-          !methodSource.contains('activate')) {
+      // Check if App Check is activated, in this method or elsewhere in
+      // the file (see comment above on deferred activation).
+      if (!_containsAppCheckActivation(methodSource) &&
+          !_containsAppCheckActivation(context.fileContent)) {
         reporter.atNode(node);
       }
     });
@@ -3028,13 +3031,16 @@ class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
       if (target == null) return;
       if (target is! SimpleIdentifier || target.name != 'Firebase') return;
 
-      // Check if the same function body contains AppCheck activation
+      // Check if the same function body contains AppCheck activation. Apps
+      // commonly defer activate() to a separate function (e.g. queued as a
+      // deferred startup task) so a slow/flaky Play Integrity check can't
+      // block first frame — so also fall back to a whole-file search before
+      // reporting, matching the class doc's stated intent ("not necessarily
+      // in the same file").
       final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
-      if (body == null) return;
-
-      final String source = body.toSource();
-      if (RegExp(r'\bFirebaseAppCheck\b').hasMatch(source) ||
-          RegExp(r'\bAppCheck\b').hasMatch(source)) {
+      final String bodySource = body?.toSource() ?? '';
+      if (_containsAppCheckActivation(bodySource) ||
+          _containsAppCheckActivation(context.fileContent)) {
         return;
       }
 
@@ -3042,6 +3048,10 @@ class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
     });
   }
 }
+
+bool _containsAppCheckActivation(String source) =>
+    RegExp(r'\bFirebaseAppCheck\b').hasMatch(source) ||
+    RegExp(r'\bAppCheck\b').hasMatch(source);
 
 /// Warns when sensitive Firebase Auth operations are used without reauthentication.
 ///

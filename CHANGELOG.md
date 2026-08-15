@@ -69,6 +69,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Added
 
 - `require_error_logging` now offers a quick fix: applying it inserts a `debugPrint` call logging the caught error (interpolating the captured exception variable when one exists, or naming the statically-known exception type when it does not) instead of only reporting the missing log call.
+- `move_variable_closer_to_its_usage` now offers a quick fix: applying it moves the flagged declaration down to just before its first use. The fix only activates when doing so is provably safe (a single-variable declaration whose initializer shares no identifier with any statement it would move past) and otherwise leaves the diagnostic for manual review, so no action is required beyond reviewing the proposed edit before applying it.
 
 ### Fixed
 

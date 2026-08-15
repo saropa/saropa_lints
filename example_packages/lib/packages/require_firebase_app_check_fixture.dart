@@ -122,3 +122,13 @@ void _good625_initFirebase() async {
   await FirebaseAppCheck.instance.activate();
   FirebaseFirestore.instance.collection('users').get();
 }
+
+// GOOD: App Check is activated in a separate top-level function in the same
+// file (e.g. deferred to a later startup task) — should NOT trigger.
+void _good625_initFirebaseDeferred() async {
+  await Firebase.initializeApp();
+}
+
+void _good625_activateAppCheckLater() async {
+  await FirebaseAppCheck.instance.activate();
+}
