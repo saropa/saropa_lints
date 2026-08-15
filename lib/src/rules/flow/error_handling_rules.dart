@@ -13,6 +13,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
 import '../../analyzer_metadata_compat_utils.dart';
+import '../../catch_body_logging_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/error_handling/add_rethrow_in_catch_fix.dart';
 import '../../fixes/error_handling/change_exception_to_object_fix.dart';
@@ -751,6 +752,18 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
       }
 
       if (!hasBuilder) {
+        // Skip the app's own crash-recovery screen: a MaterialApp/CupertinoApp
+        // built inside a catch clause that already logged the caught error is
+        // the fallback UI, not the app's normal entry point. Demanding it also
+        // carry an error-boundary builder is recursive — it can only run after
+        // the one real failure path already terminated.
+        final CatchClause? enclosingCatch = node
+            .thisOrAncestorOfType<CatchClause>();
+        if (enclosingCatch != null &&
+            catchBodyHasLoggingCall(enclosingCatch.body)) {
+          return;
+        }
+
         reporter.atNode(node.constructorName, code);
       }
     });
@@ -2417,65 +2430,6 @@ class RequireErrorLoggingRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
-  /// Method/function names that indicate logging is happening.
-  static const Set<String> _loggingMethods = <String>{
-    // Standard logging
-    'log',
-    'print',
-    'debugPrint',
-    'debugPrintStack',
-
-    // Common logger methods
-    'error',
-    'warning',
-    'warn',
-    'info',
-    'debug',
-    'severe',
-    'shout',
-    'fine',
-    'finer',
-    'finest',
-
-    // Crash reporting services
-    'recordError',
-    'recordFlutterError',
-    'captureException',
-    'captureMessage',
-    'logError',
-    'logException',
-    'reportError',
-    'report',
-
-    // Firebase Crashlytics
-    'recordFlutterFatalError',
-
-    // Sentry
-    'captureEvent',
-
-    // Custom debug helpers
-    'debugException',
-    'logDebug',
-    'logWarning',
-    'logInfo',
-  };
-
-  /// Receiver names that indicate a logger object.
-  static const Set<String> _loggerReceivers = <String>{
-    'logger',
-    'log',
-    'Logger',
-    'Crashlytics',
-    'crashlytics',
-    'FirebaseCrashlytics',
-    'Sentry',
-    'sentry',
-    'analytics',
-    'Analytics',
-    'debugger',
-    'console',
-  };
-
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -2487,46 +2441,16 @@ class RequireErrorLoggingRule extends SaropaLintRule {
       // Skip empty catch blocks - handled by AvoidSwallowingExceptionsRule
       if (body.statements.isEmpty) return;
 
-      // Check if the exception variable exists and is used in logging
-      final CatchClauseParameter? exceptionParam = node.exceptionParameter;
-      if (exceptionParam == null) {
-        // No exception variable captured - can't log it
-        reporter.atNode(node);
-        return;
-      }
-
-      // Check if any logging method is called in the catch body
-      if (!_hasLoggingCall(body)) {
+      // Always check the body for a logging call first, regardless of
+      // whether an exception variable was captured. A clause like
+      // `on TimeoutException { debug('timed out'); }` logs a complete,
+      // useful message about the static exception type without ever
+      // needing the exception object itself, so capture is not required
+      // for compliance - only absence of any logging call is a violation.
+      if (!catchBodyHasLoggingCall(body)) {
         reporter.atNode(node);
       }
     });
-  }
-
-  /// Checks if the block contains any logging method calls.
-  bool _hasLoggingCall(Block body) {
-    final String bodySource = body.toSource();
-
-    for (final String method in _loggingMethods) {
-      if (RegExp(
-            r'\b' + RegExp.escape(method) + r'\s*\(',
-          ).hasMatch(bodySource) ||
-          RegExp(
-            r'\.' + RegExp.escape(method) + r'\s*\(',
-          ).hasMatch(bodySource)) {
-        return true;
-      }
-    }
-
-    for (final String receiver in _loggerReceivers) {
-      if (RegExp(RegExp.escape(receiver) + r'\.').hasMatch(bodySource)) {
-        return true;
-      }
-    }
-
-    if (RegExp(r'\brethrow\b').hasMatch(bodySource)) return true;
-    if (RegExp(r'\bthrow\s+').hasMatch(bodySource)) return true;
-
-    return false;
   }
 }
 

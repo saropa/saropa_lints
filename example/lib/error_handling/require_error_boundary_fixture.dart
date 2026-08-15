@@ -124,3 +124,17 @@ void _good359() {
     home: MyHomePage(),
   );
 }
+
+// GOOD: MaterialApp built inside a catch clause that already logged the
+// caught error is the app's crash-recovery fallback UI, not its normal
+// entry point — demanding a builder: here is recursive.
+void _good360() {
+  try {
+    _bad359();
+  } on Object catch (error, stack) {
+    debugException(error, stack);
+    MaterialApp(
+      home: MyHomePage(),
+    );
+  }
+}
