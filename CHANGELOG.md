@@ -70,12 +70,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - `avoid_catching_generic_exception` no longer flags `on Object`/`on Exception`/`dynamic` catch clauses whose body forwards the caught error to a logging or crash-reporting call (or rethrows it) before falling back — this is a deliberate pattern for also catching `Error` subtypes and reporting them, not a swallowed exception. Untyped `catch (e)` is unaffected. ([bugs/avoid_catching_generic_exception_false_positive_logged_broad_catch.md](bugs/avoid_catching_generic_exception_false_positive_logged_broad_catch.md))
 - `require_error_boundary` no longer flags a `MaterialApp`/`CupertinoApp` built inside a `catch` clause that already logged the caught error — that's the app's own crash-recovery fallback UI, not its normal entry point, and demanding it also carry an error-boundary `builder:` is recursive. A `MaterialApp`/`CupertinoApp` built outside any such catch still requires a `builder:` as before. ([bugs/require_error_boundary_false_positive_fallback_ui_inside_catch.md](bugs/require_error_boundary_false_positive_fallback_ui_inside_catch.md))
+- `require_error_logging` no longer flags a `catch`/`on Type` clause with no captured exception variable if its body still calls a recognized logging function — a static message like `on TimeoutException { debug('timed out'); }` is a complete log entry even without touching the exception object. A clause with no captured variable and no logging call is still flagged, as before. ([bugs/require_error_logging_false_positive_unparamed_catch_with_logged_body.md](bugs/require_error_logging_false_positive_unparamed_catch_with_logged_body.md))
 
 ### Changed (Extension)
 
 - Saving a Dart file now scans it in an external process and shows findings as squiggles and Problems panel entries — no separate setting to find or enable, this is what `saropaLints.enabled` now does. Turning that toggle off stops save scans and shuts the scanner down immediately, rather than leaving stale findings in the Problems panel. `saropaLints.scanOnSave.resolveTypes` (default on) controls whether scans fully resolve types so type-based rules fire; turn it off only if save latency matters more than catching those rules.
 - Type-resolved save scans run through a persistent `scan_daemon` process that builds the analyzer's project context once and keeps it warm, so a save is checked in a few seconds instead of re-paying a roughly one-minute analyzer warmup on every save. The status bar shows a warming message while the first scan after opening is still resolving; the daemon restarts automatically (with backoff) if it stops. Measured memory is comparable to the in-process analyzer plugin — the daemon's advantage is living outside the editor's own process, not a smaller footprint.
 - New projects (`dart run saropa_lints:init` or the extension's Enable) no longer get a live in-process analyzer plugin — the `plugins:` block is written commented out by default, since it can hold several GB of resolved analysis state on large projects for no benefit over the scan-on-save daemon above. A project that already had the plugin running, or had it explicitly turned off, keeps that state through tier changes and re-enabling; uncomment the block in `analysis_options.yaml` to opt back in to live in-editor squiggles.
+
+<details>
+<summary>Maintenance</summary>
+
+- Investigated a `no_magic_string` false-positive report (string literal inside a `//`-commented-out `debugPrint` call) and confirmed by code inspection it cannot occur — the rule and all its gating helpers are AST-callback-only, with no raw-text scanning. Added a resolved-analyzer regression test pinning this behavior. ([bugs/no_magic_string_false_positive_commented_out_code.md](bugs/no_magic_string_false_positive_commented_out_code.md))
+
+</details>
 
 ---
 
