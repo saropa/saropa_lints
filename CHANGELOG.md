@@ -96,6 +96,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 <summary>Maintenance</summary>
 
 - Investigated a `no_magic_string` false-positive report (string literal inside a `//`-commented-out `debugPrint` call) and confirmed by code inspection it cannot occur — the rule and all its gating helpers are AST-callback-only, with no raw-text scanning. Added a resolved-analyzer regression test pinning this behavior. ([bugs/no_magic_string_false_positive_commented_out_code.md](bugs/no_magic_string_false_positive_commented_out_code.md))
+- Manually corrected six German and Swahili extension strings that the MT pipeline's Google fallback had produced when the primary engine declined them, including one where the Swahili translation had mangled the literal `--resolve` CLI flag name into `--suluhisha`.
 
 </details>
 
