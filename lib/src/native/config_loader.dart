@@ -91,10 +91,49 @@ void loadNativePluginConfigFromProjectRoot(String projectRoot) {
   _loadFromRoot(projectRoot);
 }
 
+/// Substring of the sentinel the VS Code extension writes into
+/// `analysis_options.yaml` when the user toggles "Lint integration" off
+/// (it comments out the `plugins:` block and brackets it with this marker —
+/// see `DISABLE_BEGIN_MARKER` in `extension/src/setup.ts`). Matched as a
+/// substring so punctuation/arrow changes around it don't silently defeat
+/// the kill switch.
+const String kIntegrationOffSentinel =
+    'saropa_lints integration turned OFF by the VS Code extension';
+
 /// Shared implementation for config loading from an optional [projectRoot].
 /// When null, falls back to [Directory.current].
 void _loadFromRoot(String? projectRoot) {
   try {
+    // Hard kill switch — in-server plugin only. If the consumer's
+    // analysis_options.yaml carries the extension's OFF sentinel, the user
+    // explicitly disabled lint integration: enable ZERO rules, no matter
+    // what fallback (tier floor, packs, severity-implied enables) would
+    // otherwise populate the set. Field evidence (2026-08-13, contacts
+    // project): with the plugins block commented out, a plugin session
+    // still loaded 1034 rules from fallbacks and held multi-GB of resolved
+    // AST state. Scoped to [_nativePluginStarted] so the scan CLI and the
+    // rule test harness — which run full coverage deliberately, including
+    // on projects whose integration is toggled off — are unaffected.
+    if (_nativePluginStarted) {
+      final mainOptions = _readProjectFile(
+        'analysis_options.yaml',
+        projectRoot,
+      );
+      if (mainOptions != null &&
+          mainOptions.contains(kIntegrationOffSentinel)) {
+        SaropaLintRule.enabledRules = null;
+        SaropaLintRule.disabledRules = null;
+        SaropaLintRule.severityOverrides = null;
+        PluginLogger.log(
+          'Lint integration is turned OFF (sentinel found in '
+          'analysis_options.yaml) — 0 rules enabled. Toggle "Lint '
+          'integration" On in the VS Code extension to restore.',
+        );
+
+        return;
+      }
+    }
+
     final content = _readProjectFile(
       'analysis_options_custom.yaml',
       projectRoot,

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2334,
+  "ruleCount": 2335,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -8074,6 +8074,23 @@
       "certIds": [],
       "tags": [
         "maintainability"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
+    "avoid_parenthesized_button_caption": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "flutter",
+        "ui",
+        "ux"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,

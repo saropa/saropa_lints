@@ -66,11 +66,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [14.5.9]
 
-This release adds a rule catching a common button-labeling mistake: cramming extra detail into a button's main text using parentheses instead of the dedicated subtitle line. Buttons that mix primary and secondary information this way are harder to scan and lose the visual hierarchy the subtitle styling provides. [log](https://github.com/saropa/saropa_lints/blob/v14.5.9/CHANGELOG.md)
+This release adds a rule catching a common button-labeling mistake: cramming extra detail into a button's main text using parentheses instead of the dedicated subtitle line. It also closes the last gap in the "Lint integration off" toggle: the analyzer plugin itself now refuses to enable any rules while the integration is disabled, so no fallback configuration can silently re-enable analysis and its multi-gigabyte memory footprint. [log](https://github.com/saropa/saropa_lints/blob/v14.5.9/CHANGELOG.md)
 
 ### Added
 
 - New rule `avoid_parenthesized_button_caption` (Comprehensive tier): flags `CommonButton` / `CommonButtonWait` calls where the `text:` parameter contains parenthesized text that belongs in `subtitleText:` instead. No action required.
+
+### Fixed
+
+- The analyzer plugin now enables zero rules whenever "Lint integration" is toggled off, even if it gets loaded anyway — previously fallback configuration could re-enable over a thousand rules and hold several GB of analysis-server memory on a project the user had disabled. No action required.
 
 ---
 
