@@ -2245,19 +2245,23 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
 /// Alias: move_variable_closer_to_usage
 ///
 /// Distance is measured in intervening sibling statements, not source lines,
-/// so a single multi-line initializer never counts as "far". Statements that
-/// are themselves part of this block's own declare/consume story — another
-/// of its declarations, or the first-use site of another variable it
-/// declares — are excluded from that count, so a deliberate "load N, then
-/// consume N" batch (e.g. five awaited loads followed by five assignments
-/// consuming them in order) reads as one legible unit instead of each member
-/// accumulating false distance from its position in the group. The rule
-/// stays silent when the first use is nested inside a loop,
+/// so a single multi-line initializer never counts as "far". A statement is
+/// excluded from that count only when it is genuinely part of the same
+/// batch as the declaration being measured: another declaration in the same
+/// *contiguous* run of declarations whose own variable is itself used
+/// somewhere (not dead clutter that merely sits nearby), or the first-use
+/// statement of another variable from that same run. This lets a deliberate
+/// "load N, then consume N" batch (e.g. five awaited loads followed by five
+/// assignments consuming them in order) read as one legible unit instead of
+/// each member accumulating false distance from its position in the group,
+/// while an unrelated declaration that just happens to sit next to a lonely
+/// one still counts toward the threshold. The rule stays silent when the
+/// first use is nested inside a loop,
 /// branch, nested block, or closure: moving an accumulator into a loop would
 /// reset it every iteration, and moving a value into one branch would drop it
 /// from sibling branches that also read it. See
 /// plans/history/2026.05/2026.05.21/move_variable_closer_to_its_usage_false_positive_loop_accumulator.md
-/// and bugs/move_variable_closer_to_its_usage_false_positive_batch_declaration_grouping.md.
+/// and plans/history/2026.08/2026.08.15/move_variable_closer_to_its_usage_false_positive_batch_declaration_grouping.md.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -2370,33 +2374,43 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
         _FirstUsageVisitor(declarations.keys.toSet(), firstUsage),
       );
 
-      // Third pass: collect every direct-child statement that is itself part
-      // of "this block's own declare/consume story" — either a declaration
-      // of one of this block's variables, or the statement holding the first
-      // use of one of them. A batch of N sequential loads followed by N
-      // statements that consume them in order is built entirely from these
-      // two kinds of statement, so excluding both from the "intervening"
-      // count is what lets that deliberate two-phase shape read as legible
-      // instead of accumulating false distance per member.
-      final Set<Statement> batchStatements = <Statement>{};
-      for (final Statement statement in node.statements) {
-        if (statement is VariableDeclarationStatement) {
-          batchStatements.add(statement);
-        }
-      }
-      for (final SimpleIdentifier useNode in firstUsage.values) {
-        final Statement? useStatement = useNode
+      // Third pass: index which statements are themselves declarations, and
+      // which direct-child statements hold the first use of a block-declared
+      // variable (a use-statement can first-use more than one variable, e.g.
+      // `result.driftOk = driftOk` first-uses both `result` and `driftOk`).
+      final List<Statement> statements = node.statements;
+      final List<bool> isDeclStatement = <bool>[
+        for (final Statement s in statements) s is VariableDeclarationStatement,
+      ];
+      final Map<Statement, List<String>> useStatementVars =
+          <Statement, List<String>>{};
+      for (final MapEntry<String, SimpleIdentifier> entry
+          in firstUsage.entries) {
+        final Statement? useStatement = entry.value
             .thisOrAncestorOfType<Statement>();
         if (useStatement != null && useStatement.parent == node) {
-          batchStatements.add(useStatement);
+          (useStatementVars[useStatement] ??= <String>[]).add(entry.key);
         }
       }
+      // A variable counts as "genuinely consumed" (not dead clutter sitting
+      // next to a real declaration) if it has any recorded first use at all,
+      // even one nested in a loop/branch/closure — that still proves it
+      // isn't unused padding, even though a nested use can't itself satisfy
+      // the direct-child guard below.
+      final Set<String> consumedVars = firstUsage.keys.toSet();
 
       for (final MapEntry<String, VariableDeclaration> entry
           in declarations.entries) {
         final SimpleIdentifier? useNode = firstUsage[entry.key];
         if (useNode == null) continue;
-        if (_canMoveCloser(node, entry.value, useNode, batchStatements)) {
+        if (_canMoveCloser(
+          node,
+          entry.value,
+          useNode,
+          isDeclStatement,
+          useStatementVars,
+          consumedVars,
+        )) {
           reporter.atToken(entry.value.name, code);
         }
       }
@@ -2412,19 +2426,24 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
   ///   accumulator into a per-iteration reset; relocating into one branch drops
   ///   the variable from sibling branches that also read it.
   /// - At least [_minInterveningStatements] sibling statements unrelated to
-  ///   this block's own declarations must separate the declaration from the
-  ///   use statement. Counting statements (not lines) ignores the
-  ///   declaration's own multi-line initializer. [batchStatements] excludes
-  ///   both other declarations and other declared variables' first-use
-  ///   statements from the count, so a deliberate "load N, then consume N"
-  ///   batch — where every intervening sibling is itself part of that same
-  ///   declare/consume story — reads as one legible unit instead of each
-  ///   member accumulating false distance from its position in the group.
+  ///   this batch's own declare/consume story must separate the declaration
+  ///   from the use statement. An intervening statement is exempted only when
+  ///   it is (a) another declaration in the same *contiguous* run of
+  ///   declarations as [decl] whose variable is itself genuinely used
+  ///   somewhere (not dead clutter that merely happens to sit nearby), or (b)
+  ///   the first-use statement of another variable declared in that same
+  ///   run. Requiring both contiguity and genuine downstream use is what
+  ///   distinguishes a deliberate "load N, then consume N" batch — where
+  ///   every intervening sibling really is part of that same story — from an
+  ///   unrelated declaration that merely happens to sit next to this one;
+  ///   the latter must still count toward the threshold.
   bool _canMoveCloser(
     Block block,
     VariableDeclaration decl,
     SimpleIdentifier useNode,
-    Set<Statement> batchStatements,
+    List<bool> isDeclStatement,
+    Map<Statement, List<String>> useStatementVars,
+    Set<String> consumedVars,
   ) {
     // The statement holding the first use must be a direct child of the block;
     // anything nested means the declaration must enclose that inner scope.
@@ -2435,18 +2454,74 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
         .thisOrAncestorOfType<VariableDeclarationStatement>();
     if (declStatement == null) return false;
 
-    final int declIndex = block.statements.indexOf(declStatement);
-    final int useIndex = block.statements.indexOf(useStatement);
+    final List<Statement> statements = block.statements;
+    final int declIndex = statements.indexOf(declStatement);
+    final int useIndex = statements.indexOf(useStatement);
     if (declIndex < 0 || useIndex <= declIndex) return false;
+
+    // The maximal contiguous run of declaration statements containing
+    // [decl] — its "load group". Membership in this run, not merely being a
+    // declaration anywhere in the block, is what a legitimate batch sibling
+    // requires.
+    int groupStart = declIndex;
+    while (groupStart > 0 && isDeclStatement[groupStart - 1]) {
+      groupStart--;
+    }
+    int groupEnd = declIndex;
+    while (groupEnd < statements.length - 1 && isDeclStatement[groupEnd + 1]) {
+      groupEnd++;
+    }
 
     int interveningCount = 0;
     for (int i = declIndex + 1; i < useIndex; i++) {
-      if (!batchStatements.contains(block.statements[i])) {
-        interveningCount++;
+      if (isDeclStatement[i] && i >= groupStart && i <= groupEnd) {
+        final VariableDeclarationStatement sibling =
+            statements[i] as VariableDeclarationStatement;
+        final bool siblingIsConsumed = sibling.variables.variables.any(
+          (VariableDeclaration v) => consumedVars.contains(v.name.lexeme),
+        );
+        if (siblingIsConsumed) continue;
+      } else {
+        final List<String>? usedVars = useStatementVars[statements[i]];
+        if (usedVars != null &&
+            usedVars.any(
+              (String name) => _declaredWithin(
+                statements,
+                isDeclStatement,
+                name,
+                groupStart,
+                groupEnd,
+              ),
+            )) {
+          continue;
+        }
       }
+      interveningCount++;
     }
 
     return interveningCount >= _minInterveningStatements;
+  }
+
+  /// Returns true when [name] is declared by one of the declaration
+  /// statements in `statements[groupStart..groupEnd]` — i.e. it belongs to
+  /// the same contiguous load group as the declaration currently being
+  /// measured.
+  bool _declaredWithin(
+    List<Statement> statements,
+    List<bool> isDeclStatement,
+    String name,
+    int groupStart,
+    int groupEnd,
+  ) {
+    for (int i = groupStart; i <= groupEnd; i++) {
+      if (!isDeclStatement[i]) continue;
+      final VariableDeclarationStatement decl =
+          statements[i] as VariableDeclarationStatement;
+      if (decl.variables.variables.any((v) => v.name.lexeme == name)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

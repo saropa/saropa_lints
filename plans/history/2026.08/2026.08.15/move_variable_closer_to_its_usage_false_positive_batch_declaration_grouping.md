@@ -174,18 +174,26 @@ should include:
 
 `_canMoveCloser` in `lib/src/rules/code_quality/code_quality_variables_rules.dart`
 no longer counts every intervening sibling statement toward the distance
-threshold. `runWithReporter` now precomputes a `batchStatements` set per block
-containing (a) every `VariableDeclarationStatement` in the block and (b) every
-direct-child statement that holds the first use of one of the block's own
-declared variables. `_canMoveCloser` only counts intervening statements that
-are *not* in that set — i.e. statements genuinely unrelated to the block's own
-declare/consume story. This suppresses the whole "load N, then consume N in
-order" batch shape, since every intervening sibling for every member of the
-batch is itself part of that same story (either another load or another
-member's consuming statement), while a single declaration surrounded by
-actually-unrelated statements is still flagged, and two declarations whose
-uses are separated by unrelated statements in mismatched order are still
-flagged.
+threshold. `runWithReporter` now precomputes, per block: which statement
+indices are declarations (`isDeclStatement`), which direct-child statements
+hold the first use of a block-declared variable and which variable names
+(`useStatementVars`), and the set of variable names with any recorded first
+use at all (`consumedVars`). `_canMoveCloser` computes the maximal
+*contiguous* run of declaration statements containing `decl` (its "load
+group") and only exempts an intervening statement from the distance count
+when it is genuinely part of that same batch: another declaration in the
+same contiguous run whose variable is itself in `consumedVars` (i.e. used
+somewhere, not dead clutter), or the first-use statement of another
+variable declared within that same run.
+
+An initial version of this fix (committed as f24de443) exempted *any*
+declaration statement or *any* block-declared variable's first-use statement
+regardless of relation to the specific decl/use pair being measured — a
+subsequent review caught that this caused a false NEGATIVE: unused "padding"
+declarations sitting next to a genuinely lonely declaration would silently
+suppress the lint (since they were declarations, full stop). The contiguity
+and "must be genuinely consumed" requirements close that hole while keeping
+the original batch-load fix intact.
 
 Rule version bumped to v9, class doc and message tag updated to match. Added a
 `_loadStartup`/`_StartupResult` "left alone" doc example.
@@ -201,17 +209,26 @@ Rule version bumped to v9, class doc and message tag updated to match. Added a
 - `_outOfOrderUseNotABatch` — two declarations separated by genuinely
   unrelated statements, used out of declared order in one shared statement;
   expect LINT on both (batch carve-out must not blanket-suppress real cases).
+- `_unusedPaddingDeclarationsNotABatch` — one real declaration/use pair with
+  three unused padding declarations sitting in between; expect LINT on the
+  real one (batch carve-out must not exempt dead-clutter declarations that
+  are never consumed anywhere).
 
 Verified via `dart run saropa_lints scan example/lib/code_quality --tier
 comprehensive --resolve --format json`: `move_variable_closer_to_its_usage`
-now fires only at lines 117, 212, 214 (the three `expect_lint` markers) and
-nowhere inside `_loadStartup`.
+fires only at lines 117, 212, 214, 230 (the four `expect_lint` markers) and
+nowhere inside `_loadStartup`. `dart test
+test/rules/code_quality/code_quality_rules_test.dart` — 215/215 passed
+(instantiation-pin test for this rule unaffected).
 
 ---
 
 ## Commits
 
-_Pending — implementation done, not yet committed._
+- `f24de443` — initial fix (batch-load false positive resolved; introduced a
+  false negative caught by review).
+- Follow-up commit (this session) — tightened to contiguous-run + genuine-use
+  requirement, closing the false negative.
 
 ---
 
@@ -222,3 +239,35 @@ _Pending — implementation done, not yet committed._
 - custom_lint version: n/a
 - Triggering project/file: downstream Flutter/Dart app (contacts), 6 occurrences
   in `lib/main.dart` on this shape
+
+---
+
+## Finish Report (2026-08-15)
+
+`move_variable_closer_to_its_usage` flagged a deliberate "load N values, then
+consume all N in the same order" grouping (e.g. five sequential `await`-loads
+followed by five field assignments) because its distance calculation counted
+every intervening sibling statement without regard for whether that sibling
+was itself part of the same declare/consume story.
+
+`_canMoveCloser` in `lib/src/rules/code_quality/code_quality_variables_rules.dart`
+now excludes an intervening statement from the distance count only when it
+is genuinely part of the same batch as the declaration being measured: a
+sibling declaration in the same *contiguous* run of declarations whose own
+variable is itself used somewhere in the block (not unused padding sitting
+nearby), or the first-use statement of another variable from that same run.
+An initial version of the fix exempted any declaration or any block
+variable's first-use statement regardless of relation to the specific pair
+being measured; a deep-review pass caught that this introduced a false
+negative (unused padding declarations silently suppressing a genuinely far
+declaration), which the contiguous-run-plus-genuine-use requirement closes.
+
+Rule version bumped to v9 (message tag and class doc updated to match). Four
+fixture cases now exercise the rule: the original single-declaration true
+positive, the new batch-load true negative, an out-of-order-use true
+positive (guards against blanket suppression), and an unused-padding true
+positive (guards against the false negative found in review). Verified via
+`dart run saropa_lints scan example/lib/code_quality --tier comprehensive
+--resolve --format json` (all four `expect_lint` markers fire, nothing else
+in the batch function) and `dart test
+test/rules/code_quality/code_quality_rules_test.dart` (215/215 passed).

@@ -186,7 +186,7 @@ bool _warmCache() => true;
 // The intervening siblings between each early declaration and its use are
 // themselves declarations awaiting their own later use, not unrelated code —
 // this reads as one deliberate "load N, then assign N" unit.
-// See: bugs/move_variable_closer_to_its_usage_false_positive_batch_declaration_grouping.md
+// See: plans/history/2026.08/2026.08.15/move_variable_closer_to_its_usage_false_positive_batch_declaration_grouping.md
 _StartupResult _loadStartup() {
   final driftOk = _initDrift();
   final prefsOk = _initPrefs();
@@ -218,4 +218,18 @@ int _outOfOrderUseNotABatch(int seed) {
   _step();
   final total = second + first;
   return total;
+}
+
+// LINT (batch carve-out must not exempt dead-clutter declarations sitting
+// next to a real one): three of the four declarations here are pure padding
+// with no use anywhere in the function, so they are not a genuine batch —
+// only `target`'s own declaration/use pair exists. `target` must still be
+// flagged for the unrelated padding sitting between it and its one use.
+int _unusedPaddingDeclarationsNotABatch(int seed) {
+  // expect_lint: move_variable_closer_to_its_usage
+  final target = _compute(seed);
+  final unrelated1 = _compute(seed + 1);
+  final unrelated2 = _compute(seed + 2);
+  final unrelated3 = _compute(seed + 3);
+  return target;
 }
