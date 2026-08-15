@@ -771,6 +771,14 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
   /// this, a class mixing one well-behaved field-tracked Timer with a second,
   /// untracked leaking one would wrongly pass as "cleaned up" on the
   /// strength of the first alone.
+  ///
+  /// Known limitation, accepted rather than fixed: only `dispose()`'s own
+  /// body is inspected, not methods it calls — `dispose() { _teardown(); }`
+  /// where `_teardown()` does the actual `.cancel()` still false-positives.
+  /// Fixing that needs call-graph analysis, out of scope for this check.
+  /// Also, `dispose()` is matched by name only (no `@override` check); an
+  /// unrelated same-named method would be misread as the cleanup site, but
+  /// that shape is vanishingly rare in a `State` subclass in practice.
   static bool _isCleanedUpInDispose(ClassDeclaration node) {
     MethodDeclaration? disposeMethod;
     for (final ClassMember member in node.bodyMembers) {

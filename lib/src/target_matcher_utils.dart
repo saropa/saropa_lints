@@ -42,6 +42,13 @@ String? assignmentTargetFieldName(AssignmentExpression node) {
 /// Conservative by design: if [expr] isn't assigned to a field we can name
 /// (a local variable, a fire-and-forget call), or [enclosingClass] has no
 /// `dispose()` method, this returns false — the caller should still flag.
+///
+/// Known limitation: only inspects `dispose()`'s own body, not methods it
+/// delegates to (a `dispose() { _teardown(); }` pattern still false-flags);
+/// and matches `dispose()` by name only, with no `@override` check. Both
+/// are accepted trade-offs — see the equivalent note on
+/// `RequireAppLifecycleHandlingRule._isCleanedUpInDispose` in
+/// lifecycle_rules.dart, which shares this exact shape.
 bool isBackgroundWorkCanceledInDispose(
   Expression expr,
   ClassDeclaration enclosingClass,
