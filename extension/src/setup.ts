@@ -237,9 +237,13 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
     {
       location: vscode.ProgressLocation.Notification,
       title: 'Enabling Saropa Lints',
-      cancellable: false,
+      // Cancellable + async child processes below: pub get / write_config / analyze
+      // used to run via the synchronous runInWorkspace (spawnSync), which blocks
+      // the whole extension host — on a large project this reads as a permanent
+      // "Enabling Saropa Lints" stall with no way out but reloading the window.
+      cancellable: true,
     },
-    async () => {
+    async (_progress, token) => {
       logSection('Enable');
 
       if (!ensureSaropaLintsInPubspec(workspaceRoot)) return;
@@ -247,11 +251,16 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
 
       const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
       const pubCmd = useFlutter ? 'flutter' : 'dart';
-      const { ok: pubOk, stderr: pubErr } = runInWorkspace(workspaceRoot, pubCmd, ['pub', 'get']);
-      if (!pubOk) {
-        logReport(`- pub get FAILED: ${pubErr || '(no details)'}`);
+      const pubResult = await runInWorkspaceAsync(workspaceRoot, pubCmd, ['pub', 'get'], { token });
+      if (pubResult.cancelled) {
+        logReport('- Enable cancelled by user (pub get)');
         flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(l10n('notify.setup.pubGetFailed', { details: pubErr || l10n('notify.setup.checkOutput') }));
+        return;
+      }
+      if (!pubResult.ok) {
+        logReport(`- pub get FAILED: ${pubResult.stderr || '(no details)'}`);
+        flushReport(workspaceRoot);
+        vscode.window.showErrorMessage(l10n('notify.setup.pubGetFailed', { details: pubResult.stderr || l10n('notify.setup.checkOutput') }));
         return;
       }
       logReport(`- Ran pub get (${pubCmd})`);
@@ -280,22 +289,32 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
 
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const tier = (cfg.get<string>('tier') ?? 'recommended').trim();
-      const { ok: initOk, stderr: initErr } = runInWorkspace(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier));
-      if (!initOk) {
-        logReport(`- write_config FAILED: ${initErr || '(no details)'}`);
+      const initResult = await runInWorkspaceAsync(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier), { token });
+      if (initResult.cancelled) {
+        logReport('- Enable cancelled by user (write_config)');
         flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(l10n('notify.setup.configWriteFailedNs', { details: initErr || l10n('notify.setup.checkOutput') }));
+        return;
+      }
+      if (!initResult.ok) {
+        logReport(`- write_config FAILED: ${initResult.stderr || '(no details)'}`);
+        flushReport(workspaceRoot);
+        vscode.window.showErrorMessage(l10n('notify.setup.configWriteFailedNs', { details: initResult.stderr || l10n('notify.setup.checkOutput') }));
         return;
       }
       logReport(`- Wrote config (tier: ${tier})`);
 
-      await runAnalysisAfterConfigChangeScoped(
+      const { cancelled: analysisCancelled } = await runAnalysisAfterConfigChangeScoped(
         context,
         workspaceRoot,
         '- Ran analysis',
         '- Ran analysis',
-        { skipEnabledCheck: true },
+        { skipEnabledCheck: true, token },
       );
+      if (analysisCancelled) {
+        logReport('- Enable cancelled by user (analysis)');
+        flushReport(workspaceRoot);
+        return;
+      }
       success = true;
       flushReport(workspaceRoot);
     },
@@ -404,6 +423,56 @@ function findPluginsBlock(lines: string[]): { start: number; end: number } | nul
   return { start, end };
 }
 
+/** One line of text plus the exact terminator that followed it ('' for a final line with no trailing newline). */
+interface EolLine {
+  text: string;
+  eol: '' | '\n' | '\r\n';
+}
+
+/**
+ * Split file content into lines while recording each line's OWN terminator.
+ *
+ * Why not `content.split(eol)` with one guessed EOL for the whole file: a file
+ * can legitimately mix CRLF and bare-LF lines (e.g. `write_config`'s Dart writer
+ * always emits `\n` for a freshly-generated block, dropped into a file whose
+ * other lines are CRLF from a Windows/git checkout). Guessing a single EOL and
+ * splitting on it turns most lines into one glued-together array element
+ * instead of separate lines, so an exact-match `lines.indexOf(sentinel)` fails
+ * even though `content.includes(sentinel)` (substring) still succeeds — this
+ * caused `restorePluginsIntegration` to silently report "nothing to restore"
+ * on a file that plainly had the sentinel.
+ */
+function splitLinesPreservingEol(content: string): EolLine[] {
+  const result: EolLine[] = [];
+  let i = 0;
+  while (i < content.length) {
+    const next = content.indexOf('\n', i);
+    if (next === -1) {
+      result.push({ text: content.slice(i), eol: '' });
+      break;
+    }
+    const hasCr = next > i && content[next - 1] === '\r';
+    result.push({ text: content.slice(i, hasCr ? next - 1 : next), eol: hasCr ? '\r\n' : '\n' });
+    i = next + 1;
+  }
+  return result;
+}
+
+/**
+ * Every line except the true last one needs a real terminator — a '' (no
+ * trailing newline) eol is only valid on whatever ends up last after
+ * inserting/removing sentinel lines, not wherever it originated in the
+ * source file. Without this, a sentinel spliced in after an original
+ * last-line-with-no-newline would get glued onto it with no line break.
+ */
+function normalizeInteriorEols(lines: EolLine[], fallback: '\n' | '\r\n'): EolLine[] {
+  return lines.map((l, i) => (i < lines.length - 1 && l.eol === '' ? { ...l, eol: fallback } : l));
+}
+
+function joinEolLines(lines: EolLine[]): string {
+  return lines.map((l) => l.text + l.eol).join('');
+}
+
 /**
  * Comment out the `plugins:` block so the analyzer stops loading saropa_lints.
  *
@@ -419,24 +488,27 @@ export function disablePluginsIntegration(root: string): 'commented' | 'already-
   const content = fs.readFileSync(file, 'utf-8');
   if (content.includes(DISABLE_BEGIN_MARKER)) return 'already-off';
 
-  const eol = content.includes('\r\n') ? '\r\n' : '\n';
-  const lines = content.split(eol);
-  const block = findPluginsBlock(lines);
+  const lines = splitLinesPreservingEol(content);
+  const block = findPluginsBlock(lines.map((l) => l.text));
   if (!block) return 'no-config';
 
-  // Prefix '# ' onto every non-blank line in the block; restore strips it back.
-  const commented = lines
-    .slice(block.start, block.end)
-    .map((l) => (l.length === 0 ? l : `# ${l}`));
+  // New sentinel lines inherit the EOL style already in use at the insertion
+  // point, so a homogeneous file (CRLF or LF) stays homogeneous.
+  const fallbackEol: '\n' | '\r\n' = lines[block.start]?.eol === '\r\n' ? '\r\n' : '\n';
 
-  const next = [
+  // Prefix '# ' onto every non-blank line in the block; restore strips it back.
+  const commented: EolLine[] = lines
+    .slice(block.start, block.end)
+    .map((l) => (l.text.length === 0 ? l : { text: `# ${l.text}`, eol: l.eol }));
+
+  const next: EolLine[] = [
     ...lines.slice(0, block.start),
-    DISABLE_BEGIN_MARKER,
+    { text: DISABLE_BEGIN_MARKER, eol: fallbackEol },
     ...commented,
-    DISABLE_END_MARKER,
+    { text: DISABLE_END_MARKER, eol: fallbackEol },
     ...lines.slice(block.end),
   ];
-  fs.writeFileSync(file, next.join(eol), 'utf-8');
+  fs.writeFileSync(file, joinEolLines(normalizeInteriorEols(next, fallbackEol)), 'utf-8');
   return 'commented';
 }
 
@@ -454,18 +526,18 @@ export function restorePluginsIntegration(root: string): boolean {
   const content = fs.readFileSync(file, 'utf-8');
   if (!content.includes(DISABLE_BEGIN_MARKER)) return false;
 
-  const eol = content.includes('\r\n') ? '\r\n' : '\n';
-  const lines = content.split(eol);
-  const begin = lines.indexOf(DISABLE_BEGIN_MARKER);
-  const end = lines.indexOf(DISABLE_END_MARKER);
+  const lines = splitLinesPreservingEol(content);
+  const begin = lines.findIndex((l) => l.text === DISABLE_BEGIN_MARKER);
+  const end = lines.findIndex((l) => l.text === DISABLE_END_MARKER);
   if (begin === -1 || end === -1 || end <= begin) return false;
 
-  const restored = lines
+  const restored: EolLine[] = lines
     .slice(begin + 1, end)
-    .map((l) => (l.startsWith('# ') ? l.slice(2) : l));
+    .map((l) => (l.text.startsWith('# ') ? { text: l.text.slice(2), eol: l.eol } : l));
 
-  const next = [...lines.slice(0, begin), ...restored, ...lines.slice(end + 1)];
-  fs.writeFileSync(file, next.join(eol), 'utf-8');
+  const next: EolLine[] = [...lines.slice(0, begin), ...restored, ...lines.slice(end + 1)];
+  const fallbackEol: '\n' | '\r\n' = lines[begin]?.eol === '\r\n' ? '\r\n' : '\n';
+  fs.writeFileSync(file, joinEolLines(normalizeInteriorEols(next, fallbackEol)), 'utf-8');
   return true;
 }
 
@@ -589,13 +661,18 @@ async function runAnalysisAfterConfigChangeScoped(
   // The `saropaLints.enable` command calls this mid-transition, before it flips
   // `enabled` to true, so that specific call site opts out of the check below —
   // every other caller (e.g. a tier change while integration is off) must not
-  // bypass it.
-  options?: { skipEnabledCheck?: boolean },
-): Promise<void> {
+  // bypass it. `token` lets a cancellable caller (e.g. runEnable) stop a
+  // long-running `dart analyze` instead of leaving it to finish unattended.
+  options?: { skipEnabledCheck?: boolean; token?: vscode.CancellationToken },
+  // Reports whether the analysis step was cancelled, so a cancellable caller
+  // (runEnable) can avoid treating a cancelled run as a completed success —
+  // without this, cancelling mid-analyze still marked the whole Enable flow
+  // successful and flipped `saropaLints.enabled` on regardless.
+): Promise<{ cancelled: boolean }> {
   const cfg = vscode.workspace.getConfiguration('saropaLints');
-  if (!options?.skipEnabledCheck && !(cfg.get<boolean>('enabled', true) ?? true)) return;
+  if (!options?.skipEnabledCheck && !(cfg.get<boolean>('enabled', true) ?? true)) return { cancelled: false };
   const runAnalysisAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true);
-  if (!runAnalysisAfter) return;
+  if (!runAnalysisAfter) return { cancelled: false };
 
   const openEditorsOnly = cfg.get<boolean>('runAnalysisOpenEditorsOnly', false) ?? false;
   if (openEditorsOnly) {
@@ -605,13 +682,22 @@ async function runAnalysisAfterConfigChangeScoped(
     } else {
       logReport('- Skipped analysis (no open Dart files)');
     }
-    return;
+    return { cancelled: false };
   }
 
   const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
   const analyzeCmd = useFlutter ? 'flutter' : 'dart';
-  const analysisResult = runInWorkspace(workspaceRoot, analyzeCmd, ['analyze']);
+  // Async spawn: `dart analyze` on a large project can run for tens of seconds,
+  // and the synchronous spawnSync variant used to block the whole extension
+  // host for that entire duration — the root cause of the "Enabling Saropa
+  // Lints" progress notification appearing permanently stalled.
+  const analysisResult = await runInWorkspaceAsync(workspaceRoot, analyzeCmd, ['analyze'], { token: options?.token });
+  if (analysisResult.cancelled) {
+    logReport('- Analysis cancelled by user');
+    return { cancelled: true };
+  }
   logReport(analysisResult.ok ? fullOkMessage : fullFailMessage);
+  return { cancelled: false };
 }
 
 /**

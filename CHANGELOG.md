@@ -64,11 +64,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [15.0.1]
+
+Version 15.0.1 improves the editor extension's responsiveness and resolves a file-parsing bug that prevented the plugin from re-enabling. The setup flow now executes asynchronously to prevent UI freezes, while deactivated lint configurations generate significantly smaller files by omitting unused inline documentation. [log](https://github.com/saropa/saropa_lints/blob/v15.0.1/CHANGELOG.md)
 
 ### Fixed (Extension)
 
 - A project whose `plugins:` block is written commented-out (new projects, or one where "Turn Off Lint Integration" was used) no longer gets the full per-rule description dump on every regenerate — the disabled block now keeps only the `rule_name: true/false` lines needed to restore the exact configured tier, dropping the multi-hundred-line prose and box-drawing headers that served no purpose while inert. A live (uncommented) block is unaffected and keeps its full inline documentation. No action required; re-run `dart run saropa_lints:init` or trigger a config write to see the smaller file.
+- "Enabling Saropa Lints" could appear to hang forever on larger projects — the enable flow ran `pub get`, config write, and analysis synchronously, freezing the whole editor for as long as those took instead of just showing progress. The flow now runs them without blocking the UI and can be canceled from the progress notification. Canceling during the final analysis step also no longer silently reports "Enable" as successful — it now stops and logs the cancellation instead of turning the plugin on as if the flow had completed. No action required.
+- "Re-enable Plugin" could report "nothing to restore" on a project whose `analysis_options.yaml` mixed CRLF and plain-LF line endings, even though the disabled `plugins:` block was plainly present — line detection now tolerates mixed endings instead of assuming one for the whole file. No action required.
 
 ---
 

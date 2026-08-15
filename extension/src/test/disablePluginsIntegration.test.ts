@@ -107,4 +107,35 @@ describe('disablePluginsIntegration / restorePluginsIntegration', () => {
 
     assert.strictEqual(fs.readFileSync(optionsPath, 'utf-8'), crlf);
   });
+
+  // Regression: a real project's analysis_options.yaml can end up with MIXED
+  // line endings (e.g. `write_config`'s Dart writer emits bare `\n` for the
+  // plugins: block it generates, dropped into a file whose other lines are
+  // CRLF from a Windows/git checkout). The old `content.split(guessedEol)`
+  // logic guessed one EOL for the whole file, which glued most lines together
+  // and made the exact-match sentinel lookup fail even though the sentinel
+  // was plainly present in the file — surfacing to the user as
+  // "Re-enable Plugin: nothing to restore" on a file that WAS disabled.
+  it('restores correctly even when the file mixes CRLF and bare-LF lines', () => {
+    const linesLf = ORIGINAL.split('\n');
+    // CRLF above the plugins: block, bare LF for the block itself and below —
+    // matches the real-world shape (surrounding file CRLF, generated block LF).
+    const pluginsIdx = linesLf.indexOf('plugins:');
+    const mixed =
+      linesLf.slice(0, pluginsIdx).join('\r\n') +
+      '\r\n' +
+      linesLf.slice(pluginsIdx).join('\n');
+    fs.writeFileSync(optionsPath, mixed);
+
+    const disableResult = disablePluginsIntegration(tmpDir);
+    assert.strictEqual(disableResult, 'commented');
+
+    const restoreResult = restorePluginsIntegration(tmpDir);
+    assert.strictEqual(restoreResult, true, 'restore must find the sentinel despite mixed EOLs');
+
+    const after = fs.readFileSync(optionsPath, 'utf-8');
+    assert.ok(after.includes('rule_packs:'));
+    assert.ok(after.includes('- bloc'));
+    assert.ok(!after.includes('# plugins:'), 'plugins: block must be live again, not still commented');
+  });
 });
