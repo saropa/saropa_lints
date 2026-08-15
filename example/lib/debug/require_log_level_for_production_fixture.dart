@@ -168,3 +168,20 @@ void finest(String message, {int level = 5}) {}
 void _bad310_numericLevelDefault() {
   finest('polling status');
 }
+
+class _CustomLevel {
+  const _CustomLevel(this.value);
+  final int value;
+}
+
+// Locally-declared wrapper whose `level` parameter defaults via a const
+// constructor call, not a bare enum constant — there is no reliable
+// constant name to check for safety, so this is treated as unsafe.
+void fine(String message, {_CustomLevel level = const _CustomLevel(5)}) {}
+
+// BAD: Should trigger require_log_level_for_production — a constructor-call
+// default has no bare enum-constant name to verify as safe.
+// expect_lint: require_log_level_for_production
+void _bad310_constructorCallLevelDefault() {
+  fine('cache warm');
+}

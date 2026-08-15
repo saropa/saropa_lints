@@ -938,7 +938,7 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
 
 /// Warns when verbose logging methods are used without a debug-mode guard.
 ///
-/// Since: v4.14.0 | Updated: v14.5.10 | Rule version: v3
+/// Since: v4.14.0 | Updated: v14.5.10 | Rule version: v4
 ///
 /// `[HEURISTIC]` - Detects verbose log calls (log, fine, finer, finest, debug,
 /// trace, verbose) outside kDebugMode/kReleaseMode guards or assert blocks.
@@ -993,7 +993,7 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
     '[require_log_level_for_production] Verbose log method called without '
         'a debug-mode guard. In production builds, verbose logging exposes '
         'internal application state, degrades performance, and may leak '
-        'sensitive information to device logs accessible by other apps. {v3}',
+        'sensitive information to device logs accessible by other apps. {v4}',
     correctionMessage:
         'Wrap verbose logging in if (kDebugMode) { ... } or use '
         'a log-level-aware logger that suppresses verbose output in release.',
@@ -1109,10 +1109,13 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
   /// would change nothing.
   ///
   /// A default with no qualified enum-constant reference (no `.` in
-  /// `defaultValueCode` — e.g. a bare numeric literal `int level = 3`) is
-  /// deliberately treated as UNSAFE rather than safe: there is no name to
-  /// check against [_verboseDefaultValueNames], and guessing "no name means
-  /// safe" would silently stop flagging a genuinely verbose numeric default.
+  /// `defaultValueCode` — e.g. a bare numeric literal `int level = 3`), or
+  /// one that is itself a constructor call rather than a bare enum constant
+  /// (e.g. `const Level.custom(5)` — contains `(` after the qualifier), is
+  /// deliberately treated as UNSAFE rather than safe: there is no reliable
+  /// constant name to check against [_verboseDefaultValueNames], and
+  /// guessing "unrecognized shape means safe" would silently stop flagging
+  /// a genuinely verbose default.
   bool _hasSafeLevelDefault(Element? callee) {
     if (callee is! ExecutableElement) return false;
     for (final FormalParameterElement param in callee.formalParameters) {
@@ -1120,9 +1123,12 @@ class RequireLogLevelForProductionRule extends SaropaLintRule {
       if (!_levelParameterNames.contains(paramName) || !param.hasDefaultValue) {
         continue;
       }
-      final String? defaultCode = param.defaultValueCode;
-      if (defaultCode == null || !defaultCode.contains('.')) return false;
-      final String constantName = defaultCode.split('.').last.toLowerCase();
+      final String rawCode = param.defaultValueCode ?? '';
+      final String code = rawCode.startsWith('const ')
+          ? rawCode.substring('const '.length).trimLeft()
+          : rawCode;
+      if (!code.contains('.') || code.contains('(')) return false;
+      final String constantName = code.split('.').last.toLowerCase();
       return !_verboseDefaultValueNames.contains(constantName);
     }
     return false;

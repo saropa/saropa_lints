@@ -332,6 +332,30 @@ this pass was traced to an unrelated, concurrently-edited file,
 change — confirmed by diff inspection and a clean re-run once that file's
 edit completed).
 
+### Second hardening pass (same day)
+
+A follow-up reflection pass on the handoff report closed a third gap: a
+default written as a `const` constructor call on a custom level type (e.g.
+`const Level.custom(5)`, as opposed to a bare enum constant like
+`Level.trace`) had a `defaultValueCode` containing a `.` and was therefore
+matched against `_verboseDefaultValueNames` using its trailing `(5)` text —
+never equal to any recognized word, so it was silently treated as safe with
+no way to verify that. `_hasSafeLevelDefault` now strips a leading `const `
+prefix and additionally requires the remaining code contain no `(` before
+treating it as a bare qualified enum reference; a constructor-call default
+falls through to the same "unrecognized shape means unsafe" fallback as a
+bare numeric default. `example/lib/debug/require_log_level_for_production_fixture.dart`
+gained `_bad310_constructorCallLevelDefault` (a `fine()` wrapper whose
+`level` defaults to `const _CustomLevel(5)`) pinning this as a still-flagged
+case. Rule version bumped v3 → v4. `dart test test/rules/testing/debug_rules_test.dart`
+re-run, 20/20 passing.
+
+The remaining reflection items (exhaustive verbose-word/parameter-name
+coverage, and runtime measurement of the `cost`/`usesTypeResolution`
+changes) were left as documented, accepted heuristic limits rather than
+pursued further — they require either a real-world corpus this repo does
+not have, or profiling infrastructure out of scope for a false-positive fix.
+
 ---
 
 ## Environment
