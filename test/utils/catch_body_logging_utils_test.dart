@@ -66,6 +66,33 @@ void main() {
     test('returns false when only unrelated calls are made', () {
       expect(hasLoggingCall('catch (e) { showFallbackUi(); }'), isFalse);
     });
+
+    test(
+      'does not false-positive on a logging method name inside a string literal',
+      () {
+        // AST-based detection must not be fooled by "log(" appearing inside
+        // an unrelated string argument — only real method-invocation/
+        // rethrow/throw nodes count.
+        expect(
+          hasLoggingCall(
+            "catch (e) { showMessage('please log(in) again'); }",
+          ),
+          isFalse,
+        );
+      },
+    );
+
+    test(
+      'detects a logger-receiver call reached through a property chain',
+      () {
+        expect(
+          hasLoggingCall(
+            'on Object catch (e, s) { Crashlytics.instance.recordError(e, s); }',
+          ),
+          isTrue,
+        );
+      },
+    );
   });
 }
 
