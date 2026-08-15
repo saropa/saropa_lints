@@ -107,6 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic builder;
 dynamic child;
+dynamic analytics;
 final context = BuildContext();
 
 // BAD: Should trigger require_error_boundary
@@ -126,11 +127,12 @@ void _good359() {
 }
 
 // GOOD: MaterialApp built inside a catch clause that already logged the
-// caught error is the app's crash-recovery fallback UI, not its normal
-// entry point — demanding a builder: here is recursive.
+// caught error, where the try body attempted runApp, is the app's
+// crash-recovery fallback UI, not its normal entry point — demanding a
+// builder: here is recursive.
 void _good360() {
   try {
-    _bad359();
+    runApp(MyHomePage());
   } on Object catch (error, stack) {
     debugException(error, stack);
     MaterialApp(
@@ -138,3 +140,35 @@ void _good360() {
     );
   }
 }
+
+// GOOD: same shape as _good360, but the logging call is a receiver-based
+// logger (analytics.track) rather than a recognized method name — exercises
+// the catchBodyLoggerReceiverNames branch instead of the method-name branch.
+void _good362() {
+  try {
+    runApp(MyHomePage());
+  } on Object catch (error, stack) {
+    analytics.track(error);
+    MaterialApp(
+      home: MyHomePage(),
+    );
+  }
+}
+
+// BAD: MaterialApp built inside a logged catch clause, but the try body
+// never attempted to bootstrap the app (no runApp) — this is an unrelated
+// logged catch that happens to construct a MaterialApp, not a genuine
+// startup-fallback pattern, so it must still be flagged.
+// expect_lint: require_error_boundary
+void _bad361() {
+  try {
+    doSomethingUnrelated();
+  } on Object catch (error, stack) {
+    debugException(error, stack);
+    MaterialApp(
+      home: MyHomePage(),
+    );
+  }
+}
+
+void doSomethingUnrelated() {}

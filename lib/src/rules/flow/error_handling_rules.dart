@@ -753,20 +753,37 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
 
       if (!hasBuilder) {
         // Skip the app's own crash-recovery screen: a MaterialApp/CupertinoApp
-        // built inside a catch clause that already logged the caught error is
-        // the fallback UI, not the app's normal entry point. Demanding it also
-        // carry an error-boundary builder is recursive — it can only run after
-        // the one real failure path already terminated.
+        // built inside a catch clause that already logged the caught error,
+        // where the try body was itself attempting to bootstrap the app
+        // (runApp), is the fallback UI shown after that bootstrap failed —
+        // not the app's normal entry point. Demanding it also carry an
+        // error-boundary builder is recursive — it can only run after the
+        // one real failure path already terminated. The runApp(...) check on
+        // the try body (not just "any logged catch") keeps this scoped to
+        // genuine startup-fallback patterns, so an unrelated logged catch
+        // elsewhere that happens to build a MaterialApp is still flagged.
         final CatchClause? enclosingCatch = node
             .thisOrAncestorOfType<CatchClause>();
+        final AstNode? enclosingTry = enclosingCatch?.parent;
         if (enclosingCatch != null &&
-            catchBodyHasLoggingCall(enclosingCatch.body)) {
+            enclosingTry is TryStatement &&
+            catchBodyHasLoggingCall(enclosingCatch.body) &&
+            _tryBodyCallsRunApp(enclosingTry.body)) {
           return;
         }
 
         reporter.atNode(node.constructorName, code);
       }
     });
+  }
+
+  /// Returns true if [body] calls `runApp(...)`, the idiom for bootstrapping
+  /// a Flutter app — confirms the enclosing try/catch is a genuine
+  /// startup-fallback pattern (try to runApp the real app, catch and runApp
+  /// a fallback) rather than an unrelated logged catch that happens to also
+  /// construct a MaterialApp.
+  bool _tryBodyCallsRunApp(Block body) {
+    return RegExp(r'\brunApp\s*\(').hasMatch(body.toSource());
   }
 }
 

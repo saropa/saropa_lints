@@ -256,11 +256,35 @@ needed. The end-to-end `dart run saropa_lints scan` path against the
 fixture was attempted but not completed: the scan CLI's `--files` targeting
 against the `example/` package root returned `No .dart files found` in this
 session regardless of invocation form tried (root with `--files`, `example`
-as target root, run from inside `example/`); root cause not isolated
-(likely a scan-CLI path-resolution quirk specific to scanning the nested
-`example/` pub package, or an existing exclude edge case) and is not
-specific to this change. Logic was verified by code trace and the passing
-unit-test suite instead.
+as target root, run from inside `example/`). Root cause isolated:
+`ScanRunner._isExcluded` (`lib/src/scan/scan_runner.dart:656-669`)
+unconditionally rejects any path containing `/example`, applied both to
+directory discovery and to explicit `--files` lists — the scan CLI cannot
+scan this package's own `example/` fixtures under any invocation, by
+design, independent of this change. Logic was verified by code trace and
+the passing unit-test suite instead.
+
+### Hardening pass (same day)
+
+The initial fix exempted any `MaterialApp`/`CupertinoApp` inside a logged
+`catch` clause, anywhere in the codebase — too broad: an unrelated logged
+catch elsewhere (not a startup-fallback path) that happened to also
+construct a `MaterialApp` would have silently lost its error-boundary
+requirement. Tightened the exemption to additionally require the enclosing
+`TryStatement`'s `body` to itself call `runApp(...)` (new
+`_tryBodyCallsRunApp` helper, source-text `RegExp` scan matching the style
+of `catchBodyHasLoggingCall`) — this ties the exemption to the actual
+try-`runApp`/catch-log-and-`runApp`-fallback idiom described in the bug
+report, not to any logged catch in general.
+
+Fixture additions: `_good360` updated so its `try` body calls
+`runApp(MyHomePage())` (previously called an unrelated helper, which would
+now fail the tightened check); `_good362` added to exercise the
+receiver-based branch of `catchBodyHasLoggingCall` (`analytics.track(error)`
+rather than a recognized method name); `_bad361` added — a logged catch
+whose `try` body does **not** call `runApp`, which must remain flagged.
+`dart test test/rules/flow/error_handling_rules_test.dart` re-run after
+each edit, 50/50 passing throughout.
 
 
 
