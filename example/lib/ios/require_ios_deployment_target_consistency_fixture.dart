@@ -103,15 +103,24 @@
 // Test fixture for: require_ios_deployment_target_consistency
 // Source: lib\src\rules\platforms\ios_rules.dart
 
+import 'dart:async';
+import 'package:async/async.dart';
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger require_ios_deployment_target_consistency
-// expect_lint: require_ios_deployment_target_consistency
+// BAD: Should trigger require_ios_deployment_target_consistency — a genuine
+// method-channel call name referencing an iOS 15+ Swift API.
 void _bad891() {
-  // NOTE: require_ios_deployment_target_consistency — see rule docs for triggering pattern
+  // expect_lint: require_ios_deployment_target_consistency
+  const String channelMethod = 'SharePlay.startSession';
 }
 
-// GOOD: Should NOT trigger require_ios_deployment_target_consistency
+// GOOD: Should NOT trigger require_ios_deployment_target_consistency —
+// `import 'dart:async'` and `import 'package:async/async.dart'` are Dart
+// library URIs, not references to Swift's `async`/`await` keyword. The rule
+// previously substring-matched import/export directive URIs against the
+// tracked Swift API names (see plans/history/2026.08/2026.08.15/
+// require_ios_deployment_target_consistency_false_positive_import_uri_misattribution.md).
 void _good891() {
-  // Compliant version — see rule docs
+  unawaited(Future<void>.value());
 }

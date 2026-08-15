@@ -8,6 +8,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../long_operation_method_name_match.dart';
+import '../../literal_context_utils.dart';
 import '../../target_matcher_utils.dart';
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -1814,6 +1815,13 @@ class RequireIosDeploymentTargetConsistencyRule extends SaropaLintRule {
     }
 
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
+      // Import/export URIs are library paths (e.g. 'dart:async',
+      // 'package:async/async.dart'), not Swift API/keyword usage — the
+      // substring check below would otherwise misread 'dart:async' as the
+      // Swift `async` keyword. See plans/history/2026.08/2026.08.15/
+      // require_ios_deployment_target_consistency_false_positive_import_uri_misattribution.md.
+      if (isInImportOrExport(node)) return;
+
       final String value = node.value;
       for (final String api in _ios15PlusApis.keys) {
         if (value.contains(api)) {
