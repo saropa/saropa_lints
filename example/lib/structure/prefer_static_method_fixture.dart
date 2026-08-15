@@ -118,3 +118,102 @@ class _bad1060_Utils {
 class _good1060_Utils {
   static int add(int a, int b) => a + b;
 }
+
+// Regression fixture for: prefer_static_method false positive on bare
+// (unprefixed) instance-member access — see plans/history/2026.08/2026.08.15/prefer_static_method_false_positive_implicit_field_access.md
+class _ImplicitAccessState {
+  final ValueNotifier<Map<String, int>> _countsNotifier =
+      ValueNotifier<Map<String, int>>(<String, int>{});
+  int _count = 0;
+
+  // GOOD: writes a bare field — must NOT lint. Regression case: a pure write
+  // target has a null `SimpleIdentifier.element` (only reads resolve there),
+  // so this needs the assignment's own writeElement to be detected.
+  void writeBareGood() {
+    _count = 5;
+  }
+
+  // GOOD: bare field increment — must NOT lint (same writeElement fallback).
+  void incrementBareGood() {
+    _count++;
+  }
+
+  // GOOD: reads instance state (`_countsNotifier`) via a bare identifier
+  // inside a nested closure — must NOT lint, even though no `this.` appears.
+  Widget buildCountsGood() {
+    return ValueListenableBuilder<Map<String, int>>(
+      valueListenable: _countsNotifier,
+      builder: (BuildContext _, Map<String, int> counts, Widget? _) =>
+          Text('${counts.length}'),
+    );
+  }
+
+  // BAD: touches no instance state itself — must still lint (true positive).
+  // expect_lint: prefer_static_method
+  void _helper() {}
+
+  // GOOD: calls another instance method via a bare identifier — must NOT lint.
+  void callsHelperGood() {
+    _helper();
+  }
+
+  // BAD: touches no instance state anywhere, including nested closures —
+  // must still lint (true positive preserved).
+  // expect_lint: prefer_static_method
+  int computeGood(int x, int y) {
+    final List<int> values = <int>[x, y];
+    return values.fold(0, (int a, int b) => a + b);
+  }
+
+  // GOOD: explicit `this.field` access — already correctly not linted.
+  void explicitThisGood() {
+    this._countsNotifier.value = <String, int>{};
+  }
+
+  // BAD: cascaded calls on a local variable are not instance-state access —
+  // must still lint. Regression case for the cascade/target-detection gap.
+  // expect_lint: prefer_static_method
+  int cascadeOnLocalGood(int x, int y) {
+    final List<int> values = <int>[]..add(x)..add(y);
+    return values.length;
+  }
+
+  // GOOD: cascading on `this` — must NOT lint. Confirms the cascade-section
+  // exclusion above only skips non-`this` targets; ThisExpression itself
+  // still signals instance-state usage for a `this..` cascade.
+  void cascadeOnThisGood() {
+    this
+      .._countsNotifier.value = <String, int>{}
+      .._helper();
+  }
+
+  // GOOD: a local function closes over the enclosing instance, so a bare
+  // field read inside it is still instance-state access — must NOT lint.
+  void localFunctionClosureGood() {
+    void inner() {
+      _countsNotifier.value = <String, int>{};
+    }
+
+    inner();
+  }
+}
+
+mixin _ImplicitAccessMixin {
+  int get _count => 0;
+
+  // GOOD: reads a mixin's own instance getter via a bare identifier —
+  // must NOT lint.
+  int mixinReadsGood() => _count;
+}
+
+enum _ImplicitAccessEnum {
+  a(1),
+  b(2);
+
+  const _ImplicitAccessEnum(this._value);
+  final int _value;
+
+  // GOOD: enum instance method reading its own field via a bare identifier
+  // — must NOT lint.
+  int enumReadsGood() => _value;
+}

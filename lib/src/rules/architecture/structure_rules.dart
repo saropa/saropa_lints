@@ -5,6 +5,7 @@ import 'dart:io' show File, IOException;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/source/line_info.dart';
@@ -2087,12 +2088,69 @@ class _ThisUsageFinder extends RecursiveAstVisitor<void> {
 
   @override
   void visitSimpleIdentifier(SimpleIdentifier node) {
-    // Check if identifier refers to an instance member
-    // This is a simplification - ideally we'd check the element
+    // Bare (unprefixed) instance member access — e.g. `_field` or `_helper()`
+    // instead of `this._field` — is idiomatic Dart and does not produce a
+    // ThisExpression, so it must be detected via the resolved element instead:
+    // an instance-level (non-static) member whose enclosing element is the
+    // class/mixin/extension-type itself signals the method depends on
+    // instance state. Locals/parameters resolve to non-Executable elements
+    // and are naturally excluded.
+    //
+    // But the element's enclosing class alone is not enough: `values.fold(...)`
+    // resolves `fold`'s element to List (an InterfaceElement) even though the
+    // call target is a local variable, not `this`. Skip identifiers that are
+    // the member name of an EXPLICIT qualified access (`x.member`,
+    // `x.method()`) — the ThisExpression visitor above already covers the
+    // `this.member` case, so nothing is lost by excluding all explicit
+    // targets here, only bare/implicit-this member references remain.
     final AstNode? parent = node.parent;
-    if (parent is! PropertyAccess && parent is! PrefixedIdentifier) {
-      // Could be an unqualified instance member reference
-      // Full implementation would check if it resolves to instance member
+    if (parent is PropertyAccess && identical(parent.propertyName, node)) {
+      super.visitSimpleIdentifier(node);
+      return;
+    }
+    if (parent is PrefixedIdentifier && identical(parent.identifier, node)) {
+      super.visitSimpleIdentifier(node);
+      return;
+    }
+    if (parent is MethodInvocation && identical(parent.methodName, node)) {
+      // A cascade section (`foo..bar()`) also parses with `target == null`
+      // on the inner MethodInvocation — the real target lives on the
+      // enclosing CascadeExpression, not on this node. Without this check,
+      // `values..add(x)..add(y)` on a local `values` would be misread as an
+      // instance-member call the same way `values.fold(...)` was above.
+      final bool isCascadeSection =
+          parent.target == null &&
+          parent.thisOrAncestorOfType<CascadeExpression>() != null;
+      if (parent.target != null || isCascadeSection) {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+    }
+
+    // `node.element` only resolves a READ. A bare identifier used purely as
+    // a write target (`_field = x`) has no read component, so `.element` is
+    // null there even though it plainly touches instance state — fall back
+    // to the assignment/increment's own writeElement (a SetterElement, which
+    // is an ExecutableElement) for that case. Compound assignments
+    // (`_field += x`) and increments (`_field++`/`++_field`) both read AND
+    // write, but checking writeElement alone still finds the instance member.
+    Element? element = node.element;
+    if (element == null) {
+      if (parent is AssignmentExpression &&
+          identical(parent.leftHandSide, node)) {
+        element = parent.writeElement;
+      } else if (parent is PostfixExpression &&
+          identical(parent.operand, node)) {
+        element = parent.writeElement;
+      } else if (parent is PrefixExpression &&
+          identical(parent.operand, node)) {
+        element = parent.writeElement;
+      }
+    }
+    if (element is ExecutableElement &&
+        !element.isStatic &&
+        element.enclosingElement is InterfaceElement) {
+      onFound();
     }
     super.visitSimpleIdentifier(node);
   }
