@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: Scan on Save",
+      "scanning": "Saropa: scanning {count} file(s)…",
+      "done": "Saropa: {count} issue(s), {elapsed}s",
+      "failed": "Saropa: scan failed",
+      "warming": "Saropa: warming up the analyzer… the first scan after opening can take a minute"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: scanning whole project",
+      "progressMessage": "{scanned}/{total} files scanned, {issues} issue(s) found"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "Run a package scan first — the opportunities report is built from scan results.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "Fix {count} violations in {fileName}?",
       "issuesBulkFixResult": "Fixed {fixed}. Run analysis to update score.",
       "issuesBulkFixResultSkipped": "Fixed {fixed}, skipped {skipped} (no fix available). Run analysis to update score.",
+      "scanOnSaveStartFailed": "Scan on save failed to start. Ensure Dart SDK is installed.",
+      "scanOnSaveFailed": "Scan on save failed.",
+      "scanOnSaveFailedDetails": "Scan on save failed: {details}",
+      "scanOnSaveInvalidJson": "Scan on save returned invalid JSON output.",
+      "scanOnSaveDaemonBadResponse": "The scan process returned an unrecognized response.",
+      "scanOnSaveDaemonDown": "The scan process is not running. It will restart on the next save.",
+      "scanOnSaveDaemonTimeout": "The scan process did not respond in time.",
+      "scanOnSaveDaemonExited": "The scan process stopped unexpectedly. It will restart on the next save.",
+      "scanOnSaveDaemonBackoff": "The scan process stopped recently and is waiting to restart. Save again in a moment.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints is turned off — turn on \"Lint integration\" before running a whole-project scan.",
+      "scanOnSaveBaselineAlreadyRunning": "A whole-project scan is already running.",
+      "scanOnSaveBaselineCanceled": "Whole-project scan canceled after {scanned}/{total} files.",
+      "scanOnSaveBaselineFailed": "Whole-project scan failed: {details}",
+      "scanOnSaveBaselineDone": "Whole-project scan complete: {total} files, {issues} issue(s).",
       "codeHealthStartFailedDetails": "Code Health scan failed to start ({command}): {details}",
       "codeHealthStartFailed": "Code Health scan failed to start. Ensure Dart SDK is installed.",
       "codeHealthScanFailed": "Code Health scan failed.",

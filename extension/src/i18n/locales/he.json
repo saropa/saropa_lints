@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: ס캔 בעת שמירה",
+      "scanning": "Saropa: סקרון {count} קבצים...",
+      "done": "Saropa: {count} תקלה(ות), {elapsed}s",
+      "failed": "Saropa: שגיאה בסריקה",
+      "warming": "Saropa: התאמה של המודל... הסריקה הראשונה לאחר פתיחה יכולה לקחת דקה"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: סקרנות פרויקט שלם",
+      "progressMessage": "קבצי {scanned}/{total} נבדקו, נמצאו {issues} בעיה(ות)"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "החלף ס캔 של פאקדג'ה תחילה — דוח האפשרויות נבנה מהنتائج של הס캔.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "לתקן הפרות {count} ב-{fileName}?",
       "issuesBulkFixResult": "תוקן {fixed}. הפעל ניתוח כדי לעדכן את הציון.",
       "issuesBulkFixResultSkipped": "קבועה {fixed}, דלגה {skipped} (אין תקנה זמינה). רץ ניתוח כדי לעדכן את התוצאה.",
+      "scanOnSaveStartFailed": "הסריקה בשמירת הקובץ נכשלה להתחיל. בדוק שהותקן Dart SDK.",
+      "scanOnSaveFailed": "הסריקה בשמירת הקובץ נכשלה.",
+      "scanOnSaveFailedDetails": "הסריקה בשמירת הקובץ נכשלה: {details}",
+      "scanOnSaveInvalidJson": "הסריקה בעת שמירתה החזרה פלט JSON לא חוקי.",
+      "scanOnSaveDaemonBadResponse": "ה",
+      "scanOnSaveDaemonDown": "ה",
+      "scanOnSaveDaemonTimeout": "ה",
+      "scanOnSaveDaemonExited": "ה",
+      "scanOnSaveDaemonBackoff": "ה",
+      "scanOnSaveBaselineDisabled": "Saropa Lints הוא מוטוס — הפעל \"אינטגרציה לינט\" לפני הרצת ס캔 של פרויקט מלא.",
+      "scanOnSaveBaselineAlreadyRunning": "סריקה של כל הפרויקט כבר בפעולה.",
+      "scanOnSaveBaselineCanceled": "סריקה של כל הפרויקט בוטלה לאחר {scanned}/{total} קבצים.",
+      "scanOnSaveBaselineFailed": "סריקה של כל הפרויקט נכשלה: {details}",
+      "scanOnSaveBaselineDone": "סריקה של כל הפרויקט הושלמה: {total} קבצים, {issues} בעיה(ות).",
       "codeHealthStartFailedDetails": "קוד סריקה בריאותית לא הצליחה להתחיל ({command}): {details} זה ה- _PH1_.",
       "codeHealthStartFailed": "קוד בריאות הסריקה לא הצליחה להתחיל. ודא ש- Dart SDK מותקן.",
       "codeHealthScanFailed": "קוד סריקה בריאותית נכשלה.",

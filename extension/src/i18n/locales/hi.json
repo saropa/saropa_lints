@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: सेवा के समय स्कैन करें",
+      "scanning": "Saropa: {count} फ़ाइल (एस) का स्कैन कर रहे हैं…",
+      "done": "Saropa: {count} अप्रत्यय, {elapsed}s",
+      "failed": "Saropa: स्कैन विफल रहा",
+      "warming": "Saropa: एनालाइजर को गरम कर रहे हैं... खोलने के बाद पहली स्कैन एक मिनट ले सकती है"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: पूरे प्रोजेक्ट की स्कैनिंग",
+      "progressMessage": "{scanned}/{total} फ़ाइलें स्कैन की गई, {issues} समस्या(एं) पाई गई"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "पैकेज स्कैन पहले चलाएं — सूचना रिपोर्ट स्कैन परिणामों से बनाया जाता है।",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "{fileName} में {count} उल्लंघन ठीक करें?",
       "issuesBulkFixResult": "फिक्स्ड {fixed}. . स्कोर को अपडेट करने के लिए विश्लेषण चलाएं।",
       "issuesBulkFixResultSkipped": "फिक्स्ड {fixed}, स्किप किया गया {skipped} (कोई तय उपलब्ध नहीं है). स्कोर को अपडेट करने के लिए विश्लेषण चलाएं।",
+      "scanOnSaveStartFailed": "सेव करते हुए स्कैन शुरू करने में विफल रहा। Dart SDK इंस्टॉल करें।",
+      "scanOnSaveFailed": "सेव करते हुए स्कैन विफल रहा।",
+      "scanOnSaveFailedDetails": "सेव करते हुए स्कैन विफल रहा: {details}",
+      "scanOnSaveInvalidJson": "सेव करते हुए स्कैन करें ने अमान्य JSON आउटपुट लौटाया।",
+      "scanOnSaveDaemonBadResponse": "स्कैन प्रक्रिया एक अचिन्तित प्रतिक्रिया के साथ लौटी।",
+      "scanOnSaveDaemonDown": "स्कैन प्रक्रिया चल रही नहीं है। अगले सेव के साथ यह पुनः शुरू होगी।",
+      "scanOnSaveDaemonTimeout": "स्कैन प्रक्रिया समय पर प्रतिक्रिया नहीं देने वाली।",
+      "scanOnSaveDaemonExited": "स्कैन प्रक्रिया अप्रत्यक्ष रूप से रोक दी गई। अगली बचत पर यह पुनः शुरू होगी।",
+      "scanOnSaveDaemonBackoff": "स्कैन प्रक्रिया अतीत में रोक दी गई थी और पुनः शुरू होने के लिए इंतज़ार कर रही है। एक क्षण बाद फिर से सेव करें।",
+      "scanOnSaveBaselineDisabled": "Saropa Lints बंद है — पूरे प्रोजेक्ट स्कैन करने से पहले \"लिंट एंटीग्रेशन\" को सक्रिय करें।",
+      "scanOnSaveBaselineAlreadyRunning": "एक पूरे प्रोजेक्ट की स्कैनिंग पहले से ही चल रही है।",
+      "scanOnSaveBaselineCanceled": "पूरे प्रोजेक्ट की स्कैन बाद में {scanned}/{total} फ़ाइलों के बाद रद्द कर दिया गया।",
+      "scanOnSaveBaselineFailed": "पूरे प्रोजेक्ट स्कैन विफल रहा: {details}",
+      "scanOnSaveBaselineDone": "पूरे प्रोजेक्ट की स्कैन पूरा: {total} फ़ाइल, {issues} समस्या(एं)।",
       "codeHealthStartFailedDetails": "कोड स्वास्थ्य स्कैन शुरू करने में विफल रहा ({command}): {details} _PH1_ को क्या कहते हैं?",
       "codeHealthStartFailed": "कोड स्वास्थ्य स्कैन शुरू करने में विफल रहा। सुनिश्चित करें कि Dart SDK स्थापित है।",
       "codeHealthScanFailed": "कोड स्वास्थ्य स्कैन विफल।",

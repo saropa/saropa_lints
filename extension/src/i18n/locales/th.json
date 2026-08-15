@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: ตรวจจับเมื่อบันทึก",
+      "scanning": "Saropa: การสแกนไฟล์ {count} ไฟล์...",
+      "done": "Saropa: {count} ปัญหา(ส), {elapsed}s",
+      "failed": "Saropa: ไม่สามารถสแกนได้",
+      "warming": "Saropa: กำลังเตรียมเครื่องมือวิเคราะห์... การสแกนครั้งแรกหลังจากเปิดใช้งานอาจใช้เวลาประมาณ 1 นาที"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: การสแกนทั้งโครงการ",
+      "progressMessage": "ไฟล์ {scanned}/{total} ถูกสแกน พบปัญหา {issues} รายการ"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "รันการสแกนแพ็กเกจก่อน — รายงานโอกาสสร้างจากผลการสแกน",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "แก้ไข {count} การละเมิดใน {fileName}?",
       "issuesBulkFixResult": "แก้ไข {fixed}. วิ่งวิเคราะห์เพื่ออัพเดทคะแนน",
       "issuesBulkFixResultSkipped": "แก้ไข {fixed} ข้าม {skipped} (ไม่มีการแก้ไข) ดำเนินการวิเคราะห์เพื่ออัปเดตคะแนน",
+      "scanOnSaveStartFailed": "การสแกนเมื่อบันทึกล้มเหลวในการเริ่มต้น ตรวจสอบว่าติดตั้ง SDK Dart แล้ว",
+      "scanOnSaveFailed": "การสแกนล้มเหลวเมื่อบันทึก",
+      "scanOnSaveFailedDetails": "ตรวจสอบไม่สำเร็จ: {details}",
+      "scanOnSaveInvalidJson": "สแกนเมื่อบันทึกแล้วได้รับข้อมูล JSON ที่ไม่ถูกต้อง",
+      "scanOnSaveDaemonBadResponse": "กระบวนการสแกนคืนค่าที่ไม่สามารถรู้จำได้",
+      "scanOnSaveDaemonDown": "กระบวนการสแกนไม่ได้ทำงานอยู่ กระบวนการจะเริ่มทำงานอีกครั้งเมื่อทำการบันทึกครั้งต่อไป",
+      "scanOnSaveDaemonTimeout": "กระบวนการสแกนไม่ตอบสนองทันเวลา",
+      "scanOnSaveDaemonExited": "กระบวนการสแกนหยุดลงอย่างไม่คาดคิด กระบวนการจะเริ่มต้นใหม่เมื่อทำการบันทึกครั้งต่อไป",
+      "scanOnSaveDaemonBackoff": "กระบวนการสแกนหยุดลงเมื่อไม่นานมานี้และกำลังรอเพื่อเริ่มต้นใหม่ บันทึกอีกครั้งในไม่กี่วินาที",
+      "scanOnSaveBaselineDisabled": "Saropa Lints ถูกปิด — เปิด \"การบูรณาการการลินต์\" ก่อนเริ่มการสแกนทั้งโครงการ",
+      "scanOnSaveBaselineAlreadyRunning": "การสแกนทั้งโครงการอยู่ในระหว่างการดำเนินการแล้ว",
+      "scanOnSaveBaselineCanceled": "การสแกนทั้งโครงการถูกยกเลิกหลังจาก {scanned}/{total} ไฟล์",
+      "scanOnSaveBaselineFailed": "การสแกนทั้งโครงการล้มเหลว: {details}",
+      "scanOnSaveBaselineDone": "การสแกนทั้งโครงการเสร็จสิ้น: {total} ไฟล์, {issues} ปัญหา(ส)",
       "codeHealthStartFailedDetails": "รหัส Health scan ไม่สามารถเริ่มต้นได้ ({command}): {details} การรักษาโรค",
       "codeHealthStartFailed": "รหัส สุขภาพ scan ไม่สามารถเริ่มต้น. รับรองว่า Dart SDK ได้รับการติดตั้ง.",
       "codeHealthScanFailed": "รหัส สภาพ scan ไม่สําเร็จ.",

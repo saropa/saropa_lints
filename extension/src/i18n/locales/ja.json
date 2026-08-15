@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: 保存時にスキャン",
+      "scanning": "Saropa: {count}ファイルをスキャン中…",
+      "done": "Saropa: {count}件の問題, {elapsed}",
+      "failed": "Saropa: スキャン失敗",
+      "warming": "Saropa：分析器をウォームアップ中…開いた後の最初のスキャンは1分ほどかかる"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: 全体プロジェクトをスキャン中",
+      "progressMessage": "{scanned}/{total}ファイルがスキャンされ、{issues}の問題が見つかりました"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "最初にパッケージスキャンを実行してください — オッポチュニティーレポートはスキャン結果から構築されます。",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "{fileName} の {count} 違反を修正しますか?",
       "issuesBulkFixResult": "固定した {fixed}. スコアを更新するために分析を実行します.",
       "issuesBulkFixResultSkipped": "{fixed}を修正し, {skipped} をスキップしました (修正は利用できません). スコアを更新するために分析を実行します.",
+      "scanOnSaveStartFailed": "セーブ時にスキャンが開始できませんでした。Dart SDKがインストールされていることを確認してください。",
+      "scanOnSaveFailed": "保存時にスキャンが失敗しました。",
+      "scanOnSaveFailedDetails": "保存時にスキャン失敗: {details}",
+      "scanOnSaveInvalidJson": "保存時にスキャンを実行した結果、無効なJSON出力が返されました。",
+      "scanOnSaveDaemonBadResponse": "スキャンプロセスは未認識の応答を返しました。",
+      "scanOnSaveDaemonDown": "スキャンプロセスは実行されていません。次回の保存時に再開します。",
+      "scanOnSaveDaemonTimeout": "スキャンプロセスがタイムアウトしました。",
+      "scanOnSaveDaemonExited": "スキャンプロセスが予期せず停止しました。次回の保存時に再開します。",
+      "scanOnSaveDaemonBackoff": "スキャンプロセスは最近停止しており、再開を待っています。少々お待ちください。",
+      "scanOnSaveBaselineDisabled": "Saropa Lints はオフになっています — 全プロジェクトスキャンを実行する前に「Lint インテグレーション」をオンにしてください。",
+      "scanOnSaveBaselineAlreadyRunning": "プロジェクト全体のスキャンがすでに実行中です。",
+      "scanOnSaveBaselineCanceled": "全体プロジェクトスキャンは {scanned}/{total} ファイルの後でキャンセルされました。",
+      "scanOnSaveBaselineFailed": "プロジェクト全体スキャン失敗: {details}",
+      "scanOnSaveBaselineDone": "プロジェクト全体スキャン完了: {total}ファイル、{issues}問題件。",
       "codeHealthStartFailedDetails": "コード 保健スキャンが起動できませんでした ({command}): {details} _ ヒトの\"つの細胞を構成する",
       "codeHealthStartFailed": "コード 健康スキャンが起動できませんでした. Dart SDKがインストールされていることを確認してください.",
       "codeHealthScanFailed": "コード 健康スキャン失敗.",

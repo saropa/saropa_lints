@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: সেভ করার সময় স্ক্যান করুন",
+      "scanning": "Saropa: ফাইল স্ক্যান করা হচ্ছে {count}…",
+      "done": "Saropa: {count} সমস্যা(গুলো), {elapsed}স",
+      "failed": "Saropa: স্ক্যান ব্যর্থ হয়েছে",
+      "warming": "Saropa: এনালাইজার গরম করা হচ্ছে... খুলে নেওয়ার পর প্রথম স্ক্যানটি এক মিনিট সময় নিতে পারে"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: পুরো প্রকল্প স্ক্যান করছি",
+      "progressMessage": "{scanned}/{total} ফাইল স্ক্যান করা হয়েছে, {issues} সমস্যা(স) খুঁজে পাওয়া হয়েছে"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "প্যাকেজ স্ক্যান করুন — অবসর রিপোর্ট স্ক্যান ফলাফল থেকে তৈরি হয়।",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "{fileName} এ {count} লঙ্ঘনগুলি ঠিক করুন?",
       "issuesBulkFixResult": "স্থির করা হয়েছে {fixed}. . স্কোর আপডেট করতে বিশ্লেষণ চালান।",
       "issuesBulkFixResultSkipped": "স্থির {fixed}, এড়িয়ে গেছে {skipped} (কোনও ফিক্স পাওয়া যায় না) । স্কোর আপডেট করতে বিশ্লেষণ চালান।",
+      "scanOnSaveStartFailed": "সংরক্ষণে স্ক্যান শুরু হতে ব্যর্থ হয়েছে। নিশ্চিত করুন Dart SDK ইনস্টল করা হয়েছে।",
+      "scanOnSaveFailed": "সংরক্ষণে স্ক্যান ব্যর্থ হয়েছে।",
+      "scanOnSaveFailedDetails": "সংরক্ষণে স্ক্যান ব্যর্থ: {details}",
+      "scanOnSaveInvalidJson": "সেভ করার সময় স্ক্যান করে বৈধ JSON আউটপুট পাওয়া গেল না।",
+      "scanOnSaveDaemonBadResponse": "স্ক্যান প্রক্রিয়াটি অনুচিত ব্যবধান ফিরিয়েছে।",
+      "scanOnSaveDaemonDown": "স্ক্যান প্রক্রিয়া চালু নয়। এটি পরবর্তী সেভ করার সময় পুনরাবৃত্তি করবে।",
+      "scanOnSaveDaemonTimeout": "স্ক্যান প্রক্রিয়াটি সময়মত প্রতিক্রিয়া করেনি।",
+      "scanOnSaveDaemonExited": "স্ক্যান প্রক্রিয়া অপ্রত্যাশিতভাবে বন্ধ হয়ে গেল। এটি পরবর্তী সেভ করার সময় পুনরাবৃত্তি করবে।",
+      "scanOnSaveDaemonBackoff": "স্ক্যান প্রক্রিয়া পরে বন্ধ হয়েছিল এবং আবার শুরু করতে অপেক্ষা করছে। কিছুক্ষণ পরে আবার সংরক্ষণ করুন।",
+      "scanOnSaveBaselineDisabled": "Saropa Lints অনুপস্থিত — সম্পূর্ণ প্রকল্প স্ক্যান চালানোর আগে \"লিন্ট ইন্টিগ্রেশন\" চালু করুন।",
+      "scanOnSaveBaselineAlreadyRunning": "একটি পুরো প্রকল্প স্ক্যান বর্তমানে চালু আছে।",
+      "scanOnSaveBaselineCanceled": "{scanned}/{total} ফাইল পরিসংখ্যানের পর সম্পূর্ণ প্রকল্প স্ক্যান বাতিল হয়েছে।",
+      "scanOnSaveBaselineFailed": "সম্পূর্ণ প্রকল্প স্ক্যান ব্যর্থ হয়েছে: {details}",
+      "scanOnSaveBaselineDone": "পুরো প্রকল্প স্ক্যান সম্পন্ন: {total} ফাইল, {issues} সমস্যা(স)।",
       "codeHealthStartFailedDetails": "কোড স্বাস্থ্য স্ক্যান শুরু করতে ব্যর্থ হয়েছে ({command}): {details} _ PH1__ এর সাথে সম্পর্কিত",
       "codeHealthStartFailed": "কোড স্বাস্থ্য স্ক্যান শুরু করতে ব্যর্থ হয়েছে। নিশ্চিত করুন যে Dart SDK ইনস্টল করা আছে।",
       "codeHealthScanFailed": "কোড স্বাস্থ্য স্ক্যান ব্যর্থ হয়েছে।",

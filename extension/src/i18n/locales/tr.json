@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: Kaydedildiğinde Tarayın",
+      "scanning": "Saropa: {count} dosya(ya) taranıyor…",
+      "done": "Saropa: {count} sorun(lar), {elapsed}",
+      "failed": "Saropa: taranamadı",
+      "warming": "Saropa: analizleyiciyi ısınlatıyor... açıldıktan sonra ilk tarayıcı bir dakika sürebilir"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: projeyi tarıyor",
+      "progressMessage": "{scanned}/{total} dosyaları taraştırıldı, {issues} sorun bulundu"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "Bir paket taraması yapın — fırsat raporu tarama sonuçlarından oluşturulur.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "{fileName}'deki {count} ihlalleri düzeltilsin mi?",
       "issuesBulkFixResult": "{fixed}. sabitlendi Puanı güncellemek için analiz çalıştırın.",
       "issuesBulkFixResultSkipped": "{fixed} sabitlendi, {skipped} atlandı (düzeltilemez). Puanı güncellemek için analiz çalıştırın.",
+      "scanOnSaveStartFailed": "Kaydetme sırasında tarayıcı başlatılamadı. Dart SDK'sı yüklü olduğundan emin olun.",
+      "scanOnSaveFailed": "Kaydedilirken taranamadı.",
+      "scanOnSaveFailedDetails": "Kaydetme sırasında taranamadı: {details}",
+      "scanOnSaveInvalidJson": "Kaydedilirken taranmış geçersiz JSON çıktısı döndürüldü.",
+      "scanOnSaveDaemonBadResponse": "Tarama işlemi bilinmeyen bir yanıt döndürdü.",
+      "scanOnSaveDaemonDown": "Tarama işlemi çalışmadı. Bir sonraki kaydedme sırasında yeniden başlatılacak.",
+      "scanOnSaveDaemonTimeout": "Tarama işlemi zamanında yanıt vermedi.",
+      "scanOnSaveDaemonExited": "Tarama işlemi beklenmedik şekilde durdu. Bir sonraki kaydedme sırasında yeniden başlatılacak.",
+      "scanOnSaveDaemonBackoff": "Tarama işlemi son zamanlarda durduruldu ve yeniden başlatmayı bekliyor. Bir an sonra tekrar kaydedin.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints devre dışı — tam proje taramasını çalıştırmadan önce \"Lint entegrasyonu\"yu açın.",
+      "scanOnSaveBaselineAlreadyRunning": "Bir proje taraması zaten çalışmaktadır.",
+      "scanOnSaveBaselineCanceled": "Proje genel taraması {scanned}/{total} dosyaları ardından iptal edildi.",
+      "scanOnSaveBaselineFailed": "Proje genel taraması başarısız: {details}",
+      "scanOnSaveBaselineDone": "Proje genel taraması tamamlandı: {total} dosya, {issues} sorun(lar).",
       "codeHealthStartFailedDetails": "Kod Sağlık taraması başlatılamadı ({command}): {details} _PH1_ = PH1__ (Hücre Basıncı",
       "codeHealthStartFailed": "Kod Sağlık taraması başlatılamadı. Dart SDK'nın kurulduğundan emin olun.",
       "codeHealthScanFailed": "Kod Sağlık taraması başarısız oldu.",

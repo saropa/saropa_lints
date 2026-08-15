@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: I-scan sa Pag-save",
+      "scanning": "Saropa: nag-scan ng {count} file(s)...",
+      "done": "Saropa: {count} problema(s), {elapsed}s",
+      "failed": "Saropa: nabigo ang pag-scan",
+      "warming": "Saropa: naglalabas ng analysta... ang unang pag-scan sa pagbukas ay maaaring mag-iskedyul ng isang minuto"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: pag-scan ng buong proyekto",
+      "progressMessage": "Nag-scan ng {scanned}/{total} mga file, nakita ang {issues} issue(s)"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "I-run muna ang isang package scan — ang report ng oportunidad ay binubuo mula sa mga resulta ng scan.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "Ayusin ang mga paglabag sa {count} sa {fileName}?",
       "issuesBulkFixResult": "Nakapirming {fixed}. Patakbuhin ang pagsusuri upang i-update ang marka.",
       "issuesBulkFixResultSkipped": "Fixed {fixed}, lumampas sa {skipped} (walang available na pag-aayos). Magpatakbo ng pagsusuri upang i-update ang marka.",
+      "scanOnSaveStartFailed": "Nag-iba ang pag-scan sa pag-save. Siguraduhin na nakainstall ang Dart SDK.",
+      "scanOnSaveFailed": "Nagtagal ang pag-scan.",
+      "scanOnSaveFailedDetails": "Nag.Fail ang pag-scan sa pag-save: {details}",
+      "scanOnSaveInvalidJson": "Skan sa pag-save ay nag-return ng hindi wastong output ng JSON.",
+      "scanOnSaveDaemonBadResponse": "Ang proseso ng pag-scan ay nagbigay ng isang response na hindi mapapahintulutan.",
+      "scanOnSaveDaemonDown": "Ang proseso ng pag-scan ay hindi naglalaban. Ito ay magsisimula muli sa susunod na pag-save.",
+      "scanOnSaveDaemonTimeout": "Hindi sumagot ang proseso ng pag-scan sa oras.",
+      "scanOnSaveDaemonExited": "Ang proseso ng pag-scan ay nagsimula nang hindi inaasahan. Ito ay magsisimula muli sa susunod na pag-save.",
+      "scanOnSaveDaemonBackoff": "Ang proseso ng pag-scan ay nagsiwalat na at nangungunan para muling simulan. I-save muli sa ilang sandali.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints ay naka-off — i-activate ang \"Lint integration\" bago mag-verify ng buong proyekto.",
+      "scanOnSaveBaselineAlreadyRunning": "Ang isang buong proyekto scan ay nagsisimula na.",
+      "scanOnSaveBaselineCanceled": "Nag-utos ng whole-project scan matapos ang {scanned}/{total} files.",
+      "scanOnSaveBaselineFailed": "Nag.Fail ang pagscan ng buong proyekto: {details}",
+      "scanOnSaveBaselineDone": "Nag-complete ang whole-project scan: {total} file, {issues} issue(s).",
       "codeHealthStartFailedDetails": "Code Hindi nagsimula ang health scan ({command}): {details} Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili.",
       "codeHealthStartFailed": "Code Health scan ay nabigo upang simulan. Tiyaking naka-install ang Dart SDK.",
       "codeHealthScanFailed": "Code Health scan na nabigo.",

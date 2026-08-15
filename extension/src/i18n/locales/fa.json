@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: اسکن در زمان ذخیره",
+      "scanning": "Saropa: اسکن کردن {count} فایل(ها)…",
+      "done": "Saropa: {count} مسئله(ها)، {elapsed}ها",
+      "failed": "Saropa: اسکن شکست خورد",
+      "warming": "Saropa: چکارگاه چکارگاه را گرم کردن... اولین اسکن پس از باز کردن ممکن است یک دقیقه طول بکشد"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: اسکن کردن پروژه کامل",
+      "progressMessage": "فایل‌های {scanned}/{total} اسکن شد، {issues} مسئله (ها) پیدا شد"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "اسکن پکیج اول اجرا کنید — گزارش فرصت‌ها از نتایج اسکن ساخته می‌شود.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "آیا نقض {count} را در {fileName} برطرف می کنید؟",
       "issuesBulkFixResult": "{fixed}. ثابت شده برای به روز رسانی امتیاز، تجزیه و تحلیل را اجرا کنید.",
       "issuesBulkFixResultSkipped": "{fixed} را اصلاح کردم، {skipped} را حذف کردم (اصلاح در دسترس نیست). برای به روز رسانی امتیاز، تجزیه و تحلیل را اجرا کنید.",
+      "scanOnSaveStartFailed": "اسکن در حین ذخیره شدن شروع نشد. لطفا Dart SDK را نصب کنید.",
+      "scanOnSaveFailed": "اسکن در حین ذخیره شدن ناموفق بود.",
+      "scanOnSaveFailedDetails": "اسкан در ذخیره شکست: {details}",
+      "scanOnSaveInvalidJson": "خروجی JSON نامعتبر در زمان اسکن پس از ذخیره بازگردانده شد.",
+      "scanOnSaveDaemonBadResponse": "فراوردن فرآیند اسکن پاسخی ناشناخته را بازگرداند.",
+      "scanOnSaveDaemonDown": "فراوردن فرآیند انجام نمی‌شود. در نگهداری بعدی مجدد شروع خواهد شد.",
+      "scanOnSaveDaemonTimeout": "فراوردن فرآیند اسکن به موقع پاسخ نداد.",
+      "scanOnSaveDaemonExited": "فراوردن فرآیند متوقف شد. در نگهداری بعدی مجدد شروع خواهد شد.",
+      "scanOnSaveDaemonBackoff": "فراوردن فرآیند متوقف شده است و منتظر بازگشت به فعال شدن است. لطفاً مجدد ذخیره کنید.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints غیر فعال است — قبل از اجرای اسکن پروژه کامل، \"نتیجه گیری انتگریسیون\" را فعال کنید.",
+      "scanOnSaveBaselineAlreadyRunning": "اسکن پروژه کامل در حال اجرا است.",
+      "scanOnSaveBaselineCanceled": "اسکن پروژه کامل پس از {scanned}/{total} فایل لغو شد.",
+      "scanOnSaveBaselineFailed": "اسکن پروژه کامل ناموفق بود: {details}",
+      "scanOnSaveBaselineDone": "اسکن پروژه کامل شد: {total} فایل، {issues} مشکل(ها).",
       "codeHealthStartFailedDetails": "کد اسکن سلامت نتوانسته است شروع شود ({command}): {details} _فرد_منتظره",
       "codeHealthStartFailed": "کد سلامت اسکن شروع نشد. اطمینان حاصل کنید که Dart SDK نصب شده است.",
       "codeHealthScanFailed": "کد اسکن سلامت ناموفق شد.",

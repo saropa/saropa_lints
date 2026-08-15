@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: 저장 시 스캔",
+      "scanning": "Saropa: {count} 파일(들) 스캔 중…",
+      "done": "Saropa: {count} 개의 문제, {elapsed}s",
+      "failed": "Saropa: 스캔 실패",
+      "warming": "Saropa: 분석기 가열 중… 열기 후 첫 스캔은 분간 걸릴 수 있습니다"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: 전체 프로젝트 스캔 중",
+      "progressMessage": "{scanned}/{total} 파일 스캔, {issues} 문제 발견"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "패키지 스캔을 먼저 실행하세요 — 기회 보고서는 스캔 결과에서 생성됩니다.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "{fileName}에서 {count} 위반을 수정합니까?",
       "issuesBulkFixResult": "{fixed}.을 고정했습니다. 점수를 업데이트하기 위해 분석을 실행하십시오.",
       "issuesBulkFixResultSkipped": "{fixed}를 수정하고, {skipped}을 건너뛰었다 (정치가 없습니다). 점수를 업데이트하기 위해 분석을 실행하십시오.",
+      "scanOnSaveStartFailed": "저장 시 스캔 실패. Dart SDK가 설치되어 있는지 확인하세요.",
+      "scanOnSaveFailed": "저장 시 스캔 실패.",
+      "scanOnSaveFailedDetails": "저장 시 스캔 실패: {details}",
+      "scanOnSaveInvalidJson": "저장 시 스캔 결과가 유효하지 않은 JSON 출력을 반환했습니다.",
+      "scanOnSaveDaemonBadResponse": "스캔 프로세스는 인식할 수 없는 응답을 반환했습니다.",
+      "scanOnSaveDaemonDown": "스캔 프로세스가 실행 중이지 않습니다. 다음 저장 시 다시 시작됩니다.",
+      "scanOnSaveDaemonTimeout": "스캔 프로세스가 시간내에 응답하지 않았습니다.",
+      "scanOnSaveDaemonExited": "스캔 프로세스가 예상치 못하게 중단되었습니다. 다음 저장 시 다시 시작됩니다.",
+      "scanOnSaveDaemonBackoff": "최근 스캔 프로세스가 중단되었고 재시작을 기다리고 있습니다. 잠시 후 다시 저장하세요.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints는 꺼짐 — 전체 프로젝트 스캔 전 \"Lint 통합\"을 켜주세요.",
+      "scanOnSaveBaselineAlreadyRunning": "전체 프로젝트 스캔이 이미 실행 중입니다.",
+      "scanOnSaveBaselineCanceled": "전체 프로젝트 스캔이 {scanned}/{total} 파일 후 취소되었습니다.",
+      "scanOnSaveBaselineFailed": "전체 프로젝트 스캔 실패: {details}",
+      "scanOnSaveBaselineDone": "전체 프로젝트 스캔 완료: {total} 파일, {issues} 문제(사항).",
       "codeHealthStartFailedDetails": "코드 건강 스캔 시작 실패 ({command}): {details}는",
       "codeHealthStartFailed": "코드 건강 스캔 시작 실패. Dart SDK가 설치되어 있는지 확인하십시오.",
       "codeHealthScanFailed": "코드 건강 스캔 실패.",

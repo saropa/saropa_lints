@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: التحقق عند الحفظ",
+      "scanning": "Saropa: مسح ملف (ملفات) {count}...",
+      "done": "Saropa: {count} مسألة(s)، {elapsed}",
+      "failed": "Saropa: فشل التحليل",
+      "warming": "Saropa: تهيئات مُحلّل... يمكن أن يستغرق أول مسح بعد فتح التطبيق دقيقة"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: مسح المشروع بأكمله",
+      "progressMessage": "ملفات {scanned}/{total} تم فحصها، تم العثور على {issues} مشكلة(ات)"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "أعد تنفيذ مسح حزمة أولاً — تُبنى تقرير الفرص من نتائج المسح.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "إصلاح انتهاكات {count} في {fileName}؟",
       "issuesBulkFixResult": "تم إصلاح {fixed}. قم بتشغيل التحليل لتحديث النتيجة.",
       "issuesBulkFixResultSkipped": "تم إصلاح {fixed} ، وتخطي {skipped} (لا يوجد تصحيح متاح). قم بتشغيل التحليل لتحديث النتيجة.",
+      "scanOnSaveStartFailed": "فشل بدء المسح عند الحفظ. تأكد من تثبيت Dart SDK.",
+      "scanOnSaveFailed": "التحقق من الفحص عند الحفظ فشل.",
+      "scanOnSaveFailedDetails": "التحقق من الصحة أثناء الحفظ فاشل: {details}",
+      "scanOnSaveInvalidJson": "التحقق من صحة التخزين المؤقت أعاد إخراج JSON غير صحيح",
+      "scanOnSaveDaemonBadResponse": "العملية التحليلية عادت برد غير معروف.",
+      "scanOnSaveDaemonDown": "العملية التحليلية لا تعمل حالياً. سيتم إعادة تشغيلها عند الحفظ التالي.",
+      "scanOnSaveDaemonTimeout": "لم يتم استجابة عملية المسح في الوقت المحدد.",
+      "scanOnSaveDaemonExited": "العملية التحليلية توقفت بشكل غير متوقع. سيتم إعادة تشغيلها عند الحفظ التالي.",
+      "scanOnSaveDaemonBackoff": "العملية التحليلية توقفت مؤخرًا وهي تنتظر إعادة التشغيل. احفظ مرة أخرى بعد لحظة.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints مغلق — قم بتشغيل \"دمج التحقق\" قبل تنفيذ مسح المشروع بأكمله.",
+      "scanOnSaveBaselineAlreadyRunning": "يتم الآن مسح المشروع بأكمله.",
+      "scanOnSaveBaselineCanceled": "تم إلغاء مسح المشروع بأكمله بعد {scanned}/{total} ملفات.",
+      "scanOnSaveBaselineFailed": "فشل مسح المشروع بأكمله: {details}",
+      "scanOnSaveBaselineDone": "مسح المشروع بأكمله اكتمل: {total} ملفات، {issues} مشكلة(ات).",
       "codeHealthStartFailedDetails": "فشل الاختبار الصحي في بدء تشغيل ({command}): {details} هيئة البشرة.",
       "codeHealthStartFailed": "فشل الاختبار الصحي للكود في البدء. تأكد من تثبيت Dart SDK.",
       "codeHealthScanFailed": "فشل مسح الرمز الصحي.",

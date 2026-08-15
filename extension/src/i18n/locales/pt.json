@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: Escaneio ao Salvar",
+      "scanning": "Saropa: varredura {count} arquivo(s)...",
+      "done": "Saropa: {count} problema(s), {elapsed}",
+      "failed": "Saropa: escaneamento falhou",
+      "warming": "Saropa: aquecendo o analisador... a primeira varredura após abrir pode levar um minuto"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: varredura do projeto inteiro",
+      "progressMessage": "Arquivos {scanned}/{total} analisados, {issues} problema(s) encontrado(s)"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "Execute primeiro uma varredura de pacote — o relatório de oportunidades é construído com base nos resultados da varredura.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "Corrigir as violações {count} em {fileName}?",
       "issuesBulkFixResult": "Corrigido o {fixed}. Execute a análise para atualizar o resultado.",
       "issuesBulkFixResultSkipped": "Corrigido {fixed}, ignorado {skipped} (nenhuma correção disponível). Execute a análise para atualizar o resultado.",
+      "scanOnSaveStartFailed": "A verificação ao salvar falhou ao iniciar. Certifique-se de que o SDK Dart está instalado.",
+      "scanOnSaveFailed": "Falha ao escanear ao salvar.",
+      "scanOnSaveFailedDetails": "Falha ao escanear ao salvar: {details}",
+      "scanOnSaveInvalidJson": "Saída JSON inválida retornada ao scanner ao salvar.",
+      "scanOnSaveDaemonBadResponse": "O processo de varredura retornou uma resposta não reconhecida.",
+      "scanOnSaveDaemonDown": "O processo de varredura não está em execução. Ele será reiniciado na próxima salvaguarda.",
+      "scanOnSaveDaemonTimeout": "O processo de varredura não respondeu a tempo.",
+      "scanOnSaveDaemonExited": "O processo de varredura foi interrompido inesperadamente. Ele será reiniciado na próxima salvaguarda.",
+      "scanOnSaveDaemonBackoff": "O processo de varredura parou recentemente e está aguardando para reiniciar. Salve novamente em breve.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints está desativado — ative \"Integração de lint\" antes de executar uma varredura de todo o projeto.",
+      "scanOnSaveBaselineAlreadyRunning": "Uma varredura de todo o projeto já está em execução.",
+      "scanOnSaveBaselineCanceled": "Varredura do projeto inteiro cancelada após {scanned}/{total} arquivos.",
+      "scanOnSaveBaselineFailed": "Varredura do projeto inteiro falhou: {details}",
+      "scanOnSaveBaselineDone": "Varredura do projeto completo: {total} arquivo(s), {issues} problema(s).",
       "codeHealthStartFailedDetails": "Código A varredura de saúde não conseguiu iniciar ({command}): {details} É um tipo de vírus que se alimenta do sangue.",
       "codeHealthStartFailed": "Código de Saúde a varredura não conseguiu iniciar. Certifique-se de que o Dart SDK esteja instalado.",
       "codeHealthScanFailed": "Código de Saúde varredura falhou.",

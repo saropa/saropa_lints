@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: Scan bei Speicherung",
+      "scanning": "Saropa: Scannen von {count} Datei(en)...",
+      "done": "Saropa: {count} Fehler(s), {elapsed}",
+      "failed": "Saropa: Scan fehlgeschlagen",
+      "warming": "Saropa: Analyzer wird aufgewärmt… der erste Scan nach dem Öffnen kann eine Minute dauern"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: Durchsuchung des gesamten Projekts",
+      "progressMessage": "{scanned}/{total} Dateien gescannt, {issues} Problem(e) gefunden"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "Zuerst einen Paket-Scan durchführen — der Opportunities-Report wird aus den Scan-Ergebnissen erstellt.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "{count}-Verstöße in {fileName} beheben?",
       "issuesBulkFixResult": "Fixed {fixed}. . wurde repariert Führen Sie eine Analyse durch, um den Score zu aktualisieren.",
       "issuesBulkFixResultSkipped": "Fixed {fixed}, übersprungen {skipped} (keine Lösung verfügbar). Führen Sie eine Analyse durch, um den Score zu aktualisieren.",
+      "scanOnSaveStartFailed": "Scan beim Speichern konnte nicht gestartet werden. Stellen Sie sicher, dass der Dart SDK installiert ist.",
+      "scanOnSaveFailed": "Scan bei Speichern fehlgeschlagen.",
+      "scanOnSaveFailedDetails": "Scan bei Speicherung fehlgeschlagen: {details}",
+      "scanOnSaveInvalidJson": "Scan bei Speicherung gab ungültiges JSON-Output zurück.",
+      "scanOnSaveDaemonBadResponse": "Der Scan-Vorgang gab eine unerkannte Antwort zurück.",
+      "scanOnSaveDaemonDown": "Der Scan-Vorgang läuft nicht. Er wird beim nächsten Speichern neu gestartet.",
+      "scanOnSaveDaemonTimeout": "Die Scan-Prozess hat nicht in der Zeit geantwortet.",
+      "scanOnSaveDaemonExited": "Der Scan-Prozess ist unerwartet abgebrochen. Er wird beim nächsten Speichern neu gestartet.",
+      "scanOnSaveDaemonBackoff": "Der Scan-Prozess ist kürzlich abgebrochen und wartet auf Neustart. Speichern Sie erneut in ein paar Minuten.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints ist deaktiviert — aktiviere „Lint Integration“ vor der Durchführung einer vollständigen Projektscan.",
+      "scanOnSaveBaselineAlreadyRunning": "Eine vollständige Projektscan läuft bereits.",
+      "scanOnSaveBaselineCanceled": "Ganzen-Projekt-Scan abgebrochen nach {scanned}/{total} Dateien.",
+      "scanOnSaveBaselineFailed": "Ganzer Projekt-Scan fehlgeschlagen: {details}",
+      "scanOnSaveBaselineDone": "Ganzer Projekt-Scan abgeschlossen: {total} Dateien, {issues} Problem(e).",
       "codeHealthStartFailedDetails": "Code Gesundheits-Scan konnte nicht gestartet werden ({command}): {details} ist ein _PH1-Präparat.",
       "codeHealthStartFailed": "Code Health Scan konnte nicht gestartet werden. Stellen Sie sicher, dass das Dart SDK installiert ist.",
       "codeHealthScanFailed": "Code Gesundheitsscan fehlgeschlagen.",

@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: Scansiona al salvataggio",
+      "scanning": "Saropa: scansione dei file {count}…",
+      "done": "Saropa: {count} problema(i), {elapsed}",
+      "failed": "Saropa: scansito fallito",
+      "warming": "Saropa: riscaldamento dell'analizzatore... la prima scansione dopo l'apertura può richiedere un minuto"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: scansione dell'intero progetto",
+      "progressMessage": "File {scanned}/{total} analizzati, {issues} problema(i) trovato(i)"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "Esegui prima uno scan del package — il report delle opportunità è costruito dai risultati dello scan.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "Risolvere le violazioni di {count} in {fileName}?",
       "issuesBulkFixResult": "Fissato {fixed}. . Eseguire l'analisi per aggiornare il punteggio.",
       "issuesBulkFixResultSkipped": "Risolto {fixed}, saltato {skipped} (nessuna correzione disponibile). Eseguire l'analisi per aggiornare il punteggio.",
+      "scanOnSaveStartFailed": "Scansione all salvataggio non è riuscita a iniziare. Assicurati che l'SDK Dart sia installato.",
+      "scanOnSaveFailed": "Scansione su salvataggio fallita.",
+      "scanOnSaveFailedDetails": "Scansione su salvataggio fallita: {details}",
+      "scanOnSaveInvalidJson": "Scansiona su salvataggio restituito output JSON non valido.",
+      "scanOnSaveDaemonBadResponse": "Il processo di scansione ha restituito una risposta non riconosciuta.",
+      "scanOnSaveDaemonDown": "Il processo di scansione non è in esecuzione. Riavvierà il processo al successivo salvataggio.",
+      "scanOnSaveDaemonTimeout": "Il processo di scansione non ha risposto in tempo.",
+      "scanOnSaveDaemonExited": "Il processo di scansione è stato interrotto inaspettatamente. Riinizierà al successivo salvataggio.",
+      "scanOnSaveDaemonBackoff": "Il processo di scansione è stato interrotto di recente e attende il riavvio. Salva nuovamente tra un momento.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints è disattivato — attiva \"Integrazione linter\" prima di eseguire uno scan dell'intero progetto.",
+      "scanOnSaveBaselineAlreadyRunning": "Un'analisi dell'intero progetto è già in corso.",
+      "scanOnSaveBaselineCanceled": "Scansione dell'intero progetto annullata dopo {scanned}/{total} file.",
+      "scanOnSaveBaselineFailed": "Scansione dell'intero progetto fallita: {details}",
+      "scanOnSaveBaselineDone": "Scansione dell'intero progetto completata: {total} file, {issues} problema(i).",
       "codeHealthStartFailedDetails": "Codice La scansione di salute non è riuscita ad avviarsi ({command}): {details} è il nome di una cellula.",
       "codeHealthStartFailed": "Codice La scansione della salute non è riuscita ad avviarsi. Assicurarsi che Dart SDK sia installato.",
       "codeHealthScanFailed": "Codice di salute Scansione fallita.",

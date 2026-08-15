@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: Scan saat Disimpan",
+      "scanning": "Saropa: memindai {count} file(s)...",
+      "done": "Saropa: {count} masalah, {elapsed}",
+      "failed": "Saropa: scan gagal",
+      "warming": "Saropa: memanaskan analis… pemindaian pertama setelah membuka bisa memakan waktu satu menit"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: memindai seluruh proyek",
+      "progressMessage": "{scanned}/{total} file di-scan, {issues} masalah ditemukan"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "Jalankan pemindaian paket terlebih dahulu — laporan peluang dibangun dari hasil pemindaian.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "Memperbaiki pelanggaran {count} di {fileName}?",
       "issuesBulkFixResult": "Fixed {fixed}. . diperbaiki Jalankan analisis untuk memperbarui skor.",
       "issuesBulkFixResultSkipped": "Fixed {fixed}, di skip {skipped} (tidak ada perbaikan yang tersedia). Jalankan analisis untuk memperbarui skor.",
+      "scanOnSaveStartFailed": "Pindaian saat menyimpan gagal dimulai. Pastikan Dart SDK terinstal.",
+      "scanOnSaveFailed": "Pindaian saat menyimpan gagal.",
+      "scanOnSaveFailedDetails": "Scan saat menyimpan gagal: {details}",
+      "scanOnSaveInvalidJson": "Scan saat menyimpan mengembalikan output JSON yang tidak valid.",
+      "scanOnSaveDaemonBadResponse": "Proses pemindaian mengembalikan respons yang tidak dikenal.",
+      "scanOnSaveDaemonDown": "Proses pemindaian tidak sedang berjalan. Ia akan dijalankan kembali pada penyimpanan berikutnya.",
+      "scanOnSaveDaemonTimeout": "Proses pemindaian tidak merespons tepat waktu.",
+      "scanOnSaveDaemonExited": "Proses pemindaian berhenti secara tidak terduga. Ia akan dijalankan kembali pada penyimpanan berikutnya.",
+      "scanOnSaveDaemonBackoff": "Proses pemindaian berhenti beberapa saat lalu dan menunggu untuk dijalankan kembali. Simpan kembali dalam beberapa saat.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints dimatikan — nyalakan \"Lint integration\" sebelum melakukan pemindaian seluruh proyek.",
+      "scanOnSaveBaselineAlreadyRunning": "Pindaian seluruh proyek sedang berjalan.",
+      "scanOnSaveBaselineCanceled": "Pindaian seluruh proyek dibatalkan setelah {scanned}/{total} file.",
+      "scanOnSaveBaselineFailed": "Pindaian seluruh proyek gagal: {details}",
+      "scanOnSaveBaselineDone": "Pindaian seluruh proyek selesai: {total} file, {issues} masalah.",
       "codeHealthStartFailedDetails": "Kode Health scan gagal dimulai ({command}): {details} adalah",
       "codeHealthStartFailed": "Kode Kesehatan scan gagal dimulai. Pastikan Dart SDK diinstal.",
       "codeHealthScanFailed": "Kode Kesehatan scan gagal.",

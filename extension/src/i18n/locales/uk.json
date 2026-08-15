@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: Сканування під час збереження",
+      "scanning": "Saropa: сканування {count} файл(ів)...",
+      "done": "Saropa: {count} помилка(и), {elapsed}s",
+      "failed": "Saropa: сканування не вдалося",
+      "warming": "Saropa: нагрів аналізатора... перший сканування після відкриття може зайняти хвилину"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: сканування всього проекту",
+      "progressMessage": "{scanned}/{total} файли скановані, {issues} проблема(и) знайдено"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "Запустіть сканування пакету спочатку — звіт про можливості будується на підставі результатів сканування.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "Виправити {count} порушення в {fileName}?",
       "issuesBulkFixResult": "Випрацювали {fixed}. . Запустити аналіз, щоб оновити результат.",
       "issuesBulkFixResultSkipped": "Випрацював {fixed}, пропустив {skipped} (недоступного виправлення). Запустити аналіз, щоб оновити результат.",
+      "scanOnSaveStartFailed": "Сканування при збереженні не вдалося запустити. Переконайтесь, що встановлено Dart SDK.",
+      "scanOnSaveFailed": "Сканування при збереженні не вдалося.",
+      "scanOnSaveFailedDetails": "Сканування при збереженні не вдалося: {details}",
+      "scanOnSaveInvalidJson": "Сканування при збереженні повернуло недійсний JSON-вихід.",
+      "scanOnSaveDaemonBadResponse": "Сканування повернуло невідомий відповідь.",
+      "scanOnSaveDaemonDown": "Сканування не виконується. Воно відновиться під час наступного збереження.",
+      "scanOnSaveDaemonTimeout": "Сканування не відповіло вчасно.",
+      "scanOnSaveDaemonExited": "Сканування припинилося непередбачено. Воно відновиться під час наступного збереження.",
+      "scanOnSaveDaemonBackoff": "Сканування припинено недавно та очікує відновлення. Збережіть ще раз через кілька хвилин.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints вимкнено — увімкніть \"Інтеграція з лінтом\" перед виконанням повної сканування проекту.",
+      "scanOnSaveBaselineAlreadyRunning": "Повний сканування проекту вже виконується.",
+      "scanOnSaveBaselineCanceled": "Сканування всього проекту припинено після {scanned}/{total} файлів.",
+      "scanOnSaveBaselineFailed": "Повноекранний сканування проекту не вдалося: {details}",
+      "scanOnSaveBaselineDone": "Повний сканування проекту завершено: {total} файлів, {issues} проблема(и).",
       "codeHealthStartFailedDetails": "Код Не вдалося почати сканування здоров'я ({command}): {details}__ - це фізіотип, що містить в собі",
       "codeHealthStartFailed": "Код здоров'я сканування не вдалося почати. Переконайтеся, що Dart SDK встановлений.",
       "codeHealthScanFailed": "Код здоров'я сканування не вдалося.",

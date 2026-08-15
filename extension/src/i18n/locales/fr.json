@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints : Analyse en sauvegardant",
+      "scanning": "Saropa : analyse {count} fichier(s)…",
+      "done": "Saropa : {count} problème(s), {elapsed}",
+      "failed": "Saropa : scan échoué",
+      "warming": "Saropa : préchauffage de l'analyseur... le premier scan après l'ouverture peut prendre une minute"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints : analyse de l'ensemble du projet",
+      "progressMessage": "Fichiers {scanned}/{total} analysés, {issues} problème(s) trouvé(s)"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "Exécutez d'abord un scan de package — le rapport des opportunités est construit à partir des résultats du scan.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "Résoudre les violations de {count} dans le {fileName} ?",
       "issuesBulkFixResult": "Correction de {fixed}. Exécutez une analyse pour mettre à jour le score.",
       "issuesBulkFixResultSkipped": "Correction de {fixed}, saut de {skipped} (aucun correctif disponible). Exécutez une analyse pour mettre à jour le score.",
+      "scanOnSaveStartFailed": "L'analyse sur enregistrement a échoué à l'initialisation. Vérifiez que l'SDK Dart est installé.",
+      "scanOnSaveFailed": "La vérification sur enregistrement a échoué.",
+      "scanOnSaveFailedDetails": "Scan sur enregistrement échoué : {details}",
+      "scanOnSaveInvalidJson": "La scan sur enregistrement a retourné un output JSON invalide.",
+      "scanOnSaveDaemonBadResponse": "Le processus de scan a renvoyé une réponse non reconnue.",
+      "scanOnSaveDaemonDown": "Le processus de scan ne s'exécute pas. Il redémarrera lors de la prochaine sauvegarde.",
+      "scanOnSaveDaemonTimeout": "Le processus de scan n'a pas répondu à temps.",
+      "scanOnSaveDaemonExited": "Le processus de scan s'est arrêté inopinément. Il redémarrera lors de la prochaine sauvegarde.",
+      "scanOnSaveDaemonBackoff": "Le processus de scan s'est arrêté récemment et attend de redémarrer. Sauvegardez à nouveau dans un instant.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints est désactivé — activez \"Intégration des règles de linter\" avant d'exécuter un scan de l'ensemble du projet.",
+      "scanOnSaveBaselineAlreadyRunning": "Un scan de l'ensemble du projet est déjà en cours.",
+      "scanOnSaveBaselineCanceled": "Scan de l'ensemble du projet annulé après {scanned}/{total} fichiers.",
+      "scanOnSaveBaselineFailed": "Scan de l'ensemble du projet échoué : {details}",
+      "scanOnSaveBaselineDone": "Analyse de l'ensemble du projet terminée : {total} fichier(s), {issues} problème(s).",
       "codeHealthStartFailedDetails": "Code Le scan de santé n'a pas pu être démarré ({command}): {details} est une protéine.",
       "codeHealthStartFailed": "Code La numérisation de l'état d'esprit n'a pas pu démarrer. Assurez-vous que le SDK Dart est installé.",
       "codeHealthScanFailed": "Code de santé Le scan a échoué.",

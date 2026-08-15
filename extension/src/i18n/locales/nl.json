@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: Scan bij opslaan",
+      "scanning": "Saropa: scannen van {count} bestand(en)...",
+      "done": "Saropa: {count} fout(en), {elapsed}",
+      "failed": "Saropa: scan mislukt",
+      "warming": "Saropa: de analyzer wordt opgewarmd... de eerste scan na het openen kan een minuut duren"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: hele project scannen",
+      "progressMessage": "{scanned}/{total} bestanden gescand, {issues} probleem(en) gevonden"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "Eerst een package scan uitvoeren — het opportunities rapport wordt opgebouwd uit scanresultaten.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "Fix {count} schendingen in {fileName}?",
       "issuesBulkFixResult": "Vaste {fixed}. . Voer analyse uit om de score bij te werken.",
       "issuesBulkFixResultSkipped": "Fixed {fixed}, overgeslagen {skipped} (geen fix beschikbaar). Voer analyse uit om de score bij te werken.",
+      "scanOnSaveStartFailed": "Scan bij opslaan mislukt. Zorg dat de Dart SDK is geïnstalleerd.",
+      "scanOnSaveFailed": "Scan bij opslaan mislukt.",
+      "scanOnSaveFailedDetails": "Scan bij opslaan mislukt: {details}",
+      "scanOnSaveInvalidJson": "Scan bij opslaan gaf ongeldig JSON-output.",
+      "scanOnSaveDaemonBadResponse": "De scanprocess heeft een onherkende respons geretourneerd.",
+      "scanOnSaveDaemonDown": "De scanprocess is niet actief. Het wordt opnieuw gestart bij de volgende opslag.",
+      "scanOnSaveDaemonTimeout": "De scanprocess is niet op tijd geantwoord.",
+      "scanOnSaveDaemonExited": "De scanprocess is onverwacht gestopt. Het zal opnieuw starten bij de volgende opslag.",
+      "scanOnSaveDaemonBackoff": "De scanprocess is recentelijk gestopt en wacht op herstart. Bewaar opnieuw over een moment.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints is uitgeschakeld — schakel \"Lint integratie\" in voordat je een volledig project scanne.",
+      "scanOnSaveBaselineAlreadyRunning": "Een volledig project scan loopt al.",
+      "scanOnSaveBaselineCanceled": "Gehele projectscan geannuleerd na {scanned}/{total} bestanden.",
+      "scanOnSaveBaselineFailed": "Gehele project scan mislukt: {details}",
+      "scanOnSaveBaselineDone": "Volledige projectscan voltooid: {total} bestanden, {issues} probleem(en).",
       "codeHealthStartFailedDetails": "Code Gezondheids-scan kon niet worden gestart ({command}): {details} is een genetisch gemodificeerde stof.",
       "codeHealthStartFailed": "Code Gezondheidsonderzoek kon niet starten. Zorg ervoor dat Dart SDK is geïnstalleerd.",
       "codeHealthScanFailed": "Code Gezondheidsonderzoek mislukt.",
