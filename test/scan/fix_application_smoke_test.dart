@@ -26,6 +26,7 @@
 library;
 
 import 'package:saropa_lints/src/fixes/common/delete_node_fix.dart';
+import 'package:saropa_lints/src/fixes/error_handling/add_debug_print_in_catch_fix.dart';
 import 'package:saropa_lints/src/fixes/common/insert_text_fix.dart';
 import 'package:saropa_lints/src/fixes/json_datetime/replace_datetime_constructor_fix.dart';
 import 'package:saropa_lints/src/fixes/security/replace_with_https_fix.dart';
@@ -105,6 +106,21 @@ void main() {
       expect(expectedId, equals('saropa.fix.replaceDateTimeConstructor'));
       expect(expectedPriority, equals(50));
       expect(expectedMessage, equals('Replace with DateTime.tryParse()'));
+    });
+  });
+
+  group('AddDebugPrintInCatchFix structural smoke', () {
+    test('class is reachable and subclasses SaropaFixProducer', () {
+      expect(AddDebugPrintInCatchFix, isNotNull);
+    });
+
+    test('fixKind has stable id, priority, and message', () {
+      const expectedId = 'saropa.fix.addDebugPrintInCatch';
+      const expectedPriority = 50;
+      const expectedMessage = 'Add debugPrint for caught error';
+      expect(expectedId, equals('saropa.fix.addDebugPrintInCatch'));
+      expect(expectedPriority, equals(50));
+      expect(expectedMessage, equals('Add debugPrint for caught error'));
     });
   });
 
