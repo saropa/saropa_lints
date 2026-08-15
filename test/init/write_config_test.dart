@@ -148,6 +148,65 @@ plugins:
       },
     );
 
+    // A disabled block's `rule_name: true` lines are what config_loader.dart
+    // parses back into SaropaLintRule.enabledRules on restore — dropping any
+    // of them would silently downgrade a restored project to the essential-
+    // tier fallback. Only the surrounding prose/box-art is safe to compact.
+    test(
+      'new (disabled-by-default) project keeps every enabled rule line but drops per-rule comments',
+      () {
+        final dir = Directory.systemTemp.createTempSync('write_config_test');
+        try {
+          final result = runWriteConfig(
+            WriteConfigOptions(targetDir: dir.path, tier: 'essential'),
+          );
+          expect(result.ok, isTrue);
+          final content = File(
+            '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
+          ).readAsStringSync();
+
+          // Compact mode still emits every rule as its own diagnostics entry...
+          expect(content, contains(': true'));
+          // ...but never the long inline problem-message comment that made
+          // disabled blocks balloon to hundreds of extra lines of dead prose.
+          expect(content, isNot(contains('[WARNING]')));
+          expect(content, isNot(contains('[INFO]')));
+          expect(content, isNot(contains('═')));
+          expect(content, isNot(contains('┌')));
+        } finally {
+          dir.deleteSync(recursive: true);
+        }
+      },
+    );
+
+    // A live block is actively read/edited by a human, so it keeps the full
+    // verbose form — only the (unread, commented-out) disabled case compacts.
+    test('existing live plugins block keeps verbose per-rule comments', () {
+      final dir = Directory.systemTemp.createTempSync('write_config_test');
+      try {
+        final outputFile = File(
+          '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
+        );
+        outputFile.writeAsStringSync('''
+plugins:
+  saropa_lints:
+    version: "9.0.0"
+    diagnostics:
+      avoid_unguarded_debug: true
+''');
+
+        final result = runWriteConfig(
+          WriteConfigOptions(targetDir: dir.path, tier: 'essential'),
+        );
+        expect(result.ok, isTrue);
+
+        final content = outputFile.readAsStringSync();
+        expect(content, contains('SAROPA LINTS CONFIGURATION'));
+      } finally {
+        dir.deleteSync(recursive: true);
+      }
+    });
+
     test('creates analysis_options_custom.yaml when missing', () {
       final dir = Directory.systemTemp.createTempSync('write_config_test');
       try {

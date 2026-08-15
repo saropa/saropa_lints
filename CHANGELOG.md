@@ -66,6 +66,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Fixed (Extension)
+
+- A project whose `plugins:` block is written commented-out (new projects, or one where "Turn Off Lint Integration" was used) no longer gets the full per-rule description dump on every regenerate — the disabled block now keeps only the `rule_name: true/false` lines needed to restore the exact configured tier, dropping the multi-hundred-line prose and box-drawing headers that served no purpose while inert. A live (uncommented) block is unaffected and keeps its full inline documentation. No action required; re-run `dart run saropa_lints:init` or trigger a config write to see the smaller file.
+
 ---
 
 ## [15.0.0]

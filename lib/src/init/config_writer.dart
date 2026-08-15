@@ -51,6 +51,15 @@ String wrapPluginsYamlAsDisabled(String pluginsYaml) {
 /// Generate the plugins YAML section with proper formatting.
 ///
 /// Organizes rules by tier with problem message comments.
+/// [compact] drops the per-rule description comments and the box-drawing
+/// section headers, keeping only the `rule_name: true/false` lines that
+/// actually control enablement (see `config_loader.dart`'s `diagnostics:`
+/// parser — these lines are load-bearing, not just documentation, so they
+/// can never be omitted). Pass true when the block being written is going
+/// to end up wrapped in the disabled sentinel: nobody reads a commented-out
+/// block's prose, so the ~2000-rule dump only needs to stay byte-for-byte
+/// restorable, not human-readable. A live block keeps the full verbose form
+/// since a user editing it directly benefits from the inline explanations.
 String generatePluginsYaml({
   required String tier,
   required String packageVersion,
@@ -60,6 +69,7 @@ String generatePluginsYaml({
   required Map<String, bool> platformSettings,
   required Map<String, bool> packageSettings,
   List<String> rulePacksEnabled = const [],
+  bool compact = false,
 }) {
   final StringBuffer buffer = StringBuffer();
   final customizedRuleNames = userCustomizations.keys.toSet();
@@ -82,103 +92,126 @@ String generatePluginsYaml({
       buffer.writeln('        - $id');
     }
   }
-  buffer.writeln(
-    '    # ═══════════════════════════════════════════════════════════════════',
-  );
-  buffer.writeln('    # SAROPA LINTS CONFIGURATION');
-  buffer.writeln(
-    '    # ═══════════════════════════════════════════════════════════════════',
-  );
-  buffer.writeln(
-    '    # Regenerate with: dart run saropa_lints:init --tier $tier',
-  );
-  buffer.writeln(
-    '    # Tier: $tier (${enabledRules.length} of ${allRules.length} rules enabled)',
-  );
-  buffer.writeln(
-    '    # Lint rules are disabled by default. Set to true to enable.',
-  );
-  buffer.writeln(
-    '    # User customizations are preserved unless --reset is used',
-  );
-  buffer.writeln('    #');
-  buffer.writeln('    # Tiers (cumulative):');
-  buffer.writeln(
-    '    #   1. essential    - Critical: crashes, security, memory leaks',
-  );
-  buffer.writeln(
-    '    #   2. recommended  - Essential + accessibility, performance',
-  );
-  buffer.writeln(
-    '    #   3. professional - Recommended + architecture, testing',
-  );
-  buffer.writeln('    #   4. comprehensive - Professional + thorough coverage');
-  buffer.writeln(
-    '    #   5. pedantic     - All rules (pedantic, highly opinionated)',
-  );
-  buffer.writeln(
-    '    #   +  stylistic    - Opt-in only (formatting, ordering)',
-  );
-  buffer.writeln('    #');
-
-  // Show platform status
-  final disabledPlatforms = platformSettings.entries
-      .where((e) => !e.value)
-      .map((e) => e.key)
-      .toList();
-
-  if (disabledPlatforms.isNotEmpty) {
-    buffer.writeln('    # Disabled platforms: ${disabledPlatforms.join(', ')}');
+  if (compact) {
+    buffer.writeln(
+      '    # SAROPA LINTS — plugin disabled. Rule list kept below so a',
+    );
+    buffer.writeln(
+      '    # future re-enable restores the exact $tier-tier configuration',
+    );
+    buffer.writeln(
+      '    # instead of falling back to essential-only. Regenerate the full,',
+    );
+    buffer.writeln(
+      '    # commented form with: dart run saropa_lints:init --tier $tier',
+    );
+  } else {
+    buffer.writeln(
+      '    # ═══════════════════════════════════════════════════════════════════',
+    );
+    buffer.writeln('    # SAROPA LINTS CONFIGURATION');
+    buffer.writeln(
+      '    # ═══════════════════════════════════════════════════════════════════',
+    );
+    buffer.writeln(
+      '    # Regenerate with: dart run saropa_lints:init --tier $tier',
+    );
+    buffer.writeln(
+      '    # Tier: $tier (${enabledRules.length} of ${allRules.length} rules enabled)',
+    );
+    buffer.writeln(
+      '    # Lint rules are disabled by default. Set to true to enable.',
+    );
+    buffer.writeln(
+      '    # User customizations are preserved unless --reset is used',
+    );
     buffer.writeln('    #');
-  }
-
-  // Show package status
-  final disabledPackages = packageSettings.entries
-      .where((e) => !e.value)
-      .map((e) => e.key)
-      .toList();
-
-  if (disabledPackages.isNotEmpty) {
-    buffer.writeln('    # Disabled packages: ${disabledPackages.join(', ')}');
+    buffer.writeln('    # Tiers (cumulative):');
+    buffer.writeln(
+      '    #   1. essential    - Critical: crashes, security, memory leaks',
+    );
+    buffer.writeln(
+      '    #   2. recommended  - Essential + accessibility, performance',
+    );
+    buffer.writeln(
+      '    #   3. professional - Recommended + architecture, testing',
+    );
+    buffer.writeln(
+      '    #   4. comprehensive - Professional + thorough coverage',
+    );
+    buffer.writeln(
+      '    #   5. pedantic     - All rules (pedantic, highly opinionated)',
+    );
+    buffer.writeln(
+      '    #   +  stylistic    - Opt-in only (formatting, ordering)',
+    );
     buffer.writeln('    #');
-  }
 
-  buffer.writeln(
-    '    # Settings (max_issues, platforms, packages) are in analysis_options_custom.yaml',
-  );
-  buffer.writeln('    #');
-  buffer.writeln(
-    '    # MEMORY: this in-process plugin resolves types for every rule and',
-  );
-  buffer.writeln(
-    '    # can retain several GB of resolved AST on large projects. The VS',
-  );
-  buffer.writeln(
-    '    # Code extension\'s scan-on-save (out-of-process, ~3 GB fixed) covers',
-  );
-  buffer.writeln('    # the same diagnostics for a fraction of the cost — see');
-  buffer.writeln(
-    '    # plans/PLAN_scan_only_diagnostics.md. New projects get this block',
-  );
-  buffer.writeln(
-    '    # commented out by default for that reason; delete the sentinel',
-  );
-  buffer.writeln('    # comment lines around it to run it live.');
-  buffer.writeln(
-    '    # ═══════════════════════════════════════════════════════════════════',
-  );
+    // Show platform status
+    final disabledPlatforms = platformSettings.entries
+        .where((e) => !e.value)
+        .map((e) => e.key)
+        .toList();
+
+    if (disabledPlatforms.isNotEmpty) {
+      buffer.writeln(
+        '    # Disabled platforms: ${disabledPlatforms.join(', ')}',
+      );
+      buffer.writeln('    #');
+    }
+
+    // Show package status
+    final disabledPackages = packageSettings.entries
+        .where((e) => !e.value)
+        .map((e) => e.key)
+        .toList();
+
+    if (disabledPackages.isNotEmpty) {
+      buffer.writeln('    # Disabled packages: ${disabledPackages.join(', ')}');
+      buffer.writeln('    #');
+    }
+
+    buffer.writeln(
+      '    # Settings (max_issues, platforms, packages) are in analysis_options_custom.yaml',
+    );
+    buffer.writeln('    #');
+    buffer.writeln(
+      '    # MEMORY: this in-process plugin resolves types for every rule and',
+    );
+    buffer.writeln(
+      '    # can retain several GB of resolved AST on large projects. The VS',
+    );
+    buffer.writeln(
+      '    # Code extension\'s scan-on-save (out-of-process, ~3 GB fixed) covers',
+    );
+    buffer.writeln('    # the same diagnostics for a fraction of the cost — see');
+    buffer.writeln(
+      '    # plans/PLAN_scan_only_diagnostics.md. New projects get this block',
+    );
+    buffer.writeln(
+      '    # commented out by default for that reason; delete the sentinel',
+    );
+    buffer.writeln('    # comment lines around it to run it live.');
+    buffer.writeln(
+      '    # ═══════════════════════════════════════════════════════════════════',
+    );
+  }
   buffer.writeln('');
   buffer.writeln('    diagnostics:');
 
   // Section 1: User customizations (always at top, preserved)
   if (userCustomizations.isNotEmpty) {
-    buffer.writeln(sectionHeader('USER CUSTOMIZATIONS', '~'));
-    buffer.writeln(
-      '      # These rules have been manually configured and will be preserved',
-    );
-    buffer.writeln(
-      '      # when regenerating. Use --reset to discard these customizations.',
-    );
+    if (compact) {
+      buffer.writeln('      # USER CUSTOMIZATIONS (preserved; --reset discards)');
+    } else {
+      buffer.writeln(sectionHeader('USER CUSTOMIZATIONS', '~'));
+      buffer.writeln(
+        '      # These rules have been manually configured and will be preserved',
+      );
+      buffer.writeln(
+        '      # when regenerating. Use --reset to discard these customizations.',
+      );
+    }
     buffer.writeln('');
 
     final List<String> sortedCustomizations = userCustomizations.keys.toList()
@@ -186,6 +219,10 @@ String generatePluginsYaml({
     for (final String rule in sortedCustomizations) {
       final bool? enabled = userCustomizations[rule];
       if (enabled == null) continue;
+      if (compact) {
+        buffer.writeln('      $rule: $enabled');
+        continue;
+      }
       final String msg = getProblemMessage(rule);
       final String severity = getRuleSeverity(rule);
       buffer.writeln('      $rule: $enabled  # [$severity] $msg');
@@ -206,7 +243,11 @@ String generatePluginsYaml({
   }
 
   // Section 2: Enabled rules organized by tier
-  buffer.writeln(sectionHeader('ENABLED RULES ($tier tier)', '='));
+  if (compact) {
+    buffer.writeln('      # ENABLED RULES ($tier tier)');
+  } else {
+    buffer.writeln(sectionHeader('ENABLED RULES ($tier tier)', '='));
+  }
   buffer.writeln('');
 
   // Output enabled tiers in order
@@ -229,6 +270,10 @@ String generatePluginsYaml({
     );
     buffer.writeln('      #');
     for (final String rule in rules) {
+      if (compact) {
+        buffer.writeln('      $rule: true');
+        continue;
+      }
       final String msg = getProblemMessage(rule);
       final String severity = getRuleSeverity(rule);
       buffer.writeln('      $rule: true  # [$severity] $msg');
@@ -240,25 +285,33 @@ String generatePluginsYaml({
   final stylisticEnabled = (enabledByTier[RuleTier.stylistic] ?? [])..sort();
 
   if (stylisticEnabled.isNotEmpty) {
-    buffer.writeln(sectionHeader('STYLISTIC RULES (opt-in)', '~'));
-    buffer.writeln('      # Formatting, ordering, naming conventions.');
-    buffer.writeln(
-      '      # Enable with: dart run saropa_lints:init --tier <tier> --stylistic-all',
-    );
-    buffer.writeln('');
+    if (compact) {
+      buffer.writeln('      # STYLISTIC RULES (opt-in, ${stylisticEnabled.length} rules)');
+    } else {
+      buffer.writeln(sectionHeader('STYLISTIC RULES (opt-in)', '~'));
+      buffer.writeln('      # Formatting, ordering, naming conventions.');
+      buffer.writeln(
+        '      # Enable with: dart run saropa_lints:init --tier <tier> --stylistic-all',
+      );
+      buffer.writeln('');
 
-    buffer.writeln('      #');
-    buffer.writeln(
-      '      # ┌─────────────────────────────────────────────────────────────────┐',
-    );
-    buffer.writeln(
-      '      # │  ✓ ENABLED STYLISTIC (${stylisticEnabled.length} rules)${' ' * (43 - stylisticEnabled.length.toString().length)}│',
-    );
-    buffer.writeln(
-      '      # └─────────────────────────────────────────────────────────────────┘',
-    );
-    buffer.writeln('      #');
+      buffer.writeln('      #');
+      buffer.writeln(
+        '      # ┌─────────────────────────────────────────────────────────────────┐',
+      );
+      buffer.writeln(
+        '      # │  ✓ ENABLED STYLISTIC (${stylisticEnabled.length} rules)${' ' * (43 - stylisticEnabled.length.toString().length)}│',
+      );
+      buffer.writeln(
+        '      # └─────────────────────────────────────────────────────────────────┘',
+      );
+      buffer.writeln('      #');
+    }
     for (final String rule in stylisticEnabled) {
+      if (compact) {
+        buffer.writeln('      $rule: true');
+        continue;
+      }
       final String msg = getProblemMessage(rule);
       buffer.writeln('      $rule: true  # $msg');
     }

@@ -516,6 +516,15 @@ Future<void> runInit(List<String> args) async {
           cliArgs.enablePackIds,
         );
 
+  // New projects get the plugin block commented out by default — the
+  // in-process plugin costs several GB on large projects and the daemon
+  // already delivers the same diagnostics for a fraction of that (see
+  // plans/PLAN_scan_only_diagnostics.md). An existing project's live/off
+  // state is preserved either way: a live block stays live, and a
+  // previously-disabled block stays disabled through a regenerate/--reset.
+  final bool wasDisabled = existingContent.contains(pluginsDisabledBeginMarker);
+  final bool willBeDisabled = isNewFile || wasDisabled;
+
   // Generate the new plugins section with proper formatting
   final String pluginsYaml = generatePluginsYaml(
     tier: resolvedTier,
@@ -526,16 +535,10 @@ Future<void> runInit(List<String> args) async {
     platformSettings: platformSettings,
     packageSettings: packageSettings,
     rulePacksEnabled: mergedRulePacks,
+    compact: willBeDisabled,
   );
 
-  // New projects get the plugin block commented out by default — the
-  // in-process plugin costs several GB on large projects and the daemon
-  // already delivers the same diagnostics for a fraction of that (see
-  // plans/PLAN_scan_only_diagnostics.md). An existing project's live/off
-  // state is preserved either way: a live block stays live, and a
-  // previously-disabled block stays disabled through a regenerate/--reset.
-  final bool wasDisabled = existingContent.contains(pluginsDisabledBeginMarker);
-  final String pluginsBlock = (isNewFile || wasDisabled)
+  final String pluginsBlock = willBeDisabled
       ? wrapPluginsYamlAsDisabled(pluginsYaml)
       : pluginsYaml;
 
