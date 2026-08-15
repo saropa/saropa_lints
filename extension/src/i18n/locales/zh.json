@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints：保存时扫描",
+      "scanning": "Saropa：正在扫描 {count} 个文件…",
+      "done": "Saropa: {count} 个问题，{elapsed}",
+      "failed": "Saropa: 扫描失败",
+      "warming": "Saropa：正在启动分析器… 打开后的首次扫描可能需要一分钟"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: 扫描整个项目",
+      "progressMessage": "{scanned}/{total}文件扫描完成，发现{issues}个问题"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "先运行一个包扫描 —— 机会报告是基于扫描结果构建的。",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "修复 {fileName} 中的 {count} 违规问题吗？",
       "issuesBulkFixResult": "修复了 {fixed}。运行分析以更新分数。",
       "issuesBulkFixResultSkipped": "修复了 {fixed}，跳过了 {skipped}（无可用修复）。运行分析以更新分数。",
+      "scanOnSaveStartFailed": "保存时扫描失败。请确保已安装 Dart SDK。",
+      "scanOnSaveFailed": "保存时扫描失败。",
+      "scanOnSaveFailedDetails": "保存时扫描失败: {details}",
+      "scanOnSaveInvalidJson": "保存时扫描返回了无效的JSON输出。",
+      "scanOnSaveDaemonBadResponse": "扫描过程返回了一个无法识别的响应。",
+      "scanOnSaveDaemonDown": "扫描过程未运行。下次保存时将重新启动。",
+      "scanOnSaveDaemonTimeout": "扫描过程未及时响应。",
+      "scanOnSaveDaemonExited": "扫描过程意外停止。下次保存时将重新启动。",
+      "scanOnSaveDaemonBackoff": "扫描过程最近已停止，正在等待重新启动。请稍后再次保存。",
+      "scanOnSaveBaselineDisabled": "Saropa Lints 已关闭 — 在执行整个项目扫描前，请开启“lint 集成”",
+      "scanOnSaveBaselineAlreadyRunning": "一个整个项目的扫描已经在运行。",
+      "scanOnSaveBaselineCanceled": "整个项目扫描在处理 {scanned}/{total} 文件后取消。",
+      "scanOnSaveBaselineFailed": "整个项目扫描失败：{details}",
+      "scanOnSaveBaselineDone": "项目级扫描完成：{total} 个文件，{issues} 个问题。",
       "codeHealthStartFailedDetails": "代码 健康扫描无法启动 ({command}): {details} 已经成为一种",
       "codeHealthStartFailed": "代码健康扫描无法启动. 确保 Dart SDK 安装. 这是一个很好的方法.",
       "codeHealthScanFailed": "代码健康扫描失败了.",
