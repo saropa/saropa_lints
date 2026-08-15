@@ -126,3 +126,82 @@ class _good463__MyState extends State<MyWidget> with WidgetsBindingObserver {
     else if (state == AppLifecycleState.resumed) _startTimer();
   }
 }
+
+// GOOD: Timer created in initState and canceled in dispose() — a
+// foreground-only ticker torn down with the widget does not need to pause
+// on backgrounding, since it stops existing when disposed.
+// See plans/history/2026.08/2026.08.15/require_app_lifecycle_handling_false_positive_dispose_cancels_timer.md
+class _WorldClockListScreenState extends State<MyWidget> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}
+
+// BAD: Timer created in initState, dispose() present but does NOT cancel
+// the timer — the leak the rule exists to catch must still fire.
+// expect_lint: require_app_lifecycle_handling
+class _bad463b__LeakyDisposeState extends State<MyWidget> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => refresh());
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+}
+
+// GOOD: stream subscription assigned to a field, canceled in dispose().
+class _good463c__SubscriptionCanceledState extends State<MyWidget> {
+  StreamSubscription<void>? _sub;
+
+  @override
+  void initState() {
+    super.initState();
+    _sub = someStream.listen((_) => refresh());
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
+  }
+}
+
+// BAD: one field-tracked Timer properly canceled in dispose(), plus a
+// second, untracked fire-and-forget Timer.periodic() with no assignment —
+// the untracked timer must still force a flag; a class must not slip
+// through just because SOME of its background work is provably cleaned up.
+// expect_lint: require_app_lifecycle_handling
+class _bad463d__MixedTrackedAndUntrackedState extends State<MyWidget> {
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) => refresh());
+    Timer.periodic(const Duration(seconds: 5), (_) => refresh());
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+}

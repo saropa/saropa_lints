@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../target_matcher_utils.dart';
 
 /// Warns when Timer or periodic work runs without AppLifecycleState check.
 ///
@@ -561,13 +562,16 @@ String? _assignmentTargetFieldName(AssignmentExpression node) {
 
 /// Warns when State subclasses use Timer or stream subscriptions without
 ///
-/// Since: v2.4.0 | Updated: v4.13.0 | Rule version: v4
+/// Since: v2.4.0 | Updated: v14.5.10 | Rule version: v5
 ///
 /// lifecycle handling.
 ///
 /// Timer.periodic, Timer() constructor, and .listen() calls in State
 /// subclasses should have corresponding lifecycle handling to pause or
-/// stop background work when the app is not active.
+/// stop background work when the app is not active, OR the field they are
+/// assigned to must be canceled/closed in dispose() — a foreground-only
+/// ticker that is torn down when the widget unmounts does not need to pause
+/// on backgrounding, since it simply stops existing.
 ///
 /// **Note:** StreamBuilder is intentionally not flagged. Flutter's
 /// StreamBuilder manages its own subscription lifecycle through
@@ -577,6 +581,8 @@ String? _assignmentTargetFieldName(AssignmentExpression node) {
 ///
 /// - WidgetsBindingObserver: didChangeAppLifecycleState
 /// - AppLifecycleListener: onStateChange
+/// - dispose(): `<field>?.cancel()` / `<field>?.close()` on the field the
+///   Timer/subscription was assigned to
 ///
 /// **Bad:**
 /// ```dart
@@ -586,6 +592,8 @@ String? _assignmentTargetFieldName(AssignmentExpression node) {
 ///     super.initState();
 ///     _timer = Timer.periodic(Duration(seconds: 1), (_) => refresh());
 ///   }
+///   // No dispose() cancellation and no lifecycle observer — the timer
+///   // leaks if the widget is disposed and keeps running in the background.
 /// }
 /// ```
 ///
@@ -596,6 +604,22 @@ String? _assignmentTargetFieldName(AssignmentExpression node) {
 ///   void didChangeAppLifecycleState(AppLifecycleState state) {
 ///     if (state == AppLifecycleState.paused) _timer?.cancel();
 ///     else if (state == AppLifecycleState.resumed) _startTimer();
+///   }
+/// }
+/// ```
+///
+/// **Also Good:** foreground-only ticker, torn down with the widget:
+/// ```dart
+/// class _MyState extends State<MyWidget> {
+///   Timer? _timer;
+///   void initState() {
+///     super.initState();
+///     _timer = Timer.periodic(Duration(seconds: 1), (_) => setState(() {}));
+///   }
+///   @override
+///   void dispose() {
+///     _timer?.cancel();
+///     super.dispose();
 ///   }
 /// }
 /// ```
@@ -626,11 +650,15 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'require_app_lifecycle_handling',
     '[require_app_lifecycle_handling] Timer or subscription detected '
-        'without lifecycle handling. '
-        'Stop background work when app is inactive to save battery. {v4}',
+        'without lifecycle handling or a matching dispose() cancellation. '
+        'Stop background work when app is inactive to save battery, or '
+        'cancel/close it in dispose() if it is a foreground-only ticker. '
+        '{v5}',
     correctionMessage:
         'Implement WidgetsBindingObserver and pause/resume in '
-        'didChangeAppLifecycleState, or use AppLifecycleListener.',
+        'didChangeAppLifecycleState, use AppLifecycleListener, or cancel/'
+        'close the field in dispose() if the app-lifecycle state does not '
+        'matter for this work.',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -642,9 +670,13 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
     context.addClassDeclaration((ClassDeclaration node) {
       if (!_extendsState(node)) return;
       if (_hasLifecycleHandling(node)) return;
-      if (_hasBackgroundWork(node)) {
-        reporter.atToken(node.nameToken, code);
-      }
+      if (!_hasBackgroundWork(node)) return;
+      // "Canceled in dispose()" and "paused via app-lifecycle hook" are two
+      // independently sufficient answers — a foreground-only ticker that is
+      // torn down with the widget does not need to also pause/resume.
+      // See plans/history/2026.08/2026.08.15/require_app_lifecycle_handling_false_positive_dispose_cancels_timer.md
+      if (_isCleanedUpInDispose(node)) return;
+      reporter.atToken(node.nameToken, code);
     });
   }
 
@@ -691,11 +723,129 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
 
   static bool _hasBackgroundWork(ClassDeclaration node) {
     for (final ClassMember member in node.bodyMembers) {
-      if (member is MethodDeclaration) {
+      // dispose() is where cleanup calls live, not where background work is
+      // started; scanning it here could false-positive on a teardown helper
+      // that itself contains the word "listen" (e.g. `_sub?.cancel()` inside
+      // a block that also calls some other `.listen(...)` for a *different*
+      // resource). Background work is always established elsewhere
+      // (initState, didChangeDependencies, build, etc.).
+      if (member is MethodDeclaration && member.name.lexeme != 'dispose') {
         final String bodySource = member.body.toSource();
         if (_timerPeriodicPattern.hasMatch(bodySource)) return true;
         if (_timerConstructorPattern.hasMatch(bodySource)) return true;
         if (_listenCallPattern.hasMatch(bodySource)) return true;
+      }
+    }
+    return false;
+  }
+
+  /// Returns true when every Timer/subscription this class creates (outside
+  /// of dispose()) is provably canceled or closed inside dispose().
+  ///
+  /// Only background-work expressions assigned to a class field we can name
+  /// (`_field = Timer.periodic(...)`, `_field = stream.listen(...)`, or an
+  /// inline `Timer? _field = Timer.periodic(...)` initializer) can be
+  /// checked against dispose(). Anything else — a local variable, a
+  /// fire-and-forget call with no assignment — is "unattributed": we cannot
+  /// point at anything in dispose() to prove it was cleaned up, so its mere
+  /// presence forces this to return false, even if every *other*,
+  /// field-tracked Timer in the same class IS properly canceled. Without
+  /// this, a class mixing one well-behaved field-tracked Timer with a second,
+  /// untracked leaking one would wrongly pass as "cleaned up" on the
+  /// strength of the first alone.
+  static bool _isCleanedUpInDispose(ClassDeclaration node) {
+    MethodDeclaration? disposeMethod;
+    for (final ClassMember member in node.bodyMembers) {
+      if (member is MethodDeclaration && member.name.lexeme == 'dispose') {
+        disposeMethod = member;
+        break;
+      }
+    }
+    if (disposeMethod == null) return false;
+
+    final _BackgroundWorkVisitor visitor = _BackgroundWorkVisitor();
+    for (final ClassMember member in node.bodyMembers) {
+      if (member is MethodDeclaration && member.name.lexeme != 'dispose') {
+        member.body.accept(visitor);
+      } else if (member is FieldDeclaration) {
+        // Inline field initializer: `Timer? _t = Timer.periodic(...)`.
+        for (final VariableDeclaration variable in member.fields.variables) {
+          final Expression? initializer = variable.initializer;
+          if (initializer != null &&
+              _BackgroundWorkVisitor._isBackgroundWorkExpression(
+                initializer,
+              )) {
+            visitor.fieldNames.add(variable.name.lexeme);
+          }
+        }
+      }
+    }
+    if (visitor.hasUnattributedWork) return false;
+    if (visitor.fieldNames.isEmpty) return false;
+
+    final FunctionBody disposeBody = disposeMethod.body;
+    return visitor.fieldNames.every(
+      (String field) =>
+          isFieldCleanedUp(field, 'cancel', disposeBody) ||
+          isFieldCleanedUp(field, 'close', disposeBody),
+    );
+  }
+}
+
+/// Walks every `Timer(...)`, `Timer.periodic(...)`, and `.listen(...)` call
+/// site so [RequireAppLifecycleHandlingRule._isCleanedUpInDispose] can check
+/// dispose() cancels/closes each one specifically, rather than just checking
+/// for the presence of a `.cancel()`/`.close()` call anywhere in the class.
+///
+/// Each call site is either attributed to a class field name (recorded in
+/// [fieldNames]) or, if it can't be tied to any field the caller could point
+/// at inside dispose() — a local variable, a fire-and-forget call with no
+/// assignment — flips [hasUnattributedWork]. The caller must treat
+/// [hasUnattributedWork] as "cannot prove cleanup" regardless of how many
+/// fields in [fieldNames] ARE cleaned up.
+class _BackgroundWorkVisitor extends RecursiveAstVisitor<void> {
+  final Set<String> fieldNames = <String>{};
+  bool hasUnattributedWork = false;
+
+  void _recordIfBackgroundWork(Expression node) {
+    if (!_isBackgroundWorkExpression(node)) return;
+    final AstNode? parent = node.parent;
+    if (parent is AssignmentExpression && parent.rightHandSide == node) {
+      final String? fieldName = _assignmentTargetFieldName(parent);
+      if (fieldName != null) {
+        fieldNames.add(fieldName);
+        return;
+      }
+    } else if (parent is VariableDeclaration &&
+        parent.initializer == node &&
+        parent.parent?.parent is FieldDeclaration) {
+      fieldNames.add(parent.name.lexeme);
+      return;
+    }
+    hasUnattributedWork = true;
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    _recordIfBackgroundWork(node);
+    super.visitInstanceCreationExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    _recordIfBackgroundWork(node);
+    super.visitMethodInvocation(node);
+  }
+
+  static bool _isBackgroundWorkExpression(Expression expr) {
+    if (expr is InstanceCreationExpression) {
+      return expr.constructorName.type.name.lexeme == 'Timer';
+    }
+    if (expr is MethodInvocation) {
+      if (expr.methodName.name == 'listen') return true;
+      if (expr.methodName.name == 'periodic') {
+        final Expression? target = expr.target;
+        return target is SimpleIdentifier && target.name == 'Timer';
       }
     }
     return false;
