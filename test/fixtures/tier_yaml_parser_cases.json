@@ -1,0 +1,35 @@
+{
+  "_comment": "Shared parity fixtures for the tier-block yaml parser, which is implemented independently in lib/src/config/runtime_tier_cap.dart (parseSaropaTierFromPluginBlock) and extension/src/config/tierConfig.ts (parseTierFromPluginBlock). Both test suites load this file and assert the same expected tier for the same yaml input, so the two implementations cannot silently drift without a test failure on one side.",
+  "cases": [
+    {
+      "name": "no plugins block",
+      "yaml": "linter:\n  rules:\n    - avoid_print\n",
+      "expected": null
+    },
+    {
+      "name": "runtime_tier under plugins.saropa_lints",
+      "yaml": "plugins:\n  saropa_lints:\n    runtime_tier: comprehensive\n",
+      "expected": "comprehensive"
+    },
+    {
+      "name": "saropa_tier alias",
+      "yaml": "plugins:\n  saropa_lints:\n    saropa_tier: essential\n",
+      "expected": "essential"
+    },
+    {
+      "name": "quoted value",
+      "yaml": "plugins:\n  saropa_lints:\n    runtime_tier: 'professional'\n",
+      "expected": "professional"
+    },
+    {
+      "name": "invalid tier label",
+      "yaml": "plugins:\n  saropa_lints:\n    runtime_tier: not_a_tier\n",
+      "expected": null
+    },
+    {
+      "name": "sibling plugin block does not match",
+      "yaml": "plugins:\n  other_plugin:\n    runtime_tier: pedantic\n  saropa_lints:\n    diagnostics: {}\n",
+      "expected": null
+    }
+  ]
+}

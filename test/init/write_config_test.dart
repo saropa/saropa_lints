@@ -45,6 +45,106 @@ void main() {
       }
     });
 
+    // Lane 2 part B (plans/PLAN_scan_only_diagnostics.md): the in-process
+    // plugin costs several GB on large projects, so a brand-new project must
+    // not get a live `plugins:` block by default — the block is written
+    // commented out behind the same sentinels the extension's "Lint
+    // integration: Off" toggle uses.
+    test('new project writes plugins block commented out by default', () {
+      final dir = Directory.systemTemp.createTempSync('write_config_test');
+      try {
+        final result = runWriteConfig(
+          WriteConfigOptions(targetDir: dir.path, tier: 'recommended'),
+        );
+        expect(result.ok, isTrue);
+        final content = File(
+          '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
+        ).readAsStringSync();
+
+        expect(
+          content,
+          contains(
+            'saropa_lints integration turned OFF by the VS Code extension',
+          ),
+        );
+        expect(content, contains('# <<< saropa_lints end of disabled'));
+        // The live header line must itself be commented — not just present
+        // somewhere in the file — proving the analyzer will not load it.
+        expect(content, isNot(contains('\nplugins:\n')));
+        expect(content, contains('# plugins:'));
+      } finally {
+        dir.deleteSync(recursive: true);
+      }
+    });
+
+    // A project that already has a LIVE plugins: block (from before this
+    // default changed, or from a user who deliberately re-enabled it) must
+    // not be silently flipped off by an unrelated tier change.
+    test('existing live plugins block stays live after a tier change', () {
+      final dir = Directory.systemTemp.createTempSync('write_config_test');
+      try {
+        final outputFile = File(
+          '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
+        );
+        outputFile.writeAsStringSync('''
+plugins:
+  saropa_lints:
+    version: "9.0.0"
+    diagnostics:
+      avoid_unguarded_debug: true
+''');
+
+        final result = runWriteConfig(
+          WriteConfigOptions(targetDir: dir.path, tier: 'professional'),
+        );
+        expect(result.ok, isTrue);
+
+        final content = outputFile.readAsStringSync();
+        expect(content, isNot(contains('turned OFF by the VS Code')));
+        expect(content, isNot(contains('# plugins:')));
+        expect(content.trimLeft(), startsWith('plugins:\n'));
+      } finally {
+        dir.deleteSync(recursive: true);
+      }
+    });
+
+    // A project where integration was explicitly turned off (sentinel
+    // present) must stay off through a regenerate — turning saropaLints.
+    // enabled back on must not silently restore the heavy in-process plugin.
+    test('existing disabled plugins block stays disabled after a tier change', () {
+      final dir = Directory.systemTemp.createTempSync('write_config_test');
+      try {
+        final outputFile = File(
+          '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
+        );
+        outputFile.writeAsStringSync('''
+# >>> saropa_lints integration turned OFF by the VS Code extension — toggle "Lint integration" On to restore >>>
+# plugins:
+#   saropa_lints:
+#     version: "9.0.0"
+#     diagnostics:
+#       avoid_unguarded_debug: true
+# <<< saropa_lints end of disabled integration block <<<
+''');
+
+        final result = runWriteConfig(
+          WriteConfigOptions(targetDir: dir.path, tier: 'professional'),
+        );
+        expect(result.ok, isTrue);
+
+        final content = outputFile.readAsStringSync();
+        expect(
+          content,
+          contains(
+            'saropa_lints integration turned OFF by the VS Code extension',
+          ),
+        );
+        expect(content, isNot(contains('\nplugins:\n')));
+      } finally {
+        dir.deleteSync(recursive: true);
+      }
+    });
+
     test('creates analysis_options_custom.yaml when missing', () {
       final dir = Directory.systemTemp.createTempSync('write_config_test');
       try {

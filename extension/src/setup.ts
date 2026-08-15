@@ -12,6 +12,7 @@ import { getProjectRoot } from './projectRoot';
 import { readViolations } from './violationsReader';
 import { readInstalledVersion } from './upgrade-checker';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
+import { readTierFromAnalysisOptionsYaml } from './config/tierConfig';
 import { l10n } from './i18n/runtime';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
@@ -267,17 +268,15 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
         return;
       }
 
-      // If integration was previously turned off, the plugins block is
-      // commented out behind sentinels. Restore it first so write_config
-      // replaces the real block in place (keeping the user's rule_packs and
-      // overrides) rather than appending a duplicate below the dead one.
-      if (restorePluginsIntegration(workspaceRoot)) {
-        logReport('- Restored previously disabled plugins block');
-        // Symmetric with the disable path: force the analysis server to pick
-        // up the restored plugins block now rather than on its next natural
-        // restart, so re-enabling takes effect immediately.
-        await restartDartAnalysisServer();
-      }
+      // Deliberately NOT calling restorePluginsIntegration() here. Enable
+      // means "turn on saropa_lints delivery" (scan-on-save, gated by this
+      // same saropaLints.enabled setting) — it must not silently restore
+      // the memory-heavy in-process plugin as a side effect. write_config
+      // (below) preserves whatever plugins: block state already exists on
+      // disk (live stays live, disabled-via-sentinel stays disabled) and
+      // defaults a brand-new file to disabled. A user who explicitly wants
+      // the in-process plugin back can uncomment the block themselves —
+      // see the MEMORY comment write_config prints next to it.
 
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const tier = (cfg.get<string>('tier') ?? 'recommended').trim();
@@ -1292,7 +1291,17 @@ async function applyTierChange(
  * Returns the new and previous tier on success, or null on cancel/failure/same-tier.
  */
 export async function runSetTier(context: vscode.ExtensionContext): Promise<TierChangeResult | null> {
-  const previousTier = (vscode.workspace.getConfiguration('saropaLints').get<string>('tier') ?? 'recommended').trim();
+  const workspaceRoot = getProjectRoot();
+  if (!workspaceRoot) {
+    vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
+    return null;
+  }
+  // analysis_options.yaml is the source of truth for the current tier — only
+  // fall back to the saropaLints.tier setting when the project has never been
+  // initialized (no yaml tier configured yet), so the picker always reflects
+  // what's actually on disk instead of a setting that can drift from it.
+  const previousTier = readTierFromAnalysisOptionsYaml(workspaceRoot)
+    ?? (vscode.workspace.getConfiguration('saropaLints').get<string>('tier') ?? 'recommended').trim();
 
   // Build descriptive pick items — current tier marked with checkmark, rule counts shown.
   interface TierPickItem extends vscode.QuickPickItem { id: string }
@@ -1316,11 +1325,6 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<Tier
     return null;
   }
 
-  const workspaceRoot = getProjectRoot();
-  if (!workspaceRoot) {
-    vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
-    return null;
-  }
   await vscode.workspace.getConfiguration('saropaLints').update('tier', tier, vscode.ConfigurationTarget.Workspace);
   let ok = false;
   await vscode.window.withProgress(

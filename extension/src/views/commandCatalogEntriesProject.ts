@@ -165,6 +165,13 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'play',
   },
   {
+    command: 'saropaLints.scanOnSave.runBaselineScan',
+    title: 'Scan Whole Project for Issues',
+    description: 'Run a cancelable whole-project scan to populate the Problems panel for files not yet saved this session — a one-off pass separate from save-triggered scanning.',
+    category: 'Analysis',
+    icon: 'search',
+  },
+  {
     command: 'saropaLints.crossFile.unusedFiles',
     title: 'Cross-File — Find Unused Files',
     description: 'Run project-wide analysis to find Dart files that are not imported by any other file.',

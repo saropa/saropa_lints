@@ -164,6 +164,7 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
 
   final outputPath = options.resolvedOutputPath;
   final outputFile = File(outputPath);
+  final bool isNewFile = !outputFile.existsSync();
   String existingContent = '';
   Map<String, bool> userCustomizations = <String, bool>{};
 
@@ -195,7 +196,22 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
     rulePacksEnabled: preservedRulePacks,
   );
 
-  final newContent = replacePluginsSection(existingContent, pluginsYaml);
+  // New projects get the plugin block commented out by default — the
+  // in-process plugin costs several GB on large projects and the daemon
+  // already delivers the same diagnostics for a fraction of that (see
+  // plans/PLAN_scan_only_diagnostics.md). An existing project's live/off
+  // state is preserved either way: a live block stays live (no forced
+  // flip for someone already relying on it), and a previously-disabled
+  // block stays disabled even after a tier change or Enable — turning on
+  // scan-on-save must not silently turn the heavy plugin back on too.
+  final bool wasDisabled = existingContent.contains(
+    pluginsDisabledBeginMarker,
+  );
+  final String pluginsBlock = (isNewFile || wasDisabled)
+      ? wrapPluginsYamlAsDisabled(pluginsYaml)
+      : pluginsYaml;
+
+  final newContent = replacePluginsSection(existingContent, pluginsBlock);
   final patchedContent = ensureNonDartExcludes(newContent);
 
   try {

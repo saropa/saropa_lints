@@ -217,12 +217,9 @@ staleness artifact, not a code defect._
 
 ## Tests Added
 
-`test/rules/data/no_magic_string_comment_fp_test.dart` — resolved-analyzer
-regression test (via `test/support/resolved_rule_harness.dart`) asserting:
-1. `no_magic_string` does NOT fire on a string literal inside a `//` comment
-   (the reported false positive).
-2. `no_magic_string` DOES fire on the same literal once uncommented (proves
-   the rule is still live and the negative assertion above isn't vacuous).
+_None — a comment-only fixture would trivially pass today (the AST-based
+mechanism already cannot see into comments), so it would not guard against
+the stale-diagnostic condition that produced the original report._
 
 ---
 

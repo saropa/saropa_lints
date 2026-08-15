@@ -61,27 +61,73 @@ never reliably surfaced a squiggle and costs 8 GB resident.
 
 ### Lane 2 — in-process plugin becomes opt-in (default OFF)
 
-- The extension's existing disable path (`disablePluginsIntegration`,
-  sentinel comment markers in `analysis_options.yaml`) becomes the default
-  state for new setups; `init` stops emitting a live `plugins:` block.
+**Status: Done (2026-08-15), parts A and B both landed.**
+
+- Part A (prior session): `saropaLints.scanOnSave.enabled` removed; the
+  master `saropaLints.enabled` toggle alone gates scan-on-save.
+- Part B (this session): `generatePluginsYaml`/`replacePluginsSection`
+  (`lib/src/init/config_writer.dart`) now wrap a brand-new project's
+  `plugins:` block in the extension's own disable sentinels
+  (`pluginsDisabledBeginMarker`/`pluginsDisabledEndMarker`, matching
+  `DISABLE_BEGIN_MARKER`/`DISABLE_END_MARKER` in `extension/src/setup.ts`)
+  so it is written commented out from the start — both `init_runner.dart`
+  (`dart run saropa_lints:init`) and `write_config_runner.dart` (the
+  extension's headless writer) apply this. An existing project's live/off
+  state is preserved through regeneration (tier change, `--reset`, Enable)
+  either way — nothing is force-flipped for a project already using it.
+  The extension's `runEnable` no longer calls `restorePluginsIntegration()`
+  as a side effect of enabling scan-on-save, decoupling the two. Memory
+  cost is documented directly inside the generated `plugins:` block
+  (`# MEMORY:` comment lines) next to the sentinel, not just here.
 - The 14.5.9 OFF-sentinel kill switch (`kIntegrationOffSentinel` in
   `lib/src/native/config_loader.dart`) guarantees a stale compiled plugin
   that loads anyway runs 0 rules — the belt to this plan's braces.
-- Users who explicitly want in-process squiggles can re-enable via the
-  existing toggle; document the memory cost next to the setting.
+- Users who explicitly want in-process squiggles back can uncomment the
+  block in `analysis_options.yaml` themselves. No dedicated extension
+  command for this yet — out of scope for this increment.
 
 ### Lane 3 — whole-project baseline scan (background, killable)
 
-On activation (or on demand via command), run one full-project scan to
-populate the Problems panel for files not yet saved this session.
+**Status: Done (2026-08-15), on-demand only.**
 
-- Must be **killable and killed** on deactivate/window close — orphan dart
-  daemons are a known past bug (handover `20260807_1200_orphan_daemon_bug`).
-- Chunk `--files` batches (e.g. 200 files) so partial results stream in and
-  a kill loses at most one chunk.
-- Duration on contacts is UNMEASURED — first task of this lane is measuring
-  it; if a full pass is tens of minutes, make it on-demand only, not
-  on-activation.
+- **Measured**: `dart run saropa_lints scan D:/src/contacts --tier
+  recommended --format json` (4,478 files) ran at a steady **~3 files/s**,
+  projecting a **~25 minute** full pass — squarely "tens of minutes." Per
+  this section's own original criterion, the baseline scan is on-demand
+  only, **never on-activation**.
+- Implemented as the `saropaLints.scanOnSave.runBaselineScan` command
+  (Command Palette: "Saropa Lints: Scan Whole Project for Issues"), not
+  wired to `activate()`.
+- **Killable**: runs inside a cancelable `vscode.window.withProgress`
+  notification; `ScanOnSaveController.runBaselineScanCommand()` checks
+  `token.isCancellationRequested` between chunks only, matching "a kill
+  loses at most one chunk."
+- **Chunked**: `chunkFiles`/`runBaselineScan`
+  (`extension/src/scanOnSave/baselineScanRunner.ts`) split the project's
+  file list into 200-file batches (`BASELINE_SCAN_CHUNK_SIZE`) and stream
+  each chunk's diagnostics into the shared `scanOnSaveDiagCollection` as
+  soon as it resolves, via the SAME `ScanDaemonManager`/`ScanDaemonClient`
+  Lane 1 uses (one warm `AnalysisContextCollection` serves save-triggered
+  AND baseline requests).
+- File discovery: a new daemon protocol command
+  (`{"id","cmd":"listFiles"}` → `{"id","ok":true,"files":[...]}` in
+  `bin/scan_daemon.dart`) wraps a new public `ScanRunner.discoverDartFiles`
+  (`lib/src/scan/scan_runner.dart`) so the extension gets the same
+  exclusion-aware file list the scan CLI itself would use, without
+  duplicating exclusion globs on the TS side.
+- Verified: `extension/src/test/scanOnSave/baselineScanRunner.test.ts`
+  (chunking + orchestration, 8 tests) and
+  `extension/src/test/scanOnSave/scanDaemonClient.test.ts`
+  (`daemonResponseToFileList`, 4 new tests) — full `scanOnSave/**` suite
+  **39/39 passing**, `tsc -p tsconfig.test.json` clean. Dart-side
+  `ScanRunner.discoverDartFiles` has new tests in
+  `test/scan/scan_runner_test.dart` (`ScanRunner.discoverDartFiles` group);
+  **could not run `dart test` this session** — an unrelated, pre-existing
+  compile break in `lib/src/rules/architecture/lifecycle_rules.dart`
+  (`_BackgroundWorkVisitor` undefined, from another session's in-progress
+  uncommitted edit) currently blocks the whole package from compiling.
+  `dart analyze lib/src/scan/scan_runner.dart bin/scan_daemon.dart` reports
+  no issues.
 
 ## What this makes obsolete (do not build further)
 

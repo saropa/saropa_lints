@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: ذخیرہ کر کے اسکن",
+      "scanning": "Saropa: اسکن کر رہے ہیں {count} فائل (س)…",
+      "done": "Saropa: {count} مسئلہ(ے)، {elapsed}س",
+      "failed": "Saropa: اسکن فیلڈ",
+      "warming": "Saropa: تحلیل کنندہ گرم کر رہے ہیں ... کھولنے کے بعد پہلا اسکن ایک منٹ لے سکتا ہے"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: پراجیکٹ کے تمام فائلیں اسکن کر رہا ہے",
+      "progressMessage": "{scanned}/{total} فائلیں اسکن کی گئیں، {issues} مسئلہ(ات) پایا گیا"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "پیکیج اسکن پہلے چلائیں — امکانات ڈاکیمینٹ اسکن کے نتائج سے بنایا جاتا ہے۔",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "{fileName} میں {count} کی خلاف ورزیوں کو درست کریں؟",
       "issuesBulkFixResult": "فکسڈ {fixed}۔ اسکور کو اپ ڈیٹ کرنے کے لیے تجزیہ چلائیں۔",
       "issuesBulkFixResultSkipped": "فکسڈ {fixed}، چھوڑ دیا گیا {skipped} (کوئی درست دستیاب نہیں). اسکور کو اپ ڈیٹ کرنے کے لئے تجزیہ چلائیں۔",
+      "scanOnSaveStartFailed": "ذخیرہ کرنے پر اسکن شروع نہ ہوسکا۔ Dart SDK انسٹال کریں۔",
+      "scanOnSaveFailed": "سکن ذخیرہ کرنے پر فیل ہو گیا۔",
+      "scanOnSaveFailedDetails": "سکن ذخیرہ کرنے پر فیل ہوگیا: {details}",
+      "scanOnSaveInvalidJson": "ذخیرہ کرنے پر اسکن کی غلط JSON نتیجہ لوٹا۔",
+      "scanOnSaveDaemonBadResponse": "اسکن پروسس نے شناخت نہ کرنے والی جواب لوٹا دیا۔",
+      "scanOnSaveDaemonDown": "اسکن پروسس جاری نہیں ہے۔ اگلی بچھاﺅ پر دوبارہ شروع ہوگا۔",
+      "scanOnSaveDaemonTimeout": "اسکن پروسس کی جواب دہی وقت کے مطابق نہ ہوئی۔",
+      "scanOnSaveDaemonExited": "اسکن پروسس غیر متوقع طور پر رک گیا۔ اگلی بچھا کرنے پر دوبارہ شروع ہو گا۔",
+      "scanOnSaveDaemonBackoff": "نیزی کی جانچ کرنا تازہ طور پر روک دی گئی ہے اور دوبارہ شروع ہونے کے لئے انتظار کر رہی ہے۔ اچھی طرح سے بچھا دیں۔",
+      "scanOnSaveBaselineDisabled": "Saropa Lints بند ہے — پوری پروجیکٹ چیک کرنے سے پہلے \"Lint اندراج\" کو چاہیے۔",
+      "scanOnSaveBaselineAlreadyRunning": "ایک پورے پروجیکٹ کی گھماؤ کا ابھی تک چل رہا ہے",
+      "scanOnSaveBaselineCanceled": "کامل پروجیکٹ اسکن {scanned}/{total} فائلوں کے بعد منسوخ ہو گیا۔",
+      "scanOnSaveBaselineFailed": "کامل پروجیکٹ اسکن فیل ہو گیا: {details}",
+      "scanOnSaveBaselineDone": "کامل پروجیکٹ اسکن: {total} فائلیں، {issues} مسئلہ(ے)۔",
       "codeHealthStartFailedDetails": "کوڈ ہیلتھ اسکین شروع کرنے میں ناکام ({command}): {details} _PH1_ ___ کا مطلب ہے کہ آپ کو ایک ہی چیز",
       "codeHealthStartFailed": "کوڈ ہیلتھ اسکین شروع کرنے میں ناکام۔ اس بات کو یقینی بنائیں کہ Dart SDK انسٹال ہے۔",
       "codeHealthScanFailed": "کوڈ ہیلتھ اسکین ناکام ہوگیا۔",

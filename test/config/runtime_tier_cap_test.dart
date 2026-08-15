@@ -6,6 +6,7 @@
 /// Uses `// LINT` markers and `example/` fixtures per CONTRIBUTING.md.
 library;
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:saropa_lints/src/config/runtime_tier_cap.dart';
@@ -50,6 +51,27 @@ plugins:
 ''';
       expect(parseSaropaTierFromPluginBlock(yaml), 'essential');
     });
+  });
+
+  // Shared parity fixtures with extension/src/test/config/tierConfig.test.ts
+  // — both suites assert the same expected tier for the same yaml input, so
+  // the Dart and TS regex-based block parsers can't silently drift apart.
+  // See test/fixtures/tier_yaml_parser_cases.json's own header comment.
+  group('parseSaropaTierFromPluginBlock (shared fixture parity)', () {
+    final fixtureFile = File('test/fixtures/tier_yaml_parser_cases.json');
+    final fixture =
+        jsonDecode(fixtureFile.readAsStringSync()) as Map<String, dynamic>;
+    final cases = fixture['cases'] as List<dynamic>;
+
+    for (final raw in cases) {
+      final c = raw as Map<String, dynamic>;
+      test(c['name'] as String, () {
+        expect(
+          parseSaropaTierFromPluginBlock(c['yaml'] as String),
+          c['expected'] as String?,
+        );
+      });
+    }
   });
 
   group('RuntimeTierCap', () {

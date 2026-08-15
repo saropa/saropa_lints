@@ -4,10 +4,18 @@
 /// for [SaropaLintRule.enabledRules] counts, even if `analysis_options.yaml`
 /// lists them as enabled.
 ///
-/// **Sources (precedence):** non-empty `SAROPA_TIER` environment variable wins;
-/// otherwise `saropa_tier:` in `analysis_options_custom.yaml`; otherwise
-/// `runtime_tier:` or `saropa_tier:` under `plugins.saropa_lints` in
-/// `analysis_options.yaml`.
+/// **Sources (precedence):** `runtime_tier:` or `saropa_tier:` under
+/// `plugins.saropa_lints` in `analysis_options.yaml` is the source of truth;
+/// a non-empty `SAROPA_TIER` environment variable is a dev-only override that
+/// wins when set, but logs a loud warning if it disagrees with the yaml value
+/// (see [_reload]) so it is never silently masking a real project setting.
+/// `saropa_tier:` in `analysis_options_custom.yaml` is deprecated — it is
+/// parsed only to warn callers to migrate to `analysis_options.yaml`, it no
+/// longer wins tier resolution. (Prior sessions' drift among VS Code's
+/// `saropaLints.tier` setting, the daemon `--tier` launch flag, `SAROPA_TIER`,
+/// and the two yaml files caused a real incident — see
+/// `docs/handover/20260815_1500_progress_bar_fix_and_contacts_recovery.md` —
+/// hence `analysis_options.yaml` being made the single authority here.)
 ///
 /// **Semantics:** Cumulative strictness — `recommended` runs essential and
 /// recommended rules only. [RuleTier.stylistic] rules are not capped (they are
@@ -47,6 +55,19 @@ int _strictnessIndex(RuleTier tier) {
     RuleTier.comprehensive => 3,
     RuleTier.pedantic => 4,
     RuleTier.stylistic => -1,
+  };
+}
+
+/// Human-readable label for a tier (e.g. `recommended`). Shared by the
+/// disagreement warning and the final resolved-cap log line.
+String _capLabelFor(RuleTier tier) {
+  return switch (tier) {
+    RuleTier.essential => 'essential',
+    RuleTier.recommended => 'recommended',
+    RuleTier.professional => 'professional',
+    RuleTier.comprehensive => 'comprehensive',
+    RuleTier.pedantic => 'pedantic',
+    RuleTier.stylistic => 'stylistic',
   };
 }
 
@@ -95,6 +116,14 @@ String? parseSaropaTierFromCustomYaml(String? content) {
 }
 
 /// `runtime_tier` / `saropa_tier` under `plugins.saropa_lints`.
+///
+/// Returns `null` for an unrecognized tier label (validated against the same
+/// five names `_parseTierLabel` accepts) rather than the raw string — this
+/// keeps the contract identical to the TS mirror,
+/// `extension/src/config/tierConfig.ts`'s `readTierFromAnalysisOptionsYaml`,
+/// which both sides' test suites verify against a single shared fixture file
+/// (`test/fixtures/tier_yaml_parser_cases.json`) so the two independent
+/// regex implementations can't silently diverge.
 String? parseSaropaTierFromPluginBlock(String? content) {
   if (content == null || content.isEmpty) return null;
   final normalized = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
@@ -115,7 +144,8 @@ String? parseSaropaTierFromPluginBlock(String? content) {
       if (m != null) {
         final v = m.group(2)?.trim();
         if (v == null || v.isEmpty) continue;
-        return _stripYamlScalarQuotes(v).toLowerCase();
+        final label = _stripYamlScalarQuotes(v).toLowerCase();
+        return _parseTierLabel(label) == null ? null : label;
       }
     }
   }
@@ -175,22 +205,6 @@ abstract final class RuntimeTierCap {
     _capLabel = null;
     _allowedCache.clear();
 
-    final envMap = environmentOverride ?? Platform.environment;
-    final envRaw = envMap['SAROPA_TIER']?.trim();
-    RuleTier? resolved;
-    String? source;
-
-    if (envRaw != null && envRaw.isNotEmpty) {
-      resolved = _parseTierLabel(envRaw);
-      source = 'SAROPA_TIER';
-      if (resolved == null) {
-        PluginLogger.warning(
-          'Ignoring invalid SAROPA_TIER="$envRaw" '
-          '(use essential, recommended, professional, comprehensive, pedantic).',
-        );
-      }
-    }
-
     String? readFile(String name) {
       if (projectRoot == null || projectRoot.isEmpty) return null;
       try {
@@ -209,21 +223,57 @@ abstract final class RuntimeTierCap {
       }
     }
 
-    if (resolved == null) {
-      final custom = readFile('analysis_options_custom.yaml');
-      final fromCustom = _parseTierLabel(parseSaropaTierFromCustomYaml(custom));
-      if (fromCustom != null) {
-        resolved = fromCustom;
-        source = 'analysis_options_custom.yaml saropa_tier';
-      }
+    // analysis_options.yaml is read first and is the source of truth for
+    // project tier — resolved before SAROPA_TIER so the env-disagreement
+    // warning below always has the yaml value to compare against.
+    final main = readFile('analysis_options.yaml');
+    final yamlTier = _parseTierLabel(parseSaropaTierFromPluginBlock(main));
+
+    RuleTier? resolved;
+    String? source;
+    if (yamlTier != null) {
+      resolved = yamlTier;
+      source = 'analysis_options.yaml (plugins.saropa_lints)';
     }
 
-    if (resolved == null) {
-      final main = readFile('analysis_options.yaml');
-      final fromPlugin = _parseTierLabel(parseSaropaTierFromPluginBlock(main));
-      if (fromPlugin != null) {
-        resolved = fromPlugin;
-        source = 'analysis_options.yaml (plugins.saropa_lints)';
+    // saropa_tier: in analysis_options_custom.yaml is deprecated — it no
+    // longer resolves the tier, but a project still using it gets a loud
+    // one-line warning pointing at the replacement so drift is visible
+    // instead of silently ignored.
+    final custom = readFile('analysis_options_custom.yaml');
+    final customTier = parseSaropaTierFromCustomYaml(custom);
+    if (customTier != null) {
+      PluginLogger.warning(
+        'analysis_options_custom.yaml saropa_tier="$customTier" is deprecated '
+        'and no longer used — set plugins.saropa_lints.runtime_tier in '
+        'analysis_options.yaml instead.',
+      );
+    }
+
+    final envMap = environmentOverride ?? Platform.environment;
+    final envRaw = envMap['SAROPA_TIER']?.trim();
+    if (envRaw != null && envRaw.isNotEmpty) {
+      final envTier = _parseTierLabel(envRaw);
+      if (envTier == null) {
+        PluginLogger.warning(
+          'Ignoring invalid SAROPA_TIER="$envRaw" '
+          '(use essential, recommended, professional, comprehensive, pedantic).',
+        );
+      } else {
+        // SAROPA_TIER is a dev-only override — it still wins when set, but a
+        // silent disagreement with the project's own yaml is exactly the
+        // class of drift that caused the contacts incident (see doc comment
+        // above), so it is surfaced loudly rather than swallowed.
+        if (yamlTier != null && envTier != yamlTier) {
+          PluginLogger.warning(
+            'SAROPA_TIER="$envRaw" overrides analysis_options.yaml, which '
+            'configures a different tier (${_capLabelFor(yamlTier)}). This '
+            'override is dev-only — unset SAROPA_TIER to use the project '
+            'config.',
+          );
+        }
+        resolved = envTier;
+        source = 'SAROPA_TIER (dev override)';
       }
     }
 
@@ -241,14 +291,7 @@ abstract final class RuntimeTierCap {
 
     final tier = resolved;
     _cap = tier;
-    final label = switch (tier) {
-      RuleTier.essential => 'essential',
-      RuleTier.recommended => 'recommended',
-      RuleTier.professional => 'professional',
-      RuleTier.comprehensive => 'comprehensive',
-      RuleTier.pedantic => 'pedantic',
-      RuleTier.stylistic => 'stylistic',
-    };
+    final label = _capLabelFor(tier);
     _capLabel = label;
     final src = source ?? 'config';
     PluginLogger.log(

@@ -43,6 +43,7 @@ import { showHelpHubQuickPick } from './views/helpHub';
 import { SummaryTreeProvider } from './views/summaryTree';
 import { SuppressionsTreeProvider } from './views/suppressionsTree';
 import { ConfigTreeProvider } from './views/configTree';
+import { readTierFromAnalysisOptionsYaml } from './config/tierConfig';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePacks/rulePackYaml';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
@@ -122,6 +123,7 @@ import {
 import { logReport, logSection, flushReport, findLatestAnalysisReport } from './reportWriter';
 import { generateOwaspReport } from './owaspExport';
 import { getProjectRoot, invalidateProjectRoot } from './projectRoot';
+import { ScanOnSaveController } from './scanOnSave/scanOnSaveController';
 import {
   runActivation as runVibrancyActivation,
   stopFreshnessWatcher,
@@ -514,6 +516,15 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   const driftAdvisorDiagCollection = vscode.languages.createDiagnosticCollection('Saropa Drift Advisor');
   context.subscriptions.push(driftAdvisorDiagCollection);
   const driftAdvisorProvider = new DriftAdvisorTreeProvider(driftAdvisorDiagCollection);
+
+  // Scan-on-save (plans/PLAN_scan_only_diagnostics.md, Lane 2): the default
+  // delivery path for `saropaLints.enabled` — no separate toggle. Findings
+  // are published as diagnostics on this collection, not by the in-process
+  // analyzer plugin (which Lane 2 makes opt-in).
+  const scanOnSaveDiagCollection = vscode.languages.createDiagnosticCollection('saropa_lints');
+  context.subscriptions.push(scanOnSaveDiagCollection);
+  const scanOnSaveController = new ScanOnSaveController(scanOnSaveDiagCollection, getProjectRoot);
+  context.subscriptions.push(scanOnSaveController);
 
   // Pubspec validation: inline diagnostics for dependency ordering,
   // version syntax, and constraint issues on pubspec.yaml.
@@ -942,14 +953,20 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       return;
     }
     const en = getConfig().get<boolean>('enabled', true) ?? true;
-    const tier = getConfig().get<string>('tier', 'recommended') ?? 'recommended';
+    // analysis_options.yaml is the tier source of truth (see tierConfig.ts) —
+    // fall back to the saropaLints.tier setting only when no yaml tier is
+    // configured, so the status bar can't show a tier that disagrees with
+    // what actually gets scanned.
+    const statusBarRoot = getProjectRoot();
+    const tier = (statusBarRoot && readTierFromAnalysisOptionsYaml(statusBarRoot))
+      || (getConfig().get<string>('tier', 'recommended') ?? 'recommended');
     const showVibrancy =
       vscode.workspace.getConfiguration('saropaLints.packageVibrancy').get<boolean>('showInStatusBar', true) &&
       vibrancyData !== null;
     const vibrancyLabel = showVibrancy ? `${Math.round(vibrancyData!.averageScore / 10)}/10` : null;
 
     if (en) {
-      const root = getProjectRoot();
+      const root = statusBarRoot;
       // Live + disabled-filtered: the score matches the Problems panel and never
       // counts a muted rule. (Was the raw, file-based readViolations.)
       const data = preloadedData ?? (root ? readVisibleViolations(root) : null);
@@ -1250,6 +1267,14 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         return;
       }
       await forceUpgradeCheck(context, root);
+    }),
+    // Lane 3 (plans/PLAN_scan_only_diagnostics.md) — on-demand whole-project
+    // scan, deliberately NOT run on activation (measured ~25 min on a
+    // 4,478-file project). Populates the Problems panel for files the user
+    // hasn't saved this session, which save-triggered scan-on-save alone
+    // never reaches.
+    vscode.commands.registerCommand('saropaLints.scanOnSave.runBaselineScan', async () => {
+      await scanOnSaveController.runBaselineScanCommand();
     }),
     // Create a baseline (saropa_baseline.json) that suppresses existing
     // violations so only new code is flagged. Backs the "Create baseline"

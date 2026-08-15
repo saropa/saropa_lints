@@ -88,6 +88,26 @@ class AnalysisReporter {
   /// Debounce duration: write reports after this idle period.
   static const Duration _debounce = Duration(seconds: 3);
 
+  /// When true, all report output for this process is suppressed.
+  ///
+  /// Report writing is a side effect of the shared rule machinery
+  /// ([ProgressTracker] schedules a debounced write on every new file), so
+  /// any long-lived scanning process — the scan daemon answering IDE
+  /// save-scans — would otherwise drop `*_saropa_lint_report.log` files
+  /// into the TARGET project on every request. One-shot CLI runs exit
+  /// before the 3s debounce fires, which is why they never showed this.
+  static bool _disabled = false;
+
+  /// Permanently suppress report writing for this process.
+  ///
+  /// Call before any scanning starts (the daemon calls it at startup).
+  /// [initialize], [scheduleWrite], and [writeNow] all become no-ops.
+  static void disableForProcess() {
+    _disabled = true;
+    _debounceTimer?.cancel();
+    _debounceTimer = null;
+  }
+
   /// Maximum violations to write inline in the report.
   /// Higher-impact violations take priority when the cap is reached.
   static const int _maxInlineViolations = 500;
@@ -147,6 +167,7 @@ class AnalysisReporter {
   /// so `package:` self-imports resolve before any [ImportGraphTracker.collectImports]
   /// calls (collection runs from [ProgressTracker.recordFile] on the first file).
   static void initialize(String projectRoot) {
+    if (_disabled) return;
     if (_projectRoot != null) return;
     _projectRoot = projectRoot;
     ImportGraphTracker.setProjectInfo(
@@ -179,7 +200,7 @@ class AnalysisReporter {
   /// session: resets trackers, generates a new timestamp, and writes to
   /// a new report file.
   static void scheduleWrite() {
-    if (_projectRoot == null) return;
+    if (_disabled || _projectRoot == null) return;
 
     // Detect new analysis session: a report was already written and the
     // analyzer is now re-visiting files it already processed. This is
@@ -227,6 +248,7 @@ class AnalysisReporter {
   /// Used by the abort mechanism to flush partial results before rules
   /// stop running.
   static void writeNow() {
+    if (_disabled) return;
     _debounceTimer?.cancel();
     _debounceTimer = null;
     _writeReport();

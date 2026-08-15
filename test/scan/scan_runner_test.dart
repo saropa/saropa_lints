@@ -12,6 +12,7 @@ library;
 
 import 'dart:io';
 
+import 'package:saropa_lints/saropa_lints.dart' show SaropaLintRule;
 import 'package:saropa_lints/scan.dart';
 import 'package:test/test.dart';
 
@@ -70,6 +71,103 @@ void main() {
       expect(result, isNotNull);
       // Just ensure we got a result; rule count differs by tier
       expect(result, isA<List<ScanDiagnostic>>());
+    });
+
+    // Regression for the scan-on-save daemon bug: the daemon always spawns
+    // with --tier, and this project's `_resolveRuleNames` used to return the
+    // tier's rule set directly, entirely ignoring the project's own
+    // `diagnostics:` overrides. A user who explicitly disabled a rule in
+    // their analysis_options.yaml saw it fire anyway on save.
+    test('run with tier still applies project diagnostics: overrides', () {
+      final tempDir = Directory.systemTemp.createTempSync(
+        'scan_runner_tier_override_',
+      );
+      try {
+        File(
+          '${tempDir.path}/analysis_options.yaml',
+        ).writeAsStringSync('''
+plugins:
+  saropa_lints:
+    diagnostics:
+      avoid_hardcoded_credentials: false
+      no_empty_block: true
+''');
+        Directory('${tempDir.path}/lib').createSync();
+        File(
+          '${tempDir.path}/lib/main.dart',
+        ).writeAsStringSync('void main() {}\n');
+
+        final runner = ScanRunner(
+          targetPath: tempDir.path,
+          tier: 'essential',
+          messageSink: (_) {},
+        );
+        final result = runner.run();
+        expect(result, isNotNull);
+
+        // avoid_hardcoded_credentials is in the essential tier, but the
+        // config above explicitly disables it — must stay disabled.
+        expect(
+          SaropaLintRule.enabledRules,
+          isNot(contains('avoid_hardcoded_credentials')),
+          reason: 'config diagnostics: false must override the tier default',
+        );
+        expect(
+          SaropaLintRule.disabledRules,
+          contains('avoid_hardcoded_credentials'),
+        );
+
+        // no_empty_block is NOT in the essential tier, but the config above
+        // explicitly enables it — must run even though the tier excludes it.
+        expect(
+          SaropaLintRule.enabledRules,
+          contains('no_empty_block'),
+          reason: 'config diagnostics: true must add rules beyond the tier',
+        );
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+  });
+
+  // Exercises the public wrapper the scan daemon's `listFiles` request uses
+  // (bin/scan_daemon.dart) to hand the IDE baseline scan a file list it can
+  // chunk before issuing per-chunk resolved scans — see
+  // plans/PLAN_scan_only_diagnostics.md Lane 3.
+  group('ScanRunner.discoverDartFiles', () {
+    test('finds included Dart files and skips excluded ones', () {
+      final tempDir = Directory.systemTemp.createTempSync(
+        'scan_runner_discover_',
+      );
+      try {
+        Directory('${tempDir.path}/lib').createSync();
+        File('${tempDir.path}/lib/main.dart').writeAsStringSync('void main() {}\n');
+        File('${tempDir.path}/lib/model.g.dart').writeAsStringSync('// generated\n');
+        Directory('${tempDir.path}/build').createSync();
+        File('${tempDir.path}/build/leftover.dart').writeAsStringSync('// build output\n');
+
+        final files = ScanRunner.discoverDartFiles(tempDir.path);
+        final relative = files
+            .map((f) => f.replaceAll('\\', '/').split('${tempDir.path.replaceAll('\\', '/')}/').last)
+            .toList();
+
+        expect(relative, contains('lib/main.dart'));
+        expect(relative, isNot(contains('lib/model.g.dart')));
+        expect(relative, isNot(contains('build/leftover.dart')));
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
+    });
+
+    test('returns an empty list for a directory with no Dart files', () {
+      final tempDir = Directory.systemTemp.createTempSync(
+        'scan_runner_discover_empty_',
+      );
+      try {
+        expect(ScanRunner.discoverDartFiles(tempDir.path), isEmpty);
+      } finally {
+        tempDir.deleteSync(recursive: true);
+      }
     });
   });
 
@@ -138,6 +236,75 @@ void main() {
             'resolved scan should surface instance-creation / type-based rules '
             'that the syntactic pass cannot see',
       );
+    });
+  });
+
+  group('ScanRunner.runResolvedWithCollection', () {
+    // The daemon path: one collection built up front, reused across
+    // requests. These tests pin that a shared collection produces the same
+    // contract as runResolved (non-null diagnostics, null on bad tier) and
+    // that the collection survives repeated calls — the whole point of the
+    // daemon is the second call being served by the same warm collection.
+    //
+    // Fixture choice: this repo's own analysis_options.yaml excludes
+    // `lib/**` (dev-only self-exclusion), and a project-rooted collection
+    // honors analyzer excludes — so unlike the runResolved tests above
+    // (whose per-file collection bypasses project config) these must use a
+    // file the project actually analyzes; test/ files qualify.
+    const analyzedFixture = 'test/scan/scan_daemon_args_test.dart';
+
+    test('serves repeated scans from one shared collection', () async {
+      final collection = ScanRunner.buildProjectCollection(projectRoot);
+
+      final first = await ScanRunner(
+        targetPath: projectRoot,
+        dartFiles: [analyzedFixture],
+        tier: 'essential',
+        messageSink: (_) {},
+      ).runResolvedWithCollection(collection);
+      expect(first, isNotNull);
+      expect(first, isA<List<ScanDiagnostic>>());
+
+      // Second request through the SAME collection (a fresh runner, as the
+      // daemon constructs per request) must also succeed — a collection
+      // corrupted by changeFile/applyPendingFileChanges would fail here.
+      final second = await ScanRunner(
+        targetPath: projectRoot,
+        dartFiles: [analyzedFixture],
+        tier: 'essential',
+        messageSink: (_) {},
+      ).runResolvedWithCollection(collection);
+      expect(second, isNotNull);
+      // Same file, same rules, no edits between calls: diagnostics must
+      // be reproducible, not accumulate or vanish across requests.
+      expect(second!.length, first!.length);
+    });
+
+    test('excluded file is skipped, not a StateError', () async {
+      // lib/scan.dart IS excluded by this repo's analyzer config — the
+      // exact shape of a user saving a file their own project excludes.
+      // The daemon path must degrade to "scanned nothing" rather than
+      // throw out of contextFor.
+      final collection = ScanRunner.buildProjectCollection(projectRoot);
+      final result = await ScanRunner(
+        targetPath: projectRoot,
+        dartFiles: ['lib/scan.dart'],
+        tier: 'essential',
+        messageSink: (_) {},
+      ).runResolvedWithCollection(collection);
+      expect(result, isNotNull);
+      expect(result, isEmpty);
+    });
+
+    test('invalid tier returns null (same contract as runResolved)', () async {
+      final collection = ScanRunner.buildProjectCollection(projectRoot);
+      final result = await ScanRunner(
+        targetPath: projectRoot,
+        dartFiles: [analyzedFixture],
+        tier: 'invalid_tier_name',
+        messageSink: (_) {},
+      ).runResolvedWithCollection(collection);
+      expect(result, isNull);
     });
   });
 }

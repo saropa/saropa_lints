@@ -50,6 +50,12 @@ executables:
   # 2026-06-05 rename (LintImpact taxonomy collapsed into severity).
   impact_report: impact_report
   scan: scan
+  # Long-lived resolved-scan process: builds the analysis context once, then
+  # answers repeated save-triggered scan requests over stdin/stdout without
+  # repaying the whole-project resolution cost each time (unlike `scan
+  # --resolve`, which rebuilds it from scratch per invocation). Used by the
+  # VS Code extension's scan-on-save feature.
+  scan_daemon: scan_daemon
   quality_gate: quality_gate
   # Registered so the VS Code extension (and any consumer project) can invoke
   # `dart run saropa_lints:project_vibrancy` instead of needing the source path

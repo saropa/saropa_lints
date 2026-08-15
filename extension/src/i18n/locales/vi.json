@@ -1,4 +1,17 @@
 {
+  "scanOnSave": {
+    "statusBar": {
+      "name": "Saropa Lints: Quét khi Lưu",
+      "scanning": "Saropa: đang quét {count} tập tin(s)...",
+      "done": "Saropa: {count} lỗi, {elapsed}s",
+      "failed": "Saropa: quét thất bại",
+      "warming": "Saropa: đang khởi động phân tích... quét lần đầu sau khi mở có thể mất một phút"
+    },
+    "baseline": {
+      "progressTitle": "Saropa Lints: quét toàn bộ dự án",
+      "progressMessage": "Tập tin {scanned}/{total} đã được quét, tìm thấy {issues} vấn đề(s)"
+    }
+  },
   "featureInventory": {
     "export": {
       "noScan": "Chạy quét gói trước — báo cáo cơ hội được xây dựng từ kết quả quét.",
@@ -1853,6 +1866,20 @@
       "issuesConfirmFixAll": "Sửa chữa vi phạm {count} trong {fileName}?",
       "issuesBulkFixResult": "Cải thiện {fixed}. Chạy phân tích để cập nhật điểm số.",
       "issuesBulkFixResultSkipped": "Sửa {fixed}, bỏ qua {skipped} (không có sửa chữa). Chạy phân tích để cập nhật điểm số.",
+      "scanOnSaveStartFailed": "Quét khi lưu không thể bắt đầu. Hãy đảm bảo đã cài đặt Dart SDK.",
+      "scanOnSaveFailed": "Quét khi lưu thất bại.",
+      "scanOnSaveFailedDetails": "Quét khi lưu thất bại: {details}",
+      "scanOnSaveInvalidJson": "Quét khi lưu trả về đầu ra JSON không hợp lệ.",
+      "scanOnSaveDaemonBadResponse": "Quy trình quét đã trả về một phản hồi không được nhận diện.",
+      "scanOnSaveDaemonDown": "Quy trình quét không đang chạy. Nó sẽ khởi động lại vào lần lưu tiếp theo.",
+      "scanOnSaveDaemonTimeout": "Quy trình quét không phản hồi kịp thời.",
+      "scanOnSaveDaemonExited": "Quy trình quét đã dừng bất ngờ. Nó sẽ khởi động lại khi lưu lần sau.",
+      "scanOnSaveDaemonBackoff": "Quy trình quét đã dừng lại gần đây và đang chờ để khởi động lại. Lưu lại lần nữa sau một lúc.",
+      "scanOnSaveBaselineDisabled": "Saropa Lints đã bị tắt — hãy bật \"Lint integration\" trước khi thực hiện quét toàn bộ dự án.",
+      "scanOnSaveBaselineAlreadyRunning": "Một quét toàn bộ dự án đang chạy.",
+      "scanOnSaveBaselineCanceled": "Quét toàn bộ dự án đã bị hủy sau khi có {scanned}/{total} tệp.",
+      "scanOnSaveBaselineFailed": "Quét toàn bộ dự án thất bại: {details}",
+      "scanOnSaveBaselineDone": "Quét toàn bộ dự án hoàn tất: {total} tệp, {issues} vấn đề.",
       "codeHealthStartFailedDetails": "Mã Health scan không khởi động được ({command}): {details} là một loại tế bào có thể",
       "codeHealthStartFailed": "Mã Health scan không khởi động được. Đảm bảo Dart SDK được cài đặt.",
       "codeHealthScanFailed": "Mã Health scan đã thất bại.",

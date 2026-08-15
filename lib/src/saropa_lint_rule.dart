@@ -477,7 +477,19 @@ class ProgressTracker {
     if (!_isDiscoveredFromFiles && _seenFiles.isEmpty) {
       final projectRoot = ProjectContext.findProjectRoot(path);
       if (projectRoot != null) {
-        discoverFiles(projectRoot);
+        // discoverFiles() walks the ENTIRE project directory tree to
+        // estimate a total for the "Files: N/M" percentage. That estimate
+        // is only meaningful for the long-lived analysis-server plugin
+        // session, which really does progress through the whole project
+        // over an editing session. Batch/one-shot runners (scan CLI, the
+        // save-triggered daemon) route through this same hot path
+        // (SaropaContext._wrapCallback) but process only a small,
+        // caller-known file set per invocation — walking the whole project
+        // here produced a misleading "Files: 1/4477, ETA: 2h" bar against a
+        // 1-file daemon request. Scope the walk to the real analysis server.
+        if (SaropaLintRule.isAnalysisServer) {
+          discoverFiles(projectRoot);
+        }
         AnalysisReporter.initialize(projectRoot);
         loadOutputConfigFromProjectRoot(projectRoot);
         loadRulePacksConfigFromProjectRoot(projectRoot);

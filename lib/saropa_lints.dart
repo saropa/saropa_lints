@@ -17,12 +17,13 @@
 ///
 /// This generates `analysis_options.yaml` with explicit rule lists.
 ///
-/// **Runtime tier cap (optional):** set `SAROPA_TIER` to one of the tier
-/// names below to skip rules above that cumulative band during analysis even
-/// when they stay enabled in YAML, or set `saropa_tier` in
-/// `analysis_options_custom.yaml`, or `runtime_tier` / `saropa_tier` under
-/// `plugins.saropa_lints`; when both env and file specify a cap, the env value
-/// wins.
+/// **Runtime tier cap (optional):** `analysis_options.yaml` is the source of
+/// truth — set `runtime_tier` / `saropa_tier` under `plugins.saropa_lints` to
+/// cap rules above that cumulative band during analysis even when they stay
+/// enabled in YAML. `SAROPA_TIER` is a dev-only override that wins when set
+/// (and warns if it disagrees with the yaml value). `saropa_tier` in
+/// `analysis_options_custom.yaml` is deprecated — it is parsed only to warn,
+/// not to resolve the tier.
 ///
 /// Available tiers: `essential` (1), `recommended` (2),
 /// `professional` (3), `comprehensive` (4), `pedantic` (5).

@@ -11,6 +11,43 @@ final RegExp _pluginsSectionPattern = RegExp(r'^plugins:\s*$', multiLine: true);
 /// Matches any top-level YAML key (for finding section boundaries).
 final RegExp topLevelKeyPattern = RegExp(r'^\w+:', multiLine: true);
 
+/// Sentinel bracketing a `plugins:` block that is intentionally disabled.
+/// Mirrors `DISABLE_BEGIN_MARKER`/`DISABLE_END_MARKER` in
+/// `extension/src/setup.ts` and the detection substring
+/// `kIntegrationOffSentinel` in `lib/src/native/config_loader.dart` — all
+/// three describe the same commented-out block. Keep the text identical
+/// across all three so the extension's restore/disable toggle and the
+/// analyzer's kill switch keep recognizing a block this writer produced.
+const String pluginsDisabledBeginMarker =
+    '# >>> saropa_lints integration turned OFF by the VS Code extension — toggle "Lint integration" On to restore >>>';
+const String pluginsDisabledEndMarker =
+    '# <<< saropa_lints end of disabled integration block <<<';
+
+/// Matches the begin sentinel line of a disabled `plugins:` block.
+final RegExp _pluginsDisabledBeginPattern = RegExp(
+  r'^# >>> saropa_lints integration turned OFF.*$',
+  multiLine: true,
+);
+
+/// Matches the end sentinel line of a disabled `plugins:` block.
+final RegExp _pluginsDisabledEndPattern = RegExp(
+  r'^# <<< saropa_lints end of disabled integration block <<<\s*$',
+  multiLine: true,
+);
+
+/// Wraps a generated `plugins:` block ([pluginsYaml]) in the disabled
+/// sentinels, commenting every non-blank line. Mirrors the extension's
+/// `disablePluginsIntegration` transform in `setup.ts` so a file written by
+/// either side has the exact same on-disk shape, and either side's
+/// restore/re-disable logic can operate on it.
+String wrapPluginsYamlAsDisabled(String pluginsYaml) {
+  final List<String> commented = pluginsYaml
+      .split('\n')
+      .map((String line) => line.isEmpty ? line : '# $line')
+      .toList();
+  return '$pluginsDisabledBeginMarker\n${commented.join('\n')}\n$pluginsDisabledEndMarker\n';
+}
+
 /// Generate the plugins YAML section with proper formatting.
 ///
 /// Organizes rules by tier with problem message comments.
@@ -108,6 +145,28 @@ String generatePluginsYaml({
 
   buffer.writeln(
     '    # Settings (max_issues, platforms, packages) are in analysis_options_custom.yaml',
+  );
+  buffer.writeln('    #');
+  buffer.writeln(
+    '    # MEMORY: this in-process plugin resolves types for every rule and',
+  );
+  buffer.writeln(
+    '    # can retain several GB of resolved AST on large projects. The VS',
+  );
+  buffer.writeln(
+    '    # Code extension\'s scan-on-save (out-of-process, ~3 GB fixed) covers',
+  );
+  buffer.writeln(
+    '    # the same diagnostics for a fraction of the cost — see',
+  );
+  buffer.writeln(
+    '    # plans/PLAN_scan_only_diagnostics.md. New projects get this block',
+  );
+  buffer.writeln(
+    '    # commented out by default for that reason; delete the sentinel',
+  );
+  buffer.writeln(
+    '    # comment lines around it to run it live.',
   );
   buffer.writeln(
     '    # ═══════════════════════════════════════════════════════════════════',
@@ -249,6 +308,24 @@ String sectionHeader(String title, String char) {
 String replacePluginsSection(String existingContent, String newPlugins) {
   if (existingContent.isEmpty) {
     return newPlugins;
+  }
+
+  // A previously-disabled block (sentinel-wrapped) is not matched by
+  // _pluginsSectionPattern since its `plugins:` line is commented out.
+  // Replace the whole bracketed region so regeneration is idempotent
+  // whether the block is currently live or disabled.
+  final Match? disabledBegin = _pluginsDisabledBeginPattern.firstMatch(
+    existingContent,
+  );
+  if (disabledBegin != null) {
+    final Match? disabledEnd = _pluginsDisabledEndPattern.firstMatch(
+      existingContent,
+    );
+    if (disabledEnd != null && disabledEnd.start > disabledBegin.start) {
+      final String before = existingContent.prefix(disabledBegin.start);
+      final String after = existingContent.afterIndex(disabledEnd.end);
+      return '$before$newPlugins\n$after';
+    }
   }
 
   // Find plugins: section

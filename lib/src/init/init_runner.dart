@@ -366,6 +366,7 @@ Future<void> runInit(List<String> args) async {
       ? cliArgs.outputPath
       : '$targetDir/${cliArgs.outputPath}';
   final File outputFile = File(resolvedOutput);
+  final bool isNewFile = !outputFile.existsSync();
   Map<String, bool> userCustomizations = <String, bool>{};
   String existingContent = '';
 
@@ -527,8 +528,21 @@ Future<void> runInit(List<String> args) async {
     rulePacksEnabled: mergedRulePacks,
   );
 
+  // New projects get the plugin block commented out by default — the
+  // in-process plugin costs several GB on large projects and the daemon
+  // already delivers the same diagnostics for a fraction of that (see
+  // plans/PLAN_scan_only_diagnostics.md). An existing project's live/off
+  // state is preserved either way: a live block stays live, and a
+  // previously-disabled block stays disabled through a regenerate/--reset.
+  final bool wasDisabled = existingContent.contains(
+    pluginsDisabledBeginMarker,
+  );
+  final String pluginsBlock = (isNewFile || wasDisabled)
+      ? wrapPluginsYamlAsDisabled(pluginsYaml)
+      : pluginsYaml;
+
   // Replace plugins section in existing content, preserving everything else
-  final String newContent = replacePluginsSection(existingContent, pluginsYaml);
+  final String newContent = replacePluginsSection(existingContent, pluginsBlock);
 
   if (cliArgs.isDryRun) {
     log.terminal('${InitColors.yellow}━━━ DRY RUN ━━━${InitColors.reset}');
@@ -537,8 +551,9 @@ Future<void> runInit(List<String> args) async {
     );
     log.terminal('');
 
-    // Show preview of plugins section only
-    final List<String> lines = pluginsYaml.split('\n');
+    // Show preview of plugins section only (what will actually be written,
+    // including the disabled sentinel wrap when applicable).
+    final List<String> lines = pluginsBlock.split('\n');
     const int previewLines = 100;
     log.terminal(
       '${InitColors.bold}Preview${InitColors.reset} ${InitColors.dim}(first $previewLines of ${lines.length} lines):${InitColors.reset}',
