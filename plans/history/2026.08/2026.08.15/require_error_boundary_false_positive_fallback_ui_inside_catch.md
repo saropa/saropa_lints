@@ -221,11 +221,48 @@ existed in the fixture as `_bad359`/`_good359`.
 
 ## Commits
 
-_None yet._
+- `0c9b4248` — fix: require_error_boundary no longer flags MaterialApp built as logged catch-clause fallback UI
+- `d3674f09` — docs: archive fixed require_error_boundary bug report
 
 ---
 
-## Environment
+## Finish Report (2026-08-15)
+
+`RequireErrorBoundaryRule.runWithReporter` reported `require_error_boundary`
+on every argument-less `MaterialApp`/`CupertinoApp` construction with no
+check for lexical context, so a fatal-startup-error recovery screen built
+inside `main()`'s outer `catch` clause — after the real error had already
+been logged — was flagged identically to the app's normal, always-built
+root widget. The fix adds a `node.thisOrAncestorOfType<CatchClause>()` walk
+and skips the diagnostic when the enclosing catch body already contains a
+recognized logging/crash-reporting call, via the shared
+`catchBodyHasLoggingCall` helper in `lib/src/catch_body_logging_utils.dart`
+(the same helper already used by `require_error_logging` and
+`avoid_catching_generic_exception`, so the exemption stays consistent
+across all three rules).
+
+`example/lib/error_handling/require_error_boundary_fixture.dart` gained
+`_good360`: a `MaterialApp` built inside `on Object catch (error, stack) {
+debugException(error, stack); ... }`, covering Fixture Gap case 1 from the
+bug report. Cases 2 and 3 (plain top-level `MaterialApp`, and
+`MaterialApp(builder: ...)`) were already present as `_bad359`/`_good359`
+and continue to pass.
+
+**Verification:** `dart test test/rules/flow/error_handling_rules_test.dart`
+— 50/50 passed, including the `RequireErrorBoundaryRule` instantiation and
+fixture-existence checks. The rule's own message/code assertions are
+unaffected by this change (no wording change), so no assertion updates were
+needed. The end-to-end `dart run saropa_lints scan` path against the
+fixture was attempted but not completed: the scan CLI's `--files` targeting
+against the `example/` package root returned `No .dart files found` in this
+session regardless of invocation form tried (root with `--files`, `example`
+as target root, run from inside `example/`); root cause not isolated
+(likely a scan-CLI path-resolution quirk specific to scanning the nested
+`example/` pub package, or an existing exclude edge case) and is not
+specific to this change. Logic was verified by code trace and the passing
+unit-test suite instead.
+
+
 
 - saropa_lints version: (repo HEAD at filing time)
 - Dart SDK version: n/a
