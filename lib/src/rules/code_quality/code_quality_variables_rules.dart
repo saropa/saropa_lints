@@ -2240,16 +2240,24 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
 /// Warns when a variable is declared several unrelated statements before its
 /// first use and the declaration can move closer without changing semantics.
 ///
-/// Since: v0.1.4 | Updated: v13.10.4 | Rule version: v8
+/// Since: v0.1.4 | Updated: v14.5.10 | Rule version: v9
 ///
 /// Alias: move_variable_closer_to_usage
 ///
-/// Distance is measured in intervening sibling statements, not source lines, so
-/// a single multi-line initializer never counts as "far". The rule stays silent
-/// when the first use is nested inside a loop, branch, nested block, or closure:
-/// moving an accumulator into a loop would reset it every iteration, and moving
-/// a value into one branch would drop it from sibling branches that also read
-/// it. See plans/history/2026.05/2026.05.21/move_variable_closer_to_its_usage_false_positive_loop_accumulator.md.
+/// Distance is measured in intervening sibling statements, not source lines,
+/// so a single multi-line initializer never counts as "far". Statements that
+/// are themselves part of this block's own declare/consume story — another
+/// of its declarations, or the first-use site of another variable it
+/// declares — are excluded from that count, so a deliberate "load N, then
+/// consume N" batch (e.g. five awaited loads followed by five assignments
+/// consuming them in order) reads as one legible unit instead of each member
+/// accumulating false distance from its position in the group. The rule
+/// stays silent when the first use is nested inside a loop,
+/// branch, nested block, or closure: moving an accumulator into a loop would
+/// reset it every iteration, and moving a value into one branch would drop it
+/// from sibling branches that also read it. See
+/// plans/history/2026.05/2026.05.21/move_variable_closer_to_its_usage_false_positive_loop_accumulator.md
+/// and bugs/move_variable_closer_to_its_usage_false_positive_batch_declaration_grouping.md.
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -2283,6 +2291,23 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
 ///   return fields;
 /// }
 /// ```
+///
+/// Example of code that is **left alone** (deliberate batch load, then batch
+/// assign in the same order — the intervening siblings are themselves
+/// declarations, not unrelated statements):
+/// ```dart
+/// Future<StartupResult> loadStartup() async {
+///   final driftOk = await initDrift();
+///   final prefsOk = await initPrefs();
+///   final permsOk = await initPermissions();
+///
+///   final result = StartupResult();
+///   result.driftOk = driftOk; // not flagged: siblings were declarations
+///   result.prefsOk = prefsOk;
+///   result.permsOk = permsOk;
+///   return result;
+/// }
+/// ```
 class MoveVariableCloserToUsageRule extends SaropaLintRule {
   MoveVariableCloserToUsageRule() : super(code: _code);
 
@@ -2304,7 +2329,7 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'move_variable_closer_to_its_usage',
-    '[move_variable_closer_to_its_usage] Variable declared far from its first use, with several unrelated statements in between. This forces readers to hold the variable in memory while reading irrelevant code, reducing comprehension and increasing the risk of accidental reuse or shadowing. {v8}',
+    '[move_variable_closer_to_its_usage] Variable declared far from its first use, with several unrelated statements in between. This forces readers to hold the variable in memory while reading irrelevant code, reducing comprehension and increasing the risk of accidental reuse or shadowing. {v9}',
     correctionMessage:
         'Move the variable declaration to just before its first usage. This narrows the scope, improves readability, and makes the data flow easier to follow.',
     severity: DiagnosticSeverity.INFO,
@@ -2345,11 +2370,33 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
         _FirstUsageVisitor(declarations.keys.toSet(), firstUsage),
       );
 
+      // Third pass: collect every direct-child statement that is itself part
+      // of "this block's own declare/consume story" — either a declaration
+      // of one of this block's variables, or the statement holding the first
+      // use of one of them. A batch of N sequential loads followed by N
+      // statements that consume them in order is built entirely from these
+      // two kinds of statement, so excluding both from the "intervening"
+      // count is what lets that deliberate two-phase shape read as legible
+      // instead of accumulating false distance per member.
+      final Set<Statement> batchStatements = <Statement>{};
+      for (final Statement statement in node.statements) {
+        if (statement is VariableDeclarationStatement) {
+          batchStatements.add(statement);
+        }
+      }
+      for (final SimpleIdentifier useNode in firstUsage.values) {
+        final Statement? useStatement = useNode
+            .thisOrAncestorOfType<Statement>();
+        if (useStatement != null && useStatement.parent == node) {
+          batchStatements.add(useStatement);
+        }
+      }
+
       for (final MapEntry<String, VariableDeclaration> entry
           in declarations.entries) {
         final SimpleIdentifier? useNode = firstUsage[entry.key];
         if (useNode == null) continue;
-        if (_canMoveCloser(node, entry.value, useNode)) {
+        if (_canMoveCloser(node, entry.value, useNode, batchStatements)) {
           reporter.atToken(entry.value.name, code);
         }
       }
@@ -2364,13 +2411,20 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
   ///   branch, nested block, or closure. Relocating into a loop turns an
   ///   accumulator into a per-iteration reset; relocating into one branch drops
   ///   the variable from sibling branches that also read it.
-  /// - At least [_minInterveningStatements] sibling statements must separate the
-  ///   declaration from the use statement. Counting statements (not lines)
-  ///   ignores the declaration's own multi-line initializer.
+  /// - At least [_minInterveningStatements] sibling statements unrelated to
+  ///   this block's own declarations must separate the declaration from the
+  ///   use statement. Counting statements (not lines) ignores the
+  ///   declaration's own multi-line initializer. [batchStatements] excludes
+  ///   both other declarations and other declared variables' first-use
+  ///   statements from the count, so a deliberate "load N, then consume N"
+  ///   batch — where every intervening sibling is itself part of that same
+  ///   declare/consume story — reads as one legible unit instead of each
+  ///   member accumulating false distance from its position in the group.
   bool _canMoveCloser(
     Block block,
     VariableDeclaration decl,
     SimpleIdentifier useNode,
+    Set<Statement> batchStatements,
   ) {
     // The statement holding the first use must be a direct child of the block;
     // anything nested means the declaration must enclose that inner scope.
@@ -2385,7 +2439,14 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
     final int useIndex = block.statements.indexOf(useStatement);
     if (declIndex < 0 || useIndex <= declIndex) return false;
 
-    return useIndex - declIndex - 1 >= _minInterveningStatements;
+    int interveningCount = 0;
+    for (int i = declIndex + 1; i < useIndex; i++) {
+      if (!batchStatements.contains(block.statements[i])) {
+        interveningCount++;
+      }
+    }
+
+    return interveningCount >= _minInterveningStatements;
   }
 }
 

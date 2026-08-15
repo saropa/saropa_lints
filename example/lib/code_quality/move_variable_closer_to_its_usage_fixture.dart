@@ -166,3 +166,56 @@ int _multiUseConstAcrossBranches(int mode) {
   }
   return factor * 3;
 }
+
+class _StartupResult {
+  bool driftOk = false;
+  bool prefsOk = false;
+  bool permsOk = false;
+  bool envOk = false;
+  bool cacheOk = false;
+}
+
+bool _initDrift() => true;
+bool _initPrefs() => true;
+bool _initPermissions() => true;
+bool _initEnvOverrides() => true;
+bool _warmCache() => true;
+
+// NO LINT (Defect 4, batch-declaration grouping): five sequential loads
+// followed by five assignments consuming them in the same declared order.
+// The intervening siblings between each early declaration and its use are
+// themselves declarations awaiting their own later use, not unrelated code —
+// this reads as one deliberate "load N, then assign N" unit.
+// See: bugs/move_variable_closer_to_its_usage_false_positive_batch_declaration_grouping.md
+_StartupResult _loadStartup() {
+  final driftOk = _initDrift();
+  final prefsOk = _initPrefs();
+  final permsOk = _initPermissions();
+  final envOk = _initEnvOverrides();
+  final cacheOk = _warmCache();
+
+  final result = _StartupResult();
+  result.driftOk = driftOk;
+  result.prefsOk = prefsOk;
+  result.permsOk = permsOk;
+  result.envOk = envOk;
+  result.cacheOk = cacheOk;
+  return result;
+}
+
+// LINT (batch-grouping carve-out must not blanket-suppress real cases): two
+// declarations separated by genuinely unrelated statements, each used far
+// apart and in the OPPOSITE order from how they were declared — not a
+// matching load/assign batch, so both must still be flagged.
+int _outOfOrderUseNotABatch(int seed) {
+  // expect_lint: move_variable_closer_to_its_usage
+  final first = _compute(seed);
+  // expect_lint: move_variable_closer_to_its_usage
+  final second = _compute(seed + 1);
+  _step();
+  _step();
+  _step();
+  _step();
+  final total = second + first;
+  return total;
+}
