@@ -17,6 +17,7 @@ import * as path from 'node:path';
 import {
   runEnable,
   runDisable,
+  runReenablePlugin,
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
   runInitializeConfig,
@@ -1204,6 +1205,16 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       await runDisable();
       await cfg.update('enabled', false, vscode.ConfigurationTarget.Workspace);
       updateContext(false, false);
+      refreshAll();
+      updateAllStatusBars();
+    }),
+    // Counterpart to `saropaLints.disable`: restores the plugins: block that
+    // disable commented out, then restarts the analysis server so the
+    // in-process plugin actually reloads. Distinct from `saropaLints.enable`,
+    // which only turns on scan-on-save delivery and never touches this block.
+    vscode.commands.registerCommand('saropaLints.reenablePlugin', async () => {
+      await runReenablePlugin();
+      updateContext(true, issuesProvider.hasViolations());
       refreshAll();
       updateAllStatusBars();
     }),

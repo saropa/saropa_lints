@@ -28,6 +28,13 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'circle-slash',
   },
   {
+    command: 'saropaLints.reenablePlugin',
+    title: 'Re-enable In-Process Plugin',
+    description: 'Restore the plugins: block after Turn Off Lint Integration and restart the analysis server.',
+    category: 'Setup & Configuration',
+    icon: 'debug-restart',
+  },
+  {
     command: 'saropaLints.initializeConfig',
     title: 'Initialize / Update Analysis Options',
     description: 'Create or refresh the analysis_options.yaml configuration file.',

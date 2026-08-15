@@ -504,6 +504,35 @@ export async function runDisable(): Promise<void> {
   );
 }
 
+/**
+ * Restore the in-process plugin after `runDisable` commented it out.
+ *
+ * `runEnable` deliberately never calls `restorePluginsIntegration` (see the
+ * comment above its `write_config` call) — enabling scan-on-save must not
+ * silently bring back the memory-heavy in-process plugin as a side effect.
+ * This is the dedicated, explicit counterpart a user reaches for when they
+ * DO want the in-process plugin (live in-editor squiggles) back, rather than
+ * hand-editing analysis_options.yaml to uncomment the sentinel block.
+ */
+export async function runReenablePlugin(): Promise<void> {
+  const root = getProjectRoot();
+  if (!root) {
+    vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
+    return;
+  }
+
+  const restored = restorePluginsIntegration(root);
+  if (!restored) {
+    vscode.window.showInformationMessage(l10n('notify.setup.reenableNothingToRestore'));
+    return;
+  }
+
+  // Same reasoning as runDisable: editing the yaml only affects the NEXT
+  // analysis server start, so restart now to actually load the plugin.
+  await restartDartAnalysisServer();
+  vscode.window.showInformationMessage(l10n('notify.setup.reenabledPlugin'));
+}
+
 const RUN_ANALYSIS_FOR_FILES_CAP = 50;
 
 // Directories to ignore when deriving the "open editors only" file list.
