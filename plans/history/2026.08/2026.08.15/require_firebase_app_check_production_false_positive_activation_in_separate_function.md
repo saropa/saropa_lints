@@ -272,12 +272,26 @@ pins both the fixed and the preserved true-positive behavior for both rules
 `test/rules/packages/firebase_rules_test.dart` suite (69 cases) continues to
 pass unmodified.
 
-A follow-up attempt to harden the whole-file fallback with a reachability
-check (requiring the function containing `activate()` to be referenced
-elsewhere in the file, not just present as dead code or a comment mention)
-was implemented and then reverted after a test case exposed a defect in
-the reachability logic that wasn't diagnosed before a token budget cutoff
-forced the session to wrap up. The plain whole-file text-match fallback —
-fully verified — shipped instead. The reachability idea remains valid
-future work; see the unstated-assumptions note in the handover for where to
-pick it back up.
+**Update:** the whole-file fallback was subsequently hardened with a
+reachability check. `_isAppCheckActivationReachable` now requires that the
+function/method containing the `activate(` call is itself referenced at
+least once more elsewhere in the file (a direct call, or a tear-off passed
+to something like `StartupTaskRunner.run(task: ...)`) before treating the
+file as having real activation — a bare `AppCheck` text match no longer
+suffices. This closes two remaining false-negative gaps: a comment merely
+mentioning `FirebaseAppCheck`, and a function containing the activation
+call that is declared but never actually invoked (dead code).
+
+An initial version of this check had its own bug: it matched any method
+whose body contained the substring `"FirebaseAppCheck"`, which incorrectly
+matched trivial singleton-accessor getters like `static get instance =>
+FirebaseAppCheck();` (the class name appears there without activating
+anything), and their getter name (`instance`) then trivially "matched" as
+referenced elsewhere via `FirebaseAppCheck.instance.activate()`. Fixed by
+requiring an actual `activate(` call substring
+(`_looksLikeAppCheckActivationCall`) and by skipping getters/setters
+entirely in the reachability walk. Two dedicated regression tests were
+added for this: a dead-code case and a comment-only-mention case, both
+verified firing correctly. Total suite: 75 tests passing
+(`firebase_app_check_deferred_activation_test.dart` + the pre-existing
+`firebase_rules_test.dart`).

@@ -2085,12 +2085,13 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
           break;
         }
         if (current is FunctionDeclaration) {
-          // Check function body, then fall back to the whole file — App
-          // Check activation is commonly deferred to a separate function
-          // (e.g. a queued startup task) so it doesn't block first frame.
+          // Check function body, then fall back to a reachability-aware
+          // whole-file search — App Check activation is commonly deferred
+          // to a separate function (e.g. a queued startup task) so it
+          // doesn't block first frame.
           final funcSource = current.toSource();
           if (_containsAppCheckActivation(funcSource) ||
-              _containsAppCheckActivation(context.fileContent)) {
+              _isAppCheckActivationReachable(node.root)) {
             return;
           }
           reporter.atNode(node);
@@ -2105,10 +2106,10 @@ class RequireFirebaseAppCheckRule extends SaropaLintRule {
 
       final methodSource = enclosingMethod.toSource();
 
-      // Check if App Check is activated, in this method or elsewhere in
-      // the file (see comment above on deferred activation).
+      // Check if App Check is activated, in this method or reachably
+      // elsewhere in the file (see comment above on deferred activation).
       if (!_containsAppCheckActivation(methodSource) &&
-          !_containsAppCheckActivation(context.fileContent)) {
+          !_isAppCheckActivationReachable(node.root)) {
         reporter.atNode(node);
       }
     });
@@ -3034,13 +3035,13 @@ class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
       // Check if the same function body contains AppCheck activation. Apps
       // commonly defer activate() to a separate function (e.g. queued as a
       // deferred startup task) so a slow/flaky Play Integrity check can't
-      // block first frame — so also fall back to a whole-file search before
-      // reporting, matching the class doc's stated intent ("not necessarily
-      // in the same file").
+      // block first frame — so also fall back to a reachability-aware
+      // whole-file search before reporting, matching the class doc's
+      // stated intent ("not necessarily in the same file").
       final FunctionBody? body = node.thisOrAncestorOfType<FunctionBody>();
       final String bodySource = body?.toSource() ?? '';
       if (_containsAppCheckActivation(bodySource) ||
-          _containsAppCheckActivation(context.fileContent)) {
+          _isAppCheckActivationReachable(node.root)) {
         return;
       }
 
@@ -3052,6 +3053,68 @@ class RequireFirebaseAppCheckProductionRule extends SaropaLintRule {
 bool _containsAppCheckActivation(String source) =>
     RegExp(r'\bFirebaseAppCheck\b').hasMatch(source) ||
     RegExp(r'\bAppCheck\b').hasMatch(source);
+
+/// A stricter version of [_containsAppCheckActivation] for the reachability
+/// walk below: requires an actual `activate(` call, not just the word
+/// "AppCheck" anywhere in the body. A bare text/word match is too loose once
+/// it's applied to every method in a class — e.g. a `static get instance =>
+/// FirebaseAppCheck();` singleton accessor contains the class name
+/// "FirebaseAppCheck" without activating anything, and would otherwise be
+/// misidentified as the activation site.
+bool _looksLikeAppCheckActivationCall(String source) =>
+    _containsAppCheckActivation(source) && source.contains('activate(');
+
+/// Whether App Check activation exists elsewhere in [root] AND the function
+/// containing it is actually referenced from somewhere else in the file —
+/// not just mentioned in a comment/string or left as dead code that nothing
+/// ever calls. A bare text search for "AppCheck" would also go quiet on
+/// those two cases, which is a stronger false-negative than the deferred-
+/// activation pattern this fallback exists to support.
+///
+/// Deliberately conservative: "referenced" means the declaring function's
+/// name appears at least once more in the file (a direct call, or a
+/// tear-off passed to something like `StartupTaskRunner.run(task: ...)`).
+/// This cannot follow indirection through a second file or a dynamic
+/// dispatch table — see the class doc note on cross-file activation, which
+/// remains out of scope for this syntactic check. Getters/setters are
+/// skipped: they can't meaningfully "activate" anything themselves, and are
+/// prone to false matches from merely referencing the App Check type (see
+/// [_looksLikeAppCheckActivationCall]).
+bool _isAppCheckActivationReachable(AstNode root) {
+  if (root is! CompilationUnit) return false;
+
+  bool referencedElsewhere(String functionName, String unitSource) {
+    final matches = RegExp(
+      r'\b' + RegExp.escape(functionName) + r'\b',
+    ).allMatches(unitSource).length;
+    return matches >= 2;
+  }
+
+  String? unitSource;
+  for (final declaration in root.declarations) {
+    if (declaration is FunctionDeclaration) {
+      final FunctionBody funcBody = declaration.functionExpression.body;
+      if (!_looksLikeAppCheckActivationCall(funcBody.toSource())) continue;
+      unitSource ??= root.toSource();
+      if (referencedElsewhere(declaration.name.lexeme, unitSource)) {
+        return true;
+      }
+    } else if (declaration is ClassDeclaration) {
+      for (final ClassMember member in declaration.bodyMembers) {
+        if (member is! MethodDeclaration) continue;
+        if (member.isGetter || member.isSetter) continue;
+        if (!_looksLikeAppCheckActivationCall(member.body.toSource())) {
+          continue;
+        }
+        unitSource ??= root.toSource();
+        if (referencedElsewhere(member.name.lexeme, unitSource)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
 
 /// Warns when sensitive Firebase Auth operations are used without reauthentication.
 ///

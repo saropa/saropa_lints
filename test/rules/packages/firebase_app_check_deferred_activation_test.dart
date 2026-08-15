@@ -46,6 +46,46 @@ Future<void> main() async {
       );
       expect(diags.map((d) => d.ruleName), contains('require_firebase_app_check_production'));
     });
+
+    test('still fires when the activating function is never called (dead code)', () async {
+      final diags = await runRuleResolved(
+        RequireFirebaseAppCheckProductionRule(),
+        '''
+// uses firebase
+class Firebase { static Future<void> initializeApp() async {} }
+class FirebaseAppCheck {
+  static FirebaseAppCheck get instance => FirebaseAppCheck();
+  Future<void> activate() async {}
+}
+
+Future<void> main() async {
+  await Firebase.initializeApp();
+}
+
+// Never referenced from anywhere — dead code, not a real activation path.
+Future<void> _unusedInitAppCheck() async {
+  await FirebaseAppCheck.instance.activate();
+}
+''',
+      );
+      expect(diags.map((d) => d.ruleName), contains('require_firebase_app_check_production'));
+    });
+
+    test('still fires when AppCheck is only mentioned in a comment', () async {
+      final diags = await runRuleResolved(
+        RequireFirebaseAppCheckProductionRule(),
+        '''
+// uses firebase
+// TODO: consider FirebaseAppCheck activation later
+class Firebase { static Future<void> initializeApp() async {} }
+
+Future<void> main() async {
+  await Firebase.initializeApp();
+}
+''',
+      );
+      expect(diags.map((d) => d.ruleName), contains('require_firebase_app_check_production'));
+    });
   });
 
   group('RequireFirebaseAppCheckRule', () {
