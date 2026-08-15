@@ -17,6 +17,7 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../fixes/code_quality/add_late_final_fix.dart';
+import '../../fixes/code_quality/move_declaration_closer_fix.dart';
 import '../../fixes/code_quality/remove_late_keyword_fix.dart';
 import '../../fixes/code_quality/remove_unused_assignment_fix.dart';
 import '../../saropa_lint_rule.dart';
@@ -2255,8 +2256,19 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
 /// assignments consuming them in order) read as one legible unit instead of
 /// each member accumulating false distance from its position in the group,
 /// while an unrelated declaration that just happens to sit next to a lonely
-/// one still counts toward the threshold. The rule stays silent when the
-/// first use is nested inside a loop,
+/// one still counts toward the threshold.
+///
+/// Known limitations, accepted for now: the contiguous-run requirement has
+/// zero tolerance for a single incidental non-declaration statement
+/// splitting a real batch's load group (e.g. a stray log line between two
+/// loads), which would reintroduce the original false positive on the
+/// later half of that batch — not yet seen in practice, revisit if
+/// reported. A variable counts as "genuinely used" for group-membership
+/// purposes even when its only use is nested inside a loop/branch/closure
+/// (unlike the direct-child guard the rule itself enforces), on the theory
+/// that any recorded use still proves the declaration isn't dead clutter.
+///
+/// The rule stays silent when the first use is nested inside a loop,
 /// branch, nested block, or closure: moving an accumulator into a loop would
 /// reset it every iteration, and moving a value into one branch would drop it
 /// from sibling branches that also read it. See
@@ -2523,6 +2535,12 @@ class MoveVariableCloserToUsageRule extends SaropaLintRule {
     }
     return false;
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        MoveDeclarationCloserFix(context: context),
+  ];
 }
 
 class _FirstUsageVisitor extends RecursiveAstVisitor<void> {

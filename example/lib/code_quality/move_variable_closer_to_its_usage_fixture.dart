@@ -233,3 +233,16 @@ int _unusedPaddingDeclarationsNotABatch(int seed) {
   final unrelated3 = _compute(seed + 3);
   return target;
 }
+
+// NO LINT (multi-variable declaration statement inside a batch): `a` and `b`
+// are declared in a single statement, both consumed by later statements in
+// matching order — the group logic must treat this statement as one unit
+// (excluded because at least one of its variables is genuinely consumed),
+// not crash or miscount because it holds more than one declared variable.
+int _multiVariableDeclarationInBatch(int seed) {
+  final a = _compute(seed), b = _compute(seed + 1);
+  final c = _compute(seed + 2);
+  _step();
+  final sum = a + b + c;
+  return sum;
+}
