@@ -105,6 +105,13 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
+// `avoid_catching_generic_exception` is gated to FileType.widget (content-based
+// detection looks for a StatelessWidget/StatefulWidget/State<> subclass), so
+// this marker class is required for the cases below to be reachable at all.
+class _CatchClauseFixtureWidget extends StatelessWidget {
+  const _CatchClauseFixtureWidget();
+}
+
 // BAD: Should trigger avoid_catching_generic_exception
 // expect_lint: avoid_catching_generic_exception
 void _bad1376() {
@@ -122,5 +129,34 @@ void _good1376() {
     doSomething();
   } on FormatException catch (e) {
     // Handle specific exception
+  }
+}
+
+// GOOD: `on Object catch` that logs before falling back is not swallowing.
+void _goodObjectCatchLogged() {
+  try {
+    doSomething();
+  } on Object catch (error, stack) {
+    debugException(error, stack);
+    showFallbackUi();
+  }
+}
+
+// GOOD: crash-reporting SDK receiver is also recognized as logging.
+void _goodObjectCatchCrashlytics() {
+  try {
+    doSomething();
+  } on Object catch (error, stack) {
+    Crashlytics.instance.recordError(error, stack);
+  }
+}
+
+// BAD: `on Object catch` that swallows the error silently should still lint.
+// expect_lint: avoid_catching_generic_exception
+void _badObjectCatchSwallowed() {
+  try {
+    doSomething();
+  } on Object catch (e) {
+    // nothing — swallowed silently
   }
 }

@@ -14,6 +14,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../catch_body_logging_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/common/remove_named_argument_fix.dart';
 import '../../fixes/widget_patterns/comment_out_print_fix.dart';
@@ -1032,6 +1033,19 @@ class AvoidPrintInProductionRule extends SaropaLintRule {
 ///   // Handle specific exception
 /// }
 /// ```
+///
+/// `on Object`/`on Exception`/`dynamic` catches are also **not** flagged when
+/// the body forwards the caught error to a logging/crash-reporting call (or
+/// rethrows it) before falling back — that is the deliberate pattern used to
+/// also catch `Error` subtypes (e.g. assertion failures) and report them:
+/// ```dart
+/// try {
+///   doSomething();
+/// } on Object catch (error, stack) {
+///   debugException(error, stack); // reported, not swallowed
+///   showFallbackUi();
+/// }
+/// ```
 class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
   AvoidCatchingGenericExceptionRule() : super(code: _code);
 
@@ -1081,6 +1095,15 @@ class AvoidCatchingGenericExceptionRule extends SaropaLintRule {
         if (typeName == 'Exception' ||
             typeName == 'Object' ||
             typeName == 'dynamic') {
+          // `on Object catch` is a deliberate, documented pattern for
+          // reaching Error subtypes (e.g. assertion failures) so they can
+          // be reported before a safe fallback runs. If the body already
+          // forwards the caught error to a logging/crash-reporting call
+          // (or rethrows it), the error isn't being swallowed, so don't
+          // flag it — only bodies that drop the error silently are bugs.
+          if (catchBodyHasLoggingCall(node.body)) {
+            return;
+          }
           reporter.atNode(exceptionType);
         }
       }

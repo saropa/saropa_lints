@@ -68,12 +68,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed
 
-- `avoid_catching_generic_exception` no longer flags `on Object`/`on Exception`/`dynamic` catch clauses whose body forwards the caught error to a logging or crash-reporting call (or rethrows it) before falling back — this is a deliberate pattern for also catching `Error` subtypes and reporting them, not a swallowed exception. Untyped `catch (e)` is unaffected. ([bugs/avoid_catching_generic_exception_false_positive_logged_broad_catch.md](bugs/avoid_catching_generic_exception_false_positive_logged_broad_catch.md))
+- `avoid_catching_generic_exception` no longer flags `on Object`/`on Exception`/`dynamic` catch clauses whose body forwards the caught error to a logging or crash-reporting call (or rethrows it) before falling back — this is a deliberate pattern for also catching `Error` subtypes and reporting them, not a swallowed exception. Untyped `catch (e)` is unaffected. ([plans/history/2026.08/2026.08.15/avoid_catching_generic_exception_false_positive_logged_broad_catch.md](plans/history/2026.08/2026.08.15/avoid_catching_generic_exception_false_positive_logged_broad_catch.md))
 - `require_error_boundary` no longer flags a `MaterialApp`/`CupertinoApp` built inside a `catch` clause that already logged the caught error — that's the app's own crash-recovery fallback UI, not its normal entry point, and demanding it also carry an error-boundary `builder:` is recursive. A `MaterialApp`/`CupertinoApp` built outside any such catch still requires a `builder:` as before. ([bugs/require_error_boundary_false_positive_fallback_ui_inside_catch.md](bugs/require_error_boundary_false_positive_fallback_ui_inside_catch.md))
 - `require_error_logging` no longer flags a `catch`/`on Type` clause with no captured exception variable if its body still calls a recognized logging function — a static message like `on TimeoutException { debug('timed out'); }` is a complete log entry even without touching the exception object. A clause with no captured variable and no logging call is still flagged, as before. ([plans/history/2026.08/2026.08.15/require_error_logging_false_positive_unparamed_catch_with_logged_body.md](plans/history/2026.08/2026.08.15/require_error_logging_false_positive_unparamed_catch_with_logged_body.md))
 - `require_app_lifecycle_handling` no longer flags a `Timer`/`.listen()` subscription that is created and canceled/closed within the same `State` class's own `initState`/`dispose()` pair — that's Flutter's standard cleanup contract for a foreground-only ticker that doesn't need to pause on backgrounding, since it stops existing when the widget is disposed. A class whose `dispose()` does not cancel the field it created, or that assigns the Timer/subscription somewhere dispose() can't prove cleanup for, is still flagged, as before. ([bugs/require_app_lifecycle_handling_false_positive_dispose_cancels_timer.md](bugs/require_app_lifecycle_handling_false_positive_dispose_cancels_timer.md))
 - `require_ios_deployment_target_consistency` no longer flags `import 'dart:async'` (or any other import/export URI) as Swift `async`/`await` usage — the rule now skips string literals inside import/export directives before checking them against its tracked iOS 15+ API names. A genuine API name appearing elsewhere in the file is still flagged, as before. ([bugs/require_ios_deployment_target_consistency_false_positive_import_uri_misattribution.md](bugs/require_ios_deployment_target_consistency_false_positive_import_uri_misattribution.md))
-- `prefer_static_method` no longer flags methods that read instance fields or call instance methods via bare (unprefixed) identifiers — the idiomatic Dart style used throughout most codebases. Previously the rule only recognized an explicit `this.` prefix, so any method touching instance state through a bare identifier (including inside a nested closure) was misdiagnosed as "could be static." A method that truly uses no instance state anywhere is still flagged, as before. ([bugs/prefer_static_method_false_positive_implicit_field_access.md](bugs/prefer_static_method_false_positive_implicit_field_access.md))
+- `prefer_static_method` no longer flags methods that read instance fields or call instance methods via bare (unprefixed) identifiers — the idiomatic Dart style used throughout most codebases. Previously the rule only recognized an explicit `this.` prefix, so any method touching instance state through a bare identifier (including inside a nested closure) was misdiagnosed as "could be static." A method that truly uses no instance state anywhere is still flagged, as before. ([plans/history/2026.08/2026.08.15/prefer_static_method_false_positive_implicit_field_access.md](plans/history/2026.08/2026.08.15/prefer_static_method_false_positive_implicit_field_access.md))
 - `move_variable_closer_to_its_usage` no longer flags a deliberate "load N values, then consume all N in the same order" batch shape (e.g. five sequential `await`-loads followed by five field assignments) — a statement that is itself another of the block's own declarations, or the first-use site of another of its declared variables, no longer counts toward the "unrelated intervening statements" distance. A genuinely far-apart single declaration, or declarations used out of matching order, are still flagged, as before. ([bugs/move_variable_closer_to_its_usage_false_positive_batch_declaration_grouping.md](bugs/move_variable_closer_to_its_usage_false_positive_batch_declaration_grouping.md))
 
 ### Changed (Extension)
@@ -508,32 +508,7 @@ Adds a cross-tool data channel so sibling Saropa Suite tools can pull this proje
 
 ---
 
-## [14.3.3]
-
-Adds a rule pack for device_calendar_plus, a maintained replacement for the abandoned device_calendar plugin with a different API (no relation to the existing device_calendar rule pack, which stays as-is). Also fixes the Package Dashboard's Opportunities detection so document files like README.md are never counted as an adoptable API, and adds an Opportunities section to the Package Detail sidebar with per-feature links to the package's source code and documentation. No action required — the new rules and the Opportunities fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.3/CHANGELOG.md)
-
-### Added
-
-- **New device_calendar_plus rule pack (3 rules).** Flags data operations (create/update/delete/list) called with no permission check anywhere in the file; flags all-day events (`isAllDay: true`) given a UTC-converted date, which can shift the event to the wrong calendar day; and flags `updateEvent` calls that change no field, a no-op the package treats as silently harmless. No action required — rules run automatically wherever `device_calendar_plus` is imported.
-- **(Extension) Opportunities section in the Package Detail sidebar.** Each unadopted changelog feature now lists its introducing bullet plus, per named API, a link to search the package's source repository and a link to its online documentation, so you can review a feature without leaving the sidebar. No action required — the section appears automatically for any package with unadopted features.
-
-### Fixed
-
-- **(Extension) Opportunities detection no longer treats document files as adoptable APIs.** A changelog bullet mentioning `README.md`, `CHANGELOG.md`, or `pubspec.yaml` was being extracted as if it were a dotted API reference (like `ReelText.rich`), so the Package Dashboard's Opportunities column and count could include filenames instead of real code. Extraction now excludes filename-shaped tokens. No action required — rescanning drops the false entries.
-- **(Extension) Sidebar views now show an icon.** The Banner, Editor Dashboards, Status, Settings, and Help views in the activity bar panel were missing an icon, so they rendered as unlabeled entries when moved to another panel. No action required — icons appear automatically.
-
-<details>
-<summary>Maintenance</summary>
-
-- Added false-positive-guard fixtures and additional UTC-shape cases for the device_calendar_plus all-day-event rule, closing a regression-coverage gap where the resolved-receiver-type check shipped in 14.3.3 had no fixture or test exercising it.
-- Fixed an inconsistent `target`/`realTarget` accessor in the device_calendar_plus UTC-taint helper's `DateTime.parse` branch (no behavior change — not a realistic cascade shape).
-
-</details>
-
----
-
 ## Historical Changelog Archive
 
 > **Looking for older changes?**
 > See [CHANGELOG_ARCHIVE.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG_ARCHIVE.md) for older versions.
-
