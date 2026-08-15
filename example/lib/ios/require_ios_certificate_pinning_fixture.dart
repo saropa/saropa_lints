@@ -103,15 +103,23 @@
 // Test fixture for: require_ios_certificate_pinning
 // Source: lib\src\rules\platforms\ios_rules.dart
 
+import 'package:app/auth/auth_repo.dart';
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger require_ios_certificate_pinning
-// expect_lint: require_ios_certificate_pinning
+// BAD: Should trigger require_ios_certificate_pinning — a real sensitive
+// endpoint string, not the import statement above.
 void _bad895() {
-  // NOTE: require_ios_certificate_pinning — see rule docs for triggering pattern
+  // expect_lint: require_ios_certificate_pinning
+  const String endpoint = 'https://api.example.com/auth/login';
 }
 
-// GOOD: Should NOT trigger require_ios_certificate_pinning
+// GOOD: Should NOT trigger require_ios_certificate_pinning —
+// `import 'package:app/auth/auth_repo.dart'` is a Dart package URI whose
+// path happens to contain the sensitive-path substring `/auth`; it is not
+// a network endpoint string. The rule previously substring-matched
+// import/export directive URIs against its tracked path-pattern list (same
+// false-positive class as require_ios_deployment_target_consistency).
 void _good895() {
   // Compliant version — see rule docs
 }

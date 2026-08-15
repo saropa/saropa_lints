@@ -41,13 +41,24 @@ bool isInAnnotation(AstNode node) {
   return false;
 }
 
-/// Checks if a node is inside an import or export directive.
+/// Checks if a node is inside an import, export, or part directive.
 ///
-/// Returns true if the literal is part of an import/export path.
+/// Returns true if the literal is part of a directive's library-path URI
+/// (`import`/`export`/`part`/`part of`) — these are library identifiers, not
+/// user-authored strings, so keyword/substring checks over string-literal
+/// content (e.g. scanning for API names) must not match against them. A
+/// substring match against `'dart:async'` or `'package:live_activities/...'`
+/// otherwise misreads the library path as a reference to whatever keyword
+/// happens to be a substring of it.
 bool isInImportOrExport(AstNode node) {
   AstNode? current = node.parent;
   while (current != null) {
-    if (current is ImportDirective || current is ExportDirective) return true;
+    if (current is ImportDirective ||
+        current is ExportDirective ||
+        current is PartDirective ||
+        current is PartOfDirective) {
+      return true;
+    }
     current = current.parent;
   }
 

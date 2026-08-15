@@ -103,15 +103,23 @@
 // Test fixture for: require_ios_live_activities_setup
 // Source: lib\src\rules\platforms\ios_rules.dart
 
+import 'package:live_activities/live_activities.dart';
+
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger require_ios_live_activities_setup
-// expect_lint: require_ios_live_activities_setup
+// BAD: Should trigger require_ios_live_activities_setup — a real reference
+// to ActivityKit setup, not the import statement above.
 void _bad882() {
-  // NOTE: require_ios_live_activities_setup — see rule docs for triggering pattern
+  // expect_lint: require_ios_live_activities_setup
+  const String activityKind = 'ActivityKit configuration pending';
 }
 
-// GOOD: Should NOT trigger require_ios_live_activities_setup
+// GOOD: Should NOT trigger require_ios_live_activities_setup —
+// `import 'package:live_activities/live_activities.dart'` is a Dart package
+// URI, not code referencing ActivityKit/LiveActivity APIs. The rule
+// previously substring-matched import/export directive URIs against its
+// tracked keyword list (same false-positive class as
+// require_ios_deployment_target_consistency).
 void _good882() {
   // Compliant version — see rule docs
 }

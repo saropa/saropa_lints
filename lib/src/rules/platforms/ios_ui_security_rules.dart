@@ -8,6 +8,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../../literal_context_utils.dart';
 import '../../target_matcher_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/platforms/ios/replace_http_with_https_fix.dart';
@@ -1149,6 +1150,12 @@ class RequireIosCertificatePinningRule extends SaropaLintRule {
     }
 
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
+      // A package import path (e.g. 'package:app/auth/auth_repo.dart')
+      // can contain a folder segment matching one of the sensitive path
+      // patterns below; only endpoint-like strings in ordinary code should
+      // be flagged, not directive URIs.
+      if (isInImportOrExport(node)) return;
+
       final String value = node.value.toLowerCase();
       for (final String pattern in _sensitivePatterns) {
         if (value.contains(pattern)) {

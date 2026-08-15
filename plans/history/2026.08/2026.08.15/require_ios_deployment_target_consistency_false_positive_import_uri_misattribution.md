@@ -256,3 +256,59 @@ diagnostic (plus one from the unrelated sibling rule
 `require_ios_minimum_version_check`, which matches the same string by
 design). `dart test test/rules/platforms/ios_rules_test.dart` (179 tests)
 passed unchanged.
+
+---
+
+## Hardening Follow-up (2026-08-15)
+
+The bug's root cause — `context.addSimpleStringLiteral` scanning a fixed
+keyword/pattern list with `.contains()` against every string literal in a
+file, with no import/export directive exclusion — was not unique to
+`require_ios_deployment_target_consistency`. An audit of every rule using
+that same shape (`context.addSimpleStringLiteral` + a loop over a
+`Set`/`List` of tracked strings doing `.contains(pattern)`) found two more
+rules with the identical live false-positive risk:
+
+- `RequireIosLiveActivitiesSetupRule` (`require_ios_live_activities_setup`,
+  `lib/src/rules/platforms/ios_capabilities_permissions_rules.dart`) —
+  `live_activities` is a real pub.dev package name, so
+  `import 'package:live_activities/live_activities.dart';` matched its own
+  keyword list.
+- `RequireIosCertificatePinningRule` (`require_ios_certificate_pinning`,
+  `lib/src/rules/platforms/ios_ui_security_rules.dart`) — its sensitive-path
+  keyword list (`/auth`, `/login`, `/payment`, etc.) matches ordinary package
+  import paths whose folder structure happens to contain one of those
+  segments (e.g. `package:app/auth/auth_repo.dart`).
+
+Both received the same `isInImportOrExport(node)` early-return guard used in
+the original fix. `isInImportOrExport`
+(`lib/src/literal_context_utils.dart`) was also widened to additionally
+recognize `PartDirective`/`PartOfDirective` URIs, not just
+`ImportDirective`/`ExportDirective` — a strict superset of its previous
+behavior, so existing consumers (`no_magic_string`,
+`require_ios_deployment_target_consistency`) are unaffected.
+
+Other rules using `context.addSimpleStringLiteral` in
+`ios_ui_security_rules.dart`, `macos_rules.dart`, `windows_rules.dart`, and
+`linux_rules.dart` were audited and found NOT vulnerable to this class: they
+either use a regex/`startsWith`/exact-`Set.contains` match instead of
+substring-`.contains()` against a keyword list, or their keyword lists
+(CamelCase API names, absolute filesystem paths like `/Users/`) have no
+plausible overlap with real Dart import/export URI content. A pub.dev-wide
+search for package names colliding with the remaining keyword lists
+(`SharePlay`, `GroupActivities`, `AttributedString`, and the other rules'
+patterns) was not performed — this was judged out of scope for a
+false-positive hardening pass, since importing this rule set into
+production is what would surface any remaining live collision.
+
+Verified via the scan CLI against throwaway files outside `example/`
+(same reason as above — `/example` paths are excluded from CLI scans): a
+file importing both `package:live_activities/live_activities.dart` and
+`package:app/auth/auth_repo.dart` alongside genuine triggering code (an
+`ActivityKit` string and an `/auth` endpoint URL) produced exactly one
+diagnostic per rule, on the triggering lines only — no diagnostics on either
+import line. `example/lib/ios/require_ios_live_activities_setup_fixture.dart`
+and `example/lib/ios/require_ios_certificate_pinning_fixture.dart` were
+updated from stub functions to real triggering/non-triggering cases, mirroring
+the original fixture fix. `dart test test/rules/platforms/ios_rules_test.dart`
+(179 tests) passed after these changes.

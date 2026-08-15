@@ -8,6 +8,7 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 
 import '../../info_plist_utils.dart';
+import '../../literal_context_utils.dart';
 import '../../target_matcher_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/platforms/ios/replace_http_with_https_fix.dart';
@@ -2277,6 +2278,10 @@ class RequireIosLiveActivitiesSetupRule extends SaropaLintRule {
 
     context.addSimpleStringLiteral((SimpleStringLiteral node) {
       if (hasReported) return;
+      // 'live_activities' is a real pub.dev package name, so an import
+      // directive's URI (e.g. 'package:live_activities/live_activities.dart')
+      // would otherwise substring-match this rule's own keyword list.
+      if (isInImportOrExport(node)) return;
 
       final String value = node.value;
       for (final String pattern in _liveActivityPatterns) {
