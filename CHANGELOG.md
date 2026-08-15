@@ -64,6 +64,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+---
+
 ## [15.0.0]
 
 Version 15.0.0 adds new quick fixes for error logging and variable placement while introducing a persistent background daemon for significantly faster IDE save-scans. This release resolves false positives across exception handling, lifecycle timers, static method detection, and platform target checks. Project tier management is now unified directly through project configuration, reducing default editor memory overhead. [log](https://github.com/saropa/saropa_lints/blob/v15.0.0/CHANGELOG.md)
