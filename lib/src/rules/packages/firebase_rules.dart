@@ -3062,7 +3062,7 @@ bool _containsAppCheckActivation(String source) =>
 /// "FirebaseAppCheck" without activating anything, and would otherwise be
 /// misidentified as the activation site.
 bool _looksLikeAppCheckActivationCall(String source) =>
-    _containsAppCheckActivation(source) && source.contains('activate(');
+    _containsAppCheckActivation(source) && RegExp(r'activate\(').hasMatch(source);
 
 /// Whether App Check activation exists elsewhere in [root] AND the function
 /// containing it is actually referenced from somewhere else in the file —

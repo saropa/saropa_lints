@@ -8,7 +8,7 @@
 /// `plugins.saropa_lints` in `analysis_options.yaml` is the source of truth;
 /// a non-empty `SAROPA_TIER` environment variable is a dev-only override that
 /// wins when set, but logs a loud warning if it disagrees with the yaml value
-/// (see [_reload]) so it is never silently masking a real project setting.
+/// (see `_reload`) so it is never silently masking a real project setting.
 /// `saropa_tier:` in `analysis_options_custom.yaml` is deprecated — it is
 /// parsed only to warn callers to migrate to `analysis_options.yaml`, it no
 /// longer wins tier resolution. (Prior sessions' drift among VS Code's

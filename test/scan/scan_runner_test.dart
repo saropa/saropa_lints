@@ -83,9 +83,7 @@ void main() {
         'scan_runner_tier_override_',
       );
       try {
-        File(
-          '${tempDir.path}/analysis_options.yaml',
-        ).writeAsStringSync('''
+        File('${tempDir.path}/analysis_options.yaml').writeAsStringSync('''
 plugins:
   saropa_lints:
     diagnostics:
@@ -141,14 +139,25 @@ plugins:
       );
       try {
         Directory('${tempDir.path}/lib').createSync();
-        File('${tempDir.path}/lib/main.dart').writeAsStringSync('void main() {}\n');
-        File('${tempDir.path}/lib/model.g.dart').writeAsStringSync('// generated\n');
+        File(
+          '${tempDir.path}/lib/main.dart',
+        ).writeAsStringSync('void main() {}\n');
+        File(
+          '${tempDir.path}/lib/model.g.dart',
+        ).writeAsStringSync('// generated\n');
         Directory('${tempDir.path}/build').createSync();
-        File('${tempDir.path}/build/leftover.dart').writeAsStringSync('// build output\n');
+        File(
+          '${tempDir.path}/build/leftover.dart',
+        ).writeAsStringSync('// build output\n');
 
         final files = ScanRunner.discoverDartFiles(tempDir.path);
         final relative = files
-            .map((f) => f.replaceAll('\\', '/').split('${tempDir.path.replaceAll('\\', '/')}/').last)
+            .map(
+              (f) => f
+                  .replaceAll('\\', '/')
+                  .split('${tempDir.path.replaceAll('\\', '/')}/')
+                  .last,
+            )
             .toList();
 
         expect(relative, contains('lib/main.dart'));

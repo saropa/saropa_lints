@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart e Flutter regras de linhas para segurança, acessibilidade e desempenho.\n\nRequer um projeto Dart ou Flutter.\n\nAbra uma pasta contendo um `pubspec.yaml̅ para começar.\n\n[Aprenda mais on-line] (https://pub.dev/pacotes/saropa_lints)\n[Explorar Todos os Comandos] (comando:saropaLints.showCommandCatalog)\n[Sobre Saropa Lints] (comando:saropaLints.showAbout)\n[Começando] (comando:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Configurar o projeto (pubspec + config)",
   "command.disable.title": "Saropa Lints: Desligue a integração da Lint.",
+  "command.reenablePlugin.title": "Saropa Lints: Reativar Plugin em Processo único",
   "command.runAnalysis.title": "Saropa Lints: Execute a Análise de Executar.",
   "command.verifyPlugin.title": "Saropa Lints: Verificar Plugin Está A Ser Execucionado (verificação de vitalidade)",
   "command.initializeConfig.title": "Saropa Lints: Inicializar / Atualizar Opções de Análise.",

@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints**** PH2 là gì?\n\n2100+ Dart và Flutter quy tắc lông măng cho an ninh, khả năng tiếp cận và hiệu suất.\n\nYêu cầu một dự án Dart hoặc Flutter.\n\nMở một thư mục chứa `pubspec.yaml̅ để bắt đầu.\n\n[Hãy tìm hiểu thêm trực tuyến] (https://pub.dev/packages/saropa_lints)\n[Thiết lập tất cả các lệnh]{command:saropaLints.showCommandCatalog}\n[Về Saropa Lints]{Command:saropaLints.showAbout}\n[Bắt đầu]{Command:saropaLints.openWalkthrough}",
   "command.enable.title": "Saropa Lints: là người có thể Thiết lập dự án (pubspec + config)",
   "command.disable.title": "Saropa Lints: là người có thể Tắt Lint Integration (Tổ hợp với Lint)",
+  "command.reenablePlugin.title": "Saropa Lints: Kích hoạt lại Plugin Trong Cùng Một Quá Trình",
   "command.runAnalysis.title": "Saropa Lints: là người có thể Chạy phân tích Run Analysis",
   "command.verifyPlugin.title": "Saropa Lints: là người có thể Xác minh Plugin đang chạy (kiểm tra tính năng hoạt động)",
   "command.initializeConfig.title": "Saropa Lints: là người có thể Initialize / Update Analysis Options (Đầu tiên hóa/ Cập nhật các tùy chọn phân tích)",

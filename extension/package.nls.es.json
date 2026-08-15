@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart y Flutter reglas de lint para la seguridad, accesibilidad y rendimiento.\n\nRequiere un proyecto Dart o Flutter.\n\nAbra una carpeta que contenga un `pubspec.yaml̅ para comenzar.\n\n[Aprender más en línea] (https://pub.dev/paquetes/saropa_lints)\n[Explorar todos los comandos] (comando:saropaLints.muestraComandoCatálogo)\n[Acerca de Saropa Lints] (comando:saropaLints.showAbout) Se trata del juego en el que los jugadores pueden jugar con sus propios objetos y también con otros objetos.\n[Comenzando] (comando:saropaLints.open) Camina a través de las líneas",
   "command.enable.title": "Saropa Lints: Configurar el proyecto (pubspec + config)",
   "command.disable.title": "Saropa Lints: Apagar la integración de la cinta de banda",
+  "command.reenablePlugin.title": "Saropa Lints: Reactivar Plugin en Proceso",
   "command.runAnalysis.title": "Saropa Lints: ejecutar el análisis.",
   "command.verifyPlugin.title": "Saropa Lints: Verificar que el plugin está en ejecución (verificación de vitalidad)",
   "command.initializeConfig.title": "Saropa Lints: Inicializa / actualiza las opciones de análisis.",

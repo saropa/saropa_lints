@@ -193,7 +193,9 @@ class ScanRunner {
       }
     }
     if (absFiles.isEmpty) return const [];
-    final affectedContexts = {for (final f in absFiles) collection.contextFor(f)};
+    final affectedContexts = {
+      for (final f in absFiles) collection.contextFor(f),
+    };
     for (final ctx in affectedContexts) {
       await ctx.applyPendingFileChanges();
     }

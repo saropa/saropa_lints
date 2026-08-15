@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart و Flutter قواعد الشعيرات للأمان والوصول والأداء.\n\nيتطلب مشروع Dart أو Flutter.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[Browse All Commands](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: إعداد المشروع (pubspec + config)",
   "command.disable.title": "Saropa Lints: إيقاف تشغيل تكامل Lint",
+  "command.reenablePlugin.title": "Saropa Lints: إعادة تفعيل إضافة المُضافة الداخلية",
   "command.runAnalysis.title": "Saropa Lints: تشغيل تحليل التحليل.",
   "command.verifyPlugin.title": "Saropa Lints: تحقق من تشغيل البرنامج الإضافي (تحقق من الحيوية)",
   "command.initializeConfig.title": "Saropa Lints: إطلاق / تحديث خيارات التحليل.",

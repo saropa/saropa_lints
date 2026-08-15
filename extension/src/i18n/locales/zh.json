@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: 已经是 配置文件写入失败了. {details}",
       "disabled": "Saropa Lints被禁用了. 这是一个非常好的方法. 项目文件没有被更改.",
       "disabledAnalyzer": "Saropa Lints 集成关闭. 在线电话 分析仪诊断将在不久的将来得到清除; 切换Lint集成 在恢复.",
+      "reenabledPlugin": "Saropa Lints 在进程内插件已重新启用。正在重启 Dart 分析服务器以重新加载它。",
+      "reenableNothingToRestore": "Saropa Lints：没有内容可还原。当前进程中的插件未通过扩展禁用。",
       "noOpenDartFiles": "Saropa Lints: 没有一个人. 没有找到开放的 Dart 文件. 重新打开一个 Dart 文件或关闭\"仅为编辑器打开\"设置.",
       "configUpdated": "Saropa Lints 配置已更新（等级：{tier}）。",
       "configWriteFailed": "配置写入失败了. {details}",

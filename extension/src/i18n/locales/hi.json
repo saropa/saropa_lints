@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: _PH1_: config लिखना विफल. {details}",
       "disabled": "Saropa Lints अक्षम है। प्रोजेक्ट फ़ाइलों को नहीं बदला गया था।",
       "disabledAnalyzer": "Saropa Lints एकीकरण बंद कर दिया गया है। विश्लेषक निदान जल्द ही स्पष्ट हो जाएगा; टॉगल करें Lint एकीकरण को बहाल करने के लिए चालू करें।",
+      "reenabledPlugin": "Saropa Lints अंतर्निहित प्लगइन पुनः सक्रिय किया गया है। Dart विश्लेषण सर्वर को पुनः शुरू करके इसे पुनः लोड कर रहे हैं।",
+      "reenableNothingToRestore": "Saropa Lints: कुछ बहाल करने के लिए नहीं। वर्तमान प्रक्रिया प्लगइन वर्तमान में एक्सटेंशन के माध्यम से अक्षम नहीं है।",
       "noOpenDartFiles": "Saropa Lints: _PH0_: कोई खुली Dart फ़ाइल नहीं मिली। एक Dart फ़ाइल को फिर से खोलें या \"केवल संपादकों खोलें\" सेटिंग बंद करें।",
       "configUpdated": "Saropa Lints config अपडेट किया गया (स्तरः {tier}). . . यह एक बहुत ही अच्छा विचार है.",
       "configWriteFailed": "कॉन्फ़िग लिखना विफल. {details}",

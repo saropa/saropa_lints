@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: _PH1_: -HİS'in ilk aşamas config write başarısız oldu. {details}",
       "disabled": "Saropa Lints devre dışı bırakıldı. Proje dosyaları değiştirilmedi.",
       "disabledAnalyzer": "Saropa Lints entegrasyonu kapalı. Analizör teşhisleri kısa sürede temizlenecek; toggle Lint entegrasyonu On restore.",
+      "reenabledPlugin": "Saropa Lints iç süreç eklentisi yeniden etkinleştirildi. Dart analiz sunucusunu yeniden başlatarak onu yeniden yüklüyor.",
+      "reenableNothingToRestore": "Saropa Lints: geri yüklenmesi gereken şey yok. Eklenti aracılığıyla şu anda işlem içi eklenti devre dışı bırakılmamıştır.",
       "noOpenDartFiles": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. hiçbir açık Dart dosyası bulunamadı. Bir Dart dosyasını yeniden açın veya \"Sadece editörleri aç\" ayarını kapatın.",
       "configUpdated": "Saropa Lints konfigürasyonu güncellenmiştir (kat: {tier}).) olarak tanımlanır.",
       "configWriteFailed": "Config write başarısız oldu. {details}",

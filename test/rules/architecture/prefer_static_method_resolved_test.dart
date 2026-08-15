@@ -37,12 +37,10 @@ class Counter {
       expect(codes, isNot(contains('prefer_static_method')));
     });
 
-    test(
-      'does NOT flag a bare field WRITE '
-      '(regression: SimpleIdentifier.element is null for a pure write '
-      'target, unlike a read — must fall back to writeElement)',
-      () async {
-        final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
+    test('does NOT flag a bare field WRITE '
+        '(regression: SimpleIdentifier.element is null for a pure write '
+        'target, unlike a read — must fall back to writeElement)', () async {
+      final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
 class Counter {
   int _count = 0;
 
@@ -51,12 +49,13 @@ class Counter {
   }
 }
 ''');
-        expect(codes, isNot(contains('prefer_static_method')));
-      },
-    );
+      expect(codes, isNot(contains('prefer_static_method')));
+    });
 
-    test('does NOT flag a bare field increment/decrement/compound-assign', () async {
-      final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
+    test(
+      'does NOT flag a bare field increment/decrement/compound-assign',
+      () async {
+        final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
 class Counter {
   int _count = 0;
 
@@ -73,8 +72,9 @@ class Counter {
   }
 }
 ''');
-      expect(codes, isNot(contains('prefer_static_method')));
-    });
+        expect(codes, isNot(contains('prefer_static_method')));
+      },
+    );
 
     test('does NOT flag a bare instance-method call', () async {
       final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
@@ -113,12 +113,10 @@ class Counter {
       expect(codes, contains('prefer_static_method'));
     });
 
-    test(
-      'still flags a method whose only calls are on a LOCAL variable '
-      '(regression: values.fold(...) resolves to List, an InterfaceElement, '
-      'even though the receiver is not `this`)',
-      () async {
-        final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
+    test('still flags a method whose only calls are on a LOCAL variable '
+        '(regression: values.fold(...) resolves to List, an InterfaceElement, '
+        'even though the receiver is not `this`)', () async {
+      final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
 class Counter {
   int _count = 0;
 
@@ -128,16 +126,13 @@ class Counter {
   }
 }
 ''');
-        expect(codes, contains('prefer_static_method'));
-      },
-    );
+      expect(codes, contains('prefer_static_method'));
+    });
 
-    test(
-      'still flags a method whose only calls are cascaded on a LOCAL '
-      'variable (regression: cascade sections also parse with '
-      'target == null, same AST shape as a bare call)',
-      () async {
-        final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
+    test('still flags a method whose only calls are cascaded on a LOCAL '
+        'variable (regression: cascade sections also parse with '
+        'target == null, same AST shape as a bare call)', () async {
+      final codes = await reportedRuleCodes(PreferStaticMethodRule(), '''
 class Counter {
   int _count = 0;
 
@@ -147,9 +142,8 @@ class Counter {
   }
 }
 ''');
-        expect(codes, contains('prefer_static_method'));
-      },
-    );
+      expect(codes, contains('prefer_static_method'));
+    });
 
     test('does NOT flag a cascade on `this`', () async {
       // `_helper` itself must also read instance state here, or its own

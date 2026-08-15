@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: = ПХ1: config write не вдалося. {details}",
       "disabled": "Saropa Lints відключено. Файли проекту не були змінені.",
       "disabledAnalyzer": "Saropa Lints інтеграція відключена. Аналізовані діагностичні дані аналізатора будуть очищені незабаром; перемикайте Lint integration Включити для відновлення.",
+      "reenabledPlugin": "Saropa Lints вбудований плагін відновлено. Перезапуск аналізового сервера Dart для перезавантаження.",
+      "reenableNothingToRestore": "Saropa Lints: нічого не можна відновити. Плагін в процесі не вимкнено через розширення наразі.",
       "noOpenDartFiles": "Saropa Lints: = ПХ0__ (по-моєму, це є не знайдено відкритих файлів Dart. Відкрийте файл Dart або відключіть настройку \"Відкрити тільки для редакторів\".",
       "configUpdated": "Saropa Lints конфігурація оновлена (рівня: {tier}). в) В. Прізвиток",
       "configWriteFailed": "Невдало написати конфігурацію. {details}",

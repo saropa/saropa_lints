@@ -33,8 +33,8 @@
 /// goes to stderr; stdout carries only protocol messages.
 ///
 /// Startup:
-///   dart run saropa_lints:scan_daemon <projectRoot> [--tier <tier>]
-///       [--max-rss-mb <mb>]
+///   dart run saropa_lints:scan_daemon `<projectRoot>` [--tier `<tier>`]
+///       [--max-rss-mb `<mb>`]
 ///
 /// Once the initial collection build + prewarm finishes (slow — about a
 /// minute on a large project), the daemon writes one line to stdout:

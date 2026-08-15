@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: jest to grupa, która zawiera Nie powiodło się zapisanie konfiguracji. {details}",
       "disabled": "Saropa Lints jest wyłączony. Pliki projektu nie zostały zmienione.",
       "disabledAnalyzer": "Saropa Lints integracja wyłączona. Diagnostyka analizatora zostanie wkrótce wyczyszczona; przełączyć integrację Lint Na przywrócenie.",
+      "reenabledPlugin": "Saropa Lints włączono ponownie jako w-process plugin. Uruchamianie ponownie serwera analizy Dart, aby załadować go ponownie.",
+      "reenableNothingToRestore": "Saropa Lints: nic do przywrócenia. Wtyczka w procesie nie jest obecnie wyłączona przez rozszerzenie.",
       "noOpenDartFiles": "Saropa Lints: to znaczy, że jest nie znaleziono żadnych otwartych plików Dart. Ponownie otwórz plik Dart lub wyłącz ustawienie \"Otwieraj tylko edytorów\".",
       "configUpdated": "Saropa Lints konfiguracja uaktualniona (poziom: poziom: {tier}). - To jest to, co się nazywa ________.",
       "configWriteFailed": "Nie powiodło się zapisanie konfiguracji. {details}",

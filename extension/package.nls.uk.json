@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints**** ПФО - це рівень рівня крові.\n\n2100+ Dart і Flutter правила для безпеки, доступності та продуктивності.\n\nПотрібен проект Dart або Flutter.\n\nДля початку відкрийте папку, що містить `pubspec.yaml̅.\n\n[Узнайте більше онлайн] (https://pub.dev/packages/saropa_lints)\n[Проглянути всі команди] (команда:saropaLints.showCommandCatalog)\n[Про Saropa Lints] (команда:saropaLints.showAbout)\n[Починаємо] (команда:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Налаштувати проект (pubspec + config)",
   "command.disable.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Вимкніть інтеграцію Lint Integration",
+  "command.reenablePlugin.title": "Saropa Lints: Повернення вбудованого плагіну",
   "command.runAnalysis.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Запустити аналіз.",
   "command.verifyPlugin.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Перевірте, що плагін працює (проведення життєздатності)",
   "command.initializeConfig.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Ініціалізувати / оновлювати параметри аналізу",

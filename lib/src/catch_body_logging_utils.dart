@@ -2,7 +2,7 @@
 
 /// Shared detection for "does this catch block forward the caught error to a
 /// logging or crash-reporting call" — the single source of truth for the
-/// method/receiver name lists used by [error_handling_rules.dart]'s
+/// method/receiver name lists used by `error_handling_rules.dart`'s
 /// `require_error_logging` rule and by `avoid_catching_generic_exception`'s
 /// body-inspection exemption for deliberately-broad `on Object`/`on
 /// Exception` catches that immediately report before falling back.
@@ -117,7 +117,8 @@ class _LoggingCallVisitor extends RecursiveAstVisitor<void> {
         found = true;
       } else {
         final String? receiver = _leftmostIdentifierName(node.target);
-        if (receiver != null && catchBodyLoggerReceiverNames.contains(receiver)) {
+        if (receiver != null &&
+            catchBodyLoggerReceiverNames.contains(receiver)) {
           found = true;
         }
       }

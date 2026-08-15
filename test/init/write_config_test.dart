@@ -111,13 +111,15 @@ plugins:
     // A project where integration was explicitly turned off (sentinel
     // present) must stay off through a regenerate — turning saropaLints.
     // enabled back on must not silently restore the heavy in-process plugin.
-    test('existing disabled plugins block stays disabled after a tier change', () {
-      final dir = Directory.systemTemp.createTempSync('write_config_test');
-      try {
-        final outputFile = File(
-          '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
-        );
-        outputFile.writeAsStringSync('''
+    test(
+      'existing disabled plugins block stays disabled after a tier change',
+      () {
+        final dir = Directory.systemTemp.createTempSync('write_config_test');
+        try {
+          final outputFile = File(
+            '${dir.path}${Platform.pathSeparator}analysis_options.yaml',
+          );
+          outputFile.writeAsStringSync('''
 # >>> saropa_lints integration turned OFF by the VS Code extension — toggle "Lint integration" On to restore >>>
 # plugins:
 #   saropa_lints:
@@ -127,23 +129,24 @@ plugins:
 # <<< saropa_lints end of disabled integration block <<<
 ''');
 
-        final result = runWriteConfig(
-          WriteConfigOptions(targetDir: dir.path, tier: 'professional'),
-        );
-        expect(result.ok, isTrue);
+          final result = runWriteConfig(
+            WriteConfigOptions(targetDir: dir.path, tier: 'professional'),
+          );
+          expect(result.ok, isTrue);
 
-        final content = outputFile.readAsStringSync();
-        expect(
-          content,
-          contains(
-            'saropa_lints integration turned OFF by the VS Code extension',
-          ),
-        );
-        expect(content, isNot(contains('\nplugins:\n')));
-      } finally {
-        dir.deleteSync(recursive: true);
-      }
-    });
+          final content = outputFile.readAsStringSync();
+          expect(
+            content,
+            contains(
+              'saropa_lints integration turned OFF by the VS Code extension',
+            ),
+          );
+          expect(content, isNot(contains('\nplugins:\n')));
+        } finally {
+          dir.deleteSync(recursive: true);
+        }
+      },
+    );
 
     test('creates analysis_options_custom.yaml when missing', () {
       final dir = Directory.systemTemp.createTempSync('write_config_test');

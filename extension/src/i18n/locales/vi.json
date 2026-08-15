@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: là một loại tế bào có thể config write failed. {details} Không có gì để làm",
       "disabled": "Saropa Lints bị vô hiệu hóa. Các tệp dự án không được thay đổi.",
       "disabledAnalyzer": "Saropa Lints tích hợp bị tắt. Chẩn đoán của máy phân tích sẽ sớm được làm rõ; toggle Lint integration On để khôi phục.",
+      "reenabledPlugin": "Saropa Lints plugin được kích hoạt lại trong quá trình xử lý. Đang khởi động lại máy chủ phân tích Dart để tải lại nó.",
+      "reenableNothingToRestore": "Saropa Lints: không có gì để khôi phục. Plugin trong quá trình không đang bị vô hiệu hóa bởi tiện ích mở rộng hiện tại.",
       "noOpenDartFiles": "Saropa Lints: là người có thể không tìm thấy tệp Dart mở. Mở lại một tập tin Dart hoặc tắt cài đặt \"Chỉ mở các trình soạn thảo\".",
       "configUpdated": "Saropa Lints config được cập nhật (tier: {tier}). và các loại khác nhau.",
       "configWriteFailed": "Config write failed. {details} Không thành công",

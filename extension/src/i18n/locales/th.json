@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: เป็นการตรวจหา config write ไม่สําเร็จ. {details} การเขียนแบบการตั้งค่า",
       "disabled": "Saropa Lints มีการพิทักษ์. ไฟล์โครงการไม่ได้ถูกเปลี่ยน.",
       "disabledAnalyzer": "Saropa Lints การรวมตัวถูกปิด. การวินิจฉัย Analyzer จะไถ่ในไม่ช้า; toggle Lint integration เปิดเพื่อฟื้นคืนการ",
+      "reenabledPlugin": "Saropa Lints ปลั๊กอินในกระบวนการถูกเปิดใช้งานอีกครั้ง กำลังเริ่มต้น Dart เซิร์ฟเวอร์การวิเคราะห์เพื่อโหลดมันใหม่",
+      "reenableNothingToRestore": "Saropa Lints: ไม่มีอะไรให้กู้คืน ปลั๊กอินที่ทำงานในกระบวนการไม่ได้ถูกปิดใช้งานผ่านการขยายในขณะนี้",
       "noOpenDartFiles": "Saropa Lints: เป็นการประกอบของ ไม่พบไฟล์ Dart เปิด เปิดไฟล์ Dart อีกครั้ง หรือปิดการตั้งค่า \"เปิดเฉพาะบรรณาธิการ\"",
       "configUpdated": "Saropa Lints config อัพเดทแล้ว (ชั้น: ระดับที่ 1 {tier}).การใช้งานของ PH0__",
       "configWriteFailed": "Config write ไม่สําเร็จ {details} การเขียนการตั้งค่า",

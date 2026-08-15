@@ -40,7 +40,8 @@ class MoveDeclarationCloserFix extends SaropaFixProducer {
     final AstNode? node = coveringNode;
     if (node == null) return;
 
-    final VariableDeclarationStatement? declStatement = node is VariableDeclarationStatement
+    final VariableDeclarationStatement? declStatement =
+        node is VariableDeclarationStatement
         ? node
         : node.thisOrAncestorOfType<VariableDeclarationStatement>();
     if (declStatement == null) return;
@@ -81,9 +82,7 @@ class MoveDeclarationCloserFix extends SaropaFixProducer {
     );
     if (initializerNames.isNotEmpty) {
       for (int i = declIndex + 1; i < useIndex; i++) {
-        final Set<String> siblingNames = _collectIdentifierNames(
-          statements[i],
-        );
+        final Set<String> siblingNames = _collectIdentifierNames(statements[i]);
         if (siblingNames.intersection(initializerNames).isNotEmpty) return;
       }
     }

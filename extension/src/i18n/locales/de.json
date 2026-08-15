@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: Das ist ein _PH1-Präparat. Config-Schreibfehler. {details}",
       "disabled": "Saropa Lints ist deaktiviert. Projektdateien wurden nicht geändert.",
       "disabledAnalyzer": "Saropa Lints Integration ausgeschaltet. Die Diagnostik der Analysatoren wird in Kürze geklärt; Schalten Sie die Lint-Integration ein, um wiederherzustellen.",
+      "reenabledPlugin": "Saropa Lints in-process Plugin wurde wieder aktiviert. Der Dart Analyse-Server wird neu gestartet, um es zu laden.",
+      "reenableNothingToRestore": "Saropa Lints: nichts zum Wiederherstellen. Der im Prozess laufende Plugin ist derzeit nicht über die Erweiterung deaktiviert.",
       "noOpenDartFiles": "Saropa Lints: Das ist ein _PH0_. keine offenen Dart Dateien gefunden. Öffnen Sie eine Dart Datei erneut oder deaktivieren Sie die Einstellung \"Nur für Redakteure öffnen\".",
       "configUpdated": "Saropa Lints config aktualisiert (Tier: {tier}). und die sind sehr gut.",
       "configWriteFailed": "Config-Schreibfehler. {details}",

@@ -534,15 +534,16 @@ Future<void> runInit(List<String> args) async {
   // plans/PLAN_scan_only_diagnostics.md). An existing project's live/off
   // state is preserved either way: a live block stays live, and a
   // previously-disabled block stays disabled through a regenerate/--reset.
-  final bool wasDisabled = existingContent.contains(
-    pluginsDisabledBeginMarker,
-  );
+  final bool wasDisabled = existingContent.contains(pluginsDisabledBeginMarker);
   final String pluginsBlock = (isNewFile || wasDisabled)
       ? wrapPluginsYamlAsDisabled(pluginsYaml)
       : pluginsYaml;
 
   // Replace plugins section in existing content, preserving everything else
-  final String newContent = replacePluginsSection(existingContent, pluginsBlock);
+  final String newContent = replacePluginsSection(
+    existingContent,
+    pluginsBlock,
+  );
 
   if (cliArgs.isDryRun) {
     log.terminal('${InitColors.yellow}━━━ DRY RUN ━━━${InitColors.reset}');

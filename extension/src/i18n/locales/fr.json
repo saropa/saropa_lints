@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: Il s'agit de la protéine du cerveau. L'écriture du configurateur a échoué. {details}",
       "disabled": "Saropa Lints est désactivé. Les fichiers du projet n'ont pas été modifiés.",
       "disabledAnalyzer": "Saropa Lints l'intégration est désactivée. Les diagnostics des analyseurs seront bientôt effacés; basculez sur Lint intégration On pour restaurer.",
+      "reenabledPlugin": "Saropa Lints plugin en cours de traitement réactivé. Redémarrage du serveur d'analyse Dart pour le recharger.",
+      "reenableNothingToRestore": "Saropa Lints : rien à restaurer. Le plugin en cours de traitement n'est pas actuellement désactivé via l'extension.",
       "noOpenDartFiles": "Saropa Lints: Il s'agit de la réponse à une question. Aucun fichier ouvert Dart n'a été trouvé. Réouvrez un fichier Dart ou désactivez le paramètre \" Ouvrir uniquement les éditeurs \".",
       "configUpdated": "Saropa Lints config est mis à jour (niveau: {tier}). est une forme de phono.",
       "configWriteFailed": "L'écriture de configuration a échoué. {details}",

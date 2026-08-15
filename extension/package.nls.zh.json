@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2100 多个 Dart 和 Flutter lint 规则，用于安全性、可访问性和性能。\n\n需要 Dart 或 Flutter 项目。\n\n打开包含“pubspec.yaml”的文件夹即可开始。\n\n[在线了解更多](https://pub.dev/packages/saropa_lints)\n[浏览所有命令]（命令：saropaLints.showCommandCatalog）\n[关于Saropa Lints]（命令：saropaLints.showAbout）\n[入门]（命令：saropaLints.openWalkthrough）",
   "command.enable.title": "Saropa Lints: 没有一个人. 设置项目 (pubspec + config) 的一个组件.",
   "command.disable.title": "Saropa Lints: 没有一个人. 关闭带线集成的功能",
+  "command.reenablePlugin.title": "Saropa Lints: 重新启用进程内插件",
   "command.runAnalysis.title": "Saropa Lints: 没有一个人. 运行分析,进行分析.",
   "command.verifyPlugin.title": "Saropa Lints: 没有一个人. 验证插件正在运行 (活力检查)",
   "command.initializeConfig.title": "Saropa Lints: 没有一个人. 初始化 /更新分析选项",

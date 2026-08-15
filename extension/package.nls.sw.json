@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart na Flutter sheria za lint kwa usalama, upatikanaji, na utendaji.\n\nInahitaji mradi wa Dart au Flutter.\n\nFungua folda iliyo na faili ya `pubspec.yaml̅ ili uanze.\n\n[Jifunze zaidi mtandaoni] (https://pub.dev/packages/saropa_lints)\n[Browse All Commands] ((amri:saropaLints.onyeshaKatalog ya amri))\n[Kuhusu Saropa Lints] ((amri:saropaLints.showAbout)\n[Kuanza] ((amri:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Kuanzisha Mradi (pubspec + config)",
   "command.disable.title": "Saropa Lints: Zima Ushirikiano wa Lint ya Lint",
+  "command.reenablePlugin.title": "Saropa Lints: Tumia Plugin ya Kati ya Kati",
   "command.runAnalysis.title": "Saropa Lints: Run Uchambuzi wa kukimbia.",
   "command.verifyPlugin.title": "Saropa Lints: Kuthibitisha Plugin ni Running (Uhai kuangalia)",
   "command.initializeConfig.title": "Saropa Lints: Initialize / Update Uchambuzi Chaguzi chaguo.",

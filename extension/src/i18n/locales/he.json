@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: - פטריוטיביות כתיבת התצורה נכשלה. {details}",
       "disabled": "Saropa Lints הוא מופעל. קבצי הפרויקט לא הוחלפו.",
       "disabledAnalyzer": "Saropa Lints אינטגרציה כבויה. אבחון האנליזאר יבהר בקרוב; להפעיל את אינטגרציה Lint על כדי לשחזר.",
+      "reenabledPlugin": "המוצר Saropa Lints של ההרחבה בפועל הופעל מחדש. אתחול מחדש את שרת ניתוח Dart כדי לטעון אותו.",
+      "reenableNothingToRestore": "Saropa Lints: אין מה לשחזר. הרחבת הפלוגין בתהליך אינה מושבתת כרגע.",
       "noOpenDartFiles": "Saropa Lints: זה היה חרא. לא נמצאו קבצי Dart פתוחים. פתח מחדש קובץ Dart או לכבות את ההגדרה \"פתוח עורך בלבד\".",
       "configUpdated": "Saropa Lints config עדכון (שכבה: {tier}).היא הייתה בתפקיד.",
       "configWriteFailed": "כתיבת התצורה נכשלה. {details}",

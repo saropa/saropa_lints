@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart 및 Flutter 안전, 접근성 및 성능을 위한 lint 규칙.\n\nDart 또는 Flutter 프로젝트가 필요합니다.\n\n시작하기 위해 `pubspec.yaml`를 포함하는 폴더를 열으십시오.\n\n[온라인에서 더 알아보세요] (https://pub.dev/packages/saropa_lints)\n[모든 명령어를 탐색] (명령:saropaLints.showCommandCatalog)\n[그것에 대해 Saropa Lints] (명령:saropaLints.showAbout)\n[시작] (명령:saropaLints.openWalkthrough) 를 통해 진행됩니다",
   "command.enable.title": "Saropa Lints: 프로젝트를 설정 (pubspec + config)",
   "command.disable.title": "Saropa Lints: 리트 통합을 끄십시오.",
+  "command.reenablePlugin.title": "Saropa Lints: 인 프로세스 플러그인 다시 활성화",
   "command.runAnalysis.title": "Saropa Lints: 분석을 실행합니다.",
   "command.verifyPlugin.title": "Saropa Lints: 플러그인이 실행 중인지 확인 (생명성 검사)",
   "command.initializeConfig.title": "Saropa Lints: 분석 옵션을 초기화 / 업데이트하십시오.",

@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: _PH1_: - Ni aina ya kiini cha mwili. config write failed. {details} kuandika kushindwa.",
       "disabled": "Saropa Lints imezimwa. Faili za mradi hazijabadilishwa.",
       "disabledAnalyzer": "Saropa Lints ujumuishaji umezuiwa. Diagnostics analyzer itakuwa wazi hivi karibuni; kubadili Lint ushirikiano On kurejesha.",
+      "reenabledPlugin": "Unganisha plugin wa kati Saropa Lints. Kupakia server wa analizi ya Dart kujaribu kujaribu.",
+      "reenableNothingToRestore": "Saropa Lints: hapa kujitambua. Plugin in-process haukotambua kwa makini kwa extension.",
       "noOpenDartFiles": "Saropa Lints:: kwa hiyo ni sawa. hakuna faili wazi za Dart zilizopatikana. Fungua tena faili ya Dart au uzime mipangilio \"Fungua wahariri tu\".",
       "configUpdated": "Saropa Lints config updated (tier: tier: imefanywa kuwa ya kisasa) {tier}). kwa hiyo, ni lazima uwe na",
       "configWriteFailed": "Config write imeshindwa. {details}",

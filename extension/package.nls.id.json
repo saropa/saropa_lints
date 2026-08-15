@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart dan Flutter aturan lint untuk keamanan, aksesibilitas, dan kinerja.\n\nMembutuhkan proyek Dart atau Flutter.\n\nBuka folder yang berisi `pubspec.yaml̅ untuk memulai.\n\n[Learn more online]https://pub.dev/packages/saropa_lints) (dalam bahasa Inggris).\n[Browse All Commands] (perintah:saropaLints.tunjukkan Katalog Komando)\n[Tentang Saropa Lints] (perintah:saropaLints.showAbout)\n[Mulai] (perintah: saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Mengatur Proyek (pubspec + config)",
   "command.disable.title": "Saropa Lints: Matikan Integrasi Lint",
+  "command.reenablePlugin.title": "Saropa Lints: Aktifkan Kembali Plugin In-Process",
   "command.runAnalysis.title": "Saropa Lints: Jalankan Analisis.",
   "command.verifyPlugin.title": "Saropa Lints: Verifikasi Plugin sedang berjalan (cek keaktifan)",
   "command.initializeConfig.title": "Saropa Lints: Inisialisasi / Perbarui Opsi Analisis.",

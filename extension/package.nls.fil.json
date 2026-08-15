@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart at Flutter mga patakaran ng lint para sa seguridad, kakayahang ma-access, at pagganap.\n\nKinakailangan ng isang Dart o Flutter proyekto.\n\nBuksan ang isang folder na naglalaman ng isang `pubspec.yaml̅ upang makapagsimula.\n\n[Magbasa nang higit pa sa online] (https://pub.dev/packages/saropa_lints)\n[Browse All Commands] ((command:saropaLints.showCommandCatalog) -[Tingnan ang Lahat ng mga Komando] (Ipakita ang Katalogan ng Mga Kumandong Kumandadong Kumandado)\n[Tungkol sa Saropa Lints] ((command:saropaLints.showAbout))\n[Pagsimula] (komando:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: I-set Up ang Proyekto (pubspec + config)",
   "command.disable.title": "Saropa Lints: Patayin ang Pagsasama ng Lint Integration",
+  "command.reenablePlugin.title": "Saropa Lints: I-palikas ang Plugin sa Loob ng Process",
   "command.runAnalysis.title": "Saropa Lints: Patakbuhin ang Pagsusuri",
   "command.verifyPlugin.title": "Saropa Lints: Verify Plugin Is Running (liveness check) - Suriin kung tumatakbo na ang plugin.",
   "command.initializeConfig.title": "Saropa Lints: I-initialize / I-update ang Analysis Options",

@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: é um tipo de células Config write falhou. {details}",
       "disabled": "Saropa Lints está desativado. Os arquivos do projeto não foram alterados.",
       "disabledAnalyzer": "Saropa Lints integração desligada. Os diagnósticos do analisador serão esclarecidos em breve; Troque a integração Lint para restaurar.",
+      "reenabledPlugin": "Saropa Lints plugin reativado no processo. Reiniciando o servidor de análise Dart para re carregar.",
+      "reenableNothingToRestore": "Saropa Lints: nada para restaurar. O plugin em processo não está atualmente desativado via extensão.",
       "noOpenDartFiles": "Saropa Lints: é um número de PH0__. Não foram encontrados arquivos abertos Dart. Reabra um arquivo Dart ou desligue a configuração \"Abrir somente editores\".",
       "configUpdated": "Saropa Lints config atualizado (nível: {tier}). é um termo usado para descrever a",
       "configWriteFailed": "Escrever configuração falhou. {details}",

@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: ヒトの体内にある config 書き込みが失敗しました. {details}",
       "disabled": "Saropa Lints は無効になっています. プロジェクトファイルは変更されていません.",
       "disabledAnalyzer": "Saropa Lints統合がオフになりました. 分析器の診断は間もなくクリアされる. トグタッチ Lint統合 復元をオンにする.",
+      "reenabledPlugin": "Saropa Lints プラグインが再び有効になりました。Dart 分析サーバーを再起動してそのプラグインを再読み込みしています。",
+      "reenableNothingToRestore": "Saropa Lints: 恢復するものがありません。拡張機能によって現在、インプロセスプラグインは無効にしていません。",
       "noOpenDartFiles": "Saropa Lints: フォローしている オープンした Dartファイルが見つかりませんでした. Dart ファイルを再開するか\",編集者のみを開く\"の設定をオフにします.",
       "configUpdated": "Saropa Lintsコンフィギュレーションを更新しました (Tier: {tier}). フォローしている",
       "configWriteFailed": "コンフィギュレーション書き込みが失敗しました. {details}",

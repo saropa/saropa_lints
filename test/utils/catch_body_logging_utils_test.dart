@@ -57,10 +57,7 @@ void main() {
     });
 
     test('returns false for a silently swallowed catch', () {
-      expect(
-        hasLoggingCall('on Object catch (e) { /* nothing */ }'),
-        isFalse,
-      );
+      expect(hasLoggingCall('on Object catch (e) { /* nothing */ }'), isFalse);
     });
 
     test('returns false when only unrelated calls are made', () {
@@ -74,25 +71,20 @@ void main() {
         // an unrelated string argument — only real method-invocation/
         // rethrow/throw nodes count.
         expect(
-          hasLoggingCall(
-            "catch (e) { showMessage('please log(in) again'); }",
-          ),
+          hasLoggingCall("catch (e) { showMessage('please log(in) again'); }"),
           isFalse,
         );
       },
     );
 
-    test(
-      'detects a logger-receiver call reached through a property chain',
-      () {
-        expect(
-          hasLoggingCall(
-            'on Object catch (e, s) { Crashlytics.instance.recordError(e, s); }',
-          ),
-          isTrue,
-        );
-      },
-    );
+    test('detects a logger-receiver call reached through a property chain', () {
+      expect(
+        hasLoggingCall(
+          'on Object catch (e, s) { Crashlytics.instance.recordError(e, s); }',
+        ),
+        isTrue,
+      );
+    });
   });
 }
 

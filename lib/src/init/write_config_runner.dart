@@ -204,9 +204,7 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
   // flip for someone already relying on it), and a previously-disabled
   // block stays disabled even after a tier change or Enable — turning on
   // scan-on-save must not silently turn the heavy plugin back on too.
-  final bool wasDisabled = existingContent.contains(
-    pluginsDisabledBeginMarker,
-  );
+  final bool wasDisabled = existingContent.contains(pluginsDisabledBeginMarker);
   final String pluginsBlock = (isNewFile || wasDisabled)
       ? wrapPluginsYamlAsDisabled(pluginsYaml)
       : pluginsYaml;

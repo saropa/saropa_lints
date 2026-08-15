@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: это число, которое соответствует числу config write не удалось. {details}",
       "disabled": "Saropa Lints отключен. Файлы проекта не были изменены.",
       "disabledAnalyzer": "Saropa Lints интеграция отключена. Диагностика анализатора будет вскоре очищена; переключатель интеграции Lint Включить для восстановления.",
+      "reenabledPlugin": "Saropa Lints встроенный плагин снова включен. Перезапуск анализатора Dart для перезагрузки.",
+      "reenableNothingToRestore": "Saropa Lints: ничего восстанавливать нечего. Встроенный плагин в настоящее время не отключен через расширение.",
       "noOpenDartFiles": "Saropa Lints: это - _PH0_. открытых Dart файлов не найдено. Откройте файл Dart или отключите настройку \"Открыть только для редакторов\".",
       "configUpdated": "Saropa Lints конфигурация обновлена (уровень: {tier}). это и есть",
       "configWriteFailed": "Не удалось записать конфигурацию. {details}",

@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\nセキュリティ、アクセシビリティ、パフォーマンスのための 2100 以上の Dart および Flutter lint ルール。\n\nDart または Flutter プロジェクトが必要です。\n\n開始するには、「pubspec.yaml」を含むフォルダーを開いてください。\n\n[オンラインで詳細を確認](https://pub.dev/packages/saropa_lints)\n[すべてのコマンドを参照](コマンド:saropaLints.showCommandCatalog)\n[Saropa Lints について](コマンド:saropaLints.showAbout)\n[はじめに](コマンド:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: プロジェクトを設定する (pubspec + config)",
   "command.disable.title": "Saropa Lints: リント統合をオフに",
+  "command.reenablePlugin.title": "Saropa Lints: インプロセスプラグインを再有効化",
   "command.runAnalysis.title": "Saropa Lints: 分析を実行する",
   "command.verifyPlugin.title": "Saropa Lints: プラグインの実行を確認 (活力チェック)",
   "command.initializeConfig.title": "Saropa Lints: 解析オプションを初期化 / アップデートする",

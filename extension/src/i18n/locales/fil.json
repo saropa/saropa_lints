@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili config write ay nabigo. {details}",
       "disabled": "Saropa Lints ay hindi pinagana. Ang mga file ng proyekto ay hindi binago.",
       "disabledAnalyzer": "Saropa Lints integration off. _PHO_ pag-iisa ay naka-off na. Ang mga diagnostics ng analyzer ay lilinisin sa lalong madaling panahon; i-toggle ang Lint integration On upang ibalik.",
+      "reenabledPlugin": "Saropa Lints plugin na ginamit sa proseso ay nagsimula muli. Nagrerestart ng server ng analisis ng Dart upang i-load ito muli.",
+      "reenableNothingToRestore": "Saropa Lints: walang nangangailangan i-restore. Ang plugin na nasa proseso ay hindi kasalukuyang naka-disable sa pamamagitan ng extension.",
       "noOpenDartFiles": "Saropa Lints: ang mga ito ay may _ph0__. walang bukas na Dart file natagpuan. Buksan muli ang isang Dart file o i-off ang \"Open editors only\" setting.",
       "configUpdated": "Saropa Lints config na-update (tier: ang antas ng pag-config ay hindi dapat i-upgrade) {tier}). sa pamamagitan ng .",
       "configWriteFailed": "Ang Config write ay nabigo. {details}",

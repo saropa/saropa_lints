@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: _PH1_: به معنی PH1. config write ناکام شد. {details}",
       "disabled": "Saropa Lints غیرفعال است. فایل های پروژه تغییر نکرده اند.",
       "disabledAnalyzer": "Saropa Lints یکپارچه سازی غیرفعال شد. تشخیص تجزیه کننده به زودی روشن خواهد شد؛ بر روی Lint integration تا بازیابی شود.",
+      "reenabledPlugin": "Saropa Lints پلاگین درون پروسه دوباره فعال شد. بازگردانی سرور تحلیل Dart را برای بارگذاری مجدد آن انجام می‌دهیم.",
+      "reenableNothingToRestore": "Saropa Lints: چیزی برای بازیابی نیست. پلاگین در процه نیست که اکنون از طریق افزونه غیرفعال شده است.",
       "noOpenDartFiles": "Saropa Lints: _PH0_: = PH0__::: -پای هیچ فایل Dart باز یافت نشد. یک فایل Dart را دوباره باز کنید یا تنظیمات \"فقط ویرایشگرها را باز کنید\" را غیرفعال کنید.",
       "configUpdated": "Saropa Lints config به روز شده است (سطح: سطح: {tier}).به طور کلی، این یک",
       "configWriteFailed": "نوشتن پیکربندی ناموفق شد. {details}",

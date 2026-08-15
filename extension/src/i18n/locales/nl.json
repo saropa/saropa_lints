@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: Het is een generieke vorm van _ph1__. config schrijven mislukte. {details}",
       "disabled": "Saropa Lints is uitgeschakeld. De projectbestanden zijn niet gewijzigd.",
       "disabledAnalyzer": "Saropa Lints integratie uitgeschakeld. De analyserdiagnostiek zal binnenkort worden opgehelderd; schakel Lint-integratie in om te herstellen.",
+      "reenabledPlugin": "Saropa Lints in-process plugin is opnieuw ingeschakeld. Herstarten van de Dart analyse-server om het op te laden.",
+      "reenableNothingToRestore": "Saropa Lints: niets te herstellen. Het in-proces plugin is momenteel niet gedeactiveerd via de extensie.",
       "noOpenDartFiles": "Saropa Lints: Het is een _PH0_. geen open Dart bestanden gevonden. Heropent een Dart bestand of schakel de instelling \"Alleen editors openen\" uit.",
       "configUpdated": "Saropa Lints config is bijgewerkt (tier: {tier}). het is een soort van",
       "configWriteFailed": "Config schrijven mislukte. {details}",

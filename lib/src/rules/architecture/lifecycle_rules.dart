@@ -798,9 +798,7 @@ class RequireAppLifecycleHandlingRule extends SaropaLintRule {
         for (final VariableDeclaration variable in member.fields.variables) {
           final Expression? initializer = variable.initializer;
           if (initializer != null &&
-              _BackgroundWorkVisitor._isBackgroundWorkExpression(
-                initializer,
-              )) {
+              _BackgroundWorkVisitor._isBackgroundWorkExpression(initializer)) {
             visitor.fieldNames.add(variable.name.lexeme);
           }
         }

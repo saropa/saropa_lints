@@ -6,10 +6,12 @@ import '../../support/resolved_rule_harness.dart';
 /// top-level function (bugs/require_firebase_app_check_production_false_positive_activation_in_separate_function.md).
 void main() {
   group('RequireFirebaseAppCheckProductionRule', () {
-    test('does not fire when activate() is in a separate top-level function', () async {
-      final diags = await runRuleResolved(
-        RequireFirebaseAppCheckProductionRule(),
-        '''
+    test(
+      'does not fire when activate() is in a separate top-level function',
+      () async {
+        final diags = await runRuleResolved(
+          RequireFirebaseAppCheckProductionRule(),
+          '''
 // uses firebase
 class Firebase { static Future<void> initializeApp() async {} }
 class FirebaseAppCheck {
@@ -28,9 +30,10 @@ Future<void> initAppCheckLater() async {
 
 void scheduleStartupTask(Future<void> Function() task) {}
 ''',
-      );
-      expect(diags, isEmpty);
-    });
+        );
+        expect(diags, isEmpty);
+      },
+    );
 
     test('fires when no activation exists anywhere in the file', () async {
       final diags = await runRuleResolved(
@@ -44,13 +47,18 @@ Future<void> main() async {
 }
 ''',
       );
-      expect(diags.map((d) => d.ruleName), contains('require_firebase_app_check_production'));
+      expect(
+        diags.map((d) => d.ruleName),
+        contains('require_firebase_app_check_production'),
+      );
     });
 
-    test('still fires when the activating function is never called (dead code)', () async {
-      final diags = await runRuleResolved(
-        RequireFirebaseAppCheckProductionRule(),
-        '''
+    test(
+      'still fires when the activating function is never called (dead code)',
+      () async {
+        final diags = await runRuleResolved(
+          RequireFirebaseAppCheckProductionRule(),
+          '''
 // uses firebase
 class Firebase { static Future<void> initializeApp() async {} }
 class FirebaseAppCheck {
@@ -67,9 +75,13 @@ Future<void> _unusedInitAppCheck() async {
   await FirebaseAppCheck.instance.activate();
 }
 ''',
-      );
-      expect(diags.map((d) => d.ruleName), contains('require_firebase_app_check_production'));
-    });
+        );
+        expect(
+          diags.map((d) => d.ruleName),
+          contains('require_firebase_app_check_production'),
+        );
+      },
+    );
 
     test('still fires when AppCheck is only mentioned in a comment', () async {
       final diags = await runRuleResolved(
@@ -84,15 +96,18 @@ Future<void> main() async {
 }
 ''',
       );
-      expect(diags.map((d) => d.ruleName), contains('require_firebase_app_check_production'));
+      expect(
+        diags.map((d) => d.ruleName),
+        contains('require_firebase_app_check_production'),
+      );
     });
   });
 
   group('RequireFirebaseAppCheckRule', () {
-    test('does not fire when activate() is in a separate top-level function', () async {
-      final diags = await runRuleResolved(
-        RequireFirebaseAppCheckRule(),
-        '''
+    test(
+      'does not fire when activate() is in a separate top-level function',
+      () async {
+        final diags = await runRuleResolved(RequireFirebaseAppCheckRule(), '''
 class Firebase { static Future<void> initializeApp() async {} }
 class FirebaseAppCheck {
   static FirebaseAppCheck get instance => FirebaseAppCheck();
@@ -109,24 +124,24 @@ Future<void> initAppCheckLater() async {
 }
 
 void scheduleStartupTask(Future<void> Function() task) {}
-''',
-      );
-      expect(diags, isEmpty);
-    });
+''');
+        expect(diags, isEmpty);
+      },
+    );
 
     test('fires when no activation exists anywhere in the file', () async {
-      final diags = await runRuleResolved(
-        RequireFirebaseAppCheckRule(),
-        '''
+      final diags = await runRuleResolved(RequireFirebaseAppCheckRule(), '''
 // uses firebase
 class Firebase { static Future<void> initializeApp() async {} }
 
 Future<void> main() async {
   await Firebase.initializeApp();
 }
-''',
+''');
+      expect(
+        diags.map((d) => d.ruleName),
+        contains('require_firebase_app_check'),
       );
-      expect(diags.map((d) => d.ruleName), contains('require_firebase_app_check'));
     });
   });
 }

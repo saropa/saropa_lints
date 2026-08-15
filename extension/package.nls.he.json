@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2100+ כללי מוך Dart ו-Flutter לאבטחה, נגישות וביצועים.\n\nדורש פרויקט Dart או Flutter.\n\nפתח תיקיה המכילה 'pubspec.yaml' כדי להתחיל.\n\n[למידע נוסף באינטרנט](https://pub.dev/packages/saropa_lints)\n[עיין בכל הפקודות](command:saropaLints.showCommandCatalog)\n[אודות Saropa Lints](command:saropaLints.showAbout)\n[תחילת העבודה](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: הגדרת פרויקט (pubspec + config)",
   "command.disable.title": "Saropa Lints: כבה את אינטגרציה של Lint",
+  "command.reenablePlugin.title": "Saropa Lints: הפעלה מחדש של מודול פלגרען בתוך התהליך",
   "command.runAnalysis.title": "Saropa Lints: רץ ניתוח",
   "command.verifyPlugin.title": "Saropa Lints: אימת התוספת פועלת (בדיקת חיות)",
   "command.initializeConfig.title": "Saropa Lints: הפעלת פתיחה / עדכון של אפשרויות ניתוח.",

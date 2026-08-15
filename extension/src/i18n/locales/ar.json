@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: هيئة البيانات الحيوية فشل كتابة التكوين. {details}",
       "disabled": "Saropa Lints معطلة. لم يتم تغيير ملفات المشروع.",
       "disabledAnalyzer": "Saropa Lints تم إيقاف التكامل. سيتم إزالة تشخيصات المحلل قريباً؛ التبديل Lint تكامل على لاستعادة.",
+      "reenabledPlugin": "تم إعادة تمكين مُساعِد Saropa Lints داخل العملية. إعادة تشغيل خادم تحليل Dart لتحميله مرة أخرى.",
+      "reenableNothingToRestore": "Saropa Lints: لا شيء لاستعادة. لا يُعتبر المُتوَقِّف في العملية حاليًا مُعطَّلًا من خلال التوسِيع.",
       "noOpenDartFiles": "Saropa Lints: هيئة إدارة المعلومات لم يتم العثور على أي ملفات مفتوحة Dart. أعد فتح ملف Dart أو قم بإيقاف تشغيل إعداد \"فتح المحررين فقط\".",
       "configUpdated": "Saropa Lints config تم تحديثها (الدرجة: {tier}).) ، وذلك بسبب أنّه",
       "configWriteFailed": "فشل كتابة التكوين. {details}",

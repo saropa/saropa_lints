@@ -1813,6 +1813,8 @@
       "configWriteFailedNs": "Saropa Lints: adalah suatu senyawa yang config write gagal. {details}",
       "disabled": "Saropa Lints dinonaktifkan. File proyek tidak diubah.",
       "disabledAnalyzer": "Saropa Lints integrasi dimatikan. Diagnostik analis akan segera dibersihkan; toggle Integrasi Lint Dihidupkan untuk mengembalikan.",
+      "reenabledPlugin": "Saropa Lints plugin dalam proses diaktifkan kembali. Mengulang restart server analisis Dart untuk memuat ulangnya.",
+      "reenableNothingToRestore": "Saropa Lints: tidak ada yang bisa dikembalikan. Plugin dalam proses tidak saat ini dinonaktifkan melalui ekstensi.",
       "noOpenDartFiles": "Saropa Lints: adalah suatu bentuk dari _PH0_. tidak ada file Dart terbuka yang ditemukan. Buka kembali file Dart atau matikan pengaturan \"Buka editor saja\".",
       "configUpdated": "Saropa Lints config diperbarui (tier: {tier}). dan lain-lain.",
       "configWriteFailed": "Config write gagal. {details}",

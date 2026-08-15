@@ -156,18 +156,14 @@ String generatePluginsYaml({
   buffer.writeln(
     '    # Code extension\'s scan-on-save (out-of-process, ~3 GB fixed) covers',
   );
-  buffer.writeln(
-    '    # the same diagnostics for a fraction of the cost — see',
-  );
+  buffer.writeln('    # the same diagnostics for a fraction of the cost — see');
   buffer.writeln(
     '    # plans/PLAN_scan_only_diagnostics.md. New projects get this block',
   );
   buffer.writeln(
     '    # commented out by default for that reason; delete the sentinel',
   );
-  buffer.writeln(
-    '    # comment lines around it to run it live.',
-  );
+  buffer.writeln('    # comment lines around it to run it live.');
   buffer.writeln(
     '    # ═══════════════════════════════════════════════════════════════════',
   );

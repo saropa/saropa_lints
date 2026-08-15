@@ -11,6 +11,7 @@
   "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart और Flutter सुरक्षा, पहुंच और प्रदर्शन के लिए नियम।\n\nएक Dart या Flutter परियोजना की आवश्यकता है।\n\nप्रारंभ करने के लिए एक फ़ोल्डर खोलें जिसमें `pubspec.yaml̅ है।\n\n[अधिक ऑनलाइन जानें] (https://pub.dev/packages/saropa_lints)\n[सभी कमांड ब्राउज़ करें] (कमांडःsaropaLints. showCommandCatalog)\n[के बारे में Saropa Lints]{कमांडःsaropaLints.showAbout}\n[प्रारंभ] (कमांडः saropaLints. openWalkthrough)",
   "command.enable.title": "Saropa Lints: प्रोजेक्ट सेट अप करें (pubspec + config)",
   "command.disable.title": "Saropa Lints: लिंट एकीकरण को बंद करें",
+  "command.reenablePlugin.title": "Saropa Lints: इन-प्रोसेस प्लगइन फिर से सक्रिय करें",
   "command.runAnalysis.title": "Saropa Lints: विश्लेषण चलाएँ",
   "command.verifyPlugin.title": "Saropa Lints: सत्यापित करें प्लगइन चल रहा है (जीवन की जाँच)",
   "command.initializeConfig.title": "Saropa Lints: विश्लेषण विकल्पों को आरंभ / अद्यतन करें",
