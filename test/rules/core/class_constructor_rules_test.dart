@@ -111,12 +111,12 @@ void main() {
     );
     testRule(
       'AvoidUnusedConstructorParametersRule',
-      'avoid_unused_constructor_parameters',
+      'avoid_unused_constructor_parameters_skip_private',
       () => AvoidUnusedConstructorParametersRule(),
     );
     testRule(
       'AvoidFieldInitializersInConstClassesRule',
-      'avoid_field_initializers_in_const_classes',
+      'avoid_field_initializers_in_const_classes_relaxed',
       () => AvoidFieldInitializersInConstClassesRule(),
     );
     testRule(
@@ -126,17 +126,17 @@ void main() {
     );
     testRule(
       'PreferAssertsInInitializerListsRule',
-      'prefer_asserts_in_initializer_lists',
+      'prefer_asserts_in_initializer_lists_safe',
       () => PreferAssertsInInitializerListsRule(),
     );
     testRule(
       'PreferConstConstructorsInImmutablesRule',
-      'prefer_const_constructors_in_immutables',
+      'prefer_const_constructors_in_immutables_extended',
       () => PreferConstConstructorsInImmutablesRule(),
     );
     testRule(
       'PreferFinalFieldsRule',
-      'prefer_final_fields',
+      'prefer_final_fields_with_fix',
       () => PreferFinalFieldsRule(),
     );
     testRule(

@@ -43,9 +43,9 @@ String buildStylisticSection({
   );
   buffer.writeln('# Set to true to enable, false to disable.');
   buffer.writeln('#');
-  buffer.writeln('# NOTE: Some rules conflict (e.g., prefer_single_quotes vs');
+  buffer.writeln('# NOTE: Some rules conflict (e.g., prefer_single_quotes_strict vs');
   buffer.writeln(
-    '# prefer_double_quotes). Only enable one from each conflicting group.',
+    '# prefer_double_quotes_with_fix). Only enable one from each conflicting group.',
   );
   buffer.writeln('');
 

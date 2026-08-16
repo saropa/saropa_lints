@@ -70,13 +70,8 @@ void main() {
       () => VerifyDocumentedParametersExistRule(),
     );
     testRule(
-      'MissingCodeBlockLanguageInDocCommentRule',
-      'missing_code_block_language_in_doc_comment',
-      () => MissingCodeBlockLanguageInDocCommentRule(),
-    );
-    testRule(
       'UnintendedHtmlInDocCommentRule',
-      'unintended_html_in_doc_comment',
+      'unintended_html_in_doc_comment_strict',
       () => UnintendedHtmlInDocCommentRule(),
     );
     testRule(

@@ -151,7 +151,7 @@ void main() {
         'avoid_context_across_async',
         'prefer_secure_random_for_crypto',
         'require_completer_error_handling',
-        'avoid_void_async',
+        'avoid_void_async_extended',
         'prefer_compile_time_config',
         'prefer_flavor_configuration',
         'prefer_connectivity_debounce',

@@ -27,7 +27,7 @@ void main() {
 
     testRule(
       'PreferRelativeImportsRule',
-      'prefer_relative_imports',
+      'prefer_relative_imports_enforced',
       () => PreferRelativeImportsRule(),
     );
 
@@ -49,7 +49,7 @@ void main() {
     );
     testRule(
       'AvoidTypesOnClosureParametersRule',
-      'avoid_types_on_closure_parameters',
+      'avoid_types_on_closure_parameters_with_fix',
       () => AvoidTypesOnClosureParametersRule(),
     );
     testRule(
@@ -127,7 +127,7 @@ void main() {
 
     testRule(
       'PreferSingleQuotesRule',
-      'prefer_single_quotes',
+      'prefer_single_quotes_strict',
       () => PreferSingleQuotesRule(),
     );
 
@@ -155,7 +155,7 @@ void main() {
     );
     testRule(
       'UseTruncatingDivisionRule',
-      'use_truncating_division',
+      'use_truncating_division_strict',
       () => UseTruncatingDivisionRule(),
     );
 
@@ -251,13 +251,13 @@ void main() {
 
     testRule(
       'AvoidEscapingInnerQuotesRule',
-      'avoid_escaping_inner_quotes',
+      'avoid_escaping_inner_quotes_with_fix',
       () => AvoidEscapingInnerQuotesRule(),
     );
 
     testRule(
       'AvoidSingleCascadeInExpressionStatementsRule',
-      'avoid_single_cascade_in_expression_statements',
+      'avoid_single_cascade_in_expression_statements_with_fix',
       () => AvoidSingleCascadeInExpressionStatementsRule(),
     );
 
@@ -311,10 +311,10 @@ void main() {
       });
     });
 
-    group('prefer_single_quotes', () {
+    group('prefer_single_quotes_strict', () {
       test('has conflictingRules metadata', () {
         final rule = PreferSingleQuotesRule();
-        expect(rule.conflictingRules, contains('prefer_double_quotes'));
+        expect(rule.conflictingRules, contains('prefer_double_quotes_with_fix'));
       });
     });
 

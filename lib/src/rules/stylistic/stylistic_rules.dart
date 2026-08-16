@@ -35,7 +35,7 @@ import '../../fixes/return/convert_to_expression_body_fix.dart';
 // preferences where there is no objectively "correct" answer. Teams can
 // enable them individually based on their coding conventions.
 //
-// Some rules have valid opposing alternatives (e.g., prefer_relative_imports
+// Some rules have valid opposing alternatives (e.g., prefer_relative_imports_enforced
 // vs prefer_absolute_imports).
 // ============================================================================
 
@@ -92,8 +92,8 @@ class PreferRelativeImportsRule extends SaropaLintRule {
   String get exampleGood => "import '../../utils.dart';";
 
   static const LintCode _code = LintCode(
-    'prefer_relative_imports',
-    '[prefer_relative_imports] An absolute package import was used for a file within the same package. Relative imports simplify refactoring and clearly signal local dependencies. Replace the absolute import with a relative path. {v6}',
+    'prefer_relative_imports_enforced',
+    '[prefer_relative_imports_enforced] An absolute package import was used for a file within the same package. Relative imports simplify refactoring and clearly signal local dependencies. Replace the absolute import with a relative path. {v6}',
     correctionMessage:
         'Relative imports make refactoring easier and clearly signal local dependencies within the package.',
     severity: DiagnosticSeverity.INFO,
@@ -498,8 +498,8 @@ class AvoidTypesOnClosureParametersRule extends SaropaLintRule {
   String get exampleGood => 'list.map((x) => x + 1);  // type inferred';
 
   static const LintCode _code = LintCode(
-    'avoid_types_on_closure_parameters',
-    '[avoid_types_on_closure_parameters] Closure parameter has an explicit type; consider removing it when the type can be inferred.',
+    'avoid_types_on_closure_parameters_with_fix',
+    '[avoid_types_on_closure_parameters_with_fix] Closure parameter has an explicit type; consider removing it when the type can be inferred.',
     correctionMessage:
         'Remove the type annotation to let the type be inferred.',
     severity: DiagnosticSeverity.INFO,
@@ -1967,7 +1967,7 @@ class PreferSingleQuotesRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   @override
-  List<String> get conflictingRules => const <String>['prefer_double_quotes'];
+  List<String> get conflictingRules => const <String>['prefer_double_quotes_with_fix'];
 
   @override
   String get exampleBad => 'String name = "John";';
@@ -1982,8 +1982,8 @@ class PreferSingleQuotesRule extends SaropaLintRule {
   ];
 
   static const LintCode _code = LintCode(
-    'prefer_single_quotes',
-    '[prefer_single_quotes] Double quotes detected where single quotes would suffice. Prefer single quotes for consistency with Dart style conventions and to reduce visual noise in string literals. {v7}',
+    'prefer_single_quotes_strict',
+    '[prefer_single_quotes_strict] Double quotes detected where single quotes would suffice. Prefer single quotes for consistency with Dart style conventions and to reduce visual noise in string literals. {v7}',
     correctionMessage:
         "Replace double quotes with single quotes to follow Dart style conventions and maintain codebase consistency.",
     severity: DiagnosticSeverity.INFO,
@@ -4780,8 +4780,8 @@ class AvoidEscapingInnerQuotesRule extends SaropaLintRule {
       'final msg = "It\'s a beautiful day";  // no escaping';
 
   static const LintCode _code = LintCode(
-    'avoid_escaping_inner_quotes',
-    '[avoid_escaping_inner_quotes] String literal uses backslash-escaped quote characters when switching the string delimiter would eliminate the need for escaping, improving readability.',
+    'avoid_escaping_inner_quotes_with_fix',
+    '[avoid_escaping_inner_quotes_with_fix] String literal uses backslash-escaped quote characters when switching the string delimiter would eliminate the need for escaping, improving readability.',
     correctionMessage:
         'Switch to the other quote delimiter (single ↔ double) so inner quotes do not need escaping.',
     severity: DiagnosticSeverity.INFO,
@@ -4859,8 +4859,8 @@ class AvoidSingleCascadeInExpressionStatementsRule extends SaropaLintRule {
       "list..add('a')..add('b');  // multi-cascade is fine";
 
   static const LintCode _code = LintCode(
-    'avoid_single_cascade_in_expression_statements',
-    '[avoid_single_cascade_in_expression_statements] Cascade with exactly one section used as a statement. Use a direct method call or property access instead of a single cascade.',
+    'avoid_single_cascade_in_expression_statements_with_fix',
+    '[avoid_single_cascade_in_expression_statements_with_fix] Cascade with exactly one section used as a statement. Use a direct method call or property access instead of a single cascade.',
     correctionMessage:
         'Replace the single cascade with a direct call (e.g. list.add(item) instead of list..add(item)).',
     severity: DiagnosticSeverity.INFO,
@@ -5197,8 +5197,8 @@ class UseTruncatingDivisionRule extends SaropaLintRule {
   String get exampleGood => 'final pages = items ~/ pageSize;';
 
   static const LintCode _code = LintCode(
-    'use_truncating_division',
-    '[use_truncating_division] Prefer truncating division (`~/`) instead of `/` followed by `.toInt()`.',
+    'use_truncating_division_strict',
+    '[use_truncating_division_strict] Prefer truncating division (`~/`) instead of `/` followed by `.toInt()`.',
     correctionMessage: 'Replace `(a / b).toInt()` with `a ~/ b`.',
     severity: DiagnosticSeverity.WARNING,
   );

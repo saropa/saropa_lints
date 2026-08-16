@@ -187,12 +187,12 @@ void main() {
     );
     testRule(
       'AvoidClassesWithOnlyStaticMembersRule',
-      'avoid_classes_with_only_static_members',
+      'avoid_classes_with_only_static_members_with_fix',
       () => AvoidClassesWithOnlyStaticMembersRule(),
     );
     testRule(
       'AvoidSettersWithoutGettersRule',
-      'avoid_setters_without_getters',
+      'avoid_setters_without_getters_local',
       () => AvoidSettersWithoutGettersRule(),
     );
     testRule(
@@ -242,7 +242,7 @@ void main() {
     );
     testRule(
       'PreferConstructorsOverStaticMethodsRule',
-      'prefer_constructors_over_static_methods',
+      'prefer_constructors_over_static_methods_strict',
       () => PreferConstructorsOverStaticMethodsRule(),
     );
     testRule(
@@ -287,7 +287,7 @@ void main() {
     );
     testRule(
       'UnnecessaryLibraryNameRule',
-      'unnecessary_library_name',
+      'unnecessary_library_name_with_fix',
       () => UnnecessaryLibraryNameRule(),
     );
     testRule(

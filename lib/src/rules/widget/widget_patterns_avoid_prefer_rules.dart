@@ -5371,8 +5371,8 @@ class AvoidUnnecessaryContainersRule extends SaropaLintRule {
   Set<String>? get requiredPatterns => const <String>{'Container('};
 
   static const LintCode _code = LintCode(
-    'avoid_unnecessary_containers',
-    '[avoid_unnecessary_containers] Container adds no value when it only has a child (and optionally a key). It adds an extra layer to the widget tree with no benefit. Remove the Container and use the child directly, or use Padding, ColoredBox, SizedBox, or Align when you need those behaviors.',
+    'avoid_unnecessary_containers_resolved',
+    '[avoid_unnecessary_containers_resolved] Container adds no value when it only has a child (and optionally a key). It adds an extra layer to the widget tree with no benefit. Remove the Container and use the child directly, or use Padding, ColoredBox, SizedBox, or Align when you need those behaviors.',
     correctionMessage:
         'Remove the unnecessary Container and use the child directly. If you need padding, color, or alignment, use Padding, ColoredBox, or Align instead.',
     severity: DiagnosticSeverity.INFO,
@@ -5440,8 +5440,8 @@ class PreferConstLiteralsToCreateImmutablesRule extends SaropaLintRule {
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
   static const LintCode _code = LintCode(
-    'prefer_const_literals_to_create_immutables',
-    '[prefer_const_literals_to_create_immutables] Non-const collection literal passed to an immutable class. Add const to avoid allocating on every rebuild.',
+    'prefer_const_literals_to_create_immutables_widget_scoped',
+    '[prefer_const_literals_to_create_immutables_widget_scoped] Non-const collection literal passed to an immutable class. Add const to avoid allocating on every rebuild.',
     correctionMessage: 'Add the const keyword before the collection literal.',
     severity: DiagnosticSeverity.INFO,
   );

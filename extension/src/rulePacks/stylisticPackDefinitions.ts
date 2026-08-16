@@ -209,7 +209,7 @@ export const STYLISTIC_PACK_DEFINITIONS: readonly StylisticPackDefinition[] = [
       'prefer_flat_imports',
       'prefer_grouped_imports',
       'prefer_named_imports',
-      'prefer_relative_imports',
+      'prefer_relative_imports_enforced',
     ],
   },
   {
@@ -217,8 +217,8 @@ export const STYLISTIC_PACK_DEFINITIONS: readonly StylisticPackDefinition[] = [
     label: 'Quote style',
     selectionMode: 'pickOne',
     ruleCodes: [
-      'prefer_double_quotes',
-      'prefer_single_quotes',
+      'prefer_double_quotes_with_fix',
+      'prefer_single_quotes_strict',
     ],
   },
   {
@@ -498,7 +498,6 @@ export const STYLISTIC_PACK_DEFINITIONS: readonly StylisticPackDefinition[] = [
       'prefer_future_void_function_over_async_callback',
       'prefer_grouped_by_purpose',
       'prefer_guard_clauses',
-      'prefer_initializing_formals',
       'prefer_keys_with_lookup',
       'prefer_map_entries_iteration',
       'prefer_mutable_collections',

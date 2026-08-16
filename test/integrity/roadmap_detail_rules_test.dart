@@ -2,18 +2,18 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Tests for 15 roadmap-detail lint rules (prefer_final_locals, prefer_getters_before_setters, etc.).
+/// Tests for 15 roadmap-detail lint rules (prefer_final_locals_with_fix, prefer_getters_before_setters, etc.).
 ///
 /// Verifies fixture exists and documents expected rule names and tiers.
 /// Registration and tier assignment are in lib/saropa_lints.dart and lib/src/tiers.dart.
 void main() {
   const recommendedRules = <String>[
-    'prefer_final_locals',
-    'prefer_if_elements_to_conditional_expressions',
-    'prefer_inlined_adds',
+    'prefer_final_locals_with_fix',
+    'prefer_if_elements_to_conditional_expressions_null_branch',
+    'prefer_inlined_adds_strict',
     'prefer_interpolation_to_compose',
     'prefer_lowercase_constants',
-    'prefer_null_aware_method_calls',
+    'prefer_null_aware_method_calls_extended',
   ];
 
   const professionalRules = <String>[

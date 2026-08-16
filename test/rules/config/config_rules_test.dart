@@ -100,15 +100,15 @@ void main() {
     });
     test('SortPubDependenciesRule', () {
       final rule = SortPubDependenciesRule();
-      expect(rule.code.lowerCaseName, 'sort_pub_dependencies');
-      expect(rule.code.problemMessage, contains('[sort_pub_dependencies]'));
+      expect(rule.code.lowerCaseName, 'sort_pub_dependencies_extended');
+      expect(rule.code.problemMessage, contains('[sort_pub_dependencies_extended]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('SecurePubspecUrlsRule', () {
       final rule = SecurePubspecUrlsRule();
-      expect(rule.code.lowerCaseName, 'secure_pubspec_urls');
-      expect(rule.code.problemMessage, contains('[secure_pubspec_urls]'));
+      expect(rule.code.lowerCaseName, 'secure_pubspec_urls_strict');
+      expect(rule.code.problemMessage, contains('[secure_pubspec_urls_strict]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -197,7 +197,7 @@ void main() {
   });
 
   group('Configuration - Pubspec Rules', () {
-    group('secure_pubspec_urls', () {
+    group('secure_pubspec_urls_strict', () {
       test('ruleType is securityHotspot', () {
         final rule = SecurePubspecUrlsRule();
         expect(rule.ruleType, isNotNull);

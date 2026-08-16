@@ -3,28 +3,28 @@ import 'dart:io';
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
-/// Tests for 12 roadmap-detail lint rules (avoid_unnecessary_containers,
+/// Tests for 12 roadmap-detail lint rules (avoid_unnecessary_containers_resolved,
 /// prefer_adjacent_strings, prefer_adjective_bool_getters, etc.).
 ///
 /// Verifies each rule is registered, assigned to the correct tier, and
 /// has a fixture with bad/good and false-positive coverage.
 void main() {
   const recommendedRules = <String>[
-    'avoid_unnecessary_containers',
+    'avoid_unnecessary_containers_resolved',
     'prefer_adjacent_strings',
-    'prefer_const_declarations',
-    'prefer_const_literals_to_create_immutables',
+    'prefer_const_declarations_with_fix',
+    'prefer_const_literals_to_create_immutables_widget_scoped',
   ];
 
   const professionalRules = <String>[
     'prefer_adjective_bool_getters',
-    'prefer_asserts_in_initializer_lists',
-    'prefer_const_constructors_in_immutables',
+    'prefer_asserts_in_initializer_lists_safe',
+    'prefer_const_constructors_in_immutables_extended',
     'prefer_constructors_first',
     'prefer_extension_methods',
     'prefer_extension_over_utility_class',
     'prefer_extension_type_for_wrapper',
-    'prefer_final_fields',
+    'prefer_final_fields_with_fix',
   ];
 
   final allNewRules = [...recommendedRules, ...professionalRules];

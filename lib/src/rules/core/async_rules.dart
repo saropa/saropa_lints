@@ -5131,8 +5131,8 @@ class AvoidVoidAsyncRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'avoid_void_async',
-    '[avoid_void_async] Async functions returning void silently swallow '
+    'avoid_void_async_extended',
+    '[avoid_void_async_extended] Async functions returning void silently swallow '
         'exceptions — callers cannot catch errors or await completion. '
         'Changing the return type to Future<void> lets errors propagate and '
         'enables callers to coordinate execution order. This is especially '

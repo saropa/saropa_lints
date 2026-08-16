@@ -254,7 +254,7 @@ void main() {
     );
     testRule(
       'AvoidVoidAsyncRule',
-      'avoid_void_async',
+      'avoid_void_async_extended',
       () => AvoidVoidAsyncRule(),
     );
     testRule(

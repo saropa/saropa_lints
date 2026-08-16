@@ -138,8 +138,8 @@ class AvoidReturningThisRule extends SaropaLintRule {
       '}';
 
   static const LintCode _code = LintCode(
-    'avoid_returning_this',
-    '[avoid_returning_this] Returning this from a method encourages fluent chaining but obscures return type and can confuse readers. Prefer explicit return types or void. {v1}',
+    'avoid_returning_this_with_fix',
+    '[avoid_returning_this_with_fix] Returning this from a method encourages fluent chaining but obscures return type and can confuse readers. Prefer explicit return types or void. {v1}',
     correctionMessage:
         'Change the method to return void or a concrete type instead of returning this.',
     severity: DiagnosticSeverity.INFO,
@@ -483,8 +483,8 @@ class AvoidReturningNullForVoidRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'avoid_returning_null_for_void',
-    '[avoid_returning_null_for_void] Returning null from a void function is '
+    'avoid_returning_null_for_void_with_fix',
+    '[avoid_returning_null_for_void_with_fix] Returning null from a void function is '
         'redundant and misleading. Void functions should either use a bare '
         'return statement or simply let execution fall through. An explicit '
         'return null suggests the caller expects a value, which contradicts '
@@ -567,8 +567,8 @@ class AvoidReturningNullForFutureRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'avoid_returning_null_for_future',
-    '[avoid_returning_null_for_future] Returning null from a synchronous '
+    'avoid_returning_null_for_future_strict',
+    '[avoid_returning_null_for_future_strict] Returning null from a synchronous '
         'function declared to return Future<T> where T is non-nullable causes '
         'a runtime null error when the future is awaited. Use Future.value() '
         'to wrap the default, or make the function async to let Dart handle '

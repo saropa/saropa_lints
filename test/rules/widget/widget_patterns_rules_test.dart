@@ -664,13 +664,13 @@ void main() {
 
     testRule(
       'AvoidUnnecessaryContainersRule',
-      'avoid_unnecessary_containers',
+      'avoid_unnecessary_containers_resolved',
       () => AvoidUnnecessaryContainersRule(),
     );
 
     testRule(
       'PreferConstLiteralsToCreateImmutablesRule',
-      'prefer_const_literals_to_create_immutables',
+      'prefer_const_literals_to_create_immutables_widget_scoped',
       () => PreferConstLiteralsToCreateImmutablesRule(),
     );
 

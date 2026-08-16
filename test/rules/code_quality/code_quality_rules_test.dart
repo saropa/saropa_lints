@@ -648,7 +648,7 @@ void main() {
 
     testRule(
       'AvoidPositionalBooleanParametersRule',
-      'avoid_positional_boolean_parameters',
+      'avoid_positional_boolean_parameters_with_fix',
       () => AvoidPositionalBooleanParametersRule(),
     );
 

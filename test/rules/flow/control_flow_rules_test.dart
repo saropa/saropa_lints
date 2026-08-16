@@ -162,17 +162,17 @@ void main() {
     );
     testRule(
       'AvoidDoubleAndIntChecksRule',
-      'avoid_double_and_int_checks',
+      'avoid_double_and_int_checks_extended',
       () => AvoidDoubleAndIntChecksRule(),
     );
     testRule(
       'PreferIfElementsToConditionalExpressionsRule',
-      'prefer_if_elements_to_conditional_expressions',
+      'prefer_if_elements_to_conditional_expressions_null_branch',
       () => PreferIfElementsToConditionalExpressionsRule(),
     );
     testRule(
       'PreferNullAwareMethodCallsRule',
-      'prefer_null_aware_method_calls',
+      'prefer_null_aware_method_calls_extended',
       () => PreferNullAwareMethodCallsRule(),
     );
   });

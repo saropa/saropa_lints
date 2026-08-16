@@ -229,7 +229,7 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   @override
-  List<String> get conflictingRules => const <String>['prefer_single_quotes'];
+  List<String> get conflictingRules => const <String>['prefer_single_quotes_strict'];
 
   @override
   String get exampleBad => "String name = 'John';";
@@ -244,8 +244,8 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
   ];
 
   static const LintCode _code = LintCode(
-    'prefer_double_quotes',
-    '[prefer_double_quotes] String literal uses single quotes instead of double quotes. Mixing quote styles creates inconsistent formatting that distracts during code review. {v6}',
+    'prefer_double_quotes_with_fix',
+    '[prefer_double_quotes_with_fix] String literal uses single quotes instead of double quotes. Mixing quote styles creates inconsistent formatting that distracts during code review. {v6}',
     correctionMessage:
         'Replace single quotes with double quotes across all string literals for a consistent codebase style.',
     severity: DiagnosticSeverity.INFO,

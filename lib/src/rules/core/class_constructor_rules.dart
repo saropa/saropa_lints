@@ -1891,8 +1891,8 @@ class AvoidUnusedConstructorParametersRule extends SaropaLintRule {
   bool get requiresClassDeclaration => true;
 
   static const LintCode _code = LintCode(
-    'avoid_unused_constructor_parameters',
-    '[avoid_unused_constructor_parameters] A constructor parameter that is '
+    'avoid_unused_constructor_parameters_skip_private',
+    '[avoid_unused_constructor_parameters_skip_private] A constructor parameter that is '
         'not assigned to any field, forwarded to a super constructor, or '
         'referenced in the constructor body is dead code. It adds to the '
         'public API surface without serving any purpose and confuses callers '
@@ -1992,8 +1992,8 @@ class AvoidFieldInitializersInConstClassesRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'avoid_field_initializers_in_const_classes',
-    '[avoid_field_initializers_in_const_classes] Const class has a field with an inline initializer. Prefer moving it to the constructor initializer list for clarity.',
+    'avoid_field_initializers_in_const_classes_relaxed',
+    '[avoid_field_initializers_in_const_classes_relaxed] Const class has a field with an inline initializer. Prefer moving it to the constructor initializer list for clarity.',
     correctionMessage:
         'Move the field initializer to the const constructor initializer list.',
     severity: DiagnosticSeverity.INFO,
@@ -2245,8 +2245,8 @@ class PreferAssertsInInitializerListsRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'prefer_asserts_in_initializer_lists',
-    '[prefer_asserts_in_initializer_lists] assert() in constructor body could be moved to the initializer list. Initializer list asserts run at construction time and work in const constructors.',
+    'prefer_asserts_in_initializer_lists_safe',
+    '[prefer_asserts_in_initializer_lists_safe] assert() in constructor body could be moved to the initializer list. Initializer list asserts run at construction time and work in const constructors.',
     correctionMessage:
         'Move the assert to the constructor initializer list (after the parameter list, before the body).',
     severity: DiagnosticSeverity.INFO,
@@ -2379,8 +2379,8 @@ class PreferConstConstructorsInImmutablesRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'prefer_const_constructors_in_immutables',
-    '[prefer_const_constructors_in_immutables] @immutable class has no const constructor. Add a const constructor so call sites can use const and reduce allocations.',
+    'prefer_const_constructors_in_immutables_extended',
+    '[prefer_const_constructors_in_immutables_extended] @immutable class has no const constructor. Add a const constructor so call sites can use const and reduce allocations.',
     correctionMessage:
         'Add the const keyword to the constructor. Ensure all field initializers are const-capable.',
     severity: DiagnosticSeverity.INFO,
@@ -2615,7 +2615,7 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
 /// resolves one compilation unit at a time, so it cannot observe a write to a
 /// public field that happens in another library — suggesting `final` there
 /// could produce a non-compiling fix. Private fields are library-scoped, so the
-/// whole unit is visible (the SDK's own `prefer_final_fields` is private-only
+/// whole unit is visible (the SDK's own `prefer_final_fields_with_fix` is private-only
 /// for the same reason). Reassignment is matched by resolved element, so a write
 /// through any holder in the unit counts (`holder._count++` from a sibling
 /// class), not only `this`-qualified writes. Use `prefer_final_fields_always`
@@ -2655,8 +2655,8 @@ class PreferFinalFieldsRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'prefer_final_fields',
-    '[prefer_final_fields] Field is never reassigned and could be final. Marking it final makes immutability explicit and enables compiler optimizations.',
+    'prefer_final_fields_with_fix',
+    '[prefer_final_fields_with_fix] Field is never reassigned and could be final. Marking it final makes immutability explicit and enables compiler optimizations.',
     correctionMessage: 'Add the final modifier to the field declaration.',
     severity: DiagnosticSeverity.INFO,
   );

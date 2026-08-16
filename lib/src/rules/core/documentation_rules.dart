@@ -1192,101 +1192,9 @@ void _visitAllDocComments(
   }
 }
 
-// =============================================================================
-// missing_code_block_language_in_doc_comment
-// =============================================================================
-
-/// Warns when a fenced code block in a doc comment lacks a language tag.
-///
-/// Since: v9.10.0 | Rule version: v2
-///
-/// Code blocks in doc comments should specify a language (e.g. ```dart)
-/// for proper syntax highlighting in generated documentation and IDEs.
-/// Checks doc comments on top-level declarations and class members.
-///
-/// **BAD:**
-/// ```dart
-/// /// Example:
-/// /// ```
-/// /// final x = 1;
-/// /// ```
-/// class MyClass {}
-/// ```
-///
-/// **GOOD:**
-/// ```dart
-/// /// Example:
-/// /// ```dart
-/// /// final x = 1;
-/// /// ```
-/// class MyClass {}
-/// ```
-class MissingCodeBlockLanguageInDocCommentRule extends SaropaLintRule {
-  MissingCodeBlockLanguageInDocCommentRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.info;
-
-  @override
-  RuleType? get ruleType => RuleType.codeSmell;
-
-  @override
-  Set<String> get tags => const {'documentation'};
-
-  @override
-  RuleCost get cost => RuleCost.medium;
-
-  static const LintCode _code = LintCode(
-    'missing_code_block_language_in_doc_comment',
-    '[missing_code_block_language_in_doc_comment] Fenced code block in doc comment is missing a language identifier. Without a language tag (e.g. ```dart), generated documentation and IDEs cannot apply syntax highlighting, reducing readability and discoverability of code examples. {v2}',
-    correctionMessage:
-        'Add a language identifier after the opening fence, e.g. ```dart.',
-    severity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    SaropaDiagnosticReporter reporter,
-    SaropaContext context,
-  ) {
-    context.addCompilationUnit((CompilationUnit unit) {
-      _visitAllDocComments(unit, (Comment doc) {
-        _checkDocComment(doc, reporter);
-      });
-    });
-  }
-
-  void _checkDocComment(Comment docComment, SaropaDiagnosticReporter reporter) {
-    bool inCodeBlock = false;
-
-    for (final Token token in docComment.tokens) {
-      final String content = _stripDocCommentPrefix(token.lexeme);
-
-      if (inCodeBlock) {
-        // Inside a code block — look for closing fence
-        if (_fenceWithoutTag.hasMatch(content)) {
-          inCodeBlock = false;
-        }
-        continue;
-      }
-
-      // Outside code block — check for opening fence
-      if (_fenceWithTag.hasMatch(content)) {
-        inCodeBlock = true; // Has a language tag — good
-        continue;
-      }
-
-      if (_fenceWithoutTag.hasMatch(content)) {
-        // Opening fence without language tag — report
-        reporter.atNode(docComment);
-        return; // One report per doc comment is enough
-      }
-    }
-  }
-}
 
 // =============================================================================
-// unintended_html_in_doc_comment
+// unintended_html_in_doc_comment_strict
 // =============================================================================
 
 /// Warns when angle brackets in doc comments may be interpreted as HTML.
@@ -1326,8 +1234,8 @@ class UnintendedHtmlInDocCommentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   static const LintCode _code = LintCode(
-    'unintended_html_in_doc_comment',
-    '[unintended_html_in_doc_comment] Angle brackets in doc comment text may be interpreted as HTML tags by documentation generators. Content like <String> or <MyType> will be treated as unknown HTML elements, causing text to disappear or render incorrectly in generated documentation. {v2}',
+    'unintended_html_in_doc_comment_strict',
+    '[unintended_html_in_doc_comment_strict] Angle brackets in doc comment text may be interpreted as HTML tags by documentation generators. Content like <String> or <MyType> will be treated as unknown HTML elements, causing text to disappear or render incorrectly in generated documentation. {v2}',
     correctionMessage:
         'Wrap the type reference in backticks (e.g. `List<String>`) or use square bracket references (e.g. [List]<[String]>).',
     severity: DiagnosticSeverity.INFO,

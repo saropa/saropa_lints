@@ -105,7 +105,7 @@ enum RuleSource {
   saropa('saropa'),
 
   /// Rule is a Dart SDK / `package:lints` built-in (e.g.
-  /// `depend_on_referenced_packages`, `prefer_final_locals`).
+  /// `depend_on_referenced_packages`, `prefer_final_locals_with_fix`).
   dartLints('dart-lints'),
 
   /// Rule is a Flutter `package:flutter_lints` rule.
@@ -474,12 +474,12 @@ class ReportSynthesis {
 /// only when a user-report shows a real SDK rule being mislabeled.
 const Set<String> _dartLintsRuleNames = <String>{
   'depend_on_referenced_packages',
-  'prefer_final_locals',
-  'prefer_const_literals_to_create_immutables',
-  'prefer_const_declarations',
+  'prefer_final_locals_with_fix',
+  'prefer_const_literals_to_create_immutables_widget_scoped',
+  'prefer_const_declarations_with_fix',
   'prefer_const_constructors',
-  'prefer_const_constructors_in_immutables',
-  'prefer_final_fields',
+  'prefer_const_constructors_in_immutables_extended',
+  'prefer_final_fields_with_fix',
   'prefer_final_in_for_each',
   'prefer_final_parameters',
   'use_setstate_synchronously',
@@ -516,7 +516,7 @@ const Set<String> _dartLintsRuleNames = <String>{
   'prefer_function_declarations_over_variables',
   'prefer_generic_function_type_aliases',
   'prefer_if_null_operators',
-  'prefer_inlined_adds',
+  'prefer_inlined_adds_strict',
   'prefer_interpolation_to_compose_strings',
   'prefer_iterable_whereType',
   'prefer_null_aware_operators',
@@ -562,6 +562,6 @@ const Set<String> _dartLintsRuleNames = <String>{
 /// above. Separate classification is kept so the user sees "flutter-lints"
 /// for the ones that really ship from that package.
 const Set<String> _flutterLintsRuleNames = <String>{
-  'avoid_unnecessary_containers',
+  'avoid_unnecessary_containers_resolved',
   'use_full_hex_values_for_flutter_colors',
 };

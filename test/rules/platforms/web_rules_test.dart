@@ -56,7 +56,7 @@ void main() {
     );
     testRule(
       'AvoidJsRoundedIntsRule',
-      'avoid_js_rounded_ints',
+      'avoid_js_rounded_ints_extended',
       () => AvoidJsRoundedIntsRule(),
     );
     testRule(

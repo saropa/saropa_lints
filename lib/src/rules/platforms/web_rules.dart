@@ -685,7 +685,7 @@ class RequireWebRendererAwarenessRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// avoid_js_rounded_ints
+// avoid_js_rounded_ints_extended
 // =============================================================================
 
 /// JavaScript safe integer maximum (2^53). Integers above this are rounded when compiled to JS.
@@ -724,10 +724,10 @@ class AvoidJsRoundedIntsRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'avoid_js_rounded_ints',
-    '[avoid_js_rounded_ints] Integer literal exceeds JavaScript safe integer maximum (2^53 = 9007199254740992). When compiled to JavaScript (e.g. Flutter Web), the value may be silently rounded, causing data corruption.',
+    'avoid_js_rounded_ints_extended',
+    '[avoid_js_rounded_ints_extended] Integer literal exceeds JavaScript safe integer maximum (2^53 = 9007199254740992). When compiled to JavaScript (e.g. Flutter Web), the value may be silently rounded, causing data corruption.',
     correctionMessage:
-        'Use BigInt.parse for exact large integers, or a String for nominal IDs. For VM-only code, add // ignore: avoid_js_rounded_ints.',
+        'Use BigInt.parse for exact large integers, or a String for nominal IDs. For VM-only code, add // ignore: avoid_js_rounded_ints_extended.',
     severity: DiagnosticSeverity.INFO,
   );
 

@@ -2909,8 +2909,8 @@ class AvoidClassesWithOnlyStaticMembersRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'avoid_classes_with_only_static_members',
-    '[avoid_classes_with_only_static_members] Class has only static members. In Dart, prefer top-level functions and constants for better tree-shaking and discoverability.',
+    'avoid_classes_with_only_static_members_with_fix',
+    '[avoid_classes_with_only_static_members_with_fix] Class has only static members. In Dart, prefer top-level functions and constants for better tree-shaking and discoverability.',
     correctionMessage:
         'Refactor static members to top-level declarations or use extension methods where appropriate.',
     severity: DiagnosticSeverity.INFO,
@@ -2992,8 +2992,8 @@ class AvoidSettersWithoutGettersRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'avoid_setters_without_getters',
-    '[avoid_setters_without_getters] Setter has no corresponding getter. Prefer adding a getter or using a named method for write-only semantics.',
+    'avoid_setters_without_getters_local',
+    '[avoid_setters_without_getters_local] Setter has no corresponding getter. Prefer adding a getter or using a named method for write-only semantics.',
     correctionMessage:
         'Add a getter for this property or replace the setter with a method (e.g. setTimeout).',
     severity: DiagnosticSeverity.INFO,
@@ -3764,8 +3764,8 @@ class PreferConstructorsOverStaticMethodsRule extends SaropaLintRule {
       '}';
 
   static const LintCode _code = LintCode(
-    'prefer_constructors_over_static_methods',
-    '[prefer_constructors_over_static_methods] Prefer factory constructor over static method that returns an instance.',
+    'prefer_constructors_over_static_methods_strict',
+    '[prefer_constructors_over_static_methods_strict] Prefer factory constructor over static method that returns an instance.',
     correctionMessage: 'Convert the static method to a factory constructor.',
     severity: DiagnosticSeverity.INFO,
   );
@@ -4629,7 +4629,7 @@ class WrongNumberOfParametersForSetterRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// unnecessary_library_name
+// unnecessary_library_name_with_fix
 // =============================================================================
 
 /// A library directive that only has a name (e.g. `library my_lib;`) with no
@@ -4664,8 +4664,8 @@ class UnnecessaryLibraryNameRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'unnecessary_library_name',
-    '[unnecessary_library_name] A library directive with only a name and no URI is unnecessary; use "library;" or remove it.',
+    'unnecessary_library_name_with_fix',
+    '[unnecessary_library_name_with_fix] A library directive with only a name and no URI is unnecessary; use "library;" or remove it.',
     correctionMessage: 'Replace with "library;" or remove the name.',
     severity: DiagnosticSeverity.INFO,
   );

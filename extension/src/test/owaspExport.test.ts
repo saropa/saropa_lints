@@ -24,7 +24,7 @@ describe('generateOwaspReport', () => {
           byKind: { ignore: 3, ignoreForFile: 2, baseline: 1 },
           byRule: {
             insecure_transport: 4,
-            prefer_final_locals: 2,
+            prefer_final_locals_with_fix: 2,
           },
           byFile: {
             'lib/a.dart': 4,
@@ -37,7 +37,7 @@ describe('generateOwaspReport', () => {
         enabledRuleCount: 100,
         ruleMetadataByRule: {
           insecure_transport: { ruleType: 'securityVulnerability', tags: ['security'] },
-          prefer_final_locals: { ruleType: 'style' },
+          prefer_final_locals_with_fix: { ruleType: 'style' },
         },
       },
     };
@@ -47,6 +47,6 @@ describe('generateOwaspReport', () => {
     assert.ok(report.includes('- Total suppressions: **6**'));
     assert.ok(report.includes('- Security-related suppressions: **4**'));
     assert.ok(report.includes('| insecure_transport | 4 | Yes |'));
-    assert.ok(report.includes('| prefer_final_locals | 2 | No |'));
+    assert.ok(report.includes('| prefer_final_locals_with_fix | 2 | No |'));
   });
 });

@@ -69,12 +69,6 @@ void main() {
     );
 
     testRule(
-      'PreferInitializingFormalsRule',
-      'prefer_initializing_formals',
-      () => PreferInitializingFormalsRule(),
-    );
-
-    testRule(
       'PreferConstructorBodyAssignmentRule',
       'prefer_constructor_body_assignment',
       () => PreferConstructorBodyAssignmentRule(),

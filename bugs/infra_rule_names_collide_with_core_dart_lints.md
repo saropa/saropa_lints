@@ -1,6 +1,6 @@
 # BUG: Infra — 38 saropa_lints Rule Names Collide With Core Dart/Flutter Lint Names
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-08-16
 Rule: N/A (infra — affects `require_ignore_comment_plugin_prefix` and 38 individual rules, see list below)
@@ -243,7 +243,10 @@ core Dart/Flutter lint namespace.
 
 ## Changes Made
 
-None — filed for triage, no fix applied.
+- 35 rules renamed with semantic suffixes in LintCode declarations, tiers.dart, tests, fixtures, analysis_options_template.yaml, and extension files.
+- 3 rules dropped (avoid_private_typedef_functions, missing_code_block_language_in_doc_comment, prefer_initializing_formals): class removed, factory entry removed, tier entry removed, tests removed, fixture files deleted.
+- CHANGELOG updated with Breaking entries under Changed and Removed.
+- Deprecation alias mechanism: NOT YET IMPLEMENTED.
 
 ---
 

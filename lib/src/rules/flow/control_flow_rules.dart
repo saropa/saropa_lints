@@ -2418,15 +2418,15 @@ class AvoidDoubleAndIntChecksRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _codeAlwaysFalse = LintCode(
-    'avoid_double_and_int_checks',
-    '[avoid_double_and_int_checks] Condition is always false: int and double are disjoint types in Dart; no value can be both.',
+    'avoid_double_and_int_checks_extended',
+    '[avoid_double_and_int_checks_extended] Condition is always false: int and double are disjoint types in Dart; no value can be both.',
     correctionMessage:
         'Remove this dead condition or use a single type check (e.g. is num).',
     severity: DiagnosticSeverity.INFO,
   );
   static const LintCode _codePreferNum = LintCode(
-    'avoid_double_and_int_checks',
-    '[avoid_double_and_int_checks] Prefer "value is num" instead of "value is int || value is double".',
+    'avoid_double_and_int_checks_extended',
+    '[avoid_double_and_int_checks_extended] Prefer "value is num" instead of "value is int || value is double".',
     correctionMessage: 'Replace with: value is num',
     severity: DiagnosticSeverity.INFO,
   );
@@ -2499,8 +2499,8 @@ class PreferIfElementsToConditionalExpressionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    'prefer_if_elements_to_conditional_expressions',
-    '[prefer_if_elements_to_conditional_expressions] Use if element instead of ternary with null in collection literals.',
+    'prefer_if_elements_to_conditional_expressions_null_branch',
+    '[prefer_if_elements_to_conditional_expressions_null_branch] Use if element instead of ternary with null in collection literals.',
     correctionMessage:
         'Replace with if (condition) expr or if (!condition) expr for the non-null branch.',
     severity: DiagnosticSeverity.INFO,
@@ -2543,8 +2543,8 @@ class PreferNullAwareMethodCallsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   static const LintCode _code = LintCode(
-    'prefer_null_aware_method_calls',
-    '[prefer_null_aware_method_calls] Use null-aware operator (?.) instead of explicit null check and call.',
+    'prefer_null_aware_method_calls_extended',
+    '[prefer_null_aware_method_calls_extended] Use null-aware operator (?.) instead of explicit null check and call.',
     correctionMessage: 'Replace with receiver?.method().',
     severity: DiagnosticSeverity.INFO,
   );

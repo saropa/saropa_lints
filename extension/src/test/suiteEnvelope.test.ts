@@ -55,8 +55,8 @@ describe('suite/envelope deriveCategory', () => {
   });
 
   it('falls back to other when no domain signal exists', () => {
-    assert.strictEqual(deriveCategory('prefer_final_locals', { tags: ['readability'] }), 'other');
-    assert.strictEqual(deriveCategory('prefer_final_locals', undefined), 'other');
+    assert.strictEqual(deriveCategory('prefer_final_locals_with_fix', { tags: ['readability'] }), 'other');
+    assert.strictEqual(deriveCategory('prefer_final_locals_with_fix', undefined), 'other');
   });
 });
 
@@ -83,7 +83,7 @@ describe('suite/envelope buildLintsEnvelope', () => {
   const data: ViolationsData = {
     violations: [
       { file: 'lib/db.dart', line: 10, rule: 'avoid_drift_update_without_where', message: 'No WHERE clause', severity: 'error' },
-      { file: 'lib/a.dart', line: 3, rule: 'prefer_final_locals', message: 'Prefer final', severity: 'info' },
+      { file: 'lib/a.dart', line: 3, rule: 'prefer_final_locals_with_fix', message: 'Prefer final', severity: 'info' },
     ],
   };
 

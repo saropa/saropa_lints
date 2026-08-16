@@ -3593,8 +3593,8 @@ class AvoidFunctionLiteralsInForeachCallsRule extends SaropaLintRule {
   String get exampleGood => 'items.forEach(process);  // tear-off, OK';
 
   static const LintCode _code = LintCode(
-    'avoid_function_literals_in_foreach_calls',
-    '[avoid_function_literals_in_foreach_calls] forEach called with a function literal. Prefer a for-in loop for break/continue/return/await support.',
+    'avoid_function_literals_in_foreach_calls_no_maps',
+    '[avoid_function_literals_in_foreach_calls_no_maps] forEach called with a function literal. Prefer a for-in loop for break/continue/return/await support.',
     correctionMessage: 'Replace with: for (final element in target) { ... }',
     severity: DiagnosticSeverity.INFO,
   );
@@ -3652,8 +3652,8 @@ class PreferInlinedAddsRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'prefer_inlined_adds',
-    '[prefer_inlined_adds] Prefer inline collection literal instead of empty literal followed by add/addAll.',
+    'prefer_inlined_adds_strict',
+    '[prefer_inlined_adds_strict] Prefer inline collection literal instead of empty literal followed by add/addAll.',
     correctionMessage:
         'Replace with a single literal containing the elements (e.g. <String>[\'a\', \'b\']).',
     severity: DiagnosticSeverity.INFO,

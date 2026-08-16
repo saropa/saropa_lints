@@ -478,8 +478,8 @@ void main() {
         );
       }
 
-      checkPair('prefer_single_quotes', 'prefer_double_quotes');
-      checkPair('prefer_relative_imports', 'prefer_absolute_imports');
+      checkPair('prefer_single_quotes_strict', 'prefer_double_quotes_with_fix');
+      checkPair('prefer_relative_imports_enforced', 'prefer_absolute_imports');
       checkPair('prefer_var_over_explicit_type', 'prefer_type_over_var');
       checkPair(
         'prefer_sizedbox_over_container',

@@ -1048,7 +1048,7 @@ class PackageNamesRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// sort_pub_dependencies
+// sort_pub_dependencies_extended
 // =============================================================================
 
 /// Warns when pubspec dependencies are not sorted alphabetically.
@@ -1090,8 +1090,8 @@ class SortPubDependenciesRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'sort_pub_dependencies',
-    '[sort_pub_dependencies] Dependencies in pubspec.yaml are not sorted alphabetically. Unsorted dependency lists are harder to scan visually, increase the chance of merge conflicts when multiple developers add packages, and deviate from the alphabetical order that `dart pub add` uses by default. {v1}',
+    'sort_pub_dependencies_extended',
+    '[sort_pub_dependencies_extended] Dependencies in pubspec.yaml are not sorted alphabetically. Unsorted dependency lists are harder to scan visually, increase the chance of merge conflicts when multiple developers add packages, and deviate from the alphabetical order that `dart pub add` uses by default. {v1}',
     correctionMessage:
         'Sort dependencies alphabetically within each section (dependencies, dev_dependencies).',
     severity: DiagnosticSeverity.INFO,
@@ -1188,7 +1188,7 @@ class SortPubDependenciesRule extends SaropaLintRule {
 }
 
 // =============================================================================
-// secure_pubspec_urls
+// secure_pubspec_urls_strict
 // =============================================================================
 
 /// Warns when pubspec.yaml contains insecure HTTP URLs.
@@ -1239,8 +1239,8 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'secure_pubspec_urls',
-    '[secure_pubspec_urls] Insecure URL (http:// or git://) found in pubspec.yaml dependency source. Plain HTTP and unencrypted git:// URLs are vulnerable to man-in-the-middle attacks that could inject malicious code into your dependencies. Always use https:// for dependency URLs to ensure integrity and authenticity. {v1}',
+    'secure_pubspec_urls_strict',
+    '[secure_pubspec_urls_strict] Insecure URL (http:// or git://) found in pubspec.yaml dependency source. Plain HTTP and unencrypted git:// URLs are vulnerable to man-in-the-middle attacks that could inject malicious code into your dependencies. Always use https:// for dependency URLs to ensure integrity and authenticity. {v1}',
     correctionMessage:
         'Replace http:// with https:// in the dependency URL. For git dependencies, use https://github.com/... instead of git://github.com/...',
     severity: DiagnosticSeverity.WARNING,

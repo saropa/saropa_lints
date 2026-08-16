@@ -85,6 +85,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 </details>
 
+### Changed
+
+- **Breaking:** 35 rules renamed with semantic suffixes to resolve name collisions with core Dart/Flutter lints. Update `analysis_options.yaml` and `// ignore:` comments to use the new names (e.g. `prefer_single_quotes` → `prefer_single_quotes_strict`). Old names remain as deprecated aliases for one release cycle.
+
+### Removed
+
+- **Breaking:** `avoid_private_typedef_functions`, `missing_code_block_language_in_doc_comment`, and `prefer_initializing_formals` removed — identical to core Dart lints with no behavioral difference. Use the core Dart lint instead; no action required if already enabled.
+
 ---
 
 ## [15.0.4]

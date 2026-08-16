@@ -19,8 +19,8 @@ void main() {
     });
     test('AvoidReturningThisRule', () {
       final rule = AvoidReturningThisRule();
-      expect(rule.code.lowerCaseName, 'avoid_returning_this');
-      expect(rule.code.problemMessage, contains('[avoid_returning_this]'));
+      expect(rule.code.lowerCaseName, 'avoid_returning_this_with_fix');
+      expect(rule.code.problemMessage, contains('[avoid_returning_this_with_fix]'));
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
@@ -47,20 +47,20 @@ void main() {
     });
     test('AvoidReturningNullForVoidRule', () {
       final rule = AvoidReturningNullForVoidRule();
-      expect(rule.code.lowerCaseName, 'avoid_returning_null_for_void');
+      expect(rule.code.lowerCaseName, 'avoid_returning_null_for_void_with_fix');
       expect(
         rule.code.problemMessage,
-        contains('[avoid_returning_null_for_void]'),
+        contains('[avoid_returning_null_for_void_with_fix]'),
       );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('AvoidReturningNullForFutureRule', () {
       final rule = AvoidReturningNullForFutureRule();
-      expect(rule.code.lowerCaseName, 'avoid_returning_null_for_future');
+      expect(rule.code.lowerCaseName, 'avoid_returning_null_for_future_strict');
       expect(
         rule.code.problemMessage,
-        contains('[avoid_returning_null_for_future]'),
+        contains('[avoid_returning_null_for_future_strict]'),
       );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
@@ -98,19 +98,19 @@ void main() {
         expect(rule.fixGenerators, isNotEmpty);
       });
     });
-    group('avoid_returning_this', () {
+    group('avoid_returning_this_with_fix', () {
       test('rule offers quick fix (replace return this with return)', () {
         final rule = AvoidReturningThisRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
     });
-    group('avoid_returning_null_for_void', () {
+    group('avoid_returning_null_for_void_with_fix', () {
       test('rule offers quick fix (replace return null with return)', () {
         final rule = AvoidReturningNullForVoidRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
     });
-    group('avoid_returning_null_for_future', () {
+    group('avoid_returning_null_for_future_strict', () {
       test('rule offers quick fix (replace with Future.value(null))', () {
         final rule = AvoidReturningNullForFutureRule();
         expect(rule.fixGenerators, isNotEmpty);

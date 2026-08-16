@@ -1115,7 +1115,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferNoBlankLineInsideBlocksRule.new,
   PreferSingleBlankLineMaxRule.new,
   PreferSuperParametersRule.new,
-  PreferInitializingFormalsRule.new,
   PreferConstructorBodyAssignmentRule.new,
   PreferFactoryForValidationRule.new,
   PreferConstructorAssertionRule.new,
@@ -3110,7 +3109,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidJsRoundedIntsRule.new,
   PreferScheduleMicrotaskOverWindowPostmessageRule.new,
   AvoidPositionalBooleanParametersRule.new,
-  AvoidPrivateTypedefFunctionsRule.new,
   NoRuntimeTypeToStringRule.new,
   AvoidSettersWithoutGettersRule.new,
   AvoidSingleCascadeInExpressionStatementsRule.new,
@@ -3145,7 +3143,6 @@ _allRuleFactories = <SaropaLintRule Function()>[
   WrongNumberOfParametersForSetterRule.new,
 
   // Additional rules (plan_additional_rules_11_through_20)
-  MissingCodeBlockLanguageInDocCommentRule.new,
   UnintendedHtmlInDocCommentRule.new,
   UriDoesNotExistInDocImportRule.new,
   PreferForElementsToMapFromIterableRule.new,
@@ -3645,7 +3642,7 @@ const List<List<String>> _conflictingRulePairs = <List<String>>[
   // Type inference vs explicit types
   <String>['prefer_inferred_type_arguments', 'prefer_explicit_type_arguments'],
   // Import style preferences
-  <String>['prefer_relative_imports', 'always_use_package_imports'],
+  <String>['prefer_relative_imports_enforced', 'always_use_package_imports'],
 ];
 
 /// Check for conflicting rules and print a warning if both are enabled.
@@ -3835,7 +3832,7 @@ void _registerRuleGroups() {
       rules: const {
         'avoid_stateless_widget_initialized_fields',
         'avoid_state_constructors',
-        'prefer_const_constructors_in_immutables',
+        'prefer_const_constructors_in_immutables_extended',
         'avoid_unnecessary_setstate',
         'use_build_context_synchronously',
         'prefer_stateless_widget',

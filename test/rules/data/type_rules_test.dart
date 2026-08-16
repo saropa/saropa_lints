@@ -102,22 +102,17 @@ void main() {
     );
     testRule(
       'AvoidShadowingTypeParametersRule',
-      'avoid_shadowing_type_parameters',
+      'avoid_shadowing_type_parameters_class_methods',
       () => AvoidShadowingTypeParametersRule(),
     );
     testRule(
-      'AvoidPrivateTypedefFunctionsRule',
-      'avoid_private_typedef_functions',
-      () => AvoidPrivateTypedefFunctionsRule(),
-    );
-    testRule(
       'PreferFinalLocalsRule',
-      'prefer_final_locals',
+      'prefer_final_locals_with_fix',
       () => PreferFinalLocalsRule(),
     );
     testRule(
       'PreferConstDeclarationsRule',
-      'prefer_const_declarations',
+      'prefer_const_declarations_with_fix',
       () => PreferConstDeclarationsRule(),
     );
     testRule(
@@ -204,14 +199,14 @@ void main() {
       });
     });
 
-    group('prefer_final_locals', () {
+    group('prefer_final_locals_with_fix', () {
       test('rule offers quick fix (add final to local)', () {
         final rule = PreferFinalLocalsRule();
         expect(rule.fixGenerators, isNotEmpty);
       });
     });
 
-    group('prefer_const_declarations', () {
+    group('prefer_const_declarations_with_fix', () {
       test('rule offers quick fix (use const instead of final)', () {
         final rule = PreferConstDeclarationsRule();
         expect(rule.fixGenerators, isNotEmpty);

@@ -1575,7 +1575,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_classes_with_only_static_members": {
+    "avoid_classes_with_only_static_members_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -2645,7 +2645,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_double_and_int_checks": {
+    "avoid_double_and_int_checks_extended": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -3476,7 +3476,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_escaping_inner_quotes": {
+    "avoid_escaping_inner_quotes_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -3806,7 +3806,7 @@
         "description": "Vulnerability default target: >= 80% true positives."
       }
     },
-    "avoid_field_initializers_in_const_classes": {
+    "avoid_field_initializers_in_const_classes_relaxed": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -4208,7 +4208,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_function_literals_in_foreach_calls": {
+    "avoid_function_literals_in_foreach_calls_no_maps": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -6122,7 +6122,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_js_rounded_ints": {
+    "avoid_js_rounded_ints_extended": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -8305,7 +8305,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_positional_boolean_parameters": {
+    "avoid_positional_boolean_parameters_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -8446,22 +8446,6 @@
       "certIds": [],
       "tags": [
         "testing"
-      ],
-      "accuracyTarget": {
-        "expectZeroFalsePositives": true,
-        "description": "Code smell default target: zero false positives."
-      }
-    },
-    "avoid_private_typedef_functions": {
-      "ruleType": "codeSmell",
-      "ruleStatus": "ready",
-      "requiresReview": false,
-      "defaultReviewState": null,
-      "cweIds": [],
-      "certIds": [],
-      "tags": [
-        "reliability",
-        "type-safety"
       ],
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
@@ -9338,7 +9322,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_returning_null_for_future": {
+    "avoid_returning_null_for_future_strict": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -9353,7 +9337,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_returning_null_for_void": {
+    "avoid_returning_null_for_void_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -9368,7 +9352,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_returning_this": {
+    "avoid_returning_this_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -9823,7 +9807,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_setters_without_getters": {
+    "avoid_setters_without_getters_local": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -9865,7 +9849,7 @@
       "tags": [],
       "accuracyTarget": null
     },
-    "avoid_shadowing_type_parameters": {
+    "avoid_shadowing_type_parameters_class_methods": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -10014,7 +9998,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_single_cascade_in_expression_statements": {
+    "avoid_single_cascade_in_expression_statements_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -11020,7 +11004,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_types_on_closure_parameters": {
+    "avoid_types_on_closure_parameters_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -11424,7 +11408,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_unnecessary_containers": {
+    "avoid_unnecessary_containers_resolved": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -12119,7 +12103,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_unused_constructor_parameters": {
+    "avoid_unused_constructor_parameters_skip_private": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -12302,7 +12286,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "avoid_void_async": {
+    "avoid_void_async_extended": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -14625,21 +14609,6 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "missing_code_block_language_in_doc_comment": {
-      "ruleType": "codeSmell",
-      "ruleStatus": "ready",
-      "requiresReview": false,
-      "defaultReviewState": null,
-      "cweIds": [],
-      "certIds": [],
-      "tags": [
-        "documentation"
-      ],
-      "accuracyTarget": {
-        "expectZeroFalsePositives": true,
-        "description": "Code smell default target: zero false positives."
-      }
-    },
     "missing_test_assertion": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -15463,7 +15432,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_asserts_in_initializer_lists": {
+    "prefer_asserts_in_initializer_lists_safe": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -16838,7 +16807,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_const_constructors_in_immutables": {
+    "prefer_const_constructors_in_immutables_extended": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -16853,7 +16822,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_const_declarations": {
+    "prefer_const_declarations_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -16869,7 +16838,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_const_literals_to_create_immutables": {
+    "prefer_const_literals_to_create_immutables_widget_scoped": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -17033,7 +17002,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_constructors_over_static_methods": {
+    "prefer_constructors_over_static_methods_strict": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -17961,7 +17930,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_double_quotes": {
+    "prefer_double_quotes_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -18792,7 +18761,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_final_fields": {
+    "prefer_final_fields_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -18822,7 +18791,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_final_locals": {
+    "prefer_final_locals_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -19759,7 +19728,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_if_elements_to_conditional_expressions": {
+    "prefer_if_elements_to_conditional_expressions_null_branch": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -20142,21 +20111,6 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_initializing_formals": {
-      "ruleType": "codeSmell",
-      "ruleStatus": "ready",
-      "requiresReview": false,
-      "defaultReviewState": null,
-      "cweIds": [],
-      "certIds": [],
-      "tags": [
-        "convention"
-      ],
-      "accuracyTarget": {
-        "expectZeroFalsePositives": true,
-        "description": "Code smell default target: zero false positives."
-      }
-    },
     "prefer_injectable_package": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -20219,7 +20173,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_inlined_adds": {
+    "prefer_inlined_adds_strict": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -21891,7 +21845,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_null_aware_method_calls": {
+    "prefer_null_aware_method_calls_extended": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -22822,7 +22776,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_relative_imports": {
+    "prefer_relative_imports_enforced": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -23839,7 +23793,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "prefer_single_quotes": {
+    "prefer_single_quotes_strict": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -35304,7 +35258,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "secure_pubspec_urls": {
+    "secure_pubspec_urls_strict": {
       "ruleType": "securityHotspot",
       "ruleStatus": "ready",
       "requiresReview": true,
@@ -35429,7 +35383,7 @@
         "description": "Bug rule default target: zero false positives."
       }
     },
-    "sort_pub_dependencies": {
+    "sort_pub_dependencies_extended": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -35568,7 +35522,7 @@
         "description": "Bug rule default target: zero false positives."
       }
     },
-    "unintended_html_in_doc_comment": {
+    "unintended_html_in_doc_comment_strict": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -35583,7 +35537,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "unnecessary_library_name": {
+    "unnecessary_library_name_with_fix": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,
@@ -35750,7 +35704,7 @@
         "description": "Code smell default target: zero false positives."
       }
     },
-    "use_truncating_division": {
+    "use_truncating_division_strict": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
       "requiresReview": false,

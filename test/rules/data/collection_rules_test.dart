@@ -145,12 +145,12 @@ void main() {
     );
     testRule(
       'AvoidFunctionLiteralsInForeachCallsRule',
-      'avoid_function_literals_in_foreach_calls',
+      'avoid_function_literals_in_foreach_calls_no_maps',
       () => AvoidFunctionLiteralsInForeachCallsRule(),
     );
     testRule(
       'PreferInlinedAddsRule',
-      'prefer_inlined_adds',
+      'prefer_inlined_adds_strict',
       () => PreferInlinedAddsRule(),
     );
     testRule(

@@ -28,7 +28,7 @@ const noneInstalled = () => false;
 describe('suite/siblingDeepLinkTargets (R5)', () => {
   it('classifies Drift rule ids', () => {
     assert.strictEqual(isDriftRuleId('avoid_drift_update_without_where'), true);
-    assert.strictEqual(isDriftRuleId('prefer_final_locals'), false);
+    assert.strictEqual(isDriftRuleId('prefer_final_locals_with_fix'), false);
   });
 
   it('offers the Advisor runtime-issues jump for a Drift finding when Advisor is installed', () => {
@@ -44,7 +44,7 @@ describe('suite/siblingDeepLinkTargets (R5)', () => {
   });
 
   it('offers nothing when no finding is a Drift rule', () => {
-    assert.deepStrictEqual(suiteDeepLinkTargets(['prefer_final_locals', 'avoid_print'], installed), []);
+    assert.deepStrictEqual(suiteDeepLinkTargets(['prefer_final_locals_with_fix', 'avoid_print'], installed), []);
   });
 
   it('offers nothing for an empty finding set', () => {

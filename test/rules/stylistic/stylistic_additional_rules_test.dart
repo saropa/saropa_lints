@@ -37,7 +37,7 @@ void main() {
 
     testRule(
       'PreferDoubleQuotesRule',
-      'prefer_double_quotes',
+      'prefer_double_quotes_with_fix',
       () => PreferDoubleQuotesRule(),
     );
 
@@ -200,7 +200,7 @@ void main() {
       );
       expect(
         PreferDoubleQuotesRule().conflictingRules,
-        contains('prefer_single_quotes'),
+        contains('prefer_single_quotes_strict'),
       );
       expect(
         PreferGroupedImportsRule().conflictingRules,

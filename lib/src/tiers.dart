@@ -13,7 +13,7 @@ export 'tiers.dart' show getRulesForTier;
 /// Stylistic tier rules - formatting, ordering, naming conventions.
 /// Orthogonal to correctness - code can be correct while violating these.
 ///
-/// NOTE: Conflicting pairs (e.g., prefer_single_quotes vs prefer_double_quotes)
+/// NOTE: Conflicting pairs (e.g., prefer_single_quotes_strict vs prefer_double_quotes_with_fix)
 /// are intentionally excluded. Users must explicitly enable one of the pair.
 /// See README_STYLISTIC.md for all available rules including conflicting pairs.
 const Set<String> stylisticRules = <String>{
@@ -63,7 +63,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_no_i_prefix_interfaces',
   'prefer_impl_suffix',
   'prefer_constructor_over_literals',
-  'prefer_constructors_over_static_methods',
+  'prefer_constructors_over_static_methods_strict',
   'format_test_name',
   'avoid_explicit_type_declaration',
   'prefer_explicit_null_checks',
@@ -73,7 +73,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_optional_positional_params',
   'prefer_positional_bool_params',
   // prefer_named_bool_params in pedanticOnlyRules to avoid duplicate diagnostics
-  // with avoid_positional_boolean_parameters (professional). Enable explicitly via pedantic tier.
+  // with avoid_positional_boolean_parameters_with_fix (professional). Enable explicitly via pedantic tier.
   'prefer_if_else_over_guards',
   'prefer_cascade_assignments',
   'prefer_factory_constructor',
@@ -83,16 +83,16 @@ const Set<String> stylisticRules = <String>{
   'prefer_static_method_over_function',
 
   // === Code style preferences ===
-  'avoid_escaping_inner_quotes',
-  'avoid_function_literals_in_foreach_calls',
-  'avoid_single_cascade_in_expression_statements',
+  'avoid_escaping_inner_quotes_with_fix',
+  'avoid_function_literals_in_foreach_calls_no_maps',
+  'avoid_single_cascade_in_expression_statements_with_fix',
   'avoid_cascade_notation',
-  'avoid_returning_this',
+  'avoid_returning_this_with_fix',
   'avoid_cubit_usage',
   'prefer_fold_over_reduce',
   'prefer_expression_body_getters',
   'prefer_block_body_setters',
-  'avoid_types_on_closure_parameters',
+  'avoid_types_on_closure_parameters_with_fix',
   'prefer_no_continue_statement',
   'prefer_single_exit_point',
   'prefer_wildcard_for_unused_param',
@@ -165,14 +165,14 @@ const Set<String> stylisticRules = <String>{
   'prefer_flat_imports',
   'prefer_grouped_imports',
   'prefer_named_imports',
-  'prefer_relative_imports',
+  'prefer_relative_imports_enforced',
   'prefer_import_group_comments',
   'prefer_import_over_part',
 
   // === Quote style (conflicting pair - opt-in only) ===
-  'prefer_double_quotes',
+  'prefer_double_quotes_with_fix',
   'prefer_us_english_spelling',
-  'prefer_single_quotes',
+  'prefer_single_quotes_strict',
 
   // === Apostrophe style (conflicting pair - opt-in only) ===
   'prefer_doc_curly_apostrophe',
@@ -228,7 +228,6 @@ const Set<String> stylisticRules = <String>{
   'prefer_guard_clauses',
   'prefer_if_null_over_ternary',
   'prefer_implicit_boolean_comparison',
-  'prefer_initializing_formals',
   'prefer_interpolation_over_concatenation',
   'prefer_keys_with_lookup',
   'prefer_late_over_nullable',
@@ -924,28 +923,28 @@ const Set<String> recommendedOnlyRules = <String>{
   'prefer_hack_format',
 
   // Code quality (roadmap detail requirements)
-  'prefer_final_locals',
-  'prefer_if_elements_to_conditional_expressions',
-  'prefer_inlined_adds',
+  'prefer_final_locals_with_fix',
+  'prefer_if_elements_to_conditional_expressions_null_branch',
+  'prefer_inlined_adds_strict',
   'prefer_interpolation_to_compose',
   'prefer_lowercase_constants',
-  'prefer_null_aware_method_calls',
+  'prefer_null_aware_method_calls_extended',
   'no_runtimetype_tostring',
-  'avoid_unnecessary_containers',
+  'avoid_unnecessary_containers_resolved',
   'prefer_adjacent_strings',
-  'prefer_const_declarations',
-  'prefer_const_literals_to_create_immutables',
-  'use_truncating_division',
+  'prefer_const_declarations_with_fix',
+  'prefer_const_literals_to_create_immutables_widget_scoped',
+  'use_truncating_division_strict',
 
   // v5.1.0 - New rules (Recommended)
   'avoid_cached_image_web',
-  'avoid_void_async',
-  'avoid_unused_constructor_parameters',
+  'avoid_void_async_extended',
+  'avoid_unused_constructor_parameters_skip_private',
   'avoid_redundant_await',
   'avoid_redundant_null_check',
-  'avoid_returning_null_for_void',
-  'avoid_returning_null_for_future',
-  'avoid_shadowing_type_parameters',
+  'avoid_returning_null_for_void_with_fix',
+  'avoid_returning_null_for_future_strict',
+  'avoid_shadowing_type_parameters_class_methods',
 
   // Database (Isar)
   'require_isar_nullable_field',
@@ -1735,7 +1734,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_stack_trace_in_production', // WARNING - stack trace exposed to users
   // Additional rules (plan_additional_rules_11_through_20)
   'pubspec_package_name_convention', // WARNING - package name convention
-  'secure_pubspec_urls', // WARNING - insecure URLs in pubspec
+  'secure_pubspec_urls_strict', // WARNING - insecure URLs in pubspec
   // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
   'require_sdk_upper_bound', // WARNING - SDK constraint missing upper bound
   'avoid_unbounded_dependency', // WARNING - dependency pinned to `any`
@@ -1797,10 +1796,10 @@ const Set<String> professionalOnlyRules = <String>{
   // Code quality (roadmap detail requirements)
   'require_late_access_check', // late field access without init check
   'avoid_bool_in_widget_constructors',
-  'avoid_double_and_int_checks',
-  'avoid_field_initializers_in_const_classes',
-  'avoid_positional_boolean_parameters',
-  'avoid_setters_without_getters',
+  'avoid_double_and_int_checks_extended',
+  'avoid_field_initializers_in_const_classes_relaxed',
+  'avoid_positional_boolean_parameters_with_fix',
+  'avoid_setters_without_getters_local',
   'prefer_getters_before_setters',
   'prefer_mixin_over_abstract',
   'prefer_noun_class_names',
@@ -1811,14 +1810,14 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_static_before_instance',
   'prefer_verb_method_names',
   'prefer_adjective_bool_getters',
-  'prefer_asserts_in_initializer_lists',
-  'prefer_const_constructors_in_immutables',
+  'prefer_asserts_in_initializer_lists_safe',
+  'prefer_const_constructors_in_immutables_extended',
   'prefer_const_constructor_declarations',
   'prefer_constructors_first',
   'prefer_extension_methods',
   'prefer_extension_over_utility_class',
   'prefer_extension_type_for_wrapper',
-  'prefer_final_fields',
+  'prefer_final_fields_with_fix',
   // Widget Best Practices
   'prefer_widget_private_members', // Widget fields should be final/private
   // Architecture
@@ -2422,7 +2421,7 @@ const Set<String> professionalOnlyRules = <String>{
   'require_analytics_event_naming', // INFO - snake_case analytics events
   // Best practices (auto-assigned by severity)
   'avoid_adjacent_strings',
-  'avoid_classes_with_only_static_members',
+  'avoid_classes_with_only_static_members_with_fix',
   'avoid_always_null_parameters',
   'avoid_autoplay_audio',
   'avoid_barrel_files',
@@ -2624,7 +2623,7 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_doc_comments_over_regular' moved to stylisticRules (opinionated)
   // 'prefer_doc_curly_apostrophe' moved to stylisticRules (conflicting pair)
   // 'prefer_doc_straight_apostrophe' moved to stylisticRules (conflicting pair)
-  // 'prefer_double_quotes' moved to stylisticRules (conflicting pair)
+  // 'prefer_double_quotes_with_fix' moved to stylisticRules (conflicting pair)
   // 'prefer_dynamic_over_object' moved to stylisticRules (opinionated)
   // 'prefer_edgeinsets_only' moved to stylisticRules (opinionated)
   // 'prefer_edgeinsets_symmetric' moved to stylisticRules (opinionated)
@@ -2658,7 +2657,6 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_if_null_over_ternary' moved to stylisticRules (opinionated)
   // 'prefer_immediate_return' moved to stylisticRules (opinionated)
   // 'prefer_implicit_boolean_comparison' moved to stylisticRules (opinionated)
-  // 'prefer_initializing_formals' moved to stylisticRules (opinionated)
   // 'prefer_inline_callbacks' moved to stylisticRules (opinionated)
   // 'prefer_instance_members_first' moved to stylisticRules (conflicting pair)
   // 'prefer_interpolation_over_concatenation' moved to stylisticRules (opinionated)
@@ -2727,7 +2725,7 @@ const Set<String> professionalOnlyRules = <String>{
   // 'prefer_single_blank_line_max' moved to stylisticRules (opinionated)
   'prefer_single_declaration_per_file',
   // 'prefer_single_expectation_per_test' moved to stylisticRules (opinionated)
-  // 'prefer_single_quotes' moved to stylisticRules (conflicting pair)
+  // 'prefer_single_quotes_strict' moved to stylisticRules (conflicting pair)
   'prefer_single_widget_per_file',
   // 'prefer_sizedbox_over_container' moved to stylisticRules (opinionated)
   // 'prefer_sliver_prefix' moved to stylisticRules (opinionated)
@@ -3074,8 +3072,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'in_app_review_missing_store_listing_fallback',
   'in_app_review_ios_store_listing_missing_app_id',
   // Code style / Web (roadmap detail requirements)
-  'avoid_js_rounded_ints',
-  'avoid_private_typedef_functions',
+  'avoid_js_rounded_ints_extended',
   // Import sorting
   'prefer_sorted_imports', // alphabetical import sorting within groups
   // Performance micro-optimizations (moved from Professional)
@@ -3236,14 +3233,13 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'illegal_enum_values',
   'invalid_runtime_check_with_js_interop_types',
   'type_check_with_null',
-  'unnecessary_library_name',
+  'unnecessary_library_name_with_fix',
   'wrong_number_of_parameters_for_setter',
   // Additional rules (plan_additional_rules_11_through_20)
-  'missing_code_block_language_in_doc_comment', // INFO - doc code block language
-  'unintended_html_in_doc_comment', // INFO - angle brackets as HTML
+  'unintended_html_in_doc_comment_strict', // INFO - angle brackets as HTML
   'uri_does_not_exist_in_doc_import', // INFO - broken @docImport URI
   'invalid_visible_outside_template_annotation', // WARNING - wrong annotation use
-  'sort_pub_dependencies', // INFO - unsorted pubspec deps
+  'sort_pub_dependencies_extended', // INFO - unsorted pubspec deps
   // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
   'avoid_overly_wide_app_constraint', // INFO - app: range spans 2+ majors
   // CommonButton/CommonButtonWait caption hygiene (widget_patterns_avoid_prefer_rules.dart)
@@ -3275,7 +3271,7 @@ const Set<String> pedanticOnlyRules = <String>{
   // Very strict patterns
   'avoid_returning_widgets', // no widget helper methods
   'avoid_nullable_widget_methods', // no nullable widget returns
-  // Bool params: in pedantic only to avoid duplicate diagnostics with avoid_positional_boolean_parameters (professional)
+  // Bool params: in pedantic only to avoid duplicate diagnostics with avoid_positional_boolean_parameters_with_fix (professional)
   'prefer_named_bool_params',
   // Test pedantry
   'avoid_duplicate_test_assertions', // no repeated assertions
@@ -4730,8 +4726,7 @@ const Set<String> documentationRules = <String>{
   'avoid_misleading_documentation',
   'verify_documented_parameters_exist',
   'deprecated_new_in_comment_reference',
-  'missing_code_block_language_in_doc_comment',
-  'unintended_html_in_doc_comment',
+  'unintended_html_in_doc_comment_strict',
   'uri_does_not_exist_in_doc_import',
 };
 

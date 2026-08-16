@@ -4365,8 +4365,8 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'avoid_positional_boolean_parameters',
-    '[avoid_positional_boolean_parameters] Positional bool parameter makes call sites unreadable. Use named parameters for clarity.',
+    'avoid_positional_boolean_parameters_with_fix',
+    '[avoid_positional_boolean_parameters_with_fix] Positional bool parameter makes call sites unreadable. Use named parameters for clarity.',
     correctionMessage:
         'Convert to a named parameter so call sites are self-documenting.',
     severity: DiagnosticSeverity.INFO,
@@ -4422,7 +4422,7 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
 /// Prefer named boolean parameters for functions with few parameters.
 ///
 /// Flags positional bool parameters in functions with 1–3 parameters. Complements
-/// avoid_positional_boolean_parameters; use one or the other. Excludes setters,
+/// avoid_positional_boolean_parameters_with_fix; use one or the other. Excludes setters,
 /// operators, and @override methods.
 class BannedUsageRule extends SaropaLintRule {
   BannedUsageRule() : super(code: _code);

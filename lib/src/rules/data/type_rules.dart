@@ -2776,8 +2776,8 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
   bool get requiresClassDeclaration => true;
 
   static const LintCode _code = LintCode(
-    'avoid_shadowing_type_parameters',
-    '[avoid_shadowing_type_parameters] A method type parameter with the same '
+    'avoid_shadowing_type_parameters_class_methods',
+    '[avoid_shadowing_type_parameters_class_methods] A method type parameter with the same '
         'name as the enclosing class type parameter creates a new, unrelated '
         'type that shadows the outer one. This causes confusing compile errors '
         'where values of the "same" type T are incompatible. Rename the method '
@@ -2822,57 +2822,6 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a private typedef defines a function type.
-///
-/// Prefer inline function types at the usage site for clarity.
-///
-/// **Bad:**
-/// ```dart
-/// typedef _ClickHandler = void Function(BuildContext context);
-/// ```
-///
-/// **Good:**
-/// ```dart
-/// final void Function(BuildContext context) onTap;
-/// ```
-class AvoidPrivateTypedefFunctionsRule extends SaropaLintRule {
-  AvoidPrivateTypedefFunctionsRule() : super(code: _code);
-
-  @override
-  LintImpact get impact => LintImpact.info;
-
-  @override
-  RuleType? get ruleType => RuleType.codeSmell;
-
-  @override
-  Set<String> get tags => const {'reliability', 'type-safety'};
-
-  @override
-  RuleCost get cost => RuleCost.low;
-  @override
-  bool get usesTypeResolution => true;
-
-  static const LintCode _code = LintCode(
-    'avoid_private_typedef_functions',
-    '[avoid_private_typedef_functions] Private typedef that defines a function type. Prefer using the inline function type at each usage site.',
-    correctionMessage:
-        'Remove this private typedef and use the inline function type (e.g. void Function(BuildContext)) at usage sites.',
-    severity: DiagnosticSeverity.INFO,
-  );
-
-  @override
-  void runWithReporter(
-    SaropaDiagnosticReporter reporter,
-    SaropaContext context,
-  ) {
-    context.addGenericTypeAlias((GenericTypeAlias node) {
-      if (!node.name.lexeme.startsWith('_')) return;
-      final TypeAnnotation type = node.type;
-      if (type is! GenericFunctionType) return;
-      reporter.atToken(node.name);
-    });
-  }
-}
 
 /// Prefer final for local variables that are never reassigned.
 ///
@@ -2904,8 +2853,8 @@ class PreferFinalLocalsRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'prefer_final_locals',
-    '[prefer_final_locals] Local variable that is never reassigned should be declared final.',
+    'prefer_final_locals_with_fix',
+    '[prefer_final_locals_with_fix] Local variable that is never reassigned should be declared final.',
     correctionMessage: 'Add the final modifier (or replace var with final).',
     severity: DiagnosticSeverity.INFO,
   );
@@ -3051,8 +3000,8 @@ class PreferConstDeclarationsRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
-    'prefer_const_declarations',
-    '[prefer_const_declarations] Variable with constant initializer could be declared const for better performance and clarity.',
+    'prefer_const_declarations_with_fix',
+    '[prefer_const_declarations_with_fix] Variable with constant initializer could be declared const for better performance and clarity.',
     correctionMessage: 'Use const instead of final for this declaration.',
     severity: DiagnosticSeverity.INFO,
   );
