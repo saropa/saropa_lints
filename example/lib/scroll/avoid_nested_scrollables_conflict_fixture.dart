@@ -1,5 +1,5 @@
 // ignore_for_file: depend_on_referenced_packages, prefer_const_constructors
-// ignore_for_file: prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_literals_to_create_immutables_widget_scoped
 
 /// Fixture for `avoid_nested_scrollables_conflict` (same-axis nesting vs cross-axis).
 

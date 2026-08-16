@@ -1,9 +1,9 @@
 // ignore_for_file: unused_local_variable, unused_element
 
-/// Fixture for `avoid_returning_this` lint rule.
+/// Fixture for `avoid_returning_this_with_fix` lint rule.
 
 // BAD: Return this for chaining (can confuse or encourage mutable APIs)
-// expect_lint: avoid_returning_this
+// expect_lint: avoid_returning_this_with_fix
 class Bad {
   Bad copy() => this;
 }

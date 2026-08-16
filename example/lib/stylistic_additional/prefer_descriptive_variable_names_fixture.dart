@@ -2,7 +2,7 @@
 // ignore_for_file: depend_on_referenced_packages
 // ignore_for_file: prefer_const_constructors
 // ignore_for_file: unnecessary_import, unused_import
-// ignore_for_file: prefer_const_declarations
+// ignore_for_file: prefer_const_declarations_with_fix
 // Test fixture for: prefer_descriptive_variable_names (v4)
 // Source: lib/src/rules/stylistic/stylistic_additional_rules.dart
 

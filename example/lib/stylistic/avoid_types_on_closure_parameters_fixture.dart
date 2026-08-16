@@ -1,5 +1,5 @@
 // ignore_for_file: unused_element
-// Fixture for avoid_types_on_closure_parameters.
+// Fixture for avoid_types_on_closure_parameters_with_fix.
 // Rule: avoid explicit types on closure parameters when inferrable.
 
 void useList(List<int> list) {

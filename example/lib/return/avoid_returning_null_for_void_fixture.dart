@@ -1,5 +1,5 @@
 // ignore_for_file: unused_element
-// Fixture for avoid_returning_null_for_void.
+// Fixture for avoid_returning_null_for_void_with_fix.
 // Rule flags explicit return of null in void functions.
 
 // BAD: return null in void function — should trigger

@@ -1,9 +1,9 @@
 // ignore_for_file: unused_local_variable, unused_element
 
-/// Fixture for `avoid_single_cascade_in_expression_statements` lint rule.
+/// Fixture for `avoid_single_cascade_in_expression_statements_with_fix` lint rule.
 
 // BAD: Single cascade as statement
-// expect_lint: avoid_single_cascade_in_expression_statements
+// expect_lint: avoid_single_cascade_in_expression_statements_with_fix
 void bad() {
   final list = <int>[];
   list..add(1);

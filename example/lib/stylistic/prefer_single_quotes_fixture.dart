@@ -1,6 +1,6 @@
 // ignore_for_file: unused_local_variable, unused_element
 
-/// Fixture for `prefer_single_quotes` lint rule.
+/// Fixture for `prefer_single_quotes_strict` lint rule.
 
 void badExamples() {
   // LINT: Double-quoted simple string without single quotes

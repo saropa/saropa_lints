@@ -1,5 +1,5 @@
 // ignore_for_file: unused_element
-// Fixture for avoid_setters_without_getters.
+// Fixture for avoid_setters_without_getters_local.
 // Rule flags setter without corresponding getter.
 
 void placeholderAvoidSettersWithoutGetters() {}

@@ -5,7 +5,7 @@
 // ignore_for_file: non_type_as_type_argument, annotate_overrides
 // ignore_for_file: body_might_complete_normally, missing_required_argument
 // ignore_for_file: argument_type_not_assignable, return_of_invalid_type
-// ignore_for_file: avoid_unused_constructor_parameters
+// ignore_for_file: avoid_unused_constructor_parameters_skip_private
 // ignore_for_file: non_constant_identifier_names, constant_identifier_names
 
 /// Fixture for `prefer_static_final_for_session_constant`.

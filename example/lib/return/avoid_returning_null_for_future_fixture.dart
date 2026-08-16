@@ -1,5 +1,5 @@
 // ignore_for_file: unused_element
-// Fixture for avoid_returning_null_for_future.
+// Fixture for avoid_returning_null_for_future_strict.
 // Rule flags return null where Future<T> is expected (e.g. async returning null).
 
 // BAD: async function returning null — should trigger

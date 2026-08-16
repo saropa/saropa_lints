@@ -1,5 +1,5 @@
 // ignore_for_file: unused_local_variable, prefer_const_constructors
-// ignore_for_file: avoid_unnecessary_containers, unused_element
+// ignore_for_file: avoid_unnecessary_containers_resolved, unused_element
 // ignore_for_file: dead_code, unreachable_from_main
 // ignore_for_file: unnecessary_null_comparison, dead_null_aware_expression
 
@@ -212,27 +212,6 @@ class Cat extends Animal {
   Cat(super.name, this.breed);
 }
 
-// --- prefer_initializing_formals / prefer_explicit_field_assignment ---
-
-// BAD: Explicit field assignment (prefer_initializing_formals)
-// expect_lint: prefer_initializing_formals
-class PersonExplicit {
-  final String name;
-  final int age;
-
-  PersonExplicit(String name, int age)
-      : name = name,
-        age = age;
-}
-
-// GOOD: Initializing formals
-class PersonFormals {
-  final String name;
-  final int age;
-
-  PersonFormals(this.name, this.age);
-}
-
 // =============================================================================
 // ERROR HANDLING STYLE RULES
 // =============================================================================
@@ -321,10 +300,10 @@ class AdditionalStyleExamples {
     return 'Hello, $name!';
   }
 
-  // --- prefer_single_quotes / prefer_double_quotes ---
+  // --- prefer_single_quotes_strict / prefer_double_quotes_with_fix ---
 
-  // BAD: Double quotes (prefer_single_quotes)
-  // expect_lint: prefer_single_quotes
+  // BAD: Double quotes (prefer_single_quotes_strict)
+  // expect_lint: prefer_single_quotes_strict
   final doubleQuoted = "Hello";
 
   // GOOD: Single quotes
