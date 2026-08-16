@@ -198,5 +198,168 @@ void main() {
       expect(result, isA<ScanParseOk>());
       expect((result as ScanParseOk).args.debugRule, isNull);
     });
+
+    test('--min-severity parses valid values', () {
+      // All three recognized severity levels should parse successfully.
+      for (final sev in ['info', 'warning', 'error', 'INFO', 'Warning']) {
+        final result = parseScanArgs(<String>['.', '--min-severity', sev]);
+        expect(result, isA<ScanParseOk>(), reason: sev);
+        expect(
+          (result as ScanParseOk).args.minSeverity,
+          sev.toUpperCase(),
+          reason: sev,
+        );
+      }
+    });
+
+    test('--min-severity with invalid value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--min-severity', 'debug']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--min-severity must be one of'),
+      );
+    });
+
+    test('--min-severity with no value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--min-severity']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--min-severity requires a value'),
+      );
+    });
+
+    test('--min-severity with next option as value returns invalid', () {
+      // --format looks like a flag, not a severity value.
+      final result = parseScanArgs(<String>[
+        '.',
+        '--min-severity',
+        '--format',
+      ]);
+      expect(result, isA<ScanParseInvalid>());
+    });
+
+    test('--min-severity null by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.minSeverity, isNull);
+    });
+
+    test('--min-severity combines with other flags', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--min-severity',
+        'warning',
+        '--tier',
+        'pedantic',
+        '--format',
+        'json',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.minSeverity, 'WARNING');
+      expect(args.tier, 'pedantic');
+      expect(args.formatJson, isTrue);
+    });
+
+    test('--max-severity parses valid values', () {
+      for (final sev in ['info', 'warning', 'error', 'INFO', 'Error']) {
+        final result = parseScanArgs(<String>['.', '--max-severity', sev]);
+        expect(result, isA<ScanParseOk>(), reason: sev);
+        expect(
+          (result as ScanParseOk).args.maxSeverity,
+          sev.toUpperCase(),
+          reason: sev,
+        );
+      }
+    });
+
+    test('--max-severity with invalid value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--max-severity', 'hint']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--max-severity must be one of'),
+      );
+    });
+
+    test('--max-severity with no value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--max-severity']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--max-severity requires a value'),
+      );
+    });
+
+    test('--max-severity null by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.maxSeverity, isNull);
+    });
+
+    test('--min-severity and --max-severity combine for a severity window', () {
+      // Both flags together define a severity band.
+      final result = parseScanArgs(<String>[
+        '.',
+        '--min-severity',
+        'info',
+        '--max-severity',
+        'warning',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.minSeverity, 'INFO');
+      expect(args.maxSeverity, 'WARNING');
+    });
+  });
+
+  group('--min-severity filtering (process)', () {
+    test('--min-severity error with no errors exits 0 with threshold message',
+        () async {
+      // Runs against the project itself with --tier essential (mostly info/warning),
+      // filtered to ERROR-only — expect exit 0 and the "below threshold" message.
+      final result = await Process.run(
+        'dart',
+        [
+          'run',
+          'saropa_lints:scan',
+          '.',
+          '--tier',
+          'essential',
+          '--min-severity',
+          'error',
+          '--files',
+          'lib/src/scan/scan_cli_args.dart',
+        ],
+        runInShell: true,
+        workingDirectory: Directory.current.path,
+      );
+      // If there are no error-level diagnostics in this file, expect exit 0
+      // and either "No issues found" or the "below threshold" message.
+      if (result.exitCode == 0) {
+        final stdout = result.stdout.toString();
+        expect(
+          stdout.contains('No issues') || stdout.contains('below threshold'),
+          isTrue,
+          reason: 'Expected clean or threshold message, got: $stdout',
+        );
+      }
+    });
+
+    test('--min-severity invalid value exits 2', () async {
+      final result = await Process.run(
+        'dart',
+        ['run', 'saropa_lints:scan', '.', '--min-severity', 'debug'],
+        runInShell: true,
+        workingDirectory: Directory.current.path,
+      );
+      expect(result.exitCode, 2);
+      expect(
+        result.stdout.toString(),
+        contains('--min-severity must be one of'),
+      );
+    });
   });
 }

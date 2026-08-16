@@ -64,6 +64,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.0.3]
+
+The scan CLI now lets users filter diagnostics by severity, so AI agents and CI pipelines can suppress info-level noise and focus on warnings and errors. [log](https://github.com/saropa/saropa_lints/blob/v15.0.3/CHANGELOG.md)
+
+### Added
+
+- `--min-severity` flag for the `scan` command filters diagnostics by severity threshold — `--min-severity warning` excludes info-level output from both stdout and the report file, reducing noise for AI agents and CI pipelines. No action required.
+- `--max-severity` flag for the `scan` command caps output at a severity ceiling — `--max-severity warning` hides errors so you can triage lower-priority noise in isolation. No action required.
+
+---
+
 ## [15.0.2]
 
 This release focuses on improving the reliability and user experience of the extension's setup workflows. Progress notifications now provide real-time feedback during lengthy operations to clearly communicate the current status. Safeguards have also been introduced to prevent duplicate, conflicting tasks from executing concurrently if a command is triggered multiple times. [log](https://github.com/saropa/saropa_lints/blob/v15.0.2/CHANGELOG.md)

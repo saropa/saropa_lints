@@ -12,9 +12,11 @@
 /// **Usage from tests:** Call [parseScanArgs] with [stdinLines] set to a
 /// fixed list of paths so that stdin is not read. Omit [readStdin].
 ///
-/// **Validation:** [--tier] with no following argument (or with the next
-/// argument being an option like [--format]) returns [ScanParseInvalid]
-/// with a user-facing message; the binary then exits with code 2.
+/// **Validation:** [--tier], [--min-severity], [--max-severity], and
+/// [--debug-rule] with no following argument (or with the next argument being
+/// an option like [--format]) return [ScanParseInvalid] with a user-facing
+/// message; the binary then exits with code 2. Severity values are validated
+/// against the set {info, warning, error} (case-insensitive).
 library;
 
 /// Result of parsing scan CLI arguments.
@@ -42,12 +44,26 @@ class ScanCliArgs {
     required this.resolve,
     this.debugRule,
     this.fixIgnores = false,
+    this.minSeverity,
+    this.maxSeverity,
   });
 
   final String path;
   final List<String> dartFiles;
   final String? tier;
   final bool formatJson;
+
+  /// Minimum severity threshold for output filtering.
+  /// When set, diagnostics below this severity are excluded from stdout
+  /// and report output. Valid values: 'INFO', 'WARNING', 'ERROR'.
+  /// Null means no filtering (show all severities).
+  final String? minSeverity;
+
+  /// Maximum severity cap for output filtering.
+  /// When set, diagnostics above this severity are excluded — useful for
+  /// viewing only lower-priority noise during triage. Valid values same
+  /// as [minSeverity]. Null means no upper cap.
+  final String? maxSeverity;
 
   /// When true, the scan fully resolves each unit instead of the default
   /// syntactic parse. Required for rules registered on
@@ -88,6 +104,8 @@ ScanParseResult parseScanArgs(
   List<String> dartFiles = [];
   String? tier;
   String? debugRule;
+  String? minSeverity;
+  String? maxSeverity;
   bool formatJson = false;
   bool resolve = false;
 
@@ -143,6 +161,46 @@ ScanParseResult parseScanArgs(
       }
       continue;
     }
+    if (arg == '--min-severity') {
+      i++;
+      // Validate the severity value is a recognized level.
+      if (i < args.length && !args[i].startsWith('--')) {
+        final value = args[i].toUpperCase();
+        if (value == 'INFO' || value == 'WARNING' || value == 'ERROR') {
+          minSeverity = value;
+          i++;
+        } else {
+          return ScanParseInvalid(
+            '--min-severity must be one of: info, warning, error.',
+          );
+        }
+      } else {
+        return ScanParseInvalid(
+          '--min-severity requires a value (info, warning, error).',
+        );
+      }
+      continue;
+    }
+    if (arg == '--max-severity') {
+      i++;
+      // Validate the severity value is a recognized level.
+      if (i < args.length && !args[i].startsWith('--')) {
+        final value = args[i].toUpperCase();
+        if (value == 'INFO' || value == 'WARNING' || value == 'ERROR') {
+          maxSeverity = value;
+          i++;
+        } else {
+          return ScanParseInvalid(
+            '--max-severity must be one of: info, warning, error.',
+          );
+        }
+      } else {
+        return ScanParseInvalid(
+          '--max-severity requires a value (info, warning, error).',
+        );
+      }
+      continue;
+    }
     if (arg == '--format') {
       i++;
       if (i < args.length) {
@@ -162,6 +220,8 @@ ScanParseResult parseScanArgs(
       resolve: resolve,
       debugRule: debugRule,
       fixIgnores: fixIgnores,
+      minSeverity: minSeverity,
+      maxSeverity: maxSeverity,
     ),
   );
 }

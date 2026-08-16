@@ -82,21 +82,62 @@ Future<void> main(List<String> args) async {
     exit(2);
   }
 
-  if (diagnostics.isEmpty) {
-    if (!formatJson) print('\nNo issues found.');
+  // Warn about unrecognized severity values so a future analyzer change
+  // doesn't silently drop diagnostics through the rank-0 fallback.
+  if (parsed.minSeverity != null) {
+    final unknown = diagnostics
+        .map((d) => d.severity.toUpperCase())
+        .where((s) => !_knownSeverities.contains(s))
+        .toSet();
+    for (final s in unknown) {
+      stderr.writeln('Warning: unrecognized severity "$s" — excluded by filter.');
+    }
+  }
+
+  // Apply --min-severity / --max-severity filter to exclude diagnostics
+  // outside the requested severity window.
+  final filtered = (parsed.minSeverity != null || parsed.maxSeverity != null)
+      ? diagnostics.where((d) {
+          final rank = _severityRank(d.severity);
+          if (parsed.minSeverity != null &&
+              rank < _severityRank(parsed.minSeverity!)) {
+            return false;
+          }
+          if (parsed.maxSeverity != null &&
+              rank > _severityRank(parsed.maxSeverity!)) {
+            return false;
+          }
+          return true;
+        }).toList()
+      : diagnostics;
+
+  if (filtered.isEmpty) {
+    if (!formatJson) {
+      // Distinguish "genuinely clean" from "all outside window" so callers
+      // (AI agents, CI) know diagnostics were suppressed, not absent.
+      final hasFilter = parsed.minSeverity != null || parsed.maxSeverity != null;
+      if (hasFilter && diagnostics.isNotEmpty) {
+        print(
+          '\nNo issues in the requested severity window '
+          '(${diagnostics.length} outside threshold).',
+        );
+      } else {
+        print('\nNo issues found.');
+      }
+    }
     if (formatJson) {
-      print(scanDiagnosticsToJsonString(diagnostics));
+      print(scanDiagnosticsToJsonString(filtered));
     }
     exit(0);
   }
 
   if (formatJson) {
-    print(scanDiagnosticsToJsonString(diagnostics));
+    print(scanDiagnosticsToJsonString(filtered));
     exit(1);
   }
 
-  final reportPath = _writeReport(diagnostics, path);
-  _printSummary(diagnostics);
+  final reportPath = _writeReport(filtered, path);
+  _printSummary(filtered);
   print('Report: $reportPath');
   exit(1);
 }
@@ -242,6 +283,24 @@ void _runFixIgnores(String targetPath) {
   }
 }
 
+/// Known severity strings emitted by the analyzer diagnostic system.
+const _knownSeverities = {'ERROR', 'WARNING', 'INFO'};
+
+/// Severity rank for ordering/filtering: higher = more severe.
+/// The fallback `_ => 0` handles the analyzer's NONE severity (never used in
+/// practice for diagnostics) — such entries are excluded by any filter, which
+/// is safe because no real lint rule emits NONE.
+int _severityRank(String severity) => switch (severity.toUpperCase()) {
+  'ERROR' => 3,
+  'WARNING' => 2,
+  'INFO' => 1,
+  _ => 0,
+};
+
+/// Returns true if [severity] is at or above [minSeverity].
+bool _meetsMinSeverity(String severity, String minSeverity) =>
+    _severityRank(severity) >= _severityRank(minSeverity);
+
 void _printUsage() {
   print('saropa_lints scan - Standalone lint scanner');
   print('');
@@ -279,6 +338,18 @@ void _printUsage() {
   );
   print(
     '                      // ignore: saropa_lints/rule_name for all known rules.',
+  );
+  print(
+    '  --min-severity <s>  Only show diagnostics at or above this severity.',
+  );
+  print(
+    '                      Values: info (default/all), warning, error.',
+  );
+  print(
+    '  --max-severity <s>  Only show diagnostics at or below this severity.',
+  );
+  print(
+    '                      Useful for viewing lower-priority noise in isolation.',
   );
   print(
     '  --format json       Output machine-readable JSON to stdout (no report file).',
@@ -333,5 +404,7 @@ void _printUsage() {
   print(
     '  echo "lib/foo.dart" | dart run saropa_lints scan . --files-from-stdin',
   );
+  print('  dart run saropa_lints scan . --min-severity warning  # skip info');
+  print('  dart run saropa_lints scan . --max-severity warning  # skip errors');
   print('  dart run saropa_lints scan . --format json  # JSON to stdout');
 }
