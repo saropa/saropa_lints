@@ -1225,10 +1225,16 @@ class AvoidDeepNestingRule extends SaropaLintRule {
 /// Cyclomatic complexity measures the number of independent execution paths
 /// through a function. High complexity makes testing and maintenance harder.
 ///
-/// **Exclusion:** Methods or functions named `copyWith` are not reported.
-/// They implement the standard Dart immutable-update pattern; their apparent
-/// complexity is mechanical (one null-coalescing branch per parameter), not
-/// logical, and does not match the rule's intent.
+/// **Exclusions:**
+/// - Methods or functions named `copyWith` are not reported.
+///   They implement the standard Dart immutable-update pattern; their apparent
+///   complexity is mechanical (one null-coalescing branch per parameter), not
+///   logical, and does not match the rule's intent.
+/// - Flat switch dispatch tables (every case body is a single return, break,
+///   continue, or expression statement with no nested control flow and no
+///   guard clauses) use fractional weighting (0.2 per case) instead of +1
+///   per case. Normal enum→value lookups pass; extreme outliers (70+ cases)
+///   still flag.
 ///
 /// ### Example
 ///
@@ -1323,12 +1329,21 @@ class AvoidHighCyclomaticComplexityRule extends SaropaLintRule {
   static int _computeComplexity(FunctionBody body) {
     final counter = _ComplexityCounter();
     body.accept(counter);
-    return counter.complexity + 1; // +1 for the function itself
+    // Ceiling so fractional flat-switch weight rounds up conservatively
+    return counter.complexity.ceil() + 1; // +1 for the function itself
   }
 }
 
 class _ComplexityCounter extends RecursiveAstVisitor<void> {
-  int complexity = 0;
+  /// Fractional weight per case in a flat dispatch table — a 70-case
+  /// lookup contributes 15.0 total (1.0 base + 70 × 0.2), flagging
+  /// extreme outliers while passing normal enum dispatches.
+  static const double _flatCaseWeight = 0.2;
+
+  double complexity = 0;
+
+  /// Switches identified as flat dispatch tables — skip per-case counting.
+  final Set<SwitchStatement> _flatSwitches = {};
 
   @override
   void visitIfStatement(IfStatement node) {
@@ -1355,7 +1370,27 @@ class _ComplexityCounter extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitSwitchStatement(SwitchStatement node) {
+    // Detect flat dispatch tables: every case body is a single trivial
+    // statement (return, break, expression, or continue) with no nested
+    // control flow. These are enum→value lookup tables whose complexity
+    // is mechanical (proportional to enum cardinality), not logical.
+    if (_isFlatDispatchTable(node)) {
+      // Count the switch as 1 + (caseCount × fractional weight) instead
+      // of +1 per case. Normal enum dispatches pass; extreme outliers flag.
+      complexity += 1.0 + (node.members.length * _flatCaseWeight);
+      _flatSwitches.add(node);
+    }
+    super.visitSwitchStatement(node);
+  }
+
+  @override
   void visitSwitchPatternCase(SwitchPatternCase node) {
+    // Skip per-case counting for flat dispatch tables — already counted
+    // as +1 for the whole switch in visitSwitchStatement.
+    final AstNode? parent = node.parent;
+    if (parent is SwitchStatement && _flatSwitches.contains(parent)) return;
+
     complexity++;
     super.visitSwitchPatternCase(node);
   }
@@ -1385,5 +1420,103 @@ class _ComplexityCounter extends RecursiveAstVisitor<void> {
   @override
   void visitFunctionExpression(FunctionExpression node) {
     // Skip — nested closures have their own complexity
+  }
+
+  /// A flat dispatch table has only SwitchPatternCase/SwitchDefault members,
+  /// each with exactly one trivial statement, no guard clauses, and no
+  /// nested control flow.
+  static bool _isFlatDispatchTable(SwitchStatement node) {
+    // An empty switch or single-case switch is too small to be a dispatch
+    // table — let it go through normal per-case counting.
+    if (node.members.length < 2) return false;
+
+    for (final SwitchMember member in node.members) {
+      final NodeList<Statement> statements;
+      if (member is SwitchPatternCase) {
+        // Guard clauses (when expressions) introduce real branching —
+        // a guarded case is not part of a flat dispatch table.
+        if (member.guardedPattern.whenClause != null) return false;
+        statements = member.statements;
+      } else if (member is SwitchDefault) {
+        statements = member.statements;
+      } else {
+        // Old-style SwitchCase — not a pattern switch, don't exempt
+        return false;
+      }
+
+      // Each case must have exactly one statement
+      if (statements.length != 1) return false;
+
+      // That statement must be trivial (no nested branching)
+      if (!_isTrivialStatement(statements.first)) return false;
+    }
+
+    return true;
+  }
+
+  /// A trivial statement has no internal branching — just a return, break,
+  /// continue, or expression with no ternaries, logical operators, or
+  /// nested control flow.
+  static bool _isTrivialStatement(Statement stmt) {
+    if (stmt is BreakStatement || stmt is ContinueStatement) return true;
+
+    // Check for complexity-contributing nodes inside the statement
+    final checker = _HasBranchingVisitor();
+    stmt.accept(checker);
+    return !checker.hasBranching;
+  }
+}
+
+/// Detects any complexity-contributing nodes inside a statement.
+/// Used by [_ComplexityCounter._isTrivialStatement] to verify that
+/// switch case bodies have no internal branching.
+class _HasBranchingVisitor extends RecursiveAstVisitor<void> {
+  bool hasBranching = false;
+
+  @override
+  void visitIfStatement(IfStatement node) {
+    hasBranching = true;
+  }
+
+  @override
+  void visitForStatement(ForStatement node) {
+    hasBranching = true;
+  }
+
+  @override
+  void visitWhileStatement(WhileStatement node) {
+    hasBranching = true;
+  }
+
+  @override
+  void visitDoStatement(DoStatement node) {
+    hasBranching = true;
+  }
+
+  @override
+  void visitSwitchStatement(SwitchStatement node) {
+    hasBranching = true;
+  }
+
+  @override
+  void visitTryStatement(TryStatement node) {
+    // try/catch introduces error-handling branches — not trivial.
+    hasBranching = true;
+  }
+
+  @override
+  void visitConditionalExpression(ConditionalExpression node) {
+    hasBranching = true;
+  }
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    if (hasBranching) return;
+    final String op = node.operator.lexeme;
+    if (op == '&&' || op == '||' || op == '??') {
+      hasBranching = true;
+    }
+    // Continue visiting for non-branching binary expressions.
+    if (!hasBranching) super.visitBinaryExpression(node);
   }
 }
