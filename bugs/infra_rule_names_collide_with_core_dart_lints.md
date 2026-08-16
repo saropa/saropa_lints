@@ -194,7 +194,7 @@ Common suffix patterns:
 | 14 | `avoid_single_cascade_in_expression_statements` | `avoid_single_cascade_in_expression_statements_with_fix` | adds `ReplaceSingleCascadeWithDotFix` |
 | 15 | `avoid_types_on_closure_parameters` | `avoid_types_on_closure_parameters_with_fix` | adds `RemoveClosureParameterTypeFix` |
 | 16 | `avoid_unnecessary_containers` | `avoid_unnecessary_containers_resolved` | uses resolved type info, not name matching |
-| 17 | `avoid_unused_constructor_parameters` | `avoid_unused_constructor_parameters_no_private` | skips private params, regex-based usage detection |
+| 17 | `avoid_unused_constructor_parameters` | `avoid_unused_constructor_parameters_skip_private` | skips private params, regex-based usage detection |
 | 18 | `avoid_void_async` | `avoid_void_async_extended` | lifecycle/test method exemptions + @override skip + fix |
 | 19 | `missing_code_block_language_in_doc_comment` | **DROP** | no behavioral difference from core lint |
 | 20 | `prefer_asserts_in_initializer_lists` | `prefer_asserts_in_initializer_lists_safe` | safety analysis prevents invalid moves |

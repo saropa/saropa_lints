@@ -108,14 +108,11 @@ TIER_SET_PATTERNS: dict[str, str] = {
 }
 
 # Core Dart/Flutter analyzer lint names. saropa_lints must NEVER register
-# a rule under any of these names — zero collisions permitted. Sourced from
-# the Dart SDK linter package (dart-lang/linter) as of Dart 3.7. Update
-# this set when new core lints are added upstream.
-#
-# Only includes rules that a saropa_lints rule has historically collided
-# with or is likely to collide with (common naming patterns). Not the
-# full ~200-rule SDK set — add names as needed when new saropa_lints
-# rules are authored with names close to core lints.
+# a rule under any of these names — zero collisions permitted. Auto-generated
+# from dart-lang/linter (tool/machine/rules.json). To update:
+#     python scripts/update_core_lint_names.py
+# To check staleness without modifying:
+#     python scripts/update_core_lint_names.py --check
 CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "always_declare_return_types",
     "always_put_control_body_on_new_line",
@@ -124,7 +121,6 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "always_specify_types",
     "always_use_package_imports",
     "annotate_overrides",
-    "annotate_redeclares",
     "avoid_annotating_with_dynamic",
     "avoid_as",
     "avoid_bool_literals_in_conditional_expressions",
@@ -163,7 +159,6 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "avoid_types_as_parameter_names",
     "avoid_types_on_closure_parameters",
     "avoid_unnecessary_containers",
-    "avoid_unstable_final_fields",
     "avoid_unused_constructor_parameters",
     "avoid_void_async",
     "avoid_web_libraries_in_flutter",
@@ -189,10 +184,10 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "directives_ordering",
     "discarded_futures",
     "do_not_use_environment",
-    "document_ignores",
     "empty_catches",
     "empty_constructor_bodies",
     "empty_statements",
+    "enable_null_safety",
     "eol_at_end_of_file",
     "exhaustive_cases",
     "file_names",
@@ -202,6 +197,8 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "implicit_call_tearoffs",
     "implicit_reopen",
     "invalid_case_patterns",
+    "invariant_booleans",
+    "iterable_contains_unrelated_type",
     "join_return_with_assignment",
     "leading_newlines_in_multiline_strings",
     "library_annotations",
@@ -209,9 +206,9 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "library_prefixes",
     "library_private_types_in_public_api",
     "lines_longer_than_80_chars",
+    "list_remove_unrelated_type",
     "literal_only_boolean_expressions",
     "matching_super_parameters",
-    "missing_code_block_language_in_doc_comment",
     "missing_whitespace_between_adjacent_strings",
     "no_adjacent_strings_in_list",
     "no_default_cases",
@@ -228,8 +225,6 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "null_check_on_nullable_type_parameter",
     "null_closures",
     "omit_local_variable_types",
-    "omit_obvious_local_variable_types",
-    "omit_obvious_property_types",
     "one_member_abstracts",
     "only_throw_errors",
     "overridden_fields",
@@ -240,6 +235,7 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "prefer_adjacent_string_concatenation",
     "prefer_asserts_in_initializer_lists",
     "prefer_asserts_with_message",
+    "prefer_bool_in_asserts",
     "prefer_collection_literals",
     "prefer_conditional_assignment",
     "prefer_const_constructors",
@@ -249,6 +245,7 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "prefer_constructors_over_static_methods",
     "prefer_contains",
     "prefer_double_quotes",
+    "prefer_equal_for_default_values",
     "prefer_expression_function_bodies",
     "prefer_final_fields",
     "prefer_final_in_for_each",
@@ -288,8 +285,7 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "sort_constructors_first",
     "sort_pub_dependencies",
     "sort_unnamed_constructors_first",
-    "specify_nonobvious_local_variable_types",
-    "specify_nonobvious_property_types",
+    "super_goes_last",
     "test_types_in_equals",
     "throw_in_finally",
     "tighten_type_of_initializing_formals",
@@ -297,7 +293,6 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "type_init_formals",
     "type_literal_in_constant_pattern",
     "unawaited_futures",
-    "unintended_html_in_doc_comment",
     "unnecessary_await_in_return",
     "unnecessary_brace_in_string_interps",
     "unnecessary_breaks",
@@ -308,7 +303,6 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "unnecessary_lambdas",
     "unnecessary_late",
     "unnecessary_library_directive",
-    "unnecessary_library_name",
     "unnecessary_new",
     "unnecessary_null_aware_assignments",
     "unnecessary_null_aware_operator_on_extension_on_nullable",
@@ -345,7 +339,6 @@ CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
     "use_super_parameters",
     "use_test_throws_matchers",
     "use_to_and_as_if_applicable",
-    "use_truncating_division",
     "valid_regexps",
     "void_checks",
 })

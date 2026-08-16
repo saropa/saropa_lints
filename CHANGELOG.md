@@ -81,6 +81,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 <details><summary>Maintenance</summary>
 
 - Consolidated animation-builder widget name sets into `kAnimatedRebuilders` in `compound_performance_patterns.dart`, used by both compound-performance rules and `avoid_gradient_in_build`.
+- Publish audit now blocks on core Dart lint name collisions (Check 8 in tier integrity), auto-updated from dart-lang/linter via `python scripts/update_core_lint_names.py`.
 
 </details>
 
