@@ -652,7 +652,7 @@ saropa_lints:
     - pass_correct_accepted_type: false
     - pass_optional_argument: false
     - avoid_returning_cascades: false
-    - avoid_returning_this: false
+    - avoid_returning_this_with_fix: false
     - avoid_returning_void: false
     - avoid_unnecessary_return: false
     - prefer_immediate_return: false
@@ -1107,18 +1107,18 @@ saropa_lints:
     - avoid_global_state: false
     - avoid_variable_shadowing: false
     # Roadmap detail 12 rules (v6.0.8) — Recommended / Professional
-    - avoid_unnecessary_containers: false
+    - avoid_unnecessary_containers_resolved: false
     - prefer_adjacent_strings: false
     - prefer_adjective_bool_getters: false
-    - prefer_asserts_in_initializer_lists: false
-    - prefer_const_constructors_in_immutables: false
-    - prefer_const_declarations: false
-    - prefer_const_literals_to_create_immutables: false
+    - prefer_asserts_in_initializer_lists_safe: false
+    - prefer_const_constructors_in_immutables_extended: false
+    - prefer_const_declarations_with_fix: false
+    - prefer_const_literals_to_create_immutables_widget_scoped: false
     - prefer_constructors_first: false
     - prefer_extension_methods: false
     - prefer_extension_over_utility_class: false
     - prefer_extension_type_for_wrapper: false
-    - prefer_final_fields: false
+    - prefer_final_fields_with_fix: false
     - prefer_final_fields_always: false
     - avoid_generics_shadowing: false
     - avoid_similar_names: false
@@ -1226,7 +1226,7 @@ saropa_lints:
     # Many rules have opposing pairs - choose based on your team's conventions.
 
     # --- Original Stylistic Rules ---
-    - prefer_relative_imports: false
+    - prefer_relative_imports_enforced: false
     - prefer_one_widget_per_file: false
     - prefer_arrow_functions: false
     - prefer_expression_body_getters: false
@@ -1238,7 +1238,7 @@ saropa_lints:
     - prefer_explicit_types: false
     - prefer_class_over_record_return: false
     - prefer_inline_callbacks: false
-    - prefer_single_quotes: false
+    - prefer_single_quotes_strict: false
     - prefer_todo_format: false
     - prefer_fixme_format: false
     - prefer_sentence_case_comments: false
@@ -1319,13 +1319,12 @@ saropa_lints:
     - prefer_image_filter_quality_medium: false   # INFO - Image APIs: FilterQuality.low -> medium / omit (Flutter 3.24+ PR #148799)
     - prefer_super_key: false                    # INFO - Flutter widget Key? key -> super.key (v9.11.0)
     - prefer_explicit_super_calls: false         # Opposite - explicit super.
-    - prefer_initializing_formals: false         # this.x parameters
     - prefer_explicit_field_assignment: false    # Opposite - explicit assignments
     - prefer_factory_constructors: false         # Factory for conditional construction
     - prefer_assertion_constructors: false       # Opposite - assertions in regular
     - prefer_named_constructors: false           # Named constructors
     - prefer_unnamed_constructors: false         # Opposite - unnamed constructors
-    - prefer_const_constructors_in_immutables: false  # Const in immutable classes
+    - prefer_const_constructors_in_immutables_extended: false  # Const in immutable classes
     - prefer_mutable_constructors: false         # Opposite - mutable patterns
 
     # --- Error Handling & Testing Style Rules (v2.7.0) ---
@@ -1346,8 +1345,8 @@ saropa_lints:
     # --- Additional Style Rules (v2.7.0) ---
     - prefer_string_interpolation: false         # Interpolation over concatenation
     - prefer_string_concatenation: false         # Opposite - explicit concatenation
-    # prefer_single_quotes already listed above
-    - prefer_double_quotes: false                # Opposite - double quotes
+    # prefer_single_quotes_strict already listed above
+    - prefer_double_quotes_with_fix: false                # Opposite - double quotes
     - prefer_grouped_imports: false              # Imports grouped by type
     - prefer_flat_imports: false                 # Opposite - flat import list
     - prefer_fields_before_methods: false        # Fields declared before methods
@@ -1592,18 +1591,18 @@ saropa_lints:
     - avoid_high_cyclomatic_complexity: false           # WARNING - complexity exceeding 15 (v5.1.0)
 
     # --- Async ---
-    - avoid_void_async: false                          # WARNING - async void instead of Future<void> (v5.1.0)
+    - avoid_void_async_extended: false                          # WARNING - async void instead of Future<void> (v5.1.0)
     - avoid_redundant_await: false                     # INFO - await on non-Future expression (v5.1.0, supertype walk + AnimationController v3)
 
     # --- Constructor ---
-    - avoid_unused_constructor_parameters: false       # WARNING - unused constructor params (v5.1.0)
+    - avoid_unused_constructor_parameters_skip_private: false       # WARNING - unused constructor params (v5.1.0)
 
     # --- Return ---
-    - avoid_returning_null_for_void: false             # INFO - return null in void function (v5.1.0)
-    - avoid_returning_null_for_future: false            # INFO - return null from sync Future function (v5.1.0)
+    - avoid_returning_null_for_void_with_fix: false             # INFO - return null in void function (v5.1.0)
+    - avoid_returning_null_for_future_strict: false            # INFO - return null from sync Future function (v5.1.0)
 
     # --- Type Safety ---
-    - avoid_shadowing_type_parameters: false           # WARNING - method type param shadows class type param (v5.1.0)
+    - avoid_shadowing_type_parameters_class_methods: false           # WARNING - method type param shadows class type param (v5.1.0)
     - avoid_redundant_null_check: false                # INFO - null check on non-nullable value (v5.1.0)
 
     # --- State Management ---
@@ -1670,21 +1669,20 @@ saropa_lints:
     # =========================================================================
 
     # --- Stylistic ---
-    - avoid_escaping_inner_quotes: false                 # INFO - use opposite quote style (v6.0.8)
-    - avoid_single_cascade_in_expression_statements: false # INFO - single cascade, use normal call (v6.0.8)
+    - avoid_escaping_inner_quotes_with_fix: false                 # INFO - use opposite quote style (v6.0.8)
+    - avoid_single_cascade_in_expression_statements_with_fix: false # INFO - single cascade, use normal call (v6.0.8)
     - avoid_cascade_notation: false                       # INFO - discourage cascade (..) (roadmap)
-    - avoid_function_literals_in_foreach_calls: false   # INFO - forEach with function literal (v6.0.8)
+    - avoid_function_literals_in_foreach_calls_no_maps: false   # INFO - forEach with function literal (v6.0.8)
 
     # --- Recommended ---
-    - avoid_classes_with_only_static_members: false    # INFO - prefer top-level or mixin (v6.0.8)
+    - avoid_classes_with_only_static_members_with_fix: false    # INFO - prefer top-level or mixin (v6.0.8)
 
     # --- Professional ---
     - avoid_bool_in_widget_constructors: false         # WARNING - positional bool in widget (v6.0.8)
-    - avoid_double_and_int_checks: false               # WARNING - is int / is double type checks (v6.0.8)
-    - avoid_field_initializers_in_const_classes: false # WARNING - non-const field init in const class (v6.0.8)
-    - avoid_positional_boolean_parameters: false       # WARNING - bool param without name (v6.0.8)
-    - avoid_setters_without_getters: false             # WARNING - setter without getter (v6.0.8)
+    - avoid_double_and_int_checks_extended: false               # WARNING - is int / is double type checks (v6.0.8)
+    - avoid_field_initializers_in_const_classes_relaxed: false # WARNING - non-const field init in const class (v6.0.8)
+    - avoid_positional_boolean_parameters_with_fix: false       # WARNING - bool param without name (v6.0.8)
+    - avoid_setters_without_getters_local: false             # WARNING - setter without getter (v6.0.8)
 
     # --- Comprehensive ---
-    - avoid_js_rounded_ints: false                     # INFO - int literal > JS safe integer (v6.0.8)
-    - avoid_private_typedef_functions: false           # INFO - private typedef for function (v6.0.8)
+    - avoid_js_rounded_ints_extended: false                     # INFO - int literal > JS safe integer (v6.0.8)
