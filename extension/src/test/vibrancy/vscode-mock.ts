@@ -108,8 +108,14 @@ export const window = {
         hide: () => { /* no-op */ },
         dispose: () => { /* no-op */ },
     }),
-    withProgress: async (_options: any, task: (progress: any) => Promise<any>) =>
-        task({ report: () => { /* no-op */ } }),
+    // A never-cancelled token is passed as the second argument because the real
+    // API always supplies one for `cancellable: true` flows; without it, code
+    // under test that reads `token.isCancellationRequested` throws only in tests.
+    withProgress: async (_options: any, task: (progress: any, token: any) => Promise<any>) =>
+        task(
+            { report: () => { /* no-op */ } },
+            { isCancellationRequested: false, onCancellationRequested: () => ({ dispose: () => { /* no-op */ } }) },
+        ),
     showInformationMessage: async (msg: string, ..._rest: unknown[]) => {
         messageMock.infos.push(msg);
         if (informationMessageMockQueue.length > 0) {

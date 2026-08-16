@@ -1667,30 +1667,61 @@ function tierLabel(id: string): string {
   return TIER_INFO.find(t => t.id === id)?.label ?? id;
 }
 
-/** Run write_config + optional analysis for a tier change; returns true on success. */
+/**
+ * Run write_config + analysis for a tier change; returns true on success.
+ *
+ * Async and cancellable throughout. The original used the synchronous
+ * `runInWorkspace`, which blocks the extension host event loop for the whole
+ * child process — on a large project `write_config` writes a ~2000-rule block
+ * and the Set Tier command froze the entire window until it finished, with a
+ * non-cancellable notification showing one static title. That is the same
+ * freeze-bug class already fixed in Enable and Create Baseline. A ticking
+ * elapsed-time message cannot work before this conversion: `setInterval` never
+ * fires while `spawnSync` holds the loop.
+ */
 async function applyTierChange(
   context: vscode.ExtensionContext,
   workspaceRoot: string,
-  tier: string,
-  previousTier: string,
+  tiers: { next: string; previous: string },
+  ui: { progress: vscode.Progress<{ message?: string }>; token: vscode.CancellationToken },
 ): Promise<boolean> {
   logSection('Set Tier');
-  logReport(`- Changed tier: ${previousTier} → ${tier}`);
-  const writeResult = runInWorkspace(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier));
+  logReport(`- Changed tier: ${tiers.previous} → ${tiers.next}`);
+  const writeResult = await withTickingProgress(
+    ui.progress,
+    (elapsed) => l10n('notify.setup.progressConfigWrite', { elapsed: String(elapsed) }),
+    runInWorkspaceAsync(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tiers.next), { token: ui.token }),
+  );
+  if (writeResult.cancelled) {
+    // Cancelling mid-write leaves analysis_options.yaml in whatever state the
+    // killed child got to, so report failure rather than claim the tier moved.
+    logReport('- Tier change cancelled by user (write_config)');
+    flushReport(workspaceRoot);
+    return false;
+  }
   if (!writeResult.ok) {
     logReport(`- write_config FAILED: ${writeResult.stderr || '(no details)'}`);
     flushReport(workspaceRoot);
     vscode.window.showErrorMessage(l10n('notify.setup.configWriteFailed', { details: writeResult.stderr || l10n('notify.setup.checkOutput') }));
     return false;
   }
-  logReport(`- Wrote config (tier: ${tier})`);
+  logReport(`- Wrote config (tier: ${tiers.next})`);
+
   // C6: Re-analyze after tier change so violations.json reflects the new ruleset.
-  await runAnalysisAfterConfigChangeScoped(
-    context,
-    workspaceRoot,
-    '- Analysis completed',
-    '- Analysis reported issues',
+  // The config is already written at this point, so a cancelled analysis still
+  // leaves the tier change itself valid — only the violations are stale.
+  const { cancelled } = await withTickingProgress(
+    ui.progress,
+    (elapsed) => l10n('notify.setup.progressAnalysis', { elapsed: String(elapsed) }),
+    runAnalysisAfterConfigChangeScoped(
+      context,
+      workspaceRoot,
+      '- Analysis completed',
+      '- Analysis reported issues',
+      { token: ui.token },
+    ),
   );
+  if (cancelled) logReport('- Analysis cancelled by user; violations may be stale for the new tier');
   flushReport(workspaceRoot);
   return true;
 }
@@ -1699,7 +1730,24 @@ async function applyTierChange(
  * Show an enhanced tier picker and run write_config + analysis for the selected tier.
  * Returns the new and previous tier on success, or null on cancel/failure/same-tier.
  */
+// One in-flight tier change at a time — same rationale as `_enableInFlight`
+// and `_baselineInFlight`: it rewrites analysis_options.yaml and shells out to
+// write_config, so two concurrent runs race on that file. Reaching the command
+// twice is easy (the sidebar row, the command palette, and the status bar all
+// route here), and before the flow was cancellable and ticking there was
+// nothing on screen to say the first one was still working.
+let _tierChangeInFlight: Promise<TierChangeResult | null> | undefined;
+
 export async function runSetTier(context: vscode.ExtensionContext): Promise<TierChangeResult | null> {
+  if (_tierChangeInFlight) return _tierChangeInFlight;
+  const run = runSetTierExclusive(context).finally(() => {
+    _tierChangeInFlight = undefined;
+  });
+  _tierChangeInFlight = run;
+  return run;
+}
+
+async function runSetTierExclusive(context: vscode.ExtensionContext): Promise<TierChangeResult | null> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
     vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
@@ -1740,11 +1788,24 @@ export async function runSetTier(context: vscode.ExtensionContext): Promise<Tier
     {
       location: vscode.ProgressLocation.Notification,
       title: `Updating tier to ${tierLabel(tier)}`,
-      cancellable: false,
+      // Cancellable now that the work is off the event loop: write_config on a
+      // large project takes long enough that a user with no Cancel button and a
+      // static title reasonably concludes the window has hung.
+      cancellable: true,
     },
     // Smart notification is shown by the handler in extension.ts after we return.
-    async () => { ok = await applyTierChange(context, workspaceRoot, tier, previousTier); },
+    async (progress, token) => {
+      ok = await applyTierChange(context, workspaceRoot, { next: tier, previous: previousTier }, { progress, token });
+    },
   );
+  if (!ok) {
+    // The setting was moved optimistically before the work started, so a
+    // cancelled or failed write would otherwise leave `saropaLints.tier`
+    // claiming a tier that analysis_options.yaml never received — the same
+    // setting-contradicts-the-file drift the analyzer-plugin row exists to
+    // eliminate. Put it back.
+    await vscode.workspace.getConfiguration('saropaLints').update('tier', previousTier, vscode.ConfigurationTarget.Workspace);
+  }
   return ok ? { tier, tierLabel: tierLabel(tier), previousTier } : null;
 }
 

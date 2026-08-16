@@ -83,6 +83,7 @@ The scan CLI now lets users filter diagnostics by severity, so AI agents and CI 
 - The sidebar now reports the analyzer plugin's actual on-disk state as its own row, so "Lint integration: On" can no longer sit above a project whose `plugins:` block is commented out — clicking that row while it reads Off restores the plugin. No action required.
 - The record of which side switched the analyzer plugin off is now stored twice, so a VS Code profile switch or extension-storage reset can no longer make Enable silently stop restoring the plugin. No action required.
 - The analyzer plugin row and its restore logic now track every folder in a multi-root window and start working in a window that had no folder open at startup, instead of only the one folder present when the extension activated. No action required.
+- Changing the tier froze the whole window until the config rewrite finished, behind a notification that showed one static title and no Cancel button — on a large project that is indistinguishable from a hang. The tier change now runs in the background with a live elapsed-time counter and a working Cancel, joins a second invocation to the one already running instead of racing on the same file, and restores the previous tier setting if the change does not complete. No action required.
 
 <details><summary>Maintenance</summary>
 
