@@ -43,6 +43,12 @@ The progress notification did tick an elapsed counter (added in an earlier chang
 - 52 passing across the affected slice (ownership, divergence prompt, tier guard, enable re-entrancy, async cancellation, analysis gate, scaffold gate, disable integration, and the new suite).
 - The 1.9 s / 116.1 s figures were measured directly, not inferred.
 
+## Hardening applied after review
+
+- **Version correctness in the skip check.** Presence in `package_config.json` proves only that some version of saropa_lints is on disk; a constraint change pub has not acted on still shows the old one. `isSaropaLintsAlreadyResolved` now additionally requires `pubspec.lock` to be no older than `pubspec.yaml` — the lock is what pub rewrites when a constraint selects a different version, so this buys version correctness without a semver parser.
+- **The retry gate fails loud.** `shouldRetryWithFlutter` matches wording that varies by SDK release. When it declines to retry on a project that does declare Flutter, the report now states that explicitly and names the manual `flutter pub get` escape hatch, so a future wording change surfaces as a documented miss rather than a bare "pub get failed".
+- **Command timing.** `runInWorkspace` and `runInWorkspaceAsync` record elapsed seconds, command, and outcome to the extension report and output channel. The 116 s / 1.9 s difference took a manual stopwatch to find because nothing recorded child-process duration.
+
 ## Not verified
 
 No Extension Development Host run was performed. The dart-to-flutter fallback path has unit coverage of its decision function only; the fallback has never been executed end to end against a machine whose PATH resolves a standalone Dart SDK ahead of the Flutter-bundled one, which is the condition that makes it necessary.
