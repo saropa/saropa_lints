@@ -47,6 +47,18 @@ Four user-facing strings were added to `extension/src/i18n/locales/en.json` unde
 
 `tsc --noEmit` clean on both `tsconfig.json` and `tsconfig.test.json`. Seven new tests in `extension/src/test/pluginDisableOwnership.test.ts` pin the ownership rules — including the two negative cases (already-disabled block, no plugins block) that guard the new-project default, per-root key isolation, and the already-live recovery path. The previously-broken sidebar assertion passes.
 
+## Hardening pass
+
+Three further changes landed after the initial review:
+
+**Sentinel no longer outranks a live block.** `getPluginsIntegrationState` now checks for a live column-0 `plugins:` header before checking the sentinel. An orphaned begin marker — reachable from a partial hand-edit or a merge conflict, since restore strips the pair together — previously made the row report "off" while the analysis server was loading the plugin, reproducing the exact UI-contradicts-the-file defect the row was added to eliminate.
+
+**Recovery for a declared-but-dormant plugin**, described above, was added in the same pass.
+
+**Ownership reconciliation on external change.** A debounced (500 ms) watcher on `analysis_options.yaml` refreshes the sidebar row and clears a stale ownership claim when the block goes live without the extension's involvement (`saropa_lints:init`, a checkout, a hand-edit, a merge). Two properties were verified during review: the watcher cannot feed back on itself, because neither `refreshAll` nor `reconcilePluginOwnership` writes the file; and debouncing matches the precedent of the sibling violations and `pubspec.lock` watchers, which is load-bearing here because one Enable rewrites the file twice (block restore, then the `write_config` subprocess) on top of the explicit refresh the command handler already performs.
+
+A known residual: `reconcilePluginOwnership` does not clear a claim when the file or block is `absent`, only when it is `live`. This self-heals, because the next Enable clears the claim unconditionally regardless of the restore's return value. Deliberately not widened, since a transient absence mid-checkout would otherwise discard a legitimate claim.
+
 ## Not verified
 
 The end-to-end Off→On round trip was not exercised in a live VS Code window; `runEnable` requires a real `pub get` and `write_config` spawn, so only the unit-level ownership rules are pinned. The analysis-server restart is a guarded `executeCommand` against the Dart extension and is not asserted by any test. Translated locale catalogs were not regenerated, leaving the four new keys English-only in the non-English locales.
