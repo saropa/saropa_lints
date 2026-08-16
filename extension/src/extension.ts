@@ -17,6 +17,7 @@ import * as path from 'node:path';
 import {
   runEnable,
   runDisable,
+  reconcilePluginOwnership,
   runReenablePlugin,
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
@@ -824,6 +825,52 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   };
   watchViolations();
 
+  // ── Keep the analyzer-plugin row honest ─────────────────────────────────
+  // The sidebar's "Analyzer plugin" row reads the plugins: block straight off
+  // disk, but the tree only rebuilds on discrete events — so a block changed
+  // outside the extension (`dart run saropa_lints:init`, a git checkout, a
+  // hand-edit, a merge) left the row asserting a state the file contradicted.
+  // That silent drift between what the UI claims and what analysis_options.yaml
+  // says is the whole defect class this row was added to close, so watching the
+  // file is what makes the row trustworthy rather than merely usually-right.
+  // The same change also reconciles a stale disable-ownership claim.
+  {
+    const root = getProjectRoot();
+    if (root) {
+      const optionsWatcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(root, 'analysis_options.yaml'),
+      );
+      // Debounced for the same reason as the violations and pubspec.lock
+      // watchers above: one Enable rewrites this file twice in quick
+      // succession (the plugins-block restore, then the write_config
+      // subprocess), and the command handler already calls refreshAll() when
+      // it finishes. Reacting to each raw event would run several redundant
+      // full refreshes — every provider plus the per-editor annotation cache —
+      // for a single user action, which shows up as sidebar flicker.
+      let optionsChangeTimer: ReturnType<typeof setTimeout> | undefined;
+      const onOptionsChanged = () => {
+        if (optionsChangeTimer) clearTimeout(optionsChangeTimer);
+        optionsChangeTimer = setTimeout(() => {
+          void (async () => {
+            const cleared = await reconcilePluginOwnership(context, root);
+            if (cleared) {
+              getSharedOutputChannel().appendLine(
+                '[saropa] plugins: block went live outside the extension — cleared stale disable ownership.',
+              );
+            }
+            refreshAll();
+          })();
+        }, 500);
+      };
+      optionsWatcher.onDidChange(onOptionsChanged);
+      optionsWatcher.onDidCreate(onOptionsChanged);
+      optionsWatcher.onDidDelete(onOptionsChanged);
+      context.subscriptions.push(optionsWatcher, {
+        dispose: () => { if (optionsChangeTimer) clearTimeout(optionsChangeTimer); },
+      });
+    }
+  }
+
   // ── Auto-analyze on dependency changes ──────────────────────────────────
   // When pubspec.lock changes (after `pub get` / `pub upgrade` / extension
   // update that resolves new packages), stale violations.json no longer
@@ -1202,7 +1249,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       await showFirstRunNotification(health, totalViolations);
     }),
     vscode.commands.registerCommand('saropaLints.disable', async () => {
-      await runDisable();
+      await runDisable(context);
       await cfg.update('enabled', false, vscode.ConfigurationTarget.Workspace);
       updateContext(false, false);
       refreshAll();
@@ -1213,7 +1260,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // in-process plugin actually reloads. Distinct from `saropaLints.enable`,
     // which only turns on scan-on-save delivery and never touches this block.
     vscode.commands.registerCommand('saropaLints.reenablePlugin', async () => {
-      await runReenablePlugin();
+      await runReenablePlugin(context);
       updateContext(true, issuesProvider.hasViolations());
       refreshAll();
       updateAllStatusBars();

@@ -324,15 +324,27 @@ async function runEnableExclusive(context: vscode.ExtensionContext): Promise<boo
         return;
       }
 
-      // Deliberately NOT calling restorePluginsIntegration() here. Enable
-      // means "turn on saropa_lints delivery" (scan-on-save, gated by this
-      // same saropaLints.enabled setting) — it must not silently restore
-      // the memory-heavy in-process plugin as a side effect. write_config
-      // (below) preserves whatever plugins: block state already exists on
-      // disk (live stays live, disabled-via-sentinel stays disabled) and
-      // defaults a brand-new file to disabled. A user who explicitly wants
-      // the in-process plugin back can uncomment the block themselves —
-      // see the MEMORY comment write_config prints next to it.
+      // Restore the in-process plugin ONLY if our own Disable is what took it
+      // away. Enable still must not switch the memory-heavy plugin on as a
+      // side effect for anyone else — write_config (below) preserves whatever
+      // state is on disk (live stays live, disabled stays disabled) and
+      // defaults a brand-new file to disabled.
+      //
+      // Without this, the single sidebar toggle was lossy in one direction:
+      // Disable commented the block out, Enable left it commented, so Off→On
+      // silently cost a user their live plugin with no way back except the
+      // separate "Re-enable Plugin" command they had no reason to know about.
+      // The memento (not the on-disk sentinel) is what makes this safe — see
+      // pluginDisabledByExtensionKey for why the sentinel cannot be used.
+      let restoredPlugin = false;
+      if (wasPluginDisabledByExtension(context, workspaceRoot)) {
+        restoredPlugin = restorePluginsIntegration(workspaceRoot);
+        // Clear the flag either way. A false return means the block is no
+        // longer sentinel-wrapped (the user uncommented it by hand, or
+        // re-ran init), so our claim to own its disabled state is stale.
+        await setPluginDisabledByExtension(context, workspaceRoot, false);
+        if (restoredPlugin) logReport('- Restored the plugins: block disabled by a previous Disable');
+      }
 
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const tier = (cfg.get<string>('tier') ?? 'recommended').trim();
@@ -353,6 +365,11 @@ async function runEnableExclusive(context: vscode.ExtensionContext): Promise<boo
         return;
       }
       logReport(`- Wrote config (tier: ${tier})`);
+
+      // Uncommenting the block only affects the analysis server's NEXT start,
+      // so the plugin the user just got back stays dormant until we restart it
+      // (same reasoning as runDisable/runReenablePlugin).
+      if (restoredPlugin) await restartDartAnalysisServer();
 
       const { cancelled: analysisCancelled } = await withTickingProgress(
         progress,
@@ -590,9 +607,11 @@ export function disablePluginsIntegration(root: string): 'commented' | 'already-
 /**
  * Reverse [disablePluginsIntegration]: strip the sentinels and the '# ' prefix
  * so the live `plugins:` block returns with the user's rule_packs and overrides
- * intact. Called by runEnable before write_config so the regeneration edits the
- * real block in place instead of appending a duplicate below the commented one.
- * Returns true when a disabled block was restored.
+ * intact. Called by runEnable before write_config (only when this extension is
+ * the one that turned the block off — see [wasPluginDisabledByExtension]) so
+ * the regeneration edits the real block in place instead of appending a
+ * duplicate below the commented one. Returns true when a disabled block was
+ * restored.
  */
 export function restorePluginsIntegration(root: string): boolean {
   const file = path.join(root, ANALYSIS_OPTIONS_FILENAME);
@@ -616,6 +635,98 @@ export function restorePluginsIntegration(root: string): boolean {
   return true;
 }
 
+/** On-disk state of the `plugins:` block, independent of `saropaLints.enabled`. */
+export type PluginsIntegrationState = 'live' | 'disabled' | 'absent';
+
+/**
+ * Read whether the in-process analyzer plugin is actually wired up on disk.
+ *
+ * This is a DIFFERENT subsystem from the `saropaLints.enabled` setting: that
+ * setting gates scan-on-save delivery, while this block is the only thing the
+ * Dart analysis server reads to decide whether to load the plugin at all. The
+ * sidebar used to surface only the setting, so it happily reported
+ * "Lint integration: On" over a file whose plugins block was commented out —
+ * which is what a user sees as "enabled but the yaml says disabled".
+ */
+export function getPluginsIntegrationState(root: string): PluginsIntegrationState {
+  const file = path.join(root, ANALYSIS_OPTIONS_FILENAME);
+  if (!fs.existsSync(file)) return 'absent';
+  const content = fs.readFileSync(file, 'utf-8');
+
+  // A live (column-0) `plugins:` header is what the analysis server actually
+  // acts on, so it OUTRANKS the sentinel. Checking the sentinel first would
+  // report 'disabled' for a file that has a stray/orphaned marker above a
+  // live block — the analyzer would be loading the plugin while this row
+  // claimed it was off, which is the same category of lie this row exists to
+  // eliminate. Orphaned markers are reachable: restore strips the sentinel
+  // pair together, but a partial hand-edit or a merge conflict can leave one
+  // behind.
+  const lines = splitLinesPreservingEol(content).map((l) => l.text);
+  if (findPluginsBlock(lines)) return 'live';
+  if (content.includes(DISABLE_BEGIN_MARKER)) return 'disabled';
+  return 'absent';
+}
+
+/**
+ * Memento key recording that OUR `runDisable` commented out a block that was
+ * live at the time. Keyed by project root so a multi-root window tracks each
+ * folder separately.
+ *
+ * Why a memento instead of just checking for the disable sentinel: the sentinel
+ * cannot distinguish the two ways a block ends up disabled. `write_config`
+ * writes the exact same marker for a BRAND-NEW project
+ * (`willBeDisabled = isNewFile || wasDisabled` in write_config_runner.dart),
+ * because the in-process plugin costs several GB and new projects deliberately
+ * default to daemon-only delivery. Restoring on "sentinel present" would
+ * therefore switch that heavy plugin on for every new user the first time they
+ * hit Enable — the precise outcome the default exists to prevent. The memento
+ * is only ever set on a live→disabled transition we performed ourselves, so
+ * Enable restores exactly what Disable took away and nothing else.
+ *
+ * Trade-off accepted: workspaceState is per-machine, so on a fresh clone the
+ * flag is absent and Enable leaves the block alone — i.e. it degrades to the
+ * previous behavior rather than guessing wrong in the expensive direction.
+ */
+function pluginDisabledByExtensionKey(root: string): string {
+  return `saropaLints.pluginDisabledByExtension:${root}`;
+}
+
+function wasPluginDisabledByExtension(context: vscode.ExtensionContext, root: string): boolean {
+  return context.workspaceState.get<boolean>(pluginDisabledByExtensionKey(root), false) ?? false;
+}
+
+async function setPluginDisabledByExtension(
+  context: vscode.ExtensionContext,
+  root: string,
+  value: boolean,
+): Promise<void> {
+  // `undefined` removes the key entirely rather than leaving a `false` behind.
+  await context.workspaceState.update(pluginDisabledByExtensionKey(root), value ? true : undefined);
+}
+
+/**
+ * Drop a stale ownership claim when the `plugins:` block went live without us.
+ *
+ * The claim means "our Disable commented out a block that was live". Anything
+ * that puts the block back independently — `dart run saropa_lints:init`, a git
+ * checkout, a hand-edit, a merge — invalidates it. Left stale, the next Enable
+ * would call restore on an already-live block; that is harmless today (restore
+ * no-ops and the claim is cleared) but it means the claim silently describes
+ * something untrue for an unbounded stretch, which is exactly the drift this
+ * whole change is about. Reconciling on file change keeps the claim honest.
+ *
+ * Returns true when a stale claim was cleared, so callers can log it.
+ */
+export async function reconcilePluginOwnership(
+  context: vscode.ExtensionContext,
+  root: string,
+): Promise<boolean> {
+  if (!wasPluginDisabledByExtension(context, root)) return false;
+  if (getPluginsIntegrationState(root) !== 'live') return false;
+  await setPluginDisabledByExtension(context, root, false);
+  return true;
+}
+
 // Editing analysis_options.yaml only changes what the Dart analysis server
 // will load on its NEXT start — the already-running plugin host process (a
 // separate long-lived `dart.exe`, several GB once warmed up) keeps running
@@ -630,7 +741,7 @@ async function restartDartAnalysisServer(): Promise<void> {
   }
 }
 
-export async function runDisable(): Promise<void> {
+export async function runDisable(context: vscode.ExtensionContext): Promise<void> {
   await vscode.workspace.getConfiguration('saropaLints').update('enabled', false, vscode.ConfigurationTarget.Workspace);
 
   // Setting the flag is not enough: the analyzer keeps emitting diagnostics
@@ -638,6 +749,12 @@ export async function runDisable(): Promise<void> {
   // the Problems pane (plans/history/2026.06/2026.06.18/BUG_cant turn off lints.md).
   const root = getProjectRoot();
   const result = root ? disablePluginsIntegration(root) : 'no-config';
+  if (result === 'commented' && root) {
+    // Remember that WE took a live block away, so the matching Enable can put
+    // it back. Only on 'commented': 'already-off' means someone else (or a
+    // new-project default) disabled it and Enable must not claim ownership.
+    await setPluginDisabledByExtension(context, root, true);
+  }
   if (result === 'commented') {
     // The commented-out block only stops future loads — restart now so the
     // already-running plugin host process actually exits and its memory is
@@ -661,7 +778,7 @@ export async function runDisable(): Promise<void> {
  * DO want the in-process plugin (live in-editor squiggles) back, rather than
  * hand-editing analysis_options.yaml to uncomment the sentinel block.
  */
-export async function runReenablePlugin(): Promise<void> {
+export async function runReenablePlugin(context: vscode.ExtensionContext): Promise<void> {
   const root = getProjectRoot();
   if (!root) {
     vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
@@ -669,7 +786,21 @@ export async function runReenablePlugin(): Promise<void> {
   }
 
   const restored = restorePluginsIntegration(root);
+  // The block is live again however it got there, so drop any claim that our
+  // Disable still owns its off state — otherwise the next Enable would try to
+  // "restore" an already-restored block.
+  await setPluginDisabledByExtension(context, root, false);
   if (!restored) {
+    // A block that is ALREADY live still justifies a restart: Enable restores
+    // the block and restarts the server as two separate steps, so cancelling
+    // in between (or any crash there) leaves the plugin declared-but-dormant.
+    // Reporting "nothing to restore" there was a dead end — the state looks
+    // correct on disk and the only fix was reloading the window by hand.
+    if (getPluginsIntegrationState(root) === 'live') {
+      await restartDartAnalysisServer();
+      vscode.window.showInformationMessage(l10n('notify.setup.reenabledPlugin'));
+      return;
+    }
     vscode.window.showInformationMessage(l10n('notify.setup.reenableNothingToRestore'));
     return;
   }

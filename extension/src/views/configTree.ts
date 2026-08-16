@@ -11,6 +11,8 @@ import * as vscode from 'vscode';
 import { readPubspec } from '../pubspecReader';
 import { getProjectRoot } from '../projectRoot';
 import { formatLanguageChoiceLabel } from '../i18n/languagePick';
+import { l10n } from '../i18n/runtime';
+import { getPluginsIntegrationState } from '../setup';
 import { getViolationsTriageState, readViolations } from '../violationsReader';
 import {
   type ConfigTreeNode,
@@ -64,6 +66,41 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     return this.buildTriageSection();
   }
 
+  /**
+   * Row reporting the `plugins:` block's real on-disk state.
+   *
+   * Clicking it offers "Re-enable Plugin" when the block is commented out —
+   * previously the only route back was a command-palette entry a user had no
+   * reason to look for. Omitted entirely when there is no project root, since
+   * there is no analysis_options.yaml to describe.
+   *
+   * Every state maps to a real command: this view's invariant is that no row
+   * is dead (see the "every leaf has a click command" assertion in
+   * test/views/overviewTreeFlat.test.ts, and the dead "Lints" row removed
+   * next to it). A live plugin offers the liveness probe — the useful question
+   * about a plugin that claims to be on is whether it is actually reporting.
+   */
+  private buildAnalyzerPluginNode(): ConfigTreeNode[] {
+    const root = getProjectRoot();
+    if (!root) return [];
+    const state = getPluginsIntegrationState(root);
+    const byState = {
+      live: {
+        description: l10n('dashboards.controls.analyzerPluginLive'),
+        command: 'saropaLints.verifyPlugin',
+      },
+      disabled: {
+        description: l10n('dashboards.controls.analyzerPluginDisabled'),
+        command: 'saropaLints.reenablePlugin',
+      },
+      absent: {
+        description: l10n('dashboards.controls.analyzerPluginAbsent'),
+        command: 'saropaLints.initializeConfig',
+      },
+    }[state];
+    return [setting(l10n('dashboards.controls.analyzerPlugin'), byState.description, byState.command)];
+  }
+
   /** Lint integration, tier, run-after-config, detected packages. */
   private buildSettingNodes(): ConfigTreeNode[] {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
@@ -76,6 +113,13 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
 
     const items: ConfigTreeNode[] = [
       setting('Lint integration', enabled ? 'On' : 'Off', enabled ? 'saropaLints.disable' : 'saropaLints.enable'),
+      // The in-process analyzer plugin is a SEPARATE subsystem from the row
+      // above: "Lint integration" gates scan-on-save delivery, this gates the
+      // plugins: block the Dart analysis server reads for live in-editor
+      // squiggles. Reporting only the first one made the sidebar claim
+      // "Lint integration: On" over an analysis_options.yaml whose plugins
+      // block was commented out, which reads as the extension lying.
+      ...this.buildAnalyzerPluginNode(),
       // Tier click → Lints Config dashboard. The dashboard's tier control is a
       // visual segmented radio (Essential → Pedantic) with rule counts and
       // descriptions per tier — far richer than the bare quickpick the row
