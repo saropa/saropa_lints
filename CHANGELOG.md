@@ -64,6 +64,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.0.4]
+
+Switching Lint integration on is now near-instant instead of a two-minute wait that looked like a freeze. Every command the extension shells out to a Dart tool for now uses the Dart executable directly rather than routing through Flutter, and the dependency resolve is skipped altogether when nothing needs resolving. [log](https://github.com/saropa/saropa_lints/blob/v15.0.4/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- Turning Lint integration on took around two minutes on a Flutter project and looked frozen, so it got canceled and the project seemed impossible to re-enable. The extension now runs `dart` rather than `flutter` for `pub get` and `analyze` — the same work without the Flutter tool's startup cost, measured at 1.9 s versus 116 s on the same project — and skips `pub get` entirely when `pubspec.yaml` is unchanged and the package is already resolved. No action required.
+- Upgrading the saropa_lints version from the extension paid the same two-minute Flutter startup cost on every upgrade. It now uses the same fast path, falling back to Flutter only when the resolve genuinely fails on the Flutter SDK. No action required.
+
+---
+
 ## [15.0.3]
 
 The scan CLI now lets users filter diagnostics by severity, so AI agents and CI pipelines can suppress info-level noise and focus on warnings and errors. The extension also stops losing the in-editor analyzer plugin when Lint integration is switched off and back on, and now reports that plugin's real state instead of implying it from a setting that does not control it. [log](https://github.com/saropa/saropa_lints/blob/v15.0.3/CHANGELOG.md)
@@ -84,7 +95,6 @@ The scan CLI now lets users filter diagnostics by severity, so AI agents and CI 
 - The sidebar now reports the analyzer plugin's actual on-disk state as its own row, so "Lint integration: On" can no longer sit above a project whose `plugins:` block is commented out — clicking that row while it reads Off restores the plugin. No action required.
 - The record of which side switched the analyzer plugin off is now stored twice, so a VS Code profile switch or extension-storage reset can no longer make Enable silently stop restoring the plugin. No action required.
 - The analyzer plugin row and its restore logic now track every folder in a multi-root window and start working in a window that had no folder open at startup, instead of only the one folder present when the extension activated. No action required.
-- Turning Lint integration on took around two minutes on a Flutter project and looked frozen, so it got canceled and the project seemed impossible to re-enable. The extension now runs `dart` rather than `flutter` for `pub get` and `analyze` — the same work without the Flutter tool's startup cost, measured at 1.9 s versus 116 s on the same project — and skips `pub get` entirely when `pubspec.yaml` is unchanged and the package is already resolved. No action required.
 - Changing the tier froze the whole window until the config rewrite finished, behind a notification that showed one static title and no Cancel button — on a large project that is indistinguishable from a hang. The tier change now runs in the background with a live elapsed-time counter and a working Cancel, joins a second invocation to the one already running instead of racing on the same file, and restores the previous tier setting if the change does not complete. No action required.
 
 <details><summary>Maintenance</summary>

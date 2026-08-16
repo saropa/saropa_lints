@@ -322,28 +322,55 @@ export async function runInWorkspaceAsync(
  * that result instead. A genuinely Flutter-only resolution therefore still
  * succeeds — it just pays the slow path in the rare case rather than always.
  */
-async function runPubGet(
-  workspaceRoot: string,
-  progress: vscode.Progress<{ message?: string }>,
-  token: vscode.CancellationToken,
-): Promise<{ ok: boolean; stderr: string; cancelled: boolean; command: string }> {
-  const tick = (elapsed: number) =>
-    l10n('notify.setup.progressPubGet', { elapsed: String(elapsed) });
+/**
+ * Should a failed `dart pub get` be retried as `flutter pub get`?
+ *
+ * Only when the project declares Flutter AND the failure looks like the one
+ * the Flutter path actually cures: `dart` could not locate the Flutter SDK to
+ * resolve a `sdk: flutter` dependency. That happens when a standalone Dart SDK
+ * precedes the Flutter-bundled one on PATH, so the `dart` on PATH cannot
+ * self-locate a Flutter root — it is a PATH-ordering fault, not a pubspec one.
+ *
+ * Retrying on ANY non-zero exit would be worse than the bug being fixed: an
+ * offline machine, an auth failure or a malformed pubspec would fail fast in
+ * ~2 s under `dart`, then pay the ~114 s flutter_tool boot to fail again for
+ * the same reason. Errors the Flutter wrapper cannot change are reported as-is.
+ */
+export function shouldRetryWithFlutter(workspaceRoot: string, stderr: string): boolean {
+  if (!hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'))) return false;
+  // Matched case-insensitively against pub's own wording for an unresolvable
+  // SDK dependency; kept broad because the exact phrasing varies by SDK version.
+  return /flutter[_ ]?sdk|sdk: *flutter|which sdk|unknown sdk|flutter sdk/i.test(stderr);
+}
 
-  const dartResult = await withTickingProgress(
-    progress,
-    tick,
+export async function resolveDependencies(
+  workspaceRoot: string,
+  token: vscode.CancellationToken,
+  progress?: vscode.Progress<{ message?: string }>,
+): Promise<{ ok: boolean; stderr: string; cancelled: boolean; command: string }> {
+  // Ticking elapsed-time feedback when the caller owns a progress notification;
+  // callers without one (the upgrade checker runs under its own progress) just
+  // get the plain awaited result.
+  const withTick = <T>(work: Promise<T>): Promise<T> =>
+    progress
+      ? withTickingProgress(
+          progress,
+          (elapsed) => l10n('notify.setup.progressPubGet', { elapsed: String(elapsed) }),
+          work,
+        )
+      : work;
+
+  const dartResult = await withTick(
     runInWorkspaceAsync(workspaceRoot, 'dart', ['pub', 'get'], { token }),
   );
   if (dartResult.ok || dartResult.cancelled) return { ...dartResult, command: 'dart' };
 
-  const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
-  if (!useFlutter) return { ...dartResult, command: 'dart' };
+  if (!shouldRetryWithFlutter(workspaceRoot, dartResult.stderr)) {
+    return { ...dartResult, command: 'dart' };
+  }
 
-  logReport('- dart pub get failed on a Flutter project; retrying with flutter pub get');
-  const flutterResult = await withTickingProgress(
-    progress,
-    tick,
+  logReport('- dart pub get failed to resolve the Flutter SDK; retrying with flutter pub get');
+  const flutterResult = await withTick(
     runInWorkspaceAsync(workspaceRoot, 'flutter', ['pub', 'get'], { token }),
   );
   return { ...flutterResult, command: 'flutter' };
@@ -376,7 +403,7 @@ async function ensureDependencyResolved(
     return 'resolved';
   }
 
-  const pubResult = await runPubGet(workspaceRoot, progress, token);
+  const pubResult = await resolveDependencies(workspaceRoot, token, progress);
   if (pubResult.cancelled) return 'cancelled';
   if (!pubResult.ok) {
     logReport(`- pub get FAILED: ${pubResult.stderr || '(no details)'}`);

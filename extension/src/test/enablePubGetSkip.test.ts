@@ -20,7 +20,7 @@ import * as assert from 'node:assert';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { isSaropaLintsAlreadyResolved } from '../setup';
+import { isSaropaLintsAlreadyResolved, shouldRetryWithFlutter } from '../setup';
 
 /** Creates a throwaway project root; caller decides which files exist in it. */
 function makeProject(): string {
@@ -88,3 +88,55 @@ describe('isSaropaLintsAlreadyResolved', () => {
     assert.strictEqual(isSaropaLintsAlreadyResolved(root), false);
   });
 });
+
+/**
+ * The dart-first `pub get` only falls back to the slow `flutter pub get` when
+ * that fallback can plausibly help. Retrying on every failure would make an
+ * offline machine or a malformed pubspec fail in ~116 s instead of ~2 s — the
+ * exact experience this whole change exists to eliminate.
+ */
+describe('shouldRetryWithFlutter', () => {
+  /** Writes a pubspec that either declares Flutter via the SDK dep or does not. */
+  function projectWithFlutter(declared: boolean): string {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-retry-'));
+    fs.writeFileSync(
+      path.join(root, 'pubspec.yaml'),
+      declared
+        ? 'name: demo\ndependencies:\n  flutter:\n    sdk: flutter\n'
+        : 'name: demo\ndependencies:\n  http: ^1.0.0\n',
+    );
+    return root;
+  }
+
+  it('retries when a Flutter project fails to resolve the Flutter SDK', () => {
+    const root = projectWithFlutter(true);
+    const stderr = 'Because demo depends on flutter from sdk which doesn\'t exist (the Flutter SDK is not available).';
+    assert.strictEqual(shouldRetryWithFlutter(root, stderr), true);
+  });
+
+  it('does not retry a Flutter project on an unrelated failure', () => {
+    // Network/auth/pubspec faults reproduce identically under flutter and would
+    // cost the user ~114 s of flutter_tool boot to learn nothing new.
+    const root = projectWithFlutter(true);
+    assert.strictEqual(
+      shouldRetryWithFlutter(root, 'Got socket error trying to find package http at https://pub.dev.'),
+      false,
+    );
+  });
+
+  it('never retries a project that does not declare Flutter', () => {
+    const root = projectWithFlutter(false);
+    assert.strictEqual(shouldRetryWithFlutter(root, 'the Flutter SDK is not available'), false);
+  });
+
+  it('does not retry on empty stderr', () => {
+    const root = projectWithFlutter(true);
+    assert.strictEqual(shouldRetryWithFlutter(root, ''), false);
+  });
+
+  it('is case-insensitive about the SDK wording', () => {
+    const root = projectWithFlutter(true);
+    assert.strictEqual(shouldRetryWithFlutter(root, 'FLUTTER SDK not found'), true);
+  });
+});
+

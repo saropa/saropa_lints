@@ -15,7 +15,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fetchWithRetry } from './vibrancy/services/fetch-retry';
 import { compareVersions } from './vibrancy/services/changelog-service';
-import { runInWorkspaceAsync, hasFlutterDep } from './setup';
+import { resolveDependencies } from './setup';
 import { l10n } from './i18n/runtime';
 
 // ── Constants ────────────────────────────────────────────────────────────
@@ -330,13 +330,14 @@ async function performUpgrade(
 
       // Step 2: Run pub get to resolve the new version. Async + cancellable so the
       // extension host stays responsive while pub fetches and resolves the graph.
-      const useFlutter = hasFlutterDep(pubspecPath);
-      const pubCmd = useFlutter ? 'flutter' : 'dart';
-      const { ok, stderr, cancelled } = await runInWorkspaceAsync(
+      // `dart`, not `flutter`, for the same reason as the Enable flow: the
+      // flutter wrapper boots flutter_tool before pub runs, measured at ~114 s
+      // of pure overhead on a large project. resolveDependencies falls back to
+      // `flutter pub get` when — and only when — the dart resolve fails on the
+      // Flutter SDK itself.
+      const { ok, stderr, cancelled, command: pubCmd } = await resolveDependencies(
         workspaceRoot,
-        pubCmd,
-        ['pub', 'get'],
-        { token },
+        token,
       );
       if (cancelled) {
         // pubspec.yaml constraint already changed; tell the user how to recover.
