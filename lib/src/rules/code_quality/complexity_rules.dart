@@ -1329,8 +1329,9 @@ class AvoidHighCyclomaticComplexityRule extends SaropaLintRule {
   static int _computeComplexity(FunctionBody body) {
     final counter = _ComplexityCounter();
     body.accept(counter);
-    // Ceiling so fractional flat-switch weight rounds up conservatively
-    return counter.complexity.ceil() + 1; // +1 for the function itself
+    // Truncate so a flat switch at exactly the weight boundary (e.g. 70
+    // cases × 0.2 = 14.0) passes — only cases strictly above flag.
+    return counter.complexity.truncate() + 1; // +1 for the function itself
   }
 }
 

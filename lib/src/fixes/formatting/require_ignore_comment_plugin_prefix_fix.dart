@@ -1,6 +1,9 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'package:analyzer/source/source_range.dart';
+
 import '../../native/saropa_fix.dart';
+import '../../rule_name_utils.dart' as rule_names;
 import '../../tiers.dart' as tiers;
 
 /// Quick fix: Add saropa_lints/ prefix to bare rule names in ignore comments.
@@ -128,4 +131,112 @@ class RequireIgnoreCommentPluginPrefixFix extends SaropaFixProducer {
     }
     return null;
   }
+}
+
+/// Quick fix: Replace an unregistered saropa_lints/ rule name with the
+/// closest registered match (Levenshtein distance). Only offered when
+/// a close match exists — otherwise no fix is proposed.
+class ReplaceUnknownPrefixedRuleNameFix extends SaropaFixProducer {
+  ReplaceUnknownPrefixedRuleNameFix({required super.context});
+
+  static const _fixKind = FixKind(
+    'saropa.fix.replaceUnknownPrefixedRuleNameFix',
+    50,
+    'Replace with closest registered rule name',
+  );
+
+  @override
+  FixKind get fixKind => _fixKind;
+
+  static const _prefix = 'saropa_lints/';
+
+  static const List<String> _ignorePrefixes = <String>[
+    '// ignore:',
+    '// ignore_for_file:',
+  ];
+
+  static final _ruleNamePattern = RegExp(r'[\w-]+');
+
+  @override
+  Future<void> compute(ChangeBuilder builder) async {
+    final content = unitResult.content;
+    if (content.isEmpty) return;
+
+    final start = diagnosticOffset;
+    final len = diagnosticLength;
+    if (start == null || len == null || len <= 0) return;
+
+    final end = (start + len).clamp(0, content.length);
+    final slice = content.substring(start, end);
+
+    // Find the first prefixed-but-unknown rule name and its replacement.
+    final replacement = _findReplacement(slice, start);
+    if (replacement == null) return;
+
+    await builder.addDartFileEdit(file, (b) {
+      b.addSimpleReplacement(
+        SourceRange(replacement.offset, replacement.length),
+        replacement.newName,
+      );
+    });
+  }
+
+  /// Scans [text] for a `saropa_lints/<unknown>` name whose suffix is not
+  /// registered, and returns the replacement if a close match exists.
+  static _Replacement? _findReplacement(String text, int baseOffset) {
+    for (final prefix in _ignorePrefixes) {
+      final idx = text.indexOf(prefix);
+      if (idx < 0) continue;
+
+      final ruleListStart = idx + prefix.length;
+      final ruleList = text.substring(ruleListStart);
+      final trailingComment = ruleList.indexOf('--');
+      final effective = trailingComment >= 0
+          ? ruleList.substring(0, trailingComment)
+          : ruleList;
+
+      // Walk rule names in the comma-separated list.
+      for (final m in _ruleNamePattern.allMatches(effective)) {
+        final name = m.group(0);
+        if (name == null || name.isEmpty) continue;
+        if (name == 'saropa_lints') continue;
+
+        // Only process names that are preceded by the saropa_lints/ prefix.
+        final nameStart = ruleListStart + m.start;
+        if (nameStart < _prefix.length) continue;
+        if (text.substring(nameStart - _prefix.length, nameStart) != _prefix) {
+          continue;
+        }
+
+        // Check if suffix is unknown.
+        final bare = name.replaceAll('-', '_');
+        if (rule_names.allSaropaRuleNames.contains(bare)) continue;
+
+        // Find the closest registered name.
+        final suggestion = rule_names.closestRuleName(bare);
+        if (suggestion == null) continue;
+
+        // Return replacement: the suffix portion after saropa_lints/.
+        return _Replacement(
+          offset: baseOffset + nameStart,
+          length: name.length,
+          newName: suggestion,
+        );
+      }
+    }
+    return null;
+  }
+}
+
+/// A text replacement: replace [length] chars at [offset] with [newName].
+class _Replacement {
+  const _Replacement({
+    required this.offset,
+    required this.length,
+    required this.newName,
+  });
+
+  final int offset;
+  final int length;
+  final String newName;
 }
