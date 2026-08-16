@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Otwórz README.",
       "scaffoldFailed": "Rusztowanie zawiodło. {details}",
       "scaffoldFailedHint": "Upewnij się, że saropa_lints jest w dev_dependencies i uruchom pub get.",
-      "alreadyOnTier": "Już na poziomie {tier}."
+      "alreadyOnTier": "Już na poziomie {tier}.",
+      "progressPubGet": "Uruchamianie pub get… ({elapsed}s)",
+      "progressConfigWrite": "Zapisywanie konfiguracji… ({elapsed}s)",
+      "progressAnalysis": "Analiza w trakcie… ({elapsed}s)",
+      "progressBaseline": "Uruchamianie podstawowego skanowania… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} nie powiodło się: {message} to grupa, która ma",

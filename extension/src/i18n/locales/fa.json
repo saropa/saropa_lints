@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "README را باز کنید",
       "scaffoldFailed": "داربست شکست خورد. {details}",
       "scaffoldFailedHint": "مطمئن شوید که saropa_lints در dev_dependencies است و pub get را اجرا کنید.",
-      "alreadyOnTier": "در حال حاضر در سطح {tier} است."
+      "alreadyOnTier": "در حال حاضر در سطح {tier} است.",
+      "progressPubGet": "اجرای pub get... ({elapsed}s)",
+      "progressConfigWrite": "نوشتن پیکربندی... ({elapsed}s)",
+      "progressAnalysis": "تحلیل در حال اجرا است... ({elapsed}s)",
+      "progressBaseline": "اسکن پایه‌ای در حال اجرا است... ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} شکست خورده: {message} _فرد_منتظره",

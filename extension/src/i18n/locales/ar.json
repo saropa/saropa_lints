@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "افتح README.",
       "scaffoldFailed": "فشل الشاشة. {details}",
       "scaffoldFailedHint": "تأكد من وجود saropa_lints في dev_dependencies وقم بتشغيل pub get.",
-      "alreadyOnTier": "بالفعل على مستوى {tier}."
+      "alreadyOnTier": "بالفعل على مستوى {tier}.",
+      "progressPubGet": "تشغيل pub get… ({elapsed}s)",
+      "progressConfigWrite": "كتابة التكوين... ({elapsed}s)",
+      "progressAnalysis": "التحليل في التشغيل... ({elapsed}s)",
+      "progressBaseline": "التحقق من الأساسيات... ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} فاشل: {message}",

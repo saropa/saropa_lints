@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "README کھولیں",
       "scaffoldFailed": "سکیفولڈ ناکام ہو گیا۔ {details}",
       "scaffoldFailedHint": "یقینی بنائیں کہ saropa_lints dev_dependencies میں ہے اور پب حاصل کریں۔",
-      "alreadyOnTier": "پہلے ہی _{tier} کی سطح پر۔"
+      "alreadyOnTier": "پہلے ہی _{tier} کی سطح پر۔",
+      "progressPubGet": "پبل گیٹ کر رہے ہیں... ({elapsed}s)",
+      "progressConfigWrite": "لکھنا کنفیگ... ({elapsed}s)",
+      "progressAnalysis": "تحلیل کر رہے ہیں... ({elapsed}s)",
+      "progressBaseline": "اسکن بنیادی حد تک جاری ہے... ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} ناکام: {message} _PH1_ ___ کا مطلب ہے کہ آپ کو ایک ہی چیز",

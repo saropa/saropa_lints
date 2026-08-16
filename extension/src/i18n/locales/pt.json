@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Abra o README e leia-o.",
       "scaffoldFailed": "O andaime falhou. {details}",
       "scaffoldFailedHint": "Certifique-se de que saropa_lints esteja em dev_dependencies e execute pub get.",
-      "alreadyOnTier": "Já no nível {tier}."
+      "alreadyOnTier": "Já no nível {tier}.",
+      "progressPubGet": "Executando pub get… ({elapsed}s)",
+      "progressConfigWrite": "Escrevendo config... ({elapsed}s)",
+      "progressAnalysis": "Análise em execução… ({elapsed}s)",
+      "progressBaseline": "Escaneando baseline... ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} falhou: não conseguiu {message} É um tipo de vírus que se alimenta do sangue.",

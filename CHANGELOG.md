@@ -64,7 +64,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [15.0.2]
+
+This release focuses on improving the reliability and user experience of the extension's setup workflows. Progress notifications now provide real-time feedback during lengthy operations to clearly communicate the current status. Safeguards have also been introduced to prevent duplicate, conflicting tasks from executing concurrently if a command is triggered multiple times. [log](https://github.com/saropa/saropa_lints/blob/v15.0.2/CHANGELOG.md)
 
 ### Fixed (Extension)
 

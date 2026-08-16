@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Ouvrez le README et lisez-le.",
       "scaffoldFailed": "L'échafaudage a échoué. {details}",
       "scaffoldFailedHint": "Assurez-vous que saropa_lints est dans dev_dependencies et exécutez pub get.",
-      "alreadyOnTier": "Déjà au niveau {tier}."
+      "alreadyOnTier": "Déjà au niveau {tier}.",
+      "progressPubGet": "Exécution de pub get… ({elapsed}s)",
+      "progressConfigWrite": "Écriture de la configuration… ({elapsed}s)",
+      "progressAnalysis": "Analyse en cours… ({elapsed}s)",
+      "progressBaseline": "Scan de base en cours… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} échoué: le code de la réponse est {message} est une protéine.",

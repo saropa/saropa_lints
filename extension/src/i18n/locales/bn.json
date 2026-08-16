@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "README খুলুন",
       "scaffoldFailed": "ভারা ব্যর্থ হয়েছে. {details}",
       "scaffoldFailedHint": "saropa_lints dev_dependencies-এ আছে তা নিশ্চিত করুন এবং পাব চালান।",
-      "alreadyOnTier": "ইতিমধ্যে {tier} স্তরে।"
+      "alreadyOnTier": "ইতিমধ্যে {tier} স্তরে।",
+      "progressPubGet": "পাব গেট চালানো হচ্ছে… ({elapsed}s)",
+      "progressConfigWrite": "লিখন কনফিগ... ({elapsed}s)",
+      "progressAnalysis": "অ্যানালাইসিস চালানো হচ্ছে... ({elapsed}s)",
+      "progressBaseline": "বেসলাইন স্ক্যান চালানো হচ্ছে… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} ব্যর্থ হয়েছেঃ {message} _ PH1__ এর সাথে সম্পর্কিত",

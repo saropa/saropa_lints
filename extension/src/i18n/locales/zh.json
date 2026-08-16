@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "打开 README,然后将其打开.",
       "scaffoldFailed": "脚手架失败。 {details}",
       "scaffoldFailedHint": "确保 saropa_lints 位于 dev_dependencies 中并运行 pub get。",
-      "alreadyOnTier": "已经在{tier}层."
+      "alreadyOnTier": "已经在{tier}层.",
+      "progressPubGet": "正在运行 pub get… ({elapsed}s)",
+      "progressConfigWrite": "编写配置… ({elapsed}s)",
+      "progressAnalysis": "分析中… ({elapsed}s)",
+      "progressBaseline": "正在运行基线扫描… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} 失败:没有成功 {message} 已经成为一种",

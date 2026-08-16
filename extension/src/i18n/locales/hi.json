@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "README को खोलें।",
       "scaffoldFailed": "मचान विफल. {details}",
       "scaffoldFailedHint": "सुनिश्चित करें कि saropa_lints dev_dependencies में है और पब गेट चलाएँ।",
-      "alreadyOnTier": "पहले से ही {tier} स्तर पर।"
+      "alreadyOnTier": "पहले से ही {tier} स्तर पर।",
+      "progressPubGet": "पब गेट चल रहा है... ({elapsed}s)",
+      "progressConfigWrite": "लिखना विन्यासन... ({elapsed}s)",
+      "progressAnalysis": "एनालिसिस चल रहा है... ({elapsed}s)",
+      "progressBaseline": "आधार खोज चल रही है... ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} विफलः {message} _PH1_ को क्या कहते हैं?",

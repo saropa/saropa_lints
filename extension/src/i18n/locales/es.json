@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Abre el README y lee.",
       "scaffoldFailed": "El andamio falló. {details}",
       "scaffoldFailedHint": "Asegúrese de que saropa_lints esté en dev_dependencies y ejecute pub get.",
-      "alreadyOnTier": "Ya en el nivel {tier}."
+      "alreadyOnTier": "Ya en el nivel {tier}.",
+      "progressPubGet": "Ejecutando pub get… ({elapsed}s)",
+      "progressConfigWrite": "Escribiendo configuración… ({elapsed}s)",
+      "progressAnalysis": "Análisis en ejecución… ({elapsed}s)",
+      "progressBaseline": "Ejecutando escaneo de base… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} falló: no fue posible {message} es el número de células",

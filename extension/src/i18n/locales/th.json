@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "เปิด README และอ่าน",
       "scaffoldFailed": "รางล้มเหลว _{details}",
       "scaffoldFailedHint": "ตรวจสอบให้แน่ใจว่า saropa_lints อยู่ใน dev_dependencies และเรียกใช้ pub get",
-      "alreadyOnTier": "ได้อยู่ในระดับ {tier} แล้ว"
+      "alreadyOnTier": "ได้อยู่ในระดับ {tier} แล้ว",
+      "progressPubGet": "กำลังดำเนินการ pub get… ({elapsed}s)",
+      "progressConfigWrite": "การเขียนค่ากำหนด... ({elapsed}s)",
+      "progressAnalysis": "วิเคราะห์อยู่… ({elapsed}s)",
+      "progressBaseline": "กำลังดำเนินการสแกนพื้นฐาน… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} ไม่สําเร็จ: การทําความผิดพลาด {message} การรักษาโรค",

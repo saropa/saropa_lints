@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Fungua README ya wazi.",
       "scaffoldFailed": "Kiunzi kimeshindwa. {details}",
       "scaffoldFailedHint": "Hakikisha saropa_lints iko katika dev_dependencies na kukimbia kupata. pub get.",
-      "alreadyOnTier": "Tayari kwenye kiwango cha {tier}."
+      "alreadyOnTier": "Tayari kwenye kiwango cha {tier}.",
+      "progressPubGet": "Kupata pub get… ({elapsed}s)",
+      "progressConfigWrite": "Kushiriki config… ({elapsed}s)",
+      "progressAnalysis": "Unganisha matokeo... ({elapsed}s)",
+      "progressBaseline": "Kupata skani ya mbingu... ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} imeshindwa: {message} _ PH1__ ni aina ya virusi vya kuambukiza.",

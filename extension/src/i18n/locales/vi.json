@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Mở README mở ra.",
       "scaffoldFailed": "Căn giáo bị hỏng. {details}",
       "scaffoldFailedHint": "Đảm bảo saropa_lints là trong dev_dependencies và chạy pub get.",
-      "alreadyOnTier": "Đã ở tầng {tier}."
+      "alreadyOnTier": "Đã ở tầng {tier}.",
+      "progressPubGet": "Đang chạy pub get… ({elapsed}s)",
+      "progressConfigWrite": "Viết config… ({elapsed}s)",
+      "progressAnalysis": "Đang phân tích... ({elapsed}s)",
+      "progressBaseline": "Đang chạy quét cơ sở... ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} thất bại: {message} là một loại tế bào có thể",

@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Aprire README.",
       "scaffoldFailed": "Gli impalcaturi hanno ceduto. {details}",
       "scaffoldFailedHint": "Assicurati che saropa_lints sia in dev_dependencies ed esegui pub get.",
-      "alreadyOnTier": "Già al livello {tier}."
+      "alreadyOnTier": "Già al livello {tier}.",
+      "progressPubGet": "Esecuzione di pub get… ({elapsed}s)",
+      "progressConfigWrite": "Scrittura configurazione… ({elapsed}s)",
+      "progressAnalysis": "Analisi in corso… ({elapsed}s)",
+      "progressBaseline": "Scansione baseline in corso… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} fallito: {message} è il nome di una cellula.",

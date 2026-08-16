@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Откройте README.",
       "scaffoldFailed": "Подставка не удалась. {details}",
       "scaffoldFailedHint": "Убедитесь, что saropa_lints находится в dev_dependencies, и запустите pub get.",
-      "alreadyOnTier": "Уже на уровне _{tier}."
+      "alreadyOnTier": "Уже на уровне _{tier}.",
+      "progressPubGet": "Выполнение pub get… ({elapsed}s)",
+      "progressConfigWrite": "Запись конфига… ({elapsed}s)",
+      "progressAnalysis": "Анализ выполняется… ({elapsed}s)",
+      "progressBaseline": "Сканирование базовой линии… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} не удалось: {message} - это ________, который является основой для развития.",

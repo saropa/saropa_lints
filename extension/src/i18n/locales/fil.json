@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Buksan ang README.",
       "scaffoldFailed": "Nabigo ang scaffold. {details}",
       "scaffoldFailedHint": "Tiyaking nasa dev_dependencies ang saropa_lints at magpatakbo ng pub get.",
-      "alreadyOnTier": "Nasa {tier} tier na."
+      "alreadyOnTier": "Nasa {tier} tier na.",
+      "progressPubGet": "Pumuproseso ang pub get… ({elapsed}s)",
+      "progressConfigWrite": "Paghahatag ng config... ({elapsed}s)",
+      "progressAnalysis": "Pagsusuri... ({elapsed}s)",
+      "progressBaseline": "Pagsusimula ng baseline scan… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} nabigo: hindi nakamit ang iyong mga layunin {message} Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili.",

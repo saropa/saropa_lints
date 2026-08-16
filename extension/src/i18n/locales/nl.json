@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Open de README-weergave.",
       "scaffoldFailed": "Steiger mislukt. {details}",
       "scaffoldFailedHint": "Zorg ervoor dat saropa_lints in dev_dependencies is en voer pub get uit.",
-      "alreadyOnTier": "Al op {tier} niveau."
+      "alreadyOnTier": "Al op {tier} niveau.",
+      "progressPubGet": "pub get uitvoeren… ({elapsed}s)",
+      "progressConfigWrite": "Config schrijven… ({elapsed}s)",
+      "progressAnalysis": "Analyseren... ({elapsed}s)",
+      "progressBaseline": "Baseline-scan uitvoeren… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} mislukt: {message} is een genetisch gemodificeerde stof.",

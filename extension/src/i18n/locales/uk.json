@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Відкрийте README.",
       "scaffoldFailed": "Стільця не спрацювали. {details}__",
       "scaffoldFailedHint": "Переконайтеся, що saropa_lints знаходиться в dev_dependencies, і запустіть pub get.",
-      "alreadyOnTier": "Уже на {tier} рівні."
+      "alreadyOnTier": "Уже на {tier} рівні.",
+      "progressPubGet": "Виконання pub get… ({elapsed}s)",
+      "progressConfigWrite": "Написання конфігурації… ({elapsed}s)",
+      "progressAnalysis": "Виконання аналізу… ({elapsed}s)",
+      "progressBaseline": "Виконання базового сканування… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} не вдалося: {message}__ - це фізіотип, що містить в собі",

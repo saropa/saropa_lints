@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "פתח את README הפתוח.",
       "scaffoldFailed": "הפיגום נכשל. {details}",
       "scaffoldFailedHint": "ודא ש-saropa_lints נמצא ב-dev_dependencies והפעל את pub get.",
-      "alreadyOnTier": "כבר בשכבת {tier}."
+      "alreadyOnTier": "כבר בשכבת {tier}.",
+      "progressPubGet": "מבצעת pub get… ({elapsed}s)",
+      "progressConfigWrite": "כתיבה של קובץ Yapı… ({elapsed}s)",
+      "progressAnalysis": "ניתוח ביצועים... ({elapsed}s)",
+      "progressBaseline": "סריקה בסיסית בדיקה... ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} נכשל: {message} זה ה- _PH1_.",

@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "README'yi açın.",
       "scaffoldFailed": "İskele başarısız oldu. {details}",
       "scaffoldFailedHint": "saropa_lints'nin dev_dependencies'de olduğundan emin olun ve pub get'i çalıştırın.",
-      "alreadyOnTier": "Zaten {tier} katında. seviye."
+      "alreadyOnTier": "Zaten {tier} katında. seviye.",
+      "progressPubGet": "pub get çalıştırılıyor… ({elapsed}s)",
+      "progressConfigWrite": "Yazılım yapılandırması… ({elapsed}s)",
+      "progressAnalysis": "Analiz çalıştırılıyor… ({elapsed}s)",
+      "progressBaseline": "Temel tarama çalıştırılıyor… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} başarısız oldu: {message} _PH1_ = PH1__ (Hücre Basıncı",

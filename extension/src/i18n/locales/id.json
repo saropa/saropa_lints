@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Buka README yang terbuka.",
       "scaffoldFailed": "Perancah gagal. {details}",
       "scaffoldFailedHint": "Pastikan saropa_lints ada di dev_dependencies dan jalankan pub get.",
-      "alreadyOnTier": "Sudah ada di tingkat {tier}."
+      "alreadyOnTier": "Sudah ada di tingkat {tier}.",
+      "progressPubGet": "Menggunakan pub get… ({elapsed}s)",
+      "progressConfigWrite": "Menulis konfigurasi… ({elapsed}s)",
+      "progressAnalysis": "Analisis sedang berjalan… ({elapsed}s)",
+      "progressBaseline": "Melakukan pemindaian dasar… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} gagal: tidak bisa {message} adalah",

@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "README를 열고 README을 열어보세요.",
       "scaffoldFailed": "비계가 실패했습니다. {details}",
       "scaffoldFailedHint": "saropa_lints가 dev_dependencies에 있는지 확인하고 pub get을 실행하세요.",
-      "alreadyOnTier": "이미 {tier} 계층에 있습니다."
+      "alreadyOnTier": "이미 {tier} 계층에 있습니다.",
+      "progressPubGet": "pub get 실행 중… ({elapsed}s)",
+      "progressConfigWrite": "구성 파일 작성 중… ({elapsed}s)",
+      "progressAnalysis": "분석 중입니다… ({elapsed}s)",
+      "progressBaseline": "기본 스캔 중… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} 실패: {message}는",

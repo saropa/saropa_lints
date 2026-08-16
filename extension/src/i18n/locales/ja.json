@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "READMEを開いて読みます.",
       "scaffoldFailed": "足場が失敗しました。 {details}",
       "scaffoldFailedHint": "saropa_lints が dev_dependencies にあることを確認して、pub get を実行します。",
-      "alreadyOnTier": "すでに {tier} レベルにいます."
+      "alreadyOnTier": "すでに {tier} レベルにいます.",
+      "progressPubGet": "pub getを実行中…（{elapsed}s）",
+      "progressConfigWrite": "設定を書いている…（{elapsed}s）",
+      "progressAnalysis": "解析中… ({elapsed}s)",
+      "progressBaseline": "ベースラインスキャンを実行中…（{elapsed}s）"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} 失敗: _PH2_ が実行できませんでした. {message} _ ヒトの\"つの細胞を構成する",

@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Öffnen Sie die README.",
       "scaffoldFailed": "Gerüst versagt. {details}",
       "scaffoldFailedHint": "Stellen Sie sicher, dass sich saropa_lints in dev_dependencies befindet, und führen Sie pub get aus.",
-      "alreadyOnTier": "Bereits auf der {tier} Ebene."
+      "alreadyOnTier": "Bereits auf der {tier} Ebene.",
+      "progressPubGet": "pub get ausführen… ({elapsed}s)",
+      "progressConfigWrite": "Konfiguration schreiben… ({elapsed}s)",
+      "progressAnalysis": "Analyse läuft… ({elapsed}s)",
+      "progressBaseline": "Baseline-Scan läuft… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} fehlgeschlagen: {message} ist ein _PH1-Präparat.",
