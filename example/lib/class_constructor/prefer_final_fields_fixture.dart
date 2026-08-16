@@ -1,5 +1,5 @@
 // ignore_for_file: unused_element, unused_field, unused_local_variable
-// Fixture for prefer_final_fields.
+// Fixture for prefer_final_fields_with_fix.
 //
 // The rule flags a PRIVATE instance field that is never reassigned anywhere in
 // the compilation unit (resolved by element, so a write through any holder
@@ -48,12 +48,12 @@ class _Accumulator {
 // Control — genuinely never reassigned. True positive must still fire.
 class _Holder {
   _Holder(this._label);
-  String _label; // LINT prefer_final_fields — no write anywhere in the unit.
+  String _label; // LINT prefer_final_fields_with_fix — no write anywhere in the unit.
 }
 
 // Control — public field. Never flagged (could be written from another
 // library), even though it is never reassigned in this unit.
 class PublicConfig {
   PublicConfig(this.name);
-  String name; // OK: public field is out of scope for prefer_final_fields.
+  String name; // OK: public field is out of scope for prefer_final_fields_with_fix.
 }

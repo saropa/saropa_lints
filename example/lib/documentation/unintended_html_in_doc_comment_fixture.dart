@@ -1,8 +1,8 @@
-// Fixture for unintended_html_in_doc_comment.
+// Fixture for unintended_html_in_doc_comment_strict.
 
 /// Bad: unintended HTML from generic type in prose.
 ///
-/// Returns a <String> value. // expect_lint: unintended_html_in_doc_comment
+/// Returns a <String> value. // expect_lint: unintended_html_in_doc_comment_strict
 void bad() {}
 
 /// Good: use backtick-delimited code for types.

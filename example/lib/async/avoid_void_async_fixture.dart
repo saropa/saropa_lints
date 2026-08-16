@@ -1,9 +1,9 @@
 // ignore_for_file: unused_local_variable, unused_element
 
-/// Fixture for `avoid_void_async` lint rule.
+/// Fixture for `avoid_void_async_extended` lint rule.
 
 // BAD: async function returning void
-// expect_lint: avoid_void_async
+// expect_lint: avoid_void_async_extended
 void bad() async {}
 
 // GOOD: Future<void>

@@ -1,9 +1,9 @@
 // ignore_for_file: unused_local_variable, unused_element, unawaited_futures
-// ignore_for_file: avoid_print, unused_field, avoid_types_on_closure_parameters
+// ignore_for_file: avoid_print, unused_field, avoid_types_on_closure_parameters_with_fix
 // ignore_for_file: use_of_void_result
 // ignore_for_file: depend_on_referenced_packages, prefer_const_constructors
 // ignore_for_file: unnecessary_import, unused_import
-// ignore_for_file: avoid_unused_constructor_parameters, override_on_non_overriding_member
+// ignore_for_file: avoid_unused_constructor_parameters_skip_private, override_on_non_overriding_member
 // ignore_for_file: annotate_overrides, duplicate_ignore
 // ignore_for_file: non_abstract_class_inherits_abstract_member, extends_non_class
 // ignore_for_file: mixin_of_non_class, field_initializer_outside_constructor
