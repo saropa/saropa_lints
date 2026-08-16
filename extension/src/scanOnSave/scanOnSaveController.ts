@@ -17,6 +17,7 @@ import { runScanOnSave, type ScanOnSaveDiagnostic, type ScanOnSaveResult } from 
 import { ScanDaemonManager } from './scanDaemonManager';
 import { runBaselineScan } from './baselineScanRunner';
 import { readTierFromAnalysisOptionsYaml } from '../config/tierConfig';
+import { getEnabledSeverities, affectsSeveritySettings } from '../config/severityConfig';
 import { l10n } from '../i18n/runtime';
 
 /**
@@ -112,6 +113,9 @@ export class ScanOnSaveController implements vscode.Disposable {
   private readonly _daemonManager = new ScanDaemonManager();
   /** True while a Lane 3 baseline scan is running — guards against a second concurrent invocation. */
   private _baselineScanInFlight = false;
+  /** Last raw scan results per file — retained so severity toggles can
+   *  re-filter without rescanning (no _pendingFiles to trigger a rescan). */
+  private _lastDiagnosticsByFile = new Map<string, ScanOnSaveDiagnostic[]>();
 
   constructor(
     private readonly _collection: vscode.DiagnosticCollection,
@@ -147,8 +151,18 @@ export class ScanOnSaveController implements vscode.Disposable {
           // feature repopulates on the next save.
           if (!this._isEnabled()) {
             this._collection.clear();
+            // Clear the raw-diagnostic cache so a future severity toggle
+            // doesn't re-publish stale data from before the feature was off.
+            this._lastDiagnosticsByFile.clear();
             this._statusBarItem.hide();
           }
+        }
+        // When a severity toggle changes, re-filter the existing
+        // diagnostics in-place. A clear+rescan approach fails because
+        // _pendingFiles is empty (no save happened), so _runQueuedScan
+        // no-ops and the Problems panel goes blank.
+        if (affectsSeveritySettings(e) && this._isEnabled()) {
+          this._refilterDiagnostics();
         }
       }),
     );
@@ -215,10 +229,10 @@ export class ScanOnSaveController implements vscode.Disposable {
         return;
       }
       const diagnostics = result.payload?.diagnostics ?? [];
-      this._applyDiagnostics(files, diagnostics);
+      const publishedCount = this._applyDiagnostics(files, diagnostics);
       const elapsedS = ((Date.now() - start) / 1000).toFixed(1);
       this._statusBarItem.text = l10n('scanOnSave.statusBar.done', {
-        count: String(diagnostics.length),
+        count: String(publishedCount),
         elapsed: elapsedS,
       });
     } finally {
@@ -247,16 +261,53 @@ export class ScanOnSaveController implements vscode.Disposable {
    * clearing a file that scanned clean, which a naive "only set when
    * non-empty" approach would leave stale. Files outside this batch (not
    * scanned this pass) are left untouched.
+   *
+   * Diagnostics whose severity is toggled off in `saropaLints.severity.*`
+   * settings are dropped before reaching the collection, so they never
+   * appear in the Problems panel.
    */
-  private _applyDiagnostics(files: readonly string[], diagnostics: readonly ScanOnSaveDiagnostic[]): void {
+  private _applyDiagnostics(files: readonly string[], diagnostics: readonly ScanOnSaveDiagnostic[]): number {
     const byFile = groupDiagnosticsByFile(diagnostics);
+    // Cache raw results so _refilterDiagnostics can re-apply severity
+    // toggles without rescanning.
+    for (const filePath of files) {
+      const raw = byFile.get(filePath) ?? [];
+      if (raw.length > 0) {
+        this._lastDiagnosticsByFile.set(filePath, raw);
+      } else {
+        this._lastDiagnosticsByFile.delete(filePath);
+      }
+    }
+    return this._publishFiltered(byFile, files);
+  }
+
+  /** Convert + filter + push diagnostics to the collection. */
+  private _publishFiltered(
+    byFile: Map<string, ScanOnSaveDiagnostic[]>,
+    files: Iterable<string>,
+  ): number {
+    // Read enabled severities once per batch instead of per-diagnostic.
+    const enabled = getEnabledSeverities();
+    let total = 0;
     for (const filePath of files) {
       const fileDiagnostics = byFile.get(filePath) ?? [];
-      this._collection.set(
-        vscode.Uri.file(filePath),
-        fileDiagnostics.map(toVscodeDiagnostic),
-      );
+      const mapped = fileDiagnostics
+        .map(toVscodeDiagnostic)
+        .filter((d) => enabled.has(d.severity));
+      this._collection.set(vscode.Uri.file(filePath), mapped);
+      total += mapped.length;
     }
+    return total;
+  }
+
+  /** Re-filter cached diagnostics when severity toggles change —
+   *  avoids the clear+rescan path that no-ops on empty _pendingFiles. */
+  private _refilterDiagnostics(): void {
+    if (this._lastDiagnosticsByFile.size === 0) return;
+    this._publishFiltered(
+      this._lastDiagnosticsByFile,
+      this._lastDiagnosticsByFile.keys(),
+    );
   }
 
   /**

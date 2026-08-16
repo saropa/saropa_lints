@@ -47,6 +47,7 @@ import { SummaryTreeProvider } from './views/summaryTree';
 import { SuppressionsTreeProvider } from './views/suppressionsTree';
 import { ConfigTreeProvider } from './views/configTree';
 import { readTierFromAnalysisOptionsYaml } from './config/tierConfig';
+import { getEnabledSeverityCount, affectsSeveritySettings } from './config/severityConfig';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePacks/rulePackYaml';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
@@ -554,6 +555,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // as dead code — product decision, flagged in the (now archived)
   // plans/history sidebar_view_inventory audit.
   const issuesProvider = new IssuesTreeProvider(context.workspaceState);
+  // Wire up dispose so the severity config watcher is cleaned up on deactivation.
+  context.subscriptions.push(issuesProvider);
   const hotspotReviewState = new SecurityHotspotReviewStateService(context.workspaceState);
   const summaryProvider = new SummaryTreeProvider(context.workspaceState);
   const suppressionsProvider = new SuppressionsTreeProvider();
@@ -582,6 +585,26 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const helpExtVersion = (context.extension.packageJSON as { version: string }).version;
       helpView.title = `${l10n('findingsDash.menuPalette.help')} (v${helpExtVersion})`;
       context.subscriptions.push(helpView);
+      continue;
+    }
+    // Severity Filters section gets a dynamic title showing the active
+    // count (e.g. "Severity Filters (3/4)") so users see at a glance
+    // that a severity is suppressed without expanding the section.
+    if (provider.viewId === SECTION_VIEW_IDS.severityFilters) {
+      const sevView = vscode.window.createTreeView(provider.viewId, {
+        treeDataProvider: provider,
+      });
+      const updateSevTitle = (): void => {
+        const count = getEnabledSeverityCount();
+        sevView.title = `Severity Filters (${count}/4)`;
+      };
+      updateSevTitle();
+      context.subscriptions.push(
+        vscode.workspace.onDidChangeConfiguration((e) => {
+          if (affectsSeveritySettings(e)) updateSevTitle();
+        }),
+        sevView,
+      );
       continue;
     }
     context.subscriptions.push(
@@ -1425,6 +1448,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       await cfg.update('runAnalysisAfterDependencyChange', !cur, target);
       refreshAllSections();
     }),
+    // One-click severity toggles for the sidebar "Severity Filters" rows.
+    // Each flips its boolean setting and refreshes all sidebar sections so
+    // the row label updates from "On" to "Off" (or vice versa) immediately.
+    ...registerSeverityToggle('saropaLints.toggleSeverityError', 'severity.error', refreshAllSections),
+    ...registerSeverityToggle('saropaLints.toggleSeverityWarning', 'severity.warning', refreshAllSections),
+    ...registerSeverityToggle('saropaLints.toggleSeverityInfo', 'severity.info', refreshAllSections),
+    ...registerSeverityToggle('saropaLints.toggleSeverityHint', 'severity.hint', refreshAllSections),
     vscode.commands.registerCommand(
       'saropaLints.toggleTodosAndHacksScanner',
       async () => {
@@ -2336,4 +2366,27 @@ export function deactivate(): void {
   } catch (err) {
     console.error('[Saropa Lints] Package Vibrancy deactivation failed:', err);
   }
+}
+
+/**
+ * Registers a one-click toggle command for a `saropaLints.severity.*`
+ * boolean setting. Returns a single-element array so the caller can
+ * spread it into the subscriptions list.
+ */
+function registerSeverityToggle(
+  commandId: string,
+  settingKey: string,
+  refreshAllSections: () => void,
+): vscode.Disposable[] {
+  return [
+    vscode.commands.registerCommand(commandId, async () => {
+      const cfg = vscode.workspace.getConfiguration('saropaLints');
+      const cur = cfg.get<boolean>(settingKey, true) !== false;
+      const target = vscode.workspace.workspaceFolders?.length
+        ? vscode.ConfigurationTarget.Workspace
+        : vscode.ConfigurationTarget.Global;
+      await cfg.update(settingKey, !cur, target);
+      refreshAllSections();
+    }),
+  ];
 }

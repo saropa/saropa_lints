@@ -563,6 +563,25 @@ function buildSettingsItems(configProvider: ConfigTreeProvider): SectionNode[] {
     return [...actions, ...settings, ...triage];
 }
 
+/**
+ * Severity filter toggle rows — own sidebar section so users can find
+ * them at a glance and flip a severity off in one click instead of
+ * wading through 13,000 Problems panel entries.
+ */
+function buildSeverityFilterItems(): SectionNode[] {
+    const cfg = vscode.workspace.getConfiguration('saropaLints');
+    const showErrors = cfg.get<boolean>('severity.error', true) !== false;
+    const showWarnings = cfg.get<boolean>('severity.warning', true) !== false;
+    const showInfos = cfg.get<boolean>('severity.info', true) !== false;
+    const showHints = cfg.get<boolean>('severity.hint', true) !== false;
+    return [
+        new LeafItem('Show errors', showErrors ? 'On' : 'Off', 'saropaLints.toggleSeverityError'),
+        new LeafItem('Show warnings', showWarnings ? 'On' : 'Off', 'saropaLints.toggleSeverityWarning'),
+        new LeafItem('Show infos', showInfos ? 'On' : 'Off', 'saropaLints.toggleSeverityInfo'),
+        new LeafItem('Show hints', showHints ? 'On' : 'Off', 'saropaLints.toggleSeverityHint'),
+    ];
+}
+
 // ── Provider class ────────────────────────────────────────────────────────
 
 /**
@@ -614,6 +633,7 @@ export const SECTION_VIEW_IDS = {
     // Actions and Triage views were merged in: the user wanted a single panel
     // to operate and configure the project's lints in one place.
     settings: 'saropaLints.settings',
+    severityFilters: 'saropaLints.severityFilters',
     help: 'saropaLints.help',
 } as const;
 
@@ -635,6 +655,7 @@ export function createSidebarSectionProviders(
         // Merged Actions + Settings + Triage panel, placed at the former Actions
         // slot (above Status) so the run/initialize operations stay prominent.
         new FlatSectionProvider(SECTION_VIEW_IDS.settings, () => buildSettingsItems(configProvider)),
+        new FlatSectionProvider(SECTION_VIEW_IDS.severityFilters, () => buildSeverityFilterItems()),
         new FlatSectionProvider(SECTION_VIEW_IDS.status, () => buildStatusItems(workspaceState)),
         new FlatSectionProvider(SECTION_VIEW_IDS.help, () => buildHelpItems()),
     ];

@@ -41,6 +41,7 @@ import { readDisabledRules } from '../configWriter';
 import { l10n } from '../i18n/runtime';
 import { packsForRule, tierForRule } from './ruleGroupingMeta';
 import { VIOLATIONS_GROUP_BY_MODES, type GroupByMode } from './issuesTreeGrouping';
+import { getEnabledSeverityStrings, affectsSeveritySettings } from '../config/severityConfig';
 
 // The node types and the command registrar moved to sibling modules;
 // re-export them so existing importers keep referencing issuesTree.ts.
@@ -184,7 +185,7 @@ function getPathTreeChildren(
   return { folders, files };
 }
 
-export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode> {
+export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode>, vscode.Disposable {
   private _onDidChangeTreeData = new vscode.EventEmitter<IssueTreeNode | undefined | void>();
   readonly onDidChangeTreeData = this._onDidChangeTreeData.event;
 
@@ -209,11 +210,26 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
   /** When true, getTreeItem() returns Expanded instead of Collapsed for all collapsible nodes. */
   private _expandAllOverride = false;
 
+  /** Disposes config watchers registered in the constructor. */
+  private readonly _disposables: vscode.Disposable[] = [];
+
   constructor(workspaceState: vscode.Memento) {
     this.workspaceState = workspaceState;
     this.securityHotspotReviewState = new SecurityHotspotReviewStateService(workspaceState);
     this.suppressions = loadSuppressions(workspaceState);
     this.groupBy = parseViolationsGroupBy(vscode.workspace.getConfiguration('saropaLints'));
+    // Initialize the severity filter from settings so toggling off a
+    // severity in VS Code settings takes immediate effect in the tree.
+    this.severitiesToShow = getEnabledSeverityStrings();
+    // Re-sync whenever the user changes a severity toggle.
+    this._disposables.push(
+      vscode.workspace.onDidChangeConfiguration((e) => {
+        if (affectsSeveritySettings(e)) {
+          this.severitiesToShow = getEnabledSeverityStrings();
+          this.refresh();
+        }
+      }),
+    );
   }
 
   hasViolations(): boolean {
@@ -373,7 +389,9 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
 
   clearFilters(): void {
     this.textFilter = '';
-    this.severitiesToShow = new Set(SEVERITY_ORDER);
+    // Reset to settings-based defaults, not a hardcoded all-on set,
+    // so "clear filters" respects the user's severity toggle settings.
+    this.severitiesToShow = getEnabledSeverityStrings();
     // Three-bucket severity model (post-collapse, 2026-05-03).
     this.impactsToShow = new Set(['error', 'warning', 'info']);
     this.rulesToHide = new Set();
@@ -732,6 +750,11 @@ export class IssuesTreeProvider implements vscode.TreeDataProvider<IssueTreeNode
 
   getParent(element: IssueTreeNode): vscode.ProviderResult<IssueTreeNode> {
     return undefined;
+  }
+
+  /** Clean up config change listeners registered in the constructor. */
+  dispose(): void {
+    for (const d of this._disposables) d.dispose();
   }
 }
 

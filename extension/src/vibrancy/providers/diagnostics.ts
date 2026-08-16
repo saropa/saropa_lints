@@ -12,6 +12,7 @@ import { buildExceededDiagnostics } from '../scoring/budget-checker';
 import { filterBySeverity } from '../scoring/vuln-classifier';
 import { isReplacementPackageName, getReplacementDisplayText } from '../scoring/known-issues';
 import { isHostedUpgradeable } from '../scoring/blocker-analyzer';
+import { getEnabledSeverities } from '../../config/severityConfig';
 
 // Maps scan results to VS Code diagnostics (budget, vulns, EOL, known issues).
 const SEVERITY_MAP: Record<number, vscode.DiagnosticSeverity> = {
@@ -153,7 +154,12 @@ export class VibrancyDiagnostics {
         }
         this._addBudgetDiagnostics(results, diagnostics);
 
-        this._collection.set(uri, diagnostics);
+        // Drop diagnostics whose severity is toggled off in settings,
+        // so disabling e.g. hints removes all vibrancy hints at once.
+        // Read the enabled set once per update, not per diagnostic.
+        const enabled = getEnabledSeverities();
+        const filtered = diagnostics.filter((d) => enabled.has(d.severity));
+        this._collection.set(uri, filtered);
     }
 
     private _addBudgetDiagnostics(

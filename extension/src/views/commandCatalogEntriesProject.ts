@@ -78,6 +78,34 @@ export const projectCatalogEntries: readonly CatalogEntry[] = [
     icon: 'sync',
   },
   {
+    command: 'saropaLints.toggleSeverityError',
+    title: 'Toggle Error Diagnostics',
+    description: 'Show or hide error-level diagnostics in the Problems panel and Findings tree.',
+    category: 'Violations & Filtering',
+    icon: 'filter',
+  },
+  {
+    command: 'saropaLints.toggleSeverityWarning',
+    title: 'Toggle Warning Diagnostics',
+    description: 'Show or hide warning-level diagnostics in the Problems panel and Findings tree.',
+    category: 'Violations & Filtering',
+    icon: 'filter',
+  },
+  {
+    command: 'saropaLints.toggleSeverityInfo',
+    title: 'Toggle Info Diagnostics',
+    description: 'Show or hide info-level diagnostics in the Problems panel and Findings tree.',
+    category: 'Violations & Filtering',
+    icon: 'filter',
+  },
+  {
+    command: 'saropaLints.toggleSeverityHint',
+    title: 'Toggle Hint Diagnostics',
+    description: 'Show or hide hint-level diagnostics in the Problems panel and Findings tree.',
+    category: 'Violations & Filtering',
+    icon: 'filter',
+  },
+  {
     command: 'saropaLints.toggleTodosAndHacksScanner',
     title: 'Toggle TODO/HACK Workspace Scanner',
     description:
