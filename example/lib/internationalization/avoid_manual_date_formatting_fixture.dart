@@ -1,5 +1,5 @@
 // ignore_for_file: unused_local_variable, unused_element
-// ignore_for_file: prefer_const_declarations
+// ignore_for_file: prefer_const_declarations_with_fix
 
 /// Fixture for `avoid_manual_date_formatting` lint rule.
 ///

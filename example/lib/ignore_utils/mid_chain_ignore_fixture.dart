@@ -2,7 +2,7 @@
 // ignore_for_file: avoid_print
 // ignore_for_file: unused_element, depend_on_referenced_packages
 // ignore_for_file: prefer_const_constructors, unnecessary_import
-// ignore_for_file: unused_import, avoid_unused_constructor_parameters
+// ignore_for_file: unused_import, avoid_unused_constructor_parameters_skip_private
 // ignore_for_file: override_on_non_overriding_member, annotate_overrides
 // ignore_for_file: duplicate_ignore, non_abstract_class_inherits_abstract_member
 // ignore_for_file: extends_non_class, mixin_of_non_class

@@ -2,7 +2,7 @@
 // ignore_for_file: depend_on_referenced_packages
 // ignore_for_file: prefer_const_constructors
 // ignore_for_file: unnecessary_import, unused_import
-// ignore_for_file: avoid_unused_constructor_parameters
+// ignore_for_file: avoid_unused_constructor_parameters_skip_private
 // ignore_for_file: prefer_async_callback
 // ignore_for_file: override_on_non_overriding_member
 // ignore_for_file: annotate_overrides, duplicate_ignore
