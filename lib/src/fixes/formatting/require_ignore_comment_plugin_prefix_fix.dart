@@ -116,7 +116,15 @@ class RequireIgnoreCommentPluginPrefixFix extends SaropaFixProducer {
           insertions.add(baseOffset + ruleListStart + m.start);
         }
       }
-      if (insertions.isNotEmpty) return insertions;
+      // Found the ignore-comment line the diagnostic targets — return its
+      // insertions even when empty. An empty result means every name in
+      // this comment is already prefixed (the "prefixed but unregistered
+      // rule name" diagnostic case, which this fix cannot correct — it only
+      // knows how to ADD a missing prefix, not rename a typo). Returning []
+      // here (not null) stops compute() from falling back to
+      // _findFirstBareLineInsertions and silently "fixing" an unrelated
+      // bare-name comment elsewhere in the file.
+      return insertions;
     }
     return null;
   }

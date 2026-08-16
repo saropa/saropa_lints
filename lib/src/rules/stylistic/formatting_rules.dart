@@ -1213,8 +1213,14 @@ class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
         for (final prefix in _ignorePrefixes) {
           if (content.startsWith(prefix)) {
             final ruleList = content.substring(prefix.length).trimLeft();
+            // Check for bare saropa rule names (missing prefix).
             if (_hasBareRuleName(ruleList)) {
               reporter.atToken(comment);
+            }
+            // Check for prefixed names whose suffix isn't a real rule.
+            final unknownSuffix = _firstUnknownPrefixedSuffix(ruleList);
+            if (unknownSuffix != null) {
+              reporter.atToken(comment, _buildUnknownPrefixedCode(unknownSuffix));
             }
             break;
           }
@@ -1224,6 +1230,8 @@ class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
     }
   }
 
+  /// Returns true when [ruleList] contains a bare (unprefixed) name that
+  /// matches a registered saropa_lints rule.
   bool _hasBareRuleName(String ruleList) {
     final trailingComment = ruleList.indexOf('--');
     final effective = trailingComment >= 0
@@ -1238,6 +1246,102 @@ class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
       if (_allSaropaRuleNames.contains(bare)) return true;
     }
     return false;
+  }
+
+  /// Returns the first unknown suffix from a prefixed ignore-comment name,
+  /// or null if all prefixed names are registered.
+  String? _firstUnknownPrefixedSuffix(String ruleList) {
+    final trailingComment = ruleList.indexOf('--');
+    final effective = trailingComment >= 0
+        ? ruleList.substring(0, trailingComment)
+        : ruleList;
+
+    for (final part in effective.split(',')) {
+      final name = part.trim();
+      if (name.isEmpty) continue;
+      if (!name.startsWith(_prefix)) continue;
+      // Strip the prefix and normalize hyphens to underscores.
+      final suffix = name.substring(_prefix.length).replaceAll('-', '_');
+      if (suffix.isEmpty) continue;
+      if (!_allSaropaRuleNames.contains(suffix)) return suffix;
+    }
+    return null;
+  }
+
+  /// Builds a diagnostic with a "did you mean?" suggestion when the unknown
+  /// suffix is close to a registered rule name (Levenshtein distance ≤ 5).
+  LintCode _buildUnknownPrefixedCode(String unknownSuffix) {
+    final suggestion = _closestRuleName(unknownSuffix);
+    final didYouMean = suggestion != null
+        ? ' Did you mean \'$suggestion\'?'
+        : '';
+
+    return LintCode(
+      'require_ignore_comment_plugin_prefix',
+      '[require_ignore_comment_plugin_prefix] This // ignore: comment uses '
+          'saropa_lints/ prefix but \'$unknownSuffix\' is not a registered '
+          'saropa_lints rule — the suppression has no effect because the '
+          'analyzer matches ignore comments by exact rule id.$didYouMean',
+      correctionMessage: suggestion != null
+          ? 'Replace with saropa_lints/$suggestion.'
+          : 'Replace the rule name with a registered saropa_lints rule name.',
+      severity: DiagnosticSeverity.WARNING,
+    );
+  }
+
+  /// Returns the closest registered rule name if its edit distance
+  /// is within a reasonable threshold, or null if nothing is close.
+  static String? _closestRuleName(String unknown) {
+    // Max edit distance — tuned for typical typos (1–2 char changes,
+    // a dropped/swapped word segment).
+    const maxDistance = 5;
+    String? best;
+    int bestDist = maxDistance + 1;
+
+    for (final rule in _allSaropaRuleNames) {
+      // Skip candidates that differ too much in length to ever be ≤ max.
+      final lengthDiff = (rule.length - unknown.length).abs();
+      if (lengthDiff > maxDistance) continue;
+
+      final dist = _editDistance(unknown, rule);
+      if (dist < bestDist) {
+        bestDist = dist;
+        best = rule;
+      }
+    }
+    return best;
+  }
+
+  /// Standard Levenshtein edit distance — O(m × n) where m and n are
+  /// string lengths. Adequate here because rule names are short (~30 chars)
+  /// and the call is made at most once per diagnostic, not per token.
+  static int _editDistance(String a, String b) {
+    if (a == b) return 0;
+    if (a.isEmpty) return b.length;
+    if (b.isEmpty) return a.length;
+
+    // Single-row DP — only need the previous row at each step.
+    final int m = a.length;
+    final int n = b.length;
+    List<int> prev = List<int>.generate(n + 1, (i) => i);
+    List<int> curr = List<int>.filled(n + 1, 0);
+
+    for (int i = 1; i <= m; i++) {
+      curr[0] = i;
+      for (int j = 1; j <= n; j++) {
+        final cost = a[i - 1] == b[j - 1] ? 0 : 1;
+        curr[j] = [
+          prev[j] + 1,
+          curr[j - 1] + 1,
+          prev[j - 1] + cost,
+        ].reduce((a, b) => a < b ? a : b);
+      }
+      // Swap rows.
+      final tmp = prev;
+      prev = curr;
+      curr = tmp;
+    }
+    return prev[n];
   }
 }
 

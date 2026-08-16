@@ -44,4 +44,28 @@ final x4 = 4;
 // LINT: require_ignore_comment_plugin_prefix
 // ignore: avoid_null_assertion -- this is a false positive
 
+// BAD: prefixed name whose suffix is NOT a registered saropa_lints rule —
+// typo or renamed rule, suppression silently does nothing.
+
+// LINT: require_ignore_comment_plugin_prefix
+// ignore: saropa_lints/duplicate_ignore
+final x5 = 5;
+
+// LINT: require_ignore_comment_plugin_prefix
+// ignore: saropa_lints/require_dispose
+final x6 = 6;
+
+// LINT: require_ignore_comment_plugin_prefix
+// ignore: saropa_lints/totally_made_up_rule_name
+final x7 = 7;
+
+// LINT: require_ignore_comment_plugin_prefix
+// ignore_for_file: saropa_lints/nonexistent_rule
+
+// BAD: prefixed unknown with trailing comment.
+
+// LINT: require_ignore_comment_plugin_prefix
+// ignore: saropa_lints/bogus_rule -- thought this was real
+final x8 = 8;
+
 void main() {}
