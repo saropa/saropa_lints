@@ -57,11 +57,23 @@ export function scanOnSaveIsEnabled(masterEnabled: boolean): boolean {
 
 /** Maps one scan diagnostic onto a `vscode.Diagnostic` for its source line. */
 export function toVscodeDiagnostic(d: ScanOnSaveDiagnostic): vscode.Diagnostic {
-  // scan CLI lines/columns are 1-based; VS Code Positions are 0-based. Column
+  // Scan CLI lines/columns are 1-based; VS Code Positions are 0-based. Column
   // can be absent/0 for file-level findings — clamp to a valid non-negative.
   const line = Math.max(0, d.line - 1);
   const column = Math.max(0, (d.column || 1) - 1);
-  const range = new vscode.Range(line, column, line, column + 1);
+  // Use the full diagnostic span so clicking the problem highlights the
+  // offending declaration, not a single character (which triggers VS Code's
+  // "highlight all occurrences" and selects every matching letter in the file).
+  // When endLine/endColumn are absent (legacy scan output) OR produce a
+  // zero-width range (some rules report at a point, not a span), fall back to
+  // highlighting to end-of-line so the diagnostic is always visible.
+  let endLine = d.endLine != null ? Math.max(0, d.endLine - 1) : line;
+  let endColumn = d.endColumn != null ? Math.max(0, d.endColumn - 1) : column + 1;
+  // Guard: zero-width ranges are invisible in VS Code — extend to end-of-line.
+  if (endLine === line && endColumn <= column) {
+    endColumn = Number.MAX_SAFE_INTEGER;
+  }
+  const range = new vscode.Range(line, column, endLine, endColumn);
   const severity = SEVERITY_MAP[d.severity.toUpperCase()] ?? vscode.DiagnosticSeverity.Information;
   const message = d.correctionMessage
     ? `${d.problemMessage ?? d.ruleName}\n${d.correctionMessage}`

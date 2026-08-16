@@ -581,6 +581,9 @@ class ScanRunner {
   ) {
     for (final d in listener.diagnostics) {
       final loc = unit.lineInfo.getLocation(d.offset);
+      // End position lets the extension highlight the full diagnostic span
+      // instead of a single character (which triggers "find all occurrences").
+      final endLoc = unit.lineInfo.getLocation(d.offset + d.length);
       diagnostics.add(
         ScanDiagnostic(
           ruleName: d.diagnosticCode.lowerCaseName,
@@ -589,6 +592,8 @@ class ScanRunner {
           column: loc.columnNumber,
           offset: d.offset,
           length: d.length,
+          endLine: endLoc.lineNumber,
+          endColumn: endLoc.columnNumber,
           severity: d.diagnosticCode.severity.name,
           problemMessage: d.problemMessage.messageText(includeUrl: false),
         ),

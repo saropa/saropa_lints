@@ -29,6 +29,40 @@ describe('toVscodeDiagnostic', () => {
     assert.strictEqual(d.range.start.character, 4);
   });
 
+  it('uses endLine/endColumn for a full-span range when present', () => {
+    // Diagnostic spanning columns 3–25 on line 10 (1-based from Dart).
+    const d = toVscodeDiagnostic(diag({ line: 10, column: 3, endLine: 10, endColumn: 25 }));
+    assert.strictEqual(d.range.start.line, 9);
+    assert.strictEqual(d.range.start.character, 2);
+    assert.strictEqual(d.range.end.line, 9);
+    assert.strictEqual(d.range.end.character, 24);
+  });
+
+  it('falls back to column + 1 when endLine/endColumn are absent', () => {
+    // Legacy scan output without end position fields.
+    const d = toVscodeDiagnostic(diag({ line: 10, column: 5 }));
+    assert.strictEqual(d.range.end.line, 9);
+    assert.strictEqual(d.range.end.character, 5);
+  });
+
+  it('supports multi-line diagnostic spans', () => {
+    const d = toVscodeDiagnostic(diag({ line: 5, column: 3, endLine: 8, endColumn: 10 }));
+    assert.strictEqual(d.range.start.line, 4);
+    assert.strictEqual(d.range.start.character, 2);
+    assert.strictEqual(d.range.end.line, 7);
+    assert.strictEqual(d.range.end.character, 9);
+  });
+
+  it('extends zero-width range to end-of-line so the diagnostic stays visible', () => {
+    // endLine == line and endColumn == column → zero-width → extend to EOL.
+    const d = toVscodeDiagnostic(diag({ line: 10, column: 5, endLine: 10, endColumn: 5 }));
+    assert.strictEqual(d.range.start.line, 9);
+    assert.strictEqual(d.range.start.character, 4);
+    assert.strictEqual(d.range.end.line, 9);
+    // VS Code clamps MAX_SAFE_INTEGER to the actual line length.
+    assert.ok(d.range.end.character > 4, 'end character should extend past start');
+  });
+
   it('clamps line/column at 0 for file-level findings (line=1, column=0)', () => {
     const d = toVscodeDiagnostic(diag({ line: 1, column: 0 }));
     assert.strictEqual(d.range.start.line, 0);

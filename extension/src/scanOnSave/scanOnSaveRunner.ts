@@ -40,8 +40,14 @@ export function buildScanOnSaveArgs(
 
 export interface ScanOnSaveDiagnostic {
   filePath: string;
+  /** 1-based start line. */
   line: number;
+  /** 1-based start column. */
   column: number;
+  /** 1-based end line (may be absent in older scan output). */
+  endLine?: number;
+  /** 1-based end column, exclusive (may be absent in older scan output). */
+  endColumn?: number;
   ruleName: string;
   severity: string;
   problemMessage?: string | null;

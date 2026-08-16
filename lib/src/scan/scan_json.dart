@@ -18,8 +18,8 @@ const String kScanJsonByRule = 'byRule';
 ///
 /// Schema:
 /// - `version`: 1 (int)
-/// - `diagnostics`: list of objects with: filePath, line, column, ruleName,
-///   severity, problemMessage, correctionMessage (optional)
+/// - `diagnostics`: list of objects with: filePath, line, column, endLine,
+///   endColumn, ruleName, severity, problemMessage, correctionMessage (opt)
 /// - `summary`: object with totalCount, byFile (map filePath -> count),
 ///   byRule (map ruleName -> count)
 Map<String, Object> scanDiagnosticsToJson(List<ScanDiagnostic> diagnostics) {
@@ -29,6 +29,8 @@ Map<String, Object> scanDiagnosticsToJson(List<ScanDiagnostic> diagnostics) {
           'filePath': d.filePath,
           'line': d.line,
           'column': d.column,
+          'endLine': d.endLine,
+          'endColumn': d.endColumn,
           'ruleName': d.ruleName,
           'severity': d.severity,
           'problemMessage': d.problemMessage,

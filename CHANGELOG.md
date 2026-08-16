@@ -64,14 +64,6 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
-
-### Fixed (Extension)
-
-- Clicking a finding in the Problems panel now highlights the full diagnostic span instead of a single character — eliminates the "highlight every matching letter" noise caused by VS Code's occurrence-highlight when the range was only one character wide. No action required.
-
----
-
 ## [15.0.3]
 
 The scan CLI now lets users filter diagnostics by severity, so AI agents and CI pipelines can suppress info-level noise and focus on warnings and errors. The extension also stops losing the in-editor analyzer plugin when Lint integration is switched off and back on, and now reports that plugin's real state instead of implying it from a setting that does not control it. [log](https://github.com/saropa/saropa_lints/blob/v15.0.3/CHANGELOG.md)
@@ -87,6 +79,7 @@ The scan CLI now lets users filter diagnostics by severity, so AI agents and CI 
 
 ### Fixed (Extension)
 
+- Clicking a finding in the Problems panel now highlights the full diagnostic span instead of a single character — eliminates the "highlight every matching letter" noise caused by VS Code's occurrence-highlight when the range was only one character wide. No action required.
 - Turning Lint integration off and then on again left the in-editor analyzer plugin switched off — the off step comments out the `plugins:` block in `analysis_options.yaml`, and the on step never put it back, so a project silently lost live diagnostics with no indication of why. Enable now restores the block when it was this extension's own Off that commented it out, leaving new projects (which default to the lighter scan-on-save delivery) untouched. This has proven to be tricky!
 - The sidebar now reports the analyzer plugin's actual on-disk state as its own row, so "Lint integration: On" can no longer sit above a project whose `plugins:` block is commented out — clicking that row while it reads Off restores the plugin. No action required.
 - The record of which side switched the analyzer plugin off is now stored twice, so a VS Code profile switch or extension-storage reset can no longer make Enable silently stop restoring the plugin. No action required.
@@ -100,6 +93,7 @@ The scan CLI now lets users filter diagnostics by severity, so AI agents and CI 
 - (Extension) Pinned Filipino translation of "Analyzer plugin" in the curated dictionary so the MT pipeline stops overwriting it with untranslated English on every run. No action required.
 - (Extension) The i18n pipeline now warns at the start of every run when a curated dictionary key no longer matches any English source string — catches silent regressions where a renamed en.json string causes the dictionary entry to stop matching and MT takes over. Pass `--fail-on-drift` to hard-gate (added to publish pipeline). No action required.
 - (Extension) Fixed 9 orphaned curated dictionary keys across nl, fr, ur, bn, fil, and he — stale from prior en.json renames ("Search Packages" → "Search packages", "Open Lints Config" → "Manage Rule Packs"). No action required.
+- Added fixture coverage for `avoid_positioned_outside_stack` — covers the Positioned-in-list-passed-to-custom-widget false positive that was already fixed in v4.13.0 but had no test. No action required.
 
 </details>
 
@@ -520,68 +514,6 @@ Removes the `avoid_debug_print` rule, which contradicted the existing `prefer_de
 
 - `avoid_redundant_null_check` no longer fires on variables, parameters, fields, or getters declared with a nullable type (`Type?`). The rule cross-checks the element's declared type against the resolved `staticType` and guards against `InvalidType` from failed type resolution, preventing false positives in cross-package contexts.
 - `avoid_redundant_await` no longer fires on `await` of static methods returning `Future<T>`. The rule now guards against `InvalidType` (unresolvable types) and falls back to checking the invoked method signature's return type via `staticInvokeType` when `staticType` fails to resolve for cross-file static invocations.
-
----
-
-## [14.3.5]
-
-This update improves the precision of our accessibility lints by isolating Flutter UI components from lower-level graphics classes. Projects utilizing external image processing libraries alongside Flutter will no longer experience irrelevant warnings. [log](https://github.com/saropa/saropa_lints/blob/v14.3.5/CHANGELOG.md)
-
-### Added
-
-- `isFlutterWidgetNamed(Element?, String)` shared utility for verifying a resolved element is a Flutter SDK widget by name and library origin, with `TypeAliasElement` unwrapping.
-
-### Fixed
-
-- `require_image_semantics`, `require_image_description`, `require_accessible_images` no longer fire on non-Flutter classes named `Image` (e.g. `package:image`'s pixel-buffer `Image` or `dart:ui`'s `Image`). All three rules now verify the declaring library is `package:flutter/` before reporting, with `TypeAliasElement` unwrapping for typedef'd widget references.
-
----
-
-## [14.3.4]
-
-Adds a cross-tool data channel so sibling Saropa Suite tools can pull this project's daily health snapshot, adds a validated `fresh_code` risk flag to the Code Health report, and revives a batch of lint rules that never fired for anyone: seven that were missing their most common bad-code shape, and fourteen whole-file rules (desktop, BLoC, Riverpod, iOS, testing, navigation, i18n, and animation checks) that reported through an end-of-file step the analysis engine ignored. Also fixes a broken age signal that scored every function as maximally stale. No action required — the API is opt-in and the new flag and fixes take effect automatically. [log](https://github.com/saropa/saropa_lints/blob/v14.3.4/CHANGELOG.md)
-
-### Added
-
-- **`fresh_code` flag in the Code Health (vibrancy) report.** Functions with cyclomatic complexity above 10 whose body was written or rewritten within the last 90 days are now flagged, because validation against real bug-fix history showed recently rewritten complex code causes incidents far more often than old code. No action required — the flag appears in the CLI report and as a filterable pill in the extension's Code Health view.
-- **(Extension) `getDailySummary(date)` on the extension's public API.** Sibling Saropa Suite tools can now read this project's current health score, violation counts, and error-level trouble items for a given day via `getExtension('saropa.saropa-lints').exports.getDailySummary('YYYY-MM-DD')`, which resolves to a documented `DailySummary` (or `undefined` before any analysis has run). No action required — the summary is built lazily on call, reads only local analysis output, and transmits nothing.
-
-### Fixed
-
-- **`prefer_notifier_over_state` false positives eliminated.** The rule matched `StateProvider` by scanning serialized source text, which could match unrelated identifiers containing that substring; it now checks the constructor/invocation name directly via the AST. The `MethodInvocation` branch is restricted to the known Riverpod factory methods (`autoDispose`, `family`) to prevent false positives from unrelated static methods. A fixture pins all three detection branches and a false-positive decoy. No action required.
-- **Code Health age scores were stuck at zero.** A broken decay formula scored every function with git history as maximally stale, so the age component contributed nothing to health rankings; ages now decay correctly from 100 (touched today) toward 0 over years. Overall scores rise slightly on recently maintained code — no action required.
-- **`prefer_list_contains` now flags `indexOf(x) != -1`.** The rule only recognized a bare `0` or `-1` on the right of the comparison, but `-1` is written as a negation, not a plain number, so the most common presence check — `list.indexOf(x) != -1` — was never flagged. It now is. No action required.
-- **`avoid_map_keys_contains` now flags `map.keys.contains(k)` on a plain variable.** The rule previously matched only chained receivers (like `this.map.keys.contains(k)`) and missed the ordinary `map.keys.contains(k)` on a simple map variable — the usual shape. Its quick fix (`map.containsKey(k)`) now applies to those cases too. No action required.
-- **`avoid_unnecessary_collections` now flags `List.of([...])`/`Set.of(...)`/`Map.of(...)`.** The rule missed these wrapped-literal constructors during full analysis because they are constructor calls, which analysis represents differently from the method-call shape the rule looked for. Both shapes are now flagged. No action required.
-- **`prefer_asmap_over_indexed_iteration` now flags `for (i = 0; i < list.length; i++)`.** The rule required the loop bound to be a chained property read and missed the ordinary `list.length` on a plain list variable — the usual shape — so it effectively never fired. It now does. No action required.
-- **`require_key_for_collection` now flags `ListView.builder`/`GridView.builder` during full analysis.** These are constructor calls, which full analysis represents differently from the method-call shape the rule looked for, so keyless items in the most common list builders went unflagged; only a few less-common widgets were caught. All shapes are now flagged. No action required.
-- **`prefer_commenting_future_delayed` now works during full analysis and stops flagging already-commented delays.** `Future.delayed` is a constructor call (represented differently from a method call during full analysis), so the rule never fired for anyone; and it looked for the explanatory comment on the wrong token, so an `await Future.delayed(...)` with a comment above it was treated as uncommented. Both are fixed: the rule fires on uncommented delays and stays quiet when a comment precedes the statement. No action required.
-- **`avoid_sequential_awaits` now fires.** The rule registered for a callback the analysis engine silently ignores, so three or more independent sequential awaits (which could run together with `Future.wait`) were never flagged for anyone. It now registers correctly and reports. No action required.
-- **Four more rules that never fired now work: `prefer_single_exit_point`, `prefer_guard_clauses`, `require_getit_registration_order`, and `require_hive_adapter_registration_order`.** All registered through the same ignored callback as `avoid_sequential_awaits`, so none produced a diagnostic for anyone. All four now register correctly and report. No action required.
-- **`pass_correct_accepted_type` now fires, and `prefer_correct_identifier_length` now checks parameter names.** Both registered for a parameter callback the engine ignores: `pass_correct_accepted_type` never fired at all, and `prefer_correct_identifier_length` only checked variable names, silently skipping parameters. Both now register correctly. No action required.
-- **Fourteen more whole-file rules that never fired now work.** Each aggregated information across the whole file and then reported through an end-of-file callback the analysis engine silently ignores, so none produced a diagnostic for anyone. The revived rules are `require_menu_bar_for_desktop`, `require_window_close_confirmation`, `require_error_state`, `avoid_circular_provider_deps`, `prefer_notifier_over_state`, `require_apple_sign_in`, `require_error_case_tests`, `avoid_test_coupling`, `require_test_cleanup`, `prefer_test_variant`, `require_route_transition_consistency`, `prefer_shell_route_for_persistent_ui`, `require_intl_locale_initialization`, and `prefer_implicit_animations`. All now scan the file in a single pass and report correctly; `require_intl_locale_initialization` also stops missing usages that a duplicate registration had been discarding, and `require_apple_sign_in` now recognizes the standard `GoogleSignIn().signIn()` call shape (a constructor-call receiver) that its detection had been skipping. No action required.
-
-<details>
-<summary>Maintenance</summary>
-
-- Fixed the rule-liveness report (`accuracy_report`) so it exercises stylistic rules. No tier — not even pedantic — contains the stylistic rules, so the previous tier-scoped scan never enabled them and falsely reported stylistic rules with fixtures as silent; correcting it flipped 80 previously-false-silent rules to firing (the silent worklist dropped from 744 to 664). The report now defaults to all defined rules (`--tier <name>` narrows it), via a new optional explicit rule-set on the scan runner.
-- Repaired the collection and async rule fixtures so the liveness instrument exercises the rules that were correct but sitting on inadequate fixtures. Collection reached full coverage (all 27 rules fire). Async went from 13 silent to 4: eight fixtures made realistic (typed streams/futures, class-method context, matching heuristic identifiers, a real `WebSocketChannel`). The four remaining are two rules whose fixtures resolve to zero diagnostics under the full-corpus scan (cause not yet isolated with per-file tooling) and two `expect_lint` markers naming rules that were never implemented.
-- Added an integrity test that fails the build if any rule calls one of the three no-op registration stubs (`addPostRunCallback`, `addFunctionBody`, `addFormalParameter`), which silently discard their callback and were the root cause of the fourteen dead whole-file rules revived this release. The guard forces authors to the real registrations instead.
-- Repaired the liveness fixtures for the revived whole-file rules and added fixtures for three that had none (`require_error_state`, `avoid_circular_provider_deps`, `prefer_notifier_over_state`). Because these rules judge the whole file, a fixture that placed a BAD and a GOOD example together let the GOOD example mask the BAD; the compliant examples were moved to sibling `*_good.dart` files, path-gated fixtures were relocated, and mock classes (`GoogleSignIn`, `CupertinoPageRoute`, `FadeTransitionRoute`) were added so constructor-based rules resolve. All fourteen are confirmed firing (six in the full corpus scan, eight in isolated scans — the eight hit the pre-existing full-corpus-scan measurement limitation with the crowded test-fixture directory, already noted for the async cluster).
-- Fixed the Code Health `unused` flag producing ~50% false positives on multi-package repos. Nested `pubspec.yaml` files fragmented the analysis context, the resolved-usage pass silently degraded, and every `@override` method and `bin/`-only-called function was flagged dead. The fix scopes the analysis context to `lib/`, `test/`, `bin/` (preventing fragmentation), includes `bin/` files in the usage set (so CLI delegates get real caller counts), and adds a syntactic `@override` safety net that protects polymorphic methods even if resolution degrades. No action required.
-- Split the Issues tree provider's ~220-line tree-item renderer into a sibling module so the provider class carries only its stateful filter/index logic. Behavior-identical; the tree-item tests pin the render output.
-- Closed the oversized view-file breakdown plan and archived it to plan history — all ten tracked files are decomposed, and the two residual stateful controllers are accepted as cohesive final-state modules.
-- Ran the flight-risk scoring research gate (predictive-score validation) and recorded a negative result: on a 16-incident corpus mined from this repo's fix history, the candidate composite formula lost to the complexity-alone baseline, so the feature stays unbuilt and its plan stays open with the findings and re-attempt conditions documented.
-- Closed the sidebar-and-affordance inventory snapshot and archived it to plan history — every count had drifted from the manifest, and the one durable decision (the palette-only JSON-export tree providers are intentionally never registered as views) now lives as a comment at their construction site.
-- Fixed the `loadHealthHistory` test so it asserts real behavior instead of silently passing on empty results. The test had `if (points.isEmpty) return`, which meant a completely broken function still produced a green test. It now requires non-empty results (this repo has tags), asserts `codeLoc > 0`, the `codeLoc <= loc` invariant, and distinct tags when two points are returned.
-- Added `HistoryPoint.toMarkdownRow()`, `HistoryPoint.markdownHeader`, and `HistoryPoint.toMarkdownTable()` for rendering health trajectory as markdown tables.
-- Fixed the performance-rules fixture verification test: renamed `require_window_close_confirmation_desktop_fixture.dart` to match the rule-name convention, and added 8 fixture files that existed on disk but were missing from the verification list.
-- Replaced the hardcoded fixture list in the performance test with a directory scan, so new fixture files are verified automatically without manual list maintenance. Also renamed the stale `require_window_close_confirmation_desktop_good.dart` to drop the `_desktop` suffix.
-- Converted all 126 remaining test files from hardcoded fixture lists to the same `Directory.listSync()` auto-discovery pattern. Every fixture verification group now scans its directory on disk, so adding a fixture file is automatically tested — no manual list to maintain or drift out of sync. The `android_rules_test` retains one explicit test for a cross-directory fixture (`require_android_manifest_entries` in `example/lib/platform/`). Two files (`roadmap_15_rules_test`, `migration_rules_test`) were excluded because their fixture groups contain content-validation tests beyond simple existence checks.
-- Extracted fixture auto-discovery into a shared `discoverFixtures()` helper (`test/helpers/fixture_discovery.dart`) and migrated all 127 fixture-verification test files to use it. The helper returns an empty list when the directory is missing, so the guard test fails with a clear assertion instead of a `FileSystemException` aborting the group. Removes ~7 lines of duplicated `listSync` chain per file.
-- Added a fixture-vs-tiers integrity test (`test/integrity/fixture_integrity_test.dart`) that cross-references every `*_fixture.dart` on disk against `getAllDefinedRules()`. Catches stale or misspelled fixture files whose names don't match any registered rule. Group/category fixtures (covering multiple rules) are logged but not failed. Includes a regression floor at >2300 exact-match fixtures.
-
-</details>
 
 ---
 
