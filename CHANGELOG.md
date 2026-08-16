@@ -64,6 +64,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed (Extension)
+
+- Clicking a finding in the Problems panel now highlights the full diagnostic span instead of a single character — eliminates the "highlight every matching letter" noise caused by VS Code's occurrence-highlight when the range was only one character wide. No action required.
+
+---
+
 ## [15.0.3]
 
 The scan CLI now lets users filter diagnostics by severity, so AI agents and CI pipelines can suppress info-level noise and focus on warnings and errors. The extension also stops losing the in-editor analyzer plugin when Lint integration is switched off and back on, and now reports that plugin's real state instead of implying it from a setting that does not control it. [log](https://github.com/saropa/saropa_lints/blob/v15.0.3/CHANGELOG.md)
@@ -90,7 +98,8 @@ The scan CLI now lets users filter diagnostics by severity, so AI agents and CI 
 - (Extension) Added explicit `"types"` field to both `tsconfig.json` and `tsconfig.test.json` so the TypeScript compiler reliably resolves Node.js globals and test framework types instead of relying on auto-discovery. No action required.
 - (Extension) Added `verify-tsconfig-types` build gate that validates both tsconfig files during `precompile` — fails when an imported `@types/*` package is missing from either config's `"types"` array. No action required.
 - (Extension) Pinned Filipino translation of "Analyzer plugin" in the curated dictionary so the MT pipeline stops overwriting it with untranslated English on every run. No action required.
-- (Extension) The i18n pipeline now warns at the start of every run when a curated dictionary key no longer matches any English source string — catches silent regressions where a renamed en.json string causes the dictionary entry to stop matching and MT takes over. No action required.
+- (Extension) The i18n pipeline now warns at the start of every run when a curated dictionary key no longer matches any English source string — catches silent regressions where a renamed en.json string causes the dictionary entry to stop matching and MT takes over. Pass `--fail-on-drift` to hard-gate (added to publish pipeline). No action required.
+- (Extension) Fixed 9 orphaned curated dictionary keys across nl, fr, ur, bn, fil, and he — stale from prior en.json renames ("Search Packages" → "Search packages", "Open Lints Config" → "Manage Rule Packs"). No action required.
 
 </details>
 

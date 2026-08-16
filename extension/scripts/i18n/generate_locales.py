@@ -127,6 +127,16 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
+        "--fail-on-drift",
+        action="store_true",
+        help=(
+            "Exit non-zero if any curated dictionary key in dictionaries.py "
+            "no longer matches an English source string. Catches stale keys "
+            "that silently stop working after en.json renames. Pair with "
+            "--fail-on-missing in the publish pipeline."
+        ),
+    )
+    parser.add_argument(
         "--mode",
         choices=["gaps", "upgrade", "all", "audit"],
         default=None,
@@ -819,7 +829,15 @@ def main() -> int:
 
     # Early warning: curated dictionary keys that no longer match any English
     # source string — the translation silently stops being used and MT takes over.
-    _check_dictionary_drift(unique_en)
+    drift_orphans = _check_dictionary_drift(unique_en)
+    if args.fail_on_drift and drift_orphans:
+        print(
+            c("red", f"  Dictionary drift gate FAILED: {len(drift_orphans)} orphaned "
+                     "key(s). Update dictionaries.py to match the current en.json / "
+                     "package.nls.json wording, then re-run."),
+            file=sys.stderr,
+        )
+        return 1
 
     # Interactive launches preview the current gap/low-quality state with a
     # read-only audit BEFORE the menu, so the mode choice is informed by what is

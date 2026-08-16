@@ -150,7 +150,8 @@ def audit_extension_locales(project_dir: Path) -> bool | None:
         # --mode audit => no translation, no locale-file rewrite, just the report.
         # --fail-on-missing turns a residual gap into a non-zero exit so the caller
         # treats False as a gate failure and prompts rather than shipping English.
-        [sys.executable, str(gen), "--mode", "audit", "--fail-on-missing"],
+        # --fail-on-drift catches curated dictionary keys that drifted from en.json.
+        [sys.executable, str(gen), "--mode", "audit", "--fail-on-missing", "--fail-on-drift"],
         i18n_dir,
         "Audit extension locale coverage (no translation)",
         capture_output=True,

@@ -20,16 +20,28 @@ Only flags entries where the translation differs from the key — curated passth
 
 On first run, the guard immediately surfaced 9 pre-existing orphaned entries across `nl`, `fr`, `ur`, `bn`, `fil`, and `he` — confirming the class of bug was not limited to the Filipino "Analyzer plugin" case.
 
+### Fix (CI gate — `--fail-on-drift`)
+
+Added `--fail-on-drift` CLI flag to `generate_locales.py`. When set, the drift check returns exit code 1 instead of printing a warning. Added to the publish pipeline's audit invocation in `_extension_publish.py` alongside `--fail-on-missing`, so stale dictionary keys now block publishing the same way missing translations do.
+
+### Orphan cleanup
+
+Fixed 9 pre-existing orphaned dictionary keys:
+- `nl`, `fr`, `ur`: "Search Packages" → "Search packages" (case change), "Search Packages..." → "Search packages…" (case + Unicode ellipsis)
+- `bn`, `fil`, `he`: "Saropa Lints: Open Lints Config" → "Saropa Lints: Manage Rule Packs" (command renamed)
+- `ur`: passthrough for "Saropa Lints: Open Lints Config" also renamed
+
 ### Files changed
 
 | File | Change |
 |------|--------|
-| `extension/scripts/i18n/dictionaries.py` | Added curated Filipino entry for "Analyzer plugin" |
-| `extension/scripts/i18n/generate_locales.py` | Added `_check_dictionary_drift()` function + call site |
+| `extension/scripts/i18n/dictionaries.py` | Added curated Filipino entry; fixed 9 orphaned keys |
+| `extension/scripts/i18n/generate_locales.py` | Added `_check_dictionary_drift()` + `--fail-on-drift` flag |
+| `scripts/modules/_extension_publish.py` | Added `--fail-on-drift` to publish audit invocation |
 | `extension/src/i18n/locales/fil.json` | Corrected `analyzerPlugin` value |
 | `extension/src/i18n/locale_coverage.json` | Updated `fil` missing count 1 → 0 |
 | `CHANGELOG.md` | Added maintenance entries |
 
 ### Scope
 
-Scripts and generated locale files only. No Dart lint rules, no TypeScript extension code, no tests affected.
+Scripts, publish pipeline, and generated locale files only. No Dart lint rules, no TypeScript extension code, no tests affected.
