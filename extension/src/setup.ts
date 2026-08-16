@@ -307,6 +307,49 @@ export async function runInWorkspaceAsync(
 }
 
 /**
+ * Runs `pub get`, preferring `dart` over `flutter` even on Flutter projects.
+ *
+ * Why: `flutter pub get` is not a wrapper around `dart pub get` — it boots the
+ * flutter_tool (SDK version check, artifact validation, its own package
+ * resolution) before pub ever runs. Measured back-to-back on the same
+ * unchanged Flutter project: `dart pub get` 1.9 s, `flutter pub get` 116 s.
+ * That difference is the whole reason toggling Lint integration on read as a
+ * hang. Modern `dart pub` resolves `sdk: flutter` dependencies correctly, so
+ * the Flutter path is only needed when it does not.
+ *
+ * The fallback is what makes the preference safe: if `dart pub get` fails on a
+ * project that declares Flutter, we retry with `flutter pub get` and report
+ * that result instead. A genuinely Flutter-only resolution therefore still
+ * succeeds — it just pays the slow path in the rare case rather than always.
+ */
+async function runPubGet(
+  workspaceRoot: string,
+  progress: vscode.Progress<{ message?: string }>,
+  token: vscode.CancellationToken,
+): Promise<{ ok: boolean; stderr: string; cancelled: boolean; command: string }> {
+  const tick = (elapsed: number) =>
+    l10n('notify.setup.progressPubGet', { elapsed: String(elapsed) });
+
+  const dartResult = await withTickingProgress(
+    progress,
+    tick,
+    runInWorkspaceAsync(workspaceRoot, 'dart', ['pub', 'get'], { token }),
+  );
+  if (dartResult.ok || dartResult.cancelled) return { ...dartResult, command: 'dart' };
+
+  const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
+  if (!useFlutter) return { ...dartResult, command: 'dart' };
+
+  logReport('- dart pub get failed on a Flutter project; retrying with flutter pub get');
+  const flutterResult = await withTickingProgress(
+    progress,
+    tick,
+    runInWorkspaceAsync(workspaceRoot, 'flutter', ['pub', 'get'], { token }),
+  );
+  return { ...flutterResult, command: 'flutter' };
+}
+
+/**
  * Makes sure saropa_lints is resolved on disk, running `pub get` only when it
  * is actually needed.
  *
@@ -333,13 +376,7 @@ async function ensureDependencyResolved(
     return 'resolved';
   }
 
-  const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
-  const pubCmd = useFlutter ? 'flutter' : 'dart';
-  const pubResult = await withTickingProgress(
-    progress,
-    (elapsed) => l10n('notify.setup.progressPubGet', { elapsed: String(elapsed) }),
-    runInWorkspaceAsync(workspaceRoot, pubCmd, ['pub', 'get'], { token }),
-  );
+  const pubResult = await runPubGet(workspaceRoot, progress, token);
   if (pubResult.cancelled) return 'cancelled';
   if (!pubResult.ok) {
     logReport(`- pub get FAILED: ${pubResult.stderr || '(no details)'}`);
@@ -350,7 +387,7 @@ async function ensureDependencyResolved(
     );
     return 'failed';
   }
-  logReport(`- Ran pub get (${pubCmd})`);
+  logReport(`- Ran pub get (${pubResult.command})`);
 
   // A `pub get` that exits 0 without resolving the package means the manifest
   // parsed but did not yield saropa_lints (corrupted YAML, wrong indent level).
@@ -1084,8 +1121,11 @@ async function runAnalysisAfterConfigChangeScoped(
     return { cancelled: false };
   }
 
-  const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
-  const analyzeCmd = useFlutter ? 'flutter' : 'dart';
+  // Always `dart`, never `flutter`, even on Flutter projects: both run the same
+  // analyzer, but the flutter wrapper boots the flutter_tool first (SDK version
+  // check, artifact validation, its own resolution) — measured at ~114 s of pure
+  // overhead on a large project. See runPubGet for the measurement.
+  const analyzeCmd = 'dart';
   // Async spawn: `dart analyze` on a large project can run for tens of seconds,
   // and the synchronous spawnSync variant used to block the whole extension
   // host for that entire duration — the root cause of the "Enabling Saropa
@@ -1428,8 +1468,9 @@ export async function runAnalysis(context: vscode.ExtensionContext): Promise<boo
         return;
       }
 
-      const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
-      const cmd = useFlutter ? 'flutter' : 'dart';
+      // `dart`, not `flutter` — same analyzer, none of the flutter_tool boot
+      // cost (see the comment on analyzeCmd above).
+      const cmd = 'dart';
       logSection('Analysis');
       // Async + cancellable: never block the extension-host event loop (see the
       // cancellable rationale on this progress above). The token wires the
@@ -1516,8 +1557,9 @@ export async function runAnalysisForFiles(
     );
   }
 
-  const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
-  const cmd = useFlutter ? 'flutter' : 'dart';
+  // `dart`, not `flutter` — same analyzer, none of the flutter_tool boot cost
+  // (see the comment on analyzeCmd above).
+  const cmd = 'dart';
   const args = ['analyze', ...toRun];
 
   const doRun = (): boolean => {
