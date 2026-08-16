@@ -186,7 +186,7 @@
       "yes": "Oo, oo, ay isang tunay na pag-ibig.",
       "no": "Hindi, hindi, hindi na.",
       "lintIntegrationState": "Pagsasama ng Lint: Lint integration: Ang pagsasama sa lint. {state} ang kanyang mga",
-      "analyzerPlugin": "Analyzer plugin",
+      "analyzerPlugin": "Plugin ng analyzer",
       "analyzerPluginLive": "Sa — live in-editor diagnostics",
       "analyzerPluginDisabled": "Off — scan-on-save lamang",
       "analyzerPluginAbsent": "Hindi nakakonekta",

@@ -691,8 +691,80 @@ function pluginDisabledByExtensionKey(root: string): string {
   return `saropaLints.pluginDisabledByExtension:${root}`;
 }
 
-function wasPluginDisabledByExtension(context: vscode.ExtensionContext, root: string): boolean {
-  return context.workspaceState.get<boolean>(pluginDisabledByExtensionKey(root), false) ?? false;
+/**
+ * Durable mirror of the memento, written next to the project instead of into
+ * VS Code's per-workspace storage.
+ *
+ * Why BOTH records exist: the memento alone makes the whole restore inert if
+ * `workspaceState` is ever cleared, and — this is the dangerous part — the
+ * resulting failure is indistinguishable from the original bug (Enable simply
+ * stops restoring, silently). `workspaceState` is documented as persistent but
+ * is scoped to the extension's storage for that workspace, so an extension
+ * storage reset, a VS Code profile switch, or a workspace re-opened under a
+ * different folder identity can drop it. The two records fail in DIFFERENT
+ * situations and therefore cover each other:
+ *
+ *   - the memento survives `flutter clean` / `dart run build_runner clean`
+ *     (which delete `.dart_tool/` wholesale) but not a storage/profile reset;
+ *   - this file survives storage and profile resets but not `.dart_tool/`
+ *     deletion.
+ *
+ * `.dart_tool/` is the right home rather than the project tree proper: it is
+ * gitignored by every Dart/Flutter project, so a committed claim can never
+ * follow the repo onto a teammate's machine and switch the multi-GB in-process
+ * plugin on for someone who never disabled anything. It also cannot live
+ * INSIDE the commented `plugins:` block — `write_config` regenerates that whole
+ * block from scratch (`replacePluginsSection`), so any marker parked in there
+ * is erased the next time a tier change runs while integration is off.
+ */
+function pluginOwnershipFilePath(root: string): string {
+  return path.join(root, '.dart_tool', 'saropa_lints', 'plugin_ownership.json');
+}
+
+/** True when the durable sidecar claims our Disable owns this root's off state. */
+function readPluginOwnershipFile(root: string): boolean {
+  try {
+    const file = pluginOwnershipFilePath(root);
+    if (!fs.existsSync(file)) return false;
+    const parsed: unknown = JSON.parse(fs.readFileSync(file, 'utf-8'));
+    // Defensive shape check: a hand-mangled or truncated file must read as
+    // "no claim" rather than throw during activation.
+    return typeof parsed === 'object' && parsed !== null
+      && (parsed as { disabledByExtension?: unknown }).disabledByExtension === true;
+  } catch {
+    // Unreadable/corrupt sidecar degrades to the memento — never fatal.
+    return false;
+  }
+}
+
+/** Write or delete the durable sidecar. Failures are logged, never thrown. */
+function writePluginOwnershipFile(root: string, value: boolean): void {
+  const file = pluginOwnershipFilePath(root);
+  try {
+    if (!value) {
+      if (fs.existsSync(file)) fs.rmSync(file);
+      return;
+    }
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    // `root` is recorded so a copied/moved .dart_tool is still diagnosable from
+    // the file alone; only `disabledByExtension` is load-bearing.
+    fs.writeFileSync(file, `${JSON.stringify({ disabledByExtension: true, root }, null, 2)}\n`, 'utf-8');
+  } catch (e) {
+    // A read-only or missing .dart_tool is survivable: the memento still holds
+    // the claim. Log rather than fail the Disable the user asked for.
+    getOutputChannel().appendLine(`[saropa] could not persist plugin ownership to ${file}: ${String(e)}`);
+  }
+}
+
+/**
+ * True when EITHER record claims ownership. OR (not AND) is deliberate: both
+ * records are only ever written by our own live→disabled transition, so
+ * neither can produce a false claim, and each one's disappearance is a
+ * survivable data loss rather than evidence that the claim was never made.
+ */
+export function wasPluginDisabledByExtension(context: vscode.ExtensionContext, root: string): boolean {
+  const memento = context.workspaceState.get<boolean>(pluginDisabledByExtensionKey(root), false) ?? false;
+  return memento || readPluginOwnershipFile(root);
 }
 
 async function setPluginDisabledByExtension(
@@ -702,6 +774,22 @@ async function setPluginDisabledByExtension(
 ): Promise<void> {
   // `undefined` removes the key entirely rather than leaving a `false` behind.
   await context.workspaceState.update(pluginDisabledByExtensionKey(root), value ? true : undefined);
+  writePluginOwnershipFile(root, value);
+}
+
+/**
+ * One-line activation probe for the ownership records.
+ *
+ * The restore path is invisible when it fails — Enable just quietly does not
+ * restore — so the only way a user or a bug report can tell "the claim was
+ * never made" from "the claim was lost" is a log line stating what each record
+ * held at startup. Cheap (two existence checks) and written once per folder.
+ */
+export function describePluginOwnership(context: vscode.ExtensionContext, root: string): string {
+  const memento = context.workspaceState.get<boolean>(pluginDisabledByExtensionKey(root), false) ?? false;
+  const sidecar = readPluginOwnershipFile(root);
+  return `[saropa] plugin ownership for ${root}: block=${getPluginsIntegrationState(root)}`
+    + `, memento=${memento}, sidecar=${sidecar}`;
 }
 
 /**

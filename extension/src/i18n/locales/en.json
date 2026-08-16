@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Running analysis… ({elapsed}s)",
       "progressBaseline": "Running baseline scan… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints is on, but in-editor diagnostics are off: the analyzer plugin was turned off from this extension and never restored, so issues only appear after a scan. Restore live in-editor diagnostics, or keep scan-on-save only?",
+      "actionRestorePlugin": "Restore in-editor diagnostics",
+      "actionKeepScanOnly": "Keep scan-on-save only",
+      "disabledButPluginOn": "Saropa Lints is off, but the analyzer plugin is still declared in analysis_options.yaml, so it will load and hold several GB the next time the Dart analysis server starts. Turn the plugin off too, or keep it on?",
+      "actionTurnOffPlugin": "Turn off the analyzer plugin",
+      "actionKeepPluginOn": "Keep the plugin on"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} failed: {message}",
       "crossFileGraphExportFailed": "Saropa Lints graph export failed: {message}",

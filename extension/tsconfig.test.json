@@ -111,6 +111,7 @@
     "src/test/runInWorkspaceAsyncCancellation.test.ts",
     "src/test/runEnableReentrancyGuard.test.ts",
     "src/test/pluginDisableOwnership.test.ts",
+    "src/test/pluginDivergencePrompt.test.ts",
     "src/pluginLiveness.ts",
     "src/test/pluginLiveness.test.ts",
     "src/scanOnSave/scanOnSaveRunner.ts",

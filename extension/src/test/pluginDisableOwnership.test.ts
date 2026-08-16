@@ -27,6 +27,7 @@ import {
   restorePluginsIntegration,
   runDisable,
   runReenablePlugin,
+  wasPluginDisabledByExtension,
 } from '../setup';
 import { invalidateProjectRoot } from '../projectRoot';
 import { messageMock, mockWorkspaceFolders } from './vibrancy/vscode-mock';
@@ -208,6 +209,71 @@ describe('analyzer plugin disable ownership', () => {
 
     assert.strictEqual(cleared, false, 'reconcile must not drop a claim that is still true');
     assert.strictEqual(context.store.has(`saropaLints.pluginDisabledByExtension:${tmpDir}`), true);
+  });
+
+  it('mirrors the claim to a durable sidecar so a lost memento is survivable', async () => {
+    // workspaceState is per-machine extension storage: an extension-storage
+    // reset or a VS Code profile switch can drop it, and when that happens
+    // Enable silently stops restoring — a failure INDISTINGUISHABLE from the
+    // original bug. The sidecar under .dart_tool/ is the second, independent
+    // record that keeps the claim readable in exactly that case.
+    fs.writeFileSync(optionsPath, LIVE_OPTIONS);
+    const context = fakeContext();
+    await runDisable(context as any);
+
+    const sidecar = path.join(tmpDir, '.dart_tool', 'saropa_lints', 'plugin_ownership.json');
+    assert.ok(fs.existsSync(sidecar), 'Disable must write the durable ownership record');
+
+    // Simulate the memento being wiped while the project is untouched.
+    context.store.clear();
+    assert.strictEqual(
+      wasPluginDisabledByExtension(context as any, tmpDir),
+      true,
+      'the sidecar alone must still assert ownership',
+    );
+  });
+
+  it('removes the sidecar when the claim is released', async () => {
+    fs.writeFileSync(optionsPath, LIVE_OPTIONS);
+    const context = fakeContext();
+    await runDisable(context as any);
+
+    await runReenablePlugin(context as any);
+
+    const sidecar = path.join(tmpDir, '.dart_tool', 'saropa_lints', 'plugin_ownership.json');
+    assert.strictEqual(
+      fs.existsSync(sidecar),
+      false,
+      'a released claim must not linger on disk, or the next Enable acts on a lie',
+    );
+  });
+
+  it('reads a corrupt sidecar as "no claim" rather than throwing', () => {
+    // The file is read during activation; a truncated or hand-mangled JSON
+    // blob must degrade to the memento, never break startup.
+    fs.writeFileSync(optionsPath, LIVE_OPTIONS);
+    const dir = path.join(tmpDir, '.dart_tool', 'saropa_lints');
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'plugin_ownership.json'), '{ this is not json');
+    const context = fakeContext();
+
+    assert.strictEqual(wasPluginDisabledByExtension(context as any, tmpDir), false);
+  });
+
+  it('does NOT write a sidecar for an already-disabled block', async () => {
+    // Same new-project guard as the memento: a sidecar written here would
+    // switch the multi-GB plugin on for every new user's first Enable.
+    fs.writeFileSync(optionsPath, LIVE_OPTIONS);
+    disablePluginsIntegration(tmpDir);
+    const context = fakeContext();
+
+    await runDisable(context as any);
+
+    assert.strictEqual(
+      fs.existsSync(path.join(tmpDir, '.dart_tool', 'saropa_lints', 'plugin_ownership.json')),
+      false,
+      'an already-off block must not be claimed on disk either',
+    );
   });
 
   it('tracks ownership per project root', async () => {

@@ -17,7 +17,6 @@ import * as path from 'node:path';
 import {
   runEnable,
   runDisable,
-  reconcilePluginOwnership,
   runReenablePlugin,
   runAnalysis as runAnalysisCommand,
   runAnalysisForFiles as runAnalysisForFilesCommand,
@@ -31,6 +30,8 @@ import {
   getSharedOutputChannel,
   TIER_ORDER,
 } from './setup';
+import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
+import { surfacePluginDivergence } from './pluginDivergencePrompt';
 import { verifyPluginLiveness, surfaceLivenessResult } from './pluginLiveness';
 import type { SaropaLintsApi } from './api';
 import { buildDailySummary } from './dailySummary';
@@ -815,60 +816,50 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (regressionNudgeTimer) clearTimeout(regressionNudgeTimer);
     },
   });
+  // The watched path derives from the project root, which is undefined in a
+  // window opened with no folder — and was captured ONCE at activation, so such
+  // a window never watched violations.json for the rest of the session even
+  // after a folder was added (the common "VS Code restored my session" flow).
+  // Re-run on folder changes, disposing the previous watcher so repeated
+  // changes cannot stack duplicates that each fire debouncedRefresh.
+  let violationsWatcher: vscode.FileSystemWatcher | undefined;
+  // `null` (no root yet) is a distinct starting value from `undefined` so the
+  // first call still registers when violationsPath() legitimately returns null.
+  let watchedViolationsPath: string | null | undefined;
   const watchViolations = () => {
     const p = violationsPath();
+    if (p === watchedViolationsPath) return;
+    violationsWatcher?.dispose();
+    violationsWatcher = undefined;
+    watchedViolationsPath = p;
     if (!p) return;
-    const watcher = vscode.workspace.createFileSystemWatcher(p);
-    watcher.onDidChange(debouncedRefresh);
-    watcher.onDidCreate(debouncedRefresh);
-    context.subscriptions.push(watcher);
+    violationsWatcher = vscode.workspace.createFileSystemWatcher(p);
+    violationsWatcher.onDidChange(debouncedRefresh);
+    violationsWatcher.onDidCreate(debouncedRefresh);
   };
   watchViolations();
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeWorkspaceFolders(watchViolations),
+    { dispose: () => violationsWatcher?.dispose() },
+  );
 
   // ── Keep the analyzer-plugin row honest ─────────────────────────────────
-  // The sidebar's "Analyzer plugin" row reads the plugins: block straight off
-  // disk, but the tree only rebuilds on discrete events — so a block changed
-  // outside the extension (`dart run saropa_lints:init`, a git checkout, a
-  // hand-edit, a merge) left the row asserting a state the file contradicted.
-  // That silent drift between what the UI claims and what analysis_options.yaml
-  // says is the whole defect class this row was added to close, so watching the
-  // file is what makes the row trustworthy rather than merely usually-right.
-  // The same change also reconciles a stale disable-ownership claim.
+  // Watches every workspace root's analysis_options.yaml, reconciles a stale
+  // disable-ownership claim, and re-registers when folders change. See
+  // analyzerPluginWatch.ts for why each of those three parts is needed.
+  registerAnalyzerPluginWatchers(context, refreshAll, (message) =>
+    getSharedOutputChannel().appendLine(message),
+  );
+
+  // ── Offer to reconcile a divergence the user probably did not intend ─────
+  // Fire-and-forget so a modal-ish notification never delays activation, and
+  // only for the primary root: the sidebar renders one root, so prompting per
+  // folder in a multi-root window would stack notifications about rows the user
+  // cannot even see. Silent unless the two switches disagree in one of the two
+  // states that is not a legitimate default — see pluginDivergencePrompt.ts.
   {
-    const root = getProjectRoot();
-    if (root) {
-      const optionsWatcher = vscode.workspace.createFileSystemWatcher(
-        new vscode.RelativePattern(root, 'analysis_options.yaml'),
-      );
-      // Debounced for the same reason as the violations and pubspec.lock
-      // watchers above: one Enable rewrites this file twice in quick
-      // succession (the plugins-block restore, then the write_config
-      // subprocess), and the command handler already calls refreshAll() when
-      // it finishes. Reacting to each raw event would run several redundant
-      // full refreshes — every provider plus the per-editor annotation cache —
-      // for a single user action, which shows up as sidebar flicker.
-      let optionsChangeTimer: ReturnType<typeof setTimeout> | undefined;
-      const onOptionsChanged = () => {
-        if (optionsChangeTimer) clearTimeout(optionsChangeTimer);
-        optionsChangeTimer = setTimeout(() => {
-          void (async () => {
-            const cleared = await reconcilePluginOwnership(context, root);
-            if (cleared) {
-              getSharedOutputChannel().appendLine(
-                '[saropa] plugins: block went live outside the extension — cleared stale disable ownership.',
-              );
-            }
-            refreshAll();
-          })();
-        }, 500);
-      };
-      optionsWatcher.onDidChange(onOptionsChanged);
-      optionsWatcher.onDidCreate(onOptionsChanged);
-      optionsWatcher.onDidDelete(onOptionsChanged);
-      context.subscriptions.push(optionsWatcher, {
-        dispose: () => { if (optionsChangeTimer) clearTimeout(optionsChangeTimer); },
-      });
-    }
+    const divergenceRoot = getProjectRoot();
+    if (divergenceRoot) void surfacePluginDivergence(context, divergenceRoot);
   }
 
   // ── Auto-analyze on dependency changes ──────────────────────────────────

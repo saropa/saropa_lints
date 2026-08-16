@@ -73,10 +73,16 @@ The scan CLI now lets users filter diagnostics by severity, so AI agents and CI 
 - `--min-severity` flag for the `scan` command filters diagnostics by severity threshold — `--min-severity warning` excludes info-level output from both stdout and the report file, reducing noise for AI agents and CI pipelines. No action required.
 - `--max-severity` flag for the `scan` command caps output at a severity ceiling — `--max-severity warning` hides errors so you can triage lower-priority noise in isolation. No action required.
 
+### Added (Extension)
+
+- When Lint integration and the analyzer plugin disagree in a way you probably did not intend — scan-on-save on with in-editor diagnostics silently off, or the multi-gigabyte plugin still loading while lints read as off — the extension now offers once to reconcile it either way. Answer or dismiss it and it does not ask again for that project.
+
 ### Fixed (Extension)
 
 - Turning Lint integration off and then on again left the in-editor analyzer plugin switched off — the off step comments out the `plugins:` block in `analysis_options.yaml`, and the on step never put it back, so a project silently lost live diagnostics with no indication of why. Enable now restores the block when it was this extension's own Off that commented it out, leaving new projects (which default to the lighter scan-on-save delivery) untouched. This has proven to be tricky!
 - The sidebar now reports the analyzer plugin's actual on-disk state as its own row, so "Lint integration: On" can no longer sit above a project whose `plugins:` block is commented out — clicking that row while it reads Off restores the plugin. No action required.
+- The record of which side switched the analyzer plugin off is now stored twice, so a VS Code profile switch or extension-storage reset can no longer make Enable silently stop restoring the plugin. No action required.
+- The analyzer plugin row and its restore logic now track every folder in a multi-root window and start working in a window that had no folder open at startup, instead of only the one folder present when the extension activated. No action required.
 
 <details><summary>Maintenance</summary>
 
