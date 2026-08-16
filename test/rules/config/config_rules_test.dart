@@ -101,14 +101,20 @@ void main() {
     test('SortPubDependenciesRule', () {
       final rule = SortPubDependenciesRule();
       expect(rule.code.lowerCaseName, 'sort_pub_dependencies_extended');
-      expect(rule.code.problemMessage, contains('[sort_pub_dependencies_extended]'));
+      expect(
+        rule.code.problemMessage,
+        contains('[sort_pub_dependencies_extended]'),
+      );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
     test('SecurePubspecUrlsRule', () {
       final rule = SecurePubspecUrlsRule();
       expect(rule.code.lowerCaseName, 'secure_pubspec_urls_strict');
-      expect(rule.code.problemMessage, contains('[secure_pubspec_urls_strict]'));
+      expect(
+        rule.code.problemMessage,
+        contains('[secure_pubspec_urls_strict]'),
+      );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });

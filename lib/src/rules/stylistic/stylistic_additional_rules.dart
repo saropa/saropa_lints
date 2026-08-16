@@ -229,7 +229,9 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   @override
-  List<String> get conflictingRules => const <String>['prefer_single_quotes_strict'];
+  List<String> get conflictingRules => const <String>[
+    'prefer_single_quotes_strict',
+  ];
 
   @override
   String get exampleBad => "String name = 'John';";

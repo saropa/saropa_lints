@@ -137,11 +137,12 @@ class W {
       );
     });
 
-    test('RadialGradient inside TweenAnimationBuilder.builder is not reported',
-        () {
-      // Same exemption applies to TweenAnimationBuilder
-      expect(
-        _wouldReport(r'''
+    test(
+      'RadialGradient inside TweenAnimationBuilder.builder is not reported',
+      () {
+        // Same exemption applies to TweenAnimationBuilder
+        expect(
+          _wouldReport(r'''
 class W {
   Object build(Object context) {
     return TweenAnimationBuilder(
@@ -157,11 +158,12 @@ class W {
   }
 }
 '''),
-        isFalse,
-        reason:
-            'TweenAnimationBuilder.builder re-runs per frame; gradient is exempt',
-      );
-    });
+          isFalse,
+          reason:
+              'TweenAnimationBuilder.builder re-runs per frame; gradient is exempt',
+        );
+      },
+    );
 
     test('SweepGradient inside ListenableBuilder.builder is not reported', () {
       // ListenableBuilder shares the same builder: contract as AnimatedBuilder
@@ -214,13 +216,13 @@ class W {
     });
 
     test(
-        'gradient referencing closure-unique param on unknown widget is not reported',
-        () {
-      // Gate 3: widget-name-independent heuristic — if the gradient's args
-      // reference a parameter unique to the builder closure (not context/child),
-      // it can't be hoisted regardless of widget type.
-      expect(
-        _wouldReport(r'''
+      'gradient referencing closure-unique param on unknown widget is not reported',
+      () {
+        // Gate 3: widget-name-independent heuristic — if the gradient's args
+        // reference a parameter unique to the builder closure (not context/child),
+        // it can't be hoisted regardless of widget type.
+        expect(
+          _wouldReport(r'''
 class W {
   Object build(Object context) {
     return CustomAnimWidget(
@@ -235,18 +237,19 @@ class W {
   }
 }
 '''),
-        isFalse,
-        reason:
-            'gradient references animValue — a closure-unique param; cannot be hoisted',
-      );
-    });
+          isFalse,
+          reason:
+              'gradient references animValue — a closure-unique param; cannot be hoisted',
+        );
+      },
+    );
 
     test(
-        'gradient NOT referencing closure-unique param on unknown widget IS reported',
-        () {
-      // The builder has extra params but the gradient doesn't use them
-      expect(
-        _wouldReport(r'''
+      'gradient NOT referencing closure-unique param on unknown widget IS reported',
+      () {
+        // The builder has extra params but the gradient doesn't use them
+        expect(
+          _wouldReport(r'''
 class W {
   Object build(Object context) {
     return CustomWidget(
@@ -261,17 +264,19 @@ class W {
   }
 }
 '''),
-        isTrue,
-        reason:
-            'gradient uses only const args — does not depend on closure params',
-      );
-    });
+          isTrue,
+          reason:
+              'gradient uses only const args — does not depend on closure params',
+        );
+      },
+    );
 
-    test('LinearGradient outside AnimatedBuilder.builder closure is reported',
-        () {
-      // Gradient at the build() level, not inside the builder closure
-      expect(
-        _wouldReport(r'''
+    test(
+      'LinearGradient outside AnimatedBuilder.builder closure is reported',
+      () {
+        // Gradient at the build() level, not inside the builder closure
+        expect(
+          _wouldReport(r'''
 class W {
   Object build(Object context) {
     final g = LinearGradient(colors: const [1, 2]);
@@ -284,11 +289,12 @@ class W {
   }
 }
 '''),
-        isTrue,
-        reason:
-            'gradient is in build() body, not inside the builder closure itself',
-      );
-    });
+          isTrue,
+          reason:
+              'gradient is in build() body, not inside the builder closure itself',
+        );
+      },
+    );
   });
 }
 

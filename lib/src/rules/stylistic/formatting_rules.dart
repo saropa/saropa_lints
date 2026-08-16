@@ -13,7 +13,6 @@ import '../../fixes/formatting/require_ignore_comment_plugin_prefix_fix.dart';
 import '../../fixes/formatting/require_ignore_comment_spacing_fix.dart';
 import '../../fixes/stylistic/capitalize_comment_fix.dart';
 import '../../rule_name_utils.dart' as rule_names;
-import '../../tiers.dart' as tiers;
 
 /// Warns when case clauses don't have newlines before them.
 ///
@@ -1223,7 +1222,10 @@ class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
             // Check for prefixed names whose suffix isn't a real rule.
             final unknownSuffix = _firstUnknownPrefixedSuffix(ruleList);
             if (unknownSuffix != null) {
-              reporter.atToken(comment, _buildUnknownPrefixedCode(unknownSuffix));
+              reporter.atToken(
+                comment,
+                _buildUnknownPrefixedCode(unknownSuffix),
+              );
             }
             break;
           }

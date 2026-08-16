@@ -2822,7 +2822,6 @@ class AvoidShadowingTypeParametersRule extends SaropaLintRule {
   }
 }
 
-
 /// Prefer final for local variables that are never reassigned.
 ///
 /// Flags local variable declarations (var or typed) that are never reassigned

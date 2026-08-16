@@ -242,8 +242,7 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
     while (current != null) {
       if (current is FunctionExpression) {
         final AstNode? parent = current.parent;
-        if (parent is NamedExpression &&
-            parent.name.label.name == 'builder') {
+        if (parent is NamedExpression && parent.name.label.name == 'builder') {
           return current;
         }
       }
@@ -255,8 +254,7 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
   /// Returns the parameter names of [closure] that are NOT standard builder
   /// params (context, child, _).
   static Set<String> _closureUniqueParams(FunctionExpression closure) {
-    final NodeList<FormalParameter>? params =
-        closure.parameters?.parameters;
+    final NodeList<FormalParameter>? params = closure.parameters?.parameters;
     if (params == null) return const <String>{};
 
     final Set<String> unique = <String>{};

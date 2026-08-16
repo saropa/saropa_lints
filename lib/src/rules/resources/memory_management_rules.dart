@@ -124,8 +124,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
               for (final VariableDeclaration v in member.fields.variables) {
                 // Resolve the declared element for shadow-safe matching.
                 // Falls back to string name if resolution fails.
-                final Element? fieldElement =
-                    v.declaredFragment?.element;
+                final Element? fieldElement = v.declaredFragment?.element;
                 if (!_isReplacedNotAccumulated(
                   node,
                   v.name.lexeme,

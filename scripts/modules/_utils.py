@@ -303,6 +303,45 @@ def exit_with_error(message: str, code: ExitCode) -> NoReturn:
     sys.exit(code.value)
 
 
+def prompt_step_failure(
+    step_name: str,
+    *,
+    allow_ignore: bool = True,
+) -> str:
+    """Ask user how to proceed after a pipeline step fails.
+
+    Provides a consistent Retry / Ignore / Abort menu across all
+    publish pipeline steps so that no failure is an immediate hard
+    exit. The developer can fix the issue in another terminal and
+    retry, or consciously skip a non-critical gate.
+
+    When *allow_ignore* is False (used for irreversible steps like
+    git push, tag creation, and pub.dev publish), the Ignore option
+    is hidden so the developer cannot accidentally skip a critical
+    step. Typing 'i' in strict mode is treated as abort.
+
+    Returns:
+        'retry' | 'ignore' | 'abort'.
+    """
+    print_warning(f"{step_name} failed. Choose an action:")
+    print_colored("  [R]etry  (re-run after fixing the issue)", Color.CYAN)
+    if allow_ignore:
+        print_colored("  [I]gnore (continue despite the failure)", Color.CYAN)
+    print_colored("  [A]bort  (stop the publish)", Color.CYAN)
+    try:
+        default = "a"
+        prompt = "  Choice [r/i/a]: " if allow_ignore else "  Choice [r/a]: "
+        raw = input(prompt).strip().lower() or default
+        if raw.startswith("r"):
+            return "retry"
+        if raw.startswith("i") and allow_ignore:
+            return "ignore"
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return "abort"
+    return "abort"
+
+
 # =============================================================================
 # PLATFORM DETECTION
 # =============================================================================

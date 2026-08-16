@@ -82,8 +82,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - Consolidated animation-builder widget name sets into `kAnimatedRebuilders` in `compound_performance_patterns.dart`, used by both compound-performance rules and `avoid_gradient_in_build`.
 - Publish audit now blocks on core Dart lint name collisions (Check 8 in tier integrity), auto-updated from dart-lang/linter via `python scripts/update_core_lint_names.py`.
+- Publish pipeline steps now prompt Retry / Ignore / Abort on failure instead of hard-exiting, so the developer can fix issues in another terminal without losing the publish session. Irreversible steps (git push, tag, pub.dev publish, GitHub release) only offer Retry / Abort.
+- Removed unused `tiers.dart` import from formatting rules.
 
 </details>
+
+### Added (Extension)
+
+- **Severity Filters** settings section — four toggles (`saropaLints.severity.error`, `.warning`, `.info`, `.hint`) to show/hide entire severity levels from the Problems panel and Findings tree. All on by default; turn off hints to drop thousands of low-priority diagnostics at once. Survives `init --tier` re-runs. No action required.
 
 ### Changed
 

@@ -314,7 +314,10 @@ void main() {
     group('prefer_single_quotes_strict', () {
       test('has conflictingRules metadata', () {
         final rule = PreferSingleQuotesRule();
-        expect(rule.conflictingRules, contains('prefer_double_quotes_with_fix'));
+        expect(
+          rule.conflictingRules,
+          contains('prefer_double_quotes_with_fix'),
+        );
       });
     });
 

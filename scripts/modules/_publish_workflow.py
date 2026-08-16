@@ -26,10 +26,12 @@ from scripts.modules._utils import (
     ExitCode,
     exit_with_error,
     print_colored,
+    print_error,
     print_header,
     print_info,
     print_success,
     print_warning,
+    prompt_step_failure,
 )
 from scripts.modules._git_ops import (
     create_git_tag,
@@ -593,6 +595,9 @@ def _prompt_extension_install_and_publish(
 def run_audit_with_retry(project_dir: Path) -> tuple[bool, object]:
     """Run pre-publish audit; if prefix fix applies, fix and retry.
 
+    On non-auto-fixable failures, prompts Retry / Ignore / Abort
+    so the developer can fix blocking issues in another terminal.
+
     Returns:
         (ok, audit_result) tuple.
     """
@@ -602,24 +607,31 @@ def run_audit_with_retry(project_dir: Path) -> tuple[bool, object]:
         missing_prefix = getattr(
             audit_result, "rules_missing_prefix", None,
         )
-        if not missing_prefix:
-            exit_with_error(
-                _AUDIT_FAILED_MSG,
-                ExitCode.AUDIT_FAILED,
-            )
-        from scripts.modules._audit_checks import fix_missing_prefix
+        if missing_prefix:
+            from scripts.modules._audit_checks import fix_missing_prefix
 
-        n = fix_missing_prefix(rules_dir)
-        if not n:
-            exit_with_error(
-                _AUDIT_FAILED_MSG,
-                ExitCode.AUDIT_FAILED,
-            )
-        print_success(
-            f"Added [rule_name] prefix to {n} rule(s)."
+            n = fix_missing_prefix(rules_dir)
+            if n:
+                print_success(
+                    f"Added [rule_name] prefix to {n} rule(s)."
+                )
+                print_info("Re-running audit...")
+                audit_ok, audit_result = run_pre_publish_audits(project_dir)
+                continue
+
+        # No auto-fix available — prompt the developer
+        choice = prompt_step_failure("Pre-publish audit")
+        if choice == "retry":
+            print_info("Re-running audit...")
+            audit_ok, audit_result = run_pre_publish_audits(project_dir)
+            continue
+        if choice == "ignore":
+            print_warning("Ignoring audit failure — continuing.")
+            return True, None
+        exit_with_error(
+            _AUDIT_FAILED_MSG,
+            ExitCode.AUDIT_FAILED,
         )
-        print_info("Re-running audit...")
-        audit_ok, audit_result = run_pre_publish_audits(project_dir)
     return audit_ok, audit_result
 
 
@@ -633,9 +645,13 @@ def run_audit_step(
     if not skip_audit:
         with timer.step("Pre-publish audit"):
             print_header("STEP 1: AUDIT")
+            # run_audit_with_retry now handles its own RIA prompt
+            # internally, so a False return means user chose abort.
             audit_ok, _ = run_audit_with_retry(project_dir)
             if not audit_ok:
-                exit_with_error(_AUDIT_FAILED_MSG, ExitCode.AUDIT_FAILED)
+                exit_with_error(
+                    _AUDIT_FAILED_MSG, ExitCode.AUDIT_FAILED,
+                )
 
         if audit_only:
             print_success(
@@ -650,46 +666,91 @@ def run_audit_step(
     return None
 
 
+def _run_step_with_retry(
+    step_name: str,
+    run_fn,
+    exit_code: ExitCode,
+    *,
+    allow_ignore: bool = True,
+) -> None:
+    """Run a pipeline step in a retry/ignore/abort loop.
+
+    On failure the developer is prompted to retry (after fixing the
+    issue in another terminal), ignore (proceed despite the failure),
+    or abort (hard exit). Replaces bare exit_with_error() calls so
+    that no step is an unconditional hard exit.
+
+    Set *allow_ignore* to False for irreversible steps (git push,
+    tag, pub.dev publish) where skipping would leave the release in
+    an inconsistent state.
+    """
+    while True:
+        if run_fn():
+            return
+        choice = prompt_step_failure(
+            step_name, allow_ignore=allow_ignore,
+        )
+        if choice == "retry":
+            print_info(f"Re-running {step_name}...")
+            continue
+        if choice == "ignore":
+            print_warning(f"Ignoring {step_name} failure — continuing.")
+            return
+        # abort
+        exit_with_error(
+            f"{step_name} failed.", exit_code,
+        )
+
+
 def run_pre_publish_pipeline(
     project_dir: Path, branch: str, timer: StepTimer,
 ) -> None:
     """Run prerequisites, working tree, sync, workflow, format, analysis, tests.
 
-    Exits on failure via exit_with_error().
+    Each step prompts Retry / Ignore / Abort on failure so the
+    developer can fix issues in another terminal without losing
+    the publish session.
     """
     with timer.step("Prerequisites"):
-        if not check_prerequisites():
-            exit_with_error(
-                "Prerequisites failed",
-                ExitCode.PREREQUISITES_FAILED,
-            )
+        _run_step_with_retry(
+            "Prerequisites", check_prerequisites,
+            ExitCode.PREREQUISITES_FAILED,
+        )
     with timer.step("Working tree"):
-        ok, _ = check_working_tree(project_dir)
-        if not ok:
-            exit_with_error("Aborted.", ExitCode.USER_CANCELED)
+        # check_working_tree returns (ok, has_changes); wrap to bool
+        _run_step_with_retry(
+            "Working tree",
+            lambda: check_working_tree(project_dir)[0],
+            ExitCode.USER_CANCELED,
+        )
     with timer.step("Remote sync"):
-        if not check_remote_sync(project_dir, branch):
-            exit_with_error(
-                "Remote sync failed",
-                ExitCode.WORKING_TREE_FAILED,
-            )
+        _run_step_with_retry(
+            "Remote sync",
+            lambda: check_remote_sync(project_dir, branch),
+            ExitCode.WORKING_TREE_FAILED,
+        )
     with timer.step("Publish workflow"):
-        if not ensure_publish_workflow_committed(project_dir, branch):
-            exit_with_error(
-                "Failed to commit/push .github/workflows/publish.yml",
-                ExitCode.GIT_FAILED,
-            )
+        _run_step_with_retry(
+            "Publish workflow commit",
+            lambda: ensure_publish_workflow_committed(project_dir, branch),
+            ExitCode.GIT_FAILED,
+        )
     with timer.step("Format"):
-        if not run_format(project_dir):
-            exit_with_error(
-                "Formatting failed.", ExitCode.VALIDATION_FAILED,
-            )
+        _run_step_with_retry(
+            "Formatting",
+            lambda: run_format(project_dir),
+            ExitCode.VALIDATION_FAILED,
+        )
     with timer.step("Analysis"):
+        # run_analysis already has its own Ignore/Retry/Abort prompt
+        # inside run_analysis_with_prompt, so a bare gate is fine here.
         if not run_analysis(project_dir):
             exit_with_error(
                 "Analysis failed.", ExitCode.ANALYSIS_FAILED,
             )
     with timer.step("Tests"):
+        # run_tests already has its own Continue/Retry/Abort prompt
+        # inside _run_test_pass, so a bare gate is fine here.
         if not run_tests(project_dir):
             exit_with_error("Tests failed.", ExitCode.TEST_FAILED)
 
@@ -702,47 +763,70 @@ def run_badge_validation_docs_dryrun(
 ) -> str:
     """Badge sync, CHANGELOG validation, docs, pre-publish dry-run.
 
+    Each step prompts Retry / Ignore / Abort on failure.
+
     Returns:
-        Release notes string for GitHub release. Exits on failure.
+        Release notes string for GitHub release.
     """
+    release_notes = ""
     with timer.step("Badge sync"):
         sync_readme_badges(project_dir, version, rule_count)
     with timer.step("CHANGELOG validation"):
-        ok, release_notes = validate_changelog(project_dir, version)
-        if not ok:
+        # validate_changelog returns (ok, notes); retry loop needs
+        # to capture the notes on success.
+        while True:
+            ok, notes = validate_changelog(project_dir, version)
+            if ok:
+                release_notes = notes
+                break
+            choice = prompt_step_failure("CHANGELOG validation")
+            if choice == "retry":
+                print_info("Re-checking CHANGELOG...")
+                continue
+            if choice == "ignore":
+                print_warning(
+                    "Ignoring CHANGELOG failure — continuing "
+                    "with generic release notes."
+                )
+                release_notes = f"Release {version}"
+                break
             exit_with_error(
-                "CHANGELOG failed",
-                ExitCode.CHANGELOG_FAILED,
+                "CHANGELOG failed", ExitCode.CHANGELOG_FAILED,
             )
     with timer.step("Docs"):
-        if not generate_docs(project_dir):
-            exit_with_error(
-                "Docs failed",
-                ExitCode.VALIDATION_FAILED,
-            )
+        _run_step_with_retry(
+            "Docs generation",
+            lambda: generate_docs(project_dir),
+            ExitCode.VALIDATION_FAILED,
+        )
     with timer.step("Pre-publish validation"):
-        if not pre_publish_validation(project_dir):
-            exit_with_error(
-                "Validation failed",
-                ExitCode.VALIDATION_FAILED,
-            )
+        _run_step_with_retry(
+            "Pre-publish validation",
+            lambda: pre_publish_validation(project_dir),
+            ExitCode.VALIDATION_FAILED,
+        )
     return release_notes
 
 
 def run_final_ci_gate(project_dir: Path, timer: StepTimer) -> None:
-    """Re-run analysis after version bump; exit on failure."""
+    """Re-run analysis after version bump; prompt RIA on failure.
+
+    run_analysis already has its own inner Ignore/Retry/Abort for
+    dart analyze, so this outer gate only fires when analysis
+    returns False (user chose Abort inside). The outer prompt gives
+    one more chance to retry or ignore before hard-exiting.
+    """
     with timer.step("Final CI gate"):
         print_header("FINAL CI GATE")
         print_info(
             "Re-running CI checks after version changes to "
             "prevent burning a tag on a broken build..."
         )
-        if not run_analysis(project_dir):
-            exit_with_error(
-                "Final CI gate failed — aborting before "
-                "tag creation. Fix analysis issues and re-run.",
-                ExitCode.ANALYSIS_FAILED,
-            )
+        _run_step_with_retry(
+            "Final CI gate",
+            lambda: run_analysis(project_dir),
+            ExitCode.ANALYSIS_FAILED,
+        )
         print_success("CI gate passed — safe to create tag")
 
 
@@ -755,39 +839,60 @@ def run_commit_tag_publish_release(
 ) -> None:
     """Commit/push, retrigger CI, tag, publish to pub.dev, GitHub release.
 
-    Exits on failure via exit_with_error().
+    Each step prompts Retry / Ignore / Abort on failure so the
+    developer can fix issues (e.g. auth, network) without losing
+    the publish session.
     """
     with timer.step("Git commit & push"):
-        if not git_commit_and_push(project_dir, version, branch):
-            exit_with_error(
-                "Git operations failed",
-                ExitCode.GIT_FAILED,
-            )
+        # Irreversible: downstream steps assume the commit is on the
+        # remote. Ignoring a failed push would create orphan tags.
+        _run_step_with_retry(
+            "Git commit & push",
+            lambda: git_commit_and_push(project_dir, version, branch),
+            ExitCode.GIT_FAILED,
+            allow_ignore=False,
+        )
     with timer.step("CI status"):
         from scripts.modules._retrigger_ci import offer_retrigger_ci
 
         offer_retrigger_ci(limit=10)
     with timer.step("Git tag"):
-        if not create_git_tag(project_dir, version):
-            exit_with_error(
-                "Git tag failed",
-                ExitCode.GIT_FAILED,
-            )
-    with timer.step("Publish"):
-        if not publish_to_pubdev_step(project_dir, version):
-            exit_with_error(
-                "Publish failed",
-                ExitCode.PUBLISH_FAILED,
-            )
-    with timer.step("GitHub release"):
-        gh_success, gh_error = create_github_release(
-            project_dir, version, release_notes,
+        # Irreversible: publishing without a tag breaks release
+        # traceability. Retry or abort only.
+        _run_step_with_retry(
+            "Git tag",
+            lambda: create_git_tag(project_dir, version),
+            ExitCode.GIT_FAILED,
+            allow_ignore=False,
         )
-        if not gh_success:
-            exit_with_error(
-                f"GitHub release failed: {gh_error}",
-                ExitCode.GITHUB_RELEASE_FAILED,
+    with timer.step("Publish"):
+        # Irreversible: skipping the actual publish would create a
+        # GitHub release for a version not on pub.dev.
+        _run_step_with_retry(
+            "Publish to pub.dev",
+            lambda: publish_to_pubdev_step(project_dir, version),
+            ExitCode.PUBLISH_FAILED,
+            allow_ignore=False,
+        )
+    with timer.step("GitHub release"):
+        # create_github_release returns (ok, error_msg); wrap for the
+        # retry helper and surface the error message on failure.
+        def _try_gh_release() -> bool:
+            ok, err = create_github_release(
+                project_dir, version, release_notes,
             )
+            if not ok and err:
+                print_error(f"GitHub release: {err}")
+            return ok
+
+        # Irreversible: the package is already on pub.dev at this
+        # point; a missing GitHub release leaves no release notes.
+        _run_step_with_retry(
+            "GitHub release",
+            _try_gh_release,
+            ExitCode.GITHUB_RELEASE_FAILED,
+            allow_ignore=False,
+        )
 
 
 def run_version_bump(
@@ -833,15 +938,34 @@ def run_extension_after_publish(
     if not extension_exists(project_dir):
         return None, False
     with timer.step("Extension (install & stores)"):
-        package_extension(project_dir, version)
+        # Retry loop: packaging may fail due to compile errors the
+        # developer can fix in another terminal window.
+        def _try_post_publish_ext() -> bool:
+            package_extension(project_dir, version)
+            expected_ext = extension_vsix_path(project_dir, version)
+            if not expected_ext.is_file():
+                print_error(
+                    f"Full publish requires extension/{expected_ext.name}. "
+                    "Fix compile or packaging errors."
+                )
+                return False
+            return True
+
+        _run_step_with_retry(
+            "Extension packaging",
+            _try_post_publish_ext,
+            ExitCode.VALIDATION_FAILED,
+        )
         expected = extension_vsix_path(project_dir, version)
+        # Guard: if the developer chose Ignore on a packaging failure,
+        # the .vsix does not exist — skip install/publish gracefully
+        # instead of crashing downstream.
         if not expected.is_file():
-            exit_with_error(
-                "Full publish requires extension/"
-                f"{expected.name} (run vsce package successfully). "
-                "Fix compile or packaging errors and re-run.",
-                ExitCode.VALIDATION_FAILED,
+            print_warning(
+                f"Extension {expected.name} not found on disk "
+                "(packaging was skipped). Run option 6 to publish later."
             )
+            return None, False
         if not _prompt_extension_install_and_publish(
             expected,
             skip_publish_msg=(
@@ -890,11 +1014,11 @@ def run_full_publish(
         # test files; running pub get up front eliminates that whole
         # class of triage regardless of which downstream mode runs.
         with timer.step("Dependencies"):
-            if not run_pub_get(ctx.project_dir):
-                exit_with_error(
-                    "dart pub get failed.",
-                    ExitCode.PREREQUISITES_FAILED,
-                )
+            _run_step_with_retry(
+                "Dependency resolution (dart pub get)",
+                lambda: run_pub_get(ctx.project_dir),
+                ExitCode.PREREQUISITES_FAILED,
+            )
 
         code = run_audit_step(
             ctx.project_dir, skip_audit, audit_only, timer,
@@ -979,14 +1103,24 @@ def run_full_publish(
         # mean "no .vsix on disk" when the extension compiles.
         if extension_exists(ctx.project_dir):
             with timer.step("Extension package"):
-                package_extension(ctx.project_dir, version)
-                expected = extension_vsix_path(ctx.project_dir, version)
-                if not expected.is_file():
-                    exit_with_error(
-                        f"Release requires extension/{expected.name} after "
-                        "package. Fix compile/vsce errors and re-run.",
-                        ExitCode.VALIDATION_FAILED,
-                    )
+                # Retry loop: package_extension may fail due to transient
+                # compile errors the developer can fix in another terminal.
+                def _try_package_extension() -> bool:
+                    package_extension(ctx.project_dir, version)
+                    expected = extension_vsix_path(ctx.project_dir, version)
+                    if not expected.is_file():
+                        print_error(
+                            f"Release requires extension/{expected.name} "
+                            "after package. Fix compile/vsce errors."
+                        )
+                        return False
+                    return True
+
+                _run_step_with_retry(
+                    "Extension packaging",
+                    _try_package_extension,
+                    ExitCode.VALIDATION_FAILED,
+                )
         run_commit_tag_publish_release(
             ctx.project_dir, version, ctx.branch, release_notes, timer,
         )

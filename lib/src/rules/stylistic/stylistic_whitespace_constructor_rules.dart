@@ -785,7 +785,6 @@ class PreferSuperParametersRule extends SaropaLintRule {
   }
 }
 
-
 /// Warns when constructor body assignment could use initializing formals (opposite).
 ///
 /// Since: v4.9.11 | Updated: v4.13.0 | Rule version: v2

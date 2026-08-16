@@ -20,8 +20,8 @@ String? closestRuleName(String unknown) {
   final int maxDistance = unknown.length <= 10
       ? 2
       : unknown.length <= 20
-          ? 3
-          : 5;
+      ? 3
+      : 5;
   String? best;
   int bestDist = maxDistance + 1;
 

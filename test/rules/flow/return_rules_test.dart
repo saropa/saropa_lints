@@ -20,7 +20,10 @@ void main() {
     test('AvoidReturningThisRule', () {
       final rule = AvoidReturningThisRule();
       expect(rule.code.lowerCaseName, 'avoid_returning_this_with_fix');
-      expect(rule.code.problemMessage, contains('[avoid_returning_this_with_fix]'));
+      expect(
+        rule.code.problemMessage,
+        contains('[avoid_returning_this_with_fix]'),
+      );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);
     });
