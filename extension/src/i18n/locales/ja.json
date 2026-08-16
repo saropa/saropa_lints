@@ -1839,6 +1839,14 @@
       "progressAnalysis": "解析中… ({elapsed}s)",
       "progressBaseline": "ベースラインスキャンを実行中…（{elapsed}s）"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lintsは有効ですが、エディタ内診断は無効: この拡張機能からアナライザープラグインがオフにされ、復元されていないため、問題はスキャン後にのみ表示されます。エディタ内診断をリアルタイムで復元するか、保存時にスキャンするだけにするか？",
+      "actionRestorePlugin": "インライン診断を復元",
+      "actionKeepScanOnly": "保存時にスキャンのみ保持",
+      "disabledButPluginOn": "Saropa Lintsはオフになっていますが、analysis_options.yamlで分析プラグインがまだ宣言されているため、次回Dart分析サーバーが起動するときに何GBもメモリを占有してしまいます。プラグインもオフにしてくださいか、それとも有効のままにしておきましょうか？",
+      "actionTurnOffPlugin": "アナライザープラグインをオフにする",
+      "actionKeepPluginOn": "プラグインを常に有効にしてください"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} 失敗: _PH2_ が実行できませんでした. {message} _ ヒトの\"つの細胞を構成する",
       "crossFileGraphExportFailed": "Saropa Lintsグラフのエクスポートは失敗: {message} フォローしている",

@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Analiz çalıştırılıyor… ({elapsed}s)",
       "progressBaseline": "Temel tarama çalıştırılıyor… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints etkin, ancak editör içi tanımlama raporları devre dışı: analizör eklentisi bu eklentiden devre dışı bırakılmış ve tekrar etkinleştirilmemiştir, bu nedenle sorunlar sadece tarandıktan sonra görünür. Editör içi tanımlama raporlarını canlı olarak geri yüklemek mi, yoksa sadece kaydedildiğinde taranmak mı?",
+      "actionRestorePlugin": "Düzenleyici içindeki tanılama yeniden yükle",
+      "actionKeepScanOnly": "Sadece kaydedildiğinde tarayın",
+      "disabledButPluginOn": "Saropa Lints devre dışı, ancak analiz eklentisi hâlâ analysis_options.yaml'da bildirilmiş, bu yüzden bir sonraki Dart analiz sunucusu başlatıldığında birkaç GB bellek tutacaktır. Eklentiyi de devre dışı bırakın mı, yoksa açık bırakın mı?",
+      "actionTurnOffPlugin": "Analizör eklentisini kapat",
+      "actionKeepPluginOn": "Plugini devreye al"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} başarısız oldu: {message} _PH1_ = PH1__ (Hücre Basıncı",
       "crossFileGraphExportFailed": "Saropa Lints grafik ihracatı başarısız oldu: {message} _PH0___ -Hepimiz birer insanız.",

@@ -1839,6 +1839,14 @@
       "progressAnalysis": "ניתוח ביצועים... ({elapsed}s)",
       "progressBaseline": "סריקה בסיסית בדיקה... ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints הוא פעיל, אך אזהרות בתוך העריכה אינן פעילות: מודול האנליזה הושתק מהשורה הזו והלא נחזר, ולכן בעיות מופיעות רק לאחר ס캔. חזור לבעלות אזהרות בתוך העריכה, או לשמור על ס캔 בעת שמירה?",
+      "actionRestorePlugin": "שחזר תצוגת אזהרות בתוך המודעה",
+      "actionKeepScanOnly": "המריץ רק בשמירת קובץ",
+      "disabledButPluginOn": "Saropa Lints מופסק, אך מודול האנליזה עדיין מוגדר ב analysis_options.yaml, ולכן הוא יטען ויגדיל מספר ג'יגהבייטים בפעם הבאה שсер버 האנליזה של Dart יתחיל. תסגר גם את המודול, או תשמור עליו?",
+      "actionTurnOffPlugin": "השבית את 플러그-אין האנליזר",
+      "actionKeepPluginOn": "המריץ את הרשומה"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} נכשל: {message} זה ה- _PH1_.",
       "crossFileGraphExportFailed": "Saropa Lints גרף יצוא נכשל: {message} זה ה- PH0__.",

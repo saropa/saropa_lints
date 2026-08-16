@@ -1839,6 +1839,14 @@
       "progressAnalysis": "분석 중입니다… ({elapsed}s)",
       "progressBaseline": "기본 스캔 중… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints는 켜져 있지만, 에디터 내 진단 기능은 꺼져 있습니다: 분석기 플러그인은 이 확장에서 끄고 이후로 복원되지 않았기 때문에, 스캔 이후에만 문제가 나타납니다. 실시간 에디터 내 진단 기능을 복원할 것인가, 아니면 저장 시만 스캔할 것인가?",
+      "actionRestorePlugin": "편집기 내 진단 복원",
+      "actionKeepScanOnly": "저장 시 스캔만 유지",
+      "disabledButPluginOn": "Saropa Lints는 꺼져 있지만 analysis_options.yaml에 분석기 플러그인 여전히 선언되어 있으므로 다음번 Dart 분석 서버가 시작될 때 몇 GB를 차지하게 됩니다. 플러그인도 꺼야 할까요, 혹은 계속开着할까요?",
+      "actionTurnOffPlugin": "분석기 플러그인을 끄기",
+      "actionKeepPluginOn": "플러그인을 계속 유지하세요"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} 실패: {message}는",
       "crossFileGraphExportFailed": "Saropa Lints 그래프 수출 실패: {message} _PH0_는 PH0__의 제곱근을 나타냅니다",

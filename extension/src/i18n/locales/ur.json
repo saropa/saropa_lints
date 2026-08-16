@@ -1839,6 +1839,14 @@
       "progressAnalysis": "تحلیل کر رہے ہیں... ({elapsed}s)",
       "progressBaseline": "اسکن بنیادی حد تک جاری ہے... ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints کھلے ہیں، لیکن ایڈیٹر میں تشخیصات بند ہیں: تحلیل کن پلگ ان یہ ایکسٹینشن سے بند کر دیا گیا تھا اور کبھی دوبارہ تازہ کر کے نہیں لے گیا گیا، اس لیے ایک اسکن کے بعد صرف مسائل ظاہر ہوتے ہیں۔ زندہ ایڈیٹر میں تشخیصات لوڈ کریں، یا صرف ایک اسکن کے بعد رکھیں؟",
+      "actionRestorePlugin": "ڈیٹا بیس کی تعمیر",
+      "actionKeepScanOnly": "بچھاﺅ کے وقت ہی اسکن کریں کیوں کہ",
+      "disabledButPluginOn": "Saropa Lints بند ہے، لیکن analysis_options.yaml میں تحلیل کن پلگ ان ابھی تک دیکھا گیا ہے، اس لیے اگلی بار Dart تحلیل سرور شروع ہونے پر چند گیگا بائٹس گھوم جائیں گے۔ پلگ ان بند کر دیجیے یا اسے چھوڑ دیجیے؟",
+      "actionTurnOffPlugin": "اکثریت تحلیل کنندہ پلاگ ان ختم کریں",
+      "actionKeepPluginOn": "پلاگ ان چھوڑیں نہیں"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} ناکام: {message} _PH1_ ___ کا مطلب ہے کہ آپ کو ایک ہی چیز",
       "crossFileGraphExportFailed": "Saropa Lints گراف ایکسپورٹ ناکام: {message}",

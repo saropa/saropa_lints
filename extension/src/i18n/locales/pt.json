@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Análise em execução… ({elapsed}s)",
       "progressBaseline": "Escaneando baseline... ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints está ligado, mas os diagnósticos em editor estão desligados: o plugin do analisador foi desativado por esta extensão e nunca foi restaurado, então os problemas só aparecem após uma varredura. Restaurar diagnósticos em tempo real em editor, ou manter varredura ao salvar apenas?",
+      "actionRestorePlugin": "Restaurar diagnósticos em editor",
+      "actionKeepScanOnly": "Mantenha scan-on-save apenas",
+      "disabledButPluginOn": "Saropa Lints está desativado, mas o plugin do analisador ainda está declarado no analysis_options.yaml, então ele será carregado e ocupará vários GB na próxima vez que o servidor de análise Dart iniciar. Desative o plugin também, ou mantenha-o ativado?",
+      "actionTurnOffPlugin": "Desative o plugin do analisador",
+      "actionKeepPluginOn": "Mantenha o plugin ativado"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} falhou: não conseguiu {message} É um tipo de vírus que se alimenta do sangue.",
       "crossFileGraphExportFailed": "Saropa Lints exportar gráfico falhou: {message} É um termo usado para descrever a",

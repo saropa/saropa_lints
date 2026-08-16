@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Đang phân tích... ({elapsed}s)",
       "progressBaseline": "Đang chạy quét cơ sở... ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints đã được bật, nhưng thông báo trong trình soạn thảo đang bị tắt: plugin phân tích đã bị tắt từ tiện ích này và chưa bao giờ được khôi phục, do đó các vấn đề chỉ xuất hiện sau khi quét. Khôi phục thông báo trong trình soạn thảo trực tiếp, hay chỉ giữ lại quét khi lưu?",
+      "actionRestorePlugin": "Khôi phục chẩn đoán trong trình soạn thảo",
+      "actionKeepScanOnly": "Giữ lại quét khi lưu chỉ",
+      "disabledButPluginOn": "Saropa Lints bị tắt, nhưng plugin phân tích vẫn được khai báo trong analysis_options.yaml, vì vậy nó sẽ được tải và chiếm nhiều GB khi lần sau Dart server phân tích khởi động. Tắt plugin đi nữa, hay giữ nguyên trạng thái?",
+      "actionTurnOffPlugin": "Tắt plugin phân tích",
+      "actionKeepPluginOn": "Giữ plugin ở trạng thái bật"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} thất bại: {message} là một loại tế bào có thể",
       "crossFileGraphExportFailed": "Saropa Lints export graph failed: Không thể xuất khẩu đồ thị {message} là Phương pháp",

@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Analiza w trakcie… ({elapsed}s)",
       "progressBaseline": "Uruchamianie podstawowego skanowania… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints jest włączony, ale wtyczka analizująca jest wyłączona: analizator został wyłączony z tej wtyczki i nigdy nie został przywrócony, więc problemy pojawiają się tylko po skanowaniu. Przywróć aktywne wtyczki do analizy w edytorze, czy zachowaj analizę przy zapisywaniu?",
+      "actionRestorePlugin": "Wznowienie weryfikacji w edytorze",
+      "actionKeepScanOnly": "Zachowuj skanowanie przy zapisie tylko",
+      "disabledButPluginOn": "Saropa Lints jest wyłączony, ale wtyczka analizująca nadal jest oznaczona w analysis_options.yaml, więc zostanie załadowana i zajmie kilka GB przy kolejnym uruchomieniu serwera analizy Dart. Wyłącz również wtyczkę, czy zostaw ją włączoną?",
+      "actionTurnOffPlugin": "Wyłącz analizator plugin",
+      "actionKeepPluginOn": "Zachowaj wtyczkę włączoną"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} nie powiodło się: {message} to grupa, która ma",
       "crossFileGraphExportFailed": "Saropa Lints wykres wywóz nie powiodło się: {message} to odmiana _PH0_.",

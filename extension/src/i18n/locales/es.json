@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Análisis en ejecución… ({elapsed}s)",
       "progressBaseline": "Ejecutando escaneo de base… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints está encendido, pero los diagnósticos en el editor están desactivados: el plugin de análisis fue desactivado desde esta extensión y nunca se restauró, por lo tanto, los problemas solo aparecen después de un escaneo. Restaurar diagnósticos en tiempo real en el editor, o mantener solo escaneo al guardar?",
+      "actionRestorePlugin": "Restaurar diagnósticos en el editor",
+      "actionKeepScanOnly": "Mantén escaneo al guardar solo",
+      "disabledButPluginOn": "Saropa Lints está desactivado, pero el plugin del analizador aún está declarado en analysis_options.yaml, por lo que cargará y ocupará varios GB la próxima vez que se inicie el servidor de análisis Dart. Desactívalo también, o manténlo activo?",
+      "actionTurnOffPlugin": "Desactivar el plugin de análisis",
+      "actionKeepPluginOn": "Mantén el plugin activo"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} falló: no fue posible {message} es el número de células",
       "crossFileGraphExportFailed": "Saropa Lints gráfico de exportación no fue: {message} El hombre de la ciudad",

@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Analisi in corso… ({elapsed}s)",
       "progressBaseline": "Scansione baseline in corso… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints è attivo, ma i diagnostic in-editor sono disattivati: il plugin analizzatore è stato disattivato da questa estensione e non è mai stato ripristinato, quindi i problemi si verificano solo dopo uno scan. Ripristina i diagnostic in-editor in tempo reale o mantieni solo scan-on-save?",
+      "actionRestorePlugin": "Ripristina la diagnostica in-editor",
+      "actionKeepScanOnly": "Mantieni scan-on-save solo",
+      "disabledButPluginOn": "Saropa Lints è disattivato, ma il plugin analizzatore è comunque dichiarato in analysis_options.yaml, quindi verrà caricato e occuperà diversi GB la prossima volta che il server di analisi Dart si avvierà. Disattiva anche il plugin o lascialo attivo?",
+      "actionTurnOffPlugin": "Disattiva il plugin dell'analizzatore",
+      "actionKeepPluginOn": "Mantieni il plugin abilitato"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} fallito: {message} è il nome di una cellula.",
       "crossFileGraphExportFailed": "Saropa Lints grafico esportazione fallita: {message} È il nome di un'altra versione.",

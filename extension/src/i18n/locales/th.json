@@ -1839,6 +1839,14 @@
       "progressAnalysis": "วิเคราะห์อยู่… ({elapsed}s)",
       "progressBaseline": "กำลังดำเนินการสแกนพื้นฐาน… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints ได้เปิด แต่การวินิจฉัยในตัวแก้ไขข้อความถูกปิด: ปลั๊กอินวิเคราะห์ถูกปิดโดยส่วนขยายนี้และไม่เคยกู้คืน ดังนั้นปัญหาจึงปรากฏเฉพาะหลังจากการสแกน คุณต้องการกู้คืนการวินิจฉัยในตัวแก้ไขข้อความแบบเรียลไทม์ หรือจะใช้การสแกนเมื่อบันทึกเท่านั้น?",
+      "actionRestorePlugin": "กู้คืนการวินิจฉัยในตัวแก้ไข",
+      "actionKeepScanOnly": "รักษาการสแกนเมื่อบันทึกเท่านั้น",
+      "disabledButPluginOn": "Saropa Lints ถูกปิด แต่ปลั๊กอินเครื่องวิเคราะห์ยังถูกประกาศใน analysis_options.yaml ดังนั้นจะโหลดและใช้พื้นที่เก็บข้อมูลหลาย GB เมื่อ Dart บริการเครื่องวิเคราะห์เริ่มต้นอีกครั้ง ปิดปลั๊กอินด้วยหรือไม่ หรือจะปล่อยไว้?",
+      "actionTurnOffPlugin": "ปิดปลั๊กอินเครื่องมือวิเคราะห์",
+      "actionKeepPluginOn": "รักษาปลั๊กอินไว้"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} ไม่สําเร็จ: การทําความผิดพลาด {message} การรักษาโรค",
       "crossFileGraphExportFailed": "Saropa Lints กราฟ การส่งออกล้มเหลว: {message} การตรวจสอบ",

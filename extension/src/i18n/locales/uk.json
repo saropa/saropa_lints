@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Виконання аналізу… ({elapsed}s)",
       "progressBaseline": "Виконання базового сканування… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints увімкнено, але діагностика в редакторі вимкнена: аналізатор плагін був вимкнено з цієї розширення і ніколи не відновлено, тому проблеми з'являються лише після сканування. Відновити живу діагностику в редакторі, або залишити сканування при збереженні?",
+      "actionRestorePlugin": "Відновити діагностику в редакторі",
+      "actionKeepScanOnly": "Підтримуйте сканування при збереженні лише",
+      "disabledButPluginOn": "Saropa Lints вимкнено, але аналізатор plugin все ще оголошений в analysis_options.yaml, тому він завантажиться та витратить кілька ГБ під час наступного запуску аналізатора Dart. Вимкніть plugin також, чи залиште його увімкненим?",
+      "actionTurnOffPlugin": "Вимкніть аналізатор плагін",
+      "actionKeepPluginOn": "Підтримуйте плагін у включених"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} не вдалося: {message}__ - це фізіотип, що містить в собі",
       "crossFileGraphExportFailed": "Saropa Lints export failed: графік експорту не вдалося: {message} _ПХО__ ПхО__",

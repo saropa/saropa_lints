@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Analisis sedang berjalan… ({elapsed}s)",
       "progressBaseline": "Melakukan pemindaian dasar… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints aktif, tetapi diagnosa dalam editor dimatikan: plugin analyzer telah dimatikan dari ekstensi ini dan tidak pernah dipulihkan, sehingga masalah hanya muncul setelah pemindaian. Pulihkan diagnosa dalam editor secara real-time, atau tetap hanya memindai saat menyimpan?",
+      "actionRestorePlugin": "Pulihkan diagnostik dalam editor",
+      "actionKeepScanOnly": "Simpan hanya saat menyimpan",
+      "disabledButPluginOn": "Saropa Lints dimatikan, tetapi plugin analyzer masih dideklarasikan di analysis_options.yaml, sehingga akan memuat dan menghabiskan beberapa GB ketika Dart analysis server berikutnya dimulai. Matikan plugin tersebut juga, atau biarkan tetap menyala?",
+      "actionTurnOffPlugin": "Matikan plugin analyzer",
+      "actionKeepPluginOn": "Tetapkan plugin tersebut"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} gagal: tidak bisa {message} adalah",
       "crossFileGraphExportFailed": "Saropa Lints grafik ekspor gagal: {message} adalah",

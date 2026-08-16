@@ -1839,6 +1839,14 @@
       "progressAnalysis": "تحلیل در حال اجرا است... ({elapsed}s)",
       "progressBaseline": "اسکن پایه‌ای در حال اجرا است... ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints فعال است، اما تشخیص درون ویرایشگر غیر فعال است: پلاگین تحلیل کننده غیر فعال شده است و به طور دائم بازنشانی نشده است، بنابراین مشکلات فقط پس از اسکن ظاهر می شود. تشخیص درون ویرایشگر زنده را باز کن یا فقط اسکن در حین ذخیره را حفظ کن؟",
+      "actionRestorePlugin": "بازگرداندن اطلاعات دیاگنوستیک درون ویرایشگر",
+      "actionKeepScanOnly": "فقط اسکن در حین ذخیره را نگه دارید",
+      "disabledButPluginOn": "Saropa Lints غیر فعال است، اما پلاگین تحلیل کننده هنوز در analysis_options.yaml اعلان شده است، بنابراین در هر بار شروع مجدد سرور تحلیل Dart، چند گیگابایت حافظه را به خود اختصاص می‌دهد. پلاگین را نیز غیر فعال کن یا آن را فعال نگه کن؟",
+      "actionTurnOffPlugin": "اتور کردن پلاگین تحلیل کننده را خاموش کنید",
+      "actionKeepPluginOn": "پلاگین را فعال نگه دارید"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} شکست خورده: {message} _فرد_منتظره",
       "crossFileGraphExportFailed": "صادرات نمودار Saropa Lints انجام نشد: {message}",

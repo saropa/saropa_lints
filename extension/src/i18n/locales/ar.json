@@ -1839,6 +1839,14 @@
       "progressAnalysis": "التحليل في التشغيل... ({elapsed}s)",
       "progressBaseline": "التحقق من الأساسيات... ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints قيد التشغيل، ولكن التشخيصات داخل المحرر متوقفة: تم إيقاف تشغيل المكون الإضافي للمحلل من هذا الملحق ولم يتم استعادته مطلقًا، لذا لا تظهر المشكلات إلا بعد الفحص. هل ترغب في استعادة التشخيصات المباشرة داخل المحرر، أم الاحتفاظ بالمسح الضوئي عند الحفظ فقط؟",
+      "actionRestorePlugin": "استعادة التشخيص داخل المحرر",
+      "actionKeepScanOnly": "احتفظ بمسح عند حفظ الملف فقط",
+      "disabledButPluginOn": "تم إيقاف Saropa Lints، ولكن لا يزال يتم الإعلان عن البرنامج الإضافي للمحلل في analysis_options.yaml، لذلك سيتم تحميل عدة غيغابايت والاحتفاظ بها في المرة التالية التي يبدأ فيها خادم التحليل Dart. هل تريد إيقاف تشغيل المكوّن الإضافي أيضًا أم إبقائه قيد التشغيل؟",
+      "actionTurnOffPlugin": "الغاء تفعيل مُحلل المُساعِد",
+      "actionKeepPluginOn": "احتفظ بالملحق مفعلًا"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} فاشل: {message}",
       "crossFileGraphExportFailed": "فشل تصدير الرسم البياني Saropa Lints: فشل في تصدير {message} _ PH0__ الـ (ف) = الحالة التي يمر",

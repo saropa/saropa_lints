@@ -1839,6 +1839,14 @@
       "progressAnalysis": "एनालिसिस चल रहा है... ({elapsed}s)",
       "progressBaseline": "आधार खोज चल रही है... ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints सक्रिय है, लेकिन सम्पादक में निदान बंद है: एनालाइजर प्लगइन इस एक्सटेंशन से बंद कर दिया गया था और फिर से सक्रिय नहीं किया गया, इसलिए समस्याएं केवल एक स्कैन के बाद ही दिखाई देती हैं। जीवित सम्पादक में निदान फिर से सक्रिय करें, या केवल बचे बर्खास्त करें?",
+      "actionRestorePlugin": "अपने समाप्ति तक विश्लेषण पुनः स्थापित करें",
+      "actionKeepScanOnly": "केवल सेवा के समय स्कैन करें",
+      "disabledButPluginOn": "Saropa Lints बंद है, लेकिन analysis_options.yaml में एनालाइजर प्लगइन अभी भी घोषित है, इसलिए अगली बार Dart एनालाइजर सर्वर शुरू होने पर यह कई जीबी लोड करेगा और रखेगा। प्लगइन को भी बंद कर दें या इसे चालू रखें?",
+      "actionTurnOffPlugin": "एनालाइजर प्लगइन को बंद करें",
+      "actionKeepPluginOn": "प्लगइन को बरकरार रखें"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} विफलः {message} _PH1_ को क्या कहते हैं?",
       "crossFileGraphExportFailed": "Saropa Lints ग्राफ़ निर्यात विफल: {message}",

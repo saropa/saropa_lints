@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Unganisha matokeo... ({elapsed}s)",
       "progressBaseline": "Kupata skani ya mbingu... ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints inatoa, lakini diagnostics ya kwenye editor inaofaa: plugin ya analyzer ilifunguka kutikwa extension huu na ilisimamika kufunguka, kwa hiyo maslahi yango yango yango kama baadhi ya scan. Tafuta diagnostics ya kwenye editor ya kutoa kwa muda mrefu, au tafuta kutoa scan kwa kuzalisha?",
+      "actionRestorePlugin": "Kufunga diagnostics katika editor",
+      "actionKeepScanOnly": "Tuma scan-on-save kwa muda mmoja",
+      "disabledButPluginOn": "Saropa Lints inatikisa, lakini plugin ya analyzer inatikisa kwa mbele katika analysis_options.yaml, kwa hiyo inatikisa na inatokana na miongoni mwa GB mwingi wakati ya kuanza server ya analysis ya Dart. Tumia plugin kwenye kufuta au kufanya kwa mbele?",
+      "actionTurnOffPlugin": "Kifungua plugin ya analyzer",
+      "actionKeepPluginOn": "Tuma plugin kwenye"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} imeshindwa: {message} _ PH1__ ni aina ya virusi vya kuambukiza.",
       "crossFileGraphExportFailed": "Saropa Lints graph export failed: Mfano wa picha ya nje umeshindwa {message} _ PH0__ - Msaada wa kuokoa maisha.",

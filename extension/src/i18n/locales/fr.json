@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Analyse en cours… ({elapsed}s)",
       "progressBaseline": "Scan de base en cours… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints est activé, mais les diagnostics en mode édition sont désactivés : le plugin d'analyse a été désactivé depuis cet extension et n'a jamais été restauré, donc les problèmes ne s'affichent que après un scan. Restaurer les diagnostics en mode édition en temps réel, ou garder le scan sur enregistrement uniquement ?",
+      "actionRestorePlugin": "Restaurer les diagnostics en mode édition",
+      "actionKeepScanOnly": "Garder le scan-sur-sauvegarde uniquement",
+      "disabledButPluginOn": "Saropa Lints est désactivé, mais le plugin d'analyse est encore déclaré dans analysis_options.yaml, donc il chargera et占用 plusieurs GB la prochaine fois que le serveur d'analyse Dart démarrera. Désactivez également le plugin, ou le laissez-il activé ?",
+      "actionTurnOffPlugin": "Désactiver le plugin d'analyse",
+      "actionKeepPluginOn": "Gardez le plugin activé"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} échoué: le code de la réponse est {message} est une protéine.",
       "crossFileGraphExportFailed": "Échec de l'exportation du graphique Saropa Lints : {message}",

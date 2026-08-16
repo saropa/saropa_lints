@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Pagsusuri... ({elapsed}s)",
       "progressBaseline": "Pagsusimula ng baseline scan… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints ay naka-on, ngunit ang mga diagnostics sa loob ng editor ay naka-off: ang plugin ng analyzer ay tinanggal mula sa extension na ito at hindi pa ito ibinalik, kaya ang mga isyu lamang ay lumalabas pagkatapos ng isang scan. Ibalik ang live in-editor diagnostics, o manatiling scan-on-save lamang?",
+      "actionRestorePlugin": "Pabalik ang diagnostics sa loob ng editor",
+      "actionKeepScanOnly": "Panatag ang scan-on-save lamang",
+      "disabledButPluginOn": "Saropa Lints ay nagsususpend, ngunit ang plugin ng analyzer ay pa rin nakalimbag sa analysis_options.yaml, kaya ito ay mag-load at mag-imbak ng maraming GB sa susunod na pag-iinitialize ng server ng analisis ng Dart. I-off rin ang plugin, o i-keep ito?",
+      "actionTurnOffPlugin": "I-off ang plugin ng analizer",
+      "actionKeepPluginOn": "Panatilihin ang plugin"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} nabigo: hindi nakamit ang iyong mga layunin {message} Ang mga taong may ________ ay hindi nakikilala ang kanilang sarili.",
       "crossFileGraphExportFailed": "Saropa Lints graph export failed: hindi na rin nagamit ang . {message} ang kanyang mga",

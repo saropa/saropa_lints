@@ -1244,6 +1244,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
     "fil": {
         # Manual: MT returned the English unchanged for this drift label.
         "Cross-project drift": "Drift sa iba't ibang proyekto",
+        # Manual: MT returns English unchanged — technical terms kept as loanwords, Filipino word order.
+        "Analyzer plugin": "Plugin ng analyzer",
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "CC {cc}": "CC {cc}",
         # Curated passthrough: format-only string (two placeholders + colon) has no translatable words.

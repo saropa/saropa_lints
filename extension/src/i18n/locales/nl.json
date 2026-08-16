@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Analyseren... ({elapsed}s)",
       "progressBaseline": "Baseline-scan uitvoeren… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints is aan, maar in-editor diagnostics zijn uit: de analyzer plugin is van deze extensie uitgeschakeld en is nooit hersteld, dus problemen verschijnen alleen na een scan. Herstel live in-editor diagnostics, of behoud scan-on-save alleen?",
+      "actionRestorePlugin": "Herstel in-editor diagnosticaties",
+      "actionKeepScanOnly": "Alleen scan-on-save behouden",
+      "disabledButPluginOn": "Saropa Lints is uitgeschakeld, maar de analyzer plugin is nog steeds vermeld in analysis_options.yaml, dus het zal laden en meerdere GB in beslag nemen de volgende keer dat de Dart analysis server start. Schakel de plugin ook uit, of houd hem aan?",
+      "actionTurnOffPlugin": "Analyseerplugin uitschakelen",
+      "actionKeepPluginOn": "Houd de plug-in aan"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} mislukt: {message} is een genetisch gemodificeerde stof.",
       "crossFileGraphExportFailed": "Saropa Lints grafiek export mislukt: {message} is een PH0__.",

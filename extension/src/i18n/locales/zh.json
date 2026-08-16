@@ -1839,6 +1839,14 @@
       "progressAnalysis": "分析中… ({elapsed}s)",
       "progressBaseline": "正在运行基线扫描… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints已开启，但编辑器内诊断功能已关闭：分析器插件已从此扩展中禁用且从未恢复，因此问题仅在扫描后才会出现。恢复实时编辑器内诊断功能，还是仅保留保存时扫描？",
+      "actionRestorePlugin": "恢复编辑器内诊断",
+      "actionKeepScanOnly": "仅保留保存时扫描",
+      "disabledButPluginOn": "Saropa Lints已关闭，但分析器插件仍声明在analysis_options.yaml中，因此下次Dart分析服务器启动时会加载并占用数GB内存。也请关闭该插件，还是保持开启？",
+      "actionTurnOffPlugin": "关闭分析器插件",
+      "actionKeepPluginOn": "保持插件开启"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} 失败:没有成功 {message} 已经成为一种",
       "crossFileGraphExportFailed": "Saropa Lints图形出口失败:没有成功 {message} 没有任何问题.",

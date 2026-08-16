@@ -1839,6 +1839,14 @@
       "progressAnalysis": "Analyse läuft… ({elapsed}s)",
       "progressBaseline": "Baseline-Scan läuft… ({elapsed}s)"
     },
+    "divergence": {
+      "enabledButPluginOff": "Saropa Lints ist eingeschaltet, aber die in-editor Diagnose ist aus: der Analyzer-Plugin wurde von dieser Erweiterung deaktiviert und wurde nie wiederhergestellt, daher werden Probleme nur nach einer Scan-Operation angezeigt. Die live in-editor Diagnose wiederherstellen oder nur Scan-on-Save beibehalten?",
+      "actionRestorePlugin": "Diagnose in-editor wiederherstellen",
+      "actionKeepScanOnly": "Nur beim Speichern scannen",
+      "disabledButPluginOn": "Saropa Lints ist deaktiviert, aber der Analyzer-Plugin ist immer noch in analysis_options.yaml deklariert, sodass es geladen und mehrere GB belegen wird, wenn der Dart Analyse-Server das nächste Mal startet. Deaktiviere das Plugin ebenfalls oder behalte es aktiv?",
+      "actionTurnOffPlugin": "Analysator-Plugin deaktivieren",
+      "actionKeepPluginOn": "Plugin aktivieren bleiben"
+    },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} fehlgeschlagen: {message} ist ein _PH1-Präparat.",
       "crossFileGraphExportFailed": "Saropa Lints Graph Export fehlgeschlagen: {message} ist ein _PH0_.",
