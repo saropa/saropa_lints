@@ -64,6 +64,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed (Extension)
+
+- The "Enabling Saropa Lints" progress notification stayed on a single static title for the entire `pub get` step, which can take over a minute on projects with many plugins — with nothing on screen to distinguish "still working" from "stuck," clicking Cancel (or clicking "Enable" again) mid-run was a reasonable reaction. The notification now shows which step is running and a live elapsed-time counter (e.g. "Running pub get… (45s)"). No action required.
+- Clicking "Enable" again while an enable flow was already running started a second, fully concurrent flow — both writing `pubspec.yaml`/`analysis_options.yaml` and shelling out to `pub get`/`write_config` at the same time — instead of joining the one already in progress, which could stack duplicate progress notifications and race on the same files. A second call now joins the in-flight run instead of starting a new one. The same fix applies to "Create Baseline" (`saropa_baseline.json`), which had the same gap. No action required.
+
+---
+
 ## [15.0.1]
 
 Version 15.0.1 improves the editor extension's responsiveness and resolves a file-parsing bug that prevented the plugin from re-enabling. The setup flow now executes asynchronously to prevent UI freezes, while deactivated lint configurations generate significantly smaller files by omitting unused inline documentation. [log](https://github.com/saropa/saropa_lints/blob/v15.0.1/CHANGELOG.md)

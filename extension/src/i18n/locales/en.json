@@ -1829,7 +1829,11 @@
       "actionOpenReadme": "Open README",
       "scaffoldFailed": "Scaffold failed. {details}",
       "scaffoldFailedHint": "Ensure saropa_lints is in dev_dependencies and run pub get.",
-      "alreadyOnTier": "Already on {tier} tier."
+      "alreadyOnTier": "Already on {tier} tier.",
+      "progressPubGet": "Running pub get… ({elapsed}s)",
+      "progressConfigWrite": "Writing config… ({elapsed}s)",
+      "progressAnalysis": "Running analysis… ({elapsed}s)",
+      "progressBaseline": "Running baseline scan… ({elapsed}s)"
     },
     "commands": {
       "crossFileCommandFailed": "Saropa Lints {title} failed: {message}",

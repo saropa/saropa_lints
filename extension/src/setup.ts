@@ -149,6 +149,30 @@ function killProcessTree(child: ChildProcess): void {
 }
 
 /**
+ * Reports an elapsed-time-ticking progress message (e.g. "Running pub get… (12s)")
+ * every second while `work` is in flight, so a long shelled-out step — `pub get`
+ * alone measured 112s on a 60-plugin project — reads as actively running instead
+ * of a frozen notification with no feedback (see reports/.../saropa_extension.md
+ * "cancelled by user (pub get)" — the user cancelled a step that was working
+ * normally, because nothing on screen distinguished "slow" from "stuck").
+ */
+async function withTickingProgress<T>(
+  progress: vscode.Progress<{ message?: string }>,
+  messageFor: (elapsedSeconds: number) => string,
+  work: Promise<T>,
+): Promise<T> {
+  const start = Date.now();
+  const report = () => progress.report({ message: messageFor(Math.floor((Date.now() - start) / 1000)) });
+  report();
+  const interval = setInterval(report, 1000);
+  try {
+    return await work;
+  } finally {
+    clearInterval(interval);
+  }
+}
+
+/**
  * Async sibling of `runInWorkspace` — does NOT block the extension host event loop.
  *
  * Why this exists: the synchronous `spawnSync` version freezes the entire extension
@@ -225,7 +249,26 @@ export async function runInWorkspaceAsync(
   });
 }
 
+// One in-flight `runEnable` at a time. Unlike the analysis supersede pattern
+// (cancel old, start new — safe because a rerun just reads violations), this
+// flow WRITES pubspec.yaml/analysis_options.yaml and shells out to pub get /
+// write_config: two concurrent runs could race on those files. A user
+// repeatedly clicking "Enable" while the ~2-minute pub-get step gives no
+// visible feedback (see withTickingProgress above) used to stack N identical
+// "Enabling Saropa Lints" notifications and N concurrent write/spawn
+// sequences instead of joining the one already running.
+let _enableInFlight: Promise<boolean> | undefined;
+
 export async function runEnable(context: vscode.ExtensionContext): Promise<boolean> {
+  if (_enableInFlight) return _enableInFlight;
+  const run = runEnableExclusive(context).finally(() => {
+    _enableInFlight = undefined;
+  });
+  _enableInFlight = run;
+  return run;
+}
+
+async function runEnableExclusive(context: vscode.ExtensionContext): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
     vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
@@ -243,7 +286,7 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
       // "Enabling Saropa Lints" stall with no way out but reloading the window.
       cancellable: true,
     },
-    async (_progress, token) => {
+    async (progress, token) => {
       logSection('Enable');
 
       if (!ensureSaropaLintsInPubspec(workspaceRoot)) return;
@@ -251,7 +294,11 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
 
       const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
       const pubCmd = useFlutter ? 'flutter' : 'dart';
-      const pubResult = await runInWorkspaceAsync(workspaceRoot, pubCmd, ['pub', 'get'], { token });
+      const pubResult = await withTickingProgress(
+        progress,
+        (elapsed) => l10n('notify.setup.progressPubGet', { elapsed: String(elapsed) }),
+        runInWorkspaceAsync(workspaceRoot, pubCmd, ['pub', 'get'], { token }),
+      );
       if (pubResult.cancelled) {
         logReport('- Enable cancelled by user (pub get)');
         flushReport(workspaceRoot);
@@ -289,7 +336,11 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
 
       const cfg = vscode.workspace.getConfiguration('saropaLints');
       const tier = (cfg.get<string>('tier') ?? 'recommended').trim();
-      const initResult = await runInWorkspaceAsync(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier), { token });
+      const initResult = await withTickingProgress(
+        progress,
+        (elapsed) => l10n('notify.setup.progressConfigWrite', { elapsed: String(elapsed) }),
+        runInWorkspaceAsync(workspaceRoot, 'dart', buildWriteConfigArgs(workspaceRoot, tier), { token }),
+      );
       if (initResult.cancelled) {
         logReport('- Enable cancelled by user (write_config)');
         flushReport(workspaceRoot);
@@ -303,12 +354,16 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
       }
       logReport(`- Wrote config (tier: ${tier})`);
 
-      const { cancelled: analysisCancelled } = await runAnalysisAfterConfigChangeScoped(
-        context,
-        workspaceRoot,
-        '- Ran analysis',
-        '- Ran analysis',
-        { skipEnabledCheck: true, token },
+      const { cancelled: analysisCancelled } = await withTickingProgress(
+        progress,
+        (elapsed) => l10n('notify.setup.progressAnalysis', { elapsed: String(elapsed) }),
+        runAnalysisAfterConfigChangeScoped(
+          context,
+          workspaceRoot,
+          '- Ran analysis',
+          '- Ran analysis',
+          { skipEnabledCheck: true, token },
+        ),
       );
       if (analysisCancelled) {
         logReport('- Enable cancelled by user (analysis)');
@@ -339,7 +394,23 @@ export async function runEnable(context: vscode.ExtensionContext): Promise<boole
  * extension host responsive and lets the progress UI's Cancel button kill the
  * child (and its dart grandchild) cleanly via killProcessTree.
  */
+// One in-flight `runCreateBaseline` at a time — same rationale as
+// `_enableInFlight`: it writes saropa_baseline.json, so two concurrent runs
+// could race on that file. A user clicking the command again while a large
+// project's `dart analyze` is still working (silently, before the ticking
+// progress message below existed) could otherwise stack duplicate runs.
+let _baselineInFlight: Promise<boolean> | undefined;
+
 export async function runCreateBaseline(): Promise<boolean> {
+  if (_baselineInFlight) return _baselineInFlight;
+  const run = runCreateBaselineExclusive().finally(() => {
+    _baselineInFlight = undefined;
+  });
+  _baselineInFlight = run;
+  return run;
+}
+
+async function runCreateBaselineExclusive(): Promise<boolean> {
   const workspaceRoot = getProjectRoot();
   if (!workspaceRoot) {
     void vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
@@ -353,13 +424,17 @@ export async function runCreateBaseline(): Promise<boolean> {
       title: l10n('notify.setup.baselineRunning'),
       cancellable: true,
     },
-    async (_progress, token) => {
+    async (progress, token) => {
       logSection('Create Baseline');
-      const result = await runInWorkspaceAsync(
-        workspaceRoot,
-        'dart',
-        ['run', 'saropa_lints:baseline'],
-        { token },
+      const result = await withTickingProgress(
+        progress,
+        (elapsed) => l10n('notify.setup.progressBaseline', { elapsed: String(elapsed) }),
+        runInWorkspaceAsync(
+          workspaceRoot,
+          'dart',
+          ['run', 'saropa_lints:baseline'],
+          { token },
+        ),
       );
       // User-initiated cancel is not an error: leave the report quiet and skip
       // both the success and failure toasts.
