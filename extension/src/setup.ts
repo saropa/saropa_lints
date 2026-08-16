@@ -111,15 +111,27 @@ function ensureSaropaLintsInPubspec(workspaceRoot: string): PubspecEnsureResult 
  * outside this extension (a hand-bumped constraint, a merge, the upgrade
  * checker) leaves the manifest newer than the resolution, and in that case the
  * resolve is genuinely stale and must not be skipped.
+ *
+ * pubspec.lock is checked alongside package_config.json because presence in
+ * package_config proves only that SOME version of saropa_lints is on disk, not
+ * that it satisfies the current constraint. The lock is what pub rewrites when
+ * a constraint change selects a different version, so requiring the lock to be
+ * no older than the manifest is what makes "already resolved" mean "resolved
+ * against THIS pubspec" — without needing a semver parser in the extension.
  */
 export function isSaropaLintsAlreadyResolved(workspaceRoot: string): boolean {
-  const pkgConfigPath = path.join(workspaceRoot, '.dart_tool', 'package_config.json');
   const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
+  const mustBeFresh = [
+    path.join(workspaceRoot, '.dart_tool', 'package_config.json'),
+    path.join(workspaceRoot, 'pubspec.lock'),
+  ];
   try {
     if (!resolvesSaropaLints(workspaceRoot)) return false;
-    return fs.statSync(pkgConfigPath).mtimeMs >= fs.statSync(pubspecPath).mtimeMs;
+    const pubspecMs = fs.statSync(pubspecPath).mtimeMs;
+    return mustBeFresh.every((file) => fs.statSync(file).mtimeMs >= pubspecMs);
   } catch {
-    // Missing or unreadable package_config => never resolved => run pub get.
+    // Missing or unreadable artifact (no lock, no package_config) => not
+    // resolved as far as we can prove => run pub get.
     return false;
   }
 }
@@ -158,11 +170,15 @@ export function runInWorkspace(workspaceRoot: string, command: string, args: str
     const ch = getOutputChannel();
     ch.appendLine(`$ ${command} ${args.join(' ')}`);
   }
+  // Timed like the async variant — this path (analyze-for-files) blocks the
+  // extension host outright, so its duration is the one most worth recording.
+  const startedMs = Date.now();
   const result = spawnSync(command, args, {
     cwd: workspaceRoot,
     encoding: 'utf-8',
     shell: true,
   });
+  logCommandTiming(command, args, startedMs, `exit ${result.status}`);
   const stdout = (result.stdout ?? '') as string;
   const stderr = (result.stderr || result.error?.message || '') as string;
   if (logToOutput) {
@@ -175,6 +191,30 @@ export function runInWorkspace(workspaceRoot: string, command: string, args: str
     stderr,
     stdout,
   };
+}
+
+/**
+ * Records how long a shelled-out command ran, in the extension report and the
+ * output channel.
+ *
+ * Kept to one line per command with the elapsed seconds first, so a report can
+ * be scanned for the slow step without reading the surrounding narrative. The
+ * arguments are truncated because analyze-for-files passes one path per changed
+ * file and would otherwise bury the timing in a wall of paths.
+ */
+function logCommandTiming(
+  command: string,
+  args: string[],
+  startedMs: number,
+  outcome: string,
+): void {
+  const seconds = ((Date.now() - startedMs) / 1000).toFixed(1);
+  const MAX_ARGS_SHOWN = 4;
+  const shown = args.slice(0, MAX_ARGS_SHOWN).join(' ');
+  const more = args.length > MAX_ARGS_SHOWN ? ` (+${args.length - MAX_ARGS_SHOWN} more)` : '';
+  const line = `- timing: ${seconds}s — ${command} ${shown}${more} [${outcome}]`;
+  logReport(line);
+  getOutputChannel().appendLine(line);
 }
 
 /**
@@ -252,6 +292,13 @@ export async function runInWorkspaceAsync(
   const ch = logToOutput ? getOutputChannel() : undefined;
   ch?.appendLine(`$ ${command} ${args.join(' ')}`);
 
+  // Every shelled-out command is timed into the extension report. The whole
+  // `flutter pub get` incident (116 s vs 1.9 s for the same work) took a manual
+  // stopwatch session to identify because nothing recorded how long these
+  // children actually ran — the next "it feels slow" report should arrive with
+  // the numbers already in it.
+  const startedMs = Date.now();
+
   return new Promise((resolve) => {
     const child = spawn(command, args, {
       cwd: workspaceRoot,
@@ -296,6 +343,7 @@ export async function runInWorkspaceAsync(
     // Resolve on `close` (not `exit`) so stdout/stderr pipes are fully flushed.
     child.on('close', (code) => {
       cancelSub?.dispose();
+      logCommandTiming(command, args, startedMs, cancelled ? 'cancelled' : `exit ${code}`);
       resolve({
         ok: !cancelled && code === 0,
         stderr: cancelled && !stderr ? 'Cancelled by user.' : stderr,
@@ -366,6 +414,13 @@ export async function resolveDependencies(
   if (dartResult.ok || dartResult.cancelled) return { ...dartResult, command: 'dart' };
 
   if (!shouldRetryWithFlutter(workspaceRoot, dartResult.stderr)) {
+    // The regex above is matched against wording that changes between SDK
+    // releases. If it ever stops matching a genuine Flutter-SDK failure, the
+    // user would otherwise see a bare "pub get failed" and no route forward —
+    // so on any Flutter project the failure carries the manual escape hatch.
+    if (hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'))) {
+      logReport('- dart pub get failed on a Flutter project and did not look like an SDK-resolution error; if this was one, run `flutter pub get` manually and report it');
+    }
     return { ...dartResult, command: 'dart' };
   }
 

@@ -73,6 +73,12 @@ Switching Lint integration on is now near-instant instead of a two-minute wait t
 - Turning Lint integration on took around two minutes on a Flutter project and looked frozen, so it got canceled and the project seemed impossible to re-enable. The extension now runs `dart` rather than `flutter` for `pub get` and `analyze` — the same work without the Flutter tool's startup cost, measured at 1.9 s versus 116 s on the same project — and skips `pub get` entirely when `pubspec.yaml` is unchanged and the package is already resolved. No action required.
 - Upgrading the saropa_lints version from the extension paid the same two-minute Flutter startup cost on every upgrade. It now uses the same fast path, falling back to Flutter only when the resolve genuinely fails on the Flutter SDK. No action required.
 
+<details><summary>Maintenance</summary>
+
+- (Extension) Every command the extension shells out to is now timed into the extension report and output channel, so a slowness report carries its own measurements instead of needing a stopwatch. No action required.
+
+</details>
+
 ---
 
 ## [15.0.3]

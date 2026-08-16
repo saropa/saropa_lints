@@ -35,7 +35,7 @@ function makeProject(): string {
  */
 function seed(
   root: string,
-  options: { packages: string[]; pkgConfigOffsetMs: number },
+  options: { packages: string[]; pkgConfigOffsetMs: number; lockOffsetMs?: number },
 ): void {
   const pubspecPath = path.join(root, 'pubspec.yaml');
   fs.writeFileSync(pubspecPath, 'name: demo\ndev_dependencies:\n  saropa_lints: ^15.0.3\n');
@@ -48,9 +48,18 @@ function seed(
     JSON.stringify({ packages: options.packages.map((name) => ({ name })) }),
   );
 
+  // The lock defaults to the same freshness as package_config; a test that
+  // cares about a stale lock overrides it via lockOffsetMs.
+  const lockPath = path.join(root, 'pubspec.lock');
+  fs.writeFileSync(lockPath, 'packages:\n  saropa_lints:\n    version: "15.0.3"\n');
+
   const pubspecMtime = fs.statSync(pubspecPath).mtime;
-  const shifted = new Date(pubspecMtime.getTime() + options.pkgConfigOffsetMs);
-  fs.utimesSync(pkgConfigPath, shifted, shifted);
+  const shift = (file: string, offsetMs: number) => {
+    const at = new Date(pubspecMtime.getTime() + offsetMs);
+    fs.utimesSync(file, at, at);
+  };
+  shift(pkgConfigPath, options.pkgConfigOffsetMs);
+  shift(lockPath, options.lockOffsetMs ?? options.pkgConfigOffsetMs);
 }
 
 describe('isSaropaLintsAlreadyResolved', () => {
@@ -71,6 +80,26 @@ describe('isSaropaLintsAlreadyResolved', () => {
   it('runs pub get when saropa_lints is absent from package_config', () => {
     const root = makeProject();
     seed(root, { packages: ['flutter'], pkgConfigOffsetMs: 1000 });
+    assert.strictEqual(isSaropaLintsAlreadyResolved(root), false);
+  });
+
+  it('runs pub get when the lock is stale even though package_config is fresh', () => {
+    // The constraint moved and pub has not re-locked: package_config still
+    // lists saropa_lints, but at whatever version the OLD constraint chose.
+    // Presence alone would wrongly report this as resolved.
+    const root = makeProject();
+    seed(root, {
+      packages: ['flutter', 'saropa_lints'],
+      pkgConfigOffsetMs: 1000,
+      lockOffsetMs: -5000,
+    });
+    assert.strictEqual(isSaropaLintsAlreadyResolved(root), false);
+  });
+
+  it('runs pub get when there is no lock file at all', () => {
+    const root = makeProject();
+    seed(root, { packages: ['saropa_lints'], pkgConfigOffsetMs: 1000 });
+    fs.rmSync(path.join(root, 'pubspec.lock'));
     assert.strictEqual(isSaropaLintsAlreadyResolved(root), false);
   });
 
