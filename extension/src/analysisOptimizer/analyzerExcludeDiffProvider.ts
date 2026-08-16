@@ -2,6 +2,10 @@ import * as vscode from 'vscode';
 
 export const PREVIEW_SCHEME = 'saropa-analyzer-exclude-preview';
 
+// Virtual document provider so the "proposed exclusions" diff can be shown
+// against the real file without ever writing the proposed content to disk
+// (VS Code's diff editor only reads registered TextDocumentContentProviders
+// for non-file URI schemes).
 class AnalyzerExcludePreviewProvider implements vscode.TextDocumentContentProvider {
   private readonly _content = new Map<string, string>();
   private readonly _onDidChange = new vscode.EventEmitter<vscode.Uri>();
@@ -35,6 +39,8 @@ export async function showAnalyzerExcludeDiff(
   title: string,
 ): Promise<void> {
   if (!_provider) return;
+  // Query string uniquifies the URI per call so VS Code doesn't reuse a
+  // cached editor for a stale previous proposal when this is invoked twice.
   const previewUri = vscode.Uri.parse(`${PREVIEW_SCHEME}:/analysis_options.yaml?${Date.now()}`);
   _provider.set(previewUri, proposedContent);
   const fileUri = vscode.Uri.file(filePath);

@@ -3,6 +3,9 @@ import 'package:saropa_lints/src/project_context.dart' show FileContentCache;
 import 'package:test/test.dart';
 
 void main() {
+  // Covers the balanced/full mode toggle plus the CLI override, since the
+  // two flags interact (markCli forces filtering off even in balanced mode)
+  // and a regression there would silently change scan output.
   group('MemoryModeConfig', () {
     setUp(MemoryModeConfig.resetForTest);
 
@@ -33,6 +36,9 @@ void main() {
     });
   });
 
+  // Covers the incremental-analysis cache: a file's content hash gates
+  // whether per-rule pass results are trusted, so any drift here would
+  // cause stale rule results to be reused after a file actually changed.
   group('FileContentCache pass/revoke lifecycle', () {
     setUp(FileContentCache.clearCache);
 

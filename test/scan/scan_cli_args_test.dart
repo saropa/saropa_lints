@@ -232,11 +232,7 @@ void main() {
 
     test('--min-severity with next option as value returns invalid', () {
       // --format looks like a flag, not a severity value.
-      final result = parseScanArgs(<String>[
-        '.',
-        '--min-severity',
-        '--format',
-      ]);
+      final result = parseScanArgs(<String>['.', '--min-severity', '--format']);
       expect(result, isA<ScanParseInvalid>());
     });
 
@@ -316,37 +312,39 @@ void main() {
   });
 
   group('--min-severity filtering (process)', () {
-    test('--min-severity error with no errors exits 0 with threshold message',
-        () async {
-      // Runs against the project itself with --tier essential (mostly info/warning),
-      // filtered to ERROR-only — expect exit 0 and the "below threshold" message.
-      final result = await Process.run(
-        'dart',
-        [
-          'run',
-          'saropa_lints:scan',
-          '.',
-          '--tier',
-          'essential',
-          '--min-severity',
-          'error',
-          '--files',
-          'lib/src/scan/scan_cli_args.dart',
-        ],
-        runInShell: true,
-        workingDirectory: Directory.current.path,
-      );
-      // If there are no error-level diagnostics in this file, expect exit 0
-      // and either "No issues found" or the "below threshold" message.
-      if (result.exitCode == 0) {
-        final stdout = result.stdout.toString();
-        expect(
-          stdout.contains('No issues') || stdout.contains('below threshold'),
-          isTrue,
-          reason: 'Expected clean or threshold message, got: $stdout',
+    test(
+      '--min-severity error with no errors exits 0 with threshold message',
+      () async {
+        // Runs against the project itself with --tier essential (mostly info/warning),
+        // filtered to ERROR-only — expect exit 0 and the "below threshold" message.
+        final result = await Process.run(
+          'dart',
+          [
+            'run',
+            'saropa_lints:scan',
+            '.',
+            '--tier',
+            'essential',
+            '--min-severity',
+            'error',
+            '--files',
+            'lib/src/scan/scan_cli_args.dart',
+          ],
+          runInShell: true,
+          workingDirectory: Directory.current.path,
         );
-      }
-    });
+        // If there are no error-level diagnostics in this file, expect exit 0
+        // and either "No issues found" or the "below threshold" message.
+        if (result.exitCode == 0) {
+          final stdout = result.stdout.toString();
+          expect(
+            stdout.contains('No issues') || stdout.contains('below threshold'),
+            isTrue,
+            reason: 'Expected clean or threshold message, got: $stdout',
+          );
+        }
+      },
+    );
 
     test('--min-severity invalid value exits 2', () async {
       final result = await Process.run(

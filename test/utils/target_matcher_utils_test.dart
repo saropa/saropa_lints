@@ -3,7 +3,13 @@ import 'package:test/test.dart';
 
 import '../helpers/parse_class_method.dart';
 
+// Covers the two independent cleanup-detection strategies
+// (regex over raw source vs AST cascade walking) plus the combined
+// entry point, since a regression in either path alone would slip
+// past callers that only exercise `isFieldCleanedUp`.
 void main() {
+  // Regex path operates on raw source text, so it must be checked
+  // against dot-call, null-aware, and cascade syntax independently.
   group('isFieldCleanedUpInSource - regex path', () {
     test('plain dot call', () {
       expect(
@@ -85,6 +91,8 @@ void main() {
     });
   });
 
+  // AST path is required for cascades since the regex path cannot
+  // reliably track nested/closure-embedded cascade sections.
   group('hasCascadeCleanup - AST path', () {
     test('single cascade section: field..dispose()', () {
       final body = parseMethodBody('dispose', '''
@@ -175,6 +183,8 @@ class S {
     });
   });
 
+  // Predicate variant lets callers match cleanup method families
+  // (e.g. anything containing "dispose") instead of one exact name.
   group('hasCascadeCleanupWhere - predicate matching', () {
     test('matches disposeSafe via predicate', () {
       final body = parseMethodBody('dispose', '''
@@ -195,6 +205,8 @@ class S {
     });
   });
 
+  // Combined entry point is what rules actually call; verifies it
+  // falls through to AST cascade detection when the regex path misses.
   group('isFieldCleanedUp - combined regex + AST', () {
     test('direct call via regex', () {
       final body = parseMethodBody('dispose', '''

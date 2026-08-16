@@ -21,8 +21,13 @@ ANALYSIS_OPTIONS = Path('analysis_options.yaml')
 
 INCLUDE_LINE = 'include: package:lints/recommended.yaml\n'
 
-
+# Matches YAML document boundary markers so the include line is inserted
+# after them rather than splitting the document (analyzer treats a `---`
+# inserted mid-document as a new empty document).
 _YAML_DOC_MARKER = re.compile(r'^(---|\.\.\.)\s*$')
+# Matches the `lib/**` exclude entry (with or without quotes) so it can be
+# stripped for this check only — the real config excludes lib/ from
+# analysis, but this script needs lib/ analyzed to catch regressions.
 _LIB_EXCLUDE = re.compile(r'^(\s*-\s*)["\']?lib/\*\*["\']?\s*$')
 
 
@@ -75,6 +80,8 @@ def main() -> int:
         patched = _patch(original)
         ANALYSIS_OPTIONS.write_text(patched, encoding='utf-8')
 
+        # Nested try so the outer `finally` always restores the file even
+        # if dart itself is missing or hangs, not just on lint failures.
         try:
             result = subprocess.run(
                 ['dart', 'analyze', 'lib/'],
@@ -103,6 +110,8 @@ def main() -> int:
         return 1
 
     finally:
+        # Always restore the original file, even on crash/timeout, so a
+        # failed check run never leaves the repo's real config mutated.
         ANALYSIS_OPTIONS.write_bytes(original_bytes)
 
 

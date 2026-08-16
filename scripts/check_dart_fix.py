@@ -11,7 +11,9 @@ import re
 import subprocess
 import sys
 
-
+# Multiple patterns because `dart fix --dry-run` output wording has
+# changed across SDK versions (e.g. "fixes made" vs "fixes available");
+# each pattern targets one known summary-line phrasing.
 _FIX_PATTERNS = [
     re.compile(r'(\d+)\s+fix(?:es)?\s+(?:made|available)'),
     re.compile(r'(\d+)\s+fix(?:es)?\s+in\s+\d+\s+file'),
@@ -25,6 +27,8 @@ def _parse_fix_count(output: str) -> int:
         if match:
             return int(match.group(1))
 
+    # Fallback: no summary line matched, so sum the per-file "- N fix"
+    # breakdown lines instead of reporting a false zero.
     per_file = re.findall(r'-\s+(\d+)\s+fix', output)
     if per_file:
         return sum(int(n) for n in per_file)
@@ -47,6 +51,8 @@ def main() -> int:
         print('ERROR: dart fix --dry-run timed out after 300s.')
         return 2
 
+    # dart fix writes some summary lines to stderr depending on SDK version,
+    # so both streams must be searched together.
     output = result.stdout + result.stderr
     fix_count = _parse_fix_count(output)
 

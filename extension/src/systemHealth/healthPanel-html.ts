@@ -11,6 +11,10 @@ export interface HealthPanelData {
   totalRssBytes: number;
 }
 
+// Renders the full panel document (not a partial update) because the
+// webview has no incremental-DOM path — every refresh/kill action
+// reassigns webview.html wholesale, so client-side JS re-applies its own
+// sort/scroll state on load (see healthPanel-script.ts).
 export function buildHealthPanelHtml(data: HealthPanelData | null): string {
   const nonce = createWebviewCspNonce();
   const styles = getHealthPanelStyles();
@@ -67,6 +71,9 @@ function buildTableHtml(data: HealthPanelData): string {
     const isOrphan = data.orphanPids.has(p.processId);
     const isDaemon = isDaemonProcess(p);
 
+    // Orphan takes priority over daemon in the type pill because an
+    // orphaned daemon is the actionable case (has a kill button below);
+    // a live daemon with a parent is normal and not worth flagging.
     let typePill: string;
     if (isOrphan) {
       typePill = `<span class="pill pill-orphan">${escapeHtml(l10n('systemHealth.panel.typeOrphan'))}</span>`;

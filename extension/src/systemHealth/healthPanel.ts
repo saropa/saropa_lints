@@ -4,10 +4,16 @@ import { queryDartProcesses, buildSnapshot, killProcess } from './processQuery';
 import { buildHealthPanelHtml } from './healthPanel-html';
 import type { HealthPanelData } from './healthPanel-html';
 
+// Singleton webview panel: only one System Health view makes sense at a
+// time, so re-invoking the command reveals + refreshes the existing panel
+// instead of spawning a duplicate.
 export class HealthPanel implements vscode.Disposable {
   private static instance: HealthPanel | undefined;
   private readonly panel: vscode.WebviewPanel;
   private readonly disposables: vscode.Disposable[] = [];
+  // Guards async callbacks (refresh/kill) that may resolve after the user
+  // closed the panel — without this, a late webview.html write would throw
+  // on a disposed webview.
   private disposed = false;
 
   static createOrShow(context: vscode.ExtensionContext): void {
@@ -45,6 +51,9 @@ export class HealthPanel implements vscode.Disposable {
   }
 
   private async queryData(): Promise<HealthPanelData | null> {
+    // Process enumeration (queryDartProcesses) shells out to a Windows-only
+    // tool; on other platforms there is no data source, so show the empty
+    // state rather than attempting a query that would just fail.
     if (process.platform !== 'win32') return null;
     const processes = await queryDartProcesses();
     if (processes.length === 0) return null;
@@ -66,6 +75,7 @@ export class HealthPanel implements vscode.Disposable {
 
   private async killAndNotify(pid: number): Promise<void> {
     const success = await killProcess(pid);
+    // killProcess is async and the panel may have closed while it ran.
     if (this.disposed) return;
     void this.panel.webview.postMessage({
       type: 'killResult',
@@ -78,6 +88,8 @@ export class HealthPanel implements vscode.Disposable {
   }
 
   dispose(): void {
+    // Set before clearing instance/disposables so any in-flight async
+    // callback (refresh/kill) sees disposed=true on its next check.
     this.disposed = true;
     HealthPanel.instance = undefined;
     for (const d of this.disposables) d.dispose();

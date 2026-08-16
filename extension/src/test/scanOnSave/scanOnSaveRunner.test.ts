@@ -1,6 +1,9 @@
 import * as assert from 'node:assert';
 import { buildScanOnSaveArgs, parseScanOnSaveOutput } from '../../scanOnSave/scanOnSaveRunner';
 
+// Arg order matters here: parseScanArgs (the CLI's own arg parser) takes
+// the first non-flag token as the project path, so a regression that
+// reorders these would silently break scan-on-save without any type error.
 describe('buildScanOnSaveArgs', () => {
   it('puts the project root first (parseScanArgs takes the FIRST non-flag token as path)', () => {
     const args = buildScanOnSaveArgs('D:/src/contacts', ['lib/main.dart'], 'recommended', false);
@@ -28,6 +31,9 @@ describe('buildScanOnSaveArgs', () => {
   });
 });
 
+// The CLI subprocess can produce empty stdout or malformed JSON on crash;
+// parseScanOnSaveOutput must degrade to null rather than throwing, since
+// an uncaught exception here would break the save-triggered scan silently.
 describe('parseScanOnSaveOutput', () => {
   it('parses a valid payload with diagnostics', () => {
     const raw = JSON.stringify({

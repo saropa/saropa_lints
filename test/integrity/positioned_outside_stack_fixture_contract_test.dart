@@ -28,7 +28,8 @@ void main() {
     expect(
       pattern.hasMatch(body),
       isTrue,
-      reason: 'Fixture must declare // expect_lint: avoid_positioned_outside_stack',
+      reason:
+          'Fixture must declare // expect_lint: avoid_positioned_outside_stack',
     );
   });
 

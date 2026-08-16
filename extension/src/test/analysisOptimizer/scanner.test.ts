@@ -1,6 +1,10 @@
 import * as assert from 'assert';
 import { computeFileMetrics } from '../../analysisOptimizer/scanner';
 
+// computeFileMetrics drives the exclude-pattern cost estimates shown in
+// the Analysis Optimizer panel, so its widget/async/generated heuristics
+// need explicit positive AND negative cases — a false positive here would
+// misclassify ordinary data classes as expensive widget files.
 describe('scanner computeFileMetrics', () => {
   it('counts imports, classes, and lines', () => {
     const content = `import 'package:flutter/material.dart';

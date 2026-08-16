@@ -1,5 +1,7 @@
 import { getDashboardChromeStyles } from '../views/dashboardChromeStyles';
 
+// Extends the shared dashboard chrome so this panel matches the other
+// vibrancy/views panels without duplicating base layout/typography rules.
 export function getHealthPanelStyles(): string {
   return `${getDashboardChromeStyles()}
 .health-table {
@@ -44,6 +46,9 @@ export function getHealthPanelStyles(): string {
   font-size: 11px;
   font-weight: 600;
 }
+/* Orphan/daemon/process colors track VS Code's own error/warning/info
+   theme tokens so the severity read (red=orphan) stays consistent with
+   the rest of the editor UI across light/dark/high-contrast themes. */
 .pill-orphan {
   background: var(--vscode-editorError-foreground, #f14c4c);
   color: #fff;

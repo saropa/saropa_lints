@@ -1,8 +1,14 @@
+// Returned as a raw string (not a .js file) because it is injected
+// directly into the webview's <script> tag under a CSP nonce — the
+// panel has no bundler step for webview-side code.
 export function getOptimizerScript(): string {
   return `
 (function() {
   const vscode = acquireVsCodeApi();
 
+  // Single delegated listener for the whole panel body since rows/buttons
+  // are recreated on every full-HTML re-render (see below) — per-element
+  // listeners would be silently dropped each time.
   document.addEventListener('click', function(e) {
     const target = e.target;
     if (!target) return;
@@ -70,6 +76,8 @@ export function getOptimizerScript(): string {
     }
   });
 
+  // Keeps the bulk-apply button's enabled state in sync with checkbox
+  // selection without a full row-count recompute on every keystroke path.
   function updateApplySelected() {
     var btn = document.getElementById('apply-selected-btn');
     if (!btn) return;
