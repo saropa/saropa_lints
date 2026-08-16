@@ -8,6 +8,7 @@ library;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/element.dart';
 
 import '../../fixes/memory_management/add_mounted_check_fix.dart';
 import '../../saropa_lint_rule.dart';
@@ -116,17 +117,25 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
                 break;
               }
 
-              // Extract all variable names from this field declaration
-              final List<String> fieldNames = <String>[
-                for (final VariableDeclaration v in member.fields.variables)
+              // Check each variable independently — multi-variable
+              // declarations (`List<X> a, b;`) need per-variable tracking
+              // so that `b`'s reassignment doesn't suppress `a`'s growth.
+              bool anyAccumulates = false;
+              for (final VariableDeclaration v in member.fields.variables) {
+                // Resolve the declared element for shadow-safe matching.
+                // Falls back to string name if resolution fails.
+                final Element? fieldElement =
+                    v.declaredFragment?.element;
+                if (!_isReplacedNotAccumulated(
+                  node,
                   v.name.lexeme,
-              ];
-
-              // AST-walk method bodies to classify field usage as
-              // "replaced" (suppress) vs. "accumulated" (fire).
-              if (_isReplacedNotAccumulated(node, fieldNames)) {
-                break;
+                  fieldElement: fieldElement,
+                )) {
+                  anyAccumulates = true;
+                  break;
+                }
               }
+              if (!anyAccumulates) break;
 
               reporter.atNode(member);
               break;
@@ -137,7 +146,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
     });
   }
 
-  /// Whether every usage of [fieldNames] in method/constructor bodies of
+  /// Whether every usage of [fieldName] in method/constructor bodies of
   /// [classNode] is a full reassignment (`field = <expr>`) with no
   /// accumulating mutations (`.add()`, `+=`, etc.).
   ///
@@ -151,15 +160,28 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
   /// `reset()`) does NOT suppress subscript-writes in `store()`.
   static bool _isReplacedNotAccumulated(
     ClassDeclaration classNode,
-    List<String> fieldNames,
-  ) {
-    final Set<String> names = fieldNames.toSet();
+    String fieldName, {
+    Element? fieldElement,
+  }) {
+    final Set<String> names = <String>{fieldName};
     bool hasReassignment = false;
     bool hasAccumulation = false;
 
     // Walk each method/constructor body independently to track
     // per-method subscript-write + reassignment co-occurrence.
     for (final ClassMember member in classNode.bodyMembers) {
+      // Constructor initializer lists (`: field = expr`) are NOT in
+      // `.body` — check them separately. A `ConstructorFieldInitializer`
+      // that assigns our field is a full reassignment.
+      if (member is ConstructorDeclaration) {
+        for (final ConstructorInitializer init in member.initializers) {
+          if (init is ConstructorFieldInitializer &&
+              init.fieldName.name == fieldName) {
+            hasReassignment = true;
+          }
+        }
+      }
+
       FunctionBody? body;
       if (member is MethodDeclaration) {
         body = member.body;
@@ -173,6 +195,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
       final _FieldMutationVisitor visitor = _FieldMutationVisitor(
         names,
         _accumulatingMethods,
+        fieldElement: fieldElement,
       );
       body.accept(visitor);
 
@@ -210,10 +233,19 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
 ///   accumulation when no full reassignment exists.
 /// - **Full reassignment:** `field = <expr>` — replaces the collection.
 class _FieldMutationVisitor extends RecursiveAstVisitor<void> {
-  _FieldMutationVisitor(this._fieldNames, this._accumulatingMethods);
+  _FieldMutationVisitor(
+    this._fieldNames,
+    this._accumulatingMethods, {
+    this.fieldElement,
+  });
 
   final Set<String> _fieldNames;
   final Set<String> _accumulatingMethods;
+
+  /// Resolved element for the field declaration. When non-null, identifier
+  /// matching uses element identity (shadow-safe). Falls back to string
+  /// name matching when null (e.g. if type resolution was unavailable).
+  final Element? fieldElement;
 
   /// `.add()`, `.addAll()`, `+=`, self-cascade — always unbounded.
   bool hasHardAccumulation = false;
@@ -229,7 +261,7 @@ class _FieldMutationVisitor extends RecursiveAstVisitor<void> {
     final Expression left = node.leftHandSide;
 
     // `field = <expr>` — full reassignment (simple `=` operator)
-    if (left is SimpleIdentifier && _fieldNames.contains(left.name)) {
+    if (left is SimpleIdentifier && _matchesField(left)) {
       if (node.operator.lexeme == '=') {
         // Check for self-reassigning cascade: `field = field..add(x)`.
         // The RHS is a CascadeExpression whose target is the same field,
@@ -237,15 +269,19 @@ class _FieldMutationVisitor extends RecursiveAstVisitor<void> {
         final Expression rhs = node.rightHandSide;
         if (rhs is CascadeExpression) {
           final Expression target = rhs.target;
-          if (target is SimpleIdentifier && target.name == left.name) {
+          if (target is SimpleIdentifier && _matchesField(target)) {
             hasHardAccumulation = true;
             super.visitAssignmentExpression(node);
             return;
           }
         }
         hasReassignment = true;
+      } else if (node.operator.lexeme == '??=') {
+        // `field ??= []` is a conditional reassignment (lazy init),
+        // not accumulation — it replaces when null, doesn't grow.
+        hasReassignment = true;
       } else {
-        // Compound assignment: `+=`, `??=`, etc. — hard accumulation
+        // Compound assignment: `+=`, `<<=`, etc. — hard accumulation
         hasHardAccumulation = true;
       }
     }
@@ -272,17 +308,33 @@ class _FieldMutationVisitor extends RecursiveAstVisitor<void> {
     super.visitMethodInvocation(node);
   }
 
+  /// Whether [id] resolves to the tracked field. Uses element identity
+  /// when available (immune to shadowed locals with the same name),
+  /// falling back to string name matching otherwise.
+  bool _matchesField(SimpleIdentifier id) {
+    final Element? fe = fieldElement;
+    if (fe != null) {
+      // Element-resolved: `.element` on a SimpleIdentifier gives the
+      // declaration the reference binds to. Shadowed locals resolve
+      // to a different element, so they won't spuriously match.
+      final Element? refElement = id.element;
+      if (refElement != null) {
+        return identical(refElement, fe) || refElement == fe;
+      }
+    }
+    // Fallback: match by name when element resolution is unavailable
+    return _fieldNames.contains(id.name);
+  }
+
   /// Whether [expr] is a `SimpleIdentifier` referencing one of the tracked
   /// fields, possibly wrapped in a null-assertion (`field!`).
   bool _isFieldReference(Expression? expr) {
     if (expr is SimpleIdentifier) {
-      return _fieldNames.contains(expr.name);
+      return _matchesField(expr);
     }
     // `field!.add(x)` or `field![k] = v` — PostfixExpression with `!`
     if (expr is PostfixExpression && expr.operand is SimpleIdentifier) {
-      return _fieldNames.contains(
-        (expr.operand as SimpleIdentifier).name,
-      );
+      return _matchesField(expr.operand as SimpleIdentifier);
     }
     return false;
   }

@@ -76,7 +76,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - `verify_documented_parameters_exist` no longer flags valid dartdoc cross-references to methods, functions, or getters as stale parameter names. No action required.
 - `require_ignore_comment_plugin_prefix` now validates the suffix of already-prefixed ignore comments against the rule registry. A prefixed name that doesn't match any registered rule (typo, renamed rule, or fabricated name) now produces a diagnostic with a "did you mean?" suggestion and a quick fix to auto-replace the typo. No action required.
 - `avoid_high_cyclomatic_complexity` no longer flags flat switch dispatch tables where every case is a single return, break, or expression with no nested branching — these are enum-to-value lookups with mechanical complexity, not logical branching. No action required.
-- `avoid_large_objects_in_state` no longer flags collection fields that are reassigned wholesale in method bodies without accumulating mutations. Fields replaced via `field = <fresh collection>` (e.g. recomputed caches derived from widget props) are now recognized as bounded-by-replacement. No action required.
+- `avoid_large_objects_in_state` no longer flags collection fields that are reassigned wholesale in method bodies without accumulating mutations. Accumulation detection now uses element-resolved field matching (immune to shadowed locals), per-variable tracking for multi-variable declarations, constructor initializer list walking, and treats `??=` as a conditional reassignment instead of growth. No action required.
 
 <details><summary>Maintenance</summary>
 

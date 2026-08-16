@@ -202,3 +202,42 @@ class _bad471__SelfReassigningCascadeState extends State<MyWidget> {
     log = log..add(entry); // self-reassigning cascade, still accumulates
   }
 }
+
+// GOOD: Field reassigned in constructor initializer list (`: field = expr`).
+// Constructor initializer lists are NOT in `.body` — the rule must still
+// recognize the reassignment to suppress the diagnostic.
+class _good470__ConstructorInitializerState extends State<MyWidget> {
+  List<String> items; // no LINT — reassigned via constructor initializer
+
+  _good470__ConstructorInitializerState(List<String> initial) : items = initial;
+
+  void refresh(List<String> newItems) {
+    items = newItems; // also reassigned in method body
+  }
+}
+
+// GOOD: Field lazily initialized via `??=` — conditional reassignment, not
+// unbounded growth. The field starts null and gets assigned once.
+class _good471__LazyInitState extends State<MyWidget> {
+  List<String>? _cached; // no LINT — lazy init via ??=
+
+  List<String> get cached => _cached ??= _computeExpensive();
+
+  List<String> _computeExpensive() => <String>[];
+}
+
+// BAD: Multi-variable declaration where one variable accumulates but the
+// other is reassigned. The reassignment of `b` must NOT suppress the
+// diagnostic for `a`'s accumulation — per-variable tracking required.
+// expect_lint: avoid_large_objects_in_state
+class _bad472__MultiVarMixedState extends State<MyWidget> {
+  List<String> a = [], b = []; // LINT — `a` accumulates, `b`'s reassignment shouldn't suppress
+
+  void grow() {
+    a.add('item'); // accumulation on `a`
+  }
+
+  void reset() {
+    b = <String>[]; // reassignment of `b` only
+  }
+}
