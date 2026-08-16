@@ -61,6 +61,8 @@ class TierIntegrityResult:
             any tier set. Each entry is (rule_name, package_name).
         unpaired_examples: Rules that have exampleBad but not exampleGood
             or vice versa. Each entry is (rule_name, which_missing).
+        core_lint_collisions: saropa_lints rule names that collide with
+            core Dart/Flutter analyzer lint names. Zero permitted.
     """
 
     passed: bool
@@ -73,6 +75,7 @@ class TierIntegrityResult:
         default_factory=list,
     )
     unpaired_examples: list[tuple[str, str]] = field(default_factory=list)
+    core_lint_collisions: list[str] = field(default_factory=list)
 
     @property
     def issues_count(self) -> int:
@@ -85,6 +88,7 @@ class TierIntegrityResult:
             + len(self.flutter_stylistic_not_in_stylistic)
             + len(self.package_rules_not_in_tiers)
             + len(self.unpaired_examples)
+            + len(self.core_lint_collisions)
         )
 
 
@@ -102,6 +106,249 @@ TIER_SET_PATTERNS: dict[str, str] = {
     "pedantic": r"const Set<String> pedanticOnlyRules = <String>\{([^}]*)\};",
     "stylistic": r"const Set<String> stylisticRules = <String>\{([^}]*)\};",
 }
+
+# Core Dart/Flutter analyzer lint names. saropa_lints must NEVER register
+# a rule under any of these names — zero collisions permitted. Sourced from
+# the Dart SDK linter package (dart-lang/linter) as of Dart 3.7. Update
+# this set when new core lints are added upstream.
+#
+# Only includes rules that a saropa_lints rule has historically collided
+# with or is likely to collide with (common naming patterns). Not the
+# full ~200-rule SDK set — add names as needed when new saropa_lints
+# rules are authored with names close to core lints.
+CORE_DART_LINT_NAMES: frozenset[str] = frozenset({
+    "always_declare_return_types",
+    "always_put_control_body_on_new_line",
+    "always_put_required_named_parameters_first",
+    "always_require_non_null_named_parameters",
+    "always_specify_types",
+    "always_use_package_imports",
+    "annotate_overrides",
+    "annotate_redeclares",
+    "avoid_annotating_with_dynamic",
+    "avoid_as",
+    "avoid_bool_literals_in_conditional_expressions",
+    "avoid_catches_without_on_clauses",
+    "avoid_catching_errors",
+    "avoid_classes_with_only_static_members",
+    "avoid_double_and_int_checks",
+    "avoid_dynamic_calls",
+    "avoid_empty_else",
+    "avoid_equals_and_hash_code_on_mutable_classes",
+    "avoid_escaping_inner_quotes",
+    "avoid_field_initializers_in_const_classes",
+    "avoid_final_parameters",
+    "avoid_function_literals_in_foreach_calls",
+    "avoid_implementing_value_types",
+    "avoid_init_to_null",
+    "avoid_js_rounded_ints",
+    "avoid_multiple_declarations_per_line",
+    "avoid_null_checks_in_equality_operators",
+    "avoid_positional_boolean_parameters",
+    "avoid_print",
+    "avoid_private_typedef_functions",
+    "avoid_redundant_argument_values",
+    "avoid_relative_lib_imports",
+    "avoid_renaming_method_parameters",
+    "avoid_return_types_on_setters",
+    "avoid_returning_null",
+    "avoid_returning_null_for_future",
+    "avoid_returning_null_for_void",
+    "avoid_returning_this",
+    "avoid_setters_without_getters",
+    "avoid_shadowing_type_parameters",
+    "avoid_single_cascade_in_expression_statements",
+    "avoid_slow_async_io",
+    "avoid_type_to_string",
+    "avoid_types_as_parameter_names",
+    "avoid_types_on_closure_parameters",
+    "avoid_unnecessary_containers",
+    "avoid_unstable_final_fields",
+    "avoid_unused_constructor_parameters",
+    "avoid_void_async",
+    "avoid_web_libraries_in_flutter",
+    "await_only_futures",
+    "camel_case_extensions",
+    "camel_case_types",
+    "cancel_subscriptions",
+    "cascade_invocations",
+    "cast_nullable_to_non_nullable",
+    "close_sinks",
+    "collection_methods_unrelated_type",
+    "combinators_ordering",
+    "comment_references",
+    "conditional_uri_does_not_exist",
+    "constant_identifier_names",
+    "control_flow_in_finally",
+    "curly_braces_in_flow_control_structures",
+    "dangling_library_doc_comments",
+    "depend_on_referenced_packages",
+    "deprecated_consistency",
+    "deprecated_member_use_from_same_package",
+    "diagnostic_describe_all_properties",
+    "directives_ordering",
+    "discarded_futures",
+    "do_not_use_environment",
+    "document_ignores",
+    "empty_catches",
+    "empty_constructor_bodies",
+    "empty_statements",
+    "eol_at_end_of_file",
+    "exhaustive_cases",
+    "file_names",
+    "flutter_style_todos",
+    "hash_and_equals",
+    "implementation_imports",
+    "implicit_call_tearoffs",
+    "implicit_reopen",
+    "invalid_case_patterns",
+    "join_return_with_assignment",
+    "leading_newlines_in_multiline_strings",
+    "library_annotations",
+    "library_names",
+    "library_prefixes",
+    "library_private_types_in_public_api",
+    "lines_longer_than_80_chars",
+    "literal_only_boolean_expressions",
+    "matching_super_parameters",
+    "missing_code_block_language_in_doc_comment",
+    "missing_whitespace_between_adjacent_strings",
+    "no_adjacent_strings_in_list",
+    "no_default_cases",
+    "no_duplicate_case_values",
+    "no_leading_underscores_for_library_prefixes",
+    "no_leading_underscores_for_local_identifiers",
+    "no_literal_bool_comparisons",
+    "no_logic_in_create_state",
+    "no_runtimeType_toString",
+    "no_self_assignments",
+    "no_wildcard_variable_uses",
+    "non_constant_identifier_names",
+    "noop_primitive_operations",
+    "null_check_on_nullable_type_parameter",
+    "null_closures",
+    "omit_local_variable_types",
+    "omit_obvious_local_variable_types",
+    "omit_obvious_property_types",
+    "one_member_abstracts",
+    "only_throw_errors",
+    "overridden_fields",
+    "package_api_docs",
+    "package_names",
+    "package_prefixed_library_names",
+    "parameter_assignments",
+    "prefer_adjacent_string_concatenation",
+    "prefer_asserts_in_initializer_lists",
+    "prefer_asserts_with_message",
+    "prefer_collection_literals",
+    "prefer_conditional_assignment",
+    "prefer_const_constructors",
+    "prefer_const_constructors_in_immutables",
+    "prefer_const_declarations",
+    "prefer_const_literals_to_create_immutables",
+    "prefer_constructors_over_static_methods",
+    "prefer_contains",
+    "prefer_double_quotes",
+    "prefer_expression_function_bodies",
+    "prefer_final_fields",
+    "prefer_final_in_for_each",
+    "prefer_final_locals",
+    "prefer_final_parameters",
+    "prefer_for_elements_to_map_fromIterable",
+    "prefer_foreach",
+    "prefer_function_declarations_over_variables",
+    "prefer_generic_function_type_aliases",
+    "prefer_if_elements_to_conditional_expressions",
+    "prefer_if_null_operators",
+    "prefer_initializing_formals",
+    "prefer_inlined_adds",
+    "prefer_int_literals",
+    "prefer_interpolation_to_compose_strings",
+    "prefer_is_empty",
+    "prefer_is_not_empty",
+    "prefer_is_not_operator",
+    "prefer_iterable_whereType",
+    "prefer_mixin",
+    "prefer_null_aware_method_calls",
+    "prefer_null_aware_operators",
+    "prefer_relative_imports",
+    "prefer_single_quotes",
+    "prefer_spread_collections",
+    "prefer_typing_uninitialized_variables",
+    "prefer_void_to_null",
+    "provide_deprecation_message",
+    "public_member_api_docs",
+    "recursive_getters",
+    "require_trailing_commas",
+    "secure_pubspec_urls",
+    "sized_box_for_whitespace",
+    "sized_box_shrink_expand",
+    "slash_for_doc_comments",
+    "sort_child_properties_last",
+    "sort_constructors_first",
+    "sort_pub_dependencies",
+    "sort_unnamed_constructors_first",
+    "specify_nonobvious_local_variable_types",
+    "specify_nonobvious_property_types",
+    "test_types_in_equals",
+    "throw_in_finally",
+    "tighten_type_of_initializing_formals",
+    "type_annotate_public_apis",
+    "type_init_formals",
+    "type_literal_in_constant_pattern",
+    "unawaited_futures",
+    "unintended_html_in_doc_comment",
+    "unnecessary_await_in_return",
+    "unnecessary_brace_in_string_interps",
+    "unnecessary_breaks",
+    "unnecessary_const",
+    "unnecessary_constructor_name",
+    "unnecessary_final",
+    "unnecessary_getters_setters",
+    "unnecessary_lambdas",
+    "unnecessary_late",
+    "unnecessary_library_directive",
+    "unnecessary_library_name",
+    "unnecessary_new",
+    "unnecessary_null_aware_assignments",
+    "unnecessary_null_aware_operator_on_extension_on_nullable",
+    "unnecessary_null_checks",
+    "unnecessary_null_in_if_null_operators",
+    "unnecessary_nullable_for_final_variable_declarations",
+    "unnecessary_overrides",
+    "unnecessary_parenthesis",
+    "unnecessary_raw_strings",
+    "unnecessary_statements",
+    "unnecessary_string_escapes",
+    "unnecessary_string_interpolations",
+    "unnecessary_this",
+    "unnecessary_to_list_in_spreads",
+    "unreachable_from_main",
+    "unrelated_type_equality_checks",
+    "unsafe_html",
+    "use_build_context_synchronously",
+    "use_colored_box",
+    "use_decorated_box",
+    "use_enums",
+    "use_full_hex_values_for_flutter_colors",
+    "use_function_type_syntax_for_parameters",
+    "use_if_null_to_convert_nulls_to_bools",
+    "use_is_even_rather_than_modulo",
+    "use_key_in_widget_constructors",
+    "use_late_for_private_fields_and_variables",
+    "use_named_constants",
+    "use_raw_strings",
+    "use_rethrow_when_possible",
+    "use_setters_to_change_properties",
+    "use_string_buffers",
+    "use_string_in_part_of_directives",
+    "use_super_parameters",
+    "use_test_throws_matchers",
+    "use_to_and_as_if_applicable",
+    "use_truncating_division",
+    "valid_regexps",
+    "void_checks",
+})
 
 
 def _find_lint_rule_class_start(content: str, class_name: str) -> int:
@@ -566,6 +813,10 @@ def check_tier_integrity(
         exampleGood (and vice versa). Unpaired examples break
         the interactive walkthrough display.
 
+    Check 8 - Core lint name collisions:
+        saropa_lints rule names must never collide with core
+        Dart/Flutter analyzer lint names. Zero conflicts permitted.
+
     Args:
         rules_dir: Path to lib/src/rules/ directory.
         tiers_path: Path to lib/src/tiers.dart.
@@ -649,6 +900,11 @@ def check_tier_integrity(
     unpaired = get_unpaired_examples(rules_dir)
 
     # ------------------------------------------------------------------
+    # Check 8: No collisions with core Dart/Flutter lint names
+    # ------------------------------------------------------------------
+    core_collisions = sorted(implemented & CORE_DART_LINT_NAMES)
+
+    # ------------------------------------------------------------------
     # Result
     # ------------------------------------------------------------------
     passed = (
@@ -659,6 +915,7 @@ def check_tier_integrity(
         and not flutter_not_in_stylistic
         and not pkg_not_in_tiers
         and not unpaired
+        and not core_collisions
     )
 
     return TierIntegrityResult(
@@ -670,6 +927,7 @@ def check_tier_integrity(
         flutter_stylistic_not_in_stylistic=flutter_not_in_stylistic,
         package_rules_not_in_tiers=pkg_not_in_tiers,
         unpaired_examples=unpaired,
+        core_lint_collisions=core_collisions,
     )
 
 
@@ -782,6 +1040,18 @@ def get_tier_integrity_checks(
         ))
     else:
         checks.append((_P, "All rule examples properly paired", []))
+
+    # 8. Core lint name collisions
+    if result.core_lint_collisions:
+        shown = sorted(result.core_lint_collisions)[:10]
+        checks.append((
+            _F,
+            f"{len(result.core_lint_collisions)} rule(s) collide with core "
+            f"Dart/Flutter lint names",
+            shown,
+        ))
+    else:
+        checks.append((_P, "No collisions with core Dart lint names", []))
 
     return checks
 

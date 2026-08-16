@@ -64,14 +64,19 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.0.5]
+## [15.1.0] - Unreleased
 
-Two false-positive fixes: `avoid_gradient_in_build` no longer fires inside animation-builder closures where the gradient intentionally varies per frame, and `verify_documented_parameters_exist` no longer flags valid dartdoc cross-references. [log](https://github.com/saropa/saropa_lints/blob/v15.0.5/CHANGELOG.md)
+**Breaking:** 35 rule names that collided with core Dart/Flutter lint names are renamed with semantic suffixes (e.g. `prefer_single_quotes` → `prefer_single_quotes_strict`); 3 duplicates with no behavioral difference are removed. Old names are deprecated aliases for one release cycle. Use `--fix-ignores` to migrate downstream projects. [log](https://github.com/saropa/saropa_lints/blob/v15.1.0/CHANGELOG.md)
+
+`require_ignore_comment_plugin_prefix` now validates prefixed ignore comments against the rule registry. Four false-positive fixes across gradient-in-build, dartdoc cross-refs, cyclomatic-complexity flat switches, and large-objects-in-state recomputed caches.
 
 ### Fixed
 
 - `avoid_gradient_in_build` no longer flags gradients inside `AnimatedBuilder.builder`, `TweenAnimationBuilder.builder`, `ListenableBuilder.builder`, or `ValueListenableBuilder.builder` closures, where the gradient intentionally varies every animation frame. Also exempts gradients in any `builder:` closure when the gradient's arguments reference a closure-unique parameter (e.g. a tween value), making the gate work for custom animation builders too. No action required.
 - `verify_documented_parameters_exist` no longer flags valid dartdoc cross-references to methods, functions, or getters as stale parameter names. No action required.
+- `require_ignore_comment_plugin_prefix` now validates the suffix of already-prefixed ignore comments against the rule registry. A prefixed name that doesn't match any registered rule (typo, renamed rule, or fabricated name) now produces a diagnostic instead of being silently skipped.
+- `avoid_high_cyclomatic_complexity` no longer flags flat switch dispatch tables where every case is a single return, break, or expression with no nested branching — these are enum-to-value lookups with mechanical complexity, not logical branching. No action required.
+- `avoid_large_objects_in_state` no longer flags collection fields that are reassigned wholesale in method bodies without accumulating mutations. Fields replaced via `field = <fresh collection>` (e.g. recomputed caches derived from widget props) are now recognized as bounded-by-replacement. No action required.
 
 <details><summary>Maintenance</summary>
 
