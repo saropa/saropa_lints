@@ -10,6 +10,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:meta/meta.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 
+import '../core/compound_performance_patterns.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when Gradient objects are created inside build().
@@ -111,28 +112,11 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
   // ShaderCallback (Shader Function(Rect)) signature convention.
   static const Set<String> _paintTimeCallbackNames = <String>{'shaderCallback'};
 
-  // Widgets whose `builder:` closure re-executes on every notification/tick.
-  //
-  // Why: gradients inside these closures intentionally vary per tick (e.g.
-  // alignment/colors driven by AnimationController.value). Hoisting the
-  // gradient to a field would defeat the animation. The rule's intent — avoid
-  // allocating identical gradients 60×/s — does not apply when the gradient
-  // genuinely changes each frame.
-  //
   // Known limitation: `AnimatedWidget` subclasses override `build()` directly
   // (no `builder:` closure), so their gradient construction is still flagged.
   // Exempting those requires type-hierarchy resolution, not just AST names.
   //
-  // See also: `animation_rules.dart` and `compound_performance_patterns.dart`
-  // define their own animation-builder sets for different rule purposes.
-  //
   // Bug: plans/history/2026.08/2026.08.16/avoid_gradient_in_build_fp_animated_builder_closure.md
-  static const Set<String> _animationBuilderTypes = <String>{
-    'AnimatedBuilder',
-    'ListenableBuilder',
-    'TweenAnimationBuilder',
-    'ValueListenableBuilder',
-  };
 
   @override
   void visitFunctionExpression(FunctionExpression node) {
@@ -177,12 +161,15 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
       final String typeName =
           call.constructorName.type.element?.name ??
           call.constructorName.type.name.lexeme;
-      return _animationBuilderTypes.contains(typeName);
+      return kAnimatedRebuilders.contains(typeName);
     }
 
-    // Unresolved implicit-new: parser emits MethodInvocation
+    // Unresolved implicit-new: the Dart parser emits MethodInvocation for
+    // `Foo(...)` when it can't resolve `Foo` as a type at parse time. Both
+    // branches are needed because custom_lint provides resolved analysis
+    // (InstanceCreationExpression) while parseString-based tests don't.
     if (call is MethodInvocation) {
-      return _animationBuilderTypes.contains(call.methodName.name);
+      return kAnimatedRebuilders.contains(call.methodName.name);
     }
 
     return false;
@@ -231,7 +218,7 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
   /// parameter of `TweenAnimationBuilder.builder`), it can't be hoisted
   /// to a field — the rule's correction message is impossible to satisfy.
   /// This gate is widget-name-independent: it catches custom animation
-  /// builders that aren't in [_animationBuilderTypes].
+  /// builders that aren't in [kAnimatedRebuilders].
   static bool _gradientDependsOnClosureParams(AstNode gradientNode) {
     // Walk up to find the nearest enclosing builder: closure
     final FunctionExpression? closure = _findBuilderClosure(gradientNode);
@@ -298,7 +285,8 @@ class _ParamRefChecker extends RecursiveAstVisitor<void> {
     if (_paramNames.contains(node.name)) {
       found = true;
     }
-    // Continue visiting — RecursiveAstVisitor handles child traversal
+    // No short-circuit needed: gradient argument subtrees are small (a few
+    // nodes), so the overhead of continuing after a match is negligible.
   }
 }
 

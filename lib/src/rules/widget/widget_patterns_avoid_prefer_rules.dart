@@ -15,6 +15,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../catch_body_logging_utils.dart';
+import '../core/compound_performance_patterns.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/common/remove_named_argument_fix.dart';
 import '../../fixes/widget_patterns/comment_out_print_fix.dart';
@@ -3312,7 +3313,7 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
     while (current != null && depth < 10) {
       if (current is InstanceCreationExpression) {
         final String name = current.constructorName.type.name.lexeme;
-        if (name == 'AnimatedBuilder' || name == 'TweenAnimationBuilder') {
+        if (kAnimatedRebuilders.contains(name)) {
           return true;
         }
       }

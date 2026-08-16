@@ -96,9 +96,15 @@ Implementation: `_gradientDependsOnClosureParams` walks up to find the nearest `
 - 12 AST-level unit tests (5 existing + 7 new): ShaderCallback gate (5), AnimatedBuilder/TweenAnimationBuilder/ListenableBuilder widget-name gate (3), non-animation widget `builder:` still fires (1), gradient outside closure still fires (1), closure-param-reference gate exempt (1), closure-param-reference gate still fires when no reference (1).
 - 2 GOOD fixture examples in `avoid_gradient_in_build_fixture.dart`.
 
+### Consolidation: single-source-of-truth for animated-rebuilder names
+
+`kAnimatedRebuilders` in `compound_performance_patterns.dart` (previously only `AnimatedBuilder`) expanded to all 4 widgets and adopted by `build_method_rules.dart` and `widget_patterns_avoid_prefer_rules.dart`. Eliminates three independent copies of the same widget name list. The test mirror in the shaderCallback test retains its own copy (it's a standalone parseString-based test that doesn't import production code).
+
 ### Files changed
 
-- `lib/src/rules/widget/build_method_rules.dart` — `_animationBuilderTypes` set (4 widgets), `_isAnimationBuilderArg()`, `_gradientDependsOnClosureParams()`, `_findBuilderClosure()`, `_closureUniqueParams()`, `_ParamRefChecker` class
+- `lib/src/rules/core/compound_performance_patterns.dart` — expanded `kAnimatedRebuilders` to 4 widgets
+- `lib/src/rules/widget/build_method_rules.dart` — uses `kAnimatedRebuilders`, `_isAnimationBuilderArg()`, `_gradientDependsOnClosureParams()`, `_findBuilderClosure()`, `_closureUniqueParams()`, `_ParamRefChecker` class
+- `lib/src/rules/widget/widget_patterns_avoid_prefer_rules.dart` — uses `kAnimatedRebuilders` instead of inline check
 - `test/rules/widget/avoid_gradient_in_build_shadercallback_test.dart` — mirrored all gates + 7 new tests
 - `example/lib/build_method/avoid_gradient_in_build_fixture.dart` — 2 GOOD examples
 - `CHANGELOG.md` — entry under `[15.0.5]`

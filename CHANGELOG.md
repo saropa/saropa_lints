@@ -73,6 +73,12 @@ Two false-positive fixes: `avoid_gradient_in_build` no longer fires inside anima
 - `avoid_gradient_in_build` no longer flags gradients inside `AnimatedBuilder.builder`, `TweenAnimationBuilder.builder`, `ListenableBuilder.builder`, or `ValueListenableBuilder.builder` closures, where the gradient intentionally varies every animation frame. Also exempts gradients in any `builder:` closure when the gradient's arguments reference a closure-unique parameter (e.g. a tween value), making the gate work for custom animation builders too. No action required.
 - `verify_documented_parameters_exist` no longer flags valid dartdoc cross-references to methods, functions, or getters as stale parameter names. No action required.
 
+<details><summary>Maintenance</summary>
+
+- Consolidated animation-builder widget name sets into `kAnimatedRebuilders` in `compound_performance_patterns.dart`, used by both compound-performance rules and `avoid_gradient_in_build`.
+
+</details>
+
 ---
 
 ## [15.0.4]

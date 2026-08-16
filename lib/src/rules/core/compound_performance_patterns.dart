@@ -25,8 +25,16 @@ const Set<String> kScrollableWidgets = <String>{
   'PageView',
 };
 
-/// Widgets that rebuild their `builder` subtree on every animation frame.
-const Set<String> kAnimatedRebuilders = <String>{'AnimatedBuilder'};
+/// Widgets that rebuild their `builder` subtree on every animation frame or
+/// notification. Used by compound-performance rules (costly widget inside
+/// rebuilder) and `avoid_gradient_in_build` (exempt gradient construction
+/// inside these closures).
+const Set<String> kAnimatedRebuilders = <String>{
+  'AnimatedBuilder',
+  'ListenableBuilder',
+  'TweenAnimationBuilder',
+  'ValueListenableBuilder',
+};
 
 /// One "expensive widget inside a costly parent" pattern plus its gravity weight.
 ///
