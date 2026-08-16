@@ -108,15 +108,97 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 dynamic data;
 
 // BAD: Should trigger avoid_large_objects_in_state
+// Unbounded List accumulated via .add() — genuine growth-without-limit.
 // expect_lint: avoid_large_objects_in_state
 class _bad467__MyWidgetState extends State<MyWidget> {
-  List<LargeDataModel> allItems = []; // May grow unbounded
-  Map<String, Uint8List> imageCache = {}; // Large binary data
+  List<LargeDataModel> allItems = []; // LINT — grows unbounded via .add()
+  Map<String, Uint8List> imageCache = {}; // LINT — no reassignment or bound
+
+  void loadMore(List<LargeDataModel> items) {
+    allItems.addAll(items); // accumulates across calls
+  }
 }
 
-// GOOD: Should NOT trigger avoid_large_objects_in_state
+// BAD: Field accumulated via .add() across multiple calls without clear.
+// expect_lint: avoid_large_objects_in_state
+class _bad468__AccumulatedState extends State<MyWidget> {
+  List<String> history = []; // LINT — accumulated, never cleared/replaced
+
+  void onEvent(String event) {
+    history.add(event); // accumulates without bound
+  }
+}
+
+// GOOD: Field always reassigned to a fresh collection — not accumulated.
 class _good467__MyWidgetState extends State<MyWidget> {
-// Use pagination or streaming
+  // Use pagination or streaming
   late final ScrollController _controller;
-// Or use external cache with LRU eviction
+  // Or use external cache with LRU eviction
+}
+
+// GOOD: Fields reassigned wholesale in a recompute method — bounded by input.
+class _good468__RecomputedCacheState extends State<MyWidget> {
+  List<DateTime>? _groupValues; // no LINT — replaced every recompute
+  Map<DateTime, List<String>>? _groupedByDate; // no LINT — replaced
+
+  void _recompute(Map<DateTime, List<String>> byDate) {
+    // Replaces both fields with fresh collections sized to the input.
+    _groupValues = byDate.keys.toList()
+      ..sort((DateTime a, DateTime b) => b.compareTo(a));
+    _groupedByDate = <DateTime, List<String>>{};
+    for (final DateTime key in _groupValues!) {
+      _groupedByDate![key] = byDate[key]!;
+    }
+  }
+}
+
+// GOOD: Field reassigned via ..sort() cascade on a fresh .toList().
+class _good469__SortedListState extends State<MyWidget> {
+  List<int>? _sorted; // no LINT — fresh list each time
+
+  void refresh(List<int> source) {
+    _sorted = source.toList()..sort();
+  }
+}
+
+// BAD: Field grown via subscript-assignment (`_cache[k] = v`) — unbounded
+// even though a `reset()` method elsewhere reassigns the field wholesale.
+// Growth-via-subscript is unbounded whenever reset() isn't called, so the
+// presence of a reset must not suppress the diagnostic.
+// expect_lint: avoid_large_objects_in_state
+class _bad469__SubscriptGrownState extends State<MyWidget> {
+  Map<String, String> cache = {}; // LINT — grows via cache[k] = v, unbounded
+
+  void store(String key, String value) {
+    cache[key] = value; // subscript-assignment accumulation
+  }
+
+  void reset() {
+    cache = {}; // unrelated wholesale reassignment — does not bound growth
+  }
+}
+
+// BAD: Field accumulated via cascade (`..add()`) — the double-dot form must
+// not evade detection just because it differs from the single-dot `.add()`.
+// expect_lint: avoid_large_objects_in_state
+class _bad470__CascadeAccumulatedState extends State<MyWidget> {
+  List<int> items = []; // LINT — grows via cascade ..add()
+
+  void addItems(List<int> newItems) {
+    items
+      ..addAll(newItems)
+      ..sort();
+  }
+}
+
+// BAD: Self-reassigning cascade (`field = field..add(x)`) — looks like a
+// reassignment but is actually accumulation. The reassignment regex must
+// not suppress this because the cascade mutates the same collection.
+// expect_lint: avoid_large_objects_in_state
+class _bad471__SelfReassigningCascadeState extends State<MyWidget> {
+  List<String> log = []; // LINT — cascade append disguised as reassignment
+
+  void append(String entry) {
+    log = log..add(entry); // self-reassigning cascade, still accumulates
+  }
 }

@@ -7,6 +7,7 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../fixes/memory_management/add_mounted_check_fix.dart';
 import '../../saropa_lint_rule.dart';
@@ -72,6 +73,19 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
     'ByteBuffer',
   };
 
+  /// Method names that mutate a collection by adding entries.
+  /// Used by `_FieldMutationVisitor` to detect accumulation via AST
+  /// `MethodInvocation` nodes — immune to cascade vs. single-dot
+  /// distinctions that tripped the old string scanner.
+  static const Set<String> _accumulatingMethods = <String>{
+    'add',
+    'addAll',
+    'addEntries',
+    'insert',
+    'insertAll',
+    'putIfAbsent',
+  };
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,
@@ -84,6 +98,7 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
 
       final String superName = extendsClause.superclass.toSource();
       if (!superName.startsWith('State<')) return;
+
       // Check fields for large collection types
       for (final ClassMember member in node.bodyMembers) {
         if (member is FieldDeclaration) {
@@ -93,19 +108,183 @@ class AvoidLargeObjectsInStateRule extends SaropaLintRule {
           final String typeSource = type.toSource();
           for (final String pattern in _largeTypePatterns) {
             if (typeSource.contains(pattern)) {
-              // Check if it's unbounded (no clear size limit)
+              // Magic-string escape hatch on the declaration line
               final String fieldSource = member.toSource();
-              if (!fieldSource.contains('// bounded') &&
-                  !fieldSource.contains('maxSize') &&
-                  !fieldSource.contains('limit')) {
-                reporter.atNode(member);
+              if (fieldSource.contains('// bounded') ||
+                  fieldSource.contains('maxSize') ||
+                  fieldSource.contains('limit')) {
                 break;
               }
+
+              // Extract all variable names from this field declaration
+              final List<String> fieldNames = <String>[
+                for (final VariableDeclaration v in member.fields.variables)
+                  v.name.lexeme,
+              ];
+
+              // AST-walk method bodies to classify field usage as
+              // "replaced" (suppress) vs. "accumulated" (fire).
+              if (_isReplacedNotAccumulated(node, fieldNames)) {
+                break;
+              }
+
+              reporter.atNode(member);
+              break;
             }
           }
         }
       }
     });
+  }
+
+  /// Whether every usage of [fieldNames] in method/constructor bodies of
+  /// [classNode] is a full reassignment (`field = <expr>`) with no
+  /// accumulating mutations (`.add()`, `+=`, etc.).
+  ///
+  /// Uses AST walking instead of string scanning — immune to shadowed
+  /// locals, cascade vs. single-dot, and field names inside strings/comments.
+  ///
+  /// Subscript-assignment (`field[k] = v`) is treated as accumulation
+  /// UNLESS a full reassignment to the same field also appears in the
+  /// SAME method body — the common "reassign to fresh map, then populate
+  /// in a loop" pattern. A reassignment in a different method (e.g. a
+  /// `reset()`) does NOT suppress subscript-writes in `store()`.
+  static bool _isReplacedNotAccumulated(
+    ClassDeclaration classNode,
+    List<String> fieldNames,
+  ) {
+    final Set<String> names = fieldNames.toSet();
+    bool hasReassignment = false;
+    bool hasAccumulation = false;
+
+    // Walk each method/constructor body independently to track
+    // per-method subscript-write + reassignment co-occurrence.
+    for (final ClassMember member in classNode.bodyMembers) {
+      FunctionBody? body;
+      if (member is MethodDeclaration) {
+        body = member.body;
+      } else if (member is ConstructorDeclaration) {
+        if (member.body is! EmptyFunctionBody) {
+          body = member.body;
+        }
+      }
+      if (body == null) continue;
+
+      final _FieldMutationVisitor visitor = _FieldMutationVisitor(
+        names,
+        _accumulatingMethods,
+      );
+      body.accept(visitor);
+
+      // Hard accumulation anywhere → always fires
+      if (visitor.hasHardAccumulation) return false;
+
+      // Subscript-writes in a method that ALSO has a full reassignment
+      // are safe (building a fresh map). Subscript-writes without a
+      // co-located reassignment are accumulation.
+      if (visitor.hasSubscriptWrite && !visitor.hasReassignment) {
+        hasAccumulation = true;
+      }
+
+      if (visitor.hasReassignment) {
+        hasReassignment = true;
+      }
+    }
+
+    if (hasAccumulation) return false;
+
+    // Suppress only if there is at least one reassignment — a field with
+    // no usage at all should still fire.
+    return hasReassignment;
+  }
+}
+
+/// AST visitor that walks method bodies looking for accumulating mutations
+/// or full reassignments targeting a set of field names.
+///
+/// Classifies mutations into three categories:
+/// - **Hard accumulation:** `.add()`, `.addAll()`, `+=`, self-cascade —
+///   always indicates unbounded growth.
+/// - **Soft accumulation:** `field[k] = v` — may be unbounded growth OR
+///   building a fresh collection after reassignment. Only treated as
+///   accumulation when no full reassignment exists.
+/// - **Full reassignment:** `field = <expr>` — replaces the collection.
+class _FieldMutationVisitor extends RecursiveAstVisitor<void> {
+  _FieldMutationVisitor(this._fieldNames, this._accumulatingMethods);
+
+  final Set<String> _fieldNames;
+  final Set<String> _accumulatingMethods;
+
+  /// `.add()`, `.addAll()`, `+=`, self-cascade — always unbounded.
+  bool hasHardAccumulation = false;
+
+  /// `field[k] = v` — unbounded only when no reassignment exists.
+  bool hasSubscriptWrite = false;
+
+  /// `field = <expr>` — replaces the collection wholesale.
+  bool hasReassignment = false;
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final Expression left = node.leftHandSide;
+
+    // `field = <expr>` — full reassignment (simple `=` operator)
+    if (left is SimpleIdentifier && _fieldNames.contains(left.name)) {
+      if (node.operator.lexeme == '=') {
+        // Check for self-reassigning cascade: `field = field..add(x)`.
+        // The RHS is a CascadeExpression whose target is the same field,
+        // so the "reassignment" is really an in-place mutation.
+        final Expression rhs = node.rightHandSide;
+        if (rhs is CascadeExpression) {
+          final Expression target = rhs.target;
+          if (target is SimpleIdentifier && target.name == left.name) {
+            hasHardAccumulation = true;
+            super.visitAssignmentExpression(node);
+            return;
+          }
+        }
+        hasReassignment = true;
+      } else {
+        // Compound assignment: `+=`, `??=`, etc. — hard accumulation
+        hasHardAccumulation = true;
+      }
+    }
+
+    // `field[key] = value` — subscript assignment (IndexExpression on LHS)
+    if (left is IndexExpression) {
+      if (_isFieldReference(left.target)) {
+        hasSubscriptWrite = true;
+      }
+    }
+
+    super.visitAssignmentExpression(node);
+  }
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    // `field.add(x)`, `field!.addAll(y)`, or cascade `field..add(x)`
+    if (_accumulatingMethods.contains(node.methodName.name)) {
+      final Expression? target = node.realTarget;
+      if (target != null && _isFieldReference(target)) {
+        hasHardAccumulation = true;
+      }
+    }
+    super.visitMethodInvocation(node);
+  }
+
+  /// Whether [expr] is a `SimpleIdentifier` referencing one of the tracked
+  /// fields, possibly wrapped in a null-assertion (`field!`).
+  bool _isFieldReference(Expression? expr) {
+    if (expr is SimpleIdentifier) {
+      return _fieldNames.contains(expr.name);
+    }
+    // `field!.add(x)` or `field![k] = v` — PostfixExpression with `!`
+    if (expr is PostfixExpression && expr.operand is SimpleIdentifier) {
+      return _fieldNames.contains(
+        (expr.operand as SimpleIdentifier).name,
+      );
+    }
+    return false;
   }
 }
 
