@@ -48,7 +48,24 @@ export function hasFlutterDep(pubspecPath: string): boolean {
   }
 }
 
-function ensureSaropaLintsInPubspec(workspaceRoot: string): boolean {
+/**
+ * Outcome of the pubspec check at the head of Enable.
+ *
+ * `changed` is what makes the difference between a two-minute Enable and an
+ * instant one: `pub get` only has work to do when we actually edited the
+ * manifest. Returning a bare boolean (the previous shape) threw that fact away
+ * and forced every Enable to re-resolve the whole dependency graph — measured
+ * at 116 s on a ~60-plugin Flutter project, which reads as a hang and gets
+ * cancelled.
+ */
+interface PubspecEnsureResult {
+  /** False only when there is no pubspec.yaml — the flow cannot continue. */
+  ok: boolean;
+  /** True when this call wrote the dev-dependency into pubspec.yaml. */
+  changed: boolean;
+}
+
+function ensureSaropaLintsInPubspec(workspaceRoot: string): PubspecEnsureResult {
   const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
   if (!fs.existsSync(pubspecPath)) {
     void vscode.window.showErrorMessage(
@@ -59,13 +76,14 @@ function ensureSaropaLintsInPubspec(workspaceRoot: string): boolean {
         void vscode.env.openExternal(vscode.Uri.parse('https://pub.dev/packages/saropa_lints'));
       }
     });
-    return false;
+    return { ok: false, changed: false };
   }
   const content = fs.readFileSync(pubspecPath, 'utf-8');
 
   // Precision check: match as an actual dependency entry, not a substring
   // in comments or similarly-named packages like saropa_lints_extra.
-  if (/^\s{2}saropa_lints\s*:/m.test(content)) return true;
+  // Already declared => nothing written => the caller can skip `pub get`.
+  if (/^\s{2}saropa_lints\s*:/m.test(content)) return { ok: true, changed: false };
 
   // Line-based insertion avoids regex backtracking bugs that corrupted YAML
   // by placing the dependency on the same line as dev_dependencies:.
@@ -81,7 +99,46 @@ function ensureSaropaLintsInPubspec(workspaceRoot: string): boolean {
     lines.splice(devDepsIdx + 1, 0, entry);
   }
   fs.writeFileSync(pubspecPath, lines.join(eol), 'utf-8');
-  return true;
+  return { ok: true, changed: true };
+}
+
+/**
+ * True when `.dart_tool/package_config.json` already resolves saropa_lints AND
+ * that resolution is newer than pubspec.yaml — i.e. a `pub get` right now would
+ * re-derive the graph it already has.
+ *
+ * The mtime comparison is the correctness guard: an edit to pubspec.yaml made
+ * outside this extension (a hand-bumped constraint, a merge, the upgrade
+ * checker) leaves the manifest newer than the resolution, and in that case the
+ * resolve is genuinely stale and must not be skipped.
+ */
+export function isSaropaLintsAlreadyResolved(workspaceRoot: string): boolean {
+  const pkgConfigPath = path.join(workspaceRoot, '.dart_tool', 'package_config.json');
+  const pubspecPath = path.join(workspaceRoot, 'pubspec.yaml');
+  try {
+    if (!resolvesSaropaLints(workspaceRoot)) return false;
+    return fs.statSync(pkgConfigPath).mtimeMs >= fs.statSync(pubspecPath).mtimeMs;
+  } catch {
+    // Missing or unreadable package_config => never resolved => run pub get.
+    return false;
+  }
+}
+
+/**
+ * Content-only check: does `.dart_tool/package_config.json` list saropa_lints?
+ *
+ * Deliberately has NO mtime component, unlike `isSaropaLintsAlreadyResolved`.
+ * It is used to verify a `pub get` that has just run, and pub does not rewrite
+ * package_config.json when the resolution is unchanged — an mtime test there
+ * would report a perfectly good resolve as a failure.
+ */
+function resolvesSaropaLints(workspaceRoot: string): boolean {
+  const pkgConfigPath = path.join(workspaceRoot, '.dart_tool', 'package_config.json');
+  try {
+    return fs.readFileSync(pkgConfigPath, 'utf-8').includes('"saropa_lints"');
+  } catch {
+    return false;
+  }
 }
 
 /** Builds args for headless config write (Enable, Initialize config, Set tier). Uses write_config so the extension does not shell out to init. */
@@ -249,6 +306,64 @@ export async function runInWorkspaceAsync(
   });
 }
 
+/**
+ * Makes sure saropa_lints is resolved on disk, running `pub get` only when it
+ * is actually needed.
+ *
+ * `needsResolve` is the caller's knowledge that the manifest just changed;
+ * `isSaropaLintsAlreadyResolved` is the independent on-disk check. Either one
+ * demanding a resolve wins — the skip is only taken when the manifest was
+ * untouched AND the existing resolution already covers it.
+ *
+ * The pub-get failure toast is raised here rather than by the caller so the
+ * caller stays a linear read; the caller only distinguishes the three outcomes.
+ */
+async function ensureDependencyResolved(
+  workspaceRoot: string,
+  options: {
+    needsResolve: boolean;
+    progress: vscode.Progress<{ message?: string }>;
+    token: vscode.CancellationToken;
+  },
+): Promise<'resolved' | 'cancelled' | 'failed'> {
+  const { needsResolve, progress, token } = options;
+
+  if (!needsResolve && isSaropaLintsAlreadyResolved(workspaceRoot)) {
+    logReport('- Skipped pub get (saropa_lints already resolved and pubspec unchanged)');
+    return 'resolved';
+  }
+
+  const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
+  const pubCmd = useFlutter ? 'flutter' : 'dart';
+  const pubResult = await withTickingProgress(
+    progress,
+    (elapsed) => l10n('notify.setup.progressPubGet', { elapsed: String(elapsed) }),
+    runInWorkspaceAsync(workspaceRoot, pubCmd, ['pub', 'get'], { token }),
+  );
+  if (pubResult.cancelled) return 'cancelled';
+  if (!pubResult.ok) {
+    logReport(`- pub get FAILED: ${pubResult.stderr || '(no details)'}`);
+    void vscode.window.showErrorMessage(
+      l10n('notify.setup.pubGetFailed', {
+        details: pubResult.stderr || l10n('notify.setup.checkOutput'),
+      }),
+    );
+    return 'failed';
+  }
+  logReport(`- Ran pub get (${pubCmd})`);
+
+  // A `pub get` that exits 0 without resolving the package means the manifest
+  // parsed but did not yield saropa_lints (corrupted YAML, wrong indent level).
+  // Reported here so the caller never proceeds to write_config against a
+  // package that is not on disk.
+  if (!resolvesSaropaLints(workspaceRoot)) {
+    logReport('- saropa_lints not found in package_config.json after pub get');
+    void vscode.window.showErrorMessage(l10n('notify.setup.pubGetNotResolved'));
+    return 'failed';
+  }
+  return 'resolved';
+}
+
 // One in-flight `runEnable` at a time. Unlike the analysis supersede pattern
 // (cancel old, start new — safe because a rerun just reads violations), this
 // flow WRITES pubspec.yaml/analysis_options.yaml and shells out to pub get /
@@ -289,40 +404,30 @@ async function runEnableExclusive(context: vscode.ExtensionContext): Promise<boo
     async (progress, token) => {
       logSection('Enable');
 
-      if (!ensureSaropaLintsInPubspec(workspaceRoot)) return;
-      logReport('- Added saropa_lints to pubspec.yaml');
+      const pubspec = ensureSaropaLintsInPubspec(workspaceRoot);
+      if (!pubspec.ok) return;
+      logReport(pubspec.changed
+        ? '- Added saropa_lints to pubspec.yaml'
+        : '- saropa_lints already declared in pubspec.yaml');
 
-      const useFlutter = hasFlutterDep(path.join(workspaceRoot, 'pubspec.yaml'));
-      const pubCmd = useFlutter ? 'flutter' : 'dart';
-      const pubResult = await withTickingProgress(
+      // Skip the single most expensive step in the whole flow when it has
+      // nothing to do. Re-resolving an unchanged manifest took 116 s on a
+      // ~60-plugin Flutter project, during which Enable looks frozen — users
+      // cancel it and conclude the extension cannot be re-enabled at all.
+      const resolveState = await ensureDependencyResolved(workspaceRoot, {
+        needsResolve: pubspec.changed,
         progress,
-        (elapsed) => l10n('notify.setup.progressPubGet', { elapsed: String(elapsed) }),
-        runInWorkspaceAsync(workspaceRoot, pubCmd, ['pub', 'get'], { token }),
-      );
-      if (pubResult.cancelled) {
-        logReport('- Enable cancelled by user (pub get)');
+        token,
+      });
+      if (resolveState !== 'resolved') {
+        if (resolveState === 'cancelled') logReport('- Enable cancelled by user (pub get)');
         flushReport(workspaceRoot);
         return;
       }
-      if (!pubResult.ok) {
-        logReport(`- pub get FAILED: ${pubResult.stderr || '(no details)'}`);
-        flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(l10n('notify.setup.pubGetFailed', { details: pubResult.stderr || l10n('notify.setup.checkOutput') }));
-        return;
-      }
-      logReport(`- Ran pub get (${pubCmd})`);
 
-      // Verify saropa_lints was actually resolved — corrupted pubspec YAML
-      // can cause pub get to exit 0 without resolving the package.
-      const pkgConfigPath = path.join(workspaceRoot, '.dart_tool', 'package_config.json');
-      if (!fs.existsSync(pkgConfigPath) || !fs.readFileSync(pkgConfigPath, 'utf-8').includes('"saropa_lints"')) {
-        logReport('- saropa_lints not found in package_config.json after pub get');
-        flushReport(workspaceRoot);
-        vscode.window.showErrorMessage(
-          l10n('notify.setup.pubGetNotResolved'),
-        );
-        return;
-      }
+      // (The "resolved but not in package_config" case — corrupted pubspec YAML
+      // letting pub get exit 0 without resolving — is checked and reported
+      // inside ensureDependencyResolved, which returns 'failed' for it.)
 
       // Restore the in-process plugin ONLY if our own Disable is what took it
       // away. Enable still must not switch the memory-heavy plugin on as a

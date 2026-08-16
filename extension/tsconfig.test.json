@@ -107,6 +107,7 @@
     "src/setup.ts",
     "src/test/setupCompositeScaffoldGate.test.ts",
     "src/test/disablePluginsIntegration.test.ts",
+    "src/test/enablePubGetSkip.test.ts",
     "src/test/runAnalysisEnabledGate.test.ts",
     "src/test/runInWorkspaceAsyncCancellation.test.ts",
     "src/test/runEnableReentrancyGuard.test.ts",
