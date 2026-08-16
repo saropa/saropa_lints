@@ -66,10 +66,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.0.5]
 
-Doc comments that reference a method or function by name — a common dartdoc pattern like "see [otherMethod]" — no longer trip a false "undocumented parameter" warning. The check now recognizes those as valid cross-references instead of assuming every bracketed name is a stale parameter. [log](https://github.com/saropa/saropa_lints/blob/v15.0.5/CHANGELOG.md)
+Two false-positive fixes: `avoid_gradient_in_build` no longer fires inside animation-builder closures where the gradient intentionally varies per frame, and `verify_documented_parameters_exist` no longer flags valid dartdoc cross-references. [log](https://github.com/saropa/saropa_lints/blob/v15.0.5/CHANGELOG.md)
 
 ### Fixed
 
+- `avoid_gradient_in_build` no longer flags gradients inside `AnimatedBuilder.builder`, `TweenAnimationBuilder.builder`, `ListenableBuilder.builder`, or `ValueListenableBuilder.builder` closures, where the gradient intentionally varies every animation frame. Also exempts gradients in any `builder:` closure when the gradient's arguments reference a closure-unique parameter (e.g. a tween value), making the gate work for custom animation builders too. No action required.
 - `verify_documented_parameters_exist` no longer flags valid dartdoc cross-references to methods, functions, or getters as stale parameter names. No action required.
 
 ---

@@ -76,3 +76,41 @@ Widget _goodShaderCallbackBuild(BuildContext context) {
 Widget _goodHoistedDecorationBuild(BuildContext context) {
   return Container(decoration: _hoistedDecoration);
 }
+
+// GOOD: gradient inside AnimatedBuilder.builder closure. The closure re-runs
+// every animation frame with animation-dependent values (alignment driven by
+// AnimationController.value), so the gradient intentionally varies per tick.
+// Hoisting it would defeat the animation. Regression coverage for:
+//   plans/history/2026.08/2026.08.16/avoid_gradient_in_build_fp_animated_builder_closure.md
+Widget _goodAnimatedBuilderGradientBuild(BuildContext context) {
+  return AnimatedBuilder(
+    animation: controller,
+    builder: (context, child) {
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment(-1.0, 0),
+            colors: [Colors.red, Colors.blue],
+          ),
+        ),
+        child: child,
+      );
+    },
+    child: const SizedBox(),
+  );
+}
+
+// GOOD: gradient inside TweenAnimationBuilder.builder closure — same
+// exemption as AnimatedBuilder; the gradient depends on the tween value.
+Widget _goodTweenAnimationBuilderGradientBuild(BuildContext context) {
+  return TweenAnimationBuilder(
+    tween: tween,
+    builder: (context, value, child) {
+      return Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(colors: [value, Colors.blue]),
+        ),
+      );
+    },
+  );
+}

@@ -111,6 +111,29 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
   // ShaderCallback (Shader Function(Rect)) signature convention.
   static const Set<String> _paintTimeCallbackNames = <String>{'shaderCallback'};
 
+  // Widgets whose `builder:` closure re-executes on every notification/tick.
+  //
+  // Why: gradients inside these closures intentionally vary per tick (e.g.
+  // alignment/colors driven by AnimationController.value). Hoisting the
+  // gradient to a field would defeat the animation. The rule's intent — avoid
+  // allocating identical gradients 60×/s — does not apply when the gradient
+  // genuinely changes each frame.
+  //
+  // Known limitation: `AnimatedWidget` subclasses override `build()` directly
+  // (no `builder:` closure), so their gradient construction is still flagged.
+  // Exempting those requires type-hierarchy resolution, not just AST names.
+  //
+  // See also: `animation_rules.dart` and `compound_performance_patterns.dart`
+  // define their own animation-builder sets for different rule purposes.
+  //
+  // Bug: plans/history/2026.08/2026.08.16/avoid_gradient_in_build_fp_animated_builder_closure.md
+  static const Set<String> _animationBuilderTypes = <String>{
+    'AnimatedBuilder',
+    'ListenableBuilder',
+    'TweenAnimationBuilder',
+    'ValueListenableBuilder',
+  };
+
   @override
   void visitFunctionExpression(FunctionExpression node) {
     // Stop the walk at paint-time callback boundaries. Without this gate,
@@ -119,12 +142,60 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
     // and per-frame animation values) would be flagged with a correction
     // message that is impossible to satisfy.
     final AstNode? parent = node.parent;
-    if (parent is NamedExpression &&
-        _paintTimeCallbackNames.contains(parent.name.label.name)) {
-      return;
+    if (parent is NamedExpression) {
+      final String argName = parent.name.label.name;
+
+      // Gate 1: paint-time callbacks (e.g. shaderCallback)
+      if (_paintTimeCallbackNames.contains(argName)) {
+        return;
+      }
+
+      // Gate 2: `builder:` closures on animation widgets — these re-run
+      // every frame with animation-dependent values, so the gradient must
+      // be constructed inside the closure.
+      if (argName == 'builder' && _isAnimationBuilderArg(parent)) {
+        return;
+      }
     }
     super.visitFunctionExpression(node);
   }
+
+  /// Checks whether a `builder:` [NamedExpression] belongs to a constructor
+  /// call for a known animation builder widget.
+  ///
+  /// Handles both [InstanceCreationExpression] (resolved / `const` / `new`)
+  /// and [MethodInvocation] (how the parser represents implicit-`new`
+  /// constructor calls before type resolution).
+  static bool _isAnimationBuilderArg(NamedExpression namedExpr) {
+    // Walk up: NamedExpression → ArgumentList → constructor/call
+    final AstNode? argList = namedExpr.parent;
+    if (argList is! ArgumentList) return false;
+    final AstNode? call = argList.parent;
+
+    // Resolved constructor or explicit `const`/`new`
+    if (call is InstanceCreationExpression) {
+      final String typeName =
+          call.constructorName.type.element?.name ??
+          call.constructorName.type.name.lexeme;
+      return _animationBuilderTypes.contains(typeName);
+    }
+
+    // Unresolved implicit-new: parser emits MethodInvocation
+    if (call is MethodInvocation) {
+      return _animationBuilderTypes.contains(call.methodName.name);
+    }
+
+    return false;
+  }
+
+  // Parameters that are also available at the build() method level, so
+  // referencing them does not prove the gradient depends on closure-unique
+  // data. Excluded from the closure-parameter-reference heuristic.
+  static const Set<String> _standardBuilderParams = <String>{
+    'context',
+    'child',
+    '_',
+  };
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
@@ -133,8 +204,9 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
         node.constructorName.type.name.lexeme;
 
     if (gradientTypes.contains(typeName)) {
-      // Skip const gradients - they're properly reused
-      if (node.keyword?.lexeme != 'const') {
+      // Skip const gradients — they're properly reused
+      if (node.keyword?.lexeme != 'const' &&
+          !_gradientDependsOnClosureParams(node)) {
         reporter.atNode(node);
       }
     }
@@ -145,10 +217,88 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     // Implicit constructor calls may appear as method invocations
     final String methodName = node.methodName.name;
-    if (gradientTypes.contains(methodName)) {
+    if (gradientTypes.contains(methodName) &&
+        !_gradientDependsOnClosureParams(node)) {
       reporter.atNode(node);
     }
     super.visitMethodInvocation(node);
+  }
+
+  /// Gate 3: checks whether a gradient's arguments reference a parameter
+  /// unique to the enclosing `builder:` closure.
+  ///
+  /// If the gradient depends on closure-unique data (e.g. the `value`
+  /// parameter of `TweenAnimationBuilder.builder`), it can't be hoisted
+  /// to a field — the rule's correction message is impossible to satisfy.
+  /// This gate is widget-name-independent: it catches custom animation
+  /// builders that aren't in [_animationBuilderTypes].
+  static bool _gradientDependsOnClosureParams(AstNode gradientNode) {
+    // Walk up to find the nearest enclosing builder: closure
+    final FunctionExpression? closure = _findBuilderClosure(gradientNode);
+    if (closure == null) return false;
+
+    // Collect parameter names unique to the closure (not available at
+    // build-method level)
+    final Set<String> uniqueParams = _closureUniqueParams(closure);
+    if (uniqueParams.isEmpty) return false;
+
+    // Check if any gradient argument references those parameters
+    final _ParamRefChecker checker = _ParamRefChecker(uniqueParams);
+    gradientNode.visitChildren(checker);
+    return checker.found;
+  }
+
+  /// Walks up the AST to find the nearest [FunctionExpression] that is
+  /// passed as a `builder:` named argument.
+  static FunctionExpression? _findBuilderClosure(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FunctionExpression) {
+        final AstNode? parent = current.parent;
+        if (parent is NamedExpression &&
+            parent.name.label.name == 'builder') {
+          return current;
+        }
+      }
+      current = current.parent;
+    }
+    return null;
+  }
+
+  /// Returns the parameter names of [closure] that are NOT standard builder
+  /// params (context, child, _).
+  static Set<String> _closureUniqueParams(FunctionExpression closure) {
+    final NodeList<FormalParameter>? params =
+        closure.parameters?.parameters;
+    if (params == null) return const <String>{};
+
+    final Set<String> unique = <String>{};
+    for (final FormalParameter param in params) {
+      final String? name = param.name?.lexeme;
+      if (name != null && !_standardBuilderParams.contains(name)) {
+        unique.add(name);
+      }
+    }
+    return unique;
+  }
+}
+
+/// Walks an AST subtree looking for [SimpleIdentifier] nodes whose name
+/// matches one of the target parameter names.
+class _ParamRefChecker extends RecursiveAstVisitor<void> {
+  _ParamRefChecker(this._paramNames);
+
+  final Set<String> _paramNames;
+
+  /// Whether any matching identifier was found.
+  bool found = false;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (_paramNames.contains(node.name)) {
+      found = true;
+    }
+    // Continue visiting — RecursiveAstVisitor handles child traversal
   }
 }
 
