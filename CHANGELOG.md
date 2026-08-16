@@ -66,12 +66,24 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.0.3]
 
-The scan CLI now lets users filter diagnostics by severity, so AI agents and CI pipelines can suppress info-level noise and focus on warnings and errors. [log](https://github.com/saropa/saropa_lints/blob/v15.0.3/CHANGELOG.md)
+The scan CLI now lets users filter diagnostics by severity, so AI agents and CI pipelines can suppress info-level noise and focus on warnings and errors. The extension also stops losing the in-editor analyzer plugin when Lint integration is switched off and back on, and now reports that plugin's real state instead of implying it from a setting that does not control it. [log](https://github.com/saropa/saropa_lints/blob/v15.0.3/CHANGELOG.md)
 
 ### Added
 
 - `--min-severity` flag for the `scan` command filters diagnostics by severity threshold — `--min-severity warning` excludes info-level output from both stdout and the report file, reducing noise for AI agents and CI pipelines. No action required.
 - `--max-severity` flag for the `scan` command caps output at a severity ceiling — `--max-severity warning` hides errors so you can triage lower-priority noise in isolation. No action required.
+
+### Fixed (Extension)
+
+- Turning Lint integration off and then on again left the in-editor analyzer plugin switched off — the off step comments out the `plugins:` block in `analysis_options.yaml`, and the on step never put it back, so a project silently lost live diagnostics with no indication of why. Enable now restores the block when it was this extension's own Off that commented it out, leaving new projects (which default to the lighter scan-on-save delivery) untouched. This has proven to be tricky!
+- The sidebar now reports the analyzer plugin's actual on-disk state as its own row, so "Lint integration: On" can no longer sit above a project whose `plugins:` block is commented out — clicking that row while it reads Off restores the plugin. No action required.
+
+<details><summary>Maintenance</summary>
+
+- (Extension) Added explicit `"types"` field to `tsconfig.json` so the TypeScript compiler reliably resolves Node.js globals (`Buffer`, `process`, `node:*` modules) instead of relying on auto-discovery. No action required.
+- (Extension) Added `verify-tsconfig-types` build gate that fails `precompile` when a runtime `@types/*` package is missing from the `"types"` array — catches the gap before `tsc` sees it. No action required.
+
+</details>
 
 ---
 

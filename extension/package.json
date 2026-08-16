@@ -2026,9 +2026,10 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
-    "precompile": "node -e \"require('fs').copyFileSync('../ABOUT_SAROPA.md','media/about-saropa.md')\" && node scripts/copy-codicons.js",
+    "precompile": "node -e \"require('fs').copyFileSync('../ABOUT_SAROPA.md','media/about-saropa.md')\" && node scripts/copy-codicons.js && npm run verify-tsconfig-types",
     "check-types": "node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc --noEmit",
     "verify-nls-keys": "node scripts/verify-manifest-nls-keys.mjs",
+    "verify-tsconfig-types": "node scripts/verify-tsconfig-types.mjs",
     "compile": "npm run precompile && npm run check-types && node esbuild.js",
     "watch": "npm-run-all -p watch:*",
     "watch:esbuild": "node esbuild.js --watch",
