@@ -10,10 +10,14 @@ The VS Code extension's `tsconfig.json` relied on TypeScript's automatic `@types
 
 **Validation:** `npx tsc --noEmit` passes with zero errors.
 
-**Risk mitigation:** A `verify-tsconfig-types.mjs` script scans non-test source files for imports of installed `@types/*` packages and fails if any are missing from the `"types"` array. Wired into `precompile` so every `npm run compile` and `npm run package` catches the gap before `tsc` runs. This eliminates the manual-maintenance risk of the explicit `"types"` field.
+**Risk mitigation:** A `verify-tsconfig-types.mjs` script validates both `tsconfig.json` and `tsconfig.test.json`. For each config that has an explicit `"types"` field, it scans the compiled source tree for imports of installed `@types/*` packages and fails if any are missing. Wired into `precompile` so every `npm run compile` and `npm run package` catches the gap before `tsc` runs. The script handles static imports, re-exports, dynamic `import()`, and `require()` calls.
+
+**Test config fix:** `tsconfig.test.json` previously declared `"types": ["mocha", "node"]` but test files import `vscode` (23 files), `sinon` (25 files), `jsdom` (2 files), and `semver` (transitively via vibrancy scoring modules included in the test compilation). Updated to `["mocha", "node", "vscode", "sinon", "jsdom", "semver"]`. Tests compiled clean before and after — module resolution finds `@types/*` declarations regardless of the `"types"` field, but the explicit list prevents the same auto-discovery fragility that caused the original runtime config failure.
 
 **Hardening verification:**
 - `@types/semver` confirmed used in 7 non-test source files (vibrancy scoring modules).
 - `@types/jsdom` confirmed test-only (2 files under `src/test/`).
 - `@types/sinon` confirmed test-only (25 files under `src/test/`).
 - `configTree.ts:85` TS2339 error was transient (stash state artifact); final `tsc --noEmit` clean.
+- Import regex expanded to catch `import()`, `require()`, and `export ... from` patterns.
+- Both `tsc --noEmit` (main) and `tsc -p tsconfig.test.json --noEmit` (test) pass with zero errors.

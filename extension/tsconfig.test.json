@@ -3,7 +3,7 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "out-test",
-    "types": ["mocha", "node"]
+    "types": ["mocha", "node", "vscode", "sinon", "jsdom", "semver"]
   },
   "include": [
     "src/services/todosAndHacksScannerCore.ts",
@@ -110,6 +110,7 @@
     "src/test/runAnalysisEnabledGate.test.ts",
     "src/test/runInWorkspaceAsyncCancellation.test.ts",
     "src/test/runEnableReentrancyGuard.test.ts",
+    "src/test/pluginDisableOwnership.test.ts",
     "src/pluginLiveness.ts",
     "src/test/pluginLiveness.test.ts",
     "src/scanOnSave/scanOnSaveRunner.ts",
