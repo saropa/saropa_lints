@@ -71,6 +71,39 @@ class LocaleStats:
     missing: int
 
 
+def _check_dictionary_drift(english_strings: set[str]) -> list[str]:
+    """Warn when a curated dictionary key does not match any English source string.
+
+    If the en.json wording changes (e.g., "Analyzer plugin" → "Analyzer Plugin"),
+    the curated entry silently stops matching and MT takes over — causing the exact
+    regression the dictionary was supposed to prevent. This check catches that drift
+    at the start of every run.
+    """
+    # Curated passthroughs (English == translation) are intentional and harmless
+    # even if the source disappears, so only flag entries that actually translate.
+    orphans: list[str] = []
+    for locale, entries in TRANSLATIONS.items():
+        for en_key, translation in entries.items():
+            if en_key == translation:
+                # Passthrough — not a real translation, safe to ignore.
+                continue
+            if en_key not in english_strings:
+                orphans.append(f"  {locale}: {en_key!r} → {translation!r}")
+    if orphans:
+        print(
+            c("yellow", f"  ⚠ {len(orphans)} curated dictionary key(s) no longer "
+                        "match any English source string (stale or renamed):"),
+        )
+        for line in orphans:
+            print(c("yellow", line))
+        print(
+            c("gray", "    Fix: update the key in dictionaries.py to match "
+                      "the current en.json / package.nls.json wording."),
+        )
+        print()
+    return orphans
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate extension locale JSON files.")
     parser.add_argument(
@@ -783,6 +816,10 @@ def main() -> int:
     collect_unique_strings(package_en, unique_en)
     collect_unique_strings(runtime_en, unique_en)
     sorted_unique = sorted(unique_en)
+
+    # Early warning: curated dictionary keys that no longer match any English
+    # source string — the translation silently stops being used and MT takes over.
+    _check_dictionary_drift(unique_en)
 
     # Interactive launches preview the current gap/low-quality state with a
     # read-only audit BEFORE the menu, so the mode choice is informed by what is

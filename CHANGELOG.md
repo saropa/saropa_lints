@@ -89,6 +89,8 @@ The scan CLI now lets users filter diagnostics by severity, so AI agents and CI 
 
 - (Extension) Added explicit `"types"` field to both `tsconfig.json` and `tsconfig.test.json` so the TypeScript compiler reliably resolves Node.js globals and test framework types instead of relying on auto-discovery. No action required.
 - (Extension) Added `verify-tsconfig-types` build gate that validates both tsconfig files during `precompile` — fails when an imported `@types/*` package is missing from either config's `"types"` array. No action required.
+- (Extension) Pinned Filipino translation of "Analyzer plugin" in the curated dictionary so the MT pipeline stops overwriting it with untranslated English on every run. No action required.
+- (Extension) The i18n pipeline now warns at the start of every run when a curated dictionary key no longer matches any English source string — catches silent regressions where a renamed en.json string causes the dictionary entry to stop matching and MT takes over. No action required.
 
 </details>
 
