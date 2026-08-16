@@ -64,6 +64,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.0.5]
+
+Doc comments that reference a method or function by name — a common dartdoc pattern like "see [otherMethod]" — no longer trip a false "undocumented parameter" warning. The check now recognizes those as valid cross-references instead of assuming every bracketed name is a stale parameter. [log](https://github.com/saropa/saropa_lints/blob/v15.0.5/CHANGELOG.md)
+
+### Fixed
+
+- `verify_documented_parameters_exist` no longer flags valid dartdoc cross-references to methods, functions, or getters as stale parameter names. No action required.
+
+---
+
 ## [15.0.4]
 
 Switching Lint integration on is now near-instant instead of a two-minute wait that looked like a freeze. Every command the extension shells out to a Dart tool for now uses the Dart executable directly rather than routing through Flutter, and the dependency resolve is skipped altogether when nothing needs resolving. [log](https://github.com/saropa/saropa_lints/blob/v15.0.4/CHANGELOG.md)

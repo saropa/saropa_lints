@@ -702,8 +702,16 @@ class RequireExampleInDocumentationRule extends SaropaLintRule {
 ///
 /// **Suppressions:** No lint for `[String]`, `[int]`, `[null]`, `[true]`,
 /// `[false]`, or other `_knownDocRefNames`; single-letter uppercase (type
-/// params); PascalCase only when confirmed as parameter context (bullet or
-/// "parameter"/"argument" keyword); class field names.
+/// params); class field and method/getter/setter names on the enclosing
+/// class, including inherited members when the superclass is declared in
+/// the same file; same-file top-level function names and enum constants
+/// (valid dartdoc cross-references). Any name is only flagged when
+/// confirmed as parameter context (bullet position — `-`, `*`, or `1.` —
+/// or a following "parameter"/"argument" keyword) — this applies to both
+/// PascalCase and lowercase names. Refs to members declared in another
+/// file/package (cross-file inheritance, extension methods, imported enum
+/// values) are not suppressed by name and rely on the confirmed-context
+/// gate instead.
 ///
 /// **BAD:**
 /// ```dart
@@ -748,6 +756,10 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
   /// field/enum accesses, not parameter references).
   static final RegExp _bracketedNamePattern = RegExp(r'\[([a-zA-Z_]\w*)\]');
 
+  /// Matches a trailing list-item marker (`-`, `*`, or `12.`) immediately
+  /// before a `[name]` reference, confirming bullet-list position.
+  static final RegExp _bulletMarkerPattern = RegExp(r'(^|\s)([-*]|\d+\.)\s*$');
+
   /// Words after `[name]` that confirm parameter intent.
   static const Set<String> _parameterKeywords = <String>{
     'parameter',
@@ -789,6 +801,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
         docComment: node.documentationComment,
         parameters: node.parameters,
         enclosingClass: node.thisOrAncestorOfType<ClassDeclaration>(),
+        enclosingUnit: node.thisOrAncestorOfType<CompilationUnit>(),
         reporter: reporter,
       );
     });
@@ -797,6 +810,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
       _checkDeclaration(
         docComment: node.documentationComment,
         parameters: node.functionExpression.parameters,
+        enclosingUnit: node.thisOrAncestorOfType<CompilationUnit>(),
         reporter: reporter,
       );
     });
@@ -806,6 +820,7 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
         docComment: node.documentationComment,
         parameters: node.parameters,
         enclosingClass: node.thisOrAncestorOfType<ClassDeclaration>(),
+        enclosingUnit: node.thisOrAncestorOfType<CompilationUnit>(),
         reporter: reporter,
       );
     });
@@ -815,13 +830,29 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
     required Comment? docComment,
     required FormalParameterList? parameters,
     ClassDeclaration? enclosingClass,
+    CompilationUnit? enclosingUnit,
     required SaropaDiagnosticReporter reporter,
   }) {
     if (docComment == null) return;
     if (parameters == null) return;
 
     final Set<String> paramNames = _extractParamNames(parameters);
-    final Set<String> classFieldNames = _extractClassFieldNames(enclosingClass);
+    // Field/method extraction also walks same-file superclasses, so docs
+    // on a subclass can reference an inherited member without a false
+    // positive — cross-file inheritance still relies on the context gate.
+    final Set<String> classFieldNames = _extractClassFieldNames(
+      enclosingClass,
+      enclosingUnit,
+    );
+    final Set<String> classMethodNames = _extractClassMethodNames(
+      enclosingClass,
+      enclosingUnit,
+    );
+    // Same-file top-level functions and enum constants are also valid
+    // dartdoc cross-reference targets.
+    final Set<String> fileScopedNames = _extractSameFileTopLevelNames(
+      enclosingUnit,
+    );
 
     // Joined text for semantic context (e.g. bullet/keyword detection).
     final String docText = docComment.tokens
@@ -844,15 +875,23 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
         if (_knownDocRefNames.contains(name)) continue;
         if (name.length == 1 && name == name.toUpperCase()) continue;
 
-        if (name[0] == name[0].toUpperCase()) {
-          final int joinedStart = docTextOffset + match.start;
-          final int joinedEnd = docTextOffset + match.end;
-          if (!_isConfirmedParameterRef(docText, joinedStart, joinedEnd)) {
-            continue;
-          }
-        }
-
+        // Skip references to class fields/methods (own class or same-file
+        // superclass) and same-file top-level functions/enum constants —
+        // these are valid dartdoc cross-references, not stale parameter
+        // names.
         if (classFieldNames.contains(name)) continue;
+        if (classMethodNames.contains(name)) continue;
+        if (fileScopedNames.contains(name)) continue;
+
+        // Only flag when context confirms parameter intent (bullet-list
+        // position or keyword like "parameter"/"argument" after the ref).
+        // Without this gate, valid cross-references to top-level functions
+        // or methods on other classes would be false positives.
+        final int joinedStart = docTextOffset + match.start;
+        final int joinedEnd = docTextOffset + match.end;
+        if (!_isConfirmedParameterRef(docText, joinedStart, joinedEnd)) {
+          continue;
+        }
 
         reporter.atOffset(
           offset: match.start + token.offset,
@@ -866,10 +905,14 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
   /// Returns true when the context around `[Name]` at [start]..[end] in
   /// [docText] confirms it is a parameter reference, not a type reference.
   bool _isConfirmedParameterRef(String docText, int start, int end) {
-    // Bullet-style: `/// - [Name]`
-    if (start >= 2) {
-      final String before = docText.substring(start - 2, start).trimLeft();
-      if (before.endsWith('-')) return true;
+    // Bullet-style: `/// - [Name]`, `/// * [Name]`, or a numbered item
+    // like `/// 1. [Name]` — dartdoc/markdown all treat these as lists.
+    // A wider lookback window than the marker itself is needed to see the
+    // digits of a numbered-list marker (e.g. `12. `).
+    if (start > 0) {
+      final int lookbackStart = start - 8 < 0 ? 0 : start - 8;
+      final String before = docText.substring(lookbackStart, start);
+      if (_bulletMarkerPattern.hasMatch(before)) return true;
     }
 
     // Keyword after: `[Name] parameter`, `[Name] argument`
@@ -892,13 +935,88 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
     return names;
   }
 
-  Set<String> _extractClassFieldNames(ClassDeclaration? classDecl) {
-    if (classDecl == null) return const <String>{};
+  /// Extracts field names from [classDecl] and, when declared in the same
+  /// file, its superclass chain — so a subclass's docs can reference an
+  /// inherited field without a false positive.
+  Set<String> _extractClassFieldNames(
+    ClassDeclaration? classDecl, [
+    CompilationUnit? unit,
+  ]) {
     final Set<String> names = <String>{};
-    for (final ClassMember member in classDecl.bodyMembers) {
-      if (member is FieldDeclaration) {
-        for (final VariableDeclaration variable in member.fields.variables) {
-          names.add(variable.name.lexeme);
+    for (final ClassDeclaration decl in _sameFileClassChain(classDecl, unit)) {
+      for (final ClassMember member in decl.bodyMembers) {
+        if (member is FieldDeclaration) {
+          for (final VariableDeclaration variable in member.fields.variables) {
+            names.add(variable.name.lexeme);
+          }
+        }
+      }
+    }
+    return names;
+  }
+
+  /// Extracts method/getter/setter names from [classDecl] and, when
+  /// declared in the same file, its superclass chain, so `[methodName]`
+  /// cross-references (including inherited ones) aren't flagged as stale
+  /// parameters.
+  Set<String> _extractClassMethodNames(
+    ClassDeclaration? classDecl, [
+    CompilationUnit? unit,
+  ]) {
+    final Set<String> names = <String>{};
+    for (final ClassDeclaration decl in _sameFileClassChain(classDecl, unit)) {
+      for (final ClassMember member in decl.bodyMembers) {
+        if (member is MethodDeclaration) {
+          names.add(member.name.lexeme);
+        }
+      }
+    }
+    return names;
+  }
+
+  /// Walks [classDecl] and its superclasses that are declared in the same
+  /// [unit], stopping at the first superclass declared elsewhere (a
+  /// different file or an external package) — those still rely on the
+  /// confirmed-context gate rather than name resolution. A visited set
+  /// guards against cyclic `extends` (which the analyzer itself rejects,
+  /// but defends this rule's own extraction loop regardless).
+  Iterable<ClassDeclaration> _sameFileClassChain(
+    ClassDeclaration? classDecl,
+    CompilationUnit? unit,
+  ) sync* {
+    ClassDeclaration? current = classDecl;
+    final Set<String> visited = <String>{};
+    while (current != null && visited.add(current.nameToken.lexeme)) {
+      yield current;
+      final NamedType? superType = current.extendsClause?.superclass;
+      current = superType == null
+          ? null
+          : _findClassInUnit(unit, superType.name.lexeme);
+    }
+  }
+
+  ClassDeclaration? _findClassInUnit(CompilationUnit? unit, String name) {
+    if (unit == null) return null;
+    for (final CompilationUnitMember member in unit.declarations) {
+      if (member is ClassDeclaration && member.nameToken.lexeme == name) {
+        return member;
+      }
+    }
+    return null;
+  }
+
+  /// Extracts top-level function names and enum constant names declared in
+  /// the same file, so `[topLevelFunction]` and `[EnumValue]` doc
+  /// cross-references aren't flagged as stale parameters.
+  Set<String> _extractSameFileTopLevelNames(CompilationUnit? unit) {
+    if (unit == null) return const <String>{};
+    final Set<String> names = <String>{};
+    for (final CompilationUnitMember member in unit.declarations) {
+      if (member is FunctionDeclaration) {
+        names.add(member.name.lexeme);
+      } else if (member is EnumDeclaration) {
+        for (final EnumConstantDeclaration constant in member.bodyConstants) {
+          names.add(constant.name.lexeme);
         }
       }
     }

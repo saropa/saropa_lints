@@ -83,3 +83,89 @@ class MyWidget {
 
 /// References a [BackupOptionEnum.contact] enum value.
 void enumReference() {}
+
+/// Service with method cross-references in doc comments.
+class MyService {
+  /// The service name.
+  final String name;
+
+  /// Creates a [MyService] with [name].
+  MyService(this.name);
+
+  /// Deprecated — use [showNewDialog] instead.
+  /// This is a valid dartdoc cross-reference to another method, not a param.
+  void showOldDialog() {}
+
+  /// The replacement for [showOldDialog].
+  void showNewDialog() {}
+
+  /// See [name] for the display value.
+  /// Field cross-references should not trigger either.
+  void printName() {}
+
+  /// Mirrors [isEligible] so callers can skip the check.
+  /// Cross-class method ref — should not trigger.
+  bool canProceed() => true;
+
+  /// Refreshes after [loadContacts] completes.
+  /// Top-level function ref — should not trigger.
+  void refresh() {}
+
+  /// Checks eligibility.
+  bool isEligible() => true;
+}
+
+/// Top-level function referenced from doc comments.
+void loadContacts() {}
+
+/// Method with a stale param ref in bullet-list context.
+///
+// expect_lint: verify_documented_parameters_exist
+/// - [removedParam] was renamed
+void hasStaleParam(String actualParam) {}
+
+/// Stale param ref using a `*` bullet marker.
+///
+// expect_lint: verify_documented_parameters_exist
+/// * [goneParam] no longer exists
+void hasStaleParamStarBullet(String actualParam) {}
+
+/// Stale param ref using a numbered-list marker.
+///
+// expect_lint: verify_documented_parameters_exist
+/// 1. [oldParam] no longer exists
+void hasStaleParamNumberedBullet(String actualParam) {}
+
+/// Base class declared in the same file as its subclass.
+class BaseRecord {
+  /// The record identifier.
+  final String id;
+
+  /// Creates a [BaseRecord] with [id].
+  BaseRecord(this.id);
+
+  /// Validates the record.
+  bool validate() => id.isNotEmpty;
+}
+
+/// Subclass referencing an inherited field and method in its docs.
+class DerivedRecord extends BaseRecord {
+  /// Creates a [DerivedRecord] with [id].
+  DerivedRecord(super.id);
+
+  /// Calls [validate] and logs the [id] used.
+  /// Both refs are inherited from the same-file superclass — should NOT
+  /// trigger.
+  void checkAndLog() {}
+}
+
+/// Enum declared in the same file as a function that references it.
+enum SyncStatus { pending, complete }
+
+/// Starts a sync, ending in [SyncStatus.complete].
+/// References [SyncStatus] and its constant via dotted access, which the
+/// bracketed-name pattern does not match at all (dotted refs are skipped
+/// by the pattern itself). This function also plainly references the
+/// [pending] status by name — should NOT trigger since it is a same-file
+/// enum constant.
+void startSync() {}
