@@ -46,13 +46,13 @@ void avoidExpensiveLogGood(int id, String action) {
 }
 
 // -----------------------------------------------------------------------------
-// avoid_returning_this
+// avoid_returning_this_with_fix
 // -----------------------------------------------------------------------------
 class AvoidReturningThisBad {
   int _x = 0;
   AvoidReturningThisBad setX(int x) {
     _x = x;
-    return this; // LINT: avoid_returning_this
+    return this; // LINT: avoid_returning_this_with_fix
   }
 }
 

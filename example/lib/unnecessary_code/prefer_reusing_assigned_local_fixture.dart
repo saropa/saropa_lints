@@ -1,6 +1,6 @@
 // ignore_for_file: unused_local_variable, unused_element
 // ignore_for_file: depend_on_referenced_packages
-// ignore_for_file: avoid_print, prefer_final_locals
+// ignore_for_file: avoid_print, prefer_final_locals_with_fix
 // ignore_for_file: unused_import, unnecessary_null_comparison
 // ignore_for_file: avoid_dynamic_calls
 // Test fixture for: prefer_reusing_assigned_local

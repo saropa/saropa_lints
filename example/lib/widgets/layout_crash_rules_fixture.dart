@@ -1,5 +1,5 @@
 // ignore_for_file: unused_local_variable, prefer_const_constructors
-// ignore_for_file: prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_literals_to_create_immutables_widget_scoped
 // Fixtures for layout crash detection rules
 
 import 'package:saropa_lints_example/flutter_mocks.dart';

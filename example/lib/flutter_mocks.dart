@@ -1,4 +1,4 @@
-// ignore_for_file: unused_element, avoid_unused_constructor_parameters
+// ignore_for_file: unused_element, avoid_unused_constructor_parameters_skip_private
 // ignore_for_file: avoid_context_in_static_methods
 // ignore_for_file: prefer_explicit_type_arguments, avoid_double_for_money
 // ignore_for_file: require_websocket_reconnection, require_immutable_bloc_state

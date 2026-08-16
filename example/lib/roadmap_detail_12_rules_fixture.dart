@@ -1,19 +1,19 @@
-// Fixture for 12 roadmap-detail rules (avoid_unnecessary_containers, prefer_adjacent_strings, etc.)
-// ignore_for_file: unused_local_variable, unused_element, prefer_const_declarations
-// ignore_for_file: avoid_unnecessary_containers, prefer_adjacent_strings, prefer_adjective_bool_getters
-// ignore_for_file: prefer_asserts_in_initializer_lists, prefer_const_constructors_in_immutables
-// ignore_for_file: prefer_const_declarations, prefer_const_literals_to_create_immutables
+// Fixture for 12 roadmap-detail rules (avoid_unnecessary_containers_resolved, prefer_adjacent_strings, etc.)
+// ignore_for_file: unused_local_variable, unused_element, prefer_const_declarations_with_fix
+// ignore_for_file: avoid_unnecessary_containers_resolved, prefer_adjacent_strings, prefer_adjective_bool_getters
+// ignore_for_file: prefer_asserts_in_initializer_lists_safe, prefer_const_constructors_in_immutables_extended
+// ignore_for_file: prefer_const_declarations_with_fix, prefer_const_literals_to_create_immutables_widget_scoped
 // ignore_for_file: prefer_constructors_first, prefer_extension_methods, prefer_extension_over_utility_class
-// ignore_for_file: prefer_extension_type_for_wrapper, prefer_final_fields
+// ignore_for_file: prefer_extension_type_for_wrapper, prefer_final_fields_with_fix
 
 import 'package:flutter/material.dart';
 
-// ========== avoid_unnecessary_containers (widget files only) ==========
+// ========== avoid_unnecessary_containers_resolved (widget files only) ==========
 // BAD: Container with only child — expect_lint in widget
 Widget badContainerOnlyChild() {
   return Container(
     child: Text('Hi'),
-  ); // expect_lint: avoid_unnecessary_containers
+  ); // expect_lint: avoid_unnecessary_containers_resolved
 }
 
 Widget goodContainerWithPadding() {
@@ -39,10 +39,10 @@ class GoodBoolGetters {
   bool get isLoading => false;
 }
 
-// ========== prefer_asserts_in_initializer_lists ==========
+// ========== prefer_asserts_in_initializer_lists_safe ==========
 class BadAssertInBody {
   BadAssertInBody(this.x) {
-    assert(x > 0); // expect_lint: prefer_asserts_in_initializer_lists
+    assert(x > 0); // expect_lint: prefer_asserts_in_initializer_lists_safe
   }
 
   final int x;
@@ -53,12 +53,12 @@ class GoodAssertInInitializer {
   final int x;
 }
 
-// ========== prefer_const_constructors_in_immutables ==========
+// ========== prefer_const_constructors_in_immutables_extended ==========
 @immutable
 class BadImmutableNoConst {
   BadImmutableNoConst({
     required this.url,
-  }); // expect_lint: prefer_const_constructors_in_immutables
+  }); // expect_lint: prefer_const_constructors_in_immutables_extended
   final String url;
 }
 
@@ -68,20 +68,20 @@ class GoodImmutableWithConst {
   final String url;
 }
 
-// ========== prefer_const_declarations ==========
+// ========== prefer_const_declarations_with_fix ==========
 void constDeclarations() {
-  final pi = 3.14; // expect_lint: prefer_const_declarations
-  final greeting = 'x'; // expect_lint: prefer_const_declarations
+  final pi = 3.14; // expect_lint: prefer_const_declarations_with_fix
+  final greeting = 'x'; // expect_lint: prefer_const_declarations_with_fix
   const ok = 1;
 }
 
-// ========== prefer_const_literals_to_create_immutables (widget) ==========
+// ========== prefer_const_literals_to_create_immutables_widget_scoped (widget) ==========
 Widget constLiterals() {
   return Column(
     children: [
       Text('a'),
       Text('b'),
-    ], // expect_lint: prefer_const_literals_to_create_immutables
+    ], // expect_lint: prefer_const_literals_to_create_immutables_widget_scoped
   );
 }
 
@@ -117,9 +117,9 @@ class UserId {
   const UserId(this.value); // expect_lint: prefer_extension_type_for_wrapper
 }
 
-// ========== prefer_final_fields ==========
+// ========== prefer_final_fields_with_fix ==========
 class BadMutableNeverAssigned {
-  String name; // expect_lint: prefer_final_fields
+  String name; // expect_lint: prefer_final_fields_with_fix
   BadMutableNeverAssigned(this.name);
 }
 

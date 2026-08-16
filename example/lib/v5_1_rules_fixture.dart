@@ -1,8 +1,8 @@
 // Test fixture for v5.1.0 lint rules
-// ignore_for_file: unused_local_variable, unused_element, prefer_const_declarations
+// ignore_for_file: unused_local_variable, unused_element, prefer_const_declarations_with_fix
 // ignore_for_file: avoid_print_in_release, prefer_no_commented_out_code
 // ignore_for_file: unused_import, depend_on_referenced_packages
-// ignore_for_file: prefer_const_constructors, avoid_returning_null_for_void
+// ignore_for_file: prefer_const_constructors, avoid_returning_null_for_void_with_fix
 // ignore_for_file: avoid_image_rebuild_on_scroll, avoid_large_objects_in_state
 // ignore_for_file: require_dispose, avoid_undisposed_instances
 

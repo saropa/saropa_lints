@@ -1,5 +1,5 @@
 // Test fixture for v4.15.0 ROADMAP ⭐ rules
-// ignore_for_file: unused_local_variable, unused_element, prefer_const_declarations
+// ignore_for_file: unused_local_variable, unused_element, prefer_const_declarations_with_fix
 // ignore_for_file: avoid_print_in_release, prefer_no_commented_out_code
 // ignore_for_file: unused_import, depend_on_referenced_packages
 

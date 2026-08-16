@@ -1,11 +1,11 @@
-// ignore_for_file: unused_element, unused_local_variable, prefer_const_declarations, unused_catch_clause
+// ignore_for_file: unused_element, unused_local_variable, prefer_const_declarations_with_fix, unused_catch_clause
 
-/// Fixture for `prefer_final_locals` lint rule.
+/// Fixture for `prefer_final_locals_with_fix` lint rule.
 /// Quick fix: Add final (or replace var with final).
 
 void placeholderPreferFinalLocals() {
   // BAD: var never reassigned — LINT
-  // expect_lint: prefer_final_locals
+  // expect_lint: prefer_final_locals_with_fix
   var count = 1;
 
   // GOOD: final
@@ -131,7 +131,7 @@ String? reassignSelfRef(String? input) {
 // the same name is. Shadow must NOT be mistaken for a reassignment of the
 // outer — rule MUST still fire on the outer.
 void shadowedInnerReassignment() {
-  // expect_lint: prefer_final_locals
+  // expect_lint: prefer_final_locals_with_fix
   var outer = 1;
   {
     var outer = 10; // inner shadow — different element
@@ -144,7 +144,7 @@ void shadowedInnerReassignment() {
 // BAD: truly never reassigned in a function with if/for/closures that do not
 // touch this particular variable — regression baseline.
 void trulyNeverReassigned() {
-  // expect_lint: prefer_final_locals
+  // expect_lint: prefer_final_locals_with_fix
   var unchanged = 'hello';
   int other = 0;
   if (other == 0) {

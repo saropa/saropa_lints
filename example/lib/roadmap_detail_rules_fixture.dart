@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_final_locals, prefer_getters_before_setters, prefer_if_elements_to_conditional_expressions, prefer_inlined_adds, prefer_interpolation_to_compose, prefer_lowercase_constants, prefer_mixin_over_abstract, prefer_named_bool_params, prefer_noun_class_names, prefer_null_aware_method_calls, prefer_raw_strings, prefer_record_over_tuple_class, prefer_sealed_classes, prefer_sealed_for_state, prefer_static_before_instance, prefer_verb_method_names
+// ignore_for_file: prefer_final_locals_with_fix, prefer_getters_before_setters, prefer_if_elements_to_conditional_expressions_null_branch, prefer_inlined_adds_strict, prefer_interpolation_to_compose, prefer_lowercase_constants, prefer_mixin_over_abstract, prefer_named_bool_params, prefer_noun_class_names, prefer_null_aware_method_calls_extended, prefer_raw_strings, prefer_record_over_tuple_class, prefer_sealed_classes, prefer_sealed_for_state, prefer_static_before_instance, prefer_verb_method_names
 // Fixture for roadmap-detail rules: bad examples (each would trigger its rule without ignore).
 
 void preferFinalLocalsBad() {
