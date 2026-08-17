@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: تبديل تحذيرات التشخيص",
   "command.toggleSeverityInfo.title": "Saropa Lints: تبديل معلومات التشخيص",
   "command.toggleSeverityHint.title": "Saropa Lints: تبديل إشارة التشخيص",
+  "command.toggleSeverityInline.title": "تبديل",
   "command.pickUiLanguage.title": "Saropa Lints: اللغة / Langue / Sprache / 言語 / 语言 لغة / لغه / لغات / لغة",
   "command.openConfigDashboard.title": "Saropa Lints: هيئة إدارة المعلومات إدارة حزم القواعد",
   "command.openAnalysisOptimizer.title": "Saropa Lints: مُحسّن التحليل",

@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: שחלוף 경고 תצפית",
   "command.toggleSeverityInfo.title": "Saropa Lints: שחלוף מידע דיאגנוסטיקה",
   "command.toggleSeverityHint.title": "Saropa Lints: מראה/הסרת תיאורים אבחנתיים",
+  "command.toggleSeverityInline.title": "החלף",
   "command.pickUiLanguage.title": "Saropa Lints: שפה / Langue / Sprache / 言語 / 语言 השפה / הלשון",
   "command.openConfigDashboard.title": "Saropa Lints: פתיחת הגדרות Lints",
   "command.openAnalysisOptimizer.title": "Saropa Lints: אופטימיזר ניתוח",

@@ -2073,5 +2073,10 @@
       "detail": "الأنماط: {preview}"
     },
     "diffTitle": "مُحسّن تحليل: المقترحات التبعية"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "اضغط مرتين لتبديل {severity}"
+    }
   }
 }

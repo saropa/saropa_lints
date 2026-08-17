@@ -2073,5 +2073,10 @@
       "detail": "Patterns : {preview}"
     },
     "diffTitle": "Optimiseur d'analyse : Exclusions proposées"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "Double-cliquez pour basculer {severity}"
+    }
   }
 }

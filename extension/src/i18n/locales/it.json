@@ -2073,5 +2073,10 @@
       "detail": "Pattern: {preview}"
     },
     "diffTitle": "Ottimizzatore Analisi: Esclusioni Proposte"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "Fai doppio clic per attivare/disattivare {severity}"
+    }
   }
 }

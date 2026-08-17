@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints : Basculer les diagnostics d'avertissement",
   "command.toggleSeverityInfo.title": "Saropa Lints : Basculer les diagnostics Info",
   "command.toggleSeverityHint.title": "Saropa Lints : Basculer les diagnostics d'indice",
+  "command.toggleSeverityInline.title": "Basculer",
   "command.pickUiLanguage.title": "Saropa Lints: Langue / langue / langage / langue de la bouche ou du nez.",
   "command.openConfigDashboard.title": "Saropa Lints: Il s'agit de la réponse à une question. Gérer les packs de règles.",
   "command.openAnalysisOptimizer.title": "Saropa Lints : Optimiseur d'analyse",

@@ -1001,8 +1001,8 @@
       "footprintUnique": "+ منفرد۔ انوکھا",
       "footprintTotalTitle": "اپنی سائز + تمام ٹرانزیٹوز ، بشمول دوسرے محکموں کے ساتھ مشترکہ ڈپٹی۔",
       "footprintTotal": "تمام + سبھی + سب",
-      "searchLabel": "تلاش پیکجوں کی تلاش کریں.",
-      "searchPlaceholder": "تلاش پیکجوں ...",
+      "searchLabel": "تلاش",
+      "searchPlaceholder": "تلاش",
       "clearSearchTitle": "ڳولا صاف ڪريو",
       "clearSearchAria": "ڳولا صاف ڪريو",
       "ageFilterTitle": "عمر شائع کرنے کے لحاظ سے فلٹر کریں",
@@ -2073,5 +2073,10 @@
       "detail": "القواعد صارف: {preview}"
     },
     "diffTitle": "تحلیل اپٹیمайزر: پیش کی گئی استثنیات"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "دو بار کلک کریں تاکہ {severity} کو تبدیل کریں"
+    }
   }
 }

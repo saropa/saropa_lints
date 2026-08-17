@@ -2073,5 +2073,10 @@
       "detail": "Pola: {preview}"
     },
     "diffTitle": "Analisis Optimizer: Rekomendasi Pengeluaran"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "Klik dua kali untuk membalikkan {severity}"
+    }
   }
 }

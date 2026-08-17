@@ -2073,5 +2073,10 @@
       "detail": "รูปแบบ: {preview}"
     },
     "diffTitle": "เครื่องมือปรับแต่งการวิเคราะห์: การยกเว้นที่แนะนำ"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "คลิกสองครั้งเพื่อสลับ {severity}"
+    }
   }
 }

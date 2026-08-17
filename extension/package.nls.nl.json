@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: Waarschuwing Diagnostiek in/uit",
   "command.toggleSeverityInfo.title": "Saropa Lints: Info Diagnostiek in/uit",
   "command.toggleSeverityHint.title": "Saropa Lints: Schakel Hint Diagnostiek in/uit",
+  "command.toggleSeverityInline.title": "Schakel om",
   "command.pickUiLanguage.title": "Saropa Lints: Taal / taal / sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Het is een _PH0_. Regelpakketten beheren",
   "command.openAnalysisOptimizer.title": "Saropa Lints: Analyse Optimaliseer",

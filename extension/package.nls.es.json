@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: Alternar Diagnósticos de Advertencia",
   "command.toggleSeverityInfo.title": "Saropa Lints: Alternar Información Diagnósticos",
   "command.toggleSeverityHint.title": "Saropa Lints: Alternar sugerencias de diagnóstico",
+  "command.toggleSeverityInline.title": "Alternar",
   "command.pickUiLanguage.title": "Saropa Lints: Lenguaje / lengua / lenguaje / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin Gestionar los paquetes de reglas.",
   "command.openAnalysisOptimizer.title": "Saropa Lints: Optimizador de análisis",

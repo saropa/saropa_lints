@@ -2073,5 +2073,10 @@
       "detail": "প্যাটার্ন: {preview}"
     },
     "diffTitle": "বিশ্লেষণ অপ্টিমাইজার: প্রস্তাবিত বাদ দেওয়া বিষয়গুলি"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "দ্বিগুণ ক্লিক করে টুগেল করুন {severity}"
+    }
   }
 }

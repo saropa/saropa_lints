@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: Alternar Avisos de Diagnóstico",
   "command.toggleSeverityInfo.title": "Saropa Lints: Alternar Info Diagnósticos",
   "command.toggleSeverityHint.title": "Saropa Lints: Alternar Dicas de Diagnóstico",
+  "command.toggleSeverityInline.title": "Alternar",
   "command.pickUiLanguage.title": "Saropa Lints: Língua / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: é um número de PH0__. Gerenciar Pacotes de Regras para Gerir",
   "command.openAnalysisOptimizer.title": "Saropa Lints: Analisador de Otimização",

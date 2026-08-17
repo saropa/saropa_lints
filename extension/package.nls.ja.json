@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: ウォーニング診断の切り替え",
   "command.toggleSeverityInfo.title": "Saropa Lints: インフォ診断のトグル",
   "command.toggleSeverityHint.title": "Saropa Lints: ヒント診断の切り替え",
+  "command.toggleSeverityInline.title": "トグル",
   "command.pickUiLanguage.title": "Saropa Lints: 言語 / Langue / Sprache / 言語/ 言語の言葉について",
   "command.openConfigDashboard.title": "Saropa Lints: フォローしている ルールパックを管理する",
   "command.openAnalysisOptimizer.title": "Saropa Lints: 分析最適化",

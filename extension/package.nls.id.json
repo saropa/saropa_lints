@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: Beralih Peringatan Diagnostik",
   "command.toggleSeverityInfo.title": "Saropa Lints: Beralihkan Info Diagnostik",
   "command.toggleSeverityHint.title": "Saropa Lints: Beralihkan Petunjuk Diagnostik",
+  "command.toggleSeverityInline.title": "Beralih",
   "command.pickUiLanguage.title": "Saropa Lints: Bahasa / Langue / Sprache / 言語 / 语言 bahasa",
   "command.openConfigDashboard.title": "Saropa Lints: adalah suatu bentuk dari _PH0_. Mengelola Rule Packs.",
   "command.openAnalysisOptimizer.title": "Saropa Lints: Optimizer Analisis",

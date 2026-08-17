@@ -2073,5 +2073,10 @@
       "detail": "תבניות: {preview}"
     },
     "diffTitle": "מotify תحليل: הצעות היעדרויות"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "לחיצה כפולה כדי להחלף {severity}"
+    }
   }
 }

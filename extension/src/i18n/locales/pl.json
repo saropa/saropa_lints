@@ -2073,5 +2073,10 @@
       "detail": "Wzorce: {preview}"
     },
     "diffTitle": "Optymalizator Analizy: Zalecane Wykluczenia"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "Kliknij dwukrotnie, aby przełączyć {severity}"
+    }
   }
 }

@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: Attiva/Disattiva Avvisi Diagnostici",
   "command.toggleSeverityInfo.title": "Saropa Lints: Attiva/Disattiva Diagnostica Informazioni",
   "command.toggleSeverityHint.title": "Saropa Lints: Attiva/Disattiva Suggestion Diagnostico",
+  "command.toggleSeverityInline.title": "Attiva",
   "command.pickUiLanguage.title": "Saropa Lints: Lingua / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: è il nome di una delle sue compagne. Gestisci i pacchetti di regole.",
   "command.openAnalysisOptimizer.title": "Saropa Lints: Ottimizzatore dell'Analisi",

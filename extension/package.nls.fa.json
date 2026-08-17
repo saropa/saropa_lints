@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: ویژگی چیک کردن یا غیر فعال کردن پیش گویی ها",
   "command.toggleSeverityInfo.title": "Saropa Lints: تoggling اطلاعات دیاگنستیکس",
   "command.toggleSeverityHint.title": "Saropa Lints: یک بار دیگر نشانه گذاری",
+  "command.toggleSeverityInline.title": "تoggل",
   "command.pickUiLanguage.title": "Saropa Lints: Language / Langue / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: _PH0_: = PH0__::: -پای مدیریت Rule Packs بسته های قاعده",
   "command.openAnalysisOptimizer.title": "Saropa Lints: بهینه سازی تحلیل",

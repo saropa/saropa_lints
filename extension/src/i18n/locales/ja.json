@@ -2073,5 +2073,10 @@
       "detail": "パターン: {preview}"
     },
     "diffTitle": "分析最適化: 提案された除外項目"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "ダブルクリックで{severity}を切り替え"
+    }
   }
 }

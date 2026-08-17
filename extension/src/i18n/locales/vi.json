@@ -2073,5 +2073,10 @@
       "detail": "Mẫu: {preview}"
     },
     "diffTitle": "Trình tối ưu hóa phân tích: Loại trừ được đề xuất"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "Nhấp đúp để bật/tắt {severity}"
+    }
   }
 }

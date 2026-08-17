@@ -2073,5 +2073,10 @@
       "detail": "Патерни: {preview}"
     },
     "diffTitle": "Оптимізатор аналізу: Пропоновані виключення"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "Двічі клікніть, щоб переключити {severity}"
+    }
   }
 }

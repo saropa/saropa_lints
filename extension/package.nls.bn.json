@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: আপত্তি বিশ্লেষণ টগল করুন",
   "command.toggleSeverityInfo.title": "Saropa Lints: তথ্য ডায়নোস্টিকস টুগেল",
   "command.toggleSeverityHint.title": "Saropa Lints: হিন্ট ডায়নোস্টিকস টুগেল",
+  "command.toggleSeverityInline.title": "টুগল",
   "command.pickUiLanguage.title": "Saropa Lints: ভাষা / ল্যাঙ্গুয়েজ / স্প্রেচে / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: লিন্ট কনফিগারেশন খুলুন",
   "command.openAnalysisOptimizer.title": "Saropa Lints: বিশ্লেষণ অপ্টিমাইজার",

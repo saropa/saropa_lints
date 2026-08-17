@@ -2073,5 +2073,10 @@
       "detail": "Desenler: {preview}"
     },
     "diffTitle": "Analiz Optimizasyonu: Önerilen İndirgenmeler"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "İkili tıkla {severity} geçiş yap"
+    }
   }
 }

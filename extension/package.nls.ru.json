@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: Переключить Предупреждение Диагностика",
   "command.toggleSeverityInfo.title": "Saropa Lints: Переключить Информационные Диагностики",
   "command.toggleSeverityHint.title": "Saropa Lints: Переключить подсказки диагностики",
+  "command.toggleSeverityInline.title": "Переключить",
   "command.pickUiLanguage.title": "Saropa Lints: Язык / язык / языковые / Sprache / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: это - _PH0_. Управление пакетами правил.",
   "command.openAnalysisOptimizer.title": "Saropa Lints: Оптимизатор анализа",

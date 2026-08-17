@@ -2073,5 +2073,10 @@
       "detail": "Patrones: {preview}"
     },
     "diffTitle": "Analizador Optimizador: Exclusiones Propuestas"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "Hacer doble clic para alternar {severity}"
+    }
   }
 }

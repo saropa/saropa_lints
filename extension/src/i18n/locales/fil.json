@@ -2073,5 +2073,10 @@
       "detail": "Mga Pattern: {preview}"
     },
     "diffTitle": "Analysis Optimizer: Mga Iminungkahing Pagbubukod"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "I-double click upang i-toggle ang {severity}"
+    }
   }
 }

@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: चेतावनी निदान टॉगल करें",
   "command.toggleSeverityInfo.title": "Saropa Lints: जानकारी निदान टॉगल करें",
   "command.toggleSeverityHint.title": "Saropa Lints: टॉगल हिंट डायनोस्टिक्स",
+  "command.toggleSeverityInline.title": "टॉगल",
   "command.pickUiLanguage.title": "Saropa Lints: भाषा / लैंग्वेज / स्प्रेचे / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: _PH0_: नियम पैक का प्रबंधन करें",
   "command.openAnalysisOptimizer.title": "Saropa Lints: विश्लेषण उत्कृष्टक",

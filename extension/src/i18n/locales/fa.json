@@ -2073,5 +2073,10 @@
       "detail": "ال mẫu: {preview}"
     },
     "diffTitle": "بهینه ساز تحلیل: پیشنهادهای استثناء"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "دوبار کلیک کنید تا حالت {severity} را تغییر دهید"
+    }
   }
 }

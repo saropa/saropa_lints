@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: 경고 진단 토글",
   "command.toggleSeverityInfo.title": "Saropa Lints: 정보 진단 전환",
   "command.toggleSeverityHint.title": "Saropa Lints: 힌트 진단 전환",
+  "command.toggleSeverityInline.title": "토글",
   "command.pickUiLanguage.title": "Saropa Lints: 언어 / 랭귀지 / 스프라체 / 言語 / 语言",
   "command.openConfigDashboard.title": "Saropa Lints: PH0__:::  ⁇ PH0_: 규칙 팩을 관리하십시오.",
   "command.openAnalysisOptimizer.title": "Saropa Lints: 분석 최적화",

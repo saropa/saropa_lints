@@ -29,6 +29,7 @@
   "command.toggleSeverityWarning.title": "Saropa Lints: Magbago ng Waring Diagnostics",
   "command.toggleSeverityInfo.title": "Saropa Lints: Magbago ng Impormasyon ng Diagnostiko",
   "command.toggleSeverityHint.title": "Saropa Lints: Magbago ng Tinting ng Paliwanag",
+  "command.toggleSeverityInline.title": "Iugot",
   "command.pickUiLanguage.title": "Saropa Lints: Wika / wika / Sprache / 言語 / 语言 ng mga tao.",
   "command.openConfigDashboard.title": "Saropa Lints: Buksan ang Lints Config",
   "command.openAnalysisOptimizer.title": "Saropa Lints: Optimizer ng Paglalaro",
