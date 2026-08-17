@@ -25,6 +25,9 @@ import '../../fixes/stylistic/replace_single_cascade_with_dot_fix.dart';
 import '../../fixes/stylistic/swap_string_delimiter_fix.dart';
 import '../../fixes/stylistic/remove_closure_parameter_type_fix.dart';
 import '../../fixes/stylistic/convert_to_expression_body_getter_fix.dart';
+import '../../fixes/stylistic/prefer_adjacent_strings_fix.dart';
+import '../../fixes/stylistic/prefer_doc_comment_fix.dart';
+import '../../fixes/stylistic/remove_explicit_type_fix.dart';
 import '../../fixes/return/convert_to_expression_body_fix.dart';
 
 // ============================================================================
@@ -562,6 +565,12 @@ class AvoidExplicitTypeDeclarationRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        RemoveExplicitTypeFix(context: context),
+  ];
 
   @override
   bool get usesTypeResolution => true;
@@ -3686,6 +3695,12 @@ class PreferDocCommentsOverRegularRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferDocCommentFix(context: context),
+  ];
+
+  @override
   bool get usesTypeResolution => true;
 
   @override
@@ -4917,6 +4932,12 @@ class PreferAdjacentStringsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferAdjacentStringsFix(context: context),
+  ];
 
   @override
   bool get usesTypeResolution => true;

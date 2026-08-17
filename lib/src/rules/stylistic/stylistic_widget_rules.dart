@@ -2,6 +2,8 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 
+import '../../fixes/stylistic/prefer_borderradius_circular_fix.dart';
+import '../../fixes/stylistic/prefer_sizedbox_over_container_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 // ============================================================================
@@ -56,6 +58,12 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferSizedBoxOverContainerFix(context: context),
+  ];
 
   @override
   String get exampleBad => 'Container(width: 16, height: 16)';
@@ -556,6 +564,12 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        PreferBorderRadiusCircularFix(context: context),
+  ];
 
   @override
   String get exampleBad => 'BorderRadius.all(Radius.circular(8))';

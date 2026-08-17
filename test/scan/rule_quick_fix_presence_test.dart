@@ -21,6 +21,7 @@ import 'package:saropa_lints/src/rules/flow/return_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/formatting_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/stylistic_additional_rules.dart';
 import 'package:saropa_lints/src/rules/stylistic/stylistic_rules.dart';
+import 'package:saropa_lints/src/rules/stylistic/stylistic_widget_rules.dart';
 import 'package:saropa_lints/src/rules/ui/animation_rules.dart';
 import 'package:saropa_lints/src/rules/network/api_network_rules.dart';
 import 'package:saropa_lints/src/rules/packages/drift_rules.dart';
@@ -600,6 +601,26 @@ void main() {
     hasFix(
       'AvoidNullableParametersWithDefaultValuesRule',
       () => AvoidNullableParametersWithDefaultValuesRule(),
+    );
+
+    // Batch 19 — stylistic quick fixes (doc comments, type inference, strings,
+    // widget constructor rewrites).
+    hasFix(
+      'PreferDocCommentsOverRegularRule',
+      () => PreferDocCommentsOverRegularRule(),
+    );
+    hasFix(
+      'AvoidExplicitTypeDeclarationRule',
+      () => AvoidExplicitTypeDeclarationRule(),
+    );
+    hasFix('PreferAdjacentStringsRule', () => PreferAdjacentStringsRule());
+    hasFix(
+      'PreferBorderRadiusCircularRule',
+      () => PreferBorderRadiusCircularRule(),
+    );
+    hasFix(
+      'PreferSizedBoxOverContainerRule',
+      () => PreferSizedBoxOverContainerRule(),
     );
   });
 }
