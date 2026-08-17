@@ -64,7 +64,27 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.1.0] - Unreleased
+## [15.1.1] - Unreleased
+
+Five new quick fixes for stylistic rules: convert regular comments to doc comments, remove redundant type annotations, replace string `+` concatenation with adjacent literals, simplify `BorderRadius.all(Radius.circular(r))` to `BorderRadius.circular(r)`, and replace sizing-only `Container` with `SizedBox`. [log](https://github.com/saropa/saropa_lints/blob/v15.1.1/CHANGELOG.md)
+
+### Added
+
+- Quick fix for `prefer_doc_comments_over_regular`: converts `//` comments to `///` doc comments with one click. No action required.
+- Quick fix for `avoid_explicit_type_declaration`: removes the redundant type annotation, letting the compiler infer the type. No action required.
+- Quick fix for `prefer_adjacent_strings`: strips `+` operators between string literals, producing idiomatic adjacent-string syntax. No action required.
+- Quick fix for `prefer_borderradius_circular`: rewrites `BorderRadius.all(Radius.circular(r))` to the shorter `BorderRadius.circular(r)`. No action required.
+- Quick fix for `prefer_sizedbox_over_container`: replaces sizing-only `Container` with `SizedBox`. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Publish script now strips `- Unreleased` suffix (and typo variants) from versioned CHANGELOG headings at publish time, so `## [X.Y.Z] - Unreleased` is cleaned to `## [X.Y.Z]` before version sync.
+
+</details>
+
+---
+
+## [15.1.0]
 
 **Breaking:** 35 rule names that collided with core Dart/Flutter lint names are renamed with semantic suffixes (e.g. `prefer_single_quotes` → `prefer_single_quotes_strict`); 3 duplicates with no behavioral difference are removed. Old names are deprecated aliases for one release cycle. Use `--fix-ignores` to migrate downstream projects. [log](https://github.com/saropa/saropa_lints/blob/v15.1.0/CHANGELOG.md)
 

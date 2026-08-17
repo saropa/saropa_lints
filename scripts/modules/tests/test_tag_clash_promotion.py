@@ -99,6 +99,34 @@ class TestPromoteTopSectionToVersion(unittest.TestCase):
         result = self._promote(path, "13.11.8", "13.11.9")
         self.assertIsNone(result)
 
+    def test_strips_unreleased_suffix_from_versioned_heading(self) -> None:
+        # ``## [15.1.0] - Unreleased`` should be treated as ``## [15.1.0]``,
+        # promoted to next_version, and the suffix must not survive in output.
+        path = self._write(
+            "# Changelog\n\n"
+            "## [13.11.8] - Unreleased\n\n### Added\n\n- new stuff\n\n"
+            "## [13.11.7]\n\n- prior\n"
+        )
+        result = self._promote(path, "13.11.8", "13.11.9")
+        self.assertEqual(result, "13.11.8")
+        self.assertEqual(self._top_heading(path), "13.11.9")
+        # The suffix must be fully stripped from the written file.
+        content = path.read_text(encoding="utf-8")
+        self.assertNotIn("Unreleased", content)
+        self.assertIn("new stuff", content)
+
+    def test_strips_unreleased_typo_suffix(self) -> None:
+        # Covers a common typo: "Unreleasted" instead of "Unreleased".
+        path = self._write(
+            "# Changelog\n\n"
+            "## [13.11.8] - Unreleasted\n\n### Fixed\n\n- typo test\n\n"
+            "## [13.11.7]\n\n- prior\n"
+        )
+        result = self._promote(path, "13.11.8", "13.11.9")
+        self.assertEqual(result, "13.11.8")
+        content = path.read_text(encoding="utf-8")
+        self.assertNotIn("Unreleasted", content)
+
 
 if __name__ == "__main__":
     unittest.main()

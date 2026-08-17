@@ -33,6 +33,27 @@ from scripts.modules._git_ops import tag_exists_on_remote
 # Matches: 5.0.0, 5.0.0-beta.1, 5.0.0-rc.2, etc.
 _VERSION_RE = r"\d+\.\d+\.\d+(?:-[\w]+(?:\.[\w]+)*)?"
 
+# Pattern fragment matching " - Unreleased" (and common typos like
+# "Unreleasted") appended after a heading bracket.  Kept as a plain string
+# (not re.compile) because every call site embeds it inside a larger regex.
+_UNRELEASED_SUFFIX_PAT = r"\s*-\s*unreleas\w*"
+
+
+def _strip_unreleased_suffix(content: str) -> str:
+    """Remove ' - Unreleased' (and typo variants) from versioned headings.
+
+    Handles headings like ``## [15.1.0] - Unreleased`` that carry a version
+    number AND an unreleased marker — the publish flow expects either a bare
+    ``## [Unreleased]`` or a clean ``## [X.Y.Z]``, not a hybrid.  Only
+    rewrites ``## [...]`` headings at the start of a line.
+    """
+    return re.sub(
+        rf"^(## \[[^\]]+\]){_UNRELEASED_SUFFIX_PAT}",
+        r"\1",
+        content,
+        flags=re.MULTILINE | re.IGNORECASE,
+    )
+
 
 def get_version_from_pubspec(pubspec_path: Path) -> str:
     """Read version string from pubspec.yaml."""
@@ -381,7 +402,15 @@ def has_unreleased_section(changelog_path: Path) -> bool:
     # code-span (a release note describing the publish prompt itself), which
     # made this report a phantom Unreleased section after the heading was
     # already renamed — same hardening as get_latest_changelog_version.
-    return bool(re.search(r"^## \[Unreleased\]", content, re.MULTILINE))
+    if re.search(r"^## \[Unreleased\]", content, re.MULTILINE):
+        return True
+    # Also detect versioned headings with an "- Unreleased" suffix, e.g.
+    # ``## [15.1.0] - Unreleased`` — these carry real content too.
+    return bool(re.search(
+        rf"^## \[[^\]]+\]{_UNRELEASED_SUFFIX_PAT}",
+        content,
+        re.MULTILINE | re.IGNORECASE,
+    ))
 
 
 def rename_unreleased_to_version(
@@ -389,13 +418,24 @@ def rename_unreleased_to_version(
 ) -> bool:
     """Rename [Unreleased] heading to [version] before publishing.
 
+    Handles both ``## [Unreleased]`` and versioned variants like
+    ``## [15.1.0] - Unreleased`` (including typos such as
+    "Unreleasted").  The suffix is stripped first so downstream
+    functions see a clean ``## [X.Y.Z]`` heading.
+
     Returns:
-        True if renamed, False if no [Unreleased] section found.
+        True if renamed, False if no unreleased heading found.
 
     Raises:
         ValueError: If both [Unreleased] and [version] sections exist.
     """
-    content = changelog_path.read_text(encoding="utf-8")
+    original = changelog_path.read_text(encoding="utf-8")
+
+    # Strip " - Unreleased" suffix from versioned headings BEFORE any
+    # other matching — converts ``## [15.1.0] - Unreleased`` to
+    # ``## [15.1.0]`` so the rest of the pipeline sees a clean heading.
+    content = _strip_unreleased_suffix(original)
+    suffix_was_stripped = content != original
 
     # Anchor every heading match to line start (MULTILINE). Unanchored patterns
     # matched a literal `## [Unreleased]` / `## [X.Y.Z]` token written inside a
@@ -403,7 +443,17 @@ def rename_unreleased_to_version(
     # heading in prose made this raise the bogus "both [Unreleased] and [version]
     # exist" error — after which the publish loop bumped to the next patch,
     # corrupting the chosen version. Real headings always start the line.
-    if not re.search(r"^## \[Unreleased\]", content, re.MULTILINE):
+    has_pure_unreleased = bool(
+        re.search(r"^## \[Unreleased\]", content, re.MULTILINE),
+    )
+
+    if not has_pure_unreleased:
+        # No pure [Unreleased] heading — but the suffix strip may have
+        # cleaned a versioned heading.  Write the cleaned content back
+        # and signal whether anything actually changed.
+        if suffix_was_stripped:
+            changelog_path.write_text(content, encoding="utf-8")
+            return True
         return False
 
     version_pattern = rf"^## \[{re.escape(version)}\]"
@@ -413,6 +463,7 @@ def rename_unreleased_to_version(
             f"Remove one before publishing."
         )
 
+    # Rename [Unreleased] to the target version.
     content = re.sub(
         r"^## \[Unreleased\]",
         f"## [{version}]",
@@ -750,11 +801,21 @@ def _promote_top_section_to_version(
     """Rename the top `## [X]` heading to `## [next_version]` when X is the
     expected colliding version or [Unreleased].
 
+    Also strips any trailing " - Unreleased" suffix (and typo variants)
+    from versioned headings before comparing — ``## [15.1.0] - Unreleased``
+    is treated identically to ``## [15.1.0]``.
+
     Returns the original heading label on success (or ``next_version`` itself
     when the section already carries that version — no file write needed),
     None when the top section is something else (caller should retry or abort).
     """
-    content = changelog_path.read_text(encoding="utf-8")
+    original = changelog_path.read_text(encoding="utf-8")
+
+    # Strip " - Unreleased" suffix before matching so versioned-but-unreleased
+    # headings are handled cleanly (the suffix would otherwise survive in the
+    # output because match.end() only covers ``## [X.Y.Z]``).
+    content = _strip_unreleased_suffix(original)
+
     # Match the first ## [...] heading anywhere in the file — there are no
     # version-like headings before the first release section in this repo's
     # CHANGELOG layout (the header block uses no `## [...]` form).
@@ -767,6 +828,9 @@ def _promote_top_section_to_version(
         # was NOT promoted from it — two separate histories exist.
         if re.search(rf"## \[{re.escape(expected_version)}\]", content):
             return None
+        # Write back in case the suffix strip changed content.
+        if content != original:
+            changelog_path.write_text(content, encoding="utf-8")
         return label
     if label != expected_version and label != "Unreleased":
         return None
