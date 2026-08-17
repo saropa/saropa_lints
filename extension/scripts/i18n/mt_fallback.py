@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 import re
+import tempfile
 import threading
 import time
 from collections.abc import Callable
@@ -145,9 +146,54 @@ def load_mt_cache() -> dict[str, str]:
         return {}
 
 
+def _stream_dict_to_json(target: Path, data: dict[str, str]) -> None:
+    """Atomically write a str→str dict as JSON, streaming one entry at a time.
+
+    Avoids the MemoryError that ``json.dumps(entire_dict)`` hits on large
+    caches (100k+ entries with full Unicode translations). Each
+    ``json.dumps`` call serialises a single short string, so peak memory
+    stays O(1) regardless of dict size.
+
+    Uses write-to-temp + ``os.replace`` so a crash mid-write never
+    corrupts the existing cache file — the old file stays intact until
+    the new one is fully flushed and closed.
+    """
+    target.parent.mkdir(parents=True, exist_ok=True)
+    # Write to a temp file in the same directory so os.replace is atomic
+    # (same-filesystem rename).
+    fd, tmp = tempfile.mkstemp(
+        dir=str(target.parent), suffix=".tmp", prefix=target.stem,
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write("{")
+            first = True
+            for key, value in data.items():
+                # Comma-separate entries (skip comma before the first one).
+                if not first:
+                    fh.write(",")
+                first = False
+                fh.write("\n")
+                # Serialise key and value independently — each is a short
+                # string, so json.dumps never allocates a problematic amount.
+                fh.write(json.dumps(key, ensure_ascii=False))
+                fh.write(": ")
+                fh.write(json.dumps(value, ensure_ascii=False))
+            fh.write("\n}\n")
+        # Atomic replace — old file is untouched until this succeeds.
+        os.replace(tmp, str(target))
+    except BaseException:
+        # Clean up the temp file on any failure (including KeyboardInterrupt).
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+        raise
+
+
 def save_mt_cache(cache: dict[str, str]) -> None:
-    _CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    _CACHE_PATH.write_text(json.dumps(cache, ensure_ascii=False, indent=0) + "\n", encoding="utf-8")
+    """Persist the translation cache to disk (atomic, streaming)."""
+    _stream_dict_to_json(_CACHE_PATH, cache)
 
 
 # ---------------------------------------------------------------------------
@@ -184,10 +230,8 @@ def load_provenance() -> None:
 
 
 def save_provenance() -> None:
-    _CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    _PROVENANCE_PATH.write_text(
-        json.dumps(_provenance, ensure_ascii=False, indent=0) + "\n", encoding="utf-8",
-    )
+    """Persist the engine-provenance sidecar to disk (atomic, streaming)."""
+    _stream_dict_to_json(_PROVENANCE_PATH, _provenance)
 
 
 def provenance_of(locale: str, text: str) -> str | None:

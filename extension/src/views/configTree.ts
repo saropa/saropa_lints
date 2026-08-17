@@ -61,6 +61,15 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     return [...this.buildSettingNodes(), ...this.buildActionNodes()];
   }
 
+  /**
+   * Lint integration, Analyzer plugin, and Tier nodes — the 3 core
+   * diagnostic-control settings now displayed in the Diagnostics sidebar
+   * section alongside severity toggles.
+   */
+  getDiagnosticControlNodes(): ConfigTreeNode[] {
+    return this.buildDiagnosticControlNodes();
+  }
+
   /** Triage nodes only (groups + info). Used by the overview "Issues" section. */
   getTriageNodes(): ConfigTreeNode[] {
     return this.buildTriageSection();
@@ -101,17 +110,15 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     return [setting(l10n('dashboards.controls.analyzerPlugin'), byState.description, byState.command)];
   }
 
-  /** Lint integration, tier, run-after-config, detected packages. */
-  private buildSettingNodes(): ConfigTreeNode[] {
+  /**
+   * Lint integration, Analyzer plugin, and Tier — the 3 core diagnostic
+   * controls now surfaced in the Diagnostics sidebar section.
+   */
+  private buildDiagnosticControlNodes(): ConfigTreeNode[] {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const enabled = cfg.get<boolean>('enabled', true) ?? true;
     const tier = cfg.get<string>('tier', 'recommended') ?? 'recommended';
-    const runAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
-    const runAfterDep = cfg.get<boolean>('runAnalysisAfterDependencyChange', true) ?? true;
-    const uiLanguage = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';
-    const localeLabel = formatLanguageChoiceLabel(uiLanguage);
-
-    const items: ConfigTreeNode[] = [
+    return [
       setting('Lint integration', enabled ? 'On' : 'Off', enabled ? 'saropaLints.disable' : 'saropaLints.enable'),
       // The in-process analyzer plugin is a SEPARATE subsystem from the row
       // above: "Lint integration" gates scan-on-save delivery, this gates the
@@ -126,6 +133,18 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       // used to launch (`saropaLints.setTier`). Users get the full context of
       // each option instead of guessing from a one-line label.
       setting('Tier', tier, 'saropaLints.openConfigDashboard'),
+    ];
+  }
+
+  /** Run-after-config, UI language, detected packages. */
+  private buildSettingNodes(): ConfigTreeNode[] {
+    const cfg = vscode.workspace.getConfiguration('saropaLints');
+    const runAfter = cfg.get<boolean>('runAnalysisAfterConfigChange', true) ?? true;
+    const runAfterDep = cfg.get<boolean>('runAnalysisAfterDependencyChange', true) ?? true;
+    const uiLanguage = cfg.get<string>('uiLanguage', 'auto') ?? 'auto';
+    const localeLabel = formatLanguageChoiceLabel(uiLanguage);
+
+    const items: ConfigTreeNode[] = [
       // Each settings row needs a click target — the user expects every visible
       // sidebar item to navigate somewhere. Toggling a boolean in one click
       // beats opening the Settings UI just to flip a checkbox.

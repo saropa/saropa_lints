@@ -175,6 +175,11 @@
         "title": "%command.toggleSeverityHint.title%"
       },
       {
+        "command": "saropaLints.toggleSeverityInline",
+        "title": "%command.toggleSeverityInline.title%",
+        "icon": "$(eye)"
+      },
+      {
         "command": "saropaLints.toggleTodosAndHacksScanner",
         "title": "%command.toggleTodosAndHacksScanner.title%"
       },
@@ -949,6 +954,11 @@
           "command": "saropaLints.focusIssuesForActiveFile",
           "when": "view == workbench.panel.markers.view",
           "group": "navigation"
+        },
+        {
+          "command": "saropaLints.toggleSeverityInline",
+          "when": "view == saropaLints.severityFilters && viewItem == severityToggle",
+          "group": "inline"
         }
       ],
       "editor/title": [
@@ -993,6 +1003,10 @@
         },
         {
           "command": "saropaLints.enableRulePack",
+          "when": "false"
+        },
+        {
+          "command": "saropaLints.toggleSeverityInline",
           "when": "false"
         },
         {

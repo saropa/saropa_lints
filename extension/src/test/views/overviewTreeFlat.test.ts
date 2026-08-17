@@ -1,18 +1,20 @@
 /**
  * Pins the multi-panel sidebar contract for the Saropa Lints activity-bar
  * container. Each section is its own VS Code view (Banner / Editor dashboards
- * / Actions / Status / Settings / Help), and inside every section the rows
- * are flat clickable leaves only — no chevrons, no nested expansion.
+ * / Settings / Diagnostics / Status / Help), and inside every section the
+ * rows are flat clickable leaves only — no chevrons, no nested expansion.
  *
- * Triage was merged into Settings; the panel renders settings rows (lint
- * integration, tier, run-after-config, detected packages) followed by triage
- * rows when triage data exists.
+ * Diagnostics holds severity toggles (double-click only, no single-click
+ * command) plus Lint integration, Analyzer plugin, and Tier. Settings holds
+ * run-after-config, UI language, and detected packages; Triage rows append
+ * when triage data exists.
  *
  * Regression guards:
  *   - View IDs match what package.json declares.
  *   - Every leaf returned by every provider has `CollapsibleState.None`
  *     (no chevrons inside any section).
- *   - Every leaf has a click `command` so nothing in the sidebar is dead.
+ *   - Every leaf has a click `command` (except SeverityToggleItem, which
+ *     toggles on double-click) so nothing in the sidebar is dead.
  *   - Run analysis appears exactly once across all sections.
  */
 import '../vibrancy/register-vscode-mock';
@@ -130,6 +132,9 @@ describe('Saropa Lints sidebar — multi-panel section providers', () => {
       const rows = provider.getChildren() as Array<unknown>;
       for (const node of rows) {
         const item = provider.getTreeItem(node as never);
+        // SeverityToggleItem intentionally has no single-click command —
+        // toggles fire on double-click only to prevent accidental flips.
+        if (item.contextValue === 'severityToggle') continue;
         assert.ok(
           item.command !== undefined,
           `${provider.viewId} leaf "${String(item.label)}" has no command`,

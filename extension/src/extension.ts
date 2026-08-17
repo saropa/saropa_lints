@@ -40,6 +40,7 @@ import { IssuesTreeProvider, parseViolationsGroupBy, registerIssueCommands, type
 import {
   createSidebarSectionProviders,
   SECTION_VIEW_IDS,
+  SeverityToggleItem,
   updateSidebarSectionContext,
 } from './views/sectionedSidebar';
 import { showHelpHubQuickPick } from './views/helpHub';
@@ -47,7 +48,7 @@ import { SummaryTreeProvider } from './views/summaryTree';
 import { SuppressionsTreeProvider } from './views/suppressionsTree';
 import { ConfigTreeProvider } from './views/configTree';
 import { readTierFromAnalysisOptionsYaml } from './config/tierConfig';
-import { getEnabledSeverityCount, affectsSeveritySettings } from './config/severityConfig';
+import { affectsSeveritySettings } from './config/severityConfig';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePacks/rulePackYaml';
 import { SecurityPostureTreeProvider } from './views/securityPostureTree';
 import { FileRiskTreeProvider } from './views/fileRiskTree';
@@ -587,23 +588,39 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       context.subscriptions.push(helpView);
       continue;
     }
-    // Severity Filters section gets a dynamic title showing the active
-    // count (e.g. "Severity Filters (3/4)") so users see at a glance
-    // that a severity is suppressed without expanding the section.
+    // Diagnostics section — severity toggles require double-click to
+    // prevent accidental flips while browsing. SeverityToggleItem has no
+    // single-click command; we detect double-click via rapid
+    // re-selection of the same item within a short window.
     if (provider.viewId === SECTION_VIEW_IDS.severityFilters) {
-      const sevView = vscode.window.createTreeView(provider.viewId, {
+      const diagView = vscode.window.createTreeView(provider.viewId, {
         treeDataProvider: provider,
       });
-      const updateSevTitle = (): void => {
-        const count = getEnabledSeverityCount();
-        sevView.title = `Severity Filters (${count}/4)`;
-      };
-      updateSevTitle();
+      // Double-click detection: track last-selected item + timestamp.
+      // 400ms matches VS Code's own internal double-click window for
+      // editor tabs and list views (see vscode src workbench/browser).
+      const DOUBLE_CLICK_MS = 400;
+      let lastSelectedId: string | undefined;
+      let lastSelectedTime = 0;
       context.subscriptions.push(
-        vscode.workspace.onDidChangeConfiguration((e) => {
-          if (affectsSeveritySettings(e)) updateSevTitle();
+        diagView.onDidChangeSelection((e) => {
+          const selected = e.selection[0];
+          if (!(selected instanceof SeverityToggleItem)) return;
+          const now = Date.now();
+          const itemId = selected.toggleCommandId;
+          // Fire only when the same item is selected twice in rapid succession.
+          if (itemId === lastSelectedId && (now - lastSelectedTime) < DOUBLE_CLICK_MS) {
+            void vscode.commands.executeCommand(selected.toggleCommandId);
+            // Reset state so a third click doesn't re-fire, and the
+            // next single-click starts a fresh detection window.
+            lastSelectedId = undefined;
+            lastSelectedTime = 0;
+          } else {
+            lastSelectedId = itemId;
+            lastSelectedTime = now;
+          }
         }),
-        sevView,
+        diagView,
       );
       continue;
     }
@@ -1455,6 +1472,17 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     ...registerSeverityToggle('saropaLints.toggleSeverityWarning', 'severity.warning', refreshAllSections),
     ...registerSeverityToggle('saropaLints.toggleSeverityInfo', 'severity.info', refreshAllSections),
     ...registerSeverityToggle('saropaLints.toggleSeverityHint', 'severity.hint', refreshAllSections),
+    // Inline icon button fallback — VS Code passes the tree item as the
+    // first arg for view/item/context inline commands. Delegates to the
+    // item's own toggleCommandId so each severity fires its correct toggle.
+    vscode.commands.registerCommand(
+      'saropaLints.toggleSeverityInline',
+      (item: unknown) => {
+        if (item instanceof SeverityToggleItem) {
+          void vscode.commands.executeCommand(item.toggleCommandId);
+        }
+      },
+    ),
     vscode.commands.registerCommand(
       'saropaLints.toggleTodosAndHacksScanner',
       async () => {

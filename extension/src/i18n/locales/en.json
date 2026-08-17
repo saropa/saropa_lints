@@ -2073,5 +2073,10 @@
       "detail": "Patterns: {preview}"
     },
     "diffTitle": "Analysis Optimizer: Proposed Exclusions"
+  },
+  "diagnostics": {
+    "sidebar": {
+      "severityToggleTooltip": "Double-click to toggle {severity}"
+    }
   }
 }

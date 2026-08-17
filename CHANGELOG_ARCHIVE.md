@@ -4,6 +4,69 @@
 
 Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa_lints/blob/main/CHANGELOG.md) for the latest versions.
 
+
+---
+
+## [14.3.8]
+
+Fixes an issue where the analysis server repeatedly restarted the plugin isolate, causing IDE diagnostic results to clear continuously. Automatically excludes common non-Dart output directories during initialization to prevent file-watcher feedback loops. Adds restart-rate telemetry, log rotation, and a configurable `log_level` setting to control plugin log verbosity. [log](https://github.com/saropa/saropa_lints/blob/v14.3.8/CHANGELOG.md)
+
+### Fixed
+
+- **Plugin isolate restart storm** — the analysis server respawned the plugin isolate hundreds of times per day (13,660 over 91 days on the `contacts` project), clearing all diagnostics from the Problems tab each time. Two causes addressed: (1) `Plugin.start()` now skips config loading when the working directory is not a Dart project (e.g. the VS Code install directory), eliminating the 0-rules phase and noisy log entries; (2) `PluginLogger.setProjectRoot()` now validates that the root contains `pubspec.yaml` before writing log files, preventing log writes into non-project directories that could trigger file-watcher restarts.
+- **Init command: non-Dart directories now excluded from analyzer** — `dart run saropa_lints:init` and the headless config writer now ensure common non-Dart directories (`reports/**`, `docs/**`, `bugs/**`, `plans/**`, `doc/**`, `output/**`, `tmp/**`) are in the `analyzer > exclude` list. Without this, plugin log writes to `reports/.saropa_lints/` could trigger the analysis server's file watcher and restart the plugin isolate in a feedback loop.
+- **Plugin logger: restart-rate telemetry** — after each isolate spawn, `PluginLogger` counts recent "session started" entries in the log file. When the rate exceeds 10 restarts in 10 minutes, a `WARNING` line is emitted with remediation advice. The log file itself is the durable counter since statics reset per isolate.
+- **Init command: flow-style YAML guard** — `ensureNonDartExcludes` now detects flow-style `exclude: [...]` under the `analyzer:` section and leaves it unchanged instead of inserting a duplicate `exclude:` key. Trailing comments after `exclude:` are also handled correctly.
+- **Plugin logger: log rotation** — `plugin.log` is now capped at 512 KB; oldest content is discarded at each isolate start, bounding the cost of the restart-rate telemetry read and preventing unbounded disk growth. No action required.
+
+### Added
+
+- **Plugin logger: configurable log level** — new `log_level:` key under `plugins > saropa_lints` in `analysis_options.yaml` controls which messages are written to `plugin.log`. Valid values: `off`, `error`, `warning`, `info` (default), `debug`. Messages below the configured level are still sent to the analysis server's developer log but skip the user-visible file. The init command writes `log_level: info` by default.
+- **Plugin logger: convenience API** — `PluginLogger.debug()`, `.warning()`, and `.error()` replace the `level:` named parameter pattern, making log call sites more concise. Unrecognized `log_level` values now emit a warning instead of silently falling back to `info`. Tab-indented configs are now parsed correctly.
+
+---
+
+## [14.3.7]
+
+Updates the Dio linting behavior to favor dependency injection and factory patterns over static singletons. The updated rule flags top-level and static `Dio` declarations while permitting instantiation inside methods, constructors, and callbacks, resolving an architectural contradiction with anti-singleton guidelines. [log](https://github.com/saropa/saropa_lints/blob/v14.3.7/CHANGELOG.md)
+
+### Changed
+
+- **Breaking:** Renamed `require_dio_singleton` to `require_dio_factory` — the rule now flags `Dio()` in static fields and top-level variables (the singleton anti-pattern) instead of recommending them. `Dio()` inside methods, constructors, closures, and DI callbacks is allowed. Resolves the architectural contradiction with `avoid_singleton_pattern` ([#274](https://github.com/saropa/saropa_lints/issues/274)). No action required if already using factory/DI patterns.
+- **`require_dio_factory` config alias:** Projects using `require_dio_singleton` in `analysis_options.yaml` continue working via `configAliases` — no config migration required on upgrade.
+
+### Added
+
+- **Hardened `require_dio_factory` detection:** Added coverage for `late static final Dio` fields, static getters, nested closures, and mixin method bodies. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Closed Dependabot PR #271 bug (js-yaml 4.1.1 → 4.3.0): lock file already resolves to 4.3.0 via mocha; archived as fixed.
+- Publish audit now detects dangling `bugs/*.md` references in active documents (skips frozen `plans/history/`).
+
+</details>
+
+---
+
+## [14.3.6]
+
+Removes the `avoid_debug_print` rule, which contradicted the existing `prefer_debug_print` and left no valid console output path. Also fixes false positives in `avoid_redundant_null_check` and `avoid_redundant_await` when types are nullable or resolve across package boundaries. A new `--debug-rule` flag on the scan CLI traces type resolution for any named rule, making it easier to diagnose false positives.
+[log](https://github.com/saropa/saropa_lints/blob/v14.3.6/CHANGELOG.md)
+
+### Removed
+
+- **`avoid_debug_print` rule deleted.** The rule contradicted `prefer_debug_print` — one said "use debugPrint," the other said "don't" — leaving no valid console output function for projects without a custom logging wrapper. `prefer_debug_print` remains and covers the `print()` → `debugPrint()` upgrade path. No action required unless your config explicitly enabled `avoid_debug_print`; if so, remove the entry.
+- **`CommentOutDebugPrintFix` quick fix deleted** (was the only fix for the removed rule). No action required.
+
+### Added
+
+- **`--debug-rule <name>` flag for the scan CLI.** Emits per-node type-resolution trace output (staticType, staticInvokeType, returnType) for the named rule during a scan. Use with `--resolve` for full type information. Designed for diagnosing false positives caused by type-resolution divergence in the analyzer plugin context. No action required.
+
+### Fixed
+
+- `avoid_redundant_null_check` no longer fires on variables, parameters, fields, or getters declared with a nullable type (`Type?`). The rule cross-checks the element's declared type against the resolved `staticType` and guards against `InvalidType` from failed type resolution, preventing false positives in cross-package contexts.
+- `avoid_redundant_await` no longer fires on `await` of static methods returning `Future<T>`. The rule now guards against `InvalidType` (unresolvable types) and falls back to checking the invoked method signature's return type via `staticInvokeType` when `staticType` fails to resolve for cross-file static invocations.
+
 ---
 
 ## [14.3.5]

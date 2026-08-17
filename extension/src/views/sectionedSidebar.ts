@@ -84,6 +84,33 @@ class LeafItem extends vscode.TreeItem {
     }
 }
 
+/**
+ * Severity toggle row — no single-click command. The toggle fires on
+ * double-click only (detected via `onDidChangeSelection` timing in
+ * extension.ts) so users don't accidentally flip a severity while
+ * browsing the sidebar.
+ */
+export class SeverityToggleItem extends vscode.TreeItem {
+    /** The command to execute on double-click. */
+    readonly toggleCommandId: string;
+
+    constructor(
+        label: string,
+        description: string,
+        toggleCommandId: string,
+        iconId: string,
+        iconColor: vscode.ThemeColor,
+    ) {
+        super(label, vscode.TreeItemCollapsibleState.None);
+        this.description = description;
+        this.toggleCommandId = toggleCommandId;
+        // Tooltip tells the user to double-click since single-click only selects.
+        this.tooltip = l10n('diagnostics.sidebar.severityToggleTooltip', { severity: label.toLowerCase() });
+        this.contextValue = 'severityToggle';
+        this.iconPath = new vscode.ThemeIcon(iconId, iconColor);
+    }
+}
+
 // ── Filtered violation cache (shared across status view) ───────────────────
 
 let _cachedFiltered: { data: ViolationsData; root: string } | null | undefined;
@@ -564,21 +591,46 @@ function buildSettingsItems(configProvider: ConfigTreeProvider): SectionNode[] {
 }
 
 /**
- * Severity filter toggle rows — own sidebar section so users can find
- * them at a glance and flip a severity off in one click instead of
- * wading through 13,000 Problems panel entries.
+ * Diagnostics section — severity filter toggles plus the 3 core
+ * diagnostic controls (Lint integration, Analyzer plugin, Tier)
+ * that were previously in the Settings section. Grouped here because
+ * they all govern what diagnostics the user sees.
  */
-function buildSeverityFilterItems(): SectionNode[] {
+function buildDiagnosticsItems(configProvider: ConfigTreeProvider): SectionNode[] {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const showErrors = cfg.get<boolean>('severity.error', true) !== false;
     const showWarnings = cfg.get<boolean>('severity.warning', true) !== false;
     const showInfos = cfg.get<boolean>('severity.info', true) !== false;
     const showHints = cfg.get<boolean>('severity.hint', true) !== false;
     return [
-        new LeafItem('Show errors', showErrors ? 'On' : 'Off', 'saropaLints.toggleSeverityError'),
-        new LeafItem('Show warnings', showWarnings ? 'On' : 'Off', 'saropaLints.toggleSeverityWarning'),
-        new LeafItem('Show infos', showInfos ? 'On' : 'Off', 'saropaLints.toggleSeverityInfo'),
-        new LeafItem('Show hints', showHints ? 'On' : 'Off', 'saropaLints.toggleSeverityHint'),
+        // Each severity gets a distinct icon + theme color so the user can
+        // visually distinguish them at a glance without reading the label.
+        // SeverityToggleItem (not LeafItem) — no single-click command;
+        // toggle fires on double-click only to prevent accidental flips.
+        new SeverityToggleItem(
+            'Show errors', showErrors ? 'On' : 'Off',
+            'saropaLints.toggleSeverityError', 'error',
+            new vscode.ThemeColor('list.errorForeground'),
+        ),
+        new SeverityToggleItem(
+            'Show warnings', showWarnings ? 'On' : 'Off',
+            'saropaLints.toggleSeverityWarning', 'warning',
+            new vscode.ThemeColor('list.warningForeground'),
+        ),
+        new SeverityToggleItem(
+            'Show infos', showInfos ? 'On' : 'Off',
+            'saropaLints.toggleSeverityInfo', 'info',
+            new vscode.ThemeColor('charts.blue'),
+        ),
+        new SeverityToggleItem(
+            'Show hints', showHints ? 'On' : 'Off',
+            'saropaLints.toggleSeverityHint', 'lightbulb',
+            new vscode.ThemeColor('charts.green'),
+        ),
+        // Lint integration, Analyzer plugin, and Tier — moved here from
+        // the Settings section because they directly control which
+        // diagnostics appear (same concern as the severity toggles above).
+        ...configProvider.getDiagnosticControlNodes(),
     ];
 }
 
@@ -655,7 +707,7 @@ export function createSidebarSectionProviders(
         // Merged Actions + Settings + Triage panel, placed at the former Actions
         // slot (above Status) so the run/initialize operations stay prominent.
         new FlatSectionProvider(SECTION_VIEW_IDS.settings, () => buildSettingsItems(configProvider)),
-        new FlatSectionProvider(SECTION_VIEW_IDS.severityFilters, () => buildSeverityFilterItems()),
+        new FlatSectionProvider(SECTION_VIEW_IDS.severityFilters, () => buildDiagnosticsItems(configProvider)),
         new FlatSectionProvider(SECTION_VIEW_IDS.status, () => buildStatusItems(workspaceState)),
         new FlatSectionProvider(SECTION_VIEW_IDS.help, () => buildHelpItems()),
     ];
