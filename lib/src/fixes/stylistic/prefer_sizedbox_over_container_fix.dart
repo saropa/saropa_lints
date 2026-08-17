@@ -26,8 +26,6 @@ class PreferSizedBoxOverContainerFix extends ReplaceNodeFix {
   String computeReplacement(AstNode node) {
     if (node is! InstanceCreationExpression) return node.toSource();
 
-    final source = node.toSource();
-
     // Preserve const keyword if present
     final constPrefix = node.keyword?.lexeme == 'const' ? 'const ' : '';
 

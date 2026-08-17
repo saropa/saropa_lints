@@ -64,7 +64,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.1.1] - Unreleased
+## [15.1.1]
 
 Five new quick fixes for stylistic rules: convert regular comments to doc comments, remove redundant type annotations, replace string `+` concatenation with adjacent literals, simplify `BorderRadius.all(Radius.circular(r))` to `BorderRadius.circular(r)`, and replace sizing-only `Container` with `SizedBox`. [log](https://github.com/saropa/saropa_lints/blob/v15.1.1/CHANGELOG.md)
 
