@@ -261,8 +261,17 @@
       "locationsTitle": "Gdzie Twój projekt używa tego pakietu?",
       "noLocations": "Nie jest zaimportowany w źródle projektu  ⁇ prawdopodobnie uzależnienie od dev lub transitywne.",
       "moreFiles": "i {count} więcej plików.",
-      "copyForAi": "Kopiowanie polecenia aktualizacji dla sztucznej inteligencji.",
-      "openInDashboard": "Otwórz w Dashboardie pakietu."
+      "openInDashboard": "Otwórz w Dashboardie pakietu.",
+      "writeReport": "Zapisz raport"
+    },
+    "actions": {
+      "writeReport": "Zapisz raport"
+    },
+    "report": {
+      "noWorkspace": "Brak otwartego folderu roboczego — nie można zapisać raportu.",
+      "noContent": "Brak pakietów z treścią AI prompt do napisania.",
+      "written": "Zapisano raport — ścieżka skopiowana do schowka: {path}",
+      "failed": "Nie udało się zapisać raportu o okazjach: {error}"
     },
     "empty": {
       "title": "Nic do przyjęcia, nic do przyjmowania.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Wyłączanie wyłączyć",
       "actionEnable": "Włącz Enable włączyć",
       "bulkRuleToggleConfirm": "{verb} {count} zasady? To aktualizacja analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints wykrył projekt Dart bez skonfigurowanego saropa_lints. Ustaw się teraz na 2100+ reguł lint.",
+      "setupPrompt": "Saropa Lints wykrył projekt Dart bez skonfigurowanego saropa_lints. Skonfiguruj teraz aby zastosować 2300+ reguł lint.",
       "actionSetUpProject": "Ustaw projekt, skonfiguruj projekt.",
       "actionNotNow": "Nie teraz, nie teraz."
     },

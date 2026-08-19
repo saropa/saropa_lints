@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter sheria za lint na uchambuzi wa kuona, pamoja na Vibe ya Package kwa ajili ya kupima afya ya utegemezi, skanning udhaifu, na upgrading mipango.",
+  "extension.description": "2300+ nizawa ya Dart/Flutter ya lint na analizi ya vizual, kwa kati Package Vibrancy kwa kuhesabi maadhimia ya kipindi, kusimamia kipindi, na kuanza kujaribu kujaribu.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Editorial dashboards, vibao vya mhariri.",
@@ -9,7 +9,7 @@
   "views.settings.name": "Uwekaji wa Mipangilio ya Kuweka.",
   "views.severityFilters.name": "Uchunguzi",
   "views.help.name": "Msaada wa Kusaidia Msaidizi.",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart na Flutter sheria za lint kwa usalama, upatikanaji, na utendaji.\n\nInahitaji mradi wa Dart au Flutter.\n\nFungua folda iliyo na faili ya `pubspec.yaml̅ ili uanze.\n\n[Jifunze zaidi mtandaoni] (https://pub.dev/packages/saropa_lints)\n[Browse All Commands] ((amri:saropaLints.onyeshaKatalog ya amri))\n[Kuhusu Saropa Lints] ((amri:saropaLints.showAbout)\n[Kuanza] ((amri:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart na Flutter kwa uhusiano, uwezo wa kujifunza na uwezo wa kujifunza.\n\nInakaribisha project ya Dart au Flutter.\n\nOpenda folder inayoyeneza `pubspec.yaml` kujitambua kifundo.\n\n[Ondoa kuhusu kwa kutoa](https://pub.dev/packages/saropa_lints)\n[Ondoa kifundo kote](command:saropaLints.showCommandCatalog)\n[Ondoa kuhusu kwa kutoa Saropa Lints](command:saropaLints.showAbout)\n[Ondoa kifundo](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Kuanzisha Mradi (pubspec + config)",
   "command.disable.title": "Saropa Lints: Zima Ushirikiano wa Lint ya Lint",
   "command.reenablePlugin.title": "Saropa Lints: Tumia Plugin ya Kati ya Kati",

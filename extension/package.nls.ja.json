@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter 視覚分析のリントル,依存性の健康スコア付け,脆弱性スキャンおよびアップグレード計画のためのパッケージバイブランシー.",
+  "extension.description": "2300＋ Dart/Flutter ライントルールと可視化分析、さらに Package Vibrancy による依存関係の健康スコアリング、脆弱性スキャン、アップグレード計画",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "エディターダッシュボード,エディタ・ダッシュボード",
@@ -9,7 +9,7 @@
   "views.settings.name": "設定セットは,設定を設定する.",
   "views.severityFilters.name": "診断",
   "views.help.name": "援助・支援をすること.",
-  "viewsWelcome.banner.contents": "**Saropa Lints**\n\nセキュリティ、アクセシビリティ、パフォーマンスのための 2100 以上の Dart および Flutter lint ルール。\n\nDart または Flutter プロジェクトが必要です。\n\n開始するには、「pubspec.yaml」を含むフォルダーを開いてください。\n\n[オンラインで詳細を確認](https://pub.dev/packages/saropa_lints)\n[すべてのコマンドを参照](コマンド:saropaLints.showCommandCatalog)\n[Saropa Lints について](コマンド:saropaLints.showAbout)\n[はじめに](コマンド:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart および Flutter の lint ルールでセキュリティ、アクセシビリティ、パフォーマンスを強化します。\n\nDart または Flutter プロジェクトが必要です。\n\n`pubspec.yaml` を含むフォルダを開くことで開始できます。\n\n[オンラインで詳しく見る](https://pub.dev/packages/saropa_lints)\n[すべてのコマンドを表示](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: プロジェクトを設定する (pubspec + config)",
   "command.disable.title": "Saropa Lints: リント統合をオフに",
   "command.reenablePlugin.title": "Saropa Lints: インプロセスプラグインを再有効化",

@@ -261,8 +261,17 @@
       "locationsTitle": "היכן הפרויקט שלך משתמש בחבילה זו?",
       "noLocations": "לא מיובא במקור הפרויקט  ⁇ סביר להניח שתלות dev או transitive.",
       "moreFiles": "ו-{count} קבצים נוספים",
-      "copyForAi": "העתק את הזמנת השדרוג עבור AI.",
-      "openInDashboard": "פתח בדאש-בורד החבילות (Package Dashboard)"
+      "openInDashboard": "פתח בדאש-בורד החבילות (Package Dashboard)",
+      "writeReport": "כתוב דוח"
+    },
+    "actions": {
+      "writeReport": "כתוב דוח"
+    },
+    "report": {
+      "noWorkspace": "אין תיקון עבודה פתוח — לא ניתן לכתוב את הדוח.",
+      "noContent": "אין חבילות עם תוכן של תוברים AI לכתוב.",
+      "written": "ה보고 נכתב — מסלול העתק ללוח ה메모: {path}",
+      "failed": "התקלקלה לכתוב דוח הזדמנויות: {error}"
     },
     "empty": {
       "title": "שום דבר לאמץ לאמנת.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Disable disable - כבלי את היכולת",
       "actionEnable": "Enable enable אפשר את הפעלת",
       "bulkRuleToggleConfirm": "{verb} {count} כללים? זה מעדכן את analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints זיהה פרויקט Dart ללא תצורת saropa_lints. הגדר עכשיו עבור 2100+ כללי מוך.",
+      "setupPrompt": "Saropa Lints נתן זיהוי פרויקט Dart ללא saropa_lints מוגדר. תצטרכו להכין עכשיו עבור 2300+ правила לינט.",
       "actionSetUpProject": "הקמת פרויקט, הגדרת פרוייקט.",
       "actionNotNow": "לא עכשיו, לא עכשיו."
     },

@@ -78,7 +78,7 @@ _None._
   - Current reason: Stateless animation logic is fundamentally incompatible with Dart 3 type safety.
 - **`syncfusion_flutter_calendar`** (end_of_life) — recorded `2026-03-10`, pub.dev latest `2026-08-18` (v34.2.4). [pub.dev](https://pub.dev/packages/syncfusion_flutter_calendar)
   - Current reason: Legacy commercial package; completely fails Dart 3 type checks.
-- **`workmanager`** (caution) — recorded `2025-08-31`, pub.dev latest `2026-08-04` (v0.10.7). [pub.dev](https://pub.dev/packages/workmanager)
+- **`workmanager`** (caution) — recorded `2025-08-31`, pub.dev latest `2026-08-19` (v0.10.8). [pub.dev](https://pub.dev/packages/workmanager)
   - Current reason: May have compatibility issues with modern Android WorkManager architecture.
 - **`youtube_player_iframe`** (end_of_life) — recorded `2025-08-07`, pub.dev latest `2026-05-30` (v6.0.2). [pub.dev](https://pub.dev/packages/youtube_player_iframe)
   - Current reason: YouTube blocked the old Web API; iframe renders a black screen.
@@ -103,7 +103,7 @@ _None._
   - Current reason: Session recording and heat-mapping tool. Generous free tier, but the cost scales incredibly steeply once you have a moderate user base.
 - **`mapbox_maps_flutter`** (freemium) — recorded `2026-02-26`, pub.dev latest `2026-08-18` (v2.28.3). [pub.dev](https://pub.dev/packages/mapbox_maps_flutter)
   - Current reason: Requires an active billing account and credit card to even generate the necessary public tokens. Charges per map-load/API request after you exceed their free tier.
-- **`purchases_flutter`** (freemium) — recorded `2026-03-05`, pub.dev latest `2026-08-13` (v10.9.0). [pub.dev](https://pub.dev/packages/purchases_flutter)
+- **`purchases_flutter`** (freemium) — recorded `2026-03-05`, pub.dev latest `2026-08-19` (v10.9.1). [pub.dev](https://pub.dev/packages/purchases_flutter)
   - Current reason: RevenueCat's proprietary wrapper. Free up to a specific monthly revenue limit, after which they take a percentage cut of your app's earnings.
 - **`scanbot_sdk`** (paid) — recorded `2025-11-03`, pub.dev latest `2026-07-22` (v9.0.1). [pub.dev](https://pub.dev/packages/scanbot_sdk)
   - Current reason: Strictly commercial enterprise SDK. Cannot be used in production without purchasing a highly expensive yearly corporate license from Scanbot.

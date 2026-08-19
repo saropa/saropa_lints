@@ -261,8 +261,17 @@
       "locationsTitle": "あなたのプロジェクトがこのパッケージを使用している場合",
       "noLocations": "プロジェクトソースにインポートされていない 恐らく,devまたはトランジティブ依存関係である.",
       "moreFiles": "そして, {count} より多くのファイルが表示されます.",
-      "copyForAi": "AI のアップグレードプロンプトをコピーする",
-      "openInDashboard": "パッケージダッシュボードで開きます."
+      "openInDashboard": "パッケージダッシュボードで開きます.",
+      "writeReport": "レポートを作成する"
+    },
+    "actions": {
+      "writeReport": "レポートを作成する"
+    },
+    "report": {
+      "noWorkspace": "ワークスペースフォルダが開いていません — レポートを書けません。",
+      "noContent": "AIプロンプトコンテンツを書くパッケージはありません。",
+      "written": "レポート作成完了 — パスがクリップボードにコピーされました: {path}",
+      "failed": "opportunitiesレポートの書き込みに失敗しました: {error}"
     },
     "empty": {
       "title": "採択するものはなし.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "禁断する Disable",
       "actionEnable": "Enable 設定を有効にします.",
       "bulkRuleToggleConfirm": "{verb} {count} ルール? これは analysis_options_custom.yaml.を更新しています.",
-      "setupPrompt": "Saropa Lintsは,設定された saropa_lints を使わずに Dart プロジェクトを検出しました. 2100以上のリントルールに今すぐ設定してください.",
+      "setupPrompt": "Saropa Lints により saropa_lints が設定されていない Dart プロジェクトが検出されました。2300 以上の lint ルールの設定を今すぐ行います。",
       "actionSetUpProject": "プロジェクトを設定する プロジェクトのセットアップ",
       "actionNotNow": "今,今ではない."
     },

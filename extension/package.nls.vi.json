@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter quy tắc lông măng với phân tích trực quan, cộng thêm gói Vibrancy để đánh giá sức khỏe phụ thuộc, quét lỗ hổng và lên kế hoạch nâng cấp.",
+  "extension.description": "2300+ quy tắc lint Dart/Flutter với phân tích trực quan, thêm Package Vibrancy để đánh điểm sức khỏe phụ thuộc, quét lỗ hổng và lên kế hoạch nâng cấp.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Bảng điều khiển biên tập viên, bảng điều khiển của nhà soạn thảo.",
@@ -9,7 +9,7 @@
   "views.settings.name": "Settings Settings (Thay đổi định vị)",
   "views.severityFilters.name": "Chẩn đoán",
   "views.help.name": "Giúp đỡ giúp đỡ",
-  "viewsWelcome.banner.contents": "**Saropa Lints**** PH2 là gì?\n\n2100+ Dart và Flutter quy tắc lông măng cho an ninh, khả năng tiếp cận và hiệu suất.\n\nYêu cầu một dự án Dart hoặc Flutter.\n\nMở một thư mục chứa `pubspec.yaml̅ để bắt đầu.\n\n[Hãy tìm hiểu thêm trực tuyến] (https://pub.dev/packages/saropa_lints)\n[Thiết lập tất cả các lệnh]{command:saropaLints.showCommandCatalog}\n[Về Saropa Lints]{Command:saropaLints.showAbout}\n[Bắt đầu]{Command:saropaLints.openWalkthrough}",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ quy tắc Dart và Flutter kiểm tra bảo mật, tính tiếp cận và hiệu năng.\n\nYêu cầu một dự án Dart hoặc Flutter.\n\nMở một thư mục chứa file `pubspec.yaml` để bắt đầu.\n\n[Học thêm trực tuyến](https://pub.dev/packages/saropa_lints)\n[Duyệt tất cả lệnh](command:saropaLints.showCommandCatalog)\n[Về Saropa Lints](command:saropaLints.showAbout)\n[Bắt đầu](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: là người có thể Thiết lập dự án (pubspec + config)",
   "command.disable.title": "Saropa Lints: là người có thể Tắt Lint Integration (Tổ hợp với Lint)",
   "command.reenablePlugin.title": "Saropa Lints: Kích hoạt lại Plugin Trong Cùng Một Quá Trình",

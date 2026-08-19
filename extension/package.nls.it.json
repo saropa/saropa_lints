@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter regole di lint con analisi visiva, più Package Vibrancy per il punteggio della dipendenza, la scansione delle vulnerabilità e la pianificazione degli aggiornamenti.",
+  "extension.description": "2300+ regole Dart/Flutter di lint con analisi visiva, più Package Vibrancy per la valutazione dello stato delle dipendenze, scansione delle vulnerabilità e pianificazione degli aggiornamenti.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Dashboard dell'editor, dashboard degli editor.",
@@ -9,7 +9,7 @@
   "views.settings.name": "Settings Settings Impostazioni",
   "views.severityFilters.name": "Diagnostica",
   "views.help.name": "Aiutare a aiutare",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart e Flutter regole di sicurezza, accessibilità e prestazioni.\n\nRichiede un progetto Dart o Flutter.\n\nAprire una cartella contenente un `pubspec.yaml̅ per iniziare.\n\n[Sapere di più online] (https://pub.dev/packages/saropa_lints)\n[Sfoglia tutti i comandi] (comando:saropaLints.showCommandCatalog)\n[A proposito di Saropa Lints] (comando:saropaLints.showAbout)\n[Inizio] (comando:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart e Flutter regole di lint per sicurezza, accessibilità e prestazioni.\n\nRichiede un progetto Dart o Flutter.\n\nApri una cartella contenente un `pubspec.yaml` per iniziare.\n\n[Scopri di più online](https://pub.dev/packages/saropa_lints)\n[Elenca tutti i comandi](command:saropaLints.showCommandCatalog)\n[Informazioni su Saropa Lints](command:saropaLints.showAbout)\n[Guida all'avvio](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Configurazione del progetto (pubspec + config)",
   "command.disable.title": "Saropa Lints: Spegnere l'integrazione Lint di integrazione.",
   "command.reenablePlugin.title": "Saropa Lints: Ripristina Plugin In-Process",

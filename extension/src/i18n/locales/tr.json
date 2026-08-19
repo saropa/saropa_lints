@@ -261,8 +261,17 @@
       "locationsTitle": "Projenizin bu paketi kullandığı yerler.",
       "noLocations": "Proje kaynağında ithal edilmemiş  ⁇ Dev veya transitif bir bağımlılık olasılığı vardır.",
       "moreFiles": "ve {count} daha fazla dosya",
-      "copyForAi": "AI için yükseltme çağrısını kopyalayın.",
-      "openInDashboard": "Paket Tablosunda Açık"
+      "openInDashboard": "Paket Tablosunda Açık",
+      "writeReport": "Rapor Yazdır"
+    },
+    "actions": {
+      "writeReport": "Rapor Yazdır"
+    },
+    "report": {
+      "noWorkspace": "Hiçbir çalışma alanı klasörü açık değil — rapor yazmak mümkün değil.",
+      "noContent": "Hiçbir pakette AI prompt içeriği yazmak için bulunmamaktadır.",
+      "written": "Rapor yazıldı — yolu panoya kopyalandı: {path}",
+      "failed": "İş fırsatları raporunu yazamadı: {error}"
     },
     "empty": {
       "title": "Hiçbir şey kabul etmek için hiçbir şey.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Disable Deaktive Etme İşlemleri",
       "actionEnable": "Enable enable Etkinleştirin etkinleştir",
       "bulkRuleToggleConfirm": "{verb} {count} kuralları? Bu, analysis_options_custom.yaml'i güncelliyor.",
-      "setupPrompt": "Saropa Lints, saropa_lints yapılandırılmamış bir Dart projesi algıladı. 2100'den fazla tüysüz kural için şimdi ayarlayın.",
+      "setupPrompt": "Saropa Lints, saropa_lints yapılandırılmadığı bir Dart projesi tespit etti. 2300+ linter kuralı için şimdi ayarlayın.",
       "actionSetUpProject": "Projeyi Kurmak Projesi Yapılandırma",
       "actionNotNow": "Şimdi değil şimdi, şimdi değil."
     },

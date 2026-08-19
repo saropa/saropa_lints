@@ -261,8 +261,17 @@
       "locationsTitle": "যেখানে আপনার প্রকল্প এই প্যাকেজ ব্যবহার করে।",
       "noLocations": "প্রকল্পের উৎসতে আমদানি করা হয়নি  ⁇ সম্ভবত একটি dev বা transitive নির্ভরতা।",
       "moreFiles": "এবং {count} আরও ফাইলগুলিকে ফোল্ডার করে।",
-      "copyForAi": "এআই জন্য আপগ্রেড প্রম্পট কপি করুন",
-      "openInDashboard": "প্যাকেজ ড্যাশবোর্ডে খুলুন"
+      "openInDashboard": "প্যাকেজ ড্যাশবোর্ডে খুলুন",
+      "writeReport": "রিপোর্ট লেখুন"
+    },
+    "actions": {
+      "writeReport": "রিপোর্ট লেখুন"
+    },
+    "report": {
+      "noWorkspace": "কোনও ওয়ার্কস্পেস ফোল্ডার খোলা নেই — রিপোর্ট লেখা সম্ভব নয়।",
+      "noContent": "কোন প্যাকেজে এআই প্রম্পট কনটেন্ট লেখার জন্য আছে না।",
+      "written": "বিবরণ লেখা হয়েছে — পাথ ক্লিপবোর্ডে কপি করা হয়েছে: {path}",
+      "failed": "অব্যবহার করা সম্ভব হয়নি সুযোগ বিবরণী: {error}"
     },
     "empty": {
       "title": "কিছুই গ্রহণ করতে হবে না",
@@ -1800,7 +1809,7 @@
       "actionDisable": "অক্ষম করুন নিষ্ক্রিয় করুন",
       "actionEnable": "Enable সক্ষম করুন সক্রিয় করুন",
       "bulkRuleToggleConfirm": "{verb} {count} নিয়ম? এই আপডেট analysis_options_custom.yaml.am এর সাথে মিলিত হয়েছে।",
-      "setupPrompt": "Saropa Lints একটি Dart প্রকল্প সনাক্ত করেছে যার মধ্যে saropa_lints কনফিগার করা নেই। এখন 2100+ টিন্ট নিয়মের জন্য সেট আপ করুন।",
+      "setupPrompt": "Saropa Lints একটি Dart প্রকল্প বিনা saropa_lints এর সাথে প্রক্ষেতা করেছে। 2300+ লিন্ট নিয়ম সেট আপ করুন।",
       "actionSetUpProject": "প্রকল্প সেট আপ করুন প্রজেক্ট সেটআপ করুন",
       "actionNotNow": "এখন না, এখন নয়।"
     },

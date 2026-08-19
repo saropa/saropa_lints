@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter กฎ lint กับการวิเคราะห์ภาพ, บวก Package Vibrancy สําหรับการให้คะแนนสุขภาพความพึ่งพา, การสแกนจุดอ่อนและแผนปรับปรุง.",
+  "extension.description": "2300+ กฎการตรวจสอบ Dart/Flutter พร้อมการวิเคราะห์ภาพที่เห็นได้ รวมถึง Package Vibrancy สำหรับการให้คะแนนสุขภาพของขึ้นทะเบียน การสแกนช่องโหว่ และการวางแผนการอัปเกรด",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "แดชบอร์ดบรรณาธิการ ดัชโบ๊ดผู้จัด",
@@ -9,7 +9,7 @@
   "views.settings.name": "การตั้งค่า Settings",
   "views.severityFilters.name": "การวินิจฉัย",
   "views.help.name": "ช่วยเหลือ สนับสนุน",
-  "viewsWelcome.banner.contents": "**Saropa Lints**\n\nกฎผ้าสำลี Dart และ Flutter มากกว่า 2,100 รายการเพื่อความปลอดภัย การเข้าถึง และประสิทธิภาพ\n\nต้องมีโปรเจ็กต์ Dart หรือ Flutter\n\nเปิดโฟลเดอร์ที่มี `pubspec.yaml` เพื่อเริ่มต้น\n\n[เรียนรู้เพิ่มเติมออนไลน์](https://pub.dev/packages/saropa_lints)\n[เรียกดูคำสั่งทั้งหมด](command:saropaLints.showCommandCatalog)\n[เกี่ยวกับ Saropa Lints](command:saropaLints.showAbout)\n[เริ่มต้นใช้งาน](คำสั่ง:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart และ Flutter กฎการตรวจสอบคุณภาพด้านความปลอดภัย ความเข้าถึง และประสิทธิภาพ\n\nต้องการโปรเจกต์ Dart หรือ Flutter\n\nเปิดโฟลเดอร์ที่มีไฟล์ `pubspec.yaml` เพื่อเริ่มต้น\n\n[เรียนรู้เพิ่มเติมออนไลน์](https://pub.dev/packages/saropa_lints)\n[ดูคำสั่งทั้งหมด](command:saropaLints.showCommandCatalog)\n[เกี่ยวกับ Saropa Lints](command:saropaLints.showAbout)\n[เริ่มต้นใช้งาน](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: ตั้งโครงการ (pubspec + config)",
   "command.disable.title": "Saropa Lints: ปิดการบูรณาการ Lint",
   "command.reenablePlugin.title": "Saropa Lints: เปิดใช้งานอีกครั้ง ปลั๊กอินแบบ In-Process",

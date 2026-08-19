@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter правила з візуальним аналізом, плюс пакет Vibrancy для оцінки стану залежності, сканування вразливостей та планування оновлення.",
+  "extension.description": "2300+ Dart/Flutter правил лінту з візуальним аналізом, плюс Package Vibrancy для оцінки стану залежностей, сканування вразливостей та планування оновлень.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Редакторські панелі, контрольні табло редактора.",
@@ -9,7 +9,7 @@
   "views.settings.name": "Налагодження розрахунків",
   "views.severityFilters.name": "Діагностика",
   "views.help.name": "Допомога допомога допомога",
-  "viewsWelcome.banner.contents": "**Saropa Lints**** ПФО - це рівень рівня крові.\n\n2100+ Dart і Flutter правила для безпеки, доступності та продуктивності.\n\nПотрібен проект Dart або Flutter.\n\nДля початку відкрийте папку, що містить `pubspec.yaml̅.\n\n[Узнайте більше онлайн] (https://pub.dev/packages/saropa_lints)\n[Проглянути всі команди] (команда:saropaLints.showCommandCatalog)\n[Про Saropa Lints] (команда:saropaLints.showAbout)\n[Починаємо] (команда:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart та Flutter правил лінта для безпеки, доступності та продуктивності.\n\nВимагає проекту Dart або Flutter.\n\nВідкрийте папку, що містить `pubspec.yaml`, щоб почати.\n\n[Дізнатися більше онлайн](https://pub.dev/packages/saropa_lints)\n[Переглянути всі команди](command:saropaLints.showCommandCatalog)\n[Про Saropa Lints](command:saropaLints.showAbout)\n[Почати роботу](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Налаштувати проект (pubspec + config)",
   "command.disable.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Вимкніть інтеграцію Lint Integration",
   "command.reenablePlugin.title": "Saropa Lints: Повернення вбудованого плагіну",

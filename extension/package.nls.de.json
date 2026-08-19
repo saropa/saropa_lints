@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter Lint-Regeln mit visueller Analyse, plus Package Vibrancy für Abhängigkeitsgesundheitsscoring, Schwachstellenanalyse und Upgradeplanung.",
+  "extension.description": "2300+ Dart/Flutter Lint-Regeln mit visueller Analyse, plus Package Vibrancy für Abhängigkeitsgesundheitsbewertung, Sicherheitsprüfung und Upgrade-Planung.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Editor Dashboards und -tabellen",
@@ -9,7 +9,7 @@
   "views.settings.name": "Settings Einstellungen der Einrichtung",
   "views.severityFilters.name": "Diagnose",
   "views.help.name": "Hilfsmittel Hilfe Hilfe",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart und Flutter Regeln für Sicherheit, Zugänglichkeit und Leistung.\n\nErfordert ein Dart oder Flutter Projekt.\n\nÖffnen Sie einen Ordner mit einem `pubspec.yaml̅, um loszulegen.\n\n[Erfahren Sie mehr online] (https://pub.dev/packages/saropa_lints)\n[Browse All Commands] (befehl:saropaLints.zeige Befehlskatalog)\n[Über Saropa Lints]{Befehl:saropaLints.showAbout}\n[Start] (befehl:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart und Flutter Lint-Regeln für Sicherheit, Barrierefreiheit und Leistung.\n\nErfordert ein Dart- oder Flutter-Projekt.\n\nÖffnen Sie ein Verzeichnis mit einer `pubspec.yaml`, um zu beginnen.\n\n[Weitere Informationen online](https://pub.dev/packages/saropa_lints)\n[Alle Befehle durchsuchen](command:saropaLints.showCommandCatalog)\n[Über Saropa Lints](command:saropaLints.showAbout)\n[Erste Schritte](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Einrichten des Projekts (pubspec + config)",
   "command.disable.title": "Saropa Lints: Schalten Sie die Lint-Integration aus.",
   "command.reenablePlugin.title": "Saropa Lints: In-Process Plugin wieder aktivieren",

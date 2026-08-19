@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter reglas de parche con análisis visual, además del paquete Vibrancy para la puntuación de salud de dependencias, escaneo de vulnerabilidades y planificación de actualizaciones.",
+  "extension.description": "2300+ reglas Dart/Flutter de lint con análisis visual, más Package Vibrancy para puntuación de salud de dependencias, escaneo de vulnerabilidades y planificación de actualizaciones.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Tableros de control del editor y tablones de mando.",
@@ -9,7 +9,7 @@
   "views.settings.name": "La configuración de las configuraciones.",
   "views.severityFilters.name": "Diagnóstico",
   "views.help.name": "Ayuda ayuda ayuda.",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart y Flutter reglas de lint para la seguridad, accesibilidad y rendimiento.\n\nRequiere un proyecto Dart o Flutter.\n\nAbra una carpeta que contenga un `pubspec.yaml̅ para comenzar.\n\n[Aprender más en línea] (https://pub.dev/paquetes/saropa_lints)\n[Explorar todos los comandos] (comando:saropaLints.muestraComandoCatálogo)\n[Acerca de Saropa Lints] (comando:saropaLints.showAbout) Se trata del juego en el que los jugadores pueden jugar con sus propios objetos y también con otros objetos.\n[Comenzando] (comando:saropaLints.open) Camina a través de las líneas",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ reglas Dart y Flutter de seguridad, accesibilidad y rendimiento.\n\nRequiere un proyecto Dart o Flutter.\n\nAbra una carpeta que contenga un `pubspec.yaml` para comenzar.\n\n[Obtener más información en línea](https://pub.dev/packages/saropa_lints)\n[Explorar todos los comandos](command:saropaLints.showCommandCatalog)\n[Sobre Saropa Lints](command:saropaLints.showAbout)\n[Comenzar](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Configurar el proyecto (pubspec + config)",
   "command.disable.title": "Saropa Lints: Apagar la integración de la cinta de banda",
   "command.reenablePlugin.title": "Saropa Lints: Reactivar Plugin en Proceso",

@@ -261,8 +261,17 @@
       "locationsTitle": "جایی که پروژه شما از این بسته استفاده می کند.",
       "noLocations": "در منبع پروژه وارد نشده است  ⁇ احتمالا یک وابستگی dev یا transitive است.",
       "moreFiles": "و {count} فایل های بیشتری را ذخیره می کند.",
-      "copyForAi": "کپی کردن درخواست ارتقاء برای هوش مصنوعی",
-      "openInDashboard": "در داشبورد بسته باز کنید"
+      "openInDashboard": "در داشبورد بسته باز کنید",
+      "writeReport": "گزارش بنویسید"
+    },
+    "actions": {
+      "writeReport": "گزارش بنویسید"
+    },
+    "report": {
+      "noWorkspace": "هیچ پوشه کارگاهی باز نیست — نمی‌توان گزارش را نوشت.",
+      "noContent": "هیچ پکیجی وجود ندارد که محتوای پرMotion AI را برای نوشتن ارائه کند.",
+      "written": "گزارش نوشته شده — مسیر کپی شد: {path}",
+      "failed": "اشکال در نوشتن گزارش فرصت ها: {error}"
     },
     "empty": {
       "title": "هیچ چیز برای تصویب اتخاذ نمی کند.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "غیرفعال کردن Disable",
       "actionEnable": "فعال کردن enable Enable امکان پذیر ساختن",
       "bulkRuleToggleConfirm": "{verb} {count} قوانین؟ این analysis_options_custom.yaml را به روز می کند",
-      "setupPrompt": "Saropa Lints یک پروژه Dart بدون پیکربندی saropa_lints را شناسایی کرد. اکنون برای 2100+ قوانین lint تنظیم کنید.",
+      "setupPrompt": "Saropa Lints یک پروژه Dart بدون پیکربندی saropa_lints تشخیص داد. اکنون پیکربندی کنید تا 2300 + قاعده لینت را فعال کنید.",
       "actionSetUpProject": "راه اندازی پروژه تنظیم پروژه",
       "actionNotNow": "حالا نه، الان نه"
     },

@@ -261,8 +261,17 @@
       "locationsTitle": "Dove il tuo progetto utilizza questo pacchetto.",
       "noLocations": "Non importato nella fonte del progetto  ⁇ probabile una dipendenza dev o transitiva.",
       "moreFiles": "e {count} più file.",
-      "copyForAi": "Copiare l'invio di aggiornamento per AI.",
-      "openInDashboard": "Aprire nella Dashboard del pacchetto."
+      "openInDashboard": "Aprire nella Dashboard del pacchetto.",
+      "writeReport": "Scrivi Rapporto"
+    },
+    "actions": {
+      "writeReport": "Scrivi Rapporto"
+    },
+    "report": {
+      "noWorkspace": "Nessuna cartella workspace è aperta — non è possibile scrivere il report.",
+      "noContent": "Nessun package ha contenuti di prompt AI da scrivere.",
+      "written": "Rapporto redatto — percorso copiato negli appunti: {path}",
+      "failed": "Errore nella scrittura del report delle opportunità: {error}"
     },
     "empty": {
       "title": "Niente da adottare nulla.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Disabilitare Disattivare",
       "actionEnable": "Abilitare abilitare",
       "bulkRuleToggleConfirm": "{verb} {count} regole? Questo aggiorna analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints ha rilevato un progetto di Dart senza la configurazione del saropa_lints. Impostati ora per 2100+ regole di lint.",
+      "setupPrompt": "Saropa Lints ha rilevato un progetto Dart senza saropa_lints configurato. Configura ora per 2300+ regole di lint.",
       "actionSetUpProject": "Impostare il progetto Set Up Project",
       "actionNotNow": "Non ora, non adesso."
     },

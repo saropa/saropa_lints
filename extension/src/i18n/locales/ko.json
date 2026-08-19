@@ -261,8 +261,17 @@
       "locationsTitle": "프로젝트에서 이 패키지를 사용하는 경우",
       "noLocations": "프로젝트 소스에서 가져온 것은 아닙니다  ⁇ dev 또는 과도적 의존성이 있을 가능성이 높습니다.",
       "moreFiles": "그리고 {count} 더 많은 파일을 저장합니다.",
-      "copyForAi": "인공지능 업그레이드 프롬프트를 복사하여 AI에 적용합니다.",
-      "openInDashboard": "패키지 대시보드에서 열립니다."
+      "openInDashboard": "패키지 대시보드에서 열립니다.",
+      "writeReport": "보고 작성"
+    },
+    "actions": {
+      "writeReport": "보고 작성"
+    },
+    "report": {
+      "noWorkspace": "작업 영역 폴더가 열려 있지 않음 — 보고서를 작성할 수 없습니다.",
+      "noContent": "AI 프롬프트 콘텐츠를 작성할 패키지가 없습니다.",
+      "written": "보고서 작성 완료 — 경로 클립보드에 복사됨: {path}",
+      "failed": "기회 보고서를 작성하지 못했습니다: {error}"
     },
     "empty": {
       "title": "채택할 것이 아무것도 없다.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "비활성화 해제",
       "actionEnable": "Enable Enable를 활성화하십시오.",
       "bulkRuleToggleConfirm": "{verb} {count} 규칙? analysis_options_custom.yaml.ly를 업데이트합니다",
-      "setupPrompt": "Saropa Lints가 saropa_lints를 구성하지 않은 Dart 프로젝트를 감지했습니다. 2100+ lint 규칙에 대해 지금 설정하십시오.",
+      "setupPrompt": "Saropa Lints는 saropa_lints가 설정되지 않은 Dart 프로젝트를 감지했습니다. 2300개 이상의 린트 규칙을 설정하려면 지금 설정하세요.",
       "actionSetUpProject": "프로젝트 설정 프로젝트를 구성하십시오.",
       "actionNotNow": "지금은 지금, 지금은 아니다."
     },

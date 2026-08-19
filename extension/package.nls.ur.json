@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter lint قواعد بصری تجزیہ کے ساتھ، پلس پیکج وابستگی صحت اسکورنگ کے لئے Vibrancy، خطرے کی اسکیننگ، کمزوریاں سکین کرنا. اور اپ گریڈ کی منصوبہ بندی.",
+  "extension.description": "2300+ Dart/Flutter قواعد لائٹنگ مع ہم نظریہ تحلیل، پکیج وبرنسیٹی کے ساتھ پیکیج سلامتی اسکورنگ، خطرات کی تحلیل، اور اپ گریڈ کرنے کے منصوبہ بندی۔",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "ايڊيٽر ڊيش بورڊز",
@@ -9,7 +9,7 @@
   "views.settings.name": "سيٽنگز",
   "views.severityFilters.name": "تشخيصات",
   "views.help.name": "مدد",
-  "viewsWelcome.banner.contents": "**Saropa Lints**\n\nسیکیورٹی، رسائی اور کارکردگی کے لیے 2100+ Dart اور Flutter lint کے اصول۔\n\nDart یا Flutter پروجیکٹ کی ضرورت ہے۔\n\nشروع کرنے کے لیے `pubspec.yaml` پر مشتمل فولڈر کھولیں۔\n\n[آن لائن مزید جانیں](https://pub.dev/packages/saropa_lints)\n[تمام کمانڈز کو براؤز کریں](command:saropaLints.showCommandCatalog)\n[Saropa Lints کے بارے میں](command:saropaLints.showAbout)\n[شروع کرنا](command:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart اور Flutter لائٹ رولز سیکورٹی، اکسیسیبلیٹی، اور پرفارمنس کے لیے۔\n\nDart یا Flutter پروجیکٹ کی ضرورت ہے۔\n\nایک فولڈر کھولیں جس میں `pubspec.yaml` موجود ہو۔\n\n[آن لائن سیکھیں](https://pub.dev/packages/saropa_lints)\n[سی ڈی ای کمانڈز دیکھیں](command:saropaLints.showCommandCatalog)\n[Saropa Lints بارے میں](command:saropaLints.showAbout)\n[شروع کریں](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: پروجيڪٽ سيٽ اپ ڪريو (pubspec + config)",
   "command.disable.title": "Saropa Lints: Lint انٽيگريشن بند ڪريو",
   "command.reenablePlugin.title": "Saropa Lints: انسائیڈ پروسس پلاگن کو دوبارہ سے سرکاری کریں",

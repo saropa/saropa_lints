@@ -261,8 +261,17 @@
       "locationsTitle": "Ambapo mradi wako unatumia kifurushi hiki cha pakiti.",
       "noLocations": "Haijaingizwa katika chanzo cha mradi  ⁇ uwezekano wa utegemezi wa dev au transitive.",
       "moreFiles": "na {count} faili zaidi files.",
-      "copyForAi": "Nakili mwongozo wa kuboresha kwa AI.",
-      "openInDashboard": "Fungua katika Dashibodi ya Package Dashboard."
+      "openInDashboard": "Fungua katika Dashibodi ya Package Dashboard.",
+      "writeReport": "Tuma Ripoti"
+    },
+    "actions": {
+      "writeReport": "Tuma Ripoti"
+    },
+    "report": {
+      "noWorkspace": "Hakuna jumla ya folder ya workspace — hakuna kuzalishia raporti.",
+      "noContent": "Hakuna paketi ambayo ina kifungu ya AI ya kuzunguka.",
+      "written": "Unganisha wakati — jina la jalan ya kujitokeza kuzalisha kwenye clipboard: {path}",
+      "failed": "Hakikisha ujumbe wa matokeo ya muda mwingi: {error}"
     },
     "empty": {
       "title": "Hakuna kitu cha kupitisha.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Disable Disable Kulemaza",
       "actionEnable": "Enable Kuwezesha kuwezesha",
       "bulkRuleToggleConfirm": "{verb} {count} sheria? Hii inasasisha analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints iligundua mradi wa Dart bila saropa_lints kusanidiwa. Weka sasa kwa sheria 2100+ za lint.",
+      "setupPrompt": "Saropa Lints amesha kujaribu project ya Dart bila kujaribu saropa_lints. Tafakari kwa 2300+ rules ya lint.",
       "actionSetUpProject": "Kuanzisha Mradi wa kuanzisha mradi.",
       "actionNotNow": "Sio sasa, sio sasa."
     },

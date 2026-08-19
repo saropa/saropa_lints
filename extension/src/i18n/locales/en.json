@@ -1809,7 +1809,7 @@
       "actionDisable": "Disable",
       "actionEnable": "Enable",
       "bulkRuleToggleConfirm": "{verb} {count} rules? This updates analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints detected a Dart project without saropa_lints configured. Set up now for 2100+ lint rules.",
+      "setupPrompt": "Saropa Lints detected a Dart project without saropa_lints configured. Set up now for 2300+ lint rules.",
       "actionSetUpProject": "Set Up Project",
       "actionNotNow": "Not Now"
     },

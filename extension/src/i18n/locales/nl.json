@@ -261,8 +261,17 @@
       "locationsTitle": "Waar uw project dit pakket gebruikt.",
       "noLocations": "Niet geïmporteerd in de projectbron  ⁇ Waarschijnlijk een dev of transitieve afhankelijkheid.",
       "moreFiles": "en {count} meer bestanden",
-      "copyForAi": "Kopieer de upgrade prompt voor AI.",
-      "openInDashboard": "Open in het Dashboard van de pakketten."
+      "openInDashboard": "Open in het Dashboard van de pakketten.",
+      "writeReport": "Rapport opstellen"
+    },
+    "actions": {
+      "writeReport": "Rapport opstellen"
+    },
+    "report": {
+      "noWorkspace": "Geen werkruimte map is open — kan het rapport niet schrijven.",
+      "noContent": "Geen pakketten hebben AI prompt inhoud om te schrijven.",
+      "written": "Rapport opgesteld — pad gekopieerd naar klembord: {path}",
+      "failed": "Mislukt om opportunities rapport te schrijven: {error}"
     },
     "empty": {
       "title": "Niets om te aannemen.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Disable Disable Ontschakelen",
       "actionEnable": "Enable Enable is een functie die wordt ingeschakeld door de gebruiker.",
       "bulkRuleToggleConfirm": "{verb} {count} regels? Dit is een update van analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints heeft een Dart project gedetecteerd zonder dat saropa_lints geconfigureerd is. Stel je nu in voor 2100+ lintregels.",
+      "setupPrompt": "Saropa Lints heeft een Dart project gedetecteerd zonder saropa_lints geconfigureerd. Stel nu in voor 2300+ lint regels.",
       "actionSetUpProject": "Project opzetten project instellen",
       "actionNotNow": "Nu niet, nu niet."
     },

@@ -261,8 +261,17 @@
       "locationsTitle": "Wo Ihr Projekt dieses Paket verwendet.",
       "noLocations": "Nicht in der Projektquelle importiert  ⁇ wahrscheinlich eine dev oder transitive Abhängigkeit.",
       "moreFiles": "und {count} mehr Dateien.",
-      "copyForAi": "Kopieren Sie die Aktualisierungs-Befehl für KI.",
-      "openInDashboard": "Öffnen Sie in der Package Dashboard."
+      "openInDashboard": "Öffnen Sie in der Package Dashboard.",
+      "writeReport": "Bericht erstellen"
+    },
+    "actions": {
+      "writeReport": "Bericht erstellen"
+    },
+    "report": {
+      "noWorkspace": "Kein Arbeitsbereichsordner ist geöffnet — kann den Bericht nicht schreiben.",
+      "noContent": "Keine Pakete enthalten AI-Prompt-Inhalt zum Schreiben.",
+      "written": "Bericht erstellt — Pfad in die Zwischenablage kopiert: {path}",
+      "failed": "Fehler beim Schreiben des Opportunities-Berichts: {error}"
     },
     "empty": {
       "title": "Nichts zu verabschieden, nichts anzunehmen.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Deaktivieren Sie deaktiviert.",
       "actionEnable": "Aktivieren Enable aktivieren",
       "bulkRuleToggleConfirm": "{verb} {count} Regeln? Dies aktualisiert analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints hat ein Dart-Projekt ohne konfigurierte saropa_lints erkannt. Jetzt für 2100+ Flintenregeln einrichten.",
+      "setupPrompt": "Saropa Lints hat ein Dart-Projekt ohne saropa_lints erkannt. Richten Sie jetzt 2300+ Lint-Regeln ein.",
       "actionSetUpProject": "Projekt aufstellen Projektieren",
       "actionNotNow": "Nicht jetzt, nicht jetzt."
     },

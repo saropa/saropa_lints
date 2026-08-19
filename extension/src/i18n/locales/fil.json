@@ -261,8 +261,17 @@
       "locationsTitle": "Kung saan ginagamit ng iyong proyekto ang pakete na ito.",
       "noLocations": "Hindi na-import sa project source  ⁇ malamang na isang dev o transitive dependency.",
       "moreFiles": "at {count} higit pang mga file ng files.",
-      "copyForAi": "Kopyahin ang pag-upgrade ng prompt para sa AI.",
-      "openInDashboard": "Buksan sa Dashboard ng Package na Dashboard."
+      "openInDashboard": "Buksan sa Dashboard ng Package na Dashboard.",
+      "writeReport": "Isumulat ng Report"
+    },
+    "actions": {
+      "writeReport": "Isumulat ng Report"
+    },
+    "report": {
+      "noWorkspace": "Walang nakapag-open na workspace folder — hindi maaaring i-write ang report.",
+      "noContent": "Walang mga package ang may nilalaman ng AI prompt para i-write.",
+      "written": "Napagawa na ang ulat — path nakopya sa clipboard: {path}",
+      "failed": "Nagkabigo ang pagsulat ng report ng oportunidades: {error}"
     },
     "empty": {
       "title": "Walang dapat tanggapin na bagay.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "I-disable Disable Pagkakaroon ng mga ito",
       "actionEnable": "Pagbibigay-daan sa paganahin ay pinapayagan.",
       "bulkRuleToggleConfirm": "{verb} {count} mga patakaran? Ito ay nag-update ng analysis_options_custom.yaml.",
-      "setupPrompt": "Nakakita ang Saropa Lints ng proyektong Dart nang hindi naka-configure ang saropa_lints. I-set up ngayon para sa 2100+ lint rules.",
+      "setupPrompt": "Nakadetekta ang Saropa Lints ng isang Dart project nang walang saropa_lints na nakakonfigure. Mag-set up ngayon para sa 2300+ lint rules.",
       "actionSetUpProject": "I-set up ang proyekto, i-setup ang proyekto.",
       "actionNotNow": "Hindi ngayon, hindi pa."
     },

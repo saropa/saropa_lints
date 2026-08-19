@@ -261,8 +261,17 @@
       "locationsTitle": "حيث يستخدم مشروعك هذه الحزمة.",
       "noLocations": "لم يتم استيرادها في مصدر المشروع  ⁇ من المحتمل أن يكون هناك اعتماد على التطور أو الانتقال.",
       "moreFiles": "و {count} المزيد من الملفات.",
-      "copyForAi": "نسخ استجابة الترقية لـ AI",
-      "openInDashboard": "افتح في لوحة تحكم الحزمة."
+      "openInDashboard": "افتح في لوحة تحكم الحزمة.",
+      "writeReport": "اكتب تقرير"
+    },
+    "actions": {
+      "writeReport": "اكتب تقرير"
+    },
+    "report": {
+      "noWorkspace": "لا يوجد مجلد مساحة العمل مفتوح — لا يمكن كتابة التقرير.",
+      "noContent": "لا توجد حزم تحتوي على محتوى إشارة AI لكتابة.",
+      "written": "الإبلاغ عن الكتابة — المسار نسخ إلى الحافظة: {path}",
+      "failed": "فشل في كتابة تقرير الفرص: {error}"
     },
     "empty": {
       "title": "لا شيء لتبني تبنيه.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "تعطيل تعطيّل",
       "actionEnable": "تمكين Enable تمكين",
       "bulkRuleToggleConfirm": "{verb} {count} قاعدة؟ هذا تحديث analysis_options_custom.yaml",
-      "setupPrompt": "اكتشف Saropa Lints مشروع Dart دون تكوين saropa_lints. قم بالإعداد الآن لأكثر من 2100 قاعدة للوبر.",
+      "setupPrompt": "اكتشف Saropa Lints مشروع Dart دون تكوين saropa_lints. قم بالإعداد الآن لأكثر من 2300+ من قواعد الوبر.",
       "actionSetUpProject": "إعداد المشروع إنشاء مشروع.",
       "actionNotNow": "ليس الآن وليس الآن"
     },

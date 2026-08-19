@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter lint aturan dengan analisis visual, ditambah paket Vibrancy untuk penilaian kesehatan ketergantungan, pemindaian kerentanan, dan perencanaan upgrade.",
+  "extension.description": "2300+ aturan lint Dart/Flutter dengan analisis visual, plus Package Vibrancy untuk penilaian kesehatan dependensi, pemindaian kerentanan, dan perencanaan pembaruan.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Dashboard editor, dasbor editor dan lainnya.",
@@ -9,7 +9,7 @@
   "views.settings.name": "Pengaturan Settings Setelan.",
   "views.severityFilters.name": "Diagnostik",
   "views.help.name": "Bantuan yang diberikan untuk membantu",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart dan Flutter aturan lint untuk keamanan, aksesibilitas, dan kinerja.\n\nMembutuhkan proyek Dart atau Flutter.\n\nBuka folder yang berisi `pubspec.yaml̅ untuk memulai.\n\n[Learn more online]https://pub.dev/packages/saropa_lints) (dalam bahasa Inggris).\n[Browse All Commands] (perintah:saropaLints.tunjukkan Katalog Komando)\n[Tentang Saropa Lints] (perintah:saropaLints.showAbout)\n[Mulai] (perintah: saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart dan Flutter rules lint untuk keamanan, aksesibilitas, dan kinerja.\n\nMemerlukan proyek Dart atau Flutter.\n\nBuka folder yang mengandung file `pubspec.yaml` untuk memulai.\n\n[Belajar lebih lanjut secara online](https://pub.dev/packages/saropa_lints)\n[Melihat Semua Perintah](command:saropaLints.showCommandCatalog)\n[Tentang Saropa Lints](command:saropaLints.showAbout)\n[Memulai](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Mengatur Proyek (pubspec + config)",
   "command.disable.title": "Saropa Lints: Matikan Integrasi Lint",
   "command.reenablePlugin.title": "Saropa Lints: Aktifkan Kembali Plugin In-Process",

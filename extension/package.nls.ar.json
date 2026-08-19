@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter قواعد التشعيب مع التحليل البصري ، بالإضافة إلى حزمة Vibrancy لتقييم صحة الاعتماد ، مسح الضعف ، وتخطيط الترقية.",
+  "extension.description": "2300+ قاعدة Dart/Flutter للتحليل البصري، بالإضافة إلى حزمة Vibrancy لتقدير صحة الاعتماد، وفحص الثغرات، وتنظيم الترقية.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "لوحات تحكم المحررين لوحة التحكم.",
@@ -9,7 +9,7 @@
   "views.settings.name": "تحديدات التسويات",
   "views.severityFilters.name": "التشخيصات",
   "views.help.name": "مساعدة المساعدات المساعدة",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart و Flutter قواعد الشعيرات للأمان والوصول والأداء.\n\nيتطلب مشروع Dart أو Flutter.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[Browse All Commands](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart و Flutter قواعد التحقق من صحة الكود لضمان الأمان والوصول والكفاءة.\n\nيتطلب مشروع Dart أو Flutter.\n\nافتح مجلدًا يحتوي على ملف `pubspec.yaml` للبدء.\n\n[اقرأ المزيد على الإنترنت](https://pub.dev/packages/saropa_lints)\n[استعرض جميع الأوامر](command:saropaLints.showCommandCatalog)\n[حول Saropa Lints](command:saropaLints.showAbout)\n[البدء](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: إعداد المشروع (pubspec + config)",
   "command.disable.title": "Saropa Lints: إيقاف تشغيل تكامل Lint",
   "command.reenablePlugin.title": "Saropa Lints: إعادة تفعيل إضافة المُضافة الداخلية",

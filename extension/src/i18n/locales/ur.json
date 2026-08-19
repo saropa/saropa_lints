@@ -261,8 +261,17 @@
       "locationsTitle": "جہاں آپ کا پروجیکٹ اس پیکیج کو استعمال کرتا ہے",
       "noLocations": "پروجیکٹ ماخذ میں درآمد نہیں کیا گیا  ⁇ ممکنہ طور پر ایک ڈیو یا ٹرانزٹ انحصار.",
       "moreFiles": "اور {count} مزید فائلیں",
-      "copyForAi": "AI کے لئے اپ گریڈ پرامپٹ کاپی کریں",
-      "openInDashboard": "پیکج ڈیش بورڈ میں کھولیں"
+      "openInDashboard": "پیکج ڈیش بورڈ میں کھولیں",
+      "writeReport": "رپورٹ لکھیں"
+    },
+    "actions": {
+      "writeReport": "رپورٹ لکھیں"
+    },
+    "report": {
+      "noWorkspace": "کوئی ورک سپیس فولڈر کھولی گئی ہے — ڈاکیمینٹ کی رپورٹ لکھنا ممکن نہیں۔",
+      "noContent": "کوئی پیکیج ای 1111111111111111111111111111111",
+      "written": "رپورٹ تیار کر دی گئی — پہچان کی جانچ کا راستہ کلیپ بورڈ میں کپی کر دیا گیا: {path}",
+      "failed": "کامیابی سے مواقع ڈاکument لکھنا ناممکن ہو گیا: {error}"
     },
     "empty": {
       "title": "اپنانے کے لئے کچھ بھی نہیں.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "غیر فعال کریں Disable",
       "actionEnable": "Enable فعال کریں چالو کریں۔",
       "bulkRuleToggleConfirm": "{verb} {count} قواعد کیا ہیں؟ اس سے analysis_options_custom.yaml کو اپ ڈیٹ کیا گیا ہے۔",
-      "setupPrompt": "Saropa Lints نے saropa_lints کنفیگر کیے بغیر Dart پروجیکٹ کا پتہ لگایا۔ 2100+ لِنٹ رولز کے لیے ابھی سیٹ اپ کریں۔",
+      "setupPrompt": "Saropa Lints میں Dart پروجیکٹ کا پتہ چلا لیا گیا ہے جس میں saropa_lints کی ترتیب نہیں ہے۔ 2300+ لینٹ قواعد کے لیے اب تیار کریں۔",
       "actionSetUpProject": "پروجیکٹ سیٹ اپ کریں منصوبے کی ترتیب دیں",
       "actionNotNow": "اب نہیں، ابھی نہیں۔"
     },

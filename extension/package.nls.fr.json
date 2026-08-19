@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter règles de filetage avec analyse visuelle, ainsi que le Package Vibrancy pour la notation d'état des dépendances, l'analyse des vulnérabilités et la planification des mises à niveau.",
+  "extension.description": "2300+ règles Dart/Flutter de linter avec analyse visuelle, plus Package Vibrancy pour le scoring de santé des dépendances, le balayage des vulnérabilités et la planification des mises à jour.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Tableaux de bord editeur",
@@ -9,7 +9,7 @@
   "views.settings.name": "Parametres",
   "views.severityFilters.name": "Diagnostic",
   "views.help.name": "Aide",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart et Flutter règles de linte pour la sécurité, l'accessibilité et les performances. le principe est que chaque ligne doit être équipée d'un support adapté à sa taille.\n\nRequiert un projet Dart ou Flutter.\n\nOuvrez un dossier contenant une `pubspec.yaml̅ pour commencer.\n\n[En savoir plus en ligne] (https://pub.dev/packages/saropa_lints)\n[Examiner toutes les commandes] (commande:saropaLints.afficher le catalogue de commandes)\n[À propos de Saropa Lints] (commande:saropaLints.afficher À propos)\n[Commencez à jouer] (commande:saropaLints.openWalkthrough) - Le jeu est en cours de développement",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ règles Dart et Flutter de sécurité, d'accessibilité et de performance.\n\nNécessite un projet Dart ou Flutter.\n\nOuvrez un dossier contenant un `pubspec.yaml` pour commencer.\n\n[En savoir plus en ligne](https://pub.dev/packages/saropa_lints)\n[Parcourir toutes les commandes](command:saropaLints.showCommandCatalog)\n[À propos de Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints : Configurer le projet (pubspec + config)",
   "command.disable.title": "Saropa Lints : Désactiver l'intégration des lints",
   "command.reenablePlugin.title": "Saropa Lints : Réactiver le plugin en processus",

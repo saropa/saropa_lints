@@ -261,8 +261,17 @@
       "locationsTitle": "ที่โครงการของคุณใช้แพ็กเกจนี้",
       "noLocations": "ไม่นําเข้าในโครงการที่มา  ⁇ เป็นไปได้ว่าการพึ่งพา dev หรือ transitive.",
       "moreFiles": "และ {count} ไฟล์เพิ่มเติม",
-      "copyForAi": "สําเนาการอัพเกรดทันทีสําหรับ AI",
-      "openInDashboard": "เปิดใน แดชบอร์ด Package Dashboard"
+      "openInDashboard": "เปิดใน แดชบอร์ด Package Dashboard",
+      "writeReport": "เขียนรายงาน"
+    },
+    "actions": {
+      "writeReport": "เขียนรายงาน"
+    },
+    "report": {
+      "noWorkspace": "ไม่มีโฟลเดอร์งานที่เปิด — ไม่สามารถเขียนรายงานได้",
+      "noContent": "ไม่มีแพ็กเกจใดที่มีเนื้อหา AI prompt เพื่อเขียน",
+      "written": "รายงานเสร็จสิ้น — บันทึกเส้นทางถูกคัดลอกไปยังคลิปบอร์ด: {path}",
+      "failed": "ไม่สามารถเขียนรายงานโอกาสได้: {error}"
     },
     "empty": {
       "title": "ไม่มีอะไรที่จะรับใช้ ยอมรับ",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Disable ปิดการใช้งาน",
       "actionEnable": "Enable enable เปิดให้ใช้ได้",
       "bulkRuleToggleConfirm": "{verb} {count} กฎกติกา? การอัพเดท analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints พบโครงการ Dart โดยไม่มี saropa_lints ที่ตั้งค่า ตั้งค่าตอนนี้สําหรับ 2100+ กฎ lint.",
+      "setupPrompt": "Saropa Lints พบโปรเจกต์ Dart ที่ไม่มี saropa_lints ตั้งค่า ตั้งค่าทันทีเพื่อกฎการตรวจสอบ 2300+ ข้อ",
       "actionSetUpProject": "ตั้งโครงการ Set Up Project จัดทําโครต",
       "actionNotNow": "ไม่ตอนนี้ ไม่ใช่ ตอนนี้"
     },

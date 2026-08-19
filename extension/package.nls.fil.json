@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter lint rules na may visual analysis, kasama ang Package Vibrancy para sa dependency health scoring, vulnerability scanning, at pag-upgrade ng plano.",
+  "extension.description": "2300+ Dart/Flutter mga rule ng lint na may visual analysis, plus Package Vibrancy para sa scoring ng kalusugan ng dependency, pag-scan ng kahinaan, at pag-plano ng upgrade.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Mga dashboard ng editor, mga dashboard sa editor.",
@@ -9,7 +9,7 @@
   "views.settings.name": "Mga Pag-aayos ng Settings",
   "views.severityFilters.name": "Mga diagnostic",
   "views.help.name": "Magbigay ng tulong sa mga taong nakakatulong.",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart at Flutter mga patakaran ng lint para sa seguridad, kakayahang ma-access, at pagganap.\n\nKinakailangan ng isang Dart o Flutter proyekto.\n\nBuksan ang isang folder na naglalaman ng isang `pubspec.yaml̅ upang makapagsimula.\n\n[Magbasa nang higit pa sa online] (https://pub.dev/packages/saropa_lints)\n[Browse All Commands] ((command:saropaLints.showCommandCatalog) -[Tingnan ang Lahat ng mga Komando] (Ipakita ang Katalogan ng Mga Kumandong Kumandadong Kumandado)\n[Tungkol sa Saropa Lints] ((command:saropaLints.showAbout))\n[Pagsimula] (komando:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart at Flutter na mga rule para sa seguridad, accessibility, at performance.\n\nKinakailangan ang isang Dart o Flutter project.\n\nBumuksan ang isang folder na may isang `pubspec.yaml` upang magsimula.\n\n[Mag-aral pa nang online](https://pub.dev/packages/saropa_lints)\n[Pangkatin ang lahat ng mga command](command:saropaLints.showCommandCatalog)\n[Tungkol sa Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: I-set Up ang Proyekto (pubspec + config)",
   "command.disable.title": "Saropa Lints: Patayin ang Pagsasama ng Lint Integration",
   "command.reenablePlugin.title": "Saropa Lints: I-palikas ang Plugin sa Loob ng Process",

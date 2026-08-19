@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter כללי פנט עם ניתוח חזותי, בנוסף לחבילה Vibrancy עבור ציון בריאות תלותיות, סריקת חולשה ותכנון שדרוג.",
+  "extension.description": "2300+ Dart/Flutter правила לינט עם ניתוח חזותי, ועוד Package Vibrancy לציון מצב תלות, סקרון רגישות ותכנון עדכון.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "לוחיות של היועצים, לוחי הפיקוד של העורכים.",
@@ -9,7 +9,7 @@
   "views.settings.name": "התיישבות הפניות",
   "views.severityFilters.name": "דיאגנוסטיקה",
   "views.help.name": "עזרה עזר סיוע",
-  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2100+ כללי מוך Dart ו-Flutter לאבטחה, נגישות וביצועים.\n\nדורש פרויקט Dart או Flutter.\n\nפתח תיקיה המכילה 'pubspec.yaml' כדי להתחיל.\n\n[למידע נוסף באינטרנט](https://pub.dev/packages/saropa_lints)\n[עיין בכל הפקודות](command:saropaLints.showCommandCatalog)\n[אודות Saropa Lints](command:saropaLints.showAbout)\n[תחילת העבודה](command:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart ו-Flutter правила למאגר, גישה, ותפקוד.\n\nדורשת פרויקט של Dart או Flutter.\n\nפתח תיקייה עם `pubspec.yaml` כדי להתחיל.\n\n[ל更多信息 באינטרנט](https://pub.dev/packages/saropa_lints)\n[צפו בכל הפקודות](command:saropaLints.showCommandCatalog)\n[אודות Saropa Lints](command:saropaLints.showAbout)\n[היכן להתחיל](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: הגדרת פרויקט (pubspec + config)",
   "command.disable.title": "Saropa Lints: כבה את אינטגרציה של Lint",
   "command.reenablePlugin.title": "Saropa Lints: הפעלה מחדש של מודול פלגרען בתוך התהליך",

@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter قوانین lint با تجزیه و تحلیل بصری، به علاوه بسته Vibrancy برای امتیاز دهی سلامت وابستگی، اسکن آسیب پذیری و برنامه ریزی ارتقاء.",
+  "extension.description": "۲۳۰۰+ قاعده Dart/Flutter با تحلیل بصري، به علاوه پکیج وبرانسی برای امتیاز دهی به سلامت وابستگی ها، اسکن نقص و برنامه ریزی برای به روز رسانی",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "داشبورد های ویرایشگر، دش بوردهای مدیر",
@@ -9,7 +9,7 @@
   "views.settings.name": "تنظیمات Settings تنظیمات",
   "views.severityFilters.name": "دیاگنوستیکس",
   "views.help.name": "کمک به یاری کردن",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart و Flutter قوانین لنت برای امنیت، دسترسی پذیری و عملکرد.\n\nنیاز به یک پروژه Dart یا Flutter دارد.\n\nبرای شروع یک پوشه حاوی `pubspec.yaml̅ را باز کنید.\n\n[بیشتر در اینستاگرام بخوانید]https://pub.dev/packages/saropa_lints)\n[بررسي تمام فرمان ها] (کمانده:saropaLints.showCommandCatalog)\n[در مورد Saropa Lints]{کمانده:saropaLints.showAbout}\n[آغاز کردن]{کمانده:saropaLints.openWalkthrough}",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart و Flutter قواعد لینت برای امنیت، دسترسی پذیری و عملکرد.\n\nنیاز به یک پروژه Dart یا Flutter دارد.\n\nپوشه ای که شامل یک `pubspec.yaml` باشد را باز کنید تا شروع کنید.\n\n[بیشتر بدانید](https://pub.dev/packages/saropa_lints)\n[دیدن تمام دستورات](command:saropaLints.showCommandCatalog)\n[درباره Saropa Lints](command:saropaLints.showAbout)\n[شروع کردن](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: تنظیم پروژه (pubspec + config)",
   "command.disable.title": "Saropa Lints: خاموش کردن ادغام Lint",
   "command.reenablePlugin.title": "Saropa Lints: فعال سازی مجدد پلاگین در فرآیند میزبان",

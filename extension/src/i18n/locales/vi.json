@@ -261,8 +261,17 @@
       "locationsTitle": "Trường hợp dự án của bạn sử dụng gói này.",
       "noLocations": "Không được nhập vào nguồn dự án  ⁇ có thể là một sự phụ thuộc dev hoặc chuyển tiếp.",
       "moreFiles": "và {count} nhiều file hơn.",
-      "copyForAi": "Sao chép nhắc nâng cấp cho AI",
-      "openInDashboard": "Mở trong Package Dashboard."
+      "openInDashboard": "Mở trong Package Dashboard.",
+      "writeReport": "Viết Báo cáo"
+    },
+    "actions": {
+      "writeReport": "Viết Báo cáo"
+    },
+    "report": {
+      "noWorkspace": "Không có thư mục làm việc nào đang mở — không thể viết báo cáo.",
+      "noContent": "Không có gói nào chứa nội dung gợi ý AI để viết.",
+      "written": "Báo cáo đã được viết — đường dẫn đã được sao chép vào clipboard: {path}",
+      "failed": "Không thể ghi báo cáo cơ hội: {error}"
     },
     "empty": {
       "title": "Không có gì để thông qua.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Disable vô hiệu hóa",
       "actionEnable": "Enable enable enable cho phép",
       "bulkRuleToggleConfirm": "{verb} {count} quy tắc? Điều này cập nhật analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints phát hiện một dự án Dart mà không có cấu hình saropa_lints. Bây giờ thiết lập cho 2100 + quy tắc lông.",
+      "setupPrompt": "Saropa Lints phát hiện một dự án Dart không có saropa_lints được cấu hình. Thiết lập ngay để có 2300+ quy tắc lint.",
       "actionSetUpProject": "Thiết lập dự án thiết lập dự kiến",
       "actionNotNow": "Không phải bây giờ, không phải lúc này."
     },

@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter lint regels met visuele analyse, plus Package Vibrancy voor afhankelijkheid gezondheid scoring, kwetsbaarheid scanning en upgrade planning.",
+  "extension.description": "2300+ Dart/Flutter lint regels met visuele analyse, plus Package Vibrancy voor afhankelijkheidsgesondheidsbeoordeling, kwetsbaarheidsscan en upgradeplanning.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Editor-dashboards",
@@ -9,7 +9,7 @@
   "views.settings.name": "Instellingen",
   "views.severityFilters.name": "Diagnostiek",
   "views.help.name": "Help",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart en Flutter lint regels voor veiligheid, toegankelijkheid en prestaties.\n\nVereist een Dart of Flutter project.\n\nOpen een map met een `pubspec.yaml̅ om te beginnen.\n\n[Leer meer online] (https://pub.dev/pakketten/saropa_lints)\n[Browse All Commands] (commando:saropaLints.showCommandCatalog)\n[Over Saropa Lints](commando:saropaLints.showAbout)\n[Begin] (commando:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart en Flutter lint-regels voor beveiliging, toegankelijkheid en prestaties.\n\nVereist een Dart of Flutter project.\n\nOpen een map die een `pubspec.yaml` bevat om te beginnen.\n\n[Lees meer online](https://pub.dev/packages/saropa_lints)\n[Blader door alle commando's](command:saropaLints.showCommandCatalog)\n[Over Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Project instellen (pubspec + config)",
   "command.disable.title": "Saropa Lints: Lint-integratie uitschakelen",
   "command.reenablePlugin.title": "Saropa Lints: In-Process Plugin opnieuw activeren",

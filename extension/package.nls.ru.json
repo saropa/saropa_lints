@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter правила с визуальным анализом, плюс пакет Vibrancy для оценки состояния зависимости, сканирования уязвимостей и планирования обновлений.",
+  "extension.description": "2300+ Dart/Flutter правил линта с визуализацией анализа, плюс Package Vibrancy для оценки здоровья зависимостей, сканирования уязвимостей и планирования обновления.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Схемы редакторов, панели управления.",
@@ -9,7 +9,7 @@
   "views.settings.name": "Настройки настройки.",
   "views.severityFilters.name": "Диагностика",
   "views.help.name": "Помочь помочь помочь.",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart и Flutter правила безопасности, доступности и производительности.\n\nТребует проекта Dart или Flutter.\n\nЧтобы начать, откройте папку с файлом `pubspec.yaml̅.\n\n[Узнать больше онлайн] (https://pub.dev/packages/saropa_lints)\n[Просмотр всех команд] (команда:saropaLints. покажите Каталог команд)\n[О Saropa Lints] (команда:saropaLints.showAbout) - это приложение, которое позволяет пользователям просматривать и получать информацию о себе.\n[Начинаем] (команда:saropaLints.open Прогулка)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart и Flutter правил для безопасности, доступности и производительности.\n\nТребуется проект Dart или Flutter.\n\nОткройте папку, содержащую файл `pubspec.yaml`, чтобы начать работу.\n\n[Узнать больше онлайн](https://pub.dev/packages/saropa_lints)\n[Просмотреть все команды](command:saropaLints.showCommandCatalog)\n[О Saropa Lints](command:saropaLints.showAbout)\n[Начало работы](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Настройка проекта (pubspec + config)",
   "command.disable.title": "Saropa Lints: Выключить интеграцию Lint",
   "command.reenablePlugin.title": "Saropa Lints: Включить плагин In-Process",

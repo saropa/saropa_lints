@@ -261,8 +261,17 @@
       "locationsTitle": "Lorsque votre projet utilise ce package.",
       "noLocations": "N'est pas importé dans la source du projet  ⁇ Il est probable qu'il s'agisse d'une dépendance dev ou transitive.",
       "moreFiles": "et {count} plus de fichiers.",
-      "copyForAi": "Copiez l'invite de mise à niveau pour AI.",
-      "openInDashboard": "Ouvrir dans le tableau de bord du paquet."
+      "openInDashboard": "Ouvrir dans le tableau de bord du paquet.",
+      "writeReport": "Écrire Rapport"
+    },
+    "actions": {
+      "writeReport": "Écrire Rapport"
+    },
+    "report": {
+      "noWorkspace": "Aucun dossier de travail n'est ouvert — impossible d'écrire le rapport.",
+      "noContent": "Aucun package ne contient de contenu de prompt AI à écrire.",
+      "written": "Rapport rédigé — chemin copié dans le presse-papier : {path}",
+      "failed": "Échec d'écriture du rapport des opportunités : {error}"
     },
     "empty": {
       "title": "Rien à adopter n'est adopté.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Désactiver désactiver.",
       "actionEnable": "L'option Activer est activée.",
       "bulkRuleToggleConfirm": "Les règles de {verb} {count} ? Cela met à jour analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints a détecté un projet de Dart sans configuration du saropa_lints. Préparez-vous maintenant pour les 2100 règles de plus que des poils.",
+      "setupPrompt": "Saropa Lints a détecté un projet Dart sans saropa_lints configuré. Configurez maintenant pour plus de 2300 règles de linter.",
       "actionSetUpProject": "Mettre en place le projet de mise en place du projet.",
       "actionNotNow": "Pas maintenant, pas tout de suite."
     },

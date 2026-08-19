@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter görsel analiz ile lint kuralları, artı bağımlılık sağlık puanlama için Paket Vibrancy, kırılganlık tarama ve yükseltme planlaması.",
+  "extension.description": "2300+ Dart/Flutter dilimleme kuralı ile görsel analiz, Paket Vibransı ile bağımlılık sağlığı puanlama, açıklık tarama ve yükseltme planlama.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Editör panelleri, düzenleyici panoları.",
@@ -9,7 +9,7 @@
   "views.settings.name": "Ayarlar ayarları ayarlar.",
   "views.severityFilters.name": "Teşhis",
   "views.help.name": "Yardım yardım yardımcı yardımcı",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart ve Flutter güvenlik, erişilebilirlik ve performans için kuralları.\n\nBir Dart veya Flutter projesi gerektirir.\n\nBaşlamak için bir `pubspec.yaml̅ içeren bir klasör açın.\n\n[Daha fazlasını online öğren]https://pub.dev/packages/saropa_lints)\n[Browse All Commands]{command:saropaLints.showCommandCatalog} (Tüm Komutları Keşfet)\n[About Saropa Lints] ((Command:saropaLints.showAbouts) hakkında\n[Başlamak için] (komut:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart ve Flutter tarifesi güvenlik, erişilebilirlik ve performans için.\n\nDart veya Flutter projesi gerektirir.\n\nBaşlamak için bir `pubspec.yaml` içeren klasöre açın.\n\n[Online'da daha fazlasını öğren](https://pub.dev/packages/saropa_lints)\n[Bütün Komutları Görüntüle](command:saropaLints.showCommandCatalog)\n[Saropa Lints Hakkında](command:saropaLints.showAbout)\n[Başlangıç](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Projeyi Kur (pubspec + config)",
   "command.disable.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Lint entegrasyonunu kapatın.",
   "command.reenablePlugin.title": "Saropa Lints: İç İşlem Plugin'ini Yeniden Etkinleştir",

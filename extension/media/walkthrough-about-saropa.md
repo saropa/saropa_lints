@@ -8,7 +8,7 @@ Established in 2010, **Saropa Pty Limited** is a technology firm rooted in finan
 
 | Package | Description |
 |---------|-------------|
-| **[saropa_lints](https://pub.dev/packages/saropa_lints)** | 2134 custom lint rules + 254 quick fixes. OWASP-mapped, with bundled Package Vibrancy dependency-health scoring (replaces the standalone `saropa_package_validator`). |
+| **[saropa_lints](https://pub.dev/packages/saropa_lints)** | 2332 custom lint rules + 254 quick fixes. OWASP-mapped, with bundled Package Vibrancy dependency-health scoring (replaces the standalone `saropa_package_validator`). |
 | **[saropa_dart_utils](https://pub.dev/packages/saropa_dart_utils)** | 280+ production-hardened extension methods for Strings, Dates, Lists, async, and HTTP. Includes 278-entity HTML5 decoding with zero `dart:io` dependency. |
 | **[saropa_drift_advisor](https://pub.dev/packages/saropa_drift_advisor)** | Debug-only SQLite/Drift inspector with web UI, Query Replay DVR, Visual Query Builder, and natural-language-to-SQL. |
 

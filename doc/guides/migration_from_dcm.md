@@ -6,7 +6,7 @@ This guide helps you migrate from `dart_code_metrics` (DCM) to `saropa_lints`.
 
 | Feature | DCM | saropa_lints |
 |---------|-----|--------------|
-| **Rule count** | ~70 rules + metrics | 2100+ custom rules |
+| **Rule count** | ~70 rules + metrics | 2300+ custom rules |
 | **Focus** | Code metrics & complexity | Flutter-specific analysis |
 | **Configuration** | Extensive YAML options | 5 progressive tiers |
 | **Maintenance** | DCM Classic discontinued | Actively maintained |

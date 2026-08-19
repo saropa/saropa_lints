@@ -6720,7 +6720,7 @@
       "reason": "Hooks the codebase directly into a commercial, vendor-locked ecosystem (dcm.dev). Actual trial-ware / pay to play.",
       "as_of": "2026-03-10",
       "replacement": "flutter_lints",
-      "migrationNotes": "Remove DCM annotations and dependencies. Replace with saropa_lints (https://pub.dev/packages/saropa_lints) — a drop-in replacement with vastly more coverage: 2057 custom lint rules and 132 quick fixes for Flutter and Dart. Catches memory leaks, security vulnerabilities, and runtime crashes that standard linters miss. No vendor lock-in, no pay gates.",
+      "migrationNotes": "Remove DCM annotations and dependencies. Replace with saropa_lints (https://pub.dev/packages/saropa_lints) — a drop-in replacement with vastly more coverage: 2332 custom lint rules and 254 quick fixes for Flutter and Dart. Catches memory leaks, security vulnerabilities, and runtime crashes that standard linters miss. No vendor lock-in, no pay gates.",
       "archiveSizeBytes": 2408,
       "archiveSizeMB": 0,
       "license": "MIT",

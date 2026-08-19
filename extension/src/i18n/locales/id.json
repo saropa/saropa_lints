@@ -261,8 +261,17 @@
       "locationsTitle": "Dimana proyek Anda menggunakan paket ini.",
       "noLocations": "Tidak diimpor dalam sumber proyek  ⁇ kemungkinan ketergantungan dev atau transitif.",
       "moreFiles": "dan {count} lebih banyak file.",
-      "copyForAi": "Salin upgrade prompt untuk AI.",
-      "openInDashboard": "Buka di Dashboard Paket."
+      "openInDashboard": "Buka di Dashboard Paket.",
+      "writeReport": "Tulis Laporan"
+    },
+    "actions": {
+      "writeReport": "Tulis Laporan"
+    },
+    "report": {
+      "noWorkspace": "Tidak ada folder workspace yang terbuka — tidak dapat menulis laporan.",
+      "noContent": "Tidak ada paket yang memiliki konten prompt AI untuk ditulis.",
+      "written": "Laporan ditulis — jalur salinan ke clipboard: {path}",
+      "failed": "Gagal menulis laporan peluang: {error}"
     },
     "empty": {
       "title": "Tidak ada yang harus diadopsi.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "Disable Disabled Menonaktifkan",
       "actionEnable": "Enable mengaktifkan.",
       "bulkRuleToggleConfirm": "{verb} {count} aturan? Ini memperbarui analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints mendeteksi proyek Dart tanpa konfigurasi saropa_lints. Siap sekarang untuk 2100+ aturan lint.",
+      "setupPrompt": "Saropa Lints mendeteksi proyek Dart tanpa saropa_lints dikonfigurasi. Susun sekarang untuk 2300+ aturan lint.",
       "actionSetUpProject": "Membuat Set Up Project Proyek",
       "actionNotNow": "Tidak sekarang, tidak sekarang."
     },

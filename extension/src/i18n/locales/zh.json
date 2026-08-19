@@ -261,8 +261,17 @@
       "locationsTitle": "您的项目使用此包在哪里?",
       "noLocations": "项目源中没有进口 ⁇ 可能是dev或过渡性依赖.",
       "moreFiles": "和 {count} 更多的文件.",
-      "copyForAi": "复制升级提示符用于AI.",
-      "openInDashboard": "在包装仪表板中打开."
+      "openInDashboard": "在包装仪表板中打开.",
+      "writeReport": "编写报告"
+    },
+    "actions": {
+      "writeReport": "编写报告"
+    },
+    "report": {
+      "noWorkspace": "没有打开的工作区文件夹 — 无法写入报告。",
+      "noContent": "没有包包含AI提示内容以供编写。",
+      "written": "报告已编写 — 路径已复制到剪贴板：{path}",
+      "failed": "写入机会报告失败：{error}"
     },
     "empty": {
       "title": "没有什么可以通过的.",
@@ -1800,7 +1809,7 @@
       "actionDisable": "禁用 禁止 使用",
       "actionEnable": "启用 启动 在此处.",
       "bulkRuleToggleConfirm": "规则是什么? {verb} {count} 的规则? 这更新了 analysis_options_custom.yaml.",
-      "setupPrompt": "Saropa Lints 检测到未配置 saropa_lints 的 Dart 项目。立即设置 2100 多个 lint 规则。",
+      "setupPrompt": "Saropa Lints 检测到未配置 saropa_lints 的 Dart 项目。立即设置 2300 多个 lint 规则。",
       "actionSetUpProject": "设置项目,建立一个项目.",
       "actionNotNow": "现在不是,不应该是."
     },

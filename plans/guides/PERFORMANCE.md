@@ -10,10 +10,10 @@ Saropa Lints (v5+) runs as a **native Dart analyzer plugin**, integrated directl
 
 1. **Native integration** - Rules run inside the analyzer process, eliminating IPC overhead
 2. **Incremental analysis** - The analyzer only re-analyzes changed files
-3. **Lazy rule instantiation** - Only rules in the selected tier are created (not all 2100+)
+3. **Lazy rule instantiation** - Only rules in the selected tier are created (not all 2300+)
 4. **Compile-time constant tier sets** - No runtime set-building overhead
 
-With 2100+ rules, analysis can still be slow on large projects. The optimizations below help manage this.
+With 2300+ rules, analysis can still be slow on large projects. The optimizations below help manage this.
 
 ---
 
@@ -133,7 +133,7 @@ Higher tiers use `.union()` on these const sets. Since the base sets are immutab
 
 ### Lazy Rule Instantiation
 
-**Problem:** Instantiating all 2100+ rules consumes ~4GB of memory.
+**Problem:** Instantiating all 2300+ rules consumes ~4GB of memory.
 
 **Solution:** Rules are stored as factory functions and only instantiated when needed:
 

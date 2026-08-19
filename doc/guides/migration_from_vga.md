@@ -6,7 +6,7 @@ This guide helps you migrate from `very_good_analysis` to Saropa Lints.
 
 | Feature | very_good_analysis | Saropa Lints |
 |---------|-------------------|--------------|
-| **Rule count** | 174 standard rules | 2100+ custom rules |
+| **Rule count** | 174 standard rules | 2300+ custom rules |
 | **Rule types** | Dart linter rules | Deep custom analysis |
 | **Configuration** | Single file | 5 progressive tiers + optional stylistic rules |
 | **Specialization** | General best practices | Flutter-specific (accessibility, state management, security) |

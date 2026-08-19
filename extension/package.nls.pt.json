@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter regras de lint com análise visual, além do Pacote Vibrancy para avaliação da saúde das dependências, varredura de vulnerabilidades e planejamento de atualização.",
+  "extension.description": "2300+ regras Dart/Flutter de lint com análise visual, mais Package Vibrancy para pontuação de saúde de dependências, varredura de vulnerabilidades e planejamento de atualizações.",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "Painéis de controle do editor, painéis de comando.",
@@ -9,7 +9,7 @@
   "views.settings.name": "Configurações de configuração.",
   "views.severityFilters.name": "Diagnósticos",
   "views.help.name": "Ajuda a ajudar.",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart e Flutter regras de linhas para segurança, acessibilidade e desempenho.\n\nRequer um projeto Dart ou Flutter.\n\nAbra uma pasta contendo um `pubspec.yaml̅ para começar.\n\n[Aprenda mais on-line] (https://pub.dev/pacotes/saropa_lints)\n[Explorar Todos os Comandos] (comando:saropaLints.showCommandCatalog)\n[Sobre Saropa Lints] (comando:saropaLints.showAbout)\n[Começando] (comando:saropaLints.openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart e Flutter regras de lint para segurança, acessibilidade e desempenho.\n\nRequer um projeto Dart ou Flutter.\n\nAbra uma pasta que contenha um `pubspec.yaml` para começar.\n\n[Saiba mais online](https://pub.dev/packages/saropa_lints)\n[Exibir Todos os Comandos](command:saropaLints.showCommandCatalog)\n[Sobre Saropa Lints](command:saropaLints.showAbout)\n[Começar](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Configurar o projeto (pubspec + config)",
   "command.disable.title": "Saropa Lints: Desligue a integração da Lint.",
   "command.reenablePlugin.title": "Saropa Lints: Reativar Plugin em Processo único",

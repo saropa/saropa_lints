@@ -1,6 +1,6 @@
 {
   "extension.displayName": "Saropa Lints",
-  "extension.description": "2100+ Dart/Flutter दृश्य विश्लेषण के साथ लिंट नियम, और निर्भरता स्वास्थ्य स्कोरिंग, भेद्यता स्कैनिंग और उन्नयन योजना के लिए पैकेज वाइब्रेंसी।",
+  "extension.description": "2300+ Dart/Flutter लिंट नियम जिनमें आंकिक विश्लेषण शामिल है, अधिक रूप में पैकेज विब्रेंसी लिए निर्भरता स्वास्थ्य अंकन, कमजोरत खोज और अपग्रेड योजना के लिए।",
   "views.container.title": "Saropa Lints",
   "views.banner.name": "Saropa Lints",
   "views.editorDashboards.name": "संपादक डैशबोर्ड, संपादकीय डैਸ਼बोर्ड।",
@@ -9,7 +9,7 @@
   "views.settings.name": "सेटिंग्स सेटिंग्स",
   "views.severityFilters.name": "निदान",
   "views.help.name": "सहायता मदद करें।",
-  "viewsWelcome.banner.contents": "**Saropa Lints** 2100+ Dart और Flutter सुरक्षा, पहुंच और प्रदर्शन के लिए नियम।\n\nएक Dart या Flutter परियोजना की आवश्यकता है।\n\nप्रारंभ करने के लिए एक फ़ोल्डर खोलें जिसमें `pubspec.yaml̅ है।\n\n[अधिक ऑनलाइन जानें] (https://pub.dev/packages/saropa_lints)\n[सभी कमांड ब्राउज़ करें] (कमांडःsaropaLints. showCommandCatalog)\n[के बारे में Saropa Lints]{कमांडःsaropaLints.showAbout}\n[प्रारंभ] (कमांडः saropaLints. openWalkthrough)",
+  "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart और Flutter लिंट नियम सुरक्षा, पहुँच एवं प्रदर्शन के लिए।\n\nDart या Flutter परियोजना के लिए आवश्यक है।\n\nएक फोल्डर खोलें जिसमें `pubspec.yaml` हो।\n\n[ऑनलाइन अधिक जानकारी](https://pub.dev/packages/saropa_lints)\n[सभी आदेश देखें](command:saropaLints.showCommandCatalog)\n[बारे में Saropa Lints](command:saropaLints.showAbout)\n[शुरू करें](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: प्रोजेक्ट सेट अप करें (pubspec + config)",
   "command.disable.title": "Saropa Lints: लिंट एकीकरण को बंद करें",
   "command.reenablePlugin.title": "Saropa Lints: इन-प्रोसेस प्लगइन फिर से सक्रिय करें",
