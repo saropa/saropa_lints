@@ -509,21 +509,34 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
     from scripts.modules._known_issues_freshness import check_known_issues_freshness
 
     known_issues_check: list[tuple[str, str, list[str]]] = []
-    freshness_result = check_known_issues_freshness(project_dir)
-    if freshness_result.has_confirmed_stale:
+    # timeout=5.0 bounds the worst case (pub.dev fully unreachable) to roughly
+    # 4 sequential-batch rounds x 2 requests x 5s ~= 40s added to the publish,
+    # instead of the ~2 minutes a 15s timeout would allow. Any unexpected
+    # exception here must not block a publish over third-party API tooling,
+    # so it's caught and reported as an inconclusive run rather than raised.
+    try:
+        freshness_result = check_known_issues_freshness(project_dir, timeout=5.0)
+    except Exception as exc:  # noqa: BLE001 (see comment above)
         known_issues_check.append((
             "warn",
-            f"{len(freshness_result.confirmed_stale)} known_issues.json "
-            f"entrie(s) contradicted by current pub.dev data",
-            [f"{s['name']}: {s['reason']}" for s in freshness_result.confirmed_stale[:10]],
-        ))
-    else:
-        known_issues_check.append((
-            "pass",
-            f"known_issues.json: {freshness_result.checked_count} "
-            f"lifecycle claim(s) still consistent with pub.dev",
+            f"known_issues.json freshness check errored ({exc}); skipped",
             [],
         ))
+    else:
+        if freshness_result.has_confirmed_stale:
+            known_issues_check.append((
+                "warn",
+                f"{len(freshness_result.confirmed_stale)} known_issues.json "
+                f"entrie(s) contradicted by current pub.dev data",
+                [f"{s['name']}: {s['reason']}" for s in freshness_result.confirmed_stale[:10]],
+            ))
+        else:
+            known_issues_check.append((
+                "pass",
+                f"known_issues.json: {freshness_result.checked_count} "
+                f"lifecycle claim(s) still consistent with pub.dev",
+                [],
+            ))
 
     # --- Full audit (includes tier integrity + quality checks) ---
     audit_result = run_full_audit(

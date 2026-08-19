@@ -19,16 +19,30 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import http.client
 import json
+import re
 import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
-# Statuses that make an "avoid this package" claim worth re-verifying.
-# "active"/"freemium"/"paid"/etc. aren't lifecycle claims a release can falsify.
-_CHECKABLE_STATUSES = {"end_of_life", "caution", "maintenance_mode"}
+# known_issues.json also carries synthetic version-pinned names for historical
+# tracking (e.g. "cached_network_image_v1", "flutter_rating_bar (Orig)") that
+# were never real pub.dev packages. pub.dev package names are lowercase
+# letters/digits/underscores only — anything outside that isn't worth an API
+# round-trip and, for names containing spaces/parens, urllib rejects the URL
+# outright (http.client.InvalidURL) rather than 404ing.
+_VALID_PUBDEV_NAME = re.compile(r"^[a-z0-9_]+$")
+
+# Statuses that make a lifecycle-style "avoid this package" claim worth
+# re-verifying against release cadence. Business-model statuses (commercial,
+# paid, freemium, ...) aren't lifecycle claims a release can falsify — a
+# licensing model doesn't change because the vendor ships a patch — so they
+# are handled separately (see _known_issues_review_report.py).
+CHECKABLE_LIFECYCLE_STATUSES = {"end_of_life", "caution", "maintenance_mode"}
+_CHECKABLE_STATUSES = CHECKABLE_LIFECYCLE_STATUSES  # backward-compat alias
 
 # Reason-text fragments that a continued, non-discontinued release directly
 # contradicts. Keep narrow — this drives a build-gate warning, so false
@@ -69,25 +83,56 @@ class KnownIssuesFreshnessResult:
 
 
 def _fetch_json(url: str, timeout: float) -> dict | None:
+    """Fetch and parse a pub.dev JSON endpoint. Returns None on any failure —
+    network error, timeout, non-JSON body, or a JSON body that isn't an
+    object (a pub.dev API-shape change should degrade to "unknown", not crash
+    the whole check)."""
     try:
         with urllib.request.urlopen(url, timeout=timeout) as resp:  # noqa: S310 (pub.dev, fixed host)
-            return json.loads(resp.read().decode("utf-8"))
-    except (urllib.error.URLError, TimeoutError, ValueError, OSError):
+            parsed = json.loads(resp.read().decode("utf-8"))
+    except (
+        urllib.error.URLError,
+        TimeoutError,
+        ValueError,
+        OSError,
+        http.client.InvalidURL,
+    ):
         return None
+    return parsed if isinstance(parsed, dict) else None
 
 
 def _check_one(issue: dict, timeout: float) -> tuple[dict, bool]:
-    """Return (issue, network_error) — issue is unchanged; caller decides staleness."""
+    """Return (issue, network_error) — issue is unchanged; caller decides staleness.
+
+    Non-pub.dev names (synthetic version-pinned tracking entries like
+    "flutter_rating_bar (Orig)") are treated the same as a network error —
+    there's nothing to check, so downstream code should not treat them as a
+    fresh/stale verdict either way.
+
+    The score fetch failing independently of the package fetch is ALSO
+    treated as network_error=True, not as "not discontinued" — the
+    discontinued check only comes from the score endpoint, so a dropped
+    score request means we genuinely don't know, and defaulting the unknown
+    to False would let a real timeout/rate-limit turn a discontinued
+    package into a false "confirmed stale" flag.
+    """
     name = issue["name"]
+    if not _VALID_PUBDEV_NAME.match(name):
+        return issue, True
     package = _fetch_json(f"https://pub.dev/api/packages/{name}", timeout)
     if package is None:
         return issue, True
     score = _fetch_json(f"https://pub.dev/api/packages/{name}/score", timeout)
-    latest = package.get("latest", {})
-    published = latest.get("published", "")
+    if score is None:
+        return issue, True
+    latest = package.get("latest") or {}
+    published = latest.get("published") or ""
     issue["_actual_published"] = published[:10] if published else ""
     issue["_actual_version"] = latest.get("version", "")
-    issue["_is_discontinued"] = bool(score.get("isDiscontinued")) if score else False
+    # pub.dev's score API has no top-level "isDiscontinued" boolean — discontinued
+    # status is signaled via "is:discontinued" in the tags array (confirmed against
+    # the `pedantic` package, which pub.dev explicitly marks discontinued).
+    issue["_is_discontinued"] = "is:discontinued" in (score.get("tags") or [])
     return issue, False
 
 

@@ -72,7 +72,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 <details><summary>Maintenance</summary>
 
-- Added a pre-publish audit check that cross-checks `known_issues.json` lifecycle claims (end-of-life/caution/maintenance-mode) against live pub.dev data and warns when a package has since shipped a non-discontinued release contradicting the recorded reason. Non-blocking (network-dependent); run standalone with `python scripts/check_known_issues_freshness.py`.
+- Added a pre-publish audit check that cross-checks `known_issues.json` lifecycle claims (end-of-life/caution/maintenance-mode) against live pub.dev data and warns when a package has since shipped a non-discontinued release contradicting the recorded reason. Non-blocking (network-dependent, 5s per-request timeout); run standalone with `python scripts/check_known_issues_freshness.py`.
+- Added `scripts/generate_known_issues_review.py`, which extends the same pub.dev cross-check to every lifecycle/business-model-status entry and writes a HIGH/MEDIUM/LOW confidence triage report to `plans/known_issues_review.md` for manual review — does not edit `known_issues.json` itself.
 
 </details>
 
