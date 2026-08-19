@@ -64,6 +64,18 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Fixed (Extension)
+
+- (Extension) Removed 7 stale entries from the Package Dashboard's known-issues database (`timezone`, `retrofit`, `sqflite_sqlcipher`, `intl_translation`, `window_size`, `routemaster`, `flutter_keychain`) that flagged actively-maintained packages as end-of-life based on outdated data. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Added a pre-publish audit check that cross-checks `known_issues.json` lifecycle claims (end-of-life/caution/maintenance-mode) against live pub.dev data and warns when a package has since shipped a non-discontinued release contradicting the recorded reason. Non-blocking (network-dependent); run standalone with `python scripts/check_known_issues_freshness.py`.
+
+</details>
+
 ## [15.1.1]
 
 Five new quick fixes for stylistic rules: convert regular comments to doc comments, remove redundant type annotations, replace string `+` concatenation with adjacent literals, simplify `BorderRadius.all(Radius.circular(r))` to `BorderRadius.circular(r)`, and replace sizing-only `Container` with `SizedBox`. [log](https://github.com/saropa/saropa_lints/blob/v15.1.1/CHANGELOG.md)

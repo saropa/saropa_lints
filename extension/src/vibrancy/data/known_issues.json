@@ -2848,28 +2848,6 @@
       "platforms": []
     },
     {
-      "name": "routemaster",
-      "status": "end_of_life",
-      "reason": "Unmaintained; memory leaks active Route objects on heavy app traversal.",
-      "as_of": "2026-03-10",
-      "replacement": "go_router",
-      "migrationNotes": "Rewrite tab navigation and route delegates.",
-      "archiveSizeBytes": 322093,
-      "archiveSizeMB": 0.31,
-      "license": "MIT",
-      "lastUpdated": "2026-02-17",
-      "pubPoints": 140,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ]
-    },
-    {
       "name": "flutter_modular",
       "status": "end_of_life",
       "reason": "Global singletons block Dart 3 compilation; deeply flawed memory management.",
@@ -3958,27 +3936,6 @@
       ]
     },
     {
-      "name": "intl_translation",
-      "status": "end_of_life",
-      "reason": "Officially deprecated by the Dart team.",
-      "as_of": "2026-03-10",
-      "replacement": "intl_utils",
-      "migrationNotes": "Shift to the community standard generation.",
-      "archiveSizeBytes": 80734,
-      "archiveSizeMB": 0.08,
-      "license": "BSD-3-Clause",
-      "lastUpdated": "2025-09-19",
-      "pubPoints": 140,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "windows"
-      ]
-    },
-    {
       "name": "flutter_localizations",
       "status": "end_of_life",
       "reason": "Pre-null-safety; lacks modern RTL language mappings.",
@@ -4245,25 +4202,6 @@
       "platforms": []
     },
     {
-      "name": "sqflite_sqlcipher",
-      "status": "end_of_life",
-      "reason": "Dead package; native C bindings break on Android 15.",
-      "as_of": "2026-03-10",
-      "replacement": "sqlcipher_flutter_libs",
-      "migrationNotes": "Update imports and native libraries.",
-      "archiveSizeBytes": 1304080,
-      "archiveSizeMB": 1.24,
-      "license": "MIT",
-      "lastUpdated": "2025-09-15",
-      "pubPoints": 150,
-      "verifiedPublisher": false,
-      "platforms": [
-        "android",
-        "ios",
-        "macos"
-      ]
-    },
-    {
       "name": "shared_preferences_windows",
       "status": "end_of_life",
       "reason": "Integrated into the core package; keeping this causes duplicate symbol errors.",
@@ -4420,29 +4358,6 @@
       ],
       "appliesToMinVersion": "3.0.0",
       "appliesToMaxVersion": "4.0.0"
-    },
-    {
-      "name": "retrofit",
-      "status": "end_of_life",
-      "reason": "Pre-null-safety; generator outputs dead code.",
-      "as_of": "2026-03-10",
-      "migrationNotes": "Regenerate client services.",
-      "archiveSizeBytes": 23392,
-      "archiveSizeMB": 0.02,
-      "license": "MIT",
-      "lastUpdated": "2025-12-28",
-      "pubPoints": 145,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ],
-      "appliesToMinVersion": "1.0.0",
-      "appliesToMaxVersion": "2.0.0"
     },
     {
       "name": "graphql",
@@ -4763,25 +4678,6 @@
       ]
     },
     {
-      "name": "window_size",
-      "status": "end_of_life",
-      "reason": "Obsolete experimental package discontinued by Google.",
-      "as_of": "2026-03-10",
-      "replacement": "window_manager",
-      "migrationNotes": "Total rewrite.",
-      "archiveSizeBytes": 17084,
-      "archiveSizeMB": 0.02,
-      "license": "Apache-2.0",
-      "lastUpdated": "2024-10-30",
-      "pubPoints": 115,
-      "verifiedPublisher": true,
-      "platforms": [
-        "linux",
-        "macos",
-        "windows"
-      ]
-    },
-    {
       "name": "flutter_web_plugins",
       "status": "end_of_life",
       "reason": "Built directly into the Flutter SDK now; causes namespace collisions.",
@@ -4951,24 +4847,6 @@
       "platforms": []
     },
     {
-      "name": "flutter_keychain",
-      "status": "end_of_life",
-      "reason": "Dead repository; unpatched vulnerabilities and crashes on iOS 18.",
-      "as_of": "2026-03-10",
-      "replacement": "flutter_secure_storage",
-      "migrationNotes": "Total rewrite. Keys must be migrated.",
-      "archiveSizeBytes": 56577,
-      "archiveSizeMB": 0.05,
-      "license": "BSD-3-Clause",
-      "lastUpdated": "2024-06-24",
-      "pubPoints": 130,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios"
-      ]
-    },
-    {
       "name": "flutter_uploader",
       "status": "end_of_life",
       "reason": "Background isolates fail to register on Android 15, silently failing uploads.",
@@ -5019,28 +4897,6 @@
       "pubPoints": 70,
       "verifiedPublisher": false,
       "platforms": []
-    },
-    {
-      "name": "timezone",
-      "status": "end_of_life",
-      "reason": "Pre-null-safety; blocks Dart 3 compilation entirely.",
-      "as_of": "2026-03-10",
-      "migrationNotes": "Total rewrite of timezone initialization and database fetching logic.",
-      "archiveSizeBytes": 664044,
-      "archiveSizeMB": 0.63,
-      "license": "BSD-2-Clause",
-      "lastUpdated": "2026-01-07",
-      "pubPoints": 160,
-      "verifiedPublisher": false,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ],
-      "appliesToMaxVersion": "1.0.0"
     },
     {
       "name": "flutter_phone_direct_caller",

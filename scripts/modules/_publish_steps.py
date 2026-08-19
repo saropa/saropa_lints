@@ -500,12 +500,37 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
             "pass", "No British English spellings found", [],
         ))
 
+    # --- Known-issues freshness (extension known_issues.json vs live pub.dev) ---
+    # Non-blocking: it depends on a third-party API, so a pub.dev outage or
+    # CI network restriction must not stop a publish. Surfaces the class of
+    # defect fixed 2026-08-18 (timezone flagged "pre-null-safety" long after
+    # it shipped a null-safe release) so it's caught before it goes stale
+    # for months, not blocked outright.
+    from scripts.modules._known_issues_freshness import check_known_issues_freshness
+
+    known_issues_check: list[tuple[str, str, list[str]]] = []
+    freshness_result = check_known_issues_freshness(project_dir)
+    if freshness_result.has_confirmed_stale:
+        known_issues_check.append((
+            "warn",
+            f"{len(freshness_result.confirmed_stale)} known_issues.json "
+            f"entrie(s) contradicted by current pub.dev data",
+            [f"{s['name']}: {s['reason']}" for s in freshness_result.confirmed_stale[:10]],
+        ))
+    else:
+        known_issues_check.append((
+            "pass",
+            f"known_issues.json: {freshness_result.checked_count} "
+            f"lifecycle claim(s) still consistent with pub.dev",
+            [],
+        ))
+
     # --- Full audit (includes tier integrity + quality checks) ---
     audit_result = run_full_audit(
         project_dir=project_dir,
         skip_dx=False,
         compact=True,
-        extra_checks=spelling_check,
+        extra_checks=spelling_check + known_issues_check,
     )
 
     # --- Run dart analyze as part of audit (fail fast; same as Step 6) ---
