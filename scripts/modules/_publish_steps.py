@@ -500,22 +500,38 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
             "pass", "No British English spellings found", [],
         ))
 
-    # --- Known-issues freshness (extension known_issues.json vs live pub.dev) ---
-    # Non-blocking: it depends on a third-party API, so a pub.dev outage or
-    # CI network restriction must not stop a publish. Surfaces the class of
-    # defect fixed 2026-08-18 (timezone flagged "pre-null-safety" long after
-    # it shipped a null-safe release) so it's caught before it goes stale
-    # for months, not blocked outright.
-    from scripts.modules._known_issues_freshness import check_known_issues_freshness
+    # --- Known-issues freshness + manual-review report (known_issues.json vs
+    # live pub.dev) ---
+    # Non-blocking: both depend on a third-party API, so a pub.dev outage or
+    # CI network restriction must not stop a publish. The freshness half
+    # surfaces the class of defect fixed 2026-08-18 (timezone flagged
+    # "pre-null-safety" long after it shipped a null-safe release) so it's
+    # caught before it goes stale for months. The review-report half
+    # regenerates plans/known_issues_review.md on every publish instead of
+    # only on manual invocation — a standalone-only tool goes stale exactly
+    # like the data it's meant to catch going stale.
+    #
+    # run_known_issues_checks() fetches pub.dev data once for the union of
+    # both checks' candidates (the review set is a superset of the freshness
+    # set) and derives both results from that single pass, so wiring the
+    # broader ~302-entry review scan into publish doesn't roughly double the
+    # network cost of the ~70-entry freshness scan that was already here.
+    from scripts.modules._known_issues_review_report import (
+        render_markdown,
+        run_known_issues_checks,
+    )
 
     known_issues_check: list[tuple[str, str, list[str]]] = []
     # timeout=5.0 bounds the worst case (pub.dev fully unreachable) to roughly
     # 4 sequential-batch rounds x 2 requests x 5s ~= 40s added to the publish,
-    # instead of the ~2 minutes a 15s timeout would allow. Any unexpected
-    # exception here must not block a publish over third-party API tooling,
-    # so it's caught and reported as an inconclusive run rather than raised.
+    # instead of the minutes a 15s timeout would allow across ~302 candidates.
+    # Any unexpected exception here must not block a publish over third-party
+    # API tooling, so it's caught and reported as an inconclusive run rather
+    # than raised.
     try:
-        freshness_result = check_known_issues_freshness(project_dir, timeout=5.0)
+        freshness_result, review_report = run_known_issues_checks(
+            project_dir, timeout=5.0
+        )
     except Exception as exc:  # noqa: BLE001 (see comment above)
         known_issues_check.append((
             "warn",
@@ -537,6 +553,32 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
                 f"lifecycle claim(s) still consistent with pub.dev",
                 [],
             ))
+
+        # Regenerating the review report itself must not block a publish
+        # either — a disk-write failure or a report-rendering bug is a
+        # tooling defect, not a reason to stop shipping.
+        try:
+            review_path = project_dir / "plans" / "known_issues_review.md"
+            review_path.parent.mkdir(parents=True, exist_ok=True)
+            review_path.write_text(
+                render_markdown(review_report, generated_on="(regenerated at publish time)"),
+                encoding="utf-8",
+            )
+        except Exception as exc:  # noqa: BLE001 (see comment above)
+            known_issues_check.append((
+                "warn",
+                f"known_issues_review.md regeneration errored ({exc}); skipped",
+                [],
+            ))
+        else:
+            if review_report.entries:
+                known_issues_check.append((
+                    "warn",
+                    f"known_issues_review.md: {len(review_report.entries)} "
+                    f"entrie(s) queued for manual triage "
+                    f"(plans/known_issues_review.md regenerated)",
+                    [],
+                ))
 
     # --- Full audit (includes tier integrity + quality checks) ---
     audit_result = run_full_audit(

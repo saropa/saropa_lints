@@ -1,5 +1,5 @@
 """Generate a manual-review report for known_issues.json entries pub.dev has
-outgrown but that ``_known_issues_freshness`` can't auto-classify as false.
+outgrown but that ``check_known_issues_freshness`` can't auto-classify as false.
 
 ``check_known_issues_freshness`` only flags entries where the reason text uses
 a claim class a newer non-discontinued release directly falsifies (abandoned,
@@ -18,16 +18,17 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
-import json
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
 from scripts.modules._known_issues_freshness import (
     CHECKABLE_LIFECYCLE_STATUSES,
-    _FALSIFIABLE_KEYWORDS,
-    _KNOWN_ISSUES_RELATIVE_PATH,
-    _check_one,
+    FALSIFIABLE_KEYWORDS,
+    KnownIssuesFreshnessResult,
+    fetch_pubdev_candidates,
+    freshness_result_from_fetched,
+    is_outgrown,
+    load_known_issues,
 )
 
 # Business-model statuses: a continued release doesn't disprove a licensing
@@ -86,10 +87,38 @@ def _classify_tier(issue: dict) -> str:
     status = issue["status"]
     if status in CHECKABLE_LIFECYCLE_STATUSES:
         has_keyword = any(
-            kw in issue.get("reason", "").lower() for kw in _FALSIFIABLE_KEYWORDS
+            kw in issue.get("reason", "").lower() for kw in FALSIFIABLE_KEYWORDS
         )
         return "high" if has_keyword else "medium"
     return "low"  # business-model status
+
+
+def _review_report_from_fetched(
+    fetched: list[dict], network_error_count: int, *, checked_count: int
+) -> KnownIssuesReviewReport:
+    """Derive a review report from an already-fetched candidate set. Shared
+    by ``build_known_issues_review_report`` and ``run_known_issues_checks``
+    so both apply the identical outgrown/tier rule to whatever candidates
+    they fetched."""
+    report = KnownIssuesReviewReport(
+        checked_count=checked_count, network_error_count=network_error_count
+    )
+    for issue in fetched:
+        if not is_outgrown(issue):
+            continue  # not outgrown by pub.dev's account — nothing to review
+        report.entries.append(
+            ReviewEntry(
+                name=issue["name"],
+                status=issue["status"],
+                reason=issue.get("reason", ""),
+                recorded_last_updated=issue["lastUpdated"],
+                actual_latest_published=issue.get("_actual_published", ""),
+                actual_latest_version=issue.get("_actual_version", ""),
+                tier=_classify_tier(issue),
+            )
+        )
+    report.entries.sort(key=lambda e: (_TIER_ORDER.index(e.tier), e.name))
+    return report
 
 
 def build_known_issues_review_report(
@@ -102,46 +131,59 @@ def build_known_issues_review_report(
     and classify pub.dev-outgrown entries into HIGH/MEDIUM/LOW confidence
     tiers for manual triage. See module docstring for the tier definitions.
     """
-    report = KnownIssuesReviewReport()
-    known_issues_path = project_dir / _KNOWN_ISSUES_RELATIVE_PATH
-    if not known_issues_path.exists():
-        return report
-
-    with known_issues_path.open(encoding="utf-8") as f:
-        data = json.load(f)
-
+    issues = load_known_issues(project_dir)
     candidates = [
         issue
-        for issue in data.get("issues", [])
+        for issue in issues
         if issue.get("status") in _REVIEWABLE_STATUSES and issue.get("lastUpdated")
     ]
-    report.checked_count = len(candidates)
+    fetched, network_error_count = fetch_pubdev_candidates(
+        candidates, timeout=timeout, max_workers=max_workers
+    )
+    return _review_report_from_fetched(
+        fetched, network_error_count, checked_count=len(candidates)
+    )
 
-    with ThreadPoolExecutor(max_workers=max_workers) as ex:
-        checked = list(ex.map(lambda issue: _check_one(issue, timeout), candidates))
 
-    for issue, network_error in checked:
-        if network_error:
-            report.network_error_count += 1
-            continue
-        recorded = issue["lastUpdated"]
-        actual = issue.get("_actual_published", "")
-        if not actual or actual <= recorded or issue.get("_is_discontinued"):
-            continue  # not outgrown by pub.dev's account — nothing to review
-        report.entries.append(
-            ReviewEntry(
-                name=issue["name"],
-                status=issue["status"],
-                reason=issue.get("reason", ""),
-                recorded_last_updated=recorded,
-                actual_latest_published=actual,
-                actual_latest_version=issue.get("_actual_version", ""),
-                tier=_classify_tier(issue),
-            )
-        )
+def run_known_issues_checks(
+    project_dir: Path,
+    *,
+    timeout: float = 15.0,
+    max_workers: int = 20,
+) -> tuple[KnownIssuesFreshnessResult, KnownIssuesReviewReport]:
+    """Run the freshness check and the review-report scan as a single pub.dev
+    fetch pass over the union of both candidate sets.
 
-    report.entries.sort(key=lambda e: (_TIER_ORDER.index(e.tier), e.name))
-    return report
+    ``check_known_issues_freshness`` (narrow, ~70 keyword-matched entries)
+    and ``build_known_issues_review_report`` (broad, ~302 all-reviewable
+    entries) overlap almost entirely — every freshness candidate is also a
+    review candidate. Calling both independently fetches the overlapping
+    entries twice; this fetches the review candidate set once (a superset)
+    and derives both results from it, so the publish pipeline pays for one
+    ~302-entry pass instead of 70 + 302. Used by the publish pipeline, which
+    needs both the pass/warn gate line and a fresh ``known_issues_review.md``
+    on every run — see ``scripts/modules/_publish_steps.py``.
+    """
+    issues = load_known_issues(project_dir)
+    candidates = [
+        issue
+        for issue in issues
+        if issue.get("status") in _REVIEWABLE_STATUSES and issue.get("lastUpdated")
+    ]
+    fetched, network_error_count = fetch_pubdev_candidates(
+        candidates, timeout=timeout, max_workers=max_workers
+    )
+    # network_error_count here is for the full review candidate set (302), not
+    # just the freshness subset (70) — the combined fetch can't attribute a
+    # given failure to one subset or the other. Cosmetic only: it can only
+    # over-report freshness's error count relative to a standalone run, never
+    # under-report a real stale entry, since staleness is only ever derived
+    # from candidates that were actually fetched successfully.
+    freshness = freshness_result_from_fetched(fetched, network_error_count)
+    review = _review_report_from_fetched(
+        fetched, network_error_count, checked_count=len(candidates)
+    )
+    return freshness, review
 
 
 def render_markdown(report: KnownIssuesReviewReport, *, generated_on: str) -> str:

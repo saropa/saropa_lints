@@ -1,6 +1,6 @@
 # known_issues.json manual review queue
 
-Generated 2026-08-18. Checked 302 lifecycle/business-model entries against live pub.dev (13 network error(s)); 49 appear outgrown by a newer release.
+Generated (regenerated at publish time). Checked 302 lifecycle/business-model entries against live pub.dev (13 network error(s)); 49 appear outgrown by a newer release.
 
 Each entry needs a human read of the current reason against the package's present state before editing `known_issues.json` — this report does not edit the file.
 

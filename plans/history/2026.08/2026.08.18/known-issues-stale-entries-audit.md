@@ -40,8 +40,20 @@ A bug surfaced while implementing this: pub.dev's `/score` endpoint has no top-l
 
 Also noticed but out of scope for this change: `known_issues.json` has a duplicate `flutter_local_notifications` entry (two objects, different `reason` text) and at least two entries with an empty `reason` string (`better_player`, `flutter_vibrate`) — both pre-existing data-quality issues unrelated to staleness.
 
-## Known limitations (not addressed this session)
+## Follow-up: review-report wired into publish, not left standalone
 
-- No automated test coverage for the new modules (`_known_issues_freshness.py`, `_known_issues_review_report.py`) — the repo's `scripts/modules/tests/` has coverage for sibling audit checks but none was added here.
-- The freshness check adds real wall-clock time to every publish run (bounded to ~40s worst case via a 5s per-request timeout after this session's hardening, previously unbounded at up to ~2 minutes with a 15s timeout) with no opt-out flag if a developer wants to skip it.
-- `_known_issues_review_report.py` imports underscore-prefixed "private" names (`_FALSIFIABLE_KEYWORDS`, `_KNOWN_ISSUES_RELATIVE_PATH`, `_check_one`) directly from `_known_issues_freshness.py` — works, but the shared surface should be promoted to an explicit public API if a third consumer appears.
+`scripts/generate_known_issues_review.py` initially shipped as a manually-invoked-only script — explicitly rejected as an "orphan script" and required to be integrated into the real publish pipeline instead of just existing as a runnable tool.
+
+Rather than adding a second, independent ~302-entry pub.dev scan to every publish (on top of the freshness check's existing ~70-entry scan — the two candidate sets overlap almost entirely), `_known_issues_freshness.py` and `_known_issues_review_report.py` were refactored to share one fetch pass: `run_known_issues_checks()` in `_known_issues_review_report.py` loads the full reviewable candidate set (302, a superset of the freshness check's 70), fetches pub.dev data for it once, and derives both the freshness result and the review report from that single fetch. `scripts/modules/_publish_steps.py::run_pre_publish_audits()` now calls `run_known_issues_checks()` and regenerates `plans/known_issues_review.md` on every publish (still non-blocking — wrapped in the same `try/except` pattern as the freshness check, since a disk-write failure or pub.dev outage must not stop a release). Live smoke test against pub.dev: 4.4s for the combined 302-entry pass, well within the bounded worst case.
+
+As part of this refactor, `_known_issues_review_report.py`'s underscore-prefixed cross-module imports (`_FALSIFIABLE_KEYWORDS`, `_KNOWN_ISSUES_RELATIVE_PATH`, `_check_one`) were promoted to an explicit public surface in `_known_issues_freshness.py` (`FALSIFIABLE_KEYWORDS`, `KNOWN_ISSUES_RELATIVE_PATH`, `check_pubdev_data`, plus new `load_known_issues`/`fetch_pubdev_candidates`/`is_outgrown`/`freshness_result_from_fetched` helpers), closing the "reaches into private names" gap flagged in the code review.
+
+Test coverage was added: `scripts/modules/tests/test_known_issues_freshness.py` and `test_known_issues_review_report.py` (21 tests), covering the discontinued-tag detection, the network-error-vs-false distinction on a failed `/score` fetch, the staleness/outgrown predicate, the candidate-filtering pipeline, and — the core contract of this integration — that `run_known_issues_checks()` calls the pub.dev fetch exactly once for the union of both candidate sets, not once per check. All mock the fetch boundary; no test hits the network.
+
+## Known limitations (still not addressed)
+
+- The freshness/review check has no opt-out flag if a developer wants to skip it on a specific publish run.
+- No caching between repeated publish attempts in one session — each re-fetches identical pub.dev data from scratch.
+- `network_error_count` doesn't distinguish 404/429/timeout — a systemic pub.dev rate-limit would look identical to isolated flakiness.
+- `_VALID_PUBDEV_NAME` regex (`^[a-z0-9_]+$`) doesn't enforce pub.dev's "must start with a letter" rule — harmless (invalid names just fall into the network-error bucket).
+- The duplicate `flutter_local_notifications` entry and the two empty-`reason` entries (`better_player`, `flutter_vibrate`) noted above are still unfixed — pre-existing data-quality issues unrelated to staleness.

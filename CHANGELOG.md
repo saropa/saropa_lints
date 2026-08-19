@@ -66,6 +66,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Added (Extension)
+
+- (Extension) The Upgrade Opportunities "Copy for AI" prompt now includes deprecated APIs the project actually calls (with call sites), the package's vibrancy score/license/vulnerabilities/known-issue status, and any GitHub issues flagged as breaking or deprecation-related — previously only new-feature changelog bullets were included. No action required.
+- (Extension) The Upgrade Opportunities panel no longer lists dev-only or transitive dependencies with zero source imports (e.g. `build_runner`), since new features in a package the project never calls are not actionable. No action required.
+
+### Changed (Extension)
+
+- (Extension) The "Copy for AI" prompt's task instruction now asks two separate questions per feature — does it replace something the project does manually (retrofit), and does it solve a problem the project has never addressed (greenfield) — instead of only "does it fit an existing call site". No action required.
+
 ### Fixed (Extension)
 
 - (Extension) Removed 7 stale entries from the Package Dashboard's known-issues database (`timezone`, `retrofit`, `sqflite_sqlcipher`, `intl_translation`, `window_size`, `routemaster`, `flutter_keychain`) that flagged actively-maintained packages as end-of-life based on outdated data. No action required.
@@ -73,7 +82,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 <details><summary>Maintenance</summary>
 
 - Added a pre-publish audit check that cross-checks `known_issues.json` lifecycle claims (end-of-life/caution/maintenance-mode) against live pub.dev data and warns when a package has since shipped a non-discontinued release contradicting the recorded reason. Non-blocking (network-dependent, 5s per-request timeout); run standalone with `python scripts/check_known_issues_freshness.py`.
-- Added `scripts/generate_known_issues_review.py`, which extends the same pub.dev cross-check to every lifecycle/business-model-status entry and writes a HIGH/MEDIUM/LOW confidence triage report to `plans/known_issues_review.md` for manual review — does not edit `known_issues.json` itself.
+- The pre-publish audit now also regenerates `plans/known_issues_review.md` on every publish run (previously only via manually running `scripts/generate_known_issues_review.py`), sharing one pub.dev fetch pass with the freshness check above instead of double-fetching the overlapping entries.
+- Added unit test coverage for the freshness-check and review-report generator modules, and promoted their shared internals (candidate loading, pub.dev fetch, staleness rule) from private cross-module imports to an explicit shared surface.
 
 </details>
 

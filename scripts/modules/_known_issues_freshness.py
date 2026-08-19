@@ -42,12 +42,12 @@ _VALID_PUBDEV_NAME = re.compile(r"^[a-z0-9_]+$")
 # licensing model doesn't change because the vendor ships a patch — so they
 # are handled separately (see _known_issues_review_report.py).
 CHECKABLE_LIFECYCLE_STATUSES = {"end_of_life", "caution", "maintenance_mode"}
-_CHECKABLE_STATUSES = CHECKABLE_LIFECYCLE_STATUSES  # backward-compat alias
 
 # Reason-text fragments that a continued, non-discontinued release directly
 # contradicts. Keep narrow — this drives a build-gate warning, so false
-# positives here erode trust in the check.
-_FALSIFIABLE_KEYWORDS = (
+# positives here erode trust in the check. Public: shared with
+# _known_issues_review_report.py's tier classifier.
+FALSIFIABLE_KEYWORDS = (
     "abandon",
     "unmaintain",
     "discontinu",
@@ -64,7 +64,9 @@ _FALSIFIABLE_KEYWORDS = (
     "deprecated by",
 )
 
-_KNOWN_ISSUES_RELATIVE_PATH = Path(
+# Public: shared with _known_issues_review_report.py so both modules load the
+# same source file rather than each hardcoding the path independently.
+KNOWN_ISSUES_RELATIVE_PATH = Path(
     "extension/src/vibrancy/data/known_issues.json"
 )
 
@@ -101,7 +103,7 @@ def _fetch_json(url: str, timeout: float) -> dict | None:
     return parsed if isinstance(parsed, dict) else None
 
 
-def _check_one(issue: dict, timeout: float) -> tuple[dict, bool]:
+def check_pubdev_data(issue: dict, timeout: float) -> tuple[dict, bool]:
     """Return (issue, network_error) — issue is unchanged; caller decides staleness.
 
     Non-pub.dev names (synthetic version-pinned tracking entries like
@@ -136,6 +138,96 @@ def _check_one(issue: dict, timeout: float) -> tuple[dict, bool]:
     return issue, False
 
 
+def load_known_issues(project_dir: Path) -> list[dict]:
+    """Load known_issues.json's ``issues`` list, or ``[]`` if the file is
+    missing (a fresh checkout before the extension has been built, or a
+    project_dir that isn't the repo root)."""
+    known_issues_path = project_dir / KNOWN_ISSUES_RELATIVE_PATH
+    if not known_issues_path.exists():
+        return []
+    with known_issues_path.open(encoding="utf-8") as f:
+        data = json.load(f)
+    return data.get("issues", [])
+
+
+def fetch_pubdev_candidates(
+    candidates: list[dict],
+    *,
+    timeout: float,
+    max_workers: int,
+) -> tuple[list[dict], int]:
+    """Fetch pub.dev data for each candidate concurrently. Returns
+    (successfully-fetched issues, network_error_count) — issues that hit a
+    network error are dropped rather than returned with stale/absent
+    ``_actual_*`` fields, so callers never need to re-check the error flag.
+
+    Public and shared between ``check_known_issues_freshness`` (narrow,
+    keyword-matched subset) and ``_known_issues_review_report`` (broad,
+    all-reviewable-status set) so a caller that needs both results — the
+    publish pipeline — can fetch the union of candidates once instead of
+    each function independently re-fetching the ~70 entries they have in
+    common. See ``run_known_issues_checks`` for that combined pass.
+    """
+    checked_ok: list[dict] = []
+    network_error_count = 0
+    with ThreadPoolExecutor(max_workers=max_workers) as ex:
+        checked = list(
+            ex.map(lambda issue: check_pubdev_data(issue, timeout), candidates)
+        )
+    for issue, network_error in checked:
+        if network_error:
+            network_error_count += 1
+        else:
+            checked_ok.append(issue)
+    return checked_ok, network_error_count
+
+
+def _is_falsifiable_keyword_match(issue: dict) -> bool:
+    reason = issue.get("reason", "").lower()
+    return any(kw in reason for kw in FALSIFIABLE_KEYWORDS)
+
+
+def is_outgrown(issue: dict) -> bool:
+    """True if a fetched issue's recorded claim is contradicted by pub.dev:
+    a later release exists and the package isn't discontinued."""
+    recorded = issue["lastUpdated"]
+    actual = issue.get("_actual_published", "")
+    return bool(actual) and actual > recorded and not issue.get("_is_discontinued")
+
+
+def freshness_result_from_fetched(
+    fetched: list[dict], network_error_count: int
+) -> KnownIssuesFreshnessResult:
+    """Derive a freshness result from an already-fetched candidate set,
+    narrowing to the falsifiable-keyword subset. Shared by
+    ``check_known_issues_freshness`` and ``run_known_issues_checks`` so both
+    apply the identical keyword/staleness rule to whatever candidates they
+    fetched."""
+    keyword_matched = [
+        i
+        for i in fetched
+        if i.get("status") in CHECKABLE_LIFECYCLE_STATUSES
+        and _is_falsifiable_keyword_match(i)
+    ]
+    result = KnownIssuesFreshnessResult(
+        checked_count=len(keyword_matched),
+        network_error_count=network_error_count,
+    )
+    for issue in keyword_matched:
+        if is_outgrown(issue):
+            result.confirmed_stale.append(
+                {
+                    "name": issue["name"],
+                    "status": issue["status"],
+                    "reason": issue["reason"],
+                    "recorded_lastUpdated": issue["lastUpdated"],
+                    "actual_latest_published": issue.get("_actual_published", ""),
+                    "actual_latest_version": issue.get("_actual_version", ""),
+                }
+            )
+    return result
+
+
 def check_known_issues_freshness(
     project_dir: Path,
     *,
@@ -148,44 +240,15 @@ def check_known_issues_freshness(
     a pub.dev outage or CI network restriction shouldn't block publish, it
     just means fewer entries got re-verified this run.
     """
-    result = KnownIssuesFreshnessResult()
-    known_issues_path = project_dir / _KNOWN_ISSUES_RELATIVE_PATH
-    if not known_issues_path.exists():
-        return result
-
-    with known_issues_path.open(encoding="utf-8") as f:
-        data = json.load(f)
-
+    issues = load_known_issues(project_dir)
     candidates = [
         issue
-        for issue in data.get("issues", [])
-        if issue.get("status") in _CHECKABLE_STATUSES
+        for issue in issues
+        if issue.get("status") in CHECKABLE_LIFECYCLE_STATUSES
         and issue.get("lastUpdated")
-        and any(kw in issue.get("reason", "").lower() for kw in _FALSIFIABLE_KEYWORDS)
+        and _is_falsifiable_keyword_match(issue)
     ]
-    result.checked_count = len(candidates)
-
-    with ThreadPoolExecutor(max_workers=max_workers) as ex:
-        checked = list(
-            ex.map(lambda issue: _check_one(issue, timeout), candidates)
-        )
-
-    for issue, network_error in checked:
-        if network_error:
-            result.network_error_count += 1
-            continue
-        recorded = issue["lastUpdated"]
-        actual = issue.get("_actual_published", "")
-        if actual and actual > recorded and not issue.get("_is_discontinued"):
-            result.confirmed_stale.append(
-                {
-                    "name": issue["name"],
-                    "status": issue["status"],
-                    "reason": issue["reason"],
-                    "recorded_lastUpdated": recorded,
-                    "actual_latest_published": actual,
-                    "actual_latest_version": issue.get("_actual_version", ""),
-                }
-            )
-
-    return result
+    fetched, network_error_count = fetch_pubdev_candidates(
+        candidates, timeout=timeout, max_workers=max_workers
+    )
+    return freshness_result_from_fetched(fetched, network_error_count)
