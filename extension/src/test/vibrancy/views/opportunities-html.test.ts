@@ -2,7 +2,7 @@
  * Tests **opportunities-html**: the dedicated Upgrade Opportunities dashboard
  * renderer. Verifies it lists only packages with unadopted features, ranks them
  * by relevance score, renders the empty state when none, and surfaces the
- * features, code locations, and the Copy-for-AI button.
+ * features, code locations, and the Write Report button.
  */
 import '../register-vscode-mock';
 import * as assert from 'assert';
@@ -53,17 +53,28 @@ describe('opportunities-html', () => {
         assert.ok(html.indexOf('high_pkg') < html.indexOf('low_pkg'), 'higher score should render first');
     });
 
-    it('renders the Copy-for-AI button only when a prompt exists', () => {
-        // The stylesheet always contains the `.opp-copy` rule; the BUTTON is
-        // identified by its unique data-prompt attribute, so assert on that.
-        const withPrompt = buildOpportunitiesHtml(
+    it('renders Write Report buttons when cards exist, omits them in empty state', () => {
+        // Global header button + per-card button when a prompt exists.
+        const withCards = buildOpportunitiesHtml(
             [card({ unadoptedApiNames: ['A'], opportunityScore: 10 }, 'THE PROMPT')], '1.0.0',
         );
-        assert.ok(withPrompt.includes('data-prompt='));
-        const withoutPrompt = buildOpportunitiesHtml(
+        assert.ok(withCards.includes('id="writeReportBtn"'), 'global write-report button');
+        assert.ok(withCards.includes('opp-write-card'), 'per-card write-report button');
+
+        // Per-card button absent when aiPrompt is null. Use the button tag
+        // selector to avoid false matches on the class name in the <script>.
+        const noPrompt = buildOpportunitiesHtml(
             [card({ unadoptedApiNames: ['A'], opportunityScore: 10 }, null)], '1.0.0',
         );
-        assert.ok(!withoutPrompt.includes('data-prompt='));
+        assert.ok(noPrompt.includes('id="writeReportBtn"'), 'global button still shows');
+        assert.ok(!noPrompt.includes('<button class="opp-btn opp-write-card"'), 'no per-card button without prompt');
+
+        // Empty state has neither button.
+        const empty = buildOpportunitiesHtml(
+            [card({ unadoptedApiNames: [], opportunityScore: 0 })], '1.0.0',
+        );
+        assert.ok(!empty.includes('id="writeReportBtn"'));
+        assert.ok(!empty.includes('<button class="opp-btn opp-write-card"'));
     });
 
     it('shows code locations as openable links', () => {

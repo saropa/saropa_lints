@@ -696,7 +696,7 @@ function registerCommands(
         // Package Dashboard table.
         vscode.commands.registerCommand(
             'saropaLints.packageVibrancy.showOpportunities',
-            () => {
+            async () => {
                 const extensionVersion = (context.extension.packageJSON as { version: string }).version;
                 const root = lastParsedDeps
                     ? vscode.Uri.joinPath(lastParsedDeps.yamlUri, '..')
@@ -707,7 +707,9 @@ function registerCommands(
                     );
                     return;
                 }
-                OpportunitiesPanel.createOrShow(latestResults, extensionVersion, root);
+                await OpportunitiesPanel.createOrShow(
+                    latestResults, extensionVersion, root, lastReverseDeps ?? new Map(),
+                );
             },
         ),
         vscode.commands.registerCommand(

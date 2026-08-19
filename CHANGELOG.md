@@ -64,16 +64,21 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [15.1.2]
+
+The Upgrade Opportunities panel's AI prompt is more accurate and less noisy: it now surfaces the deprecated APIs a project actually calls, dual-dependency version risk, and possible local reimplementations of library code, while dropping dev-only and transitive dependencies that aren't actionable. The old per-card clipboard copy is replaced by "Write Report" buttons — global (all packages in one file) and per-card (single package) — that save dated files and copy the path. Seven actively-maintained packages were removed from the known-issues database after being incorrectly flagged as end-of-life. [log](https://github.com/saropa/saropa_lints/blob/v15.1.2                                                                                                                                                                                                                                                                                                                                                           /CHANGELOG.md)
 
 ### Added (Extension)
 
-- (Extension) The Upgrade Opportunities "Copy for AI" prompt now includes deprecated APIs the project actually calls (with call sites), the package's vibrancy score/license/vulnerabilities/known-issue status, and any GitHub issues flagged as breaking or deprecation-related — previously only new-feature changelog bullets were included. No action required.
+- (Extension) The Upgrade Opportunities AI prompt now includes deprecated APIs the project actually calls (with call sites), the package's vibrancy score/license/vulnerabilities/known-issue status, and any GitHub issues flagged as breaking or deprecation-related — previously only new-feature changelog bullets were included. No action required.
 - (Extension) The Upgrade Opportunities panel no longer lists dev-only or transitive dependencies with zero source imports (e.g. `build_runner`), since new features in a package the project never calls are not actionable. No action required.
+- (Extension) The AI prompt now flags "dual dependency" risk — a direct dependency that is also required transitively through another direct dependency — since a major version bump on either side can diverge type identity for shared exported classes. No action required.
+- (Extension) The AI prompt now flags possible local reimplementation — project code (a class, mixin, extension, or function) whose name matches something the dependency's own source already exports — as a candidate for deletion in favor of the library version. No action required.
 
 ### Changed (Extension)
 
-- (Extension) The "Copy for AI" prompt's task instruction now asks two separate questions per feature — does it replace something the project does manually (retrofit), and does it solve a problem the project has never addressed (greenfield) — instead of only "does it fit an existing call site". No action required.
+- (Extension) The Upgrade Opportunities panel replaces the per-card "Copy for AI" clipboard button with "Write Report" buttons — a global one in the header that writes all packages' prompts to one file, and a per-card one that writes just that package's prompt. Both save a dated markdown file under `reports/` and copy the absolute path to the clipboard. No action required.
+- (Extension) The AI prompt's task instruction now asks two separate questions per feature — does it replace something the project does manually (retrofit), and does it solve a problem the project has never addressed (greenfield) — instead of only "does it fit an existing call site". No action required.
 
 ### Fixed (Extension)
 

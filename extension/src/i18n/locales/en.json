@@ -261,8 +261,17 @@
       "locationsTitle": "Where your project uses this package",
       "noLocations": "Not imported in project source — likely a dev or transitive dependency.",
       "moreFiles": "and {count} more files",
-      "copyForAi": "Copy upgrade prompt for AI",
-      "openInDashboard": "Open in Package Dashboard"
+      "openInDashboard": "Open in Package Dashboard",
+      "writeReport": "Write Report"
+    },
+    "actions": {
+      "writeReport": "Write Report"
+    },
+    "report": {
+      "noWorkspace": "No workspace folder is open — cannot write the report.",
+      "noContent": "No packages have AI prompt content to write.",
+      "written": "Report written — path copied to clipboard: {path}",
+      "failed": "Failed to write opportunities report: {error}"
     },
     "empty": {
       "title": "Nothing to adopt",

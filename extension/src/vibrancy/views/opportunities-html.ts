@@ -6,7 +6,8 @@
  * not adopted, and what do I need to act on each? It lists ONLY packages with
  * unadopted changelog features, ranked by relevance, and for each shows the
  * package, its description, README imagery, the new features, the project code
- * locations that use it, and a one-click "Copy for AI" prompt.
+ * locations that use it, and a global "Write Report" action that saves all
+ * packages' AI prompts to a dated file.
  *
  * Pure HTML builder: takes already-scanned results (the opportunity scan and
  * symbol cross-reference ran during the package scan) and renders a string. The
@@ -55,6 +56,14 @@ export function buildOpportunitiesHtml(
             l10n('opportunities.subtitle', { count: String(ranked.length) }),
         )}</p>`;
 
+    // Global "Write Report" button — writes all cards' prompts to a single
+    // dated file and copies the path. Only shown when there are cards to write.
+    const writeBtn = ranked.length === 0
+        ? ''
+        : `<button class="opp-btn opp-write-report" id="writeReportBtn">${escapeHtml(
+            l10n('opportunities.actions.writeReport'),
+        )}</button>`;
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,6 +79,7 @@ export function buildOpportunitiesHtml(
             <h1>${escapeHtml(l10n('opportunities.heroTitle'))} <span class="header-version">v${escapeHtml(extensionVersion)}</span></h1>
             ${subtitle}
         </div>
+        ${writeBtn}
     </header>
     <main class="opp-list">
         ${body}
@@ -158,16 +168,18 @@ function buildLocations(r: VibrancyResult): string {
     </div>`;
 }
 
-/** Card actions: copy the AI prompt and open the package in the dashboard. */
+/** Card actions: per-card report write + open in dashboard. */
 function buildActions(card: OpportunityCardData): string {
     const name = escapeHtml(card.result.package.name);
-    const copyBtn = card.aiPrompt
-        // The prompt is embedded as an escaped data attribute the script reads,
-        // so copying is a pure in-webview clipboard write (no host round-trip).
-        ? `<button class="opp-btn opp-copy" data-prompt="${escapeHtml(card.aiPrompt)}">${escapeHtml(l10n('opportunities.card.copyForAi'))}</button>`
+    // Per-card "Write Report" — writes just this package's prompt to its own
+    // dated file, complementing the global button that writes all packages.
+    const writeBtn = card.aiPrompt
+        ? `<button class="opp-btn opp-write-card" data-pkg="${name}">${escapeHtml(
+            l10n('opportunities.card.writeReport'),
+        )}</button>`
         : '';
     const openBtn = `<button class="opp-btn opp-open" data-pkg="${name}">${escapeHtml(l10n('opportunities.card.openInDashboard'))}</button>`;
-    return `<div class="opp-actions">${copyBtn}${openBtn}</div>`;
+    return `<div class="opp-actions">${writeBtn}${openBtn}</div>`;
 }
 
 /** Positive empty state — being fully adopted is a good outcome, not a blank. */
@@ -215,26 +227,54 @@ function getOpportunitiesStyles(): string {
             border-radius: 4px; padding: 4px 12px; cursor: pointer; font-size: 0.85em;
             background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground);
         }
-        .opp-copy { background: var(--vscode-button-background); color: var(--vscode-button-foreground); }
-        .opp-btn.copied { opacity: 0.7; }
+        .opp-write-report {
+            background: var(--vscode-button-background); color: var(--vscode-button-foreground);
+            margin-left: auto; align-self: flex-start;
+        }
+        .opp-write-report:disabled { opacity: 0.6; cursor: default; }
+        .opp-write-card:disabled { opacity: 0.6; cursor: default; }
         .opp-empty { text-align: center; padding: 64px 16px; color: var(--vscode-descriptionForeground); }
         .opp-empty-glyph { font-size: 2.5em; color: var(--vscode-charts-green, var(--vscode-testing-iconPassed)); }
     `;
 }
 
-/** Card-level interactions: copy prompt (in-webview), open file, open package. */
+/** Card-level interactions: write report (host round-trip), open file, open package. */
 function getOpportunitiesScript(): string {
     return `
         const vscode = acquireVsCodeApi();
-        document.querySelectorAll('.opp-copy').forEach(function(btn) {
-            const label = btn.textContent;
+        // Global "Write Report" — asks the extension host to write a dated
+        // file and copy its path. Disables while the host processes the request.
+        var writeBtn = document.getElementById('writeReportBtn');
+        if (writeBtn) {
+            // Fallback guards against an empty textContent if l10n returned blank.
+            var writeLabel = writeBtn.textContent || 'Write Report';
+            writeBtn.addEventListener('click', function() {
+                if (writeBtn.disabled) { return; }
+                writeBtn.disabled = true;
+                writeBtn.textContent = '\\u2026';
+                vscode.postMessage({ type: 'writeReport' });
+            });
+        }
+        // Host sends reportWritten/reportFailed back to re-enable the button.
+        window.addEventListener('message', function(event) {
+            var msg = event.data;
+            if (!writeBtn) { return; }
+            if (msg.type === 'reportWritten' || msg.type === 'reportFailed') {
+                writeBtn.disabled = false;
+                writeBtn.textContent = writeLabel;
+            }
+        });
+        // Per-card "Write Report" — sends the package name to the host, which
+        // writes just that package's prompt to a separate dated file.
+        document.querySelectorAll('.opp-write-card').forEach(function(btn) {
+            var cardLabel = btn.textContent || 'Write Report';
             btn.addEventListener('click', function() {
-                if (btn.classList.contains('copied')) { return; }
-                navigator.clipboard.writeText(btn.dataset.prompt || '').then(function() {
-                    btn.textContent = '\\u2713';
-                    btn.classList.add('copied');
-                    setTimeout(function() { btn.textContent = label; btn.classList.remove('copied'); }, 1500);
-                });
+                if (btn.disabled) { return; }
+                btn.disabled = true;
+                btn.textContent = '\\u2026';
+                vscode.postMessage({ type: 'writeCardReport', package: btn.dataset.pkg });
+                // Re-enable after a short delay — the host toast confirms success/failure.
+                setTimeout(function() { btn.disabled = false; btn.textContent = cardLabel; }, 2000);
             });
         });
         document.querySelectorAll('.opp-open').forEach(function(btn) {
