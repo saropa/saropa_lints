@@ -1598,7 +1598,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       void showHelpHubQuickPick();
     }),
     vscode.commands.registerCommand('saropaLints.showAbout', () => {
-      showAboutPanel(context.extensionUri, extVersion);
+      void showAboutPanel(context.extensionUri, extVersion);
     }),
     vscode.commands.registerCommand('saropaLints.showCommandCatalog', () => {
       showCommandCatalogPanel(context);

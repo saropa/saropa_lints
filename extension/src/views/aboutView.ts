@@ -8,11 +8,14 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { getDashboardChromeStyles } from './dashboardChromeStyles';
 import { buildDashboardHero } from './dashboardHero';
+import { fetchRuleCounts, type RuleCountSummary } from './ruleCountCliRunner';
+import { getProjectRoot } from '../projectRoot';
+import { l10n } from '../i18n/runtime';
 
 /** Re-uses an existing panel if already open; otherwise creates a new one. */
 let currentPanel: vscode.WebviewPanel | undefined;
 
-export function showAboutPanel(extensionUri: vscode.Uri, version: string): void {
+export async function showAboutPanel(extensionUri: vscode.Uri, version: string): Promise<void> {
   // If already open, bring it to front instead of creating a duplicate.
   if (currentPanel) {
     currentPanel.reveal(vscode.ViewColumn.One);
@@ -26,14 +29,32 @@ export function showAboutPanel(extensionUri: vscode.Uri, version: string): void 
     { enableScripts: false },
   );
 
-  currentPanel.webview.html = buildHtml(extensionUri, version);
+  // Fast-path render with static content immediately (no wait on a Dart
+  // spawn), then swap in the live rule count once the CLI call resolves.
+  // `dart run` cold-start can take a second or two, so waiting to open the
+  // panel would make "About" feel unresponsive for what is a supplementary
+  // figure, not the panel's primary content.
+  currentPanel.webview.html = buildHtml(extensionUri, version, null);
+  const projectRoot = getProjectRoot();
+  if (projectRoot) {
+    void fetchRuleCounts(projectRoot).then((counts) => {
+      if (counts && currentPanel) {
+        currentPanel.webview.html = buildHtml(extensionUri, version, counts);
+      }
+    });
+  }
 
   // Clear reference when the user closes the tab.
   currentPanel.onDidDispose(() => { currentPanel = undefined; });
 }
 
-function buildHtml(extensionUri: vscode.Uri, version: string): string {
-  const bodyHtml = markdownToHtml(readMarkdown(extensionUri));
+function buildHtml(
+  extensionUri: vscode.Uri,
+  version: string,
+  ruleCounts: RuleCountSummary | null,
+): string {
+  const bodyHtml =
+    buildRuleCountBlock(ruleCounts) + markdownToHtml(readMarkdown(extensionUri));
   const nonce = getNonce();
   // Adopts the shared dashboard chrome (SAROPA_DASHBOARD_STYLE_GUIDE) so About reads as the
   // same product as every other dashboard. The hero comes from the shared builder, which
@@ -88,7 +109,34 @@ body { max-width: 820px; }
   font-family: var(--vscode-editor-font-family, monospace);
   background: var(--surface-3); border-radius: var(--radius-sm); padding: 0 4px;
 }
+#rule-count-strip {
+  background: var(--surface-3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3);
+  margin: 0 0 var(--space-4); font-size: var(--text-body);
+}
+#rule-count-strip .rule-count-detail { color: var(--text-secondary); }
 `;
+}
+
+/**
+ * Renders the live rule-count strip, or an empty string while it is still
+ * loading / unavailable (no workspace open, CLI failed). Computed fresh from
+ * `lib/src/tiers.dart` via `dart run saropa_lints:rule_count` — see
+ * ruleCountCliRunner.ts — so this number cannot go stale the way the
+ * hand-typed marketing copy previously did.
+ */
+function buildRuleCountBlock(counts: RuleCountSummary | null): string {
+  if (!counts) return '';
+  const text = l10n('about.ruleCountStrip', {
+    total: counts.total,
+    essential: counts.essential,
+    recommended: counts.recommended,
+    professional: counts.professional,
+    comprehensive: counts.comprehensive,
+    pedantic: counts.pedantic,
+    stylistic: counts.stylistic,
+  });
+  return `<div id="rule-count-strip">${escapeHtml(text)}</div>`;
 }
 
 function readMarkdown(extensionUri: vscode.Uri): string {

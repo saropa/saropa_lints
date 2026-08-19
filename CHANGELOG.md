@@ -64,6 +64,18 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.1.3]
+
+The About Saropa Lints panel now shows the live rule count instead of static marketing copy, fetched on open from a new `rule_count` CLI that reads directly from the tier registry. This replaces hand-typed counts across docs and extension strings that had drifted stale, giving every future rule addition a single source of truth. [log](https://github.com/saropa/saropa_lints/blob/v15.1.3/CHANGELOG.md)
+
+### Added
+
+- New `rule_count` CLI (`dart run saropa_lints:rule_count`, or `--format json`) reports the live rule count per tier plus opt-in stylistic rules, computed directly from `lib/src/tiers.dart`. No action required.
+
+### Added (Extension)
+
+- (Extension) The About Saropa Lints panel now shows a live rule-count strip (total plus per-tier breakdown) fetched from the new `rule_count` CLI when a project is open, replacing the static number previously baked into the panel's markdown copy. No action required.
+
 ## [15.1.2]
 
 The Upgrade Opportunities panel's AI prompt is more accurate and less noisy: it now surfaces the deprecated APIs a project actually calls, dual-dependency version risk, and possible local reimplementations of library code, while dropping dev-only and transitive dependencies that aren't actionable. The old per-card clipboard copy is replaced by "Write Report" buttons — global (all packages in one file) and per-card (single package) — that save dated files and copy the path. Seven actively-maintained packages were removed from the known-issues database after being incorrectly flagged as end-of-life. [log](https://github.com/saropa/saropa_lints/blob/v15.1.2/CHANGELOG.md)

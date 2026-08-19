@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "{total} lint rules currently ship in this version (essential {essential} · recommended {recommended} · professional {professional} · comprehensive {comprehensive} · pedantic {pedantic} · {stylistic} opt-in stylistic)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Scan on Save",

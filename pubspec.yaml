@@ -7,7 +7,7 @@ description: >-
   Static analysis for security, accessibility, and performance.
 
 # SemVer version used by pub.dev and dependency resolution
-version: 15.1.2
+version: 15.1.3
 
 # SPDX license identifier shown on pub.dev
 license: MIT
@@ -64,6 +64,10 @@ executables:
   project_vibrancy: project_vibrancy
   # Project Health "size map" scan, invoked by the Saropa Project Map dashboard.
   project_health: project_health
+  # Live rule-count summary (per tier + total), computed from lib/src/tiers.dart.
+  # Single source of truth so the VS Code extension's About panel and status
+  # bar never need a hand-typed rule count that goes stale as rules are added.
+  rule_count: rule_count
 
 # Dart SDK constraint (pure Dart package; Flutter topic tag provides discoverability)
 environment:
