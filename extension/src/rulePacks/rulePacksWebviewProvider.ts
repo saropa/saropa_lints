@@ -42,6 +42,7 @@ import { getConfigDashboardScript } from './configDashboardScript';
 import { getConfigDashboardStyles } from './configDashboardStyles';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePackYaml';
 import { computeConfigSuggestions } from '../config/configSuggestions';
+import { fetchRuleCounts, type RuleCountSummary } from '../views/ruleCountCliRunner';
 
 const CONFIG_DASHBOARD_PANEL_TYPE = 'saropaLints.configDashboard';
 const TIERS = ['essential', 'recommended', 'professional', 'comprehensive', 'pedantic'] as const;
@@ -185,10 +186,20 @@ export function computePackDashboardStats(rows: readonly PackChartRow[]): PackDa
  * interactive but did nothing — the user had to click a separate "Set tier" toolbar button. The
  * new control posts `setTier` messages on click, removing the bait-and-switch pattern.
  */
-export function buildTierControl(currentTier: string): string {
+export function buildTierControl(
+  currentTier: string,
+  ruleCounts: RuleCountSummary | null = null,
+): string {
   const buttons = TIERS.map((tier) => {
     const active = tier === currentTier;
-    const label = active ? `${escapeHtml(tier)} (current)` : escapeHtml(tier);
+    const count = ruleCounts?.[tier];
+    // Live count, not a static "≈2000 rules" string that drifts stale as
+    // rules are added — see plans/history/2026.08/2026.08.19/rule_count_correction.md
+    // for why hardcoded counts caused a real user-facing accuracy bug.
+    const countLabel = typeof count === 'number' ? ` <span class="tier-btn-count">${escapeHtml(l10n('tierPicker.ruleCount', { count: String(count) }))}</span>` : '';
+    const label = active
+      ? `${escapeHtml(tier)} (current)${countLabel}`
+      : `${escapeHtml(tier)}${countLabel}`;
     return [
       '<button type="button" class="tier-btn"',
       ` role="radio" aria-checked="${active ? 'true' : 'false'}"`,
@@ -309,6 +320,11 @@ export function buildConfigSnippetYaml(tier: string, enabledPackIds: readonly st
 
 export class RulePacksWebviewProvider {
   private _panel?: vscode.WebviewPanel;
+  // Cached across refresh() calls (fired on every toggle/edit) so the tier
+  // picker's live counts don't re-spawn `dart run` dozens of times per
+  // session — fetched once per panel open, then reused until the panel closes.
+  private _ruleCounts: RuleCountSummary | null = null;
+  private _ruleCountsRequested = false;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -390,9 +406,33 @@ export class RulePacksWebviewProvider {
 
     panel.onDidDispose(() => {
       this._panel = undefined;
+      // Re-fetch on next open rather than serving a session-stale count —
+      // rules can change between opens (e.g. the user updates the package).
+      this._ruleCounts = null;
+      this._ruleCountsRequested = false;
     });
 
+    this._loadRuleCounts();
     this.refresh();
+  }
+
+  /**
+   * Fires the rule-count CLI once per panel lifetime and redraws when it
+   * resolves. Best-effort: `fetchRuleCounts` already degrades to `null` on
+   * any failure (no workspace, CLI missing, timeout), so the tier picker
+   * simply renders without counts rather than erroring.
+   */
+  private _loadRuleCounts(): void {
+    if (this._ruleCountsRequested) return;
+    this._ruleCountsRequested = true;
+    const root = getProjectRoot();
+    if (!root) return;
+    void fetchRuleCounts(root).then((counts) => {
+      if (counts) {
+        this._ruleCounts = counts;
+        this.refresh();
+      }
+    });
   }
 
   refresh(): void {
@@ -664,7 +704,7 @@ export class RulePacksWebviewProvider {
   private _buildTierSection(ctx: DashboardContext): string {
     return `<section aria-label="Tier">
   <h2>Tier</h2>
-  ${buildTierControl(ctx.currentTier)}
+  ${buildTierControl(ctx.currentTier, this._ruleCounts)}
   <p class="hint">Tier sets broad defaults. Pack-owned migration rules require pack enablement.</p>
 </section>`;
   }

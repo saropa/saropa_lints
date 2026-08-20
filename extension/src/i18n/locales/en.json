@@ -148,6 +148,9 @@
       "sdk-migrations": "Dart and Flutter version-upgrade rules that flag APIs removed or deprecated in a given SDK."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} rules"
+  },
   "consolidated": {
     "kicker": "Security · Quality",
     "searchPlaceholder": "Filter rules…",

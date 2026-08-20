@@ -184,6 +184,11 @@ function tierControlStyles(): string {
   font-weight: 600;
   opacity: 1;
 }
+.tier-btn-count {
+  opacity: 0.75;
+  font-size: 0.9em;
+  margin-left: 2px;
+}
 `;
 }
 

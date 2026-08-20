@@ -45,6 +45,23 @@ describe('rulePacksWebviewProvider dashboard helpers', () => {
     assert.ok(html.includes('data-tier="pedantic"'));
   });
 
+  it('renders live per-tier rule counts when provided, omits them when null', () => {
+    const withCounts = buildTierControl('essential', {
+      essential: 331,
+      recommended: 1036,
+      professional: 1881,
+      comprehensive: 2094,
+      pedantic: 2109,
+      stylistic: 223,
+      total: 2332,
+    });
+    assert.ok(withCounts.includes('331 rules'));
+    assert.ok(withCounts.includes('2109 rules'));
+
+    const withoutCounts = buildTierControl('essential', null);
+    assert.ok(!withoutCounts.includes('rules'));
+  });
+
   it('classifies sdk pack risk kind from rule codes', () => {
     assert.strictEqual(
       sdkPackRiskKind({ id: 'flutter_sdk_3_19', ruleCodes: ['avoid_removed_foo'] }),

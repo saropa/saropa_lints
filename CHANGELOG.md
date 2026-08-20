@@ -75,6 +75,15 @@ The About Saropa Lints panel now shows the live rule count instead of static mar
 ### Added (Extension)
 
 - (Extension) The About Saropa Lints panel now shows a live rule-count strip (total plus per-tier breakdown) fetched from the new `rule_count` CLI when a project is open, replacing the static number previously baked into the panel's markdown copy. No action required.
+- (Extension) The Manage Rule Packs tier picker now shows each tier's live rule count next to its name (e.g. "essential 331 rules"), fetched once per panel open from the same `rule_count` CLI. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Widened the `rule_count` CLI's extension-side timeout from 10s to 25s — a cold `dart run` invocation measured at 8.4s, leaving too little margin under the old cap on a slower first run.
+- Fixed the pre-commit hook's dart-fix and recommended.yaml gates: `subprocess.run(['dart', ...])` silently failed to find `dart` on Windows (Flutter ships `dart.bat`, which Python's subprocess can't resolve without `shell=True`), so both gates had been no-op'ing on every commit. Now resolved via `shutil.which('dart')`.
+
+</details>
 
 ## [15.1.2]
 
