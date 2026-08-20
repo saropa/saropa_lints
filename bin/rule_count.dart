@@ -52,13 +52,17 @@ Future<void> main(List<String> args) async {
     return;
   }
 
-  stdout.writeln('saropa_lints rule counts (computed from lib/src/tiers.dart):');
+  stdout.writeln(
+    'saropa_lints rule counts (computed from lib/src/tiers.dart):',
+  );
   stdout.writeln('  Essential:      ${counts['essential']}');
   stdout.writeln('  Recommended:    ${counts['recommended']}');
   stdout.writeln('  Professional:   ${counts['professional']}');
   stdout.writeln('  Comprehensive:  ${counts['comprehensive']}');
   stdout.writeln('  Pedantic:       ${counts['pedantic']} (all tiered rules)');
-  stdout.writeln('  Stylistic:      ${counts['stylistic']} (opt-in, not part of any tier)');
+  stdout.writeln(
+    '  Stylistic:      ${counts['stylistic']} (opt-in, not part of any tier)',
+  );
   stdout.writeln('  Total defined:  ${counts['total']} (pedantic + stylistic)');
 }
 
