@@ -736,6 +736,16 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
     // always see "unknown → true" and never suppress mobile-only projects.
     // See plan/history/2026.04/2026.04.26/avoid_platform_specific_imports_false_positive_mobile_only_no_web_dir.md.
     context.addImportDirective((ImportDirective node) {
+      // PERF: the literal URI check is the cheapest and most selective gate —
+      // almost no import is `dart:io` — so it runs first. The web-support and
+      // path gates below then execute only a handful of times per project
+      // instead of once per import directive (5.6k on the baseline scan).
+      final String? uri = node.uri.stringValue;
+      if (uri != 'dart:io') return;
+
+      // Conditional imports are the correct pattern — don't flag them
+      if (node.configurations.isNotEmpty) return;
+
       // The rule's entire justification is "dart:io breaks web builds". In
       // a mobile-only Flutter project (no `web/` directory) that failure
       // mode is structurally impossible, so every diagnostic we'd raise is
@@ -746,12 +756,6 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
       for (final String dir in _platformDirs) {
         if (path.contains(dir)) return;
       }
-
-      final String? uri = node.uri.stringValue;
-      if (uri != 'dart:io') return;
-
-      // Conditional imports are the correct pattern — don't flag them
-      if (node.configurations.isNotEmpty) return;
 
       reporter.atNode(node);
     });

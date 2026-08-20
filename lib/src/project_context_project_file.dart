@@ -46,9 +46,26 @@ class ProjectContext {
     return info.packageName;
   }
 
+  /// Memoized directory -> project-root answers for [findProjectRoot].
+  ///
+  /// PERF-CRITICAL: rules call `hasWebSupport`/`getProjectInfo` from inside
+  /// per-AST-node callbacks, so before this cache existed every visited node
+  /// triggered a fresh directory walk with one `existsSync` syscall per
+  /// level. On a 165-file real-project scan that was >10k walks PER RULE and
+  /// the single largest cost in the timing profile (2026-08-20 baseline).
+  /// The key is the file's parent directory (post-[normalizePath]); the value
+  /// is the nearest root containing pubspec.yaml, or null when none exists —
+  /// nulls are cached too so pathological no-root trees stay cheap.
+  /// Staleness policy matches [_projectCache]: entries live for the process
+  /// lifetime (pubspec.yaml files moving mid-session is not a supported case)
+  /// and are dropped by [clearCache].
+  static final Map<String, String?> _rootByDir = {};
+
   /// Find the project root directory (contains pubspec.yaml).
   ///
-  /// Walks up the directory tree from [filePath] looking for pubspec.yaml.
+  /// Walks up the directory tree from [filePath] looking for pubspec.yaml,
+  /// memoizing the answer for every directory visited so repeat lookups from
+  /// the same subtree are a single map hit (see [_rootByDir]).
   /// Returns `null` if no project root is found or [filePath] is null/empty.
   static String? findProjectRoot(String? filePath) {
     if (filePath == null || filePath.isEmpty) return null;
@@ -57,17 +74,42 @@ class ProjectContext {
     try {
       var dir = Directory(normalized).parent;
 
+      // Fast path: the file's own directory was resolved before. containsKey
+      // (not a null check) so cached "no root" answers also short-circuit.
+      if (_rootByDir.containsKey(dir.path)) return _rootByDir[dir.path];
+
+      // Directories traversed before the root is found. Every one of them
+      // shares the same answer (the nearest pubspec at-or-above it), so the
+      // whole chain is back-filled in one pass — the next file in a sibling
+      // folder resolves after at most a few uncached levels.
+      final List<String> visited = <String>[];
+      String? root;
+
       // Walk up the directory tree looking for pubspec.yaml
       while (dir.path.length > 1) {
+        // A cached ancestor answers for the entire remaining walk.
+        if (_rootByDir.containsKey(dir.path)) {
+          root = _rootByDir[dir.path];
+          break;
+        }
+        visited.add(dir.path);
         final pubspec = File('${dir.path}/pubspec.yaml');
         if (pubspec.existsSync()) {
-          return dir.path;
+          root = dir.path;
+          break;
         }
         final parent = dir.parent;
         if (parent.path == dir.path) break;
         dir = parent;
       }
-      return null;
+
+      // Back-fill: visited dirs are all at-or-below the found root (the loop
+      // breaks AT the root), so `root` is the correct answer for each. When
+      // no root exists, null is cached to make the miss cheap next time.
+      for (final String v in visited) {
+        _rootByDir[v] = root;
+      }
+      return root;
     } on OSError {
       return null;
     }
@@ -213,6 +255,10 @@ class ProjectContext {
   /// Clear the project cache (useful for testing).
   static void clearCache() {
     _projectCache.clear();
+    // The root memo must clear with the project cache: tests create/delete
+    // temp pubspec.yaml files, and a stale directory->root entry would make
+    // getProjectInfo resolve the wrong (or a vanished) project root.
+    _rootByDir.clear();
     clearCrossFileSnapshotCache();
   }
 }

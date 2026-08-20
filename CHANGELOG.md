@@ -64,18 +64,30 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.1.3]
+## [15.2.0]
 
-The About Saropa Lints panel now shows the live rule count instead of static marketing copy, fetched on open from a new `rule_count` CLI that reads directly from the tier registry. This replaces hand-typed counts across docs and extension strings that had drifted stale, giving every future rule addition a single source of truth. [log](https://github.com/saropa/saropa_lints/blob/v15.1.3/CHANGELOG.md)
+Rule execution is roughly twice as fast, and the analysis server now reports the ~200 most important error and warning rules by default without holding the full resolved type model in memory — the remaining rules fire on save via the scan daemon so nothing is lost. Measured at +0.6% memory over the plugin-off baseline (vs +77.2% for full in-process coverage), so this is safe for every project with the `plugins:` block enabled, with no config change required. The About panel and tier picker now show live rule counts from a single source of truth, replacing stale hand-typed numbers. [log](https://github.com/saropa/saropa_lints/blob/v15.2.0/CHANGELOG.md)
 
 ### Added
 
 - New `rule_count` CLI (`dart run saropa_lints:rule_count`, or `--format json`) reports the live rule count per tier plus opt-in stylistic rules, computed directly from `lib/src/tiers.dart`. No action required.
+- New `--profile` flag on the scan CLI records per-rule execution timing and writes it to `reports/.saropa_lints/rule_timings.json` (slowest first, with call counts and averages). Timing was previously collected but never written anywhere; this makes slow rules measurable so performance work targets real offenders. No action required.
+- New `lane` setting under `plugins.saropa_lints` controls which rules run inside the analysis server. `light` (the default when the key is absent) runs only the ~200 error and warning rules that need no type resolution, so those findings appear in the editor shortly after typing pauses rather than only after a save, without the editor holding the whole project's resolved type model; the rest still fire on save via the scan daemon. Set `lane: full` to keep the previous behavior of running every enabled rule in-process.
+
+### Changed
+
+- Rule execution is roughly twice as fast: project-root lookups are now memoized instead of re-walking the directory tree on every AST node, the hottest platform/import rules run their cheap syntactic checks before project gates, repeated file probes are cached, and deprecation checks are computed once per API element instead of once per reference — a 47% rule-time reduction on a 165-file before/after benchmark, confirmed at scale on a 4,487-file production app. No action required.
+
+### Fixed
+
+- `prefer_moving_to_variable`, `prefer_pattern_destructuring`, `avoid_multiple_stream_listeners`, and `require_sqflite_transaction` no longer re-scan nested scopes once per enclosing block, which removes duplicate diagnostics for the same code. Each nested block (an `if`/`else` arm, a loop or `try` body, any brace-delimited scope) is now judged on its own rather than summed with its enclosing scope — this also means a pattern split across a block boundary (e.g. 2 writes before a loop plus 1 inside it) may no longer trigger `require_sqflite_transaction` or `avoid_multiple_stream_listeners` where it previously did. No action required.
+- Dropping a `.saropa_stop` file in the scan target root now actually aborts a running scan between files with a partial report, instead of being silently ignored by the scan CLI; the sentinel is consumed so the next scan runs normally. No action required.
 
 ### Added (Extension)
 
 - (Extension) The About Saropa Lints panel now shows a live rule-count strip (total plus per-tier breakdown) fetched from the new `rule_count` CLI when a project is open, replacing the static number previously baked into the panel's markdown copy. No action required.
 - (Extension) The Manage Rule Packs tier picker now shows each tier's live rule count next to its name (e.g. "essential 331 rules"), fetched once per panel open from the same `rule_count` CLI. No action required.
+- (Extension) On-save scans now skip the rules the in-process plugin already reports when a project runs `lane: light`, so a finding is not listed twice in the Problems panel; the skip applies only while the plugin is verifiably reporting, so nothing is hidden if it is off or silent. No action required.
 
 <details>
 <summary>Maintenance</summary>
@@ -490,95 +502,6 @@ Static analysis fixes. [log](https://github.com/saropa/saropa_lints/blob/v14.4.2
 ### Fixed
 
 - Fix 41 static analysis issues flagged by pub.dev pana scoring (unnecessary null checks, unused imports, missing curly braces, dead code, redundant ignores, invalid overrides)
-
----
-
-## [14.4.1]
-
-**Ignore**: Published build error - mixed code/versions. Ignore.
-
----
-
-## [14.4.0]
-
-Introduces a new lint rule to catch invalid date initializations that would otherwise silently roll over into incorrect dates. Developers are now guided toward strict parsing methods to make date handling safer across Dart and Flutter projects. [log](https://github.com/saropa/saropa_lints/blob/v14.4.0/CHANGELOG.md)
-
-### Added
-
-- `avoid_datetime_constructor` — flags `DateTime()` and `DateTime.utc()` constructors, which silently roll over out-of-range values (e.g. month 13 becomes January of the next year). All-literal in-range calls are allowed. Quick fix available: replace with `DateTime.tryParse()`. No action required.
-- `avoid_datetime_constructor_unvalidated` — flags `DateTime()` calls whose result is consumed directly (returned, passed as argument, used in field initializer) without being assigned to a local variable where components can be validated. No action required.
-
----
-
-## [14.3.13]
-
-Fix false positive in `avoid_bluetooth_scan_without_timeout` — the rule no longer fires on non-Bluetooth `scan()` calls. [log](https://github.com/saropa/saropa_lints/blob/v14.3.13/CHANGELOG.md)
-
-### Fixed
-
-- `avoid_bluetooth_scan_without_timeout` no longer flags `scan().listen()` on non-Bluetooth receivers (e.g. dedup scanners, port scanners). No action required.
-- `require_bluetooth_state_check` now recognizes additional Bluetooth package types (`flutter_reactive_ble`, `bluetooth_low_energy`, `quick_blue`, `universal_ble`). No action required.
-- `avoid_bluetooth_scan_without_timeout` skips files without scan-related strings via `requiredPatterns` pre-filter, reducing unnecessary AST traversal. No action required.
-
----
-
-## [14.3.12]
-
-Re-release of v14.3.10 with a build fix — no rule or extension changes. [log](https://github.com/saropa/saropa_lints/blob/v14.3.12/CHANGELOG.md)
-
-<details>
-<summary>Maintenance</summary>
-
-- Fix test compilation error that blocked the v14.3.10 publish pipeline. No action required.
-- Extract shared `parseMethodBody` test helper and add CI guard against `childEntities` usage on class-like declarations. No action required.
-
-</details>
-
----
-
-## [14.3.11]
-
-**Skipped**: Internal build only.
-
----
-
-## [14.3.10]
-
-Resolves false positives across matrix scaling operations and resource disposal lints. Uniform scaling factors in matrix transformations are no longer incorrectly flagged as duplicate arguments, and cleanup rules now properly recognize cascade syntax when disposing of controllers, streams, and timers. [log](https://github.com/saropa/saropa_lints/blob/v14.3.10/CHANGELOG.md)
-
-### Fixed
-
-- **Fix: `no_equal_arguments` false positive on Matrix4 uniform scaling** — `scaleByDouble(s, s, 1, 1)`, `scale(s, s, 1)`, and `diagonal3Values(s, s, 1)` no longer flag the repeated factor as a copy-paste error. The `scale` exemption is receiver-type-guarded to Matrix4 only, so `myWidget.scale(x, x)` still fires.
-- **Fix: disposal rules false positive on cascade syntax** — all disposal/cleanup rules (`require_text_editing_controller_dispose`, `require_page_controller_dispose`, stream/timer cancel rules, etc.) now recognize `_field..dispose()` and `_field..close()` cascade expressions as valid cleanup. Previously only `_field.dispose()` and `_field?.dispose()` were matched.
-
-<details>
-<summary>Maintenance</summary>
-
-- Fix cascade cleanup test helper to use `ClassDeclaration.body.members` instead of `childEntities`, which stopped exposing `MethodDeclaration` in analyzer 12.1.0.
-
-</details>
-
----
-
-## [14.3.9]
-
-Two new comprehensive rules help monitor native bridge performance by requiring the `@MethodChannelInstrumented` annotation on channel classes and ensuring those calls are wrapped in timing helpers like `noteIfSlow`. [log](https://github.com/saropa/saropa_lints/blob/v14.3.9/CHANGELOG.md)
-
-### Added
-
-- **New rule: `require_method_channel_instrumented`** — flags classes that call `MethodChannel.invokeMethod` / `invokeListMethod` / `invokeMapMethod` without a `@MethodChannelInstrumented` annotation, one diagnostic per class. Quick fix inserts the annotation. Comprehensive tier.
-- **New rule: `prefer_method_channel_note_if_slow`** — flags bare invoke-method calls inside `@MethodChannelInstrumented` classes that are not wrapped in `noteIfSlow` or an equivalent timing helper. Comprehensive tier.
-
-<details><summary>Maintenance</summary>
-
-- **Fix: rule packs UI in self-package** — the Config Dashboard's "Enable all" and individual pack toggles produced misleading toasts ("already enabled" / "could not write") when the workspace is the saropa_lints package itself. The extension now detects the self-package via `name: saropa_lints` in pubspec, treats the implicit plugin load as configured, and creates a `plugins: saropa_lints:` block when no anchor exists for `rule_packs` writes.
-- **CI: full clone for test job** — the `health_history_test` needs git tags; shallow CI clones lacked them. Changed to `fetch-depth: 0` (full clone) so tags and history are always available.
-- **Security: fix 3 Dependabot alerts** — upgraded `shell-quote` 1.8.4 → 1.10.0 (quadratic DoS in `parse()`), replaced abandoned `npm-run-all` with maintained `npm-run-all2@8`, and overrode `brace-expansion` to patched versions (exponential DoS). All dev-only dependencies.
-- **Dependabot: grouped weekly schedule** — added `.github/dependabot.yml` to batch all extension npm security updates into a single weekly PR (Mondays) instead of one PR per alert.
-- **i18n engine: NLLB → Qwen** — the extension's machine-translation pipeline now uses Qwen 3 via local Ollama as the primary engine, with Google Translate as the per-string fallback. NLLB is deprecated; existing NLLB-provenance translations are treated as low-quality and re-translated on the next `--mode upgrade` run. No user action required.
-- **i18n: LLM control-token rejection** — the translation cache validator now rejects cached strings containing leaked LLM control tokens (`/no_think`, `<|endoftext|>`, `[INST]`, etc.). Contaminated entries auto-heal on the next translation run. GPU detection is deferred to first use so importing the engine no longer runs `nvidia-smi`.
-
-</details>
 
 ---
 

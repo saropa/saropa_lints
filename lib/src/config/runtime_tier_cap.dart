@@ -125,9 +125,35 @@ String? parseSaropaTierFromCustomYaml(String? content) {
 /// (`test/fixtures/tier_yaml_parser_cases.json`) so the two independent
 /// regex implementations can't silently diverge.
 String? parseSaropaTierFromPluginBlock(String? content) {
-  if (content == null || content.isEmpty) return null;
+  final label = parseScalarFromPluginBlock(content, const <String>{
+    'runtime_tier',
+    'saropa_tier',
+  });
+  if (label == null) return null;
+
+  return _parseTierLabel(label) == null ? null : label;
+}
+
+/// Reads the first of [keys] found as a scalar under `plugins.saropa_lints`
+/// in [content], lower-cased and unquoted; `null` when absent.
+///
+/// Extracted from [parseSaropaTierFromPluginBlock] so every plugin-block key
+/// (tier, `lane:`, and whatever comes next) walks the block with ONE
+/// implementation. The walk is indentation-based rather than a YAML parse
+/// because this runs inside the analysis-server isolate on every config load,
+/// where pulling in a full YAML parse of the consumer's options file is
+/// disproportionate — and because the TS mirror
+/// (`extension/src/config/tierConfig.ts`) has to reproduce the same behavior
+/// against the shared fixture `test/fixtures/tier_yaml_parser_cases.json`.
+String? parseScalarFromPluginBlock(String? content, Set<String> keys) {
+  if (content == null || content.isEmpty || keys.isEmpty) return null;
   final normalized = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
   final lines = normalized.split('\n');
+  // Alternation over the requested keys, anchored so `lane:` cannot match a
+  // longer key such as `lane_override:`.
+  final keyPattern = RegExp(
+    '^\\s*(${keys.map(RegExp.escape).join('|')}):\\s*([^\\s#]+)',
+  );
   for (var i = 0; i < lines.length; i++) {
     final trimmed = lines[i].trimRight();
     if (!RegExp(r'^\s+saropa_lints:\s*(?:#.*)?$').hasMatch(trimmed)) continue;
@@ -135,20 +161,22 @@ String? parseSaropaTierFromPluginBlock(String? content) {
     for (var j = i + 1; j < lines.length; j++) {
       final inner = lines[j];
       final t = inner.trimLeft();
+      // Blank lines and comments do not end the block — a commented-out key
+      // inside the block must not stop the search for a live one below it.
       if (t.isEmpty || t.startsWith('#')) continue;
       final ind = _leadingSpaces(inner);
+      // Dedent to or past the `saropa_lints:` key means the block ended.
       if (ind <= baseIndent) break;
-      final m = RegExp(
-        r'^\s*(runtime_tier|saropa_tier):\s*([^\s#]+)',
-      ).firstMatch(inner);
+      final m = keyPattern.firstMatch(inner);
       if (m != null) {
         final v = m.group(2)?.trim();
         if (v == null || v.isEmpty) continue;
-        final label = _stripYamlScalarQuotes(v).toLowerCase();
-        return _parseTierLabel(label) == null ? null : label;
+
+        return _stripYamlScalarQuotes(v).toLowerCase();
       }
     }
   }
+
   return null;
 }
 

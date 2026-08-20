@@ -44,6 +44,29 @@ void main() {
       expect((result as ScanParseOk).args.resolve, isTrue);
     });
 
+    // --profile is a valueless boolean flag: it must set profile without
+    // consuming a following argument (regression guard for the value-eating
+    // pattern used by --tier/--debug-rule).
+    test('--profile sets profile flag and defaults to off', () {
+      final off = parseScanArgs(<String>['.']);
+      expect((off as ScanParseOk).args.profile, isFalse);
+
+      final on = parseScanArgs(<String>['.', '--profile', '--tier', 'essential']);
+      expect(on, isA<ScanParseOk>());
+      expect((on as ScanParseOk).args.profile, isTrue);
+      expect((on).args.tier, 'essential');
+    });
+
+    test('--exclude-light-lane sets the flag and defaults to off', () {
+      final off = parseScanArgs(<String>['.']);
+      expect((off as ScanParseOk).args.excludeLightLane, isFalse);
+
+      final on = parseScanArgs(<String>['.', '--exclude-light-lane', '--tier', 'essential']);
+      expect(on, isA<ScanParseOk>());
+      expect((on as ScanParseOk).args.excludeLightLane, isTrue);
+      expect((on).args.tier, 'essential');
+    });
+
     test('--resolve combines with --tier without consuming its value', () {
       final result = parseScanArgs(<String>[
         '.',

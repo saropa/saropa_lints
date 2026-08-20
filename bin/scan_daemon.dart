@@ -42,8 +42,13 @@
 ///
 /// Request (one line on stdin):
 ///   {"id": "1", "files": ["lib/a.dart", "lib/b.dart"]}
+///   {"id": "1", "files": [...], "excludeLane": "light"}
 ///   {"id": "2", "cmd": "shutdown"}
 ///   {"id": "3", "cmd": "listFiles"}
+///
+/// `excludeLane: "light"` drops the rules the in-process plugin runs itself
+/// when the project is configured with `lane: light`, so the same finding is
+/// not reported twice (see plans/PLAN_two_lane_daemon_architecture.md).
 ///
 /// Response (one line on stdout per request):
 ///   {"id": "1", "ok": true, "diagnostics": [...], "summary": {...}}
@@ -200,6 +205,15 @@ Future<void> _handleScanRequest(
     return;
   }
 
+  // Two-lane de-duplication. The caller sets `"excludeLane": "light"` when the
+  // project's in-process plugin is configured with `lane: light`, meaning the
+  // severe/cheap/resolution-free rules already produce in-editor squiggles
+  // (once edits settle, not while typing); running them here too would
+  // double every such finding in the Problems panel. Any other value (or an
+  // absent key) means scan everything, so a caller that does not know about
+  // lanes keeps today's behavior.
+  final excludeLightLane = request['excludeLane'] == 'light';
+
   try {
     final sw = Stopwatch()..start();
     final runner = ScanRunner(
@@ -207,6 +221,7 @@ Future<void> _handleScanRequest(
       dartFiles: files,
       tier: options.tier,
       messageSink: (msg) => stderr.writeln('[scan_daemon] $msg'),
+      excludeLightLane: excludeLightLane,
     );
     final diagnostics = await runner.runResolvedWithCollection(collection);
     if (diagnostics == null) {

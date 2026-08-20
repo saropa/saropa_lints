@@ -1177,12 +1177,16 @@ class AvoidIsarWebLimitationsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addMethodInvocation((MethodInvocation node) {
+      // PERF: set-membership check first — it rejects nearly every invocation
+      // for free, so the web-support gate (project-root resolution) runs only
+      // on the rare Isar `*Sync` calls instead of all 13k+ method invocations
+      // seen on the 165-file baseline scan (was #2 in the timing profile).
+      final methodName = node.methodName.name;
+      if (!_syncMethods.contains(methodName)) return;
+
       if (!ProjectContext.hasWebSupport(context.filePath)) return;
 
-      final methodName = node.methodName.name;
-      if (_syncMethods.contains(methodName)) {
-        reporter.atNode(node.methodName, code);
-      }
+      reporter.atNode(node.methodName, code);
     });
   }
 }

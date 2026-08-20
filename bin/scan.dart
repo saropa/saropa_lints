@@ -15,6 +15,9 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/scan.dart';
 import 'package:saropa_lints/src/init/migration.dart';
+import 'package:saropa_lints/src/native/saropa_context.dart';
+import 'package:saropa_lints/src/report/timing_emitter.dart';
+import 'package:saropa_lints/src/saropa_lint_rule.dart' show RuleTimingTracker;
 import 'package:saropa_lints/src/scan/scan_cli_args.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 import 'package:saropa_lints/src/tiers.dart';
@@ -65,11 +68,21 @@ Future<void> main(List<String> args) async {
     exit(0);
   }
 
+  // --profile: arm per-rule timing capture BEFORE any rule callback runs and
+  // start from a clean tracker so the report reflects only this run. This is
+  // the runtime path (not the SAROPA_LINTS_PROFILE dart-define) so `dart run`
+  // snapshot caching can never silently disable it.
+  if (parsed.profile) {
+    RuleTimingTracker.reset();
+    SaropaContext.runtimeProfilingEnabled = true;
+  }
+
   final runner = ScanRunner(
     targetPath: path,
     dartFiles: dartFiles.isEmpty ? null : dartFiles,
     tier: tier,
     debugRule: parsed.debugRule,
+    excludeLightLane: parsed.excludeLightLane,
   );
   // --resolve runs the slower, fully-resolved scan so that
   // InstanceCreationExpression and type-based rules actually fire; the default
@@ -77,6 +90,26 @@ Future<void> main(List<String> args) async {
   final diagnostics = parsed.resolve
       ? await runner.runResolved()
       : runner.run();
+
+  // Flush the timing profile even when diagnostics is null (config error):
+  // by that point rules may already have run, and a partial profile beats a
+  // silently discarded one. Written to stderr so --format json stdout stays
+  // machine-parseable.
+  if (parsed.profile) {
+    final timingPath = writeRuleTimingReport(
+      projectRoot: path,
+      tier: tier,
+      resolved: parsed.resolve,
+      fileCount: dartFiles.isEmpty ? null : dartFiles.length,
+    );
+    if (timingPath != null) {
+      stderr.writeln('Timing profile: $timingPath');
+    } else {
+      // An empty tracker after a profiled run means no rule callbacks
+      // executed — surface it, never let profiling fail silently again.
+      stderr.writeln('Timing profile: no data collected (no rules ran).');
+    }
+  }
 
   if (diagnostics == null) {
     exit(2);
@@ -353,6 +386,18 @@ void _printUsage() {
   );
   print(
     '  --format json       Output machine-readable JSON to stdout (no report file).',
+  );
+  print(
+    '  --profile           Record per-rule execution timing and write it to',
+  );
+  print(
+    '                      reports/.saropa_lints/rule_timings.json (slowest first).',
+  );
+  print(
+    '  --exclude-light-lane Skip rules the in-process plugin runs itself under',
+  );
+  print(
+    '                      `lane: light`, so findings are not reported twice.',
   );
   print(
     '  --debug-rule <name> Emit per-node type-resolution trace for the named',

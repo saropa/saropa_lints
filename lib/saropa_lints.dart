@@ -47,6 +47,9 @@ import 'package:analysis_server_plugin/registry.dart' show PluginRegistry;
 import 'package:analyzer/error/error.dart' show DiagnosticCode;
 import 'package:saropa_lints/src/baseline/baseline_config.dart';
 import 'package:saropa_lints/src/baseline/baseline_manager.dart';
+// Two-lane split: light-lane membership is computed during the registry
+// build below (see _buildRuleFactoriesMap).
+import 'package:saropa_lints/src/config/rule_lane.dart';
 import 'package:saropa_lints/src/native/plugin_logger.dart';
 import 'package:saropa_lints/src/report/analysis_reporter.dart';
 import 'package:saropa_lints/src/rules/all_rules.dart';
@@ -84,6 +87,9 @@ export 'package:saropa_lints/src/baseline/baseline_file.dart';
 export 'package:saropa_lints/src/baseline/baseline_manager.dart';
 export 'package:saropa_lints/src/baseline/baseline_paths.dart';
 export 'package:saropa_lints/src/tiers.dart';
+// Lane API is public so the scan CLI, the daemon, and tests share one
+// definition of light-lane membership.
+export 'package:saropa_lints/src/config/rule_lane.dart';
 export 'package:saropa_lints/src/project_context.dart'
     show
         AstNodeCategory,
@@ -3317,6 +3323,12 @@ Set<String> _rulesWithFixesSet = const <String>{};
 Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
   final map = <String, SaropaLintRule Function()>{};
   final fixes = <String>{};
+  // Light-lane membership is harvested in this same pass. The temporary
+  // instance below already exposes severity/cost/usesTypeResolution, so
+  // deriving the lane here costs nothing beyond a predicate call and keeps
+  // membership impossible to drift from the rules that actually ship (no
+  // hand-maintained name list). See lib/src/config/rule_lane.dart.
+  final lightLane = <String>{};
   for (final factory in _allRuleFactories) {
     final rule = factory(); // temporary instance to get name + fix info
     final name = rule.code.lowerCaseName;
@@ -3324,10 +3336,14 @@ Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
     if (rule.fixGenerators.isNotEmpty) {
       fixes.add(name);
     }
+    if (isLightLaneRule(rule)) {
+      lightLane.add(name);
+    }
     // rule goes out of scope, can be GC'd
   }
 
   _rulesWithFixesSet = fixes;
+  setLightLaneRuleNames(lightLane);
 
   // Publish both sets to the reporter so the TOP RULES table and the
   // triage synthesis can classify each rule as saropa-authored /
@@ -3341,6 +3357,22 @@ Map<String, SaropaLintRule Function()> _buildRuleFactoriesMap() {
   );
 
   return map;
+}
+
+/// Forces the lazy rule registry to build, if it has not already.
+///
+/// The registry is a lazy `final`, so it initializes on first *access* — and
+/// [getRulesFromRegistry] only accesses it inside its loop body, which means
+/// calling it with an empty set does NOT build anything. Light-lane membership
+/// is published as a side effect of that build
+/// (see [_buildRuleFactoriesMap]), so any caller that needs the membership
+/// without wanting rule instances must come through here. Calling it with an
+/// empty set instead silently leaves the lane set empty, which makes the lane
+/// gate and the daemon's de-duplication no-op.
+void ensureRuleRegistryBuilt() {
+  // Bind to a throwaway so the access is a documented consumer, not a
+  // statement the analyzer flags as unnecessary.
+  final _ = _ruleFactories;
 }
 
 /// Get rules for a set of rule names.

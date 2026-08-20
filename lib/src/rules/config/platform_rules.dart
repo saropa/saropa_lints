@@ -186,17 +186,22 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
     // Project and path gates use [context.filePath] and must run inside the
     // visitor: at registration time the current unit path is often empty.
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
+      // PERF: syntactic discriminators FIRST — they reject ~99% of visited
+      // identifiers for free, so the project/web/path gates below (which hit
+      // the ProjectContext caches) run only on actual `Platform.isX` nodes.
+      // This callback fired 12.4k times on a 165-file baseline scan; gating
+      // on project info first made it the single slowest rule in the profile.
+      if (node.prefix.name != 'Platform') return;
+
+      final String property = node.identifier.name;
+      if (!property.startsWith('is')) return; // Platform.isAndroid, etc.
+
       final projectInfo = ProjectContext.getProjectInfo(context.filePath);
       if (projectInfo == null || !projectInfo.isFlutterProject) return;
 
       if (!ProjectContext.hasWebSupport(context.filePath)) return;
 
       if (isNativeOnlyConditionalImportTarget(context.filePath)) return;
-
-      if (node.prefix.name != 'Platform') return;
-
-      final String property = node.identifier.name;
-      if (!property.startsWith('is')) return; // Platform.isAndroid, etc.
 
       if (!_isGuardedByKIsWeb(node)) {
         reporter.atNode(node);
@@ -305,12 +310,15 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
     // Same pattern as `avoid_platform_specific_imports`; see
     // plan/history/2026.04/2026.04.26/prefer_foundation_platform_check_false_positive_mobile_only_no_web_dir.md.
     context.addPrefixedIdentifier((PrefixedIdentifier node) {
-      if (!ProjectContext.hasWebSupport(context.filePath)) return;
-
+      // PERF: cheap name checks before the web-support gate — hasWebSupport
+      // resolves the project root, and running it on every identifier (12k+
+      // per baseline scan) put this rule in the top-10 timing offenders.
       if (node.prefix.name != 'Platform') return;
 
       final String property = node.identifier.name;
       if (!property.startsWith('is')) return;
+
+      if (!ProjectContext.hasWebSupport(context.filePath)) return;
 
       // Check if inside a widget build method
       if (_isInsideBuildMethod(node)) {

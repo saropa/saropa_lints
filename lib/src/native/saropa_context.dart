@@ -21,6 +21,7 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/line_info.dart';
 
 import '../config/memory_mode.dart' show MemoryModeConfig;
+import '../config/rule_lane.dart' show ruleAllowedByLane;
 import '../config/runtime_tier_cap.dart';
 import '../init/project_info.dart' show getPackageVersion;
 import '../project_context.dart'
@@ -79,6 +80,21 @@ class SaropaContext {
       String.fromEnvironment('SAROPA_LINTS_PROFILE', defaultValue: '') ==
           'true' ||
       String.fromEnvironment('SAROPA_LINTS_REPORT', defaultValue: '') == 'true';
+
+  /// Runtime-mutable profiling switch, set by the scan CLI's `--profile`
+  /// flag before a run starts.
+  ///
+  /// Why this exists alongside the compile-time [_timingEnabled] defines:
+  /// `dart run` caches a compiled snapshot of the package, and it is
+  /// unverified whether toggling a `-D` define invalidates that cache — a
+  /// profiling run that silently used a stale non-profiling snapshot would
+  /// produce an empty report and look like "no data". A plain runtime bool
+  /// sidesteps snapshot semantics entirely: the flag is read fresh on every
+  /// callback, so `--profile` always means profiled. Costs one static bool
+  /// read per AST node on the non-profiling path — negligible next to the
+  /// gates already run above it in `_wrapCallback`.
+  static bool runtimeProfilingEnabled = false;
+
   static const int _slowRuleThresholdMs = 10;
 
   // ===========================================================================
@@ -266,6 +282,16 @@ class SaropaContext {
       if (!RuntimeTierCap.ruleAllowedByCap(rule.code.lowerCaseName)) {
         return;
       }
+      // Two-lane split: in the light lane only severe, cheap, resolution-free
+      // rules run inside the analysis server. This gate is the memory-critical
+      // one — a rule that never executes never dereferences an element, so it
+      // cannot trigger the analyzer's lazy cross-library resolution whose
+      // retained model is what drove the server to multi-GB RSS. Skipped rules
+      // are not lost: the scan daemon reports them on save. Costs one enum
+      // comparison in the default (full) lane. See src/config/rule_lane.dart.
+      if (!ruleAllowedByLane(rule.code.lowerCaseName)) {
+        return;
+      }
       if (_shouldSkipCurrentFile()) return;
 
       // In-flux relief: while the interactive server rapidly re-analyzes a file
@@ -306,7 +332,10 @@ class SaropaContext {
       // UnsupportedError when rules access newer AST properties (.body,
       // .namePart, etc.). Catching here prevents one gated property from
       // crashing the entire plugin — the rule simply skips that file.
-      if (!_timingEnabled) {
+      // Timing is on when either the compile-time defines or the scan CLI's
+      // runtime --profile flag enabled it; see runtimeProfilingEnabled for
+      // why both paths exist.
+      if (!_timingEnabled && !runtimeProfilingEnabled) {
         try {
           callback(node);
         } on UnsupportedError {

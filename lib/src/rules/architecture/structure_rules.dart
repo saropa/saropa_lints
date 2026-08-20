@@ -1,6 +1,9 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
-import 'dart:io' show File, IOException;
+// FileStat / FileSystemEntityType are needed by the mtime-validated
+// re-export cache in AvoidImportingEntrypointExportsRule.
+import 'dart:io'
+    show File, FileStat, FileSystemEntityType, IOException;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
@@ -4473,16 +4476,54 @@ class AvoidImportingEntrypointExportsRule extends SaropaLintRule {
     return resolved.replaceAll('\\', '/');
   }
 
+  /// Memoized answers for [_fileReExportsEntryPoint], keyed on the resolved
+  /// import target path with the file's mtime for staleness validation.
+  ///
+  /// PERF: without this cache the rule read every imported file from disk and
+  /// regex-scanned it on EVERY ImportDirective — 5.6k reads on a 165-file
+  /// baseline scan (1.5s, #3 in the timing profile) — and a barrel file
+  /// imported by N files was re-read N times. The mtime check keeps long-lived
+  /// analysis-server sessions correct when the target file is edited: a
+  /// changed mtime invalidates the entry, at the cost of one statSync (far
+  /// cheaper than read + regex) per lookup.
+  static final Map<String, ({DateTime mtime, bool reExports})> _reExportCache =
+      {};
+
   bool _fileReExportsEntryPoint(String path) {
     try {
+      // One-shot runners (scan CLI, tests) can't see files change mid-run, so
+      // a plain path-keyed hit skips even the statSync — which at 5.6k imports
+      // per baseline scan was still ~0.8s of pure stat syscalls. Only the
+      // long-lived analysis server needs the mtime staleness check below.
+      if (!SaropaLintRule.isAnalysisServer) {
+        final cachedFast = _reExportCache[path];
+        if (cachedFast != null) return cachedFast.reExports;
+      }
+
       final File file = File(path);
-      if (!file.existsSync()) return false;
+      // statSync doubles as the existence check: a missing file reports
+      // FileSystemEntityType.notFound instead of throwing.
+      final FileStat stat = file.statSync();
+      if (stat.type == FileSystemEntityType.notFound) return false;
+
+      // Cache hit is only valid while the file is unmodified — an edit that
+      // adds/removes the `export 'main.dart'` line must change the answer.
+      final cached = _reExportCache[path];
+      if (cached != null && cached.mtime == stat.modified) {
+        return cached.reExports;
+      }
+
       final String content = file.readAsStringSync();
+      bool reExports = false;
       for (final Match m in _exportUriPattern.allMatches(content)) {
         final String exportedUri = m.group(1) ?? '';
-        if (exportedUri.endsWith('main.dart')) return true;
+        if (exportedUri.endsWith('main.dart')) {
+          reExports = true;
+          break;
+        }
       }
-      return false;
+      _reExportCache[path] = (mtime: stat.modified, reExports: reExports);
+      return reExports;
     } on IOException {
       return false;
     }

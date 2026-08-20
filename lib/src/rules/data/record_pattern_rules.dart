@@ -1329,6 +1329,11 @@ class PreferPatternDestructuringRule extends SaropaLintRule {
     }
   }
 
+  /// Matches positional record field names ($1, $2, ...). Static so the
+  /// pattern compiles once — it previously compiled per PropertyAccess
+  /// visited, which showed up in the per-rule timing profile.
+  static final RegExp _positionalFieldPattern = RegExp(r'^\$\d+$');
+
   void _collectRecordAccesses(
     AstNode node,
     Map<String, List<PropertyAccess>> accesses,
@@ -1336,7 +1341,7 @@ class PreferPatternDestructuringRule extends SaropaLintRule {
     if (node is PropertyAccess) {
       final String propertyName = node.propertyName.name;
       // Check for $1, $2, $3, etc.
-      if (RegExp(r'^\$\d+$').hasMatch(propertyName)) {
+      if (_positionalFieldPattern.hasMatch(propertyName)) {
         final Expression? target = node.target;
         if (target is SimpleIdentifier) {
           final String varName = target.name;
@@ -1346,8 +1351,13 @@ class PreferPatternDestructuringRule extends SaropaLintRule {
       }
     }
 
-    // Recursively check children
+    // Recursively check children — but NOT into nested Blocks: each Block
+    // gets its own addBlock callback, so descending here would (a) re-walk
+    // every inner node once per ancestor block (O(depth) duplication, a
+    // top-10 timing offender) and (b) double-report the same accesses from
+    // both the inner and outer scope maps.
     for (final AstNode child in node.childEntities.whereType<AstNode>()) {
+      if (child is Block) continue;
       _collectRecordAccesses(child, accesses);
     }
   }

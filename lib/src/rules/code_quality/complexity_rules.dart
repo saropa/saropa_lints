@@ -1030,6 +1030,16 @@ class _ExpressionCollector extends RecursiveAstVisitor<void> {
     onExpression(node);
     super.visitPropertyAccess(node);
   }
+
+  /// Do NOT descend into nested Blocks: each Block fires its own addBlock
+  /// callback in [PreferMovingToVariableRule], so recursing here re-walked
+  /// every inner node once per ancestor block (O(depth) duplication — a
+  /// top-10 timing offender) and double-counted inner expressions in both
+  /// the inner and outer scope maps, producing duplicate diagnostics.
+  @override
+  void visitBlock(Block node) {
+    // Intentionally no super call — the nested block's own callback owns it.
+  }
 }
 
 /// Warns when if-null operator (??) is used without parentheses in

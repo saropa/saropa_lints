@@ -46,6 +46,8 @@ class ScanCliArgs {
     this.fixIgnores = false,
     this.minSeverity,
     this.maxSeverity,
+    this.profile = false,
+    this.excludeLightLane = false,
   });
 
   final String path;
@@ -82,6 +84,19 @@ class ScanCliArgs {
   /// When true, bulk-convert bare `// ignore: rule_name` comments to
   /// `// ignore: saropa_lints/rule_name` for all known saropa_lints rules.
   final bool fixIgnores;
+
+  /// When true, per-rule execution timing is recorded during the scan and
+  /// flushed to `reports/.saropa_lints/rule_timings.json` at the end.
+  /// Runtime flag (not a dart-define) so `dart run` snapshot caching can
+  /// never silently disable it — see `SaropaContext.runtimeProfilingEnabled`.
+  final bool profile;
+
+  /// When true, light-lane rules are dropped from the scan.
+  ///
+  /// The CLI mirror of the scan daemon's `excludeLane` request field, so the
+  /// two-lane de-duplication can be exercised and verified from a terminal
+  /// without driving the daemon protocol by hand.
+  final bool excludeLightLane;
 }
 
 /// Parses [args] for the scan command.
@@ -110,12 +125,29 @@ ScanParseResult parseScanArgs(
   bool resolve = false;
 
   bool fixIgnores = false;
+  bool profile = false;
+  bool excludeLightLane = false;
 
   var i = 0;
   while (i < args.length) {
     final arg = args[i];
     if (arg == '--fix-ignores') {
       fixIgnores = true;
+      i++;
+      continue;
+    }
+    // Two-lane de-duplication: skip the rules the in-process plugin runs
+    // itself under `lane: light`. Boolean flag with no value — the lane name
+    // is implicit because "light" is the only lane the scan can exclude
+    // (excluding "full" would leave nothing to scan).
+    if (arg == '--exclude-light-lane') {
+      excludeLightLane = true;
+      i++;
+      continue;
+    }
+    // Per-rule timing capture + report; a plain boolean flag with no value.
+    if (arg == '--profile') {
+      profile = true;
       i++;
       continue;
     }
@@ -222,6 +254,8 @@ ScanParseResult parseScanArgs(
       fixIgnores: fixIgnores,
       minSeverity: minSeverity,
       maxSeverity: maxSeverity,
+      profile: profile,
+      excludeLightLane: excludeLightLane,
     ),
   );
 }

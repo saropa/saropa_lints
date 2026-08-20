@@ -148,7 +148,10 @@ export class ScanDaemonClient {
    * daemon death, timeout, and malformed responses all settle with
    * `payload: null` + `errorMessage`, matching `runScanOnSave`'s contract.
    */
-  async scan(files: readonly string[]): Promise<ScanOnSaveResult> {
+  async scan(
+    files: readonly string[],
+    excludeLane?: 'light',
+  ): Promise<ScanOnSaveResult> {
     const becameReady = await this._ready;
     const stdin = this._child?.stdin;
     if (!becameReady || !this._alive || !stdin?.writable) {
@@ -171,7 +174,12 @@ export class ScanDaemonClient {
           settle(result);
         },
       });
-      stdin.write(`${JSON.stringify({ id, files: [...files] })}\n`);
+      // `excludeLane` is omitted entirely when undefined so an older daemon
+      // (which ignores unknown keys anyway) sees a byte-identical request.
+      const request = excludeLane
+        ? { id, files: [...files], excludeLane }
+        : { id, files: [...files] };
+      stdin.write(`${JSON.stringify(request)}\n`);
     });
   }
 

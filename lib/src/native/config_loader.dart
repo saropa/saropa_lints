@@ -27,6 +27,14 @@ import '../config/analysis_options_rule_packs.dart';
 import '../config/pubspec_lock_resolver.dart';
 import '../config/rule_packs.dart';
 import '../config/memory_mode.dart' show MemoryMode, MemoryModeConfig;
+// Two-lane split (in-process light lane vs scan-daemon lane).
+import '../config/rule_lane.dart'
+    show
+        RuleLane,
+        applyLaneToEnabledRuleSet,
+        kLaneConfigKey,
+        parseRuleLane,
+        setActiveRuleLane;
 import '../config/runtime_tier_cap.dart';
 import '../report/diagnostic_statistics.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
@@ -178,6 +186,17 @@ void _loadFromRoot(String? projectRoot) {
     }
     RuntimeTierCap.applyCapToEnabledRuleSet();
 
+    // Two-lane split. Applied AFTER the tier cap so the lane narrows whatever
+    // the cap left, never the other way round (the cap is the consumer's
+    // strictness choice; the lane is a delivery-mechanism choice, and the
+    // rules it removes here are not lost — the scan daemon reports them on
+    // save). In-process only: the scan CLI and the rule test harness must keep
+    // running full coverage, and they reach this loader without starting the
+    // plugin, which is exactly what [_nativePluginStarted] distinguishes.
+    if (_nativePluginStarted) {
+      _loadRuleLane(projectRoot);
+    }
+
     // Success telemetry — visible in reports/.saropa_lints/plugin.log once
     // the project root is set. This is the primary signal users can check
     // to confirm the fix landed and their config was actually read.
@@ -194,6 +213,42 @@ void _loadFromRoot(String? projectRoot) {
     );
     // Defensive: ensure plugin can still register with defaults
   }
+}
+
+/// Reads `lane:` from the plugin block of `analysis_options.yaml` and narrows
+/// [SaropaLintRule.enabledRules] to that lane.
+///
+/// ```yaml
+/// plugins:
+///   saropa_lints:
+///     lane: light   # default when the key is absent; or: full
+/// ```
+///
+/// `light` runs only rules that are severe, cheap, and free of type
+/// resolution in the analysis server; everything else is delivered on save by
+/// the scan daemon. See `lib/src/config/rule_lane.dart` for why that
+/// particular set, and `plans/PLAN_two_lane_daemon_architecture.md` for the
+/// architecture.
+///
+/// A null/empty [SaropaLintRule.enabledRules] is left alone rather than being
+/// populated with the lane: null means "no explicit enables", and the
+/// downstream per-node gate ([ruleAllowedByLane], consulted from
+/// `SaropaContext._wrapCallback`) already enforces the lane for that path.
+/// Writing a set here would turn "nothing configured" into "these 200 rules
+/// are explicitly enabled", changing tier-cap and reporting semantics.
+void _loadRuleLane(String? projectRoot) {
+  final mainOptions = _readProjectFile('analysis_options.yaml', projectRoot);
+  final lane = parseRuleLane(
+    parseScalarFromPluginBlock(mainOptions, const <String>{kLaneConfigKey}),
+  );
+  setActiveRuleLane(lane);
+  if (lane == RuleLane.full) return;
+
+  final enabled = SaropaLintRule.enabledRules;
+  if (enabled == null || enabled.isEmpty) return;
+
+  final filtered = applyLaneToEnabledRuleSet(enabled);
+  SaropaLintRule.enabledRules = filtered.isEmpty ? null : filtered;
 }
 
 /// Parse diagnostic statistics config (threshold gates + baseline diff).

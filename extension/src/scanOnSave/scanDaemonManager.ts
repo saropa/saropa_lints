@@ -9,6 +9,7 @@
  * on every save, each attempt burning a full analyzer warmup.
  */
 import { ScanDaemonClient } from './scanDaemonClient';
+import { resolveExcludeLane, resetLivenessCache } from '../config/laneConfig';
 import { l10n } from '../i18n/runtime';
 import type { ScanOnSaveResult } from './scanOnSaveRunner';
 
@@ -51,7 +52,11 @@ export class ScanDaemonManager {
         errorMessage: l10n('notify.commands.scanOnSaveDaemonBackoff'),
       };
     }
-    const result = await client.scan(files);
+    // Two-lane de-duplication. resolveExcludeLane returns 'light' ONLY when
+    // the project configures the light lane AND the in-process plugin is
+    // verifiably reporting; any doubt means scan everything, so a finding can
+    // never fall between the two lanes (see config/laneConfig.ts).
+    const result = await client.scan(files, resolveExcludeLane(root));
     if (result.payload) this._consecutiveFailures = 0;
     return result;
   }
@@ -70,6 +75,10 @@ export class ScanDaemonManager {
 
   /** Drops the current daemon (config change / disable); next save respawns fresh. */
   restart(): void {
+    // A restart follows a config change, which may have flipped the lane or
+    // enabled/disabled the plugin — the cached liveness verdict describes the
+    // old configuration and must not decide the next scan's exclusion.
+    resetLivenessCache();
     this._dropClient();
   }
 

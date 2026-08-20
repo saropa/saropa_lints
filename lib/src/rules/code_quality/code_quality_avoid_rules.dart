@@ -4244,8 +4244,28 @@ class AvoidDeprecatedUsageRule extends SaropaLintRule {
     severity: DiagnosticSeverity.WARNING,
   );
 
+  /// Element-identity memo for [_isDeprecated]. An Expando so entries are
+  /// garbage-collected with their elements — no retention risk in the
+  /// long-lived analysis server, unlike a static Map keyed by element.
+  ///
+  /// PERF: the same element (a popular API like setState or a common getter)
+  /// is referenced thousands of times per project, and metadata iteration per
+  /// REFERENCE cost 2.3s on a 1,480-file scan (the #1 rule in that profile).
+  /// Deprecation is a property of the declaration, not the call site, so one
+  /// computation per element is exactly right.
+  static final Expando<bool> _deprecatedByElement = Expando<bool>();
+
   static bool _isDeprecated(Element? element) {
     if (element == null) return false;
+    final bool? cached = _deprecatedByElement[element];
+    if (cached != null) return cached;
+    final bool result = _computeIsDeprecated(element);
+    _deprecatedByElement[element] = result;
+    return result;
+  }
+
+  /// Uncached deprecation check — see [_isDeprecated] for the memo.
+  static bool _computeIsDeprecated(Element element) {
     try {
       if (hasDeprecatedFlag(element)) return true;
 

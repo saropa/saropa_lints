@@ -611,8 +611,16 @@ class RequireSqfliteTransactionRule extends SaropaLintRule {
       }
     }
 
-    // Recurse into children
+    // Recurse into children — but NOT into nested Blocks: each Block fires
+    // its own addBlock callback, so descending here re-walked every inner
+    // node once per ancestor block (O(depth) duplication — 821ms on a
+    // 1,480-file profile) and counted the same writes toward BOTH scopes,
+    // which could double-report one write cluster. Writes split across
+    // sibling nested blocks (e.g. if/else branches) are no longer summed —
+    // each branch is judged on its own, which matches the rule's intent of
+    // "3+ sequential writes on one path".
     for (final child in node.childEntities) {
+      if (child is Block) continue;
       if (child is AstNode) {
         _countWrites(child, onWrite);
       }

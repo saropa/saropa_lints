@@ -2576,6 +2576,14 @@ class AvoidMultipleStreamListenersRule extends SaropaLintRule {
     }
 
     for (final child in node.childEntities) {
+      // Do NOT descend into nested Blocks: each Block fires its own addBlock
+      // callback, so recursing here re-walked every inner node once per
+      // ancestor block (O(depth) duplication — a top-10 timing offender) and
+      // could report the same listen() pair from both scopes. Listens in
+      // sibling nested blocks (e.g. if/else branches) are mutually exclusive
+      // at runtime, so not pairing them across blocks also removes a
+      // false-positive class.
+      if (child is Block) continue;
       if (child is AstNode) {
         _findListenCalls(child, callback);
       }

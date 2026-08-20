@@ -51,6 +51,7 @@ class ScanRunner {
     this.messageSink,
     this.applyExclusionsToFileList = true,
     this.debugRule,
+    this.excludeLightLane = false,
   });
 
   /// Project root: config is loaded from here and relative [dartFiles] are resolved against it.
@@ -82,6 +83,17 @@ class ScanRunner {
   /// When set, emits per-node trace output for the named rule, showing type
   /// resolution details at each visited AST node.
   final String? debugRule;
+
+  /// Drops light-lane rules from the scan's rule set.
+  ///
+  /// Set by the scan daemon when the project's in-process plugin is running
+  /// the light lane: those rules already produce live analyzer squiggles, so
+  /// scanning them again would report every severe finding twice in the
+  /// Problems panel — once as an analyzer diagnostic and once from the
+  /// extension's own `DiagnosticCollection`. Membership comes from the shared
+  /// predicate in `lib/src/config/rule_lane.dart`, so the two sides cannot
+  /// disagree about which rules the split covers.
+  final bool excludeLightLane;
 
   /// Builds an [AnalysisContextCollection] rooted at [projectRoot] for a
   /// long-lived caller (the scan daemon) to hold and reuse across many
@@ -236,7 +248,23 @@ class ScanRunner {
     final resolved = _resolveRuleNames();
     if (resolved == null) return null;
 
-    final ruleNames = RuntimeTierCap.filterRuleSet(resolved);
+    // Lane exclusion runs before the empty check so that "the light lane
+    // covered everything you asked for" reports as nothing-to-scan rather
+    // than scanning duplicates.
+    var ruleNames = RuntimeTierCap.filterRuleSet(resolved);
+    if (excludeLightLane) {
+      // Light-lane membership is published as a side effect of the lazy
+      // rule-registry build, which may not have happened yet. Without this
+      // the set would still be empty here and the exclusion would silently
+      // no-op into duplicate diagnostics.
+      ensureRuleRegistryBuilt();
+      final before = ruleNames.length;
+      ruleNames = excludeLightLaneRules(ruleNames);
+      _out(
+        'Light lane excluded: $before → ${ruleNames.length} rules '
+        '(the rest run live in the analysis server).',
+      );
+    }
     if (ruleNames.isEmpty) {
       _out('All rules are disabled in the configuration.');
       return (rules: const [], files: const []);
@@ -399,6 +427,14 @@ class ScanRunner {
     final visitorRule = _visitorRuleMap(registrations);
 
     for (var i = 0; i < files.length; i++) {
+      // Abort hook: a `.saropa_stop` file in the scan target root stops the
+      // walk between files. This must live HERE — the historical sentinel
+      // path (SaropaLintRule._checkAbortSentinel) keys on
+      // AnalysisReporter.projectRoot, which is null in the scan CLI, so it
+      // never fired; and even when armed it only no-ops rule callbacks
+      // without ending the file loop, leaving long scans unkillable except
+      // by killing the process (which loses the report and timing profile).
+      if (_stopSentinelHit(i, files.length, diagnostics.length)) break;
       _showProgress(i, files.length, diagnostics.length, files[i], sw);
       _scanSingleFile(files[i], registrations, visitorRule, diagnostics);
     }
@@ -408,6 +444,37 @@ class ScanRunner {
       io.stderr.write('\r${' ' * 79}\r');
     }
     return diagnostics;
+  }
+
+  /// True when the user dropped a `.saropa_stop` file in the scan target
+  /// root, requesting the scan stop early with a partial report.
+  ///
+  /// Checked once per file — a single `existsSync` is trivial next to the
+  /// ~100ms of rule work an average file costs, and per-file checking keeps
+  /// abort latency at one file instead of one batch. The sentinel is deleted
+  /// on detection so the NEXT scan does not instantly abort on the leftover
+  /// file; a delete failure (e.g. permissions) still aborts, because honoring
+  /// the user's stop request matters more than the cleanup.
+  bool _stopSentinelHit(int scanned, int total, int issueCount) {
+    final sentinel = io.File(p.join(p.absolute(targetPath), '.saropa_stop'));
+    try {
+      if (!sentinel.existsSync()) return false;
+    } on io.IOException {
+      // Unreadable sentinel state: keep scanning rather than abort on an OS
+      // error the user never asked for.
+      return false;
+    }
+    try {
+      sentinel.deleteSync();
+    } on io.IOException {
+      // Leave the stale sentinel; the abort itself still proceeds.
+    }
+    _out(
+      '[saropa_lints] Scan aborted by .saropa_stop after '
+      '$scanned/$total files ($issueCount issues so far). '
+      'Partial report follows.',
+    );
+    return true;
   }
 
   void _scanSingleFile(

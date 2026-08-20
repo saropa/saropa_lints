@@ -353,10 +353,14 @@ class AvoidSecureStorageOnWebRule extends SaropaLintRule {
     // Web gate runs inside the visitor — [context.filePath] is not reliable
     // at [registerNodeProcessors] time (often empty until a unit is active).
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      if (!ProjectContext.hasWebSupport(context.filePath)) return;
-
+      // PERF: constructor-name check first — it rejects virtually every
+      // instance creation for free, so the web-support gate (project-root
+      // resolution) runs only on actual FlutterSecureStorage constructions
+      // instead of all 1.4k creations seen on the baseline scan.
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'FlutterSecureStorage') return;
+
+      if (!ProjectContext.hasWebSupport(context.filePath)) return;
 
       // Check if there's a kIsWeb check in the surrounding context
       AstNode? current = node.parent;
