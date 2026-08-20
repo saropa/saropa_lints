@@ -56,13 +56,16 @@ export function fetchRuleCounts(projectRoot: string): Promise<RuleCountSummary |
       resolve(result);
     };
 
-    // The count is a pure in-memory set computation — if it hasn't returned
-    // in 10s something is wrong (cold `dart` toolchain start at worst), so
-    // stop waiting rather than leave the About panel open indefinitely.
+    // The count itself is a pure in-memory set computation, but `dart run`
+    // must first compile a kernel snapshot on a cold invocation — measured
+    // at ~8.4s on a warm-ish machine, leaving almost no margin under a 10s
+    // cap on a genuinely cold toolchain start (first run after boot, slower
+    // disk/CPU). 25s keeps the "stop waiting eventually" guarantee without
+    // false-negativing on legitimate cold starts.
     const timeout = setTimeout(() => {
       try { child.kill(); } catch { /* best-effort */ }
       finish(null);
-    }, 10_000);
+    }, 25_000);
 
     child.stdout?.on('data', (chunk: Buffer) => { stdout += chunk.toString(); });
     child.on('error', () => { clearTimeout(timeout); finish(null); });
