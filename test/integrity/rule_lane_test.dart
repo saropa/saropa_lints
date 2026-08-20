@@ -63,7 +63,9 @@ Map<String, String> _indexRuleSources() {
 /// the next top-level `class`/`mixin`/`extension`, so one rule's element usage
 /// is not blamed on its neighbor in the same file.
 String? _classBody(String source, String className) {
-  final start = source.indexOf(RegExp('^class\\s+$className\\s', multiLine: true));
+  final start = source.indexOf(
+    RegExp('^class\\s+$className\\s', multiLine: true),
+  );
   if (start < 0) return null;
   final rest = source.substring(start);
   final next = RegExp(

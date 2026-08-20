@@ -26,6 +26,7 @@ import {
   openConfig,
   runRepairConfig,
   runSetTier,
+  runSetLane,
   showOutputChannel,
   getSharedOutputChannel,
   TIER_ORDER,
@@ -1870,6 +1871,15 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           delta: postTotal - preTierTotal,
         });
       }
+    }),
+    // Switch between the `light` (default, ~200 error/warning rules in-process)
+    // and `full` (every enabled rule in-process) analysis lanes. See
+    // `lib/src/config/rule_lane.dart` and `plans/PLAN_two_lane_daemon_architecture.md`.
+    // No refreshAll()/status-bar update afterward: a lane change does not alter
+    // which rules are enabled or violations.json, only where they execute — the
+    // command's own notification (via runSetLane) is the complete feedback loop.
+    vscode.commands.registerCommand('saropaLints.setLane', async () => {
+      await runSetLane();
     }),
     // D1/I1: Focus Violations view filtered to a set of rule names.
     // Shared helper — hides all rules EXCEPT the given set and resets orthogonal filters.

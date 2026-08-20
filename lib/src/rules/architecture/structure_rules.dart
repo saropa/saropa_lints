@@ -2,8 +2,7 @@
 
 // FileStat / FileSystemEntityType are needed by the mtime-validated
 // re-export cache in AvoidImportingEntrypointExportsRule.
-import 'dart:io'
-    show File, FileStat, FileSystemEntityType, IOException;
+import 'dart:io' show File, FileStat, FileSystemEntityType, IOException;
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';

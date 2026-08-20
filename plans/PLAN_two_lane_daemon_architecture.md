@@ -11,10 +11,13 @@ compiled VS Code extension does. **Result: light lane adds +0.6% RSS vs
 +77.2% for the full lane. The memory claim is now a measured result, not a
 hypothesis — `light` is now the default lane when the `lane:` key is absent**
 (revised 2026-08-20; see acceptance criterion 1 for the decision history).
-Remaining gap: no lane-picker UI in the extension — users who want `lane:
-full` still set it by hand in `analysis_options.yaml`. Not a blocker for
-15.2.0 since `light` now covers the config-untouched case, but tracked as
-open work below.
+Lane-picker UI landed 2026-08-20 (`saropaLints.setLane` command, mirroring
+the tier-picker QuickPick pattern; sidebar row + command palette entry) —
+see `## Finish Report (2026-08-20)` below. Remaining gap: acceptance
+criteria 2-5 (in-editor squiggle timing, no-duplicate Problems-panel
+entries, daemon-lane-unchanged, full/OFF regression pin) are still only
+unit/integration-tested, never verified in a live VS Code Extension
+Development Host session — tracked as open work below.
 
 Two corrections found during implementation, recorded so they are not
 re-learned:
@@ -242,3 +245,83 @@ everything, exactly as today.
 - `plans/PLAN_scan_only_diagnostics.md` — measured RSS table, lanes 1–3.
 - `.claude/skills/saropa-lints-performance-campaign/` — fences, terminology.
 - `d:\tmp\lane_census.dart` — throwaway census script behind the 200/415 counts.
+
+## Finish Report (2026-08-20)
+
+Adds the extension-side lane-picker command that this plan's "remaining
+gap" section called for. A project's `lane:` setting could previously only
+be changed by hand-editing `analysis_options.yaml`.
+
+**Command**: `saropaLints.setLane` (`extension/src/setup.ts`, `runSetLane`)
+— a QuickPick offering `light`/`full`, decorated with a checkmark and
+"(current)" on the active value, structurally mirroring the existing
+`runSetTier` command (same re-entrancy guard shape, same `getProjectRoot()`
+/ no-workspace-folder guard). On selection it writes the `lane:` key via a
+new pair of functions in `extension/src/config/laneConfig.ts` —
+`readRawLaneFromAnalysisOptionsYaml` and `writeLaneToAnalysisOptionsYaml`
+— then calls the existing `restartDartAnalysisServer()` so the change takes
+effect without a manual reload. The writer reuses the same block-scan
+regexes the reader already used (`SAROPA_BLOCK_HEADER`, `LANE_KEY`), so the
+two can never disagree about where the key lives; it replaces only the
+value token of a live `lane:` line (preserving indentation and any trailing
+comment) or inserts a new line under the block header when only the
+commented documentation line is present, and returns a distinct
+`no-plugin-block` failure (with its own user-facing error message) when the
+project has no `plugins.saropa_lints` block to write into at all.
+
+**Discoverability**: registered in `extension/package.json`'s
+`contributes.commands` (title via `package.nls.json`, same convention as
+neighboring commands) and as a new "Lane" row in the sidebar's Diagnostics
+section (`extension/src/views/configTree.ts`), next to the existing Tier
+row.
+
+**i18n**: every new string added to `extension/src/i18n/locales/en.json`
+under `notify.lane.*` (picker copy, notifications) and
+`dashboards.controls.lane*` (sidebar row). Non-English locale catalogs were
+NOT regenerated — running the translation pipeline requires an explicit,
+in-the-moment request per this session's operating rules, and none was
+given for this change. New strings currently show their English fallback in
+every other locale until a translation pass is explicitly run.
+
+**Tests**: `extension/src/test/config/laneConfig.test.ts` extended with 15
+new cases covering `readRawLaneFromAnalysisOptionsYaml` and
+`writeLaneToAnalysisOptionsYaml` — insert-when-absent, in-place value
+replacement with comment/indentation preservation, block isolation from a
+sibling plugin's `lane:` key, CRLF preservation, and both failure paths
+(`no-plugin-block`, `no-file`). `runSetLane` itself (the QuickPick flow, the
+"already on this lane" short-circuit, the post-write restart call, and the
+`writeFailed` vs `noPluginBlock` branch selection) has no test coverage —
+VS Code QuickPick command-level flows are not covered anywhere else in this
+codebase either (`runSetTier` is in the same state), so this was treated as
+an accepted pattern rather than a new gap, but it means none of that logic
+is regression-pinned.
+
+**Known gaps, not fixed this pass**:
+- A freshly-inserted `lane:` line always uses 2-space indentation
+  (`baseIndent + 2`); a project whose `plugins:` block uses a different
+  indent width would get a visually inconsistent (but still valid) line.
+  Cosmetic, untested either way.
+- `configTree.ts`'s new lane row and the neighboring `buildAnalyzerPluginNode()`
+  each independently call `getProjectRoot()` for the same tree build — a
+  small duplicate in-memory lookup, not a correctness or real performance
+  issue.
+- No live VS Code Extension Development Host session was run to visually
+  confirm the QuickPick or the sidebar row render correctly — verified only
+  via compile (`tsc -p tsconfig.json`, `tsc -p tsconfig.test.json`, both
+  clean) and the unit tests above (25/25 passing in `laneConfig.test.ts`;
+  full config-suite regression run also clean).
+- Acceptance criteria 2–5 from this plan's own measurement section remain
+  unverified in a live editor session (see plan status note above).
+
+**Unrelated, explicitly excluded from this change's commit**: a background
+process (unrelated to this session) had regenerated real translated strings
+across all 25 non-English locale catalogs plus `locale_coverage.json` and
+two `package.nls.<lang>.json` manifests, for keys unrelated to this feature
+(`about.ruleCountStrip`, `tierPicker.ruleCount` — from a prior, separate
+commit). Those files were found staged mid-session, unstaged, and left
+untouched in the working tree pending an explicit decision from the
+maintainer on whether to keep or discard them — they are not part of this
+change and were not authorized as an in-the-moment translation-pipeline
+run. A separate, unrelated dirty file (`plans/known_issues_review.md`, a
+pub.dev package-version-check tracking doc) was likewise found staged and
+excluded — unconnected to any work in this session.

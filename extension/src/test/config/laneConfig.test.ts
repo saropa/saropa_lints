@@ -13,7 +13,12 @@ import * as assert from 'node:assert';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { parseLaneFromPluginBlock, projectConfiguresLightLane } from '../../config/laneConfig';
+import {
+  parseLaneFromPluginBlock,
+  projectConfiguresLightLane,
+  readRawLaneFromAnalysisOptionsYaml,
+  writeLaneToAnalysisOptionsYaml,
+} from '../../config/laneConfig';
 
 function makeWorkspace(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-lane-cfg-'));
@@ -132,5 +137,114 @@ describe('projectConfiguresLightLane', () => {
   it('reads not-light when analysis_options.yaml does not exist', () => {
     const root = makeWorkspace();
     assert.strictEqual(projectConfiguresLightLane(root), false);
+  });
+});
+
+describe('readRawLaneFromAnalysisOptionsYaml', () => {
+  it('returns the raw value when set', () => {
+    const root = makeWorkspace();
+    write(root, 'analysis_options.yaml', 'plugins:\n  saropa_lints:\n    lane: full\n');
+    assert.strictEqual(readRawLaneFromAnalysisOptionsYaml(root), 'full');
+  });
+
+  it('returns undefined when absent', () => {
+    const root = makeWorkspace();
+    write(root, 'analysis_options.yaml', 'plugins:\n  saropa_lints:\n    version: "1.0.0"\n');
+    assert.strictEqual(readRawLaneFromAnalysisOptionsYaml(root), undefined);
+  });
+
+  it('returns undefined when the file does not exist', () => {
+    const root = makeWorkspace();
+    assert.strictEqual(readRawLaneFromAnalysisOptionsYaml(root), undefined);
+  });
+});
+
+describe('writeLaneToAnalysisOptionsYaml', () => {
+  // Covers the lane-picker command's write path (`runSetLane` in setup.ts):
+  // the picker only ever calls this with a live plugin block already on disk.
+  it('inserts a live lane line under the block header when only the commented documentation line ships', () => {
+    const root = makeWorkspace();
+    write(
+      root,
+      'analysis_options.yaml',
+      ['plugins:', '  saropa_lints:', '    version: "1.0.0"', '    # lane: light # full | light (default when absent: light)', ''].join('\n'),
+    );
+    const result = writeLaneToAnalysisOptionsYaml(root, 'full');
+    assert.deepStrictEqual(result, { ok: true });
+    const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf-8');
+    assert.strictEqual(parseLaneFromPluginBlock(content), 'full');
+    // The commented documentation line must survive untouched — only a NEW
+    // live line is added, the comment is not overwritten or removed.
+    assert.ok(content.includes('# lane: light # full | light (default when absent: light)'));
+  });
+
+  it('replaces only the value token of an existing live lane line, preserving indentation and a trailing comment', () => {
+    const root = makeWorkspace();
+    write(root, 'analysis_options.yaml', ['plugins:', '  saropa_lints:', '    lane: light # why', ''].join('\n'));
+    const result = writeLaneToAnalysisOptionsYaml(root, 'full');
+    assert.deepStrictEqual(result, { ok: true });
+    const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf-8');
+    assert.strictEqual(parseLaneFromPluginBlock(content), 'full');
+    // Trailing comment must survive the flip — the writer replaces only the
+    // value token, not the whole line, so a user's own annotation is kept.
+    assert.ok(content.includes('lane: full # why'));
+  });
+
+  it('does not disturb sibling keys in the same block or a later, unrelated plugin block', () => {
+    const root = makeWorkspace();
+    write(
+      root,
+      'analysis_options.yaml',
+      [
+        'plugins:',
+        '  saropa_lints:',
+        '    version: "1.0.0"',
+        '    log_level: info',
+        '  other_plugin:',
+        '    lane: light',
+        '',
+      ].join('\n'),
+    );
+    const result = writeLaneToAnalysisOptionsYaml(root, 'full');
+    assert.deepStrictEqual(result, { ok: true });
+    const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf-8');
+    assert.strictEqual(parseLaneFromPluginBlock(content), 'full');
+    assert.ok(content.includes('version: "1.0.0"'));
+    assert.ok(content.includes('log_level: info'));
+    // The OTHER plugin's own `lane: light` must be untouched — only
+    // saropa_lints's block was in scope for the write.
+    assert.ok(content.includes('  other_plugin:\n    lane: light'));
+  });
+
+  it('preserves CRLF line endings when the source file uses them', () => {
+    const root = makeWorkspace();
+    write(root, 'analysis_options.yaml', 'plugins:\r\n  saropa_lints:\r\n    lane: light\r\n');
+    const result = writeLaneToAnalysisOptionsYaml(root, 'full');
+    assert.deepStrictEqual(result, { ok: true });
+    const content = fs.readFileSync(path.join(root, 'analysis_options.yaml'), 'utf-8');
+    assert.ok(content.includes('\r\n'));
+    assert.ok(!/[^\r]\n/.test(content), 'expected every newline to be preceded by \\r');
+  });
+
+  it('returns no-plugin-block when analysis_options.yaml has no saropa_lints block', () => {
+    const root = makeWorkspace();
+    write(root, 'analysis_options.yaml', 'analyzer:\n  strong-mode: true\n');
+    const result = writeLaneToAnalysisOptionsYaml(root, 'light');
+    assert.deepStrictEqual(result, { ok: false, reason: 'no-plugin-block' });
+  });
+
+  it('returns no-file when analysis_options.yaml does not exist', () => {
+    const root = makeWorkspace();
+    const result = writeLaneToAnalysisOptionsYaml(root, 'light');
+    assert.deepStrictEqual(result, { ok: false, reason: 'no-file' });
+  });
+
+  it('round-trips through readRawLaneFromAnalysisOptionsYaml', () => {
+    const root = makeWorkspace();
+    write(root, 'analysis_options.yaml', 'plugins:\n  saropa_lints:\n    version: "1.0.0"\n');
+    writeLaneToAnalysisOptionsYaml(root, 'full');
+    assert.strictEqual(readRawLaneFromAnalysisOptionsYaml(root), 'full');
+    writeLaneToAnalysisOptionsYaml(root, 'light');
+    assert.strictEqual(readRawLaneFromAnalysisOptionsYaml(root), 'light');
   });
 });

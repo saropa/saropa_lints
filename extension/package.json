@@ -359,6 +359,10 @@
         "title": "%command.setTier.title%"
       },
       {
+        "command": "saropaLints.setLane",
+        "title": "%command.setLane.title%"
+      },
+      {
         "command": "saropaLints.showOutput",
         "title": "%command.showOutput.title%"
       },

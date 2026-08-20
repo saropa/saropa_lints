@@ -89,7 +89,9 @@ String generatePluginsYaml({
   // for `full`) — the comment documents that explicitly so a user reading the
   // generated file is not misled by the commented-out value.
   // See plans/PLAN_two_lane_daemon_architecture.md.
-  buffer.writeln('    # lane: light # full | light (default when absent: light)');
+  buffer.writeln(
+    '    # lane: light # full | light (default when absent: light)',
+  );
   buffer.writeln(
     '    # `light` runs ONLY error/warning rules that need no type resolution',
   );

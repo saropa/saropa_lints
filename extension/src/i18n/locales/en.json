@@ -197,6 +197,9 @@
       "analyzerPluginDisabled": "Off — scan-on-save only",
       "analyzerPluginAbsent": "Not configured",
       "tierState": "Tier: {tier}",
+      "lane": "Lane",
+      "laneLight": "Light — ~200 rules in-editor, rest on save",
+      "laneFull": "Full — every enabled rule in-editor",
       "runAfterConfigState": "Run analysis after config change: {state}",
       "runAfterDependencyState": "Run analysis after dependency change: {state}",
       "uiLanguageState": "UI language: {language}",
@@ -1853,6 +1856,20 @@
       "progressConfigWrite": "Writing config… ({elapsed}s)",
       "progressAnalysis": "Running analysis… ({elapsed}s)",
       "progressBaseline": "Running baseline scan… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Set Analysis Lane",
+      "pickerPlaceholder": "Current: {lane}",
+      "lightLabel": "Light (default)",
+      "lightDescription": "Only ~200 error/warning rules run in-editor",
+      "lightDetail": "Everything else arrives a few seconds later, on save, via the scan daemon. Near-baseline memory: +0.6% RSS measured on a large project. Recommended for most projects.",
+      "fullLabel": "Full",
+      "fullDescription": "Every enabled rule runs in-editor",
+      "fullDetail": "The historical behavior. Higher memory cost: +77% RSS measured on the same project. Choose this only if you have verified your project can afford the footprint.",
+      "alreadyOnLane": "Already on the {lane} lane.",
+      "updated": "Analysis lane set to {lane}. Restarting the Dart analysis server to apply it.",
+      "noPluginBlock": "Saropa Lints: could not set the analysis lane — the analyzer plugin block was not found in analysis_options.yaml. Enable the in-process plugin first.",
+      "writeFailed": "Saropa Lints: failed to write the analysis lane. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints is on, but in-editor diagnostics are off: the analyzer plugin was turned off from this extension and never restored, so issues only appear after a scan. Restore live in-editor diagnostics, or keep scan-on-save only?",

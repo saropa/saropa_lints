@@ -88,6 +88,7 @@ Rule execution is roughly twice as fast, and the analysis server now reports the
 - (Extension) The About Saropa Lints panel now shows a live rule-count strip (total plus per-tier breakdown) fetched from the new `rule_count` CLI when a project is open, replacing the static number previously baked into the panel's markdown copy. No action required.
 - (Extension) The Manage Rule Packs tier picker now shows each tier's live rule count next to its name (e.g. "essential 331 rules"), fetched once per panel open from the same `rule_count` CLI. No action required.
 - (Extension) On-save scans now skip the rules the in-process plugin already reports when a project runs `lane: light`, so a finding is not listed twice in the Problems panel; the skip applies only while the plugin is verifiably reporting, so nothing is hidden if it is off or silent. No action required.
+- (Extension) New "Saropa Lints: Set Analysis Lane" command (command palette, or the sidebar's Lane row) switches between `light` and `full` in-process analysis without hand-editing `analysis_options.yaml`. Picking a lane restarts the Dart analysis server so the change takes effect immediately.
 
 <details>
 <summary>Maintenance</summary>

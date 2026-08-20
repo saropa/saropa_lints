@@ -51,7 +51,12 @@ void main() {
       final off = parseScanArgs(<String>['.']);
       expect((off as ScanParseOk).args.profile, isFalse);
 
-      final on = parseScanArgs(<String>['.', '--profile', '--tier', 'essential']);
+      final on = parseScanArgs(<String>[
+        '.',
+        '--profile',
+        '--tier',
+        'essential',
+      ]);
       expect(on, isA<ScanParseOk>());
       expect((on as ScanParseOk).args.profile, isTrue);
       expect((on).args.tier, 'essential');
@@ -61,7 +66,12 @@ void main() {
       final off = parseScanArgs(<String>['.']);
       expect((off as ScanParseOk).args.excludeLightLane, isFalse);
 
-      final on = parseScanArgs(<String>['.', '--exclude-light-lane', '--tier', 'essential']);
+      final on = parseScanArgs(<String>[
+        '.',
+        '--exclude-light-lane',
+        '--tier',
+        'essential',
+      ]);
       expect(on, isA<ScanParseOk>());
       expect((on as ScanParseOk).args.excludeLightLane, isTrue);
       expect((on).args.tier, 'essential');

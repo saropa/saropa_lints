@@ -13,6 +13,7 @@ import { getProjectRoot } from '../projectRoot';
 import { formatLanguageChoiceLabel } from '../i18n/languagePick';
 import { l10n } from '../i18n/runtime';
 import { getPluginsIntegrationState } from '../setup';
+import { readRawLaneFromAnalysisOptionsYaml } from '../config/laneConfig';
 import { getViolationsTriageState, readViolations } from '../violationsReader';
 import {
   type ConfigTreeNode,
@@ -118,6 +119,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     const cfg = vscode.workspace.getConfiguration('saropaLints');
     const enabled = cfg.get<boolean>('enabled', true) ?? true;
     const tier = cfg.get<string>('tier', 'recommended') ?? 'recommended';
+    const root = getProjectRoot();
     return [
       setting('Lint integration', enabled ? 'On' : 'Off', enabled ? 'saropaLints.disable' : 'saropaLints.enable'),
       // The in-process analyzer plugin is a SEPARATE subsystem from the row
@@ -133,7 +135,30 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
       // used to launch (`saropaLints.setTier`). Users get the full context of
       // each option instead of guessing from a one-line label.
       setting('Tier', tier, 'saropaLints.openConfigDashboard'),
+      // Lane click → the light/full QuickPick (`saropaLints.setLane`), not the
+      // dashboard: unlike Tier's 5-way segmented control, this is a plain
+      // binary switch with no rule list to browse, so a QuickPick with two
+      // detailed items is the right amount of UI — same reasoning that used to
+      // apply to Tier before it grew a dedicated dashboard section.
+      ...this.buildLaneNode(root),
     ];
+  }
+
+  /**
+   * Row reporting the configured analysis lane (`plugins.saropa_lints.lane`
+   * in analysis_options.yaml). Omitted with no project root, mirroring
+   * {@link buildAnalyzerPluginNode} — there is no yaml to describe.
+   */
+  private buildLaneNode(root: string | undefined): ConfigTreeNode[] {
+    if (!root) return [];
+    // Absent/unrecognized reads as 'light' — matches the Dart-side default
+    // (RuleLane.light) so the sidebar agrees with what the in-process plugin
+    // is actually doing when the key was never written.
+    const raw = readRawLaneFromAnalysisOptionsYaml(root);
+    const lane = raw === 'full' ? 'full' : 'light';
+    const description =
+      lane === 'full' ? l10n('dashboards.controls.laneFull') : l10n('dashboards.controls.laneLight');
+    return [setting(l10n('dashboards.controls.lane'), description, 'saropaLints.setLane')];
   }
 
   /** Run-after-config, UI language, detected packages. */

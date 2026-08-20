@@ -13,6 +13,11 @@ import { readViolations } from './violationsReader';
 import { readInstalledVersion } from './upgrade-checker';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
 import { readTierFromAnalysisOptionsYaml } from './config/tierConfig';
+import {
+  readRawLaneFromAnalysisOptionsYaml,
+  writeLaneToAnalysisOptionsYaml,
+  type RuleLaneValue,
+} from './config/laneConfig';
 import { l10n } from './i18n/runtime';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
@@ -2036,6 +2041,118 @@ async function runSetTierExclusive(context: vscode.ExtensionContext): Promise<Ti
     await vscode.workspace.getConfiguration('saropaLints').update('tier', previousTier, vscode.ConfigurationTarget.Workspace);
   }
   return ok ? { tier, tierLabel: tierLabel(tier), previousTier } : null;
+}
+
+/**
+ * Lane picker copy, built fresh on each call (unlike `TIER_INFO`, which is a
+ * static hardcoded array) so `l10n()` resolves against the locale active at
+ * invocation time rather than whatever was active when `setup.ts` was first
+ * imported at extension activation.
+ */
+function laneInfo(): ReadonlyArray<{ id: RuleLaneValue; label: string; description: string; detail: string }> {
+  return [
+    {
+      id: 'light',
+      label: l10n('notify.lane.lightLabel'),
+      description: l10n('notify.lane.lightDescription'),
+      detail: l10n('notify.lane.lightDetail'),
+    },
+    {
+      id: 'full',
+      label: l10n('notify.lane.fullLabel'),
+      description: l10n('notify.lane.fullDescription'),
+      detail: l10n('notify.lane.fullDetail'),
+    },
+  ];
+}
+
+/** Look up the picker label for a lane id, falling back to the raw id for an unrecognized value. */
+function laneLabel(id: string): string {
+  return laneInfo().find((l) => l.id === id)?.label ?? id;
+}
+
+// One in-flight lane change at a time, mirroring `_tierChangeInFlight` — the
+// command is reachable from both the command palette and (once wired) the
+// Config Dashboard toolbar, and two concurrent runs would race on the same
+// analysis_options.yaml write.
+let _laneChangeInFlight: Promise<void> | undefined;
+
+/**
+ * Show a QuickPick to switch between the `light` and `full` in-process
+ * analysis lanes (`plugins.saropa_lints.lane` in `analysis_options.yaml`; see
+ * `lib/src/config/rule_lane.dart` and `plans/PLAN_two_lane_daemon_architecture.md`).
+ *
+ * Deliberately lighter-weight than {@link runSetTier}: a lane change is a
+ * single scalar write (`writeLaneToAnalysisOptionsYaml`), not a ~2000-rule
+ * regeneration, so there is no child-process CLI call and no progress bar —
+ * just the write plus an analysis-server restart so the new lane actually
+ * takes effect (see `restartDartAnalysisServer`'s comment for why editing the
+ * yaml alone is not enough).
+ */
+export async function runSetLane(): Promise<void> {
+  if (_laneChangeInFlight) return _laneChangeInFlight;
+  const run = runSetLaneExclusive().finally(() => {
+    _laneChangeInFlight = undefined;
+  });
+  _laneChangeInFlight = run;
+  return run;
+}
+
+async function runSetLaneExclusive(): Promise<void> {
+  const root = getProjectRoot();
+  if (!root) {
+    vscode.window.showErrorMessage(l10n('notify.setup.noWorkspaceFolder'));
+    return;
+  }
+
+  // Absent/unrecognized reads as 'light' — matches the Dart-side default
+  // (RuleLane.light) so the picker's "current" marker agrees with what the
+  // in-process plugin is actually doing when the key was never written.
+  const rawCurrent = readRawLaneFromAnalysisOptionsYaml(root);
+  const previousLane: RuleLaneValue = rawCurrent === 'full' ? 'full' : 'light';
+
+  interface LanePickItem extends vscode.QuickPickItem {
+    id: RuleLaneValue;
+  }
+  const items: LanePickItem[] = laneInfo().map((entry) => ({
+    label: entry.id === previousLane ? `$(check) ${entry.label}` : entry.label,
+    description: entry.id === previousLane ? `${entry.description} (current)` : entry.description,
+    detail: entry.detail,
+    id: entry.id,
+  }));
+
+  const pick = await vscode.window.showQuickPick(items, {
+    placeHolder: l10n('notify.lane.pickerPlaceholder', { lane: laneLabel(previousLane) }),
+    title: l10n('notify.lane.pickerTitle'),
+  });
+  if (!pick) return;
+  const lane = pick.id;
+
+  if (lane === previousLane) {
+    void vscode.window.showInformationMessage(l10n('notify.lane.alreadyOnLane', { lane: laneLabel(lane) }));
+    return;
+  }
+
+  const result = writeLaneToAnalysisOptionsYaml(root, lane);
+  if (!result.ok) {
+    // 'no-file' / 'no-plugin-block' both mean the analyzer plugin was never
+    // configured (or was disabled and commented out) — writing a lane into a
+    // nonexistent block would create a dangling key nothing reads, so this
+    // points the user at enabling the plugin first instead of guessing at a
+    // block to synthesize.
+    const message =
+      result.reason === 'write-error'
+        ? l10n('notify.lane.writeFailed', { message: result.message ?? '' })
+        : l10n('notify.lane.noPluginBlock');
+    vscode.window.showErrorMessage(message);
+    return;
+  }
+
+  // The write only changes what the analysis server loads on its NEXT start —
+  // restart it now so the lane actually takes effect, same rationale as
+  // `restartDartAnalysisServer`'s call site in `runDisable`.
+  await restartDartAnalysisServer();
+  vscode.window.showInformationMessage(l10n('notify.lane.updated', { lane: laneLabel(lane) }));
 }
 
 export function showOutputChannel(): void {
