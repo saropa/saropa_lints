@@ -62,6 +62,7 @@
   "command.refresh.title": "Refreshing dan menyegarkan.",
   "command.repairConfig.title": "Saropa Lints: Opsi Analisis Perbaikan dan Analisis.",
   "command.setTier.title": "Saropa Lints: Tingkat Tetap Set Tier",
+  "command.setLane.title": "Saropa Lints: Analisis Jalur Set",
   "command.showOutput.title": "Saropa Lints: Tampilkan Output Keluaran",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: Tampilkan Telemetri Aturan Terkait.",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: Reset Terkait Telemetri Aturan.",

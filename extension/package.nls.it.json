@@ -62,6 +62,7 @@
   "command.refresh.title": "Rinfrescare e rinfrescare.",
   "command.repairConfig.title": "Saropa Lints: Opzioni di Analisi della Riparazione delle Opzioni.",
   "command.setTier.title": "Saropa Lints: Set Tier Tier (Tier fissato)",
+  "command.setLane.title": "Saropa Lints: Analisi Set Lane",
   "command.showOutput.title": "Saropa Lints: Mostra l'output di uscita.",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: Mostra la regola di telemetria relativa alla regola.",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: Reset Related Rule Telemetry (Rimetti le regole di telemetria correlate).",

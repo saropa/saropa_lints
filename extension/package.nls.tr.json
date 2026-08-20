@@ -62,6 +62,7 @@
   "command.refresh.title": "Rahatlatıcı ve rahatlatıcı olsun.",
   "command.repairConfig.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Onarım Analiz Seçenekler Düzeltme.",
   "command.setTier.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Set Tier Tier Değerlendirme Seti",
+  "command.setLane.title": "Saropa Lints: Analiz Yolu Belirle",
   "command.showOutput.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Show Output Output'u gösterin",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Göster Bağlı Kural Telemetri İlişkileri Gösterelim.",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Yeniden ayarlama İlgili kural telemetri.",

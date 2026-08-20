@@ -62,6 +62,7 @@
   "command.refresh.title": "爽やかにリフレッシュする.",
   "command.repairConfig.title": "Saropa Lints: 修理分析 オプション",
   "command.setTier.title": "Saropa Lints: 設定レベル",
+  "command.setLane.title": "Saropa Lints: アナリシスレーンの設定",
   "command.showOutput.title": "Saropa Lints: 輸出を表示する",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: 関連ルールテレメトリを表示する",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: 関連ルールテレメトリをリセットする",

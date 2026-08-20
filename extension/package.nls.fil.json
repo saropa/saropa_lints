@@ -62,6 +62,7 @@
   "command.refresh.title": "Magpahinga at mag-refresh.",
   "command.repairConfig.title": "Saropa Lints: Kumpunihin ang Analysis Options",
   "command.setTier.title": "Saropa Lints: Itinakda ang Tier na Tuntunin.",
+  "command.setLane.title": "Saropa Lints: Itakda ang Analysis Lane",
   "command.showOutput.title": "Saropa Lints: Ipakita ang Output ng output.",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: Ipakita ang Related Rule Telemetry",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: I-reset ang may kaugnayan na panuntunan sa telemetrya ng telemetry.",

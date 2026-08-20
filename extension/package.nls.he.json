@@ -62,6 +62,7 @@
   "command.refresh.title": "מרענן ומקפיא",
   "command.repairConfig.title": "Saropa Lints: תיקון ניתוח אפשרויות אופציות.",
   "command.setTier.title": "Saropa Lints: רמת הנקודה המוגדרת",
+  "command.setLane.title": "Saropa Lints: הגדרת ניתוח מסלול",
   "command.showOutput.title": "Saropa Lints: להראות פלט מוציא",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: הצגת טלמטריית כללים קשורים",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: Reset קשור כלל טלמטריה.",

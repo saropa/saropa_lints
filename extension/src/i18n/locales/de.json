@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "{total} Lint-Regeln sind in dieser Version enthalten (essentiell {essential} · empfohlen {recommended} · professionell {professional} · umfassend {comprehensive} · pedantisch {pedantic} · {stylistic} opt-in stylistisch)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Scan bei Speicherung",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart und Flutter Version-Upgrade Regeln, die APIs markieren, die in einem bestimmten SDK entfernt oder veraltet wurden."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} Regeln"
+  },
   "consolidated": {
     "kicker": "Sicherheit · Qualität · Sicherheit",
     "searchPlaceholder": "Filterregeln ... Regeln für die Filter.",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Aus — nur beim Speichern scannen",
       "analyzerPluginAbsent": "Nicht konfiguriert",
       "tierState": "Tier: Die Ebene, auf der sich die Unternehmen befinden. {tier} ist ein _PH0_.",
+      "lane": "Spur",
+      "laneLight": "Light — ~200 Regeln in-editor, rest bei Speichern",
+      "laneFull": "Vollständig — jede aktivierte Regel im Editor",
       "runAfterConfigState": "Führen Sie die Analyse nach der Konfigurationsänderung aus: {state} ist ein _PH0_.",
       "runAfterDependencyState": "Laufen Sie die Analyse nach der Abhängigkeitsänderung durch: {state} ist ein _PH0_.",
       "uiLanguageState": "Benutzeroberflächensprache: Sprache der Benutzerausrichtung {language} ist ein _PH0_.",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Konfiguration schreiben… ({elapsed}s)",
       "progressAnalysis": "Analyse läuft… ({elapsed}s)",
       "progressBaseline": "Baseline-Scan läuft… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Analyse der Analyse-Spur",
+      "pickerPlaceholder": "Aktuell: {lane}",
+      "lightLabel": "Hell (Standard)",
+      "lightDescription": "Nur ~200 Fehler/Warnungsregeln laufen im Editor",
+      "lightDetail": "Alles andere kommt ein paar Sekunden später, beim Speichern, über den Scan-Deamon. Nahe Basis-Heap: +0,6 % RSS gemessen an einem großen Projekt. Empfohlen für die meisten Projekte.",
+      "fullLabel": "Vollständig",
+      "fullDescription": "Jede aktivierte Regel läuft im Editor",
+      "fullDetail": "Die historische Verhaltensweise. Höherer Speicherkosten: +77% RSS gemessen am selben Projekt. Wählen Sie dies nur, wenn Sie überprüft haben, dass Ihr Projekt den Fußabdruck tragen kann.",
+      "alreadyOnLane": "Bereits auf der {lane} Spur.",
+      "updated": "Analyse-Spur auf {lane} eingestellt. Das Dart Analyse-Server wird neu gestartet, um dies anzuwenden.",
+      "noPluginBlock": "Saropa Lints: Die Analyse-Spur konnte nicht festgelegt werden – der Analyzer-Plugin-Block wurde nicht in analysis_options.yaml gefunden. Aktivieren Sie zuerst das in-Prozess-Plugin.",
+      "writeFailed": "Saropa Lints: Fehler beim Schreiben der Analyse-Spur. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints ist eingeschaltet, aber die in-editor Diagnose ist aus: der Analyzer-Plugin wurde von dieser Erweiterung deaktiviert und wurde nie wiederhergestellt, daher werden Probleme nur nach einer Scan-Operation angezeigt. Die live in-editor Diagnose wiederherstellen oder nur Scan-on-Save beibehalten?",

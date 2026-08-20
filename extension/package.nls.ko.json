@@ -62,6 +62,7 @@
   "command.refresh.title": "신선하고 상쾌한 느낌을 줍니다.",
   "command.repairConfig.title": "Saropa Lints: 수리 분석 옵션",
   "command.setTier.title": "Saropa Lints: 설정 레벨",
+  "command.setLane.title": "Saropa Lints: 분석 라인 설정",
   "command.showOutput.title": "Saropa Lints: 출력 표시",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: 관련 규칙 텔레메트리를 표시하십시오.",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: 관계 규칙 원격 측정 재설정",

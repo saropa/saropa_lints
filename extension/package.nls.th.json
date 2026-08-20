@@ -62,6 +62,7 @@
   "command.refresh.title": "สะดวกสบาย Refresh",
   "command.repairConfig.title": "Saropa Lints: การซ่อมแซม วิเคราะห์ตัวเลือกการวิเคราะห",
   "command.setTier.title": "Saropa Lints: เต็ทเทียร์ระดับที่กําหนด",
+  "command.setLane.title": "Saropa Lints: ตั้งค่าช่องทางการวิเคราะห์",
   "command.showOutput.title": "Saropa Lints: แสดงผลิตออก",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: แสดง กฎที่เกี่ยวข้อง Telemetry",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: การตั้งค่าใหม่ที่เกี่ยวข้องกับกฎ Telemetry",

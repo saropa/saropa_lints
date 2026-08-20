@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "Quy tắc lint {total} hiện đang được cung cấp trong phiên bản này (cơ bản {essential} · khuyến nghị {recommended} · chuyên nghiệp {professional} · toàn diện {comprehensive} · cầu kỳ {pedantic} · {stylistic} tùy chọn phong cách)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Quét khi Lưu",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart và Flutter quy tắc nâng cấp phiên bản mà API cờ đã được loại bỏ hoặc không còn sử dụng trong một SDK nhất định."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} quy tắc"
+  },
   "consolidated": {
     "kicker": "An ninh · Chất lượng",
     "searchPlaceholder": "Quy tắc lọc... quy tắc lọc.",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Tắt — quét khi lưu chỉ",
       "analyzerPluginAbsent": "Chưa được cấu hình",
       "tierState": "Tier: cấp bậc nhất. {tier} là Phương pháp",
+      "lane": "Ngõ",
+      "laneLight": "Light — ~200 quy tắc trong trình soạn thảo, còn lại khi lưu",
+      "laneFull": "Hoàn chỉnh — mọi quy tắc đã kích hoạt trong trình soạn thảo",
       "runAfterConfigState": "Chạy phân tích sau khi thay đổi cấu hình: {state} là Phương pháp",
       "runAfterDependencyState": "Chạy phân tích sau khi thay đổi phụ thuộc: {state} là Phương pháp",
       "uiLanguageState": "Ngôn ngữ giao diện người dùng: UI language {language} là Phương pháp",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Viết config… ({elapsed}s)",
       "progressAnalysis": "Đang phân tích... ({elapsed}s)",
       "progressBaseline": "Đang chạy quét cơ sở... ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Thiết lập Phân tích Lane",
+      "pickerPlaceholder": "Hiện tại: {lane}",
+      "lightLabel": "Ánh sáng (mặc định)",
+      "lightDescription": "Chỉ có ~200 quy tắc lỗi/cảnh báo chạy trong trình soạn thảo",
+      "lightDetail": "Tất cả những thứ khác sẽ đến vài giây sau đó, khi lưu, thông qua daemon quét. Bộ nhớ gần mức cơ bản: +0.6% RSS được đo trên một dự án lớn. Khuyến nghị cho hầu hết các dự án.",
+      "fullLabel": "Toàn bộ",
+      "fullDescription": "Mỗi quy tắc được kích hoạt sẽ chạy trong trình soạn thảo",
+      "fullDetail": "Hành vi lịch sử. Chi phí bộ nhớ cao hơn: +77% RSS được đo trên cùng một dự án. Chỉ chọn lựa này nếu bạn đã xác minh dự án của bạn có thể chịu được mức sử dụng này.",
+      "alreadyOnLane": "Đã ở làn {lane}.",
+      "updated": "Làn đường phân tích được đặt thành {lane}. Khởi động lại máy chủ phân tích Dart để áp dụng nó.",
+      "noPluginBlock": "Saropa Lints: không thể thiết lập đường phân tích — plugin phân tích không được tìm thấy trong analysis_options.yaml. Vui lòng kích hoạt plugin trong quá trình xử lý trước.",
+      "writeFailed": "Saropa Lints: thất bại khi ghi phân tích kênh. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints đã được bật, nhưng thông báo trong trình soạn thảo đang bị tắt: plugin phân tích đã bị tắt từ tiện ích này và chưa bao giờ được khôi phục, do đó các vấn đề chỉ xuất hiện sau khi quét. Khôi phục thông báo trong trình soạn thảo trực tiếp, hay chỉ giữ lại quét khi lưu?",

@@ -62,6 +62,7 @@
   "command.refresh.title": "Thức mới và làm mới",
   "command.repairConfig.title": "Saropa Lints: là người có thể Sửa chữa Phân tích Lựa chọn phân tích",
   "command.setTier.title": "Saropa Lints: là người có thể Đặt mức độ cơ bản",
+  "command.setLane.title": "Saropa Lints: Thiết lập Phân tích Lane",
   "command.showOutput.title": "Saropa Lints: là người có thể Show Output: Hiển thị đầu ra",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: là người có thể Show Related Rule Telemetry (Xem quy tắc liên quan, đo từ xa)",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: là người có thể Reset Related Rule Telemetry (Đặt lại quy tắc liên quan)",

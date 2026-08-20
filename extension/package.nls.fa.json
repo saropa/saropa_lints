@@ -62,6 +62,7 @@
   "command.refresh.title": "به راحتی و با آرامش استراحت کنید.",
   "command.repairConfig.title": "Saropa Lints: تعمیر گزینه‌های تحلیل",
   "command.setTier.title": "Saropa Lints: تنظیم سطح",
+  "command.setLane.title": "Saropa Lints: تنظیم خط تحلیل",
   "command.showOutput.title": "Saropa Lints: نمایش خروجی",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: نمایش تله‌متری قوانین مرتبط",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: تنظیم مجدد کنترل از راه دور قواعد مرتبط",

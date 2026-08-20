@@ -62,6 +62,7 @@
   "command.refresh.title": "Відсвіжіть, освіждайте.",
   "command.repairConfig.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Ремонт Аналіз Варианти варіантів",
   "command.setTier.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Складіть базовий капітал",
+  "command.setLane.title": "Saropa Lints: Встановити аналіз ланки",
   "command.showOutput.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Показати вихідну продукцію.",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Показати пов'язані правила телеметрії.",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Рестатування пов'язаних правил телеметрії.",

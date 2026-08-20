@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "Aturan lint {total} saat ini tersedia dalam versi ini (esensial {essential} · direkomendasikan {recommended} · profesional {professional} · komprehensif {comprehensive} · pedantik {pedantic} · {stylistic} opt-in stilistis)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Scan saat Disimpan",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart dan Flutter aturan upgrade versi yang ditandai API dihapus atau usang dalam SDK tertentu."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} aturan"
+  },
   "consolidated": {
     "kicker": "Keamanan · Kualitas · Keselamatan",
     "searchPlaceholder": "Aturan filter... aturan penyaringan.",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Off — scan-on-save hanya",
       "analyzerPluginAbsent": "Belum dikonfigurasi",
       "tierState": "Tier: Tingkat yang lebih rendah. {tier} adalah",
+      "lane": "Jalur",
+      "laneLight": "Light — ~200 aturan dalam editor, sisanya saat menyimpan",
+      "laneFull": "Lengkap — setiap aturan yang diaktifkan dalam editor",
       "runAfterConfigState": "Jalankan analisis setelah perubahan konfigurasi: {state} adalah",
       "runAfterDependencyState": "Jalankan analisis setelah perubahan ketergantungan: {state} adalah",
       "uiLanguageState": "Bahasa UI: bahasa yang digunakan. {language} adalah",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Menulis konfigurasi… ({elapsed}s)",
       "progressAnalysis": "Analisis sedang berjalan… ({elapsed}s)",
       "progressBaseline": "Melakukan pemindaian dasar… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Analisis Jalur Set",
+      "pickerPlaceholder": "Saat ini: {lane}",
+      "lightLabel": "Ringan (default)",
+      "lightDescription": "Hanya ~200 aturan error/peringatan yang berjalan di dalam editor",
+      "lightDetail": "Segala hal lain tiba beberapa detik kemudian, saat menyimpan, melalui daemon scan. Penggunaan memori mendekati baseline: +0.6% RSS diukur pada proyek besar. Direkomendasikan untuk sebagian besar proyek.",
+      "fullLabel": "Lengkap",
+      "fullDescription": "Setiap aturan yang diaktifkan berjalan di dalam editor",
+      "fullDetail": "Perilaku sejarah. Biaya memori yang lebih tinggi: +77% RSS diukur pada proyek yang sama. Pilih ini hanya jika Anda sudah memverifikasi proyek Anda dapat memenuhi kebutuhan memori.",
+      "alreadyOnLane": "Sudah berada di lane {lane}.",
+      "updated": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Analysis lane set to {lane}. Restarting the Dart analysis server to apply it.",
+      "noPluginBlock": "Saropa Lints: tidak dapat menetapkan jalur analisis — plugin analisis tidak ditemukan dalam analysis_options.yaml. Aktifkan terlebih dahulu plugin dalam proses.",
+      "writeFailed": "Saropa Lints: gagal menulis jalur analisis. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints aktif, tetapi diagnosa dalam editor dimatikan: plugin analyzer telah dimatikan dari ekstensi ini dan tidak pernah dipulihkan, sehingga masalah hanya muncul setelah pemindaian. Pulihkan diagnosa dalam editor secara real-time, atau tetap hanya memindai saat menyimpan?",

@@ -16,13 +16,13 @@ _None._
 
 - **`agora_rtc_engine`** (end_of_life) — recorded `2025-09-16`, pub.dev latest `2026-04-14` (v6.6.3). [pub.dev](https://pub.dev/packages/agora_rtc_engine)
   - Current reason: Agora officially retired these SDK versions; calls will not connect.
-- **`animations`** (caution) — recorded `2025-11-14`, pub.dev latest `2026-04-23` (v2.2.0). [pub.dev](https://pub.dev/packages/animations)
+- **`animations`** (caution) — recorded `2025-11-14`, pub.dev latest `2026-08-19` (v3.0.0). [pub.dev](https://pub.dev/packages/animations)
   - Current reason: Pre-Material 3 transition API; may lack predictive back gesture support.
 - **`audioplayers`** (end_of_life) — recorded `2026-03-01`, pub.dev latest `2026-06-27` (v6.8.1). [pub.dev](https://pub.dev/packages/audioplayers)
   - Current reason: Fails on Apple Silicon builds.
 - **`badges`** (end_of_life) — recorded `2023-08-28`, pub.dev latest `2026-04-10` (v3.2.0). [pub.dev](https://pub.dev/packages/badges)
   - Current reason: Positioning logic broken; badges render off-screen in Material 3.
-- **`better_player`** (maintenance_mode) — recorded `2024-06-15`, pub.dev latest `2026-08-18` (v0.7.0). [pub.dev](https://pub.dev/packages/better_player)
+- **`better_player`** (maintenance_mode) — recorded `2024-06-15`, pub.dev latest `2026-08-19` (v0.7.1). [pub.dev](https://pub.dev/packages/better_player)
   - Current reason: 
 - **`camera`** (end_of_life) — recorded `2026-02-25`, pub.dev latest `2026-07-13` (v0.12.0+2). [pub.dev](https://pub.dev/packages/camera)
   - Current reason: Fails Android 14 Scoped Storage and iOS 18 hardware manifest requirements.
@@ -78,7 +78,7 @@ _None._
   - Current reason: Stateless animation logic is fundamentally incompatible with Dart 3 type safety.
 - **`syncfusion_flutter_calendar`** (end_of_life) — recorded `2026-03-10`, pub.dev latest `2026-08-18` (v34.2.4). [pub.dev](https://pub.dev/packages/syncfusion_flutter_calendar)
   - Current reason: Legacy commercial package; completely fails Dart 3 type checks.
-- **`workmanager`** (caution) — recorded `2025-08-31`, pub.dev latest `2026-08-19` (v0.10.8). [pub.dev](https://pub.dev/packages/workmanager)
+- **`workmanager`** (caution) — recorded `2025-08-31`, pub.dev latest `2026-08-20` (v0.10.9). [pub.dev](https://pub.dev/packages/workmanager)
   - Current reason: May have compatibility issues with modern Android WorkManager architecture.
 - **`youtube_player_iframe`** (end_of_life) — recorded `2025-08-07`, pub.dev latest `2026-05-30` (v6.0.2). [pub.dev](https://pub.dev/packages/youtube_player_iframe)
   - Current reason: YouTube blocked the old Web API; iframe renders a black screen.

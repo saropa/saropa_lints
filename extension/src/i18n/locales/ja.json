@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "現在のバージョンで提供されている{total} lintルール（必須{essential} · 推奨{recommended} · 専門家{professional} · 完全{comprehensive} · 厳格{pedantic} · {stylistic} スタイル選択）"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: 保存時にスキャン",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dartと Flutterのバージョンアップルールは,特定のSDKでAPIが削除されたか廃止されていることをフラグします."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} つのルール"
+  },
   "consolidated": {
     "kicker": "セキュリティー · 品質",
     "searchPlaceholder": "フィルタールール...",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "オフ — 保存時にスキャンのみ",
       "analyzerPluginAbsent": "未設定",
       "tierState": "レベル: 一級. {tier} フォローしている",
+      "lane": "レーン",
+      "laneLight": "ライト — ~200ルールインエディタ内、残りは保存時に実行",
+      "laneFull": "完全 — エディタ内でのすべての有効なルール",
       "runAfterConfigState": "設定変更後に分析を実行: {state} フォローしている",
       "runAfterDependencyState": "依存関係変更後の分析を実行: {state} フォローしている",
       "uiLanguageState": "UI言語: ユーザーインターフェイスの言語 {language} フォローしている",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "設定を書いている…（{elapsed}s）",
       "progressAnalysis": "解析中… ({elapsed}s)",
       "progressBaseline": "ベースラインスキャンを実行中…（{elapsed}s）"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: アナリシスレーンの設定",
+      "pickerPlaceholder": "現在: {lane}",
+      "lightLabel": "ライト（デフォルト）",
+      "lightDescription": "インラインで実行されるエラー/警告ルールは約200件のみです",
+      "lightDetail": "その他は保存時に数秒後にスキャンデーモン経由で到達します。ニアベースラインメモリ: +0.6% RSS 大規模なプロジェクトで測定されました。ほとんどのプロジェクトに推奨されます。",
+      "fullLabel": "フル",
+      "fullDescription": "すべての有効なルールはエディタ内で実行されます",
+      "fullDetail": "過去の動作状況。メモリ使用量の増加: 同じプロジェクトで測定した結果 +77% RSS。プロジェクトがこのフットプリントを負担できることが確認されている場合にのみ選択してください。",
+      "alreadyOnLane": "既に{lane}レーンにいます",
+      "updated": "分析レーンが{lane}に設定されました。Dart分析サーバーを再起動して適用します。",
+      "noPluginBlock": "Saropa Lints: 分析レーンを設定できませんでした — analysis_options.yamlに分析プラグインブロックが見つかりませんでした。インプロセスプラグインを有効にしてください。",
+      "writeFailed": "Saropa Lints: 分析レーンの書き込みに失敗しました。{message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lintsは有効ですが、エディタ内診断は無効: この拡張機能からアナライザープラグインがオフにされ、復元されていないため、問題はスキャン後にのみ表示されます。エディタ内診断をリアルタイムで復元するか、保存時にスキャンするだけにするか？",

@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "Règles {total} de lint sont actuellement incluses dans cette version (essentiel {essential} · recommandé {recommended} · professionnel {professional} · complet {comprehensive} · pédant {pedantic} · {stylistic} opt-in stylistique)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints : Analyse en sauvegardant",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart et Flutter régissent la mise à niveau de version des API supprimées ou obsolètes dans un SDK donné."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} règles"
+  },
   "consolidated": {
     "kicker": "La sécurité · la qualité",
     "searchPlaceholder": "Les règles du filtre...",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Hors service — analyse uniquement lors de la sauvegarde",
       "analyzerPluginAbsent": "Pas configuré",
       "tierState": "Niveau : {tier}",
+      "lane": "voie",
+      "laneLight": "Lumière — ~200 règles en mode édition, le reste sur enregistrement",
+      "laneFull": "Complet — toutes les règles activées analysées en ligne",
       "runAfterConfigState": "Exécuter l'analyse après le changement de configuration : {state}",
       "runAfterDependencyState": "Exécuter l'analyse après le changement de dépendance : {state}",
       "uiLanguageState": "Langue de l'interface utilisateur : {language}",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Écriture de la configuration… ({elapsed}s)",
       "progressAnalysis": "Analyse en cours… ({elapsed}s)",
       "progressBaseline": "Scan de base en cours… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints : Analyse de la voie",
+      "pickerPlaceholder": "Actuel : {lane}",
+      "lightLabel": "Lumière (par défaut)",
+      "lightDescription": "Seulement ~200 règles d'erreur/avertissement en cours d'exécution dans l'éditeur",
+      "lightDetail": "Tout le reste arrive quelques secondes plus tard, lors de la sauvegarde, via le démon de scan. Mémoire quasi-basique : +0,6 % RSS mesurée sur un grand projet. Recommandé pour la plupart des projets.",
+      "fullLabel": "Complet",
+      "fullDescription": "Chaque règle activée s'exécute en mode éditeur",
+      "fullDetail": "Le comportement historique. Coût mémoire plus élevé : +77% RSS mesuré sur le même projet. Choisissez cette option uniquement si vous avez vérifié que votre projet peut supporter l'empreinte.",
+      "alreadyOnLane": "Déjà sur la lane {lane}.",
+      "updated": "Règle stricte : Analyse de la voie définie à {lane}. Redémarrage du serveur d'analyse Dart pour l'appliquer.",
+      "noPluginBlock": "Saropa Lints : impossible de définir la voie d'analyse — le plug-in d'analyse n'a pas été trouvé dans analysis_options.yaml. Activez d'abord le plug-in en processus.",
+      "writeFailed": "Saropa Lints : échec d'écriture de la ligne d'analyse. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints est activé, mais les diagnostics en mode édition sont désactivés : le plugin d'analyse a été désactivé depuis cet extension et n'a jamais été restauré, donc les problèmes ne s'affichent que après un scan. Restaurer les diagnostics en mode édition en temps réel, ou garder le scan sur enregistrement uniquement ?",

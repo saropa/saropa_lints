@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "Mga tala ng {total} na mga tala ng lint ay kasama na sa bersyon na ito (essensial {essential} · inirerekomenda {recommended} · profesional {professional} · komprehensibo {comprehensive} · pedantiko {pedantic} · {stylistic} opt-in stylistic)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: I-scan sa Pag-save",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart at Flutter version-upgrade rules na nagbabandera ng mga API na tinanggal o hindi na ginagamit sa isang naibigay na SDK."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} na rule"
+  },
   "consolidated": {
     "kicker": "Kaligtasan · Kalidad Security · Kaligtas",
     "searchPlaceholder": "Mga patakaran sa filter...",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Off — scan-on-save lamang",
       "analyzerPluginAbsent": "Hindi nakakonekta",
       "tierState": "Tier: Ang antas ng pag-aari. {tier} ang kanyang mga",
+      "lane": "Lane",
+      "laneLight": "Light — ~200 na mga rule sa loob ng editor, ang iba ay nagsisimula sa pag-save",
+      "laneFull": "Full — lahat ng nakarehistro na rule sa loob ng editor",
       "runAfterConfigState": "Patakbuhin ang pagsusuri pagkatapos ng config pagbabago: {state} ang kanyang mga",
       "runAfterDependencyState": "Patakbuhin ang pagsusuri pagkatapos ng pagbabago sa dependency: {state} ang kanyang mga",
       "uiLanguageState": "Wika ng UI: wika ng UI. {language} ang kanyang mga",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Paghahatag ng config... ({elapsed}s)",
       "progressAnalysis": "Pagsusuri... ({elapsed}s)",
       "progressBaseline": "Pagsusimula ng baseline scan… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Itakda ang Analysis Lane",
+      "pickerPlaceholder": "Ngayon: {lane}",
+      "lightLabel": "Banayad (default)",
+      "lightDescription": "Lamang ~200 error/warning rules na nagpapatakbo sa loob ng editor",
+      "lightDetail": "Ang lahat ng iba pang mga bagay ay dumating ilang segundo pagkatapos, sa pag-save, sa pamamagitan ng scan daemon. Nakakatipid ng malapit sa base memory: +0.6% RSS na naging resulta sa isang malaking proyekto. Rekomendado para sa karamihan sa mga proyekto.",
+      "fullLabel": "Puno",
+      "fullDescription": "Ang bawat nakakatagong rule ay nagpapatakbo sa loob ng editor",
+      "fullDetail": "Ang nakaraang pagkakabahagi. Mas mataas na gastos sa memorya: +77% RSS na naitala sa parehong proyekto. Piliin ito lamang kung iyong napatunayan na ang proyekto mo ay makakakaya ng footprint.",
+      "alreadyOnLane": "Nasa {lane} lane na.",
+      "updated": "Itinakda sa {lane} ang analysis lane. I-restart ang server ng pagsusuri ng Dart upang ilapat ito.",
+      "noPluginBlock": "Saropa Lints: hindi maitala ang analysis lane — walang nakita na analyzer plugin block sa analysis_options.yaml. Mag-enable muna ng in-process plugin.",
+      "writeFailed": "Saropa Lints: nabigo mag-imbak ng analysis lane. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints ay naka-on, ngunit ang mga diagnostics sa loob ng editor ay naka-off: ang plugin ng analyzer ay tinanggal mula sa extension na ito at hindi pa ito ibinalik, kaya ang mga isyu lamang ay lumalabas pagkatapos ng isang scan. Ibalik ang live in-editor diagnostics, o manatiling scan-on-save lamang?",

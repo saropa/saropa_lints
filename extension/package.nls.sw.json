@@ -62,6 +62,7 @@
   "command.refresh.title": "Kufanya kazi kwa njia ya burudani.",
   "command.repairConfig.title": "Saropa Lints: Marekebisho Uchambuzi Chaguzi za Ufuatiliaji.",
   "command.setTier.title": "Saropa Lints: Kiwango cha Juu kilichowekwa.",
+  "command.setLane.title": "Saropa Lints: Weka Njia ya Uchambuzi",
   "command.showOutput.title": "Saropa Lints: Onyesha pato la pato.",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: Onyesha Kanuni ya Telemetry inayohusiana na Sheria.",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: Rudisha Utawala wa Telemetry Unaohusiana na Reset.",

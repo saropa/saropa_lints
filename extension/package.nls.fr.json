@@ -62,6 +62,7 @@
   "command.refresh.title": "Actualiser",
   "command.repairConfig.title": "Saropa Lints: Options d'analyse de réparation et d'évaluation des dégâts.",
   "command.setTier.title": "Saropa Lints: Le niveau fixe de base.",
+  "command.setLane.title": "Saropa Lints : Analyse de la voie",
   "command.showOutput.title": "Saropa Lints: Afficher la sortie de sortie.",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: Afficher la télémétrie de règle liée.",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: Réinitialiser la télémétrie de règle liée à l'application.",

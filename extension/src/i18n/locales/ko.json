@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "{total} lint 규칙은 현재 버전에 포함되어 있습니다 (필수 {essential} · 권장 {recommended} · 전문 {professional} · 포괄적 {comprehensive} · 철저 {pedantic} · {stylistic} 스타일적 옵인)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: 저장 시 스캔",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart 및 Flutter 버전 업그레이드 규칙은 API가 제거되거나 소멸된 플래그를 SDK에서 지정합니다."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count}개 규칙"
+  },
   "consolidated": {
     "kicker": "보안 · 품질 · 안전성 · 품질",
     "searchPlaceholder": "필터 규칙...필터 규칙을 따르십시오.",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "오프 — 저장 시 스캔만",
       "analyzerPluginAbsent": "설정되지 않음",
       "tierState": "Tier: 계층, 즉 수준 {tier} _PH0_는 PH0__의 제곱근을 나타냅니다",
+      "lane": "라인",
+      "laneLight": "경량 — ~200 규칙 인-에디터, 나머지는 저장 시",
+      "laneFull": "완전 — 에디터 내에서 활성화된 모든 규칙",
       "runAfterConfigState": "구성 변경 후 분석을 실행: {state} _PH0_는 PH0__의 제곱근을 나타냅니다",
       "runAfterDependencyState": "의존성 변경 후 분석을 실행: 종속성 변화 후에 분석. {state} _PH0_는 PH0__의 제곱근을 나타냅니다",
       "uiLanguageState": "UI 언어: 사용자 인터페이스 언어 {language} _PH0_는 PH0__의 제곱근을 나타냅니다",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "구성 파일 작성 중… ({elapsed}s)",
       "progressAnalysis": "분석 중입니다… ({elapsed}s)",
       "progressBaseline": "기본 스캔 중… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: 분석 라인 설정",
+      "pickerPlaceholder": "현재: {lane}",
+      "lightLabel": "가벼운 (기본값)",
+      "lightDescription": "직접 편집기에서 실행되는 오직 ~200개의 오류/경고 규칙만",
+      "lightDetail": "모든 다른 내용은 저장 시 몇 초 후에 스캔 데몬을 통해 도착합니다. 근접 기준 메모리: +0.6% RSS 대규모 프로젝트에서 측정됨. 대부분의 프로젝트에 권장됩니다.",
+      "fullLabel": "완전한",
+      "fullDescription": "모든 활성화된 규칙은 에디터 내에서 실행됩니다",
+      "fullDetail": "역사적 행동. 더 높은 메모리 비용: 같은 프로젝트에서 측정한 +77% RSS. 프로젝트가 발자국을 감당할 수 있음을 확인했다면만 선택하세요.",
+      "alreadyOnLane": "이미 {lane} 라인에 있습니다.",
+      "updated": "분석 라인 설정됨 {lane}. Dart 분석 서버를 재시작하여 적용합니다.",
+      "noPluginBlock": "Saropa Lints: 분석 라인을 설정할 수 없습니다 — analysis_options.yaml에서 분석기 플러그인 블록을 찾을 수 없습니다. 인 프로세스 플러그인을 먼저 활성화하세요.",
+      "writeFailed": "Saropa Lints: 분석 라인에 쓰기 실패. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints는 켜져 있지만, 에디터 내 진단 기능은 꺼져 있습니다: 분석기 플러그인은 이 확장에서 끄고 이후로 복원되지 않았기 때문에, 스캔 이후에만 문제가 나타납니다. 실시간 에디터 내 진단 기능을 복원할 것인가, 아니면 저장 시만 스캔할 것인가?",

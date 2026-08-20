@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "Regras {total} de lint estão incluídas nessa versão (essencial {essential} · recomendado {recommended} · profissional {professional} · abrangente {comprehensive} · pedante {pedantic} · {stylistic} opt-in estilístico)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Escaneio ao Salvar",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart e Flutter regras de atualização de versão que sinalizam APIs removidas ou desatualizadas em um determinado SDK."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} regras"
+  },
   "consolidated": {
     "kicker": "Segurança · Qualidade · Qualidades.",
     "searchPlaceholder": "Regras de filtro... regras do filtro.",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Desligado — escaneio apenas ao salvar",
       "analyzerPluginAbsent": "Não configurado",
       "tierState": "Tier: Nível de nível. {tier} É um termo usado para descrever a",
+      "lane": "Faixa",
+      "laneLight": "Light — ~200 regras em-editor, restante ao salvar",
+      "laneFull": "Completo — todas as regras ativadas em editor",
       "runAfterConfigState": "Execute a análise após a alteração da configuração: {state} É um termo usado para descrever a",
       "runAfterDependencyState": "Execute a análise após mudança de dependência: {state} É um termo usado para descrever a",
       "uiLanguageState": "Idioma da interface do usuário: UI language. {language} É um termo usado para descrever a",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Escrevendo config... ({elapsed}s)",
       "progressAnalysis": "Análise em execução… ({elapsed}s)",
       "progressBaseline": "Escaneando baseline... ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Definição de Análise de Faixa",
+      "pickerPlaceholder": "Atual: {lane}",
+      "lightLabel": "Claro (padrão)",
+      "lightDescription": "Apenas ~200 regras de erro/aviso executam em-editor",
+      "lightDetail": "Tudo o resto chega alguns segundos depois, ao salvar, via o daemon de varredura. Uso de memória próximo à linha de base: +0,6% RSS medido em um grande projeto. Recomendado para a maioria dos projetos.",
+      "fullLabel": "Completo",
+      "fullDescription": "Toda regra habilitada executa dentro do editor",
+      "fullDetail": "Comportamento histórico. Custo de memória mais alto: +77% RSS medido no mesmo projeto. Escolha isso apenas se você tiver verificado que seu projeto pode suportar o impacto.",
+      "alreadyOnLane": "Já na pista {lane}.",
+      "updated": "Pista de análise definida como {lane}. Reiniciando o servidor de análise Dart para aplicá-lo.",
+      "noPluginBlock": "Saropa Lints: não foi possível definir a análise de linha — o plug-in de análise não foi encontrado em analysis_options.yaml. Ative primeiro o plug-in em processo.",
+      "writeFailed": "Saropa Lints: falha ao escrever a análise da linha. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints está ligado, mas os diagnósticos em editor estão desligados: o plugin do analisador foi desativado por esta extensão e nunca foi restaurado, então os problemas só aparecem após uma varredura. Restaurar diagnósticos em tempo real em editor, ou manter varredura ao salvar apenas?",

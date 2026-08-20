@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "Reglas de lint {total} actualmente incluidas en esta versión (esenciales {essential} · recomendadas {recommended} · profesionales {professional} · completas {comprehensive} · pedantes {pedantic} · {stylistic} de estilo opt-in)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Escaneo al guardar",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart y Flutter reglas de actualización de versiones que señalan las API eliminadas o obsoletas en un SDK dado."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} reglas"
+  },
   "consolidated": {
     "kicker": "Seguridad · Calidad · Seguridad.",
     "searchPlaceholder": "Reglas de filtro... las reglas del filtro.",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Off — escaneo al guardar solo",
       "analyzerPluginAbsent": "No configurado",
       "tierState": "Tier: Nivel de nivel superior, es decir, el nivel que se encuentra por encima del {tier} El hombre de la ciudad",
+      "lane": "carril",
+      "laneLight": "Light — ~200 reglas en editor, el resto al guardar",
+      "laneFull": "Completo — cada regla habilitada en el editor",
       "runAfterConfigState": "Ejecutar análisis después de cambiar la configuración: {state} El hombre de la ciudad",
       "runAfterDependencyState": "Ejecuta el análisis después del cambio de dependencia: {state} El hombre de la ciudad",
       "uiLanguageState": "Lenguaje de la interfaz: lenguaje de usuario. {language} El hombre de la ciudad",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Escribiendo configuración… ({elapsed}s)",
       "progressAnalysis": "Análisis en ejecución… ({elapsed}s)",
       "progressBaseline": "Ejecutando escaneo de base… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Establecer Análisis de Vía",
+      "pickerPlaceholder": "Actual: {lane}",
+      "lightLabel": "Claro (predeterminado)",
+      "lightDescription": "Solo ~200 reglas de error/advertencia se ejecutan en el editor",
+      "lightDetail": "Todo lo demás llega unos segundos después, al guardar, a través del daemon de escaneo. Uso de memoria cercano a la base: +0.6% RSS medido en un gran proyecto. Recomendado para la mayoría de los proyectos.",
+      "fullLabel": "Completo",
+      "fullDescription": "Cada regla habilitada se ejecuta dentro del editor",
+      "fullDetail": "El comportamiento histórico. Mayor costo de memoria: +77% RSS medido en el mismo proyecto. Elija esta opción solo si ha verificado que su proyecto puede soportar el pie de peso.",
+      "alreadyOnLane": "Ya estás en la {lane} lane.",
+      "updated": "Línea de análisis establecida en {lane}. Reiniciando el servidor de análisis Dart para aplicarlo.",
+      "noPluginBlock": "Saropa Lints: no se pudo establecer la línea de análisis — el complemento del analizador no se encontró en analysis_options.yaml. Active primero el complemento en proceso.",
+      "writeFailed": "Saropa Lints: no se pudo escribir el análisis de la línea. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints está encendido, pero los diagnósticos en el editor están desactivados: el plugin de análisis fue desactivado desde esta extensión y nunca se restauró, por lo tanto, los problemas solo aparecen después de un escaneo. Restaurar diagnósticos en tiempo real en el editor, o mantener solo escaneo al guardar?",

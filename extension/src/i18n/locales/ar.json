@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "قواعد {total} lint تُوزع حاليًا في هذه الإصدار (الأساسية {essential} · الموصى بها {recommended} · المهنية {professional} · الشاملة {comprehensive} · الصارمة {pedantic} · {stylistic} المُفعَّلة اختياريًا من حيث الأسلوب)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: التحقق عند الحفظ",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart و Flutter قواعد ترقية الإصدار التي تم إزالة APIs أو تجاهلها في SDK معين."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} قواعد"
+  },
   "consolidated": {
     "kicker": "الأمن · الجودة · الوعي",
     "searchPlaceholder": "قواعد الفلتر...",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "إيقاف - التحليل عند حفظ الملف فقط",
       "analyzerPluginAbsent": "غير مُconfigured",
       "tierState": "المستوى: مستوى من الدرجة. {tier} _ PH0__ الـ (ف) = الحالة التي يمر",
+      "lane": "النهر",
+      "laneLight": "خفيف — ~200 قاعدة داخل المحرر، باقي عند حفظ الملف",
+      "laneFull": "كامل — كل القواعد المفعلة داخل المحرر",
       "runAfterConfigState": "تشغيل التحليل بعد تغيير التكوين: {state} _ PH0__ الـ (ف) = الحالة التي يمر",
       "runAfterDependencyState": "تشغيل التحليل بعد تغيير التبعية: {state} _ PH0__ الـ (ف) = الحالة التي يمر",
       "uiLanguageState": "لغة واجهة المستخدم: {language} _ PH0__ الـ (ف) = الحالة التي يمر",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "كتابة التكوين... ({elapsed}s)",
       "progressAnalysis": "التحليل في التشغيل... ({elapsed}s)",
       "progressBaseline": "التحقق من الأساسيات... ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: تحديد مسار التحليل",
+      "pickerPlaceholder": "الحالية: {lane}",
+      "lightLabel": "خفيف (الافتراضي)",
+      "lightDescription": "قواعد صارمة:\n1. عودة فقط النص المترجم.",
+      "lightDetail": "كل شيء آخر يصل بعد بضع ثوانٍ، عند حفظ الملف، عبر خدمة المسح. ذاكرة قريبة من مستوى الأساس: +0.6% RSS قياس على مشروع كبير. موصى بها لمعظم المشاريع.",
+      "fullLabel": "كامل",
+      "fullDescription": "كل قاعدة مفعلة تعمل داخل المحرر",
+      "fullDetail": "السلوك التاريخي. تكلفة ذاكرة أعلى: +77% RSS تم قياسها على المشروع نفسه. اختر هذا فقط إذا كنت تأكدت من أن مشروعك يمكنه تحمل الحجم.",
+      "alreadyOnLane": "بالفعل في المسار {lane}.",
+      "updated": "التحليل المسار محدد إلى {lane}. إعادة تشغيل خادم التحليل Dart لتطبيقه.",
+      "noPluginBlock": "Saropa Lints: لم يتم القدرة على تعيين مسار التحليل — لم يتم العثور على مُحلل مُضافة المُصنف في analysis_options.yaml. تفعيل مُضافة المُصنف في العملية أولاً.",
+      "writeFailed": "Saropa Lints: فشل في كتابة المسار التحليلي. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints قيد التشغيل، ولكن التشخيصات داخل المحرر متوقفة: تم إيقاف تشغيل المكون الإضافي للمحلل من هذا الملحق ولم يتم استعادته مطلقًا، لذا لا تظهر المشكلات إلا بعد الفحص. هل ترغب في استعادة التشخيصات المباشرة داخل المحرر، أم الاحتفاظ بالمسح الضوئي عند الحفظ فقط؟",

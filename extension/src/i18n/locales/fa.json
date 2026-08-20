@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "قوانین پرز {total} در حال حاضر در این نسخه ارسال می شود (ضروری {essential} · {recommended} پیشنهادی · {professional} حرفه ای · {comprehensive} جامع · {pedantic} pedantic · سبک انتخابی {stylistic})"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: اسکن در زمان ذخیره",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart و Flutter قوانین ارتقاء نسخه ای را که API های پرچم در یک SDK داده شده حذف یا منسوخ می شوند."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} قانون"
+  },
   "consolidated": {
     "kicker": "امنیت · کیفیت · ایمنی",
     "searchPlaceholder": "قوانین فیلتر...",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "غیر فعال — فقط در زمان ذخیره",
       "analyzerPluginAbsent": "تعریف نشده",
       "tierState": "ردیف: {tier}",
+      "lane": "لینه",
+      "laneLight": "نور — ~200 قاعده در داخل ویرایشگر، بقیه در زمان ذخیره",
+      "laneFull": "کامل — هر قاعده‌ای که فعال است در داخل ویرایشگر",
       "runAfterConfigState": "تجزیه و تحلیل را پس از تغییر پیکربندی اجرا کنید: {state}",
       "runAfterDependencyState": "اجرای تجزیه و تحلیل پس از تغییر وابستگی: {state}",
       "uiLanguageState": "زبان رابط کاربری: {language}",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "نوشتن پیکربندی... ({elapsed}s)",
       "progressAnalysis": "تحلیل در حال اجرا است... ({elapsed}s)",
       "progressBaseline": "اسکن پایه‌ای در حال اجرا است... ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: تنظیم خط تحلیل",
+      "pickerPlaceholder": "موجود: {lane}",
+      "lightLabel": "نور (پیش‌فرض)",
+      "lightDescription": "فقط ~200 قاعده خطا/هشدار درون ویرایشگر اجرا می‌شود",
+      "lightDetail": "همه چیز دیگر چند ثانیه بعد، در زمان ذخیره سازی، از طریق اسکن دمون ارسال می‌شود. حافظه نزدیک به پایه: +0.6% RSS اندازه‌گیری شده بر روی یک پروژه بزرگ. توصیه شده برای اکثر پروژه‌ها.",
+      "fullLabel": "کامل",
+      "fullDescription": "هر قاعده‌ی فعال در داخل ویرایشگر اجرا می‌شود",
+      "fullDetail": "رفتار تاریخی. هزینه حافظه بالاتر: +77% RSS اندازه گیری شده بر روی پروژه یکسان. فقط این را انتخاب کنید اگر اطمینان حاصل کرده اید پروژه شما می تواند اثر این انتخاب را تحمل کند.",
+      "alreadyOnLane": "در خط {lane} هستید.",
+      "updated": "تحلیل راه انتخاب شده به {lane} است. بازگردانی سرور تحلیل Dart برای اعمال آن.",
+      "noPluginBlock": "Saropa Lints: نتوانست خطای تحلیل را تنظیم کرد — بلوک پلاگین تحلیل کننده در analysis_options.yaml پیدا نشد. ابتدا پلاگین درون فرآیند را فعال کنید.",
+      "writeFailed": "Saropa Lints: تحلیل خط نوشته نشد. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints فعال است، اما تشخیص درون ویرایشگر غیر فعال است: پلاگین تحلیل کننده غیر فعال شده است و به طور دائم بازنشانی نشده است، بنابراین مشکلات فقط پس از اسکن ظاهر می شود. تشخیص درون ویرایشگر زنده را باز کن یا فقط اسکن در حین ذخیره را حفظ کن؟",

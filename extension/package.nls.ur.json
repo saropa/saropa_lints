@@ -62,6 +62,7 @@
   "command.refresh.title": "ريفريش",
   "command.repairConfig.title": "Saropa Lints:۔ مرمت تجزیہ اختیارات کی اصلاح کے لئے تجاویز",
   "command.setTier.title": "Saropa Lints:۔ سیٹ ٹیر لیول سیٹ کریں",
+  "command.setLane.title": "Saropa Lints: تحلیل کرنے والی لین",
   "command.showOutput.title": "Saropa Lints:۔ آؤٹ پٹ دکھائیں آؤٹپٹ دکھائے۔",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints:۔ شو رلیٹڈ رول ٹیلی میٹری دکھائیں۔",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints:۔ ری سیٹ متعلقہ قاعدہ ٹیلی میٹری کی ترتیبات کو دوبارہ ترتیب دیں۔",

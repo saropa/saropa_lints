@@ -62,6 +62,7 @@
   "command.refresh.title": "让人感到清爽,使自己得到新鲜感.",
   "command.repairConfig.title": "Saropa Lints: 没有一个人. 维修分析选项可选择",
   "command.setTier.title": "Saropa Lints: 没有一个人. 设置基准资本的基本情况",
+  "command.setLane.title": "Saropa Lints: 设置分析车道",
   "command.showOutput.title": "Saropa Lints: 没有一个人. 显示输出结果",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: 没有一个人. 显示相关规则远程测量",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: 没有一个人. 重置相关规则远程测量 恢复",

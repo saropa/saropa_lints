@@ -62,6 +62,7 @@
   "command.refresh.title": "Odświeżaj i oddychaj.",
   "command.repairConfig.title": "Saropa Lints: Naprawa Analiza Opcje analizy.",
   "command.setTier.title": "Saropa Lints: ustalony poziom",
+  "command.setLane.title": "Saropa Lints: Ustawienia Analizy Kanału",
   "command.showOutput.title": "Saropa Lints: Pokaż wydajność.",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: Pokaż powiązane reguły telemetrii.",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: Reset Related Rule Telemetry.",

@@ -62,6 +62,7 @@
   "command.refresh.title": "সতেজতা আনুন এবং রিফ্রেশ করুন।",
   "command.repairConfig.title": "Saropa Lints: মেরামত বিশ্লেষণ বিকল্পগুলি",
   "command.setTier.title": "Saropa Lints: সেট টায়ার লেভেল",
+  "command.setLane.title": "Saropa Lints: অ্যানালাইসিস লেন",
   "command.showOutput.title": "Saropa Lints: আউটপুট প্রদর্শন করুন",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: সম্পর্কিত নিয়ম টেলিমেট্রি দেখান।",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: সম্পর্কিত নিয়ম টেলিমেট্রি রিসেট করুন।",

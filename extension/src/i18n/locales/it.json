@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "Regole {total} di lint attualmente presenti in questa versione (essenziali {essential} · consigliate {recommended} · professionali {professional} · complete {comprehensive} · pedanti {pedantic} · {stylistic} stili opt-in)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Scansiona al salvataggio",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart e Flutter regole di aggiornamento della versione che contrassegnano le API rimosse o deprecate in un dato SDK."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} regole"
+  },
   "consolidated": {
     "kicker": "Sicurezza · Qualità · Qualitá.",
     "searchPlaceholder": "Regole del filtro... regole dei filtri.",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Spento — scansione solo su salvataggio",
       "analyzerPluginAbsent": "Non configurato",
       "tierState": "Tier: livello di base. {tier} È il nome di un'altra versione.",
+      "lane": "Sentiero",
+      "laneLight": "Light — ~200 regole in-editor, il resto su salvataggio",
+      "laneFull": "Completo — ogni regola abilitata analizzata in-editor",
       "runAfterConfigState": "Eseguire l'analisi dopo la modifica della configurazione: {state} È il nome di un'altra versione.",
       "runAfterDependencyState": "Eseguire l'analisi dopo la modifica della dipendenza: {state} È il nome di un'altra versione.",
       "uiLanguageState": "Lingua dell'interfaccia utente: lingua UI. {language} È il nome di un'altra versione.",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Scrittura configurazione… ({elapsed}s)",
       "progressAnalysis": "Analisi in corso… ({elapsed}s)",
       "progressBaseline": "Scansione baseline in corso… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Analisi Set Lane",
+      "pickerPlaceholder": "Corrente: {lane}",
+      "lightLabel": "Luce (predefinito)",
+      "lightDescription": "Solo ~200 regole di errore/avviso in esecuzione nell'editor",
+      "lightDetail": "Tutto il resto arriva qualche secondo dopo, in fase di salvataggio, tramite il daemon di scansione. Consumo di memoria quasi a baseline: +0.6% RSS misurato su un grande progetto. Consigliato per la maggior parte dei progetti.",
+      "fullLabel": "Completo",
+      "fullDescription": "Ogni regola abilitata esegue in-editor",
+      "fullDetail": "Comportamento storico. Costo maggiore di memoria: +77% RSS misurato sullo stesso progetto. Scegli questa opzione solo se hai verificato che il tuo progetto può sostenere l'impatto.",
+      "alreadyOnLane": "Già sulla corsia {lane}.",
+      "updated": "Regola rigorosa: Analisi canale impostato su {lane}. Riavviando il server di analisi Dart per applicarlo.",
+      "noPluginBlock": "Saropa Lints: non è stato possibile impostare la lane di analisi — il plugin di analisi non è stato trovato in analysis_options.yaml. Abilita prima il plugin in-process.",
+      "writeFailed": "Saropa Lints: impossibile scrivere la lane di analisi. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints è attivo, ma i diagnostic in-editor sono disattivati: il plugin analizzatore è stato disattivato da questa estensione e non è mai stato ripristinato, quindi i problemi si verificano solo dopo uno scan. Ripristina i diagnostic in-editor in tempo reale o mantieni solo scan-on-save?",

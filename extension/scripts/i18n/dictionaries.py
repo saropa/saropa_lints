@@ -1030,6 +1030,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "hi": {
+        # Manual: MT returned this identical to English; pinned so a regen cannot revert it.
+        "{total} lint rules currently ship in this version (essential {essential} · recommended {recommended} · professional {professional} · comprehensive {comprehensive} · pedantic {pedantic} · {stylistic} opt-in stylistic)": "{total} लिंट नियम वर्तमान में इस संस्करण में शामिल हैं (आवश्यक {essential} · अनुशंसित {recommended} · पेशेवर {professional} · व्यापक {comprehensive} · सूक्ष्म {pedantic} · {stylistic} ऐच्छिक शैलीगत)",
         # Manual: pin the Hindi rendering so a dictionary regen cannot revert it to English.
         "{count} downloads in the last 30 days": "पिछले 30 दिनों में {count} डाउनलोड",
         # Manual: MT hallucinated trailing clauses ("का अर्थ है _", "पारगमन अवसाद") and PH artifacts; these are short technical tooltips.
@@ -1242,6 +1244,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "fil": {
+        # Manual: no MT engine translated this single-word settings label; kept as the established English loanword, matching sibling UI labels this locale already keeps untranslated (Activity bar, Code Health, Dependency Network).
+        "Lane": "Lane",
         # Manual: MT returned the English unchanged for this drift label.
         "Cross-project drift": "Drift sa iba't ibang proyekto",
         # Manual: MT returns English unchanged — technical terms kept as loanwords, Filipino word order.
@@ -1696,6 +1700,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
     },
     "tr": {
+        # Manual: no MT engine translated this single-word settings label (analysis lane: Light/Full).
+        "Lane": "Şerit",
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
         "• {dep}": "• {dep}",
         "{label}: {size}": "{label}: {size}",

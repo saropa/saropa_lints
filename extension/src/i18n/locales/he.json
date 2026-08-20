@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "חוקי לינט {total} נמצאים כרגע בגרסה זו (חובה {essential} · מומלץ {recommended} · מקצועית {professional} · מפורט {comprehensive} · פדנטי {pedantic} · {stylistic} בחירה חופשית סגנון)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: ס캔 בעת שמירה",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart ו- Flutter חוקי שדרוג גרסה שמצביעים על API שהוסרו או לא מתאימים ב-SDK נתון."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} כללים"
+  },
   "consolidated": {
     "kicker": "אבטחה · איכות · ביטחון",
     "searchPlaceholder": "חוקי הפילטר...",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "כבוי – ס캔 רק בעת שמירת הקובץ",
       "analyzerPluginAbsent": "לא מוגדר",
       "tierState": "רמה: Tier - רמת עליונה {tier} זה ה- PH0__.",
+      "lane": "לן",
+      "laneLight": "הבהירות — ~200 כללי בunting, שארית בשמירת הקובץ",
+      "laneFull": "מלא — כל כלל מופעל בתוך המודעה",
       "runAfterConfigState": "ריצה ניתוח לאחר שינוי התצורות: {state} זה ה- PH0__.",
       "runAfterDependencyState": "הוצא ניתוח לאחר שינוי התלות: {state} זה ה- PH0__.",
       "uiLanguageState": "שפת ממשק המשתמש: UI language {language} זה ה- PH0__.",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "כתיבה של קובץ Yapı… ({elapsed}s)",
       "progressAnalysis": "ניתוח ביצועים... ({elapsed}s)",
       "progressBaseline": "סריקה בסיסית בדיקה... ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: הגדרת ניתוח מסלול",
+      "pickerPlaceholder": "הווה: {lane}",
+      "lightLabel": "הבהירות (ברירת המחדל)",
+      "lightDescription": "רק ~200 правила שגיאה/אזהרה 작동 בתוך המודעה",
+      "lightDetail": "כל מה שנותר מגיע כמה שניות לאחר מכן, בשמירת הקובץ, דרךDaemon של הסקן. זיכרון קרובה לבסיס: +0.6% RSS נמדדת בפרויקט גדול. מומלץ לרוב הprojects.",
+      "fullLabel": "מלא",
+      "fullDescription": "כל כלל מופעל מופעל בתוך המודעה",
+      "fullDetail": "הנהירות התנהגות. עלות זיכרון גבוהה יותר: +77% RSS נמדדת על אותו פרויקט. בחר בזה רק אם בדקת שפרויקט שלך יכול לה bearing את הרגל.",
+      "alreadyOnLane": "כבר על ה-{lane}.",
+      "updated": "ניתוח רכבת מותאמת ל{lane}. إعادة تشغيل שרת ניתוח Dart כדי לה적ון.",
+      "noPluginBlock": "Saropa Lints: לא ניתן לקבוע את מסלול האנליזה — wasn't found in analysis_options.yaml. הפעל תוסף-plugin תהליך-ב-תהליך תחילה.",
+      "writeFailed": "Saropa Lints: לא ניתן לכתוב את הניתוח הרציף. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints הוא פעיל, אך אזהרות בתוך העריכה אינן פעילות: מודול האנליזה הושתק מהשורה הזו והלא נחזר, ולכן בעיות מופיעות רק לאחר ס캔. חזור לבעלות אזהרות בתוך העריכה, או לשמור על ס캔 בעת שמירה?",

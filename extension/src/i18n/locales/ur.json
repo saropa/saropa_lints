@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "{total} قاعدات لینٹ کررنتی ہیں اس نسخے میں (ضروری {essential} · موصیح {recommended} · پرو فیشنل {professional} · مکمل {comprehensive} · تکنیکی {pedantic} · {stylistic} استعمال کرنے والے سٹائل )"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: ذخیرہ کر کے اسکن",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart اور Flutter ورژن اپ گریڈ کے قواعد جو کسی دیئے گئے SDK میں ہٹا یا منسوخ شدہ API کو نشان زد کرتے ہیں۔"
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} اصول"
+  },
   "consolidated": {
     "kicker": "سیکیورٹی · معیار · حفاظت",
     "searchPlaceholder": "فلٹر کے قواعد...",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "آف — صرف بچھوڑن پر اسکن /نُو_تھِنک",
       "analyzerPluginAbsent": "نہ ترتیب دیا گیا",
       "tierState": "ٹائر: {tier}",
+      "lane": "لو نو تھنک",
+      "laneLight": "ہلکا — ~200 قاعدے ان ڈیٹور میں، باقی ذخیرہ کرنے پر",
+      "laneFull": "کامل — ہر ایک ایک سے چالو ہوئے قاعدہ داخلہ میں",
       "runAfterConfigState": "ترتیب میں تبدیلی کے بعد تجزیہ چلائیں: {state}",
       "runAfterDependencyState": "انحصار میں تبدیلی کے بعد تجزیہ چلائیں: {state}",
       "uiLanguageState": "UI زبان: {language}",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "لکھنا کنفیگ... ({elapsed}s)",
       "progressAnalysis": "تحلیل کر رہے ہیں... ({elapsed}s)",
       "progressBaseline": "اسکن بنیادی حد تک جاری ہے... ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: تحلیل کرنے والی لین",
+      "pickerPlaceholder": "موجود: {lane}",
+      "lightLabel": "کم (پیش فرض)",
+      "lightDescription": "صرف ~200 خطا / چेतاوں کے قواعد انڈیٹور میں چل رہے ہیں",
+      "lightDetail": "ہر چیز ایک چند سیکنڈ بعد، بچھوڑنے پر، اسکن ڈیمون کے ذریعے پہنچ جاتی ہے۔ نیار بیس لائن میموری: +0.6% RSS ایک بڑے پروجیکٹ پر مقدار ہے۔ اکثر پروجیکٹوں کے لیے تجویز کیا جاتا ہے۔",
+      "fullLabel": "پورا",
+      "fullDescription": "ہر ایک ایکسٹنشن کی قاعدہ ایکسپلورر کے اندر کام کرتی ہے",
+      "fullDetail": "تاریخی سلوک۔ زیادہ یادگیری کی لاگت: +77% RSS ایک ہی پروجیکٹ پر مقدار ہے۔ اسے چننا ہی ہے اگر آپ نے اپنے پروجیکٹ کی یادگیری کو برداشت کرنے کی یقینیت پر چیک کیا ہے۔",
+      "alreadyOnLane": "پہلے ہی {lane} لین پر ہیں۔",
+      "updated": "تحلیل چنل {lane} پر تیار کیا گیا ہے۔ Dart تحلیل سرور کو دوبارہ شروع کر کے اس کی تعمیل کی جا رہی ہے۔",
+      "noPluginBlock": "Saropa Lints: تحلیلی چنل کو نہیں سیٹ کیا جا سکتا - analysis_options.yaml میں تحلیل کنندہ پلاگن بکس نہیں ملا۔ پہلے انسائیڈ پروسس پلاگن کو اکیلے کریں۔",
+      "writeFailed": "Saropa Lints: تحلیلی لین کو لکھنا میں ناکام رہ گیا۔ {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints کھلے ہیں، لیکن ایڈیٹر میں تشخیصات بند ہیں: تحلیل کن پلگ ان یہ ایکسٹینشن سے بند کر دیا گیا تھا اور کبھی دوبارہ تازہ کر کے نہیں لے گیا گیا، اس لیے ایک اسکن کے بعد صرف مسائل ظاہر ہوتے ہیں۔ زندہ ایڈیٹر میں تشخیصات لوڈ کریں، یا صرف ایک اسکن کے بعد رکھیں؟",

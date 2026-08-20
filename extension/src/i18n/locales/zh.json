@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "{total} 条 lint 规则目前包含在此版本中（基础 {essential} · 推荐 {recommended} · 专业 {professional} · 全面 {comprehensive} · 严谨 {pedantic} · {stylistic} 风格化选项）"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints：保存时扫描",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart和 Flutter 版本升级规则标记了在给定的 SDK 中删除或废弃的 API."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} 个规则"
+  },
   "consolidated": {
     "kicker": "安全 · 质量 · 品质",
     "searchPlaceholder": "过 ⁇ 器规则...过 ⁇ 的规则是什么",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "关闭 — 仅保存时扫描",
       "analyzerPluginAbsent": "未配置",
       "tierState": "层级:是指在资本阶段中,有较高的水平. {tier} 没有任何问题.",
+      "lane": "车道",
+      "laneLight": "轻量 — ~200条编辑器内规则，其余在保存时执行",
+      "laneFull": "完整 — 编辑器中所有启用的规则",
       "runAfterConfigState": "在配置更改后运行分析: {state} 没有任何问题.",
       "runAfterDependencyState": "在依赖性变化后运行分析: {state} 没有任何问题.",
       "uiLanguageState": "界面语言:用户界面的语言 {language} 没有任何问题.",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "编写配置… ({elapsed}s)",
       "progressAnalysis": "分析中… ({elapsed}s)",
       "progressBaseline": "正在运行基线扫描… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: 设置分析车道",
+      "pickerPlaceholder": "当前: {lane}",
+      "lightLabel": "轻量（默认）",
+      "lightDescription": "仅 ~200 条错误/警告规则在编辑器内运行",
+      "lightDetail": "其他内容会在几秒后保存时通过扫描守护进程到达。近基线内存：+0.6% RSS 在一个大型项目中测量得出。推荐用于大多数项目。",
+      "fullLabel": "完整",
+      "fullDescription": "每个启用的规则都在编辑器中运行",
+      "fullDetail": "历史行为。更高的内存消耗：+77% RSS 在同一个项目中测量。仅在您已验证您的项目可以承担该占用空间时选择此选项。",
+      "alreadyOnLane": "已经位于{lane}道上",
+      "updated": "分析通道设置为 {lane}。正在重启 Dart 分析服务器以应用该设置。",
+      "noPluginBlock": "Saropa Lints: 无法设置分析通道 —— 在 analysis_options.yaml 中未找到分析器插件块。请先启用进程内插件。",
+      "writeFailed": "Saropa Lints: 无法写入分析车道。{message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints已开启，但编辑器内诊断功能已关闭：分析器插件已从此扩展中禁用且从未恢复，因此问题仅在扫描后才会出现。恢复实时编辑器内诊断功能，还是仅保留保存时扫描？",

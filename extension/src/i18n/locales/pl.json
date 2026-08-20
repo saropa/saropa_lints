@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "Zasady {total} lint w tej wersji (podstawowe {essential} · zalecane {recommended} · profesjonalne {professional} · kompleksowe {comprehensive} · pedantyczne {pedantic} · {stylistic} opcjonalne stylowe)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Skanuj przy zapisie",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart i Flutter reguły aktualizacji wersji, które oznaczają usunięte lub przestarzałe API w danym SDK."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} reguł"
+  },
   "consolidated": {
     "kicker": "Bezpieczeństwo · Jakość · Jakości.",
     "searchPlaceholder": "Zasady filtracji... zasady filtrów.",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Wyłącz — skanowanie przy zapisie tylko",
       "analyzerPluginAbsent": "Nie skonfigurowano",
       "tierState": "Tier: poziom podstawowy. {tier} to odmiana _PH0_.",
+      "lane": "Uliczka",
+      "laneLight": "Light — ~200 reguł w edytorze, reszta przy zapisie",
+      "laneFull": "Pełny — każda włączona reguła w edytorze",
       "runAfterConfigState": "Przeprowadź analizę po zmianie konfiguracji: {state} to odmiana _PH0_.",
       "runAfterDependencyState": "Przeprowadź analizę po zmianie zależności: {state} to odmiana _PH0_.",
       "uiLanguageState": "Język interfejsu użytkownika: język UI: {language} to odmiana _PH0_.",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Zapisywanie konfiguracji… ({elapsed}s)",
       "progressAnalysis": "Analiza w trakcie… ({elapsed}s)",
       "progressBaseline": "Uruchamianie podstawowego skanowania… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Ustawienia Analizy Kanału",
+      "pickerPlaceholder": "Aktualny: {lane}",
+      "lightLabel": "Jasny (domyślny)",
+      "lightDescription": "Tylko ~200 reguł błędów/warningu działają w edytorze",
+      "lightDetail": "Wszystko inne przychodzi kilka sekund później, przy zapisie, przez daemon skanowania. Pamięć bliska podstawy: +0,6% RSS zmierzona na dużym projekcie. Zalecane dla większości projektów.",
+      "fullLabel": "Pełny",
+      "fullDescription": "Każda włączona reguła działa w edytorze",
+      "fullDetail": "Zachowanie historyczne. Wyższy koszt pamięci: +77% RSS zmierzony na tym samym projekcie. Wybierz to tylko jeśli potwierdziłeś, że Twój projekt może się z nim pogodzić.",
+      "alreadyOnLane": "Już na pasie {lane}.",
+      "updated": "Analiza kanału ustawiona na {lane}. Uruchamianie ponownie serwera analizy Dart, aby zastosować go.",
+      "noPluginBlock": "Saropa Lints: nie można ustawić analizy wątku — w pliku analysis_options.yaml nie znaleziono wtyczki analizatora. Włącz najpierw wtyczkę w procesie.",
+      "writeFailed": "Saropa Lints: nie udało się zapisać analizy kanału. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints jest włączony, ale wtyczka analizująca jest wyłączona: analizator został wyłączony z tej wtyczki i nigdy nie został przywrócony, więc problemy pojawiają się tylko po skanowaniu. Przywróć aktywne wtyczki do analizy w edytorze, czy zachowaj analizę przy zapisywaniu?",

@@ -62,6 +62,7 @@
   "command.refresh.title": "استرخاء وترفعه.",
   "command.repairConfig.title": "Saropa Lints: إصلاح تحليل خيارات التحليل.",
   "command.setTier.title": "Saropa Lints: مستوى الثابت المستقر.",
+  "command.setLane.title": "Saropa Lints: تحديد مسار التحليل",
   "command.showOutput.title": "Saropa Lints: عرض الناتج.",
   "command.showRelatedRuleTelemetry.title": "Saropa Lints: عرض قاعدة القياس عن بعد ذات الصلة.",
   "command.resetRelatedRuleTelemetry.title": "Saropa Lints: إعادة تعيين قاعدة القياس عن بعد ذات الصلة.",

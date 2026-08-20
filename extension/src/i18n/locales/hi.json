@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "{total} lint rules currently ship in this version (essential {essential} · recommended {recommended} · professional {professional} · comprehensive {comprehensive} · pedantic {pedantic} · {stylistic} opt-in stylistic)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: सेवा के समय स्कैन करें",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart और Flutter संस्करण-अपग्रेड नियम जो किसी दिए गए SDK में हटाए गए या अप्रचलित एपीआई को ध्वजांकित करते हैं।"
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} नियम"
+  },
   "consolidated": {
     "kicker": "सुरक्षा · गुणवत्ता · गुणवत्ता",
     "searchPlaceholder": "फ़िल्टर नियम ... फिल्टर नियम।",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "अफ ऑफ — सेव करते ही स्कैन करें",
       "analyzerPluginAbsent": "अनुपलब्ध",
       "tierState": "स्तर: {tier}",
+      "lane": "लेन",
+      "laneLight": "हलका — ~200 नियम संपादन के समय, बाकी सहेजने पर",
+      "laneFull": "पूर्ण — सभी सक्रिय नियम एडिटर में",
       "runAfterConfigState": "कॉन्फ़िगरेशन परिवर्तन के बाद विश्लेषण चलाएँ: {state}",
       "runAfterDependencyState": "निर्भरता परिवर्तन के बाद विश्लेषण चलाएँ: {state}",
       "uiLanguageState": "यूआई भाषा: {language}",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "लिखना विन्यासन... ({elapsed}s)",
       "progressAnalysis": "एनालिसिस चल रहा है... ({elapsed}s)",
       "progressBaseline": "आधार खोज चल रही है... ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: एनालिसिस लेन",
+      "pickerPlaceholder": "वर्तमान: {lane}",
+      "lightLabel": "हलका (डिफ़ॉल्ट)",
+      "lightDescription": "केवल ~200 त्रुटि/चेतावनी नियम एडिटर में चलते हैं",
+      "lightDetail": "सभी अन्य चीजें कुछ सेकंड बाद, सेव करते हुए, स्कैन डेमोन के माध्यम से आती हैं। निकटतम आधार यादृच्छिक स्मृति: +0.6% RSS एक बड़े प्रोजेक्ट पर मापा गया। अधिकांश प्रोजेक्ट के लिए सिफारिश किया गया।",
+      "fullLabel": "पूर्ण",
+      "fullDescription": "हर एक सक्षम नियम एडिटर में चलता है",
+      "fullDetail": "प्राग्भव व्यवहार। अधिक संसाधन खर्च: +77% RSS एक ही प्रोजेक्ट पर मापा गया। आप अपने प्रोजेक्ट के फुटप्रिंट के खर्च को स्वयं जांच कर लेने के बाद ही इस विकल्प का चयन करें।",
+      "alreadyOnLane": "पहले से ही {lane} लेन पर हैं।",
+      "updated": "अनुक्रमण लेन आप के {lane} पर सेट किया गया है। Dart विश्लेषण सर्वर को लागू करने के लिए पुनरारम्भ कर रहे हैं।",
+      "noPluginBlock": "Saropa Lints: विश्लेषण लेन सेट करने में असमर्थ रहा - analysis_options.yaml में विश्लेषक प्लगइन ब्लॉक नहीं मिला। पहले इन-प्रोसेस प्लगइन को सक्षम करें।",
+      "writeFailed": "Saropa Lints: विश्लेषण लेन में लिखने में विफल रहा। {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints सक्रिय है, लेकिन सम्पादक में निदान बंद है: एनालाइजर प्लगइन इस एक्सटेंशन से बंद कर दिया गया था और फिर से सक्रिय नहीं किया गया, इसलिए समस्याएं केवल एक स्कैन के बाद ही दिखाई देती हैं। जीवित सम्पादक में निदान फिर से सक्रिय करें, या केवल बचे बर्खास्त करें?",

@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "{total} maelezo ya kusandika kwa sasa inapakia katika versi hii (mazungumzaji {essential} · mazungumzaji ya kuchangia {recommended} · mazungumzaji ya kifalme {professional} · mazungumzaji ya kifalme {comprehensive} · mazungumzaji ya kifalme {pedantic} · {stylistic} mazungumzaji ya kuchangia)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Tafuta kwenye Kujifunza",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart na Flutter version-upgrade sheria ambazo API za bendera zimeondolewa au hazitumiki katika SDK fulani."
     }
   },
+  "tierPicker": {
+    "ruleCount": "sheria {count}"
+  },
   "consolidated": {
     "kicker": "Usalama · Ubora wa ubora.",
     "searchPlaceholder": "Kanuni za kuchuja... sheria za kufuta.",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Off — kusimama kwa kuzalisha",
       "analyzerPluginAbsent": "Hakuna inayozungumzwa",
       "tierState": "Tier: Kiwango cha juu zaidi. {tier} _ PH0__ - Msaada wa kuokoa maisha.",
+      "lane": "Njia",
+      "laneLight": "Light — ~200 hadi kwenye editor, wengine kwenye kuzalisha",
+      "laneFull": "Panda — kila neno ya kipengele kizalishwa katika kipengele ya editor",
       "runAfterConfigState": "Tumia uchambuzi baada ya mabadiliko ya usanidi: {state} _ PH0__ - Msaada wa kuokoa maisha.",
       "runAfterDependencyState": "Tumia uchambuzi baada ya mabadiliko ya utegemezi: {state} _ PH0__ - Msaada wa kuokoa maisha.",
       "uiLanguageState": "Lugha ya UI: lugha ya UI. {language} _ PH0__ - Msaada wa kuokoa maisha.",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Kushiriki config… ({elapsed}s)",
       "progressAnalysis": "Unganisha matokeo... ({elapsed}s)",
       "progressBaseline": "Kupata skani ya mbingu... ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Weka Njia ya Uchambuzi",
+      "pickerPlaceholder": "Sasa: {lane}",
+      "lightLabel": "Moyo (kati)",
+      "lightDescription": "Kati ya ~200 hadi maelekezo/makosa ya kujifunza kwenye editor",
+      "lightDetail": "Kila vitu vya kiliyojifunza huitwa kwa muda muda kati ya sekondi mbili, kama kujifunza, kwa njia ya daemon ya scan. Moyo ya kipindi kikubwa: +0.6% RSS kwa project kikubwa. Iliyotangaza kwa kipindi kikubwa ya kila project.",
+      "fullLabel": "Panda",
+      "fullDescription": "Kila kundi ya kifedha ina kazi katika editor",
+      "fullDetail": "Mipango ya kifichwa. Upeleka maelekezo ya kifichwa: +77% RSS iliyotangaza katika proyekti kati. Chagua hiki tu kama unaweza kushirikisha proyekti wakati wakati unaweza kushirikisha matokeo ya kifichwa.",
+      "alreadyOnLane": "Sasa na lane {lane}.",
+      "updated": "Analisi ya lane inaunda {lane}. Kupakia server ya analisi ya Dart kujaribu.",
+      "noPluginBlock": "Saropa Lints: hakuna kujaribu kuanza kwenye mstari ya analisi — plugin ya analyzer block hakifanyika katika analysis_options.yaml. Angalia kujaribu plugin kwa kwanza.",
+      "writeFailed": "Saropa Lints: uliokokotia kujisajili kwa mstari ya analizi. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints inatoa, lakini diagnostics ya kwenye editor inaofaa: plugin ya analyzer ilifunguka kutikwa extension huu na ilisimamika kufunguka, kwa hiyo maslahi yango yango yango kama baadhi ya scan. Tafuta diagnostics ya kwenye editor ya kutoa kwa muda mrefu, au tafuta kutoa scan kwa kuzalisha?",

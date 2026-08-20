@@ -1,4 +1,7 @@
 {
+  "about": {
+    "ruleCountStrip": "{total} lint regels zijn momenteel beschikbaar in deze versie (essentieel {essential} · aanbevolen {recommended} · professioneel {professional} · comprehensief {comprehensive} · pedant {pedantic} · {stylistic} opt-in stylistisch)"
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Scan bij opslaan",
@@ -145,6 +148,9 @@
       "sdk-migrations": "Dart en Flutter version-upgrade regels die API's verwijderen of verouderd in een bepaalde SDK."
     }
   },
+  "tierPicker": {
+    "ruleCount": "{count} regels"
+  },
   "consolidated": {
     "kicker": "Veiligheid · Kwaliteit · Beveiliging.",
     "searchPlaceholder": "Filterregels... filterregels.",
@@ -191,6 +197,9 @@
       "analyzerPluginDisabled": "Off — scan-on-save alleen",
       "analyzerPluginAbsent": "Niet geconfigureerd",
       "tierState": "Tier: de hoogste niveau. {tier} is een PH0__.",
+      "lane": "Laan",
+      "laneLight": "Light — ~200 regels in-editor, rest op slaan",
+      "laneFull": "Volledig — elke ingeschakelde regel in de editor",
       "runAfterConfigState": "Voer analyse uit na config-wijziging: {state} is een PH0__.",
       "runAfterDependencyState": "Analyse uitvoeren na afhankelijkheidsverandering: {state} is een PH0__.",
       "uiLanguageState": "UI taal: gebruikersinterface. {language} is een PH0__.",
@@ -1847,6 +1856,20 @@
       "progressConfigWrite": "Config schrijven… ({elapsed}s)",
       "progressAnalysis": "Analyseren... ({elapsed}s)",
       "progressBaseline": "Baseline-scan uitvoeren… ({elapsed}s)"
+    },
+    "lane": {
+      "pickerTitle": "Saropa Lints: Analyseer Regel",
+      "pickerPlaceholder": "Huidig: {lane}",
+      "lightLabel": "Licht (standaard)",
+      "lightDescription": "Alleen ~200 fout/waarschuwing regels lopen in-editor",
+      "lightDetail": "Alles andere arriveert een paar seconden later, bij opslaan, via de scan daemon. Bijna basislijn geheugengebruik: +0,6% RSS gemeten op een groot project. Aanbevolen voor de meeste projecten.",
+      "fullLabel": "Volledig",
+      "fullDescription": "Elke ingeschakelde regel draait in-editor",
+      "fullDetail": "De historische gedrag. Hogere geheugen kosten: +77% RSS gemeten op hetzelfde project. Kies dit alleen als je hebt gecontroleerd dat je project de voetafdruk kan dragen.",
+      "alreadyOnLane": "Al op de {lane} baan.",
+      "updated": "Analysebaan ingesteld op {lane}. Herstarten van de Dart analyse-server om het toe te passen.",
+      "noPluginBlock": "Saropa Lints: kon de analysebaan niet instellen — het analyzer plugin block werd niet gevonden in analysis_options.yaml. Schakel eerst het in-proces plugin in.",
+      "writeFailed": "Saropa Lints: het schrijven van de analysebaan is mislukt. {message}"
     },
     "divergence": {
       "enabledButPluginOff": "Saropa Lints is aan, maar in-editor diagnostics zijn uit: de analyzer plugin is van deze extensie uitgeschakeld en is nooit hersteld, dus problemen verschijnen alleen na een scan. Herstel live in-editor diagnostics, of behoud scan-on-save alleen?",
