@@ -8,6 +8,7 @@ Usage:
 """
 
 import re
+import shutil
 import subprocess
 import sys
 
@@ -37,9 +38,19 @@ def _parse_fix_count(output: str) -> int:
 
 
 def main() -> int:
+    # subprocess.run(['dart', ...]) fails with FileNotFoundError on Windows
+    # even when dart IS on PATH, because Flutter ships `dart.bat` and
+    # CreateProcess does not resolve .bat files without shell=True.
+    # shutil.which() honors PATHEXT and finds it; resolving the full path
+    # up front avoids needing shell=True (and its quoting/injection risk).
+    dart_exe = shutil.which('dart')
+    if dart_exe is None:
+        print('ERROR: dart not found on PATH.')
+        return 2
+
     try:
         result = subprocess.run(
-            ['dart', 'fix', '--dry-run'],
+            [dart_exe, 'fix', '--dry-run'],
             capture_output=True,
             text=True,
             timeout=300,

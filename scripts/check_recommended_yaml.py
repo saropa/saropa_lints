@@ -13,6 +13,7 @@ Usage:
 """
 
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -76,15 +77,25 @@ def main() -> int:
         )
         return 1
 
+    # subprocess.run(['dart', ...]) fails with FileNotFoundError on Windows
+    # even when dart IS on PATH, because Flutter ships `dart.bat` and
+    # CreateProcess does not resolve .bat files without shell=True.
+    # shutil.which() honors PATHEXT and finds it. Resolved before patching
+    # the config so a missing dart bails without ever touching the file.
+    dart_exe = shutil.which('dart')
+    if dart_exe is None:
+        print('ERROR: dart not found on PATH.')
+        return 2
+
     try:
         patched = _patch(original)
         ANALYSIS_OPTIONS.write_text(patched, encoding='utf-8')
 
         # Nested try so the outer `finally` always restores the file even
-        # if dart itself is missing or hangs, not just on lint failures.
+        # if dart itself hangs, not just on lint failures.
         try:
             result = subprocess.run(
-                ['dart', 'analyze', 'lib/'],
+                [dart_exe, 'analyze', 'lib/'],
                 capture_output=True,
                 text=True,
                 timeout=300,
