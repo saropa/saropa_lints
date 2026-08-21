@@ -4,6 +4,8 @@ import 'package:saropa_lints/src/info_plist_utils.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
 import 'package:test/test.dart';
 
+import '../../support/safe_delete.dart';
+
 /// Behavioral contract for [RequireImagePickerPermissionIosRule] plist gating.
 ///
 /// The rule reports only when [InfoPlistChecker.getMissingKeys] lists
@@ -32,7 +34,8 @@ void main() {
       });
 
       tearDown(() {
-        tempDir.deleteSync(recursive: true);
+        // Retry-tolerant cleanup: Windows file handles can linger after tests
+        safeDeleteDir(tempDir);
         InfoPlistChecker.clearCache();
       });
 

@@ -4,6 +4,8 @@ import 'package:saropa_lints/src/android_manifest_utils.dart';
 import 'package:saropa_lints/src/rules/widget/widget_patterns_require_rules.dart';
 import 'package:test/test.dart';
 
+import '../../support/safe_delete.dart';
+
 // Manifest + widget fixture checks for image_picker camera/gallery permissions.
 /// Behavioral contract for [RequireImagePickerPermissionAndroidRule] manifest
 /// gating and [AndroidManifestChecker].
@@ -32,7 +34,8 @@ void main() {
       });
 
       tearDown(() {
-        tempDir.deleteSync(recursive: true);
+        // Retry-tolerant cleanup: Windows file handles can linger after tests
+        safeDeleteDir(tempDir);
         AndroidManifestChecker.clearCache();
       });
 

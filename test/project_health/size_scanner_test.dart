@@ -11,6 +11,8 @@ import 'package:saropa_lints/src/cli/project_health/health_model.dart';
 import 'package:saropa_lints/src/cli/project_health/size_scanner.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   late Directory tmp;
 
@@ -28,7 +30,8 @@ void main() {
     ).writeAsStringSync('var z = 0;\n');
   });
 
-  tearDown(() => tmp.deleteSync(recursive: true));
+  // Retry-tolerant cleanup: Windows file handles can linger after tests
+  tearDown(() => safeDeleteDir(tmp));
 
   test('measures only dart files, skips non-dart and build/', () async {
     final rows = <FileHealth>[];

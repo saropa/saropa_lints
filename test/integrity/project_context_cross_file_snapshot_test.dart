@@ -10,6 +10,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/project_context.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   tearDown(clearCrossFileSnapshotCache);
 
@@ -25,7 +27,8 @@ void main() {
       clearCrossFileSnapshotCache();
       expect(loadCrossFileSnapshot(root.path), isNull);
     } finally {
-      root.deleteSync(recursive: true);
+      // Retry-tolerant cleanup: Windows file handles can linger after tests
+      safeDeleteDir(root);
       clearCrossFileSnapshotCache();
     }
   });
@@ -42,7 +45,7 @@ void main() {
       clearCrossFileSnapshotCache();
       expect(loadCrossFileSnapshot(root.path), isNull);
     } finally {
-      root.deleteSync(recursive: true);
+      safeDeleteDir(root);
       clearCrossFileSnapshotCache();
     }
   });

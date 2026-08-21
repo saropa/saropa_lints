@@ -1,6 +1,6 @@
 # known_issues.json manual review queue
 
-Generated (regenerated at publish time). Checked 302 lifecycle/business-model entries against live pub.dev (13 network error(s)); 49 appear outgrown by a newer release.
+Generated (regenerated at publish time). Checked 302 lifecycle/business-model entries against live pub.dev (13 network error(s)); 50 appear outgrown by a newer release.
 
 Each entry needs a human read of the current reason against the package's present state before editing `known_issues.json` — this report does not edit the file.
 
@@ -10,7 +10,7 @@ Each entry needs a human read of the current reason against the package's presen
 
 _None._
 
-## MEDIUM confidence — lifecycle claim, package still releasing (34)
+## MEDIUM confidence — lifecycle claim, package still releasing (35)
 
 **Suggested action:** Reread the reason against the package's current state; a release doesn't disprove e.g. a specific unfixed bug, but often the underlying complaint has moved on too.
 
@@ -74,6 +74,8 @@ _None._
   - Current reason: Flagged physical Samsung/Pixel devices as emulators due to outdated hardware lists.
 - **`sembast`** (end_of_life) — recorded `2025-12-17`, pub.dev latest `2026-06-26` (v3.8.9+1). [pub.dev](https://pub.dev/packages/sembast)
   - Current reason: Synchronous writes freeze the UI thread on modern devices.
+- **`shimmer`** (caution) — recorded `2023-05-21`, pub.dev latest `2026-08-21` (v4.0.0). [pub.dev](https://pub.dev/packages/shimmer)
+  - Current reason: Significant performance issues (UI jank) were reported with this package.
 - **`simple_animations`** (end_of_life) — recorded `2025-05-03`, pub.dev latest `2026-05-23` (v5.3.0). [pub.dev](https://pub.dev/packages/simple_animations)
   - Current reason: Stateless animation logic is fundamentally incompatible with Dart 3 type safety.
 - **`syncfusion_flutter_calendar`** (end_of_life) — recorded `2026-03-10`, pub.dev latest `2026-08-18` (v34.2.4). [pub.dev](https://pub.dev/packages/syncfusion_flutter_calendar)
@@ -101,13 +103,13 @@ _None._
   - Current reason: Enterprise observability and Application Performance Monitoring (APM). No permanent free tier; you pay heavily per millions of sessions logged.
 - **`flutter_uxcam`** (freemium) — recorded `2026-02-27`, pub.dev latest `2026-08-14` (v2.9.1). [pub.dev](https://pub.dev/packages/flutter_uxcam)
   - Current reason: Session recording and heat-mapping tool. Generous free tier, but the cost scales incredibly steeply once you have a moderate user base.
-- **`mapbox_maps_flutter`** (freemium) — recorded `2026-02-26`, pub.dev latest `2026-08-20` (v2.28.4). [pub.dev](https://pub.dev/packages/mapbox_maps_flutter)
+- **`mapbox_maps_flutter`** (freemium) — recorded `2026-02-26`, pub.dev latest `2026-08-21` (v2.29.0). [pub.dev](https://pub.dev/packages/mapbox_maps_flutter)
   - Current reason: Requires an active billing account and credit card to even generate the necessary public tokens. Charges per map-load/API request after you exceed their free tier.
 - **`purchases_flutter`** (freemium) — recorded `2026-03-05`, pub.dev latest `2026-08-19` (v10.9.1). [pub.dev](https://pub.dev/packages/purchases_flutter)
   - Current reason: RevenueCat's proprietary wrapper. Free up to a specific monthly revenue limit, after which they take a percentage cut of your app's earnings.
 - **`scanbot_sdk`** (paid) — recorded `2025-11-03`, pub.dev latest `2026-07-22` (v9.0.1). [pub.dev](https://pub.dev/packages/scanbot_sdk)
   - Current reason: Strictly commercial enterprise SDK. Cannot be used in production without purchasing a highly expensive yearly corporate license from Scanbot.
-- **`sendbird_chat_sdk`** (commercial) — recorded `2026-02-12`, pub.dev latest `2026-03-27` (v4.10.0). [pub.dev](https://pub.dev/packages/sendbird_chat_sdk)
+- **`sendbird_chat_sdk`** (commercial) — recorded `2026-02-12`, pub.dev latest `2026-08-21` (v4.10.1). [pub.dev](https://pub.dev/packages/sendbird_chat_sdk)
   - Current reason: A heavy, proprietary Chat-as-a-Service SDK. Their free tier is heavily crippled (limits on MAUs and concurrent connections), forcing a rapid upgrade to very expensive paid tiers.
 - **`stream_chat_flutter`** (freemium) — recorded `2026-01-28`, pub.dev latest `2026-08-14` (v10.3.0). [pub.dev](https://pub.dev/packages/stream_chat_flutter)
   - Current reason: Proprietary Chat-as-a-Service SaaS. While it has a startup tier, it is a heavily vendor-locked enterprise product that scales aggressively in cost.

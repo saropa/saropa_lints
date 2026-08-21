@@ -38,6 +38,8 @@ import 'package:saropa_lints/saropa_lints.dart';
 import 'package:saropa_lints/src/scan/capturing_registry.dart';
 import 'package:saropa_lints/src/scan/scan_walker.dart';
 
+import 'safe_delete.dart';
+
 /// A single diagnostic reported by a rule during a harness run.
 class HarnessDiagnostic {
   HarnessDiagnostic({
@@ -136,9 +138,8 @@ Future<List<HarnessDiagnostic>> runRuleResolved(
         ),
     ];
   } finally {
-    if (dir.existsSync()) {
-      dir.deleteSync(recursive: true);
-    }
+    // Retry-tolerant cleanup: Windows file handles can linger after tests
+    safeDeleteDir(dir);
   }
 }
 

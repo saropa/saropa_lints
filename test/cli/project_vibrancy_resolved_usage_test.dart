@@ -18,6 +18,8 @@ import 'dart:io';
 import 'package:saropa_lints/src/cli/project_vibrancy.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   group('project vibrancy resolved usage', () {
     late Directory tempDir;
@@ -34,9 +36,8 @@ environment:
       Directory('${tempDir.path}/lib').createSync(recursive: true);
     });
 
-    tearDown(() {
-      if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
-    });
+    // Retry-tolerant cleanup: Windows file handles can linger after tests
+    tearDown(() => safeDeleteDir(tempDir));
 
     ProjectVibrancyFunctionResult? rowFor(
       ProjectVibrancyReport report,

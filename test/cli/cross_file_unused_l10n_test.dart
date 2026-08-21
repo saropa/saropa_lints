@@ -10,6 +10,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_unused_l10n.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   test(
     'malformed ARB JSON does not throw and yields no keys from that file',
@@ -28,7 +30,8 @@ void main() {
         expect(r.unusedKeys, isEmpty);
         expect(r.arbPaths, isNotEmpty);
       } finally {
-        root.deleteSync(recursive: true);
+        // Retry-tolerant cleanup: Windows file handles can linger
+        safeDeleteDir(root);
       }
     },
   );
@@ -51,7 +54,7 @@ void main() {
       final r = await analyzeUnusedL10n(projectPath: root.path);
       expect(r.unusedKeys, isEmpty);
     } finally {
-      root.deleteSync(recursive: true);
+      safeDeleteDir(root);
     }
   });
 }

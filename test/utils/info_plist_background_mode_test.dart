@@ -11,6 +11,8 @@ import 'dart:io';
 import 'package:saropa_lints/src/info_plist_utils.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   group('InfoPlistChecker background modes', () {
     late Directory tempDir;
@@ -41,7 +43,8 @@ $body
 
     tearDown(() {
       InfoPlistChecker.clearCache();
-      tempDir.deleteSync(recursive: true);
+      // Retry-tolerant cleanup: Windows file handles can linger after tests
+      safeDeleteDir(tempDir);
     });
 
     test(

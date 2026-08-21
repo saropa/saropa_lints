@@ -28,6 +28,8 @@ import 'package:saropa_lints/src/native/config_loader.dart'
 import 'package:saropa_lints/src/native/plugin_logger.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   Set<String>? savedEnabled;
   Set<String>? savedDisabled;
@@ -87,7 +89,8 @@ severity_overrides:
             'rules regardless of fallback config sources.',
       );
     } finally {
-      tempDir.deleteSync(recursive: true);
+      // Retry-tolerant cleanup: Windows file handles can linger after tests
+      safeDeleteDir(tempDir);
     }
   });
 
@@ -115,7 +118,7 @@ plugins:
           reason: 'Without the sentinel, explicit enables must still load.',
         );
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     },
   );

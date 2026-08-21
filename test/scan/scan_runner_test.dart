@@ -16,6 +16,8 @@ import 'package:saropa_lints/saropa_lints.dart' show SaropaLintRule;
 import 'package:saropa_lints/scan.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   final projectRoot = Directory.current.path;
 
@@ -123,7 +125,8 @@ plugins:
           reason: 'config diagnostics: true must add rules beyond the tier',
         );
       } finally {
-        tempDir.deleteSync(recursive: true);
+        // Retry-tolerant cleanup: Windows file handles can linger after tests
+        safeDeleteDir(tempDir);
       }
     });
   });
@@ -164,7 +167,7 @@ plugins:
         expect(relative, isNot(contains('lib/model.g.dart')));
         expect(relative, isNot(contains('build/leftover.dart')));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -175,7 +178,7 @@ plugins:
       try {
         expect(ScanRunner.discoverDartFiles(tempDir.path), isEmpty);
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
   });

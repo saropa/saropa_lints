@@ -7,6 +7,8 @@ import 'dart:io';
 import 'package:saropa_lints/src/cli/project_health/temporal_coupling.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   test('returns well-formed change-coupled pairs', () {
     final pairs = loadTemporalCoupling(
@@ -31,7 +33,8 @@ void main() {
 
   test('a non-git directory yields no pairs', () {
     final tmp = Directory.systemTemp.createTempSync('saropa_nogit_tc_');
-    addTearDown(() => tmp.deleteSync(recursive: true));
+    // Retry-tolerant cleanup: Windows file handles can linger after tests
+    addTearDown(() => safeDeleteDir(tmp));
     expect(loadTemporalCoupling(tmp.path), isEmpty);
   });
 }

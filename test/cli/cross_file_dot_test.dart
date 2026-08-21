@@ -5,6 +5,8 @@ import 'package:saropa_lints/src/cli/cross_file_analyzer.dart';
 import 'package:saropa_lints/src/cli/cross_file_dot_reporter.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 /// Tests for DOT graph export in cross-file analysis.
 ///
 /// Uses the cross_file_fixture which has 4 files:
@@ -26,11 +28,8 @@ void main() {
     tempDir = Directory.systemTemp.createTempSync('cross_file_dot_test_');
   });
 
-  tearDown(() {
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
-  });
+  // Retry-tolerant cleanup: Windows file handles can linger
+  tearDown(() => safeDeleteDir(tempDir));
 
   group('exportDotGraph', () {
     test('produces valid DOT with all 4 fixture nodes', () async {

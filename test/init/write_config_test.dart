@@ -9,6 +9,8 @@ import 'package:saropa_lints/src/config/analysis_options_rule_packs.dart';
 import 'package:saropa_lints/src/init/write_config_runner.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   group('runWriteConfig', () {
     test('invalid tier returns error', () {
@@ -20,7 +22,8 @@ void main() {
         expect(result.ok, isFalse);
         expect(result.error, contains('Invalid tier'));
       } finally {
-        dir.deleteSync(recursive: true);
+        // Retry-tolerant cleanup: Windows file handles can linger after tests
+        safeDeleteDir(dir);
       }
     });
 
@@ -41,7 +44,7 @@ void main() {
         expect(content, contains('diagnostics:'));
         expect(content, contains('log_level: info'));
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
 
@@ -73,7 +76,7 @@ void main() {
         expect(content, isNot(contains('\nplugins:\n')));
         expect(content, contains('# plugins:'));
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
 
@@ -104,7 +107,7 @@ plugins:
         expect(content, isNot(contains('# plugins:')));
         expect(content.trimLeft(), startsWith('plugins:\n'));
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
 
@@ -143,7 +146,7 @@ plugins:
           );
           expect(content, isNot(contains('\nplugins:\n')));
         } finally {
-          dir.deleteSync(recursive: true);
+          safeDeleteDir(dir);
         }
       },
     );
@@ -174,7 +177,7 @@ plugins:
           expect(content, isNot(contains('═')));
           expect(content, isNot(contains('┌')));
         } finally {
-          dir.deleteSync(recursive: true);
+          safeDeleteDir(dir);
         }
       },
     );
@@ -203,7 +206,7 @@ plugins:
         final content = outputFile.readAsStringSync();
         expect(content, contains('SAROPA LINTS CONFIGURATION'));
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
 
@@ -219,7 +222,7 @@ plugins:
         );
         expect(customFile.existsSync(), isTrue);
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
 
@@ -252,7 +255,7 @@ plugins:
           expect(content.contains('rule_packs:'), isTrue);
           expect(parseRulePacksEnabledList(content), contains('drift'));
         } finally {
-          dir.deleteSync(recursive: true);
+          safeDeleteDir(dir);
         }
       },
     );
@@ -291,7 +294,7 @@ plugins:
           expect(after.contains('rule_packs:'), isTrue);
           expect(parseRulePacksEnabledList(after), ['drift', 'riverpod']);
         } finally {
-          dir.deleteSync(recursive: true);
+          safeDeleteDir(dir);
         }
       },
     );
@@ -317,7 +320,7 @@ plugins:
         // Essential output is non-empty (the filter did not wipe the tier).
         expect(content.contains('diagnostics:'), isTrue);
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
 
@@ -345,7 +348,7 @@ plugins:
         ).readAsStringSync();
         expect(content.contains('avoid_api_key_in_code: true'), isTrue);
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
   });

@@ -12,6 +12,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/config/pubspec_lock_resolver.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 // pubspec_lock_resolver: path resolution from pubspec.lock package entries.
 
 const _sampleLock = r'''
@@ -81,7 +83,8 @@ void main() {
         expect(isDirectDependency(dir.path, 'not_present'), isNull);
       } finally {
         clearPubspecLockResolverCacheForTests();
-        dir.deleteSync(recursive: true);
+        // Retry-tolerant cleanup: Windows file handles can linger after tests
+        safeDeleteDir(dir);
       }
     });
   });

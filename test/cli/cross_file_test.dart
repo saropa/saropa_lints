@@ -17,6 +17,7 @@ import 'package:saropa_lints/src/cli/cross_file_analyzer.dart';
 import 'package:saropa_lints/src/cli/cross_file_html_reporter.dart';
 import 'package:saropa_lints/src/cli/cross_file_reporter.dart';
 import 'package:test/test.dart';
+import '../support/safe_delete.dart';
 import '../../bin/cross_file.dart' as cross_file_bin;
 
 void main() {
@@ -343,9 +344,8 @@ void main() {
           expect(featureHtml, contains('Matrix'));
           expect(featureHtml, contains('href="report.css"'));
         } finally {
-          if (tmp.existsSync()) {
-            tmp.deleteSync(recursive: true);
-          }
+          // Retry-tolerant cleanup: Windows file handles can linger
+          safeDeleteDir(tmp);
         }
       },
     );

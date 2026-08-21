@@ -11,6 +11,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/conditional_import_utils.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   group('isNativeOnlyConditionalImportTarget', () {
     test('returns false for null or empty path', () {
@@ -37,7 +39,8 @@ environment:
           File(filePath).writeAsStringSync('void main() {}');
           expect(isNativeOnlyConditionalImportTarget(filePath), isFalse);
         } finally {
-          dir.deleteSync(recursive: true);
+          // Retry-tolerant cleanup: Windows file handles can linger after tests
+          safeDeleteDir(dir);
         }
       },
     );
@@ -56,7 +59,7 @@ import 'stub.dart' if (dart.library.io) 'native_impl.dart';
           final nativePath = p.join(dir.path, 'lib', 'native_impl.dart');
           expect(isNativeOnlyConditionalImportTarget(nativePath), isTrue);
         } finally {
-          dir.deleteSync(recursive: true);
+          safeDeleteDir(dir);
         }
       },
     );
@@ -76,7 +79,7 @@ import 'executor_web.dart' if (dart.library.ffi) 'executor_native.dart';
           File(nativePath).writeAsStringSync('void f() {}');
           expect(isNativeOnlyConditionalImportTarget(nativePath), isTrue);
         } finally {
-          dir.deleteSync(recursive: true);
+          safeDeleteDir(dir);
         }
       },
     );
@@ -93,7 +96,7 @@ import 'stub.dart' if (dart.library.io) 'native_impl.dart';
         final stubPath = p.join(dir.path, 'lib', 'stub.dart');
         expect(isNativeOnlyConditionalImportTarget(stubPath), isFalse);
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
 
@@ -110,7 +113,7 @@ import 'stub.dart' if (dart.library.io) 'native_impl.dart';
         File(otherPath).writeAsStringSync('void other() {}');
         expect(isNativeOnlyConditionalImportTarget(otherPath), isFalse);
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
 
@@ -128,7 +131,7 @@ import 'package:test_package/stub.dart' if (dart.library.io) 'package:test_packa
           final nativePath = p.join(dir.path, 'lib', 'native_impl.dart');
           expect(isNativeOnlyConditionalImportTarget(nativePath), isTrue);
         } finally {
-          dir.deleteSync(recursive: true);
+          safeDeleteDir(dir);
         }
       },
     );
@@ -150,7 +153,7 @@ export 'stub.dart' if (dart.library.io) 'native_impl.dart';
           final nativePath = p.join(dir.path, 'lib', 'native_impl.dart');
           expect(isNativeOnlyConditionalImportTarget(nativePath), isTrue);
         } finally {
-          dir.deleteSync(recursive: true);
+          safeDeleteDir(dir);
         }
       },
     );
@@ -174,7 +177,7 @@ environment:
         ).writeAsStringSync('void serve() {}');
         expect(isNativeOnlyConditionalImportTarget(ioPath), isTrue);
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
 
@@ -192,7 +195,7 @@ environment:
         File(ioPath).writeAsStringSync('void serve() {}');
         expect(isNativeOnlyConditionalImportTarget(ioPath), isFalse);
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
 
@@ -218,7 +221,7 @@ import 'native_impl.dart';
         final nativePath = p.join(dir.path, 'lib', 'native_impl.dart');
         expect(isNativeOnlyConditionalImportTarget(nativePath), isFalse);
       } finally {
-        dir.deleteSync(recursive: true);
+        safeDeleteDir(dir);
       }
     });
   });

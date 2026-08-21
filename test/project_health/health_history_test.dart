@@ -12,6 +12,8 @@ import 'dart:io';
 import 'package:saropa_lints/src/cli/project_health/health_history.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   test(
     'builds well-formed trajectory points from git tags',
@@ -95,7 +97,8 @@ void main() {
 
   test('a non-git directory yields no history', () async {
     final tmp = Directory.systemTemp.createTempSync('saropa_nohist_');
-    addTearDown(() => tmp.deleteSync(recursive: true));
+    // Retry-tolerant cleanup: Windows file handles can linger after tests
+    addTearDown(() => safeDeleteDir(tmp));
     expect(await loadHealthHistory(tmp.path), isEmpty);
   });
 }

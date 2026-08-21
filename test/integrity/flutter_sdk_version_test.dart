@@ -4,6 +4,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 /// Tests for [ProjectContext.flutterSdkAtLeast]. Creates a temporary project
 /// root with a synthetic `pubspec.yaml`, then asks the SDK-gate helper
 /// whether the project satisfies a required `major.minor.patch`.
@@ -20,11 +22,8 @@ void main() {
       tempRoot = Directory.systemTemp.createTempSync('saropa_sdk_gate_');
     });
 
-    tearDown(() {
-      if (tempRoot.existsSync()) {
-        tempRoot.deleteSync(recursive: true);
-      }
-    });
+    // Retry-tolerant cleanup: Windows file handles can linger after tests
+    tearDown(() => safeDeleteDir(tempRoot));
 
     /// Writes `pubspec.yaml` at the temp project root and returns a path to
     /// a synthetic Dart file inside `lib/` — the argument shape the gate

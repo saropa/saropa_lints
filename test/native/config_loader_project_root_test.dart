@@ -34,6 +34,8 @@ import 'package:saropa_lints/src/native/config_loader.dart'
 import 'package:saropa_lints/src/native/plugin_logger.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   Set<String>? savedEnabled;
   Set<String>? savedDisabled;
@@ -100,7 +102,8 @@ plugins:
           contains('prefer_const_constructors'),
         );
       } finally {
-        tempDir.deleteSync(recursive: true);
+        // Retry-tolerant cleanup: Windows file handles can linger after tests
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -131,7 +134,7 @@ plugins:
           reason: 'Missing diagnostics block must fail closed, not open',
         );
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -155,7 +158,7 @@ plugins:
           reason: 'log_level must be parsed even without diagnostics block',
         );
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -196,7 +199,7 @@ plugins:
           reason: 'Must state the retained level, not hardcode "falling back"',
         );
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -218,7 +221,7 @@ plugins:
           reason: 'Tab-indented log_level must be parsed',
         );
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -234,7 +237,7 @@ plugins:
           reason: 'Missing config file must fail closed, not open',
         );
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
   });
@@ -296,7 +299,7 @@ plugins:
           reason: 'Prior pack contributions must be removed on root switch',
         );
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
   });

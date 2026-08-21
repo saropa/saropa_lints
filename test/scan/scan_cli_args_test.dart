@@ -9,6 +9,8 @@ import 'dart:io';
 import 'package:saropa_lints/src/scan/scan_cli_args.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   group('scan CLI (process)', () {
     test('--tier with no value exits with 2', () async {
@@ -915,8 +917,8 @@ void main() {
           reason: 'Expected stderr confirmation of file write',
         );
       } finally {
-        // Clean up the temp directory.
-        tempDir.deleteSync(recursive: true);
+        // Retry-tolerant cleanup: Windows file handles can linger after tests
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -950,7 +952,7 @@ void main() {
               'exit: ${result.exitCode}, stderr: ${result.stderr}',
         );
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
   });

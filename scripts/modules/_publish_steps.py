@@ -878,19 +878,63 @@ def _dart_test_env(project_dir: Path) -> dict[str, str]:
     return env
 
 
+def _read_log_text(log_path: Path) -> str:
+    """Read a log file as UTF-8, returning empty string on missing/unreadable files."""
+    if not log_path.exists():
+        return ""
+    try:
+        return log_path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
 def _log_shows_windows_file_lock(log_path: Path) -> bool:
     """True if the log indicates a transient Windows file-lock (PathAccessException / errno 32)."""
-    if not log_path.exists():
-        return False
-    try:
-        text = log_path.read_text(encoding="utf-8", errors="replace")
-    except OSError:
+    text = _read_log_text(log_path)
+    if not text:
         return False
     return (
         "PathAccessException" in text
         or "being used by another process" in text
         or "errno = 32" in text
     )
+
+
+def _log_shows_vm_crash(log_path: Path) -> bool:
+    """True if the log indicates a Dart VM crash (heap corruption, segfault, etc.).
+
+    These crashes kill the test runner isolate mid-run, causing all subsequent
+    test files to report "Failed to load" with no message. They are transient
+    and unrelated to code correctness.
+    """
+    text = _read_log_text(log_path)
+    if not text:
+        return False
+    return (
+        "Corrupt heap" in text
+        or "Invalid cid:" in text
+        or "EXCEPTION CAUGHT BY VM" in text
+        or "raw_object.cc" in text
+    )
+
+
+def _log_transient_failure_reason(log_path: Path) -> str | None:
+    """Return a human-readable reason if the log only shows transient failures, else None.
+
+    Detects Windows file locks and Dart VM crashes — both are infrastructure
+    flakes that disappear on retry and never indicate a code defect.
+    """
+    has_file_lock = _log_shows_windows_file_lock(log_path)
+    has_vm_crash = _log_shows_vm_crash(log_path)
+    if not has_file_lock and not has_vm_crash:
+        return None
+    # Build a combined reason string
+    reasons: list[str] = []
+    if has_vm_crash:
+        reasons.append("Dart VM heap corruption crash")
+    if has_file_lock:
+        reasons.append("Windows file-lock race (PathAccessException)")
+    return " + ".join(reasons)
 
 
 def _run_chain_stack_traces_and_check(
@@ -902,7 +946,7 @@ def _run_chain_stack_traces_and_check(
 
     Used in Step 7 when plain 'dart test' fails. Writes to reports/YYYYMMDD/YYYYMMDD_HHMMSS_chain_stack_traces.log.
     Shows a spinner while the subprocess runs. Calls _check_log_for_errors to print failure lines (cap 50).
-    On Windows, retries once if the log shows a transient PathAccessException (file in use in .dart_test_tmp).
+    Retries once if the log shows transient failures (VM heap crash or Windows file lock).
 
     Returns:
         True iff the test process exited with code 0. False if non-zero exit or if subprocess/open raised.
@@ -965,12 +1009,12 @@ def _run_chain_stack_traces_and_check(
                 pass
         if result is not None and result.returncode == 0:
             return True
-        # Retry once on Windows when log shows transient file lock in .dart_test_tmp
-        if attempt == 0 and _log_shows_windows_file_lock(log_path):
-            print_warning(
-                "Transient Windows file lock detected (.dart_test_tmp). Retrying tests once..."
-            )
-            continue
+        # Retry once on transient failures: Windows file locks or Dart VM crashes
+        if attempt == 0:
+            transient = _log_transient_failure_reason(log_path)
+            if transient:
+                print_warning(f"Transient failure detected: {transient}. Retrying once...")
+                continue
         break
 
     _check_log_for_errors(last_log_path, last_date_str, last_log_name)
@@ -992,6 +1036,9 @@ _TEST_FAILURE_MARKERS_PRIMARY = (
     "Error:",
     "Exception",
     "Bad state",
+    "Corrupt heap",
+    "PathAccessException",
+    "Failed to load",
 )
 # Compact reporter: only useful if primary markers did not capture the real error.
 _TEST_FAILURE_MARKERS_COMPACT = (
@@ -1107,6 +1154,9 @@ def _check_log_for_errors(log_path: Path, date_str: str, log_name: str) -> None:
         "Actual:",
         "which was",
         "Bad state",
+        "Corrupt heap",
+        "PathAccessException",
+        "Failed to load",
     )
     found = []
     for i, line in enumerate(lines):
@@ -1153,17 +1203,32 @@ def _run_test_pass(
         print_success(f"{label.capitalize()} tests passed.")
         return True
 
-    print_warning("Retrying tests once...")
+    # Check whether the failure looks transient (VM crash or file lock)
+    transient_reason = _log_transient_failure_reason(log_path)
+    if transient_reason:
+        print_warning(f"Transient failure detected: {transient_reason}")
+        print_warning("Retrying tests once...")
+    else:
+        print_warning("Retrying tests once...")
     retry_name = f"{date_str}_{time_str}_dart_test_{label}_retry.log"
     retry_path = reports_dir / retry_name
     retry_code = _run_dart_test_to_file(project_dir, env, retry_path, extra_args)
     if retry_code == 0:
-        print_success(f"{label.capitalize()} tests passed on retry.")
+        if transient_reason:
+            print_success(f"{label.capitalize()} tests passed on retry (confirmed transient).")
+        else:
+            print_success(f"{label.capitalize()} tests passed on retry.")
         return True
 
-    # Both runs failed: show log path and short excerpt, then prompt
+    # Both runs failed: check whether retry also shows transient issues
+    retry_transient = _log_transient_failure_reason(retry_path)
     last_log = retry_path
     while True:
+        # Surface transient failure diagnosis so the user knows Retry is safe
+        current_transient = _log_transient_failure_reason(last_log)
+        if current_transient:
+            print_warning(f"⚠ Transient infrastructure failure: {current_transient}")
+            print_info("  These failures are unrelated to code — Retry is recommended.")
         print_error(
             f"{label.capitalize()} tests failed. Full output in log file (no test output was printed to this terminal)."
         )
@@ -1192,8 +1257,9 @@ def _run_test_pass(
                 return True
             continue
         # Abort: run chain-stack-traces so a detailed log exists, then return False
-        print_info("Writing detailed trace to log (output → reports/.../chain_stack_traces.log)")
+        print_warning("Aborting — capturing one final diagnostic trace (this is NOT a retry)...")
         _run_chain_stack_traces_and_check(project_dir, env, extra_args)
+        print_info("Diagnostic trace saved. Aborting publish.")
         return False
 
 

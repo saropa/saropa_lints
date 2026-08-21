@@ -9,12 +9,15 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/project_health/deadweight_overlay.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   test(
     'flags an unimported file as unused, spares an imported one',
     () async {
       final tmp = Directory.systemTemp.createTempSync('saropa_dw_int_');
-      addTearDown(() => tmp.deleteSync(recursive: true));
+      // Retry-tolerant cleanup: Windows file handles can linger after tests
+      addTearDown(() => safeDeleteDir(tmp));
       Directory(p.join(tmp.path, 'lib')).createSync();
       File(p.join(tmp.path, 'pubspec.yaml')).writeAsStringSync(
         'name: demo\nenvironment:\n  sdk: ">=3.0.0 <4.0.0"\n',

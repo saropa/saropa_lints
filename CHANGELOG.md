@@ -81,6 +81,12 @@ The scan CLI gains three new flags that make it easier to wire into CI and autom
 - The `max_issues` Problems-tab cap (default 500, configurable via `max_issues:` in `analysis_options_custom.yaml`) is now actually enforced. It previously tracked the count and printed a "N issues in Problems tab" message without withholding anything — every issue still reached the Problems tab regardless of the configured limit. ERROR-severity diagnostics always surface regardless of the cap; `violations.json` and the text report remain uncapped either way. No action required.
 - Scan CLI progress messages ("Loaded N rules…", "Scanning N files…") now go to stderr instead of stdout, so `--format json` output is valid JSON when redirected to a file. No action required. ([#310](https://github.com/saropa/saropa_lints/issues/310))
 
+<details><summary>Maintenance</summary>
+
+- Publish script test runner now detects Dart VM heap corruption crashes and Windows file-lock races as transient infrastructure failures, shows a clear diagnosis, and recommends Retry instead of leaving the user to parse raw stack traces.
+
+</details>
+
 ---
 
 ## [15.2.0]

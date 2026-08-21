@@ -7,12 +7,15 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_options_config.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   // Missing YAML → empty excludes; valid section → typed fields (see CrossFileProjectCliOptions).
   group('CrossFileProjectCliOptions', () {
     test('returns empty when analysis_options.yaml is missing', () {
       final dir = Directory.systemTemp.createTempSync('cross_file_cfg_');
-      addTearDown(() => dir.deleteSync(recursive: true));
+      // Retry-tolerant cleanup: Windows file handles can linger
+      addTearDown(() => safeDeleteDir(dir));
       final o = CrossFileProjectCliOptions.load(dir.path);
       expect(o.excludeGlobs, isEmpty);
       expect(o.heuristicDeadImports, isNull);
@@ -20,7 +23,7 @@ void main() {
 
     test('parses saropa_lints_cross_file section', () {
       final dir = Directory.systemTemp.createTempSync('cross_file_cfg_');
-      addTearDown(() => dir.deleteSync(recursive: true));
+      addTearDown(() => safeDeleteDir(dir));
       File(p.join(dir.path, 'analysis_options.yaml')).writeAsStringSync('''
 saropa_lints_cross_file:
   excludes:

@@ -14,6 +14,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart' show RuleTier;
 import 'package:saropa_lints/src/tiers.dart' as tiers;
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 // runtime_tier_cap: parse tier from analysis options YAML; rule cap by tier in tests.
 
 void main() {
@@ -77,13 +79,8 @@ plugins:
   group('RuntimeTierCap', () {
     test('SAROPA_TIER caps pedantic-only rules off', () {
       final tmp = Directory.systemTemp.createTempSync('saropa_tier_cap_');
-      addTearDown(() {
-        try {
-          tmp.deleteSync(recursive: true);
-        } on Object {
-          // Best-effort cleanup.
-        }
-      });
+      // Retry-tolerant cleanup: Windows file handles can linger after tests
+      addTearDown(() => safeDeleteDir(tmp));
 
       File('${tmp.path}/analysis_options.yaml').writeAsStringSync('''
 plugins:
@@ -112,13 +109,7 @@ plugins:
   group('in-process plugin tier cap (memory fix)', () {
     Directory makeProject(String? optionsYaml) {
       final tmp = Directory.systemTemp.createTempSync('saropa_plugin_cap_');
-      addTearDown(() {
-        try {
-          tmp.deleteSync(recursive: true);
-        } on Object {
-          // Best-effort cleanup.
-        }
-      });
+      addTearDown(() => safeDeleteDir(tmp));
       if (optionsYaml != null) {
         File(
           '${tmp.path}/analysis_options.yaml',

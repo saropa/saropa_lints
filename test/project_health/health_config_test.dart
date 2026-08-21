@@ -8,11 +8,14 @@ import 'package:saropa_lints/src/cli/project_health/asset_scanner.dart';
 import 'package:saropa_lints/src/cli/project_health/health_config.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   group('loadHealthConfig', () {
     test('absent config is empty (no-op)', () {
       final tmp = Directory.systemTemp.createTempSync('saropa_cfg_');
-      addTearDown(() => tmp.deleteSync(recursive: true));
+      // Retry-tolerant cleanup: Windows file handles can linger after tests
+      addTearDown(() => safeDeleteDir(tmp));
       final cfg = loadHealthConfig(tmp.path);
       expect(cfg.excludeGlobs, isEmpty);
       expect(cfg.ignoreDeadFiles, isEmpty);
@@ -20,7 +23,7 @@ void main() {
 
     test('parses excludes and ignore lists', () {
       final tmp = Directory.systemTemp.createTempSync('saropa_cfg_');
-      addTearDown(() => tmp.deleteSync(recursive: true));
+      addTearDown(() => safeDeleteDir(tmp));
       File(p.join(tmp.path, '.saropa_health.yaml')).writeAsStringSync('''
 exclude:
   - "lib/generated/**"

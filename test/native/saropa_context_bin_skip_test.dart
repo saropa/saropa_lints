@@ -28,6 +28,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/native/saropa_context.dart' show SaropaContext;
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   late Directory tempDir;
   late String tempRoot;
@@ -45,7 +47,8 @@ void main() {
   });
 
   tearDown(() {
-    tempDir.deleteSync(recursive: true);
+    // Retry-tolerant cleanup: Windows file handles can linger after tests
+    safeDeleteDir(tempDir);
   });
 
   group('SaropaContext.isPathUnderProjectBin', () {
@@ -106,7 +109,7 @@ void main() {
         final path = p.join(orphanDir.path, 'bin', 'cli.dart');
         expect(SaropaContext.isPathUnderProjectBin(path), isFalse);
       } finally {
-        orphanDir.deleteSync(recursive: true);
+        safeDeleteDir(orphanDir);
       }
     });
   });

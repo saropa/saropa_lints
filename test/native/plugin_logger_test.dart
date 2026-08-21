@@ -25,6 +25,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/native/plugin_logger.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   setUp(() {
     PluginLogger.resetForTesting();
@@ -92,7 +94,8 @@ void main() {
           expect(contents, contains('pre-root entry one'));
           expect(contents, contains('pre-root entry two'));
         } finally {
-          tempDir.deleteSync(recursive: true);
+          // Retry-tolerant cleanup: Windows file handles can linger after tests
+          safeDeleteDir(tempDir);
         }
       },
     );
@@ -114,7 +117,7 @@ void main() {
         ).readAsStringSync();
         expect(contents, contains('post-root entry'));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -146,8 +149,8 @@ void main() {
           isFalse,
         );
       } finally {
-        firstRoot.deleteSync(recursive: true);
-        secondRoot.deleteSync(recursive: true);
+        safeDeleteDir(firstRoot);
+        safeDeleteDir(secondRoot);
       }
     });
 
@@ -169,7 +172,7 @@ void main() {
         );
         expect(PluginLogger.bufferSizeForTesting, 1);
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -201,7 +204,7 @@ void main() {
         expect(contents, contains('WARNING:'));
         expect(contents, contains('plugin restarts in last'));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -231,7 +234,7 @@ void main() {
         final contents = logFile.readAsStringSync();
         expect(contents, isNot(contains('WARNING:')));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -261,7 +264,7 @@ void main() {
         final contents = logFile.readAsStringSync();
         expect(contents, isNot(contains('WARNING:')));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -286,7 +289,7 @@ void main() {
         final contents = logFile.readAsStringSync();
         expect(contents, contains('session started'));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -322,7 +325,7 @@ void main() {
         );
         expect(contents, contains('session started'));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -351,7 +354,7 @@ void main() {
         expect(contents.startsWith('\r'), isFalse);
         expect(contents, contains('session started'));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -375,7 +378,7 @@ void main() {
         expect(contents, contains('session started'));
         expect(contents.length, lessThan(600 * 1024));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -397,7 +400,7 @@ void main() {
         expect(contents, isNot(contains('info message')));
         expect(contents, isNot(contains('debug message')));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -416,7 +419,7 @@ void main() {
         expect(contents, isNot(contains('should not appear')));
         expect(contents, contains('session started'));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
 
@@ -439,7 +442,7 @@ void main() {
         expect(contents, contains('deliberate test error'));
         expect(contents, contains('stack:'));
       } finally {
-        tempDir.deleteSync(recursive: true);
+        safeDeleteDir(tempDir);
       }
     });
   });

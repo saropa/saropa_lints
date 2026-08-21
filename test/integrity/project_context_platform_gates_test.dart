@@ -4,6 +4,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 /// Tests for [ProjectContext.hasNonWebPlatform] and
 /// [ProjectContext.hasPointerPlatform].
 ///
@@ -32,11 +34,8 @@ void main() {
     tempRoot = Directory.systemTemp.createTempSync('saropa_platform_gates_');
   });
 
-  tearDown(() {
-    if (tempRoot.existsSync()) {
-      tempRoot.deleteSync(recursive: true);
-    }
-  });
+  // Retry-tolerant cleanup: Windows file handles can linger after tests
+  tearDown(() => safeDeleteDir(tempRoot));
 
   /// Writes `pubspec.yaml` at the temp project root, creates each named
   /// directory in [platformDirs] at the root, and returns a path to a

@@ -10,6 +10,8 @@ import 'dart:io';
 import 'package:saropa_lints/src/android_manifest_utils.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   group('AndroidManifestChecker', () {
     late Directory root;
@@ -46,9 +48,8 @@ $entries
 
     tearDown(() {
       AndroidManifestChecker.clearCache();
-      if (root.existsSync()) {
-        root.deleteSync(recursive: true);
-      }
+      // Retry-tolerant cleanup: Windows file handles can linger after tests
+      safeDeleteDir(root);
     });
 
     test(

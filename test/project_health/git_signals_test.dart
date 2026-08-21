@@ -7,6 +7,8 @@ import 'dart:io';
 import 'package:saropa_lints/src/cli/project_health/git_signals.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   group('loadGitSignals', () {
     test('returns well-formed signals for tracked files', () {
@@ -22,7 +24,8 @@ void main() {
 
     test('a non-git directory yields no signals', () {
       final tmp = Directory.systemTemp.createTempSync('saropa_nogit_');
-      addTearDown(() => tmp.deleteSync(recursive: true));
+      // Retry-tolerant cleanup: Windows file handles can linger after tests
+      addTearDown(() => safeDeleteDir(tmp));
       expect(loadGitSignals(tmp.path), isEmpty);
     });
   });

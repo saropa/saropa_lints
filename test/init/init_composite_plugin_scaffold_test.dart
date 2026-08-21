@@ -12,6 +12,8 @@ import 'package:saropa_lints/src/init/cli_args.dart';
 import 'package:saropa_lints/src/init/composite_plugin_scaffold.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 // composite_plugin_scaffold: emitted custom_lint plugin package layout on disk.
 
 void main() {
@@ -26,7 +28,8 @@ void main() {
       expect(main, contains('registerSaropaLintRules'));
       expect(main, contains('class SaropaCompositePlugin'));
     } finally {
-      dir.deleteSync(recursive: true);
+      // Retry-tolerant cleanup: Windows file handles can linger after tests
+      safeDeleteDir(dir);
     }
   });
 

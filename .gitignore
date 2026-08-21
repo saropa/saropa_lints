@@ -45,7 +45,7 @@ articles/
 __pycache__/
 
 # Reports (output ignored, but organize script is tracked)
-report/
+/report/
 reports/*
 !reports/organize_reports.py
 

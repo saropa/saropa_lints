@@ -4,6 +4,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart';
 import 'package:test/test.dart';
 
+import '../../support/safe_delete.dart';
+
 /// Tests for [ProjectContext.hasWebSupport] and the `avoid_platform_specific_imports`
 /// project-level gate.
 ///
@@ -36,11 +38,8 @@ void main() {
       tempRoot = Directory.systemTemp.createTempSync('saropa_web_gate_');
     });
 
-    tearDown(() {
-      if (tempRoot.existsSync()) {
-        tempRoot.deleteSync(recursive: true);
-      }
-    });
+    // Retry-tolerant cleanup: Windows file handles can linger after tests
+    tearDown(() => safeDeleteDir(tempRoot));
 
     /// Writes `pubspec.yaml` at the temp project root, optionally creates
     /// a `web/` directory, and returns a path to a synthetic Dart file

@@ -7,6 +7,8 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/project_health/asset_scanner.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   late Directory tmp;
 
@@ -30,7 +32,8 @@ flutter:
     ).writeAsStringSync("const img = 'assets/used.png';");
   });
 
-  tearDown(() => tmp.deleteSync(recursive: true));
+  // Retry-tolerant cleanup: Windows file handles can linger after tests
+  tearDown(() => safeDeleteDir(tmp));
 
   test('flags unreferenced declared assets but not referenced ones', () {
     final findings = scanUnusedAssets(tmp.path);
@@ -47,7 +50,7 @@ flutter:
 
   test('no pubspec yields no findings', () {
     final empty = Directory.systemTemp.createTempSync('saropa_noassets_');
-    addTearDown(() => empty.deleteSync(recursive: true));
+    addTearDown(() => safeDeleteDir(empty));
     expect(scanUnusedAssets(empty.path), isEmpty);
   });
 }
