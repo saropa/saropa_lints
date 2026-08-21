@@ -519,6 +519,71 @@ void main() {
     });
   });
 
+  group('--fail-on-count', () {
+    test('--fail-on-count parses valid integer', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on',
+        'warning',
+        '--fail-on-count',
+        '5',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.failOnCount, 5);
+    });
+
+    test('--fail-on-count accepts zero', () {
+      // Zero means "any match triggers exit 1" — same as omitting the flag.
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on',
+        'error',
+        '--fail-on-count',
+        '0',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.failOnCount, 0);
+    });
+
+    test('--fail-on-count with negative value returns invalid', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on-count',
+        '-1',
+      ]);
+      // Negative looks like a flag (starts with --), caught by the starts-with check.
+      expect(result, isA<ScanParseInvalid>());
+    });
+
+    test('--fail-on-count with non-integer returns invalid', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on-count',
+        'five',
+      ]);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--fail-on-count must be a non-negative integer'),
+      );
+    });
+
+    test('--fail-on-count with no value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--fail-on-count']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--fail-on-count requires'),
+      );
+    });
+
+    test('--fail-on-count null by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.failOnCount, isNull);
+    });
+  });
+
   group('--quiet / -q', () {
     test('--quiet sets quiet flag', () {
       final result = parseScanArgs(<String>['.', '--quiet']);
@@ -723,6 +788,66 @@ void main() {
       expect(
         result.stdout.toString(),
         contains('--fail-on must be one of'),
+      );
+    });
+
+    test('--fail-on checks full set when --max-severity narrows display',
+        () async {
+      // Display is capped at warning (no errors shown), but --fail-on info
+      // checks the FULL set. The project always has info-level diagnostics,
+      // so exit should be 1 even though the display window excludes errors.
+      final result = await Process.run(
+        'dart',
+        [
+          'run',
+          'saropa_lints:scan',
+          '.',
+          '--tier',
+          'essential',
+          '--max-severity',
+          'warning',
+          '--fail-on',
+          'info',
+        ],
+        runInShell: true,
+        workingDirectory: Directory.current.path,
+      );
+      expect(
+        result.exitCode,
+        1,
+        reason:
+            'Expected exit 1: --fail-on info checks full set, not the '
+            '--max-severity-filtered display. stdout: ${result.stdout}',
+      );
+    });
+
+    test('--fail-on-count raises the exit threshold', () async {
+      // The project has many info+ diagnostics under essential. Without
+      // --fail-on-count, --fail-on info exits 1. With a very high count
+      // baseline, the matching count won't exceed it — exit 0.
+      final result = await Process.run(
+        'dart',
+        [
+          'run',
+          'saropa_lints:scan',
+          '.',
+          '--tier',
+          'essential',
+          '--fail-on',
+          'info',
+          '--fail-on-count',
+          '99999',
+        ],
+        runInShell: true,
+        workingDirectory: Directory.current.path,
+      );
+      // With a baseline of 99999, the project's diagnostics can't exceed it.
+      expect(
+        result.exitCode,
+        0,
+        reason:
+            'Expected exit 0: --fail-on-count 99999 baseline not exceeded. '
+            'stdout: ${result.stdout}',
       );
     });
   });

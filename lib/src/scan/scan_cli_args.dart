@@ -48,6 +48,7 @@ class ScanCliArgs {
     this.maxSeverity,
     this.minImpact,
     this.failOn,
+    this.failOnCount,
     this.jsonFilePath,
     this.profile = false,
     this.excludeLightLane = false,
@@ -84,6 +85,12 @@ class ScanCliArgs {
   /// Null means the exit code is determined by the filtered list (existing
   /// behavior: any displayed diagnostic → exit 1).
   final String? failOn;
+
+  /// Count threshold for [failOn]. When set, the scan exits 1 only when the
+  /// number of diagnostics at or above the [failOn] severity exceeds this
+  /// count — lets CI tolerate a known baseline of warnings. Requires [failOn]
+  /// to be set; ignored without it. Null means any single match triggers exit 1.
+  final int? failOnCount;
 
   /// Minimum impact threshold for output filtering. Filters on the rule's
   /// declared [LintImpact] rather than the analyzer severity — some rules have
@@ -154,6 +161,7 @@ ScanParseResult parseScanArgs(
   String? maxSeverity;
   String? minImpact;
   String? failOn;
+  int? failOnCount;
   String? jsonFilePath;
   bool formatJson = false;
   bool resolve = false;
@@ -317,6 +325,27 @@ ScanParseResult parseScanArgs(
       }
       continue;
     }
+    // Count threshold for --fail-on: exit 1 only when the number of matching
+    // diagnostics exceeds this count. Requires --fail-on to be meaningful.
+    if (arg == '--fail-on-count') {
+      i++;
+      if (i < args.length && !args[i].startsWith('--')) {
+        final parsed = int.tryParse(args[i]);
+        if (parsed != null && parsed >= 0) {
+          failOnCount = parsed;
+          i++;
+        } else {
+          return ScanParseInvalid(
+            '--fail-on-count must be a non-negative integer.',
+          );
+        }
+      } else {
+        return ScanParseInvalid(
+          '--fail-on-count requires a non-negative integer value.',
+        );
+      }
+      continue;
+    }
     if (arg == '--format') {
       i++;
       if (i < args.length) {
@@ -356,6 +385,7 @@ ScanParseResult parseScanArgs(
       maxSeverity: maxSeverity,
       minImpact: minImpact,
       failOn: failOn,
+      failOnCount: failOnCount,
       profile: profile,
       excludeLightLane: excludeLightLane,
       quiet: quiet,

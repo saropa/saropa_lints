@@ -22,7 +22,13 @@ const String kScanJsonByRule = 'byRule';
 ///   endColumn, ruleName, severity, problemMessage, correctionMessage (opt)
 /// - `summary`: object with totalCount, byFile (map filePath -> count),
 ///   byRule (map ruleName -> count)
-Map<String, Object> scanDiagnosticsToJson(List<ScanDiagnostic> diagnostics) {
+/// - `failOn` (optional): object with `threshold` and `thresholdMet` when
+///   `--fail-on` is active — explains why exit code may differ from the
+///   diagnostic list contents.
+Map<String, Object> scanDiagnosticsToJson(
+  List<ScanDiagnostic> diagnostics, {
+  Map<String, Object>? failOn,
+}) {
   final list = diagnostics
       .map(
         (d) => <String, Object?>{
@@ -56,12 +62,21 @@ Map<String, Object> scanDiagnosticsToJson(List<ScanDiagnostic> diagnostics) {
       kScanJsonByFile: byFile,
       kScanJsonByRule: byRule,
     },
+    // Inject --fail-on metadata when present so JSON consumers understand
+    // why the exit code may disagree with an empty diagnostics array.
+    if (failOn != null) 'failOn': failOn,
   };
 }
 
 /// Encodes [diagnostics] to a JSON string (pretty-printed).
-String scanDiagnosticsToJsonString(List<ScanDiagnostic> diagnostics) {
+///
+/// When [failOn] is provided, a `failOn` object is included in the root
+/// to explain exit-code semantics to JSON consumers.
+String scanDiagnosticsToJsonString(
+  List<ScanDiagnostic> diagnostics, {
+  Map<String, Object>? failOn,
+}) {
   return const JsonEncoder.withIndent(
     '  ',
-  ).convert(scanDiagnosticsToJson(diagnostics));
+  ).convert(scanDiagnosticsToJson(diagnostics, failOn: failOn));
 }

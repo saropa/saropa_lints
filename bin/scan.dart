@@ -171,7 +171,20 @@ Future<void> main(List<String> args) async {
     filtered: filtered,
     allDiagnostics: diagnostics,
     failOn: parsed.failOn,
+    failOnCount: parsed.failOnCount,
   );
+
+  // Build --fail-on metadata for JSON output so consumers understand why
+  // the exit code may disagree with an empty diagnostics array.
+  final failOnMeta = parsed.failOn != null
+      ? <String, Object>{
+          'threshold': parsed.failOn!,
+          'thresholdMet': exitCode == 1,
+          // Include the count baseline when --fail-on-count is active.
+          if (parsed.failOnCount != null)
+            'countBaseline': parsed.failOnCount!,
+        }
+      : null;
 
   if (filtered.isEmpty) {
     if (!formatJson) {
@@ -195,13 +208,13 @@ Future<void> main(List<String> args) async {
       );
     }
     if (formatJson) {
-      _writeJson(scanDiagnosticsToJsonString(filtered), parsed.jsonFilePath, quiet: quiet);
+      _writeJson(scanDiagnosticsToJsonString(filtered, failOn: failOnMeta), parsed.jsonFilePath, quiet: quiet);
     }
     exit(exitCode);
   }
 
   if (formatJson) {
-    _writeJson(scanDiagnosticsToJsonString(filtered), parsed.jsonFilePath, quiet: quiet);
+    _writeJson(scanDiagnosticsToJsonString(filtered, failOn: failOnMeta), parsed.jsonFilePath, quiet: quiet);
     exit(exitCode);
   }
 
@@ -393,18 +406,23 @@ bool _meetsMinSeverity(String severity, String minSeverity) =>
 ///
 /// Without --fail-on: exit 1 when any filtered diagnostic exists (existing
 /// behavior). With --fail-on: exit 1 only when the FULL diagnostic list
-/// contains at least one entry at or above the threshold severity, so
-/// automation can display everything but gate CI on errors only.
+/// contains enough entries at or above the threshold severity. The optional
+/// [failOnCount] raises the bar: exit 1 only when the count EXCEEDS the
+/// threshold (i.e. count > failOnCount), letting CI tolerate a known baseline.
 int _computeExitCode({
   required List<ScanDiagnostic> filtered,
   required List<ScanDiagnostic> allDiagnostics,
   required String? failOn,
+  int? failOnCount,
 }) {
   if (failOn != null) {
-    // Check against the full set, not the display-filtered set.
-    return allDiagnostics.any((d) => _meetsMinSeverity(d.severity, failOn))
-        ? 1
-        : 0;
+    // Count diagnostics in the full set that meet the severity threshold.
+    final matchCount =
+        allDiagnostics.where((d) => _meetsMinSeverity(d.severity, failOn)).length;
+    // Without --fail-on-count: any match → exit 1 (count > 0).
+    // With --fail-on-count: exit 1 only when count exceeds the baseline.
+    final threshold = failOnCount ?? 0;
+    return matchCount > threshold ? 1 : 0;
   }
   // Default: any displayed diagnostic → exit 1.
   return filtered.isEmpty ? 0 : 1;
@@ -474,6 +492,18 @@ void _printUsage() {
   );
   print(
     '                      Values: info, warning, error.',
+  );
+  print(
+    '  --fail-on-count <n> With --fail-on: exit 1 only when the count of',
+  );
+  print(
+    '                      matching diagnostics exceeds <n>. Lets CI tolerate',
+  );
+  print(
+    '                      a known baseline (e.g. --fail-on warning',
+  );
+  print(
+    '                      --fail-on-count 5 allows up to 5 warnings).',
   );
   print(
     '  --min-impact <s>    Only show diagnostics whose rule-declared impact is',
@@ -568,6 +598,7 @@ void _printUsage() {
   print('  dart run saropa_lints scan . --max-severity warning  # skip errors');
   print('  dart run saropa_lints scan . --min-impact warning    # by rule impact');
   print('  dart run saropa_lints scan . --fail-on error         # exit 1 on errors only');
+  print('  dart run saropa_lints scan . --fail-on warning --fail-on-count 5  # tolerate up to 5 warnings');
   print('  dart run saropa_lints scan . --format json  # JSON to stdout');
   print('  dart run saropa_lints scan . -q --json-file-path out.json  # silent');
 }

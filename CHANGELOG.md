@@ -64,13 +64,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [15.2.1]
+
+The scan CLI gains three new flags that make it easier to wire into CI and automation pipelines. `--min-impact` filters by the rule author's declared impact rather than the configurable analyzer severity, `--fail-on` decouples the exit code from display filtering so you can show everything but fail only on errors, and `--json-file-path` writes machine-readable output to a file without stdout redirection. A `--quiet` flag silences all progress chatter for fully headless runs. The Problems-tab cap (`max_issues`) is now actually enforced instead of just tracked. [log](https://github.com/saropa/saropa_lints/blob/v15.2.1/CHANGELOG.md)
 
 ### Added
 
 - Scan CLI: `--min-impact` flag filters diagnostics by the rule's declared impact level (error, warning, info) instead of the analyzer severity. Some rules have info severity but warning impact; `--min-impact warning` excludes the truly-info ones. JSON output now includes an `impact` field per diagnostic. ([#308](https://github.com/saropa/saropa_lints/issues/308))
 - Scan CLI: `--json-file-path <path>` writes JSON output directly to a file instead of stdout, so automation harnesses can consume the result without stdout redirection. Implies `--format json`. ([#310](https://github.com/saropa/saropa_lints/issues/310))
-- Scan CLI: `--fail-on <severity>` decouples the exit code from display filtering — the scan shows all diagnostics (or those matching `--min-severity`) but exits 1 only when the full set contains at least one diagnostic at or above the threshold (e.g. `--fail-on error`). ([#309](https://github.com/saropa/saropa_lints/issues/309))
+- Scan CLI: `--fail-on <severity>` decouples the exit code from display filtering — the scan shows all diagnostics (or those matching `--min-severity`) but exits 1 only when the full set contains at least one diagnostic at or above the threshold (e.g. `--fail-on error`). Pair with `--fail-on-count <n>` to tolerate a known baseline (exit 1 only when the count exceeds n). JSON output includes a `failOn` metadata object when the flag is active. ([#309](https://github.com/saropa/saropa_lints/issues/309))
 - Scan CLI: `--quiet` / `-q` flag suppresses all stderr progress and status messages. The caller gets only the exit code and stdout output (report or JSON). Useful for fully silent automation paired with `--json-file-path`.
 - Scan CLI: `--json-file-path` now creates parent directories if they don't exist, so callers don't need to `mkdir` first.
 
