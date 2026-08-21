@@ -3150,13 +3150,13 @@ class SaropaDiagnosticReporter {
       final length = node.end - adjustedOffset;
       if (_isDuplicateAttempt(adjustedOffset)) return;
       if (_isSuppressed(adjustedOffset, node)) return;
-      _rule.reportAtOffset(adjustedOffset, length);
+      if (!_isCappedFromProblemsTab()) _rule.reportAtOffset(adjustedOffset, length);
       _trackViolation(adjustedOffset, node: node);
       return;
     }
     if (_isDuplicateAttempt(node.offset)) return;
     if (_isSuppressed(node.offset, node)) return;
-    _rule.reportAtNode(node);
+    if (!_isCappedFromProblemsTab()) _rule.reportAtNode(node);
     _trackViolation(node.offset, node: node);
   }
 
@@ -3189,7 +3189,7 @@ class SaropaDiagnosticReporter {
       _trackSuppression(token.offset, SuppressionKind.ignore);
       return;
     }
-    _rule.reportAtToken(token);
+    if (!_isCappedFromProblemsTab()) _rule.reportAtToken(token);
     _trackViolation(token.offset);
   }
 
@@ -3205,8 +3205,23 @@ class SaropaDiagnosticReporter {
       _trackSuppression(offset, SuppressionKind.ignoreForFile);
       return;
     }
-    _rule.reportAtOffset(offset, length);
+    if (!_isCappedFromProblemsTab()) _rule.reportAtOffset(offset, length);
     _trackViolation(offset);
+  }
+
+  /// Whether [ProgressTracker.maxIssues] has been reached and this
+  /// diagnostic should be withheld from the Problems tab.
+  ///
+  /// ERROR-severity diagnostics always surface regardless of the cap —
+  /// [ProgressTracker.recordViolation] only counts non-ERROR issues toward
+  /// the limit (see its doc comment), so the report-side check mirrors that
+  /// split rather than blocking everything once tripped. The violation is
+  /// still tracked via [_trackViolation] either way, so `violations.json`
+  /// and the text report stay uncapped — only the live editor surface is
+  /// capped, matching `maxIssuesNote` in violation_export.dart.
+  bool _isCappedFromProblemsTab() {
+    if (!ProgressTracker.isLimitReached) return false;
+    return lintCode.severity.name.toUpperCase() != 'ERROR';
   }
 
   /// Check if a violation at [offset] on [node] should be suppressed.
