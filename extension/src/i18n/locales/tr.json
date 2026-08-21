@@ -197,7 +197,7 @@
       "analyzerPluginDisabled": "Kapalı — sadece kaydedildiğinde taranır",
       "analyzerPluginAbsent": "Ayarlanmamış",
       "tierState": "Tier: Seviye, seviye. {tier} _PH0___ -Hepimiz birer insanız.",
-      "lane": "Lane",
+      "lane": "Şerit",
       "laneLight": "Hafif — ~200 kural editörde, kalanlar kaydedilirken",
       "laneFull": "Tam — editörde etkinleştirilmiş her kural",
       "runAfterConfigState": "Config değişikliğinden sonra analiz çalıştır: {state} _PH0___ -Hepimiz birer insanız.",

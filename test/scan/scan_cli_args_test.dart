@@ -342,6 +342,119 @@ void main() {
       expect(args.minSeverity, 'INFO');
       expect(args.maxSeverity, 'WARNING');
     });
+
+    test('--min-impact parses valid values', () {
+      // All three recognized impact levels should parse successfully.
+      for (final imp in ['info', 'warning', 'error', 'INFO', 'Warning']) {
+        final result = parseScanArgs(<String>['.', '--min-impact', imp]);
+        expect(result, isA<ScanParseOk>(), reason: imp);
+        expect(
+          (result as ScanParseOk).args.minImpact,
+          imp.toUpperCase(),
+          reason: imp,
+        );
+      }
+    });
+
+    test('--min-impact with invalid value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--min-impact', 'debug']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--min-impact must be one of'),
+      );
+    });
+
+    test('--min-impact with no value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--min-impact']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--min-impact requires a value'),
+      );
+    });
+
+    test('--min-impact with next option as value returns invalid', () {
+      // --format looks like a flag, not an impact value.
+      final result = parseScanArgs(<String>['.', '--min-impact', '--format']);
+      expect(result, isA<ScanParseInvalid>());
+    });
+
+    test('--min-impact null by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.minImpact, isNull);
+    });
+
+    test('--min-impact combines with severity and other flags', () {
+      // Impact filtering is independent of severity filtering.
+      final result = parseScanArgs(<String>[
+        '.',
+        '--min-impact',
+        'warning',
+        '--min-severity',
+        'info',
+        '--tier',
+        'pedantic',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.minImpact, 'WARNING');
+      expect(args.minSeverity, 'INFO');
+      expect(args.tier, 'pedantic');
+    });
+
+    test('--json-file-path sets path and implies formatJson', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--json-file-path',
+        '/tmp/out.json',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.jsonFilePath, '/tmp/out.json');
+      expect(args.formatJson, isTrue);
+    });
+
+    test('--json-file-path with no value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--json-file-path']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--json-file-path requires a file path'),
+      );
+    });
+
+    test('--json-file-path with next option as value returns invalid', () {
+      // --tier looks like a flag, not a file path.
+      final result = parseScanArgs(<String>[
+        '.',
+        '--json-file-path',
+        '--tier',
+      ]);
+      expect(result, isA<ScanParseInvalid>());
+    });
+
+    test('--json-file-path null by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.jsonFilePath, isNull);
+    });
+
+    test('--json-file-path combines with other flags', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--json-file-path',
+        '/tmp/out.json',
+        '--tier',
+        'essential',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.jsonFilePath, '/tmp/out.json');
+      expect(args.formatJson, isTrue);
+      expect(args.tier, 'essential');
+    });
   });
 
   group('--min-severity filtering (process)', () {

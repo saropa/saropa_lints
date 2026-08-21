@@ -69,10 +69,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Added
 
 - Scan CLI: `--min-impact` flag filters diagnostics by the rule's declared impact level (error, warning, info) instead of the analyzer severity. Some rules have info severity but warning impact; `--min-impact warning` excludes the truly-info ones. JSON output now includes an `impact` field per diagnostic. ([#308](https://github.com/saropa/saropa_lints/issues/308))
-
-### Changed
-
-- Scan CLI now defaults `--min-severity` to `error`, so only error-level diagnostics cause a non-zero exit code — info and warning diagnostics are still collected but do not fail the run. Pass `--min-severity info` to restore the previous behavior of failing on any diagnostic. ([#309](https://github.com/saropa/saropa_lints/issues/309))
+- Scan CLI: `--json-file-path <path>` writes JSON output directly to a file instead of stdout, so automation harnesses can consume the result without stdout redirection. Implies `--format json`. ([#310](https://github.com/saropa/saropa_lints/issues/310))
 
 ### Fixed
 

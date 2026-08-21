@@ -43,6 +43,47 @@ void main() {
       expect(entry['problemMessage'], 'do not do this');
     });
 
+    test('emits impact field when present and null when absent', () {
+      // A diagnostic with an explicit impact value.
+      final withImpact = ScanDiagnostic(
+        ruleName: 'avoid_something',
+        filePath: '/proj/lib/a.dart',
+        line: 10,
+        column: 3,
+        offset: 200,
+        length: 42,
+        endLine: 12,
+        endColumn: 15,
+        severity: 'INFO',
+        problemMessage: 'do not do this',
+        impact: 'warning',
+      );
+      // A diagnostic without impact (non-saropa rule).
+      final withoutImpact = ScanDiagnostic(
+        ruleName: 'other_rule',
+        filePath: '/proj/lib/b.dart',
+        line: 1,
+        column: 1,
+        offset: 0,
+        length: 5,
+        endLine: 1,
+        endColumn: 6,
+        severity: 'WARNING',
+        problemMessage: 'something',
+      );
+
+      final json = scanDiagnosticsToJson([withImpact, withoutImpact]);
+      final diagnostics = json['diagnostics']! as List<dynamic>;
+
+      // First diagnostic carries the impact field.
+      final first = diagnostics[0] as Map<String, Object?>;
+      expect(first['impact'], 'warning');
+
+      // Second diagnostic has null impact.
+      final second = diagnostics[1] as Map<String, Object?>;
+      expect(second['impact'], isNull);
+    });
+
     test('summary counts are correct', () {
       final diags = [
         ScanDiagnostic(

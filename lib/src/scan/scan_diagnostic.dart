@@ -15,6 +15,7 @@ class ScanDiagnostic {
     required this.severity,
     required this.problemMessage,
     this.correctionMessage,
+    this.impact,
   });
 
   final String ruleName;
@@ -36,6 +37,10 @@ class ScanDiagnostic {
   final String severity;
   final String? problemMessage;
   final String? correctionMessage;
+
+  /// Rule-declared impact level (error, warning, info), independent of the
+  /// analyzer severity. Null for non-saropa diagnostics that have no impact.
+  final String? impact;
 
   @override
   // Default nullable problemMessage to an empty string so the output never

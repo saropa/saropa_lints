@@ -33,6 +33,8 @@ Map<String, Object> scanDiagnosticsToJson(List<ScanDiagnostic> diagnostics) {
           'endColumn': d.endColumn,
           'ruleName': d.ruleName,
           'severity': d.severity,
+          // Rule-declared impact when available (null for non-saropa rules).
+          'impact': d.impact,
           'problemMessage': d.problemMessage,
           'correctionMessage': d.correctionMessage,
         },

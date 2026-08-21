@@ -46,6 +46,9 @@ class ScanCliArgs {
     this.fixIgnores = false,
     this.minSeverity,
     this.maxSeverity,
+    this.minImpact,
+    this.failOn,
+    this.jsonFilePath,
     this.profile = false,
     this.excludeLightLane = false,
   });
@@ -54,6 +57,11 @@ class ScanCliArgs {
   final List<String> dartFiles;
   final String? tier;
   final bool formatJson;
+
+  /// When set, writes JSON output directly to this file path instead of
+  /// stdout. Implies [formatJson] = true. Lets automation harnesses avoid
+  /// stdout redirection entirely.
+  final String? jsonFilePath;
 
   /// Minimum severity threshold for output filtering.
   /// When set, diagnostics below this severity are excluded from stdout
@@ -66,6 +74,22 @@ class ScanCliArgs {
   /// viewing only lower-priority noise during triage. Valid values same
   /// as [minSeverity]. Null means no upper cap.
   final String? maxSeverity;
+
+  /// Exit-code severity threshold, independent of display filtering.
+  /// When set, the scan exits 1 only if any diagnostic in the FULL (unfiltered)
+  /// set meets this severity — diagnostics below it still appear in output but
+  /// do not cause a non-zero exit. This lets automation see all diagnostics
+  /// while gating CI on errors only. Valid values: 'INFO', 'WARNING', 'ERROR'.
+  /// Null means the exit code is determined by the filtered list (existing
+  /// behavior: any displayed diagnostic → exit 1).
+  final String? failOn;
+
+  /// Minimum impact threshold for output filtering. Filters on the rule's
+  /// declared [LintImpact] rather than the analyzer severity — some rules have
+  /// info severity but warning impact, so this lets the user exclude the
+  /// truly-info ones. Valid values: 'INFO', 'WARNING', 'ERROR'. Null = no
+  /// filtering.
+  final String? minImpact;
 
   /// When true, the scan fully resolves each unit instead of the default
   /// syntactic parse. Required for rules registered on
@@ -121,6 +145,9 @@ ScanParseResult parseScanArgs(
   String? debugRule;
   String? minSeverity;
   String? maxSeverity;
+  String? minImpact;
+  String? failOn;
+  String? jsonFilePath;
   bool formatJson = false;
   bool resolve = false;
 
@@ -233,11 +260,68 @@ ScanParseResult parseScanArgs(
       }
       continue;
     }
+    // Impact filtering: uses the rule's declared LintImpact, which can differ
+    // from the analyzer severity (e.g. info severity + warning impact).
+    if (arg == '--min-impact') {
+      i++;
+      if (i < args.length && !args[i].startsWith('--')) {
+        final value = args[i].toUpperCase();
+        if (value == 'INFO' || value == 'WARNING' || value == 'ERROR') {
+          minImpact = value;
+          i++;
+        } else {
+          return ScanParseInvalid(
+            '--min-impact must be one of: info, warning, error.',
+          );
+        }
+      } else {
+        return ScanParseInvalid(
+          '--min-impact requires a value (info, warning, error).',
+        );
+      }
+      continue;
+    }
+    // Exit-code threshold: decouples the exit code from display filtering so
+    // automation can see all diagnostics but only fail on a chosen severity.
+    if (arg == '--fail-on') {
+      i++;
+      if (i < args.length && !args[i].startsWith('--')) {
+        final value = args[i].toUpperCase();
+        if (value == 'INFO' || value == 'WARNING' || value == 'ERROR') {
+          failOn = value;
+          i++;
+        } else {
+          return ScanParseInvalid(
+            '--fail-on must be one of: info, warning, error.',
+          );
+        }
+      } else {
+        return ScanParseInvalid(
+          '--fail-on requires a value (info, warning, error).',
+        );
+      }
+      continue;
+    }
     if (arg == '--format') {
       i++;
       if (i < args.length) {
         formatJson = args[i].toLowerCase() == 'json';
         i++;
+      }
+      continue;
+    }
+    // Write JSON directly to a file, bypassing stdout entirely.
+    // Implies --format json.
+    if (arg == '--json-file-path') {
+      i++;
+      if (i < args.length && !args[i].startsWith('--')) {
+        jsonFilePath = args[i];
+        formatJson = true;
+        i++;
+      } else {
+        return ScanParseInvalid(
+          '--json-file-path requires a file path.',
+        );
       }
       continue;
     }
@@ -249,11 +333,14 @@ ScanParseResult parseScanArgs(
       dartFiles: dartFiles,
       tier: tier,
       formatJson: formatJson,
+      jsonFilePath: jsonFilePath,
       resolve: resolve,
       debugRule: debugRule,
       fixIgnores: fixIgnores,
       minSeverity: minSeverity,
       maxSeverity: maxSeverity,
+      minImpact: minImpact,
+      failOn: failOn,
       profile: profile,
       excludeLightLane: excludeLightLane,
     ),

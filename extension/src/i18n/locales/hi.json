@@ -1,6 +1,6 @@
 {
   "about": {
-    "ruleCountStrip": "{total} lint rules currently ship in this version (essential {essential} · recommended {recommended} · professional {professional} · comprehensive {comprehensive} · pedantic {pedantic} · {stylistic} opt-in stylistic)"
+    "ruleCountStrip": "{total} लिंट नियम वर्तमान में इस संस्करण में शामिल हैं (आवश्यक {essential} · अनुशंसित {recommended} · पेशेवर {professional} · व्यापक {comprehensive} · सूक्ष्म {pedantic} · {stylistic} ऐच्छिक शैलीगत)"
   },
   "scanOnSave": {
     "statusBar": {

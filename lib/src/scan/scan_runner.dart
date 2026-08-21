@@ -95,6 +95,10 @@ class ScanRunner {
   /// disagree about which rules the split covers.
   final bool excludeLightLane;
 
+  /// Map from rule name to its declared LintImpact name (error/warning/info).
+  /// Built by [_prepare] so [_collectDiagnostics] can stamp each diagnostic.
+  Map<String, String> _ruleImpactMap = const {};
+
   /// Builds an [AnalysisContextCollection] rooted at [projectRoot] for a
   /// long-lived caller (the scan daemon) to hold and reuse across many
   /// [runResolvedWithCollection] calls. This is the expensive step
@@ -106,7 +110,10 @@ class ScanRunner {
     );
   }
 
-  void _out(String message) {
+  /// Writes to stdout (via messageSink or print). Reserved for opt-in
+  /// diagnostic output (--debug-rule trace). All progress/status messages
+  /// must use [_err] so --format json stdout stays machine-parseable.
+  void _debugOut(String message) {
     if (messageSink != null) {
       messageSink!(message);
     } else {
@@ -260,32 +267,38 @@ class ScanRunner {
       ensureRuleRegistryBuilt();
       final before = ruleNames.length;
       ruleNames = excludeLightLaneRules(ruleNames);
-      _out(
+      // Progress message — stderr keeps stdout clean for JSON.
+      _err(
         'Light lane excluded: $before → ${ruleNames.length} rules '
         '(the rest run live in the analysis server).',
       );
     }
     if (ruleNames.isEmpty) {
-      _out('All rules are disabled in the configuration.');
+      _err('All rules are disabled in the configuration.');
       return (rules: const [], files: const []);
     }
 
     SaropaLintRule.enabledRules = ruleNames;
     final rules = getRulesFromRegistry(ruleNames);
+    // Build the impact lookup so diagnostics carry the rule-declared impact.
+    _ruleImpactMap = {
+      for (final r in rules) r.code.lowerCaseName: r.impact.name,
+    };
     // Copy nullable to local so promotion applies (avoid_nullable_interpolation).
     final tierLabel = tier;
+    // Progress messages go to stderr so --format json stdout stays valid JSON.
     if (tierLabel != null) {
-      _out('Loaded ${rules.length} rules for tier: $tierLabel');
+      _err('Loaded ${rules.length} rules for tier: $tierLabel');
     } else {
-      _out('Loaded ${rules.length} rules from analysis_options.yaml');
+      _err('Loaded ${rules.length} rules from analysis_options.yaml');
     }
 
     final filesToScan = _resolveDartFiles();
     if (filesToScan.isEmpty) {
-      _out('No .dart files found in: $targetPath');
+      _err('No .dart files found in: $targetPath');
       return (rules: rules, files: const []);
     }
-    _out('Scanning ${filesToScan.length} files...\n');
+    _err('Scanning ${filesToScan.length} files...');
     return (rules: rules, files: filesToScan);
   }
 
@@ -304,7 +317,7 @@ class ScanRunner {
     if (tierLabel != null) {
       final normalized = tierLabel.toLowerCase();
       if (!tierOrder.contains(normalized)) {
-        _out(
+        _err(
           "Unknown tier: '$tierLabel'. Valid tiers: ${tierOrder.join(', ')}",
         );
         return null;
@@ -339,11 +352,11 @@ class ScanRunner {
     final config = loadScanConfig(p.absolute(targetPath));
     if (config == null) {
       final absPath = p.absolute(targetPath);
-      _out('No saropa_lints configuration found in:');
-      _out('  $absPath/analysis_options.yaml');
-      _out('');
-      _out('Run init first to configure rules:');
-      _out('  dart run saropa_lints init --target $absPath');
+      _err('No saropa_lints configuration found in:');
+      _err('  $absPath/analysis_options.yaml');
+      _err('');
+      _err('Run init first to configure rules:');
+      _err('  dart run saropa_lints init --target $absPath');
       return null;
     }
 
@@ -401,12 +414,12 @@ class ScanRunner {
 
       final dbg = debugRule;
       if (dbg != null && rule.code.lowerCaseName == dbg) {
-        _out(
+        _debugOut(
           'DEBUG: tracing rule "$dbg" '
           '(${visitors.length} visitor(s))',
         );
         visitors = visitors
-            .map((v) => TracingVisitorWrapper(v as AstVisitor<void>, _out, dbg))
+            .map((v) => TracingVisitorWrapper(v as AstVisitor<void>, _debugOut, dbg))
             .toList();
       }
 
@@ -469,7 +482,8 @@ class ScanRunner {
     } on io.IOException {
       // Leave the stale sentinel; the abort itself still proceeds.
     }
-    _out(
+    // Abort notice goes to stderr so stdout stays valid JSON.
+    _err(
       '[saropa_lints] Scan aborted by .saropa_stop after '
       '$scanned/$total files ($issueCount issues so far). '
       'Partial report follows.',
@@ -651,9 +665,10 @@ class ScanRunner {
       // End position lets the extension highlight the full diagnostic span
       // instead of a single character (which triggers "find all occurrences").
       final endLoc = unit.lineInfo.getLocation(d.offset + d.length);
+      final ruleName = d.diagnosticCode.lowerCaseName;
       diagnostics.add(
         ScanDiagnostic(
-          ruleName: d.diagnosticCode.lowerCaseName,
+          ruleName: ruleName,
           filePath: filePath,
           line: loc.lineNumber,
           column: loc.columnNumber,
@@ -663,6 +678,8 @@ class ScanRunner {
           endColumn: endLoc.columnNumber,
           severity: d.diagnosticCode.severity.name,
           problemMessage: d.problemMessage.messageText(includeUrl: false),
+          // Look up the rule's declared impact; null for non-saropa diagnostics.
+          impact: _ruleImpactMap[ruleName],
         ),
       );
     }
