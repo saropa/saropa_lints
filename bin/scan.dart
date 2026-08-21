@@ -34,9 +34,9 @@ import 'package:saropa_lints/src/tiers.dart';
 ///   dart run saropa_lints:scan [path]
 ///
 /// Exit codes:
-///   0 - No issues found
-///   1 - Issues found
-///   2 - No configuration found / invalid tier
+///   0 - No issues found (or none at/above --fail-on threshold)
+///   1 - Issues found (or at least one at/above --fail-on threshold)
+///   2 - No configuration found / invalid tier / parse error
 Future<void> main(List<String> args) async {
   if (args.contains('--help') || args.contains('-h')) {
     _printUsage();
@@ -62,6 +62,9 @@ Future<void> main(List<String> args) async {
   final dartFiles = parsed.dartFiles;
   final tier = parsed.tier;
   final formatJson = parsed.formatJson;
+  // --quiet: suppress non-fatal stderr messages so automation sees only the
+  // exit code + stdout output. Fatal errors (exit 2) still go to stderr.
+  final quiet = parsed.quiet;
 
   if (parsed.fixIgnores) {
     _runFixIgnores(path);
@@ -77,12 +80,15 @@ Future<void> main(List<String> args) async {
     SaropaContext.runtimeProfilingEnabled = true;
   }
 
+  // --quiet: suppress ALL stderr progress/status from the scanner by routing
+  // messages to a no-op sink. The caller gets only the exit code + stdout.
   final runner = ScanRunner(
     targetPath: path,
     dartFiles: dartFiles.isEmpty ? null : dartFiles,
     tier: tier,
     debugRule: parsed.debugRule,
     excludeLightLane: parsed.excludeLightLane,
+    messageSink: parsed.quiet ? (_) {} : null,
   );
   // --resolve runs the slower, fully-resolved scan so that
   // InstanceCreationExpression and type-based rules actually fire; the default
@@ -103,11 +109,11 @@ Future<void> main(List<String> args) async {
       fileCount: dartFiles.isEmpty ? null : dartFiles.length,
     );
     if (timingPath != null) {
-      stderr.writeln('Timing profile: $timingPath');
+      if (!quiet) stderr.writeln('Timing profile: $timingPath');
     } else {
       // An empty tracker after a profiled run means no rule callbacks
       // executed — surface it, never let profiling fail silently again.
-      stderr.writeln('Timing profile: no data collected (no rules ran).');
+      if (!quiet) stderr.writeln('Timing profile: no data collected (no rules ran).');
     }
   }
 
@@ -123,7 +129,7 @@ Future<void> main(List<String> args) async {
         .where((s) => !_knownSeverities.contains(s))
         .toSet();
     for (final s in unknown) {
-      stderr.writeln('Warning: unrecognized severity "$s" — excluded by filter.');
+      if (!quiet) stderr.writeln('Warning: unrecognized severity "$s" — excluded by filter.');
     }
   }
 
@@ -158,6 +164,15 @@ Future<void> main(List<String> args) async {
         }).toList()
       : diagnostics;
 
+  // --fail-on decouples exit code from display filtering: the exit code is
+  // determined by whether any diagnostic in the FULL set meets the threshold,
+  // not by what survived the display filter.
+  final exitCode = _computeExitCode(
+    filtered: filtered,
+    allDiagnostics: diagnostics,
+    failOn: parsed.failOn,
+  );
+
   if (filtered.isEmpty) {
     if (!formatJson) {
       // Distinguish "genuinely clean" from "all outside window" so callers
@@ -171,21 +186,29 @@ Future<void> main(List<String> args) async {
         print('\nNo issues found.');
       }
     }
-    if (formatJson) {
-      _writeJson(scanDiagnosticsToJsonString(filtered), parsed.jsonFilePath);
+    // When --fail-on causes a non-zero exit despite no displayed diagnostics,
+    // print an explanation so automation doesn't see "No issues" + exit 1.
+    if (!formatJson && exitCode != 0 && parsed.failOn != null) {
+      print(
+        '(exit 1: --fail-on ${parsed.failOn!.toLowerCase()} threshold met '
+        'in unfiltered diagnostics)',
+      );
     }
-    exit(0);
+    if (formatJson) {
+      _writeJson(scanDiagnosticsToJsonString(filtered), parsed.jsonFilePath, quiet: quiet);
+    }
+    exit(exitCode);
   }
 
   if (formatJson) {
-    _writeJson(scanDiagnosticsToJsonString(filtered), parsed.jsonFilePath);
-    exit(1);
+    _writeJson(scanDiagnosticsToJsonString(filtered), parsed.jsonFilePath, quiet: quiet);
+    exit(exitCode);
   }
 
   final reportPath = _writeReport(filtered, path);
   _printSummary(filtered);
   print('Report: $reportPath');
-  exit(1);
+  exit(exitCode);
 }
 
 /// Reads stdin until EOF; returns non-empty trimmed lines (for --files-from-stdin).
@@ -331,10 +354,17 @@ void _runFixIgnores(String targetPath) {
 
 /// Writes JSON output to [filePath] if set, otherwise prints to stdout.
 /// Using a file avoids the stdout-redirection problem entirely (#310).
-void _writeJson(String json, String? filePath) {
+/// Creates parent directories if they don't exist — fail-fast on
+/// permission errors, but don't force callers to mkdir first.
+void _writeJson(String json, String? filePath, {bool quiet = false}) {
   if (filePath != null) {
-    File(filePath).writeAsStringSync(json);
-    stderr.writeln('JSON written to: $filePath');
+    final file = File(filePath);
+    final parent = file.parent;
+    if (!parent.existsSync()) {
+      parent.createSync(recursive: true);
+    }
+    file.writeAsStringSync(json);
+    if (!quiet) stderr.writeln('JSON written to: $filePath');
   } else {
     print(json);
   }
@@ -357,6 +387,28 @@ int _severityRank(String severity) => switch (severity.toUpperCase()) {
 /// Returns true if [severity] is at or above [minSeverity].
 bool _meetsMinSeverity(String severity, String minSeverity) =>
     _severityRank(severity) >= _severityRank(minSeverity);
+
+/// Determines exit code based on diagnostics and the optional --fail-on
+/// threshold.
+///
+/// Without --fail-on: exit 1 when any filtered diagnostic exists (existing
+/// behavior). With --fail-on: exit 1 only when the FULL diagnostic list
+/// contains at least one entry at or above the threshold severity, so
+/// automation can display everything but gate CI on errors only.
+int _computeExitCode({
+  required List<ScanDiagnostic> filtered,
+  required List<ScanDiagnostic> allDiagnostics,
+  required String? failOn,
+}) {
+  if (failOn != null) {
+    // Check against the full set, not the display-filtered set.
+    return allDiagnostics.any((d) => _meetsMinSeverity(d.severity, failOn))
+        ? 1
+        : 0;
+  }
+  // Default: any displayed diagnostic → exit 1.
+  return filtered.isEmpty ? 0 : 1;
+}
 
 void _printUsage() {
   print('saropa_lints scan - Standalone lint scanner');
@@ -409,6 +461,21 @@ void _printUsage() {
     '                      Useful for viewing lower-priority noise in isolation.',
   );
   print(
+    '  --fail-on <s>       Exit 1 only when any diagnostic (before display',
+  );
+  print(
+    '                      filtering) is at or above this severity. Decouples',
+  );
+  print(
+    '                      exit code from --min-severity, so automation can',
+  );
+  print(
+    '                      see all diagnostics but gate CI on errors only.',
+  );
+  print(
+    '                      Values: info, warning, error.',
+  );
+  print(
     '  --min-impact <s>    Only show diagnostics whose rule-declared impact is',
   );
   print(
@@ -428,6 +495,12 @@ void _printUsage() {
   );
   print(
     '                      stdout. Implies --format json. Avoids stdout redirection.',
+  );
+  print(
+    '  -q, --quiet         Suppress all stderr progress/status messages.',
+  );
+  print(
+    '                      The caller gets only stdout output and the exit code.',
   );
   print(
     '  --profile           Record per-rule execution timing and write it to',
@@ -494,5 +567,7 @@ void _printUsage() {
   print('  dart run saropa_lints scan . --min-severity warning  # skip info');
   print('  dart run saropa_lints scan . --max-severity warning  # skip errors');
   print('  dart run saropa_lints scan . --min-impact warning    # by rule impact');
+  print('  dart run saropa_lints scan . --fail-on error         # exit 1 on errors only');
   print('  dart run saropa_lints scan . --format json  # JSON to stdout');
+  print('  dart run saropa_lints scan . -q --json-file-path out.json  # silent');
 }

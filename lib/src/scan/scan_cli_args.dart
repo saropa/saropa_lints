@@ -51,6 +51,7 @@ class ScanCliArgs {
     this.jsonFilePath,
     this.profile = false,
     this.excludeLightLane = false,
+    this.quiet = false,
   });
 
   final String path;
@@ -121,6 +122,12 @@ class ScanCliArgs {
   /// two-lane de-duplication can be exercised and verified from a terminal
   /// without driving the daemon protocol by hand.
   final bool excludeLightLane;
+
+  /// When true, suppresses ALL stderr progress/status messages (Loaded,
+  /// Scanning, timing, threshold notes). The caller gets only the exit code
+  /// and stdout output (report or JSON). Useful for fully silent automation
+  /// where only the exit code and optional --json-file-path output matter.
+  final bool quiet;
 }
 
 /// Parses [args] for the scan command.
@@ -154,10 +161,18 @@ ScanParseResult parseScanArgs(
   bool fixIgnores = false;
   bool profile = false;
   bool excludeLightLane = false;
+  bool quiet = false;
 
   var i = 0;
   while (i < args.length) {
     final arg = args[i];
+    // Suppress all stderr progress/status messages for fully silent
+    // automation — the caller gets only stdout output and the exit code.
+    if (arg == '--quiet' || arg == '-q') {
+      quiet = true;
+      i++;
+      continue;
+    }
     if (arg == '--fix-ignores') {
       fixIgnores = true;
       i++;
@@ -343,6 +358,7 @@ ScanParseResult parseScanArgs(
       failOn: failOn,
       profile: profile,
       excludeLightLane: excludeLightLane,
+      quiet: quiet,
     ),
   );
 }
