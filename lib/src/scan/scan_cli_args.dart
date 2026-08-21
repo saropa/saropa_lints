@@ -363,9 +363,7 @@ ScanParseResult parseScanArgs(
         formatJson = true;
         i++;
       } else {
-        return ScanParseInvalid(
-          '--json-file-path requires a file path.',
-        );
+        return ScanParseInvalid('--json-file-path requires a file path.');
       }
       continue;
     }

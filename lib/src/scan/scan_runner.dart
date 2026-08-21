@@ -96,7 +96,7 @@ class ScanRunner {
   final bool excludeLightLane;
 
   /// Map from rule name to its declared LintImpact name (error/warning/info).
-  /// Built by [_prepare] so [_collectDiagnostics] can stamp each diagnostic.
+  /// Built by `_prepare` so [_collectDiagnostics] can stamp each diagnostic.
   Map<String, String> _ruleImpactMap = const {};
 
   /// Builds an [AnalysisContextCollection] rooted at [projectRoot] for a
@@ -112,7 +112,7 @@ class ScanRunner {
 
   /// Writes to stdout (via messageSink or print). Reserved for opt-in
   /// diagnostic output (--debug-rule trace). All progress/status messages
-  /// must use [_err] so --format json stdout stays machine-parseable.
+  /// must use `_err` so --format json stdout stays machine-parseable.
   void _debugOut(String message) {
     if (messageSink != null) {
       messageSink!(message);
@@ -419,7 +419,10 @@ class ScanRunner {
           '(${visitors.length} visitor(s))',
         );
         visitors = visitors
-            .map((v) => TracingVisitorWrapper(v as AstVisitor<void>, _debugOut, dbg))
+            .map(
+              (v) =>
+                  TracingVisitorWrapper(v as AstVisitor<void>, _debugOut, dbg),
+            )
             .toList();
       }
 

@@ -82,6 +82,20 @@ environment:
 dependencies:
   # A framework and support code for building plugins for the analysis server.
   # https://pub.dev/packages/analysis_server_plugin
+  #
+  # ====================================================================
+  # ###### HARD STOP: DO NOT bump this past ^0.3.14 until the analyzer
+  # ###### constraint below can move to ^13 or higher.
+  #
+  # analysis_server_plugin versions pin their analyzer dependency EXACTLY:
+  #   - 0.3.14  -> analyzer 12.1.0  (compatible — this is what we use)
+  #   - 0.3.16  -> analyzer 13.1.0  (BREAKS — meta ^1.18.3 floor)
+  #   - 0.3.18  -> analyzer 13.3.0  (BREAKS)
+  #   - 0.3.20  -> analyzer 14.1.0  (BREAKS)
+  # Every version after 0.3.14 drags in an analyzer that requires
+  # meta ^1.18.3, which Flutter stable (meta 1.18.0) cannot satisfy.
+  # See the full meta-pin reasoning on the analyzer constraint below.
+  # ====================================================================
   analysis_server_plugin: ^0.3.14
 
   # This package provides a library that performs static analysis of Dart code.

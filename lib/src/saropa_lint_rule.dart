@@ -3150,7 +3150,8 @@ class SaropaDiagnosticReporter {
       final length = node.end - adjustedOffset;
       if (_isDuplicateAttempt(adjustedOffset)) return;
       if (_isSuppressed(adjustedOffset, node)) return;
-      if (!_isCappedFromProblemsTab()) _rule.reportAtOffset(adjustedOffset, length);
+      if (!_isCappedFromProblemsTab())
+        _rule.reportAtOffset(adjustedOffset, length);
       _trackViolation(adjustedOffset, node: node);
       return;
     }

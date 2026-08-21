@@ -427,11 +427,7 @@ void main() {
 
     test('--json-file-path with next option as value returns invalid', () {
       // --tier looks like a flag, not a file path.
-      final result = parseScanArgs(<String>[
-        '.',
-        '--json-file-path',
-        '--tier',
-      ]);
+      final result = parseScanArgs(<String>['.', '--json-file-path', '--tier']);
       expect(result, isA<ScanParseInvalid>());
     });
 
@@ -546,21 +542,13 @@ void main() {
     });
 
     test('--fail-on-count with negative value returns invalid', () {
-      final result = parseScanArgs(<String>[
-        '.',
-        '--fail-on-count',
-        '-1',
-      ]);
+      final result = parseScanArgs(<String>['.', '--fail-on-count', '-1']);
       // Negative looks like a flag (starts with --), caught by the starts-with check.
       expect(result, isA<ScanParseInvalid>());
     });
 
     test('--fail-on-count with non-integer returns invalid', () {
-      final result = parseScanArgs(<String>[
-        '.',
-        '--fail-on-count',
-        'five',
-      ]);
+      final result = parseScanArgs(<String>['.', '--fail-on-count', 'five']);
       expect(result, isA<ScanParseInvalid>());
       expect(
         (result as ScanParseInvalid).message,
@@ -671,39 +659,41 @@ void main() {
   });
 
   group('--fail-on exit code (process)', () {
-    test('--fail-on error exits 0 when only info/warning diagnostics exist',
-        () async {
-      // Scan a file that produces diagnostics but none at ERROR level.
-      // --min-severity info ensures diagnostics are shown, --fail-on error
-      // means exit 0 because no diagnostic reaches the error threshold.
-      final result = await Process.run(
-        'dart',
-        [
-          'run',
-          'saropa_lints:scan',
-          '.',
-          '--tier',
-          'essential',
-          '--min-severity',
-          'info',
-          '--fail-on',
-          'error',
-          '--files',
-          'lib/src/scan/scan_cli_args.dart',
-        ],
-        runInShell: true,
-        workingDirectory: Directory.current.path,
-      );
-      // If any diagnostics were found but none are ERROR, exit should be 0.
-      // If no diagnostics at all, exit 0 is also correct.
-      expect(
-        result.exitCode,
-        0,
-        reason:
-            'Expected exit 0 when --fail-on error but no error-level '
-            'diagnostics exist. stderr: ${result.stderr}',
-      );
-    });
+    test(
+      '--fail-on error exits 0 when only info/warning diagnostics exist',
+      () async {
+        // Scan a file that produces diagnostics but none at ERROR level.
+        // --min-severity info ensures diagnostics are shown, --fail-on error
+        // means exit 0 because no diagnostic reaches the error threshold.
+        final result = await Process.run(
+          'dart',
+          [
+            'run',
+            'saropa_lints:scan',
+            '.',
+            '--tier',
+            'essential',
+            '--min-severity',
+            'info',
+            '--fail-on',
+            'error',
+            '--files',
+            'lib/src/scan/scan_cli_args.dart',
+          ],
+          runInShell: true,
+          workingDirectory: Directory.current.path,
+        );
+        // If any diagnostics were found but none are ERROR, exit should be 0.
+        // If no diagnostics at all, exit 0 is also correct.
+        expect(
+          result.exitCode,
+          0,
+          reason:
+              'Expected exit 0 when --fail-on error but no error-level '
+              'diagnostics exist. stderr: ${result.stderr}',
+        );
+      },
+    );
 
     test('--fail-on info exits 1 when any diagnostic exists', () async {
       // --fail-on info is the lowest threshold: any diagnostic at all → exit 1.
@@ -785,41 +775,40 @@ void main() {
         workingDirectory: Directory.current.path,
       );
       expect(result.exitCode, 2);
-      expect(
-        result.stdout.toString(),
-        contains('--fail-on must be one of'),
-      );
+      expect(result.stdout.toString(), contains('--fail-on must be one of'));
     });
 
-    test('--fail-on checks full set when --max-severity narrows display',
-        () async {
-      // Display is capped at warning (no errors shown), but --fail-on info
-      // checks the FULL set. The project always has info-level diagnostics,
-      // so exit should be 1 even though the display window excludes errors.
-      final result = await Process.run(
-        'dart',
-        [
-          'run',
-          'saropa_lints:scan',
-          '.',
-          '--tier',
-          'essential',
-          '--max-severity',
-          'warning',
-          '--fail-on',
-          'info',
-        ],
-        runInShell: true,
-        workingDirectory: Directory.current.path,
-      );
-      expect(
-        result.exitCode,
-        1,
-        reason:
-            'Expected exit 1: --fail-on info checks full set, not the '
-            '--max-severity-filtered display. stdout: ${result.stdout}',
-      );
-    });
+    test(
+      '--fail-on checks full set when --max-severity narrows display',
+      () async {
+        // Display is capped at warning (no errors shown), but --fail-on info
+        // checks the FULL set. The project always has info-level diagnostics,
+        // so exit should be 1 even though the display window excludes errors.
+        final result = await Process.run(
+          'dart',
+          [
+            'run',
+            'saropa_lints:scan',
+            '.',
+            '--tier',
+            'essential',
+            '--max-severity',
+            'warning',
+            '--fail-on',
+            'info',
+          ],
+          runInShell: true,
+          workingDirectory: Directory.current.path,
+        );
+        expect(
+          result.exitCode,
+          1,
+          reason:
+              'Expected exit 1: --fail-on info checks full set, not the '
+              '--max-severity-filtered display. stdout: ${result.stdout}',
+        );
+      },
+    );
 
     test('--fail-on-count raises the exit threshold', () async {
       // The project has many info+ diagnostics under essential. Without
@@ -875,8 +864,7 @@ void main() {
       expect(
         stderrOutput,
         isEmpty,
-        reason:
-            'Expected empty stderr with --quiet, got: $stderrOutput',
+        reason: 'Expected empty stderr with --quiet, got: $stderrOutput',
       );
     });
   });
@@ -917,7 +905,8 @@ void main() {
         expect(
           content.startsWith('[') || content.startsWith('{'),
           isTrue,
-          reason: 'Expected JSON content, got: ${content.substring(0, 40.clamp(0, content.length))}',
+          reason:
+              'Expected JSON content, got: ${content.substring(0, 40.clamp(0, content.length))}',
         );
         // Stderr should confirm the file path (unless --quiet suppressed it).
         expect(

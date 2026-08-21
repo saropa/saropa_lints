@@ -29,15 +29,13 @@ void main() {
     ProgressTracker.reset();
   });
 
-  test(
-    'withholds non-ERROR diagnostics from the Problems tab once '
-    'max_issues is exceeded, but keeps tracking every violation',
-    () async {
-      ProgressTracker.setMaxIssues(2);
+  test('withholds non-ERROR diagnostics from the Problems tab once '
+      'max_issues is exceeded, but keeps tracking every violation', () async {
+    ProgressTracker.setMaxIssues(2);
 
-      // prefer_static_method is INFO severity — five independent
-      // static-eligible methods each trigger one non-ERROR violation.
-      final diags = await runRuleResolved(PreferStaticMethodRule(), '''
+    // prefer_static_method is INFO severity — five independent
+    // static-eligible methods each trigger one non-ERROR violation.
+    final diags = await runRuleResolved(PreferStaticMethodRule(), '''
 class FiveMethods {
   int one() => 1;
   int two() => 2;
@@ -47,15 +45,14 @@ class FiveMethods {
 }
 ''');
 
-      // Cap trips strictly AFTER the count exceeds max_issues (matches the
-      // documented semantics on ProgressTracker.recordViolation), so the
-      // 3rd violation is the one that flips isLimitReached — it still
-      // reports, and the 4th/5th are withheld.
-      expect(diags.length, 3);
-      expect(ProgressTracker.isLimitReached, isTrue);
-      expect(ProgressTracker.reportData.violationsFound, 5);
-    },
-  );
+    // Cap trips strictly AFTER the count exceeds max_issues (matches the
+    // documented semantics on ProgressTracker.recordViolation), so the
+    // 3rd violation is the one that flips isLimitReached — it still
+    // reports, and the 4th/5th are withheld.
+    expect(diags.length, 3);
+    expect(ProgressTracker.isLimitReached, isTrue);
+    expect(ProgressTracker.reportData.violationsFound, 5);
+  });
 
   test('does not cap while max_issues is unlimited (0)', () async {
     ProgressTracker.setMaxIssues(0);
