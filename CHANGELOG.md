@@ -81,6 +81,10 @@ The scan CLI gains three new flags that make it easier to wire into CI and autom
 - The `max_issues` Problems-tab cap (default 500, configurable via `max_issues:` in `analysis_options_custom.yaml`) is now actually enforced. It previously tracked the count and printed a "N issues in Problems tab" message without withholding anything — every issue still reached the Problems tab regardless of the configured limit. ERROR-severity diagnostics always surface regardless of the cap; `violations.json` and the text report remain uncapped either way. No action required.
 - Scan CLI progress messages ("Loaded N rules…", "Scanning N files…") now go to stderr instead of stdout, so `--format json` output is valid JSON when redirected to a file. No action required. ([#310](https://github.com/saropa/saropa_lints/issues/310))
 
+### Added (docs)
+
+- New standalone [CLI reference guide](doc/guides/cli.md) documents every CLI command (`init`, `scan`, `cross_file`, `project_vibrancy`, `quality_gate`, `baseline`, `rule_count`, `project_health`) with complete flag tables, CI examples, exit codes, and JSON output schema. The README scanner section is also updated with the full flag set. No action required.
+
 <details><summary>Maintenance</summary>
 
 - Publish script test runner now detects Dart VM heap corruption crashes and Windows file-lock races as transient infrastructure failures, shows a clear diagnosis, and recommends Retry instead of leaving the user to parse raw stack traces.
@@ -494,40 +498,6 @@ This release introduces comprehensive system health monitoring to track memory u
 - Add `PID`, `RSS`, `Daemon` to MT do-not-translate list and expand skip logic for emoji+placeholder patterns (`⚠ {size}`, `🔴 {size}`), resolving 71 false-positive missing-translation entries across 24 locales. No action required.
 
 </details>
-
----
-
-## [14.4.3]
-
-Resolves a runtime error in the lint diagnostic reporter that could prevent ignore-comments and deduplication checks from functioning correctly. This release also hardens internal code quality with broad static analysis improvements and introduces new automated CI gates to prevent future regressions. [log](https://github.com/saropa/saropa_lints/blob/v14.4.3/CHANGELOG.md)
-
-### Fixed
-
-- Fix undefined `ruleContext` reference in `SaropaLintRule.registerNodeProcessors` — the diagnostic reporter was receiving an unresolved identifier instead of the method's `RuleContext` parameter, which could cause ignore-comment and dedup checks to fail at runtime. No action required.
-
-<details>
-<summary>Maintenance</summary>
-
-- Resolve `unnecessary_string_interpolations`, `unnecessary_string_escapes`, and `prefer_adjacent_string_concatenation` lint issues across lib/ to future-proof against pana baseline upgrades to `package:lints/recommended.yaml`. No action required.
-- Resolve 209 dart analyzer lint issues across lib/ and test/: nullable final variables, string interpolation style, dangling library doc comments, unnecessary `this`/`late`, missing `@override`, `prefer_contains`, `use_super_parameters`, `prefer_collection_literals`, and parameter naming alignment with base class signatures.
-- Remove dead field `_isProjectRootInitialized` from `SaropaLintRule`.
-- Add `scripts/check_dart_fix.py` — CI gate that fails if fixable dart issues exist; hardened with multiple regex patterns and error handling for missing `dart` or timeout.
-- Integrate `dart fix --dry-run` / `--apply` into the publish pipeline as an auto-fix step before blocking checks.
-- Add `// ignore:` suppressions for 5 unfixable recommended.yaml issues (implementation_imports, library_private_types_in_public_api, prefer_interpolation_to_compose_strings) with verified rationale comments.
-- Add `scripts/check_recommended_yaml.py` — CI gate that temporarily enables recommended.yaml analysis and asserts zero unsuppressed issues; preserves original file bytes on restore, handles YAML document markers and missing `dart`.
-- Add `dart fix` and recommended.yaml checks to pre-commit hook — regressions are now caught before push; dart availability is checked by each Python script (exit 2 = skip), not the shell.
-
-</details>
-
----
-
-## [14.4.2]
-
-Static analysis fixes. [log](https://github.com/saropa/saropa_lints/blob/v14.4.2/CHANGELOG.md)
-
-### Fixed
-
-- Fix 41 static analysis issues flagged by pub.dev pana scoring (unnecessary null checks, unused imports, missing curly braces, dead code, redundant ignores, invalid overrides)
 
 ---
 

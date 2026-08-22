@@ -15,6 +15,8 @@ import 'package:saropa_lints/src/report/violation_export.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 /// Runs export scenarios under isolated `tempDir` workspaces with `setUp`/`tearDown`.
 void main() {
   // Isolated temp project per test; always reset graph/baseline singletons to avoid order coupling.
@@ -29,9 +31,8 @@ void main() {
 
   tearDown(() {
     BaselineManager.reset();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    // Retry-tolerant cleanup for Windows file-lock races
+    safeDeleteDir(tempDir);
   });
 
   /// Helper to build ConsolidatedData with sensible defaults.

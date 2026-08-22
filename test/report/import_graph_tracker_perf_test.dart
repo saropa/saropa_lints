@@ -13,6 +13,8 @@ import 'package:saropa_lints/src/saropa_lint_rule.dart'
     show LintImpact, ViolationRecord;
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   test('ImportGraphTracker compute + ordering work is fast enough', () {
     // Synthetic performance test to validate the plan’s overhead budget.
@@ -128,11 +130,8 @@ void main() {
       );
     } finally {
       ImportGraphTracker.reset();
-      try {
-        if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
-      } catch (_) {
-        // Best-effort cleanup in tests.
-      }
+      // Retry-tolerant cleanup for Windows file-lock races
+      safeDeleteDir(tempDir);
     }
   });
 }

@@ -6,6 +6,40 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [14.4.3]
+
+Resolves a runtime error in the lint diagnostic reporter that could prevent ignore-comments and deduplication checks from functioning correctly. This release also hardens internal code quality with broad static analysis improvements and introduces new automated CI gates to prevent future regressions. [log](https://github.com/saropa/saropa_lints/blob/v14.4.3/CHANGELOG.md)
+
+### Fixed
+
+- Fix undefined `ruleContext` reference in `SaropaLintRule.registerNodeProcessors` — the diagnostic reporter was receiving an unresolved identifier instead of the method's `RuleContext` parameter, which could cause ignore-comment and dedup checks to fail at runtime. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Resolve `unnecessary_string_interpolations`, `unnecessary_string_escapes`, and `prefer_adjacent_string_concatenation` lint issues across lib/ to future-proof against pana baseline upgrades to `package:lints/recommended.yaml`. No action required.
+- Resolve 209 dart analyzer lint issues across lib/ and test/: nullable final variables, string interpolation style, dangling library doc comments, unnecessary `this`/`late`, missing `@override`, `prefer_contains`, `use_super_parameters`, `prefer_collection_literals`, and parameter naming alignment with base class signatures.
+- Remove dead field `_isProjectRootInitialized` from `SaropaLintRule`.
+- Add `scripts/check_dart_fix.py` — CI gate that fails if fixable dart issues exist; hardened with multiple regex patterns and error handling for missing `dart` or timeout.
+- Integrate `dart fix --dry-run` / `--apply` into the publish pipeline as an auto-fix step before blocking checks.
+- Add `// ignore:` suppressions for 5 unfixable recommended.yaml issues (implementation_imports, library_private_types_in_public_api, prefer_interpolation_to_compose_strings) with verified rationale comments.
+- Add `scripts/check_recommended_yaml.py` — CI gate that temporarily enables recommended.yaml analysis and asserts zero unsuppressed issues; preserves original file bytes on restore, handles YAML document markers and missing `dart`.
+- Add `dart fix` and recommended.yaml checks to pre-commit hook — regressions are now caught before push; dart availability is checked by each Python script (exit 2 = skip), not the shell.
+
+</details>
+
+---
+
+## [14.4.2]
+
+Static analysis fixes. [log](https://github.com/saropa/saropa_lints/blob/v14.4.2/CHANGELOG.md)
+
+### Fixed
+
+- Fix 41 static analysis issues flagged by pub.dev pana scoring (unnecessary null checks, unused imports, missing curly braces, dead code, redundant ignores, invalid overrides)
+
+---
+
 ## [14.4.1]
 
 **Ignore**: Published build error - mixed code/versions. Ignore.

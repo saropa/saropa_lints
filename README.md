@@ -1005,7 +1005,43 @@ dart run saropa_lints init --target /path/to/project --tier recommended
 dart run saropa_lints scan /path/to/project
 ```
 
-**CLI options:** `--tier <name>` (essential | recommended | professional | comprehensive | pedantic) overrides the project config for that run. `--files <path>...` scans only the listed Dart files; `--files-from-stdin` reads one path per line from stdin. `--format json` writes machine-readable JSON to stdout (no report file). `--resolve` fully resolves each file (type/element resolution) instead of the default fast syntactic parse — required for rules that fire on constructor calls like `File('x')` and for type-based rules, which the syntactic pass cannot see; it is slower and the target project must have had `pub get` run. Results are otherwise written to `reports/<date>/<timestamp>_scan_report.log` with a compact summary printed to terminal.
+**CLI options:**
+
+| Flag | Description |
+|------|-------------|
+| `--tier <name>` | Override the project config for this run. Values: `essential`, `recommended`, `professional`, `comprehensive`, `pedantic`. |
+| `--files <path>...` | Scan only the listed Dart files. |
+| `--files-from-stdin` | Read one file path per line from stdin. |
+| `--format json` | Write machine-readable JSON to stdout (no report file). |
+| `--json-file-path <path>` | Write JSON output directly to a file instead of stdout. Implies `--format json`. Creates parent directories if they don't exist. |
+| `--resolve` | Fully resolve each file (type/element resolution) instead of the default fast syntactic parse. Required for rules that fire on constructor calls like `File('x')` and for type-based rules; slower, and the target project must have had `pub get` run. |
+| `--min-severity <level>` | Exclude diagnostics below this analyzer severity from output. Values: `info`, `warning`, `error`. |
+| `--max-severity <level>` | Exclude diagnostics above this severity from output — useful for viewing only lower-priority noise during triage. |
+| `--min-impact <level>` | Filter by the rule author's declared impact level instead of analyzer severity. Some rules have info severity but warning impact; `--min-impact warning` excludes the truly-info ones. |
+| `--fail-on <severity>` | Decouple the exit code from display filtering. The scan shows all diagnostics (or those matching `--min-severity`) but exits 1 only when the full unfiltered set contains at least one diagnostic at or above the threshold. |
+| `--fail-on-count <n>` | Used with `--fail-on`: exit 1 only when the count of matching diagnostics exceeds _n_. Lets CI tolerate a known baseline of warnings. |
+| `--quiet` / `-q` | Suppress all stderr progress and status messages. The caller gets only the exit code and stdout output (report or JSON). |
+| `--profile` | Record per-rule execution timing and write it to `reports/.saropa_lints/rule_timings.json` (slowest first, with call counts and averages). |
+| `--fix-ignores` | Bulk-convert bare `// ignore: rule_name` comments to `// ignore: saropa_lints/rule_name` for all known saropa_lints rules. |
+| `--exclude-light-lane` | Drop light-lane rules from the scan (for two-lane de-duplication when the analysis-server plugin handles those rules in-process). |
+
+Results are written to `reports/<date>/<timestamp>_scan_report.log` with a compact summary printed to terminal, unless `--format json` or `--json-file-path` is used.
+
+**CI examples:**
+
+```bash
+# Show all diagnostics but fail only on errors
+dart run saropa_lints scan /path/to/project --fail-on error
+
+# Tolerate up to 5 warnings before failing
+dart run saropa_lints scan /path/to/project --fail-on warning --fail-on-count 5
+
+# Silent automation: JSON to file, no progress output
+dart run saropa_lints scan /path/to/project --json-file-path results.json --quiet
+
+# Filter to warning-impact rules and above
+dart run saropa_lints scan /path/to/project --min-impact warning --format json
+```
 
 **Programmatic scan:** Import `package:saropa_lints/scan.dart` to run scans from code (e.g. from another package or script) without invoking the CLI. The public API includes `ScanRunner`, `ScanConfig`, `ScanDiagnostic`, `loadScanConfig`, `scanDiagnosticsToJson`, and `scanDiagnosticsToJsonString`. Example:
 
@@ -1027,7 +1063,7 @@ if (diagnostics != null) {
 
 `runner.run()` is the fast syntactic pass. For rules on constructor calls or that need resolved types, use the async `await runner.runResolved()` instead (slower; the target must have had `pub get` run).
 
-JSON output (from `--format json` or `scanDiagnosticsToJson`) includes `version`, `diagnostics` (each with filePath, line, column, ruleName, severity, problemMessage, correctionMessage?), and `summary` (totalCount, byFile, byRule).
+JSON output (from `--format json` or `scanDiagnosticsToJson`) includes `version`, `diagnostics` (each with filePath, line, column, ruleName, severity, impact, problemMessage, correctionMessage?), `summary` (totalCount, byFile, byRule), and `failOn` metadata when `--fail-on` is active.
 
 ## Rule Categories
 

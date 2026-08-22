@@ -11,6 +11,8 @@ import 'dart:io' show Directory, Platform;
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show ProgressTracker;
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 // ProgressTracker file-level dedup of repeated diagnostics.
 
 void main() {
@@ -27,9 +29,8 @@ void main() {
 
   tearDown(() {
     ProgressTracker.reset();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    // Retry-tolerant cleanup for Windows file-lock races
+    safeDeleteDir(tempDir);
   });
 
   test('dedup is offset-based (same offset => counted once)', () {

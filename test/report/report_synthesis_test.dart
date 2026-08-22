@@ -20,6 +20,8 @@ import 'dart:io' show Directory, File, Platform;
 import 'package:saropa_lints/src/report/report_synthesis.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   group('ReportSynthesis.buildRuleRows', () {
     test('sorts rows descending by count and derives share', () {
@@ -209,7 +211,8 @@ void main() {
       tempDir = Directory.systemTemp.createTempSync('report_synthesis_test_');
     });
     tearDown(() {
-      if (tempDir.existsSync()) tempDir.deleteSync(recursive: true);
+      // Retry-tolerant cleanup for Windows file-lock races
+      safeDeleteDir(tempDir);
     });
 
     // Helper: write a minimal report log with a parseable total-issues line.

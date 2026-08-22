@@ -12,6 +12,8 @@ import 'package:saropa_lints/src/report/import_graph_tracker.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show LintImpact;
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 // import_graph_tracker: per-edit dedupe of import edges for cross-file reporting.
 
 void main() {
@@ -30,9 +32,8 @@ void main() {
 
   tearDown(() {
     ImportGraphTracker.reset();
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    // Retry-tolerant cleanup for Windows file-lock races
+    safeDeleteDir(tempDir);
   });
 
   test('setProjectInfo and collectImports build resolved package edges', () {

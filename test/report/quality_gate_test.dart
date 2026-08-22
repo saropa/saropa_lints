@@ -7,6 +7,8 @@ import 'dart:io' show Directory, File;
 import 'package:saropa_lints/src/report/quality_gate.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 /// Each `group` targets one evaluator feature (operators, boundaries, error messages).
 void main() {
   late Directory tempDir;
@@ -16,9 +18,8 @@ void main() {
   });
 
   tearDown(() {
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    // Retry-tolerant cleanup for Windows file-lock races
+    safeDeleteDir(tempDir);
   });
 
   group('QualityGateEvaluator', () {

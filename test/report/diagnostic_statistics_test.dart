@@ -13,6 +13,8 @@ import 'package:path/path.dart' as path;
 import 'package:saropa_lints/src/report/diagnostic_statistics.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 // diagnostic_statistics: severity counts, config reset, and temp violations.json handling.
 
 void main() {
@@ -26,9 +28,8 @@ void main() {
 
     tearDown(() {
       DiagnosticStatisticsConfig.reset();
-      if (tempDir.existsSync()) {
-        tempDir.deleteSync(recursive: true);
-      }
+      // Retry-tolerant cleanup for Windows file-lock races
+      safeDeleteDir(tempDir);
     });
 
     test('evaluates warn/fail threshold breaches', () {

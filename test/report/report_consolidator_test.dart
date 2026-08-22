@@ -11,6 +11,8 @@ import 'package:saropa_lints/src/report/report_consolidator.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart';
 import 'package:test/test.dart';
 
+import '../support/safe_delete.dart';
+
 void main() {
   late Directory tempDir;
   late String projectRoot;
@@ -22,9 +24,8 @@ void main() {
 
   tearDown(() {
     ReportConsolidator.cleanupSession(projectRoot);
-    if (tempDir.existsSync()) {
-      tempDir.deleteSync(recursive: true);
-    }
+    // Retry-tolerant cleanup for Windows file-lock races
+    safeDeleteDir(tempDir);
   });
 
   group('ReportConsolidator path deduplication', () {
