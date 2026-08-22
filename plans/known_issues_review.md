@@ -22,7 +22,7 @@ _None._
   - Current reason: Fails on Apple Silicon builds.
 - **`badges`** (end_of_life) — recorded `2023-08-28`, pub.dev latest `2026-04-10` (v3.2.0). [pub.dev](https://pub.dev/packages/badges)
   - Current reason: Positioning logic broken; badges render off-screen in Material 3.
-- **`better_player`** (maintenance_mode) — recorded `2024-06-15`, pub.dev latest `2026-08-19` (v0.7.1). [pub.dev](https://pub.dev/packages/better_player)
+- **`better_player`** (maintenance_mode) — recorded `2024-06-15`, pub.dev latest `2026-08-21` (v0.8.0). [pub.dev](https://pub.dev/packages/better_player)
   - Current reason: 
 - **`camera`** (end_of_life) — recorded `2026-02-25`, pub.dev latest `2026-07-13` (v0.12.0+2). [pub.dev](https://pub.dev/packages/camera)
   - Current reason: Fails Android 14 Scoped Storage and iOS 18 hardware manifest requirements.
