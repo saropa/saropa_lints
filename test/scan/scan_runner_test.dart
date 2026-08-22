@@ -207,12 +207,13 @@ plugins:
       expect(result, isNull);
     });
 
-    // The core of bug infra_scan_cli_misses_instance_creation_rules: an
-    // implicit constructor call (`File('x')`) parses as a MethodInvocation in
-    // the syntactic pass, so addInstanceCreationExpression and type-based rules
-    // never fire under run(). runResolved() resolves the unit, so those rules
-    // fire — the resolved diagnostics must be a strict superset for a fixture
-    // that contains a resolution-only violation.
+    // Bug infra_scan_cli_misses_instance_creation_rules: an implicit
+    // constructor call (`File('x')`) parses as MethodInvocation in older Dart
+    // syntactic passes, so addInstanceCreationExpression rules never fire
+    // under run(). runResolved() resolves the unit, so those rules always
+    // fire. From Dart 3.13+ the parser handles implicit `new` even in
+    // syntactic mode, so both passes may fire the same rules — the resolved
+    // result must be a (possibly non-strict) superset of the syntactic one.
     test('fires rules that the syntactic run() misses', () async {
       const fixture =
           'example/lib/platform/require_platform_check_fixture.dart';
@@ -241,12 +242,22 @@ plugins:
       final syntacticRules = syntactic!.map((d) => d.ruleName).toSet();
       final resolvedRules = resolved!.map((d) => d.ruleName).toSet();
 
+      // Resolved must find everything syntactic found (superset).
       expect(
-        resolvedRules.difference(syntacticRules),
+        syntacticRules.difference(resolvedRules),
+        isEmpty,
+        reason:
+            'resolved scan must be a superset of the syntactic scan — '
+            'every syntactic rule should also fire under resolution',
+      );
+
+      // Resolved must find at least one rule on this fixture.
+      expect(
+        resolvedRules,
         isNotEmpty,
         reason:
-            'resolved scan should surface instance-creation / type-based rules '
-            'that the syntactic pass cannot see',
+            'resolved scan should surface instance-creation / type-based '
+            'rules on the platform-check fixture',
       );
     });
   });
