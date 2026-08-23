@@ -66,11 +66,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.2.3]
 
+The scan CLI now supports custom glob filtering, giving teams precise control to include ephemeral sources or exclude generated and vendored code. CI pipelines gain stricter quality gates with the ability to fail builds based on a rule's declared business impact, decoupling pipeline status from editor severity. Finally, automatic exclusions have been expanded to silently ignore platform symlinks by default so they no longer clutter scan reports. [log](https://github.com/saropa/saropa_lints/blob/v15.2.3/CHANGELOG.md)
+
 ### Added
 
 - Scan CLI: `--exclude-globs <pattern>...` flag excludes files matching glob patterns from the scan. Supports `**` (any path segments), `*` (any non-separator chars), and `?` (single char). Use it to skip vendored code, generated directories, or any paths the hardcoded exclusions don't cover. ([#313](https://github.com/saropa/saropa_lints/issues/313))
 - Scan CLI: `--include-globs <pattern>...` flag overrides the hardcoded exclusions for matching paths — when a path matches both a default exclusion and an include-glob, the include wins. Use it to force-scan third-party plugin code in ephemeral or generated directories. ([#313](https://github.com/saropa/saropa_lints/issues/313))
 - Scan CLI: `--fail-on-impact <level>` flag exits 1 when any saropa rule's declared impact meets the threshold (info/warning/error). Unlike `--fail-on` (which uses analyzer severity), this checks the rule author's business-consequence rating — use it to gate CI on high-impact rules regardless of their configurable severity. Pair with `--fail-on-impact-count <n>` to tolerate a known baseline during migration. ([#312](https://github.com/saropa/saropa_lints/issues/312))
+- Scan CLI: `--fail-on-tier <name>` flag exits 1 only when a diagnostic comes from a rule in the specified tier or below. Scan at a high tier for visibility but only fail on essential-tier findings during incremental adoption — e.g. `--tier comprehensive --fail-on-tier essential`. ([#312](https://github.com/saropa/saropa_lints/issues/312))
 
 ### Fixed
 
@@ -143,6 +146,8 @@ Rule execution is roughly twice as fast, and the analysis server now reports the
 
 </details>
 
+---
+
 ## [15.1.2]
 
 The Upgrade Opportunities panel's AI prompt is more accurate and less noisy: it now surfaces the deprecated APIs a project actually calls, dual-dependency version risk, and possible local reimplementations of library code, while dropping dev-only and transitive dependencies that aren't actionable. The old per-card clipboard copy is replaced by "Write Report" buttons — global (all packages in one file) and per-card (single package) — that save dated files and copy the path. Seven actively-maintained packages were removed from the known-issues database after being incorrectly flagged as end-of-life. [log](https://github.com/saropa/saropa_lints/blob/v15.1.2/CHANGELOG.md)
@@ -171,6 +176,8 @@ The Upgrade Opportunities panel's AI prompt is more accurate and less noisy: it 
 - Corrected the advertised rule count from a stale "2100+"/"2134" to the current 2332 (2109 tiered + 223 opt-in stylistic) across the README, extension manifest, and marketing copy.
 
 </details>
+
+---
 
 ## [15.1.1]
 

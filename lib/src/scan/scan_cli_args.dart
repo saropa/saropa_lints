@@ -49,6 +49,7 @@ class ScanCliArgs {
     this.minImpact,
     this.failOn,
     this.failOnImpact,
+    this.failOnTier,
     this.failOnCount,
     this.failOnImpactCount,
     this.jsonFilePath,
@@ -98,6 +99,15 @@ class ScanCliArgs {
   /// wins, so CI catches problems on EITHER axis).
   /// Valid values: 'INFO', 'WARNING', 'ERROR'. Null = not used.
   final String? failOnImpact;
+
+  /// Exit-code tier threshold. When set, the scan exits 1 only when any
+  /// diagnostic comes from a rule that belongs to this tier or below it.
+  /// This lets CI fail only on essential-tier findings during incremental
+  /// adoption, even if the scan runs at a higher tier for visibility.
+  /// Valid values: 'essential', 'recommended', 'professional', 'comprehensive',
+  /// 'pedantic'. Null = not used. When combined with [failOn] or
+  /// [failOnImpact], any threshold being met triggers exit 1 (logical OR).
+  final String? failOnTier;
 
   /// Count threshold for [failOn]. When set, the scan exits 1 only when the
   /// number of diagnostics at or above the [failOn] severity exceeds this
@@ -198,6 +208,7 @@ ScanParseResult parseScanArgs(
   String? minImpact;
   String? failOn;
   String? failOnImpact;
+  String? failOnTier;
   int? failOnCount;
   int? failOnImpactCount;
   String? jsonFilePath;
@@ -405,6 +416,36 @@ ScanParseResult parseScanArgs(
       }
       continue;
     }
+    // Exit-code tier gate: fail only when a diagnostic comes from a rule
+    // in this tier or below. Lets CI see all diagnostics at a high tier
+    // but only fail on essential/recommended findings during adoption.
+    if (arg == '--fail-on-tier') {
+      i++;
+      if (i < args.length && !args[i].startsWith('--')) {
+        final value = args[i].toLowerCase();
+        if (const {
+          'essential',
+          'recommended',
+          'professional',
+          'comprehensive',
+          'pedantic',
+        }.contains(value)) {
+          failOnTier = value;
+          i++;
+        } else {
+          return ScanParseInvalid(
+            '--fail-on-tier must be one of: essential, recommended, '
+            'professional, comprehensive, pedantic.',
+          );
+        }
+      } else {
+        return ScanParseInvalid(
+          '--fail-on-tier requires a value (essential, recommended, '
+          'professional, comprehensive, pedantic).',
+        );
+      }
+      continue;
+    }
     // Count threshold for --fail-on: exit 1 only when the number of matching
     // diagnostics exceeds this count. Requires --fail-on to be meaningful.
     if (arg == '--fail-on-count') {
@@ -486,6 +527,7 @@ ScanParseResult parseScanArgs(
       minImpact: minImpact,
       failOn: failOn,
       failOnImpact: failOnImpact,
+      failOnTier: failOnTier,
       failOnCount: failOnCount,
       failOnImpactCount: failOnImpactCount,
       profile: profile,

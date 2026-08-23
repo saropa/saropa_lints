@@ -683,6 +683,73 @@ void main() {
     });
   });
 
+  group('--fail-on-tier', () {
+    test('--fail-on-tier parses valid tier names', () {
+      for (final tier in [
+        'essential',
+        'recommended',
+        'professional',
+        'comprehensive',
+        'pedantic',
+      ]) {
+        final result = parseScanArgs(<String>['.', '--fail-on-tier', tier]);
+        expect(result, isA<ScanParseOk>(), reason: tier);
+        expect((result as ScanParseOk).args.failOnTier, tier);
+      }
+    });
+
+    test('--fail-on-tier is case-insensitive', () {
+      final result =
+          parseScanArgs(<String>['.', '--fail-on-tier', 'Essential']);
+      expect(result, isA<ScanParseOk>());
+      // Parser lowercases the value to match tiers.dart convention.
+      expect((result as ScanParseOk).args.failOnTier, 'essential');
+    });
+
+    test('--fail-on-tier with invalid value returns invalid', () {
+      final result =
+          parseScanArgs(<String>['.', '--fail-on-tier', 'maximum']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--fail-on-tier must be one of'),
+      );
+    });
+
+    test('--fail-on-tier with no value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--fail-on-tier']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--fail-on-tier requires a value'),
+      );
+    });
+
+    test('--fail-on-tier null by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.failOnTier, isNull);
+    });
+
+    test('--fail-on-tier combines with --fail-on and --fail-on-impact', () {
+      // All three thresholds can coexist — logical OR for exit code.
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on',
+        'error',
+        '--fail-on-impact',
+        'warning',
+        '--fail-on-tier',
+        'essential',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.failOn, 'ERROR');
+      expect(args.failOnImpact, 'WARNING');
+      expect(args.failOnTier, 'essential');
+    });
+  });
+
   group('--quiet / -q', () {
     test('--quiet sets quiet flag', () {
       final result = parseScanArgs(<String>['.', '--quiet']);

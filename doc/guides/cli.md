@@ -71,6 +71,7 @@ dart run saropa_lints scan /path/to/project
 | `--fail-on-impact <level>` | Like `--fail-on` but checks the rule author's declared impact instead of analyzer severity. Non-saropa diagnostics are excluded. When both `--fail-on` and `--fail-on-impact` are set, either threshold being met triggers exit 1. |
 | `--fail-on-count <n>` | Used with `--fail-on`: exit 1 only when the count of matching diagnostics exceeds _n_. Lets CI tolerate a known baseline of warnings. |
 | `--fail-on-impact-count <n>` | Used with `--fail-on-impact`: exit 1 only when the count of matching impact-level diagnostics exceeds _n_. Lets CI tolerate a known baseline during migration. |
+| `--fail-on-tier <name>` | Exit 1 only when any diagnostic comes from a rule in this tier or below. Lets CI see all diagnostics at a high tier but only fail on essential-tier findings during incremental adoption. Values: `essential`, `recommended`, `professional`, `comprehensive`, `pedantic`. |
 | `--quiet` / `-q` | Suppress all stderr progress and status messages. The caller gets only the exit code and stdout output (report or JSON). |
 | `--profile` | Record per-rule execution timing and write to `reports/.saropa_lints/rule_timings.json` (slowest first, with call counts and averages). |
 | `--fix-ignores` | Bulk-convert bare `// ignore: rule_name` comments to `// ignore: saropa_lints/rule_name` for all known saropa_lints rules. |
@@ -94,6 +95,9 @@ dart run saropa_lints scan . --fail-on warning --fail-on-count 5
 
 # Fail only on rules with high business impact (regardless of severity config)
 dart run saropa_lints scan . --fail-on-impact error
+
+# Scan at comprehensive tier but only fail on essential-tier rules
+dart run saropa_lints scan . --tier comprehensive --fail-on-tier essential
 
 # Silent automation: JSON to file, no progress output
 dart run saropa_lints scan . --json-file-path results.json --quiet

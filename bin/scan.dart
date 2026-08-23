@@ -169,24 +169,39 @@ Future<void> main(List<String> args) async {
   // --fail-on / --fail-on-impact decouple exit code from display filtering:
   // the exit code is determined by whether any diagnostic in the FULL set meets
   // the threshold, not by what survived the display filter.
+  // Build the tier rule set once if --fail-on-tier is active, so the exit-code
+  // check doesn't recompute it per diagnostic.
+  final failOnTierRules = parsed.failOnTier != null
+      ? getRulesForTier(parsed.failOnTier!)
+      : null;
+
   final exitCode = _computeExitCode(
     filtered: filtered,
     allDiagnostics: diagnostics,
     failOn: parsed.failOn,
     failOnImpact: parsed.failOnImpact,
+    failOnTierRules: failOnTierRules,
     failOnCount: parsed.failOnCount,
     failOnImpactCount: parsed.failOnImpactCount,
   );
 
   // Build --fail-on metadata for JSON output so consumers understand why
   // the exit code may disagree with an empty diagnostics array.
-  final failOnMeta = parsed.failOn != null || parsed.failOnImpact != null
+  // BREAKING for consumers that check `failOn == null`: this object is now
+  // non-null when --fail-on-impact or --fail-on-tier is used alone. The
+  // `threshold` key is still absent in that case — check for it specifically.
+  final failOnMeta = parsed.failOn != null ||
+          parsed.failOnImpact != null ||
+          parsed.failOnTier != null
       ? <String, Object>{
           // Severity threshold (original --fail-on).
           if (parsed.failOn != null) 'threshold': parsed.failOn!,
           // Impact threshold (new --fail-on-impact).
           if (parsed.failOnImpact != null)
             'impactThreshold': parsed.failOnImpact!,
+          // Tier threshold (--fail-on-tier).
+          if (parsed.failOnTier != null)
+            'tierThreshold': parsed.failOnTier!,
           'thresholdMet': exitCode == 1,
           // Include the count baselines when active.
           if (parsed.failOnCount != null)
@@ -209,15 +224,18 @@ Future<void> main(List<String> args) async {
         print('\nNo issues found.');
       }
     }
-    // When --fail-on or --fail-on-impact causes a non-zero exit despite no
-    // displayed diagnostics, explain so automation doesn't see "No issues" + exit 1.
+    // When a --fail-on* flag causes a non-zero exit despite no displayed
+    // diagnostics, explain so automation doesn't see "No issues" + exit 1.
     if (!formatJson && exitCode != 0 &&
-        (parsed.failOn != null || parsed.failOnImpact != null)) {
+        (parsed.failOn != null || parsed.failOnImpact != null ||
+         parsed.failOnTier != null)) {
       final reasons = [
         if (parsed.failOn != null)
           '--fail-on ${parsed.failOn!.toLowerCase()}',
         if (parsed.failOnImpact != null)
           '--fail-on-impact ${parsed.failOnImpact!.toLowerCase()}',
+        if (parsed.failOnTier != null)
+          '--fail-on-tier ${parsed.failOnTier!}',
       ];
       print(
         '(exit 1: ${reasons.join(' or ')} threshold met '
@@ -428,15 +446,19 @@ bool _meetsMinSeverity(String severity, String minSeverity) =>
 /// threshold being met triggers exit 1 (logical OR — strictest wins).
 /// [failOnCount] applies to --fail-on (severity count baseline).
 /// [failOnImpactCount] applies to --fail-on-impact (impact count baseline).
+/// [failOnTierRules] is the pre-computed set from [getRulesForTier] when
+/// --fail-on-tier is active — diagnostics whose ruleName is in this set
+/// trigger exit 1.
 int _computeExitCode({
   required List<ScanDiagnostic> filtered,
   required List<ScanDiagnostic> allDiagnostics,
   required String? failOn,
   String? failOnImpact,
+  Set<String>? failOnTierRules,
   int? failOnCount,
   int? failOnImpactCount,
 }) {
-  // Track whether either threshold triggers a failure.
+  // Track whether any threshold triggers a failure (logical OR).
   var triggered = false;
 
   if (failOn != null) {
@@ -453,6 +475,9 @@ int _computeExitCode({
     // Count saropa diagnostics whose rule-declared impact meets the threshold.
     // Non-saropa diagnostics (impact == null) are excluded — they have no
     // declared impact and cannot be classified on this axis.
+    // Note: impact values come from LintImpact.name (lowercase: error/warning/info)
+    // while failOnImpact is uppercased by the parser — _severityRank handles
+    // both cases via .toUpperCase() internally.
     final impactMatchCount = allDiagnostics
         .where((d) => d.impact != null && _meetsMinSeverity(d.impact!, failOnImpact))
         .length;
@@ -462,8 +487,18 @@ int _computeExitCode({
     if (impactMatchCount > impactThreshold) triggered = true;
   }
 
-  // When either threshold is active, use the triggered result.
-  if (failOn != null || failOnImpact != null) {
+  if (failOnTierRules != null) {
+    // Check if any diagnostic comes from a rule in the target tier.
+    // Rule names in diagnostics use the bare name (no saropa_lints/ prefix),
+    // which matches the tiers.dart sets.
+    final tierMatchCount = allDiagnostics
+        .where((d) => failOnTierRules.contains(d.ruleName))
+        .length;
+    if (tierMatchCount > 0) triggered = true;
+  }
+
+  // When any threshold is active, use the triggered result.
+  if (failOn != null || failOnImpact != null || failOnTierRules != null) {
     return triggered ? 1 : 0;
   }
 
@@ -600,6 +635,24 @@ void _printUsage() {
     '                      Lets CI tolerate a known baseline during migration.',
   );
   print(
+    '  --fail-on-tier <t>  Exit 1 only when any diagnostic comes from a rule',
+  );
+  print(
+    '                      in this tier or below. Lets CI see all diagnostics',
+  );
+  print(
+    '                      at a high tier but only fail on essential-tier',
+  );
+  print(
+    '                      findings during incremental adoption.',
+  );
+  print(
+    '                      Values: essential, recommended, professional,',
+  );
+  print(
+    '                      comprehensive, pedantic.',
+  );
+  print(
     '  --min-impact <s>    Only show diagnostics whose rule-declared impact is',
   );
   print(
@@ -694,6 +747,7 @@ void _printUsage() {
   print('  dart run saropa_lints scan . --fail-on error         # exit 1 on errors only');
   print('  dart run saropa_lints scan . --fail-on warning --fail-on-count 5  # tolerate up to 5 warnings');
   print('  dart run saropa_lints scan . --fail-on-impact error           # exit 1 on high-impact rules only');
+  print('  dart run saropa_lints scan . --fail-on-tier essential          # fail on essential-tier rules only');
   print('  dart run saropa_lints scan . --exclude-globs **/vendor/**  # skip vendor');
   print('  dart run saropa_lints scan . --format json  # JSON to stdout');
   print('  dart run saropa_lints scan . -q --json-file-path out.json  # silent');
