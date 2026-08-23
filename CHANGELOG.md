@@ -69,7 +69,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Added
 
 - New rule: `prefer_primary_constructor` (Professional, INFO) — flags classes eligible for Dart 3.13+ primary constructor syntax when the project's SDK lower bound is >=3.13.0. Reduces boilerplate for simple data classes that AI generators consistently produce in the verbose pre-3.13 form. No action required.
-- New rule: `require_sdk_syntax_match` (Comprehensive, WARNING) — flags Dart syntax features that require a newer SDK than the lower bound declared in pubspec.yaml. Catches AI-generated code that uses records, switch expressions, extension types, or digit separators when the project's SDK constraint doesn't support them. No action required.
+- New rule: `require_sdk_syntax_match` (Comprehensive, WARNING) — flags Dart syntax features that require a newer SDK than the lower bound declared in pubspec.yaml, with a quick fix to raise the SDK lower bound. Catches AI-generated code that uses records, switch expressions, extension types, or digit separators when the project's SDK constraint doesn't support them. No action required.
 
 <details><summary>Maintenance</summary>
 

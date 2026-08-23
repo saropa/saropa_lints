@@ -53,6 +53,12 @@ void main() {
         'avoid_overly_wide_app_constraint',
       );
     });
+    test('RequireSdkSyntaxMatchRule', () {
+      expectMetadata(
+        RequireSdkSyntaxMatchRule(),
+        'require_sdk_syntax_match',
+      );
+    });
   });
 
   group('parseConstraint', () {
