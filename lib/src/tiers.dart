@@ -1813,6 +1813,7 @@ const Set<String> professionalOnlyRules = <String>{
   'prefer_asserts_in_initializer_lists_safe',
   'prefer_const_constructors_in_immutables_extended',
   'prefer_const_constructor_declarations',
+  'prefer_primary_constructor',
   'prefer_constructors_first',
   'prefer_extension_methods',
   'prefer_extension_over_utility_class',
@@ -3244,6 +3245,8 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_overly_wide_app_constraint', // INFO - app: range spans 2+ majors
   // CommonButton/CommonButtonWait caption hygiene (widget_patterns_avoid_prefer_rules.dart)
   'avoid_parenthesized_button_caption',
+  // SDK syntax vs constraint cross-check (sdk_syntax_match_rule.dart)
+  'require_sdk_syntax_match',
 };
 
 /// Pedantic tier rules - pedantic, highly opinionated rules.

@@ -64,6 +64,22 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [Unreleased]
+
+### Added
+
+- New rule: `prefer_primary_constructor` (Professional, INFO) — flags classes eligible for Dart 3.13+ primary constructor syntax when the project's SDK lower bound is >=3.13.0. Reduces boilerplate for simple data classes that AI generators consistently produce in the verbose pre-3.13 form. No action required.
+- New rule: `require_sdk_syntax_match` (Comprehensive, WARNING) — flags Dart syntax features that require a newer SDK than the lower bound declared in pubspec.yaml. Catches AI-generated code that uses records, switch expressions, extension types, or digit separators when the project's SDK constraint doesn't support them. No action required.
+
+<details><summary>Maintenance</summary>
+
+- `bugs/BUG_REPORT_GUIDE.md` renamed to `bugs/ISSUE_REPORT_GUIDE.md` and extended with a feature request template, proposal naming patterns, and lifecycle, alongside the existing bug report process.
+- New `scripts/roadmap_status.py` prints the roadmap/bugs/proposals work report outside the interactive publish menu, with `--bugs-only` / `--proposals-only` filters; `_rule_metrics.py`'s bug counter now reports open feature proposals separately from unsolved bugs instead of lumping both into one count.
+
+</details>
+
+---
+
 ## [15.2.3]
 
 The scan CLI now supports custom glob filtering, giving teams precise control to include ephemeral sources or exclude generated and vendored code. CI pipelines gain stricter quality gates with the ability to fail builds based on a rule's declared business impact, decoupling pipeline status from editor severity. Finally, automatic exclusions have been expanded to silently ignore platform symlinks by default so they no longer clutter scan reports. [log](https://github.com/saropa/saropa_lints/blob/v15.2.3/CHANGELOG.md)
