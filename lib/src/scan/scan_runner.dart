@@ -52,7 +52,10 @@ class ScanRunner {
     this.applyExclusionsToFileList = true,
     this.debugRule,
     this.excludeLightLane = false,
-  });
+    List<String> excludeGlobs = const [],
+    List<String> includeGlobs = const [],
+  })  : _excludePatterns = excludeGlobs.map(_globToRegex).toList(),
+        _includePatterns = includeGlobs.map(_globToRegex).toList();
 
   /// Project root: config is loaded from here and relative [dartFiles] are resolved against it.
   final String targetPath;
@@ -83,6 +86,18 @@ class ScanRunner {
   /// When set, emits per-node trace output for the named rule, showing type
   /// resolution details at each visited AST node.
   final String? debugRule;
+
+  /// Compiled glob patterns from `--exclude-globs` for user-specified path
+  /// exclusions beyond the hardcoded defaults. Built once at construction from
+  /// the raw glob strings so matching is a hot-path regex check, not a
+  /// per-file glob parse. See #313.
+  final List<RegExp> _excludePatterns;
+
+  /// Compiled glob patterns from `--include-globs` that override the hardcoded
+  /// exclusions. When a path matches both a hardcoded exclusion AND an include
+  /// pattern, the include wins — letting users force-scan paths the defaults
+  /// would skip (e.g. auditing third-party plugins in ephemeral dirs).
+  final List<RegExp> _includePatterns;
 
   /// Drops light-lane rules from the scan's rule set.
   ///
@@ -366,11 +381,14 @@ class ScanRunner {
     return config.enabledRules;
   }
 
-  /// Resolves files to scan: [dartFiles] if non-empty (relative paths resolved against [targetPath], exclusions applied when [applyExclusionsToFileList]); otherwise discovers under [targetPath].
+  /// Resolves files to scan: [dartFiles] if non-empty (relative paths resolved
+  /// against [targetPath], exclusions applied when [applyExclusionsToFileList]);
+  /// otherwise discovers under [targetPath]. User-supplied `--exclude-globs`
+  /// patterns are applied in both paths.
   List<String> _resolveDartFiles() {
     final raw = dartFiles;
     if (raw == null || raw.isEmpty) {
-      return _findDartFiles(targetPath);
+      return _findDartFiles(targetPath, _excludePatterns, _includePatterns);
     }
     final root = p.absolute(targetPath);
     var list = raw
@@ -383,7 +401,15 @@ class ScanRunner {
         .where((path) => path.endsWith('.dart'))
         .toList();
     if (applyExclusionsToFileList) {
-      list = list.where((path) => !_isExcluded(path)).toList();
+      // Combined exclusion/inclusion filter: _shouldInclude handles the
+      // hardcoded defaults, user-supplied exclude-globs, and include-glob
+      // overrides in one pass.
+      list = list
+          .where(
+            (path) =>
+                _shouldInclude(path, _excludePatterns, _includePatterns),
+          )
+          .toList();
     }
     return list;
   }
@@ -734,7 +760,11 @@ class ScanRunner {
   static List<String> discoverDartFiles(String directory) =>
       _findDartFiles(directory);
 
-  static List<String> _findDartFiles(String directory) {
+  static List<String> _findDartFiles(
+    String directory, [
+    List<RegExp> excludePatterns = const [],
+    List<RegExp> includePatterns = const [],
+  ]) {
     final dir = io.Directory(directory);
     if (!dir.existsSync()) return const [];
 
@@ -742,17 +772,39 @@ class ScanRunner {
         .listSync(recursive: true)
         .whereType<io.File>()
         .where((f) => f.path.endsWith('.dart'))
-        .where((f) => !_isExcluded(f.path))
+        .where((f) => _shouldInclude(f.path, excludePatterns, includePatterns))
         .map((f) => p.normalize(f.path))
         .toList();
   }
 
+  /// Combined exclusion/inclusion check: a file is kept when it passes the
+  /// hardcoded exclusions AND user-supplied exclude-globs, OR when it matches
+  /// an include-glob (which overrides both). Include wins over exclude so
+  /// users can force-scan paths the defaults would skip.
+  static bool _shouldInclude(
+    String path,
+    List<RegExp> excludePatterns,
+    List<RegExp> includePatterns,
+  ) {
+    // Include-globs override all exclusions — check first.
+    if (_matchesExcludeGlob(path, includePatterns)) return true;
+    // Normal exclusion chain: hardcoded defaults + user-supplied globs.
+    if (_isExcluded(path)) return false;
+    if (_matchesExcludeGlob(path, excludePatterns)) return false;
+    return true;
+  }
+
+  /// Paths that are never user code — build artifacts, generated files, and
+  /// platform ephemeral directories (symlinked plugin sources the user can't
+  /// control). See #313 for the ephemeral/.plugin_symlinks addition.
   static bool _isExcluded(String path) {
     final n = path.replaceAll('\\', '/');
     return n.contains('/.dart_tool/') ||
         n.contains('/build/') ||
         n.contains('/bin/') ||
         n.contains('/example') ||
+        n.contains('/ephemeral/') ||
+        n.contains('/.plugin_symlinks/') ||
         n.contains('.g.dart') ||
         n.contains('.freezed.dart') ||
         n.contains('.gr.dart') ||
@@ -760,6 +812,52 @@ class ScanRunner {
         n.contains('.mocks.dart') ||
         n.contains('.config.dart') ||
         n.contains('/generated/');
+  }
+
+  /// Converts a simple glob pattern to a [RegExp] for path matching.
+  ///
+  /// Supports `**` (any path segments), `*` (any non-separator chars), and
+  /// `?` (single non-separator char). Pattern is matched against the
+  /// forward-slash-normalized path.
+  static RegExp _globToRegex(String glob) {
+    // Normalize Windows backslashes so patterns typed on Windows (e.g.
+    // `windows\flutter\ephemeral\**`) match forward-slash-normalized paths.
+    final normalized = glob.replaceAll('\\', '/');
+    final buf = StringBuffer('^');
+    var i = 0;
+    while (i < normalized.length) {
+      final c = normalized[i];
+      if (c == '*') {
+        // `**` matches any number of path segments (including separators).
+        if (i + 1 < normalized.length && normalized[i + 1] == '*') {
+          buf.write('.*');
+          i += 2;
+          // Skip a trailing slash after `**` so `**/foo` works naturally.
+          if (i < normalized.length && normalized[i] == '/') i++;
+          continue;
+        }
+        // Single `*` matches anything except `/`.
+        buf.write('[^/]*');
+      } else if (c == '?') {
+        buf.write('[^/]');
+      } else {
+        // Escape regex metacharacters in the literal portion.
+        buf.write(RegExp.escape(c));
+      }
+      i++;
+    }
+    buf.write(r'$');
+    return RegExp(buf.toString(), caseSensitive: false);
+  }
+
+  /// Returns true if [path] matches any of the compiled [excludePatterns].
+  static bool _matchesExcludeGlob(
+    String path,
+    List<RegExp> excludePatterns,
+  ) {
+    if (excludePatterns.isEmpty) return false;
+    final normalized = path.replaceAll('\\', '/');
+    return excludePatterns.any((re) => re.hasMatch(normalized));
   }
 }
 

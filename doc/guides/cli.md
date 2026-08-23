@@ -59,6 +59,8 @@ dart run saropa_lints scan /path/to/project
 | `--tier <name>` | Override the project config for this run. Values: `essential`, `recommended`, `professional`, `comprehensive`, `pedantic`. |
 | `--files <path>...` | Scan only the listed Dart files. |
 | `--files-from-stdin` | Read one file path per line from stdin. |
+| `--exclude-globs <pattern>...` | Exclude files matching glob patterns. Supports `**` (any path segments), `*` (any non-separator chars), `?` (single char). Patterns are matched against forward-slash-normalized full paths, so use `**/` prefix for substring-style matching (e.g. `**/vendor/**`). Platform ephemeral dirs and `.plugin_symlinks` are already excluded by default. |
+| `--include-globs <pattern>...` | Override hardcoded exclusions for matching paths. When a path matches both a default exclusion and an include-glob, the include wins — useful for auditing third-party code in ephemeral or generated directories. |
 | `--format json` | Write machine-readable JSON to stdout (no report file). |
 | `--json-file-path <path>` | Write JSON output directly to a file instead of stdout. Implies `--format json`. Creates parent directories if they don't exist. |
 | `--resolve` | Fully resolve each file (type/element resolution) instead of the default fast syntactic parse. Required for rules that fire on constructor calls like `File('x')` and for type-based rules; slower, and the target project must have had `pub get` run. |
@@ -66,7 +68,9 @@ dart run saropa_lints scan /path/to/project
 | `--max-severity <level>` | Exclude diagnostics above this severity from output — useful for viewing only lower-priority noise during triage. |
 | `--min-impact <level>` | Filter by the rule author's declared impact level instead of analyzer severity. Some rules have info severity but warning impact; `--min-impact warning` excludes the truly-info ones. |
 | `--fail-on <severity>` | Decouple the exit code from display filtering. The scan shows all diagnostics (or those matching `--min-severity`) but exits 1 only when the full unfiltered set contains at least one diagnostic at or above the threshold. |
+| `--fail-on-impact <level>` | Like `--fail-on` but checks the rule author's declared impact instead of analyzer severity. Non-saropa diagnostics are excluded. When both `--fail-on` and `--fail-on-impact` are set, either threshold being met triggers exit 1. |
 | `--fail-on-count <n>` | Used with `--fail-on`: exit 1 only when the count of matching diagnostics exceeds _n_. Lets CI tolerate a known baseline of warnings. |
+| `--fail-on-impact-count <n>` | Used with `--fail-on-impact`: exit 1 only when the count of matching impact-level diagnostics exceeds _n_. Lets CI tolerate a known baseline during migration. |
 | `--quiet` / `-q` | Suppress all stderr progress and status messages. The caller gets only the exit code and stdout output (report or JSON). |
 | `--profile` | Record per-rule execution timing and write to `reports/.saropa_lints/rule_timings.json` (slowest first, with call counts and averages). |
 | `--fix-ignores` | Bulk-convert bare `// ignore: rule_name` comments to `// ignore: saropa_lints/rule_name` for all known saropa_lints rules. |
@@ -88,6 +92,9 @@ dart run saropa_lints scan . --fail-on error
 # Tolerate up to 5 warnings before failing
 dart run saropa_lints scan . --fail-on warning --fail-on-count 5
 
+# Fail only on rules with high business impact (regardless of severity config)
+dart run saropa_lints scan . --fail-on-impact error
+
 # Silent automation: JSON to file, no progress output
 dart run saropa_lints scan . --json-file-path results.json --quiet
 
@@ -108,7 +115,7 @@ Output from `--format json` or `--json-file-path` includes:
 - `version` — saropa_lints version
 - `diagnostics` — array of `{ filePath, line, column, ruleName, severity, impact, problemMessage, correctionMessage? }`
 - `summary` — `{ totalCount, byFile, byRule }`
-- `failOn` — metadata object when `--fail-on` is active (threshold, count, exceeded)
+- `failOn` — metadata object when `--fail-on` or `--fail-on-impact` is active (threshold, impactThreshold, count, exceeded)
 
 ### Programmatic API
 

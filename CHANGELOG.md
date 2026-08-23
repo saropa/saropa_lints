@@ -64,6 +64,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.2.3]
+
+### Added
+
+- Scan CLI: `--exclude-globs <pattern>...` flag excludes files matching glob patterns from the scan. Supports `**` (any path segments), `*` (any non-separator chars), and `?` (single char). Use it to skip vendored code, generated directories, or any paths the hardcoded exclusions don't cover. ([#313](https://github.com/saropa/saropa_lints/issues/313))
+- Scan CLI: `--include-globs <pattern>...` flag overrides the hardcoded exclusions for matching paths — when a path matches both a default exclusion and an include-glob, the include wins. Use it to force-scan third-party plugin code in ephemeral or generated directories. ([#313](https://github.com/saropa/saropa_lints/issues/313))
+- Scan CLI: `--fail-on-impact <level>` flag exits 1 when any saropa rule's declared impact meets the threshold (info/warning/error). Unlike `--fail-on` (which uses analyzer severity), this checks the rule author's business-consequence rating — use it to gate CI on high-impact rules regardless of their configurable severity. Pair with `--fail-on-impact-count <n>` to tolerate a known baseline during migration. ([#312](https://github.com/saropa/saropa_lints/issues/312))
+
+### Fixed
+
+- Scan CLI now excludes platform ephemeral directories (`ephemeral/`, `.plugin_symlinks/`) by default. Previously these symlinked plugin sources appeared in scan results even though the user doesn't control them. No action required — the exclusion is automatic. ([#313](https://github.com/saropa/saropa_lints/issues/313))
+
+---
+
 ## [15.2.2]
 
 **[CLI reference guide](https://github.com/saropa/saropa_lints/blob/v15.2.1/doc/guides/cli.md)** — complete flag tables, CI examples, and exit codes for every CLI command.

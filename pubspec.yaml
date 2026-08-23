@@ -7,7 +7,7 @@ description: >-
   Static analysis for security, accessibility, and performance.
 
 # SemVer version used by pub.dev and dependency resolution
-version: 15.2.2
+version: 15.2.3
 
 # SPDX license identifier shown on pub.dev
 license: MIT
@@ -196,4 +196,5 @@ dependencies:
 dev_dependencies:
   # A full featured library for writing and running Dart tests across platforms.
   # https://pub.dev/packages/test
+  ################ Because test >=1.31.2 depends on analyzer >=13.0.0 <15.0.0 and saropa_lints depends on analyzer ^12.1.0, test >=1.31.2 is forbidden.
   test: ^1.31.1 # Unit testing framework

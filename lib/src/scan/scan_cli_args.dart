@@ -48,11 +48,15 @@ class ScanCliArgs {
     this.maxSeverity,
     this.minImpact,
     this.failOn,
+    this.failOnImpact,
     this.failOnCount,
+    this.failOnImpactCount,
     this.jsonFilePath,
     this.profile = false,
     this.excludeLightLane = false,
     this.quiet = false,
+    this.excludeGlobs = const [],
+    this.includeGlobs = const [],
   });
 
   final String path;
@@ -86,11 +90,27 @@ class ScanCliArgs {
   /// behavior: any displayed diagnostic → exit 1).
   final String? failOn;
 
+  /// Exit-code impact threshold, independent of display filtering.
+  /// Like [failOn] but checks the rule's declared [LintImpact] instead of the
+  /// analyzer severity. Diagnostics with no impact (non-saropa rules) are
+  /// excluded from the match count. When both [failOn] and [failOnImpact] are
+  /// set, either threshold being met triggers exit 1 (logical OR — strictest
+  /// wins, so CI catches problems on EITHER axis).
+  /// Valid values: 'INFO', 'WARNING', 'ERROR'. Null = not used.
+  final String? failOnImpact;
+
   /// Count threshold for [failOn]. When set, the scan exits 1 only when the
   /// number of diagnostics at or above the [failOn] severity exceeds this
   /// count — lets CI tolerate a known baseline of warnings. Requires [failOn]
   /// to be set; ignored without it. Null means any single match triggers exit 1.
   final int? failOnCount;
+
+  /// Count threshold for [failOnImpact]. When set, the scan exits 1 only when
+  /// the number of saropa diagnostics at or above the impact threshold exceeds
+  /// this count — lets CI tolerate a known baseline of high-impact findings
+  /// during migration. Requires [failOnImpact] to be set; ignored without it.
+  /// Null means any single match triggers exit 1.
+  final int? failOnImpactCount;
 
   /// Minimum impact threshold for output filtering. Filters on the rule's
   /// declared [LintImpact] rather than the analyzer severity — some rules have
@@ -135,6 +155,20 @@ class ScanCliArgs {
   /// and stdout output (report or JSON). Useful for fully silent automation
   /// where only the exit code and optional --json-file-path output matter.
   final bool quiet;
+
+  /// Glob patterns for additional path exclusions beyond the hardcoded
+  /// defaults. Supports `**` (any path segments), `*` (any non-separator
+  /// chars), and `?` (single char). Matched against forward-slash-normalized
+  /// paths. See #313 — the reporter's project scanned platform ephemeral
+  /// dirs; now those are excluded by default, but this flag lets users
+  /// exclude any other paths they don't control.
+  final List<String> excludeGlobs;
+
+  /// Glob patterns that override the hardcoded exclusions. When a path matches
+  /// both a hardcoded exclusion (e.g. `ephemeral/`) AND an include-glob, the
+  /// include wins — letting users force-scan paths the defaults would skip.
+  /// Useful for auditing third-party plugin code in platform directories.
+  final List<String> includeGlobs;
 }
 
 /// Parses [args] for the scan command.
@@ -155,13 +189,17 @@ ScanParseResult parseScanArgs(
   final path = positionals.isNotEmpty ? positionals.first : '.';
 
   List<String> dartFiles = [];
+  List<String> excludeGlobs = [];
+  List<String> includeGlobs = [];
   String? tier;
   String? debugRule;
   String? minSeverity;
   String? maxSeverity;
   String? minImpact;
   String? failOn;
+  String? failOnImpact;
   int? failOnCount;
+  int? failOnImpactCount;
   String? jsonFilePath;
   bool formatJson = false;
   bool resolve = false;
@@ -212,6 +250,26 @@ ScanParseResult parseScanArgs(
     if (arg == '--files-from-stdin') {
       dartFiles.addAll(stdinLines ?? readStdin?.call() ?? []);
       i++;
+      continue;
+    }
+    // User-specified glob patterns for path exclusion — consumes all
+    // following non-flag arguments, same grammar as --files. See #313.
+    if (arg == '--exclude-globs') {
+      i++;
+      while (i < args.length && !args[i].startsWith('--')) {
+        excludeGlobs.add(args[i]);
+        i++;
+      }
+      continue;
+    }
+    // Include-glob patterns that override the hardcoded exclusions —
+    // same grammar as --exclude-globs. See #313.
+    if (arg == '--include-globs') {
+      i++;
+      while (i < args.length && !args[i].startsWith('--')) {
+        includeGlobs.add(args[i]);
+        i++;
+      }
       continue;
     }
     if (arg == '--tier') {
@@ -325,6 +383,28 @@ ScanParseResult parseScanArgs(
       }
       continue;
     }
+    // Exit-code threshold by impact: like --fail-on but uses the rule author's
+    // declared impact rather than the analyzer severity. Non-saropa diagnostics
+    // (which have no impact) are excluded from the check.
+    if (arg == '--fail-on-impact') {
+      i++;
+      if (i < args.length && !args[i].startsWith('--')) {
+        final value = args[i].toUpperCase();
+        if (value == 'INFO' || value == 'WARNING' || value == 'ERROR') {
+          failOnImpact = value;
+          i++;
+        } else {
+          return ScanParseInvalid(
+            '--fail-on-impact must be one of: info, warning, error.',
+          );
+        }
+      } else {
+        return ScanParseInvalid(
+          '--fail-on-impact requires a value (info, warning, error).',
+        );
+      }
+      continue;
+    }
     // Count threshold for --fail-on: exit 1 only when the number of matching
     // diagnostics exceeds this count. Requires --fail-on to be meaningful.
     if (arg == '--fail-on-count') {
@@ -342,6 +422,28 @@ ScanParseResult parseScanArgs(
       } else {
         return ScanParseInvalid(
           '--fail-on-count requires a non-negative integer value.',
+        );
+      }
+      continue;
+    }
+    // Count threshold for --fail-on-impact: exit 1 only when the number of
+    // matching impact-level diagnostics exceeds this count. Mirrors the
+    // --fail-on-count semantics but for the impact axis.
+    if (arg == '--fail-on-impact-count') {
+      i++;
+      if (i < args.length && !args[i].startsWith('--')) {
+        final parsed = int.tryParse(args[i]);
+        if (parsed != null && parsed >= 0) {
+          failOnImpactCount = parsed;
+          i++;
+        } else {
+          return ScanParseInvalid(
+            '--fail-on-impact-count must be a non-negative integer.',
+          );
+        }
+      } else {
+        return ScanParseInvalid(
+          '--fail-on-impact-count requires a non-negative integer value.',
         );
       }
       continue;
@@ -383,10 +485,14 @@ ScanParseResult parseScanArgs(
       maxSeverity: maxSeverity,
       minImpact: minImpact,
       failOn: failOn,
+      failOnImpact: failOnImpact,
       failOnCount: failOnCount,
+      failOnImpactCount: failOnImpactCount,
       profile: profile,
       excludeLightLane: excludeLightLane,
       quiet: quiet,
+      excludeGlobs: excludeGlobs,
+      includeGlobs: includeGlobs,
     ),
   );
 }

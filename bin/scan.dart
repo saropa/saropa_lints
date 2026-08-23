@@ -89,6 +89,8 @@ Future<void> main(List<String> args) async {
     debugRule: parsed.debugRule,
     excludeLightLane: parsed.excludeLightLane,
     messageSink: parsed.quiet ? (_) {} : null,
+    excludeGlobs: parsed.excludeGlobs,
+    includeGlobs: parsed.includeGlobs,
   );
   // --resolve runs the slower, fully-resolved scan so that
   // InstanceCreationExpression and type-based rules actually fire; the default
@@ -164,25 +166,33 @@ Future<void> main(List<String> args) async {
         }).toList()
       : diagnostics;
 
-  // --fail-on decouples exit code from display filtering: the exit code is
-  // determined by whether any diagnostic in the FULL set meets the threshold,
-  // not by what survived the display filter.
+  // --fail-on / --fail-on-impact decouple exit code from display filtering:
+  // the exit code is determined by whether any diagnostic in the FULL set meets
+  // the threshold, not by what survived the display filter.
   final exitCode = _computeExitCode(
     filtered: filtered,
     allDiagnostics: diagnostics,
     failOn: parsed.failOn,
+    failOnImpact: parsed.failOnImpact,
     failOnCount: parsed.failOnCount,
+    failOnImpactCount: parsed.failOnImpactCount,
   );
 
   // Build --fail-on metadata for JSON output so consumers understand why
   // the exit code may disagree with an empty diagnostics array.
-  final failOnMeta = parsed.failOn != null
+  final failOnMeta = parsed.failOn != null || parsed.failOnImpact != null
       ? <String, Object>{
-          'threshold': parsed.failOn!,
+          // Severity threshold (original --fail-on).
+          if (parsed.failOn != null) 'threshold': parsed.failOn!,
+          // Impact threshold (new --fail-on-impact).
+          if (parsed.failOnImpact != null)
+            'impactThreshold': parsed.failOnImpact!,
           'thresholdMet': exitCode == 1,
-          // Include the count baseline when --fail-on-count is active.
+          // Include the count baselines when active.
           if (parsed.failOnCount != null)
             'countBaseline': parsed.failOnCount!,
+          if (parsed.failOnImpactCount != null)
+            'impactCountBaseline': parsed.failOnImpactCount!,
         }
       : null;
 
@@ -199,11 +209,18 @@ Future<void> main(List<String> args) async {
         print('\nNo issues found.');
       }
     }
-    // When --fail-on causes a non-zero exit despite no displayed diagnostics,
-    // print an explanation so automation doesn't see "No issues" + exit 1.
-    if (!formatJson && exitCode != 0 && parsed.failOn != null) {
+    // When --fail-on or --fail-on-impact causes a non-zero exit despite no
+    // displayed diagnostics, explain so automation doesn't see "No issues" + exit 1.
+    if (!formatJson && exitCode != 0 &&
+        (parsed.failOn != null || parsed.failOnImpact != null)) {
+      final reasons = [
+        if (parsed.failOn != null)
+          '--fail-on ${parsed.failOn!.toLowerCase()}',
+        if (parsed.failOnImpact != null)
+          '--fail-on-impact ${parsed.failOnImpact!.toLowerCase()}',
+      ];
       print(
-        '(exit 1: --fail-on ${parsed.failOn!.toLowerCase()} threshold met '
+        '(exit 1: ${reasons.join(' or ')} threshold met '
         'in unfiltered diagnostics)',
       );
     }
@@ -401,20 +418,27 @@ int _severityRank(String severity) => switch (severity.toUpperCase()) {
 bool _meetsMinSeverity(String severity, String minSeverity) =>
     _severityRank(severity) >= _severityRank(minSeverity);
 
-/// Determines exit code based on diagnostics and the optional --fail-on
-/// threshold.
+/// Determines exit code based on diagnostics and the optional --fail-on /
+/// --fail-on-impact thresholds.
 ///
-/// Without --fail-on: exit 1 when any filtered diagnostic exists (existing
-/// behavior). With --fail-on: exit 1 only when the FULL diagnostic list
-/// contains enough entries at or above the threshold severity. The optional
-/// [failOnCount] raises the bar: exit 1 only when the count EXCEEDS the
-/// threshold (i.e. count > failOnCount), letting CI tolerate a known baseline.
+/// Without either: exit 1 when any filtered diagnostic exists (existing
+/// behavior). With --fail-on: exit 1 when the FULL diagnostic list has enough
+/// entries at/above the severity threshold. With --fail-on-impact: same logic
+/// but checks the rule's declared impact instead. When both are set, either
+/// threshold being met triggers exit 1 (logical OR — strictest wins).
+/// [failOnCount] applies to --fail-on (severity count baseline).
+/// [failOnImpactCount] applies to --fail-on-impact (impact count baseline).
 int _computeExitCode({
   required List<ScanDiagnostic> filtered,
   required List<ScanDiagnostic> allDiagnostics,
   required String? failOn,
+  String? failOnImpact,
   int? failOnCount,
+  int? failOnImpactCount,
 }) {
+  // Track whether either threshold triggers a failure.
+  var triggered = false;
+
   if (failOn != null) {
     // Count diagnostics in the full set that meet the severity threshold.
     final matchCount =
@@ -422,8 +446,27 @@ int _computeExitCode({
     // Without --fail-on-count: any match → exit 1 (count > 0).
     // With --fail-on-count: exit 1 only when count exceeds the baseline.
     final threshold = failOnCount ?? 0;
-    return matchCount > threshold ? 1 : 0;
+    if (matchCount > threshold) triggered = true;
   }
+
+  if (failOnImpact != null) {
+    // Count saropa diagnostics whose rule-declared impact meets the threshold.
+    // Non-saropa diagnostics (impact == null) are excluded — they have no
+    // declared impact and cannot be classified on this axis.
+    final impactMatchCount = allDiagnostics
+        .where((d) => d.impact != null && _meetsMinSeverity(d.impact!, failOnImpact))
+        .length;
+    // Without --fail-on-impact-count: any match → exit 1 (count > 0).
+    // With --fail-on-impact-count: exit 1 only when count exceeds baseline.
+    final impactThreshold = failOnImpactCount ?? 0;
+    if (impactMatchCount > impactThreshold) triggered = true;
+  }
+
+  // When either threshold is active, use the triggered result.
+  if (failOn != null || failOnImpact != null) {
+    return triggered ? 1 : 0;
+  }
+
   // Default: any displayed diagnostic → exit 1.
   return filtered.isEmpty ? 0 : 1;
 }
@@ -451,6 +494,30 @@ void _printUsage() {
     '  --files <path>...    Scan only these Dart files (paths relative to path).',
   );
   print('  --files-from-stdin  Read one file path per line from stdin.');
+  print(
+    '  --exclude-globs <p> Exclude files matching these glob patterns.',
+  );
+  print(
+    '                      Supports ** (any path segments), * (any chars),',
+  );
+  print(
+    '                      ? (single char). Platform ephemeral dirs and',
+  );
+  print(
+    '                      .plugin_symlinks are already excluded by default.',
+  );
+  print(
+    '  --include-globs <p> Override hardcoded exclusions for matching paths.',
+  );
+  print(
+    '                      When a path matches both a default exclusion and',
+  );
+  print(
+    '                      an include-glob, the include wins. Useful for',
+  );
+  print(
+    '                      auditing third-party code in ephemeral dirs.',
+  );
   print(
     '  --resolve           Fully resolve each file (type/element resolution)',
   );
@@ -494,6 +561,21 @@ void _printUsage() {
     '                      Values: info, warning, error.',
   );
   print(
+    '  --fail-on-impact <s> Exit 1 when any saropa diagnostic has rule-declared',
+  );
+  print(
+    '                      impact at or above this level. Like --fail-on but',
+  );
+  print(
+    '                      checks the author\'s impact rating, not analyzer',
+  );
+  print(
+    '                      severity. Non-saropa diagnostics are excluded.',
+  );
+  print(
+    '                      Values: info, warning, error.',
+  );
+  print(
     '  --fail-on-count <n> With --fail-on: exit 1 only when the count of',
   );
   print(
@@ -504,6 +586,18 @@ void _printUsage() {
   );
   print(
     '                      --fail-on-count 5 allows up to 5 warnings).',
+  );
+  print(
+    '  --fail-on-impact-count <n>',
+  );
+  print(
+    '                      With --fail-on-impact: exit 1 only when the count',
+  );
+  print(
+    '                      of matching impact-level diagnostics exceeds <n>.',
+  );
+  print(
+    '                      Lets CI tolerate a known baseline during migration.',
   );
   print(
     '  --min-impact <s>    Only show diagnostics whose rule-declared impact is',
@@ -599,6 +693,8 @@ void _printUsage() {
   print('  dart run saropa_lints scan . --min-impact warning    # by rule impact');
   print('  dart run saropa_lints scan . --fail-on error         # exit 1 on errors only');
   print('  dart run saropa_lints scan . --fail-on warning --fail-on-count 5  # tolerate up to 5 warnings');
+  print('  dart run saropa_lints scan . --fail-on-impact error           # exit 1 on high-impact rules only');
+  print('  dart run saropa_lints scan . --exclude-globs **/vendor/**  # skip vendor');
   print('  dart run saropa_lints scan . --format json  # JSON to stdout');
   print('  dart run saropa_lints scan . -q --json-file-path out.json  # silent');
 }

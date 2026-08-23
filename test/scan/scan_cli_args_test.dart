@@ -574,6 +574,115 @@ void main() {
     });
   });
 
+  group('--fail-on-impact', () {
+    test('--fail-on-impact parses valid values', () {
+      for (final sev in ['info', 'warning', 'error', 'INFO', 'Error']) {
+        final result = parseScanArgs(<String>['.', '--fail-on-impact', sev]);
+        expect(result, isA<ScanParseOk>());
+        expect(
+          (result as ScanParseOk).args.failOnImpact,
+          sev.toUpperCase(),
+        );
+      }
+    });
+
+    test('--fail-on-impact with invalid value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--fail-on-impact', 'debug']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--fail-on-impact must be one of'),
+      );
+    });
+
+    test('--fail-on-impact with no value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--fail-on-impact']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--fail-on-impact requires a value'),
+      );
+    });
+
+    test('--fail-on-impact null by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.failOnImpact, isNull);
+    });
+
+    test('--fail-on-impact combines with --fail-on', () {
+      // Both thresholds can coexist — logical OR for exit code.
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on',
+        'error',
+        '--fail-on-impact',
+        'warning',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.failOn, 'ERROR');
+      expect(args.failOnImpact, 'WARNING');
+    });
+  });
+
+  group('--fail-on-impact-count', () {
+    test('--fail-on-impact-count parses valid integer', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on-impact',
+        'warning',
+        '--fail-on-impact-count',
+        '3',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.failOnImpactCount, 3);
+    });
+
+    test('--fail-on-impact-count accepts zero', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on-impact',
+        'error',
+        '--fail-on-impact-count',
+        '0',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.failOnImpactCount, 0);
+    });
+
+    test('--fail-on-impact-count with negative value returns invalid', () {
+      final result =
+          parseScanArgs(<String>['.', '--fail-on-impact-count', '-1']);
+      expect(result, isA<ScanParseInvalid>());
+    });
+
+    test('--fail-on-impact-count with non-integer returns invalid', () {
+      final result =
+          parseScanArgs(<String>['.', '--fail-on-impact-count', 'five']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--fail-on-impact-count must be a non-negative integer'),
+      );
+    });
+
+    test('--fail-on-impact-count with no value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--fail-on-impact-count']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--fail-on-impact-count requires'),
+      );
+    });
+
+    test('--fail-on-impact-count null by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.failOnImpactCount, isNull);
+    });
+  });
+
   group('--quiet / -q', () {
     test('--quiet sets quiet flag', () {
       final result = parseScanArgs(<String>['.', '--quiet']);
@@ -868,6 +977,106 @@ void main() {
         isEmpty,
         reason: 'Expected empty stderr with --quiet, got: $stderrOutput',
       );
+    });
+  });
+
+  group('--exclude-globs', () {
+    test('--exclude-globs collects multiple patterns', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--exclude-globs',
+        '**/ephemeral/**',
+        '**/vendor/**',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.excludeGlobs, ['**/ephemeral/**', '**/vendor/**']);
+    });
+
+    test('--exclude-globs empty by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.excludeGlobs, isEmpty);
+    });
+
+    test('--exclude-globs stops at next flag', () {
+      // The parser should stop consuming patterns when it hits another flag.
+      final result = parseScanArgs(<String>[
+        '.',
+        '--exclude-globs',
+        '**/vendor/**',
+        '--tier',
+        'essential',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.excludeGlobs, ['**/vendor/**']);
+      expect(args.tier, 'essential');
+    });
+
+    test('--exclude-globs with no patterns results in empty list', () {
+      // No patterns before the next flag — valid but a no-op.
+      final result = parseScanArgs(<String>[
+        '.',
+        '--exclude-globs',
+        '--tier',
+        'essential',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.excludeGlobs, isEmpty);
+      expect(args.tier, 'essential');
+    });
+
+    test('--exclude-globs combines with other flags', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--exclude-globs',
+        '**/build/**',
+        '--format',
+        'json',
+        '--quiet',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.excludeGlobs, ['**/build/**']);
+      expect(args.formatJson, isTrue);
+      expect(args.quiet, isTrue);
+    });
+  });
+
+  group('--include-globs', () {
+    test('--include-globs collects multiple patterns', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--include-globs',
+        '**/ephemeral/**',
+        '**/generated/**',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.includeGlobs, ['**/ephemeral/**', '**/generated/**']);
+    });
+
+    test('--include-globs empty by default', () {
+      final result = parseScanArgs(<String>['.']);
+      expect(result, isA<ScanParseOk>());
+      expect((result as ScanParseOk).args.includeGlobs, isEmpty);
+    });
+
+    test('--include-globs combines with --exclude-globs', () {
+      // Both flags should be independently collected.
+      final result = parseScanArgs(<String>[
+        '.',
+        '--exclude-globs',
+        '**/vendor/**',
+        '--include-globs',
+        '**/ephemeral/**',
+      ]);
+      expect(result, isA<ScanParseOk>());
+      final args = (result as ScanParseOk).args;
+      expect(args.excludeGlobs, ['**/vendor/**']);
+      expect(args.includeGlobs, ['**/ephemeral/**']);
     });
   });
 
