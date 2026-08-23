@@ -8,6 +8,7 @@ from pathlib import Path
 
 from scripts.modules._rule_metrics import (
     _collect_bug_categories,
+    _collect_bug_rows,
     _collect_category_rules,
     _compute_rule_instantiation_stats,
     _compute_unit_test_stats,
@@ -15,6 +16,7 @@ from scripts.modules._rule_metrics import (
     _get_example_dirs,
     _index_rule_test_files,
     _resolve_test_path,
+    display_roadmap_summary,
 )
 
 
@@ -277,6 +279,61 @@ class BugCategorySplitTests(unittest.TestCase):
             }
             self.assertEqual(categories.get("Unsolved"), 1)
             self.assertNotIn("Open Proposals", categories)
+
+    def test_collect_bug_rows_bugs_only_excludes_proposals(self) -> None:
+        # Backs scripts/roadmap_status.py --bugs-only.
+        with tempfile.TemporaryDirectory() as tmp:
+            bugs_dir = self._make_bugs_dir(
+                Path(tmp),
+                ["rule_crash_only.md", "proposal_new_rule_a.md"],
+            )
+            rows = _collect_bug_rows(bugs_dir, only="bugs")
+            labels = [r.label for r in rows]
+            self.assertTrue(any("Unsolved" in label for label in labels))
+            self.assertFalse(
+                any("Open Proposals" in label for label in labels),
+            )
+
+    def test_collect_bug_rows_proposals_only_excludes_bugs(self) -> None:
+        # Backs scripts/roadmap_status.py --proposals-only.
+        with tempfile.TemporaryDirectory() as tmp:
+            bugs_dir = self._make_bugs_dir(
+                Path(tmp),
+                ["rule_crash_only.md", "proposal_new_rule_a.md"],
+            )
+            rows = _collect_bug_rows(bugs_dir, only="proposals")
+            labels = [r.label for r in rows]
+            self.assertTrue(
+                any("Open Proposals" in label for label in labels),
+            )
+            self.assertFalse(any("Unsolved" in label for label in labels))
+            # The generic "Issues -" prefix distinguishes proposal rows from
+            # bug rows in the flat work-report display.
+            self.assertTrue(
+                any(label.startswith("Issues -") for label in labels),
+            )
+
+
+class RoadmapSummaryIssueFilterTests(unittest.TestCase):
+    """display_roadmap_summary's issue_filter parameter validation."""
+
+    def test_invalid_issue_filter_raises(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(ValueError):
+                display_roadmap_summary(
+                    Path(tmp), issue_filter="not-a-real-filter",
+                )
+
+    def test_bugs_filter_without_bugs_dir_shows_no_items(self) -> None:
+        # issue_filter set but bugs_dir omitted: roadmap/TODO rows are
+        # skipped (because issue_filter is not None) and there is no
+        # bugs_dir to source bug/proposal rows from, so the report is
+        # legitimately empty rather than falling back to full output.
+        with tempfile.TemporaryDirectory() as tmp:
+            log_path = display_roadmap_summary(
+                Path(tmp), issue_filter="bugs",
+            )
+            self.assertIsNone(log_path)
 
 
 if __name__ == "__main__":

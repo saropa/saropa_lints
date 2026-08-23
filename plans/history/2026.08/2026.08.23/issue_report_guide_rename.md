@@ -64,6 +64,39 @@ All 13 tests in `test_rule_metrics.py` pass (`python -m unittest scripts.modules
 
 Not updated. This change has no pub.dev/Marketplace-visible impact (contributor-facing process docs and an internal roadmap-display script) — the project's Maintenance-entry convention requires only end-user-visible changes at the top level, and this qualifies for neither top-level nor Maintenance placement. `CHANGELOG.md` was also under concurrent unrelated edit (an `[Unreleased]` section added by other in-flight work) during this session, so it was left untouched to avoid collision.
 
+## Finish Report (2026-08-23, round 2)
+
+### Hardened reflection items (round 2)
+
+- **CYAN collision audited.** Grepped `_rule_metrics.py` for every `Color.CYAN` and `"Unsolved"`/`"Open Proposals"` string-literal usage. CYAN is used independently in three other unrelated contexts (`MODERATE` severity label, a fixture-TODO count threshold, a generic default-color fallback) with no shared parsing — no collision with the new "Open Proposals" category.
+- **Downstream consumers of `_collect_bug_categories` output checked.** Only two callers exist: `_collect_bug_rows` (this module) and, transitively, `display_roadmap_summary` via `_publish_workflow.py`'s `print_package_banner`. No README badge sync or other script parses the `_BugCategory` label strings by exact match outside this file.
+
+### Unrequested feature implemented (with CLI docs)
+
+Added a `--bugs-only` / `--proposals-only` filter, requested in the prior round's handoff reflection as "a filter flag for contributors who only care about one queue":
+
+- `_collect_bug_rows(bugs_dir, *, only=None)` — `only="bugs"` drops the `"Open Proposals"` category; `only="proposals"` keeps only it.
+- `display_roadmap_summary(project_dir, *, bugs_dir=None, issue_filter=None)` — new `issue_filter` param (`None` / `"bugs"` / `"proposals"`). When set, skips the roadmap-rule and fixture-TODO scan entirely (faster, focused output) and restricts `bugs_dir` rows via `_collect_bug_rows`'s `only=`. Raises `ValueError` on an unrecognized value. The footer line switches from `"Total remaining: N roadmap rules"` to `"Total: N bugs"` / `"Total: N proposals"` when filtered. Default behavior (`issue_filter=None`) is unchanged — `_publish_workflow.py`'s existing call site is untouched and was re-verified to produce identical output.
+- New standalone CLI `scripts/roadmap_status.py` — argparse-based (matching `run_extension_local.py`'s style), wraps `display_roadmap_summary` so contributors can check outstanding work without the interactive `publish.py` menu. Flags: `--bugs-only`, `--proposals-only` (mutually exclusive, enforced via `p.error(...)`), `--version`. Calls `enable_ansi_support()` before printing — omitting it initially caused a `UnicodeEncodeError` on the Windows cp1252 console when printing the bar-chart glyphs; discovered and fixed during manual testing. Also avoided em-dashes in the module docstring (used as the argparse `epilog`) after confirming the same encoding issue crashes `--help` in the pre-existing sibling script `run_extension_local.py --help` on this console — a plain-ASCII docstring sidesteps it in the new file without touching shared infrastructure.
+
+### CLI docs updated
+
+`scripts/README.md`: added a "Check outstanding bugs/proposals without the full publish menu" section with usage examples and a link to `bugs/ISSUE_REPORT_GUIDE.md`'s naming convention, plus a new row in the "Scripts in this directory that can run independently" table.
+
+### Tests Added (round 2)
+
+`scripts/modules/tests/test_rule_metrics.py`:
+- `BugCategorySplitTests.test_collect_bug_rows_bugs_only_excludes_proposals` / `test_collect_bug_rows_proposals_only_excludes_bugs` — verify the `only=` filter on `_collect_bug_rows`, including the `"Issues -"` vs `"Bug Reports -"` label prefix.
+- `RoadmapSummaryIssueFilterTests.test_invalid_issue_filter_raises` — bad `issue_filter` value raises `ValueError`.
+- `RoadmapSummaryIssueFilterTests.test_bugs_filter_without_bugs_dir_shows_no_items` — filtered mode with no `bugs_dir` produces an empty report rather than silently falling back to full output.
+
+All 17 tests in `test_rule_metrics.py` pass; full suite (`python -m unittest discover -s scripts/modules/tests -t .`) — 138 tests, all pass. Manually verified `scripts/roadmap_status.py` (default, `--bugs-only`, `--proposals-only`, `--help`, and the mutual-exclusivity error) against the live `bugs/` directory.
+
+### Changelog (round 2)
+
+Added a Maintenance-block bullet pair to `CHANGELOG.md`'s `[Unreleased]` section for both rounds of this work (guide rename/split, `roadmap_status.py` CLI) — qualifies as "developer scripts" under the project's Maintenance convention. **Not committed**: `[Unreleased]` also carries two `### Added` bullets from unrelated concurrent in-flight work (new rules `prefer_primary_constructor` / `require_sdk_syntax_match`, whose implementation files are still untracked). Committing the whole file would pull in someone else's unfinished entry; a manual patch-split was judged too error-prone to do safely. The Maintenance bullets remain as an uncommitted, well-formed edit in the working tree, ready to land whenever that file's next legitimate commit happens.
+
 ## Commits
 
-- (pending — see commit accompanying this report)
+- `0a22d630` docs: rename bug report guide to issue report guide, add feature request support
+- (pending — round 2 commit, see below)

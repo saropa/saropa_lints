@@ -876,9 +876,20 @@ def _collect_todo_rows(
     return rows, log_path
 
 
-def _collect_bug_rows(bugs_dir: Path) -> list[_WorkRow]:
-    """Build remaining-work rows for bug reports and feature proposals."""
+def _collect_bug_rows(
+    bugs_dir: Path, *, only: str | None = None,
+) -> list[_WorkRow]:
+    """Build remaining-work rows for bug reports and feature proposals.
+
+    only: None shows every category (default). "bugs" drops the
+    "Open Proposals" category; "proposals" keeps only it — backs the
+    scripts/roadmap_status.py --bugs-only / --proposals-only flags.
+    """
     categories = _collect_bug_categories(bugs_dir)
+    if only == "bugs":
+        categories = [c for c in categories if c.label != "Open Proposals"]
+    elif only == "proposals":
+        categories = [c for c in categories if c.label == "Open Proposals"]
     if not categories:
         return []
 
@@ -919,22 +930,37 @@ def _collect_bug_rows(bugs_dir: Path) -> list[_WorkRow]:
 
 def display_roadmap_summary(
     project_dir: Path, *, bugs_dir: Path | None = None,
+    issue_filter: str | None = None,
 ) -> Path | None:
     """Display remaining work as flat line items.
 
+    issue_filter: None (default) shows roadmap/TODO rows plus every
+    bugs_dir category — the publish-banner behavior. "bugs" or "proposals"
+    restricts the report to just that bugs_dir category and skips the
+    roadmap/TODO rows entirely, for scripts/roadmap_status.py's
+    --bugs-only / --proposals-only flags. Requires bugs_dir when set.
+
     Returns:
-        Path to the TODO audit log file, or None if no TODOs.
+        Path to the TODO audit log file, or None if no TODOs (also None
+        when issue_filter is set, since the TODO scan does not run).
     """
-    summary = get_roadmap_summary(project_dir)
+    if issue_filter not in (None, "bugs", "proposals"):
+        raise ValueError(
+            f"issue_filter must be None, 'bugs', or 'proposals', got {issue_filter!r}",
+        )
 
     print()
     print_header("WORK REPORT")
 
-    rows = _collect_roadmap_rows(summary)
-    todo_rows, log_path = _collect_todo_rows(project_dir)
-    rows.extend(todo_rows)
+    rows: list[_WorkRow] = []
+    log_path: Path | None = None
+    if issue_filter is None:
+        summary = get_roadmap_summary(project_dir)
+        rows.extend(_collect_roadmap_rows(summary))
+        todo_rows, log_path = _collect_todo_rows(project_dir)
+        rows.extend(todo_rows)
     if bugs_dir is not None:
-        rows.extend(_collect_bug_rows(bugs_dir))
+        rows.extend(_collect_bug_rows(bugs_dir, only=issue_filter))
 
     if not rows:
         print_colored("    No remaining work items.", Color.GREEN)
@@ -971,10 +997,15 @@ def display_roadmap_summary(
             )
 
     print()
-    print_colored(
-        f"    Total remaining: {summary.grand_total} roadmap rules",
-        Color.WHITE,
-    )
+    if issue_filter is None:
+        print_colored(
+            f"    Total remaining: {summary.grand_total} roadmap rules",
+            Color.WHITE,
+        )
+    else:
+        total = sum(int(r.suffix.split()[0]) for r in rows)
+        label = "bugs" if issue_filter == "bugs" else "proposals"
+        print_colored(f"    Total: {total} {label}", Color.WHITE)
     print()
     return log_path
 
