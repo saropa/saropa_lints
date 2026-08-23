@@ -1,8 +1,10 @@
-# Bug Report Guide
+# Issue Report Guide
 
-How to file, investigate, and close bugs in `saropa_lints`.
+How to file, investigate, and close bugs and feature requests in `saropa_lints`.
 
-**False positives are in scope.** If a rule flags code that is correct (or the diagnostic is clearly wrong), file it here under `bugs/` using the [False positive](#false-positive) naming pattern and the [template below](#bug-report-template)—not only in a downstream app’s chat or issue tracker. Downstream repos can link to the bug file once filed; the fix and fixture live in `saropa_lints`.
+**False positives are in scope.** If a rule flags code that is correct (or the diagnostic is clearly wrong), file it here under `bugs/` using the [False positive](#false-positive) naming pattern and the [bug report template](#bug-report-template)—not only in a downstream app’s chat or issue tracker. Downstream repos can link to the issue file once filed; the fix and fixture live in `saropa_lints`.
+
+**Feature requests are in scope.** New rule proposals, quick fix ideas, tier changes, infrastructure improvements, and tooling enhancements belong here under `bugs/` using the [Feature request](#feature-request) naming pattern and the [feature request template](#feature-request-template).
 
 ---
 
@@ -15,6 +17,10 @@ How to file, investigate, and close bugs in `saropa_lints`.
 | Crash / error | `rule_name_crash_description.md` | `prefer_const_widgets_crash_generic_type_arg.md` |
 | Quick fix bug | `rule_name_fix_description.md` | `prefer_final_locals_fix_applies_to_loop_variable.md` |
 | Infrastructure | `infra_description.md` | `infra_tiers_mismatch_plugin_registry.md` |
+| New rule proposal | `proposal_rule_name.md` | `proposal_prefer_primary_constructor.md` |
+| Quick fix request | `proposal_fix_rule_name_description.md` | `proposal_fix_avoid_print_wrap_in_logger.md` |
+| Tooling / infra request | `proposal_infra_description.md` | `proposal_infra_scan_json_output_summary.md` |
+| Tier change | `proposal_tier_rule_name_description.md` | `proposal_tier_no_magic_numbers_to_recommended.md` |
 
 Use lowercase with underscores. Check existing files before creating.
 
@@ -214,6 +220,110 @@ new code
 
 ---
 
+## Feature Request Template
+
+Copy the block below into a new file.
+
+````markdown
+# PROPOSAL: Short, Specific Title
+
+**Status: Open**
+
+<!-- Status values: Open → Accepted → In Progress → Closed -->
+<!-- Use "Declined" if rejected, with rationale in the Decision section -->
+
+Created: YYYY-MM-DD
+Type: New rule / Quick fix / Tier change / Tooling / Infrastructure
+Related rules: `rule_name` (if modifying or extending an existing rule)
+
+---
+
+## Summary
+
+One or two sentences: what the feature does and why it matters.
+
+---
+
+## Motivation
+
+Why this feature is needed. Include concrete examples from real codebases where this would have caught a bug, improved code quality, or saved developer time. Link to external references (Effective Dart, OWASP, framework docs) if applicable.
+
+---
+
+## Detection / Behavior
+
+<!-- For new rules: describe what code should be flagged and what should pass -->
+<!-- For quick fixes: describe the transformation -->
+<!-- For tooling: describe the expected input/output -->
+
+### Should flag (bad code)
+
+```dart
+// Code that the rule should report on
+class Example {
+  void method() {
+    final x = something; // LINT
+  }
+}
+```
+
+### Should pass (good code)
+
+```dart
+// Code that the rule should NOT flag
+class Example {
+  void method() {
+    final x = correctThing; // OK
+  }
+}
+```
+
+---
+
+## Proposed Tier
+
+<!-- Which tier should this rule belong to? Justify with the tier criteria -->
+
+Tier: Essential / Recommended / Professional / Comprehensive / Pedantic
+Justification: ...
+
+---
+
+## Edge Cases
+
+<!-- Patterns that need special handling or explicit decisions -->
+
+1. **Case description** — should flag / should pass / needs discussion
+2. ...
+
+---
+
+## Alternatives Considered
+
+<!-- Other approaches and why this one is preferred -->
+
+---
+
+## Decision
+
+<!-- Fill in when the proposal is accepted or declined -->
+
+---
+
+## Implementation Notes
+
+<!-- Fill in when work begins. Reference files, existing utilities, related rules -->
+
+---
+
+## Commits
+
+<!-- Add commit hashes as implementation lands -->
+- `abcdef0` feat: description
+````
+
+---
+
 ## What Makes a Good Bug Report
 
 ### Title
@@ -295,6 +405,43 @@ A rule causes analysis to hang or take unreasonably long.
 
 ---
 
+## Feature Request Categories
+
+### New Rule Proposal
+
+A lint rule that does not exist yet.
+
+**How to report:** Create `bugs/proposal_rule_name.md`, copy the [Feature Request Template](#feature-request-template), and complete **Detection / Behavior** (bad/good examples) plus **Proposed Tier**.
+
+**Evaluation criteria:**
+- Does the rule catch real bugs or enforce a meaningful code quality bar?
+- Is there prior art in `dart analyze`, `flutter_lints`, or other linter ecosystems?
+- Does it overlap with an existing `saropa_lints` rule? Check `ROADMAP.md` and `lib/src/rules/`
+- Is the detection feasible at the AST level, or does it require whole-program analysis?
+
+### Quick Fix Request
+
+A new automated fix for an existing rule, or an improvement to an existing fix.
+
+**Evaluation criteria:**
+- Is the transformation always safe, or does it require user judgment?
+- Does the fix handle imports, whitespace, and surrounding context?
+- Can it be tested with a fixture diff?
+
+### Tier Change
+
+Move an existing rule to a different tier.
+
+**How to report:** Create `bugs/proposal_tier_rule_name_description.md` and explain why the current tier is wrong — too aggressive for the tier's audience, or too valuable to leave in a higher tier.
+
+### Tooling / Infrastructure Request
+
+Improvements to the scan CLI, publish pipeline, test harness, or other infrastructure.
+
+**How to report:** Create `bugs/proposal_infra_description.md` and describe the current behavior, desired behavior, and motivation.
+
+---
+
 ## Investigation Checklist
 
 Use this when diagnosing a new bug.
@@ -370,6 +517,8 @@ Every bug fix must satisfy these before it can be closed.
 
 ## Lifecycle
 
+### Bugs
+
 ```
 Open
   │
@@ -383,16 +532,36 @@ Fix Ready           ← code written, tests pass, awaiting commit
 Closed              ← merged, verified, file moved to history
 ```
 
+### Feature Requests
+
+```
+Open
+  │
+  ├──► Declined     ← rejected with rationale, file moved to history
+  │
+  ▼
+Accepted            ← approved, scope and tier decided
+  │
+  ▼
+In Progress         ← implementation underway
+  │
+  ▼
+Closed              ← merged, verified, file moved to history
+```
+
 ### Moving to History
 
-When a bug is closed, move its file:
+When an issue is closed (or a proposal is declined), `git mv` its file into the shared history root — the same `plans/history/` tree the `/finish` workflow archives closed plans into, not a separate `bugs/history/`:
 
 ```
 bugs/rule_name_false_positive_description.md
-  → bugs/history/YYYYMMDD/rule_name_false_positive_description.md
+  → plans/history/YYYY.MM/YYYYMMDD/rule_name_false_positive_description.md
+
+bugs/proposal_rule_name.md
+  → plans/history/YYYY.MM/YYYYMMDD/proposal_rule_name.md
 ```
 
-Use the date the bug was closed. Create the date folder if it does not exist.
+Use the date the issue was closed. Create the `YYYY.MM/YYYYMMDD` folders if they do not exist. Grep and repoint any `bugs/<file>.md` references (CHANGELOG, ROADMAP, other issue files) to the new path in the same commit.
 
 ---
 
@@ -410,16 +579,17 @@ Use the date the bug was closed. Create the date folder if it does not exist.
 ## Linking
 
 - Reference bugs from commits: `fix: description (rule_name false positive)`
-- Reference bugs from ROADMAP: `[bug file](bugs/rule_name_false_positive_description.md)`
+- Reference proposals from commits: `feat: description (proposal_rule_name)`
+- Reference issues from ROADMAP: `[issue file](bugs/rule_name_false_positive_description.md)` or `[proposal](bugs/proposal_rule_name.md)`
 - Reference related history: `Related: plans/history/YYYY.MM/YYYYMMDD/filename.md`
 
 ---
 
 ## Policy Note
 
-Do not log project-specific bug findings directly in this guide again.
+Do not log project-specific findings or proposals directly in this guide.
 
 - This file is process documentation only.
-- Every concrete issue must live in a separate bug file under `bugs/` using the naming rules above.
-- If you discover this happened again, move the content into dedicated bug files immediately and leave only this policy note.
+- Every concrete bug or feature request must live in a separate file under `bugs/` using the naming rules above.
+- If you discover this happened again, move the content into dedicated issue files immediately and leave only this policy note.
 

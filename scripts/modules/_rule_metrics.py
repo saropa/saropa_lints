@@ -745,18 +745,19 @@ class _BugCategory(NamedTuple):
 _ROOT_MD_EXCLUDED_FROM_UNSOLVED = frozenset(
     {
         "INDEX.MD",
-        "BUG_REPORT_GUIDE.MD",
+        "ISSUE_REPORT_GUIDE.MD",
         "FINISH_GUIDE.MD",
     },
 )
 
 
 def _collect_bug_categories(bugs_dir: Path) -> list[_BugCategory]:
-    """Collect bug report counts by directory.
+    """Collect bug report and feature-proposal counts by directory.
 
     - history/ -> GREEN (resolved)
     - Other subfolders -> YELLOW (in-progress/categorized)
-    - Root-level .md files (excl. index and meta guides) -> RED (unsolved)
+    - Root-level `proposal_*.md` (excl. index and meta guides) -> CYAN (open proposals)
+    - Root-level other .md (excl. index and meta guides) -> RED (unsolved bugs)
     """
     if not bugs_dir.exists() or not bugs_dir.is_dir():
         return []
@@ -781,16 +782,28 @@ def _collect_bug_categories(bugs_dir: Path) -> list[_BugCategory]:
                 _BugCategory(label, md_count, Color.YELLOW),
             )
 
-    # Root-level unsolved bugs last (most prominent)
-    unsolved = sum(
-        1 for f in bugs_dir.iterdir()
+    # Root-level files split by the `proposal_` naming convention (see
+    # bugs/ISSUE_REPORT_GUIDE.md) so feature requests get their own visibility
+    # instead of being silently lumped into the bug count.
+    root_reportable = [
+        f for f in bugs_dir.iterdir()
         if f.is_file()
         and f.suffix.lower() == ".md"
         and f.name.upper() not in _ROOT_MD_EXCLUDED_FROM_UNSOLVED
+    ]
+    proposals = sum(
+        1 for f in root_reportable if f.name.lower().startswith("proposal_")
     )
+    unsolved = len(root_reportable) - proposals
+
+    # Root-level unsolved bugs and open proposals last (most prominent)
     if unsolved > 0:
         categories.append(
             _BugCategory("Unsolved", unsolved, Color.RED),
+        )
+    if proposals > 0:
+        categories.append(
+            _BugCategory("Open Proposals", proposals, Color.CYAN),
         )
 
     return categories
@@ -864,7 +877,7 @@ def _collect_todo_rows(
 
 
 def _collect_bug_rows(bugs_dir: Path) -> list[_WorkRow]:
-    """Build remaining-work rows for bug reports."""
+    """Build remaining-work rows for bug reports and feature proposals."""
     categories = _collect_bug_categories(bugs_dir)
     if not categories:
         return []
@@ -877,8 +890,14 @@ def _collect_bug_rows(bugs_dir: Path) -> list[_WorkRow]:
         active_max = max(c.count for c in active)
         for cat in active:
             is_deferred = cat.label.lower() == "discussion"
+            # "Open Proposals" is a feature request, not a bug — use the
+            # generic "Issues" prefix for it so the row does not misread as
+            # a bug count. Every other category is bug-report specific.
+            prefix = (
+                "Issues" if cat.label == "Open Proposals" else "Bug Reports"
+            )
             rows.append(_WorkRow(
-                label=f"Bug Reports - {cat.label}",
+                label=f"{prefix} - {cat.label}",
                 bar=_make_bar(cat.count, active_max),
                 suffix=f"{cat.count:>4d}",
                 color=cat.color,

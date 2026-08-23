@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import tempfile
 import unittest
 from pathlib import Path
 
 from scripts.modules._rule_metrics import (
+    _collect_bug_categories,
     _collect_category_rules,
     _compute_rule_instantiation_stats,
     _compute_unit_test_stats,
@@ -203,6 +205,78 @@ class ExtractRuleMessagesPathTests(unittest.TestCase):
         # explicit skip-by-name guard has something to skip.
         names = {p.name for p in recursive}
         self.assertIn("all_rules.dart", names)
+
+
+class BugCategorySplitTests(unittest.TestCase):
+    """Regression: proposal_*.md files must count separately from bug reports.
+
+    Before this split, _collect_bug_categories lumped every root-level .md
+    file (bugs and feature proposals alike) into one "Unsolved" bucket,
+    hiding proposal volume behind the bug count.
+    """
+
+    def _make_bugs_dir(self, tmp: Path, filenames: list[str]) -> Path:
+        bugs_dir = tmp / "bugs"
+        bugs_dir.mkdir()
+        for name in filenames:
+            (bugs_dir / name).write_text("# placeholder\n", encoding="utf-8")
+        return bugs_dir
+
+    def test_proposals_and_bugs_counted_separately(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            bugs_dir = self._make_bugs_dir(
+                Path(tmp),
+                [
+                    "some_rule_false_positive_x.md",
+                    "another_rule_crash_y.md",
+                    "proposal_new_rule_a.md",
+                    "proposal_fix_rule_b.md",
+                    "proposal_infra_c.md",
+                ],
+            )
+            categories = {
+                c.label: c.count for c in _collect_bug_categories(bugs_dir)
+            }
+            self.assertEqual(categories.get("Unsolved"), 2)
+            self.assertEqual(categories.get("Open Proposals"), 3)
+
+    def test_guide_files_excluded_from_both_buckets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            bugs_dir = self._make_bugs_dir(
+                Path(tmp),
+                [
+                    "ISSUE_REPORT_GUIDE.md",
+                    "FINISH_GUIDE.md",
+                    "proposal_new_rule_a.md",
+                ],
+            )
+            categories = {
+                c.label: c.count for c in _collect_bug_categories(bugs_dir)
+            }
+            self.assertNotIn("Unsolved", categories)
+            self.assertEqual(categories.get("Open Proposals"), 1)
+
+    def test_only_proposals_present_omits_unsolved_category(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            bugs_dir = self._make_bugs_dir(
+                Path(tmp), ["proposal_only_one.md"],
+            )
+            categories = {
+                c.label: c.count for c in _collect_bug_categories(bugs_dir)
+            }
+            self.assertNotIn("Unsolved", categories)
+            self.assertEqual(categories.get("Open Proposals"), 1)
+
+    def test_only_bugs_present_omits_proposals_category(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            bugs_dir = self._make_bugs_dir(
+                Path(tmp), ["rule_crash_only.md"],
+            )
+            categories = {
+                c.label: c.count for c in _collect_bug_categories(bugs_dir)
+            }
+            self.assertEqual(categories.get("Unsolved"), 1)
+            self.assertNotIn("Open Proposals", categories)
 
 
 if __name__ == "__main__":
