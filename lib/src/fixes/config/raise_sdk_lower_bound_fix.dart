@@ -8,40 +8,36 @@ import 'package:analyzer/source/source_range.dart';
 import '../../native/saropa_fix.dart';
 import '../../project_context.dart';
 
-// Maps AST node types flagged by require_sdk_syntax_match to the minimum
-// SDK version that introduced them. Order doesn't matter — the covering
-// node's runtime type selects the version.
-const Map<Type, String> _nodeTypeToSdkVersion = {
-  // Dart 3.0: records, patterns, class modifiers, switch expressions.
-  RecordTypeAnnotation: '3.0.0',
-  RecordLiteral: '3.0.0',
-  SwitchExpression: '3.0.0',
-  PatternVariableDeclaration: '3.0.0',
-  PatternAssignment: '3.0.0',
-  SwitchPatternCase: '3.0.0',
-  ClassDeclaration: '3.0.0',
-  // Dart 3.3: extension types.
-  ExtensionTypeDeclaration: '3.3.0',
-  // Dart 3.6: digit separators (IntegerLiteral / DoubleLiteral with _).
-  IntegerLiteral: '3.6.0',
-  DoubleLiteral: '3.6.0',
-};
-
 /// Regex to find the SDK lower-bound version inside a pubspec.yaml
-/// `environment: sdk:` constraint. Matches `>=X.Y.Z` and captures the
-/// offset of the version digits so they can be replaced in place.
-/// The character class matches optional quote chars around the constraint.
+/// `environment: sdk:` constraint. Tolerates optional whitespace between
+/// `environment:` and `sdk:`, optional quotes (single or double) around
+/// the constraint string, and optional caret prefixes. Captures the
+/// version digits after `>=` so they can be replaced in place.
+///
+/// Handles both block-style and flow-style YAML:
+///   environment:
+///     sdk: ">=3.0.0 <4.0.0"
+///   environment:
+///     sdk: '>=3.0.0 <4.0.0'
+///   environment:
+///     sdk: >=3.0.0 <4.0.0
 final RegExp _sdkLowerBoundPattern = RegExp(
-  r"""environment\s*:\s*\n\s*sdk\s*:\s*["']?>=(\d+\.\d+\.\d+)""",
+  r"""environment\s*:\s*\n\s*sdk\s*:\s*["']?\^?>=(\d+\.\d+\.\d+)""",
   multiLine: true,
 );
 
 /// Quick fix: Raise SDK lower bound in pubspec.yaml to match the syntax
 /// feature that triggered the diagnostic.
 ///
-/// This is a companion fix for [RequireSdkSyntaxMatchRule]. It edits
-/// pubspec.yaml rather than the Dart source file, which is a novel pattern
-/// in this codebase (all other fixes edit .dart files).
+/// Companion fix for [RequireSdkSyntaxMatchRule]. Edits pubspec.yaml
+/// rather than the Dart source file — a novel pattern in this codebase
+/// using [ChangeBuilder.addGenericFileEdit] instead of `addDartFileEdit`.
+///
+/// The covering node from the diagnostic determines which SDK version
+/// is required. When the rule reports via `reporter.atToken` (e.g. on
+/// a class modifier keyword), the covering node is still the parent
+/// declaration node (ClassDeclaration), because keywords are tokens,
+/// not AST nodes — the `is` checks below handle this correctly.
 class RaiseSdkLowerBoundFix extends SaropaFixProducer {
   RaiseSdkLowerBoundFix({required super.context});
 
@@ -78,8 +74,14 @@ class RaiseSdkLowerBoundFix extends SaropaFixProducer {
     if (match == null) return;
 
     // group(1) is the captured version string (e.g. "2.19.0").
-    final versionStart = match.start + match.group(0)!.indexOf(match.group(1)!);
-    final versionLength = match.group(1)!.length;
+    // Compute its absolute offset from the match start.
+    final capturedVersion = match.group(1)!;
+    final fullMatch = match.group(0)!;
+    final relativeOffset = fullMatch.lastIndexOf(capturedVersion);
+    if (relativeOffset < 0) return;
+
+    final versionStart = match.start + relativeOffset;
+    final versionLength = capturedVersion.length;
 
     // Replace the lower-bound version with the required version.
     await builder.addGenericFileEdit(pubspecPath, (editBuilder) {
@@ -91,22 +93,21 @@ class RaiseSdkLowerBoundFix extends SaropaFixProducer {
   }
 
   /// Maps the diagnostic's covering node to the SDK version it requires.
-  /// Returns null if the node type is unrecognised (defensive — should not
-  /// happen because the fix is only registered for require_sdk_syntax_match).
+  ///
+  /// Uses `is` checks (not runtimeType map lookup) because the analyzer's
+  /// concrete classes are private `*Impl` types that would not match
+  /// abstract type keys in a `Map<Type, String>`.
   String? _resolveRequiredVersion(AstNode node) {
-    // Direct lookup by runtime type.
-    final version = _nodeTypeToSdkVersion[node.runtimeType];
-    if (version != null) return version;
-
-    // The node's concrete class may be a private impl (e.g. ClassDeclarationImpl).
-    // Walk supertypes via is-checks for the mapped abstract types.
+    // Dart 3.0: records, patterns, class modifiers, switch expressions.
     if (node is RecordTypeAnnotation || node is RecordLiteral) return '3.0.0';
     if (node is SwitchExpression) return '3.0.0';
     if (node is PatternVariableDeclaration || node is PatternAssignment) {
       return '3.0.0';
     }
     if (node is SwitchPatternCase || node is ClassDeclaration) return '3.0.0';
+    // Dart 3.3: extension types.
     if (node is ExtensionTypeDeclaration) return '3.3.0';
+    // Dart 3.6: digit separators in numeric literals.
     if (node is IntegerLiteral || node is DoubleLiteral) return '3.6.0';
     return null;
   }

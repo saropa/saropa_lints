@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -16,6 +17,7 @@ from scripts.modules._rule_metrics import (
     _get_example_dirs,
     _index_rule_test_files,
     _resolve_test_path,
+    collect_report_data,
     display_roadmap_summary,
 )
 
@@ -334,6 +336,85 @@ class RoadmapSummaryIssueFilterTests(unittest.TestCase):
                 Path(tmp), issue_filter="bugs",
             )
             self.assertIsNone(log_path)
+
+
+class CollectReportDataTests(unittest.TestCase):
+    """collect_report_data: the --json counterpart to display_roadmap_summary."""
+
+    def _make_bugs_dir(self, tmp: Path, filenames: list[str]) -> Path:
+        bugs_dir = tmp / "bugs"
+        bugs_dir.mkdir()
+        for name in filenames:
+            (bugs_dir / name).write_text("# placeholder\n", encoding="utf-8")
+        return bugs_dir
+
+    def test_invalid_issue_filter_raises(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(ValueError):
+                collect_report_data(Path(tmp), issue_filter="not-a-real-filter")
+
+    def test_default_mode_includes_roadmap_and_todo_keys(self) -> None:
+        # issue_filter=None must include the roadmap/fixture_todos keys that
+        # filtered modes deliberately skip (they mirror display_roadmap_summary's
+        # "skip the roadmap/TODO scan entirely" behavior for --bugs-only/
+        # --proposals-only).
+        with tempfile.TemporaryDirectory() as tmp:
+            data = collect_report_data(Path(tmp))
+            self.assertIn("roadmap", data)
+            self.assertIn("fixture_todos", data)
+            self.assertNotIn("bugs", data)
+            self.assertIsNone(data["issue_filter"])
+
+    def test_filtered_mode_omits_roadmap_and_todo_keys(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            bugs_dir = self._make_bugs_dir(
+                Path(tmp), ["some_rule_false_positive_x.md"],
+            )
+            data = collect_report_data(
+                Path(tmp), bugs_dir=bugs_dir, issue_filter="bugs",
+            )
+            self.assertNotIn("roadmap", data)
+            self.assertNotIn("fixture_todos", data)
+            self.assertEqual(data["bugs"]["total"], 1)
+
+    def test_bugs_only_excludes_proposals(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            bugs_dir = self._make_bugs_dir(
+                Path(tmp),
+                ["some_rule_false_positive_x.md", "proposal_new_rule_a.md"],
+            )
+            data = collect_report_data(
+                Path(tmp), bugs_dir=bugs_dir, issue_filter="bugs",
+            )
+            labels = {c["label"] for c in data["bugs"]["categories"]}
+            self.assertIn("Unsolved", labels)
+            self.assertNotIn("Open Proposals", labels)
+            self.assertEqual(data["bugs"]["total"], 1)
+
+    def test_proposals_only_excludes_bugs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            bugs_dir = self._make_bugs_dir(
+                Path(tmp),
+                ["some_rule_false_positive_x.md", "proposal_new_rule_a.md"],
+            )
+            data = collect_report_data(
+                Path(tmp), bugs_dir=bugs_dir, issue_filter="proposals",
+            )
+            labels = {c["label"] for c in data["bugs"]["categories"]}
+            self.assertIn("Open Proposals", labels)
+            self.assertNotIn("Unsolved", labels)
+            self.assertEqual(data["bugs"]["total"], 1)
+
+    def test_output_is_json_serializable(self) -> None:
+        # Regression guard: every value in the returned dict must survive
+        # json.dumps without a custom encoder — this is the whole point of
+        # collect_report_data existing separately from the _WorkRow/Color
+        # display types used by display_roadmap_summary.
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            bugs_dir = self._make_bugs_dir(tmp_path, ["proposal_a.md"])
+            data = collect_report_data(tmp_path, bugs_dir=bugs_dir)
+            json.dumps(data)  # raises TypeError on non-serializable values
 
 
 if __name__ == "__main__":

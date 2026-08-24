@@ -1010,6 +1010,56 @@ def display_roadmap_summary(
     return log_path
 
 
+def collect_report_data(
+    project_dir: Path, *, bugs_dir: Path | None = None,
+    issue_filter: str | None = None,
+) -> dict:
+    """Side-effect-free counterpart to display_roadmap_summary for --json output.
+
+    Same issue_filter semantics (None/"bugs"/"proposals") as
+    display_roadmap_summary, but returns a plain JSON-serializable dict
+    instead of printing — backs scripts/roadmap_status.py's --json flag so
+    CI can gate on bug/proposal counts. Unlike _collect_todo_rows, this does
+    not write the fixture TODO log file (no side effects for a data query).
+    """
+    if issue_filter not in (None, "bugs", "proposals"):
+        raise ValueError(
+            f"issue_filter must be None, 'bugs', or 'proposals', got {issue_filter!r}",
+        )
+
+    data: dict = {"issue_filter": issue_filter}
+
+    if issue_filter is None:
+        summary = get_roadmap_summary(project_dir)
+        data["roadmap"] = {
+            "roadmap_total": summary.roadmap_total,
+            "deferred_total": summary.deferred_total,
+            "grand_total": summary.grand_total,
+            "roadmap_by_severity": dict(summary.roadmap_by_severity),
+            "deferred_by_severity": dict(summary.deferred_by_severity),
+        }
+        todo_total, pkg_counts, _all_todos = _collect_todo_stats(project_dir)
+        data["fixture_todos"] = {
+            "total": todo_total,
+            "by_package": dict(pkg_counts),
+        }
+
+    if bugs_dir is not None:
+        categories = _collect_bug_categories(bugs_dir)
+        if issue_filter == "bugs":
+            categories = [c for c in categories if c.label != "Open Proposals"]
+        elif issue_filter == "proposals":
+            categories = [c for c in categories if c.label == "Open Proposals"]
+        data["bugs"] = {
+            "categories": [
+                {"label": c.label, "count": c.count} for c in categories
+            ],
+            "total": sum(c.count for c in categories),
+        }
+
+    return data
+
+
 # =============================================================================
 # README BADGE SYNC
 # =============================================================================

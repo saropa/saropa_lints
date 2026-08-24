@@ -29,7 +29,12 @@ runs `npm ci` when `extension/package-lock.json` exists, then launches VS Code (
 python scripts/roadmap_status.py
 python scripts/roadmap_status.py --bugs-only
 python scripts/roadmap_status.py --proposals-only
+python scripts/roadmap_status.py --json
+python scripts/roadmap_status.py --proposals-only --json-file-path proposals.json
 ```
+
+`--json` / `--json-file-path <path>` (mirroring the Dart scan CLI's `--json-file-path` naming) print
+machine-readable output instead of the colored bar chart, so CI can gate on bug/proposal counts.
 
 Prints the same "WORK REPORT" banner `publish.py`'s audit steps show (roadmap rules, deferred rules,
 fixture TODOs, unsolved `bugs/*.md` issues, and open `bugs/proposal_*.md` feature requests — see
@@ -127,7 +132,7 @@ Scripts in this directory that can run independently:
 | `bulk_rule_metadata.py` | Bulk metadata operations |
 | `export_saropa_rules_for_gap.py` | Export rules for external tools |
 | `list_rules_without_fixes.py` | Query rules lacking quick fixes |
-| `roadmap_status.py` | Print the roadmap/bugs/proposals work report outside the publish pipeline (`--bugs-only` / `--proposals-only`) |
+| `roadmap_status.py` | Print the roadmap/bugs/proposals work report outside the publish pipeline (`--bugs-only` / `--proposals-only` / `--json`) |
 
 Historical scripts in `scripts/historical/` are not part of the build.
 

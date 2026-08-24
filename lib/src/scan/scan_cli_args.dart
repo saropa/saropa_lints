@@ -44,6 +44,7 @@ class ScanCliArgs {
     required this.resolve,
     this.debugRule,
     this.fixIgnores = false,
+    this.checkSdkCompat = false,
     this.minSeverity,
     this.maxSeverity,
     this.minImpact,
@@ -147,6 +148,11 @@ class ScanCliArgs {
   /// `// ignore: saropa_lints/rule_name` for all known saropa_lints rules.
   final bool fixIgnores;
 
+  /// When true, run a standalone SDK compatibility audit: cross-reference
+  /// the pubspec.yaml SDK lower bound against Dart syntax features in lib/
+  /// and output a summary showing the minimum required version.
+  final bool checkSdkCompat;
+
   /// When true, per-rule execution timing is recorded during the scan and
   /// flushed to `reports/.saropa_lints/rule_timings.json` at the end.
   /// Runtime flag (not a dart-define) so `dart run` snapshot caching can
@@ -216,6 +222,7 @@ ScanParseResult parseScanArgs(
   bool resolve = false;
 
   bool fixIgnores = false;
+  bool checkSdkCompat = false;
   bool profile = false;
   bool excludeLightLane = false;
   bool quiet = false;
@@ -232,6 +239,13 @@ ScanParseResult parseScanArgs(
     }
     if (arg == '--fix-ignores') {
       fixIgnores = true;
+      i++;
+      continue;
+    }
+    // Standalone SDK compatibility audit — cross-references pubspec SDK
+    // lower bound against syntax features in lib/.
+    if (arg == '--check-sdk-compat') {
+      checkSdkCompat = true;
       i++;
       continue;
     }
@@ -522,6 +536,7 @@ ScanParseResult parseScanArgs(
       resolve: resolve,
       debugRule: debugRule,
       fixIgnores: fixIgnores,
+      checkSdkCompat: checkSdkCompat,
       minSeverity: minSeverity,
       maxSeverity: maxSeverity,
       minImpact: minImpact,

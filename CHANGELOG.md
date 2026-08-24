@@ -70,11 +70,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - New rule: `prefer_primary_constructor` (Professional, INFO) — flags classes eligible for Dart 3.13+ primary constructor syntax when the project's SDK lower bound is >=3.13.0. Reduces boilerplate for simple data classes that AI generators consistently produce in the verbose pre-3.13 form. No action required.
 - New rule: `require_sdk_syntax_match` (Comprehensive, WARNING) — flags Dart syntax features that require a newer SDK than the lower bound declared in pubspec.yaml, with a quick fix to raise the SDK lower bound. Catches AI-generated code that uses records, switch expressions, extension types, or digit separators when the project's SDK constraint doesn't support them. No action required.
+- Scan CLI: `--check-sdk-compat` standalone audit cross-references the pubspec SDK lower bound against Dart syntax features in `lib/`. Prints a grouped summary showing which files force each version bump. Exits 1 on mismatch, 0 when compatible — suitable for CI gating.
 
 <details><summary>Maintenance</summary>
 
+- `require_sdk_syntax_match` quick fix: removed dead `Map<Type, String>` lookup (analyzer concrete types are private `*Impl` classes that never matched abstract keys); hardened regex with triple-quoted raw string to handle embedded quotes.
 - `bugs/BUG_REPORT_GUIDE.md` renamed to `bugs/ISSUE_REPORT_GUIDE.md` and extended with a feature request template, proposal naming patterns, and lifecycle, alongside the existing bug report process.
 - New `scripts/roadmap_status.py` prints the roadmap/bugs/proposals work report outside the interactive publish menu, with `--bugs-only` / `--proposals-only` filters; `_rule_metrics.py`'s bug counter now reports open feature proposals separately from unsolved bugs instead of lumping both into one count.
+- `roadmap_status.py` gains a `--json` / `--json-file-path` mode (mirroring the scan CLI's flag naming) so CI can gate on bug/proposal counts instead of parsing the colored bar chart.
 
 </details>
 

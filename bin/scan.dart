@@ -18,6 +18,7 @@ import 'package:saropa_lints/src/init/migration.dart';
 import 'package:saropa_lints/src/native/saropa_context.dart';
 import 'package:saropa_lints/src/report/timing_emitter.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show RuleTimingTracker;
+import 'package:saropa_lints/src/cli/sdk_compat_checker.dart';
 import 'package:saropa_lints/src/scan/scan_cli_args.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 import 'package:saropa_lints/src/tiers.dart';
@@ -69,6 +70,15 @@ Future<void> main(List<String> args) async {
   if (parsed.fixIgnores) {
     _runFixIgnores(path);
     exit(0);
+  }
+
+  // --check-sdk-compat: standalone SDK compatibility audit, then exit.
+  if (parsed.checkSdkCompat) {
+    final result = checkSdkCompat(path, quiet: quiet);
+    if (result == null) exit(2);
+    stdout.write(formatSdkCompatResult(result));
+    // Exit 1 if there's a mismatch, 0 if OK.
+    exit(result.hasMismatch ? 1 : 0);
   }
 
   // --profile: arm per-rule timing capture BEFORE any rule callback runs and
@@ -567,6 +577,15 @@ void _printUsage() {
   );
   print(
     '                      // ignore: saropa_lints/rule_name for all known rules.',
+  );
+  print(
+    '  --check-sdk-compat  Audit SDK compatibility: cross-reference the pubspec',
+  );
+  print(
+    '                      SDK lower bound against syntax features in lib/.',
+  );
+  print(
+    '                      Exits 1 on mismatch, 0 when compatible.',
   );
   print(
     '  --min-severity <s>  Only show diagnostics at or above this severity.',

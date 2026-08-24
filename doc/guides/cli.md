@@ -77,6 +77,7 @@ dart run saropa_lints scan /path/to/project
 | `--fix-ignores` | Bulk-convert bare `// ignore: rule_name` comments to `// ignore: saropa_lints/rule_name` for all known saropa_lints rules. |
 | `--exclude-light-lane` | Drop light-lane rules from the scan (for two-lane de-duplication when the analysis-server plugin handles those rules in-process). |
 | `--debug-rule <name>` | Emit per-node diagnostic trace for the named rule, showing type resolution details. Used to diagnose false positives. |
+| `--check-sdk-compat` | Standalone SDK compatibility audit: cross-reference the pubspec SDK lower bound against Dart syntax features in `lib/`. Prints a summary showing the minimum required version and which files force each version bump. Exits 1 on mismatch, 0 when compatible. |
 
 ### Exit codes
 
@@ -110,6 +111,9 @@ dart run saropa_lints scan . --files lib/main.dart lib/app.dart
 
 # Pipe file list from another command
 git diff --name-only --diff-filter=d HEAD~1 | dart run saropa_lints scan . --files-from-stdin
+
+# SDK compatibility audit — fails CI if codebase uses syntax newer than declared bound
+dart run saropa_lints scan . --check-sdk-compat
 ```
 
 ### JSON output

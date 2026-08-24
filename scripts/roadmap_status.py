@@ -13,11 +13,17 @@ TODOs, unsolved bugs, and open proposals), matching the publish banner.
 of that kind and skip the roadmap/TODO scan entirely, for a faster,
 focused check.
 
+--json switches to machine-readable output (no colored bar chart) so CI
+can gate on bug/proposal counts, matching the Dart scan CLI's --json-file-path
+naming convention.
+
 Usage (from repository root):
 
     python scripts/roadmap_status.py
     python scripts/roadmap_status.py --bugs-only
     python scripts/roadmap_status.py --proposals-only
+    python scripts/roadmap_status.py --json
+    python scripts/roadmap_status.py --proposals-only --json-file-path proposals.json
 
 Version:   1.0
 Author:    Saropa
@@ -31,6 +37,7 @@ Exit Codes:
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -41,7 +48,10 @@ _SCRIPTS_PARENT = str(Path(__file__).resolve().parent.parent)
 if _SCRIPTS_PARENT not in sys.path:
     sys.path.insert(0, _SCRIPTS_PARENT)
 
-from scripts.modules._rule_metrics import display_roadmap_summary  # noqa: E402
+from scripts.modules._rule_metrics import (  # noqa: E402
+    collect_report_data,
+    display_roadmap_summary,
+)
 from scripts.modules._utils import enable_ansi_support, print_error  # noqa: E402
 
 SCRIPT_VERSION = "1.0"
@@ -65,6 +75,16 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         help="Show only open bugs/proposal_*.md feature requests; skip roadmap and TODO rows.",
     )
     p.add_argument(
+        "--json",
+        action="store_true",
+        help="Print machine-readable JSON instead of the colored bar chart.",
+    )
+    p.add_argument(
+        "--json-file-path",
+        metavar="<path>",
+        help="Write JSON output to a file instead of stdout. Implies --json.",
+    )
+    p.add_argument(
         "--version",
         action="version",
         version=f"%(prog)s {SCRIPT_VERSION}",
@@ -72,6 +92,8 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     ns = p.parse_args(argv)
     if ns.bugs_only and ns.proposals_only:
         p.error("--bugs-only and --proposals-only are mutually exclusive.")
+    if ns.json_file_path:
+        ns.json = True
     return ns
 
 
@@ -80,7 +102,8 @@ def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv if argv is not None else sys.argv[1:])
     # Sets up ANSI color escapes on Windows consoles and reconfigures stdout
     # to UTF-8 — without it, the bar-chart glyphs in the report crash with
-    # UnicodeEncodeError on the default Windows cp1252 console.
+    # UnicodeEncodeError on the default Windows cp1252 console. Also needed
+    # for --json's stdout write below (still goes through the UTF-8 stream).
     enable_ansi_support()
 
     project_dir = Path(_SCRIPTS_PARENT)
@@ -94,6 +117,17 @@ def main(argv: list[str] | None = None) -> int:
         issue_filter = "bugs"
     elif args.proposals_only:
         issue_filter = "proposals"
+
+    if args.json:
+        data = collect_report_data(
+            project_dir, bugs_dir=bugs_dir, issue_filter=issue_filter,
+        )
+        text = json.dumps(data, indent=2)
+        if args.json_file_path:
+            Path(args.json_file_path).write_text(text + "\n", encoding="utf-8")
+        else:
+            print(text)
+        return 0
 
     display_roadmap_summary(
         project_dir, bugs_dir=bugs_dir, issue_filter=issue_filter,
