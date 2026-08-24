@@ -76,8 +76,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - `require_sdk_syntax_match` quick fix: removed dead `Map<Type, String>` lookup (analyzer concrete types are private `*Impl` classes that never matched abstract keys); hardened regex with triple-quoted raw string to handle embedded quotes.
 - `bugs/BUG_REPORT_GUIDE.md` renamed to `bugs/ISSUE_REPORT_GUIDE.md` and extended with a feature request template, proposal naming patterns, and lifecycle, alongside the existing bug report process.
-- New `scripts/roadmap_status.py` prints the roadmap/bugs/proposals work report outside the interactive publish menu, with `--bugs-only` / `--proposals-only` filters; `_rule_metrics.py`'s bug counter now reports open feature proposals separately from unsolved bugs instead of lumping both into one count.
-- `roadmap_status.py` gains a `--json` / `--json-file-path` mode (mirroring the scan CLI's flag naming) so CI can gate on bug/proposal counts instead of parsing the colored bar chart.
+- `_rule_metrics.py`'s bug counter now reports open feature proposals separately from unsolved bugs in the publish "WORK REPORT" banner, instead of lumping both into one count.
 
 </details>
 

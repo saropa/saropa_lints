@@ -23,26 +23,6 @@ Uses `scripts/modules/_utils` (Saropa logo, colors, progress), validates Node 18
 runs `npm ci` when `extension/package-lock.json` exists, then launches VS Code (or Cursor) with
 `--extensionDevelopmentPath` and **opens this repo** as the host folder (`--new-window` so the folder is not lost to an empty restored session). See `python scripts/run_extension_local.py --help`.
 
-### Check outstanding bugs/proposals without the full publish menu
-
-```bash
-python scripts/roadmap_status.py
-python scripts/roadmap_status.py --bugs-only
-python scripts/roadmap_status.py --proposals-only
-python scripts/roadmap_status.py --json
-python scripts/roadmap_status.py --proposals-only --json-file-path proposals.json
-```
-
-`--json` / `--json-file-path <path>` (mirroring the Dart scan CLI's `--json-file-path` naming) print
-machine-readable output instead of the colored bar chart, so CI can gate on bug/proposal counts.
-
-Prints the same "WORK REPORT" banner `publish.py`'s audit steps show (roadmap rules, deferred rules,
-fixture TODOs, unsolved `bugs/*.md` issues, and open `bugs/proposal_*.md` feature requests — see
-[`bugs/ISSUE_REPORT_GUIDE.md`](../bugs/ISSUE_REPORT_GUIDE.md) for the naming convention that
-distinguishes the two), without running the interactive publish pipeline. `--bugs-only` /
-`--proposals-only` (mutually exclusive) skip the roadmap/TODO scan and narrow the report to just
-that one `bugs/` category, for a faster status check. See `python scripts/roadmap_status.py --help`.
-
 `publish.py` has no CLI flags; it prompts for one of eight modes:
 
 | # | Mode | What it does |
@@ -132,7 +112,6 @@ Scripts in this directory that can run independently:
 | `bulk_rule_metadata.py` | Bulk metadata operations |
 | `export_saropa_rules_for_gap.py` | Export rules for external tools |
 | `list_rules_without_fixes.py` | Query rules lacking quick fixes |
-| `roadmap_status.py` | Print the roadmap/bugs/proposals work report outside the publish pipeline (`--bugs-only` / `--proposals-only` / `--json`) |
 
 Historical scripts in `scripts/historical/` are not part of the build.
 
