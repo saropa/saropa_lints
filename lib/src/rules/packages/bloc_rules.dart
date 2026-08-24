@@ -1013,10 +1013,10 @@ class _BlocProviderOfVisitor extends RecursiveAstVisitor<void> {
         // Check if listen: false is explicitly set
         final ArgumentList args = node.argumentList;
         bool hasListenFalse = false;
-        for (final Expression arg in args.arguments) {
-          final expr = arg is NamedExpression ? arg.expression : null;
-          if (arg is NamedExpression &&
-              arg.name.label.name == 'listen' &&
+        for (final Argument arg in args.arguments) {
+          final expr = arg is NamedArgument ? arg.argumentExpression : null;
+          if (arg is NamedArgument &&
+              arg.name.lexeme == 'listen' &&
               expr is BooleanLiteral &&
               !expr.value) {
             hasListenFalse = true;
@@ -1488,8 +1488,8 @@ class RequireBlocTransformerRule extends SaropaLintRule {
 
       // Check if transformer argument is present
       bool hasTransformer = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'transformer') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'transformer') {
           hasTransformer = true;
           break;
         }
@@ -1572,7 +1572,7 @@ class AvoidLongEventHandlersRule extends SaropaLintRule {
       if (node.methodName.name != 'on') return;
 
       // Find the handler function in arguments
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         if (arg is FunctionExpression) {
           final String source = arg.body.toSource();
           final int lineCount = '\n'.allMatches(source).length + 1;
@@ -1653,9 +1653,9 @@ class PreferMultiBlocProviderRule extends SaropaLintRule {
       if (typeName != 'BlocProvider') return;
 
       // Check if child is also a BlocProvider
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
-          final Expression childExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
+          final Expression childExpr = arg.argumentExpression;
           if (childExpr is InstanceCreationExpression) {
             final String childType = childExpr.constructorName.type.name.lexeme;
             if (childType == 'BlocProvider') {
@@ -1738,9 +1738,9 @@ class AvoidInstantiatingInBlocValueProviderRule extends SaropaLintRule {
       if (constructorName.name?.name != 'value') return;
 
       // Check if value parameter is an instance creation (new bloc)
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'value') {
-          final Expression valueExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'value') {
+          final Expression valueExpr = arg.argumentExpression;
           if (valueExpr is InstanceCreationExpression) {
             // This is creating a new instance in value - BAD
             reporter.atNode(valueExpr);
@@ -1823,9 +1823,9 @@ class AvoidExistingInstancesInBlocProviderRule extends SaropaLintRule {
       if (constructorName.name?.name == 'value') return;
 
       // Check if create parameter returns an existing variable
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'create') {
-          final Expression createExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'create') {
+          final Expression createExpr = arg.argumentExpression;
           if (createExpr is FunctionExpression) {
             final FunctionBody body = createExpr.body;
             if (body is ExpressionFunctionBody) {
@@ -1913,9 +1913,9 @@ class PreferCorrectBlocProviderRule extends SaropaLintRule {
       if (constructorName.name?.name == 'value') return;
 
       // Check if create parameter uses context.read()
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'create') {
-          final Expression createExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'create') {
+          final Expression createExpr = arg.argumentExpression;
           if (createExpr is FunctionExpression) {
             final FunctionBody body = createExpr.body;
             if (body is ExpressionFunctionBody) {
@@ -2000,7 +2000,7 @@ class CheckIsNotClosedAfterAsyncGapRule extends SaropaLintRule {
       if (args.arguments.isEmpty) return;
 
       // Get the callback
-      final Expression callback = args.arguments.first;
+      final Argument callback = args.arguments.first;
       if (callback is! FunctionExpression) return;
 
       final FunctionBody body = callback.body;
@@ -2779,10 +2779,10 @@ class EmitNewBlocStateInstancesRule extends SaropaLintRule {
       if (node.methodName.name != 'emit') return;
 
       // Check argument for cascade expression
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression arg = args.first;
+      final Argument arg = args.first;
       if (arg is CascadeExpression) {
         // Check if target is 'state'
         final String targetSource = arg.target.toSource();
@@ -3028,9 +3028,9 @@ class RequireBlocSelectorRule extends SaropaLintRule {
       if (typeName != 'BlocBuilder') return;
 
       // Find builder parameter
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'builder') {
-          final Expression builderExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
+          final Expression builderExpr = arg.argumentExpression;
           if (builderExpr is FunctionExpression) {
             // Count state property accesses
             final _StateAccessCounter counter = _StateAccessCounter();
@@ -3907,9 +3907,9 @@ class PreferBlocListenerForSideEffectsRule extends SaropaLintRule {
       if (typeName != 'BlocBuilder') return;
 
       // Find the builder argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'builder') {
-          final String builderSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
+          final String builderSource = arg.argumentExpression.toSource();
 
           // Check for side effect patterns
           for (final String pattern in _sideEffectPatterns) {
@@ -3992,9 +3992,9 @@ class RequireBlocConsumerWhenBothRule extends SaropaLintRule {
       if (typeName != 'BlocListener') return;
 
       // Check if the child is a BlocBuilder
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
-          final Expression childExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
+          final Expression childExpr = arg.argumentExpression;
 
           if (childExpr is InstanceCreationExpression) {
             final String childTypeName =
@@ -4495,7 +4495,7 @@ class PreferBlocTransformRule extends SaropaLintRule {
       // Check if transformer is provided
       final args = node.argumentList.arguments;
       final hasTransformer = args.any((arg) {
-        return arg is NamedExpression && arg.name.label.name == 'transformer';
+        return arg is NamedArgument && arg.name.lexeme == 'transformer';
       });
 
       if (!hasTransformer) {
@@ -4625,13 +4625,11 @@ class AvoidPassingBlocToBlocRule extends SaropaLintRule {
   }
 
   String? _getParameterTypeName(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
+    // analyzer 13: SimpleFormalParameter/DefaultFormalParameter were merged
+    // into RegularFormalParameter, which carries `.defaultClause` directly
+    // instead of wrapping an inner parameter node.
+    if (param is RegularFormalParameter) {
       return param.type?.toSource();
-    } else if (param is DefaultFormalParameter) {
-      final inner = param.parameter;
-      if (inner is SimpleFormalParameter) {
-        return inner.type?.toSource();
-      }
     }
     return null;
   }
@@ -4722,15 +4720,11 @@ class AvoidPassingBuildContextToBlocsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
   ) {
     for (final param in constructor.parameters.parameters) {
-      String? typeName;
-      if (param is SimpleFormalParameter) {
-        typeName = param.type?.toSource();
-      } else if (param is DefaultFormalParameter) {
-        final inner = param.parameter;
-        if (inner is SimpleFormalParameter) {
-          typeName = inner.type?.toSource();
-        }
-      }
+      // analyzer 13: SimpleFormalParameter/DefaultFormalParameter were
+      // merged into RegularFormalParameter — no more wrapper node to unwrap.
+      final String? typeName = param is RegularFormalParameter
+          ? param.type?.toSource()
+          : null;
       if (typeName == 'BuildContext') {
         reporter.atNode(param);
       }

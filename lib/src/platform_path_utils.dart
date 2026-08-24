@@ -232,10 +232,14 @@ class _LiteralArgChecker extends RecursiveAstVisitor<void> {
 
     // Resolve the argument bound to our target parameter.
     Expression? arg;
+    // analyzer 13: NamedExpression -> NamedArgument; `.name.lexeme` replaces
+    // `.name.label.name`, and `.argumentExpression` replaces `.expression`.
+    // ArgumentList.arguments is now NodeList<Argument>, so plain positional
+    // entries need an `as Expression` cast.
     if (_pos.isNamed) {
-      for (final Expression a in args.arguments) {
-        if (a is NamedExpression && a.name.label.name == _pos.name) {
-          arg = a.expression;
+      for (final Argument a in args.arguments) {
+        if (a is NamedArgument && a.name.lexeme == _pos.name) {
+          arg = a.argumentExpression;
           break;
         }
       }
@@ -246,10 +250,10 @@ class _LiteralArgChecker extends RecursiveAstVisitor<void> {
       }
     } else {
       int idx = 0;
-      for (final Expression a in args.arguments) {
-        if (a is NamedExpression) continue;
+      for (final Argument a in args.arguments) {
+        if (a is NamedArgument) continue;
         if (idx == _pos.positionalIndex) {
-          arg = a;
+          arg = a as Expression;
           break;
         }
         idx++;

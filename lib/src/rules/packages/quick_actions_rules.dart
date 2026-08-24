@@ -29,9 +29,12 @@ bool _isQuickActionsReceiver(Expression? target) =>
 /// Returns the value expression of the named argument [name] on an
 /// `InstanceCreationExpression`, or null when the argument is absent.
 Expression? _namedArg(InstanceCreationExpression node, String name) {
-  for (final Expression arg in node.argumentList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) {
-      return arg.expression;
+  // analyzer 13 renamed NamedExpression -> NamedArgument; argument list
+  // elements are typed `Argument`, `.name` is the Token directly, and
+  // `.expression` -> `.argumentExpression`.
+  for (final Argument arg in node.argumentList.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) {
+      return arg.argumentExpression;
     }
   }
   return null;

@@ -1271,17 +1271,12 @@ class PreferBooleanPrefixesForParamsRule extends SaropaLintRule {
     String? paramName;
     Token? nameToken;
 
-    if (param is SimpleFormalParameter) {
+    // Analyzer 13: DefaultFormalParameter removed — params with defaults are
+    // now RegularFormalParameter directly, so this branch handles both cases.
+    if (param is RegularFormalParameter) {
       typeAnnotation = param.type;
       paramName = param.name?.lexeme;
       nameToken = param.name;
-    } else if (param is DefaultFormalParameter) {
-      final FormalParameter innerParam = param.parameter;
-      if (innerParam is SimpleFormalParameter) {
-        typeAnnotation = innerParam.type;
-        paramName = innerParam.name?.lexeme;
-        nameToken = innerParam.name;
-      }
     } else if (param is FieldFormalParameter) {
       // this.field parameters - check if bool type
       typeAnnotation = param.type;
@@ -1469,15 +1464,11 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
         TypeAnnotation? typeAnnotation;
         String? paramName;
 
-        if (param is SimpleFormalParameter) {
+        // Analyzer 13: DefaultFormalParameter removed — params with defaults
+        // are now RegularFormalParameter directly.
+        if (param is RegularFormalParameter) {
           typeAnnotation = param.type;
           paramName = param.name?.lexeme;
-        } else if (param is DefaultFormalParameter) {
-          final FormalParameter innerParam = param.parameter;
-          if (innerParam is SimpleFormalParameter) {
-            typeAnnotation = innerParam.type;
-            paramName = innerParam.name?.lexeme;
-          }
         }
 
         if (typeAnnotation == null || paramName == null) continue;
@@ -1495,13 +1486,8 @@ class PreferCorrectCallbackFieldNameRule extends SaropaLintRule {
           if (thirdChar == thirdChar.toUpperCase()) continue;
         }
 
-        if (param is SimpleFormalParameter && param.name != null) {
+        if (param is RegularFormalParameter && param.name != null) {
           reporter.atToken(param.name!, code);
-        } else if (param is DefaultFormalParameter) {
-          final FormalParameter innerParam = param.parameter;
-          if (innerParam is SimpleFormalParameter && innerParam.name != null) {
-            reporter.atToken(innerParam.name!, code);
-          }
         }
       }
     });
@@ -1794,12 +1780,12 @@ class PreferCorrectIdentifierLengthRule extends SaropaLintRule {
 
     // addFormalParameter is a no-op stub in the native engine (FormalParameter
     // is not a visitable node), so the parameter-name branch of this rule never
-    // fired. addSimpleFormalParameter is the real registration and covers
+    // fired. addRegularFormalParameter is the real registration and covers
     // regular, optional, and named parameters (a default-valued param wraps a
-    // SimpleFormalParameter, which the visitor still reaches). Field/super/
+    // RegularFormalParameter, which the visitor still reaches). Field/super/
     // function-typed params are not length-checked — a minor, acceptable gap
     // versus the previous total deadness (BUG FIX 2026-07-16).
-    context.addSimpleFormalParameter((SimpleFormalParameter node) {
+    context.addRegularFormalParameter((RegularFormalParameter node) {
       final String? name = node.name?.lexeme;
       if (name != null) {
         _checkIdentifier(name, node, reporter);
@@ -1897,13 +1883,10 @@ class PreferCorrectSetterParameterNameRule extends SaropaLintRule {
       final FormalParameter param = params.parameters.first;
       String? paramName;
 
-      if (param is SimpleFormalParameter) {
+      // Analyzer 13: DefaultFormalParameter removed — params with defaults
+      // are now RegularFormalParameter directly.
+      if (param is RegularFormalParameter) {
         paramName = param.name?.lexeme;
-      } else if (param is DefaultFormalParameter) {
-        final NormalFormalParameter normalParam = param.parameter;
-        if (normalParam is SimpleFormalParameter) {
-          paramName = normalParam.name?.lexeme;
-        }
       }
 
       if (paramName != null && paramName != 'value' && paramName != '_') {
@@ -1964,7 +1947,7 @@ class PreferExplicitParameterNamesRule extends SaropaLintRule {
       if (params.parameters.isEmpty) return;
 
       for (final FormalParameter param in params.parameters) {
-        if (param is SimpleFormalParameter) {
+        if (param is RegularFormalParameter) {
           if (param.name == null && param.type != null) {
             reporter.atNode(param);
           }
@@ -2193,7 +2176,8 @@ class TagNameRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>
+      final firstArg = args.arguments.first;
       if (firstArg is! StringLiteral) return;
 
       final String? tagName = firstArg.stringValue;

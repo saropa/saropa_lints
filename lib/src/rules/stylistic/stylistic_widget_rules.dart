@@ -96,8 +96,11 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
       final argNames = <String>{};
 
       for (final arg in args) {
-        if (arg is NamedExpression) {
-          argNames.add(arg.name.label.name);
+        // Analyzer 13: `NamedExpression` was renamed to `NamedArgument`; the
+        // argument name is now a `Token` (`.name.lexeme`) rather than a
+        // `Label` (`.name.label.name`).
+        if (arg is NamedArgument) {
+          argNames.add(arg.name.lexeme);
         }
       }
 
@@ -415,8 +418,11 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
       // Extract values
       final args = <String, String>{};
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          args[arg.name.label.name] = arg.expression.toString();
+        // Analyzer 13: `NamedExpression` -> `NamedArgument`; name is now a
+        // `Token` (`.name.lexeme`) and the value getter is `.argumentExpression`
+        // (renamed from `.expression`).
+        if (arg is NamedArgument) {
+          args[arg.name.lexeme] = arg.argumentExpression.toString();
         }
       }
 
@@ -688,8 +694,10 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
 
       // Check for fit: FlexFit.tight
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'fit') {
-          final expr = arg.expression;
+        // Analyzer 13: `NamedExpression` -> `NamedArgument`; name is now a
+        // `Token` (`.name.lexeme`) and value getter is `.argumentExpression`.
+        if (arg is NamedArgument && arg.name.lexeme == 'fit') {
+          final expr = arg.argumentExpression;
           if (expr is PrefixedIdentifier) {
             if (expr.prefix.name == 'FlexFit' &&
                 expr.identifier.name == 'tight') {
@@ -847,8 +855,10 @@ class PreferMaterialThemeColorsRule extends SaropaLintRule {
         // Check if this is a color assignment in a widget context
         // We look for common color parameter names
         final parent = node.parent;
-        if (parent is NamedExpression) {
-          final paramName = parent.name.label.name;
+        // Analyzer 13: `NamedExpression` -> `NamedArgument`; name is now a
+        // non-nullable `Token` (`.name.lexeme`) rather than `Label`.
+        if (parent is NamedArgument) {
+          final paramName = parent.name.lexeme;
           if (_isColorParam(paramName)) {
             reporter.atNode(node);
           }
@@ -1044,7 +1054,9 @@ class PreferClipRSuperellipseRule extends SaropaLintRule {
       // Only flag when no custom clipper is used (safe drop-in replacement)
       final args = node.argumentList.arguments;
       for (final arg in args) {
-        if (arg is NamedExpression && arg.name.label.name == 'clipper') {
+        // Analyzer 13: `NamedExpression` -> `NamedArgument`; name is now a
+        // `Token` (`.name.lexeme`) rather than `Label`.
+        if (arg is NamedArgument && arg.name.lexeme == 'clipper') {
           return;
         }
       }
@@ -1131,8 +1143,10 @@ class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
       if (constructorName != 'ClipRRect') return;
 
       // Only flag when a custom clipper IS used (no auto-fix possible)
+      // Analyzer 13: `NamedExpression` -> `NamedArgument`; name is now a
+      // `Token` (`.name.lexeme`) rather than `Label`.
       final hasClipper = node.argumentList.arguments.any(
-        (arg) => arg is NamedExpression && arg.name.label.name == 'clipper',
+        (arg) => arg is NamedArgument && arg.name.lexeme == 'clipper',
       );
       if (!hasClipper) return;
 

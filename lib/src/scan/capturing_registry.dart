@@ -144,9 +144,17 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   @override
   void addDeclaredVariablePattern(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
-  @override
+  // analyzer 13: addDefaultFormalParameter removed from the RuleVisitorRegistry
+  // interface (DefaultFormalParameter class removed; each FormalParameter now
+  // carries .defaultClause directly). Kept without @override for legacy compat.
   void addDefaultFormalParameter(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
+  // analyzer 13: new interface method for FormalParameterDefaultClause nodes.
+  @override
+  void addFormalParameterDefaultClause(
+    AbstractAnalysisRule r,
+    AstVisitor v,
+  ) => _capture(v);
   @override
   void addDoStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
@@ -254,9 +262,16 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   @override
   void addFunctionTypeAlias(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
-  @override
+  // analyzer 13: addFunctionTypedFormalParameter removed from the interface
+  // (replaced by addFunctionTypedFormalParameterSuffix). Kept without @override.
   void addFunctionTypedFormalParameter(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
+  // analyzer 13: new interface method replacing addFunctionTypedFormalParameter.
+  @override
+  void addFunctionTypedFormalParameterSuffix(
+    AbstractAnalysisRule r,
+    AstVisitor v,
+  ) => _capture(v);
   @override
   void addGenericFunctionType(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
@@ -299,6 +314,9 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addLabel(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addLabeledStatement(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  // analyzer 13: new interface method for LabelReference nodes.
+  @override
+  void addLabelReference(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addLibraryDirective(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   // analyzer 11 keeps addLibraryIdentifier (LibraryDirective.name typed as
@@ -329,7 +347,11 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addMixinDeclaration(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addMixinOnClause(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  // analyzer 13: addNamedArgument replaces addNamedExpression in the
+  // RuleVisitorRegistry interface (NamedExpression → NamedArgument rename).
   @override
+  void addNamedArgument(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  // Legacy compat for analyzer 9-12 (no @override — not in the 13 interface).
   void addNamedExpression(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addNamedType(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
@@ -398,6 +420,10 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addPropertyAccess(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addRecordLiteral(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  // analyzer 13: new interface method for RecordLiteralNamedField nodes.
+  @override
+  void addRecordLiteralNamedField(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
   @override
   void addRecordPattern(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
@@ -440,7 +466,12 @@ class CapturingRuleVisitorRegistry implements RuleVisitorRegistry {
   void addSetOrMapLiteral(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
   @override
   void addShowCombinator(AbstractAnalysisRule r, AstVisitor v) => _capture(v);
+  // analyzer 13: addRegularFormalParameter replaces addSimpleFormalParameter
+  // in the RuleVisitorRegistry interface (SimpleFormalParameter → RegularFormalParameter).
   @override
+  void addRegularFormalParameter(AbstractAnalysisRule r, AstVisitor v) =>
+      _capture(v);
+  // Legacy compat for analyzer 9-12 (no @override — not in the 13 interface).
   void addSimpleFormalParameter(AbstractAnalysisRule r, AstVisitor v) =>
       _capture(v);
   @override

@@ -1238,10 +1238,10 @@ class RequireImageCompressionRule extends SaropaLintRule {
       bool isFromCamera = false;
       bool hasCompression = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          final String value = arg.expression.toSource();
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
+          final String value = arg.argumentExpression.toSource();
 
           if (name == 'source' && value.contains('camera')) {
             isFromCamera = true;
@@ -1325,12 +1325,12 @@ class PreferCoarseLocationRule extends SaropaLintRule {
         return;
       }
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
 
           if (name == 'desiredAccuracy' || name == 'accuracy') {
-            final String value = arg.expression.toSource();
+            final String value = arg.argumentExpression.toSource();
 
             // Flag high-precision modes that might be unnecessary
             if (value.contains('.high') ||
@@ -1404,8 +1404,8 @@ class AvoidImagePickerWithoutSourceRule extends SaropaLintRule {
 
       // Check if source is specified
       bool hasSource = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'source') {
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'source') {
           hasSource = true;
           break;
         }
@@ -1484,10 +1484,10 @@ class PreferGeolocatorAccuracyAppropriateRule extends SaropaLintRule {
 
       // Check for high accuracy
       final ArgumentList args = node.argumentList;
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'desiredAccuracy') {
-          final String valueSource = arg.expression.toSource();
+      for (final arg in args.arguments) {
+        if (arg is NamedArgument &&
+            arg.name.lexeme == 'desiredAccuracy') {
+          final String valueSource = arg.argumentExpression.toSource();
           if (valueSource.contains('.high') ||
               valueSource.contains('.best') ||
               valueSource.contains('.bestForNavigation')) {
@@ -1559,10 +1559,10 @@ class PreferGeolocatorLastKnownRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       bool hasLowAccuracy = false;
 
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'desiredAccuracy') {
-          final String valueSource = arg.expression.toSource();
+      for (final arg in args.arguments) {
+        if (arg is NamedArgument &&
+            arg.name.lexeme == 'desiredAccuracy') {
+          final String valueSource = arg.argumentExpression.toSource();
           if (valueSource.contains('.low') ||
               valueSource.contains('.lowest') ||
               valueSource.contains('.reduced')) {

@@ -155,10 +155,10 @@ class AvoidCollectionMethodsWithUnrelatedTypesRule extends SaropaLintRule {
       final DartType? targetType = target.staticType;
       if (targetType == null) return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final DartType? argType = args.first.staticType;
+      final DartType? argType = args.first.argumentExpression.staticType;
       if (argType == null) return;
 
       // Get the element type of the collection
@@ -311,7 +311,7 @@ class AvoidDynamicRule extends SaropaLintRule {
   /// `List<dynamic>`), so `dynamic` is imposed, not chosen.
   static bool _isClosureParameter(NamedType node) {
     final AstNode? parent = node.parent;
-    if (parent is! SimpleFormalParameter) return false;
+    if (parent is! RegularFormalParameter) return false;
     final AstNode? paramList = parent.parent;
     if (paramList is! FormalParameterList) return false;
     final AstNode? paramListParent = paramList.parent;
@@ -631,20 +631,24 @@ class AvoidNullableParametersWithDefaultValuesRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addDefaultFormalParameter((DefaultFormalParameter node) {
-      final Expression? defaultValue = node.defaultValue;
+    // analyzer 13 removed the DefaultFormalParameter wrapper node; every
+    // FormalParameter now carries its own optional `defaultClause` directly,
+    // so the default-value check happens inline against RegularFormalParameter.
+    context.addRegularFormalParameter((RegularFormalParameter node) {
+      // analyzer 13 merged the old SimpleFormalParameter and
+      // FunctionTypedFormalParameter into one node; a non-null
+      // functionTypedSuffix means this is function-typed (e.g. `void foo()`),
+      // which the original rule never checked, so skip it here too.
+      if (node.functionTypedSuffix != null) return;
+
+      final Expression? defaultValue = node.defaultClause?.value;
       if (defaultValue == null) return;
 
       // Skip if default value is null
       if (defaultValue is NullLiteral) return;
 
       // Check if the parameter type is nullable
-      final NormalFormalParameter parameter = node.parameter;
-      TypeAnnotation? typeAnnotation;
-
-      if (parameter is SimpleFormalParameter) {
-        typeAnnotation = parameter.type;
-      }
+      final TypeAnnotation? typeAnnotation = node.type;
 
       if (typeAnnotation is NamedType && typeAnnotation.question != null) {
         reporter.atNode(typeAnnotation);
@@ -891,9 +895,9 @@ class AvoidNullAssertionRule extends SaropaLintRule {
     // full match (always non-null on a successful match); `group(N >= 1)` is a
     // specific capture group. Non-literal arguments are rejected because we
     // cannot reason about runtime values.
-    final NodeList<Expression> args = operand.argumentList.arguments;
+    final NodeList<Argument> args = operand.argumentList.arguments;
     if (args.length != 1) return false;
-    final Expression arg = args.first;
+    final Expression arg = args.first.argumentExpression;
     if (arg is! IntegerLiteral) return false;
     final int? groupIndex = arg.value;
     if (groupIndex == null || groupIndex < 0) return false;
@@ -2293,10 +2297,10 @@ class ArgumentMustBeNativeRule extends SaropaLintRule {
         if (targetStr != 'Native' && !targetStr.endsWith('.Native')) return;
       }
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression arg = args.first;
+      final Expression arg = args.first.argumentExpression;
       final DartType? argType = arg.staticType;
       if (argType == null) return;
 
@@ -3225,10 +3229,12 @@ class DuplicateRecordFieldNameRule extends SaropaLintRule {
 
     context.addRecordLiteral((RecordLiteral node) {
       final List<(Token, AstNode)> fields = <(Token, AstNode)>[];
-      for (final Expression e in node.fields) {
-        if (e is NamedExpression) {
-          final SimpleIdentifier id = e.name.label;
-          fields.add((id.token, id));
+      for (final RecordLiteralField e in node.fields) {
+        // analyzer 13 replaced NamedExpression fields with
+        // RecordLiteralNamedField; the name is now a bare Token (no wrapping
+        // identifier node), so the field node itself is the report target.
+        if (e is RecordLiteralNamedField) {
+          fields.add((e.name, e));
         }
       }
       reportDuplicates(fields);
@@ -3291,11 +3297,12 @@ class InvalidRecordFieldNameRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addRecordLiteral((RecordLiteral node) {
-      for (final Expression e in node.fields) {
-        if (e is! NamedExpression) continue;
-        final SimpleIdentifier id = e.name.label;
-        if (_tokenIsReservedKeyword(id.token)) {
-          reporter.atNode(id, code);
+      for (final RecordLiteralField e in node.fields) {
+        if (e is! RecordLiteralNamedField) continue;
+        // analyzer 13: no wrapping identifier node for the field name
+        // anymore, just a Token — report at the token directly.
+        if (_tokenIsReservedKeyword(e.name)) {
+          reporter.atToken(e.name, code);
         }
       }
     });

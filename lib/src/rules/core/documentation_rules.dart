@@ -423,16 +423,11 @@ class RequireParameterDocumentationRule extends SaropaLintRule {
     });
   }
 
-  String? _getParameterName(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
-      return param.name?.lexeme;
-    } else if (param is DefaultFormalParameter) {
-      return _getParameterName(param.parameter);
-    } else if (param is FieldFormalParameter) {
-      return param.name.lexeme;
-    }
-    return null;
-  }
+  // analyzer 13: DefaultFormalParameter was removed — every FormalParameter
+  // subtype (RegularFormalParameter, FieldFormalParameter, etc.) now carries
+  // its name directly via the base interface, with an optional
+  // `.defaultClause` for the default value instead of a wrapping node.
+  String? _getParameterName(FormalParameter param) => param.name?.lexeme;
 }
 
 /// Warns when return value documentation is missing.
@@ -1023,18 +1018,12 @@ class VerifyDocumentedParametersExistRule extends SaropaLintRule {
     return names;
   }
 
-  String? _getParameterName(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
-      return param.name?.lexeme;
-    } else if (param is DefaultFormalParameter) {
-      return _getParameterName(param.parameter);
-    } else if (param is FieldFormalParameter) {
-      return param.name.lexeme;
-    } else if (param is SuperFormalParameter) {
-      return param.name.lexeme;
-    }
-    return null;
-  }
+  // analyzer 13: DefaultFormalParameter was removed — every FormalParameter
+  // subtype now exposes its name directly via the base interface, so the
+  // per-type dispatch (SimpleFormalParameter/FieldFormalParameter/
+  // SuperFormalParameter/unwrap-DefaultFormalParameter) collapses to one
+  // getter access.
+  String? _getParameterName(FormalParameter param) => param.name?.lexeme;
 }
 
 /// Suggests documenting thrown exceptions with `@Throws` annotation.

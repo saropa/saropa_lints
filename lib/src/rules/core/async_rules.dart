@@ -1324,7 +1324,8 @@ class PreferAsyncCallbackRule extends SaropaLintRule {
     });
 
     // Check parameter declarations (in constructors and functions)
-    context.addSimpleFormalParameter((SimpleFormalParameter node) {
+    // Analyzer 13: SimpleFormalParameter → RegularFormalParameter
+    context.addRegularFormalParameter((RegularFormalParameter node) {
       final TypeAnnotation? type = node.type;
       if (!_isVoidCallback(type)) return;
 
@@ -1882,7 +1883,8 @@ class RequireWebsocketMessageValidationRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>
+      final firstArg = args.arguments.first;
       if (firstArg is! FunctionExpression) return;
 
       final String bodySource = firstArg.body.toSource();
@@ -1974,7 +1976,8 @@ class RequireFeatureFlagDefaultRule extends SaropaLintRule {
       }
 
       // OK if passed to a parameter with default
-      if (parent is NamedExpression) return;
+      // Analyzer 13: NamedExpression → NamedArgument
+      if (parent is NamedArgument) return;
 
       // OK if assigned to a variable with default
       if (parent is VariableDeclaration) return;
@@ -2256,9 +2259,11 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 
   /// Checks if any named argument is a timeout parameter.
   static bool _hasTimeoutArg(MethodInvocation node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression &&
-          _timeoutArgNames.contains(arg.name.label.name)) {
+    // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>;
+    // NamedExpression → NamedArgument, .name.label.name → .name.lexeme
+    for (final arg in node.argumentList.arguments) {
+      if (arg is NamedArgument &&
+          _timeoutArgNames.contains(arg.name.lexeme)) {
         return true;
       }
     }
@@ -2672,7 +2677,8 @@ class RequireStreamErrorHandlingRule extends SaropaLintRule {
       bool hasOnError = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'onError') {
+        // Analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme
+        if (arg is NamedArgument && arg.name.lexeme == 'onError') {
           hasOnError = true;
           break;
         }
@@ -2850,7 +2856,8 @@ class RequireFutureWaitErrorHandlingRule extends SaropaLintRule {
       // Check for eagerError parameter
       bool hasEagerError = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'eagerError') {
+        // Analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme
+        if (arg is NamedArgument && arg.name.lexeme == 'eagerError') {
           hasEagerError = true;
           break;
         }
@@ -2929,7 +2936,8 @@ class RequireStreamOnDoneRule extends SaropaLintRule {
       // Check for onDone parameter
       bool hasOnDone = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'onDone') {
+        // Analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme
+        if (arg is NamedArgument && arg.name.lexeme == 'onDone') {
           hasOnDone = true;
           break;
         }
@@ -3605,8 +3613,9 @@ class AvoidUnawaitedFutureRule extends SaropaLintRule {
     // Walk up AST to find if we're in an onDone/onError named parameter
     AstNode? current = node.parent;
     while (current != null) {
-      if (current is NamedExpression) {
-        final String paramName = current.name.label.name;
+      // Analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme
+      if (current is NamedArgument) {
+        final String paramName = current.name.lexeme;
         return paramName == 'onDone' || paramName == 'onError';
       }
       // Stop searching if we hit a method or function declaration
@@ -4127,7 +4136,8 @@ class _FutureCreationVisitor extends RecursiveAstVisitor<void> {
     if (_asyncMethodPrefixes.any((p) => methodName.startsWith(p))) {
       // Check if this is assigned to a FutureBuilder
       final parent = node.parent;
-      if (parent is NamedExpression && parent.name.label.name == 'future') {
+      // Analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme
+      if (parent is NamedArgument && parent.name.lexeme == 'future') {
         onFutureCreated(node);
       }
     }
@@ -4554,14 +4564,11 @@ class RequireNetworkStatusCheckRule extends SaropaLintRule {
   }
 
   static String? _extractParamType(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
+    // Analyzer 13: DefaultFormalParameter removed — every FormalParameter now
+    // carries .defaultClause directly. SimpleFormalParameter →
+    // RegularFormalParameter covers both defaulted and non-defaulted params.
+    if (param is RegularFormalParameter) {
       return param.type?.toSource();
-    }
-    if (param is DefaultFormalParameter) {
-      final NormalFormalParameter normalParam = param.parameter;
-      if (normalParam is SimpleFormalParameter) {
-        return normalParam.type?.toSource();
-      }
     }
     return null;
   }
@@ -4662,8 +4669,10 @@ class AvoidSyncOnEveryChangeRule extends SaropaLintRule {
 
       // Check onChanged callback
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'onChanged') {
-          final callback = arg.expression;
+        // Analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme,
+        // .expression → .argumentExpression
+        if (arg is NamedArgument && arg.name.lexeme == 'onChanged') {
+          final callback = arg.argumentExpression;
           final callbackSource = callback.toSource();
 
           // Check for API/network calls in onChanged

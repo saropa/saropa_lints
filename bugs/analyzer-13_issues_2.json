@@ -1,0 +1,1072 @@
+[{
+	"resource": "/d:/src/saropa_lints/test/fixes/config/prefer_primary_constructor_fix_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_getter",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_getter",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The getter 'members' isn't defined for the type 'ClassDeclaration'.\nTry importing the library that defines 'members', correcting the name to the name of an existing getter, or defining a getter or field named 'members'.",
+	"source": "dart",
+	"startLineNumber": 143,
+	"startColumn": 20,
+	"endLineNumber": 143,
+	"endColumn": 27,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/config/listview_extent_metadata_rules_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "type_test_with_undefined_name",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/type_test_with_undefined_name",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't defined, so it can't be used in an 'is' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 326,
+	"startColumn": 19,
+	"endLineNumber": 326,
+	"endColumn": 34,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/config/listview_extent_metadata_rules_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_getter",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_getter",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The getter 'name' isn't defined for the type 'Argument'.\nTry importing the library that defines 'name', correcting the name to the name of an existing getter, or defining a getter or field named 'name'.",
+	"source": "dart",
+	"startLineNumber": 327,
+	"startColumn": 24,
+	"endLineNumber": 327,
+	"endColumn": 28,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/config/listview_extent_metadata_rules_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_getter",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_getter",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The getter 'expression' isn't defined for the type 'Argument'.\nTry importing the library that defines 'expression', correcting the name to the name of an existing getter, or defining a getter or field named 'expression'.",
+	"source": "dart",
+	"startLineNumber": 332,
+	"startColumn": 23,
+	"endLineNumber": 332,
+	"endColumn": 33,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/config/listview_extent_metadata_rules_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_getter",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_getter",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The getter 'expression' isn't defined for the type 'Argument'.\nTry importing the library that defines 'expression', correcting the name to the name of an existing getter, or defining a getter or field named 'expression'.",
+	"source": "dart",
+	"startLineNumber": 336,
+	"startColumn": 28,
+	"endLineNumber": 336,
+	"endColumn": 38,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/config/listview_extent_metadata_rules_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dead_code",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dead_code",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 4,
+	"message": "Dead code.\nTry removing the code, or fixing the code before it so that it can be reached.",
+	"source": "dart",
+	"startLineNumber": 326,
+	"startColumn": 36,
+	"endLineNumber": 326,
+	"endColumn": 45,
+	"tags": [
+		1
+	],
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/stylistic/stylistic_control_flow_rules_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "non_type_as_type_argument",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/non_type_as_type_argument",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't a type, so it can't be used as a type argument.\nTry correcting the name to an existing type, or defining a type named 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 345,
+	"startColumn": 40,
+	"endLineNumber": 345,
+	"endColumn": 55,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 86,
+	"startColumn": 3,
+	"endLineNumber": 86,
+	"endColumn": 18,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unchecked_use_of_nullable_value",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unchecked_use_of_nullable_value",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The property 'name' can't be unconditionally accessed because the receiver can be 'null'.\nTry making the access conditional (using '?.') or adding a null check to the target ('!').",
+	"source": "dart",
+	"startLineNumber": 89,
+	"startColumn": 13,
+	"endLineNumber": 89,
+	"endColumn": 17,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 101,
+	"startColumn": 46,
+	"endLineNumber": 101,
+	"endColumn": 61,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 155,
+	"startColumn": 3,
+	"endLineNumber": 155,
+	"endColumn": 18,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "type_test_with_undefined_name",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/type_test_with_undefined_name",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't defined, so it can't be used in an 'is' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 162,
+	"startColumn": 16,
+	"endLineNumber": 162,
+	"endColumn": 31,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 178,
+	"startColumn": 23,
+	"endLineNumber": 178,
+	"endColumn": 38,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 181,
+	"startColumn": 29,
+	"endLineNumber": 181,
+	"endColumn": 44,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_super_member",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_super_member",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The method 'visitNamedExpression' isn't defined in a superclass of '_PickNamedExpression'.\nTry correcting the name to the name of an existing method, or defining a method named 'visitNamedExpression' in a superclass.",
+	"source": "dart",
+	"startLineNumber": 183,
+	"startColumn": 11,
+	"endLineNumber": 183,
+	"endColumn": 31,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dead_code",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dead_code",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 4,
+	"message": "Dead code.\nTry removing the code, or fixing the code before it so that it can be reached.",
+	"source": "dart",
+	"startLineNumber": 94,
+	"startColumn": 36,
+	"endLineNumber": 96,
+	"endColumn": 4,
+	"tags": [
+		1
+	],
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dead_code",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dead_code",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 4,
+	"message": "Dead code.\nTry removing the code, or fixing the code before it so that it can be reached.",
+	"source": "dart",
+	"startLineNumber": 159,
+	"startColumn": 38,
+	"endLineNumber": 159,
+	"endColumn": 48,
+	"tags": [
+		1
+	],
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_builder_index_out_of_bounds_behavior_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "override_on_non_overriding_member",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/override_on_non_overriding_member",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 4,
+	"message": "The method doesn't override an inherited method.\nTry updating this class to match the superclass, or removing the override annotation.",
+	"source": "dart",
+	"startLineNumber": 181,
+	"startColumn": 8,
+	"endLineNumber": 181,
+	"endColumn": 28,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_gradient_in_build_shadercallback_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "type_test_with_undefined_name",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/type_test_with_undefined_name",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't defined, so it can't be used in an 'is' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 353,
+	"startColumn": 19,
+	"endLineNumber": 353,
+	"endColumn": 34,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_gradient_in_build_shadercallback_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unchecked_use_of_nullable_value",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unchecked_use_of_nullable_value",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The property 'name' can't be unconditionally accessed because the receiver can be 'null'.\nTry making the access conditional (using '?.') or adding a null check to the target ('!').",
+	"source": "dart",
+	"startLineNumber": 354,
+	"startColumn": 37,
+	"endLineNumber": 354,
+	"endColumn": 41,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_gradient_in_build_shadercallback_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 372,
+	"startColumn": 38,
+	"endLineNumber": 372,
+	"endColumn": 53,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_gradient_in_build_shadercallback_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "type_test_with_undefined_name",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/type_test_with_undefined_name",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't defined, so it can't be used in an 'is' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 428,
+	"startColumn": 23,
+	"endLineNumber": 428,
+	"endColumn": 38,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/avoid_gradient_in_build_shadercallback_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "unchecked_use_of_nullable_value",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/unchecked_use_of_nullable_value",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The property 'name' can't be unconditionally accessed because the receiver can be 'null'.\nTry making the access conditional (using '?.') or adding a null check to the target ('!').",
+	"source": "dart",
+	"startLineNumber": 428,
+	"startColumn": 49,
+	"endLineNumber": 428,
+	"endColumn": 53,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/image_filter_quality_detection_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 16,
+	"startColumn": 1,
+	"endLineNumber": 16,
+	"endColumn": 16,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/image_filter_quality_detection_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 43,
+	"startColumn": 15,
+	"endLineNumber": 43,
+	"endColumn": 30,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/image_filter_quality_detection_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "cast_to_non_type",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/cast_to_non_type",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't a type, so it can't be used in an 'as' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 44,
+	"startColumn": 49,
+	"endLineNumber": 44,
+	"endColumn": 64,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/image_filter_quality_detection_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 68,
+	"startColumn": 13,
+	"endLineNumber": 68,
+	"endColumn": 28,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/image_filter_quality_detection_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 112,
+	"startColumn": 13,
+	"endLineNumber": 112,
+	"endColumn": 28,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/image_filter_quality_detection_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "cast_to_non_type",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/cast_to_non_type",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't a type, so it can't be used in an 'as' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 113,
+	"startColumn": 47,
+	"endLineNumber": 113,
+	"endColumn": 62,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/image_filter_quality_detection_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 131,
+	"startColumn": 13,
+	"endLineNumber": 131,
+	"endColumn": 28,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/image_filter_quality_detection_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "cast_to_non_type",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/cast_to_non_type",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't a type, so it can't be used in an 'as' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 132,
+	"startColumn": 47,
+	"endLineNumber": 132,
+	"endColumn": 62,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/image_filter_quality_detection_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 182,
+	"startColumn": 13,
+	"endLineNumber": 182,
+	"endColumn": 28,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/image_filter_quality_detection_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "cast_to_non_type",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/cast_to_non_type",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't a type, so it can't be used in an 'as' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 183,
+	"startColumn": 47,
+	"endLineNumber": 183,
+	"endColumn": 62,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/prefer_overflow_bar_over_button_bar_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 121,
+	"startColumn": 7,
+	"endLineNumber": 121,
+	"endColumn": 22,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/prefer_overflow_bar_over_button_bar_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "type_test_with_undefined_name",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/type_test_with_undefined_name",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't defined, so it can't be used in an 'is' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 169,
+	"startColumn": 22,
+	"endLineNumber": 169,
+	"endColumn": 37,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/prefer_overflow_bar_over_button_bar_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_getter",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_getter",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The getter 'name' isn't defined for the type 'Argument'.\nTry importing the library that defines 'name', correcting the name to the name of an existing getter, or defining a getter or field named 'name'.",
+	"source": "dart",
+	"startLineNumber": 170,
+	"startColumn": 19,
+	"endLineNumber": 170,
+	"endColumn": 23,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/prefer_overflow_bar_over_button_bar_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "type_test_with_undefined_name",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/type_test_with_undefined_name",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'NamedExpression' isn't defined, so it can't be used in an 'is' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 195,
+	"startColumn": 20,
+	"endLineNumber": 195,
+	"endColumn": 35,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/prefer_overflow_bar_over_button_bar_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_getter",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_getter",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The getter 'name' isn't defined for the type 'Argument'.\nTry importing the library that defines 'name', correcting the name to the name of an existing getter, or defining a getter or field named 'name'.",
+	"source": "dart",
+	"startLineNumber": 195,
+	"startColumn": 43,
+	"endLineNumber": 195,
+	"endColumn": 47,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/prefer_overflow_bar_over_button_bar_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 209,
+	"startColumn": 23,
+	"endLineNumber": 209,
+	"endColumn": 38,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/prefer_overflow_bar_over_button_bar_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_class",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_class",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "Undefined class 'NamedExpression'.\nTry changing the name to the name of an existing class, or creating a class with the name 'NamedExpression'.",
+	"source": "dart",
+	"startLineNumber": 212,
+	"startColumn": 29,
+	"endLineNumber": 212,
+	"endColumn": 44,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/prefer_overflow_bar_over_button_bar_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_super_member",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_super_member",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The method 'visitNamedExpression' isn't defined in a superclass of '_FindNamedArgVisitor'.\nTry correcting the name to the name of an existing method, or defining a method named 'visitNamedExpression' in a superclass.",
+	"source": "dart",
+	"startLineNumber": 216,
+	"startColumn": 11,
+	"endLineNumber": 216,
+	"endColumn": 31,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/prefer_overflow_bar_over_button_bar_rule_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "override_on_non_overriding_member",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/override_on_non_overriding_member",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 4,
+	"message": "The method doesn't override an inherited method.\nTry updating this class to match the superclass, or removing the override annotation.",
+	"source": "dart",
+	"startLineNumber": 212,
+	"startColumn": 8,
+	"endLineNumber": 212,
+	"endColumn": 28,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/require_error_widget_extension_method_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "type_test_with_undefined_name",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/type_test_with_undefined_name",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'DefaultFormalParameter' isn't defined, so it can't be used in an 'is' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'DefaultFormalParameter'.",
+	"source": "dart",
+	"startLineNumber": 25,
+	"startColumn": 45,
+	"endLineNumber": 25,
+	"endColumn": 67,
+	"modelVersionId": 1,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/require_error_widget_extension_method_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_getter",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_getter",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The getter 'parameter' isn't defined for the type 'FormalParameter'.\nTry importing the library that defines 'parameter', correcting the name to the name of an existing getter, or defining a getter or field named 'parameter'.",
+	"source": "dart",
+	"startLineNumber": 26,
+	"startColumn": 18,
+	"endLineNumber": 26,
+	"endColumn": 27,
+	"modelVersionId": 1,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/require_error_widget_extension_method_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "type_test_with_undefined_name",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/type_test_with_undefined_name",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'SimpleFormalParameter' isn't defined, so it can't be used in an 'is' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'SimpleFormalParameter'.",
+	"source": "dart",
+	"startLineNumber": 28,
+	"startColumn": 18,
+	"endLineNumber": 28,
+	"endColumn": 39,
+	"modelVersionId": 1,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/require_error_widget_extension_method_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "type_test_with_undefined_name",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/type_test_with_undefined_name",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'DefaultFormalParameter' isn't defined, so it can't be used in an 'is' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'DefaultFormalParameter'.",
+	"source": "dart",
+	"startLineNumber": 175,
+	"startColumn": 29,
+	"endLineNumber": 175,
+	"endColumn": 51,
+	"modelVersionId": 1,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/require_error_widget_extension_method_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "undefined_getter",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/undefined_getter",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The getter 'parameter' isn't defined for the type 'FormalParameter'.\nTry importing the library that defines 'parameter', correcting the name to the name of an existing getter, or defining a getter or field named 'parameter'.",
+	"source": "dart",
+	"startLineNumber": 175,
+	"startColumn": 61,
+	"endLineNumber": 175,
+	"endColumn": 70,
+	"modelVersionId": 1,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/require_error_widget_extension_method_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "type_test_with_undefined_name",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/type_test_with_undefined_name",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 8,
+	"message": "The name 'SimpleFormalParameter' isn't defined, so it can't be used in an 'is' expression.\nTry changing the name to the name of an existing type, or creating a type with the name 'SimpleFormalParameter'.",
+	"source": "dart",
+	"startLineNumber": 176,
+	"startColumn": 18,
+	"endLineNumber": 176,
+	"endColumn": 39,
+	"modelVersionId": 1,
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/require_error_widget_extension_method_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dead_code",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dead_code",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 4,
+	"message": "Dead code.\nTry removing the code, or fixing the code before it so that it can be reached.",
+	"source": "dart",
+	"startLineNumber": 27,
+	"startColumn": 11,
+	"endLineNumber": 27,
+	"endColumn": 17,
+	"modelVersionId": 1,
+	"tags": [
+		1
+	],
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/require_error_widget_extension_method_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dead_code",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dead_code",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 4,
+	"message": "Dead code.\nTry removing the code, or fixing the code before it so that it can be reached.",
+	"source": "dart",
+	"startLineNumber": 31,
+	"startColumn": 5,
+	"endLineNumber": 31,
+	"endColumn": 17,
+	"modelVersionId": 1,
+	"tags": [
+		1
+	],
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/require_error_widget_extension_method_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dead_code",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dead_code",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 4,
+	"message": "Dead code.\nTry removing the code, or fixing the code before it so that it can be reached.",
+	"source": "dart",
+	"startLineNumber": 175,
+	"startColumn": 73,
+	"endLineNumber": 175,
+	"endColumn": 79,
+	"modelVersionId": 1,
+	"tags": [
+		1
+	],
+	"origin": "extHost2"
+},{
+	"resource": "/d:/src/saropa_lints/test/rules/widget/require_error_widget_extension_method_test.dart",
+	"owner": "dartAnalysisLSP",
+	"code": {
+		"value": "dead_code",
+		"target": {
+			"$mid": 1,
+			"path": "/diagnostics/dead_code",
+			"scheme": "https",
+			"authority": "dart.dev"
+		}
+	},
+	"severity": 4,
+	"message": "Dead code.\nTry removing the code, or fixing the code before it so that it can be reached.",
+	"source": "dart",
+	"startLineNumber": 177,
+	"startColumn": 5,
+	"endLineNumber": 177,
+	"endColumn": 17,
+	"modelVersionId": 1,
+	"tags": [
+		1
+	],
+	"origin": "extHost2"
+}]

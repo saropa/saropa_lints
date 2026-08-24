@@ -41,7 +41,6 @@ class CompatVisitor extends SimpleAstVisitor<void> {
   void Function(ConstructorDeclaration)? onConstructorDeclaration;
   void Function(ContinueStatement)? onContinueStatement;
   void Function(DeclaredVariablePattern)? onDeclaredVariablePattern;
-  void Function(DefaultFormalParameter)? onDefaultFormalParameter;
   void Function(DoStatement)? onDoStatement;
   void Function(DoubleLiteral)? onDoubleLiteral;
   void Function(EnumConstantDeclaration)? onEnumConstantDeclaration;
@@ -75,7 +74,7 @@ class CompatVisitor extends SimpleAstVisitor<void> {
   void Function(MethodDeclaration)? onMethodDeclaration;
   void Function(MethodInvocation)? onMethodInvocation;
   void Function(MixinDeclaration)? onMixinDeclaration;
-  void Function(NamedExpression)? onNamedExpression;
+  void Function(NamedArgument)? onNamedArgument;
   void Function(NamedType)? onNamedType;
   void Function(NullCheckPattern)? onNullCheckPattern;
   void Function(ObjectPattern)? onObjectPattern;
@@ -91,7 +90,7 @@ class CompatVisitor extends SimpleAstVisitor<void> {
   void Function(ReturnStatement)? onReturnStatement;
   void Function(SetOrMapLiteral)? onSetOrMapLiteral;
   void Function(SimpleIdentifier)? onSimpleIdentifier;
-  void Function(SimpleFormalParameter)? onSimpleFormalParameter;
+  void Function(RegularFormalParameter)? onRegularFormalParameter;
   void Function(SimpleStringLiteral)? onSimpleStringLiteral;
   void Function(SpreadElement)? onSpreadElement;
   void Function(StringInterpolation)? onStringInterpolation;
@@ -157,9 +156,6 @@ class CompatVisitor extends SimpleAstVisitor<void> {
   @override
   void visitDeclaredVariablePattern(DeclaredVariablePattern node) =>
       onDeclaredVariablePattern?.call(node);
-  @override
-  void visitDefaultFormalParameter(DefaultFormalParameter node) =>
-      onDefaultFormalParameter?.call(node);
   @override
   void visitDoStatement(DoStatement node) => onDoStatement?.call(node);
   @override
@@ -251,8 +247,7 @@ class CompatVisitor extends SimpleAstVisitor<void> {
   void visitMixinDeclaration(MixinDeclaration node) =>
       onMixinDeclaration?.call(node);
   @override
-  void visitNamedExpression(NamedExpression node) =>
-      onNamedExpression?.call(node);
+  void visitNamedArgument(NamedArgument node) => onNamedArgument?.call(node);
   @override
   void visitNamedType(NamedType node) => onNamedType?.call(node);
   @override
@@ -294,8 +289,8 @@ class CompatVisitor extends SimpleAstVisitor<void> {
   void visitSimpleIdentifier(SimpleIdentifier node) =>
       onSimpleIdentifier?.call(node);
   @override
-  void visitSimpleFormalParameter(SimpleFormalParameter node) =>
-      onSimpleFormalParameter?.call(node);
+  void visitRegularFormalParameter(RegularFormalParameter node) =>
+      onRegularFormalParameter?.call(node);
   @override
   void visitSimpleStringLiteral(SimpleStringLiteral node) =>
       onSimpleStringLiteral?.call(node);

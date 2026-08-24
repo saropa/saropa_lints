@@ -87,12 +87,12 @@ class RequireWorkmanagerConstraintsRule extends SaropaLintRule {
         return;
       }
 
-      // Check for constraints parameter
-      final bool hasConstraints = node.argumentList.arguments.any((
-        Expression arg,
-      ) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'constraints';
+      // Analyzer 13: arguments returns NodeList<Argument>; parameter type
+      // must be Argument (not Expression). NamedExpression → NamedArgument,
+      // .name.label.name → .name.lexeme.
+      final bool hasConstraints = node.argumentList.arguments.any((arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'constraints';
         }
         return false;
       });
@@ -177,7 +177,9 @@ class RequireWorkmanagerResultReturnRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression callback = args.arguments.first;
+      // Analyzer 13: .arguments.first returns Argument; use
+      // .argumentExpression to get the underlying Expression value.
+      final Expression callback = args.arguments.first.argumentExpression;
       if (callback is! FunctionExpression) return;
 
       final FunctionBody body = callback.body;

@@ -31,10 +31,15 @@ class IncreaseFontSizeFix extends SaropaFixProducer {
 
     // Find the fontSize argument
     for (final arg in creation.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'fontSize') {
+      // analyzer 13 renamed NamedExpression -> NamedArgument: `.name` is now
+      // the Token directly (use `.lexeme`), and `.expression` -> `.argumentExpression`.
+      if (arg is NamedArgument && arg.name.lexeme == 'fontSize') {
         await builder.addDartFileEdit(file, (builder) {
           builder.addSimpleReplacement(
-            SourceRange(arg.expression.offset, arg.expression.length),
+            SourceRange(
+              arg.argumentExpression.offset,
+              arg.argumentExpression.length,
+            ),
             '12',
           );
         });

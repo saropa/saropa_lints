@@ -36,13 +36,16 @@ class ReplaceDateTimeConstructorFix extends SaropaFixProducer {
     final args = creation.argumentList.arguments;
     if (args.isEmpty) return;
 
-    for (final Expression arg in args) {
-      if (!_isSafeForInterpolation(arg)) return;
+    // analyzer 13: ArgumentList.arguments is NodeList<Argument>. DateTime()
+    // constructor args are always positional, so each Argument is an
+    // Expression directly (never a NamedArgument) — cast is safe here.
+    for (final Argument arg in args) {
+      if (!_isSafeForInterpolation(arg as Expression)) return;
     }
 
     final bool isUtc = creation.constructorName.name?.name == 'utc';
     final List<String> parts = <String>[];
-    for (final Expression arg in args) {
+    for (final Argument arg in args) {
       parts.add(arg.toSource());
     }
 

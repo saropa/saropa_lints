@@ -74,7 +74,7 @@ class RequireDioTimeoutRule extends SaropaLintRule {
       if (typeName != 'Dio') return;
 
       // Check if BaseOptions argument has timeout
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
 
       if (args.isEmpty) {
         // No options at all
@@ -238,7 +238,7 @@ class RequireDioInterceptorErrorHandlerRule extends SaropaLintRule {
       bool hasOnError = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'onError') {
+        if (arg is NamedArgument && arg.name.lexeme == 'onError') {
           hasOnError = true;
           break;
         }
@@ -314,7 +314,7 @@ class PreferDioCancelTokenRule extends SaropaLintRule {
       bool hasCancelToken = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'cancelToken') {
+        if (arg is NamedArgument && arg.name.lexeme == 'cancelToken') {
           hasCancelToken = true;
           break;
         }
@@ -403,7 +403,7 @@ class RequireDioSslPinningRule extends SaropaLintRule {
       if (!_dioTargetRegex.hasMatch(targetSource)) return;
 
       // Check URL argument for auth endpoints
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final String urlSource = args.first.toSource().toLowerCase();
@@ -773,7 +773,7 @@ class PreferDioBaseOptionsRule extends SaropaLintRule {
 
       // Check for options parameter
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'options') {
+        if (arg is NamedArgument && arg.name.lexeme == 'options') {
           dioRequestsWithOptions.add(node);
           break;
         }
@@ -992,7 +992,7 @@ class RequireDioResponseTypeRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       bool hasResponseType = false;
 
-      for (final Expression arg in args.arguments) {
+      for (final Argument arg in args.arguments) {
         final String argSource = arg.toSource();
         if (argSource.contains('responseType') ||
             argSource.contains('ResponseType')) {

@@ -66,6 +66,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+**BREAKING:** Minimum Dart SDK raised to >=3.13.0 (Flutter >=3.47.1). Projects on older SDKs must stay on saropa_lints 15.x.
+
+### Changed
+
+- **Breaking:** Migrated from `analyzer ^12.0.0` to `analyzer ^13.1.0` (`meta ^1.18.3`). Requires Dart >=3.13.0 / Flutter >=3.47.1. No action required beyond upgrading the host SDK.
+
 ### Added
 
 - New rule: `prefer_primary_constructor` (Professional, INFO) — flags classes eligible for Dart 3.13+ primary constructor syntax when the project's SDK lower bound is >=3.13.0. Reduces boilerplate for simple data classes that AI generators consistently produce in the verbose pre-3.13 form. No action required.

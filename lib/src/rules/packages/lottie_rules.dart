@@ -67,17 +67,20 @@ bool _isLottieFactory(MethodInvocation node, Set<String> methodNames) {
 }
 
 /// True when [argList] contains a named argument called [name].
+/// Migrated: NamedExpression → NamedArgument, .name.label.name → .name.lexeme
+/// (analyzer 13 API).
 bool _hasNamedArg(ArgumentList argList, String name) {
-  for (final Expression arg in argList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) return true;
+  for (final arg in argList.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) return true;
   }
   return false;
 }
 
-/// Returns the [NamedExpression] with [name] from [argList], or null.
-NamedExpression? _namedArg(ArgumentList argList, String name) {
-  for (final Expression arg in argList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) return arg;
+/// Returns the [NamedArgument] with [name] from [argList], or null.
+/// Migrated: NamedExpression → NamedArgument (analyzer 13 API).
+NamedArgument? _namedArg(ArgumentList argList, String name) {
+  for (final arg in argList.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) return arg;
   }
   return null;
 }
@@ -155,7 +158,8 @@ class LottieControllerMissingOnLoadedRule extends SaropaLintRule {
 
       // Only report when controller: is present — no controller means the
       // package self-manages the animation, so onLoaded: is optional.
-      final NamedExpression? controllerArg = _namedArg(args, 'controller');
+      // Migrated: NamedExpression → NamedArgument (analyzer 13 API).
+      final NamedArgument? controllerArg = _namedArg(args, 'controller');
       if (controllerArg == null) return;
 
       // onLoaded: present → developer is handling duration assignment.
@@ -303,13 +307,16 @@ class LottieFrameRateMaxWithoutRenderCacheRule extends SaropaLintRule {
 
       final ArgumentList args = node.argumentList;
 
-      final NamedExpression? frameRateArg = _namedArg(args, 'frameRate');
+      // Migrated: NamedExpression → NamedArgument (analyzer 13 API).
+      final NamedArgument? frameRateArg = _namedArg(args, 'frameRate');
       if (frameRateArg == null) return;
 
       // Only match the static member access `FrameRate.max`.
       // A variable holding FrameRate.max is not statically resolvable here;
       // the conservative approach is not to flag it (avoids FPs).
-      if (!_isPrefixedAccess(frameRateArg.expression, 'FrameRate', 'max')) {
+      // Migrated: .expression → .argumentExpression on NamedArgument
+      // (analyzer 13 API).
+      if (!_isPrefixedAccess(frameRateArg.argumentExpression, 'FrameRate', 'max')) {
         return;
       }
 
@@ -383,15 +390,18 @@ class LottieRenderCacheRasterLargeRiskRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (!_isLottieFactory(node, _lottieFactoryMethods)) return;
 
-      final NamedExpression? renderCacheArg = _namedArg(
+      // Migrated: NamedExpression → NamedArgument (analyzer 13 API).
+      final NamedArgument? renderCacheArg = _namedArg(
         node.argumentList,
         'renderCache',
       );
       if (renderCacheArg == null) return;
 
       // Only match the static member access `RenderCache.raster`.
+      // Migrated: .expression → .argumentExpression on NamedArgument
+      // (analyzer 13 API).
       if (!_isPrefixedAccess(
-        renderCacheArg.expression,
+        renderCacheArg.argumentExpression,
         'RenderCache',
         'raster',
       )) {
@@ -469,7 +479,8 @@ class LottieNetworkMissingBackgroundLoadingRule extends SaropaLintRule {
 
       final ArgumentList args = node.argumentList;
 
-      final NamedExpression? bgArg = _namedArg(args, 'backgroundLoading');
+      // Migrated: NamedExpression → NamedArgument (analyzer 13 API).
+      final NamedArgument? bgArg = _namedArg(args, 'backgroundLoading');
 
       // Absent backgroundLoading: → default false → UI-thread parse.
       if (bgArg == null) {
@@ -478,7 +489,9 @@ class LottieNetworkMissingBackgroundLoadingRule extends SaropaLintRule {
       }
 
       // Explicit backgroundLoading: false is as bad as omitting it.
-      final Expression value = bgArg.expression;
+      // Migrated: .expression → .argumentExpression on NamedArgument
+      // (analyzer 13 API).
+      final Expression value = bgArg.argumentExpression;
       if (value is BooleanLiteral && value.value == true) return;
 
       // Any other value (variable, false literal) → report at the argument.

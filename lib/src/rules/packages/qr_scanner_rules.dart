@@ -63,12 +63,14 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      final String paramName = node.name.label.name;
+    // analyzer 13: NamedExpression renamed to NamedArgument; name is now a
+    // Token (.lexeme) and the value getter is .argumentExpression.
+    context.addNamedArgument((NamedArgument node) {
+      final String paramName = node.name.lexeme;
       if (!_scanCallbacks.contains(paramName)) return;
 
       // Check if the callback contains feedback
-      final Expression value = node.expression;
+      final Expression value = node.argumentExpression;
       String callbackSource = '';
 
       if (value is FunctionExpression) {
@@ -89,7 +91,8 @@ class RequireQrScanFeedbackRule extends SaropaLintRule {
           callbackSource.contains('AudioPlayer');
 
       if (!hasFeedback) {
-        reporter.atNode(node.name, code);
+        // analyzer 13: node.name is now a Token, not an AstNode — use atToken.
+        reporter.atToken(node.name, code);
       }
     });
   }
@@ -292,12 +295,14 @@ class RequireQrContentValidationRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      final String paramName = node.name.label.name;
+    // analyzer 13: NamedExpression renamed to NamedArgument; name is now a
+    // Token (.lexeme) and the value getter is .argumentExpression.
+    context.addNamedArgument((NamedArgument node) {
+      final String paramName = node.name.lexeme;
       if (!_scanCallbacks.contains(paramName)) return;
 
       // Check the callback body
-      final Expression value = node.expression;
+      final Expression value = node.argumentExpression;
       String callbackSource = '';
 
       if (value is FunctionExpression) {
@@ -337,7 +342,8 @@ class RequireQrContentValidationRule extends SaropaLintRule {
           callbackSource.contains('startsWith("http');
 
       if (!hasValidation) {
-        reporter.atNode(node.name, code);
+        // analyzer 13: node.name is now a Token, not an AstNode — use atToken.
+        reporter.atToken(node.name, code);
       }
     });
 
@@ -346,8 +352,9 @@ class RequireQrContentValidationRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (!_dangerousMethods.contains(methodName)) return;
 
-      // Check if any argument references barcode/rawValue directly
-      for (final Expression arg in node.argumentList.arguments) {
+      // Check if any argument references barcode/rawValue directly.
+      // analyzer 13: arguments is NodeList<Argument>, not List<Expression>.
+      for (final Argument arg in node.argumentList.arguments) {
         final String argSource = arg.toSource();
         if (argSource.contains('rawValue') ||
             argSource.contains('barcode') ||

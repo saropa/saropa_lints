@@ -349,9 +349,11 @@ class _CountingGradientVisitor extends GeneralizingAstVisitor<void> {
 
   @override
   void visitFunctionExpression(FunctionExpression node) {
+    // Analyzer 13 migration: NamedExpression → NamedArgument,
+    // .name.label.name → .name.lexeme
     final AstNode? parent = node.parent;
-    if (parent is NamedExpression) {
-      final String argName = parent.name.label.name;
+    if (parent is NamedArgument) {
+      final String argName = parent.name.lexeme;
 
       // Gate 1: paint-time callbacks (e.g. shaderCallback)
       if (_paintTimeCallbackNames.contains(argName)) {
@@ -366,10 +368,11 @@ class _CountingGradientVisitor extends GeneralizingAstVisitor<void> {
     super.visitFunctionExpression(node);
   }
 
-  /// Checks whether a builder: NamedExpression belongs to an animation widget.
+  /// Checks whether a builder: NamedArgument belongs to an animation widget.
   /// Handles both InstanceCreationExpression (resolved) and MethodInvocation
   /// (how parseString emits implicit-new calls without type resolution).
-  static bool _isAnimationBuilderArg(NamedExpression namedExpr) {
+  /// Analyzer 13 migration: NamedExpression → NamedArgument
+  static bool _isAnimationBuilderArg(NamedArgument namedExpr) {
     final AstNode? argList = namedExpr.parent;
     if (argList is! ArgumentList) return false;
     final AstNode? call = argList.parent;
@@ -425,7 +428,8 @@ class _CountingGradientVisitor extends GeneralizingAstVisitor<void> {
     while (current != null) {
       if (current is FunctionExpression) {
         final AstNode? parent = current.parent;
-        if (parent is NamedExpression && parent.name.label.name == 'builder') {
+        // Analyzer 13 migration: NamedExpression → NamedArgument
+        if (parent is NamedArgument && parent.name.lexeme == 'builder') {
           closure = current;
           break;
         }

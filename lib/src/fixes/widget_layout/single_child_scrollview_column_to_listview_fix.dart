@@ -30,11 +30,13 @@ class SingleChildScrollViewColumnToListViewFix extends SaropaFixProducer {
       return;
     }
 
+    // Migrated: NamedExpression → NamedArgument, .name.label.name → .name.lexeme,
+    // .expression → .argumentExpression (analyzer 13 API).
     InstanceCreationExpression? column;
     for (final arg in scroll.argumentList.arguments) {
-      if (arg is! NamedExpression) continue;
-      if (arg.name.label.name != 'child') continue;
-      final ex = arg.expression;
+      if (arg is! NamedArgument) continue;
+      if (arg.name.lexeme != 'child') continue;
+      final ex = arg.argumentExpression;
       if (ex is InstanceCreationExpression &&
           ex.constructorName.type.name.lexeme == 'Column') {
         column = ex;
@@ -45,9 +47,9 @@ class SingleChildScrollViewColumnToListViewFix extends SaropaFixProducer {
 
     ListLiteral? childrenList;
     for (final arg in column.argumentList.arguments) {
-      if (arg is! NamedExpression) continue;
-      if (arg.name.label.name != 'children') continue;
-      final ex = arg.expression;
+      if (arg is! NamedArgument) continue;
+      if (arg.name.lexeme != 'children') continue;
+      final ex = arg.argumentExpression;
       if (ex is ListLiteral) childrenList = ex;
       break;
     }
@@ -55,10 +57,10 @@ class SingleChildScrollViewColumnToListViewFix extends SaropaFixProducer {
 
     final otherArgs = <String>[];
     for (final arg in scroll.argumentList.arguments) {
-      if (arg is! NamedExpression) continue;
-      final n = arg.name.label.name;
+      if (arg is! NamedArgument) continue;
+      final n = arg.name.lexeme;
       if (n == 'child' || n == 'children') continue;
-      otherArgs.add('$n: ${arg.expression.toSource()}');
+      otherArgs.add('$n: ${arg.argumentExpression.toSource()}');
     }
     final prefix = otherArgs.isEmpty ? '' : '${otherArgs.join(', ')}, ';
     final replacement =

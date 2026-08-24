@@ -176,9 +176,9 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
       String? hintText;
       bool hasKeyboardType = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
 
           if (name == 'keyboardType') {
             hasKeyboardType = true;
@@ -186,20 +186,20 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
 
           if (name == 'decoration') {
             // Extract label/hint from InputDecoration
-            final Expression decorationExpr = arg.expression;
+            final Expression decorationExpr = arg.argumentExpression;
             if (decorationExpr is InstanceCreationExpression) {
-              for (final Expression decorArg
+              for (final Argument decorArg
                   in decorationExpr.argumentList.arguments) {
-                if (decorArg is NamedExpression) {
-                  final String decorName = decorArg.name.label.name;
+                if (decorArg is NamedArgument) {
+                  final String decorName = decorArg.name.lexeme;
                   if (decorName == 'labelText') {
-                    final Expression labelExpr = decorArg.expression;
+                    final Expression labelExpr = decorArg.argumentExpression;
                     if (labelExpr is SimpleStringLiteral) {
                       labelText = labelExpr.value.toLowerCase();
                     }
                   }
                   if (decorName == 'hintText') {
-                    final Expression hintExpr = decorArg.expression;
+                    final Expression hintExpr = decorArg.argumentExpression;
                     if (hintExpr is SimpleStringLiteral) {
                       hintText = hintExpr.value.toLowerCase();
                     }
@@ -294,8 +294,8 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
 
       // Check if Text has overflow specified
       bool hasOverflow = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'overflow') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'overflow') {
           hasOverflow = true;
           break;
         }
@@ -402,29 +402,29 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
       String? hintText;
       bool hasObscureText = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
 
           if (name == 'obscureText') {
             hasObscureText = true;
           }
 
           if (name == 'decoration') {
-            final Expression decorationExpr = arg.expression;
+            final Expression decorationExpr = arg.argumentExpression;
             if (decorationExpr is InstanceCreationExpression) {
-              for (final Expression decorArg
+              for (final Argument decorArg
                   in decorationExpr.argumentList.arguments) {
-                if (decorArg is NamedExpression) {
-                  final String decorName = decorArg.name.label.name;
+                if (decorArg is NamedArgument) {
+                  final String decorName = decorArg.name.lexeme;
                   if (decorName == 'labelText') {
-                    final Expression labelExpr = decorArg.expression;
+                    final Expression labelExpr = decorArg.argumentExpression;
                     if (labelExpr is SimpleStringLiteral) {
                       labelText = labelExpr.value.toLowerCase();
                     }
                   }
                   if (decorName == 'hintText') {
-                    final Expression hintExpr = decorArg.expression;
+                    final Expression hintExpr = decorArg.argumentExpression;
                     if (hintExpr is SimpleStringLiteral) {
                       hintText = hintExpr.value.toLowerCase();
                     }
@@ -535,15 +535,15 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
       if (typeName != 'TextFormField') return;
 
       // Find validator argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'validator') {
-          final String validatorSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'validator') {
+          final String validatorSource = arg.argumentExpression.toSource();
 
           // Check for return statements with string literals
           // Simple pattern: check for short generic messages
           for (final RegExp pattern in _genericMessagePatterns) {
             if (pattern.hasMatch(validatorSource)) {
-              reporter.atNode(arg.name, code);
+              reporter.atToken(arg.name, code);
               return;
             }
           }
@@ -620,8 +620,8 @@ class RequireFormKeyRule extends SaropaLintRule {
 
       // Check if key argument exists
       bool hasKey = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'key') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'key') {
           hasKey = true;
           break;
         }
@@ -721,11 +721,11 @@ class _ValidatorVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'validator') {
-        final String exprSource = arg.expression.toSource();
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'validator') {
+        final String exprSource = arg.argumentExpression.toSource();
         if (_validatorDangerPatterns.any((re) => re.hasMatch(exprSource))) {
-          reporter.atNode(arg.name, code);
+          reporter.atToken(arg.name, code);
         }
       }
     }
@@ -803,12 +803,12 @@ class RequireSubmitButtonStateRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_buttonTypePattern.hasMatch(typeName)) return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'onPressed') {
-          final String exprSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'onPressed') {
+          final String exprSource = arg.argumentExpression.toSource();
           if (_asyncPattern.hasMatch(exprSource) &&
               !_loadingIndicatorPatterns.any((re) => re.hasMatch(exprSource))) {
-            reporter.atNode(arg.name, code);
+            reporter.atToken(arg.name, code);
           }
         }
       }
@@ -1135,9 +1135,9 @@ class RequireFormFieldControllerRule extends SaropaLintRule {
       bool hasOnSaved = false;
       bool hasInitialValue = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'controller') hasController = true;
           if (name == 'onSaved') hasOnSaved = true;
           if (name == 'initialValue') hasInitialValue = true;
@@ -1214,11 +1214,11 @@ class AvoidFormInAlertDialogRule extends SaropaLintRule {
       if (typeName != 'AlertDialog' && typeName != 'SimpleDialog') return;
 
       // Check if content contains Form
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'content') {
-          final String contentSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'content') {
+          final String contentSource = arg.argumentExpression.toSource();
           if (contentSource.contains('Form(')) {
-            reporter.atNode(arg.name, code);
+            reporter.atToken(arg.name, code);
           }
         }
       }
@@ -1287,9 +1287,9 @@ class RequireKeyboardActionTypeRule extends SaropaLintRule {
 
       // Check for textInputAction parameter
       bool hasTextInputAction = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'textInputAction') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument &&
+            arg.name.lexeme == 'textInputAction') {
           hasTextInputAction = true;
           break;
         }
@@ -1366,9 +1366,9 @@ class RequireKeyboardDismissOnScrollRule extends SaropaLintRule {
 
       // Check for keyboardDismissBehavior parameter
       bool hasKeyboardDismissBehavior = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'keyboardDismissBehavior') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument &&
+            arg.name.lexeme == 'keyboardDismissBehavior') {
           hasKeyboardDismissBehavior = true;
           break;
         }
@@ -1665,9 +1665,9 @@ class RequireFormAutoValidateModeRule extends SaropaLintRule {
 
       // Check if autovalidateMode argument exists
       bool hasAutovalidateMode = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'autovalidateMode') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument &&
+            arg.name.lexeme == 'autovalidateMode') {
           hasAutovalidateMode = true;
           break;
         }
@@ -1744,8 +1744,8 @@ class RequireAutofillHintsRule extends SaropaLintRule {
 
       // Check for autofillHints parameter
       bool hasAutofillHints = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'autofillHints') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'autofillHints') {
           hasAutofillHints = true;
           break;
         }
@@ -1824,9 +1824,9 @@ class PreferOnFieldSubmittedRule extends SaropaLintRule {
 
       // Check for onFieldSubmitted or onSubmitted parameter
       bool hasOnSubmitted = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'onFieldSubmitted' || name == 'onSubmitted') {
             hasOnSubmitted = true;
             break;
@@ -2146,14 +2146,14 @@ class PreferRegexValidationRule extends SaropaLintRule {
       String? labelText;
       String? validatorSource;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
 
-        final String paramName = arg.name.label.name;
+        final String paramName = arg.name.lexeme;
 
         // Get label/hint text
         if (paramName == 'decoration') {
-          final String decorationSource = arg.expression
+          final String decorationSource = arg.argumentExpression
               .toSource()
               .toLowerCase();
           for (final String label in _structuredDataLabels) {
@@ -2166,7 +2166,7 @@ class PreferRegexValidationRule extends SaropaLintRule {
 
         // Get validator
         if (paramName == 'validator') {
-          validatorSource = arg.expression.toSource();
+          validatorSource = arg.argumentExpression.toSource();
         }
       }
 
@@ -2258,12 +2258,12 @@ class PreferInputFormattersRule extends SaropaLintRule {
       bool hasStructuredKeyboard = false;
       bool hasInputFormatters = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        final String paramName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
+        final String paramName = arg.name.lexeme;
 
         if (paramName == 'keyboardType') {
-          final String value = arg.expression.toSource();
+          final String value = arg.argumentExpression.toSource();
           if (_structuredKeyboardTypes.any(value.contains)) {
             hasStructuredKeyboard = true;
           }
@@ -2465,8 +2465,8 @@ class AvoidFormValidationOnChangeRule extends SaropaLintRule {
       // Walk up to find if we're inside an onChanged callback
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is NamedExpression &&
-            current.name.label.name == 'onChanged') {
+        if (current is NamedArgument &&
+            current.name.lexeme == 'onChanged') {
           reporter.atNode(node);
           return;
         }

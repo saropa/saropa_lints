@@ -329,9 +329,21 @@ class NoMagicNumberRule extends SaropaLintRule {
 
   /// Returns true if the literal is a default value for a named or optional
   /// parameter. The parameter name provides context, making it not "magic."
+  ///
+  /// analyzer 13: DefaultFormalParameter removed; each FormalParameter now
+  /// carries .defaultClause (FormalParameterDefaultClause?). Walk up from
+  /// the literal to find the enclosing FormalParameter with a default clause.
   static bool _isDefaultParameterValue(AstNode node) {
-    final AstNode? parent = node.parent;
-    return parent is DefaultFormalParameter;
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (current is FormalParameter) {
+        return current.defaultClause != null;
+      }
+      // Stop at function/class boundaries to avoid false positives.
+      if (current is FunctionBody || current is ClassDeclaration) return false;
+      current = current.parent;
+    }
+    return false;
   }
 }
 

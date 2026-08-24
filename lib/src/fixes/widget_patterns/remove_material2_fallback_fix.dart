@@ -23,9 +23,10 @@ class RemoveMaterial2FallbackFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final target = node is NamedExpression
+    // analyzer 13 renamed NamedExpression -> NamedArgument (no deprecated alias).
+    final target = node is NamedArgument
         ? node
-        : node.thisOrAncestorOfType<NamedExpression>();
+        : node.thisOrAncestorOfType<NamedArgument>();
     if (target == null) return;
 
     await builder.addDartFileEdit(file, (builder) {

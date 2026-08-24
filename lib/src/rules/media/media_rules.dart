@@ -70,13 +70,15 @@ class AvoidAutoplayAudioRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      if (node.name.label.name != 'autoPlay' &&
-          node.name.label.name != 'autoplay') {
+    // analyzer 13: addNamedExpression → addNamedArgument, NamedExpression → NamedArgument,
+    // .name.label.name → .name.lexeme, .expression → .argumentExpression
+    context.addNamedArgument((NamedArgument node) {
+      if (node.name.lexeme != 'autoPlay' &&
+          node.name.lexeme != 'autoplay') {
         return;
       }
 
-      final Expression value = node.expression;
+      final Expression value = node.argumentExpression;
       if (value is BooleanLiteral && value.value) {
         reporter.atNode(node);
       }

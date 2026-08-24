@@ -192,11 +192,13 @@ class AvoidTooManyDependenciesRule extends SaropaLintRule {
     });
   }
 
+  // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter and
+  // removed the DefaultFormalParameter wrapper node -- the default value is
+  // now exposed directly via `.defaultClause` on the parameter itself, so
+  // there is no wrapped inner parameter to recurse into.
   String? _getParameterTypeName(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
+    if (param is RegularFormalParameter) {
       return param.type?.toSource();
-    } else if (param is DefaultFormalParameter) {
-      return _getParameterTypeName(param.parameter);
     } else if (param is FieldFormalParameter) {
       return param.type?.toSource();
     }
@@ -405,11 +407,13 @@ class PreferAbstractDependenciesRule extends SaropaLintRule {
     });
   }
 
+  // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter and
+  // removed the DefaultFormalParameter wrapper node -- the default value is
+  // now exposed directly via `.defaultClause` on the parameter itself, so
+  // there is no wrapped inner parameter to recurse into.
   String? _getParameterTypeName(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
+    if (param is RegularFormalParameter) {
       return param.type?.toSource();
-    } else if (param is DefaultFormalParameter) {
-      return _getParameterTypeName(param.parameter);
     } else if (param is FieldFormalParameter) {
       return param.type?.toSource();
     }
@@ -490,7 +494,7 @@ class AvoidSingletonForScopedDependenciesRule extends SaropaLintRule {
 
       if (methodName != 'registerSingleton') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final String argSource = args.first.toSource();
@@ -585,11 +589,13 @@ class AvoidCircularDiDependenciesRule extends SaropaLintRule {
     });
   }
 
+  // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter and
+  // removed the DefaultFormalParameter wrapper node -- the default value is
+  // now exposed directly via `.defaultClause` on the parameter itself, so
+  // there is no wrapped inner parameter to recurse into.
   String? _getParameterTypeName(FormalParameter param) {
-    if (param is SimpleFormalParameter) {
+    if (param is RegularFormalParameter) {
       return param.type?.toSource();
-    } else if (param is DefaultFormalParameter) {
-      return _getParameterTypeName(param.parameter);
     } else if (param is FieldFormalParameter) {
       return param.type?.toSource();
     }
@@ -848,9 +854,11 @@ class AvoidFunctionsInRegisterSingletonRule extends SaropaLintRule {
 
       // Get the first positional argument
       Expression? firstArg;
-      for (final Expression arg in args.arguments) {
-        if (arg is! NamedExpression) {
-          firstArg = arg;
+      for (final Argument arg in args.arguments) {
+        if (arg is! NamedArgument) {
+          // A positional argument is itself the Expression (unlike
+          // NamedArgument, which wraps one via .argumentExpression).
+          firstArg = arg as Expression;
           break;
         }
       }
@@ -941,9 +949,9 @@ class RequireDefaultConfigRule extends SaropaLintRule {
 
       // Check if a default/fallback is provided
       final ArgumentList args = node.argumentList;
-      final bool hasDefault = args.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      final bool hasDefault = args.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           return name == 'fallback' ||
               name == 'defaultValue' ||
               name == 'orElse';
@@ -1115,13 +1123,11 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
     final FormalParameter param = params.parameters.first;
     String? typeStr;
 
-    if (param is SimpleFormalParameter) {
+    // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter
+    // and removed the DefaultFormalParameter wrapper; the type is read
+    // directly off the parameter regardless of whether it has a default.
+    if (param is RegularFormalParameter) {
       typeStr = param.type?.toSource();
-    } else if (param is DefaultFormalParameter) {
-      final innerParam = param.parameter;
-      if (innerParam is SimpleFormalParameter) {
-        typeStr = innerParam.type?.toSource();
-      }
     }
 
     if (typeStr != null) {
@@ -1154,13 +1160,11 @@ class PreferConstructorInjectionRule extends SaropaLintRule {
     for (final FormalParameter param in params.parameters) {
       String? typeStr;
 
-      if (param is SimpleFormalParameter) {
+      // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter
+      // and removed the DefaultFormalParameter wrapper; the type is read
+      // directly off the parameter regardless of whether it has a default.
+      if (param is RegularFormalParameter) {
         typeStr = param.type?.toSource();
-      } else if (param is DefaultFormalParameter) {
-        final innerParam = param.parameter;
-        if (innerParam is SimpleFormalParameter) {
-          typeStr = innerParam.type?.toSource();
-        }
       }
 
       if (typeStr != null) {
@@ -1519,13 +1523,11 @@ class PreferAbstractionInjectionRule extends SaropaLintRule {
       for (final FormalParameter param in params.parameters) {
         String? typeStr;
 
-        if (param is SimpleFormalParameter) {
+        // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter
+        // and removed the DefaultFormalParameter wrapper; the type is read
+        // directly off the parameter regardless of whether it has a default.
+        if (param is RegularFormalParameter) {
           typeStr = param.type?.toSource();
-        } else if (param is DefaultFormalParameter) {
-          final innerParam = param.parameter;
-          if (innerParam is SimpleFormalParameter) {
-            typeStr = innerParam.type?.toSource();
-          }
         } else if (param is FieldFormalParameter) {
           typeStr = param.type?.toSource();
         }
@@ -1618,7 +1620,7 @@ class PreferLazySingletonRegistrationRule extends SaropaLintRule {
       if (node.methodName.name != 'registerSingleton') return;
 
       // Check arguments for potentially expensive services
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final String argSource = args.first.toSource();

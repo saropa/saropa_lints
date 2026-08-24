@@ -596,8 +596,13 @@ class AvoidMixingNamedAndPositionalFieldsRule extends SaropaLintRule {
       bool hasPositional = false;
       bool hasNamed = false;
 
-      for (final Expression field in node.fields) {
-        if (field is NamedExpression) {
+      // analyzer 13: RecordLiteral.fields is NodeList<RecordLiteralField>.
+      // Named fields inside a record literal are RecordLiteralNamedField
+      // (NOT NamedArgument/NamedExpression — that rename only applies to
+      // ArgumentList.arguments); RecordLiteralNamedField still exposes
+      // `.expression` unchanged.
+      for (final RecordLiteralField field in node.fields) {
+        if (field is RecordLiteralNamedField) {
           hasNamed = true;
         } else {
           hasPositional = true;

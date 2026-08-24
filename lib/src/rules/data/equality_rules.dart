@@ -438,7 +438,9 @@ class NoEqualArgumentsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addArgumentList((ArgumentList node) {
-      final List<Expression> args = node.arguments.toList();
+      // analyzer 13: ArgumentList.arguments is NodeList<Argument>, not
+      // List<Expression> — named args no longer implement Expression.
+      final List<Argument> args = node.arguments.toList();
       if (args.length < 2) return;
 
       // Constructors/factories where equal positional arguments are
@@ -452,9 +454,10 @@ class NoEqualArgumentsRule extends SaropaLintRule {
 
       // Check positional arguments for duplicates
       final Set<String> seen = <String>{};
-      for (final Expression arg in args) {
-        // Skip named arguments for this check
-        if (arg is NamedExpression) continue;
+      for (final Argument arg in args) {
+        // Skip named arguments for this check.
+        // analyzer 13: NamedExpression renamed to NamedArgument.
+        if (arg is NamedArgument) continue;
 
         // Skip numeric literals - it's common to have Alignment(0.7, 0.7),
         // Offset(10, 10), Size(100, 100), etc.

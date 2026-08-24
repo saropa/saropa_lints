@@ -765,14 +765,17 @@ class PreferSuperParametersRule extends SaropaLintRule {
         if (initializer is SuperConstructorInvocation) {
           // Check if any arguments just pass through a parameter
           for (final arg in initializer.argumentList.arguments) {
-            if (arg is NamedExpression) {
-              final expr = arg.expression;
+            if (arg is NamedArgument) {
+              // analyzer 13: NamedExpression renamed to NamedArgument;
+              // value getter renamed from `.expression` to `.argumentExpression`.
+              final expr = arg.argumentExpression;
               if (expr is SimpleIdentifier) {
                 // Check if this identifier matches a constructor parameter
                 for (final param in node.parameters.parameters) {
                   final paramName = param.name?.lexeme;
                   if (paramName == expr.name &&
-                      arg.name.label.name == paramName) {
+                      // analyzer 13: NamedArgument.name is a Token; use .lexeme directly.
+                      arg.name.lexeme == paramName) {
                     reporter.atNode(arg);
                   }
                 }

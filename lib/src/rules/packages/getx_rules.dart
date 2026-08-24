@@ -250,9 +250,9 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
 
       // Check for permanent: true argument
       bool hasPermanent = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'permanent') {
-          final Expression value = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'permanent') {
+          final Expression value = arg.argumentExpression;
           if (value is BooleanLiteral && value.value == true) {
             hasPermanent = true;
             break;
@@ -283,8 +283,8 @@ class RequireGetxPermanentCleanupRule extends SaropaLintRule {
       // Get the type being put
       String? controllerType;
       if (node.argumentList.arguments.isNotEmpty) {
-        final Expression firstArg = node.argumentList.arguments.first;
-        if (firstArg is! NamedExpression) {
+        final Argument firstArg = node.argumentList.arguments.first;
+        if (firstArg is! NamedArgument) {
           final String argSource = firstArg.toSource();
           // Try to extract type from constructor call
           final RegExpMatch? match = _typePattern.firstMatch(argSource);
@@ -663,10 +663,10 @@ class RequireGetxBindingRoutesRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       bool hasBinding = false;
 
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'binding' ||
-              arg.name.label.name == 'bindings') {
+      for (final Argument arg in args.arguments) {
+        if (arg is NamedArgument) {
+          if (arg.name.lexeme == 'binding' ||
+              arg.name.lexeme == 'bindings') {
             hasBinding = true;
             break;
           }

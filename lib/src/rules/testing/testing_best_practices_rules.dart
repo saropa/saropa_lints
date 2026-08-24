@@ -126,9 +126,11 @@ class RequireTestAssertionsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      // Get the test body (second argument, usually a function)
+      // Get the test body (second argument, usually a function).
+      // analyzer 13: ArgumentList.arguments is NodeList<Argument>; positional
+      // args are still Expression (Expression implements Argument), so cast.
       final Expression? bodyArg = args.arguments.length >= 2
-          ? args.arguments[1]
+          ? args.arguments[1] as Expression
           : null;
 
       if (bodyArg == null) return;
@@ -233,7 +235,9 @@ class AvoidVagueTestDescriptionsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      // analyzer 13: ArgumentList.arguments is NodeList<Argument>; positional
+      // args are still Expression instances at runtime, so this cast is safe.
+      final Expression firstArg = args.arguments.first as Expression;
       if (firstArg is! StringLiteral) return;
 
       final String? description = firstArg.stringValue?.toLowerCase();
@@ -353,8 +357,10 @@ class AvoidRealNetworkCallsInTestsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
+      // analyzer 13: index-1 is the positional test body closure, so it is
+      // always an Expression at runtime despite the NodeList<Argument> type.
       final Expression? bodyArg = args.arguments.length >= 2
-          ? args.arguments[1]
+          ? args.arguments[1] as Expression
           : null;
 
       if (bodyArg == null) return;
@@ -642,8 +648,10 @@ class RequirePumpAfterInteractionRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
+      // analyzer 13: index-1 is the positional test body closure, so it is
+      // always an Expression at runtime despite the NodeList<Argument> type.
       final Expression? bodyArg = args.arguments.length >= 2
-          ? args.arguments[1]
+          ? args.arguments[1] as Expression
           : null;
 
       if (bodyArg == null) return;
@@ -1100,7 +1108,9 @@ class AvoidFindByTextRule extends SaropaLintRule {
       if (!_interactionMethods.contains(methodName)) return;
 
       // Check if any argument uses find.text()
-      for (final Expression arg in node.argumentList.arguments) {
+      // analyzer 13: arguments is NodeList<Argument>; loop over Argument and
+      // narrow with `is MethodInvocation` (Expression subtypes still match).
+      for (final Argument arg in node.argumentList.arguments) {
         if (arg is MethodInvocation) {
           if (arg.methodName.name == 'text') {
             final Expression? target = arg.target;
@@ -1203,9 +1213,11 @@ class RequireTestKeysRule extends SaropaLintRule {
       if (!_interactiveWidgets.contains(typeName)) return;
 
       // Check if key is provided
+      // analyzer 13: NamedExpression -> NamedArgument, arguments is now
+      // NodeList<Argument>, and the argument name is a Token (.name.lexeme).
       bool hasKey = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'key') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'key') {
           hasKey = true;
           break;
         }
@@ -1301,7 +1313,9 @@ class RequireArrangeActAssertRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression bodyArg = args.arguments[1];
+      // analyzer 13: index-1 is the positional test body closure, so it is
+      // always an Expression at runtime despite the NodeList<Argument> type.
+      final Expression bodyArg = args.arguments[1] as Expression;
 
       final String bodySource = bodyArg.toSource();
 
@@ -1665,7 +1679,9 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression matcher = args.arguments[1];
+      // analyzer 13: expect(actual, matcher, ...) args are positional, so
+      // they are Expression instances at runtime despite the Argument type.
+      final Expression matcher = args.arguments[1] as Expression;
 
       // Check for literal booleans
       if (matcher is BooleanLiteral) {
@@ -1680,7 +1696,7 @@ class PreferMatcherOverEqualsRule extends SaropaLintRule {
       }
 
       // Check for .length comparisons
-      final Expression actual = args.arguments.first;
+      final Expression actual = args.arguments.first as Expression;
       if (actual is PrefixedIdentifier && actual.identifier.name == 'length') {
         reporter.atNode(node);
       }
@@ -1789,7 +1805,9 @@ class PreferTestWrapperRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression widget = args.arguments.first;
+      // analyzer 13: the widget passed to pumpWidget() is positional, so it
+      // is an Expression instance at runtime despite the Argument type.
+      final Expression widget = args.arguments.first as Expression;
       final String widgetSource = widget.toSource();
 
       // Skip teardown patterns - simple widgets used to unmount before disposal
@@ -1825,10 +1843,12 @@ class PreferTestWrapperRule extends SaropaLintRule {
       if (args.isEmpty) return true;
 
       // If only has simple args like width/height, it's likely teardown
+      // analyzer 13: NamedExpression -> NamedArgument; the name is a Token
+      // (.name.lexeme) rather than a Label with a nested SimpleIdentifier.
       if (typeName == 'SizedBox' || typeName == 'Container') {
         final bool hasOnlySimpleArgs = args.every((arg) {
-          if (arg is NamedExpression) {
-            final name = arg.name.label.name;
+          if (arg is NamedArgument) {
+            final name = arg.name.lexeme;
             return name == 'width' ||
                 name == 'height' ||
                 name == 'key' ||
@@ -1920,7 +1940,9 @@ class RequireScreenSizeTestsRule extends SaropaLintRule {
       if (args.arguments.length < 2) return;
 
       // Get the test name
-      final Expression nameArg = args.arguments.first;
+      // analyzer 13: the test description is a positional Expression at
+      // runtime despite the Argument static type on NodeList<Argument>.
+      final Expression nameArg = args.arguments.first as Expression;
       if (nameArg is! StringLiteral) return;
       final String? testName = nameArg.stringValue?.toLowerCase();
       if (testName == null) return;
@@ -2163,7 +2185,9 @@ class RequireGoldenTestRule extends SaropaLintRule {
       if (args.arguments.isEmpty) return;
 
       // Get the test name
-      final Expression nameArg = args.arguments.first;
+      // analyzer 13: the test description is a positional Expression at
+      // runtime despite the Argument static type on NodeList<Argument>.
+      final Expression nameArg = args.arguments.first as Expression;
       if (nameArg is! StringLiteral) return;
       final String? testName = nameArg.stringValue?.toLowerCase();
       if (testName == null) return;
@@ -2316,7 +2340,9 @@ class AvoidFlakyTestsRule extends SaropaLintRule {
       if (args.arguments.length < 2) return;
 
       // Get the test body
-      final Expression bodyArg = args.arguments[1];
+      // analyzer 13: index-1 is the positional test body closure, so it is
+      // always an Expression at runtime despite the NodeList<Argument> type.
+      final Expression bodyArg = args.arguments[1] as Expression;
       final String bodySource = bodyArg.toSource();
 
       // Skip if test has safe patterns (mocking in place; word-boundary)
@@ -2549,7 +2575,10 @@ class AvoidFindAllRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression typeArg = args.arguments.first;
+      // analyzer 13: the type-argument-like arg to find.byType() is
+      // positional, so it is an Expression at runtime despite the
+      // NodeList<Argument> static type.
+      final Expression typeArg = args.arguments.first as Expression;
       final String typeSource = typeArg.toSource();
 
       if (_genericTypes.contains(typeSource)) {
@@ -4059,10 +4088,15 @@ class RequireTestDocumentationRule extends SaropaLintRule {
       if (methodName != 'testWidgets' && methodName != 'test') return;
 
       // Get the test body
-      final NodeList<Expression> args = node.argumentList.arguments;
+      // analyzer 13: ArgumentList.arguments is NodeList<Argument>, not
+      // NodeList<Expression>; retype and cast index-1 (the positional
+      // closure) back to Expression before the FunctionExpression check.
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.length < 2) return;
 
-      final Expression? testBody = args.length >= 2 ? args[1] : null;
+      final Expression? testBody = args.length >= 2
+          ? args[1] as Expression
+          : null;
       if (testBody is! FunctionExpression) return;
 
       final FunctionBody body = testBody.body;

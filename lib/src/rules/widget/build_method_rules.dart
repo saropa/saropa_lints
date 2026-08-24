@@ -126,8 +126,8 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
     // and per-frame animation values) would be flagged with a correction
     // message that is impossible to satisfy.
     final AstNode? parent = node.parent;
-    if (parent is NamedExpression) {
-      final String argName = parent.name.label.name;
+    if (parent is NamedArgument) {
+      final String argName = parent.name.lexeme;
 
       // Gate 1: paint-time callbacks (e.g. shaderCallback)
       if (_paintTimeCallbackNames.contains(argName)) {
@@ -144,14 +144,14 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
     super.visitFunctionExpression(node);
   }
 
-  /// Checks whether a `builder:` [NamedExpression] belongs to a constructor
+  /// Checks whether a `builder:` [NamedArgument] belongs to a constructor
   /// call for a known animation builder widget.
   ///
   /// Handles both [InstanceCreationExpression] (resolved / `const` / `new`)
   /// and [MethodInvocation] (how the parser represents implicit-`new`
   /// constructor calls before type resolution).
-  static bool _isAnimationBuilderArg(NamedExpression namedExpr) {
-    // Walk up: NamedExpression → ArgumentList → constructor/call
+  static bool _isAnimationBuilderArg(NamedArgument namedExpr) {
+    // Walk up: NamedArgument → ArgumentList → constructor/call
     final AstNode? argList = namedExpr.parent;
     if (argList is! ArgumentList) return false;
     final AstNode? call = argList.parent;
@@ -242,7 +242,7 @@ class _GradientVisitor extends GeneralizingAstVisitor<void> {
     while (current != null) {
       if (current is FunctionExpression) {
         final AstNode? parent = current.parent;
-        if (parent is NamedExpression && parent.name.label.name == 'builder') {
+        if (parent is NamedArgument && parent.name.lexeme == 'builder') {
           return current;
         }
       }
@@ -404,8 +404,8 @@ class _DialogVisitor extends RecursiveAstVisitor<void> {
       if (current is FunctionExpression) {
         // Check if this is a callback parameter
         final parent = current.parent;
-        if (parent is NamedExpression) {
-          final String name = parent.name.label.name;
+        if (parent is NamedArgument) {
+          final String name = parent.name.lexeme;
           if (_callbackNames.contains(name)) {
             return true;
           }
@@ -1291,8 +1291,7 @@ class PreferForLoopInChildrenRule extends SaropaLintRule {
       // Check if inside a children argument
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is NamedExpression &&
-            current.name.label.name == 'children') {
+        if (current is NamedArgument && current.name.lexeme == 'children') {
           reporter.atNode(node);
           return;
         }
@@ -1377,9 +1376,9 @@ class PreferContainerRule extends SaropaLintRule {
       if (!_containerRelatedWidgets.contains(typeName)) return;
 
       // Check if child is also a container-related widget
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
-          final Expression childExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
+          final Expression childExpr = arg.argumentExpression;
           if (childExpr is InstanceCreationExpression) {
             final String? childType =
                 childExpr.constructorName.type.element?.name;

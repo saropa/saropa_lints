@@ -52,16 +52,17 @@ bool compilationUnitDeclaresClassLikeName(
   return false;
 }
 
-/// Source range to delete a [NamedExpression] inside an [ArgumentList], including
+/// Source range to delete a [NamedArgument] inside an [ArgumentList], including
 /// an adjacent comma and surrounding whitespace (leading or trailing).
 ///
 /// Returns null when [named] is not a direct child of an argument list.
 ///
 /// For a **middle** named argument, only a **leading** comma is absorbed (not
 /// both neighbors) so `a: 1, b: 2, c: 3` stays valid after removing `b: 2`.
+// analyzer 13 renamed NamedExpression -> NamedArgument (no deprecated alias).
 SourceRange? sourceRangeForDeletingNamedArgument(
   String unitContent,
-  NamedExpression named,
+  NamedArgument named,
 ) {
   if (named.parent is! ArgumentList) return null;
 

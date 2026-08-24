@@ -30,9 +30,12 @@ import '../../saropa_lint_rule.dart';
 const String _controllerType = 'YoutubePlayerController';
 
 Expression? _namedArg(ArgumentList args, String name) {
-  for (final Expression arg in args.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) {
-      return arg.expression;
+  // analyzer 13 renamed NamedExpression -> NamedArgument; argument list
+  // elements are typed `Argument`, `.name` is the Token directly, and
+  // `.expression` -> `.argumentExpression`.
+  for (final Argument arg in args.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) {
+      return arg.argumentExpression;
     }
   }
   return null;

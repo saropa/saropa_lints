@@ -29,8 +29,10 @@ class AddNeverScrollablePhysicsFix extends SaropaFixProducer {
     if (parent is! InstanceCreationExpression) return;
     final ice = parent;
 
+    // analyzer 13: NamedExpression renamed to NamedArgument; name is a
+    // Token (.lexeme) rather than a Label.
     for (final arg in ice.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'physics') {
+      if (arg is NamedArgument && arg.name.lexeme == 'physics') {
         return;
       }
     }

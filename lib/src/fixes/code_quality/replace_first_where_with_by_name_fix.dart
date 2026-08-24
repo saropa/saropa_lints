@@ -37,10 +37,12 @@ class ReplaceFirstWhereWithByNameFix extends SaropaFixProducer {
       return;
     }
 
-    final NodeList<Expression> args = invocation.argumentList.arguments;
+    // analyzer 13: ArgumentList.arguments now returns NodeList<Argument>
+    final NodeList<Argument> args = invocation.argumentList.arguments;
     if (args.isEmpty) return;
 
-    final Expression firstArg = args.first;
+    // analyzer 13: args contains Argument, use .argumentExpression to get Expression
+    final Expression firstArg = args.first.argumentExpression;
     if (firstArg is! FunctionExpression) return;
 
     final FunctionBody body = firstArg.body;

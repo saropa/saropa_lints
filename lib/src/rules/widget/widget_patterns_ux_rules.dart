@@ -52,9 +52,9 @@ class PreferSemanticWidgetNamesRule extends SaropaLintRule {
       if (typeName == 'Container') {
         // Check what properties are used
         final Set<String> usedProps = <String>{};
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression) {
-            usedProps.add(arg.name.label.name);
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument) {
+            usedProps.add(arg.name.lexeme);
           }
         }
 
@@ -136,7 +136,7 @@ class PreferTextThemeRule extends SaropaLintRule {
       // Check if inside a Text widget's style argument
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is NamedExpression && current.name.label.name == 'style') {
+        if (current is NamedArgument && current.name.lexeme == 'style') {
           // Check if parent is Text widget
           final AstNode? namedParent = current.parent;
           if (namedParent is ArgumentList) {
@@ -225,9 +225,9 @@ class PreferColorSchemeFromSeedRule extends SaropaLintRule {
 
       // Check if it has many color arguments (indicating manual definition)
       int colorArgs = 0;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name.startsWith('on') ||
               name == 'primary' ||
               name == 'secondary' ||
@@ -316,9 +316,9 @@ class PreferRichTextForComplexRule extends SaropaLintRule {
       if (typeName != 'Row' && typeName != 'Wrap') return;
 
       // Find children argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'children') {
-          final Expression childrenExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'children') {
+          final Expression childrenExpr = arg.argumentExpression;
           if (childrenExpr is ListLiteral) {
             int textWidgetCount = 0;
 
@@ -422,8 +422,8 @@ class PreferSystemThemeDefaultRule extends SaropaLintRule {
         }
 
         // Check if directly in themeMode: argument
-        if (current is NamedExpression &&
-            current.name.label.name == 'themeMode') {
+        if (current is NamedArgument &&
+            current.name.lexeme == 'themeMode') {
           foundThemeModeArg = true;
           break;
         }
@@ -771,8 +771,8 @@ class PreferActionButtonTooltipRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
 
       bool hasTooltip = false;
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'tooltip') {
+      for (final Argument arg in args.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'tooltip') {
           hasTooltip = true;
           break;
         }

@@ -93,9 +93,9 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
       if (!_animatedListWidgets.contains(constructorName)) return;
 
       // Find itemBuilder argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
-          final Expression builderExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'itemBuilder') {
+          final Expression builderExpr = arg.argumentExpression;
           if (builderExpr is FunctionExpression) {
             _checkBuilderForKey(builderExpr.body, reporter);
           }
@@ -126,9 +126,9 @@ class RequireKeysInAnimatedListsRule extends SaropaLintRule {
     AstNode reportNode,
   ) {
     if (expr is InstanceCreationExpression) {
-      final bool hasKey = expr.argumentList.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'key';
+      final bool hasKey = expr.argumentList.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'key';
         }
         return false;
       });
@@ -871,11 +871,11 @@ class _DepthVisitor extends RecursiveAstVisitor<void> {
     onDepth(newDepth, node);
 
     // Continue with increased depth for child arguments
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'child') {
-        arg.expression.visitChildren(_DepthVisitor(onDepth, newDepth));
-      } else if (arg is NamedExpression && arg.name.label.name == 'children') {
-        arg.expression.visitChildren(_DepthVisitor(onDepth, newDepth));
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'child') {
+        arg.argumentExpression.visitChildren(_DepthVisitor(onDepth, newDepth));
+      } else if (arg is NamedArgument && arg.name.lexeme == 'children') {
+        arg.argumentExpression.visitChildren(_DepthVisitor(onDepth, newDepth));
       }
     }
   }
@@ -951,9 +951,9 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
       bool hasPrototypeItem = false;
       int? itemCount;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'itemExtent' || name == 'itemExtentBuilder') {
             hasItemExtent = true;
           }
@@ -961,7 +961,7 @@ class RequireItemExtentForLargeListsRule extends SaropaLintRule {
             hasPrototypeItem = true;
           }
           if (name == 'itemCount') {
-            final expr = arg.expression;
+            final expr = arg.argumentExpression;
             if (expr is IntegerLiteral) {
               itemCount = expr.value;
             }
@@ -1056,7 +1056,7 @@ class PreferImagePrecacheRule extends SaropaLintRule {
       // Check if image name suggests it's a hero/important image
       if (node.argumentList.arguments.isEmpty) return;
 
-      final Expression firstArg = node.argumentList.arguments.first;
+      final Argument firstArg = node.argumentList.arguments.first;
       final String argSource = firstArg.toSource().toLowerCase();
 
       for (final String indicator in _heroIndicators) {
@@ -1246,7 +1246,7 @@ class _SetStateVisitor extends RecursiveAstVisitor<void> {
   // Skipping the entire `FunctionExpression` subtree is the conventional
   // pattern for "synchronous-execution" detection rules. It also subsumes
   // every special-case (addPostFrameCallback, then, Future, scheduleMicrotask,
-  // GestureDetector callbacks bound via NamedExpression, etc.) that the
+  // GestureDetector callbacks bound via NamedArgument, etc.) that the
   // previous `walk-up` logic tried — and missed — to enumerate. See
   // bugs/avoid_setstate_in_build_false_positive_setstate_inside_event_handler_closure.md.
   @override
@@ -2218,10 +2218,10 @@ class _TextSpanVisitor extends RecursiveAstVisitor<void> {
       if (!node.isConst) {
         // Check if it has children (complex TextSpan worth caching)
         final bool hasChildren = node.argumentList.arguments.any((
-          Expression arg,
+          Argument arg,
         ) {
-          if (arg is NamedExpression) {
-            return arg.name.label.name == 'children';
+          if (arg is NamedArgument) {
+            return arg.name.lexeme == 'children';
           }
           return false;
         });
@@ -2357,7 +2357,7 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
       // needed — keep climbing to whatever consumes their value. A named
       // argument (`children: x.toList()`) is also just a transparent wrapper:
       // its parent is the ArgumentList, where a concrete List is required.
-      // Without unwrapping NamedExpression the .toList() is judged against the
+      // Without unwrapping NamedArgument the .toList() is judged against the
       // wrapper and fires a false positive on every `children:`-style call.
       //
       // A switch-expression arm and the switch expression itself are likewise
@@ -2372,7 +2372,7 @@ class AvoidLargeListCopyRule extends SaropaLintRule {
       // return/assignment.
       if (parent is ParenthesizedExpression ||
           parent is ConditionalExpression ||
-          parent is NamedExpression ||
+          parent is NamedArgument ||
           parent is SwitchExpressionCase ||
           parent is SwitchExpression ||
           parent is RecordLiteral) {
@@ -2513,8 +2513,11 @@ class PreferConstWidgetsRule extends SaropaLintRule {
 
       // Check if all arguments are literals or const
       bool canBeConst = true;
-      for (final Expression arg in node.argumentList.arguments) {
-        final Expression expr = arg is NamedExpression ? arg.expression : arg;
+      for (final Argument arg in node.argumentList.arguments) {
+        final Expression expr = arg is NamedArgument
+            ? arg.argumentExpression
+            // Positional arguments are Expression subtypes of Argument.
+            : arg as Expression;
         if (expr is! Literal && !_isConstExpression(expr)) {
           canBeConst = false;
           break;
@@ -2714,7 +2717,7 @@ class _MapWidgetVisitor extends RecursiveAstVisitor<void> {
     if (node.methodName.name == 'map') {
       // Check if the argument creates widgets
       final widgetCtorRegex = RegExp(r'\b[A-Z][a-zA-Z]+\(');
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         if (arg is FunctionExpression) {
           final String bodySource = arg.body.toSource();
           // Simple heuristic: uppercase first letter suggests widget
@@ -3108,7 +3111,7 @@ class _StreamListenVisitor extends RecursiveAstVisitor<void> {
       // Check if callback has setState without mounted check
       final setStateRegex = RegExp(r'\bsetState\b');
       final mountedRegex = RegExp(r'\bmounted\b');
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         if (arg is FunctionExpression) {
           final String bodySource = arg.body.toSource();
           if (setStateRegex.hasMatch(bodySource) &&
@@ -3552,7 +3555,7 @@ class PreferBuilderForConditionalRule extends SaropaLintRule {
       if (_expensiveWidgets.contains(typeName)) {
         // Check if already wrapped in Builder
         final AstNode? parent = expr.parent;
-        if (parent is NamedExpression && parent.name.label.name == 'builder') {
+        if (parent is NamedArgument && parent.name.lexeme == 'builder') {
           return; // Already using Builder pattern
         }
         reporter.atNode(expr.constructorName, code);
@@ -3638,9 +3641,9 @@ class RequireWidgetKeyStrategyRule extends SaropaLintRule {
       if (!_builderWidgets.contains(typeName)) return;
 
       // Find itemBuilder argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
-          final Expression builderExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'itemBuilder') {
+          final Expression builderExpr = arg.argumentExpression;
           if (builderExpr is FunctionExpression) {
             _checkBuilderForConsistentKeys(
               builderExpr.body,
@@ -3677,9 +3680,9 @@ class _KeyConsistencyVisitor extends RecursiveAstVisitor<void> {
   void visitReturnStatement(ReturnStatement node) {
     final Expression? expr = node.expression;
     if (expr is InstanceCreationExpression) {
-      final bool hasKey = expr.argumentList.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'key';
+      final bool hasKey = expr.argumentList.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'key';
         }
         return false;
       });
@@ -3970,9 +3973,9 @@ class PreferNativeFileDialogsRule extends SaropaLintRule {
 
       // Check if dialog is for file selection
       final ArgumentList args = node.argumentList;
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'builder') {
-          final String builderSource = arg.expression.toSource();
+      for (final Argument arg in args.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
+          final String builderSource = arg.argumentExpression.toSource();
           if (builderSource.contains('File') &&
               (builderSource.contains('Picker') ||
                   builderSource.contains('Selector') ||
@@ -4164,8 +4167,8 @@ class PreferLayoutBuilderOverMediaQueryRule extends SaropaLintRule {
       bool inItemBuilder = false;
 
       while (current != null) {
-        if (current is NamedExpression) {
-          final paramName = current.name.label.name;
+        if (current is NamedArgument) {
+          final paramName = current.name.lexeme;
           if (paramName == 'itemBuilder' ||
               paramName == 'separatorBuilder' ||
               paramName == 'delegate') {
@@ -4666,11 +4669,11 @@ class AvoidAnimationInLargeListRule extends SaropaLintRule {
       if (methodName != 'builder' && methodName != 'separated') return;
 
       // Check itemBuilder for animation widgets
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme;
           if (paramName == 'itemBuilder') {
-            final String builderSource = arg.expression.toSource();
+            final String builderSource = arg.argumentExpression.toSource();
 
             for (final String animWidget in _animationWidgets) {
               if (builderSource.contains(animWidget)) {
@@ -4771,8 +4774,8 @@ class PreferLazyLoadingImagesRule extends SaropaLintRule {
       AstNode? current = node.parent;
 
       while (current != null) {
-        if (current is NamedExpression) {
-          final String paramName = current.name.label.name;
+        if (current is NamedArgument) {
+          final String paramName = current.name.lexeme;
           if (paramName == 'itemBuilder' ||
               paramName == 'builder' ||
               paramName == 'separatorBuilder') {

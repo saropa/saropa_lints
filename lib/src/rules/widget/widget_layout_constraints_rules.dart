@@ -123,9 +123,9 @@ class _PaddingMisuseVisitor extends RecursiveAstVisitor<void> {
     // Check for: Padding(padding: padding, ...)
     final String constructorName = node.constructorName.type.name.lexeme;
     if (constructorName == 'Padding') {
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'padding') {
-          final String valueSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'padding') {
+          final String valueSource = arg.argumentExpression.toSource();
           // Check if it references the "padding" field
           if (valueSource == 'padding' ||
               valueSource.startsWith('padding ') ||
@@ -143,7 +143,7 @@ class _PaddingMisuseVisitor extends RecursiveAstVisitor<void> {
   void visitMethodInvocation(MethodInvocation node) {
     // Check for: .withPadding(padding)
     if (node.methodName.name == 'withPadding') {
-      for (final Expression arg in node.argumentList.arguments) {
+      for (final Argument arg in node.argumentList.arguments) {
         final String argSource = arg.toSource();
         if (argSource == 'padding' ||
             argSource.startsWith('padding ') ||
@@ -229,9 +229,9 @@ class AvoidWrappingInPaddingRule extends SaropaLintRule {
       if (typeName != 'Padding') return;
 
       // Find the child argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
-          final Expression childExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
+          final Expression childExpr = arg.argumentExpression;
           if (childExpr is InstanceCreationExpression) {
             final String childType = childExpr.constructorName.type.name.lexeme;
             if (_widgetsWithPadding.contains(childType)) {
@@ -669,12 +669,12 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
     InstanceCreationExpression node,
     SaropaDiagnosticReporter reporter,
   ) {
-    final NodeList<Expression> args = node.argumentList.arguments;
+    final NodeList<Argument> args = node.argumentList.arguments;
     if (args.length != 4) return;
 
     // Get all values as strings
     final List<String> values = args
-        .map((Expression e) => e.toSource())
+        .map((Argument e) => e.toSource())
         .toList();
 
     // Check if all values are the same (could use .all)
@@ -691,14 +691,14 @@ class PreferCorrectEdgeInsetsConstructorRule extends SaropaLintRule {
     InstanceCreationExpression node,
     SaropaDiagnosticReporter reporter,
   ) {
-    final NodeList<Expression> args = node.argumentList.arguments;
+    final NodeList<Argument> args = node.argumentList.arguments;
 
     // Extract named arguments
     String? left, right, top, bottom;
-    for (final Expression arg in args) {
-      if (arg is NamedExpression) {
-        final String name = arg.name.label.name;
-        final String value = arg.expression.toSource();
+    for (final Argument arg in args) {
+      if (arg is NamedArgument) {
+        final String name = arg.name.lexeme;
+        final String value = arg.argumentExpression.toSource();
         switch (name) {
           case 'left':
             left = value;
@@ -1089,10 +1089,13 @@ class PreferConstWidgetsInListsRule extends SaropaLintRule {
   }
 
   bool _couldBeConst(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression) {
-        if (!_isConstExpression(arg.expression)) return false;
-      } else if (!_isConstExpression(arg)) {
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument) {
+        if (!_isConstExpression(arg.argumentExpression)) return false;
+      } else if (!_isConstExpression(arg as Expression)) {
+        // Positional arguments are always Expression under analyzer 13's
+        // Argument interface; narrow explicitly since NamedArgument was
+        // excluded above.
         return false;
       }
     }
@@ -1172,9 +1175,9 @@ class AvoidLayoutBuilderMisuseRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'LayoutBuilder') {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'builder') {
-            final Expression builderExpr = arg.expression;
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'builder') {
+            final Expression builderExpr = arg.argumentExpression;
             if (builderExpr is FunctionExpression) {
               final FormalParameterList? params = builderExpr.parameters;
               if (params != null && params.parameters.length >= 2) {
@@ -1269,9 +1272,9 @@ class AvoidRepaintBoundaryMisuseRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'RepaintBoundary') {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'child') {
-            final Expression child = arg.expression;
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'child') {
+            final Expression child = arg.argumentExpression;
             // Check if child is const
             if (child is InstanceCreationExpression &&
                 child.keyword?.type == Keyword.CONST) {
@@ -1357,9 +1360,9 @@ class AvoidGestureDetectorInScrollViewRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'GestureDetector' || typeName == 'InkWell') {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'child') {
-            final Expression child = arg.expression;
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'child') {
+            final Expression child = arg.argumentExpression;
             if (child is InstanceCreationExpression) {
               final String childType = child.constructorName.type.name.lexeme;
               if (_scrollableWidgets.contains(childType)) {
@@ -1432,15 +1435,15 @@ class PreferOpacityWidgetRule extends SaropaLintRule {
           node.methodName.name == 'withAlpha') {
         // Check if this is part of a color argument to a container-like widget
         final AstNode? parent = node.parent;
-        if (parent is NamedExpression && parent.name.label.name == 'color') {
+        if (parent is NamedArgument && parent.name.lexeme == 'color') {
           final AstNode? grandparent = parent.parent?.parent;
           if (grandparent is InstanceCreationExpression) {
             final String typeName =
                 grandparent.constructorName.type.name.lexeme;
             if (typeName == 'Container' || typeName == 'DecoratedBox') {
               // Check if it has a child that might be expensive
-              for (final Expression arg in grandparent.argumentList.arguments) {
-                if (arg is NamedExpression && arg.name.label.name == 'child') {
+              for (final Argument arg in grandparent.argumentList.arguments) {
+                if (arg is NamedArgument && arg.name.lexeme == 'child') {
                   reporter.atNode(node);
                   break;
                 }
@@ -1521,7 +1524,7 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Container') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       // Check if Container only has width/height arguments (and optionally key)
@@ -1529,9 +1532,9 @@ class PreferSizedBoxForWhitespaceRule extends SaropaLintRule {
       bool hasHeight = false;
       bool hasOtherArgs = false;
 
-      for (final Expression arg in args) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in args) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'width') {
             hasWidth = true;
           } else if (name == 'height') {
@@ -1817,8 +1820,8 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
   }
 
   static bool _hasSpacingParam(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'spacing') {
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'spacing') {
         return true;
       }
     }
@@ -1867,9 +1870,9 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
   }
 
   static ListLiteral? _getChildrenList(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'children') {
-        final Expression value = arg.expression;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'children') {
+        final Expression value = arg.argumentExpression;
         if (value is ListLiteral) return value;
       }
     }
@@ -1903,12 +1906,12 @@ class PreferSpacingOverSizedBoxRule extends SaropaLintRule {
 
       final String expectedArg = parentType == 'Column' ? 'height' : 'width';
 
-      for (final Expression arg in expr.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'child') {
+      for (final Argument arg in expr.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          if (arg.name.lexeme == 'child') {
             hasChild = true;
-          } else if (arg.name.label.name == expectedArg) {
-            dimensionValue = arg.expression;
+          } else if (arg.name.lexeme == expectedArg) {
+            dimensionValue = arg.argumentExpression;
           }
         }
       }
@@ -2034,11 +2037,11 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_layoutWidgets.contains(typeName)) return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
           if (_layoutProperties.contains(argName)) {
-            _checkForHardcodedValue(arg.expression, reporter);
+            _checkForHardcodedValue(arg.argumentExpression, reporter);
           }
         }
       }
@@ -2049,11 +2052,13 @@ class AvoidHardcodedLayoutValuesRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'EdgeInsets') return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          _checkForHardcodedValue(arg.expression, reporter);
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          _checkForHardcodedValue(arg.argumentExpression, reporter);
         } else {
-          _checkForHardcodedValue(arg, reporter);
+          // Positional EdgeInsets args are always Expression under the
+          // analyzer 13 Argument interface (NamedArgument excluded above).
+          _checkForHardcodedValue(arg as Expression, reporter);
         }
       }
     });
@@ -2227,9 +2232,9 @@ class PreferPageStorageKeyRule extends SaropaLintRule {
 
       bool hasPageStorageKey = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'key') {
-          if (_isPageStorageKey(arg.expression)) {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'key') {
+          if (_isPageStorageKey(arg.argumentExpression)) {
             hasPageStorageKey = true;
           }
         }
@@ -2340,10 +2345,10 @@ class PreferIntrinsicDimensionsRule extends SaropaLintRule {
       if (typeName != 'Column') return;
 
       // Check for CrossAxisAlignment.stretch without IntrinsicWidth parent
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'crossAxisAlignment') {
-          final String value = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument &&
+            arg.name.lexeme == 'crossAxisAlignment') {
+          final String value = arg.argumentExpression.toSource();
           if (value.contains('stretch')) {
             // Check if already wrapped in IntrinsicWidth
             AstNode? current = node.parent;
@@ -2482,9 +2487,9 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
 
   /// Whether SingleChildScrollView has scrollDirection: Axis.horizontal.
   static bool _hasHorizontalScrollDirection(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'scrollDirection') {
-        return _horizontalPattern.hasMatch(arg.expression.toSource());
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'scrollDirection') {
+        return _horizontalPattern.hasMatch(arg.argumentExpression.toSource());
       }
     }
     return false;
@@ -2493,9 +2498,9 @@ class AvoidUnboundedConstraintsRule extends SaropaLintRule {
   /// Checks only direct children for Expanded/Flexible, not nested
   /// descendants which have their own constraint context.
   static bool _hasDirectExpandedOrFlexible(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'children') {
-        final Expression childrenExpr = arg.expression;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'children') {
+        final Expression childrenExpr = arg.argumentExpression;
         if (childrenExpr is ListLiteral) {
           return _elementsContainExpandedFlexible(childrenExpr.elements);
         }
@@ -2818,7 +2823,7 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
         // e.g. `ResponsiveLayout.isWide(MediaQuery.sizeOf(context).width)`,
         // which returns a device-class bool. LayoutBuilder gives the LOCAL box
         // width, the wrong signal for a window-class breakpoint. Real sizing is
-        // written as a `width:`/`height:` NAMED argument (a NamedExpression
+        // written as a `width:`/`height:` NAMED argument (a NamedArgument
         // value, whose parent is not the ArgumentList), so that case still
         // flags.
         if (_isPositionalCallArgument(node)) return;
@@ -2969,7 +2974,7 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
 
   /// True when [node] is a positional argument to a call (its parent, after
   /// unwrapping parentheses, is the call's `ArgumentList`). A `width:`/`height:`
-  /// named-argument value does NOT match — its parent is the `NamedExpression`
+  /// named-argument value does NOT match — its parent is the `NamedArgument`
   /// — so genuine widget sizing still flags.
   static bool _isPositionalCallArgument(PropertyAccess node) {
     AstNode cur = node;
@@ -3021,12 +3026,17 @@ class PreferLayoutBuilderForConstraintsRule extends SaropaLintRule {
   static bool _declaresBuildContextParameter(FormalParameterList? parameters) {
     if (parameters == null) return false;
     for (final FormalParameter parameter in parameters.parameters) {
-      final FormalParameter normalized = switch (parameter) {
-        DefaultFormalParameter() => parameter.parameter,
-        _ => parameter,
-      };
-      if (normalized is! SimpleFormalParameter) continue;
-      final TypeAnnotation? type = normalized.type;
+      // analyzer 13 removed the DefaultFormalParameter wrapper node — every
+      // FormalParameter (including ones with a default value) now exposes
+      // `.type` directly on the base interface, so no unwrapping is needed.
+      // Restrict to plain (non-function-typed) parameters, matching the
+      // original `is SimpleFormalParameter` check — FieldFormalParameter /
+      // SuperFormalParameter are constructor-only forms, not relevant here.
+      if (parameter is! RegularFormalParameter ||
+          parameter.functionTypedSuffix != null) {
+        continue;
+      }
+      final TypeAnnotation? type = parameter.type;
       if (type is NamedType && type.name.lexeme == 'BuildContext') {
         return true;
       }
@@ -3293,9 +3303,9 @@ class AvoidOpacityMisuseRule extends SaropaLintRule {
       // rule's own documented BAD example, is a state-toggled ternary
       // (`_isVisible ? 1.0 : 0.0`), which is a ConditionalExpression. Match that
       // node type directly so a plain const/variable reference no longer trips.
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'opacity') {
-          if (arg.expression is ConditionalExpression) {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'opacity') {
+          if (arg.argumentExpression is ConditionalExpression) {
             reporter.atNode(node.constructorName, code);
           }
         }
@@ -3372,8 +3382,8 @@ class PreferClipBehaviorRule extends SaropaLintRule {
       if (!_clippableWidgets.contains(typeName)) return;
 
       bool hasClipBehavior = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'clipBehavior') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'clipBehavior') {
           hasClipBehavior = true;
           break;
         }
@@ -3449,9 +3459,9 @@ class PreferPositionedDirectionalRule extends SaropaLintRule {
 
       // Check if using left/right (not top/bottom only)
       bool usesLeftRight = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
           if (argName == 'left' || argName == 'right') {
             usesLeftRight = true;
             break;
@@ -3643,23 +3653,23 @@ class PreferSafeAreaAwareRule extends SaropaLintRule {
       bool hasExtendBehindAppBar = false;
       Expression? bodyExpr;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'appBar') {
             hasAppBar = true;
           }
           if (name == 'body') {
-            bodyExpr = arg.expression;
+            bodyExpr = arg.argumentExpression;
           }
           // extendBody/extendBodyBehindAppBar mean developer intentionally
           // wants content to extend behind system UI (e.g., fullscreen images)
           if (name == 'extendBody') {
-            final String value = arg.expression.toSource();
+            final String value = arg.argumentExpression.toSource();
             if (value == 'true') hasExtendBody = true;
           }
           if (name == 'extendBodyBehindAppBar') {
-            final String value = arg.expression.toSource();
+            final String value = arg.argumentExpression.toSource();
             if (value == 'true') hasExtendBehindAppBar = true;
           }
         }
@@ -3766,10 +3776,10 @@ class AvoidFixedDimensionsRule extends SaropaLintRule {
       double? width;
       double? height;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
-          final Expression value = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
+          final Expression value = arg.argumentExpression;
 
           if (name == 'width' && value is IntegerLiteral) {
             width = value.value?.toDouble();
@@ -4047,9 +4057,9 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
       bool hasWidth = false;
       bool hasHeight = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'width') hasWidth = true;
           if (name == 'height') hasHeight = true;
         }
@@ -4077,9 +4087,9 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
       bool hasWidth = false;
       bool hasHeight = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'width') hasWidth = true;
           if (name == 'height') hasHeight = true;
         }
@@ -4105,9 +4115,9 @@ class AvoidUnconstrainedImagesRule extends SaropaLintRule {
           return true;
         }
       }
-      if (current is NamedExpression) {
+      if (current is NamedArgument) {
         // Check if this is inside a 'child' argument of a constraining widget
-        final String paramName = current.name.label.name;
+        final String paramName = current.name.lexeme;
         if (paramName == 'child') {
           final AstNode? grandParent = current.parent?.parent;
           if (grandParent is InstanceCreationExpression) {
@@ -4206,13 +4216,13 @@ class PreferSizedBoxSquareRule extends SaropaLintRule {
       String? widthSource;
       String? heightSource;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'width') {
-            widthSource = arg.expression.toSource();
+            widthSource = arg.argumentExpression.toSource();
           } else if (name == 'height') {
-            heightSource = arg.expression.toSource();
+            heightSource = arg.argumentExpression.toSource();
           }
         }
       }
@@ -4309,11 +4319,11 @@ class PreferCenterOverAlignRule extends SaropaLintRule {
       if (typeName != 'Align') return;
 
       // Check if alignment is Alignment.center
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'alignment') {
-            final String alignmentSource = arg.expression.toSource();
+            final String alignmentSource = arg.argumentExpression.toSource();
             if (alignmentSource == 'Alignment.center') {
               reporter.atNode(node);
               return;
@@ -4399,9 +4409,9 @@ class PreferAlignOverContainerRule extends SaropaLintRule {
       bool hasAlignment = false;
       bool hasOtherArgs = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           switch (name) {
             case 'alignment':
               hasAlignment = true;
@@ -4499,9 +4509,9 @@ class PreferPaddingOverContainerRule extends SaropaLintRule {
       bool hasPadding = false;
       bool hasOtherArgs = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           switch (name) {
             case 'padding':
               hasPadding = true;
@@ -4597,9 +4607,9 @@ class PreferConstrainedBoxOverContainerRule extends SaropaLintRule {
       bool hasConstraints = false;
       bool hasOtherArgs = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           switch (name) {
             case 'constraints':
               hasConstraints = true;
@@ -4691,9 +4701,9 @@ class PreferTransformOverContainerRule extends SaropaLintRule {
       bool hasTransform = false;
       bool hasOtherProperties = false;
 
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in args.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'transform') {
             hasTransform = true;
           } else if (name != 'child' && name != 'key') {
@@ -4793,9 +4803,9 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
       if (_hasAlignmentOrFit(node)) return;
 
       // Find children parameter
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'children') {
-          final Expression childrenExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'children') {
+          final Expression childrenExpr = arg.argumentExpression;
           if (childrenExpr is ListLiteral) {
             // Skip if first child is a background (common pattern)
             final elements = childrenExpr.elements;
@@ -4818,9 +4828,9 @@ class AvoidStackWithoutPositionedRule extends SaropaLintRule {
   /// signaling that its children are positioned at the Stack level rather than
   /// via per-child Positioned wrappers.
   static bool _hasAlignmentOrFit(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression) {
-        final String argName = arg.name.label.name;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument) {
+        final String argName = arg.name.lexeme;
         if (argName == 'alignment' || argName == 'fit') return true;
       }
     }
@@ -4908,10 +4918,10 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      if (node.name.label.name != 'itemBuilder') return;
+    context.addNamedArgument((NamedArgument node) {
+      if (node.name.lexeme != 'itemBuilder') return;
 
-      final Expression builderExpr = node.expression;
+      final Expression builderExpr = node.argumentExpression;
       if (builderExpr is! FunctionExpression) return;
 
       // AST traversal replaces the previous regex-over-toSource() approach.
@@ -4954,13 +4964,13 @@ class AvoidBuilderIndexOutOfBoundsRule extends SaropaLintRule {
   /// Receiver chains bound via `itemCount: <receiver>.length` on the sibling
   /// arguments. The receiver chain is compared in full (e.g. `widget.items`),
   /// so a count on one object's member never covers a subscript on another's.
-  Set<String> _getItemCountBoundReceivers(NamedExpression itemBuilderNode) {
+  Set<String> _getItemCountBoundReceivers(NamedArgument itemBuilderNode) {
     final AstNode? argumentList = itemBuilderNode.parent;
     if (argumentList is! ArgumentList) return const <String>{};
 
-    for (final Expression arg in argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'itemCount') {
-        final String? receiver = _lengthReceiverChain(arg.expression);
+    for (final Argument arg in argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'itemCount') {
+        final String? receiver = _lengthReceiverChain(arg.argumentExpression);
         if (receiver != null) return <String>{receiver};
         break;
       }
@@ -5262,7 +5272,7 @@ _AncestorResult _findWidgetAncestor(
       // Named-parameter callbacks (e.g. builder: (ctx) => Positioned(...)).
       // The callback output's placement depends on the call site, not this
       // widget, so we cannot determine the ancestor statically.
-      if (feParent is NamedExpression) {
+      if (feParent is NamedArgument) {
         return _AncestorResult.indeterminate;
       }
 
@@ -5634,11 +5644,11 @@ class RequireBaselineTextBaselineRule extends SaropaLintRule {
       bool hasBaseline = false;
       bool hasTextBaseline = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'crossAxisAlignment') {
-            final String value = arg.expression.toSource();
+            final String value = arg.argumentExpression.toSource();
             if (value.contains('baseline')) hasBaseline = true;
           }
           if (name == 'textBaseline') hasTextBaseline = true;
@@ -5737,9 +5747,9 @@ class AvoidUnconstrainedDialogColumnRule extends SaropaLintRule {
       if (typeName != 'Column') return;
 
       // Check if mainAxisSize: MainAxisSize.min is already set.
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'mainAxisSize') {
-          if (_minPattern.hasMatch(arg.expression.toSource())) return;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'mainAxisSize') {
+          if (_minPattern.hasMatch(arg.argumentExpression.toSource())) return;
         }
       }
 
@@ -5854,8 +5864,8 @@ class AvoidTextfieldInRowRule extends SaropaLintRule {
         // pass-through pattern (Builder, LayoutBuilder, etc.).
         if (current is FunctionExpression) {
           final feParent = current.parent;
-          if (feParent is NamedExpression) {
-            final paramName = feParent.name.label.name;
+          if (feParent is NamedArgument) {
+            final paramName = feParent.name.lexeme;
             if (paramName != 'builder') {
               final argList = feParent.parent;
               if (argList is ArgumentList &&
@@ -5958,11 +5968,11 @@ class AvoidFixedSizeInScaffoldBodyRule extends SaropaLintRule {
       if (typeName != 'Scaffold') return;
 
       // Find the 'body' argument.
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        if (arg.name.label.name != 'body') continue;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
+        if (arg.name.lexeme != 'body') continue;
 
-        final Expression bodyExpr = arg.expression;
+        final Expression bodyExpr = arg.argumentExpression;
         if (bodyExpr is! InstanceCreationExpression) return;
 
         final String bodyType = bodyExpr.constructorName.type.name.lexeme;

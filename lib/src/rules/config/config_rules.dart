@@ -634,8 +634,10 @@ class AvoidStringEnvParsingRule extends SaropaLintRule {
       if (!_envTypes.contains(target.name)) return;
 
       // Check for defaultValue named argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'defaultValue') {
+      // Analyzer 13 migration: arguments returns NodeList<Argument>,
+      // NamedExpression → NamedArgument, .name.label.name → .name.lexeme
+      for (final arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'defaultValue') {
           return;
         }
       }

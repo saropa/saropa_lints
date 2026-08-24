@@ -274,8 +274,8 @@ class AvoidDeprecatedUseInheritedMediaQueryRule extends SaropaLintRule {
       if (!_targetWidgets.contains(typeName)) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'useInheritedMediaQuery') {
+        if (arg is NamedArgument &&
+            arg.name.lexeme == 'useInheritedMediaQuery') {
           reporter.atNode(arg);
           return;
         }
@@ -308,12 +308,12 @@ class _RemoveUseInheritedMediaQueryFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    // Walk up to the NamedExpression
-    final named = node is NamedExpression
+    // Walk up to the NamedArgument
+    final named = node is NamedArgument
         ? node
-        : node.thisOrAncestorOfType<NamedExpression>();
+        : node.thisOrAncestorOfType<NamedArgument>();
     if (named == null) return;
-    if (named.name.label.name != 'useInheritedMediaQuery') return;
+    if (named.name.lexeme != 'useInheritedMediaQuery') return;
 
     // Reuse shared utility for robust comma/whitespace deletion
     final range = migration_src.sourceRangeForDeletingNamedArgument(
@@ -549,8 +549,8 @@ class AvoidRemovedAppbarBackwardsCompatibilityRule extends SaropaLintRule {
       if (typeName != 'AppBar' && typeName != 'SliverAppBar') return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'backwardsCompatibility') {
+        if (arg is NamedArgument &&
+            arg.name.lexeme == 'backwardsCompatibility') {
           reporter.atNode(arg);
           return;
         }
@@ -583,11 +583,11 @@ class _RemoveAppbarBackwardsCompatibilityFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final named = node is NamedExpression
+    final named = node is NamedArgument
         ? node
-        : node.thisOrAncestorOfType<NamedExpression>();
+        : node.thisOrAncestorOfType<NamedArgument>();
     if (named == null) return;
-    if (named.name.label.name != 'backwardsCompatibility') return;
+    if (named.name.lexeme != 'backwardsCompatibility') return;
 
     // Reuse shared utility for robust comma/whitespace deletion
     final range = migration_src.sourceRangeForDeletingNamedArgument(
@@ -1149,7 +1149,8 @@ class PreferStringForTypeofEqualsRule extends SaropaLintRule {
 
       final args = node.argumentList.arguments;
       if (args.isEmpty) return;
-      final arg = args.first;
+      // analyzer 13: argumentExpression is defined uniformly on Argument.
+      final arg = args.first.argumentExpression;
       if (!_isJsStringLikeExpression(arg)) return;
 
       reporter.atNode(arg);
@@ -1234,7 +1235,8 @@ class PreferIntForJsarrayWithLengthRule extends SaropaLintRule {
 
       final args = node.argumentList.arguments;
       if (args.isEmpty) return;
-      final lenArg = args.first;
+      // analyzer 13: argumentExpression is defined uniformly on Argument.
+      final lenArg = args.first.argumentExpression;
       if (!_isJsNumberLikeExpression(lenArg)) return;
 
       reporter.atNode(lenArg);

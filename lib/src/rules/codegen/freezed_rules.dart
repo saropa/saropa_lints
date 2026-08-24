@@ -423,16 +423,11 @@ class RequireFreezedExplicitJsonRule extends SaropaLintRule {
   }
 
   bool _isComplexType(FormalParameter param) {
-    TypeAnnotation? type;
-
-    if (param is SimpleFormalParameter) {
-      type = param.type;
-    } else if (param is DefaultFormalParameter) {
-      final FormalParameter innerParam = param.parameter;
-      if (innerParam is SimpleFormalParameter) {
-        type = innerParam.type;
-      }
-    }
+    // Analyzer 13: `DefaultFormalParameter`/`SimpleFormalParameter` wrapper
+    // types were removed/merged; every `FormalParameter` now exposes `.type`
+    // directly (including ones with a default value), so no unwrapping or
+    // `is`-check is needed anymore.
+    final TypeAnnotation? type = param.type;
 
     if (type is NamedType) {
       final String typeName = type.name.lexeme;
@@ -582,32 +577,24 @@ class PreferFreezedDefaultValuesRule extends SaropaLintRule {
   }
 
   bool _isNullableWithoutDefault(FormalParameter param) {
-    // Handle DefaultFormalParameter (optional parameters)
-    FormalParameter actualParam = param;
-    if (param is DefaultFormalParameter) {
-      actualParam = param.parameter;
-    }
+    // Analyzer 13: `DefaultFormalParameter`/`SimpleFormalParameter` wrapper
+    // types were removed/merged; `FormalParameter` now directly implements
+    // `AnnotatedNode` (so `.metadata` is always available) and exposes
+    // `.type` directly, so no unwrapping or `is`-checks are needed.
 
     // Check if parameter has @Default annotation
-    final NodeList<Annotation>? metadata = actualParam is NormalFormalParameter
-        ? actualParam.metadata
-        : null;
-    if (metadata != null) {
-      for (final Annotation annotation in metadata) {
-        if (annotation.name.name == 'Default') {
-          return false; // Already has @Default
-        }
+    for (final Annotation annotation in param.metadata) {
+      if (annotation.name.name == 'Default') {
+        return false; // Already has @Default
       }
     }
 
     // Check if type is nullable
-    if (actualParam is SimpleFormalParameter) {
-      final TypeAnnotation? type = actualParam.type;
-      if (type is NamedType) {
-        // Check for ? suffix indicating nullable
-        if (type.question != null) {
-          return true;
-        }
+    final TypeAnnotation? type = param.type;
+    if (type is NamedType) {
+      // Check for ? suffix indicating nullable
+      if (type.question != null) {
+        return true;
       }
     }
 
@@ -712,15 +699,10 @@ class RequireFreezedJsonConverterRule extends SaropaLintRule {
           final FormalParameterList params = member.parameters;
 
           for (final FormalParameter param in params.parameters) {
-            String? typeSource;
-            if (param is DefaultFormalParameter) {
-              final NormalFormalParameter inner = param.parameter;
-              if (inner is SimpleFormalParameter) {
-                typeSource = inner.type?.toSource();
-              }
-            } else if (param is SimpleFormalParameter) {
-              typeSource = param.type?.toSource();
-            }
+            // Analyzer 13: `.type` is available directly on every
+            // `FormalParameter` (the `DefaultFormalParameter`/
+            // `SimpleFormalParameter` wrapper types were removed/merged).
+            final String? typeSource = param.type?.toSource();
 
             // cspell:ignore annot
             if (typeSource != null) {

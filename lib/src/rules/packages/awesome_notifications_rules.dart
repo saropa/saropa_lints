@@ -156,10 +156,10 @@ class AwesomeNotificationsNonStaticListenerRule extends SaropaLintRule {
       if (!_isAwesomeReceiver(node.target)) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        if (!_listenerArgNames.contains(arg.name.label.name)) continue;
+        if (arg is! NamedArgument) continue;
+        if (!_listenerArgNames.contains(arg.name.lexeme)) continue;
 
-        final expr = arg.expression;
+        final expr = arg.argumentExpression;
         // Resolve the expression to the MethodDeclaration it refers to.
         final method = _resolveToMethod(expr, node);
         if (method == null) continue;
@@ -253,11 +253,11 @@ class AwesomeNotificationsHandlerWrongParameterTypeRule extends SaropaLintRule {
       if (!_isAwesomeReceiver(node.target)) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        final argName = arg.name.label.name;
+        if (arg is! NamedArgument) continue;
+        final argName = arg.name.lexeme;
         if (!_listenerArgNames.contains(argName)) continue;
 
-        final method = _resolveToMethod(arg.expression, node);
+        final method = _resolveToMethod(arg.argumentExpression, node);
         if (method == null) continue;
 
         final params = method.parameters?.parameters;
@@ -279,7 +279,7 @@ class AwesomeNotificationsHandlerWrongParameterTypeRule extends SaropaLintRule {
         // Skip 'dynamic', base types, or anything else — those are a
         // separate concern and skipping avoids false positives.
         if (typeName == wrongType) {
-          reporter.atNode(arg.expression);
+          reporter.atNode(arg.argumentExpression);
         }
       }
     });
@@ -362,10 +362,10 @@ class AwesomeNotificationsMissingPragmaAnnotationRule extends SaropaLintRule {
       if (!_isAwesomeReceiver(node.target)) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        if (!_listenerArgNames.contains(arg.name.label.name)) continue;
+        if (arg is! NamedArgument) continue;
+        if (!_listenerArgNames.contains(arg.name.lexeme)) continue;
 
-        final method = _resolveToMethod(arg.expression, node);
+        final method = _resolveToMethod(arg.argumentExpression, node);
         if (method == null) continue;
 
         // Top-level functions (not inside a ClassDeclaration) are exempt.
@@ -377,7 +377,7 @@ class AwesomeNotificationsMissingPragmaAnnotationRule extends SaropaLintRule {
 
         // Check annotations for @pragma('vm:entry-point').
         if (!_hasPragmaEntryPoint(method)) {
-          reporter.atNode(arg.expression);
+          reporter.atNode(arg.argumentExpression);
         }
       }
     });
@@ -534,7 +534,7 @@ class _InitializeChannelKeyCollector extends RecursiveAstVisitor<void> {
         } else {
           // channelKey is present but non-literal — bail signal.
           final hasKey = node.argumentList.arguments.any(
-            (a) => a is NamedExpression && a.name.label.name == 'channelKey',
+            (a) => a is NamedArgument && a.name.lexeme == 'channelKey',
           );
           if (hasKey) foundNonLiteral = true;
         }
@@ -771,7 +771,8 @@ class AwesomeNotificationsNegativeNotificationIdRule extends SaropaLintRule {
       final idArg = _findNamedArg(node.argumentList, 'id');
       if (idArg == null) return;
 
-      final expr = idArg.expression;
+      // Analyzer 13: NamedArgument uses .argumentExpression (not .expression).
+      final expr = idArg.argumentExpression;
       // A PrefixExpression with operator '-' whose operand is an IntegerLiteral
       // is the syntactic form of `id: -1`.
       if (expr is PrefixExpression &&
@@ -1012,8 +1013,8 @@ MethodDeclaration? _resolveToMethod(Expression expr, AstNode context) {
 /// the value is a [SimpleStringLiteral]. Returns null otherwise.
 String? _namedStringArg(ArgumentList argList, String argName) {
   for (final arg in argList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == argName) {
-      final expr = arg.expression;
+    if (arg is NamedArgument && arg.name.lexeme == argName) {
+      final expr = arg.argumentExpression;
       if (expr is SimpleStringLiteral) return expr.value;
       if (expr is StringInterpolation) return null; // non-literal
     }
@@ -1021,23 +1022,25 @@ String? _namedStringArg(ArgumentList argList, String argName) {
   return null;
 }
 
-/// Returns the [NamedExpression] for [argName] in [argList], or null.
-NamedExpression? _findNamedArg(ArgumentList argList, String argName) {
+/// Returns the [NamedArgument] for [argName] in [argList], or null.
+NamedArgument? _findNamedArg(ArgumentList argList, String argName) {
   for (final arg in argList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == argName) return arg;
+    if (arg is NamedArgument && arg.name.lexeme == argName) return arg;
   }
   return null;
 }
 
 /// Returns the simple type name of the first parameter of [param], or null
 /// when the type is absent, dynamic, or not a simple named type.
+///
+/// Analyzer 13: DefaultFormalParameter / NormalFormalParameter removed;
+/// SimpleFormalParameter → RegularFormalParameter. Every FormalParameter now
+/// carries .defaultClause directly, so we only need to check
+/// RegularFormalParameter for the type annotation.
 String? _paramTypeName(FormalParameter param) {
   TypeAnnotation? type;
-  if (param is SimpleFormalParameter) {
+  if (param is RegularFormalParameter) {
     type = param.type;
-  } else if (param is DefaultFormalParameter) {
-    final inner = param.parameter;
-    if (inner is SimpleFormalParameter) type = inner.type;
   }
   if (type == null) return null;
   if (type is NamedType) return type.name.lexeme;

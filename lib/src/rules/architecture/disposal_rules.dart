@@ -2743,21 +2743,17 @@ class DisposeClassFieldsRule extends SaropaLintRule {
       }
 
       // Collect constructor parameter names to exclude passed-in fields
+      // analyzer 13: DefaultFormalParameter removed (every FormalParameter now
+      // carries .defaultClause); SimpleFormalParameter → RegularFormalParameter.
+      // Check param types directly without unwrapping a DefaultFormalParameter wrapper.
       final Set<String> constructorParams = <String>{};
       for (final member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           // Check formal parameters
           for (final param in member.parameters.parameters) {
-            if (param is DefaultFormalParameter) {
-              final normalParam = param.parameter;
-              if (normalParam is FieldFormalParameter) {
-                constructorParams.add(normalParam.name.lexeme);
-              } else if (normalParam is SimpleFormalParameter) {
-                constructorParams.add(normalParam.name?.lexeme ?? '');
-              }
-            } else if (param is FieldFormalParameter) {
+            if (param is FieldFormalParameter) {
               constructorParams.add(param.name.lexeme);
-            } else if (param is SimpleFormalParameter) {
+            } else if (param is RegularFormalParameter) {
               constructorParams.add(param.name?.lexeme ?? '');
             }
           }

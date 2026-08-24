@@ -74,7 +74,8 @@ class RequireDarkModeTestingRule extends SaropaLintRule {
       }
 
       final hasTheme = node.argumentList.arguments.any(
-        (arg) => arg is NamedExpression && arg.name.label.name == 'theme',
+        // analyzer 13: NamedExpression -> NamedArgument, name is Token now
+        (arg) => arg is NamedArgument && arg.name.lexeme == 'theme',
       );
 
       // Only warn if theme is set but darkTheme is missing
@@ -83,7 +84,7 @@ class RequireDarkModeTestingRule extends SaropaLintRule {
       }
 
       final hasDarkTheme = node.argumentList.arguments.any(
-        (arg) => arg is NamedExpression && arg.name.label.name == 'darkTheme',
+        (arg) => arg is NamedArgument && arg.name.lexeme == 'darkTheme',
       );
 
       if (!hasDarkTheme) {
@@ -168,9 +169,9 @@ class AvoidElevationOpacityInDarkRule extends SaropaLintRule {
       }
 
       // Find elevation argument
-      NamedExpression? elevationArg;
+      NamedArgument? elevationArg;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'elevation') {
+        if (arg is NamedArgument && arg.name.lexeme == 'elevation') {
           elevationArg = arg;
           break;
         }
@@ -181,7 +182,7 @@ class AvoidElevationOpacityInDarkRule extends SaropaLintRule {
       }
 
       // Check if elevation is a literal > 4
-      final expr = elevationArg.expression;
+      final expr = elevationArg.argumentExpression;
       if (expr is IntegerLiteral && expr.value != null && expr.value! > 4) {
         reporter.atNode(elevationArg);
       } else if (expr is DoubleLiteral && expr.value > 4) {
@@ -303,8 +304,8 @@ class PreferThemeExtensionsRule extends SaropaLintRule {
       ];
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final paramName = arg.name.label.name;
+        if (arg is NamedArgument) {
+          final paramName = arg.name.lexeme;
           if (colorParams.contains(paramName)) {
             reporter.atNode(node);
             return;
@@ -484,9 +485,10 @@ class PreferDarkModeColorsRule extends SaropaLintRule {
       if (typeName != 'MaterialApp' && typeName != 'CupertinoApp') return;
       bool hasTheme = false;
       bool hasDarkTheme = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      // analyzer 13: argument list elements are Argument, not Expression
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'theme') hasTheme = true;
           if (name == 'darkTheme') hasDarkTheme = true;
         }

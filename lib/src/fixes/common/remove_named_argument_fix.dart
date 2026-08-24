@@ -37,9 +37,10 @@ class RemoveNamedArgumentFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final named = node is NamedExpression
+    // analyzer 13: NamedExpression renamed to NamedArgument.
+    final named = node is NamedArgument
         ? node
-        : node.thisOrAncestorOfType<NamedExpression>();
+        : node.thisOrAncestorOfType<NamedArgument>();
     if (named == null) return;
     if (named.parent is! ArgumentList) return;
 

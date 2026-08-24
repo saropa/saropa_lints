@@ -690,14 +690,18 @@ class RequireStructuredLoggingRule extends SaropaLintRule {
       if (!_logMethods.contains(methodName)) return;
 
       // Check if first argument uses string concatenation
-      final NodeList<Expression> args = node.argumentList.arguments;
+      // Analyzer 13: `ArgumentList.arguments` is now `NodeList<Argument>`
+      // (a positional `Expression` also implements `Argument`); use
+      // `.argumentExpression` to reach the real expression uniformly.
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
-      if (firstArg is NamedExpression) return;
+      final Argument firstArg = args.first;
+      if (firstArg is NamedArgument) return;
 
-      if (_usesConcatenation(firstArg)) {
-        reporter.atNode(firstArg);
+      final Expression firstExpr = firstArg.argumentExpression;
+      if (_usesConcatenation(firstExpr)) {
+        reporter.atNode(firstExpr);
       }
     });
   }
@@ -824,13 +828,13 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (!_logMethods.contains(methodName)) return;
 
-      // Check all arguments for sensitive patterns
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (_containsSensitiveData(arg.expression)) {
-            reporter.atNode(arg);
-          }
-        } else if (_containsSensitiveData(arg)) {
+      // Check all arguments for sensitive patterns.
+      // Analyzer 13: `ArgumentList.arguments` is now `NodeList<Argument>`;
+      // loop over `Argument` and use `.argumentExpression` (works uniformly
+      // for both named and positional arguments) instead of the old
+      // `NamedExpression`-specific `.expression` getter.
+      for (final Argument arg in node.argumentList.arguments) {
+        if (_containsSensitiveData(arg.argumentExpression)) {
           reporter.atNode(arg);
         }
       }
@@ -905,13 +909,12 @@ class AvoidSensitiveInLogsRule extends SaropaLintRule {
     // For method calls, don't flag - method results aren't inherently sensitive
     // by name (e.g., getToken() might return masked data)
     if (expr is MethodInvocation) {
-      // But do check arguments being passed
-      for (final Expression arg in expr.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (_containsSensitiveData(arg.expression)) {
-            return true;
-          }
-        } else if (_containsSensitiveData(arg)) {
+      // But do check arguments being passed.
+      // Analyzer 13: `ArgumentList.arguments` is now `NodeList<Argument>`;
+      // `.argumentExpression` resolves the real expression uniformly for
+      // both named and positional arguments.
+      for (final Argument arg in expr.argumentList.arguments) {
+        if (_containsSensitiveData(arg.argumentExpression)) {
           return true;
         }
       }
@@ -1195,12 +1198,13 @@ class PreferConditionalLoggingRule extends SaropaLintRule {
       if (targetNode is! SimpleIdentifier) return;
       if (targetNode.name != 'log') return;
       if (!_logMethods.contains(node.methodName.name)) return;
-      final NodeList<Expression> args = node.argumentList.arguments;
+      // Analyzer 13: `ArgumentList.arguments` is now `NodeList<Argument>`;
+      // `.argumentExpression` resolves the real expression uniformly for
+      // both named and positional arguments.
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
-      final firstArg = args.first;
-      final Expression first = firstArg is NamedExpression
-          ? firstArg.expression
-          : firstArg;
+      final Argument firstArg = args.first;
+      final Expression first = firstArg.argumentExpression;
       if (first is! StringInterpolation && first is! AdjacentStrings) return;
       reporter.atNode(node.methodName, code);
     });

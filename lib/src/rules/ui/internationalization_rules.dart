@@ -83,9 +83,9 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
 
       // Check Text widgets
       if (_textWidgets.contains(constructorName)) {
-        final NodeList<Expression> args = node.argumentList.arguments;
+        final NodeList<Argument> args = node.argumentList.arguments;
         if (args.isNotEmpty) {
-          final Expression firstArg = args.first;
+          final Argument firstArg = args.first;
           if (firstArg is SimpleStringLiteral) {
             // Skip empty strings and single characters
             if (firstArg.value.length > 1) {
@@ -98,9 +98,9 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
 
       // Check button labels
       if (constructorName.contains('Button')) {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'child') {
-            _checkForHardcodedText(arg.expression, reporter);
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'child') {
+            _checkForHardcodedText(arg.argumentExpression, reporter);
           }
         }
         return;
@@ -108,10 +108,10 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
 
       // Check InputDecoration string parameters
       if (constructorName == 'InputDecoration') {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression &&
-              _inputDecorationStringParams.contains(arg.name.label.name)) {
-            _checkForHardcodedString(arg.expression, reporter);
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument &&
+              _inputDecorationStringParams.contains(arg.name.lexeme)) {
+            _checkForHardcodedString(arg.argumentExpression, reporter);
           }
         }
         return;
@@ -119,20 +119,20 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
 
       // Check AlertDialog title/content, SimpleDialog title only
       if (constructorName == 'AlertDialog') {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression) {
-            final String paramName = arg.name.label.name;
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument) {
+            final String paramName = arg.name.lexeme;
             if (paramName == 'title' || paramName == 'content') {
-              _checkForHardcodedText(arg.expression, reporter);
+              _checkForHardcodedText(arg.argumentExpression, reporter);
             }
           }
         }
         return;
       }
       if (constructorName == 'SimpleDialog') {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'title') {
-            _checkForHardcodedText(arg.expression, reporter);
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'title') {
+            _checkForHardcodedText(arg.argumentExpression, reporter);
           }
         }
         return;
@@ -140,9 +140,9 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
 
       // Check Tooltip message
       if (constructorName == 'Tooltip') {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'message') {
-            _checkForHardcodedString(arg.expression, reporter);
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'message') {
+            _checkForHardcodedString(arg.argumentExpression, reporter);
           }
         }
         return;
@@ -150,9 +150,9 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
 
       // Check SnackBar content
       if (constructorName == 'SnackBar') {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'content') {
-            _checkForHardcodedText(arg.expression, reporter);
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'content') {
+            _checkForHardcodedText(arg.argumentExpression, reporter);
           }
         }
       }
@@ -187,9 +187,9 @@ class AvoidHardcodedStringsInUiRule extends SaropaLintRule {
     if (expr is InstanceCreationExpression) {
       final String? name = expr.constructorName.type.element?.name;
       if (name == 'Text') {
-        final NodeList<Expression> args = expr.argumentList.arguments;
+        final NodeList<Argument> args = expr.argumentList.arguments;
         if (args.isNotEmpty) {
-          final Expression firstArg = args.first;
+          final Argument firstArg = args.first;
           if (firstArg is SimpleStringLiteral && firstArg.value.length > 1) {
             reporter.atNode(firstArg);
           }
@@ -344,9 +344,9 @@ class RequireDirectionalWidgetsRule extends SaropaLintRule {
 
       // Check for non-directional EdgeInsets.only with left/right
       if (constructorSource.contains('EdgeInsets.only')) {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression) {
-            final String name = arg.name.label.name;
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument) {
+            final String name = arg.name.lexeme;
             if (name == 'left' || name == 'right') {
               reporter.atNode(node);
               return;
@@ -640,10 +640,10 @@ class AvoidStringConcatenationInUiRule extends SaropaLintRule {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'Text') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
 
       // Check for string concatenation with +
       if (firstArg is BinaryExpression && firstArg.operator.lexeme == '+') {
@@ -736,10 +736,10 @@ class AvoidTextInImagesRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (methodName != 'asset' && methodName != 'network') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
       if (firstArg is SimpleStringLiteral) {
         final String path = firstArg.value.toLowerCase();
         for (final String indicator in _textIndicators) {
@@ -806,15 +806,15 @@ class AvoidHardcodedAppNameRule extends SaropaLintRule {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'AppBar') return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'title') {
-          final titleExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'title') {
+          final titleExpr = arg.argumentExpression;
           if (titleExpr is InstanceCreationExpression) {
             final String? textName =
                 titleExpr.constructorName.type.element?.name;
 
             if (textName == 'Text') {
-              final NodeList<Expression> textArgs =
+              final NodeList<Argument> textArgs =
                   titleExpr.argumentList.arguments;
               if (textArgs.isNotEmpty &&
                   textArgs.first is SimpleStringLiteral) {
@@ -985,8 +985,8 @@ class PreferIntlNameRule extends SaropaLintRule {
   }
 
   bool _hasNamedParameter(MethodInvocation node, String paramName) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == paramName) {
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == paramName) {
         return true;
       }
     }
@@ -1071,8 +1071,8 @@ class PreferProvidingIntlDescriptionRule extends SaropaLintRule {
   }
 
   bool _hasNamedParameter(MethodInvocation node, String paramName) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == paramName) {
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == paramName) {
         return true;
       }
     }
@@ -1165,8 +1165,8 @@ class PreferProvidingIntlExamplesRule extends SaropaLintRule {
   }
 
   bool _hasNamedParameter(MethodInvocation node, String paramName) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == paramName) {
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == paramName) {
         return true;
       }
     }
@@ -1554,12 +1554,12 @@ class RequireNumberFormatLocaleRule extends SaropaLintRule {
       // Check if locale is provided (as first positional or named 'locale')
       bool hasLocale = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'locale') {
+        if (arg is NamedArgument && arg.name.lexeme == 'locale') {
           hasLocale = true;
           break;
         }
         // First positional argument for methods that take locale positionally
-        if (arg is! NamedExpression &&
+        if (arg is! NamedArgument &&
             node.argumentList.arguments.first == arg) {
           // Some methods like decimalPattern take locale as first positional
           if (methodName == 'decimalPattern' ||
@@ -2077,15 +2077,13 @@ class RequireIntlPluralRulesRule extends SaropaLintRule {
         String? typeName;
         String? paramName;
 
-        if (param is SimpleFormalParameter) {
+        // analyzer 13 merged SimpleFormalParameter/FunctionTypedFormalParameter
+        // into RegularFormalParameter and removed the DefaultFormalParameter
+        // wrapper entirely - every FormalParameter now carries its own
+        // .name/.type/.defaultClause directly, so no unwrapping is needed.
+        if (param is RegularFormalParameter) {
           typeName = param.type?.toSource();
           paramName = param.name?.lexeme;
-        } else if (param is DefaultFormalParameter) {
-          final NormalFormalParameter normalParam = param.parameter;
-          if (normalParam is SimpleFormalParameter) {
-            typeName = normalParam.type?.toSource();
-            paramName = normalParam.name?.lexeme;
-          }
         }
 
         if (typeName == 'int' && paramName != null) {
@@ -2200,7 +2198,7 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
       if (args.arguments.isEmpty) return;
 
       // Get the message string
-      final Expression messageArg = args.arguments.first;
+      final Argument messageArg = args.arguments.first;
       String? messageText;
 
       if (messageArg is SimpleStringLiteral) {
@@ -2223,9 +2221,9 @@ class RequireIntlArgsMatchRule extends SaropaLintRule {
 
       // Find args parameter
       int argsCount = 0;
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'args') {
-          final Expression argsValue = arg.expression;
+      for (final Argument arg in args.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'args') {
+          final Expression argsValue = arg.argumentExpression;
           if (argsValue is ListLiteral) {
             argsCount = argsValue.elements.length;
           }
@@ -2515,8 +2513,8 @@ class ProvideCorrectIntlArgsRule extends SaropaLintRule {
 
       // Find args parameter
       for (final arg in args) {
-        if (arg is NamedExpression && arg.name.label.name == 'args') {
-          final argsExpr = arg.expression;
+        if (arg is NamedArgument && arg.name.lexeme == 'args') {
+          final argsExpr = arg.argumentExpression;
           if (argsExpr is ListLiteral) {
             final argsCount = argsExpr.elements.length;
             if (argsCount != placeholders.length) {
@@ -2697,7 +2695,7 @@ class PreferIntlMessageDescriptionRule extends SaropaLintRule {
       // Check for desc parameter
       bool hasDesc = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'desc') {
+        if (arg is NamedArgument && arg.name.lexeme == 'desc') {
           hasDesc = true;
           break;
         }

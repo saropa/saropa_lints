@@ -230,9 +230,10 @@ class AppLinksUncaughtStreamErrorRule extends SaropaLintRule {
         return;
       }
 
+      // analyzer 13: arguments is NodeList<Argument>; NamedExpression renamed
+      // to NamedArgument with a Token name (.lexeme).
       final bool hasOnError = node.argumentList.arguments.any(
-        (Expression arg) =>
-            arg is NamedExpression && arg.name.label.name == 'onError',
+        (Argument arg) => arg is NamedArgument && arg.name.lexeme == 'onError',
       );
       if (hasOnError) return;
 

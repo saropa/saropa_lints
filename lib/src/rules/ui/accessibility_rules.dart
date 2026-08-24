@@ -79,9 +79,9 @@ class AvoidIconButtonsWithoutTooltipRule extends SaropaLintRule {
       final String? constructorName = node.constructorName.type.element?.name;
       if (constructorName != 'IconButton') return;
 
-      final bool hasTooltip = node.argumentList.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'tooltip';
+      final bool hasTooltip = node.argumentList.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'tooltip';
         }
         return false;
       });
@@ -197,11 +197,11 @@ class AvoidSmallTouchTargetsRule extends SaropaLintRule {
       double? width;
       double? height;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'width' || name == 'height') {
-            final double? value = _extractNumericValue(arg.expression);
+            final double? value = _extractNumericValue(arg.argumentExpression);
             if (name == 'width') {
               width = value;
             } else {
@@ -449,7 +449,7 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
 
       // Only a Container whose color is chosen by a conditional is a candidate
       // status indicator; a constant color carries no state to mis-convey.
-      final NamedExpression? colorArg = _conditionalColorArg(node);
+      final NamedArgument? colorArg = _conditionalColorArg(node);
       if (colorArg == null) return;
 
       // Treat as a status indicator only when the Container carries nothing but
@@ -457,7 +457,7 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
       if (!_hasOnlyColorAndChild(node)) return;
 
       final ConditionalExpression condition =
-          colorArg.expression as ConditionalExpression;
+          colorArg.argumentExpression as ConditionalExpression;
 
       // A bar whose color toggles to Colors.transparent in one branch is a
       // show/hide presence cue (active-tab underline, selection underbar), not a
@@ -479,11 +479,11 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
 
   /// Returns the `color:` argument when it is set by a [ConditionalExpression],
   /// or null when there is no such argument.
-  NamedExpression? _conditionalColorArg(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression &&
-          arg.name.label.name == 'color' &&
-          arg.expression is ConditionalExpression) {
+  NamedArgument? _conditionalColorArg(InstanceCreationExpression node) {
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument &&
+          arg.name.lexeme == 'color' &&
+          arg.argumentExpression is ConditionalExpression) {
         return arg;
       }
     }
@@ -493,10 +493,10 @@ class AvoidColorOnlyIndicatorsRule extends SaropaLintRule {
   /// True when every named argument is one of color/child/key/width/height —
   /// the shape of a bare status swatch rather than a decorated Container.
   bool _hasOnlyColorAndChild(InstanceCreationExpression node) {
-    return node.argumentList.arguments.whereType<NamedExpression>().every((
-      NamedExpression na,
+    return node.argumentList.arguments.whereType<NamedArgument>().every((
+      NamedArgument na,
     ) {
-      final String name = na.name.label.name;
+      final String name = na.name.lexeme;
       return name == 'color' ||
           name == 'child' ||
           name == 'key' ||
@@ -661,17 +661,17 @@ class RequireTextScaleFactorAwarenessRule extends SaropaLintRule {
 
       double? height;
       Expression? childArg;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'height') {
-            final Expression expr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          if (arg.name.lexeme == 'height') {
+            final Expression expr = arg.argumentExpression;
             if (expr is IntegerLiteral) {
               height = expr.value?.toDouble();
             } else if (expr is DoubleLiteral) {
               height = expr.value;
             }
-          } else if (arg.name.label.name == 'child') {
-            childArg = arg.expression;
+          } else if (arg.name.lexeme == 'child') {
+            childArg = arg.argumentExpression;
           }
         }
       }
@@ -685,9 +685,9 @@ class RequireTextScaleFactorAwarenessRule extends SaropaLintRule {
     if (node is InstanceCreationExpression) {
       final String? name = node.constructorName.type.element?.name;
       if (name == 'Text') return true;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
-          if (_hasTextDescendant(arg.expression)) return true;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
+          if (_hasTextDescendant(arg.argumentExpression)) return true;
         }
       }
     }
@@ -783,10 +783,10 @@ class AvoidGestureOnlyInteractionsRule extends SaropaLintRule {
       if (!hasKeyboardSupport) {
         // Check if GestureDetector has interactive callbacks
         final bool hasInteractiveCallback = node.argumentList.arguments.any((
-          Expression arg,
+          Argument arg,
         ) {
-          if (arg is NamedExpression) {
-            final String name = arg.name.label.name;
+          if (arg is NamedArgument) {
+            final String name = arg.name.lexeme;
             return name == 'onTap' ||
                 name == 'onDoubleTap' ||
                 name == 'onLongPress';
@@ -871,15 +871,15 @@ class RequireSemanticsLabelRule extends SaropaLintRule {
       bool hasLabel = false;
       bool isInteractive = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'label') {
             hasLabel = true;
           }
           if (_interactiveProperties.contains(name)) {
             // Check if the value is true
-            final expr = arg.expression;
+            final expr = arg.argumentExpression;
             if (expr is BooleanLiteral && expr.value) {
               isInteractive = true;
             }
@@ -1077,7 +1077,7 @@ class RequireLiveRegionRule extends SaropaLintRule {
       if (constructorName != 'Text') return;
 
       // Check if the text content suggests dynamic content
-      final Expression? textArg = node.argumentList.arguments.firstOrNull;
+      final Argument? textArg = node.argumentList.arguments.firstOrNull;
       if (textArg == null) return;
 
       String? variableName;
@@ -1105,11 +1105,11 @@ class RequireLiveRegionRule extends SaropaLintRule {
           final String? parentName = current.constructorName.type.element?.name;
           if (parentName == 'Semantics') {
             hasLiveRegion = current.argumentList.arguments.any((
-              Expression arg,
+              Argument arg,
             ) {
-              if (arg is NamedExpression &&
-                  arg.name.label.name == 'liveRegion') {
-                final expr = arg.expression;
+              if (arg is NamedArgument &&
+                  arg.name.lexeme == 'liveRegion') {
+                final expr = arg.argumentExpression;
                 if (expr is BooleanLiteral) return expr.value;
               }
               return false;
@@ -1203,9 +1203,9 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
       // Check if using a heading text style
       bool usesHeadingStyle = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'style') {
-          final String styleSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'style') {
+          final String styleSource = arg.argumentExpression.toSource();
           usesHeadingStyle = _headingStyles.any(
             (String style) => styleSource.contains(style),
           );
@@ -1224,10 +1224,10 @@ class RequireHeadingSemanticsRule extends SaropaLintRule {
           final String? parentName = current.constructorName.type.element?.name;
           if (parentName == 'Semantics') {
             hasHeaderSemantics = current.argumentList.arguments.any((
-              Expression arg,
+              Argument arg,
             ) {
-              if (arg is NamedExpression && arg.name.label.name == 'header') {
-                final expr = arg.expression;
+              if (arg is NamedArgument && arg.name.lexeme == 'header') {
+                final expr = arg.argumentExpression;
                 if (expr is BooleanLiteral) return expr.value;
               }
               return false;
@@ -1313,9 +1313,9 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
       if (!_tapWidgets.contains(constructorName)) return;
 
       // Check if has onTap
-      final bool hasOnTap = node.argumentList.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'onTap';
+      final bool hasOnTap = node.argumentList.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'onTap';
         }
         return false;
       });
@@ -1324,9 +1324,9 @@ class AvoidImageButtonsWithoutTooltipRule extends SaropaLintRule {
 
       // Check if child is an image
       bool hasImageChild = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
-          final childExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
+          final childExpr = arg.argumentExpression;
           if (childExpr is InstanceCreationExpression) {
             final String? childName =
                 childExpr.constructorName.type.element?.name;
@@ -1424,12 +1424,12 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'textScaleFactor') {
             // Check if value is 1.0
-            final Expression value = arg.expression;
+            final Expression value = arg.argumentExpression;
             if (value is DoubleLiteral && value.value == 1.0) {
               reporter.atNode(arg);
             } else if (value is IntegerLiteral && value.value == 1) {
@@ -1444,11 +1444,11 @@ class AvoidTextScaleFactorIgnoreRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'copyWith') return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'textScaleFactor') {
-            final Expression value = arg.expression;
+            final Expression value = arg.argumentExpression;
             if (value is DoubleLiteral && value.value == 1.0) {
               reporter.atNode(arg);
             } else if (value is IntegerLiteral && value.value == 1) {
@@ -1529,14 +1529,14 @@ class RequireImageSemanticsRule extends SaropaLintRule {
       bool hasSemanticLabel = false;
       bool isExcludedFromSemantics = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'semanticLabel') {
             hasSemanticLabel = true;
           }
           if (name == 'excludeFromSemantics') {
-            final expr = arg.expression;
+            final expr = arg.argumentExpression;
             if (expr is BooleanLiteral) {
               isExcludedFromSemantics = expr.value;
             }
@@ -1572,14 +1572,14 @@ class RequireImageSemanticsRule extends SaropaLintRule {
       bool hasSemanticLabel = false;
       bool isExcludedFromSemantics = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'semanticLabel') {
             hasSemanticLabel = true;
           }
           if (name == 'excludeFromSemantics') {
-            final expr = arg.expression;
+            final expr = arg.argumentExpression;
             if (expr is BooleanLiteral) {
               isExcludedFromSemantics = expr.value;
             }
@@ -1690,10 +1690,10 @@ class AvoidHiddenInteractiveRule extends SaropaLintRule {
       if (constructorName == 'Semantics') {
         bool hasExcludeSemantics = false;
 
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression &&
-              arg.name.label.name == 'excludeSemantics') {
-            final expr = arg.expression;
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument &&
+              arg.name.lexeme == 'excludeSemantics') {
+            final expr = arg.argumentExpression;
             if (expr is BooleanLiteral) hasExcludeSemantics = expr.value;
           }
         }
@@ -1800,9 +1800,9 @@ class PreferScalableTextRule extends SaropaLintRule {
       if (typeName != 'TextStyle') return;
 
       // Check for fontSize argument with literal value
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'fontSize') {
-          final Expression valueExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'fontSize') {
+          final Expression valueExpr = arg.argumentExpression;
 
           // Report if it's a literal number
           if (valueExpr is IntegerLiteral || valueExpr is DoubleLiteral) {
@@ -1889,9 +1889,9 @@ class RequireButtonSemanticsRule extends SaropaLintRule {
 
       // Check if has onTap
       bool hasOnTap = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'onTap' || name == 'onPressed' || name == 'onLongPress') {
             hasOnTap = true;
             break;
@@ -1908,8 +1908,8 @@ class RequireButtonSemanticsRule extends SaropaLintRule {
           final String parentType = current.constructorName.type.name.lexeme;
           if (parentType == 'Semantics') {
             // Check for button: true
-            for (final Expression arg in current.argumentList.arguments) {
-              if (arg is NamedExpression && arg.name.label.name == 'button') {
+            for (final Argument arg in current.argumentList.arguments) {
+              if (arg is NamedArgument && arg.name.lexeme == 'button') {
                 return; // Has Semantics with button property
               }
             }
@@ -2157,9 +2157,9 @@ class AvoidHoverOnlyRule extends SaropaLintRule {
 
       // Check if has hover callbacks
       bool hasHover = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'onEnter' || name == 'onExit' || name == 'onHover') {
             hasHover = true;
             break;
@@ -2451,9 +2451,9 @@ class RequireMinimumContrastRule extends SaropaLintRule {
       if (typeName != 'TextStyle') return;
 
       // Check for color argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'color') {
-          final String colorSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'color') {
+          final String colorSource = arg.argumentExpression.toSource();
 
           // Check if it's a light color
           for (final String lightColor in _lightColors) {
@@ -2511,12 +2511,12 @@ class RequireMinimumContrastRule extends SaropaLintRule {
 
   /// Classifies the background color of a container widget.
   _BgColorResult _getBackgroundColor(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is! NamedExpression) continue;
-      final String name = arg.name.label.name;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is! NamedArgument) continue;
+      final String name = arg.name.lexeme;
       if (name != 'color' && name != 'decoration') continue;
 
-      final String colorSrc = arg.expression.toSource();
+      final String colorSrc = arg.argumentExpression.toSource();
 
       // Known dark backgrounds
       if (colorSrc.contains('black') ||
@@ -2600,8 +2600,8 @@ class RequireAvatarAltTextRule extends SaropaLintRule {
 
       // Check for semanticLabel argument
       bool hasSemanticLabel = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'semanticLabel') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'semanticLabel') {
           hasSemanticLabel = true;
           break;
         }
@@ -2758,9 +2758,9 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
       if (typeName != 'Badge') return;
 
       // Check label argument for literal number > 99
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'label') {
-          final Expression labelExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'label') {
+          final Expression labelExpr = arg.argumentExpression;
 
           // Check if it's a Text widget with a literal number
           if (labelExpr is InstanceCreationExpression) {
@@ -2768,7 +2768,7 @@ class RequireBadgeCountLimitRule extends SaropaLintRule {
                 labelExpr.constructorName.type.name.lexeme;
             if (labelTypeName == 'Text' &&
                 labelExpr.argumentList.arguments.isNotEmpty) {
-              final Expression textArg = labelExpr.argumentList.arguments.first;
+              final Argument textArg = labelExpr.argumentList.arguments.first;
               if (textArg is SimpleStringLiteral) {
                 final int? number = int.tryParse(textArg.value);
                 if (number != null && number > 99) {
@@ -2850,9 +2850,9 @@ class RequireImageDescriptionRule extends SaropaLintRule {
       bool hasSemanticLabel = false;
       bool hasExclude = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'semanticLabel') hasSemanticLabel = true;
           if (name == 'excludeFromSemantics') hasExclude = true;
         }
@@ -2919,11 +2919,11 @@ class AvoidSemanticsExclusionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      if (node.name.label.name != 'excludeFromSemantics') return;
+    context.addNamedArgument((NamedArgument node) {
+      if (node.name.lexeme != 'excludeFromSemantics') return;
 
       // Check if value is true
-      final Expression value = node.expression;
+      final Expression value = node.argumentExpression;
       if (value is! BooleanLiteral || !value.value) return;
 
       // Check for preceding comment
@@ -3008,9 +3008,9 @@ class PreferMergeSemanticsRule extends SaropaLintRule {
       bool hasIcon = false;
       bool hasText = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'children') {
-          final Expression children = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'children') {
+          final Expression children = arg.argumentExpression;
           if (children is ListLiteral) {
             for (final CollectionElement element in children.elements) {
               if (element is InstanceCreationExpression) {
@@ -3122,9 +3122,9 @@ class RequireFocusIndicatorRule extends SaropaLintRule {
 
       // Check if has tap handler
       bool hasTapHandler = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'onTap' || name == 'onPressed') {
             hasTapHandler = true;
             break;
@@ -3236,9 +3236,9 @@ class AvoidFlashingContentRule extends SaropaLintRule {
       if (!_hasRepeatCascade(node)) return;
 
       // Check duration argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'duration') {
-          final int? millis = _extractMilliseconds(arg.expression);
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'duration') {
+          final int? millis = _extractMilliseconds(arg.argumentExpression);
           if (millis != null && millis > 0 && millis < 333) {
             reporter.atNode(arg);
           }
@@ -3278,9 +3278,9 @@ class AvoidFlashingContentRule extends SaropaLintRule {
   /// is unknowable statically; treating those as flashing would let an ERROR
   /// false-fire on `repeat(reverse: someRuntimeFlag)`, so they are not flagged.
   bool _repeatReversesDirection(MethodInvocation repeatCall) {
-    for (final Expression arg in repeatCall.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'reverse') {
-        final Expression value = arg.expression;
+    for (final Argument arg in repeatCall.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'reverse') {
+        final Expression value = arg.argumentExpression;
         return value is BooleanLiteral && value.value;
       }
     }
@@ -3294,10 +3294,10 @@ class AvoidFlashingContentRule extends SaropaLintRule {
     final String durationTypeName = duration.constructorName.type.name.lexeme;
     if (durationTypeName != 'Duration') return null;
 
-    for (final Expression durationArg in duration.argumentList.arguments) {
-      if (durationArg is NamedExpression &&
-          durationArg.name.label.name == 'milliseconds') {
-        final Expression millisExpr = durationArg.expression;
+    for (final Argument durationArg in duration.argumentList.arguments) {
+      if (durationArg is NamedArgument &&
+          durationArg.name.lexeme == 'milliseconds') {
+        final Expression millisExpr = durationArg.argumentExpression;
         if (millisExpr is IntegerLiteral) {
           return millisExpr.value;
         }
@@ -3378,8 +3378,8 @@ class PreferAdequateSpacingRule extends SaropaLintRule {
     context.addListLiteral((ListLiteral node) {
       // Check if this is likely a children list
       final AstNode? parent = node.parent;
-      if (parent is! NamedExpression) return;
-      if (parent.name.label.name != 'children') return;
+      if (parent is! NamedArgument) return;
+      if (parent.name.lexeme != 'children') return;
 
       // Check for adjacent touch targets
       bool lastWasTouchTarget = false;
@@ -3479,9 +3479,9 @@ class AvoidMotionWithoutReduceRule extends SaropaLintRule {
       if (!_animatedWidgets.contains(typeName)) return;
 
       // Check if duration references disableAnimations
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'duration') {
-          final String durationSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'duration') {
+          final String durationSource = arg.argumentExpression.toSource();
           if (durationSource.contains('disableAnimations') ||
               durationSource.contains('reduceMotion') ||
               durationSource.contains('accessibleNavigation')) {
@@ -3556,9 +3556,9 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
 
       bool hasSemanticLabel = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'semanticLabel') {
             hasSemanticLabel = true;
             break;
@@ -3590,10 +3590,10 @@ class RequireSemanticLabelIconsRule extends SaropaLintRule {
 
         // Check for Semantics with excludeSemantics: true
         if (typeName == 'Semantics') {
-          for (final Expression arg in current.argumentList.arguments) {
-            if (arg is NamedExpression &&
-                arg.name.label.name == 'excludeSemantics') {
-              final expr = arg.expression;
+          for (final Argument arg in current.argumentList.arguments) {
+            if (arg is NamedArgument &&
+                arg.name.lexeme == 'excludeSemantics') {
+              final expr = arg.argumentExpression;
               if (expr is BooleanLiteral && expr.value) return true;
             }
           }
@@ -3701,18 +3701,18 @@ class RequireAccessibleImagesRule extends SaropaLintRule {
     });
   }
 
-  bool _hasAccessibilityHandling(NodeList<Expression> arguments) {
+  bool _hasAccessibilityHandling(NodeList<Argument> arguments) {
     bool hasSemanticLabel = false;
     bool hasExcludeFromSemantics = false;
 
-    for (final Expression arg in arguments) {
-      if (arg is NamedExpression) {
-        final String name = arg.name.label.name;
+    for (final Argument arg in arguments) {
+      if (arg is NamedArgument) {
+        final String name = arg.name.lexeme;
         if (name == 'semanticLabel') {
           hasSemanticLabel = true;
         }
         if (name == 'excludeFromSemantics') {
-          final expr = arg.expression;
+          final expr = arg.argumentExpression;
           if (expr is BooleanLiteral) {
             hasExcludeFromSemantics = expr.value;
           }
@@ -3830,12 +3830,12 @@ class AvoidAutoPlayMediaRule extends SaropaLintRule {
       if (!isMediaWidget) return;
 
       // Check for autoPlay parameter set to true
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme;
           if (_autoPlayParams.contains(paramName)) {
             // Check if value is true
-            final Expression value = arg.expression;
+            final Expression value = arg.argumentExpression;
             if (value is BooleanLiteral && value.value) {
               reporter.atNode(arg);
             }
@@ -3853,11 +3853,11 @@ class AvoidAutoPlayMediaRule extends SaropaLintRule {
           methodName == 'init' ||
           methodName == 'configure' ||
           methodName == 'setConfig') {
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression) {
-            final String paramName = arg.name.label.name;
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument) {
+            final String paramName = arg.name.lexeme;
             if (_autoPlayParams.contains(paramName)) {
-              final Expression value = arg.expression;
+              final Expression value = arg.argumentExpression;
               if (value is BooleanLiteral && value.value) {
                 reporter.atNode(arg);
               }
@@ -3971,11 +3971,11 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
       double? width;
       double? height;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
 
-        final String paramName = arg.name.label.name;
-        final Expression value = arg.expression;
+        final String paramName = arg.name.lexeme;
+        final Expression value = arg.argumentExpression;
 
         if (paramName == 'width' && value is DoubleLiteral) {
           width = value.value;
@@ -3996,7 +3996,7 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
           }
         } else if (paramName == 'constraints') {
           // Check BoxConstraints
-          _checkBoxConstraints(arg.expression, reporter);
+          _checkBoxConstraints(arg.argumentExpression, reporter);
         }
       }
 
@@ -4018,11 +4018,11 @@ class PreferLargeTouchTargetsRule extends SaropaLintRule {
     final String typeName = expr.constructorName.type.name.lexeme;
     if (typeName != 'BoxConstraints') return;
 
-    for (final Expression arg in expr.argumentList.arguments) {
-      if (arg is! NamedExpression) continue;
+    for (final Argument arg in expr.argumentList.arguments) {
+      if (arg is! NamedArgument) continue;
 
-      final String paramName = arg.name.label.name;
-      final Expression value = arg.expression;
+      final String paramName = arg.name.lexeme;
+      final Expression value = arg.argumentExpression;
 
       double? size;
       if (value is DoubleLiteral) {
@@ -4122,9 +4122,9 @@ class AvoidTimeLimitsRule extends SaropaLintRule {
       if (constructorName != 'SnackBar' && constructorName != 'Toast') return;
 
       // Check for duration parameter
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'duration') {
-          final durationValue = _extractDurationSeconds(arg.expression);
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'duration') {
+          final durationValue = _extractDurationSeconds(arg.argumentExpression);
           if (durationValue != null && durationValue < _minDurationSeconds) {
             reporter.atNode(arg);
           }
@@ -4139,7 +4139,9 @@ class AvoidTimeLimitsRule extends SaropaLintRule {
 
       // Check for short timers that might auto-dismiss
       if (node.argumentList.arguments.isNotEmpty) {
-        final firstArg = node.argumentList.arguments.first;
+        // Positional Timer argument is always an Expression (not a
+        // NamedArgument), so this cast from the broader Argument type is safe.
+        final firstArg = node.argumentList.arguments.first as Expression;
         final durationValue = _extractDurationSeconds(firstArg);
         if (durationValue != null && durationValue < _minDurationSeconds) {
           // Check if callback contains navigation or dismiss
@@ -4179,9 +4181,9 @@ class AvoidTimeLimitsRule extends SaropaLintRule {
     } else {
       // Positional constructor Duration(seconds: 5)
       for (final arg in expr.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final name = arg.name.label.name;
-          final value = arg.expression;
+        if (arg is NamedArgument) {
+          final name = arg.name.lexeme;
+          final value = arg.argumentExpression;
           if (value is IntegerLiteral) {
             if (name == 'seconds') {
               return value.value;
@@ -4513,17 +4515,17 @@ class PreferSemanticsContainerRule extends SaropaLintRule {
       if (typeName != 'Semantics') return;
 
       // Check if container: true is already set
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'container') {
-          final String value = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'container') {
+          final String value = arg.argumentExpression.toSource();
           if (value == 'true') return; // Already has container: true
         }
       }
 
       // Check if child is a multi-child layout widget
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
-          final Expression child = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
+          final Expression child = arg.argumentExpression;
           if (child is InstanceCreationExpression) {
             final String childType = child.constructorName.type.name.lexeme;
             if (_groupWidgets.contains(childType)) {
@@ -4608,10 +4610,10 @@ class AvoidRedundantSemanticsRule extends SaropaLintRule {
       bool hasLabel = false;
       Expression? childExpr;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'label') hasLabel = true;
-          if (arg.name.label.name == 'child') childExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          if (arg.name.lexeme == 'label') hasLabel = true;
+          if (arg.name.lexeme == 'child') childExpr = arg.argumentExpression;
         }
       }
 
@@ -4623,8 +4625,8 @@ class AvoidRedundantSemanticsRule extends SaropaLintRule {
       if (!_imageTypes.contains(childType)) return;
 
       // Check for semanticLabel in the Image
-      for (final Expression arg in childExpr.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'semanticLabel') {
+      for (final Argument arg in childExpr.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'semanticLabel') {
           reporter.atNode(node.constructorName, code);
           return;
         }
@@ -4750,12 +4752,12 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
       if (!_colorBearingWidgets.contains(typeName)) return;
 
       // Find color or backgroundColor named argument with conditional
-      NamedExpression? conditionalColorArg;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        final String name = arg.name.label.name;
+      NamedArgument? conditionalColorArg;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
+        final String name = arg.name.lexeme;
         if ((name == 'color' || name == 'backgroundColor') &&
-            arg.expression is ConditionalExpression) {
+            arg.argumentExpression is ConditionalExpression) {
           // Skip theme / platform / locale / directionality ternaries.
           // Why: WCAG 1.4.1 is about color as an *information channel* the
           // user must decode. An environment-adaptive ternary (dark mode,
@@ -4767,7 +4769,7 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
           // background. See
           // bugs/avoid_color_only_meaning_false_positive_theme_dark_mode_conditional.md
           final ConditionalExpression cond =
-              arg.expression as ConditionalExpression;
+              arg.argumentExpression as ConditionalExpression;
           if (_isEnvironmentPredicate(cond.condition)) continue;
 
           conditionalColorArg = arg;
@@ -4833,11 +4835,11 @@ class AvoidColorOnlyMeaningRule extends SaropaLintRule {
     InstanceCreationExpression node, {
     AstNode? excludeNode,
   }) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression) {
-        final String name = arg.name.label.name;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument) {
+        final String name = arg.name.lexeme;
         if (name == 'child' || name == 'children') {
-          return _expressionHasCompanion(arg.expression, excludeNode);
+          return _expressionHasCompanion(arg.argumentExpression, excludeNode);
         }
       }
     }
@@ -4943,13 +4945,13 @@ class PreferSemanticsSortRule extends SaropaLintRule {
 
       bool hasSortKey = false;
       bool explicitChildNodes = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
+        final String name = arg.name.lexeme;
         if (name == 'sortKey') {
           hasSortKey = true;
         } else if (name == 'explicitChildNodes') {
-          final Expression value = arg.expression;
+          final Expression value = arg.argumentExpression;
           explicitChildNodes = value is BooleanLiteral && value.value;
         }
       }

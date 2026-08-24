@@ -28,25 +28,28 @@ class ReplaceExpandedEmptyChildWithSpacerFix extends SaropaFixProducer {
     if (expanded == null) return;
     if (expanded.constructorName.type.name.lexeme != 'Expanded') return;
 
-    NamedExpression? childArg;
+    // analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme,
+    // .expression → .argumentExpression
+    NamedArgument? childArg;
     final parts = <String>[];
     for (final arg in expanded.argumentList.arguments) {
-      if (arg is NamedExpression) {
-        final name = arg.name.label.name;
+      if (arg is NamedArgument) {
+        final name = arg.name.lexeme;
         if (name == 'child') {
           childArg = arg;
         } else if (name == 'flex' || name == 'key') {
-          parts.add('$name: ${arg.expression.toSource()}');
+          parts.add('$name: ${arg.argumentExpression.toSource()}');
         }
       }
     }
     if (childArg == null) return;
-    final childExpr = childArg.expression;
+    final childExpr = childArg.argumentExpression;
     if (childExpr is! InstanceCreationExpression) return;
     final childType = childExpr.constructorName.type.name.lexeme;
     if (childType != 'SizedBox' && childType != 'Container') return;
+    // analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme
     final hasNestedChild = childExpr.argumentList.arguments.any(
-      (e) => e is NamedExpression && e.name.label.name == 'child',
+      (e) => e is NamedArgument && e.name.lexeme == 'child',
     );
     if (hasNestedChild) return;
 

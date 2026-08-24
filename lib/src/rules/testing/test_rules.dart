@@ -139,7 +139,7 @@ class AvoidEmptyTestGroupsRule extends SaropaLintRule {
       if (args.arguments.length < 2) return;
 
       // Second argument should be the callback function
-      final Expression callback = args.arguments[1];
+      final Argument callback = args.arguments[1];
       if (callback is! FunctionExpression) return;
 
       final FunctionBody body = callback.body;
@@ -334,7 +334,7 @@ class PreferDescriptiveTestNameRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is! StringLiteral) return;
 
       final String? testName = firstArg.stringValue;
@@ -424,7 +424,7 @@ class FormatTestNameRule extends SaropaLintRule {
       }
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is! StringLiteral) return;
       final String? name = firstArg.stringValue;
       if (name == null || name.isEmpty) return;
@@ -612,7 +612,7 @@ class AvoidTestOnRealDeviceRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is! StringLiteral) return;
 
       final String testName = (firstArg.stringValue ?? firstArg.toSource())
@@ -683,8 +683,10 @@ class PreferExpectLaterRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
-      final DartType? type = firstArg.staticType;
+      final Argument firstArg = args.arguments.first;
+      // analyzer 13: Argument has no staticType; argumentExpression yields
+      // the underlying Expression for both positional and named arguments.
+      final DartType? type = firstArg.argumentExpression.staticType;
       if (type == null) return;
 
       final String typeName = type.getDisplayString();
@@ -895,7 +897,7 @@ class _UniqueTestNameVisitor extends RecursiveAstVisitor<void> {
       if (testName != null) {
         final String fqName = [..._groupStack, testName].join(' ');
         if (_fullyQualifiedNames.contains(fqName)) {
-          final Expression firstArg = node.argumentList.arguments.first;
+          final Argument firstArg = node.argumentList.arguments.first;
           reporter.atNode(firstArg);
         } else {
           _fullyQualifiedNames.add(fqName);
@@ -909,7 +911,7 @@ class _UniqueTestNameVisitor extends RecursiveAstVisitor<void> {
   static String? _extractName(MethodInvocation node) {
     final ArgumentList args = node.argumentList;
     if (args.arguments.isEmpty) return null;
-    final Expression firstArg = args.arguments.first;
+    final Argument firstArg = args.arguments.first;
     if (firstArg is StringLiteral) return firstArg.stringValue;
     return null;
   }
@@ -1179,7 +1181,7 @@ class _TestAnalyzer extends RecursiveAstVisitor<void> {
       // Analyze the test body
       final ArgumentList args = node.argumentList;
       if (args.arguments.length >= 2) {
-        final Expression callback = args.arguments[1];
+        final Argument callback = args.arguments[1];
         if (callback is FunctionExpression) {
           final Set<String> assigns = <String>{};
           final Set<String> reads = <String>{};
@@ -1571,7 +1573,7 @@ class RequireScrollTestsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression callback = args.arguments[1];
+      final Argument callback = args.arguments[1];
       if (callback is! FunctionExpression) return;
 
       final String bodySource = callback.body.toSource();
@@ -1689,7 +1691,7 @@ class RequireTextInputTestsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression callback = args.arguments[1];
+      final Argument callback = args.arguments[1];
       if (callback is! FunctionExpression) return;
 
       final String bodySource = callback.body.toSource();
@@ -1809,7 +1811,7 @@ class PreferFakeOverMockRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression callback = args.arguments[1];
+      final Argument callback = args.arguments[1];
       if (callback is! FunctionExpression) return;
 
       final String bodySource = callback.body.toSource();
@@ -2089,10 +2091,12 @@ class PreferTestDataBuilderRule extends SaropaLintRule {
 
       // Check if there's nested object construction
       int nestedObjects = 0;
-      for (final Expression arg in args.arguments) {
+      // analyzer 13: arguments is NodeList<Argument>; named arguments are
+      // NamedArgument (not Expression), so widen the loop variable.
+      for (final Argument arg in args.arguments) {
         if (arg is InstanceCreationExpression ||
-            (arg is NamedExpression &&
-                arg.expression is InstanceCreationExpression)) {
+            (arg is NamedArgument &&
+                arg.argumentExpression is InstanceCreationExpression)) {
           nestedObjects++;
         }
       }
@@ -2185,7 +2189,7 @@ class AvoidTestImplementationDetailsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression callback = args.arguments[1];
+      final Argument callback = args.arguments[1];
       if (callback is! FunctionExpression) return;
 
       final String bodySource = callback.body.toSource();
@@ -2389,7 +2393,7 @@ class MissingTestAssertionRule extends SaropaLintRule {
       if (args.arguments.length < 2) return;
 
       // Get the callback body
-      final Expression callback = args.arguments[1];
+      final Argument callback = args.arguments[1];
       FunctionBody? body;
 
       if (callback is FunctionExpression) {
@@ -2573,7 +2577,7 @@ class AvoidAsyncCallbackInFakeAsyncRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression callback = args.arguments.first;
+      final Argument callback = args.arguments.first;
       if (callback is! FunctionExpression) return;
 
       // Check if the callback is async
@@ -2659,7 +2663,7 @@ class PreferSymbolOverKeyRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is StringLiteral) {
         reporter.atNode(node);
       }
@@ -2824,7 +2828,7 @@ class _TestCleanupVisitor extends RecursiveAstVisitor<void> {
     } else if (methodName == 'test' || methodName == 'testWidgets') {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length >= 2) {
-        final Expression callback = args.arguments[1];
+        final Argument callback = args.arguments[1];
         // Specific patterns avoid false positives like createWidget().
         if (callback is FunctionExpression &&
             _createsTestResources(callback.body.toSource())) {
@@ -2934,7 +2938,7 @@ class _SizeTestVisitor extends RecursiveAstVisitor<void> {
     if (node.methodName.name == 'testWidgets') {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length >= 2) {
-        final Expression callback = args.arguments[1];
+        final Argument callback = args.arguments[1];
         if (callback is FunctionExpression) {
           final String bodySource = callback.body.toSource();
           // Word-boundary matches avoid false positives.
@@ -3136,7 +3140,7 @@ class RequireAnimationTestsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.length < 2) return;
 
-      final Expression callback = args.arguments[1];
+      final Argument callback = args.arguments[1];
       if (callback is! FunctionExpression) return;
 
       final String bodySource = callback.body.toSource();
@@ -3584,9 +3588,9 @@ class RequireIntegrationTestTimeoutRule extends SaropaLintRule {
 
       // Check for timeout argument
       final ArgumentList args = node.argumentList;
-      final bool hasTimeout = args.arguments.any((Expression arg) {
-        if (arg is NamedExpression) {
-          return arg.name.label.name == 'timeout';
+      final bool hasTimeout = args.arguments.any((Argument arg) {
+        if (arg is NamedArgument) {
+          return arg.name.lexeme == 'timeout';
         }
         return false;
       });
@@ -3676,8 +3680,11 @@ class AvoidMisusedTestMatchersRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'expect') return;
 
+      // analyzer 13: arguments is NodeList<Argument>; positional args are
+      // Expression (Expression implements Argument), so whereType narrows
+      // the element type directly.
       final List<Expression> positionalArgs = node.argumentList.arguments
-          .where((Expression e) => e is! NamedExpression)
+          .whereType<Expression>()
           .toList();
 
       if (positionalArgs.length < 2) return;

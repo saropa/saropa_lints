@@ -183,16 +183,18 @@ bool containsEarlyExit(Statement stmt) {
 /// Returns true for `BuildContext`, `BuildContext?`, or any type containing
 /// `BuildContext` (e.g., generic types).
 bool isBuildContextParam(FormalParameter param) {
-  if (param is SimpleFormalParameter) {
+  // analyzer 13: SimpleFormalParameter and FunctionTypedFormalParameter merged
+  // into RegularFormalParameter, and DefaultFormalParameter (the wrapper for
+  // a parameter with a default value) was removed — every FormalParameter
+  // now carries its own optional `.defaultClause`, so no unwrap step is
+  // needed. Exclude function-typed parameters (functionTypedSuffix != null)
+  // to preserve the original SimpleFormalParameter-only behavior.
+  if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
     final typeSource = param.type?.toSource();
     if (typeSource == null) return false;
     return typeSource == 'BuildContext' ||
         typeSource == 'BuildContext?' ||
         typeSource.contains('BuildContext');
-  }
-
-  if (param is DefaultFormalParameter) {
-    return isBuildContextParam(param.parameter);
   }
 
   return false;
@@ -203,7 +205,9 @@ bool isBuildContextParam(FormalParameter param) {
 /// Useful for tracking context parameter names in static methods where
 /// the parameter might not be named 'context'.
 String? getBuildContextParamName(FormalParameter param) {
-  if (param is SimpleFormalParameter) {
+  // analyzer 13: same RegularFormalParameter merge / DefaultFormalParameter
+  // removal as isBuildContextParam above — see comment there.
+  if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
     final typeSource = param.type?.toSource();
     if (typeSource == null) return null;
     if (typeSource == 'BuildContext' ||
@@ -211,10 +215,6 @@ String? getBuildContextParamName(FormalParameter param) {
         typeSource.contains('BuildContext')) {
       return param.name?.lexeme;
     }
-  }
-
-  if (param is DefaultFormalParameter) {
-    return getBuildContextParamName(param.parameter);
   }
 
   return null;

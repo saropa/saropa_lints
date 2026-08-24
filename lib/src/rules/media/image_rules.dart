@@ -75,8 +75,8 @@ class AvoidImageRebuildOnScrollRule extends SaropaLintRule {
       AstNode? current = node.parent;
 
       while (current != null) {
-        if (current is NamedExpression &&
-            current.name.label.name == 'itemBuilder') {
+        if (current is NamedArgument &&
+            current.name.lexeme == 'itemBuilder') {
           // Found itemBuilder, now check if parent is ListView/GridView
           AstNode? listViewNode = current.parent;
           while (listViewNode != null) {
@@ -173,13 +173,13 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
       bool hasNetworkImage = false;
       bool hasErrorHandler = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
 
           if (name == 'backgroundImage') {
             // Check if it's a NetworkImage
-            final expr = arg.expression;
+            final expr = arg.argumentExpression;
             if (expr is InstanceCreationExpression) {
               final String? imgTypeName =
                   expr.constructorName.type.element?.name;
@@ -268,9 +268,9 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
 
       // Check for placeholder parameter
       bool hasPlaceholder = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'placeholder') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          if (arg.name.lexeme == 'placeholder') {
             hasPlaceholder = true;
             break;
           }
@@ -355,9 +355,9 @@ class PreferImageSizeConstraintsRule extends SaropaLintRule {
       bool hasWidth = false;
       bool hasHeight = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme;
           if (paramName == 'cacheWidth') hasCacheWidth = true;
           if (paramName == 'cacheHeight') hasCacheHeight = true;
           if (paramName == 'width') hasWidth = true;
@@ -432,8 +432,8 @@ class RequireImageErrorFallbackRule extends SaropaLintRule {
       if (typeName != 'Image' || constructorName != 'network') return;
 
       bool hasErrorBuilder = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'errorBuilder') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'errorBuilder') {
           hasErrorBuilder = true;
           break;
         }
@@ -510,8 +510,8 @@ class RequireImageLoadingPlaceholderRule extends SaropaLintRule {
       if (typeName != 'Image' || constructorName != 'network') return;
 
       bool hasLoadingBuilder = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'loadingBuilder') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'loadingBuilder') {
           hasLoadingBuilder = true;
           break;
         }
@@ -691,9 +691,9 @@ class RequirePdfLoadingIndicatorRule extends SaropaLintRule {
       if (!_pdfViewers.contains(typeName)) return;
 
       bool hasLoadingCallback = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           // Check for common loading-related callbacks
           if (name == 'onDocumentLoaded' ||
               name == 'onPageChanged' ||
@@ -872,8 +872,8 @@ class RequireCachedImageDimensionsRule extends SaropaLintRule {
       bool hasMaxHeightDiskCache = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'memCacheWidth') hasMemCacheWidth = true;
           if (name == 'memCacheHeight') hasMemCacheHeight = true;
           if (name == 'maxWidthDiskCache') hasMaxWidthDiskCache = true;
@@ -946,8 +946,8 @@ class RequireCachedImagePlaceholderRule extends SaropaLintRule {
       bool hasProgressIndicator = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'placeholder') hasPlaceholder = true;
           if (name == 'progressIndicatorBuilder') hasProgressIndicator = true;
         }
@@ -1016,9 +1016,9 @@ class RequireCachedImageErrorWidgetRule extends SaropaLintRule {
       bool hasErrorFallback = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
+        if (arg is! NamedArgument) continue;
 
-        final String argumentName = arg.name.label.name;
+        final String argumentName = arg.name.lexeme;
         if (argumentName == 'errorWidget' || argumentName == 'errorBuilder') {
           hasErrorFallback = true;
           break;
@@ -1190,8 +1190,8 @@ class PreferCachedImageFadeAnimationRule extends SaropaLintRule {
       // Check if fadeInDuration is specified
       bool hasFadeInDuration = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'fadeInDuration') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'fadeInDuration') {
           hasFadeInDuration = true;
           break;
         }
@@ -1444,9 +1444,9 @@ class PreferImagePickerRequestFullMetadataRule extends SaropaLintRule {
       // Check for requestFullMetadata parameter
       bool hasRequestFullMetadata = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'requestFullMetadata') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          if (arg.name.lexeme == 'requestFullMetadata') {
             hasRequestFullMetadata = true;
             break;
           }
@@ -1545,9 +1545,9 @@ class AvoidImagePickerLargeFilesRule extends SaropaLintRule {
       // Check for imageQuality or size constraint parameters
       bool hasCompression = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme;
           if (paramName == 'imageQuality' ||
               paramName == 'maxWidth' ||
               paramName == 'maxHeight') {
@@ -1628,8 +1628,8 @@ class PreferCachedImageCacheManagerRule extends SaropaLintRule {
 
       // Check for cacheManager parameter
       bool hasCacheManager = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'cacheManager') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'cacheManager') {
           hasCacheManager = true;
           break;
         }
@@ -1699,9 +1699,9 @@ class RequireImageCacheDimensionsRule extends SaropaLintRule {
 
       // Check for cacheWidth or cacheHeight parameter
       bool hasCacheDimensions = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'cacheWidth' || name == 'cacheHeight') {
             hasCacheDimensions = true;
             break;
@@ -1788,14 +1788,14 @@ class RequireCachedImageDevicePixelRatioRule extends SaropaLintRule {
       bool hasFixedSize = false;
       bool hasDprScaling = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
+        final String name = arg.name.lexeme;
 
         // Check for fixed width/height
         if (name == 'width' || name == 'height') {
-          if (arg.expression is IntegerLiteral ||
-              arg.expression is DoubleLiteral) {
+          if (arg.argumentExpression is IntegerLiteral ||
+              arg.argumentExpression is DoubleLiteral) {
             hasFixedSize = true;
           }
         }
@@ -1898,9 +1898,9 @@ class AvoidCachedImageUnboundedListRule extends SaropaLintRule {
       if (!constructorSource.contains('CachedNetworkImage')) return;
 
       // Check if already has memCacheWidth or memCacheHeight
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'memCacheWidth' || name == 'memCacheHeight') {
             return; // Has cache bounds, OK
           }

@@ -453,24 +453,27 @@ class PreferUseCallbackRule extends SaropaLintRule {
 class _InlineCallbackVisitor extends RecursiveAstVisitor<void> {
   AstNode? inlineCallbackNode;
 
+  // analyzer 13 renamed NamedExpression -> NamedArgument, and the visitor
+  // method along with it. `.name` is now the Token directly (use `.lexeme`),
+  // and `.expression` -> `.argumentExpression`.
   @override
-  void visitNamedExpression(NamedExpression node) {
+  void visitNamedArgument(NamedArgument node) {
     if (inlineCallbackNode != null) return;
 
-    final String paramName = node.name.label.name;
+    final String paramName = node.name.lexeme;
     if (!PreferUseCallbackRule._callbackParams.contains(paramName)) {
-      super.visitNamedExpression(node);
+      super.visitNamedArgument(node);
       return;
     }
 
     // Check if the value is an inline closure
-    final Expression value = node.expression;
+    final Expression value = node.argumentExpression;
     if (value is FunctionExpression) {
       inlineCallbackNode = value;
       return;
     }
 
-    super.visitNamedExpression(node);
+    super.visitNamedArgument(node);
   }
 }
 

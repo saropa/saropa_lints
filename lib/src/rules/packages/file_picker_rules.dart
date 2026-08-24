@@ -36,9 +36,12 @@ const Set<String> _resultMembers = <String>{
 };
 
 Expression? _namedArgValue(ArgumentList args, String name) {
-  for (final Expression arg in args.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) {
-      return arg.expression;
+  // Analyzer 13: `arguments` is now `NodeList<Argument>` (not `Expression`);
+  // `NamedExpression` was renamed to `NamedArgument` with `.name` as a Token
+  // (use `.lexeme`) instead of a `Label`.
+  for (final Argument arg in args.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) {
+      return arg.argumentExpression;
     }
   }
   return null;
@@ -567,10 +570,12 @@ class FilePickerDeprecatedWithDataRule extends SaropaLintRule {
       if (!_pickerMethods.contains(node.methodName.name)) return;
       if (!fileImportsPackage(node, PackageImports.filePicker)) return;
 
-      // Report on the NamedExpression node so the squiggle sits under the
+      // Report on the NamedArgument node so the squiggle sits under the
       // deprecated argument, not the whole call.
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'withData') {
+      // Analyzer 13: NamedExpression -> NamedArgument, arguments is
+      // NodeList<Argument> now.
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'withData') {
           reporter.atNode(arg);
           return;
         }
@@ -639,8 +644,10 @@ class FilePickerDeprecatedWithReadStreamRule extends SaropaLintRule {
       if (!_pickerMethods.contains(node.methodName.name)) return;
       if (!fileImportsPackage(node, PackageImports.filePicker)) return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'withReadStream') {
+      // Analyzer 13: NamedExpression -> NamedArgument, arguments is
+      // NodeList<Argument> now.
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'withReadStream') {
           reporter.atNode(arg);
           return;
         }
@@ -713,8 +720,10 @@ class FilePickerDeprecatedAllowMultipleRule extends SaropaLintRule {
       if (!_pickerMethods.contains(node.methodName.name)) return;
       if (!fileImportsPackage(node, PackageImports.filePicker)) return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'allowMultiple') {
+      // Analyzer 13: NamedExpression -> NamedArgument, arguments is
+      // NodeList<Argument> now.
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'allowMultiple') {
           reporter.atNode(arg);
           return;
         }
@@ -795,9 +804,10 @@ class FilePickerDeprecatedAllowCompressionRule extends SaropaLintRule {
       if (!_pickerMethods.contains(node.methodName.name)) return;
       if (!fileImportsPackage(node, PackageImports.filePicker)) return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'allowCompression') {
+      // Analyzer 13: NamedExpression -> NamedArgument, arguments is
+      // NodeList<Argument> now.
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'allowCompression') {
           reporter.atNode(arg);
           return;
         }
@@ -812,7 +822,7 @@ class FilePickerDeprecatedAllowCompressionRule extends SaropaLintRule {
 /// `allowCompression: true`  → `compressionQuality: 75` (documented default)
 /// `allowCompression: false` → `compressionQuality: 0`  (disable compression)
 ///
-/// The fix targets the whole NamedExpression so both the label and the value
+/// The fix targets the whole NamedArgument so both the label and the value
 /// are replaced in one atomic edit. When the value is not a boolean literal the
 /// computeReplacement returns the original source unchanged, which means the
 /// fix is silently skipped (ReplaceNodeFix contract).
@@ -828,8 +838,10 @@ class _AllowCompressionToQualityFix extends ReplaceNodeFix {
 
   @override
   String computeReplacement(AstNode node) {
-    if (node is! NamedExpression) return node.toSource();
-    final Expression value = node.expression;
+    // Analyzer 13: NamedExpression -> NamedArgument; the argument value is
+    // now `.argumentExpression` instead of `.expression`.
+    if (node is! NamedArgument) return node.toSource();
+    final Expression value = node.argumentExpression;
     if (value is BooleanLiteral) {
       // true → quality 75 (the documented default equivalent)
       // false → quality 0  (disabled compression)

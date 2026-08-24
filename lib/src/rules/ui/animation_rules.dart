@@ -89,8 +89,8 @@ class RequireVsyncMixinRule extends SaropaLintRule {
 
       bool hasVsync = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'vsync') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'vsync') {
           hasVsync = true;
           break;
         }
@@ -542,9 +542,9 @@ class _HeroTagCollector extends RecursiveAstVisitor<void> {
   void visitInstanceCreationExpression(InstanceCreationExpression node) {
     final String? constructorName = node.constructorName.type.element?.name;
     if (constructorName == 'Hero') {
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'tag') {
-          final Expression tagValue = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'tag') {
+          final Expression tagValue = arg.argumentExpression;
 
           if (tagValue is SimpleStringLiteral) {
             final String tagString = tagValue.value;
@@ -716,9 +716,9 @@ class AvoidHardcodedDurationRule extends SaropaLintRule {
 
       // Check if arguments contain literal values
       bool hasLiteralArgs = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final Expression value = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final Expression value = arg.argumentExpression;
           if (value is IntegerLiteral || value is DoubleLiteral) {
             hasLiteralArgs = true;
             break;
@@ -819,17 +819,19 @@ class RequireAnimationCurveRule extends SaropaLintRule {
       // CurvedAnimation(...)` (source `parent: CurvedAnimation(...)`) slipped
       // through and produced a false positive. Inspect the resolved type of
       // each argument expression instead.
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'curve') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          if (arg.name.lexeme == 'curve') {
             return; // Explicit curve parameter.
           }
-          if (_staticTypeIsCurvedAnimation(arg.expression)) {
+          if (_staticTypeIsCurvedAnimation(arg.argumentExpression)) {
             return; // CurvedAnimation passed as a named argument.
           }
           continue;
         }
-        if (_staticTypeIsCurvedAnimation(arg)) {
+        // Positional arguments are Expressions directly under analyzer 13's
+        // Argument union (only named args wrap in NamedArgument).
+        if (_staticTypeIsCurvedAnimation(arg as Expression)) {
           return; // CurvedAnimation passed positionally.
         }
       }
@@ -837,7 +839,8 @@ class RequireAnimationCurveRule extends SaropaLintRule {
       // If the (first) argument is just a direct Animation/Listenable reference
       // without any curve, the animation runs linearly — flag it.
       if (node.argumentList.arguments.isNotEmpty) {
-        final Expression firstArg = node.argumentList.arguments.first;
+        final Expression firstArg =
+            node.argumentList.arguments.first as Expression;
         if (firstArg is SimpleIdentifier || firstArg is PrefixedIdentifier) {
           // Direct controller reference without CurvedAnimation
           reporter.atNode(node);
@@ -1087,9 +1090,9 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
       if (typeName != 'ListView' && typeName != 'GridView') return;
 
       // Check for itemBuilder
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
-          final String builderSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'itemBuilder') {
+          final String builderSource = arg.argumentExpression.toSource();
 
           // Check if builder contains transition widgets
           bool hasTransition = false;
@@ -1111,7 +1114,9 @@ class RequireStaggeredAnimationDelaysRule extends SaropaLintRule {
               builderSource.contains('stagger');
 
           if (!hasStagger) {
-            reporter.atNode(arg.name, code);
+            // arg.name is now a Token (analyzer 13), not an AstNode — report
+            // at the token directly instead of wrapping in atNode.
+            reporter.atToken(arg.name, code);
           }
         }
       }
@@ -1188,7 +1193,8 @@ class PreferTweenSequenceRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression callback = args.arguments.first;
+      // Positional argument: still an Expression under the Argument union.
+      final Expression callback = args.arguments.first as Expression;
       if (callback is FunctionExpression) {
         final String bodySource = callback.body.toSource();
         if (_forwardCallPattern.hasMatch(bodySource)) {
@@ -1450,9 +1456,9 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
 
     // SizeTransition needs special handling based on axis
     if (typeName == 'SizeTransition') {
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'axis') {
-          final String axisValue = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'axis') {
+          final String axisValue = arg.argumentExpression.toSource();
           if (axisValue.contains('horizontal')) {
             return 'size_horizontal';
           }
@@ -1476,9 +1482,9 @@ class AvoidOverlappingAnimationsRule extends SaropaLintRule {
       if (property == null) return;
 
       // Check if child is same type of transition with same effective property
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
-          final Expression child = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
+          final Expression child = arg.argumentExpression;
           if (child is InstanceCreationExpression) {
             final String childTypeName = child.constructorName.type.name.lexeme;
             final String? childProperty = _getEffectiveProperty(
@@ -1582,9 +1588,9 @@ class AvoidAnimationRebuildWasteRule extends SaropaLintRule {
       if (typeName != 'AnimatedBuilder') return;
 
       // Check builder argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'builder') {
-          final String builderSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
+          final String builderSource = arg.argumentExpression.toSource();
 
           // Check if builder contains large containers
           for (final String container in _largeContainers) {
@@ -1671,12 +1677,12 @@ class PreferPhysicsSimulationRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      final String name = node.name.label.name;
+    context.addNamedArgument((NamedArgument node) {
+      final String name = node.name.lexeme;
 
       if (name != 'onPanEnd' && name != 'onDragEnd') return;
 
-      final Expression callback = node.expression;
+      final Expression callback = node.argumentExpression;
       if (callback is! FunctionExpression) return;
 
       final String bodySource = callback.body.toSource();
@@ -1919,9 +1925,9 @@ class PreferSpringAnimationRule extends SaropaLintRule {
       if (constructorName != 'CurvedAnimation') return;
 
       // Check if the curve argument is a physics-like curve
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'curve') {
-          final String curveSource = arg.expression.toSource();
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'curve') {
+          final String curveSource = arg.argumentExpression.toSource();
           for (final String physicsCurve in _physicsLikeCurves) {
             if (curveSource.contains(physicsCurve)) {
               reporter.atNode(node);
@@ -2039,11 +2045,11 @@ class AvoidExcessiveRebuildsAnimationRule extends SaropaLintRule {
       }
 
       // Find the builder named argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is! NamedExpression) continue;
-        if (arg.name.label.name != 'builder') continue;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is! NamedArgument) continue;
+        if (arg.name.lexeme != 'builder') continue;
 
-        final Expression builderExpr = arg.expression;
+        final Expression builderExpr = arg.argumentExpression;
         if (builderExpr is! FunctionExpression) continue;
 
         final int count = _countWidgetsInBody(builderExpr.body);
@@ -2092,9 +2098,9 @@ Expression? _namedArgumentExpression(
   InstanceCreationExpression node,
   String name,
 ) {
-  for (final Expression arg in node.argumentList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == name) {
-      return arg.expression;
+  for (final Argument arg in node.argumentList.arguments) {
+    if (arg is NamedArgument && arg.name.lexeme == name) {
+      return arg.argumentExpression;
     }
   }
   return null;
@@ -2408,12 +2414,12 @@ class AvoidClipDuringAnimationRule extends SaropaLintRule {
     while (current != null && current != ancestor) {
       final AstNode? parent = current.parent;
       // When we step into the ancestor's argument list, the immediate wrapping
-      // NamedExpression must be a child/children slot for the clip to be in its
+      // NamedArgument must be a child/children slot for the clip to be in its
       // render subtree.
-      if (parent is NamedExpression) {
+      if (parent is NamedArgument) {
         final AstNode? grand = parent.parent;
         if (grand is ArgumentList && grand.parent == ancestor) {
-          final String label = parent.name.label.name;
+          final String label = parent.name.lexeme;
           return label == 'child' || label == 'children';
         }
       }
@@ -2729,15 +2735,16 @@ class _VsyncThisHandoffVisitor extends RecursiveAstVisitor<void> {
   bool hasVsyncThisHandoff = false;
 
   @override
-  void visitNamedExpression(NamedExpression node) {
+  void visitNamedArgument(NamedArgument node) {
     if (hasVsyncThisHandoff) return;
 
-    if (node.name.label.name == 'vsync' && node.expression is ThisExpression) {
+    if (node.name.lexeme == 'vsync' &&
+        node.argumentExpression is ThisExpression) {
       hasVsyncThisHandoff = true;
       return;
     }
 
-    super.visitNamedExpression(node);
+    super.visitNamedArgument(node);
   }
 }
 
@@ -2985,9 +2992,9 @@ class PreferListenableBuilderRule extends SaropaLintRule {
       // Locate the `animation:` named argument. If it's absent (constructor
       // mis-use), nothing to report — the Dart analyzer will already flag it.
       Expression? animationArg;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'animation') {
-          animationArg = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'animation') {
+          animationArg = arg.argumentExpression;
           break;
         }
       }
@@ -3249,16 +3256,17 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
     return false;
   }
 
-  /// Unwraps `DefaultFormalParameter` and returns the declared
-  /// [TypeAnnotation] of a `SimpleFormalParameter`. Returns `null` for
+  /// Returns the declared [TypeAnnotation] of a non-function-typed
+  /// `RegularFormalParameter`. Analyzer 13 removed the `DefaultFormalParameter`
+  /// wrapper — every `FormalParameter` now carries its own `.defaultClause`
+  /// directly, so there is no wrapper node to unwrap. Returns `null` for
+  /// function-typed params (`.functionTypedSuffix != null`) and for
   /// field/super-formal parameters (their type is inherited from the
   /// field or superclass, which we don't follow in v1).
   static TypeAnnotation? _parameterTypeAnnotation(FormalParameter param) {
-    FormalParameter inner = param;
-    if (inner is DefaultFormalParameter) {
-      inner = inner.parameter;
+    if (param is RegularFormalParameter && param.functionTypedSuffix == null) {
+      return param.type;
     }
-    if (inner is SimpleFormalParameter) return inner.type;
     return null;
   }
 
@@ -3268,8 +3276,8 @@ class AvoidInertAnimationValueInBuildRule extends SaropaLintRule {
   /// every listener notification, so `.value` reads inside are live.
   static bool _isListeningBuilderCallback(FunctionExpression fn) {
     final AstNode? namedArg = fn.parent;
-    if (namedArg is! NamedExpression) return false;
-    if (namedArg.name.label.name != 'builder') return false;
+    if (namedArg is! NamedArgument) return false;
+    if (namedArg.name.lexeme != 'builder') return false;
 
     final AstNode? argList = namedArg.parent;
     if (argList is! ArgumentList) return false;
@@ -3380,9 +3388,9 @@ class _ListeningBuilderInstantiationVisitor extends RecursiveAstVisitor<void> {
 
     // Only treat this as the same data flow when the animation field is passed
     // via a named argument with the same identifier.
-    NamedExpression? receiverArg;
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == receiverName) {
+    NamedArgument? receiverArg;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == receiverName) {
         receiverArg = arg;
         break;
       }
@@ -3393,7 +3401,7 @@ class _ListeningBuilderInstantiationVisitor extends RecursiveAstVisitor<void> {
       return;
     }
 
-    final Expression argExpression = receiverArg.expression;
+    final Expression argExpression = receiverArg.argumentExpression;
     final DartType? argType = argExpression.staticType;
     final bool isAnimationArg =
         argType is InterfaceType && _isAnimationType(argType);
@@ -3684,7 +3692,8 @@ class _AddStatusListenerVisitor extends RecursiveAstVisitor<void> {
     if (node.methodName.name == 'addStatusListener') {
       final Expression? target = node.realTarget;
       if (target != null && node.argumentList.arguments.length == 1) {
-        final Expression arg = node.argumentList.arguments.first;
+        // Positional argument: still an Expression under the Argument union.
+        final Argument arg = node.argumentList.arguments.first;
         if (arg is FunctionExpression) {
           final String receiverSource = target.toSource();
           // Walk the listener body once with a scanner that sets two
@@ -3843,7 +3852,7 @@ bool _isAnimationControllerType(DartType? type) {
 }
 
 /// Walks ancestors looking for any [FunctionExpression] whose parent is
-/// a [NamedExpression] using a press-gesture callback name. Stops at
+/// a [NamedArgument] using a press-gesture callback name. Stops at
 /// the enclosing [ClassDeclaration] — past the class we cannot be
 /// inside a widget's gesture callback anymore, so returning `false`
 /// there avoids spurious matches from helper functions defined below
@@ -3857,8 +3866,8 @@ bool _isInPressGestureCallback(AstNode start) {
     if (current is ClassDeclaration) return false;
     if (current is FunctionExpression) {
       final AstNode? parent = current.parent;
-      if (parent is NamedExpression &&
-          _pressGestureCallbackNames.contains(parent.name.label.name)) {
+      if (parent is NamedArgument &&
+          _pressGestureCallbackNames.contains(parent.name.lexeme)) {
         return true;
       }
     }

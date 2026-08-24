@@ -117,11 +117,13 @@ bool _methodHasConcreteBody(MethodDeclaration m) {
 }
 
 bool _hasSuperFormalParameter(ConstructorDeclaration c) {
+  // analyzer 13: DefaultFormalParameter was removed — every FormalParameter
+  // subtype (including SuperFormalParameter) now carries its own optional
+  // `.defaultClause` directly instead of being wrapped, so the previous
+  // "wrapped in DefaultFormalParameter" case is already covered by the
+  // plain `is SuperFormalParameter` check below.
   for (final FormalParameter p in c.parameters.parameters) {
     if (p is SuperFormalParameter) return true;
-    if (p is DefaultFormalParameter && p.parameter is SuperFormalParameter) {
-      return true;
-    }
   }
   return false;
 }

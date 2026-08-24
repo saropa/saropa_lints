@@ -72,11 +72,11 @@ class _ReviewScan extends RecursiveAstVisitor<void> {
   }
 
   @override
-  void visitNamedExpression(NamedExpression node) {
-    if (_buttonCallbackNames.contains(node.name.label.name)) {
+  void visitNamedArgument(NamedArgument node) {
+    if (_buttonCallbackNames.contains(node.name.lexeme)) {
       hasButtonCallback = true;
     }
-    super.visitNamedExpression(node);
+    super.visitNamedArgument(node);
   }
 }
 
@@ -229,8 +229,8 @@ class InAppReviewButtonCallbackRequestRule extends SaropaLintRule {
       final FunctionExpression? closure = node
           .thisOrAncestorOfType<FunctionExpression>();
       final AstNode? closureParent = closure?.parent;
-      if (closureParent is! NamedExpression) return;
-      if (!_buttonCallbackNames.contains(closureParent.name.label.name)) return;
+      if (closureParent is! NamedArgument) return;
+      if (!_buttonCallbackNames.contains(closureParent.name.lexeme)) return;
 
       reporter.atNode(node);
     });
@@ -481,9 +481,9 @@ class InAppReviewIosStoreListingMissingAppIdRule extends SaropaLintRule {
 
       // Flag when appStoreId is omitted entirely or explicitly null.
       Expression? appStoreId;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'appStoreId') {
-          appStoreId = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'appStoreId') {
+          appStoreId = arg.argumentExpression;
           break;
         }
       }

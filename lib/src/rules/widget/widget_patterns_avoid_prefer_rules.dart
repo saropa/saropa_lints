@@ -66,9 +66,9 @@ class AvoidIncorrectImageOpacityRule extends SaropaLintRule {
       if (typeName != 'Opacity') return;
 
       // Find the child argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
-          final Expression childExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
+          final Expression childExpr = arg.argumentExpression;
           if (_isImageWidget(childExpr)) {
             reporter.atNode(node);
             return;
@@ -186,8 +186,8 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
   ) {
     final bool hasSemanticLabel = node.argumentList.arguments.any(
-      (Expression arg) =>
-          arg is NamedExpression && arg.name.label.name == 'semanticLabel',
+      (Argument arg) =>
+          arg is NamedArgument && arg.name.lexeme == 'semanticLabel',
     );
 
     if (!hasSemanticLabel) {
@@ -200,8 +200,8 @@ class AvoidMissingImageAltRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
   ) {
     final bool hasSemanticLabel = node.argumentList.arguments.any(
-      (Expression arg) =>
-          arg is NamedExpression && arg.name.label.name == 'semanticLabel',
+      (Argument arg) =>
+          arg is NamedArgument && arg.name.lexeme == 'semanticLabel',
     );
 
     if (!hasSemanticLabel) {
@@ -383,12 +383,12 @@ class AvoidUnnecessaryGestureDetectorRule extends SaropaLintRule {
 
       // Check if any gesture callback is defined
       bool hasGestureCallback = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String paramName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String paramName = arg.name.lexeme;
           if (_gestureCallbacks.contains(paramName)) {
             // Check if it's not null
-            final Expression value = arg.expression;
+            final Expression value = arg.argumentExpression;
             if (value is! NullLiteral) {
               hasGestureCallback = true;
               break;
@@ -467,8 +467,8 @@ class PreferDefineHeroTagRule extends SaropaLintRule {
 
       // Check if tag is defined
       final bool hasTag = node.argumentList.arguments.any(
-        (Expression arg) =>
-            arg is NamedExpression && arg.name.label.name == 'tag',
+        (Argument arg) =>
+            arg is NamedArgument && arg.name.lexeme == 'tag',
       );
 
       if (!hasTag) {
@@ -505,7 +505,7 @@ class PreferExtractingCallbacksRule extends SaropaLintRule {
     context.addFunctionExpression((FunctionExpression node) {
       // Only check callbacks passed as arguments
       final AstNode? parent = node.parent;
-      if (parent is! NamedExpression && parent is! ArgumentList) return;
+      if (parent is! NamedArgument && parent is! ArgumentList) return;
 
       // Check callback length
       final FunctionBody body = node.body;
@@ -846,8 +846,8 @@ class AvoidUncontrolledTextFieldRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       bool hasController = false;
 
-      for (final Expression arg in args.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'controller') {
+      for (final Argument arg in args.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'controller') {
           hasController = true;
           break;
         }
@@ -905,7 +905,7 @@ class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is StringLiteral) {
         final String? path = firstArg.stringValue;
         if (path != null &&
@@ -923,7 +923,7 @@ class AvoidHardcodedAssetPathsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = args.arguments.first;
+      final Argument firstArg = args.arguments.first;
       if (firstArg is StringLiteral) {
         final String? path = firstArg.stringValue;
         if (path != null &&
@@ -1702,9 +1702,9 @@ class AvoidImageWithoutCacheRule extends SaropaLintRule {
         bool hasCacheWidth = false;
         bool hasCacheHeight = false;
 
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression) {
-            final String name = arg.name.label.name;
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument) {
+            final String name = arg.name.lexeme;
             if (name == 'cacheWidth') hasCacheWidth = true;
             if (name == 'cacheHeight') hasCacheHeight = true;
           }
@@ -1943,9 +1943,11 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
       for (final CollectionElement element in node.elements) {
         if (element is InstanceCreationExpression) {
           // Find key argument
-          for (final Expression arg in element.argumentList.arguments) {
-            if (arg is NamedExpression && arg.name.label.name == 'key') {
-              final String? keyString = _extractKeyString(arg.expression);
+          for (final Argument arg in element.argumentList.arguments) {
+            if (arg is NamedArgument && arg.name.lexeme == 'key') {
+              final String? keyString = _extractKeyString(
+                arg.argumentExpression,
+              );
               if (keyString != null) {
                 keyValues.putIfAbsent(keyString, () => <AstNode>[]).add(arg);
               }
@@ -1972,7 +1974,7 @@ class AvoidDuplicateWidgetKeysRule extends SaropaLintRule {
   // InstanceCreationExpression (a constructor call), never a MethodInvocation.
   String? _extractKeyString(Expression expr) {
     if (expr is! InstanceCreationExpression) return null;
-    final NodeList<Expression> args = expr.argumentList.arguments;
+    final NodeList<Argument> args = expr.argumentList.arguments;
     if (args.isEmpty) return null;
     final first = args.first;
     if (first is! StringLiteral) return null;
@@ -2060,9 +2062,9 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
 
       if (typeName == 'Scaffold') {
         if (!_scaffoldHasAppBarOrBottomNav(node)) return;
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'body') {
-            final bodyExpr = arg.expression;
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'body') {
+            final bodyExpr = arg.argumentExpression;
             if (bodyExpr is InstanceCreationExpression &&
                 bodyExpr.constructorName.type.name.lexeme == 'SafeArea') {
               if (_safeAreaHasTopFalse(bodyExpr)) continue;
@@ -2079,11 +2081,11 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
   static bool _scaffoldHasAppBarOrBottomNav(
     InstanceCreationExpression scaffold,
   ) {
-    for (final Expression arg in scaffold.argumentList.arguments) {
-      if (arg is NamedExpression) {
-        final name = arg.name.label.name;
+    for (final Argument arg in scaffold.argumentList.arguments) {
+      if (arg is NamedArgument) {
+        final name = arg.name.lexeme;
         if (name == 'appBar' || name == 'bottomNavigationBar') {
-          if (arg.expression is! NullLiteral) return true;
+          if (arg.argumentExpression is! NullLiteral) return true;
         }
       }
     }
@@ -2093,9 +2095,9 @@ class PreferSafeAreaConsumerRule extends SaropaLintRule {
   /// True when this SafeArea has an explicit `top: false` (no redundant top
   /// inset with Scaffold appBar).
   static bool _safeAreaHasTopFalse(InstanceCreationExpression safeArea) {
-    for (final Expression arg in safeArea.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'top') {
-        final expr = arg.expression;
+    for (final Argument arg in safeArea.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == 'top') {
+        final expr = arg.argumentExpression;
         return expr is BooleanLiteral && !expr.value;
       }
     }
@@ -2161,8 +2163,8 @@ class AvoidUnrestrictedTextFieldLengthRule extends SaropaLintRule {
       if (typeName == 'TextField' || typeName == 'TextFormField') {
         bool hasMaxLength = false;
 
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'maxLength') {
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'maxLength') {
             hasMaxLength = true;
             break;
           }
@@ -2296,8 +2298,8 @@ class AvoidFormWithoutKeyRule extends SaropaLintRule {
       if (typeName == 'Form') {
         bool hasKey = false;
 
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'key') {
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'key') {
             hasKey = true;
             break;
           }
@@ -2507,10 +2509,10 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
       if (target.name != 'ListView' && target.name != 'GridView') return;
 
       // Check itemBuilder argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'itemBuilder') {
           // Check if builder creates widgets without keys
-          final Expression builderExpr = arg.expression;
+          final Expression builderExpr = arg.argumentExpression;
           if (builderExpr is FunctionExpression) {
             final FunctionBody body = builderExpr.body;
             if (body is ExpressionFunctionBody) {
@@ -2526,9 +2528,9 @@ class AvoidStatefulWidgetInListRule extends SaropaLintRule {
 
                 // Check if key is provided
                 bool hasKey = false;
-                for (final Expression argExpr in expr.argumentList.arguments) {
-                  if (argExpr is NamedExpression &&
-                      argExpr.name.label.name == 'key') {
+                for (final Argument argExpr in expr.argumentList.arguments) {
+                  if (argExpr is NamedArgument &&
+                      argExpr.name.lexeme == 'key') {
                     hasKey = true;
                     break;
                   }
@@ -2598,12 +2600,12 @@ class AvoidEmptyTextWidgetsRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Text') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       // First argument should be the text string
-      final Expression firstArg = args.first;
-      if (firstArg is NamedExpression) return; // Skip if no positional arg
+      final Argument firstArg = args.first;
+      if (firstArg is NamedArgument) return; // Skip if no positional arg
 
       // Check for empty string literal
       if (firstArg is SimpleStringLiteral && firstArg.value.isEmpty) {
@@ -2941,8 +2943,8 @@ class AvoidIconSizeOverrideRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Icon') return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'size') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'size') {
           reporter.atNode(arg);
           return;
         }
@@ -3065,15 +3067,15 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
       bool hasDoubleTap = false;
       Expression? childExpression;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'onTap') hasOnTap = true;
           if (name == 'onDoubleTap') hasDoubleTap = true;
           if (name == 'behavior') hasBehavior = true;
           if (_simpleGestures.contains(name)) hasSimple = true;
           if (_complexGestures.contains(name)) hasComplex = true;
-          if (name == 'child') childExpression = arg.expression;
+          if (name == 'child') childExpression = arg.argumentExpression;
         }
       }
 
@@ -3116,9 +3118,9 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
   }
 
   bool _containerHasVisualBackground(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is! NamedExpression) continue;
-      final String argName = arg.name.label.name;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is! NamedArgument) continue;
+      final String argName = arg.name.lexeme;
       if (argName == 'color' || argName == 'decoration') return true;
     }
     return false;
@@ -3128,9 +3130,9 @@ class PreferInkwellOverGestureRule extends SaropaLintRule {
     InstanceCreationExpression node,
     String argumentName,
   ) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is! NamedExpression) continue;
-      if (arg.name.label.name == argumentName) return arg.expression;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is! NamedArgument) continue;
+      if (arg.name.lexeme == argumentName) return arg.argumentExpression;
     }
     return null;
   }
@@ -3190,9 +3192,9 @@ class AvoidFittedBoxForTextRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'FittedBox') return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
-          if (_isTextWidget(arg.expression)) {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
+          if (_isTextWidget(arg.argumentExpression)) {
             reporter.atNode(node.constructorName, code);
             return;
           }
@@ -3293,11 +3295,11 @@ class AvoidOpacityAnimationRule extends SaropaLintRule {
   /// as potentially animation-driven and falls through to the existing
   /// detection.
   bool _hasConstantOpacity(InstanceCreationExpression node) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is! NamedExpression) continue;
-      if (arg.name.label.name != 'opacity') continue;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is! NamedArgument) continue;
+      if (arg.name.lexeme != 'opacity') continue;
 
-      Expression value = arg.expression;
+      Expression value = arg.argumentExpression;
       if (value is PrefixExpression && value.operator.lexeme == '-') {
         value = value.operand;
       }
@@ -3385,11 +3387,11 @@ class PreferSelectableTextRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Text') return;
 
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
-      if (firstArg is NamedExpression) return;
+      final Argument firstArg = args.first;
+      if (firstArg is NamedArgument) return;
 
       if (firstArg is SimpleStringLiteral &&
           firstArg.value.length >= _minLength) {
@@ -3458,10 +3460,10 @@ class AvoidMaterial2FallbackRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'ThemeData') return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          if (arg.name.label.name == 'useMaterial3') {
-            final Expression valueExpr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          if (arg.name.lexeme == 'useMaterial3') {
+            final Expression valueExpr = arg.argumentExpression;
             if (valueExpr is BooleanLiteral && !valueExpr.value) {
               reporter.atNode(arg);
             }
@@ -3792,9 +3794,9 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
 
       bool looksLikeBarrier = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
 
           // Look for onTap callback
           if (argName == 'onTap') {
@@ -3804,23 +3806,23 @@ class PreferTapRegionForDismissRule extends SaropaLintRule {
             // identifier containing `pop`/`close`/`hide` (e.g. `populate()`,
             // `closest()`). Inspect the callback AST for an actual invocation
             // whose method name IS one of the dismiss verbs instead.
-            if (_callbackInvokesDismiss(arg.expression)) {
+            if (_callbackInvokesDismiss(arg.argumentExpression)) {
               hasDismissPattern = true;
             }
           }
 
           // Check for barrier-like child (transparent/semi-transparent container)
           if (argName == 'child') {
-            final Expression childExpr = arg.expression;
+            final Expression childExpr = arg.argumentExpression;
             if (childExpr is InstanceCreationExpression) {
               final String childName =
                   childExpr.constructorName.type.name.lexeme;
               // Container/ColoredBox with color often indicates barrier
               if (childName == 'Container' || childName == 'ColoredBox') {
-                for (final Expression childArg
+                for (final Argument childArg
                     in childExpr.argumentList.arguments) {
-                  if (childArg is NamedExpression &&
-                      childArg.name.label.name == 'color') {
+                  if (childArg is NamedArgument &&
+                      childArg.name.lexeme == 'color') {
                     // Has a color, likely a barrier
                     looksLikeBarrier = true;
                   }
@@ -3903,8 +3905,8 @@ class AvoidGestureWithoutBehaviorRule extends SaropaLintRule {
 
       // Check if behavior is specified
       bool hasBehavior = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'behavior') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'behavior') {
           hasBehavior = true;
           break;
         }
@@ -3984,14 +3986,14 @@ class AvoidDoubleTapSubmitRule extends SaropaLintRule {
       Expression? childExpr;
       Expression? onPressedExpr;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
           if (argName == 'child') {
-            childExpr = arg.expression;
+            childExpr = arg.argumentExpression;
           }
           if (argName == 'onPressed') {
-            onPressedExpr = arg.expression;
+            onPressedExpr = arg.argumentExpression;
           }
         }
       }
@@ -4119,9 +4121,9 @@ class PreferCursorForButtonsRule extends SaropaLintRule {
       bool hasOnTap = false;
       bool hasMouseCursor = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
           if (argName == 'onTap' || argName == 'onPressed') {
             hasOnTap = true;
           }
@@ -4200,7 +4202,7 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
 
       // Check if this TextStyle is used inline in a Text widget style argument
       final AstNode? parent = node.parent;
-      if (parent is NamedExpression && parent.name.label.name == 'style') {
+      if (parent is NamedArgument && parent.name.lexeme == 'style') {
         final AstNode? grandparent = parent.parent?.parent;
         if (grandparent is InstanceCreationExpression) {
           final String parentType =
@@ -4210,13 +4212,13 @@ class AvoidHardcodedTextStylesRule extends SaropaLintRule {
               parentType == 'DefaultTextStyle') {
             // Check for hardcoded values
             bool hasHardcodedValues = false;
-            for (final Expression arg in node.argumentList.arguments) {
-              if (arg is NamedExpression) {
-                final String argName = arg.name.label.name;
+            for (final Argument arg in node.argumentList.arguments) {
+              if (arg is NamedArgument) {
+                final String argName = arg.name.lexeme;
                 if (argName == 'fontSize' || argName == 'fontWeight') {
                   // Check if value is a literal
-                  if (arg.expression is IntegerLiteral ||
-                      arg.expression is DoubleLiteral) {
+                  if (arg.argumentExpression is IntegerLiteral ||
+                      arg.argumentExpression is DoubleLiteral) {
                     hasHardcodedValues = true;
                     break;
                   }
@@ -4301,7 +4303,7 @@ class PreferAssetImageForLocalRule extends SaropaLintRule {
       // referenced by a path that STARTS with `assets/`. Look for a string
       // literal argument (the File path) whose value begins with `assets/`.
       if (node.argumentList.arguments.isEmpty) return;
-      final Expression first = node.argumentList.arguments.first;
+      final Argument first = node.argumentList.arguments.first;
       if (_referencesBundledAssetPath(first)) {
         reporter.atNode(node.constructorName, code);
       }
@@ -4374,8 +4376,8 @@ class PreferFitCoverForBackgroundRule extends SaropaLintRule {
       if (typeName != 'DecorationImage') return;
 
       bool hasFit = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'fit') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'fit') {
           hasFit = true;
           break;
         }
@@ -4522,9 +4524,9 @@ class AvoidLargeImagesInMemoryRule extends SaropaLintRule {
       bool hasHeight = false;
       bool hasCacheWidth = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
           if (argName == 'width') hasWidth = true;
           if (argName == 'height') hasHeight = true;
           if (argName == 'cacheWidth' || argName == 'cacheHeight') {
@@ -4668,11 +4670,11 @@ class AvoidFindChildInBuildRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'ListView' && typeName != 'GridView') return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression &&
-            arg.name.label.name == 'findChildIndexCallback') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument &&
+            arg.name.lexeme == 'findChildIndexCallback') {
           // Check if it's a lambda defined inline
-          if (arg.expression is FunctionExpression) {
+          if (arg.argumentExpression is FunctionExpression) {
             // Check if we're in a build method
             AstNode? current = node.parent;
             while (current != null) {
@@ -5278,17 +5280,22 @@ class AvoidBoolInWidgetConstructorsRule extends SaropaLintRule {
       if (!_isWidgetClass(classDecl)) return;
       final FormalParameterList params = node.parameters;
       for (final FormalParameter p in params.parameters) {
-        final FormalParameter inner = p is DefaultFormalParameter
-            ? p.parameter
-            : p;
-        if (inner is! SimpleFormalParameter) continue;
-        if (!inner.isNamed) continue;
-        final String? name = inner.name?.lexeme;
+        // analyzer 13: SimpleFormalParameter/DefaultFormalParameter were
+        // merged away — every simple param (with or without a default
+        // value) is now a RegularFormalParameter with an optional
+        // .defaultClause carrying the default value directly.
+        if (p is! RegularFormalParameter) continue;
+        // Exclude function-typed params (old SimpleFormalParameter check
+        // implicitly excluded FunctionTypedFormalParameter, since the two
+        // were separate types pre-analyzer-13).
+        if (p.functionTypedSuffix != null) continue;
+        if (!p.isNamed) continue;
+        final String? name = p.name?.lexeme;
         if (name == null || _widgetBoolParamAllowlist.contains(name)) continue;
-        final TypeAnnotation? type = inner.type;
+        final TypeAnnotation? type = p.type;
         if (type is! NamedType) continue;
         if (type.name.lexeme != 'bool') continue;
-        reporter.atNode(inner);
+        reporter.atNode(p);
       }
     });
   }
@@ -5391,9 +5398,9 @@ class AvoidUnnecessaryContainersRule extends SaropaLintRule {
       if (!uri.contains('flutter')) return;
 
       final Set<String> namedArgNames = <String>{};
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          namedArgNames.add(arg.name.label.name);
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          namedArgNames.add(arg.name.lexeme);
         }
       }
 
@@ -5464,8 +5471,10 @@ class PreferConstLiteralsToCreateImmutablesRule extends SaropaLintRule {
       // bugs/prefer_const_literals_to_create_immutables_false_positive_inside_const_constructor_context.md
       if (node.isConst) return;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        final Expression expr = arg is NamedExpression ? arg.expression : arg;
+      for (final Argument arg in node.argumentList.arguments) {
+        final Expression expr = arg is NamedArgument
+            ? arg.argumentExpression
+            : arg as Expression;
         if (expr is ListLiteral &&
             expr.constKeyword == null &&
             _allElementsConst(expr.elements)) {
@@ -5577,7 +5586,7 @@ InstanceCreationExpression? _enclosingChildChainWidget(
     // (the argument itself, its named wrapper, the argument list, and simple
     // collection literals used for `children:`). Anything else (method calls,
     // conditional expressions, casts, ...) is not a direct child slot.
-    if (current is NamedExpression ||
+    if (current is NamedArgument ||
         current is ArgumentList ||
         current is ListLiteral ||
         current is Expression && _isChildPlumbing(current)) {
@@ -5616,7 +5625,7 @@ bool _callbackInvokesDismiss(Expression callbackExpr) {
 /// `assets/`. Handles the common `FileImage(File('assets/...'))` shape by
 /// scanning the argument subtree for any such literal. Replaces the old
 /// `contains('asset')` that matched paths like `/var/dataset/...`.
-bool _referencesBundledAssetPath(Expression arg) {
+bool _referencesBundledAssetPath(Argument arg) {
   final _AssetPathLiteralDetector detector = _AssetPathLiteralDetector();
   arg.accept(detector);
   return detector.matched;
@@ -5640,8 +5649,10 @@ bool _isConstConstructible(InstanceCreationExpression node) {
   final element = node.constructorName.element;
   // No resolved constructor, or a non-const constructor, cannot be const.
   if (element == null || !element.isConst) return false;
-  for (final Expression arg in node.argumentList.arguments) {
-    final Expression value = arg is NamedExpression ? arg.expression : arg;
+  for (final Argument arg in node.argumentList.arguments) {
+    final Expression value = arg is NamedArgument
+        ? arg.argumentExpression
+        : arg as Expression;
     if (!_isConstArgument(value)) return false;
   }
   return true;
@@ -5873,9 +5884,9 @@ class AvoidParenthesizedButtonCaptionRule extends SaropaLintRule {
     InstanceCreationExpression node,
     String name,
   ) {
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == name) {
-        return arg.expression;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument && arg.name.lexeme == name) {
+        return arg.argumentExpression;
       }
     }
     return null;

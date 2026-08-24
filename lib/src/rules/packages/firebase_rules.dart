@@ -996,9 +996,10 @@ class IncorrectFirebaseEventNameRule extends SaropaLintRule {
       if (node.methodName.name != 'logEvent') return;
 
       // Find the 'name' argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'name') {
-          final Expression value = arg.expression;
+      // analyzer 13: NamedExpression -> NamedArgument; name via .name.lexeme, value via argumentExpression
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'name') {
+          final Expression value = arg.argumentExpression;
           if (value is StringLiteral) {
             final String? eventName = value.stringValue;
             if (eventName != null && !_isValidEventName(eventName)) {
@@ -1106,9 +1107,10 @@ class IncorrectFirebaseParameterNameRule extends SaropaLintRule {
       if (node.methodName.name != 'logEvent') return;
 
       // Find the 'parameters' argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'parameters') {
-          final Expression value = arg.expression;
+      // analyzer 13: NamedExpression -> NamedArgument; name via .name.lexeme, value via argumentExpression
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'parameters') {
+          final Expression value = arg.argumentExpression;
           if (value is SetOrMapLiteral) {
             _checkMapLiteral(value, reporter);
           }
@@ -1820,11 +1822,12 @@ class RequireMapIdleCallbackRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      if (node.name.label.name != 'onCameraMove') return;
+    // analyzer 13: NamedExpression -> NamedArgument; name via .name.lexeme, value via argumentExpression
+    context.addNamedArgument((NamedArgument node) {
+      if (node.name.lexeme != 'onCameraMove') return;
 
       // Check if the callback contains fetch/load/get operations
-      final Expression value = node.expression;
+      final Expression value = node.argumentExpression;
       if (value is! FunctionExpression) return;
 
       final String bodySource = value.body.toSource();
@@ -1895,11 +1898,12 @@ class PreferMarkerClusteringRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedExpression((NamedExpression node) {
-      if (node.name.label.name != 'markers') return;
+    // analyzer 13: NamedExpression -> NamedArgument; name via .name.lexeme, value via argumentExpression
+    context.addNamedArgument((NamedArgument node) {
+      if (node.name.lexeme != 'markers') return;
 
       // Check if using .map() to create markers from a collection
-      final Expression value = node.expression;
+      final Expression value = node.argumentExpression;
       final String valueSource = value.toSource();
 
       // Look for patterns that suggest many markers
@@ -2686,14 +2690,14 @@ class RequireFirestoreIndexRule extends SaropaLintRule {
           if (method == 'where') {
             whereCount++;
             // Try to extract field name from first argument
-            final NodeList<Expression> args = current.argumentList.arguments;
+            final NodeList<Argument> args = current.argumentList.arguments;
             if (args.isNotEmpty) {
               final String fieldArg = args.first.toSource();
               whereFields.add(fieldArg);
             }
           } else if (method == 'orderBy') {
             orderByCount++;
-            final NodeList<Expression> args = current.argumentList.arguments;
+            final NodeList<Argument> args = current.argumentList.arguments;
             if (args.isNotEmpty) {
               final String fieldArg = args.first.toSource();
               orderByFields.add(fieldArg);
@@ -3307,7 +3311,7 @@ class RequireFirebaseTokenRefreshRule extends SaropaLintRule {
           !RegExp(r'\bcurrentUser\b').hasMatch(targetSrc)) {
         return;
       }
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isNotEmpty && args.first.toSource() == 'true') {
         return;
       }

@@ -58,9 +58,9 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
       bool hasMaxLines = false;
       bool hasSoftWrap = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
           if (argName == 'overflow') hasOverflow = true;
           if (argName == 'maxLines') hasMaxLines = true;
           if (argName == 'softWrap') hasSoftWrap = true;
@@ -71,10 +71,10 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
       if (hasOverflow || hasMaxLines || hasSoftWrap) return;
 
       // Check if text content is dynamic (not a simple string literal)
-      final NodeList<Expression> args = node.argumentList.arguments;
+      final NodeList<Argument> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first;
+      final Argument firstArg = args.first;
 
       // Skip if it's a short static string (likely a label/button text)
       if (firstArg is SimpleStringLiteral) {
@@ -171,8 +171,8 @@ class RequireImageErrorBuilderRule extends SaropaLintRule {
 
       bool hasErrorBuilder = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'errorBuilder') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'errorBuilder') {
           hasErrorBuilder = true;
           break;
         }
@@ -257,9 +257,9 @@ class RequireImageDimensionsRule extends SaropaLintRule {
     bool hasHeight = false;
     bool hasFit = false;
 
-    for (final Expression arg in node.argumentList.arguments) {
-      if (arg is NamedExpression) {
-        final String argName = arg.name.label.name;
+    for (final Argument arg in node.argumentList.arguments) {
+      if (arg is NamedArgument) {
+        final String argName = arg.name.lexeme;
         if (argName == 'width') hasWidth = true;
         if (argName == 'height') hasHeight = true;
         if (argName == 'fit') hasFit = true;
@@ -287,9 +287,9 @@ class RequireImageDimensionsRule extends SaropaLintRule {
             parentType == 'Container' ||
             parentType == 'ConstrainedBox' ||
             parentType == 'AspectRatio') {
-          for (final Expression arg in current.argumentList.arguments) {
-            if (arg is NamedExpression) {
-              final String argName = arg.name.label.name;
+          for (final Argument arg in current.argumentList.arguments) {
+            if (arg is NamedArgument) {
+              final String argName = arg.name.lexeme;
               if (argName == 'width' ||
                   argName == 'height' ||
                   argName == 'constraints' ||
@@ -402,9 +402,9 @@ class RequirePlaceholderForNetworkRule extends SaropaLintRule {
 
       bool hasPlaceholder = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
           if (argName == 'loadingBuilder' ||
               argName == 'placeholder' ||
               argName == 'progressIndicatorBuilder') {
@@ -494,9 +494,9 @@ class RequireHoverStatesRule extends SaropaLintRule {
       bool hasOnTap = false;
       bool hasHoverHandling = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
           if (argName == 'onTap' || argName == 'onPressed') {
             hasOnTap = true;
           }
@@ -588,14 +588,14 @@ class RequireButtonLoadingStateRule extends SaropaLintRule {
       Expression? onPressedExpr;
       Expression? childExpr;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
           if (argName == 'onPressed') {
-            onPressedExpr = arg.expression;
+            onPressedExpr = arg.argumentExpression;
           }
           if (argName == 'child') {
-            childExpr = arg.expression;
+            childExpr = arg.argumentExpression;
           }
         }
       }
@@ -795,9 +795,9 @@ class RequireDefaultTextStyleRule extends SaropaLintRule {
         if (element is InstanceCreationExpression) {
           final String typeName = element.constructorName.type.name.lexeme;
           if (typeName == 'Text') {
-            for (final Expression arg in element.argumentList.arguments) {
-              if (arg is NamedExpression && arg.name.label.name == 'style') {
-                final String styleSource = arg.expression.toSource();
+            for (final Argument arg in element.argumentList.arguments) {
+              if (arg is NamedArgument && arg.name.lexeme == 'style') {
+                final String styleSource = arg.argumentExpression.toSource();
                 if (firstStyleSource == null) {
                   firstStyleSource = styleSource;
                   textWithStyleCount++;
@@ -886,12 +886,12 @@ class RequireDisabledStateRule extends SaropaLintRule {
       final questionMarkPattern = RegExp(r'\?');
       final nullWordPattern = RegExp(r'\bnull\b');
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
 
           if (argName == 'onPressed') {
-            final String exprSource = arg.expression.toSource();
+            final String exprSource = arg.argumentExpression.toSource();
             if (questionMarkPattern.hasMatch(exprSource) &&
                 nullWordPattern.hasMatch(exprSource)) {
               hasConditionalOnPressed = true;
@@ -970,8 +970,8 @@ class RequireDragFeedbackRule extends SaropaLintRule {
       if (typeName != 'Draggable' && typeName != 'LongPressDraggable') return;
 
       bool hasFeedback = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'feedback') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'feedback') {
           hasFeedback = true;
           break;
         }
@@ -1032,9 +1032,9 @@ class RequireLongPressCallbackRule extends SaropaLintRule {
       bool hasOnTap = false;
       bool hasOnLongPress = false;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String argName = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String argName = arg.name.lexeme;
           if (argName == 'onTap') hasOnTap = true;
           if (argName == 'onLongPress') hasOnLongPress = true;
         }
@@ -1043,9 +1043,9 @@ class RequireLongPressCallbackRule extends SaropaLintRule {
       // Only suggest if has onTap but no onLongPress, and is on a list item
       if (hasOnTap && !hasOnLongPress) {
         // Check if child is a list-like item
-        for (final Expression arg in node.argumentList.arguments) {
-          if (arg is NamedExpression && arg.name.label.name == 'child') {
-            final String childSource = arg.expression.toSource();
+        for (final Argument arg in node.argumentList.arguments) {
+          if (arg is NamedArgument && arg.name.lexeme == 'child') {
+            final String childSource = arg.argumentExpression.toSource();
             if (childSource.contains('ListTile') ||
                 childSource.contains('Card') ||
                 childSource.contains('Item')) {
@@ -1119,9 +1119,9 @@ class RequireErrorWidgetRule extends SaropaLintRule {
       if (typeName != 'FutureBuilder' && typeName != 'StreamBuilder') return;
 
       // Find the builder argument
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'builder') {
-          final Expression expr = arg.expression;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
+          final Expression expr = arg.argumentExpression;
           if (expr is FunctionExpression) {
             // AST-based check. Avoids the previous source-substring trap
             // where (a) a builder that delegates error handling to an
@@ -1223,15 +1223,11 @@ class RequireErrorWidgetRule extends SaropaLintRule {
     final NodeList<FormalParameter> list = params.parameters;
     if (list.length < 2) return null;
     final FormalParameter second = list[1];
-    // Optional/named-defaulted parameters are wrapped; unwrap before
-    // inspecting the underlying name token.
-    final FormalParameter inner = second is DefaultFormalParameter
-        ? second.parameter
-        : second;
-    if (inner is SimpleFormalParameter) {
-      return inner.name?.lexeme;
-    }
-    return null;
+    // analyzer 13 removed the DefaultFormalParameter wrapper node: every
+    // FormalParameter subtype (including optional/named-defaulted ones)
+    // now exposes its own `.name` token directly on the base interface, so
+    // no unwrapping is needed before reading the parameter's name.
+    return second.name?.lexeme;
   }
 }
 
@@ -1388,8 +1384,8 @@ class RequireFormValidationRule extends SaropaLintRule {
 
       // Check if has validator
       bool hasValidator = false;
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'validator') {
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument && arg.name.lexeme == 'validator') {
           hasValidator = true;
           break;
         }
@@ -1478,7 +1474,7 @@ class RequireThemeColorFromSchemeRule extends SaropaLintRule {
 
       // Check for hex literal
       if (node.argumentList.arguments.isNotEmpty) {
-        final Expression firstArg = node.argumentList.arguments.first;
+        final Argument firstArg = node.argumentList.arguments.first;
         if (firstArg is IntegerLiteral) {
           reporter.atNode(node);
         }
@@ -1564,11 +1560,11 @@ class RequireSafeAreaHandlingRule extends SaropaLintRule {
       // Check Scaffold arguments
       bool hasAppBar = false;
       bool hasBottomNav = false;
-      NamedExpression? bodyArg;
+      NamedArgument? bodyArg;
 
-      for (final Expression arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final String name = arg.name.label.name;
+      for (final Argument arg in node.argumentList.arguments) {
+        if (arg is NamedArgument) {
+          final String name = arg.name.lexeme;
           if (name == 'appBar') hasAppBar = true;
           if (name == 'bottomNavigationBar') hasBottomNav = true;
           if (name == 'body') bodyArg = arg;
@@ -1580,10 +1576,10 @@ class RequireSafeAreaHandlingRule extends SaropaLintRule {
       if (hasAppBar && hasBottomNav) return;
 
       // Skip if body is a simple variable reference
-      if (bodyArg.expression is SimpleIdentifier) return;
+      if (bodyArg.argumentExpression is SimpleIdentifier) return;
 
       // Check if body widget handles safe areas
-      final Expression bodyExpr = bodyArg.expression;
+      final Expression bodyExpr = bodyArg.argumentExpression;
       if (bodyExpr is InstanceCreationExpression) {
         final String bodyType = bodyExpr.constructorName.type.name.lexeme;
 
@@ -1597,10 +1593,10 @@ class RequireSafeAreaHandlingRule extends SaropaLintRule {
         if (safeWidgets.contains(bodyType)) return;
 
         // Check if body wraps with SafeArea
-        for (final Expression bodyChildArg in bodyExpr.argumentList.arguments) {
-          if (bodyChildArg is NamedExpression &&
-              bodyChildArg.name.label.name == 'child') {
-            final Expression childExpr = bodyChildArg.expression;
+        for (final Argument bodyChildArg in bodyExpr.argumentList.arguments) {
+          if (bodyChildArg is NamedArgument &&
+              bodyChildArg.name.lexeme == 'child') {
+            final Expression childExpr = bodyChildArg.argumentExpression;
             if (childExpr is InstanceCreationExpression) {
               final String childType =
                   childExpr.constructorName.type.name.lexeme;
@@ -1610,7 +1606,7 @@ class RequireSafeAreaHandlingRule extends SaropaLintRule {
         }
       }
 
-      reporter.atNode(bodyArg.name, code);
+      reporter.atToken(bodyArg.name, code);
     });
   }
 }
@@ -1879,7 +1875,7 @@ class RequireTextFormFieldInFormRule extends SaropaLintRule {
       // Check if the TextFormField has a validator parameter (indicates form usage)
       bool hasValidator = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'validator') {
+        if (arg is NamedArgument && arg.name.lexeme == 'validator') {
           hasValidator = true;
           break;
         }
@@ -1986,8 +1982,8 @@ class RequireWebViewNavigationDelegateRule extends SaropaLintRule {
       // Check for navigationDelegate or onNavigationRequest parameter
       bool hasNavigationControl = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression) {
-          final paramName = arg.name.label.name;
+        if (arg is NamedArgument) {
+          final paramName = arg.name.lexeme;
           if (paramName == 'navigationDelegate' ||
               paramName == 'onNavigationRequest' ||
               paramName == 'shouldOverrideUrlLoading') {
@@ -2079,7 +2075,7 @@ class RequireAnimatedBuilderChildRule extends SaropaLintRule {
       // Check if child parameter is present
       bool hasChild = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'child') {
+        if (arg is NamedArgument && arg.name.lexeme == 'child') {
           hasChild = true;
           break;
         }
@@ -2394,8 +2390,8 @@ class RequireImagePickerPermissionIosRule extends SaropaLintRule {
       if (missingCamera.isEmpty) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'source') {
-          if (arg.expression.toSource() == 'ImageSource.camera') {
+        if (arg is NamedArgument && arg.name.lexeme == 'source') {
+          if (arg.argumentExpression.toSource() == 'ImageSource.camera') {
             reporter.atNode(node);
           }
         }
@@ -2469,8 +2465,8 @@ class RequireImagePickerPermissionAndroidRule extends SaropaLintRule {
       if (!_cameraCapableMethods.contains(node.methodName.name)) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedExpression && arg.name.label.name == 'source') {
-          if (arg.expression.toSource() == 'ImageSource.camera') {
+        if (arg is NamedArgument && arg.name.lexeme == 'source') {
+          if (arg.argumentExpression.toSource() == 'ImageSource.camera') {
             reporter.atNode(node);
           }
         }
@@ -3008,7 +3004,7 @@ class _RequireImageErrorBuilderFix extends SaropaFixProducer {
     if (creation.constructorName.name?.name != 'network') return;
 
     for (final arg in creation.argumentList.arguments) {
-      if (arg is NamedExpression && arg.name.label.name == 'errorBuilder') {
+      if (arg is NamedArgument && arg.name.lexeme == 'errorBuilder') {
         return;
       }
     }
@@ -3060,8 +3056,8 @@ class _RequirePlaceholderForNetworkFix extends SaropaFixProducer {
     if (!isImageNetwork && !isCached) return;
 
     for (final arg in creation.argumentList.arguments) {
-      if (arg is NamedExpression) {
-        final n = arg.name.label.name;
+      if (arg is NamedArgument) {
+        final n = arg.name.lexeme;
         if (n == 'loadingBuilder' ||
             n == 'placeholder' ||
             n == 'progressIndicatorBuilder') {

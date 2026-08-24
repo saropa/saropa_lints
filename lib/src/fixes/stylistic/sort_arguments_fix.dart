@@ -28,11 +28,14 @@ class SortArgumentsFix extends SaropaFixProducer {
         : node.thisOrAncestorOfType<ArgumentList>();
     if (target == null) return;
 
-    // Separate positional and named arguments
-    final positional = <Expression>[];
-    final named = <NamedExpression>[];
+    // Separate positional and named arguments. analyzer 13: argument-list
+    // entries are now `Argument` (Expression for positional, NamedArgument
+    // for named) rather than a uniform Expression with NamedExpression
+    // subtype, so the split keys on NamedArgument instead.
+    final positional = <Argument>[];
+    final named = <NamedArgument>[];
     for (final arg in target.arguments) {
-      if (arg is NamedExpression) {
+      if (arg is NamedArgument) {
         named.add(arg);
       } else {
         positional.add(arg);
@@ -42,8 +45,8 @@ class SortArgumentsFix extends SaropaFixProducer {
     if (named.length < 2) return;
 
     // Sort named arguments alphabetically by name
-    final sortedNamed = List<NamedExpression>.from(named)
-      ..sort((a, b) => a.name.label.name.compareTo(b.name.label.name));
+    final sortedNamed = List<NamedArgument>.from(named)
+      ..sort((a, b) => a.name.lexeme.compareTo(b.name.lexeme));
 
     // Build replacement argument list
     final parts = <String>[
