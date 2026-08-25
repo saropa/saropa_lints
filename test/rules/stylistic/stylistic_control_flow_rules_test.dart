@@ -342,7 +342,7 @@ void f() {
 }
 ''');
         expect(nodes, hasLength(1));
-        expect(nodes.first.parent, isA<NamedArgument>());
+        expect(nodes.first.parent, isA<NamedExpression>());
       });
     });
   });

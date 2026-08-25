@@ -13,7 +13,7 @@ import 'package:test/test.dart';
 /// Parses [code] into a [CompilationUnit] for visitor probes.
 CompilationUnit _parse(String code) => parseString(content: code).unit;
 
-NamedArgument? _filterQualityViolationFromStatement(Expression expr) {
+NamedExpression? _filterQualityViolationFromStatement(Expression expr) {
   if (expr is InstanceCreationExpression) {
     return ImageFilterQualityLowDetection.violatingFilterQualityNamedArg(expr);
   }
@@ -40,16 +40,16 @@ void main() {
         final ExpressionStatement stmt =
             body.block.statements.first as ExpressionStatement;
         final MethodInvocation inv = stmt.expression as MethodInvocation;
-        final NamedArgument arg =
-            inv.argumentList.arguments.first as NamedArgument;
+        final NamedExpression arg =
+            inv.argumentList.arguments.first as NamedExpression;
         expect(
           ImageFilterQualityLowDetection.isFilterQualityLowValue(
-            arg.argumentExpression,
+            arg.expression,
           ),
           isTrue,
         );
         expect(
-          ImageFilterQualityLowDetection.replacementSource(arg.argumentExpression),
+          ImageFilterQualityLowDetection.replacementSource(arg.expression),
           'FilterQuality.medium',
         );
       },
@@ -65,11 +65,11 @@ void main() {
           fun.functionExpression.body as BlockFunctionBody;
       final ExpressionStatement stmt =
           body.block.statements.first as ExpressionStatement;
-      final NamedArgument? named = _filterQualityViolationFromStatement(
+      final NamedExpression? named = _filterQualityViolationFromStatement(
         stmt.expression,
       );
       expect(named, isNotNull);
-      expect(named!.name.lexeme, 'filterQuality');
+      expect(named!.name.label.name, 'filterQuality');
     });
 
     test('skips Image.network with FilterQuality.medium', () {
@@ -109,10 +109,10 @@ void main() {
       final ExpressionStatement stmt =
           body.block.statements.first as ExpressionStatement;
       final MethodInvocation inv = stmt.expression as MethodInvocation;
-      final NamedArgument arg =
-          inv.argumentList.arguments.first as NamedArgument;
+      final NamedExpression arg =
+          inv.argumentList.arguments.first as NamedExpression;
       expect(
-        ImageFilterQualityLowDetection.isFilterQualityLowValue(arg.argumentExpression),
+        ImageFilterQualityLowDetection.isFilterQualityLowValue(arg.expression),
         isFalse,
       );
     });
@@ -128,10 +128,10 @@ void main() {
       final ExpressionStatement stmt =
           body.block.statements.first as ExpressionStatement;
       final MethodInvocation inv = stmt.expression as MethodInvocation;
-      final NamedArgument arg =
-          inv.argumentList.arguments.first as NamedArgument;
+      final NamedExpression arg =
+          inv.argumentList.arguments.first as NamedExpression;
       expect(
-        ImageFilterQualityLowDetection.isFilterQualityLowValue(arg.argumentExpression),
+        ImageFilterQualityLowDetection.isFilterQualityLowValue(arg.expression),
         isFalse,
       );
     });
@@ -179,10 +179,10 @@ void main() {
       final ExpressionStatement stmt =
           body.block.statements.first as ExpressionStatement;
       final MethodInvocation inv = stmt.expression as MethodInvocation;
-      final NamedArgument arg =
-          inv.argumentList.arguments.first as NamedArgument;
+      final NamedExpression arg =
+          inv.argumentList.arguments.first as NamedExpression;
       expect(
-        ImageFilterQualityLowDetection.replacementSource(arg.argumentExpression),
+        ImageFilterQualityLowDetection.replacementSource(arg.expression),
         'ui.FilterQuality.medium',
       );
     });
