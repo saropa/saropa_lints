@@ -19,6 +19,7 @@ import 'package:saropa_lints/src/native/saropa_context.dart';
 import 'package:saropa_lints/src/report/timing_emitter.dart';
 import 'package:saropa_lints/src/saropa_lint_rule.dart' show RuleTimingTracker;
 import 'package:saropa_lints/src/cli/sdk_compat_checker.dart';
+import 'package:saropa_lints/src/config/rule_lane.dart' show parseRuleLane;
 import 'package:saropa_lints/src/scan/scan_cli_args.dart';
 import 'package:saropa_lints/src/string_slice_utils.dart';
 import 'package:saropa_lints/src/tiers.dart';
@@ -98,6 +99,10 @@ Future<void> main(List<String> args) async {
     tier: tier,
     debugRule: parsed.debugRule,
     excludeLightLane: parsed.excludeLightLane,
+    // --lane full|light: explicit lane override. parseRuleLane handles null
+    // (defaults to light for the plugin, but ScanRunner defaults to full).
+    lane: parseRuleLane(parsed.lane ?? 'full'),
+    laneStats: parsed.laneStats,
     messageSink: parsed.quiet ? (_) {} : null,
     excludeGlobs: parsed.excludeGlobs,
     includeGlobs: parsed.includeGlobs,
@@ -709,6 +714,21 @@ void _printUsage() {
   );
   print(
     '                      `lane: light`, so findings are not reported twice.',
+  );
+  print(
+    '  --lane <full|light> Which rule lane to run. "full" (default) runs every',
+  );
+  print(
+    '                      enabled rule; "light" restricts to cheap, resolution-',
+  );
+  print(
+    '                      free rules only (the same subset the analysis server',
+  );
+  print(
+    '                      uses in its default lane).',
+  );
+  print(
+    '  --lane-stats        Print how many rules are light-lane vs full-only.',
   );
   print(
     '  --debug-rule <name> Emit per-node type-resolution trace for the named',

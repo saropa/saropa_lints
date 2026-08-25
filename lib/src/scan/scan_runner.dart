@@ -26,6 +26,8 @@ import 'package:analyzer/src/string_source.dart';
 import 'package:path/path.dart' as p;
 
 import '../config/memory_mode.dart' show MemoryModeConfig;
+import '../config/rule_lane.dart'
+    show RuleLane, lightLaneRuleNames, setActiveRuleLane;
 import '../config/runtime_tier_cap.dart';
 import '../init/cli_args.dart' show tierOrder;
 import '../../saropa_lints.dart';
@@ -52,6 +54,8 @@ class ScanRunner {
     this.applyExclusionsToFileList = true,
     this.debugRule,
     this.excludeLightLane = false,
+    this.lane = RuleLane.full,
+    this.laneStats = false,
     List<String> excludeGlobs = const [],
     List<String> includeGlobs = const [],
   })  : _excludePatterns = excludeGlobs.map(_globToRegex).toList(),
@@ -109,6 +113,16 @@ class ScanRunner {
   /// predicate in `lib/src/config/rule_lane.dart`, so the two sides cannot
   /// disagree about which rules the split covers.
   final bool excludeLightLane;
+
+  /// Which lane the scan should use. Defaults to [RuleLane.full] so every
+  /// enabled rule fires. Set to [RuleLane.light] via `--lane light` to
+  /// restrict the scan to the same cheap, resolution-free subset the
+  /// analysis server runs in its default lane.
+  final RuleLane lane;
+
+  /// When true, prints how many rules are in the light lane vs full-only,
+  /// making the lane gate's effect observable. Activated by `--lane-stats`.
+  final bool laneStats;
 
   /// Map from rule name to its declared LintImpact name (error/warning/info).
   /// Built by `_prepare` so [_collectDiagnostics] can stamp each diagnostic.
@@ -261,6 +275,12 @@ class ScanRunner {
   /// and the caller returns no diagnostics.
   ({List<SaropaLintRule> rules, List<String> files})? _prepare() {
     MemoryModeConfig.markCli();
+    // The lane system limits in-process analysis server RSS by gating
+    // expensive rules (usesTypeResolution, high cost, INFO severity) to the
+    // full lane. The CLI scanner exits after one run, so RSS is irrelevant —
+    // default to full coverage. Callers can pass RuleLane.light via --lane
+    // to restrict the scan to the cheap subset.
+    setActiveRuleLane(lane);
     reloadRuntimeTierCapFromProject(p.absolute(targetPath));
     // Reset before resolving, not after: _resolveRuleNames (via
     // _applyConfigOverrides / _loadRulesFromConfig) sets this when the
@@ -306,6 +326,20 @@ class ScanRunner {
       _err('Loaded ${rules.length} rules for tier: $tierLabel');
     } else {
       _err('Loaded ${rules.length} rules from analysis_options.yaml');
+    }
+
+    // --lane-stats: show how the lane gate partitions the loaded rules.
+    if (laneStats) {
+      ensureRuleRegistryBuilt();
+      final lightNames = lightLaneRuleNames;
+      final lightCount =
+          ruleNames.where((n) => lightNames.contains(n)).length;
+      final fullOnly = ruleNames.length - lightCount;
+      _err(
+        'Lane stats: ${ruleNames.length} enabled, '
+        '$lightCount light-lane, $fullOnly full-only. '
+        'Active lane: ${lane.name}.',
+      );
     }
 
     final filesToScan = _resolveDartFiles();

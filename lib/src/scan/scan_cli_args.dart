@@ -56,6 +56,8 @@ class ScanCliArgs {
     this.jsonFilePath,
     this.profile = false,
     this.excludeLightLane = false,
+    this.lane,
+    this.laneStats = false,
     this.quiet = false,
     this.excludeGlobs = const [],
     this.includeGlobs = const [],
@@ -166,6 +168,15 @@ class ScanCliArgs {
   /// without driving the daemon protocol by hand.
   final bool excludeLightLane;
 
+  /// Which lane the scan should use. `full` (default) runs every enabled
+  /// rule; `light` restricts to cheap, resolution-free rules only. When
+  /// null, the scanner defaults to `full`.
+  final String? lane;
+
+  /// When true, prints how many rules are in the light lane vs full-only,
+  /// making the lane gate's effect observable.
+  final bool laneStats;
+
   /// When true, suppresses ALL stderr progress/status messages (Loaded,
   /// Scanning, timing, threshold notes). The caller gets only the exit code
   /// and stdout output (report or JSON). Useful for fully silent automation
@@ -225,6 +236,8 @@ ScanParseResult parseScanArgs(
   bool checkSdkCompat = false;
   bool profile = false;
   bool excludeLightLane = false;
+  String? lane;
+  bool laneStats = false;
   bool quiet = false;
 
   var i = 0;
@@ -255,6 +268,30 @@ ScanParseResult parseScanArgs(
     // (excluding "full" would leave nothing to scan).
     if (arg == '--exclude-light-lane') {
       excludeLightLane = true;
+      i++;
+      continue;
+    }
+    // Explicit lane override: --lane full (default) or --lane light.
+    // Light lane restricts the scan to cheap, resolution-free rules; full
+    // runs every enabled rule. Validates the value against the known set.
+    if (arg == '--lane') {
+      i++;
+      if (i >= args.length || args[i].startsWith('--')) {
+        return ScanParseInvalid('--lane requires a value (full or light)');
+      }
+      final value = args[i].toLowerCase();
+      if (value != 'full' && value != 'light') {
+        return ScanParseInvalid(
+          '--lane must be "full" or "light", got "$value"',
+        );
+      }
+      lane = value;
+      i++;
+      continue;
+    }
+    // Lane stats: show how the lane gate partitions the loaded rules.
+    if (arg == '--lane-stats') {
+      laneStats = true;
       i++;
       continue;
     }
@@ -547,6 +584,8 @@ ScanParseResult parseScanArgs(
       failOnImpactCount: failOnImpactCount,
       profile: profile,
       excludeLightLane: excludeLightLane,
+      lane: lane,
+      laneStats: laneStats,
       quiet: quiet,
       excludeGlobs: excludeGlobs,
       includeGlobs: includeGlobs,

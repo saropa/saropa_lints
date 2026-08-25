@@ -79,6 +79,48 @@ void main() {
       expect((on).args.tier, 'essential');
     });
 
+    test('--lane parses valid values and defaults to null', () {
+      // Default: null (scanner defaults to full).
+      final off = parseScanArgs(<String>['.']);
+      expect((off as ScanParseOk).args.lane, isNull);
+
+      // Explicit full.
+      final full = parseScanArgs(<String>['.', '--lane', 'full']);
+      expect((full as ScanParseOk).args.lane, 'full');
+
+      // Explicit light.
+      final light = parseScanArgs(<String>['.', '--lane', 'light']);
+      expect((light as ScanParseOk).args.lane, 'light');
+
+      // Case-insensitive.
+      final upper = parseScanArgs(<String>['.', '--lane', 'FULL']);
+      expect((upper as ScanParseOk).args.lane, 'full');
+    });
+
+    test('--lane with invalid value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--lane', 'bogus']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('must be "full" or "light"'),
+      );
+    });
+
+    test('--lane with no value returns invalid', () {
+      final result = parseScanArgs(<String>['.', '--lane']);
+      expect(result, isA<ScanParseInvalid>());
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--lane requires a value'),
+      );
+    });
+
+    test('--lane with next option as value returns invalid', () {
+      // --lane followed by another flag should be treated as missing value.
+      final result = parseScanArgs(<String>['.', '--lane', '--resolve']);
+      expect(result, isA<ScanParseInvalid>());
+    });
+
     test('--resolve combines with --tier without consuming its value', () {
       final result = parseScanArgs(<String>[
         '.',

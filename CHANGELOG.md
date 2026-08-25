@@ -72,10 +72,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - **Breaking:** Migrated from `analyzer ^12.0.0` to `analyzer ^13.1.0` (`meta ^1.18.3`). Requires Dart >=3.13.0 / Flutter >=3.47.1. No action required beyond upgrading the host SDK.
 
+### Fixed
+
+- **Scan CLI:** Rules with `usesTypeResolution`, INFO severity, or cost above `low` were silently blocked by the analysis-server lane gate, which defaulted to `light` in the CLI path. The scanner now runs at full lane coverage so all enabled rules fire correctly. No action required.
+
 ### Added
 
 - New rule: `prefer_primary_constructor` (Professional, INFO) — flags classes eligible for Dart 3.13+ primary constructor syntax when the project's SDK lower bound is >=3.13.0. Reduces boilerplate for simple data classes that AI generators consistently produce in the verbose pre-3.13 form. No action required.
 - New rule: `require_sdk_syntax_match` (Comprehensive, WARNING) — flags Dart syntax features that require a newer SDK than the lower bound declared in pubspec.yaml, with a quick fix to raise the SDK lower bound. Catches AI-generated code that uses records, switch expressions, extension types, or digit separators when the project's SDK constraint doesn't support them. No action required.
+- Scan CLI: `--lane full|light` flag controls which rule lane the scanner uses. Defaults to `full` (every enabled rule); `light` restricts to the same cheap, resolution-free subset the analysis server runs in its default lane. No action required — existing scans are unaffected.
+- Scan CLI: `--lane-stats` prints how many of the loaded rules are light-lane vs full-only, making the lane gate's partitioning observable.
 - Scan CLI: `--check-sdk-compat` standalone audit cross-references the pubspec SDK lower bound against Dart syntax features in `lib/`. Prints a grouped summary showing which files force each version bump. Exits 1 on mismatch, 0 when compatible — suitable for CI gating.
 
 <details><summary>Maintenance</summary>
