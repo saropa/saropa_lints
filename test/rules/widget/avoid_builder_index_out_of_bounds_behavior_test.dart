@@ -83,14 +83,14 @@ bool _wouldReport(String unitSource) {
     featureSet: FeatureSet.latestLanguageVersion(),
     throwIfDiagnostics: false,
   );
-  NamedExpression? itemBuilder;
+  NamedArgument? itemBuilder;
   result.unit.accept(
-    _PickNamedExpression((n) {
-      if (n.name.label.name == 'itemBuilder') itemBuilder = n;
+    _PickNamedArgument((n) {
+      if (n.name.lexeme == 'itemBuilder') itemBuilder = n;
     }),
   );
   expect(itemBuilder, isNotNull, reason: 'fixture must contain itemBuilder');
-  final expr = itemBuilder!.expression;
+  final expr = itemBuilder!.argumentExpression;
   if (expr is! FunctionExpression) {
     fail('itemBuilder must be a FunctionExpression');
   }
@@ -98,7 +98,7 @@ bool _wouldReport(String unitSource) {
   return _simulateWouldReport(bodySource, itemBuilder!);
 }
 
-bool _simulateWouldReport(String bodySource, NamedExpression itemBuilderNode) {
+bool _simulateWouldReport(String bodySource, NamedArgument itemBuilderNode) {
   const indexAccessPattern =
       r'(\b[a-zA-Z_][\w.]*)\s*\[\s*(?:index|i|idx|realIndex|itemIndex)\s*\]';
   const comparisonOpPattern = r'>=|>|<|<=';
@@ -152,15 +152,15 @@ String _extractListName(String fullName) {
 }
 
 Set<String> _itemCountBoundLists(
-  NamedExpression itemBuilderNode,
+  NamedArgument itemBuilderNode,
   RegExp itemCountLengthPattern,
 ) {
   final argumentList = itemBuilderNode.parent;
   if (argumentList is! ArgumentList) return {};
 
   for (final arg in argumentList.arguments) {
-    if (arg is NamedExpression && arg.name.label.name == 'itemCount') {
-      final countSource = arg.expression.toSource();
+    if (arg is NamedArgument && arg.name.lexeme == 'itemCount') {
+      final countSource = arg.argumentExpression.toSource();
       final match = itemCountLengthPattern.firstMatch(countSource);
       final g1 = match?.group(1);
       if (g1 != null) {
@@ -172,14 +172,14 @@ Set<String> _itemCountBoundLists(
   return {};
 }
 
-class _PickNamedExpression extends RecursiveAstVisitor<void> {
-  _PickNamedExpression(this.onNamed);
+class _PickNamedArgument extends RecursiveAstVisitor<void> {
+  _PickNamedArgument(this.onNamed);
 
-  final void Function(NamedExpression n) onNamed;
+  final void Function(NamedArgument n) onNamed;
 
   @override
-  void visitNamedExpression(NamedExpression node) {
+  void visitNamedArgument(NamedArgument node) {
     onNamed(node);
-    super.visitNamedExpression(node);
+    super.visitNamedArgument(node);
   }
 }
