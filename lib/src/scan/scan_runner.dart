@@ -294,6 +294,16 @@ class ScanRunner {
     // covered everything you asked for" reports as nothing-to-scan rather
     // than scanning duplicates.
     var ruleNames = RuntimeTierCap.filterRuleSet(resolved);
+    // Warn on the degenerate combination: --lane light keeps only light-lane
+    // rules in the callback gate, while --exclude-light-lane removes those same
+    // rules from the name set. The result is zero rules — not wrong, but almost
+    // certainly not what the caller intended.
+    if (excludeLightLane && lane == RuleLane.light) {
+      _err(
+        'Warning: --lane light combined with --exclude-light-lane '
+        'leaves no rules to scan.',
+      );
+    }
     if (excludeLightLane) {
       // Light-lane membership is published as a side effect of the lazy
       // rule-registry build, which may not have happened yet. Without this
@@ -340,6 +350,19 @@ class ScanRunner {
         '$lightCount light-lane, $fullOnly full-only. '
         'Active lane: ${lane.name}.',
       );
+      // In light lane, list which rules are blocked so the caller can see
+      // exactly what they're missing — this would have caught the original
+      // bug where the CLI silently defaulted to light.
+      if (lane == RuleLane.light) {
+        final blocked =
+            ruleNames.where((n) => !lightNames.contains(n)).toList()..sort();
+        if (blocked.isNotEmpty) {
+          _err('Blocked by light lane (${blocked.length}):');
+          for (final name in blocked) {
+            _err('  - $name');
+          }
+        }
+      }
     }
 
     final filesToScan = _resolveDartFiles();

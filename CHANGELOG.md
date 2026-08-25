@@ -81,7 +81,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - New rule: `prefer_primary_constructor` (Professional, INFO) — flags classes eligible for Dart 3.13+ primary constructor syntax when the project's SDK lower bound is >=3.13.0. Reduces boilerplate for simple data classes that AI generators consistently produce in the verbose pre-3.13 form. No action required.
 - New rule: `require_sdk_syntax_match` (Comprehensive, WARNING) — flags Dart syntax features that require a newer SDK than the lower bound declared in pubspec.yaml, with a quick fix to raise the SDK lower bound. Catches AI-generated code that uses records, switch expressions, extension types, or digit separators when the project's SDK constraint doesn't support them. No action required.
 - Scan CLI: `--lane full|light` flag controls which rule lane the scanner uses. Defaults to `full` (every enabled rule); `light` restricts to the same cheap, resolution-free subset the analysis server runs in its default lane. No action required — existing scans are unaffected.
-- Scan CLI: `--lane-stats` prints how many of the loaded rules are light-lane vs full-only, making the lane gate's partitioning observable.
+- Scan CLI: `--lane-stats` prints how many of the loaded rules are light-lane vs full-only; when in light lane, lists every blocked rule name so the gate's effect is fully observable.
 - Scan CLI: `--check-sdk-compat` standalone audit cross-references the pubspec SDK lower bound against Dart syntax features in `lib/`. Prints a grouped summary showing which files force each version bump. Exits 1 on mismatch, 0 when compatible — suitable for CI gating.
 
 <details><summary>Maintenance</summary>
@@ -89,6 +89,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - `require_sdk_syntax_match` quick fix: removed dead `Map<Type, String>` lookup (analyzer concrete types are private `*Impl` classes that never matched abstract keys); hardened regex with triple-quoted raw string to handle embedded quotes.
 - `bugs/BUG_REPORT_GUIDE.md` renamed to `bugs/ISSUE_REPORT_GUIDE.md` and extended with a feature request template, proposal naming patterns, and lifecycle, alongside the existing bug report process.
 - `_rule_metrics.py`'s bug counter now reports open feature proposals separately from unsolved bugs in the publish "WORK REPORT" banner, instead of lumping both into one count.
+- Scan daemon and accuracy report now pass `lane: RuleLane.full` explicitly instead of relying on the constructor default.
+- Scan CLI warns when `--lane light` is combined with `--exclude-light-lane` (degenerate: zero rules to scan).
 
 </details>
 

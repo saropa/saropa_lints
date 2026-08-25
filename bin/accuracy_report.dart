@@ -28,6 +28,7 @@ import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart'
     show AccuracyTarget, allSaropaRules, getAllDefinedRules;
 import 'package:saropa_lints/scan.dart';
+import 'package:saropa_lints/src/config/rule_lane.dart' show RuleLane;
 import 'package:saropa_lints/src/report/accuracy_report.dart';
 
 Future<void> main(List<String> args) async {
@@ -107,6 +108,8 @@ Future<List<ScanDiagnostic>?> _runScan(String path, String? tier) {
     enabledRuleNames: tier == null ? getAllDefinedRules() : null,
     // Suppress the scanner's own progress chatter; this CLI prints its report.
     messageSink: (_) {},
+    // Accuracy report must exercise every rule — always full lane.
+    lane: RuleLane.full,
   );
   return runner.runResolved();
 }

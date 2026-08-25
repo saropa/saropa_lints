@@ -70,6 +70,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/scan.dart';
+import 'package:saropa_lints/src/config/rule_lane.dart' show RuleLane;
 // bin/ is inside this package, so importing src/ directly is allowed; the
 // reporter kill switch is deliberately NOT public API for consumers.
 import 'package:saropa_lints/src/report/analysis_reporter.dart'
@@ -222,6 +223,9 @@ Future<void> _handleScanRequest(
       tier: options.tier,
       messageSink: (msg) => stderr.writeln('[scan_daemon] $msg'),
       excludeLightLane: excludeLightLane,
+      // The daemon is a separate process from the analysis server, so RSS
+      // is not shared — full lane is always correct here.
+      lane: RuleLane.full,
     );
     final diagnostics = await runner.runResolvedWithCollection(collection);
     if (diagnostics == null) {
