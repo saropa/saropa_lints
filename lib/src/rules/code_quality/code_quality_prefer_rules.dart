@@ -57,9 +57,7 @@ class PreferBothInliningAnnotationsRule extends SaropaLintRule {
         final ArgumentList? args = annotation.arguments;
         if (args == null || args.arguments.isEmpty) continue;
 
-        // ArgumentList.arguments is NodeList<Argument> in analyzer 13; a
-        // pragma's first positional arg is always an Expression.
-        final Argument firstArg = args.arguments.first;
+        final Expression firstArg = args.arguments.first;
         if (firstArg is! SimpleStringLiteral) continue;
 
         final String value = firstArg.value;
@@ -232,12 +230,11 @@ class PreferEnumsByNameRule extends SaropaLintRule {
       if (target is! PropertyAccess) return;
       if (target.propertyName.name != 'values') return;
 
-      // Check if the argument is a function that compares .name.
-      // ArgumentList.arguments is NodeList<Argument> in analyzer 13.
-      final NodeList<Argument> args = node.argumentList.arguments;
+      // Check if the argument is a function that compares .name
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Argument firstArg = args.first;
+      final Expression firstArg = args.first;
       if (firstArg is FunctionExpression) {
         final FunctionBody body = firstArg.body;
         if (body is ExpressionFunctionBody) {
@@ -311,10 +308,9 @@ class PreferExtractingFunctionCallbacksRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addFunctionExpression((FunctionExpression node) {
-      // Skip if not used as an argument. Analyzer 13 renamed
-      // NamedExpression -> NamedArgument.
+      // Skip if not used as an argument
       final AstNode? parent = node.parent;
-      if (parent is! NamedArgument && parent is! ArgumentList) return;
+      if (parent is! NamedExpression && parent is! ArgumentList) return;
 
       // Check function body size
       final FunctionBody body = node.body;
@@ -842,11 +838,10 @@ class PreferPushingConditionalExpressionsRule extends SaropaLintRule {
           final String? elseTarget = elseExpr.target?.toSource();
 
           if (thenTarget == elseTarget) {
-            // Check if only one argument differs. ArgumentList.arguments is
-            // NodeList<Argument> in analyzer 13.
-            final List<Argument> thenArgs = thenExpr.argumentList.arguments
+            // Check if only one argument differs
+            final List<Expression> thenArgs = thenExpr.argumentList.arguments
                 .toList();
-            final List<Argument> elseArgs = elseExpr.argumentList.arguments
+            final List<Expression> elseArgs = elseExpr.argumentList.arguments
                 .toList();
 
             if (thenArgs.length == elseArgs.length && thenArgs.length >= 2) {
@@ -940,8 +935,7 @@ class PreferShorthandsWithConstructorsRule extends SaropaLintRule {
       final ArgumentList args = bodyExpr.argumentList;
       if (args.arguments.length != 1) return;
 
-      // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>
-      final arg = args.arguments.first;
+      final Expression arg = args.arguments.first;
       if (arg is SimpleIdentifier && arg.name == paramName) {
         reporter.atNode(node);
       }
@@ -1067,8 +1061,7 @@ class PreferShorthandsWithStaticFieldsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>
-      final firstArg = args.arguments.first;
+      final Expression firstArg = args.arguments.first;
       if (firstArg is! FunctionExpression) return;
 
       final FunctionBody body = firstArg.body;
@@ -1115,17 +1108,16 @@ class PassCorrectAcceptedTypeRule extends SaropaLintRule {
   ) {
     // addFormalParameter is a no-op stub in the native engine (FormalParameter
     // is not a visitable node), so this rule never fired. This rule only ever
-    // acted on RegularFormalParameter (it read `.type`), so addRegularFormalParameter
+    // acted on SimpleFormalParameter (it read `.type`), so addSimpleFormalParameter
     // is the correct real registration (BUG FIX 2026-07-16).
-    context.addRegularFormalParameter((RegularFormalParameter node) {
+    context.addSimpleFormalParameter((SimpleFormalParameter node) {
       // Check for Accept-style annotations
       for (final Annotation annotation in node.metadata) {
         final String annotationName = annotation.name.name;
         if (annotationName == 'Accept' || annotationName == 'AcceptType') {
           final ArgumentList? args = annotation.arguments;
           if (args != null && args.arguments.isNotEmpty) {
-            // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>
-            final firstArg = args.arguments.first;
+            final Expression firstArg = args.arguments.first;
             if (firstArg is TypeLiteral) {
               // Get expected type from annotation
               final String expectedTypeName = firstArg.type.toSource();
@@ -1373,21 +1365,20 @@ class PreferTestMatchersRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'expect') return;
 
-      // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>
-      final args = node.argumentList.arguments.toList();
+      final List<Expression> args = node.argumentList.arguments.toList();
       if (args.length < 2) return;
 
-      final actual = args[0];
-      final matcher = args[1];
+      final Expression actual = args[0];
+      final Expression matcher = args[1];
 
       // Check for list.length == 0 pattern
       if (actual is PropertyAccess && actual.propertyName.name == 'length') {
         if (matcher is MethodInvocation &&
             matcher.methodName.name == 'equals') {
-          // Analyzer 13: .arguments returns NodeList<Argument>
-          final matcherArgs = matcher.argumentList.arguments.toList();
+          final List<Expression> matcherArgs = matcher.argumentList.arguments
+              .toList();
           if (matcherArgs.isNotEmpty) {
-            final matcherArg = matcherArgs[0];
+            final Expression matcherArg = matcherArgs[0];
             if (matcherArg is IntegerLiteral && matcherArg.value == 0) {
               reporter.atNode(node);
               return;
@@ -1700,7 +1691,7 @@ class PreferTypedefsForCallbacksRule extends SaropaLintRule {
   ) {
     context.addFormalParameterList((FormalParameterList node) {
       for (final FormalParameter param in node.parameters) {
-        if (param is RegularFormalParameter) {
+        if (param is SimpleFormalParameter) {
           final TypeAnnotation? type = param.type;
           if (type is GenericFunctionType) {
             reporter.atNode(type);
@@ -1768,8 +1759,7 @@ class PreferRedirectingSuperclassConstructorRule extends SaropaLintRule {
         if (init is SuperConstructorInvocation) {
           // Check if super call has simple parameter forwarding
           final ArgumentList args = init.argumentList;
-          // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>
-          for (final arg in args.arguments) {
+          for (final Expression arg in args.arguments) {
             if (arg is SimpleIdentifier) {
               // Check if the identifier matches a constructor parameter
               final FormalParameterList params = node.parameters;
@@ -2007,8 +1997,7 @@ class PreferDotShorthandRule extends SaropaLintRule {
           // Type is explicit, shorthand could be used
           reporter.atNode(node);
         }
-      // Analyzer 13: NamedExpression → NamedArgument
-      } else if (parent is NamedArgument) {
+      } else if (parent is NamedExpression) {
         // In named parameter, type is known from function signature
         reporter.atNode(node);
       } else if (parent is AssignmentExpression &&
@@ -2312,11 +2301,13 @@ class PreferNamedBoolParamsRule extends SaropaLintRule {
       } else if (parent is FunctionExpression) {
         return;
       }
-      // Analyzer 13: DefaultFormalParameter removed — params with defaults
-      // are now RegularFormalParameter directly. Check .defaultClause to
-      // distinguish defaulted from non-defaulted params.
       for (final FormalParameter p in node.parameters) {
-        if (p is RegularFormalParameter) {
+        if (p is DefaultFormalParameter) {
+          final param = p.parameter;
+          if (param is! SimpleFormalParameter) continue;
+          if (param.isNamed) continue;
+          if (_isBoolType(param)) reporter.atNode(p);
+        } else if (p is SimpleFormalParameter) {
           if (p.isNamed) continue;
           if (_isBoolType(p)) reporter.atNode(p);
         }
@@ -2324,7 +2315,7 @@ class PreferNamedBoolParamsRule extends SaropaLintRule {
     });
   }
 
-  bool _isBoolType(RegularFormalParameter p) {
+  bool _isBoolType(SimpleFormalParameter p) {
     final TypeAnnotation? type = p.type;
     if (type is! NamedType) return false;
     return type.name.lexeme == 'bool' || type.name.lexeme == 'bool?';

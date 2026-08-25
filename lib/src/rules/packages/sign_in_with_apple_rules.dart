@@ -889,13 +889,11 @@ class RequireAppleSigninNonceRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'getAppleIDCredential') return;
 
-      // Check for nonce parameter. analyzer 13 renamed NamedExpression ->
-      // NamedArgument and argument list elements are typed `Argument`;
-      // `.name` is now the Token directly.
+      // Check for nonce parameter
       final ArgumentList args = node.argumentList;
-      final bool hasNonce = args.arguments.any((Argument arg) {
-        if (arg is NamedArgument) {
-          return arg.name.lexeme == 'nonce';
+      final bool hasNonce = args.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'nonce';
         }
         return false;
       });

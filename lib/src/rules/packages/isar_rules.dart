@@ -856,10 +856,8 @@ class RequireIsarInspectorDebugOnlyRule extends SaropaLintRule {
 
       // Look for inspector: true
       for (final arg in node.argumentList.arguments) {
-        // analyzer 13: NamedExpression renamed to NamedArgument; name is a
-        // Token (.lexeme) and the value getter is now .argumentExpression.
-        if (arg is NamedArgument && arg.name.lexeme == 'inspector') {
-          final value = arg.argumentExpression;
+        if (arg is NamedExpression && arg.name.label.name == 'inspector') {
+          final value = arg.expression;
           if (value is BooleanLiteral && value.value == true) {
             reporter.atNode(arg);
           }

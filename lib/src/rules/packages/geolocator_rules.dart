@@ -561,9 +561,10 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
 
       // Look for locationSettings parameter
       Expression? locationSettingsArg;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'locationSettings') {
-          locationSettingsArg = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'locationSettings') {
+          locationSettingsArg = arg.expression;
           break;
         }
       }
@@ -580,8 +581,8 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
             .argumentList
             .arguments
             .any((arg) {
-              if (arg is NamedArgument) {
-                return arg.name.lexeme == 'distanceFilter';
+              if (arg is NamedExpression) {
+                return arg.name.label.name == 'distanceFilter';
               }
               return false;
             });
@@ -621,8 +622,8 @@ class PreferGeolocatorDistanceFilterRule extends SaropaLintRule {
 
       // Check for distanceFilter parameter
       final bool hasDistanceFilter = node.argumentList.arguments.any((arg) {
-        if (arg is NamedArgument) {
-          return arg.name.lexeme == 'distanceFilter';
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'distanceFilter';
         }
         return false;
       });

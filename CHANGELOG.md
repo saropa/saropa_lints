@@ -66,11 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-**BREAKING:** Minimum Dart SDK raised to >=3.13.0 (Flutter >=3.47.1). Projects on older SDKs must stay on saropa_lints 15.x.
-
-### Changed
-
-- **Breaking:** Migrated from `analyzer ^12.0.0` to `analyzer ^13.1.0` (`meta ^1.18.3`). Requires Dart >=3.13.0 / Flutter >=3.47.1. No action required beyond upgrading the host SDK.
+> The `analyzer ^13.1.0` migration (Dart 3.13+ / Flutter 3.47.1+, released 2026-08-19) is complete and tested but held off `main` — adoption of 3.47.1 is near zero. It is parked on the `analyzer-13-migration` branch and will ship as a 16.0.0 major bump once adoption is widespread.
 
 ### Fixed
 

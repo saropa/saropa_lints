@@ -68,14 +68,12 @@ class RequireGoogleFontsFallbackRule extends SaropaLintRule {
       final String? target = node.target?.toSource();
       if (target != 'GoogleFonts') return;
 
-      // Check for fontFamilyFallback parameter. analyzer 13 renamed
-      // NamedExpression -> NamedArgument and argument list elements are
-      // typed `Argument`; `.name` is now the Token directly.
+      // Check for fontFamilyFallback parameter
       final bool hasFallback = node.argumentList.arguments.any((
-        Argument arg,
+        Expression arg,
       ) {
-        if (arg is NamedArgument) {
-          return arg.name.lexeme == 'fontFamilyFallback';
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'fontFamilyFallback';
         }
         return false;
       });

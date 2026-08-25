@@ -421,11 +421,8 @@ class AvoidUnnecessaryEnumArgumentsRule extends SaropaLintRule {
       final ArgumentList? args = node.arguments?.argumentList;
       if (args == null || args.arguments.isEmpty) return;
 
-      // Check for common default value patterns.
-      // analyzer 13: .arguments returns NodeList<Argument>; unwrap each
-      // via .argumentExpression to get the underlying Expression.
-      for (final argNode in args.arguments) {
-        final Expression arg = argNode.argumentExpression;
+      // Check for common default value patterns
+      for (final Expression arg in args.arguments) {
         if (arg is BooleanLiteral && !arg.value) {
           // false is often a default
           reporter.atNode(arg);

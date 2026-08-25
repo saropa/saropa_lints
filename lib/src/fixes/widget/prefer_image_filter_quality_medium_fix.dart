@@ -30,12 +30,10 @@ class PreferImageFilterQualityMediumFix extends SaropaFixProducer {
     final AstNode? node = coveringNode;
     if (node == null) return;
 
-    // analyzer 13: NamedExpression renamed to NamedArgument; name is a
-    // Token (.lexeme) and the value getter is now .argumentExpression.
-    final NamedArgument? named = node.thisOrAncestorOfType<NamedArgument>();
-    if (named == null || named.name.lexeme != 'filterQuality') return;
+    final NamedExpression? named = node.thisOrAncestorOfType<NamedExpression>();
+    if (named == null || named.name.label.name != 'filterQuality') return;
 
-    final Expression value = named.argumentExpression;
+    final Expression value = named.expression;
     if (!ImageFilterQualityLowDetection.isFilterQualityLowValue(value)) {
       return;
     }

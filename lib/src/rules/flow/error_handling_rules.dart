@@ -375,8 +375,7 @@ class RequireErrorContextRule extends SaropaLintRule {
           return;
         }
 
-        // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>
-        final firstArg = thrown.argumentList.arguments.first;
+        final Expression firstArg = thrown.argumentList.arguments.first;
         if (firstArg is SimpleStringLiteral) {
           // Check if message is too short
           if (firstArg.value.length < _minMessageLength) {
@@ -745,11 +744,9 @@ class RequireErrorBoundaryRule extends SaropaLintRule {
       }
 
       // Check for builder argument
-      // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>;
-      // NamedExpression → NamedArgument, .name.label.name → .name.lexeme
       bool hasBuilder = false;
-      for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
           hasBuilder = true;
           break;
         }
@@ -1098,8 +1095,7 @@ class AvoidUncaughtFutureErrorsRule extends SaropaLintRule {
     // .then() with onError parameter - error handler in callback
     if (methodName == 'then') {
       for (final arg in node.argumentList.arguments) {
-        // Analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme
-        if (arg is NamedArgument && arg.name.lexeme == 'onError') {
+        if (arg is NamedExpression && arg.name.label.name == 'onError') {
           return true;
         }
       }
@@ -1263,10 +1259,8 @@ class _PrintErrorVisitor extends RecursiveAstVisitor<void> {
 
     // Check if the exception variable is used in the print call
     if (node.argumentList.arguments.isNotEmpty) {
-      // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>;
-      // positional args are Expressions, use type check for narrowing
-      final arg = node.argumentList.arguments.first;
-      if (arg is Expression && _usesException(arg)) {
+      final Expression arg = node.argumentList.arguments.first;
+      if (_usesException(arg)) {
         onPrintError(node);
       }
     }
@@ -1594,12 +1588,11 @@ bool _hasDeveloperLogWithErrorAndStack(Block block) {
     if (expr.methodName.name != 'log') continue;
     final target = expr.target;
     if (target is! SimpleIdentifier || target.name != 'developer') continue;
-    // Analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme
     final hasError = expr.argumentList.arguments.any(
-      (a) => a is NamedArgument && a.name.lexeme == 'error',
+      (a) => a is NamedExpression && a.name.label.name == 'error',
     );
     final hasStack = expr.argumentList.arguments.any(
-      (a) => a is NamedArgument && a.name.lexeme == 'stackTrace',
+      (a) => a is NamedExpression && a.name.label.name == 'stackTrace',
     );
     if (hasError && hasStack) return true;
   }
@@ -2068,19 +2061,15 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
     if (args.arguments.isEmpty) return null;
 
     // Check for named 'key' parameter first
-    // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>;
-    // NamedExpression → NamedArgument, .name.label.name → .name.lexeme,
-    // .expression → .argumentExpression
-    for (final arg in args.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'key') {
-        return arg.argumentExpression;
+    for (final Expression arg in args.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'key') {
+        return arg.expression;
       }
     }
 
     // Otherwise, first positional argument is the key
-    // Analyzer 13: arguments.first is Argument; positional args are Expressions
-    final firstArg = args.arguments.first;
-    if (firstArg is! NamedArgument && firstArg is Expression) {
+    final Expression firstArg = args.arguments.first;
+    if (firstArg is! NamedExpression) {
       return firstArg;
     }
 
@@ -2118,20 +2107,17 @@ class RequireCacheKeyDeterminismRule extends SaropaLintRule {
     ArgumentList argList,
     SaropaDiagnosticReporter reporter,
   ) {
-    // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>;
-    // NamedExpression → NamedArgument, .name.label.name → .name.lexeme,
-    // .expression → .argumentExpression
-    for (final arg in argList.arguments) {
-      if (arg is NamedArgument) {
-        final String paramName = arg.name.lexeme;
+    for (final Expression arg in argList.arguments) {
+      if (arg is NamedExpression) {
+        final String paramName = arg.name.label.name;
         if (_debugOnlyParameters.contains(paramName)) continue;
         if (_metadataParameters.contains(paramName)) continue;
-        if (_containsNonDeterministicValue(arg.argumentExpression)) {
+        if (_containsNonDeterministicValue(arg.expression)) {
           reporter.atNode(arg);
           return;
         }
-      } else if (arg is Expression) {
-        // Positional argument (Expression IS-A Argument in analyzer 13)
+      } else {
+        // Positional argument
         if (_containsNonDeterministicValue(arg)) {
           reporter.atNode(arg);
           return;
@@ -2314,10 +2300,8 @@ class RequireNotificationActionHandlingRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       bool hasActions = false;
 
-      // Analyzer 13: ArgumentList.arguments returns NodeList<Argument>;
-      // NamedExpression → NamedArgument, .name.label.name → .name.lexeme
-      for (final arg in args.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'actions') {
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'actions') {
           hasActions = true;
           break;
         }

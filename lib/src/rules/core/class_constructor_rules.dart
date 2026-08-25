@@ -1138,8 +1138,7 @@ class AvoidRenamingRepresentationGettersRule extends SaropaLintRule {
       if (params.isEmpty) return;
       final repParam = params.first;
       final String repFieldName = repParam.name?.lexeme ?? '';
-      // analyzer 13: SimpleFormalParameter merged into RegularFormalParameter.
-      final repType = repParam is RegularFormalParameter ? repParam.type : null;
+      final repType = repParam is SimpleFormalParameter ? repParam.type : null;
       final String repTypeSource = (repType?.toSource() ?? '')
           .replaceAll(RegExp(r'\s+'), ' ')
           .trim();
@@ -1928,10 +1927,10 @@ class AvoidUnusedConstructorParametersRule extends SaropaLintRule {
         if (param is FieldFormalParameter) continue;
         if (param is SuperFormalParameter) continue;
 
-        // analyzer 13: DefaultFormalParameter was removed. Every FormalParameter
-        // now carries its own optional defaultClause directly, so `param` IS
-        // already the effective parameter — no wrapper to unwrap anymore.
-        final FormalParameter actual = param;
+        // Get the actual parameter (unwrap DefaultFormalParameter)
+        final FormalParameter actual = param is DefaultFormalParameter
+            ? param.parameter
+            : param;
         if (actual is FieldFormalParameter) continue;
         if (actual is SuperFormalParameter) continue;
 
@@ -1949,10 +1948,8 @@ class AvoidUnusedConstructorParametersRule extends SaropaLintRule {
   }
 
   static String? _paramName(FormalParameter param) {
-    // analyzer 13: SimpleFormalParameter and FunctionTypedFormalParameter were
-    // merged into RegularFormalParameter, whose `.name` (a Token?) covers both
-    // the plain and function-typed cases uniformly.
-    if (param is RegularFormalParameter) return param.name?.lexeme;
+    if (param is SimpleFormalParameter) return param.name?.lexeme;
+    if (param is FunctionTypedFormalParameter) return param.name.lexeme;
     return null;
   }
 }
@@ -2289,13 +2286,12 @@ class PreferAssertsInInitializerListsRule extends SaropaLintRule {
   static Set<String> _constructorParamNames(ConstructorDeclaration node) {
     final Set<String> names = <String>{};
     for (final FormalParameter p in node.parameters.parameters) {
-      // analyzer 13: DefaultFormalParameter was removed — `p` is already the
-      // effective parameter (it carries its own optional defaultClause).
-      final FormalParameter inner = p;
+      final FormalParameter inner = p is DefaultFormalParameter
+          ? p.parameter
+          : p;
       if (inner is FieldFormalParameter && inner.name.lexeme.isNotEmpty) {
         names.add(inner.name.lexeme);
-      } else if (inner is RegularFormalParameter) {
-        // analyzer 13: SimpleFormalParameter merged into RegularFormalParameter.
+      } else if (inner is SimpleFormalParameter) {
         final name = inner.name;
         if (name != null) names.add(name.lexeme);
       }
@@ -2540,12 +2536,11 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
   /// True if any parameter is a function type (const constructor impossible).
   static bool _constructorHasFunctionTypeParam(ConstructorDeclaration node) {
     for (final FormalParameter p in node.parameters.parameters) {
-      // analyzer 13: DefaultFormalParameter was removed — `p` is already the
-      // effective parameter (it carries its own optional defaultClause).
-      final FormalParameter param = p;
+      final FormalParameter param = p is DefaultFormalParameter
+          ? p.parameter
+          : p;
       TypeAnnotation? type;
-      if (param is RegularFormalParameter) {
-        // analyzer 13: SimpleFormalParameter merged into RegularFormalParameter.
+      if (param is SimpleFormalParameter) {
         type = param.type;
       } else if (param is FieldFormalParameter) {
         type = param.type;
@@ -2575,12 +2570,8 @@ class PreferConstConstructorDeclarationsRule extends SaropaLintRule {
       if (init is ConstructorFieldInitializer) {
         if (_expressionIsNonConst(init.expression)) return true;
       } else if (init is SuperConstructorInvocation) {
-        // analyzer 13: ArgumentList.arguments is now NodeList<Argument>, not
-        // NodeList<Expression>. `.argumentExpression` (defined on the base
-        // Argument interface) yields the underlying value for both plain
-        // Expression args and NamedArgument args uniformly.
-        for (final Argument arg in init.argumentList.arguments) {
-          if (_expressionIsNonConst(arg.argumentExpression)) return true;
+        for (final Expression arg in init.argumentList.arguments) {
+          if (_expressionIsNonConst(arg)) return true;
         }
       }
     }

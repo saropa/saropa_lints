@@ -408,20 +408,17 @@ class RequireLinuxFontFallbackRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextStyle') return;
 
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
 
       String? fontFamilyValue;
       bool hasFallback = false;
 
-      // analyzer 13: NamedExpression -> NamedArgument; `.name.lexeme`
-      // replaces `.name.label.name`, and `.argumentExpression` replaces
-      // `.expression`.
-      for (final Argument arg in args) {
-        if (arg is! NamedArgument) continue;
+      for (final Expression arg in args) {
+        if (arg is! NamedExpression) continue;
 
-        final String name = arg.name.lexeme;
+        final String name = arg.name.label.name;
         if (name == 'fontFamily') {
-          final Expression value = arg.argumentExpression;
+          final Expression value = arg.expression;
           if (value is SimpleStringLiteral) {
             fontFamilyValue = value.value;
           }
@@ -533,13 +530,10 @@ class AvoidSudoShellCommandsRule extends SaropaLintRule {
       final String targetSource = target.toSource();
       if (targetSource != 'Process') return;
 
-      // analyzer 13: arguments is NodeList<Argument>; the first Process.run
-      // arg is always positional (the command string), so it's safe to
-      // treat as an Expression.
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Expression firstArg = args.first as Expression;
+      final Expression firstArg = args.first;
       if (firstArg is! SimpleStringLiteral) return;
 
       if (_elevatedCommands.contains(firstArg.value)) {

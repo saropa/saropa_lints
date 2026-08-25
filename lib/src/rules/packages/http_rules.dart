@@ -144,12 +144,8 @@ class _BodyScan extends RecursiveAstVisitor<void> {
   /// local leak can no longer be proven. Conservative on purpose.
   bool escapesAsArgument(String varName) {
     for (final MethodInvocation inv in invocations) {
-      // analyzer 13: NamedExpression -> NamedArgument; the value getter is
-      // now `.argumentExpression`. A plain (non-named) Argument is itself
-      // the value expression.
-      for (final Argument arg in inv.argumentList.arguments) {
-        final Expression value =
-            arg is NamedArgument ? arg.argumentExpression : arg as Expression;
+      for (final Expression arg in inv.argumentList.arguments) {
+        final Expression value = arg is NamedExpression ? arg.expression : arg;
         if (value is SimpleIdentifier && value.name == varName) return true;
       }
     }
@@ -455,11 +451,9 @@ class AvoidHttpStringUrlRule extends SaropaLintRule {
   }
 
   Expression? _firstPositional(MethodInvocation node) {
-    // analyzer 13: NamedExpression -> NamedArgument; skip named args to
-    // find the first positional (plain Expression) argument.
-    for (final Argument arg in node.argumentList.arguments) {
-      if (arg is NamedArgument) continue;
-      return arg as Expression;
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression) continue;
+      return arg;
     }
     return null;
   }

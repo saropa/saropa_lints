@@ -118,8 +118,7 @@ void f({int a = 0, int b = 0, int c = 0}) {}
         featureSet: FeatureSet.latestLanguageVersion(),
         throwIfDiagnostics: false,
       );
-      // Analyzer 13 migration: NamedExpression → NamedArgument
-      NamedArgument? named;
+      NamedExpression? named;
       result.unit.accept(_FindNamedArgVisitor('b', (n) => named = n));
       expect(named, isNotNull);
       final range = sourceRangeForDeletingNamedArgument(result.content, named!);
@@ -166,11 +165,9 @@ class _OverflowBarIceVisitor extends RecursiveAstVisitor<void> {
         typeLexeme: typeName,
         compilationUnit: unit,
       )) {
-        // Analyzer 13 migration: NamedExpression → NamedArgument,
-        // .name.label.name → .name.lexeme
         for (final arg in node.argumentList.arguments) {
-          if (arg is NamedArgument &&
-              arg.name.lexeme == 'buttonBarTheme') {
+          if (arg is NamedExpression &&
+              arg.name.label.name == 'buttonBarTheme') {
             count++;
             break;
           }
@@ -194,9 +191,8 @@ class _OverflowBarIceVisitor extends RecursiveAstVisitor<void> {
     }
     if (m == 'ThemeData') {
       if (compilationUnitDeclaresClassLikeName(unit, 'ThemeData')) return;
-      // Analyzer 13 migration: NamedExpression → NamedArgument
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'buttonBarTheme') {
+        if (arg is NamedExpression && arg.name.label.name == 'buttonBarTheme') {
           count++;
           return;
         }
@@ -206,20 +202,17 @@ class _OverflowBarIceVisitor extends RecursiveAstVisitor<void> {
   }
 }
 
-/// Visitor that finds a named argument by name.
-/// Analyzer 13 migration: NamedExpression → NamedArgument,
-/// visitNamedExpression → visitNamedArgument, .name.label.name → .name.lexeme
 class _FindNamedArgVisitor extends RecursiveAstVisitor<void> {
   _FindNamedArgVisitor(this.name, this.onFound);
 
   final String name;
-  final void Function(NamedArgument node) onFound;
+  final void Function(NamedExpression node) onFound;
 
   @override
-  void visitNamedArgument(NamedArgument node) {
-    if (node.name.lexeme == name) {
+  void visitNamedExpression(NamedExpression node) {
+    if (node.name.label.name == name) {
       onFound(node);
     }
-    super.visitNamedArgument(node);
+    super.visitNamedExpression(node);
   }
 }

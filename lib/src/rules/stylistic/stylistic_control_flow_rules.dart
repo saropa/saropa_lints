@@ -618,8 +618,7 @@ class PreferSwitchStatementRule extends SaropaLintRule {
     if (parent is YieldStatement) return true;
 
     // label: switch (...) { ... }  (named argument — value position)
-    // analyzer 13: NamedExpression renamed to NamedArgument.
-    if (parent is NamedArgument) return true;
+    if (parent is NamedExpression) return true;
 
     return false;
   }

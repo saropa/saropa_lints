@@ -98,16 +98,15 @@ class AvoidAutoRouteContextNavigationRule extends SaropaLintRule {
       if (!targetSource.endsWith('context')) return;
 
       // Check if first argument is a string literal (string-based nav)
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final Expression firstArg;
       final first = args.first;
-      // analyzer 13: NamedExpression -> NamedArgument, value accessed via argumentExpression
-      if (first is NamedArgument) {
-        firstArg = first.argumentExpression;
+      if (first is NamedExpression) {
+        firstArg = first.expression;
       } else {
-        firstArg = first as Expression;
+        firstArg = first;
       }
 
       final bool isStringNav =
@@ -436,7 +435,7 @@ class RequireAutoRouteFullHierarchyRule extends SaropaLintRule {
       if (!targetSource.endsWith('router')) return;
 
       // Argument should be a Route object (not a string)
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
       if (args.first is SimpleStringLiteral) return; // string-based nav
 
@@ -504,12 +503,11 @@ class PreferAutoRoutePathParamsSimpleRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!typeName.endsWith('Route')) return;
 
-      // analyzer 13: NamedExpression -> NamedArgument; value via argumentExpression
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final Expression expr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final Expression expr = arg.expression;
           if (expr is InstanceCreationExpression) {
-            reporter.atNode(arg.argumentExpression, code);
+            reporter.atNode(arg.expression, code);
             return;
           }
         }
@@ -576,16 +574,15 @@ class PreferAutoRouteTypedArgsRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!typeName.endsWith('Route')) return;
 
-      // analyzer 13: NamedExpression -> NamedArgument; value via argumentExpression
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final Expression expr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final Expression expr = arg.expression;
           final String? typeStr = expr.staticType?.getDisplayString();
           if (typeStr != null &&
               (typeStr == 'Map<String, dynamic>' ||
                   typeStr == 'Map<dynamic, dynamic>' ||
                   typeStr == 'dynamic')) {
-            reporter.atNode(arg.argumentExpression, code);
+            reporter.atNode(arg.expression, code);
             return;
           }
         }

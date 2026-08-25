@@ -95,9 +95,9 @@ class RequireUnknownRouteHandlerRule extends SaropaLintRule {
       bool hasOnUnknownRoute = false;
       bool hasRouter = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String name = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
           if (name == 'routes' || name == 'onGenerateRoute') {
             hasRoutes = true;
           }
@@ -259,7 +259,7 @@ class _NavigationContextVisitor extends RecursiveAstVisitor<void> {
         }
       }
       // Check arguments for direct context usage
-      for (final Argument arg in node.argumentList.arguments) {
+      for (final Expression arg in node.argumentList.arguments) {
         if (arg is SimpleIdentifier && arg.name == 'context') {
           reporter.atNode(node);
           break;
@@ -453,7 +453,7 @@ class AvoidNavigatorPushUnnamedRule extends SaropaLintRule {
       // Check if second argument is a MaterialPageRoute/CupertinoPageRoute
       // (which indicates inline route definition)
       if (node.argumentList.arguments.length >= 2) {
-        final Argument secondArg = node.argumentList.arguments[1];
+        final Expression secondArg = node.argumentList.arguments[1];
         if (secondArg is InstanceCreationExpression) {
           final String? typeName = secondArg.constructorName.type.element?.name;
           if (typeName == 'MaterialPageRoute' ||
@@ -546,11 +546,11 @@ class RequireRouteGuardsRule extends SaropaLintRule {
       String? routePath;
       bool hasRedirect = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String name = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
           if (name == 'path') {
-            final expr = arg.argumentExpression;
+            final expr = arg.expression;
             if (expr is SimpleStringLiteral) {
               routePath = expr.value;
             }
@@ -656,9 +656,9 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'GoRoute') return;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'redirect') {
-          final Expression redirectExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'redirect') {
+          final Expression redirectExpr = arg.expression;
 
           if (redirectExpr is FunctionExpression) {
             final FunctionBody body = redirectExpr.body;
@@ -668,11 +668,11 @@ class AvoidCircularRedirectsRule extends SaropaLintRule {
               if (!_redirectConditionPatterns.any(
                 (p) => p.hasMatch(bodySource),
               )) {
-                reporter.atNode(arg.argumentExpression, code);
+                reporter.atNode(arg.expression, code);
               }
             } else if (body is BlockFunctionBody) {
               if (!_redirectReturnPatterns.any((p) => p.hasMatch(bodySource))) {
-                reporter.atNode(arg.argumentExpression, code);
+                reporter.atNode(arg.expression, code);
               }
             }
           }
@@ -963,9 +963,9 @@ class _PersistentUiRouteVisitor extends RecursiveAstVisitor<void> {
     if (node.constructorName.type.element?.name == 'GoRoute') {
       // A GoRoute whose builder embeds a nav bar / drawer / rail is duplicating
       // persistent UI that a ShellRoute could share.
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
-          final String builderSource = arg.argumentExpression.toSource();
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
           if (builderSource.contains('bottomNavigationBar') ||
               builderSource.contains('drawer') ||
               builderSource.contains('NavigationRail')) {
@@ -1434,7 +1434,7 @@ class PreferTypedRouteParamsRule extends SaropaLintRule {
       if (parent is PropertyAccess) return;
 
       // Report if used directly in expression
-      if (parent is NamedArgument || parent is ArgumentList) {
+      if (parent is NamedExpression || parent is ArgumentList) {
         reporter.atNode(node);
       }
     });
@@ -1510,9 +1510,9 @@ class RequireStepperValidationRule extends SaropaLintRule {
       if (typeName != 'Stepper') return;
 
       // Check onStepContinue callback
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'onStepContinue') {
-          final Expression callback = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'onStepContinue') {
+          final Expression callback = arg.expression;
           if (callback is FunctionExpression) {
             final String bodySource = callback.body.toSource();
 
@@ -1751,8 +1751,8 @@ class RequireGoRouterErrorHandlerRule extends SaropaLintRule {
       bool hasErrorHandler = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String name = arg.name.lexeme;
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
           if (name == 'errorBuilder' || name == 'errorPageBuilder') {
             hasErrorHandler = true;
             break;
@@ -1831,8 +1831,8 @@ class RequireGoRouterRefreshListenableRule extends SaropaLintRule {
       bool hasRefreshListenable = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String name = arg.name.lexeme;
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
           if (name == 'redirect') hasRedirect = true;
           if (name == 'refreshListenable') hasRefreshListenable = true;
         }
@@ -1919,10 +1919,10 @@ class AvoidGoRouterStringPathsRule extends SaropaLintRule {
       if (target is! SimpleIdentifier || target.name != 'context') return;
 
       // Check first argument for string literal
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Argument firstArg = args.first;
+      final Expression firstArg = args.first;
       if (firstArg is SimpleStringLiteral ||
           firstArg is StringInterpolation ||
           firstArg is AdjacentStrings) {
@@ -2011,9 +2011,9 @@ class PreferGoRouterRedirectAuthRule extends SaropaLintRule {
       if (!fileImportsPackage(node, PackageImports.goRouter)) return;
 
       // Find builder argument
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
-          final Expression builderExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final Expression builderExpr = arg.expression;
 
           // Check if builder contains auth-related checks
           final String builderSource = builderExpr.toSource().toLowerCase();
@@ -2228,11 +2228,11 @@ class PreferGoRouterExtraTypedRule extends SaropaLintRule {
       if (!_goRouterMethods.contains(methodName)) return;
 
       // Look for extra parameter
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is! NamedArgument) continue;
-        if (arg.name.lexeme != 'extra') continue;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        if (arg.name.label.name != 'extra') continue;
 
-        final Expression extraValue = arg.argumentExpression;
+        final Expression extraValue = arg.expression;
 
         // Check if extra is a Map literal
         if (extraValue is SetOrMapLiteral && extraValue.isMap) {
@@ -2409,8 +2409,8 @@ class PreferMaybePopRule extends SaropaLintRule {
       // where the framework already handles the logic
       current = node.parent;
       while (current != null) {
-        if (current is NamedArgument) {
-          final String paramName = current.name.lexeme;
+        if (current is NamedExpression) {
+          final String paramName = current.name.label.name;
           if (paramName == 'onPopInvoked' ||
               paramName == 'onWillPop' ||
               paramName == 'onPopInvokedWithResult') {
@@ -2489,7 +2489,7 @@ class PreferUrlLauncherUriOverStringRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Argument firstArg = args.arguments.first;
+      final Expression firstArg = args.arguments.first;
       if (firstArg is MethodInvocation && firstArg.methodName.name == 'parse') {
         final Expression? target = firstArg.target;
         if (target is SimpleIdentifier && target.name == 'Uri') {
@@ -2582,10 +2582,7 @@ class AvoidGoRouterPushReplacementConfusionRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      // The route path is always the first positional argument (a string
-      // literal or interpolation), so it is an Expression, not a
-      // NamedArgument.
-      final Expression pathArg = args.arguments.first as Expression;
+      final Expression pathArg = args.arguments.first;
 
       // Compare whole path SEGMENTS, not substrings: 'pathSource.contains(/view)'
       // made '/viewport/$x' match the '/view' detail segment, flagging a
@@ -2709,14 +2706,14 @@ class RequireUrlLauncherEncodingRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Argument firstArg = args.arguments.first;
+      final Expression firstArg = args.arguments.first;
 
       // Check for Uri.parse('...$var...')
       if (firstArg is MethodInvocation && firstArg.methodName.name == 'parse') {
         final ArgumentList parseArgs = firstArg.argumentList;
         if (parseArgs.arguments.isEmpty) return;
 
-        final Argument urlArg = parseArgs.arguments.first;
+        final Expression urlArg = parseArgs.arguments.first;
         if (urlArg is StringInterpolation) {
           final String source = urlArg.toSource();
           if (!_urlEncodePatterns.any((p) => p.hasMatch(source))) {
@@ -2790,10 +2787,7 @@ class AvoidNestedRoutesWithoutParentRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      // The route path is always the first positional argument (a string
-      // literal or interpolation), so it is an Expression, not a
-      // NamedArgument.
-      final Expression pathArg = args.arguments.first as Expression;
+      final Expression pathArg = args.arguments.first;
       if (pathArg is! SimpleStringLiteral) return;
 
       final String path = pathArg.value;
@@ -2877,9 +2871,9 @@ class PreferShellRouteSharedLayoutRule extends SaropaLintRule {
 
       // Check for builder parameter with Scaffold
       final ArgumentList args = node.argumentList;
-      for (final Argument arg in args.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
-          final String builderSource = arg.argumentExpression.toSource();
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
           if (builderSource.contains('Scaffold(') &&
               (builderSource.contains('AppBar(') ||
                   builderSource.contains('BottomNavigationBar(') ||
@@ -2960,9 +2954,9 @@ class RequireStatefulShellRouteTabsRule extends SaropaLintRule {
 
       // Check for tab-related patterns in builder
       final ArgumentList args = node.argumentList;
-      for (final Argument arg in args.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
-          final String builderSource = arg.argumentExpression.toSource();
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
           // Look for tab-related widgets
           if (builderSource.contains('BottomNavigationBar') ||
               builderSource.contains('NavigationBar') ||
@@ -3044,9 +3038,9 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       bool hasErrorHandler = false;
 
-      for (final Argument arg in args.arguments) {
-        if (arg is NamedArgument) {
-          final String paramName = arg.name.lexeme;
+      for (final Expression arg in args.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name;
           if (paramName == 'errorBuilder' ||
               paramName == 'errorPageBuilder' ||
               paramName == 'onException') {
@@ -3069,9 +3063,9 @@ class RequireGoRouterFallbackRouteRule extends SaropaLintRule {
 
 /// Returns the expression passed as the [settings] named argument, if any.
 Expression? _getSettingsArgument(InstanceCreationExpression node) {
-  for (final Argument arg in node.argumentList.arguments) {
-    if (arg is NamedArgument && arg.name.lexeme == 'settings') {
-      return arg.argumentExpression;
+  for (final Expression arg in node.argumentList.arguments) {
+    if (arg is NamedExpression && arg.name.label.name == 'settings') {
+      return arg.expression;
     }
   }
   return null;
@@ -3246,7 +3240,7 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
 
       // Check arguments for currentContext usage
       final ArgumentList args = node.argumentList;
-      for (final Argument arg in args.arguments) {
+      for (final Expression arg in args.arguments) {
         if (_hasProblematicContextUsage(arg.toSource())) {
           reporter.atNode(arg);
           return;
@@ -3265,7 +3259,7 @@ class AvoidNavigatorContextIssueRule extends SaropaLintRule {
         return;
       }
 
-      for (final Argument arg in node.argumentList.arguments) {
+      for (final Expression arg in node.argumentList.arguments) {
         if (_hasProblematicContextUsage(arg.toSource())) {
           reporter.atNode(arg);
         }
@@ -3467,11 +3461,7 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
       // matched 'view' and an `Order...` builder matched 'order' — flagging
       // unrelated routes. Matching whole '/'-split segments of a literal name
       // confines detection to a route actually named e.g. 'detail' or 'edit'.
-      for (final Argument arg in node.argumentList.arguments) {
-        // _routeNameOf only recognizes positional Expression arguments
-        // (string literals / RouteSettings(...)); a NamedArgument (e.g.
-        // `key:`) can never be a route name, so skip it rather than crash.
-        if (arg is! Expression) continue;
+      for (final Expression arg in node.argumentList.arguments) {
         final String? routeName = _routeNameOf(arg);
         if (routeName == null) continue;
         for (final String segment in routeName.toLowerCase().split('/')) {
@@ -3493,9 +3483,9 @@ class AvoidPushReplacementMisuseRule extends SaropaLintRule {
     if (arg is SimpleStringLiteral) return arg.value;
     if (arg is InstanceCreationExpression &&
         arg.constructorName.type.name.lexeme == 'RouteSettings') {
-      for (final Argument a in arg.argumentList.arguments) {
-        if (a is NamedArgument && a.name.lexeme == 'name') {
-          final Expression value = a.argumentExpression;
+      for (final Expression a in arg.argumentList.arguments) {
+        if (a is NamedExpression && a.name.label.name == 'name') {
+          final Expression value = a.expression;
           if (value is SimpleStringLiteral) return value.value;
         }
       }
@@ -3683,9 +3673,9 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
 
       // Check if passing complex objects instead of IDs
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'arguments') {
+        if (arg is NamedExpression && arg.name.label.name == 'arguments') {
           // Check if passing an object that's not a simple type
-          final value = arg.argumentExpression;
+          final value = arg.expression;
           if (value is! SimpleStringLiteral &&
               value is! IntegerLiteral &&
               value is! DoubleLiteral &&
@@ -3712,8 +3702,8 @@ class RequireDeepLinkTestingRule extends SaropaLintRule {
   /// correctly flagged for lacking a routable id.
   static bool _carriesIdArgument(Expression value) {
     if (value is InstanceCreationExpression) {
-      for (final Argument a in value.argumentList.arguments) {
-        if (a is NamedArgument && a.name.lexeme == 'id') return true;
+      for (final Expression a in value.argumentList.arguments) {
+        if (a is NamedExpression && a.name.label.name == 'id') return true;
       }
       return false;
     }
@@ -3893,8 +3883,8 @@ class PreferGoRouterRedirectRule extends SaropaLintRule {
       if (typeName != 'GoRouter') return;
 
       // Check if redirect parameter is present
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'redirect') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'redirect') {
           return; // Has redirect, OK
         }
       }
@@ -3963,13 +3953,13 @@ class PreferGoRouterBuilderRule extends SaropaLintRule {
 
       if (!fileImportsPackage(node, PackageImports.goRouter)) return;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument &&
-            arg.name.lexeme == 'path' &&
-            (arg.argumentExpression is SimpleStringLiteral ||
-                arg.argumentExpression is StringInterpolation ||
-                arg.argumentExpression is AdjacentStrings)) {
-          reporter.atNode(arg.argumentExpression, code);
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'path' &&
+            (arg.expression is SimpleStringLiteral ||
+                arg.expression is StringInterpolation ||
+                arg.expression is AdjacentStrings)) {
+          reporter.atNode(arg.expression, code);
           return;
         }
       }
@@ -4162,12 +4152,12 @@ class PreferNamedRoutesForDeepLinksRule extends SaropaLintRule {
     if (settingsExpr.constructorName.type.name.lexeme != 'RouteSettings') {
       return false;
     }
-    for (final Argument settingsArg in settingsExpr.argumentList.arguments) {
-      if (settingsArg is! NamedArgument ||
-          settingsArg.name.lexeme != 'name') {
+    for (final Expression settingsArg in settingsExpr.argumentList.arguments) {
+      if (settingsArg is! NamedExpression ||
+          settingsArg.name.label.name != 'name') {
         continue;
       }
-      final Expression nameExpr = settingsArg.argumentExpression;
+      final Expression nameExpr = settingsArg.expression;
       if (nameExpr is SimpleStringLiteral) {
         return nameExpr.value.isNotEmpty;
       }

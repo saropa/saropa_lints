@@ -346,8 +346,8 @@ class RequireCurrencyFormattingLocaleRule extends SaropaLintRule {
 
       // Check for locale parameter
       bool hasLocale = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'locale') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'locale') {
           hasLocale = true;
           break;
         }
@@ -435,8 +435,8 @@ class RequireNumberFormattingLocaleRule extends SaropaLintRule {
 
       // Check for locale parameter
       bool hasLocale = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'locale') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'locale') {
           hasLocale = true;
           break;
         }
@@ -583,16 +583,16 @@ class AvoidBadgeWithoutMeaningRule extends SaropaLintRule {
       bool hasZeroLabel = false;
       bool hasIsLabelVisible = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String paramName = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name;
 
           if (paramName == 'isLabelVisible') {
             hasIsLabelVisible = true;
           }
 
           if (paramName == 'label') {
-            final String labelSource = arg.argumentExpression.toSource();
+            final String labelSource = arg.expression.toSource();
             if (labelSource.contains("'0'") || labelSource.contains('"0"')) {
               hasZeroLabel = true;
             }
@@ -742,9 +742,9 @@ class PreferItemExtentWhenKnownRule extends SaropaLintRule {
 
       // Check for itemExtent, prototypeItem, or itemExtentBuilder
       bool hasItemExtent = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String paramName = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name;
           if (paramName == 'itemExtent' ||
               paramName == 'prototypeItem' ||
               paramName == 'itemExtentBuilder') {
@@ -929,12 +929,12 @@ class PreferSkeletonOverSpinnerRule extends SaropaLintRule {
 
   bool _hasDeterminateValue(InstanceCreationExpression node) {
     for (final arg
-        in node.argumentList.arguments.whereType<NamedArgument>()) {
-      if (arg.name.lexeme != 'value') {
+        in node.argumentList.arguments.whereType<NamedExpression>()) {
+      if (arg.name.label.name != 'value') {
         continue;
       }
 
-      final expression = arg.argumentExpression;
+      final expression = arg.expression;
       if (expression is NullLiteral) {
         return false;
       }
@@ -1012,15 +1012,15 @@ class RequireEmptyResultsStateRule extends SaropaLintRule {
 
       // Check if itemCount references search-related variable
       final itemCountArg = node.argumentList.arguments
-          .whereType<NamedArgument>()
-          .where((arg) => arg.name.lexeme == 'itemCount')
+          .whereType<NamedExpression>()
+          .where((arg) => arg.name.label.name == 'itemCount')
           .firstOrNull;
 
       if (itemCountArg == null) {
         return;
       }
 
-      final itemCountSource = itemCountArg.argumentExpression.toSource().toLowerCase();
+      final itemCountSource = itemCountArg.expression.toSource().toLowerCase();
 
       // Check if it's search-related
       final isSearchRelated = _searchTerms.any(
@@ -1125,15 +1125,15 @@ class RequireSearchLoadingIndicatorRule extends SaropaLintRule {
 
       // Find onSubmitted or controller.addListener
       for (final arg in node.argumentList.arguments) {
-        if (arg is! NamedArgument) continue;
+        if (arg is! NamedExpression) continue;
 
-        final paramName = arg.name.lexeme;
+        final paramName = arg.name.label.name;
         if (paramName != 'onSubmitted' && paramName != 'onEditingComplete') {
           continue;
         }
 
         // Check if callback contains search-related terms
-        final callbackSource = arg.argumentExpression.toSource().toLowerCase();
+        final callbackSource = arg.expression.toSource().toLowerCase();
         if (!callbackSource.contains('search') &&
             !callbackSource.contains('query') &&
             !callbackSource.contains('find') &&
@@ -1218,9 +1218,9 @@ class RequireSearchDebounceRule extends SaropaLintRule {
       }
 
       // Find onChanged callback
-      NamedArgument? onChangedArg;
+      NamedExpression? onChangedArg;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'onChanged') {
+        if (arg is NamedExpression && arg.name.label.name == 'onChanged') {
           onChangedArg = arg;
           break;
         }
@@ -1230,7 +1230,7 @@ class RequireSearchDebounceRule extends SaropaLintRule {
         return;
       }
 
-      final callbackSource = onChangedArg.argumentExpression.toSource().toLowerCase();
+      final callbackSource = onChangedArg.expression.toSource().toLowerCase();
 
       // Check if it's search-related
       final isSearchRelated =
@@ -1372,15 +1372,15 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
 
       // Find itemBuilder
       final itemBuilderArg = node.argumentList.arguments
-          .whereType<NamedArgument>()
-          .where((arg) => arg.name.lexeme == 'itemBuilder')
+          .whereType<NamedExpression>()
+          .where((arg) => arg.name.label.name == 'itemBuilder')
           .firstOrNull;
 
       if (itemBuilderArg == null) {
         return;
       }
 
-      final builderSource = itemBuilderArg.argumentExpression.toSource().toLowerCase();
+      final builderSource = itemBuilderArg.expression.toSource().toLowerCase();
 
       // cspell:ignore loadmore fetchmore nextpage loadnext
 
@@ -1397,15 +1397,15 @@ class RequirePaginationLoadingStateRule extends SaropaLintRule {
 
       // Check itemCount for loading indicator
       final itemCountArg = node.argumentList.arguments
-          .whereType<NamedArgument>()
-          .where((arg) => arg.name.lexeme == 'itemCount')
+          .whereType<NamedExpression>()
+          .where((arg) => arg.name.label.name == 'itemCount')
           .firstOrNull;
 
       if (itemCountArg == null) {
         return;
       }
 
-      final itemCountSource = itemCountArg.argumentExpression.toSource().toLowerCase();
+      final itemCountSource = itemCountArg.expression.toSource().toLowerCase();
 
       // Check if itemCount includes loading state
       final hasLoadingInCount =
@@ -1511,14 +1511,14 @@ class RequirePaginationErrorRecoveryRule extends SaropaLintRule {
       }
 
       final itemBuilderArg = node.argumentList.arguments
-          .whereType<NamedArgument>()
-          .where((arg) => arg.name.lexeme == 'itemBuilder')
+          .whereType<NamedExpression>()
+          .where((arg) => arg.name.label.name == 'itemBuilder')
           .firstOrNull;
       if (itemBuilderArg == null) {
         return;
       }
 
-      final builderSource = itemBuilderArg.argumentExpression.toSource().toLowerCase();
+      final builderSource = itemBuilderArg.expression.toSource().toLowerCase();
       if (!_paginationTriggerPattern.hasMatch(builderSource)) {
         return;
       }
@@ -1652,9 +1652,9 @@ class RequireWebViewProgressIndicatorRule extends SaropaLintRule {
       // Check for progress-related callbacks
       bool hasProgressIndicator = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String paramName = arg.name.lexeme.toLowerCase();
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name.toLowerCase();
           if (_progressParams.contains(paramName)) {
             hasProgressIndicator = true;
             break;
@@ -1781,9 +1781,9 @@ class AvoidLoadingFlashRule extends SaropaLintRule {
       if (typeName != 'FutureBuilder' && typeName != 'StreamBuilder') return;
 
       // Check if the builder immediately shows loading indicator
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
-          final String builderSource = arg.argumentExpression.toSource();
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final String builderSource = arg.expression.toSource();
 
           // Check for immediate loading indicator without delay
           if (builderSource.contains('CircularProgressIndicator') ||
@@ -1868,12 +1868,12 @@ class PreferAvatarLoadingPlaceholderRule extends SaropaLintRule {
       bool hasErrorHandler = false;
       bool hasChild = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is! NamedArgument) continue;
-        final String paramName = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        final String paramName = arg.name.label.name;
 
         if (paramName == 'backgroundImage') {
-          final String imgSource = arg.argumentExpression.toSource();
+          final String imgSource = arg.expression.toSource();
           if (imgSource.contains('NetworkImage') ||
               imgSource.contains('CachedNetworkImageProvider')) {
             hasNetworkImage = true;
@@ -1947,11 +1947,11 @@ class PreferAdaptiveIconsRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'Icon') return;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'size') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'size') {
           // Flag only literal number sizes (not variables or expressions)
-          if (arg.argumentExpression is IntegerLiteral ||
-              arg.argumentExpression is DoubleLiteral) {
+          if (arg.expression is IntegerLiteral ||
+              arg.expression is DoubleLiteral) {
             reporter.atNode(arg);
             return;
           }

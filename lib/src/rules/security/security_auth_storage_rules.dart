@@ -123,7 +123,7 @@ class RequireSecureStorageRule extends SaropaLintRule {
 
       if (node.argumentList.arguments.isEmpty) return;
 
-      final Argument firstArg = node.argumentList.arguments.first;
+      final Expression firstArg = node.argumentList.arguments.first;
       final String keySource = firstArg.toSource().toLowerCase();
 
       if (_sensitiveKeyPatterns.any((p) => p.hasMatch(keySource))) {
@@ -371,10 +371,10 @@ class RequireBiometricFallbackRule extends SaropaLintRule {
       if (!_isBiometricReceiver(target)) return;
 
       // Check for biometricOnly: true
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          if (arg.name.lexeme == 'biometricOnly') {
-            final expr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          if (arg.name.label.name == 'biometricOnly') {
+            final expr = arg.expression;
             if (expr is BooleanLiteral && expr.value) {
               reporter.atNode(arg);
               return;
@@ -491,7 +491,7 @@ class AvoidStoringPasswordsRule extends SaropaLintRule {
 
       if (node.argumentList.arguments.isEmpty) return;
 
-      final Argument firstArg = node.argumentList.arguments.first;
+      final Expression firstArg = node.argumentList.arguments.first;
       final String keySource = firstArg.toSource().toLowerCase();
 
       if (_passwordKeyPatterns.any((p) => p.hasMatch(keySource))) {
@@ -735,14 +735,15 @@ class RequireAuthCheckRule extends SaropaLintRule {
   }
 
   /// Extracts the type string from a formal parameter.
-  ///
-  /// Analyzer 13 merged `SimpleFormalParameter`/`FunctionTypedFormalParameter`
-  /// into `RegularFormalParameter` and removed the `DefaultFormalParameter`
-  /// wrapper — every `FormalParameter` now exposes `.type` directly, so there
-  /// is no wrapped inner parameter to unwrap.
   static String? _extractParamType(FormalParameter param) {
-    if (param is RegularFormalParameter) {
+    if (param is SimpleFormalParameter) {
       return param.type?.toSource();
+    }
+    if (param is DefaultFormalParameter) {
+      final NormalFormalParameter normalParam = param.parameter;
+      if (normalParam is SimpleFormalParameter) {
+        return normalParam.type?.toSource();
+      }
     }
     return null;
   }
@@ -1629,16 +1630,16 @@ class RequireSecurePasswordFieldRule extends SaropaLintRule {
       // `enableSuggestions:false` (no space) or split across wrapped lines by
       // the formatter was a false positive, and `obscureText: true` matched even
       // when `true` was actually a getter expression. Reading the literal value
-      // off each NamedArgument removes that formatting dependence.
+      // off each NamedExpression removes that formatting dependence.
       bool obscureTextTrue = false;
       bool enableSuggestionsFalse = false;
       bool autocorrectFalse = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is! NamedArgument) continue;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
 
-        final String label = arg.name.lexeme;
-        final Expression value = arg.argumentExpression;
+        final String label = arg.name.label.name;
+        final Expression value = arg.expression;
 
         // Only a literal `true` / `false` is decidable here. A non-literal
         // (e.g. `obscureText: _obscure`) leaves the flag at its default, so a
@@ -1802,7 +1803,7 @@ class RequireSecureStorageForAuthRule extends SaropaLintRule {
       if (!isPrefs) return;
 
       // Check VALUE argument for auth patterns (key is checked by other rule)
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.length < 2) return;
 
       final String valueSource = args[1].toSource().toLowerCase();
@@ -2201,13 +2202,13 @@ class AvoidStoringSensitiveUnencryptedRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Argument firstArg = args.arguments.first;
+      final Expression firstArg = args.arguments.first;
       String? keyValue;
 
       if (firstArg is SimpleStringLiteral) {
         keyValue = firstArg.value.toLowerCase();
-      } else if (firstArg is NamedArgument) {
-        final expr = firstArg.argumentExpression;
+      } else if (firstArg is NamedExpression) {
+        final expr = firstArg.expression;
         if (expr is SimpleStringLiteral) {
           keyValue = expr.value.toLowerCase();
         }
@@ -2433,9 +2434,9 @@ class AvoidSecureStorageLargeDataRule extends SaropaLintRule {
       }
 
       // Check the value being written
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'value') {
-          final Expression value = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'value') {
+          final Expression value = arg.expression;
 
           // cspell:ignore imagedata
           // Check for indicators of large data
@@ -2527,9 +2528,9 @@ class PreferBiometricProtectionRule extends SaropaLintRule {
   static bool _hasAuthenticationRequired(Expression optionsExpr) {
     if (optionsExpr is! InstanceCreationExpression) return false;
     for (final arg in optionsExpr.argumentList.arguments) {
-      if (arg is NamedArgument &&
-          arg.name.lexeme == 'authenticationRequired') {
-        final expr = arg.argumentExpression;
+      if (arg is NamedExpression &&
+          arg.name.label.name == 'authenticationRequired') {
+        final expr = arg.expression;
         if (expr is BooleanLiteral && expr.value) return true;
       }
     }
@@ -2546,11 +2547,11 @@ class PreferBiometricProtectionRule extends SaropaLintRule {
       if (typeName != 'FlutterSecureStorage') return;
 
       bool hasBiometric = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final name = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final name = arg.name.label.name;
           if (name == 'aOptions' || name == 'iOptions') {
-            if (_hasAuthenticationRequired(arg.argumentExpression)) {
+            if (_hasAuthenticationRequired(arg.expression)) {
               hasBiometric = true;
               break;
             }
@@ -2649,7 +2650,7 @@ class AvoidSensitiveDataInClipboardRule extends SaropaLintRule {
       if (target is! SimpleIdentifier || target.name != 'Clipboard') return;
 
       // Check the argument for sensitive patterns
-      for (final Argument arg in node.argumentList.arguments) {
+      for (final Expression arg in node.argumentList.arguments) {
         final String argSource = arg.toSource();
         if (_sensitivePattern.hasMatch(argSource)) {
           reporter.atNode(node);
@@ -3013,9 +3014,9 @@ class PreferOauthPkceRule extends SaropaLintRule {
       if (!_oauthConstructors.contains(typeName)) return;
 
       // Check for PKCE-related parameters
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String paramName = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name;
           if (paramName == 'codeVerifier' ||
               paramName == 'codeChallenge' ||
               paramName == 'pkce') {
@@ -3410,9 +3411,9 @@ class PreferWebviewSandboxRule extends SaropaLintRule {
   /// Returns the source of the controller argument (root identifier/chain), or
   /// null if there is no named `controller` argument.
   static String? _controllerRootFromCreation(InstanceCreationExpression node) {
-    for (final Argument arg in node.argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'controller') {
-        return _controllerRootFromExpression(arg.argumentExpression);
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'controller') {
+        return _controllerRootFromExpression(arg.expression);
       }
     }
     return null;

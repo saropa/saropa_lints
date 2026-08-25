@@ -200,12 +200,8 @@ class RequireHiveTypeAdapterRule extends SaropaLintRule {
       // Check if target looks like a Hive box
       if (!_isHiveBoxTarget(node.target)) return;
 
-      // Check arguments - if it's a custom object (not primitive).
-      // Named args (if any) can only follow positional ones, so filtering to
-      // Expression preserves positional order/indices.
-      final List<Expression> args = node.argumentList.arguments
-          .whereType<Expression>()
-          .toList();
+      // Check arguments - if it's a custom object (not primitive)
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       // Get the value argument (2nd for put, 1st for add)
@@ -413,9 +409,7 @@ class PreferHiveEncryptionRule extends SaropaLintRule {
       if (!_isHiveBoxTarget(node.target)) return;
 
       // Check key for sensitive patterns
-      final List<Expression> args = node.argumentList.arguments
-          .whereType<Expression>()
-          .toList();
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final String keySource = args.first.toSource().toLowerCase();
@@ -490,9 +484,7 @@ class RequireHiveEncryptionKeySecureRule extends SaropaLintRule {
       if (typeName != 'HiveAesCipher') return;
 
       // Check if argument is a literal
-      final List<Expression> args = node.argumentList.arguments
-          .whereType<Expression>()
-          .toList();
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final Expression keyArg = args.first;
@@ -796,12 +788,9 @@ class PreferLazyBoxForLargeRule extends SaropaLintRule {
 
       // Check box name argument
       final ArgumentList args = node.argumentList;
-      final List<Expression> positionalArgs = args.arguments
-          .whereType<Expression>()
-          .toList();
-      if (positionalArgs.isEmpty) return;
+      if (args.arguments.isEmpty) return;
 
-      final Expression firstArg = positionalArgs.first;
+      final Expression firstArg = args.arguments.first;
       final String boxName = firstArg.toSource().toLowerCase();
 
       // Check if this looks like a potentially large collection
@@ -1037,10 +1026,7 @@ class AvoidHiveFieldIndexReuseRule extends SaropaLintRule {
     final ArgumentList? args = annotation.arguments;
     if (args == null || args.arguments.isEmpty) return null;
 
-    // The HiveField index is always the first positional argument.
-    final Argument firstRawArg = args.arguments.first;
-    if (firstRawArg is! Expression) return null;
-    final Expression firstArg = firstRawArg;
+    final Expression firstArg = args.arguments.first;
     if (firstArg is IntegerLiteral) {
       return firstArg.value;
     }
@@ -1136,9 +1122,9 @@ class RequireHiveFieldDefaultValueRule extends SaropaLintRule {
         return;
       }
 
-      final bool hasDefaultValue = args.arguments.any((Argument arg) {
-        if (arg is NamedArgument) {
-          return arg.name.lexeme == 'defaultValue';
+      final bool hasDefaultValue = args.arguments.any((Expression arg) {
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'defaultValue';
         }
         return false;
       });
@@ -1457,9 +1443,8 @@ class AvoidHiveBoxNameCollisionRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      final Argument firstRawArg = args.arguments.first;
-      if (firstRawArg is! SimpleStringLiteral) return;
-      final SimpleStringLiteral firstArg = firstRawArg;
+      final Expression firstArg = args.arguments.first;
+      if (firstArg is! SimpleStringLiteral) return;
 
       final String boxName = firstArg.value.toLowerCase();
       if (_genericNames.contains(boxName)) {
@@ -2098,9 +2083,7 @@ class RequireHiveWebSubdirectoryRule extends SaropaLintRule {
       if (target is! SimpleIdentifier || target.name != 'Hive') return;
 
       // Check if subDir argument is provided
-      final List<Expression> args = node.argumentList.arguments
-          .whereType<Expression>()
-          .toList();
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) {
         // No arguments at all - missing subDir
         reporter.atNode(node);
@@ -2185,9 +2168,7 @@ class AvoidHiveDatetimeLocalRule extends SaropaLintRule {
       if (!RegExp(r'\bBox\b').hasMatch(targetStr)) return;
 
       // Get the value argument (second positional arg)
-      final List<Expression> args = node.argumentList.arguments
-          .whereType<Expression>()
-          .toList();
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.length < 2) return;
 
       final Expression value = args[1];
@@ -2294,9 +2275,7 @@ class AvoidHiveTypeModificationRule extends SaropaLintRule {
         if (member is! FieldDeclaration) continue;
         for (final Annotation annotation in member.metadata) {
           if (annotation.name.name != 'HiveField') continue;
-          final List<Expression>? args = annotation.arguments?.arguments
-              .whereType<Expression>()
-              .toList();
+          final NodeList<Expression>? args = annotation.arguments?.arguments;
           if (args == null || args.isEmpty) continue;
 
           final Expression indexExpr = args.first;
@@ -2387,9 +2366,7 @@ class AvoidHiveLargeSingleEntryRule extends SaropaLintRule {
       if (!RegExp(r'\bBox\b').hasMatch(targetStr)) return;
 
       // Get the value argument
-      final List<Expression> args = node.argumentList.arguments
-          .whereType<Expression>()
-          .toList();
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.length < 2) return;
 
       final String? valueType = args[1].staticType?.getDisplayString();

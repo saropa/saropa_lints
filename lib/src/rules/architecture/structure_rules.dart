@@ -1600,11 +1600,14 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
         // Skip if already named
         if (param.isNamed) continue;
 
-        // Check if the parameter type is bool. Analyzer 13 removed the
-        // DefaultFormalParameter wrapper and merged SimpleFormalParameter
-        // into RegularFormalParameter, so the type is read directly.
-        final RegularFormalParameter? simpleParam =
-            param is RegularFormalParameter ? param : null;
+        // Check if the parameter type is bool
+        SimpleFormalParameter? simpleParam;
+        if (param is SimpleFormalParameter) {
+          simpleParam = param;
+        } else if (param is DefaultFormalParameter) {
+          final p = param.parameter;
+          simpleParam = p is SimpleFormalParameter ? p : null;
+        }
 
         if (simpleParam == null) continue;
 
@@ -3917,12 +3920,13 @@ class PreferExtensionMethodsRule extends SaropaLintRule {
       final FormalParameterList? params = node.functionExpression.parameters;
       if (params == null || params.parameters.isEmpty) return;
 
-      // Analyzer 13 removed the DefaultFormalParameter wrapper and merged
-      // SimpleFormalParameter into RegularFormalParameter.
       final FormalParameter first = params.parameters.first;
-      if (first is! RegularFormalParameter) return;
+      final FormalParameter inner = first is DefaultFormalParameter
+          ? first.parameter
+          : first;
+      if (inner is! SimpleFormalParameter) return;
 
-      final TypeAnnotation? typeAnnotation = first.type;
+      final TypeAnnotation? typeAnnotation = inner.type;
       if (typeAnnotation is! NamedType) return;
       final String typeName = typeAnnotation.name.lexeme;
       if (typeName.isEmpty) return;
@@ -4004,12 +4008,13 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
       final FormalParameterList? params = node.functionExpression.parameters;
       if (params == null || params.parameters.isEmpty) return;
 
-      // Analyzer 13 removed DefaultFormalParameter wrapping / merged
-      // SimpleFormalParameter into RegularFormalParameter.
       final FormalParameter first = params.parameters.first;
-      if (first is! RegularFormalParameter) return;
+      final FormalParameter inner = first is DefaultFormalParameter
+          ? first.parameter
+          : first;
+      if (inner is! SimpleFormalParameter) return;
 
-      final TypeAnnotation? typeAnnotation = first.type;
+      final TypeAnnotation? typeAnnotation = inner.type;
       if (typeAnnotation is! NamedType) return;
       final String typeName = typeAnnotation.name.lexeme;
       if (_primitiveTypeNames.contains(typeName)) return;
@@ -4164,10 +4169,9 @@ class PreferExtensionOverUtilityClassRule extends SaropaLintRule {
       for (final MethodDeclaration m in staticMethods) {
         final params = m.parameters?.parameters;
         if (params == null || params.isEmpty) return;
-        // Analyzer 13 removed DefaultFormalParameter wrapping / merged
-        // SimpleFormalParameter into RegularFormalParameter.
         final p = params.first;
-        final innerType = p is RegularFormalParameter ? p.type : null;
+        final inner = p is DefaultFormalParameter ? p.parameter : p;
+        final innerType = inner is SimpleFormalParameter ? inner.type : null;
         if (innerType is NamedType) {
           firstParamTypeNames.add(innerType.name.lexeme);
         }
@@ -4252,11 +4256,11 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
 
       final ConstructorDeclaration ctor = constructors[0];
       if (ctor.parameters.parameters.length != 1) return;
-      // Analyzer 13 removed the DefaultFormalParameter wrapper — parameters
-      // (including named/optional ones) are no longer wrapped, so no
-      // unwrapping is needed before the type test.
       final FormalParameter p = ctor.parameters.parameters.single;
-      if (p is! FieldFormalParameter) return;
+      final FormalParameter inner = p is DefaultFormalParameter
+          ? p.parameter
+          : p;
+      if (inner is! FieldFormalParameter) return;
 
       final int methodCount = node.bodyMembers
           .whereType<MethodDeclaration>()
@@ -4656,10 +4660,8 @@ class WrongNumberOfParametersForSetterRule extends SaropaLintRule {
         return;
       }
 
-      // Analyzer 13 removed DefaultFormalParameter; a parameter carrying a
-      // default value now exposes it directly via .defaultClause.
       final FormalParameter single = list.single;
-      if (single.defaultClause != null || single.isNamed) {
+      if (single is DefaultFormalParameter || single.isNamed) {
         reporter.atNode(node);
       }
     });

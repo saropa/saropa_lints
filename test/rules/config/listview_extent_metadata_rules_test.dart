@@ -322,22 +322,18 @@ class _ListViewExtentVisitor extends RecursiveAstVisitor<void> {
     var hasItemExtentBuilder = false;
     var shrinkWrapTrue = false;
     var neverScrollablePhysics = false;
-    // Analyzer 13 migration: NamedExpression → NamedArgument,
-    // .name.label.name → .name.lexeme, .expression → .argumentExpression
     for (final arg in argumentList.arguments) {
-      if (arg is! NamedArgument) continue;
-      final name = arg.name.lexeme;
+      if (arg is! NamedExpression) continue;
+      final name = arg.name.label.name;
       if (name == 'itemExtent') hasItemExtent = true;
       if (name == 'prototypeItem') hasPrototypeItem = true;
       if (name == 'itemExtentBuilder') hasItemExtentBuilder = true;
       if (name == 'shrinkWrap') {
-        final v = arg.argumentExpression;
+        final v = arg.expression;
         if (v is BooleanLiteral && v.value) shrinkWrapTrue = true;
       }
       if (name == 'physics') {
-        // .argumentExpression on NamedArgument; .expression on
-        // ParenthesizedExpression is unchanged (it's not a NamedArgument)
-        Expression v = arg.argumentExpression;
+        Expression v = arg.expression;
         if (v is ParenthesizedExpression) v = v.expression;
         if (v is InstanceCreationExpression &&
             v.constructorName.type.name.lexeme ==

@@ -88,10 +88,10 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     // Look for shrinkWrap: true arguments directly
-    context.addNamedArgument((NamedArgument node) {
-      if (node.name.lexeme != 'shrinkWrap') return;
+    context.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'shrinkWrap') return;
 
-      final Expression value = node.argumentExpression;
+      final Expression value = node.expression;
       if (value is! BooleanLiteral || !value.value) return;
 
       // Check if this shrinkWrap is on a scrollable widget
@@ -110,13 +110,13 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   }
 
   /// Check if sibling arguments include physics: NeverScrollableScrollPhysics()
-  bool _hasNeverScrollablePhysicsInSiblings(NamedArgument shrinkWrapNode) {
+  bool _hasNeverScrollablePhysicsInSiblings(NamedExpression shrinkWrapNode) {
     final AstNode? argumentList = shrinkWrapNode.parent;
     if (argumentList is! ArgumentList) return false;
 
-    for (final Argument arg in argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'physics') {
-        final Expression physicsValue = arg.argumentExpression;
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'physics') {
+        final Expression physicsValue = arg.expression;
         if (physicsValue is InstanceCreationExpression) {
           final String typeName = physicsValue.constructorName.type.name.lexeme;
           if (typeName == 'NeverScrollableScrollPhysics') {
@@ -298,8 +298,8 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
     }
 
     var hasPhysics = false;
-    for (final Argument arg in args.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'physics') {
+    for (final Expression arg in args.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'physics') {
         hasPhysics = true;
         break;
       }
@@ -350,10 +350,10 @@ class _NestedScrollableVisitor extends RecursiveAstVisitor<void> {
   /// Resolves `scrollDirection` when it is `Axis.horizontal` /
   /// `Axis.vertical`; otherwise returns `null` so the rule stays conservative.
   static bool? _horizontalAxisOrUnknown(String typeName, ArgumentList args) {
-    for (final Argument arg in args.arguments) {
-      if (arg is! NamedArgument) continue;
-      if (arg.name.lexeme != 'scrollDirection') continue;
-      return _literalHorizontalFromAxisExpression(arg.argumentExpression);
+    for (final Expression arg in args.arguments) {
+      if (arg is! NamedExpression) continue;
+      if (arg.name.label.name != 'scrollDirection') continue;
+      return _literalHorizontalFromAxisExpression(arg.expression);
     }
     return _defaultHorizontalForType(typeName);
   }
@@ -431,9 +431,9 @@ class AvoidListViewChildrenForLargeListsRule extends SaropaLintRule {
       }
 
       // Check for children argument
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'children') {
-          final Expression value = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'children') {
+          final Expression value = arg.expression;
           if (value is ListLiteral &&
               value.elements.length > _maxChildrenCount) {
             reporter.atNode(node.constructorName, code);
@@ -501,12 +501,12 @@ class AvoidExcessiveBottomNavItemsRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     // Look for items/destinations arguments directly
-    context.addNamedArgument((NamedArgument node) {
-      final String argName = node.name.lexeme;
+    context.addNamedExpression((NamedExpression node) {
+      final String argName = node.name.label.name;
       if (argName != 'items' && argName != 'destinations') return;
 
       // Check if the value is a list with too many items
-      final Expression value = node.argumentExpression;
+      final Expression value = node.expression;
       if (value is! ListLiteral || value.elements.length <= _maxItems) return;
 
       // Check if this is on a nav bar widget
@@ -710,9 +710,9 @@ class AvoidRefreshWithoutAwaitRule extends SaropaLintRule {
       if (typeName != 'RefreshIndicator') return;
 
       // Check for onRefresh argument
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'onRefresh') {
-          final Expression value = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'onRefresh') {
+          final Expression value = arg.expression;
           if (value is FunctionExpression) {
             // Check if it's async
             final bool isAsync = value.body.isAsynchronous;
@@ -808,14 +808,14 @@ class _AutofocusVisitor extends RecursiveAstVisitor<void> {
   final List<AstNode> autofocusNodes;
 
   @override
-  void visitNamedArgument(NamedArgument node) {
-    if (node.name.lexeme == 'autofocus') {
-      final Expression value = node.argumentExpression;
+  void visitNamedExpression(NamedExpression node) {
+    if (node.name.label.name == 'autofocus') {
+      final Expression value = node.expression;
       if (value is BooleanLiteral && value.value) {
         autofocusNodes.add(node);
       }
     }
-    super.visitNamedArgument(node);
+    super.visitNamedExpression(node);
   }
 }
 
@@ -992,10 +992,10 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedArgument((NamedArgument node) {
-      if (node.name.lexeme != 'shrinkWrap') return;
+    context.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'shrinkWrap') return;
 
-      final Expression value = node.argumentExpression;
+      final Expression value = node.expression;
       if (value is! BooleanLiteral || !value.value) return;
 
       // Check if this shrinkWrap is on a scrollable widget
@@ -1040,8 +1040,8 @@ class AvoidShrinkWrapExpensiveRule extends SaropaLintRule {
     if (argList == null) return false;
 
     for (final arg in argList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'physics') {
-        final String exprSource = arg.argumentExpression.toSource().toLowerCase();
+      if (arg is NamedExpression && arg.name.label.name == 'physics') {
+        final String exprSource = arg.expression.toSource().toLowerCase();
         if (_neverScrollablePhysicsPattern.hasMatch(exprSource)) {
           return true;
         }
@@ -1118,9 +1118,9 @@ class PreferItemExtentRule extends SaropaLintRule {
       bool hasPrototypeItem = false;
       bool hasItemExtentBuilder = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String argName = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
           if (argName == 'itemExtent') hasItemExtent = true;
           if (argName == 'prototypeItem') hasPrototypeItem = true;
           if (argName == 'itemExtentBuilder') hasItemExtentBuilder = true;
@@ -1201,9 +1201,9 @@ class PreferPrototypeItemRule extends SaropaLintRule {
       bool hasItemExtent = false;
       bool hasItemExtentBuilder = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String argName = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
           if (argName == 'prototypeItem') hasPrototypeItem = true;
           if (argName == 'itemExtent') hasItemExtent = true;
           if (argName == 'itemExtentBuilder') hasItemExtentBuilder = true;
@@ -1284,14 +1284,14 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
       if (!_reorderableTypes.contains(typeName)) return;
 
       // Check for children argument or itemBuilder
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String argName = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
 
           if (argName == 'children') {
-            _checkChildrenForKeys(arg.argumentExpression, reporter);
+            _checkChildrenForKeys(arg.expression, reporter);
           } else if (argName == 'itemBuilder') {
-            _checkItemBuilderForKeys(arg.argumentExpression, reporter);
+            _checkItemBuilderForKeys(arg.expression, reporter);
           }
         }
       }
@@ -1328,7 +1328,7 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
   ) {
     if (mapInvocation.argumentList.arguments.isNotEmpty) {
-      final Argument callback = mapInvocation.argumentList.arguments.first;
+      final Expression callback = mapInvocation.argumentList.arguments.first;
       if (callback is FunctionExpression) {
         _checkBuilderBodyForKey(callback.body, reporter);
       }
@@ -1361,8 +1361,8 @@ class RequireKeyForReorderableRule extends SaropaLintRule {
   }
 
   bool _hasKeyArgument(ArgumentList args) {
-    for (final Argument arg in args.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'key') {
+    for (final Expression arg in args.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'key') {
         return true;
       }
     }
@@ -1381,8 +1381,8 @@ class _ReturnKeyVisitor extends RecursiveAstVisitor<void> {
     final Expression? expr = node.expression;
     if (expr is InstanceCreationExpression) {
       bool hasKey = false;
-      for (final Argument arg in expr.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'key') {
+      for (final Expression arg in expr.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'key') {
           hasKey = true;
           break;
         }
@@ -1470,13 +1470,13 @@ class RequireAddAutomaticKeepAlivesOffRule extends SaropaLintRule {
       bool hasAddAutomaticKeepAlives = false;
       int? itemCount;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String argName = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
           if (argName == 'addAutomaticKeepAlives') {
             hasAddAutomaticKeepAlives = true;
           } else if (argName == 'itemCount') {
-            final Expression countExpr = arg.argumentExpression;
+            final Expression countExpr = arg.expression;
             if (countExpr is IntegerLiteral) {
               itemCount = countExpr.value;
             }
@@ -1717,7 +1717,7 @@ class AvoidInfiniteScrollDuplicateRequestsRule extends SaropaLintRule {
       }
 
       // Check callback body for maxScrollExtent without loading guard
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final String callbackSource = args.first.toSource();
@@ -1939,17 +1939,17 @@ class RequirePaginationForLargeListsRule extends SaropaLintRule {
     });
   }
 
-  NamedArgument? _getItemCountArgument(InstanceCreationExpression node) {
+  NamedExpression? _getItemCountArgument(InstanceCreationExpression node) {
     for (final arg in node.argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'itemCount') {
+      if (arg is NamedExpression && arg.name.label.name == 'itemCount') {
         return arg;
       }
     }
     return null;
   }
 
-  bool _isLengthFromBulkList(NamedArgument itemCountArg) {
-    final expr = itemCountArg.argumentExpression;
+  bool _isLengthFromBulkList(NamedExpression itemCountArg) {
+    final expr = itemCountArg.expression;
     if (expr is! PropertyAccess) return false;
     if (expr.propertyName.name != 'length') return false;
     final target = expr.target;
@@ -1971,8 +1971,8 @@ class RequirePaginationForLargeListsRule extends SaropaLintRule {
           return true;
         }
         for (final arg in current.argumentList.arguments) {
-          if (arg is NamedArgument &&
-              arg.name.lexeme == 'pagingController') {
+          if (arg is NamedExpression &&
+              arg.name.label.name == 'pagingController') {
             return true;
           }
         }
@@ -2059,8 +2059,8 @@ class PreferCacheExtentRule extends SaropaLintRule {
       }
 
       bool hasCacheExtent = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'cacheExtent') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'cacheExtent') {
           hasCacheExtent = true;
           break;
         }
@@ -2114,8 +2114,8 @@ class PreferSliverForMixedScrollRule extends SaropaLintRule {
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String name = node.constructorName.type.name.lexeme;
       if (name != 'ListView' && name != 'GridView') return;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'shrinkWrap') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'shrinkWrap') {
           reporter.atNode(node);
           return;
         }

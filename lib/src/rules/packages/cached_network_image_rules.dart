@@ -32,10 +32,8 @@ bool _isConstruction(InstanceCreationExpression node, String typeName) =>
 
 /// True when the argument list carries a named arg called [name].
 bool _hasNamedArg(InstanceCreationExpression node, String name) {
-  // analyzer 13 renamed NamedExpression -> NamedArgument; argument list
-  // elements are typed `Argument`, and `.name` is the Token directly.
-  for (final Argument arg in node.argumentList.arguments) {
-    if (arg is NamedArgument && arg.name.lexeme == name) return true;
+  for (final Expression arg in node.argumentList.arguments) {
+    if (arg is NamedExpression && arg.name.label.name == name) return true;
   }
   return false;
 }
@@ -243,15 +241,13 @@ class AvoidInlineCacheManagerConstructionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // analyzer 13 renamed NamedExpression -> NamedArgument, and the
-    // SaropaContext registration method was renamed to match.
-    context.addNamedArgument((NamedArgument node) {
-      if (node.name.lexeme != 'cacheManager') return;
+    context.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'cacheManager') return;
       if (!fileImportsPackage(node, PackageImports.cachedNetworkImage)) return;
 
       // Only inline construction is the per-frame footgun; a reference to an
       // already-built manager (a SimpleIdentifier) is the correct pattern.
-      final Expression expr = node.argumentExpression;
+      final Expression expr = node.expression;
       if (expr is! InstanceCreationExpression) return;
 
       final String typeName = expr.constructorName.type.name.lexeme;

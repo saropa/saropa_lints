@@ -207,10 +207,10 @@ class AvoidIncorrectUriRule extends SaropaLintRule {
       final String methodName = node.methodName.name;
       if (methodName != 'parse' && methodName != 'tryParse') return;
 
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Argument firstArg = args.first;
+      final Expression firstArg = args.first;
       if (firstArg is! SimpleStringLiteral) return;
 
       final String uriString = firstArg.value;
@@ -378,10 +378,10 @@ class AvoidMissedCallsRule extends SaropaLintRule {
         return;
       }
 
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Argument firstArg = args.first;
+      final Expression firstArg = args.first;
 
       // Check if argument is a simple identifier (potential tear-off)
       if (firstArg is SimpleIdentifier) {
@@ -575,12 +575,10 @@ class AvoidPassingSelfAsArgumentRule extends SaropaLintRule {
       final String targetSource = target.toSource();
 
       // Check if any argument matches the target
-      for (final Argument arg in node.argumentList.arguments) {
-        // A positional argument is itself the Expression; a NamedArgument
-        // wraps one via .argumentExpression.
-        final Expression actualArg = arg is NamedArgument
-            ? arg.argumentExpression
-            : arg as Expression;
+      for (final Expression arg in node.argumentList.arguments) {
+        final Expression actualArg = arg is NamedExpression
+            ? arg.expression
+            : arg;
         if (actualArg.toSource() == targetSource) {
           reporter.atNode(actualArg);
         }
@@ -1161,7 +1159,7 @@ class AvoidRedundantPragmaInlineRule extends SaropaLintRule {
         if (annotation.name.name == 'pragma') {
           final ArgumentList? args = annotation.arguments;
           if (args != null && args.arguments.isNotEmpty) {
-            final Argument firstArg = args.arguments.first;
+            final Expression firstArg = args.arguments.first;
             if (firstArg is SimpleStringLiteral) {
               if (firstArg.value.contains('inline')) {
                 hasPragmaInline = true;
@@ -1521,9 +1519,7 @@ class AvoidSubstringRule extends SaropaLintRule {
   static Set<String> _substringArgNames(MethodInvocation call) {
     final names = <String>{};
     for (final arg in call.argumentList.arguments) {
-      // String.substring only ever takes positional arguments, so every
-      // Argument here is itself an Expression (never a NamedArgument).
-      _collectIdentifierNames(arg as Expression, names);
+      _collectIdentifierNames(arg, names);
     }
     return names;
   }
@@ -1634,7 +1630,7 @@ class AvoidUnknownPragmaRule extends SaropaLintRule {
       final ArgumentList? args = node.arguments;
       if (args == null || args.arguments.isEmpty) return;
 
-      final Argument firstArg = args.arguments.first;
+      final Expression firstArg = args.arguments.first;
       if (firstArg is! SimpleStringLiteral) return;
 
       final String pragmaValue = firstArg.value;
@@ -2041,18 +2037,18 @@ class AvoidAlwaysNullParametersRule extends SaropaLintRule {
   ) {
     // Check each method invocation for null arguments
     context.addMethodInvocation((MethodInvocation node) {
-      for (final Argument arg in node.argumentList.arguments) {
+      for (final Expression arg in node.argumentList.arguments) {
         // Only check named parameters passed as explicit null
-        if (arg is NamedArgument && arg.argumentExpression is NullLiteral) {
+        if (arg is NamedExpression && arg.expression is NullLiteral) {
           reporter.atNode(arg);
         }
       }
     });
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
-      for (final Argument arg in node.argumentList.arguments) {
+      for (final Expression arg in node.argumentList.arguments) {
         // Only check named parameters passed as explicit null
-        if (arg is NamedArgument && arg.argumentExpression is NullLiteral) {
+        if (arg is NamedExpression && arg.expression is NullLiteral) {
           reporter.atNode(arg);
         }
       }
@@ -2320,8 +2316,8 @@ class AvoidAsyncCallInSyncFunctionRule extends SaropaLintRule {
 
     AstNode? current = node.parent;
     while (current != null) {
-      if (current is NamedArgument) {
-        final String name = current.name.lexeme;
+      if (current is NamedExpression) {
+        final String name = current.name.label.name;
         return name == 'onDone' || name == 'onError';
       }
       if (current is MethodDeclaration || current is FunctionDeclaration) {
@@ -2574,7 +2570,7 @@ class AvoidMissingCompleterStackTraceRule extends SaropaLintRule {
       if (node.methodName.name != 'completeError') return;
 
       // Check argument count
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.length < 2) {
         reporter.atNode(node);
       }
@@ -3185,8 +3181,7 @@ class AvoidNestedExtensionTypesRule extends SaropaLintRule {
       final params = primaryCtor.formalParameters.parameters;
       if (params.isEmpty) return;
       final param = params.first;
-      // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter.
-      if (param is! RegularFormalParameter) return;
+      if (param is! SimpleFormalParameter) return;
       final TypeAnnotation? repType = param.type;
       if (repType == null) return;
 
@@ -3455,10 +3450,10 @@ class AvoidPassingDefaultValuesRule extends SaropaLintRule {
     ArgumentList argList,
     SaropaDiagnosticReporter reporter,
   ) {
-    for (final Argument arg in argList.arguments) {
-      if (arg is! NamedArgument) continue;
+    for (final Expression arg in argList.arguments) {
+      if (arg is! NamedExpression) continue;
 
-      final Expression value = arg.argumentExpression;
+      final Expression value = arg.expression;
 
       // Only flag empty collection literals - these are almost always defaults
       if (_isEmptyCollectionLiteral(value)) {
@@ -3852,8 +3847,8 @@ class AvoidExpensiveLogStringConstructionRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'log') return;
 
-      final List<Argument> args = node.argumentList.arguments;
-      final Argument? first = args.isEmpty ? null : args.first;
+      final List<Expression> args = node.argumentList.arguments;
+      final Expression? first = args.isEmpty ? null : args.first;
       if (first == null) return;
       if (first is! StringInterpolation) return;
 
@@ -3913,9 +3908,9 @@ class AvoidEmptyBuildWhenRule extends SaropaLintRule {
       final String? typeName = node.constructorName.type.element?.name;
       if (typeName != 'BlocBuilder' && typeName != 'BlocConsumer') return;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'buildWhen') {
-          final Expression expr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'buildWhen') {
+          final Expression expr = arg.expression;
           if (expr is FunctionExpression) {
             final FunctionBody body = expr.body;
             // Check for => true
@@ -4415,20 +4410,16 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
         if (parent.metadata.any((a) => a.name.name == 'override')) return;
       } else if (parent is FunctionExpression) {
         return;
-      } else if (parent is FunctionTypedFormalParameterSuffix) {
-        // Analyzer 13 replaced the FunctionTypedFormalParameter wrapper node
-        // with a `.functionTypedSuffix` on RegularFormalParameter; a
-        // FormalParameterList whose parent is that suffix node is the
-        // parameter list of a function-typed parameter (e.g. the
-        // `(int a, bool b)` in `void Function(int a, bool b) callback`),
-        // which this rule intentionally skips.
+      } else if (parent is FunctionTypedFormalParameter) {
         return;
       }
-      // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter
-      // and removed the DefaultFormalParameter wrapper; the parameter (with
-      // or without a default value) is inspected directly.
       for (final FormalParameter p in node.parameters) {
-        if (p is RegularFormalParameter) {
+        if (p is DefaultFormalParameter) {
+          final param = p.parameter;
+          if (param is! SimpleFormalParameter) continue;
+          if (!_isPositional(node, p)) continue;
+          if (_isBoolType(param)) reporter.atNode(p);
+        } else if (p is SimpleFormalParameter) {
           if (!_isPositional(node, p)) continue;
           if (_isBoolType(p)) reporter.atNode(p);
         }
@@ -4440,7 +4431,7 @@ class AvoidPositionalBooleanParametersRule extends SaropaLintRule {
     return p.isNamed == false;
   }
 
-  bool _isBoolType(RegularFormalParameter p) {
+  bool _isBoolType(SimpleFormalParameter p) {
     final TypeAnnotation? type = p.type;
     if (type is! NamedType) return false;
     final String name = type.name.lexeme;

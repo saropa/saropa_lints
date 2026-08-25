@@ -111,11 +111,9 @@ class _EmptyBodyStubVisitor extends RecursiveAstVisitor<void> {
       // pass — it is a documented placeholder for an un-runnable case, not a
       // stub that earns misleading coverage. Excluding it lets such cases be
       // recorded explicitly while the gate still rejects real `() {}` stubs.
-      // analyzer 13: NamedExpression renamed to NamedArgument; name is a
-      // Token (.lexeme) rather than a Label.
       final isSkipped = node.argumentList.arguments
-          .whereType<NamedArgument>()
-          .any((arg) => arg.name.lexeme == 'skip');
+          .whereType<NamedExpression>()
+          .any((arg) => arg.name.label.name == 'skip');
       if (!isSkipped) {
         final callback = node.argumentList.arguments
             .whereType<FunctionExpression>()

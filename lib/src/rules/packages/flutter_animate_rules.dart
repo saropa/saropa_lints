@@ -89,17 +89,14 @@ class FlutterAnimateUnconditionalRepeatInOnPlayRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // analyzer 13: NamedExpression -> NamedArgument; the name is now a raw
-    // Token (`.name.lexeme`) instead of a Label wrapping a SimpleIdentifier,
-    // and the value getter was renamed `.expression` -> `.argumentExpression`.
-    context.addNamedArgument((NamedArgument node) {
+    context.addNamedExpression((NamedExpression node) {
       if (!fileImportsPackage(node, PackageImports.flutterAnimate)) return;
-      if (node.name.lexeme != 'onPlay') return;
+      if (node.name.label.name != 'onPlay') return;
 
       // Only care when the parent ArgumentList belongs to Animate()/animate().
       if (!_isAnimateCall(node)) return;
 
-      final Expression value = node.argumentExpression;
+      final Expression value = node.expression;
       if (value is! FunctionExpression) return;
 
       // Walk the function body looking for a .repeat() call.
@@ -332,10 +329,9 @@ class FlutterAnimateNoKeyInListRule extends SaropaLintRule {
       if (!fileImportsPackage(node, PackageImports.flutterAnimate)) return;
 
       // The ListLiteral must be the value of a `children:` named arg.
-      // analyzer 13: NamedExpression -> NamedArgument; name is a Token now.
       final AstNode? parent = node.parent;
-      if (parent is! NamedArgument) return;
-      if (parent.name.lexeme != 'children') return;
+      if (parent is! NamedExpression) return;
+      if (parent.name.label.name != 'children') return;
 
       // The named arg's grandparent must be an ArgumentList of a recognized
       // multi-child widget constructor.
@@ -394,11 +390,8 @@ class FlutterAnimateNoKeyInListRule extends SaropaLintRule {
 
   /// Returns true when [args] contains a named argument named `key`.
   bool _hasKeyArg(ArgumentList args) {
-    // analyzer 13: ArgumentList.arguments is now NodeList<Argument> (positional
-    // args are still Expression at runtime, but NamedArgument no longer
-    // implements Expression) — loop over the Argument base type instead.
-    for (final Argument arg in args.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'key') return true;
+    for (final Expression arg in args.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'key') return true;
     }
     return false;
   }
@@ -480,12 +473,10 @@ class FlutterAnimateEmptyAnimateListRule extends SaropaLintRule {
       if (!fileImportsPackage(node, PackageImports.flutterAnimate)) return;
       if (node.constructorName.type.name.lexeme != 'AnimateList') return;
 
-      // analyzer 13: ArgumentList.arguments is NodeList<Argument> now; only
-      // NamedArgument entries carry a name, so filter with `is` before use.
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is! NamedArgument) continue;
-        if (arg.name.lexeme != 'children') continue;
-        final Expression value = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
+        if (arg.name.label.name != 'children') continue;
+        final Expression value = arg.expression;
         if (value is ListLiteral && value.elements.isEmpty) {
           reporter.atNode(node);
         }
@@ -560,13 +551,12 @@ class FlutterAnimateFixedTargetLiteralRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // analyzer 13: NamedExpression -> NamedArgument (see rule above for detail).
-    context.addNamedArgument((NamedArgument node) {
+    context.addNamedExpression((NamedExpression node) {
       if (!fileImportsPackage(node, PackageImports.flutterAnimate)) return;
-      if (node.name.lexeme != 'target') return;
+      if (node.name.label.name != 'target') return;
       if (!_isAnimateCall(node)) return;
 
-      final Expression value = node.argumentExpression;
+      final Expression value = node.expression;
 
       // Direct numeric literal: 1.0 or 1.
       if (value is DoubleLiteral || value is IntegerLiteral) {
@@ -645,24 +635,22 @@ class FlutterAnimateAutoPlayFalseNoDriverRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // analyzer 13: NamedExpression -> NamedArgument (see rule above for detail).
-    context.addNamedArgument((NamedArgument node) {
+    context.addNamedExpression((NamedExpression node) {
       if (!fileImportsPackage(node, PackageImports.flutterAnimate)) return;
-      if (node.name.lexeme != 'autoPlay') return;
+      if (node.name.label.name != 'autoPlay') return;
       if (!_isAnimateCall(node)) return;
 
       // Value must be the literal `false`.
-      final Expression value = node.argumentExpression;
+      final Expression value = node.expression;
       if (value is! BooleanLiteral || value.value) return;
 
       // If any driver arg is present in the same ArgumentList, do not report.
       final AstNode? argList = node.parent;
       if (argList is! ArgumentList) return;
 
-      // analyzer 13: arguments is NodeList<Argument>; only NamedArgument
-      // entries can match a driver-arg name.
-      for (final Argument arg in argList.arguments) {
-        if (arg is NamedArgument && _driverArgs.contains(arg.name.lexeme)) {
+      for (final Expression arg in argList.arguments) {
+        if (arg is NamedExpression &&
+            _driverArgs.contains(arg.name.label.name)) {
           return;
         }
       }
@@ -681,9 +669,7 @@ class FlutterAnimateAutoPlayFalseNoDriverRule extends SaropaLintRule {
 ///
 /// Syntactic check only (no type resolution) so it works under the scan CLI
 /// and in files with partial resolution.
-///
-/// analyzer 13: parameter type NamedExpression -> NamedArgument.
-bool _isAnimateCall(NamedArgument namedExpr) {
+bool _isAnimateCall(NamedExpression namedExpr) {
   final AstNode? argList = namedExpr.parent;
   if (argList is! ArgumentList) return false;
 

@@ -91,9 +91,8 @@ bool _isInsideCallbackClosure(AstNode node) {
   while (current != null) {
     if (current is FunctionExpression) {
       final AstNode? parent = current.parent;
-      // analyzer 13: NamedExpression renamed to NamedArgument.
       if (parent is ArgumentList ||
-          parent is NamedArgument ||
+          parent is NamedExpression ||
           parent is FunctionExpressionInvocation) {
         return true;
       }

@@ -79,7 +79,7 @@ class AvoidWatchInCallbacksRule extends SaropaLintRule {
       while (current != null) {
         if (current is FunctionExpression) {
           final AstNode? funcParent = current.parent;
-          if (funcParent is ArgumentList || funcParent is NamedArgument) {
+          if (funcParent is ArgumentList || funcParent is NamedExpression) {
             reporter.atNode(node);
             return;
           }
@@ -276,9 +276,9 @@ class _ProviderOfVisitor extends RecursiveAstVisitor<void> {
 
     // Check if listen: false is specified
     bool hasListenFalse = false;
-    for (final Argument arg in node.argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'listen') {
-        final Expression expr = arg.argumentExpression;
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'listen') {
+        final Expression expr = arg.expression;
         if (expr is BooleanLiteral) {
           hasListenFalse = !expr.value;
         }
@@ -699,16 +699,16 @@ class RequireProviderDisposeRule extends SaropaLintRule {
       bool createsNotifier = false;
       bool hasDispose = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String name = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
 
           if (name == 'dispose') {
             hasDispose = true;
           }
 
           if (name == 'create') {
-            final String createSource = arg.argumentExpression.toSource();
+            final String createSource = arg.expression.toSource();
             if (createSource.endsWith('Notifier()') ||
                 createSource.endsWith('Controller()') ||
                 createSource.endsWith('ViewModel()')) {
@@ -934,9 +934,9 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
 
       while (current != null) {
         // Check for builder callback pattern
-        if (current is NamedArgument &&
-            (current.name.lexeme == 'builder' ||
-                current.name.lexeme == 'selector')) {
+        if (current is NamedExpression &&
+            (current.name.label.name == 'builder' ||
+                current.name.label.name == 'selector')) {
           // Check if this builder belongs to a Consumer
           AstNode? builderParent = current.parent;
           while (builderParent != null) {
@@ -953,7 +953,7 @@ class AvoidNestedProvidersRule extends SaropaLintRule {
         }
 
         // Also check for direct nesting in child argument of other providers
-        if (current is NamedArgument && current.name.lexeme == 'child') {
+        if (current is NamedExpression && current.name.label.name == 'child') {
           AstNode? childParent = current.parent;
           while (childParent != null) {
             if (childParent is InstanceCreationExpression) {
@@ -1056,9 +1056,9 @@ class PreferMultiProviderRule extends SaropaLintRule {
       if (node.constructorName.name?.name == 'value') return;
 
       // Check if child is also a Provider
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'child') {
-          final Expression childExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          final Expression childExpr = arg.expression;
           if (childExpr is InstanceCreationExpression) {
             final String childType = childExpr.constructorName.type.name.lexeme;
             if (_providerTypes.contains(childType)) {
@@ -1151,9 +1151,9 @@ class AvoidInstantiatingInValueProviderRule extends SaropaLintRule {
       if (constructorName.name?.name != 'value') return;
 
       // Check if value parameter is an instance creation
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'value') {
-          final Expression valueExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'value') {
+          final Expression valueExpr = arg.expression;
           if (valueExpr is InstanceCreationExpression) {
             reporter.atNode(valueExpr);
             return;
@@ -1239,9 +1239,9 @@ class DisposeProvidersRule extends SaropaLintRule {
       bool hasDispose = false;
       bool hasCreate = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String name = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
           if (name == 'dispose') hasDispose = true;
           if (name == 'create') hasCreate = true;
         }
@@ -1409,11 +1409,11 @@ class DisposeProvidedInstancesRule extends SaropaLintRule {
       bool hasDispose = false;
       Expression? createExpression;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String name = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
           if (name == 'dispose') hasDispose = true;
-          if (name == 'create') createExpression = arg.argumentExpression;
+          if (name == 'create') createExpression = arg.expression;
         }
       }
 
@@ -1511,9 +1511,9 @@ class PreferNullableProviderTypesRule extends SaropaLintRule {
       if (isNullable) return; // Already nullable, good!
 
       // Check if create callback contains null return or null literal
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'create') {
-          final Expression createExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'create') {
+          final Expression createExpr = arg.expression;
           if (createExpr is FunctionExpression) {
             // Check body for null returns
             final _NullReturnVisitor visitor = _NullReturnVisitor();
@@ -1864,8 +1864,8 @@ class PreferContextReadInCallbacksRule extends SaropaLintRule {
         if (current is FunctionExpression) {
           // Check if this is an event callback
           final AstNode? funcParent = current.parent;
-          if (funcParent is NamedArgument) {
-            final String paramName = funcParent.name.lexeme;
+          if (funcParent is NamedExpression) {
+            final String paramName = funcParent.name.label.name;
             // Check for Flutter callback convention: onX where X is uppercase
             // This avoids false positives on 'once', 'only', etc.
             if (_isFlutterCallbackName(paramName) ||
@@ -1973,9 +1973,9 @@ class PreferProxyProviderRule extends SaropaLintRule {
       if (_proxyOrMulti.contains(typeName)) return;
 
       // Find the create callback argument
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'create') {
-          final Expression createExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'create') {
+          final Expression createExpr = arg.expression;
 
           // Check if the create callback accesses other providers
           final _ProxyProviderAccessVisitor visitor =
@@ -2114,9 +2114,9 @@ class RequireUpdateCallbackRule extends SaropaLintRule {
       if (!_proxyProviderTypes.contains(typeName)) return;
 
       // Find the update callback argument
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'update') {
-          final Expression updateExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'update') {
+          final Expression updateExpr = arg.expression;
 
           // Check if it's a function expression
           if (updateExpr is FunctionExpression) {
@@ -2252,9 +2252,9 @@ class PreferSelectorOverConsumerRule extends SaropaLintRule {
       if (typeName != 'Consumer') return;
 
       // Find the builder argument
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
-          final Expression builderExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final Expression builderExpr = arg.expression;
           if (builderExpr is FunctionExpression) {
             // Analyze the builder body for property access patterns
             final String bodySource = builderExpr.body.toSource();
@@ -2358,9 +2358,9 @@ class AvoidProviderValueRebuildRule extends SaropaLintRule {
       if (!typeName.endsWith('Provider')) return;
 
       // Check value parameter
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'value') {
-          final Expression valueExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'value') {
+          final Expression valueExpr = arg.expression;
           // Check if value is an inline constructor call
           if (valueExpr is InstanceCreationExpression) {
             reporter.atNode(valueExpr);
@@ -2446,8 +2446,8 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
       // Check if listen: false is provided
       final args = node.argumentList.arguments;
       final hasListenFalse = args.any((arg) {
-        if (arg is NamedArgument && arg.name.lexeme == 'listen') {
-          final value = arg.argumentExpression;
+        if (arg is NamedExpression && arg.name.label.name == 'listen') {
+          final value = arg.expression;
           return value is BooleanLiteral && !value.value;
         }
         return false;
@@ -2495,8 +2495,8 @@ class PreferChangeNotifierProxyRule extends SaropaLintRule {
       if (current is FunctionExpression) {
         // Check if parent is a callback argument
         final parent = current.parent;
-        if (parent is NamedArgument) {
-          final name = parent.name.lexeme;
+        if (parent is NamedExpression) {
+          final name = parent.name.label.name;
           if (name == 'onTap' ||
               name == 'onPressed' ||
               name == 'onChanged' ||
@@ -2591,8 +2591,8 @@ class PreferSelectorWidgetRule extends SaropaLintRule {
       // Check if builder has complex widget tree
       final args = node.argumentList.arguments;
       for (final arg in args) {
-        if (arg is NamedArgument && arg.name.lexeme == 'builder') {
-          final builderExpr = arg.argumentExpression;
+        if (arg is NamedExpression && arg.name.label.name == 'builder') {
+          final builderExpr = arg.expression;
           if (builderExpr is FunctionExpression) {
             final body = builderExpr.body;
             if (body is ExpressionFunctionBody) {
@@ -2700,8 +2700,8 @@ class PreferChangeNotifierProxyProviderRule extends SaropaLintRule {
 
       // Find create parameter
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'create') {
-          final createExpr = arg.argumentExpression;
+        if (arg is NamedExpression && arg.name.label.name == 'create') {
+          final createExpr = arg.expression;
           if (createExpr is FunctionExpression) {
             // Check if body contains context.read or context.watch
             final body = createExpr.body.toSource();
@@ -2795,9 +2795,9 @@ class AvoidProviderListenFalseInBuildRule extends SaropaLintRule {
 
       // Check for listen: false named argument
       bool hasListenFalse = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'listen') {
-          final Expression expr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'listen') {
+          final Expression expr = arg.expression;
           if (expr is BooleanLiteral && expr.value == false) {
             hasListenFalse = true;
             break;

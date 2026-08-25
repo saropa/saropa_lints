@@ -216,9 +216,7 @@ class AvoidSqfliteTypeMismatchRule extends SaropaLintRule {
       // Check for execute/rawQuery with CREATE TABLE
       if (methodName != 'execute' && methodName != 'rawQuery') return;
 
-      // analyzer 13: .arguments returns NodeList<Argument>; .toSource()
-      // works on Argument (inherits from AstNode), so no unwrap needed here.
-      final args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       final String sqlArg = args.first.toSource().toLowerCase();

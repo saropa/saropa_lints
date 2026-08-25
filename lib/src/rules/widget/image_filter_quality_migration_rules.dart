@@ -98,11 +98,9 @@ class PreferImageFilterQualityMediumRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // analyzer 13: NamedExpression renamed to NamedArgument; name is a
-    // Token, so reporting uses atToken instead of atNode.
-    void reportNamed(NamedArgument? named) {
+    void reportNamed(NamedExpression? named) {
       if (named == null) return;
-      reporter.atToken(named.name);
+      reporter.atNode(named.name);
     }
 
     context.addInstanceCreationExpression((InstanceCreationExpression node) {

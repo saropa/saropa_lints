@@ -337,16 +337,15 @@ class RequireDidUpdateWidgetCheckRule extends SaropaLintRule {
       final NodeList<FormalParameter>? params = node.parameters?.parameters;
       if (params == null || params.isEmpty) return;
 
-      // Analyzer 13: SimpleFormalParameter → RegularFormalParameter;
-      // DefaultFormalParameter / NormalFormalParameter removed — every
-      // FormalParameter now carries .defaultClause and .name directly.
       String paramName = 'oldWidget';
       final FormalParameter firstParam = params.first;
-      if (firstParam is RegularFormalParameter) {
+      if (firstParam is SimpleFormalParameter) {
         paramName = firstParam.name?.lexeme ?? 'oldWidget';
-      } else {
-        // Fallback: any FormalParameter exposes .name in analyzer 13.
-        paramName = firstParam.name?.lexeme ?? 'oldWidget';
+      } else if (firstParam is DefaultFormalParameter) {
+        final NormalFormalParameter normalParam = firstParam.parameter;
+        if (normalParam is SimpleFormalParameter) {
+          paramName = normalParam.name?.lexeme ?? 'oldWidget';
+        }
       }
 
       final String bodySource = body.toSource();

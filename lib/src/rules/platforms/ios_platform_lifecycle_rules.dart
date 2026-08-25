@@ -522,11 +522,8 @@ class AvoidIosInAppBrowserForAuthRule extends SaropaLintRule {
         return;
       }
 
-      // Check if any string argument contains OAuth URL.
-      // analyzer 13: ArgumentList.arguments is NodeList<Argument>, not
-      // Expression - Argument is the new supertype covering both plain
-      // and named arguments, and toSource() works on either.
-      for (final Argument arg in node.argumentList.arguments) {
+      // Check if any string argument contains OAuth URL
+      for (final Expression arg in node.argumentList.arguments) {
         final String argSource = arg.toSource();
         for (final String pattern in _oauthPatterns) {
           if (argSource.contains(pattern)) {
@@ -801,11 +798,8 @@ class AvoidIosHardcodedBundleIdRule extends SaropaLintRule {
               return;
             }
           }
-          // analyzer 13: NamedExpression renamed to NamedArgument; the
-          // param name is now a raw Token (`.name.lexeme`), not a
-          // Label wrapper (`.name.label.name`).
-          if (parent is NamedArgument) {
-            final String paramName = parent.name.lexeme.toLowerCase();
+          if (parent is NamedExpression) {
+            final String paramName = parent.name.label.name.toLowerCase();
             if (paramName.contains('bundle') ||
                 paramName.contains('package') ||
                 paramName.contains('appid')) {
@@ -1324,13 +1318,10 @@ class RequireIosKeychainSyncAwarenessRule extends SaropaLintRule {
         return;
       }
 
-      // Check if key contains sensitive patterns.
-      // analyzer 13: NamedExpression -> NamedArgument, `.name.lexeme`
-      // replaces `.name.label.name`, and `.argumentExpression` replaces
-      // `.expression` for the argument's value.
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'key') {
-          final String keyValue = arg.argumentExpression.toSource().toLowerCase();
+      // Check if key contains sensitive patterns
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'key') {
+          final String keyValue = arg.expression.toSource().toLowerCase();
           for (final String pattern in _sensitiveKeyPatterns) {
             if (keyValue.contains(pattern)) {
               // Check if ThisDeviceOnly is specified

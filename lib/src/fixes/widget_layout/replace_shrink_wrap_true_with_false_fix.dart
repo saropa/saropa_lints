@@ -23,11 +23,8 @@ class ReplaceShrinkWrapTrueWithFalseFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    // analyzer 13: NamedExpression -> NamedArgument; `.name.lexeme`
-    // replaces `.name.label.name`, `.argumentExpression` replaces
-    // `.expression`.
-    if (node is NamedArgument && node.name.lexeme == 'shrinkWrap') {
-      final expr = node.argumentExpression;
+    if (node is NamedExpression && node.name.label.name == 'shrinkWrap') {
+      final expr = node.expression;
       if (expr is BooleanLiteral && expr.value) {
         await builder.addDartFileEdit(file, (builder) {
           builder.addSimpleReplacement(
@@ -43,9 +40,9 @@ class ReplaceShrinkWrapTrueWithFalseFix extends SaropaFixProducer {
     if (ice == null) return;
 
     for (final arg in ice.argumentList.arguments) {
-      if (arg is! NamedArgument) continue;
-      if (arg.name.lexeme != 'shrinkWrap') continue;
-      final expr = arg.argumentExpression;
+      if (arg is! NamedExpression) continue;
+      if (arg.name.label.name != 'shrinkWrap') continue;
+      final expr = arg.expression;
       if (expr is BooleanLiteral && expr.value) {
         await builder.addDartFileEdit(file, (builder) {
           builder.addSimpleReplacement(

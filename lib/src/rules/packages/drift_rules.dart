@@ -701,13 +701,13 @@ Set<String> _readUniqueIndexColumns(ClassDeclaration decl) {
     bool? unique;
     Set<String>? cols;
     for (final arg in args) {
-      if (arg is! NamedArgument) continue;
-      final label = arg.name.lexeme;
+      if (arg is! NamedExpression) continue;
+      final label = arg.name.label.name;
       if (label == 'unique') {
-        final expr = arg.argumentExpression;
+        final expr = arg.expression;
         if (expr is BooleanLiteral) unique = expr.value;
       } else if (label == 'columns') {
-        cols = _parseSymbolSet(arg.argumentExpression);
+        cols = _parseSymbolSet(arg.expression);
       }
     }
     if (unique != true || cols == null || cols.isEmpty) continue;
@@ -770,11 +770,8 @@ String? _extractTargetTableIdentifier(MethodInvocation node) {
 
   // Batch shapes pass the table as the first positional argument.
   if (methodName == 'insert' || methodName == 'insertAll') {
-    // analyzer 13: arguments is NodeList<Argument>; positional args are
-    // Expression (Expression implements Argument), so whereType narrows the
-    // element type directly instead of a NamedExpression exclusion filter.
     final positional = node.argumentList.arguments
-        .whereType<Expression>()
+        .where((a) => a is! NamedExpression)
         .toList();
     if (positional.isNotEmpty) {
       final fromArg = _identifierOfTableExpr(positional.first);
@@ -791,7 +788,7 @@ String? _extractTargetTableIdentifier(MethodInvocation node) {
     // Walk into `into(<table>)` when the target is such a call.
     if (target is MethodInvocation && target.methodName.name == 'into') {
       final intoArgs = target.argumentList.arguments
-          .whereType<Expression>()
+          .where((a) => a is! NamedExpression)
           .toList();
       if (intoArgs.isNotEmpty) {
         return _identifierOfTableExpr(intoArgs.first);
@@ -839,7 +836,7 @@ bool _hasMatchingConflictTarget(MethodInvocation node, Set<String> uniqueCols) {
   final onConflict = _namedArg(node, 'onConflict');
   if (onConflict == null) return false;
 
-  Expression value = onConflict.argumentExpression;
+  Expression value = onConflict.expression;
   // Allow nested parens/as/await.
   while (value is ParenthesizedExpression) {
     value = value.expression;
@@ -857,7 +854,7 @@ bool _hasMatchingConflictTarget(MethodInvocation node, Set<String> uniqueCols) {
       return false;
     }
     final target = _namedArgFromArgList(value.argumentList, 'target');
-    return _targetSetContainsAny(target?.argumentExpression, uniqueCols);
+    return _targetSetContainsAny(target?.expression, uniqueCols);
   }
   if (value is MethodInvocation) {
     // DoUpdate.withExcluded(...) — receiver is the class name.
@@ -867,7 +864,7 @@ bool _hasMatchingConflictTarget(MethodInvocation node, Set<String> uniqueCols) {
     final isBareCtor = value.methodName.name == 'DoUpdate';
     if (!isNamedCtor && !isBareCtor) return false;
     final target = _namedArgFromArgList(value.argumentList, 'target');
-    return _targetSetContainsAny(target?.argumentExpression, uniqueCols);
+    return _targetSetContainsAny(target?.expression, uniqueCols);
   }
   return false;
 }
@@ -890,7 +887,7 @@ bool _targetSetContainsAny(Expression? expr, Set<String> uniqueCols) {
 bool _hasReplaceMode(MethodInvocation node) {
   final mode = _namedArg(node, 'mode');
   if (mode == null) return false;
-  final expr = mode.argumentExpression;
+  final expr = mode.expression;
   // Match InsertMode.replace regardless of whether it's via PrefixedIdentifier
   // or PropertyAccess (e.g. drift.InsertMode.replace).
   String? propertyName;
@@ -902,12 +899,12 @@ bool _hasReplaceMode(MethodInvocation node) {
   return propertyName == 'replace';
 }
 
-NamedArgument? _namedArg(MethodInvocation node, String name) =>
+NamedExpression? _namedArg(MethodInvocation node, String name) =>
     _namedArgFromArgList(node.argumentList, name);
 
-NamedArgument? _namedArgFromArgList(ArgumentList args, String name) {
+NamedExpression? _namedArgFromArgList(ArgumentList args, String name) {
   for (final arg in args.arguments) {
-    if (arg is NamedArgument && arg.name.lexeme == name) return arg;
+    if (arg is NamedExpression && arg.name.label.name == name) return arg;
   }
   return null;
 }
@@ -1588,11 +1585,11 @@ class AvoidDriftLogStatementsProductionRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedArgument((NamedArgument node) {
-      if (node.name.lexeme != 'logStatements') return;
+    context.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'logStatements') return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
-      final value = node.argumentExpression;
+      final value = node.expression;
       // Only flag if value is literal true
       if (value is BooleanLiteral && value.value) {
         reporter.atNode(node);
@@ -1752,7 +1749,7 @@ class PreferDriftUseColumnsFalseRule extends SaropaLintRule {
       // Check if useColumns parameter is already set
       final args = node.argumentList.arguments;
       for (final arg in args) {
-        if (arg is NamedArgument && arg.name.lexeme == 'useColumns') {
+        if (arg is NamedExpression && arg.name.label.name == 'useColumns') {
           return;
         }
       }
@@ -2023,8 +2020,8 @@ class AvoidDriftQueryInMigrationRule extends SaropaLintRule {
   bool _isInsideMigrationCallback(AstNode node) {
     AstNode? current = node.parent;
     while (current != null) {
-      if (current is NamedArgument) {
-        final label = current.name.lexeme;
+      if (current is NamedExpression) {
+        final label = current.name.label.name;
         if (_migrationCallbacks.contains(label)) return true;
       }
       // Stop at class boundary
@@ -2222,8 +2219,8 @@ class AvoidDriftForeignKeyInMigrationRule extends SaropaLintRule {
       // Check if inside onCreate or onUpgrade
       AstNode? current = node.parent;
       while (current != null) {
-        if (current is NamedArgument) {
-          final label = current.name.lexeme;
+        if (current is NamedExpression) {
+          final label = current.name.label.name;
           if (_migrationCallbacks.contains(label)) {
             reporter.atNode(node);
             return;
@@ -2482,8 +2479,8 @@ class AvoidDriftCloseStreamsInTestsRule extends SaropaLintRule {
           if (wrapperType == 'DatabaseConnection') {
             // Check for closeStreamsSynchronously parameter
             for (final arg in grandparent.argumentList.arguments) {
-              if (arg is NamedArgument &&
-                  arg.name.lexeme == 'closeStreamsSynchronously') {
+              if (arg is NamedExpression &&
+                  arg.name.label.name == 'closeStreamsSynchronously') {
                 return; // Already wrapped correctly
               }
             }
@@ -2915,8 +2912,8 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    context.addNamedArgument((NamedArgument node) {
-      if (node.name.lexeme != 'onCreate') return;
+    context.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'onCreate') return;
       if (!fileImportsPackage(node, PackageImports.drift)) return;
 
       // `onCreate:` is a generic parameter name used far beyond Drift
@@ -2930,7 +2927,7 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
       // (`onCreate: _seedSchema`) delegates to a method we cannot read here;
       // assuming it omits createAll() would be a false positive, so stay
       // silent on anything that is not a function literal.
-      final callback = node.argumentExpression;
+      final callback = node.expression;
       if (callback is! FunctionExpression) return;
 
       // Check if the callback body contains createAll
@@ -2947,7 +2944,7 @@ class RequireDriftCreateAllInOnCreateRule extends SaropaLintRule {
 /// ArgumentList to the construction node, so the onCreate handler we flag is
 /// unambiguously Drift's migration callback and not some unrelated
 /// `onCreate:` parameter that happens to share the name.
-bool _isMigrationStrategyArgument(NamedArgument arg) {
+bool _isMigrationStrategyArgument(NamedExpression arg) {
   final argList = arg.parent;
   if (argList is! ArgumentList) return false;
   final creation = argList.parent;
@@ -3199,7 +3196,7 @@ class AvoidDriftMissingUpdatesParamRule extends SaropaLintRule {
       // Check if updates parameter is present
       final args = node.argumentList.arguments;
       for (final arg in args) {
-        if (arg is NamedArgument && arg.name.lexeme == 'updates') {
+        if (arg is NamedExpression && arg.name.label.name == 'updates') {
           return; // Has updates parameter
         }
       }

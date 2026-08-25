@@ -99,11 +99,9 @@ class RequireNotificationChannelAndroidRule extends SaropaLintRule {
       bool hasChannelDescription = false;
       bool hasImportance = false;
 
-      // ArgumentList.arguments is NodeList<Argument> in analyzer 13; only
-      // NamedArgument (renamed from NamedExpression) carries a param name.
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String name = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
           if (name == 'channelDescription') {
             hasChannelDescription = true;
           }
@@ -232,14 +230,13 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
       // Check if it's a notification method
       if (!_notificationMethods.contains(methodName)) return;
 
-      // Check all arguments for sensitive data. ArgumentList.arguments is
-      // NodeList<Argument> in analyzer 13; NamedExpression -> NamedArgument.
-      for (final Argument arg in node.argumentList.arguments) {
+      // Check all arguments for sensitive data
+      for (final Expression arg in node.argumentList.arguments) {
         String argSource;
 
-        if (arg is NamedArgument) {
+        if (arg is NamedExpression) {
           // Check common notification parameter names
-          final String paramName = arg.name.lexeme.toLowerCase();
+          final String paramName = arg.name.label.name.toLowerCase();
           if (paramName != 'body' &&
               paramName != 'title' &&
               paramName != 'payload' &&
@@ -247,7 +244,7 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
               paramName != 'content') {
             continue;
           }
-          argSource = arg.argumentExpression.toSource().toLowerCase();
+          argSource = arg.expression.toSource().toLowerCase();
         } else {
           argSource = arg.toSource().toLowerCase();
         }
@@ -271,17 +268,17 @@ class AvoidNotificationPayloadSensitiveRule extends SaropaLintRule {
         return;
       }
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is! NamedArgument) continue;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is! NamedExpression) continue;
 
-        final String paramName = arg.name.lexeme.toLowerCase();
+        final String paramName = arg.name.label.name.toLowerCase();
         if (paramName != 'body' &&
             paramName != 'subtitle' &&
             paramName != 'ticker') {
           continue;
         }
 
-        final String argSource = arg.argumentExpression.toSource().toLowerCase();
+        final String argSource = arg.expression.toSource().toLowerCase();
         for (final String pattern in _sensitivePatterns) {
           if (argSource.contains(pattern)) {
             reporter.atNode(node);
@@ -377,9 +374,9 @@ class RequireNotificationInitializePerPlatformRule extends SaropaLintRule {
       bool hasAndroid = false;
       bool hasIOS = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String name = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
           if (name == 'android') hasAndroid = true;
           if (name == 'iOS') hasIOS = true;
         }
@@ -486,20 +483,19 @@ class RequireNotificationTimezoneAwarenessRule extends SaropaLintRule {
         }
       }
 
-      // Check arguments for DateTime usage instead of TZDateTime.
-      // ArgumentList.arguments is NodeList<Argument> in analyzer 13.
-      for (final Argument arg in node.argumentList.arguments) {
+      // Check arguments for DateTime usage instead of TZDateTime
+      for (final Expression arg in node.argumentList.arguments) {
         // Skip named expressions that aren't time-related
-        if (arg is NamedArgument) {
-          final String paramName = arg.name.lexeme.toLowerCase();
+        if (arg is NamedExpression) {
+          final String paramName = arg.name.label.name.toLowerCase();
           if (paramName != 'scheduleddate' &&
               paramName != 'time' &&
               paramName != 'datetime' &&
               paramName != 'date') {
             continue;
           }
-          _checkForDateTime(arg.argumentExpression, node, reporter);
-        } else if (arg is Expression) {
+          _checkForDateTime(arg.expression, node, reporter);
+        } else {
           // Check positional arguments for DateTime expressions
           _checkForDateTime(arg, node, reporter);
         }
@@ -622,11 +618,10 @@ class AvoidNotificationSameIdRule extends SaropaLintRule {
         return;
       }
 
-      // Check for id parameter with literal value. ArgumentList.arguments is
-      // NodeList<Argument> in analyzer 13; NamedExpression -> NamedArgument.
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'id') {
-          final Expression idExpr = arg.argumentExpression;
+      // Check for id parameter with literal value
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'id') {
+          final Expression idExpr = arg.expression;
           if (idExpr is IntegerLiteral ||
               (idExpr is SimpleIdentifier &&
                   (idExpr.name.startsWith('_') ||

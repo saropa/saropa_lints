@@ -54,18 +54,18 @@ String? _receiverName(Expression? target) {
 /// `play(..., mode: PlayerMode.lowLatency)` form. Resolved structurally
 /// (prefix `PlayerMode`, identifier `lowLatency`) rather than by type element
 /// so the rule fires without the package being fully resolvable.
-bool _argIsLowLatency(Argument arg) {
-  // analyzer 13: Argument.argumentExpression is defined on both plain
-  // expressions (self) and NamedArgument (the value), so no is-check needed.
-  final Expression value = arg.argumentExpression;
+bool _argIsLowLatency(Expression arg) {
+  Expression value = arg;
+  if (value is NamedExpression) value = value.expression;
   return value is PrefixedIdentifier &&
       value.prefix.name == 'PlayerMode' &&
       value.identifier.name == 'lowLatency';
 }
 
 /// True when `ReleaseMode.loop` appears as an argument of [node].
-bool _argIsReleaseLoop(Argument arg) {
-  final Expression value = arg.argumentExpression;
+bool _argIsReleaseLoop(Expression arg) {
+  Expression value = arg;
+  if (value is NamedExpression) value = value.expression;
   return value is PrefixedIdentifier &&
       value.prefix.name == 'ReleaseMode' &&
       value.identifier.name == 'loop';
@@ -84,7 +84,7 @@ class _ModeScan extends RecursiveAstVisitor<void> {
   @override
   void visitMethodInvocation(MethodInvocation node) {
     final String name = node.methodName.name;
-    final List<Argument> args = node.argumentList.arguments;
+    final List<Expression> args = node.argumentList.arguments;
 
     // play(...) and setPlayerMode(...) can both carry the lowLatency mode.
     if (name == 'setPlayerMode' || name == 'play') {
@@ -529,7 +529,7 @@ class AudioplayersUrlSourceInAssetContextRule extends SaropaLintRule {
       if (node.constructorName.type.name.lexeme != 'UrlSource') return;
       if (!fileImportsPackage(node, PackageImports.audioplayers)) return;
 
-      final Argument? arg = node.argumentList.arguments.firstOrNull;
+      final Expression? arg = node.argumentList.arguments.firstOrNull;
       if (arg is! SimpleStringLiteral) return;
       final String value = arg.value;
       // Bundled-asset paths only — a real URL ("https://.../assets/..") contains
@@ -556,7 +556,7 @@ class _SwapToAssetSourceFix extends ReplaceNodeFix {
   @override
   String computeReplacement(AstNode node) {
     if (node is! InstanceCreationExpression) return node.toSource();
-    final Argument? arg = node.argumentList.arguments.firstOrNull;
+    final Expression? arg = node.argumentList.arguments.firstOrNull;
     if (arg is! SimpleStringLiteral) return node.toSource();
 
     // Strip the leading assets/ (or asset/) — AudioCache.prefix re-adds it.
@@ -629,14 +629,10 @@ class AudioplayersHardcodedVolumeAboveOneRule extends SaropaLintRule {
       if (method != 'setVolume' && method != 'play') return;
       if (!fileImportsPackage(node, PackageImports.audioplayers)) return;
 
-      // analyzer 13: Argument.argumentExpression is defined uniformly on
-      // plain positional expressions (self) and NamedArgument (the value),
-      // so unwrap once regardless of which branch produced the argument.
-      final Argument? arg = method == 'setVolume'
+      final Expression? value = method == 'setVolume'
           ? node.argumentList.arguments.firstOrNull
           : _namedArg(node, 'volume');
-      if (arg == null) return;
-      final Expression value = arg.argumentExpression;
+      if (value == null) return;
 
       final num? literal = _numericLiteral(value);
       if (literal == null || literal <= 1.0) return;
@@ -646,10 +642,10 @@ class AudioplayersHardcodedVolumeAboveOneRule extends SaropaLintRule {
   }
 
   /// The first named argument [name] of [node], or null.
-  NamedArgument? _namedArg(MethodInvocation node, String name) {
-    for (final Argument arg in node.argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == name) {
-        return arg;
+  Expression? _namedArg(MethodInvocation node, String name) {
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == name) {
+        return arg.expression;
       }
     }
     return null;

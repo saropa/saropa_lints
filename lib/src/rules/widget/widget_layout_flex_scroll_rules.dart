@@ -75,9 +75,9 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
       if (constructorName != 'Expanded') return;
 
       // Find the child argument
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'child') {
-          final Expression childExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          final Expression childExpr = arg.expression;
 
           // Check if child is SizedBox() or Container() with no meaningful content
           if (childExpr is InstanceCreationExpression) {
@@ -85,7 +85,8 @@ class AvoidExpandedAsSpacerRule extends SaropaLintRule {
             if (childType == 'SizedBox' || childType == 'Container') {
               // Check if it has no child argument (empty)
               final bool hasChild = childExpr.argumentList.arguments.any(
-                (Argument e) => e is NamedArgument && e.name.lexeme == 'child',
+                (Expression e) =>
+                    e is NamedExpression && e.name.label.name == 'child',
               );
               if (!hasChild) {
                 reporter.atNode(node);
@@ -258,9 +259,9 @@ class AvoidShrinkWrapInListsRule extends SaropaLintRule {
       if (!_scrollableWidgets.contains(constructorName)) return;
 
       // Check for shrinkWrap: true
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'shrinkWrap') {
-          final expr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'shrinkWrap') {
+          final expr = arg.expression;
           if (expr is BooleanLiteral && expr.value) {
             // Check if inside another scrollable
             AstNode? parent = node.parent;
@@ -339,9 +340,9 @@ class AvoidSingleChildColumnRowRule extends SaropaLintRule {
       final String constructorName = node.constructorName.type.name.lexeme;
       if (constructorName != 'Column' && constructorName != 'Row') return;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'children') {
-          final Expression value = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'children') {
+          final Expression value = arg.expression;
           if (value is ListLiteral) {
             // Only flag if there's exactly one static element and no
             // dynamic elements. Spreads, collection-if, and collection-for
@@ -546,9 +547,9 @@ class PreferUsingListViewRule extends SaropaLintRule {
       if (typeName != 'SingleChildScrollView') return;
 
       // Find the child argument
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'child') {
-          final Expression childExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'child') {
+          final Expression childExpr = arg.expression;
           if (_isColumnOrRow(childExpr)) {
             reporter.atNode(node);
             return;
@@ -693,15 +694,15 @@ class AvoidListViewWithoutItemExtentRule extends SaropaLintRule {
     bool shrinkWrapTrue = false;
     Expression? itemBuilder;
 
-    for (final Argument arg in argumentList.arguments) {
-      if (arg is! NamedArgument) continue;
-      final String name = arg.name.lexeme;
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is! NamedExpression) continue;
+      final String name = arg.name.label.name;
       if (name == 'itemExtent') hasItemExtent = true;
       if (name == 'prototypeItem') hasPrototypeItem = true;
       if (name == 'itemExtentBuilder') hasItemExtentBuilder = true;
-      if (name == 'itemBuilder') itemBuilder = arg.argumentExpression;
+      if (name == 'itemBuilder') itemBuilder = arg.expression;
       if (name == 'shrinkWrap') {
-        final Expression v = arg.argumentExpression;
+        final Expression v = arg.expression;
         if (v is BooleanLiteral && v.value) shrinkWrapTrue = true;
       }
     }
@@ -854,7 +855,7 @@ class PreferSliverListDelegateRule extends SaropaLintRule {
 
       if (typeName == 'SliverChildListDelegate') {
         // Check if the list has many items
-        final NodeList<Argument> args = node.argumentList.arguments;
+        final NodeList<Expression> args = node.argumentList.arguments;
         if (args.isNotEmpty) {
           final first = args.first;
           if (first is ListLiteral && first.elements.length > 10) {
@@ -935,9 +936,9 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
 
       if (typeName == 'SingleChildScrollView') {
-        for (final Argument arg in node.argumentList.arguments) {
-          if (arg is NamedArgument && arg.name.lexeme == 'child') {
-            final Expression child = arg.argumentExpression;
+        for (final Expression arg in node.argumentList.arguments) {
+          if (arg is NamedExpression && arg.name.label.name == 'child') {
+            final Expression child = arg.expression;
             if (child is InstanceCreationExpression) {
               final String childType = child.constructorName.type.name.lexeme;
               if (childType == 'Column' || childType == 'Row') {
@@ -954,9 +955,9 @@ class AvoidSingleChildScrollViewWithColumnRule extends SaropaLintRule {
   }
 
   bool _hasFlexibleChildren(InstanceCreationExpression node) {
-    for (final Argument arg in node.argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'children') {
-        final Expression childrenExpr = arg.argumentExpression;
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'children') {
+        final Expression childrenExpr = arg.expression;
         if (childrenExpr is ListLiteral) {
           for (final CollectionElement element in childrenExpr.elements) {
             if (element is InstanceCreationExpression) {
@@ -1034,9 +1035,9 @@ class PreferListViewBuilderRule extends SaropaLintRule {
       if (typeName != 'ListView') return;
       if (node.constructorName.name != null) return; // Skip named constructors
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'children') {
-          final Expression childrenExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'children') {
+          final Expression childrenExpr = arg.expression;
 
           if (childrenExpr is MethodInvocation &&
               childrenExpr.methodName.name == 'generate') {
@@ -1129,15 +1130,15 @@ class AvoidNestedScrollablesRule extends SaropaLintRule {
       bool hasShrinkWrap = false;
       bool hasNeverScrollPhysics = false;
 
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String argName = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String argName = arg.name.label.name;
           if (argName == 'shrinkWrap') {
-            final String value = arg.argumentExpression.toSource();
+            final String value = arg.expression.toSource();
             if (value == 'true') hasShrinkWrap = true;
           }
           if (argName == 'physics') {
-            final String value = arg.argumentExpression.toSource();
+            final String value = arg.expression.toSource();
             if (value.contains('NeverScrollableScrollPhysics')) {
               hasNeverScrollPhysics = true;
             }
@@ -1245,8 +1246,8 @@ class RequireScrollPhysicsRule extends SaropaLintRule {
       if (!_scrollableWidgets.contains(typeName)) return;
 
       bool hasPhysics = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'physics') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'physics') {
           hasPhysics = true;
           break;
         }
@@ -1520,9 +1521,9 @@ class PreferWrapOverOverflowRule extends SaropaLintRule {
       if (typeName != 'Row') return;
 
       // Count children
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'children') {
-          final Expression childrenExpr = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'children') {
+          final Expression childrenExpr = arg.expression;
           if (childrenExpr is ListLiteral) {
             // If row has many small widgets, suggest Wrap
             if (childrenExpr.elements.length >= 5) {
@@ -1689,8 +1690,8 @@ class RequireScrollControllerRule extends SaropaLintRule {
       if (typeName != 'ListView' || constructorName != 'builder') return;
 
       bool hasController = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'controller') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'controller') {
           hasController = true;
           break;
         }
@@ -1804,9 +1805,9 @@ class AvoidShrinkWrapInScrollRule extends SaropaLintRule {
 
       // Check for shrinkWrap: true
       bool hasShrinkWrapTrue = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'shrinkWrap') {
-          final String value = arg.argumentExpression.toSource();
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'shrinkWrap') {
+          final String value = arg.expression.toSource();
           if (value == 'true') {
             hasShrinkWrapTrue = true;
             break;
@@ -1905,7 +1906,7 @@ class RequirePhysicsForNestedScrollRule extends SaropaLintRule {
       // Check if has physics parameter
       bool hasPhysics = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'physics') {
+        if (arg is NamedExpression && arg.name.label.name == 'physics') {
           hasPhysics = true;
           break;
         }
@@ -2129,7 +2130,7 @@ class AvoidExpandedOutsideFlexRule extends SaropaLintRule {
           final feParent = current.parent;
 
           // Named-parameter callbacks — placement depends on the call site.
-          if (feParent is NamedArgument) {
+          if (feParent is NamedExpression) {
             assignedToVariable = true;
             break;
           }
@@ -2431,7 +2432,7 @@ _AncestorResult _findWidgetAncestor(
     }
     if (current is FunctionExpression) {
       final feParent = current.parent;
-      if (feParent is NamedArgument) return _AncestorResult.indeterminate;
+      if (feParent is NamedExpression) return _AncestorResult.indeterminate;
       if (feParent is ArgumentList) {
         final grandparent = feParent.parent;
         if (grandparent is MethodInvocation) {
@@ -2645,7 +2646,7 @@ class AvoidAnimatedSizeInWrapRule extends SaropaLintRule {
   // owning `children:` argument. Flag only when the immediate enclosing widget
   // is Wrap/Flow with no intervening widget: the first InstanceCreationExpression
   // ancestor would be the intervening box (escape hatch), and a non-`children`
-  // NamedArgument (e.g. `child:` of a SizedBox) means it is not a direct
+  // NamedExpression (e.g. `child:` of a SizedBox) means it is not a direct
   // child either.
   static bool _isDirectChildOfUnsafeParent(InstanceCreationExpression node) {
     AstNode? current = node.parent;
@@ -2654,11 +2655,11 @@ class AvoidAnimatedSizeInWrapRule extends SaropaLintRule {
       // between the AnimatedSize and any children list — bounded parent, safe.
       if (current is InstanceCreationExpression) return false;
 
-      if (current is NamedArgument) {
+      if (current is NamedExpression) {
         // Reached an argument boundary. Only a `children:` list of Wrap/Flow
         // qualifies; `child:`/other names mean an intervening single-child
         // widget, which is the escape hatch.
-        if (current.name.lexeme != 'children') return false;
+        if (current.name.label.name != 'children') return false;
         final AstNode? argList = current.parent;
         if (argList is! ArgumentList) return false;
         final AstNode? owner = argList.parent;
@@ -2870,8 +2871,8 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
         // pass-through pattern (Builder, LayoutBuilder, etc.).
         if (current is FunctionExpression) {
           final feParent = current.parent;
-          if (feParent is NamedArgument) {
-            final paramName = feParent.name.lexeme;
+          if (feParent is NamedExpression) {
+            final paramName = feParent.name.label.name;
             if (paramName != 'builder') {
               final argList = feParent.parent;
               if (argList is ArgumentList &&
@@ -2904,9 +2905,9 @@ class AvoidUnboundedListviewInColumnRule extends SaropaLintRule {
   }
 
   static bool _hasShrinkWrap(InstanceCreationExpression node) {
-    for (final Argument arg in node.argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'shrinkWrap') {
-        final String value = arg.argumentExpression.toSource();
+    for (final Expression arg in node.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'shrinkWrap') {
+        final String value = arg.expression.toSource();
         if (value == 'true') return true;
       }
     }

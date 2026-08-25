@@ -519,9 +519,7 @@ class AvoidTypesOnClosureParametersRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter
-    // and renamed the context registration method to match.
-    context.addRegularFormalParameter((RegularFormalParameter node) {
+    context.addSimpleFormalParameter((SimpleFormalParameter node) {
       if (node.type == null) return;
       AstNode? parent = node.parent;
       while (parent != null) {
@@ -811,10 +809,9 @@ class PreferOptionalPositionalParamsRule extends SaropaLintRule {
     });
   }
 
-  // Analyzer 13 removed DefaultFormalParameter wrapping and merged
-  // SimpleFormalParameter into RegularFormalParameter.
   static TypeAnnotation? _getTypeAnnotation(FormalParameter p) {
-    if (p is RegularFormalParameter) return p.type;
+    if (p is SimpleFormalParameter) return p.type;
+    if (p is DefaultFormalParameter) return _getTypeAnnotation(p.parameter);
     return null;
   }
 }
@@ -897,10 +894,9 @@ class PreferPositionalBoolParamsRule extends SaropaLintRule {
     });
   }
 
-  // Analyzer 13 removed DefaultFormalParameter wrapping and merged
-  // SimpleFormalParameter into RegularFormalParameter.
   static TypeAnnotation? _getTypeAnnotation(FormalParameter p) {
-    if (p is RegularFormalParameter) return p.type;
+    if (p is SimpleFormalParameter) return p.type;
+    if (p is DefaultFormalParameter) return _getTypeAnnotation(p.parameter);
     return null;
   }
 }
@@ -1264,16 +1260,11 @@ class PreferTrailingCommaAlwaysRule extends SaropaLintRule {
   /// collection literal (`[...]` / `{...}`). In both shapes dart format adds
   /// no trailing comma, so the rule must not demand one. Handles both
   /// positional and named arguments.
-  // ArgumentList.arguments is NodeList<Argument> in analyzer 13 (not
-  // Expression); NamedExpression -> NamedArgument, .expression ->
-  // .argumentExpression.
-  bool _lastArgIsBlockFormatted(NodeList<Argument> arguments) {
-    final Argument lastArg = arguments.last;
-    final Expression? expr = lastArg is NamedArgument
-        ? lastArg.argumentExpression
-        : lastArg is Expression
-        ? lastArg
-        : null;
+  bool _lastArgIsBlockFormatted(NodeList<Expression> arguments) {
+    final Expression lastArg = arguments.last;
+    final Expression expr = lastArg is NamedExpression
+        ? lastArg.expression
+        : lastArg;
     return expr is FunctionExpression ||
         expr is ListLiteral ||
         expr is SetOrMapLiteral;
@@ -1905,15 +1896,13 @@ class PreferInlineCallbacksRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // Analyzer 13 renamed NamedExpression -> NamedArgument (Token name,
-    // .argumentExpression instead of .expression).
-    context.addNamedArgument((NamedArgument node) {
-      final String paramName = node.name.lexeme;
+    context.addNamedExpression((NamedExpression node) {
+      final String paramName = node.name.label.name;
 
       // Only check common callback parameters
       if (!_callbackParams.contains(paramName)) return;
 
-      final Expression expression = node.argumentExpression;
+      final Expression expression = node.expression;
 
       // Check if it's a simple identifier (method reference)
       if (expression is SimpleIdentifier) {
@@ -3089,8 +3078,7 @@ class PreferDescriptiveBoolNamesRule extends SaropaLintRule {
     });
 
     // Check parameters
-    // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter.
-    context.addRegularFormalParameter((RegularFormalParameter node) {
+    context.addSimpleFormalParameter((SimpleFormalParameter node) {
       // Check the type annotation
       final TypeAnnotation? typeAnnotation = node.type;
       if (typeAnnotation == null) return;
@@ -3281,8 +3269,7 @@ class PreferDescriptiveBoolNamesStrictRule extends SaropaLintRule {
     });
 
     // Check parameters
-    // Analyzer 13 merged SimpleFormalParameter into RegularFormalParameter.
-    context.addRegularFormalParameter((RegularFormalParameter node) {
+    context.addSimpleFormalParameter((SimpleFormalParameter node) {
       // Check the type annotation
       final TypeAnnotation? typeAnnotation = node.type;
       if (typeAnnotation == null) return;
@@ -3619,15 +3606,13 @@ class AvoidSmallTextRule extends SaropaLintRule {
     });
   }
 
-  // ArgumentList.arguments is NodeList<Argument> in analyzer 13; NamedExpression
-  // -> NamedArgument, .name is now a Token (.lexeme), .expression -> .argumentExpression.
   void _checkFontSize(
-    NodeList<Argument> arguments,
+    NodeList<Expression> arguments,
     SaropaDiagnosticReporter reporter,
   ) {
-    for (final Argument arg in arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'fontSize') {
-        final Expression expression = arg.argumentExpression;
+    for (final Expression arg in arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'fontSize') {
+        final Expression expression = arg.expression;
 
         double? fontSize;
         if (expression is IntegerLiteral) {
@@ -4514,12 +4499,10 @@ class ArgumentsOrderingRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addArgumentList((ArgumentList node) {
-      // Extract only named arguments. Analyzer 13 renamed
-      // NamedExpression -> NamedArgument; ArgumentList.arguments is
-      // NodeList<Argument> (not Expression).
-      final List<NamedArgument> namedArgs = <NamedArgument>[];
-      for (final Argument arg in node.arguments) {
-        if (arg is NamedArgument) {
+      // Extract only named arguments
+      final List<NamedExpression> namedArgs = <NamedExpression>[];
+      for (final Expression arg in node.arguments) {
+        if (arg is NamedExpression) {
           namedArgs.add(arg);
         }
       }
@@ -4529,8 +4512,8 @@ class ArgumentsOrderingRule extends SaropaLintRule {
 
       // Check if named arguments are in alphabetical order
       for (int i = 1; i < namedArgs.length; i++) {
-        final String currentName = namedArgs[i].name.lexeme;
-        final String previousName = namedArgs[i - 1].name.lexeme;
+        final String currentName = namedArgs[i].name.label.name;
+        final String previousName = namedArgs[i - 1].name.label.name;
 
         if (currentName.compareTo(previousName) < 0) {
           // Found an argument that should come before the previous one

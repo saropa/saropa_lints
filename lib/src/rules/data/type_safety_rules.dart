@@ -253,15 +253,14 @@ class AvoidUnsafeCastRule extends SaropaLintRule {
       expression is PropertyAccess &&
       expression.propertyName.name == 'parentData';
 
-  // analyzer 13: SimpleFormalParameter/FunctionTypedFormalParameter merged
-  // into RegularFormalParameter (name is now Token?, use .name?.lexeme).
-  // DefaultFormalParameter is removed entirely — every FormalParameter
-  // carries its own .defaultClause directly, so `parameter` is already the
-  // effective (unwrapped) parameter and no recursive unwrap is needed.
   String? _parameterName(FormalParameter parameter) {
-    if (parameter is RegularFormalParameter) return parameter.name?.lexeme;
+    if (parameter is SimpleFormalParameter) return parameter.name?.lexeme;
+    if (parameter is DefaultFormalParameter) {
+      return _parameterName(parameter.parameter);
+    }
     if (parameter is FieldFormalParameter) return parameter.name.lexeme;
     if (parameter is SuperFormalParameter) return parameter.name.lexeme;
+    if (parameter is FunctionTypedFormalParameter) return parameter.name.lexeme;
     return null;
   }
 
@@ -396,12 +395,17 @@ class RequireCovariantDocumentationRule extends SaropaLintRule {
       final FormalParameterList? params = node.parameters;
       if (params == null) return;
 
-      // analyzer 13: DefaultFormalParameter wrapper node is removed —
-      // every FormalParameter (including one with a default value) exposes
-      // .covariantKeyword directly, so the DefaultFormalParameter unwrap
-      // branch collapses into the single check below.
       for (final FormalParameter param in params.parameters) {
-        if (param.covariantKeyword != null) {
+        if (param is DefaultFormalParameter) {
+          final NormalFormalParameter normalParam = param.parameter;
+          if (normalParam.covariantKeyword != null) {
+            // Check if method has documentation
+            final Comment? doc = node.documentationComment;
+            if (doc == null) {
+              reporter.atNode(param);
+            }
+          }
+        } else if (param.covariantKeyword != null) {
           final Comment? doc = node.documentationComment;
           if (doc == null) {
             reporter.atNode(param);
@@ -1432,10 +1436,8 @@ class RequireEnumUnknownValueRule extends SaropaLintRule {
             RegExp(r'\.values\b').hasMatch(target.toSource())) {
           // Check if has orElse parameter
           bool hasOrElse = false;
-          // analyzer 13: arguments is NodeList<Argument>; NamedExpression ->
-          // NamedArgument with Token name (.lexeme).
-          for (final Argument arg in node.argumentList.arguments) {
-            if (arg is NamedArgument && arg.name.lexeme == 'orElse') {
+          for (final Expression arg in node.argumentList.arguments) {
+            if (arg is NamedExpression && arg.name.label.name == 'orElse') {
               hasOrElse = true;
               break;
             }
@@ -1543,19 +1545,16 @@ class RequireValidatorReturnNullRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'TextFormField') return;
 
-      // Find validator argument.
-      // analyzer 13: arguments is NodeList<Argument>; NamedExpression ->
-      // NamedArgument with Token name (.lexeme) and .argumentExpression.
-      // arg.name is now a Token (not a node), so report via atToken.
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'validator') {
-          final Expression validatorExpr = arg.argumentExpression;
+      // Find validator argument
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'validator') {
+          final Expression validatorExpr = arg.expression;
 
           // Check function expression validators
           if (validatorExpr is FunctionExpression) {
             final FunctionBody body = validatorExpr.body;
             if (!_hasNullReturn(body)) {
-              reporter.atToken(arg.name, code);
+              reporter.atNode(arg.name, code);
             }
           }
         }

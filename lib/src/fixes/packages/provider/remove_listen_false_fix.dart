@@ -28,11 +28,9 @@ class RemoveListenFalseFix extends SaropaFixProducer {
         : node.thisOrAncestorOfType<MethodInvocation>();
     if (target == null) return;
 
-    // Find and remove only the 'listen: false' named argument.
-    // analyzer 13: NamedExpression renamed to NamedArgument; name is a
-    // Token (.lexeme) rather than a Label.
+    // Find and remove only the 'listen: false' named argument
     for (final arg in target.argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'listen') {
+      if (arg is NamedExpression && arg.name.label.name == 'listen') {
         await builder.addDartFileEdit(file, (builder) {
           // Find preceding comma if not first argument
           final idx = target.argumentList.arguments.indexOf(arg);

@@ -82,7 +82,7 @@ abstract final class ImageFilterQualityLowDetection {
   }
 
   /// `filterQuality:` argument whose value is `FilterQuality.low` (dart:ui / Flutter).
-  static NamedArgument? violatingFilterQualityNamedArg(
+  static NamedExpression? violatingFilterQualityNamedArg(
     InstanceCreationExpression node,
   ) {
     final NamedType typeNode = node.constructorName.type;
@@ -95,7 +95,7 @@ abstract final class ImageFilterQualityLowDetection {
   }
 
   /// Unqualified `Image.network` / … or `FadeInImage.*` parsed as [MethodInvocation].
-  static NamedArgument? violatingFilterQualityNamedArgInvocation(
+  static NamedExpression? violatingFilterQualityNamedArgInvocation(
     MethodInvocation node,
   ) {
     final Expression? target = node.target;
@@ -123,7 +123,7 @@ abstract final class ImageFilterQualityLowDetection {
   /// `RawImage(…)`, `Image(…)`, `DecorationImage(…)` often parse as [MethodInvocation]
   /// with a null [MethodInvocation.target] when the ctor context is missing
   /// (e.g. [parseString]); real analysis may still use [InstanceCreationExpression].
-  static NamedArgument? _violatingFilterQualityForNullTargetMethodInvocation(
+  static NamedExpression? _violatingFilterQualityForNullTargetMethodInvocation(
     MethodInvocation node,
   ) {
     final String method = node.methodName.name;
@@ -159,13 +159,13 @@ abstract final class ImageFilterQualityLowDetection {
     return _findFilterQualityLowNamed(node.argumentList.arguments);
   }
 
-  static NamedArgument? _findFilterQualityLowNamed(
-    NodeList<Argument> args,
+  static NamedExpression? _findFilterQualityLowNamed(
+    NodeList<Expression> args,
   ) {
-    for (final Argument arg in args) {
-      if (arg is! NamedArgument) continue;
-      if (arg.name.lexeme != 'filterQuality') continue;
-      if (isFilterQualityLowValue(arg.argumentExpression)) return arg;
+    for (final Expression arg in args) {
+      if (arg is! NamedExpression) continue;
+      if (arg.name.label.name != 'filterQuality') continue;
+      if (isFilterQualityLowValue(arg.expression)) return arg;
     }
     return null;
   }

@@ -248,10 +248,7 @@ class _NonTrivialAssertionScanner extends RecursiveAstVisitor<void> {
       }
     } else if (name == 'assert') {
       final args = node.argumentList.arguments;
-      // analyzer 13: .arguments returns NodeList<Argument>; unwrap via
-      // .argumentExpression to pass Expression to the type checker.
-      if (args.length == 1 &&
-          !_isTriviallyTrueExpression(args[0].argumentExpression)) {
+      if (args.length == 1 && !_isTriviallyTrueExpression(args[0])) {
         found = true;
       }
     }

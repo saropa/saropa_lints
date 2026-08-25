@@ -26,11 +26,10 @@ abstract final class PreferSuperKeyDetection {
   ) {
     for (final FormalParameter p in ctor.parameters.parameters) {
       if (p is SuperFormalParameter) continue;
-      // analyzer 13 removed DefaultFormalParameter (params carry their own
-      // defaultClause now) and merged SimpleFormalParameter into
-      // RegularFormalParameter, so there is no wrapper to unwrap.
-      final FormalParameter inner = p;
-      if (inner is! RegularFormalParameter) continue;
+      final FormalParameter inner = p is DefaultFormalParameter
+          ? p.parameter
+          : p;
+      if (inner is! SimpleFormalParameter) continue;
       if (inner.name?.lexeme != 'key') continue;
       final TypeAnnotation? ta = inner.type;
       if (ta is! NamedType || ta.name.lexeme != 'Key') continue;
@@ -54,15 +53,13 @@ abstract final class PreferSuperKeyDetection {
   ) {
     for (final ConstructorInitializer init in ctor.initializers) {
       if (init is! SuperConstructorInvocation) continue;
-      final NodeList<Argument> args = init.argumentList.arguments;
+      final NodeList<Expression> args = init.argumentList.arguments;
       if (args.length != 1) continue;
-      final Argument a = args.single;
-      // analyzer 13 renamed NamedExpression -> NamedArgument: `.name` is
-      // now the Token directly, and `.expression` -> `.argumentExpression`.
-      if (a is! NamedArgument) continue;
-      if (a.name.lexeme != 'key') continue;
-      if (a.argumentExpression is! SimpleIdentifier) continue;
-      if ((a.argumentExpression as SimpleIdentifier).name != 'key') continue;
+      final Expression a = args.single;
+      if (a is! NamedExpression) continue;
+      if (a.name.label.name != 'key') continue;
+      if (a.expression is! SimpleIdentifier) continue;
+      if ((a.expression as SimpleIdentifier).name != 'key') continue;
       return init;
     }
     return null;
@@ -95,7 +92,7 @@ abstract final class ChipDeleteInkWellCircleBorderDetection {
   };
 
   /// Chip widget call from an [InstanceCreationExpression] (`const InputChip(`).
-  static NamedArgument? violationForChipConstructor(
+  static NamedExpression? violationForChipConstructor(
     InstanceCreationExpression node,
   ) {
     return violationForChipNamedCall(
@@ -108,7 +105,7 @@ abstract final class ChipDeleteInkWellCircleBorderDetection {
   /// receiver). The parser often represents these as method calls until
   /// resolution; both shapes appear in analyzed sources, so the lint handles
   /// both.
-  static NamedArgument? violationForChipMethodInvocation(
+  static NamedExpression? violationForChipMethodInvocation(
     MethodInvocation node,
   ) {
     if (node.target != null) return null;
@@ -119,33 +116,29 @@ abstract final class ChipDeleteInkWellCircleBorderDetection {
   }
 
   /// Shared: [typeName] must be a Material chip class; inspect `deleteIcon:`.
-  static NamedArgument? violationForChipNamedCall({
+  static NamedExpression? violationForChipNamedCall({
     required String typeName,
     required ArgumentList argumentList,
   }) {
     if (!chipTypes.contains(typeName)) return null;
 
-    // analyzer 13 renamed NamedExpression -> NamedArgument; argument list
-    // elements are typed `Argument`, and `.name` is the Token directly.
-    NamedArgument? deleteIconArg;
-    for (final Argument arg in argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'deleteIcon') {
+    NamedExpression? deleteIconArg;
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'deleteIcon') {
         deleteIconArg = arg;
         break;
       }
     }
     if (deleteIconArg == null) return null;
-    return findInkWellCircleBorderCustomBorder(
-      deleteIconArg.argumentExpression,
-    );
+    return findInkWellCircleBorderCustomBorder(deleteIconArg.expression);
   }
 
   /// Depth-first search for `InkWell(..., customBorder: CircleBorder(...), ...)`.
   ///
   /// Handles both [InstanceCreationExpression] and unqualified
   /// [MethodInvocation] for `InkWell`, matching typical parser output.
-  static NamedArgument? findInkWellCircleBorderCustomBorder(Expression root) {
-    NamedArgument? found;
+  static NamedExpression? findInkWellCircleBorderCustomBorder(Expression root) {
+    NamedExpression? found;
 
     bool isCircleBorderShape(Expression ex) {
       if (ex is InstanceCreationExpression &&
@@ -160,21 +153,21 @@ abstract final class ChipDeleteInkWellCircleBorderDetection {
       return false;
     }
 
-    NamedArgument? inkWellCustomBorderCircle(InstanceCreationExpression e) {
+    NamedExpression? inkWellCustomBorderCircle(InstanceCreationExpression e) {
       if (e.constructorName.type.name.lexeme != 'InkWell') return null;
-      for (final Argument arg in e.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'customBorder') {
-          if (isCircleBorderShape(arg.argumentExpression)) return arg;
+      for (final Expression arg in e.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'customBorder') {
+          if (isCircleBorderShape(arg.expression)) return arg;
         }
       }
       return null;
     }
 
-    NamedArgument? inkWellMiCustomBorderCircle(MethodInvocation e) {
+    NamedExpression? inkWellMiCustomBorderCircle(MethodInvocation e) {
       if (e.target != null || e.methodName.name != 'InkWell') return null;
-      for (final Argument arg in e.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'customBorder') {
-          if (isCircleBorderShape(arg.argumentExpression)) return arg;
+      for (final Expression arg in e.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'customBorder') {
+          if (isCircleBorderShape(arg.expression)) return arg;
         }
       }
       return null;
@@ -185,20 +178,20 @@ abstract final class ChipDeleteInkWellCircleBorderDetection {
       if (e is InstanceCreationExpression) {
         found = inkWellCustomBorderCircle(e);
         if (found != null) return;
-        for (final Argument arg in e.argumentList.arguments) {
-          if (arg is NamedArgument) {
-            visit(arg.argumentExpression);
-          } else if (arg is Expression) {
+        for (final Expression arg in e.argumentList.arguments) {
+          if (arg is NamedExpression) {
+            visit(arg.expression);
+          } else {
             visit(arg);
           }
         }
       } else if (e is MethodInvocation) {
         found = inkWellMiCustomBorderCircle(e);
         if (found != null) return;
-        for (final Argument arg in e.argumentList.arguments) {
-          if (arg is NamedArgument) {
-            visit(arg.argumentExpression);
-          } else if (arg is Expression) {
+        for (final Expression arg in e.argumentList.arguments) {
+          if (arg is NamedExpression) {
+            visit(arg.expression);
+          } else {
             visit(arg);
           }
         }

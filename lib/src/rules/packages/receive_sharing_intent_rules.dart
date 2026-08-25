@@ -441,12 +441,8 @@ class ReceiveSharingIntentUnfilteredTypeRule extends SaropaLintRule {
   /// Returns the first positional or named argument of [node] that is a
   /// [FunctionExpression] (inline callback), or null when none exists.
   FunctionExpression? _firstCallbackArg(MethodInvocation node) {
-    // analyzer 13 renamed NamedExpression -> NamedArgument; argument list
-    // elements are typed `Argument`, and `.expression` -> `.argumentExpression`.
-    for (final Argument arg in node.argumentList.arguments) {
-      final Expression value = arg is NamedArgument
-          ? arg.argumentExpression
-          : arg as Expression;
+    for (final Expression arg in node.argumentList.arguments) {
+      final Expression value = arg is NamedExpression ? arg.expression : arg;
       if (value is FunctionExpression) return value;
     }
     return null;

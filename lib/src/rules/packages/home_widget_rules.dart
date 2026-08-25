@@ -75,9 +75,7 @@ bool _hasVmEntryPointPragma(AnnotatedNode decl) {
     if (annotation.name.name != 'pragma') continue;
     final args = annotation.arguments?.arguments;
     if (args == null || args.isEmpty) continue;
-    // analyzer 13: annotation arguments are Argument, not Expression;
-    // a plain (unnamed) annotation argument is itself an Expression.
-    final Expression first = args.first as Expression;
+    final Expression first = args.first;
     if (first is StringLiteral && first.stringValue == 'vm:entry-point') {
       return true;
     }
@@ -87,11 +85,9 @@ bool _hasVmEntryPointPragma(AnnotatedNode decl) {
 
 /// True when [node] has a named argument [name] whose value is non-null.
 bool _hasNonNullNamedArg(MethodInvocation node, String name) {
-  // analyzer 13: NamedExpression -> NamedArgument; `.name.lexeme` replaces
-  // `.name.label.name`, and `.argumentExpression` replaces `.expression`.
-  for (final Argument arg in node.argumentList.arguments) {
-    if (arg is NamedArgument && arg.name.lexeme == name) {
-      return arg.argumentExpression is! NullLiteral;
+  for (final Expression arg in node.argumentList.arguments) {
+    if (arg is NamedExpression && arg.name.label.name == name) {
+      return arg.expression is! NullLiteral;
     }
   }
   return false;
@@ -187,10 +183,7 @@ class HomeWidgetCallbackMissingPragmaRule extends SaropaLintRule {
 
       final args = node.argumentList.arguments;
       if (args.isEmpty) return;
-      // analyzer 13: arguments is NodeList<Argument>; args.first here is
-      // always the first positional arg (call is guarded upstream), so it
-      // is safe to treat as an Expression.
-      final Expression arg = args.first as Expression;
+      final Expression arg = args.first;
       // Only a bare tear-off can be verified here; closures / instance methods
       // are handled by home_widget_callback_not_top_level.
       if (arg is! SimpleIdentifier) return;
@@ -268,10 +261,7 @@ class HomeWidgetCallbackNotTopLevelRule extends SaropaLintRule {
 
       final args = node.argumentList.arguments;
       if (args.isEmpty) return;
-      // analyzer 13: arguments is NodeList<Argument>; args.first here is
-      // always the first positional arg (call is guarded upstream), so it
-      // is safe to treat as an Expression.
-      final Expression arg = args.first as Expression;
+      final Expression arg = args.first;
 
       // Closures and instance-method / this-qualified tear-offs cannot be
       // serialized. A bare SimpleIdentifier (top-level or static, possibly via

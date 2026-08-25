@@ -1635,11 +1635,9 @@ extension InstanceCreationExpressionUtils on InstanceCreationExpression {
   /// node.hasNamedParameter('keyboardType')  // true
   /// node.hasNamedParameter('obscureText')   // false
   /// ```
-  /// Migrated: NamedExpression → NamedArgument, .name.label.name → .name.lexeme,
-  /// Expression arg → untyped (analyzer 13: arguments returns NodeList<Argument>).
   bool hasNamedParameter(String name) {
-    for (final arg in argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == name) {
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == name) {
         return true;
       }
     }
@@ -1652,11 +1650,9 @@ extension InstanceCreationExpressionUtils on InstanceCreationExpression {
   /// ```dart
   /// node.hasAnyNamedParameter({'keyboardType', 'inputType'})
   /// ```
-  /// Migrated: NamedExpression → NamedArgument, .name.label.name → .name.lexeme,
-  /// Expression arg → untyped (analyzer 13: arguments returns NodeList<Argument>).
   bool hasAnyNamedParameter(Set<String> names) {
-    for (final arg in argumentList.arguments) {
-      if (arg is NamedArgument && names.contains(arg.name.lexeme)) {
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is NamedExpression && names.contains(arg.name.label.name)) {
         return true;
       }
     }
@@ -1666,12 +1662,10 @@ extension InstanceCreationExpressionUtils on InstanceCreationExpression {
   /// Gets the value of a named parameter if it exists.
   ///
   /// Returns the [Expression] for the parameter value, or null if not found.
-  /// Migrated: NamedExpression → NamedArgument, .expression → .argumentExpression,
-  /// Expression arg → untyped (analyzer 13: arguments returns NodeList<Argument>).
   Expression? getNamedParameterValue(String name) {
-    for (final arg in argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == name) {
-        return arg.argumentExpression;
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == name) {
+        return arg.expression;
       }
     }
     return null;
@@ -3156,9 +3150,8 @@ class SaropaDiagnosticReporter {
       final length = node.end - adjustedOffset;
       if (_isDuplicateAttempt(adjustedOffset)) return;
       if (_isSuppressed(adjustedOffset, node)) return;
-      if (!_isCappedFromProblemsTab()) {
+      if (!_isCappedFromProblemsTab())
         _rule.reportAtOffset(adjustedOffset, length);
-      }
       _trackViolation(adjustedOffset, node: node);
       return;
     }

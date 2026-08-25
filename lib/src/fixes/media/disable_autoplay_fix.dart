@@ -23,15 +23,13 @@ class DisableAutoplayFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    // analyzer 13 renamed NamedExpression -> NamedArgument (no deprecated alias).
-    final target = node is NamedArgument
+    final target = node is NamedExpression
         ? node
-        : node.thisOrAncestorOfType<NamedArgument>();
+        : node.thisOrAncestorOfType<NamedExpression>();
     if (target == null) return;
 
-    // Replace the value expression (true -> false). `.expression` was
-    // renamed to `.argumentExpression` on NamedArgument in analyzer 13.
-    final expr = target.argumentExpression;
+    // Replace the value expression (true -> false)
+    final expr = target.expression;
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(

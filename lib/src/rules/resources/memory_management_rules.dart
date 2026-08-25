@@ -574,11 +574,8 @@ class AvoidCapturingThisInCallbacksRule extends SaropaLintRule {
 
       if (!isLongLivedCallback) return;
 
-      // Check if any argument is an inline function that uses setState or
-      // this. analyzer 13 renamed the argument list element type to
-      // `Argument`; `FunctionExpression` (an `Expression` subtype) still
-      // matches directly since bare positional args stay `Expression`.
-      for (final Argument arg in node.argumentList.arguments) {
+      // Check if any argument is an inline function that uses setState or this
+      for (final Expression arg in node.argumentList.arguments) {
         if (arg is FunctionExpression) {
           final String funcSource = arg.toSource();
           if (funcSource.contains('setState') ||
@@ -942,8 +939,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
 
       // Check for compute() calls
       if (methodName == 'compute') {
-        // analyzer 13 renamed the argument list element type to `Argument`.
-        final NodeList<Argument> args = node.argumentList.arguments;
+        final NodeList<Expression> args = node.argumentList.arguments;
         if (args.length >= 2) {
           final String argSource = args[1].toSource().toLowerCase();
 
@@ -965,8 +961,7 @@ class AvoidLargeIsolateCommunicationRule extends SaropaLintRule {
           final String targetSource = target.toSource().toLowerCase();
           if (RegExp(r'\bport\b').hasMatch(targetSource) ||
               RegExp(r'\bsendport\b').hasMatch(targetSource)) {
-            // analyzer 13 renamed the argument list element type to `Argument`.
-            final NodeList<Argument> args = node.argumentList.arguments;
+            final NodeList<Expression> args = node.argumentList.arguments;
             if (args.isNotEmpty) {
               final String argSource = args.first.toSource().toLowerCase();
               if (argSource.contains('list') ||
@@ -1755,10 +1750,9 @@ class AvoidClosureCaptureLeaksRule extends SaropaLintRule {
     final AstNode? parent = callback.parent;
     if (parent == null) return false;
 
-    // The closure may be a direct argument or inside an ArgumentList.
-    // analyzer 13 renamed NamedExpression -> NamedArgument.
+    // The closure may be a direct argument or inside an ArgumentList
     AstNode? argContext = parent;
-    if (argContext is NamedArgument) {
+    if (argContext is NamedExpression) {
       argContext = argContext.parent;
     }
     if (argContext is! ArgumentList) return false;

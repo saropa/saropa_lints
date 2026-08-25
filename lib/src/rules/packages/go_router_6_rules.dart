@@ -109,14 +109,11 @@ class AvoidGoRouterLegacyRedirectRule extends SaropaLintRule {
     // constructor/call is never mistaken for the router callback.
     if (!fileImportsPackage(node, PackageImports.goRouter)) return;
 
-    // Analyzer 13: arguments returns NodeList<Argument>;
-    // NamedExpression → NamedArgument, .name.label.name → .name.lexeme,
-    // .expression → .argumentExpression.
-    for (final arg in argumentList.arguments) {
-      if (arg is! NamedArgument) continue;
-      if (arg.name.lexeme != 'redirect') continue;
+    for (final Expression arg in argumentList.arguments) {
+      if (arg is! NamedExpression) continue;
+      if (arg.name.label.name != 'redirect') continue;
 
-      final Expression value = arg.argumentExpression;
+      final Expression value = arg.expression;
       // Only inline closures expose their arity; tear-offs are left alone to
       // avoid false positives where the parameter list is not visible here.
       if (value is! FunctionExpression) continue;

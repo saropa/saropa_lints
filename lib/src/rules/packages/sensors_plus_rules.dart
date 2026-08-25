@@ -235,9 +235,7 @@ class SensorsPlusNoSamplingPeriodRule extends SaropaLintRule {
 
       // Already has a samplingPeriod: arg — compliant.
       for (final arg in node.argumentList.arguments) {
-        // analyzer 13: NamedExpression -> NamedArgument; `.name.lexeme`
-        // replaces `.name.label.name`.
-        if (arg is NamedArgument && arg.name.lexeme == 'samplingPeriod') {
+        if (arg is NamedExpression && arg.name.label.name == 'samplingPeriod') {
           return;
         }
       }
@@ -365,18 +363,14 @@ class SensorsPlusFastestIntervalRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
-    // analyzer 13: NamedExpression -> NamedArgument; visitor method and
-    // context registration renamed to match (addNamedExpression ->
-    // addNamedArgument). `.name.lexeme` replaces `.name.label.name`, and
-    // `.argumentExpression` replaces `.expression`.
-    context.addNamedArgument((NamedArgument node) {
+    context.addNamedExpression((NamedExpression node) {
       // Only match `samplingPeriod:` arguments.
-      if (node.name.lexeme != 'samplingPeriod') return;
+      if (node.name.label.name != 'samplingPeriod') return;
       if (!fileImportsPackage(node, _sensorsImport)) return;
 
       // Value must reference SensorInterval.fastestInterval syntactically.
       // We match the prefixed-identifier form `SensorInterval.fastestInterval`.
-      final value = node.argumentExpression;
+      final value = node.expression;
       if (value is! PrefixedIdentifier) return;
       if (value.prefix.name != 'SensorInterval') return;
       if (value.identifier.name != 'fastestInterval') return;
@@ -499,9 +493,7 @@ class SensorsPlusMissingOnErrorRule extends SaropaLintRule {
 
       // Already has onError: — compliant.
       for (final arg in node.argumentList.arguments) {
-        // analyzer 13: NamedExpression -> NamedArgument; `.name.lexeme`
-        // replaces `.name.label.name`.
-        if (arg is NamedArgument && arg.name.lexeme == 'onError') {
+        if (arg is NamedExpression && arg.name.label.name == 'onError') {
           return;
         }
       }

@@ -257,18 +257,15 @@ class AvoidMissingEnumConstantInMapRule extends SaropaLintRule {
     EnumElement enumElement,
   ) {
     final AstNode? named = mapNode.parent;
-    // Analyzer 13 renamed NamedExpression -> NamedArgument.
-    if (named is! NamedArgument) return false;
+    if (named is! NamedExpression) return false;
     final AstNode? argumentList = named.parent;
     if (argumentList is! ArgumentList) return false;
 
-    // ArgumentList.arguments is NodeList<Argument> (not Expression) in analyzer 13.
-    for (final Argument arg in argumentList.arguments) {
+    for (final Expression arg in argumentList.arguments) {
       if (identical(arg, named)) continue;
-      if (arg is! NamedArgument) continue;
+      if (arg is! NamedExpression) continue;
 
-      // .expression renamed to .argumentExpression on NamedArgument.
-      final DartType? siblingType = arg.argumentExpression.staticType;
+      final DartType? siblingType = arg.expression.staticType;
       if (siblingType is InterfaceType &&
           identical(siblingType.element, enumElement)) {
         return true;
@@ -627,11 +624,10 @@ class AvoidParameterMutationRule extends SaropaLintRule {
   /// Returns the simple name of a parameter's declared type, or null when it
   /// has no explicit annotation. Unwraps optional/default parameters.
   static String? _declaredTypeName(FormalParameter param) {
-    // Analyzer 13 removed DefaultFormalParameter wrapping and merged
-    // SimpleFormalParameter into RegularFormalParameter, so the type
-    // annotation is now available directly on the parameter.
-    if (param is RegularFormalParameter) {
-      final TypeAnnotation? type = param.type;
+    FormalParameter inner = param;
+    if (inner is DefaultFormalParameter) inner = inner.parameter;
+    if (inner is SimpleFormalParameter) {
+      final TypeAnnotation? type = inner.type;
       if (type is NamedType) return type.name.lexeme;
     }
     return null;
@@ -866,12 +862,15 @@ class AvoidUnnecessaryNullableParametersRule extends SaropaLintRule {
       if (params == null) return;
 
       for (final FormalParameter param in params.parameters) {
-        // Check if parameter type is nullable. Analyzer 13 removed the
-        // DefaultFormalParameter wrapper and merged SimpleFormalParameter
-        // into RegularFormalParameter, so the type is read directly.
+        // Check if parameter type is nullable
         TypeAnnotation? type;
-        if (param is RegularFormalParameter) {
+        if (param is SimpleFormalParameter) {
           type = param.type;
+        } else if (param is DefaultFormalParameter) {
+          final FormalParameter normalParam = param.parameter;
+          if (normalParam is SimpleFormalParameter) {
+            type = normalParam.type;
+          }
         }
 
         if (type == null) continue;
@@ -1596,16 +1595,20 @@ class AvoidUnassignedFieldsRule extends SaropaLintRule {
             }
           }
           // A field is assigned when a constructor declares it via an
-          // initializing formal (`this.x`) or a super formal (`super.x`).
-          // Analyzer 13 removed the DefaultFormalParameter wrapper — every
-          // parameter (including NAMED and OPTIONAL ones) now carries its
-          // own optional defaultClause directly, so no unwrapping is needed
-          // before the type test.
+          // initializing formal (`this.x`) or a super formal (`super.x`). For
+          // NAMED and OPTIONAL parameters the analyzer wraps the real parameter
+          // in a DefaultFormalParameter, so unwrap before the type test —
+          // otherwise a `required this.x` named parameter (the common
+          // const-data-class pattern) is missed and the field is wrongly
+          // reported as unassigned.
           for (final FormalParameter param in member.parameters.parameters) {
-            if (param is FieldFormalParameter) {
-              assignedFields.add(param.name.lexeme);
-            } else if (param is SuperFormalParameter) {
-              assignedFields.add(param.name.lexeme);
+            final FormalParameter inner = param is DefaultFormalParameter
+                ? param.parameter
+                : param;
+            if (inner is FieldFormalParameter) {
+              assignedFields.add(inner.name.lexeme);
+            } else if (inner is SuperFormalParameter) {
+              assignedFields.add(inner.name.lexeme);
             }
           }
         }
@@ -2200,11 +2203,11 @@ class MatchBaseClassDefaultValueRule extends SaropaLintRule {
         final FormalParameterList? params = member.parameters;
         if (params == null) continue;
 
-        // Check parameters with default values. Analyzer 13 removed the
-        // DefaultFormalParameter wrapper; the default value now lives on
-        // the parameter's own optional defaultClause.
+        // Check parameters with default values
         for (final FormalParameter param in params.parameters) {
-          final Expression? defaultValue = param.defaultClause?.value;
+          if (param is! DefaultFormalParameter) continue;
+
+          final Expression? defaultValue = param.defaultValue;
           if (defaultValue == null) continue;
 
           // Flag non-standard defaults that are likely to differ from parent
@@ -2677,9 +2680,8 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
   bool _isLoopInvariant(Expression expr) {
     // Check for common loop-invariant patterns
     if (expr is InstanceCreationExpression) {
-      // Constructor calls with only literal arguments. ArgumentList.arguments
-      // is NodeList<Argument> in analyzer 13 (not Expression).
-      for (final Argument arg in expr.argumentList.arguments) {
+      // Constructor calls with only literal arguments
+      for (final Expression arg in expr.argumentList.arguments) {
         if (!_isConstant(arg)) return false;
       }
       return true;
@@ -2692,7 +2694,7 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
         final String name = target.name;
         // Check if it's a type name (static call)
         if (name.isNotEmpty && name[0] == name[0].toUpperCase()) {
-          for (final Argument arg in expr.argumentList.arguments) {
+          for (final Expression arg in expr.argumentList.arguments) {
             if (!_isConstant(arg)) return false;
           }
           return true;
@@ -2703,11 +2705,9 @@ class MoveVariableOutsideIterationRule extends SaropaLintRule {
     return false;
   }
 
-  bool _isConstant(Argument expr) {
+  bool _isConstant(Expression expr) {
     if (expr is Literal) return true;
-    // Analyzer 13 renamed NamedExpression -> NamedArgument, whose value
-    // getter is .argumentExpression (not .expression).
-    if (expr is NamedArgument) return _isConstant(expr.argumentExpression);
+    if (expr is NamedExpression) return _isConstant(expr.expression);
     return false;
   }
 }

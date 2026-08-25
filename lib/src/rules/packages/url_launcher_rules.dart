@@ -212,15 +212,12 @@ class AvoidUrlLauncherSimulatorTestsRule extends SaropaLintRule {
         return;
       }
 
-      // Analyzer 13: arguments returns NodeList<Argument>; use
-      // .argumentExpression to access the underlying Expression value.
-      final args = node.argumentList.arguments;
-      for (final arg in args) {
-        // Analyzer 13: arg is Argument; get the expression to type-check.
-        final argExpr = arg.argumentExpression;
-        if (argExpr is! FunctionExpression) continue;
+      // Check the test body for problematic schemes
+      final NodeList<Expression> args = node.argumentList.arguments;
+      for (final Expression arg in args) {
+        if (arg is! FunctionExpression) continue;
 
-        final String bodySource = argExpr.body.toSource();
+        final String bodySource = arg.body.toSource();
 
         // Must contain a problematic scheme string (word-boundary to avoid FPs)
         final bool hasScheme = _problematicSchemes.any((scheme) {
@@ -327,12 +324,11 @@ class PreferUrlLauncherFallbackRule extends SaropaLintRule {
       // Check for launchUrl calls
       if (methodName != 'launchUrl' && methodName != 'launch') return;
 
-      // Analyzer 13: arguments returns NodeList<Argument>; use
-      // .argumentExpression to get the Expression value for source text.
-      final args = node.argumentList.arguments;
+      // Check if this is a scheme that commonly needs fallback
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final String argSource = args.first.argumentExpression.toSource();
+      final String argSource = args.first.toSource();
       bool needsFallbackScheme = false;
 
       for (final String scheme in _schemesNeedingFallback) {
@@ -443,15 +439,13 @@ class RequireUrlLauncherModeRule extends SaropaLintRule {
       if (node.methodName.name != 'launchUrl') return;
 
       // Verify first argument is a Uri (url_launcher signature)
-      // Analyzer 13: arguments returns NodeList<Argument>.
-      final args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
       // Check if mode is specified
       bool hasMode = false;
-      // Analyzer 13: NamedExpression → NamedArgument, .name.label.name → .name.lexeme
-      for (final arg in args) {
-        if (arg is NamedArgument && arg.name.lexeme == 'mode') {
+      for (final Expression arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'mode') {
           hasMode = true;
           break;
         }

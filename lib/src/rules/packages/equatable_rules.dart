@@ -950,10 +950,13 @@ class RequireCopyWithNullHandlingRule extends SaropaLintRule {
         String? paramName;
         TypeAnnotation? paramType;
 
-        // Analyzer 13: DefaultFormalParameter / NormalFormalParameter removed.
-        // Every FormalParameter now carries .defaultClause directly.
-        // SimpleFormalParameter → RegularFormalParameter.
-        if (param is RegularFormalParameter) {
+        if (param is DefaultFormalParameter) {
+          final NormalFormalParameter inner = param.parameter;
+          if (inner is SimpleFormalParameter) {
+            paramName = inner.name?.lexeme;
+            paramType = inner.type;
+          }
+        } else if (param is SimpleFormalParameter) {
           paramName = param.name?.lexeme;
           paramType = param.type;
         }

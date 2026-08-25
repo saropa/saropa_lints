@@ -875,11 +875,9 @@ class PreferPermissionMinimalRequestRule extends SaropaLintRule {
   ) {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'request') return;
-      // analyzer 13: .arguments returns NodeList<Argument>; unwrap via
-      // .argumentExpression to get the Expression value.
-      final args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.length != 1) return;
-      final Expression arg = args.single.argumentExpression;
+      final Expression arg = args.single;
       if (arg is! ListLiteral) return;
       if (arg.elements.length <= 2) return;
       reporter.atNode(node);

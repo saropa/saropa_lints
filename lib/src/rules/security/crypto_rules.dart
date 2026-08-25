@@ -134,10 +134,8 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
       if (!_keyClasses.any(targetSource.contains)) return;
 
       // Check if argument is a string literal (hardcoded key)
-      // Migrated: .first returns Argument; use .argumentExpression
-      // for the Expression value (analyzer 13 API).
       if (node.argumentList.arguments.isNotEmpty) {
-        final firstArg = node.argumentList.arguments.first.argumentExpression;
+        final Expression firstArg = node.argumentList.arguments.first;
         if (firstArg is StringLiteral) {
           reporter.atNode(firstArg);
         }
@@ -159,10 +157,8 @@ class AvoidHardcodedEncryptionKeysRule extends SaropaLintRule {
       if (!_keyMethods.contains(name.name)) return;
 
       // Check if argument is a string literal (hardcoded key)
-      // Migrated: .first returns Argument; use .argumentExpression
-      // for the Expression value (analyzer 13 API).
       if (node.argumentList.arguments.isNotEmpty) {
-        final firstArg = node.argumentList.arguments.first.argumentExpression;
+        final Expression firstArg = node.argumentList.arguments.first;
         if (firstArg is StringLiteral) {
           reporter.atNode(firstArg);
         }
@@ -623,10 +619,8 @@ class RequireUniqueIvPerEncryptionRule extends SaropaLintRule {
       if (!_ivWordRegex.hasMatch(targetSource)) return;
 
       // Check if argument is a string literal (fixed IV)
-      // Migrated: .first returns Argument; use .argumentExpression
-      // for the Expression value (analyzer 13 API).
       if (node.argumentList.arguments.isNotEmpty) {
-        final firstArg = node.argumentList.arguments.first.argumentExpression;
+        final Expression firstArg = node.argumentList.arguments.first;
         if (firstArg is StringLiteral) {
           reporter.atNode(node);
         }
@@ -741,12 +735,10 @@ class RequireSecureKeyGenerationRule extends SaropaLintRule {
       final String typeName = node.constructorName.type.name.lexeme;
       if (!_keyClasses.contains(typeName)) return;
 
-      // Migrated: NodeList<Expression> → inferred type, .first returns
-      // Argument; use .argumentExpression (analyzer 13 API).
-      final args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final firstArg = args.first.argumentExpression;
+      final Expression firstArg = args.first;
 
       // Key([1, 2, 3, ...]) — direct list literal
       if (firstArg is ListLiteral) {
@@ -758,10 +750,9 @@ class RequireSecureKeyGenerationRule extends SaropaLintRule {
       if (firstArg is MethodInvocation) {
         final String method = firstArg.methodName.name;
         if (method == 'fromList' || method == 'filled') {
-          // Migrated: NodeList<Expression> → inferred type, .first returns
-          // Argument (analyzer 13 API).
-          final innerArgs = firstArg.argumentList.arguments;
-          if (innerArgs.isNotEmpty && innerArgs.first.argumentExpression is ListLiteral) {
+          final NodeList<Expression> innerArgs =
+              firstArg.argumentList.arguments;
+          if (innerArgs.isNotEmpty && innerArgs.first is ListLiteral) {
             reporter.atNode(node);
           } else if (method == 'filled') {
             // List.filled always produces predictable output

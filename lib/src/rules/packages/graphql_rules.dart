@@ -72,11 +72,11 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
       if (methodName != 'gql' && methodName != 'parseString') return;
 
       // Check if the argument is a string literal
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Argument firstArg = args.first;
-      if (firstArg is NamedArgument) {
+      final Expression firstArg = args.first;
+      if (firstArg is NamedExpression) {
         // Skip named arguments
         return;
       }
@@ -86,7 +86,6 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
-
 
     // Also check for InstanceCreationExpression with document parameter
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
@@ -101,14 +100,14 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
       }
 
       // Check for document parameter with gql() call
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'document') {
-          final Expression value = arg.argumentExpression;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'document') {
+          final Expression value = arg.expression;
           if (value is MethodInvocation) {
             final String methodName = value.methodName.name;
             if (methodName == 'gql' || methodName == 'parseString') {
               // Check if gql() has a string literal
-              final NodeList<Argument> gqlArgs = value.argumentList.arguments;
+              final NodeList<Expression> gqlArgs = value.argumentList.arguments;
               if (gqlArgs.isNotEmpty && _isStringLiteral(gqlArgs.first)) {
                 reporter.atNode(arg);
               }
@@ -119,8 +118,8 @@ class AvoidGraphqlStringQueriesRule extends SaropaLintRule {
     });
   }
 
-  /// Check if an argument is a string literal.
-  bool _isStringLiteral(Argument expr) {
+  /// Check if an expression is a string literal.
+  bool _isStringLiteral(Expression expr) {
     if (expr is SimpleStringLiteral) return true;
     if (expr is AdjacentStrings) return true;
     if (expr is StringInterpolation) return true;

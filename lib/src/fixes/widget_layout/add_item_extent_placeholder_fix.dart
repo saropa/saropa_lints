@@ -30,11 +30,9 @@ class AddItemExtentPlaceholderFix extends SaropaFixProducer {
     if (parent is! InstanceCreationExpression) return;
     final ice = parent;
 
-    // analyzer 13: NamedExpression renamed to NamedArgument; name is a
-    // Token (.lexeme) rather than a Label.
     for (final arg in ice.argumentList.arguments) {
-      if (arg is NamedArgument) {
-        final n = arg.name.lexeme;
+      if (arg is NamedExpression) {
+        final n = arg.name.label.name;
         if (n == 'itemExtent' ||
             n == 'prototypeItem' ||
             n == 'itemExtentBuilder') {

@@ -189,8 +189,8 @@ class PreferDropdownInitialValueRule extends SaropaLintRule {
       if (typeName != 'DropdownButtonFormField') return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'value') {
-          reporter.atToken(arg.name);
+        if (arg is NamedExpression && arg.name.label.name == 'value') {
+          reporter.atNode(arg.name);
           return;
         }
       }
@@ -216,19 +216,17 @@ class _PreferDropdownInitialValueFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    // The error is reported on the NamedArgument's name token. analyzer 13
-    // removed the separate Label wrapper node — `.name` is now a bare Token.
-    final namedArg = node is NamedArgument
-        ? node
-        : node.thisOrAncestorOfType<NamedArgument>();
-    if (namedArg == null) return;
+    // The error is reported on the NamedExpression's Label node.
+    // Find the label whose name is 'value'.
+    final label = node is Label ? node : node.thisOrAncestorOfType<Label>();
+    if (label == null) return;
 
-    final nameToken = namedArg.name;
-    if (nameToken.lexeme != 'value') return;
+    final identifier = label.label;
+    if (identifier.name != 'value') return;
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(
-        SourceRange(nameToken.offset, nameToken.length),
+        SourceRange(identifier.offset, identifier.length),
         'initialValue',
       );
     });
@@ -483,8 +481,8 @@ class PreferOnPopWithResultRule extends SaropaLintRule {
     // not just Route constructors. False positives are unlikely because:
     // 1. requiresFlutterImport filters to Flutter files only
     // 2. 'onPop' is a navigation-specific name rarely used elsewhere
-    context.addNamedArgument((NamedArgument node) {
-      if (node.name.lexeme != 'onPop') return;
+    context.addNamedExpression((NamedExpression node) {
+      if (node.name.label.name != 'onPop') return;
 
       final parent = node.parent;
       if (parent is! ArgumentList) return;
@@ -525,18 +523,13 @@ class _PreferOnPopWithResultFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    // For named arguments: the error is on the NamedArgument node itself.
-    // analyzer 13 removed the separate `Label` wrapper AST node for named
-    // arguments — `.name` is now a bare Token, so the fix targets the
-    // NamedArgument's name token directly instead of a Label child.
-    final namedArg = node is NamedArgument
-        ? node
-        : node.thisOrAncestorOfType<NamedArgument>();
-    if (namedArg != null && namedArg.name.lexeme == 'onPop') {
-      final nameToken = namedArg.name;
+    // For named arguments: the error is on the Label node.
+    final label = node is Label ? node : node.thisOrAncestorOfType<Label>();
+    if (label != null && label.label.name == 'onPop') {
+      final identifier = label.label;
       await builder.addDartFileEdit(file, (builder) {
         builder.addSimpleReplacement(
-          SourceRange(nameToken.offset, nameToken.length),
+          SourceRange(identifier.offset, identifier.length),
           'onPopWithResult',
         );
       });
@@ -647,8 +640,8 @@ class PreferTabbarThemeIndicatorColorRule extends SaropaLintRule {
       if (typeName != 'ThemeData') return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'indicatorColor') {
-          reporter.atToken(arg.name);
+        if (arg is NamedExpression && arg.name.label.name == 'indicatorColor') {
+          reporter.atNode(arg.name);
           return;
         }
       }
@@ -665,8 +658,8 @@ class PreferTabbarThemeIndicatorColorRule extends SaropaLintRule {
       if (!typeName.startsWith('ThemeData')) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'indicatorColor') {
-          reporter.atToken(arg.name);
+        if (arg is NamedExpression && arg.name.label.name == 'indicatorColor') {
+          reporter.atNode(arg.name);
           return;
         }
       }
@@ -721,9 +714,9 @@ class _RemoveIndicatorColorArgFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final named = node.thisOrAncestorOfType<NamedArgument>();
+    final named = node.thisOrAncestorOfType<NamedExpression>();
     if (named == null) return;
-    if (named.name.lexeme != 'indicatorColor') return;
+    if (named.name.label.name != 'indicatorColor') return;
 
     final range = migration_src.sourceRangeForDeletingNamedArgument(
       unitResult.content,
@@ -822,8 +815,8 @@ class PreferPlatformMenuBarChildRule extends SaropaLintRule {
       if (typeName != 'PlatformMenuBar') return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'body') {
-          reporter.atToken(arg.name);
+        if (arg is NamedExpression && arg.name.label.name == 'body') {
+          reporter.atNode(arg.name);
           return;
         }
       }
@@ -849,19 +842,15 @@ class _PreferPlatformMenuBarChildFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    // analyzer 13 removed the Label wrapper for named arguments — the
-    // reported node is a NamedArgument whose `.name` is a bare Token.
-    final namedArg = node is NamedArgument
-        ? node
-        : node.thisOrAncestorOfType<NamedArgument>();
-    if (namedArg == null) return;
+    final label = node is Label ? node : node.thisOrAncestorOfType<Label>();
+    if (label == null) return;
 
-    final nameToken = namedArg.name;
-    if (nameToken.lexeme != 'body') return;
+    final identifier = label.label;
+    if (identifier.name != 'body') return;
 
     await builder.addDartFileEdit(file, (builder) {
       builder.addSimpleReplacement(
-        SourceRange(nameToken.offset, nameToken.length),
+        SourceRange(identifier.offset, identifier.length),
         'child',
       );
     });
@@ -1077,8 +1066,8 @@ class PreferContextMenuBuilderRule extends SaropaLintRule {
       if (typeName != 'CupertinoContextMenu') return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'previewBuilder') {
-          reporter.atToken(arg.name);
+        if (arg is NamedExpression && arg.name.label.name == 'previewBuilder') {
+          reporter.atNode(arg.name);
           return;
         }
       }
@@ -1169,8 +1158,8 @@ class PreferPanAxisRule extends SaropaLintRule {
       if (typeName != 'InteractiveViewer') return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'alignPanAxis') {
-          reporter.atToken(arg.name);
+        if (arg is NamedExpression && arg.name.label.name == 'alignPanAxis') {
+          reporter.atNode(arg.name);
           return;
         }
       }
@@ -1276,8 +1265,8 @@ class PreferButtonStyleIconAlignmentRule extends SaropaLintRule {
       if (!_buttonTypes.contains(typeName)) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'iconAlignment') {
-          reporter.atToken(arg.name);
+        if (arg is NamedExpression && arg.name.label.name == 'iconAlignment') {
+          reporter.atNode(arg.name);
           return;
         }
       }
@@ -1405,8 +1394,8 @@ class PreferKeyEventRule extends SaropaLintRule {
       if (!_onKeyWidgets.contains(typeName)) return;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'onKey') {
-          reporter.atToken(arg.name);
+        if (arg is NamedExpression && arg.name.label.name == 'onKey') {
+          reporter.atNode(arg.name);
           return;
         }
       }
@@ -1574,8 +1563,8 @@ class PreferM3TextThemeRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
   ) {
     for (final arg in argList.arguments) {
-      if (arg is NamedArgument && _renames.containsKey(arg.name.lexeme)) {
-        reporter.atToken(arg.name);
+      if (arg is NamedExpression && _renames.containsKey(arg.name.label.name)) {
+        reporter.atNode(arg.name);
       }
     }
   }
@@ -1599,19 +1588,16 @@ class _PreferM3TextThemeFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    // For named arguments: reported on the NamedArgument's name token.
-    // analyzer 13 removed the Label wrapper node for named arguments.
-    final namedArg = node is NamedArgument
-        ? node
-        : node.thisOrAncestorOfType<NamedArgument>();
-    if (namedArg != null) {
-      final nameToken = namedArg.name;
-      final replacement = PreferM3TextThemeRule._renames[nameToken.lexeme];
+    // For named arguments: reported on Label → find the identifier
+    final label = node is Label ? node : node.thisOrAncestorOfType<Label>();
+    if (label != null) {
+      final identifier = label.label;
+      final replacement = PreferM3TextThemeRule._renames[identifier.name];
       if (replacement == null) return;
 
       await builder.addDartFileEdit(file, (b) {
         b.addSimpleReplacement(
-          SourceRange(nameToken.offset, nameToken.length),
+          SourceRange(identifier.offset, identifier.length),
           replacement,
         );
       });
@@ -1758,8 +1744,8 @@ class PreferOverflowBarOverButtonBarRule extends SaropaLintRule {
         return;
       }
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'buttonBarTheme') {
-          reporter.atToken(arg.name, code);
+        if (arg is NamedExpression && arg.name.label.name == 'buttonBarTheme') {
+          reporter.atNode(arg.name, code);
           return;
         }
       }
@@ -1785,9 +1771,9 @@ class PreferOverflowBarOverButtonBarRule extends SaropaLintRule {
           return;
         }
         for (final arg in node.argumentList.arguments) {
-          if (arg is NamedArgument &&
-              arg.name.lexeme == 'buttonBarTheme') {
-            reporter.atToken(arg.name, code);
+          if (arg is NamedExpression &&
+              arg.name.label.name == 'buttonBarTheme') {
+            reporter.atNode(arg.name, code);
             return;
           }
         }
@@ -1800,8 +1786,8 @@ class PreferOverflowBarOverButtonBarRule extends SaropaLintRule {
       if (targetType == null) return;
       if (!targetType.getDisplayString().startsWith('ThemeData')) return;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'buttonBarTheme') {
-          reporter.atToken(arg.name, code);
+        if (arg is NamedExpression && arg.name.label.name == 'buttonBarTheme') {
+          reporter.atNode(arg.name, code);
           return;
         }
       }
@@ -1844,9 +1830,9 @@ class _RemoveThemeDataButtonBarThemeArgFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    final named = node.thisOrAncestorOfType<NamedArgument>();
+    final named = node.thisOrAncestorOfType<NamedExpression>();
     if (named == null) return;
-    if (named.name.lexeme != 'buttonBarTheme') return;
+    if (named.name.label.name != 'buttonBarTheme') return;
 
     final range = migration_src.sourceRangeForDeletingNamedArgument(
       unitResult.content,
@@ -2391,8 +2377,8 @@ class AvoidDeprecatedUseMaterial3CopyWithRule extends SaropaLintRule {
 
       // Check for useMaterial3 named argument.
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'useMaterial3') {
-          reporter.atToken(arg.name);
+        if (arg is NamedExpression && arg.name.label.name == 'useMaterial3') {
+          reporter.atNode(arg.name);
           return;
         }
       }
@@ -2417,11 +2403,11 @@ class _RemoveUseMaterial3CopyWithFix extends SaropaFixProducer {
     final node = coveringNode;
     if (node == null) return;
 
-    // Find the NamedArgument for useMaterial3.
-    final named = node is NamedArgument
+    // Find the NamedExpression for useMaterial3.
+    final named = node is NamedExpression
         ? node
-        : node.thisOrAncestorOfType<NamedArgument>();
-    if (named == null || named.name.lexeme != 'useMaterial3') return;
+        : node.thisOrAncestorOfType<NamedExpression>();
+    if (named == null || named.name.label.name != 'useMaterial3') return;
 
     final argList = named.parent;
     if (argList is! ArgumentList) return;

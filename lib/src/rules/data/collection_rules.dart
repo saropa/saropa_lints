@@ -371,9 +371,7 @@ class AvoidUnnecessaryCollectionsRule extends SaropaLintRule {
   /// and resolved detection paths.
   bool _wrapsCollectionLiteral(ArgumentList args) {
     if (args.arguments.length != 1) return false;
-    // analyzer 13: arguments is NodeList<Argument>; a single positional
-    // literal argument is an Expression (Expression implements Argument).
-    final Argument arg = args.arguments.first;
+    final Expression arg = args.arguments.first;
     return arg is ListLiteral || arg is SetOrMapLiteral;
   }
 
@@ -914,8 +912,8 @@ class AvoidUnsafeCollectionMethodsRule extends SaropaLintRule {
 
     // Check if the callback is the value of a known named argument
     final AstNode? callbackParent = callback.parent;
-    if (callbackParent is NamedArgument) {
-      final String argName = callbackParent.name.lexeme;
+    if (callbackParent is NamedExpression) {
+      final String argName = callbackParent.name.label.name;
       if (_nonEmptyCallbackNames.contains(argName)) return true;
     }
 
@@ -1583,11 +1581,9 @@ class AvoidUnsafeWhereMethodsRule extends SaropaLintRule {
       }
 
       // Check if orElse is provided - if so, it's safe
-      // analyzer 13: arguments is NodeList<Argument>; widen the loop type
-      // since named args are no longer Expression subtypes.
-      final NodeList<Argument> args = node.argumentList.arguments;
-      for (final Argument arg in args) {
-        if (arg is NamedArgument && arg.name.lexeme == 'orElse') {
+      final NodeList<Expression> args = node.argumentList.arguments;
+      for (final Expression arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'orElse') {
           return; // Has orElse callback, safe to use
         }
       }
@@ -1682,12 +1678,10 @@ class PreferWhereOrNullRule extends SaropaLintRule {
       }
 
       // Only flag if orElse IS provided (otherwise AvoidUnsafeWhereMethodsRule handles it)
-      // analyzer 13: arguments is NodeList<Argument>; widen the loop type
-      // since named args are no longer Expression subtypes.
-      final NodeList<Argument> args = node.argumentList.arguments;
-      NamedArgument? orElseArg;
-      for (final Argument arg in args) {
-        if (arg is NamedArgument && arg.name.lexeme == 'orElse') {
+      final NodeList<Expression> args = node.argumentList.arguments;
+      NamedExpression? orElseArg;
+      for (final Expression arg in args) {
+        if (arg is NamedExpression && arg.name.label.name == 'orElse') {
           orElseArg = arg;
           break;
         }
@@ -2280,14 +2274,10 @@ class PreferAddAllRule extends SaropaLintRule {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'forEach') return;
 
-      // analyzer 13: arguments is NodeList<Argument>, not
-      // NodeList<Expression>; the `is! FunctionExpression` check below still
-      // works since FunctionExpression is an Expression, which implements
-      // Argument for positional args.
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final Argument firstArg = args.first;
+      final Expression firstArg = args.first;
       if (firstArg is! FunctionExpression) return;
 
       final FunctionBody body = firstArg.body;
@@ -2298,7 +2288,7 @@ class PreferAddAllRule extends SaropaLintRule {
           final FormalParameterList? params = firstArg.parameters;
           if (params != null && params.parameters.isNotEmpty) {
             final String? paramName = params.parameters.first.name?.lexeme;
-            final NodeList<Argument> addArgs = expr.argumentList.arguments;
+            final NodeList<Expression> addArgs = expr.argumentList.arguments;
             final firstAddArg = addArgs.isNotEmpty ? addArgs.first : null;
             if (firstAddArg is SimpleIdentifier &&
                 firstAddArg.name == paramName) {
@@ -2327,7 +2317,7 @@ class PreferAddAllRule extends SaropaLintRule {
 
       // Check if add argument matches loop variable
       final String loopVar = parts.loopVariable.name.lexeme;
-      final NodeList<Argument> addArgs = expr.argumentList.arguments;
+      final NodeList<Expression> addArgs = expr.argumentList.arguments;
       final firstAddArg = addArgs.isNotEmpty ? addArgs.first : null;
       if (firstAddArg is SimpleIdentifier && firstAddArg.name == loopVar) {
         reporter.atNode(node);
@@ -2610,8 +2600,8 @@ const Set<String> _positionSensitiveSequenceParams = <String>{
 /// a repeated entry is part of the intended ordered sequence.
 bool _isPositionSensitiveSequenceList(ListLiteral node) {
   final AstNode? parent = node.parent;
-  if (parent is! NamedArgument) return false;
-  return _positionSensitiveSequenceParams.contains(parent.name.lexeme);
+  if (parent is! NamedExpression) return false;
+  return _positionSensitiveSequenceParams.contains(parent.name.label.name);
 }
 
 /// Suggests const constructor calls in list literals when possible.
@@ -3511,11 +3501,9 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
     ArgumentList args,
     SaropaDiagnosticReporter reporter,
   ) {
-    // analyzer 13: arguments is NodeList<Argument>; only NamedArgument
-    // entries are relevant here, so widen the loop variable.
-    for (final Argument arg in args.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'itemBuilder') {
-        final Expression builderExpr = arg.argumentExpression;
+    for (final Expression arg in args.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'itemBuilder') {
+        final Expression builderExpr = arg.expression;
         if (builderExpr is FunctionExpression) {
           _checkBuilderForKey(builderExpr, reporter);
         }
@@ -3555,8 +3543,8 @@ class RequireKeyForCollectionRule extends SaropaLintRule {
   }
 
   bool _hasKeyArgument(InstanceCreationExpression widget) {
-    for (final Argument arg in widget.argumentList.arguments) {
-      if (arg is NamedArgument && arg.name.lexeme == 'key') {
+    for (final Expression arg in widget.argumentList.arguments) {
+      if (arg is NamedExpression && arg.name.label.name == 'key') {
         return true;
       }
     }
@@ -3618,7 +3606,7 @@ class AvoidFunctionLiteralsInForeachCallsRule extends SaropaLintRule {
   ) {
     context.addMethodInvocation((MethodInvocation node) {
       if (node.methodName.name != 'forEach') return;
-      final NodeList<Argument> args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.length != 1) return;
       if (args.first is! FunctionExpression) return;
       final DartType? targetType = node.realTarget?.staticType;
@@ -3799,12 +3787,12 @@ class PreferForElementsToMapFromIterableRule extends SaropaLintRule {
     bool hasValue = false;
 
     for (final arg in args.arguments) {
-      if (arg is! NamedArgument) continue;
-      final label = arg.name.lexeme;
+      if (arg is! NamedExpression) continue;
+      final label = arg.name.label.name;
 
-      if (label == 'key' && _isSimpleClosure(arg.argumentExpression)) {
+      if (label == 'key' && _isSimpleClosure(arg.expression)) {
         hasKey = true;
-      } else if (label == 'value' && _isSimpleClosure(arg.argumentExpression)) {
+      } else if (label == 'value' && _isSimpleClosure(arg.expression)) {
         hasValue = true;
       }
     }

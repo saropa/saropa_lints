@@ -500,13 +500,11 @@ class PreferVisibilityOverOpacityZeroRule extends SaropaLintRule {
       if (typeName != 'Opacity') return;
 
       for (final arg in node.argumentList.arguments) {
-        // analyzer 13 renamed NamedExpression -> NamedArgument: `.name` is
-        // now the Token directly, and `.expression` -> `.argumentExpression`.
-        if (arg is! NamedArgument) continue;
-        if (arg.name.lexeme != 'opacity') continue;
+        if (arg is! NamedExpression) continue;
+        if (arg.name.label.name != 'opacity') continue;
 
         // Check for literal 0 or 0.0
-        final expr = arg.argumentExpression;
+        final expr = arg.expression;
         if (expr is IntegerLiteral && expr.value == 0) {
           reporter.atNode(node.constructorName);
           return;

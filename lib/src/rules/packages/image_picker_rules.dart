@@ -40,11 +40,9 @@ bool _isTestFilePath(String path) {
 }
 
 Expression? _namedArg(MethodInvocation node, String name) {
-  // analyzer 13: NamedExpression -> NamedArgument; `.name.lexeme` replaces
-  // `.name.label.name`, and `.argumentExpression` replaces `.expression`.
-  for (final Argument arg in node.argumentList.arguments) {
-    if (arg is NamedArgument && arg.name.lexeme == name) {
-      return arg.argumentExpression;
+  for (final Expression arg in node.argumentList.arguments) {
+    if (arg is NamedExpression && arg.name.label.name == name) {
+      return arg.expression;
     }
   }
   return null;
@@ -634,11 +632,9 @@ class PreferImagePickerMaxDimensionsRule extends SaropaLintRule {
       bool hasMaxWidth = false;
       bool hasMaxHeight = false;
 
-      // analyzer 13: NamedExpression -> NamedArgument; `.name.lexeme`
-      // replaces `.name.label.name`.
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final String name = arg.name.lexeme;
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression) {
+          final String name = arg.name.label.name;
           if (name == 'source') hasSourceParam = true;
           if (name == 'maxWidth') hasMaxWidth = true;
           if (name == 'maxHeight') hasMaxHeight = true;

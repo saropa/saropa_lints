@@ -59,18 +59,15 @@ bool _isSvgPictureNode(InstanceCreationExpression node) {
 /// [name].
 bool _hasNamedArg(InstanceCreationExpression node, String name) {
   for (final arg in node.argumentList.arguments) {
-    // analyzer 13: NamedExpression -> NamedArgument; the arg name is now a
-    // bare Token, so `.name.lexeme` replaces `.name.label.name`.
-    if (arg is NamedArgument && arg.name.lexeme == name) return true;
+    if (arg is NamedExpression && arg.name.label.name == name) return true;
   }
   return false;
 }
 
-/// Returns the [NamedArgument] for [name], or null if absent.
-// analyzer 13: NamedExpression -> NamedArgument.
-NamedArgument? _namedArg(InstanceCreationExpression node, String name) {
+/// Returns the [NamedExpression] for [name], or null if absent.
+NamedExpression? _namedArg(InstanceCreationExpression node, String name) {
   for (final arg in node.argumentList.arguments) {
-    if (arg is NamedArgument && arg.name.lexeme == name) return arg;
+    if (arg is NamedExpression && arg.name.label.name == name) return arg;
   }
   return null;
 }
@@ -80,8 +77,7 @@ NamedArgument? _namedArg(InstanceCreationExpression node, String name) {
 double? _literalDouble(InstanceCreationExpression node, String argName) {
   final arg = _namedArg(node, argName);
   if (arg == null) return null;
-  // analyzer 13: NamedArgument.expression -> .argumentExpression.
-  final expr = arg.argumentExpression;
+  final expr = arg.expression;
   if (expr is IntegerLiteral) return expr.value?.toDouble();
   if (expr is DoubleLiteral) return expr.value;
   return null;
@@ -93,8 +89,7 @@ double? _literalDouble(InstanceCreationExpression node, String argName) {
 /// the trailing comma so the remaining arguments stay valid; falls back to the
 /// leading comma when the argument is last. Returns null when the range cannot
 /// be computed safely.
-// analyzer 13: NamedExpression -> NamedArgument.
-SourceRange? _namedArgDeletionRange(NamedArgument named) {
+SourceRange? _namedArgDeletionRange(NamedExpression named) {
   int start = named.offset;
   int end = named.end;
 
@@ -233,8 +228,7 @@ class _PreferSvgColorFilterFix extends SaropaFixProducer {
 
     // Reject non-provably-non-null color expressions: nullable types,
     // conditional expressions, and null-aware operators are not safe.
-    // analyzer 13: NamedArgument.expression -> .argumentExpression.
-    final colorExpr = colorArg.argumentExpression;
+    final colorExpr = colorArg.expression;
 
     // Simple heuristic: trust constructor calls, prefixed/property accesses,
     // simple identifiers, and method invocations; reject anything else (e.g.
@@ -253,15 +247,14 @@ class _PreferSvgColorFilterFix extends SaropaFixProducer {
     final bool colorIsConst =
         colorExpr is InstanceCreationExpression &&
         colorExpr.keyword?.lexeme == 'const';
-    // analyzer 13: NamedArgument.expression -> .argumentExpression.
     final bool blendIsConst =
         blendArg == null ||
-        blendArg.argumentExpression is PrefixedIdentifier ||
-        blendArg.argumentExpression is SimpleIdentifier;
+        blendArg.expression is PrefixedIdentifier ||
+        blendArg.expression is SimpleIdentifier;
     final bool useConst = colorIsConst && blendIsConst;
 
     final String blendSrc =
-        blendArg?.argumentExpression.toSource() ?? 'BlendMode.srcIn';
+        blendArg?.expression.toSource() ?? 'BlendMode.srcIn';
     final String colorSrc = colorExpr.toSource();
     final String constKw = useConst ? 'const ' : '';
     final String colorFilterSrc =
@@ -485,8 +478,7 @@ class SvgMissingSemanticsLabelRule extends SaropaLintRule {
       // Suppress when explicitly excluded from semantics (decorative SVG).
       final excludeArg = _namedArg(node, 'excludeFromSemantics');
       if (excludeArg != null) {
-        // analyzer 13: NamedArgument.expression -> .argumentExpression.
-        final val = excludeArg.argumentExpression;
+        final val = excludeArg.expression;
         // BooleanLiteral true → legitimately decorative, skip.
         if (val is BooleanLiteral && val.value) return;
       }
@@ -494,7 +486,7 @@ class SvgMissingSemanticsLabelRule extends SaropaLintRule {
       // Suppress when a semanticsLabel is present and is not an empty literal.
       final labelArg = _namedArg(node, 'semanticsLabel');
       if (labelArg != null) {
-        final val = labelArg.argumentExpression;
+        final val = labelArg.expression;
         // Any non-literal expression (variable, method call) is trusted.
         if (val is! StringLiteral) return;
         final strVal = val.stringValue;
@@ -600,9 +592,7 @@ class SvgStringMissingErrorBuilderRule extends SaropaLintRule {
   /// Returns the first positional (non-named) argument, or null.
   Expression? _firstPositionalArg(InstanceCreationExpression node) {
     for (final arg in node.argumentList.arguments) {
-      // analyzer 13: argumentList.arguments is NodeList<Argument>. Any
-      // non-NamedArgument entry is a positional Expression.
-      if (arg is! NamedArgument) return arg as Expression;
+      if (arg is! NamedExpression) return arg;
     }
     return null;
   }
@@ -673,15 +663,12 @@ class RequireSvgErrorHandlerRule extends SaropaLintRule {
         return;
       }
 
-      // Check for errorBuilder parameter.
-      // analyzer 13: argumentList.arguments is NodeList<Argument>, not
-      // NodeList<Expression>; named args are now NamedArgument with a bare
-      // Token name (`.lexeme` instead of `.label.name`).
+      // Check for errorBuilder parameter
       final bool hasErrorBuilder = node.argumentList.arguments.any((
-        Argument arg,
+        Expression arg,
       ) {
-        if (arg is NamedArgument) {
-          return arg.name.lexeme == 'errorBuilder';
+        if (arg is NamedExpression) {
+          return arg.name.label.name == 'errorBuilder';
         }
         return false;
       });

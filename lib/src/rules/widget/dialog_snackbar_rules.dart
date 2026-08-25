@@ -63,8 +63,8 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
 
       // Check for duration parameter
       bool hasDuration = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'duration') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression && arg.name.label.name == 'duration') {
           hasDuration = true;
           break;
         }
@@ -136,8 +136,9 @@ class RequireDialogBarrierDismissibleRule extends SaropaLintRule {
 
       // Check for barrierDismissible parameter
       bool hasBarrierDismissible = false;
-      for (final Argument arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'barrierDismissible') {
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'barrierDismissible') {
           hasBarrierDismissible = true;
           break;
         }
@@ -518,7 +519,7 @@ class RequireSnackbarActionForUndoRule extends SaropaLintRule {
       // Check if has action parameter
       bool hasAction = false;
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument && arg.name.lexeme == 'action') {
+        if (arg is NamedExpression && arg.name.label.name == 'action') {
           hasAction = true;
           break;
         }

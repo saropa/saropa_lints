@@ -10,11 +10,10 @@ import '../../native/saropa_fix.dart';
 /// so the type is inferred (e.g. `(int x) => …` becomes `(x) => …`).
 ///
 /// Matches `AvoidTypesOnClosureParametersRule`. The rule reports at a
-/// [RegularFormalParameter] (analyzer 13 merged SimpleFormalParameter into
-/// this type) whose ancestor is a [FunctionExpression] (i.e. a closure, not
-/// a top-level/method declaration where types still serve as the declared
-/// API). We delete from the type's start through the whitespace separating
-/// it from the parameter name.
+/// [SimpleFormalParameter] whose ancestor is a [FunctionExpression] (i.e.
+/// a closure, not a top-level/method declaration where types still serve
+/// as the declared API). We delete from the type's start through the
+/// whitespace separating it from the parameter name.
 class RemoveClosureParameterTypeFix extends SaropaFixProducer {
   RemoveClosureParameterTypeFix({required super.context});
 
@@ -32,11 +31,9 @@ class RemoveClosureParameterTypeFix extends SaropaFixProducer {
     final AstNode? node = coveringNode;
     if (node == null) return;
 
-    // analyzer 13 merged SimpleFormalParameter/FunctionTypedFormalParameter
-    // into RegularFormalParameter (no deprecated alias).
-    final RegularFormalParameter? param = node is RegularFormalParameter
+    final SimpleFormalParameter? param = node is SimpleFormalParameter
         ? node
-        : node.thisOrAncestorOfType<RegularFormalParameter>();
+        : node.thisOrAncestorOfType<SimpleFormalParameter>();
     if (param == null) return;
 
     final TypeAnnotation? type = param.type;

@@ -64,11 +64,10 @@ bool _isInsideBuildMethod(AstNode node) {
 }
 
 /// Unwraps a (possibly defaulted) formal parameter to its declared type.
-/// analyzer 13: DefaultFormalParameter is removed (no wrapping); every
-/// FormalParameter carries its own optional defaultClause. SimpleFormalParameter
-/// and FunctionTypedFormalParameter are merged into RegularFormalParameter.
 TypeAnnotation? _parameterType(FormalParameter param) {
-  if (param is RegularFormalParameter) return param.type;
+  FormalParameter inner = param;
+  if (inner is DefaultFormalParameter) inner = inner.parameter;
+  if (inner is SimpleFormalParameter) return inner.type;
   return null;
 }
 
@@ -85,9 +84,9 @@ bool _isInsideTry(AstNode node) {
 }
 
 /// Named argument with label [name] on a constructor/method call, or null.
-NamedArgument? _namedArgExpression(ArgumentList args, String name) {
-  for (final Argument arg in args.arguments) {
-    if (arg is NamedArgument && arg.name.lexeme == name) {
+NamedExpression? _namedArgExpression(ArgumentList args, String name) {
+  for (final Expression arg in args.arguments) {
+    if (arg is NamedExpression && arg.name.label.name == name) {
       return arg;
     }
   }
@@ -233,7 +232,7 @@ class GoogleMapsCloudMapIdDeprecatedRule extends SaropaLintRule {
       if (node.constructorName.type.name.lexeme != 'GoogleMap') return;
       if (!fileImportsPackage(node, PackageImports.googleMapsFlutter)) return;
 
-      final NamedArgument? arg = _namedArgExpression(
+      final NamedExpression? arg = _namedArgExpression(
         node.argumentList,
         'cloudMapId',
       );
@@ -254,9 +253,9 @@ class _RenameCloudMapIdFix extends ReplaceNodeFix {
 
   @override
   String computeReplacement(AstNode node) {
-    if (node is NamedArgument) {
+    if (node is NamedExpression) {
       // Keep the original value source; only the label changes.
-      return 'mapId: ${node.argumentExpression.toSource()}';
+      return 'mapId: ${node.expression.toSource()}';
     }
     return node.toSource();
   }

@@ -93,10 +93,8 @@ class AvoidPrefsForLargeDataRule extends SaropaLintRule {
       }
 
       // Check for patterns that suggest large data storage
-      // Migrated: arguments returns NodeList<Argument> in analyzer 13;
-      // use .argumentExpression to get the Expression value.
       if (node.argumentList.arguments.length >= 2) {
-        final keyArg = node.argumentList.arguments.first.argumentExpression;
+        final Expression keyArg = node.argumentList.arguments.first;
         final String keySource = keyArg.toSource().toLowerCase();
 
         // Flag keys that suggest storing collections
@@ -355,12 +353,14 @@ class AvoidSharedPrefsInIsolateRule extends SaropaLintRule {
     return false;
   }
 
-  /// Migrated: SimpleFormalParameter → RegularFormalParameter,
-  /// DefaultFormalParameter removed — param IS the actual parameter now
-  /// (analyzer 13 API).
   String? _getParameterTypeName(FormalParameter param) {
-    if (param is RegularFormalParameter) {
+    if (param is SimpleFormalParameter) {
       return param.type?.toSource();
+    } else if (param is DefaultFormalParameter) {
+      final inner = param.parameter;
+      if (inner is SimpleFormalParameter) {
+        return inner.type?.toSource();
+      }
     }
     return null;
   }
@@ -455,14 +455,10 @@ class PreferTypedPrefsWrapperRule extends SaropaLintRule {
       }
 
       // Check if key is a string literal (not a constant)
-      // Migrated: NodeList<Expression> → use inferred type
-      // (analyzer 13: arguments returns NodeList<Argument>).
-      final args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      // Migrated: args.first returns Argument; use .argumentExpression
-      // to get the Expression (analyzer 13 API).
-      final keyArg = args.first.argumentExpression;
+      final Expression keyArg = args.first;
       if (keyArg is SimpleStringLiteral) {
         // Direct string literal - suggests not using a wrapper
         reporter.atNode(node);
@@ -578,9 +574,7 @@ class AvoidAuthStateInPrefsRule extends SaropaLintRule {
       final ArgumentList args = node.argumentList;
       if (args.arguments.isEmpty) return;
 
-      // Migrated: .first returns Argument; use .argumentExpression
-      // for the Expression value (analyzer 13 API).
-      final String keySource = args.arguments.first.argumentExpression.toSource().toLowerCase();
+      final String keySource = args.arguments.first.toSource().toLowerCase();
       for (final String sensitive in _sensitiveKeys) {
         if (RegExp(
           r'\b' + RegExp.escape(sensitive) + r'\b',
@@ -698,9 +692,7 @@ class PreferEncryptedPrefsRule extends SaropaLintRule {
       // `shopping_cart`, `spinner`, `mapping`, `topping` all contain the
       // letters "pin" — which at ERROR severity would break unrelated builds.
       // Word boundaries keep `pin_code` / `pin` while dropping those.
-      // Migrated: .first returns Argument; use .argumentExpression
-      // for the Expression value (analyzer 13 API).
-      final String keySource = args.arguments.first.argumentExpression.toSource().toLowerCase();
+      final String keySource = args.arguments.first.toSource().toLowerCase();
       for (final String sensitive in _sensitivePatterns) {
         if (RegExp(
           r'\b' + RegExp.escape(sensitive) + r'\b',
@@ -812,12 +804,10 @@ class AvoidSharedPrefsSensitiveDataRule extends SaropaLintRule {
       }
 
       // Check first argument (key) for sensitive patterns
-      // Migrated: NodeList<Expression> → inferred type, .first returns
-      // Argument (analyzer 13: arguments returns NodeList<Argument>).
-      final args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final keyArg = args.first.argumentExpression;
+      final Expression keyArg = args.first;
       final String keySource = keyArg.toSource().toLowerCase();
 
       for (final String sensitiveKey in _sensitiveKeys) {
@@ -994,12 +984,10 @@ class RequireSharedPrefsKeyConstantsRule extends SaropaLintRule {
       }
 
       // Check first argument for string literal
-      // Migrated: NodeList<Expression> → inferred type, .first returns
-      // Argument; use .argumentExpression (analyzer 13 API).
-      final args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.isEmpty) return;
 
-      final keyArg = args.first.argumentExpression;
+      final Expression keyArg = args.first;
       if (keyArg is SimpleStringLiteral || keyArg is AdjacentStrings) {
         reporter.atNode(keyArg);
       }
@@ -1086,14 +1074,10 @@ class AvoidSharedPrefsLargeDataRule extends SaropaLintRule {
       }
 
       // Check if value argument contains serialization
-      // Migrated: NodeList<Expression> → inferred type
-      // (analyzer 13: arguments returns NodeList<Argument>).
-      final args = node.argumentList.arguments;
+      final NodeList<Expression> args = node.argumentList.arguments;
       if (args.length < 2) return;
 
-      // Migrated: args[i] returns Argument; use .argumentExpression
-      // for the Expression value (analyzer 13 API).
-      final String valueSource = args[1].argumentExpression.toSource();
+      final String valueSource = args[1].toSource();
       for (final String pattern in _serializationPatterns) {
         if (valueSource.contains(pattern)) {
           reporter.atNode(node);

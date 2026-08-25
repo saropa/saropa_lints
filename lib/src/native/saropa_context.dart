@@ -697,6 +697,13 @@ class SaropaContext {
     _registry.addDeclaredVariablePattern(_rule, _visitor);
   }
 
+  void addDefaultFormalParameter(
+    void Function(DefaultFormalParameter) callback,
+  ) {
+    _visitor.onDefaultFormalParameter = _wrapCallback(callback);
+    _registry.addDefaultFormalParameter(_rule, _visitor);
+  }
+
   void addDoStatement(void Function(DoStatement) callback) {
     _visitor.onDoStatement = _wrapCallback(callback);
     _registry.addDoStatement(_rule, _visitor);
@@ -876,9 +883,9 @@ class SaropaContext {
     _registry.addMixinDeclaration(_rule, _visitor);
   }
 
-  void addNamedArgument(void Function(NamedArgument) callback) {
-    _visitor.onNamedArgument = _wrapCallback(callback);
-    _registry.addNamedArgument(_rule, _visitor);
+  void addNamedExpression(void Function(NamedExpression) callback) {
+    _visitor.onNamedExpression = _wrapCallback(callback);
+    _registry.addNamedExpression(_rule, _visitor);
   }
 
   void addNamedType(void Function(NamedType) callback) {
@@ -958,11 +965,9 @@ class SaropaContext {
     _registry.addSimpleIdentifier(_rule, _visitor);
   }
 
-  void addRegularFormalParameter(
-    void Function(RegularFormalParameter) callback,
-  ) {
-    _visitor.onRegularFormalParameter = _wrapCallback(callback);
-    _registry.addRegularFormalParameter(_rule, _visitor);
+  void addSimpleFormalParameter(void Function(SimpleFormalParameter) callback) {
+    _visitor.onSimpleFormalParameter = _wrapCallback(callback);
+    _registry.addSimpleFormalParameter(_rule, _visitor);
   }
 
   void addSimpleStringLiteral(void Function(SimpleStringLiteral) callback) {
@@ -1065,11 +1070,6 @@ class SaropaContext {
   /// No-op: [FormalParameter] is not a visitable node in the native registry.
   ///
   /// Rules that need formal-parameter analysis should register for
-  /// [RegularFormalParameter] (covers what were [SimpleFormalParameter] and
-  /// [FunctionTypedFormalParameter] pre-analyzer-13) and check
-  /// [FormalParameter.defaultClause] for default-value handling (what was
-  /// [DefaultFormalParameter] pre-analyzer-13 — analyzer 13 removed the
-  /// wrapper node; default values are now a property directly on the
-  /// parameter node).
+  /// [SimpleFormalParameter] or [DefaultFormalParameter] instead.
   void addFormalParameter(void Function(FormalParameter) callback) {}
 }

@@ -272,13 +272,14 @@ class AvoidCircularDependenciesRule extends SaropaLintRule {
       for (final ClassMember member in node.bodyMembers) {
         if (member is ConstructorDeclaration) {
           for (final FormalParameter param in member.parameters.parameters) {
-            // analyzer 13: DefaultFormalParameter was removed — a defaulted
-            // simple parameter is now just a RegularFormalParameter with a
-            // populated .defaultClause, so one type check covers both the
-            // plain and defaulted cases the old branch handled separately.
             String? paramType;
-            if (param is RegularFormalParameter) {
+            if (param is SimpleFormalParameter) {
               paramType = param.type?.toSource();
+            } else if (param is DefaultFormalParameter) {
+              final NormalFormalParameter normalParam = param.parameter;
+              if (normalParam is SimpleFormalParameter) {
+                paramType = normalParam.type?.toSource();
+              }
             }
 
             if (paramType != null &&
@@ -492,7 +493,7 @@ class AvoidUiInDomainLayerRule extends SaropaLintRule {
       for (final FormalParameter param
           in node.parameters?.parameters ?? <FormalParameter>[]) {
         String? paramType;
-        if (param is RegularFormalParameter) {
+        if (param is SimpleFormalParameter) {
           paramType = param.type?.toSource();
         }
         if (paramType != null) {
@@ -733,8 +734,8 @@ class AvoidTouchOnlyGesturesRule extends SaropaLintRule {
       bool hasSecondaryOrHover = false;
 
       for (final arg in node.argumentList.arguments) {
-        if (arg is NamedArgument) {
-          final name = arg.name.lexeme;
+        if (arg is NamedExpression) {
+          final name = arg.name.label.name;
           if (name == 'onTap' || name == 'onTapDown') {
             hasOnTap = true;
           }
