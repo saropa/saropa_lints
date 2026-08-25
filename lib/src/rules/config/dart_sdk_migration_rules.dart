@@ -6,7 +6,6 @@ import 'package:analyzer/dart/ast/ast.dart';
 import 'package:meta/meta.dart' show visibleForTesting;
 
 import '../../config/pubspec_constraint_parser.dart';
-import '../../fixes/config/prefer_primary_constructor_fix.dart';
 import '../../saropa_lint_rule.dart';
 
 // =============================================================================
@@ -125,12 +124,6 @@ class PreferPrimaryConstructorRule extends SaropaLintRule {
   @override
   bool get requiresClassDeclaration => true;
 
-  @override
-  List<SaropaFixGenerator> get fixGenerators => [
-    ({required CorrectionProducerContext context}) =>
-        PreferPrimaryConstructorFix(context: context),
-  ];
-
   static const LintCode _code = LintCode(
     'prefer_primary_constructor',
     '[prefer_primary_constructor] This class is eligible for Dart 3.13+ '
@@ -167,10 +160,12 @@ class PreferPrimaryConstructorRule extends SaropaLintRule {
 /// the proposal. Purely syntactic — never touches a resolved type — so it can
 /// be exercised directly against an unresolved `parseString` AST in tests.
 ///
-/// Top-level (not a method) so both [PreferPrimaryConstructorRule] and
-/// [PreferPrimaryConstructorFix] share one eligibility check, and tests can
+/// Top-level (not a method) and `@visibleForTesting` so behavior tests can
 /// verify detection logic without depending on the SDK-gate/pubspec plumbing
-/// in [PreferPrimaryConstructorRule.runWithReporter].
+/// in [PreferPrimaryConstructorRule.runWithReporter], which requires a real
+/// project root with SDK >=3.13.0 that the shared `example/` fixture package
+/// does not have.
+@visibleForTesting
 bool isPrimaryConstructorEligible(ClassDeclaration node) {
   // Rule 6: not a mixin class.
   if (node.mixinKeyword != null) return false;
@@ -241,10 +236,8 @@ bool isPrimaryConstructorEligible(ClassDeclaration node) {
   final coveredFields = <String>{};
 
   for (final FormalParameter param in params) {
-    // analyzer 13 removed DefaultFormalParameter entirely — every
-    // FormalParameter now carries its own optional defaultClause directly,
-    // so there is no wrapper node left to unwrap here.
-    final actual = param;
+    // Unwrap DefaultFormalParameter to get the actual parameter.
+    final actual = param is DefaultFormalParameter ? param.parameter : param;
     if (actual is! FieldFormalParameter) return false;
     // Same rationale as field annotations above — annotated constructor
     // parameters (e.g. @Default()) have no established primary-ctor form.
