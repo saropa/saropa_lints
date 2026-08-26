@@ -24,6 +24,7 @@ import 'package:analyzer/file_system/physical_file_system.dart';
 // ignore: implementation_imports -- no public API for StringSource (analyzer <=7.4.x)
 import 'package:analyzer/src/string_source.dart';
 import 'package:path/path.dart' as p;
+import 'package:glob/glob.dart';
 
 import '../config/memory_mode.dart' show MemoryModeConfig;
 import '../config/runtime_tier_cap.dart';
@@ -52,6 +53,7 @@ class ScanRunner {
     this.applyExclusionsToFileList = true,
     this.debugRule,
     this.excludeLightLane = false,
+    this.excludedGlobs = const [],
   });
 
   /// Project root: config is loaded from here and relative [dartFiles] are resolved against it.
@@ -98,6 +100,11 @@ class ScanRunner {
   /// Map from rule name to its declared LintImpact name (error/warning/info).
   /// Built by `_prepare` so [_collectDiagnostics] can stamp each diagnostic.
   Map<String, String> _ruleImpactMap = const {};
+
+  /// User-defined glob patterns for files that should be excluded from scanning.
+  ///
+  /// Patterns are matched against paths relative to [targetPath].
+  final List<String> excludedGlobs;
 
   /// Builds an [AnalysisContextCollection] rooted at [projectRoot] for a
   /// long-lived caller (the scan daemon) to hold and reuse across many
@@ -366,13 +373,20 @@ class ScanRunner {
     return config.enabledRules;
   }
 
-  /// Resolves files to scan: [dartFiles] if non-empty (relative paths resolved against [targetPath], exclusions applied when [applyExclusionsToFileList]); otherwise discovers under [targetPath].
+  /// Resolves the Dart files that should be scanned.
+  ///
+  /// Uses [dartFiles] when explicit files were provided; otherwise discovers
+  /// Dart files recursively under [targetPath]. Built-in exclusions and
+  /// user-defined [excludedGlobs] are applied before scanning.
   List<String> _resolveDartFiles() {
     final raw = dartFiles;
+
     if (raw == null || raw.isEmpty) {
-      return _findDartFiles(targetPath);
+      return _findDartFiles(targetPath, excludedGlobs: excludedGlobs);
     }
+
     final root = p.absolute(targetPath);
+
     var list = raw
         .where((path) => path.trim().isNotEmpty)
         .map(
@@ -382,9 +396,14 @@ class ScanRunner {
         )
         .where((path) => path.endsWith('.dart'))
         .toList();
+
     if (applyExclusionsToFileList) {
-      list = list.where((path) => !_isExcluded(path)).toList();
+      list = list
+          .where((path) => !_isExcluded(path))
+          .where((path) => !_matchesExcludeGlob(path, excludedGlobs, root))
+          .toList();
     }
+
     return list;
   }
 
@@ -688,6 +707,30 @@ class ScanRunner {
     }
   }
 
+  /// Returns whether [filePath] matches any user-defined exclusion glob.
+  ///
+  /// The file path is converted to a path relative to [root] before matching,
+  /// allowing users to provide project-relative patterns. Path separators are
+  /// normalized so the same patterns work across supported platforms.
+  static bool _matchesExcludeGlob(
+    String filePath,
+    List<String> excludedGlobs,
+    String root,
+  ) {
+    if (excludedGlobs.isEmpty) {
+      return false;
+    }
+
+    final relativePath = p
+        .relative(filePath, from: p.absolute(root))
+        .replaceAll('\\', '/');
+
+    return excludedGlobs.any((pattern) {
+      final normalizedPattern = pattern.replaceAll('\\', '/');
+      return Glob(normalizedPattern).matches(relativePath);
+    });
+  }
+
   void _showProgress(
     int index,
     int total,
@@ -731,10 +774,15 @@ class ScanRunner {
   /// project's discovered file list up front (e.g. the scan daemon's
   /// `listFiles` request, which the IDE baseline scan uses to build chunked
   /// batches before issuing per-chunk resolved scans).
-  static List<String> discoverDartFiles(String directory) =>
-      _findDartFiles(directory);
+  static List<String> discoverDartFiles(String directory, {List<String> excludedGlobs = const []}) =>
+      _findDartFiles(directory,excludedGlobs: excludedGlobs);
 
-  static List<String> _findDartFiles(String directory) {
+  /// Discovers Dart files recursively while applying built-in exclusions and
+  /// user-defined [excludedGlobs].
+  static List<String> _findDartFiles(
+    String directory, {
+    List<String> excludedGlobs = const [],
+  }) {
     final dir = io.Directory(directory);
     if (!dir.existsSync()) return const [];
 
@@ -743,6 +791,7 @@ class ScanRunner {
         .whereType<io.File>()
         .where((f) => f.path.endsWith('.dart'))
         .where((f) => !_isExcluded(f.path))
+        .where((f) => !_matchesExcludeGlob(f.path, excludedGlobs, directory))
         .map((f) => p.normalize(f.path))
         .toList();
   }

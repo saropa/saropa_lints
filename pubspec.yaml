@@ -161,6 +161,7 @@ dependencies:
   # unresolvable for Flutter consumers. ^1.18.0 accepts Flutter's 1.18.0 and the
   # 1.18.3 already resolved here transitively. See the analyzer note below for the
   # full meta-pin rationale — do NOT raise this floor.
+  glob: ^2.1.3
   meta: ^1.18.3
 
   # # https://pub.dev/packages/json2yaml/changelog

@@ -89,6 +89,7 @@ Future<void> main(List<String> args) async {
     debugRule: parsed.debugRule,
     excludeLightLane: parsed.excludeLightLane,
     messageSink: parsed.quiet ? (_) {} : null,
+    excludedGlobs: parsed.excludedGlobs
   );
   // --resolve runs the slower, fully-resolved scan so that
   // InstanceCreationExpression and type-based rules actually fire; the default
@@ -451,6 +452,12 @@ void _printUsage() {
     '  --files <path>...    Scan only these Dart files (paths relative to path).',
   );
   print('  --files-from-stdin  Read one file path per line from stdin.');
+  print(
+    '  --exclude-globs <glob>... Exclude files matching one or more glob patterns.',
+  );
+  print(
+    '                      Patterns are relative to the scan target path.',
+  );
   print(
     '  --resolve           Fully resolve each file (type/element resolution)',
   );

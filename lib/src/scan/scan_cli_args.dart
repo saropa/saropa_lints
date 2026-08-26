@@ -53,6 +53,7 @@ class ScanCliArgs {
     this.profile = false,
     this.excludeLightLane = false,
     this.quiet = false,
+    this.excludedGlobs = const [],
   });
 
   final String path;
@@ -135,6 +136,12 @@ class ScanCliArgs {
   /// and stdout output (report or JSON). Useful for fully silent automation
   /// where only the exit code and optional --json-file-path output matter.
   final bool quiet;
+
+  /// User-defined glob patterns for files that should be excluded from scanning.
+  ///
+  /// Patterns are matched against paths relative to the scan target.
+  /// An empty list means no additional file exclusions are applied.
+  final List<String> excludedGlobs;
 }
 
 /// Parses [args] for the scan command.
@@ -170,6 +177,7 @@ ScanParseResult parseScanArgs(
   bool profile = false;
   bool excludeLightLane = false;
   bool quiet = false;
+  final excludedGlobs = <String>[];
 
   var i = 0;
   while (i < args.length) {
@@ -214,6 +222,24 @@ ScanParseResult parseScanArgs(
       i++;
       continue;
     }
+
+    // Collect one or more exclusion patterns until the next CLI option.
+    // Missing patterns are rejected instead of silently ignoring the flag.
+    if (arg == '--exclude-globs') {
+      i++;
+
+      if (i >= args.length || args[i].startsWith('--')) {
+        return ScanParseInvalid(
+          '--exclude-globs requires at least one glob pattern.',
+        );
+      }
+      while (i < args.length && !args[i].startsWith('--')) {
+        excludedGlobs.add(args[i]);
+        i++;
+      }
+      continue;
+    }
+
     if (arg == '--tier') {
       i++;
       if (i < args.length && !args[i].startsWith('--')) {
@@ -387,6 +413,7 @@ ScanParseResult parseScanArgs(
       profile: profile,
       excludeLightLane: excludeLightLane,
       quiet: quiet,
+      excludedGlobs: excludedGlobs,
     ),
   );
 }

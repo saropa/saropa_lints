@@ -145,6 +145,50 @@ void main() {
       ]);
     });
 
+    test('--exclude-globs collects patterns until next option', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--exclude-globs',
+        'linux/flutter/ephemeral/**',
+        'windows/flutter/ephemeral/**',
+        '--tier',
+        'essential',
+      ]);
+
+      expect(result, isA<ScanParseOk>());
+
+      final args = (result as ScanParseOk).args;
+
+      expect(args.excludedGlobs, [
+        'linux/flutter/ephemeral/**',
+        'windows/flutter/ephemeral/**',
+      ]);
+
+      expect(args.tier, 'essential');
+    });
+
+    test('--exclude-globs with no patterns returns invalid', () {
+      final result = parseScanArgs(['.', '--exclude-globs']);
+
+      expect(result, isA<ScanParseInvalid>());
+
+      expect(
+        (result as ScanParseInvalid).message,
+        contains('--exclude-globs requires at least one glob pattern'),
+      );
+    });
+
+    test('--exclude-globs with next option as value returns invalid', () {
+      final result = parseScanArgs(<String>[
+        '.',
+        '--exclude-globs',
+        '--tier',
+        'essential',
+      ]);
+
+      expect(result, isA<ScanParseInvalid>());
+    });
+
     test('--tier with value parses', () {
       for (final tier in [
         'essential',

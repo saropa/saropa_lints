@@ -63,6 +63,43 @@ void main() {
       }
     });
 
+    test('run excludes explicit dartFiles matching user glob patterns', () {
+      final tempDir = Directory.systemTemp.createTempSync(
+        'scan_runner_explicit_exclude_globs_',
+      );
+
+      try {
+        Directory('${tempDir.path}/lib').createSync(recursive: true);
+        Directory(
+          '${tempDir.path}/linux/flutter/ephemeral',
+        ).createSync(recursive: true);
+
+        File(
+          '${tempDir.path}/lib/keep.dart',
+        ).writeAsStringSync('void keep() {}\n');
+
+        File(
+          '${tempDir.path}/linux/flutter/ephemeral/skip.dart',
+        ).writeAsStringSync('void skip() {}\n');
+
+        final messages = <String>[];
+
+        final runner = ScanRunner(
+          targetPath: tempDir.path,
+          dartFiles: ['lib/keep.dart', 'linux/flutter/ephemeral/skip.dart'],
+          tier: 'essential',
+          excludedGlobs: ['linux/flutter/ephemeral/**'],
+          messageSink: messages.add,
+        );
+
+        runner.run();
+
+        expect(messages, contains('Scanning 1 files...'));
+      } finally {
+        safeDeleteDir(tempDir);
+      }
+    });
+
     test('run with tier uses tier rule set not config', () {
       final runner = ScanRunner(
         targetPath: projectRoot,
@@ -177,6 +214,47 @@ plugins:
       );
       try {
         expect(ScanRunner.discoverDartFiles(tempDir.path), isEmpty);
+      } finally {
+        safeDeleteDir(tempDir);
+      }
+    });
+
+    test('excludes files matching user-defined glob patterns', () {
+      final tempDir = Directory.systemTemp.createTempSync(
+        'scan_runner_exclude_globs_',
+      );
+
+      try {
+        Directory('${tempDir.path}/lib').createSync(recursive: true);
+
+        File(
+          '${tempDir.path}/lib/main.dart',
+        ).writeAsStringSync('void main() {}\n');
+
+        Directory(
+          '${tempDir.path}/linux/flutter/ephemeral/plugin',
+        ).createSync(recursive: true);
+
+        File(
+          '${tempDir.path}/linux/flutter/ephemeral/plugin/generated.dart',
+        ).writeAsStringSync('void generated() {}\n');
+
+        final files = ScanRunner.discoverDartFiles(
+          tempDir.path,
+          excludedGlobs: ['linux/flutter/ephemeral/**'],
+        );
+
+        final normalized = files.map((file) => file.replaceAll('\\', '/'));
+
+        expect(
+          normalized.any((file) => file.endsWith('/lib/main.dart')),
+          isTrue,
+        );
+
+        expect(
+          normalized.any((file) => file.contains('/linux/flutter/ephemeral/')),
+          isFalse,
+        );
       } finally {
         safeDeleteDir(tempDir);
       }
