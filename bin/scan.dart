@@ -89,7 +89,7 @@ Future<void> main(List<String> args) async {
     debugRule: parsed.debugRule,
     excludeLightLane: parsed.excludeLightLane,
     messageSink: parsed.quiet ? (_) {} : null,
-    excludedGlobs: parsed.excludedGlobs
+    excludedGlobs: parsed.excludedGlobs,
   );
   // --resolve runs the slower, fully-resolved scan so that
   // InstanceCreationExpression and type-based rules actually fire; the default

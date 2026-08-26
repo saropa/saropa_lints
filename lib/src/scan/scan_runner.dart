@@ -774,8 +774,13 @@ class ScanRunner {
   /// project's discovered file list up front (e.g. the scan daemon's
   /// `listFiles` request, which the IDE baseline scan uses to build chunked
   /// batches before issuing per-chunk resolved scans).
-  static List<String> discoverDartFiles(String directory, {List<String> excludedGlobs = const []}) =>
-      _findDartFiles(directory,excludedGlobs: excludedGlobs);
+  static List<String> discoverDartFiles(
+      String directory, {
+        List<String> excludedGlobs = const [],
+      }) => _findDartFiles(
+    directory,
+    excludedGlobs: excludedGlobs,
+  );
 
   /// Discovers Dart files recursively while applying built-in exclusions and
   /// user-defined [excludedGlobs].
