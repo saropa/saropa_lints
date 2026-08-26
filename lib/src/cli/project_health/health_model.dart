@@ -128,24 +128,24 @@ class FileHealth {
     'codeLoc': codeLoc,
     'commentLoc': commentLoc,
     'blankLoc': blankLoc,
-    'commentRatio': double.parse(commentRatio.toStringAsFixed(4)),
+    'commentRatio': roundToDecimalPlaces(commentRatio, 4),
     if (complexity != null) 'complexity': complexity!.toJson(),
     if (maintainability != null)
-      'maintainability': double.parse(maintainability!.toStringAsFixed(2)),
+      'maintainability': roundToDecimalPlaces(maintainability!, 2),
     if (docCoverage != null)
-      'docCoverage': double.parse(docCoverage!.toStringAsFixed(4)),
+      'docCoverage': roundToDecimalPlaces(docCoverage!, 4),
     if (isUnusedFile) 'isUnusedFile': true,
     if (deadSymbols > 0) 'deadSymbols': deadSymbols,
     if (coveragePct != null)
-      'coveragePct': double.parse(coveragePct!.toStringAsFixed(4)),
+      'coveragePct': roundToDecimalPlaces(coveragePct!, 4),
     if (churn != null) 'churn': churn,
     if (lastCommitDaysAgo != null) 'lastCommitDaysAgo': lastCommitDaysAgo,
     if (busFactorPct != null)
-      'busFactorPct': double.parse(busFactorPct!.toStringAsFixed(4)),
+      'busFactorPct': roundToDecimalPlaces(busFactorPct!, 4),
     if (fanIn != null) 'fanIn': fanIn,
     if (fanOut != null) 'fanOut': fanOut,
     if (instability != null)
-      'instability': double.parse(instability!.toStringAsFixed(4)),
+      'instability': roundToDecimalPlaces(instability!, 4),
     if (perfWeight > 0) 'perfWeight': perfWeight,
     if (perfPatternCount > 0) 'perfPatternCount': perfPatternCount,
   };

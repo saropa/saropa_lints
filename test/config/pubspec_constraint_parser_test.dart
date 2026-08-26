@@ -54,10 +54,7 @@ void main() {
       );
     });
     test('RequireSdkSyntaxMatchRule', () {
-      expectMetadata(
-        RequireSdkSyntaxMatchRule(),
-        'require_sdk_syntax_match',
-      );
+      expectMetadata(RequireSdkSyntaxMatchRule(), 'require_sdk_syntax_match');
     });
   });
 

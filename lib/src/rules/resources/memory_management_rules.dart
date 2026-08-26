@@ -9,8 +9,10 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
+import 'package:analyzer/dart/element/type.dart';
 
 import '../../fixes/memory_management/add_mounted_check_fix.dart';
+import '../../flutter_widget_utils.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when large objects are stored in widget state.
@@ -1598,6 +1600,20 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
         final TypeAnnotation? type = member.fields.type;
         if (type == null) continue;
 
+        // Prefer the resolved static type: it distinguishes Flutter's
+        // `Widget`/`State`/`Element` from same-named classes in unrelated
+        // packages (e.g. analyzer's `Element`), which the old raw-source
+        // string match could not — that mismatch produced false positives
+        // in non-Flutter Dart packages (this repo included). Only fall back
+        // to the name-only heuristic when the type genuinely can't be
+        // resolved, so parsed-only (unresolved-AST) callers keep detecting.
+        if (type.type != null) {
+          if (_isWidgetRelatedType(type.type)) {
+            reporter.atNode(member);
+          }
+          continue;
+        }
+
         final String typeSource = type.toSource();
 
         // Exact-match against known Flutter lifecycle types
@@ -1612,6 +1628,24 @@ class AvoidRetainingDisposedWidgetsRule extends SaropaLintRule {
         }
       }
     });
+  }
+
+  /// True when [type] (or its `List<T>` element type) resolves to one of
+  /// [_widgetTypes] AND that class is actually declared in
+  /// `package:flutter/` — the resolved-type counterpart of the name-only
+  /// fallback above.
+  bool _isWidgetRelatedType(DartType? type) {
+    if (type == null) return false;
+    DartType effective = type;
+    if (type is InterfaceType &&
+        type.element.name == 'List' &&
+        type.typeArguments.isNotEmpty) {
+      effective = type.typeArguments.first;
+    }
+    if (effective is! InterfaceType) return false;
+    final InterfaceElement element = effective.element;
+    return _widgetTypes.contains(element.name) &&
+        isFlutterSdkInterface(element);
   }
 
   /// Check if class extends a known Flutter widget base class.

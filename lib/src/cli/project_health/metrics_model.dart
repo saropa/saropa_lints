@@ -7,6 +7,18 @@ library;
 
 import 'dart:math' as math;
 
+/// Rounds [value] to [decimalPlaces] decimal places without a string
+/// round-trip. Replaces the `double.parse(value.toStringAsFixed(n))` idiom
+/// (previously used throughout this package to truncate JSON output
+/// precision) — that pattern tripped `prefer_try_parse_for_dynamic_data`
+/// because the rule can't see that a self-produced `toStringAsFixed` string
+/// is always parseable; doing the rounding arithmetically sidesteps both the
+/// false positive and the unnecessary parse/format cost.
+double roundToDecimalPlaces(double value, int decimalPlaces) {
+  final factor = math.pow(10, decimalPlaces);
+  return (value * factor).round() / factor;
+}
+
 /// One function/method's complexity profile.
 class FunctionMetric {
   const FunctionMetric({
@@ -95,7 +107,7 @@ class ClassMetric {
     'fieldCount': fieldCount,
     'methodCount': methodCount,
     'publicMembers': publicMembers,
-    'lcom': double.parse(lcom.toStringAsFixed(4)),
+    'lcom': roundToDecimalPlaces(lcom, 4),
   };
 }
 
@@ -169,7 +181,7 @@ class FileComplexity {
     'maxVariableCount': maxVariableCount,
     'maxBooleanTerms': maxBooleanTerms,
     'maxNesting': maxNesting,
-    'worstLcom': double.parse(worstLcom.toStringAsFixed(4)),
+    'worstLcom': roundToDecimalPlaces(worstLcom, 4),
     if (topFunctions.isNotEmpty)
       'topFunctions': [for (final f in topFunctions) f.toJson()],
   };

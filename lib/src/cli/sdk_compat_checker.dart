@@ -285,8 +285,7 @@ class _SdkFeatureVisitor extends RecursiveAstVisitor<void> {
   void _check(AstNode node, SemverParts required, String feature) {
     if (!_isHigher(required, declaredBound)) return;
     final line = node.offset >= 0 ? _lineOf(node) : 0;
-    final version =
-        '${required.major}.${required.minor}.${required.patch}';
+    final version = '${required.major}.${required.minor}.${required.patch}';
     hits.add(SdkFeatureHit(filePath, line, feature, version));
   }
 

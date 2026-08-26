@@ -1,6 +1,6 @@
 # known_issues.json manual review queue
 
-Generated (regenerated at publish time). Checked 302 lifecycle/business-model entries against live pub.dev (13 network error(s)); 50 appear outgrown by a newer release.
+Generated (regenerated at publish time). Checked 302 lifecycle/business-model entries against live pub.dev (13 network error(s)); 51 appear outgrown by a newer release.
 
 Each entry needs a human read of the current reason against the package's present state before editing `known_issues.json` — this report does not edit the file.
 
@@ -10,7 +10,7 @@ Each entry needs a human read of the current reason against the package's presen
 
 _None._
 
-## MEDIUM confidence — lifecycle claim, package still releasing (35)
+## MEDIUM confidence — lifecycle claim, package still releasing (36)
 
 **Suggested action:** Reread the reason against the package's current state; a release doesn't disprove e.g. a specific unfixed bug, but often the underlying complaint has moved on too.
 
@@ -22,7 +22,7 @@ _None._
   - Current reason: Fails on Apple Silicon builds.
 - **`badges`** (end_of_life) — recorded `2023-08-28`, pub.dev latest `2026-04-10` (v3.2.0). [pub.dev](https://pub.dev/packages/badges)
   - Current reason: Positioning logic broken; badges render off-screen in Material 3.
-- **`better_player`** (maintenance_mode) — recorded `2024-06-15`, pub.dev latest `2026-08-21` (v0.8.0). [pub.dev](https://pub.dev/packages/better_player)
+- **`better_player`** (maintenance_mode) — recorded `2024-06-15`, pub.dev latest `2026-08-24` (v0.8.1). [pub.dev](https://pub.dev/packages/better_player)
   - Current reason: 
 - **`camera`** (end_of_life) — recorded `2026-02-25`, pub.dev latest `2026-07-13` (v0.12.0+2). [pub.dev](https://pub.dev/packages/camera)
   - Current reason: Fails Android 14 Scoped Storage and iOS 18 hardware manifest requirements.
@@ -30,12 +30,14 @@ _None._
   - Current reason: Code generator fails completely on Dart 3.
 - **`desktop_window`** (end_of_life) — recorded `2024-10-29`, pub.dev latest `2026-05-29` (v0.4.4). [pub.dev](https://pub.dev/packages/desktop_window)
   - Current reason: Obsolete since native Flutter desktop size support was added.
-- **`file_picker`** (end_of_life) — recorded `2026-01-28`, pub.dev latest `2026-08-14` (v12.0.0). [pub.dev](https://pub.dev/packages/file_picker)
+- **`file_picker`** (end_of_life) — recorded `2026-01-28`, pub.dev latest `2026-08-25` (v12.1.0). [pub.dev](https://pub.dev/packages/file_picker)
   - Current reason: Returns unreadable cache paths.
 - **`flutter_cache_manager`** (end_of_life) — recorded `2024-08-13`, pub.dev latest `2026-07-21` (v3.4.2). [pub.dev](https://pub.dev/packages/flutter_cache_manager)
   - Current reason: Fails to clear disk space, leading to out-of-storage app crashes.
 - **`flutter_calendar_carousel`** (end_of_life) — recorded `2025-06-06`, pub.dev latest `2026-08-09` (v3.0.0). [pub.dev](https://pub.dev/packages/flutter_calendar_carousel)
   - Current reason: Swiping physics conflicts with Flutter 3 engine updates, causing stutter.
+- **`flutter_downloader`** (end_of_life) — recorded `2025-01-23`, pub.dev latest `2026-08-22` (v1.12.1). [pub.dev](https://pub.dev/packages/flutter_downloader)
+  - Current reason: Progress synchronization isolates are broken, leaving ghost notifications.
 - **`flutter_email_sender`** (caution) — recorded `2025-09-12`, pub.dev latest `2026-06-15` (v10.0.1). [pub.dev](https://pub.dev/packages/flutter_email_sender)
   - Current reason: File attachment intents may crash due to modern FileProvider security rules.
 - **`flutter_local_notifications`** (end_of_life) — recorded `2026-03-05`, pub.dev latest `2026-08-08` (v22.3.0). [pub.dev](https://pub.dev/packages/flutter_local_notifications)
@@ -78,7 +80,7 @@ _None._
   - Current reason: Significant performance issues (UI jank) were reported with this package.
 - **`simple_animations`** (end_of_life) — recorded `2025-05-03`, pub.dev latest `2026-05-23` (v5.3.0). [pub.dev](https://pub.dev/packages/simple_animations)
   - Current reason: Stateless animation logic is fundamentally incompatible with Dart 3 type safety.
-- **`syncfusion_flutter_calendar`** (end_of_life) — recorded `2026-03-10`, pub.dev latest `2026-08-18` (v34.2.4). [pub.dev](https://pub.dev/packages/syncfusion_flutter_calendar)
+- **`syncfusion_flutter_calendar`** (end_of_life) — recorded `2026-03-10`, pub.dev latest `2026-08-25` (v34.2.5). [pub.dev](https://pub.dev/packages/syncfusion_flutter_calendar)
   - Current reason: Legacy commercial package; completely fails Dart 3 type checks.
 - **`workmanager`** (caution) — recorded `2025-08-31`, pub.dev latest `2026-08-20` (v0.10.9). [pub.dev](https://pub.dev/packages/workmanager)
   - Current reason: May have compatibility issues with modern Android WorkManager architecture.
@@ -105,7 +107,7 @@ _None._
   - Current reason: Session recording and heat-mapping tool. Generous free tier, but the cost scales incredibly steeply once you have a moderate user base.
 - **`mapbox_maps_flutter`** (freemium) — recorded `2026-02-26`, pub.dev latest `2026-08-21` (v2.29.0). [pub.dev](https://pub.dev/packages/mapbox_maps_flutter)
   - Current reason: Requires an active billing account and credit card to even generate the necessary public tokens. Charges per map-load/API request after you exceed their free tier.
-- **`purchases_flutter`** (freemium) — recorded `2026-03-05`, pub.dev latest `2026-08-19` (v10.9.1). [pub.dev](https://pub.dev/packages/purchases_flutter)
+- **`purchases_flutter`** (freemium) — recorded `2026-03-05`, pub.dev latest `2026-08-25` (v10.10.0). [pub.dev](https://pub.dev/packages/purchases_flutter)
   - Current reason: RevenueCat's proprietary wrapper. Free up to a specific monthly revenue limit, after which they take a percentage cut of your app's earnings.
 - **`scanbot_sdk`** (paid) — recorded `2025-11-03`, pub.dev latest `2026-07-22` (v9.0.1). [pub.dev](https://pub.dev/packages/scanbot_sdk)
   - Current reason: Strictly commercial enterprise SDK. Cannot be used in production without purchasing a highly expensive yearly corporate license from Scanbot.
@@ -115,7 +117,7 @@ _None._
   - Current reason: Proprietary Chat-as-a-Service SaaS. While it has a startup tier, it is a heavily vendor-locked enterprise product that scales aggressively in cost.
 - **`superwallkit_flutter`** (freemium) — recorded `2026-02-23`, pub.dev latest `2026-04-15` (v2.4.12). [pub.dev](https://pub.dev/packages/superwallkit_flutter)
   - Current reason: A paywall-as-a-service provider. Like RevenueCat, they inject themselves into your monetization flow and take a cut or charge a flat SaaS fee to manage your subscription UI.
-- **`syncfusion_flutter_core`** (commercial_trap) — recorded `2026-03-10`, pub.dev latest `2026-08-18` (v34.2.4). [pub.dev](https://pub.dev/packages/syncfusion_flutter_core)
+- **`syncfusion_flutter_core`** (commercial_trap) — recorded `2026-03-10`, pub.dev latest `2026-08-25` (v34.2.5). [pub.dev](https://pub.dev/packages/syncfusion_flutter_core)
   - Current reason: Syncfusion offers a 'Community License', but it is a legal trap. The moment your company hits $1M USD in gross revenue OR has more than 5 developers, you are legally required to buy their enterprise licenses.
 - **`zego_uikit_prebuilt_call`** (freemium) — recorded `2026-02-03`, pub.dev latest `2026-08-12` (v4.24.4). [pub.dev](https://pub.dev/packages/zego_uikit_prebuilt_call)
   - Current reason: Hooks the app into ZEGOCLOUD's proprietary infrastructure. Shifts from free-tier to a pay-as-you-go commercial model at scale.

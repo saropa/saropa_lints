@@ -116,6 +116,11 @@ Future<List<HarnessDiagnostic>> runRuleResolved(
     );
 
     final registry = CapturingRuleVisitorRegistry();
+    // Verified false positive: `context` is `_ResolvedRuleContext` (this
+    // file's own test-harness context, defined below), not Flutter's
+    // BuildContext. The scan CLI's default syntactic pass has no type
+    // information to distinguish that from the identifier name alone.
+    // ignore: avoid_context_across_async
     rule.registerNodeProcessors(registry, context);
     rule.reporter = reporter;
 

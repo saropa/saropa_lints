@@ -243,11 +243,13 @@ plugins:
       try {
         // Set up a kept file and a vendor file that should be excluded.
         Directory('${tempDir.path}/lib').createSync();
-        File('${tempDir.path}/lib/app.dart')
-            .writeAsStringSync('void main() {}\n');
+        File(
+          '${tempDir.path}/lib/app.dart',
+        ).writeAsStringSync('void main() {}\n');
         Directory('${tempDir.path}/vendor/pkg').createSync(recursive: true);
-        File('${tempDir.path}/vendor/pkg/dep.dart')
-            .writeAsStringSync('void dep() {}\n');
+        File(
+          '${tempDir.path}/vendor/pkg/dep.dart',
+        ).writeAsStringSync('void dep() {}\n');
 
         // discoverDartFiles is static and doesn't take globs, so verify
         // indirectly: construct with explicit dartFiles and check the glob
@@ -285,12 +287,15 @@ plugins:
       );
       try {
         Directory('${tempDir.path}/lib').createSync();
-        File('${tempDir.path}/lib/app.dart')
-            .writeAsStringSync('void main() {}\n');
-        Directory('${tempDir.path}/third_party/src')
-            .createSync(recursive: true);
-        File('${tempDir.path}/third_party/src/ext.dart')
-            .writeAsStringSync('void ext() {}\n');
+        File(
+          '${tempDir.path}/lib/app.dart',
+        ).writeAsStringSync('void main() {}\n');
+        Directory(
+          '${tempDir.path}/third_party/src',
+        ).createSync(recursive: true);
+        File(
+          '${tempDir.path}/third_party/src/ext.dart',
+        ).writeAsStringSync('void ext() {}\n');
 
         // Windows-style backslash pattern should still match after
         // normalization in _globToRegex.
@@ -307,8 +312,7 @@ plugins:
             expect(
               d.filePath,
               isNot(contains('third_party')),
-              reason:
-                  'backslash globs should match after normalization',
+              reason: 'backslash globs should match after normalization',
             );
           }
         }
@@ -329,8 +333,9 @@ plugins:
           '${tempDir.path}/linux/flutter/ephemeral',
         );
         ephemeralDir.createSync(recursive: true);
-        File('${ephemeralDir.path}/plugin.dart')
-            .writeAsStringSync('void plugin() {}\n');
+        File(
+          '${ephemeralDir.path}/plugin.dart',
+        ).writeAsStringSync('void plugin() {}\n');
 
         // Without includeGlobs, this file is excluded.
         final withoutInclude = ScanRunner(

@@ -12,6 +12,9 @@ library;
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/dart/element/type.dart';
+
+import 'flutter_widget_utils.dart';
 
 /// Checks if an AST node contains any await expressions.
 ///
@@ -350,6 +353,19 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
         return;
       }
 
+      // Skip when resolved type information proves this `context` is NOT
+      // Flutter's BuildContext — a variable/parameter merely NAMED `context`
+      // (e.g. an analyzer `RuleContext`, or this package's own scan-rule
+      // context types) is not subject to the widget-disposal danger this
+      // rule exists to catch. Only skip on a confident negative: unresolved
+      // types (null) fall through to the pre-existing name-only heuristic so
+      // callers without a resolved AST keep prior behavior.
+      final staticType = node.staticType;
+      if (staticType != null && !_isBuildContextType(staticType)) {
+        super.visitSimpleIdentifier(node);
+        return;
+      }
+
       // Skip if part of a mounted check (context.mounted is safe to access)
       final parent = node.parent;
       if (parent is PrefixedIdentifier && parent.identifier.name == 'mounted') {
@@ -394,6 +410,15 @@ class ContextUsageFinder extends RecursiveAstVisitor<void> {
       onContextFound(node);
     }
     super.visitSimpleIdentifier(node);
+  }
+
+  /// True when [type] is Flutter's `BuildContext` from `package:flutter/...`.
+  /// Delegates to the shared [isFlutterWidgetNamed] helper (also used by the
+  /// widget-detection rules) so the "is this really Flutter's class, not a
+  /// same-named class from another package" check has one implementation.
+  bool _isBuildContextType(DartType type) {
+    if (type is! InterfaceType) return false;
+    return isFlutterWidgetNamed(type.element, 'BuildContext');
   }
 
   /// Checks if node is in the then-branch of a mounted-guarded ternary.

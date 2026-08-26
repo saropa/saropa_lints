@@ -71,6 +71,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Fixed
 
 - **Scan CLI:** Rules with `usesTypeResolution`, INFO severity, or cost above `low` were silently blocked by the analysis-server lane gate, which defaulted to `light` in the CLI path. The scanner now runs at full lane coverage so all enabled rules fire correctly. No action required.
+- `avoid_context_across_async` and `avoid_retaining_disposed_widgets` now check the resolved type (when type information is available, e.g. in-editor or `--resolve` scans) instead of matching on the bare identifier/type name alone. Fixes false positives on non-Flutter classes that happen to be named `context` or `Element` (an analyzer `Element`, a custom `Context` type, etc.). No action required.
 
 ### Added
 
@@ -87,6 +88,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - `_rule_metrics.py`'s bug counter now reports open feature proposals separately from unsolved bugs in the publish "WORK REPORT" banner, instead of lumping both into one count.
 - Scan daemon and accuracy report now pass `lane: RuleLane.full` explicitly instead of relying on the constructor default.
 - Scan CLI warns when `--lane light` is combined with `--exclude-light-lane` (degenerate: zero rules to scan).
+- Fixed the 17 real ERROR-severity findings the full-lane self-scan (above) surfaced against this package's own source: `double.parse(x.toStringAsFixed(n))` round-trip patterns in the project-health/vibrancy models now round arithmetically via a shared `roundToDecimalPlaces` helper instead of parsing a self-produced string; a regex-guaranteed-digits `int.parse` triple in the pubspec constraint parser is annotated as a verified false positive. The remaining findings were genuine name-only false positives specific to the default syntactic (non-`--resolve`) scan mode, where no type information exists to rule them out — annotated as verified false positives with a one-line justification each.
 
 </details>
 

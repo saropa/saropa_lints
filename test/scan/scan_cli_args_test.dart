@@ -621,10 +621,7 @@ void main() {
       for (final sev in ['info', 'warning', 'error', 'INFO', 'Error']) {
         final result = parseScanArgs(<String>['.', '--fail-on-impact', sev]);
         expect(result, isA<ScanParseOk>());
-        expect(
-          (result as ScanParseOk).args.failOnImpact,
-          sev.toUpperCase(),
-        );
+        expect((result as ScanParseOk).args.failOnImpact, sev.toUpperCase());
       }
     });
 
@@ -694,14 +691,20 @@ void main() {
     });
 
     test('--fail-on-impact-count with negative value returns invalid', () {
-      final result =
-          parseScanArgs(<String>['.', '--fail-on-impact-count', '-1']);
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on-impact-count',
+        '-1',
+      ]);
       expect(result, isA<ScanParseInvalid>());
     });
 
     test('--fail-on-impact-count with non-integer returns invalid', () {
-      final result =
-          parseScanArgs(<String>['.', '--fail-on-impact-count', 'five']);
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on-impact-count',
+        'five',
+      ]);
       expect(result, isA<ScanParseInvalid>());
       expect(
         (result as ScanParseInvalid).message,
@@ -741,16 +744,18 @@ void main() {
     });
 
     test('--fail-on-tier is case-insensitive', () {
-      final result =
-          parseScanArgs(<String>['.', '--fail-on-tier', 'Essential']);
+      final result = parseScanArgs(<String>[
+        '.',
+        '--fail-on-tier',
+        'Essential',
+      ]);
       expect(result, isA<ScanParseOk>());
       // Parser lowercases the value to match tiers.dart convention.
       expect((result as ScanParseOk).args.failOnTier, 'essential');
     });
 
     test('--fail-on-tier with invalid value returns invalid', () {
-      final result =
-          parseScanArgs(<String>['.', '--fail-on-tier', 'maximum']);
+      final result = parseScanArgs(<String>['.', '--fail-on-tier', 'maximum']);
       expect(result, isA<ScanParseInvalid>());
       expect(
         (result as ScanParseInvalid).message,

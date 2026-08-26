@@ -193,6 +193,14 @@ class _ResolvedUsageVisitor extends RecursiveAstVisitor<void> {
   /// canonical element is on this stack is a self/recursive reference from
   /// within the declaration's own body and is NOT counted (the source plan
   /// counts only references *outside* the declaration).
+  ///
+  /// Verified false positive: `Element` here is
+  /// `package:analyzer/dart/element/element.dart`'s `Element` (a resolved
+  /// declaration handle), not Flutter's widget-tree `Element` — this file is
+  /// a pure analyzer-based scanner with no widget tree. The scan CLI's
+  /// default syntactic pass has no type information to distinguish the two
+  /// same-named classes from the bare `List<Element>` source text.
+  // ignore: avoid_retaining_disposed_widgets
   final List<Element> _enclosing = <Element>[];
 
   @override

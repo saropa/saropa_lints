@@ -156,7 +156,7 @@ class PreferPrimaryConstructorRule extends SaropaLintRule {
   }
 }
 
-/// Checks all eligibility conditions for [prefer_primary_constructor] from
+/// Checks all eligibility conditions for `prefer_primary_constructor` from
 /// the proposal. Purely syntactic — never touches a resolved type — so it can
 /// be exercised directly against an unresolved `parseString` AST in tests.
 ///

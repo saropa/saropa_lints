@@ -58,8 +58,8 @@ class ScanRunner {
     this.laneStats = false,
     List<String> excludeGlobs = const [],
     List<String> includeGlobs = const [],
-  })  : _excludePatterns = excludeGlobs.map(_globToRegex).toList(),
-        _includePatterns = includeGlobs.map(_globToRegex).toList();
+  }) : _excludePatterns = excludeGlobs.map(_globToRegex).toList(),
+       _includePatterns = includeGlobs.map(_globToRegex).toList();
 
   /// Project root: config is loaded from here and relative [dartFiles] are resolved against it.
   final String targetPath;
@@ -342,8 +342,7 @@ class ScanRunner {
     if (laneStats) {
       ensureRuleRegistryBuilt();
       final lightNames = lightLaneRuleNames;
-      final lightCount =
-          ruleNames.where((n) => lightNames.contains(n)).length;
+      final lightCount = ruleNames.where((n) => lightNames.contains(n)).length;
       final fullOnly = ruleNames.length - lightCount;
       _err(
         'Lane stats: ${ruleNames.length} enabled, '
@@ -354,8 +353,8 @@ class ScanRunner {
       // exactly what they're missing — this would have caught the original
       // bug where the CLI silently defaulted to light.
       if (lane == RuleLane.light) {
-        final blocked =
-            ruleNames.where((n) => !lightNames.contains(n)).toList()..sort();
+        final blocked = ruleNames.where((n) => !lightNames.contains(n)).toList()
+          ..sort();
         if (blocked.isNotEmpty) {
           _err('Blocked by light lane (${blocked.length}):');
           for (final name in blocked) {
@@ -463,8 +462,7 @@ class ScanRunner {
       // overrides in one pass.
       list = list
           .where(
-            (path) =>
-                _shouldInclude(path, _excludePatterns, _includePatterns),
+            (path) => _shouldInclude(path, _excludePatterns, _includePatterns),
           )
           .toList();
     }
@@ -714,8 +712,17 @@ class ScanRunner {
       // The factory in runResolved only ever produces ResolvedScanRuleContext,
       // so this cast is safe; updating its resolution results per file is what
       // makes type-based rules see the current file rather than the first one.
+      // Verified false positive: `context` here is this package's own
+      // ResolvedScanRuleContext (rule-registration state), not Flutter's
+      // BuildContext — there is no widget tree in this CLI tool. The scan
+      // CLI's default syntactic pass (see ScanRunner.run doc) has no type
+      // information to rule that out by itself, so avoid_context_across_async
+      // matches on the identifier name alone at each `context.` use below.
+      // ignore: avoid_context_across_async
       final context = reg.context as ResolvedScanRuleContext;
+      // ignore: avoid_context_across_async
       context.currentUnit = ctxUnit;
+      // ignore: avoid_context_across_async
       context.setResolved(
         typeProvider: result.typeProvider,
         typeSystem: result.typeSystem,
@@ -908,10 +915,7 @@ class ScanRunner {
   }
 
   /// Returns true if [path] matches any of the compiled [excludePatterns].
-  static bool _matchesExcludeGlob(
-    String path,
-    List<RegExp> excludePatterns,
-  ) {
+  static bool _matchesExcludeGlob(String path, List<RegExp> excludePatterns) {
     if (excludePatterns.isEmpty) return false;
     final normalized = path.replaceAll('\\', '/');
     return excludePatterns.any((re) => re.hasMatch(normalized));
