@@ -12,6 +12,7 @@ import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/json_datetime/add_null_aware_access_fix.dart';
+import '../../fixes/json_datetime/replace_dateonly_fix.dart';
 import '../../fixes/json_datetime/replace_datetime_constructor_fix.dart';
 import '../../fixes/json_datetime/use_date_time_try_parse_fix.dart';
 import '../../fixes/json_datetime/use_try_parse_fix.dart';
@@ -1990,6 +1991,9 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
+    // DateUtils.dateOnly() fix takes priority for the strip-time idiom.
+    ({required CorrectionProducerContext context}) =>
+        ReplaceDateOnlyFix(context: context),
     ({required CorrectionProducerContext context}) =>
         ReplaceDateTimeConstructorFix(context: context),
   ];
@@ -2107,6 +2111,15 @@ class AvoidDateTimeConstructorUnvalidatedRule extends SaropaLintRule {
   List<String> get relatedRules => const [
     'avoid_datetime_constructor',
     'avoid_datetime_parse_unvalidated',
+  ];
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    // DateUtils.dateOnly() fix for the strip-time idiom.
+    ({required CorrectionProducerContext context}) =>
+        ReplaceDateOnlyFix(context: context),
+    ({required CorrectionProducerContext context}) =>
+        ReplaceDateTimeConstructorFix(context: context),
   ];
 
   static const LintCode _code = LintCode(

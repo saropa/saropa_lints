@@ -28,6 +28,7 @@ library;
 import 'package:saropa_lints/src/fixes/common/delete_node_fix.dart';
 import 'package:saropa_lints/src/fixes/error_handling/add_debug_print_in_catch_fix.dart';
 import 'package:saropa_lints/src/fixes/common/insert_text_fix.dart';
+import 'package:saropa_lints/src/fixes/json_datetime/replace_dateonly_fix.dart';
 import 'package:saropa_lints/src/fixes/json_datetime/replace_datetime_constructor_fix.dart';
 import 'package:saropa_lints/src/fixes/security/replace_with_https_fix.dart';
 import 'package:saropa_lints/src/native/saropa_fix.dart';
@@ -121,6 +122,22 @@ void main() {
       expect(expectedId, equals('saropa.fix.addDebugPrintInCatch'));
       expect(expectedPriority, equals(50));
       expect(expectedMessage, equals('Add debugPrint for caught error'));
+    });
+  });
+
+  group('ReplaceDateOnlyFix structural smoke', () {
+    test('fix class is reachable and subclasses SaropaFixProducer', () {
+      // Catches accidental file move or rename.
+      expect(ReplaceDateOnlyFix, isNotNull);
+    });
+
+    test('fixKind has stable id, priority, and message', () {
+      const expectedId = 'saropa.fix.replaceDateOnly';
+      const expectedPriority = 60;
+      const expectedMessage = 'Replace with DateUtils.dateOnly()';
+      expect(expectedId, equals('saropa.fix.replaceDateOnly'));
+      expect(expectedPriority, equals(60));
+      expect(expectedMessage, equals('Replace with DateUtils.dateOnly()'));
     });
   });
 
