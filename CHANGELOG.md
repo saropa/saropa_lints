@@ -66,27 +66,6 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
-### Added
-
-- **`DateUtils.dateOnly()` quick fix** for `avoid_datetime_constructor` and `avoid_datetime_constructor_unvalidated` — recognizes the strip-time idiom `DateTime(x.year, x.month, x.day)` and the explicit-midnight-zeros variant `DateTime(x.year, x.month, x.day, 0, 0, 0)`, replacing both with `DateUtils.dateOnly(x)`. Appears above the existing `DateTime.tryParse()` fix when both apply. Not offered for `.utc()` constructors, nullable receivers, non-DateTime types, or pure Dart projects without Flutter. No action required.
-
-### Changed
-
-- **known_issues.json** — reviewed 51 flagged entries against live pub.dev data. Version-scoped 2 entries (flutter_calendar_carousel, keyboard_actions) whose issues were fixed in newer releases. Updated workmanager and flutter_email_sender from stale caution to active. Fixed missing reason on flutter_vibrate. Updated better_player from stale maintenance_mode to active.
-
-<details><summary>Maintenance</summary>
-
-- **known_issues review script** — now skips entries with `appliesToMaxVersion` to avoid false-positive flagging of version-scoped entries that are correct by design.
-
-</details>
-
----
-
-## [15.3.0]
-
-    This release enhances stability on large codebases by introducing adaptive per-file memory budgets and hardening the OOM mitigation pipeline against memory pressure. It also expands stream and future builder lint coverage to prevent accidental subscription recreation during widget rebuilds. Upgrade to benefit from robust out-of-memory prevention and enhanced build-method safety checks. [log](https://github.com/saropa/saropa_lints/blob/v15.3.0/CHANGELOG.md)
-
-
 ### Fixed
 
 - `avoid_future_in_build` (v3) removed name-prefix heuristic that only caught methods starting with `fetch`/`load`/`get`/etc. Now flags ANY method invocation in `FutureBuilder(future:)` inside `build()`. Also detects non-deterministic `Future` constructors while exempting `Future.value()` and `Future.error()`. Scoped to `FutureBuilder` only (no longer flags custom widgets with a `future:` parameter). Widget class detection now covers third-party bases (`HookWidget`, `ConsumerWidget`, etc.). No action required.
@@ -95,12 +74,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Added
 
+- **`DateUtils.dateOnly()` quick fix** for `avoid_datetime_constructor` and `avoid_datetime_constructor_unvalidated` — recognizes the strip-time idiom `DateTime(x.year, x.month, x.day)` and the explicit-midnight-zeros variant `DateTime(x.year, x.month, x.day, 0, 0, 0)`, replacing both with `DateUtils.dateOnly(x)`. Appears above the existing `DateTime.tryParse()` fix when both apply. Not offered for `.utc()` constructors, nullable receivers, non-DateTime types, or pure Dart projects without Flutter. No action required.
 - **Per-file memory budget:** On large projects approaching the RSS cap, the plugin now skips cold (unmodified >24h) files and prioritizes recently edited files for lint analysis — partial coverage instead of all-or-nothing OOM. The analysis summary reports how many files were skipped. No action required.
 - **`@cachedFuture` annotation** (`package:saropa_lints/annotations.dart`) — marks a method as returning a cached Future, suppressing `pass_existing_future_to_future_builder` without needing the heuristic (private method + `Future?` field). Use when your naming convention doesn't match the heuristic.
 
 ### Changed
 
 - `avoid_stream_in_build` (v3) now also detects `StreamBuilder(stream: method())` where a method invocation creates a new subscription on every rebuild. Previously only caught `StreamController()` instantiation inside `build()`. Excludes safe constructors (`Stream.value()`, `Stream.empty()`) and the `??=` caching idiom. A new quick fix converts a simple `StatelessWidget` flagged this way into a `StatefulWidget` with the stream cached in `initState()`. No action required.
+- **known_issues.json** — reviewed 51 flagged entries against live pub.dev data. Version-scoped 2 entries (flutter_calendar_carousel, keyboard_actions) whose issues were fixed in newer releases. Updated workmanager and flutter_email_sender from stale caution to active. Fixed missing reason on flutter_vibrate. Updated better_player from stale maintenance_mode to active.
+- **known_issues.json** — source-verified the remaining 10 UNCLEAR entries from that review. Removed 5 entries with no corroborating evidence in changelogs or issue trackers (agora_rtc_engine end-of-life claim, badges Material 3 bug, flutter_cache_manager disk-space bug, fluttertoast overlay/context leak, google_fonts thread-blocking claim). Version-scoped or corrected 6 entries against confirmed fix versions (animations, audioplayers, flutter_downloader, flutter_modular, graphql, shimmer). No action required.
 
 <details><summary>Maintenance</summary>
 
@@ -112,6 +94,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Reorganized the memory-monitor proposal into `plans/PLAN_analyzer_memory_monitor.md` (phased checklist: soft RSS threshold, selective rule shedding, VS Code status-bar integration), matching the repo's `PLAN_*` convention. Added `scripts/check_plan_naming.py` — an informational, non-blocking report of `plans/*.md` files that don't follow the `PLAN_<name>.md` naming convention.
 - **Publish script: `--dry-run` CLI flag** — runs dependency resolution, audit, format, analysis, tests, and `dart pub publish --dry-run` with no commit, tag, version bump, or publish. Needs no pub.dev credentials; intended for CI pre-merge validation.
 - **Publish script: further crash-detection hardening** — test-temp-dir contents are wiped before each run instead of accumulating across publish attempts, the temp dir is write-verified before use (falls back to system temp on failure), and the auto-tune concurrency cache key now includes an available-RAM bucket so a level probed safe on an idle machine doesn't get trusted indefinitely under memory pressure.
+- **known_issues review script** — now skips entries with `appliesToMaxVersion` or `replacementObsoleteFromVersion` to avoid false-positive flagging of version-scoped entries that are correct by design.
 
 </details>
 
