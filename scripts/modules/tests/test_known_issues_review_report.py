@@ -161,8 +161,9 @@ class TestRunKnownIssuesChecksSharesOneFetch(unittest.TestCase):
 
 
 class TestVersionScopedEntriesExcluded(unittest.TestCase):
-    """Entries with appliesToMaxVersion are already scoped to old versions —
-    a newer pub.dev release doesn't invalidate them."""
+    """Entries with appliesToMaxVersion or replacementObsoleteFromVersion are
+    already scoped to old versions — a newer pub.dev release doesn't
+    invalidate them."""
 
     def setUp(self) -> None:
         self._root = Path(tempfile.mkdtemp(prefix="known_issues_test_"))
@@ -187,13 +188,23 @@ class TestVersionScopedEntriesExcluded(unittest.TestCase):
                 "reason": "Abandoned by maintainer",
                 "lastUpdated": "2026-01-01",
             },
-            # Version-scoped — should be SKIPPED.
+            # Version-scoped via appliesToMaxVersion — should be SKIPPED.
             {
                 "name": "pkgB",
                 "status": "end_of_life",
                 "reason": "Fails on Dart 3",
                 "lastUpdated": "2025-01-01",
                 "appliesToMaxVersion": "2.0.0",
+            },
+            # Version-scoped via replacementObsoleteFromVersion alone (no
+            # appliesToMaxVersion) — same false-positive class as pkgB,
+            # should also be SKIPPED.
+            {
+                "name": "pkgC",
+                "status": "end_of_life",
+                "reason": "Global singletons block Dart 3 compilation",
+                "lastUpdated": "2025-06-12",
+                "replacementObsoleteFromVersion": "7.0.0",
             },
         ])
 
@@ -212,7 +223,8 @@ class TestVersionScopedEntriesExcluded(unittest.TestCase):
         ) as mock_fetch:
             _, review = run_known_issues_checks(self._root, timeout=5.0)
 
-        # Only pkgA should be fetched — pkgB has appliesToMaxVersion.
+        # Only pkgA should be fetched — pkgB has appliesToMaxVersion and
+        # pkgC has replacementObsoleteFromVersion.
         fetched_names = [c["name"] for c in mock_fetch.call_args.args[0]]
         self.assertEqual(fetched_names, ["pkgA"])
 

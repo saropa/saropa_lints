@@ -133,13 +133,16 @@ def build_known_issues_review_report(
     """
     issues = load_known_issues(project_dir)
     # Skip version-scoped entries — they warn only about old package versions
-    # and a newer pub.dev release doesn't invalidate them.
+    # (appliesToMaxVersion) or an obsolete replacement recommendation
+    # (replacementObsoleteFromVersion), and a newer pub.dev release doesn't
+    # invalidate either kind.
     candidates = [
         issue
         for issue in issues
         if issue.get("status") in _REVIEWABLE_STATUSES
         and issue.get("lastUpdated")
         and not issue.get("appliesToMaxVersion")
+        and not issue.get("replacementObsoleteFromVersion")
     ]
     fetched, network_error_count = fetch_pubdev_candidates(
         candidates, timeout=timeout, max_workers=max_workers
@@ -176,6 +179,7 @@ def run_known_issues_checks(
         if issue.get("status") in _REVIEWABLE_STATUSES
         and issue.get("lastUpdated")
         and not issue.get("appliesToMaxVersion")
+        and not issue.get("replacementObsoleteFromVersion")
     ]
     fetched, network_error_count = fetch_pubdev_candidates(
         candidates, timeout=timeout, max_workers=max_workers

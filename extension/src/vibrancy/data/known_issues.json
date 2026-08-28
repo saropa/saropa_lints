@@ -1576,8 +1576,8 @@
     {
       "name": "flutter_downloader",
       "status": "end_of_life",
-      "reason": "Progress synchronization isolates are broken, leaving ghost notifications.",
-      "as_of": "2026-03-09",
+      "reason": "Progress synchronization isolates were broken pre-1.5.2, leaving ghost notifications stuck in 'processing' state (fixed in 1.5.2).",
+      "as_of": "2026-08-28",
       "replacement": "background_downloader",
       "migrationNotes": "Total rewrite of background task initialization.",
       "archiveSizeBytes": 828168,
@@ -1589,7 +1589,8 @@
       "platforms": [
         "android",
         "ios"
-      ]
+      ],
+      "appliesToMaxVersion": "1.5.1"
     },
     {
       "name": "open_file_v3",
@@ -2347,8 +2348,8 @@
     {
       "name": "audioplayers",
       "status": "end_of_life",
-      "reason": "Fails on Apple Silicon builds.",
-      "as_of": "2026-03-09",
+      "reason": "Uses the removed `AudioCache` API; a new async player-instance API is required.",
+      "as_of": "2026-08-28",
       "migrationNotes": "Heavy migration. `AudioCache` is gone, completely new async API.",
       "archiveSizeBytes": 21027379,
       "archiveSizeMB": 20.05,
@@ -2471,30 +2472,6 @@
         "windows"
       ],
       "appliesToMaxVersion": "1.0.0"
-    },
-    {
-      "name": "google_fonts",
-      "status": "end_of_life",
-      "reason": "Dynamic fetching blocks the main UI thread during load.",
-      "as_of": "2026-03-09",
-      "replacement": "Update to latest version",
-      "migrationNotes": "Drop-in update, massive performance boost.",
-      "archiveSizeBytes": 1847877,
-      "archiveSizeMB": 1.76,
-      "license": "BSD-3-Clause",
-      "lastUpdated": "2026-02-18",
-      "pubPoints": 160,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ],
-      "appliesToMinVersion": "1.0.0",
-      "appliesToMaxVersion": "2.0.0"
     },
     {
       "name": "flutter_spinkit",
@@ -2746,8 +2723,8 @@
     {
       "name": "animations",
       "status": "caution",
-      "reason": "Pre-Material 3 transition API; may lack predictive back gesture support.",
-      "as_of": "2026-03-10",
+      "reason": "Predates the material_ui-based Material 3 component styling shipped in 3.0.0.",
+      "as_of": "2026-08-28",
       "replacement": "flutter_animate",
       "migrationNotes": "Total rewrite. Use native Material 3 transitions where possible.",
       "archiveSizeBytes": 37455785,
@@ -2763,7 +2740,8 @@
         "macos",
         "web",
         "windows"
-      ]
+      ],
+      "appliesToMaxVersion": "3.0.0"
     },
     {
       "name": "simple_animations",
@@ -2870,7 +2848,7 @@
       ],
       "appliesToMinVersion": "3.0.0",
       "appliesToMaxVersion": "4.0.0",
-      "replacementObsoleteFromVersion": "6.0.0"
+      "replacementObsoleteFromVersion": "7.0.0"
     },
     {
       "name": "dio_http_cache",
@@ -3550,30 +3528,6 @@
       "pubPoints": 70,
       "verifiedPublisher": true,
       "platforms": []
-    },
-    {
-      "name": "badges",
-      "status": "end_of_life",
-      "reason": "Positioning logic broken; badges render off-screen in Material 3.",
-      "as_of": "2026-03-10",
-      "migrationNotes": "Syntax overhaul; badge positioning changed entirely.",
-      "archiveSizeBytes": 7602536,
-      "archiveSizeMB": 7.25,
-      "license": "MIT",
-      "lastUpdated": "2023-08-28",
-      "pubPoints": 160,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ],
-      "appliesToMinVersion": "1.0.0",
-      "appliesToMaxVersion": "2.0.0",
-      "replacementObsoleteFromVersion": "3.0.0"
     },
     {
       "name": "flutter_inner_drawer",
@@ -4301,29 +4255,6 @@
       ]
     },
     {
-      "name": "flutter_cache_manager",
-      "status": "end_of_life",
-      "reason": "Fails to clear disk space, leading to out-of-storage app crashes.",
-      "as_of": "2026-03-10",
-      "migrationNotes": "Update cache eviction callbacks.",
-      "archiveSizeBytes": 323689,
-      "archiveSizeMB": 0.31,
-      "license": "MIT",
-      "lastUpdated": "2024-08-13",
-      "pubPoints": 150,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "linux",
-        "macos",
-        "web",
-        "windows"
-      ],
-      "appliesToMinVersion": "1.0.0",
-      "appliesToMaxVersion": "2.0.0"
-    },
-    {
       "name": "http_middleware",
       "status": "end_of_life",
       "reason": "Incompatible with the modern Dart http package architecture.",
@@ -4364,10 +4295,10 @@
     {
       "name": "graphql",
       "status": "end_of_life",
-      "reason": "Fails to compile on modern Flutter SDKs.",
-      "as_of": "2026-03-10",
-      "replacement": "graphql_flutter",
-      "migrationNotes": "Huge rewrite. Link configurations changed entirely.",
+      "reason": "Pre-null-safety versions fail to compile under Dart 3's sound null safety.",
+      "as_of": "2026-08-28",
+      "replacement": "Upgrade to graphql ^5.2.4",
+      "migrationNotes": "graphql_flutter itself depends on this package, so switching to it does not avoid the upgrade — update graphql directly.",
       "archiveSizeBytes": 75322,
       "archiveSizeMB": 0.07,
       "license": "MIT",
@@ -4383,7 +4314,7 @@
         "windows"
       ],
       "appliesToMinVersion": "3.0.0",
-      "appliesToMaxVersion": "4.0.0"
+      "appliesToMaxVersion": "4.9.9"
     },
     {
       "name": "hasura_connect",
@@ -4469,23 +4400,6 @@
         "android",
         "ios"
       ]
-    },
-    {
-      "name": "agora_rtc_engine",
-      "status": "end_of_life",
-      "reason": "Agora officially retired these SDK versions; calls will not connect.",
-      "as_of": "2026-03-10",
-      "migrationNotes": "Massive rewrite of video view and event handlers.",
-      "archiveSizeBytes": 5206880,
-      "archiveSizeMB": 4.97,
-      "license": "MIT",
-      "lastUpdated": "2025-09-16",
-      "pubPoints": 60,
-      "verifiedPublisher": true,
-      "platforms": [],
-      "appliesToMinVersion": "4.0.0",
-      "appliesToMaxVersion": "5.0.0",
-      "replacementObsoleteFromVersion": "6.0.0"
     },
     {
       "name": "youtube_player_iframe",
@@ -4761,26 +4675,6 @@
       ],
       "appliesToMinVersion": "1.0.0",
       "appliesToMaxVersion": "2.0.0"
-    },
-    {
-      "name": "fluttertoast",
-      "status": "end_of_life",
-      "reason": "Uses deprecated overlay APIs causing context leaks and app freezes.",
-      "as_of": "2026-03-10",
-      "migrationNotes": "Shift to contextless FToast pattern.",
-      "archiveSizeBytes": 546320,
-      "archiveSizeMB": 0.52,
-      "license": "MIT",
-      "lastUpdated": "2025-09-21",
-      "pubPoints": 140,
-      "verifiedPublisher": true,
-      "platforms": [
-        "android",
-        "ios",
-        "web"
-      ],
-      "appliesToMinVersion": "8.0.0",
-      "appliesToMaxVersion": "9.0.0"
     },
     {
       "name": "flutter_absolute_path",
@@ -5453,14 +5347,14 @@
     {
       "name": "shimmer",
       "status": "caution",
-      "reason": "Significant performance issues (UI jank) were reported with this package.",
-      "as_of": "2026-03-16",
+      "reason": "Significant performance issues (UI jank) were reported in versions prior to 4.0.0's paint/animation rewrite.",
+      "as_of": "2026-08-28",
       "replacement": "skeletonizer",
       "migrationNotes": "Replace Shimmer widgets with Skeletonizer wrappers around your actual UI widgets.",
       "archiveSizeBytes": 1771115,
       "archiveSizeMB": 1.69,
       "license": "BSD-3-Clause",
-      "lastUpdated": "2023-05-21",
+      "lastUpdated": "2026-08-21",
       "pubPoints": 160,
       "verifiedPublisher": true,
       "platforms": [
@@ -5470,7 +5364,8 @@
         "macos",
         "web",
         "windows"
-      ]
+      ],
+      "appliesToMaxVersion": "3.0.0"
     },
     {
       "name": "fade_shimmer",
