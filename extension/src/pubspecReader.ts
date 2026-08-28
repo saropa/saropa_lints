@@ -6,7 +6,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-/** Flutter embedder folder names (Appendix C, plan_migration_plugin_system.md). */
+/** Flutter embedder folder names (Appendix C, PLAN_migration_plugin_system.md). */
 export const FLUTTER_EMBEDDER_PLATFORMS = [
     'android',
     'ios',

@@ -127,7 +127,7 @@ def _dart_header(rel: str) -> list[str]:
         f"/// {topic}",
         "///",
         "/// Saropa custom lints: rules register in `lib/src/rules/all_rules.dart`",
-        "/// and tiers in `lib/src/tiers.dart` where applicable; see `plans/COMMENT_COVERAGE_PLAN.md`.",
+        "/// and tiers in `lib/src/tiers.dart` where applicable; see `plans/PLAN_comment_coverage.md`.",
         "",
     ]
 
@@ -174,7 +174,7 @@ def _py_header(rel: str) -> list[str]:
         "#",
         f"# {topic}",
         "#",
-        "# See scripts/README.md and plans/COMMENT_COVERAGE_PLAN.md for conventions.",
+        "# See scripts/README.md and plans/PLAN_comment_coverage.md for conventions.",
         "",
     ]
 

@@ -3,7 +3,7 @@
 #
 # Repository maintenance or publish pipeline script (Python).
 #
-# See scripts/README.md and plans/COMMENT_COVERAGE_PLAN.md for conventions.
+# See scripts/README.md and plans/PLAN_comment_coverage.md for conventions.
 
 # Scrapes Dart-Code, Flutter SDK, and Dart SDK release notes into reports/_cache/.
 # Historical script: not part of the build. Run before extract_lint_candidates.py.

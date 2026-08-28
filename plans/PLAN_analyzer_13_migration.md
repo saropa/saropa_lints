@@ -3,7 +3,7 @@
 **Created:** 2026-08-23
 **Trigger:** Flutter 3.47.1 ships `meta ^1.18.3`, clearing the blocker.
 **Status:** Not started
-**Related:** `plan_migration_plugin_system.md` (plugin system migration, separate concern)
+**Related:** `PLAN_migration_plugin_system.md` (plugin system migration, separate concern)
 
 ---
 

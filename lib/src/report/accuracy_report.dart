@@ -19,7 +19,7 @@
 /// [AccuracyTarget] is intentionally out of scope here: it requires markers
 /// placed immediately above each violation with good examples isolated in
 /// separate files, which this corpus does not yet provide. See
-/// `plans/TODO_rule_metadata_completeness.md` §4.1.
+/// `plans/PLAN_rule_metadata_completeness.md` §4.1.
 ///
 /// IO and scan execution live in the CLI (`bin/accuracy_report.dart`); this
 /// core is pure so the matching logic is unit-testable without a real scan.

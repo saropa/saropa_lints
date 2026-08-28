@@ -15,7 +15,7 @@ from pathlib import Path
 def _repair_dart_first_physical_line(line: str) -> str | None:
     core = line.rstrip("\r\n")
     has_sentinel = "comment-coverage: module overview (batch)" in core
-    has_shebang_glue = "`plans/COMMENT_COVERAGE_PLAN.md`.#!/" in core and "\n#!/" not in core
+    has_shebang_glue = "`plans/PLAN_comment_coverage.md`.#!/" in core and "\n#!/" not in core
     if not has_sentinel and not has_shebang_glue:
         return None
     if line.count("\n") > 1:
@@ -27,11 +27,11 @@ def _repair_dart_first_physical_line(line: str) -> str | None:
     s = s.replace("`///", "`\n///")
     junctions = [
         ("CONTRIBUTING.md.", "import "),
-        ("`plans/COMMENT_COVERAGE_PLAN.md`.", "#!/"),
-        ("plans/COMMENT_COVERAGE_PLAN.md.", "#!/"),
-        ("plans/COMMENT_COVERAGE_PLAN.md.", "import '"),
-        ('plans/COMMENT_COVERAGE_PLAN.md.', 'import "'),
-        ("plans/COMMENT_COVERAGE_PLAN.md.", "part of "),
+        ("`plans/PLAN_comment_coverage.md`.", "#!/"),
+        ("plans/PLAN_comment_coverage.md.", "#!/"),
+        ("plans/PLAN_comment_coverage.md.", "import '"),
+        ('plans/PLAN_comment_coverage.md.', 'import "'),
+        ("plans/PLAN_comment_coverage.md.", "part of "),
     ]
     for prefix, start in junctions:
         key = prefix + start

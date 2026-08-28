@@ -748,4 +748,4 @@ Choose by **whether the old API still compiles on the new version**:
 
 **Not done / deferred:** translated `package.nls.<lang>.json` regen for the new setting key is NOT run (standing no-NLLB prohibition; publish `--fail-on-missing` gate will flag, regen is a separate explicit step). Live custom_lint IDE run and Extension-Development-Host nudge flow not exercised (scan CLI + unit tests only). riverpod_3 / bloc_8 / go_router_6 gates are forward-looking for versions a sample project may not yet use.
 
-**Finish report appended:** `plans/plan_migration_plugin_system.md`. Plan stays ACTIVE (advanced the pack catalog; Phase 7 + deferred items keep it open).
+**Finish report appended:** `plans/PLAN_migration_plugin_system.md`. Plan stays ACTIVE (advanced the pack catalog; Phase 7 + deferred items keep it open).

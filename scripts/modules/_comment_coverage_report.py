@@ -184,7 +184,7 @@ def display_comment_coverage_worst_files(
     )
     print_colored(
         "    (Heuristic only: //, /* */, outside strings; Python: # tokens. "
-        "Does not measure doc quality - see plan/COMMENT_COVERAGE_PLAN.md.)",
+        "Does not measure doc quality - see plans/PLAN_comment_coverage.md.)",
         Color.DIM,
     )
     print_colored(

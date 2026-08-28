@@ -61,4 +61,4 @@ Both paths write a minimal `pubspec.yaml` + `lib/main.dart` + `README.md` under 
 ## See also
 
 - [Rule packs](rule_packs.md) — optional Saropa bundles (same YAML block as above).
-- [plans/plan_migration_plugin_system.md](../../plans/plan_migration_plugin_system.md) — Phase 7 product context.
+- [plans/PLAN_migration_plugin_system.md](../../plans/PLAN_migration_plugin_system.md) — Phase 7 product context.

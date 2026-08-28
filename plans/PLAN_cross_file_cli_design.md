@@ -11,7 +11,7 @@
 
 ### Next 3 (ordered)
 
-- [x] **XFILE-01 (P1)** Add `analysis_options.yaml`-backed config support for commonly repeated cross-file flags. (Done 2026-05-08: top-level **`saropa_lints_cross_file`** map with `excludes` / heuristic flags merged before CLI — see `CrossFileProjectCliOptions` + `plans/cross_file_cli_design.md` §XFILE-01.)
+- [x] **XFILE-01 (P1)** Add `analysis_options.yaml`-backed config support for commonly repeated cross-file flags. (Done 2026-05-08: top-level **`saropa_lints_cross_file`** map with `excludes` / heuristic flags merged before CLI — see `CrossFileProjectCliOptions` + `plans/PLAN_cross_file_cli_design.md` §XFILE-01.)
 - [ ] **XFILE-02 (P1)** Decide whether to keep line-block duplication as final scope or schedule token/AST similarity upgrade with perf budget.
 - [ ] **XFILE-03 (P2)** Improve watch-mode UX (progress surfacing and long-run diagnostics) without regressing CI-first behavior.
 

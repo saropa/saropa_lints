@@ -12,7 +12,7 @@
 ///
 /// True false-positive / true-positive *rate* measurement against each rule's
 /// `accuracyTarget` is out of scope until the fixture corpus is line-precise —
-/// see `plans/TODO_rule_metadata_completeness.md` §4.1.
+/// see `plans/PLAN_rule_metadata_completeness.md` §4.1.
 ///
 /// Exit codes:
 ///   0 - no silent rules (or --fail-on none)

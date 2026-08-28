@@ -5,7 +5,7 @@
 /// Dart CLI entrypoint for saropa_lints tooling.
 ///
 /// Saropa custom lints: rules register in `lib/src/rules/all_rules.dart`
-/// and tiers in `lib/src/tiers.dart` where applicable; see `plans/COMMENT_COVERAGE_PLAN.md`.
+/// and tiers in `lib/src/tiers.dart` where applicable; see `plans/PLAN_comment_coverage.md`.
 
 /// CLI for [QualityGateEvaluator]: reads `violations.json` summary and gate config,
 /// prints PASS / FAIL / WARN, exits 0 (pass or no config), 1 (breach with fail), 2 (errors).
