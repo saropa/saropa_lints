@@ -18,6 +18,7 @@ import '../../fixes/async/remove_redundant_await_fix.dart';
 import '../../fixes/async/replace_future_tostring_with_await_fix.dart';
 import '../../fixes/async/replace_void_with_future_void_fix.dart';
 import '../../fixes/async/wrap_in_unawaited_fix.dart';
+import '../../fixes/async/convert_stateless_to_stateful_for_stream_fix.dart';
 
 /// Warns when calling .ignore() on a Future.
 ///
@@ -2336,6 +2337,13 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 ///   return StreamBuilder(stream: _stream, ...); // Cached field reference
 /// }
 /// ```
+///
+/// **Quick fix available:** For a `StatelessWidget` whose `build()` passes a
+/// bare method call as `StreamBuilder`'s `stream:` argument (Pattern 2),
+/// converts the class to a `StatefulWidget` with the stream cached in a
+/// `late final` field assigned in `initState()`. Only offered when the class
+/// has no fields and no methods besides `build()` — see
+/// [ConvertStatelessToStatefulForStreamFix] for why.
 class AvoidStreamInBuildRule extends SaropaLintRule {
   AvoidStreamInBuildRule() : super(code: _code);
 
@@ -2403,6 +2411,12 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
       );
     });
   }
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        ConvertStatelessToStatefulForStreamFix(context: context),
+  ];
 }
 
 /// Visitor that finds method invocations passed as StreamBuilder's stream:

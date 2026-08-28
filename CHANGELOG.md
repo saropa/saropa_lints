@@ -79,7 +79,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Changed
 
-- `avoid_stream_in_build` (v3) now also detects `StreamBuilder(stream: method())` where a method invocation creates a new subscription on every rebuild. Previously only caught `StreamController()` instantiation inside `build()`. Excludes safe constructors (`Stream.value()`, `Stream.empty()`) and the `??=` caching idiom. No action required.
+- `avoid_stream_in_build` (v3) now also detects `StreamBuilder(stream: method())` where a method invocation creates a new subscription on every rebuild. Previously only caught `StreamController()` instantiation inside `build()`. Excludes safe constructors (`Stream.value()`, `Stream.empty()`) and the `??=` caching idiom. A new quick fix converts a simple `StatelessWidget` flagged this way into a `StatefulWidget` with the stream cached in `initState()`. No action required.
 
 <details><summary>Maintenance</summary>
 
@@ -87,6 +87,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - **Publish script: fixed Dart frontend_server crash** — `dart test -j <all-cores>` (24 on a 24-core machine) caused native access violations (`STATUS_ACCESS_VIOLATION`) and `front_end` compiler exceptions during test compilation. The test step now auto-tunes concurrency by probing a single test at increasing `-j` levels (4, 6, 8, 10, 12), caching the result in `build/.dart_test_max_j`; crash retries halve concurrency automatically, the failure prompt offers `[F]ewer workers` to halve manually, and set `SAROPA_TEST_MAX_J=N` to skip the probe entirely.
 - **Publish script: fixed test temp dir location** — kernel-cache `.dill` files were written inside the project tree (`build/test_tmp/`), causing `uri_does_not_exist` scan errors and filling the C: drive. Temp dir now defaults to `<system_temp>/saropa_dart_test` outside the project tree; set `SAROPA_TEST_TMP` to override (validated: falls back if inside project tree).
 - Removed `plans/known_issues_review.md` from git tracking (generated file, regenerated each publish run).
+- **Publish script: `--dry-run` CLI flag** — runs dependency resolution, audit, format, analysis, tests, and `dart pub publish --dry-run` with no commit, tag, version bump, or publish. Needs no pub.dev credentials; intended for CI pre-merge validation.
+- **Publish script: further crash-detection hardening** — test-temp-dir contents are wiped before each run instead of accumulating across publish attempts, the temp dir is write-verified before use (falls back to system temp on failure), and the auto-tune concurrency cache key now includes an available-RAM bucket so a level probed safe on an idle machine doesn't get trusted indefinitely under memory pressure.
 
 </details>
 
