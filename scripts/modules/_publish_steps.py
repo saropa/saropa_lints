@@ -1065,11 +1065,17 @@ def _run_chain_stack_traces_and_check(
                 pass
         if result is not None and result.returncode == 0:
             return True
-        # Retry once on transient failures: Windows file locks or Dart VM crashes
+        # Retry once on transient failures: Windows file locks or Dart VM
+        # crashes. Halve concurrency on compiler crash to reduce pressure.
         if attempt == 0:
             transient = _log_transient_failure_reason(log_path)
             if transient:
-                print_warning(f"Transient failure detected: {transient}. Retrying once...")
+                if _log_shows_vm_crash(log_path):
+                    diag_j = max(1, diag_j // 2)
+                print_warning(
+                    f"Transient failure detected: {transient}. "
+                    f"Retrying with -j {diag_j}..."
+                )
                 continue
         break
 
