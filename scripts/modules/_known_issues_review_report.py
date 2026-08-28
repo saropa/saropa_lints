@@ -132,10 +132,14 @@ def build_known_issues_review_report(
     tiers for manual triage. See module docstring for the tier definitions.
     """
     issues = load_known_issues(project_dir)
+    # Skip version-scoped entries — they warn only about old package versions
+    # and a newer pub.dev release doesn't invalidate them.
     candidates = [
         issue
         for issue in issues
-        if issue.get("status") in _REVIEWABLE_STATUSES and issue.get("lastUpdated")
+        if issue.get("status") in _REVIEWABLE_STATUSES
+        and issue.get("lastUpdated")
+        and not issue.get("appliesToMaxVersion")
     ]
     fetched, network_error_count = fetch_pubdev_candidates(
         candidates, timeout=timeout, max_workers=max_workers
@@ -165,15 +169,18 @@ def run_known_issues_checks(
     on every run — see ``scripts/modules/_publish_steps.py``.
     """
     issues = load_known_issues(project_dir)
+    # Skip version-scoped entries — see build_known_issues_review_report.
     candidates = [
         issue
         for issue in issues
-        if issue.get("status") in _REVIEWABLE_STATUSES and issue.get("lastUpdated")
+        if issue.get("status") in _REVIEWABLE_STATUSES
+        and issue.get("lastUpdated")
+        and not issue.get("appliesToMaxVersion")
     ]
     fetched, network_error_count = fetch_pubdev_candidates(
         candidates, timeout=timeout, max_workers=max_workers
     )
-    # network_error_count here is for the full review candidate set (302), not
+    # network_error_count here is for the full review candidate set, not
     # just the freshness subset (70) — the combined fetch can't attribute a
     # given failure to one subset or the other. Cosmetic only: it can only
     # over-report freshness's error count relative to a standalone run, never

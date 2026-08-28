@@ -1726,15 +1726,15 @@
     },
     {
       "name": "workmanager",
-      "status": "caution",
-      "reason": "May have compatibility issues with modern Android WorkManager architecture.",
-      "as_of": "2026-03-09",
+      "status": "active",
+      "reason": "Actively maintained; v0.10.8+ explicitly fixed Android 16 WorkManager compatibility.",
+      "as_of": "2026-08-28",
       "replacement": null,
       "migrationNotes": null,
       "archiveSizeBytes": 13544,
       "archiveSizeMB": 0.01,
       "license": "MIT",
-      "lastUpdated": "2025-08-31",
+      "lastUpdated": "2026-08-20",
       "pubPoints": 140,
       "verifiedPublisher": true,
       "platforms": [
@@ -1949,15 +1949,15 @@
     },
     {
       "name": "flutter_email_sender",
-      "status": "caution",
-      "reason": "File attachment intents may crash due to modern FileProvider security rules.",
-      "as_of": "2026-03-09",
-      "replacement": "Use `url_launcher`",
-      "migrationNotes": "Build `mailto:` schemes natively, or use backend emailing.",
+      "status": "active",
+      "reason": "FileProvider attachment issues fixed across v2.0.2–v10.0.1; rewrite added typed exceptions and platform capability checks.",
+      "as_of": "2026-08-28",
+      "replacement": null,
+      "migrationNotes": null,
       "archiveSizeBytes": 61135,
       "archiveSizeMB": 0.06,
       "license": "Apache-2.0",
-      "lastUpdated": "2025-09-12",
+      "lastUpdated": "2026-06-15",
       "pubPoints": 150,
       "verifiedPublisher": false,
       "platforms": [
@@ -2019,7 +2019,8 @@
         "macos",
         "web",
         "windows"
-      ]
+      ],
+      "appliesToMaxVersion": "4.2.2"
     },
     {
       "name": "connectivity",
@@ -3320,7 +3321,8 @@
         "macos",
         "web",
         "windows"
-      ]
+      ],
+      "appliesToMaxVersion": "3.0.0"
     },
     {
       "name": "syncfusion_flutter_calendar",
@@ -4973,17 +4975,21 @@
     },
     {
       "name": "flutter_vibrate",
-      "as_of": "2026-03-10",
-      "status": "end_of_life",
+      "as_of": "2026-08-28",
+      "status": "caution",
+      "reason": "Redundant — Flutter's built-in HapticFeedback API covers the same functionality without a third-party dependency.",
       "replacement": "Native `HapticFeedback`",
       "migrationNotes": "Use standard `HapticFeedback.vibrate()` from `package:flutter/services.dart`.",
       "archiveSizeBytes": 10240,
       "archiveSizeMB": 0.01,
       "license": "BSD-3-Clause",
-      "lastUpdated": "2016-04-20",
-      "pubPoints": 15,
+      "lastUpdated": "2026-01-14",
+      "pubPoints": 140,
       "verifiedPublisher": false,
-      "platforms": []
+      "platforms": [
+        "android",
+        "ios"
+      ]
     },
     {
       "name": "speech_recognition",
@@ -7019,18 +7025,22 @@
       ]
     },
     {
-      "as_of": "2026-03-10",
       "name": "better_player",
-      "status": "maintenance_mode",
-      "replacement": "media_kit",
-      "migrationNotes": "Development has stalled. Consider migrating to `media_kit` for modern hardware-accelerated video rendering.",
+      "status": "active",
+      "reason": "Resumed active development with v1.0.0 federated plugin rewrite; no longer in maintenance mode.",
+      "as_of": "2026-08-28",
+      "replacement": null,
+      "migrationNotes": null,
       "archiveSizeBytes": 27282206,
       "archiveSizeMB": 26.02,
       "license": "Apache-2.0",
-      "lastUpdated": "2024-06-15",
+      "lastUpdated": "2026-08-27",
       "pubPoints": 60,
       "verifiedPublisher": true,
-      "platforms": []
+      "platforms": [
+        "android",
+        "ios"
+      ]
     },
     {
       "name": "spritewidget",

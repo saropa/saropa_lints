@@ -66,6 +66,27 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Added
+
+- **`DateUtils.dateOnly()` quick fix** for `avoid_datetime_constructor` and `avoid_datetime_constructor_unvalidated` — recognizes the strip-time idiom `DateTime(x.year, x.month, x.day)` and the explicit-midnight-zeros variant `DateTime(x.year, x.month, x.day, 0, 0, 0)`, replacing both with `DateUtils.dateOnly(x)`. Appears above the existing `DateTime.tryParse()` fix when both apply. Not offered for `.utc()` constructors, nullable receivers, non-DateTime types, or pure Dart projects without Flutter. No action required.
+
+### Changed
+
+- **known_issues.json** — reviewed 51 flagged entries against live pub.dev data. Version-scoped 2 entries (flutter_calendar_carousel, keyboard_actions) whose issues were fixed in newer releases. Updated workmanager and flutter_email_sender from stale caution to active. Fixed missing reason on flutter_vibrate. Updated better_player from stale maintenance_mode to active.
+
+<details><summary>Maintenance</summary>
+
+- **known_issues review script** — now skips entries with `appliesToMaxVersion` to avoid false-positive flagging of version-scoped entries that are correct by design.
+
+</details>
+
+---
+
+## [15.3.0]
+
+    This release enhances stability on large codebases by introducing adaptive per-file memory budgets and hardening the OOM mitigation pipeline against memory pressure. It also expands stream and future builder lint coverage to prevent accidental subscription recreation during widget rebuilds. Upgrade to benefit from robust out-of-memory prevention and enhanced build-method safety checks. [log](https://github.com/saropa/saropa_lints/blob/v15.3.0/CHANGELOG.md)
+
+
 ### Fixed
 
 - `avoid_future_in_build` (v3) removed name-prefix heuristic that only caught methods starting with `fetch`/`load`/`get`/etc. Now flags ANY method invocation in `FutureBuilder(future:)` inside `build()`. Also detects non-deterministic `Future` constructors while exempting `Future.value()` and `Future.error()`. Scoped to `FutureBuilder` only (no longer flags custom widgets with a `future:` parameter). Widget class detection now covers third-party bases (`HookWidget`, `ConsumerWidget`, etc.). No action required.
@@ -98,7 +119,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.2.4]
 
-> The `analyzer ^13.1.0` migration (Dart 3.13+ / Flutter 3.47.1+, released 2026-08-19) is complete and tested but held off `main` — adoption of 3.47.1 is near zero. It is parked on the `analyzer-13-migration` branch and will ship as a 16.0.0 major bump once adoption is widespread.
+> The `analyzer ^13.1.0` migration (Dart 3.13+ / Flutter 3.47.1+, released 2026-08-19) is complete and tested but held off `main` — adoption of 3.47.1 is near zero. It is parked on the `analyzer-13-migration` branch and will ship as a 16.0.0 major bump once adoption is widespread. [log](https://github.com/saropa/saropa_lints/blob/v15.2.4/CHANGELOG.md)
+
 
 ### Fixed
 

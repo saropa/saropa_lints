@@ -160,6 +160,63 @@ class TestRunKnownIssuesChecksSharesOneFetch(unittest.TestCase):
         )
 
 
+class TestVersionScopedEntriesExcluded(unittest.TestCase):
+    """Entries with appliesToMaxVersion are already scoped to old versions —
+    a newer pub.dev release doesn't invalidate them."""
+
+    def setUp(self) -> None:
+        self._root = Path(tempfile.mkdtemp(prefix="known_issues_test_"))
+
+    def _write_known_issues(self, issues: list[dict]) -> None:
+        from scripts.modules._known_issues_freshness import KNOWN_ISSUES_RELATIVE_PATH
+
+        path = self._root / KNOWN_ISSUES_RELATIVE_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"issues": issues}), encoding="utf-8")
+
+    def test_version_scoped_entries_are_not_fetched(self) -> None:
+        from scripts.modules._known_issues_review_report import (
+            run_known_issues_checks,
+        )
+
+        self._write_known_issues([
+            # Unscoped — should be fetched.
+            {
+                "name": "pkgA",
+                "status": "end_of_life",
+                "reason": "Abandoned by maintainer",
+                "lastUpdated": "2026-01-01",
+            },
+            # Version-scoped — should be SKIPPED.
+            {
+                "name": "pkgB",
+                "status": "end_of_life",
+                "reason": "Fails on Dart 3",
+                "lastUpdated": "2025-01-01",
+                "appliesToMaxVersion": "2.0.0",
+            },
+        ])
+
+        def fake_fetch(candidates, *, timeout, max_workers):
+            fetched = []
+            for issue in candidates:
+                issue["_actual_published"] = "2026-06-01"
+                issue["_actual_version"] = "9.9.9"
+                issue["_is_discontinued"] = False
+                fetched.append(issue)
+            return fetched, 0
+
+        with patch(
+            "scripts.modules._known_issues_review_report.fetch_pubdev_candidates",
+            side_effect=fake_fetch,
+        ) as mock_fetch:
+            _, review = run_known_issues_checks(self._root, timeout=5.0)
+
+        # Only pkgA should be fetched — pkgB has appliesToMaxVersion.
+        fetched_names = [c["name"] for c in mock_fetch.call_args.args[0]]
+        self.assertEqual(fetched_names, ["pkgA"])
+
+
 class TestRenderMarkdown(unittest.TestCase):
     def test_renders_all_three_tier_sections(self) -> None:
         from scripts.modules._known_issues_review_report import (
