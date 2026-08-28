@@ -2,8 +2,31 @@
 
 **Created:** 2026-08-23
 **Trigger:** Flutter 3.47.1 ships `meta ^1.18.3`, clearing the blocker.
-**Status:** Not started
+**Status:** Implemented and tested, held off `main` — parked on the
+`analyzer-13-migration` branch pending wider Flutter 3.47.1 adoption. Will
+ship as a 16.0.0 major bump. This plan's checklists below are kept as
+reference for the approach taken; do not re-execute them from scratch — start
+from the branch (see Outcome).
 **Related:** `PLAN_migration_plugin_system.md` (plugin system migration, separate concern)
+
+## Outcome (2026-08-25)
+
+Phases 1–6 below were carried out on the `analyzer-13-migration` branch:
+`39b665c8` ("feat: migrate to analyzer ^13.1.0 (BREAKING — minimum Dart
+3.13.0)") plus three follow-up fixes (`2b6cc8a4` four missed test files,
+`028b30ce` a scan-CLI lane-gate regression the migration exposed, `d6cb4f8f`
+hardening for that lane-gate fix). The branch built and tested clean.
+
+The merge to `main` was reverted the same day (`f088516b`, `ecbdc1f3`,
+`7b06ef7c`) because Flutter 3.47.1 adoption was still near zero — bumping the
+SDK floor to 3.13.0 would have orphaned most consumers. `prefer_primary_constructor`
+was kept on `main` as detection-only (no quick fix) pending the eventual bump.
+
+**To ship this migration later:** rebase/cherry-pick from `analyzer-13-migration`
+rather than redoing the phases below — the AST rename work (the expensive
+part, ~1073 `.arguments` sites / 804 `NamedExpression` sites) is already done
+and was verified against the full test suite. Re-verify against `main`'s
+drift since 2026-08-25 before merging.
 
 ---
 
