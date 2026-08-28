@@ -1067,6 +1067,13 @@ class MemoryPressureHandler {
   static DateTime? _lastMemoryLogAt;
   static const Duration _memoryLogInterval = Duration(seconds: 30);
 
+  /// True once the RSS-unavailable warning has been logged. Without this,
+  /// _refreshHardLimit's early return on rss<=0 would leave the trend log
+  /// permanently and silently empty on a platform without RSS support —
+  /// indistinguishable from "the plugin never ran". One warning at first
+  /// detection surfaces the cause without repeating it on every refresh.
+  static bool _loggedRssUnavailable = false;
+
   /// The configured hard RSS cap in MB, or 0 if disabled. Used by
   /// FileBudgetTracker to compute its file-skipping threshold.
   static int get hardRssLimitMb => _hardLimitMb;
@@ -1112,7 +1119,19 @@ class MemoryPressureHandler {
   /// Read the real process RSS and update [_hardLimitTripped] with hysteresis.
   static void _refreshHardLimit() {
     final rss = _currentRssMb();
-    if (rss <= 0) return; // RSS unavailable on this platform — leave flag as-is
+    if (rss <= 0) {
+      // RSS unavailable on this platform — leave the hard-limit flag as-is
+      // and the trend log empty, but say so once so an empty plugin.log
+      // reads as "unsupported platform" rather than "plugin never started".
+      if (!_loggedRssUnavailable) {
+        _loggedRssUnavailable = true;
+        PluginLogger.log(
+          '[memory] RSS sampling unavailable on this platform — hard-limit '
+          'valve and periodic memory trend log are both inert.',
+        );
+      }
+      return;
+    }
 
     // Periodic trend line for post-crash diagnosis: this call site already
     // runs on every RSS refresh (throttled via _rssCheckInterval above), so

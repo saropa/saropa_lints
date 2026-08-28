@@ -25,6 +25,10 @@
 // visibility into the RSS trend, but does NOT implement the proposal's
 // warning threshold, rule shedding, or status-bar integration, none of
 // which exist yet.
+//
+// `plugin.log` is size-capped and rotated (PluginLogger._rotateIfNeeded);
+// when that happens mid-session, this tool prints a CAVEAT rather than
+// silently reporting a min/max that omits the discarded history.
 library;
 
 import 'dart:io';
@@ -34,6 +38,12 @@ import 'dart:io';
 final _memoryLinePattern = RegExp(
   r'^(?<timestamp>\S+) \| \[memory\] RSS (?<rss>\d+)MB \(cap (?<cap>\d+)MB\)$',
 );
+
+/// Matches the marker `PluginLogger._rotateIfNeeded` writes after truncating
+/// `plugin.log` for size. Its presence means some history before this
+/// timestamp was discarded, so this report's min/max cannot be trusted as
+/// the full session's — only the retained window's.
+final _rotationMarkerPattern = RegExp(r'^(?<timestamp>\S+) \| \[log-rotated\]');
 
 void main(List<String> args) {
   if (args.contains('--help') || args.contains('-h')) {
@@ -59,16 +69,25 @@ void main(List<String> args) {
   }
 
   final samples = <_MemorySample>[];
+  String? lastRotationTimestamp;
   for (final line in logFile.readAsLinesSync()) {
-    final match = _memoryLinePattern.firstMatch(line);
-    if (match == null) continue;
-    samples.add(
-      _MemorySample(
-        timestamp: match.namedGroup('timestamp')!,
-        rssMb: int.parse(match.namedGroup('rss')!),
-        capMb: int.parse(match.namedGroup('cap')!),
-      ),
-    );
+    final memoryMatch = _memoryLinePattern.firstMatch(line);
+    if (memoryMatch != null) {
+      samples.add(
+        _MemorySample(
+          timestamp: memoryMatch.namedGroup('timestamp')!,
+          rssMb: int.parse(memoryMatch.namedGroup('rss')!),
+          capMb: int.parse(memoryMatch.namedGroup('cap')!),
+        ),
+      );
+      continue;
+    }
+    final rotationMatch = _rotationMarkerPattern.firstMatch(line);
+    if (rotationMatch != null) {
+      // Log-rotate can fire more than once across a long session — only the
+      // most recent cut matters, since it discarded everything before it.
+      lastRotationTimestamp = rotationMatch.namedGroup('timestamp');
+    }
   }
 
   if (samples.isEmpty) {
@@ -96,6 +115,14 @@ void main(List<String> args) {
   if (last.capMb > 0) {
     final pctOfCap = (last.rssMb / last.capMb * 100).round();
     print('Latest is $pctOfCap% of the configured cap.');
+  }
+  if (lastRotationTimestamp != null) {
+    print('');
+    print(
+      'CAVEAT: plugin.log was rotated at $lastRotationTimestamp — earlier '
+      'entries were discarded to keep the file under its size cap. Min/Max '
+      'above reflect only the retained window, not the full session.',
+    );
   }
 }
 

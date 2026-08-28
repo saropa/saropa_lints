@@ -315,6 +315,23 @@ final class PluginLogger {
       }
 
       file.writeAsBytesSync(bytes.sublist(newlinePos + 1));
+
+      // Mark the cut so readers that trend a value across the file's history
+      // (e.g. bin/memory_report.dart's RSS min/max) can tell "this really is
+      // the session minimum" apart from "the true minimum was in the
+      // discarded prefix". Written directly rather than via [log] because
+      // [_logFilePath] may not be set yet at this call site (setProjectRoot
+      // assigns it just before calling this).
+      _appendToFile(
+        path,
+        _LogEntry(
+          timestamp: DateTime.now().toUtc(),
+          message:
+              '[log-rotated] earlier entries discarded — file exceeded '
+              '$_maxLogFileBytes bytes. Trend summaries below this line '
+              'reflect only the retained window, not the full session.',
+        ),
+      );
     } on Object catch (_) {
       // Best-effort rotation — never crash the plugin.
     }

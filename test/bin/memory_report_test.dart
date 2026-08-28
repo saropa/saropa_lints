@@ -78,4 +78,35 @@ void main() {
     expect(output, contains('Min RSS: 5000MB'));
     expect(output, contains('Max RSS: 5000MB'));
   });
+
+  test('prints a CAVEAT when the log was rotated mid-session', () {
+    final logDir = Directory(
+      p.join(tempDir.path, 'reports', '.saropa_lints'),
+    )..createSync(recursive: true);
+    File(p.join(logDir.path, 'plugin.log')).writeAsStringSync(
+      '2026-08-28T00:00:30.000Z | [memory] RSS 4200MB (cap 6144MB)\n'
+      '2026-08-28T00:01:00.000Z | [log-rotated] earlier entries discarded '
+      '— file exceeded 524288 bytes.\n'
+      '2026-08-28T00:01:30.000Z | [memory] RSS 3800MB (cap 6144MB)\n',
+    );
+
+    final output = runReport(tempDir.path);
+    expect(output, contains('Samples: 2'));
+    expect(
+      output,
+      contains('CAVEAT: plugin.log was rotated at 2026-08-28T00:01:00.000Z'),
+    );
+  });
+
+  test('omits the CAVEAT when the log has never been rotated', () {
+    final logDir = Directory(
+      p.join(tempDir.path, 'reports', '.saropa_lints'),
+    )..createSync(recursive: true);
+    File(p.join(logDir.path, 'plugin.log')).writeAsStringSync(
+      '2026-08-28T00:00:30.000Z | [memory] RSS 4200MB (cap 6144MB)\n',
+    );
+
+    final output = runReport(tempDir.path);
+    expect(output, isNot(contains('CAVEAT')));
+  });
 }
