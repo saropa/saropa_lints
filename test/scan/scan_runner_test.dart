@@ -12,7 +12,8 @@ library;
 
 import 'dart:io';
 
-import 'package:saropa_lints/saropa_lints.dart' show SaropaLintRule;
+import 'package:saropa_lints/saropa_lints.dart'
+    show RuleLane, SaropaLintRule, resetRuleLaneForTest;
 import 'package:saropa_lints/scan.dart';
 import 'package:test/test.dart';
 
@@ -451,6 +452,76 @@ plugins:
         reason:
             'resolved scan should surface instance-creation / type-based '
             'rules on the platform-check fixture',
+      );
+    });
+  });
+
+  group('ScanRunner lane', () {
+    // Regression for the lane-gate bug (2026-08-25): the CLI scan path
+    // defaulted to RuleLane.light, silently blocking every rule with
+    // usesTypeResolution => true — including prefer_switch_with_sealed_classes.
+    // ScanRunner now defaults to RuleLane.full (see the `lane` field), but
+    // that default must stay correct: pin both directions so a regression to
+    // the light default, or a broken lane predicate, fails this test rather
+    // than only being caught by a hand-run reproducer.
+    tearDown(resetRuleLaneForTest);
+
+    const fixture =
+        'example/lib/code_quality/prefer_switch_with_sealed_classes_fixture.dart';
+
+    test('full lane fires a usesTypeResolution rule the light lane blocks', () {
+      final fullResult = ScanRunner(
+        targetPath: projectRoot,
+        dartFiles: [fixture],
+        tier: 'pedantic',
+        // Fixture lives under example/, which directory discovery excludes;
+        // scan it explicitly without applying those exclusions.
+        applyExclusionsToFileList: false,
+        lane: RuleLane.full,
+        messageSink: (_) {},
+      ).run();
+
+      expect(fullResult, isNotNull);
+      final fullRules = fullResult!.map((d) => d.ruleName).toSet();
+      expect(
+        fullRules,
+        contains('prefer_switch_with_sealed_classes'),
+        reason:
+            'full lane must run every enabled rule regardless of '
+            'usesTypeResolution',
+      );
+
+      final lightResult = ScanRunner(
+        targetPath: projectRoot,
+        dartFiles: [fixture],
+        tier: 'pedantic',
+        applyExclusionsToFileList: false,
+        lane: RuleLane.light,
+        messageSink: (_) {},
+      ).run();
+
+      expect(lightResult, isNotNull);
+      final lightRules = lightResult!.map((d) => d.ruleName).toSet();
+      expect(
+        lightRules,
+        isNot(contains('prefer_switch_with_sealed_classes')),
+        reason:
+            'prefer_switch_with_sealed_classes declares '
+            'usesTypeResolution => true, so the light lane must gate its '
+            'callback out — this pins the exact false-negative from the '
+            'bug report',
+      );
+
+      // The lane gate blocks the majority of the catalog, not just this one
+      // rule — the light-lane run should report strictly fewer diagnostics
+      // overall on the same file.
+      expect(
+        lightResult.length,
+        lessThan(fullResult.length),
+        reason:
+            'light lane should surface fewer diagnostics than full lane on '
+            'the same file — most professional/comprehensive/pedantic rules '
+            'require type resolution and are light-lane-excluded',
       );
     });
   });

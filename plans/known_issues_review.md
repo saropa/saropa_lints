@@ -22,7 +22,7 @@ _None._
   - Current reason: Fails on Apple Silicon builds.
 - **`badges`** (end_of_life) — recorded `2023-08-28`, pub.dev latest `2026-04-10` (v3.2.0). [pub.dev](https://pub.dev/packages/badges)
   - Current reason: Positioning logic broken; badges render off-screen in Material 3.
-- **`better_player`** (maintenance_mode) — recorded `2024-06-15`, pub.dev latest `2026-08-24` (v0.8.1). [pub.dev](https://pub.dev/packages/better_player)
+- **`better_player`** (maintenance_mode) — recorded `2024-06-15`, pub.dev latest `2026-08-27` (v1.1.0). [pub.dev](https://pub.dev/packages/better_player)
   - Current reason: 
 - **`camera`** (end_of_life) — recorded `2026-02-25`, pub.dev latest `2026-07-13` (v0.12.0+2). [pub.dev](https://pub.dev/packages/camera)
   - Current reason: Fails Android 14 Scoped Storage and iOS 18 hardware manifest requirements.
@@ -30,7 +30,7 @@ _None._
   - Current reason: Code generator fails completely on Dart 3.
 - **`desktop_window`** (end_of_life) — recorded `2024-10-29`, pub.dev latest `2026-05-29` (v0.4.4). [pub.dev](https://pub.dev/packages/desktop_window)
   - Current reason: Obsolete since native Flutter desktop size support was added.
-- **`file_picker`** (end_of_life) — recorded `2026-01-28`, pub.dev latest `2026-08-25` (v12.1.0). [pub.dev](https://pub.dev/packages/file_picker)
+- **`file_picker`** (end_of_life) — recorded `2026-01-28`, pub.dev latest `2026-08-26` (v12.1.1). [pub.dev](https://pub.dev/packages/file_picker)
   - Current reason: Returns unreadable cache paths.
 - **`flutter_cache_manager`** (end_of_life) — recorded `2024-08-13`, pub.dev latest `2026-07-21` (v3.4.2). [pub.dev](https://pub.dev/packages/flutter_cache_manager)
   - Current reason: Fails to clear disk space, leading to out-of-storage app crashes.
@@ -111,7 +111,7 @@ _None._
   - Current reason: RevenueCat's proprietary wrapper. Free up to a specific monthly revenue limit, after which they take a percentage cut of your app's earnings.
 - **`scanbot_sdk`** (paid) — recorded `2025-11-03`, pub.dev latest `2026-07-22` (v9.0.1). [pub.dev](https://pub.dev/packages/scanbot_sdk)
   - Current reason: Strictly commercial enterprise SDK. Cannot be used in production without purchasing a highly expensive yearly corporate license from Scanbot.
-- **`sendbird_chat_sdk`** (commercial) — recorded `2026-02-12`, pub.dev latest `2026-08-21` (v4.10.1). [pub.dev](https://pub.dev/packages/sendbird_chat_sdk)
+- **`sendbird_chat_sdk`** (commercial) — recorded `2026-02-12`, pub.dev latest `2026-08-27` (v4.10.2). [pub.dev](https://pub.dev/packages/sendbird_chat_sdk)
   - Current reason: A heavy, proprietary Chat-as-a-Service SDK. Their free tier is heavily crippled (limits on MAUs and concurrent connections), forcing a rapid upgrade to very expensive paid tiers.
 - **`stream_chat_flutter`** (freemium) — recorded `2026-01-28`, pub.dev latest `2026-08-14` (v10.3.0). [pub.dev](https://pub.dev/packages/stream_chat_flutter)
   - Current reason: Proprietary Chat-as-a-Service SaaS. While it has a startup tier, it is a heavily vendor-locked enterprise product that scales aggressively in cost.
