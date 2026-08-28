@@ -1,6 +1,6 @@
 # Plan: `DateUtils.dateOnly()` quick fix for `avoid_datetime_constructor`
 
-**Status: Open**
+**Status: Implemented**
 **Created: 2026-08-09**
 **Rule: `avoid_datetime_constructor`**
 **File: `lib/src/rules/data/json_datetime_rules.dart`**
@@ -133,3 +133,27 @@ Low. This is a new fix producer alongside the existing one. The detection is nar
 - Existing rule history: `plans/history/2026.08/2026.08.04/avoid_datetime_constructor_rule.md`
 - Existing fix: `lib/src/fixes/json_datetime/replace_datetime_constructor_fix.dart`
 - Flutter `DateUtils.dateOnly`: strips time components, returns `DateTime(d.year, d.month, d.day)`
+
+---
+
+## Finish Report (2026-08-28)
+
+`ReplaceDateOnlyFix` (`lib/src/fixes/json_datetime/replace_dateonly_fix.dart`) implements a quick fix that detects the strip-time idiom `DateTime(x.year, x.month, x.day)` and replaces it with `DateUtils.dateOnly(x)`. The fix auto-adds `package:flutter/material.dart` via `builder.importLibrary()`.
+
+**Detection criteria:** unnamed `DateTime()` constructor, exactly 3 positional args (no named), each a `PropertyAccess` or `PrefixedIdentifier` with `.year`/`.month`/`.day` in order, all sharing the same receiver by `toSource()` string equality, with the receiver's `staticType` being non-nullable `DateTime` from `dart:core`.
+
+**Exclusions:** `.utc()` (implicit — bails on any named constructor), nullable `DateTime?`, non-`DateTime` types with matching accessors, complex/null-aware arg expressions.
+
+**Registration:** Added to `fixGenerators` on both `AvoidDateTimeConstructorRule` and `AvoidDateTimeConstructorUnvalidatedRule`, listed before `ReplaceDateTimeConstructorFix` (priority 60 vs 50).
+
+**Fixture:** `example/lib/json_datetime/avoid_datetime_constructor_dateonly_fixture.dart` — 6 cases: positive strip-time, 4-arg, UTC, different receivers, non-DateTime type (`_FakeDate`), complex null-aware args, nullable receiver.
+
+**Test:** Structural smoke test in `test/scan/fix_application_smoke_test.dart` verifies class reachability, fixKind id, priority, and message. Full source-rewrite verification requires analyzer harness or IDE manual testing.
+
+**Drift `hide Column` import collision** (plan line 50): not implemented. `builder.importLibrary()` adds the import unconditionally. If a target file also imports `package:drift/drift.dart`, the user may need to manually add `hide Column`. This is a rare edge case and a potential follow-up.
+
+### Hardening (2026-08-28)
+
+- **Flutter-only guard:** `_hasFlutterImport()` checks for any `package:flutter/` import in the compilation unit before offering the fix. Without Flutter, `DateUtils` is unavailable and the fix would produce unresolvable code.
+- **Explicit-midnight-zeros variant:** The fix now also matches `DateTime(x.year, x.month, x.day, 0)`, `DateTime(x.year, x.month, x.day, 0, 0)`, and `DateTime(x.year, x.month, x.day, 0, 0, 0)` — trailing integer-literal-zero args are stripped. Non-zero trailing args still bail.
+- **Additional fixture cases:** `_FakeDate` (non-DateTime type), complex null-aware args, explicit midnight zeros, partial midnight zeros, non-zero 4th arg.
