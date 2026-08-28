@@ -101,32 +101,136 @@
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for: avoid_stream_in_build
-// Source: lib\src\rules\async_rules.dart
+// Source: lib\src\rules\core\async_rules.dart
+
+import 'dart:async';
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-final context = BuildContext();
-dynamic controller;
-dynamic stream;
+// --- Mock helpers for fixture ---
 
-// BAD: Should trigger avoid_stream_in_build
-// The rule walks up to a MethodDeclaration named `build`, so the controller
-// must be created inside an actual build method, not a top-level function.
-class BadStreamWidget extends StatelessWidget {
+// Simulates a database/repo method that returns a stream
+Stream<List<String>> _watchAll() => Stream.value([]);
+Stream<List<String>> _watchByIds(List<int> ids) => Stream.value([]);
+
+// BAD: StreamController created inside build() — recreated every build
+class BadStreamControllerWidget extends StatelessWidget {
   @override
-  // expect_lint: avoid_stream_in_build
   Widget build(BuildContext context) {
-    final controller = StreamController<int>(); // Recreated every build!
+    // expect_lint: avoid_stream_in_build
+    final controller = StreamController<int>(); // LINT — recreated every build
     return StreamBuilder(stream: controller.stream);
   }
 }
 
-// GOOD: Should NOT trigger avoid_stream_in_build
-void _good105() {
-  late final StreamController<int> _controller;
+// BAD: StreamBuilder with method invocation as stream: argument
+class BadStreamBuilderWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<String>>(
+      // expect_lint: avoid_stream_in_build
+      stream: _watchAll(), // LINT — new subscription every rebuild
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}
 
+// BAD: Nested builder — inner stream created on every outer emission
+class BadNestedStreamWidget extends StatefulWidget {
+  @override
+  State<BadNestedStreamWidget> createState() => _BadNestedStreamWidgetState();
+}
+
+class _BadNestedStreamWidgetState extends State<BadNestedStreamWidget> {
+  final Stream<List<int>> _outerStream = Stream.value([1, 2]);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<int>>(
+      stream: _outerStream, // OK — field reference
+      builder: (context, outerSnap) {
+        return StreamBuilder<List<String>>(
+          // expect_lint: avoid_stream_in_build
+          stream: _watchByIds(outerSnap.data ?? []), // LINT — inline method
+          builder: (context, innerSnap) => Container(),
+        );
+      },
+    );
+  }
+}
+
+// GOOD: Stream cached in State field via initState
+class GoodCachedStreamWidget extends StatefulWidget {
+  @override
+  State<GoodCachedStreamWidget> createState() => _GoodCachedStreamWidgetState();
+}
+
+class _GoodCachedStreamWidgetState extends State<GoodCachedStreamWidget> {
+  late final Stream<List<String>> _stream;
+
+  @override
   void initState() {
-    // super.initState();
-    _controller = StreamController<int>();
+    super.initState();
+    _stream = _watchAll();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<String>>(
+      stream: _stream, // OK — field reference, not a method call
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}
+
+// GOOD: Stream.value() is safe — no real subscription
+class GoodStreamValueWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<int>(
+      stream: Stream.value(42), // OK — safe constructor
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}
+
+// GOOD: Stream.empty() is safe — no I/O
+class GoodStreamEmptyWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<int>(
+      stream: Stream.empty(), // OK — safe constructor
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}
+
+// GOOD: Stream.fromIterable() is safe — deterministic, no I/O
+class GoodStreamFromIterableWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<int>(
+      stream: Stream.fromIterable([1, 2, 3]), // OK — safe constructor
+      builder: (context, snapshot) => Container(),
+    );
+  }
+}
+
+// GOOD: ??= caching idiom — only creates the stream once
+class GoodNullAwareCacheWidget extends StatefulWidget {
+  @override
+  State<GoodNullAwareCacheWidget> createState() =>
+      _GoodNullAwareCacheWidgetState();
+}
+
+class _GoodNullAwareCacheWidgetState extends State<GoodNullAwareCacheWidget> {
+  Stream<List<String>>? _stream;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<String>>(
+      stream: _stream ??= _watchAll(), // OK — ??= caching idiom
+      builder: (context, snapshot) => Container(),
+    );
   }
 }

@@ -249,3 +249,40 @@ bool hasChainedMethod(MethodInvocation node, String methodName) {
 
   return false;
 }
+
+// =============================================================================
+// Widget / build-method detection
+// =============================================================================
+
+/// Returns true if [node] extends a class that is a Flutter widget or State.
+/// Matches classes ending in "Widget" (StatelessWidget, StatefulWidget,
+/// HookWidget, ConsumerWidget, etc.) or ending in "State" (State<T>,
+/// ConsumerState, etc.). This covers both core Flutter and third-party
+/// widget frameworks (Riverpod, flutter_hooks, etc.).
+bool isWidgetOrStateClass(ClassDeclaration node) {
+  final extendsClause = node.extendsClause;
+  if (extendsClause == null) return false;
+
+  final superName = extendsClause.superclass.name.lexeme;
+  // Catches StatelessWidget, StatefulWidget, HookWidget, ConsumerWidget, etc.
+  if (superName.endsWith('Widget')) return true;
+  // Catches State<T>, ConsumerState<T>, etc.
+  if (superName.endsWith('State')) return true;
+
+  return false;
+}
+
+/// Walks up the AST from [node] through closures, callbacks, and
+/// function literals to determine if the node is inside a method
+/// named `build`. Returns true if any ancestor MethodDeclaration
+/// has the name `build`.
+bool isInsideBuildMethod(AstNode node) {
+  AstNode? current = node.parent;
+  while (current != null) {
+    if (current is MethodDeclaration && current.name.lexeme == 'build') {
+      return true;
+    }
+    current = current.parent;
+  }
+  return false;
+}
