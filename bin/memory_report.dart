@@ -20,11 +20,11 @@
 // roughly every 30s while the in-process analyzer plugin is running. This
 // tool is a separate, short-lived process — it has no access to the live
 // analysis server's memory — so it can only read that log file after the
-// fact. This is the minimal slice of the "memory monitor" proposal in
-// `bugs/proposal_infra_analyzer_memory_monitor.md`: it gives post-crash
-// visibility into the RSS trend, but does NOT implement the proposal's
-// warning threshold, rule shedding, or status-bar integration, none of
-// which exist yet.
+// fact. This is Phase 0 of the memory-monitor plan in
+// `plans/PLAN_analyzer_memory_monitor.md`: it gives post-crash
+// visibility into the RSS trend, but does NOT implement that plan's
+// warning threshold (Phase 1), rule shedding (Phase 3), or status-bar
+// integration (Phase 4), none of which exist yet.
 //
 // `plugin.log` is size-capped and rotated (PluginLogger._rotateIfNeeded);
 // when that happens mid-session, this tool prints a CAVEAT rather than
