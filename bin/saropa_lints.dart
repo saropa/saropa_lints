@@ -20,6 +20,7 @@
 ///   baseline        Generate and manage baseline files for existing violations
 ///   impact-report   Run lint analysis and display results by impact level
 ///   scan            Run lint rules against any Dart project
+///   memory-report   Summarize the analysis server's RSS trend from plugin.log
 ///
 /// Examples:
 ///   dart run saropa_lints init --tier comprehensive
@@ -33,6 +34,7 @@ import 'package:collection/collection.dart';
 
 import 'baseline.dart' as baseline_cmd;
 import 'init.dart' as init_cmd;
+import 'memory_report.dart' as memory_report_cmd;
 import 'scan.dart' as scan_cmd;
 import 'severity_report.dart' as severity_cmd;
 
@@ -61,6 +63,9 @@ Future<void> main(List<String> args) async {
     case 'scan':
       // scan.main is synchronous — no await needed
       scan_cmd.main(commandArgs);
+    case 'memory-report' || 'memory_report':
+      // memory_report.main is synchronous — no await needed
+      memory_report_cmd.main(commandArgs);
     default:
       print('Unknown command: $command');
       print('');
@@ -79,6 +84,7 @@ void _printUsage() {
   print('  baseline        Generate/manage baseline for existing violations');
   print('  severity-report Run analysis and show results grouped by severity');
   print('  scan            Run configured lint rules against any Dart project');
+  print('  memory-report   Summarize analysis server RSS trend from plugin.log');
   print('');
   print('Options:');
   print('  -h, --help      Show this help message');

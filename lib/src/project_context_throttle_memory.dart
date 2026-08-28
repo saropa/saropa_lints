@@ -1058,6 +1058,15 @@ class MemoryPressureHandler {
   /// flapping when RSS hovers at the threshold.
   static const int _rssRecoveryMarginMb = 512;
 
+  /// Wall-clock time of the last periodic RSS trend line written to
+  /// `plugin.log`. Separate from [_callsSinceRssCheck] (which throttles the
+  /// RSS *syscall*) because the trend log needs its own, coarser cadence —
+  /// otherwise a busy analysis pass would flood the log with a line every
+  /// ~200 rule callbacks instead of the ~30s a human reviewing a post-crash
+  /// log actually needs.
+  static DateTime? _lastMemoryLogAt;
+  static const Duration _memoryLogInterval = Duration(seconds: 30);
+
   /// The configured hard RSS cap in MB, or 0 if disabled. Used by
   /// FileBudgetTracker to compute its file-skipping threshold.
   static int get hardRssLimitMb => _hardLimitMb;
@@ -1078,6 +1087,16 @@ class MemoryPressureHandler {
     if (value && _hardLimitMb <= 0) _hardLimitMb = 1;
   }
 
+  /// Runs the real RSS refresh (including the periodic memory-log write) on
+  /// demand. Test-only — production code reaches [_refreshHardLimit] only via
+  /// [isOverHardLimit]'s call-count throttle, which a test would otherwise
+  /// have to drive 200+ times just to exercise the log line.
+  static void refreshForTesting() => _refreshHardLimit();
+
+  /// Resets the periodic memory-log cooldown so the next [refreshForTesting]
+  /// or [isOverHardLimit] refresh is guaranteed to log. Test-only.
+  static void resetMemoryLogCooldownForTesting() => _lastMemoryLogAt = null;
+
   /// Whether the process RSS is currently over the hard cap, meaning rule
   /// execution should pause. Self-samples the real RSS on a throttle so callers
   /// can invoke it on the hot per-node path without a syscall every time.
@@ -1094,6 +1113,19 @@ class MemoryPressureHandler {
   static void _refreshHardLimit() {
     final rss = _currentRssMb();
     if (rss <= 0) return; // RSS unavailable on this platform — leave flag as-is
+
+    // Periodic trend line for post-crash diagnosis: this call site already
+    // runs on every RSS refresh (throttled via _rssCheckInterval above), so
+    // piggybacking here avoids a second polling loop. Gated on wall-clock
+    // interval, not refresh count, since refresh frequency depends on how
+    // busy the analysis server is.
+    final now = DateTime.now();
+    if (_lastMemoryLogAt == null ||
+        now.difference(_lastMemoryLogAt!) >= _memoryLogInterval) {
+      _lastMemoryLogAt = now;
+      PluginLogger.log('[memory] RSS ${rss}MB (cap ${_hardLimitMb}MB)');
+    }
+
     if (!_hardLimitTripped && rss >= _hardLimitMb) {
       _hardLimitTripped = true;
       // Shed the plugin's own caches immediately to give back what we can.
