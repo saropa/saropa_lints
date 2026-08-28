@@ -66,6 +66,24 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [Unreleased]
 
+### Fixed
+
+- `avoid_future_in_build` (v3) removed name-prefix heuristic that only caught methods starting with `fetch`/`load`/`get`/etc. Now flags ANY method invocation in `FutureBuilder(future:)` inside `build()`. Also detects non-deterministic `Future` constructors while exempting `Future.value()` and `Future.error()`. Scoped to `FutureBuilder` only (no longer flags custom widgets with a `future:` parameter). Widget class detection now covers third-party bases (`HookWidget`, `ConsumerWidget`, etc.). No action required.
+- `pass_existing_future_to_future_builder` (v9) no longer flags `Future.value()` and `Future.error()` constructors. Cache-method exemption now also recognizes `@cachedFuture` annotation from `package:saropa_lints/annotations.dart`. No action required.
+- **OOM crash on large projects (4000+ files):** The in-process analyzer plugin could exhaust memory on projects with thousands of files because forward-accumulating trackers were never evicted under pressure, the hard RSS safety valve defaulted too high, and violation tracking continued after the valve tripped. The plugin now sheds tracker data under memory pressure, stops accumulating records while memory-critical, adapts the default RSS cap to 60% of system RAM (capped at 4 GB), warns when the project exceeds 2000 files, and includes tracker sizes in the memory estimate. No action required — set `SAROPA_LINTS_MAX_RSS_MB` to override the adaptive cap.
+
+### Added
+
+- **`@cachedFuture` annotation** (`package:saropa_lints/annotations.dart`) — marks a method as returning a cached Future, suppressing `pass_existing_future_to_future_builder` without needing the heuristic (private method + `Future?` field). Use when your naming convention doesn't match the heuristic.
+
+### Changed
+
+- `avoid_stream_in_build` (v3) now also detects `StreamBuilder(stream: method())` where a method invocation creates a new subscription on every rebuild. Previously only caught `StreamController()` instantiation inside `build()`. Excludes safe constructors (`Stream.value()`, `Stream.empty()`) and the `??=` caching idiom. No action required.
+
+---
+
+## [15.2.4]
+
 > The `analyzer ^13.1.0` migration (Dart 3.13+ / Flutter 3.47.1+, released 2026-08-19) is complete and tested but held off `main` — adoption of 3.47.1 is near zero. It is parked on the `analyzer-13-migration` branch and will ship as a 16.0.0 major bump once adoption is widespread.
 
 ### Fixed

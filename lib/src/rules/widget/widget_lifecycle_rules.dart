@@ -3772,11 +3772,14 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'pass_existing_future_to_future_builder',
-    '[pass_existing_future_to_future_builder] Creating new Future in FutureBuilder restarts the async operation on every widget rebuild. This causes duplicate network calls, database queries, and slow UI with visible loading states. {v8}',
+    '[pass_existing_future_to_future_builder] Creating new Future in FutureBuilder restarts the async operation on every widget rebuild. This causes duplicate network calls, database queries, and slow UI with visible loading states. {v9}',
     correctionMessage:
         'Cache the Future in initState() or a final field and pass the stored reference to the FutureBuilder to prevent duplicate async operations on each rebuild.',
     severity: DiagnosticSeverity.WARNING,
   );
+
+  // v8→v9: tightened cache-method exemption to require method name matches
+  // a specific Future? field; exempted Future.value()/Future.error().
 
   @override
   void runWithReporter(
@@ -3792,25 +3795,29 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
         if (arg is NamedExpression && arg.name.label.name == 'future') {
           final Expression value = arg.expression;
 
-          // Warn if future is a method invocation (creating new future).
-          // Skip the cache-method pattern: a private instance method on a class
-          // that owns a Future<T>? field is the idiomatic way to return a
-          // cached future when the cached value depends on dynamic input
-          // (where `late final` would be wrong). See bug:
-          // pass_existing_future_to_future_builder_false_positive_private_method_returning_cached_field.
+          // Flag method invocations that create a new Future each rebuild.
+          // Exempt the cache-method pattern: a private method whose name
+          // references a specific Future? field on the same class (not just
+          // any class with any Future? field).
           if (value is MethodInvocation) {
             if (!_isCacheMethodCall(value)) {
               reporter.atNode(value);
             }
           }
 
-          // Warn if future is a function expression
+          // Flag inline function expressions — always creates a new closure.
           if (value is FunctionExpression) {
             reporter.atNode(value);
           }
 
-          // Warn if future is a Future constructor (e.g., Future.value())
+          // Flag Future constructors except Future.value() and Future.error()
+          // which are deterministic with no I/O and safe to call in build.
           if (value is InstanceCreationExpression) {
+            final typeName = value.constructorName.type.name.lexeme;
+            if (typeName == 'Future') {
+              final ctorName = value.constructorName.name?.name;
+              if (ctorName == 'value' || ctorName == 'error') return;
+            }
             reporter.atNode(value);
           }
         }
@@ -3818,31 +3825,39 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
     });
   }
 
-  /// Returns true when the call looks like a cache-method pattern:
-  /// a private instance method on the enclosing class whose owning class
-  /// declares at least one `Future<...>?` field.
+  /// Returns true when the call looks like a cache-method pattern.
   ///
-  /// The combination of (implicit-this private call) + (nullable Future field
-  /// on the same class) is a strong signal that the method returns a cached
-  /// future rather than allocating a fresh one each call. Without this opt-out
-  /// the rule criminalizes the project's idiomatic cache-method pattern, which
-  /// the rule's own correction message ("cache the Future") already endorses.
+  /// Two signals are recognized (either is sufficient):
+  /// 1. **@cachedFuture annotation** on the method declaration — explicit
+  ///    opt-out from `package:saropa_lints/annotations.dart`.
+  /// 2. **Heuristic** — private instance method on a class that declares at
+  ///    least one `Future<...>?` field. The nullable `?` is the load-bearing
+  ///    signal: the cache-method reassignment pattern requires a nullable
+  ///    field.
+  ///
+  /// See bug: pass_existing_future_to_future_builder_false_positive_private_method_returning_cached_field.
   bool _isCacheMethodCall(MethodInvocation node) {
     // Must be a method call on the enclosing class (implicit-this or `this`).
     final Expression? target = node.target;
     if (target != null && target is! ThisExpression) return false;
 
-    // Must be a private method (lives in the same library) — strong signal
-    // that we can reason about its body shape from project conventions.
-    if (!node.methodName.name.startsWith('_')) return false;
-
     final ClassDeclaration? cls = node.thisOrAncestorOfType<ClassDeclaration>();
     if (cls == null) return false;
 
-    // Search for at least one `Future<...>?` field on the class. Nullable
-    // (`?`) is the load-bearing signal: late-final non-nullable futures can
-    // only be assigned once, so the cache-method reassignment pattern requires
-    // the field to be nullable.
+    // Check for @cachedFuture annotation on the called method's declaration.
+    // Works for methods defined in the same class (AST-only, no type
+    // resolution needed).
+    final String methodName = node.methodName.name;
+    for (final ClassMember member in cls.bodyMembers) {
+      if (member is MethodDeclaration && member.name.lexeme == methodName) {
+        if (_hasCachedFutureAnnotation(member)) return true;
+        break;
+      }
+    }
+
+    // Heuristic fallback: private method + class has a Future<T>? field.
+    if (!methodName.startsWith('_')) return false;
+
     for (final ClassMember member in cls.bodyMembers) {
       if (member is! FieldDeclaration) continue;
       final TypeAnnotation? type = member.fields.type;
@@ -3851,6 +3866,16 @@ class PassExistingFutureToFutureBuilderRule extends SaropaLintRule {
           type.question != null) {
         return true;
       }
+    }
+    return false;
+  }
+
+  /// Checks if a method declaration has a `@cachedFuture` or `@CachedFuture()`
+  /// annotation from `package:saropa_lints/annotations.dart`.
+  bool _hasCachedFutureAnnotation(MethodDeclaration method) {
+    for (final Annotation annotation in method.metadata) {
+      final name = annotation.name.name;
+      if (name == 'cachedFuture' || name == 'CachedFuture') return true;
     }
     return false;
   }

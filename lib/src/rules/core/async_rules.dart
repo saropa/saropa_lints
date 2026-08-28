@@ -2293,12 +2293,17 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 // Part 5 Rules: Stream/Future Rules
 // =============================================================================
 
-/// Warns when StreamController is created inside build() method.
+/// Warns when a Stream is created inside a widget's build() method.
 ///
-/// Since: v2.1.0 | Updated: v4.13.0 | Rule version: v2
+/// Since: v2.1.0 | Updated: v4.14.0 | Rule version: v3
 ///
-/// Creating streams in build causes them to be recreated on every rebuild,
-/// leading to memory leaks and lost events.
+/// Detects two patterns that create new stream subscriptions on every rebuild:
+/// 1. `StreamController()` instantiation inside build()
+/// 2. `StreamBuilder(stream: someMethod())` where stream: is a method call
+///
+/// Both cause overlapping subscriptions, memory leaks, and lost events.
+/// Excludes safe constructors (`Stream.value()`, `Stream.empty()`) and
+/// caching idioms (`_stream ??= method()`).
 ///
 /// **BAD:**
 /// ```dart
@@ -2308,13 +2313,27 @@ class RequireLocationTimeoutRule extends SaropaLintRule {
 /// }
 /// ```
 ///
+/// **BAD:**
+/// ```dart
+/// Widget build(BuildContext context) {
+///   return StreamBuilder<List<Model>>(
+///     stream: DatabaseIO.watchAll(), // New subscription every rebuild!
+///     builder: (context, snapshot) => ListView(...),
+///   );
+/// }
+/// ```
+///
 /// **GOOD:**
 /// ```dart
-/// late final StreamController<int> _controller;
+/// late final Stream<List<Model>> _stream;
 ///
 /// void initState() {
 ///   super.initState();
-///   _controller = StreamController<int>();
+///   _stream = DatabaseIO.watchAll();
+/// }
+///
+/// Widget build(BuildContext context) {
+///   return StreamBuilder(stream: _stream, ...); // Cached field reference
 /// }
 /// ```
 class AvoidStreamInBuildRule extends SaropaLintRule {
@@ -2330,15 +2349,24 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
   Set<String> get tags => const {'dart-core'};
 
   @override
-  RuleCost get cost => RuleCost.low;
+  // Pattern 2 walks the full build body with a RecursiveAstVisitor
+  RuleCost get cost => RuleCost.medium;
   @override
   bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'avoid_stream_in_build',
-    "[avoid_stream_in_build] Creating a Stream or StreamController inside a widget's build() method causes a new stream instance to be created on every rebuild of that widget. This leads to multiple overlapping subscriptions, memory leaks, and lost or duplicated events, making the widget's state unpredictable and difficult to debug. Always manage streams as persistent fields in the State class, not as local variables in build(). See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder. {v2}",
+    "[avoid_stream_in_build] Creating a Stream or StreamController inside a "
+        "widget's build() method causes a new stream instance on every rebuild. "
+        "This leads to overlapping subscriptions, memory leaks, and lost or "
+        "duplicated events. Always manage streams as persistent fields in the "
+        "State class, not as local variables or inline method calls in "
+        "build(). {v3}",
     correctionMessage:
-        'Move all Stream and StreamController creation out of the build() method and into the State class, typically initializing them in initState() and disposing them in dispose(). This ensures a single, consistent stream lifecycle per widget instance and prevents memory leaks or event loss. See https://docs.flutter.dev/cookbook/networking/web-sockets#using-streambuilder for recommended patterns.',
+        'Move all Stream and StreamController creation out of the build() '
+        'method and into the State class, typically initializing them in '
+        'initState() and disposing them in dispose(). For StreamBuilder, pass '
+        'a cached field reference instead of a method call.',
     severity: DiagnosticSeverity.ERROR,
   );
 
@@ -2347,20 +2375,107 @@ class AvoidStreamInBuildRule extends SaropaLintRule {
     SaropaDiagnosticReporter reporter,
     SaropaContext context,
   ) {
+    // Pattern 1: StreamController() instantiation inside build()
     context.addInstanceCreationExpression((InstanceCreationExpression node) {
       final String typeName = node.constructorName.type.name.lexeme;
       if (typeName != 'StreamController') return;
 
-      // Check if inside build method
-      AstNode? current = node.parent;
-      while (current != null) {
-        if (current is MethodDeclaration && current.name.lexeme == 'build') {
-          reporter.atNode(node);
-          return;
-        }
-        current = current.parent;
+      // Walk up to confirm we're inside a build() method
+      if (isInsideBuildMethod(node)) {
+        reporter.atNode(node);
       }
     });
+
+    // Pattern 2: StreamBuilder(stream: method()) inside build()
+    context.addMethodDeclaration((MethodDeclaration node) {
+      if (node.name.lexeme != 'build') return;
+
+      // Confirm this is a widget class build method
+      final classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
+      if (classDecl == null) return;
+      if (!isWidgetOrStateClass(classDecl)) return;
+
+      // Walk the build body looking for StreamBuilder stream: arguments
+      node.body.visitChildren(
+        _StreamInBuildVisitor((streamArgNode) {
+          reporter.atNode(streamArgNode);
+        }),
+      );
+    });
+  }
+}
+
+/// Visitor that finds method invocations passed as StreamBuilder's stream:
+/// argument, excluding safe patterns like Stream.value()/Stream.empty() and
+/// the ??= caching idiom.
+class _StreamInBuildVisitor extends RecursiveAstVisitor<void> {
+  _StreamInBuildVisitor(this._onStreamCreated);
+
+  final void Function(AstNode) _onStreamCreated;
+
+  /// Safe Stream constructors that don't create real subscriptions.
+  static const Set<String> _safeStreamConstructors = <String>{
+    'value',
+    'empty',
+    'fromIterable',
+  };
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    // Check for StreamBuilder(stream: method())
+    final typeName = node.constructorName.type.name.lexeme;
+    if (typeName == 'StreamBuilder') {
+      _checkStreamArgument(node.argumentList);
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+
+  /// Inspects the stream: named argument for method invocations.
+  void _checkStreamArgument(ArgumentList argList) {
+    for (final arg in argList.arguments) {
+      if (arg is! NamedExpression) continue;
+      if (arg.name.label.name != 'stream') continue;
+
+      final expr = arg.expression;
+      // Unwrap the actual value — may be wrapped in an assignment
+      final effectiveExpr = _unwrapAssignment(expr);
+      if (effectiveExpr == null) break;
+
+      // Flag method invocations (e.g., DatabaseIO.watchAll())
+      if (effectiveExpr is MethodInvocation &&
+          !_isSafeStreamMethod(effectiveExpr)) {
+        _onStreamCreated(effectiveExpr);
+      }
+
+      // Flag function expression invocations (e.g., getStream()())
+      if (effectiveExpr is FunctionExpressionInvocation) {
+        _onStreamCreated(effectiveExpr);
+      }
+      break;
+    }
+  }
+
+  /// Unwraps assignment expressions to get the actual value being passed.
+  /// Returns null for ??= (caching idiom that should not be flagged),
+  /// the RHS for plain = (still a rebuild-time creation), or the
+  /// expression itself if it's not an assignment.
+  Expression? _unwrapAssignment(Expression expr) {
+    if (expr is AssignmentExpression) {
+      // ??= is a caching idiom — skip it entirely
+      if (expr.operator.type == TokenType.QUESTION_QUESTION_EQ) return null;
+      // Plain = assignment still creates on every rebuild
+      return expr.rightHandSide;
+    }
+    return expr;
+  }
+
+  /// Returns true for Stream.value(), Stream.empty(), Stream.fromIterable().
+  bool _isSafeStreamMethod(MethodInvocation node) {
+    final target = node.target;
+    if (target is SimpleIdentifier && target.name == 'Stream') {
+      return _safeStreamConstructors.contains(node.methodName.name);
+    }
+    return false;
   }
 }
 
@@ -4066,7 +4181,7 @@ class AvoidFutureInBuildRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_future_in_build',
     '[avoid_future_in_build] Creating Future in build() causes repeated '
-        'async calls on every rebuild. {v2}',
+        'async calls on every rebuild. {v3}',
     correctionMessage:
         'Create the Future in initState() and store it in a field.',
     severity: DiagnosticSeverity.WARNING,
@@ -4083,7 +4198,7 @@ class AvoidFutureInBuildRule extends SaropaLintRule {
       // Check if this is a widget's build method
       final classDecl = node.thisOrAncestorOfType<ClassDeclaration>();
       if (classDecl == null) return;
-      if (!_isWidgetClass(classDecl)) return;
+      if (!isWidgetOrStateClass(classDecl)) return;
 
       // Look for async function calls in build
       node.body.visitChildren(
@@ -4093,16 +4208,6 @@ class AvoidFutureInBuildRule extends SaropaLintRule {
       );
     });
   }
-
-  bool _isWidgetClass(ClassDeclaration node) {
-    final extendsClause = node.extendsClause;
-    if (extendsClause == null) return false;
-
-    final superName = extendsClause.superclass.name.lexeme;
-    return superName == 'StatelessWidget' ||
-        superName == 'StatefulWidget' ||
-        superName.contains('State');
-  }
 }
 
 class _FutureCreationVisitor extends RecursiveAstVisitor<void> {
@@ -4110,28 +4215,52 @@ class _FutureCreationVisitor extends RecursiveAstVisitor<void> {
 
   final void Function(AstNode) onFutureCreated;
 
-  static const Set<String> _asyncMethodPrefixes = <String>{
-    'fetch',
-    'load',
-    'get',
-    'retrieve',
-    'download',
-    'upload',
-    'request',
-  };
-
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    // Check for common async method patterns
-    final methodName = node.methodName.name.toLowerCase();
-    if (_asyncMethodPrefixes.any((p) => methodName.startsWith(p))) {
-      // Check if this is assigned to a FutureBuilder
-      final parent = node.parent;
-      if (parent is NamedExpression && parent.name.label.name == 'future') {
-        onFutureCreated(node);
-      }
+    // Flag ANY method invocation passed as FutureBuilder's `future:` argument.
+    // The old prefix heuristic (`fetch`, `load`, etc.) missed most call sites.
+    //
+    // The ??= caching idiom (`_f ??= method()`) is naturally safe here:
+    // the MethodInvocation's parent is AssignmentExpression, not
+    // NamedExpression, so the guard below never matches it.
+    final parent = node.parent;
+    if (parent is NamedExpression &&
+        parent.name.label.name == 'future' &&
+        _isInsideFutureBuilder(parent)) {
+      onFutureCreated(node);
     }
     super.visitMethodInvocation(node);
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    // Flag Future constructors in FutureBuilder's `future:` arg, but exempt
+    // Future.value() and Future.error() since they're deterministic / no I/O.
+    final parent = node.parent;
+    if (parent is NamedExpression &&
+        parent.name.label.name == 'future' &&
+        _isInsideFutureBuilder(parent)) {
+      final typeName = node.constructorName.type.name.lexeme;
+      if (typeName == 'Future') {
+        final constructorName = node.constructorName.name?.name;
+        if (constructorName != 'value' && constructorName != 'error') {
+          onFutureCreated(node);
+        }
+      }
+    }
+    super.visitInstanceCreationExpression(node);
+  }
+
+  /// Walks up from a NamedExpression to check if it's inside a FutureBuilder
+  /// constructor. Prevents false positives on custom widgets with `future:`
+  /// parameters that may not have the same rebuild-subscription semantics.
+  bool _isInsideFutureBuilder(NamedExpression namedExpr) {
+    // NamedExpression → ArgumentList → InstanceCreationExpression
+    final argList = namedExpr.parent;
+    if (argList is! ArgumentList) return false;
+    final creation = argList.parent;
+    if (creation is! InstanceCreationExpression) return false;
+    return creation.constructorName.type.name.lexeme == 'FutureBuilder';
   }
 }
 
