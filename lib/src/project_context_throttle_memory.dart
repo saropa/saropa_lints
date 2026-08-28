@@ -1405,15 +1405,12 @@ int _totalPhysicalMemoryMb() {
     if (Platform.isWindows) {
       // Try PowerShell CIM first — wmic is deprecated since Windows 10 21H1
       // and may be removed in future builds. CIM returns bytes as a string.
-      final cimResult = Process.runSync(
-        'powershell',
-        [
-          '-NoProfile',
-          '-NonInteractive',
-          '-Command',
-          '(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory',
-        ],
-      );
+      final cimResult = Process.runSync('powershell', [
+        '-NoProfile',
+        '-NonInteractive',
+        '-Command',
+        '(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory',
+      ]);
       if (cimResult.exitCode == 0) {
         final bytes = int.tryParse((cimResult.stdout as String).trim());
         if (bytes != null && bytes > 0) return bytes ~/ (1 << 20);
@@ -1421,10 +1418,12 @@ int _totalPhysicalMemoryMb() {
 
       // Fall back to wmic for older Windows versions where PowerShell CIM
       // may not be available or the powershell binary isn't on PATH.
-      final wmicResult = Process.runSync(
-        'wmic',
-        ['OS', 'get', 'TotalVisibleMemorySize', '/value'],
-      );
+      final wmicResult = Process.runSync('wmic', [
+        'OS',
+        'get',
+        'TotalVisibleMemorySize',
+        '/value',
+      ]);
       if (wmicResult.exitCode == 0) {
         final output = (wmicResult.stdout as String).trim();
         // Format: "TotalVisibleMemorySize=16384000" (in KB)
@@ -1655,12 +1654,11 @@ void initializeCacheManagement({
   final startupRss = MemoryPressureHandler._currentRssMb();
   if (startupRss > 0) {
     // Log cap source so users understand the value.
-    final capSource =
-        parsedCap != null
-            ? 'env SAROPA_LINTS_MAX_RSS_MB'
-            : adaptiveCap != hardRssLimitMb
-            ? 'adaptive (60% of system RAM)'
-            : 'default';
+    final capSource = parsedCap != null
+        ? 'env SAROPA_LINTS_MAX_RSS_MB'
+        : adaptiveCap != hardRssLimitMb
+        ? 'adaptive (60% of system RAM)'
+        : 'default';
     stderr.writeln(
       '[saropa_lints] Memory management armed: '
       '${MemoryPressureHandler._caches.length} caches registered, '

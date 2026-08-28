@@ -1,13 +1,12 @@
 #!/usr/bin/env dart
 // ignore_for_file: avoid_print
 
-/// Module overview (comment coverage pass).
-/// comment-coverage: module overview (batch).
-///
-/// Dart CLI entrypoint for saropa_lints tooling.
+/// Dart CLI tool to summarize the analysis server's RSS trend from
+/// `plugin.log`.
 ///
 /// Saropa custom lints: rules register in `lib/src/rules/all_rules.dart`
-/// and tiers in `lib/src/tiers.dart` where applicable; see `plans/COMMENT_COVERAGE_PLAN.md`.
+/// and tiers in `lib/src/tiers.dart` where applicable.
+library;
 
 // CLI tool to summarize the analysis server's RSS trend from `plugin.log`.
 //
@@ -29,7 +28,6 @@
 // `plugin.log` is size-capped and rotated (PluginLogger._rotateIfNeeded);
 // when that happens mid-session, this tool prints a CAVEAT rather than
 // silently reporting a min/max that omits the discarded history.
-library;
 
 import 'dart:io';
 

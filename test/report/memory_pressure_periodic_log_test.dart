@@ -6,8 +6,7 @@ library;
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
-import 'package:saropa_lints/src/native/plugin_logger.dart'
-    show PluginLogger;
+import 'package:saropa_lints/src/native/plugin_logger.dart' show PluginLogger;
 import 'package:saropa_lints/src/project_context.dart'
     show MemoryPressureHandler;
 import 'package:test/test.dart';

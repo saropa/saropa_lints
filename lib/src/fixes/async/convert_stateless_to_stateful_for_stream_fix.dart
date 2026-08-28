@@ -156,7 +156,11 @@ class ConvertStatelessToStatefulForStreamFix extends SaropaFixProducer {
   /// unlikely given the zero-field applicability gate, but a name clash
   /// would produce invalid code).
   String? _pickFieldName(String buildSource) {
-    for (final candidate in const ['_stream', '_streamValue', '_cachedStream']) {
+    for (final candidate in const [
+      '_stream',
+      '_streamValue',
+      '_cachedStream',
+    ]) {
       if (!RegExp('\\b$candidate\\b').hasMatch(buildSource)) return candidate;
     }
     return null;

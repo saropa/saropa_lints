@@ -33,9 +33,8 @@ void main() {
   });
 
   test('reports "no memory trend lines" when log has no [memory] lines', () {
-    final logDir = Directory(
-      p.join(tempDir.path, 'reports', '.saropa_lints'),
-    )..createSync(recursive: true);
+    final logDir = Directory(p.join(tempDir.path, 'reports', '.saropa_lints'))
+      ..createSync(recursive: true);
     File(
       p.join(logDir.path, 'plugin.log'),
     ).writeAsStringSync('2026-08-28T00:00:00.000Z | Plugin.start()\n');
@@ -45,9 +44,8 @@ void main() {
   });
 
   test('summarizes min/max/latest RSS from matching lines', () {
-    final logDir = Directory(
-      p.join(tempDir.path, 'reports', '.saropa_lints'),
-    )..createSync(recursive: true);
+    final logDir = Directory(p.join(tempDir.path, 'reports', '.saropa_lints'))
+      ..createSync(recursive: true);
     File(p.join(logDir.path, 'plugin.log')).writeAsStringSync(
       '2026-08-28T00:00:00.000Z | [memory] RSS 3000MB (cap 6144MB)\n'
       '2026-08-28T00:00:30.000Z | [memory] RSS 4200MB (cap 6144MB)\n'
@@ -64,9 +62,8 @@ void main() {
   });
 
   test('ignores non-memory log lines interleaved with memory lines', () {
-    final logDir = Directory(
-      p.join(tempDir.path, 'reports', '.saropa_lints'),
-    )..createSync(recursive: true);
+    final logDir = Directory(p.join(tempDir.path, 'reports', '.saropa_lints'))
+      ..createSync(recursive: true);
     File(p.join(logDir.path, 'plugin.log')).writeAsStringSync(
       '2026-08-28T00:00:00.000Z | Plugin.start() — loading initial config\n'
       '2026-08-28T00:00:30.000Z | [memory] RSS 5000MB (cap 6144MB)\n'
@@ -80,9 +77,8 @@ void main() {
   });
 
   test('prints a CAVEAT when the log was rotated mid-session', () {
-    final logDir = Directory(
-      p.join(tempDir.path, 'reports', '.saropa_lints'),
-    )..createSync(recursive: true);
+    final logDir = Directory(p.join(tempDir.path, 'reports', '.saropa_lints'))
+      ..createSync(recursive: true);
     File(p.join(logDir.path, 'plugin.log')).writeAsStringSync(
       '2026-08-28T00:00:30.000Z | [memory] RSS 4200MB (cap 6144MB)\n'
       '2026-08-28T00:01:00.000Z | [log-rotated] earlier entries discarded '
@@ -99,9 +95,8 @@ void main() {
   });
 
   test('omits the CAVEAT when the log has never been rotated', () {
-    final logDir = Directory(
-      p.join(tempDir.path, 'reports', '.saropa_lints'),
-    )..createSync(recursive: true);
+    final logDir = Directory(p.join(tempDir.path, 'reports', '.saropa_lints'))
+      ..createSync(recursive: true);
     File(p.join(logDir.path, 'plugin.log')).writeAsStringSync(
       '2026-08-28T00:00:30.000Z | [memory] RSS 4200MB (cap 6144MB)\n',
     );

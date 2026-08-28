@@ -256,7 +256,7 @@ bool hasChainedMethod(MethodInvocation node, String methodName) {
 
 /// Returns true if [node] extends a class that is a Flutter widget or State.
 /// Matches classes ending in "Widget" (StatelessWidget, StatefulWidget,
-/// HookWidget, ConsumerWidget, etc.) or ending in "State" (State<T>,
+/// HookWidget, ConsumerWidget, etc.) or ending in "State" (`State<T>`,
 /// ConsumerState, etc.). This covers both core Flutter and third-party
 /// widget frameworks (Riverpod, flutter_hooks, etc.).
 bool isWidgetOrStateClass(ClassDeclaration node) {
