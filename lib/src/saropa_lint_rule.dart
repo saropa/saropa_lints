@@ -336,6 +336,11 @@ class ProgressTracker {
     _isEtaCalibrated = true;
   }
 
+  /// File-count threshold above which the in-process plugin warns about
+  /// potential OOM. Projects this large should use `lane: light` (the
+  /// default) and rely on the out-of-process scan daemon for full coverage.
+  static const int _largeProjectThreshold = 2000;
+
   /// Auto-discover dart files in a directory for ETA estimation.
   /// Call this early to enable % progress. Returns estimated count.
   static int discoverFiles(String projectPath) {
@@ -362,6 +367,22 @@ class ProgressTracker {
         _isEtaCalibrated = true;
         _isDiscoveredFromFiles = true;
       }
+
+      // Warn when the project is large enough to risk OOM in-process.
+      // The light lane (default) is safe, but full-lane users may not
+      // realize the memory cost scales with file count × resolved types.
+      if (count > _largeProjectThreshold) {
+        stderr.writeln('');
+        stderr.writeln(
+          '[saropa_lints] WARNING: Large project detected ($count Dart files, '
+          'threshold: $_largeProjectThreshold). '
+          'In-process analysis of large projects can cause the analysis server '
+          'to run out of memory. Ensure lane: light (the default) is active, '
+          'or use the VS Code extension scan-on-save for full coverage. '
+          'Set SAROPA_LINTS_MAX_RSS_MB to adjust the memory cap.',
+        );
+      }
+
       return count;
     } catch (e, st) {
       developer.log(
@@ -915,6 +936,12 @@ class ProgressTracker {
     if (relieveCount > 0) {
       buf.writeln('    $yellow Cache evictions: $relieveCount$reset');
     }
+    // Per-file memory budget: report how many cold files were skipped to
+    // stay within the RSS cap (only non-zero on large projects).
+    final budgetSkip = FileBudgetTracker.skipSummary;
+    if (budgetSkip != null) {
+      buf.writeln('    $yellow$budgetSkip$reset');
+    }
 
     buf.writeln();
     buf.writeln('$cyan${'═' * 70}$reset');
@@ -927,15 +954,19 @@ class ProgressTracker {
     // Release per-file maps — summary is reported, this data is dead weight.
     // Scalar counters (_violationsFound, _errorCount, etc.) are kept for
     // re-analysis detection and limit tracking.
-    _releasePerFileMaps();
+    releasePerFileMaps();
   }
 
-  /// Free per-file tracking maps after the summary has been reported.
+  /// Free per-file tracking maps to reduce memory pressure.
   ///
   /// Scalar counters (_violationsFound, _errorCount, etc.) are kept — they
   /// cost nothing and _clearFileData references them if a file is re-analyzed.
   /// _seenFiles is kept — it drives ongoing progress and re-analysis detection.
-  static void _releasePerFileMaps() {
+  ///
+  /// Public so MemoryPressureHandler can invoke it on hard RSS relief,
+  /// shedding the largest ProgressTracker allocation before OOM. Also called
+  /// internally after reportSummary() when the data is no longer needed.
+  static void releasePerFileMaps() {
     _issuesByFile.clear();
     _issuesByFileBySeverity.clear();
     _issuesByFileByRule.clear();
@@ -1166,6 +1197,111 @@ class ProgressTracker {
     _hasReanalyzedFile = false;
     _isSummaryReported = false;
     // Note: _maxIssues and _isFileOnly are not reset - they're config, not state
+  }
+}
+
+/// Per-file memory budget: tracks estimated cumulative memory cost of
+/// analyzed files and skips cold (unmodified) files when the budget
+/// approaches the configured RSS cap.
+///
+/// The budget is file-content-length × multiplier — a rough proxy for the
+/// resolved AST + element model the analyzer retains per file. When the
+/// cumulative estimate crosses [budgetThresholdFraction] of the RSS cap,
+/// files whose modification time is older than [recencyWindow] are skipped.
+/// This gives partial-project coverage (recently edited files) instead of
+/// all-or-nothing OOM.
+///
+/// Disabled when the hard RSS cap is 0 (tests, scan CLI) or when no
+/// project has been discovered yet.
+class FileBudgetTracker {
+  FileBudgetTracker._();
+
+  /// Multiplier from file content length (bytes) to estimated retained
+  /// memory (bytes). The analyzer's resolved model is ~8-12× the source
+  /// size; we use 10× as a conservative mid-point.
+  static const int _memoryMultiplier = 10;
+
+  /// Skip cold files once the cumulative estimate reaches this fraction
+  /// of the RSS cap. 0.7 = start skipping at 70% estimated usage, leaving
+  /// 30% headroom for caches, the IDE, and OS.
+  static const double budgetThresholdFraction = 0.7;
+
+  /// Files modified within this window are considered "hot" (recently
+  /// edited) and are never skipped by the budget. Covers a typical
+  /// work session — files the developer touched today.
+  static const Duration recencyWindow = Duration(hours: 24);
+
+  /// Cumulative estimated memory in bytes across all analyzed files.
+  static int _cumulativeEstimateBytes = 0;
+
+  /// Number of files skipped by the budget guard.
+  static int _skippedCount = 0;
+
+  /// Whether the budget guard has been armed (requires a non-zero RSS cap).
+  static bool get _isArmed => MemoryPressureHandler.hardRssLimitMb > 0;
+
+  /// Budget threshold in bytes, derived from the RSS cap.
+  static int get _budgetBytes {
+    final capMb = MemoryPressureHandler.hardRssLimitMb;
+    if (capMb <= 0) return 0;
+    return (capMb * 1024 * 1024 * budgetThresholdFraction).round();
+  }
+
+  /// Whether the cumulative estimate has crossed the budget threshold.
+  static bool get isOverBudget =>
+      _isArmed && _cumulativeEstimateBytes >= _budgetBytes;
+
+  /// Number of files skipped by the budget guard this session.
+  static int get skippedCount => _skippedCount;
+
+  /// Cumulative estimated memory in MB (for diagnostics/logging).
+  static int get cumulativeEstimateMb =>
+      _cumulativeEstimateBytes ~/ (1024 * 1024);
+
+  /// Record a file's estimated memory cost. Call once per newly-seen file
+  /// from [ProgressTracker.recordFile] so the budget accumulates as files
+  /// are analyzed.
+  static void recordFileCost(int contentLengthBytes) {
+    _cumulativeEstimateBytes += contentLengthBytes * _memoryMultiplier;
+  }
+
+  /// Check whether a file should be skipped to stay within the memory
+  /// budget. Returns true if the budget is exceeded AND the file hasn't
+  /// been modified within [recencyWindow].
+  ///
+  /// Hot files (recently modified) are never skipped — they're the ones
+  /// the developer is actively working on and most needs diagnostics for.
+  /// Cold files are skipped to avoid pushing the analysis server to OOM.
+  static bool shouldSkipFile(String path) {
+    if (!isOverBudget) return false;
+
+    // Recently edited files are always analyzed regardless of budget.
+    try {
+      final stat = File(path).statSync();
+      final age = DateTime.now().difference(stat.modified);
+      if (age < recencyWindow) return false;
+    } on Object {
+      // stat failed — treat as cold (unknown recency = conservative skip).
+    }
+
+    _skippedCount++;
+    return true;
+  }
+
+  /// Log a one-line summary when files were skipped (called from
+  /// reportSummary or the analysis completion path).
+  static String? get skipSummary {
+    if (_skippedCount == 0) return null;
+    return '$_skippedCount file${_skippedCount == 1 ? '' : 's'} skipped by '
+        'memory budget (estimated ${cumulativeEstimateMb}MB / '
+        '${MemoryPressureHandler.hardRssLimitMb}MB cap). '
+        'Recently edited files were analyzed first.';
+  }
+
+  /// Reset all state (between analysis runs or for tests).
+  static void reset() {
+    _cumulativeEstimateBytes = 0;
+    _skippedCount = 0;
   }
 }
 
@@ -1910,6 +2046,17 @@ class ImpactTracker {
     }
   }
 
+  /// Estimated memory footprint in bytes, for MemoryPressureHandler's
+  /// heuristic estimate. Each ViolationRecord holds ~5 interned strings
+  /// plus object overhead (~200 bytes conservative).
+  static int get estimatedBytes {
+    var total = 0;
+    for (final set in _violations.values) {
+      total += set.length;
+    }
+    return total * 200;
+  }
+
   /// Clear all tracked violations (useful between analysis runs).
   static void reset() {
     for (final set in _violations.values) {
@@ -2066,6 +2213,11 @@ class SuppressionTracker {
     if (bc > 0) parts.add('$bc baseline');
     return '$t suppression${t == 1 ? '' : 's'} (${parts.join(', ')})';
   }
+
+  /// Estimated memory footprint in bytes, for MemoryPressureHandler's
+  /// heuristic estimate. Each SuppressionRecord holds 3 strings + an enum
+  /// + object overhead (~120 bytes conservative).
+  static int get estimatedBytes => _records.length * 120;
 
   /// Clear all records and counters (called between analysis sessions).
   static void reset() {
@@ -3340,6 +3492,10 @@ class SaropaDiagnosticReporter {
   /// instead of the shared mutable `currentUnit` (see [_resolveLocation]
   /// for the rationale and the issue this prevents).
   void _trackViolation(int offset, {AstNode? node}) {
+    // Skip accumulation when the hard RSS valve has tripped — the trackers
+    // were just cleared to avoid OOM, so re-filling them defeats the purpose.
+    if (MemoryPressureHandler.isOverHardLimit) return;
+
     final loc = _resolveLocation(offset, node);
     if (loc == null) return;
 
@@ -3373,6 +3529,10 @@ class SaropaDiagnosticReporter {
   /// the same CompilationUnit as the violation would have been (keeps
   /// suppression line numbers comparable to violation line numbers).
   void _trackSuppression(int offset, SuppressionKind kind, {AstNode? node}) {
+    // Skip accumulation when the hard RSS valve has tripped — suppression
+    // records are diagnostic, not worth re-filling under OOM pressure.
+    if (MemoryPressureHandler.isOverHardLimit) return;
+
     final loc = _resolveLocation(offset, node);
     if (loc == null) return;
 

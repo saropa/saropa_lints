@@ -124,14 +124,42 @@ class SaropaLintsPlugin extends Plugin {
       // Register saropa_lint_rule.dart caches (separate library, not
       // reachable from initializeCacheManagement's project_context library).
       //
-      // NOTE: ProgressTracker, ImpactTracker, ReportWriter, and
-      // SuppressionTracker are NOT registered — they are forward-accumulating
-      // session counters (issue counts, severity totals, suppression records),
-      // not recomputable caches. Clearing them mid-session silently truncates
-      // the analysis summary.
+      // ImpactTracker, SuppressionTracker, and ProgressTracker are
+      // forward-accumulating session counters — clearing them mid-session
+      // truncates the analysis summary. They are registered at priority < 50
+      // so they shed ONLY on hard RSS relief (OOM imminent), not on soft
+      // relief. A truncated summary is acceptable when the alternative is
+      // crashing the analysis server.
       //
       // NOTE: BaselineManager is NOT registered — its reset() nulls _config,
       // permanently disabling baseline suppression with no lazy re-init path.
+      MemoryPressureHandler.registerCache(
+        'impactTracker',
+        ImpactTracker.reset,
+        // Hard-relief only: losing violation records beats OOM crash.
+        priority: 15,
+      );
+      MemoryPressureHandler.registerCache(
+        'suppressionTracker',
+        SuppressionTracker.reset,
+        // Hard-relief only: suppression counts are diagnostic, not critical.
+        priority: 15,
+      );
+      MemoryPressureHandler.registerCache(
+        'progressTrackerMaps',
+        ProgressTracker.releasePerFileMaps,
+        // Hard-relief only: per-file maps are the largest ProgressTracker
+        // allocation; scalar counters survive for limit tracking.
+        priority: 20,
+      );
+      // Include tracker footprints in the soft-relief memory estimate so
+      // auto-relief fires earlier on projects that accumulate many violations.
+      // Named registration is idempotent — safe if start() re-runs.
+      MemoryPressureHandler.registerEstimator(
+        'saropa_lint_trackers',
+        () => ImpactTracker.estimatedBytes + SuppressionTracker.estimatedBytes,
+      );
+
       MemoryPressureHandler.registerCache(
         'ruleTimingTracker',
         RuleTimingTracker.reset,

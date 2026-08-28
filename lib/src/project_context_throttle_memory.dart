@@ -1002,6 +1002,12 @@ class MemoryPressureHandler {
   // Registered cache clear functions with priority (lower = clear first)
   static final Map<String, _CacheRegistration> _caches = {};
 
+  // External memory estimators — named callbacks that return estimated bytes
+  // for data structures in other libraries (e.g. ImpactTracker,
+  // SuppressionTracker) that can't be accessed directly due to import
+  // direction. Keyed by name to support idempotent re-registration.
+  static final Map<String, int Function()> _externalEstimators = {};
+
   // Configuration
   static int _thresholdMb = 512; // Default 512MB threshold
   static bool _autoReliefEnabled = false;
@@ -1036,7 +1042,7 @@ class MemoryPressureHandler {
   /// SaropaContext._wrapCallback), making all "rule fires" tests fail. The
   /// valve is the in-process plugin's protection only, so it is armed solely by
   /// [initializeCacheManagement] (called from `Plugin.start()`), which sets the
-  /// real cap — 6144 MB by default, overridable via `SAROPA_LINTS_MAX_RSS_MB`.
+  /// real cap — 4096 MB by default, overridable via `SAROPA_LINTS_MAX_RSS_MB`.
   static int _hardLimitMb = 0;
 
   /// True once RSS has crossed [_hardLimitMb]; cleared when it drops below the
@@ -1052,9 +1058,24 @@ class MemoryPressureHandler {
   /// flapping when RSS hovers at the threshold.
   static const int _rssRecoveryMarginMb = 512;
 
+  /// The configured hard RSS cap in MB, or 0 if disabled. Used by
+  /// FileBudgetTracker to compute its file-skipping threshold.
+  static int get hardRssLimitMb => _hardLimitMb;
+
   /// Set the hard RSS cap (MB). 0 or negative disables the valve.
   static void setHardRssLimitMb(int mb) {
     _hardLimitMb = mb;
+  }
+
+  /// Force the hard-limit-tripped flag for testing. Production code should
+  /// never call this — use [setHardRssLimitMb] to arm the real valve instead.
+  /// This exists because tests can't control the real process RSS, so the
+  /// end-to-end eviction path needs a way to simulate the trip.
+  static void setHardLimitTrippedForTest(bool value) {
+    _hardLimitTripped = value;
+    // Arm the valve with a non-zero cap so isOverHardLimit doesn't short-
+    // circuit on the _hardLimitMb <= 0 check.
+    if (value && _hardLimitMb <= 0) _hardLimitMb = 1;
   }
 
   /// Whether the process RSS is currently over the hard cap, meaning rule
@@ -1121,6 +1142,18 @@ class MemoryPressureHandler {
   /// Unregister a cache.
   static void unregisterCache(String name) {
     _caches.remove(name);
+  }
+
+  /// Register a named callback that returns estimated bytes for memory not
+  /// directly visible to this library (cross-library trackers). The
+  /// estimate is included in [_estimateMemoryUsageMb] and therefore
+  /// influences soft auto-relief decisions.
+  ///
+  /// Named registration is idempotent: re-registering the same [name]
+  /// replaces the previous callback, so Plugin.start() re-entry and
+  /// composite plugins cannot duplicate estimators.
+  static void registerEstimator(String name, int Function() estimator) {
+    _externalEstimators[name] = estimator;
   }
 
   /// Enable automatic memory relief.
@@ -1242,6 +1275,12 @@ class MemoryPressureHandler {
       estimatedBytes += durations.length * 16;
     }
 
+    // Cross-library trackers (ImpactTracker, SuppressionTracker, etc.)
+    // registered via registerEstimator() from main.dart.
+    for (final estimator in _externalEstimators.values) {
+      estimatedBytes += estimator();
+    }
+
     const bytesPerMb = 1 << 20;
     return estimatedBytes ~/ bytesPerMb;
   }
@@ -1276,6 +1315,103 @@ class _CacheRegistration {
   final int priority;
 }
 
+/// Compute an adaptive RSS cap based on system physical RAM.
+///
+/// Returns 60% of detected physical RAM, clamped to [2048, 8192].
+/// Falls back to [fallbackMb] when RAM detection fails or returns an
+/// implausible value (<4096 MB — systems that small are too constrained
+/// for the analysis server + IDE + plugin).
+///
+/// Examples: 8 GB RAM → cap 4915 MB, 16 GB → 8192 MB (ceiling),
+/// 32 GB → 8192 MB (ceiling). The 8192 upper bound prevents the plugin
+/// from claiming too much on high-RAM servers where other processes
+/// also need memory.
+int _computeAdaptiveRssCap(int fallbackMb) {
+  final ramMb = _totalPhysicalMemoryMb();
+  if (ramMb < 4096) return fallbackMb;
+
+  // 60% of physical RAM: the analysis server shares memory with the IDE,
+  // OS, browser, and other dev tools. 60% is aggressive enough to protect
+  // 8 GB machines (cap ≈ 4915) while giving 16 GB+ machines real headroom
+  // (cap ≈ 9830, clamped to 8192).
+  final adaptive = (ramMb * 0.6).round();
+
+  // Clamp: never below 2048 (too aggressive — would pause rules on small
+  // projects), never above 8192 (enough for large projects; beyond that
+  // the OS/IDE/browser start competing for RAM). The fallbackMb default
+  // (4096) only applies when RAM detection fails.
+  return adaptive.clamp(2048, 8192);
+}
+
+/// Detect total physical memory in MB, or -1 if unavailable.
+///
+/// Platform-specific: Windows tries PowerShell CIM first (wmic is deprecated
+/// since Win10 21H1), then falls back to wmic. Linux reads `/proc/meminfo`,
+/// macOS uses `sysctl`. All wrapped in try/catch so a failure on an
+/// unknown platform returns -1 (the caller falls back to the fixed default).
+int _totalPhysicalMemoryMb() {
+  try {
+    if (Platform.isWindows) {
+      // Try PowerShell CIM first — wmic is deprecated since Windows 10 21H1
+      // and may be removed in future builds. CIM returns bytes as a string.
+      final cimResult = Process.runSync(
+        'powershell',
+        [
+          '-NoProfile',
+          '-NonInteractive',
+          '-Command',
+          '(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory',
+        ],
+      );
+      if (cimResult.exitCode == 0) {
+        final bytes = int.tryParse((cimResult.stdout as String).trim());
+        if (bytes != null && bytes > 0) return bytes ~/ (1 << 20);
+      }
+
+      // Fall back to wmic for older Windows versions where PowerShell CIM
+      // may not be available or the powershell binary isn't on PATH.
+      final wmicResult = Process.runSync(
+        'wmic',
+        ['OS', 'get', 'TotalVisibleMemorySize', '/value'],
+      );
+      if (wmicResult.exitCode == 0) {
+        final output = (wmicResult.stdout as String).trim();
+        // Format: "TotalVisibleMemorySize=16384000" (in KB)
+        final match = RegExp(r'=(\d+)').firstMatch(output);
+        if (match != null) {
+          final kb = int.tryParse(match.group(1)!);
+          if (kb != null) return kb ~/ 1024;
+        }
+      }
+    } else if (Platform.isLinux) {
+      // /proc/meminfo first line: "MemTotal:       16384000 kB"
+      final file = File('/proc/meminfo');
+      if (file.existsSync()) {
+        final line = file.readAsLinesSync().firstWhere(
+          (l) => l.startsWith('MemTotal'),
+          orElse: () => '',
+        );
+        final match = RegExp(r'(\d+)').firstMatch(line);
+        if (match != null) {
+          final kb = int.tryParse(match.group(1)!);
+          if (kb != null) return kb ~/ 1024;
+        }
+      }
+    } else if (Platform.isMacOS) {
+      // sysctl outputs: "hw.memsize: 17179869184" (in bytes)
+      final result = Process.runSync('sysctl', ['-n', 'hw.memsize']);
+      if (result.exitCode == 0) {
+        final bytes = int.tryParse((result.stdout as String).trim());
+        if (bytes != null) return bytes ~/ (1 << 20);
+      }
+    }
+  } on Object {
+    // Any failure (permission, missing binary, unsupported platform) —
+    // return -1 to trigger fallback.
+  }
+  return -1;
+}
+
 /// Initialize all caches with memory pressure handling.
 ///
 /// Call this once at startup to register all caches.
@@ -1286,7 +1422,11 @@ void initializeCacheManagement({
   int maxSymbolCache = 1000,
   int maxCompilationUnitCache = 1000,
   int memoryThresholdMb = 512,
-  int hardRssLimitMb = 6144,
+  // Lowered from 6144 to 4096: the Dart analysis server's default heap on
+  // 64-bit is typically 4 GB, so 6 GB let the process OOM before the valve
+  // could trip. 4 GB trips early enough to pause rule execution and shed
+  // caches before the OS or runtime kills the process.
+  int hardRssLimitMb = 4096,
 }) {
   // Cap the LRU on the two largest unbounded caches.
   FileContentCache.setMaxPassedRulesFiles(maxFileContentCache);
@@ -1349,7 +1489,7 @@ void initializeCacheManagement({
   //
   // Priority semantics (pre-existing — see relieve()):
   //   >= 50: cleared on SOFT relief (memory estimate exceeds threshold)
-  //   <  50: cleared only on HARD relief (RSS valve trips at 6 GB)
+  //   <  50: cleared only on HARD relief (RSS valve trips at 4 GB)
   // Assign >= 50 to large per-file caches; < 50 to small stats or
   // expensive-to-rebuild registries.
 
@@ -1449,19 +1589,32 @@ void initializeCacheManagement({
   // only sees the plugin's own caches; this reads the true process size. The
   // env override lets a consumer tune the cap (or disable it with 0) without a
   // plugin release.
+  //
+  // Adaptive cap: if system RAM is detectable, cap at 60% of physical RAM
+  // (the analysis server shares memory with the IDE, OS, and other tools).
+  // Falls back to the hardRssLimitMb parameter default (4096 MB) when RAM
+  // detection fails or returns an implausible value.
   final envCap = Platform.environment['SAROPA_LINTS_MAX_RSS_MB'];
   final parsedCap = envCap == null ? null : int.tryParse(envCap.trim());
-  final effectiveCap = parsedCap ?? hardRssLimitMb;
+  final adaptiveCap = _computeAdaptiveRssCap(hardRssLimitMb);
+  final effectiveCap = parsedCap ?? adaptiveCap;
   MemoryPressureHandler.setHardRssLimitMb(effectiveCap);
 
   // Diagnostic: verify ProcessInfo.currentRss works on this platform.
   final startupRss = MemoryPressureHandler._currentRssMb();
   if (startupRss > 0) {
+    // Log cap source so users understand the value.
+    final capSource =
+        parsedCap != null
+            ? 'env SAROPA_LINTS_MAX_RSS_MB'
+            : adaptiveCap != hardRssLimitMb
+            ? 'adaptive (60% of system RAM)'
+            : 'default';
     stderr.writeln(
       '[saropa_lints] Memory management armed: '
       '${MemoryPressureHandler._caches.length} caches registered, '
       'soft relief at ${memoryThresholdMb}MB estimated, '
-      'hard RSS cap at ${effectiveCap}MB. '
+      'hard RSS cap at ${effectiveCap}MB ($capSource). '
       'Current RSS: ${startupRss}MB.',
     );
   } else {

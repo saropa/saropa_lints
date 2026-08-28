@@ -33,7 +33,12 @@ import '../project_context.dart'
 import '../report/analysis_reporter.dart' show AnalysisReporter, ReportConfig;
 import '../report/import_graph_tracker.dart' show ImportGraphTracker;
 import '../saropa_lint_rule.dart'
-    show ProgressTracker, ReportWriter, RuleTimingTracker, SaropaLintRule;
+    show
+        FileBudgetTracker,
+        ProgressTracker,
+        ReportWriter,
+        RuleTimingTracker,
+        SaropaLintRule;
 import 'compat_visitor.dart';
 import 'config_loader.dart' show loadNativePluginConfigFromProjectRoot;
 import 'plugin_logger.dart' show PluginLogger;
@@ -469,11 +474,25 @@ class SaropaContext {
     if (path.isEmpty) return false;
     if (path == _lastCheckedPath) return _wasLastFileSkipped;
     _lastCheckedPath = path;
-    _fileContentChanged = FileContentCache.hasChanged(path, fileContent);
+    final content = fileContent;
+    _fileContentChanged = FileContentCache.hasChanged(path, content);
     ProgressTracker.recordFile(path);
+
+    // Record this file's estimated memory cost for the per-file budget.
+    // Uses content length × multiplier as a proxy for the retained resolved
+    // AST. Must happen before the budget skip check below.
+    FileBudgetTracker.recordFileCost(content.length);
+
+    // Per-file memory budget: when the cumulative estimate approaches the
+    // RSS cap, skip cold (unmodified) files to give partial coverage instead
+    // of crashing. Recently edited files are always analyzed.
+    if (FileBudgetTracker.shouldSkipFile(path)) {
+      return _wasLastFileSkipped = true;
+    }
+
     // Populate import graph for report FILE IMPORTANCE / FIX PRIORITY /
     // PROJECT STRUCTURE (idempotent per path; see ImportGraphTracker).
-    ImportGraphTracker.collectImports(path, fileContent);
+    ImportGraphTracker.collectImports(path, content);
 
     // Skip lint plugin source files — pattern definitions in rule/fix files
     // trigger self-referential false positives (e.g. OAuth URL strings in
@@ -502,10 +521,7 @@ class SaropaContext {
       return _wasLastFileSkipped = true;
     }
 
-    // Read file content once for all content-based checks.
-    final content = fileContent;
-
-    // 2. applicableFileTypes check.
+    // 2. applicableFileTypes check (content already captured above).
     final applicable = rule.applicableFileTypes;
     if (applicable != null) {
       final fileTypes = FileTypeDetector.detect(path, content);
