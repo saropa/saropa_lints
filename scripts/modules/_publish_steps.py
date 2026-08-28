@@ -890,7 +890,30 @@ def _dart_test_env(project_dir: Path) -> dict[str, str]:
             test_tmp = Path(tempfile.gettempdir()) / "saropa_dart_test"
     except OSError:
         pass
+    # Wipe stale contents before every run rather than accumulating .dill
+    # kernel-cache files across publish attempts — this dir is exclusively
+    # ours (never user data), so a full wipe is safe and prevents the same
+    # disk-fill failure mode that motivated moving it out of build/ (root
+    # cause 2 of the crash this was originally written to fix).
+    if test_tmp.exists():
+        import shutil
+        shutil.rmtree(test_tmp, ignore_errors=True)
     test_tmp.mkdir(parents=True, exist_ok=True)
+    # Verify the directory is actually writable before handing it to dart
+    # test — catches permission issues or an unsupported path (e.g. a TMP
+    # override on a read-only mount) up front instead of surfacing as an
+    # opaque test-runner crash.
+    probe_path = test_tmp / ".write_probe"
+    try:
+        probe_path.write_text("ok", encoding="utf-8")
+        probe_path.unlink()
+    except OSError as exc:
+        print_warning(
+            f"Test temp dir {test_tmp} is not writable ({exc}) — "
+            f"falling back to system temp."
+        )
+        test_tmp = Path(tempfile.gettempdir()) / "saropa_dart_test"
+        test_tmp.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env["TMP"] = str(test_tmp)
     env["TEMP"] = str(test_tmp)
@@ -1378,6 +1401,42 @@ def _run_test_pass(
         return False
 
 
+def _available_ram_gb() -> float | None:
+    """Return currently available (not total) RAM in GB, or None if undetectable.
+
+    Windows-only via ctypes (stdlib, no new dependency). Used to keep the
+    auto-tune cache from trusting a concurrency level that was only safe
+    because the machine happened to be idle when it was probed — a value
+    cached under light load can OOM-crash the compiler on a later run where
+    other processes (IDE, browser, another publish) are competing for RAM.
+    """
+    if not is_windows():
+        return None
+    try:
+        import ctypes
+
+        class MEMORYSTATUSEX(ctypes.Structure):
+            _fields_ = [
+                ("dwLength", ctypes.c_ulong),
+                ("dwMemoryLoad", ctypes.c_ulong),
+                ("ullTotalPhys", ctypes.c_ulonglong),
+                ("ullAvailPhys", ctypes.c_ulonglong),
+                ("ullTotalPageFile", ctypes.c_ulonglong),
+                ("ullAvailPageFile", ctypes.c_ulonglong),
+                ("ullTotalVirtual", ctypes.c_ulonglong),
+                ("ullAvailVirtual", ctypes.c_ulonglong),
+                ("sullAvailExtendedVirtual", ctypes.c_ulonglong),
+            ]
+
+        stat = MEMORYSTATUSEX()
+        stat.dwLength = ctypes.sizeof(MEMORYSTATUSEX)
+        if not ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(stat)):
+            return None
+        return stat.ullAvailPhys / (1024 ** 3)
+    except (OSError, AttributeError, ValueError):
+        return None
+
+
 def _auto_tune_concurrency(
     project_dir: Path,
     env: dict[str, str] | None,
@@ -1388,6 +1447,16 @@ def _auto_tune_concurrency(
     12) and returns the highest level that completed without a native crash.
     Results are cached in build/.dart_test_max_j so the probe only runs once
     per machine/SDK combination.
+
+    The cache key includes a coarse available-RAM bucket (rounded down to the
+    nearest 4 GB) alongside SDK version and CPU count: a level probed safe
+    while the machine had 20 GB free is not necessarily safe once other
+    processes have claimed most of it, so a large drop in available RAM
+    invalidates the cache and forces a fresh probe under current conditions.
+    This does not fully solve "safe when idle, crashes under load" (RAM at
+    cache-write time still isn't RAM at test-run time), but it prevents a
+    stale cache from surviving across sessions with materially different
+    memory pressure.
 
     Set SAROPA_TEST_MAX_J to skip the probe and use a fixed value (e.g.
     ``SAROPA_TEST_MAX_J=4`` for CI where the machine profile is known).
@@ -1421,7 +1490,9 @@ def _auto_tune_concurrency(
         sdk_version = sdk_result.stdout.strip() or sdk_result.stderr.strip()
     except (OSError, subprocess.TimeoutExpired):
         pass
-    cache_key = f"{sdk_version}|{os.cpu_count()}"
+    ram_gb = _available_ram_gb()
+    ram_bucket = int(ram_gb // 4) if ram_gb is not None else "unknown"
+    cache_key = f"{sdk_version}|{os.cpu_count()}|ram{ram_bucket}"
 
     # Read cached result if it exists and matches.
     if cache_file.exists():
@@ -1457,6 +1528,16 @@ def _auto_tune_concurrency(
     levels = [j for j in levels if j <= cpu]
     if not levels:
         levels = [4]
+    # Under memory pressure, each frontend_server worker is more likely to
+    # OOM the compiler regardless of CPU headroom — cap the ceiling rather
+    # than probing all the way up and risking the crash the probe exists to
+    # avoid. Thresholds are conservative estimates (~1.5 GB/worker), not
+    # measured; the probe itself is still the authority on what's stable.
+    if ram_gb is not None:
+        if ram_gb < 4:
+            levels = [j for j in levels if j <= 2] or [2]
+        elif ram_gb < 8:
+            levels = [j for j in levels if j <= 4] or [4]
 
     print_info(f"Tuning test concurrency (probing {probe_file})...")
     best_j = levels[0]

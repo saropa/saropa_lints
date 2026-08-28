@@ -289,6 +289,57 @@ def run_analyze_only(mode: str, project_dir: Path) -> int | None:
     return ExitCode.SUCCESS.value if ok else ExitCode.ANALYSIS_FAILED.value
 
 
+def run_dry_run_mode(
+    mode: str,
+    project_dir: Path,
+    timer: StepTimer,
+) -> int | None:
+    """If mode is dry_run, run the full validation pipeline without publishing.
+
+    Runs dependency resolution, audit, format, analysis, tests, and
+    `dart pub publish --dry-run` — every check that doesn't need pub.dev
+    credentials or mutate git/version state (no version prompt, no commit,
+    no tag, no push, no GitHub release). Intended for CI pre-merge
+    validation of a branch before it's mergeable, without the write side
+    effects a real publish run has.
+    """
+    if mode != "dry_run":
+        return None
+
+    branch = get_current_branch(project_dir)
+
+    with timer.step("Dependencies"):
+        _run_step_with_retry(
+            "Dependency resolution (dart pub get)",
+            lambda: run_pub_get(project_dir),
+            ExitCode.PREREQUISITES_FAILED,
+        )
+
+    code = run_audit_step(
+        project_dir, skip_audit=False, audit_only=False, timer=timer,
+    )
+    if code is not None:
+        return code
+
+    run_pre_publish_pipeline(project_dir, branch, timer)
+
+    # `dart pub publish --dry-run` needs no credentials and mutates nothing —
+    # it's the pub.dev tool's own manifest/package validation, a natural fit
+    # for this mode even without a version bump.
+    with timer.step("Pre-publish validation"):
+        _run_step_with_retry(
+            "Pre-publish validation",
+            lambda: pre_publish_validation(project_dir),
+            ExitCode.VALIDATION_FAILED,
+        )
+
+    print_success(
+        "Dry run complete — all pre-publish checks passed. "
+        "No commit, tag, version bump, or publish was performed."
+    )
+    return ExitCode.SUCCESS.value
+
+
 def run_ci_fallback_mode(
     mode: str,
     project_dir: Path,

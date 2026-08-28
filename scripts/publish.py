@@ -13,7 +13,11 @@ and VS Code extension). Delegates all logic to scripts/modules/:
     _timing.py            — step timing and summary reporting
 
 Run:  python scripts/publish.py
-Modes: full publish / audit only / fix docs / skip audit / analyze only / extension only
+      python scripts/publish.py --dry-run   (audit + format + analyze + tests
+                                              + `dart pub publish --dry-run`;
+                                              no commit/tag/publish — for CI
+                                              pre-merge validation)
+Modes: full publish / audit only / fix docs / skip audit / analyze only / extension only / dry run
 1
 See scripts/README.md for the full architecture and module map.
 
@@ -139,6 +143,7 @@ from scripts.modules._publish_workflow import (
     print_package_banner,
     run_analyze_only,
     run_ci_fallback_mode,
+    run_dry_run_mode,
     run_extension_only_mode,
     run_fix_docs_mode,
     run_full_publish,
@@ -189,7 +194,7 @@ def main(
     """Run publish workflow. Returns exit code (0 = success).
 
     Args:
-        mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'extension_only' | 'publish_existing_vsix' | 'ci_fallback'.
+        mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'dry_run' | 'extension_only' | 'publish_existing_vsix' | 'ci_fallback'.
               If None, prompts the user interactively (after displaying the logo so
               the Saropa brand always appears first — see "logo ALWAYS first" rule).
         output_level: Verbosity level (defaults to VERBOSE).
@@ -209,9 +214,14 @@ def main(
     changelog_path = project_dir / "CHANGELOG.md"
     validate_pubspec_changelog(pubspec_path, changelog_path)
 
+    # Created here (not after the early-exit loop) so dry_run mode — an
+    # early-exit mode — can still report step timings for the checks it runs.
+    timer = StepTimer()
+
     # Early exits for alternative modes
     for handler in (
         lambda: run_analyze_only(mode, project_dir),
+        lambda: run_dry_run_mode(mode, project_dir, timer),
         lambda: run_ci_fallback_mode(mode, project_dir, pubspec_path),
         lambda: run_extension_only_mode(mode, project_dir, pubspec_path),
         lambda: run_publish_existing_vsix_mode(mode, project_dir),
@@ -224,10 +234,20 @@ def main(
     # Build context and run full pipeline
     ctx = build_publish_context(project_dir, pubspec_path, changelog_path)
     print_package_banner(ctx, SCRIPT_VERSION)
-    timer = StepTimer()
     return run_full_publish(ctx, mode, timer)
+
+
+def _parse_mode_from_argv(argv: list[str]) -> str | None:
+    """Map CLI flags to a publish mode. Returns None for interactive prompting.
+
+    Only --dry-run is currently supported as a flag; all other modes are
+    still chosen via the interactive menu (_prompt_publish_mode).
+    """
+    if "--dry-run" in argv:
+        return "dry_run"
+    return None
 
 
 if __name__ == "__main__":
     # main() now displays the logo before prompting for mode, so call it directly.
-    sys.exit(main())
+    sys.exit(main(mode=_parse_mode_from_argv(sys.argv[1:])))
