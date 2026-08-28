@@ -80,6 +80,12 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - `avoid_stream_in_build` (v3) now also detects `StreamBuilder(stream: method())` where a method invocation creates a new subscription on every rebuild. Previously only caught `StreamController()` instantiation inside `build()`. Excludes safe constructors (`Stream.value()`, `Stream.empty()`) and the `??=` caching idiom. No action required.
 
+<details><summary>Maintenance</summary>
+
+- Extracted shared `isWidgetOrStateClass()` and `isInsideBuildMethod()` utilities into `target_matcher_utils.dart` — used by `avoid_stream_in_build` and `avoid_future_in_build`; replaces per-rule private duplicates.
+
+</details>
+
 ---
 
 ## [15.2.4]
