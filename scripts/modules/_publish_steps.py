@@ -936,17 +936,17 @@ def _log_shows_vm_crash(log_path: Path) -> bool:
     # Check for native crash: null bytes in the log mean the process died
     # with a native fault (STATUS_ACCESS_VIOLATION) before flushing. The
     # crash leaves unflushed null-filled data at the tail of the log (valid
-    # test output precedes it), so read the last 8 KB, not the first.
+    # test output precedes it), so read the last 25% (min 8 KB).
+    # Require >=16 null bytes to avoid false positives from tests that
+    # legitimately print a stray null character in their output.
     if log_path.exists():
         try:
             size = log_path.stat().st_size
-            # Read last 25% of file (min 8 KB) to catch null bytes from a
-            # native crash even when the valid-output prefix is very large.
             check_size = max(8192, size // 4)
             with open(log_path, "rb") as f:
                 f.seek(max(0, size - check_size))
                 tail = f.read(check_size)
-            if b"\x00" in tail:
+            if tail.count(b"\x00") >= 16:
                 return True
         except OSError:
             pass
@@ -1353,6 +1353,12 @@ def _run_test_pass(
                 next_j = max(1, last_j // 2)
             else:
                 next_j = last_j
+            # Warn when concurrency can't be reduced further.
+            if is_crash and next_j <= 1 and last_j <= 1:
+                print_warning(
+                    "Already at -j 1 — reducing concurrency further won't help. "
+                    "This may be a Dart SDK bug unrelated to parallelism."
+                )
             print_info(f"Re-running tests with -j {next_j}...")
             relog_time = datetime.now().strftime("%H%M%S")
             relog_name = f"{date_str}_{relog_time}_dart_test_{label}_retry.log"
@@ -1383,8 +1389,23 @@ def _auto_tune_concurrency(
     Results are cached in build/.dart_test_max_j so the probe only runs once
     per machine/SDK combination.
 
+    Set SAROPA_TEST_MAX_J to skip the probe and use a fixed value (e.g.
+    ``SAROPA_TEST_MAX_J=4`` for CI where the machine profile is known).
+
     Falls back to 4 if no probe succeeds (extremely conservative).
     """
+    # Allow explicit override via env var — skips the probe entirely.
+    override = os.environ.get("SAROPA_TEST_MAX_J", "").strip()
+    if override:
+        try:
+            forced_j = max(1, int(override))
+            print_info(f"Test concurrency: -j {forced_j} (SAROPA_TEST_MAX_J)")
+            return forced_j
+        except ValueError:
+            print_warning(
+                f"SAROPA_TEST_MAX_J={override!r} is not a valid integer — "
+                "falling through to auto-tune"
+            )
     # Cache key: SDK version + cpu count — a new SDK or different machine
     # invalidates the cached result.
     cache_dir = project_dir / "build"
