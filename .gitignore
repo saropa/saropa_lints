@@ -107,6 +107,9 @@ CODE_INDEX.md
 BROKEN_TIERS.md
 bugs/FINISH_GUIDE.md
 
+# Generated publish-pipeline reports (regenerated each publish run)
+plans/known_issues_review.md
+
 # Saropa Log Capture (index & cache)
 .saropa/
 *.vsix

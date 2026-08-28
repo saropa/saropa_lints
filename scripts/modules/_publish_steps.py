@@ -15,6 +15,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from datetime import datetime
@@ -864,13 +865,31 @@ def check_remote_sync(project_dir: Path, branch: str) -> bool:
 
 
 def _dart_test_env(project_dir: Path) -> dict[str, str]:
-    """Return env with TMP/TEMP set to project-local build/test_tmp so test kernel files don't fill system temp.
+    """Return env with TMP/TEMP redirected so test kernel files don't fill system temp.
 
-    Uses build/test_tmp (not .dart_test_tmp) to avoid Windows PathAccessException when tests that create
-    temp dirs via Directory.systemTemp run: the dart test runner also uses .dart_test_tmp and can hold
-    handles during cleanup, causing "file is being used by another process" on teardown.
+    Override: set SAROPA_TEST_TMP to an absolute path outside the project tree.
+    Default: <system temp>/saropa_dart_test (tempfile.gettempdir(), which
+    honors the existing TMP/TEMP on the machine).
+
+    Must NOT be inside the project tree — ScanRunner scans the working directory
+    recursively, so kernel-cache .dill files in a project-local temp dir produce
+    spurious uri_does_not_exist errors.
     """
-    test_tmp = project_dir / "build" / "test_tmp"
+    override = os.environ.get("SAROPA_TEST_TMP")
+    test_tmp = Path(override) if override else Path(tempfile.gettempdir()) / "saropa_dart_test"
+    # Guard: temp dir must not be inside the project tree, or the scanner will
+    # pick up kernel-cache .dill files and report uri_does_not_exist errors.
+    try:
+        resolved = test_tmp.resolve()
+        project_resolved = project_dir.resolve()
+        if resolved == project_resolved or project_resolved in resolved.parents:
+            print_warning(
+                f"SAROPA_TEST_TMP ({test_tmp}) is inside the project tree — "
+                f"falling back to system temp to avoid scanner interference."
+            )
+            test_tmp = Path(tempfile.gettempdir()) / "saropa_dart_test"
+    except OSError:
+        pass
     test_tmp.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env["TMP"] = str(test_tmp)
@@ -901,20 +920,49 @@ def _log_shows_windows_file_lock(log_path: Path) -> bool:
 
 
 def _log_shows_vm_crash(log_path: Path) -> bool:
-    """True if the log indicates a Dart VM crash (heap corruption, segfault, etc.).
+    """True if the log indicates a Dart VM or compiler crash.
 
-    These crashes kill the test runner isolate mid-run, causing all subsequent
-    test files to report "Failed to load" with no message. They are transient
-    and unrelated to code correctness.
+    Covers three crash families:
+    1. VM heap corruption — "Corrupt heap", "Invalid cid:", "raw_object.cc"
+    2. front_end compiler crash — "Crash when compiling",
+       "NamedTypeBuilderImpl", "Cannot remove from a fixed-length list"
+    3. Native access violation — the process dies mid-write and the log
+       contains null bytes (STATUS_ACCESS_VIOLATION on Windows)
+
+    All three kill the test runner, causing subsequent test files to report
+    "Failed to load" with no message. They are transient infrastructure
+    failures unrelated to code correctness.
     """
+    # Check for native crash: null bytes in the log mean the process died
+    # with a native fault (STATUS_ACCESS_VIOLATION) before flushing. The
+    # crash leaves unflushed null-filled data at the tail of the log (valid
+    # test output precedes it), so read the last 8 KB, not the first.
+    if log_path.exists():
+        try:
+            size = log_path.stat().st_size
+            # Read last 25% of file (min 8 KB) to catch null bytes from a
+            # native crash even when the valid-output prefix is very large.
+            check_size = max(8192, size // 4)
+            with open(log_path, "rb") as f:
+                f.seek(max(0, size - check_size))
+                tail = f.read(check_size)
+            if b"\x00" in tail:
+                return True
+        except OSError:
+            pass
     text = _read_log_text(log_path)
     if not text:
         return False
     return (
+        # VM heap corruption
         "Corrupt heap" in text
         or "Invalid cid:" in text
         or "EXCEPTION CAUGHT BY VM" in text
         or "raw_object.cc" in text
+        # front_end compiler crash (Dart SDK bug in incremental compilation)
+        or "Crash when compiling" in text
+        or "Cannot remove from a fixed-length list" in text
+        or "NamedTypeBuilderImpl" in text
     )
 
 
@@ -931,7 +979,7 @@ def _log_transient_failure_reason(log_path: Path) -> str | None:
     # Build a combined reason string
     reasons: list[str] = []
     if has_vm_crash:
-        reasons.append("Dart VM heap corruption crash")
+        reasons.append("Dart VM/compiler crash")
     if has_file_lock:
         reasons.append("Windows file-lock race (PathAccessException)")
     return " + ".join(reasons)
@@ -957,6 +1005,8 @@ def _run_chain_stack_traces_and_check(
     last_log_path = None
     last_date_str = None
     last_log_name = None
+    # Track concurrency across attempts so crash retries can halve it.
+    diag_j = min(os.cpu_count() or 8, 8)
 
     for attempt in range(max_attempts):
         now = datetime.now()
@@ -968,11 +1018,13 @@ def _run_chain_stack_traces_and_check(
         log_path = reports_dir / log_name
         if attempt > 0:
             print_info(
-                f"Retrying dart test --chain-stack-traces (output → reports/{date_str}/{log_name})"
+                f"Retrying dart test --chain-stack-traces "
+                f"(-j {diag_j}, output → reports/{date_str}/{log_name})"
             )
         else:
             print_info(
-                f"Running dart test --chain-stack-traces (output → reports/{date_str}/{log_name})"
+                f"Running dart test --chain-stack-traces "
+                f"(-j {diag_j}, output → reports/{date_str}/{log_name})"
             )
         running = threading.Event()
         running.set()
@@ -986,7 +1038,11 @@ def _run_chain_stack_traces_and_check(
         try:
             with open(log_path, "w", encoding="utf-8") as out:
                 result = subprocess.run(
-                    ["dart", "test", "--chain-stack-traces", *(extra_args or [])],
+                    [
+                        "dart", "test", "--chain-stack-traces",
+                        "-j", str(diag_j),
+                        *(extra_args or []),
+                    ],
                     cwd=project_dir,
                     stdout=out,
                     stderr=subprocess.STDOUT,
@@ -1076,22 +1132,21 @@ def _run_dart_test_to_file(
     env: dict[str, str] | None,
     log_path: Path,
     extra_args: list[str] | None = None,
+    concurrency: int | None = None,
 ) -> int:
     """Run dart test with stdout/stderr piped only to log_path. Returns exit code.
 
     extra_args appends tag selectors (e.g. ['-x', 'slow'] or ['-t', 'slow']) so the
     caller can split the suite into a fast pass and a slow pass.
+    concurrency overrides -j (default: min(cpu_count, 8)).
 
     On non-zero exit, appends a line to the log so the file explicitly records that tests failed.
     """
     use_shell = get_shell_mode()
-    # Use all logical cores. dart test defaults to ~half the cores, which leaves
-    # the long full-repo scan integration tests (fixture_lint_integration,
-    # scan_runner, fix_application_dart_fix_dry_run) queued behind the unit tests
-    # instead of overlapping them. -j <cores> shortens the publish test step with
-    # no change to which tests run. Falls back to a sane default if the count is
-    # unavailable.
-    cores = os.cpu_count() or 8
+    # Cap at 8 workers by default: the Dart kernel compiler crashes with a
+    # native access violation or front_end exception when too many
+    # frontend_server compile workers run in parallel on Windows.
+    cores = concurrency or min(os.cpu_count() or 8, 8)
     cmd = ["dart", "test", "-j", str(cores)]
     if extra_args:
         cmd.extend(extra_args)
@@ -1110,16 +1165,29 @@ def _run_dart_test_to_file(
     return result.returncode
 
 
-def _prompt_test_failure() -> str:
-    """Ask user what to do after tests failed. Returns 'continue' | 'retry' | 'abort'."""
+def _prompt_test_failure(is_crash: bool = False) -> str:
+    """Ask user what to do after tests failed.
+
+    Returns 'continue' | 'retry' | 'retry_fewer' | 'abort'.
+    When is_crash is True, offers a "retry with fewer workers" option that
+    halves the concurrency to work around compiler crashes.
+    """
     print_warning("Tests failed. Choose an action:")
     print_colored("  [R]etry (re-run tests after fixing the issue)", Color.CYAN)
+    if is_crash:
+        print_colored(
+            "  [F]ewer workers (retry with halved concurrency — fixes compiler crashes)",
+            Color.CYAN,
+        )
     print_colored("  [C]ontinue anyway (proceed with publish)", Color.CYAN)
     print_colored("  [A]bort (stop publish)", Color.CYAN)
+    prompt = "  Choice [r/f/c/a]: " if is_crash else "  Choice [r/c/a]: "
     try:
-        raw = input("  Choice [r/c/a]: ").strip().lower() or "a"
+        raw = input(prompt).strip().lower() or "a"
         if raw.startswith("r"):
             return "retry"
+        if is_crash and raw.startswith("f"):
+            return "retry_fewer"
         if raw.startswith("c"):
             return "continue"
         if raw.startswith("a"):
@@ -1184,6 +1252,7 @@ def _run_test_pass(
     time_str: str,
     label: str,
     extra_args: list[str] | None = None,
+    concurrency: int | None = None,
 ) -> bool:
     """Run one dart test pass (e.g. fast = exclude `slow`, slow = only `slow`).
 
@@ -1191,28 +1260,47 @@ def _run_test_pass(
     like the original single-pass flow. The label is woven into the log filename so
     the fast and slow passes write distinct logs under the same timestamp.
 
+    concurrency overrides -j for the initial run (from auto-tune). Crash retries
+    still halve it further.
+
     Returns True to continue the publish (the pass passed, or the user chose
     Continue), False to abort.
     """
     log_name = f"{date_str}_{time_str}_dart_test_{label}.log"
     log_path = reports_dir / log_name
 
-    print_info(f"Running {label} tests (output → reports/{date_str}/{log_name})")
-    returncode = _run_dart_test_to_file(project_dir, env, log_path, extra_args)
+    # Show the concurrency so crashes are diagnosable from the terminal.
+    effective_j = concurrency or min(os.cpu_count() or 8, 8)
+    print_info(
+        f"Running {label} tests (-j {effective_j}, "
+        f"output → reports/{date_str}/{log_name})"
+    )
+    returncode = _run_dart_test_to_file(
+        project_dir, env, log_path, extra_args, concurrency=concurrency,
+    )
     if returncode == 0:
         print_success(f"{label.capitalize()} tests passed.")
         return True
 
     # Check whether the failure looks transient (VM crash or file lock)
     transient_reason = _log_transient_failure_reason(log_path)
+    # On compiler crashes, halve concurrency for the retry — the crash is
+    # caused by too many frontend_server workers running in parallel.
+    initial_j = concurrency or min(os.cpu_count() or 8, 8)
+    retry_j = max(initial_j // 2, 2) if _log_shows_vm_crash(log_path) else None
     if transient_reason:
         print_warning(f"Transient failure detected: {transient_reason}")
-        print_warning("Retrying tests once...")
+        if retry_j:
+            print_warning(f"Retrying with reduced concurrency (-j {retry_j})...")
+        else:
+            print_warning("Retrying tests once...")
     else:
         print_warning("Retrying tests once...")
     retry_name = f"{date_str}_{time_str}_dart_test_{label}_retry.log"
     retry_path = reports_dir / retry_name
-    retry_code = _run_dart_test_to_file(project_dir, env, retry_path, extra_args)
+    retry_code = _run_dart_test_to_file(
+        project_dir, env, retry_path, extra_args, concurrency=retry_j,
+    )
     if retry_code == 0:
         if transient_reason:
             print_success(f"{label.capitalize()} tests passed on retry (confirmed transient).")
@@ -1220,17 +1308,20 @@ def _run_test_pass(
             print_success(f"{label.capitalize()} tests passed on retry.")
         return True
 
-    # Both runs failed: check whether retry also shows transient issues
-    retry_transient = _log_transient_failure_reason(retry_path)
+    # Both runs failed — enter the interactive retry loop. Track the last
+    # concurrency used so "fewer workers" can halve it progressively.
     last_log = retry_path
+    last_j = retry_j or min(os.cpu_count() or 8, 8)
     while True:
-        # Surface transient failure diagnosis so the user knows Retry is safe
+        # Surface transient failure diagnosis so the user knows Retry is safe.
+        is_crash = _log_shows_vm_crash(last_log)
         current_transient = _log_transient_failure_reason(last_log)
         if current_transient:
             print_warning(f"⚠ Transient infrastructure failure: {current_transient}")
             print_info("  These failures are unrelated to code — Retry is recommended.")
         print_error(
-            f"{label.capitalize()} tests failed. Full output in log file (no test output was printed to this terminal)."
+            f"{label.capitalize()} tests failed (ran with -j {last_j}). "
+            "Full output in log file (no test output was printed to this terminal)."
         )
         print_colored(f"  Log: {last_log.relative_to(project_dir)}", Color.CYAN)
         excerpt = _extract_failure_excerpt(last_log, max_lines=10)
@@ -1241,19 +1332,31 @@ def _run_test_pass(
         else:
             print_info("  (No failure markers found in log; open the log file to see output.)")
 
-        choice = _prompt_test_failure()
+        choice = _prompt_test_failure(is_crash=is_crash)
         if choice == "continue":
             print_info("Continuing despite test failure.")
             return True
-        if choice == "retry":
-            # Re-run tests (user may have fixed the issue in another terminal)
-            print_info("Re-running tests...")
+        if choice in ("retry", "retry_fewer"):
+            # "retry_fewer" halves the concurrency to work around compiler
+            # crashes (user-visible option when is_crash is True). Plain
+            # "retry" auto-reduces on crash, but keeps the current level
+            # if the failure wasn't a crash.
+            if choice == "retry_fewer":
+                next_j = max(1, last_j // 2)
+            elif is_crash:
+                next_j = max(1, last_j // 2)
+            else:
+                next_j = last_j
+            print_info(f"Re-running tests with -j {next_j}...")
             relog_time = datetime.now().strftime("%H%M%S")
             relog_name = f"{date_str}_{relog_time}_dart_test_{label}_retry.log"
             last_log = reports_dir / relog_name
-            rc = _run_dart_test_to_file(project_dir, env, last_log, extra_args)
+            rc = _run_dart_test_to_file(
+                project_dir, env, last_log, extra_args, concurrency=next_j,
+            )
+            last_j = next_j
             if rc == 0:
-                print_success(f"{label.capitalize()} tests passed on retry.")
+                print_success(f"{label.capitalize()} tests passed on retry (-j {next_j}).")
                 return True
             continue
         # Abort: run chain-stack-traces so a detailed log exists, then return False
@@ -1261,6 +1364,117 @@ def _run_test_pass(
         _run_chain_stack_traces_and_check(project_dir, env, extra_args)
         print_info("Diagnostic trace saved. Aborting publish.")
         return False
+
+
+def _auto_tune_concurrency(
+    project_dir: Path,
+    env: dict[str, str] | None,
+) -> int:
+    """Probe for the highest stable dart-test concurrency on this machine.
+
+    Runs a single lightweight test file at increasing -j levels (4, 6, 8, 10,
+    12) and returns the highest level that completed without a native crash.
+    Results are cached in build/.dart_test_max_j so the probe only runs once
+    per machine/SDK combination.
+
+    Falls back to 4 if no probe succeeds (extremely conservative).
+    """
+    # Cache key: SDK version + cpu count — a new SDK or different machine
+    # invalidates the cached result.
+    cache_dir = project_dir / "build"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    cache_file = cache_dir / ".dart_test_max_j"
+    sdk_version = ""
+    try:
+        sdk_result = subprocess.run(
+            ["dart", "--version"],
+            capture_output=True, text=True, timeout=10,
+            shell=get_shell_mode(),
+        )
+        sdk_version = sdk_result.stdout.strip() or sdk_result.stderr.strip()
+    except (OSError, subprocess.TimeoutExpired):
+        pass
+    cache_key = f"{sdk_version}|{os.cpu_count()}"
+
+    # Read cached result if it exists and matches.
+    if cache_file.exists():
+        try:
+            lines = cache_file.read_text(encoding="utf-8").splitlines()
+            if len(lines) >= 2 and lines[0] == cache_key:
+                cached_j = int(lines[1])
+                print_info(f"Test concurrency: -j {cached_j} (cached)")
+                return cached_j
+        except (ValueError, OSError):
+            pass
+
+    # Find a small test file for probing (avoid slow-tagged ones).
+    probe_file = None
+    test_dir = project_dir / "test"
+    for candidate in sorted(test_dir.rglob("*_test.dart")):
+        # Pick a small, fast test — skip integration/slow/scan/project_health.
+        rel = str(candidate.relative_to(project_dir))
+        if any(skip in rel for skip in ("scan", "project_health", "cross_file", "fixture")):
+            continue
+        # Use the first one found (sorted alphabetically = predictable).
+        probe_file = rel
+        break
+
+    if not probe_file:
+        print_warning("No probe test file found — defaulting to -j 4")
+        return 4
+
+    # Probe at increasing concurrency levels.
+    levels = [4, 6, 8, 10, 12]
+    cpu = os.cpu_count() or 8
+    # Don't probe above the CPU count — no point.
+    levels = [j for j in levels if j <= cpu]
+    if not levels:
+        levels = [4]
+
+    print_info(f"Tuning test concurrency (probing {probe_file})...")
+    best_j = levels[0]
+    use_shell = get_shell_mode()
+
+    for j in levels:
+        try:
+            result = subprocess.run(
+                ["dart", "test", "-j", str(j), probe_file],
+                cwd=project_dir,
+                capture_output=True,
+                env=env,
+                timeout=120,
+                shell=use_shell,
+            )
+            # Exit code 9 = native crash (SIGKILL / STATUS_ACCESS_VIOLATION).
+            # Also check for null bytes in output (sign of native crash).
+            stdout_bytes = result.stdout or b""
+            if result.returncode == 9 or b"\x00" in stdout_bytes[:4096]:
+                print_info(f"  -j {j}: crash — stopping")
+                break
+            # Any non-zero exit that looks like a VM crash.
+            output_text = stdout_bytes.decode("utf-8", errors="replace")
+            if result.returncode != 0 and (
+                "Corrupt heap" in output_text
+                or "CRASH" in output_text
+                or "ExceptionCode=" in output_text
+            ):
+                print_info(f"  -j {j}: VM crash detected — stopping")
+                break
+            # Test passed or failed normally (not a crash) — this level is safe.
+            best_j = j
+            print_info(f"  -j {j}: stable")
+        except subprocess.TimeoutExpired:
+            print_info(f"  -j {j}: timeout — stopping")
+            break
+
+    # Cache the result.
+    try:
+        cache_file.write_text(f"{cache_key}\n{best_j}\n", encoding="utf-8")
+    except OSError:
+        pass
+
+    print_success(f"Test concurrency: -j {best_j}")
+    return best_j
 
 
 def run_tests(project_dir: Path) -> bool:
@@ -1281,9 +1495,9 @@ def run_tests(project_dir: Path) -> bool:
 
     All test output is written to a log file only (no test output on terminal).
     On failure, shows log path and a short excerpt, then prompts Continue or Abort.
-    Uses a temp dir under the project so the test runner does not fill the system
-    temp drive. Full integration tests (dart analyze in example/) are skipped during
-    publish; run manually: cd example && dart analyze
+    Test temp is redirected outside the project tree so the scanner does not pick up
+    kernel-cache .dill files. Full integration tests (dart analyze in example/) are
+    skipped during publish; run manually: cd example && dart analyze
     """
     print_header("STEP 7: RUNNING TESTS")
 
@@ -1295,6 +1509,11 @@ def run_tests(project_dir: Path) -> bool:
         return True
 
     env = _dart_test_env(project_dir)
+
+    # Auto-tune: probe for the highest safe concurrency on this machine,
+    # then pass it through to all test runs in this step.
+    tuned_j = _auto_tune_concurrency(project_dir, env)
+
     now = datetime.now()
     date_str = now.strftime("%Y%m%d")
     time_str = now.strftime("%H%M%S")
@@ -1305,6 +1524,7 @@ def run_tests(project_dir: Path) -> bool:
     return _run_test_pass(
         project_dir, env, reports_dir, date_str, time_str,
         label="fast", extra_args=["-x", "slow"],
+        concurrency=tuned_j,
     )
 
 

@@ -70,10 +70,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 - `avoid_future_in_build` (v3) removed name-prefix heuristic that only caught methods starting with `fetch`/`load`/`get`/etc. Now flags ANY method invocation in `FutureBuilder(future:)` inside `build()`. Also detects non-deterministic `Future` constructors while exempting `Future.value()` and `Future.error()`. Scoped to `FutureBuilder` only (no longer flags custom widgets with a `future:` parameter). Widget class detection now covers third-party bases (`HookWidget`, `ConsumerWidget`, etc.). No action required.
 - `pass_existing_future_to_future_builder` (v9) no longer flags `Future.value()` and `Future.error()` constructors. Cache-method exemption now also recognizes `@cachedFuture` annotation from `package:saropa_lints/annotations.dart`. No action required.
-- **OOM crash on large projects (4000+ files):** The in-process analyzer plugin could exhaust memory on projects with thousands of files because forward-accumulating trackers were never evicted under pressure, the hard RSS safety valve defaulted too high, and violation tracking continued after the valve tripped. The plugin now sheds tracker data under memory pressure, stops accumulating records while memory-critical, adapts the default RSS cap to 60% of system RAM (capped at 4 GB), warns when the project exceeds 2000 files, and includes tracker sizes in the memory estimate. No action required — set `SAROPA_LINTS_MAX_RSS_MB` to override the adaptive cap.
+- **OOM crash on large projects (4000+ files):** The in-process analyzer plugin could exhaust memory on projects with thousands of files because forward-accumulating trackers were never evicted under pressure, the hard RSS safety valve defaulted too high, and violation tracking continued after the valve tripped. The plugin now sheds tracker data under memory pressure, stops accumulating records while memory-critical, adapts the default RSS cap to 60% of system RAM (capped at 8 GB on high-RAM machines), warns when the project exceeds 2000 files, and includes tracker sizes in the memory estimate. No action required — set `SAROPA_LINTS_MAX_RSS_MB` to override the adaptive cap.
 
 ### Added
 
+- **Per-file memory budget:** On large projects approaching the RSS cap, the plugin now skips cold (unmodified >24h) files and prioritizes recently edited files for lint analysis — partial coverage instead of all-or-nothing OOM. The analysis summary reports how many files were skipped. No action required.
 - **`@cachedFuture` annotation** (`package:saropa_lints/annotations.dart`) — marks a method as returning a cached Future, suppressing `pass_existing_future_to_future_builder` without needing the heuristic (private method + `Future?` field). Use when your naming convention doesn't match the heuristic.
 
 ### Changed
@@ -83,6 +84,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 <details><summary>Maintenance</summary>
 
 - Extracted shared `isWidgetOrStateClass()` and `isInsideBuildMethod()` utilities into `target_matcher_utils.dart` — used by `avoid_stream_in_build` and `avoid_future_in_build`; replaces per-rule private duplicates.
+- **Publish script: fixed Dart frontend_server crash** — `dart test -j <all-cores>` (24 on a 24-core machine) caused native access violations (`STATUS_ACCESS_VIOLATION`) and `front_end` compiler exceptions during test compilation. The test step now auto-tunes concurrency by probing a single test at increasing `-j` levels (4, 6, 8, 10, 12), caching the result in `build/.dart_test_max_j`; crash retries halve concurrency automatically.
+- **Publish script: fixed test temp dir location** — kernel-cache `.dill` files were written inside the project tree (`build/test_tmp/`), causing `uri_does_not_exist` scan errors and filling the C: drive. Temp dir now defaults to `<system_temp>/saropa_dart_test` outside the project tree; set `SAROPA_TEST_TMP` to override (validated: falls back if inside project tree).
+- Removed `plans/known_issues_review.md` from git tracking (generated file, regenerated each publish run).
 
 </details>
 
