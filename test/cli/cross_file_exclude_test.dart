@@ -1,10 +1,13 @@
+/// Tests for --exclude glob filtering in cross-file analysis.
+@Tags(['slow'])
+library;
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/src/cli/cross_file_analyzer.dart';
 import 'package:test/test.dart';
 
-/// Tests for --exclude glob filtering in cross-file analysis.
 ///
 /// Uses the cross_file_fixture which has 4 files:
 ///   lib/a.dart  (imports b.dart — part of a→b→c→a cycle)

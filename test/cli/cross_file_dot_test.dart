@@ -1,3 +1,7 @@
+/// Tests for DOT graph export in cross-file analysis.
+@Tags(['slow'])
+library;
+
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
@@ -7,7 +11,6 @@ import 'package:test/test.dart';
 
 import '../support/safe_delete.dart';
 
-/// Tests for DOT graph export in cross-file analysis.
 ///
 /// Uses the cross_file_fixture which has 4 files:
 ///   lib/a.dart  → imports b.dart

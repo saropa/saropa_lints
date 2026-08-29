@@ -11,6 +11,7 @@
 /// Each scenario seeds a real on-disk package under `Directory.systemTemp` so
 /// the analyzer can build a resolved element model (the name-based fallback
 /// would defeat the point of the assertions).
+@Tags(['slow'])
 library;
 
 import 'dart:io';

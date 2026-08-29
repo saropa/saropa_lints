@@ -1,6 +1,7 @@
 /// Integration-style tests for [runProjectVibrancy]: builds ephemeral **pubspec + lib + lcov** trees,
 /// asserts JSON shape, grades, flags (`unused`, `uncovered`, …), and CLI-facing options like folder scope.
 /// Uses real filesystem I/O under `Directory.systemTemp` with `setUp`/`tearDown` cleanup.
+@Tags(['slow'])
 library;
 
 import 'dart:convert';

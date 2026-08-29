@@ -1,4 +1,5 @@
 /// Loads `saropa_lints_cross_file` from `analysis_options.yaml`: excludes, heuristic flags, optional symbols.
+@Tags(['slow'])
 library;
 
 import 'dart:io';

@@ -2,6 +2,7 @@
 ///
 /// Does not use repo fixtures: each case builds a minimal `lib/l10n` + `lib` layout under
 /// a system temp directory and deletes it in `finally` to avoid leaking disk state.
+@Tags(['slow'])
 library;
 
 import 'dart:io';
