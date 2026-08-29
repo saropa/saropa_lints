@@ -114,8 +114,10 @@ Runs a full audit but filters output to only diagnostics in files changed since 
 ref. Lets teams use audit as a PR review tool without drowning in pre-existing findings.
 
 **CLI:** `dart run saropa_lints audit <dir> --since <ref>` — `<ref>` is any git ref
-(branch name, SHA, `HEAD~5`). The CLI calls `git diff --name-only <ref> -- '*.dart'`
-to get the changed file list, then passes it as `--include-globs` to the scan engine.
+(branch name, SHA, `HEAD~5`). The CLI calls
+`git diff --name-only --diff-filter=ACMR -M <ref>..HEAD -- '*.dart'`
+to get the changed file list (Added, Copied, Modified, Renamed — `-M` ensures renamed
+files show their new path), then passes it as `--include-globs` to the scan engine.
 
 **Extension UI:** The sidebar audit button shows a quick-pick prompt BEFORE running:
 
@@ -147,11 +149,12 @@ targeted audits on a specific directory.
 4. Stream progress from stderr (scan already emits file-count progress).
 5. On completion, open the Audit Report webview with the JSON payload.
 
-**Audit Report webview** — new `AuditReportPanel` singleton. Reuse existing shared
-infrastructure from the Vibrancy report (`report-html-shared.ts`, shared styles, gauge
-component) rather than building a parallel report system from scratch. The audit-specific
-parts (diagnostic table with tier/category facets, search) are new; the summary header,
-gauge, and base table/sort/group patterns are shared.
+**Audit Report webview** — new `AuditReportPanel` singleton. The Vibrancy report's
+`report-html-shared.ts` is mostly vibrancy-locked (`ReportOptions` is typed to
+`VibrancyResult[]`, gauge/grid CSS is vibrancy-specific). Reusable pieces: the two date
+utilities (`daysSinceIsoDate`, `formatAgeFromDays`) and the CSS token strategy
+(`var(--vscode-*)` palette approach, zebra rows, sticky headers). Everything else — options
+interface, data table builder, filter chip bar, stylesheet — is audit-specific and new.
 
 **Report features:**
 
@@ -210,7 +213,9 @@ Deferred because it touches every rule class.
 | `extension/src/audit/audit-report-panel.ts` | Webview panel singleton (reuses `report-html-shared.ts`) |
 | `extension/src/audit/audit-report-html.ts` | HTML generation: diagnostic table, filter chips, search |
 | `extension/src/audit/audit-report-script.ts` | Client-side JS: search, filter, sort, group |
-| `lib/src/scan/git_changed_files.dart` | `git diff --name-only <ref>` wrapper for `--since` |
+| `lib/src/scan/git_changed_files.dart` | `git diff --name-only --diff-filter=ACMR -M` wrapper for `--since` |
+| `lib/src/scan/audit_baseline.dart` | Baseline save/load/diff logic for `--baseline` / `--save-baseline` |
+| `extension/src/audit/audit-report-styles.ts` | Audit-specific CSS (own stylesheet, not shared with vibrancy) |
 
 ### Modified files
 
@@ -311,8 +316,9 @@ Two memory costs to consider:
 3. **Dispatcher subcommand** (`dart run saropa_lints audit`), not a separate `pubspec.yaml`
    executable — matches project convention.
 
-4. **Reuse `report-html-shared.ts`** for the webview — shared gauge, styles, table patterns.
-   Only audit-specific parts (diagnostic table, tier/category facets, search) are new.
+4. **Minimal reuse from `report-html-shared.ts`** — only date utilities and CSS token
+   strategy are reusable. The options interface, table builder, filter chips, and
+   stylesheet are audit-specific (vibrancy report is typed to `VibrancyResult[]`).
 
 5. **Category from rule factory grouping** for v1 — static map derived from the factory
    list's source file grouping. `category` getter on `SaropaLintRule` deferred to v2.
@@ -329,6 +335,118 @@ Two memory costs to consider:
 10. **Diff mode UI exposure** — `--since` is surfaced as a quick-pick prompt in the
     extension UI before every audit run, not buried as a CLI-only flag. Three options:
     Full project / Changed vs main / Pick branch.
+
+---
+
+## Audit baseline diffing
+
+Saves an audit snapshot and on subsequent runs shows only new/resolved findings compared
+to the baseline. Turns audit into a ratchet: teams fix new findings without being
+overwhelmed by the existing backlog.
+
+### All outputs are datetime-stamped
+
+Every audit output includes a UTC ISO-8601 timestamp at the top level:
+
+```json
+{
+  "timestamp": "2026-08-29T14:32:00Z",
+  "version": 1,
+  "tierCapBypassed": true,
+  "diagnostics": [...],
+  "summary": {...},
+  "baseline": {
+    "comparedTo": "2026-08-28T10:15:00Z",
+    "new": 12,
+    "resolved": 5,
+    "unchanged": 483
+  }
+}
+```
+
+The `baseline` key is present only when `--baseline` is used. The webview report header
+shows the timestamp and, when baseline-diffing, a "vs baseline from <date>" subtitle.
+
+### CLI
+
+| Flag | Purpose |
+|------|---------|
+| `--save-baseline` | Save this audit's JSON as the project baseline at `.saropa/audit_baseline.json` |
+| `--baseline` | Compare against the saved baseline; output includes `baseline.new` / `baseline.resolved` / `baseline.unchanged` counts; diagnostics gain a `baselineStatus` field (`new` / `unchanged` / `resolved`) |
+| `--baseline-path <path>` | Use a specific baseline file instead of the default location |
+
+`--save-baseline` and `--baseline` can be combined: compare against existing baseline,
+then overwrite it with the current results.
+
+### Extension UI
+
+The sidebar audit quick-pick gains a fourth option when a baseline exists:
+
+| Option | Behavior |
+|--------|----------|
+| **Full project audit** | All files, no baseline |
+| **Changed files only (vs main)** | `--since main` |
+| **Changed files only (pick branch...)** | Branch picker + `--since` |
+| **Compare to baseline** | `--baseline` — shows new/resolved badges in the report |
+
+A "Save as baseline" button appears in the audit report webview header after any audit
+completes. Clicking it calls the CLI with `--save-baseline` on the current results.
+
+The report webview shows three filter chips when baseline data is present:
+**New** (red badge) / **Unchanged** (neutral) / **Resolved** (green badge, struck through).
+
+### Baseline file format
+
+`.saropa/audit_baseline.json` — same schema as audit output JSON, datetime-stamped.
+The file is project-local (lives in the project root, gitignored by default). Teams
+that want shared baselines can commit it.
+
+---
+
+## Verified hardening (reflection items)
+
+### 1. RuntimeTierCap — sole enforcement point confirmed
+
+Verified: `RuntimeTierCap.filterRuleSet()` at `scan_runner.dart:296` is the only
+enforcement point in the scan CLI path. `reloadRuntimeTierCapFromProject()` (line 284)
+sets the static `_cap` field but does not filter or gate rules — that happens only when
+`filterRuleSet` is subsequently called. The `bypassTierCap` flag on `ScanRunner` is
+sufficient.
+
+### 2. report-html-shared.ts — mostly vibrancy-locked
+
+Verified: `ReportOptions` is typed to `VibrancyResult[]`. Gauge, grid CSS, and data
+helpers (`resolveRepoUrl`, `buildDormancyStatus`, `computeActivitySignal`) are all
+vibrancy-specific. Only `daysSinceIsoDate()`, `formatAgeFromDays()`, and the CSS token
+strategy (`var(--vscode-*)` palette) are reusable. The audit report needs its own options
+interface, table builder, filter chip bar, and stylesheet.
+
+### 3. Git diff renamed files
+
+Verified: `git diff --name-only` without `-M` shows renamed files as delete + add.
+The `--since` implementation must use:
+`git diff --name-only --diff-filter=ACMR -M <ref>..HEAD -- '*.dart'`
+(`-M` enables rename detection; `ACMR` = Added, Copied, Modified, Renamed.)
+
+### 4. Webview row capacity (100k+ diagnostics)
+
+Unverified empirically. Mitigation: the report webview should paginate or virtualize
+rows above 5,000. v1 can use simple DOM pagination (show 500 rows, "Load more" button)
+rather than full virtual scroll. The filter chips reduce visible rows significantly in
+practice.
+
+### 5. postMessage size limit
+
+VS Code's `webview.postMessage()` has no documented hard limit but serializes through
+JSON. For 100k diagnostics at ~500 bytes each = ~50MB JSON string. Mitigation: if the
+payload exceeds 10MB, write it to a temp file and pass the file URI to the webview via
+`postMessage({type: 'auditFile', uri: ...})` instead of inlining the data.
+
+### 6. Multi-root workspace UX
+
+`showWorkspaceFolderPick()` handles any number of folders. For single-root workspaces
+it can be skipped entirely (use the one root). For multi-root, the picker shows folder
+names — acceptable at any scale.
 
 ---
 
@@ -357,6 +475,19 @@ Additional hardening (2026-08-29, reflection gate):
 5. Added "Audit diff mode" (`--since <ref>`) — filters to files changed since a git ref.
    CLI flag + UI quick-pick before every audit run (Full / Changed vs main / Pick branch).
    Ensures the `--since` option is never buried as a CLI-only param.
+
+Additional hardening (2026-08-29, reflection gate, round 2):
+
+6. Verified `RuntimeTierCap.filterRuleSet()` is the sole scan-path enforcement point
+   (no indirect gating via `reloadRuntimeTierCapFromProject` side effects).
+7. Verified `report-html-shared.ts` is mostly vibrancy-locked — audit report needs its
+   own options interface, table builder, filter chips, stylesheet. Only date utilities
+   and CSS token strategy reusable.
+8. Fixed `--since` git command to use `--diff-filter=ACMR -M` for renamed file handling.
+9. Added webview pagination mitigation for 100k+ rows (paginate above 5k, not full DOM).
+10. Added `postMessage` size mitigation (temp file for payloads >10MB).
+11. Added audit baseline diffing feature — `--save-baseline`, `--baseline`, datetime
+    stamps on all outputs, UI quick-pick option + "Save as baseline" button in report.
 
 **Status:** Plan complete and committed. No implementation started. Three phases defined:
 CLI (Dart), Extension UI (TypeScript), Polish.
