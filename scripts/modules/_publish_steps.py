@@ -431,10 +431,13 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
         print_success("No pub.dev doc issues found")
 
     # --- AUTO-FIX: Apply dart fix for auto-fixable lint issues ---
+    # shell=get_shell_mode() is required on Windows: `dart` resolves to
+    # dart.bat, which CreateProcess cannot launch directly without a shell.
     dart_fix_result = subprocess.run(
         ['dart', 'fix', '--dry-run'],
         capture_output=True, text=True, timeout=300,
         cwd=str(project_dir),
+        shell=get_shell_mode(),
     )
     dart_fix_output = dart_fix_result.stdout + dart_fix_result.stderr
     fix_match = re.search(r'(\d+)\s+fix', dart_fix_output)
@@ -446,6 +449,7 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
             ['dart', 'fix', '--apply'],
             capture_output=True, text=True, timeout=300,
             cwd=str(project_dir),
+            shell=get_shell_mode(),
         )
         print_success("Auto-fixed dart lint issues")
     else:
