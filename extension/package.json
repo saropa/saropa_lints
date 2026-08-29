@@ -2,7 +2,7 @@
   "name": "saropa-lints",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "version": "15.2.2",
+  "version": "15.2.3",
   "publisher": "saropa",
   "license": "MIT",
   "repository": {
@@ -2125,7 +2125,7 @@
     "@types/node": "^26.2.0",
     "@types/semver": "^7.7.1",
     "@types/sinon": "^22.0.0",
-    "@types/vscode": "^1.134.0",
+    "@types/vscode": "~1.74.0",
     "axe-core": "^4.12.1",
     "esbuild": "^0.28.1",
     "jsdom": "^30.0.1",

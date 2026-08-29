@@ -14,6 +14,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "CC {cc}": "CC {cc}",
         "complex": "complex",
         "impact ≠ {v}": "impact ≠ {v}",
+        # Curated command title: "Saropa Lints" is the brand prefix (never translated); Dutch VS Code
+        # convention puts the verb in infinitive form at the end of a command title.
+        "Saropa Lints: Fix Stale Ignore Comments": "Saropa Lints: Verouderde ignore-opmerkingen corrigeren",
         "Search": "Zoeken",
         "Search packages": "Zoeken",
         "Search packages…": "Zoeken",

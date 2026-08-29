@@ -66,9 +66,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.2.3] — Unreleased
+## [15.2.3]
 
-Major scan CLI expansion: lane control (`--lane full|light`, `--lane-stats`), CI gating by rule impact or tier (`--fail-on-impact`, `--fail-on-tier`), stale-ignore detection (`--find-stale-ignores`), SDK compatibility audit (`--check-sdk-compat`), and include/exclude glob filters for fine-grained file targeting. Eight false-positive fixes across core rules including `avoid_context_in_async_static`, `avoid_large_list_copy`, `avoid_datetime_constructor`, `no_equal_nested_conditions`, and the context-across-async family. An OOM crash fix for projects over 4 000 files adds per-file memory budgeting and adaptive RSS caps. Two new rules: `prefer_primary_constructor` (Dart 3.13+ syntax) and `require_sdk_syntax_match` (catches AI-generated code using syntax the project's SDK constraint doesn't support).
+Major scan CLI expansion: lane control (`--lane full|light`, `--lane-stats`), CI gating by rule impact or tier (`--fail-on-impact`, `--fail-on-tier`), stale-ignore detection (`--find-stale-ignores`), SDK compatibility audit (`--check-sdk-compat`), and include/exclude glob filters for fine-grained file targeting. Eight false-positive fixes across core rules including `avoid_context_in_async_static`, `avoid_large_list_copy`, `avoid_datetime_constructor`, `no_equal_nested_conditions`, and the context-across-async family. An OOM crash fix for projects over 4 000 files adds per-file memory budgeting and adaptive RSS caps. Two new rules: `prefer_primary_constructor` (Dart 3.13+ syntax) and `require_sdk_syntax_match` (catches AI-generated code using syntax the project's SDK constraint doesn't support). [log](https://github.com/saropa/saropa_lints/blob/v15.2.3/CHANGELOG.md)
 
 > The `analyzer ^13.1.0` migration (Dart 3.13+ / Flutter 3.47.1+, released 2026-08-19) is complete and tested but held off `main` — adoption of 3.47.1 is near zero. It is parked on the `analyzer-13-migration` branch and will ship as a `<n+1>`.0.0 major bump once adoption is widespread.
 

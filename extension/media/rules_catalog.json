@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0",
-  "ruleCount": 2332,
+  "ruleCount": 2334,
   "rules": {
     "abi_specific_integer_invalid": {
       "ruleType": "bug",
@@ -22487,6 +22487,23 @@
         "description": "Code smell default target: zero false positives."
       }
     },
+    "prefer_primary_constructor": {
+      "ruleType": "codeSmell",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "dart-core",
+        "migration",
+        "sdk"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Code smell default target: zero false positives."
+      }
+    },
     "prefer_private_extension_type_field": {
       "ruleType": "codeSmell",
       "ruleStatus": "ready",
@@ -33394,6 +33411,23 @@
       "accuracyTarget": {
         "expectZeroFalsePositives": true,
         "description": "Code smell default target: zero false positives."
+      }
+    },
+    "require_sdk_syntax_match": {
+      "ruleType": "bug",
+      "ruleStatus": "ready",
+      "requiresReview": false,
+      "defaultReviewState": null,
+      "cweIds": [],
+      "certIds": [],
+      "tags": [
+        "config",
+        "pubspec",
+        "sdk"
+      ],
+      "accuracyTarget": {
+        "expectZeroFalsePositives": true,
+        "description": "Bug rule default target: zero false positives."
       }
     },
     "require_sdk_upper_bound": {
