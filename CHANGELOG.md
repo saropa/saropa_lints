@@ -54,6 +54,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
     **Maintenance section** — Changes with no end-user impact (publish/CI tooling, internal refactors, test harness, plan housekeeping, developer scripts) belong in a collapsed `<details><summary>Maintenance</summary>...</details>` block at the bottom of the version section, never in `### Added` / `### Changed` / `### Fixed`. Test: if a pub.dev or Marketplace user would notice, it is top-level; otherwise Maintenance.
 
+    **Unreleased convention** — The top changelog section MUST use the heading `## [X.Y.Z] — Unreleased` (with ` — Unreleased` suffix) while work is in progress. All new entries go into this ONE section — never create a second unreleased section or bump the version number. The publish script strips ` — Unreleased` (and typo variants like ` - Unreleased`) at publish time via `_strip_unreleased_suffix()`. The version numbers in `pubspec.yaml` and `package.json` stay at the LAST PUBLISHED version until the publish script updates them. After publishing, manually add a new `## [X.Y.Z] — Unreleased` section for the next cycle.
+
     **Tagged changelog** — Published versions use git tag `vx.y.z`. Each section ends its summary with `[log](url)` pointing to that tag's snapshot. Compare against [current `main`](https://github.com/saropa/saropa-lints/blob/main/CHANGELOG.md).
 
     **Published version** — `"version": "x.y.z"` in [package.json](./package.json).
@@ -64,19 +66,38 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [Unreleased]
+## [15.2.3] — Unreleased
+
+> The `analyzer ^13.1.0` migration (Dart 3.13+ / Flutter 3.47.1+, released 2026-08-19) is complete and tested but held off `main` — adoption of 3.47.1 is near zero. It is parked on the `analyzer-13-migration` branch and will ship as a 16.0.0 major bump once adoption is widespread.
 
 ### Fixed
 
+- `avoid_context_in_async_static` no longer false-positives when `BuildContext` is passed solely as an argument to the awaited call and never read after the `await` resumes (e.g. `await showDialog(context: context)`). The rule now walks all context usages in the method body and suppresses the diagnostic when every usage is consumed synchronously inside the awaited expression. No action required.
+- `avoid_large_list_copy` no longer false-positives when `.toList()` feeds a `??` expression, a `List<T>`-typed argument, an explicit `List<T>` variable, a `List<T>` return type, a cascade, a property access, or a collection literal — all cases where removing `.toList()` would cause a compile error. No action required.
+- `avoid_datetime_constructor` and `avoid_datetime_constructor_unvalidated` no longer flag `DateTime()` / `DateTime.utc()` calls when all three date components (year, month, day) are property accesses on a `DateTime`-typed expression, since the source object already guarantees valid components. Day arithmetic (`dt.day ± N`) is also suppressed because Dart documents rollover behavior. No action required.
+- `no_equal_nested_conditions` no longer false-positives when the condition variable is reassigned between the outer and inner checks (e.g. `if (x == null) { x = compute(); if (x == null) ... }`). Simple, null-aware (`??=`), and compound (`+=`) assignments are all recognized. No action required.
 - `avoid_future_in_build` (v3) removed name-prefix heuristic that only caught methods starting with `fetch`/`load`/`get`/etc. Now flags ANY method invocation in `FutureBuilder(future:)` inside `build()`. Also detects non-deterministic `Future` constructors while exempting `Future.value()` and `Future.error()`. Scoped to `FutureBuilder` only (no longer flags custom widgets with a `future:` parameter). Widget class detection now covers third-party bases (`HookWidget`, `ConsumerWidget`, etc.). No action required.
 - `pass_existing_future_to_future_builder` (v9) no longer flags `Future.value()` and `Future.error()` constructors. Cache-method exemption now also recognizes `@cachedFuture` annotation from `package:saropa_lints/annotations.dart`. No action required.
+- `require_error_widget` no longer false-positives when error handling is delegated to an extension method on the snapshot parameter (e.g. `snapshot.snapLoadingProgress()`). Any method invocation on the snapshot is now recognized as delegated error handling. No action required.
 - **OOM crash on large projects (4000+ files):** The in-process analyzer plugin could exhaust memory on projects with thousands of files because forward-accumulating trackers were never evicted under pressure, the hard RSS safety valve defaulted too high, and violation tracking continued after the valve tripped. The plugin now sheds tracker data under memory pressure, stops accumulating records while memory-critical, adapts the default RSS cap to 60% of system RAM (capped at 8 GB on high-RAM machines), warns when the project exceeds 2000 files, and includes tracker sizes in the memory estimate. No action required — set `SAROPA_LINTS_MAX_RSS_MB` to override the adaptive cap.
+- **Scan CLI:** Rules with `usesTypeResolution`, INFO severity, or cost above `low` were silently blocked by the analysis-server lane gate, which defaulted to `light` in the CLI path. The scanner now runs at full lane coverage so all enabled rules fire correctly. No action required.
+- `avoid_context_across_async` and `avoid_retaining_disposed_widgets` now check the resolved type (when type information is available, e.g. in-editor or `--resolve` scans) instead of matching on the bare identifier/type name alone. Fixes false positives on non-Flutter classes that happen to be named `context` or `Element` (an analyzer `Element`, a custom `Context` type, etc.). No action required.
+- Scan CLI now excludes platform ephemeral directories (`ephemeral/`, `.plugin_symlinks/`) by default. Previously these symlinked plugin sources appeared in scan results even though the user doesn't control them. No action required — the exclusion is automatic. ([#313](https://github.com/saropa/saropa_lints/issues/313))
 
 ### Added
 
 - **`DateUtils.dateOnly()` quick fix** for `avoid_datetime_constructor` and `avoid_datetime_constructor_unvalidated` — recognizes the strip-time idiom `DateTime(x.year, x.month, x.day)` and the explicit-midnight-zeros variant `DateTime(x.year, x.month, x.day, 0, 0, 0)`, replacing both with `DateUtils.dateOnly(x)`. Appears above the existing `DateTime.tryParse()` fix when both apply. Not offered for `.utc()` constructors, nullable receivers, non-DateTime types, or pure Dart projects without Flutter. No action required.
 - **Per-file memory budget:** On large projects approaching the RSS cap, the plugin now skips cold (unmodified >24h) files and prioritizes recently edited files for lint analysis — partial coverage instead of all-or-nothing OOM. The analysis summary reports how many files were skipped. No action required.
 - **`@cachedFuture` annotation** (`package:saropa_lints/annotations.dart`) — marks a method as returning a cached Future, suppressing `pass_existing_future_to_future_builder` without needing the heuristic (private method + `Future?` field). Use when your naming convention doesn't match the heuristic.
+- New rule: `prefer_primary_constructor` (Professional, INFO) — flags classes eligible for Dart 3.13+ primary constructor syntax when the project's SDK lower bound is >=3.13.0. Reduces boilerplate for simple data classes that AI generators consistently produce in the verbose pre-3.13 form. Detection only for now — the quick fix ships with the analyzer 13 migration on the `analyzer-13-migration` branch. No action required.
+- New rule: `require_sdk_syntax_match` (Comprehensive, WARNING) — flags Dart syntax features that require a newer SDK than the lower bound declared in pubspec.yaml, with a quick fix to raise the SDK lower bound. Catches AI-generated code that uses records, switch expressions, extension types, or digit separators when the project's SDK constraint doesn't support them. No action required.
+- Scan CLI: `--lane full|light` flag controls which rule lane the scanner uses. Defaults to `full` (every enabled rule); `light` restricts to the same cheap, resolution-free subset the analysis server runs in its default lane. No action required — existing scans are unaffected.
+- Scan CLI: `--lane-stats` prints how many of the loaded rules are light-lane vs full-only; when in light lane, lists every blocked rule name so the gate's effect is fully observable.
+- Scan CLI: `--check-sdk-compat` standalone audit cross-references the pubspec SDK lower bound against Dart syntax features in `lib/`. Prints a grouped summary showing which files force each version bump. Exits 1 on mismatch, 0 when compatible — suitable for CI gating.
+- Scan CLI: `--exclude-globs <pattern>...` flag excludes files matching glob patterns from the scan. Supports `**` (any path segments), `*` (any non-separator chars), and `?` (single char). Use it to skip vendored code, generated directories, or any paths the hardcoded exclusions don't cover. ([#313](https://github.com/saropa/saropa_lints/issues/313))
+- Scan CLI: `--include-globs <pattern>...` flag overrides the hardcoded exclusions for matching paths — when a path matches both a default exclusion and an include-glob, the include wins. Use it to force-scan third-party plugin code in ephemeral or generated directories. ([#313](https://github.com/saropa/saropa_lints/issues/313))
+- Scan CLI: `--fail-on-impact <level>` flag exits 1 when any saropa rule's declared impact meets the threshold (info/warning/error). Unlike `--fail-on` (which uses analyzer severity), this checks the rule author's business-consequence rating — use it to gate CI on high-impact rules regardless of their configurable severity. Pair with `--fail-on-impact-count <n>` to tolerate a known baseline during migration. ([#312](https://github.com/saropa/saropa_lints/issues/312))
+- Scan CLI: `--fail-on-tier <name>` flag exits 1 only when a diagnostic comes from a rule in the specified tier or below. Scan at a high tier for visibility but only fail on essential-tier findings during incremental adoption — e.g. `--tier comprehensive --fail-on-tier essential`. ([#312](https://github.com/saropa/saropa_lints/issues/312))
 
 ### Changed
 
@@ -95,56 +116,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - **Publish script: `--dry-run` CLI flag** — runs dependency resolution, audit, format, analysis, tests, and `dart pub publish --dry-run` with no commit, tag, version bump, or publish. Needs no pub.dev credentials; intended for CI pre-merge validation.
 - **Publish script: further crash-detection hardening** — test-temp-dir contents are wiped before each run instead of accumulating across publish attempts, the temp dir is write-verified before use (falls back to system temp on failure), and the auto-tune concurrency cache key now includes an available-RAM bucket so a level probed safe on an idle machine doesn't get trusted indefinitely under memory pressure.
 - **known_issues review script** — now skips entries with `appliesToMaxVersion` or `replacementObsoleteFromVersion` to avoid false-positive flagging of version-scoped entries that are correct by design.
-
-</details>
-
----
-
-## [15.2.4]
-
-> The `analyzer ^13.1.0` migration (Dart 3.13+ / Flutter 3.47.1+, released 2026-08-19) is complete and tested but held off `main` — adoption of 3.47.1 is near zero. It is parked on the `analyzer-13-migration` branch and will ship as a 16.0.0 major bump once adoption is widespread. [log](https://github.com/saropa/saropa_lints/blob/v15.2.4/CHANGELOG.md)
-
-
-### Fixed
-
-- **Scan CLI:** Rules with `usesTypeResolution`, INFO severity, or cost above `low` were silently blocked by the analysis-server lane gate, which defaulted to `light` in the CLI path. The scanner now runs at full lane coverage so all enabled rules fire correctly. No action required.
-- `avoid_context_across_async` and `avoid_retaining_disposed_widgets` now check the resolved type (when type information is available, e.g. in-editor or `--resolve` scans) instead of matching on the bare identifier/type name alone. Fixes false positives on non-Flutter classes that happen to be named `context` or `Element` (an analyzer `Element`, a custom `Context` type, etc.). No action required.
-
-### Added
-
-- New rule: `prefer_primary_constructor` (Professional, INFO) — flags classes eligible for Dart 3.13+ primary constructor syntax when the project's SDK lower bound is >=3.13.0. Reduces boilerplate for simple data classes that AI generators consistently produce in the verbose pre-3.13 form. Detection only for now — the quick fix ships with the analyzer 13 migration on the `analyzer-13-migration` branch. No action required.
-- New rule: `require_sdk_syntax_match` (Comprehensive, WARNING) — flags Dart syntax features that require a newer SDK than the lower bound declared in pubspec.yaml, with a quick fix to raise the SDK lower bound. Catches AI-generated code that uses records, switch expressions, extension types, or digit separators when the project's SDK constraint doesn't support them. No action required.
-- Scan CLI: `--lane full|light` flag controls which rule lane the scanner uses. Defaults to `full` (every enabled rule); `light` restricts to the same cheap, resolution-free subset the analysis server runs in its default lane. No action required — existing scans are unaffected.
-- Scan CLI: `--lane-stats` prints how many of the loaded rules are light-lane vs full-only; when in light lane, lists every blocked rule name so the gate's effect is fully observable.
-- Scan CLI: `--check-sdk-compat` standalone audit cross-references the pubspec SDK lower bound against Dart syntax features in `lib/`. Prints a grouped summary showing which files force each version bump. Exits 1 on mismatch, 0 when compatible — suitable for CI gating.
-
-<details><summary>Maintenance</summary>
-
 - `require_sdk_syntax_match` quick fix: removed dead `Map<Type, String>` lookup (analyzer concrete types are private `*Impl` classes that never matched abstract keys); hardened regex with triple-quoted raw string to handle embedded quotes.
 - `bugs/BUG_REPORT_GUIDE.md` renamed to `bugs/ISSUE_REPORT_GUIDE.md` and extended with a feature request template, proposal naming patterns, and lifecycle, alongside the existing bug report process.
 - `_rule_metrics.py`'s bug counter now reports open feature proposals separately from unsolved bugs in the publish "WORK REPORT" banner, instead of lumping both into one count.
 - Scan daemon and accuracy report now pass `lane: RuleLane.full` explicitly instead of relying on the constructor default.
 - Scan CLI warns when `--lane light` is combined with `--exclude-light-lane` (degenerate: zero rules to scan).
-- Fixed the 17 real ERROR-severity findings the full-lane self-scan (above) surfaced against this package's own source: `double.parse(x.toStringAsFixed(n))` round-trip patterns in the project-health/vibrancy models now round arithmetically via a shared `roundToDecimalPlaces` helper instead of parsing a self-produced string; a regex-guaranteed-digits `int.parse` triple in the pubspec constraint parser is annotated as a verified false positive. The remaining findings were genuine name-only false positives specific to the default syntactic (non-`--resolve`) scan mode, where no type information exists to rule them out — annotated as verified false positives with a one-line justification each.
+- Fixed the 17 real ERROR-severity findings the full-lane self-scan surfaced against this package's own source: `double.parse(x.toStringAsFixed(n))` round-trip patterns in the project-health/vibrancy models now round arithmetically via a shared `roundToDecimalPlaces` helper instead of parsing a self-produced string; a regex-guaranteed-digits `int.parse` triple in the pubspec constraint parser is annotated as a verified false positive.
 
 </details>
-
----
-
-## [15.2.3]
-
-The scan CLI now supports custom glob filtering, giving teams precise control to include ephemeral sources or exclude generated and vendored code. CI pipelines gain stricter quality gates with the ability to fail builds based on a rule's declared business impact, decoupling pipeline status from editor severity. Finally, automatic exclusions have been expanded to silently ignore platform symlinks by default so they no longer clutter scan reports. [log](https://github.com/saropa/saropa_lints/blob/v15.2.3/CHANGELOG.md)
-
-### Added
-
-- Scan CLI: `--exclude-globs <pattern>...` flag excludes files matching glob patterns from the scan. Supports `**` (any path segments), `*` (any non-separator chars), and `?` (single char). Use it to skip vendored code, generated directories, or any paths the hardcoded exclusions don't cover. ([#313](https://github.com/saropa/saropa_lints/issues/313))
-- Scan CLI: `--include-globs <pattern>...` flag overrides the hardcoded exclusions for matching paths — when a path matches both a default exclusion and an include-glob, the include wins. Use it to force-scan third-party plugin code in ephemeral or generated directories. ([#313](https://github.com/saropa/saropa_lints/issues/313))
-- Scan CLI: `--fail-on-impact <level>` flag exits 1 when any saropa rule's declared impact meets the threshold (info/warning/error). Unlike `--fail-on` (which uses analyzer severity), this checks the rule author's business-consequence rating — use it to gate CI on high-impact rules regardless of their configurable severity. Pair with `--fail-on-impact-count <n>` to tolerate a known baseline during migration. ([#312](https://github.com/saropa/saropa_lints/issues/312))
-- Scan CLI: `--fail-on-tier <name>` flag exits 1 only when a diagnostic comes from a rule in the specified tier or below. Scan at a high tier for visibility but only fail on essential-tier findings during incremental adoption — e.g. `--tier comprehensive --fail-on-tier essential`. ([#312](https://github.com/saropa/saropa_lints/issues/312))
-
-### Fixed
-
-- Scan CLI now excludes platform ephemeral directories (`ephemeral/`, `.plugin_symlinks/`) by default. Previously these symlinked plugin sources appeared in scan results even though the user doesn't control them. No action required — the exclusion is automatic. ([#313](https://github.com/saropa/saropa_lints/issues/313))
 
 ---
 

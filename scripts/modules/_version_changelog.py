@@ -33,10 +33,11 @@ from scripts.modules._git_ops import tag_exists_on_remote
 # Matches: 5.0.0, 5.0.0-beta.1, 5.0.0-rc.2, etc.
 _VERSION_RE = r"\d+\.\d+\.\d+(?:-[\w]+(?:\.[\w]+)*)?"
 
-# Pattern fragment matching " - Unreleased" (and common typos like
-# "Unreleasted") appended after a heading bracket.  Kept as a plain string
-# (not re.compile) because every call site embeds it inside a larger regex.
-_UNRELEASED_SUFFIX_PAT = r"\s*-\s*unreleas\w*"
+# Pattern fragment matching " - Unreleased", " — Unreleased" (em-dash),
+# and common typos like "Unreleasted" appended after a heading bracket.
+# Kept as a plain string (not re.compile) because every call site embeds
+# it inside a larger regex.
+_UNRELEASED_SUFFIX_PAT = r"\s*(?:-|—)\s*unreleas\w*"
 
 
 def _strip_unreleased_suffix(content: str) -> str:
@@ -198,6 +199,40 @@ def assert_no_empty_changelog_sections(changelog_path: Path) -> None:
     )
     exit_with_error(
         "Empty version section(s) in CHANGELOG.md — fix manually and retry.",
+        ExitCode.CHANGELOG_FAILED,
+    )
+
+
+def assert_single_unreleased_section(changelog_path: Path) -> None:
+    """Abort if CHANGELOG.md has more than one unreleased section.
+
+    Detects both ``## [Unreleased]`` and ``## [X.Y.Z] — Unreleased`` style
+    headings. Multiple unreleased sections indicate version-drift from
+    automated sessions creating new sections instead of appending to the
+    existing one.
+    """
+    if not changelog_path.is_file():
+        return
+    content = changelog_path.read_text(encoding="utf-8")
+    # Count pure [Unreleased] headings
+    pure = re.findall(r"^## \[Unreleased\]", content, re.MULTILINE)
+    # Count versioned headings with an unreleased suffix
+    suffixed = re.findall(
+        rf"^## \[[^\]]+\]{_UNRELEASED_SUFFIX_PAT}",
+        content,
+        re.MULTILINE | re.IGNORECASE,
+    )
+    total = len(pure) + len(suffixed)
+    if total <= 1:
+        return
+    print_warning(
+        f"CHANGELOG.md has {total} unreleased sections "
+        f"({len(pure)} bare [Unreleased] + {len(suffixed)} versioned "
+        f"with suffix). Merge them into a single section before "
+        f"publishing."
+    )
+    exit_with_error(
+        "Multiple unreleased sections in CHANGELOG.md — merge and retry.",
         ExitCode.CHANGELOG_FAILED,
     )
 
@@ -870,6 +905,7 @@ def sync_version_with_changelog(
     # the v13.4.3 publish (the rename collision triggered the auto-suggest-
     # next-patch recovery in apply_version_and_rename_unreleased).
     assert_no_empty_changelog_sections(changelog_path)
+    assert_single_unreleased_section(changelog_path)
     version_to_sync = apply_version_and_rename_unreleased(
         pubspec_path, changelog_path, pubspec_version, version,
     )
