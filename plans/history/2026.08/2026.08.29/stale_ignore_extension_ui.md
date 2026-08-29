@@ -95,3 +95,11 @@ Ran: full `npx tsc --noEmit` (clean), `node --max-old-space-size=8192 node_modul
 
 - l10n catalogs are now further behind: 2 more keys added this pass (`info.fixedInFile`, `quickFix.title`) bring the total to 20 keys × 24 locales. The translation command handed to the user earlier in this document is unchanged and still needs to run before publish.
 - End-to-end validation against `d:\src\contacts` remains open — still not performed.
+
+## Follow-up (2026-08-29, resumed session)
+
+**Locale catalogs committed.** The user manually ran `generate_translations.py` after the prior session ended, closing the coverage gap for all 18 previously-outstanding locales down to one remaining string (`command.fixStaleIgnores.title` in `nl` — confirmed via the coverage audit report). Committed in two parts: `a001b660` (a genuine perf fix to the translation pipeline itself — deferred Qwen/Ollama self-provisioning until a locale actually has untranslated strings, found and fixed alongside the manual run; see `plans/history/2026.08/2026.08.28/i18n_deferred_qwen_provisioning.md`) and `d64e2e87` (the regenerated locale data for all 18 locales).
+
+**End-to-end validation against `d:\src\contacts` performed.** Ran `dart run saropa_lints:scan d:/src/contacts --find-stale-ignores --tier comprehensive --format json` against the real 4528-file project. Result: 1102 stale ignores detected, exit code 1 (matches the documented "found is expected" contract). Spot-checked several entries — file paths, comment/target line pairs, and rule names parsed from the `// ignore:` comments all matched the real source correctly, confirming the path-normalization and diagnostic-matching logic in `lib/src/scan/stale_ignore_detector.dart` works against a real multi-file project, not just the unit-test-stubbed CLI output verified previously.
+
+`--fix-stale-ignores` was deliberately NOT run against `d:\src\contacts` — that would mutate another project's source files, which requires explicit permission under the blast-radius rule. Only the read-only `--find` path was validated. If write-path validation against a live project is wanted, it needs to be requested explicitly.
