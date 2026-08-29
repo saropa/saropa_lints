@@ -294,6 +294,18 @@
         "enablement": "saropaLints.isDartProject"
       },
       {
+        "command": "saropaLints.findStaleIgnores",
+        "title": "%command.findStaleIgnores.title%",
+        "icon": "$(search-remove)",
+        "enablement": "saropaLints.isDartProject"
+      },
+      {
+        "command": "saropaLints.fixStaleIgnores",
+        "title": "%command.fixStaleIgnores.title%",
+        "icon": "$(trash)",
+        "enablement": "saropaLints.isDartProject"
+      },
+      {
         "command": "saropaLints.openViolationsWideReport",
         "title": "%command.openViolationsWideReport.title%",
         "category": "%command.openViolationsWideReport.category%",

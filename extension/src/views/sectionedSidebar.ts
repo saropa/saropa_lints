@@ -345,6 +345,23 @@ function buildActionItems(): LeafItem[] {
             'saropaLints.initializeConfig',
             'gear',
         ),
+        // Stale ignore detection and cleanup — surfaces the CLI's
+        // --find-stale-ignores / --fix-stale-ignores as clickable sidebar rows
+        // so the feature is discoverable without knowing CLI flags.
+        new LeafItem(
+            l10n('staleIgnores.sidebar.findLabel'),
+            l10n('staleIgnores.sidebar.findDescription'),
+            'saropaLints.findStaleIgnores',
+            'search-remove',
+            new vscode.ThemeColor('charts.orange'),
+        ),
+        new LeafItem(
+            l10n('staleIgnores.sidebar.fixLabel'),
+            l10n('staleIgnores.sidebar.fixDescription'),
+            'saropaLints.fixStaleIgnores',
+            'trash',
+            new vscode.ThemeColor('charts.red'),
+        ),
         // `Open analysis_options_custom.yaml` was intentionally REMOVED from the
         // sidebar. The generated file carries a "DO NOT EDIT MANUALLY — use the
         // Saropa Lints VS Code extension" banner, so a sidebar row pointing

@@ -2110,5 +2110,35 @@
     "sidebar": {
       "severityToggleTooltip": "Double-click to toggle {severity}"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "Scanning for stale ignore comments…",
+      "fixing": "Removing stale ignore comments…"
+    },
+    "error": {
+      "findFailed": "Find stale ignores failed: {message}",
+      "fixFailed": "Fix stale ignores failed: {message}",
+      "noWorkspace": "No Dart/Flutter workspace found. Open a project with pubspec.yaml first.",
+      "missingDep": "Add saropa_lints to pubspec.yaml before scanning for stale ignores."
+    },
+    "info": {
+      "noneFound": "No stale ignore comments found.",
+      "found": "{count} stale ignore(s) in {fileCount} file(s). See the Problems panel for details.",
+      "fixed": "Stale ignore comments removed. See the Output panel for details."
+    },
+    "confirm": {
+      "fixMessage": "This will remove stale ignore comments from your source files. The changes can be undone with git. Continue?",
+      "fixAction": "Remove stale ignores"
+    },
+    "diagnostic": {
+      "message": "Stale ignore: rule '{ruleName}' no longer fires on this line."
+    },
+    "sidebar": {
+      "findLabel": "Find stale ignores",
+      "findDescription": "Detect dead // ignore: comments",
+      "fixLabel": "Fix stale ignores",
+      "fixDescription": "Auto-remove dead // ignore: comments"
+    }
   }
 }

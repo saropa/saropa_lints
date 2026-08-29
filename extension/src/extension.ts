@@ -152,6 +152,7 @@ import { HealthLevel } from './systemHealth/types';
 import type { DartProcessSnapshot } from './systemHealth/types';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
+import { registerStaleIgnoreCommands } from './stale-ignore-commands';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
 import { openViolationsWideReport, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
 import { openConsolidatedDashboard } from './views/consolidated/consolidatedView';
@@ -678,6 +679,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   };
 
   registerCrossFileCommands(context);
+  // Stale ignore commands — detect and auto-remove dead // ignore: comments.
+  // Returns a DiagnosticCollection added to subscriptions for cleanup.
+  context.subscriptions.push(registerStaleIgnoreCommands(context));
   registerProjectMapCommand(context);
   registerSaropaDashboardsCommand(context);
   registerHealthCodeLens(context);
