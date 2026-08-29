@@ -1088,9 +1088,7 @@ bool _allContextUsagesInAwaitedArgs(
 ) {
   // Visitor collects every usage of the context parameter names.
   final usages = <SimpleIdentifier>[];
-  block.visitChildren(
-    _ContextUsageCollector(contextParamNames, usages),
-  );
+  block.visitChildren(_ContextUsageCollector(contextParamNames, usages));
 
   // No usages at all → nothing to flag.
   if (usages.isEmpty) return true;

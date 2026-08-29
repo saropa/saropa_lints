@@ -6,6 +6,86 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [14.5.3]
+
+This release fixes a test-suite timeout in the health-history archival path and completes Filipino and Dutch translation coverage across the extension UI. No action required. [log](https://github.com/saropa/saropa_lints/blob/v14.5.3/CHANGELOG.md)
+
+### Fixed
+
+- `loadHealthHistory` test timeout — complexity parsing every Dart file across archived tags exceeded the 2-minute test budget. The function now accepts an optional `withComplexity` parameter (defaults `true`; test passes `false`).
+
+<details>
+<summary>Maintenance</summary>
+
+- `loadHealthHistory` now caches each tag's computed `HistoryPoint` on disk (`.dart_tool/saropa_lints/health_history_cache.json`), keyed by the tag's resolved commit SHA. Repeat calls against unchanged tags skip re-archiving and re-scanning entirely.
+- Fill `fil`/`nl` extension i18n coverage gaps for `Default`, `Pattern`, `Medium`, and `Open analysis_options.yaml`. `Pattern` is kept as the English loanword already used in the sibling `{count} file pattern(s)` string; `Open analysis_options.yaml` uses verb-final Dutch order to match the existing `pubspec.yaml openen` sibling.
+
+</details>
+
+---
+
+## [14.5.2]
+
+This release introduces the Analysis Optimizer to help developers proactively manage their Dart analyzer's resource footprint. The extension now identifies memory-intensive files and provides an interactive dashboard for safely previewing and applying workspace exclusion patterns. By intelligently filtering out generated code and high-cost directories, users can easily maintain editor performance and swiftly resolve critical memory warnings. [log](https://github.com/saropa/saropa_lints/blob/v14.5.2/CHANGELOG.md)
+
+
+### Added (Extension)
+
+- **Analysis Optimizer** — new dashboard (sidebar, command palette, or memory warning toast) that scans the workspace, identifies high-cost files and folders, and recommends `analyzer: exclude:` patterns to reduce Dart analyzer memory usage. Applying a pattern opens a diff preview of the resulting `analysis_options.yaml` before writing; multi-pattern applies require confirmation. Generated code patterns (`*.g.dart`, `*.freezed.dart`, etc.) are recommended by default. No action required.
+- The critical-memory toast now includes an "Optimize Analysis" button alongside "Clean Up" to surface the optimizer when the analyzer is consuming excessive memory.
+
+---
+
+## [14.5.1]
+
+This release introduces a new balanced memory mode to drastically reduce RAM consumption during incremental analysis, alongside a Full Opportunities Report designed specifically for AI-driven dependency reviews. It also refines localization workflows by eliminating false-positive translation warnings on placeholder-only templates. Developers will experience a significantly lighter background footprint on large projects and gain deeper, exportable insights into their codebase's dependency utilization. [log](https://github.com/saropa/saropa_lints/blob/v14.5.1/CHANGELOG.md)
+
+### Added
+
+- **Full Opportunities Report** — a new export (sidebar, or `Saropa Lints: Export Full Opportunities Report`) that consolidates every dependency and every changelog feature into one HTML, Markdown, and JSON report under `reports/`. Unlike the Upgrade Opportunities panel, it keeps fully-adopted packages and every changelog category, and counts each feature's usage from zero upward with the exact project file and line of every reference. Built to hand to an AI for a dependency-usage review.
+- **Balanced memory mode** — new `memory_mode: balanced` setting (default) that skips type-heavy rules on unchanged files during incremental analysis, reducing CPU work on re-analysis passes. When a dependency changes, all transitive importers are automatically re-analyzed via import-graph invalidation. Set `memory_mode: full` in `analysis_options_custom.yaml` or `SAROPA_MEMORY_MODE=full` to restore previous behavior. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Moved `.vsix` output from `extension/` to the project root for easier access after packaging.
+- Translation skip logic now recognizes placeholder-only templates (`{category} ({count})`) as untranslatable, eliminating 48 false-positive missing-translation reports.
+- Pinned the opportunities report's symbol matcher against the implementation it replaced with a differential test, which found that the previous matcher silently never counted `$`-prefixed identifiers.
+- Added a headless-DOM test harness (`jsdom`) that executes the opportunities report's inline script, so its filter, mode toggles, expand/collapse, and column sort are verified to work rather than merely to be present.
+- Marked 68 rule files as type-resolution-heavy (`usesTypeResolution`) to support balanced memory mode filtering.
+
+</details>
+
+---
+
+## [14.5.0]
+
+This release introduces comprehensive system health monitoring to track memory usage and safely terminate orphaned background processes. It also resolves severe memory retention issues during analysis of large codebases and refines localization workflows by preventing false-positive translation warnings. Developers will experience a significantly more stable and responsive environment with highly accurate diagnostic results during extended coding sessions. [log](https://github.com/saropa/saropa_lints/blob/v14.5.0/CHANGELOG.md)
+
+### Added
+
+- System health monitor in the VS Code extension: polls Dart/Flutter process memory and orphaned daemon count every 60 seconds (Windows). Status bar shows a warning or critical suffix when memory exceeds configurable thresholds or orphaned daemons accumulate. One-click "Kill Orphaned Flutter Daemons" command re-queries live processes before killing, avoiding stale-PID risks. All thresholds configurable via extension settings under "System Health".
+- Process Health panel (Command Palette → "Process Health"): live table of all Dart/Flutter processes with PID, parent, RSS, type classification (process/daemon/orphan), and per-process kill buttons for orphaned daemons.
+
+### Fixed
+
+- Register 25+ internal caches for eviction under memory pressure — previously only 10 of ~70 were managed, causing unbounded memory growth on large projects (7.8 GB observed on a 3,900-file codebase). No action required.
+- Fix memory estimator to measure actual per-file cache sizes instead of flat approximations that understated real usage by ~25×. No action required.
+- Cap the per-file passed-rules cache with LRU eviction (default 500 files) — the single largest memory consumer at O(files × rules), previously unbounded. No action required.
+- Cap the per-file diff cache with LRU eviction (default 250 files) — retained full source text of every analyzed file (~19.5 MB on a 3,900-file project), now bounded. No action required.
+- Release per-file tracking maps after the analysis summary is reported — previously retained indefinitely, wasting memory for the rest of the session. No action required.
+- Fix VS Code integrated terminal color detection on Windows — ANSI escape sequences now render correctly when `TERM_PROGRAM` is set. No action required.
+
+<details>
+<summary>Maintenance</summary>
+
+- Add infrastructure bug report for orphaned `flutter daemon` processes accumulating on Windows and exhausting system RAM. Includes hardened cleanup scripts with PID-reuse detection, a scheduled task to break the OOM feedback loop, and a Win32 Job Object permanent fix concept.
+- Add `PID`, `RSS`, `Daemon` to MT do-not-translate list and expand skip logic for emoji+placeholder patterns (`⚠ {size}`, `🔴 {size}`), resolving 71 false-positive missing-translation entries across 24 locales. No action required.
+
+</details>
+
+---
+
 ## [14.4.3]
 
 Resolves a runtime error in the lint diagnostic reporter that could prevent ignore-comments and deduplication checks from functioning correctly. This release also hardens internal code quality with broad static analysis improvements and introduces new automated CI gates to prevent future regressions. [log](https://github.com/saropa/saropa_lints/blob/v14.4.3/CHANGELOG.md)

@@ -36,5 +36,9 @@ export 'src/scan/scan_runner.dart' show ScanMessageSink, ScanRunner;
 export 'src/scan/scan_json.dart'
     show scanDiagnosticsToJson, scanDiagnosticsToJsonString;
 export 'src/scan/stale_ignore_detector.dart'
-    show StaleIgnore, StaleIgnoreFixResult, detectStaleIgnores,
-         fixStaleIgnores, staleIgnoresToJsonString;
+    show
+        StaleIgnore,
+        StaleIgnoreFixResult,
+        detectStaleIgnores,
+        fixStaleIgnores,
+        staleIgnoresToJsonString;

@@ -2116,9 +2116,9 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
   /// when [allowArithmetic] is true.
   static _DateComponentMatch? _matchDateComponent(
     Expression arg,
-    String expectedProperty,
-    {required bool allowArithmetic}
-  ) {
+    String expectedProperty, {
+    required bool allowArithmetic,
+  }) {
     // Direct property access: `dt.year`.
     final _DateComponentMatch? direct = _matchPropertyAccess(
       arg,
@@ -2161,9 +2161,7 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
     }
     if (expr is PrefixedIdentifier) {
       if (expr.identifier.name != expectedProperty) return null;
-      return _DateComponentMatch(
-        receiverSource: expr.prefix.toSource(),
-      );
+      return _DateComponentMatch(receiverSource: expr.prefix.toSource());
     }
     return null;
   }

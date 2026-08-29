@@ -45,7 +45,8 @@ class StaleIgnore {
   final String commentText;
 
   @override
-  String toString() => '$filePath:$commentLine  $ruleName  (target line '
+  String toString() =>
+      '$filePath:$commentLine  $ruleName  (target line '
       '$targetLine)  $commentText';
 }
 
@@ -75,9 +76,7 @@ String _normalizePath(String path) {
 /// Matches `// ignore:` directives (not `// ignore_for_file:`). Captures
 /// everything after the colon so individual rule names can be extracted.
 /// Anchored to `//` so it won't match inside strings or block comments.
-final RegExp _ignoreLinePattern = RegExp(
-  r'//\s*ignore\s*:\s*(.+)',
-);
+final RegExp _ignoreLinePattern = RegExp(r'//\s*ignore\s*:\s*(.+)');
 
 /// Splits a comma-separated rule list into individual names, stripping the
 /// `saropa_lints/` plugin prefix when present so the name matches the
@@ -131,10 +130,7 @@ class _IgnoreEntry {
 /// Only includes rules that exist in the saropa_lints registry — ignore
 /// directives for core Dart lints or unknown names are skipped, since we
 /// can only verify staleness for rules the scan actually runs.
-List<_IgnoreEntry> _parseIgnoreComments(
-  String content,
-  String filePath,
-) {
+List<_IgnoreEntry> _parseIgnoreComments(String content, String filePath) {
   final lines = content.split('\n');
   final entries = <_IgnoreEntry>[];
 
@@ -304,7 +300,8 @@ StaleIgnoreFixResult? _fixFileStaleIgnores(
 
   // Process lines bottom-to-top so removing a line doesn't shift the indices
   // of lines we haven't processed yet.
-  final sortedLines = byCommentLine.keys.toList()..sort((a, b) => b.compareTo(a));
+  final sortedLines = byCommentLine.keys.toList()
+    ..sort((a, b) => b.compareTo(a));
 
   for (final commentLine in sortedLines) {
     final staleOnLine = byCommentLine[commentLine]!;
@@ -392,9 +389,7 @@ int _pruneStaleRules(
   final kept = <String>[];
   for (final seg in segments) {
     // Strip the prefix for comparison but keep the original segment text.
-    final bare = seg.startsWith('saropa_lints/')
-        ? seg.substring(13)
-        : seg;
+    final bare = seg.startsWith('saropa_lints/') ? seg.substring(13) : seg;
     // Also strip trailing rationale for matching purposes.
     final bareName = _stripRationale(bare);
     if (!staleSet.contains(bareName)) {

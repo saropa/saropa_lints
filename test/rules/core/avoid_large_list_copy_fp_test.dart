@@ -33,11 +33,12 @@ List<int> run(List<int>? items) {
   });
 
   group('avoid_large_list_copy — named argument typed as List<T>', () {
-    test('does NOT flag .toList() passed to a List<T> named parameter',
-        () async {
-      // The function declares `required List<String> phones` — removing
-      // .toList() would pass an Iterable<String>, causing a compile error.
-      final codes = await reportedRuleCodes(AvoidLargeListCopyRule(), '''
+    test(
+      'does NOT flag .toList() passed to a List<T> named parameter',
+      () async {
+        // The function declares `required List<String> phones` — removing
+        // .toList() would pass an Iterable<String>, causing a compile error.
+        final codes = await reportedRuleCodes(AvoidLargeListCopyRule(), '''
 void updateContact({required List<String> phones}) {}
 
 void run(List<String> rawPhones) {
@@ -46,24 +47,27 @@ void run(List<String> rawPhones) {
   );
 }
 ''');
-      expect(codes, isNot(contains('avoid_large_list_copy')));
-    });
+        expect(codes, isNot(contains('avoid_large_list_copy')));
+      },
+    );
   });
 
   group('avoid_large_list_copy — explicit List<T> variable declaration', () {
-    test('does NOT flag .toList() assigned to explicit List<T> variable',
-        () async {
-      // The declared type is `List<String>` — removing .toList() would assign
-      // an Iterable<String> to a List<String> variable, a compile error.
-      final codes = await reportedRuleCodes(AvoidLargeListCopyRule(), '''
+    test(
+      'does NOT flag .toList() assigned to explicit List<T> variable',
+      () async {
+        // The declared type is `List<String>` — removing .toList() would assign
+        // an Iterable<String> to a List<String> variable, a compile error.
+        final codes = await reportedRuleCodes(AvoidLargeListCopyRule(), '''
 void run(List<String> items) {
   final List<String> filtered =
       items.where((String s) => s.isNotEmpty).toList();
   print(filtered);
 }
 ''');
-      expect(codes, isNot(contains('avoid_large_list_copy')));
-    });
+        expect(codes, isNot(contains('avoid_large_list_copy')));
+      },
+    );
   });
 
   group('avoid_large_list_copy — List<T> return type', () {
@@ -155,25 +159,27 @@ void run(List<int> items) {
   // -- True positives: .toList() IS genuinely unnecessary ----------------------
 
   group('avoid_large_list_copy — genuine unnecessary copies', () {
-    test('STILL flags .toList() on a lazy chain with no List requirement',
-        () async {
-      // The .toList() result is passed to forEach which accepts Iterable —
-      // the copy is gratuitous. (forEach is called directly on the result,
-      // making the parent a MethodInvocation with target == the chain.)
-      //
-      // NOTE: The current rule only fires when the .toList() parent is NOT
-      // in any exempted category (return, var, arg, cascade, ??, property
-      // access, collection literal, method chain, assignment). A standalone
-      // expression statement like `items.where(...).toList();` would fire.
-      final codes = await reportedRuleCodes(AvoidLargeListCopyRule(), '''
+    test(
+      'STILL flags .toList() on a lazy chain with no List requirement',
+      () async {
+        // The .toList() result is passed to forEach which accepts Iterable —
+        // the copy is gratuitous. (forEach is called directly on the result,
+        // making the parent a MethodInvocation with target == the chain.)
+        //
+        // NOTE: The current rule only fires when the .toList() parent is NOT
+        // in any exempted category (return, var, arg, cascade, ??, property
+        // access, collection literal, method chain, assignment). A standalone
+        // expression statement like `items.where(...).toList();` would fire.
+        final codes = await reportedRuleCodes(AvoidLargeListCopyRule(), '''
 void run(List<int> items) {
   items.where((int e) => e > 0).toList();
 }
 ''');
-      // Standalone expression statement — parent is ExpressionStatement,
-      // which is not in any exemption list.
-      expect(codes, contains('avoid_large_list_copy'));
-    });
+        // Standalone expression statement — parent is ExpressionStatement,
+        // which is not in any exemption list.
+        expect(codes, contains('avoid_large_list_copy'));
+      },
+    );
   });
 
   // -- List.from() branch: type-argument exemption ----------------------------
