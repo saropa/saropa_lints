@@ -855,25 +855,34 @@ def _iter_pending_texts(
     """Yield strings that would require a fresh MT network call.
 
     Shared by ``count_pending_translations`` and ``prefetch_machine_translations``
-    so both apply identical filter rules — keep them in lockstep here. Pending is
-    measured against the locale's PRIMARY engine key (Qwen when available, else
-    Google).
+    so both apply identical filter rules — keep them in lockstep here.
+
+    ``_primary_engine()`` is deferred until a string is confirmed NOT already
+    cached under any engine's keyspace. On Qwen locales that call
+    self-provisions Ollama (starts the daemon, pulls a multi-GB model on first
+    use) — running it eagerly for every locale on every invocation meant a
+    fully-cached run (nothing left to translate) still paid that cost. Probing
+    ``cache_lookup_any`` first (which checks the qwen keyspace too) answers
+    "is this already cached" without ever needing to know the primary engine.
     """
-    primary = _primary_engine(locale)
-    if primary is None:
-        return
+    primary: str | None = None
+    primary_checked = False
     for text in texts:
         if not text or text in dict_table or should_skip_machine_translate(text):
             continue
-        # Check primary engine key first, then fall back to any engine's keyspace.
-        # After engine swap (NLLB→Qwen), the primary key is empty but a valid
-        # translation exists under the old engine's key — that is NOT a gap.
-        cached = cache.get(_cache_key(locale, text, primary))
-        if cached is not None and _cache_value_is_clean(text, cached):
-            continue
-        # Probe legacy keyspaces so "gaps only" doesn't re-translate everything.
+        # Engine-agnostic cache probe first — covers the primary engine's own
+        # keyspace plus legacy ones, so a fully-cached locale never needs to
+        # determine (and thus never provisions) its primary engine.
         any_cached, _ = cache_lookup_any(cache, locale, text)
         if any_cached is not None and _cache_value_is_clean(text, any_cached):
+            continue
+        if not primary_checked:
+            primary = _primary_engine(locale)
+            primary_checked = True
+            if primary is None:
+                return
+        cached = cache.get(_cache_key(locale, text, primary))
+        if cached is not None and _cache_value_is_clean(text, cached):
             continue
         yield text
 
@@ -885,10 +894,13 @@ def count_pending_translations(
     cache: dict[str, str],
     dict_table: dict[str, str],
 ) -> int:
-    """How many strings prefetch would translate. 0 when MT is disabled."""
+    """How many strings prefetch would translate. 0 when MT is disabled.
+
+    Does not force primary-engine detection itself — ``_iter_pending_texts``
+    only calls ``_primary_engine()`` (which self-provisions Qwen/Ollama) once
+    it finds a string that isn't already cached under any engine.
+    """
     if locale == "en" or not _mt_env_enabled():
-        return 0
-    if _primary_engine(locale) is None:
         return 0
     return sum(1 for _ in _iter_pending_texts(locale, texts, cache=cache, dict_table=dict_table))
 
@@ -915,12 +927,16 @@ def prefetch_machine_translations(
     """
     if locale == "en" or not _mt_env_enabled():
         return
-    primary = _primary_engine(locale)
-    if primary is None:
-        return
 
+    # Build the pending list first — it only resolves the primary engine (and
+    # thus only self-provisions Qwen/Ollama) once it hits a string that isn't
+    # already cached under any engine. A fully-cached locale never reaches that.
     pending = list(_iter_pending_texts(locale, texts, cache=cache, dict_table=dict_table))
     if not pending:
+        return
+
+    primary = _primary_engine(locale)
+    if primary is None:
         return
 
     total = len(pending)

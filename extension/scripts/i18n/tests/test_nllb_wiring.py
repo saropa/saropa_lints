@@ -115,6 +115,51 @@ class TestPrefetchWarmsPrimaryKey(unittest.TestCase):
         self.assertEqual(qf.call_count, 1)
 
 
+class TestLazyEngineDetectionOnFullyCachedLocale(unittest.TestCase):
+    """Pins the fix: a fully-cached locale must never resolve the primary
+    engine — resolving it self-provisions Qwen/Ollama (daemon start, model
+    pull), which a "nothing left to translate" run must not pay for."""
+
+    def test_all_cached_never_calls_primary_engine(self) -> None:
+        texts = ["Cancel", "Save", "Delete"]
+        cache = {mt._cache_key("de", t, "qwen"): f"{t}-de" for t in texts}
+        with mock.patch.object(mt, "_primary_engine") as pe:
+            pending = list(
+                mt._iter_pending_texts("de", texts, cache=cache, dict_table={})
+            )
+        self.assertEqual(pending, [])
+        pe.assert_not_called()
+
+    def test_count_pending_zero_never_calls_primary_engine(self) -> None:
+        texts = ["Cancel"]
+        cache = {mt._cache_key("de", "Cancel", "qwen"): "Cancel-de"}
+        with mock.patch.object(mt, "_mt_env_enabled", return_value=True), \
+                mock.patch.object(mt, "_primary_engine") as pe:
+            count = mt.count_pending_translations(
+                "de", texts, cache=cache, dict_table={}
+            )
+        self.assertEqual(count, 0)
+        pe.assert_not_called()
+
+    def test_prefetch_all_cached_never_calls_primary_engine(self) -> None:
+        texts = ["Cancel"]
+        cache = {mt._cache_key("de", "Cancel", "qwen"): "Cancel-de"}
+        with mock.patch.object(mt, "_mt_env_enabled", return_value=True), \
+                mock.patch.object(mt, "_primary_engine") as pe:
+            mt.prefetch_machine_translations("de", texts, cache=cache, dict_table={})
+        pe.assert_not_called()
+
+    def test_one_uncached_string_resolves_engine_exactly_once(self) -> None:
+        cache = {mt._cache_key("de", "Cancel", "qwen"): "Cancel-de"}
+        texts = ["Cancel", "NewString"]
+        with mock.patch.object(mt, "_primary_engine", return_value="qwen") as pe:
+            pending = list(
+                mt._iter_pending_texts("de", texts, cache=cache, dict_table={})
+            )
+        self.assertEqual(pending, ["NewString"])
+        pe.assert_called_once_with("de")
+
+
 class TestEngineStats(unittest.TestCase):
     def setUp(self) -> None:
         mt.reset_engine_stats()

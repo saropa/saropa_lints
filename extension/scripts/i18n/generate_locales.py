@@ -862,9 +862,12 @@ def main() -> int:
             locales, sorted_unique, mt_cache, root, fail_on_missing=args.fail_on_missing
         )
 
-    # Announce the active MT engine up front so a silent Google downgrade is
-    # visible before a long run starts.
-    print(f"[{c('blue', 'i18n')}] {describe_engine_availability()}", flush=True)
+    # The engine-availability announcement is deferred to the first locale with
+    # actual pending work (below) — describe_engine_availability() calls
+    # qwen_model_available(), which self-provisions Ollama (starts the daemon,
+    # pulls a multi-GB model on first use). Printing it here unconditionally
+    # meant a fully-cached run (nothing left to translate) paid that cost anyway.
+    engine_announced = False
     mode_label = {
         "gaps": "gaps only", "upgrade": "gaps + upgrade low-quality to Qwen",
         "all": "force re-translate all",
@@ -912,6 +915,9 @@ def main() -> int:
             if pending == 0:
                 phase = c("gray", "all cached, mapping…")
             else:
+                if not engine_announced:
+                    print(f"[{c('blue', 'i18n')}] {describe_engine_availability()}", flush=True)
+                    engine_announced = True
                 engine = active_engine_name(locale)
                 engine_label = {"qwen": "Qwen", "google": "Google"}.get(engine or "", "MT")
                 phase = c("gray", f"translating {pending} new strings via {engine_label}…")
