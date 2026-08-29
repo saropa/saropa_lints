@@ -2007,7 +2007,7 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
         'has no way to detect invalid components after construction. '
         'All-literal calls with in-range values are allowed. Use '
         'DateTime.tryParse() or DateTime.parse() for validated date '
-        'creation. {v1}',
+        'creation. {v2}',
     correctionMessage:
         'Use DateTime.tryParse() (returns null on invalid input) or '
         'DateTime.parse() (throws FormatException). For component-based '
@@ -2028,7 +2028,14 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
       final String? namedConstructor = constructorName.name?.name;
       if (namedConstructor != null && namedConstructor != 'utc') return;
 
-      if (allLiteralsInRange(node.argumentList.arguments)) return;
+      final NodeList<Expression> args = node.argumentList.arguments;
+
+      if (allLiteralsInRange(args)) return;
+
+      // Suppress when all date components (year, month, day) come from an
+      // existing DateTime — those values are already validated by the source
+      // object, so the constructor cannot produce a silently wrong date.
+      if (componentsFromValidDateTime(args)) return;
 
       reporter.atNode(node);
     });
@@ -2056,6 +2063,137 @@ class AvoidDateTimeConstructorRule extends SaropaLintRule {
     }
     return true;
   }
+
+  /// Returns true when the first 3 positional args (year, month, day) are all
+  /// property accesses on a DateTime-typed expression — meaning the components
+  /// are sourced from an already-valid DateTime, not from raw user input.
+  ///
+  /// Allows `± intLiteral` on the day arg (position 2) because Dart's DateTime
+  /// constructor documents rollover behavior for out-of-range day values, and
+  /// day arithmetic on a valid date is an intentional idiom.
+  ///
+  /// Remaining args (positions 3+) may be anything — hour/min/sec/ms/us don't
+  /// affect date validity and are commonly set to literal 0 in strip-time code.
+  static bool componentsFromValidDateTime(NodeList<Expression> args) {
+    if (args.length < 3) return false;
+
+    // Named arguments are unusual for DateTime() and signal intent we can't
+    // verify with this positional heuristic.
+    if (args.any((a) => a is NamedExpression)) return false;
+
+    const List<String> expectedProperties = ['year', 'month', 'day'];
+
+    // Collect the receiver source from each of the 3 date-component args.
+    // All three must share the same DateTime-typed receiver.
+    String? commonReceiver;
+
+    for (int i = 0; i < 3; i++) {
+      final _DateComponentMatch? match = _matchDateComponent(
+        args[i],
+        expectedProperties[i],
+        // Only the day arg (i==2) allows ± arithmetic for rollover.
+        allowArithmetic: i == 2,
+      );
+      if (match == null) return false;
+
+      if (commonReceiver == null) {
+        commonReceiver = match.receiverSource;
+      } else if (commonReceiver != match.receiverSource) {
+        // Mixed receivers (e.g., dt1.year, dt2.month) — not safe to suppress.
+        return false;
+      }
+    }
+
+    // Verify the receiver's static type is DateTime (or DateTime?).
+    final DartType? receiverType = _receiverStaticType(args[0]);
+    if (receiverType == null || !_isCoreDateTime(receiverType)) return false;
+
+    return true;
+  }
+
+  /// Matches a single date-component argument: a property access (.year,
+  /// .month, or .day) on some receiver, optionally wrapped in `± intLiteral`
+  /// when [allowArithmetic] is true.
+  static _DateComponentMatch? _matchDateComponent(
+    Expression arg,
+    String expectedProperty,
+    {required bool allowArithmetic}
+  ) {
+    // Direct property access: `dt.year`.
+    final _DateComponentMatch? direct = _matchPropertyAccess(
+      arg,
+      expectedProperty,
+    );
+    if (direct != null) return direct;
+
+    // Arithmetic wrapper: `dt.day - 1` or `dt.day + 3`.
+    if (allowArithmetic && arg is BinaryExpression) {
+      final String op = arg.operator.lexeme;
+      if (op != '+' && op != '-') return null;
+
+      // The int literal may be on either side: `dt.day - 1` or `1 + dt.day`.
+      final Expression left = arg.leftOperand;
+      final Expression right = arg.rightOperand;
+
+      if (right is IntegerLiteral) {
+        return _matchPropertyAccess(left, expectedProperty);
+      }
+      if (left is IntegerLiteral) {
+        return _matchPropertyAccess(right, expectedProperty);
+      }
+    }
+
+    return null;
+  }
+
+  /// Checks if [expr] is a property access with the given name and returns
+  /// the receiver info. Handles both `PropertyAccess` (e.g., `obj.prop`) and
+  /// `PrefixedIdentifier` (e.g., `local.prop` without a dot receiver).
+  static _DateComponentMatch? _matchPropertyAccess(
+    Expression expr,
+    String expectedProperty,
+  ) {
+    if (expr is PropertyAccess) {
+      if (expr.propertyName.name != expectedProperty) return null;
+      final String? source = expr.target?.toSource();
+      if (source == null) return null;
+      return _DateComponentMatch(receiverSource: source);
+    }
+    if (expr is PrefixedIdentifier) {
+      if (expr.identifier.name != expectedProperty) return null;
+      return _DateComponentMatch(
+        receiverSource: expr.prefix.toSource(),
+      );
+    }
+    return null;
+  }
+
+  /// Extracts the static type of the receiver from a property access arg.
+  /// Used to verify the receiver is actually DateTime-typed.
+  static DartType? _receiverStaticType(Expression expr) {
+    if (expr is PropertyAccess) return expr.target?.staticType;
+    if (expr is PrefixedIdentifier) return expr.prefix.staticType;
+    return null;
+  }
+
+  /// Returns true if [type] is the core `dart:core` DateTime type,
+  /// regardless of nullability — a nullable DateTime still holds valid
+  /// date components when non-null.
+  static bool _isCoreDateTime(DartType type) {
+    if (type is! InterfaceType) return false;
+    return type.element.name == 'DateTime' &&
+        type.element.library.uri.toString() == 'dart:core';
+  }
+}
+
+/// Internal match result for [AvoidDateTimeConstructorRule._matchDateComponent].
+/// Carries the source text of the receiver expression so we can verify all
+/// three date components share the same source DateTime.
+class _DateComponentMatch {
+  _DateComponentMatch({required this.receiverSource});
+
+  /// The source code text of the receiver, e.g. "dateTime" or "widget.date".
+  final String receiverSource;
 }
 
 // =============================================================================
@@ -2131,7 +2269,7 @@ class AvoidDateTimeConstructorUnvalidatedRule extends SaropaLintRule {
         'over out-of-range values, so without a post-construction check '
         'the caller has no way to detect invalid input. Assign the result '
         'to a local variable and verify the components match the input '
-        'before using it. {v1}',
+        'before using it. {v2}',
     correctionMessage:
         'Assign the DateTime to a local variable, then verify '
         'date.month == month && date.day == day before using it. '
@@ -2152,9 +2290,13 @@ class AvoidDateTimeConstructorUnvalidatedRule extends SaropaLintRule {
       final String? named = constructorName.name?.name;
       if (named != null && named != 'utc') return;
 
-      if (AvoidDateTimeConstructorRule.allLiteralsInRange(
-        node.argumentList.arguments,
-      )) {
+      final NodeList<Expression> args = node.argumentList.arguments;
+
+      if (AvoidDateTimeConstructorRule.allLiteralsInRange(args)) return;
+
+      // Same suppression as the primary rule — components sourced from a
+      // valid DateTime can't produce a silently wrong date.
+      if (AvoidDateTimeConstructorRule.componentsFromValidDateTime(args)) {
         return;
       }
 

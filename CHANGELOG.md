@@ -68,7 +68,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.2.3] — Unreleased
 
-> The `analyzer ^13.1.0` migration (Dart 3.13+ / Flutter 3.47.1+, released 2026-08-19) is complete and tested but held off `main` — adoption of 3.47.1 is near zero. It is parked on the `analyzer-13-migration` branch and will ship as a 16.0.0 major bump once adoption is widespread.
+Major scan CLI expansion: lane control (`--lane full|light`, `--lane-stats`), CI gating by rule impact or tier (`--fail-on-impact`, `--fail-on-tier`), stale-ignore detection (`--find-stale-ignores`), SDK compatibility audit (`--check-sdk-compat`), and include/exclude glob filters for fine-grained file targeting. Eight false-positive fixes across core rules including `avoid_context_in_async_static`, `avoid_large_list_copy`, `avoid_datetime_constructor`, `no_equal_nested_conditions`, and the context-across-async family. An OOM crash fix for projects over 4 000 files adds per-file memory budgeting and adaptive RSS caps. Two new rules: `prefer_primary_constructor` (Dart 3.13+ syntax) and `require_sdk_syntax_match` (catches AI-generated code using syntax the project's SDK constraint doesn't support).
+
+> The `analyzer ^13.1.0` migration (Dart 3.13+ / Flutter 3.47.1+, released 2026-08-19) is complete and tested but held off `main` — adoption of 3.47.1 is near zero. It is parked on the `analyzer-13-migration` branch and will ship as a `<n+1>`.0.0 major bump once adoption is widespread.
 
 ### Fixed
 
@@ -99,6 +101,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - Scan CLI: `--fail-on-impact <level>` flag exits 1 when any saropa rule's declared impact meets the threshold (info/warning/error). Unlike `--fail-on` (which uses analyzer severity), this checks the rule author's business-consequence rating — use it to gate CI on high-impact rules regardless of their configurable severity. Pair with `--fail-on-impact-count <n>` to tolerate a known baseline during migration. ([#312](https://github.com/saropa/saropa_lints/issues/312))
 - Scan CLI: `--fail-on-tier <name>` flag exits 1 only when a diagnostic comes from a rule in the specified tier or below. Scan at a high tier for visibility but only fail on essential-tier findings during incremental adoption — e.g. `--tier comprehensive --fail-on-tier essential`. ([#312](https://github.com/saropa/saropa_lints/issues/312))
 - Scan CLI: `--find-stale-ignores` flag detects `// ignore:` comments whose suppressed saropa_lints rule no longer fires on the target line — the code was fixed but the ignore was left behind. Reports each stale ignore with file path, line number, and rule name. Supports `--format json` for CI integration. Exits 1 if any stale ignores found, 0 if clean. No action required.
+- Scan CLI: `--fix-stale-ignores` flag detects AND automatically removes stale `// ignore:` directives from source files. Standalone comments are deleted entirely; inline comments are stripped preserving the code; multi-rule comments have only the stale rules pruned. Prints a summary of files modified. No action required.
 
 ### Changed
 

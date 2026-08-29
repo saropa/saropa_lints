@@ -934,7 +934,15 @@ class _StaticContextUsageFinder extends RecursiveAstVisitor<void> {
 
   @override
   void visitFunctionExpression(FunctionExpression node) {
-    // Don't descend into callbacks - they have their own valid context scope
+    // Don't descend into callbacks — they have their own valid context scope.
+    return;
+  }
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    // Don't descend into local named functions — they create a new scope
+    // just like closures. A context usage inside a local function is not
+    // a usage in the enclosing static method's flow.
     return;
   }
 }
@@ -995,7 +1003,7 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
   static const LintCode _code = LintCode(
     'avoid_context_in_async_static',
     '[avoid_context_in_async_static] BuildContext in async static method may become invalid during '
-        'async operations. {v2}',
+        'async operations. {v3}',
     correctionMessage:
         'Pass an isMounted callback, use a navigator key, or convert to '
         'instance method.',
@@ -1026,14 +1034,25 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
       }
       if (contextParams.isEmpty) return;
 
-      // A BuildContext parameter is only stale-prone when the body actually
-      // uses it AFTER an await without a mounted guard. Using it solely before
-      // the first await (no async gap has opened yet) or only behind a
-      // `if (!context.mounted) return;` / `if (context.mounted) { ... }` guard
-      // is safe. Reporting unconditionally forced ~119 `// ignore:`
-      // suppressions in downstream projects on otherwise-correct code. Reuse
-      // the same flow analysis the sibling avoid_context_after_await_in_static
-      // rule applies so the two rules agree on what "guarded" means.
+      // Fast path: when every context usage in the body is consumed
+      // synchronously as an argument to an awaited call (and never read
+      // after the await resumes), the context cannot become stale — the
+      // callee receives it before any suspension point. This covers the
+      // most common pattern: `await showDialog(context: context)` with no
+      // post-await context reads. Checking this first avoids the heavier
+      // statement-level flow analysis for the ~80 % of methods that only
+      // forward context into the awaited call.
+      if (_allContextUsagesInAwaitedArgs(body.block, contextParamNames)) {
+        return;
+      }
+
+      // Full flow analysis: a BuildContext parameter is only stale-prone
+      // when the body uses it AFTER an await without a mounted guard.
+      // Using it solely before the first await (no async gap) or behind a
+      // `if (!context.mounted) return;` / `if (context.mounted) { ... }`
+      // guard is safe. Reuses the same analysis the sibling
+      // avoid_context_after_await_in_static rule applies so both agree on
+      // what "guarded" means.
       bool hasUnguardedUsage = false;
       AvoidContextAfterAwaitInStaticRule.checkAsyncStaticBody(
         body.block,
@@ -1046,6 +1065,133 @@ class AvoidContextInAsyncStaticRule extends SaropaLintRule {
         reporter.atNode(param);
       }
     });
+  }
+}
+
+/// Returns true when every usage of [contextParamNames] in [block] appears
+/// exclusively inside the argument list of an awaited invocation — meaning
+/// the context is consumed synchronously before any suspension point and
+/// cannot become stale.
+///
+/// A "usage" is a [SimpleIdentifier] whose name matches one of the tracked
+/// context parameters. Declarations (formal parameters, variable
+/// declarations) and label positions (`context:`) are not usages.
+///
+/// The check walks the entire block once. If ANY usage falls outside an
+/// awaited call's argument list (e.g., `context.size` after an `await`, or
+/// a standalone `useContext(context)` call that is not itself awaited), the
+/// method returns false and the caller falls through to the full flow
+/// analysis in [AvoidContextAfterAwaitInStaticRule.checkAsyncStaticBody].
+bool _allContextUsagesInAwaitedArgs(
+  Block block,
+  List<String> contextParamNames,
+) {
+  // Visitor collects every usage of the context parameter names.
+  final usages = <SimpleIdentifier>[];
+  block.visitChildren(
+    _ContextUsageCollector(contextParamNames, usages),
+  );
+
+  // No usages at all → nothing to flag.
+  if (usages.isEmpty) return true;
+
+  // Every usage must be safely consumed inside an awaited call's args.
+  for (final usage in usages) {
+    if (!_isInsideAwaitedCallArgs(usage)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/// Checks whether [usage] sits inside the argument list of an invocation
+/// that is the direct expression of an [AwaitExpression].
+///
+/// Walking up the ancestor chain from [usage]:
+/// 1. Stop at function boundaries (closures have their own async scope —
+///    a context captured into a `.then()` callback is NOT consumed
+///    synchronously).
+/// 2. If we hit an [AwaitExpression], and the path from [usage] went
+///    through the `expression` child (the thing being awaited), the
+///    context is evaluated synchronously before the await suspends.
+///
+/// This deliberately does NOT require the usage to be in a
+/// [MethodInvocation]'s [ArgumentList] specifically — any position inside
+/// the awaited expression (e.g., `await (condition ? foo(ctx) : bar())`)
+/// is consumed before the suspension point.
+bool _isInsideAwaitedCallArgs(SimpleIdentifier usage) {
+  AstNode? current = usage;
+  while (current != null) {
+    // Closures and nested methods own their own async scope — context
+    // captured into a callback (e.g., `.then((x) => use(context))`) is
+    // NOT consumed synchronously by the outer await.
+    if (current is FunctionExpression || current is MethodDeclaration) {
+      return false;
+    }
+
+    final parent = current.parent;
+
+    // Found an AwaitExpression: the usage is safe only if it is inside
+    // the `expression` subtree (the thing being awaited), not in a
+    // position evaluated after the await resumes.
+    if (parent is AwaitExpression && current == parent.expression) {
+      return true;
+    }
+
+    current = parent;
+  }
+  return false;
+}
+
+/// Collects every [SimpleIdentifier] in a subtree whose name matches one
+/// of the tracked context parameter names — skipping declarations, labels,
+/// and nested function bodies (which have their own scope).
+class _ContextUsageCollector extends RecursiveAstVisitor<void> {
+  _ContextUsageCollector(this._names, this._usages);
+
+  final List<String> _names;
+  final List<SimpleIdentifier> _usages;
+
+  @override
+  void visitSimpleIdentifier(SimpleIdentifier node) {
+    if (!_names.contains(node.name)) {
+      super.visitSimpleIdentifier(node);
+      return;
+    }
+
+    final parent = node.parent;
+
+    // Parameter declaration — not a usage.
+    if (parent is FormalParameter || parent is VariableDeclaration) {
+      super.visitSimpleIdentifier(node);
+      return;
+    }
+
+    // Named argument label (`context:`) — not a usage of the value.
+    if (parent is Label) {
+      super.visitSimpleIdentifier(node);
+      return;
+    }
+
+    _usages.add(node);
+    super.visitSimpleIdentifier(node);
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    // Don't descend into closures — they have their own async scope.
+    return;
+  }
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    // Don't descend into local named functions defined inside the method
+    // body — they create a new scope just like closures do. Without this
+    // skip, a context usage inside a local function would be collected as
+    // if it were in the enclosing async static method, causing a false
+    // negative (the usage would appear "consumed in awaited args" when it
+    // is actually captured into a separate call site).
+    return;
   }
 }
 

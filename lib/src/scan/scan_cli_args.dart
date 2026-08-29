@@ -44,6 +44,8 @@ class ScanCliArgs {
     required this.resolve,
     this.debugRule,
     this.fixIgnores = false,
+    this.findStaleIgnores = false,
+    this.fixStaleIgnores = false,
     this.checkSdkCompat = false,
     this.minSeverity,
     this.maxSeverity,
@@ -150,6 +152,19 @@ class ScanCliArgs {
   /// `// ignore: saropa_lints/rule_name` for all known saropa_lints rules.
   final bool fixIgnores;
 
+  /// When true, run the normal scan and then detect `// ignore:` directives
+  /// whose suppressed saropa_lints rule no longer fires on the target line.
+  /// Reports each stale ignore with file, line, and rule name. Supports
+  /// `--format json` for machine-readable output. Exits 1 if any stale
+  /// ignores are found, 0 if none.
+  final bool findStaleIgnores;
+
+  /// When true, run the stale-ignore detection (same as [findStaleIgnores])
+  /// and then automatically remove the stale directives from the source files.
+  /// Standalone comments are deleted; inline comments are stripped; multi-rule
+  /// comments have only the stale rules pruned. Prints a summary of changes.
+  final bool fixStaleIgnores;
+
   /// When true, run a standalone SDK compatibility audit: cross-reference
   /// the pubspec.yaml SDK lower bound against Dart syntax features in lib/
   /// and output a summary showing the minimum required version.
@@ -233,6 +248,8 @@ ScanParseResult parseScanArgs(
   bool resolve = false;
 
   bool fixIgnores = false;
+  bool findStaleIgnores = false;
+  bool fixStaleIgnores = false;
   bool checkSdkCompat = false;
   bool profile = false;
   bool excludeLightLane = false;
@@ -252,6 +269,20 @@ ScanParseResult parseScanArgs(
     }
     if (arg == '--fix-ignores') {
       fixIgnores = true;
+      i++;
+      continue;
+    }
+    // Stale-ignore detection: run the scan, then compare diagnostics against
+    // `// ignore:` comments to find directives whose rule no longer fires.
+    if (arg == '--find-stale-ignores') {
+      findStaleIgnores = true;
+      i++;
+      continue;
+    }
+    // Stale-ignore auto-fix: detect stale ignores (same as --find-stale-ignores)
+    // and then remove them from the source files automatically.
+    if (arg == '--fix-stale-ignores') {
+      fixStaleIgnores = true;
       i++;
       continue;
     }
@@ -573,6 +604,8 @@ ScanParseResult parseScanArgs(
       resolve: resolve,
       debugRule: debugRule,
       fixIgnores: fixIgnores,
+      findStaleIgnores: findStaleIgnores,
+      fixStaleIgnores: fixStaleIgnores,
       checkSdkCompat: checkSdkCompat,
       minSeverity: minSeverity,
       maxSeverity: maxSeverity,

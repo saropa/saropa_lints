@@ -320,6 +320,11 @@ void main() {
       () => AvoidWildcardCasesWithEnumsRule(),
     );
 
+    // Pin the large-enum threshold so changes are intentional.
+    test('AvoidWildcardCasesWithEnumsRule has maxEnumSize = 20', () {
+      expect(AvoidWildcardCasesWithEnumsRule.maxEnumSize, 20);
+    });
+
     testRule(
       'FunctionAlwaysReturnsSameValueRule',
       'function_always_returns_same_value',

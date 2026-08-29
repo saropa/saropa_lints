@@ -101,27 +101,89 @@
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
 // Test fixture for: avoid_wildcard_cases_with_enums
-// Source: lib\src\rules\code_quality_rules.dart
+// Source: lib\src\rules\code_quality\code_quality_control_flow_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-dynamic status;
+// ---------------------------------------------------------------------------
+// Small enum (4 members) — default: should be flagged because exhaustive
+// case listing is practical and prevents silent missed-case bugs.
+// ---------------------------------------------------------------------------
 
-// BAD: Should trigger avoid_wildcard_cases_with_enums
+/// Small enum for testing threshold behavior.
+enum SmallStatus { pending, active, inactive, deleted }
+
+// BAD: Small enum with default — rule should fire.
 // expect_lint: avoid_wildcard_cases_with_enums
-void _bad191() {
-  switch (status) {
-    case Status.active:
-    default: // May hide unhandled enum values
+void _badSmallEnumWithDefault() {
+  SmallStatus s = SmallStatus.active;
+  switch (s) {
+    case SmallStatus.active:
+      print('active');
+    default: // LINT — only 4 members, all should be listed explicitly
+      print('other');
   }
 }
 
-// GOOD: Should NOT trigger avoid_wildcard_cases_with_enums
-void _good191() {
-  switch (status) {
-    case Status.active:
+// GOOD: Small enum with exhaustive cases — no default, no lint.
+void _goodSmallEnumExhaustive() {
+  SmallStatus s = SmallStatus.active;
+  switch (s) {
+    case SmallStatus.pending:
+      print('pending');
+    case SmallStatus.active:
       print('active');
-    case Status.inactive:
-      print('inactive'); // All enum values handled explicitly, no default
+    case SmallStatus.inactive:
+      print('inactive');
+    case SmallStatus.deleted:
+      print('deleted');
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Large enum (25 members, above the 20-member threshold) — default: is the
+// correct design choice here, so the rule should NOT fire.
+// ---------------------------------------------------------------------------
+
+/// Large enum simulating a real-world type like ActivityType or CountryCode.
+/// Has 25 members, exceeding the default maxEnumSize threshold of 20.
+enum LargeActivityType {
+  phoneCall,
+  videoCall,
+  smsMessage,
+  emailSent,
+  emailReceived,
+  meetingScheduled,
+  meetingCanceled,
+  meetingCompleted,
+  taskCreated,
+  taskAssigned,
+  taskCompleted,
+  noteAdded,
+  fileUploaded,
+  fileDownloaded,
+  commentPosted,
+  statusChanged,
+  priorityChanged,
+  labelAdded,
+  labelRemoved,
+  assigneeChanged,
+  dueDateSet,
+  reminderSet,
+  archived,
+  restored,
+  deleted,
+}
+
+// GOOD: Large enum (25 members) with default — rule suppressed by threshold.
+void _goodLargeEnumWithDefault() {
+  LargeActivityType t = LargeActivityType.phoneCall;
+  switch (t) {
+    case LargeActivityType.phoneCall:
+      print('phone');
+    case LargeActivityType.videoCall:
+      print('video');
+    default: // OK — 25 members, exhaustive listing is impractical
+      print('other');
   }
 }

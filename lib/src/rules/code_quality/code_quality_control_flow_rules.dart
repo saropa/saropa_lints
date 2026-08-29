@@ -190,6 +190,14 @@ class AvoidConstantConditionsRule extends SaropaLintRule {
 class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
   AvoidWildcardCasesWithEnumsRule() : super(code: _code);
 
+  /// Enums with more members than this threshold are exempt from the rule.
+  /// Large enums (100+ members like country codes or locale enums) make
+  /// exhaustive case listing unmaintainable — a default: catch-all is the
+  /// correct design choice for those. Hardcoded default; could be made
+  /// configurable via analysis_options.yaml if a configuration system is
+  /// added to the plugin.
+  static const int maxEnumSize = 20;
+
   /// Code quality issue. Review when count exceeds 100.
   @override
   LintImpact get impact => LintImpact.warning;
@@ -208,7 +216,7 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
 
   static const LintCode _code = LintCode(
     'avoid_wildcard_cases_with_enums',
-    '[avoid_wildcard_cases_with_enums] Switch on an enum uses a default or wildcard case, suppressing exhaustiveness checking. When new enum values are added, the compiler will not flag this switch as incomplete, allowing the new case to silently fall into the default branch instead of being explicitly handled. {v5}',
+    '[avoid_wildcard_cases_with_enums] Switch on an enum uses a default or wildcard case, suppressing exhaustiveness checking. When new enum values are added, the compiler will not flag this switch as incomplete, allowing the new case to silently fall into the default branch instead of being explicitly handled. Suppressed for enums with more than $maxEnumSize members, where exhaustive listing is impractical. {v6}',
     correctionMessage:
         'Remove the default/wildcard case and add explicit case clauses for every enum value so the compiler reports an error when new values are introduced.',
     severity: DiagnosticSeverity.WARNING,
@@ -224,8 +232,23 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
       final DartType? type = expression.staticType;
       if (type == null) return;
 
-      final String typeName = type.getDisplayString();
-      if (!_looksLikeEnumType(typeName)) return;
+      // Resolve the enum element from the switch expression's type.
+      // Falls back to string heuristic when type resolution is unavailable
+      // (e.g. scan CLI without --resolve).
+      final EnumElement? enumElement = _resolveEnumElement(type);
+      if (enumElement == null) {
+        // No resolved enum — fall back to the string heuristic so the rule
+        // still fires in unresolved contexts (scan CLI light mode).
+        final String typeName = type.getDisplayString();
+        if (!_looksLikeEnumType(typeName)) return;
+      } else {
+        // Count declared enum constants (excludes synthetic fields like
+        // `values` and `index`). Skip large enums where a default: case is
+        // the pragmatic choice — exhaustive listing of 20+ irrelevant cases
+        // obscures intent and creates maintenance burden.
+        final int constantCount = _countEnumConstants(enumElement);
+        if (constantCount > maxEnumSize) return;
+      }
 
       for (final SwitchMember member in node.members) {
         if (member is SwitchDefault) {
@@ -241,6 +264,28 @@ class AvoidWildcardCasesWithEnumsRule extends SaropaLintRule {
         RemoveWildcardOrDefaultCaseFix(context: context),
   ];
 
+  /// Resolves the [EnumElement] from a [DartType], stripping nullability.
+  /// Returns null when the type is not an enum (primitive, generic, class).
+  EnumElement? _resolveEnumElement(DartType type) {
+    if (type is InterfaceType) {
+      final element = type.element;
+      if (element is EnumElement) return element;
+    }
+    return null;
+  }
+
+  /// Counts declared enum constants (fields marked [isEnumConstant]).
+  /// Synthetic members like `values` and `index` are excluded.
+  int _countEnumConstants(EnumElement enumElement) {
+    int count = 0;
+    for (final FieldElement field in enumElement.fields) {
+      if (field.isEnumConstant) count++;
+    }
+    return count;
+  }
+
+  /// String-based heuristic for detecting enum-like types when type
+  /// resolution is unavailable. Excludes primitives and generic types.
   bool _looksLikeEnumType(String typeName) {
     if (typeName.isEmpty) return false;
     final String clean = typeName.replaceAll('?', '');

@@ -37,6 +37,46 @@ void badOutOfRangeLiterals() {
   final bad8 = DateTime(2026, 1, 1, 0, 60);
 }
 
+void badMixedSources(DateTime dt, int month) {
+  // expect_lint: avoid_datetime_constructor
+  // Mixed: year from DateTime, month from raw int — not fully sourced.
+  final mixed1 = DateTime(dt.year, month, dt.day);
+
+  // expect_lint: avoid_datetime_constructor
+  // Only two of three components from DateTime (day missing).
+  final mixed2 = DateTime(dt.year, dt.month, 15);
+
+  // expect_lint: avoid_datetime_constructor
+  // Month arithmetic is not allowed — only day arithmetic is safe.
+  final mixed3 = DateTime(dt.year, dt.month + 1, dt.day);
+}
+
+void goodComponentsFromDateTime(DateTime dt) {
+  // OK — all date components sourced from a valid DateTime.
+  final dateOnly1 = DateTime(dt.year, dt.month, dt.day);
+
+  // OK — same pattern with UTC constructor.
+  final dateOnly2 = DateTime.utc(dt.year, dt.month, dt.day);
+
+  // OK — strip-time with explicit zero time components.
+  final dateOnly3 = DateTime(dt.year, dt.month, dt.day, 0, 0, 0);
+
+  // OK — day arithmetic uses Dart's documented rollover behavior.
+  final prevDay = DateTime.utc(dt.year, dt.month, dt.day - 1);
+
+  // OK — day addition for rollover arithmetic.
+  final nextDay = DateTime(dt.year, dt.month, dt.day + 7);
+
+  // OK — components from DateTime with non-zero time args.
+  final withTime = DateTime(dt.year, dt.month, dt.day, 12, 30);
+}
+
+void goodComponentsFromDateTimeNullable(DateTime? dt) {
+  // OK — nullable DateTime with consistent bang on all three accesses.
+  // The receiver source "dt!" matches across all three args.
+  final dateOnly = DateTime(dt!.year, dt!.month, dt!.day);
+}
+
 void goodExamples(String dateString) {
   // OK — all literals, all in range
   final literal1 = DateTime(2026, 6, 15);

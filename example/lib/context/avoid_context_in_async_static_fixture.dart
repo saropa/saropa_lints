@@ -7,6 +7,8 @@
 /// The rule flags a BuildContext parameter on an async static method ONLY when
 /// the body uses that context after an await without a mounted guard. Context
 /// used before the first await, or only behind a mounted guard, is safe.
+/// Context passed solely as an argument to the awaited call is also safe — the
+/// callee receives it synchronously before any suspension point.
 
 class BuildContext {
   bool get mounted => true;
@@ -16,9 +18,16 @@ Future<int> load() async => 0;
 
 Future<bool?> showDialogStub({required BuildContext context}) async => true;
 
+Future<void> showDialogCommon({
+  required BuildContext context,
+  String? title,
+}) async {}
+
 void doSomething() {}
 
 void useContext(BuildContext context) {}
+
+void debugException(Object error, StackTrace stack) {}
 
 class ShowHelper {
   // GOOD: context used only after a mounted guard — no lint.
@@ -52,6 +61,48 @@ class ShowHelper {
     await load();
     useContext(context);
   }
+
+  // GOOD: context passed only as arg to the awaited call — consumed
+  // synchronously before suspension. No post-await context read.
+  static Future<void> showDialogForward(BuildContext context) async {
+    await showDialogCommon(context: context, title: 'Hello');
+  }
+
+  // GOOD: context passed as arg to awaited call inside try-catch — same
+  // safe pattern, the try wrapper does not change the synchronous
+  // consumption of context.
+  static Future<void> showDialogInTryCatch(BuildContext context) async {
+    try {
+      await showDialogCommon(context: context);
+    } on Object catch (error, stack) {
+      debugException(error, stack);
+    }
+  }
+
+  // BAD: context passed to the awaited call AND read after the await — the
+  // post-await read is the violation, not the arg to the awaited call.
+  // expect_lint: avoid_context_in_async_static
+  static Future<void> showAndRead(BuildContext context) async {
+    await showDialogCommon(context: context);
+    useContext(context);
+  }
+
+  // GOOD: multiple awaits but context only appears as arg to the first —
+  // no post-await context reads.
+  static Future<void> multipleAwaitsContextOnlyFirst(
+    BuildContext context,
+  ) async {
+    await showDialogCommon(context: context);
+    await load();
+    doSomething();
+  }
+
+  // GOOD: context as positional arg to awaited call — same safe pattern.
+  static Future<void> showDialogPositionalArg(BuildContext context) async {
+    await useContextAsync(context);
+  }
 }
+
+Future<void> useContextAsync(BuildContext context) async {}
 
 void main() {}

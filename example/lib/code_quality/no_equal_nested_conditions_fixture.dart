@@ -140,3 +140,46 @@ void _goodReassignedNested(String? q) {
     use(q);
   }
 }
+
+// GOOD: null-aware assignment (??=) still counts as a reassignment — the
+// variable may now hold a non-null value, so the inner null-check is a
+// genuine guard on the new value.
+void _goodNullAwareReassignment(String? q) {
+  if (q == null) {
+    q ??= _fallback();
+    if (q == null) {
+      // OK — q was reassigned via ??= which may have changed its value.
+      return;
+    }
+    use(q);
+  }
+}
+
+// BAD: a DIFFERENT variable is reassigned between the checks — the condition
+// variable itself is untouched, so the inner check is still redundant.
+// expect_lint: no_equal_nested_conditions
+void _badDifferentVarReassigned(int? x) {
+  if (x == null) {
+    int? y;
+    y = 42;
+    if (x == null) {
+      // LINT — x was never reassigned; only y was.
+      return;
+    }
+  }
+}
+
+// GOOD: compound assignment (+= etc.) on the condition variable means its
+// value changed — inner check on the new value is not redundant.
+void _goodCompoundAssignment(int x) {
+  if (x > 0) {
+    x += _delta();
+    if (x > 0) {
+      // OK — x was modified by +=, the value may have changed.
+      use(x);
+    }
+  }
+}
+
+String? _fallback() => null;
+int _delta() => -10;

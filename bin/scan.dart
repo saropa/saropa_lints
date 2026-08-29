@@ -138,6 +138,29 @@ Future<void> main(List<String> args) async {
     exit(2);
   }
 
+  // --find-stale-ignores: detect ignore comments whose suppressed rule no
+  // longer fires. Runs AFTER the scan so we have the full diagnostic set to
+  // diff against the ignore directives in the source files.
+  if (parsed.findStaleIgnores) {
+    _runFindStaleIgnores(
+      diagnostics,
+      path,
+      dartFiles,
+      formatJson,
+      parsed.jsonFilePath,
+      quiet,
+    );
+    // _runFindStaleIgnores calls exit() internally.
+  }
+
+  // --fix-stale-ignores: detect stale ignores AND automatically remove them
+  // from the source files. Runs the same detection as --find-stale-ignores,
+  // then writes the cleaned files back to disk.
+  if (parsed.fixStaleIgnores) {
+    _runFixStaleIgnores(diagnostics, path, dartFiles, quiet);
+    // _runFixStaleIgnores calls exit() internally.
+  }
+
   // Warn about unrecognized severity values so a future analyzer change
   // doesn't silently drop diagnostics through the rank-0 fallback.
   if (parsed.minSeverity != null) {
@@ -415,6 +438,133 @@ void _runFixIgnores(String targetPath) {
   }
 }
 
+/// Detects stale `// ignore:` comments by comparing ignore directives against
+/// the diagnostics the scan actually produced. An ignore is stale when its rule
+/// did not fire on the target line — the code was fixed but the ignore remains.
+///
+/// Resolves the file list the same way the scanner does: from [dartFiles] if
+/// specified, otherwise by discovering all `.dart` files under [targetPath].
+void _runFindStaleIgnores(
+  List<ScanDiagnostic> diagnostics,
+  String targetPath,
+  List<String> dartFiles,
+  bool formatJson,
+  String? jsonFilePath,
+  bool quiet,
+) {
+  // Resolve the scanned file list so we can parse ignore comments from every
+  // file the scan covered — including files with zero diagnostics.
+  final files = dartFiles.isNotEmpty
+      ? dartFiles
+          .map(
+            (f) => p.isAbsolute(f) ? p.normalize(f) : p.normalize(p.join(p.absolute(targetPath), f)),
+          )
+          .where((f) => f.endsWith('.dart'))
+          .toList()
+      : ScanRunner.discoverDartFiles(p.absolute(targetPath));
+
+  final stale = detectStaleIgnores(diagnostics: diagnostics, files: files);
+
+  if (formatJson) {
+    _writeJson(staleIgnoresToJsonString(stale), jsonFilePath, quiet: quiet);
+    exit(stale.isEmpty ? 0 : 1);
+  }
+
+  if (stale.isEmpty) {
+    print('\nNo stale ignore comments found.');
+    exit(0);
+  }
+
+  // Group by file for readable text output.
+  final byFile = <String, List<StaleIgnore>>{};
+  for (final s in stale) {
+    byFile.putIfAbsent(s.filePath, () => []).add(s);
+  }
+
+  final fileCount = byFile.length;
+  print('');
+  print('${stale.length} stale ignore(s) in $fileCount file(s):');
+  print('');
+
+  for (final entry in byFile.entries) {
+    print(p.relative(entry.key, from: targetPath));
+    for (final s in entry.value) {
+      print(
+        '  line ${s.commentLine.toString().padLeft(4)}  '
+        '${s.ruleName}  (target line ${s.targetLine})',
+      );
+    }
+    print('');
+  }
+
+  // Top rules summary for quick triage.
+  final byRule = <String, int>{};
+  for (final s in stale) {
+    byRule[s.ruleName] = (byRule[s.ruleName] ?? 0) + 1;
+  }
+  final sortedRules = byRule.entries.toList()
+    ..sort((a, b) => b.value.compareTo(a.value));
+  print('By rule:');
+  for (final entry in sortedRules) {
+    print('  ${entry.value.toString().padLeft(6)}  ${entry.key}');
+  }
+  print('');
+
+  exit(1);
+}
+
+/// Detects stale `// ignore:` comments and automatically removes them from
+/// the source files. Prints a summary of what was fixed.
+///
+/// Uses the same file-resolution logic as [_runFindStaleIgnores] so the
+/// detection covers the same set of files the scan analyzed.
+void _runFixStaleIgnores(
+  List<ScanDiagnostic> diagnostics,
+  String targetPath,
+  List<String> dartFiles,
+  bool quiet,
+) {
+  // Resolve the scanned file list identically to _runFindStaleIgnores.
+  final files = dartFiles.isNotEmpty
+      ? dartFiles
+          .map(
+            (f) => p.isAbsolute(f) ? p.normalize(f) : p.normalize(p.join(p.absolute(targetPath), f)),
+          )
+          .where((f) => f.endsWith('.dart'))
+          .toList()
+      : ScanRunner.discoverDartFiles(p.absolute(targetPath));
+
+  final stale = detectStaleIgnores(diagnostics: diagnostics, files: files);
+
+  if (stale.isEmpty) {
+    print('\nNo stale ignore comments found. Nothing to fix.');
+    exit(0);
+  }
+
+  // Apply the fixes — removes stale directives from source files.
+  final results = fixStaleIgnores(stale);
+
+  if (results.isEmpty) {
+    // Detection found stale ignores but the fixer couldn't modify any files
+    // (e.g. files were deleted between detection and fix).
+    print('\nDetected ${stale.length} stale ignore(s) but no files were modified.');
+    exit(1);
+  }
+
+  // Summary: total removed and files touched.
+  final totalRemoved = results.fold(0, (sum, r) => sum + r.removedCount);
+  final fileCount = results.length;
+  print('');
+  print('Fixed $totalRemoved stale ignore(s) in $fileCount file(s):');
+  print('');
+  for (final r in results) {
+    print('  ${r.removedCount} removed in ${p.relative(r.filePath, from: targetPath)}');
+  }
+  print('');
+
+  exit(0);
+}
+
 /// Writes JSON output to [filePath] if set, otherwise prints to stdout.
 /// Using a file avoids the stdout-redirection problem entirely (#310).
 /// Creates parent directories if they don't exist — fail-fast on
@@ -582,6 +732,48 @@ void _printUsage() {
   );
   print(
     '                      // ignore: saropa_lints/rule_name for all known rules.',
+  );
+  print('');
+  print('Stale ignore management:');
+  print(
+    '  Stale ignores are // ignore: comments whose suppressed rule no longer',
+  );
+  print(
+    '  fires — the code was fixed but the suppression was left behind.',
+  );
+  print('');
+  print(
+    '  --find-stale-ignores',
+  );
+  print(
+    '                      Detect stale // ignore: directives and report them.',
+  );
+  print(
+    '                      Reports each stale ignore with file, line, and rule.',
+  );
+  print(
+    '                      Exits 1 if any found, 0 if clean.',
+  );
+  print(
+    '                      Supports --format json and --json-file-path.',
+  );
+  print(
+    '  --fix-stale-ignores',
+  );
+  print(
+    '                      Detect AND automatically remove stale // ignore:',
+  );
+  print(
+    '                      directives from source files. Standalone comments',
+  );
+  print(
+    '                      are deleted; inline comments are stripped; multi-rule',
+  );
+  print(
+    '                      comments have only the stale rules pruned.',
+  );
+  print(
+    '                      Prints a summary of files modified and ignores removed.',
   );
   print(
     '  --check-sdk-compat  Audit SDK compatibility: cross-reference the pubspec',
@@ -790,4 +982,7 @@ void _printUsage() {
   print('  dart run saropa_lints scan . --exclude-globs **/vendor/**  # skip vendor');
   print('  dart run saropa_lints scan . --format json  # JSON to stdout');
   print('  dart run saropa_lints scan . -q --json-file-path out.json  # silent');
+  print('  dart run saropa_lints scan . --find-stale-ignores  # detect dead ignores');
+  print('  dart run saropa_lints scan . --find-stale-ignores --format json');
+  print('  dart run saropa_lints scan . --fix-stale-ignores  # auto-remove dead ignores');
 }

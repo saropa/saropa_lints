@@ -103,9 +103,7 @@ class ReplaceDateOnlyFix extends SaropaFixProducer {
       );
 
       // Ensure flutter/material.dart is imported (provides DateUtils).
-      builder.importLibrary(
-        Uri.parse('package:flutter/material.dart'),
-      );
+      builder.importLibrary(Uri.parse('package:flutter/material.dart'));
     });
   }
 
