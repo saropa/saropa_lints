@@ -70,11 +70,17 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ### Fixed
 
-- `avoid_unguarded_debug` no longer false-positives when `debugPrint()` is dominated by an early-return guard (`if (!kDebugMode) return;`) at the top of the enclosing block. Also recognizes `kDebugMode == false`, `kDebugMode != true`, and multi-statement then-blocks ending in `return`. No action required.
+- `avoid_unguarded_debug` no longer false-positives when `debugPrint()` is dominated by an early-return guard (`if (!kDebugMode) return;`) at the top of the enclosing block. Also recognizes `kDebugMode == false`, `kDebugMode != true`, reversed operand order (`false == kDebugMode`), and multi-statement then-blocks ending in `return`. No action required.
+
+### Added
+
+- `avoid_unguarded_debug` now recognizes variable-indirection guards: `final isDebug = kDebugMode; if (!isDebug) return;` is accepted as a valid guard. Only `final` and `const` locals are trusted — mutable `var` assignments are correctly rejected since they can be reassigned after the guard. No action required.
 
 <details><summary>Maintenance</summary>
 
 - Extracted shared `early_exit_guard_utils.dart` — `containsEarlyExit`, `endsWithEarlyExit`, `findPrecedingGuardInBlock`, and `hasDominatingEarlyExitGuard` replace five independent reimplementations across `debug_rules.dart`, `collection_rules.dart`, `async_rules.dart`, `type_rules.dart`, and `code_quality_avoid_rules.dart`.
+- `hasDominatingEarlyExitGuard` now supports a `stopAtClosureBoundary` parameter — runtime-mutable guards (collection emptiness) stop at closure/function boundaries; compile-time constants (`kDebugMode`) opt out since closures in the guarded zone are safe.
+- `endsWithEarlyExit` now recognizes `break` and `continue` statements, matching the coverage of `containsEarlyExit`.
 
 </details>
 

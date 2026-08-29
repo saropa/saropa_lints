@@ -179,3 +179,46 @@ void _bad_debugPrintBeforeGuard() {
   if (!kDebugMode) return;
   debugPrint('This is after the guard — ok');
 }
+
+// GOOD: Variable indirection — final local assigned from kDebugMode
+void _good_variableIndirectionFinal() {
+  final isDebug = kDebugMode;
+  if (!isDebug) return;
+  debugPrint('Guarded via variable indirection');
+}
+
+// GOOD: Variable indirection — const local assigned from kDebugMode
+void _good_variableIndirectionConst() {
+  const isDebug = kDebugMode;
+  if (!isDebug) return;
+  debugPrint('Guarded via const variable indirection');
+}
+
+// BAD: Variable indirection with mutable var — not trustworthy
+// expect_lint: avoid_unguarded_debug
+void _bad_variableIndirectionMutable() {
+  var isDebug = kDebugMode;
+  if (!isDebug) return;
+  isDebug = true;
+  debugPrint('Var can be reassigned — guard is unsound');
+}
+
+// GOOD: Early-return guard inside for-loop body
+void _good_earlyReturnGuardInLoop() {
+  for (var i = 0; i < 10; i++) {
+    if (!kDebugMode) return;
+    debugPrint('Iteration $i');
+  }
+}
+
+// GOOD: Reversed operand order — false == kDebugMode
+void _good_reversedOperandFalseEquals() {
+  if (false == kDebugMode) return;
+  debugPrint('Guarded by reversed equality');
+}
+
+// GOOD: Reversed operand order — true != kDebugMode
+void _good_reversedOperandTrueNotEquals() {
+  if (true != kDebugMode) return;
+  debugPrint('Guarded by reversed inequality');
+}

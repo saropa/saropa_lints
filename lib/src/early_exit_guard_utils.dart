@@ -40,13 +40,17 @@ bool containsEarlyExit(Statement stmt) {
 }
 
 /// True when [stmt] ends with an early exit — the last statement in a
-/// block (or the statement itself) is return/throw.
+/// block (or the statement itself) is return/throw/break/continue.
 ///
 /// More permissive than [containsEarlyExit] for multi-statement blocks
 /// like `if (!cond) { cleanup(); return; }` where only the final
 /// statement matters.
 bool endsWithEarlyExit(Statement stmt) {
-  if (stmt is ReturnStatement) return true;
+  if (stmt is ReturnStatement ||
+      stmt is BreakStatement ||
+      stmt is ContinueStatement) {
+    return true;
+  }
   if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
     return true;
   }
@@ -94,19 +98,26 @@ bool findPrecedingGuardInBlock(
 /// for rules that need domination analysis across nested blocks (e.g. a
 /// guard in the function body dominates code inside a nested try block).
 ///
-/// Note: this walk does NOT stop at closure/function-expression boundaries.
-/// For compile-time constants (e.g. `kDebugMode`) this is correct — the
-/// closure can only be created inside the guarded zone. For runtime-mutable
-/// guards this is a known trade-off (see individual rule docs).
+/// When [stopAtClosureBoundary] is `true` (the default), the walk halts
+/// at closure literals, function expressions, and local function
+/// declarations — a guard in the outer scope does not dominate code inside
+/// a nested closure whose execution is deferred. Set to `false` only for
+/// compile-time constants (e.g. `kDebugMode`) where the closure can only
+/// be created inside the guarded zone.
 bool hasDominatingEarlyExitGuard(
   AstNode node, {
   required GuardConditionPredicate predicate,
   bool requireNoElse = true,
+  bool stopAtClosureBoundary = true,
   bool Function(Statement) exitTest = containsEarlyExit,
 }) {
   AstNode? child = node;
   AstNode? current = node.parent;
   while (current != null) {
+    // Stop at closure/function boundaries when requested — a guard in
+    // the outer scope doesn't dominate deferred-execution closures
+    if (stopAtClosureBoundary && _isClosureBoundary(current)) break;
+
     if (current is Block) {
       if (findPrecedingGuardInBlock(
         current,
@@ -122,4 +133,11 @@ bool hasDominatingEarlyExitGuard(
     current = current.parent;
   }
   return false;
+}
+
+/// True when [node] is a closure or function boundary that defers execution.
+bool _isClosureBoundary(AstNode node) {
+  return node is FunctionExpression ||
+      node is MethodDeclaration ||
+      node is FunctionDeclaration;
 }

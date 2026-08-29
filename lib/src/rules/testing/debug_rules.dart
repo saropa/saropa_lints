@@ -192,11 +192,13 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
   /// patterns accepted by `_isDebugGuardCondition` are treated identically.
   bool _isGuarded(AstNode node) {
     // Early-return guard: `if (!kDebugMode) return;` dominates all
-    // subsequent statements in the same block
+    // subsequent statements in the same block. kDebugMode is compile-time
+    // constant so closures created in the guarded zone are safe to cross.
     if (hasDominatingEarlyExitGuard(
       node,
       predicate: _isNegatedDebugGuardCondition,
       exitTest: endsWithEarlyExit,
+      stopAtClosureBoundary: false,
     )) {
       return true;
     }
@@ -293,6 +295,14 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
       return true;
     }
 
+    // Variable indirection: `final isDebug = kDebugMode;` then
+    // `if (isDebug) { ... }` or `if (!isDebug) return;` — resolve the
+    // identifier to its final/const initializer and check recursively
+    final Expression? initializer = _resolveLocalInitializer(condition);
+    if (initializer != null) {
+      return _isDebugGuardCondition(initializer);
+    }
+
     return false;
   }
 
@@ -342,6 +352,44 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
   /// True when [expr] is a boolean literal matching [expected].
   bool _isBoolLiteral(Expression expr, bool expected) {
     return expr is BooleanLiteral && expr.value == expected;
+  }
+
+  /// Resolve a [SimpleIdentifier] to the initializer of a `final` or `const`
+  /// variable declared in an enclosing block.
+  ///
+  /// Returns `null` if the identifier isn't a simple local variable, isn't
+  /// final/const (mutable vars can be reassigned, breaking the guard), or if
+  /// no declaration with a matching name is found in ancestor blocks.
+  Expression? _resolveLocalInitializer(Expression expr) {
+    if (expr is! SimpleIdentifier) return null;
+    final String name = expr.name;
+
+    // Walk ancestor blocks looking for the variable declaration
+    AstNode? current = expr.parent;
+    while (current != null) {
+      if (current is Block) {
+        for (final Statement stmt in current.statements) {
+          if (stmt is! VariableDeclarationStatement) continue;
+          final VariableDeclarationList declList = stmt.variables;
+          // Only trust final/const — mutable vars can be reassigned
+          if (!declList.isFinal && !declList.isConst) continue;
+          for (final VariableDeclaration decl in declList.variables) {
+            if (decl.name.lexeme == name && decl.initializer != null) {
+              return decl.initializer;
+            }
+          }
+        }
+      }
+      // Stop at function/method boundaries — outer scope vars are not
+      // guaranteed to be in the same execution context
+      if (current is FunctionExpression ||
+          current is MethodDeclaration ||
+          current is FunctionDeclaration) {
+        break;
+      }
+      current = current.parent;
+    }
+    return null;
   }
 }
 
