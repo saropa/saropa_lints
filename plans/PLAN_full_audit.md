@@ -58,6 +58,8 @@ using `ScanRunner` + `enabledRuleNames` exactly as `accuracy_report.dart` alread
 No `--tier` flag — audit always means everything. No `--fail-on` — audit is informational,
 not a gate (use `quality_gate` for that).
 
+| `--since` | none | Git ref — only audit files changed since this ref |
+
 **Exit codes:**
 
 | Code | Meaning |
@@ -74,9 +76,15 @@ missing.
 
 ### RuntimeTierCap bypass (CRITICAL)
 
-`ScanRunner._prepare()` unconditionally calls `RuntimeTierCap.filterRuleSet()`, which
-silently trims the rule set to whatever `runtime_tier:` / `saropa_tier:` / `SAROPA_TIER`
-the project specifies. This defeats the "always all-rules" guarantee.
+`RuntimeTierCap` is enforced at two sites:
+
+1. **Scan path** — `ScanRunner._prepare()` (`scan_runner.dart:296`) calls
+   `RuntimeTierCap.filterRuleSet(resolved)`, silently trimming the rule set to whatever
+   `runtime_tier:` / `saropa_tier:` / `SAROPA_TIER` the project specifies.
+2. **Native plugin path** — `SaropaContext` (`saropa_context.dart:287`) calls
+   `RuntimeTierCap.ruleAllowedByCap(rule.code.lowerCaseName)` per-rule during analysis.
+
+Audit uses the scan path only, so only site 1 needs bypassing.
 
 **Solution:** add a `bypassTierCap` flag to `ScanRunner` (default `false`). When `true`,
 `_prepare()` skips the `RuntimeTierCap.filterRuleSet()` call. `bin/audit.dart` passes
@@ -84,6 +92,42 @@ the project specifies. This defeats the "always all-rules" guarantee.
 
 The audit JSON output includes a `tierCapBypassed: true` field so consumers can verify
 the audit ran uncapped.
+
+### Category mapping
+
+The `_allRuleFactories` list in `lib/saropa_lints.dart` groups factories by section
+comment (`// Core rules`, `// Security rules`, etc.). Category is derived by:
+
+1. Instantiating each rule from the factory list (already done by `allSaropaRules` getter).
+2. Using the rule's `runtimeType` to find its source file via a static
+   `Map<Type, String>` built from the import structure in `all_rules.dart`.
+3. Stripping `_rules.dart` from the filename → category slug.
+
+Alternatively (simpler for v1): a hand-maintained `Map<String, String>` in
+`rule_tier_index.dart` built from the section comments in the factory list. A unit test
+validates that every rule in `_allRuleFactories` appears in the map — same pattern as
+the existing tier-registration tests that catch missing entries.
+
+### Audit diff mode — changed-files-only audit
+
+Runs a full audit but filters output to only diagnostics in files changed since a git
+ref. Lets teams use audit as a PR review tool without drowning in pre-existing findings.
+
+**CLI:** `dart run saropa_lints audit <dir> --since <ref>` — `<ref>` is any git ref
+(branch name, SHA, `HEAD~5`). The CLI calls `git diff --name-only <ref> -- '*.dart'`
+to get the changed file list, then passes it as `--include-globs` to the scan engine.
+
+**Extension UI:** The sidebar audit button shows a quick-pick prompt BEFORE running:
+
+| Option | Behavior |
+|--------|----------|
+| **Full project audit** | Runs all files (default) |
+| **Changed files only (vs main)** | Runs `--since main` |
+| **Changed files only (pick branch...)** | Shows branch picker, then runs `--since <selected>` |
+
+This ensures `--since` is never buried as a CLI-only param — the UI surfaces it as an
+explicit choice before every audit run. The Explorer context-menu "Audit Folder..." entry
+always runs full (no diff mode — it's already scoped to a folder).
 
 ### Extension UI
 
@@ -166,6 +210,7 @@ Deferred because it touches every rule class.
 | `extension/src/audit/audit-report-panel.ts` | Webview panel singleton (reuses `report-html-shared.ts`) |
 | `extension/src/audit/audit-report-html.ts` | HTML generation: diagnostic table, filter chips, search |
 | `extension/src/audit/audit-report-script.ts` | Client-side JS: search, filter, sort, group |
+| `lib/src/scan/git_changed_files.dart` | `git diff --name-only <ref>` wrapper for `--since` |
 
 ### Modified files
 
@@ -200,15 +245,21 @@ Deferred because it touches every rule class.
 1. Add `bypassTierCap` flag to `ScanRunner`, gate `RuntimeTierCap.filterRuleSet()` call.
 2. `rule_tier_index.dart` — reverse maps: rule → tier, rule → category.
 3. Enrich `scan_json.dart` with optional `tier` + `category` fields per diagnostic.
-4. `bin/audit.dart` — arg parsing, `getAllDefinedRules()`, `ScanRunner(bypassTierCap: true)`,
-   JSON output. Reuse `writeRuleTimingReport` for `--profile`.
-5. Register in `bin/saropa_lints.dart` dispatcher.
-6. Test: run `dart run saropa_lints audit example/` and verify JSON output includes all tiers.
+4. `git_changed_files.dart` — `--since <ref>` wrapper: calls `git diff --name-only`,
+   returns `.dart` file list for `ScanRunner`'s `includeGlobs`.
+5. `bin/audit.dart` — arg parsing, `getAllDefinedRules()`, `ScanRunner(bypassTierCap: true)`,
+   `--since` integration, JSON output. Reuse `writeRuleTimingReport` for `--profile`.
+6. Register in `bin/saropa_lints.dart` dispatcher.
+7. Unit test for `rule_tier_index.dart` — validates every rule in `_allRuleFactories` has
+   a tier and category entry (catches registration drift, same pattern as tier tests).
+8. Test: run `dart run saropa_lints audit example/` and verify JSON output includes all tiers.
 
 ### Phase 2 — Extension UI (TypeScript)
 
 1. `audit-command.ts` — spawn CLI, stream progress, collect JSON.
    Handle multi-root workspaces via `showWorkspaceFolderPick()`.
+   Show quick-pick before running: "Full project audit" / "Changed files only (vs main)"
+   / "Changed files only (pick branch...)". Pass `--since` to CLI accordingly.
 2. `audit-report-panel.ts` — singleton webview, receives JSON via `postMessage`.
    Reuse `report-html-shared.ts` for gauge, base styles, table primitives.
 3. `audit-report-html.ts` + script — summary header, diagnostic table with filter chips.
@@ -271,3 +322,41 @@ Two memory costs to consider:
 7. **Multi-root workspaces** — `showWorkspaceFolderPick()` when multiple roots present.
 
 8. **Profile flag** reuses existing `writeRuleTimingReport`, no reimplementation.
+
+9. **Category map drift** — unit test validates every factory-registered rule has a
+   category entry. Same pattern as the existing tier-registration completeness test.
+
+10. **Diff mode UI exposure** — `--since` is surfaced as a quick-pick prompt in the
+    extension UI before every audit run, not buried as a CLI-only flag. Three options:
+    Full project / Changed vs main / Pick branch.
+
+---
+
+## Finish Report (2026-08-29)
+
+**What was done:** Plan drafted for a "Full Audit" feature — CLI subcommand + visible
+extension sidebar/context-menu entry + filterable webview report. Underwent automated
+code review that identified two critical issues:
+
+1. `RuntimeTierCap` silently caps the rule set even when an explicit `enabledRuleNames`
+   is passed — the plan now specifies a `bypassTierCap` flag on `ScanRunner`.
+2. A proposed `audit_runner.dart` duplicated existing `accuracy_report.dart` patterns —
+   removed in favor of a thin ~30-line `bin/audit.dart` call site.
+
+Additional review-driven fixes: dispatcher subcommand (not separate executable), reuse
+of `report-html-shared.ts`, multi-root workspace handling, resolved-AST memory cost
+documentation, exit-code contract, locale regeneration step.
+
+Additional hardening (2026-08-29, reflection gate):
+
+3. Verified `RuntimeTierCap` enforcement sites — two exist: `scan_runner.dart:296`
+   (`filterRuleSet`, scan path) and `saropa_context.dart:287` (`ruleAllowedByCap`,
+   native plugin path). Audit uses scan path only; plan now documents both sites.
+4. Added category-map drift guard: unit test validates every rule in `_allRuleFactories`
+   has a tier and category entry, same pattern as existing tier-registration tests.
+5. Added "Audit diff mode" (`--since <ref>`) — filters to files changed since a git ref.
+   CLI flag + UI quick-pick before every audit run (Full / Changed vs main / Pick branch).
+   Ensures the `--since` option is never buried as a CLI-only param.
+
+**Status:** Plan complete and committed. No implementation started. Three phases defined:
+CLI (Dart), Extension UI (TypeScript), Polish.
