@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: Cross-File  ⁇  Schreiben Sie einen Projekt Snapshot (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: Cross-File  ⁇  Export Import Graph (DOT) - ein Verknüpfungssystem für die Ausfuhr von Waren.",
   "command.crossFile.report.title": "Saropa Lints: Cross-File  ⁇  Erstellen Sie einen HTML-Bericht.",
+  "command.findStaleIgnores.title": "Saropa Lints: Stale Ignore Kommentare finden",
+  "command.fixStaleIgnores.title": "Saropa Lints: Veraltete Kommentare ignorieren beheben",
   "command.openViolationsWideReport.title": "Saropa Lints: Öffnen Sie das Findings-Dashboard.",
   "command.openConsolidatedDashboard.title": "Saropa Lints: Das ist ein _PH0_. Öffnen Sie das Dashboard.",
   "command.openViolationsWideReport.category": "Saropa",

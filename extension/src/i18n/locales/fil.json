@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "I-double click upang i-toggle ang {severity}"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "Nagsuscan para sa mga hindi inilalagay na komento...",
+      "fixing": "Pagbabawal ng mga komento na ignore na hindi na kailangan…"
+    },
+    "error": {
+      "findFailed": "Hanapin ang mga naka-ignored na nagsusumite ng mga error: {message}",
+      "fixFailed": "Iayos ang mga naka-ignored na nagsisimula na: {message}",
+      "noWorkspace": "Walang Dart/Flutter workspace. Bumuksan ang isang proyekto sa pubspec.yaml muna.",
+      "missingDep": "Ibahin ang saropa_lints sa pubspec.yaml bago mag-scan para sa mga hindi inilagay na ignores."
+    },
+    "info": {
+      "noneFound": "Walang mga komento sa pag-ignor ng mga panukat na nangungunat.",
+      "found": "{count} mga ignore na stale sa {fileCount} file(s). Tingnan ang panel ng Problems para sa detalye.",
+      "fixed": "Nakaraan na ang mga komento sa ignore. Tingnan ang panel ng Output para sa detalye.",
+      "fixedInFile": "Saropa Lints: naka-ayos na ang mga ignore na nakakalimot dito"
+    },
+    "confirm": {
+      "fixMessage": "Ito ay magpapalit ng mga hindi na kinakailangang komento sa iyong mga source files. Ang mga pagbabago ay maaaring i-undo gamit ang git. Susunod?",
+      "fixAction": "Tanggalin ang mga ignore na hindi aktibo"
+    },
+    "diagnostic": {
+      "message": "Nag-iignore na: ang rule '{ruleName}' ay wala nang magtatag ng alerta sa linya na ito."
+    },
+    "sidebar": {
+      "findLabel": "Hanapin ang mga hindi ginamit na ignores",
+      "findDescription": "I-detect ang patay // huwag pansinin: mga komento",
+      "fixLabel": "Ibahin ang mga hindi kinakailangang ignore",
+      "fixDescription": "Auto-remover ng mga // ignore: komento na walang kahulugan"
+    },
+    "quickFix": {
+      "title": "Iayos ang mga hindi kinakailangang ignores dito"
+    }
   }
 }

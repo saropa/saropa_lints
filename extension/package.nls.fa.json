@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: چند-فایلی — نوشتن اسنپ‌شات پروژه (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: چند-فایلی — صدور نمودار واردات (DOT)",
   "command.crossFile.report.title": "Saropa Lints: Cross-File  ⁇  گزارش HTML را تولید می کند.",
+  "command.findStaleIgnores.title": "Saropa Lints: یافتن نظرات ناگهانی چک کردن",
+  "command.fixStaleIgnores.title": "Saropa Lints: تصحیح نظرات نادیده گرفته شده",
   "command.openViolationsWideReport.title": "Saropa Lints: باز کردن داشبورد یافته ها",
   "command.openConsolidatedDashboard.title": "Saropa Lints: _PH0_: = PH0__::: -پای داشبورد را باز کنید Dashboard",
   "command.openViolationsWideReport.category": "Saropa",

@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: Cross-File  ⁇  Sumulat ng Project Snapshot (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: Cross-File — I-export ang Import Graph (DOT)",
   "command.crossFile.report.title": "Saropa Lints: Cross-File  ⁇  Gumawa ng HTML na ulat.",
+  "command.findStaleIgnores.title": "Saropa Lints: Hanapin ang mga komento na walang epekto",
+  "command.fixStaleIgnores.title": "Saropa Lints: Ito ay Pagbabago ng mga Komento na Ibaon sa Ignore",
   "command.openViolationsWideReport.title": "Saropa Lints: Buksan ang Findings Dashboard",
   "command.openConsolidatedDashboard.title": "Saropa Lints: ang mga ito ay may _ph0__. Buksan ang Dashboard ng dashboard.",
   "command.openViolationsWideReport.category": "Saropa",

@@ -2125,7 +2125,8 @@
     "info": {
       "noneFound": "No stale ignore comments found.",
       "found": "{count} stale ignore(s) in {fileCount} file(s). See the Problems panel for details.",
-      "fixed": "Stale ignore comments removed. See the Output panel for details."
+      "fixed": "Stale ignore comments removed. See the Output panel for details.",
+      "fixedInFile": "Saropa Lints: stale ignores fixed in this file"
     },
     "confirm": {
       "fixMessage": "This will remove stale ignore comments from your source files. The changes can be undone with git. Continue?",
@@ -2139,6 +2140,9 @@
       "findDescription": "Detect dead // ignore: comments",
       "fixLabel": "Fix stale ignores",
       "fixDescription": "Auto-remove dead // ignore: comments"
+    },
+    "quickFix": {
+      "title": "Fix stale ignores in this file"
     }
   }
 }

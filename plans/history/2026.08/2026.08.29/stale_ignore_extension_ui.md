@@ -53,3 +53,45 @@ py -3 D:\src\saropa_lints\extension\scripts\generate_translations.py
 Choosing `[1]` (default, gap-closing only) at the prompt is sufficient — it does not touch existing translations. **This must run before publish** — the coverage gate (`generate_locales.py --fail-on-missing`) will fail otherwise.
 
 **End-to-end validation against a real downstream project (`d:\src\contacts`) was not performed this session** — the commands were verified via unit tests with stubbed CLI output, confirming the exact argv shape matches `bin/scan.dart`'s parser, but not run against a live project with real stale ignores. This remains open from the prior handover.
+
+## Finish Report (2026-08-29)
+
+Following the initial commit, the handoff reflection surfaced three concerns and one candidate feature; the user selected all three follow-up actions (harden reflection items, implement the unrequested feature, commit).
+
+### Hardening applied
+
+1. **Sidebar visibility gating (non-issue, documented)** — verified the whole "Settings" sidebar view (`package.json` id `saropaLints.settings`) already carries `"when": "saropaLints.isDartProject"`, so the two new stale-ignore rows are hidden along with the rest of the panel on non-Dart projects. No code change; added an inline comment recording the verification so a future reader doesn't re-ask the question.
+
+2. **Output-channel-reveal inconsistency (fixed)** — the bulk `fixStaleIgnores` command was force-revealing the Output panel on every successful run (`getSharedOutputChannel().show(true)`), unlike `cross-file-commands.ts`'s convention of only revealing Output on error and using a lighter-weight message on success. Removed the forced reveal on the fix-success path; the channel still has the full CLI transcript (`logToOutput: true`) for anyone who checks it.
+
+3. **Silent false-negative on JSON corruption (fixed)** — the find command's JSON-read `catch` block treated ANY read/parse failure as "no stale ignores found," including genuine corruption, a partial write, or a permissions error. Since the CLI's `--format json` path (`bin/scan.dart`) unconditionally writes the output file before exiting — even for zero results — a read failure after a normal-looking exit can only mean something broke. The catch block now surfaces an error message instead of a false-clean report.
+
+### Unrequested feature implemented: per-file quick fix
+
+A `StaleIgnoreCodeActionProvider` (exported, registered for `{ language: 'dart' }`) offers a lightbulb quick fix — "Fix stale ignores in this file" — on any diagnostic with `source === 'Saropa Lints'`. It delegates to a new command, `saropaLints.fixStaleIgnoresInFile(uri)`, which scopes the CLI to one file via `--files <path>` rather than editing text directly in TypeScript — deliberately avoiding a second, potentially drifting implementation of the comment-removal logic (standalone vs inline, multi-rule pruning) that already lives once in `lib/src/scan/stale_ignore_detector.dart`. No confirmation dialog on this path (unlike the bulk fix): the action is invoked on a single, already-visible diagnostic, a much smaller blast radius than the whole-project sidebar/palette action.
+
+After the scoped fix, the file is re-scanned (find, scoped to the same file) and its diagnostics are replaced via a new `updateDiagnosticsForUri()` helper that updates only that file's entries in the shared `DiagnosticCollection`, leaving every other file's diagnostics untouched.
+
+Shared logic was extracted into `runFindScan()` and `runFixScan()`/`showFixFailure()` helpers so the whole-project commands and the new per-file command share one code path for CLI invocation, exit-code interpretation, and error reporting — no duplicated exit-code logic to drift out of sync a second time.
+
+### Bug caught in the second review pass: JSON-path race condition (fixed)
+
+A second review pass (targeted at the newly-added code only) found that the per-file refresh scan wrote its JSON output to one **fixed** shared path (`stale_ignores_file.json`) regardless of which file was being fixed. Two quick fixes triggered close together on two *different* files would race on that same path — one scan's write could land between the other scan's write and read, and `updateDiagnosticsForUri` would then silently apply the wrong file's (possibly empty) result to the wrong URI, clearing real diagnostics instead of refreshing them correctly.
+
+Fixed by deriving the JSON path from an MD5 hash of the target file's path (`perFileJsonPath()`, exported for test use) — each file gets its own output path, so concurrent fixes on different files can no longer cross-contaminate. A same-file double-click race remains theoretically possible but is far lower risk (idempotent outcome — the second run's fix finds nothing left to fix) and was not further hardened.
+
+### Test coverage added
+
+`extension/src/test/views/staleIgnoreCommands.test.ts` grew from 9 to 15 tests, plus a new `describe('StaleIgnoreCodeActionProvider', ...)` block (2 tests) testing the provider class directly (VS Code's `registerCodeActionsProvider` is a no-op stub in the test mock, matching the existing `PubspecCodeActionProvider` test pattern in `pubspec-code-actions.test.ts`):
+- JSON-corruption hardening: asserts a missing/unreadable output file surfaces an error, not a false "none found."
+- Per-file fix: asserts the exact scoped CLI argument arrays for both the fix and refresh-find calls, AND (closing a gap the second review pass flagged) that a pre-seeded stale diagnostic on the target file is actually cleared from the `DiagnosticCollection` after the refresh reports it clean — not just that the CLI was called correctly.
+- Race-condition regression guard: asserts `perFileJsonPath()` returns different paths for different files and a stable path for the same file across calls.
+- No-confirmation-dialog guard for the per-file command.
+- CodeActionProvider: offers exactly one action delegating to `fixStaleIgnoresInFile` with the document's URI, for a diagnostic sourced from `'Saropa Lints'`; ignores diagnostics from other sources.
+
+Ran: full `npx tsc --noEmit` (clean), `node --max-old-space-size=8192 node_modules/typescript/bin/tsc -p tsconfig.test.json` (clean), `node node_modules/mocha/bin/mocha "out-test/test/views/staleIgnoreCommands.test.js" "out-test/test/views/crossFileCommands.test.js" --timeout 10000` — 25/25 passing (15 stale-ignore command tests + 2 CodeActionProvider tests + 10 cross-file, confirming no regression from the refactor).
+
+### Still deferred
+
+- l10n catalogs are now further behind: 2 more keys added this pass (`info.fixedInFile`, `quickFix.title`) bring the total to 20 keys × 24 locales. The translation command handed to the user earlier in this document is unchanged and still needs to run before publish.
+- End-to-end validation against `d:\src\contacts` remains open — still not performed.

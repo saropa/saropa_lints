@@ -16,11 +16,11 @@ import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 
-import { registerStaleIgnoreCommands } from '../../stale-ignore-commands';
+import { registerStaleIgnoreCommands, StaleIgnoreCodeActionProvider, perFileJsonPath } from '../../stale-ignore-commands';
 import * as projectRoot from '../../projectRoot';
 import * as pubspecReader from '../../pubspecReader';
 import * as setup from '../../setup';
-import { messageMock, resetMocks } from '../vibrancy/vscode-mock';
+import { messageMock, resetMocks, DiagnosticSeverity, Diagnostic, MockDiagnosticCollection } from '../vibrancy/vscode-mock';
 
 /** Minimal [vscode.ExtensionContext] for command registration (subscriptions only). */
 function makeContext(): vscode.ExtensionContext {
@@ -30,17 +30,27 @@ function makeContext(): vscode.ExtensionContext {
 describe('stale-ignore commands', () => {
   let sandbox: sinon.SinonSandbox;
   let root: string;
+  let diagnosticCollection: MockDiagnosticCollection;
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     resetMocks();
-    registerStaleIgnoreCommands(makeContext());
+    // registerStaleIgnoreCommands returns the SAME module-level singleton
+    // collection on every call (lazily created once) — captured here so
+    // tests can assert on its state directly instead of indexing into
+    // vscode-mock's createdDiagnosticCollections, which is only populated
+    // on the very first call across the whole test run.
+    diagnosticCollection = registerStaleIgnoreCommands(makeContext()) as unknown as MockDiagnosticCollection;
     root = fs.mkdtempSync(path.join(os.tmpdir(), 'saropa-staleignores-'));
     sandbox.stub(projectRoot, 'getProjectRoot').returns(root);
     sandbox.stub(pubspecReader, 'hasSaropaLintsDep').returns(true);
     sandbox.stub(setup, 'getSharedOutputChannel').returns({
       show: () => undefined,
     } as unknown as vscode.OutputChannel);
+    // Not present on the base mock (see cross-file-commands tests for the
+    // same pattern) — only needed by commands that report success via the
+    // status bar rather than a toast.
+    (vscode.window as unknown as { setStatusBarMessage: (...args: unknown[]) => void }).setStatusBarMessage = () => undefined;
   });
 
   afterEach(() => {
@@ -207,5 +217,136 @@ describe('stale-ignore commands', () => {
     await vscode.commands.executeCommand('saropaLints.findStaleIgnores');
 
     assert.ok(messageMock.errors.some((msg) => msg.includes('Add saropa_lints to pubspec.yaml')));
+  });
+
+  it('surfaces an error instead of a false "none found" when the JSON output is corrupt', async () => {
+    // The CLI ALWAYS writes stale_ignores.json on a normal completion (even
+    // for zero results), so a read/parse failure means something genuinely
+    // broke — not "clean, no findings". A prior version of this handler
+    // treated ANY read failure as "no stale ignores found", silently hiding
+    // a corrupted-write or permissions failure as a false success.
+    sandbox.stub(setup, 'runInWorkspaceAsync').resolves({
+      ok: true,
+      stdout: '',
+      stderr: '',
+      cancelled: false,
+    });
+    // Deliberately do NOT write the JSON file, simulating a corrupted or
+    // missing output despite a reported-success exit code.
+
+    await vscode.commands.executeCommand('saropaLints.findStaleIgnores');
+
+    assert.ok(messageMock.errors.some((msg) => msg.includes('Find stale ignores failed')));
+    assert.ok(!messageMock.infos.some((msg) => msg.includes('No stale ignore comments found')));
+  });
+
+  it('runs fix-stale-ignores-in-file scoped to a single file, then clears that file\'s diagnostics when the refresh scan reports it clean', async () => {
+    const fileUri = vscode.Uri.file(path.join(root, 'lib', 'a.dart'));
+    const scopedJsonPath = perFileJsonPath(root, fileUri.fsPath);
+
+    // Seed a pre-existing diagnostic on this file, as if an earlier
+    // whole-project find had flagged it — the refresh after fix must
+    // replace/clear this, not leave it stale.
+    diagnosticCollection.set(fileUri, [
+      new Diagnostic(new vscode.Range(4, 0, 4, 10), 'stale', DiagnosticSeverity.Warning as unknown as vscode.DiagnosticSeverity),
+    ]);
+
+    const runStub = sandbox.stub(setup, 'runInWorkspaceAsync').callsFake(async (_root, _cmd, args) => {
+      const argv = args as string[];
+      if (argv.includes('--fix-stale-ignores')) {
+        return { ok: true, stdout: 'Fixed 1 stale ignore(s) in 1 file(s)', stderr: '', cancelled: false };
+      }
+      // The refresh find call, scoped to the same file — reports clean.
+      fs.mkdirSync(path.dirname(scopedJsonPath), { recursive: true });
+      fs.writeFileSync(
+        scopedJsonPath,
+        JSON.stringify({ version: 1, staleIgnores: [], summary: { totalCount: 0, byFile: {}, byRule: {} } }),
+        'utf8',
+      );
+      return { ok: true, stdout: '', stderr: '', cancelled: false };
+    });
+
+    await vscode.commands.executeCommand('saropaLints.fixStaleIgnoresInFile', fileUri);
+
+    assert.strictEqual(runStub.callCount, 2);
+    const fixArgs = runStub.firstCall.args[2] as string[];
+    assert.deepStrictEqual(fixArgs, ['run', 'saropa_lints:scan', root, '--files', fileUri.fsPath, '--fix-stale-ignores']);
+    const findArgs = runStub.secondCall.args[2] as string[];
+    assert.deepStrictEqual(findArgs, [
+      'run', 'saropa_lints:scan', root, '--files', fileUri.fsPath,
+      '--find-stale-ignores', '--format', 'json', '--json-file-path', scopedJsonPath, '-q',
+    ]);
+    // The stale diagnostic seeded above must be gone — the file is now clean.
+    assert.deepStrictEqual(diagnosticCollection.get(fileUri), []);
+  });
+
+  it('uses independent JSON output paths for concurrent per-file fixes on different files', () => {
+    // Regression guard for a race condition where both per-file refreshes
+    // shared one fixed filename (stale_ignores_file.json): a second file's
+    // scan could write between the first file's write and read, silently
+    // clobbering the first file's diagnostics with the second file's
+    // (possibly empty) result. Hashing the file path into the JSON filename
+    // gives each file its own output path.
+    const fileA = path.join(root, 'lib', 'a.dart');
+    const fileB = path.join(root, 'lib', 'b.dart');
+
+    assert.notStrictEqual(perFileJsonPath(root, fileA), perFileJsonPath(root, fileB));
+    // Deterministic — same file always maps to the same path (needed so a
+    // single fix-then-find round trip for one file reads back its own write).
+    assert.strictEqual(perFileJsonPath(root, fileA), perFileJsonPath(root, fileA));
+  });
+
+  it('does not run fix-stale-ignores-in-file without a confirmation dialog (single-file blast radius)', async () => {
+    const fileUri = vscode.Uri.file(path.join(root, 'lib', 'a.dart'));
+    const warnStub = sandbox.stub(vscode.window, 'showWarningMessage');
+    sandbox.stub(setup, 'runInWorkspaceAsync').resolves({
+      ok: true, stdout: '', stderr: '', cancelled: false,
+    });
+
+    await vscode.commands.executeCommand('saropaLints.fixStaleIgnoresInFile', fileUri);
+
+    // Unlike the bulk fix command, the per-file quick fix must not prompt —
+    // it's invoked from a lightbulb on a single already-visible diagnostic.
+    assert.strictEqual(warnStub.callCount, 0);
+  });
+});
+
+describe('StaleIgnoreCodeActionProvider', () => {
+  it('offers a file-scoped quick fix for a stale-ignore diagnostic', () => {
+    const provider = new StaleIgnoreCodeActionProvider();
+    const uri = vscode.Uri.file('/repo/lib/a.dart');
+    const range = new vscode.Range(4, 0, 4, 20);
+    const diag = new vscode.Diagnostic(
+      range,
+      "Stale ignore: rule 'avoid_print' no longer fires on this line.",
+      DiagnosticSeverity.Warning as unknown as vscode.DiagnosticSeverity,
+    );
+    diag.source = 'Saropa Lints';
+    diag.code = 'avoid_print';
+
+    const doc = { uri } as vscode.TextDocument;
+    const context = { diagnostics: [diag] } as unknown as vscode.CodeActionContext;
+
+    const actions = provider.provideCodeActions(doc, range, context);
+
+    assert.strictEqual(actions.length, 1);
+    assert.strictEqual(actions[0].command?.command, 'saropaLints.fixStaleIgnoresInFile');
+    assert.deepStrictEqual(actions[0].command?.arguments, [uri]);
+    assert.deepStrictEqual(actions[0].diagnostics, [diag]);
+  });
+
+  it('ignores diagnostics from other sources', () => {
+    const provider = new StaleIgnoreCodeActionProvider();
+    const uri = vscode.Uri.file('/repo/lib/a.dart');
+    const range = new vscode.Range(4, 0, 4, 20);
+    const diag = new vscode.Diagnostic(range, 'some other lint', DiagnosticSeverity.Warning as unknown as vscode.DiagnosticSeverity);
+    diag.source = 'Some Other Linter';
+
+    const doc = { uri } as vscode.TextDocument;
+    const context = { diagnostics: [diag] } as unknown as vscode.CodeActionContext;
+
+    const actions = provider.provideCodeActions(doc, range, context);
+
+    assert.strictEqual(actions.length, 0);
   });
 });

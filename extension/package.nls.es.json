@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: Ficha cruzada  ⁇  Escribe una instantánea del proyecto (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: Ficha cruzada  ⁇  Gráfico de exportación importación (DOT)",
   "command.crossFile.report.title": "Saropa Lints: Archivo cruzado  ⁇  Generar un informe HTML.",
+  "command.findStaleIgnores.title": "Saropa Lints: Buscar comentarios de ignorar obsoletos",
+  "command.fixStaleIgnores.title": "Saropa Lints: Corrige comentarios de ignorar obsoletos",
   "command.openViolationsWideReport.title": "Saropa Lints: Abre el panel de resultados.",
   "command.openConsolidatedDashboard.title": "Saropa Lints: Es el nombre de la persona que tiene más probabilidades de ser asesin Abra el panel de control y abra Dashboard.",
   "command.openViolationsWideReport.category": "Saropa",

@@ -102,7 +102,7 @@ Major scan CLI expansion: lane control (`--lane full|light`, `--lane-stats`), CI
 - Scan CLI: `--fail-on-tier <name>` flag exits 1 only when a diagnostic comes from a rule in the specified tier or below. Scan at a high tier for visibility but only fail on essential-tier findings during incremental adoption — e.g. `--tier comprehensive --fail-on-tier essential`. ([#312](https://github.com/saropa/saropa_lints/issues/312))
 - Scan CLI: `--find-stale-ignores` flag detects `// ignore:` comments whose suppressed saropa_lints rule no longer fires on the target line — the code was fixed but the ignore was left behind. Reports each stale ignore with file path, line number, and rule name. Supports `--format json` for CI integration. Exits 1 if any stale ignores found, 0 if clean. No action required.
 - Scan CLI: `--fix-stale-ignores` flag detects AND automatically removes stale `// ignore:` directives from source files. Standalone comments are deleted entirely; inline comments are stripped preserving the code; multi-rule comments have only the stale rules pruned. Prints a summary of files modified. No action required.
-- **VS Code extension: Stale Ignore commands** — two new command palette entries ("Find Stale Ignore Comments" and "Fix Stale Ignore Comments") plus sidebar action rows in the Settings panel. Find runs the scan and publishes stale ignores as warnings in the Problems panel with squiggly lines on the offending comment lines. Fix confirms before auto-removing dead `// ignore:` comments from source files. No action required.
+- **VS Code extension: Stale Ignore commands** — two new command palette entries ("Find Stale Ignore Comments" and "Fix Stale Ignore Comments") plus sidebar action rows in the Settings panel. Find runs the scan and publishes stale ignores as warnings in the Problems panel with squiggly lines on the offending comment lines. Fix confirms before auto-removing dead `// ignore:` comments from source files. A lightbulb quick fix on each stale-ignore diagnostic offers a file-scoped "Fix stale ignores in this file" action with no confirmation prompt, for cleaning up one file at a time without leaving the editor. No action required.
 
 ### Changed
 
@@ -495,24 +495,6 @@ This release fixes the Analysis Optimizer's exclusion detection, which previousl
 
 - Each Analysis Optimizer recommendation now has a "Preview" toggle showing the approximate line that would be added to `analysis_options.yaml`, without leaving the table. No action required.
 - Analysis Optimizer now proactively warns when `analysis_options.yaml` already has invalid exclude syntax and offers a one-click "Fix Syntax" that re-quotes every entry, so a broken file can be repaired without needing to apply or remove a specific pattern first. No action required.
-
----
-
-## [14.5.3]
-
-This release fixes a test-suite timeout in the health-history archival path and completes Filipino and Dutch translation coverage across the extension UI. No action required. [log](https://github.com/saropa/saropa_lints/blob/v14.5.3/CHANGELOG.md)
-
-### Fixed
-
-- `loadHealthHistory` test timeout — complexity parsing every Dart file across archived tags exceeded the 2-minute test budget. The function now accepts an optional `withComplexity` parameter (defaults `true`; test passes `false`).
-
-<details>
-<summary>Maintenance</summary>
-
-- `loadHealthHistory` now caches each tag's computed `HistoryPoint` on disk (`.dart_tool/saropa_lints/health_history_cache.json`), keyed by the tag's resolved commit SHA. Repeat calls against unchanged tags skip re-archiving and re-scanning entirely.
-- Fill `fil`/`nl` extension i18n coverage gaps for `Default`, `Pattern`, `Medium`, and `Open analysis_options.yaml`. `Pattern` is kept as the English loanword already used in the sibling `{count} file pattern(s)` string; `Open analysis_options.yaml` uses verb-final Dutch order to match the existing `pubspec.yaml openen` sibling.
-
-</details>
 
 ---
 

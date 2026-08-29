@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "Doppelklick, um {severity} zu schalten"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "Stale Ignore-Kommentare scannen…",
+      "fixing": "Stale Ignore-Kommentare entfernen…"
+    },
+    "error": {
+      "findFailed": "Stale Ignorieren finden gescheitert: {message}",
+      "fixFailed": "Fehler beim Beheben veralteter Ignorierungen: {message}",
+      "noWorkspace": "Kein Dart/Flutter Arbeitsbereich gefunden. Öffnen Sie zunächst ein Projekt mit pubspec.yaml.",
+      "missingDep": "saropa_lints zu pubspec.yaml hinzufügen, bevor Sie nach veralteten Ignorierungen suchen."
+    },
+    "info": {
+      "noneFound": "Keine veralteten Ignore-Kommentare gefunden.",
+      "found": "{count} veraltete Ignorierungen in {fileCount} Datei(en). Siehe das Problems-Fenster für Details.",
+      "fixed": "Veraltete Ignore-Kommentare entfernt. Details im Ausgabefenster finden.",
+      "fixedInFile": "Saropa Lints: ignorierte Fehler wurden in dieser Datei behoben"
+    },
+    "confirm": {
+      "fixMessage": "Dies entfernt veraltete ignore-Kommentare aus Ihren Quelldateien. Die Änderungen können mit git rückgängig gemacht werden. Fortfahren?",
+      "fixAction": "Stale Ignores entfernen"
+    },
+    "diagnostic": {
+      "message": "Veraltete Ignorierung: Regel '{ruleName}' feuert nicht mehr auf dieser Zeile."
+    },
+    "sidebar": {
+      "findLabel": "Stale Ignores finden",
+      "findDescription": "Tote // ignore: Kommentare erkennen",
+      "fixLabel": "Stale Ignores beheben",
+      "fixDescription": "Automatisches Entfernen von toten // ignore: Kommentaren"
+    },
+    "quickFix": {
+      "title": "Stale Ignores in dieser Datei beheben"
+    }
   }
 }

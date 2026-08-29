@@ -17,6 +17,7 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -212,6 +213,7 @@ _SCAN_EXTENSIONS = {".dart", ".py", ".md", ".yaml", ".yml"}
 
 # Directories to skip entirely
 _SKIP_DIRS = {
+    ".claude",
     ".dart_tool",
     ".git",
     "build",
@@ -401,21 +403,27 @@ def scan_file(file_path: Path) -> list[SpellingHit]:
 
 
 def scan_directory(project_dir: Path) -> list[SpellingHit]:
-    """Scan all source files in a project for British spellings."""
+    """Scan all source files in a project for British spellings.
+
+    Uses os.walk with in-place pruning so skip-dirs (node_modules,
+    .dart_tool, build, etc.) are never descended into at all.
+    """
     root = project_dir.resolve()
     all_hits: list[SpellingHit] = []
-    for file_path in project_dir.rglob("*"):
-        if file_path.suffix not in _SCAN_EXTENSIONS:
-            continue
-        if _should_skip_dir(file_path):
-            continue
-        if file_path.name in _SKIP_FILES:
-            continue
-        if _should_skip_path_for_i18n_tooling(file_path, root):
-            continue
-        if _should_skip_plans_history(file_path, root):
-            continue
-        all_hits.extend(scan_file(file_path))
+    for dirpath, dirnames, filenames in os.walk(project_dir):
+        # Prune skip-dirs in-place so os.walk never enters them.
+        dirnames[:] = [d for d in dirnames if d not in _SKIP_DIRS]
+        for fname in filenames:
+            file_path = Path(dirpath) / fname
+            if file_path.suffix not in _SCAN_EXTENSIONS:
+                continue
+            if file_path.name in _SKIP_FILES:
+                continue
+            if _should_skip_path_for_i18n_tooling(file_path, root):
+                continue
+            if _should_skip_plans_history(file_path, root):
+                continue
+            all_hits.extend(scan_file(file_path))
     all_hits.sort(key=lambda h: (str(h.file), h.line_number))
     return all_hits
 

@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: ক্রস-ফাইল  ⁇  প্রকল্প স্ন্যাপশট (জেএসওএন) লিখুন",
   "command.crossFile.graph.title": "Saropa Lints: ক্রস-ফাইল  ⁇  রপ্তানি আমদানি গ্রাফ (ডিওটি)",
   "command.crossFile.report.title": "Saropa Lints: ক্রস-ফাইল  ⁇  HTML রিপোর্ট তৈরি করুন",
+  "command.findStaleIgnores.title": "Saropa Lints: অপচয় করা অবহেলনা কমেন্ট খুঁজুন",
+  "command.fixStaleIgnores.title": "Saropa Lints: ফিক্স স্টেল ইগনর কমেন্ট",
   "command.openViolationsWideReport.title": "Saropa Lints: ওপেন ফাইন্ডিংস ড্যাশবোর্ড খুলুন",
   "command.openConsolidatedDashboard.title": "Saropa Lints: PH0__::: -PH0_: =PH0 ড্যাশবোর্ড খুলুন।",
   "command.openViolationsWideReport.category": "Saropa",

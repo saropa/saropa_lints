@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: ملفات متقاطعة  ⁇  كتابة صورة سريعة للمشروع (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: ملف متقاطع  ⁇  مخطط تصدير / استيراد (DOT)",
   "command.crossFile.report.title": "Saropa Lints: ملفات متقاطعة  ⁇  توليد تقرير HTML.",
+  "command.findStaleIgnores.title": "Saropa Lints: ابحث عن التعليقات المهمّة المُهمَّلة",
+  "command.fixStaleIgnores.title": "Saropa Lints: إصلاح التعليقات المهمّة غير المحدثة",
   "command.openViolationsWideReport.title": "Saropa Lints: افتحوا لوحة تحكم النتائج.",
   "command.openConsolidatedDashboard.title": "Saropa Lints: هيئة إدارة المعلومات افتح لوحة التحكم Dashboard.",
   "command.openViolationsWideReport.category": "Saropa",

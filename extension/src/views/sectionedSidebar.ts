@@ -347,7 +347,11 @@ function buildActionItems(): LeafItem[] {
         ),
         // Stale ignore detection and cleanup — surfaces the CLI's
         // --find-stale-ignores / --fix-stale-ignores as clickable sidebar rows
-        // so the feature is discoverable without knowing CLI flags.
+        // so the feature is discoverable without knowing CLI flags. No extra
+        // `when` gating needed here: the whole Settings VIEW (package.json
+        // "saropaLints.settings") already requires saropaLints.isDartProject,
+        // so these rows are hidden together with the rest of the panel on
+        // non-Dart projects — no separate enablement check required.
         new LeafItem(
             l10n('staleIgnores.sidebar.findLabel'),
             l10n('staleIgnores.sidebar.findDescription'),
