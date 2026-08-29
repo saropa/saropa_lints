@@ -1156,6 +1156,11 @@ def _extract_failure_excerpt(log_path: Path, max_lines: int = 10) -> list[tuple[
     return _collect(_TEST_FAILURE_MARKERS_COMPACT)[:max_lines]
 
 
+# Dart test compact-reporter progress pattern: "HH:MM +N: ..." or "HH:MM +N -M: ..."
+_DART_PROGRESS_RE = re.compile(
+    r"^(\d{2}:\d{2})\s+\+(\d+)(?:\s+(?:~(\d+)))?(?:\s+(?:-(\d+)))?\s*:\s*(.*)"
+)
+
 def _run_dart_test_to_file(
     project_dir: Path,
     env: dict[str, str] | None,
@@ -1163,7 +1168,12 @@ def _run_dart_test_to_file(
     extra_args: list[str] | None = None,
     concurrency: int | None = None,
 ) -> int:
-    """Run dart test with stdout/stderr piped only to log_path. Returns exit code.
+    """Run dart test, streaming a single-line progress bar to the terminal.
+
+    The progress line overwrites itself in-place (carriage return) showing
+    elapsed time, pass/skip/fail counts, and the current test name. All
+    output goes to log_path for post-mortem; only the progress line and a
+    final summary appear on screen.
 
     extra_args appends tag selectors (e.g. ['-x', 'slow'] or ['-t', 'slow']) so the
     caller can split the suite into a fast pass and a slow pass.
@@ -1179,19 +1189,89 @@ def _run_dart_test_to_file(
     cmd = ["dart", "test", "-j", str(cores)]
     if extra_args:
         cmd.extend(extra_args)
-    with open(log_path, "w", encoding="utf-8", errors="replace") as out:
-        result = subprocess.run(
-            cmd,
-            cwd=project_dir,
-            stdout=out,
-            stderr=subprocess.STDOUT,
-            env=env,
-            shell=use_shell,
-        )
-    if result.returncode != 0:
+
+    # Stream output line-by-line: log everything, show only progress on terminal.
+    proc = subprocess.Popen(
+        cmd,
+        cwd=project_dir,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        env=env,
+        shell=use_shell,
+    )
+
+    # Track whether we have an active CR-overwritten progress line on screen.
+    wrote_progress = False
+    # Last parsed counts for the final summary line.
+    last_elapsed = ""
+    last_passed = "0"
+    last_skipped = None
+    last_failed = None
+
+    with open(log_path, "w", encoding="utf-8", errors="replace") as log_f:
+        for raw_line in proc.stdout:
+            line = raw_line.decode("utf-8", errors="replace")
+            # Always write full output to the log file.
+            log_f.write(line)
+
+            stripped = line.rstrip("\n\r")
+            if not stripped:
+                continue
+
+            # Parse compact-reporter progress (e.g. "00:12 +42 -1: test name").
+            m = _DART_PROGRESS_RE.match(stripped)
+            if not m:
+                continue
+
+            last_elapsed = m.group(1)
+            last_passed = m.group(2)
+            last_skipped = m.group(3)
+            last_failed = m.group(4)
+            test_name = m.group(5)
+
+            # Build compact status: time +pass ~skip -fail: test_name
+            parts = [f"{last_elapsed} +{last_passed}"]
+            if last_skipped:
+                parts.append(f"~{last_skipped}")
+            if last_failed and last_failed != "0":
+                parts.append(f"-{last_failed}")
+            status = " ".join(parts) + f": {test_name}"
+
+            # Truncate to terminal width so the line never wraps.
+            try:
+                cols = os.get_terminal_size().columns
+            except OSError:
+                cols = 120
+            if len(status) > cols - 1:
+                status = status[: cols - 4] + "..."
+
+            # Carriage-return overwrite for single-line progress.
+            sys.stdout.write(f"\r{status}\033[K")
+            sys.stdout.flush()
+            wrote_progress = True
+
+    # Clear the in-place progress line before printing the final summary.
+    if wrote_progress:
+        sys.stdout.write("\r\033[K")
+
+    # Print a permanent one-line summary with final counts.
+    parts = [f"{last_elapsed} +{last_passed}"]
+    if last_skipped:
+        parts.append(f"~{last_skipped}")
+    if last_failed and last_failed != "0":
+        parts.append(f"-{last_failed}")
+    final = " ".join(parts)
+    if last_failed and last_failed != "0":
+        print_colored(f"  Result: {final}", Color.RED)
+    else:
+        print_colored(f"  Result: {final}", Color.GREEN)
+    sys.stdout.flush()
+
+    returncode = proc.wait()
+    if returncode != 0:
         with open(log_path, "a", encoding="utf-8") as ap:
-            ap.write(f"\n[Tests failed — exit code {result.returncode}.]\n")
-    return result.returncode
+            ap.write(f"\n[Tests failed — exit code {returncode}.]\n")
+    return returncode
 
 
 def _prompt_test_failure(is_crash: bool = False) -> str:
@@ -1311,36 +1391,40 @@ def _run_test_pass(
         print_success(f"{label.capitalize()} tests passed.")
         return True
 
-    # Check whether the failure looks transient (VM crash or file lock)
+    # Only auto-retry when the failure looks transient (VM crash or file
+    # lock) — a real test failure should go straight to the user instead of
+    # silently doubling the wait time on a run that was never going to pass.
+    # Also skip the automatic retry for the expensive full-suite ("fast")
+    # pass: doubling a multi-minute 337-file compile without asking is the
+    # exact behavior the user rejected. Cheap passes (delta, a handful of
+    # files) still auto-retry since the cost of doing so is negligible.
     transient_reason = _log_transient_failure_reason(log_path)
-    # On compiler crashes, halve concurrency for the retry — the crash is
-    # caused by too many frontend_server workers running in parallel.
-    initial_j = concurrency or min(os.cpu_count() or 8, 8)
-    retry_j = max(initial_j // 2, 2) if _log_shows_vm_crash(log_path) else None
-    if transient_reason:
+    last_log = log_path
+    last_j = concurrency or min(os.cpu_count() or 8, 8)
+    if transient_reason and label != "fast":
+        # On compiler crashes, halve concurrency for the retry — the crash is
+        # caused by too many frontend_server workers running in parallel.
+        initial_j = concurrency or min(os.cpu_count() or 8, 8)
+        retry_j = max(initial_j // 2, 2) if _log_shows_vm_crash(log_path) else None
         print_warning(f"Transient failure detected: {transient_reason}")
         if retry_j:
             print_warning(f"Retrying with reduced concurrency (-j {retry_j})...")
         else:
             print_warning("Retrying tests once...")
-    else:
-        print_warning("Retrying tests once...")
-    retry_name = f"{date_str}_{time_str}_dart_test_{label}_retry.log"
-    retry_path = reports_dir / retry_name
-    retry_code = _run_dart_test_to_file(
-        project_dir, env, retry_path, extra_args, concurrency=retry_j,
-    )
-    if retry_code == 0:
-        if transient_reason:
+        retry_name = f"{date_str}_{time_str}_dart_test_{label}_retry.log"
+        retry_path = reports_dir / retry_name
+        retry_code = _run_dart_test_to_file(
+            project_dir, env, retry_path, extra_args, concurrency=retry_j,
+        )
+        if retry_code == 0:
             print_success(f"{label.capitalize()} tests passed on retry (confirmed transient).")
-        else:
-            print_success(f"{label.capitalize()} tests passed on retry.")
-        return True
+            return True
+        last_log = retry_path
+        last_j = retry_j or last_j
 
-    # Both runs failed — enter the interactive retry loop. Track the last
-    # concurrency used so "fewer workers" can halve it progressively.
-    last_log = retry_path
-    last_j = retry_j or min(os.cpu_count() or 8, 8)
+    # Real failure (or transient retry also failed) — enter the interactive
+    # retry loop so the user decides whether to spend more time re-running.
+    # Track the last concurrency used so "fewer workers" can halve it further.
     while True:
         # Surface transient failure diagnosis so the user knows Retry is safe.
         is_crash = _log_shows_vm_crash(last_log)
@@ -1585,23 +1669,115 @@ def _auto_tune_concurrency(
     return best_j
 
 
+def _find_delta_test_files(project_dir: Path) -> list[str]:
+    """Identify test files affected by uncommitted changes (staged + unstaged).
+
+    Maps changed lib/ source files to their corresponding test/ files by
+    mirroring the directory structure:
+      lib/src/rules/core/context_rules.dart → test/rules/core/*_test.dart
+      lib/src/scan/foo.dart                 → test/scan/*_test.dart
+      lib/src/config/bar.dart               → test/config/*_test.dart
+
+    Also includes any directly changed test files. Returns paths relative to
+    project_dir, suitable for passing to `dart test <file> <file> ...`.
+
+    Returns an empty list when git is unavailable, the diff is too broad
+    (infrastructure files like tiers.dart or all_rules.dart changed), or no
+    test files can be mapped — the caller should fall back to the full suite.
+    """
+    use_shell = get_shell_mode()
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--name-only", "HEAD"],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            shell=use_shell,
+        )
+        # Also pick up staged-but-not-yet-in-HEAD changes.
+        staged = subprocess.run(
+            ["git", "diff", "--name-only", "--cached"],
+            cwd=project_dir,
+            capture_output=True,
+            text=True,
+            timeout=10,
+            shell=use_shell,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+
+    changed = set()
+    for line in (result.stdout + "\n" + staged.stdout).splitlines():
+        line = line.strip().replace("\\", "/")
+        if line:
+            changed.add(line)
+
+    if not changed:
+        return []
+
+    # Infrastructure files affect everything — bail to full suite.
+    # Changes to tiers, registration, or the plugin entry point can break any test.
+    # pubspec.yaml is NOT here: version bumps and metadata don't affect tests.
+    _BROAD_IMPACT = (
+        "lib/saropa_lints.dart",
+        "lib/src/rules/all_rules.dart",
+        "lib/src/tiers.dart",
+    )
+    for broad in _BROAD_IMPACT:
+        if broad in changed:
+            return []
+
+    test_dir = project_dir / "test"
+    delta_files: set[str] = set()
+
+    for path in changed:
+        # Directly changed test files — include as-is.
+        if path.startswith("test/") and path.endswith("_test.dart"):
+            full = project_dir / path.replace("/", os.sep)
+            if full.exists():
+                delta_files.add(path)
+            continue
+
+        # Map lib/src/<subpath>/foo.dart → test/<subpath>/*_test.dart
+        # The test dir mirrors lib/src/ but drops the "src/" segment.
+        if not path.startswith("lib/src/"):
+            continue
+        # Strip lib/src/ prefix to get the relative subpath.
+        rel = path[len("lib/src/"):]
+        # Get the directory portion (e.g. "rules/core" from "rules/core/context_rules.dart").
+        parts = rel.replace("\\", "/").rsplit("/", 1)
+        if len(parts) < 2:
+            # Top-level lib/src/ file — look for test/<stem>*_test.dart.
+            stem = Path(parts[0]).stem
+            for t in test_dir.glob(f"{stem}*_test.dart"):
+                delta_files.add(str(t.relative_to(project_dir)).replace("\\", "/"))
+            continue
+        subdir = parts[0]
+        stem = Path(parts[1]).stem
+        # Look for test files in the mirrored directory.
+        test_subdir = test_dir / subdir.replace("/", os.sep)
+        if not test_subdir.is_dir():
+            continue
+        # Collect all test files that share the stem prefix or live in the same dir.
+        # e.g. context_rules.dart → context_rules_test.dart, context_rules_fp_test.dart
+        for t in test_subdir.glob(f"{stem}*_test.dart"):
+            delta_files.add(str(t.relative_to(project_dir)).replace("\\", "/"))
+
+    return sorted(delta_files)
+
+
 def run_tests(project_dir: Path) -> bool:
-    """Step 7: Run the fast unit-test pass (excludes `slow`-tagged integration tests).
+    """Step 7: Run tests — delta only when possible, full suite as fallback.
 
-    The `slow` tag marks the full-repo scanner / cross-file integration tests (tens
-    of seconds each: scan_runner, fixture_lint_integration, fix_application dry-run,
-    cross_file, health_history). Excluding them here cuts the local publish test step
-    from ~157s to ~89s. They are NOT skipped overall — both ci.yml and publish.yml run
-    the full `dart test` on every push and release, so the slow integration tests are
-    verified in CI before any tag is created.
+    Detects changed files via git diff and runs only their corresponding tests
+    (seconds, not minutes). If delta passes, done — CI runs the full suite on
+    push. If delta fails, stops immediately. Falls back to the full fast suite
+    only when no delta can be computed (broad infrastructure changes or clean
+    tree). Slow-tagged integration tests are always deferred to CI.
 
-    Why not run the slow tests locally too: `dart test -t slow` still compiles all 317
-    test files to discover the tag, then runs only the five — so a second local pass
-    costs ~158s on top of the fast pass (worse than one full run). Splitting only pays
-    off because CI carries the slow set. To run them locally on demand:
-        dart test -t slow
-
-    All test output is written to a log file only (no test output on terminal).
+    Test output streams to both the terminal (live progress bar with pass/skip/fail
+    counts) and a log file (full output). Failures print immediately on the terminal.
     On failure, shows log path and a short excerpt, then prompts Continue or Abort.
     Test temp is redirected outside the project tree so the scanner does not pick up
     kernel-cache .dill files. Full integration tests (dart analyze in example/) are
@@ -1610,6 +1786,14 @@ def run_tests(project_dir: Path) -> bool:
     print_header("STEP 7: RUNNING TESTS")
 
     clear_flutter_lock()
+
+    # Clear cached test kernels so tag changes (@Tags) take effect immediately.
+    # Without this, dart test reuses stale .dill files that don't reflect new tags.
+    test_cache = project_dir / ".dart_tool" / "test"
+    if test_cache.is_dir():
+        import shutil
+        shutil.rmtree(test_cache, ignore_errors=True)
+        print_info("Cleared stale test cache (.dart_tool/test)")
 
     test_dir = project_dir / "test"
     if not test_dir.exists():
@@ -1628,7 +1812,29 @@ def run_tests(project_dir: Path) -> bool:
     reports_dir = project_dir / "reports" / date_str
     reports_dir.mkdir(parents=True, exist_ok=True)
 
-    # Fast pass only: excludes slow-tagged integration tests (run in CI instead).
+    # Delta pass: run only tests affected by uncommitted changes.
+    # Compiles a handful of files instead of 340+, giving feedback in seconds.
+    delta_files = _find_delta_test_files(project_dir)
+    if delta_files:
+        print_info(f"Delta: {len(delta_files)} test file(s) affected by changes")
+        for f in delta_files:
+            print_colored(f"    {f}", Color.CYAN)
+        # Pass the specific test files — dart test compiles only these.
+        # No tag filter: delta runs exactly these files, even if slow-tagged.
+        delta_ok = _run_test_pass(
+            project_dir, env, reports_dir, date_str, time_str,
+            label="delta",
+            extra_args=delta_files,
+            concurrency=tuned_j,
+        )
+        if not delta_ok:
+            return False
+        # Delta passed — CI runs the full suite on push, no need to repeat it here.
+        print_success("Delta tests passed. Full suite deferred to CI.")
+        return True
+
+    # No delta (broad infrastructure changes or clean tree) — run full suite.
+    print_info("No delta (broad changes or clean tree) — running full suite")
     return _run_test_pass(
         project_dir, env, reports_dir, date_str, time_str,
         label="fast", extra_args=["-x", "slow"],
