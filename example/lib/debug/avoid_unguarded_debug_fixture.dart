@@ -107,6 +107,7 @@ import 'package:saropa_lints_example/flutter_mocks.dart';
 
 dynamic data;
 dynamic x;
+void cleanupResources() {}
 
 // BAD: Should trigger avoid_unguarded_debug
 // expect_lint: avoid_unguarded_debug
@@ -123,4 +124,58 @@ void _good307_someMethod() {
 // debug() is always allowed — it's production-safe
   debug('Missing data');
   debug('Important warning', level: DebugLevels.Warning);
+}
+
+// GOOD: Early-return guard — all subsequent code is debug-only
+void _good_earlyReturnGuard() {
+  if (!kDebugMode) return;
+  debugPrint('Only runs in debug mode');
+}
+
+// GOOD: Early-return guard inside try block
+Future<void> _good_earlyReturnGuardInTry() async {
+  try {
+    if (!kDebugMode) return;
+    debugPrint('Build identity banner');
+    debugPrint('Version info');
+  } on Object catch (error, stack) {
+    debugPrint('exception path — allowed by catch guard');
+  }
+}
+
+// GOOD: Early-return guard with braces around return
+void _good_earlyReturnGuardBraces() {
+  if (!kDebugMode) {
+    return;
+  }
+  debugPrint('Also guarded');
+}
+
+// GOOD: Early-return guard using == false form
+void _good_earlyReturnGuardEqualsFalse() {
+  if (kDebugMode == false) return;
+  debugPrint('Guarded by equality check');
+}
+
+// GOOD: Early-return guard using != true form
+void _good_earlyReturnGuardNotEqualTrue() {
+  if (kDebugMode != true) return;
+  debugPrint('Guarded by inequality check');
+}
+
+// GOOD: Multi-statement early-return guard with cleanup before return
+void _good_earlyReturnGuardMultiStatement() {
+  if (!kDebugMode) {
+    cleanupResources();
+    return;
+  }
+  debugPrint('Guarded despite multi-statement block');
+}
+
+// BAD: debugPrint BEFORE the early-return guard — not protected
+// expect_lint: avoid_unguarded_debug
+void _bad_debugPrintBeforeGuard() {
+  debugPrint('This is BEFORE the guard'); // LINT — not yet guarded
+  if (!kDebugMode) return;
+  debugPrint('This is after the guard — ok');
 }

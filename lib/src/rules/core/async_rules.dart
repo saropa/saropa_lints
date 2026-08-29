@@ -6,6 +6,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
+import '../../early_exit_guard_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../target_matcher_utils.dart';
 import '../../fixes/async/avoid_redundant_async_fix.dart';
@@ -1740,7 +1741,8 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
 
       final String condition = statement.expression.toSource();
       if (!condition.contains('mounted')) continue;
-      if (!_containsEarlyExit(statement.thenStatement)) continue;
+      // Uses shared exit detection from early_exit_guard_utils.dart
+      if (!containsEarlyExit(statement.thenStatement)) continue;
 
       // Guard found — check no await exists between guard and target
       if (!_hasAwaitInRange(block, statement.end, target.offset)) {
@@ -1750,22 +1752,7 @@ class CheckMountedAfterAsyncRule extends SaropaLintRule {
     return false;
   }
 
-  /// Returns true if the statement unconditionally exits (return/throw).
-  bool _containsEarlyExit(Statement statement) {
-    if (statement is ReturnStatement) return true;
-    if (statement is ExpressionStatement &&
-        statement.expression is ThrowExpression) {
-      return true;
-    }
-    if (statement is Block) {
-      return statement.statements.any(
-        (Statement s) =>
-            s is ReturnStatement ||
-            (s is ExpressionStatement && s.expression is ThrowExpression),
-      );
-    }
-    return false;
-  }
+  // Exit detection uses shared containsEarlyExit from early_exit_guard_utils
 
   /// Returns true if any await expression exists in [body] between
   /// [startOffset] and [endOffset].

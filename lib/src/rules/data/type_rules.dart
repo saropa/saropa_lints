@@ -15,6 +15,7 @@ import '../../fixes/type/remove_null_assertion_fix.dart';
 import '../../fixes/type/replace_unnecessary_type_assertion_fix.dart';
 import '../../fixes/type/remove_unnecessary_type_cast_fix.dart';
 import '../../fixes/type/replace_var_with_type_fix.dart';
+import '../../early_exit_guard_utils.dart';
 import '../../saropa_lint_rule.dart';
 
 /// Warns when casting to an extension type.
@@ -1406,27 +1407,10 @@ class AvoidNullAssertionRule extends SaropaLintRule {
   }
 
   /// Checks if the node comes after an early return in the if statement.
+  /// Uses [endsWithEarlyExit] from the shared early_exit_guard_utils.
   bool _isAfterEarlyReturn(IfStatement ifStmt, AstNode node) {
-    final Statement thenStmt = ifStmt.thenStatement;
-
-    // Check if then branch is an early exit (return, throw, break, continue)
-    bool isEarlyExit = false;
-    if (thenStmt is ReturnStatement) {
-      isEarlyExit = true;
-    } else if (thenStmt is ExpressionStatement &&
-        thenStmt.expression is ThrowExpression) {
-      isEarlyExit = true;
-    } else if (thenStmt is Block && thenStmt.statements.isNotEmpty) {
-      final Statement lastStmt = thenStmt.statements.last;
-      if (lastStmt is ReturnStatement) {
-        isEarlyExit = true;
-      } else if (lastStmt is ExpressionStatement &&
-          lastStmt.expression is ThrowExpression) {
-        isEarlyExit = true;
-      }
-    }
-
-    if (!isEarlyExit) return false;
+    // The then-branch must end with an exit (return/throw)
+    if (!endsWithEarlyExit(ifStmt.thenStatement)) return false;
 
     // The node should NOT be in the then branch
     return !_containsNode(ifStmt.thenStatement, node);

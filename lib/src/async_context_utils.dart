@@ -10,6 +10,10 @@
 library;
 
 import 'package:analyzer/dart/ast/ast.dart';
+// Import + re-export containsEarlyExit from the shared utility so this
+// file can use it internally AND existing importers resolve it unchanged.
+import 'early_exit_guard_utils.dart' show containsEarlyExit;
+export 'early_exit_guard_utils.dart' show containsEarlyExit;
 import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
@@ -159,22 +163,8 @@ bool hasAncestorMountedCheck(AstNode node) {
 // Early Exit Detection
 // ---------------------------------------------------------------------------
 
-/// Checks if a statement contains an early exit (return or throw).
-///
-/// Used by mounted guard detection to verify that negated guards
-/// (`if (!mounted) return;`) actually exit the function.
-bool containsEarlyExit(Statement stmt) {
-  if (stmt is ReturnStatement) return true;
-  if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
-    return true;
-  }
-  // Handle block with single return/throw
-  if (stmt is Block && stmt.statements.length == 1) {
-    return containsEarlyExit(stmt.statements.first);
-  }
-
-  return false;
-}
+// containsEarlyExit is now defined in early_exit_guard_utils.dart and
+// re-exported above — callers of this file resolve it unchanged.
 
 // ---------------------------------------------------------------------------
 // BuildContext Parameter Helpers

@@ -5,6 +5,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
+import '../../early_exit_guard_utils.dart';
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/debug/replace_with_debug_print_fix.dart';
@@ -176,60 +177,87 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
     });
   }
 
-  /// Check if the node is inside a debug guard
+  /// Check if the node is inside a debug guard.
+  ///
+  /// Recognizes two patterns:
+  /// 1. Direct wrapping: `if (kDebugMode) { debugPrint(...); }`
+  /// 2. Early-return guard: `if (!kDebugMode) return;` preceding the call
+  ///
+  /// Note: the walk crosses closure/function-expression boundaries. This is
+  /// correct for compile-time constants like `kDebugMode` (the closure can
+  /// only be created inside the guarded zone), but is technically unsound for
+  /// runtime-mutable guards (`isDebugActive`, etc.) where the value could
+  /// change between closure creation and execution. This is a pre-existing
+  /// design trade-off shared with the wrapping-if pattern — all guard
+  /// patterns accepted by `_isDebugGuardCondition` are treated identically.
   bool _isGuarded(AstNode node) {
-    AstNode? current = node.parent;
-
-    while (current != null) {
-      // Check for if statement guards
-      if (current is IfStatement) {
-        if (_isDebugGuardCondition(current.expression)) {
-          return true;
-        }
-      }
-
-      // Check for enclosing method/function named debug* or _debug*
-      // These are debug helper methods that are only called from guarded sites
-      if (current is MethodDeclaration) {
-        final String name = current.name.lexeme;
-        if (name.startsWith('debug') || name.startsWith('_debug')) {
-          return true;
-        }
-      }
-      if (current is FunctionDeclaration) {
-        final String name = current.name.lexeme;
-        if (name.startsWith('debug') || name.startsWith('_debug')) {
-          return true;
-        }
-      }
-
-      // Check for assert statement (debug code by definition)
-      if (current is AssertStatement) {
-        return true;
-      }
-
-      // Check for catch clause (exception handling is allowed)
-      if (current is CatchClause) {
-        return true;
-      }
-
-      // Check for try statement's catch blocks
-      if (current is TryStatement) {
-        // If we're in a catch block, it's allowed
-        for (final CatchClause catchClause in current.catchClauses) {
-          if (_isDescendantOf(node, catchClause)) {
-            return true;
-          }
-        }
-      }
-
-      current = current.parent;
+    // Early-return guard: `if (!kDebugMode) return;` dominates all
+    // subsequent statements in the same block
+    if (hasDominatingEarlyExitGuard(
+      node,
+      predicate: _isNegatedDebugGuardCondition,
+      exitTest: endsWithEarlyExit,
+    )) {
+      return true;
     }
 
+    // Wrapping guards, debug-named helpers, assert, and catch
+    return _hasAncestorGuard(node);
+  }
+
+  /// Walk ancestors checking for wrapping debug guards, debug-named
+  /// methods/functions, assert statements, and catch clauses.
+  bool _hasAncestorGuard(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      if (_isGuardingAncestor(current, node)) return true;
+      current = current.parent;
+    }
     return false;
   }
 
-  /// Check if a condition is a debug guard
+  /// True when [ancestor] is a guard that protects [target] from
+  /// needing an explicit debug check.
+  bool _isGuardingAncestor(AstNode ancestor, AstNode target) {
+    // Wrapping if-statement guard: `if (kDebugMode) { ... }`
+    if (ancestor is IfStatement) {
+      return _isDebugGuardCondition(ancestor.expression);
+    }
+    // Enclosing method/function named debug* or _debug*
+    if (ancestor is MethodDeclaration || ancestor is FunctionDeclaration) {
+      return _isDebugNamedDeclaration(ancestor);
+    }
+    // Assert statement — debug code by definition
+    if (ancestor is AssertStatement) return true;
+    // Catch clause — exception handling is allowed
+    if (ancestor is CatchClause) return true;
+    // Inside a try statement's catch block
+    if (ancestor is TryStatement) {
+      return ancestor.catchClauses.any(
+        (CatchClause c) => _isDescendantOf(target, c),
+      );
+    }
+    return false;
+  }
+
+  /// True when [node] is a method or function declaration starting with
+  /// `debug` or `_debug` — debug helpers only called from guarded sites.
+  bool _isDebugNamedDeclaration(AstNode node) {
+    String? lexeme;
+    if (node is MethodDeclaration) {
+      lexeme = node.name.lexeme;
+    } else if (node is FunctionDeclaration) {
+      lexeme = node.name.lexeme;
+    }
+    if (lexeme == null) return false;
+    return lexeme.startsWith('debug') || lexeme.startsWith('_debug');
+  }
+
+  /// Check if a condition is a debug guard (positive form).
+  ///
+  /// Matches `kDebugMode`, `DebugType.*.isDebug`, `MainSettings.isDebugMode`,
+  /// `isDebug*` local variables, `is*Debug` patterns, and
+  /// `UserPreferenceType.Debug*`.
   bool _isDebugGuardCondition(Expression condition) {
     final String source = condition.toSource();
 
@@ -278,6 +306,42 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
       current = current.parent;
     }
     return false;
+  }
+
+  /// True when [condition] is the negation of a recognized debug guard,
+  /// e.g. `!kDebugMode`, `kDebugMode == false`, `kDebugMode != true`.
+  bool _isNegatedDebugGuardCondition(Expression condition) {
+    // Prefix negation: `!kDebugMode`
+    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+      return _isDebugGuardCondition(condition.operand);
+    }
+
+    if (condition is BinaryExpression) {
+      // Equality-with-false: `kDebugMode == false` or `false == kDebugMode`
+      if (condition.operator.lexeme == '==') {
+        if (_isBoolLiteral(condition.rightOperand, false)) {
+          return _isDebugGuardCondition(condition.leftOperand);
+        }
+        if (_isBoolLiteral(condition.leftOperand, false)) {
+          return _isDebugGuardCondition(condition.rightOperand);
+        }
+      }
+      // Inequality-with-true: `kDebugMode != true` or `true != kDebugMode`
+      if (condition.operator.lexeme == '!=') {
+        if (_isBoolLiteral(condition.rightOperand, true)) {
+          return _isDebugGuardCondition(condition.leftOperand);
+        }
+        if (_isBoolLiteral(condition.leftOperand, true)) {
+          return _isDebugGuardCondition(condition.rightOperand);
+        }
+      }
+    }
+    return false;
+  }
+
+  /// True when [expr] is a boolean literal matching [expected].
+  bool _isBoolLiteral(Expression expr, bool expected) {
+    return expr is BooleanLiteral && expr.value == expected;
   }
 }
 

@@ -17,6 +17,7 @@ import '../../fixes/collection/replace_with_where_or_null_fix.dart';
 import '../../fixes/collection/use_contains_key_fix.dart';
 import '../../fixes/collection/use_last_fix.dart';
 import '../../fixes/collection/use_where_or_null_fix.dart';
+import '../../early_exit_guard_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/collection/use_contains_fix.dart';
 import '../../fixes/collection/replace_unnecessary_collection_wrapper_fix.dart';
@@ -963,6 +964,10 @@ String _stripNullOps(String s) => s.replaceAll('!', '').replaceAll('?', '');
 /// - `if (list.isEmpty) return;`
 /// - `if (list.length < N) return;` where N >= 1
 /// - `if (list.length == 0) return;`
+///
+/// Uses the shared [hasDominatingEarlyExitGuard] utility to walk outward
+/// through every ancestor block (not just the nearest), so a guard in the
+/// enclosing method body covers accesses nested one block deeper.
 bool _isCollectionGuardedByEarlyReturn(AstNode node, String collectionName) {
   // Check the access name AND, for `map.keys`/`.values`/`.entries`, the
   // underlying map name (a guard on the map covers its key/value view).
@@ -970,29 +975,17 @@ bool _isCollectionGuardedByEarlyReturn(AstNode node, String collectionName) {
   final String? mapName = _underlyingMapName(collectionName);
   if (mapName != null) names.add(mapName);
 
-  // D: walk OUTWARD through every ancestor block, not just the nearest. When
-  // the access is nested one block below the guard (`if (x.isEmpty) return;`
-  // then `if (cond) { x.first; }`), the guard lives in the enclosing method
-  // block, invisible to a nearest-block-only scan.
-  AstNode? current = node;
-  while (current != null) {
-    if (current is Block) {
-      for (final Statement stmt in current.statements) {
-        // Only statements before the access, and not the one containing it.
-        if (stmt.offset >= node.offset) break;
-        if (stmt.end > node.offset) continue;
-        if (stmt is! IfStatement) continue;
-        if (stmt.elseStatement != null) continue;
-        if (!_containsEarlyExit(stmt.thenStatement)) continue;
-        for (final String n in names) {
-          if (_isEmptinessCheck(stmt.expression, n)) return true;
-        }
+  // Condition predicate: the if-condition must be an emptiness check for
+  // any of the tracked collection names.
+  return hasDominatingEarlyExitGuard(
+    node,
+    predicate: (Expression condition) {
+      for (final String n in names) {
+        if (_isEmptinessCheck(condition, n)) return true;
       }
-    }
-    current = current.parent;
-  }
-
-  return false;
+      return false;
+    },
+  );
 }
 
 /// True when [node] sits inside a `while` / `for` / `do` loop whose condition
@@ -1055,24 +1048,7 @@ bool _isCollectionGuardedByWrapper(AstNode node, String collectionName) {
   return false;
 }
 
-/// Returns true if the statement exits the current iteration/scope early:
-/// `return`, `throw`, or — inside a loop body — `continue` / `break`. A
-/// `continue`/`break` only parses inside a loop, so accepting it unconditionally
-/// is safe and recognizes `if (c.length != 1) continue;` guards.
-bool _containsEarlyExit(Statement stmt) {
-  if (stmt is ReturnStatement ||
-      stmt is ContinueStatement ||
-      stmt is BreakStatement) {
-    return true;
-  }
-  if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
-    return true;
-  }
-  if (stmt is Block) {
-    return stmt.statements.any(_containsEarlyExit);
-  }
-  return false;
-}
+// Exit detection uses shared containsEarlyExit from early_exit_guard_utils
 
 /// Checks if [condition] is an emptiness or length check for [name].
 bool _isEmptinessCheck(Expression condition, String name) {

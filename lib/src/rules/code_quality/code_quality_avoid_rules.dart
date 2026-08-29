@@ -43,6 +43,7 @@ import '../../fixes/code_quality/add_use_result_fix.dart';
 import '../../fixes/code_quality/convert_to_named_bool_param_fix.dart';
 import '../../fixes/code_quality/replace_weak_crypto_fix.dart';
 import '../../fixes/code_quality/wrap_unawaited_fix.dart';
+import '../../early_exit_guard_utils.dart';
 import '../../saropa_lint_rule.dart';
 
 class AvoidAdjacentStringsRule extends SaropaLintRule {
@@ -1414,6 +1415,8 @@ class AvoidSubstringRule extends SaropaLintRule {
   ///   `final idx = s.indexOf(';'); if (idx == -1) return;`
   /// followed by `s.substring(0, idx)` means `idx` is a valid index
   /// because the -1 case already bailed out.
+  /// Uses the shared [findPrecedingGuardInBlock] utility to detect preceding
+  /// early-exit guards that validate substring arguments or receiver length.
   static bool _hasPrecedingEarlyExitGuard(
     Block block,
     AstNode childStmt,
@@ -1424,19 +1427,15 @@ class AvoidSubstringRule extends SaropaLintRule {
     // (`if (s.isEmpty) return;`, `if (!s.startsWith('p/')) return;`,
     // `if (!pattern.hasMatch(s)) return;`) proves the bound even when the
     // substring index is a literal (empty arg-name set).
-    for (final stmt in block.statements) {
-      // Only check statements BEFORE the one containing the substring.
-      if (identical(stmt, childStmt)) break;
-      if (stmt is! IfStatement) continue;
-      if (!_containsEarlyExit(stmt.thenStatement)) continue;
-      final Expression cond = stmt.expression;
-      if (_conditionInvolvesArgs(cond, argNames) ||
+    return findPrecedingGuardInBlock(
+      block,
+      childStmt,
+      requireNoElse: false,
+      predicate: (Expression cond) =>
+          _conditionInvolvesArgs(cond, argNames) ||
           _conditionGuardsLength(cond, receiverSource) ||
-          _conditionHasRegexGuard(cond, receiverSource)) {
-        return true;
-      }
-    }
-    return false;
+          _conditionHasRegexGuard(cond, receiverSource),
+    );
   }
 
   /// True when [block] contains a preceding loop (`while` / `for` / `do`) whose
@@ -1495,21 +1494,7 @@ class AvoidSubstringRule extends SaropaLintRule {
     return ancestor.offset <= node.offset && node.end <= ancestor.end;
   }
 
-  /// True when [stmt] contains a return, break, continue, or throw —
-  /// i.e. control flow that exits the current block early.
-  static bool _containsEarlyExit(Statement stmt) {
-    if (stmt is ReturnStatement ||
-        stmt is BreakStatement ||
-        stmt is ContinueStatement) {
-      return true;
-    }
-    if (stmt is ExpressionStatement && stmt.expression is ThrowExpression) {
-      return true;
-    }
-    // Unwrap block bodies: `if (x) { return; }` is still an early exit.
-    if (stmt is Block) return stmt.statements.any(_containsEarlyExit);
-    return false;
-  }
+  // Exit detection uses shared containsEarlyExit from early_exit_guard_utils
 
   /// Collects all identifier names referenced in the substring arguments.
   ///

@@ -66,6 +66,20 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.2.4] — Unreleased
+
+### Fixed
+
+- `avoid_unguarded_debug` no longer false-positives when `debugPrint()` is dominated by an early-return guard (`if (!kDebugMode) return;`) at the top of the enclosing block. Also recognizes `kDebugMode == false`, `kDebugMode != true`, and multi-statement then-blocks ending in `return`. No action required.
+
+<details><summary>Maintenance</summary>
+
+- Extracted shared `early_exit_guard_utils.dart` — `containsEarlyExit`, `endsWithEarlyExit`, `findPrecedingGuardInBlock`, and `hasDominatingEarlyExitGuard` replace five independent reimplementations across `debug_rules.dart`, `collection_rules.dart`, `async_rules.dart`, `type_rules.dart`, and `code_quality_avoid_rules.dart`.
+
+</details>
+
+---
+
 ## [15.2.3]
 
 Major scan CLI expansion: lane control (`--lane full|light`, `--lane-stats`), CI gating by rule impact or tier (`--fail-on-impact`, `--fail-on-tier`), stale-ignore detection (`--find-stale-ignores`), SDK compatibility audit (`--check-sdk-compat`), and include/exclude glob filters for fine-grained file targeting. Eight false-positive fixes across core rules including `avoid_context_in_async_static`, `avoid_large_list_copy`, `avoid_datetime_constructor`, `no_equal_nested_conditions`, and the context-across-async family. An OOM crash fix for projects over 4 000 files adds per-file memory budgeting and adaptive RSS caps. Two new rules: `prefer_primary_constructor` (Dart 3.13+ syntax) and `require_sdk_syntax_match` (catches AI-generated code using syntax the project's SDK constraint doesn't support). [log](https://github.com/saropa/saropa_lints/blob/v15.2.3/CHANGELOG.md)
