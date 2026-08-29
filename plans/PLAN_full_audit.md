@@ -54,11 +54,10 @@ using `ScanRunner` + `enabledRuleNames` exactly as `accuracy_report.dart` alread
 | `--min-severity` | none | Post-filter: hide diagnostics below this severity |
 | `--min-impact` | none | Post-filter: hide diagnostics below this impact |
 | `--profile` | false | Emit per-rule timing (reuses `writeRuleTimingReport`) |
+| `--since` | none | Git ref — only audit files changed since this ref |
 
 No `--tier` flag — audit always means everything. No `--fail-on` — audit is informational,
 not a gate (use `quality_gate` for that).
-
-| `--since` | none | Git ref — only audit files changed since this ref |
 
 **Exit codes:**
 
@@ -491,3 +490,29 @@ Additional hardening (2026-08-29, reflection gate, round 2):
 
 **Status:** Plan complete and committed. No implementation started. Three phases defined:
 CLI (Dart), Extension UI (TypeScript), Polish.
+
+## Finish Report (2026-08-29, code review of hardening commits)
+
+Code review of the two hardening commits (910ed16e, 0681adb9) found one defect: the
+`--since` flag row (added during round 1 hardening) was inserted as a standalone table
+row separated from the Flags table by a blank line and two lines of prose, so GitHub-
+flavored Markdown would not render it as part of the table — it would appear as a stray
+line of pipe-delimited text. Fixed by moving the row into the Flags table directly above
+the `--tier`/`--fail-on` prose note. No other defects found; plan remains design-only,
+no implementation started.
+
+Reflection-gate hardening: re-verified all four line-number citations against current
+source (`scan_runner.dart:284`, `scan_runner.dart:296`, `saropa_context.dart:287`,
+`saropa_lints.dart:231`, `tiers.dart:3323`) — all unchanged since the plan was drafted,
+no drift to correct. VS Code's built-in Markdown preview was not separately checked
+against the GFM renderer used above; both use CommonMark-family table parsing so the
+same blank-line-breaks-a-table rule applies, but this was not independently confirmed.
+
+### SARIF output (brainstorm only — not scoped for v1)
+
+Deferred, out of scope for the phases above. `--format sarif` would emit SARIF 2.1.0
+instead of the native JSON schema, letting `audit` results feed GitHub code-scanning
+annotations directly on a PR diff (particularly useful combined with `--since`). Would
+require a `sarif_writer.dart` mapping diagnostic severity/impact to SARIF `level` and
+`rank`, plus a `physicalLocation` per diagnostic. Not designed further here — raised as
+a future-work candidate only.
