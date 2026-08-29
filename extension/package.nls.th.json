@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: คลอสไฟล์  ⁇  เขียนโครงการฉบับ (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: Cross-File  ⁇  การส่งออกการนําเข้ากราฟ (DOT)",
   "command.crossFile.report.title": "Saropa Lints: คลัสไฟล์  ⁇  สร้างรายงาน HTML",
+  "command.findStaleIgnores.title": "Saropa Lints: ค้นหาความคิดเห็นการละเลย",
+  "command.fixStaleIgnores.title": "Saropa Lints: แก้ไขข้อความระบุให้ละเลยสิ่งที่ไม่จำเป็น",
   "command.openViolationsWideReport.title": "Saropa Lints: เปิดผลการค้นพบ ดัชบอร์ด",
   "command.openConsolidatedDashboard.title": "Saropa Lints: เป็นการประกอบของ เปิด Dashboard แล้วเปิด",
   "command.openViolationsWideReport.category": "Saropa",

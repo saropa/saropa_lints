@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Cross-File  ⁇  Dosyaları çapraz yapın. Proje Anıtı (JSON) Yazın",
   "command.crossFile.graph.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Cross-File  ⁇  Dosyaları çapraz yapın. İhracat ve ithalat grafiği (DOT)",
   "command.crossFile.report.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Cross-File  ⁇  Dosyaları çapraz yapın. HTML Raporu Oluşturun",
+  "command.findStaleIgnores.title": "Saropa Lints: İndirgenmemiş Yorumları Bul",
+  "command.fixStaleIgnores.title": "Saropa Lints: İgnore Yorumlarını Düzelt",
   "command.openViolationsWideReport.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Açık Bulgular Tablosu (Dashboard)",
   "command.openConsolidatedDashboard.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Açın Dashboard'ı açın.",
   "command.openViolationsWideReport.category": "Saropa",

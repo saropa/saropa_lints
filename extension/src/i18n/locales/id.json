@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "Klik dua kali untuk membalikkan {severity}"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "Mengamati komentar ignore yang usang…",
+      "fixing": "Menghapus komentar ignore yang usang…"
+    },
+    "error": {
+      "findFailed": "Temukan ignore yang usang gagal: {message}",
+      "fixFailed": "Perbaiki ignores yang usang gagal: {message}",
+      "noWorkspace": "Tidak ditemukan workspace Dart/Flutter. Buka proyek dengan pubspec.yaml terlebih dahulu.",
+      "missingDep": "Tambahkan saropa_lints ke pubspec.yaml sebelum melakukan pemindaian untuk ignores yang usang."
+    },
+    "info": {
+      "noneFound": "Tidak ditemukan komentar ignore yang sudah usang.",
+      "found": "{count} ignore yang tidak valid dalam {fileCount} file. Lihat panel Problems untuk detailnya.",
+      "fixed": "Komentar ignore yang usang dihapus. Lihat panel Output untuk detailnya.",
+      "fixedInFile": "Saropa Lints: ignore yang kedaluwarsa telah diperbaiki dalam berkas ini"
+    },
+    "confirm": {
+      "fixMessage": "Ini akan menghapus komentar ignore yang tidak aktif dari file sumber Anda. Perubahan ini dapat dibatalkan dengan git. Lanjutkan?",
+      "fixAction": "Hapus ignores yang usang"
+    },
+    "diagnostic": {
+      "message": "Ignore usang: aturan '{ruleName}' tidak lagi berlaku pada baris ini."
+    },
+    "sidebar": {
+      "findLabel": "Cari ignores yang tidak aktif",
+      "findDescription": "Deteksi komentar // ignore: mati",
+      "fixLabel": "Perbaiki ignores yang usang",
+      "fixDescription": "Hapus otomatis komentar // ignore: yang mati"
+    },
+    "quickFix": {
+      "title": "Perbaiki ignores yang usang dalam berkas ini"
+    }
   }
 }

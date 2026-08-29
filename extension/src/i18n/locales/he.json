@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "לחיצה כפולה כדי להחלף {severity}"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "סריקה לחיבורים זרים שלتعليות 忽略…",
+      "fixing": "הסרתتعليמות זכירות מיותרים..."
+    },
+    "error": {
+      "findFailed": "מצא שגיאות בדמויות שנשכחו: {message}",
+      "fixFailed": "תקן איסורים ישנים נכשל: {message}",
+      "noWorkspace": "לא נמצאו תחומים עבודה Dart/Flutter. פתח פרויקט עם pubspec.yaml תחילה.",
+      "missingDep": "הוסף saropa_lints ל pubspec.yaml לפני ס캔 לחיבורים ישנים."
+    },
+    "info": {
+      "noneFound": "לא נמצאוتعليقات זכירות להתעלמות.",
+      "found": "{count} זיהויים ישנים של איסור ({fileCount} קבצים). ראה את painel הבעיות לפרטים.",
+      "fixed": "הערות זכירות שנמחקו. ראה את painel הפלט לפרטים.",
+      "fixedInFile": "Saropa Lints: איזורים ישנים שונו在这个文件中"
+    },
+    "confirm": {
+      "fixMessage": "הפעולה תמחקتعليים ישנים מהתיעודים בקבצי המקור שלך. השינויים יכולים להיות מוחקים באמצעות git. המשך?",
+      "fixAction": "הסרת איסורים ישנים"
+    },
+    "diagnostic": {
+      "message": "התעלמות ישנה: כלל '{ruleName}' כבר לא פועל בשורה זו."
+    },
+    "sidebar": {
+      "findLabel": "מצא איסורים ישנים",
+      "findDescription": "הגדרת חוקים엄격ות:",
+      "fixLabel": "תקן איסורים ישנים",
+      "fixDescription": "הסרת אוטומטיתتعليות // игнорировать:"
+    },
+    "quickFix": {
+      "title": "תקן איסורים ישנים在这个文件中"
+    }
   }
 }

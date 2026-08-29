@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "더블클릭하여 {severity} 전환"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "무시된 주석 검색 중…",
+      "fixing": "스테일 인그노어 주석 제거 중…"
+    },
+    "error": {
+      "findFailed": "기존 무시 목록 검색 실패: {message}",
+      "fixFailed": "수정 실패: {message}",
+      "noWorkspace": "Dart/Flutter 워크스페이스가 없습니다. 먼저 pubspec.yaml 프로젝트를 열어 주세요.",
+      "missingDep": "saropa_lints를 pubspec.yaml에 추가한 후 오래된 무시 항목을 스캔하십시오."
+    },
+    "info": {
+      "noneFound": "스테일 무시 주석이 발견되지 않았습니다.",
+      "found": "{count} 파일에서 {fileCount} 개의 stale ignore가 있습니다. 자세한 내용은 Problems 패널을 참조하세요.",
+      "fixed": "사용하지 않는 무시 주석이 제거되었습니다. 자세한 내용은 출력 패널을 확인하세요.",
+      "fixedInFile": "Saropa Lints: 이 파일에서 무시된 항목이 해결되었습니다"
+    },
+    "confirm": {
+      "fixMessage": "이 작업은 소스 파일에서 오래된 무시 주석을 제거합니다. 변경 내용은 git을 통해 되돌릴 수 있습니다. 계속하시겠습니까?",
+      "fixAction": "기존 무효한 무시 항목 제거"
+    },
+    "diagnostic": {
+      "message": "무효한 무시: 규칙 '{ruleName}'은 이 줄에서 더 이상 작동하지 않습니다."
+    },
+    "sidebar": {
+      "findLabel": "기존 무시 목록 찾기",
+      "findDescription": "사망한 // 무시: 주석 감지",
+      "fixLabel": "무시된 항목 정리",
+      "fixDescription": "자동으로 죽은 // ignore: 주석 제거"
+    },
+    "quickFix": {
+      "title": "이 파일의 오래된 무시 목록 수정"
+    }
   }
 }

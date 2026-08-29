@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Кросс-файл  ⁇ Напишіть проектний сніп (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: Між файлами — Експорт графа імпорту (DOT)",
   "command.crossFile.report.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Кросс-файл  ⁇ Створення HTML-доповіді",
+  "command.findStaleIgnores.title": "Saropa Lints: Знайти Старі Коментарі Ignore",
+  "command.fixStaleIgnores.title": "Saropa Lints: Виправити Старі Коментарі Зневаження",
   "command.openViolationsWideReport.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Відкрийте панель даних \"Знайдені результати\".",
   "command.openConsolidatedDashboard.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Відкрийте панель управління Dashboard.",
   "command.openViolationsWideReport.category": "Saropa",

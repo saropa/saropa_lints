@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: là người có thể Cross-File  ⁇ Viết Project Snapshot (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: là người có thể Cross-File  ⁇ Biểu đồ xuất khẩu nhập khẩu (DOT)",
   "command.crossFile.report.title": "Saropa Lints: là người có thể Cross-File  ⁇ Tạo báo cáo HTML",
+  "command.findStaleIgnores.title": "Saropa Lints: Tìm Comment Bỏ qua Cũ",
+  "command.fixStaleIgnores.title": "Saropa Lints: Sửa Bình luận Bỏ qua Cũ",
   "command.openViolationsWideReport.title": "Saropa Lints: là người có thể Mở bảng điều khiển kết quả tìm kiếm.",
   "command.openConsolidatedDashboard.title": "Saropa Lints: là người có thể Mở Dashboard ra.",
   "command.openViolationsWideReport.category": "Saropa",

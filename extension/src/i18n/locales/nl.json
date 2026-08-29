@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "Dubbelklik om {severity} te schakelen"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "Stille ignore-teksten scannen…",
+      "fixing": "Stale ignore comments verwijderen…"
+    },
+    "error": {
+      "findFailed": "Stale ignores failed: {message}",
+      "fixFailed": "Herstel verouderde ignores mislukt: {message}",
+      "noWorkspace": "Geen Dart/Flutter workspace gevonden. Open een project met pubspec.yaml eerst.",
+      "missingDep": "Voeg saropa_lints toe aan pubspec.yaml voor het scannen naar verouderde ignores."
+    },
+    "info": {
+      "noneFound": "Geen verouderde ignore opmerkingen gevonden.",
+      "found": "{count} verouderde negeren(s) in {fileCount} bestand(s). Zie het Problems-paneel voor meer informatie.",
+      "fixed": "Verouwde ignore opmerkingen verwijderd. Zie de Output-venster voor details.",
+      "fixedInFile": "Saropa Lints: verouwde ignoreren is aangepast in deze bestand"
+    },
+    "confirm": {
+      "fixMessage": "Dit zal oude ignore comments verwijderen uit je bronbestanden. De wijzigingen kunnen met git ongedaan worden gemaakt. Verder?",
+      "fixAction": "Verwijder verouderde ignores"
+    },
+    "diagnostic": {
+      "message": "Stale ignore: regel '{ruleName}' activeert zich niet meer op deze regel."
+    },
+    "sidebar": {
+      "findLabel": "Stale ignores vinden",
+      "findDescription": "Detecteer dode // ignore: opmerkingen",
+      "fixLabel": "Vermijd verouderde ignores",
+      "fixDescription": "Auto-verwijderen van dode // ignore: opmerkingen"
+    },
+    "quickFix": {
+      "title": "Vermijd verouderde ignores in deze bestand"
+    }
   }
 }

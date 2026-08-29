@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: Cross-File  ⁇  Schrijf Project Snapshot (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: Cross-File  ⁇  Export Import Graph (DOT) - De export van de invoer.",
   "command.crossFile.report.title": "Saropa Lints: Cross-File  ⁇  Genereren van HTML Rapport",
+  "command.findStaleIgnores.title": "Saropa Lints: Stale Ignore Comments vinden",
+  "command.fixStaleIgnores.title": "Saropa Lints: Fix Stale Ignore Comments",
   "command.openViolationsWideReport.title": "Saropa Lints: Open het Dashboard van de bevindingen.",
   "command.openConsolidatedDashboard.title": "Saropa Lints: Het is een _PH0_. Open het Dashboard.",
   "command.openViolationsWideReport.category": "Saropa",

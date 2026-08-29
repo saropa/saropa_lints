@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "Kilieke kwa muda mmoja ili kuchagua {severity}"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "Kuandika kwa matokeo ya ignore comments...",
+      "fixing": "Kufuta komenti ya ignore ya kipengele..."
+    },
+    "error": {
+      "findFailed": "Tazama ignores ya kifupishwa kifupishwa: {message}",
+      "fixFailed": "Fungua kipengele ya kubadilisha kwa kuzalisha kwa kuzalisha: {message}",
+      "noWorkspace": "Hakuna workspace ya Dart/Flutter. Openda project na pubspec.yaml kwa kwanza.",
+      "missingDep": "Ona saropa_lints kwenye pubspec.yaml kabla ya kifungua kwa kifungua kifungua."
+    },
+    "info": {
+      "noneFound": "Hakuna matokeo ya komenti ya ignore ya kufungua.",
+      "found": "{count} matokeo ya kusimamia kwa kuzalisha (s) katika {fileCount} faili (s). Tafuta paneli ya Problems kwa detali.",
+      "fixed": "Komenti ya ignore ya kipengele kifukuzwa. Tafuta matokeo kwenye paneli ya Output.",
+      "fixedInFile": "Saropa Lints: matokeo ya kushughulisha ya kuzalishwa katika faili hii"
+    },
+    "confirm": {
+      "fixMessage": "Hii inaondosha komento ya ignore ya kipasifika kutoka kwenye faili zako ya michezo. Mabadiliko haya inaweza kubadilishwa na git. Je, unaweza kubegani?",
+      "fixAction": "Ondoa kipengele ya ignore ya kipengele kifupi"
+    },
+    "diagnostic": {
+      "message": "Stale ignore: rule '{ruleName}' hakuna kufanya kwenye linia hii."
+    },
+    "sidebar": {
+      "findLabel": "Tazama ignores ya kipato",
+      "findDescription": "Tazama kifupi // ignore: comments",
+      "fixLabel": "Tuzaliwa kwa kuzalisha ignores ya kipengele",
+      "fixDescription": "Oto-elimina kipengele ya // ignore: comments"
+    },
+    "quickFix": {
+      "title": "Tumeua kifungu kwenye faili hili"
+    }
   }
 }

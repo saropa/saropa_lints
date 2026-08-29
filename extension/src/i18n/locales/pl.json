@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "Kliknij dwukrotnie, aby przełączyć {severity}"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "Wyszukiwanie nieużywanych komentarzy ignorowania…",
+      "fixing": "Usuwanie przestarzałych komentarzy ignorujacych…"
+    },
+    "error": {
+      "findFailed": "Znaleziono nieaktualne ignorowane pomyślnie niepowodzeniem: {message}",
+      "fixFailed": "Popraw błędy z nieaktualnymi ignorowaniami: {message}",
+      "noWorkspace": "Brak przestrzeni roboczej Dart/Flutter. Otwórz najpierw projekt pubspec.yaml.",
+      "missingDep": "Dodaj saropa_lints do pubspec.yaml przed skanowaniem nieaktywnych ignorów."
+    },
+    "info": {
+      "noneFound": "Brak znaleziono zaneglowanych komentarzy ignorowania.",
+      "found": "{count} nieuwzględnione ignorowane w {fileCount} plikach. Zobacz panel Problemy dla szczegółów.",
+      "fixed": "Usunięto stare komentarze ignorujące. Zobacz panel Wyjścia dla szczegółów.",
+      "fixedInFile": "Saropa Lints: zignorowane stale naprawione w tym pliku"
+    },
+    "confirm": {
+      "fixMessage": "Usunie to stare komentarze ignorujące z plików źródłowych. Zmiany można cofnąć za pomocą git. Czy kontynuować?",
+      "fixAction": "Usuń nieaktualne ignorowane"
+    },
+    "diagnostic": {
+      "message": "Ignorujesz regułę: reguła '{ruleName}' nie wykrywa już tego wiersza."
+    },
+    "sidebar": {
+      "findLabel": "Znajdź nieaktualne ignorowane",
+      "findDescription": "Wykryj martwe // ignore: komentarze",
+      "fixLabel": "Popraw nieaktualne ignorowane",
+      "fixDescription": "Auto-usuń martwe // ignore: komentarze"
+    },
+    "quickFix": {
+      "title": "Popraw nieaktualne ignorowane w tym pliku"
+    }
   }
 }

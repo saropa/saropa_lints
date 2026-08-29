@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "Double-cliquez pour basculer {severity}"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "Analyse des commentaires ignore périmés…",
+      "fixing": "Suppression des commentaires d'ignorance périmés…"
+    },
+    "error": {
+      "findFailed": "Trouver des ignorés périmés échoués : {message}",
+      "fixFailed": "Corriger les ignorés périmés échoués : {message}",
+      "noWorkspace": "Aucun espace de travail Dart/Flutter trouvé. Ouvrez un projet avec pubspec.yaml en premier.",
+      "missingDep": "Ajoutez saropa_lints à pubspec.yaml avant de scanner les ignorés périmés."
+    },
+    "info": {
+      "noneFound": "Aucun commentaire d'ignoration périmé trouvé.",
+      "found": "{count} ignors périmés dans {fileCount} fichier(s). Voir le panneau Problèmes pour plus de détails.",
+      "fixed": "Commentaires d'ignoration périmés supprimés. Voir le panneau de sortie pour plus de détails.",
+      "fixedInFile": "Saropa Lints : les ignorés périmés ont été corrigés dans ce fichier"
+    },
+    "confirm": {
+      "fixMessage": "Cela supprimera les commentaires d'ignorance périmés de vos fichiers sources. Les modifications peuvent être annulées avec git. Continuer ?",
+      "fixAction": "Supprimer les ignorés périmés"
+    },
+    "diagnostic": {
+      "message": "Règle '{ruleName}' ignorée : cette règle ne s'applique plus sur cette ligne."
+    },
+    "sidebar": {
+      "findLabel": "Trouver les ignorés périmés",
+      "findDescription": "Détection des commentaires // ignore: morts",
+      "fixLabel": "Corriger les ignorés périmés",
+      "fixDescription": "Suppression automatique des commentaires // ignore: morts"
+    },
+    "quickFix": {
+      "title": "Corriger les ignorés périmés dans ce fichier"
+    }
   }
 }

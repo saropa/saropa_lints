@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: Кросс-файл  ⁇  Напишите проектный снимок (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: Кросс-файл  ⁇  Экспорт Импорт График (DOT)",
   "command.crossFile.report.title": "Saropa Lints: Кросс-файл  ⁇  Создание HTML отчета.",
+  "command.findStaleIgnores.title": "Saropa Lints: Найдите устаревшие комментарии Ignore",
+  "command.fixStaleIgnores.title": "Saropa Lints: Исправить устаревшие комментарии Ignore",
   "command.openViolationsWideReport.title": "Saropa Lints: Открыть панель инструментов результатов.",
   "command.openConsolidatedDashboard.title": "Saropa Lints: это - _PH0_. Откройте панель управления.",
   "command.openViolationsWideReport.category": "Saropa",

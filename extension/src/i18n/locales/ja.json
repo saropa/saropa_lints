@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "ダブルクリックで{severity}を切り替え"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "古い無視コメントのスキャン中…",
+      "fixing": "古くなった無視コメントを削除しています…"
+    },
+    "error": {
+      "findFailed": "古い無視リストの取得に失敗しました: {message}",
+      "fixFailed": "修正失敗: {message}",
+      "noWorkspace": "Dart/Flutter ワークスペースが見つかりません。まず pubspec.yaml でプロジェクトを開いてください。",
+      "missingDep": "saropa_lintsをpubspec.yamlに追加してから、古くなった無視項目をスキャンしてください。"
+    },
+    "info": {
+      "noneFound": "古い無視コメントが見つかりません。",
+      "found": "{count} で ignore しているものが {fileCount} にあります。詳細は Problems パネルをご覧ください。",
+      "fixed": "非活性化された無視コメントが削除されました。詳細は出力パネルをご確認ください。",
+      "fixedInFile": "Saropa Lints: このファイルで無視リストが更新されました"
+    },
+    "confirm": {
+      "fixMessage": "これは、ソースファイルから古くなった無視コメントを削除します。変更はgitで元に戻せます。続行しますか？",
+      "fixAction": "古くなった無視設定を削除"
+    },
+    "diagnostic": {
+      "message": "無効な無視: ルール '{ruleName}' はこの行ではもう発火しません。"
+    },
+    "sidebar": {
+      "findLabel": "古くなった無視設定を検索",
+      "findDescription": "// 無視: コメントを検出",
+      "fixLabel": "不適な無視を修正",
+      "fixDescription": "自動的に無効な// ignore: コメントを削除"
+    },
+    "quickFix": {
+      "title": "このファイルの古くなった無視設定を修正してください"
+    }
   }
 }

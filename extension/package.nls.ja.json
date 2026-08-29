@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints:クロスファイル  ⁇ プロジェクト・スナップショット (JSON) を書き込み",
   "command.crossFile.graph.title": "Saropa Lints:クロスファイル  ⁇ 輸出輸入グラフ (DOT)",
   "command.crossFile.report.title": "Saropa Lints:クロスファイル  ⁇  HTMLレポートを生成する",
+  "command.findStaleIgnores.title": "Saropa Lints: 過期した無視コメントを検索",
+  "command.fixStaleIgnores.title": "Saropa Lints: 無効な無視コメントを修正",
   "command.openViolationsWideReport.title": "Saropa Lints: オープンな結果ダッシュボード",
   "command.openConsolidatedDashboard.title": "Saropa Lints: フォローしている ダッシュボードを開く",
   "command.openViolationsWideReport.category": "Saropa",

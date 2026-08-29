@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: חציית קבצים  ⁇  כתיבת תמונת פרויקט (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: קובץ חוצה  ⁇  גרף ייצוא-יבוא (DOT)",
   "command.crossFile.report.title": "Saropa Lints: קבצים חוצים  ⁇  ליצור דוח HTML.",
+  "command.findStaleIgnores.title": "Saropa Lints: מצאتعليמות זכריים להתעלמות",
+  "command.fixStaleIgnores.title": "Saropa Lints: תיקון הערות זכירות להתעלמות",
   "command.openViolationsWideReport.title": "Saropa Lints: פתח דשבורד ממצאים פתוחים.",
   "command.openConsolidatedDashboard.title": "Saropa Lints: זה היה חרא. פתח את דשבארד (Dashboard)",
   "command.openViolationsWideReport.category": "Saropa",

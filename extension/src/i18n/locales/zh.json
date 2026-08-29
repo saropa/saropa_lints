@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "双击切换 {severity}"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "正在扫描过期的忽略注释…",
+      "fixing": "正在移除过时的忽略注释…"
+    },
+    "error": {
+      "findFailed": "找到陈旧的忽略失败: {message}",
+      "fixFailed": "修复过期的忽略失败: {message}",
+      "noWorkspace": "未找到 Dart/Flutter 工作区。请先打开一个 pubspec.yaml 项目。",
+      "missingDep": "在扫描过期忽略项之前，添加 saropa_lints 到 pubspec.yaml。"
+    },
+    "info": {
+      "noneFound": "未找到过期的忽略注释。",
+      "found": "{count} 个已忽略的 stale 项在 {fileCount} 个文件中。详情请查看 Problems 面板。",
+      "fixed": "已移除过期的忽略注释。详情请查看输出面板。",
+      "fixedInFile": "Saropa Lints: 本文件中已修复过期的忽略项"
+    },
+    "confirm": {
+      "fixMessage": "这将从您的源文件中删除过期的忽略注释。更改可以通过 git 撤销。继续吗？",
+      "fixAction": "移除过期的忽略"
+    },
+    "diagnostic": {
+      "message": "过时的忽略：规则 '{ruleName}' 此行不再触发。"
+    },
+    "sidebar": {
+      "findLabel": "查找过期的忽略项",
+      "findDescription": "检测死 // 忽略: 注释",
+      "fixLabel": "修复过时的忽略项",
+      "fixDescription": "自动移除死掉的 // ignore: 注释"
+    },
+    "quickFix": {
+      "title": "修复此文件中过时的忽略项"
+    }
   }
 }

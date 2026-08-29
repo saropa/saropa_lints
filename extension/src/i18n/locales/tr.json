@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "İkili tıkla {severity} geçiş yap"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "İgnore yorumlarını tarıyor...",
+      "fixing": "Eski ignore yorumlarını kaldırıyor..."
+    },
+    "error": {
+      "findFailed": "Yeniden değerlendirilmemiş atlananlar bulunamadı: {message}",
+      "fixFailed": "Yeniden ignore edilenleri düzeltme başarısız: {message}",
+      "noWorkspace": "Dart/Flutter çalışma alanı bulunamadı. İlk olarak pubspec.yaml ile bir proje açın.",
+      "missingDep": "saropa_lints'ı pubspec.yaml'a ekleyin, eski görmezden gelme öğeleri taramadan önce."
+    },
+    "info": {
+      "noneFound": "İgnore yorumları bulunamadı.",
+      "found": "{count} eski ignore(s) {fileCount} dosya(s) içinde. Detaylar için Sorunlar paneline bakın.",
+      "fixed": "İgnore yorumları kaldırıldı. Detaylar için Çıktı panosunu inceleyin.",
+      "fixedInFile": "Saropa Lints: bu dosyada eski görmezlikler düzeltilmiş"
+    },
+    "confirm": {
+      "fixMessage": "Bu, kaynak dosyanızdaki eski ignore yorumlarını kaldırır. Değişiklikler git ile geri alınamaz. Devam edilsin mi?",
+      "fixAction": "Stale ignore'leri kaldır"
+    },
+    "diagnostic": {
+      "message": "İgnore edilmiş: kural '{ruleName}' bu satırda artık tetiklenmiyor."
+    },
+    "sidebar": {
+      "findLabel": "Yeniden kullanılmayan ignore'ları bul",
+      "findDescription": "Ölü // ignore: yorumlarını tespit et",
+      "fixLabel": "Yeniden değerlendirilen ignore'ları düzelt",
+      "fixDescription": "Ölüm // ignore: yorumlarını otomatik olarak kaldır"
+    },
+    "quickFix": {
+      "title": "Bu dosyadaki eski atlananları düzelt"
+    }
   }
 }

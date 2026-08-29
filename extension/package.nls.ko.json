@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: 크로스 파일  ⁇  프로젝트 스냅샷 (JSON) 을 작성합니다.",
   "command.crossFile.graph.title": "Saropa Lints: 크로스 파일  ⁇  수출 수입 그래프 (DOT)",
   "command.crossFile.report.title": "Saropa Lints: 크로스 파일  ⁇  HTML 보고서를 생성합니다.",
+  "command.findStaleIgnores.title": "Saropa Lints: 무효한 무시 주석 찾기",
+  "command.fixStaleIgnores.title": "Saropa Lints: 무시 주석 수정",
   "command.openViolationsWideReport.title": "Saropa Lints: 오픈 결과 대시보드",
   "command.openConsolidatedDashboard.title": "Saropa Lints: PH0__:::  ⁇ PH0_: 대시보드를 열고, Dashboard를 열어보세요.",
   "command.openViolationsWideReport.category": "Saropa",

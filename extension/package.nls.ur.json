@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints:۔ کراس فائل  ⁇ پروجیکٹ سنیپ شاٹ (JSON) لکھیں",
   "command.crossFile.graph.title": "Saropa Lints:۔ کراس فائل  ⁇ برآمد درآمد گراف (ڈی او ٹی)",
   "command.crossFile.report.title": "Saropa Lints:۔ کراس فائل  ⁇ HTML رپورٹ تیار کریں",
+  "command.findStaleIgnores.title": "Saropa Lints: چھوڑے گئے تخلیقی تبصرے تلاش کریں",
+  "command.fixStaleIgnores.title": "Saropa Lints: چھوڑ دیئے گئے تبصرے ترمیم کریں",
   "command.openViolationsWideReport.title": "Saropa Lints:۔ نتائج ڈیش بورڈ کھولیں",
   "command.openConsolidatedDashboard.title": "Saropa Lints:۔ ڈیش بورڈ کھولیں۔",
   "command.openViolationsWideReport.category": "Saropa",

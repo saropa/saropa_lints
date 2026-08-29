@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "Nhấp đúp để bật/tắt {severity}"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "Đang quét các chú thích bỏ qua lỗi cũ…",
+      "fixing": "Đang xóa các chú thích bỏ qua lỗi lỗi thời…"
+    },
+    "error": {
+      "findFailed": "Tìm các ignore lỗi thời đã thất bại: {message}",
+      "fixFailed": "Sửa bỏ qua lỗi đã lỗi thời: {message}",
+      "noWorkspace": "Không tìm thấy workspace Dart/Flutter. Mở một dự án với pubspec.yaml trước.",
+      "missingDep": "Thêm saropa_lints vào pubspec.yaml trước khi quét tìm các ignores lỗi thời."
+    },
+    "info": {
+      "noneFound": "Không tìm thấy bất kỳ bình luận bỏ qua nào.",
+      "found": "{count} lỗi bỏ qua (stale ignore) trong {fileCount} tệp (file). Xem bảng điều khiển Problems để biết chi tiết.",
+      "fixed": "Nhận xét bỏ qua lỗi đã bị xóa. Xem bảng điều khiển Đầu ra để xem chi tiết.",
+      "fixedInFile": "Saropa Lints: các ignores lỗi đã được sửa trong tệp này"
+    },
+    "confirm": {
+      "fixMessage": "Điều này sẽ xóa các chú thích bỏ qua lỗi cũ từ các tệp nguồn của bạn. Những thay đổi này có thể được hủy bỏ bằng git. Tiếp tục?",
+      "fixAction": "Loại bỏ các ignores lỗi thời"
+    },
+    "diagnostic": {
+      "message": "Quy tắc bỏ qua lỗi: quy tắc '{ruleName}' không còn kích hoạt trên dòng này nữa."
+    },
+    "sidebar": {
+      "findLabel": "Tìm các ignore lỗi thời",
+      "findDescription": "Nhận diện các chú thích // ignore: chết",
+      "fixLabel": "Sửa bỏ các ignore lỗi",
+      "fixDescription": "Tự động loại bỏ các chú thích // ignore: chết"
+    },
+    "quickFix": {
+      "title": "Sửa các ignore lỗi thời trong tệp này"
+    }
   }
 }

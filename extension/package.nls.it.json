@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: Cross-File  ⁇  Scrivi Project Snapshot (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: Cross-File  ⁇  Grafico delle esportazioni e importazioni (DOT)",
   "command.crossFile.report.title": "Saropa Lints: Cross-File  ⁇  Generare un report HTML.",
+  "command.findStaleIgnores.title": "Saropa Lints: Trova Commenti Ignora Obsoleti",
+  "command.fixStaleIgnores.title": "Saropa Lints: Correggi Commenti Ignora Obsoleti",
   "command.openViolationsWideReport.title": "Saropa Lints: Aprire il pannello dei risultati.",
   "command.openConsolidatedDashboard.title": "Saropa Lints: è il nome di una delle sue compagne. Apri il Dashboard.",
   "command.openViolationsWideReport.category": "Saropa",

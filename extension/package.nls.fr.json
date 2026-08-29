@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: Cross-File  ⁇  Écrire un instantané du projet (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: Fichier croisé  ⁇  Graphique des exportations et importations (DOT)",
   "command.crossFile.report.title": "Saropa Lints: Fichier croisé  ⁇  Génère un rapport HTML.",
+  "command.findStaleIgnores.title": "Saropa Lints : Trouver les commentaires d'ignorance périmés",
+  "command.fixStaleIgnores.title": "Saropa Lints : Corriger les commentaires d'ignorance périmés",
   "command.openViolationsWideReport.title": "Saropa Lints: ouvrir le tableau de bord des résultats.",
   "command.openConsolidatedDashboard.title": "Saropa Lints: Il s'agit de la réponse à une question. Ouvrez le tableau de bord.",
   "command.openViolationsWideReport.category": "Saropa",

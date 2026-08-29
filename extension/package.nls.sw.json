@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: Cross-File  ⁇  Write Project Snapshot (JSON) - Picha ya Mradi",
   "command.crossFile.graph.title": "Saropa Lints: Cross-File  ⁇  Export Import Graph (DOT) Picha ya Uagizaji wa Bidhaa za Nje.",
   "command.crossFile.report.title": "Saropa Lints: Cross-File  ⁇  Kuzalisha Ripoti ya HTML.",
+  "command.findStaleIgnores.title": "Saropa Lints: Tazama Kipengele Kifupi Kwa Kibinafsi",
+  "command.fixStaleIgnores.title": "Saropa Lints: Tuzalisha Ujumbe wa Kufunga Kifungua",
   "command.openViolationsWideReport.title": "Saropa Lints: Fungua Dashibodi ya Matokeo ya Utaftaji.",
   "command.openConsolidatedDashboard.title": "Saropa Lints:: kwa hiyo ni sawa. Fungua Dashibodi ya Dashboard.",
   "command.openViolationsWideReport.category": "Saropa",

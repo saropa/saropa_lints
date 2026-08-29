@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: Cross-File  ⁇  Write Project Snapshot (JSON) adalah sebuah proyek yang dapat",
   "command.crossFile.graph.title": "Saropa Lints: Cross-File  ⁇  Grafik Ekspor Impor (DOT)",
   "command.crossFile.report.title": "Saropa Lints: Cross-File  ⁇  Menghasilkan Laporan HTML",
+  "command.findStaleIgnores.title": "Saropa Lints: Cari Komentar Ignore yang Tidak Aktif",
+  "command.fixStaleIgnores.title": "Saropa Lints: Perbaiki Komentar Ignore yang Tidak Aktif",
   "command.openViolationsWideReport.title": "Saropa Lints: Buka Dasbor Temuan Dashboard.",
   "command.openConsolidatedDashboard.title": "Saropa Lints: adalah suatu bentuk dari _PH0_. Buka Dashboard dan buka bagian atasnya.",
   "command.openViolationsWideReport.category": "Saropa",

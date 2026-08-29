@@ -47,6 +47,8 @@
   "command.crossFile.snapshot.title": "Saropa Lints: 没有一个人. 交叉档案  ⁇  在线查询 写项目快照 (JSON)",
   "command.crossFile.graph.title": "Saropa Lints: 没有一个人. 交叉档案  ⁇  在线查询 进出口图表 (DOT) 的一个例子.",
   "command.crossFile.report.title": "Saropa Lints: 没有一个人. 交叉档案  ⁇  在线查询 生成HTML报告的产生",
+  "command.findStaleIgnores.title": "Saropa Lints：查找过期忽略注释",
+  "command.fixStaleIgnores.title": "Saropa Lints: 修复过期的忽略注释",
   "command.openViolationsWideReport.title": "Saropa Lints: 没有一个人. 打开发现仪表板",
   "command.openConsolidatedDashboard.title": "Saropa Lints: 没有一个人. 打开仪表板,然后打开Dashboard.",
   "command.openViolationsWideReport.category": "Saropa",

@@ -2110,5 +2110,39 @@
     "sidebar": {
       "severityToggleTooltip": "Clique duas vezes para alternar {severity}"
     }
+  },
+  "staleIgnores": {
+    "progress": {
+      "finding": "Varredura de comentários ignorados obsoletos...",
+      "fixing": "Removendo comentários de ignorar obsoletos…"
+    },
+    "error": {
+      "findFailed": "Encontrar ignorar obsoletos falhou: {message}",
+      "fixFailed": "Corrija ignores obsoletos falhados: {message}",
+      "noWorkspace": "Nenhum workspace Dart/Flutter encontrado. Abra um projeto com pubspec.yaml primeiro.",
+      "missingDep": "Adicione saropa_lints a pubspec.yaml antes de escanear por ignores obsoletos."
+    },
+    "info": {
+      "noneFound": "Nenhum comentário de ignorar obsoleto encontrado.",
+      "found": "{count} ignora(s) stale em {fileCount} arquivo(s). Veja o painel Problems para detalhes.",
+      "fixed": "Comentários de ignorar obsoletos removidos. Veja a painel de Saída para detalhes.",
+      "fixedInFile": "Saropa Lints: ignorados obsoletos corrigidos neste arquivo"
+    },
+    "confirm": {
+      "fixMessage": "Isso removerá comentários de ignorar obsoletos dos seus arquivos de origem. As alterações podem ser desfeitas com o git. Continuar?",
+      "fixAction": "Remova ignorados obsoletos"
+    },
+    "diagnostic": {
+      "message": "Ignorar obsoleto: a regra '{ruleName}' não aciona mais nesta linha."
+    },
+    "sidebar": {
+      "findLabel": "Encontrar ignorados obsoletos",
+      "findDescription": "Detectar comentários mortos // ignore:",
+      "fixLabel": "Corrija ignorados obsoletos",
+      "fixDescription": "Auto-remover comentários // ignore: mortos"
+    },
+    "quickFix": {
+      "title": "Corrija ignores obsoletos neste arquivo"
+    }
   }
 }
