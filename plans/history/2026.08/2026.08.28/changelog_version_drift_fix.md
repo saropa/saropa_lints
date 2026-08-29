@@ -30,3 +30,5 @@ Each Claude session that added changelog entries also bumped the version number 
 - `grep -n "^## \[" CHANGELOG.md` shows one unreleased section (`[15.2.3] — Unreleased`) followed directly by `[15.2.2]`.
 - The regex change is a strict superset of the old pattern — existing hyphen-separated headings still match.
 - The new `assert_single_unreleased_section()` would catch the exact drift pattern (multiple unreleased sections) at publish time.
+
+7. **Added `scripts/hooks/changelog_guard.py`** — dual-mode pre-commit / PostToolUse hook (same pattern as `spelling_guard.py`) that catches version drift at write time, not just publish time. Guards against multiple unreleased sections in CHANGELOG.md AND version numbers in pubspec.yaml / package.json that don't match the last published git tag. Wired into `.claude/settings.json` PostToolUse alongside the spelling guard. Exit code 2 blocks the commit or surfaces the error to Claude.
