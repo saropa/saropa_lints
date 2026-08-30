@@ -1712,6 +1712,15 @@ class AvoidUnusedParametersRule extends SaropaLintRule {
   ) {
     if (params == null || body == null) return;
 
+    // Only check bodies that contain actual implementation code.
+    // Abstract/external methods produce EmptyFunctionBody (`;`), native methods
+    // produce NativeFunctionBody — neither has code that could reference params,
+    // so flagging them is a false positive (#319).  Checking positively for the
+    // two implementation body types (block `{}` and expression `=>`) is more
+    // robust than enumerating the no-op types, since any future body subclass
+    // without implementation is automatically excluded.
+    if (body is! BlockFunctionBody && body is! ExpressionFunctionBody) return;
+
     // Collect parameter names
     final Map<String, FormalParameter> paramMap = <String, FormalParameter>{};
     for (final FormalParameter param in params.parameters) {

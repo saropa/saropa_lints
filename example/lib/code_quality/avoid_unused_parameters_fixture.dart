@@ -122,3 +122,23 @@ void _good161_process(String data, int count) {
 
 // Or mark as intentionally unused:
 void process(String data, int _) {}
+
+// GOOD: Abstract method parameters define the contract, not an implementation.
+// They cannot be "used" because there is no body — must not trigger (#319).
+abstract interface class NoteRepo {
+  Future<void> get({
+    required String id,
+    required String? userId,
+    required bool markViewed,
+  });
+}
+
+// GOOD: Plain abstract class methods are the same — no body means no usage.
+abstract class BaseService {
+  void execute(String command, int timeout);
+}
+
+// GOOD: External methods also have no implementation body.
+class NativeHelper {
+  external void compute(int value);
+}

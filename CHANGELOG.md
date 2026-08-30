@@ -77,6 +77,7 @@ This patch moves `log_level`, `lane`, and `memory_mode` configuration from the `
 - **Audit report keyboard navigation** — use ↑/↓ arrow keys to move between rows and Enter to open the file at that diagnostic. A "no matches" state now appears when filters exclude all results.
 - **Audit baseline diffing** — `--save-baseline` saves the current audit as a project baseline at `.saropa/audit_baseline.json`; `--baseline` compares against the saved baseline and tags each diagnostic as new or unchanged. The sidebar quick-pick shows a "Compare to baseline" option when a baseline exists, and the report webview has a "Save as baseline" button and new/unchanged filter chips.
 - **Migrate Config** — `dart run saropa_lints migrate-config` and a sidebar button ("Migrate config keys") automatically move `log_level`, `lane`, and `memory_mode` from the old plugin block to `analysis_options_custom.yaml`. Safe to run multiple times; already-migrated keys are skipped.
+- **Configurable `max_declarations_per_file`** — set `max_declarations_per_file: N` in `analysis_options_custom.yaml` to allow up to N top-level declarations before `prefer_single_declaration_per_file` fires (default 1). No action required — existing behavior is unchanged.
 
 ### Fixed
 
