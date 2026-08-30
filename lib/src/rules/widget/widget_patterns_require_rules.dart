@@ -37,12 +37,14 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
-  /// Offers "Wrap in Expanded" as the quick fix — keeps text visible
-  /// instead of hiding it behind ellipsis (#320).
+  /// Two context-aware fixes: "Wrap in Expanded" inside Row/Column/Flex,
+  /// "Add maxLines" everywhere else. Only one activates per location (#320).
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
         WrapTextInExpandedFix(context: context),
+    ({required CorrectionProducerContext context}) =>
+        AddMaxLinesToTextFix(context: context),
   ];
 
   static const LintCode _code = LintCode(
