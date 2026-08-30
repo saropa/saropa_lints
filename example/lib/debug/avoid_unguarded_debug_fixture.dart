@@ -222,3 +222,11 @@ void _good_reversedOperandTrueNotEquals() {
   if (true != kDebugMode) return;
   debugPrint('Guarded by reversed inequality');
 }
+
+// GOOD: Chained variable indirection — two hops to kDebugMode
+void _good_chainedVariableIndirection() {
+  final isDebug = kDebugMode;
+  final alsoDebug = isDebug;
+  if (!alsoDebug) return;
+  debugPrint('Guarded via two-hop chain');
+}

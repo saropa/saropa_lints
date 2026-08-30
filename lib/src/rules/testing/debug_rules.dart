@@ -295,12 +295,12 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
       return true;
     }
 
-    // Variable indirection: `final isDebug = kDebugMode;` then
-    // `if (isDebug) { ... }` or `if (!isDebug) return;` — resolve the
-    // identifier to its final/const initializer and check recursively
-    final Expression? initializer = _resolveLocalInitializer(condition);
-    if (initializer != null) {
-      return _isDebugGuardCondition(initializer);
+    // Variable indirection: `final isDebug = kDebugMode;` or chained
+    // `final a = kDebugMode; final b = a;` — resolve through up to 3
+    // levels of final/const assignment and check each initializer
+    final Expression? resolved = _resolveChainedInitializer(condition);
+    if (resolved != null) {
+      return _isDebugGuardCondition(resolved);
     }
 
     return false;
@@ -354,17 +354,43 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
     return expr is BooleanLiteral && expr.value == expected;
   }
 
-  /// Resolve a [SimpleIdentifier] to the initializer of a `final` or `const`
-  /// variable declared in an enclosing block.
+  /// Follow a chain of `final`/`const` local variable assignments up to
+  /// [_maxIndirectionDepth] levels to find the terminal initializer.
   ///
-  /// Returns `null` if the identifier isn't a simple local variable, isn't
-  /// final/const (mutable vars can be reassigned, breaking the guard), or if
-  /// no declaration with a matching name is found in ancestor blocks.
-  Expression? _resolveLocalInitializer(Expression expr) {
-    if (expr is! SimpleIdentifier) return null;
-    final String name = expr.name;
+  /// Example: `final a = kDebugMode; final b = a;` — resolving `b` yields
+  /// `kDebugMode` after two hops. Returns `null` if the chain breaks (no
+  /// declaration found, mutable var, or depth exceeded). Tracks visited
+  /// names to prevent infinite loops on circular references.
+  Expression? _resolveChainedInitializer(Expression expr) {
+    // Track visited variable names to prevent cycles
+    final Set<String> visited = {};
+    Expression current = expr;
 
-    // Walk ancestor blocks looking for the variable declaration
+    for (int depth = 0; depth < _maxIndirectionDepth; depth++) {
+      if (current is! SimpleIdentifier) return null;
+      final String name = current.name;
+
+      // Cycle detection — a variable referencing itself (impossible in
+      // valid Dart, but defensive against malformed AST)
+      if (!visited.add(name)) return null;
+
+      final Expression? initializer = _findLocalInitializer(current, name);
+      if (initializer == null) return null;
+
+      // If the initializer is itself a simple identifier, follow the chain
+      if (initializer is SimpleIdentifier) {
+        current = initializer;
+        continue;
+      }
+      // Terminal expression — return it for the caller to test
+      return initializer;
+    }
+    return null;
+  }
+
+  /// Find the initializer of a `final`/`const` local variable named [name]
+  /// declared in an enclosing block of [expr].
+  Expression? _findLocalInitializer(Expression expr, String name) {
     AstNode? current = expr.parent;
     while (current != null) {
       if (current is Block) {
@@ -391,6 +417,10 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
     }
     return null;
   }
+
+  /// Maximum depth for following variable indirection chains.
+  /// Keeps resolution bounded — deeper chains are unlikely in practice.
+  static const int _maxIndirectionDepth = 3;
 }
 
 /// Warns when `// ignore:` comments don't have a preceding explanatory comment.

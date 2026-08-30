@@ -87,9 +87,18 @@ Consumers refactored:
 - `type_rules.dart` — `_isAfterEarlyReturn()` uses `endsWithEarlyExit`
 - `code_quality_avoid_rules.dart` — `_hasPrecedingEarlyExitGuard()` uses `findPrecedingGuardInBlock`
 
+### Hardening (2026-08-29, follow-up)
+
+- **Closure boundary safety:** `hasDominatingEarlyExitGuard` gained a `stopAtClosureBoundary` parameter. Runtime-mutable guards (collection emptiness checks) now stop at closure/function boundaries by default. Compile-time constants (`kDebugMode`) opt out with `stopAtClosureBoundary: false` since closures created in the guarded zone are safe.
+- **`endsWithEarlyExit` break/continue:** Now recognizes `BreakStatement` and `ContinueStatement`, matching `containsEarlyExit` coverage.
+- **Variable-indirection guard detection:** `_isDebugGuardCondition` resolves `final`/`const` local variables to their initializers via `_resolveLocalInitializer`. Patterns like `final isDebug = kDebugMode; if (!isDebug) return;` are accepted. Mutable `var` assignments are rejected — they can be reassigned after the guard check.
+- **New fixture tests:** Variable indirection (final, const, mutable rejection), for-loop guard, reversed operand order (`false == kDebugMode`, `true != kDebugMode`).
+
 ### Known limitations (pre-existing, documented)
 
-The ancestor walk crosses closure/function-expression boundaries. For compile-time constants (`kDebugMode`) this is correct — the closure can only be created inside the guarded zone. For runtime-mutable guards (`isDebugActive`, `MainSettings.isDebugMode`, etc.) this is technically unsound if the guard changes between closure creation and execution. This trade-off is shared with the pre-existing wrapping-`if` pattern and is documented in a new comment on `_isGuarded()`.
+The ancestor walk crosses closure/function-expression boundaries when `stopAtClosureBoundary: false` is set. For compile-time constants (`kDebugMode`) this is correct — the closure can only be created inside the guarded zone. For runtime-mutable guards (`isDebugActive`, `MainSettings.isDebugMode`, etc.) this is technically unsound if the guard changes between closure creation and execution — these use the default `stopAtClosureBoundary: true`.
+
+Variable-indirection resolution only follows one level of indirection (`final x = kDebugMode;`) — chained assignments (`final a = kDebugMode; final b = a;`) are not followed. The resolver stops at function/closure boundaries and only inspects `VariableDeclarationStatement` nodes in enclosing blocks.
 
 ### Files changed
 

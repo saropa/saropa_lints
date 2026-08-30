@@ -136,6 +136,12 @@ bool hasDominatingEarlyExitGuard(
 }
 
 /// True when [node] is a closure or function boundary that defers execution.
+///
+/// Includes MethodDeclaration and FunctionDeclaration as defensive stops —
+/// the enclosing function's body Block is always checked before the walk
+/// reaches these, so same-function guards are found. These just prevent
+/// the walk from escaping into class or file scope where guard statements
+/// are impossible.
 bool _isClosureBoundary(AstNode node) {
   return node is FunctionExpression ||
       node is MethodDeclaration ||
