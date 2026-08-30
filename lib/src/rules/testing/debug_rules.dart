@@ -5,6 +5,7 @@ import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 
+import '../../analyzer_compat.dart';
 import '../../early_exit_guard_utils.dart';
 import '../../mode_constants_utils.dart';
 import '../../saropa_lint_rule.dart';
@@ -354,10 +355,12 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
     return expr is BooleanLiteral && expr.value == expected;
   }
 
-  /// Follow a chain of `final`/`const` local variable assignments up to
+  /// Follow a chain of `final`/`const` variable assignments up to
   /// [_maxIndirectionDepth] levels to find the terminal initializer.
   ///
-  /// Example: `final a = kDebugMode; final b = a;` — resolving `b` yields
+  /// Resolves local variables, top-level constants, and static class
+  /// fields — all via pure AST walk (no type resolution). Example:
+  /// `final a = kDebugMode; final b = a;` — resolving `b` yields
   /// `kDebugMode` after two hops. Returns `null` if the chain breaks (no
   /// declaration found, mutable var, or depth exceeded). Tracks visited
   /// names to prevent infinite loops on circular references.
@@ -374,7 +377,11 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
       // valid Dart, but defensive against malformed AST)
       if (!visited.add(name)) return null;
 
-      final Expression? initializer = _findLocalInitializer(current, name);
+      // Try local scope first, then fall back to static element resolution
+      // for top-level constants and static class fields
+      final Expression? initializer =
+          _findLocalInitializer(current, name) ??
+          _resolveStaticInitializer(current);
       if (initializer == null) return null;
 
       // If the initializer is itself a simple identifier, follow the chain
@@ -389,12 +396,18 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
   }
 
   /// Find the initializer of a `final`/`const` local variable named [name]
-  /// declared in an enclosing block of [expr].
+  /// declared in an enclosing block of [expr], BEFORE the usage site.
+  ///
+  /// Only considers declarations whose offset precedes [expr] — a forward
+  /// reference is invalid Dart and would be unsound to trust as a guard.
   Expression? _findLocalInitializer(Expression expr, String name) {
+    final int usageOffset = expr.offset;
     AstNode? current = expr.parent;
     while (current != null) {
       if (current is Block) {
         for (final Statement stmt in current.statements) {
+          // Only check declarations before the usage site
+          if (stmt.offset >= usageOffset) break;
           if (stmt is! VariableDeclarationStatement) continue;
           final VariableDeclarationList declList = stmt.variables;
           // Only trust final/const — mutable vars can be reassigned
@@ -413,6 +426,77 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
           current is FunctionDeclaration) {
         break;
       }
+      current = current.parent;
+    }
+    return null;
+  }
+
+  /// Resolve a [SimpleIdentifier] to the initializer of a top-level or
+  /// static class `final`/`const` variable in the same compilation unit.
+  ///
+  /// Pure AST walk — does NOT use `.element` or type resolution, keeping
+  /// this rule in the light lane for fast analysis.
+  Expression? _resolveStaticInitializer(SimpleIdentifier identifier) {
+    final CompilationUnit? unit = _findCompilationUnit(identifier);
+    if (unit == null) return null;
+
+    final String targetName = identifier.name;
+    return _findFieldInitializerInUnit(unit, targetName);
+  }
+
+  /// Walk a CompilationUnit's top-level and class-level declarations to
+  /// find the initializer of a `final`/`const` field matching [targetName].
+  Expression? _findFieldInitializerInUnit(
+    CompilationUnit unit,
+    String targetName,
+  ) {
+    for (final CompilationUnitMember member in unit.declarations) {
+      // Top-level variable declarations
+      if (member is TopLevelVariableDeclaration) {
+        final Expression? init =
+            _matchVariableDecl(member.variables, targetName);
+        if (init != null) return init;
+      }
+      // Static fields inside classes/mixins/extensions
+      if (member is ClassDeclaration) {
+        final Expression? init =
+            _findStaticFieldInClass(member.bodyMembers, targetName);
+        if (init != null) return init;
+      }
+    }
+    return null;
+  }
+
+  /// Search class/mixin members for a static field matching [name].
+  Expression? _findStaticFieldInClass(
+    List<ClassMember> members,
+    String name,
+  ) {
+    for (final ClassMember member in members) {
+      if (member is! FieldDeclaration || !member.isStatic) continue;
+      final Expression? init = _matchVariableDecl(member.fields, name);
+      if (init != null) return init;
+    }
+    return null;
+  }
+
+  /// Match a variable declaration list for a final/const [name] with an
+  /// initializer.
+  Expression? _matchVariableDecl(VariableDeclarationList list, String name) {
+    if (!list.isFinal && !list.isConst) return null;
+    for (final VariableDeclaration decl in list.variables) {
+      if (decl.name.lexeme == name && decl.initializer != null) {
+        return decl.initializer;
+      }
+    }
+    return null;
+  }
+
+  /// Walk up from [node] to find the enclosing CompilationUnit.
+  CompilationUnit? _findCompilationUnit(AstNode node) {
+    AstNode? current = node;
+    while (current != null) {
+      if (current is CompilationUnit) return current;
       current = current.parent;
     }
     return null;

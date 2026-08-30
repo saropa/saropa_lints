@@ -98,7 +98,7 @@ Consumers refactored:
 
 The ancestor walk crosses closure/function-expression boundaries when `stopAtClosureBoundary: false` is set. For compile-time constants (`kDebugMode`) this is correct — the closure can only be created inside the guarded zone. For runtime-mutable guards (`isDebugActive`, `MainSettings.isDebugMode`, etc.) this is technically unsound if the guard changes between closure creation and execution — these use the default `stopAtClosureBoundary: true`.
 
-Variable-indirection resolution only follows one level of indirection (`final x = kDebugMode;`) — chained assignments (`final a = kDebugMode; final b = a;`) are not followed. The resolver stops at function/closure boundaries and only inspects `VariableDeclarationStatement` nodes in enclosing blocks.
+Variable-indirection resolution follows chains up to 3 levels deep with cycle detection. It resolves local `final`/`const` variables (via AST block walk, offset-guarded to prevent forward-reference resolution) and same-file top-level/static class `const`/`final` fields (via CompilationUnit walk). Cross-file resolution is not supported — would require session-level library access. All resolution is pure AST (no `.element` or type resolution), keeping the rule in the light analysis lane.
 
 ### Files changed
 

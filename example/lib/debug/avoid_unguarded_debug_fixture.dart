@@ -230,3 +230,12 @@ void _good_chainedVariableIndirection() {
   if (!alsoDebug) return;
   debugPrint('Guarded via two-hop chain');
 }
+
+// GOOD: Top-level const assigned from kDebugMode — name doesn't
+// match debug patterns, resolved via static element
+const _buildModeFlag = kDebugMode;
+
+void _good_topLevelConstIndirection() {
+  if (!_buildModeFlag) return;
+  debugPrint('Guarded via top-level const');
+}
