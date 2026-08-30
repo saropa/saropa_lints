@@ -453,14 +453,18 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
     for (final CompilationUnitMember member in unit.declarations) {
       // Top-level variable declarations
       if (member is TopLevelVariableDeclaration) {
-        final Expression? init =
-            _matchVariableDecl(member.variables, targetName);
+        final Expression? init = _matchVariableDecl(
+          member.variables,
+          targetName,
+        );
         if (init != null) return init;
       }
       // Static fields inside classes/mixins/extensions
       if (member is ClassDeclaration) {
-        final Expression? init =
-            _findStaticFieldInClass(member.bodyMembers, targetName);
+        final Expression? init = _findStaticFieldInClass(
+          member.bodyMembers,
+          targetName,
+        );
         if (init != null) return init;
       }
     }
@@ -468,10 +472,7 @@ class AvoidUnguardedDebugRule extends SaropaLintRule {
   }
 
   /// Search class/mixin members for a static field matching [name].
-  Expression? _findStaticFieldInClass(
-    List<ClassMember> members,
-    String name,
-  ) {
+  Expression? _findStaticFieldInClass(List<ClassMember> members, String name) {
     for (final ClassMember member in members) {
       if (member is! FieldDeclaration || !member.isStatic) continue;
       final Expression? init = _matchVariableDecl(member.fields, name);

@@ -66,7 +66,10 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.2.4] — Unreleased
+## [15.2.4]
+
+This patch release focuses on refining the avoid_unguarded_debug rule to eliminate several false positives. The rule now correctly recognizes early-exit returns and safely resolves variable-indirection chains for debug mode checks. Behind the scenes, early-exit and guard-evaluation utilities were unified across multiple core rules to ensure consistent behavior moving forward. [log](https://github.com/saropa/saropa_lints/blob/v15.2.4/CHANGELOG.md)
+
 
 ### Fixed
 
