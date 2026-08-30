@@ -14,6 +14,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/source/source_range.dart';
 
 import '../../android_manifest_utils.dart';
+import '../../fixes/widget/wrap_text_in_expanded_fix.dart';
 import '../../info_plist_utils.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -36,11 +37,24 @@ class RequireTextOverflowHandlingRule extends SaropaLintRule {
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
+  /// Offers "Wrap in Expanded" as the quick fix — keeps text visible
+  /// instead of hiding it behind ellipsis (#320).
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WrapTextInExpandedFix(context: context),
+  ];
+
   static const LintCode _code = LintCode(
     'require_text_overflow_handling',
     '[require_text_overflow_handling] Text displaying dynamic content (user input, API data, translations) without overflow handling can break layouts when the text is longer than expected. Unbounded text pushes sibling widgets off-screen, triggers RenderFlex overflow errors in Row/Column contexts, and creates inconsistent UI across locales with varying text lengths. {v3}',
+    // Wrapping guidance first — ellipsis is a last resort, not the default fix.
+    // AI agents were blindly adding ellipsis, hiding text users need to read.
     correctionMessage:
-        'Add overflow: TextOverflow.ellipsis and maxLines to limit visible lines, or wrap in Expanded/Flexible within Row/Column to constrain the available width.',
+        'Wrap in Expanded or Flexible to constrain width and let text wrap naturally. '
+        'Only use overflow: TextOverflow.ellipsis when truncation is intentional '
+        '(e.g. list tiles, chip labels). For multi-line content, set maxLines '
+        'to a value > 1 to keep text readable.',
     severity: DiagnosticSeverity.WARNING,
   );
 

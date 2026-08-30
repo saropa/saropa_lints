@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/forms/change_to_on_user_interaction_fix.dart';
+import '../../fixes/widget/wrap_text_in_expanded_fix.dart';
 
 // =============================================================================
 // Shared Constants
@@ -251,10 +252,7 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
 /// Row(
 ///   children: [
 ///     Expanded(
-///       child: Text(
-///         userName,
-///         overflow: TextOverflow.ellipsis,
-///       ),
+///       child: Text(userName), // wraps naturally within Row
 ///     ),
 ///   ],
 /// )
@@ -275,11 +273,22 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  /// Offers "Wrap in Expanded" as the quick fix — keeps text visible
+  /// instead of hiding it behind ellipsis (#320).
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        WrapTextInExpandedFix(context: context),
+  ];
+
   static const LintCode _code = LintCode(
     'require_text_overflow_in_row',
     '[require_text_overflow_in_row] Text child element inside a Row build tree has no overflow handling. When text content exceeds the available width, Flutter renders yellow and black diagonal overflow stripes that break the visual layout. Users see unreadable, clipped content with an ugly error indicator instead of gracefully truncated or wrapped text. {v3}',
+    // Wrapping guidance first — ellipsis hides text and should not be the default.
     correctionMessage:
-        'Add overflow: TextOverflow.ellipsis to the Text widget, or wrap it in an Expanded or Flexible widget to constrain its width within the Row layout.',
+        'Wrap the Text in Expanded or Flexible to constrain its width and let '
+        'text wrap naturally within the Row. Only add overflow: TextOverflow.ellipsis '
+        'when truncation is intentional (e.g. list tiles, chip labels).',
     severity: DiagnosticSeverity.WARNING,
   );
 

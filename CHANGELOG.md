@@ -70,10 +70,6 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 This patch moves `log_level`, `lane`, and `memory_mode` configuration from the `plugins > saropa_lints:` block in `analysis_options.yaml` to top-level keys in `analysis_options_custom.yaml`, eliminating false `unsupported_option` warnings from the Dart SDK's plugin-block validator. Projects using the old location get a deprecation warning and automatic fallback — the keys still work from the plugin block, but moving them to the custom file silences the warnings.
 
-### Fixed
-
-- `log_level`, `lane`, and `memory_mode` plugin configuration keys no longer trigger `unsupported_option` warnings from the Dart SDK analyzer. These keys now live as top-level entries in `analysis_options_custom.yaml` instead of under `plugins > saropa_lints:`. Projects still using the old location get a deprecation warning with the key's value honored as a fallback; `dart run saropa_lints init` generates the updated layout automatically.
-
 ### Added
 
 - **Full Audit CLI** — `dart run saropa_lints audit <dir>` runs every rule (pedantic + stylistic) against a codebase regardless of the project's configured tier. Produces enriched JSON with per-diagnostic `tier` and `category` fields. Supports `--since <ref>` to audit only changed files, `--min-severity`/`--min-impact` post-filters, `--profile` timing, and `--exclude-globs`/`--include-globs`.
@@ -84,8 +80,9 @@ This patch moves `log_level`, `lane`, and `memory_mode` configuration from the `
 
 ### Fixed
 
+- `log_level`, `lane`, and `memory_mode` plugin configuration keys no longer trigger `unsupported_option` warnings from the Dart SDK analyzer. These keys now live as top-level entries in `analysis_options_custom.yaml` instead of under `plugins > saropa_lints:`. Projects still using the old location get a deprecation warning with the key's value honored as a fallback; `dart run saropa_lints init` generates the updated layout automatically.
 - `prefer_sorted_parameters` no longer conflicts with `dart format`. The rule now respects `always_put_required_named_parameters_first`: required named parameters come first, then optional named parameters, each group sorted alphabetically. Includes a quick fix that reorders parameters automatically. ([#321](https://github.com/saropa/saropa_lints/issues/321))
-- `require_text_overflow_handling` and `require_text_overflow_in_row` correction messages no longer default to `TextOverflow.ellipsis`. The guidance now recommends wrapping in `Expanded`/`Flexible` first — ellipsis is a last resort when truncation is intentional. This prevents AI agents from blindly hiding text behind ellipsis. ([#320](https://github.com/saropa/saropa_lints/issues/320))
+- `require_text_overflow_handling` and `require_text_overflow_in_row` correction messages no longer default to `TextOverflow.ellipsis`. The guidance now recommends wrapping in `Expanded`/`Flexible` first — ellipsis is a last resort when truncation is intentional. Both rules now offer a "Wrap in Expanded" quick fix in the IDE lightbulb menu. ([#320](https://github.com/saropa/saropa_lints/issues/320))
 - `prefer_single_declaration_per_file` no longer fires on sealed class hierarchies. Dart requires sealed subtypes in the same library, so co-locating them is mandatory, not a style violation. ([#322](https://github.com/saropa/saropa_lints/issues/322))
 - `avoid_unused_parameters` no longer fires on abstract, external, or native method declarations. These methods have no implementation body, so their parameters define the interface contract and cannot be "used." ([#319](https://github.com/saropa/saropa_lints/issues/319))
 
