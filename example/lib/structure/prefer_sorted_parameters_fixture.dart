@@ -139,3 +139,19 @@ void _good1053f() {}
 
 // GOOD: single named param — nothing to sort
 void _good1053g({required String only}) {}
+
+// BAD: constructor with unsorted required named params
+class _Bad1053Widget {
+  // expect_lint: prefer_sorted_parameters
+  _Bad1053Widget({required this.zebra, required this.alpha}); // LINT
+  final String zebra;
+  final String alpha;
+}
+
+// GOOD: constructor with required-first alphabetical named params
+class _Good1053Widget {
+  _Good1053Widget({required this.alpha, required this.zebra, this.beta});
+  final String alpha;
+  final String zebra;
+  final String? beta;
+}

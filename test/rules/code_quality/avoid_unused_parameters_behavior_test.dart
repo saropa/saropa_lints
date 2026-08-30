@@ -58,7 +58,11 @@ abstract interface class NoteRepo {
   });
 }
 ''');
-      expect(diags, isEmpty, reason: 'abstract methods have no body to use params in');
+      expect(
+        diags,
+        isEmpty,
+        reason: 'abstract methods have no body to use params in',
+      );
     });
 
     test('silent on abstract class methods', () async {
@@ -67,7 +71,11 @@ abstract class BaseService {
   void execute(String command, int timeout);
 }
 ''');
-      expect(diags, isEmpty, reason: 'abstract methods define contracts, not usage');
+      expect(
+        diags,
+        isEmpty,
+        reason: 'abstract methods define contracts, not usage',
+      );
     });
 
     test('silent on external methods', () async {
@@ -76,7 +84,11 @@ class NativeHelper {
   external void compute(int value);
 }
 ''');
-      expect(diags, isEmpty, reason: 'external methods have no implementation body');
+      expect(
+        diags,
+        isEmpty,
+        reason: 'external methods have no implementation body',
+      );
     });
 
     test('silent on override methods', () async {
@@ -103,7 +115,11 @@ void process(String data, int _count) {
   print(data);
 }
 ''');
-      expect(diags, isEmpty, reason: 'underscore-prefixed params are intentionally unused');
+      expect(
+        diags,
+        isEmpty,
+        reason: 'underscore-prefixed params are intentionally unused',
+      );
     });
 
     test('silent when all parameters are used', () async {

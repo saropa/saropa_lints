@@ -1280,8 +1280,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
           if (_extendsSealedClassInFile(member, sealedClassNames)) continue;
           majorCount++;
           // Capture the first class that exceeds the threshold
-          if (excessClass == null &&
-              majorCount > maxDeclarationsPerFile) {
+          if (excessClass == null && majorCount > maxDeclarationsPerFile) {
             excessClass = member;
           }
         } else if (member is EnumDeclaration) {
@@ -1302,9 +1301,7 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
 
         // Skip if all classes are abstract final with only static members
         // (pure constant / utility namespaces co-located for discoverability)
-        if (!hasEnum &&
-            !hasMixin &&
-            _allClassesAreStaticNamespaces(node)) {
+        if (!hasEnum && !hasMixin && _allClassesAreStaticNamespaces(node)) {
           return;
         }
 
@@ -1316,13 +1313,11 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
       // the optional max_sealed_hierarchy_lines threshold is configured,
       // nudge the developer to use part/part-of to split the subtypes.
       if (sealedClassNames.isNotEmpty && maxSealedHierarchyLines > 0) {
-        final int lineCount =
-            node.lineInfo.getLocation(node.end).lineNumber;
+        final int lineCount = node.lineInfo.getLocation(node.end).lineNumber;
         if (lineCount > maxSealedHierarchyLines) {
           // Report on the first sealed class in the file
           for (final CompilationUnitMember member in node.declarations) {
-            if (member is ClassDeclaration &&
-                member.sealedKeyword != null) {
+            if (member is ClassDeclaration && member.sealedKeyword != null) {
               reporter.atNode(member);
               return;
             }

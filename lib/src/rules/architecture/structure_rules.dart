@@ -1497,12 +1497,10 @@ class PreferSortedParametersRule extends SaropaLintRule {
   bool get usesTypeResolution => true;
 
   @override
-  String get exampleBad =>
-      'void f({String? apple, required String zebra}) {}';
+  String get exampleBad => 'void f({String? apple, required String zebra}) {}';
 
   @override
-  String get exampleGood =>
-      'void f({required String zebra, String? apple}) {}';
+  String get exampleGood => 'void f({required String zebra, String? apple}) {}';
 
   /// Alias: prefer_sorted_parameter
   static const LintCode _code = LintCode(

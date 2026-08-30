@@ -66,9 +66,9 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.2.5] — Unreleased
+## [15.2.5]
 
-This patch moves `log_level`, `lane`, and `memory_mode` configuration from the `plugins > saropa_lints:` block in `analysis_options.yaml` to top-level keys in `analysis_options_custom.yaml`, eliminating false `unsupported_option` warnings from the Dart SDK's plugin-block validator. Projects using the old location get a deprecation warning and automatic fallback — the keys still work from the plugin block, but moving them to the custom file silences the warnings.
+This patch moves `log_level`, `lane`, and `memory_mode` configuration from the `plugins > saropa_lints:` block in `analysis_options.yaml` to top-level keys in `analysis_options_custom.yaml`, eliminating false `unsupported_option` warnings from the Dart SDK's plugin-block validator. Projects using the old location get a deprecation warning and automatic fallback — the keys still work from the plugin block, but moving them to the custom file silences the warnings. [log](https://github.com/saropa/saropa_lints/blob/v15.2.5/CHANGELOG.md)
 
 ### Added
 

@@ -44,6 +44,9 @@ class SortNamedParametersFix extends SaropaFixProducer {
   /// Rebuilds the parameter list with required named params first
   /// (alphabetical), then optional named (alphabetical), preserving
   /// positional params, annotations, default values via toSource().
+  /// Note: toSource() may lose trailing comments attached to individual
+  /// params and collapses multi-line params to single-line; dart format
+  /// will re-format the result afterward.
   static String _buildSortedParamList(FormalParameterList paramList) {
     final List<_ParamInfo> required = <_ParamInfo>[];
     final List<_ParamInfo> optional = <_ParamInfo>[];
@@ -96,12 +99,16 @@ class SortNamedParametersFix extends SaropaFixProducer {
     // Direct hit on the parameter list.
     if (node is FormalParameterList) return node;
 
-    // The diagnostic is on the function/method name — check parent types.
+    // The diagnostic is on the function/method/constructor name — check
+    // parent types to locate the parameter list.
     final AstNode? parent = node.parent;
     if (parent is FunctionDeclaration) {
       return parent.functionExpression.parameters;
     }
     if (parent is MethodDeclaration) {
+      return parent.parameters;
+    }
+    if (parent is ConstructorDeclaration) {
       return parent.parameters;
     }
 

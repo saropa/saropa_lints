@@ -107,9 +107,7 @@ String buildMinimalConfig(
   // analysis_options.yaml) to avoid unsupported_option warnings from the
   // Dart SDK's plugin-block validator, which hardcodes the allowed key set.
   buf.writeln('log_level: info # off | error | warning | info | debug');
-  buf.writeln(
-    '# lane: light # full | light (default when absent: light)',
-  );
+  buf.writeln('# lane: light # full | light (default when absent: light)');
   buf.writeln();
 
   // Platform settings (no auto-detection available — user controls these)

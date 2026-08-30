@@ -15,6 +15,12 @@ The `PreferSortedParametersRule` enforced a single flat alphabetical sort across
 
 The fix partitions named parameters into required and optional lists during the visitor pass. A required parameter appearing after an optional parameter flags the violation immediately (grouping error). Otherwise, each group is checked for alphabetical order independently via `_isUnsorted()`. This matches `dart format`'s output exactly: `{required String alpha, required String zebra, String? gamma}` is valid even though `gamma` < `zebra` in flat sort order.
 
-A quick fix (`SortNamedParametersFix`) was added that rebuilds the parameter list with required named params first (alphabetical) then optional named params (alphabetical), preserving positional params, annotations, default values, and type annotations via `toSource()`.
+A quick fix (`SortNamedParametersFix`) was added that rebuilds the parameter list with required named params first (alphabetical) then optional named params (alphabetical), preserving positional params, annotations, default values, and type annotations via `toSource()`. Documented limitation: `toSource()` may lose trailing comments and collapses multi-line params; `dart format` re-formats afterward.
 
-Test: `dart test test/rules/architecture/structure_rules_test.dart --name "PreferSortedParametersRule"` — passed.
+### Hardening (v8)
+
+Constructor support was added via `context.addConstructorDeclaration` — Widget constructors commonly have many named params that benefit from the same ordering enforcement. The quick fix's `_findParameterList` was updated to handle `ConstructorDeclaration` parent nodes. Fixtures were expanded with constructor BAD/GOOD cases, positional-only guards, empty-param guards, and single-param guards.
+
+Verified: Dart can't mix `[]` optional positional and `{}` named params in the same list, so the fix's positional-vs-named partition is safe. Case-sensitive `compareTo` is correct because Dart parameter names follow lowerCamelCase convention.
+
+Test: `dart test test/rules/architecture/structure_rules_test.dart --name "PreferSortedParametersRule"` — passed (when unrelated compile error in `code_quality_prefer_rules.dart` is absent). Static analysis of both changed files: 0 issues.

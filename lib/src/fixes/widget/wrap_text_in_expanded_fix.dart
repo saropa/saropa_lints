@@ -37,13 +37,12 @@ class WrapTextInExpandedFix extends SaropaFixProducer {
 
     // The diagnostic is reported atNode(constructorName), so walk up
     // to the enclosing InstanceCreationExpression (the full Text(...)).
-    final InstanceCreationExpression? textWidget =
-        node.thisOrAncestorOfType<InstanceCreationExpression>();
+    final InstanceCreationExpression? textWidget = node
+        .thisOrAncestorOfType<InstanceCreationExpression>();
     if (textWidget == null) return;
 
     // Only wrap if the Text widget's constructor is actually "Text".
-    final String constructorName =
-        textWidget.constructorName.type.name.lexeme;
+    final String constructorName = textWidget.constructorName.type.name.lexeme;
     if (constructorName != 'Text') return;
 
     // Guard: only offer Expanded when inside a Flex ancestor (Row/Column/Flex).
@@ -99,12 +98,11 @@ class AddMaxLinesToTextFix extends SaropaFixProducer {
     if (node == null) return;
 
     // Walk up to the enclosing InstanceCreationExpression.
-    final InstanceCreationExpression? textWidget =
-        node.thisOrAncestorOfType<InstanceCreationExpression>();
+    final InstanceCreationExpression? textWidget = node
+        .thisOrAncestorOfType<InstanceCreationExpression>();
     if (textWidget == null) return;
 
-    final String constructorName =
-        textWidget.constructorName.type.name.lexeme;
+    final String constructorName = textWidget.constructorName.type.name.lexeme;
     if (constructorName != 'Text') return;
 
     // Only offer maxLines when NOT inside a Flex — Expanded is better there.
