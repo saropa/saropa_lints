@@ -15,6 +15,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/element/type.dart';
+import '../../config/max_declarations_config.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/code_quality/prefer_dot_shorthand_fix.dart';
 import '../../fixes/code_quality/prefer_returning_conditional_expressions_fix.dart';
@@ -1217,9 +1218,17 @@ class PassOptionalArgumentRule extends SaropaLintRule {
   }
 }
 
-/// Warns when a file contains multiple top-level declarations.
+/// Warns when a file contains too many top-level declarations.
 ///
-/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v3
+/// Since: v0.1.4 | Updated: v4.13.0 | Rule version: v4
+///
+/// Sealed class hierarchies are exempt — Dart requires sealed subtypes in
+/// the same library, so they are not counted toward the threshold.
+///
+/// **Configuration** (in `analysis_options_custom.yaml`):
+/// ```yaml
+/// max_declarations_per_file: 1  # default; raise for data-class-heavy projects
+/// ```
 ///
 /// Example of **bad** code:
 /// ```dart
@@ -1246,7 +1255,17 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
     SaropaContext context,
   ) {
     context.addCompilationUnit((CompilationUnit node) {
-      // Count significant top-level declarations
+      // Collect names of sealed classes in this file — Dart requires their
+      // subtypes to live in the same library, so co-location is mandatory.
+      final Set<String> sealedClassNames = <String>{};
+      for (final CompilationUnitMember member in node.declarations) {
+        if (member is ClassDeclaration && member.sealedKeyword != null) {
+          sealedClassNames.add(member.nameToken.lexeme);
+        }
+      }
+
+      // Count significant top-level declarations, excluding classes that
+      // are part of a sealed hierarchy (they MUST be in the same file).
       int classCount = 0;
       int enumCount = 0;
       int mixinCount = 0;
@@ -1254,6 +1273,9 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
 
       for (final CompilationUnitMember member in node.declarations) {
         if (member is ClassDeclaration) {
+          // Skip subtypes of a sealed class declared in this file —
+          // Dart requires sealed subtypes in the same library
+          if (_extendsSealedClassInFile(member, sealedClassNames)) continue;
           classCount++;
           if (classCount == 2) {
             secondClass = member;
@@ -1265,9 +1287,11 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
         }
       }
 
-      // Report if there are multiple major declarations
+      // Report when declarations exceed the configured threshold (default 1).
+      // The threshold is configurable via `max_declarations_per_file:` in
+      // analysis_options_custom.yaml.
       final int majorDeclarations = classCount + enumCount + mixinCount;
-      if (majorDeclarations > 1 && secondClass != null) {
+      if (majorDeclarations > maxDeclarationsPerFile && secondClass != null) {
         // Skip if it looks like a private helper class
         if (secondClass.nameToken.lexeme.startsWith('_')) return;
 
@@ -1282,6 +1306,43 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
         reporter.atNode(secondClass);
       }
     });
+  }
+
+  /// Returns true when [cls] extends, implements, or mixes in a sealed class
+  /// whose name is in [sealedNames] (i.e. declared in the same file).
+  ///
+  /// Covers all three ways a class can be a direct subtype of a sealed class:
+  /// `extends`, `implements`, and `with` (for sealed mixin classes).
+  static bool _extendsSealedClassInFile(
+    ClassDeclaration cls,
+    Set<String> sealedNames,
+  ) {
+    if (sealedNames.isEmpty) return false;
+
+    // Check `extends` clause
+    final ExtendsClause? extendsClause = cls.extendsClause;
+    if (extendsClause != null) {
+      final String superName = extendsClause.superclass.name.lexeme;
+      if (sealedNames.contains(superName)) return true;
+    }
+
+    // Check `implements` clause (sealed subtypes can also use implements)
+    final ImplementsClause? implementsClause = cls.implementsClause;
+    if (implementsClause != null) {
+      for (final NamedType iface in implementsClause.interfaces) {
+        if (sealedNames.contains(iface.name.lexeme)) return true;
+      }
+    }
+
+    // Check `with` clause (sealed mixin classes can be mixed in)
+    final WithClause? withClause = cls.withClause;
+    if (withClause != null) {
+      for (final NamedType mixin in withClause.mixinTypes) {
+        if (sealedNames.contains(mixin.name.lexeme)) return true;
+      }
+    }
+
+    return false;
   }
 
   /// Returns true when every [ClassDeclaration] in [unit] is `abstract final`

@@ -118,3 +118,23 @@ class _bad214_Bar {} // Should be in separate file
 void _good214() {
   // In compliant code, each file contains only one top-level public declaration.
 }
+
+// GOOD: Sealed class hierarchies are exempt — Dart requires subtypes
+// in the same library, so co-location is mandatory (not a style choice).
+// See: https://github.com/saropa/saropa_lints/issues/322
+//
+// Uses `_` prefix so these don't affect the BAD-case count above.
+// The sealed-hierarchy skip is also covered by a dedicated unit test.
+sealed class _good214_ShareResult {
+  const _good214_ShareResult();
+}
+
+// Subtype via `extends` — exempt from the declaration count
+final class _good214_ShareResultCreated extends _good214_ShareResult {
+  const _good214_ShareResultCreated();
+}
+
+// Subtype via `implements` — also exempt (sealed subtypes can use either)
+final class _good214_ShareResultCanceled implements _good214_ShareResult {
+  const _good214_ShareResultCanceled();
+}
