@@ -105,9 +105,37 @@
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
 
-// BAD: Should trigger prefer_sorted_parameters
+// BAD: unsorted within the same group (both optional)
 // expect_lint: prefer_sorted_parameters
 void _bad1053({int z = 0, int a = 0}) {} // z before a — not alphabetical
 
-// GOOD: Should NOT trigger prefer_sorted_parameters
+// BAD: optional named param before required named param
+// (violates dart format's required-first convention)
+// expect_lint: prefer_sorted_parameters
+void _bad1053b({String? apple, required String zebra}) {} // LINT
+
+// BAD: required params unsorted
+// expect_lint: prefer_sorted_parameters
+void _bad1053c({required int z, required int a}) {} // LINT
+
+// GOOD: both optional, alphabetical
 void _good1053({int a = 0, int z = 0}) {} // a before z — alphabetical
+
+// GOOD: required first (alphabetical), then optional (alphabetical)
+// — matches dart format output
+void _good1053b({required String alpha, required String beta, String? gamma}) {}
+
+// GOOD: single required before single optional — no conflict with dart format
+void _good1053c({required String zebra, String? apple}) {}
+
+// GOOD: positional-only params are ignored entirely by this rule
+void _good1053d(int z, int a, String b) {}
+
+// GOOD: mixed positional + named — only named params are checked
+void _good1053e(int z, {required String alpha, String? beta}) {}
+
+// GOOD: no params at all
+void _good1053f() {}
+
+// GOOD: single named param — nothing to sort
+void _good1053g({required String only}) {}

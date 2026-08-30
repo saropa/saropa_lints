@@ -24,6 +24,7 @@ import '../../fixes/structure/remove_double_slash_imports_fix.dart';
 import '../../fixes/structure/remove_library_name_fix.dart';
 import '../../fixes/structure/remove_unnecessary_nullable_return_type_fix.dart';
 import '../../fixes/structure/remove_unnecessary_reassignment_fix.dart';
+import '../../fixes/structure/sort_named_parameters_fix.dart';
 import '../../fixes/return/inline_immediate_return_fix.dart';
 import '../../saropa_lint_rule.dart';
 
@@ -1446,22 +1447,28 @@ class MaxImportsRule extends SaropaLintRule {
   }
 }
 
-/// Warns when function parameters are not in alphabetical order.
+/// Warns when named parameters are not in alphabetical order within their
+/// required/optional group.
 ///
-/// Since: v0.1.2 | Updated: v4.13.0 | Rule version: v6
+/// Since: v0.1.2 | Updated: v4.13.0 | Rule version: v7
 ///
-/// Consistent parameter ordering improves readability.
+/// Respects `dart format`'s `always_put_required_named_parameters_first`
+/// convention: required named parameters come first, then optional named
+/// parameters, each group sorted alphabetically. This avoids conflicts
+/// between the formatter and this lint rule.
 ///
 /// ### Example
 ///
 /// #### BAD:
 /// ```dart
 /// void foo({required String zebra, required String apple}) { }
+/// void bar({String? apple, required String zebra}) { }
 /// ```
 ///
 /// #### GOOD:
 /// ```dart
 /// void foo({required String apple, required String zebra}) { }
+/// void baz({required String zebra, String? apple}) { }
 /// ```
 class PreferSortedParametersRule extends SaropaLintRule {
   PreferSortedParametersRule() : super(code: _code);
@@ -1479,26 +1486,34 @@ class PreferSortedParametersRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Quick fix: reorder named params to required-first-alphabetical grouping.
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        SortNamedParametersFix(context: context),
+  ];
+
   @override
   bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
-      'void f({required String zebra, required String apple}) {}';
+      'void f({String? apple, required String zebra}) {}';
 
   @override
   String get exampleGood =>
-      'void f({required String apple, required String zebra}) {}';
+      'void f({required String zebra, String? apple}) {}';
 
   /// Alias: prefer_sorted_parameter
   static const LintCode _code = LintCode(
     'prefer_sorted_parameters',
-    '[prefer_sorted_parameters] Named parameters are not in alphabetical order. '
-        'Unsorted parameters force developers to scan all parameters to find the one they need, '
-        'and inconsistent ordering across functions creates unnecessary cognitive load during code review. {v6}',
+    '[prefer_sorted_parameters] Named parameters are not in alphabetical order '
+        'within their required/optional group. '
+        'Required named parameters should come first (matching dart format), '
+        'then optional named parameters, each group sorted alphabetically. {v7}',
     correctionMessage:
-        'Reorder named parameters alphabetically so developers can quickly '
-        'locate parameters by name without scanning the entire parameter list.',
+        'Reorder named parameters: required named first (alphabetical), '
+        'then optional named (alphabetical).',
     severity: DiagnosticSeverity.INFO,
   );
 
@@ -1510,20 +1525,34 @@ class PreferSortedParametersRule extends SaropaLintRule {
     void checkParameters(FormalParameterList? params, Token reportAt) {
       if (params == null) return;
 
-      final List<String> namedParams = <String>[];
+      // Separate required and optional named params to respect
+      // dart format's always_put_required_named_parameters_first.
+      final List<String> requiredNames = <String>[];
+      final List<String> optionalNames = <String>[];
+      bool seenOptionalBeforeRequired = false;
 
       for (final FormalParameter param in params.parameters) {
-        if (param.isNamed) {
-          namedParams.add(param.name?.lexeme ?? '');
+        if (!param.isNamed) continue;
+        final String name = param.name?.lexeme ?? '';
+        if (param.isRequired) {
+          // Required param after an optional param violates grouping.
+          if (optionalNames.isNotEmpty) seenOptionalBeforeRequired = true;
+          requiredNames.add(name);
+        } else {
+          optionalNames.add(name);
         }
       }
 
-      // Check if named parameters are sorted
-      for (int i = 1; i < namedParams.length; i++) {
-        if (namedParams[i].compareTo(namedParams[i - 1]) < 0) {
-          reporter.atToken(reportAt);
-          return;
-        }
+      // Flag if optional named params appear before required named params
+      // (violates dart format's required-first convention).
+      if (seenOptionalBeforeRequired) {
+        reporter.atToken(reportAt);
+        return;
+      }
+
+      // Check alphabetical order within each group independently.
+      if (_isUnsorted(requiredNames) || _isUnsorted(optionalNames)) {
+        reporter.atToken(reportAt);
       }
     }
 
@@ -1534,6 +1563,14 @@ class PreferSortedParametersRule extends SaropaLintRule {
     context.addMethodDeclaration((MethodDeclaration node) {
       checkParameters(node.parameters, node.name);
     });
+  }
+
+  /// Returns true if the list has any adjacent pair out of alphabetical order.
+  static bool _isUnsorted(List<String> names) {
+    for (int i = 1; i < names.length; i++) {
+      if (names[i].compareTo(names[i - 1]) < 0) return true;
+    }
+    return false;
   }
 }
 

@@ -77,9 +77,17 @@ This patch moves `log_level`, `lane`, and `memory_mode` configuration from the `
 ### Added
 
 - **Full Audit CLI** — `dart run saropa_lints audit <dir>` runs every rule (pedantic + stylistic) against a codebase regardless of the project's configured tier. Produces enriched JSON with per-diagnostic `tier` and `category` fields. Supports `--since <ref>` to audit only changed files, `--min-severity`/`--min-impact` post-filters, `--profile` timing, and `--exclude-globs`/`--include-globs`.
-- **Full Audit sidebar button** — new "Full Audit" entry in the extension sidebar launches the audit with a scope quick-pick (full project, changed vs main, or pick a branch) and opens a filterable report webview with search, tier/severity/impact filter chips, sortable columns, and JSON export.
+- **Full Audit sidebar button** — new "Full Audit" entry in the extension sidebar launches the audit with a scope quick-pick (full project, changed vs main, or pick a branch) and opens a filterable report webview with search, tier/severity/impact filter chips, sortable columns, and JSON export. The progress notification shows real-time percentage, file count, issue count, and current filename.
 - **Audit report keyboard navigation** — use ↑/↓ arrow keys to move between rows and Enter to open the file at that diagnostic. A "no matches" state now appears when filters exclude all results.
+- **Audit baseline diffing** — `--save-baseline` saves the current audit as a project baseline at `.saropa/audit_baseline.json`; `--baseline` compares against the saved baseline and tags each diagnostic as new or unchanged. The sidebar quick-pick shows a "Compare to baseline" option when a baseline exists, and the report webview has a "Save as baseline" button and new/unchanged filter chips.
 - **Migrate Config** — `dart run saropa_lints migrate-config` and a sidebar button ("Migrate config keys") automatically move `log_level`, `lane`, and `memory_mode` from the old plugin block to `analysis_options_custom.yaml`. Safe to run multiple times; already-migrated keys are skipped.
+
+### Fixed
+
+- `prefer_sorted_parameters` no longer conflicts with `dart format`. The rule now respects `always_put_required_named_parameters_first`: required named parameters come first, then optional named parameters, each group sorted alphabetically. Includes a quick fix that reorders parameters automatically. ([#321](https://github.com/saropa/saropa_lints/issues/321))
+- `require_text_overflow_handling` and `require_text_overflow_in_row` correction messages no longer default to `TextOverflow.ellipsis`. The guidance now recommends wrapping in `Expanded`/`Flexible` first — ellipsis is a last resort when truncation is intentional. This prevents AI agents from blindly hiding text behind ellipsis. ([#320](https://github.com/saropa/saropa_lints/issues/320))
+- `prefer_single_declaration_per_file` no longer fires on sealed class hierarchies. Dart requires sealed subtypes in the same library, so co-locating them is mandatory, not a style violation. ([#322](https://github.com/saropa/saropa_lints/issues/322))
+- `avoid_unused_parameters` no longer fires on abstract, external, or native method declarations. These methods have no implementation body, so their parameters define the interface contract and cannot be "used." ([#319](https://github.com/saropa/saropa_lints/issues/319))
 
 ### Changed (Extension)
 
