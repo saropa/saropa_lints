@@ -1266,44 +1266,68 @@ class PreferSingleDeclarationPerFileRule extends SaropaLintRule {
 
       // Count significant top-level declarations, excluding classes that
       // are part of a sealed hierarchy (they MUST be in the same file).
-      int classCount = 0;
-      int enumCount = 0;
-      int mixinCount = 0;
-      ClassDeclaration? secondClass;
+      // Track the first class that pushes the count over the configured
+      // threshold so the report highlights the right declaration.
+      int majorCount = 0;
+      bool hasEnum = false;
+      bool hasMixin = false;
+      ClassDeclaration? excessClass;
 
       for (final CompilationUnitMember member in node.declarations) {
         if (member is ClassDeclaration) {
           // Skip subtypes of a sealed class declared in this file —
           // Dart requires sealed subtypes in the same library
           if (_extendsSealedClassInFile(member, sealedClassNames)) continue;
-          classCount++;
-          if (classCount == 2) {
-            secondClass = member;
+          majorCount++;
+          // Capture the first class that exceeds the threshold
+          if (excessClass == null &&
+              majorCount > maxDeclarationsPerFile) {
+            excessClass = member;
           }
         } else if (member is EnumDeclaration) {
-          enumCount++;
+          majorCount++;
+          hasEnum = true;
         } else if (member is MixinDeclaration) {
-          mixinCount++;
+          majorCount++;
+          hasMixin = true;
         }
       }
 
       // Report when declarations exceed the configured threshold (default 1).
       // The threshold is configurable via `max_declarations_per_file:` in
       // analysis_options_custom.yaml.
-      final int majorDeclarations = classCount + enumCount + mixinCount;
-      if (majorDeclarations > maxDeclarationsPerFile && secondClass != null) {
+      if (excessClass != null) {
         // Skip if it looks like a private helper class
-        if (secondClass.nameToken.lexeme.startsWith('_')) return;
+        if (excessClass.nameToken.lexeme.startsWith('_')) return;
 
         // Skip if all classes are abstract final with only static members
         // (pure constant / utility namespaces co-located for discoverability)
-        if (enumCount == 0 &&
-            mixinCount == 0 &&
+        if (!hasEnum &&
+            !hasMixin &&
             _allClassesAreStaticNamespaces(node)) {
           return;
         }
 
-        reporter.atNode(secondClass);
+        reporter.atNode(excessClass);
+        return;
+      }
+
+      // Sealed hierarchy size check: when a file has a sealed hierarchy and
+      // the optional max_sealed_hierarchy_lines threshold is configured,
+      // nudge the developer to use part/part-of to split the subtypes.
+      if (sealedClassNames.isNotEmpty && maxSealedHierarchyLines > 0) {
+        final int lineCount =
+            node.lineInfo.getLocation(node.end).lineNumber;
+        if (lineCount > maxSealedHierarchyLines) {
+          // Report on the first sealed class in the file
+          for (final CompilationUnitMember member in node.declarations) {
+            if (member is ClassDeclaration &&
+                member.sealedKeyword != null) {
+              reporter.atNode(member);
+              return;
+            }
+          }
+        }
       }
     });
   }

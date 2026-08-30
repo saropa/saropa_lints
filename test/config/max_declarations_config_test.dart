@@ -2,12 +2,15 @@ import 'package:saropa_lints/src/config/max_declarations_config.dart';
 import 'package:test/test.dart';
 
 /// Tests for [loadMaxDeclarationsConfig] — parsing `max_declarations_per_file:`
-/// from analysis_options_custom.yaml content.
+/// and `max_sealed_hierarchy_lines:` from analysis_options_custom.yaml content.
 void main() {
-  // Reset to default before each test so state doesn't leak
-  setUp(() => maxDeclarationsPerFile = 1);
+  // Reset to defaults before each test so state doesn't leak
+  setUp(() {
+    maxDeclarationsPerFile = 1;
+    maxSealedHierarchyLines = 0;
+  });
 
-  group('loadMaxDeclarationsConfig', () {
+  group('max_declarations_per_file', () {
     test('null content resets to default', () {
       maxDeclarationsPerFile = 5;
       loadMaxDeclarationsConfig(null);
@@ -53,6 +56,43 @@ void main() {
     test('commented-out line is ignored', () {
       loadMaxDeclarationsConfig('# max_declarations_per_file: 10');
       expect(maxDeclarationsPerFile, 1);
+    });
+  });
+
+  group('max_sealed_hierarchy_lines', () {
+    test('null content resets to default (disabled)', () {
+      maxSealedHierarchyLines = 200;
+      loadMaxDeclarationsConfig(null);
+      expect(maxSealedHierarchyLines, 0);
+    });
+
+    test('missing key keeps default (disabled)', () {
+      loadMaxDeclarationsConfig('max_declarations_per_file: 3');
+      expect(maxSealedHierarchyLines, 0);
+    });
+
+    test('valid value is parsed', () {
+      loadMaxDeclarationsConfig('max_sealed_hierarchy_lines: 200');
+      expect(maxSealedHierarchyLines, 200);
+    });
+
+    test('value of 0 disables the check', () {
+      loadMaxDeclarationsConfig('max_sealed_hierarchy_lines: 0');
+      expect(maxSealedHierarchyLines, 0);
+    });
+
+    test('both settings parsed together', () {
+      loadMaxDeclarationsConfig(
+        'max_declarations_per_file: 5\n'
+        'max_sealed_hierarchy_lines: 300\n',
+      );
+      expect(maxDeclarationsPerFile, 5);
+      expect(maxSealedHierarchyLines, 300);
+    });
+
+    test('commented-out line is ignored', () {
+      loadMaxDeclarationsConfig('# max_sealed_hierarchy_lines: 100');
+      expect(maxSealedHierarchyLines, 0);
     });
   });
 }

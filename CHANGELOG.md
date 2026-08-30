@@ -78,6 +78,7 @@ This patch moves `log_level`, `lane`, and `memory_mode` configuration from the `
 - **Audit baseline diffing** — `--save-baseline` saves the current audit as a project baseline at `.saropa/audit_baseline.json`; `--baseline` compares against the saved baseline and tags each diagnostic as new or unchanged. The sidebar quick-pick shows a "Compare to baseline" option when a baseline exists, and the report webview has a "Save as baseline" button and new/unchanged filter chips.
 - **Migrate Config** — `dart run saropa_lints migrate-config` and a sidebar button ("Migrate config keys") automatically move `log_level`, `lane`, and `memory_mode` from the old plugin block to `analysis_options_custom.yaml`. Safe to run multiple times; already-migrated keys are skipped.
 - **Configurable `max_declarations_per_file`** — set `max_declarations_per_file: N` in `analysis_options_custom.yaml` to allow up to N top-level declarations before `prefer_single_declaration_per_file` fires (default 1). No action required — existing behavior is unchanged.
+- **Sealed hierarchy size nudge** — set `max_sealed_hierarchy_lines: N` in `analysis_options_custom.yaml` to get a lint when a sealed class file exceeds N lines, suggesting `part`/`part of` to split subtypes while keeping them in the same library (default 0 = disabled).
 
 ### Fixed
 

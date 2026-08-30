@@ -1,11 +1,11 @@
-/// Configuration for [PreferSingleDeclarationPerFileRule].
+/// Configuration for [PreferSingleDeclarationPerFileRule] and sealed hierarchy
+/// size guidance.
 ///
-/// Loaded from `analysis_options_custom.yaml` under `max_declarations_per_file:`.
-/// Default is 1 (flag any file with more than one major top-level declaration).
-/// Set higher to allow small co-located data classes without triggering the lint.
+/// Loaded from `analysis_options_custom.yaml`. Two settings:
 ///
 /// ```yaml
-/// max_declarations_per_file: 3
+/// max_declarations_per_file: 3     # default 1
+/// max_sealed_hierarchy_lines: 200  # default 0 (disabled)
 /// ```
 library;
 
@@ -17,22 +17,43 @@ library;
 /// Default: 1 (original behavior — one major declaration per file).
 int maxDeclarationsPerFile = 1;
 
-/// Parse `max_declarations_per_file:` from custom config content.
+/// When a file contains a sealed class hierarchy AND exceeds this many lines,
+/// the rule fires with a suggestion to use `part`/`part of` to split the
+/// subtypes into separate files while keeping them in the same library.
+///
+/// Default: 0 (disabled — sealed hierarchies are never flagged for size).
+/// Set to e.g. 200 to get a nudge when sealed hierarchy files grow large.
+int maxSealedHierarchyLines = 0;
+
+/// Parse declaration config from custom config content.
 /// Called from config_loader during plugin start.
 void loadMaxDeclarationsConfig(String? content) {
-  // Reset to default each reload so removed config reverts to 1
+  // Reset to defaults each reload so removed config reverts cleanly
   maxDeclarationsPerFile = 1;
+  maxSealedHierarchyLines = 0;
   if (content == null || content.trim().isEmpty) return;
 
-  final match = RegExp(
+  final declMatch = RegExp(
     r'^max_declarations_per_file:\s*(\d+)',
     multiLine: true,
   ).firstMatch(content);
-  if (match == null) return;
+  if (declMatch != null) {
+    final parsed = int.tryParse(declMatch.group(1)!);
+    // Floor at 1 — a threshold of 0 would flag every file
+    if (parsed != null && parsed >= 1) {
+      maxDeclarationsPerFile = parsed;
+    }
+  }
 
-  final parsed = int.tryParse(match.group(1)!);
-  // Floor at 1 — a threshold of 0 would flag every file
-  if (parsed != null && parsed >= 1) {
-    maxDeclarationsPerFile = parsed;
+  final sealedMatch = RegExp(
+    r'^max_sealed_hierarchy_lines:\s*(\d+)',
+    multiLine: true,
+  ).firstMatch(content);
+  if (sealedMatch != null) {
+    final parsed = int.tryParse(sealedMatch.group(1)!);
+    // 0 = disabled; any positive value is a threshold
+    if (parsed != null && parsed >= 0) {
+      maxSealedHierarchyLines = parsed;
+    }
   }
 }
