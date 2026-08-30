@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: Run Analysis การวิเคราะห์",
   "command.verifyPlugin.title": "Saropa Lints: ยืนยัน Plugin กําลังทํางาน (ตรวจสอบความเป็นอยู่)",
   "command.initializeConfig.title": "Saropa Lints: เริ่มต้น / อัพเดทตัวเลือกการวิเคราะห์",
+  "command.migrateConfig.title": "Saropa Lints: ย้ายคีย์คอนฟิก (แก้ข้อความเตือน unsupported_option)",
   "command.createBaseline.title": "Saropa Lints: เป็นการประกอบของ สร้าง Baseline (ยับยั้งการละเมิดที่มีอยู่)",
   "command.checkForUpdatesNow.title": "Saropa Lints: เป็นการประกอบของ ตรวจสอบการอัพเดทแพคเกจตอนนี้",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: ค้นหาปัญหาทั่วโครงการ",

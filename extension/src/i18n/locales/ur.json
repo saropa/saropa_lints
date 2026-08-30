@@ -890,6 +890,12 @@
     "summaryVolume": "قاعدہ ٹریج (حجم / لازمی فکسڈ / اسٹائلسٹک)",
     "hintSameAsTree": "ٹراجیج سرگرمی بار درخت کی طرح ہی گروپ بندی: فلٹر کے مسائل ، یا `analysis_options_custom.yaml̅ میں قواعد کو غیر فعال / قابل بنائیں۔ بڑے گروپوں کی تصدیق کے لئے پوچھ سکتے ہیں."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "کی بورڈ شارٹ کٹس (?) دکھائیں",
     "toggleAria": "کی بورڈ شارٹ کٹس دکھائیں۔",
@@ -1868,7 +1874,7 @@
       "fullDetail": "تاریخی سلوک۔ زیادہ یادگیری کی لاگت: +77% RSS ایک ہی پروجیکٹ پر مقدار ہے۔ اسے چننا ہی ہے اگر آپ نے اپنے پروجیکٹ کی یادگیری کو برداشت کرنے کی یقینیت پر چیک کیا ہے۔",
       "alreadyOnLane": "پہلے ہی {lane} لین پر ہیں۔",
       "updated": "تحلیل چنل {lane} پر تیار کیا گیا ہے۔ Dart تحلیل سرور کو دوبارہ شروع کر کے اس کی تعمیل کی جا رہی ہے۔",
-      "noPluginBlock": "Saropa Lints: تحلیلی چنل کو نہیں سیٹ کیا جا سکتا - analysis_options.yaml میں تحلیل کنندہ پلاگن بکس نہیں ملا۔ پہلے انسائیڈ پروسس پلاگن کو اکیلے کریں۔",
+      "noPluginBlock": "Saropa Lints: تحلیل کی لین کو نہیں سیٹ کیا جا سکتا - analysis_options_custom.yaml پایا نہیں گیا۔ اس کو بنانے کے لیے 'dart run saropa_lints init' کریں۔",
       "writeFailed": "Saropa Lints: تحلیلی لین کو لکھنا میں ناکام رہ گیا۔ {message}"
     },
     "divergence": {

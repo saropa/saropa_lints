@@ -890,6 +890,12 @@
     "summaryVolume": "قاعدة التدقيق (حجم / يجب إصلاحه / أسلوبي)",
     "hintSameAsTree": "نفس التجميع مثل شجرة شريط النشاط Triage: إعدادات الفلتر أو تعطيل / تمكين القواعد في `analysis_options_custom.yaml゙. قد تطلب المجموعات الكبيرة التأكيد."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "مراجعة شاملة",
+      "description": "جميع القواعد · اختيار نطاق · تقرير قابل للتنقيح"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "عرض اختصارات لوحة المفاتيح (?)",
     "toggleAria": "عرض اختصارات لوحة المفاتيح",
@@ -1868,7 +1874,7 @@
       "fullDetail": "السلوك التاريخي. تكلفة ذاكرة أعلى: +77% RSS تم قياسها على المشروع نفسه. اختر هذا فقط إذا كنت تأكدت من أن مشروعك يمكنه تحمل الحجم.",
       "alreadyOnLane": "بالفعل في المسار {lane}.",
       "updated": "التحليل المسار محدد إلى {lane}. إعادة تشغيل خادم التحليل Dart لتطبيقه.",
-      "noPluginBlock": "Saropa Lints: لم يتم القدرة على تعيين مسار التحليل — لم يتم العثور على مُحلل مُضافة المُصنف في analysis_options.yaml. تفعيل مُضافة المُصنف في العملية أولاً.",
+      "noPluginBlock": "Saropa Lints: لم يتم القدرة على تحديد مسار التحليل — لم يتم العثور على analysis_options_custom.yaml. قم بتشغيل 'dart run saropa_lints init' لإنشاءه.",
       "writeFailed": "Saropa Lints: فشل في كتابة المسار التحليلي. {message}"
     },
     "divergence": {

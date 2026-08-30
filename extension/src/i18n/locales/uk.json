@@ -890,6 +890,12 @@
     "summaryVolume": "Тріаж правил (об'єм / обов'язкова фіксація / стилістика)",
     "hintSameAsTree": "Те ж саме групування, що і дерево Triage activity-bar tree: питання фільтра, або відключити/включити правила в `analysis_options_custom.yaml゙. Великі групи можуть попросити підтвердження."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Показати короткі клавіші (?)",
     "toggleAria": "Показати короткі клавіші.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Історичне поведінка. Вища вартість пам'яті: +77% RSS виміряно на тій самій проекті. Виберіть це лише у випадку, якщо ви перевірили, що ваш проект може заспокойсити витрати.",
       "alreadyOnLane": "Вже на дорозі {lane}.",
       "updated": "Аналізова смуга встановлена в {lane}. Перезапуск аналізового сервера Dart для застосування.",
-      "noPluginBlock": "Saropa Lints: не вдалося встановити аналізування потоку — плагін аналізатора не знайдено в analysis_options.yaml. Спочатку увімкніть плагін в процесі.",
+      "noPluginBlock": "Saropa Lints: не вдалося встановити аналізову смугу — analysis_options_custom.yaml не знайдено. Виконайте 'dart run saropa_lints init' для створення.",
       "writeFailed": "Saropa Lints: не вдалося записати аналіз ланки. {message}"
     },
     "divergence": {

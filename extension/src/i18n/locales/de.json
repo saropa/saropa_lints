@@ -890,6 +890,12 @@
     "summaryVolume": "Regeln Triage (Volumen / müssen fixieren / stilistisch)",
     "hintSameAsTree": "Dieselbe Gruppierung wie der Triage-Aktivitätsbalkenbaum: Filterprobleme oder Regeln deaktivieren/aktivieren in `analysis_options_custom.yaml゙. Große Gruppen können um Bestätigung bitten."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Vollständige Prüfung",
+      "description": "Alle Regeln · Bereichsauswahl · filterbarer Bericht"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Zeigen Sie Tastatur-Verknüpfungen (?) an.",
     "toggleAria": "Zeigen Sie Tastatur-Verknüpfungen an.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Die historische Verhaltensweise. Höherer Speicherkosten: +77% RSS gemessen am selben Projekt. Wählen Sie dies nur, wenn Sie überprüft haben, dass Ihr Projekt den Fußabdruck tragen kann.",
       "alreadyOnLane": "Bereits auf der {lane} Spur.",
       "updated": "Analyse-Spur auf {lane} eingestellt. Das Dart Analyse-Server wird neu gestartet, um dies anzuwenden.",
-      "noPluginBlock": "Saropa Lints: Die Analyse-Spur konnte nicht festgelegt werden – der Analyzer-Plugin-Block wurde nicht in analysis_options.yaml gefunden. Aktivieren Sie zuerst das in-Prozess-Plugin.",
+      "noPluginBlock": "Saropa Lints: Die Analyse-Spur konnte nicht festgelegt werden — analysis_options_custom.yaml wurde nicht gefunden. Führen Sie 'dart run saropa_lints init' aus, um es zu erstellen.",
       "writeFailed": "Saropa Lints: Fehler beim Schreiben der Analyse-Spur. {message}"
     },
     "divergence": {

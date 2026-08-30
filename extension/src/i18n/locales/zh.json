@@ -890,6 +890,12 @@
     "summaryVolume": "规则分类 (体积/必须修复/风格)",
     "hintSameAsTree": "与分类活动栏树相同的分组：过滤问题，或禁用/启用“analysis_options_custom.yaml”中的规则。大型团体可能会要求确认。"
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "显示键盘快捷方式 (?)",
     "toggleAria": "显示键盘快捷方式",
@@ -1868,7 +1874,7 @@
       "fullDetail": "历史行为。更高的内存消耗：+77% RSS 在同一个项目中测量。仅在您已验证您的项目可以承担该占用空间时选择此选项。",
       "alreadyOnLane": "已经位于{lane}道上",
       "updated": "分析通道设置为 {lane}。正在重启 Dart 分析服务器以应用该设置。",
-      "noPluginBlock": "Saropa Lints: 无法设置分析通道 —— 在 analysis_options.yaml 中未找到分析器插件块。请先启用进程内插件。",
+      "noPluginBlock": "Saropa Lints：无法设置分析通道 —— 未找到 analysis_options_custom.yaml。运行 'dart run saropa_lints init' 来创建它。",
       "writeFailed": "Saropa Lints: 无法写入分析车道。{message}"
     },
     "divergence": {

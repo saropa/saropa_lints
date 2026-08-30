@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: Analyse uitvoeren",
   "command.verifyPlugin.title": "Saropa Lints: Controleren of plugin draait (liveness-check)",
   "command.initializeConfig.title": "Saropa Lints: Analyse-opties initialiseren / bijwerken",
+  "command.migrateConfig.title": "Saropa Lints: Migrate Config Keys (fix unsupported_option waarschuwingen)",
   "command.createBaseline.title": "Saropa Lints: Het is een _PH0_. Creëer een baseline (onderdruk bestaande overtredingen)",
   "command.checkForUpdatesNow.title": "Saropa Lints: Het is een _PH0_. Controleer nu of er pakketupdates zijn.",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: Gehele Project Doornemen op Problemen",

@@ -964,6 +964,11 @@
     "menus": {
       "view/title": [
         {
+          "command": "saropaLints.fullAudit",
+          "when": "view == saropaLints.editorDashboards && saropaLints.isDartProject",
+          "group": "navigation"
+        },
+        {
           "command": "saropaLints.refresh",
           "when": "view == saropaLints.editorDashboards",
           "group": "navigation"

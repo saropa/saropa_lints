@@ -890,6 +890,12 @@
     "summaryVolume": "Regola di triage (volume / must-fix / stilistica)",
     "hintSameAsTree": "Stessa raggruppamento come l'albero di attività-bar Triage: filtrare problemi, o disabilitare / abilitare le regole in `analysis_options_custom.yaml゙. I gruppi più grandi possono chiedere la conferma."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Mostra scorciatoie da tastiera (?)",
     "toggleAria": "Mostra le scorciatoie da tastiera.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Comportamento storico. Costo maggiore di memoria: +77% RSS misurato sullo stesso progetto. Scegli questa opzione solo se hai verificato che il tuo progetto può sostenere l'impatto.",
       "alreadyOnLane": "Già sulla corsia {lane}.",
       "updated": "Regola rigorosa: Analisi canale impostato su {lane}. Riavviando il server di analisi Dart per applicarlo.",
-      "noPluginBlock": "Saropa Lints: non è stato possibile impostare la lane di analisi — il plugin di analisi non è stato trovato in analysis_options.yaml. Abilita prima il plugin in-process.",
+      "noPluginBlock": "Saropa Lints: non è stato possibile impostare la lane di analisi — analysis_options_custom.yaml non è stato trovato. Esegui 'dart run saropa_lints init' per crearlo.",
       "writeFailed": "Saropa Lints: impossibile scrivere la lane di analisi. {message}"
     },
     "divergence": {

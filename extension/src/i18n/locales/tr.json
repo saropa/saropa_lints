@@ -890,6 +890,12 @@
     "summaryVolume": "Kural triaj (hacim / sabitleme zorunluluğu / stilistik)",
     "hintSameAsTree": "Triage etkinlik-bar ağacı ile aynı gruplandırma: Filtre Sorunları veya `analysis_options_custom.yaml゙. içinde kuralları devre dışı bırak/etkinleştirin. Büyük gruplar onay isteyebilir."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Klavye kısayollarını göster (?)",
     "toggleAria": "Klavye kısayollarını göster.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Geçmiş davranış. Daha yüksek bellek maliyeti: Aynı projede +77% RSS ölçülmesi. Projenizin bu izin verdiğini doğruladığınız sürece sadece bu seçeneği tercih edin.",
       "alreadyOnLane": "Zaten {lane} şeridi üzerindedir.",
       "updated": "Analiz kanalı {lane} olarak ayarlandı. Dart analiz sunucusunu başlatarak uygulamak için yeniden başlatılıyor.",
-      "noPluginBlock": "Saropa Lints: analiz kanalı ayarlanamadı — analysis_options.yaml'da analizör eklentisi bloğu bulunamadı. Öncelikle iç işlem eklentisini etkinleştirin.",
+      "noPluginBlock": "Saropa Lints: analiz kanalı ayarlanamadı — analysis_options_custom.yaml bulunamadı. Oluşturmak için 'dart run saropa_lints init' komutunu çalıştırın.",
       "writeFailed": "Saropa Lints: analiz kanalına yazma başarısız oldu. {message}"
     },
     "divergence": {

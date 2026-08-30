@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: विश्लेषण चलाएँ",
   "command.verifyPlugin.title": "Saropa Lints: सत्यापित करें प्लगइन चल रहा है (जीवन की जाँच)",
   "command.initializeConfig.title": "Saropa Lints: विश्लेषण विकल्पों को आरंभ / अद्यतन करें",
+  "command.migrateConfig.title": "Saropa Lints: विन्यास अपवाद अपडेट करें (असमर्थित_विकल्प चेतावनी को ठीक करें)",
   "command.createBaseline.title": "Saropa Lints: _PH0_: बेसलाइन बनाएं (मौजूदा उल्लंघनों को दबाएं)",
   "command.checkForUpdatesNow.title": "Saropa Lints: _PH0_: पैकेज अपडेट के लिए अब जांचें",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: सम्पूर्ण प्रोजेक्ट में समस्याओं की खोज करें",

@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: רץ ניתוח",
   "command.verifyPlugin.title": "Saropa Lints: אימת התוספת פועלת (בדיקת חיות)",
   "command.initializeConfig.title": "Saropa Lints: הפעלת פתיחה / עדכון של אפשרויות ניתוח.",
+  "command.migrateConfig.title": "Saropa Lints: מעברключи Yapılandırma (إصلاح 경고 unsupported_option)",
   "command.createBaseline.title": "Saropa Lints: זה היה חרא. יצירת בסיס (הדחיקת הפרות קיימות)",
   "command.checkForUpdatesNow.title": "Saropa Lints: זה היה חרא. בדוק אם יש עדכונים לחבילה עכשיו",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: ס캔 של tout הפרוייקט לבעיות",

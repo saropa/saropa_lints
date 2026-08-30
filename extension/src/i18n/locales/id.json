@@ -890,6 +890,12 @@
     "summaryVolume": "Triage aturan (volume / harus-perbaiki / stylistic)",
     "hintSameAsTree": "Pengelompokan yang sama seperti pohon bar aktivitas Triage: isu filter, atau menonaktifkan / mengaktifkan aturan di `analysis_options_custom.yaml゙. Kelompok besar dapat meminta konfirmasi."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Tampilkan pintasan keyboard (?)",
     "toggleAria": "Tampilkan pintasan keyboard.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Perilaku sejarah. Biaya memori yang lebih tinggi: +77% RSS diukur pada proyek yang sama. Pilih ini hanya jika Anda sudah memverifikasi proyek Anda dapat memenuhi kebutuhan memori.",
       "alreadyOnLane": "Sudah berada di lane {lane}.",
       "updated": "Aturan Ketat:\n1. Kembalikan HANYA keluaran string yang diterjemahkan.\n2. JANGAN termasuk penjelasan, pengantar, notasi markdown, atau tanda kutip di sekitar.\n3. Teks mungkin mengandung token placeholder: token placeholder. Salin masing-masing token ke dalam terjemahan TEPAT SEBAGAIMANA TULISAN, di posisi gramatikal yang benar. JANGAN menerjemahkan, menghapus, atau mengubah format token.\n4. Output HARUS menggunakan sistem penulisan yang benar untuk bahasa target; jangan beralih ke bahasa lain di tengah kalimat.\n\nTeks: Analysis lane set to {lane}. Restarting the Dart analysis server to apply it.",
-      "noPluginBlock": "Saropa Lints: tidak dapat menetapkan jalur analisis — plugin analisis tidak ditemukan dalam analysis_options.yaml. Aktifkan terlebih dahulu plugin dalam proses.",
+      "noPluginBlock": "Saropa Lints: tidak dapat menetapkan jalur analisis — analysis_options_custom.yaml tidak ditemukan. Jalankan 'dart run saropa_lints init' untuk membuatnya.",
       "writeFailed": "Saropa Lints: gagal menulis jalur analisis. {message}"
     },
     "divergence": {

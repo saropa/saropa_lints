@@ -890,6 +890,12 @@
     "summaryVolume": "Pag-iisa ng mga patakaran (bolyum / dapat na i-fix / istilo)",
     "hintSameAsTree": "Katulad na pag-uuri bilang ang Triage activity bar tree: filter Issues, o i-disable/enable rules sa `analysis_options_custom.yaml゙. Ang malalaking grupo ay maaaring humiling ng kumpirmasyon."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Ipakita ang mga shortcut ng keyboard (?)",
     "toggleAria": "Ipakita ang mga keyboard shortcut.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Ang nakaraang pagkakabahagi. Mas mataas na gastos sa memorya: +77% RSS na naitala sa parehong proyekto. Piliin ito lamang kung iyong napatunayan na ang proyekto mo ay makakakaya ng footprint.",
       "alreadyOnLane": "Nasa {lane} lane na.",
       "updated": "Itinakda sa {lane} ang analysis lane. I-restart ang server ng pagsusuri ng Dart upang ilapat ito.",
-      "noPluginBlock": "Saropa Lints: hindi maitala ang analysis lane — walang nakita na analyzer plugin block sa analysis_options.yaml. Mag-enable muna ng in-process plugin.",
+      "noPluginBlock": "Saropa Lints: hindi maitala ang analysis lane — ang analysis_options_custom.yaml ay hindi na nakita. I-run ang 'dart run saropa_lints init' upang makagawa nito.",
       "writeFailed": "Saropa Lints: nabigo mag-imbak ng analysis lane. {message}"
     },
     "divergence": {

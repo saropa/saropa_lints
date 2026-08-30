@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: Execute a Análise de Executar.",
   "command.verifyPlugin.title": "Saropa Lints: Verificar Plugin Está A Ser Execucionado (verificação de vitalidade)",
   "command.initializeConfig.title": "Saropa Lints: Inicializar / Atualizar Opções de Análise.",
+  "command.migrateConfig.title": "Saropa Lints: Migrar Chaves de Configuração (corrigir avisos de unsupported_option)",
   "command.createBaseline.title": "Saropa Lints: é um número de PH0__. Criar Linha de Base (suprimir violações existentes)",
   "command.checkForUpdatesNow.title": "Saropa Lints: é um número de PH0__. Verifique se há atualizações de pacotes agora.",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: Varredura do Projeto Inteiro para Problemas",

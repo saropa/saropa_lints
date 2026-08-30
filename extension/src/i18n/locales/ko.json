@@ -890,6 +890,12 @@
     "summaryVolume": "규칙 트리아지 (대량 / 반드시 고정 / 스타일리즘)",
     "hintSameAsTree": "트라이어지 활동 바 나무와 같은 그룹: 필터 이슈, 또는 `analysis_options_custom.yaml゙. 큰 그룹은 확인을 요청할 수 있습니다."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "키보드 단축키 (?) 를 표시하세요.",
     "toggleAria": "키보드 단축키를 표시합니다.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "역사적 행동. 더 높은 메모리 비용: 같은 프로젝트에서 측정한 +77% RSS. 프로젝트가 발자국을 감당할 수 있음을 확인했다면만 선택하세요.",
       "alreadyOnLane": "이미 {lane} 라인에 있습니다.",
       "updated": "분석 라인 설정됨 {lane}. Dart 분석 서버를 재시작하여 적용합니다.",
-      "noPluginBlock": "Saropa Lints: 분석 라인을 설정할 수 없습니다 — analysis_options.yaml에서 분석기 플러그인 블록을 찾을 수 없습니다. 인 프로세스 플러그인을 먼저 활성화하세요.",
+      "noPluginBlock": "Saropa Lints: 분석 라인을 설정할 수 없습니다 — analysis_options_custom.yaml이 없습니다. 'dart run saropa_lints init'을 실행하여 생성하세요.",
       "writeFailed": "Saropa Lints: 분석 라인에 쓰기 실패. {message}"
     },
     "divergence": {

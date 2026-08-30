@@ -890,6 +890,12 @@
     "summaryVolume": "Triaż reguł (wolumen / musi być poprawiony / stylistyczny)",
     "hintSameAsTree": "Ta sama grupa jak drzewo Triage activity-bar: filtrować zagadnienia, lub wyłączać/włączania reguł w `analysis_options_custom.yaml゙. Duże grupy mogą poprosić o potwierdzenie."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Pokaż skróty klawiatury (?)",
     "toggleAria": "Pokaż skróty klawiatury.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Zachowanie historyczne. Wyższy koszt pamięci: +77% RSS zmierzony na tym samym projekcie. Wybierz to tylko jeśli potwierdziłeś, że Twój projekt może się z nim pogodzić.",
       "alreadyOnLane": "Już na pasie {lane}.",
       "updated": "Analiza kanału ustawiona na {lane}. Uruchamianie ponownie serwera analizy Dart, aby zastosować go.",
-      "noPluginBlock": "Saropa Lints: nie można ustawić analizy wątku — w pliku analysis_options.yaml nie znaleziono wtyczki analizatora. Włącz najpierw wtyczkę w procesie.",
+      "noPluginBlock": "Saropa Lints: nie można ustawić analizy kanału — plik analysis_options_custom.yaml nie został znaleziony. Uruchom 'dart run saropa_lints init', aby go utworzyć.",
       "writeFailed": "Saropa Lints: nie udało się zapisać analizy kanału. {message}"
     },
     "divergence": {

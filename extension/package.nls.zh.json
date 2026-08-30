@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: 没有一个人. 运行分析,进行分析.",
   "command.verifyPlugin.title": "Saropa Lints: 没有一个人. 验证插件正在运行 (活力检查)",
   "command.initializeConfig.title": "Saropa Lints: 没有一个人. 初始化 /更新分析选项",
+  "command.migrateConfig.title": "Saropa Lints：迁移配置键（修复不支持的选项警告）",
   "command.createBaseline.title": "Saropa Lints: 没有一个人. 创建基线 (抑制现有违规行为)",
   "command.checkForUpdatesNow.title": "Saropa Lints: 没有一个人. 现在检查包装更新.",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints：扫描整个项目中的问题",

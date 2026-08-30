@@ -315,6 +315,14 @@ function buildEditorDashboardItems(): LeafItem[] {
             'warning',
             new vscode.ThemeColor('editorWarning.foreground'),
         ),
+        // Full project audit with scope picker and filterable report webview.
+        new LeafItem(
+            l10n('fullAudit.sidebar.label'),
+            l10n('fullAudit.sidebar.description'),
+            'saropaLints.fullAudit',
+            'shield',
+            new vscode.ThemeColor('charts.red'),
+        ),
         new LeafItem(
             'Command Catalog',
             'Search all commands',

@@ -890,6 +890,12 @@
     "summaryVolume": "Правило сортировки (объем / необходимость фиксации / стилистический)",
     "hintSameAsTree": "Та же группировка, что и в дереве activity-bar Triage: фильтруйте вопросы или отключите/включите правила в `analysis_options_custom.yaml゙. Большие группы могут попросить подтверждение."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Показывать сокращения клавиатуры (?)",
     "toggleAria": "Показывать ярлыки клавиатуры.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Историческое поведение. Более высокая стоимость памяти: +77% RSS измерено на том же проекте. Выберите это только в том случае, если вы проверили, что ваш проект может позволить себе такой объем.",
       "alreadyOnLane": "Уже на полосе {lane}.",
       "updated": "Анализовая полоса установлена в {lane}. Перезапуск анализатора Dart для применения.",
-      "noPluginBlock": "Saropa Lints: не удалось установить анализаторную ленту — плагин анализатора не найден в analysis_options.yaml. Сначала включите встроенный плагин.",
+      "noPluginBlock": "Saropa Lints: не удалось установить анализовый поток — analysis_options_custom.yaml не найден. Запустите 'dart run saropa_lints init' для его создания.",
       "writeFailed": "Saropa Lints: не удалось записать анализ линии. {message}"
     },
     "divergence": {

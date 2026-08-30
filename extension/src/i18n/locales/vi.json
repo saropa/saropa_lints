@@ -890,6 +890,12 @@
     "summaryVolume": "Quy tắc phân loại (khối lượng / phải sửa chữa / phong cách)",
     "hintSameAsTree": "Cùng nhóm như cây thanh hoạt động Triage: filter Issues, hoặc disable/enable rules trong `analysis_options_custom.yaml゙n. Các nhóm lớn có thể yêu cầu xác nhận."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Hiển thị phím tắt (?)",
     "toggleAria": "Hiển thị phím tắt bàn phím",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Hành vi lịch sử. Chi phí bộ nhớ cao hơn: +77% RSS được đo trên cùng một dự án. Chỉ chọn lựa này nếu bạn đã xác minh dự án của bạn có thể chịu được mức sử dụng này.",
       "alreadyOnLane": "Đã ở làn {lane}.",
       "updated": "Làn đường phân tích được đặt thành {lane}. Khởi động lại máy chủ phân tích Dart để áp dụng nó.",
-      "noPluginBlock": "Saropa Lints: không thể thiết lập đường phân tích — plugin phân tích không được tìm thấy trong analysis_options.yaml. Vui lòng kích hoạt plugin trong quá trình xử lý trước.",
+      "noPluginBlock": "Saropa Lints: không thể thiết lập đường phân tích — không tìm thấy analysis_options_custom.yaml. Chạy 'dart run saropa_lints init' để tạo ra nó.",
       "writeFailed": "Saropa Lints: thất bại khi ghi phân tích kênh. {message}"
     },
     "divergence": {

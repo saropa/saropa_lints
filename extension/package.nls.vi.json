@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: là người có thể Chạy phân tích Run Analysis",
   "command.verifyPlugin.title": "Saropa Lints: là người có thể Xác minh Plugin đang chạy (kiểm tra tính năng hoạt động)",
   "command.initializeConfig.title": "Saropa Lints: là người có thể Initialize / Update Analysis Options (Đầu tiên hóa/ Cập nhật các tùy chọn phân tích)",
+  "command.migrateConfig.title": "Saropa Lints: Chuyển đổi Chìa khóa Cấu hình (sửa cảnh báo unsupported_option)",
   "command.createBaseline.title": "Saropa Lints: là người có thể Tạo đường cơ sở (đánh chặn các vi phạm hiện có)",
   "command.checkForUpdatesNow.title": "Saropa Lints: là người có thể Kiểm tra bản cập nhật gói ngay bây giờ",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: Quét Toàn Bộ Dự Án Tìm Các Vấn Đề",

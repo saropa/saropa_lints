@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: Jalankan Analisis.",
   "command.verifyPlugin.title": "Saropa Lints: Verifikasi Plugin sedang berjalan (cek keaktifan)",
   "command.initializeConfig.title": "Saropa Lints: Inisialisasi / Perbarui Opsi Analisis.",
+  "command.migrateConfig.title": "Saropa Lints: Migrasi Kunci Konfigurasi (perbaiki peringatan unsupported_option)",
   "command.createBaseline.title": "Saropa Lints: adalah suatu bentuk dari _PH0_. Buat Baseline (menekan pelanggaran yang ada)",
   "command.checkForUpdatesNow.title": "Saropa Lints: adalah suatu bentuk dari _PH0_. Periksa untuk Pembaruan Paket Sekarang",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: Pindai Seluruh Proyek untuk Masalah",

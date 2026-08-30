@@ -890,6 +890,12 @@
     "summaryVolume": "Regra triagem (volume / deve-fixar / estilística)",
     "hintSameAsTree": "O mesmo agrupamento que a árvore de barra de atividades do triagem: questões filtradas ou regras desativadas/ativadas em `analysis_options_custom.yaml゙. Grandes grupos podem pedir confirmação."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Mostrar atalhos de teclado (?)",
     "toggleAria": "Mostrar atalhos de teclado.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Comportamento histórico. Custo de memória mais alto: +77% RSS medido no mesmo projeto. Escolha isso apenas se você tiver verificado que seu projeto pode suportar o impacto.",
       "alreadyOnLane": "Já na pista {lane}.",
       "updated": "Pista de análise definida como {lane}. Reiniciando o servidor de análise Dart para aplicá-lo.",
-      "noPluginBlock": "Saropa Lints: não foi possível definir a análise de linha — o plug-in de análise não foi encontrado em analysis_options.yaml. Ative primeiro o plug-in em processo.",
+      "noPluginBlock": "Saropa Lints: não foi possível definir a análise de linha — analysis_options_custom.yaml não foi encontrado. Execute 'dart run saropa_lints init' para criá-lo.",
       "writeFailed": "Saropa Lints: falha ao escrever a análise da linha. {message}"
     },
     "divergence": {

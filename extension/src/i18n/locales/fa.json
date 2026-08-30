@@ -890,6 +890,12 @@
     "summaryVolume": "ردیابی قوانین (حجم / باید ثابت شود / سبک)",
     "hintSameAsTree": "همان گروه بندی که در درخت فعالیت-بار Triage وجود دارد: مسائل فیلتر، یا قوانین غیرفعال / فعال کردن در `analysis_options_custom.yaml゙. گروه های بزرگ ممکن است برای تایید درخواست کنند."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "میانبر های صفحه کلید را نشان دهید (?)",
     "toggleAria": "میانبر های صفحه کلید را نشان دهید",
@@ -1868,7 +1874,7 @@
       "fullDetail": "رفتار تاریخی. هزینه حافظه بالاتر: +77% RSS اندازه گیری شده بر روی پروژه یکسان. فقط این را انتخاب کنید اگر اطمینان حاصل کرده اید پروژه شما می تواند اثر این انتخاب را تحمل کند.",
       "alreadyOnLane": "در خط {lane} هستید.",
       "updated": "تحلیل راه انتخاب شده به {lane} است. بازگردانی سرور تحلیل Dart برای اعمال آن.",
-      "noPluginBlock": "Saropa Lints: نتوانست خطای تحلیل را تنظیم کرد — بلوک پلاگین تحلیل کننده در analysis_options.yaml پیدا نشد. ابتدا پلاگین درون فرآیند را فعال کنید.",
+      "noPluginBlock": "Saropa Lints: نتوانست خط تحليل را تنظيم کند — analysis_options_custom.yaml پيدا نشد. اجرا کنيد 'dart run saropa_lints init' تا ايجاد شود.",
       "writeFailed": "Saropa Lints: تحلیل خط نوشته نشد. {message}"
     },
     "divergence": {

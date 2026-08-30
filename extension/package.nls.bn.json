@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: Run Analysis চালান বিশ্লেষণ",
   "command.verifyPlugin.title": "Saropa Lints: প্লাগইনটি চালানো হচ্ছে কিনা তা যাচাই করুন (জীবনশক্তি পরীক্ষা) ।",
   "command.initializeConfig.title": "Saropa Lints: বিশ্লেষণ বিকল্পগুলি প্রাথমিককরণ / আপডেট করুন",
+  "command.migrateConfig.title": "Saropa Lints: কনফিগ কী স্থানান্তরিত করুন (অসমর্থ বিকল্প বার্ণিং সংক্রান্ত সংশোধন)",
   "command.createBaseline.title": "Saropa Lints: PH0__::: -PH0_: =PH0 বেসলাইন তৈরি করুন (বিদ্যমান লঙ্ঘনগুলি দমন করুন)",
   "command.checkForUpdatesNow.title": "Saropa Lints: PH0__::: -PH0_: =PH0 প্যাকেজ আপডেট এখনই চেক করুন",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: সমস্যা খুঁজতে প্রজেক্টটি স্ক্যান করুন",

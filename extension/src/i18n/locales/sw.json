@@ -890,6 +890,12 @@
     "summaryVolume": "Sheria triage (kiasi / lazima-kuweka / stylistic)",
     "hintSameAsTree": "Same makundi kama Triage shughuli-bar mti: Filter Masuala, au Disable/Enable sheria katika `analysis_options_custom.yaml゙. Vikundi vikubwa vinaweza kuomba uthibitisho."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Ukaguzi kamili",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Onyesha njia za mkato za kibodi (?)",
     "toggleAria": "Onyesha njia za mkato za kibodi.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Mipango ya kifichwa. Upeleka maelekezo ya kifichwa: +77% RSS iliyotangaza katika proyekti kati. Chagua hiki tu kama unaweza kushirikisha proyekti wakati wakati unaweza kushirikisha matokeo ya kifichwa.",
       "alreadyOnLane": "Sasa na lane {lane}.",
       "updated": "Analisi ya lane inaunda {lane}. Kupakia server ya analisi ya Dart kujaribu.",
-      "noPluginBlock": "Saropa Lints: hakuna kujaribu kuanza kwenye mstari ya analisi — plugin ya analyzer block hakifanyika katika analysis_options.yaml. Angalia kujaribu plugin kwa kwanza.",
+      "noPluginBlock": "Saropa Lints: hakuna kujaribu kuanza kwenye mstika ya analizi — analysis_options_custom.yaml hakutambulika. Jaribu 'dart run saropa_lints init' kujaribu kuanza.",
       "writeFailed": "Saropa Lints: uliokokotia kujisajili kwa mstari ya analizi. {message}"
     },
     "divergence": {

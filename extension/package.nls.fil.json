@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: Patakbuhin ang Pagsusuri",
   "command.verifyPlugin.title": "Saropa Lints: Verify Plugin Is Running (liveness check) - Suriin kung tumatakbo na ang plugin.",
   "command.initializeConfig.title": "Saropa Lints: I-initialize / I-update ang Analysis Options",
+  "command.migrateConfig.title": "Saropa Lints: I-migrate ang Config Keys (ayusin ang mga hindi sinusuportahang_option na babala)",
   "command.createBaseline.title": "Saropa Lints: ang mga ito ay may _ph0__. Lumikha ng Baseline (iwasan ang mga umiiral na paglabag)",
   "command.checkForUpdatesNow.title": "Saropa Lints: ang mga ito ay may _ph0__. Suriin para sa mga Pag-update ng Package Ngayon",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: I-scan ang Bawat Proyekto para sa Mga Isyu",

@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: 分析を実行する",
   "command.verifyPlugin.title": "Saropa Lints: プラグインの実行を確認 (活力チェック)",
   "command.initializeConfig.title": "Saropa Lints: 解析オプションを初期化 / アップデートする",
+  "command.migrateConfig.title": "Saropa Lints: 設定キーの移行（非対応オプションの警告を修正）",
   "command.createBaseline.title": "Saropa Lints: フォローしている ベースラインを作成 (既存の違反を削除)",
   "command.checkForUpdatesNow.title": "Saropa Lints: フォローしている パッケージの更新を今すぐチェック",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: イssueを含むプロジェクト全体をスキャン",

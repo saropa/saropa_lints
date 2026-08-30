@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: تشغيل تحليل التحليل.",
   "command.verifyPlugin.title": "Saropa Lints: تحقق من تشغيل البرنامج الإضافي (تحقق من الحيوية)",
   "command.initializeConfig.title": "Saropa Lints: إطلاق / تحديث خيارات التحليل.",
+  "command.migrateConfig.title": "Saropa Lints: نقل مفاتيح التكوين (إصلاح تحذيرات غير الدعم الخيار)",
   "command.createBaseline.title": "Saropa Lints: هيئة إدارة المعلومات إنشاء خط أساسي (قمع الانتهاكات الحالية)",
   "command.checkForUpdatesNow.title": "Saropa Lints: هيئة إدارة المعلومات تحقق من تحديثات الحزم الآن.",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: افحص المشروع بأكمله للعوامل المُشكلة",

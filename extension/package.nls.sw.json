@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: Run Uchambuzi wa kukimbia.",
   "command.verifyPlugin.title": "Saropa Lints: Kuthibitisha Plugin ni Running (Uhai kuangalia)",
   "command.initializeConfig.title": "Saropa Lints: Initialize / Update Uchambuzi Chaguzi chaguo.",
+  "command.migrateConfig.title": "Saropa Lints: Tumia Kipengele ya Config (kutambua matokeo ya unsupported_option)",
   "command.createBaseline.title": "Saropa Lints:: kwa hiyo ni sawa. Unda Msingi (kuzuia ukiukaji uliopo)",
   "command.checkForUpdatesNow.title": "Saropa Lints:: kwa hiyo ni sawa. Angalia kwa Updates Package Sasa.",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: Tafuta Sasa Sauti Kwa Kati Ya Project",

@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Запустити аналіз.",
   "command.verifyPlugin.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Перевірте, що плагін працює (проведення життєздатності)",
   "command.initializeConfig.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Ініціалізувати / оновлювати параметри аналізу",
+  "command.migrateConfig.title": "Saropa Lints: Міграція конфігураційних ключів (вирішення попереджень unsupported_option)",
   "command.createBaseline.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Створити базовий рівень (засунути існуючі порушення)",
   "command.checkForUpdatesNow.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Перевірте, чи є оновлення пакетів зараз.",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: Сканування всього проекту для виявлення проблем",

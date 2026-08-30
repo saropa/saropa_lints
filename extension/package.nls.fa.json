@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: اجرای تحلیل",
   "command.verifyPlugin.title": "Saropa Lints: بررسی اینکه پلاگین در حال اجرا است (بررسی زنده بودن)",
   "command.initializeConfig.title": "Saropa Lints: گزینه های تحلیل را آغاز کنید / به روزرسانی کنید.",
+  "command.migrateConfig.title": "Saropa Lints: میگریت کلیدهای کانفیگ (حل ا cảnhویل ناپشتیبان گزینه)",
   "command.createBaseline.title": "Saropa Lints: _PH0_: = PH0__::: -پای ایجاد خط پایه (کاهش نقض های موجود)",
   "command.checkForUpdatesNow.title": "Saropa Lints: _PH0_: = PH0__::: -پای چک کردن به روز رسانی های بسته در حال حاضر",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: اسکن کامل پروژه برای مشکلات",

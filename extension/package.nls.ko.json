@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: 분석을 실행합니다.",
   "command.verifyPlugin.title": "Saropa Lints: 플러그인이 실행 중인지 확인 (생명성 검사)",
   "command.initializeConfig.title": "Saropa Lints: 분석 옵션을 초기화 / 업데이트하십시오.",
+  "command.migrateConfig.title": "Saropa Lints: 설정 키 마이그레이션 (지원되지 않는 옵션 경고 수정)",
   "command.createBaseline.title": "Saropa Lints: PH0__:::  ⁇ PH0_: 기본 기준을 생성 (현재의 위반 사항을 삭제)",
   "command.checkForUpdatesNow.title": "Saropa Lints: PH0__:::  ⁇ PH0_: 패키지 업데이트를 지금 확인하세요",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: 프로젝트 전체에서 문제 검색",

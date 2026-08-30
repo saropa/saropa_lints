@@ -890,6 +890,12 @@
     "summaryVolume": "מיון כללים (קולי / חייב-תקן / סגנוני)",
     "hintSameAsTree": "אותה קבוצה כמו עץ ה-bar של פעילות Triage: מסנן בעיות, או מכבה / מאפשר כללים ב `analysis_options_custom.yaml゙. קבוצות גדולות יכולות לבקש אישור."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "להראות קיצורי מקלדת (?)",
     "toggleAria": "להראות קיצורי מקלדת מקשים.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "הנהירות התנהגות. עלות זיכרון גבוהה יותר: +77% RSS נמדדת על אותו פרויקט. בחר בזה רק אם בדקת שפרויקט שלך יכול לה bearing את הרגל.",
       "alreadyOnLane": "כבר על ה-{lane}.",
       "updated": "ניתוח רכבת מותאמת ל{lane}. إعادة تشغيل שרת ניתוח Dart כדי לה적ון.",
-      "noPluginBlock": "Saropa Lints: לא ניתן לקבוע את מסלול האנליזה — wasn't found in analysis_options.yaml. הפעל תוסף-plugin תהליך-ב-תהליך תחילה.",
+      "noPluginBlock": "Saropa Lints: לא ניתן לקבוע את מסלול האנליזה — לא נמצא analysis_options_custom.yaml. רץ על 'dart run saropa_lints init' כדי ליצור אותו.",
       "writeFailed": "Saropa Lints: לא ניתן לכתוב את הניתוח הרציף. {message}"
     },
     "divergence": {

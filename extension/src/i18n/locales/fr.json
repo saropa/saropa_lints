@@ -890,6 +890,12 @@
     "summaryVolume": "Le tri des règles (volume / doit-être fixé / stylistique)",
     "hintSameAsTree": "Même groupement que l'arbre de barre d'activité Triage: filtrez les problèmes, ou désactivez/activez des règles dans `analysis_options_custom.yaml゙. Les grands groupes peuvent demander une confirmation."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Afficher les raccourcis clavier (?)",
     "toggleAria": "Afficher les raccourcis clavier.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "Le comportement historique. Coût mémoire plus élevé : +77% RSS mesuré sur le même projet. Choisissez cette option uniquement si vous avez vérifié que votre projet peut supporter l'empreinte.",
       "alreadyOnLane": "Déjà sur la lane {lane}.",
       "updated": "Règle stricte : Analyse de la voie définie à {lane}. Redémarrage du serveur d'analyse Dart pour l'appliquer.",
-      "noPluginBlock": "Saropa Lints : impossible de définir la voie d'analyse — le plug-in d'analyse n'a pas été trouvé dans analysis_options.yaml. Activez d'abord le plug-in en processus.",
+      "noPluginBlock": "Saropa Lints : impossible de définir la voie d'analyse — analysis_options_custom.yaml n'a pas été trouvé. Exécutez 'dart run saropa_lints init' pour le créer.",
       "writeFailed": "Saropa Lints : échec d'écriture de la ligne d'analyse. {message}"
     },
     "divergence": {

@@ -890,6 +890,12 @@
     "summaryVolume": "Rule triage (volume / must-fix / stylistic)",
     "hintSameAsTree": "Same grouping as the Triage activity-bar tree: filter Issues, or disable/enable rules in `analysis_options_custom.yaml`. Large groups may ask for confirmation."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Show keyboard shortcuts (?)",
     "toggleAria": "Show keyboard shortcuts",

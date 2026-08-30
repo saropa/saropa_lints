@@ -890,6 +890,12 @@
     "summaryVolume": "ルールトリアージ (ボリューム/マストフィックス/スタイル)",
     "hintSameAsTree": "問題切り分けアクティビティ バー ツリーと同じグループ化: フィルター問題、または `analysis_options_custom.yaml` のルールの無効化/有効化。大人数の場合は確認をお願いする場合がございます。"
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "キーボードショートカット (?) を表示する",
     "toggleAria": "キーボードショートカットを表示する",
@@ -1868,7 +1874,7 @@
       "fullDetail": "過去の動作状況。メモリ使用量の増加: 同じプロジェクトで測定した結果 +77% RSS。プロジェクトがこのフットプリントを負担できることが確認されている場合にのみ選択してください。",
       "alreadyOnLane": "既に{lane}レーンにいます",
       "updated": "分析レーンが{lane}に設定されました。Dart分析サーバーを再起動して適用します。",
-      "noPluginBlock": "Saropa Lints: 分析レーンを設定できませんでした — analysis_options.yamlに分析プラグインブロックが見つかりませんでした。インプロセスプラグインを有効にしてください。",
+      "noPluginBlock": "Saropa Lints: 分析レーンの設定ができませんでした — analysis_options_custom.yamlが見つかりません。'dart run saropa_lints init'を実行して作成してください。",
       "writeFailed": "Saropa Lints: 分析レーンの書き込みに失敗しました。{message}"
     },
     "divergence": {

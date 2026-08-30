@@ -16,6 +16,7 @@
   "command.runAnalysis.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Run Analysis analizini çalıştırın.",
   "command.verifyPlugin.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Plugin'in Çalıştığını Kontrol Et (yaşamlılık kontrolü)",
   "command.initializeConfig.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Başlangıç / Güncelleme Analiz Seçenekleri Analiz seçeneklerini başlatın.",
+  "command.migrateConfig.title": "Saropa Lints: Yapılandırma Anahtarlarını Geçir (desteklenmeyen_seçenek uyarılarını düzelt)",
   "command.createBaseline.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Başlangıç çizgisi oluşturun (mevcut ihlalleri bastırın)",
   "command.checkForUpdatesNow.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Paket Güncelleştirmeleri için Şimdi Kontrol Edin",
   "command.scanOnSave.runBaselineScan.title": "Saropa Lints: Proje Boyunca Sorunları Tarayın",

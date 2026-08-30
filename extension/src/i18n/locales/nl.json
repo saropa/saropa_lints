@@ -890,6 +890,12 @@
     "summaryVolume": "Regel triage (volume / moet-fix / stilistisch)",
     "hintSameAsTree": "Dezelfde groepering als de Triage activiteit-balk boom: filter issues, of uitschakelen/activeren regels in `analysis_options_custom.yaml゙. Grote groepen kunnen om bevestiging vragen."
   },
+  "fullAudit": {
+    "sidebar": {
+      "label": "Full Audit",
+      "description": "All rules · scope picker · filterable report"
+    }
+  },
   "kbdOverlay": {
     "toggleTitle": "Toon toetsenbordsnelkoppelingen (?)",
     "toggleAria": "Toon toetsenbordsnelkoppelingen.",
@@ -1868,7 +1874,7 @@
       "fullDetail": "De historische gedrag. Hogere geheugen kosten: +77% RSS gemeten op hetzelfde project. Kies dit alleen als je hebt gecontroleerd dat je project de voetafdruk kan dragen.",
       "alreadyOnLane": "Al op de {lane} baan.",
       "updated": "Analysebaan ingesteld op {lane}. Herstarten van de Dart analyse-server om het toe te passen.",
-      "noPluginBlock": "Saropa Lints: kon de analysebaan niet instellen — het analyzer plugin block werd niet gevonden in analysis_options.yaml. Schakel eerst het in-proces plugin in.",
+      "noPluginBlock": "Saropa Lints: kon de analysebaan niet instellen — analysis_options_custom.yaml werd niet gevonden. Voer 'dart run saropa_lints init' uit om deze te maken.",
       "writeFailed": "Saropa Lints: het schrijven van de analysebaan is mislukt. {message}"
     },
     "divergence": {
