@@ -19,6 +19,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import {
   parseLaneFromCustomConfig,
+  parseLaneFromPluginBlock,
   projectConfiguresLightLane,
   readRawLaneFromCustomConfig,
   writeLaneToCustomConfig,
@@ -133,6 +134,83 @@ describe('readRawLaneFromCustomConfig', () => {
   it('returns undefined when the file does not exist', () => {
     const root = makeWorkspace();
     assert.strictEqual(readRawLaneFromCustomConfig(root), undefined);
+  });
+
+  it('falls back to legacy plugin-block location when custom file has no lane key', () => {
+    // Deprecation fallback: lane in old `plugins > saropa_lints:` block,
+    // no lane key in custom file. Must return the legacy value.
+    const root = makeWorkspace();
+    write(root, 'analysis_options_custom.yaml', 'max_issues: 500\n');
+    write(root, 'analysis_options.yaml', [
+      'plugins:',
+      '  saropa_lints:',
+      '    version: "15.2.4"',
+      '    lane: full',
+      '    diagnostics:',
+      '      avoid_unguarded_debug: true',
+    ].join('\n'));
+    assert.strictEqual(readRawLaneFromCustomConfig(root), 'full');
+  });
+
+  it('falls back to legacy plugin-block when custom file does not exist', () => {
+    const root = makeWorkspace();
+    write(root, 'analysis_options.yaml', [
+      'plugins:',
+      '  saropa_lints:',
+      '    lane: full',
+    ].join('\n'));
+    assert.strictEqual(readRawLaneFromCustomConfig(root), 'full');
+  });
+
+  it('prefers custom file over legacy plugin-block', () => {
+    // Custom file takes precedence — the legacy value is ignored.
+    const root = makeWorkspace();
+    write(root, 'analysis_options_custom.yaml', 'lane: light\n');
+    write(root, 'analysis_options.yaml', [
+      'plugins:',
+      '  saropa_lints:',
+      '    lane: full',
+    ].join('\n'));
+    assert.strictEqual(readRawLaneFromCustomConfig(root), 'light');
+  });
+});
+
+describe('parseLaneFromPluginBlock', () => {
+  it('extracts lane from the saropa_lints plugin block', () => {
+    const content = [
+      'plugins:',
+      '  saropa_lints:',
+      '    version: "15.2.4"',
+      '    lane: full',
+      '    diagnostics:',
+      '      avoid_unguarded_debug: true',
+    ].join('\n');
+    assert.strictEqual(parseLaneFromPluginBlock(content), 'full');
+  });
+
+  it('returns undefined when lane is absent from the block', () => {
+    const content = [
+      'plugins:',
+      '  saropa_lints:',
+      '    version: "15.2.4"',
+    ].join('\n');
+    assert.strictEqual(parseLaneFromPluginBlock(content), undefined);
+  });
+
+  it('handles quoted lane values', () => {
+    const content = [
+      'plugins:',
+      '  saropa_lints:',
+      '    lane: "light"',
+    ].join('\n');
+    assert.strictEqual(parseLaneFromPluginBlock(content), 'light');
+  });
+
+  it('handles tab-indented plugin blocks', () => {
+    // Tab indentation is invalid YAML but seen in the wild. The parser
+    // must still extract the value rather than breaking out of the block.
+    const content = 'plugins:\n\tsaropa_lints:\n\t\tlane: full\n';
+    assert.strictEqual(parseLaneFromPluginBlock(content), 'full');
   });
 });
 

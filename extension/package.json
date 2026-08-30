@@ -123,6 +123,10 @@
         "title": "%command.initializeConfig.title%"
       },
       {
+        "command": "saropaLints.migrateConfig",
+        "title": "%command.migrateConfig.title%"
+      },
+      {
         "command": "saropaLints.createBaseline",
         "title": "%command.createBaseline.title%"
       },
@@ -206,6 +210,11 @@
         "command": "saropaLints.openProjectVibrancyReport",
         "title": "%command.openProjectVibrancyReport.title%",
         "icon": "$(graph)"
+      },
+      {
+        "command": "saropaLints.fullAudit",
+        "title": "Saropa Lints: Full Audit (All Rules)",
+        "icon": "$(shield)"
       },
       {
         "command": "saropaLints.openProjectHealthDashboard",

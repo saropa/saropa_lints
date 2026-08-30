@@ -30,9 +30,10 @@ export function readTierFromAnalysisOptionsYaml(root: string): string | null {
 
 const VALID_TIERS = new Set(['essential', 'recommended', 'professional', 'comprehensive', 'pedantic']);
 
-function leadingSpaces(value: string): number {
+/** Counts leading whitespace (spaces and tabs) — mirrors Dart's `_leadingWhitespace`. */
+function leadingWhitespace(value: string): number {
   let count = 0;
-  while (count < value.length && value[count] === ' ') count++;
+  while (count < value.length && (value[count] === ' ' || value[count] === '\t')) count++;
   return count;
 }
 
@@ -52,12 +53,12 @@ function parseTierFromPluginBlock(content: string): string | null {
   for (let i = 0; i < lines.length; i++) {
     const trimmed = lines[i].replace(/\s+$/, '');
     if (!/^\s+saropa_lints:\s*(#.*)?$/.test(trimmed)) continue;
-    const baseIndent = leadingSpaces(lines[i]);
+    const baseIndent = leadingWhitespace(lines[i]);
     for (let j = i + 1; j < lines.length; j++) {
       const inner = lines[j];
       const t = inner.replace(/^\s+/, '');
       if (t.length === 0 || t.startsWith('#')) continue;
-      const ind = leadingSpaces(inner);
+      const ind = leadingWhitespace(inner);
       if (ind <= baseIndent) break;
       const m = /^\s*(runtime_tier|saropa_tier):\s*([^\s#]+)/.exec(inner);
       if (m) {

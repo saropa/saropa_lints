@@ -146,12 +146,10 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
 
   /**
    * Row reporting the configured analysis lane (`lane:` top-level key in
-   * `analysis_options_custom.yaml`). Omitted with no project root, mirroring
+   * `analysis_options_custom.yaml`). Falls back to the old plugin-block
+   * location for unmigrated projects — matches the Dart engine's deprecation
+   * fallback. Omitted with no project root, mirroring
    * {@link buildAnalyzerPluginNode} — there is no yaml to describe.
-   *
-   * Note: the Dart engine has a deprecation fallback to the old
-   * `plugins > saropa_lints: lane:` location. This TS read does not —
-   * an unmigrated project may show 'light' here while the engine runs 'full'.
    */
   private buildLaneNode(root: string | undefined): ConfigTreeNode[] {
     if (!root) return [];
@@ -205,6 +203,7 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
     return [
       setting('Open analysis_options_custom.yaml', undefined, 'saropaLints.openConfig'),
       setting('Initialize / Update config', undefined, 'saropaLints.initializeConfig'),
+      setting('Migrate config keys', undefined, 'saropaLints.migrateConfig'),
       // Composite analyzer plugin scaffold is intentionally NOT exposed here.
       // The action targets a tiny audience (teams shipping their own custom
       // analyzer rules alongside Saropa) and the term is jargon to everyone

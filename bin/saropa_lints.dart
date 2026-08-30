@@ -17,9 +17,11 @@
 /// Commands:
 ///   init            Generate analysis_options.yaml with explicit rule config
 ///                   (default if no command given)
+///   audit           Run every rule against a codebase (all tiers)
 ///   baseline        Generate and manage baseline files for existing violations
 ///   impact-report   Run lint analysis and display results by impact level
 ///   scan            Run lint rules against any Dart project
+///   migrate-config  Move log_level/lane/memory_mode to analysis_options_custom.yaml
 ///   memory-report   Summarize the analysis server's RSS trend from plugin.log
 ///
 /// Examples:
@@ -32,9 +34,11 @@ library;
 
 import 'package:collection/collection.dart';
 
+import 'audit.dart' as audit_cmd;
 import 'baseline.dart' as baseline_cmd;
 import 'init.dart' as init_cmd;
 import 'memory_report.dart' as memory_report_cmd;
+import 'migrate_config.dart' as migrate_config_cmd;
 import 'scan.dart' as scan_cmd;
 import 'severity_report.dart' as severity_cmd;
 
@@ -60,9 +64,14 @@ Future<void> main(List<String> args) async {
         'impact-report' ||
         'impact_report':
       await severity_cmd.main(commandArgs);
+    case 'audit':
+      await audit_cmd.main(commandArgs);
     case 'scan':
       // scan.main is synchronous — no await needed
       scan_cmd.main(commandArgs);
+    case 'migrate-config' || 'migrate_config':
+      // migrate_config.main is synchronous — no await needed
+      migrate_config_cmd.main(commandArgs);
     case 'memory-report' || 'memory_report':
       // memory_report.main is synchronous — no await needed
       memory_report_cmd.main(commandArgs);
@@ -81,6 +90,7 @@ void _printUsage() {
   print('Commands:');
   print('  init            Generate analysis_options.yaml with rule config');
   print('                  (default if no command given)');
+  print('  audit           Run every rule against a codebase (all tiers)');
   print('  baseline        Generate/manage baseline for existing violations');
   print('  severity-report Run analysis and show results grouped by severity');
   print('  scan            Run configured lint rules against any Dart project');

@@ -42,9 +42,53 @@ export function parseLaneFromCustomConfig(content: string): string | undefined {
   return match[1].trim().replace(/^['"]|['"]$/g, '').toLowerCase();
 }
 
+/** Counts leading whitespace (spaces and tabs) — mirrors Dart's `_leadingWhitespace`. */
+function leadingWhitespace(value: string): number {
+  let count = 0;
+  while (count < value.length && (value[count] === ' ' || value[count] === '\t')) count++;
+  return count;
+}
+
+/**
+ * Deprecation fallback: reads `lane:` from the old `plugins > saropa_lints:`
+ * block in `analysis_options.yaml`. Returns the raw lower-cased value, or
+ * undefined when the key is absent.
+ *
+ * Mirrors Dart's `parseScalarFromPluginBlock(mainOptions, {'lane'})` in
+ * `config_loader.dart` — projects that haven't migrated their `lane:` key
+ * to `analysis_options_custom.yaml` still get the correct UI display.
+ */
+export function parseLaneFromPluginBlock(content: string): string | undefined {
+  const lines = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].replace(/\s+$/, '');
+    if (!/^\s+saropa_lints:\s*(#.*)?$/.test(trimmed)) continue;
+    const baseIndent = leadingWhitespace(lines[i]);
+    for (let j = i + 1; j < lines.length; j++) {
+      const inner = lines[j];
+      const t = inner.replace(/^\s+/, '');
+      if (t.length === 0 || t.startsWith('#')) continue;
+      const ind = leadingWhitespace(inner);
+      // Dedent to or past the `saropa_lints:` key means the block ended.
+      if (ind <= baseIndent) break;
+      const m = /^\s*lane:\s*([^\s#]+)/.exec(inner);
+      if (m) {
+        const v = m[1]?.trim();
+        if (!v) continue;
+        return v.replace(/^['"]|['"]$/g, '').toLowerCase();
+      }
+    }
+  }
+  return undefined;
+}
+
 /**
  * Reads the raw `lane:` value from [root]'s `analysis_options_custom.yaml`,
  * or `undefined` when the key is absent or the file cannot be read.
+ *
+ * Falls back to the old `plugins > saropa_lints: lane:` location in
+ * `analysis_options.yaml` for unmigrated projects — mirrors the Dart
+ * deprecation fallback in `_readWithDeprecationFallback`.
  *
  * Exposed separately from {@link projectConfiguresLightLane} (which collapses
  * absent/unrecognized values into a boolean) because the lane-picker UI needs
@@ -52,10 +96,21 @@ export function parseLaneFromCustomConfig(content: string): string | undefined {
  * yet" to render an accurate "current" marker.
  */
 export function readRawLaneFromCustomConfig(root: string): string | undefined {
+  // Primary: top-level key in custom config file.
   try {
     const yamlPath = path.join(root, 'analysis_options_custom.yaml');
     const content = fs.readFileSync(yamlPath, 'utf8');
-    return parseLaneFromCustomConfig(content);
+    const value = parseLaneFromCustomConfig(content);
+    if (value !== undefined) return value;
+  } catch {
+    // Custom file missing or unreadable — fall through to legacy check.
+  }
+
+  // Deprecation fallback: old plugin-block location in main file.
+  try {
+    const mainPath = path.join(root, 'analysis_options.yaml');
+    const mainContent = fs.readFileSync(mainPath, 'utf8');
+    return parseLaneFromPluginBlock(mainContent);
   } catch {
     return undefined;
   }

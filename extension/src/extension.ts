@@ -31,6 +31,7 @@ import {
   getSharedOutputChannel,
   TIER_ORDER,
 } from './setup';
+import { runMigrateConfig } from './config/migrateConfig';
 import { registerAnalyzerPluginWatchers } from './analyzerPluginWatch';
 import { surfacePluginDivergence } from './pluginDivergencePrompt';
 import { verifyPluginLiveness, surfaceLivenessResult } from './pluginLiveness';
@@ -59,6 +60,7 @@ import { registerIssuesViewCommands } from './commands/issuesViewCommands';
 import { showCommandCatalogPanel } from './views/commandCatalogView';
 import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView';
 import { openProjectVibrancyReport, refreshCodeHealthDashboardIfOpen } from './views/projectVibrancyReportView';
+import { registerAuditCommand } from './audit/audit-command';
 import { registerProjectMapCommand } from './views/projectMapView';
 import { registerSaropaDashboardsCommand } from './views/saropaDashboardsView';
 import { registerHealthCodeLens } from './views/healthCodeLens';
@@ -682,6 +684,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Stale ignore commands — detect and auto-remove dead // ignore: comments.
   // Returns a DiagnosticCollection added to subscriptions for cleanup.
   context.subscriptions.push(registerStaleIgnoreCommands(context));
+  registerAuditCommand(context);
   registerProjectMapCommand(context);
   registerSaropaDashboardsCommand(context);
   registerHealthCodeLens(context);
@@ -1394,6 +1397,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         updateAllStatusBars();
         updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
       }
+    }),
+    // Migrate legacy config keys from the plugin block to the custom file.
+    // Surfaced in the sidebar (Config > Migrate config keys) and command palette.
+    vscode.commands.registerCommand('saropaLints.migrateConfig', async () => {
+      const root = getProjectRoot();
+      await runMigrateConfig(root);
+      refreshAll();
     }),
     // One-click enable of a rule pack (used by the startup toast follow-through
     // and programmatic callers). Writes the pack into analysis_options.yaml,

@@ -74,6 +74,13 @@ This patch moves `log_level`, `lane`, and `memory_mode` configuration from the `
 
 - `log_level`, `lane`, and `memory_mode` plugin configuration keys no longer trigger `unsupported_option` warnings from the Dart SDK analyzer. These keys now live as top-level entries in `analysis_options_custom.yaml` instead of under `plugins > saropa_lints:`. Projects still using the old location get a deprecation warning with the key's value honored as a fallback; `dart run saropa_lints init` generates the updated layout automatically.
 
+### Added
+
+- **Full Audit CLI** — `dart run saropa_lints audit <dir>` runs every rule (pedantic + stylistic) against a codebase regardless of the project's configured tier. Produces enriched JSON with per-diagnostic `tier` and `category` fields. Supports `--since <ref>` to audit only changed files, `--min-severity`/`--min-impact` post-filters, `--profile` timing, and `--exclude-globs`/`--include-globs`.
+- **Full Audit sidebar button** — new "Full Audit" entry in the extension sidebar launches the audit with a scope quick-pick (full project, changed vs main, or pick a branch) and opens a filterable report webview with search, tier/severity/impact filter chips, sortable columns, and JSON export.
+- **Audit report keyboard navigation** — use ↑/↓ arrow keys to move between rows and Enter to open the file at that diagnostic. A "no matches" state now appears when filters exclude all results.
+- **Migrate Config** — `dart run saropa_lints migrate-config` and a sidebar button ("Migrate config keys") automatically move `log_level`, `lane`, and `memory_mode` from the old plugin block to `analysis_options_custom.yaml`. Safe to run multiple times; already-migrated keys are skipped.
+
 ### Changed (Extension)
 
 - The lane picker now reads and writes `lane:` from `analysis_options_custom.yaml` instead of `analysis_options.yaml`. No action required — the extension handles the new location transparently.

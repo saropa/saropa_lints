@@ -85,9 +85,19 @@ RuleTier? _parseTierLabel(String? raw) {
   };
 }
 
-int _leadingSpaces(String value) {
+/// Counts leading whitespace characters (spaces and tabs).
+///
+/// YAML spec forbids tabs for indentation, but real-world files sometimes
+/// use them. Counting only ASCII space (code 32) caused `parseScalarFromPluginBlock`
+/// to break out of the block walk immediately on tab-indented content, since
+/// both the header and its children computed indent=0. Counting tabs too
+/// makes the deprecation fallback path work for tab-indented plugin blocks.
+int _leadingWhitespace(String value) {
   var count = 0;
-  while (count < value.length && value.codeUnitAt(count) == 32) {
+  while (count < value.length) {
+    final c = value.codeUnitAt(count);
+    // ASCII space (32) or tab (9).
+    if (c != 32 && c != 9) break;
     count++;
   }
   return count;
@@ -163,14 +173,14 @@ String? parseScalarFromPluginBlock(String? content, Set<String> keys) {
   for (var i = 0; i < lines.length; i++) {
     final trimmed = lines[i].trimRight();
     if (!RegExp(r'^\s+saropa_lints:\s*(?:#.*)?$').hasMatch(trimmed)) continue;
-    final baseIndent = _leadingSpaces(lines[i]);
+    final baseIndent = _leadingWhitespace(lines[i]);
     for (var j = i + 1; j < lines.length; j++) {
       final inner = lines[j];
       final t = inner.trimLeft();
       // Blank lines and comments do not end the block — a commented-out key
       // inside the block must not stop the search for a live one below it.
       if (t.isEmpty || t.startsWith('#')) continue;
-      final ind = _leadingSpaces(inner);
+      final ind = _leadingWhitespace(inner);
       // Dedent to or past the `saropa_lints:` key means the block ended.
       if (ind <= baseIndent) break;
       final m = keyPattern.firstMatch(inner);

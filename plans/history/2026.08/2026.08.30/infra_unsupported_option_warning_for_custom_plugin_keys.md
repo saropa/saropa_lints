@@ -135,7 +135,24 @@ the raw file content. The warning is purely cosmetic.
 - `writeLaneToCustomConfig` insertion-point regex hardened (`\s?` instead of `\s`) so bare `output:` / `log_level:` at EOL still anchors.
 - Callers in `setup.ts` and `configTree.ts` updated.
 
-**Tests:** All updated and passing (Dart 9/9, TS 22/22, write_config 12/12).
+**Tests:** All updated and passing (Dart 23/23, TS 37/37, write_config 12/12).
+
+### Hardening (follow-up pass)
+
+- `_leadingSpaces` renamed to `_leadingWhitespace` in `runtime_tier_cap.dart` — now counts tabs too, fixing the deprecation fallback for tab-indented plugin blocks.
+- TS `leadingSpaces` → `leadingWhitespace` in `tierConfig.ts` (same fix).
+- TS deprecation fallback added: `parseLaneFromPluginBlock` in `laneConfig.ts` + `readRawLaneFromCustomConfig` now falls back to the old plugin-block location, closing the TS/Dart display disagreement for unmigrated projects.
+- `_readWithDeprecationFallback` extracted in `config_loader.dart` to de-duplicate the fallback pattern across all three loaders.
+- Dead alias `final content = mainContent;` removed from `_loadDiagnosticsConfig`.
+- `kLaneConfigKey` constant restored in `_loadRuleLane` (was using raw `'lane'` string).
+- Garbled doc comment in `runtime_tier_cap.dart` reformatted.
+- Stale doc comment in `configTree.ts` updated to reflect the new custom file location.
+
+### Migrate Config feature
+
+- **CLI:** `dart run saropa_lints migrate-config` — reads `log_level`/`lane`/`memory_mode` from the old plugin block, moves them to `analysis_options_custom.yaml`, removes them from `analysis_options.yaml`. Safe to run multiple times.
+- **Extension:** `saropaLints.migrateConfig` command — sidebar button "Migrate config keys" + command palette entry. Shows informational toast with result.
+- Registered in `package.json`, `package.nls.json`, `extension.ts`, and `configTree.ts`.
 
 ### Not addressed
 - `rule_packs` also lives under `plugins > saropa_lints:` (same SDK warning risk, out of scope).
