@@ -14,8 +14,8 @@ import { readInstalledVersion } from './upgrade-checker';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
 import { readTierFromAnalysisOptionsYaml } from './config/tierConfig';
 import {
-  readRawLaneFromAnalysisOptionsYaml,
-  writeLaneToAnalysisOptionsYaml,
+  readRawLaneFromCustomConfig,
+  writeLaneToCustomConfig,
   type RuleLaneValue,
 } from './config/laneConfig';
 import { l10n } from './i18n/runtime';
@@ -2079,11 +2079,11 @@ let _laneChangeInFlight: Promise<void> | undefined;
 
 /**
  * Show a QuickPick to switch between the `light` and `full` in-process
- * analysis lanes (`plugins.saropa_lints.lane` in `analysis_options.yaml`; see
+ * analysis lanes (`lane:` in `analysis_options_custom.yaml`; see
  * `lib/src/config/rule_lane.dart` and `plans/PLAN_two_lane_daemon_architecture.md`).
  *
  * Deliberately lighter-weight than {@link runSetTier}: a lane change is a
- * single scalar write (`writeLaneToAnalysisOptionsYaml`), not a ~2000-rule
+ * single scalar write (`writeLaneToCustomConfig`), not a ~2000-rule
  * regeneration, so there is no child-process CLI call and no progress bar —
  * just the write plus an analysis-server restart so the new lane actually
  * takes effect (see `restartDartAnalysisServer`'s comment for why editing the
@@ -2108,7 +2108,7 @@ async function runSetLaneExclusive(): Promise<void> {
   // Absent/unrecognized reads as 'light' — matches the Dart-side default
   // (RuleLane.light) so the picker's "current" marker agrees with what the
   // in-process plugin is actually doing when the key was never written.
-  const rawCurrent = readRawLaneFromAnalysisOptionsYaml(root);
+  const rawCurrent = readRawLaneFromCustomConfig(root);
   const previousLane: RuleLaneValue = rawCurrent === 'full' ? 'full' : 'light';
 
   interface LanePickItem extends vscode.QuickPickItem {
@@ -2133,13 +2133,10 @@ async function runSetLaneExclusive(): Promise<void> {
     return;
   }
 
-  const result = writeLaneToAnalysisOptionsYaml(root, lane);
+  const result = writeLaneToCustomConfig(root, lane);
   if (!result.ok) {
-    // 'no-file' / 'no-plugin-block' both mean the analyzer plugin was never
-    // configured (or was disabled and commented out) — writing a lane into a
-    // nonexistent block would create a dangling key nothing reads, so this
-    // points the user at enabling the plugin first instead of guessing at a
-    // block to synthesize.
+    // 'no-file' means the custom config file does not exist (run
+    // `dart run saropa_lints init` to create it).
     const message =
       result.reason === 'write-error'
         ? l10n('notify.lane.writeFailed', { message: result.message ?? '' })

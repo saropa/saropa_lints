@@ -103,6 +103,13 @@ String buildMinimalConfig(
   buf.writeln('# ANALYSIS SETTINGS');
   buf.writeln('max_issues: $maxIssues');
   buf.writeln('output: $output');
+  // log_level and lane live here (not under plugins > saropa_lints: in
+  // analysis_options.yaml) to avoid unsupported_option warnings from the
+  // Dart SDK's plugin-block validator, which hardcodes the allowed key set.
+  buf.writeln('log_level: info # off | error | warning | info | debug');
+  buf.writeln(
+    '# lane: light # full | light (default when absent: light)',
+  );
   buf.writeln();
 
   // Platform settings (no auto-detection available — user controls these)

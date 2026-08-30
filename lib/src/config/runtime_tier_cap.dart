@@ -138,13 +138,19 @@ String? parseSaropaTierFromPluginBlock(String? content) {
 /// in [content], lower-cased and unquoted; `null` when absent.
 ///
 /// Extracted from [parseSaropaTierFromPluginBlock] so every plugin-block key
-/// (tier, `lane:`, and whatever comes next) walks the block with ONE
-/// implementation. The walk is indentation-based rather than a YAML parse
-/// because this runs inside the analysis-server isolate on every config load,
-/// where pulling in a full YAML parse of the consumer's options file is
-/// disproportionate — and because the TS mirror
-/// (`extension/src/config/tierConfig.ts`) has to reproduce the same behavior
-/// against the shared fixture `test/fixtures/tier_yaml_parser_cases.json`.
+/// (tier and whatever comes next) walks the block with ONE implementation.
+///
+/// Note: `lane:`, `log_level:`, and `memory_mode:` were moved out of the
+/// plugin block into `analysis_options_custom.yaml` (top-level keys) and are
+/// now parsed by `_parseTopLevelScalar` in `config_loader.dart`. This
+/// function is still used as the deprecation fallback for those keys.
+///
+/// The walk is indentation-based rather than a YAML parse because this runs
+/// inside the analysis-server isolate on every config load, where pulling in
+/// a full YAML parse of the consumer's options file is disproportionate —
+/// and because the TS mirror (`extension/src/config/tierConfig.ts`) has to
+/// reproduce the same behavior against the shared fixture
+/// `test/fixtures/tier_yaml_parser_cases.json`.
 String? parseScalarFromPluginBlock(String? content, Set<String> keys) {
   if (content == null || content.isEmpty || keys.isEmpty) return null;
   final normalized = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');

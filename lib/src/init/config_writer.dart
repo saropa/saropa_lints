@@ -83,27 +83,8 @@ String generatePluginsYaml({
   } else {
     buffer.writeln('    # version: unknown — run dart pub get to resolve');
   }
-  buffer.writeln('    log_level: info # off | error | warning | info | debug');
-  // Two-lane split. Written commented-out; `light` is the actual default
-  // when the key is absent (RSS-measured at +0.6% over plugin-off, vs +77.2%
-  // for `full`) — the comment documents that explicitly so a user reading the
-  // generated file is not misled by the commented-out value.
-  // See plans/PLAN_two_lane_daemon_architecture.md.
-  buffer.writeln(
-    '    # lane: light # full | light (default when absent: light)',
-  );
-  buffer.writeln(
-    '    # `light` runs ONLY error/warning rules that need no type resolution',
-  );
-  buffer.writeln(
-    '    # in the analysis server (~200 of 2300). Everything else is reported',
-  );
-  buffer.writeln(
-    '    # on save by the out-of-process scanner, so nothing is lost — but the',
-  );
-  buffer.writeln(
-    '    # server stops holding the whole project\'s resolved type model.',
-  );
+  // log_level and lane live in analysis_options_custom.yaml (top-level keys)
+  // to avoid unsupported_option warnings from the SDK's plugin-block validator.
   if (rulePacksEnabled.isNotEmpty) {
     final sorted = List<String>.of(rulePacksEnabled)..sort();
     buffer.writeln('    rule_packs:');

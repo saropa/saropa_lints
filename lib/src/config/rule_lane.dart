@@ -52,7 +52,9 @@ enum RuleLane {
   full,
 }
 
-/// Config key parsed from the plugin's section of `analysis_options.yaml`.
+/// Config key name — used in warning messages. Parsed as a top-level key
+/// in `analysis_options_custom.yaml` by `_parseTopLevelScalar` in
+/// `config_loader.dart`.
 const String kLaneConfigKey = 'lane';
 
 /// Highest [RuleCost] admitted to the light lane.
@@ -154,7 +156,7 @@ RuleLane parseRuleLane(String? raw) {
   if (value == 'full') return RuleLane.full;
 
   PluginLogger.log(
-    'Unknown `$kLaneConfigKey: $raw` in analysis_options.yaml — expected '
+    'Unknown `$kLaneConfigKey: $raw` in analysis_options_custom.yaml — expected '
     '"light" or "full". Falling back to "full" (all enabled rules run '
     'in-process).',
   );

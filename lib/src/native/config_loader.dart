@@ -122,11 +122,11 @@ void _loadFromRoot(String? projectRoot) {
     // AST state. Scoped to [_nativePluginStarted] so the scan CLI and the
     // rule test harness — which run full coverage deliberately, including
     // on projects whose integration is toggled off — are unaffected.
+    // Read the main file once — used for the OFF sentinel, diagnostics, and
+    // as a deprecation fallback for keys migrated to the custom file.
+    final mainOptions = _readProjectFile('analysis_options.yaml', projectRoot);
+
     if (_nativePluginStarted) {
-      final mainOptions = _readProjectFile(
-        'analysis_options.yaml',
-        projectRoot,
-      );
       if (mainOptions != null &&
           mainOptions.contains(kIntegrationOffSentinel)) {
         SaropaLintRule.enabledRules = null;
@@ -147,7 +147,7 @@ void _loadFromRoot(String? projectRoot) {
       projectRoot,
     );
     _loadSeverityOverrides(content);
-    _loadDiagnosticsConfig(projectRoot);
+    _loadDiagnosticsConfig(mainOptions, projectRoot);
     if (projectRoot != null) {
       loadRulePacksConfigFromProjectRoot(projectRoot);
     } else {
@@ -156,7 +156,12 @@ void _loadFromRoot(String? projectRoot) {
     _loadBaselineConfig(content);
     loadBannedUsageConfig(content);
     _loadOutputConfig(content);
-    _loadMemoryMode(content);
+    // log_level, lane, and memory_mode live in the custom file (top-level
+    // keys) to avoid unsupported_option warnings from the SDK's plugin-block
+    // validator. Falls back to the old `plugins > saropa_lints:` location
+    // with a deprecation warning for projects that haven't migrated yet.
+    _loadLogLevel(content, mainOptions);
+    _loadMemoryMode(content, mainOptions);
     _loadDiagnosticStatisticsConfig(content, projectRoot);
 
     // Tier cap. The in-process essential DEFAULT applies only when BOTH:
@@ -193,8 +198,9 @@ void _loadFromRoot(String? projectRoot) {
     // save). In-process only: the scan CLI and the rule test harness must keep
     // running full coverage, and they reach this loader without starting the
     // plugin, which is exactly what [_nativePluginStarted] distinguishes.
+    // Lane lives in the custom file to avoid SDK unsupported_option warnings.
     if (_nativePluginStarted) {
-      _loadRuleLane(projectRoot);
+      _loadRuleLane(content, mainOptions, projectRoot);
     }
 
     // Success telemetry — visible in reports/.saropa_lints/plugin.log once
@@ -215,14 +221,17 @@ void _loadFromRoot(String? projectRoot) {
   }
 }
 
-/// Reads `lane:` from the plugin block of `analysis_options.yaml` and narrows
-/// [SaropaLintRule.enabledRules] to that lane.
+/// Reads `lane:` as a top-level key in `analysis_options_custom.yaml` and
+/// narrows [SaropaLintRule.enabledRules] to that lane.
 ///
 /// ```yaml
-/// plugins:
-///   saropa_lints:
-///     lane: light   # default when the key is absent; or: full
+/// # analysis_options_custom.yaml
+/// lane: light   # default when the key is absent; or: full
 /// ```
+///
+/// Moved from `analysis_options.yaml` (under `plugins > saropa_lints:`) to
+/// avoid `unsupported_option` warnings from the Dart SDK's plugin-block
+/// validator, which hardcodes the allowed key set.
 ///
 /// `light` runs only rules that are severe, cheap, and free of type
 /// resolution in the analysis server; everything else is delivered on save by
@@ -236,11 +245,19 @@ void _loadFromRoot(String? projectRoot) {
 /// `SaropaContext._wrapCallback`) already enforces the lane for that path.
 /// Writing a set here would turn "nothing configured" into "these 200 rules
 /// are explicitly enabled", changing tier-cap and reporting semantics.
-void _loadRuleLane(String? projectRoot) {
-  final mainOptions = _readProjectFile('analysis_options.yaml', projectRoot);
-  final lane = parseRuleLane(
-    parseScalarFromPluginBlock(mainOptions, const <String>{kLaneConfigKey}),
+void _loadRuleLane(
+  String? customContent,
+  String? mainOptions,
+  String? projectRoot,
+) {
+  // Reads `lane:` from the custom file, falling back to the old plugin block
+  // with a deprecation warning via [_readWithDeprecationFallback].
+  final raw = _readWithDeprecationFallback(
+    customContent,
+    mainOptions,
+    kLaneConfigKey,
   );
+  final lane = parseRuleLane(raw);
   setActiveRuleLane(lane);
   if (lane == RuleLane.full) return;
 
@@ -481,9 +498,9 @@ void _loadSeverityOverrides(String? content) {
 /// project when provided. When null, falls back to [Directory.current] —
 /// which fails silently in the analyzer-launched path (see
 /// [loadNativePluginConfigFromProjectRoot]).
-void _loadDiagnosticsConfig([String? projectRoot]) {
-  final content = _readProjectFile('analysis_options.yaml', projectRoot);
-  if (content == null) {
+void _loadDiagnosticsConfig(String? mainContent, [String? projectRoot]) {
+  // Accept pre-read main file content to avoid re-reading the file.
+  if (mainContent == null) {
     PluginLogger.warning(
       'analysis_options.yaml not found at '
       '${projectRoot ?? Directory.current.path} — saropa_lints will not '
@@ -492,15 +509,10 @@ void _loadDiagnosticsConfig([String? projectRoot]) {
 
     return;
   }
-
-  // Parse log_level before the diagnostics-section check — it is a sibling
-  // key under `plugins > saropa_lints`, not nested under `diagnostics:`.
-  _loadLogLevel(content);
-
   final sectionMatch = RegExp(
     r'^\s+diagnostics:\s*$',
     multiLine: true,
-  ).firstMatch(content);
+  ).firstMatch(mainContent);
   if (sectionMatch == null) {
     PluginLogger.warning(
       'analysis_options.yaml found at '
@@ -514,7 +526,7 @@ void _loadDiagnosticsConfig([String? projectRoot]) {
 
   final enabled = SaropaLintRule.enabledRules ?? <String>{};
   final disabled = SaropaLintRule.disabledRules ?? <String>{};
-  final lines = content.afterIndex(sectionMatch.end).split('\n');
+  final lines = mainContent.afterIndex(sectionMatch.end).split('\n');
 
   for (final line in lines) {
     if (line.trim().isEmpty || line.trimLeft().startsWith('#')) continue;
@@ -540,50 +552,41 @@ void _loadDiagnosticsConfig([String? projectRoot]) {
   SaropaLintRule.disabledRules = disabled.isEmpty ? null : disabled;
 }
 
-/// Parses `log_level:` under `plugins > saropa_lints` in
-/// `analysis_options.yaml`. Valid values: off, error, warning, info, debug.
+/// Parses `log_level:` as a top-level key in `analysis_options_custom.yaml`.
+/// Valid values: off, error, warning, info, debug.
 /// Unrecognized values leave [PluginLogger.minLevel] at its default (info).
 ///
-/// Scoped to the `saropa_lints:` section so a `log_level:` key under an
-/// unrelated top-level section is not matched.
-void _loadLogLevel(String content) {
-  // Find the saropa_lints section first.
-  final saropaMatch = RegExp(
-    r'^\s+saropa_lints:\s*$',
-    multiLine: true,
-  ).firstMatch(content);
-  if (saropaMatch == null) return;
-
-  final afterSaropa = content.substring(saropaMatch.end);
-  // Match log_level at the same nesting level as version:/diagnostics:.
-  // Accept spaces or tabs — some projects use tab indentation.
-  final match = RegExp(
-    r'^[ \t]+log_level:\s*(\S+)',
-    multiLine: true,
-  ).firstMatch(afterSaropa);
-  if (match == null) return;
-
-  final raw = match.group(1);
+/// Moved from `analysis_options.yaml` (under `plugins > saropa_lints:`) to
+/// avoid `unsupported_option` warnings from the Dart SDK's plugin-block
+/// validator, which hardcodes the allowed key set. Falls back to the old
+/// plugin-block location in [mainOptions] with a deprecation warning via
+/// [_readWithDeprecationFallback].
+void _loadLogLevel(String? content, String? mainOptions) {
+  final raw = _readWithDeprecationFallback(content, mainOptions, 'log_level');
+  if (raw == null) return;
   final parsed = PluginLogLevel.tryParse(raw);
   if (parsed != null) {
     PluginLogger.minLevel = parsed;
   } else {
     PluginLogger.warning(
-      'Unrecognized log_level "$raw" in analysis_options.yaml — '
+      'Unrecognized log_level "$raw" in analysis_options_custom.yaml — '
       'valid values: off, error, warning, info, debug. '
       'Keeping current level (${PluginLogger.minLevel.name}).',
     );
   }
 }
 
-/// Parses `memory_mode:` under `plugins > saropa_lints` in
-/// `analysis_options.yaml` or the `SAROPA_MEMORY_MODE` env var.
+/// Parses `memory_mode:` as a top-level key in
+/// `analysis_options_custom.yaml` or the `SAROPA_MEMORY_MODE` env var.
 /// Valid values: `balanced` (default), `full`. Env var takes precedence.
 ///
-/// Scoped to the `saropa_lints:` section so a `memory_mode:` key under an
-/// unrelated top-level section is not matched.
-void _loadMemoryMode(String? content) {
+/// Lives in the custom file (not under `plugins > saropa_lints:`) to avoid
+/// `unsupported_option` warnings from the SDK's plugin-block validator.
+/// Falls back to the old plugin-block location in [mainOptions] with a
+/// deprecation warning so projects that haven't migrated yet still work.
+void _loadMemoryMode(String? content, String? mainOptions) {
   try {
+    // Env var takes precedence over the yaml key.
     final envValue = Platform.environment['SAROPA_MEMORY_MODE'];
     if (envValue != null) {
       final parsed = _parseMemoryMode(envValue);
@@ -602,32 +605,68 @@ void _loadMemoryMode(String? content) {
     // Platform.environment may throw on some platforms
   }
 
-  if (content == null) return;
-
-  final saropaMatch = RegExp(
-    r'^\s+saropa_lints:\s*$',
-    multiLine: true,
-  ).firstMatch(content);
-  if (saropaMatch == null) return;
-
-  final afterSaropa = content.substring(saropaMatch.end);
-  final match = RegExp(
-    r'^[ \t]+memory_mode:\s*(\S+)',
-    multiLine: true,
-  ).firstMatch(afterSaropa);
-  if (match == null) return;
-
-  final raw = match.group(1);
+  // Reads `memory_mode:` from the custom file, falling back to the old plugin
+  // block with a deprecation warning via [_readWithDeprecationFallback].
+  final raw = _readWithDeprecationFallback(content, mainOptions, 'memory_mode');
+  if (raw == null) return;
   final parsed = _parseMemoryMode(raw);
   if (parsed != null) {
     MemoryModeConfig.mode = parsed;
   } else {
     PluginLogger.warning(
-      'Unrecognized memory_mode "$raw" in analysis_options.yaml — '
+      'Unrecognized memory_mode "$raw" in analysis_options_custom.yaml — '
       'valid values: balanced, full. '
       'Keeping current mode (${MemoryModeConfig.mode.name}).',
     );
   }
+}
+
+/// Extracts the value of a top-level YAML key from [content].
+///
+/// Matches `key: value` at column 0, excluding inline comments (`# ...`).
+/// Strips surrounding YAML quotes (`"` or `'`) and lower-cases the result to
+/// mirror the TS `parseLaneFromCustomConfig` in `laneConfig.ts`. Returns null
+/// if the key is absent, commented out, or has no value.
+///
+/// Shared by `_loadLogLevel`, `_loadRuleLane`, and `_loadMemoryMode` so all
+/// top-level custom-config keys parse consistently (avoids the drift that
+/// happens when each copy re-implements its own regex).
+String? _parseTopLevelScalar(String? content, String key) {
+  if (content == null) return null;
+  final match = RegExp(
+    '^$key:\\s*([^\\s#]+)',
+    multiLine: true,
+  ).firstMatch(content);
+  final raw = match?.group(1);
+  if (raw == null) return null;
+  // Strip surrounding YAML quotes (single or double) — `lane: "light"` and
+  // `lane: light` must both parse as `light`.
+  return raw.replaceAll(RegExp(r"""^['"]|['"]$"""), '').toLowerCase();
+}
+
+/// Reads a top-level key from the custom file, falling back to the old
+/// `plugins > saropa_lints:` block in the main file with a deprecation
+/// warning. Shared by `_loadLogLevel`, `_loadRuleLane`, and `_loadMemoryMode`
+/// so the fallback-and-warn pattern is defined once.
+String? _readWithDeprecationFallback(
+  String? customContent,
+  String? mainOptions,
+  String key,
+) {
+  final value = _parseTopLevelScalar(customContent, key);
+  if (value != null) return value;
+  if (mainOptions == null) return null;
+
+  // Check the old location under `plugins > saropa_lints:`.
+  final legacy = parseScalarFromPluginBlock(mainOptions, {key});
+  if (legacy != null) {
+    PluginLogger.warning(
+      '$key found under plugins > saropa_lints: in '
+      'analysis_options.yaml — move it to analysis_options_custom.yaml '
+      '(top-level key) to avoid unsupported_option warnings.',
+    );
+  }
+  return legacy;
 }
 
 MemoryMode? _parseMemoryMode(String? raw) {

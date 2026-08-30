@@ -13,7 +13,7 @@ import { getProjectRoot } from '../projectRoot';
 import { formatLanguageChoiceLabel } from '../i18n/languagePick';
 import { l10n } from '../i18n/runtime';
 import { getPluginsIntegrationState } from '../setup';
-import { readRawLaneFromAnalysisOptionsYaml } from '../config/laneConfig';
+import { readRawLaneFromCustomConfig } from '../config/laneConfig';
 import { getViolationsTriageState, readViolations } from '../violationsReader';
 import {
   type ConfigTreeNode,
@@ -145,16 +145,20 @@ export class ConfigTreeProvider implements vscode.TreeDataProvider<ConfigTreeNod
   }
 
   /**
-   * Row reporting the configured analysis lane (`plugins.saropa_lints.lane`
-   * in analysis_options.yaml). Omitted with no project root, mirroring
+   * Row reporting the configured analysis lane (`lane:` top-level key in
+   * `analysis_options_custom.yaml`). Omitted with no project root, mirroring
    * {@link buildAnalyzerPluginNode} — there is no yaml to describe.
+   *
+   * Note: the Dart engine has a deprecation fallback to the old
+   * `plugins > saropa_lints: lane:` location. This TS read does not —
+   * an unmigrated project may show 'light' here while the engine runs 'full'.
    */
   private buildLaneNode(root: string | undefined): ConfigTreeNode[] {
     if (!root) return [];
     // Absent/unrecognized reads as 'light' — matches the Dart-side default
     // (RuleLane.light) so the sidebar agrees with what the in-process plugin
     // is actually doing when the key was never written.
-    const raw = readRawLaneFromAnalysisOptionsYaml(root);
+    const raw = readRawLaneFromCustomConfig(root);
     const lane = raw === 'full' ? 'full' : 'light';
     const description =
       lane === 'full' ? l10n('dashboards.controls.laneFull') : l10n('dashboards.controls.laneLight');

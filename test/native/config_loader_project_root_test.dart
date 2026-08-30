@@ -138,7 +138,9 @@ plugins:
       }
     });
 
-    test('log_level is honored even without a diagnostics block', () {
+    test('log_level is honored from custom config file', () {
+      // log_level lives in analysis_options_custom.yaml (top-level key) to
+      // avoid unsupported_option warnings from the SDK's plugin-block validator.
       final tempDir = Directory.systemTemp.createTempSync('saropa_lints_root_');
       try {
         File(p.join(tempDir.path, 'analysis_options.yaml')).writeAsStringSync(
@@ -146,16 +148,18 @@ plugins:
 plugins:
   saropa_lints:
     version: "14.3.8"
-    log_level: debug
 ''',
         );
+        File(
+          p.join(tempDir.path, 'analysis_options_custom.yaml'),
+        ).writeAsStringSync('log_level: debug\n');
 
         loadNativePluginConfigFromProjectRoot(tempDir.path);
 
         expect(
           PluginLogger.minLevel,
           PluginLogLevel.debug,
-          reason: 'log_level must be parsed even without diagnostics block',
+          reason: 'log_level must be parsed from custom config file',
         );
       } finally {
         safeDeleteDir(tempDir);
@@ -166,16 +170,19 @@ plugins:
       final tempDir = Directory.systemTemp.createTempSync('saropa_lints_root_');
       File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
       try {
+        // log_level is read from the custom file; diagnostics from the main file.
         File(p.join(tempDir.path, 'analysis_options.yaml')).writeAsStringSync(
           '''
 plugins:
   saropa_lints:
     version: "14.3.8"
-    log_level: verbose
     diagnostics:
       avoid_hardcoded_credentials: true
 ''',
         );
+        File(
+          p.join(tempDir.path, 'analysis_options_custom.yaml'),
+        ).writeAsStringSync('log_level: verbose\n');
 
         PluginLogger.setProjectRoot(tempDir.path);
         loadNativePluginConfigFromProjectRoot(tempDir.path);
@@ -203,22 +210,63 @@ plugins:
       }
     });
 
-    test('tab-indented log_level is parsed correctly', () {
+    test('log_level is parsed from custom config file', () {
+      // log_level is a top-level key in the custom file — no nesting, so
+      // indentation does not matter. This test verifies the basic read path.
       final tempDir = Directory.systemTemp.createTempSync('saropa_lints_root_');
       try {
-        File(p.join(tempDir.path, 'analysis_options.yaml')).writeAsStringSync(
-          'plugins:\n'
-          '\tsaropa_lints:\n'
-          '\t\tversion: "14.3.8"\n'
-          '\t\tlog_level: error\n',
-        );
+        File(
+          p.join(tempDir.path, 'analysis_options_custom.yaml'),
+        ).writeAsStringSync('log_level: error\n');
 
         loadNativePluginConfigFromProjectRoot(tempDir.path);
 
         expect(
           PluginLogger.minLevel,
           PluginLogLevel.error,
-          reason: 'Tab-indented log_level must be parsed',
+          reason: 'log_level must be parsed from custom config',
+        );
+      } finally {
+        safeDeleteDir(tempDir);
+      }
+    });
+
+    test('log_level falls back to plugin block with deprecation warning', () {
+      // Deprecation path: log_level still in the old `plugins > saropa_lints:`
+      // block and no custom file. The loader must use the old value but emit
+      // a migration warning.
+      final tempDir = Directory.systemTemp.createTempSync('saropa_lints_root_');
+      File(p.join(tempDir.path, 'pubspec.yaml')).writeAsStringSync('name: t');
+      try {
+        File(p.join(tempDir.path, 'analysis_options.yaml')).writeAsStringSync(
+          '''
+plugins:
+  saropa_lints:
+    version: "15.2.4"
+    log_level: debug
+    diagnostics:
+      avoid_hardcoded_credentials: true
+''',
+        );
+        // No custom file — forces the fallback path.
+
+        PluginLogger.setProjectRoot(tempDir.path);
+        loadNativePluginConfigFromProjectRoot(tempDir.path);
+
+        // The old value must still be honored via the fallback.
+        expect(
+          PluginLogger.minLevel,
+          PluginLogLevel.debug,
+          reason: 'log_level from old location must be honored as fallback',
+        );
+
+        // A deprecation warning must be logged pointing at the new location.
+        final logFile = File(PluginLogger.logFilePathForTesting!);
+        final contents = logFile.readAsStringSync();
+        expect(
+          contents,
+          contains('move it to analysis_options_custom.yaml'),
+          reason: 'Must warn to migrate log_level to the custom file',
         );
       } finally {
         safeDeleteDir(tempDir);

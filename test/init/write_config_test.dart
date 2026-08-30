@@ -42,7 +42,9 @@ void main() {
         expect(content, contains('plugins:'));
         expect(content, contains('saropa_lints:'));
         expect(content, contains('diagnostics:'));
-        expect(content, contains('log_level: info'));
+        // log_level moved to analysis_options_custom.yaml to avoid SDK
+        // unsupported_option warnings — no longer in the main file.
+        expect(content, isNot(contains('log_level:')));
       } finally {
         safeDeleteDir(dir);
       }

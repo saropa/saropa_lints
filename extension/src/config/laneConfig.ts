@@ -1,12 +1,16 @@
 /**
  * Decides whether a scan request may skip the "light lane" rules — those the
  * in-process analyzer plugin runs itself when the project is configured with
- * `lane: light` under `plugins.saropa_lints` in `analysis_options.yaml`.
+ * `lane: light` in `analysis_options_custom.yaml`.
  *
  * See `plans/PLAN_two_lane_daemon_architecture.md`. The Dart-side definition
  * of which rules those are lives in `lib/src/config/rule_lane.dart`; this
  * module never enumerates rules, it only answers "is the in-process lane
  * genuinely covering them right now?".
+ *
+ * `lane:` lives in the custom file (not under `plugins > saropa_lints:` in
+ * `analysis_options.yaml`) to avoid `unsupported_option` warnings from the
+ * Dart SDK's plugin-block validator, which hardcodes the allowed key set.
  *
  * **Why this is not just a YAML read.** Excluding the light lane from the scan
  * is only safe while the plugin is actually reporting. If the yaml says
@@ -23,106 +27,64 @@ import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { verifyPluginLiveness } from '../pluginLiveness';
 
-/**
- * Matches `lane: <value>` nested under `plugins:` → `saropa_lints:`.
- *
- * Mirrors the Dart parser `parseScalarFromPluginBlock`
- * (`lib/src/config/runtime_tier_cap.dart`): indentation-scoped, comment- and
- * blank-line tolerant. Kept deliberately small — a full YAML parse of the
- * consumer's options file on every save is disproportionate, and the only key
- * read here is a single scalar.
- */
-const SAROPA_BLOCK_HEADER = /^\s+saropa_lints:\s*(?:#.*)?$/;
-const LANE_KEY = /^\s*lane:\s*([^\s#]+)/;
-
-/** Leading-space count, for indentation-scoped block detection. */
-function leadingSpaces(line: string): number {
-  return line.length - line.trimStart().length;
-}
+/** Matches a top-level `lane: <value>` in `analysis_options_custom.yaml`. */
+const LANE_KEY = /^lane:\s*([^\s#]+)/m;
 
 /**
- * Reads `lane:` from the plugin block of [content]. Returns the raw
+ * Reads `lane:` as a top-level key from [content]. Returns the raw
  * lower-cased value, or undefined when the key is absent.
  *
  * Exported for unit testing without a workspace on disk.
  */
-export function parseLaneFromPluginBlock(content: string): string | undefined {
-  const lines = content.replace(/\r\n?/g, '\n').split('\n');
-  for (let i = 0; i < lines.length; i++) {
-    if (!SAROPA_BLOCK_HEADER.test(lines[i].trimEnd())) continue;
-    const baseIndent = leadingSpaces(lines[i]);
-    for (let j = i + 1; j < lines.length; j++) {
-      const inner = lines[j];
-      const trimmed = inner.trimStart();
-      // Blanks and comments do not end the block; a commented-out key must
-      // not stop the search for a live one below it.
-      if (trimmed === '' || trimmed.startsWith('#')) continue;
-      // Dedent to or past `saropa_lints:` means the block ended.
-      if (leadingSpaces(inner) <= baseIndent) break;
-      const match = LANE_KEY.exec(inner);
-      if (match) {
-        return match[1].trim().replace(/^['"]|['"]$/g, '').toLowerCase();
-      }
-    }
-  }
-  return undefined;
+export function parseLaneFromCustomConfig(content: string): string | undefined {
+  const match = LANE_KEY.exec(content);
+  if (!match) return undefined;
+  return match[1].trim().replace(/^['"]|['"]$/g, '').toLowerCase();
 }
 
 /**
- * Reads the raw `lane:` value from [root]'s `analysis_options.yaml`, or
- * `undefined` when the key is absent or the file cannot be read.
+ * Reads the raw `lane:` value from [root]'s `analysis_options_custom.yaml`,
+ * or `undefined` when the key is absent or the file cannot be read.
  *
  * Exposed separately from {@link projectConfiguresLightLane} (which collapses
  * absent/unrecognized values into a boolean) because the lane-picker UI needs
  * to distinguish "explicitly full", "explicitly light", and "not configured
  * yet" to render an accurate "current" marker.
  */
-export function readRawLaneFromAnalysisOptionsYaml(root: string): string | undefined {
+export function readRawLaneFromCustomConfig(root: string): string | undefined {
   try {
-    const yamlPath = path.join(root, 'analysis_options.yaml');
+    const yamlPath = path.join(root, 'analysis_options_custom.yaml');
     const content = fs.readFileSync(yamlPath, 'utf8');
-    return parseLaneFromPluginBlock(content);
+    return parseLaneFromCustomConfig(content);
   } catch {
     return undefined;
   }
 }
 
-/** Values {@link writeLaneToAnalysisOptionsYaml} accepts — mirrors `RuleLane` in `lib/src/config/rule_lane.dart`. */
+/** Values {@link writeLaneToCustomConfig} accepts — mirrors `RuleLane` in `lib/src/config/rule_lane.dart`. */
 export type RuleLaneValue = 'light' | 'full';
 
-/** Outcome of a {@link writeLaneToAnalysisOptionsYaml} call. */
+/** Outcome of a {@link writeLaneToCustomConfig} call. */
 export type WriteLaneResult =
   | { ok: true }
-  | { ok: false; reason: 'no-file' | 'no-plugin-block' | 'write-error'; message?: string };
+  | { ok: false; reason: 'no-file' | 'write-error'; message?: string };
 
 /**
- * Writes `lane: <value>` into [root]'s `analysis_options.yaml`, under the
- * existing `plugins.saropa_lints` block.
+ * Writes `lane: <value>` into [root]'s `analysis_options_custom.yaml` as a
+ * top-level key.
  *
- * Minimal-diff by design: this is a plain scalar, unlike `tier`, which cascades
- * into a ~2000-line enabled-rule block and is therefore written by the Dart
- * `write_config` CLI (see `setup.ts`'s `applyTierChange`). Shelling out to that
- * CLI for a one-line value would pay a multi-second child-process cost for no
- * reason, so this patches the file directly:
+ * Moved from `analysis_options.yaml` (under `plugins > saropa_lints:`) to
+ * avoid `unsupported_option` warnings from the Dart SDK's plugin-block
+ * validator, which hardcodes the allowed key set.
  *
- * - If a *live* `lane:` line already exists inside the block (mirrors the
- *   reader's indentation-scoped, comment-tolerant scan in
- *   {@link parseLaneFromPluginBlock}), only its value token is replaced —
- *   the original indentation and any trailing `# comment` are preserved
- *   verbatim, so a user's own annotation survives the flip.
- * - Otherwise (only the commented documentation line ships, or no `lane:` at
- *   all) a new line is inserted directly under the block header. Key order
- *   inside a YAML mapping is not significant, so this does not need to land
- *   next to `version:` / `log_level:` to be correct — it only needs to sit
- *   inside the block.
- * - Requires a live `plugins.saropa_lints:` block to already exist: writing a
- *   `lane:` key into a project where the plugin has never been configured (or
- *   was disabled and commented out by `runDisable`) would silently create a
- *   dangling key nothing reads. Callers should surface `no-plugin-block` as
- *   "enable the analyzer plugin first", not attempt to synthesize the block.
+ * Minimal-diff by design: if a live `lane:` line already exists, only its
+ * value token is replaced — the trailing `# comment` is preserved verbatim.
+ * Otherwise the key is appended after the `# ANALYSIS SETTINGS` section.
+ *
+ * Requires the custom file to exist (created by `dart run saropa_lints init`).
  */
-export function writeLaneToAnalysisOptionsYaml(root: string, lane: RuleLaneValue): WriteLaneResult {
-  const yamlPath = path.join(root, 'analysis_options.yaml');
+export function writeLaneToCustomConfig(root: string, lane: RuleLaneValue): WriteLaneResult {
+  const yamlPath = path.join(root, 'analysis_options_custom.yaml');
   let content: string;
   try {
     content = fs.readFileSync(yamlPath, 'utf8');
@@ -130,49 +92,34 @@ export function writeLaneToAnalysisOptionsYaml(root: string, lane: RuleLaneValue
     return { ok: false, reason: 'no-file' };
   }
 
-  // Preserve the file's original line ending style — mixed CRLF/LF churn in a
-  // diff is exactly the "as much as possible" formatting-preservation ask.
+  // Preserve the file's original line ending style.
   const usesCRLF = content.includes('\r\n');
   const lines = content.replace(/\r\n?/g, '\n').split('\n');
 
-  let blockHeaderIndex = -1;
-  let baseIndent = 0;
-  for (let i = 0; i < lines.length; i++) {
-    if (SAROPA_BLOCK_HEADER.test(lines[i].trimEnd())) {
-      blockHeaderIndex = i;
-      baseIndent = leadingSpaces(lines[i]);
-      break;
-    }
-  }
-  if (blockHeaderIndex === -1) {
-    return { ok: false, reason: 'no-plugin-block' };
-  }
-
-  // Scan the block for a live `lane:` line, stopping at the block's end
-  // (dedent to or past baseIndent) exactly as the reader does — a commented
-  // line never counts as "live" and must not be overwritten in place, since
-  // that would delete the documentation comment a fresh project ships with.
+  // Find an existing live `lane:` line (top-level, not commented).
   let liveLaneIndex = -1;
-  for (let j = blockHeaderIndex + 1; j < lines.length; j++) {
-    const inner = lines[j];
-    const trimmed = inner.trimStart();
-    if (trimmed === '' || trimmed.startsWith('#')) continue;
-    if (leadingSpaces(inner) <= baseIndent) break;
-    if (LANE_KEY.test(inner)) {
-      liveLaneIndex = j;
+  for (let i = 0; i < lines.length; i++) {
+    if (/^lane:\s*[^\s#]/.test(lines[i])) {
+      liveLaneIndex = i;
       break;
     }
   }
 
   if (liveLaneIndex !== -1) {
-    // Replace only the value token; keep the line's own indentation and any
-    // trailing `# comment` so a user's own annotation survives the flip.
-    const parts = /^(\s*lane:\s*)([^\s#]+)(.*)$/.exec(lines[liveLaneIndex]);
-    lines[liveLaneIndex] = parts ? `${parts[1]}${lane}${parts[3]}` : `${' '.repeat(baseIndent + 2)}lane: ${lane}`;
+    // Replace only the value token; keep any trailing `# comment`.
+    const parts = /^(lane:\s*)([^\s#]+)(.*)$/.exec(lines[liveLaneIndex]);
+    lines[liveLaneIndex] = parts ? `${parts[1]}${lane}${parts[3]}` : `lane: ${lane}`;
   } else {
-    // No live key yet — insert right after the block header. Valid YAML
-    // regardless of position; simplest to reason about and to diff.
-    lines.splice(blockHeaderIndex + 1, 0, `${' '.repeat(baseIndent + 2)}lane: ${lane}`);
+    // No live key yet — find `output:` or `log_level:` (siblings in the
+    // ANALYSIS SETTINGS section) and insert after the last match. Falls
+    // back to appending at end of file when neither anchor is present.
+    let insertAt = lines.length;
+    for (let i = 0; i < lines.length; i++) {
+      if (/^output:\s?/.test(lines[i]) || /^log_level:\s?/.test(lines[i])) {
+        insertAt = i + 1;
+      }
+    }
+    lines.splice(insertAt, 0, `lane: ${lane}`);
   }
 
   try {
@@ -184,7 +131,7 @@ export function writeLaneToAnalysisOptionsYaml(root: string, lane: RuleLaneValue
 }
 
 /**
- * True when [root]'s `analysis_options.yaml` configures the light lane.
+ * True when [root]'s `analysis_options_custom.yaml` configures the light lane.
  *
  * An absent/unrecognized `lane:` key reads as light — `light` is now the
  * Dart-side default (see `RuleLane` in `lib/src/config/rule_lane.dart`), so
@@ -199,9 +146,9 @@ export function writeLaneToAnalysisOptionsYaml(root: string, lane: RuleLaneValue
  */
 export function projectConfiguresLightLane(root: string): boolean {
   try {
-    const yamlPath = path.join(root, 'analysis_options.yaml');
+    const yamlPath = path.join(root, 'analysis_options_custom.yaml');
     const content = fs.readFileSync(yamlPath, 'utf8');
-    const value = parseLaneFromPluginBlock(content);
+    const value = parseLaneFromCustomConfig(content);
     return value === undefined || value === 'light';
   } catch {
     return false;
