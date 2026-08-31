@@ -283,32 +283,35 @@ void main() {
   group('require_ignore_comment_plugin_prefix — resolved message', () {
     final rule = RequireIgnoreCommentPluginPrefixRule();
 
-    test('bare saropa rule name emits "without the required prefix" message',
-        () async {
-      // 'avoid_null_assertion' is a registered saropa_lints rule used bare.
-      final diags = await runRuleResolved(rule, '''
+    test(
+      'bare saropa rule name emits "without the required prefix" message',
+      () async {
+        // 'avoid_null_assertion' is a registered saropa_lints rule used bare.
+        final diags = await runRuleResolved(rule, '''
 // ignore: avoid_null_assertion
 final x = 1;
 ''');
-      expect(diags, hasLength(1));
-      // The bare-name diagnostic tells the developer to add the prefix.
-      expect(diags.first.message, contains('without the required'));
-    });
+        expect(diags, hasLength(1));
+        // The bare-name diagnostic tells the developer to add the prefix.
+        expect(diags.first.message, contains('without the required'));
+      },
+    );
 
     test(
-        'prefixed unknown rule emits "not a registered saropa_lints rule" message',
-        () async {
-      // 'totally_fake_rule' is NOT registered — prefix is present but wrong.
-      final diags = await runRuleResolved(rule, '''
+      'prefixed unknown rule emits "not a registered saropa_lints rule" message',
+      () async {
+        // 'totally_fake_rule' is NOT registered — prefix is present but wrong.
+        final diags = await runRuleResolved(rule, '''
 // ignore: saropa_lints/totally_fake_rule
 final x = 1;
 ''');
-      expect(diags, hasLength(1));
-      // The unknown-prefix diagnostic says the rule isn't registered.
-      expect(diags.first.message, contains('not a registered'));
-      // Must NOT contain the bare-name message.
-      expect(diags.first.message, isNot(contains('without the required')));
-    });
+        expect(diags, hasLength(1));
+        // The unknown-prefix diagnostic says the rule isn't registered.
+        expect(diags.first.message, contains('not a registered'));
+        // Must NOT contain the bare-name message.
+        expect(diags.first.message, isNot(contains('without the required')));
+      },
+    );
 
     test('prefixed registered rule emits no diagnostic', () async {
       // 'avoid_null_assertion' with correct prefix — no lint expected.

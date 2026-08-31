@@ -156,7 +156,7 @@ import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
 import { registerCopyAsJsonCommands } from './extensionCopyAsJsonCommands';
-import { openViolationsWideReport, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
+import { openViolationsWideReport, postDashboardAnalysisProgress, refreshFindingsDashboardIfOpen } from './views/violationsWideReportView';
 import { openConsolidatedDashboard } from './views/consolidated/consolidatedView';
 import { pickWorkspaceFolder } from './workspaceFolderPicker';
 import { setCurrentLocale, l10n } from './i18n/runtime';
@@ -214,6 +214,21 @@ const NUDGE_REARM_MARGIN = 5;
 let regressionNudgeTimer: ReturnType<typeof setTimeout> | undefined;
 let pendingNudgeCrossing: { threshold: number } | undefined;
 let pendingNudgeSnapshot: RunSnapshot | undefined;
+
+// Deferred tier-change notification: when the user changes tier, we store the
+// metadata here and wait for the first debouncedRefresh (live diagnostics
+// settling) before showing the toast. This prevents the toast from reading
+// stale violations.json counts while the dashboard shows 0 from live
+// diagnostics that haven't arrived yet.
+let pendingTierChangeInfo: {
+  tierLabel: string;
+  previousTier: string;
+  isUpgrade: boolean;
+  preTierTotal: number;
+} | undefined;
+// Fallback timer handle so a rapid second setTier cancels the first timer
+// and the dispose path can clean it up.
+let tierChangeFallbackTimer: ReturnType<typeof setTimeout> | undefined;
 
 function readNotifiedThresholds(state: vscode.Memento): number[] {
   const raw = state.get<unknown>(NUDGE_NOTIFIED_THRESHOLDS_KEY);
@@ -850,6 +865,44 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           updateAllStatusBars(data);
           updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
           runCelebrationIfNeeded(context.workspaceState, root, history, appended);
+
+          // Fire the deferred tier-change toast now that live diagnostics
+          // have settled — the dashboard and this toast read the same source.
+          if (pendingTierChangeInfo) {
+            // Cancel the safety fallback — live data arrived in time.
+            if (tierChangeFallbackTimer) {
+              clearTimeout(tierChangeFallbackTimer);
+              tierChangeFallbackTimer = undefined;
+            }
+            const info = pendingTierChangeInfo;
+            pendingTierChangeInfo = undefined;
+            const postTotal = data.summary?.totalViolations ?? data.violations.length;
+
+            // Count critical+high in one pass for the auto-filter decision.
+            let critHigh = 0;
+            for (const v of data.violations) {
+              if (v.impact === 'critical' || v.impact === 'high') critHigh++;
+            }
+
+            // Auto-filter on upgrade when there are many violations and some are critical/high.
+            if (info.isUpgrade && postTotal > 50 && critHigh > 0) {
+              issuesProvider.setImpactFilter(new Set(['critical', 'high']));
+              issuesProvider.setSeverityFilter(new Set(['error', 'warning', 'info']));
+              updateIssuesViewMessage();
+            }
+
+            // Clear the dashboard's "Re-analyzing..." indicator now that
+            // live diagnostics have settled and the rebuild is shipping.
+            postDashboardAnalysisProgress('completed');
+
+            void showTierChangeNotification({
+              tierLabel: info.tierLabel,
+              isUpgrade: info.isUpgrade,
+              postTotal,
+              criticalPlusHigh: critHigh,
+              delta: postTotal - info.preTierTotal,
+            });
+          }
           return;
         }
       }
@@ -862,6 +915,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     dispose: () => {
       if (refreshDebounceTimer) clearTimeout(refreshDebounceTimer);
       if (regressionNudgeTimer) clearTimeout(regressionNudgeTimer);
+      if (tierChangeFallbackTimer) clearTimeout(tierChangeFallbackTimer);
     },
   });
   // The watched path derives from the project root, which is undefined in a
@@ -1844,9 +1898,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (success) refreshAll();
     }),
     vscode.commands.registerCommand('saropaLints.setTier', async () => {
-      // Capture pre-tier violation count for delta display in the notification.
+      // Capture pre-tier violation count from live diagnostics (not the stale
+      // violations.json file) so the delta in the toast matches what the
+      // dashboard will show once analysis settles.
       const root = getProjectRoot();
-      const preTierTotal = root ? (readViolations(root)?.summary?.totalViolations ?? 0) : 0;
+      const preLiveData = root ? readVisibleViolations(root) : null;
+      const preTierTotal = preLiveData?.summary?.totalViolations ?? preLiveData?.violations?.length ?? 0;
 
       const result = await runSetTier(context);
       if (result) {
@@ -1856,34 +1913,45 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         updateAllStatusBars();
         updateContext(getConfig().get<boolean>('enabled', true) ?? true, issuesProvider.hasViolations());
 
-        // Smart tier transition: build notification info from post-tier data.
-        // Note: postData may reflect a prior analysis if dart analyze has not yet
-        // written violations.json — counts will update on the next file-watcher refresh.
-        const postData = root ? readViolations(root) : null;
-        const postTotal = postData?.summary?.totalViolations ?? postData?.violations.length ?? 0;
+        // Defer the tier-change toast until debouncedRefresh fires with
+        // settled live diagnostics. Showing the toast now would read stale
+        // data (violations.json or a mid-analysis getDiagnostics snapshot)
+        // while the dashboard reads fresh live diagnostics — producing the
+        // "toast says N, dashboard shows 0" mismatch.
+        // Cancel any prior fallback timer if the user changes tier again
+        // before the first one resolved (rapid double-change).
+        if (tierChangeFallbackTimer) clearTimeout(tierChangeFallbackTimer);
+
+        // Signal the dashboard to show "Re-analyzing..." so the user sees
+        // why the findings table is empty during the analysis gap.
+        postDashboardAnalysisProgress('started');
+
         const isUpgrade = TIER_ORDER.indexOf(result.tier) > TIER_ORDER.indexOf(result.previousTier);
-
-        // Single pass to count critical+high violations (avoids 3 filter passes over 65k items).
-        let critHigh = 0;
-        for (const v of postData?.violations ?? []) {
-          if (v.impact === 'critical' || v.impact === 'high') critHigh++;
-        }
-
-        // Auto-filter on upgrade when there are many violations and some are critical/high.
-        // This shows the user a manageable set of high-priority issues instead of thousands.
-        if (isUpgrade && postTotal > 50 && critHigh > 0) {
-          issuesProvider.setImpactFilter(new Set(['critical', 'high']));
-          issuesProvider.setSeverityFilter(new Set(['error', 'warning', 'info']));
-          updateIssuesViewMessage();
-        }
-
-        await showTierChangeNotification({
+        pendingTierChangeInfo = {
           tierLabel: result.tierLabel,
+          previousTier: result.previousTier,
           isUpgrade,
-          postTotal,
-          criticalPlusHigh: critHigh,
-          delta: postTotal - preTierTotal,
-        });
+          preTierTotal,
+        };
+
+        // Safety fallback: if debouncedRefresh never fires (plugin not loaded,
+        // violations.json never written), show a simple confirmation after 15 s
+        // so the tier change doesn't silently vanish.
+        tierChangeFallbackTimer = setTimeout(() => {
+          tierChangeFallbackTimer = undefined;
+          if (!pendingTierChangeInfo) return;
+          const stale = pendingTierChangeInfo;
+          pendingTierChangeInfo = undefined;
+          // Clear "Re-analyzing..." since we're giving up waiting.
+          postDashboardAnalysisProgress('completed');
+          void showTierChangeNotification({
+            tierLabel: stale.tierLabel,
+            isUpgrade: stale.isUpgrade,
+            postTotal: 0,
+            criticalPlusHigh: 0,
+            delta: 0,
+          });
+        }, 15_000);
       }
     }),
     // Switch between the `light` (default, ~200 error/warning rules in-process)

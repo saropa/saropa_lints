@@ -781,6 +781,17 @@ export function refreshFindingsDashboardIfOpen(context: vscode.ExtensionContext)
 }
 
 /**
+ * Post an analysis-progress status to the Findings Dashboard if it is open.
+ * Used by the tier-change handler to show "Re-analyzing..." while the analysis
+ * server restarts and diagnostics have not yet settled.
+ */
+export function postDashboardAnalysisProgress(status: 'started' | 'completed' | 'failed'): void {
+  if (currentPanel?.visible) {
+    void currentPanel.webview.postMessage({ type: 'analysisProgress', status });
+  }
+}
+
+/**
  * Save the current filtered finding set to `reports/YYYYMMDD/HHMMSS_findings.json`.
  *
  * Mirrors the package-vibrancy save pattern so all dashboards drop their

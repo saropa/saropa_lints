@@ -6,6 +6,69 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [14.5.7]
+
+Dependency maintenance release — no rule or extension changes. [log](https://github.com/saropa/saropa_lints/blob/v14.5.7/CHANGELOG.md)
+
+<details>
+<summary>Maintenance</summary>
+
+- Bumped `js-yaml` (extension dev dependency, via `mocha`) from 4.3.0 to 4.3.1, resolving GHSA-5p4m-2wfm-xmqj.
+
+</details>
+
+---
+
+## [14.5.6]
+
+This release introduces a new rule to ensure lint suppression comments work correctly in your IDE. The `require_ignore_comment_plugin_prefix` rule flags ignore comments referencing saropa_lints rules that lack the required package prefix, preventing suppressions from failing silently. An automated quick fix is included to instantly apply the missing prefix. [log](https://github.com/saropa/saropa_lints/blob/v14.5.6/CHANGELOG.md)
+
+### Added
+
+- **New rule `require_ignore_comment_plugin_prefix`** (Essential tier, WARNING) — flags `// ignore: rule_name` and `// ignore_for_file: rule_name` comments that reference a saropa_lints rule without the required `saropa_lints/` prefix, which causes the suppression to silently fail in the IDE. A quick fix inserts the prefix. No action required.
+- **`dart run saropa_lints scan --fix-ignores`** — bulk-converts bare `// ignore: rule_name` to `// ignore: saropa_lints/rule_name` for all known saropa_lints rules across `lib/`, `test/`, and `bin/`.
+
+### Fixed
+
+- **`require_ignore_comment_plugin_prefix`'s quick fix could insert the prefix into the wrong `// ignore:` comment** when another ignore comment sat nearby in the file. It now targets the exact flagged comment. No action required.
+- **`--fix-ignores` skipped hyphenated rule names** (e.g. `avoid-null-assertion`), leaving them unprefixed. It now converts them correctly. No action required.
+
+---
+
+## [14.5.5]
+
+The Analysis Optimizer now makes changes safely: it surgically updates only the patterns you're modifying while preserving your file structure, comments, and ordering, and backs up your configuration before every write for easy manual recovery. The dashboard excludes redundant recommendations when patterns are already covered and automatically rescans to keep the status current. [log](https://github.com/saropa/saropa_lints/blob/v14.5.5/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- **Analysis Optimizer could silently destroy hand-curated `analysis_options.yaml` structure** — every Apply/Remove/Fix Syntax action rebuilt the entire `exclude:` block from scratch, discarding section-header comments and blank-line grouping (which aren't attached to any single pattern) and re-sorting every entry alphabetically. Writes are now surgical: only the lines for patterns actually being added or removed are touched, and every other line — comments, spacing, order — is left exactly as it was. No action required.
+- **Folder exclusion recommendations kept showing as "Recommended" even when already covered by a broader applied pattern** (e.g. individual `dependency_overrides/<package>/**` entries never matched as "Applied" despite a `dependency_overrides/**` already excluding them). These redundant recommendations no longer appear. No action required.
+- The dashboard now automatically scans on open and rescans after every Apply/Remove/Fix Syntax, instead of requiring a manual "Scan Workspace" click to see current status. No action required.
+
+### Added (Extension)
+
+- Every Analysis Optimizer write now saves a one-step-back copy of `analysis_options.yaml` to `analysis_options.yaml.bak` first, so a change can always be manually reverted. No action required.
+
+---
+
+## [14.5.4]
+
+This release fixes the Analysis Optimizer's exclusion detection, which previously missed patterns already present in analysis_options.yaml and duplicated them on apply. The dashboard's two separate exclusion lists are now one sortable table with clearer status and impact indicators, plus a quick line preview before applying. [log](https://github.com/saropa/saropa_lints/blob/v14.5.4/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- **Analysis Optimizer could write invalid YAML that broke Dart analysis entirely** — an unquoted exclude pattern starting with `**` (routine for Dart globs) is YAML alias syntax, not a literal string, and caused a real `Undefined alias` parse error the moment the analyzer read the file. Every written pattern is now quoted, and previously-malformed unquoted entries are automatically re-quoted the next time any change is applied through the dashboard. No action required.
+- **Analysis Optimizer failed to detect existing exclusions** — patterns with an inline `# comment` or a stray trailing quote (`- **/*.g.dart" # ...`) were never recognized as already excluded, so the dashboard kept recommending them and applying created a duplicate line. The reader now strips comments and malformed quoting before comparing, and the writer preserves each pattern's original comment on write. No action required.
+- **Analysis Optimizer's "Current exclusions" and "Recommended exclusions" are now one deduplicated "Exclusions" table**, with an Applied/Recommended status column, sortable columns, and the chosen sort order preserved across Apply/Remove actions. No action required.
+- An already-applied Analysis Optimizer exclusion that matches zero scanned Dart files (e.g. a non-Dart tool reference) now shows a dash and an explanatory reason instead of a misleading "0". No action required.
+
+### Added (Extension)
+
+- Each Analysis Optimizer recommendation now has a "Preview" toggle showing the approximate line that would be added to `analysis_options.yaml`, without leaving the table. No action required.
+- Analysis Optimizer now proactively warns when `analysis_options.yaml` already has invalid exclude syntax and offers a one-click "Fix Syntax" that re-quotes every entry, so a broken file can be repaired without needing to apply or remove a specific pattern first. No action required.
+
+---
+
 ## [14.5.3]
 
 This release fixes a test-suite timeout in the health-history archival path and completes Filipino and Dutch translation coverage across the extension UI. No action required. [log](https://github.com/saropa/saropa_lints/blob/v14.5.3/CHANGELOG.md)
