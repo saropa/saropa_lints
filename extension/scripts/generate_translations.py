@@ -31,16 +31,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "i18n"))
 from term_color import c  # noqa: E402
 
-# Every file/directory the translation pipeline can produce. When the pipeline
-# adds a new output path, add it here — this is the single list that controls
-# what gets staged and committed.
-_TRANSLATION_PATHS = [
-    "extension/src/i18n/locales/",
-    "extension/src/i18n/locale_coverage.json",
-]
-
 
 def main() -> int:
+    repo_root = Path(__file__).resolve().parent.parent.parent
     script_dir = Path(__file__).resolve().parent / "i18n"
     generate_script = script_dir / "generate_locales.py"
     if not generate_script.is_file():
@@ -65,42 +58,89 @@ def main() -> int:
     if no_commit:
         print(f"[{tag}] {c('yellow', '--no-commit: skipping auto-commit')}", flush=True)
 
+    # Snapshot the working tree BEFORE generation so we can auto-detect
+    # every file the pipeline touches, without a hardcoded path list.
+    pre_snapshot = _snapshot_worktree(repo_root) if not no_commit else set()
+
+    # Ignore SIGINT so the translation child can handle it cleanly, then
+    # restore the default handler before running git (so Ctrl+C can abort
+    # a stuck commit rather than being silently swallowed).
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     result = subprocess.run(cmd, env=env, cwd=str(script_dir))
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
     if result.returncode != 0:
         return result.returncode
 
     if no_commit:
         return 0
 
-    # Commit generated translation files so they don't linger as dirty state.
-    return _git_commit_translations(locales)
+    # Diff the working tree to find every file the pipeline created or modified.
+    post_snapshot = _snapshot_worktree(repo_root)
+    changed = post_snapshot - pre_snapshot
+    if not changed:
+        print(f"[{tag}] {c('gray', 'no translation changes to commit')}", flush=True)
+        return 0
+
+    # Commit only the files the pipeline actually touched.
+    return _git_commit_translations(repo_root, locales, changed)
 
 
-def _git_commit_translations(locales: str) -> int:
-    """Stage and commit changed translation files.
+def _snapshot_worktree(repo_root: Path) -> set[tuple[str, str]]:
+    """Capture (path, content-hash) pairs for every tracked+untracked file.
 
-    Only commits if there are actual changes to the locale/nls files.
-    Returns 0 on success or when there's nothing to commit.
+    Uses `git status --porcelain=v2 -z` for null-delimited, machine-stable
+    output that handles filenames with spaces, quotes, and newlines.
+    Returns a set of (path, status-line) tuples — comparing before/after
+    sets reveals exactly which files the pipeline changed.
     """
-    repo_root = Path(__file__).resolve().parent.parent.parent
-    tag = c("magenta", "generate_translations")
-
-    # Snapshot what's already staged so we can detect (and avoid committing)
-    # unrelated work that was staged before this script ran.
-    pre_staged = subprocess.run(
-        ["git", "diff", "--cached", "--name-only"],
+    result = subprocess.run(
+        ["git", "status", "--porcelain=v2", "-z", "-u"],
         cwd=str(repo_root),
         capture_output=True,
         text=True,
     )
-    pre_staged_files = set(pre_staged.stdout.strip().splitlines()) if pre_staged.stdout.strip() else set()
+    # Entries are null-separated. Each entry's last field is the path.
+    # Rename entries have two paths (old\0new), but the pipeline doesn't
+    # rename files so we don't need special handling.
+    entries = set()
+    if result.stdout:
+        for entry in result.stdout.rstrip("\0").split("\0"):
+            if entry:
+                entries.add(entry)
+    return entries
 
-    # Stage only translation-related files. Bail on any staging failure
-    # so a broken repo state doesn't silently skip the commit.
-    for p in _TRANSLATION_PATHS:
+
+def _git_commit_translations(
+    repo_root: Path, locales: str, changed: set[str],
+) -> int:
+    """Stage and commit the files the translation pipeline touched.
+
+    ``changed`` contains raw porcelain v2 entries — extract the file path
+    (last whitespace-delimited field) from each.
+    """
+    tag = c("magenta", "generate_translations")
+
+    # Extract file paths from porcelain v2 entries. Ordinary changed entries
+    # (starting with "1 " or "2 ") have the path as the last space-field.
+    # Untracked entries ("? path") have the path after "? ".
+    changed_paths: list[str] = []
+    for entry in sorted(changed):
+        if entry.startswith("? "):
+            changed_paths.append(entry[2:])
+        else:
+            # "1 .M ... path" or "2 ... path" — path is last field.
+            changed_paths.append(entry.rsplit(" ", 1)[-1])
+
+    # Snapshot what's already staged so we can detect (and avoid committing)
+    # unrelated work that was staged before this script ran. Use -z for
+    # null-delimited output — immune to filenames containing newlines.
+    pre_staged = _staged_files(repo_root)
+
+    # Stage only the files the pipeline touched.
+    for p in changed_paths:
         add_result = subprocess.run(
-            ["git", "add", p],
+            ["git", "add", "--", p],
             cwd=str(repo_root),
             capture_output=True,
             text=True,
@@ -112,31 +152,21 @@ def _git_commit_translations(locales: str) -> int:
             )
             return add_result.returncode
 
-    # Get the new staged set and compute what this script actually added.
-    post_staged = subprocess.run(
-        ["git", "diff", "--cached", "--name-only"],
-        cwd=str(repo_root),
-        capture_output=True,
-        text=True,
-    )
-    post_staged_files = set(post_staged.stdout.strip().splitlines()) if post_staged.stdout.strip() else set()
-    newly_staged = post_staged_files - pre_staged_files
+    # Compute which files this script actually staged (vs already-staged).
+    post_staged = _staged_files(repo_root)
+    newly_staged = sorted(post_staged - pre_staged)
 
     if not newly_staged:
-        # Nothing new staged — translations unchanged.
+        # Everything the pipeline touched was already staged identically.
         print(f"[{tag}] {c('gray', 'no translation changes to commit')}", flush=True)
         return 0
 
-    # Warn if there are pre-existing staged files that we won't commit.
-    if pre_staged_files:
+    # Warn if unrelated files were already staged — we won't touch them.
+    if pre_staged:
         print(
-            f"[{tag}] {c('yellow', f'note: {len(pre_staged_files)} pre-staged file(s) left untouched')}",
+            f"[{tag}] {c('yellow', f'note: {len(pre_staged)} pre-staged file(s) left untouched')}",
             flush=True,
         )
-
-    # Commit ONLY the files this script staged, not anything pre-existing.
-    # Passing explicit paths to `git commit` limits the commit scope.
-    commit_files = sorted(newly_staged)
 
     # Build a descriptive commit message.
     if locales == "all (default)":
@@ -145,8 +175,9 @@ def _git_commit_translations(locales: str) -> int:
         msg = f"chore: regenerate translations for {locales}"
 
     # Show hook output (stdout/stderr) so pre-commit failures are visible.
+    # Explicit file paths limit the commit to only what this script staged.
     result = subprocess.run(
-        ["git", "commit", "-m", msg, "--"] + commit_files,
+        ["git", "commit", "-m", msg, "--"] + newly_staged,
         cwd=str(repo_root),
     )
     if result.returncode != 0:
@@ -157,7 +188,26 @@ def _git_commit_translations(locales: str) -> int:
         return result.returncode
 
     print(f"[{tag}] {c('green', 'committed:')} {msg}", flush=True)
+    print(f"[{tag}] {c('gray', f'{len(newly_staged)} file(s)')}", flush=True)
     return 0
+
+
+def _staged_files(repo_root: Path) -> set[str]:
+    """Return the set of currently staged file paths.
+
+    Uses -z for null-delimited output — handles filenames with newlines,
+    spaces, and other special characters safely.
+    """
+    result = subprocess.run(
+        ["git", "diff", "--cached", "--name-only", "-z"],
+        cwd=str(repo_root),
+        capture_output=True,
+        text=True,
+    )
+    if not result.stdout:
+        return set()
+    # Null-delimited: split on \0, filter empty trailing entry.
+    return {p for p in result.stdout.split("\0") if p}
 
 
 def _locales_from_args(args: list[str]) -> str:
