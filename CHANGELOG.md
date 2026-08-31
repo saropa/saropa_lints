@@ -66,11 +66,14 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.2.6] — Unreleased
+## [15.2.6] - unreleased
+
+Restores the Full Audit sidebar button and fixes `require_ignore_comment_plugin_prefix` showing the wrong diagnostic message when an ignore comment uses `saropa_lints/` prefix with an unregistered rule name. No new rules or breaking changes. [log](https://github.com/saropa/saropa_lints/blob/v15.2.6/CHANGELOG.md)
 
 ### Fixed
 
 - **Full Audit sidebar button** — the "Full Audit" entry was missing from the extension sidebar despite being documented in 15.2.5. Now appears between Findings Dashboard and Command Catalog with a shield icon, plus a title-bar shortcut icon in the Editor Dashboards view header (visible only in Dart projects).
+- **`require_ignore_comment_plugin_prefix` wrong message for unknown prefixed rule** — `// ignore: saropa_lints/nonexistent_rule` showed the "add prefix" message instead of the "not a registered rule" message. The reporter always reads `diagnosticCode` and ignores per-diagnostic `LintCode` overrides; fixed by temporarily swapping `diagnosticCode` during the unknown-prefix report.
 
 ## [15.2.5]
 

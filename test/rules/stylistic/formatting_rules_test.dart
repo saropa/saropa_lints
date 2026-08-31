@@ -4,6 +4,7 @@ import 'package:saropa_lints/saropa_lints.dart' show LintImpact;
 import 'package:saropa_lints/src/rules/stylistic/formatting_rules.dart';
 import 'package:test/test.dart';
 import '../../helpers/fixture_discovery.dart';
+import '../../support/resolved_rule_harness.dart';
 
 /// Tests for 10 Formatting lint rules.
 ///
@@ -278,6 +279,53 @@ void main() {
     });
   });
 
-  // Stub-only behavior tests were removed from this file. Keep metadata,
-  // fixture checks, quick-fix presence checks, and regression fixture guards.
+  // Resolved tests: verify diagnostic messages match the detected condition.
+  group('require_ignore_comment_plugin_prefix — resolved message', () {
+    final rule = RequireIgnoreCommentPluginPrefixRule();
+
+    test('bare saropa rule name emits "without the required prefix" message',
+        () async {
+      // 'avoid_null_assertion' is a registered saropa_lints rule used bare.
+      final diags = await runRuleResolved(rule, '''
+// ignore: avoid_null_assertion
+final x = 1;
+''');
+      expect(diags, hasLength(1));
+      // The bare-name diagnostic tells the developer to add the prefix.
+      expect(diags.first.message, contains('without the required'));
+    });
+
+    test(
+        'prefixed unknown rule emits "not a registered saropa_lints rule" message',
+        () async {
+      // 'totally_fake_rule' is NOT registered — prefix is present but wrong.
+      final diags = await runRuleResolved(rule, '''
+// ignore: saropa_lints/totally_fake_rule
+final x = 1;
+''');
+      expect(diags, hasLength(1));
+      // The unknown-prefix diagnostic says the rule isn't registered.
+      expect(diags.first.message, contains('not a registered'));
+      // Must NOT contain the bare-name message.
+      expect(diags.first.message, isNot(contains('without the required')));
+    });
+
+    test('prefixed registered rule emits no diagnostic', () async {
+      // 'avoid_null_assertion' with correct prefix — no lint expected.
+      final diags = await runRuleResolved(rule, '''
+// ignore: saropa_lints/avoid_null_assertion
+final x = 1;
+''');
+      expect(diags, isEmpty);
+    });
+
+    test('non-saropa bare rule emits no diagnostic', () async {
+      // 'unused_import' is a core Dart lint, not a saropa_lints rule.
+      final diags = await runRuleResolved(rule, '''
+// ignore: unused_import
+final x = 1;
+''');
+      expect(diags, isEmpty);
+    });
+  });
 }

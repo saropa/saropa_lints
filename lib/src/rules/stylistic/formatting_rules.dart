@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/error/error.dart' show DiagnosticCode;
 import 'package:analyzer/source/line_info.dart';
 
 import '../../saropa_lint_rule.dart';
@@ -1170,6 +1171,7 @@ class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
         ReplaceUnknownPrefixedRuleNameFix(context: context),
   ];
 
+  /// Default diagnostic: bare saropa rule name missing the plugin prefix.
   static const LintCode _code = LintCode(
     'require_ignore_comment_plugin_prefix',
     '[require_ignore_comment_plugin_prefix] This // ignore: comment references '
@@ -1188,6 +1190,39 @@ class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
     'ignore:',
     'ignore_for_file:',
   ];
+
+  /// Temporarily holds a per-diagnostic LintCode override. Set just before
+  /// reporting and cleared immediately after, so `diagnosticCode` returns
+  /// the correct message for the unknown-prefix variant. Synchronous
+  /// reporting guarantees this is safe (no interleaving).
+  LintCode? _pendingCode;
+
+  /// Returns the per-diagnostic override when set, otherwise the default.
+  /// Fixes the bug where the unknown-prefix diagnostic showed the
+  /// bare-name "add prefix" message because the reporter always reads
+  /// `diagnosticCode` and ignores the optional LintCode argument.
+  /// When _pendingCode is active, applies user-configured severity
+  /// overrides so the unknown-prefix variant respects config too.
+  @override
+  DiagnosticCode get diagnosticCode {
+    final pending = _pendingCode;
+    if (pending == null) return super.diagnosticCode;
+    // Check if the base getter applied a severity override. The base
+    // returns the static _code (or a severity-overridden copy). Compare
+    // against the static _code's severity to detect overrides.
+    final base = super.diagnosticCode;
+    if (base is LintCode && base.severity != _code.severity) {
+      // User configured a severity override — apply it to the pending
+      // code so both diagnostic variants honor the same config.
+      return LintCode(
+        pending.lowerCaseName,
+        pending.problemMessage,
+        correctionMessage: pending.correctionMessage,
+        severity: base.severity,
+      );
+    }
+    return pending;
+  }
 
   @override
   void runWithReporter(
@@ -1220,12 +1255,18 @@ class RequireIgnoreCommentPluginPrefixRule extends SaropaLintRule {
               reporter.atToken(comment);
             }
             // Check for prefixed names whose suffix isn't a real rule.
+            // Swap diagnosticCode temporarily so the reporter emits the
+            // "not a registered rule" message instead of "add prefix".
             final unknownSuffix = _firstUnknownPrefixedSuffix(ruleList);
             if (unknownSuffix != null) {
-              reporter.atToken(
-                comment,
-                _buildUnknownPrefixedCode(unknownSuffix),
-              );
+              // try/finally ensures _pendingCode is cleared even if
+              // reporter.atToken throws, preventing stale diagnostic state.
+              _pendingCode = _buildUnknownPrefixedCode(unknownSuffix);
+              try {
+                reporter.atToken(comment);
+              } finally {
+                _pendingCode = null;
+              }
             }
             break;
           }
