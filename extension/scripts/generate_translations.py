@@ -51,7 +51,76 @@ def main() -> int:
 
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     result = subprocess.run(cmd, env=env, cwd=str(script_dir))
-    return result.returncode
+    if result.returncode != 0:
+        return result.returncode
+
+    # Commit generated translation files so they don't linger as dirty state.
+    return _git_commit_translations(locales)
+
+
+def _git_commit_translations(locales: str) -> int:
+    """Stage and commit changed translation files.
+
+    Only commits if there are actual changes to the locale/nls files.
+    Returns 0 on success or when there's nothing to commit.
+    """
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    tag = c("magenta", "generate_translations")
+
+    # Paths that the translation pipeline touches.
+    paths_to_stage = [
+        "extension/src/i18n/locales/",
+        "extension/src/i18n/locale_coverage.json",
+    ]
+
+    # Stage only translation-related files. Bail on any staging failure
+    # so a broken repo state doesn't silently skip the commit.
+    for p in paths_to_stage:
+        add_result = subprocess.run(
+            ["git", "add", p],
+            cwd=str(repo_root),
+            capture_output=True,
+            text=True,
+        )
+        if add_result.returncode != 0:
+            print(
+                c("red", f"ERROR: git add {p} failed:\n{add_result.stderr}"),
+                file=sys.stderr,
+            )
+            return add_result.returncode
+
+    # Check whether anything was actually staged.
+    diff = subprocess.run(
+        ["git", "diff", "--cached", "--quiet"],
+        cwd=str(repo_root),
+        capture_output=True,
+    )
+    if diff.returncode == 0:
+        # Nothing staged — translations unchanged.
+        print(f"[{tag}] {c('gray', 'no translation changes to commit')}", flush=True)
+        return 0
+
+    # Build a descriptive commit message.
+    if locales == "all (default)":
+        msg = "chore: regenerate all translated locales"
+    else:
+        msg = f"chore: regenerate translations for {locales}"
+
+    result = subprocess.run(
+        ["git", "commit", "-m", msg],
+        cwd=str(repo_root),
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print(
+            c("red", f"ERROR: git commit failed:\n{result.stderr}"),
+            file=sys.stderr,
+        )
+        return result.returncode
+
+    print(f"[{tag}] {c('green', 'committed:')} {msg}", flush=True)
+    return 0
 
 
 def _locales_from_args(args: list[str]) -> str:

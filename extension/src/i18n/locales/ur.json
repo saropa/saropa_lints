@@ -892,8 +892,8 @@
   },
   "fullAudit": {
     "sidebar": {
-      "label": "Full Audit",
-      "description": "All rules · scope picker · filterable report"
+      "label": "کامل جائزہ",
+      "description": "ہر قاعدہ · انتخاب کنندہ · فلٹر کرنا ممکن ہے ڈاکومنٹ"
     }
   },
   "kbdOverlay": {

@@ -892,7 +892,7 @@
   },
   "fullAudit": {
     "sidebar": {
-      "label": "Full Audit",
+      "label": "पूर्ण अपूर्णता",
       "description": "सभी नियम · स्कोप पिकर · फ़िल्टर करने योग्य रिपोर्ट"
     }
   },

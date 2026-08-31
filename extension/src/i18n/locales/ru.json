@@ -892,8 +892,8 @@
   },
   "fullAudit": {
     "sidebar": {
-      "label": "Full Audit",
-      "description": "All rules · scope picker · filterable report"
+      "label": "Полный аудит",
+      "description": "Все правила · выборка области · отчет с фильтром"
     }
   },
   "kbdOverlay": {

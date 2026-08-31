@@ -892,8 +892,8 @@
   },
   "fullAudit": {
     "sidebar": {
-      "label": "Full Audit",
-      "description": "All rules · scope picker · filterable report"
+      "label": "全面审计",
+      "description": "所有规则 · 作用域选择器 · 可过滤报告"
     }
   },
   "kbdOverlay": {

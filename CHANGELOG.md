@@ -76,6 +76,12 @@ Restores the Full Audit sidebar button and fixes `require_ignore_comment_plugin_
 - **`require_ignore_comment_plugin_prefix` wrong message for unknown prefixed rule** — `// ignore: saropa_lints/nonexistent_rule` showed the "add prefix" message instead of the "not a registered rule" message. The reporter always reads `diagnosticCode` and ignores per-diagnostic `LintCode` overrides; fixed by temporarily swapping `diagnosticCode` during the unknown-prefix report.
 - **Tier-change toast count mismatch with Findings Dashboard** — changing tier showed a toast with a violation count from the stale `violations.json` file while the dashboard read live diagnostics (often empty during re-analysis), producing "toast says N, dashboard shows 0". The toast now defers until the first diagnostics refresh settles, so both surfaces show the same count. The dashboard shows a "Re-analyzing..." progress indicator during the gap. A 15-second safety fallback fires if the analysis server never produces results.
 
+<details><summary>Maintenance</summary>
+
+- **`generate_translations.py` auto-commits** — the translation wrapper script now stages and commits locale files after a successful generation run, with `git add` error checking.
+
+</details>
+
 ---
 
 ## [15.2.5]

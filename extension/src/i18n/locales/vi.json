@@ -892,8 +892,8 @@
   },
   "fullAudit": {
     "sidebar": {
-      "label": "Full Audit",
-      "description": "All rules · scope picker · filterable report"
+      "label": "Kiểm tra Toàn diện",
+      "description": "Tất cả quy tắc · chọn phạm vi · báo cáo có thể lọc"
     }
   },
   "kbdOverlay": {

@@ -892,8 +892,8 @@
   },
   "fullAudit": {
     "sidebar": {
-      "label": "Full Audit",
-      "description": "All rules · scope picker · filterable report"
+      "label": "Tam Muayene",
+      "description": "Tüm kurallar · kapsam seçici · süzülebilir rapor"
     }
   },
   "kbdOverlay": {

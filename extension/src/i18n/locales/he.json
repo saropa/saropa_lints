@@ -892,8 +892,8 @@
   },
   "fullAudit": {
     "sidebar": {
-      "label": "Full Audit",
-      "description": "All rules · scope picker · filterable report"
+      "label": "مراجعة מלאה",
+      "description": "כל הכללים · בחירת טווח · דוחقابل למסננת"
     }
   },
   "kbdOverlay": {

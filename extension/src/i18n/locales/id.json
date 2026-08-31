@@ -892,8 +892,8 @@
   },
   "fullAudit": {
     "sidebar": {
-      "label": "Full Audit",
-      "description": "All rules · scope picker · filterable report"
+      "label": "Audit Lengkap",
+      "description": "Semua aturan · pemilih jangkauan · laporan yang dapat disaring"
     }
   },
   "kbdOverlay": {
