@@ -14,6 +14,7 @@ Requires: pip install deep-translator (Google fallback).
 Usage (from repo root):
     py -3 extension/scripts/generate_translations.py                    # all locales
     py -3 extension/scripts/generate_translations.py --locales bn,de    # specific locales
+    py -3 extension/scripts/generate_translations.py --no-commit        # skip auto-commit
 """
 
 from __future__ import annotations
@@ -30,6 +31,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent / "i18n"))
 from term_color import c  # noqa: E402
 
+# Every file/directory the translation pipeline can produce. When the pipeline
+# adds a new output path, add it here — this is the single list that controls
+# what gets staged and committed.
+_TRANSLATION_PATHS = [
+    "extension/src/i18n/locales/",
+    "extension/src/i18n/locale_coverage.json",
+]
+
 
 def main() -> int:
     script_dir = Path(__file__).resolve().parent / "i18n"
@@ -38,21 +47,31 @@ def main() -> int:
         print(c("red", f"ERROR: {generate_script} not found."), file=sys.stderr)
         return 1
 
+    # Strip --no-commit before forwarding args to generate_locales.py,
+    # which doesn't understand it.
+    no_commit = "--no-commit" in sys.argv[1:]
+    forwarded_args = [a for a in sys.argv[1:] if a != "--no-commit"]
+
     env = os.environ.copy()
     env["PYTHONUTF8"] = "1"
     env["SAROPA_I18N_MACHINE_TRANSLATE"] = "1"
 
-    cmd = [sys.executable, str(generate_script)] + sys.argv[1:]
+    cmd = [sys.executable, str(generate_script)] + forwarded_args
 
-    locales = _locales_from_args(sys.argv[1:])
+    locales = _locales_from_args(forwarded_args)
     tag = c("magenta", "generate_translations")
     print(f"[{tag}] {c('gray', 'python=')}{sys.executable}", flush=True)
     print(f"[{tag}] {c('gray', 'locales=')}{c('cyan', locales)}", flush=True)
+    if no_commit:
+        print(f"[{tag}] {c('yellow', '--no-commit: skipping auto-commit')}", flush=True)
 
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     result = subprocess.run(cmd, env=env, cwd=str(script_dir))
     if result.returncode != 0:
         return result.returncode
+
+    if no_commit:
+        return 0
 
     # Commit generated translation files so they don't linger as dirty state.
     return _git_commit_translations(locales)
@@ -67,15 +86,19 @@ def _git_commit_translations(locales: str) -> int:
     repo_root = Path(__file__).resolve().parent.parent.parent
     tag = c("magenta", "generate_translations")
 
-    # Paths that the translation pipeline touches.
-    paths_to_stage = [
-        "extension/src/i18n/locales/",
-        "extension/src/i18n/locale_coverage.json",
-    ]
+    # Snapshot what's already staged so we can detect (and avoid committing)
+    # unrelated work that was staged before this script ran.
+    pre_staged = subprocess.run(
+        ["git", "diff", "--cached", "--name-only"],
+        cwd=str(repo_root),
+        capture_output=True,
+        text=True,
+    )
+    pre_staged_files = set(pre_staged.stdout.strip().splitlines()) if pre_staged.stdout.strip() else set()
 
     # Stage only translation-related files. Bail on any staging failure
     # so a broken repo state doesn't silently skip the commit.
-    for p in paths_to_stage:
+    for p in _TRANSLATION_PATHS:
         add_result = subprocess.run(
             ["git", "add", p],
             cwd=str(repo_root),
@@ -89,16 +112,31 @@ def _git_commit_translations(locales: str) -> int:
             )
             return add_result.returncode
 
-    # Check whether anything was actually staged.
-    diff = subprocess.run(
-        ["git", "diff", "--cached", "--quiet"],
+    # Get the new staged set and compute what this script actually added.
+    post_staged = subprocess.run(
+        ["git", "diff", "--cached", "--name-only"],
         cwd=str(repo_root),
         capture_output=True,
+        text=True,
     )
-    if diff.returncode == 0:
-        # Nothing staged — translations unchanged.
+    post_staged_files = set(post_staged.stdout.strip().splitlines()) if post_staged.stdout.strip() else set()
+    newly_staged = post_staged_files - pre_staged_files
+
+    if not newly_staged:
+        # Nothing new staged — translations unchanged.
         print(f"[{tag}] {c('gray', 'no translation changes to commit')}", flush=True)
         return 0
+
+    # Warn if there are pre-existing staged files that we won't commit.
+    if pre_staged_files:
+        print(
+            f"[{tag}] {c('yellow', f'note: {len(pre_staged_files)} pre-staged file(s) left untouched')}",
+            flush=True,
+        )
+
+    # Commit ONLY the files this script staged, not anything pre-existing.
+    # Passing explicit paths to `git commit` limits the commit scope.
+    commit_files = sorted(newly_staged)
 
     # Build a descriptive commit message.
     if locales == "all (default)":
@@ -106,15 +144,14 @@ def _git_commit_translations(locales: str) -> int:
     else:
         msg = f"chore: regenerate translations for {locales}"
 
+    # Show hook output (stdout/stderr) so pre-commit failures are visible.
     result = subprocess.run(
-        ["git", "commit", "-m", msg],
+        ["git", "commit", "-m", msg, "--"] + commit_files,
         cwd=str(repo_root),
-        capture_output=True,
-        text=True,
     )
     if result.returncode != 0:
         print(
-            c("red", f"ERROR: git commit failed:\n{result.stderr}"),
+            c("red", "ERROR: git commit failed (see output above)"),
             file=sys.stderr,
         )
         return result.returncode

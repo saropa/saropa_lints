@@ -78,7 +78,7 @@ Restores the Full Audit sidebar button and fixes `require_ignore_comment_plugin_
 
 <details><summary>Maintenance</summary>
 
-- **`generate_translations.py` auto-commits** — the translation wrapper script now stages and commits locale files after a successful generation run, with `git add` error checking.
+- **`generate_translations.py` auto-commits** — the translation wrapper script now stages and commits locale files after a successful generation run. Only files the script itself staged are committed (pre-existing staged work is left untouched). Hook output is shown on failure. Pass `--no-commit` to skip the auto-commit for CI or review workflows.
 
 </details>
 
