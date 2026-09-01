@@ -597,7 +597,7 @@ void _loadMemoryMode(String? content, String? mainOptions) {
       } else {
         PluginLogger.warning(
           'Unrecognized SAROPA_MEMORY_MODE "$envValue" — '
-          'valid values: balanced, full. '
+          'valid values: balanced, full, aggressive. '
           'Keeping current mode (${MemoryModeConfig.mode.name}).',
         );
       }
@@ -617,7 +617,7 @@ void _loadMemoryMode(String? content, String? mainOptions) {
   } else {
     PluginLogger.warning(
       'Unrecognized memory_mode "$raw" in analysis_options_custom.yaml — '
-      'valid values: balanced, full. '
+      'valid values: balanced, full, aggressive. '
       'Keeping current mode (${MemoryModeConfig.mode.name}).',
     );
   }
@@ -675,6 +675,7 @@ MemoryMode? _parseMemoryMode(String? raw) {
   final normalized = raw?.toLowerCase().trim();
   if (normalized == 'full') return MemoryMode.full;
   if (normalized == 'balanced') return MemoryMode.balanced;
+  if (normalized == 'aggressive') return MemoryMode.aggressive;
   return null;
 }
 

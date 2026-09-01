@@ -1604,6 +1604,7 @@ class MemoryPressureHandler {
       'hardLimitMb': _hardLimitMb,
       'hardLimitTripped': _hardLimitTripped,
       'softLimitMb': _softLimitMb,
+      'softRecoveryMarginMb': _softRecoveryMarginMb,
       'softLimitTripped': _softLimitTripped,
       'shedLevel': _shedLevel,
       'shedRuleCount': _shedRuleNames.length,

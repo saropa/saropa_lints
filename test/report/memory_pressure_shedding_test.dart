@@ -141,25 +141,47 @@ void main() {
     expect(softMb, lessThan(2950));
   });
 
-  test('soft recovery margin is proportional to soft limit', () {
-    // For a small hard limit (300 MB), the soft limit is 210 MB and the
-    // recovery margin should be ~21 MB (10% of 210, floored at 32 → 32 MB).
-    // The recovery threshold (210 - 32 = 178 MB) must be positive.
-    MemoryPressureHandler.setHardRssLimitMb(300);
-    final stats = MemoryPressureHandler.getStats();
-    final softMb = stats['softLimitMb'] as int;
+  test('soft recovery margin stays positive across various hard limits', () {
+    // The proportional margin (10% of soft, floor 32 MB, cap 512 MB)
+    // must produce a positive recovery threshold for ALL viable hard limits.
+    // This prevents the negative-threshold bug where recovery = soft - margin
+    // went negative, locking shedding on permanently.
+    final testCases = <int, (int, int)>{
+      // hardLimit: (expectedSoft, expectedMargin range check)
+      100: (70, 32), // 70 * 0.1 = 7 → floored to 32
+      200: (140, 32), // 140 * 0.1 = 14 → floored to 32
+      300: (210, 32), // 210 * 0.1 = 21 → floored to 32
+      500: (350, 35), // 350 * 0.1 = 35 → 35 (above floor)
+      1024: (717, 72), // 717 * 0.1 ≈ 72
+      4096: (2867, 287), // 2867 * 0.1 ≈ 287 (similar to old 256 constant)
+      8192: (5734, 512), // 5734 * 0.1 ≈ 573 → capped to 512
+    };
 
-    // Soft limit is 70% of 300 = 210.
-    expect(softMb, 210);
+    for (final entry in testCases.entries) {
+      MemoryPressureHandler.setHardRssLimitMb(entry.key);
+      final stats = MemoryPressureHandler.getStats();
+      final softMb = stats['softLimitMb'] as int;
+      final margin = stats['softRecoveryMarginMb'] as int;
+      final recoveryPoint = softMb - margin;
 
-    // For the default 4096 MB hard limit, margin ≈ 287 (10% of 2867),
-    // which is similar to the old fixed 256 MB.
-    MemoryPressureHandler.setHardRssLimitMb(4096);
-    final defaultStats = MemoryPressureHandler.getStats();
-    final defaultSoft = defaultStats['softLimitMb'] as int;
-    // 4096 * 0.7 ≈ 2867; 10% ≈ 287. Verify it's in a reasonable range.
-    expect(defaultSoft, greaterThan(2800));
-    expect(defaultSoft, lessThan(2950));
+      expect(softMb, entry.value.$1,
+          reason: 'soft limit for hard=${entry.key}');
+      // Margin must be between 32 (floor) and 512 (cap).
+      expect(margin, greaterThanOrEqualTo(32),
+          reason: 'margin floor for hard=${entry.key}');
+      expect(margin, lessThanOrEqualTo(512),
+          reason: 'margin cap for hard=${entry.key}');
+      // Recovery threshold must always be positive.
+      expect(recoveryPoint, greaterThan(0),
+          reason: 'recovery threshold for hard=${entry.key} must be >0: '
+              'soft=$softMb - margin=$margin = $recoveryPoint');
+    }
+
+    // Disabled state: hard=0 produces soft=0, margin=0.
+    MemoryPressureHandler.setHardRssLimitMb(0);
+    final disabledStats = MemoryPressureHandler.getStats();
+    expect(disabledStats['softLimitMb'], 0);
+    expect(disabledStats['softRecoveryMarginMb'], 0);
   });
 
   test('setShedLevelForTest works with early-return guard', () {

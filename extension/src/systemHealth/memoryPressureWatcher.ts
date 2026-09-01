@@ -56,16 +56,22 @@ export class MemoryPressureWatcher implements vscode.Disposable {
     this._tryRead(stateFile);
 
     // Watch the directory, filtering for memory_state.json changes.
+    // fs.watch `filename` can be null on macOS FSEvents and some Linux
+    // configurations — fall back to reading on any event when null.
     try {
-      this._watcher = fs.watch(reportsDir, (eventType, filename) => {
-        if (filename === 'memory_state.json') {
-          this._tryRead(stateFile);
-        }
+      let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+      this._watcher = fs.watch(reportsDir, (_eventType, filename) => {
+        if (filename !== null && filename !== 'memory_state.json') return;
+        // Debounce — Windows commonly fires 2-3 events per write.
+        if (debounceTimer) clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => this._tryRead(stateFile), 80);
       });
       // Swallow watcher errors (directory may vanish mid-session).
       this._watcher.on('error', () => {});
     } catch {
       // Directory may not exist yet — the plugin creates it on first write.
+      // The watcher will be retried on the next start() call (e.g. after
+      // workspace folder change triggers extension re-init).
     }
   }
 

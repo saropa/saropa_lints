@@ -27,6 +27,19 @@ void main() {
       expect(MemoryModeConfig.shouldApplyBalancedFiltering, isFalse);
     });
 
+    test('aggressive mode applies filtering even in CLI', () {
+      // Aggressive mode keeps balanced filtering active in the scan daemon
+      // to reduce daemon RSS on incremental scans. Unlike balanced mode,
+      // markCli does NOT disable filtering.
+      MemoryModeConfig.mode = MemoryMode.aggressive;
+      expect(MemoryModeConfig.isBalanced, isTrue);
+      expect(MemoryModeConfig.shouldApplyBalancedFiltering, isTrue);
+
+      // markCli has no effect on aggressive mode — filtering stays on.
+      MemoryModeConfig.markCli();
+      expect(MemoryModeConfig.shouldApplyBalancedFiltering, isTrue);
+    });
+
     test('resetForTest clears CLI flag', () {
       MemoryModeConfig.mode = MemoryMode.full;
       MemoryModeConfig.markCli();

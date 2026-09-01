@@ -74,6 +74,7 @@ Adds graduated rule shedding under memory pressure — the analyzer plugin now p
 
 - Graduated memory-pressure rule shedding (opt-in via `SAROPA_LINTS_SHED_RULES=true`): shed level 1 disables INFO-severity rules, level 2 adds WARNING-severity rules, essential-tier rules are always protected. Without opt-in, soft-limit warnings still log but no rules are shed.
 - Memory pressure indicator in the VS Code status bar and tooltip, fed by `memory_state.json` written on shed-level transitions — no polling.
+- `memory_mode: aggressive` option in `analysis_options_custom.yaml` — applies balanced-mode unchanged-file skipping to the scan daemon and CLI too, reducing daemon RSS on incremental scans at the cost of potentially missing violations in unchanged files whose dependencies changed.
 
 <details>
 <summary>Maintenance</summary>
