@@ -797,6 +797,10 @@ class AvoidUnnecessarySetStateRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Uses NamedType.element to resolve superclass identity.
+  @override
+  bool get usesTypeResolution => true;
+
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
 
@@ -1039,6 +1043,10 @@ class AvoidUnnecessaryStatefulWidgetsRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  /// Uses NamedType.element to resolve superclass identity.
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};

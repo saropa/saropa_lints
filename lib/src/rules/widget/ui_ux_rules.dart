@@ -141,6 +141,10 @@ class PreferCachedPaintObjectsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  /// Uses NamedType.element to resolve superclass identity.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'prefer_cached_paint_objects',
     '[prefer_cached_paint_objects] Creating Paint objects inside paint() causes new allocations every frame and hurts performance. Paint objects created in paint() are recreated every frame, causing unnecessary allocations. Move to class fields to improve performance. {v2}',
@@ -227,6 +231,10 @@ class RequireCustomPainterShouldRepaintRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  /// Uses NamedType.element to resolve superclass identity.
+  @override
+  bool get usesTypeResolution => true;
 
   // cspell:ignore shouldrepaint
 

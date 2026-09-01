@@ -6,6 +6,35 @@ Archived releases live here. See [CHANGELOG.md](https://github.com/saropa/saropa
 
 ---
 
+## [14.5.9]
+
+This release adds a rule catching a common button-labeling mistake: cramming extra detail into a button's main text using parentheses instead of the dedicated subtitle line. It also closes the last gap in the "Lint integration off" toggle: the analyzer plugin itself now refuses to enable any rules while the integration is disabled, so no fallback configuration can silently re-enable analysis and its multi-gigabyte memory footprint. [log](https://github.com/saropa/saropa_lints/blob/v14.5.9/CHANGELOG.md)
+
+### Added
+
+- New rule `avoid_parenthesized_button_caption` (Comprehensive tier): flags `CommonButton` / `CommonButtonWait` calls where the `text:` parameter contains parenthesized text that belongs in `subtitleText:` instead. No action required.
+
+### Fixed
+
+- The analyzer plugin now enables zero rules whenever "Lint integration" is toggled off, even if it gets loaded anyway — previously fallback configuration could re-enable over a thousand rules and hold several GB of analysis-server memory on a project the user had disabled. No action required.
+
+---
+
+## [14.5.8]
+
+Fixed the extension running lint analysis in the background while "Lint integration" was turned off. Disabling the integration now stops every automatic analysis trigger and background suggestion, not just the editor diagnostics. [log](https://github.com/saropa/saropa_lints/blob/v14.5.8/CHANGELOG.md)
+
+### Fixed (Extension)
+
+- Turning off "Lint integration" now also stops analysis triggered by saving files, changing dependencies, changing tier, changing config, and enabling a rule pack, along with the crash-coverage rule suggestion. Previously only in-editor diagnostics were suppressed. No action required.
+- Turning off "Lint integration" now restarts the Dart analysis server immediately, so the plugin's background process actually exits instead of continuing to run (and hold onto several GB of memory) until the next manual reload. No action required.
+
+### Changed (Extension)
+
+- The "Run Analysis" toolbar button is hidden while "Lint integration" is off, instead of appearing clickable and doing nothing useful. No action required.
+
+---
+
 ## [14.5.7]
 
 Dependency maintenance release — no rule or extension changes. [log](https://github.com/saropa/saropa_lints/blob/v14.5.7/CHANGELOG.md)

@@ -14,7 +14,7 @@ function codeHealthScriptStrings(): Record<string, string> {
     clearAll: l10n('codeHealth.script.clearAll'),
     expanderCollapsed: l10n('codeHealth.table.expanderAriaCollapsed'),
     expanderExpanded: l10n('codeHealth.table.expanderAriaExpanded'),
-    detailHeading: l10n('codeHealth.table.detailHeading'),
+    detailHeading: l10n('codeHealth.table.detailHeading'), // l10n:passthrough — {score} substituted client-side
     detailNoIssues: l10n('codeHealth.table.detailNoIssues'),
     suppressLabel: l10n('codeHealth.table.suppressLabel'),
     suppressTooltip: l10n('codeHealth.table.suppressTooltip'),

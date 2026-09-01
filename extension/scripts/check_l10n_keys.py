@@ -39,7 +39,16 @@ _PLACEHOLDER_RE = re.compile(r"\{([a-zA-Z0-9_]+)\}")
 # Looks for identifiers preceded by `{` or `,` (start of a member).
 # Excludes spread (`...obj`) and computed keys (`[expr]`) by requiring
 # the captured group to be a plain identifier, not preceded by `...`.
-_OBJ_KEY_RE = re.compile(r"(?:^|[{,])\s*(?!\.\.\.)(\w+)\s*(?::|[,}])")
+# Uses lookahead for the trailing delimiter so consecutive shorthand
+# properties (e.g. `{ a, b, c }`) all match — consuming the trailing
+# `,` would swallow the next property's start delimiter.
+_OBJ_KEY_RE = re.compile(r"(?:^|[{,])\s*(?!\.\.\.)(\w+)\s*(?=:|[,}])")
+
+# Matches a l10n:passthrough marker comment on a source line.
+# When present, the checker skips param validation for any l10n()
+# call on that line — the placeholders are substituted downstream
+# (e.g. by client-side JS in a webview script-strings builder).
+_PASSTHROUGH_MARKER = 'l10n:passthrough'
 
 
 def _flatten(obj: dict, prefix: str = "") -> dict[str, str]:
@@ -220,15 +229,25 @@ def _extract_params_after(source: str, start: int) -> str | None:
     return None
 
 
-def _collect_used_keys() -> dict[str, list[tuple[str, str | None]]]:
+def _collect_used_keys() -> dict[str, list[tuple[str, str | None, bool]]]:
     """Scan TypeScript sources for l10n() calls.
 
-    Returns {key: [(file:line, raw_params_or_None), ...]}.
+    Returns {key: [(file:line, raw_params_or_None, is_passthrough), ...]}.
+    The is_passthrough flag is True when the source line contains a
+    `l10n:passthrough` marker comment, indicating that placeholders are
+    substituted downstream (not by l10n()).
     """
-    used: dict[str, list[tuple[str, str | None]]] = {}
+    used: dict[str, list[tuple[str, str | None, bool]]] = {}
     for ts_file in sorted(_SRC.rglob("*.ts")):
         rel = str(ts_file.relative_to(_REPO))
         source = ts_file.read_text(encoding="utf-8")
+        # Build a set of 1-based line numbers that have the passthrough
+        # marker — checked BEFORE comment stripping so the marker (which
+        # lives in a comment) is still visible.
+        passthrough_lines: set[int] = set()
+        for i, line in enumerate(source.splitlines(), 1):
+            if _PASSTHROUGH_MARKER in line:
+                passthrough_lines.add(i)
         # Strip comments so doc examples don't register as real calls.
         stripped = _strip_comments(source)
         # Build a line-offset index for the stripped source.
@@ -255,13 +274,70 @@ def _collect_used_keys() -> dict[str, list[tuple[str, str | None]]]:
             # Skip dynamic key prefixes (e.g. 'codeHealth.flag.' + var).
             if key.endswith('.'):
                 continue
-            used.setdefault(key, []).append((f"{rel}:{lineno}", raw_params))
+            is_passthrough = lineno in passthrough_lines
+            used.setdefault(key, []).append((f"{rel}:{lineno}", raw_params, is_passthrough))
     return used
+
+
+def _sanitize_param_values(raw: str) -> str:
+    """Replace string and template-literal contents with spaces.
+
+    This prevents the key-extraction regex from picking up identifiers
+    inside param VALUES (e.g. `${suffix}` in a template literal, or
+    `'{n}'` as a string value). Only the top-level object keys should
+    be extracted, not variable names embedded in values.
+    """
+    result: list[str] = []
+    i = 0
+    n = len(raw)
+    while i < n:
+        c = raw[i]
+        if c in ("'", '"', '`'):
+            # Keep the quotes but blank out everything between them.
+            quote = c
+            result.append(c)
+            i += 1
+            while i < n:
+                ch = raw[i]
+                if ch == '\\':
+                    # Escaped char — blank both.
+                    result.append(' ')
+                    i += 1
+                    if i < n:
+                        result.append(' ')
+                    i += 1
+                    continue
+                if ch == quote:
+                    break
+                if quote == '`' and ch == '$' and i + 1 < n and raw[i + 1] == '{':
+                    # Template interpolation — blank with balanced braces.
+                    result.append(' ')
+                    result.append(' ')
+                    i += 2
+                    depth = 1
+                    while i < n and depth > 0:
+                        if raw[i] == '{':
+                            depth += 1
+                        elif raw[i] == '}':
+                            depth -= 1
+                        result.append(' ')
+                        i += 1
+                    continue
+                # Regular char inside string — blank it.
+                result.append(' ')
+                i += 1
+            if i < n:
+                result.append(c)  # closing quote
+            i += 1
+        else:
+            result.append(c)
+            i += 1
+    return ''.join(result)
 
 
 def _check_params(
     catalog: dict[str, str],
-    used: dict[str, list[tuple[str, str | None]]],
+    used: dict[str, list[tuple[str, str | None, bool]]],
 ) -> list[str]:
     """Validate that l10n() call-site params match en.json placeholders."""
     issues: list[str] = []
@@ -269,22 +345,37 @@ def _check_params(
         if key not in catalog:
             # Missing key — already reported by the main check.
             continue
+        # Plural keys (ending in CLDR plural categories) are consumed by
+        # pluralize(), which handles {count} substitution. l10n() is
+        # deliberately called without params — {count} passes through
+        # as a literal placeholder for pluralize() to replace. Covers
+        # all CLDR categories: Zero, One, Two, Few, Many, Other.
+        if re.search(r'(?:Zero|One|Two|Few|Many|Other)$', key):
+            continue
         value = catalog[key]
         expected = set(_PLACEHOLDER_RE.findall(value))
         if not expected:
             # No placeholders in the catalog value — skip param checks.
             continue
-        for location, raw_params in sites:
+        for location, raw_params, is_passthrough in sites:
+            # l10n:passthrough marker — placeholders are substituted
+            # downstream (client-side JS, script-strings builder, etc.).
+            if is_passthrough:
+                continue
             if raw_params is None:
                 # Call site passes no params but the catalog expects them.
                 issues.append(
                     f"  {key}  expects {sorted(expected)}  but call at {location} passes no params"
                 )
                 continue
+            # Sanitize string/template-literal contents so the regex
+            # only extracts top-level object keys, not identifiers
+            # embedded in param values.
+            sanitized = _sanitize_param_values(raw_params)
             # Extract keys from the JS object literal { foo: ..., bar: ... }.
             # Spread properties (...obj) are excluded by the negative
             # lookahead; computed keys ([expr]) don't match \w+ after {/,.
-            supplied = set(_OBJ_KEY_RE.findall(raw_params))
+            supplied = set(_OBJ_KEY_RE.findall(sanitized))
             missing_params = expected - supplied
             extra_params = supplied - expected
             if missing_params:

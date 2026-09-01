@@ -10,10 +10,16 @@ import 'package:test/test.dart';
 /// Includes modern element-model APIs (`formalParameters`,
 /// `hasDefaultValue`, `defaultValueCode`) that replaced the older
 /// `staticElement` call chain but still require full resolution.
+/// Matches resolved-type API calls. Includes `NamedType.element` via
+/// `.superclass.element` — a type-resolution accessor the original
+/// regex missed. NOTE: `.constructorName.type.element` is the same API
+/// but is used by 14+ rule files that predate the flag; tracked as a
+/// separate bulk fix (see bugs/type_element_resolution_gap.md).
 final _resolvedTypePatterns = RegExp(
   r'\.(staticType|allSupertypes|thisType|resolvedType'
   r'|declaredElement|staticElement|enclosingElement'
-  r'|formalParameters|hasDefaultValue|defaultValueCode)\b',
+  r'|formalParameters|hasDefaultValue|defaultValueCode)\b'
+  r'|\.superclass\.element\b',
 );
 
 /// Matches `.library` access on elements — a resolved-type trigger — but

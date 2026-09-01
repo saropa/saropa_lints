@@ -33,7 +33,7 @@ function findingsDashScriptStrings(): Record<string, string> {
         announceFailed: l10n('findingsDash.script.announceFailed'),
         removeRecentTitle: l10n('findingsDash.script.removeRecentTitle'),
         removeRecentAriaPrefix: l10n('findingsDash.script.removeRecentAria'),
-        bulkSelectedTpl: l10n('findingsDash.script.bulkSelectedTpl'),
+        bulkSelectedTpl: l10n('findingsDash.script.bulkSelectedTpl'), // l10n:passthrough — {n} substituted client-side
     };
 }
 

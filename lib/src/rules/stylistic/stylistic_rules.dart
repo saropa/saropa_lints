@@ -191,8 +191,9 @@ class PreferOneWidgetPerFileRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Uses NamedType.element to resolve superclass identity.
   @override
-  bool get usesTypeResolution => false;
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -1332,8 +1333,9 @@ class PreferPrivateUnderscorePrefixRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Uses NamedType.element to resolve superclass identity.
   @override
-  bool get usesTypeResolution => false;
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>
@@ -1487,8 +1489,9 @@ class PreferWidgetMethodsOverClassesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  /// Uses NamedType.element to resolve superclass identity.
   @override
-  bool get usesTypeResolution => false;
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad =>

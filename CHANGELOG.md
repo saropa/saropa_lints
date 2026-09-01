@@ -93,6 +93,11 @@ Adds graduated rule shedding under memory pressure — the analyzer plugin now p
 - **Full Audit i18n** — added all 50 missing `audit.*` keys to `en.json` (scope picker, progress, errors, and report webview) plus 3 missing `findingsDash.script.*` accessibility keys, and localized the inline progress-bar message. No action required.
 - **`check_l10n_keys.py`** — new CI script cross-references every `l10n()` call in `extension/src/` against `en.json`, with `--check-params` to validate interpolation tokens match between call sites and catalog values. Handles template-literal `${}` interpolations, spread properties, and dynamic-key prefixes. No action required.
 - **Live l10n diagnostics** — new `saropa-l10n` diagnostic provider shows inline warnings for missing `en.json` keys and param mismatches on save. Re-validates when `en.json` changes. No action required.
+- **`check_l10n_keys.py` param checker hardened** — fixed false positives: consecutive shorthand properties (`{ a, b }`) were missed due to trailing-delimiter consumption; template-literal interpolations (`${suffix}`) were misidentified as extra params; plural keys (`*One`/`*Other`) with `{count}` are now skipped since `pluralize()` handles substitution. No action required.
+- **`usesTypeResolution` false flips fixed** — 8 rules across 4 files (`stylistic_rules.dart`, `ui_ux_rules.dart`, `widget_lifecycle_rules.dart`, `widget_patterns_ux_rules.dart`) were incorrectly set to `usesTypeResolution: false` despite using `NamedType.element` for superclass resolution; integrity test regex now catches `.superclass.element`. No action required.
+- **Reports-dir single source of truth** — extracted `REPORTS_DIR` and `SAROPA_LINTS_DATA_DIR` constants plus path-builder helpers into `reportsPaths.ts`, replacing 27 hardcoded `'reports'`/`'.saropa_lints'` string literals across 18 production files. No action required.
+- **Config loader deduplication** — extracted `_resolveEnvThenYaml` shared helper in `config_loader.dart`, replacing duplicated env-var-then-yaml lookup logic in `_loadShedRulesConfig` and `_loadMemoryMode`. No action required.
+- **Scan-loop RSS guard** — the scan CLI now samples RSS between files and stops early (returning partial results) when memory exceeds the configured hard limit, preventing OOM on very large codebases. No action required.
 
 </details>
 
@@ -510,35 +515,6 @@ Version 15.0.0 adds new quick fixes for error logging and variable placement whi
 - Manually corrected seven German and Swahili extension strings that had shipped corrupted machine-translation output — a mangled literal `--resolve` CLI flag, two entries collapsed into a repetition loop (one leaking a fragment resembling a stray prompt artifact), and grammatically broken fallback text — and added each as a curated `dictionaries.py` override so a future translation run can never regenerate the same corruption from cache.
 
 </details>
-
----
-
-## [14.5.9]
-
-This release adds a rule catching a common button-labeling mistake: cramming extra detail into a button's main text using parentheses instead of the dedicated subtitle line. It also closes the last gap in the "Lint integration off" toggle: the analyzer plugin itself now refuses to enable any rules while the integration is disabled, so no fallback configuration can silently re-enable analysis and its multi-gigabyte memory footprint. [log](https://github.com/saropa/saropa_lints/blob/v14.5.9/CHANGELOG.md)
-
-### Added
-
-- New rule `avoid_parenthesized_button_caption` (Comprehensive tier): flags `CommonButton` / `CommonButtonWait` calls where the `text:` parameter contains parenthesized text that belongs in `subtitleText:` instead. No action required.
-
-### Fixed
-
-- The analyzer plugin now enables zero rules whenever "Lint integration" is toggled off, even if it gets loaded anyway — previously fallback configuration could re-enable over a thousand rules and hold several GB of analysis-server memory on a project the user had disabled. No action required.
-
----
-
-## [14.5.8]
-
-Fixed the extension running lint analysis in the background while "Lint integration" was turned off. Disabling the integration now stops every automatic analysis trigger and background suggestion, not just the editor diagnostics. [log](https://github.com/saropa/saropa_lints/blob/v14.5.8/CHANGELOG.md)
-
-### Fixed (Extension)
-
-- Turning off "Lint integration" now also stops analysis triggered by saving files, changing dependencies, changing tier, changing config, and enabling a rule pack, along with the crash-coverage rule suggestion. Previously only in-editor diagnostics were suppressed. No action required.
-- Turning off "Lint integration" now restarts the Dart analysis server immediately, so the plugin's background process actually exits instead of continuing to run (and hold onto several GB of memory) until the next manual reload. No action required.
-
-### Changed (Extension)
-
-- The "Run Analysis" toolbar button is hidden while "Lint integration" is off, instead of appearing clickable and doing nothing useful. No action required.
 
 ---
 
