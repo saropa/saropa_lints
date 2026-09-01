@@ -212,7 +212,23 @@ Investigated four optimization avenues for reducing the analyzer's memory footpr
 
 **Code review fixes:** `_tryRead` change-detection predicate extended to include `softLimitTripped` (was silently dropping state transitions when shedding was disabled). `_loadShedRulesConfig` now warns on unrecognized env-var and yaml values (previously silent no-op on typos). `getStats()` exposes `shedEnabled` field, `memory_state.json` includes it, and the extension reads it.
 
-**Deferred:** `_loadShedRulesConfig`/`_loadMemoryMode` pattern duplication (env-var-then-yaml shared helper — third instance of the pattern). `_shedPromptShownThisSession` module-level flag vs per-workspace-root keying (multi-root edge case). Reports-dir path hardcoding (15+ call sites, pre-existing, cross-cutting). Phase 5 Findings 2-5 (research items, not implementation-ready).
+**Deferred:** `_loadOutputConfig` env-var-then-yaml deduplication (reads two env vars with different types — doesn't fit the shared helper cleanly). Phase 5 Finding 4 (resolved-model eviction — high risk, deferred unless other optimizations prove insufficient).
+
+## Finish Report (2026-09-01 session 2)
+
+### Phase 5 Findings 2-5 resolution + deferred refactors
+
+**Reports-dir single source of truth:** Extracted `REPORTS_DIR` and `SAROPA_LINTS_DATA_DIR` constants plus `reportsPath()`, `saropaLintsDataPath()`, `reportsUri()`, `saropaLintsDataUri()` helpers into `extension/src/reportsPaths.ts`. Replaced 27 hardcoded `'reports'`/`'.saropa_lints'` string literals across 18 production TypeScript files. Test files left with literals (test-internal paths, no shared-constant benefit).
+
+**Config loader deduplication:** Extracted `_resolveEnvThenYaml()` helper in `config_loader.dart`, replacing duplicated env-var-then-yaml lookup logic in `_loadShedRulesConfig` and `_loadMemoryMode`. The helper centralizes env-var read (with platform safety catch), yaml fallback (with optional deprecation-aware reader), and unrecognized-value warnings. `_loadOutputConfig` left untouched — it reads two env vars with incompatible types (int + string).
+
+**Phase 5 Finding 2 (`.staticType` heavy hitters):** Closed as documented — top 5 consumers (206 of ~306 call sites) genuinely require type resolution. No optimization available.
+
+**Phase 5 Finding 3 (daemon balanced-mode filtering):** Already implemented by existing infrastructure. `balanced` mode filters in-process (analysis server) where `_isCli=false`, skips CLI. `aggressive` mode filters everywhere. No additional code change needed.
+
+**Phase 5 Finding 4 (resolved-model eviction):** Deferred — high risk, analyzer SDK internals not designed for selective mid-scan eviction. Would need benchmarking to determine if memory savings outweigh re-resolution costs.
+
+**Phase 5 Finding 5 (per-file RSS check):** Implemented in `scan_runner.dart`. After each `_scanSingleFileResolved()` call, samples `ProcessInfo.currentRss` (guarded with try/catch), compares against `MemoryPressureHandler.hardRssLimitMb` (fallback: 1500 MB), and breaks with a warning when exceeded. Partial diagnostics collected so far are still returned.
 
 ---
 
