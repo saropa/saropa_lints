@@ -19,6 +19,8 @@ import {
   type RuleLaneValue,
 } from './config/laneConfig';
 import { l10n } from './i18n/runtime';
+// Shared path-segment constants/helpers — keeps 'reports'/'.saropa_lints' in one place.
+import { REPORTS_DIR, saropaLintsDataPath } from './reportsPaths';
 
 const SAROPA_LINTS_DEV_DEP = 'saropa_lints';
 const DEFAULT_VERSION = '^9.1.0';
@@ -1136,7 +1138,7 @@ const OPEN_DART_ANALYSIS_SKIP_SUBSTRINGS = [
   '/build/',
   '/node_modules/',
   '/.git/',
-  '/reports/',
+  '/' + REPORTS_DIR + '/',
   '/coverage/',
   '/dist/',
 ];
@@ -1375,7 +1377,7 @@ async function awaitFreshViolations(
   sinceMs: number,
   timeoutMs: number = FRESH_VIOLATIONS_TIMEOUT_MS,
 ): Promise<boolean> {
-  const p = path.join(workspaceRoot, 'reports', '.saropa_lints', 'violations.json');
+  const p = path.join(saropaLintsDataPath(workspaceRoot), 'violations.json');
   const deadline = Date.now() + timeoutMs;
   for (;;) {
     try {

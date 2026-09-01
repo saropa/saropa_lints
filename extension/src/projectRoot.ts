@@ -13,6 +13,8 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+// Shared path-segment constant — keeps the 'reports' directory name in one place.
+import { REPORTS_DIR } from './reportsPaths';
 
 /**
  * Directories to skip when scanning one level deep for pubspec.yaml.
@@ -30,7 +32,7 @@ const SKIP_DIRS = new Set([
   'linux',
   'macos',
   'node_modules',
-  'reports',
+  REPORTS_DIR,
   'scripts',
   'test',
   'web',

@@ -11,6 +11,7 @@ import { PackageDetailPaneController, PaneMessage } from './package-detail-pane-
 import { ReviewStateService } from '../services/review-state';
 import { CacheService } from '../services/cache-service';
 import { l10n } from '../../i18n/runtime';
+import { reportsUri } from '../../reportsPaths';
 
 /** Singleton webview panel for the vibrancy report. */
 export class VibrancyReportPanel {
@@ -305,7 +306,8 @@ export class VibrancyReportPanel {
             const ss = String(now.getSeconds()).padStart(2, '0');
             const ymd = `${y}${m}${d}`;
             const timestamp = `${hh}${mm}${ss}`;
-            const dir = vscode.Uri.joinPath(workspaceFolder.uri, 'reports', ymd);
+            // Shared helper builds the `reports/` prefix; append the day-partitioned subdir.
+            const dir = vscode.Uri.joinPath(reportsUri(workspaceFolder.uri), ymd);
             await vscode.workspace.fs.createDirectory(dir);
             const file = vscode.Uri.joinPath(
                 dir,

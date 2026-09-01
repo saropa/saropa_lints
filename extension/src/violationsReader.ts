@@ -4,6 +4,8 @@
 
 import * as path from 'path';
 import * as fs from 'fs';
+// Shared path-segment helper — keeps 'reports'/'.saropa_lints' in one place.
+import { saropaLintsDataPath } from './reportsPaths';
 
 export interface OwaspData {
   mobile?: string[];
@@ -137,7 +139,7 @@ export interface ViolationsData {
 }
 
 export function getViolationsPath(workspaceRoot: string): string {
-  return path.join(workspaceRoot, 'reports', '.saropa_lints', 'violations.json');
+  return path.join(saropaLintsDataPath(workspaceRoot), 'violations.json');
 }
 
 /**

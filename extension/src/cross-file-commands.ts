@@ -6,6 +6,8 @@ import { runInWorkspace, getSharedOutputChannel } from './setup';
 import { getProjectRoot } from './projectRoot';
 import { hasSaropaLintsDep } from './pubspecReader';
 import { l10n } from './i18n/runtime';
+// Shared path-segment helper — keeps 'reports'/'.saropa_lints' in one place.
+import { saropaLintsDataPath } from './reportsPaths';
 
 // Extension commands for cross_file analyzer (JSON summary, output channel).
 type CrossFileSummary = {
@@ -84,7 +86,7 @@ export function registerCrossFileCommands(context: vscode.ExtensionContext): voi
       if (!root) return;
       if (!ensureSaropaDependency(root)) return;
 
-      const outputDir = path.join(root, 'reports', '.saropa_lints', 'cross_file');
+      const outputDir = path.join(saropaLintsDataPath(root), 'cross_file');
       const args = [
         'run',
         'saropa_lints:cross_file',
@@ -119,7 +121,7 @@ export function registerCrossFileCommands(context: vscode.ExtensionContext): voi
       if (!root) return;
       if (!ensureSaropaDependency(root)) return;
 
-      const outputDir = path.join(root, 'reports', '.saropa_lints', 'cross_file');
+      const outputDir = path.join(saropaLintsDataPath(root), 'cross_file');
       const args = [
         'run',
         'saropa_lints:cross_file',
@@ -168,7 +170,7 @@ export function registerCrossFileCommands(context: vscode.ExtensionContext): voi
       if (!root) return;
       if (!ensureSaropaDependency(root)) return;
 
-      const outPath = path.join(root, 'reports', '.saropa_lints', 'cross_file_snapshot.json');
+      const outPath = path.join(saropaLintsDataPath(root), 'cross_file_snapshot.json');
       const args = [
         'run',
         'saropa_lints:cross_file',

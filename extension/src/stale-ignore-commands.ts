@@ -16,6 +16,8 @@ import { runInWorkspaceAsync, getSharedOutputChannel } from './setup';
 import { getProjectRoot } from './projectRoot';
 import { hasSaropaLintsDep } from './pubspecReader';
 import { l10n } from './i18n/runtime';
+// Shared path-segment helper — keeps 'reports'/'.saropa_lints' in one place.
+import { saropaLintsDataPath } from './reportsPaths';
 
 // ── Types matching the scan CLI's `--find-stale-ignores --format json` output ─
 
@@ -117,7 +119,7 @@ async function runFindStaleIgnores(): Promise<void> {
   if (!root) return;
   if (!ensureSaropaDependency(root)) return;
 
-  const jsonPath = path.join(root, 'reports', '.saropa_lints', 'stale_ignores.json');
+  const jsonPath = path.join(saropaLintsDataPath(root), 'stale_ignores.json');
   const scan = await runFindScan(root, jsonPath, l10n('staleIgnores.progress.finding'));
   if (scan === null) return; // Cancelled or a genuine error already reported.
 
@@ -468,7 +470,7 @@ export class StaleIgnoreCodeActionProvider implements vscode.CodeActionProvider 
  */
 export function perFileJsonPath(root: string, filePath: string): string {
   const hash = crypto.createHash('md5').update(filePath).digest('hex').slice(0, 12);
-  return path.join(root, 'reports', '.saropa_lints', `stale_ignores_file_${hash}.json`);
+  return path.join(saropaLintsDataPath(root), `stale_ignores_file_${hash}.json`);
 }
 
 /** Returns the workspace root or shows an error and returns null. */

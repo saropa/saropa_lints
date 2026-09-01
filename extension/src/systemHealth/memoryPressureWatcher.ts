@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
+import { saropaLintsDataPath } from '../reportsPaths';
 
 /**
  * Plugin-side memory pressure state, written to `memory_state.json`
@@ -51,7 +52,8 @@ export class MemoryPressureWatcher implements vscode.Disposable {
   start(root: string): void {
     this.dispose();
 
-    const reportsDir = path.join(root, 'reports', '.saropa_lints');
+    // Shared helper keeps this in sync with the other reports/.saropa_lints consumers.
+    const reportsDir = saropaLintsDataPath(root);
     const stateFile = path.join(reportsDir, 'memory_state.json');
 
     // Try an initial read — the file may already exist from a prior session.

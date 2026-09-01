@@ -15,6 +15,7 @@ import {
   type ViolationsData,
 } from '../violationsReader';
 import { buildViolationsDataFromDiagnostics } from '../liveDiagnosticsModel';
+import { reportsUri } from '../reportsPaths';
 import { sortedNumericCountEntries } from '../keyedCountBreakdown';
 import type { Suppressions } from '../suppressionsStore';
 import { readDisabledRules } from '../configWriter';
@@ -808,7 +809,8 @@ async function saveReportJson(violations: readonly Violation[]): Promise<void> {
     const now = new Date();
     const ymd = `${now.getFullYear()}${pad2(now.getMonth() + 1)}${pad2(now.getDate())}`;
     const hms = `${pad2(now.getHours())}${pad2(now.getMinutes())}${pad2(now.getSeconds())}`;
-    const dir = vscode.Uri.joinPath(folder.uri, 'reports', ymd);
+    // Shared helper builds the `reports/` prefix; append the day-partitioned subdir.
+    const dir = vscode.Uri.joinPath(reportsUri(folder.uri), ymd);
     await vscode.workspace.fs.createDirectory(dir);
     const file = vscode.Uri.joinPath(dir, `${ymd}_${hms}_findings.json`);
     const content = JSON.stringify(violations, null, 2);

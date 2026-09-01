@@ -10,6 +10,7 @@ import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { getProjectRoot } from '../projectRoot';
 import { l10n } from '../i18n/runtime';
+import { saropaLintsDataPath } from '../reportsPaths';
 
 interface FnHeat {
   name: string;
@@ -53,7 +54,8 @@ export function registerHealthCodeLens(context: vscode.ExtensionContext): void {
   );
   const root = getProjectRoot();
   if (root) {
-    const ndjson = path.join(root, 'reports', '.saropa_lints', 'health', 'files.ndjson');
+    // Shared helper builds the `reports/.saropa_lints` prefix; append the NDJSON shard path.
+    const ndjson = path.join(saropaLintsDataPath(root), 'health', 'files.ndjson');
     const watcher = vscode.workspace.createFileSystemWatcher(ndjson);
     watcher.onDidChange(() => provider.refresh());
     watcher.onDidCreate(() => provider.refresh());
@@ -96,7 +98,8 @@ class HealthCodeLensProvider implements vscode.CodeLensProvider, vscode.Disposab
   }
 
   private ensureCache(root: string): void {
-    const ndjson = path.join(root, 'reports', '.saropa_lints', 'health', 'files.ndjson');
+    // Shared helper builds the `reports/.saropa_lints` prefix; append the NDJSON shard path.
+    const ndjson = path.join(saropaLintsDataPath(root), 'health', 'files.ndjson');
     if (!fs.existsSync(ndjson)) {
       this.cache = new Map();
       return;

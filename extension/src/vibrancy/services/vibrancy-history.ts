@@ -3,6 +3,7 @@ import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 import { categoryToGrade } from '../scoring/status-classifier';
 import { VibrancyResult } from '../types';
+import { REPORTS_DIR } from '../../reportsPaths';
 
 /** On-disk .saropa_lints history: append snapshots, trends, optional legacy migration. */
 const SCHEMA_VERSION = 1;
@@ -51,7 +52,9 @@ const LEGACY_VIBRANCY_JSON =
 async function listLegacyVibrancyJsonPaths(workspaceRoot: string): Promise<string[]> {
     const seenNames = new Set<string>();
     const paths: string[] = [];
-    for (const subdir of ['reports', 'report'] as const) {
+    // Shared constant for the current 'reports' dir name; 'report' stays literal
+    // as the legacy fallback this loop is specifically migrating away from.
+    for (const subdir of [REPORTS_DIR, 'report'] as const) {
         const dir = path.join(workspaceRoot, subdir);
         let files: string[];
         try {

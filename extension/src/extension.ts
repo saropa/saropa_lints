@@ -62,6 +62,8 @@ import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView'
 import { openProjectVibrancyReport, refreshCodeHealthDashboardIfOpen } from './views/projectVibrancyReportView';
 import { registerAuditCommand } from './audit/audit-command';
 import { registerL10nDiagnostics } from './i18n/l10nDiagnostics';
+// Shared path-segment constants/helpers — keeps 'reports'/'.saropa_lints' in one place.
+import { saropaLintsDataPath } from './reportsPaths';
 import { registerProjectMapCommand } from './views/projectMapView';
 import { registerSaropaDashboardsCommand } from './views/saropaDashboardsView';
 import { registerHealthCodeLens } from './views/healthCodeLens';
@@ -850,7 +852,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
 
   const violationsPath = (): string | null => {
     const root = getProjectRoot();
-    return root ? path.join(root, 'reports', '.saropa_lints', 'violations.json') : null;
+    return root ? path.join(saropaLintsDataPath(root), 'violations.json') : null;
   };
   // Debounce refresh when violations.json changes to avoid rapid successive updates.
   let refreshDebounceTimer: ReturnType<typeof setTimeout> | undefined;
@@ -2214,7 +2216,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         return;
       }
       const report = generateOwaspReport(data, root);
-      const folder = path.join(root, 'reports', '.saropa_lints');
+      const folder = saropaLintsDataPath(root);
       try { fs.mkdirSync(folder, { recursive: true }); } catch { /* exists */ }
       const filePath = path.join(folder, 'owasp_compliance_report.md');
       fs.writeFileSync(filePath, report, 'utf-8');

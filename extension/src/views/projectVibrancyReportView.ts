@@ -27,6 +27,7 @@ import {
 } from './keyboard-shortcuts';
 import { l10n } from '../i18n/runtime';
 import { mergeCodeHealthSuppression } from './codeHealthSuppression';
+import { reportsPath } from '../reportsPaths';
 
 /**
  * **Code Health Dashboard** webview: runs [runProjectVibrancyScan], renders JSON as HTML in an
@@ -157,7 +158,8 @@ function writeReportFile(projectRoot: string, rawJson: string): string | undefin
     const now = new Date();
     const day = reportDateStamp(now);
     const time = reportTimeStamp(now);
-    const dir = nodePath.join(projectRoot, 'reports', day);
+    // Shared helper builds the `reports/` prefix; append the day-partitioned subdir.
+    const dir = nodePath.join(reportsPath(projectRoot), day);
     nodeFs.mkdirSync(dir, { recursive: true });
     const filePath = nodePath.join(dir, `${day}_${time}_saropa_code_health.json`);
     nodeFs.writeFileSync(filePath, rawJson);

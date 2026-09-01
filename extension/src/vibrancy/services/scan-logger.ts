@@ -13,6 +13,7 @@
  * entirely to avoid bloating the log with duplicate no-op results.
  */
 import * as vscode from 'vscode';
+import { reportsUri } from '../../reportsPaths';
 
 type LogLevel = 'INFO' | 'CACHE' | 'API' | 'SCORE' | 'ERROR';
 
@@ -76,8 +77,9 @@ export class ScanLogger {
         const dateDir = formatDateDir(now);
         const fileName = `${dateDir}_pubspec_vibrancy.log`;
 
+        // Shared helper builds the `reports/` prefix; append the day-partitioned subdir.
         const dirUri = vscode.Uri.joinPath(
-            folders[0].uri, 'reports', dateDir,
+            reportsUri(folders[0].uri), dateDir,
         );
         await vscode.workspace.fs.createDirectory(dirUri);
 

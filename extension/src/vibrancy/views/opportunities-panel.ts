@@ -32,6 +32,7 @@ import {
 } from './opportunities-html';
 import { formatTimestamp } from '../services/report-utils';
 import { l10n } from '../../i18n/runtime';
+import { reportsUri } from '../../reportsPaths';
 
 export class OpportunitiesPanel {
     private static _current: OpportunitiesPanel | undefined;
@@ -124,7 +125,8 @@ export class OpportunitiesPanel {
         try {
             // Use the scanned workspace root (beside the pubspec), not the
             // generic first workspace folder — correct in multi-root setups.
-            const reportDir = vscode.Uri.joinPath(this._workspaceRoot, 'reports');
+            // Shared helper keeps the `reports/` root in sync with other consumers.
+            const reportDir = reportsUri(this._workspaceRoot);
             await vscode.workspace.fs.createDirectory(reportDir);
 
             // Reachable even though the button shows when ranked.length > 0,
@@ -184,7 +186,8 @@ export class OpportunitiesPanel {
                 return;
             }
 
-            const reportDir = vscode.Uri.joinPath(this._workspaceRoot, 'reports');
+            // Shared helper keeps the `reports/` root in sync with other consumers.
+            const reportDir = reportsUri(this._workspaceRoot);
             await vscode.workspace.fs.createDirectory(reportDir);
 
             const stamp = formatTimestamp(new Date());

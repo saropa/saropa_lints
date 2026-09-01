@@ -12,6 +12,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+// Shared path-segment helper — keeps the 'reports' directory name in one place.
+import { reportsPath } from './reportsPaths';
 
 /** Module-level buffer — lines accumulate across logReport() calls until flushed. */
 const reportLines: string[] = [];
@@ -116,7 +118,7 @@ export interface FlushReportOptions {
  */
 export function findLatestAnalysisReport(workspaceRoot: string): string | undefined {
   try {
-    const reportsDir = path.join(workspaceRoot, 'reports');
+    const reportsDir = reportsPath(workspaceRoot);
     if (!fs.existsSync(reportsDir) || !fs.statSync(reportsDir).isDirectory()) {
       return undefined;
     }
@@ -169,7 +171,7 @@ export function flushReport(root: string, options?: FlushReportOptions): string 
   const ts = sessionTimestamp ?? makeTimestamp();
   // Derive date folder from the session timestamp to avoid midnight boundary mismatch
   // (session started at 23:59 but flushed at 00:01 would write to a different date folder).
-  const folder = path.join(root, 'reports', dateFolderFromTimestamp(ts));
+  const folder = path.join(reportsPath(root), dateFolderFromTimestamp(ts));
   const header = [
     '# Saropa Lints Extension Report',
     `**Date:** ${new Date().toISOString()}`,

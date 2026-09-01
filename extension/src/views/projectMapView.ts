@@ -14,6 +14,7 @@ import { getProjectRoot } from '../projectRoot';
 import { hasSaropaLintsDep } from '../pubspecReader';
 import { killProcessTree, resolveCliCwd } from './devCliRoot';
 import { l10n } from '../i18n/runtime';
+import { saropaLintsDataPath } from '../reportsPaths';
 
 let panel: vscode.WebviewPanel | undefined;
 let extensionUri: vscode.Uri;
@@ -54,7 +55,8 @@ function openProjectMap(): Promise<void> {
 
 async function runAndRender(root: string): Promise<void> {
   lastRoot = root;
-  const outputDir = path.join(root, 'reports', '.saropa_lints', 'health');
+  // Shared helper builds the `reports/.saropa_lints` prefix; append the view-specific subdir.
+  const outputDir = path.join(saropaLintsDataPath(root), 'health');
   const ok = await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
@@ -203,7 +205,8 @@ export async function scanProjectMapToParts(
   extUri: vscode.Uri,
   token: vscode.CancellationToken,
 ): Promise<ProjectMapParts | null> {
-  const outputDir = path.join(root, 'reports', '.saropa_lints', 'health');
+  // Shared helper builds the `reports/.saropa_lints` prefix; append the view-specific subdir.
+  const outputDir = path.join(saropaLintsDataPath(root), 'health');
   const ok = await runScan(root, outputDir, token);
   if (!ok) return null;
   const indexPath = path.join(outputDir, 'index.html');
