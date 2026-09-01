@@ -486,6 +486,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "PRs": "PRs",
         "Pause": "Pause",
         "Saropa": "Saropa",
+        # Curated passthrough: brand-prefixed product title — "Saropa Lints" is a brand prefix (never translated),
+        # "Audit" is an established German loanword from English used identically in technical contexts.
+        "Saropa Lints Audit": "Saropa Lints Audit",
         "Saropa Lints: Language / Langue / Sprache / 言語 / 语言": "Saropa Lints: Language / Langue / Sprache / 言語 / 语言",
         "Saropa Lints: Open Code Health Dashboard": "Saropa Lints: Code Health Dashboard öffnen",
         "Status": "Status",
@@ -1253,6 +1256,12 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Cross-project drift": "Drift sa iba't ibang proyekto",
         # Manual: MT returns English unchanged — technical terms kept as loanwords, Filipino word order.
         "Analyzer plugin": "Plugin ng analyzer",
+        # Manual: MT returned English unchanged — "Ulat ng Pag-audit" is the standard Filipino rendering
+        # for a formal report document ("ulat" = report, "pag-audit" = audit process).
+        "Audit Report": "Ulat ng Pag-audit",
+        # Manual: MT returned English unchanged — "Batayan" is the standard Filipino for a reference point
+        # or starting measure, used in technical/project contexts.
+        "Baseline": "Batayan",
         # Curated passthroughs: MT returns these identical (cognate / brand-prefixed title / abbreviation) for this locale; English is the correct rendering. Keeps the coverage gate honest without shipping garbage.
         "CC {cc}": "CC {cc}",
         # Curated passthrough: format-only string (two placeholders + colon) has no translatable words.
@@ -1315,6 +1324,9 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "Saropa Code Health Dashboard": "Saropa Code Health Dashboard",
         "Saropa Findings Dashboard": "Saropa Findings Dashboard",
         "Saropa Lints": "Saropa Lints",
+        # Curated passthrough: brand-prefixed product title — "Saropa Lints" never translated, "Audit" kept
+        # as English loanword matching sibling technical labels this locale already keeps untranslated.
+        "Saropa Lints Audit": "Saropa Lints Audit",
         "Saropa Lints: Cross-File — Detect Circular Dependencies": "Saropa Lints: Cross-File — Tukuyin ang Circular Dependencies",
         "Saropa Lints: Cross-File — Export Import Graph (DOT)": "Saropa Lints: Cross-File — I-export ang Import Graph (DOT)",
         "Saropa Lints: Cross-File — Find Dead Imports": "Saropa Lints: Cross-File — Hanapin ang Dead Imports",
