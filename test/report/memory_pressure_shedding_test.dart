@@ -41,8 +41,11 @@ void main() {
 
     // Level 1 sheds INFO (index 0).
     MemoryPressureHandler.setShedLevelForTest(1);
-    expect(MemoryPressureHandler.isRuleShed('old_rule'), isFalse,
-        reason: 'old map should be replaced');
+    expect(
+      MemoryPressureHandler.isRuleShed('old_rule'),
+      isFalse,
+      reason: 'old map should be replaced',
+    );
     expect(MemoryPressureHandler.isRuleShed('new_rule'), isTrue);
   });
 
@@ -66,12 +69,21 @@ void main() {
     });
     MemoryPressureHandler.setShedLevelForTest(1);
 
-    expect(MemoryPressureHandler.isRuleShed('info_rule'), isTrue,
-        reason: 'INFO shed at level 1');
-    expect(MemoryPressureHandler.isRuleShed('warning_rule'), isFalse,
-        reason: 'WARNING not shed at level 1');
-    expect(MemoryPressureHandler.isRuleShed('error_rule'), isFalse,
-        reason: 'ERROR never shed');
+    expect(
+      MemoryPressureHandler.isRuleShed('info_rule'),
+      isTrue,
+      reason: 'INFO shed at level 1',
+    );
+    expect(
+      MemoryPressureHandler.isRuleShed('warning_rule'),
+      isFalse,
+      reason: 'WARNING not shed at level 1',
+    );
+    expect(
+      MemoryPressureHandler.isRuleShed('error_rule'),
+      isFalse,
+      reason: 'ERROR never shed',
+    );
   });
 
   test('isRuleShed at level 2 sheds INFO and WARNING', () {
@@ -166,17 +178,30 @@ void main() {
       final margin = stats['softRecoveryMarginMb'] as int;
       final recoveryPoint = softMb - margin;
 
-      expect(softMb, entry.value.$1,
-          reason: 'soft limit for hard=${entry.key}');
+      expect(
+        softMb,
+        entry.value.$1,
+        reason: 'soft limit for hard=${entry.key}',
+      );
       // Margin must be between 32 (floor) and 512 (cap).
-      expect(margin, greaterThanOrEqualTo(32),
-          reason: 'margin floor for hard=${entry.key}');
-      expect(margin, lessThanOrEqualTo(512),
-          reason: 'margin cap for hard=${entry.key}');
+      expect(
+        margin,
+        greaterThanOrEqualTo(32),
+        reason: 'margin floor for hard=${entry.key}',
+      );
+      expect(
+        margin,
+        lessThanOrEqualTo(512),
+        reason: 'margin cap for hard=${entry.key}',
+      );
       // Recovery threshold must always be positive.
-      expect(recoveryPoint, greaterThan(0),
-          reason: 'recovery threshold for hard=${entry.key} must be >0: '
-              'soft=$softMb - margin=$margin = $recoveryPoint');
+      expect(
+        recoveryPoint,
+        greaterThan(0),
+        reason:
+            'recovery threshold for hard=${entry.key} must be >0: '
+            'soft=$softMb - margin=$margin = $recoveryPoint',
+      );
     }
 
     // Disabled state: hard=0 produces soft=0, margin=0.

@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.2.7] — Unreleased
+## [15.2.7]
 
 Adds graduated rule shedding under memory pressure — the analyzer plugin now progressively disables low-severity rules when RSS approaches its cap, keeping essential rules running. The VS Code extension surfaces shedding state in the status bar and tooltip. Also includes publish script hardening. [log](https://github.com/saropa/saropa_lints/blob/v15.2.7/CHANGELOG.md)
 

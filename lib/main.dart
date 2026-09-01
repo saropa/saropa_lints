@@ -180,8 +180,8 @@ class SaropaLintsPlugin extends Plugin {
       );
       // Write memory_state.json on shed-level transitions so the VS Code
       // extension can surface pressure in the status bar without polling.
-      MemoryPressureHandler.onShedLevelChanged =
-          (shedLevel, rssMb) => _writeMemoryStateFile(shedLevel, rssMb);
+      MemoryPressureHandler.onShedLevelChanged = (shedLevel, rssMb) =>
+          _writeMemoryStateFile(shedLevel, rssMb);
     } on Object catch (e, st) {
       PluginLogger.error(
         'initializeCacheManagement failed in Plugin.start()',

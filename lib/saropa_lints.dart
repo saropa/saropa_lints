@@ -3483,8 +3483,8 @@ void registerSaropaLintRules(PluginRegistry registry) {
     for (final rule in rules) {
       // Map ordinal (NONE=0..ERROR=3) → shed index (INFO=0..ERROR=2).
       // NONE-severity rules map to -1, clamped to 0 → shed as INFO.
-      severities[rule.code.lowerCaseName] =
-          (rule.code.severity.ordinal - 1).clamp(0, 2);
+      severities[rule.code.lowerCaseName] = (rule.code.severity.ordinal - 1)
+          .clamp(0, 2);
     }
     MemoryPressureHandler.registerRuleSeverities(severities);
 
