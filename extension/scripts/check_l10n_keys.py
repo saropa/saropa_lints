@@ -26,18 +26,18 @@ _REPO = Path(__file__).resolve().parents[2]
 _SRC = _REPO / "extension" / "src"
 _EN_JSON = _SRC / "i18n" / "locales" / "en.json"
 
-# Matches l10n('dotted.key') or l10n('dotted.key', { ... }) with the
-# optional second argument captured as a raw string for param extraction.
-_L10N_RE = re.compile(
-    r"""l10n\(\s*['"]([a-zA-Z0-9_.]+)['"]\s*"""
-    r"""(?:,\s*(\{[^}]*\}))?\s*\)""",
-)
+# Matches l10n('dotted.key') — key extraction only. Param extraction
+# happens separately via _extract_params_after() to handle nested parens,
+# template expressions, and multi-arg calls that a single regex can't.
+_L10N_RE = re.compile(r"""l10n\(\s*['"]([a-zA-Z0-9_.]+)['"]""")
 
 # Extracts {placeholder} tokens from en.json values.
 _PLACEHOLDER_RE = re.compile(r"\{([a-zA-Z0-9_]+)\}")
 
-# Extracts JS object keys from the second l10n() argument, e.g. { count: ..., name: ... }.
-_OBJ_KEY_RE = re.compile(r"(\w+)\s*:")
+# Extracts JS object keys from the second l10n() argument.
+# Handles both `{ count: value }` and shorthand `{ message }`.
+# Looks for identifiers preceded by `{` or `,` (start of a member).
+_OBJ_KEY_RE = re.compile(r"(?:^|[{,])\s*(\w+)\s*(?::|[,}])")
 
 
 def _flatten(obj: dict, prefix: str = "") -> dict[str, str]:
@@ -100,6 +100,54 @@ def _strip_comments(source: str) -> str:
     return ''.join(result)
 
 
+def _extract_params_after(source: str, start: int) -> str | None:
+    """Extract the second argument object from an l10n() call.
+
+    Starting after the closing quote of the key, scans for a comma
+    followed by a { ... } object literal, handling nested braces,
+    parens, brackets, and string literals. Returns the raw object
+    text or None if no second argument exists.
+    """
+    i = start
+    n = len(source)
+    # Skip whitespace after the key string.
+    while i < n and source[i] in ' \t\n\r':
+        i += 1
+    # Next char should be ',' (second arg) or ')' (no second arg).
+    if i >= n or source[i] != ',':
+        return None
+    i += 1
+    # Skip whitespace before the object.
+    while i < n and source[i] in ' \t\n\r':
+        i += 1
+    if i >= n or source[i] != '{':
+        return None
+    # Balanced-brace scan with string-literal awareness.
+    depth = 0
+    obj_start = i
+    while i < n:
+        c = source[i]
+        if c in ("'", '"', '`'):
+            # Skip string contents.
+            quote = c
+            i += 1
+            while i < n:
+                if source[i] == '\\':
+                    i += 2
+                    continue
+                if source[i] == quote:
+                    break
+                i += 1
+        elif c == '{':
+            depth += 1
+        elif c == '}':
+            depth -= 1
+            if depth == 0:
+                return source[obj_start:i + 1]
+        i += 1
+    return None
+
+
 def _collect_used_keys() -> dict[str, list[tuple[str, str | None]]]:
     """Scan TypeScript sources for l10n() calls.
 
@@ -111,16 +159,20 @@ def _collect_used_keys() -> dict[str, list[tuple[str, str | None]]]:
         source = ts_file.read_text(encoding="utf-8")
         # Strip comments so doc examples don't register as real calls.
         stripped = _strip_comments(source)
-        # Map character offset back to line number.
+        # Build a line-offset index for the stripped source.
         line_offsets: list[int] = [0]
-        for ci, ch in enumerate(source):
+        for ci, ch in enumerate(stripped):
             if ch == '\n':
                 line_offsets.append(ci + 1)
 
         for m in _L10N_RE.finditer(stripped):
             key = m.group(1)
-            raw_params = m.group(2)
-            # Find line number from character offset in original source.
+            # Extract the second argument (params object) if present.
+            # m.end() points after the closing quote of the key.
+            after_quote = m.end()
+            # Skip the closing quote character itself.
+            raw_params = _extract_params_after(stripped, after_quote)
+            # Find line number from character offset.
             offset = m.start()
             lo, hi = 0, len(line_offsets) - 1
             while lo < hi:
@@ -130,6 +182,9 @@ def _collect_used_keys() -> dict[str, list[tuple[str, str | None]]]:
                 else:
                     hi = mid - 1
             lineno = lo + 1
+            # Skip dynamic key prefixes (e.g. 'codeHealth.flag.' + var).
+            if key.endswith('.'):
+                continue
             used.setdefault(key, []).append((f"{rel}:{lineno}", raw_params))
     return used
 
