@@ -139,33 +139,35 @@ void main() {
     timeout: const Timeout(Duration(minutes: 2)),
   );
 
-  test('handle_throwing_invocations does not report when inside try/catch', () async {
-    final repoRoot = _findRepoRoot();
-    final pubspecFile = File(
-      '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
-    );
-    expect(
-      pubspecFile.existsSync(),
-      isTrue,
-      reason:
-          'Run tests from the saropa_lints repo (or a subdir). '
-          'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
-    );
+  test(
+    'handle_throwing_invocations does not report when inside try/catch',
+    () async {
+      final repoRoot = _findRepoRoot();
+      final pubspecFile = File(
+        '${repoRoot.path}${Platform.pathSeparator}pubspec.yaml',
+      );
+      expect(
+        pubspecFile.existsSync(),
+        isTrue,
+        reason:
+            'Run tests from the saropa_lints repo (or a subdir). '
+            'No pubspec.yaml with name: saropa_lints found from ${Directory.current.path}.',
+      );
 
-    final tempDir = await Directory.systemTemp.createTemp(
-      'saropa_lints_handle_throwing_try_',
-    );
-    addTearDown(() => _deleteTempDir(tempDir));
+      final tempDir = await Directory.systemTemp.createTemp(
+        'saropa_lints_handle_throwing_try_',
+      );
+      addTearDown(() => _deleteTempDir(tempDir));
 
-    final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
+      final repoPathForYaml = repoRoot.path.replaceAll('\\', '/');
 
-    await Directory(
-      '${tempDir.path}${Platform.pathSeparator}lib',
-    ).create(recursive: true);
+      await Directory(
+        '${tempDir.path}${Platform.pathSeparator}lib',
+      ).create(recursive: true);
 
-    await File(
-      '${tempDir.path}${Platform.pathSeparator}pubspec.yaml',
-    ).writeAsString('''
+      await File(
+        '${tempDir.path}${Platform.pathSeparator}pubspec.yaml',
+      ).writeAsString('''
 name: tmp_saropa_lints_consumer
 publish_to: none
 
@@ -177,18 +179,18 @@ dev_dependencies:
     path: "$repoPathForYaml"
 ''');
 
-    await File(
-      '${tempDir.path}${Platform.pathSeparator}analysis_options.yaml',
-    ).writeAsString('''
+      await File(
+        '${tempDir.path}${Platform.pathSeparator}analysis_options.yaml',
+      ).writeAsString('''
 plugins:
   saropa_lints:
     diagnostics:
       handle_throwing_invocations: true
 ''');
 
-    await File(
-      '${tempDir.path}${Platform.pathSeparator}lib${Platform.pathSeparator}main.dart',
-    ).writeAsString('''
+      await File(
+        '${tempDir.path}${Platform.pathSeparator}lib${Platform.pathSeparator}main.dart',
+      ).writeAsString('''
 void main() {
   try {
     int.parse('1');
@@ -196,33 +198,35 @@ void main() {
 }
 ''');
 
-    final pubGet = await Process.run(
-      'dart',
-      ['pub', 'get'],
-      workingDirectory: tempDir.path,
-      runInShell: true,
-    );
-    expect(pubGet.exitCode, 0);
+      final pubGet = await Process.run(
+        'dart',
+        ['pub', 'get'],
+        workingDirectory: tempDir.path,
+        runInShell: true,
+      );
+      expect(pubGet.exitCode, 0);
 
-    final analyze = await Process.run(
-      'dart',
-      ['analyze', 'lib/main.dart'],
-      workingDirectory: tempDir.path,
-      runInShell: true,
-    );
+      final analyze = await Process.run(
+        'dart',
+        ['analyze', 'lib/main.dart'],
+        workingDirectory: tempDir.path,
+        runInShell: true,
+      );
 
-    expect(
-      analyze.exitCode,
-      0,
-      reason:
-          'Code in try/catch should not trigger:\n${analyze.stdout}\n${analyze.stderr}',
-    );
-    expect(
-      '${analyze.stdout}\n${analyze.stderr}',
-      isNot(contains('handle_throwing_invocations')),
-      reason: 'No lint expected when call is inside try/catch',
-    );
-  }, timeout: const Timeout(Duration(minutes: 2)));
+      expect(
+        analyze.exitCode,
+        0,
+        reason:
+            'Code in try/catch should not trigger:\n${analyze.stdout}\n${analyze.stderr}',
+      );
+      expect(
+        '${analyze.stdout}\n${analyze.stderr}',
+        isNot(contains('handle_throwing_invocations')),
+        reason: 'No lint expected when call is inside try/catch',
+      );
+    },
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
 
   test(
     'handle_throwing_invocations does not report on non-thrower (no false positive)',

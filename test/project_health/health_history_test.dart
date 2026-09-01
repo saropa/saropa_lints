@@ -15,33 +15,37 @@ import 'package:test/test.dart';
 import '../support/safe_delete.dart';
 
 void main() {
-  test('builds well-formed trajectory points from git tags', () async {
-    final points = await loadHealthHistory(
-      Directory.current.path,
-      maxTags: 2,
-      withComplexity: false,
-    );
-    // CI uses fetch-depth: 0 (full clone) so tags are always present.
-    expect(points, isNotEmpty);
-    expect(points.length, lessThanOrEqualTo(2));
-    for (final p in points) {
-      expect(p.tag, isNotEmpty);
-      expect(p.loc, greaterThan(0));
-      expect(p.codeLoc, greaterThan(0));
-      expect(p.codeLoc, lessThanOrEqualTo(p.loc));
-      expect(p.fileCount, greaterThan(0));
-      expect(p.maxCognitive, greaterThanOrEqualTo(0));
-    }
-
-    // _recentTags returns oldest-first; verify the contract holds.
-    if (points.length == 2) {
-      expect(
-        points.first.tag,
-        isNot(equals(points.last.tag)),
-        reason: 'two points should come from distinct tags',
+  test(
+    'builds well-formed trajectory points from git tags',
+    () async {
+      final points = await loadHealthHistory(
+        Directory.current.path,
+        maxTags: 2,
+        withComplexity: false,
       );
-    }
-  }, timeout: const Timeout(Duration(minutes: 2)));
+      // CI uses fetch-depth: 0 (full clone) so tags are always present.
+      expect(points, isNotEmpty);
+      expect(points.length, lessThanOrEqualTo(2));
+      for (final p in points) {
+        expect(p.tag, isNotEmpty);
+        expect(p.loc, greaterThan(0));
+        expect(p.codeLoc, greaterThan(0));
+        expect(p.codeLoc, lessThanOrEqualTo(p.loc));
+        expect(p.fileCount, greaterThan(0));
+        expect(p.maxCognitive, greaterThanOrEqualTo(0));
+      }
+
+      // _recentTags returns oldest-first; verify the contract holds.
+      if (points.length == 2) {
+        expect(
+          points.first.tag,
+          isNot(equals(points.last.tag)),
+          reason: 'two points should come from distinct tags',
+        );
+      }
+    },
+    timeout: const Timeout(Duration(minutes: 2)),
+  );
 
   test('toMarkdownRow formats a pipe-delimited table row', () {
     const point = HistoryPoint(

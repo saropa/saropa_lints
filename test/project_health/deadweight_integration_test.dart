@@ -13,26 +13,30 @@ import 'package:test/test.dart';
 import '../support/safe_delete.dart';
 
 void main() {
-  test('flags an unimported file as unused, spares an imported one', () async {
-    final tmp = Directory.systemTemp.createTempSync('saropa_dw_int_');
-    // Retry-tolerant cleanup: Windows file handles can linger after tests
-    addTearDown(() => safeDeleteDir(tmp));
-    Directory(p.join(tmp.path, 'lib')).createSync();
-    File(
-      p.join(tmp.path, 'pubspec.yaml'),
-    ).writeAsStringSync('name: demo\nenvironment:\n  sdk: ">=3.0.0 <4.0.0"\n');
-    File(
-      p.join(tmp.path, 'lib', 'used.dart'),
-    ).writeAsStringSync('int answer() => 42;\n');
-    File(
-      p.join(tmp.path, 'lib', 'main.dart'),
-    ).writeAsStringSync("import 'used.dart';\nvoid main() {\n  answer();\n}\n");
-    File(
-      p.join(tmp.path, 'lib', 'orphan.dart'),
-    ).writeAsStringSync('int orphan() => 0;\n');
+  test(
+    'flags an unimported file as unused, spares an imported one',
+    () async {
+      final tmp = Directory.systemTemp.createTempSync('saropa_dw_int_');
+      // Retry-tolerant cleanup: Windows file handles can linger after tests
+      addTearDown(() => safeDeleteDir(tmp));
+      Directory(p.join(tmp.path, 'lib')).createSync();
+      File(p.join(tmp.path, 'pubspec.yaml')).writeAsStringSync(
+        'name: demo\nenvironment:\n  sdk: ">=3.0.0 <4.0.0"\n',
+      );
+      File(
+        p.join(tmp.path, 'lib', 'used.dart'),
+      ).writeAsStringSync('int answer() => 42;\n');
+      File(p.join(tmp.path, 'lib', 'main.dart')).writeAsStringSync(
+        "import 'used.dart';\nvoid main() {\n  answer();\n}\n",
+      );
+      File(
+        p.join(tmp.path, 'lib', 'orphan.dart'),
+      ).writeAsStringSync('int orphan() => 0;\n');
 
-    final dw = await loadDeadWeight(projectPath: tmp.path);
-    expect(dw.unusedFiles, contains('lib/orphan.dart'));
-    expect(dw.unusedFiles, isNot(contains('lib/used.dart')));
-  }, timeout: const Timeout(Duration(minutes: 1)));
+      final dw = await loadDeadWeight(projectPath: tmp.path);
+      expect(dw.unusedFiles, contains('lib/orphan.dart'));
+      expect(dw.unusedFiles, isNot(contains('lib/used.dart')));
+    },
+    timeout: const Timeout(Duration(minutes: 1)),
+  );
 }
