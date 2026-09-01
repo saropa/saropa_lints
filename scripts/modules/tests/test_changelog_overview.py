@@ -115,14 +115,22 @@ class TestCheckChangelogOverview(unittest.TestCase):
         self.assertIn("not found", problems[0])
 
     def test_real_project_unreleased_will_gate(self) -> None:
-        # Documents the live state: the real [Unreleased] has no Overview,
-        # so the next publish (after rename) WILL hit the gate. If someone
-        # later adds the Overview to [Unreleased], update this expectation.
-        # parents[3] = repo root (file is scripts/modules/tests/<name>.py).
+        # Finds the first published ## [X.Y.Z] section in the real CHANGELOG
+        # and verifies it passes the overview gate. Dynamically discovered
+        # so old-version archiving doesn't break this test every release.
+        import re
+
         repo_root = Path(__file__).resolve().parents[3]
         changelog = repo_root / "CHANGELOG.md"
+        # Find the first ## [X.Y.Z] heading (skip any — Unreleased suffix).
+        text = changelog.read_text(encoding="utf-8")
+        match = re.search(
+            r"^## \[(\d+\.\d+\.\d+)\]\s*$", text, re.MULTILINE
+        )
+        self.assertIsNotNone(match, "No published section found in CHANGELOG")
+        version = match.group(1)  # type: ignore[union-attr]
         # A real published section with a correct v-tag link passes clean.
-        self.assertEqual(self._check(changelog, "14.5.5"), [])
+        self.assertEqual(self._check(changelog, version), [])
 
 
 if __name__ == "__main__":
