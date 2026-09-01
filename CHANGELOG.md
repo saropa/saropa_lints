@@ -72,8 +72,9 @@ Adds graduated rule shedding under memory pressure — the analyzer plugin now p
 
 ### Added
 
-- Graduated memory-pressure rule shedding (opt-in via `SAROPA_LINTS_SHED_RULES=true`): shed level 1 disables INFO-severity rules, level 2 adds WARNING-severity rules, essential-tier rules are always protected. Without opt-in, soft-limit warnings still log but no rules are shed.
+- Graduated memory-pressure rule shedding (opt-in via `shed_rules: true` in `analysis_options_custom.yaml`): shed level 1 disables INFO-severity rules, level 2 adds WARNING-severity rules, essential-tier rules are always protected. Without opt-in, soft-limit warnings still log but no rules are shed.
 - Memory pressure indicator in the VS Code status bar and tooltip, fed by `memory_state.json` written on shed-level transitions — no polling.
+- VS Code warning notification when the analyzer hits memory pressure but rule shedding is not enabled — prompts the user to enable `shed_rules: true` with an "Enable" button that opens the config file, plus a "Learn More" link. Shows once per session.
 - `memory_mode: aggressive` option in `analysis_options_custom.yaml` — applies balanced-mode unchanged-file skipping to the scan daemon and CLI too, reducing daemon RSS on incremental scans at the cost of potentially missing violations in unchanged files whose dependencies changed.
 
 <details>
@@ -87,6 +88,10 @@ Adds graduated rule shedding under memory pressure — the analyzer plugin now p
 - `getStats()` now includes `softLimitMb`, `softLimitTripped`, `shedLevel`, and `shedRuleCount`.
 - Fixed negative recovery thresholds when the hard RSS limit is below ~366 MB — soft-limit recovery and de-escalation checks now clamp to zero instead of going negative, which would lock shedding on permanently.
 - Shed level updates skip the full rule-set rebuild when the level hasn't actually changed.
+- Shedding opt-in moved from the env-var-only `SAROPA_LINTS_SHED_RULES=true` to a `shed_rules: true` key in `analysis_options_custom.yaml` (the env var still works, but is no longer the only way in — `dart run saropa_lints:init` now writes a commented `shed_rules` line so the setting is discoverable). `_refreshSoftLimit` split into `_tripSoftLimit`/`_recoverSoftLimit`/`_refreshEscalation` helpers. Status-bar and tooltip memory-pressure text now share one priority-order function (`memoryPressureTooltipLine`) instead of two independently maintained decision trees.
+- **`usesTypeResolution` audit complete** — 180 false claims flipped to `false` across 9 rule files, freeing those rules from unnecessary scan-daemon routing. Integrity test unskipped and now guards both directions (missing flag + false claim). Test regex extended with `formalParameters` to catch modern element-model resolution APIs.
+- **Full Audit i18n** — added all 47 missing `audit.*` keys to `en.json` (scope picker, progress, errors, and report webview). Also added 3 missing `findingsDash.script.*` keys (`announceSearchVerb`, `severitiesNoun`, `impactsNoun`).
+- **`check_l10n_keys.py`** — new CI script cross-references every `l10n()` call in `extension/src/` against `en.json`. Exits 1 on missing keys, warns on unused keys. Skips comment lines to avoid doc-example false positives.
 
 </details>
 
