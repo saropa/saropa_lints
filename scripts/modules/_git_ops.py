@@ -135,6 +135,136 @@ def ensure_publish_workflow_committed(
     return True
 
 
+def _read_package_json_version(project_dir: Path) -> str | None:
+    """Read version from extension/package.json, or None if absent."""
+    pkg_path = project_dir / "extension" / "package.json"
+    if not pkg_path.exists():
+        return None
+    match = re.search(
+        r'"version"\s*:\s*"([^"]+)"',
+        pkg_path.read_text(encoding="utf-8"),
+    )
+    return match.group(1) if match else None
+
+
+# Semver pattern matching X.Y.Z with optional pre-release suffix.
+# Kept in sync with _version_changelog._VERSION_RE; duplicated here to
+# avoid a circular import (_version_changelog imports tag_exists_on_remote).
+_VERSION_RE = r"\d+\.\d+\.\d+(?:-[\w]+(?:\.[\w]+)*)?"
+
+
+def _verify_versions_on_disk(
+    project_dir: Path, version: str,
+) -> bool:
+    """Assert pubspec.yaml and package.json on disk carry the expected version.
+
+    Safety net: catches the case where the upstream version-write was
+    silently skipped (e.g. the guard in apply_version_and_rename_unreleased
+    compared against a stale snapshot and no-oped).
+    """
+    # Lazy import to break circular dependency with _version_changelog
+    # (_version_changelog imports tag_exists_on_remote from this module).
+    from scripts.modules._version_changelog import get_version_from_pubspec
+
+    pubspec_path = project_dir / "pubspec.yaml"
+    try:
+        actual = get_version_from_pubspec(pubspec_path)
+    except ValueError as exc:
+        print_error(f"Cannot read pubspec version: {exc}")
+        return False
+
+    if actual != version:
+        print_error(
+            f"pubspec.yaml version mismatch: "
+            f"expected {version}, found {actual}. "
+            f"Refusing to proceed — the version write was skipped."
+        )
+        return False
+
+    # Also verify package.json if present
+    pkg_version = _read_package_json_version(project_dir)
+    if pkg_version is not None and pkg_version != version:
+        print_error(
+            f"extension/package.json version mismatch: "
+            f"expected {version}, found {pkg_version}. "
+            f"Refusing to proceed."
+        )
+        return False
+
+    return True
+
+
+def _verify_versions_in_commit(
+    project_dir: Path, version: str,
+) -> bool:
+    """Assert the HEAD commit's pubspec.yaml and package.json carry the expected version.
+
+    Last-resort gate before tagging: even if the disk was right at commit
+    time, a bad staging or partial checkout could produce a commit whose
+    tree has the wrong version.
+    """
+    use_shell = get_shell_mode()
+
+    # Verify pubspec.yaml in the committed tree
+    result = subprocess.run(
+        ["git", "show", "HEAD:pubspec.yaml"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if result.returncode != 0:
+        print_error("Cannot read pubspec.yaml from HEAD commit.")
+        return False
+
+    match = re.search(
+        rf"^version:\s*({_VERSION_RE})",
+        result.stdout,
+        re.MULTILINE,
+    )
+    if not match:
+        print_error("No version field found in HEAD:pubspec.yaml.")
+        return False
+
+    actual = match.group(1)
+    if actual != version:
+        print_error(
+            f"HEAD commit pubspec.yaml version mismatch: "
+            f"expected {version}, found {actual}. "
+            f"The release commit does not carry the correct version."
+        )
+        return False
+    print_success(f"Verified HEAD:pubspec.yaml version is {version}")
+
+    # Verify extension/package.json in the committed tree
+    result = subprocess.run(
+        ["git", "show", "HEAD:extension/package.json"],
+        cwd=project_dir,
+        capture_output=True,
+        text=True,
+        shell=use_shell,
+    )
+    if result.returncode == 0:
+        # package.json exists in the commit
+        pkg_match = re.search(
+            r'"version"\s*:\s*"([^"]+)"',
+            result.stdout,
+        )
+        if pkg_match:
+            pkg_actual = pkg_match.group(1)
+            if pkg_actual != version:
+                print_error(
+                    f"HEAD commit extension/package.json version mismatch: "
+                    f"expected {version}, found {pkg_actual}."
+                )
+                return False
+            print_success(
+                f"Verified HEAD:extension/package.json version is {version}",
+            )
+
+    return True
+
+
 def git_commit_and_push(
     project_dir: Path, version: str, branch: str
 ) -> bool:
@@ -175,6 +305,12 @@ def git_commit_and_push(
     for line in other_stderr:
         print_warning(line)
     print_success("Staging changes completed")
+
+    # Gate: verify pubspec.yaml and package.json carry the target version
+    # before committing. Catches the silent-skip bug in
+    # apply_version_and_rename_unreleased.
+    if not _verify_versions_on_disk(project_dir, version):
+        return False
 
     result = subprocess.run(
         ["git", "status", "--porcelain"],
@@ -343,6 +479,12 @@ def create_git_tag(project_dir: Path, version: str) -> bool:
 
     tag_name = f"v{version}"
     use_shell = get_shell_mode()
+
+    # Gate: verify the commit being tagged actually has the right version.
+    # This is the last-resort safety net — even if disk was correct at
+    # commit time, this catches staging errors or history rewrites.
+    if not _verify_versions_in_commit(project_dir, version):
+        return False
 
     # Check if tag exists locally
     result = subprocess.run(

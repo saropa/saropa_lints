@@ -66,6 +66,27 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.2.7] — Unreleased
+
+Adds graduated rule shedding under memory pressure — the analyzer plugin now progressively disables low-severity rules when RSS approaches its cap, keeping essential rules running. The VS Code extension surfaces shedding state in the status bar and tooltip. Also includes publish script hardening. [log](https://github.com/saropa/saropa_lints/blob/v15.2.7/CHANGELOG.md)
+
+### Added
+
+- Graduated memory-pressure rule shedding: shed level 1 disables INFO-severity rules, level 2 adds WARNING-severity rules, essential-tier rules are always protected.
+- Memory pressure indicator in the VS Code status bar and tooltip, fed by `memory_state.json` written on shed-level transitions — no polling.
+
+<details>
+<summary>Maintenance</summary>
+
+- **Publish script: version verification gates** — added two safety-net checks in `_git_ops.py` that verify both `pubspec.yaml` and `extension/package.json` carry the correct version: one reads from disk after staging to block commits with the wrong version, and another reads from the HEAD commit tree before tagging. Both halt the pipeline with a clear error message instead of proceeding with a mismatched version.
+- Severity registration at plugin startup maps each rule to a 0-based shed index for the graduated shedding mechanism.
+- `memory_state.json` state file written alongside `plugin.log` on shed-level transitions for extension consumption.
+- Periodic memory log line now includes soft limit and shed level.
+- `PluginLogger.logFilePath` public getter for the memory-state writer.
+- `getStats()` now includes `softLimitMb`, `softLimitTripped`, `shedLevel`, and `shedRuleCount`.
+
+</details>
+
 ## [15.2.6]
 
 Restores the Full Audit sidebar button and fixes `require_ignore_comment_plugin_prefix` showing the wrong diagnostic message when an ignore comment uses `saropa_lints/` prefix with an unregistered rule name. No new rules or breaking changes. [log](https://github.com/saropa/saropa_lints/blob/v15.2.6/CHANGELOG.md)
