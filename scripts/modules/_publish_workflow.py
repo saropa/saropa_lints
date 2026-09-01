@@ -43,6 +43,7 @@ from scripts.modules._git_ops import (
     git_commit_and_push,
     post_publish_commit,
     publish_to_pubdev_step,
+    run_preflight_version_check,
 )
 from scripts.modules._pubdev_lint import (
     check_pubdev_lint_issues,
@@ -1144,6 +1145,18 @@ def run_full_publish(
         if extension_exists(ctx.project_dir):
             set_extension_version(ctx.project_dir, version)
         print()
+
+        # Early pre-flight: verify version files before expensive steps
+        # (badge validation, CI gate, extension packaging). Catches the
+        # silent-skip bug before any irreversible work begins.
+        with timer.step("Preflight version check"):
+            _run_step_with_retry(
+                "Preflight version check",
+                lambda: run_preflight_version_check(
+                    ctx.project_dir, version,
+                ),
+                ExitCode.VALIDATION_FAILED,
+            )
 
         release_notes = run_badge_validation_docs_dryrun(
             ctx.project_dir, version, ctx.rule_count, timer,

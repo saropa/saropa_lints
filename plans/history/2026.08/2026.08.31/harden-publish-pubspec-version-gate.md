@@ -30,13 +30,18 @@ Both gates produce clear error messages identifying the expected vs. actual vers
 - **package.json regex tightened:** `_read_package_json_version` and the commit-tree check now use `_VERSION_RE` inside the JSON value match (`"version": "({_VERSION_RE})"`) instead of the permissive `[^"]+`, rejecting non-semver values that would silently pass the old check.
 - **Visible output for all outcomes:** Both gates now print a status line for every file checked — success, mismatch (error), or missing/unparseable (warning). The operator sees exactly what was verified in the publish log.
 
+### Visible Preflight Step
+
+`run_preflight_version_check()` — a public function in `_git_ops.py` that prints a `PREFLIGHT: VERSION VERIFICATION` header banner and delegates to `_verify_versions_on_disk`. Wired into `run_full_publish()` in `_publish_workflow.py` as its own timed step, running after `set_extension_version` and before badge validation / CI gate / extension packaging. This gives the operator an early, prominent signal before expensive downstream steps run. The step uses `_run_step_with_retry` so a mismatch can be fixed and retried without restarting the entire publish.
+
 ### Files Changed
 
 - `scripts/modules/_utils.py` — added `VERSION_RE` constant.
-- `scripts/modules/_git_ops.py` — added `_read_package_json_version`, `_verify_versions_on_disk`, `_verify_versions_in_commit`; two gate call sites in `git_commit_and_push` and `create_git_tag`; imports `VERSION_RE` from `_utils`.
+- `scripts/modules/_git_ops.py` — added `_read_package_json_version`, `_verify_versions_on_disk`, `_verify_versions_in_commit`, `run_preflight_version_check`; two gate call sites in `git_commit_and_push` and `create_git_tag`; imports `VERSION_RE` from `_utils`.
 - `scripts/modules/_version_changelog.py` — removed local `_VERSION_RE` definition, imports `VERSION_RE` from `_utils`.
+- `scripts/modules/_publish_workflow.py` — imported `run_preflight_version_check`, wired it as a timed step after version sync.
 - `CHANGELOG.md` — entry under `[15.2.7] — Unreleased` Maintenance section.
 
 ### Verification
 
-Run the publish script against a test scenario where pubspec.yaml is at version N but the publish target is N+1, without the upstream version write executing. The pipeline should halt at the pre-commit gate with: `pubspec.yaml version mismatch: expected X, found Y`. Similarly, manually set `extension/package.json` to a wrong version and confirm the gate catches it. Verify the publish log shows `Verified pubspec.yaml version is X` and `Verified extension/package.json version is X` success lines on a normal run.
+Run the publish script — the log should show a `PREFLIGHT: VERSION VERIFICATION` banner with `Verified pubspec.yaml version is X` and `Verified extension/package.json version is X` lines. To test the mismatch path: temporarily set pubspec.yaml to a wrong version after the version-sync step; the preflight should halt with `pubspec.yaml version mismatch: expected X, found Y` and offer retry. The two downstream gates (after staging and before tagging) provide additional safety nets.

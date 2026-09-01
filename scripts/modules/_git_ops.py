@@ -282,6 +282,29 @@ def _verify_versions_in_commit(
     return True
 
 
+def run_preflight_version_check(
+    project_dir: Path, version: str,
+) -> bool:
+    """Visible pre-flight step: verify all version files before committing.
+
+    Runs as its own pipeline step with a header banner so the operator
+    sees the verification status prominently in the publish log. This is
+    the early warning — git_commit_and_push and create_git_tag run their
+    own gates as a safety net, but this step catches problems before any
+    git operations begin.
+    """
+    print_header("PREFLIGHT: VERSION VERIFICATION")
+    print_info(f"Checking all version files match {version}...")
+    if not _verify_versions_on_disk(project_dir, version):
+        print_error(
+            "Preflight failed — fix the version mismatch above "
+            "before continuing."
+        )
+        return False
+    print_success("Preflight version check passed")
+    return True
+
+
 def git_commit_and_push(
     project_dir: Path, version: str, branch: str
 ) -> bool:

@@ -78,7 +78,7 @@ Adds graduated rule shedding under memory pressure — the analyzer plugin now p
 <details>
 <summary>Maintenance</summary>
 
-- **Publish script: version verification gates** — the release pipeline now verifies both `pubspec.yaml` and `extension/package.json` carry the correct version at two checkpoints (after staging and before tagging), printing a status line for each file and halting on mismatch. No action required.
+- **Publish script: preflight version verification** — a visible "PREFLIGHT: VERSION VERIFICATION" step now runs early in the publish pipeline (before badge validation, CI gate, and extension packaging), checking that `pubspec.yaml` and `extension/package.json` carry the correct version. Two additional safety-net gates run later (after staging and before tagging) as a last resort. No action required.
 - Severity registration at plugin startup maps each rule to a 0-based shed index for the graduated shedding mechanism.
 - `memory_state.json` state file written alongside `plugin.log` on shed-level transitions for extension consumption.
 - Periodic memory log line now includes soft limit and shed level.
