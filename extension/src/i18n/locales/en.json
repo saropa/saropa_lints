@@ -574,6 +574,19 @@
       "killFailed": "Failed"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 Rules paused ({rssMb} MB)",
+      "shedWarning": "⚠ {count} rules shed",
+      "shedInfo": "⚡ {count} rules shed"
+    },
+    "tooltip": {
+      "shedLevel0": "Memory pressure: normal",
+      "shedLevel1": "Memory pressure: {count} low-severity rules shed to reduce RSS",
+      "shedLevel2": "Memory pressure: {count} rules shed (INFO + WARNING severity)",
+      "hardTripped": "Memory limit exceeded — all non-essential rules paused"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

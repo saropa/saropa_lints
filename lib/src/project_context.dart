@@ -22,6 +22,7 @@ import 'package:saropa_lints/src/native/plugin_logger.dart' show PluginLogger;
 import 'package:saropa_lints/src/report/import_graph_tracker.dart'
     show ImportGraphTracker;
 import 'package:saropa_lints/src/string_slice_utils.dart';
+import 'package:saropa_lints/src/tiers.dart' show essentialRules;
 
 part 'project_context_path_bloom_git.dart';
 part 'project_context_project_file.dart';

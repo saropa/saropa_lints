@@ -284,6 +284,11 @@ class SaropaContext {
 
       _ensureConfigLoadedFromProjectRoot();
       final rule = _saropaRule;
+      // O(1) set lookup — short-circuits before tier/lane checks when the
+      // memory-pressure handler has shed this rule's severity band.
+      if (MemoryPressureHandler.isRuleShed(rule.code.lowerCaseName)) {
+        return;
+      }
       if (!RuntimeTierCap.ruleAllowedByCap(rule.code.lowerCaseName)) {
         return;
       }

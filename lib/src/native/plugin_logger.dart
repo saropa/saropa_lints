@@ -403,6 +403,10 @@ final class PluginLogger {
   /// [setProjectRoot] has not yet succeeded. Test-only.
   static String? get logFilePathForTesting => _logFilePath;
 
+  /// The resolved log-file path, or null before [setProjectRoot] succeeds.
+  /// Used by the memory-state writer to derive the reports directory.
+  static String? get logFilePath => _logFilePath;
+
   /// Exposes the pending-buffer size for assertions. Test-only.
   static int get bufferSizeForTesting => _buffer.length;
 }

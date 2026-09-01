@@ -1,7 +1,7 @@
 # Analyzer Memory Monitor Plan
 
 **Created:** 2026-08-27
-**Status:** Not started — Phase 0 (periodic memory log) shipped 2026-08-28 as a minimal slice; Phases 1-3 below are unbuilt.
+**Status:** Phases 0-4 implemented 2026-08-31 (soft threshold, severity-based shedding, status bar integration). Needs real-project validation.
 **Trigger:** Dart analysis server OOM-crashes on large projects (4000+ files, 1400+ transitive deps). No diagnostic is emitted before the crash — see `plans/history/2026.08/2026.08.27/infra_analyzer_oom_crash_large_projects.md` (Status: Fixed, the reactive mitigation).
 **Related:** `plans/history/2026.08/2026.08.28/proposal_infra_analyzer_memory_monitor_review.md` (accuracy review + Phase 0 finish-report)
 
@@ -52,30 +52,30 @@ Analysis server RSS stays below the warning threshold. No output, no overhead be
 
 ## Phase 1: Soft/warning RSS threshold
 
-- [ ] Add a second, lower threshold (e.g. `_softLimitMb`, default 70% of `_hardLimitMb`) to `MemoryPressureHandler`, alongside the existing hard limit — with its own hysteresis so it doesn't flap
-- [ ] On crossing the soft threshold, emit a warning via `PluginLogger` (reuse the Phase 0 log line format) distinct from the hard-limit trip message
-- [ ] Decide how the soft threshold interacts with the existing per-file memory budget (added 2026-08-27) — do not treat RSS as the only signal
-- [ ] Unit tests mirroring the existing hard-limit hysteresis tests
-- [ ] No VS Code surfacing yet (that's Phase 3) — stderr/log only
+- [x] Add a second, lower threshold (e.g. `_softLimitMb`, default 70% of `_hardLimitMb`) to `MemoryPressureHandler`, alongside the existing hard limit — with its own hysteresis so it doesn't flap
+- [x] On crossing the soft threshold, emit a warning via `PluginLogger` (reuse the Phase 0 log line format) distinct from the hard-limit trip message
+- [x] Decide how the soft threshold interacts with the existing per-file memory budget (added 2026-08-27) — do not treat RSS as the only signal
+- [x] Unit tests mirroring the existing hard-limit hysteresis tests
+- [x] No VS Code surfacing yet (that's Phase 3) — stderr/log only
 
 ## Phase 2: Selective rule-disable mechanism (prerequisite for Phase 3 shedding)
 
-- [ ] Design how `_allRuleFactories` (`lib/saropa_lints.dart`, list begins line 231) can register rules with disable/enable toggled at runtime, keyed by tier — today registration is all-or-nothing
-- [ ] Confirm this doesn't conflict with the existing tier system in `lib/src/tiers.dart` (essential/recommended/professional/comprehensive/pedantic) — graduated shedding is a runtime overlay on top of the configured tier, not a replacement for it
-- [ ] Add tests proving a shed rule stops firing and a restored rule resumes firing without a full plugin restart
+- [x] Design how `_allRuleFactories` (`lib/saropa_lints.dart`, list begins line 231) can register rules with disable/enable toggled at runtime, keyed by tier — today registration is all-or-nothing
+- [x] Confirm this doesn't conflict with the existing tier system in `lib/src/tiers.dart` (essential/recommended/professional/comprehensive/pedantic) — graduated shedding is a runtime overlay on top of the configured tier, not a replacement for it
+- [x] Add tests proving a shed rule stops firing and a restored rule resumes firing without a full plugin restart
 
 ## Phase 3: Graduated rule shedding by tier
 
-- [ ] On crossing the soft threshold from Phase 1, shed INFO-tier rules first via the Phase 2 mechanism; escalate toward the hard limit if RSS keeps climbing
-- [ ] Restore shed rules once RSS drops back below the soft threshold (with hysteresis, matching the hard-limit pattern)
-- [ ] Log which rules were shed and the estimated memory recovered (best-effort estimate is acceptable — exact per-rule memory accounting is out of scope)
-- [ ] Tests: shed → restore cycle, ordering (INFO before WARNING before ERROR-tier), no shedding of essential/security rules
+- [x] On crossing the soft threshold from Phase 1, shed INFO-tier rules first via the Phase 2 mechanism; escalate toward the hard limit if RSS keeps climbing
+- [x] Restore shed rules once RSS drops back below the soft threshold (with hysteresis, matching the hard-limit pattern)
+- [x] Log which rules were shed and the estimated memory recovered (best-effort estimate is acceptable — exact per-rule memory accounting is out of scope)
+- [x] Tests: shed → restore cycle, ordering (INFO before WARNING before ERROR-tier), no shedding of essential/security rules
 
 ## Phase 4: VS Code extension integration
 
-- [ ] Status bar indicator — reuse the existing `createStatusBarItem` infra in `extension/src/extension.ts:978` (already used for vibrancy data) rather than building new UI plumbing
-- [ ] Surface the Phase 1 warning and Phase 3 shedding events as a status bar state (not just a notification) so it's visible without a toast
-- [ ] i18n: any new user-facing string goes through `l10n()` per `.claude/rules/i18n.md` — do not hardcode
+- [x] Status bar indicator — reuse the existing `createStatusBarItem` infra in `extension/src/extension.ts:978` (already used for vibrancy data) rather than building new UI plumbing
+- [x] Surface the Phase 1 warning and Phase 3 shedding events as a status bar state (not just a notification) so it's visible without a toast
+- [x] i18n: any new user-facing string goes through `l10n()` per `.claude/rules/i18n.md` — do not hardcode
 - [ ] Manual test: trigger a soft-threshold crossing on a large project, confirm the status bar updates
 
 ---
@@ -97,9 +97,108 @@ Analysis server RSS stays below the warning threshold. No output, no overhead be
 
 ---
 
+## Phase 5: Further Memory & Speed Savings (research 2026-08-31)
+
+### Current architecture (recap)
+
+The two-lane system already isolates type-resolving rules from the in-process analyzer:
+- **Light lane** (in-process): syntactic rules only, +0.6% RSS over baseline
+- **Full lane** (scan daemon): all rules including type-resolving, separate process with RSS-based recycle
+
+Within the daemon, one `getResolvedUnit()` call per file feeds all rules via a shared `ScanWalker` — already optimal for per-file work. The `AnalysisContextCollection` retains resolved element models indefinitely; the only relief is daemon recycle on RSS threshold or 500 requests.
+
+Cross-file analysis is decoupled: runs as a CLI batch, writes a `cross_file_snapshot.json`, rules read the snapshot — no live cross-file resolution in-process.
+
+### Finding 1: ~200+ rule classes falsely claim `usesTypeResolution`
+
+**Impact: HIGH — these rules are excluded from the light lane unnecessarily**
+
+At least 200+ rule classes override `usesTypeResolution => true` but perform only syntactic/AST analysis (string matching, operator counting, directive checking, source text comparison). Worst offenders by volume:
+
+| File | False claims / Total | Notes |
+|------|---------------------|-------|
+| `structure_rules.dart` | ~55 / 58 | Only 3 classes use `.element`/`.staticType` |
+| `stylistic_rules.dart` | ~40 / 46 | Only ~6 classes use resolved types |
+| `stylistic_additional_rules.dart` | ~23 / 24 | Only 1 class uses `.staticType` |
+| `complexity_rules.dart` | 14 / 15 | Only 1 class uses `.staticType` |
+| `config_rules.dart` | 13 / 13 | No class uses resolved types (2 have empty run methods) |
+| `api_network_rules.dart` | ~7 / 10+ | Only 3-4 classes use `.staticType`/`.element` |
+| `control_flow_rules.dart` | ~10 / 13 | Only ~3 classes use `.staticType` |
+
+**Fix:** Audit each rule class and flip `usesTypeResolution => false` where no resolved-type access exists. This moves hundreds of rules into the light lane, reducing daemon load and enabling balanced-mode skipping in-process.
+
+**Risk:** Low — `usesTypeResolution` is a self-classification flag. Setting it `false` for a rule that truly doesn't resolve types is always correct. The flag was likely set `true` at the file level rather than per-class.
+
+**Effort:** Medium — mechanical audit of ~66 rule files, but each class must be individually verified. A grep-based script could automate most of it.
+
+### Finding 2: `.staticType` heavy hitters genuinely need type resolution
+
+The top 5 consumers (206 of ~306 total call sites) — `async_rules.dart`, `collection_rules.dart`, `migration_rules.dart`, `code_quality_avoid_rules.dart`, `type_rules.dart` — **cannot** be converted to syntactic checks. They inspect resolved types on arbitrary expressions (method return values, interpolation, binary operands, inferred variables) where no AST type annotation exists. No savings available here.
+
+### Finding 3: Daemon balanced-mode filtering is disabled
+
+`MemoryModeConfig.markCli()` disables balanced filtering for all CLI/daemon scans. The daemon could skip type-heavy rules on unchanged files across requests (the same optimization that balanced mode provides in-process), since it already receives `changeFile()` notifications.
+
+**Fix:** Implement daemon-side balanced filtering — track which files have changed since last scan and skip type-heavy rules on unchanged files. The `FileContentCache` pass-tracking infrastructure already exists.
+
+**Risk:** Medium — daemon scans are expected to be comprehensive (CI, baseline scans). This should only apply to save-triggered incremental scans, not full scans.
+
+**Effort:** Medium — wire the existing balanced-mode logic into the daemon's `_scanFilesResolved` loop for incremental scan requests.
+
+### Finding 4: No resolved-model eviction between files
+
+After `_scanSingleFileResolved()` returns, the `ResolvedUnitResult` goes out of scope but the analyzer's internal `AnalysisContextCollection` cache retains the resolved element model graph indefinitely. Between files, there is no GC hint or explicit eviction.
+
+**Fix (speculative):** The Dart analyzer's `AnalysisDriver` has `removeFile()` and `dispose()` APIs, but evicting mid-scan would force re-resolution if a later file imports the evicted one. A more practical approach: after completing a scan batch, call `applyPendingFileChanges()` or rebuild the collection for the next batch. This trades re-prewarm time for memory.
+
+**Risk:** High — analyzer internals are not designed for selective eviction. Could cause correctness issues or worse performance from re-resolution.
+
+**Effort:** High — requires deep analyzer SDK knowledge and benchmarking.
+
+### Finding 5: Per-file GC hints between scans
+
+Between files in `_scanFilesResolved`, there is no explicit GC trigger or memory check. Adding a `if (rss > threshold) { /* force GC or bail */ }` check between files could prevent runaway growth within a single batch.
+
+**Fix:** Add RSS sampling between files (reuse `MemoryPressureHandler` sampling) and short-circuit the scan if RSS exceeds the daemon's recycle threshold.
+
+**Risk:** Low — worst case, a scan completes with fewer files and the extension re-requests the remainder after daemon recycle.
+
+**Effort:** Low — a few lines in the scan loop.
+
+### Recommendations (priority order)
+
+1. **Fix false `usesTypeResolution` claims** — highest ROI, lowest risk. Moves ~200+ rules to light lane.
+2. **Per-file RSS check in daemon scan loop** — trivial to add, prevents OOM mid-batch.
+3. **Daemon balanced-mode for incremental scans** — medium effort, saves significant memory on save-triggered scans.
+4. **Resolved-model eviction** — defer unless the above three are insufficient. High risk, uncertain reward.
+
+---
+
 ## Scope Estimate
 
 Multi-week effort across the plugin core (Phases 1 and 3), rule registration (Phase 2, the hardest prerequisite — no selective-disable path exists today), and the VS Code extension (Phase 4) across Windows/macOS/Linux RSS differences. Phase 0 (periodic log) is the only piece shipped so far.
+
+---
+
+## Finish Report (2026-08-31)
+
+### Phase 5 research — memory and speed savings audit
+
+Investigated four optimization avenues for reducing the analyzer's memory footprint beyond the Phase 1-4 shedding infrastructure.
+
+**Primary finding:** ~200+ rule classes across 9 files falsely declare `usesTypeResolution => true` despite performing only syntactic analysis. These rules are unnecessarily excluded from the light lane (in-process, +0.6% RSS) and forced into the scan daemon's full lane. Flipping each class to `false` moves it in-process with near-zero memory cost. The false claims originated from file-level blanket overrides rather than per-class evaluation.
+
+**Secondary finding:** The top 5 `.staticType` consumers (async, collection, migration, type, code-quality rules — 206 of ~306 total resolved-type call sites) genuinely require type resolution for correctness. No syntactic replacement is possible.
+
+**Additional opportunities identified:** (a) per-file RSS check in the daemon scan loop to prevent mid-batch OOM; (b) daemon-side balanced-mode filtering for incremental scans; (c) resolved-model eviction (high risk, deferred).
+
+**Code review of uncommitted Phases 1-4 implementation** surfaced: `_refreshSoftLimit` exceeds 50-line function limit (76 lines), `_updateShedLevel` rebuilds shed set unnecessarily when level unchanged, `memoryPressureWatcher.ts` uses raw `fs.watch` without debounce and duplicates the reports-dir path, tooltip logic duplicates the suffix decision tree, and the `SAROPA_LINTS_SHED_RULES` env-var opt-in is buried (user flagged this — needs visible UI surface in `analysis_options_custom.yaml`).
+
+**Bug fixes applied during finish review:**
+- Recovery thresholds in `_refreshSoftLimit` go negative when `_hardLimitMb < 366` (e.g. `SAROPA_LINTS_MAX_RSS_MB=300` → soft=210, recovery=210-256=-46, never true). Fixed both soft-recovery and de-escalation checks with `.clamp(0, threshold)`.
+- `_updateShedLevel` rebuilt the shed rule name set (iterating 2300+ rules) even when the level hadn't changed. Added early-return guard.
+
+**Not changed (deferred to implementation session):** `memoryPressureWatcher.ts` fs.watch issues (null filename on macOS, missing-directory ENOENT, no debounce), `_refreshSoftLimit` function length (76 lines), reports-dir path duplication, tooltip decision-tree duplication, env-var-only opt-in surface.
 
 ---
 

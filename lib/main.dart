@@ -13,6 +13,7 @@
 library;
 
 import 'dart:async' show FutureOr;
+import 'dart:convert' show jsonEncode;
 import 'dart:io' show Directory, File, Platform;
 
 import 'package:analysis_server_plugin/plugin.dart';
@@ -177,6 +178,10 @@ class SaropaLintsPlugin extends Plugin {
         RuntimeTierCap.clearCache,
         priority: 60,
       );
+      // Write memory_state.json on shed-level transitions so the VS Code
+      // extension can surface pressure in the status bar without polling.
+      MemoryPressureHandler.onShedLevelChanged =
+          (shedLevel, rssMb) => _writeMemoryStateFile(shedLevel, rssMb);
     } on Object catch (e, st) {
       PluginLogger.error(
         'initializeCacheManagement failed in Plugin.start()',
@@ -194,5 +199,39 @@ class SaropaLintsPlugin extends Plugin {
   void register(PluginRegistry registry) {
     PluginLogger.log('Plugin.register() — registering rules with analyzer');
     registerSaropaLintRules(registry);
+  }
+}
+
+/// Writes `memory_state.json` alongside `plugin.log` on shed-level transitions.
+///
+/// The VS Code extension watches this file via `fs.watch` and surfaces
+/// memory-pressure state in the status bar. Written only when the shed level
+/// or hard-limit trip state changes — not periodically.
+void _writeMemoryStateFile(int shedLevel, int rssMb) {
+  try {
+    final logPath = PluginLogger.logFilePath;
+    if (logPath == null) return;
+
+    // Derive the reports directory from the log file's parent.
+    final dir = File(logPath).parent.path;
+    final stats = MemoryPressureHandler.getStats();
+    final payload = jsonEncode({
+      'shedLevel': shedLevel,
+      'rssMb': rssMb,
+      'softLimitMb': stats['softLimitMb'],
+      'hardLimitMb': stats['hardLimitMb'],
+      'softLimitTripped': stats['softLimitTripped'],
+      'hardLimitTripped': stats['hardLimitTripped'],
+      'shedRuleCount': stats['shedRuleCount'],
+      'timestamp': DateTime.now().toIso8601String(),
+    });
+    File('$dir/memory_state.json').writeAsStringSync(payload);
+  } on Object catch (e, st) {
+    // Never crash the plugin on a state-file write failure.
+    PluginLogger.error(
+      'Failed to write memory_state.json',
+      error: e,
+      stackTrace: st,
+    );
   }
 }

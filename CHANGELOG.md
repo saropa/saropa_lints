@@ -84,6 +84,8 @@ Adds graduated rule shedding under memory pressure — the analyzer plugin now p
 - Periodic memory log line now includes soft limit and shed level.
 - `PluginLogger.logFilePath` public getter for the memory-state writer.
 - `getStats()` now includes `softLimitMb`, `softLimitTripped`, `shedLevel`, and `shedRuleCount`.
+- Fixed negative recovery thresholds when the hard RSS limit is below ~366 MB — soft-limit recovery and de-escalation checks now clamp to zero instead of going negative, which would lock shedding on permanently.
+- Shed level updates skip the full rule-set rebuild when the level hasn't actually changed.
 
 </details>
 

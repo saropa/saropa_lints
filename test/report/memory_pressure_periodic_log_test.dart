@@ -45,7 +45,8 @@ void main() {
     expect(logFile.existsSync(), isTrue);
     final content = logFile.readAsStringSync();
     expect(content, contains('[memory] RSS'));
-    expect(content, contains('MB (cap 1048576MB)'));
+    // Log format now includes soft limit: "(cap NMB, soft NMB[ shed=N])".
+    expect(content, contains('(cap 1048576MB, soft'));
   });
 
   test('a second refresh within the cooldown window does not log again', () {

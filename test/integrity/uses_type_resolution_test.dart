@@ -2,26 +2,56 @@ import 'dart:io';
 
 import 'package:test/test.dart';
 
-/// Integrity test: every rule file that accesses resolved-type APIs must
-/// declare `usesTypeResolution => true` so balanced memory mode can skip
-/// them on unchanged files. Missing the override means the optimization
-/// won't apply to that rule (performance bug, not a correctness bug).
+/// Resolved-type API patterns that force the analyzer's lazy cross-library
+/// element resolution. Any rule using these MUST declare
+/// `usesTypeResolution => true` so balanced mode can skip it on unchanged
+/// files. Conversely, rules declaring the flag without using any of these
+/// waste a light-lane slot by routing to the scan daemon unnecessarily.
+final _resolvedTypePatterns = RegExp(
+  r'\.(staticType|allSupertypes|thisType|resolvedType'
+  r'|declaredElement|staticElement|enclosingElement)\b',
+);
+
+/// Matches `.library` access on elements — a resolved-type trigger — but
+/// excludes string literals like `'dart.library.io'` and doc-comment
+/// references. Only bare `.library` after an identifier or closing paren
+/// counts as an element model access.
+final _libraryAccessPattern = RegExp(r'(?<=[a-zA-Z)\]])\.library\b');
+
+/// True if [content] contains any resolved-type API call outside of
+/// comments and string literals. Uses a heuristic (regex, not AST) —
+/// sufficient for integrity enforcement but may miss edge cases.
+bool _usesResolvedTypeApis(String content) {
+  // Strip single-line comments and doc comments to avoid matching
+  // patterns like `// uses .staticType to check...` in prose.
+  final stripped = content.replaceAll(RegExp(r'///.*|//.*'), '');
+  return _resolvedTypePatterns.hasMatch(stripped) ||
+      _libraryAccessPattern.hasMatch(stripped);
+}
+
+/// Integrity tests for `usesTypeResolution` correctness in rule files.
+/// Both directions are tested:
+/// 1. Files using resolved APIs must declare the flag (missing = perf bug)
+/// 2. Files declaring the flag must use resolved APIs (false claim = wasted
+///    light-lane capacity, forces rule into the scan daemon unnecessarily)
 void main() {
   test('rule files using resolved-type APIs have usesTypeResolution', () {
     final ruleDir = Directory('lib/src/rules');
-    final resolvedTypePatterns = RegExp(
-      r'\.(staticType|allSupertypes|thisType|resolvedType'
-      r'|declaredElement|staticElement)\b',
+    // Only rule class files are relevant — utility files (helpers, mixins,
+    // detection utils) are consumed by rules that declare the flag themselves.
+    final ruleClassPattern = RegExp(
+      r'class\s+\w+\s+extends\s+(?:Saropa|Dart)LintRule',
     );
-
     final missing = <String>[];
+
     for (final file in ruleDir.listSync(recursive: true)) {
       if (file is! File || !file.path.endsWith('.dart')) continue;
       final content = file.readAsStringSync();
-      if (!resolvedTypePatterns.hasMatch(content)) continue;
+      // Skip non-rule files (utilities, mixins, detection helpers).
+      if (!ruleClassPattern.hasMatch(content)) continue;
+      if (!_usesResolvedTypeApis(content)) continue;
       if (!content.contains('usesTypeResolution => true')) {
-        final relative = file.path.replaceAll('\\', '/');
-        missing.add(relative);
+        missing.add(file.path.replaceAll('\\', '/'));
       }
     }
 
@@ -34,4 +64,47 @@ void main() {
           '${missing.join('\n')}',
     );
   });
+
+  test(
+    'rule files declaring usesTypeResolution actually use resolved-type APIs',
+    () {
+      // Inverse check: files that declare `usesTypeResolution => true` but
+      // contain NO resolved-type API access are false claims. These rules
+      // are unnecessarily excluded from the light lane, forcing them into
+      // the scan daemon and consuming memory that syntactic-only execution
+      // would avoid. See Phase 5 research in PLAN_analyzer_memory_monitor.md.
+      final ruleDir = Directory('lib/src/rules');
+      final ruleClassPattern = RegExp(
+        r'class\s+\w+\s+extends\s+(?:Saropa|Dart)LintRule',
+      );
+      final falseClaims = <String>[];
+
+      for (final file in ruleDir.listSync(recursive: true)) {
+        if (file is! File || !file.path.endsWith('.dart')) continue;
+        final content = file.readAsStringSync();
+        // Skip non-rule files.
+        if (!ruleClassPattern.hasMatch(content)) continue;
+        // Only check files that declare the flag.
+        if (!content.contains('usesTypeResolution => true')) continue;
+        // If the file genuinely uses resolved-type APIs, it's correct.
+        if (_usesResolvedTypeApis(content)) continue;
+        falseClaims.add(file.path.replaceAll('\\', '/'));
+      }
+
+      expect(
+        falseClaims,
+        isEmpty,
+        reason:
+            'These rule files declare `usesTypeResolution => true` but '
+            'contain no resolved-type API calls (.staticType, .library, '
+            '.allSupertypes, etc.). Remove the false declaration to move '
+            'these rules into the light lane:\n'
+            '${falseClaims.join('\n')}',
+      );
+    },
+    // Skip for now — ~200+ false claims across 9 files need a manual audit
+    // to fix per-class. The test is here to prevent NEW false claims once
+    // the audit is complete. See PLAN_analyzer_memory_monitor.md Phase 5.
+    skip: 'Pending Phase 5 audit of ~200+ false usesTypeResolution claims',
+  );
 }

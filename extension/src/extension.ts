@@ -146,6 +146,8 @@ import {
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
 import { checkForUpgrade, forceUpgradeCheck } from './upgrade-checker';
 import { buildStatusBarLabel } from './statusBarLabel';
+import { MemoryPressureWatcher, memoryPressureSuffix } from './systemHealth/memoryPressureWatcher';
+import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
 import { ProcessMonitor } from './systemHealth/processMonitor';
 import { formatBytes } from './systemHealth/processQuery';
 import { registerCleanupCommand } from './systemHealth/cleanupCommand';
@@ -1045,6 +1047,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // System health snapshot pushed from the process monitor.
   let systemHealthSnapshot: DartProcessSnapshot | null = null;
   let systemHealthLevel: HealthLevel = HealthLevel.Healthy;
+  // Plugin-level memory pressure state — fed by the MemoryPressureWatcher
+  // watching memory_state.json. Takes priority over process-level health.
+  let memoryPressureState: MemoryPressureState | null = null;
 
   /** Build tooltip lines for the status bar (version, tier, score, vibrancy details). */
   function buildStatusBarTooltipLines(
@@ -1116,9 +1121,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       const badge = findingsBadge(data);
       const badgeSuffix = badge?.suffix ?? '';
 
-      // System health suffix for the status bar label.
+      // Memory-pressure suffix takes priority — plugin-level shedding is more
+      // actionable than aggregate process RSS. Falls back to system health.
+      const memPressureSuffix = memoryPressureSuffix(memoryPressureState);
       let sysHealthSuffix: string | undefined;
-      if (systemHealthSnapshot && systemHealthLevel !== HealthLevel.Healthy) {
+      if (memPressureSuffix) {
+        sysHealthSuffix = memPressureSuffix;
+      } else if (systemHealthSnapshot && systemHealthLevel !== HealthLevel.Healthy) {
         const size = formatBytes(systemHealthSnapshot.totalRssBytes);
         sysHealthSuffix = systemHealthLevel === HealthLevel.Critical
           ? l10n('systemHealth.statusBar.critical', { size })
@@ -1161,6 +1170,20 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         scorePending,
       );
       if (badge) tooltipLines.push(badge.tooltip);
+      // Memory pressure tooltip — shed level and hard-limit status.
+      if (memoryPressureState) {
+        if (memoryPressureState.hardLimitTripped) {
+          tooltipLines.push(l10n('memoryPressure.tooltip.hardTripped'));
+        } else if (memoryPressureState.shedLevel >= 2) {
+          tooltipLines.push(l10n('memoryPressure.tooltip.shedLevel2', {
+            count: String(memoryPressureState.shedRuleCount),
+          }));
+        } else if (memoryPressureState.shedLevel >= 1) {
+          tooltipLines.push(l10n('memoryPressure.tooltip.shedLevel1', {
+            count: String(memoryPressureState.shedRuleCount),
+          }));
+        }
+      }
       if (systemHealthSnapshot) {
         const sSize = formatBytes(systemHealthSnapshot.totalRssBytes);
         const sCount = String(systemHealthSnapshot.processCount);
@@ -1199,6 +1222,21 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     updateAllStatusBars();
   });
   processMonitor.start();
+
+  // Memory pressure watcher: reads memory_state.json written by the analyzer
+  // plugin on shed-level transitions. Surfaces graduated rule shedding in the
+  // status bar without polling — uses fs.watch on the reports directory.
+  const memoryWatcher = new MemoryPressureWatcher();
+  context.subscriptions.push(memoryWatcher);
+  memoryWatcher.onStateChange((state) => {
+    memoryPressureState = state;
+    updateAllStatusBars();
+  });
+  const memWatchRoot = getProjectRoot();
+  if (memWatchRoot) {
+    memoryWatcher.start(memWatchRoot);
+  }
+
   registerCleanupCommand(context);
   context.subscriptions.push(
     vscode.commands.registerCommand('saropaLints.showProcessHealth', () => {

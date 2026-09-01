@@ -1049,6 +1049,66 @@ class MemoryPressureHandler {
   /// recovery watermark. Read by [isOverHardLimit].
   static bool _hardLimitTripped = false;
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // Soft RSS threshold — early warning before the hard valve trips.
+  // Triggers graduated rule shedding (Phase 1+3 of the memory monitor plan).
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Whether graduated rule shedding is enabled. Must be explicitly armed via
+  /// [enableShedding] — without this, soft-limit warnings still log but rules
+  /// are never shed. Opt-in so users aren't surprised by rules vanishing.
+  static bool _shedEnabled = false;
+
+  /// Arm graduated rule shedding. Called from [initializeCacheManagement]
+  /// only when the user has opted in via `SAROPA_LINTS_SHED_RULES=true`.
+  static void enableShedding() {
+    _shedEnabled = true;
+  }
+
+  /// Soft limit: 70% of [_hardLimitMb]. Crossing this triggers warnings and,
+  /// when shedding is enabled, graduated rule shedding. Computed lazily from
+  /// [_hardLimitMb] so it tracks any env-var or adaptive override.
+  static int get _softLimitMb =>
+      _hardLimitMb > 0 ? (_hardLimitMb * 0.7).round() : 0;
+
+  /// True once RSS crosses [_softLimitMb]; cleared with hysteresis when RSS
+  /// drops below [_softLimitMb] - [_softRecoveryMarginMb].
+  static bool _softLimitTripped = false;
+
+  /// Hysteresis band for the soft limit (MB). Proportional to the soft limit
+  /// (10%, floored at 32 MB) so that small _hardLimitMb values (e.g. 300 MB)
+  /// still produce a viable recovery threshold instead of going negative.
+  /// For the default 4096 MB hard limit, soft=2867, margin=286 — similar to
+  /// the previous fixed 256 MB constant.
+  static int get _softRecoveryMarginMb =>
+      _softLimitMb > 0 ? (_softLimitMb * 0.1).round().clamp(32, 512) : 0;
+
+  /// Current shedding level, escalated as RSS climbs past the soft threshold.
+  ///   0 = no shedding (normal operation)
+  ///   1 = INFO-severity rules shed (non-essential only)
+  ///   2 = INFO + WARNING-severity rules shed (non-essential only)
+  /// ERROR-severity and essential-tier rules are never shed.
+  static int _shedLevel = 0;
+
+  /// Public getter for the current shed level. Read by SaropaContext's
+  /// _wrapCallback on the hot per-node path — must be a simple field read.
+  static int get shedLevel => _shedLevel;
+
+  /// Names of rules currently shed by memory pressure. Populated when
+  /// [_shedLevel] changes; read by the extension's memory state file.
+  static final Set<String> _shedRuleNames = {};
+
+  /// Snapshot of shed rule names for diagnostics and extension communication.
+  static Set<String> get shedRuleNames => Set.unmodifiable(_shedRuleNames);
+
+  /// Count of rules currently shed. Cheaper than copying the set.
+  static int get shedRuleCount => _shedRuleNames.length;
+
+  /// Callback invoked when the shed level changes. Set by the plugin at
+  /// startup to write the memory state file for the VS Code extension.
+  /// Nullable so the core library has no hard dependency on IO/extension code.
+  static void Function(int shedLevel, int rssMb)? onShedLevelChanged;
+
   /// Gate-call counter — [isOverHardLimit] is read per rule-node (very hot), so
   /// the real RSS syscall is throttled to once per [_rssСheckInterval] calls.
   static int _callsSinceRssCheck = 0;
@@ -1104,6 +1164,29 @@ class MemoryPressureHandler {
   /// or [isOverHardLimit] refresh is guaranteed to log. Test-only.
   static void resetMemoryLogCooldownForTesting() => _lastMemoryLogAt = null;
 
+  /// Force the soft-limit-tripped flag for testing. Allows tests to simulate
+  /// memory pressure without controlling real process RSS.
+  static void setSoftLimitTrippedForTest(bool value) {
+    _softLimitTripped = value;
+  }
+
+  /// Force the shed level for testing. Allows end-to-end shedding tests
+  /// without real RSS pressure.
+  static void setShedLevelForTest(int level) {
+    _shedLevel = level.clamp(0, 2);
+    // Rebuild the shed set so isRuleShed reflects the new level.
+    _rebuildShedRuleNames();
+  }
+
+  /// Reset all soft-limit and shedding state. Test-only — clears the soft
+  /// flag, shed level, and shed rule names so tests start clean.
+  static void resetShedStateForTesting() {
+    _shedEnabled = false;
+    _softLimitTripped = false;
+    _shedLevel = 0;
+    _shedRuleNames.clear();
+  }
+
   /// Whether the process RSS is currently over the hard cap, meaning rule
   /// execution should pause. Self-samples the real RSS on a throttle so callers
   /// can invoke it on the hot per-node path without a syscall every time.
@@ -1116,7 +1199,9 @@ class MemoryPressureHandler {
     return _hardLimitTripped;
   }
 
-  /// Read the real process RSS and update [_hardLimitTripped] with hysteresis.
+  /// Read the real process RSS and update [_hardLimitTripped] and
+  /// [_softLimitTripped] with hysteresis, escalating/de-escalating the shed
+  /// level as RSS climbs or drops relative to the soft threshold.
   static void _refreshHardLimit() {
     final rss = _currentRssMb();
     if (rss <= 0) {
@@ -1142,9 +1227,19 @@ class MemoryPressureHandler {
     if (_lastMemoryLogAt == null ||
         now.difference(_lastMemoryLogAt!) >= _memoryLogInterval) {
       _lastMemoryLogAt = now;
-      PluginLogger.log('[memory] RSS ${rss}MB (cap ${_hardLimitMb}MB)');
+      // Include shed level in the periodic log so post-crash diagnosis shows
+      // whether shedding was active and at what level.
+      final shedInfo = _shedLevel > 0 ? ' shed=$_shedLevel' : '';
+      PluginLogger.log(
+        '[memory] RSS ${rss}MB (cap ${_hardLimitMb}MB, '
+        'soft ${_softLimitMb}MB$shedInfo)',
+      );
     }
 
+    // ── Soft limit: graduated rule shedding ──
+    _refreshSoftLimit(rss);
+
+    // ── Hard limit: full rule-execution pause ──
     if (!_hardLimitTripped && rss >= _hardLimitMb) {
       _hardLimitTripped = true;
       // Shed the plugin's own caches immediately to give back what we can.
@@ -1161,6 +1256,166 @@ class MemoryPressureHandler {
         'Resuming rule execution.',
       );
     }
+  }
+
+  /// Evaluate the soft RSS threshold and adjust [_shedLevel] accordingly.
+  ///
+  /// Shedding escalates as RSS climbs past the soft threshold: level 1 sheds
+  /// INFO-severity rules, level 2 adds WARNING-severity rules. The midpoint
+  /// between soft and hard limits decides the escalation boundary — if RSS
+  /// is above the midpoint, escalate to level 2.
+  ///
+  /// De-escalation happens when RSS drops below [_softLimitMb] minus
+  /// [_softRecoveryMarginMb] — the hysteresis band prevents flapping when
+  /// RSS hovers near the threshold.
+  static void _refreshSoftLimit(int rss) {
+    final soft = _softLimitMb;
+    // Soft limit disabled when hard limit is disabled (both derive from
+    // _hardLimitMb = 0 set in tests and the scan CLI).
+    if (soft <= 0) return;
+
+    if (!_softLimitTripped && rss >= soft) {
+      // Crossing the soft threshold — warn unconditionally, shed only if
+      // the user opted in via SAROPA_LINTS_SHED_RULES=true.
+      _softLimitTripped = true;
+      if (_shedEnabled) {
+        _updateShedLevel(1, rss);
+        PluginLogger.log(
+          '[memory] WARNING: RSS ${rss}MB crossed soft limit ${soft}MB. '
+          'Shedding INFO-severity rules (${_shedRuleNames.length} rules).',
+        );
+        stderr.writeln(
+          '[saropa_lints] Memory pressure: RSS ${rss}MB >= ${soft}MB soft '
+          'limit. Shedding INFO-severity non-essential rules to reduce '
+          'memory growth.',
+        );
+      } else {
+        PluginLogger.log(
+          '[memory] WARNING: RSS ${rss}MB crossed soft limit ${soft}MB. '
+          'Set SAROPA_LINTS_SHED_RULES=true to enable graduated shedding.',
+        );
+        stderr.writeln(
+          '[saropa_lints] Memory pressure: RSS ${rss}MB >= ${soft}MB soft '
+          'limit. Rule shedding is not enabled — set '
+          'SAROPA_LINTS_SHED_RULES=true to auto-shed low-severity rules.',
+        );
+      }
+    } else if (_softLimitTripped && rss < soft - _softRecoveryMarginMb) {
+      // RSS dropped well below the soft threshold — restore all shed rules.
+      // The proportional margin (10% of soft, floor 32 MB) guarantees the
+      // recovery threshold stays positive for any viable soft limit.
+      _softLimitTripped = false;
+      final previousCount = _shedRuleNames.length;
+      if (_shedEnabled) {
+        _updateShedLevel(0, rss);
+      }
+      PluginLogger.log(
+        '[memory] RSS ${rss}MB dropped below soft recovery '
+        '${soft - _softRecoveryMarginMb}MB. Restored $previousCount rules.',
+      );
+      if (previousCount > 0) {
+        stderr.writeln(
+          '[saropa_lints] Memory pressure released: RSS ${rss}MB. '
+          'Restored $previousCount shed rules.',
+        );
+      }
+    } else if (_softLimitTripped && _shedEnabled) {
+      // Still above soft — check whether to escalate from level 1 to 2.
+      // The midpoint between soft and hard limits is the escalation boundary.
+      // Only when shedding is enabled — otherwise there's nothing to escalate.
+      final escalationPoint = soft + (_hardLimitMb - soft) ~/ 2;
+      if (_shedLevel == 1 && rss >= escalationPoint) {
+        _updateShedLevel(2, rss);
+        PluginLogger.log(
+          '[memory] WARNING: RSS ${rss}MB crossed escalation point '
+          '${escalationPoint}MB. Shedding WARNING-severity rules too '
+          '(${_shedRuleNames.length} rules total).',
+        );
+        stderr.writeln(
+          '[saropa_lints] Memory pressure escalated: RSS ${rss}MB. '
+          'Now shedding WARNING-severity non-essential rules too.',
+        );
+      } else if (_shedLevel == 2 &&
+          rss < escalationPoint - _softRecoveryMarginMb) {
+        // RSS dropped below escalation recovery — de-escalate to level 1.
+        _updateShedLevel(1, rss);
+        PluginLogger.log(
+          '[memory] RSS ${rss}MB below escalation recovery. '
+          'De-escalated to INFO-only shedding '
+          '(${_shedRuleNames.length} rules).',
+        );
+      }
+    }
+  }
+
+  /// Update the shed level and rebuild the shed rule name set from the tier
+  /// and severity registries. Notifies the extension callback if set.
+  static void _updateShedLevel(int newLevel, int rss) {
+    // Skip rebuild when the level hasn't changed — _rebuildShedRuleNames
+    // iterates all 2300+ rules and checks essential membership for each.
+    if (newLevel == _shedLevel) return;
+    final oldLevel = _shedLevel;
+    _shedLevel = newLevel;
+    _rebuildShedRuleNames();
+    if (oldLevel != newLevel) {
+      onShedLevelChanged?.call(newLevel, rss);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Shed rule name registry — populated from tiers + severity metadata.
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Severity metadata for each rule, populated at startup by the plugin
+  /// via [registerRuleSeverities]. Keyed by lower-case rule name.
+  static final Map<String, int> _ruleSeverityIndex = {};
+
+  /// Register the severity of each active rule so the shed mechanism can
+  /// filter by severity without instantiating rules at shedding time.
+  /// Called once at plugin startup after rule registration.
+  ///
+  /// [severities] maps lower-case rule names to their DiagnosticSeverity
+  /// index (INFO=0, WARNING=1, ERROR=2).
+  static void registerRuleSeverities(Map<String, int> severities) {
+    _ruleSeverityIndex
+      ..clear()
+      ..addAll(severities);
+  }
+
+  /// Rebuild [_shedRuleNames] based on current [_shedLevel], essential-tier
+  /// protection, and per-rule severity metadata.
+  ///
+  /// Rules are shed when ALL of:
+  ///   1. Their severity index <= the shed threshold (level 1 → INFO only,
+  ///      level 2 → INFO + WARNING)
+  ///   2. They are NOT in the essential tier
+  ///   3. The shed level is > 0
+  static void _rebuildShedRuleNames() {
+    _shedRuleNames.clear();
+    if (_shedLevel <= 0) return;
+
+    // Severity threshold: level 1 sheds INFO (index 0), level 2 adds
+    // WARNING (index 1). ERROR (index 2) is never shed.
+    final maxShedSeverityIndex = _shedLevel - 1;
+
+    for (final entry in _ruleSeverityIndex.entries) {
+      final ruleName = entry.key;
+      final severityIndex = entry.value;
+      // Skip ERROR-severity rules (never shed).
+      if (severityIndex > maxShedSeverityIndex) continue;
+      // Skip essential-tier rules (always protected).
+      if (essentialRules.contains(ruleName)) continue;
+      _shedRuleNames.add(ruleName);
+    }
+  }
+
+  /// Whether [ruleName] is currently shed due to memory pressure. Called from
+  /// SaropaContext._wrapCallback on the hot per-node path — the Set lookup
+  /// is O(1) and the _shedLevel short-circuit avoids the lookup when no
+  /// shedding is active.
+  static bool isRuleShed(String ruleName) {
+    if (_shedLevel <= 0) return false;
+    return _shedRuleNames.contains(ruleName);
   }
 
   /// Current process resident-set size in MB, or -1 if unavailable.
@@ -1348,6 +1603,10 @@ class MemoryPressureHandler {
       'rssAvailable': rss > 0,
       'hardLimitMb': _hardLimitMb,
       'hardLimitTripped': _hardLimitTripped,
+      'softLimitMb': _softLimitMb,
+      'softLimitTripped': _softLimitTripped,
+      'shedLevel': _shedLevel,
+      'shedRuleCount': _shedRuleNames.length,
       'relieveCount': _relieveCount,
       'lastRelieve': _lastRelieve?.toUtc().toIso8601String(),
     };
@@ -1649,6 +1908,14 @@ void initializeCacheManagement({
   final adaptiveCap = _computeAdaptiveRssCap(hardRssLimitMb);
   final effectiveCap = parsedCap ?? adaptiveCap;
   MemoryPressureHandler.setHardRssLimitMb(effectiveCap);
+
+  // Opt-in graduated rule shedding: only when SAROPA_LINTS_SHED_RULES=true.
+  // Without this, soft-limit warnings still log but rules are never shed —
+  // users aren't surprised by diagnostics disappearing.
+  final shedEnv = Platform.environment['SAROPA_LINTS_SHED_RULES'];
+  if (shedEnv?.trim().toLowerCase() == 'true') {
+    MemoryPressureHandler.enableShedding();
+  }
 
   // Diagnostic: verify ProcessInfo.currentRss works on this platform.
   final startupRss = MemoryPressureHandler._currentRssMb();

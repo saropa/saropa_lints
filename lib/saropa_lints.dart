@@ -3474,6 +3474,20 @@ void registerSaropaLintRules(PluginRegistry registry) {
       }
     }
 
+    // Build the severity map for graduated memory shedding. All rules are
+    // already instantiated, so we can read each rule's DiagnosticSeverity
+    // and map it to a 0-based index (INFO=0, WARNING=1, ERROR=2) for the
+    // pressure handler. The ordinal uses NONE=0, INFO=1, WARNING=2, ERROR=3,
+    // so we subtract 1 and clamp to get the shed index.
+    final severities = <String, int>{};
+    for (final rule in rules) {
+      // Map ordinal (NONE=0..ERROR=3) → shed index (INFO=0..ERROR=2).
+      // NONE-severity rules map to -1, clamped to 0 → shed as INFO.
+      severities[rule.code.lowerCaseName] =
+          (rule.code.severity.ordinal - 1).clamp(0, 2);
+    }
+    MemoryPressureHandler.registerRuleSeverities(severities);
+
     // User-visible telemetry — once the project root is known and the
     // buffered log flushes, consumers can see "Registered N rules" in
     // `reports/.saropa_lints/plugin.log`. If they instead see "Registered
