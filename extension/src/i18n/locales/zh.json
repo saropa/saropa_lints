@@ -574,6 +574,19 @@
       "killFailed": "失败"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 规则暂停 ({rssMb} MB)",
+      "shedWarning": "⚠ {count} 规则弃用",
+      "shedInfo": "⚡ {count} 规则 检查"
+    },
+    "tooltip": {
+      "shedLevel0": "内存压力：正常",
+      "shedLevel1": "内存压力：{count} 低严重性规则被弃用以减少 RSS",
+      "shedLevel2": "内存压力：{count}规则触发（INFO + WARNING严重程度）",
+      "hardTripped": "内存限制超出 — 所有非必要规则已暂停"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

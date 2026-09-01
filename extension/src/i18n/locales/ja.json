@@ -574,6 +574,19 @@
       "killFailed": "失敗"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 ルール一時停止中 ({rssMb} MB)",
+      "shedWarning": "⚠ {count} ルールは適用されません",
+      "shedInfo": "⚡ {count} ルールでスッキリ"
+    },
+    "tooltip": {
+      "shedLevel0": "メモリ圧力: 通常",
+      "shedLevel1": "メモリ圧力: {count} 低重大度ルールが削除され RSS",
+      "shedLevel2": "メモリ圧力: {count} ルールがシャドウ (INFO + ワーニング セバリティ)",
+      "hardTripped": "メモリ制限を超えた — すべての非必須ルールが一時停止されました"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

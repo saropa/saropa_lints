@@ -574,6 +574,19 @@
       "killFailed": "فشل"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 قواعد متوقفة ({rssMb} ميغا بايت)",
+      "shedWarning": "⚠ قواعد {count} تُلغي",
+      "shedInfo": "⚡ قواعد {count} تُلغي"
+    },
+    "tooltip": {
+      "shedLevel0": "الضغط على الذاكرة: طبيعي",
+      "shedLevel1": "الضغط على الذاكرة: {count} قواعد منخفضة الأهمية تُطرح لخفض RSS",
+      "shedLevel2": "الضغط على الذاكرة: {count} قواعد تُلغي (مستوى المعلومات + تحذير)",
+      "hardTripped": "الحد الأقصى للذاكرة تم تجاوزه — تم تعطيل جميع القواعد غير الضرورية"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

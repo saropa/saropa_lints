@@ -574,6 +574,19 @@
       "killFailed": "Thất bại"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 Quy tắc tạm dừng ({rssMb} MB)",
+      "shedWarning": "⚠ {count} quy tắc cảnh báo",
+      "shedInfo": "⚡ {count} quy tắc kiểm tra"
+    },
+    "tooltip": {
+      "shedLevel0": "Áp lực bộ nhớ: bình thường",
+      "shedLevel1": "Áp lực bộ nhớ: {count} quy tắc mức độ nghiêm trọng thấp được áp dụng để giảm RSS",
+      "shedLevel2": "Áp lực bộ nhớ: {count} quy tắc làm rơi (CẤP ĐỘ THÔNG TIN + CẢNH BÁO)",
+      "hardTripped": "Hạn mức bộ nhớ đã được vượt quá — tất cả các quy tắc không thiết yếu đã tạm dừng"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

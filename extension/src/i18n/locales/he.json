@@ -574,6 +574,19 @@
       "killFailed": "נכשל"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 הכללים עוצרים ({rssMb} מ\"ב)",
+      "shedWarning": "⚠ סלילים {count} שמים",
+      "shedInfo": "⚡ סלילים {count} שומרים על"
+    },
+    "tooltip": {
+      "shedLevel0": "לחץ הזיכרון: נורמלי",
+      "shedLevel1": "לחץ זיכרון: {count} правила נמוך-דרוג שוררים לลด RSS",
+      "shedLevel2": "לחץ זיכרון: {count} правила שורש (דרוג אינפורמציה + אזהרה)",
+      "hardTripped": "лимיט זיכרון מוגזם — כל כללי לא חובה נעצרו"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

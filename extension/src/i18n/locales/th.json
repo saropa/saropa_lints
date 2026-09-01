@@ -574,6 +574,19 @@
       "killFailed": "ล้มเหลว"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴กฎถูกหยุด ({rssMb} MB)",
+      "shedWarning": "⚠ กฎ {count} ที่มีผล",
+      "shedInfo": "⚡ กฎ {count} ที่เข้มงวด"
+    },
+    "tooltip": {
+      "shedLevel0": "ความดันหน่วยความจำ: ปกติ",
+      "shedLevel1": "การดันหน่วยความจำ: กฎระเบียบระดับ {count} ที่มีความรุนแรงต่ำ ช่วยลดลง RSS",
+      "shedLevel2": "ความดันหน่วยความจำ: กฎ {count} ทำให้เกิดการเตือน (ระดับข้อมูล + คำเตือน)",
+      "hardTripped": "ขีดจำกัดความจำเกิน — กฎทั้งหมดที่ไม่จำเป็นถูกระงับ"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

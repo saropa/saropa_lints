@@ -574,6 +574,19 @@
       "killFailed": "Ошибка"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 Правила приостановлены ({rssMb} МБ)",
+      "shedWarning": "⚠ {count} правила устраняют",
+      "shedInfo": "⚡ {count} правила отбрасывают"
+    },
+    "tooltip": {
+      "shedLevel0": "Напряжение памяти: нормальное",
+      "shedLevel1": "Напряжение памяти: {count} правила низкой серьёзности устранены для снижения RSS",
+      "shedLevel2": "Напряжение памяти: {count} правил выдают (INFO + WARNING уровень серьёзности)",
+      "hardTripped": "Память превышена — все необязательные правила приостановлены"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

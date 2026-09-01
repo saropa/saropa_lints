@@ -574,6 +574,19 @@
       "killFailed": "असफल"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 नियम स्थगित ({rssMb} मेगाबाइट)",
+      "shedWarning": "⚠ {count} नियम छोड़ें",
+      "shedInfo": "⚡ {count} नियम छोड़ें"
+    },
+    "tooltip": {
+      "shedLevel0": "मेमोरी दबाव: सामान्य",
+      "shedLevel1": "स्मृति दबाव: {count} कम गंभीर नियम छोड़कर घटाने के लिए RSS",
+      "shedLevel2": "स्मृति दबाव: {count} नियम छोड़ देते हैं (सूचना + चेतावनी गंभीरता)",
+      "hardTripped": "स्मृति सीमा के अतिक्रमण — सभी अनिवार्य नियम स्थगित कर दिए गए"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

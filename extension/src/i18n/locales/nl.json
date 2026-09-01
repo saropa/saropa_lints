@@ -574,6 +574,19 @@
       "killFailed": "Mislukt"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 Regels opgeschakeld ({rssMb} MB)",
+      "shedWarning": "⚠ {count} regels weergeven",
+      "shedInfo": "⚡ {count} regels weerspiegelen"
+    },
+    "tooltip": {
+      "shedLevel0": "Memory pressure: normaal",
+      "shedLevel1": "Memory pressure: {count} lage-ernst regels worden toegepast om RSS te verminderen",
+      "shedLevel2": "Memory pressure: {count} regels weergeven (INFO + WARNING ernst)",
+      "hardTripped": "Geheugenlimiet overschreden — alle niet-essentiële regels opgeschort"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

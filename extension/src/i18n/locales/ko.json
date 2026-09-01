@@ -574,6 +574,19 @@
       "killFailed": "실패"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 규칙 일시 중단 ({rssMb} MB)",
+      "shedWarning": "⚠ {count} 규칙은 제거",
+      "shedInfo": "⚡ {count} 규칙 적용"
+    },
+    "tooltip": {
+      "shedLevel0": "메모리 압력: 정상",
+      "shedLevel1": "메모리 압력: {count} 저중요도 규칙이 RSS를 줄이기 위해 제거되었습니다.",
+      "shedLevel2": "메모리 압력: {count} 규칙이 제거됨 (INFO + WARNING 심각도)",
+      "hardTripped": "메모리 제한 초과 — 모든 비필수 규칙 일시 중단"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

@@ -574,6 +574,19 @@
       "killFailed": "Başarısız"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 Kurallar durduruldu ({rssMb} MB)",
+      "shedWarning": "⚠ {count} kurallarını uygula",
+      "shedInfo": "⚡ {count} kurallarını uygula"
+    },
+    "tooltip": {
+      "shedLevel0": "Hafıza baskısı: normal",
+      "shedLevel1": "Hafıza baskısı: {count} düşük ciddiyetli kural, RSS azaltmak için bırakıldı",
+      "shedLevel2": "Hafıza baskısı: {count} kuralı uygulayın (INFO + UYARI ciddiyeti)",
+      "hardTripped": "Hafıza limiti aşıldı — tüm gerekli olmayan kural lar durduruldu"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

@@ -574,6 +574,19 @@
       "killFailed": "ব্যর্থ"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 নিয়ম অবরুদ্ধ ({rssMb} এমবি)",
+      "shedWarning": "⚠ {count} নিয়ম ছাড়া গেল",
+      "shedInfo": "⚡ {count} নিয়ম বাদ দিন"
+    },
+    "tooltip": {
+      "shedLevel0": "মেমরি চাপ: সাধারণ",
+      "shedLevel1": "মেমরি চাপ: {count} কম গুরুত্বপূর্ণ নিয়মগুলো কমানোর জন্য RSS",
+      "shedLevel2": "মেমরি চাপ: {count} নিয়ম ছুঁই (ইনফো + বার্ণিং গুরুত্ব)",
+      "hardTripped": "মেমরি সীমা অতিক্রম — সব অপ্রয়োজনীয় নিয়ম স্থগিত হয়েছে"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

@@ -574,6 +574,19 @@
       "killFailed": "Échec"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 Règles suspendues ({rssMb} Mo)",
+      "shedWarning": "⚠ Règles {count} strictes",
+      "shedInfo": "⚡ Règles {count} de suppression"
+    },
+    "tooltip": {
+      "shedLevel0": "Pression mémoire : normale",
+      "shedLevel1": "Pression mémoire : {count} règles de faible gravité à supprimer pour réduire RSS",
+      "shedLevel2": "Pression mémoire : {count} règles déclenchent (gravité INFO + AVERTISSEMENT)",
+      "hardTripped": "Limite de mémoire dépassée — toutes les règles non essentielles suspendues"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

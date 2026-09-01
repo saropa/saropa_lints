@@ -574,6 +574,19 @@
       "killFailed": "Gagal"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 Aturan dijeda ({rssMb} MB)",
+      "shedWarning": "⚠ Aturan {count} menghilangkan",
+      "shedInfo": "⚡ Aturan {count} menghilangkan"
+    },
+    "tooltip": {
+      "shedLevel0": "Tekanan memori: normal",
+      "shedLevel1": "Tekanan memori: {count} aturan beratitas rendah yang dihapus untuk mengurangi RSS",
+      "shedLevel2": "Tekanan memori: {count} aturan mengeluarkan (INFO + WARNING tingkat keparahan)",
+      "hardTripped": "Memori melebihi batas — semua aturan non-esensial dijeda"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

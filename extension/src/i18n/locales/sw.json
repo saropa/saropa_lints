@@ -574,6 +574,19 @@
       "killFailed": "Mwisho"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 Uzito wa kifungu ({rssMb} MB)",
+      "shedWarning": "⚠ Kifungu {count} kusheshwa",
+      "shedInfo": "⚡ Tafutaji ya {count}"
+    },
+    "tooltip": {
+      "shedLevel0": "Unganisho wa matokeo: normal",
+      "shedLevel1": "Unganisho wa matokeo: {count} matokeo ya ujumbe mbaya kushinda kuzuka RSS",
+      "shedLevel2": "Unganisho wa moyo: {count} rules shed (INFO + WARNING severity)",
+      "hardTripped": "Ulimwenguni wa kipato uliokosa — wote kwa kundi la kipato kifupi kipaswa"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

@@ -574,6 +574,19 @@
       "killFailed": "ناموفق"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 قوانین متوقف شد ({rssMb} مگابایت)",
+      "shedWarning": "⚠ قواعد {count} توزیع",
+      "shedInfo": "⚡ قواعد {count} توزیع"
+    },
+    "tooltip": {
+      "shedLevel0": "فشار حافظه: نرمال",
+      "shedLevel1": "فشار حافظه: قاعده های پایین سطح {count} به منظور کاهش RSS",
+      "shedLevel2": "فشار حافظه: {count} قاعده شد (اهمیت + اخطار)",
+      "hardTripped": "محدودیت حافظه پر شد — تمام قوانین غیر ضروری متوقف شدند"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

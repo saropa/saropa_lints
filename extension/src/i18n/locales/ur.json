@@ -574,6 +574,19 @@
       "killFailed": "ناکام"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 نظمات تعلق ({rssMb} ميگا بائٹ)",
+      "shedWarning": "⚠ قواعد {count} چھوڑ دیں",
+      "shedInfo": "⚡ قواعد {count} چھوڑ دیں"
+    },
+    "tooltip": {
+      "shedLevel0": "یاد کرنے کی دباؤ: نормل /نہ کریں",
+      "shedLevel1": "یاد کرنے کی دباؤ: {count} کم اہمیت کے قواعد ہیں جو RSS کم کرنے کے لیے ہیں",
+      "shedLevel2": "یاد کرنے کی دباؤ: {count} قواعد چھوڑ دیے (INFO + WARNING سطح)",
+      "hardTripped": "میموری لیمٹ اکثر — تمام غیر ضروری قواعد گھمندہ کر دیے گئے ہیں"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },

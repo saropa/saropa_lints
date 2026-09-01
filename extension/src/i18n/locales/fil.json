@@ -574,6 +574,19 @@
       "killFailed": "Nagkabigo"
     }
   },
+  "memoryPressure": {
+    "statusBar": {
+      "hardTripped": "🔴 Nakatigil ang mga batas ({rssMb} MB)",
+      "shedWarning": "⚠ {count} mga rule na nagsisilbing shed",
+      "shedInfo": "⚡ {count} mga rule na nagsisilbing shed"
+    },
+    "tooltip": {
+      "shedLevel0": "Presyon ng memorya: normal",
+      "shedLevel1": "Memory pressure: {count} low-severity rules shed para mabawasan ang RSS",
+      "shedLevel2": "Presyon sa memorya: {count} na mga rule ay nagseselos (INFO + WARNING severity)",
+      "hardTripped": "Nag-override ng memory limit — lahat ng mga hindi pangunahing rule na ipinagbawal"
+    }
+  },
   "brand": {
     "prefix": "Saropa "
   },
