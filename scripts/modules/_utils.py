@@ -25,6 +25,15 @@ from typing import NoReturn
 
 
 # =============================================================================
+# VERSION PATTERN
+# =============================================================================
+# Semver pattern matching X.Y.Z with optional pre-release suffix
+# (e.g. "15.2.7", "1.0.0-beta.1"). Single source of truth — all
+# version-parsing code in the publish pipeline imports this constant.
+VERSION_RE = r"\d+\.\d+\.\d+(?:-[\w]+(?:\.[\w]+)*)?"
+
+
+# =============================================================================
 # OUTPUT LEVEL
 # =============================================================================
 # Controls verbosity of print functions. Set once at startup by the

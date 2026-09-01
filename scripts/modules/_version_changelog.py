@@ -21,6 +21,7 @@ from pathlib import Path
 from scripts.modules._utils import (
     Color,
     ExitCode,
+    VERSION_RE as _VERSION_RE,
     exit_with_error,
     print_colored,
     print_info,
@@ -28,10 +29,6 @@ from scripts.modules._utils import (
     print_warning,
 )
 from scripts.modules._git_ops import tag_exists_on_remote
-
-# Semantic version with optional pre-release suffix.
-# Matches: 5.0.0, 5.0.0-beta.1, 5.0.0-rc.2, etc.
-_VERSION_RE = r"\d+\.\d+\.\d+(?:-[\w]+(?:\.[\w]+)*)?"
 
 # Pattern fragment matching " - Unreleased", " — Unreleased" (em-dash),
 # and common typos like "Unreleasted" appended after a heading bracket.

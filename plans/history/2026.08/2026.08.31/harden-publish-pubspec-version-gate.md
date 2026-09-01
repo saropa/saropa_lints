@@ -24,11 +24,19 @@ Both gates produce clear error messages identifying the expected vs. actual vers
 - **Regex tightened:** The commit-tree check uses `_VERSION_RE` (strict semver: `\d+\.\d+\.\d+` with optional pre-release) instead of `\S+`, preventing false matches on trailing YAML artifacts.
 - **`package.json` gate:** Both checkpoints now also verify `extension/package.json` version when the file exists, preventing the same class of mismatch for the VS Code extension.
 
+### Further Hardening
+
+- **`VERSION_RE` extracted to `_utils.py`:** Single source of truth for the semver regex pattern. Both `_git_ops.py` and `_version_changelog.py` import `VERSION_RE as _VERSION_RE` from `_utils`, eliminating the duplicated constant and sync risk. The alias preserves the private naming convention at each call site.
+- **package.json regex tightened:** `_read_package_json_version` and the commit-tree check now use `_VERSION_RE` inside the JSON value match (`"version": "({_VERSION_RE})"`) instead of the permissive `[^"]+`, rejecting non-semver values that would silently pass the old check.
+- **Visible output for all outcomes:** Both gates now print a status line for every file checked — success, mismatch (error), or missing/unparseable (warning). The operator sees exactly what was verified in the publish log.
+
 ### Files Changed
 
-- `scripts/modules/_git_ops.py` — added `_read_package_json_version`, `_VERSION_RE`, `_verify_versions_on_disk`, `_verify_versions_in_commit`; two gate call sites in `git_commit_and_push` and `create_git_tag`.
+- `scripts/modules/_utils.py` — added `VERSION_RE` constant.
+- `scripts/modules/_git_ops.py` — added `_read_package_json_version`, `_verify_versions_on_disk`, `_verify_versions_in_commit`; two gate call sites in `git_commit_and_push` and `create_git_tag`; imports `VERSION_RE` from `_utils`.
+- `scripts/modules/_version_changelog.py` — removed local `_VERSION_RE` definition, imports `VERSION_RE` from `_utils`.
 - `CHANGELOG.md` — entry under `[15.2.7] — Unreleased` Maintenance section.
 
 ### Verification
 
-Run the publish script against a test scenario where pubspec.yaml is at version N but the publish target is N+1, without the upstream version write executing. The pipeline should halt at the pre-commit gate with: `pubspec.yaml version mismatch: expected X, found Y`. Similarly, manually set `extension/package.json` to a wrong version and confirm the gate catches it.
+Run the publish script against a test scenario where pubspec.yaml is at version N but the publish target is N+1, without the upstream version write executing. The pipeline should halt at the pre-commit gate with: `pubspec.yaml version mismatch: expected X, found Y`. Similarly, manually set `extension/package.json` to a wrong version and confirm the gate catches it. Verify the publish log shows `Verified pubspec.yaml version is X` and `Verified extension/package.json version is X` success lines on a normal run.

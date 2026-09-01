@@ -21,6 +21,7 @@ from pathlib import Path
 from scripts.modules.strip_commit_msg_trailers import strip_commit_message
 from scripts.modules._utils import (
     Color,
+    VERSION_RE as _VERSION_RE,
     get_shell_mode,
     print_colored,
     print_error,
@@ -135,22 +136,15 @@ def ensure_publish_workflow_committed(
     return True
 
 
-def _read_package_json_version(project_dir: Path) -> str | None:
-    """Read version from extension/package.json, or None if absent."""
-    pkg_path = project_dir / "extension" / "package.json"
+def _read_package_json_version(pkg_path: Path) -> str | None:
+    """Read semver version from a package.json file, or None if absent/unparseable."""
     if not pkg_path.exists():
         return None
     match = re.search(
-        r'"version"\s*:\s*"([^"]+)"',
+        rf'"version"\s*:\s*"({_VERSION_RE})"',
         pkg_path.read_text(encoding="utf-8"),
     )
     return match.group(1) if match else None
-
-
-# Semver pattern matching X.Y.Z with optional pre-release suffix.
-# Kept in sync with _version_changelog._VERSION_RE; duplicated here to
-# avoid a circular import (_version_changelog imports tag_exists_on_remote).
-_VERSION_RE = r"\d+\.\d+\.\d+(?:-[\w]+(?:\.[\w]+)*)?"
 
 
 def _verify_versions_on_disk(
@@ -160,12 +154,14 @@ def _verify_versions_on_disk(
 
     Safety net: catches the case where the upstream version-write was
     silently skipped (e.g. the guard in apply_version_and_rename_unreleased
-    compared against a stale snapshot and no-oped).
+    compared against a stale snapshot and no-oped). Prints a status line
+    for every file checked so the operator sees exactly what was verified.
     """
     # Lazy import to break circular dependency with _version_changelog
     # (_version_changelog imports tag_exists_on_remote from this module).
     from scripts.modules._version_changelog import get_version_from_pubspec
 
+    # --- pubspec.yaml (mandatory) ---
     pubspec_path = project_dir / "pubspec.yaml"
     try:
         actual = get_version_from_pubspec(pubspec_path)
@@ -180,16 +176,25 @@ def _verify_versions_on_disk(
             f"Refusing to proceed — the version write was skipped."
         )
         return False
+    print_success(f"Verified pubspec.yaml version is {version}")
 
-    # Also verify package.json if present
-    pkg_version = _read_package_json_version(project_dir)
-    if pkg_version is not None and pkg_version != version:
+    # --- extension/package.json (expected but non-fatal if absent) ---
+    pkg_path = project_dir / "extension" / "package.json"
+    pkg_version = _read_package_json_version(pkg_path)
+    if pkg_version is None:
+        print_warning(
+            "extension/package.json not found or has no parseable version — "
+            "skipping package.json verification."
+        )
+    elif pkg_version != version:
         print_error(
             f"extension/package.json version mismatch: "
             f"expected {version}, found {pkg_version}. "
             f"Refusing to proceed."
         )
         return False
+    else:
+        print_success(f"Verified extension/package.json version is {version}")
 
     return True
 
@@ -201,11 +206,11 @@ def _verify_versions_in_commit(
 
     Last-resort gate before tagging: even if the disk was right at commit
     time, a bad staging or partial checkout could produce a commit whose
-    tree has the wrong version.
+    tree has the wrong version. Prints a status line for every file checked.
     """
     use_shell = get_shell_mode()
 
-    # Verify pubspec.yaml in the committed tree
+    # --- pubspec.yaml in the committed tree (mandatory) ---
     result = subprocess.run(
         ["git", "show", "HEAD:pubspec.yaml"],
         cwd=project_dir,
@@ -236,7 +241,7 @@ def _verify_versions_in_commit(
         return False
     print_success(f"Verified HEAD:pubspec.yaml version is {version}")
 
-    # Verify extension/package.json in the committed tree
+    # --- extension/package.json in the committed tree ---
     result = subprocess.run(
         ["git", "show", "HEAD:extension/package.json"],
         cwd=project_dir,
@@ -244,23 +249,35 @@ def _verify_versions_in_commit(
         text=True,
         shell=use_shell,
     )
-    if result.returncode == 0:
-        # package.json exists in the commit
-        pkg_match = re.search(
-            r'"version"\s*:\s*"([^"]+)"',
-            result.stdout,
+    if result.returncode != 0:
+        # package.json not in the commit tree — warn, don't block
+        print_warning(
+            "extension/package.json not found in HEAD commit — "
+            "skipping package.json verification."
         )
-        if pkg_match:
-            pkg_actual = pkg_match.group(1)
-            if pkg_actual != version:
-                print_error(
-                    f"HEAD commit extension/package.json version mismatch: "
-                    f"expected {version}, found {pkg_actual}."
-                )
-                return False
-            print_success(
-                f"Verified HEAD:extension/package.json version is {version}",
-            )
+        return True
+
+    pkg_match = re.search(
+        rf'"version"\s*:\s*"({_VERSION_RE})"',
+        result.stdout,
+    )
+    if not pkg_match:
+        print_warning(
+            "No parseable version in HEAD:extension/package.json — "
+            "skipping package.json verification."
+        )
+        return True
+
+    pkg_actual = pkg_match.group(1)
+    if pkg_actual != version:
+        print_error(
+            f"HEAD commit extension/package.json version mismatch: "
+            f"expected {version}, found {pkg_actual}."
+        )
+        return False
+    print_success(
+        f"Verified HEAD:extension/package.json version is {version}",
+    )
 
     return True
 

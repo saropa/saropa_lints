@@ -72,13 +72,13 @@ Adds graduated rule shedding under memory pressure — the analyzer plugin now p
 
 ### Added
 
-- Graduated memory-pressure rule shedding: shed level 1 disables INFO-severity rules, level 2 adds WARNING-severity rules, essential-tier rules are always protected.
+- Graduated memory-pressure rule shedding (opt-in via `SAROPA_LINTS_SHED_RULES=true`): shed level 1 disables INFO-severity rules, level 2 adds WARNING-severity rules, essential-tier rules are always protected. Without opt-in, soft-limit warnings still log but no rules are shed.
 - Memory pressure indicator in the VS Code status bar and tooltip, fed by `memory_state.json` written on shed-level transitions — no polling.
 
 <details>
 <summary>Maintenance</summary>
 
-- **Publish script: version verification gates** — added two safety-net checks in `_git_ops.py` that verify both `pubspec.yaml` and `extension/package.json` carry the correct version: one reads from disk after staging to block commits with the wrong version, and another reads from the HEAD commit tree before tagging. Both halt the pipeline with a clear error message instead of proceeding with a mismatched version.
+- **Publish script: version verification gates** — the release pipeline now verifies both `pubspec.yaml` and `extension/package.json` carry the correct version at two checkpoints (after staging and before tagging), printing a status line for each file and halting on mismatch. No action required.
 - Severity registration at plugin startup maps each rule to a 0-based shed index for the graduated shedding mechanism.
 - `memory_state.json` state file written alongside `plugin.log` on shed-level transitions for extension consumption.
 - Periodic memory log line now includes soft limit and shed level.
