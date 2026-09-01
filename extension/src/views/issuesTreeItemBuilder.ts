@@ -11,6 +11,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 
+import { escapeMarkdown } from '../markdownUtils';
 import { cachedFileExists } from '../pathUtils';
 import { getRelatedRules, getRuleDescription, getRuleDocUrl } from '../ruleMetadata';
 import { Violation } from '../violationsReader';
@@ -22,14 +23,6 @@ import { IssueTreeNode } from './issuesTreeTypes';
 
 const MESSAGE_LABEL_LEN = 56;
 
-/**
- * Escape all Markdown special characters so untrusted text renders as
- * literal content inside a vscode.MarkdownString.  Covers: \ ` * _ { }
- * [ ] ( ) # + - . ! | ~
- */
-function escapeMarkdown(text: string): string {
-  return text.replace(/[\\`*_{}[\]()#+\-.!|~]/g, '\\$&');
-}
 
 const STALE_ICON = new vscode.ThemeIcon(
   'warning',
