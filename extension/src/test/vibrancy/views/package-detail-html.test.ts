@@ -311,7 +311,10 @@ describe('Package Detail Panel — opportunities section', () => {
             pubDev: result.pubDev ? { ...result.pubDev, repositoryUrl: null } : null,
         };
         const html = buildPackageDetailHtml(noRepo, [], null);
-        assert.ok(!html.includes('/search?q=Http.get" data-action="openUrl"') || !html.includes('github.com'),
+        // Verify no GitHub code-search link renders when repo URL is absent
+        const hasGhSearchLink = html.includes('/search?q=Http.get" data-action="openUrl"')
+            && /github\.com/.test(html);
+        assert.ok(!hasGhSearchLink,
             'no GitHub code-search link should render without a repo URL');
         assert.ok(
             html.includes('https://pub.dev/documentation/http/latest/?search=Http.get'),

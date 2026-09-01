@@ -22,6 +22,15 @@ import { IssueTreeNode } from './issuesTreeTypes';
 
 const MESSAGE_LABEL_LEN = 56;
 
+/**
+ * Escape all Markdown special characters so untrusted text renders as
+ * literal content inside a vscode.MarkdownString.  Covers: \ ` * _ { }
+ * [ ] ( ) # + - . ! | ~
+ */
+function escapeMarkdown(text: string): string {
+  return text.replace(/[\\`*_{}[\]()#+\-.!|~]/g, '\\$&');
+}
+
 const STALE_ICON = new vscode.ThemeIcon(
   'warning',
   new vscode.ThemeColor('problemsWarningIcon.foreground'),
@@ -182,20 +191,20 @@ export function buildIssueTreeItem(
     if (!exists) {
       tooltip.appendMarkdown('**File not found** — re-run analysis to update.\n\n---\n\n');
     }
-    tooltip.appendMarkdown((v.message ?? '').replace(/]/g, '\\]'));
+    tooltip.appendMarkdown(escapeMarkdown(v.message ?? ''));
     if (hotspot && hotspotState) {
-      tooltip.appendMarkdown('\n\n**Hotspot review:** `' + hotspotState + '`');
+      tooltip.appendMarkdown('\n\n**Hotspot review:** `' + escapeMarkdown(hotspotState) + '`');
     }
     if (v.correction) {
       tooltip.appendMarkdown('\n\n**Fix:** ');
-      tooltip.appendMarkdown(v.correction.replace(/]/g, '\\]'));
+      tooltip.appendMarkdown(escapeMarkdown(v.correction));
     }
     const ruleName = v.rule ?? '';
     if (ruleName) {
-      tooltip.appendMarkdown('\n\n**Rule:** `' + ruleName.replace(/`/g, '\\`') + '`');
+      tooltip.appendMarkdown('\n\n**Rule:** `' + escapeMarkdown(ruleName) + '`');
       const desc = getRuleDescription(ruleName);
       if (desc) {
-        tooltip.appendMarkdown('\n\n' + desc.replace(/]/g, '\\]'));
+        tooltip.appendMarkdown('\n\n' + escapeMarkdown(desc));
       }
       const related = getRelatedRules(ruleName).filter((r) => r !== ruleName);
       if (related.length > 0) {
@@ -203,7 +212,7 @@ export function buildIssueTreeItem(
         tooltip.appendMarkdown(
           related
             .slice(0, 3)
-            .map((r) => '`' + r.replace(/`/g, '\\`') + '`')
+            .map((r) => '`' + escapeMarkdown(r) + '`')
             .join(', '),
         );
         if (related.length > 3) {

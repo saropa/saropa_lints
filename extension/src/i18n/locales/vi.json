@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "Quy tắc lint {total} hiện đang được cung cấp trong phiên bản này (cơ bản {essential} · khuyến nghị {recommended} · chuyên nghiệp {professional} · toàn diện {comprehensive} · cầu kỳ {pedantic} · {stylistic} tùy chọn phong cách)"
   },
+  "audit": {
+    "alreadyRunning": "Một cuộc kiểm tra đang chạy — vui lòng chờ đến khi nó kết thúc.",
+    "noProject": "Không tìm thấy dự án Dart. Mở một thư mục chứa pubspec.yaml.",
+    "missingDep": "Dự án này không phụ thuộc vào saropa_lints. Hãy thêm nó vào dev_dependencies trước.",
+    "scope": {
+      "placeholder": "Các tệp nào nên được kiểm tra?",
+      "full": "Toàn bộ dự án",
+      "fullDescription": "Kiểm tra từng tệp Dart — tùy chọn kỹ lưỡng nhất",
+      "changedVsMain": "Đã thay đổi so với main",
+      "changedVsMainDescription": "Chỉ các file khác với nhánh chính",
+      "changedPickBranch": "Đã thay đổi so với nhánh…",
+      "changedPickBranchDescription": "Chỉ các file khác với nhánh bạn chọn",
+      "compareBaseline": "So sánh với cơ sở so sánh",
+      "compareBaselineDescription": "Hiển thị những gì đã thay đổi kể từ bản sao lưu cơ sở cuối cùng",
+      "branchPrompt": "Chi nhánh để so sánh"
+    },
+    "progress": {
+      "title": "Đang chạy kiểm tra Saropa Lints...",
+      "message": "{pct}% · {scanned}/{total} tập tin · {issues} vấn đề · {file}"
+    },
+    "error": {
+      "spawnFailed": "Không thể khởi động CLI kiểm tra: {message}",
+      "invalidProject": "Cuộc kiểm tra không thể chạy được trên dự án này. {details}",
+      "parseFailed": "Cuộc kiểm tra đã hoàn tất nhưng kết quả không thể được đọc. Hãy thử chạy lại."
+    },
+    "report": {
+      "title": "Kiểm toán Saropa Lints",
+      "heading": "Báo cáo Kiểm tra",
+      "subtitle": "Kết quả {count} · {timestamp}",
+      "baselineSubtitle": "So sánh với baseline từ {date}",
+      "searchPlaceholder": "Lọc theo quy tắc, tệp hoặc thông báo…",
+      "filterTier": "Tier Tier Tier tier tier tier",
+      "filterSeverity": "Mức độ nghiêm trọng",
+      "filterImpact": "Tác động tác động Impact impact",
+      "filterBaselineStatus": "Đường cơ sở",
+      "baselineNew": "Mới",
+      "baselineUnchanged": "Không thay đổi",
+      "saveBaseline": "Lưu làm cơ sở so sánh",
+      "copyJson": "Sao chép JSON",
+      "toggleGroup": "Chuyển đổi nhóm",
+      "colFile": "File file file file File File",
+      "colLine": "Dòng Đường Đường",
+      "colRule": "Quy tắc của quy định",
+      "colSeverity": "Mức độ nghiêm trọng",
+      "colTier": "Tier Tier Tier tier tier tier",
+      "colMessage": "Thông điệp Tin nhắn Gửi tin",
+      "empty": "Không có phát hiện — dự án sạch sẽ.",
+      "filteredEmpty": "Không có kết quả nào phù hợp với bộ lọc hiện tại.",
+      "loadMore": "Hiển thị thêm",
+      "keyboardHint": "Phím mũi tên để di chuyển · Nhấn Enter để mở file · Nhấn Esc để xóa tìm kiếm",
+      "copiedJson": "Kiểm tra JSON đã được sao chép vào clipboard.",
+      "baselineSaved": "Đã lưu baseline. Các cuộc kiểm tra sau có thể so sánh với bản chụp màn hình này.",
+      "baselineSaveFailed": "Không thể lưu trữ baseline: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Quét khi Lưu",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 Quy tắc tạm dừng ({rssMb} MB)",
       "shedWarning": "⚠ {count} quy tắc cảnh báo",
-      "shedInfo": "⚡ {count} quy tắc kiểm tra"
+      "shedInfo": "⚡ {count} quy tắc kiểm tra",
+      "pressureNoShed": "⚠ Áp lực bộ nhớ ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Áp lực bộ nhớ: bình thường",
       "shedLevel1": "Áp lực bộ nhớ: {count} quy tắc mức độ nghiêm trọng thấp được áp dụng để giảm RSS",
       "shedLevel2": "Áp lực bộ nhớ: {count} quy tắc làm rơi (CẤP ĐỘ THÔNG TIN + CẢNH BÁO)",
-      "hardTripped": "Hạn mức bộ nhớ đã được vượt quá — tất cả các quy tắc không thiết yếu đã tạm dừng"
+      "hardTripped": "Hạn mức bộ nhớ đã được vượt quá — tất cả các quy tắc không thiết yếu đã tạm dừng",
+      "pressureNoShed": "Áp lực bộ nhớ được phát hiện — kích hoạt quy tắc loại bỏ trong analysis_options_custom.yaml để tự động loại bỏ các quy tắc mức độ nghiêm trọng thấp"
+    },
+    "notification": {
+      "shedDisabled": "Áp lực bộ nhớ phân tích được phát hiện (RSS {rssMb} MB, giới hạn mềm {softLimitMb} MB). Bật quy tắc loại bỏ để tự động vô hiệu hóa các quy tắc có mức độ nghiêm trọng thấp dưới áp lực.",
+      "enableButton": "Enable enable enable cho phép",
+      "learnMoreButton": "Tìm hiểu thêm Learn More",
+      "runInit": "Chạy 'dart run saropa_lints:init' để tạo analysis_options_custom.yaml, sau đó thiết lập shed_rules: true.",
+      "enabledConfirmation": "Quy tắc loại bỏ đã được kích hoạt trong analysis_options_custom.yaml. Phân tích sẽ nhận thấy sự thay đổi trong lần tải lại tiếp theo của nó."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "Phân tích không thành công. Kiểm tra đầu ra để biết chi tiết.",
       "removeRecentAria": "Remove remove loại bỏ",
       "removeRecentTitle": "Remove remove loại bỏ",
-      "bulkSelectedTpl": "đã chọn {n}"
+      "bulkSelectedTpl": "đã chọn {n}",
+      "announceSearchVerb": "Đang tìm kiếm",
+      "severitiesNoun": "cấp độ nghiêm trọng",
+      "impactsNoun": "ảnh hưởng"
     },
     "emptyState": {
       "hintAfterMessage": "Chạy phân tích Saropa Lints để tạo ra violations.json, sau đó sử dụng Refresh here hoặc mở lại bảng điều khiển này.",

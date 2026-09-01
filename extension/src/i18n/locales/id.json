@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "Aturan lint {total} saat ini tersedia dalam versi ini (esensial {essential} · direkomendasikan {recommended} · profesional {professional} · komprehensif {comprehensive} · pedantik {pedantic} · {stylistic} opt-in stilistis)"
   },
+  "audit": {
+    "alreadyRunning": "Audit sedang berjalan — tunggu hingga selesai.",
+    "noProject": "Tidak ditemukan proyek Dart. Buka folder yang mengandung pubspec.yaml.",
+    "missingDep": "Proyek ini tidak bergantung pada saropa_lints. Tambahkan terlebih dahulu ke dev_dependencies.",
+    "scope": {
+      "placeholder": "File mana yang harus ditinjau oleh audit?",
+      "full": "Proyek lengkap",
+      "fullDescription": "Audit setiap file Dart — opsi yang paling mendetail",
+      "changedVsMain": "Diubah dari vs utama",
+      "changedVsMainDescription": "Hanya file yang berbeda dari cabang utama",
+      "changedPickBranch": "Diubah vs cabang…",
+      "changedPickBranchDescription": "Hanya file yang berbeda dari cabang yang Anda pilih",
+      "compareBaseline": "Bandingkan dengan baseline",
+      "compareBaselineDescription": "Tampilkan apa yang berubah sejak snapshot basis terakhir disimpan",
+      "branchPrompt": "Cabang untuk dibandingkan"
+    },
+    "progress": {
+      "title": "Melakukan audit Saropa Lints...",
+      "message": "{pct}% · {scanned}/{total} file · {issues} issues · {file}"
+    },
+    "error": {
+      "spawnFailed": "Tidak dapat memulai audit CLI: {message}",
+      "invalidProject": "Audit tidak dapat dijalankan terhadap proyek ini. {details}",
+      "parseFailed": "Audit selesai tetapi outputnya tidak dapat dibaca. Coba jalankan kembali."
+    },
+    "report": {
+      "title": "Audit Saropa Lints",
+      "heading": "Laporan Audit",
+      "subtitle": "Temuan {count} · {timestamp}",
+      "baselineSubtitle": "Dibandingkan dengan baseline dari {date}",
+      "searchPlaceholder": "Filter berdasarkan aturan, file, atau pesan…",
+      "filterTier": "Tingkatkan tingkat keahlian Anda.",
+      "filterSeverity": "Tingkat keparahan",
+      "filterImpact": "Dampak dampak dampak dampak",
+      "filterBaselineStatus": "Dasar",
+      "baselineNew": "Baru",
+      "baselineUnchanged": "Tidak berubah",
+      "saveBaseline": "Simpan sebagai baseline",
+      "copyJson": "Salin JSON dengan cara mengkliknya.",
+      "toggleGroup": "Beralih kelompokkan",
+      "colFile": "File yang berupa file.",
+      "colLine": "Garis garis garis garis",
+      "colRule": "Peraturan Pemerintah Peraturan Negara",
+      "colSeverity": "Tingkat keparahan",
+      "colTier": "Tingkatkan tingkat keahlian Anda.",
+      "colMessage": "Pesan pesan pesan pesan.",
+      "empty": "Tidak ada temuan — proyek ini bersih.",
+      "filteredEmpty": "Tidak ada temuan yang sesuai dengan filter saat ini.",
+      "loadMore": "Tampilkan lebih banyak",
+      "keyboardHint": "Panah atas dan bawah untuk navigasi · Enter untuk membuka file · Esc untuk menghapus pencarian",
+      "copiedJson": "Audit JSON telah disalin ke clipboard.",
+      "baselineSaved": "Baseline disimpan. Audit masa depan dapat membandingkan dengan snapshot ini.",
+      "baselineSaveFailed": "Tidak dapat menyimpan baseline: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Scan saat Disimpan",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 Aturan dijeda ({rssMb} MB)",
       "shedWarning": "⚠ Aturan {count} menghilangkan",
-      "shedInfo": "⚡ Aturan {count} menghilangkan"
+      "shedInfo": "⚡ Aturan {count} menghilangkan",
+      "pressureNoShed": "⚠ Tekanan memori ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Tekanan memori: normal",
       "shedLevel1": "Tekanan memori: {count} aturan beratitas rendah yang dihapus untuk mengurangi RSS",
       "shedLevel2": "Tekanan memori: {count} aturan mengeluarkan (INFO + WARNING tingkat keparahan)",
-      "hardTripped": "Memori melebihi batas — semua aturan non-esensial dijeda"
+      "hardTripped": "Memori melebihi batas — semua aturan non-esensial dijeda",
+      "pressureNoShed": "Tekanan memori terdeteksi — aktifkan aturan pengurangan dalam analysis_options_custom.yaml untuk otomatis mengurangi aturan dengan tingkat keparahan rendah"
+    },
+    "notification": {
+      "shedDisabled": "Tekanan memori analyzer terdeteksi (RSS {rssMb} MB, batas lunak {softLimitMb} MB). Aktifkan aturan pengurangan untuk secara otomatis menonaktifkan aturan dengan tingkat keparahan rendah saat terjadi tekanan.",
+      "enableButton": "Enable mengaktifkan.",
+      "learnMoreButton": "Belajar Lebih Banyak Pelajari Lebih Banyak",
+      "runInit": "Jalankan 'dart run saropa_lints:init' untuk menghasilkan analysis_options_custom.yaml, lalu atur shed_rules: true.",
+      "enabledConfirmation": "Aturan penghapusan diaktifkan dalam analysis_options_custom.yaml. Analizer akan mendeteksi perubahan pada kali reload berikutnya."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "Analisis gagal. Periksa output untuk detail.",
       "removeRecentAria": "Remove Menghilangkan Hapus",
       "removeRecentTitle": "Remove Menghilangkan Hapus",
-      "bulkSelectedTpl": "{n} dipilih"
+      "bulkSelectedTpl": "{n} dipilih",
+      "announceSearchVerb": "Mencari",
+      "severitiesNoun": "severitas",
+      "impactsNoun": "dampak"
     },
     "emptyState": {
       "hintAfterMessage": "Jalankan analisis Saropa Lints untuk menghasilkan violations.json, lalu gunakan Refresh di sini atau buka kembali dasbor ini.",

@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "{total} लिंट नियम वर्तमान में इस संस्करण में शामिल हैं (आवश्यक {essential} · अनुशंसित {recommended} · पेशेवर {professional} · व्यापक {comprehensive} · सूक्ष्म {pedantic} · {stylistic} ऐच्छिक शैलीगत)"
   },
+  "audit": {
+    "alreadyRunning": "एक अनुमान चल रहा है - इसे खत्म होने तक इंतजार करें।",
+    "noProject": "कोई Dart प्रोजेक्ट नहीं मिला। एक pubspec.yaml वाले फोल्डर को खोलें।",
+    "missingDep": "इस प्रोजेक्ट में saropa_lints पर निर्भरता नहीं है। इसे पहले dev_dependencies में जोड़ें।",
+    "scope": {
+      "placeholder": "कौन से फ़ाइलों के अधीन आवरण होना चाहिए?",
+      "full": "पूरा प्रोजेक्ट",
+      "fullDescription": "प्रत्येक Dart फ़ाइल की जांच करें — सबसे गहरी विकल्प",
+      "changedVsMain": "परिवर्तित vs मुख्य",
+      "changedVsMainDescription": "केवल फ़ाइलें जो मुख्य श技 से अलग हैं",
+      "changedPickBranch": "ब्रांच में बदलाव…",
+      "changedPickBranchDescription": "केवल ऐसे फ़ाइल जो आप चुने वाले श",
+      "compareBaseline": "कम्पेर करें बेसलाइन के साथ",
+      "compareBaselineDescription": "पिछले सेव किए गए बेसलाइन स्नैपशॉट से क्या बदल गया है",
+      "branchPrompt": "ब्रांच को तुलना के लिए"
+    },
+    "progress": {
+      "title": "Saropa Lints आईडी जांच में...",
+      "message": "{pct}% · {scanned}/{total} फ़ाइलें · {issues} समस्याएं · {file}"
+    },
+    "error": {
+      "spawnFailed": "अप्रमाणित करने के CLI को शुरू करने में असमर्थ: {message}",
+      "invalidProject": "इस प्रोजेक्ट के खिलाफ आवर्तन चलाया नहीं जा सकता। {details}",
+      "parseFailed": "परीक्षण पूरा हो गया लेकिन इसके आउटपुट को पढ़ा नहीं सके। इसे फिर से चलाने को कोशिश करें।"
+    },
+    "report": {
+      "title": "Saropa Lints आईडी जांच",
+      "heading": "अप्रमाणित रिपोर्ट",
+      "subtitle": "{count} खोज · {timestamp}",
+      "baselineSubtitle": "{date} के मानक से तुलना में",
+      "searchPlaceholder": "नियम, फ़ाइल या संदेश के आधार पर फ़िल्टर करें…",
+      "filterTier": "Tier 1 के लिए, यह एक टियर-अप है।",
+      "filterSeverity": "गंभीरता की डिग्री।",
+      "filterImpact": "प्रभाव का असर, प्रभाव की बात।",
+      "filterBaselineStatus": "बेसलाइन",
+      "baselineNew": "नई",
+      "baselineUnchanged": "अपरिवर्तित",
+      "saveBaseline": "बेसलाइन के रूप में सेव करें",
+      "copyJson": "JSON को कॉपी करें।",
+      "toggleGroup": "स्विच ग्रुपिंग",
+      "colFile": "File फ़ाइल फाइल",
+      "colLine": "लाइन लाइन लाइन रेखा",
+      "colRule": "नियम और विनियम।",
+      "colSeverity": "गंभीरता की डिग्री।",
+      "colTier": "Tier 1 के लिए, यह एक टियर-अप है।",
+      "colMessage": "संदेश संदेश संदेश।",
+      "empty": "कोई अनुसंधान नहीं - प्रोजेक्ट स्वच्छ है।",
+      "filteredEmpty": "कोई मिलाने वाला नहीं है वर्तमान फ़िल्टर के।",
+      "loadMore": "अधिक दिखाएं",
+      "keyboardHint": "सीधे कुंजी के लिए नाविगेट · एंटर फ़ाइल खोलने के लिए · एस्क खोज साफ करने के लिए",
+      "copiedJson": "ऑडिट JSON को क्लिपबोर्ड पर कॉपी किया गया।",
+      "baselineSaved": "मूल आधार बचाया गया। भविष्य के अभियोजन इस स्नैपशॉट के खिलाफ तुलना कर सकते हैं।",
+      "baselineSaveFailed": "के आधार बनाने में असमर्थ: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: सेवा के समय स्कैन करें",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 नियम स्थगित ({rssMb} मेगाबाइट)",
       "shedWarning": "⚠ {count} नियम छोड़ें",
-      "shedInfo": "⚡ {count} नियम छोड़ें"
+      "shedInfo": "⚡ {count} नियम छोड़ें",
+      "pressureNoShed": "⚠ मेमोरी दबाव ({rssMb} मेबी)"
     },
     "tooltip": {
       "shedLevel0": "मेमोरी दबाव: सामान्य",
       "shedLevel1": "स्मृति दबाव: {count} कम गंभीर नियम छोड़कर घटाने के लिए RSS",
       "shedLevel2": "स्मृति दबाव: {count} नियम छोड़ देते हैं (सूचना + चेतावनी गंभीरता)",
-      "hardTripped": "स्मृति सीमा के अतिक्रमण — सभी अनिवार्य नियम स्थगित कर दिए गए"
+      "hardTripped": "स्मृति सीमा के अतिक्रमण — सभी अनिवार्य नियम स्थगित कर दिए गए",
+      "pressureNoShed": "मेमरी दबाव अनुमानित हुआ है — analysis_options_custom.yaml में नियम छोड़ने को सक्षम करें ताकि कम गुरुत्वपूर्ण नियम स्वचालित रूप से छोड़ दिए जाएं"
+    },
+    "notification": {
+      "shedDisabled": "एनालाइजर मेमोरी प्रेशर डिटेक्टेड (RSS {rssMb} मेगाबाइट, सॉफ्ट लिमिट {softLimitMb} मेगाबाइट)। प्रावधान नियमों को बरकरार रखने के लिए सक्षम करें ताकि दबाव के तहत कम गुणवत्ता वाले नियम ऑटोमेटिकली बंद कर दें।",
+      "enableButton": "सक्षम करें सक्षम करें",
+      "learnMoreButton": "अधिक जानें और अधिक जानें",
+      "runInit": "'dart run saropa_lints:init' चलाकर analysis_options_custom.yaml बनाएं, फिर shed_rules: true सेट करें।",
+      "enabledConfirmation": "नियम छोड़न के लिए analysis_options_custom.yaml में सक्रिय किया गया है। एनालाइजर अगली बार रीलोड के समय बदलाव को लेंगे।"
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "विश्लेषण विफल. विवरण के लिए आउटपुट की जांच करें।",
       "removeRecentAria": "Remove remove हटाना निकालना",
       "removeRecentTitle": "Remove remove हटाना निकालना",
-      "bulkSelectedTpl": "{n} चयनित"
+      "bulkSelectedTpl": "{n} चयनित",
+      "announceSearchVerb": "खोज रहे हैं",
+      "severitiesNoun": "गम्भीरता",
+      "impactsNoun": "प्रभाव डालता है"
     },
     "emptyState": {
       "hintAfterMessage": "violations.json उत्पन्न करने के लिए एक Saropa Lints विश्लेषण चलाएं, फिर यहां Refresh का उपयोग करें या इस डैशबोर्ड को पुनः खोलें।",

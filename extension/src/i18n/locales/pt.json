@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "Regras {total} de lint estão incluídas nessa versão (essencial {essential} · recomendado {recommended} · profissional {professional} · abrangente {comprehensive} · pedante {pedantic} · {stylistic} opt-in estilístico)"
   },
+  "audit": {
+    "alreadyRunning": "Uma auditoria já está em execução — aguarde até que ela termine.",
+    "noProject": "Nenhum projeto Dart encontrado. Abra uma pasta que contenha um pubspec.yaml.",
+    "missingDep": "Esse projeto não depende de saropa_lints. Adicione-o a dev_dependencies primeiro.",
+    "scope": {
+      "placeholder": "Quais arquivos a auditoria deve cobrir?",
+      "full": "Projeto completo",
+      "fullDescription": "Audite todos os arquivos Dart — a opção mais completa",
+      "changedVsMain": "Alterado vs main",
+      "changedVsMainDescription": "Apenas arquivos que diferem da branch principal",
+      "changedPickBranch": "Alterado vs branch…",
+      "changedPickBranchDescription": "Apenas arquivos que diferem de uma branch que você escolher",
+      "compareBaseline": "Comparar com a linha de base",
+      "compareBaselineDescription": "Mostrar o que mudou desde a última captura de base de salvamento",
+      "branchPrompt": "Ramal para comparar"
+    },
+    "progress": {
+      "title": "Executando análise Saropa Lints...",
+      "message": "{pct}% · {scanned}/{total} arquivos · {issues} problemas · {file}"
+    },
+    "error": {
+      "spawnFailed": "Não foi possível iniciar o CLI de auditoria: {message}",
+      "invalidProject": "A auditoria não pode ser executada neste projeto. {details}",
+      "parseFailed": "A auditoria terminou, mas sua saída não pode ser lida. Tente executá-la novamente."
+    },
+    "report": {
+      "title": "Saropa Lints Auditoria",
+      "heading": "Relatório de Auditoria",
+      "subtitle": "{count} achados · {timestamp}",
+      "baselineSubtitle": "Comparado à baseline de {date}",
+      "searchPlaceholder": "Filtrar por regra, arquivo ou mensagem…",
+      "filterTier": "A taxa de referência é Tier Tier.",
+      "filterSeverity": "Gravidade da gravidade.",
+      "filterImpact": "O impacto do impacto de impacto.",
+      "filterBaselineStatus": "Linha de base",
+      "baselineNew": "Novo",
+      "baselineUnchanged": "Inalterado",
+      "saveBaseline": "Salvar como baseline",
+      "copyJson": "Copiar o JSON.",
+      "toggleGroup": "Alternar agrupamento",
+      "colFile": "Arquivo arquivos arquivo de arquivos.",
+      "colLine": "Linha linha linha linha.",
+      "colRule": "Regra de Processo Regra do Processo",
+      "colSeverity": "Gravidade da gravidade.",
+      "colTier": "A taxa de referência é Tier Tier.",
+      "colMessage": "Mensagem de mensagem da mensagem.",
+      "empty": "Nenhum resultado encontrado — o projeto está limpo.",
+      "filteredEmpty": "Nenhum resultado corresponde aos filtros atuais.",
+      "loadMore": "Mostrar mais",
+      "keyboardHint": "Setas para navegar · Enter para abrir arquivo · Esc para limpar busca",
+      "copiedJson": "Auditoria JSON copiado para a área de transferência.",
+      "baselineSaved": "Baseline salvo. Auditorias futuras podem comparar contra esse snapshot.",
+      "baselineSaveFailed": "Não foi possível salvar a linha de base: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Escaneio ao Salvar",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 Regras pausadas ({rssMb} MB)",
       "shedWarning": "⚠ Regras {count} de análise",
-      "shedInfo": "⚡ Regras {count} de análise"
+      "shedInfo": "⚡ Regras {count} de análise",
+      "pressureNoShed": "⚠ Pressão de memória ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Pressão de memória: normal",
       "shedLevel1": "Pressão de memória: {count} regras de baixa gravidade são desativadas para reduzir RSS",
       "shedLevel2": "Pressão de memória: {count} regras lançam (gravidade INFO + WARNING)",
-      "hardTripped": "Limite de memória excedido — todas as regras não essenciais pausadas"
+      "hardTripped": "Limite de memória excedido — todas as regras não essenciais pausadas",
+      "pressureNoShed": "Pressão de memória detectada — ative a regra de descarte em analysis_options_custom.yaml para descartar automaticamente regras de baixa gravidade"
+    },
+    "notification": {
+      "shedDisabled": "Pressão de memória do analisador detectada (RSS {rssMb} MB, limite suave {softLimitMb} MB). Ative a redução de regras para desativar automaticamente regras de baixa gravidade sob pressão.",
+      "enableButton": "Ativar habilitar ativar.",
+      "learnMoreButton": "Saiba Mais Aprenda Mais.",
+      "runInit": "Execute 'dart run saropa_lints:init' para gerar analysis_options_custom.yaml, em seguida, defina shed_rules: true.",
+      "enabledConfirmation": "Regra de descarte ativada em analysis_options_custom.yaml. O analisador captará a alteração na próxima reinicialização."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "A análise falhou. Verifique a saída para obter detalhes.",
       "removeRecentAria": "Remover remover Remover Removação",
       "removeRecentTitle": "Remover remover Remover Removação",
-      "bulkSelectedTpl": "{n} selecionados"
+      "bulkSelectedTpl": "{n} selecionados",
+      "announceSearchVerb": "Buscando",
+      "severitiesNoun": "gravidades",
+      "impactsNoun": "impactos"
     },
     "emptyState": {
       "hintAfterMessage": "Execute uma análise Saropa Lints para gerar violations.json, em seguida, use Refresh aqui ou reabra este painel.",

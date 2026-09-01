@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "{total} lint regels zijn momenteel beschikbaar in deze versie (essentieel {essential} · aanbevolen {recommended} · professioneel {professional} · comprehensief {comprehensive} · pedant {pedantic} · {stylistic} opt-in stylistisch)"
   },
+  "audit": {
+    "alreadyRunning": "Een audit loopt al — wacht tot het klaar is.",
+    "noProject": "Geen Dart project gevonden. Open een map die een pubspec.yaml bevat.",
+    "missingDep": "Dit project heeft geen afhankelijkheid van saropa_lints. Voeg het eerst toe aan dev_dependencies.",
+    "scope": {
+      "placeholder": "Welke bestanden moet de audit omvatten?",
+      "full": "Volledig project",
+      "fullDescription": "Audit elk Dart bestand — de meest grondige optie",
+      "changedVsMain": "Geen wijzigingen vs hoofd",
+      "changedVsMainDescription": "Alleen bestanden die verschillen van de hoofdverzameling",
+      "changedPickBranch": "Geen vs tak…",
+      "changedPickBranchDescription": "Alleen bestanden die verschillen van een tak die je kiest",
+      "compareBaseline": "Vergelijk met baseline",
+      "compareBaselineDescription": "Toon wat veranderd is sinds de laatste opgeslagen basislijn snapshot",
+      "branchPrompt": "Branch om te vergelijken"
+    },
+    "progress": {
+      "title": "Audit Saropa Lints uitvoeren…",
+      "message": "{pct}% · {scanned}/{total} bestanden · {issues} problemen · {file}"
+    },
+    "error": {
+      "spawnFailed": "Kon de audit CLI niet starten: {message}",
+      "invalidProject": "De audit kon niet worden uitgevoerd op dit project. {details}",
+      "parseFailed": "De audit is voltooid, maar het uitvoer kon niet worden gelezen. Probeer het opnieuw te lopen."
+    },
+    "report": {
+      "title": "Saropa Lints-audit",
+      "heading": "Auditverslag",
+      "subtitle": "{count} bevindingen · {timestamp}",
+      "baselineSubtitle": "Geverdere met baseline van {date}",
+      "searchPlaceholder": "Filter op regel, bestand of bericht…",
+      "filterTier": "Tier 1 is de hoogste tier van het niveau.",
+      "filterSeverity": "De ernst van de situatie",
+      "filterImpact": "Impact impact effect van de gevolgen.",
+      "filterBaselineStatus": "Basislijn",
+      "baselineNew": "Nieuw",
+      "baselineUnchanged": "Onveranderd",
+      "saveBaseline": "Bewaar als baseline",
+      "copyJson": "JSON kopieren",
+      "toggleGroup": "Groepen in/uit schakelen",
+      "colFile": "File File File is een bestand.",
+      "colLine": "Lijn Lijnlijn Lijn",
+      "colRule": "Reglement van het reglement",
+      "colSeverity": "De ernst van de situatie",
+      "colTier": "Tier 1 is de hoogste tier van het niveau.",
+      "colMessage": "De boodschap van de boodschap is een boodschap.",
+      "empty": "Geen resultaten — het project is schoon.",
+      "filteredEmpty": "Geen resultaten matchen de huidige filters.",
+      "loadMore": "Meer tonen",
+      "keyboardHint": "Pijltoetsen om te navigeren · Enter om bestand te openen · Esc om zoekopdracht te wissen",
+      "copiedJson": "Audit JSON naar het klembord gekopieerd.",
+      "baselineSaved": "Baseline opgeslagen. Toekomstige audits kunnen dit snapshot vergelijken.",
+      "baselineSaveFailed": "Kon de baseline niet opslaan: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Scan bij opslaan",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 Regels opgeschakeld ({rssMb} MB)",
       "shedWarning": "⚠ {count} regels weergeven",
-      "shedInfo": "⚡ {count} regels weerspiegelen"
+      "shedInfo": "⚡ {count} regels weerspiegelen",
+      "pressureNoShed": "⚠ Memory druk ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Memory pressure: normaal",
       "shedLevel1": "Memory pressure: {count} lage-ernst regels worden toegepast om RSS te verminderen",
       "shedLevel2": "Memory pressure: {count} regels weergeven (INFO + WARNING ernst)",
-      "hardTripped": "Geheugenlimiet overschreden — alle niet-essentiële regels opgeschort"
+      "hardTripped": "Geheugenlimiet overschreden — alle niet-essentiële regels opgeschort",
+      "pressureNoShed": "Geheugen druk gedetecteerd — activeer regelverlies in analysis_options_custom.yaml om automatisch lage-ernst regels te verwijderen"
+    },
+    "notification": {
+      "shedDisabled": "Analyser memory pressure gedetecteerd (RSS {rssMb} MB, soft limit {softLimitMb} MB). Schakel regelverlies in om automatisch laag-zwaarheidsregels te deactiveren onder druk.",
+      "enableButton": "Enable Enable is een functie die wordt ingeschakeld door de gebruiker.",
+      "learnMoreButton": "Meer weten Leer meer Meer leren",
+      "runInit": "Voer 'dart run saropa_lints:init' uit om analysis_options_custom.yaml te genereren, daarna shed_rules: true instellen.",
+      "enabledConfirmation": "Regelverlies ingeschakeld in analysis_options_custom.yaml. De analyzer zal de wijziging opnemen bij de volgende herlaad."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "Analyse mislukt. Controleer de uitgang voor details.",
       "removeRecentAria": "Verwijderen",
       "removeRecentTitle": "Verwijderen",
-      "bulkSelectedTpl": "{n} geselecteerd"
+      "bulkSelectedTpl": "{n} geselecteerd",
+      "announceSearchVerb": "Zoeken",
+      "severitiesNoun": "zwaarheden",
+      "impactsNoun": "invloed"
     },
     "emptyState": {
       "hintAfterMessage": "Voer een Saropa Lints analyse uit om violations.json te genereren, gebruik dan Refresh hier of heropent dit dashboard.",

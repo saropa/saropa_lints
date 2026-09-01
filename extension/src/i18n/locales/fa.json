@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "قوانین پرز {total} در حال حاضر در این نسخه ارسال می شود (ضروری {essential} · {recommended} پیشنهادی · {professional} حرفه ای · {comprehensive} جامع · {pedantic} pedantic · سبک انتخابی {stylistic})"
   },
+  "audit": {
+    "alreadyRunning": "یک ا审计 در حال اجرا است — منتظر پایان آن باشید.",
+    "noProject": "هیچ پروژه Dart یافت نشد. یک پوشه که حاوی pubspec.yaml باشد را باز کنید.",
+    "missingDep": "این پروژه به saropa_lints وابسته نمی باشد. ابتدا به dev_dependencies اضافه کنید.",
+    "scope": {
+      "placeholder": "کدام فایل‌ها باید در بازرسی مورد بررسی قرار گیرند؟",
+      "full": "پروژه کامل",
+      "fullDescription": "همه Dart فایل را بررسی کنید — گزینه کامل ترین",
+      "changedVsMain": "تغییر یافته نسبت به اصلی",
+      "changedVsMainDescription": "فایل‌هایی که از شاخه اصلی متفاوت هستند",
+      "changedPickBranch": "تغییر یافته vs شاخه...",
+      "changedPickBranchDescription": "فایل‌هایی که از شاخه‌ای که انتخاب می‌کنید متفاوت هستند",
+      "compareBaseline": "مقایسه با پایه استاندارد",
+      "compareBaselineDescription": "تغییراتی که از آخرین نسخه پایه ذخیره شده تغییر کرده است نمایش دهید",
+      "branchPrompt": "فرعی که مقایسه می‌شود"
+    },
+    "progress": {
+      "title": "اجرای آudit Saropa Lints...",
+      "message": "{pct}% · {scanned}/{total} فایل · {issues} مشکل · {file}"
+    },
+    "error": {
+      "spawnFailed": "نمی تواند از ابزار CLI برای بازبینی شروع شود: {message}",
+      "invalidProject": "تحقيق قادر به اجرا نشد. {details}",
+      "parseFailed": "تحقيق تمام شد اما خروجی آن خوانده نشد. دوباره اجرا کنید."
+    },
+    "report": {
+      "title": "Saropa Lints تحلیل",
+      "heading": "گزارش بازرسی",
+      "subtitle": "یافته های {count} · {timestamp}",
+      "baselineSubtitle": "مقایسه با خط پایه از {date}",
+      "searchPlaceholder": "فیلتر کردن بر اساس قاعده، فایل یا پیام…",
+      "filterTier": "در این صورت، سطح سرمایه گذاری شما به طور کامل تحت کنترل قرار خواهد گرفت.",
+      "filterSeverity": "شدت: میزان شدید بودن",
+      "filterImpact": "تاثیرات بر اثر اثرات تأثیر",
+      "filterBaselineStatus": "بازه پایه",
+      "baselineNew": "جدید",
+      "baselineUnchanged": "غیر تغییر یافته",
+      "saveBaseline": "بازگرداندن به پایه",
+      "copyJson": "کپی JSON را کپی کنید",
+      "toggleGroup": "گروه بندی را فعال / غیر فعال کنید",
+      "colFile": "فایل های فولدر را به صورت زیر نمایش دهید:",
+      "colLine": "خط خط خط",
+      "colRule": "قاعده قانون اساسی",
+      "colSeverity": "شدت: میزان شدید بودن",
+      "colTier": "در این صورت، سطح سرمایه گذاری شما به طور کامل تحت کنترل قرار خواهد گرفت.",
+      "colMessage": "پیام پیغام پیام پیام",
+      "empty": "پروژه پاک است — چیزی پیدا نشد.",
+      "filteredEmpty": "نتیجه ای با فیلترهای موجود مطابقت ندارد.",
+      "loadMore": "نمایش بیشتر",
+      "keyboardHint": "کلیدهای سیمایی برای پیمایش · Enter برای باز کردن فایل · Esc برای پاک کردن جستجو",
+      "copiedJson": "بررسی JSON به پیش‌نویس کپی شد.",
+      "baselineSaved": "نمونه‌ی پایه ذخیره شد. تحلیل‌های آتی می‌توانند این نسخه را به عنوان یک مقایسه استفاده کنند.",
+      "baselineSaveFailed": "نمی توان پایه ی اصلی را ذخیره کرد: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: اسکن در زمان ذخیره",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 قوانین متوقف شد ({rssMb} مگابایت)",
       "shedWarning": "⚠ قواعد {count} توزیع",
-      "shedInfo": "⚡ قواعد {count} توزیع"
+      "shedInfo": "⚡ قواعد {count} توزیع",
+      "pressureNoShed": "⚠ فشار حافظه ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "فشار حافظه: نرمال",
       "shedLevel1": "فشار حافظه: قاعده های پایین سطح {count} به منظور کاهش RSS",
       "shedLevel2": "فشار حافظه: {count} قاعده شد (اهمیت + اخطار)",
-      "hardTripped": "محدودیت حافظه پر شد — تمام قوانین غیر ضروری متوقف شدند"
+      "hardTripped": "محدودیت حافظه پر شد — تمام قوانین غیر ضروری متوقف شدند",
+      "pressureNoShed": "فشار حافظه تشخیص داده شده — قاعده ریزشی را در analysis_options_custom.yaml فعال کنید تا قاعده های کم اهمیت به طور خودکار ریزش شوند"
+    },
+    "notification": {
+      "shedDisabled": "فشار حافظه تحلیلگر تشخیص داده شد (RSS {rssMb} MB، محدوده نرم {softLimitMb} MB). قاعده‌های کاهشی را فعال کنید تا در زمان فشار، قاعده‌هایی با اهمیت پایین به طور خودکار غیرفعال شوند.",
+      "enableButton": "فعال کردن enable Enable امکان پذیر ساختن",
+      "learnMoreButton": "بیشتر بدانید Learn More بیشتر بدانید",
+      "runInit": "'dart run saropa_lints:init' را اجرا کنید تا analysis_options_custom.yaml ایجاد شود، سپس shed_rules: true را تنظیم کنید.",
+      "enabledConfirmation": "قاعده پرتاب در analysis_options_custom.yaml فعال شده است. تحلیلگر تغییر را در بارگذاری بعدی خود تشخیص خواهد داد."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "تجزیه و تحلیل شکست خورده است. برای جزئیات، خروجی را بررسی کنید.",
       "removeRecentAria": "حذف remove از بین بردن",
       "removeRecentTitle": "حذف remove از بین بردن",
-      "bulkSelectedTpl": "{n} مورد انتخاب شد"
+      "bulkSelectedTpl": "{n} مورد انتخاب شد",
+      "announceSearchVerb": "جستجو کردن",
+      "severitiesNoun": "جدیت ها",
+      "impactsNoun": "تاثیر می‌گذارد"
     },
     "emptyState": {
       "hintAfterMessage": "برای تولید violations.json، یک تجزیه و تحلیل Saropa Lints را اجرا کنید، سپس از Refresh here استفاده کنید یا این داشبورد را دوباره باز کنید.",

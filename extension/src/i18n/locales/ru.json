@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "{total} правил линта в настоящее время поставляется в этой версии (основные {essential} · рекомендуемые {recommended} · профессиональные {professional} · всесторонние {comprehensive} · педантичные {pedantic} · {stylistic} опциональные стилистические)"
   },
+  "audit": {
+    "alreadyRunning": "Аудит уже запущен — подождите, пока он завершится.",
+    "noProject": "Нет проекта Dart. Откройте папку, содержащую pubspec.yaml.",
+    "missingDep": "Этот проект не зависит от saropa_lints. Добавьте его сначала в dev_dependencies.",
+    "scope": {
+      "placeholder": "Какие файлы должен охватывать аудит?",
+      "full": "Полный проект",
+      "fullDescription": "Проверяйте каждый файл Dart — наиболее тщательный вариант",
+      "changedVsMain": "Изменено по сравнению с основной",
+      "changedVsMainDescription": "Только файлы, которые отличаются от основной ветки",
+      "changedPickBranch": "Изменен vs ветка…",
+      "changedPickBranchDescription": "Только файлы, которые отличаются от ветки, которую вы выберете",
+      "compareBaseline": "Сравнить с базовой версией",
+      "compareBaselineDescription": "Показать, что изменилось с момента последней сохраненной базовой снимка",
+      "branchPrompt": "Ветка для сравнения"
+    },
+    "progress": {
+      "title": "Запуск аудита Saropa Lints…",
+      "message": "{pct}% · {scanned}/{total} файлы · {issues} ошибки · {file}"
+    },
+    "error": {
+      "spawnFailed": "Не удалось запустить аудит CLI: {message}",
+      "invalidProject": "Аудит не может выполняться по этому проекту. {details}",
+      "parseFailed": "Аудит завершен, но его вывод не удалось прочитать. Попробуйте запустить его снова."
+    },
+    "report": {
+      "title": "Saropa Lints Аудит",
+      "heading": "Отчет о проверке",
+      "subtitle": "{count} результаты · {timestamp}",
+      "baselineSubtitle": "Сравнение с базовой версией из {date}",
+      "searchPlaceholder": "Фильтровать по правилу, файлу или сообщению…",
+      "filterTier": "Tier Tier - это базовый уровень.",
+      "filterSeverity": "Тяжесть тяжести.",
+      "filterImpact": "Влияние воздействия на последствия.",
+      "filterBaselineStatus": "Бейслайн",
+      "baselineNew": "Новый",
+      "baselineUnchanged": "Неизменный",
+      "saveBaseline": "Сохранить как базовый уровень",
+      "copyJson": "Копируйте JSON.",
+      "toggleGroup": "Переключить группировку",
+      "colFile": "Файл файла файловой файл",
+      "colLine": "Линия, линия, линия.",
+      "colRule": "Статья Статья",
+      "colSeverity": "Тяжесть тяжести.",
+      "colTier": "Tier Tier - это базовый уровень.",
+      "colMessage": "Сообщение сообщения Послание.",
+      "empty": "Нет результатов — проект чистый.",
+      "filteredEmpty": "Нет совпадений с текущими фильтрами.",
+      "loadMore": "Показать больше",
+      "keyboardHint": "Стрелки вверх и вниз для навигации · Enter для открытия файла · Esc для очистки поиска",
+      "copiedJson": "Аудит JSON скопирован в буфер обмена.",
+      "baselineSaved": "Базовая точка сохранена. Будущие аудиты могут сравнивать её с этим снимком.",
+      "baselineSaveFailed": "Не удалось сохранить базовую версию: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Сканирование при сохранении",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 Правила приостановлены ({rssMb} МБ)",
       "shedWarning": "⚠ {count} правила устраняют",
-      "shedInfo": "⚡ {count} правила отбрасывают"
+      "shedInfo": "⚡ {count} правила отбрасывают",
+      "pressureNoShed": "⚠ Напряжение памяти ({rssMb} МБ)"
     },
     "tooltip": {
       "shedLevel0": "Напряжение памяти: нормальное",
       "shedLevel1": "Напряжение памяти: {count} правила низкой серьёзности устранены для снижения RSS",
       "shedLevel2": "Напряжение памяти: {count} правил выдают (INFO + WARNING уровень серьёзности)",
-      "hardTripped": "Память превышена — все необязательные правила приостановлены"
+      "hardTripped": "Память превышена — все необязательные правила приостановлены",
+      "pressureNoShed": "Обнаружено давление на память — включите правило сброса в analysis_options_custom.yaml для автоматического сброса правил низкой серьезности"
+    },
+    "notification": {
+      "shedDisabled": "Обнаружено давление на память анализатора (RSS {rssMb} МБ, мягкий лимит {softLimitMb} МБ). Включите правило сброса, чтобы автоматически отключать правила низкой важности при давлении.",
+      "enableButton": "Enable - включить.",
+      "learnMoreButton": "Узнайте больше узнайте больше",
+      "runInit": "Запустите 'dart run saropa_lints:init', чтобы сгенерировать analysis_options_custom.yaml, затем установите shed_rules: true.",
+      "enabledConfirmation": "Правило сброса включено в analysis_options_custom.yaml. Анализатор захватит изменения при следующем перезагрузке."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "Анализ не удался. Проверьте выход для деталей.",
       "removeRecentAria": "Удалить удалить убрать",
       "removeRecentTitle": "Удалить удалить убрать",
-      "bulkSelectedTpl": "{n} выбрано"
+      "bulkSelectedTpl": "{n} выбрано",
+      "announceSearchVerb": "Поиск",
+      "severitiesNoun": "серьёзность",
+      "impactsNoun": "влияет"
     },
     "emptyState": {
       "hintAfterMessage": "Запустите Saropa Lints анализ, чтобы сгенерировать violations.json, затем используйте обновление здесь или снова открыть эту панель.",

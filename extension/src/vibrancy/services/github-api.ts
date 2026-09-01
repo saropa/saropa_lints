@@ -23,6 +23,15 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 /** Sentinel value when no issue/PR has ever been closed in the repo. */
 const NO_CLOSE_DAYS = 999;
 
+/** Check whether a URL points to github.com via parsed hostname, not substring. */
+export function isGitHubUrl(url: string): boolean {
+    try {
+        const host = new URL(url).hostname;
+        // Exact match or subdomain — rejects lookalikes like evilgithub.com
+        return host === 'github.com' || host.endsWith('.github.com');
+    } catch { return false; }
+}
+
 /** Extract owner/repo from a GitHub URL. */
 export function extractGitHubRepo(
     repoUrl: string,

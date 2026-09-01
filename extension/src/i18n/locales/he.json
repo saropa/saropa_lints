@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "חוקי לינט {total} נמצאים כרגע בגרסה זו (חובה {essential} · מומלץ {recommended} · מקצועית {professional} · מפורט {comprehensive} · פדנטי {pedantic} · {stylistic} בחירה חופשית סגנון)"
   },
+  "audit": {
+    "alreadyRunning": "בדיקה כבר בדיקה — חכו לסיומה.",
+    "noProject": "לא נמצאו פרויקטים Dart. פתח תיקייה שמכילה pubspec.yaml.",
+    "missingDep": "הפרויקט הזה לא תלוי בsaropa_lints. הוסף אותו לdev_dependencies תחילה.",
+    "scope": {
+      "placeholder": "אילו קבצים צריך לשקול בבדיקה?",
+      "full": "פרויקט מלא",
+      "fullDescription": "הערכה של כל קובץ Dart — האופציה היקרה ביותר",
+      "changedVsMain": "שונה מ-main",
+      "changedVsMainDescription": "רק קבצים שמתאימים ל分歧 מהענף הראשי",
+      "changedPickBranch": "שינה את ה-vs ל一支…",
+      "changedPickBranchDescription": "רק קבצים שמתאימים ל一支 you choose",
+      "compareBaseline": "השוואה לנקודת ההתחלה",
+      "compareBaselineDescription": "הצגת מה השתנה מאז ה-snapsot של הבסיס האחרון שנמרח韬",
+      "branchPrompt": "שעלה להשוואה"
+    },
+    "progress": {
+      "title": "מבצע בדיקה Saropa Lints...",
+      "message": "{pct}% · {scanned}/{total} קבצים · {issues} בעיות · {file}"
+    },
+    "error": {
+      "spawnFailed": "לא ניתן להתחיל את CLI המراجعة: {message}",
+      "invalidProject": "האודיט לא יכול לרוץ על פרויקט זה. {details}",
+      "parseFailed": "האודיט הסתיים אך הפלט שלו לא ניתן לקרוא. נסה לרוץ אותו שוב."
+    },
+    "report": {
+      "title": "הערכה Saropa Lints",
+      "heading": "דוח ביקורת",
+      "subtitle": "ממצאים {count} · {timestamp}",
+      "baselineSubtitle": "ביחס לשורה בסיסית מ{date}",
+      "searchPlaceholder": "סנן לפי כלל, קובץ או הודעה…",
+      "filterTier": "רמת התוספת: Tier Tier",
+      "filterSeverity": "חומרת החמורות",
+      "filterImpact": "השפעה על ההשפעה Impact impact",
+      "filterBaselineStatus": "בסיסי",
+      "baselineNew": "חדש",
+      "baselineUnchanged": "לא השתנה",
+      "saveBaseline": "שמור כבסיס מرجع",
+      "copyJson": "העתק את JSON.",
+      "toggleGroup": "החלפת קבוצת קבצים",
+      "colFile": "קובץ קבצים File File",
+      "colLine": "קו קו שורה שורה",
+      "colRule": "חוקי בית סעיף",
+      "colSeverity": "חומרת החמורות",
+      "colTier": "רמת התוספת: Tier Tier",
+      "colMessage": "הודעה מסר הודעת",
+      "empty": "אין תוצאות — הפרויקט נקי.",
+      "filteredEmpty": "אין תוצאות התאימות למסננים הנוכחיים.",
+      "loadMore": "הצג יותר",
+      "keyboardHint": "מקשי החץ כדי לנוע · לחיצה על Enter כדי לפתוח קובץ · לחיצה על Esc כדי לנקות חיפוש",
+      "copiedJson": "האודיט JSON הועתק ללוח ה메모יריה.",
+      "baselineSaved": "השכלה נשמרה. בדיקות עתידיות יכולות להשוות לשקף זה.",
+      "baselineSaveFailed": "לא ניתן לשמור את הבסיס: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: ס캔 בעת שמירה",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 הכללים עוצרים ({rssMb} מ\"ב)",
       "shedWarning": "⚠ סלילים {count} שמים",
-      "shedInfo": "⚡ סלילים {count} שומרים על"
+      "shedInfo": "⚡ סלילים {count} שומרים על",
+      "pressureNoShed": "⚠ לחץ זיכרון ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "לחץ הזיכרון: נורמלי",
       "shedLevel1": "לחץ זיכרון: {count} правила נמוך-דרוג שוררים לลด RSS",
       "shedLevel2": "לחץ זיכרון: {count} правила שורש (דרוג אינפורמציה + אזהרה)",
-      "hardTripped": "лимיט זיכרון מוגזם — כל כללי לא חובה נעצרו"
+      "hardTripped": "лимיט זיכרון מוגזם — כל כללי לא חובה נעצרו",
+      "pressureNoShed": "לחץ זיכרון détected — הפעל כלל הזרימה ב analysis_options_custom.yaml כדי לזרום אוטומטית правила נמוך-דרגה"
+    },
+    "notification": {
+      "shedDisabled": "הערכה של לחץ הזיכרון détected (RSS {rssMb} MB, גבול רך {softLimitMb} MB). הפעל שיקול תקינות כדי להשבית אוטומטית правила נמוך-דרגה תחת לחץ.",
+      "enableButton": "Enable enable אפשר את הפעלת",
+      "learnMoreButton": "למד עוד לומד יותר",
+      "runInit": "הרץ \"dart run saropa_lints:init\" כדי ליצור analysis_options_custom.yaml, ואז установите shed_rules: true.",
+      "enabledConfirmation": "חוקי הזרימה הופעלו ב-analysis_options_custom.yaml. האנליטיקס יקלוט את השינוי בטעינתו הבאה."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "ניתוח נכשל. בדוק את היציאה לפרטים.",
       "removeRecentAria": "הסר את הוצאתו של Remove remove",
       "removeRecentTitle": "הסר את הוצאתו של Remove remove",
-      "bulkSelectedTpl": "{n} נבחרו"
+      "bulkSelectedTpl": "{n} נבחרו",
+      "announceSearchVerb": "מחפש",
+      "severitiesNoun": "שיטיות",
+      "impactsNoun": "השפעות"
     },
     "emptyState": {
       "hintAfterMessage": "רץ ניתוח Saropa Lints כדי לייצר violations.json, ואז להשתמש Refresh כאן או לפתוח מחדש את לוח המחוונים.",

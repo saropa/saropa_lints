@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "Regole {total} di lint attualmente presenti in questa versione (essenziali {essential} · consigliate {recommended} · professionali {professional} · complete {comprehensive} · pedanti {pedantic} · {stylistic} stili opt-in)"
   },
+  "audit": {
+    "alreadyRunning": "Un'audit è già in corso — attendi che termini.",
+    "noProject": "Nessun progetto Dart trovato. Apri una cartella che contenga un pubspec.yaml.",
+    "missingDep": "Questo progetto non dipende da saropa_lints. Aggiungilo prima a dev_dependencies.",
+    "scope": {
+      "placeholder": "Quale file dovrebbe coprire l'audit?",
+      "full": "Progetto completo",
+      "fullDescription": "Audit ogni file Dart — l'opzione più completa",
+      "changedVsMain": "Modificato vs main",
+      "changedVsMainDescription": "Solo i file che differiscono dalla branch principale",
+      "changedPickBranch": "Modificato vs ramo…",
+      "changedPickBranchDescription": "Solo file che differiscono da una ramo che scegli.",
+      "compareBaseline": "Confronta con la baseline",
+      "compareBaselineDescription": "Mostra cosa è cambiato da ultima snapshot di baseline salvata",
+      "branchPrompt": "Ramificazione da confrontare"
+    },
+    "progress": {
+      "title": "Esecuzione audit Saropa Lints...",
+      "message": "{pct}% · {scanned}/{total} file · {issues} problemi · {file}"
+    },
+    "error": {
+      "spawnFailed": "Non è stato possibile avviare l'audit CLI: {message}",
+      "invalidProject": "L'audit non può essere eseguito su questo progetto. {details}",
+      "parseFailed": "L'audit è terminato ma non è stato possibile leggere l'output. Prova a eseguirlo nuovamente."
+    },
+    "report": {
+      "title": "Saropa Lints Controllo",
+      "heading": "Rapporto di Audit",
+      "subtitle": "{count} finding · {timestamp}",
+      "baselineSubtitle": "Confronto con la baseline da {date}",
+      "searchPlaceholder": "Filtrare per regola, file o messaggio…",
+      "filterTier": "Il Tier 1 è il livello di garanzia.",
+      "filterSeverity": "Gravità della gravità.",
+      "filterImpact": "L'impatto dell'impatte impatto impatto.",
+      "filterBaselineStatus": "Linea di base",
+      "baselineNew": "Nuovo",
+      "baselineUnchanged": "Invariato",
+      "saveBaseline": "Salva come baseline",
+      "copyJson": "Copia JSON.",
+      "toggleGroup": "Attiva/disattiva gruppo",
+      "colFile": "File",
+      "colLine": "Linea Linea Linea Linea",
+      "colRule": "Regolamento Regola.",
+      "colSeverity": "Gravità della gravità.",
+      "colTier": "Il Tier 1 è il livello di garanzia.",
+      "colMessage": "Messaggio di messaggio di messaggio.",
+      "empty": "Nessun risultato — il progetto è pulito.",
+      "filteredEmpty": "Nessun risultato corrisponde ai filtri attuali.",
+      "loadMore": "Mostra di più",
+      "keyboardHint": "Freccia su e giù per navigare · Invio per aprire il file · Esc per cancellare la ricerca",
+      "copiedJson": "Audit JSON copiato negli appunti.",
+      "baselineSaved": "Baseline salvato. Future audit possono confrontarsi con questa snapshot.",
+      "baselineSaveFailed": "Non è stato possibile salvare la baseline: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Scansiona al salvataggio",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 Regole sospese ({rssMb} MB)",
       "shedWarning": "⚠ Regole {count} severe",
-      "shedInfo": "⚡ Regole {count} di analisi"
+      "shedInfo": "⚡ Regole {count} di analisi",
+      "pressureNoShed": "⚠ Pressione della memoria ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Pressione della memoria: normale",
       "shedLevel1": "Pressione della memoria: {count} regole a bassa gravità rimosse per ridurre RSS",
       "shedLevel2": "Pressione della memoria: {count} regole generano avvisi (gravità INFO + WARNING)",
-      "hardTripped": "Limite della memoria superato — tutte le regole non essenziali sospese"
+      "hardTripped": "Limite della memoria superato — tutte le regole non essenziali sospese",
+      "pressureNoShed": "Pressione della memoria rilevata — abilita la regola di riduzione in analysis_options_custom.yaml per ridurre automaticamente le regole a bassa gravità"
+    },
+    "notification": {
+      "shedDisabled": "Pressione della memoria dell'analizzatore rilevata (RSS {rssMb} MB, limite morbido {softLimitMb} MB). Abilita la riduzione delle regole per disabilitare automaticamente le regole a bassa gravità sotto pressione.",
+      "enableButton": "Abilitare abilitare",
+      "learnMoreButton": "Impara di più Scopri di più",
+      "runInit": "Esegui 'dart run saropa_lints:init' per generare analysis_options_custom.yaml, quindi imposta shed_rules: true.",
+      "enabledConfirmation": "Regola di rimozione abilitata in analysis_options_custom.yaml. L'analizzatore rileverà il cambiamento nel prossimo caricamento."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "Analisi fallita. Controlla l'output per i dettagli.",
       "removeRecentAria": "Rimuovere RemoveRimovi rimuovendo",
       "removeRecentTitle": "Rimuovere RemoveRimovi rimuovendo",
-      "bulkSelectedTpl": "{n} selezionati"
+      "bulkSelectedTpl": "{n} selezionati",
+      "announceSearchVerb": "Ricerca",
+      "severitiesNoun": "gravità",
+      "impactsNoun": "impatto"
     },
     "emptyState": {
       "hintAfterMessage": "Eseguire un'analisi Saropa Lints per generare violations.json, quindi utilizzare Refresh qui o riaprire questa dashboard.",

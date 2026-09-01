@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "{total} Lint-Regeln sind in dieser Version enthalten (essentiell {essential} · empfohlen {recommended} · professionell {professional} · umfassend {comprehensive} · pedantisch {pedantic} · {stylistic} opt-in stylistisch)"
   },
+  "audit": {
+    "alreadyRunning": "Eine Audite wird bereits ausgeführt — warten Sie, bis es fertig ist.",
+    "noProject": "Kein Dart Projekt gefunden. Öffnen Sie ein Verzeichnis, das ein pubspec.yaml enthält.",
+    "missingDep": "Dieses Projekt hängt nicht von saropa_lints ab. Fügen Sie es zunächst in dev_dependencies hinzu.",
+    "scope": {
+      "placeholder": "Welche Dateien sollte die Auditeinschätzung umfassen?",
+      "full": "Vollständiger Projektstatus",
+      "fullDescription": "Auditieren Sie jede Dart-Datei — die umfassendste Option",
+      "changedVsMain": "Geändert vs Haupt",
+      "changedVsMainDescription": "Nur Dateien, die sich von der Hauptverzweigung unterscheiden",
+      "changedPickBranch": "Geändert vs. Branch…",
+      "changedPickBranchDescription": "Nur Dateien, die sich von einer von Ihnen ausgewählten Branch unterscheiden",
+      "compareBaseline": "Vergleichen mit der Baseline",
+      "compareBaselineDescription": "Zeige, was seit der letzten gespeicherten Baselinesnapshot geändert wurde",
+      "branchPrompt": "Verzweigung zum Vergleich"
+    },
+    "progress": {
+      "title": "Saropa Lints Audit ausführen…",
+      "message": "{pct}% · {scanned}/{total} Dateien · {issues} Probleme · {file}"
+    },
+    "error": {
+      "spawnFailed": "Kann den Audit CLI nicht starten: {message}",
+      "invalidProject": "Die Auditierung konnte nicht gegen dieses Projekt durchgeführt werden. {details}",
+      "parseFailed": "Die Auditierung ist abgeschlossen, aber ihr Ausgabe konnte nicht gelesen werden. Versuchen Sie es erneut."
+    },
+    "report": {
+      "title": "Saropa Lints Audit",
+      "heading": "Auditbericht",
+      "subtitle": "{count}-Ergebnisse · {timestamp}",
+      "baselineSubtitle": "Im Vergleich zur Baseline von {date}",
+      "searchPlaceholder": "Nach Regeln, Dateien oder Nachrichten filtern…",
+      "filterTier": "Tier 1 ist ein Tier-Tier.",
+      "filterSeverity": "Schwere der Erkrankung",
+      "filterImpact": "Die Auswirkungen der Wirkung Impact Impact.",
+      "filterBaselineStatus": "Grundlinie",
+      "baselineNew": "Neu",
+      "baselineUnchanged": "Unverändert",
+      "saveBaseline": "Als Baseline speichern",
+      "copyJson": "Kopieren Sie JSON.",
+      "toggleGroup": "Gruppierung umschalten",
+      "colFile": "Dateien-Datei-Datein - Die Datei ist eine Datei.",
+      "colLine": "Linie Linie Line Line Line Die Linie",
+      "colRule": "Artikel Regel Regeln",
+      "colSeverity": "Schwere der Erkrankung",
+      "colTier": "Tier 1 ist ein Tier-Tier.",
+      "colMessage": "Die Botschaft ist eine Nachricht.",
+      "empty": "Keine Ergebnisse — das Projekt ist sauber.",
+      "filteredEmpty": "Keine Ergebnisse passen zu den aktuellen Filtern.",
+      "loadMore": "Mehr anzeigen",
+      "keyboardHint": "Pfeiltasten zum Navigieren · Enter, um Datei zu öffnen · Esc, um Suche zu löschen",
+      "copiedJson": "Audit JSON in die Zwischenablage kopiert.",
+      "baselineSaved": "Baseline gespeichert. Zukünftige Audits können dieses Snapshot vergleichen.",
+      "baselineSaveFailed": "Konnte die Baseline nicht speichern: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Scan bei Speicherung",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 Regeln pausiert ({rssMb} MB)",
       "shedWarning": "⚠ {count} Regeln werden ausgewertet",
-      "shedInfo": "⚡ {count} Regeln für die Ausgabe"
+      "shedInfo": "⚡ {count} Regeln für die Ausgabe",
+      "pressureNoShed": "⚠ Speicherdruck ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Speicherpressure: normal",
       "shedLevel1": "Speicherpressure: {count} niedrigschwere Regeln zur Reduzierung von RSS",
       "shedLevel2": "Speicherpressure: {count} Regeln werfen (INFO + WARNING Schweregrad)",
-      "hardTripped": "Speicherlimit überschritten — alle nicht notwendigen Regeln pausiert"
+      "hardTripped": "Speicherlimit überschritten — alle nicht notwendigen Regeln pausiert",
+      "pressureNoShed": "Speicherdruck erkannt — aktivieren Sie die Regelabbau-Funktion in analysis_options_custom.yaml, um Regeln mit geringer Schweregrad automatisch abzubauen"
+    },
+    "notification": {
+      "shedDisabled": "Analyser-Speicherdruck erkannt (RSS {rssMb} MB, weicher Grenzwert {softLimitMb} MB). Aktivieren Sie die Regelabbau-Funktion, um unter Druck automatisch Regeln mit niedriger Schweregrad zu deaktivieren.",
+      "enableButton": "Aktivieren Enable aktivieren",
+      "learnMoreButton": "Erfahren Sie mehr erfahren Sie Mehr",
+      "runInit": "Führe 'dart run saropa_lints:init' aus, um analysis_options_custom.yaml zu generieren, dann setze shed_rules: true.",
+      "enabledConfirmation": "Regelabbau aktiviert in analysis_options_custom.yaml. Der Analyser wird den Änderung beim nächsten Neuladen aufnehmen."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "Die Analyse ist fehlgeschlagen. Überprüfen Sie die Ausgabe für Details.",
       "removeRecentAria": "Entfernen Sie entfernen Entferne",
       "removeRecentTitle": "Entfernen Sie entfernen Entferne",
-      "bulkSelectedTpl": "{n} ausgewählt"
+      "bulkSelectedTpl": "{n} ausgewählt",
+      "announceSearchVerb": "Suche",
+      "severitiesNoun": "Schweregrade",
+      "impactsNoun": "beeinflusst"
     },
     "emptyState": {
       "hintAfterMessage": "Führen Sie eine Saropa Lints-Analyse aus, um violations.json zu generieren, und verwenden Sie dann Refresh hier oder öffnen Sie dieses Dashboard erneut.",

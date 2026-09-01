@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "قواعد {total} lint تُوزع حاليًا في هذه الإصدار (الأساسية {essential} · الموصى بها {recommended} · المهنية {professional} · الشاملة {comprehensive} · الصارمة {pedantic} · {stylistic} المُفعَّلة اختياريًا من حيث الأسلوب)"
   },
+  "audit": {
+    "alreadyRunning": "مراجعة تُجرى بالفعل — انتظر حتى تنتهي.",
+    "noProject": "لم يتم العثور على مشروع Dart. افتح مجلدًا يحتوي على pubspec.yaml.",
+    "missingDep": "هذا المشروع لا يعتمد على saropa_lints. أضفه إلى dev_dependencies أولاً.",
+    "scope": {
+      "placeholder": "أي ملفات يجب أن تشملها الفحص؟",
+      "full": "مشروع كامل",
+      "fullDescription": "مراجعة كل ملف Dart — الخيار الأكثر دقة",
+      "changedVsMain": "تم التغيير مقارنة بالرئيسي",
+      "changedVsMainDescription": "الملفات فقط التي تختلف عن الفرع الرئيسي",
+      "changedPickBranch": "تم تغيير vs فرع…",
+      "changedPickBranchDescription": "الملفات فقط التي تختلف عن一支 فرعك الذي تختاره",
+      "compareBaseline": "مقارنة مع الأساسيات",
+      "compareBaselineDescription": "покажи ما تغير منذ آخر لقطة استنادية محفوظة",
+      "branchPrompt": "فرع لمقارنة عليه"
+    },
+    "progress": {
+      "title": "التحقق من Saropa Lints...",
+      "message": "{pct}% · {scanned}/{total} ملفات · {issues} مسائل · {file}"
+    },
+    "error": {
+      "spawnFailed": "لم يتم البدء بالفحص CLI: {message}",
+      "invalidProject": "لم يتم القدرة على تشغيل المراجعة ضد هذا المشروع. {details}",
+      "parseFailed": "التحقيق انتهى لكن لم يتم القدرة على قراءة مخرجاته. جرّب تشغيله مرة أخرى."
+    },
+    "report": {
+      "title": "مراجعة Saropa Lints",
+      "heading": "تقرير المراجعة",
+      "subtitle": "نتائج {count} · {timestamp}",
+      "baselineSubtitle": "مقارنة مع الأساس من {date}",
+      "searchPlaceholder": "فلتر حسب القاعدة، الملف، أو الرسالة…",
+      "filterTier": "الدرجة الأولى: مستوى الأساسية Tier tier.",
+      "filterSeverity": "شدة الحالة:",
+      "filterImpact": "تأثير التأثير Impact impact",
+      "filterBaselineStatus": "الأساسية",
+      "baselineNew": "جديد",
+      "baselineUnchanged": "غير مُغيّر",
+      "saveBaseline": "احفظ كأساس مقارنة",
+      "copyJson": "نسخ JSON إلى النسخة.",
+      "toggleGroup": "التبديل بين التجميع",
+      "colFile": "ملفات الملفات File file",
+      "colLine": "خط خط خط",
+      "colRule": "قاعدة قانونية القواعد",
+      "colSeverity": "شدة الحالة:",
+      "colTier": "الدرجة الأولى: مستوى الأساسية Tier tier.",
+      "colMessage": "رسالة الرسالة الرسالية",
+      "empty": "لا توجد نتائج — المشروع نظيف.",
+      "filteredEmpty": "لا توجد نتائج تطابق bộ lọc الحالي.",
+      "loadMore": "покажи больше",
+      "keyboardHint": "مفاتيح السهم للتنقل · إدخال لفتح الملف · إس كيو تي لمسح البحث",
+      "copiedJson": "مراجعة JSON تم نسخها إلى الحافظة.",
+      "baselineSaved": "تم حفظ المعايير الأساسية. يمكن للمراجعة المستقبلية مقارنة هذا المقطع معه.",
+      "baselineSaveFailed": "لم يتم حفظ القاعدة الأساسية: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: التحقق عند الحفظ",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 قواعد متوقفة ({rssMb} ميغا بايت)",
       "shedWarning": "⚠ قواعد {count} تُلغي",
-      "shedInfo": "⚡ قواعد {count} تُلغي"
+      "shedInfo": "⚡ قواعد {count} تُلغي",
+      "pressureNoShed": "⚠ ضغط الذاكرة ({rssMb} ميغابايت)"
     },
     "tooltip": {
       "shedLevel0": "الضغط على الذاكرة: طبيعي",
       "shedLevel1": "الضغط على الذاكرة: {count} قواعد منخفضة الأهمية تُطرح لخفض RSS",
       "shedLevel2": "الضغط على الذاكرة: {count} قواعد تُلغي (مستوى المعلومات + تحذير)",
-      "hardTripped": "الحد الأقصى للذاكرة تم تجاوزه — تم تعطيل جميع القواعد غير الضرورية"
+      "hardTripped": "الحد الأقصى للذاكرة تم تجاوزه — تم تعطيل جميع القواعد غير الضرورية",
+      "pressureNoShed": "تم اكتشاف ضغط الذاكرة — تفعيل قاعدة التخلص من القواعد في analysis_options_custom.yaml لتخليص القواعد ذات الدرجة المنخفضة تلقائيًا"
+    },
+    "notification": {
+      "shedDisabled": "تم اكتشاف ضغط ذاكرة المُحلِّل (RSS {rssMb} ميغابايت، الحد الأدنى {softLimitMb} ميغابايت). تفعيل قواعد التخفيض تلقائيًا لتعطيل القواعد ذات الدرجة المنخفضة تحت الضغط.",
+      "enableButton": "تمكين Enable تمكين",
+      "learnMoreButton": "تعلم المزيد تعرّف على المزيد",
+      "runInit": "أعد تشغيل \"dart run saropa_lints:init\" لإنشاء analysis_options_custom.yaml، ثم قم بتعيين shed_rules: true.",
+      "enabledConfirmation": "القاعدة المُعلقة مُفعّلة في analysis_options_custom.yaml. سيقوم المُحلّل بتطبيق التغيير في إعادة التحميل التالية."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "فشل التحليل. تحقق من المخرج للحصول على التفاصيل.",
       "removeRecentAria": "إزالة Remove إزالت remove",
       "removeRecentTitle": "إزالة Remove إزالت remove",
-      "bulkSelectedTpl": "تم تحديد {n}"
+      "bulkSelectedTpl": "تم تحديد {n}",
+      "announceSearchVerb": "البحث",
+      "severitiesNoun": "الدرجات",
+      "impactsNoun": "تأثيرات"
     },
     "emptyState": {
       "hintAfterMessage": "قم بتشغيل تحليل Saropa Lints لتوليد violations.json ، ثم استخدم \"تحديث هنا\" أو إعادة فتح لوحة التحكم هذه.",

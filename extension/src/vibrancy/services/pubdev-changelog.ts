@@ -62,21 +62,57 @@ export function parseChangelogHtml(html: string): string | null {
     return lines.length > 0 ? lines.join('\n') : null;
 }
 
-function extractVersionFromHeading(html: string): string | null {
-    const text = html.replace(/<[^>]+>/g, '').trim();
-    const match = text.match(/(\d+\.\d+\.\d+)/);
-    return match ? match[1] : null;
+/**
+ * Strip all HTML tags from a string, looping until no angle-bracket
+ * fragments remain (handles malformed / nested markup that a single
+ * pass would miss — CodeQL alert #3).
+ */
+/**
+ * Max iterations for the tag-stripping loop — guards against pathological
+ * input that keeps producing new angle-bracket sequences.
+ */
+const MAX_STRIP_PASSES = 10;
+
+function stripHtmlTags(html: string): string {
+    let result = html;
+    let prev: string;
+    let passes = 0;
+    do {
+        prev = result;
+        result = result.replace(/<[^>]*>/g, '');
+        passes++;
+    } while (result !== prev && passes < MAX_STRIP_PASSES);
+    // Remove any orphaned angle brackets left after all passes
+    return result.replace(/[<>]/g, '');
 }
 
-function htmlBodyToMarkdown(html: string): string {
-    return html
-        .replace(/<li[^>]*>/gi, '- ')
-        .replace(/<\/li>/gi, '\n')
-        .replace(/<br\s*\/?>/gi, '\n')
-        .replace(/<[^>]+>/g, '')
+/**
+ * Decode HTML entities in a single pass.  Runs AFTER tag stripping so
+ * there is no double-unescape risk (CodeQL alert #5): an encoded
+ * entity like `&amp;lt;` stays as the literal text `&lt;` because the
+ * `&amp;` decode yields `&` and no second pass re-processes `&lt;`.
+ */
+function decodeHtmlEntities(text: string): string {
+    return text
         .replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>')
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'");
+}
+
+function extractVersionFromHeading(html: string): string | null {
+    const text = stripHtmlTags(html).trim();
+    const match = text.match(/(\d+\.\d+\.\d+)/);
+    return match ? match[1] : null;
+}
+
+function htmlBodyToMarkdown(html: string): string {
+    // Convert structural elements to markdown before stripping remaining tags
+    const structured = html
+        .replace(/<li[^>]*>/gi, '- ')
+        .replace(/<\/li>/gi, '\n')
+        .replace(/<br\s*\/?>/gi, '\n');
+    // Strip tags first, then decode entities (never the reverse — avoids double-unescape)
+    return decodeHtmlEntities(stripHtmlTags(structured));
 }

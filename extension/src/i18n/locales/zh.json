@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "{total} 条 lint 规则目前包含在此版本中（基础 {essential} · 推荐 {recommended} · 专业 {professional} · 全面 {comprehensive} · 严谨 {pedantic} · {stylistic} 风格化选项）"
   },
+  "audit": {
+    "alreadyRunning": "已有一个审计正在运行 —— 请等待其完成。",
+    "noProject": "未找到 Dart 项目。打开包含 pubspec.yaml 的文件夹。",
+    "missingDep": "此项目不依赖saropa_lints。请先将其添加到dev_dependencies中。",
+    "scope": {
+      "placeholder": "应审计哪些文件？",
+      "full": "完整项目",
+      "fullDescription": "审计每一个 Dart 文件 —— 最彻底的选项",
+      "changedVsMain": "已更改 vs 主分支",
+      "changedVsMainDescription": "仅与主分支不同的文件",
+      "changedPickBranch": "已更改 vs 分支…",
+      "changedPickBranchDescription": "只有与您选择的分支不同的文件",
+      "compareBaseline": "与基线对比",
+      "compareBaselineDescription": "显示自上次保存基线快照以来发生了哪些变化",
+      "branchPrompt": "要比较的分支"
+    },
+    "progress": {
+      "title": "正在运行 Saropa Lints 审计…",
+      "message": "{pct}% · {scanned}/{total} 个文件 · {issues} 个问题 · {file}"
+    },
+    "error": {
+      "spawnFailed": "无法启动审计 CLI：{message}",
+      "invalidProject": "该审计无法针对此项目运行。{details}",
+      "parseFailed": "审计已完成，但无法读取其输出。请尝试重新运行。"
+    },
+    "report": {
+      "title": "Saropa Lints 审计",
+      "heading": "审计报告",
+      "subtitle": "{count} 结果 · {timestamp}",
+      "baselineSubtitle": "与{date}基线相比",
+      "searchPlaceholder": "按规则、文件或消息筛选…",
+      "filterTier": "资本级别的其他类型",
+      "filterSeverity": "严重程度的严重性",
+      "filterImpact": "影响力的影响力冲击.",
+      "filterBaselineStatus": "基线",
+      "baselineNew": "新",
+      "baselineUnchanged": "未更改",
+      "saveBaseline": "保存为基线",
+      "copyJson": "复制JSON,然后使用它.",
+      "toggleGroup": "切换分组",
+      "colFile": "文件的档案,是我们所拥有的.",
+      "colLine": "线条 线路 线上",
+      "colRule": "规则 规章制度 在",
+      "colSeverity": "严重程度的严重性",
+      "colTier": "资本级别的其他类型",
+      "colMessage": "信息的消息是什么?",
+      "empty": "没有发现结果 — 项目干净。",
+      "filteredEmpty": "当前筛选条件没有匹配的结果。",
+      "loadMore": "显示更多",
+      "keyboardHint": "方向键导航 · 回车打开文件 · Esc 清除搜索",
+      "copiedJson": "剪贴板已复制审计 JSON",
+      "baselineSaved": "基线已保存。未来的审计可以以此快照作为对比。",
+      "baselineSaveFailed": "无法保存基线：{message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints：保存时扫描",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 规则暂停 ({rssMb} MB)",
       "shedWarning": "⚠ {count} 规则弃用",
-      "shedInfo": "⚡ {count} 规则 检查"
+      "shedInfo": "⚡ {count} 规则 检查",
+      "pressureNoShed": "⚠ 内存压力 ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "内存压力：正常",
       "shedLevel1": "内存压力：{count} 低严重性规则被弃用以减少 RSS",
       "shedLevel2": "内存压力：{count}规则触发（INFO + WARNING严重程度）",
-      "hardTripped": "内存限制超出 — 所有非必要规则已暂停"
+      "hardTripped": "内存限制超出 — 所有非必要规则已暂停",
+      "pressureNoShed": "检测到内存压力 —— 在 analysis_options_custom.yaml 中启用规则舍弃以自动舍弃低严重程度的规则"
+    },
+    "notification": {
+      "shedDisabled": "检测到分析器内存压力 (RSS {rssMb} MB，软限制 {softLimitMb} MB)。启用规则舍弃以在压力下自动禁用低严重性规则。",
+      "enableButton": "启用 启动 在此处.",
+      "learnMoreButton": "了解更多 学习更多",
+      "runInit": "运行 'dart run saropa_lints:init' 以生成 analysis_options_custom.yaml，然后设置 shed_rules: true。",
+      "enabledConfirmation": "规则舍弃已在analysis_options_custom.yaml中启用。分析器将在下一次重新加载时拾取此更改。"
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "分析失败了. 这是一个错误的结果. 检查输出以获取详细信息.",
       "removeRecentAria": "删除 去掉 移除",
       "removeRecentTitle": "删除 去掉 移除",
-      "bulkSelectedTpl": "已选择 {n} 个"
+      "bulkSelectedTpl": "已选择 {n} 个",
+      "announceSearchVerb": "搜索",
+      "severitiesNoun": "严重程度",
+      "impactsNoun": "影响"
     },
     "emptyState": {
       "hintAfterMessage": "运行 Saropa Lints 分析以生成 violations.json,然后使用 Refresh 这里或重新打开这个仪表板.",

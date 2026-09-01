@@ -46,7 +46,10 @@ export function normalizeForSnapshot(html: string): string {
   // Inline <script>...</script> blocks: replaced by a stub so the test
   // captures their PRESENCE, not their content. Per-script tests cover
   // behavior; the snapshot covers structure.
-  s = s.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, '<script><STRIPPED></script>');
+  // This regex replaces script content for snapshot normalization, not for
+  // security sanitization — false positive from CodeQL js/bad-tag-filter.
+  const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/g;
+  s = s.replace(scriptPattern, '<script><STRIPPED></script>');
 
   // Inline <style>...</style> blocks: same rationale. Token matrix covers
   // theme bindings; this snapshot covers HTML structure.

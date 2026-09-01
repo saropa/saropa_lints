@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "{total} lint 규칙은 현재 버전에 포함되어 있습니다 (필수 {essential} · 권장 {recommended} · 전문 {professional} · 포괄적 {comprehensive} · 철저 {pedantic} · {stylistic} 스타일적 옵인)"
   },
+  "audit": {
+    "alreadyRunning": "점검이 이미 실행 중입니다 — 완료를 기다려 주세요.",
+    "noProject": "Dart 프로젝트를 찾을 수 없습니다. pubspec.yaml가 포함된 폴더를 열어주세요.",
+    "missingDep": "이 프로젝트는 saropa_lints에 의존하지 않습니다. 먼저 dev_dependencies에 추가하세요.",
+    "scope": {
+      "placeholder": "어떤 파일을 감사 대상으로 해야 하나요?",
+      "full": "전체 프로젝트",
+      "fullDescription": "모든 Dart 파일을 검토하세요 — 가장 철저한 옵션",
+      "changedVsMain": "변경된 vs 메인",
+      "changedVsMainDescription": "main branch와 다른 파일만",
+      "changedPickBranch": "변경 사항 vs 분기점…",
+      "changedPickBranchDescription": "선택한 브랜치와 다른 파일만",
+      "compareBaseline": "기준과 비교",
+      "compareBaselineDescription": "마지막으로 저장한 기준 스냅샷 이후에 변경된 내용 표시",
+      "branchPrompt": "비교 대상 브랜치"
+    },
+    "progress": {
+      "title": "Saropa Lints 검사 실행 중…",
+      "message": "{pct}% · {scanned}/{total} 파일 · {issues} 문제 · {file}"
+    },
+    "error": {
+      "spawnFailed": "오디트 CLI를 시작할 수 없습니다: {message}",
+      "invalidProject": "이 프로젝트에 대한 검토를 실행할 수 없습니다. {details}",
+      "parseFailed": "점검이 완료되었지만 출력 결과를 읽을 수 없습니다. 다시 실행해 보세요."
+    },
+    "report": {
+      "title": "Saropa Lints 검토",
+      "heading": "점검 보고서",
+      "subtitle": "{count} 결과 · {timestamp}",
+      "baselineSubtitle": "기준선과 비교하여 {date}에서",
+      "searchPlaceholder": "규칙, 파일, 또는 메시지로 필터링…",
+      "filterTier": "Tier 1는 Tier 2의 기본 기준이 됩니다.",
+      "filterSeverity": "심각성 정도 중증상태",
+      "filterImpact": "영향력 있는 영향을 미치는 영향",
+      "filterBaselineStatus": "기준선",
+      "baselineNew": "새",
+      "baselineUnchanged": "변경되지 않음",
+      "saveBaseline": "기준으로 저장",
+      "copyJson": "JSON을 복사하여 작성합니다.",
+      "toggleGroup": "그룹핑 토글",
+      "colFile": "파일파일 파일이",
+      "colLine": "라인 라인",
+      "colRule": "규칙 규정 규칙",
+      "colSeverity": "심각성 정도 중증상태",
+      "colTier": "Tier 1는 Tier 2의 기본 기준이 됩니다.",
+      "colMessage": "메시지 메시지의 메시지를 전달합니다.",
+      "empty": "결과 없음 — 프로젝트는 깨끗합니다.",
+      "filteredEmpty": "현재 필터와 일치하는 결과가 없습니다.",
+      "loadMore": "더보기",
+      "keyboardHint": "화살표 키로 이동 · Enter로 파일 열기 · Esc로 검색 초기화",
+      "copiedJson": "클립보드에 복사된 JSON 검토",
+      "baselineSaved": "기준이 저장되었습니다. 향후 감사를 이 스냅샷과 비교할 수 있습니다.",
+      "baselineSaveFailed": "기본값을 저장할 수 없습니다: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: 저장 시 스캔",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 규칙 일시 중단 ({rssMb} MB)",
       "shedWarning": "⚠ {count} 규칙은 제거",
-      "shedInfo": "⚡ {count} 규칙 적용"
+      "shedInfo": "⚡ {count} 규칙 적용",
+      "pressureNoShed": "⚠ 메모리 압력 ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "메모리 압력: 정상",
       "shedLevel1": "메모리 압력: {count} 저중요도 규칙이 RSS를 줄이기 위해 제거되었습니다.",
       "shedLevel2": "메모리 압력: {count} 규칙이 제거됨 (INFO + WARNING 심각도)",
-      "hardTripped": "메모리 제한 초과 — 모든 비필수 규칙 일시 중단"
+      "hardTripped": "메모리 제한 초과 — 모든 비필수 규칙 일시 중단",
+      "pressureNoShed": "메모리 압력 감지 — analysis_options_custom.yaml에서 규칙 제거 기능을 활성화하여 저중요도 규칙을 자동으로 제거하세요"
+    },
+    "notification": {
+      "shedDisabled": "분석기 메모리 압력 감지됨 (RSS {rssMb} MB, 소프트 제한 {softLimitMb} MB). 압력 하에서 저중요도 규칙을 자동으로 비활성화하려면 규칙 제거 기능을 활성화하십시오.",
+      "enableButton": "Enable Enable를 활성화하십시오.",
+      "learnMoreButton": "더 많은 것을 배우기 위해 더 많이 배워라.",
+      "runInit": "' dart run saropa_lints:init '를 실행하여 analysis_options_custom.yaml을 생성한 다음 shed_rules: true로 설정하세요.",
+      "enabledConfirmation": "규칙 제거가 analysis_options_custom.yaml에서 활성화되었습니다. 분석기는 다음 로드 시 변경 사항을 인식할 것입니다."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "분석 실패. 자세한 내용은 출력을 확인하십시오.",
       "removeRecentAria": "제거 삭제 제거",
       "removeRecentTitle": "제거 삭제 제거",
-      "bulkSelectedTpl": "{n}개 선택됨"
+      "bulkSelectedTpl": "{n}개 선택됨",
+      "announceSearchVerb": "검색",
+      "severitiesNoun": "중증도",
+      "impactsNoun": "영향을 미침"
     },
     "emptyState": {
       "hintAfterMessage": "violations.json를 생성하기 위해 Saropa Lints 분석을 실행한 다음, 여기에 Refresh 를 사용하거나 이 대시보드를 다시 열으십시오.",

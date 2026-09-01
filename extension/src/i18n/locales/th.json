@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "กฎการ lint {total} ปัจจุบันมีในเวอร์ชันนี้ (จำเป็น {essential} · แนะนำ {recommended} · วิชาชีพ {professional} · ครอบคลุม {comprehensive} · ละเอียด {pedantic} · {stylistic} ตัวเลือกสไตล์)"
   },
+  "audit": {
+    "alreadyRunning": "การตรวจสอบอยู่ในระหว่างการดำเนินการแล้ว — รอให้เสร็จสิ้นก่อน",
+    "noProject": "ไม่พบโปรเจกต์ Dart โปรดเปิดโฟลเดอร์ที่มี pubspec.yaml",
+    "missingDep": "โปรเจกต์นี้ไม่ได้ขึ้นกับ saropa_lints โปรดเพิ่มเข้าไปที่ dev_dependencies ก่อน",
+    "scope": {
+      "placeholder": "ไฟล์ใดที่ควรให้การตรวจสอบครอบคลุม?",
+      "full": "โครงการทั้งหมด",
+      "fullDescription": "ตรวจสอบไฟล์ Dart ทุกไฟล์ — ตัวเลือกที่ละเอียดที่สุด",
+      "changedVsMain": "เปลี่ยนจาก vs main",
+      "changedVsMainDescription": "เฉพาะไฟล์ที่ต่างจากสาขาหลัก",
+      "changedPickBranch": "เปลี่ยน vs สาขา…",
+      "changedPickBranchDescription": "เฉพาะไฟล์ที่ต่างจากสาขาที่คุณเลือก",
+      "compareBaseline": "เปรียบเทียบกับฐานข้อมูลมาตรฐาน",
+      "compareBaselineDescription": "แสดงสิ่งที่เปลี่ยนไปตั้งแต่การบันทึกฐานข้อมูลครั้งสุดท้าย",
+      "branchPrompt": "สาขาที่จะเปรียบเทียบ"
+    },
+    "progress": {
+      "title": "กำลังตรวจสอบ Saropa Lints...",
+      "message": "{pct}% · {scanned}/{total} ไฟล์ · {issues} ปัญหา · {file}"
+    },
+    "error": {
+      "spawnFailed": "ไม่สามารถเริ่มต้น audit CLI ได้: {message}",
+      "invalidProject": "การตรวจสอบไม่สามารถดำเนินการกับโปรเจกต์นี้ได้ เนื่องจาก {details}",
+      "parseFailed": "การตรวจสอบเสร็จสิ้นแล้วแต่ไม่สามารถอ่านผลลัพธ์ได้ ลองรันอีกครั้ง"
+    },
+    "report": {
+      "title": "Saropa Lints ตรวจสอบ",
+      "heading": "รายงานการตรวจสอบ",
+      "subtitle": "ผลการค้นหา {count} · {timestamp}",
+      "baselineSubtitle": "เทียบกับฐานข้อมูลจาก {date}",
+      "searchPlaceholder": "กรองด้วยกฎ ไฟล์ หรือข้อความ…",
+      "filterTier": "Tier 1 หลักทรัพย์",
+      "filterSeverity": "ความรุนแรง Severity",
+      "filterImpact": "ผลการตรวจสอบ Impact",
+      "filterBaselineStatus": "มาตรฐานพื้นฐาน",
+      "baselineNew": "ใหม่",
+      "baselineUnchanged": "ไม่เปลี่ยนแปลง",
+      "saveBaseline": "บันทึกเป็นฐานข้อมูลมาตรฐาน",
+      "copyJson": "สําเนา JSON",
+      "toggleGroup": "สลับการจัดกลุ่ม",
+      "colFile": "File รายการ",
+      "colLine": "สาย เส้น เส้น",
+      "colRule": "กฎหมาย สังกัด",
+      "colSeverity": "ความรุนแรง Severity",
+      "colTier": "Tier 1 หลักทรัพย์",
+      "colMessage": "ข้อความข้อความ Message",
+      "empty": "ไม่พบข้อผิดพลาด — โครงการนี้สะอาด",
+      "filteredEmpty": "ไม่พบผลลัพธ์ที่ตรงกับกรองปัจจุบัน",
+      "loadMore": "แสดงเพิ่ม",
+      "keyboardHint": "คีย์ลูกศรเพื่อการนำทาง · ปุ่ม Enter เพื่อเปิดไฟล์ · ปุ่ม Esc เพื่อเคลียร์การค้นหา",
+      "copiedJson": "ตรวจสอบ JSON ที่คัดลอกไปยังคลิปบอร์ด",
+      "baselineSaved": "เกณฑ์พื้นฐานถูกบันทึกไว้แล้ว ตรวจสอบในอนาคตสามารถเปรียบเทียบกับภาพถ่ายหน้าจอช่วงนี้ได้",
+      "baselineSaveFailed": "ไม่สามารถบันทึกฐานข้อมูลได้: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: ตรวจจับเมื่อบันทึก",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴กฎถูกหยุด ({rssMb} MB)",
       "shedWarning": "⚠ กฎ {count} ที่มีผล",
-      "shedInfo": "⚡ กฎ {count} ที่เข้มงวด"
+      "shedInfo": "⚡ กฎ {count} ที่เข้มงวด",
+      "pressureNoShed": "⚠ ความดันหน่วยความจำ ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "ความดันหน่วยความจำ: ปกติ",
       "shedLevel1": "การดันหน่วยความจำ: กฎระเบียบระดับ {count} ที่มีความรุนแรงต่ำ ช่วยลดลง RSS",
       "shedLevel2": "ความดันหน่วยความจำ: กฎ {count} ทำให้เกิดการเตือน (ระดับข้อมูล + คำเตือน)",
-      "hardTripped": "ขีดจำกัดความจำเกิน — กฎทั้งหมดที่ไม่จำเป็นถูกระงับ"
+      "hardTripped": "ขีดจำกัดความจำเกิน — กฎทั้งหมดที่ไม่จำเป็นถูกระงับ",
+      "pressureNoShed": "ตรวจพบความดันของหน่วยความจำ — เปิดใช้งานกฎการลดระดับใน analysis_options_custom.yaml เพื่อให้ระบบลดกฎที่มีความรุนแรงต่ำอัตโนมัติ"
+    },
+    "notification": {
+      "shedDisabled": "ตรวจพบความดันหน่วยความจำของเครื่องมือวิเคราะห์ (RSS {rssMb} MB, ขีดจำกัดแบบอ่อน {softLimitMb} MB) ให้เปิดใช้กฎการลดความเครียดเพื่อปิดอัตโนมัติกฎที่มีระดับความรุนแรงต่ำเมื่อเกิดความดัน",
+      "enableButton": "Enable enable เปิดให้ใช้ได้",
+      "learnMoreButton": "เรียนรู้เพิ่มเติม Learn More",
+      "runInit": "รัน 'dart run saropa_lints:init' เพื่อสร้าง analysis_options_custom.yaml จากนั้นตั้งค่า shed_rules: true",
+      "enabledConfirmation": "กฎการตัดสินใจถูกเปิดใช้งานใน analysis_options_custom.yaml วิเคราะห์จะตรวจจับการเปลี่ยนแปลงในครั้งต่อไปที่โหลดใหม่"
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "การวิเคราะห์ล้มเหลว. เช็ค Output เพื่อรายละเอียด",
       "removeRecentAria": "Remove remove ถอดออก",
       "removeRecentTitle": "Remove remove ถอดออก",
-      "bulkSelectedTpl": "เลือกแล้ว {n} รายการ"
+      "bulkSelectedTpl": "เลือกแล้ว {n} รายการ",
+      "announceSearchVerb": "ค้นหา",
+      "severitiesNoun": "ความรุนแรง",
+      "impactsNoun": "ส่งผลต่อ"
     },
     "emptyState": {
       "hintAfterMessage": "วิ่ง Saropa Lints การวิเคราะห์เพื่อสร้าง violations.json, จากนั้นใช้ Refresh ที่นี่หรือเปิด ዳชบอร์ดนี้อีกครั้ง.",

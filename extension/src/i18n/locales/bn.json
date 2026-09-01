@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "{total} লিংট নিয়মগুলি এই সংস্করণে বর্তমান (অপরিহার্য {essential} · পরামর্শ করা যাক {recommended} · পেশাদার {professional} · সম্পূর্ণ {comprehensive} · শিক্ষামূলক {pedantic} · {stylistic} বিকল্প শৈলীগত)"
   },
+  "audit": {
+    "alreadyRunning": "একটি অ্যাউডিট বর্তমানে চালানো হচ্ছে — এটি শেষ হওয়া অপেক্ষা করুন।",
+    "noProject": "কোনও Dart প্রকল্প খুঁজে পাওয়া যায়নি। একটি pubspec.yaml কোনও ফোল্ডার খুলুন।",
+    "missingDep": "এই প্রকল্পটি saropa_lints এর উপর নির্ভর করে না। প্রথমে dev_dependencies এ যোগ করুন।",
+    "scope": {
+      "placeholder": "কোন ফাইলগুলি পরিদর্শনের জন্য বিবেচনা করা উচিত?",
+      "full": "পুরো প্রকল্প",
+      "fullDescription": "প্রতিটি Dart ফাইল পরীক্ষা করুন — সবচেয়ে গভীর বিকল্প",
+      "changedVsMain": "পরিবর্তিত vs মেইন",
+      "changedVsMainDescription": "মূল শ",
+      "changedPickBranch": "পরিবর্তন করা হয়েছে vs শ",
+      "changedPickBranchDescription": "কেবলমাত্র আপনি যে শাখা বাছাই করেন তার সাথে ভিন্ন ফাইলগুলি",
+      "compareBaseline": "বেসলাইন সাথে তুলনা করুন",
+      "compareBaselineDescription": "শেষ সংরক্ষিত বেসলাইন স্ন্যাপশট থেকে কী পরিবর্তন হয়েছে দেখুন",
+      "branchPrompt": "ট্রান্সফার করুন যেটি তুলনার জন্য"
+    },
+    "progress": {
+      "title": "Saropa Lints ক্রমবর্ধনশীল পরিদর্শন চালানো হচ্ছে...",
+      "message": "{pct}% · {scanned}/{total} ফাইল · {issues} প্রবলেম · {file}"
+    },
+    "error": {
+      "spawnFailed": "অডিট CLI চালু করতে পারিনি: {message}",
+      "invalidProject": "এই প্রকল্পের বিরুদ্ধে অডিট চালানো সম্ভব হয়নি। {details}",
+      "parseFailed": "ট্রান্সলেট করুন এবং সঠিক স্থানে প্লেসহোল্ডার টোকেনগুলি কপি করুন।"
+    },
+    "report": {
+      "title": "Saropa Lints অ্যাউডিট",
+      "heading": "অডিট রিপোর্ট",
+      "subtitle": "{count} ফাইন্ডিংস · {timestamp}",
+      "baselineSubtitle": "{date} এর বেসলাইন তুলনায়",
+      "searchPlaceholder": "রুল, ফাইল বা মেসেজ অনুযায়ী ফিল্টার করুন…",
+      "filterTier": "টীয়ার টিয়ার (Tier Tier) -এর অর্থ হলো, শীর্ষ স্ত",
+      "filterSeverity": "গুরুতরতা Severity",
+      "filterImpact": "প্রভাবের উপর প্রভাব ফেলার জন্য একটি কার্যকর উপায়।",
+      "filterBaselineStatus": "বেসলাইন",
+      "baselineNew": "নতুন",
+      "baselineUnchanged": "অপরিবর্তিত",
+      "saveBaseline": "বেসলাইন হিসাবে সংরক্ষণ করুন",
+      "copyJson": "JSON কপি করুন",
+      "toggleGroup": "গ্রুপ টুগেল",
+      "colFile": "ফাইলের নাম File file",
+      "colLine": "লাইন, লাইন, লাইনের মধ্যে",
+      "colRule": "নিয়মকানুন Rule Rule",
+      "colSeverity": "গুরুতরতা Severity",
+      "colTier": "টীয়ার টিয়ার (Tier Tier) -এর অর্থ হলো, শীর্ষ স্ত",
+      "colMessage": "বার্তা বার্তা মেসেজ",
+      "empty": "কোন ফাইন্ডিং নেই — প্রকল্পটি সাধারণ।",
+      "filteredEmpty": "বর্তমান ফিল্টারগুলির সাথে মেলে কোনও ফাইন্ডিং নেই।",
+      "loadMore": "বেশি দেখুন",
+      "keyboardHint": "সাজানো কী বাটন · এন্টার করে ফাইল খুলুন · এস্ক করে খোঁজা পরিষ্কার করুন",
+      "copiedJson": "ক্লিপবোর্ডে অডিট জেসন কপি করা হয়েছে।",
+      "baselineSaved": "বেস লাইন সংরক্ষিত। ভবিষ্যৎ অডিটগুলি এই স্ন্যাপশটটির বিরুদ্ধে তুলনা করতে পারে।",
+      "baselineSaveFailed": "বেসলাইন সংরক্ষণ করা যায়নি: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: সেভ করার সময় স্ক্যান করুন",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 নিয়ম অবরুদ্ধ ({rssMb} এমবি)",
       "shedWarning": "⚠ {count} নিয়ম ছাড়া গেল",
-      "shedInfo": "⚡ {count} নিয়ম বাদ দিন"
+      "shedInfo": "⚡ {count} নিয়ম বাদ দিন",
+      "pressureNoShed": "⚠ মেমরি চাপ ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "মেমরি চাপ: সাধারণ",
       "shedLevel1": "মেমরি চাপ: {count} কম গুরুত্বপূর্ণ নিয়মগুলো কমানোর জন্য RSS",
       "shedLevel2": "মেমরি চাপ: {count} নিয়ম ছুঁই (ইনফো + বার্ণিং গুরুত্ব)",
-      "hardTripped": "মেমরি সীমা অতিক্রম — সব অপ্রয়োজনীয় নিয়ম স্থগিত হয়েছে"
+      "hardTripped": "মেমরি সীমা অতিক্রম — সব অপ্রয়োজনীয় নিয়ম স্থগিত হয়েছে",
+      "pressureNoShed": "মেমোরি চাপ প্রকাশ হয়েছে — আপনার analysis_options_custom.yaml ফাইলে নিয়ম ছাড়া করার নিয়ম সক্রিয় করুন যাতে কম গুরুত্বপূর্ণ নিয়মগুলি অটোমেটিক ছাড় দিতে পারে"
+    },
+    "notification": {
+      "shedDisabled": "এ্যানালাইজার মেমোরি চাপ প্রকাশ হয়েছে (RSS {rssMb} MB, সফ্ট লিমিট {softLimitMb} MB)। চাপের অধীনে কম গুরুত্বপূর্ণ নিয়মগুলি বন্ধ করতে নিয়ম ছুরি সক্রিয় করুন।",
+      "enableButton": "Enable সক্ষম করুন সক্রিয় করুন",
+      "learnMoreButton": "আরও জানুন Learn More",
+      "runInit": "'dart run saropa_lints:init' চালান যেহেতু analysis_options_custom.yaml তৈরি করুন, তারপর shed_rules: true সেট করুন।",
+      "enabledConfirmation": "analysis_options_custom.yaml এ নিয়ম ছাড়া হওয়া সক্ষম। এনালাইজার তার অग্রাধিকার পুনরায় চালানোর সময় পরিবর্তনটি ধরে পেয়ে যাবে।"
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "বিশ্লেষণ ব্যর্থ হয়েছে. বিস্তারিত জানার জন্য আউটপুটটি পরীক্ষা করুন।",
       "removeRecentAria": "Remove remove অপসারণ করা",
       "removeRecentTitle": "Remove remove অপসারণ করা",
-      "bulkSelectedTpl": "{n} নির্বাচিত"
+      "bulkSelectedTpl": "{n} নির্বাচিত",
+      "announceSearchVerb": "অনুসন্ধান",
+      "severitiesNoun": "সার্ভিসিটিজ",
+      "impactsNoun": "প্রভাব করে"
     },
     "emptyState": {
       "hintAfterMessage": "violations.json উত্পন্ন করতে একটি Saropa Lints বিশ্লেষণ চালান, তারপরে এখানে রিফ্রেশ করুন বা এই ড্যাশবোর্ডটি পুনরায় খুলুন।",

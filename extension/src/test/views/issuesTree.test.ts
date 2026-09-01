@@ -511,6 +511,7 @@ describe('IssuesTreeProvider file item open-on-click', () => {
     const item = provider.getTreeItem(violationNode);
     const tooltipValue = (item.tooltip as { value?: string } | undefined)?.value ?? '';
     assert.ok(tooltipValue.includes('See also'));
-    assert.ok(tooltipValue.includes('require_secure_storage'));
+    // Underscores are Markdown-escaped in tooltips (escapeMarkdown)
+    assert.ok(tooltipValue.includes('require\\_secure\\_storage'));
   });
 });

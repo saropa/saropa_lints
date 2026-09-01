@@ -10,6 +10,9 @@ on:
       - "test/cli/project_vibrancy_cli_test.dart"
       - ".github/workflows/project-vibrancy.yml"
 
+permissions:
+  contents: read
+
 jobs:
   scan:
     runs-on: ubuntu-latest

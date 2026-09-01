@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "Mga tala ng {total} na mga tala ng lint ay kasama na sa bersyon na ito (essensial {essential} · inirerekomenda {recommended} · profesional {professional} · komprehensibo {comprehensive} · pedantiko {pedantic} · {stylistic} opt-in stylistic)"
   },
+  "audit": {
+    "alreadyRunning": "Ang isang audit ay nagsisimula na — wait for it to finish.",
+    "noProject": "Walang proyekto Dart. Bumuksa sa isang folder na mayroon ang pubspec.yaml.",
+    "missingDep": "Ang proyekto ay hindi naglalaman ng dependensya sa saropa_lints. Idagdag ito sa dev_dependencies muna.",
+    "scope": {
+      "placeholder": "Anong mga file ang dapat talaan ng audit?",
+      "full": "Buo ang proyekto",
+      "fullDescription": "I-check lahat ng Dart file — ang pinakamalayog na opsyon",
+      "changedVsMain": "Nagbago mula sa main",
+      "changedVsMainDescription": "Mga file na nangangailangan ng pagbabago mula sa pangunahing branch",
+      "changedPickBranch": "Nagbago ang vs branch…",
+      "changedPickBranchDescription": "Mga file na nangangailangan ng pagbabago mula sa isang branch na iyong piliin",
+      "compareBaseline": "Compare sa baseline",
+      "compareBaselineDescription": "Ipakita ang mga bagay na nangyari mula sa huling sinagot na baseline snapshot",
+      "branchPrompt": "Branch para i-compare"
+    },
+    "progress": {
+      "title": "Pangangalap ng Saropa Lints audit…",
+      "message": "{pct}% · {scanned}/{total} mga file · {issues} mga isyu · {file}"
+    },
+    "error": {
+      "spawnFailed": "Hindi maaaring mag-start ng audit CLI: {message}",
+      "invalidProject": "Ang audit ay hindi maaaring i-run sa proyekto na ito. {details}",
+      "parseFailed": "Nagtapos ang audit ngunit hindi mabasa ang output nito. Subukang i-run ito muli."
+    },
+    "report": {
+      "title": "Saropa Lints Audit",
+      "heading": "Audit Report",
+      "subtitle": "{count} results · {timestamp}",
+      "baselineSubtitle": "Kumpara sa baseline mula sa {date}",
+      "searchPlaceholder": "Filtra ayon sa rule, file, o mensahe…",
+      "filterTier": "Ang Tier 1 ay ang tier 2 na antas ng pag-uuri.",
+      "filterSeverity": "Grabe ng sakit na ito ay ang pagiging malubhang.",
+      "filterImpact": "Ang epekto ng impak ay ang mga epekto sa epekto.",
+      "filterBaselineStatus": "Baseline",
+      "baselineNew": "Bagong",
+      "baselineUnchanged": "Wala nang binago",
+      "saveBaseline": "I-save bilang base line",
+      "copyJson": "Kopyahin ang JSON.",
+      "toggleGroup": "I-toggle ang grouping",
+      "colFile": "Ang file ay isang file ng file.",
+      "colLine": "Ang linya ng linya ay ang mga linya na ito.",
+      "colRule": "Panuntunan ng Pamamahala sa Pamahalaan",
+      "colSeverity": "Grabe ng sakit na ito ay ang pagiging malubhang.",
+      "colTier": "Ang Tier 1 ay ang tier 2 na antas ng pag-uuri.",
+      "colMessage": "Ang mensahe ng mensahe ay isang mensahe na may mga salita.",
+      "empty": "Walang mga resulta — ang proyekto ay malinis.",
+      "filteredEmpty": "Walang mga resulta ang sumasangguni sa kasalukuyang mga filter.",
+      "loadMore": "Ipakita ang mas marami",
+      "keyboardHint": "Arrow keys para mag-navigate · Enter para buksan ang file · Esc para alisin ang search",
+      "copiedJson": "Nakakopya ang audit JSON sa clipboard.",
+      "baselineSaved": "Nakasave ang baseline. Maaari itong i-compare ng mga susunod na audit sa snapshot na ito.",
+      "baselineSaveFailed": "Hindi maaaring i-save ang baseline: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: I-scan sa Pag-save",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 Nakatigil ang mga batas ({rssMb} MB)",
       "shedWarning": "⚠ {count} mga rule na nagsisilbing shed",
-      "shedInfo": "⚡ {count} mga rule na nagsisilbing shed"
+      "shedInfo": "⚡ {count} mga rule na nagsisilbing shed",
+      "pressureNoShed": "⚠ Presyon ng memorya ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Presyon ng memorya: normal",
       "shedLevel1": "Memory pressure: {count} low-severity rules shed para mabawasan ang RSS",
       "shedLevel2": "Presyon sa memorya: {count} na mga rule ay nagseselos (INFO + WARNING severity)",
-      "hardTripped": "Nag-override ng memory limit — lahat ng mga hindi pangunahing rule na ipinagbawal"
+      "hardTripped": "Nag-override ng memory limit — lahat ng mga hindi pangunahing rule na ipinagbawal",
+      "pressureNoShed": "Narating ang presyon sa memorya — puntaan ang pagsusugat ng mga talaan sa analysis_options_custom.yaml upang mag-automate ng pagbawas ng mga talaan na may mas maliit na antas ng kahalagahan"
+    },
+    "notification": {
+      "shedDisabled": "Nabatay ang memorya ng analyzer (RSS {rssMb} MB, soft limit {softLimitMb} MB). Mag-enable ng rule shedding upang mag-automate ng pag-off ng mga low-severity rules sa presyon.",
+      "enableButton": "Pagbibigay-daan sa paganahin ay pinapayagan.",
+      "learnMoreButton": "Matuto ng Higit pang Alamin ang Higit Pang Aralin",
+      "runInit": "Punan ang 'dart run saropa_lints:init' upang makagawa ng analysis_options_custom.yaml, pagkatapos ay itakda ang shed_rules: true.",
+      "enabledConfirmation": "Nag-activate ang mga rule shedding sa analysis_options_custom.yaml. Ang analyzer ay magpapalabas ng pagbabago sa susunod na pag reload."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "Ang pagsusuri ay nabigo. Suriin ang output para sa mga detalye.",
       "removeRecentAria": "Alisin ang alisan ng pag-alis",
       "removeRecentTitle": "Alisin ang alisan ng pag-alis",
-      "bulkSelectedTpl": "{n} ang pinili"
+      "bulkSelectedTpl": "{n} ang pinili",
+      "announceSearchVerb": "Naglalakad",
+      "severitiesNoun": "severitys",
+      "impactsNoun": "nag-apekto"
     },
     "emptyState": {
       "hintAfterMessage": "Magpatakbo ng isang Saropa Lints pagsusuri upang makabuo ng violations.json, pagkatapos ay gamitin ang Refresh dito o muling buksan ang dashboard na ito.",

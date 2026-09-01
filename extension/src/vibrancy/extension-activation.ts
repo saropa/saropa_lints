@@ -114,7 +114,7 @@ import { resultToComparisonData } from './scoring/comparison-ranker';
 import {
     fetchPackageInfo, fetchPackageMetrics, fetchPublisher, fetchArchiveSize,
 } from './services/pub-dev-api';
-import { extractGitHubRepo, fetchRepoMetrics } from './services/github-api';
+import { extractGitHubRepo, fetchRepoMetrics, isGitHubUrl } from './services/github-api';
 import { calcBloatRating } from './scoring/bloat-calculator';
 import { SaveTaskRunner } from './services/save-task-runner';
 import { bulkUpdate } from './services/bulk-updater';
@@ -2460,7 +2460,8 @@ async function fetchComparisonData(
     let stars: number | null = null;
     let openIssues: number | null = null;
 
-    if (info.repositoryUrl?.includes('github.com')) {
+    // Use parsed hostname check instead of substring match to prevent spoofed URLs
+    if (info.repositoryUrl && isGitHubUrl(info.repositoryUrl)) {
         const extracted = extractGitHubRepo(info.repositoryUrl);
         if (extracted) {
             const ghMetrics = await fetchRepoMetrics(

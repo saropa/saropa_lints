@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "Kurulumdaki şu anda mevcut {total} lint kuralları (temel {essential} · önerilen {recommended} · profesyonel {professional} · kapsamlı {comprehensive} · pedantik {pedantic} · {stylistic} seçeneğiyle stil)"
   },
+  "audit": {
+    "alreadyRunning": "Bir denetim zaten çalışmaktadır — tamamlamasını bekleyin.",
+    "noProject": "Dart projesi bulunamadı. Bir pubspec.yaml içeren bir klasör açın.",
+    "missingDep": "Bu proje saropa_lints'e bağımlılık göstermiyor. Öncelikle dev_dependencies'a ekleyin.",
+    "scope": {
+      "placeholder": "Audit hangi dosyaları kapsaması gerekir?",
+      "full": "Tam proje",
+      "fullDescription": "Her Dart dosyasını denetleyin — en kapsamlı seçenek",
+      "changedVsMain": "Değiştirildi vs ana",
+      "changedVsMainDescription": "Sadece ana dal ile farklı olan dosyalar",
+      "changedPickBranch": "Değiştirildi vs dal…",
+      "changedPickBranchDescription": "Sadece seçtiğiniz bir dal ile farklı olan dosyalar",
+      "compareBaseline": "Temel ile karşılaştır",
+      "compareBaselineDescription": "Son kaydedilen temel noktası karşılaştırmalı olarak neyin değiştiğini göster",
+      "branchPrompt": "Karşılaştırılacak dal"
+    },
+    "progress": {
+      "title": "Saropa Lints audit çalıştırılıyor...",
+      "message": "{pct}% · {scanned}/{total} dosyalar · {issues} sorun · {file}"
+    },
+    "error": {
+      "spawnFailed": "Audit CLI başlatılamadı: {message}",
+      "invalidProject": "Audit bu projeye karşı çalışılamadı. {details}",
+      "parseFailed": "Audit tamamlandı ancak çıktısı okunamadı. Tekrar çalıştırmayı deneyin."
+    },
+    "report": {
+      "title": "Saropa Lints Denetimi",
+      "heading": "Audit Raporu",
+      "subtitle": "{count} bulguları · {timestamp}",
+      "baselineSubtitle": "Temel ile kıyaslandığında {date}",
+      "searchPlaceholder": "Filtreleyin kural, dosya veya mesaj...",
+      "filterTier": "Tier Tier Tier'de yer alıyor.",
+      "filterSeverity": "Ciddilik Ağırlık",
+      "filterImpact": "Etki etkisi etki etkisi",
+      "filterBaselineStatus": "Temel Seviye",
+      "baselineNew": "Yeni",
+      "baselineUnchanged": "Değiştirilmemiş",
+      "saveBaseline": "Kaydet ve temel olarak kaydet",
+      "copyJson": "JSON'u kopyalayın.",
+      "toggleGroup": "Gruplama aç / kapat",
+      "colFile": "Dosya dosyası dosya dosya.",
+      "colLine": "Hattı çizgi çizgi.",
+      "colRule": "Kural Kanun kural",
+      "colSeverity": "Ciddilik Ağırlık",
+      "colTier": "Tier Tier Tier'de yer alıyor.",
+      "colMessage": "Mesaj mesajı mesajı",
+      "empty": "Bulunamadı — proje temiz.",
+      "filteredEmpty": "Geçerli filtrelerle eşleşen sonuç bulunamadı.",
+      "loadMore": "Daha fazla göster",
+      "keyboardHint": "Ok yön tuşları ile gezin · Enter ile dosya aç · Esc ile arama temizle",
+      "copiedJson": "Audit JSON panoya kopyalandı.",
+      "baselineSaved": "Temel kaydedildi. Gelecekteki denetimler bu anlık görüntüsü ile karşılaştırabilir.",
+      "baselineSaveFailed": "Temel hattı kaydedemiyor: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Kaydedildiğinde Tarayın",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 Kurallar durduruldu ({rssMb} MB)",
       "shedWarning": "⚠ {count} kurallarını uygula",
-      "shedInfo": "⚡ {count} kurallarını uygula"
+      "shedInfo": "⚡ {count} kurallarını uygula",
+      "pressureNoShed": "⚠ Bellek baskısı ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Hafıza baskısı: normal",
       "shedLevel1": "Hafıza baskısı: {count} düşük ciddiyetli kural, RSS azaltmak için bırakıldı",
       "shedLevel2": "Hafıza baskısı: {count} kuralı uygulayın (INFO + UYARI ciddiyeti)",
-      "hardTripped": "Hafıza limiti aşıldı — tüm gerekli olmayan kural lar durduruldu"
+      "hardTripped": "Hafıza limiti aşıldı — tüm gerekli olmayan kural lar durduruldu",
+      "pressureNoShed": "Yazılım basıncı algılandı — analysis_options_custom.yaml'da kural atamasını etkinleştirin, düşük ciddiyetli kuraları otomatik olarak atayın"
+    },
+    "notification": {
+      "shedDisabled": "Analizör bellek baskısı algılandı (RSS {rssMb} MB, yumuşak sınır {softLimitMb} MB). Basınç altında düşük ciddiyetli kuraları otomatik olarak devre dışı bırakmak için kural atamasını etkinleştirin.",
+      "enableButton": "Enable enable Etkinleştirin etkinleştir",
+      "learnMoreButton": "Daha Fazlasını Öğrenin Daha fazlasını öğrenin",
+      "runInit": "'dart run saropa_lints:init' komutunu çalıştırarak analysis_options_custom.yaml oluşturun, ardından shed_rules: true olarak ayarlayın.",
+      "enabledConfirmation": "Kural atılımı analysis_options_custom.yaml'da etkinleştirildi. Analizleyici, bir sonraki yeniden yüklemede değişikliği alacaktır."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "Analiz başarısız oldu. Detaylar için çıkışı kontrol edin.",
       "removeRecentAria": "Remove remove kaldırmak",
       "removeRecentTitle": "Remove remove kaldırmak",
-      "bulkSelectedTpl": "{n} seçildi"
+      "bulkSelectedTpl": "{n} seçildi",
+      "announceSearchVerb": "Araştırılıyor",
+      "severitiesNoun": "ciddiyetler",
+      "impactsNoun": "etkiler"
     },
     "emptyState": {
       "hintAfterMessage": "violations.json oluşturmak için bir Saropa Lints analizi çalıştırın, ardından burada Refresh kullanın veya bu panoyu yeniden açın.",

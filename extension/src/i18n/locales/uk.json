@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "{total} правил лінту наразі вбудовано в цю версію (обов'язкові {essential} · рекомендовані {recommended} · професійні {professional} · повністю {comprehensive} · педантичні {pedantic} · {stylistic} опціональні стилістичні)"
   },
+  "audit": {
+    "alreadyRunning": "Аудит вже виконується — зачекайте, поки він не завершиться.",
+    "noProject": "Не знайдено проекту Dart. Відкрийте папку, яка містить pubspec.yaml.",
+    "missingDep": "Цей проект не залежить від saropa_lints. Додайте його до dev_dependencies спочатку.",
+    "scope": {
+      "placeholder": "Які файли мають бути включеними в аудит?",
+      "full": "Повний проект",
+      "fullDescription": "Перевіряти кожен файл Dart — найповнішій варіант",
+      "changedVsMain": "Змінено по відношенню до головної",
+      "changedVsMainDescription": "Тільки файли, які відрізняються від основної гілки",
+      "changedPickBranch": "Змінено vs гілка…",
+      "changedPickBranchDescription": "Тільки файли, які відрізняються від гілки, яку ви виберете",
+      "compareBaseline": "Порівняти з базовою версією",
+      "compareBaselineDescription": "Показати, що змінилося з моменту останнього збереженого базового зображення",
+      "branchPrompt": "Гілка для порівняння"
+    },
+    "progress": {
+      "title": "Виконання аудиту Saropa Lints…",
+      "message": "{pct}% · {scanned}/{total} файли · {issues} питання · {file}"
+    },
+    "error": {
+      "spawnFailed": "Не вдалося запустити аудит CLI: {message}",
+      "invalidProject": "Аудит не може виконуватися для цього проекту. {details}",
+      "parseFailed": "Аудит завершено, але його вихід не можна було прочитати. Спробуйте запустити його знову."
+    },
+    "report": {
+      "title": "Saropa Lints Аудит",
+      "heading": "Аудит звіт",
+      "subtitle": "{count} результати · {timestamp}",
+      "baselineSubtitle": "Порівняно з базовим варіантом з {date}",
+      "searchPlaceholder": "Фільтрувати за правилом, файлом або повідомленням…",
+      "filterTier": "Квалифіковані позики Tier 1",
+      "filterSeverity": "Важкість тяжкості.",
+      "filterImpact": "Вплив впливу на вплив.",
+      "filterBaselineStatus": "Бейслайн",
+      "baselineNew": "Новий",
+      "baselineUnchanged": "Незмінений",
+      "saveBaseline": "Зберігати як базову лінію",
+      "copyJson": "Копіюйте JSON.",
+      "toggleGroup": "Приховання групування",
+      "colFile": "Файл файлу файла",
+      "colLine": "Лінія лінія лінії лінія",
+      "colRule": "Статут Регуляція",
+      "colSeverity": "Важкість тяжкості.",
+      "colTier": "Квалифіковані позики Tier 1",
+      "colMessage": "Повідомлення повідомлення повідомлення повідомлення",
+      "empty": "Немає виявлення — проект чистий.",
+      "filteredEmpty": "Немає знайдених відповідних поточним фільтрам.",
+      "loadMore": "Показати більше",
+      "keyboardHint": "Стрілки для навігації · Enter для відкриття файлу · Esc для очищення пошуку",
+      "copiedJson": "Аудит JSON скопійовано в буфер обміну.",
+      "baselineSaved": "Збережено базову версію. Майбутні аудити можуть порівнювати цей знімок.",
+      "baselineSaveFailed": "Не вдалося зберегти базову лінію: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: Сканування під час збереження",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 Правила призупинено ({rssMb} МБ)",
       "shedWarning": "⚠ {count} правила видаляють",
-      "shedInfo": "⚡ {count} правила видаляють"
+      "shedInfo": "⚡ {count} правила видаляють",
+      "pressureNoShed": "⚠ Надлишок пам'яті ({rssMb} МБ)"
     },
     "tooltip": {
       "shedLevel0": "Надлишок пам'яті: нормальний",
       "shedLevel1": "Повідомлення про пам'ять: {count} правила низької середньої важливості відкинуто для зменшення RSS",
       "shedLevel2": "Надлишок пам'яті: {count} правил викидають (INFO + WARNING середньої важливості)",
-      "hardTripped": "Обмеження пам'яті перевищено — усі необхідні правила призупинено"
+      "hardTripped": "Обмеження пам'яті перевищено — усі необхідні правила призупинено",
+      "pressureNoShed": "Виявлено навантаження пам'яті — увімкніть правило відкидання в analysis_options_custom.yaml для автоматичного відкидання правил низької серйозності"
+    },
+    "notification": {
+      "shedDisabled": "Виявлено навантаження аналізатора (RSS {rssMb} МБ, м'який ліміт {softLimitMb} МБ). Увімкніть правило відкидання, щоб автоматично вимкнути правила низької важливості під навантаженням.",
+      "enableButton": "Включити ввімкнути включити",
+      "learnMoreButton": "Дізнайтеся більше дізнайтесь більше",
+      "runInit": "Виконайте 'dart run saropa_lints:init' для генерації analysis_options_custom.yaml, потім встановіть shed_rules: true.",
+      "enabledConfirmation": "Правила відкидання увімкнено в analysis_options_custom.yaml. Аналізатор виявить зміну під час наступного перезавантаження."
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "Аналіз не вдалося. Перевірте вихід для деталей.",
       "removeRecentAria": "Remove remove Знімати видалити",
       "removeRecentTitle": "Remove remove Знімати видалити",
-      "bulkSelectedTpl": "{n} вибрано"
+      "bulkSelectedTpl": "{n} вибрано",
+      "announceSearchVerb": "Пошук",
+      "severitiesNoun": "серійності",
+      "impactsNoun": "впливає"
     },
     "emptyState": {
       "hintAfterMessage": "Запустити Saropa Lints аналіз для генерації violations.json, а потім використовувати оновлення тут або знову відкрити цю панель.",

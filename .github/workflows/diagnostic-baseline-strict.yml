@@ -3,6 +3,9 @@ name: diagnostic-baseline-strict
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   strict-diagnostic-baseline:
     runs-on: ubuntu-latest

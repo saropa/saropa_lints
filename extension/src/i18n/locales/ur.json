@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "{total} قاعدات لینٹ کررنتی ہیں اس نسخے میں (ضروری {essential} · موصیح {recommended} · پرو فیشنل {professional} · مکمل {comprehensive} · تکنیکی {pedantic} · {stylistic} استعمال کرنے والے سٹائل )"
   },
+  "audit": {
+    "alreadyRunning": "ایک جانچ جاری ہے — اس کو ختم ہونے تک انتظار کریں۔",
+    "noProject": "Dart پروجیکٹ نہیں ملا۔ ایک pubspec.yaml کے ساتھ فولڈر کھولیں۔",
+    "missingDep": "یہ پروجیکٹ saropa_lints پر منحصر نہیں ہے۔ اسے پہلے dev_dependencies میں شامل کریں۔",
+    "scope": {
+      "placeholder": "کون سے فائلز کا ا审计 شامل کرے؟",
+      "full": "پورا پروجیکٹ",
+      "fullDescription": "ہر Dart فائل کا جائزہ لیں — سب سے مکمل اختیار",
+      "changedVsMain": "تبدیل کردہ vs میں اصل",
+      "changedVsMainDescription": "فقط ایسی فائلیں جو مین برانچ سے مختلف ہوں",
+      "changedPickBranch": "تبدیل کردہ vs شاخہ…",
+      "changedPickBranchDescription": "فقط اُن فائلیں جو آپ کے انتخاب کردہ شاخ سے مختلف ہوں",
+      "compareBaseline": "ٹیسٹ کریں",
+      "compareBaselineDescription": "آخری ذخیرہ کیا گیا بنیادی چھوٹی تصویر سے کیا تبدیلی ہوئی ہے دکھائیں",
+      "branchPrompt": "شاخہ جس کے خلاف تقابل کیا جائے"
+    },
+    "progress": {
+      "title": "ٹریکنگ Saropa Lints ا审计...",
+      "message": "{pct}% · {scanned}/{total} فائلز · {issues} مسائل · {file}"
+    },
+    "error": {
+      "spawnFailed": "ٹسٹ کیا جانا تھا ا审计 CLI: {message}",
+      "invalidProject": "پراجیکٹ کے خلاف آڈٹ نہیں چلا جا سکتا۔ {details}",
+      "parseFailed": "ٹیسٹ کی گزارش مکمل ہو گئی لیکن اس کا نتیجہ پڑھنا ممکن نہیں رہا۔ اسے دوبارہ چلا کر کوشش کریں۔"
+    },
+    "report": {
+      "title": "Saropa Lints جائزہ",
+      "heading": "آڈٹ رپورٹ",
+      "subtitle": "{count} نتائج · {timestamp}",
+      "baselineSubtitle": "مقابلہ بنیاد سے {date} سے",
+      "searchPlaceholder": "نگران کریں کے حوالے سے قاعدہ، فائل یا پیغام…",
+      "filterTier": "ٹائیر ٹیئر کی سطح پر درج ذیل ہیں:",
+      "filterSeverity": "شدت کی حد۔",
+      "filterImpact": "اثر و رسوخ کا اثر اثرات کے اثرات.",
+      "filterBaselineStatus": "اس کی بنیاد",
+      "baselineNew": "نیو",
+      "baselineUnchanged": "نامناسب تبدیل کیا گیا",
+      "saveBaseline": "اسے بنیادی خطہ کے طور پر بچھاؤ",
+      "copyJson": "JSON ڪاپي ڪريو",
+      "toggleGroup": "گروپنگ کا تoggling",
+      "colFile": "فائلوں کی فہرست بنائیں۔",
+      "colLine": "لائن لائن لائن لکیری",
+      "colRule": "آرٹیکل آرٹیک رول",
+      "colSeverity": "شدت کی حد۔",
+      "colTier": "ٹائیر ٹیئر کی سطح پر درج ذیل ہیں:",
+      "colMessage": "پیغام کا متن پیغام",
+      "empty": "نتائج نہیں ملا — پروجیکٹ صاف ہے۔",
+      "filteredEmpty": "فیلٹر کے مطابق کوئی نتیجہ نہیں ملا۔",
+      "loadMore": "زیادہ دکھائی دے",
+      "keyboardHint": "چھوٹے کی کیاﺅں سے ناﺅٹیگ کریں · اینٹر کریں تاکہ فائل کھولی جائے · اسکی کریں تاکہ تلاش ہٹا دی جائے",
+      "copiedJson": "ٹیسٹ جی ایسون جی کاپی کریٹھ کر دیا گیا ہے۔",
+      "baselineSaved": "اس کی بنیاد درج کر لی گئی ہے۔ مستقبل میں آڈٹس اس چھوٹے نمونے سے موازنہ کر سکتے ہیں۔",
+      "baselineSaveFailed": "نیچے کی بنیاد کو بچانے میں ناکام رہ گیا: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: ذخیرہ کر کے اسکن",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 نظمات تعلق ({rssMb} ميگا بائٹ)",
       "shedWarning": "⚠ قواعد {count} چھوڑ دیں",
-      "shedInfo": "⚡ قواعد {count} چھوڑ دیں"
+      "shedInfo": "⚡ قواعد {count} چھوڑ دیں",
+      "pressureNoShed": "⚠ ذہنی دباؤ ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "یاد کرنے کی دباؤ: نормل /نہ کریں",
       "shedLevel1": "یاد کرنے کی دباؤ: {count} کم اہمیت کے قواعد ہیں جو RSS کم کرنے کے لیے ہیں",
       "shedLevel2": "یاد کرنے کی دباؤ: {count} قواعد چھوڑ دیے (INFO + WARNING سطح)",
-      "hardTripped": "میموری لیمٹ اکثر — تمام غیر ضروری قواعد گھمندہ کر دیے گئے ہیں"
+      "hardTripped": "میموری لیمٹ اکثر — تمام غیر ضروری قواعد گھمندہ کر دیے گئے ہیں",
+      "pressureNoShed": "یاد کریں دباؤ پایا گیا — رول چھوڑنے کی قاعدہ ہیں analysis_options_custom.yaml میں فعال کریں تاکہ کم اہمیت والے قواعد اتومیٹیکس چھوڑ دیے جائیں"
+    },
+    "notification": {
+      "shedDisabled": "تحلیل کنندہ یادگیری دباؤ کا ا警觉 (RSS {rssMb} MB، نرم حد {softLimitMb} MB)۔ دباؤ کے تحت کم اہمیت کے قواعد کو خودکار طور پر غیر فعال کرنے کے لئے قواعد کی کٹوتی کو فعال کریں۔",
+      "enableButton": "Enable فعال کریں چالو کریں۔",
+      "learnMoreButton": "مزید جانیں Learn More مزید سیکھیں",
+      "runInit": "'dart run saropa_lints:init' کو چلا کر analysis_options_custom.yaml جنریٹ کریں، پھر shed_rules: true سیٹ کریں۔",
+      "enabledConfirmation": "قواعد کی اتاری جانے والی حالت analysis_options_custom.yaml میں فعال ہے۔ تحلیل کنندہ اس کی تبدیلی اگلی بار لوڈ کرنے پر اٹھالے گا۔"
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "تجزیہ ناکام ہوگیا۔ تفصیلات کے لئے آؤٹ پٹ چیک کریں۔",
       "removeRecentAria": "هٽايو",
       "removeRecentTitle": "هٽايو",
-      "bulkSelectedTpl": "{n} منتخب کردہ"
+      "bulkSelectedTpl": "{n} منتخب کردہ",
+      "announceSearchVerb": "تلاش کر رہے ہیں",
+      "severitiesNoun": "سیوریٹیز",
+      "impactsNoun": "تبدیلی کریں"
     },
     "emptyState": {
       "hintAfterMessage": "violations.json بنانے کے لیے ایک Saropa Lints تجزیہ چلائیں، پھر یہاں ریفریش کا استعمال کریں یا اس ڈیش بورڈ کو دوبارہ کھولیں۔",

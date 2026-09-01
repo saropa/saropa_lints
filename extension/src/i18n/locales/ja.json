@@ -2,6 +2,61 @@
   "about": {
     "ruleCountStrip": "現在のバージョンで提供されている{total} lintルール（必須{essential} · 推奨{recommended} · 専門家{professional} · 完全{comprehensive} · 厳格{pedantic} · {stylistic} スタイル選択）"
   },
+  "audit": {
+    "alreadyRunning": "アジャイルはすでに実行中です — 完了するのを待ってください。",
+    "noProject": "Dartプロジェクトが見つかりません。pubspec.yamlを含むフォルダを開いてください。",
+    "missingDep": "このプロジェクトはsaropa_lintsに依存していません。まずdev_dependenciesに追加してください。",
+    "scope": {
+      "placeholder": "どのファイルを検査に含めるべきですか？",
+      "full": "フルプロジェクト",
+      "fullDescription": "Dartファイルをすべて検証 — 最も丁寧なオプション",
+      "changedVsMain": "変更 vs メイン",
+      "changedVsMainDescription": "メインブランチと異なるファイルのみ",
+      "changedPickBranch": "変更 vs ブランチ…",
+      "changedPickBranchDescription": "選んだブランチと異なるファイルのみ",
+      "compareBaseline": "ベースラインと比較",
+      "compareBaselineDescription": "最後に保存されたベースラインスナップショット以来変更された内容を表示",
+      "branchPrompt": "比較対象のブランチ"
+    },
+    "progress": {
+      "title": "Saropa Lints アウド中…",
+      "message": "{pct}% · {scanned}/{total} ファイル · {issues} イssue · {file}"
+    },
+    "error": {
+      "spawnFailed": "audit CLIを起動できませんでした: {message}",
+      "invalidProject": "このプロジェクトに対してアジャイルチェックが実行できませんでした。{details}",
+      "parseFailed": "検証が終了しましたが、その出力結果を読み込めませんでした。再度実行してみてください。"
+    },
+    "report": {
+      "title": "Saropa Lints アウドิต",
+      "heading": "監査レポート",
+      "subtitle": "{count} けいとう · {timestamp}",
+      "baselineSubtitle": "ベースラインと比較して{date}",
+      "searchPlaceholder": "ルール、ファイル、またはメッセージでフィルタ…",
+      "filterTier": "準額 (Tier) の基準となる.",
+      "filterSeverity": "深刻度 (severity) とは,重度の程度を問わず",
+      "filterImpact": "影響の影響を,その効果が",
+      "filterBaselineStatus": "ベースライン",
+      "baselineNew": "新規",
+      "baselineUnchanged": "変更なし",
+      "saveBaseline": "ベースラインとして保存",
+      "copyJson": "JSONをコピーする",
+      "toggleGroup": "グループ化を切り替える",
+      "colFile": "ファイルは,ファイルの形式で",
+      "colLine": "ライン・ライン・線・ライン",
+      "colRule": "ルール ルールはルールの規則",
+      "colSeverity": "深刻度 (severity) とは,重度の程度を問わず",
+      "colTier": "準額 (Tier) の基準となる.",
+      "colMessage": "メッセージ・メッセージを伝える",
+      "empty": "見つかりません — プロジェクトはクリーンです。",
+      "filteredEmpty": "現在のフィルタに一致する結果がありません。",
+      "loadMore": "もっと表示",
+      "keyboardHint": "矢印キーで移動 · Enterでファイルを開く · Escで検索をクリア",
+      "copiedJson": "クリップボードにコピーされたJSONの審査",
+      "baselineSaved": "ベースラインが保存されました。今後のアプライアンスはこのスナップショットと比較できます。",
+      "baselineSaveFailed": "ベースラインの保存に失敗しました: {message}"
+    }
+  },
   "scanOnSave": {
     "statusBar": {
       "name": "Saropa Lints: 保存時にスキャン",
@@ -578,13 +633,22 @@
     "statusBar": {
       "hardTripped": "🔴 ルール一時停止中 ({rssMb} MB)",
       "shedWarning": "⚠ {count} ルールは適用されません",
-      "shedInfo": "⚡ {count} ルールでスッキリ"
+      "shedInfo": "⚡ {count} ルールでスッキリ",
+      "pressureNoShed": "⚠ メモリ圧力 ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "メモリ圧力: 通常",
       "shedLevel1": "メモリ圧力: {count} 低重大度ルールが削除され RSS",
       "shedLevel2": "メモリ圧力: {count} ルールがシャドウ (INFO + ワーニング セバリティ)",
-      "hardTripped": "メモリ制限を超えた — すべての非必須ルールが一時停止されました"
+      "hardTripped": "メモリ制限を超えた — すべての非必須ルールが一時停止されました",
+      "pressureNoShed": "メモリ圧力が検出されました — analysis_options_custom.yaml でルールの切り捨てを有効にして、低重要度のルールを自動で切り捨ててください"
+    },
+    "notification": {
+      "shedDisabled": "分析器メモリ圧力検出 (RSS {rssMb} MB, ソフト制限 {softLimitMb} MB)。圧力下で低重要度のルールを自動的に無効にするルールシャーディングを有効にしてください。",
+      "enableButton": "Enable 設定を有効にします.",
+      "learnMoreButton": "もっともっと学び,もっと学ぶ",
+      "runInit": "'dart run saropa_lints:init'を実行してanalysis_options_custom.yamlを生成し、その後shed_rules: trueを設定してください。",
+      "enabledConfirmation": "ルールの削除がanalysis_options_custom.yamlで有効化されました。解析器は次の再起動時に変更を検知します。"
     }
   },
   "brand": {
@@ -858,7 +922,10 @@
       "analysisFailedDetail": "分析は失敗しました. 詳細については出力をチェックしてください.",
       "removeRecentAria": "削除する Remove remove",
       "removeRecentTitle": "削除する Remove remove",
-      "bulkSelectedTpl": "{n} 件選択中"
+      "bulkSelectedTpl": "{n} 件選択中",
+      "announceSearchVerb": "検索中",
+      "severitiesNoun": "深刻度",
+      "impactsNoun": "影響"
     },
     "emptyState": {
       "hintAfterMessage": "violations.jsonを生成するために, Saropa Lints 解析を実行し,ここで Refresh を使用するか,このダッシュボードを再開します.",
