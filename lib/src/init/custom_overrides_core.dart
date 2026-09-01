@@ -108,6 +108,12 @@ String buildMinimalConfig(
   // Dart SDK's plugin-block validator, which hardcodes the allowed key set.
   buf.writeln('log_level: info # off | error | warning | info | debug');
   buf.writeln('# lane: light # full | light (default when absent: light)');
+  // shed_rules opts into graduated rule shedding under memory pressure —
+  // commented out (off) by default so diagnostics never silently vanish
+  // unless the user explicitly asks for the RSS trade-off.
+  buf.writeln(
+    '# shed_rules: false # true disables low-severity rules under memory pressure',
+  );
   buf.writeln();
 
   // Platform settings (no auto-detection available — user controls these)

@@ -134,6 +134,8 @@ void main() {
     expect(stats, containsPair('shedLevel', 0));
     expect(stats, containsPair('shedRuleCount', 0));
     expect(stats, containsPair('softLimitTripped', isFalse));
+    // shedEnabled defaults to false until enableShedding() is called.
+    expect(stats, containsPair('shedEnabled', isFalse));
 
     // Soft limit is ~70% of hard limit (4096 * 0.7 ≈ 2867).
     final softMb = stats['softLimitMb'] as int;

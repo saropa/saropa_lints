@@ -28,6 +28,7 @@ import '../config/analysis_options_rule_packs.dart';
 import '../config/pubspec_lock_resolver.dart';
 import '../config/rule_packs.dart';
 import '../config/memory_mode.dart' show MemoryMode, MemoryModeConfig;
+import '../project_context.dart' show MemoryPressureHandler;
 // Two-lane split (in-process light lane vs scan-daemon lane).
 import '../config/rule_lane.dart'
     show
@@ -164,6 +165,7 @@ void _loadFromRoot(String? projectRoot) {
     // with a deprecation warning for projects that haven't migrated yet.
     _loadLogLevel(content, mainOptions);
     _loadMemoryMode(content, mainOptions);
+    _loadShedRulesConfig(content);
     _loadDiagnosticStatisticsConfig(content, projectRoot);
 
     // Tier cap. The in-process essential DEFAULT applies only when BOTH:
@@ -619,6 +621,50 @@ void _loadMemoryMode(String? content, String? mainOptions) {
       'Unrecognized memory_mode "$raw" in analysis_options_custom.yaml — '
       'valid values: balanced, full, aggressive. '
       'Keeping current mode (${MemoryModeConfig.mode.name}).',
+    );
+  }
+}
+
+/// Parses `shed_rules:` as a top-level key in
+/// `analysis_options_custom.yaml`, or the legacy `SAROPA_LINTS_SHED_RULES`
+/// env var (env takes precedence, kept for scripted/CI use). Valid values:
+/// `true` (arm graduated shedding), `false`/absent (default — soft-limit
+/// warnings still log, no rules are shed).
+///
+/// Moved off an env-var-only opt-in: `SAROPA_LINTS_SHED_RULES=true` was
+/// undiscoverable without reading source (user feedback — "no users will
+/// ever find this"). The yaml key gives it the same visible surface as
+/// `log_level` and `memory_mode`.
+void _loadShedRulesConfig(String? content) {
+  try {
+    final envValue = Platform.environment['SAROPA_LINTS_SHED_RULES'];
+    if (envValue != null) {
+      final normalized = envValue.trim().toLowerCase();
+      if (normalized == 'true') {
+        MemoryPressureHandler.enableShedding();
+      } else if (normalized != 'false' && normalized.isNotEmpty) {
+        // Warn on typos like "ture", "1", "yes" — otherwise CI scripts
+        // silently run without shedding and no log line explains why.
+        PluginLogger.warning(
+          'Unrecognized SAROPA_LINTS_SHED_RULES value "$envValue" — '
+          'valid values: true, false. Shedding not enabled.',
+        );
+      }
+      return;
+    }
+  } on Object {
+    // Platform.environment may throw on some platforms
+  }
+
+  final raw = _parseTopLevelScalar(content, 'shed_rules');
+  if (raw == 'true') {
+    MemoryPressureHandler.enableShedding();
+  } else if (raw != null && raw != 'false') {
+    // Warn on unrecognized yaml value.
+    PluginLogger.warning(
+      'Unrecognized shed_rules value "$raw" in '
+      'analysis_options_custom.yaml — valid values: true, false. '
+      'Shedding not enabled.',
     );
   }
 }

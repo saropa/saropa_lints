@@ -146,7 +146,7 @@ import {
 import { SIDEBAR_SECTION_CONFIG_KEYS, defaultSidebarSectionVisible, sidebarSectionContextKey } from './sidebarSectionVisibilityKeys';
 import { checkForUpgrade, forceUpgradeCheck } from './upgrade-checker';
 import { buildStatusBarLabel } from './statusBarLabel';
-import { MemoryPressureWatcher, memoryPressureSuffix } from './systemHealth/memoryPressureWatcher';
+import { MemoryPressureWatcher, memoryPressureSuffix, memoryPressureTooltipLine, promptEnableShedRulesIfNeeded } from './systemHealth/memoryPressureWatcher';
 import type { MemoryPressureState } from './systemHealth/memoryPressureWatcher';
 import { ProcessMonitor } from './systemHealth/processMonitor';
 import { formatBytes } from './systemHealth/processQuery';
@@ -1170,19 +1170,13 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         scorePending,
       );
       if (badge) tooltipLines.push(badge.tooltip);
-      // Memory pressure tooltip — shed level and hard-limit status.
-      if (memoryPressureState) {
-        if (memoryPressureState.hardLimitTripped) {
-          tooltipLines.push(l10n('memoryPressure.tooltip.hardTripped'));
-        } else if (memoryPressureState.shedLevel >= 2) {
-          tooltipLines.push(l10n('memoryPressure.tooltip.shedLevel2', {
-            count: String(memoryPressureState.shedRuleCount),
-          }));
-        } else if (memoryPressureState.shedLevel >= 1) {
-          tooltipLines.push(l10n('memoryPressure.tooltip.shedLevel1', {
-            count: String(memoryPressureState.shedRuleCount),
-          }));
-        }
+      // Memory pressure tooltip — shed level and hard-limit status. Shares
+      // its priority order with the status-bar suffix via
+      // memoryPressureTooltipLine (see memoryPressureWatcher.ts) so the two
+      // surfaces can't drift out of sync.
+      const memPressureTooltipLine = memoryPressureTooltipLine(memoryPressureState);
+      if (memPressureTooltipLine) {
+        tooltipLines.push(memPressureTooltipLine);
       }
       if (systemHealthSnapshot) {
         const sSize = formatBytes(systemHealthSnapshot.totalRssBytes);
@@ -1231,6 +1225,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   memoryWatcher.onStateChange((state) => {
     memoryPressureState = state;
     updateAllStatusBars();
+    // Prompt the user to enable rule shedding if pressure is detected but
+    // shed_rules is not set. Shows once per session — see the function doc.
+    promptEnableShedRulesIfNeeded(state);
   });
   const memWatchRoot = getProjectRoot();
   if (memWatchRoot) {

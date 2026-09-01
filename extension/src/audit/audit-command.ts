@@ -208,7 +208,14 @@ function spawnAuditCli(
             const shortFile = (p.file ?? '').split(/[/\\]/).pop() ?? '';
             progress.report({
               increment,
-              message: `${pct}% · ${p.progress}/${p.total} files · ${p.issues ?? 0} issues · ${shortFile}`,
+              // Localized progress string with file counts and current filename.
+              message: l10n('audit.progress.message', {
+                pct: String(pct),
+                scanned: String(p.progress),
+                total: String(p.total),
+                issues: String(p.issues ?? 0),
+                file: shortFile,
+              }),
             });
           }
         } catch {

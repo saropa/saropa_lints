@@ -223,6 +223,7 @@ void _writeMemoryStateFile(int shedLevel, int rssMb) {
       'softLimitTripped': stats['softLimitTripped'],
       'hardLimitTripped': stats['hardLimitTripped'],
       'shedRuleCount': stats['shedRuleCount'],
+      'shedEnabled': stats['shedEnabled'],
       'timestamp': DateTime.now().toIso8601String(),
     });
     File('$dir/memory_state.json').writeAsStringSync(payload);

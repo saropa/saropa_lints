@@ -71,7 +71,7 @@ class AvoidBarrelFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_barrel_files',
@@ -170,7 +170,7 @@ class AvoidDoubleSlashImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_double_slash_imports',
@@ -247,7 +247,7 @@ class AvoidDuplicateExportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_duplicate_exports',
@@ -318,7 +318,7 @@ class AvoidDuplicateMixinsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_duplicate_mixins',
@@ -390,7 +390,7 @@ class AvoidDuplicateNamedImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_duplicate_named_imports',
@@ -465,7 +465,7 @@ class AvoidGlobalStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_global_state',
@@ -673,7 +673,7 @@ class PreferSmallFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.trivial;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxLines = 200;
 
@@ -732,7 +732,7 @@ class AvoidMediumFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.trivial;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxLines = 300;
 
@@ -790,7 +790,7 @@ class AvoidLongFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.trivial;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxLines = 500;
 
@@ -849,7 +849,7 @@ class AvoidVeryLongFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.trivial;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxLines = 1000;
 
@@ -940,7 +940,7 @@ class PreferSmallTestFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.trivial;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxLines = 400;
 
@@ -1000,7 +1000,7 @@ class AvoidMediumTestFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.trivial;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxLines = 600;
 
@@ -1060,7 +1060,7 @@ class AvoidLongTestFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.trivial;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxLines = 1000;
 
@@ -1120,7 +1120,7 @@ class AvoidVeryLongTestFilesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.trivial;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxLines = 2000;
 
@@ -1177,7 +1177,7 @@ class AvoidLongFunctionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxLines = 100;
 
@@ -1272,7 +1272,7 @@ class AvoidLongParameterListRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_long_parameter_list',
@@ -1360,7 +1360,7 @@ class AvoidLocalFunctionsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_local_functions',
@@ -1411,7 +1411,7 @@ class MaxImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxImports = 20;
 
@@ -1494,7 +1494,7 @@ class PreferSortedParametersRule extends SaropaLintRule {
   ];
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => 'void f({String? apple, required String zebra}) {}';
@@ -1607,7 +1607,7 @@ class PreferNamedBooleanParametersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_named_boolean_parameters',
@@ -1662,7 +1662,7 @@ class PreferNamedImportsRule extends SaropaLintRule {
   PreferNamedImportsRule() : super(code: _code);
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => "import 'package:foo/foo.dart'; // no show/hide";
@@ -1744,7 +1744,7 @@ class PreferNamedParametersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_named_parameters',
@@ -1794,7 +1794,7 @@ class PreferStaticClassRule extends SaropaLintRule {
   PreferStaticClassRule() : super(code: _code);
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_static_class',
@@ -1896,7 +1896,7 @@ class AvoidUnnecessaryLocalVariableRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_local_variable',
@@ -1982,7 +1982,7 @@ class AvoidUnnecessaryReassignmentRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_reassignment',
@@ -2228,7 +2228,7 @@ class PreferAbstractFinalStaticClassRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_abstract_final_static_class',
@@ -2327,7 +2327,7 @@ class AvoidHardcodedColorsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_colors',
@@ -2396,7 +2396,7 @@ class AvoidUnusedGenericsRule extends SaropaLintRule {
   AvoidUnusedGenericsRule() : super(code: _code);
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_unused_generics',
@@ -2536,7 +2536,7 @@ class PreferTrailingUnderscoreForUnusedRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => "list.map((item) => 'fixed');";
@@ -2631,7 +2631,7 @@ class AvoidUnnecessaryFuturesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_unnecessary_futures',
@@ -2733,7 +2733,7 @@ class AvoidThrowInFinallyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_throw_in_finally',
@@ -2943,7 +2943,7 @@ class AvoidClassesWithOnlyStaticMembersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_classes_with_only_static_members_with_fix',
@@ -3026,7 +3026,7 @@ class AvoidSettersWithoutGettersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_setters_without_getters_local',
@@ -3101,7 +3101,7 @@ class PreferGettersBeforeSettersRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_getters_before_setters',
@@ -3176,7 +3176,7 @@ class PreferStaticBeforeInstanceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_static_before_instance',
@@ -3250,7 +3250,7 @@ class PreferMixinOverAbstractRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_mixin_over_abstract',
@@ -3313,7 +3313,7 @@ class PreferRecordOverTupleClassRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_record_over_tuple_class',
@@ -3388,7 +3388,7 @@ class PreferSealedClassesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_sealed_classes',
@@ -3449,7 +3449,7 @@ class PreferSealedForStateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_sealed_for_state',
@@ -3537,7 +3537,7 @@ class PreferConstructorsFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_constructors_first',
@@ -3616,7 +3616,7 @@ class PreferFactoryBeforeNamedRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_factory_before_named',
@@ -3691,7 +3691,7 @@ class PreferOverridesLastRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad =>
@@ -3784,7 +3784,7 @@ class PreferConstructorsOverStaticMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad =>
@@ -3857,7 +3857,7 @@ class PreferFunctionOverStaticMethodRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad =>
@@ -3935,7 +3935,7 @@ class PreferExtensionMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_extension_methods',
@@ -4012,7 +4012,7 @@ class PreferStaticMethodOverFunctionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad =>
@@ -4094,7 +4094,7 @@ class PreferImportOverPartRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => "part 'src/helpers.dart';  // tight coupling";
@@ -4160,7 +4160,7 @@ class PreferExtensionOverUtilityClassRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_extension_over_utility_class',
@@ -4252,7 +4252,7 @@ class PreferExtensionTypeForWrapperRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_extension_type_for_wrapper',
@@ -4327,7 +4327,7 @@ class PreferDeferredImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_deferred_imports',
@@ -4364,7 +4364,7 @@ class PreferPartOverImportRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_part_over_import',
@@ -4446,7 +4446,7 @@ class AvoidImportingEntrypointExportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   /// Matches export '...' or export "..."; capture group 1 is the URI.
   static final RegExp _exportUriPattern = RegExp(
@@ -4597,7 +4597,7 @@ class IllegalEnumValuesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'illegal_enum_values',
@@ -4664,7 +4664,7 @@ class WrongNumberOfParametersForSetterRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'wrong_number_of_parameters_for_setter',
@@ -4736,7 +4736,7 @@ class UnnecessaryLibraryNameRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'unnecessary_library_name_with_fix',
@@ -4815,7 +4815,7 @@ class UriDoesNotExistRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'uri_does_not_exist',

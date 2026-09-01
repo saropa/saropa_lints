@@ -125,7 +125,7 @@ class AvoidCascadeAfterIfNullRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_cascade_after_if_null',
@@ -204,7 +204,7 @@ class AvoidCascadeShuffleRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_cascade_shuffle',
@@ -304,7 +304,7 @@ class AvoidComplexArithmeticExpressionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxOperators = 4;
 
@@ -392,7 +392,7 @@ class AvoidComplexConditionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxOperators = 3;
 
@@ -488,7 +488,7 @@ class AvoidDuplicateCascadesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_duplicate_cascades',
@@ -563,7 +563,7 @@ class AvoidExcessiveExpressionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxOperators = 5;
 
@@ -730,7 +730,7 @@ class AvoidImmediatelyInvokedFunctionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_immediately_invoked_functions',
@@ -785,7 +785,7 @@ class AvoidNestedShorthandsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_nested_shorthands',
@@ -863,7 +863,7 @@ class AvoidMultiAssignmentRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_multi_assignment',
@@ -902,7 +902,7 @@ class BinaryExpressionOperandOrderRule extends SaropaLintRule {
   @override
   LintImpact get impact => LintImpact.info;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   RuleType? get ruleType => RuleType.codeSmell;
@@ -970,7 +970,7 @@ class PreferMovingToVariableRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_moving_to_variable',
@@ -1077,7 +1077,7 @@ class PreferParenthesesWithIfNullRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_parentheses_with_if_null',
@@ -1182,7 +1182,7 @@ class AvoidDeepNestingRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _maxDepth = 5;
 
@@ -1296,7 +1296,7 @@ class AvoidHighCyclomaticComplexityRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.high;
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const int _threshold = 15;
 

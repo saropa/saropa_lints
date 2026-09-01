@@ -53,8 +53,11 @@ class RequirePlatformCheckRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  // Only syntactic checks are used (constructor name lexeme, toSource() text
+  // matching) — no .staticType/.staticElement/etc are called, so resolved
+  // type info is not required.
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_platform_check',
@@ -161,8 +164,10 @@ class PreferPlatformIoConditionalRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Only syntactic checks are used (prefix/identifier name comparison,
+  // toSource() text matching for kIsWeb guards) — no resolved-type APIs.
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -279,8 +284,11 @@ class PreferFoundationPlatformCheckRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Only syntactic checks are used (prefix/identifier name comparison, and
+  // walking ancestor nodes for a MethodDeclaration named 'build') — no
+  // resolved-type APIs are called.
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -366,8 +374,10 @@ class PreferPlatformWidgetAdaptiveRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Only a syntactic constructor-name comparison ('MaterialApp') is used —
+  // no resolved-type APIs are called.
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_platform_widget_adaptive',
@@ -407,8 +417,10 @@ class RequireDesktopWindowSetupRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Only syntactic checks are used (method name lexeme, target toSource(),
+  // and filesystem probes for runner files) — no resolved-type APIs.
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_desktop_window_setup',

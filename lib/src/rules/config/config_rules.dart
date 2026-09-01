@@ -54,7 +54,7 @@ class AvoidHardcodedConfigRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_config',
@@ -197,7 +197,7 @@ class AvoidHardcodedConfigTestRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   Set<FileType>? get applicableFileTypes => const <FileType>{FileType.test};
@@ -312,7 +312,7 @@ class AvoidMixedEnvironmentsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   // Performance: Only run on files with class declarations
   @override
@@ -474,7 +474,7 @@ class RequireFeatureFlagTypeSafetyRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_feature_flag_type_safety',
@@ -603,7 +603,7 @@ class AvoidStringEnvParsingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.trivial;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_string_env_parsing',
@@ -693,7 +693,7 @@ class AvoidPlatformSpecificImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_platform_specific_imports',
@@ -789,7 +789,7 @@ class PreferSemverVersionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_semver_version',
@@ -857,7 +857,7 @@ class PreferCompileTimeConfigRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_compile_time_config',
@@ -897,7 +897,7 @@ class PreferFlavorConfigurationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_flavor_configuration',
@@ -936,7 +936,7 @@ class RequireConfigValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_config_validation',
@@ -983,7 +983,7 @@ class PackageNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'pubspec_package_name_convention',
@@ -1091,7 +1091,7 @@ class SortPubDependenciesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'sort_pub_dependencies_extended',
@@ -1240,7 +1240,7 @@ class SecurePubspecUrlsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'secure_pubspec_urls_strict',

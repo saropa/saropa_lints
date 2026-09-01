@@ -57,7 +57,7 @@ class RequireHttpStatusCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_http_status_check',
@@ -152,7 +152,7 @@ class AvoidHardcodedApiUrlsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_hardcoded_api_urls',
@@ -276,7 +276,7 @@ class RequireRetryLogicRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_retry_logic',
@@ -363,7 +363,7 @@ class RequireTypedApiResponseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_typed_api_response',
@@ -473,7 +473,7 @@ class RequireConnectivityCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_connectivity_check',
@@ -574,7 +574,7 @@ class RequireApiErrorMappingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_api_error_mapping',
@@ -666,7 +666,7 @@ class RequireRequestTimeoutRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_request_timeout',
@@ -850,7 +850,7 @@ class RequireOfflineIndicatorRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_offline_indicator',
@@ -944,7 +944,7 @@ class PreferStreamingResponseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_streaming_response',
@@ -1137,7 +1137,7 @@ class PreferHttpConnectionReuseRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_http_connection_reuse',
@@ -1261,7 +1261,7 @@ class AvoidRedundantRequestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_redundant_requests',
@@ -1368,7 +1368,7 @@ class RequireResponseCachingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_response_caching',
@@ -1479,7 +1479,7 @@ class PreferPaginationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_api_pagination',
@@ -1752,7 +1752,7 @@ class RequireCancelTokenRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_cancel_token',
@@ -1860,7 +1860,7 @@ class RequireWebSocketErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_websocket_error_handling',
@@ -2001,7 +2001,7 @@ class RequireContentTypeCheckRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_content_type_check',
@@ -2103,7 +2103,7 @@ class AvoidWebsocketWithoutHeartbeatRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_websocket_without_heartbeat',
@@ -2210,7 +2210,7 @@ class RequireUrlLauncherErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_url_launcher_error_handling',
@@ -2303,7 +2303,7 @@ class RequireImagePickerErrorHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_image_picker_error_handling',
@@ -2382,7 +2382,7 @@ class RequireImagePickerSourceChoiceRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_image_picker_source_choice',
@@ -2471,7 +2471,7 @@ class RequireGeolocatorTimeoutRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_geolocator_timeout',
@@ -2571,7 +2571,7 @@ class RequireConnectivitySubscriptionCancelRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_connectivity_subscription_cancel',
@@ -2668,7 +2668,7 @@ class RequireNotificationHandlerTopLevelRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_notification_handler_top_level',
@@ -2764,7 +2764,7 @@ class RequirePermissionDeniedHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_permission_denied_handling',
@@ -2902,7 +2902,7 @@ class RequireImagePickerResultHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_image_picker_result_handling',
@@ -3017,7 +3017,7 @@ class AvoidCachedImageInBuildRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'avoid_cached_image_in_build',
@@ -3110,7 +3110,7 @@ class RequireSqfliteMigrationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_sqflite_migration',
@@ -3589,7 +3589,7 @@ class RequireSseSubscriptionCancelRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_sse_subscription_cancel',
@@ -3756,7 +3756,7 @@ class PreferTimeoutOnRequestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_timeout_on_requests',
@@ -3924,7 +3924,7 @@ class RequireWebsocketReconnectionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_websocket_reconnection',
@@ -4007,7 +4007,7 @@ class RequireAnalyticsEventNamingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_analytics_event_naming',
@@ -4113,7 +4113,7 @@ class PreferBatchRequestsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_batch_requests',
@@ -4177,7 +4177,7 @@ class RequireCompressionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_accept_encoding_header',
@@ -4280,7 +4280,7 @@ class RequireSslPinningSensitiveRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_ssl_pinning_sensitive',
@@ -4391,7 +4391,7 @@ class PreferStaleWhileRevalidateRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'prefer_stale_while_revalidate',
@@ -4580,7 +4580,7 @@ class RequireApiResponseValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_api_response_validation',
@@ -4633,7 +4633,7 @@ class RequireApiVersionHandlingRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_api_version_handling',
@@ -4761,7 +4761,7 @@ class RequireContentTypeValidationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   static const LintCode _code = LintCode(
     'require_content_type_validation',

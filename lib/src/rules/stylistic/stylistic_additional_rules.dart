@@ -81,7 +81,7 @@ class PreferInterpolationOverConcatenationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -158,7 +158,7 @@ class PreferConcatenationOverInterpolationRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -226,7 +226,7 @@ class PreferDoubleQuotesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -312,7 +312,7 @@ class PreferAbsoluteImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => "import '../../utils.dart';";
@@ -387,7 +387,7 @@ class PreferGroupedImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>['prefer_flat_imports'];
@@ -482,7 +482,7 @@ class PreferFlatImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>['prefer_grouped_imports'];
@@ -575,7 +575,7 @@ class PreferSortedImportsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => "import 'dart:io';\nimport 'dart:async';";
@@ -678,7 +678,7 @@ class PreferImportGroupCommentsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => "import 'dart:async';\n\nimport 'package:x/x.dart';";
@@ -797,7 +797,7 @@ class PreferFieldsBeforeMethodsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -872,7 +872,7 @@ class PreferMethodsBeforeFieldsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -955,7 +955,7 @@ class PreferStaticMembersFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -1032,7 +1032,7 @@ class PreferInstanceMembersFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -1109,7 +1109,7 @@ class PreferPublicMembersFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -1186,7 +1186,7 @@ class PreferPrivateMembersFirstRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -1268,7 +1268,7 @@ class PreferVarOverExplicitTypeRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>['prefer_type_over_var'];
@@ -1349,7 +1349,7 @@ class PreferObjectOverDynamicRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -1430,7 +1430,7 @@ class PreferDynamicOverObjectRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[
@@ -1515,7 +1515,7 @@ class PreferLowerCamelCaseConstantsRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => 'const MAX_RETRIES = 3;';
@@ -1600,7 +1600,7 @@ class PreferCamelCaseMethodNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => 'void fetch_user_data() {}';
@@ -1702,7 +1702,7 @@ class PreferDescriptiveVariableNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => 'final u = getUser();  // unclear purpose';
@@ -1807,7 +1807,7 @@ class PreferConciseVariableNamesRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => 'final theCurrentlyLoggedInUserEmail = e;';
@@ -1881,7 +1881,7 @@ class PreferExplicitThisRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   String get exampleBad => "void greet() => print('Hi, \$name');";
@@ -2049,7 +2049,7 @@ class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.medium;
 
   @override
-  bool get usesTypeResolution => true;
+  bool get usesTypeResolution => false;
 
   @override
   List<String> get conflictingRules => const <String>[

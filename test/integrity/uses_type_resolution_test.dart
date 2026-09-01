@@ -7,9 +7,13 @@ import 'package:test/test.dart';
 /// `usesTypeResolution => true` so balanced mode can skip it on unchanged
 /// files. Conversely, rules declaring the flag without using any of these
 /// waste a light-lane slot by routing to the scan daemon unnecessarily.
+/// Includes modern element-model APIs (`formalParameters`,
+/// `hasDefaultValue`, `defaultValueCode`) that replaced the older
+/// `staticElement` call chain but still require full resolution.
 final _resolvedTypePatterns = RegExp(
   r'\.(staticType|allSupertypes|thisType|resolvedType'
-  r'|declaredElement|staticElement|enclosingElement)\b',
+  r'|declaredElement|staticElement|enclosingElement'
+  r'|formalParameters|hasDefaultValue|defaultValueCode)\b',
 );
 
 /// Matches `.library` access on elements — a resolved-type trigger — but
@@ -102,9 +106,7 @@ void main() {
             '${falseClaims.join('\n')}',
       );
     },
-    // Skip for now — ~200+ false claims across 9 files need a manual audit
-    // to fix per-class. The test is here to prevent NEW false claims once
-    // the audit is complete. See PLAN_analyzer_memory_monitor.md Phase 5.
-    skip: 'Pending Phase 5 audit of ~200+ false usesTypeResolution claims',
+    // Phase 5 audit complete: 180 false claims flipped across 9 files.
+    // This test now guards against regressions.
   );
 }
