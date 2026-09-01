@@ -6,6 +6,7 @@
  */
 
 import * as vscode from 'vscode';
+import { escapeMarkdown } from '../../markdownUtils';
 import { VibrancyResult, FamilySplit, PackageInsight, activeFileUsages } from '../types';
 import { categoryLabel, categoryToGrade, scoreToGrade } from '../scoring/status-classifier';
 import { classifyLicense, licenseEmoji } from '../scoring/license-classifier';
@@ -122,8 +123,11 @@ function buildHoverContent(
     // the /10 never conveyed anything the letter didn't — see ADR in
     // category-dictionary for the letter-only rationale).
     const grade = categoryToGrade(result.category);
+    // Escape package name/version — defense-in-depth for external metadata
+    const pkgName = escapeMarkdown(result.package.name);
+    const pkgVer = escapeMarkdown(result.package.version);
     md.appendMarkdown(
-        `**${result.package.name}** v${result.package.version} `
+        `**${pkgName}** v${pkgVer} `
         + `— **${grade}** ${categoryLabel(result.category)}\n\n`,
     );
 
@@ -371,7 +375,8 @@ function appendHoverFileUsages(md: vscode.MarkdownString, r: VibrancyResult): vo
     const label = count === 1 ? '1 file' : `${count} files`;
     // Show first few file paths
     const shown = active.slice(0, 5);
-    const lines = shown.map(u => `- \`${u.filePath}:${u.line}\``).join('\n');
+    // Escape file paths — they come from the workspace and could contain backticks
+    const lines = shown.map(u => `- \`${escapeMarkdown(u.filePath)}:${u.line}\``).join('\n');
     const more = count > 5 ? `\n- ...+${count - 5} more` : '';
     md.appendMarkdown(`**FILE USAGES** (${label})\n\n${lines}${more}\n\n`);
 }
@@ -384,19 +389,21 @@ function appendHoverAlerts(
         alerts.push('🗄️ **ARCHIVED** — repository is read-only');
     }
     if (r.knownIssue?.reason) {
-        alerts.push(`❌ **Known Issue:** ${truncateBody(r.knownIssue.reason)}`);
+        // Escape external issue reason text
+        alerts.push(`❌ **Known Issue:** ${escapeMarkdown(truncateBody(r.knownIssue.reason))}`);
     }
     if (r.isUnused) {
         alerts.push('⚠️ **Unused** — no imports detected');
     }
     if (split) {
-        alerts.push(`⚠️ **Family split detected** (${split.familyLabel})`);
+        alerts.push(`⚠️ **Family split detected** (${escapeMarkdown(split.familyLabel)})`);
     }
     const flagged = r.github?.flaggedIssues ?? [];
     for (const issue of flagged.slice(0, 3)) {
-        const title = issue.title.length > 60
+        // Escape GitHub issue title — external user-generated content
+        const rawTitle = issue.title.length > 60
             ? issue.title.substring(0, 57) + '...' : issue.title;
-        alerts.push(`🚩 #${issue.number}: ${title}`);
+        alerts.push(`🚩 #${issue.number}: ${escapeMarkdown(rawTitle)}`);
     }
     if (alerts.length > 0) {
         md.appendMarkdown(`**ALERTS**\n\n${alerts.join('\n\n')}\n\n`);
@@ -411,8 +418,9 @@ function appendHoverVulnerabilities(md: vscode.MarkdownString, r: VibrancyResult
     const lines = [`${icon} **${r.vulnerabilities.length} vulnerabilities** (${label})`];
     for (const vuln of r.vulnerabilities.slice(0, 3)) {
         const emoji = severityEmoji(vuln.severity);
-        const fix = vuln.fixedVersion ? ` — fix: ${vuln.fixedVersion}` : '';
-        lines.push(`- ${emoji} ${vuln.id}: ${vuln.summary}${fix}`);
+        // Escape advisory fields — they come from pub.dev API responses
+        const fix = vuln.fixedVersion ? ` — fix: ${escapeMarkdown(vuln.fixedVersion)}` : '';
+        lines.push(`- ${emoji} ${escapeMarkdown(vuln.id)}: ${escapeMarkdown(vuln.summary)}${fix}`);
     }
     if (r.vulnerabilities.length > 3) {
         lines.push(`- ...+${r.vulnerabilities.length - 3} more`);
@@ -433,7 +441,7 @@ function appendHoverAlternatives(md: vscode.MarkdownString, r: VibrancyResult): 
        "(7/10)" suffix is gone; letter is enough to rank at a glance. */
     const lines = r.alternatives.map(alt => {
         const grade = alt.score !== null ? ` (${scoreToGrade(alt.score)})` : '';
-        return `- ${alt.name}${grade}`;
+        return `- ${escapeMarkdown(alt.name)}${grade}`;
     });
     md.appendMarkdown(`**ALTERNATIVES**\n\n${lines.join('\n')}\n\n`);
 }

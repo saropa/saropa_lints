@@ -99,8 +99,11 @@ Adds graduated rule shedding under memory pressure — the analyzer plugin now p
 - **Config loader deduplication** — extracted `_resolveEnvThenYaml` shared helper in `config_loader.dart`, replacing duplicated env-var-then-yaml lookup logic in `_loadShedRulesConfig` and `_loadMemoryMode`. No action required.
 - **Scan-loop RSS guard** — the scan CLI now samples RSS between files and stops early (returning partial results) when memory exceeds the configured hard limit, preventing OOM on very large codebases. No action required.
 - **CodeQL security fixes (13 alerts)** — added `permissions: contents: read` to 2 workflow YAMLs; fixed incomplete Markdown escaping in issue-tree tooltips; replaced substring URL check with parsed-hostname `isGitHubUrl()`; hardened pub.dev changelog HTML-to-markdown against tag-stripping bypasses and double-unescaping. No action required.
+- **Shared `markdownUtils.ts`** — extracted `escapeMarkdown()` and added `buildMarkdownString()` structured builder for safe MarkdownString construction with mixed trusted/untrusted segments. Applied defense-in-depth escaping to hover-provider for external metadata (package names, vulnerability advisories, issue titles, file paths). No action required.
 
 </details>
+
+---
 
 ## [15.2.6]
 

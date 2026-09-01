@@ -2,7 +2,7 @@
  * Shared Markdown escaping and structured builder for vscode.MarkdownString.
  *
  * Use escapeMarkdown() for untrusted text that must render literally.
- * Use MarkdownBuilder for constructing complex tooltips with mixed
+ * Use buildMarkdownString() for constructing complex tooltips with mixed
  * safe-markup and untrusted-text segments.
  */
 
@@ -18,18 +18,29 @@ const MD_SPECIAL = /[\\`*_{}[\]()#+\-.!|~]/g;
  * Escape all Markdown special characters so untrusted text renders as
  * literal content inside a vscode.MarkdownString.  Covers: \ ` * _ { }
  * [ ] ( ) # + - . ! | ~
+ *
+ * Use this on any string that originates outside our own code — package
+ * names, rule messages, user file paths, API responses.  Never on
+ * structural Markdown you control (bold wrappers, table markup, links).
  */
 export function escapeMarkdown(text: string): string {
   return text.replace(MD_SPECIAL, '\\$&');
 }
 
-/** One segment of a structured MarkdownString. */
+/**
+ * One segment of a structured MarkdownString.
+ *
+ * By default every segment is treated as untrusted and escaped.
+ * Set `raw: true` ONLY for markup you wrote yourself — never for
+ * values that come from package metadata, user files, or APIs.
+ */
 export interface MdSegment {
   /** The text content to render. */
   text: string;
   /**
-   * Whether the text is raw (trusted) Markdown or should be escaped.
-   * Default false = the text is untrusted and will be escaped.
+   * Pass-through without escaping.  ONLY for trusted structural
+   * Markdown (bold wrappers, table headers, separator lines).
+   * Using raw:true on user-supplied text is a Markdown injection bug.
    */
   raw?: boolean;
   /** Wrap the (escaped) text in backtick code spans. */
