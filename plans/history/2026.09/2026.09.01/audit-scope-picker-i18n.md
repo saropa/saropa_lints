@@ -6,31 +6,32 @@ The Full Audit feature (`extension/src/audit/`) referenced 47 `audit.*` l10n key
 
 ### Changes
 
-- **`extension/src/i18n/locales/en.json`** — Added 51 keys total:
-  - `audit.alreadyRunning`, `audit.noProject`, `audit.missingDep` (command guards)
-  - `audit.scope.*` (10 keys: scope picker labels, descriptions, placeholder, branch prompt)
-  - `audit.progress.title`, `audit.progress.message` (notification title and localized progress string)
-  - `audit.error.*` (3 keys: spawn failure, invalid project, parse failure)
-  - `audit.report.*` (27 keys: report webview title, heading, subtitle, baseline tag, search, filters, chips, buttons, table columns, empty states, keyboard hint). `toggleGroup` label corrected to "Toggle grouping" since the button toggles between grouped/ungrouped states.
-  - `findingsDash.script.announceSearchVerb`, `.severitiesNoun`, `.impactsNoun` (accessibility announcements)
+- **`extension/src/i18n/locales/en.json`** — Added 51 keys total across audit command guards, scope picker, progress, errors, report webview, and findingsDash accessibility announcements.
 
-- **`extension/src/audit/audit-command.ts`** — Replaced hardcoded inline progress message (`${pct}% · ${p.progress}/${p.total} files · ...`) with `l10n('audit.progress.message', { pct, scanned, total, issues, file })`.
+- **`extension/src/audit/audit-command.ts`** — Replaced hardcoded inline progress message with `l10n('audit.progress.message', { pct, scanned, total, issues, file })`.
 
-- **`extension/scripts/check_l10n_keys.py`** — New CI-ready script that cross-references every `l10n()` call in `extension/src/**/*.ts` against `en.json`:
-  - Key existence check: exits 1 when keys are used in code but absent from the catalog.
-  - `--check-params` flag: validates interpolation tokens — extracts `{placeholder}` from catalog values and cross-references against the call-site object keys. Handles JS shorthand properties (`{ message }`), nested parentheses in values (`String(totalCount)`), and computed/dynamic key prefixes (`codeHealth.flag.` + var).
-  - Proper block-comment and line-comment stripping (string-literal-aware) so doc examples don't register as real call sites.
-  - UTF-8 output forced on Windows.
+- **`extension/scripts/check_l10n_keys.py`** — CI-ready script cross-references every `l10n()` call against `en.json`:
+  - `--check-params` validates interpolation tokens match between call sites and catalog values.
+  - Template-literal-aware comment stripping (handles `${}` interpolations containing `//` or `/*`).
+  - Balanced-brace param extraction handles JS shorthand properties (`{ message }`), nested parentheses (`String(totalCount)`), and spread exclusion (`...obj`).
+  - Dynamic-key-prefix filtering (trailing-dot keys like `codeHealth.flag.` + var).
 
-- **`CHANGELOG.md`** — Two maintenance entries under 15.2.7 Unreleased.
+- **`extension/src/i18n/l10nDiagnostics.ts`** — New VS Code diagnostic provider (`saropa-l10n` collection):
+  - Scans TypeScript files under `extension/src/` for `l10n()` calls on save and open.
+  - Reports missing `en.json` keys as warnings (yellow squiggles at the key string).
+  - Reports interpolation param mismatches (missing params) as warnings.
+  - Caches the flattened catalog; invalidates and re-validates all open files when `en.json` changes via FileSystemWatcher.
+  - Registered at extension activation via `extension.ts`.
+
+- **`CHANGELOG.md`** — Maintenance entries under 15.2.7 Unreleased.
 
 ### What was NOT changed
 
 - Translated locale catalogs not regenerated — requires explicit approval to run the MT pipeline.
-- 38 pre-existing interpolation mismatches in other files flagged by `--check-params` but not addressed (out of scope).
+- 38 pre-existing interpolation mismatches in other files not addressed (out of scope).
 
 ### Verification
 
 - `check_l10n_keys.py`: all 1428 l10n keys resolve. Zero missing.
-- `check_l10n_keys.py --check-params`: zero audit-namespace param mismatches.
-- Code review (medium): no findings in changed files.
+- `check_l10n_keys.py --check-params`: zero audit-namespace param mismatches; 38 pre-existing in other files.
+- Code review: no findings in changed files.

@@ -61,6 +61,7 @@ import { showCommandCatalogPanel } from './views/commandCatalogView';
 import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView';
 import { openProjectVibrancyReport, refreshCodeHealthDashboardIfOpen } from './views/projectVibrancyReportView';
 import { registerAuditCommand } from './audit/audit-command';
+import { registerL10nDiagnostics } from './i18n/l10nDiagnostics';
 import { registerProjectMapCommand } from './views/projectMapView';
 import { registerSaropaDashboardsCommand } from './views/saropaDashboardsView';
 import { registerHealthCodeLens } from './views/healthCodeLens';
@@ -702,6 +703,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Returns a DiagnosticCollection added to subscriptions for cleanup.
   context.subscriptions.push(registerStaleIgnoreCommands(context));
   registerAuditCommand(context);
+  // Live l10n key validation — squiggles on missing keys / param mismatches.
+  registerL10nDiagnostics(context);
   registerProjectMapCommand(context);
   registerSaropaDashboardsCommand(context);
   registerHealthCodeLens(context);

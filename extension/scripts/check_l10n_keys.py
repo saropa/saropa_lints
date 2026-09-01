@@ -26,9 +26,9 @@ _REPO = Path(__file__).resolve().parents[2]
 _SRC = _REPO / "extension" / "src"
 _EN_JSON = _SRC / "i18n" / "locales" / "en.json"
 
-# Matches l10n('dotted.key') — key extraction only. Param extraction
-# happens separately via _extract_params_after() to handle nested parens,
-# template expressions, and multi-arg calls that a single regex can't.
+# Matches l10n('dotted.key') with single or double quotes only.
+# Template-literal keys like l10n(`prefix.${var}`) are dynamic and
+# cannot be validated statically — they are intentionally excluded.
 _L10N_RE = re.compile(r"""l10n\(\s*['"]([a-zA-Z0-9_.]+)['"]""")
 
 # Extracts {placeholder} tokens from en.json values.
@@ -37,7 +37,9 @@ _PLACEHOLDER_RE = re.compile(r"\{([a-zA-Z0-9_]+)\}")
 # Extracts JS object keys from the second l10n() argument.
 # Handles both `{ count: value }` and shorthand `{ message }`.
 # Looks for identifiers preceded by `{` or `,` (start of a member).
-_OBJ_KEY_RE = re.compile(r"(?:^|[{,])\s*(\w+)\s*(?::|[,}])")
+# Excludes spread (`...obj`) and computed keys (`[expr]`) by requiring
+# the captured group to be a plain identifier, not preceded by `...`.
+_OBJ_KEY_RE = re.compile(r"(?:^|[{,])\s*(?!\.\.\.)(\w+)\s*(?::|[,}])")
 
 
 def _flatten(obj: dict, prefix: str = "") -> dict[str, str]:
@@ -53,17 +55,19 @@ def _flatten(obj: dict, prefix: str = "") -> dict[str, str]:
 
 
 def _strip_comments(source: str) -> str:
-    """Remove block comments (/* ... */) and line comments (// ...) from TS source.
+    """Remove block and line comments from TypeScript source.
 
-    Respects string literals so l10n calls inside strings are preserved.
+    Handles single-quoted, double-quoted, and template-literal strings
+    (including nested ${...} interpolations that may contain // or /*).
+    Preserves newlines so line counts stay accurate.
     """
     result: list[str] = []
     i = 0
     n = len(source)
     while i < n:
         c = source[i]
-        # String literals — skip their contents to avoid false comment starts.
-        if c in ("'", '"', '`'):
+        # Single- or double-quoted string — consume until closing quote.
+        if c in ("'", '"'):
             quote = c
             result.append(c)
             i += 1
@@ -71,7 +75,6 @@ def _strip_comments(source: str) -> str:
                 ch = source[i]
                 result.append(ch)
                 if ch == '\\':
-                    # Escaped character — consume next char unconditionally.
                     i += 1
                     if i < n:
                         result.append(source[i])
@@ -79,17 +82,24 @@ def _strip_comments(source: str) -> str:
                     break
                 i += 1
             i += 1
-        # Block comment — discard entirely, replace with space to preserve
-        # token boundaries.
+        # Template literal — recurse through ${...} interpolations so
+        # that `//` or `/*` inside them are not treated as comments.
+        elif c == '`':
+            i = _consume_template_literal(source, i, result)
+        # Block comment — replace with a space per line to preserve
+        # token boundaries and line counts.
         elif c == '/' and i + 1 < n and source[i + 1] == '*':
             result.append(' ')
             i += 2
             while i < n:
-                if source[i] == '*' and i + 1 < n and source[i + 1] == '/':
+                if source[i] == '\n':
+                    # Preserve the newline so line numbers stay accurate.
+                    result.append('\n')
+                elif source[i] == '*' and i + 1 < n and source[i + 1] == '/':
                     i += 2
                     break
                 i += 1
-        # Line comment — discard to end of line.
+        # Line comment — discard to end of line, keep the newline.
         elif c == '/' and i + 1 < n and source[i + 1] == '/':
             i += 2
             while i < n and source[i] != '\n':
@@ -98,6 +108,68 @@ def _strip_comments(source: str) -> str:
             result.append(c)
             i += 1
     return ''.join(result)
+
+
+def _consume_template_literal(source: str, start: int, result: list[str]) -> int:
+    """Consume a template literal starting at the backtick at `start`.
+
+    Appends characters to `result` and returns the index after the
+    closing backtick. Handles nested ${...} with balanced-brace
+    tracking, including nested template literals inside interpolations.
+    """
+    n = len(source)
+    result.append(source[start])  # opening backtick
+    i = start + 1
+    while i < n:
+        ch = source[i]
+        if ch == '\\':
+            # Escaped char — consume unconditionally.
+            result.append(ch)
+            i += 1
+            if i < n:
+                result.append(source[i])
+            i += 1
+        elif ch == '`':
+            # Closing backtick.
+            result.append(ch)
+            i += 1
+            return i
+        elif ch == '$' and i + 1 < n and source[i + 1] == '{':
+            # Template interpolation — consume with balanced braces.
+            result.append(ch)
+            result.append('{')
+            i += 2
+            depth = 1
+            while i < n and depth > 0:
+                ic = source[i]
+                if ic == '`':
+                    # Nested template literal inside the interpolation.
+                    i = _consume_template_literal(source, i, result)
+                    continue
+                result.append(ic)
+                if ic == '{':
+                    depth += 1
+                elif ic == '}':
+                    depth -= 1
+                elif ic in ("'", '"'):
+                    # String inside interpolation — skip contents.
+                    q = ic
+                    i += 1
+                    while i < n:
+                        sc = source[i]
+                        result.append(sc)
+                        if sc == '\\':
+                            i += 1
+                            if i < n:
+                                result.append(source[i])
+                        elif sc == q:
+                            break
+                        i += 1
+                i += 1
+        else:
+            result.append(ch)
+            i += 1
+    return i
 
 
 def _extract_params_after(source: str, start: int) -> str | None:
@@ -168,9 +240,7 @@ def _collect_used_keys() -> dict[str, list[tuple[str, str | None]]]:
         for m in _L10N_RE.finditer(stripped):
             key = m.group(1)
             # Extract the second argument (params object) if present.
-            # m.end() points after the closing quote of the key.
             after_quote = m.end()
-            # Skip the closing quote character itself.
             raw_params = _extract_params_after(stripped, after_quote)
             # Find line number from character offset.
             offset = m.start()
@@ -212,6 +282,8 @@ def _check_params(
                 )
                 continue
             # Extract keys from the JS object literal { foo: ..., bar: ... }.
+            # Spread properties (...obj) are excluded by the negative
+            # lookahead; computed keys ([expr]) don't match \w+ after {/,.
             supplied = set(_OBJ_KEY_RE.findall(raw_params))
             missing_params = expected - supplied
             extra_params = supplied - expected
