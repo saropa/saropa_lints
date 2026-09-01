@@ -589,40 +589,20 @@ void _loadLogLevel(String? content, String? mainOptions) {
 /// Falls back to the old plugin-block location in [mainOptions] with a
 /// deprecation warning so projects that haven't migrated yet still work.
 void _loadMemoryMode(String? content, String? mainOptions) {
-  try {
-    // Env var takes precedence over the yaml key.
-    final envValue = Platform.environment['SAROPA_MEMORY_MODE'];
-    if (envValue != null) {
-      final parsed = _parseMemoryMode(envValue);
-      if (parsed != null) {
-        MemoryModeConfig.mode = parsed;
-      } else {
-        PluginLogger.warning(
-          'Unrecognized SAROPA_MEMORY_MODE "$envValue" — '
-          'valid values: balanced, full, aggressive. '
-          'Keeping current mode (${MemoryModeConfig.mode.name}).',
-        );
-      }
-      return;
-    }
-  } on Object {
-    // Platform.environment may throw on some platforms
-  }
-
-  // Reads `memory_mode:` from the custom file, falling back to the old plugin
-  // block with a deprecation warning via [_readWithDeprecationFallback].
-  final raw = _readWithDeprecationFallback(content, mainOptions, 'memory_mode');
-  if (raw == null) return;
-  final parsed = _parseMemoryMode(raw);
-  if (parsed != null) {
-    MemoryModeConfig.mode = parsed;
-  } else {
-    PluginLogger.warning(
-      'Unrecognized memory_mode "$raw" in analysis_options_custom.yaml — '
-      'valid values: balanced, full, aggressive. '
-      'Keeping current mode (${MemoryModeConfig.mode.name}).',
-    );
-  }
+  // Delegates the env-var-then-yaml lookup (with deprecation fallback for
+  // the old plugin-block location) to the shared helper; only the
+  // mode-specific parsing/assignment stays local.
+  final value = _resolveEnvThenYaml(
+    envVarName: 'SAROPA_MEMORY_MODE',
+    yamlKey: 'memory_mode',
+    customContent: content,
+    mainOptions: mainOptions,
+    validValues: const {'balanced', 'full', 'aggressive'},
+    warningContext: 'Keeping current mode (${MemoryModeConfig.mode.name}).',
+  );
+  if (value == null) return;
+  final parsed = _parseMemoryMode(value);
+  if (parsed != null) MemoryModeConfig.mode = parsed;
 }
 
 /// Parses `shed_rules:` as a top-level key in
@@ -636,37 +616,72 @@ void _loadMemoryMode(String? content, String? mainOptions) {
 /// ever find this"). The yaml key gives it the same visible surface as
 /// `log_level` and `memory_mode`.
 void _loadShedRulesConfig(String? content) {
+  // Delegates the env-var-then-yaml lookup (including typo warnings) to the
+  // shared helper; only the true/false-to-action mapping stays local.
+  final value = _resolveEnvThenYaml(
+    envVarName: 'SAROPA_LINTS_SHED_RULES',
+    yamlKey: 'shed_rules',
+    customContent: content,
+    validValues: const {'true', 'false'},
+    warningContext: 'Shedding not enabled.',
+  );
+  if (value == 'true') MemoryPressureHandler.enableShedding();
+}
+
+/// Reads a config scalar preferring env var over yaml.
+///
+/// Shared by [_loadMemoryMode] and [_loadShedRulesConfig] to deduplicate
+/// the env-var-then-yaml lookup pattern (env wins, yaml is the fallback,
+/// unrecognized values warn and are treated as absent). Callers keep their
+/// own parsing/mapping of the returned string to a typed value or action —
+/// this helper only resolves *which* raw string wins and validates it.
+///
+/// Returns the raw value (trimmed, lower-cased) from the first source
+/// that has one, or null if neither does. Warns on values not in
+/// [validValues] (when non-null) so typos like "ture" don't fail silently.
+String? _resolveEnvThenYaml({
+  required String envVarName,
+  required String yamlKey,
+  required String? customContent,
+  String? mainOptions,
+  Set<String>? validValues,
+  String? warningContext,
+}) {
+  // Env var takes precedence.
   try {
-    final envValue = Platform.environment['SAROPA_LINTS_SHED_RULES'];
+    final envValue = Platform.environment[envVarName];
     if (envValue != null) {
       final normalized = envValue.trim().toLowerCase();
-      if (normalized == 'true') {
-        MemoryPressureHandler.enableShedding();
-      } else if (normalized != 'false' && normalized.isNotEmpty) {
-        // Warn on typos like "ture", "1", "yes" — otherwise CI scripts
-        // silently run without shedding and no log line explains why.
+      if (normalized.isEmpty) return null;
+      if (validValues != null && !validValues.contains(normalized)) {
         PluginLogger.warning(
-          'Unrecognized SAROPA_LINTS_SHED_RULES value "$envValue" — '
-          'valid values: true, false. Shedding not enabled.',
+          'Unrecognized $envVarName "$envValue" — '
+          'valid values: ${validValues.join(', ')}. '
+          '${warningContext ?? ''}',
         );
+        return null;
       }
-      return;
+      return normalized;
     }
   } on Object {
     // Platform.environment may throw on some platforms
   }
 
-  final raw = _parseTopLevelScalar(content, 'shed_rules');
-  if (raw == 'true') {
-    MemoryPressureHandler.enableShedding();
-  } else if (raw != null && raw != 'false') {
-    // Warn on unrecognized yaml value.
+  // Yaml fallback — use deprecation-aware reader when mainOptions provided.
+  final raw = mainOptions != null
+      ? _readWithDeprecationFallback(customContent, mainOptions, yamlKey)
+      : _parseTopLevelScalar(customContent, yamlKey);
+  if (raw == null) return null;
+  final normalized = raw.trim().toLowerCase();
+  if (validValues != null && !validValues.contains(normalized)) {
     PluginLogger.warning(
-      'Unrecognized shed_rules value "$raw" in '
-      'analysis_options_custom.yaml — valid values: true, false. '
-      'Shedding not enabled.',
+      'Unrecognized $yamlKey "$raw" in analysis_options_custom.yaml — '
+      'valid values: ${validValues.join(', ')}. '
+      '${warningContext ?? ''}',
     );
+    return null;
   }
+  return normalized;
 }
 
 /// Extracts the value of a top-level YAML key from [content].

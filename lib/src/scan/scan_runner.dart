@@ -640,6 +640,13 @@ class ScanRunner {
     };
   }
 
+  /// Fallback RSS ceiling (MB) for the between-files scan check, used only
+  /// when no hard limit is configured via [MemoryPressureHandler] (e.g. the
+  /// scan CLI running standalone, outside the plugin's memory-mode config).
+  /// 1500 MB leaves headroom below typical OOM territory for a Dart process
+  /// while still catching runaway scans over very large codebases.
+  static const int _defaultScanRssLimitMb = 1500;
+
   /// Resolves and scans [files] one at a time, returning all diagnostics.
   ///
   /// A single [AnalysisContextCollection] spans every file so the analyzer's
@@ -659,6 +666,16 @@ class ScanRunner {
       resourceProvider: PhysicalResourceProvider.INSTANCE,
     );
 
+    // RSS ceiling for the between-files check below. Prefer the hard limit
+    // already configured on MemoryPressureHandler (e.g. via
+    // SAROPA_LINTS_MAX_RSS_MB or memory_mode) so the scan CLI and the
+    // in-editor plugin agree on one threshold; fall back to a fixed default
+    // when nothing is configured, so standalone scan runs are still
+    // protected from OOM on very large codebases.
+    final scanRssLimitMb = MemoryPressureHandler.hardRssLimitMb > 0
+        ? MemoryPressureHandler.hardRssLimitMb
+        : _defaultScanRssLimitMb;
+
     for (var i = 0; i < absFiles.length; i++) {
       _showProgress(i, absFiles.length, diagnostics.length, absFiles[i], sw);
       await _scanSingleFileResolved(
@@ -668,6 +685,30 @@ class ScanRunner {
         visitorRule,
         diagnostics,
       );
+
+      // Check RSS between files to avoid OOM during large scans. Resolved
+      // ASTs and analyzer caches accumulate per file, so a project with
+      // thousands of files can exhaust memory well before reaching the end
+      // — sampling here lets the scan bail out with partial results (still
+      // useful) instead of crashing with nothing. ProcessInfo.currentRss can
+      // throw on platforms without RSS support; treat that as "unavailable"
+      // (-1) rather than letting it crash the scan.
+      int rssMb;
+      try {
+        rssMb = io.ProcessInfo.currentRss ~/ (1024 * 1024);
+      } on Object {
+        rssMb = -1;
+      }
+      if (rssMb > scanRssLimitMb) {
+        final scanned = i + 1;
+        final remaining = absFiles.length - scanned;
+        _err(
+          '  Scan RSS (${rssMb}MB) exceeds limit (${scanRssLimitMb}MB) after '
+          '$scanned/${absFiles.length} files — stopping early '
+          '($remaining files skipped).',
+        );
+        break;
+      }
     }
 
     // Clear progress line when using stderr
