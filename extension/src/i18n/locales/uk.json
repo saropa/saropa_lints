@@ -6,6 +6,7 @@
     "alreadyRunning": "Аудит вже виконується — зачекайте, поки він не завершиться.",
     "noProject": "Не знайдено проекту Dart. Відкрийте папку, яка містить pubspec.yaml.",
     "missingDep": "Цей проект не залежить від saropa_lints. Додайте його до dev_dependencies спочатку.",
+    "pickWorkspaceFolder": "Який теку ви хочете перевірити?",
     "scope": {
       "placeholder": "Які файли мають бути включеними в аудит?",
       "full": "Повний проект",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Не вдалося запустити аудит CLI: {message}",
       "invalidProject": "Аудит не може виконуватися для цього проекту. {details}",
-      "parseFailed": "Аудит завершено, але його вихід не можна було прочитати. Спробуйте запустити його знову."
+      "parseFailed": "Аудит завершено, але його вихід не можна було прочитати. Спробуйте запустити його знову.",
+      "canceled": "Аудит скасовано."
     },
     "report": {
       "title": "Saropa Lints Аудит",
       "heading": "Аудит звіт",
+      "errorHeading": "Аудит не вдалося",
+      "canceledHeading": "Аудит скасовано",
       "subtitle": "{count} результати · {timestamp}",
       "baselineSubtitle": "Порівняно з базовим варіантом з {date}",
       "searchPlaceholder": "Фільтрувати за правилом, файлом або повідомленням…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Стрілки для навігації · Enter для відкриття файлу · Esc для очищення пошуку",
       "copiedJson": "Аудит JSON скопійовано в буфер обміну.",
       "baselineSaved": "Збережено базову версію. Майбутні аудити можуть порівнювати цей знімок.",
-      "baselineSaveFailed": "Не вдалося зберегти базову лінію: {message}"
+      "baselineSaveFailed": "Не вдалося зберегти базову лінію: {message}",
+      "deferredLoading": "Завантаження повного набору результатів (цей аудит досить великий)…",
+      "deferredLoadFailed": "Не вдалося завантажити повний набір результатів — відображаються лише перші {pageSize} виявлення.",
+      "deferredWriteFailed": "Не вдалося записати великий набір результатів у тимчасовий файл ({message}) — звіт може відкриватися повільно."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart процеси: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} процес(ів) ({size} RSS)",
       "daemonCount": "Flutter демони: {total} ({orphaned} відокремлений)",
+      "scanDaemonOrphans": "Орфанізовані сканери: {count} — використовуйте Clean Up для видалення",
       "warningHint": "Використання пам'яті високе — натисніть для деталей",
       "criticalHint": "Використання пам'яті критичне — очистити рекомендується"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Не Показувати Опять"
     },
     "cleanup": {
-      "noOrphans": "Не знайдено орфанів Flutter.",
-      "confirm": "Знайдено {count} орфанів Flutter демонів процесів використання {size}. Забити їх?",
+      "noOrphans": "Немає вільних демонів.",
+      "confirm": "Знайдено {count} орфанів процесів daemon (і) використовуючи {size}. Вбити їх?",
       "killButton": "Кіль аборігінів",
       "cancelButton": "Відкласти скасувати"
     },
@@ -622,6 +631,7 @@
       "colCommand": "Команда",
       "colAction": "Дія",
       "typeOrphan": "Орфан",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Процес",
       "kill": "Видалити",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Акції порівняння - це дії, спрямовані на те, щоб порівнювати.",
       "packageDashboard": "Пакетний панель Dashboard",
       "packageDashboardTitle": "Відкрийте панель \"Пакети\", щоб порівняти більше пакетів."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Панель дебагування"
+    },
+    "section": {
+      "engines": "Діагностичні двигуни",
+      "log": "Лог"
+    },
+    "engine": {
+      "analyzerPlugin": "Аналізатор плагінів",
+      "scanDaemon": "Сканувати Daemon",
+      "lspServer": "LSP Сервер",
+      "pid": "PID:",
+      "status": "Статус:",
+      "rules": "Правила:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "УВІМКНЕНО",
+      "off": "ВІДКЛЮЧИТИ"
+    },
+    "action": {
+      "killAll": "Видалити Всі",
+      "restartAll": "Перезапустити всі"
+    },
+    "log": {
+      "empty": "Ще немає записів журналу."
     }
   },
   "detailView": {

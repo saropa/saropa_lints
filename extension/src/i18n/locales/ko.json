@@ -6,6 +6,7 @@
     "alreadyRunning": "점검이 이미 실행 중입니다 — 완료를 기다려 주세요.",
     "noProject": "Dart 프로젝트를 찾을 수 없습니다. pubspec.yaml가 포함된 폴더를 열어주세요.",
     "missingDep": "이 프로젝트는 saropa_lints에 의존하지 않습니다. 먼저 dev_dependencies에 추가하세요.",
+    "pickWorkspaceFolder": "어떤 워크스페이스 폴더를 감사 대상으로 할까요?",
     "scope": {
       "placeholder": "어떤 파일을 감사 대상으로 해야 하나요?",
       "full": "전체 프로젝트",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "오디트 CLI를 시작할 수 없습니다: {message}",
       "invalidProject": "이 프로젝트에 대한 검토를 실행할 수 없습니다. {details}",
-      "parseFailed": "점검이 완료되었지만 출력 결과를 읽을 수 없습니다. 다시 실행해 보세요."
+      "parseFailed": "점검이 완료되었지만 출력 결과를 읽을 수 없습니다. 다시 실행해 보세요.",
+      "canceled": "감사가 취소되었습니다."
     },
     "report": {
       "title": "Saropa Lints 검토",
       "heading": "점검 보고서",
+      "errorHeading": "감사 실패",
+      "canceledHeading": "감사가 취소되었습니다.",
       "subtitle": "{count} 결과 · {timestamp}",
       "baselineSubtitle": "기준선과 비교하여 {date}에서",
       "searchPlaceholder": "규칙, 파일, 또는 메시지로 필터링…",
@@ -54,7 +58,10 @@
       "keyboardHint": "화살표 키로 이동 · Enter로 파일 열기 · Esc로 검색 초기화",
       "copiedJson": "클립보드에 복사된 JSON 검토",
       "baselineSaved": "기준이 저장되었습니다. 향후 감사를 이 스냅샷과 비교할 수 있습니다.",
-      "baselineSaveFailed": "기본값을 저장할 수 없습니다: {message}"
+      "baselineSaveFailed": "기본값을 저장할 수 없습니다: {message}",
+      "deferredLoading": "전체 결과 집합을 로딩 중입니다(이 감사 항목은 크기 때문에)...",
+      "deferredLoadFailed": "전체 결과 집합을 로드할 수 없습니다 — 첫 번째 {pageSize} 개의 발견 사항만 표시합니다.",
+      "deferredWriteFailed": "대규모 결과 세트를 임시 파일({message})에 쓸 수 없습니다. 보고서를 여는 속도가 느릴 수 있습니다."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart 처리 중: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} 프로세스( {size} RSS )",
       "daemonCount": "Flutter 데몬: {total} ({orphaned} 버려짐)",
+      "scanDaemonOrphans": "삭제된 스캔 데몬: {count} — 정리 기능을 사용하여 종료",
       "warningHint": "메모리 사용량이 높습니다 — 자세한 정보를 클릭하세요",
       "criticalHint": "메모리 사용량은 중요합니다 — 정리 권장"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "다시 보지 않기"
     },
     "cleanup": {
-      "noOrphans": "orphaned Flutter daemon 없음.",
-      "confirm": "{count}로 부터 Flutter 개의 {size} 오버헤드 프로세스 발견됨. 종료하시겠습니까?",
+      "noOrphans": "삭제된 데몬 없음.",
+      "confirm": "{count}개의 방치된 daemon 프로세스(들)을 {size}를 사용하여 찾았습니다. 종료할까요?",
       "killButton": "죽은 자식 프로세스 제거",
       "cancelButton": "취소 취소합니다."
     },
@@ -622,6 +631,7 @@
       "colCommand": "명령",
       "colAction": "작동",
       "typeOrphan": "무리",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "프로세스",
       "kill": "죽이다",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "비교 활동은 비교 활동을 의미합니다.",
       "packageDashboard": "패키지 대시보드 (Package Dashboard)",
       "packageDashboardTitle": "패키지 대시보드를 열고 더 많은 패키지를 비교하십시오."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "디버그 패널"
+    },
+    "section": {
+      "engines": "진단 엔진",
+      "log": "로그"
+    },
+    "engine": {
+      "analyzerPlugin": "분석기 플러그인",
+      "scanDaemon": "스캔 Daemon",
+      "lspServer": "LSP 서버",
+      "pid": "PID:",
+      "status": "상태:",
+      "rules": "규칙:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "에",
+      "off": "끄다"
+    },
+    "action": {
+      "killAll": "모두 종료",
+      "restartAll": "모두 재시작"
+    },
+    "log": {
+      "empty": "아직 로그 항목이 없습니다."
     }
   },
   "detailView": {

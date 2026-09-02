@@ -6,6 +6,7 @@
     "alreadyRunning": "已有一个审计正在运行 —— 请等待其完成。",
     "noProject": "未找到 Dart 项目。打开包含 pubspec.yaml 的文件夹。",
     "missingDep": "此项目不依赖saropa_lints。请先将其添加到dev_dependencies中。",
+    "pickWorkspaceFolder": "应该对哪个工作区文件夹运行审计？",
     "scope": {
       "placeholder": "应审计哪些文件？",
       "full": "完整项目",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "无法启动审计 CLI：{message}",
       "invalidProject": "该审计无法针对此项目运行。{details}",
-      "parseFailed": "审计已完成，但无法读取其输出。请尝试重新运行。"
+      "parseFailed": "审计已完成，但无法读取其输出。请尝试重新运行。",
+      "canceled": "审核取消。"
     },
     "report": {
       "title": "Saropa Lints 审计",
       "heading": "审计报告",
+      "errorHeading": "审核失败",
+      "canceledHeading": "审计被取消",
       "subtitle": "{count} 结果 · {timestamp}",
       "baselineSubtitle": "与{date}基线相比",
       "searchPlaceholder": "按规则、文件或消息筛选…",
@@ -54,7 +58,10 @@
       "keyboardHint": "方向键导航 · 回车打开文件 · Esc 清除搜索",
       "copiedJson": "剪贴板已复制审计 JSON",
       "baselineSaved": "基线已保存。未来的审计可以以此快照作为对比。",
-      "baselineSaveFailed": "无法保存基线：{message}"
+      "baselineSaveFailed": "无法保存基线：{message}",
+      "deferredLoading": "加载完整的结果集（此审计内容较多）…",
+      "deferredLoadFailed": "无法加载完整的结果集——仅显示前 {pageSize} 个发现结果。",
+      "deferredWriteFailed": "无法将大型结果集写入临时文件 ({message}) — 报告打开速度可能很慢。"
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart进程: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints：{count}个进程({size} RSS)",
       "daemonCount": "Flutter 守护进程：{total}（{orphaned} 孤儿）",
+      "scanDaemonOrphans": "孤立的扫描守护进程：{count} — 使用清理功能终止",
       "warningHint": "内存使用率高 — 点击查看详情",
       "criticalHint": "内存使用是关键 —— 建议清理"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "不再显示"
     },
     "cleanup": {
-      "noOrphans": "未发现孤立的 Flutter 守护进程。",
-      "confirm": "发现使用 {size} 的 {count} 个孤立的 Flutter 守护进程。是否终止它们？",
+      "noOrphans": "未发现孤立的守护进程。",
+      "confirm": "发现使用 {size} 的 {count} 个孤立的守护进程。是否终止它们？",
       "killButton": "杀死孤儿",
       "cancelButton": "取消 取缔 在此之前,请注销."
     },
@@ -622,6 +631,7 @@
       "colCommand": "命令",
       "colAction": "操作",
       "typeOrphan": "孤儿",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "处理",
       "kill": "杀死",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "进行比较的行动.",
       "packageDashboard": "包装仪表板 这些是",
       "packageDashboardTitle": "打开包装仪表板,可以比较更多的包."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "调试面板"
+    },
+    "section": {
+      "engines": "诊断引擎",
+      "log": "日志"
+    },
+    "engine": {
+      "analyzerPlugin": "分析器插件",
+      "scanDaemon": "扫描 Daemon",
+      "lspServer": "LSP 服务器",
+      "pid": "PID:",
+      "status": "状态:",
+      "rules": "规则：",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "在",
+      "off": "关闭"
+    },
+    "action": {
+      "killAll": "全部关闭",
+      "restartAll": "全部重启"
+    },
+    "log": {
+      "empty": "尚未有日志条目。"
     }
   },
   "detailView": {

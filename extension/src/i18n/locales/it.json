@@ -6,6 +6,7 @@
     "alreadyRunning": "Un'audit è già in corso — attendi che termini.",
     "noProject": "Nessun progetto Dart trovato. Apri una cartella che contenga un pubspec.yaml.",
     "missingDep": "Questo progetto non dipende da saropa_lints. Aggiungilo prima a dev_dependencies.",
+    "pickWorkspaceFolder": "Quale cartella del workspace dovrebbe essere analizzata?",
     "scope": {
       "placeholder": "Quale file dovrebbe coprire l'audit?",
       "full": "Progetto completo",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Non è stato possibile avviare l'audit CLI: {message}",
       "invalidProject": "L'audit non può essere eseguito su questo progetto. {details}",
-      "parseFailed": "L'audit è terminato ma non è stato possibile leggere l'output. Prova a eseguirlo nuovamente."
+      "parseFailed": "L'audit è terminato ma non è stato possibile leggere l'output. Prova a eseguirlo nuovamente.",
+      "canceled": "Verifica annullata."
     },
     "report": {
       "title": "Saropa Lints Controllo",
       "heading": "Rapporto di Audit",
+      "errorHeading": "Il controllo non è riuscito",
+      "canceledHeading": "Verifica annullata",
       "subtitle": "{count} finding · {timestamp}",
       "baselineSubtitle": "Confronto con la baseline da {date}",
       "searchPlaceholder": "Filtrare per regola, file o messaggio…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Freccia su e giù per navigare · Invio per aprire il file · Esc per cancellare la ricerca",
       "copiedJson": "Audit JSON copiato negli appunti.",
       "baselineSaved": "Baseline salvato. Future audit possono confrontarsi con questa snapshot.",
-      "baselineSaveFailed": "Non è stato possibile salvare la baseline: {message}"
+      "baselineSaveFailed": "Non è stato possibile salvare la baseline: {message}",
+      "deferredLoading": "Caricamento dell'intero set di risultati (questo audit è grande)…",
+      "deferredLoadFailed": "Non è possibile caricare l'intero set di risultati — si mostrano solo i primi {pageSize} risultati.",
+      "deferredWriteFailed": "Impossibile scrivere il set di risultati di grandi dimensioni in un file temporaneo ({message}): l'apertura del report potrebbe essere lenta."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Regole severe:\n1. Restituisci SOLO l'output della stringa tradotta.\n2. NON includere spiegazioni, introduzioni, notazione markdown o virgolette circostanti.\n3. Il testo può contenere token di placeholder: token di placeholder. Copia ciascuno di essi nella traduzione ESATTAMENTE come scritto, nella posizione grammaticalmente corretta. Mai tradurre, rimuovere o riformattare un token.\n4. L'output DEVE utilizzare il sistema di scrittura corretto per la lingua di destinazione; non passare a un'altra lingua nel mezzo della frase.\n\nTesto: Dart processi: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} processo(i) ({size} RSS)",
       "daemonCount": "Flutter daemon: {total} ({orphaned} orfani)",
+      "scanDaemonOrphans": "Scan daemons orfani: {count} — utilizza Clean Up per terminare",
       "warningHint": "Utilizzo della memoria è elevato — clicca per i dettagli",
       "criticalHint": "L'uso della memoria è critico — pulisci consigliato"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Non Mostra di Nuovo"
     },
     "cleanup": {
-      "noOrphans": "Nessun daemon Flutter orfano trovato.",
-      "confirm": "Processi daemon orfani {count} trovati utilizzando {size}: Flutter. Eliminare?",
+      "noOrphans": "Nessun daemon orfano trovato.",
+      "confirm": "Processo(i) daemon orfano(i) {count} trovato(i) utilizzando {size}. Eliminare?",
       "killButton": "Elimina Orfani",
       "cancelButton": "Annulla annulla cancella"
     },
@@ -622,6 +631,7 @@
       "colCommand": "Comando",
       "colAction": "Azione",
       "typeOrphan": "Orfano",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Processo",
       "kill": "Elimina",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Azioni di confronto: azioni comparate.",
       "packageDashboard": "Dashboard dei pacchetti.",
       "packageDashboardTitle": "Apri il pannello dei pacchetti per confrontare più paccheti."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Pannello Debug"
+    },
+    "section": {
+      "engines": "Motori di Diagnosi",
+      "log": "Tronco d'albero"
+    },
+    "engine": {
+      "analyzerPlugin": "Plugin Analizzatore",
+      "scanDaemon": "Scansiona Daemon",
+      "lspServer": "Server LSP",
+      "pid": "PID:",
+      "status": "Stato:",
+      "rules": "Regole:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "SU",
+      "off": "SPENTO"
+    },
+    "action": {
+      "killAll": "Elimina Tutti",
+      "restartAll": "Riavvia tutto"
+    },
+    "log": {
+      "empty": "Nessuna voce dei log per ora."
     }
   },
   "detailView": {

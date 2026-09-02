@@ -8,6 +8,7 @@
   "views.status.name": "اسٽيٽس",
   "views.settings.name": "سيٽنگز",
   "views.severityFilters.name": "تشخيصات",
+  "command.auditFolder.title": "Saropa: ایڈیٹ فولڈر...",
   "views.help.name": "مدد",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart اور Flutter لائٹ رولز سیکورٹی، اکسیسیبلیٹی، اور پرفارمنس کے لیے۔\n\nDart یا Flutter پروجیکٹ کی ضرورت ہے۔\n\nایک فولڈر کھولیں جس میں `pubspec.yaml` موجود ہو۔\n\n[آن لائن سیکھیں](https://pub.dev/packages/saropa_lints)\n[سی ڈی ای کمانڈز دیکھیں](command:saropaLints.showCommandCatalog)\n[Saropa Lints بارے میں](command:saropaLints.showAbout)\n[شروع کریں](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: پروجيڪٽ سيٽ اپ ڪريو (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "کل Dart RSS کے مجموعہ کو اس قیمت (GB) سے زیادہ ہونے پر اہم ا警告 دکھائیں",
   "config.property.systemHealth.warningOrphanCount.description": "اگر چھوڑے گئے Flutter ڈیمون کی تعداد اس قیمت تک پہنچ جاتی ہے تو چेतاوں۔",
   "config.property.systemHealth.criticalOrphanCount.description": "اگر چھوڑے گئے Flutter ڈیمون کی تعداد اس قیمت تک پہنچ جاتی ہے تو اہم ا警告 دکھائیں۔",
-  "config.property.systemHealth.showNotifications.description": "سسٹم ہیلتھ کریٹیکل سطح پر پہنچ جاتا ہے تو ایک نوٹیفکیشن دکھائیں"
+  "config.property.systemHealth.showNotifications.description": "سسٹم ہیلتھ کریٹیکل سطح پر پہنچ جاتا ہے تو ایک نوٹیفکیشن دکھائیں",
+  "views.debugPanel.name": "ڈیbug",
+  "command.toggleDebugPanel.title": "Saropa Lints: ڈیبیگ پنل کو تoggling کریں",
+  "command.lspServer.start.title": "Saropa Lints: لیپ سروس سرور شروع کریں",
+  "command.lspServer.stop.title": "Saropa Lints: لیپ سروس سرور روکیں",
+  "command.lspServer.restart.title": "Saropa Lints: لیپ سروس سرور کو دوبارہ شروع کریں",
+  "config.section.Debug.title": "ڈیبیگ اور ڈیاگنوسٹک انجنوز",
+  "config.property.debug.enabled.description": "Saropa Lints کے سائیڈ بار میں ڈیbug پنل دکھائیں۔ تین تشخیصی انجن (انالائزر پلاگن، اسکن Daemon، ایل ایس پی سرور) کے لیے حالت اور کنٹرول دکھاتا ہے۔",
+  "config.property.lspServer.enabled.description": "ڈیٹا کی تحلیل کے لیے سٹینڈ آلون Saropa Lints LSP سرور کو چلاو۔ جب اس کو فعال کیا جائے تو ایک الگ Dart پروسس کو چلا کر تیزی سے ترمیمیں اور تیزی سے تصحیحات زبان سرور پروٹوکول کے ذریعے پیش کی جاتی ہیں۔ اینالائزر پلگ ان کے ساتھ چلتا ہے (نہ کہ اس کی جگہ لے)۔"
 }

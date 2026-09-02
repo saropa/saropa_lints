@@ -8,6 +8,7 @@
   "views.status.name": "Hali ya hali ya hali Status Status",
   "views.settings.name": "Uwekaji wa Mipangilio ya Kuweka.",
   "views.severityFilters.name": "Uchunguzi",
+  "command.auditFolder.title": "Saropa: Folda ya Ukaguzi...",
   "views.help.name": "Msaada wa Kusaidia Msaidizi.",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart na Flutter kwa uhusiano, uwezo wa kujifunza na uwezo wa kujifunza.\n\nInakaribisha project ya Dart au Flutter.\n\nOpenda folder inayoyeneza `pubspec.yaml` kujitambua kifundo.\n\n[Ondoa kuhusu kwa kutoa](https://pub.dev/packages/saropa_lints)\n[Ondoa kifundo kote](command:saropaLints.showCommandCatalog)\n[Ondoa kuhusu kwa kutoa Saropa Lints](command:saropaLints.showAbout)\n[Ondoa kifundo](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Kuanzisha Mradi (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "Onyesha tahadhari muhimu wakati jumla ya Dart RSS inapozidi thamani hii (GB).",
   "config.property.systemHealth.warningOrphanCount.description": "Tumeza msaada kama idadi ya daemon Flutter ya kuchapishwa inapata kifupi hiki.",
   "config.property.systemHealth.criticalOrphanCount.description": "Tazama alarami kubadilishwa wakati idadi ya daemon Flutter ya kufungua inapata kipengele hiki.",
-  "config.property.systemHealth.showNotifications.description": "Tuma mstanaa kama system health inapata level ya kritikal."
+  "config.property.systemHealth.showNotifications.description": "Tuma mstanaa kama system health inapata level ya kritikal.",
+  "views.debugPanel.name": "Tatua",
+  "command.toggleDebugPanel.title": "Saropa Lints: Kifungua Pili ya Debug",
+  "command.lspServer.start.title": "Saropa Lints: Begina Server LSP",
+  "command.lspServer.stop.title": "Saropa Lints: Bade LSP Server",
+  "command.lspServer.restart.title": "Saropa Lints: Tumia LSP Server yenye kipindi ya kuzalisha",
+  "config.section.Debug.title": "Injini za Utatuzi na Uchunguzi",
+  "config.property.debug.enabled.description": "Tazama paneli ya Debug katika sidebar ya Saropa Lints. Ina kuhusiana na matokeo na kuzungumza kwa tatu engine ya diagnosis (Plugin ya Analyzer, Scan Daemon, Server ya LSP).",
+  "config.property.lspServer.enabled.description": "Tumia server ya LSP ya Saropa Lints ya kati kwa kuchapisha diagnostics. Kama ina kuchapishwa, ina kuchapishwa process ya Dart ya kati ambayo ina kuchapishwa na quick fixes kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa kwa k."
 }

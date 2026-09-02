@@ -6,6 +6,7 @@
     "alreadyRunning": "Một cuộc kiểm tra đang chạy — vui lòng chờ đến khi nó kết thúc.",
     "noProject": "Không tìm thấy dự án Dart. Mở một thư mục chứa pubspec.yaml.",
     "missingDep": "Dự án này không phụ thuộc vào saropa_lints. Hãy thêm nó vào dev_dependencies trước.",
+    "pickWorkspaceFolder": "Thư mục làm việc nào nên được kiểm tra?",
     "scope": {
       "placeholder": "Các tệp nào nên được kiểm tra?",
       "full": "Toàn bộ dự án",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Không thể khởi động CLI kiểm tra: {message}",
       "invalidProject": "Cuộc kiểm tra không thể chạy được trên dự án này. {details}",
-      "parseFailed": "Cuộc kiểm tra đã hoàn tất nhưng kết quả không thể được đọc. Hãy thử chạy lại."
+      "parseFailed": "Cuộc kiểm tra đã hoàn tất nhưng kết quả không thể được đọc. Hãy thử chạy lại.",
+      "canceled": "Kiểm toán bị hủy bỏ."
     },
     "report": {
       "title": "Kiểm toán Saropa Lints",
       "heading": "Báo cáo Kiểm tra",
+      "errorHeading": "Kiểm toán không thành công",
+      "canceledHeading": "Đã hủy kiểm tra",
       "subtitle": "Kết quả {count} · {timestamp}",
       "baselineSubtitle": "So sánh với baseline từ {date}",
       "searchPlaceholder": "Lọc theo quy tắc, tệp hoặc thông báo…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Phím mũi tên để di chuyển · Nhấn Enter để mở file · Nhấn Esc để xóa tìm kiếm",
       "copiedJson": "Kiểm tra JSON đã được sao chép vào clipboard.",
       "baselineSaved": "Đã lưu baseline. Các cuộc kiểm tra sau có thể so sánh với bản chụp màn hình này.",
-      "baselineSaveFailed": "Không thể lưu trữ baseline: {message}"
+      "baselineSaveFailed": "Không thể lưu trữ baseline: {message}",
+      "deferredLoading": "Đang tải toàn bộ tập kết quả (đ这次 audit khá lớn)…",
+      "deferredLoadFailed": "Không thể tải đầy đủ tập kết quả — chỉ hiển thị các phát hiện đầu tiên {pageSize}.",
+      "deferredWriteFailed": "Không thể ghi tập hợp kết quả lớn vào tệp tạm thời ({message}) — báo cáo có thể mở chậm."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart quy trình: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} quy trình(es) ({size} RSS)",
       "daemonCount": "Flutter daemon: {total} ({orphaned} bị bỏ rơi)",
+      "scanDaemonOrphans": "Daemon quét bị bỏ rơi: {count} — dùng Clean Up để giết",
       "warningHint": "Sử dụng bộ nhớ cao — click để xem chi tiết",
       "criticalHint": "Sử dụng bộ nhớ là rất quan trọng — dọn dẹp được khuyến nghị"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Không Hiển Thị Lại"
     },
     "cleanup": {
-      "noOrphans": "Không tìm thấy daemon Flutter nào bị bỏ rơi.",
-      "confirm": "Đã tìm thấy {count} tiến trình daemon bị bỏ rơi Flutter sử dụng {size}. Có giết chúng không?",
+      "noOrphans": "Không tìm thấy daemon nào bị bỏ rơi.",
+      "confirm": "Đã tìm thấy {count} tiến trình daemon bị bỏ rơi sử dụng {size}. Có giết chúng không?",
       "killButton": "Giết trẻ mồ côi",
       "cancelButton": "Hủy bỏ hủy bỏ"
     },
@@ -622,6 +631,7 @@
       "colCommand": "Lệnh",
       "colAction": "Hành động",
       "typeOrphan": "mồ côi",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Quy trình",
       "kill": "Giết",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Các hành động so sánh tương đương với các hành động.",
       "packageDashboard": "Package Dashboard là bảng điều khiển của gói.",
       "packageDashboardTitle": "Mở bảng điều khiển gói để so sánh nhiều gói hơn."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Panel Debug"
+    },
+    "section": {
+      "engines": "Cơ chế Chẩn đoán",
+      "log": "Nhật ký"
+    },
+    "engine": {
+      "analyzerPlugin": "Plugin phân tích",
+      "scanDaemon": "Quét Daemon",
+      "lspServer": "Máy chủ LSP",
+      "pid": "PID:",
+      "status": "Trạng thái:",
+      "rules": "Quy tắc:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "BẬT",
+      "off": "TẮT"
+    },
+    "action": {
+      "killAll": "Giết tất cả",
+      "restartAll": "Khởi động lại Tất cả"
+    },
+    "log": {
+      "empty": "Chưa có mục nhật ký nào."
     }
   },
   "detailView": {

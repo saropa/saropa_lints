@@ -8,6 +8,7 @@
   "views.status.name": "Статус статусу статус",
   "views.settings.name": "Налагодження розрахунків",
   "views.severityFilters.name": "Діагностика",
+  "command.auditFolder.title": "Saropa: Перевірка папки...",
   "views.help.name": "Допомога допомога допомога",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart та Flutter правил лінта для безпеки, доступності та продуктивності.\n\nВимагає проекту Dart або Flutter.\n\nВідкрийте папку, що містить `pubspec.yaml`, щоб почати.\n\n[Дізнатися більше онлайн](https://pub.dev/packages/saropa_lints)\n[Переглянути всі команди](command:saropaLints.showCommandCatalog)\n[Про Saropa Lints](command:saropaLints.showAbout)\n[Почати роботу](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: = ПХ0__ (по-моєму, це є Налаштувати проект (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "Показувати критичну тривогу, коли загальна Dart RSS перевищує це значення (ГБ).",
   "config.property.systemHealth.warningOrphanCount.description": "Показувати попередження, коли кількість орфанізованих Flutter демонів досягає цієї вартості.",
   "config.property.systemHealth.criticalOrphanCount.description": "Показувати критичну алерт, коли кількість орфанізованих Flutter демонів досягає цієї вартості.",
-  "config.property.systemHealth.showNotifications.description": "Показати повідомлення про те, що система досягла критичного рівня."
+  "config.property.systemHealth.showNotifications.description": "Показати повідомлення про те, що система досягла критичного рівня.",
+  "views.debugPanel.name": "Дебаг",
+  "command.toggleDebugPanel.title": "Saropa Lints: Переключити панель дебагування",
+  "command.lspServer.start.title": "Saropa Lints: Запуск LSP Серверу",
+  "command.lspServer.stop.title": "Saropa Lints: Зупинити сервер LSP",
+  "command.lspServer.restart.title": "Saropa Lints: Перезапуск сервера LSP",
+  "config.section.Debug.title": "Дебагування та діагностика двигунів",
+  "config.property.debug.enabled.description": "Показати панель Дебагування в панелі Saropa Lints. Відображає статус та керування для трьох діагностичних двигунів (Плагін аналізатора, Сканер Daemon, Сервер LSP).",
+  "config.property.lspServer.enabled.description": "Виконайте самостійний Saropa Lints сервер LSP для діагностики. Під час увімкнення, запускається окремий процес Dart, який надає підказки та швидкі фікси через Протокол сервера мови. Виконується разом (не замість) плагіну аналізатора."
 }

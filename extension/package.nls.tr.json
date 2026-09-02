@@ -8,6 +8,7 @@
   "views.status.name": "Status Durum Statüs Durumu",
   "views.settings.name": "Ayarlar ayarları ayarlar.",
   "views.severityFilters.name": "Teşhis",
+  "command.auditFolder.title": "Saropa: Audit Klasörü...",
   "views.help.name": "Yardım yardım yardımcı yardımcı",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart ve Flutter tarifesi güvenlik, erişilebilirlik ve performans için.\n\nDart veya Flutter projesi gerektirir.\n\nBaşlamak için bir `pubspec.yaml` içeren klasöre açın.\n\n[Online'da daha fazlasını öğren](https://pub.dev/packages/saropa_lints)\n[Bütün Komutları Görüntüle](command:saropaLints.showCommandCatalog)\n[Saropa Lints Hakkında](command:saropaLints.showAbout)\n[Başlangıç](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: _PH0_: -Hücumuzun bir parçası. Projeyi Kur (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "Toplam Dart RSS bu değerden (GB) fazla olduğunda kritik uyarı göster.",
   "config.property.systemHealth.warningOrphanCount.description": "Orphaned Flutter daemon sayısının bu değere ulaşması durumunda uyarı göster.",
   "config.property.systemHealth.criticalOrphanCount.description": "Orphaned Flutter daemon sayısının bu değere ulaşması durumunda kritik uyarı göster.",
-  "config.property.systemHealth.showNotifications.description": "Sistem sağlığı kritik seviyeye ulaştığında bir bildirim göster."
+  "config.property.systemHealth.showNotifications.description": "Sistem sağlığı kritik seviyeye ulaştığında bir bildirim göster.",
+  "views.debugPanel.name": "Hata ayıklama",
+  "command.toggleDebugPanel.title": "Saropa Lints: Debug Paneli Aç/Kapat",
+  "command.lspServer.start.title": "Saropa Lints: LSP Sunucusunu Başlat",
+  "command.lspServer.stop.title": "Saropa Lints: LSP Sunucusunu Durdur",
+  "command.lspServer.restart.title": "Saropa Lints: LSP Sunucusunu Yeniden Başlat",
+  "config.section.Debug.title": "Debug & Diagnostics Motorları",
+  "config.property.debug.enabled.description": "Saropa Lints panelindeki Debug Panelini göster. Üç tanılama motorunun (Analyzer Plugin, Scan Daemon, LSP Server) durumunu ve kontrolünü görüntüler.",
+  "config.property.lspServer.enabled.description": "Standalik Saropa Lints LSP sunucusunu tanımlama için çalıştırın. Etkinleştirildiğinde, dil sunucusu protokolü aracılığıyla çizgiler ve hızlı çözümler sunan ayrı bir Dart işlemi başlatır. Analizör eklentisiyle birlikte çalışır (değil yerine)."
 }

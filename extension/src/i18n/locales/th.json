@@ -6,6 +6,7 @@
     "alreadyRunning": "การตรวจสอบอยู่ในระหว่างการดำเนินการแล้ว — รอให้เสร็จสิ้นก่อน",
     "noProject": "ไม่พบโปรเจกต์ Dart โปรดเปิดโฟลเดอร์ที่มี pubspec.yaml",
     "missingDep": "โปรเจกต์นี้ไม่ได้ขึ้นกับ saropa_lints โปรดเพิ่มเข้าไปที่ dev_dependencies ก่อน",
+    "pickWorkspaceFolder": "โฟลเดอร์เวิร์สเปซใดที่ควรตรวจสอบ?",
     "scope": {
       "placeholder": "ไฟล์ใดที่ควรให้การตรวจสอบครอบคลุม?",
       "full": "โครงการทั้งหมด",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "ไม่สามารถเริ่มต้น audit CLI ได้: {message}",
       "invalidProject": "การตรวจสอบไม่สามารถดำเนินการกับโปรเจกต์นี้ได้ เนื่องจาก {details}",
-      "parseFailed": "การตรวจสอบเสร็จสิ้นแล้วแต่ไม่สามารถอ่านผลลัพธ์ได้ ลองรันอีกครั้ง"
+      "parseFailed": "การตรวจสอบเสร็จสิ้นแล้วแต่ไม่สามารถอ่านผลลัพธ์ได้ ลองรันอีกครั้ง",
+      "canceled": "ยกเลิกการตรวจสอบแล้ว"
     },
     "report": {
       "title": "Saropa Lints ตรวจสอบ",
       "heading": "รายงานการตรวจสอบ",
+      "errorHeading": "การตรวจสอบล้มเหลว",
+      "canceledHeading": "ยกเลิกการตรวจสอบแล้ว",
       "subtitle": "ผลการค้นหา {count} · {timestamp}",
       "baselineSubtitle": "เทียบกับฐานข้อมูลจาก {date}",
       "searchPlaceholder": "กรองด้วยกฎ ไฟล์ หรือข้อความ…",
@@ -54,7 +58,10 @@
       "keyboardHint": "คีย์ลูกศรเพื่อการนำทาง · ปุ่ม Enter เพื่อเปิดไฟล์ · ปุ่ม Esc เพื่อเคลียร์การค้นหา",
       "copiedJson": "ตรวจสอบ JSON ที่คัดลอกไปยังคลิปบอร์ด",
       "baselineSaved": "เกณฑ์พื้นฐานถูกบันทึกไว้แล้ว ตรวจสอบในอนาคตสามารถเปรียบเทียบกับภาพถ่ายหน้าจอช่วงนี้ได้",
-      "baselineSaveFailed": "ไม่สามารถบันทึกฐานข้อมูลได้: {message}"
+      "baselineSaveFailed": "ไม่สามารถบันทึกฐานข้อมูลได้: {message}",
+      "deferredLoading": "กำลังโหลดเซตผลลัพธ์ทั้งหมด (การตรวจสอบนี้มีขนาดใหญ่)…",
+      "deferredLoadFailed": "ไม่สามารถโหลดผลลัพธ์ทั้งหมดได้ — แสดงผลลัพธ์เพียงแค่ {pageSize} รายการเท่านั้น",
+      "deferredWriteFailed": "ไม่สามารถเขียนชุดผลลัพธ์ขนาดใหญ่ที่ตั้งค่าเป็นไฟล์ชั่วคราว ({message}) ได้ — รายงานอาจเปิดได้ช้า"
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "กระบวนการ Dart: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} กระบวนการ(ๆ) ({size} RSS)",
       "daemonCount": "Flutter ผู้ดูแลระบบ: {total} ({orphaned} ทิ้งไว้)",
+      "scanDaemonOrphans": "Daemon ที่ถูกทอดทิ้งในการสแกน: {count} — ใช้ Clean Up เพื่อปิด",
       "warningHint": "การใช้งานหน่วยความจำสูง — คลิกเพื่อดูรายละเอียด",
       "criticalHint": "การใช้งานหน่วยความจำเป็นสิ่งสำคัญ — ทำความสะอาดตามที่แนะนำ"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "อย่าแสดงอีกต่อไป"
     },
     "cleanup": {
-      "noOrphans": "ไม่พบ daemon Flutter ที่ถูกทอดทิ้ง",
-      "confirm": "พบกระบวนการ daemon ที่ถูกทอดทิ้ง {count} จำนวน Flutter ใช้ {size} ต้องการจะสั่งปิดหรือไม่?",
+      "noOrphans": "ไม่พบ daemon ที่ถูกทอดทิ้ง",
+      "confirm": "พบกระบวนการ daemon ที่ถูกทอดทิ้ง {count} ใช้ {size} ต้องการจะสั่งปิดหรือไม่?",
       "killButton": "ลบล้างผู้ลูกหลานที่ไม่มีพ่อแม่",
       "cancelButton": "ยกเลิก Cancel เลิก"
     },
@@ -622,6 +631,7 @@
       "colCommand": "คำสั่ง",
       "colAction": "การกระทำ",
       "typeOrphan": "เด็กกำพรับ",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "กระบวนการ",
       "kill": "ลบ",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "การกระทําการเปรียบเทียบ",
       "packageDashboard": "แพคเกจดัชบอร์ด (Package Dashboard) เป็น",
       "packageDashboardTitle": "เปิด แดชบอร์ดแพคเกจ เพื่อเปรียบเทียบแพ็คเกจเพิ่มเติม"
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "แผงดีบัก"
+    },
+    "section": {
+      "engines": "เครื่องมือวินิจฉัย",
+      "log": "บันทึก"
+    },
+    "engine": {
+      "analyzerPlugin": "ปลั๊กอินวิเคราะห์",
+      "scanDaemon": "สแกน Daemon",
+      "lspServer": "เซิร์ฟเวอร์ LSP",
+      "pid": "PID:",
+      "status": "สถานะ:",
+      "rules": "กฎ:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "บน",
+      "off": "ปิด"
+    },
+    "action": {
+      "killAll": "ลบออกทั้งหมด",
+      "restartAll": "รีสตาร์ททั้งหมด"
+    },
+    "log": {
+      "empty": "ยังไม่มีการบันทึกข้อมูลล็อก"
     }
   },
   "detailView": {

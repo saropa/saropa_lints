@@ -6,6 +6,7 @@
     "alreadyRunning": "یک ا审计 در حال اجرا است — منتظر پایان آن باشید.",
     "noProject": "هیچ پروژه Dart یافت نشد. یک پوشه که حاوی pubspec.yaml باشد را باز کنید.",
     "missingDep": "این پروژه به saropa_lints وابسته نمی باشد. ابتدا به dev_dependencies اضافه کنید.",
+    "pickWorkspaceFolder": "کدام پوشه کارگاه اجرا را باید علیه آن انجام دهیم؟",
     "scope": {
       "placeholder": "کدام فایل‌ها باید در بازرسی مورد بررسی قرار گیرند؟",
       "full": "پروژه کامل",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "نمی تواند از ابزار CLI برای بازبینی شروع شود: {message}",
       "invalidProject": "تحقيق قادر به اجرا نشد. {details}",
-      "parseFailed": "تحقيق تمام شد اما خروجی آن خوانده نشد. دوباره اجرا کنید."
+      "parseFailed": "تحقيق تمام شد اما خروجی آن خوانده نشد. دوباره اجرا کنید.",
+      "canceled": "حسابرسی لغو شد."
     },
     "report": {
       "title": "Saropa Lints تحلیل",
       "heading": "گزارش بازرسی",
+      "errorHeading": "حسابرسی ناموفق بود",
+      "canceledHeading": "حسابرسی لغو شد",
       "subtitle": "یافته های {count} · {timestamp}",
       "baselineSubtitle": "مقایسه با خط پایه از {date}",
       "searchPlaceholder": "فیلتر کردن بر اساس قاعده، فایل یا پیام…",
@@ -54,7 +58,10 @@
       "keyboardHint": "کلیدهای سیمایی برای پیمایش · Enter برای باز کردن فایل · Esc برای پاک کردن جستجو",
       "copiedJson": "بررسی JSON به پیش‌نویس کپی شد.",
       "baselineSaved": "نمونه‌ی پایه ذخیره شد. تحلیل‌های آتی می‌توانند این نسخه را به عنوان یک مقایسه استفاده کنند.",
-      "baselineSaveFailed": "نمی توان پایه ی اصلی را ذخیره کرد: {message}"
+      "baselineSaveFailed": "نمی توان پایه ی اصلی را ذخیره کرد: {message}",
+      "deferredLoading": "بارگذاری مجموعه نتایج کامل (این آ审计 بزرگ است)…",
+      "deferredLoadFailed": "نتیجه کامل بارگذاری نشد — فقط یافته های اولیه {pageSize} نمایش داده می شود.",
+      "deferredWriteFailed": "نمی‌توان نتیجه بزرگ را روی یک فایل موقت ({message}) نوشت - ممکن است گزارش کند باز شود."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart فرآیند ها: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} فرآیند(ها) ({size} RSS)",
       "daemonCount": "Flutter نیمکت‌ها: {total} ({orphaned} بدون والد)",
+      "scanDaemonOrphans": "اسکن های پیگیری فرزندناشده: {count} — از تمیز کردن برای خاتمه دادن استفاده کنید",
       "warningHint": "استفاده از حافظه بالا است — کلیک کنید تا جزئیات را ببینید",
       "criticalHint": "استفاده از حافظه مهم است — تمیز کردن پیشنهاد می‌شود"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "باز نشان نده"
     },
     "cleanup": {
-      "noOrphans": "هیچ چرakan Flutter گم شده ای پیدا نشد.",
-      "confirm": "{count} فرآیند Flutter مونیتور غیر مرتبط با استفاده از {size} پیدا شد. آنها را خاتمه بدهید؟",
+      "noOrphans": "هیچ دمین نیافته شد.",
+      "confirm": "تعداد {count} فرآیند پردازشی {size} پیدا شد. خواهید کشت؟",
       "killButton": "کیل یاورفان",
       "cancelButton": "لغو کن لغو کنید"
     },
@@ -622,6 +631,7 @@
       "colCommand": "کامند",
       "colAction": "عملیات",
       "typeOrphan": "孤儿",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "پردازش",
       "kill": "کیل کردن",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "اقدامات مقایسه ای:",
       "packageDashboard": "داشبورد بسته بندی (Package Dashboard)",
       "packageDashboardTitle": "برای مقایسه بسته های بیشتر، داشبورد بسته را باز کنید."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "پنل دیباگ"
+    },
+    "section": {
+      "engines": "مotive انجینهای",
+      "log": "لاگ"
+    },
+    "engine": {
+      "analyzerPlugin": "پلاگین تحلیلگر",
+      "scanDaemon": "اسкан Daemon",
+      "lspServer": "سرور LSP",
+      "pid": "PID:",
+      "status": "وضعیت:",
+      "rules": "قواعد:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "اون /نیست",
+      "off": "اُف اف"
+    },
+    "action": {
+      "killAll": "کیل کردن همه",
+      "restartAll": "تکرار تمام"
+    },
+    "log": {
+      "empty": "هنوز ورودی لاگی وجود ندارد."
     }
   },
   "detailView": {

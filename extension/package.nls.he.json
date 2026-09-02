@@ -8,6 +8,7 @@
   "views.status.name": "מצב סטטוס Status",
   "views.settings.name": "התיישבות הפניות",
   "views.severityFilters.name": "דיאגנוסטיקה",
+  "command.auditFolder.title": "Saropa: בדיקת תיקייה...",
   "views.help.name": "עזרה עזר סיוע",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart ו-Flutter правила למאגר, גישה, ותפקוד.\n\nדורשת פרויקט של Dart או Flutter.\n\nפתח תיקייה עם `pubspec.yaml` כדי להתחיל.\n\n[ל更多信息 באינטרנט](https://pub.dev/packages/saropa_lints)\n[צפו בכל הפקודות](command:saropaLints.showCommandCatalog)\n[אודות Saropa Lints](command:saropaLints.showAbout)\n[היכן להתחיל](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: הגדרת פרויקט (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "הצגת אזהרה קריטית כאשר סך Dart RSS עולה מעבר לערך זה (ג'יגה)",
   "config.property.systemHealth.warningOrphanCount.description": "הצגת 경고 כאשר מספר דמוניס Flutter המורדים לבד themselves מגיע לערך זה.",
   "config.property.systemHealth.criticalOrphanCount.description": "הצגת אזהרה קריטית כאשר מספר דמוניס Flutter שונאים מגיע לערך זה.",
-  "config.property.systemHealth.showNotifications.description": "הצגתifying הודעה כאשר מצב המערכת מגיע לרמת חירום."
+  "config.property.systemHealth.showNotifications.description": "הצגתifying הודעה כאשר מצב המערכת מגיע לרמת חירום.",
+  "views.debugPanel.name": "דיבאג",
+  "command.toggleDebugPanel.title": "Saropa Lints: מחלף painel תקצוב",
+  "command.lspServer.start.title": "Saropa Lints: הפעלה שרת LSP",
+  "command.lspServer.stop.title": "Saropa Lints: עצירה שרת LSP",
+  "command.lspServer.restart.title": "Saropa Lints: עצירה מחדש של שרת LSP",
+  "config.section.Debug.title": "מנועי דיבאגינג ודייגנוסטיקה",
+  "config.property.debug.enabled.description": "הצג את painel ה디バッグ בצדון Saropa Lints. מציג מצב ושליטה על שלושת מנועי האבחון (האנליזר-plugin, ס캔 Daemon, שרת LSP).",
+  "config.property.lspServer.enabled.description": "הפעלה של שרת Saropa Lints עצמאי לתקנות. כאשר מופעל, יוצר תהליך נפרד Dart שמספק תקנות ותיקונים מהירים באמצעות פרוטוקול שרת השפה. הופעל במקביל (ולא במקום) לplug-in האנליזר."
 }

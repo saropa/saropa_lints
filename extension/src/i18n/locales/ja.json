@@ -6,6 +6,7 @@
     "alreadyRunning": "アジャイルはすでに実行中です — 完了するのを待ってください。",
     "noProject": "Dartプロジェクトが見つかりません。pubspec.yamlを含むフォルダを開いてください。",
     "missingDep": "このプロジェクトはsaropa_lintsに依存していません。まずdev_dependenciesに追加してください。",
+    "pickWorkspaceFolder": "どのワークスペースフォルダをaudit対象としますか？",
     "scope": {
       "placeholder": "どのファイルを検査に含めるべきですか？",
       "full": "フルプロジェクト",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "audit CLIを起動できませんでした: {message}",
       "invalidProject": "このプロジェクトに対してアジャイルチェックが実行できませんでした。{details}",
-      "parseFailed": "検証が終了しましたが、その出力結果を読み込めませんでした。再度実行してみてください。"
+      "parseFailed": "検証が終了しましたが、その出力結果を読み込めませんでした。再度実行してみてください。",
+      "canceled": "監査はキャンセルされました。"
     },
     "report": {
       "title": "Saropa Lints アウドิต",
       "heading": "監査レポート",
+      "errorHeading": "監査に失敗しました",
+      "canceledHeading": "監査がキャンセルされました",
       "subtitle": "{count} けいとう · {timestamp}",
       "baselineSubtitle": "ベースラインと比較して{date}",
       "searchPlaceholder": "ルール、ファイル、またはメッセージでフィルタ…",
@@ -54,7 +58,10 @@
       "keyboardHint": "矢印キーで移動 · Enterでファイルを開く · Escで検索をクリア",
       "copiedJson": "クリップボードにコピーされたJSONの審査",
       "baselineSaved": "ベースラインが保存されました。今後のアプライアンスはこのスナップショットと比較できます。",
-      "baselineSaveFailed": "ベースラインの保存に失敗しました: {message}"
+      "baselineSaveFailed": "ベースラインの保存に失敗しました: {message}",
+      "deferredLoading": "フルな結果セットを読み込み中（このアプライアンスは大きい）…",
+      "deferredLoadFailed": "フルな結果セットを読み込めませんでした — ここでは最初の {pageSize} 個の結果のみを表示しています。",
+      "deferredWriteFailed": "大きな結果セットを一時ファイル ({message}) に書き込めませんでした。レポートを開くのに時間がかかる可能性があります。"
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart プロセス: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} プロセス(es) ({size} RSS)",
       "daemonCount": "Flutter デーモン: {total} ({orphaned} 遺棄)",
+      "scanDaemonOrphans": "孤立したスキャンデーモン: {count} — クリーンアップを使用して終了",
       "warningHint": "メモリ使用量は高い — クリックして詳細を表示",
       "criticalHint": "メモリ使用量は重要です — 推奨されるクリーンアップを行ってください"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "もう一度表示しない"
     },
     "cleanup": {
-      "noOrphans": "孤立した Flutter デーモンは見つかりませんでした。",
-      "confirm": "{count}の孤立したFlutterデーモンプロセスを{size}で見つけました。終了しますか？",
+      "noOrphans": "孤児のデーモンは見つかりません。",
+      "confirm": "{count}の孤立したデーモンプロセスを見つけました。({size}) 停止しますか？",
       "killButton": "orphansを削除",
       "cancelButton": "キャンセル キャンセル"
     },
@@ -622,6 +631,7 @@
       "colCommand": "コマンド",
       "colAction": "アクション",
       "typeOrphan": "孤児",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "プロセス",
       "kill": "キル",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "比較行動とは,比較行動を指すものです.",
       "packageDashboard": "パッケージダッシュボード",
       "packageDashboardTitle": "パッケージダッシュボードを開いて,より多くのパッケージを比較します."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "デバッグパネル"
+    },
+    "section": {
+      "engines": "診断エンジン",
+      "log": "ログ"
+    },
+    "engine": {
+      "analyzerPlugin": "アナライザープラグイン",
+      "scanDaemon": "スキャン Daemon",
+      "lspServer": "LSPサーバー",
+      "pid": "PID:",
+      "status": "状態:",
+      "rules": "ルール:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "の上",
+      "off": "オフ"
+    },
+    "action": {
+      "killAll": "すべてを終了",
+      "restartAll": "すべて再起動"
+    },
+    "log": {
+      "empty": "まだログエントリがありません。"
     }
   },
   "detailView": {

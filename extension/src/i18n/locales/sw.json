@@ -6,6 +6,7 @@
     "alreadyRunning": "Kuhesabi ya kujaribu ina kufanya - kushusha kwa kufinisha.",
     "noProject": "Hakuna project Dart. Openda folder ambalo ina pubspec.yaml.",
     "missingDep": "Proyekti haukotika na saropa_lints. Ongeza kwenye dev_dependencies kwa kwanza.",
+    "pickWorkspaceFolder": "Kila jumla ya folder ya workspace ina kujaribu kwa?",
     "scope": {
       "placeholder": "Kila faili yenye kujifunza audit?",
       "full": "Mwongozo ya project kwa kati",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Hakikisha ustart audit CLI: {message}",
       "invalidProject": "Kuzalisha audit hakipatikana na project huu. {details}",
-      "parseFailed": "Audit ya kifedha imetamani lakini matokeo yake haukupatikana. Tafakari kufaniki kwa kipindi mwingine."
+      "parseFailed": "Audit ya kifedha imetamani lakini matokeo yake haukupatikana. Tafakari kufaniki kwa kipindi mwingine.",
+      "canceled": "Ukaguzi umeghairiwa."
     },
     "report": {
       "title": "Uchunguzi wa Saropa Lints",
       "heading": "Raporti ya Audit",
+      "errorHeading": "Ukaguzi haukufaulu",
+      "canceledHeading": "Ukaguzi umeghairiwa",
       "subtitle": "Vitu vya {count} · {timestamp}",
       "baselineSubtitle": "Kati ya mbingu wa mbele ya {date}",
       "searchPlaceholder": "Tafuta kwa kiroho, kifilamu, au kipamia…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Kifua kifua kujitambua · Enter kujitambua faili · Esc kujitambua matokeo",
       "copiedJson": "Audit JSON kozalishwa katikati ya kipapera.",
       "baselineSaved": "Moto ya asili imesajiliwa. Maudhui ya kaya ya kaya inaweza kuzungumza na moto hili ya asili.",
-      "baselineSaveFailed": "Hakuna kujisajili baseline: {message}"
+      "baselineSaveFailed": "Hakuna kujisajili baseline: {message}",
+      "deferredLoading": "Kupakia matokeo ya kutoa (audit huu ina kutoa kubwa)…",
+      "deferredLoadFailed": "Hakuna kujaribu matokeo yote - kushiriki matokeo ya kwanza ya {pageSize}.",
+      "deferredWriteFailed": "Haikuweza kuandika tokeo kubwa lililowekwa kwa faili ya muda ({message}) - ripoti inaweza kuwa polepole kufunguliwa."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Mipangilio ya Dart: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} prosesu ({size} RSS)",
       "daemonCount": "Daemons Flutter: {total} ({orphaned} yatima)",
+      "scanDaemonOrphans": "Daemons ya scan ya kifupishwa: {count} — kuzalishia kwa kutumia Clean Up",
       "warningHint": "Unganisha wa matokeo ni kubwa — klikika kwa detali",
       "criticalHint": "Unganisho wa memory ni kifaa — tume kuchapisha kutoa"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Hakikisha Upeleka Tumia Kwa Muda Mmoja"
     },
     "cleanup": {
-      "noOrphans": "Hakuna daemons Flutter ya kihofu.",
-      "confirm": "Pozozo ya {count} ya daemon ya Flutter iliyotambulika kwa kuzunguka {size}. Uzalishia wanao?",
+      "noOrphans": "Hakuna daemons ya kihofu.",
+      "confirm": "Imeongezwa {count} process ya daemon ya kifalme (kifalme) kwa kutumia {size}. Uko kujikosoa?",
       "killButton": "Kifungu Kifungu Kifungu",
       "cancelButton": "Cancel cancel kufuta"
     },
@@ -622,6 +631,7 @@
       "colCommand": "Kipengele",
       "colAction": "Moto ya Ujumla",
       "typeOrphan": "Yatima",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Mipangilio",
       "kill": "Kifungua",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Ulinganisho wa vitendo vya kulinganisha.",
       "packageDashboard": "Dashibodi ya Package Dashboard.",
       "packageDashboardTitle": "Fungua Dashibodi ya Kifurushi ili kulinganisha vifurushi zaidi."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Panel ya Debug"
+    },
+    "section": {
+      "engines": "Engines ya Diagnostiki",
+      "log": "Kumbukumbu"
+    },
+    "engine": {
+      "analyzerPlugin": "Analizator Plugin",
+      "scanDaemon": "Tafuta Daemon",
+      "lspServer": "Server ya LSP",
+      "pid": "PID:",
+      "status": "Hali:",
+      "rules": "Moto ya Kifundisho:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "MWONGOLO",
+      "off": "IMEZIMWA"
+    },
+    "action": {
+      "killAll": "Ondoa Wote",
+      "restartAll": "Tumia Kila Mwaka"
+    },
+    "log": {
+      "empty": "Hakuna mstari ya log yet."
     }
   },
   "detailView": {

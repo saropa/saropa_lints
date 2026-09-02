@@ -8,6 +8,7 @@
   "views.status.name": "状态 情况 状态",
   "views.settings.name": "设置的设定,这是一个很好的方法.",
   "views.severityFilters.name": "诊断",
+  "command.auditFolder.title": "Saropa：审计文件夹...",
   "views.help.name": "帮助帮助帮助帮忙",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart 和 Flutter 用于安全、可访问性和性能的 lint 规则。\n\n需要一个 Dart 或 Flutter 项目。\n\n打开包含 `pubspec.yaml` 的文件夹以开始使用。\n\n[在线了解更多](https://pub.dev/packages/saropa_lints)\n[浏览所有命令](command:saropaLints.showCommandCatalog)\n[关于 Saropa Lints](command:saropaLints.showAbout)\n[入门指南](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: 没有一个人. 设置项目 (pubspec + config) 的一个组件.",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "当总 Dart RSS 超过此值（GB）时显示关键警报",
   "config.property.systemHealth.warningOrphanCount.description": "当孤立的 Flutter 守护进程数量达到此值时显示警告。",
   "config.property.systemHealth.criticalOrphanCount.description": "当孤立的 Flutter 守护进程数量达到此值时显示关键警报。",
-  "config.property.systemHealth.showNotifications.description": "当系统健康达到严重级别时显示通知。"
+  "config.property.systemHealth.showNotifications.description": "当系统健康达到严重级别时显示通知。",
+  "views.debugPanel.name": "调试",
+  "command.toggleDebugPanel.title": "Saropa Lints：切换调试面板",
+  "command.lspServer.start.title": "Saropa Lints: 启动 LSP 服务器",
+  "command.lspServer.stop.title": "Saropa Lints: 停止 LSP 服务器",
+  "command.lspServer.restart.title": "Saropa Lints: 重启 LSP 服务器",
+  "config.section.Debug.title": "调试与诊断引擎",
+  "config.property.debug.enabled.description": "在Saropa Lints侧边栏中显示调试面板。显示三个诊断引擎（分析器插件、扫描Daemon、LSP服务器）的状态和控制。",
+  "config.property.lspServer.enabled.description": "运行独立的 Saropa Lints LSP 服务器以进行诊断。启用后，会启动一个单独的 Dart 进程，通过语言服务器协议提供波浪线和快速修复功能。与分析器插件并行运行（而非替代）。"
 }

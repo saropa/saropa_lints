@@ -8,6 +8,7 @@
   "views.status.name": "Status",
   "views.settings.name": "Instellingen",
   "views.severityFilters.name": "Diagnostiek",
+  "command.auditFolder.title": "Saropa: Audit Map...",
   "views.help.name": "Help",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart en Flutter lint-regels voor beveiliging, toegankelijkheid en prestaties.\n\nVereist een Dart of Flutter project.\n\nOpen een map die een `pubspec.yaml` bevat om te beginnen.\n\n[Lees meer online](https://pub.dev/packages/saropa_lints)\n[Blader door alle commando's](command:saropaLints.showCommandCatalog)\n[Over Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Project instellen (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "Toon kritieke waarschuwing wanneer het totale Dart RSS boven deze waarde (GB) ligt.",
   "config.property.systemHealth.warningOrphanCount.description": "Toon waarschuwing wanneer het aantal orphanded Flutter daemonen dit waarde bereikt.",
   "config.property.systemHealth.criticalOrphanCount.description": "Toon kritieke waarschuwing wanneer het aantal orphanded Flutter daemonen dit waarde bereikt.",
-  "config.property.systemHealth.showNotifications.description": "Notificatie tonen wanneer systeemgezondheid kritiek is."
+  "config.property.systemHealth.showNotifications.description": "Notificatie tonen wanneer systeemgezondheid kritiek is.",
+  "views.debugPanel.name": "Foutopsporing",
+  "command.toggleDebugPanel.title": "Saropa Lints: Debugpaneel in-/uitklappen",
+  "command.lspServer.start.title": "Saropa Lints: LSP-server starten",
+  "command.lspServer.stop.title": "Saropa Lints: LSP-server stoppen",
+  "command.lspServer.restart.title": "Saropa Lints: Herstart LSP-server",
+  "config.section.Debug.title": "Debug- en diagnose-engines",
+  "config.property.debug.enabled.description": "Toon het Debug Panel in de Saropa Lints zijbalk. Toont status en controleerder voor de drie diagnostische engines (Analyzer Plugin, Scan Daemon, LSP Server).",
+  "config.property.lspServer.enabled.description": "Voer de standalone Saropa Lints LSP-server uit voor diagnose. Wanneer ingeschakeld, start een apart Dart proces dat zweren en snelle oplossingen levert via het Language Server Protocol. Wordt uitgevoerd naast (niet in plaats van) de analyzer plug-in."
 }

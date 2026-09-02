@@ -6,6 +6,7 @@
     "alreadyRunning": "Аудит уже запущен — подождите, пока он завершится.",
     "noProject": "Нет проекта Dart. Откройте папку, содержащую pubspec.yaml.",
     "missingDep": "Этот проект не зависит от saropa_lints. Добавьте его сначала в dev_dependencies.",
+    "pickWorkspaceFolder": "Какой каталог рабочей области должен проверяться аудитом?",
     "scope": {
       "placeholder": "Какие файлы должен охватывать аудит?",
       "full": "Полный проект",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Не удалось запустить аудит CLI: {message}",
       "invalidProject": "Аудит не может выполняться по этому проекту. {details}",
-      "parseFailed": "Аудит завершен, но его вывод не удалось прочитать. Попробуйте запустить его снова."
+      "parseFailed": "Аудит завершен, но его вывод не удалось прочитать. Попробуйте запустить его снова.",
+      "canceled": "Аудит отменен."
     },
     "report": {
       "title": "Saropa Lints Аудит",
       "heading": "Отчет о проверке",
+      "errorHeading": "Аудит не пройден",
+      "canceledHeading": "Аудит отменен",
       "subtitle": "{count} результаты · {timestamp}",
       "baselineSubtitle": "Сравнение с базовой версией из {date}",
       "searchPlaceholder": "Фильтровать по правилу, файлу или сообщению…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Стрелки вверх и вниз для навигации · Enter для открытия файла · Esc для очистки поиска",
       "copiedJson": "Аудит JSON скопирован в буфер обмена.",
       "baselineSaved": "Базовая точка сохранена. Будущие аудиты могут сравнивать её с этим снимком.",
-      "baselineSaveFailed": "Не удалось сохранить базовую версию: {message}"
+      "baselineSaveFailed": "Не удалось сохранить базовую версию: {message}",
+      "deferredLoading": "Загрузка полного набора результатов (этот аудит большой)…",
+      "deferredLoadFailed": "Не удалось загрузить полный набор результатов — отображаются только первые {pageSize} нарушений.",
+      "deferredWriteFailed": "Не удалось записать большой набор результатов во временный файл ({message}) — отчет может открываться медленно."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart процессов: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} процесс(ов) ({size} RSS)",
       "daemonCount": "Flutter демоны: {total} ({orphaned} орфанованных)",
+      "scanDaemonOrphans": "Орфанированные деймоны сканирования: {count} — используйте Clean Up для уничтожения",
       "warningHint": "Использование памяти высокое — нажмите для деталей",
       "criticalHint": "Использование памяти критично — очистите рекомендовано"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Не показывать снова"
     },
     "cleanup": {
-      "noOrphans": "Нет найденных орфанов Flutter демонов.",
-      "confirm": "Найдены {count} орфанных Flutter процессов демона с использованием {size}. Убить их?",
+      "noOrphans": "Нет найденных орфанов дэмонов.",
+      "confirm": "Найдены {count} орфанные д демон процесс(а) с использованием {size}. Убить их?",
       "killButton": "Убить Орфанов",
       "cancelButton": "Отменить отменить."
     },
@@ -622,6 +631,7 @@
       "colCommand": "Команда",
       "colAction": "Действие",
       "typeOrphan": "Орфан",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Обработка",
       "kill": "Убить",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Сравнительные действия - это сравнительные действия.",
       "packageDashboard": "Пакетная панель инструментов (Package Dashboard)",
       "packageDashboardTitle": "Откройте панель управления пакетами, чтобы сравнить больше пакетов."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Панель отладки"
+    },
+    "section": {
+      "engines": "Диагностические движки",
+      "log": "Лог"
+    },
+    "engine": {
+      "analyzerPlugin": "Анализатор плагин",
+      "scanDaemon": "Сканировать Daemon",
+      "lspServer": "LSP Сервер",
+      "pid": "PID:",
+      "status": "Статус:",
+      "rules": "Правила:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "ВКЛ",
+      "off": "ВЫКЛ"
+    },
+    "action": {
+      "killAll": "Убить Все",
+      "restartAll": "Перезапустить всё"
+    },
+    "log": {
+      "empty": "Еще нет записей лога."
     }
   },
   "detailView": {

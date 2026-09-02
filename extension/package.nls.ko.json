@@ -8,6 +8,7 @@
   "views.status.name": "상태의 지위 (Status)",
   "views.settings.name": "설정 설정을 조정합니다.",
   "views.severityFilters.name": "진단",
+  "command.auditFolder.title": "Saropa: 폴더 감사...",
   "views.help.name": "도움말 도움을 받을 수 있습니다.",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart 및 Flutter lint 규칙으로 보안, 접근성, 성능을 개선합니다.\n\nDart 또는 Flutter 프로젝트가 필요합니다.\n\n`pubspec.yaml`가 포함된 폴더를 열어 시작합니다.\n\n[온라인에서 더 알아보기](https://pub.dev/packages/saropa_lints)\n[모든 명령어 둘러보기](command:saropaLints.showCommandCatalog)\n[Saropa Lints 정보](command:saropaLints.showAbout)\n[시작하기](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: 프로젝트를 설정 (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "총 Dart RSS가 이 값(GB)을 초과할 때 심각한 경고 표시",
   "config.property.systemHealth.warningOrphanCount.description": "orphaned Flutter daemon count이 이 값에 도달할 때 경고 표시.",
   "config.property.systemHealth.criticalOrphanCount.description": "orphaned Flutter daemon count이 이 값에 도달할 때 심각한 경고 표시.",
-  "config.property.systemHealth.showNotifications.description": "시스템 건강이 위험 수준에 도달할 때 알림을 표시합니다."
+  "config.property.systemHealth.showNotifications.description": "시스템 건강이 위험 수준에 도달할 때 알림을 표시합니다.",
+  "views.debugPanel.name": "디버그",
+  "command.toggleDebugPanel.title": "Saropa Lints: 디버그 패널 토글",
+  "command.lspServer.start.title": "Saropa Lints: LSP 서버 시작",
+  "command.lspServer.stop.title": "Saropa Lints: LSP 서버 중지",
+  "command.lspServer.restart.title": "Saropa Lints: LSP 서버 재시작",
+  "config.section.Debug.title": "디버그 & 진단 엔진",
+  "config.property.debug.enabled.description": "Saropa Lints 사이드바에서 디버그 패널을 표시합니다. 분석기 플러그인, 스캔 Daemon, LSP 서버의 세 가지 진단 엔진의 상태 및 제어를 표시합니다.",
+  "config.property.lspServer.enabled.description": "스탠다로드 Saropa Lints LSP 서버를 실행하여 진단을 수행합니다. 활성화되면 Language Server Protocol을 통해 squiggles 및 빠른 수정을 제공하는 별도의 Dart 프로세스가 생성됩니다. 분석기 플러그인과 함께 실행되며(대체하지는 않습니다)."
 }

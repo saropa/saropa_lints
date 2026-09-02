@@ -6,6 +6,7 @@
     "alreadyRunning": "Een audit loopt al — wacht tot het klaar is.",
     "noProject": "Geen Dart project gevonden. Open een map die een pubspec.yaml bevat.",
     "missingDep": "Dit project heeft geen afhankelijkheid van saropa_lints. Voeg het eerst toe aan dev_dependencies.",
+    "pickWorkspaceFolder": "Welke werkmap moet de audit onderzoeken?",
     "scope": {
       "placeholder": "Welke bestanden moet de audit omvatten?",
       "full": "Volledig project",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Kon de audit CLI niet starten: {message}",
       "invalidProject": "De audit kon niet worden uitgevoerd op dit project. {details}",
-      "parseFailed": "De audit is voltooid, maar het uitvoer kon niet worden gelezen. Probeer het opnieuw te lopen."
+      "parseFailed": "De audit is voltooid, maar het uitvoer kon niet worden gelezen. Probeer het opnieuw te lopen.",
+      "canceled": "Controle geannuleerd."
     },
     "report": {
       "title": "Saropa Lints-audit",
       "heading": "Auditverslag",
+      "errorHeading": "Controle mislukt",
+      "canceledHeading": "Controle geannuleerd",
       "subtitle": "{count} bevindingen · {timestamp}",
       "baselineSubtitle": "Geverdere met baseline van {date}",
       "searchPlaceholder": "Filter op regel, bestand of bericht…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Pijltoetsen om te navigeren · Enter om bestand te openen · Esc om zoekopdracht te wissen",
       "copiedJson": "Audit JSON naar het klembord gekopieerd.",
       "baselineSaved": "Baseline opgeslagen. Toekomstige audits kunnen dit snapshot vergelijken.",
-      "baselineSaveFailed": "Kon de baseline niet opslaan: {message}"
+      "baselineSaveFailed": "Kon de baseline niet opslaan: {message}",
+      "deferredLoading": "Volledig resultaat laden (deze audit is groot)…",
+      "deferredLoadFailed": "Kon het volledige resultaatset niet laden — tonen van de eerste {pageSize} bevindingen alleen.",
+      "deferredWriteFailed": "Kan de grote resultatenset niet naar een tijdelijk bestand ({message}) schrijven. Het openen van het rapport duurt mogelijk traag."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart processen: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} proces(sen) ({size} RSS)",
       "daemonCount": "Flutter daemonen: {total} ({orphaned} orphane)",
+      "scanDaemonOrphans": "Geïsoleerde scan-daemonen: {count} — gebruik Clean Up om te killen",
       "warningHint": "Geheugengebruik is hoog — klik voor details",
       "criticalHint": "Geheugengebruik is kritisch — maak het schoon zoals aangeraden"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Niet Opnieuw Toon"
     },
     "cleanup": {
-      "noOrphans": "Geen gescheiden Flutter daemonen gevonden.",
-      "confirm": "Gevonden {count} orphane Flutter daemon processen met {size}. Verwijderen?",
+      "noOrphans": "Geen orphane daemonprocessen gevonden.",
+      "confirm": "{count} ordeelproces(zen) gevonden met behulp van {size}. Verwijderen?",
       "killButton": "Kil Orphans",
       "cancelButton": "Annuleren"
     },
@@ -622,6 +631,7 @@
       "colCommand": "Commando",
       "colAction": "Actie",
       "typeOrphan": "Wees",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Proces",
       "kill": "Kil",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Vergelijkingsacties vergelijken acties.",
       "packageDashboard": "Package Dashboard van het pakket",
       "packageDashboardTitle": "Open het pakket dashboard om meer pakketten te vergelijken."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Foutopsporingspaneel"
+    },
+    "section": {
+      "engines": "Diagnostische Engines",
+      "log": "Logboek"
+    },
+    "engine": {
+      "analyzerPlugin": "Analyzer Plug-in",
+      "scanDaemon": "Daemon scannen",
+      "lspServer": "LSP-server",
+      "pid": "PID:",
+      "status": "Status:",
+      "rules": "Regels:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "AAN",
+      "off": "AF"
+    },
+    "action": {
+      "killAll": "Dood allemaal",
+      "restartAll": "Herstart Alles"
+    },
+    "log": {
+      "empty": "Geen logboekregistraties nog."
     }
   },
   "detailView": {

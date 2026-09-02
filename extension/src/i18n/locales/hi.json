@@ -6,6 +6,7 @@
     "alreadyRunning": "एक अनुमान चल रहा है - इसे खत्म होने तक इंतजार करें।",
     "noProject": "कोई Dart प्रोजेक्ट नहीं मिला। एक pubspec.yaml वाले फोल्डर को खोलें।",
     "missingDep": "इस प्रोजेक्ट में saropa_lints पर निर्भरता नहीं है। इसे पहले dev_dependencies में जोड़ें।",
+    "pickWorkspaceFolder": "कौन सा कार्यस्थल फ़ोल्डर आवरण के खिलाफ चलाया जाए?",
     "scope": {
       "placeholder": "कौन से फ़ाइलों के अधीन आवरण होना चाहिए?",
       "full": "पूरा प्रोजेक्ट",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "अप्रमाणित करने के CLI को शुरू करने में असमर्थ: {message}",
       "invalidProject": "इस प्रोजेक्ट के खिलाफ आवर्तन चलाया नहीं जा सकता। {details}",
-      "parseFailed": "परीक्षण पूरा हो गया लेकिन इसके आउटपुट को पढ़ा नहीं सके। इसे फिर से चलाने को कोशिश करें।"
+      "parseFailed": "परीक्षण पूरा हो गया लेकिन इसके आउटपुट को पढ़ा नहीं सके। इसे फिर से चलाने को कोशिश करें।",
+      "canceled": "ऑडिट रद्द कर दिया गया."
     },
     "report": {
       "title": "Saropa Lints आईडी जांच",
       "heading": "अप्रमाणित रिपोर्ट",
+      "errorHeading": "ऑडिट विफल रहा",
+      "canceledHeading": "ऑडिट रद्द कर दिया गया",
       "subtitle": "{count} खोज · {timestamp}",
       "baselineSubtitle": "{date} के मानक से तुलना में",
       "searchPlaceholder": "नियम, फ़ाइल या संदेश के आधार पर फ़िल्टर करें…",
@@ -54,7 +58,10 @@
       "keyboardHint": "सीधे कुंजी के लिए नाविगेट · एंटर फ़ाइल खोलने के लिए · एस्क खोज साफ करने के लिए",
       "copiedJson": "ऑडिट JSON को क्लिपबोर्ड पर कॉपी किया गया।",
       "baselineSaved": "मूल आधार बचाया गया। भविष्य के अभियोजन इस स्नैपशॉट के खिलाफ तुलना कर सकते हैं।",
-      "baselineSaveFailed": "के आधार बनाने में असमर्थ: {message}"
+      "baselineSaveFailed": "के आधार बनाने में असमर्थ: {message}",
+      "deferredLoading": "पूरा रिजल्ट सेट लोड कर रहे हैं (इस ऑडिट बहुत बड़ा है)…",
+      "deferredLoadFailed": "पूरे रिजल्ट सेट को लोड नहीं किया जा सका — केवल पहले {pageSize} खोजें दिखाई दे रहे हैं।",
+      "deferredWriteFailed": "एक अस्थायी फ़ाइल ({message}) पर सेट किए गए बड़े परिणाम को नहीं लिखा जा सका - रिपोर्ट खुलने में धीमी हो सकती है।"
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart प्रक्रियाएं: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} प्रक्रिया(एं) ({size} RSS)",
       "daemonCount": "Flutter डेमोन्स: {total} ({orphaned} अकेला)",
+      "scanDaemonOrphans": "अकेले स्कैन डेमोन: {count} — स्वच्छ करें के उपयोग करके मारें",
       "warningHint": "मेमरी उपयोग उच्च है — क्लिक करें विवरण के लिए",
       "criticalHint": "मेमरी का उपयोग महत्वपूर्ण है — सुधार के लिए सावधानीपूर्वक साफ करें"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "फिर से नहीं दिखाएँ"
     },
     "cleanup": {
-      "noOrphans": "कोई अकेला Flutter डेमोन नहीं मिला।",
-      "confirm": "{count} से अकेले Flutter डेमोन प्रोसेस ज्ञात किये गए हैं जो {size} का उपयोग कर रहे हैं। उन्हें मार दें?",
+      "noOrphans": "कोई अकेला डेमोन नहीं मिला।",
+      "confirm": "{count} अकेले डेमोन प्रोसेस(एस) का पता चला {size} के उपयोग से। उन्हें मार दें?",
       "killButton": "किल ऑर्फ़न्स",
       "cancelButton": "रद्द करें रद्द करें"
     },
@@ -622,6 +631,7 @@
       "colCommand": "कमांड",
       "colAction": "कार्यविधि",
       "typeOrphan": "अकेला",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "प्रक्रिया",
       "kill": "किल्ल",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "तुलनात्मक कार्रवाई।",
       "packageDashboard": "पैकेज डैशबोर्ड",
       "packageDashboardTitle": "अधिक पैकेजों की तुलना करने के लिए पैकेज डैशबोर्ड खोलें।"
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "डिबग पैनल"
+    },
+    "section": {
+      "engines": "निदान इंजन",
+      "log": "लॉग"
+    },
+    "engine": {
+      "analyzerPlugin": "एनालाइजर प्लगइन",
+      "scanDaemon": "Daemon स्कैन करें",
+      "lspServer": "एलएसपी सर्वर",
+      "pid": "PID:",
+      "status": "स्थिति:",
+      "rules": "नियम:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "ओएन /नो_थिंक",
+      "off": "अफ ऑफ /नो_थिंक"
+    },
+    "action": {
+      "killAll": "किल अल /नो_थिंक",
+      "restartAll": "सभी रीस्टार्ट करें"
+    },
+    "log": {
+      "empty": "अभी लॉग प्रविष्टियाँ नहीं हैं।"
     }
   },
   "detailView": {

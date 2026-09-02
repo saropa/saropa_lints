@@ -8,6 +8,7 @@
   "views.status.name": "ステータス (Status) 状態",
   "views.settings.name": "設定セットは,設定を設定する.",
   "views.severityFilters.name": "診断",
+  "command.auditFolder.title": "Saropa: アウド フォルダ...",
   "views.help.name": "援助・支援をすること.",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart および Flutter の lint ルールでセキュリティ、アクセシビリティ、パフォーマンスを強化します。\n\nDart または Flutter プロジェクトが必要です。\n\n`pubspec.yaml` を含むフォルダを開くことで開始できます。\n\n[オンラインで詳しく見る](https://pub.dev/packages/saropa_lints)\n[すべてのコマンドを表示](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: プロジェクトを設定する (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "合計Dart RSSがこの値（GB）を超えた場合、重要なアラートを表示する",
   "config.property.systemHealth.warningOrphanCount.description": "孤立したFlutterデーモンの数がこの値に達したときに警告を表示する",
   "config.property.systemHealth.criticalOrphanCount.description": "孤立したFlutterデーモンの数がこの値に達したときに重大なアラートを表示する",
-  "config.property.systemHealth.showNotifications.description": "システムのヘルスが危急レベルに達したときに通知を表示する"
+  "config.property.systemHealth.showNotifications.description": "システムのヘルスが危急レベルに達したときに通知を表示する",
+  "views.debugPanel.name": "デバッグ",
+  "command.toggleDebugPanel.title": "Saropa Lints: デバッグパネルを切り替える",
+  "command.lspServer.start.title": "Saropa Lints: LSPサーバーを起動",
+  "command.lspServer.stop.title": "Saropa Lints: LSP サーバーを停止",
+  "command.lspServer.restart.title": "Saropa Lints: LSPサーバーを再起動",
+  "config.section.Debug.title": "デバッグ＆診断エンジン",
+  "config.property.debug.enabled.description": "Saropa Lintsサイドバーにデバッグパネルを表示します。3つの診断エンジン（アナライザプラグイン、スキャンDaemon、LSPサーバー）のステータスとコントロールを表示します。",
+  "config.property.lspServer.enabled.description": "スタンドアロンのSaropa Lints LSPサーバーを実行して診断を行います。有効にすると、Language Server Protocolを介して波線とクイックフィックスを提供する別個のDartプロセスが生成されます。分析プラグインと並行して実行されます（代替ではありません）。"
 }

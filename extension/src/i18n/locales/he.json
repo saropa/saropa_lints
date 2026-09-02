@@ -6,6 +6,7 @@
     "alreadyRunning": "בדיקה כבר בדיקה — חכו לסיומה.",
     "noProject": "לא נמצאו פרויקטים Dart. פתח תיקייה שמכילה pubspec.yaml.",
     "missingDep": "הפרויקט הזה לא תלוי בsaropa_lints. הוסף אותו לdev_dependencies תחילה.",
+    "pickWorkspaceFolder": "איזה תיקייה של וורקספேס צריכה ל chạy את האודיט?",
     "scope": {
       "placeholder": "אילו קבצים צריך לשקול בבדיקה?",
       "full": "פרויקט מלא",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "לא ניתן להתחיל את CLI המراجعة: {message}",
       "invalidProject": "האודיט לא יכול לרוץ על פרויקט זה. {details}",
-      "parseFailed": "האודיט הסתיים אך הפלט שלו לא ניתן לקרוא. נסה לרוץ אותו שוב."
+      "parseFailed": "האודיט הסתיים אך הפלט שלו לא ניתן לקרוא. נסה לרוץ אותו שוב.",
+      "canceled": "הביקורת בוטלה."
     },
     "report": {
       "title": "הערכה Saropa Lints",
       "heading": "דוח ביקורת",
+      "errorHeading": "הביקורת נכשלה",
+      "canceledHeading": "הביקורת בוטלה",
       "subtitle": "ממצאים {count} · {timestamp}",
       "baselineSubtitle": "ביחס לשורה בסיסית מ{date}",
       "searchPlaceholder": "סנן לפי כלל, קובץ או הודעה…",
@@ -54,7 +58,10 @@
       "keyboardHint": "מקשי החץ כדי לנוע · לחיצה על Enter כדי לפתוח קובץ · לחיצה על Esc כדי לנקות חיפוש",
       "copiedJson": "האודיט JSON הועתק ללוח ה메모יריה.",
       "baselineSaved": "השכלה נשמרה. בדיקות עתידיות יכולות להשוות לשקף זה.",
-      "baselineSaveFailed": "לא ניתן לשמור את הבסיס: {message}"
+      "baselineSaveFailed": "לא ניתן לשמור את הבסיס: {message}",
+      "deferredLoading": "טוען את קבוצת התוצאות המלאה (האודיט גדול)…",
+      "deferredLoadFailed": "לא ניתן להעניק את כל תוצאות החיפוש — הציגו רק את ה {pageSize} תוצאות הראשונות.",
+      "deferredWriteFailed": "לא ניתן היה לכתוב את התוצאה הגדולה שהוגדרה לקובץ זמני ({message}) - הדוח עשוי להיות איטי בפתיחה."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "תהליכי Dart: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} תהליך(ים) ({size} RSS)",
       "daemonCount": "Flutter דמונים: {total} ({orphaned} אובד)",
+      "scanDaemonOrphans": "דמוניס קסן אובירנים: {count} — השתמש בנקה כדי לסיים",
       "warningHint": "שימוש ב pamięć הוא גבוה — לחץ כדי לראות פרטים",
       "criticalHint": "שימוש ב pamięć הוא קריטי — ניקוי מומלץ"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "אל תציג שוב"
     },
     "cleanup": {
-      "noOrphans": "לא נמצאו דמונים Flutter אובדנים.",
-      "confirm": "מצוין {count} תהליכים Flutter חסרי אב using {size}. למחוק אותם?",
+      "noOrphans": "לא נמצאו דמונים מוזרים.",
+      "confirm": "מצאתי {count} תהליך(ים)daemon אובד(ים) באמצעות {size}. למחוק אותם?",
       "killButton": "הרג ילדים זוכרים",
       "cancelButton": "ביטול לבטל"
     },
@@ -622,6 +631,7 @@
       "colCommand": "명령",
       "colAction": "פעולה",
       "typeOrphan": "יָתוֹם",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "תהליך",
       "kill": "הכבה",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "פעולות השוואה - פעולה בהשוואה.",
       "packageDashboard": "לוח המחוונים של החבילה (Package Dashboard)",
       "packageDashboardTitle": "פתח את לוח המחוונים של החבילה כדי להשוות בין חבילות נוספות."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "패널 דיבאג"
+    },
+    "section": {
+      "engines": "מנועי אבחון",
+      "log": "לוג"
+    },
+    "engine": {
+      "analyzerPlugin": "אנליזר 플וגין",
+      "scanDaemon": "סרוק Daemon",
+      "lspServer": "שרת LSP",
+      "pid": "PID:",
+      "status": "מצב:",
+      "rules": "חוקי שיווק:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "עַל",
+      "off": "הצגת שגיאות"
+    },
+    "action": {
+      "killAll": "הרג כולם",
+      "restartAll": "إعادة تشغيل כל"
+    },
+    "log": {
+      "empty": "אין רשומות לוג עדיין."
     }
   },
   "detailView": {

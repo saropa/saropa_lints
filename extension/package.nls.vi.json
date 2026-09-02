@@ -8,6 +8,7 @@
   "views.status.name": "Tình trạng Status Status",
   "views.settings.name": "Settings Settings (Thay đổi định vị)",
   "views.severityFilters.name": "Chẩn đoán",
+  "command.auditFolder.title": "Saropa: Kiểm tra Thư mục...",
   "views.help.name": "Giúp đỡ giúp đỡ",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ quy tắc Dart và Flutter kiểm tra bảo mật, tính tiếp cận và hiệu năng.\n\nYêu cầu một dự án Dart hoặc Flutter.\n\nMở một thư mục chứa file `pubspec.yaml` để bắt đầu.\n\n[Học thêm trực tuyến](https://pub.dev/packages/saropa_lints)\n[Duyệt tất cả lệnh](command:saropaLints.showCommandCatalog)\n[Về Saropa Lints](command:saropaLints.showAbout)\n[Bắt đầu](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: là người có thể Thiết lập dự án (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "Hiển thị cảnh báo quan trọng khi tổng Dart RSS vượt quá giá trị này (GB).",
   "config.property.systemHealth.warningOrphanCount.description": "Hiển thị cảnh báo khi số lượng daemon Flutter bị bỏ rơi đạt đến giá trị này.",
   "config.property.systemHealth.criticalOrphanCount.description": "Hiển thị cảnh báo quan trọng khi số lượng daemon Flutter bị bỏ rơi đạt đến giá trị này.",
-  "config.property.systemHealth.showNotifications.description": "Hiển thị thông báo khi trạng thái hệ thống đạt mức nguy hiểm."
+  "config.property.systemHealth.showNotifications.description": "Hiển thị thông báo khi trạng thái hệ thống đạt mức nguy hiểm.",
+  "views.debugPanel.name": "Gỡ lỗi",
+  "command.toggleDebugPanel.title": "Saropa Lints: Chuyển đổi Thanh Điều khiển Debug",
+  "command.lspServer.start.title": "Saropa Lints: Khởi động Máy chủ LSP",
+  "command.lspServer.stop.title": "Saropa Lints: Dừng Server LSP",
+  "command.lspServer.restart.title": "Saropa Lints: Khởi động lại Máy chủ LSP",
+  "config.section.Debug.title": "Công cụ gỡ lỗi và chẩn đoán",
+  "config.property.debug.enabled.description": "Hiển thị bảng điều khiển Debug trong thanh bên Saropa Lints. Hiển thị trạng thái và điều khiển cho ba công cụ chẩn đoán (Analyzer Plugin, Scan Daemon, LSP Server).",
+  "config.property.lspServer.enabled.description": "Chạy máy chủ Saropa Lints LSP độc lập để thực hiện chẩn đoán. Khi bật tính năng này, sẽ tạo ra một tiến trình Dart riêng biệt để cung cấp các thông báo lỗi và giải pháp nhanh qua giao thức Language Server. Chạy song song (không thay thế) plugin analyzer."
 }

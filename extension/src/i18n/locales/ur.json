@@ -6,6 +6,7 @@
     "alreadyRunning": "ایک جانچ جاری ہے — اس کو ختم ہونے تک انتظار کریں۔",
     "noProject": "Dart پروجیکٹ نہیں ملا۔ ایک pubspec.yaml کے ساتھ فولڈر کھولیں۔",
     "missingDep": "یہ پروجیکٹ saropa_lints پر منحصر نہیں ہے۔ اسے پہلے dev_dependencies میں شامل کریں۔",
+    "pickWorkspaceFolder": "کون سا ورک سپیس فولڈر ا审计 کے خلاف چلے گا؟",
     "scope": {
       "placeholder": "کون سے فائلز کا ا审计 شامل کرے؟",
       "full": "پورا پروجیکٹ",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "ٹسٹ کیا جانا تھا ا审计 CLI: {message}",
       "invalidProject": "پراجیکٹ کے خلاف آڈٹ نہیں چلا جا سکتا۔ {details}",
-      "parseFailed": "ٹیسٹ کی گزارش مکمل ہو گئی لیکن اس کا نتیجہ پڑھنا ممکن نہیں رہا۔ اسے دوبارہ چلا کر کوشش کریں۔"
+      "parseFailed": "ٹیسٹ کی گزارش مکمل ہو گئی لیکن اس کا نتیجہ پڑھنا ممکن نہیں رہا۔ اسے دوبارہ چلا کر کوشش کریں۔",
+      "canceled": "آڈٹ منسوخ کر دیا گیا۔"
     },
     "report": {
       "title": "Saropa Lints جائزہ",
       "heading": "آڈٹ رپورٹ",
+      "errorHeading": "آڈٹ ناکام ہو گیا۔",
+      "canceledHeading": "آڈٹ منسوخ کر دیا گیا۔",
       "subtitle": "{count} نتائج · {timestamp}",
       "baselineSubtitle": "مقابلہ بنیاد سے {date} سے",
       "searchPlaceholder": "نگران کریں کے حوالے سے قاعدہ، فائل یا پیغام…",
@@ -54,7 +58,10 @@
       "keyboardHint": "چھوٹے کی کیاﺅں سے ناﺅٹیگ کریں · اینٹر کریں تاکہ فائل کھولی جائے · اسکی کریں تاکہ تلاش ہٹا دی جائے",
       "copiedJson": "ٹیسٹ جی ایسون جی کاپی کریٹھ کر دیا گیا ہے۔",
       "baselineSaved": "اس کی بنیاد درج کر لی گئی ہے۔ مستقبل میں آڈٹس اس چھوٹے نمونے سے موازنہ کر سکتے ہیں۔",
-      "baselineSaveFailed": "نیچے کی بنیاد کو بچانے میں ناکام رہ گیا: {message}"
+      "baselineSaveFailed": "نیچے کی بنیاد کو بچانے میں ناکام رہ گیا: {message}",
+      "deferredLoading": "کامل نتائج لوڈ کر رہے ہیں (یہ آڈٹ بہت بڑا ہے)…",
+      "deferredLoadFailed": "کمپلیٹ ریزولٹ سیٹ لوڈ نہیں ہوسکا — صرف پہلے {pageSize} نتائج دکھائی جارہے ہیں",
+      "deferredWriteFailed": "ایک عارضی فائل ({message}) پر سیٹ کیے گئے بڑے نتیجے کو نہیں لکھا جا سکا — رپورٹ کھلنے میں سست ہو سکتی ہے۔"
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart پرکریس: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} عمل ({size} RSS)",
       "daemonCount": "Flutter ڈیمینس: {total} ({orphaned} چھوڑے گئے)",
+      "scanDaemonOrphans": "کھوکھلے اسکن ڈیمُن: {count} — استعمال کریں کلین اپ کریں تاکہ",
       "warningHint": "یاد کرنے کی استعمال زیادہ ہے — کلک کریں تفصیلات کے لئے",
       "criticalHint": "ذہبی استعمال اہم ہے — سفارش کی گئی صفائی کریں"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "دوبارہ نہ دکھائیں"
     },
     "cleanup": {
-      "noOrphans": "کوئی چھوڑے گئے Flutter ڈیمُن نہیں ملا۔",
-      "confirm": "{count} Flutter دیمون پروسس کا پتہ لگا {size} سے۔ انہیں ہٹا دیں؟",
+      "noOrphans": "کوئی چھوڑے گئے ڈیمُن نہیں ملا۔",
+      "confirm": "{count} کے ذریعہ {size} سے اُنکے والد پروسس(س) پایا گیا۔ ان کو ہٹ کر دیں؟",
       "killButton": "کل کریکس",
       "cancelButton": "منسوخ"
     },
@@ -622,6 +631,7 @@
       "colCommand": "کمینڈ",
       "colAction": "کارروائی",
       "typeOrphan": "孤儿",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "پروسس",
       "kill": "کلیک /نومتھنک",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "موازنہ کی کارروائیوں کا موازنا کریں.",
       "packageDashboard": "پیکیج ڈیش بورڈ",
       "packageDashboardTitle": "مزید پیکیجز کا موازنہ کرنے کے لئے پیکیج ڈیش بورڈ کھولیں۔"
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "ڈیbug پنل"
+    },
+    "section": {
+      "engines": "دیاگنوسٹک انجنوز",
+      "log": "لاگ"
+    },
+    "engine": {
+      "analyzerPlugin": "تحلیل کنندہ پلاگ ان",
+      "scanDaemon": "سکن Daemon",
+      "lspServer": "LSP سرور",
+      "pid": "PID:",
+      "status": "حالة:",
+      "rules": "قواعد:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "اُپر /نہ کریں",
+      "off": "اُفف /نُو_تھِنک"
+    },
+    "action": {
+      "killAll": "کل ہٹا دو",
+      "restartAll": "ریستارت تمام"
+    },
+    "log": {
+      "empty": "نہیں لوج اینٹریز۔"
     }
   },
   "detailView": {

@@ -8,6 +8,7 @@
   "views.status.name": "Etat",
   "views.settings.name": "Parametres",
   "views.severityFilters.name": "Diagnostic",
+  "command.auditFolder.title": "Saropa : Audit du dossier...",
   "views.help.name": "Aide",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ règles Dart et Flutter de sécurité, d'accessibilité et de performance.\n\nNécessite un projet Dart ou Flutter.\n\nOuvrez un dossier contenant un `pubspec.yaml` pour commencer.\n\n[En savoir plus en ligne](https://pub.dev/packages/saropa_lints)\n[Parcourir toutes les commandes](command:saropaLints.showCommandCatalog)\n[À propos de Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints : Configurer le projet (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "Afficher l'alerte critique lorsque la valeur totale Dart RSS dépasse cette valeur (Go).",
   "config.property.systemHealth.warningOrphanCount.description": "Afficher un avertissement lorsque le nombre de daemons Flutter orphelins atteint cette valeur.",
   "config.property.systemHealth.criticalOrphanCount.description": "Afficher l'alerte critique lorsque le nombre de daemons Flutter orphelins atteint cette valeur.",
-  "config.property.systemHealth.showNotifications.description": "Afficher une notification lorsque le niveau de santé du système atteint le niveau critique."
+  "config.property.systemHealth.showNotifications.description": "Afficher une notification lorsque le niveau de santé du système atteint le niveau critique.",
+  "views.debugPanel.name": "Débogage",
+  "command.toggleDebugPanel.title": "Saropa Lints : Basculer le panneau de débogage",
+  "command.lspServer.start.title": "Saropa Lints : Démarrer le serveur LSP",
+  "command.lspServer.stop.title": "Saropa Lints : Arrêter le serveur LSP",
+  "command.lspServer.restart.title": "Saropa Lints : Redémarrer le serveur LSP",
+  "config.section.Debug.title": "Engins de débogage & de diagnostics",
+  "config.property.debug.enabled.description": "Afficher le panneau de débogage dans la barre latérale Saropa Lints. Affiche l'état et les contrôles pour les trois moteurs de diagnostic (Analyseur Plugin, Scan Daemon, Serveur LSP).",
+  "config.property.lspServer.enabled.description": "Exécutez le serveur LSP autonome Saropa Lints pour les diagnostics. Lorsqu'il est activé, il lance un processus Dart séparé qui fournit des squiggles et des solutions rapides via le Protocole du Serveur de Langage. Fonctionne en parallèle (et non à la place de) le plugin d'analyse."
 }

@@ -8,6 +8,7 @@
   "views.status.name": "El estado de la situación.",
   "views.settings.name": "La configuración de las configuraciones.",
   "views.severityFilters.name": "Diagnóstico",
+  "command.auditFolder.title": "Saropa: Auditoría de carpeta...",
   "views.help.name": "Ayuda ayuda ayuda.",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ reglas Dart y Flutter de seguridad, accesibilidad y rendimiento.\n\nRequiere un proyecto Dart o Flutter.\n\nAbra una carpeta que contenga un `pubspec.yaml` para comenzar.\n\n[Obtener más información en línea](https://pub.dev/packages/saropa_lints)\n[Explorar todos los comandos](command:saropaLints.showCommandCatalog)\n[Sobre Saropa Lints](command:saropaLints.showAbout)\n[Comenzar](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Configurar el proyecto (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "Muestra alerta crítica cuando el total Dart RSS exceda este valor (GB).",
   "config.property.systemHealth.warningOrphanCount.description": "Muestra una advertencia cuando el conteo de daemon Flutter abandonado alcanza este valor.",
   "config.property.systemHealth.criticalOrphanCount.description": "Muestra alerta crítica cuando el conteo de daemon Flutter abandonado alcanza este valor.",
-  "config.property.systemHealth.showNotifications.description": "Muestra una notificación cuando el nivel de salud del sistema alcance el nivel crítico."
+  "config.property.systemHealth.showNotifications.description": "Muestra una notificación cuando el nivel de salud del sistema alcance el nivel crítico.",
+  "views.debugPanel.name": "Depuración",
+  "command.toggleDebugPanel.title": "Saropa Lints: Alternar Panel de Depuración",
+  "command.lspServer.start.title": "Saropa Lints: Iniciar servidor LSP",
+  "command.lspServer.stop.title": "Saropa Lints: Detener servidor LSP",
+  "command.lspServer.restart.title": "Saropa Lints: Reiniciar servidor LSP",
+  "config.section.Debug.title": "Engines de depuración y diagnóstico",
+  "config.property.debug.enabled.description": "Muestra el panel de Depuración en el panel lateral Saropa Lints. Muestra el estado y los controles para los tres motores de diagnóstico (Plugin Analizador, Escaneo Daemon, Servidor LSP).",
+  "config.property.lspServer.enabled.description": "Ejecute el servidor LSP independiente Saropa Lints para diagnósticos. Al habilitarlo, se inicia un proceso separado Dart que proporciona sugerencias y soluciones rápidas mediante el Protocolo del Servidor de Lenguaje. Se ejecuta junto (no en lugar de) al plugin analizador."
 }

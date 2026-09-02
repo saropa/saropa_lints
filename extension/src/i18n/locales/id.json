@@ -6,6 +6,7 @@
     "alreadyRunning": "Audit sedang berjalan — tunggu hingga selesai.",
     "noProject": "Tidak ditemukan proyek Dart. Buka folder yang mengandung pubspec.yaml.",
     "missingDep": "Proyek ini tidak bergantung pada saropa_lints. Tambahkan terlebih dahulu ke dev_dependencies.",
+    "pickWorkspaceFolder": "Folder workspace mana yang seharusnya diuji?",
     "scope": {
       "placeholder": "File mana yang harus ditinjau oleh audit?",
       "full": "Proyek lengkap",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Tidak dapat memulai audit CLI: {message}",
       "invalidProject": "Audit tidak dapat dijalankan terhadap proyek ini. {details}",
-      "parseFailed": "Audit selesai tetapi outputnya tidak dapat dibaca. Coba jalankan kembali."
+      "parseFailed": "Audit selesai tetapi outputnya tidak dapat dibaca. Coba jalankan kembali.",
+      "canceled": "Audit dibatalkan."
     },
     "report": {
       "title": "Audit Saropa Lints",
       "heading": "Laporan Audit",
+      "errorHeading": "Audit gagal",
+      "canceledHeading": "Audit dibatalkan",
       "subtitle": "Temuan {count} · {timestamp}",
       "baselineSubtitle": "Dibandingkan dengan baseline dari {date}",
       "searchPlaceholder": "Filter berdasarkan aturan, file, atau pesan…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Panah atas dan bawah untuk navigasi · Enter untuk membuka file · Esc untuk menghapus pencarian",
       "copiedJson": "Audit JSON telah disalin ke clipboard.",
       "baselineSaved": "Baseline disimpan. Audit masa depan dapat membandingkan dengan snapshot ini.",
-      "baselineSaveFailed": "Tidak dapat menyimpan baseline: {message}"
+      "baselineSaveFailed": "Tidak dapat menyimpan baseline: {message}",
+      "deferredLoading": "Memuat hasil himpunan lengkap (audit ini besar)…",
+      "deferredLoadFailed": "Tidak dapat memuat hasil lengkap — hanya menampilkan temuan pertama {pageSize} saja.",
+      "deferredWriteFailed": "Tidak dapat menulis kumpulan hasil besar ke file sementara ({message}) — laporan mungkin lambat untuk dibuka."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart proses: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} proses(es) ({size} RSS)",
       "daemonCount": "Flutter daemon: {total} ({orphaned} terlantar)",
+      "scanDaemonOrphans": "Daemon pemindaian yang terlantar: {count} — gunakan Clean Up untuk membunuh",
       "warningHint": "Penggunaan memori tinggi — klik untuk detail",
       "criticalHint": "Penggunaan memori kritis — bersihkan rekomendasi"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Jangan Tampilkan Lagi"
     },
     "cleanup": {
-      "noOrphans": "Tidak ditemukan daemon Flutter yang terlantar.",
-      "confirm": "Ditemukan {count} proses daemon yang terlantar menggunakan Flutter dengan {size}. Bunuh mereka?",
+      "noOrphans": "Tidak ditemukan daemon yang terlantar.",
+      "confirm": "Ditemukan {count} proses daemon yang terlantar menggunakan {size}. Bunuh mereka?",
       "killButton": "Hancurkan Anak Yatim",
       "cancelButton": "Batalkan Batal."
     },
@@ -622,6 +631,7 @@
       "colCommand": "Perintah",
       "colAction": "Aksi",
       "typeOrphan": "Yatim piatu",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Proses",
       "kill": "Matikan",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Perbandingan tindakan-tindakan yang membandingkan.",
       "packageDashboard": "Dashboard Paket adalah sebuah dashboard paket.",
       "packageDashboardTitle": "Buka Dashboard Paket untuk membandingkan lebih banyak paket."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Panel Debug"
+    },
+    "section": {
+      "engines": "Engine Diagnostik",
+      "log": "Catatan"
+    },
+    "engine": {
+      "analyzerPlugin": "Analisis Plugin",
+      "scanDaemon": "Pindai Daemon",
+      "lspServer": "Server LSP",
+      "pid": "PID:",
+      "status": "Status:",
+      "rules": "Aturan:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "NYALA",
+      "off": "MATI"
+    },
+    "action": {
+      "killAll": "Matikan Semua",
+      "restartAll": "Restart Semua"
+    },
+    "log": {
+      "empty": "Belum ada entri log."
     }
   },
   "detailView": {

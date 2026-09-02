@@ -8,6 +8,7 @@
   "views.status.name": "स्थिति की स्थिति Status",
   "views.settings.name": "सेटिंग्स सेटिंग्स",
   "views.severityFilters.name": "निदान",
+  "command.auditFolder.title": "Saropa: अपवेश फोल्डर...",
   "views.help.name": "सहायता मदद करें।",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart और Flutter लिंट नियम सुरक्षा, पहुँच एवं प्रदर्शन के लिए।\n\nDart या Flutter परियोजना के लिए आवश्यक है।\n\nएक फोल्डर खोलें जिसमें `pubspec.yaml` हो।\n\n[ऑनलाइन अधिक जानकारी](https://pub.dev/packages/saropa_lints)\n[सभी आदेश देखें](command:saropaLints.showCommandCatalog)\n[बारे में Saropa Lints](command:saropaLints.showAbout)\n[शुरू करें](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: प्रोजेक्ट सेट अप करें (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "कुल Dart RSS के मूल्य के अतिरिक्त अलर्ट दिखाएं (जीबी)",
   "config.property.systemHealth.warningOrphanCount.description": "जब अकेले Flutter डेमोन की संख्या इस मान तक पहुँचती है तब चेतावनी दिखाएं।",
   "config.property.systemHealth.criticalOrphanCount.description": "जब अकेले Flutter डेमोन काउंट इस मूल्य तक पहुँचता है तब गंभीर अलर्ट दिखाएं।",
-  "config.property.systemHealth.showNotifications.description": "सिस्टम हेल्थ के क्रिटिकल स्तर तक पहुँचने पर एक सूचना दिखाएं"
+  "config.property.systemHealth.showNotifications.description": "सिस्टम हेल्थ के क्रिटिकल स्तर तक पहुँचने पर एक सूचना दिखाएं",
+  "views.debugPanel.name": "डिबग",
+  "command.toggleDebugPanel.title": "Saropa Lints: डिबग पैनल को टॉगल करें",
+  "command.lspServer.start.title": "Saropa Lints: एलएसपी सर्वर शुरू करें",
+  "command.lspServer.stop.title": "Saropa Lints: एलएसपी सर्वर बंद करें",
+  "command.lspServer.restart.title": "Saropa Lints: LSP सर्वर फिर से शुरू करें",
+  "config.section.Debug.title": "डिबग एवं डायग्नोस्टिक्स इंजिन्स",
+  "config.property.debug.enabled.description": "Saropa Lints विंडो के ओर डेबगिंग पैनल दिखाएं। तीन डियाग्नोस्टिक इंजिन्स (एनालाइजर प्लगइन, स्कैन Daemon, एलएसपी सर्वर) के स्टेटस और नियंत्रण दिखाता है।",
+  "config.property.lspServer.enabled.description": "निदान के लिए स्टैंडअलोन Saropa Lints LSP सर्वर चलाएँ। सक्षम होने पर, एक अलग Dart प्रक्रिया उत्पन्न होती है जो भाषा सर्वर प्रोटोकॉल के माध्यम से स्क्विगल और त्वरित सुधार प्रदान करती है। विश्लेषक प्लगइन के साथ-साथ चलता है (इसके बजाय नहीं)।"
 }

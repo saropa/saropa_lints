@@ -6,6 +6,7 @@
     "alreadyRunning": "Uma auditoria já está em execução — aguarde até que ela termine.",
     "noProject": "Nenhum projeto Dart encontrado. Abra uma pasta que contenha um pubspec.yaml.",
     "missingDep": "Esse projeto não depende de saropa_lints. Adicione-o a dev_dependencies primeiro.",
+    "pickWorkspaceFolder": "Qual pasta de trabalho deve ser auditada?",
     "scope": {
       "placeholder": "Quais arquivos a auditoria deve cobrir?",
       "full": "Projeto completo",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Não foi possível iniciar o CLI de auditoria: {message}",
       "invalidProject": "A auditoria não pode ser executada neste projeto. {details}",
-      "parseFailed": "A auditoria terminou, mas sua saída não pode ser lida. Tente executá-la novamente."
+      "parseFailed": "A auditoria terminou, mas sua saída não pode ser lida. Tente executá-la novamente.",
+      "canceled": "Auditoria cancelada."
     },
     "report": {
       "title": "Saropa Lints Auditoria",
       "heading": "Relatório de Auditoria",
+      "errorHeading": "Falha na auditoria",
+      "canceledHeading": "Auditoria cancelada",
       "subtitle": "{count} achados · {timestamp}",
       "baselineSubtitle": "Comparado à baseline de {date}",
       "searchPlaceholder": "Filtrar por regra, arquivo ou mensagem…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Setas para navegar · Enter para abrir arquivo · Esc para limpar busca",
       "copiedJson": "Auditoria JSON copiado para a área de transferência.",
       "baselineSaved": "Baseline salvo. Auditorias futuras podem comparar contra esse snapshot.",
-      "baselineSaveFailed": "Não foi possível salvar a linha de base: {message}"
+      "baselineSaveFailed": "Não foi possível salvar a linha de base: {message}",
+      "deferredLoading": "Carregando o conjunto completo de resultados (este auditoria é grande)...",
+      "deferredLoadFailed": "Não foi possível carregar o conjunto completo de resultados — exibindo apenas os primeiros {pageSize} achados.",
+      "deferredWriteFailed": "Não foi possível gravar o grande conjunto de resultados em um arquivo temporário ({message}) — o relatório pode demorar para abrir."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Processos Dart: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} processo(s) ({size} RSS)",
       "daemonCount": "Flutter daemons: {total} ({orphaned} orfãos)",
+      "scanDaemonOrphans": "Processos de varredura orfãos: {count} — use Clean Up para matar",
       "warningHint": "Uso de memória é alto — clique para detalhes",
       "criticalHint": "Uso de memória é crítico — limpe conforme recomendado"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Não Mostrar Novamente"
     },
     "cleanup": {
-      "noOrphans": "Nenhum daemon Flutter orfão encontrado.",
-      "confirm": "Encontrou {count} processos daemon orfãos usando Flutter com {size}. Matá-los?",
+      "noOrphans": "Nenhum daemon orfão encontrado.",
+      "confirm": "Processo(s) {count} de daemon orfão(s) encontrado(s) usando {size}. Matar eles?",
       "killButton": "Matar Orfãos",
       "cancelButton": "Cancelar cancelar Cancelá-lo"
     },
@@ -622,6 +631,7 @@
       "colCommand": "Comando",
       "colAction": "Ação",
       "typeOrphan": "Orfão",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Processo",
       "kill": "Matar",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Ações de comparação.",
       "packageDashboard": "Painel de painéis do pacote.",
       "packageDashboardTitle": "Abra o Painel de Pacotes para comparar mais pacotes."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Painel de Depuração"
+    },
+    "section": {
+      "engines": "Engines de Diagnóstico",
+      "log": "Registro"
+    },
+    "engine": {
+      "analyzerPlugin": "Analisador de Plugin",
+      "scanDaemon": "Varredura Daemon",
+      "lspServer": "Servidor LSP",
+      "pid": "PID:",
+      "status": "Status:",
+      "rules": "Regras:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "SOBRE",
+      "off": "DESLIGADO"
+    },
+    "action": {
+      "killAll": "Matar Todos",
+      "restartAll": "Reiniciar Tudo"
+    },
+    "log": {
+      "empty": "Nenhuma entrada de log ainda."
     }
   },
   "detailView": {

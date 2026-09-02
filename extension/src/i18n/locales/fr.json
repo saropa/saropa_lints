@@ -6,6 +6,7 @@
     "alreadyRunning": "Un audit est déjà en cours — attendez qu'il se termine.",
     "noProject": "Aucun projet Dart trouvé. Ouvrez un dossier contenant un pubspec.yaml.",
     "missingDep": "Ce projet ne dépend pas de saropa_lints. Ajoutez-le d'abord à dev_dependencies.",
+    "pickWorkspaceFolder": "Quel dossier de travail doit être analysé par l'audit ?",
     "scope": {
       "placeholder": "Quels fichiers l'audit doit-il couvrir ?",
       "full": "Projet complet",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Impossible de démarrer l'audit CLI : {message}",
       "invalidProject": "L'audit ne peut pas être exécuté sur ce projet. {details}",
-      "parseFailed": "L'audit s'est terminé mais son résultat ne peut pas être lu. Essayez de le relancer."
+      "parseFailed": "L'audit s'est terminé mais son résultat ne peut pas être lu. Essayez de le relancer.",
+      "canceled": "Vérification annulée."
     },
     "report": {
       "title": "Audit Saropa Lints",
       "heading": "Rapport d'audit",
+      "errorHeading": "L'audit a échoué",
+      "canceledHeading": "Vérification annulée",
       "subtitle": "{count} résultats · {timestamp}",
       "baselineSubtitle": "Comparé à la base de {date}",
       "searchPlaceholder": "Filtre par règle, fichier ou message…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Flèches directionnelles pour naviguer · Entrée pour ouvrir le fichier · Échap pour effacer la recherche",
       "copiedJson": "Audit JSON copié dans le presse-papier.",
       "baselineSaved": "Snapshot enregistré. Les futures audits peuvent comparer contre ce point de référence.",
-      "baselineSaveFailed": "Impossible de sauvegarder la base de comparaison : {message}"
+      "baselineSaveFailed": "Impossible de sauvegarder la base de comparaison : {message}",
+      "deferredLoading": "Chargement de l'ensemble complet des résultats (cet audit est volumineux)…",
+      "deferredLoadFailed": "Impossible de charger l'ensemble complet des résultats — affichage uniquement des premiers {pageSize} résultats.",
+      "deferredWriteFailed": "Impossible d'écrire le jeu de résultats volumineux dans un fichier temporaire ({message}) : l'ouverture du rapport peut être lente."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Processus Dart : {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints : {count} processus ({size} RSS)",
       "daemonCount": "Flutter daemons : {total} ({orphaned} orphelin(s))",
+      "scanDaemonOrphans": "Daemons de scan orphelins : {count} — utilisez Clean Up pour tuer",
       "warningHint": "L'utilisation de la mémoire est élevée — cliquez pour plus de détails",
       "criticalHint": "L'utilisation de la mémoire est critique — nettoyer recommandé"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Ne plus afficher à nouveau"
     },
     "cleanup": {
-      "noOrphans": "Aucun daemon Flutter orphelin trouvé.",
-      "confirm": "{count} processus de démon orphelin Flutter trouvés utilisant {size}. Les tuer ?",
+      "noOrphans": "Aucun daemon orphelin trouvé.",
+      "confirm": "Processus daemon orphelin(s) {count} trouvé(s) en utilisant {size}. Les tuer ?",
       "killButton": "Tuer les Orphelins",
       "cancelButton": "Annuler"
     },
@@ -622,6 +631,7 @@
       "colCommand": "Commande",
       "colAction": "Action",
       "typeOrphan": "Orphelin",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Processus",
       "kill": "Tuer",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Les actions de comparaison sont des actions comparatives.",
       "packageDashboard": "Le tableau de bord des paquets est le Dashboard.",
       "packageDashboardTitle": "Ouvrez le tableau de bord des paquets pour comparer plus de paquets."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Panneau de débogage"
+    },
+    "section": {
+      "engines": "Engins de diagnostic",
+      "log": "Journal"
+    },
+    "engine": {
+      "analyzerPlugin": "Analyseur de plugin",
+      "scanDaemon": "Analyser Daemon",
+      "lspServer": "Serveur LSP",
+      "pid": "PID:",
+      "status": "Statut :",
+      "rules": "Règles :",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "ACTIVÉ",
+      "off": "DÉSACTIVÉ"
+    },
+    "action": {
+      "killAll": "Tuer Tout",
+      "restartAll": "Redémarrer tout"
+    },
+    "log": {
+      "empty": "Aucune entrée de journal pour l'instant."
     }
   },
   "detailView": {

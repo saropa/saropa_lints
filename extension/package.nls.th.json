@@ -8,6 +8,7 @@
   "views.status.name": "สถานะ Status ฐานะ",
   "views.settings.name": "การตั้งค่า Settings",
   "views.severityFilters.name": "การวินิจฉัย",
+  "command.auditFolder.title": "Saropa: ตรวจสอบโฟลเดอร์...",
   "views.help.name": "ช่วยเหลือ สนับสนุน",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart และ Flutter กฎการตรวจสอบคุณภาพด้านความปลอดภัย ความเข้าถึง และประสิทธิภาพ\n\nต้องการโปรเจกต์ Dart หรือ Flutter\n\nเปิดโฟลเดอร์ที่มีไฟล์ `pubspec.yaml` เพื่อเริ่มต้น\n\n[เรียนรู้เพิ่มเติมออนไลน์](https://pub.dev/packages/saropa_lints)\n[ดูคำสั่งทั้งหมด](command:saropaLints.showCommandCatalog)\n[เกี่ยวกับ Saropa Lints](command:saropaLints.showAbout)\n[เริ่มต้นใช้งาน](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: ตั้งโครงการ (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "แสดงแจ้งเตือนข้อมูลสำคัญเมื่อค่ารวม Dart RSS เกินค่าที่กำหนด (GB)",
   "config.property.systemHealth.warningOrphanCount.description": "แสดงเตือนภัยเมื่อจำนวน daemon Flutter ที่ถูกทอดทิ้งถึงค่าที่กำหนด",
   "config.property.systemHealth.criticalOrphanCount.description": "แสดงแจ้งเตือนข้อมูลสำคัญเมื่อจำนวน daemon Flutter ที่ถูกทิ้งไว้ถึงค่าที่กำหนด",
-  "config.property.systemHealth.showNotifications.description": "แจ้งเตือนเมื่อสถานะระบบถึงระดับวิกฤต"
+  "config.property.systemHealth.showNotifications.description": "แจ้งเตือนเมื่อสถานะระบบถึงระดับวิกฤต",
+  "views.debugPanel.name": "ดีบัก",
+  "command.toggleDebugPanel.title": "Saropa Lints: แสดง/ซ่อนแผงดีบัก",
+  "command.lspServer.start.title": "Saropa Lints: เริ่มต้นเซิร์ฟเวอร์ LSP",
+  "command.lspServer.stop.title": "Saropa Lints: หยุดเซิร์ฟเวอร์ LSP",
+  "command.lspServer.restart.title": "Saropa Lints: รีสตาร์ทเซิร์ฟเวอร์ LSP",
+  "config.section.Debug.title": "เครื่องมือ Debug & Diagnostics Engines",
+  "config.property.debug.enabled.description": "แสดงแผงดีบักในส่วนข้างด้านซ้าย Saropa Lints แสดงสถานะและควบคุมสำหรับเครื่องมือวินิจฉัยสามเครื่อง (ปลั๊กอินวิเคราะห์, โปรแกรมสแกน Daemon, เซิร์ฟเวอร์ LSP)",
+  "config.property.lspServer.enabled.description": "รันเซิร์ฟเวอร์ Saropa Lints แบบ standalone เพื่อวินิจฉัย ขณะเปิดใช้งาน จะสร้างกระบวนการ Dart แยกต่างหากที่ส่ง squiggles และการแก้ไขเร็วผ่านโปรโตคอลเซิร์ฟเวอร์ภาษา ทำงานพร้อมกับ (ไม่ใช่แทน) ปลั๊กอิน analyzer"
 }

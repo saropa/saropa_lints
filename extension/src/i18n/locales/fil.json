@@ -6,6 +6,7 @@
     "alreadyRunning": "Ang isang audit ay nagsisimula na — wait for it to finish.",
     "noProject": "Walang proyekto Dart. Bumuksa sa isang folder na mayroon ang pubspec.yaml.",
     "missingDep": "Ang proyekto ay hindi naglalaman ng dependensya sa saropa_lints. Idagdag ito sa dev_dependencies muna.",
+    "pickWorkspaceFolder": "Saan ang workspace folder na dapat i-target ang audit?",
     "scope": {
       "placeholder": "Anong mga file ang dapat talaan ng audit?",
       "full": "Buo ang proyekto",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Hindi maaaring mag-start ng audit CLI: {message}",
       "invalidProject": "Ang audit ay hindi maaaring i-run sa proyekto na ito. {details}",
-      "parseFailed": "Nagtapos ang audit ngunit hindi mabasa ang output nito. Subukang i-run ito muli."
+      "parseFailed": "Nagtapos ang audit ngunit hindi mabasa ang output nito. Subukang i-run ito muli.",
+      "canceled": "Kinansela ang pag-audit."
     },
     "report": {
       "title": "Saropa Lints Audit",
       "heading": "Ulat ng Pag-audit",
+      "errorHeading": "Nabigo ang pag-audit",
+      "canceledHeading": "Kinansela ang pag-audit",
       "subtitle": "{count} results · {timestamp}",
       "baselineSubtitle": "Kumpara sa baseline mula sa {date}",
       "searchPlaceholder": "Filtra ayon sa rule, file, o mensahe…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Arrow keys para mag-navigate · Enter para buksan ang file · Esc para alisin ang search",
       "copiedJson": "Nakakopya ang audit JSON sa clipboard.",
       "baselineSaved": "Nakasave ang baseline. Maaari itong i-compare ng mga susunod na audit sa snapshot na ito.",
-      "baselineSaveFailed": "Hindi maaaring i-save ang baseline: {message}"
+      "baselineSaveFailed": "Hindi maaaring i-save ang baseline: {message}",
+      "deferredLoading": "Naglalagay ng buong result set (ang audit na ito ay malaki)…",
+      "deferredLoadFailed": "Hindi maaaring i-load ang buong result set — nagpapakita lamang ng unang {pageSize} findings.",
+      "deferredWriteFailed": "Hindi maisulat ang malaking resulta na nakatakda sa isang temp file ({message}) — maaaring mabagal ang pagbukas ng ulat."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart proseso: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} proseso(s) ({size} RSS)",
       "daemonCount": "Flutter daemon: {total} ({orphaned} na walang magulang)",
+      "scanDaemonOrphans": "Nakalabas na mga daemon ng scan: {count} — gamitin ang Clean Up para i-kill",
       "warningHint": "Mataas ang paggamit ng memorya — click para sa detalye",
       "criticalHint": "Ang paggamit ng memorya ay kritikal — i-clear ang mga inirerekomendang bagay"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Hindi Mo Iwanan Nang Magkakaroon Nang Paliwanag"
     },
     "cleanup": {
-      "noOrphans": "Walang nakakalat na Flutter daemon.",
-      "confirm": "Nakita ang {count} na walang-kaugnayan na Flutter daemon processes gamit ang {size}. I-kill ba ang mga ito?",
+      "noOrphans": "Walang nakakalat na daemon.",
+      "confirm": "Nakita ang {count} na proseso ng daemon na walang magagamit na mga anak na proseso (processes) gamit ang {size}. I-kill ba ang mga ito?",
       "killButton": "Iwanan ang mga Orphan",
       "cancelButton": "Kanselahin I-cancel ang pagkansela"
     },
@@ -622,6 +631,7 @@
       "colCommand": "Utos",
       "colAction": "Aksyon",
       "typeOrphan": "Ulila",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Proseso",
       "kill": "Iwan",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Paghahambing ng mga aksyon kumpara sa pagkilos.",
       "packageDashboard": "Package Dashboard ng Pakete Ang pakete ay isang dashboard na may mga tampok.",
       "packageDashboardTitle": "Buksan ang Package Dashboard upang ihambing ang higit pang mga pakete."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Debug Panel"
+    },
+    "section": {
+      "engines": "Mga Diagnostic Engine",
+      "log": "Log"
+    },
+    "engine": {
+      "analyzerPlugin": "Plugin ng Analyzer",
+      "scanDaemon": "I-scan Daemon",
+      "lspServer": "LSP Server",
+      "pid": "PID:",
+      "status": "Katayuan:",
+      "rules": "Mga Tala:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "NAKA-ON",
+      "off": "NAKA-OFF"
+    },
+    "action": {
+      "killAll": "Iwanan Lahat",
+      "restartAll": "Ibalik Lahat"
+    },
+    "log": {
+      "empty": "Walang mga entry sa log pa."
     }
   },
   "detailView": {

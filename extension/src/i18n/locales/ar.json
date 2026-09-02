@@ -26,11 +26,14 @@
     "error": {
       "spawnFailed": "لم يتم البدء بالفحص CLI: {message}",
       "invalidProject": "لم يتم القدرة على تشغيل المراجعة ضد هذا المشروع. {details}",
-      "parseFailed": "التحقيق انتهى لكن لم يتم القدرة على قراءة مخرجاته. جرّب تشغيله مرة أخرى."
+      "parseFailed": "التحقيق انتهى لكن لم يتم القدرة على قراءة مخرجاته. جرّب تشغيله مرة أخرى.",
+      "canceled": "التحقيق تم إلغاؤه."
     },
     "report": {
       "title": "مراجعة Saropa Lints",
       "heading": "تقرير المراجعة",
+      "errorHeading": "التحقق من الصحة فاشل",
+      "canceledHeading": "التحقق من الصحة تم إلغاؤه",
       "subtitle": "نتائج {count} · {timestamp}",
       "baselineSubtitle": "مقارنة مع الأساس من {date}",
       "searchPlaceholder": "فلتر حسب القاعدة، الملف، أو الرسالة…",
@@ -57,7 +60,8 @@
       "baselineSaved": "تم حفظ المعايير الأساسية. يمكن للمراجعة المستقبلية مقارنة هذا المقطع معه.",
       "baselineSaveFailed": "لم يتم حفظ القاعدة الأساسية: {message}",
       "deferredLoading": "تحميل مجموعة النتائج الكاملة (هذا التقرير كبير)…",
-      "deferredLoadFailed": "لم يتم تحميل النتائج الكاملة — يتم عرض أول {pageSize} نتيجة فقط."
+      "deferredLoadFailed": "لم يتم تحميل النتائج الكاملة — يتم عرض أول {pageSize} نتيجة فقط.",
+      "deferredWriteFailed": "لم يتم إمكانية كتابة مجموعة النتائج الكبيرة إلى ملف مؤقت ({message}) — قد يكون التقرير بطيئًا في الافتتاح."
     }
   },
   "scanOnSave": {

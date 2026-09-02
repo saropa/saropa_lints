@@ -6,6 +6,7 @@
     "alreadyRunning": "Bir denetim zaten çalışmaktadır — tamamlamasını bekleyin.",
     "noProject": "Dart projesi bulunamadı. Bir pubspec.yaml içeren bir klasör açın.",
     "missingDep": "Bu proje saropa_lints'e bağımlılık göstermiyor. Öncelikle dev_dependencies'a ekleyin.",
+    "pickWorkspaceFolder": "Hangi çalışma alanı klasörünü denetim için kullanmalı?",
     "scope": {
       "placeholder": "Audit hangi dosyaları kapsaması gerekir?",
       "full": "Tam proje",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Audit CLI başlatılamadı: {message}",
       "invalidProject": "Audit bu projeye karşı çalışılamadı. {details}",
-      "parseFailed": "Audit tamamlandı ancak çıktısı okunamadı. Tekrar çalıştırmayı deneyin."
+      "parseFailed": "Audit tamamlandı ancak çıktısı okunamadı. Tekrar çalıştırmayı deneyin.",
+      "canceled": "Denetim iptal edildi."
     },
     "report": {
       "title": "Saropa Lints Denetimi",
       "heading": "Audit Raporu",
+      "errorHeading": "Denetim başarısız oldu",
+      "canceledHeading": "Denetim iptal edildi",
       "subtitle": "{count} bulguları · {timestamp}",
       "baselineSubtitle": "Temel ile kıyaslandığında {date}",
       "searchPlaceholder": "Filtreleyin kural, dosya veya mesaj...",
@@ -54,7 +58,10 @@
       "keyboardHint": "Ok yön tuşları ile gezin · Enter ile dosya aç · Esc ile arama temizle",
       "copiedJson": "Audit JSON panoya kopyalandı.",
       "baselineSaved": "Temel kaydedildi. Gelecekteki denetimler bu anlık görüntüsü ile karşılaştırabilir.",
-      "baselineSaveFailed": "Temel hattı kaydedemiyor: {message}"
+      "baselineSaveFailed": "Temel hattı kaydedemiyor: {message}",
+      "deferredLoading": "Tam sonuç kümesini yükleniyor (bu denetim büyük)...",
+      "deferredLoadFailed": "Tam sonuç kümesini yükleyemedi — sadece ilk {pageSize} bulgu gösteriliyor.",
+      "deferredWriteFailed": "Büyük sonuç kümesi geçici dosyaya ({message}) yazılamadı; raporun açılması yavaş olabilir."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart işleme: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} işlem(ler) ({size} RSS)",
       "daemonCount": "Flutter daemonları: {total} ({orphaned} izole)",
+      "scanDaemonOrphans": "Artık tarama programları: {count} — öldürmek için Temizleme'yi kullanın",
       "warningHint": "Hafıza kullanımı yüksek — detaylar için tıklayınız",
       "criticalHint": "Hafıza kullanımı kritik — temizleme önerilir"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Yine Gösterme"
     },
     "cleanup": {
-      "noOrphans": "Hiçbir Flutter soykırım daemonu bulunamadı.",
-      "confirm": "{count} adet {size} kullanılarak izole Flutter daemon süreci bulundu. Onları sonlandırmanı istiyor musun?",
+      "noOrphans": "Hiçbir ölü daemon bulunamadı.",
+      "confirm": "{count} adet {size} kullanarak izole edilmiş daemon süreci bulundu. Onları sonlandırırsınız mı?",
       "killButton": "Ölçülen Çocuklar",
       "cancelButton": "İptal Et iptal et"
     },
@@ -622,6 +631,7 @@
       "colCommand": "Komut",
       "colAction": "Eylem",
       "typeOrphan": "Yetim",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "İşlem",
       "kill": "Öldür",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Karşılaştırma eylemleri karşılaştırma eylemi.",
       "packageDashboard": "Paket Tablosu (Dashboard)",
       "packageDashboardTitle": "Daha fazla paketi karşılaştırmak için Paket Kontrol Panosunu açın."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Hata Ayıklama Paneli"
+    },
+    "section": {
+      "engines": "Tanılama Motorları",
+      "log": "Kayıt"
+    },
+    "engine": {
+      "analyzerPlugin": "Analiz Eklentisi",
+      "scanDaemon": "Tarama Daemon",
+      "lspServer": "LSP Sunucusu",
+      "pid": "PID:",
+      "status": "Durum:",
+      "rules": "Kurallar:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "AÇIK",
+      "off": "KAPALI"
+    },
+    "action": {
+      "killAll": "Kilitle",
+      "restartAll": "Tümü Yeniden Başlat"
+    },
+    "log": {
+      "empty": "Henüz log kaydı yok."
     }
   },
   "detailView": {

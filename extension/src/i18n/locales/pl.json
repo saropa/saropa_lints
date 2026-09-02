@@ -6,6 +6,7 @@
     "alreadyRunning": "Audyt już się uruchomił — czekaj, aż zakończy.",
     "noProject": "Brak projektu Dart. Otwórz folder zawierający pubspec.yaml.",
     "missingDep": "Ten projekt nie zależy od saropa_lints. Dodaj go najpierw do dev_dependencies.",
+    "pickWorkspaceFolder": "Który katalog roboczy powinien być użyty do wykonania audytu?",
     "scope": {
       "placeholder": "Które pliki powinny być obejmowane audytem?",
       "full": "Cały projekt",
@@ -25,11 +26,14 @@
     "error": {
       "spawnFailed": "Nie można uruchomić audytu CLI: {message}",
       "invalidProject": "Audyt nie mógł zostać wykonany wobec tego projektu. {details}",
-      "parseFailed": "Audyt zakończony, ale jego wynik nie mógł zostać odczytany. Spróbuj uruchomić go ponownie."
+      "parseFailed": "Audyt zakończony, ale jego wynik nie mógł zostać odczytany. Spróbuj uruchomić go ponownie.",
+      "canceled": "Audyt odwołany."
     },
     "report": {
       "title": "Audyt Saropa Lints",
       "heading": "Sprawozdanie audytowe",
+      "errorHeading": "Audyt nie powiódł się",
+      "canceledHeading": "Audyt odwołany",
       "subtitle": "Wyniki {count} · {timestamp}",
       "baselineSubtitle": "W porównaniu do podstawy z {date}",
       "searchPlaceholder": "Filtruj według reguły, pliku lub wiadomości…",
@@ -54,7 +58,10 @@
       "keyboardHint": "Strzałki do nawigacji · Enter aby otworzyć plik · Esc aby wyczyścić wyszukiwanie",
       "copiedJson": "Audyt JSON skopiowany do schowka.",
       "baselineSaved": "Zapisano podstawową wersję. Przyszłe audyty mogą porównać ją z tym zrzutem.",
-      "baselineSaveFailed": "Nie można zapisać podstawy: {message}"
+      "baselineSaveFailed": "Nie można zapisać podstawy: {message}",
+      "deferredLoading": "Ładowanie pełnego zestawu wyników (ten audyt jest duży)…",
+      "deferredLoadFailed": "Nie można załadować pełnego zestawu wyników — pokazuje się tylko pierwsze {pageSize} wyników.",
+      "deferredWriteFailed": "Nie można zapisać dużego zestawu wyników w pliku tymczasowym ({message}) — raport może otwierać się powoli."
     }
   },
   "scanOnSave": {
@@ -586,7 +593,9 @@
     },
     "tooltip": {
       "processCount": "Dart procesy: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} proces(y) ({size} RSS)",
       "daemonCount": "Flutter daemony: {total} ({orphaned} orfany)",
+      "scanDaemonOrphans": "Daemony skanowania niezwiązane: {count} — użyj Clean Up, aby zakończyć",
       "warningHint": "Użycie pamięci jest wysokie — kliknij aby zobaczyć szczegóły",
       "criticalHint": "Użycie pamięci jest krytyczne — oczyszczenie zalecane"
     },
@@ -600,8 +609,8 @@
       "dontShowAgain": "Nie Pokazuj Ponownie"
     },
     "cleanup": {
-      "noOrphans": "Brak znalezionych niezwiązanych daemonów Flutter.",
-      "confirm": "Znaleziono {count} procesów daemon Flutter używając {size}. Zabij je?",
+      "noOrphans": "Brak niezarejestrowanych daemonów.",
+      "confirm": "Znaleziono {count} proces(y) daemona (daemonów) niezwiązanych używając {size}. Zabij je?",
       "killButton": "Zabij Orfany",
       "cancelButton": "Odwołaj Anulować"
     },
@@ -622,6 +631,7 @@
       "colCommand": "Polecenie",
       "colAction": "Akcja",
       "typeOrphan": "Orfan",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Proces",
       "kill": "Zabij",
@@ -1731,6 +1741,35 @@
       "ariaLabel": "Działania porównawcze.",
       "packageDashboard": "Panel paneli pakietów (Package Dashboard)",
       "packageDashboardTitle": "Otwórz Panel pakietów, aby porównać więcej pakietůw."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Panel Debugowania"
+    },
+    "section": {
+      "engines": "Silniki Diagnostyczne",
+      "log": "Dziennik"
+    },
+    "engine": {
+      "analyzerPlugin": "Analizator wtyczki",
+      "scanDaemon": "Skanuj Daemon",
+      "lspServer": "Serwer LSP",
+      "pid": "PID:",
+      "status": "Status:",
+      "rules": "Zasady:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "WŁĄCZONY",
+      "off": "WYŁĄCZONE"
+    },
+    "action": {
+      "killAll": "Zabij Wszystko",
+      "restartAll": "Uruchom ponownie wszystko"
+    },
+    "log": {
+      "empty": "Brak jeszcze wpisów dziennika."
     }
   },
   "detailView": {
