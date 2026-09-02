@@ -71,6 +71,9 @@ reports/
 # Bug tracking / internal issue docs
 bugs/
 
+# Internal planning docs / dev-only reference material
+plans/
+
 # Backup files
 *.bak
 

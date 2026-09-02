@@ -113,7 +113,7 @@ def parse_args() -> argparse.Namespace:
         ),
         help=(
             "Comma-separated locale codes (default: full shipped set per "
-            "plans/EXTENSION_LOCALIZATION_GUIDE.md primary and secondary tiers)."
+            "plans/guides/EXTENSION_LOCALIZATION_GUIDE.md primary and secondary tiers)."
         ),
     )
     parser.add_argument(
