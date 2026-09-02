@@ -1758,7 +1758,7 @@
       "pid": "PID:",
       "status": {
         "active": "active active kazi ya kufanya.",
-        "idle": "idle",
+        "idle": "haina shughuli",
         "running": "kukimbia",
         "stopped": "mpona",
         "suspended": "mehusikisa",
