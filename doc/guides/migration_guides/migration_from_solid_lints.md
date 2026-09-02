@@ -1,21 +1,20 @@
 # Migrating from solid_lints
 
-This guide helps you migrate from `solid_lints` to `saropa_lints`.
+This guide helps you migrate from [`solid_lints`](https://pub.dev/packages/solid_lints)
+(github.com/solid-software/solid_lints) to `saropa_lints`.
 
 ## Why Migrate?
 
-| Feature            | solid_lints           | saropa_lints                              |
-| ------------------ | --------------------- | ----------------------------------------- |
-| **Custom rules**   | 16 rules              | 1450+ custom rules                        |
-| **Framework**      | custom_lint           | custom_lint                               |
-| **Focus**          | Clean code principles | Flutter-specific analysis                 |
-| **Configuration**  | Single config         | 5 progressive tiers                       |
-| **Specialization** | SOLID principles      | Security, accessibility, state management |
-| **Cost**           | Free & open source    | Free & open source                        |
+| Feature | solid_lints | saropa_lints |
+|---------|-------------|--------------|
+| **Rule count** | 33 rules | 2300+ custom rules |
+| **Focus** | SOLID principles, ISO/IEC & NIST-inspired code quality | Security, accessibility, performance, Flutter-specific patterns, plus general code quality |
+| **Configuration** | Per-rule YAML options | 5 progressive tiers + rule packs |
+| **Architecture** | Native `analysis_server_plugin` | Native `analysis_server_plugin` |
+| **Flutter coverage** | A handful of widget-shape rules | Deep Flutter/GetX/Riverpod/Bloc/Provider/Firebase coverage |
 
-**Good news**: saropa_lints implements 15 of solid_lints' 16 custom rules (94% coverage), plus 1300+ additional rules.
-
-**Note**: Both packages use custom_lint, so you can only use one at a time (or carefully merge configurations).
+Both packages have moved to the native `analysis_server_plugin` API (no `custom_lint`
+runner required), so the migration is mostly a config swap, not an architecture change.
 
 ## Quick Migration
 
@@ -24,11 +23,10 @@ This guide helps you migrate from `solid_lints` to `saropa_lints`.
 ```yaml
 # Before
 dev_dependencies:
-  solid_lints: ^0.2.0
+  solid_lints: ^0.x.x
 
 # After
 dev_dependencies:
-  custom_lint: ^0.8.0
   saropa_lints: ^2.6.0
 ```
 
@@ -38,14 +36,12 @@ dev_dependencies:
 # Before
 analyzer:
   plugins:
-    - custom_lint
-
-# solid_lints uses custom_lint.yaml for config
+    - solid_lints
 
 # After
 analyzer:
   plugins:
-    - custom_lint
+    - saropa_lints
 ```
 
 Then generate the configuration:
@@ -54,201 +50,133 @@ Then generate the configuration:
 dart run saropa_lints:init --tier recommended
 ```
 
-### Step 3: Remove solid_lints config
-
-Delete or rename your `custom_lint.yaml` file if it contained solid_lints configuration.
-
-### Step 4: Run the linter
+### Step 3: Run the linter
 
 ```bash
-dart run custom_lint
+dart analyze
 ```
 
 ## Choosing a Tier
 
-solid_lints has one configuration. saropa_lints offers progressive tiers:
+solid_lints ships a flat rule set with per-rule opt-in/opt-out. saropa_lints uses
+progressive tiers so you can start narrow and grow coverage over time:
 
-| solid_lints Usage | saropa_lints Tier               | Description                           |
-| ----------------- | ------------------------------- | ------------------------------------- |
-| Basic             | **Essential** (~300 rules)      | Critical bugs, memory leaks, security |
-| Full config       | **Recommended** (~900 rules)    | Balanced coverage                     |
-| + strict mode     | **Professional** (~1600 rules)   | Enterprise-grade                      |
-| Maximum           | **Comprehensive** (~2100 rules) | Quality obsessed                      |
-| Everything        | **Pedantic** (2100+ rules)      | Every single rule                     |
+| solid_lints Usage | saropa_lints Tier | Description |
+|--------------------|--------------------|--------------|
+| Default rule set | **Recommended** (~900 rules) | Balanced coverage, closest match to solid_lints' scope |
+| Strict SOLID enforcement | **Professional** (~1600 rules) | Enterprise-grade, adds architecture rules |
+| Everything enabled | **Comprehensive** (~2100 rules) | Quality obsessed |
 
-**Start with `recommended`** - it provides similar coverage to solid_lints plus Flutter-specific rules.
-
-**Plus 114 optional stylistic rules** for team preferences (trailing commas, sorting, etc.) - see [stylistic rules](../../README_STYLISTIC.md).
+**Start with `recommended`** — it covers solid_lints' code-quality and naming concerns
+plus Flutter-specific rules solid_lints doesn't attempt.
 
 ## Rule Mapping
 
-All 16 solid_lints custom rules are mapped below. saropa_lints implements 15 of them (94%):
+Coverage: 16 HAVE (48%), 3 PARTIAL (9%), 14 TODO (42%) — audited against solid_lints'
+current published rule set (33 rules as of this audit; verified directly against
+`github.com/solid-software/solid_lints` `lib/main.dart`, not just documentation).
 
-### Complete solid_lints Coverage
+> **Note on rule count**: `plans/GAP_ANALYSIS.md` records an earlier audit of solid_lints
+> at 31 rules (15 HAVE / 3 PARTIAL / 13 GAP). Re-verifying against the live upstream
+> source for this guide found solid_lints now ships 33 rules — two more than the prior
+> audit counted, both of which saropa_lints already covers by name-equivalent rule. The
+> table below reflects the current 33-rule set.
 
-| solid_lints Rule                    | saropa_lints Equivalent             | Status                                  |
-| ----------------------------------- | ----------------------------------- | --------------------------------------- |
-| `cyclomatic_complexity`             | `avoid_long_functions`              | ✅ Different approach (line-based)      |
-| `function_lines_of_code`            | `avoid_long_functions`              | ✅ Implemented                          |
-| `number_of_parameters`              | `avoid_long_parameter_list`         | ✅ Implemented                          |
-| `avoid_returning_widgets`           | `avoid_returning_widgets`           | ✅ Implemented                          |
-| `avoid_unnecessary_type_assertions` | `avoid_unnecessary_type_assertions` | ✅ Implemented                          |
-| `avoid_unnecessary_type_casts`      | `avoid_unnecessary_type_casts`      | ✅ Implemented                          |
-| `avoid_unused_parameters`           | `avoid_unused_parameters`           | ✅ Implemented                          |
-| `avoid_late_keyword`                | `avoid_late_keyword`                | ✅ Implemented                          |
-| `avoid_using_api`                   | —                                   | ❌ Not implemented (layer architecture) |
-| `avoid_final_with_getter`           | `avoid_unnecessary_getter`          | ✅ Implemented                          |
-| `avoid_unnecessary_return_variable` | `prefer_immediate_return`           | ✅ Implemented                          |
-| `member_ordering`                   | `member_ordering`                   | ✅ Implemented                          |
-| `newline_before_return`             | `newline_before_return`             | ✅ Implemented                          |
-| `no_empty_block`                    | `no_empty_block`                    | ✅ Implemented                          |
-| `no_magic_number`                   | `no_magic_number`                   | ✅ Implemented                          |
-| `avoid_debug_print_in_release`      | `avoid_unguarded_debug`             | ✅ Implemented (guards debugPrint with kDebugMode check) |
+| solid_lints Rule | Status | Saropa Rule / Action |
+|---|---|---|
+| `avoid_debug_print_in_release` | PARTIAL | `avoid_print_in_release` guards `print()`, not `debugPrint()` |
+| `avoid_duplicate_code` | TODO | Cross-project AST clone detector — no saropa equivalent. TODO — no proposal filed yet |
+| `avoid_final_with_getter` | TODO | TODO — no proposal filed yet |
+| `avoid_global_state` | HAVE | `avoid_global_state` |
+| `avoid_late_keyword` | HAVE | `avoid_late_keyword` |
+| `avoid_non_null_assertion` | HAVE | `avoid_non_null_assertion` |
+| `avoid_returning_widgets` | TODO | Name collision only — saropa's same-named rule checks a different shape. TODO — no proposal filed yet |
+| `avoid_similar_names` | TODO | Name collision only — saropa's same-named rule targets enum-indexed Map literals, not similar identifiers. TODO — no proposal filed yet |
+| `avoid_unnecessary_return_variable` | TODO | TODO — no proposal filed yet |
+| `avoid_unnecessary_setstate` | HAVE | `avoid_unnecessary_setstate` |
+| `avoid_unnecessary_type_assertions` | HAVE | `avoid_unnecessary_type_assertions` |
+| `avoid_unrelated_type_assertions` | HAVE | `avoid_unrelated_type_assertions` |
+| `avoid_unused_parameters` | HAVE | `avoid_unused_parameters` |
+| `avoid_using_api` | TODO | Generic config-driven banned-API mechanism — no equivalent. TODO — no proposal filed yet |
+| `cyclomatic_complexity` | HAVE | `avoid_high_cyclomatic_complexity` |
+| `double_literal_format` | HAVE | `double_literal_format` |
+| `feature_envy` | TODO | TODO — no proposal filed yet |
+| `function_lines_of_code` | TODO | TODO — no proposal filed yet |
+| `member_ordering` | PARTIAL | `prefer_member_ordering` is a flat 3-bucket order vs. solid_lints' fully configurable DSL |
+| `named_parameters_ordering` | TODO | TODO — no proposal filed yet |
+| `newline_before_return` | TODO | TODO — no proposal filed yet |
+| `no_empty_block` | HAVE | `no_empty_block` |
+| `no_equal_then_else` | HAVE | `no_equal_then_else` |
+| `no_magic_number` | HAVE | `avoid_magic_numbers` (exemption support) |
+| `number_of_parameters` | PARTIAL | `prefer_named_parameters` targets excess positional params, not a pure count ceiling |
+| `prefer_conditional_expressions` | HAVE | `prefer_conditional_expressions` |
+| `prefer_early_return` | HAVE | `prefer_early_return` |
+| `prefer_first` | TODO | index-0 → `.first` — TODO, no proposal filed yet |
+| `prefer_last` | TODO | length-1 index → `.last` — TODO, no proposal filed yet |
+| `prefer_match_file_name` | HAVE | `prefer_match_file_name` |
+| `proper_super_calls` | HAVE | `proper_super_calls` |
+| `use_descriptive_names_for_type_parameters` | TODO | TODO — no proposal filed yet |
+| `use_nearest_context` | TODO | Effectively a gap — corresponds to a known saropa bug, see Known Issues below. TODO — no proposal filed yet |
 
-### The Missing Rule: avoid_using_api
+## Known Issues
 
-solid_lints' `avoid_using_api` is a configurable rule that restricts API usage by:
-
-- Source package
-- Class name
-- Identifier / named parameter
-- Glob patterns for file inclusion/exclusion
-
-This is useful for enforcing architectural boundaries (e.g., "UI layer cannot call database directly").
-
-saropa_lints provides similar functionality through specific rules:
-
-- `avoid_direct_data_access_in_ui` - UI shouldn't access data layer directly
-- `avoid_ui_in_domain_layer` - Domain layer shouldn't reference UI
-- `avoid_cross_feature_dependencies` - Features should be isolated
-
-For configurable API restriction, this remains a gap. See our [ROADMAP](../../ROADMAP.md) for `avoid_banned_api`.
-
-### SOLID Principles Coverage
-
-solid_lints focuses on SOLID principles. saropa_lints covers these through different rules:
-
-| SOLID Principle       | saropa_lints Rules                                                   |
-| --------------------- | -------------------------------------------------------------------- |
-| Single Responsibility | `avoid_god_class`, `avoid_long_length_functions`, `avoid_long_files` |
-| Open/Closed           | `prefer_abstract_dependencies`, `prefer_interface_class`             |
-| Liskov Substitution   | Type safety rules, `avoid_unsafe_cast`                               |
-| Interface Segregation | `avoid_too_many_dependencies`, architecture rules                    |
-| Dependency Inversion  | `avoid_direct_data_access_in_ui`, `avoid_service_locator_in_widgets` |
+**`use_closest_build_context` is a silent no-op.** While auditing solid_lints'
+`use_nearest_context` rule against saropa's nearest-`BuildContext` coverage, this audit
+found that `UseClosestBuildContextRule`
+(`lib/src/rules/core/context_rules.dart:1483`) is registered with a real `LintCode` but
+its `runWithReporter` body is empty (`{}`) — the rule never reports anything. This is a
+saropa-side bug independent of this migration guide and is tracked for a fix; it is
+called out here so anyone relying on `use_closest_build_context` today knows it is
+currently dormant.
 
 ## What You Gain
 
-### Rules solid_lints Doesn't Have
+Rules solid_lints doesn't attempt, beyond raw rule count:
 
-saropa_lints includes Flutter-specific rules beyond solid_lints' scope:
+**Security**
+- `avoid_hardcoded_credentials` — catches secrets in code
+- `avoid_logging_sensitive_data` — PII protection
+- `require_secure_storage` — SharedPreferences warnings
+- `avoid_http_urls` — HTTPS enforcement
 
-**Security (15+ rules)**
+**Accessibility**
+- `require_semantics_label` — screen reader support
+- `avoid_small_touch_targets` — touch target sizing
+- `avoid_color_only_indicators` — color blindness support
 
-- `avoid_hardcoded_credentials` - Catches secrets in code
-- `avoid_logging_sensitive_data` - PII protection
-- `require_secure_storage` - SharedPreferences warnings
-- `avoid_token_in_url` - Auth token exposure
-- `require_certificate_pinning` - HTTPS security
+**State Management**
+- `avoid_bloc_event_in_constructor` — Bloc anti-patterns
+- `avoid_watch_in_callbacks` — Riverpod best practices
+- `require_notify_listeners` — ChangeNotifier checks
 
-**Accessibility (15+ rules)**
-
-- `require_semantics_label` - Screen reader support
-- `avoid_small_touch_targets` - Touch target sizing
-- `avoid_color_only_indicators` - Color blindness support
-- `require_minimum_contrast` - WCAG compliance
-
-**Memory Management (20+ rules)**
-
-- `require_dispose` - Full resource disposal tracking
-- `require_timer_cancellation` - Timer leak prevention
-- `require_stream_controller_dispose` - Stream cleanup
-- `always_remove_listener` - Listener leak prevention
-
-**State Management (25+ rules)**
-
-- `avoid_bloc_event_in_constructor` - Bloc anti-patterns
-- `avoid_watch_in_callbacks` - Riverpod best practices
-- `require_notify_listeners` - ChangeNotifier checks
-- `require_mounted_check` - Async setState protection
-
-**Lifecycle Safety (10+ rules)**
-
-- `avoid_context_in_initstate_dispose` - Prevents common Flutter bug
-- `pass_existing_future_to_future_builder` - Prevents rebuild loops
-- `avoid_recursive_widget_calls` - Infinite loop prevention
+**Lifecycle**
+- `avoid_context_in_initstate_dispose` — prevents a common Flutter bug
+- `require_dispose` — full resource disposal tracking
 
 ## What You Lose
 
-solid_lints has some features saropa_lints approaches differently:
-
-| solid_lints Feature          | saropa_lints Alternative                           |
-| ---------------------------- | -------------------------------------------------- |
-| Cyclomatic complexity metric | `avoid_long_functions`, `avoid_complex_conditions` |
-| Lines of executable code     | `avoid_long_length_files`, `avoid_long_functions`  |
-| Number of parameters metric  | `avoid_long_parameter_list`                        |
-| SOLID-focused messaging      | Architecture rules with different naming           |
+solid_lints covers a few code-quality checks saropa_lints doesn't have a direct
+equivalent for yet — see the TODO rows in the Rule Mapping table above, notably
+`avoid_duplicate_code` (cross-file clone detection) and `avoid_using_api` (a generic
+configurable banned-API engine). If these are load-bearing for your team, consider
+keeping solid_lints installed alongside saropa_lints for just those rules until saropa
+closes the gap.
 
 ## Suppressing Rules
 
-The syntax is identical (both use custom_lint):
+The syntax is identical — both use underscores:
 
 ```dart
 // solid_lints style
 // ignore: avoid_returning_widgets
 
-// saropa_lints style (same!)
+// saropa_lints style
 // ignore: avoid_returning_widgets
 ```
 
-## Configuration Differences
-
-### solid_lints Configuration
-
-```yaml
-# custom_lint.yaml
-custom_lint:
-  rules:
-    - avoid_returning_widgets
-    - cyclomatic_complexity:
-        max_complexity: 10
-    - number_of_parameters:
-        max_parameters: 5
-```
-
-### saropa_lints Configuration
-
-```bash
-# Generate configuration for professional tier
-dart run saropa_lints:init --tier professional
-```
-
-Then customize specific rules in analysis_options.yaml:
-
-```yaml
-custom_lint:
-  rules:
-    - avoid_returning_widgets: false  # Change to false to disable
-```
-
-## Using Both (Not Recommended)
-
-While technically possible, using both packages simultaneously is not recommended because:
-
-- Both use custom_lint, potentially causing conflicts
-- Duplicate rule coverage increases noise
-- Configuration becomes complex
-
-If you need specific solid_lints rules, saropa_lints likely has equivalents. Check our [full rule list](https://pub.dev/packages/saropa_lints).
-
-## Migration Checklist
-
-- [ ] Remove `solid_lints` from pubspec.yaml
-- [ ] Add `saropa_lints` to pubspec.yaml
-- [ ] Update analysis_options.yaml with tier config
-- [ ] Remove or archive custom_lint.yaml
-- [ ] Run `dart run custom_lint` to verify
-- [ ] Address any new lint warnings
-- [ ] Update CI pipeline if needed
+Rule names may collide (see `avoid_returning_widgets` and `avoid_similar_names` in the
+table above) — check the Rule Mapping table before assuming a suppressed solid_lints
+rule and a saropa_lints rule of the same name check the same thing.
 
 ## Getting Help
 
