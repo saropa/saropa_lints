@@ -66,7 +66,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.2.8] — Unreleased
+## [15.2.8]
 
 Rule shedding under memory pressure is now cost-aware — expensive rules that drive the most memory consumption are shed first, keeping cheap syntactic rules running longer. The Config Dashboard surfaces which rules are currently shed and why, and the status bar tooltip shows shed category breakdowns. [log](https://github.com/saropa/saropa_lints/blob/v15.2.8/CHANGELOG.md)
 
