@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 规则暂停 ({rssMb} MB)",
+      "shedCritical": "🔴 {count} 规则警告（严重）",
       "shedWarning": "⚠ {count} 规则弃用",
-      "shedInfo": "⚡ {count} 规则 检查",
+      "shedInfo": "⚡ {count} 严格规则 丢弃",
       "pressureNoShed": "⚠ 内存压力 ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "内存压力：正常",
-      "shedLevel1": "内存压力：{count} 低严重性规则被弃用以减少 RSS",
-      "shedLevel2": "内存压力：{count}规则触发（INFO + WARNING严重程度）",
+      "shedLevel1": "内存压力：{count}昂贵的规则（类型解析 + 高成本）被移除以减少 RSS",
+      "shedLevel2": "内存压力：{count} 规则抛出（昂贵 + INFO 级别）",
+      "shedLevel3": "内存压力：{count}规则丢弃（所有非必要非错误）",
       "hardTripped": "内存限制超出 — 所有非必要规则已暂停",
-      "pressureNoShed": "检测到内存压力 —— 在 analysis_options_custom.yaml 中启用规则舍弃以自动舍弃低严重程度的规则"
+      "pressureNoShed": "检测到内存压力 —— 在 analysis_options_custom.yaml 中启用规则舍弃，以优先自动舍弃昂贵的规则"
     },
     "notification": {
-      "shedDisabled": "检测到分析器内存压力 (RSS {rssMb} MB，软限制 {softLimitMb} MB)。启用规则舍弃以在压力下自动禁用低严重性规则。",
+      "shedDisabled": "检测到分析器内存压力 (RSS {rssMb} MB，软限制 {softLimitMb} MB)。启用规则舍弃以在压力下自动禁用昂贵的规则。",
       "enableButton": "启用 启动 在此处.",
       "learnMoreButton": "了解更多 学习更多",
       "runInit": "运行 'dart run saropa_lints:init' 以生成 analysis_options_custom.yaml，然后设置 shed_rules: true。",
       "enabledConfirmation": "规则舍弃已在analysis_options_custom.yaml中启用。分析器将在下一次重新加载时拾取此更改。"
+    },
+    "dashboard": {
+      "shedSectionTitle": "内存压力规则（Shed rules）",
+      "shedHint": "这些规则由内存压力处理程序暂时禁用以减少分析器 RSS 的负载。当内存压力降低时，它们会自动恢复。",
+      "shedBadge": "棚",
+      "shedBadgeTooltip": "此规则在内存压力下暂时被弃用。",
+      "categoryTypeResolving": "类型解析（昂贵）",
+      "categoryHighCost": "高成本",
+      "categoryInfoSeverity": "INFO 严重级别",
+      "categoryWarningSeverity": "警告级别"
     }
   },
   "brand": {

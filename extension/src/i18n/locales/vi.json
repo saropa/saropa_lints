@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Quy tắc tạm dừng ({rssMb} MB)",
+      "shedCritical": "🔴 {count} quy tắc cảnh báo (cấp độ nghiêm trọng)",
       "shedWarning": "⚠ {count} quy tắc cảnh báo",
-      "shedInfo": "⚡ {count} quy tắc kiểm tra",
+      "shedInfo": "⚡ {count} quy tắc tốn kém",
       "pressureNoShed": "⚠ Áp lực bộ nhớ ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Áp lực bộ nhớ: bình thường",
-      "shedLevel1": "Áp lực bộ nhớ: {count} quy tắc mức độ nghiêm trọng thấp được áp dụng để giảm RSS",
-      "shedLevel2": "Áp lực bộ nhớ: {count} quy tắc làm rơi (CẤP ĐỘ THÔNG TIN + CẢNH BÁO)",
+      "shedLevel1": "Áp lực bộ nhớ: {count} quy tắc tốn kém (giải quyết kiểu + chi phí cao) để giảm RSS",
+      "shedLevel2": "Áp lực bộ nhớ: {count} quy tắc làm rơi (tiêu tốn + mức độ THÔNG TIN)",
+      "shedLevel3": "Áp lực bộ nhớ: {count} quy tắc loại bỏ (tất cả không cần thiết không phải LỖI)",
       "hardTripped": "Hạn mức bộ nhớ đã được vượt quá — tất cả các quy tắc không thiết yếu đã tạm dừng",
-      "pressureNoShed": "Áp lực bộ nhớ được phát hiện — kích hoạt quy tắc loại bỏ trong analysis_options_custom.yaml để tự động loại bỏ các quy tắc mức độ nghiêm trọng thấp"
+      "pressureNoShed": "Áp lực bộ nhớ được phát hiện — kích hoạt quy tắc loại bỏ trong analysis_options_custom.yaml để tự động loại bỏ các quy tắc tốn kém trước nhất"
     },
     "notification": {
-      "shedDisabled": "Áp lực bộ nhớ phân tích được phát hiện (RSS {rssMb} MB, giới hạn mềm {softLimitMb} MB). Bật quy tắc loại bỏ để tự động vô hiệu hóa các quy tắc có mức độ nghiêm trọng thấp dưới áp lực.",
+      "shedDisabled": "Áp lực bộ nhớ phân tích được phát hiện (RSS {rssMb} MB, giới hạn mềm {softLimitMb} MB). Bật quy tắc loại bỏ để tự động vô hiệu hóa các quy tắc tốn kém khi có áp lực.",
       "enableButton": "Enable enable enable cho phép",
       "learnMoreButton": "Tìm hiểu thêm Learn More",
       "runInit": "Chạy 'dart run saropa_lints:init' để tạo analysis_options_custom.yaml, sau đó thiết lập shed_rules: true.",
       "enabledConfirmation": "Quy tắc loại bỏ đã được kích hoạt trong analysis_options_custom.yaml. Phân tích sẽ nhận thấy sự thay đổi trong lần tải lại tiếp theo của nó."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Quy tắc loại bỏ (áp lực bộ nhớ)",
+      "shedHint": "Những quy tắc này được tạm thời vô hiệu hóa bởi trình xử lý áp lực bộ nhớ để giảm phân tích RSS. Chúng sẽ tự động trở lại khi áp lực bộ nhớ giảm xuống.",
+      "shedBadge": "túp lều",
+      "shedBadgeTooltip": "Quy tắc này tạm thời bị hủy dưới áp lực bộ nhớ.",
+      "categoryTypeResolving": "Kiểm tra kiểu dữ liệu (tốn kém)",
+      "categoryHighCost": "Chi phí cao",
+      "categoryInfoSeverity": "INFO mức độ nghiêm trọng",
+      "categoryWarningSeverity": "WARNING mức độ nghiêm trọng"
     }
   },
   "brand": {
