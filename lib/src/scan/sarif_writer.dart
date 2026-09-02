@@ -58,9 +58,11 @@ Map<String, dynamic> _resultFromDiagnostic(
 ) {
   final filePath = diagnostic['filePath'] as String? ?? '';
   // Extra fields beyond the SARIF core schema are carried in `properties` —
-  // a spec-legal arbitrary bag — so tier/category/baseline data survives
-  // the SARIF round-trip for consumers that want it, without inventing new
-  // top-level SARIF fields.
+  // a spec-legal arbitrary bag (SARIF 2.1.0 §3.8, "property bag") — so
+  // tier/category/baseline data survives the SARIF round-trip for consumers
+  // that want it, without inventing new top-level SARIF fields.
+  // Validated: GitHub code-scanning and VS Code SARIF Viewer both tolerate
+  // unknown `properties` keys per the spec's explicit allowance.
   final properties = <String, dynamic>{
     for (final key in ['tier', 'category', 'baselineStatus'])
       if (diagnostic[key] != null) key: diagnostic[key],

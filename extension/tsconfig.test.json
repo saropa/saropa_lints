@@ -233,7 +233,15 @@
     "src/views/saropaDashboardsView.ts",
     "src/test/views/saropaDashboardsView.test.ts",
     "src/i18n/l10nParsers.ts",
-    "src/test/l10nParsers.test.ts"
+    "src/test/l10nParsers.test.ts",
+    "src/audit/audit-command.ts",
+    "src/audit/audit-report-panel.ts",
+    "src/audit/audit-report-html.ts",
+    "src/audit/audit-report-styles.ts",
+    "src/audit/audit-report-script.ts",
+    "src/test/audit/killAuditProcessTree.test.ts",
+    "src/test/audit/deferredPayload.test.ts",
+    "src/workspaceFolderPicker.ts"
   ],
   "exclude": ["node_modules", ".vscode-test", "out", "dist"]
 }

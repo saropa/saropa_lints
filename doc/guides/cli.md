@@ -13,6 +13,7 @@ dart run saropa_lints:quality_gate  # CI pass/fail from violations.json
 dart run saropa_lints:baseline      # Generate/update a violation baseline
 dart run saropa_lints:rule_count    # Live rule count per tier
 dart run saropa_lints:project_health  # File/folder size map (bytes + LOC)
+dart run saropa_lints audit           # Full audit (all rules, SARIF output)
 ```
 
 ---
@@ -277,6 +278,113 @@ Walk a Dart project and report file/folder size (bytes + LOC split into code/com
 ```bash
 dart run saropa_lints:project_health
 dart run saropa_lints:project_health --help
+```
+
+---
+
+## audit
+
+Run **every** saropa_lints rule against a codebase regardless of the project's configured tier. Produces enriched JSON with per-diagnostic `tier` and `category` fields, or SARIF 2.1.0 for GitHub code-scanning annotations.
+
+```bash
+dart run saropa_lints audit .
+dart run saropa_lints audit /path/to/project --output report.json
+dart run saropa_lints audit . --since main --format sarif --output results.sarif
+```
+
+### Flags
+
+| Flag | Description |
+|------|-------------|
+| `--output <path>` | Write output to a file instead of stdout. |
+| `--format <fmt>` | `native` (default) or `sarif` (SARIF 2.1.0). |
+| `--since <ref>` | Only audit files changed since this git ref. |
+| `--min-severity <s>` | Post-filter: hide below this severity (`error`, `warning`, `info`). |
+| `--min-impact <i>` | Post-filter: hide below this impact (`critical`, `high`, `medium`, `low`, `minimal`). |
+| `--exclude-globs <g>` | Comma-separated glob patterns to skip. |
+| `--include-globs <g>` | Comma-separated glob patterns to force-include. |
+| `--save-baseline` | Save this audit as the project baseline. |
+| `--baseline` | Compare against the saved baseline and tag diagnostics. |
+| `--baseline-path <p>` | Override baseline file path. |
+| `--profile` | Emit per-rule timing report. |
+| `--quiet`, `-q` | Suppress non-fatal stderr messages; emit structured JSON progress lines for tooling. |
+
+### Exit codes
+
+- `0` — audit completed, no diagnostics found
+- `1` — audit completed, diagnostics found
+- `2` — invalid arguments, not a Dart project, or `pub get` not run
+
+### GitHub Actions CI with SARIF
+
+Use `--format sarif` with `github/codeql-action/upload-sarif` to get inline PR annotations from saropa_lints findings. This workflow audits only the files changed in a PR and uploads the results to GitHub's code-scanning dashboard.
+
+```yaml
+# .github/workflows/saropa-audit.yml
+name: Saropa Lint Audit
+
+on:
+  pull_request:
+    paths: ['**.dart']
+
+permissions:
+  # Required for upload-sarif to post code-scanning results.
+  security-events: write
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Fetch enough history for --since to compare against the base branch.
+          fetch-depth: 0
+
+      - uses: dart-lang/setup-dart@v1
+      # Or for Flutter projects:
+      # - uses: subosito/flutter-action@v2
+
+      - run: dart pub get
+
+      - name: Run saropa_lints audit (changed files only)
+        run: |
+          dart run saropa_lints audit . \
+            --since origin/${{ github.base_ref }} \
+            --format sarif \
+            --output results.sarif \
+            --quiet
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        # Always upload even when the audit exits 1 (findings found) —
+        # the annotations are the point.
+        if: always()
+        with:
+          sarif_file: results.sarif
+```
+
+**Full project audit** (all files, not just PR diff):
+
+```yaml
+      - name: Run full audit
+        run: |
+          dart run saropa_lints audit . \
+            --format sarif \
+            --output results.sarif \
+            --quiet
+```
+
+**Baseline comparison** (flag new-vs-existing findings):
+
+```yaml
+      - name: Run audit with baseline
+        run: |
+          dart run saropa_lints audit . \
+            --baseline \
+            --format sarif \
+            --output results.sarif \
+            --quiet
 ```
 
 ---

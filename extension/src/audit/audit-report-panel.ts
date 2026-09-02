@@ -27,7 +27,8 @@ let currentRoot = '';
  * Instead the full array is written to a temp file under the extension's
  * storage dir and the client fetches it lazily via a webview resource URI.
  */
-const MAX_INLINE_BYTES = 10 * 1024 * 1024;
+/** @internal Exported for testing only — not part of the public API. */
+export const MAX_INLINE_BYTES = 10 * 1024 * 1024;
 
 /**
  * Opens (or reveals) the audit report panel and renders the audit JSON.
@@ -158,7 +159,8 @@ function webviewOptions(storageDir: vscode.Uri): vscode.WebviewOptions {
  * forever, since nothing else in the panel's lifecycle ever removes them
  * (the panel is a singleton reused across many runs, not disposed per-run).
  */
-function maybeWriteDeferredPayload(
+/** @internal Exported for testing only — not part of the public API. */
+export function maybeWriteDeferredPayload(
   auditJson: Record<string, unknown>,
   storageDir: vscode.Uri,
 ): vscode.Uri | null {
@@ -180,6 +182,14 @@ function maybeWriteDeferredPayload(
     // permissions, etc). Still surface the failure — silently degrading to
     // a multi-tens-of-MB inline render with no explanation would violate
     // the project's "no silent async" rule if that render then stalls.
+    //
+    // KNOWN RISK (circular fallback): the payload exceeded MAX_INLINE_BYTES,
+    // which is WHY we tried the temp-file path. Inlining it back into the
+    // webview HTML may hang/crash the renderer for very large payloads
+    // (100k+ diagnostics, ~50MB+). Accepted trade-off: a degraded but
+    // visible report is better than no report at all, and the warning toast
+    // above tells the user what happened. A future mitigation could truncate
+    // the inlined array to a safe size and show a "results truncated" banner.
     const message = e instanceof Error ? e.message : String(e);
     void vscode.window.showWarningMessage(
       l10n('audit.report.deferredWriteFailed', { message }),
@@ -196,7 +206,8 @@ function maybeWriteDeferredPayload(
  * Best-effort: a locked/already-gone file is skipped rather than failing
  * the whole audit render over stale-temp-file housekeeping.
  */
-function cleanupDeferredPayloads(storageDir: vscode.Uri): void {
+/** @internal Exported for testing only — not part of the public API. */
+export function cleanupDeferredPayloads(storageDir: vscode.Uri): void {
   let entries: string[];
   try {
     entries = fs.readdirSync(storageDir.fsPath);

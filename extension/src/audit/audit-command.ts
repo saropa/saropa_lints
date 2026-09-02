@@ -35,7 +35,8 @@ let inflight: Promise<void> | undefined;
  * of the process group the spawn call above puts the shell in — POSIX
  * delivers the signal to every process in that group, including `dart`.
  */
-function killAuditProcessTree(child: cp.ChildProcess): void {
+/** @internal Exported for testing only — not part of the public API. */
+export function killAuditProcessTree(child: cp.ChildProcess): void {
   if (process.platform !== 'win32' && child.pid) {
     try {
       process.kill(-child.pid, 'SIGKILL');

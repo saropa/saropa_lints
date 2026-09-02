@@ -118,6 +118,10 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Created 46 migration guides (`doc/guides/migration_guides/`) — one per alternative lint package audited in the gap analysis — with rule-mapping tables (HAVE / PARTIAL / TODO) and migration steps.
 - Added cross-referencing requirement to `bugs/ISSUE_REPORT_GUIDE.md`: implementing a proposal that closes a migration-guide gap must flip the corresponding table row from TODO/PARTIAL to HAVE/ENHANCED.
 - Corrected stale `prefer-container` false-gap entry in `plans/GAP_ANALYSIS.md` — saropa already covers this via `PreferContainerRule`.
+- Added unit tests for the Full Audit POSIX process-group kill path (5 cases covering Linux, macOS, fallback, Windows, and no-pid edge cases) and the >10MB deferred-payload temp-file lifecycle (write, cleanup, and fallback behavior) — 11 new tests total.
+- Documented the circular-fallback risk when `globalStorageUri` temp-file write fails for large audit payloads — the fallback inlines a payload that was too large for inlining, which may stall the webview for 50MB+ results.
+- Documented GitHub code-scanning CI recipe in `doc/guides/cli.md` — example workflow using `--since` and `--format sarif` with `upload-sarif@v3` for inline PR annotations.
+- Confirmed SARIF `properties` bag carrying `tier`/`category`/`baselineStatus` is compatible with GitHub code-scanning and VS Code SARIF Viewer per SARIF 2.1.0 §3.8 — added spec-reference comment.
 
 </details>
 
