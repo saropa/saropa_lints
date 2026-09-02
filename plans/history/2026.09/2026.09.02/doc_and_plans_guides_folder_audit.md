@@ -77,3 +77,25 @@ had been blind to: `doc/troubleshooting.md` and two spots in
 `doc/guides/composite_analyzer_plugin.md` / `doc/guides/rule_packs.md`, all
 linking into `plans/PLAN_*.md` files excluded from the pub.dev package.
 Those links were removed or de-linked to plain text.
+
+## Second hardening pass
+
+Addressed the remaining gaps named in the prior handoff reflection:
+
+- Excluded directory prefixes are now parsed directly from `.pubignore`
+  (any non-comment line ending in `/`) instead of a hardcoded 3-entry list,
+  so the check automatically picks up the full set (`example/lib/`,
+  `.github/`, `vscode-saropa-lints/`, `reports/`, `articles/`, `/test/`,
+  etc.) without needing a manual update when `.pubignore` changes.
+- Added reference-style link support (`[text][ref]` with a `[ref]: path`
+  definition elsewhere in the file), not just inline `[text](path)` links.
+- Strip a trailing query string in addition to a trailing anchor when
+  resolving a link target.
+- Normalize accidental Windows-style backslash separators in link targets
+  before resolving.
+- Verified the new reference-style extraction with a synthetic
+  string-literal test (no doc in the repo currently uses that link style,
+  so a clean repo-wide pass alone wouldn't have proven the code path
+  works) — confirmed both inline and reference-style targets are captured.
+- Re-ran against the full repo after the change: still clean, no new
+  violations from the broader `.pubignore`-derived prefix list.
