@@ -86,6 +86,13 @@
           "name": "%views.help.name%",
           "when": "saropaLints.isDartProject",
           "icon": "$(question)"
+        },
+        {
+          "id": "saropaLints.debugPanel",
+          "name": "%views.debugPanel.name%",
+          "when": "saropaLints.isDartProject && config.saropaLints.debug.enabled",
+          "type": "webview",
+          "icon": "$(bug)"
         }
       ]
     },
@@ -214,6 +221,11 @@
       {
         "command": "saropaLints.fullAudit",
         "title": "Saropa Lints: Full Audit (All Rules)",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "saropaLints.auditFolder",
+        "title": "%command.auditFolder.title%",
         "icon": "$(shield)"
       },
       {
@@ -959,9 +971,33 @@
         "command": "saropaLints.showProcessHealth",
         "title": "%command.showProcessHealth.title%",
         "icon": "$(pulse)"
+      },
+      {
+        "command": "saropaLints.toggleDebugPanel",
+        "title": "%command.toggleDebugPanel.title%",
+        "icon": "$(bug)"
+      },
+      {
+        "command": "saropaLints.lspServer.start",
+        "title": "%command.lspServer.start.title%"
+      },
+      {
+        "command": "saropaLints.lspServer.stop",
+        "title": "%command.lspServer.stop.title%"
+      },
+      {
+        "command": "saropaLints.lspServer.restart",
+        "title": "%command.lspServer.restart.title%"
       }
     ],
     "menus": {
+      "explorer/context": [
+        {
+          "command": "saropaLints.auditFolder",
+          "when": "explorerResourceIsFolder",
+          "group": "saropaLints@1"
+        }
+      ],
       "view/title": [
         {
           "command": "saropaLints.fullAudit",
@@ -1996,6 +2032,21 @@
             "description": "%config.property.systemHealth.showNotifications.description%"
           }
         }
+      },
+      {
+        "title": "%config.section.Debug.title%",
+        "properties": {
+          "saropaLints.debug.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "%config.property.debug.enabled.description%"
+          },
+          "saropaLints.lspServer.enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "%config.property.lspServer.enabled.description%"
+          }
+        }
       }
     ],
     "walkthroughs": [
@@ -2127,7 +2178,7 @@
     "watch:tsc": "node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc --noEmit --watch --project tsconfig.json",
     "package": "npm run precompile && npm run check-types && node esbuild.js --production",
     "lint": "node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc --noEmit -p ./",
-    "test": "node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/vscode-mock.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/services/version-comparator.test.js\" \"out-test/test/vibrancy/services/changelog-opportunities.test.js\" \"out-test/test/vibrancy/services/ai-prompt-bundle.test.js\" \"out-test/test/vibrancy/services/symbol-usage.test.js\" \"out-test/test/vibrancy/views/opportunities-html.test.js\" \"out-test/test/vibrancy/services/feature-inventory-model.test.js\" \"out-test/test/vibrancy/services/symbol-occurrence-equivalence.test.js\" \"out-test/test/vibrancy/views/feature-inventory-html.test.js\" \"out-test/test/vibrancy/views/feature-inventory-dom.test.js\" \"out-test/test/vibrancy/views/feature-inventory-markdown.test.js\" \"out-test/test/vibrancy/services/scan-logger.test.js\" \"out-test/test/vibrancy/services/tarball-analyzer.test.js\" \"out-test/test/vibrancy/services/github-api.test.js\" \"out-test/test/vibrancy/services/import-scanner.test.js\" \"out-test/test/vibrancy/services/pubdev-changelog.test.js\" \"out-test/test/vibrancy/services/startup-gate.test.js\" \"out-test/test/vibrancy/services/vibrancy-history.test.js\" \"out-test/test/vibrancy/services/freshness-watcher.test.js\" \"out-test/test/vibrancy/views/package-detail-html.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/state/vibrancy-state.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/scoring/override-analyzer.test.js\" \"out-test/test/vibrancy/scoring/blocker-analyzer.test.js\" \"out-test/test/vibrancy/scoring/shared-dep-conflict-detector.test.js\" \"out-test/test/vibrancy/scoring/constraint-chain.test.js\" \"out-test/test/vibrancy/scoring/floor-constraints.test.js\" \"out-test/test/vibrancy/scoring/forbidden-constraints.test.js\" \"out-test/test/vibrancy/scoring/constraint-notes.test.js\" \"out-test/test/vibrancy/services/pub-conflict-text.test.js\" \"out-test/test/vibrancy/scoring/cross-project-drift-detector.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/vibrancy/views/report-webview.test.js\" \"out-test/test/vibrancy/views/html-utils.test.js\" \"out-test/test/vibrancy/views/detail-view-html.test.js\" \"out-test/test/vibrancy/views/known-issues-html.test.js\" \"out-test/test/vibrancy/providers/tree-items.test.js\" \"out-test/test/vibrancy/providers/hover-provider.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/analysisOptimizer/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleCommand.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/configSuggestions.test.js\" \"out-test/test/config/tierConfig.test.js\" \"out-test/test/config/laneConfig.test.js\" \"out-test/test/config/severityConfig.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/keyedCountBreakdown.test.js\" \"out-test/test/formatAnalysisIssuesMessage.test.js\" \"out-test/test/findLatestAnalysisReport.test.js\" \"out-test/test/owaspExport.test.js\" \"out-test/test/healthScore.test.js\" \"out-test/test/dailySummary.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/violationsReaderFilter.test.js\" \"out-test/test/configWriterDisabledRules.test.js\" \"out-test/test/views/**/*.test.js\" \"out-test/test/pubspec-validation.test.js\" \"out-test/test/pubspec-code-actions.test.js\" \"out-test/test/vibrancy/services/pubspec-sorter.test.js\" \"out-test/test/vibrancy/services/pubspec-parser-comments.test.js\" \"out-test/test/vibrancy/services/pin-intent-parser.test.js\" \"out-test/test/vibrancy/providers/annotate-command.test.js\" \"out-test/test/vibrancy/providers/adoption-gate.test.js\" \"out-test/test/commandCatalogRegistry.test.js\" \"out-test/test/commandCatalogHistory.test.js\" \"out-test/test/fileRiskData.test.js\" \"out-test/test/setupCompositeScaffoldGate.test.js\" \"out-test/test/disablePluginsIntegration.test.js\" \"out-test/test/runAnalysisEnabledGate.test.js\" \"out-test/test/pluginLiveness.test.js\" \"out-test/test/scanOnSave/**/*.test.js\" \"out-test/test/upgradeChecker.test.js\" \"out-test/test/liveDiagnosticsModel.test.js\" \"out-test/test/liveViolationsData.test.js\" \"out-test/test/ruleCatalog.test.js\" \"out-test/test/suiteEnvelope.test.js\" \"out-test/test/suiteSiblingEnvelopes.test.js\" \"out-test/test/suiteCrashToRule.test.js\" \"out-test/test/suiteDeepLinks.test.js\" \"out-test/test/suiteCommitSha.test.js\" \"out-test/test/consolidatedModel.test.js\" \"out-test/test/consolidatedClient.test.js\" --timeout 10000",
+    "test": "node --max-old-space-size=8192 ./node_modules/typescript/bin/tsc -p tsconfig.test.json && node node_modules/mocha/bin/mocha \"out-test/test/todosAndHacks/**/*.test.js\" \"out-test/test/driftAdvisor/**/*.test.js\" \"out-test/test/vibrancy/category-dictionary.test.js\" \"out-test/test/vibrancy/vscode-mock.test.js\" \"out-test/test/vibrancy/scan-helpers.test.js\" \"out-test/test/vibrancy/services/review-state.test.js\" \"out-test/test/vibrancy/services/version-comparator.test.js\" \"out-test/test/vibrancy/services/changelog-opportunities.test.js\" \"out-test/test/vibrancy/services/ai-prompt-bundle.test.js\" \"out-test/test/vibrancy/services/symbol-usage.test.js\" \"out-test/test/vibrancy/views/opportunities-html.test.js\" \"out-test/test/vibrancy/services/feature-inventory-model.test.js\" \"out-test/test/vibrancy/services/symbol-occurrence-equivalence.test.js\" \"out-test/test/vibrancy/views/feature-inventory-html.test.js\" \"out-test/test/vibrancy/views/feature-inventory-dom.test.js\" \"out-test/test/vibrancy/views/feature-inventory-markdown.test.js\" \"out-test/test/vibrancy/services/scan-logger.test.js\" \"out-test/test/vibrancy/services/tarball-analyzer.test.js\" \"out-test/test/vibrancy/services/github-api.test.js\" \"out-test/test/vibrancy/services/import-scanner.test.js\" \"out-test/test/vibrancy/services/pubdev-changelog.test.js\" \"out-test/test/vibrancy/services/startup-gate.test.js\" \"out-test/test/vibrancy/services/vibrancy-history.test.js\" \"out-test/test/vibrancy/services/freshness-watcher.test.js\" \"out-test/test/vibrancy/views/package-detail-html.test.js\" \"out-test/test/vibrancy/scoring/status-classifier.test.js\" \"out-test/test/vibrancy/state/vibrancy-state.test.js\" \"out-test/test/vibrancy/scoring/vibrancy-calculator.test.js\" \"out-test/test/vibrancy/scoring/bloat-calculator.test.js\" \"out-test/test/vibrancy/scoring/override-analyzer.test.js\" \"out-test/test/vibrancy/scoring/blocker-analyzer.test.js\" \"out-test/test/vibrancy/scoring/shared-dep-conflict-detector.test.js\" \"out-test/test/vibrancy/scoring/constraint-chain.test.js\" \"out-test/test/vibrancy/scoring/floor-constraints.test.js\" \"out-test/test/vibrancy/scoring/forbidden-constraints.test.js\" \"out-test/test/vibrancy/scoring/constraint-notes.test.js\" \"out-test/test/vibrancy/services/pub-conflict-text.test.js\" \"out-test/test/vibrancy/scoring/cross-project-drift-detector.test.js\" \"out-test/test/vibrancy/views/report-html.test.js\" \"out-test/test/vibrancy/views/report-webview.test.js\" \"out-test/test/vibrancy/views/html-utils.test.js\" \"out-test/test/vibrancy/views/detail-view-html.test.js\" \"out-test/test/vibrancy/views/known-issues-html.test.js\" \"out-test/test/vibrancy/providers/tree-items.test.js\" \"out-test/test/vibrancy/providers/hover-provider.test.js\" \"out-test/test/rulePacks/**/*.test.js\" \"out-test/test/analysisOptimizer/**/*.test.js\" \"out-test/test/sidebarSectionVisibilityKeys.test.js\" \"out-test/test/sidebarToggleCommand.test.js\" \"out-test/test/sidebarToggleLabel.test.js\" \"out-test/test/overviewEmbeddedConfigKinds.test.js\" \"out-test/test/treeSerializers.test.js\" \"out-test/test/copyTreeAsJson.test.js\" \"out-test/test/suggestionCounts.test.js\" \"out-test/test/configSuggestions.test.js\" \"out-test/test/config/tierConfig.test.js\" \"out-test/test/config/laneConfig.test.js\" \"out-test/test/config/severityConfig.test.js\" \"out-test/test/pathUtils.test.js\" \"out-test/test/keyedCountBreakdown.test.js\" \"out-test/test/formatAnalysisIssuesMessage.test.js\" \"out-test/test/findLatestAnalysisReport.test.js\" \"out-test/test/owaspExport.test.js\" \"out-test/test/healthScore.test.js\" \"out-test/test/dailySummary.test.js\" \"out-test/test/violationsReader.test.js\" \"out-test/test/violationsReaderFilter.test.js\" \"out-test/test/configWriterDisabledRules.test.js\" \"out-test/test/views/**/*.test.js\" \"out-test/test/pubspec-validation.test.js\" \"out-test/test/pubspec-code-actions.test.js\" \"out-test/test/vibrancy/services/pubspec-sorter.test.js\" \"out-test/test/vibrancy/services/pubspec-parser-comments.test.js\" \"out-test/test/vibrancy/services/pin-intent-parser.test.js\" \"out-test/test/vibrancy/providers/annotate-command.test.js\" \"out-test/test/vibrancy/providers/adoption-gate.test.js\" \"out-test/test/commandCatalogRegistry.test.js\" \"out-test/test/commandCatalogHistory.test.js\" \"out-test/test/fileRiskData.test.js\" \"out-test/test/setupCompositeScaffoldGate.test.js\" \"out-test/test/disablePluginsIntegration.test.js\" \"out-test/test/runAnalysisEnabledGate.test.js\" \"out-test/test/pluginLiveness.test.js\" \"out-test/test/scanOnSave/**/*.test.js\" \"out-test/test/upgradeChecker.test.js\" \"out-test/test/liveDiagnosticsModel.test.js\" \"out-test/test/liveViolationsData.test.js\" \"out-test/test/ruleCatalog.test.js\" \"out-test/test/suiteEnvelope.test.js\" \"out-test/test/suiteSiblingEnvelopes.test.js\" \"out-test/test/suiteCrashToRule.test.js\" \"out-test/test/suiteDeepLinks.test.js\" \"out-test/test/suiteCommitSha.test.js\" \"out-test/test/consolidatedModel.test.js\" \"out-test/test/consolidatedClient.test.js\" \"out-test/test/l10nParsers.test.js\" --timeout 10000",
     "ux:gen": "tsc -p tsconfig.ux.json && node out-ux/test/ux/generate-pages.js",
     "ux:test": "playwright test -c test-ux/playwright.config.ts",
     "ux": "npm run ux:gen && npm run ux:test"
@@ -2150,7 +2201,9 @@
     "typescript": "~7.0.2"
   },
   "dependencies": {
-    "@vscode/codicons": "^0.0.45"
+    "@vscode/codicons": "^0.0.45",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver-protocol": "^3.17.5"
   },
   "overrides": {
     "brace-expansion": ">=2.1.3",

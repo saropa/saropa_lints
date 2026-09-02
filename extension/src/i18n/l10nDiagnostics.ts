@@ -8,6 +8,11 @@
 import * as vscode from 'vscode';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import {
+  blankComments,
+  extractParamsBlock,
+  extractTopLevelKeys,
+} from './l10nParsers';
 
 /** Diagnostic collection shared across all validated files. */
 let _collection: vscode.DiagnosticCollection | undefined;
@@ -23,56 +28,6 @@ const L10N_RE = /l10n\(\s*(['"])([a-zA-Z0-9_.]+)\1/g;
 
 // Extracts {placeholder} tokens from en.json values.
 const PLACEHOLDER_RE = /\{([a-zA-Z0-9_]+)\}/g;
-
-/**
- * Advance past a string literal. `i` must point at the opening quote
- * character. Returns position immediately after the closing quote.
- */
-function skipStringLiteral(text: string, i: number): number {
-  const q = text[i];
-  const n = text.length;
-  i++;
-  while (i < n) {
-    if (text[i] === '\\') { i += 2; continue; }
-    if (text[i] === q) return i + 1;
-    i++;
-  }
-  return i;
-}
-
-/**
- * Replace comment contents with spaces so L10N_RE doesn't match inside
- * comments. Preserves string length and newlines for correct position
- * mapping back to the original document.
- */
-function blankComments(text: string): string {
-  const out = text.split('');
-  const n = text.length;
-  let i = 0;
-  while (i < n) {
-    const c = text[i];
-    // Skip strings — they can contain // and /* which aren't comments.
-    if (c === "'" || c === '"' || c === '`') { i = skipStringLiteral(text, i); continue; }
-    // Line comment: blank from // to end-of-line.
-    if (c === '/' && i + 1 < n && text[i + 1] === '/') {
-      const start = i;
-      while (i < n && text[i] !== '\n') i++;
-      for (let j = start; j < i; j++) out[j] = ' ';
-      continue;
-    }
-    // Block comment: blank from /* to */, preserving newlines.
-    if (c === '/' && i + 1 < n && text[i + 1] === '*') {
-      const start = i;
-      i += 2;
-      while (i < n && !(text[i] === '*' && i + 1 < n && text[i + 1] === '/')) i++;
-      if (i < n) i += 2;
-      for (let j = start; j < i; j++) out[j] = text[j] === '\n' ? '\n' : ' ';
-      continue;
-    }
-    i++;
-  }
-  return out.join('');
-}
 
 /**
  * Flatten a nested JSON object into a Map of dotted keys to string values.
@@ -112,78 +67,6 @@ function getCatalog(): Map<string, string> | undefined {
     }
   }
   return undefined;
-}
-
-/**
- * Extract a balanced { ... } block starting at position `start`,
- * handling nested braces and string literals.
- */
-function extractParamsBlock(text: string, start: number): string | undefined {
-  let i = start;
-  const n = text.length;
-  // Skip whitespace, expect comma then opening brace.
-  while (i < n && /\s/.test(text[i])) i++;
-  if (i >= n || text[i] !== ',') return undefined;
-  i++;
-  while (i < n && /\s/.test(text[i])) i++;
-  if (i >= n || text[i] !== '{') return undefined;
-
-  let depth = 0;
-  const objStart = i;
-  while (i < n) {
-    const c = text[i];
-    if (c === "'" || c === '"' || c === '`') { i = skipStringLiteral(text, i); continue; }
-    if (c === '{') { depth++; }
-    else if (c === '}') { depth--; if (depth === 0) return text.slice(objStart, i + 1); }
-    i++;
-  }
-  return undefined;
-}
-
-/**
- * State-machine extraction of top-level keys from a JS object literal.
- * Tracks nesting depth for {}, (), [] and skips string literals, spread
- * syntax (including member-access like ...obj.nested), and trailing commas.
- */
-function extractTopLevelKeys(block: string): Set<string> {
-  const keys = new Set<string>();
-  const n = block.length;
-  let i = 1; // Past opening brace.
-  let depth = 0;
-  while (i < n) {
-    const c = block[i];
-    if (c === "'" || c === '"' || c === '`') { i = skipStringLiteral(block, i); continue; }
-    if (c === '{' || c === '(' || c === '[') { depth++; i++; continue; }
-    if (c === '}' || c === ')' || c === ']') {
-      if (depth === 0) break; // Closing brace of params object.
-      depth--; i++; continue;
-    }
-    if (depth === 0) {
-      // Skip spread operator and its full operand (including member access).
-      if (c === '.' && i + 2 < n && block[i + 1] === '.' && block[i + 2] === '.') {
-        i += 3;
-        while (i < n && /\s/.test(block[i])) i++;
-        // Consume identifier.dotted.path so it isn't treated as a key.
-        while (i < n && /[\w$.]/.test(block[i])) i++;
-        continue;
-      }
-      // Match an identifier — a key candidate.
-      if (/[a-zA-Z_$]/.test(c)) {
-        const start = i;
-        while (i < n && /[\w$]/.test(block[i])) i++;
-        const ident = block.slice(start, i);
-        // Peek past whitespace for the delimiter that confirms it's a key.
-        let j = i;
-        while (j < n && /\s/.test(block[j])) j++;
-        if (j < n && (block[j] === ':' || block[j] === ',' || block[j] === '}')) {
-          keys.add(ident);
-        }
-        continue;
-      }
-    }
-    i++;
-  }
-  return keys;
 }
 
 /** Validate a single TypeScript document for l10n key issues. */
