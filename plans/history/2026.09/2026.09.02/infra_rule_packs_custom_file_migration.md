@@ -47,11 +47,18 @@ The custom-file-first fallback logic (5 lines: read custom file, check empty, fa
 
 Projects with `rule_packs` in the old plugin-block location continue to work — the config loader falls back to the old location with a deprecation warning. The `migrate-config` CLI and extension command handle automatic migration. New projects created by `dart run saropa_lints:init` write `rule_packs` to the custom file from the start.
 
+### Additional hardening
+
+- `writeRulePacksToCustomFile` skips disk write when content is unchanged (avoids unnecessary I/O on every init run with no packs).
+- `migrate-config` (Dart and TS) now removes skipped keys from the legacy plugin block even when they already exist in the custom file — previously, a key present in both files would be "SKIP"ped but never removed from the main file, leaving the `unsupported_option` warning intact.
+- New test file: `test/init/write_rule_packs_custom_file_test.dart` (8 tests) — covers write, replace, clear, section-boundary safety, empty file, and file creation.
+
 ### Verification
 
-- Dart analysis: 0 issues across all 6 touched files.
+- Dart analysis: 0 issues across all touched files.
 - TypeScript: `tsc --noEmit` passes clean.
 - `test/init/write_config_test.dart`: 12/12 pass.
+- `test/init/write_rule_packs_custom_file_test.dart`: 8/8 pass (new).
 - `test/config/analysis_options_rule_packs_test.dart`: all pass (parser unchanged).
 - `test/scan/rule_tier_index_test.dart`: 8/8 pass (rule registration integrity).
 

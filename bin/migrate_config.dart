@@ -67,7 +67,9 @@ void main(List<String> args) {
       ? customFile.readAsStringSync()
       : '';
 
-  // Only add scalar keys that aren't already in the custom file.
+  // Only add scalar keys that aren't already in the custom file, but always
+  // remove them from the legacy plugin block (even when skipped) so the
+  // unsupported_option warning is eliminated.
   final added = <String>[];
   for (final entry in found.entries) {
     // Check if already present as a top-level key.
@@ -77,15 +79,17 @@ void main(List<String> args) {
     ).hasMatch(customContent);
     if (existing) {
       print('  SKIP ${entry.key}: already in analysis_options_custom.yaml');
-      continue;
+    } else {
+      // Append the key to the custom file.
+      if (customContent.isNotEmpty && !customContent.endsWith('\n')) {
+        customContent += '\n';
+      }
+      customContent += '${entry.key}: ${entry.value}\n';
+      print('  MOVE ${entry.key}: ${entry.value}');
     }
-    // Append the key to the custom file.
-    if (customContent.isNotEmpty && !customContent.endsWith('\n')) {
-      customContent += '\n';
-    }
-    customContent += '${entry.key}: ${entry.value}\n';
+    // Track all found keys for removal from the main file, regardless of
+    // whether they were added to or already existed in the custom file.
     added.add(entry.key);
-    print('  MOVE ${entry.key}: ${entry.value}');
   }
 
   // Write the custom file with the scalar keys first.
@@ -94,7 +98,9 @@ void main(List<String> args) {
   }
 
   // Migrate rule_packs: write to custom file, remove from main file.
-  var migratedRulePacks = false;
+  // Always remove from the legacy block even when skipped, to eliminate
+  // the unsupported_option warning.
+  var hasLegacyRulePacks = rulePackIds.isNotEmpty;
   if (rulePackIds.isNotEmpty) {
     // Check if rule_packs already exists in the custom file — reuse the
     // in-memory content (may have been updated with scalar keys above).
@@ -107,12 +113,11 @@ void main(List<String> args) {
     } else {
       // Write rule_packs block to the custom file using the shared helper.
       writeRulePacksToCustomFile(customFile, rulePackIds);
-      migratedRulePacks = true;
       print('  MOVE rule_packs: [${rulePackIds.join(', ')}]');
     }
   }
 
-  if (added.isEmpty && !migratedRulePacks) {
+  if (found.isEmpty && !hasLegacyRulePacks) {
     print('All keys already migrated — nothing to do.');
     return;
   }
@@ -128,14 +133,15 @@ void main(List<String> args) {
     );
   }
 
-  // Remove the rule_packs block from the main file.
-  if (migratedRulePacks) {
+  // Remove the rule_packs block from the main file (even when skipped —
+  // the goal is to eliminate the warning, not just copy the value).
+  if (hasLegacyRulePacks) {
     updatedMain = updatedMain.replaceAll(_pluginRulePacksBlock, '');
   }
 
   mainFile.writeAsStringSync(updatedMain);
 
-  final totalMoved = added.length + (migratedRulePacks ? 1 : 0);
+  final totalMoved = added.length + (hasLegacyRulePacks ? 1 : 0);
   print('');
   print('Migrated $totalMoved key(s) to analysis_options_custom.yaml.');
   print('The unsupported_option warnings will no longer appear.');

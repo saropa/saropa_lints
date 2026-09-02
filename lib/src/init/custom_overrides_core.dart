@@ -358,7 +358,9 @@ final _rulePacksBlockPattern = RegExp(
 /// block is written sorted alphabetically. Creates the file if it doesn't
 /// exist, inserting after the `# ANALYSIS SETTINGS` section when present.
 void writeRulePacksToCustomFile(File customFile, List<String> packIds) {
-  var content = customFile.existsSync() ? customFile.readAsStringSync() : '';
+  final original =
+      customFile.existsSync() ? customFile.readAsStringSync() : '';
+  var content = original;
 
   // Build the new block (empty string if no packs).
   final block = _buildRulePacksBlock(packIds);
@@ -377,6 +379,10 @@ void writeRulePacksToCustomFile(File customFile, List<String> packIds) {
   if (block.isNotEmpty) {
     content = _removeRulePacksTemplate(content);
   }
+
+  // Skip disk write when content is unchanged (avoids unnecessary I/O on
+  // every init run when no packs are configured).
+  if (content == original) return;
 
   customFile.writeAsStringSync(content);
 }

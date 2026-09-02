@@ -14,7 +14,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { parseLaneFromPluginBlock } from './laneConfig';
-import { parseRulePacksEnabled, writeRulePacksEnabled } from '../rulePacks/rulePackYaml';
+import { parseRulePacksEnabled, removeLegacyRulePacksFromMainFile, writeRulePacksEnabled } from '../rulePacks/rulePackYaml';
 
 /** Keys that were moved from the plugin block to the custom file. */
 const MIGRATE_KEYS = ['log_level', 'lane', 'memory_mode'] as const;
@@ -115,20 +115,25 @@ export function migrateConfigKeys(root: string): MigrateResult {
     moved.push(key);
   }
 
-  if (moved.length > 0) {
-    // Write the custom file with the scalar keys.
+  // Write the custom file with the scalar keys (only if any were added).
+  const scalarKeysChanged = moved.length > 0;
+  if (scalarKeysChanged) {
     fs.writeFileSync(customPath, customContent, 'utf8');
+  }
 
-    // Remove the scalar keys from the main file.
+  // Remove ALL found scalar keys from the main file's plugin block — even
+  // skipped ones — so the unsupported_option warning is eliminated.
+  if (found.size > 0) {
     let updatedMain = mainContent;
-    for (const key of moved) {
-      // Match indented lines like `    log_level: info  # comment`
+    for (const key of found.keys()) {
       updatedMain = updatedMain.replace(
         new RegExp(`^[ \\t]+${key}:\\s+[^\\n]*\\n`, 'm'),
         '',
       );
     }
-    fs.writeFileSync(mainPath, updatedMain, 'utf8');
+    if (updatedMain !== mainContent) {
+      fs.writeFileSync(mainPath, updatedMain, 'utf8');
+    }
   }
 
   // Migrate rule_packs (nested block) from the plugin block to custom file.
@@ -144,6 +149,13 @@ export function migrateConfigKeys(root: string): MigrateResult {
       // writeRulePacksEnabled writes to custom file and cleans up main file.
       writeRulePacksEnabled(root, rulePackIds);
       moved.push('rule_packs');
+    }
+    // Even if rule_packs was skipped (already in custom file), clean up the
+    // legacy block from the main file to stop the warning.
+    if (!moved.includes('rule_packs')) {
+      // removeLegacyRulePacksFromMainFile is called by writeRulePacksEnabled
+      // when it runs; only need manual cleanup for the skip path.
+      removeLegacyRulePacksFromMainFile(root);
     }
   }
 

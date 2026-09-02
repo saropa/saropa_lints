@@ -177,7 +177,7 @@ export function writeRulePacksEnabled(workspaceRoot: string, packIds: readonly s
  * Removes the legacy `rule_packs:` / `migration_packs:` block from the
  * plugin section in analysis_options.yaml (cleanup after migration).
  */
-function removeLegacyRulePacksFromMainFile(workspaceRoot: string): void {
+export function removeLegacyRulePacksFromMainFile(workspaceRoot: string): void {
   const p = readAnalysisOptionsPath(workspaceRoot);
   if (!fs.existsSync(p)) return;
   try {
