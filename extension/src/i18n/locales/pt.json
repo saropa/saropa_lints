@@ -1756,9 +1756,20 @@
       "scanDaemon": "Varredura Daemon",
       "lspServer": "Servidor LSP",
       "pid": "PID:",
-      "status": "Status:",
+      "status": {
+        "active": "Atividade ativa ativo ativo.",
+        "idle": "inativo",
+        "running": "executando",
+        "stopped": "parado",
+        "suspended": "suspensa",
+        "starting": "iniciando"
+      },
       "rules": "Regras:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "em processo, não mensurável separadamente",
+        "notRunning": "não está em execução"
+      }
     },
     "toggle": {
       "on": "SOBRE",

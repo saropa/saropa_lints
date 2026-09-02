@@ -1756,9 +1756,20 @@
       "scanDaemon": "스캔 Daemon",
       "lspServer": "LSP 서버",
       "pid": "PID:",
-      "status": "상태:",
+      "status": {
+        "active": "활동적인 액티브는 활성입니다.",
+        "idle": "아이들",
+        "running": "실행",
+        "stopped": "중단됨",
+        "suspended": "중단됨",
+        "starting": "시작"
+      },
       "rules": "규칙:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "인 프로세스, 별도로 측정 불가능",
+        "notRunning": "작동하지 않음"
+      }
     },
     "toggle": {
       "on": "에",

@@ -16,6 +16,8 @@
 
 /** Domain shown for SDK version-migration packs. */
 export const SDK_DOMAIN = 'SDK migrations';
+/** Domain for alternative-package migration packs (migrate_*). */
+export const MIGRATION_DOMAIN = 'Migrations';
 /**
  * Domain for platform packs (ios, android, web, …). These are recommended from
  * the project's embedder folders, not a pubspec dependency, so they sort near
@@ -55,6 +57,7 @@ export const PACK_DOMAIN_ORDER: readonly string[] = [
   'Identity & sharing',
   'Utilities & config',
   SDK_DOMAIN,
+  MIGRATION_DOMAIN,
   OTHER_DOMAIN,
 ];
 
@@ -183,11 +186,17 @@ function isSdkPackId(id: string): boolean {
   return id.startsWith('dart_sdk_') || id.startsWith('flutter_sdk_');
 }
 
+/** True for alternative-package migration packs. */
+function isMigrationPackId(id: string): boolean {
+  return id.startsWith('migrate_');
+}
+
 /**
  * Resolve a pack's display domain. SDK packs collapse into one domain; any
  * unmapped package pack falls back to {@link OTHER_DOMAIN} so nothing is hidden.
  */
 export function packDomainForId(id: string): string {
   if (isSdkPackId(id)) return SDK_DOMAIN;
+  if (isMigrationPackId(id)) return MIGRATION_DOMAIN;
   return PACK_DOMAIN_BY_ID[id] ?? OTHER_DOMAIN;
 }

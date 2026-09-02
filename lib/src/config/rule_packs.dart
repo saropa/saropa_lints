@@ -43,6 +43,7 @@ import 'dart:developer' as developer;
 import 'package:pub_semver/pub_semver.dart';
 
 import 'package:saropa_lints/src/config/rule_pack_codes_generated.dart';
+import 'package:saropa_lints/src/config/rule_pack_migration_codes.dart';
 import 'package:saropa_lints/src/tiers.dart'
     show
         androidPlatformRules,
@@ -408,6 +409,8 @@ const Map<String, Set<String>> kRulePackPubspecMarkers = {
   'windows': {'flutter'},
   'macos': {'flutter'},
   'linux': {'flutter'},
+  // Migration packs — fire on presence of the source package in pubspec.
+  ...kRulePackMigrationPubspecMarkers,
 };
 
 /// True when [pubspecYamlContent] declares any [kRulePackPubspecMarkers] entry.
@@ -619,4 +622,8 @@ const Map<String, Set<String>> kRulePackRuleCodes = {
   'windows': windowsPlatformRules,
   'macos': macosPlatformRules,
   'linux': linuxPlatformRules,
+  // Migration packs — hand-curated rule-code sets from each alternative lint
+  // package's HAVE column, enabling one-click migration. No dependency or SDK
+  // gates: packs fire on pubspec presence of the source package (any version).
+  ...kRulePackMigrationCodes,
 };

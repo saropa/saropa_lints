@@ -1756,9 +1756,20 @@
       "scanDaemon": "سکن Daemon",
       "lspServer": "LSP سرور",
       "pid": "PID:",
-      "status": "حالة:",
+      "status": {
+        "active": "فعال طور پر سرگرم سرگرمیوں میں سے ایک ہے.",
+        "idle": "بیکار",
+        "running": "چلنا",
+        "stopped": "روک دیا گیا",
+        "suspended": "متوقف کر دیا گیا",
+        "starting": "شروع کریں"
+      },
       "rules": "قواعد:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "داخلی، الگ سے قابل اندازہ نہیں",
+        "notRunning": "نہ چل رہا ہے"
+      }
     },
     "toggle": {
       "on": "اُپر /نہ کریں",

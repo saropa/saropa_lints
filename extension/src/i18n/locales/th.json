@@ -1756,9 +1756,20 @@
       "scanDaemon": "สแกน Daemon",
       "lspServer": "เซิร์ฟเวอร์ LSP",
       "pid": "PID:",
-      "status": "สถานะ:",
+      "status": {
+        "active": "การทํางานที่มีความสามารถ Active",
+        "idle": "ว่าง",
+        "running": "กำลังทำงาน",
+        "stopped": "หยุด",
+        "suspended": "หยุดใช้งาน",
+        "starting": "เริ่มต้น"
+      },
       "rules": "กฎ:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "ในกระบวนการเดียวกัน ไม่สามารถวัดแยกได้",
+        "notRunning": "ไม่ได้รัน"
+      }
     },
     "toggle": {
       "on": "บน",

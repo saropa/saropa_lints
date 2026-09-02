@@ -1756,9 +1756,20 @@
       "scanDaemon": "Quét Daemon",
       "lspServer": "Máy chủ LSP",
       "pid": "PID:",
-      "status": "Trạng thái:",
+      "status": {
+        "active": "Active active hoạt động tích cực",
+        "idle": "nhàn rỗi",
+        "running": "đang chạy",
+        "stopped": "dừng",
+        "suspended": "tạm dừng",
+        "starting": "bắt đầu"
+      },
       "rules": "Quy tắc:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "trong cùng tiến trình, không thể đo lường riêng biệt",
+        "notRunning": "không chạy"
+      }
     },
     "toggle": {
       "on": "BẬT",

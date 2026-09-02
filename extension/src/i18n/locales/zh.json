@@ -1756,9 +1756,20 @@
       "scanDaemon": "扫描 Daemon",
       "lspServer": "LSP 服务器",
       "pid": "PID:",
-      "status": "状态:",
+      "status": {
+        "active": "活跃的积极活动.",
+        "idle": "空闲",
+        "running": "运行",
+        "stopped": "停止",
+        "suspended": "暂停",
+        "starting": "开始"
+      },
       "rules": "规则：",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "进程内，不可单独测量",
+        "notRunning": "未运行"
+      }
     },
     "toggle": {
       "on": "在",

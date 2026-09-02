@@ -1756,9 +1756,20 @@
       "scanDaemon": "スキャン Daemon",
       "lspServer": "LSPサーバー",
       "pid": "PID:",
-      "status": "状態:",
+      "status": {
+        "active": "活力のあるアクティブです.",
+        "idle": "アイドル",
+        "running": "実行中",
+        "stopped": "停止",
+        "suspended": "一時停止",
+        "starting": "開始"
+      },
       "rules": "ルール:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "インプロセス、別途測定可能ではない",
+        "notRunning": "実行されていない"
+      }
     },
     "toggle": {
       "on": "の上",

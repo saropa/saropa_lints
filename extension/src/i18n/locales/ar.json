@@ -1756,9 +1756,20 @@
       "scanDaemon": "مسح Daemon",
       "lspServer": "خادم LSP",
       "pid": "PID:",
-      "status": "الحالة:",
+      "status": {
+        "active": "النشاط الفاعل active نشط فعال.",
+        "idle": "غير نشط",
+        "running": "التشغيل",
+        "stopped": "остودت",
+        "suspended": "متوقفة",
+        "starting": "بدء"
+      },
       "rules": "القواعد:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "قواعد صارمة:\n1. العودة فقط إلى النص المترجم.",
+        "notRunning": "غير مُنفَّذ"
+      }
     },
     "toggle": {
       "on": "على",

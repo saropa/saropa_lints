@@ -1756,9 +1756,20 @@
       "scanDaemon": "סרוק Daemon",
       "lspServer": "שרת LSP",
       "pid": "PID:",
-      "status": "מצב:",
+      "status": {
+        "active": "פעילות אקטיבית פעילה.",
+        "idle": "השהייה",
+        "running": "מתבצעת",
+        "stopped": "остопед",
+        "suspended": "מושתקע",
+        "starting": "התחלת"
+      },
       "rules": "חוקי שיווק:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "במעבדה, לא ניתן למדוד בנפרד",
+        "notRunning": "לא רץ"
+      }
     },
     "toggle": {
       "on": "עַל",

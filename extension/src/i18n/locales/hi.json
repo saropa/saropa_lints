@@ -1756,9 +1756,20 @@
       "scanDaemon": "Daemon स्कैन करें",
       "lspServer": "एलएसपी सर्वर",
       "pid": "PID:",
-      "status": "स्थिति:",
+      "status": {
+        "active": "सक्रिय रूप से सक्रिय।",
+        "idle": "ईडल",
+        "running": "चल रहा है",
+        "stopped": "रोक दिया गया",
+        "suspended": "सस्पेंडेड",
+        "starting": "प्रारंभ"
+      },
       "rules": "नियम:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "अनुप्रक्रिया में, अलग-अलग माप्य नहीं",
+        "notRunning": "नॉट रनिंग"
+      }
     },
     "toggle": {
       "on": "ओएन /नो_थिंक",

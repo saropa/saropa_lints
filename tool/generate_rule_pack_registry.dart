@@ -210,6 +210,11 @@ const Map<String, String> kPackUiLabels = {
   'google_fonts': 'Google Fonts',
   'flutter_keyboard_visibility': 'Keyboard Visibility',
   'speech_to_text': 'Speech to Text',
+  // Migration packs — labels for packages with non-obvious display names.
+  // Packs not listed here use the auto-generated "Migrate from <pack_suffix>"
+  // label from _uiLabelForPackId's migrate_ prefix handler.
+  'migrate_dcm': 'Migrate from DCM',
+  'migrate_very_good_analysis': 'Migrate from very_good_analysis',
 };
 
 /// Theme ("concern") packs: cross-cutting bundles grouped by what they protect,
@@ -409,6 +414,13 @@ String _uiLabelForPackId(String pack) {
 
   final theme = kThemePacks[pack];
   if (theme != null) return theme.label;
+
+  // Migration packs: "Migrate from <source_package>" label.
+  const migratePrefix = 'migrate_';
+  if (pack.startsWith(migratePrefix)) {
+    final source = pack.substring(migratePrefix.length);
+    return 'Migrate from $source';
+  }
 
   const dartPrefix = 'dart_sdk_';
   if (pack.startsWith(dartPrefix)) {

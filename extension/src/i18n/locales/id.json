@@ -1756,9 +1756,20 @@
       "scanDaemon": "Pindai Daemon",
       "lspServer": "Server LSP",
       "pid": "PID:",
-      "status": "Status:",
+      "status": {
+        "active": "Aktivitas yang aktif.",
+        "idle": "menganggur",
+        "running": "berlari",
+        "stopped": "berhenti",
+        "suspended": "dihanguskan",
+        "starting": "memulai"
+      },
       "rules": "Aturan:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "dalam proses, tidak dapat diukur secara terpisah",
+        "notRunning": "tidak berjalan"
+      }
     },
     "toggle": {
       "on": "NYALA",

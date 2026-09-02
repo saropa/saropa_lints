@@ -80,6 +80,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Health panel marks Saropa Lints processes with a "Saropa" type pill so they are visually distinct from analysis servers and other Dart processes. No action required.
 - Standalone LSP server plumbing test (Phase 0) — a second LSP server emits one diagnostic per severity level (error, warning, info, hint) with squiggles and quick fixes, proving two LSP servers coexist in the same VS Code Problems panel. Runs alongside the analyzer plugin — disable via `saropaLints.lspServer.enabled` if needed.
 - Debug Panel sidebar — shows status and toggle controls for all three diagnostic engines (Analyzer Plugin, Scan Daemon, LSP Server) with PID, rule count, RSS, and a live log tail. Disable via `saropaLints.debug.enabled` if not needed.
+- Migration packs for 24 alternative lint packages — when a project still depends on an alternative (e.g. `pyramid_lint`, `solid_lints`, `dcm`), the extension surfaces a "Migrate from …" pack in the Rule Packs dashboard that enables all equivalent saropa rules in one click. No action required.
 
 ### Fixed
 

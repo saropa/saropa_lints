@@ -8,7 +8,7 @@
   "views.status.name": "Ang mga sumusunod ay ang status ng isang kumpanya.",
   "views.settings.name": "Mga Pag-aayos ng Settings",
   "views.severityFilters.name": "Mga diagnostic",
-  "command.auditFolder.title": "Saropa: Audit Folder...",
+  "command.auditFolder.title": "Saropa: I-audit ang Folder...",
   "views.help.name": "Magbigay ng tulong sa mga taong nakakatulong.",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart at Flutter na mga rule para sa seguridad, accessibility, at performance.\n\nKinakailangan ang isang Dart o Flutter project.\n\nBumuksan ang isang folder na may isang `pubspec.yaml` upang magsimula.\n\n[Mag-aral pa nang online](https://pub.dev/packages/saropa_lints)\n[Pangkatin ang lahat ng mga command](command:saropaLints.showCommandCatalog)\n[Tungkol sa Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: I-set Up ang Proyekto (pubspec + config)",

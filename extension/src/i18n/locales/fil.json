@@ -1745,7 +1745,7 @@
   },
   "debug": {
     "panel": {
-      "title": "Debug Panel"
+      "title": "Panel ng Debug"
     },
     "section": {
       "engines": "Mga Diagnostic Engine",
@@ -1756,9 +1756,20 @@
       "scanDaemon": "I-scan Daemon",
       "lspServer": "LSP Server",
       "pid": "PID:",
-      "status": "Katayuan:",
+      "status": {
+        "active": "Aktibong aktibong aktibo na aktibo.",
+        "idle": "walang ginagawa",
+        "running": "nagsisimula",
+        "stopped": "nag-stop",
+        "suspended": "nagsususpende",
+        "starting": "nagsimula"
+      },
       "rules": "Mga Tala:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "sa proseso, hindi nakakakita ng mas maliit na pagtatangka",
+        "notRunning": "walang pagsusulong"
+      }
     },
     "toggle": {
       "on": "NAKA-ON",

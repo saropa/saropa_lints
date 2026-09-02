@@ -1756,9 +1756,20 @@
       "scanDaemon": "Scansiona Daemon",
       "lspServer": "Server LSP",
       "pid": "PID:",
-      "status": "Stato:",
+      "status": {
+        "active": "Attivo attivo attive attivi.",
+        "idle": "oziare",
+        "running": "in esecuzione",
+        "stopped": "fermato",
+        "suspended": "sospeso",
+        "starting": "iniziando"
+      },
       "rules": "Regole:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "rssNote": {
+        "inProcess": "in-process, non misurabile separatamente",
+        "notRunning": "non in esecuzione"
+      }
     },
     "toggle": {
       "on": "SU",
