@@ -1,6 +1,6 @@
-# Competitor Gap Analysis
+# Alternative Landscape Gap Analysis
 
-Compiled 2026-09-02. Analysis of 48 competitor Dart/Flutter lint packages against saropa_lints' current
+Compiled 2026-09-02. Analysis of 48 alternative Dart/Flutter lint packages against saropa_lints' current
 2,300+ rule catalog. Source research: 10 grandchild-agent files in the gap-analysis scratchpad, each verified
 against live GitHub source (not README/pub.dev descriptions alone, except where explicitly flagged
 low-confidence).
@@ -16,16 +16,16 @@ low-confidence).
     stock lints). They are listed for completeness but have no per-package detail section.
 -->
 
-## Competitor Landscape
+## Alternative Landscape
 
-Published Dart and Flutter lint packages that compete with, or are adjacent to,
+Published Dart and Flutter lint packages that overlap with, or are adjacent to,
 `saropa_lints`. Compiled from pub.dev / GitHub search, September 2026 — verify
 current rule counts and status before quoting externally, since these packages
 update independently of this repo.
 
 ### Custom lint / analyzer-plugin rule collections
 
-<!-- Direct competitive set: packages that ship their own custom rules. -->
+<!-- Packages that ship their own custom rules. -->
 
 | Package | URL | Mechanism | Coverage / focus |
 |---|---|---|---|
@@ -96,8 +96,8 @@ update independently of this repo.
 
 ### Standard analyzer-lint presets
 
-<!-- Not direct competitors — no custom rule implementations. Frequently compared
-     since they occupy the same `analysis_options.yaml` slot. -->
+<!-- No custom rule implementations. Frequently compared since they occupy the
+     same `analysis_options.yaml` slot. -->
 
 | Package | URL | Coverage / focus |
 |---|---|---|
@@ -115,8 +115,8 @@ update independently of this repo.
 
 ### Custom-linter frameworks
 
-<!-- Not competitors — these are the frameworks saropa_lints and most competitors
-     are built on or migrated from. -->
+<!-- These are the frameworks saropa_lints and most alternatives are built on or
+     migrated from. -->
 
 | Package | URL | Purpose |
 |---|---|---|
@@ -129,17 +129,17 @@ update independently of this repo.
 
 ## Executive Summary
 
-48 competitor packages plus **DCM proper (dcm.dev, 487 rules)** were audited rule-by-rule against saropa_lints.
-DCM is the largest single competitor: saropa covers 421/487 (86%) with exact or semantic equivalents, 16 (3%)
+48 alternative packages plus **DCM proper (dcm.dev, 487 rules)** were audited rule-by-rule against saropa_lints.
+DCM is the largest single alternative: saropa covers 421/487 (86%) with exact or semantic equivalents, 16 (3%)
 partially, and has 50 true gaps (10%). Across all packages, roughly 360+ individual GAP findings were logged,
 but the true number of **distinct, generalizable gaps** is far smaller — most GAPs cluster into a handful of
 themes (see below) or are bespoke internal conventions of a single company's open-sourced linter with no broader
 applicability (ripplearc_linter, mad_lint's `mapped_fields_*` family, team_guard). saropa_lints has HAVE/PARTIAL
-coverage for roughly 75-85% of rules in the median competitor package; the largest packages checked (DCM 487
+coverage for roughly 75-85% of rules in the median alternative package; the largest packages checked (DCM 487
 rules, many_lints 261 rules, flutter_skill_lints 279 rules) confirm this ratio directly (421/487, 190/261 and
 231/279 HAVE respectively). The three biggest structural gaps are: (1) **zero fpdart coverage** (~26 rules, 100%
 GAP — the single largest unaddressed rule family), (2) **no generic, user-configurable
-architecture/import-boundary engine** (5+ competitors independently built one; saropa has only fixed
+architecture/import-boundary engine** (5+ alternatives independently built one; saropa has only fixed
 UI/domain/data heuristics), and (3) **thin coverage of newer/niche ecosystem packages** — Riverpod
 lifecycle/naming completeness, Mocktail, Patrol, get_it, easy_localization, and Flame all have partial-to-zero
 support despite saropa's deep Bloc/GetX/Equatable coverage in the same space.
@@ -211,7 +211,7 @@ regeneration/investigation as a follow-up task independent of this document.
 ## Gap Themes
 
 <!--
-  Grouped by underlying concept, not by competitor package, so duplicate gaps (the same idea proposed by
+  Grouped by underlying concept, not by package, so duplicate gaps (the same idea proposed by
   multiple packages) are counted once. Each theme lists which package(s) raised it and roughly how many
   distinct rules fall under it. This is the section to use when prioritizing what to build next.
 -->
@@ -232,7 +232,7 @@ package support" decision, since it requires modeling a whole third-party type s
 
 ### 2. Generic, user-configurable architecture/import-boundary engines (~30+ unique gaps, 6 packages)
 
-The single most-repeated pattern across the audit: at least six competitors independently built a
+The single most-repeated pattern across the audit: at least six alternative packages independently built a
 **project-configurable** rule engine (YAML/annotation-driven) for banning imports, enforcing layer
 dependencies, requiring naming conventions per component type, or requiring/forbidding base types —
 none of which saropa_lints has, because saropa's Clean-Architecture coverage
@@ -347,7 +347,7 @@ literals).
 ### 9. Budget/count-style rules with missing variants (~7 unique gaps, 3 packages)
 
 saropa has function-length, parameter-count, and cyclomatic-complexity budgets but is missing sibling
-count-based budgets that competitors ship: `avoid_long_files` (a true configurable line-count-with-max-lines-param
+count-based budgets that other packages ship: `avoid_long_files` (a true configurable line-count-with-max-lines-param
 variant — many_lints; saropa's `avoid_long_length_files` family is tier-gated/opinionated, not
 user-configurable), `avoid_too_many_methods` (class method-count budget), `avoid_too_many_widgets_per_build`
 (widget-instantiation-count per `build()`), `max_statements` (statement-count, distinct from line-count),
@@ -495,7 +495,7 @@ saropa wants dedicated `logd` support.
   `prefer_widget_methods_over_classes` recommends the **opposite**, a documented philosophical conflict.
 - `avoid_widget_operator_equals` — flags `operator ==` overridden directly on a Widget subclass; saropa's
   similarly-purposed `require_extend_equatable` fires on any `==` override and suggests extending Equatable,
-  which is what this competitor rule argues against for widgets specifically.
+  which is what their rule argues against for widgets specifically.
 
 #### Partial
 
@@ -543,7 +543,7 @@ PARTIAL if a rule with this exact name already exists), `functional_ref`, `notif
 - **Total rules**: 31
 - **Coverage**: HAVE: 15, PARTIAL: 3, GAP: 13
 
-**Bug found in saropa_lints itself (not a competitor gap):** `use_closest_build_context`
+**Bug found in saropa_lints itself (not an alternative-package gap):** `use_closest_build_context`
 (`lib/src/rules/core/context_rules.dart:1483`, class `UseClosestBuildContextRule`) is registered with a real
 `LintCode` but its `runWithReporter` body is empty (`{}`) — a silent no-op. Worth fixing independent of this doc.
 
@@ -826,7 +826,7 @@ All 20 rules are specific to the niche `all_observer` reactive-state library and
 - `@mutated` → `prefer-correct-mutated` — saropa's `avoid_parameter_mutation`/`avoid_collection_mutating_methods`
   are unconditional heuristics with no opt-out annotation mechanism; also `avoid_collection_mutating_methods`
   is scoped to mutations inside `setState()` specifically, materially narrower than the general-purpose
-  competitor rule.
+  rule.
 
 ### dart_code_metrics_presets
 
@@ -1199,7 +1199,7 @@ incomplete (`hardcoded_strings_lint`, `flutter_refactor_plugin`).
 ### DCM proper (dcm.dev) — 487 rules
 
 Audited 2026-09-02 against dcm.dev/docs/rules/ (the commercial DCM product, NOT the Bancolombia
-`dart_code_linter` open-source fork which has its own section above). DCM is the single largest competitor
+`dart_code_linter` open-source fork which has its own section above). DCM is the single largest alternative
 with 487 published lint rules across Common Dart, Flutter, Provider, Bloc, Riverpod, and Equatable categories.
 
 **Method**: All 487 DCM rule names were extracted from the published docs page. 378 have an exact name match
@@ -1326,7 +1326,6 @@ equivalent for the other 5 categories:
 - `avoid-focusable-offstage` — no Offstage focus check
 - `avoid-merge-semantics-list-tile` — no ListTile-specific MergeSemantics check
 - `keep-state-below-its-widget` — no State class ordering rule
-- `prefer-container` — no DecoratedBox+SizedBox→Container consolidation
 - `prefer-correct-static-icon-provider` — no static icon provider check
 - `prefer-haptic-feedback-on-interaction` — no haptic feedback check
 - `prefer-localized-semantic-labels` — no localized-label requirement
