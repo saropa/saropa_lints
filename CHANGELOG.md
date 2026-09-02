@@ -66,6 +66,15 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.2.8] — Unreleased
+
+### Changed
+
+- Cost-aware rule shedding: memory pressure now sheds type-resolving and high-cost rules first (level 1), then INFO-severity (level 2), then WARNING-severity (level 3). No action required.
+- Status bar tooltip shows shed rule breakdown by category (type-resolving, high-cost, INFO, WARNING) when shedding is active. No action required.
+
+---
+
 ## [15.2.7]
 
 Adds graduated rule shedding under memory pressure — the analyzer plugin now progressively disables low-severity rules when RSS approaches its cap, keeping essential rules running. The VS Code extension surfaces shedding state in the status bar and tooltip. Also includes publish script hardening. [log](https://github.com/saropa/saropa_lints/blob/v15.2.7/CHANGELOG.md)

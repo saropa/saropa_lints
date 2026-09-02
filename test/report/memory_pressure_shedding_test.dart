@@ -1,5 +1,6 @@
-/// Verifies MemoryPressureHandler's graduated rule shedding — severity-based
-/// shed levels that progressively disable non-essential rules under memory
+/// Verifies MemoryPressureHandler's cost-aware graduated rule shedding —
+/// type-resolving and high-cost rules are shed first, then severity-based
+/// levels progressively disable remaining non-essential rules under memory
 /// pressure. See project_context_throttle_memory.dart for the implementation.
 library;
 
@@ -14,6 +15,7 @@ void _resetAll() {
   MemoryPressureHandler.setHardRssLimitMb(0);
   MemoryPressureHandler.resetShedStateForTesting();
   MemoryPressureHandler.registerRuleSeverities({});
+  MemoryPressureHandler.registerRuleCosts(typeResolving: {}, highCost: {});
   MemoryPressureHandler.onShedLevelChanged = null;
 }
 
@@ -39,7 +41,11 @@ void main() {
     // Second call replaces — old_rule should no longer exist.
     MemoryPressureHandler.registerRuleSeverities({'new_rule': 0});
 
-    // Level 1 sheds INFO (index 0).
+    // Register new_rule as type-resolving so it's eligible at level 1.
+    MemoryPressureHandler.registerRuleCosts(
+      typeResolving: {'new_rule'},
+      highCost: {},
+    );
     MemoryPressureHandler.setShedLevelForTest(1);
     expect(
       MemoryPressureHandler.isRuleShed('old_rule'),
@@ -54,87 +60,170 @@ void main() {
       'info_rule': 0,
       'warning_rule': 1,
     });
+    MemoryPressureHandler.registerRuleCosts(
+      typeResolving: {'info_rule', 'warning_rule'},
+      highCost: {},
+    );
     MemoryPressureHandler.setShedLevelForTest(0);
 
     expect(MemoryPressureHandler.isRuleShed('info_rule'), isFalse);
     expect(MemoryPressureHandler.isRuleShed('warning_rule'), isFalse);
   });
 
-  test('isRuleShed at level 1 sheds INFO-severity rules only', () {
-    // Level 1 → maxShedSeverityIndex = 0 → sheds index <= 0 → INFO only.
-    MemoryPressureHandler.registerRuleSeverities({
-      'info_rule': 0,
-      'warning_rule': 1,
-      'error_rule': 2,
+  group('cost-aware shedding', () {
+    /// Standard rule set for cost-aware tests:
+    ///   - type_info: INFO + type-resolving (expensive, shed at level 1)
+    ///   - type_warn: WARNING + type-resolving (expensive, shed at level 1)
+    ///   - high_info: INFO + high cost (expensive, shed at level 1)
+    ///   - cheap_info: INFO + no type/cost flag (cheap, shed at level 2)
+    ///   - cheap_warn: WARNING + no type/cost flag (cheap, shed at level 3)
+    ///   - error_type: ERROR + type-resolving (never shed)
+    void _registerCostAwareRules() {
+      MemoryPressureHandler.registerRuleSeverities({
+        'type_info': 0,
+        'type_warn': 1,
+        'high_info': 0,
+        'cheap_info': 0,
+        'cheap_warn': 1,
+        'error_type': 2,
+      });
+      MemoryPressureHandler.registerRuleCosts(
+        typeResolving: {'type_info', 'type_warn', 'error_type'},
+        highCost: {'high_info'},
+      );
+    }
+
+    test('level 1 sheds only expensive (type-resolving + high-cost) rules', () {
+      _registerCostAwareRules();
+      MemoryPressureHandler.setShedLevelForTest(1);
+
+      // Expensive rules shed at level 1.
+      expect(
+        MemoryPressureHandler.isRuleShed('type_info'),
+        isTrue,
+        reason: 'type-resolving INFO shed at level 1',
+      );
+      expect(
+        MemoryPressureHandler.isRuleShed('type_warn'),
+        isTrue,
+        reason: 'type-resolving WARNING shed at level 1',
+      );
+      expect(
+        MemoryPressureHandler.isRuleShed('high_info'),
+        isTrue,
+        reason: 'high-cost INFO shed at level 1',
+      );
+
+      // Cheap rules survive level 1.
+      expect(
+        MemoryPressureHandler.isRuleShed('cheap_info'),
+        isFalse,
+        reason: 'cheap INFO kept at level 1',
+      );
+      expect(
+        MemoryPressureHandler.isRuleShed('cheap_warn'),
+        isFalse,
+        reason: 'cheap WARNING kept at level 1',
+      );
+
+      // ERROR never shed.
+      expect(
+        MemoryPressureHandler.isRuleShed('error_type'),
+        isFalse,
+        reason: 'ERROR never shed even if type-resolving',
+      );
     });
-    MemoryPressureHandler.setShedLevelForTest(1);
 
-    expect(
-      MemoryPressureHandler.isRuleShed('info_rule'),
-      isTrue,
-      reason: 'INFO shed at level 1',
-    );
-    expect(
-      MemoryPressureHandler.isRuleShed('warning_rule'),
-      isFalse,
-      reason: 'WARNING not shed at level 1',
-    );
-    expect(
-      MemoryPressureHandler.isRuleShed('error_rule'),
-      isFalse,
-      reason: 'ERROR never shed',
-    );
-  });
+    test('level 2 adds cheap INFO-severity rules', () {
+      _registerCostAwareRules();
+      MemoryPressureHandler.setShedLevelForTest(2);
 
-  test('isRuleShed at level 2 sheds INFO and WARNING', () {
-    // Level 2 → maxShedSeverityIndex = 1 → sheds index <= 1 → INFO + WARNING.
-    MemoryPressureHandler.registerRuleSeverities({
-      'info_rule': 0,
-      'warning_rule': 1,
-      'error_rule': 2,
+      // All expensive + cheap INFO shed.
+      expect(MemoryPressureHandler.isRuleShed('type_info'), isTrue);
+      expect(MemoryPressureHandler.isRuleShed('type_warn'), isTrue);
+      expect(MemoryPressureHandler.isRuleShed('high_info'), isTrue);
+      expect(MemoryPressureHandler.isRuleShed('cheap_info'), isTrue);
+
+      // Cheap WARNING survives level 2.
+      expect(
+        MemoryPressureHandler.isRuleShed('cheap_warn'),
+        isFalse,
+        reason: 'cheap WARNING kept at level 2',
+      );
+
+      // ERROR never shed.
+      expect(MemoryPressureHandler.isRuleShed('error_type'), isFalse);
     });
-    MemoryPressureHandler.setShedLevelForTest(2);
 
-    expect(MemoryPressureHandler.isRuleShed('info_rule'), isTrue);
-    expect(MemoryPressureHandler.isRuleShed('warning_rule'), isTrue);
-    // ERROR-severity rules are never shed (too important).
-    expect(MemoryPressureHandler.isRuleShed('error_rule'), isFalse);
+    test('level 3 sheds all non-essential non-ERROR rules', () {
+      _registerCostAwareRules();
+      MemoryPressureHandler.setShedLevelForTest(3);
+
+      // Everything shed except ERROR.
+      expect(MemoryPressureHandler.isRuleShed('type_info'), isTrue);
+      expect(MemoryPressureHandler.isRuleShed('type_warn'), isTrue);
+      expect(MemoryPressureHandler.isRuleShed('high_info'), isTrue);
+      expect(MemoryPressureHandler.isRuleShed('cheap_info'), isTrue);
+      expect(MemoryPressureHandler.isRuleShed('cheap_warn'), isTrue);
+
+      // ERROR never shed.
+      expect(MemoryPressureHandler.isRuleShed('error_type'), isFalse);
+    });
   });
 
   test('unknown rule names are not shed', () {
     MemoryPressureHandler.registerRuleSeverities({'known_rule': 0});
-    MemoryPressureHandler.setShedLevelForTest(2);
+    MemoryPressureHandler.registerRuleCosts(
+      typeResolving: {'known_rule'},
+      highCost: {},
+    );
+    MemoryPressureHandler.setShedLevelForTest(3);
 
     // Rules not in the severity map are unknown — never shed them.
     expect(MemoryPressureHandler.isRuleShed('unknown_rule'), isFalse);
   });
 
-  test('essential rules are never shed regardless of severity', () {
-    // Register an essential-tier rule at INFO severity (index 0) — the most
-    // aggressively shed band. It must still be protected.
+  test('essential rules are never shed regardless of cost or severity', () {
+    // Register an essential-tier rule as type-resolving INFO — the most
+    // aggressively shed combination. It must still be protected.
     final essentialName = essentialRules.first;
     MemoryPressureHandler.registerRuleSeverities({essentialName: 0});
-    MemoryPressureHandler.setShedLevelForTest(2);
+    MemoryPressureHandler.registerRuleCosts(
+      typeResolving: {essentialName},
+      highCost: {},
+    );
+    MemoryPressureHandler.setShedLevelForTest(3);
 
     expect(MemoryPressureHandler.isRuleShed(essentialName), isFalse);
   });
 
-  test('shedRuleCount reflects current shed set size', () {
+  test('shedRuleCount reflects cost-aware shed set size', () {
+    // 3 expensive + 1 cheap INFO + 1 cheap WARNING = 5 rules total.
     MemoryPressureHandler.registerRuleSeverities({
-      'info_a': 0,
-      'info_b': 0,
-      'warning_c': 1,
+      'type_a': 0,
+      'type_b': 1,
+      'high_c': 0,
+      'cheap_d': 0,
+      'cheap_e': 1,
     });
+    MemoryPressureHandler.registerRuleCosts(
+      typeResolving: {'type_a', 'type_b'},
+      highCost: {'high_c'},
+    );
 
     expect(MemoryPressureHandler.shedRuleCount, 0, reason: 'level 0');
 
-    // Level 1 sheds INFO only (info_a + info_b = 2).
+    // Level 1: 3 expensive rules (type_a, type_b, high_c).
     MemoryPressureHandler.setShedLevelForTest(1);
-    expect(MemoryPressureHandler.shedRuleCount, 2);
-
-    // Level 2 adds WARNING (info_a + info_b + warning_c = 3).
-    MemoryPressureHandler.setShedLevelForTest(2);
     expect(MemoryPressureHandler.shedRuleCount, 3);
+
+    // Level 2: + cheap INFO (cheap_d) = 4.
+    MemoryPressureHandler.setShedLevelForTest(2);
+    expect(MemoryPressureHandler.shedRuleCount, 4);
+
+    // Level 3: + cheap WARNING (cheap_e) = 5.
+    MemoryPressureHandler.setShedLevelForTest(3);
+    expect(MemoryPressureHandler.shedRuleCount, 5);
   });
 
   test('getStats includes soft/shed fields', () {
@@ -216,21 +305,25 @@ void main() {
     // directly, then calls _rebuildShedRuleNames. Verify it still works
     // after the early-return guard was added to _updateShedLevel.
     MemoryPressureHandler.registerRuleSeverities({
-      'info_rule': 0,
-      'warning_rule': 1,
+      'type_rule': 0,
+      'cheap_rule': 1,
     });
+    MemoryPressureHandler.registerRuleCosts(
+      typeResolving: {'type_rule'},
+      highCost: {},
+    );
 
-    // Set to level 1 — should shed info_rule.
+    // Level 1 — sheds type_rule (expensive).
     MemoryPressureHandler.setShedLevelForTest(1);
     expect(MemoryPressureHandler.shedLevel, 1);
-    expect(MemoryPressureHandler.isRuleShed('info_rule'), isTrue);
+    expect(MemoryPressureHandler.isRuleShed('type_rule'), isTrue);
     expect(MemoryPressureHandler.shedRuleCount, 1);
 
     // Set to level 1 again — early-return in _updateShedLevel shouldn't
     // affect the test helper since it sets the field directly.
     MemoryPressureHandler.setShedLevelForTest(1);
     expect(MemoryPressureHandler.shedLevel, 1);
-    expect(MemoryPressureHandler.isRuleShed('info_rule'), isTrue);
+    expect(MemoryPressureHandler.isRuleShed('type_rule'), isTrue);
   });
 
   test('onShedLevelChanged callback fires on level transition', () {
@@ -241,6 +334,10 @@ void main() {
     };
 
     MemoryPressureHandler.registerRuleSeverities({'rule_a': 0});
+    MemoryPressureHandler.registerRuleCosts(
+      typeResolving: {'rule_a'},
+      highCost: {},
+    );
     MemoryPressureHandler.setSoftLimitTrippedForTest(true);
     MemoryPressureHandler.setShedLevelForTest(1);
 
@@ -251,5 +348,26 @@ void main() {
     if (firedWithLevel >= 0) {
       expect(firedWithLevel, 1);
     }
+  });
+
+  test('level 3 clamp — values above 3 are clamped down', () {
+    MemoryPressureHandler.registerRuleSeverities({'rule_a': 0});
+    MemoryPressureHandler.registerRuleCosts(typeResolving: {}, highCost: {});
+    // Level 5 should clamp to 3.
+    MemoryPressureHandler.setShedLevelForTest(5);
+    expect(MemoryPressureHandler.shedLevel, 3);
+  });
+
+  test('cost metadata without severity has no effect', () {
+    // Rules in cost sets but NOT in severity map should not be shed —
+    // _rebuildShedRuleNames iterates _ruleSeverityIndex, not the cost sets.
+    MemoryPressureHandler.registerRuleSeverities({});
+    MemoryPressureHandler.registerRuleCosts(
+      typeResolving: {'phantom_rule'},
+      highCost: {},
+    );
+    MemoryPressureHandler.setShedLevelForTest(3);
+
+    expect(MemoryPressureHandler.isRuleShed('phantom_rule'), isFalse);
   });
 }

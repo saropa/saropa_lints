@@ -9,7 +9,7 @@ import { saropaLintsDataPath } from '../reportsPaths';
  * by the Dart analyzer plugin on shed-level transitions.
  */
 export interface MemoryPressureState {
-  /** Graduated shed level: 0=normal, 1=INFO shed, 2=INFO+WARNING shed. */
+  /** Cost-aware shed level: 0=normal, 1=expensive (type-resolving+high-cost), 2=+INFO, 3=+WARNING. */
   shedLevel: number;
   /** Current resident-set size in MB when the transition occurred. */
   rssMb: number;
@@ -27,6 +27,17 @@ export interface MemoryPressureState {
   shedEnabled: boolean;
   /** ISO 8601 timestamp of the transition. */
   timestamp: string;
+  /** Breakdown of shed rules by category — written when shedLevel > 0. */
+  shedDetails?: {
+    typeResolving: number;
+    highCost: number;
+    infoSeverity: number;
+    warningSeverity: number;
+    typeResolvingRules?: string[];
+    highCostRules?: string[];
+    infoSeverityRules?: string[];
+    warningSeverityRules?: string[];
+  };
 }
 
 /**
@@ -116,69 +127,101 @@ export class MemoryPressureWatcher implements vscode.Disposable {
  * Priority over the process-level `systemHealthSuffix` — plugin-level
  * memory pressure is more actionable than aggregate process RSS.
  */
-export function memoryPressureSuffix(
-  state: MemoryPressureState | null,
-): string | undefined {
-  if (!state) return undefined;
+/**
+ * l10n key map for each pressure band. Single source of truth — both the
+ * status-bar suffix and the tooltip line read from this table so they
+ * never disagree about which state won.
+ */
+interface PressureBandKeys {
+  statusBar: string;
+  tooltip: string;
+}
 
-  // Hard limit tripped — all rules paused, most urgent.
-  if (state.hardLimitTripped) {
-    return l10n('memoryPressure.statusBar.hardTripped', {
-      rssMb: String(state.rssMb),
-    });
-  }
-  // Level 2: INFO + WARNING rules shed.
-  if (state.shedLevel >= 2) {
-    return l10n('memoryPressure.statusBar.shedWarning', {
-      count: String(state.shedRuleCount),
-    });
-  }
-  // Level 1: INFO rules shed — informational.
-  if (state.shedLevel >= 1) {
-    return l10n('memoryPressure.statusBar.shedInfo', {
-      count: String(state.shedRuleCount),
-    });
-  }
-  // Soft limit tripped but shedding not enabled — persistent indicator so
-  // the user has ongoing visibility even after dismissing the one-shot toast.
-  if (state.softLimitTripped && !state.shedEnabled) {
-    return l10n('memoryPressure.statusBar.pressureNoShed', {
-      rssMb: String(state.rssMb),
-    });
+/** Ordered priority: hardTripped > shedLevel 3 > 2 > 1 > softNoShed. */
+const PRESSURE_BANDS: readonly {
+  match: (s: MemoryPressureState) => boolean;
+  keys: PressureBandKeys;
+  /** l10n interpolation tokens for this band. */
+  params: (s: MemoryPressureState) => Record<string, string>;
+}[] = [
+  {
+    match: (s) => s.hardLimitTripped,
+    keys: {
+      statusBar: 'memoryPressure.statusBar.hardTripped',
+      tooltip: 'memoryPressure.tooltip.hardTripped',
+    },
+    params: (s) => ({ rssMb: String(s.rssMb) }),
+  },
+  {
+    match: (s) => s.shedLevel >= 3,
+    keys: {
+      statusBar: 'memoryPressure.statusBar.shedCritical',
+      tooltip: 'memoryPressure.tooltip.shedLevel3',
+    },
+    params: (s) => ({ count: String(s.shedRuleCount) }),
+  },
+  {
+    match: (s) => s.shedLevel >= 2,
+    keys: {
+      statusBar: 'memoryPressure.statusBar.shedWarning',
+      tooltip: 'memoryPressure.tooltip.shedLevel2',
+    },
+    params: (s) => ({ count: String(s.shedRuleCount) }),
+  },
+  {
+    match: (s) => s.shedLevel >= 1,
+    keys: {
+      statusBar: 'memoryPressure.statusBar.shedInfo',
+      tooltip: 'memoryPressure.tooltip.shedLevel1',
+    },
+    params: (s) => ({ count: String(s.shedRuleCount) }),
+  },
+  {
+    match: (s) => s.softLimitTripped && !s.shedEnabled,
+    keys: {
+      statusBar: 'memoryPressure.statusBar.pressureNoShed',
+      tooltip: 'memoryPressure.tooltip.pressureNoShed',
+    },
+    params: (s) => ({ rssMb: String(s.rssMb) }),
+  },
+];
+
+/** Pick the first matching pressure band for the given state. */
+function matchPressureBand(state: MemoryPressureState | null) {
+  if (!state) return undefined;
+  for (const band of PRESSURE_BANDS) {
+    if (band.match(state)) return { keys: band.keys, params: band.params(state) };
   }
   return undefined;
 }
 
+export function memoryPressureSuffix(
+  state: MemoryPressureState | null,
+): string | undefined {
+  const band = matchPressureBand(state);
+  return band ? l10n(band.keys.statusBar, band.params) : undefined;
+}
+
 /**
  * Produces the tooltip line for the current memory-pressure state, or
- * undefined when no line is warranted. Shares the same hard-tripped /
- * shed-level-2 / shed-level-1 priority order as {@link memoryPressureSuffix}
- * so the status-bar text and tooltip never disagree about which state won.
+ * undefined when no line is warranted. Uses the same priority table as
+ * {@link memoryPressureSuffix} so the two never disagree.
  */
 export function memoryPressureTooltipLine(
   state: MemoryPressureState | null,
 ): string | undefined {
-  if (!state) return undefined;
-
-  if (state.hardLimitTripped) {
-    return l10n('memoryPressure.tooltip.hardTripped');
-  }
-  if (state.shedLevel >= 2) {
-    return l10n('memoryPressure.tooltip.shedLevel2', {
-      count: String(state.shedRuleCount),
-    });
-  }
-  if (state.shedLevel >= 1) {
-    return l10n('memoryPressure.tooltip.shedLevel1', {
-      count: String(state.shedRuleCount),
-    });
-  }
-  // Soft limit tripped with shedding off — show a tooltip so the user
-  // knows pressure exists even if they dismissed the one-shot toast.
-  if (state.softLimitTripped && !state.shedEnabled) {
-    return l10n('memoryPressure.tooltip.pressureNoShed');
-  }
-  return undefined;
+  const band = matchPressureBand(state);
+  if (!band) return undefined;
+  const base = l10n(band.keys.tooltip, band.params);
+  // Append shed breakdown when details are available.
+  const details = state?.shedDetails;
+  if (!details || !state || state.shedLevel <= 0) return base;
+  const parts: string[] = [];
+  if (details.typeResolving > 0) parts.push(`${details.typeResolving} type-resolving`);
+  if (details.highCost > 0) parts.push(`${details.highCost} high-cost`);
+  if (details.infoSeverity > 0) parts.push(`${details.infoSeverity} INFO`);
+  if (details.warningSeverity > 0) parts.push(`${details.warningSeverity} WARNING`);
+  return parts.length > 0 ? `${base} (${parts.join(', ')})` : base;
 }
 
 /**

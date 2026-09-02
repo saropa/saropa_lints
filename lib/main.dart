@@ -215,6 +215,9 @@ void _writeMemoryStateFile(int shedLevel, int rssMb) {
     // Derive the reports directory from the log file's parent.
     final dir = File(logPath).parent.path;
     final stats = MemoryPressureHandler.getStats();
+    // Include shed rule details for extension telemetry display —
+    // lets the user see exactly which rules were dropped and why.
+    final shedDetails = MemoryPressureHandler.getShedDetails();
     final payload = jsonEncode({
       'shedLevel': shedLevel,
       'rssMb': rssMb,
@@ -224,6 +227,7 @@ void _writeMemoryStateFile(int shedLevel, int rssMb) {
       'hardLimitTripped': stats['hardLimitTripped'],
       'shedRuleCount': stats['shedRuleCount'],
       'shedEnabled': stats['shedEnabled'],
+      'shedDetails': shedDetails,
       'timestamp': DateTime.now().toIso8601String(),
     });
     File('$dir/memory_state.json').writeAsStringSync(payload);

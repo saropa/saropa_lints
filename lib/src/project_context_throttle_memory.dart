@@ -1084,10 +1084,15 @@ class MemoryPressureHandler {
   static int get _softRecoveryMarginMb =>
       _softLimitMb > 0 ? (_softLimitMb * 0.1).round().clamp(32, 512) : 0;
 
+  /// Highest supported shed level. Single source of truth for clamp bounds,
+  /// escalation branches, and test helpers.
+  static const int maxShedLevel = 3;
+
   /// Current shedding level, escalated as RSS climbs past the soft threshold.
   ///   0 = no shedding (normal operation)
-  ///   1 = INFO-severity rules shed (non-essential only)
-  ///   2 = INFO + WARNING-severity rules shed (non-essential only)
+  ///   1 = expensive rules shed (type-resolving + high/extreme cost)
+  ///   2 = expensive + INFO-severity rules shed
+  ///   3 = expensive + INFO + WARNING-severity rules shed
   /// ERROR-severity and essential-tier rules are never shed.
   static int _shedLevel = 0;
 
@@ -1172,20 +1177,22 @@ class MemoryPressureHandler {
   }
 
   /// Force the shed level for testing. Allows end-to-end shedding tests
-  /// without real RSS pressure.
+  /// without real RSS pressure. Levels: 0=none, 1=expensive, 2=+INFO, 3=+WARNING.
   static void setShedLevelForTest(int level) {
-    _shedLevel = level.clamp(0, 2);
+    _shedLevel = level.clamp(0, maxShedLevel);
     // Rebuild the shed set so isRuleShed reflects the new level.
     _rebuildShedRuleNames();
   }
 
   /// Reset all soft-limit and shedding state. Test-only — clears the soft
-  /// flag, shed level, and shed rule names so tests start clean.
+  /// flag, shed level, shed rule names, and cost metadata so tests start clean.
   static void resetShedStateForTesting() {
     _shedEnabled = false;
     _softLimitTripped = false;
     _shedLevel = 0;
     _shedRuleNames.clear();
+    _typeResolvingRules.clear();
+    _highCostRules.clear();
   }
 
   /// Whether the process RSS is currently over the hard cap, meaning rule
@@ -1261,10 +1268,9 @@ class MemoryPressureHandler {
 
   /// Evaluate the soft RSS threshold and adjust [_shedLevel] accordingly.
   ///
-  /// Shedding escalates as RSS climbs past the soft threshold: level 1 sheds
-  /// INFO-severity rules, level 2 adds WARNING-severity rules. The midpoint
-  /// between soft and hard limits decides the escalation boundary — if RSS
-  /// is above the midpoint, escalate to level 2.
+  /// Cost-aware shedding: level 1 sheds expensive (type-resolving + high-cost)
+  /// rules first, level 2 adds INFO-severity, level 3 adds WARNING-severity.
+  /// Two escalation boundaries split the soft→hard range into thirds.
   ///
   /// De-escalation happens when RSS drops below [_softLimitMb] minus
   /// [_softRecoveryMarginMb] — the hysteresis band prevents flapping when
@@ -1292,12 +1298,13 @@ class MemoryPressureHandler {
       _updateShedLevel(1, rss);
       PluginLogger.log(
         '[memory] WARNING: RSS ${rss}MB crossed soft limit ${soft}MB. '
-        'Shedding INFO-severity rules (${_shedRuleNames.length} rules).',
+        'Shedding expensive rules — type-resolving + high-cost '
+        '(${_shedRuleNames.length} rules).',
       );
       stderr.writeln(
         '[saropa_lints] Memory pressure: RSS ${rss}MB >= ${soft}MB soft '
-        'limit. Shedding INFO-severity non-essential rules to reduce '
-        'memory growth.',
+        'limit. Shedding type-resolving and high-cost non-essential '
+        'rules to reduce memory growth.',
       );
     } else {
       // Shedding not enabled — notify the extension so it can prompt the
@@ -1341,30 +1348,56 @@ class MemoryPressureHandler {
     }
   }
 
-  /// Still above soft — check whether to escalate from level 1 to 2, or
-  /// de-escalate back from 2 to 1. The midpoint between soft and hard limits
-  /// is the escalation boundary. Only reached when shedding is enabled —
-  /// otherwise there's nothing to escalate.
+  /// Still above soft — escalate through 3 levels or de-escalate as RSS drops.
+  /// Two escalation boundaries split the soft→hard range into thirds:
+  ///   esc1 = soft + (hard-soft)/3  → level 2 (expensive + INFO rules)
+  ///   esc2 = soft + 2*(hard-soft)/3 → level 3 (all non-essential non-ERROR)
+  /// Only reached when shedding is enabled.
   static void _refreshEscalation(int rss, int soft) {
-    final escalationPoint = soft + (_hardLimitMb - soft) ~/ 2;
-    if (_shedLevel == 1 && rss >= escalationPoint) {
+    final range = _hardLimitMb - soft;
+    // Guard: if range is too small for meaningful thirds, collapse to
+    // a single escalation point at the midpoint — level 2 is skipped,
+    // but that's correct: there's no room for an intermediate band.
+    final esc1 = soft + range ~/ 3;
+    final esc2 = (range < 6) ? esc1 : soft + (range * 2) ~/ 3;
+    final margin = _softRecoveryMarginMb;
+
+    // Escalate upward.
+    if (_shedLevel < maxShedLevel && rss >= esc2) {
+      _updateShedLevel(maxShedLevel, rss);
+      PluginLogger.log(
+        '[memory] WARNING: RSS ${rss}MB crossed escalation-2 '
+        '${esc2}MB. Shedding all non-essential non-ERROR rules '
+        '(${_shedRuleNames.length} rules total).',
+      );
+      stderr.writeln(
+        '[saropa_lints] Memory pressure critical: RSS ${rss}MB. '
+        'Now shedding all non-essential WARNING-severity rules too.',
+      );
+    } else if (_shedLevel < 2 && rss >= esc1) {
       _updateShedLevel(2, rss);
       PluginLogger.log(
-        '[memory] WARNING: RSS ${rss}MB crossed escalation point '
-        '${escalationPoint}MB. Shedding WARNING-severity rules too '
+        '[memory] WARNING: RSS ${rss}MB crossed escalation-1 '
+        '${esc1}MB. Shedding INFO-severity rules too '
         '(${_shedRuleNames.length} rules total).',
       );
       stderr.writeln(
         '[saropa_lints] Memory pressure escalated: RSS ${rss}MB. '
-        'Now shedding WARNING-severity non-essential rules too.',
+        'Now shedding INFO-severity non-essential rules too.',
       );
-    } else if (_shedLevel == 2 &&
-        rss < escalationPoint - _softRecoveryMarginMb) {
-      // RSS dropped below escalation recovery — de-escalate to level 1.
+    }
+    // De-escalate downward.
+    else if (_shedLevel == 3 && rss < esc2 - margin) {
+      _updateShedLevel(2, rss);
+      PluginLogger.log(
+        '[memory] RSS ${rss}MB below escalation-2 recovery. '
+        'De-escalated to level 2 (${_shedRuleNames.length} rules).',
+      );
+    } else if (_shedLevel == 2 && rss < esc1 - margin) {
       _updateShedLevel(1, rss);
       PluginLogger.log(
-        '[memory] RSS ${rss}MB below escalation recovery. '
-        'De-escalated to INFO-only shedding '
+        '[memory] RSS ${rss}MB below escalation-1 recovery. '
+        'De-escalated to level 1 — expensive rules only '
         '(${_shedRuleNames.length} rules).',
       );
     }
@@ -1392,6 +1425,16 @@ class MemoryPressureHandler {
   /// via [registerRuleSeverities]. Keyed by lower-case rule name.
   static final Map<String, int> _ruleSeverityIndex = {};
 
+  /// Whether each rule uses type resolution, populated alongside severity.
+  /// Type-resolving rules force the analyzer to resolve cross-library types,
+  /// which is the dominant memory cost — shed these first.
+  static final Set<String> _typeResolvingRules = {};
+
+  /// Rules with high or extreme RuleCost, populated alongside severity.
+  /// These rules traverse large AST subtrees or simulate cross-file analysis,
+  /// making them expensive even without type resolution.
+  static final Set<String> _highCostRules = {};
+
   /// Register the severity of each active rule so the shed mechanism can
   /// filter by severity without instantiating rules at shedding time.
   /// Called once at plugin startup after rule registration.
@@ -1404,29 +1447,58 @@ class MemoryPressureHandler {
       ..addAll(severities);
   }
 
-  /// Rebuild [_shedRuleNames] based on current [_shedLevel], essential-tier
-  /// protection, and per-rule severity metadata.
+  /// Register cost metadata for cost-aware shedding. [typeResolving] lists
+  /// rules that declare `usesTypeResolution => true`; [highCost] lists rules
+  /// with `RuleCost.high` or `RuleCost.extreme`. Called once at startup
+  /// alongside [registerRuleSeverities].
+  static void registerRuleCosts({
+    required Set<String> typeResolving,
+    required Set<String> highCost,
+  }) {
+    _typeResolvingRules
+      ..clear()
+      ..addAll(typeResolving);
+    _highCostRules
+      ..clear()
+      ..addAll(highCost);
+  }
+
+  /// Cost-aware graduated shedding with 3 levels. Type-resolving and
+  /// high-cost rules are the dominant memory consumers — shedding them
+  /// first gives the biggest RSS reduction per rule dropped.
   ///
-  /// Rules are shed when ALL of:
-  ///   1. Their severity index <= the shed threshold (level 1 → INFO only,
-  ///      level 2 → INFO + WARNING)
-  ///   2. They are NOT in the essential tier
-  ///   3. The shed level is > 0
+  /// Level 1: Shed expensive rules (type-resolving OR high/extreme cost),
+  ///          excluding essential-tier and ERROR-severity rules.
+  /// Level 2: Shed remaining INFO-severity rules (cheap syntactic rules
+  ///          that were kept at level 1).
+  /// Level 3: Shed remaining WARNING-severity rules.
+  ///
+  /// ERROR-severity and essential-tier rules are NEVER shed.
   static void _rebuildShedRuleNames() {
     _shedRuleNames.clear();
     if (_shedLevel <= 0) return;
 
-    // Severity threshold: level 1 sheds INFO (index 0), level 2 adds
-    // WARNING (index 1). ERROR (index 2) is never shed.
-    final maxShedSeverityIndex = _shedLevel - 1;
-
     for (final entry in _ruleSeverityIndex.entries) {
       final ruleName = entry.key;
       final severityIndex = entry.value;
-      // Skip ERROR-severity rules (never shed).
-      if (severityIndex > maxShedSeverityIndex) continue;
-      // Skip essential-tier rules (always protected).
+
+      // ERROR-severity rules (index 2) are never shed.
+      if (severityIndex >= 2) continue;
+      // Essential-tier rules are always protected.
       if (essentialRules.contains(ruleName)) continue;
+
+      // Level 3 (maxShedLevel): shed unconditionally — skip cost lookups.
+      if (_shedLevel < maxShedLevel) {
+        // Level 1: only expensive rules (type-resolving or high/extreme cost).
+        final isExpensive =
+            _typeResolvingRules.contains(ruleName) ||
+            _highCostRules.contains(ruleName);
+        if (_shedLevel == 1 && !isExpensive) continue;
+
+        // Level 2: expensive + INFO-severity rules. WARNING-only survive.
+        if (_shedLevel == 2 && !isExpensive && severityIndex > 0) continue;
+      }
+
       _shedRuleNames.add(ruleName);
     }
   }
@@ -1438,6 +1510,41 @@ class MemoryPressureHandler {
   static bool isRuleShed(String ruleName) {
     if (_shedLevel <= 0) return false;
     return _shedRuleNames.contains(ruleName);
+  }
+
+  /// Detailed breakdown of currently shed rules for extension telemetry.
+  /// Groups shed rules by category (typeResolving, highCost, infoSeverity,
+  /// warningSeverity) so the user can see exactly what coverage was lost.
+  /// Only called on shed-level transitions — not on the hot path.
+  static Map<String, dynamic> getShedDetails() {
+    if (_shedLevel <= 0) return {};
+    final typeResolving = <String>[];
+    final highCost = <String>[];
+    final infoSeverity = <String>[];
+    final warningSeverity = <String>[];
+    for (final name in _shedRuleNames) {
+      if (_typeResolvingRules.contains(name)) {
+        typeResolving.add(name);
+      } else if (_highCostRules.contains(name)) {
+        highCost.add(name);
+      } else if ((_ruleSeverityIndex[name] ?? -1) == 0) {
+        infoSeverity.add(name);
+      } else {
+        warningSeverity.add(name);
+      }
+    }
+    return {
+      'typeResolving': typeResolving.length,
+      'highCost': highCost.length,
+      'infoSeverity': infoSeverity.length,
+      'warningSeverity': warningSeverity.length,
+      // First 20 rule names per category — enough for diagnostics without
+      // bloating the state file on large projects.
+      'typeResolvingRules': typeResolving.take(20).toList(),
+      'highCostRules': highCost.take(20).toList(),
+      'infoSeverityRules': infoSeverity.take(20).toList(),
+      'warningSeverityRules': warningSeverity.take(20).toList(),
+    };
   }
 
   /// Current process resident-set size in MB, or -1 if unavailable.

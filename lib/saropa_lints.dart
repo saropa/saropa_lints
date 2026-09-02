@@ -3457,7 +3457,13 @@ void registerSaropaLintRules(PluginRegistry registry) {
     _logUnknownConflictingRuleReferences(rules);
     _logUnknownSupersedesRuleReferences(rules);
 
+    // Single pass: register rules with the analyzer AND build severity/cost
+    // metadata for cost-aware graduated shedding. Only non-disabled rules are
+    // included — disabled rules should not appear in the shedding registry.
     var registered = 0;
+    final severities = <String, int>{};
+    final typeResolving = <String>{};
+    final highCost = <String>{};
     for (final rule in rules) {
       final code = rule.code;
       if (code.lowerCaseName.isEmpty) continue;
@@ -3472,21 +3478,24 @@ void registerSaropaLintRules(PluginRegistry registry) {
       for (final generator in rule.fixGenerators) {
         registry.registerFixForRule(code, generator);
       }
-    }
 
-    // Build the severity map for graduated memory shedding. All rules are
-    // already instantiated, so we can read each rule's DiagnosticSeverity
-    // and map it to a 0-based index (INFO=0, WARNING=1, ERROR=2) for the
-    // pressure handler. The ordinal uses NONE=0, INFO=1, WARNING=2, ERROR=3,
-    // so we subtract 1 and clamp to get the shed index.
-    final severities = <String, int>{};
-    for (final rule in rules) {
-      // Map ordinal (NONE=0..ERROR=3) → shed index (INFO=0..ERROR=2).
-      // NONE-severity rules map to -1, clamped to 0 → shed as INFO.
-      severities[rule.code.lowerCaseName] = (rule.code.severity.ordinal - 1)
-          .clamp(0, 2);
+      // Build severity + cost metadata for this registered rule.
+      // Type-resolving and high-cost rules are the dominant memory consumers,
+      // so the pressure handler sheds them first (level 1) before falling
+      // back to severity-based shedding (levels 2-3).
+      final name = code.lowerCaseName;
+      severities[name] = (code.severity.ordinal - 1).clamp(0, 2);
+      if (rule.usesTypeResolution) typeResolving.add(name);
+      // Explicit name check instead of index comparison — survives enum reorder.
+      if (rule.cost == RuleCost.high || rule.cost == RuleCost.extreme) {
+        highCost.add(name);
+      }
     }
     MemoryPressureHandler.registerRuleSeverities(severities);
+    MemoryPressureHandler.registerRuleCosts(
+      typeResolving: typeResolving,
+      highCost: highCost,
+    );
 
     // User-visible telemetry — once the project root is known and the
     // buffered log flushes, consumers can see "Registered N rules" in
