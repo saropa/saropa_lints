@@ -68,7 +68,6 @@ String generatePluginsYaml({
   required Set<String> allRules,
   required Map<String, bool> platformSettings,
   required Map<String, bool> packageSettings,
-  List<String> rulePacksEnabled = const [],
   bool compact = false,
 }) {
   final StringBuffer buffer = StringBuffer();
@@ -83,16 +82,9 @@ String generatePluginsYaml({
   } else {
     buffer.writeln('    # version: unknown — run dart pub get to resolve');
   }
-  // log_level and lane live in analysis_options_custom.yaml (top-level keys)
-  // to avoid unsupported_option warnings from the SDK's plugin-block validator.
-  if (rulePacksEnabled.isNotEmpty) {
-    final sorted = List<String>.of(rulePacksEnabled)..sort();
-    buffer.writeln('    rule_packs:');
-    buffer.writeln('      enabled:');
-    for (final String id in sorted) {
-      buffer.writeln('        - $id');
-    }
-  }
+  // log_level, lane, and rule_packs live in analysis_options_custom.yaml
+  // (top-level keys) to avoid unsupported_option warnings from the SDK's
+  // plugin-block validator, which hardcodes the allowed key set.
   if (compact) {
     buffer.writeln(
       '    # SAROPA LINTS — plugin disabled. Rule list kept below so a',

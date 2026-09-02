@@ -116,6 +116,16 @@ String buildMinimalConfig(
   );
   buf.writeln();
 
+  // rule_packs lives here (not under plugins > saropa_lints:) to avoid
+  // unsupported_option warnings from the SDK's plugin-block validator.
+  buf.writeln('# RULE PACKS');
+  buf.writeln('# Enable migration / compatibility packs by uncommenting:');
+  buf.writeln('# rule_packs:');
+  buf.writeln('#   enabled:');
+  buf.writeln('#     - collection_compat');
+  buf.writeln('#     - dart_sdk_3_2');
+  buf.writeln();
+
   // Platform settings (no auto-detection available — user controls these)
   buf.writeln('# PLATFORM SETTINGS');
   buf.writeln("# Disable platforms your project doesn't target.");
@@ -327,4 +337,116 @@ String addOutputSetting(String content) {
   const outputLine = 'output: both\n';
 
   return content.prefix(insertPos) + outputLine + content.afterIndex(insertPos);
+}
+
+// ---------------------------------------------------------------------------
+// rule_packs in analysis_options_custom.yaml
+// ---------------------------------------------------------------------------
+
+/// Pattern matching a top-level `rule_packs:` block (with `enabled:` list).
+///
+/// Only matches indented children (at least one leading space) so it cannot
+/// eat into the next section's unindented comments or headers.
+final _rulePacksBlockPattern = RegExp(
+  r'^rule_packs:\s*\n(?:\s+\S[^\n]*\n)*',
+  multiLine: true,
+);
+
+/// Writes (or replaces) the top-level `rule_packs:` block in [customFile].
+///
+/// If [packIds] is empty, any existing block is removed. If non-empty, the
+/// block is written sorted alphabetically. Creates the file if it doesn't
+/// exist, inserting after the `# ANALYSIS SETTINGS` section when present.
+void writeRulePacksToCustomFile(File customFile, List<String> packIds) {
+  var content = customFile.existsSync() ? customFile.readAsStringSync() : '';
+
+  // Build the new block (empty string if no packs).
+  final block = _buildRulePacksBlock(packIds);
+
+  if (_rulePacksBlockPattern.hasMatch(content)) {
+    // Replace existing block.
+    content = content.replaceFirst(_rulePacksBlockPattern, block);
+  } else if (block.isNotEmpty) {
+    // Insert new block. Prefer after the commented-out rule_packs template
+    // (from buildMinimalConfig), otherwise after `# RULE PACKS` header,
+    // otherwise before `# PLATFORM SETTINGS` or `platforms:`.
+    content = _insertRulePacksBlock(content, block);
+  }
+
+  // Remove any commented-out template lines that the block replaces.
+  if (block.isNotEmpty) {
+    content = _removeRulePacksTemplate(content);
+  }
+
+  customFile.writeAsStringSync(content);
+}
+
+/// Builds the YAML text for a `rule_packs:` block (top-level, no indentation).
+String _buildRulePacksBlock(List<String> packIds) {
+  if (packIds.isEmpty) return '';
+  final sorted = List<String>.of(packIds)..sort();
+  final buf = StringBuffer();
+  buf.writeln('rule_packs:');
+  buf.writeln('  enabled:');
+  for (final id in sorted) {
+    buf.writeln('    - $id');
+  }
+  return buf.toString();
+}
+
+/// Insert rule_packs block at a sensible location in the custom file.
+String _insertRulePacksBlock(String content, String block) {
+  // After `# RULE PACKS` header line (from template).
+  final headerMatch = RegExp(
+    r'^# RULE PACKS\n',
+    multiLine: true,
+  ).firstMatch(content);
+  if (headerMatch != null) {
+    // Skip past comment lines belonging to the template — stop at the first
+    // blank line so we don't eat into the next section's header comments.
+    var pos = headerMatch.end;
+    final lines = content.substring(pos).split('\n');
+    for (final line in lines) {
+      if (line.trim().isEmpty) {
+        // Consume the blank line separator, then stop.
+        pos += line.length + 1;
+        break;
+      }
+      if (line.trimLeft().startsWith('#')) {
+        pos += line.length + 1;
+      } else {
+        break;
+      }
+    }
+    return content.prefix(pos) + block + content.afterIndex(pos);
+  }
+
+  // Before `# PLATFORM SETTINGS` or `platforms:`.
+  final platformMatch = RegExp(
+    r'^(?:# PLATFORM SETTINGS|platforms:)',
+    multiLine: true,
+  ).firstMatch(content);
+  if (platformMatch != null) {
+    return '${content.prefix(platformMatch.start)}$block\n${content.afterIndex(platformMatch.start)}';
+  }
+
+  // Fallback: append before end.
+  if (content.isNotEmpty && !content.endsWith('\n')) {
+    return '$content\n$block';
+  }
+  return '$content$block';
+}
+
+/// Remove the commented-out `# RULE PACKS` template (header + comment lines).
+///
+/// Stops at the first blank line so it cannot eat into the next section's
+/// `# PLATFORM SETTINGS` header or other unrelated comments.
+String _removeRulePacksTemplate(String content) {
+  return content.replaceAll(
+    RegExp(
+      r'^# RULE PACKS\n(?:#[^\n]*\n)*(?:\n)?',
+      multiLine: true,
+    ),
+    '',
+  );
 }

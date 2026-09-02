@@ -1,7 +1,7 @@
 /**
- * Migrates `log_level`, `lane`, and `memory_mode` from the legacy
- * `plugins > saropa_lints:` block in `analysis_options.yaml` to top-level
- * keys in `analysis_options_custom.yaml`.
+ * Migrates `log_level`, `lane`, `memory_mode`, and `rule_packs` from the
+ * legacy `plugins > saropa_lints:` block in `analysis_options.yaml` to
+ * top-level keys in `analysis_options_custom.yaml`.
  *
  * Eliminates false `unsupported_option` warnings from the Dart SDK's
  * plugin-block validator, which hardcodes allowed keys.
@@ -14,6 +14,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { parseLaneFromPluginBlock } from './laneConfig';
+import { parseRulePacksEnabled, writeRulePacksEnabled } from '../rulePacks/rulePackYaml';
 
 /** Keys that were moved from the plugin block to the custom file. */
 const MIGRATE_KEYS = ['log_level', 'lane', 'memory_mode'] as const;
@@ -114,23 +115,37 @@ export function migrateConfigKeys(root: string): MigrateResult {
     moved.push(key);
   }
 
-  if (moved.length === 0) {
-    return { moved, skipped };
+  if (moved.length > 0) {
+    // Write the custom file with the scalar keys.
+    fs.writeFileSync(customPath, customContent, 'utf8');
+
+    // Remove the scalar keys from the main file.
+    let updatedMain = mainContent;
+    for (const key of moved) {
+      // Match indented lines like `    log_level: info  # comment`
+      updatedMain = updatedMain.replace(
+        new RegExp(`^[ \\t]+${key}:\\s+[^\\n]*\\n`, 'm'),
+        '',
+      );
+    }
+    fs.writeFileSync(mainPath, updatedMain, 'utf8');
   }
 
-  // Write the custom file.
-  fs.writeFileSync(customPath, customContent, 'utf8');
-
-  // Remove the migrated keys from the main file.
-  let updatedMain = mainContent;
-  for (const key of moved) {
-    // Match indented lines like `    log_level: info  # comment`
-    updatedMain = updatedMain.replace(
-      new RegExp(`^[ \\t]+${key}:\\s+[^\\n]*\\n`, 'm'),
-      '',
-    );
+  // Migrate rule_packs (nested block) from the plugin block to custom file.
+  const rulePackIds = parseRulePacksEnabled(mainContent);
+  if (rulePackIds.length > 0) {
+    // Check if rule_packs already exists in the custom file.
+    const latestCustom = fs.existsSync(customPath)
+      ? fs.readFileSync(customPath, 'utf8')
+      : '';
+    if (/^rule_packs:\s/m.test(latestCustom)) {
+      skipped.push('rule_packs');
+    } else {
+      // writeRulePacksEnabled writes to custom file and cleans up main file.
+      writeRulePacksEnabled(root, rulePackIds);
+      moved.push('rule_packs');
+    }
   }
-  fs.writeFileSync(mainPath, updatedMain, 'utf8');
 
   return { moved, skipped };
 }

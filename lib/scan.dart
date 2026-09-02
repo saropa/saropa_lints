@@ -36,7 +36,12 @@ export 'src/scan/scan_runner.dart' show ScanMessageSink, ScanRunner;
 export 'src/scan/scan_json.dart'
     show scanDiagnosticsToJson, scanDiagnosticsToJsonString;
 export 'src/scan/git_changed_files.dart' show gitChangedDartFiles;
-export 'src/scan/rule_tier_index.dart' show tierForRule, tierIndexForRules;
+export 'src/scan/rule_tier_index.dart'
+    show
+        categoryForRule,
+        categoryIndexForRules,
+        tierForRule,
+        tierIndexForRules;
 export 'src/scan/stale_ignore_detector.dart'
     show
         StaleIgnore,

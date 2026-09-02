@@ -1,6 +1,6 @@
 /// CLI command: `dart run saropa_lints migrate-config`
 ///
-/// Moves `log_level`, `lane`, and `memory_mode` from the legacy
+/// Moves `log_level`, `lane`, `memory_mode`, and `rule_packs` from the legacy
 /// `plugins > saropa_lints:` block in `analysis_options.yaml` to top-level
 /// keys in `analysis_options_custom.yaml`, eliminating false
 /// `unsupported_option` warnings from the Dart SDK's plugin-block validator.
@@ -12,11 +12,22 @@ library;
 
 import 'dart:io';
 
+import 'package:saropa_lints/src/config/analysis_options_rule_packs.dart'
+    show parseRulePacksEnabledList;
 import 'package:saropa_lints/src/config/runtime_tier_cap.dart'
     show parseScalarFromPluginBlock;
+import 'package:saropa_lints/src/init/custom_overrides_core.dart'
+    show writeRulePacksToCustomFile;
 
-/// Keys that were moved from the plugin block to the custom file.
+/// Scalar keys that were moved from the plugin block to the custom file.
 const _migrateKeys = <String>{'log_level', 'lane', 'memory_mode'};
+
+/// Pattern matching the indented `rule_packs:` block (with `enabled:` list)
+/// inside the plugin block. Used to remove it from analysis_options.yaml.
+final _pluginRulePacksBlock = RegExp(
+  r'^[ \t]+rule_packs:\s*\n(?:[ \t]+enabled:\s*\n)?(?:[ \t]+-\s+\S+.*\n|[ \t]+#[^\n]*\n|[ \t]*\n)*',
+  multiLine: true,
+);
 
 /// Entry point for `dart run saropa_lints migrate-config`.
 void main(List<String> args) {
@@ -32,7 +43,7 @@ void main(List<String> args) {
 
   final mainContent = mainFile.readAsStringSync();
 
-  // Find which keys exist in the old plugin block.
+  // --- Scalar keys (log_level, lane, memory_mode) ---
   final found = <String, String>{};
   for (final key in _migrateKeys) {
     final value = parseScalarFromPluginBlock(mainContent, {key});
@@ -41,7 +52,10 @@ void main(List<String> args) {
     }
   }
 
-  if (found.isEmpty) {
+  // --- Nested key: rule_packs ---
+  final rulePackIds = parseRulePacksEnabledList(mainContent);
+
+  if (found.isEmpty && rulePackIds.isEmpty) {
     print('Nothing to migrate — no legacy config keys found under '
         'plugins > saropa_lints:');
     return;
@@ -53,7 +67,7 @@ void main(List<String> args) {
       ? customFile.readAsStringSync()
       : '';
 
-  // Only add keys that aren't already in the custom file as top-level keys.
+  // Only add scalar keys that aren't already in the custom file.
   final added = <String>[];
   for (final entry in found.entries) {
     // Check if already present as a top-level key.
@@ -74,17 +88,38 @@ void main(List<String> args) {
     print('  MOVE ${entry.key}: ${entry.value}');
   }
 
-  if (added.isEmpty) {
+  // Write the custom file with the scalar keys first.
+  if (added.isNotEmpty) {
+    customFile.writeAsStringSync(customContent);
+  }
+
+  // Migrate rule_packs: write to custom file, remove from main file.
+  var migratedRulePacks = false;
+  if (rulePackIds.isNotEmpty) {
+    // Check if rule_packs already exists in the custom file — reuse the
+    // in-memory content (may have been updated with scalar keys above).
+    final customHasRulePacks = RegExp(
+      r'^rule_packs:\s',
+      multiLine: true,
+    ).hasMatch(customContent);
+    if (customHasRulePacks) {
+      print('  SKIP rule_packs: already in analysis_options_custom.yaml');
+    } else {
+      // Write rule_packs block to the custom file using the shared helper.
+      writeRulePacksToCustomFile(customFile, rulePackIds);
+      migratedRulePacks = true;
+      print('  MOVE rule_packs: [${rulePackIds.join(', ')}]');
+    }
+  }
+
+  if (added.isEmpty && !migratedRulePacks) {
     print('All keys already migrated — nothing to do.');
     return;
   }
 
-  // Write the custom file with the new keys.
-  customFile.writeAsStringSync(customContent);
-
-  // Remove the keys from the main file's plugin block. Match a full line
-  // like `    log_level: info  # optional comment` and remove it (including
-  // the newline). Indented so it's inside the plugin block, not top-level.
+  // Remove the scalar keys from the main file's plugin block. Match a full
+  // line like `    log_level: info  # comment` and remove it (including the
+  // newline). Indented so it's inside the plugin block, not top-level.
   var updatedMain = mainContent;
   for (final key in added) {
     updatedMain = updatedMain.replaceAll(
@@ -92,9 +127,16 @@ void main(List<String> args) {
       '',
     );
   }
+
+  // Remove the rule_packs block from the main file.
+  if (migratedRulePacks) {
+    updatedMain = updatedMain.replaceAll(_pluginRulePacksBlock, '');
+  }
+
   mainFile.writeAsStringSync(updatedMain);
 
+  final totalMoved = added.length + (migratedRulePacks ? 1 : 0);
   print('');
-  print('Migrated ${added.length} key(s) to analysis_options_custom.yaml.');
+  print('Migrated $totalMoved key(s) to analysis_options_custom.yaml.');
   print('The unsupported_option warnings will no longer appear.');
 }

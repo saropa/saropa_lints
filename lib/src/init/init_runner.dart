@@ -509,12 +509,19 @@ Future<void> runInit(List<String> args) async {
     packageFilteredRules: packageDisabledRules,
   );
 
+  // Read existing rule_packs from the custom file first (new canonical
+  // location), falling back to the old plugin-block location in
+  // analysis_options.yaml for projects that haven't migrated yet.
+  final customPackIds = overridesFile.existsSync()
+      ? parseRulePacksEnabledList(overridesFile.readAsStringSync())
+      : const <String>[];
+  final existingPackIds = customPackIds.isNotEmpty
+      ? customPackIds
+      : parseRulePacksEnabledList(existingContent);
+
   final List<String> mergedRulePacks = cliArgs.isReset
       ? mergeRulePackIdsForInit(const [], cliArgs.enablePackIds)
-      : mergeRulePackIdsForInit(
-          parseRulePacksEnabledList(existingContent),
-          cliArgs.enablePackIds,
-        );
+      : mergeRulePackIdsForInit(existingPackIds, cliArgs.enablePackIds);
 
   // New projects get the plugin block commented out by default — the
   // in-process plugin costs several GB on large projects and the daemon
@@ -525,6 +532,11 @@ Future<void> runInit(List<String> args) async {
   final bool wasDisabled = existingContent.contains(pluginsDisabledBeginMarker);
   final bool willBeDisabled = isNewFile || wasDisabled;
 
+  // Write rule_packs to the custom file (top-level key) — moved out of the
+  // plugin block to avoid unsupported_option warnings from the SDK validator.
+  // Always call even when empty: --reset must clear a pre-existing block.
+  writeRulePacksToCustomFile(overridesFile, mergedRulePacks);
+
   // Generate the new plugins section with proper formatting
   final String pluginsYaml = generatePluginsYaml(
     tier: resolvedTier,
@@ -534,7 +546,6 @@ Future<void> runInit(List<String> args) async {
     allRules: allRules,
     platformSettings: platformSettings,
     packageSettings: packageSettings,
-    rulePacksEnabled: mergedRulePacks,
     compact: willBeDisabled,
   );
 

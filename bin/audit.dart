@@ -111,6 +111,9 @@ Future<void> main(List<String> args) async {
     targetPath: path,
     dartFiles: dartFiles,
     enabledRuleNames: allRules,
+    // Bypass the RuntimeTierCap so every rule runs regardless of the
+    // project's configured tier — audit always means "everything".
+    bypassTierCap: true,
     // Feed progress messages through our structured sink.
     messageSink: progressSink,
     // Always full lane — audit must exercise every rule.
@@ -139,21 +142,25 @@ Future<void> main(List<String> args) async {
         .toList();
   }
 
-  // Build tier reverse-index for JSON enrichment.
+  // Build tier + category reverse-indexes for JSON enrichment.
   final tiers = tierIndexForRules(allRules);
+  final categories = categoryIndexForRules(allRules);
 
   // Build the enriched JSON output.
   final json = scanDiagnosticsToJson(filtered);
 
-  // Enrich each diagnostic with its tier from the reverse-index.
+  // Enrich each diagnostic with its tier and category.
   final diagList = json['diagnostics'];
   if (diagList is List) {
     for (final entry in diagList) {
       if (entry is Map<String, dynamic>) {
-        final rule = entry['rule'] as String?;
+        // Key is 'ruleName' in the scan JSON schema.
+        final rule = entry['ruleName'] as String?;
         if (rule != null) {
           final tier = tiers[rule];
           if (tier != null) entry['tier'] = tier;
+          final cat = categories[rule];
+          if (cat != null) entry['category'] = cat;
         }
       }
     }

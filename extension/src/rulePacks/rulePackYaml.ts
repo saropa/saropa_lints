@@ -1,11 +1,22 @@
 /**
- * Read/write `plugins.saropa_lints.rule_packs.enabled` in analysis_options.yaml.
+ * Read/write `rule_packs.enabled` in analysis_options_custom.yaml (canonical)
+ * with deprecation fallback to the old plugin-block location in
+ * analysis_options.yaml.
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
-const RULE_PACK_BLOCK =
+/**
+ * Pattern matching a top-level `rule_packs:` block in the custom file.
+ * Only matches indented children (at least one leading space) so it cannot
+ * eat into the next section's unindented comments or headers.
+ */
+const TOP_LEVEL_RULE_PACK_BLOCK =
+  /^rule_packs:\s*\n(?:\s+\S[^\n]*\n)*/m;
+
+/** Pattern matching an indented `rule_packs:` block inside the plugin block. */
+const PLUGIN_RULE_PACK_BLOCK =
   /^\s{4}rule_packs:\s*\n\s{6}enabled:\s*\n(?:\s{8}-\s+["']?\w+["']?\s*(?:#.*)?\n|\s{8}#.*\n|\s*\n)+/m;
 const LEGACY_MIGRATION_PACK_BLOCK =
   /^\s{4}migration_packs:\s*\n\s{6}enabled:\s*\n(?:\s{8}-\s+["']?\w+["']?\s*(?:#.*)?\n|\s{8}#.*\n|\s*\n)+/m;
@@ -14,8 +25,32 @@ export function readAnalysisOptionsPath(workspaceRoot: string): string {
   return path.join(workspaceRoot, 'analysis_options.yaml');
 }
 
-/** Returns enabled pack ids from analysis_options.yaml, or [] if missing/invalid. */
+/** Path to the custom overrides file. */
+function customFilePath(workspaceRoot: string): string {
+  return path.join(workspaceRoot, 'analysis_options_custom.yaml');
+}
+
+/**
+ * Returns enabled pack ids, reading from the custom file first (canonical),
+ * falling back to the old plugin-block location in analysis_options.yaml.
+ */
 export function readRulePacksEnabled(workspaceRoot: string): string[] {
+  // Try the custom file first (new canonical location).
+  const cp = customFilePath(workspaceRoot);
+  if (fs.existsSync(cp)) {
+    try {
+      const content = fs.readFileSync(cp, 'utf-8');
+      // If the custom file contains a `rule_packs:` key at all (even with an
+      // empty enabled list), treat it as canonical — don't fall back to the
+      // legacy plugin-block location, which could resurrect stale pack ids.
+      if (/^rule_packs:\s/m.test(content)) {
+        return parseRulePacksEnabled(content);
+      }
+    } catch {
+      // Fall through to legacy location.
+    }
+  }
+  // Fallback: old plugin-block location in analysis_options.yaml.
   const p = readAnalysisOptionsPath(workspaceRoot);
   if (!fs.existsSync(p)) return [];
   try {
@@ -87,72 +122,79 @@ function escapeRegex(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-/** Writes rule_packs block; creates file only if saropa_lints block exists. */
+/**
+ * Writes rule_packs to analysis_options_custom.yaml (top-level key).
+ *
+ * Removes any legacy block from analysis_options.yaml if present.
+ */
 export function writeRulePacksEnabled(workspaceRoot: string, packIds: readonly string[]): boolean {
-  const p = readAnalysisOptionsPath(workspaceRoot);
-  if (!fs.existsSync(p)) {
-    return false;
-  }
+  const cp = customFilePath(workspaceRoot);
   try {
-    let content = fs.readFileSync(p, 'utf-8');
-    // Normalize to canonical key on write: remove legacy alias block if present.
-    if (LEGACY_MIGRATION_PACK_BLOCK.test(content)) {
-      content = content.replace(LEGACY_MIGRATION_PACK_BLOCK, '');
-    }
-    const blockBody =
-      packIds.length === 0
-        ? ''
-        : `    rule_packs:\n      enabled:\n${packIds.map((id) => `        - ${id}`).join('\n')}\n`;
+    let content = fs.existsSync(cp) ? fs.readFileSync(cp, 'utf-8') : '';
 
-    if (RULE_PACK_BLOCK.test(content)) {
+    // Build the new top-level block.
+    const block = packIds.length === 0
+      ? ''
+      : `rule_packs:\n  enabled:\n${packIds.map((id) => `    - ${id}`).join('\n')}\n`;
+
+    if (TOP_LEVEL_RULE_PACK_BLOCK.test(content)) {
+      // Replace existing block in custom file.
       if (packIds.length === 0) {
-        content = content.replace(RULE_PACK_BLOCK, '');
+        content = content.replace(TOP_LEVEL_RULE_PACK_BLOCK, '');
       } else {
-        content = content.replace(RULE_PACK_BLOCK, blockBody);
+        content = content.replace(TOP_LEVEL_RULE_PACK_BLOCK, block);
       }
     } else if (packIds.length > 0) {
-      const inserted = insertRulePacksAfterVersion(content, blockBody);
-      if (inserted === null) {
-        return false;
+      // Append to custom file — before platforms section if present.
+      const platformMatch = /^(?:# PLATFORM SETTINGS|platforms:)/m.exec(content);
+      if (platformMatch) {
+        content = content.slice(0, platformMatch.index) + block + '\n' + content.slice(platformMatch.index);
+      } else {
+        // Append at end.
+        if (content.length > 0 && !content.endsWith('\n')) content += '\n';
+        content += block;
       }
-      content = inserted;
     }
 
-    fs.writeFileSync(p, content, 'utf-8');
+    // Remove commented-out template lines that a live block replaces.
+    // Stops at the first blank line so it cannot eat into the next section.
+    if (packIds.length > 0) {
+      content = content.replace(/^# RULE PACKS\n(?:#[^\n]*\n)*(?:\n)?/m, '');
+    }
+
+    fs.writeFileSync(cp, content, 'utf-8');
+
+    // Clean up legacy block from analysis_options.yaml if present.
+    removeLegacyRulePacksFromMainFile(workspaceRoot);
+
     return true;
   } catch {
     return false;
   }
 }
 
-function insertRulePacksAfterVersion(content: string, blockBody: string): string | null {
-  // Preferred anchor: insert immediately after the `version:` pin, which is
-  // where `dart run saropa_lints:init` places the plugin config for consumer
-  // projects, so the rule_packs block lands at the top of that mapping.
-  const versioned = /(saropa_lints:\s*\n\s*version:\s*[^\n]+\n)/.exec(content);
-  if (versioned) {
-    return content.replace(versioned[0], `${versioned[0]}${blockBody}`);
+/**
+ * Removes the legacy `rule_packs:` / `migration_packs:` block from the
+ * plugin section in analysis_options.yaml (cleanup after migration).
+ */
+function removeLegacyRulePacksFromMainFile(workspaceRoot: string): void {
+  const p = readAnalysisOptionsPath(workspaceRoot);
+  if (!fs.existsSync(p)) return;
+  try {
+    let content = fs.readFileSync(p, 'utf-8');
+    let changed = false;
+    if (PLUGIN_RULE_PACK_BLOCK.test(content)) {
+      content = content.replace(PLUGIN_RULE_PACK_BLOCK, '');
+      changed = true;
+    }
+    if (LEGACY_MIGRATION_PACK_BLOCK.test(content)) {
+      content = content.replace(LEGACY_MIGRATION_PACK_BLOCK, '');
+      changed = true;
+    }
+    if (changed) {
+      fs.writeFileSync(p, content, 'utf-8');
+    }
+  } catch {
+    // Best-effort cleanup — don't fail the write.
   }
-  // Fallback: some configs intentionally omit the version pin — notably the
-  // saropa_lints package's own dev analysis_options.yaml, which loads the
-  // plugin from workspace source rather than a pub.dev version. Without this
-  // branch the write returns null and the user sees "could not write
-  // analysis_options.yaml (rule_packs)." Anchor on the `saropa_lints:` mapping
-  // key and insert the block as its first child (4-space body under the
-  // 2-space key). The `#`-prefixed `saropa_lints:init` comment lines cannot
-  // match: they require `saropa_lints:` at the line's leading indent followed
-  // by end-of-line, not `:init`.
-  const pluginKey = /^[ \t]*saropa_lints:[ \t]*\n/m.exec(content);
-  if (pluginKey) {
-    return content.replace(pluginKey[0], `${pluginKey[0]}${blockBody}`);
-  }
-  // Final fallback: no `saropa_lints:` key at all (e.g. the plugin's own
-  // workspace). Create the entire `plugins: saropa_lints:` block. Append
-  // after a `plugins:` key if one exists, otherwise append at end of file.
-  const pluginsKey = /^plugins:[ \t]*\n/m.exec(content);
-  if (pluginsKey) {
-    return content.replace(pluginsKey[0], `${pluginsKey[0]}  saropa_lints:\n${blockBody}`);
-  }
-  const trailing = content.endsWith('\n') ? '' : '\n';
-  return `${content}${trailing}\nplugins:\n  saropa_lints:\n${blockBody}`;
 }

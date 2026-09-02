@@ -252,10 +252,14 @@ plugins:
           );
           expect(result.ok, isTrue);
 
-          final content = outputFile.readAsStringSync();
-          expect(content.contains('migration_packs:'), isFalse);
-          expect(content.contains('rule_packs:'), isTrue);
-          expect(parseRulePacksEnabledList(content), contains('drift'));
+          // rule_packs now lives in analysis_options_custom.yaml (top-level),
+          // not in the main file's plugin block.
+          final customFile = File(
+            '${dir.path}${Platform.pathSeparator}analysis_options_custom.yaml',
+          );
+          final customContent = customFile.readAsStringSync();
+          expect(customContent.contains('rule_packs:'), isTrue);
+          expect(parseRulePacksEnabledList(customContent), contains('drift'));
         } finally {
           safeDeleteDir(dir);
         }
@@ -291,10 +295,18 @@ plugins:
           );
           expect(result.ok, isTrue);
 
-          final after = outputFile.readAsStringSync();
-          expect(after.contains('migration_packs:'), isFalse);
-          expect(after.contains('rule_packs:'), isTrue);
-          expect(parseRulePacksEnabledList(after), ['drift', 'riverpod']);
+          // rule_packs now lives in analysis_options_custom.yaml (top-level).
+          final customFile = File(
+            '${dir.path}${Platform.pathSeparator}analysis_options_custom.yaml',
+          );
+          final customContent = customFile.readAsStringSync();
+          expect(customContent.contains('migration_packs:'), isFalse);
+          expect(customContent.contains('rule_packs:'), isTrue);
+          // Sorted alphabetically on write.
+          expect(
+            parseRulePacksEnabledList(customContent),
+            ['drift', 'riverpod'],
+          );
         } finally {
           safeDeleteDir(dir);
         }

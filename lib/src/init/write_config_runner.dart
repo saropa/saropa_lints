@@ -180,9 +180,16 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
     userCustomizations = {...userCustomizations, ...permanentOverrides};
   }
 
+  // Read existing rule_packs from the custom file first (new canonical
+  // location), falling back to the old plugin block for unmigrated projects.
+  final customPackIds = overridesFile.existsSync()
+      ? parseRulePacksEnabledList(overridesFile.readAsStringSync())
+      : const <String>[];
   final List<String> preservedRulePacks = options.reset
       ? const <String>[]
-      : parseRulePacksEnabledList(existingContent);
+      : (customPackIds.isNotEmpty
+          ? customPackIds
+          : parseRulePacksEnabledList(existingContent));
 
   // New projects get the plugin block commented out by default — the
   // in-process plugin costs several GB on large projects and the daemon
@@ -195,6 +202,11 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
   final bool wasDisabled = existingContent.contains(pluginsDisabledBeginMarker);
   final bool willBeDisabled = isNewFile || wasDisabled;
 
+  // Write rule_packs to the custom file (top-level key) — moved out of the
+  // plugin block to avoid unsupported_option warnings from the SDK validator.
+  // Always call even when empty: --reset must clear a pre-existing block.
+  writeRulePacksToCustomFile(overridesFile, preservedRulePacks);
+
   final version = getPackageVersion();
   final pluginsYaml = generatePluginsYaml(
     tier: resolvedTier,
@@ -204,7 +216,6 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
     allRules: allRules,
     platformSettings: platformSettings,
     packageSettings: packageSettings,
-    rulePacksEnabled: preservedRulePacks,
     compact: willBeDisabled,
   );
 

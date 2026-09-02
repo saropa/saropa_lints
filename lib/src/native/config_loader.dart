@@ -772,16 +772,46 @@ void _reloadRulePacksFromRoot(String projectRoot) {
     enabled.removeAll(_packContributedCodes!);
   }
 
-  final content = _readProjectFile('analysis_options.yaml', projectRoot);
-  if (content == null) {
-    _packContributedCodes = {};
-    SaropaLintRule.enabledRules = enabled.isEmpty ? null : enabled;
+  // Read rule_packs from the custom file first (new canonical location),
+  // falling back to the old plugin block with a deprecation warning.
+  final customContent = _readProjectFile(
+    'analysis_options_custom.yaml',
+    projectRoot,
+  );
+  final customNorm =
+      customContent?.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
 
-    return;
+  // If the custom file contains a `rule_packs:` key at all (even with an
+  // empty enabled list), treat it as canonical — don't fall back to the
+  // legacy plugin-block location, which could resurrect stale pack ids.
+  final customHasKey = customNorm != null &&
+      RegExp(r'^rule_packs:\s', multiLine: true).hasMatch(customNorm);
+  var packIds = const <String>[];
+  if (customHasKey) {
+    packIds = parseRulePacksEnabledList(customNorm);
   }
 
-  final normalized = content.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
-  final packIds = parseRulePacksEnabledList(normalized);
+  if (!customHasKey) {
+    // Fallback: check legacy location under plugins > saropa_lints:.
+    final mainContent = _readProjectFile('analysis_options.yaml', projectRoot);
+    if (mainContent == null) {
+      _packContributedCodes = {};
+      SaropaLintRule.enabledRules = enabled.isEmpty ? null : enabled;
+
+      return;
+    }
+    final mainNorm =
+        mainContent.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+    packIds = parseRulePacksEnabledList(mainNorm);
+    if (packIds.isNotEmpty) {
+      PluginLogger.warning(
+        'rule_packs found under plugins > saropa_lints: in '
+        'analysis_options.yaml — move it to analysis_options_custom.yaml '
+        '(top-level key) to avoid unsupported_option warnings. Run '
+        '`dart run saropa_lints migrate-config` to migrate automatically.',
+      );
+    }
+  }
   final lockVersions = readResolvedPackageVersions(projectRoot);
   // pubspec drives the SDK-version carve-out: a flutter_sdk_/dart_sdk_ migration
   // rule is stripped from the floor only when the pinned SDK lower bound proves
