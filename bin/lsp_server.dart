@@ -274,7 +274,9 @@ void _publishDiagnostics(String uri, int lineCount) {
       },
       'severity': t.severity,
       'code': t.code,
-      'source': 'saropa_lints',
+      // Distinct source so liveDiagnosticsModel can filter out fake
+      // test diagnostics and not inflate the real score.
+      'source': 'saropa_lsp_test',
       'message': t.message,
     });
   }

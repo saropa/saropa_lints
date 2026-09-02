@@ -8,7 +8,10 @@ import { buildDebugPanelHtml } from './debugPanel-html';
 
 /** Runtime snapshot of a single diagnostic engine (analyzer, scan daemon, LSP). */
 export interface EngineStatus {
-  /** Display name shown in the panel header row. */
+  /** Stable machine key for toggle messages and data-attributes.
+   *  Must match the DebugPanelMessage engine union: 'analyzer' | 'scanDaemon' | 'lspServer'. */
+  key: 'analyzer' | 'scanDaemon' | 'lspServer';
+  /** Display name shown in the panel header row — must come from l10n(). */
   name: string;
   /** Whether the user has toggled this engine on. */
   enabled: boolean;

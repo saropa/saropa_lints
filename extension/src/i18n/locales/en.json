@@ -1758,7 +1758,19 @@
       "pid": "PID:",
       "status": "Status:",
       "rules": "Rules:",
-      "rss": "RSS:"
+      "rss": "RSS:",
+      "status": {
+        "active": "active",
+        "idle": "idle",
+        "running": "running",
+        "stopped": "stopped",
+        "suspended": "suspended",
+        "starting": "starting"
+      },
+      "rssNote": {
+        "inProcess": "in-process, not separately measurable",
+        "notRunning": "not running"
+      }
     },
     "toggle": {
       "on": "ON",

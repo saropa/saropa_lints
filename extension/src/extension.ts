@@ -1314,9 +1314,11 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
           lspClient = new SaropaLspClient(context, lspRoot);
           void lspClient.start();
         } else if (!enabled && lspClient) {
-          void lspClient.stop();
-          lspClient.dispose();
+          // Await stop before dispose to avoid a double-stop race —
+          // dispose() calls stop() again if _client is still set.
+          const client = lspClient;
           lspClient = undefined;
+          void client.stop().then(() => client.dispose());
         }
       }
     }),
@@ -1347,28 +1349,33 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     {
       // Analyzer Plugin status — in-process, no PID or RSS available.
       getAnalyzerPluginStatus: (): EngineStatus => ({
-        name: 'Analyzer Plugin',
+        key: 'analyzer',
+        name: l10n('debug.engine.analyzerPlugin'),
         enabled: true, // Always on when plugins: saropa_lints: is in analysis_options
-        status: 'active',
-        ruleCount: 203,
-        rssNote: 'in-process, not separately measurable',
+        status: l10n('debug.engine.status.active'),
+        rssNote: l10n('debug.engine.rssNote.inProcess'),
       }),
       // Scan Daemon status — read from the scan-on-save controller.
       getScanDaemonStatus: (): EngineStatus => ({
-        name: 'Scan Daemon',
+        key: 'scanDaemon',
+        name: l10n('debug.engine.scanDaemon'),
         enabled: !scanOnSaveController.isDaemonSuspended,
-        status: scanOnSaveController.isDaemonSuspended ? 'suspended' : 'idle',
-        ruleCount: 2140,
+        status: scanOnSaveController.isDaemonSuspended
+          ? l10n('debug.engine.status.suspended')
+          : l10n('debug.engine.status.idle'),
         rssBytes: systemHealthSnapshot?.saropaRssBytes,
         pid: undefined, // TODO: expose daemon PID from ScanDaemonManager
       }),
       // LSP Server status — read from the client wrapper.
       getLspServerStatus: (): EngineStatus => ({
-        name: 'LSP Server',
+        key: 'lspServer',
+        name: l10n('debug.engine.lspServer'),
         enabled: lspClient?.isRunning ?? false,
-        status: lspClient?.isRunning ? 'running' : 'stopped',
-        ruleCount: 4, // Fake test diagnostics
-        rssNote: lspClient?.isRunning ? undefined : 'not running',
+        status: lspClient?.isRunning
+          ? l10n('debug.engine.status.running')
+          : l10n('debug.engine.status.stopped'),
+        ruleCount: 4, // Fake test diagnostics — fixed count for Phase 0
+        rssNote: lspClient?.isRunning ? undefined : l10n('debug.engine.rssNote.notRunning'),
       }),
     },
   );
@@ -1380,6 +1387,27 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       debugPanelProvider,
     ),
   );
+
+  // Wire debug panel Kill All / Restart All to the LSP server lifecycle.
+  // Analyzer Plugin and Scan Daemon aren't independently killable yet, so
+  // these only affect LSP for now — but emit visible feedback either way.
+  debugPanelProvider.onKillAll(async () => {
+    if (lspClient) {
+      await lspClient.stop();
+    }
+    debugPanelProvider.addLogEntry('Kill All: stopped all controllable engines.');
+    debugPanelProvider.refresh();
+  });
+  debugPanelProvider.onRestartAll(async () => {
+    if (lspClient) {
+      await lspClient.restart();
+    } else if (lspRoot) {
+      lspClient = new SaropaLspClient(context, lspRoot);
+      await lspClient.start();
+    }
+    debugPanelProvider.addLogEntry('Restart All: restarted all controllable engines.');
+    debugPanelProvider.refresh();
+  });
 
   // Wire debug panel toggle events to actual engine start/stop actions.
   debugPanelProvider.onToggle(async ({ engine, enabled }) => {

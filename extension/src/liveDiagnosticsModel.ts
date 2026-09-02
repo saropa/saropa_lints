@@ -115,6 +115,10 @@ export function buildViolationsDataFromDiagnostics(
     const file = path.relative(root, uri.fsPath).replaceAll('\\', '/');
 
     for (const diag of diagnostics) {
+      // Filter out fake test diagnostics from the Phase 0 LSP server —
+      // they use source 'saropa_lsp_test' and must not inflate the real score.
+      if (diag.source === 'saropa_lsp_test') continue;
+
       const bucket = severityToBucket(diag.severity);
       violations.push({
         file,

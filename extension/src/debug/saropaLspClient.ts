@@ -8,10 +8,7 @@
  * delegates the wire protocol to `vscode-languageclient` instead of raw
  * NDJSON, because the server speaks LSP.
  *
- * TODO: `vscode-languageclient` is not yet listed in extension/package.json
- *       dependencies. Add it before this module is imported:
- *         npm i vscode-languageclient
- *       (The `@types/vscode` peer is already satisfied by the extension.)
+ * `vscode-languageclient` is listed in extension/package.json dependencies.
  */
 
 import * as vscode from 'vscode';
@@ -20,6 +17,11 @@ import {
   type LanguageClientOptions,
   type ServerOptions,
 } from 'vscode-languageclient/node';
+
+// CVE-2024-27980 / PATHEXT: on Windows, `dart` resolves to `dart.bat` which
+// needs a shell to execute. Without this, spawn() returns ENOENT.
+// Same rationale as scanOnSaveRunner.ts SPAWN_USE_SHELL.
+const SPAWN_USE_SHELL = process.platform === 'win32';
 
 /** Output channel name surfaced in VS Code's "Output" dropdown. */
 const OUTPUT_CHANNEL_NAME = 'Saropa Lints LSP';
@@ -74,16 +76,17 @@ export class SaropaLspClient implements vscode.Disposable {
 
     // Server spawn configuration — identical for run and debug because
     // the Dart VM doesn't need a separate debug launch profile here.
+    // shell: true on Windows so `dart.bat` resolves via PATHEXT.
     const serverOptions: ServerOptions = {
       run: {
         command: 'dart',
         args: ['run', 'saropa_lints:lsp_server'],
-        options: { cwd: this._projectRoot },
+        options: { cwd: this._projectRoot, shell: SPAWN_USE_SHELL },
       },
       debug: {
         command: 'dart',
         args: ['run', 'saropa_lints:lsp_server'],
-        options: { cwd: this._projectRoot },
+        options: { cwd: this._projectRoot, shell: SPAWN_USE_SHELL },
       },
     };
 
@@ -102,9 +105,9 @@ export class SaropaLspClient implements vscode.Disposable {
       clientOptions,
     );
 
-    // Push the client itself as a disposable so VS Code can tear it down
-    // if the extension deactivates before we call stop() explicitly.
-    this._context.subscriptions.push(client);
+    // Track the client in local disposables only — pushing to
+    // _context.subscriptions on every start() grows unbounded across
+    // restart cycles. The class's own dispose() is the teardown path.
     this._disposables.push(client);
 
     try {

@@ -90,6 +90,13 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Fixed Full Audit showing a confusing second "output could not be read" error after canceling an audit — the forced process-tree kill on cancel could still fire a late completion event with truncated output.
 - Fixed Full Audit cancellation silently failing to stop the underlying `dart` process on macOS/Linux — the audit CLI kept running in the background after the "Audit canceled" toast, because killing the shell process alone (with `shell: true`) doesn't reach its `dart` child on POSIX.
 - Fixed Full Audit accumulating a temp file per run for large (>10MB) result sets with no cleanup, and silently swallowing a temp-file write failure instead of warning the user.
+- Fixed accuracy report showing 93% of rules as silent — the Problems-tab issue cap (500) was silently dropping diagnostics before they reached the accuracy matcher. The cap is now disabled for batch CLI analysis.
+- Fixed LSP server failing to spawn on Windows — `dart.bat` requires `shell: true` for PATHEXT resolution, matching the convention used by every other dart spawn in the extension.
+- Fixed fake LSP test diagnostics inflating the real score — changed the diagnostic source to `saropa_lsp_test` and added a source filter in `liveDiagnosticsModel` so status bar, Issues tree, and dashboard ignore them.
+- Fixed stop/dispose race when toggling the LSP server setting — `dispose()` was called before `stop()` completed, causing a double-stop. Now awaits stop before dispose.
+- Wired Kill All / Restart All buttons in the Debug Panel — previously they were rendered but nothing subscribed to the click events.
+- Replaced hardcoded English engine names and status words in the Debug Panel with `l10n()` calls — added explicit `key` field to `EngineStatus` so toggle messages don't depend on locale-sensitive substring matching.
+- Removed hand-typed rule counts (203, 2140) from the Debug Panel engine status — these drifted as rules were added. The LSP server retains its fixed count of 4 (the actual test diagnostic count).
 
 <details>
 <summary>Maintenance</summary>
@@ -107,6 +114,10 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Moved `rule_packs` config from `plugins > saropa_lints:` block in `analysis_options.yaml` to top-level key in `analysis_options_custom.yaml`, eliminating the false `unsupported_option` warning from the Dart SDK's plugin-block validator. Existing configs are read with deprecation fallback; run `dart run saropa_lints migrate-config` to migrate automatically.
 - Added `--dry-run` flag to `migrate-config` CLI — previews what would change without writing files.
 - Fixed CRLF line-ending handling in `rule_packs` write/migrate paths (Windows files with `\r\n` could silently corrupt regex matches).
+- Filed 61 new-rule and extension proposals (`bugs/proposal_*.md`) covering every DCM gap and partial-coverage rule, each traceable back to `plans/GAP_ANALYSIS.md` via a "Closes gap" line.
+- Created 46 migration guides (`doc/guides/migration_guides/`) — one per alternative lint package audited in the gap analysis — with rule-mapping tables (HAVE / PARTIAL / TODO) and migration steps.
+- Added cross-referencing requirement to `bugs/ISSUE_REPORT_GUIDE.md`: implementing a proposal that closes a migration-guide gap must flip the corresponding table row from TODO/PARTIAL to HAVE/ENHANCED.
+- Corrected stale `prefer-container` false-gap entry in `plans/GAP_ANALYSIS.md` — saropa already covers this via `PreferContainerRule`.
 
 </details>
 

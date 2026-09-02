@@ -67,11 +67,9 @@ function buildEnginesSection(engines: EngineStatus[]): string {
  *   Rules: 203 . RSS: 1.02 GB
  */
 function buildEngineCard(engine: EngineStatus): string {
-  // Determine which engine key to send in the toggle message.
-  // The key is derived from the EngineStatus.name value — the
-  // extension wires these in a fixed order (analyzer, scanDaemon,
-  // lspServer), so we use a data attribute the script reads.
-  const engineKey = engineNameToKey(engine.name);
+  // Use the explicit key from EngineStatus — stable across locales,
+  // unlike the display name which goes through l10n().
+  const engineKey = engine.key;
 
   // Toggle button labels — ON is highlighted when enabled, OFF when disabled.
   const onLabel = escapeHtml(l10n('debug.toggle.on'));
@@ -178,19 +176,8 @@ function buildLogSection(logEntries: string[]): string {
 // Helpers
 // ────────────────────────────────────────────────────────────────
 
-/**
- * Map a human-readable engine name to the message key the extension
- * host expects in toggle commands. Falls back to the name itself
- * (lowercased, spaces stripped) if no known mapping matches.
- */
-function engineNameToKey(name: string): string {
-  const lower = name.toLowerCase();
-  if (lower.includes('analyzer')) return 'analyzer';
-  if (lower.includes('scan')) return 'scanDaemon';
-  if (lower.includes('lsp')) return 'lspServer';
-  // Fallback for future engines.
-  return name.replace(/\s+/g, '').toLowerCase();
-}
+// engineNameToKey() removed — EngineStatus.key is now the explicit key,
+// so locale-dependent substring matching is no longer needed.
 
 /**
  * Return a CSS class name that colors the status text according to
