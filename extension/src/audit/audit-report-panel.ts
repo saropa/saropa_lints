@@ -9,9 +9,15 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
-import { buildAuditReportHtml } from './audit-report-html';
+import { buildAuditErrorHtml, buildAuditReportHtml } from './audit-report-html';
 
 let panel: vscode.WebviewPanel | undefined;
+
+// The message handler closes over this rather than a value captured at
+// registration time, so "Save as baseline" (fired from a reused panel)
+// always targets the most recently audited root — even when the panel was
+// first created by openAuditError() before any successful run existed.
+let currentRoot = '';
 
 /**
  * Payloads larger than this are not inlined into the webview HTML/script —
@@ -33,18 +39,57 @@ export function openAuditReport(
   auditJson: Record<string, unknown>,
   root: string,
 ): void {
+  currentRoot = root;
   const storageDir = vscode.Uri.joinPath(context.globalStorageUri, 'audit-tmp');
   const deferredFileUri = maybeWriteDeferredPayload(auditJson, storageDir);
 
+  const p = ensurePanel(context, webviewOptions(storageDir));
+  // Widen localResourceRoots on an already-existing panel so a *new*
+  // deferred temp file is reachable even if the previous render didn't
+  // need one (e.g. panel was first opened via openAuditError, which sets
+  // an empty localResourceRoots).
+  p.webview.options = webviewOptions(storageDir);
+
+  const deferredUri = deferredFileUri ? p.webview.asWebviewUri(deferredFileUri).toString() : null;
+  p.webview.html = buildAuditReportHtml(auditJson, p.webview, root, deferredUri);
+  p.reveal(vscode.ViewColumn.One);
+}
+
+/**
+ * Opens (or reveals) the audit report panel showing a failure/cancel state
+ * instead of a table — used whenever the audit CLI errors out or the user
+ * cancels it, so the panel never sits blank or shows a stale prior run's
+ * results with no explanation of what happened (project hard rule: no
+ * silent async, every action gets a visible outcome).
+ */
+export function openAuditError(
+  context: vscode.ExtensionContext,
+  root: string,
+  message: string,
+  canceled: boolean,
+): void {
+  currentRoot = root;
+  // No scripts and no filesystem access needed for a static error state.
+  const p = ensurePanel(context, { enableScripts: false, localResourceRoots: [] });
+  p.webview.html = buildAuditErrorHtml(message, canceled);
+  p.reveal(vscode.ViewColumn.One);
+}
+
+/**
+ * Returns the singleton panel, creating it (and wiring its one-time
+ * message handler) on first use. Reused across openAuditReport and
+ * openAuditError so a panel first created by either entry point still
+ * responds to "Copy JSON" / "Save as baseline" once a real report loads
+ * into it later — the handler reads `currentRoot` at call time rather than
+ * closing over the root available when the panel happened to be created.
+ */
+function ensurePanel(
+  context: vscode.ExtensionContext,
+  options: vscode.WebviewOptions,
+): vscode.WebviewPanel {
   if (panel) {
-    // Reuse existing panel — update content and reveal. Widen
-    // localResourceRoots first so a *new* deferred temp file is
-    // reachable even if the previous render didn't need one.
-    panel.webview.options = webviewOptions(storageDir);
-    const deferredUri = deferredFileUri ? panel.webview.asWebviewUri(deferredFileUri).toString() : null;
-    panel.webview.html = buildAuditReportHtml(auditJson, panel.webview, root, deferredUri);
-    panel.reveal(vscode.ViewColumn.One);
-    return;
+    panel.webview.options = options;
+    return panel;
   }
 
   panel = vscode.window.createWebviewPanel(
@@ -53,14 +98,13 @@ export function openAuditReport(
     vscode.ViewColumn.One,
     // retainContextWhenHidden is panel-level (fixed at creation, unlike
     // webview.options which can be widened later) so it's merged in only
-    // here, not in the shared webviewOptions() helper used for updates too.
-    { retainContextWhenHidden: true, ...webviewOptions(storageDir) },
+    // at creation time.
+    { retainContextWhenHidden: true, ...options },
   );
 
-  const deferredUri = deferredFileUri ? panel.webview.asWebviewUri(deferredFileUri).toString() : null;
-  panel.webview.html = buildAuditReportHtml(auditJson, panel.webview, root, deferredUri);
-
   // Handle messages from the webview (file open, copy JSON, save baseline).
+  // Registered once per panel instance regardless of which entry point
+  // created it.
   panel.webview.onDidReceiveMessage(
     (msg: { type: string; path?: string; json?: string }) => {
       if (msg.type === 'openFile' && msg.path) {
@@ -76,7 +120,7 @@ export function openAuditReport(
       }
       if (msg.type === 'saveBaseline' && msg.json) {
         // Save the audit JSON as the project baseline via the CLI.
-        saveAuditBaseline(root, msg.json);
+        saveAuditBaseline(currentRoot, msg.json);
       }
     },
     undefined,
@@ -86,6 +130,8 @@ export function openAuditReport(
   panel.onDidDispose(() => {
     panel = undefined;
   });
+
+  return panel;
 }
 
 /** Webview creation/update options — scripts on, and the deferred-payload temp dir readable. */
@@ -106,7 +152,11 @@ function webviewOptions(storageDir: vscode.Uri): vscode.WebviewOptions {
  * path, where the array is embedded directly in the generated HTML.
  *
  * A fresh filename per call (timestamped) avoids a stale temp file being
- * served if a write fails partway through a previous run.
+ * served if a write fails partway through a previous run. Any leftover
+ * files from PRIOR audit runs are deleted first — without this, every
+ * >10MB audit (each easily tens of MB) accumulates in global storage
+ * forever, since nothing else in the panel's lifecycle ever removes them
+ * (the panel is a singleton reused across many runs, not disposed per-run).
  */
 function maybeWriteDeferredPayload(
   auditJson: Record<string, unknown>,
@@ -120,13 +170,47 @@ function maybeWriteDeferredPayload(
 
   try {
     fs.mkdirSync(storageDir.fsPath, { recursive: true });
+    cleanupDeferredPayloads(storageDir);
     const filePath = path.join(storageDir.fsPath, `diagnostics-${Date.now()}.json`);
     fs.writeFileSync(filePath, serialized, 'utf-8');
     return vscode.Uri.file(filePath);
-  } catch {
+  } catch (e: unknown) {
     // Fall back to the inline path (large, but still correct) rather than
-    // showing an empty report when the temp dir isn't writable.
+    // showing an empty report when the temp dir isn't writable (disk full,
+    // permissions, etc). Still surface the failure — silently degrading to
+    // a multi-tens-of-MB inline render with no explanation would violate
+    // the project's "no silent async" rule if that render then stalls.
+    const message = e instanceof Error ? e.message : String(e);
+    void vscode.window.showWarningMessage(
+      l10n('audit.report.deferredWriteFailed', { message }),
+    );
     return null;
+  }
+}
+
+/**
+ * Deletes every previously-written deferred-payload temp file under
+ * `storageDir`. Called right before writing a new one so at most one
+ * lingers on disk at a time — the webview never reads a file mid-delete
+ * here since this runs strictly before the new file is written and served.
+ * Best-effort: a locked/already-gone file is skipped rather than failing
+ * the whole audit render over stale-temp-file housekeeping.
+ */
+function cleanupDeferredPayloads(storageDir: vscode.Uri): void {
+  let entries: string[];
+  try {
+    entries = fs.readdirSync(storageDir.fsPath);
+  } catch {
+    return;
+  }
+  for (const name of entries) {
+    if (!name.startsWith('diagnostics-') || !name.endsWith('.json')) continue;
+    try {
+      fs.unlinkSync(path.join(storageDir.fsPath, name));
+    } catch {
+      // Ignore: e.g. still open by the webview from a prior render, or
+      // already removed by another process.
+    }
   }
 }
 

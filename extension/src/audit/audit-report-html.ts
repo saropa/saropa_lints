@@ -185,6 +185,44 @@ export function buildAuditReportHtml(
 </html>`;
 }
 
+/**
+ * Builds the error/canceled-state HTML shown in place of the report when
+ * the audit CLI fails or the user cancels it. No scripts are needed here
+ * (no filtering/search to wire up), so the CSP omits script-src entirely —
+ * this keeps the failure surface minimal rather than reusing the full
+ * report shell for a state that has no table to render.
+ */
+export function buildAuditErrorHtml(
+  message: string,
+  canceled: boolean,
+): string {
+  const nonce = createWebviewCspNonce();
+  const csp = `default-src 'none'; style-src 'nonce-${nonce}';`;
+  const heading = canceled
+    ? l10n('audit.report.canceledHeading')
+    : l10n('audit.report.errorHeading');
+  const icon = canceled ? '⊘' : '✗';
+  const stateClass = canceled ? 'audit-error-canceled' : 'audit-error-failed';
+
+  return /* html */ `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="${csp}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(l10n('audit.report.title'))}</title>
+  <style nonce="${nonce}">${buildAuditStyles()}</style>
+</head>
+<body>
+  <div class="audit-error-state ${stateClass}">
+    <span class="audit-empty-icon">${icon}</span>
+    <h2>${escapeHtml(heading)}</h2>
+    <p>${escapeHtml(message)}</p>
+  </div>
+</body>
+</html>`;
+}
+
 // ── HTML builders ────────────────────────────────────────────────────
 
 /** KPI strip: total + per-tier + per-severity counts. */

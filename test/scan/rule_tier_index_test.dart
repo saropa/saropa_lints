@@ -7,6 +7,12 @@
 library;
 
 import 'package:saropa_lints/scan.dart';
+// Direct import (not re-exported from scan.dart) so the full 2334-entry
+// generated map can be iterated exhaustively below — going only through
+// getAllDefinedRules() would silently skip any map entry whose rule name
+// isn't wired into a tier set (a generator/registration drift the
+// tier-filtered test below cannot see).
+import 'package:saropa_lints/src/scan/rule_category_map.dart';
 import 'package:saropa_lints/src/tiers.dart';
 import 'package:test/test.dart';
 
@@ -134,5 +140,56 @@ void main() {
         );
       }
     });
+
+    test(
+      'every value in the generated ruleCategoryMap is a known slug '
+      '(exhaustive, all ${ruleCategoryMap.length} entries)',
+      () {
+        // The previous test filters through getAllDefinedRules() (the union
+        // of tier sets), so a rule present in the generated map but NOT
+        // wired into any tier — a real registration-drift scenario, since
+        // the map is generated from the rule factory list while tier
+        // membership is a separate, hand-maintained step — would never be
+        // checked. Iterate ruleCategoryMap directly so a generator bug that
+        // emits an unexpected/misspelled slug for ANY of the 2334 entries
+        // fails CI, not just entries that also happen to be tier-registered.
+        final validCategories = {
+          'architecture',
+          'code_quality',
+          'codegen',
+          'commerce',
+          'config',
+          'core',
+          'data',
+          'flow',
+          'hardware',
+          'media',
+          'network',
+          'packages',
+          'platforms',
+          'resources',
+          'security',
+          'stylistic',
+          'testing',
+          'ui',
+          'widget',
+        };
+
+        final invalid = <String, String>{};
+        for (final entry in ruleCategoryMap.entries) {
+          if (!validCategories.contains(entry.value)) {
+            invalid[entry.key] = entry.value;
+          }
+        }
+
+        expect(
+          invalid,
+          isEmpty,
+          reason:
+              'ruleCategoryMap entries with an unrecognized category slug '
+              '(regenerate with gen_category_map.py): $invalid',
+        );
+      },
+    );
   });
 }

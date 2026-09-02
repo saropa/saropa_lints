@@ -234,5 +234,17 @@ body {
   opacity: 0.7;
   text-align: center;
 }
+
+/* Full-panel error/canceled state — rendered instead of the table when the
+   audit CLI fails or is canceled, so the panel never shows a blank or
+   stale (previous run's) screen with no explanation. */
+.audit-error-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+.audit-error-state h2 { margin: 8px 0 6px; font-size: 1.2em; }
+.audit-error-state p { opacity: 0.75; max-width: 480px; margin: 0 auto; }
+.audit-error-failed .audit-empty-icon { color: var(--audit-sev-error); opacity: 0.9; }
+.audit-error-canceled .audit-empty-icon { opacity: 0.5; }
 `;
 }

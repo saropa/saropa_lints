@@ -26,11 +26,14 @@
     "error": {
       "spawnFailed": "Could not start the audit CLI: {message}",
       "invalidProject": "The audit could not run against this project. {details}",
-      "parseFailed": "The audit finished but its output could not be read. Try running it again."
+      "parseFailed": "The audit finished but its output could not be read. Try running it again.",
+      "canceled": "Audit canceled."
     },
     "report": {
       "title": "Saropa Lints Audit",
       "heading": "Audit Report",
+      "errorHeading": "Audit failed",
+      "canceledHeading": "Audit canceled",
       "subtitle": "{count} findings · {timestamp}",
       "baselineSubtitle": "Compared to baseline from {date}",
       "searchPlaceholder": "Filter by rule, file, or message…",
@@ -57,7 +60,8 @@
       "baselineSaved": "Baseline saved. Future audits can compare against this snapshot.",
       "baselineSaveFailed": "Could not save the baseline: {message}",
       "deferredLoading": "Loading the full result set (this audit is large)…",
-      "deferredLoadFailed": "Could not load the full result set — showing the first {pageSize} findings only."
+      "deferredLoadFailed": "Could not load the full result set — showing the first {pageSize} findings only.",
+      "deferredWriteFailed": "Could not write the large result set to a temp file ({message}) — the report may be slow to open."
     }
   },
   "scanOnSave": {

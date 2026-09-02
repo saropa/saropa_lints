@@ -73,6 +73,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 ### Added
 
 - New Full Audit command scans a project against every lint rule regardless of the configured tier — choose the whole project, only changed files versus a branch, or a comparison against a saved baseline. Results open in a dedicated report panel with tier/severity/category filters, search, file grouping, and a "Copy JSON" export. Run it from the Explorer context menu ("Saropa: Audit Folder...") or the audit icon in the dashboards sidebar.
+- Full Audit supports `--format sarif` for SARIF 2.1.0 output, so results can feed GitHub code-scanning annotations directly on a PR diff — particularly useful combined with `--since <ref>`.
 - Status bar tooltip now shows Saropa Lints process count and memory separately from the system-wide Dart total — no more blaming the extension for the entire analysis server. No action required.
 - Scan daemon auto-suspends when memory-pressure shedding reaches level 2+ (most rules shed), reclaiming the daemon's warm analyzer cache; resumes automatically when pressure drops. No action required.
 - Orphaned scan daemon detection — scan daemons left running after a VS Code crash are now identified and included in the Clean Up command alongside Flutter daemons. No action required.
@@ -87,6 +88,8 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Status bar warning/critical suffix now shows Saropa Lints RSS when available instead of the misleading system-wide total. No action required.
 - Fixed 12 rule files (28 rule classes) that accessed `.constructorName.type.element` without declaring `usesTypeResolution => true` — these rules silently produced zero findings in the light analysis lane. The integrity test now detects this access pattern.
 - Fixed Full Audit showing a confusing second "output could not be read" error after canceling an audit — the forced process-tree kill on cancel could still fire a late completion event with truncated output.
+- Fixed Full Audit cancellation silently failing to stop the underlying `dart` process on macOS/Linux — the audit CLI kept running in the background after the "Audit canceled" toast, because killing the shell process alone (with `shell: true`) doesn't reach its `dart` child on POSIX.
+- Fixed Full Audit accumulating a temp file per run for large (>10MB) result sets with no cleanup, and silently swallowing a temp-file write failure instead of warning the user.
 
 <details>
 <summary>Maintenance</summary>

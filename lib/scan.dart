@@ -42,6 +42,11 @@ export 'src/scan/rule_tier_index.dart'
         categoryIndexForRules,
         tierForRule,
         tierIndexForRules;
+export 'src/scan/sarif_writer.dart'
+    show
+        buildSarifReport,
+        sarifLevelForSeverity,
+        sarifReportToJsonString;
 export 'src/scan/stale_ignore_detector.dart'
     show
         StaleIgnore,

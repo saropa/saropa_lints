@@ -15,10 +15,38 @@ import { hasSaropaLintsDep } from '../pubspecReader';
 import { killProcessTree, resolveCliCwd } from '../views/devCliRoot';
 import { pickWorkspaceFolder } from '../workspaceFolderPicker';
 import { l10n } from '../i18n/runtime';
-import { openAuditReport } from './audit-report-panel';
+import { openAuditError, openAuditReport } from './audit-report-panel';
 
 /** In-flight guard — prevents double-spawning an audit. */
 let inflight: Promise<void> | undefined;
+
+/**
+ * Cross-platform tree-kill for the spawned audit CLI process.
+ *
+ * `devCliRoot`'s shared `killProcessTree` handles Windows correctly
+ * (`taskkill /F /T` walks the process tree by PID, independent of process
+ * groups). Its POSIX fallback is a plain `child.kill()`, which — with
+ * `shell: true` — only signals the shell wrapping `dart`, not the `dart`
+ * process itself; the shell dies and `dart` is silently orphaned, so
+ * cancellation would appear to succeed (toast shown) while the audit kept
+ * running in the background. That gap is closed here (rather than in the
+ * shared helper, which other callers such as scanOnSave's long-lived daemon
+ * rely on with different lifecycle assumptions) by killing the NEGATIVE pid
+ * of the process group the spawn call above puts the shell in — POSIX
+ * delivers the signal to every process in that group, including `dart`.
+ */
+function killAuditProcessTree(child: cp.ChildProcess): void {
+  if (process.platform !== 'win32' && child.pid) {
+    try {
+      process.kill(-child.pid, 'SIGKILL');
+      return;
+    } catch {
+      // Process group already gone (e.g. dart already exited) — fall
+      // through to the shared best-effort path below.
+    }
+  }
+  killProcessTree(child);
+}
 
 /** Registers the `saropaLints.fullAudit` and `saropaLints.auditFolder` commands; call once at activation. */
 export function registerAuditCommand(context: vscode.ExtensionContext): void {
@@ -193,16 +221,31 @@ async function doAudit(
   sinceRef: string | null,
   useBaseline: boolean,
 ): Promise<void> {
+  // spawnAuditCli reports the specific failure/cancel reason through this
+  // callback (in addition to its own toast) so doAudit can render the same
+  // message into the webview — the toast alone would leave a stale or
+  // blank report panel behind if one was already open from a prior run.
+  let failure: { message: string; canceled: boolean } | null = null;
+  const onFailure = (message: string, canceled: boolean): void => {
+    failure = { message, canceled };
+  };
+
   const result = await vscode.window.withProgress(
     {
       location: vscode.ProgressLocation.Notification,
       title: l10n('audit.progress.title'),
       cancellable: true,
     },
-    (progress, token) => spawnAuditCli(root, sinceRef, useBaseline, token, progress),
+    (progress, token) => spawnAuditCli(root, sinceRef, useBaseline, token, progress, onFailure),
   );
 
-  if (!result) return;
+  if (!result) {
+    if (failure) {
+      const f: { message: string; canceled: boolean } = failure;
+      openAuditError(context, root, f.message, f.canceled);
+    }
+    return;
+  }
   // Open the audit report webview with the JSON payload.
   openAuditReport(context, result, root);
 }
@@ -223,6 +266,10 @@ interface AuditProgress {
  * The CLI emits JSON progress lines on stderr (one per ~10 files) when
  * `--quiet` is passed. These are parsed to update the VS Code progress
  * notification with percentage and current file.
+ *
+ * @param onFailure Invoked with the localized failure/cancel message right
+ *   before resolving null, so the caller can surface the same text in the
+ *   report webview (toasts alone are easy to miss/dismiss).
  */
 function spawnAuditCli(
   root: string,
@@ -230,6 +277,7 @@ function spawnAuditCli(
   useBaseline: boolean,
   token: vscode.CancellationToken,
   progress: vscode.Progress<{ message?: string; increment?: number }>,
+  onFailure: (message: string, canceled: boolean) => void,
 ): Promise<Record<string, unknown> | null> {
   return new Promise((resolve) => {
     const args = ['run', 'saropa_lints', 'audit', root, '--quiet'];
@@ -243,11 +291,29 @@ function spawnAuditCli(
     const child = cp.spawn('dart', args, {
       cwd: resolveCliCwd(root),
       shell: true,
+      // POSIX only (no-op on win32, where killProcessTree's `taskkill /T`
+      // walks the tree by PID instead). Makes the spawned shell the leader
+      // of a NEW process group, so the dart grandchild it launches shares
+      // that group id — required for killAuditProcessTree's negative-pid
+      // kill below to reach it. Without this, the shell and dart stay in
+      // this Node process's own group and a group-kill would also try to
+      // kill the extension host itself.
+      detached: process.platform !== 'win32',
     });
 
     let stdout = '';
     let stderrBuf = '';
+    // Complete stderr lines — accumulated for the exit-code-2 error path,
+    // where the human-readable error message is a full newline-terminated
+    // line (not the trailing fragment left in stderrBuf after progress
+    // JSON parsing).
+    const stderrLines: string[] = [];
     let lastPct = 0;
+    // Cancellation already resolved + surfaced a message; taskkill's forced
+    // tree-kill still fires 'close' afterward with truncated/empty stdout,
+    // which would otherwise JSON.parse-fail and pop a second, contradictory
+    // "output could not be read" toast on top of "Audit canceled".
+    let canceled = false;
 
     child.stdout.on('data', (d: Buffer) => (stdout += d.toString()));
 
@@ -258,6 +324,9 @@ function spawnAuditCli(
       const lines = stderrBuf.split('\n');
       // Keep the last incomplete chunk for the next data event.
       stderrBuf = lines.pop() ?? '';
+
+      // Preserve all complete lines for the exit-code-2 error path.
+      stderrLines.push(...lines);
 
       for (const line of lines) {
         const trimmed = line.trim();
@@ -290,20 +359,38 @@ function spawnAuditCli(
     });
 
     // Tree-kill on cancel — shell:true means child is cmd.exe; child.kill()
-    // alone orphans the dart grandchild.
+    // alone orphans the dart grandchild. A cancel previously resolved
+    // silently with no toast or webview update — violates the project's
+    // "no silent async" rule, since the user has no confirmation the
+    // in-flight audit actually stopped.
     token.onCancellationRequested(() => {
-      killProcessTree(child);
+      canceled = true;
+      killAuditProcessTree(child);
+      const message = l10n('audit.error.canceled');
+      void vscode.window.showInformationMessage(message);
+      onFailure(message, true);
       resolve(null);
     });
 
     child.on('error', (e: Error) => {
-      void vscode.window.showErrorMessage(
-        l10n('audit.error.spawnFailed', { message: e.message }),
-      );
+      // After cancellation the tree-kill can trigger a belated 'error'
+      // (e.g. EPIPE from the killed process). The cancel path already
+      // resolved + toasted, so a second onFailure here would overwrite
+      // the canceled flag and produce a contradictory "spawn failed" toast.
+      if (canceled) return;
+
+      const message = l10n('audit.error.spawnFailed', { message: e.message });
+      void vscode.window.showErrorMessage(message);
+      onFailure(message, false);
       resolve(null);
     });
 
     child.on('close', (code: number | null) => {
+      // The cancellation path already resolved the promise and surfaced its
+      // own message; the tree-kill's belated 'close' carries no useful
+      // result, so stop here rather than risk a second, contradictory toast.
+      if (canceled) return;
+
       // Report completion.
       if (lastPct < 100) {
         progress.report({ increment: 100 - lastPct, message: l10n('audit.progress.title') });
@@ -311,12 +398,13 @@ function spawnAuditCli(
 
       // Exit 2 = invalid args or not a Dart project.
       if (code === 2) {
-        // Find the first non-JSON, non-empty line from stderr for the error.
-        const allStderr = stderrBuf;
-        const first = allStderr.split('\n').find((l) => l.trim().length > 0 && !l.trim().startsWith('{')) ?? '';
-        void vscode.window.showErrorMessage(
-          l10n('audit.error.invalidProject', { details: first }),
-        );
+        // Find the first non-JSON, non-empty line from the accumulated stderr
+        // output. Uses stderrLines (complete lines) rather than stderrBuf
+        // (which only holds the trailing fragment after progress parsing).
+        const first = stderrLines.find((l) => l.trim().length > 0 && !l.trim().startsWith('{')) ?? '';
+        const message = l10n('audit.error.invalidProject', { details: first });
+        void vscode.window.showErrorMessage(message);
+        onFailure(message, false);
         resolve(null);
         return;
       }
@@ -326,9 +414,9 @@ function spawnAuditCli(
         const json = JSON.parse(stdout) as Record<string, unknown>;
         resolve(json);
       } catch {
-        void vscode.window.showErrorMessage(
-          l10n('audit.error.parseFailed'),
-        );
+        const message = l10n('audit.error.parseFailed');
+        void vscode.window.showErrorMessage(message);
+        onFailure(message, false);
         resolve(null);
       }
     });

@@ -1,7 +1,7 @@
 # Full Audit — run every rule against a codebase, render a filterable report
 
 **Created:** 2026-08-29
-**Status:** Phase 1 complete (2026-09-02), Phases 2–3 pending
+**Status:** Complete (2026-09-02) — all three phases implemented and reviewed.
 
 ---
 
@@ -516,3 +516,68 @@ annotations directly on a PR diff (particularly useful combined with `--since`).
 require a `sarif_writer.dart` mapping diagnostic severity/impact to SARIF `level` and
 `rank`, plus a `physicalLocation` per diagnostic. Not designed further here — raised as
 a future-work candidate only.
+
+## Finish Report (2026-09-02)
+
+All three implementation phases are complete.
+
+**Phase 1 (CLI, Dart).** `bin/audit.dart`, `lib/src/scan/rule_tier_index.dart`,
+`lib/src/scan/git_changed_files.dart`, and `lib/src/scan/audit_baseline.dart` were
+already present in the working tree when implementation began, but three defects kept
+the feature from working as designed. `ScanRunner._prepare()` unconditionally called
+`RuntimeTierCap.filterRuleSet()`, silently re-capping the "all rules" set back down to
+the target project's configured tier — defeating the audit's core purpose. Fixed by
+adding a `bypassTierCap` field to `ScanRunner` (default `false`), which `bin/audit.dart`
+now sets. Tier enrichment read the wrong JSON key (`entry['rule']` instead of
+`entry['ruleName']`), silently leaving every diagnostic's `tier` field null; fixed to
+read the correct key. A `category` field required by the design (rule source directory,
+e.g. `security_rules.dart` → `security`) was entirely unimplemented; added a generated
+`lib/src/scan/rule_category_map.dart` (2334 entries, one per registered rule) plus
+`categoryForRule`/`categoryIndexForRules` lookups in `rule_tier_index.dart`, wired into
+`bin/audit.dart`'s enrichment loop and exported from `lib/scan.dart`. Verified by
+`test/scan/rule_tier_index_test.dart`, extended with 4 category tests mirroring the
+existing tier tests (8/8 passing).
+
+**Phase 2 (Extension UI, TypeScript).** The webview report under `extension/src/audit/`
+was also already substantially implemented on arrival. A follow-up audit against the
+plan found and fixed: a missing CSP nonce on the webview (the mandatory pattern used
+elsewhere in the extension via `html-utils.ts`); a file-grouping toggle button that was
+present but a no-op; the plan's >10MB payload mitigation (route through a temp file
+under `context.globalStorageUri`, fetched lazily via `asWebviewUri()`) which was
+missing entirely; missing multi-root workspace resolution; a missing Explorer
+context-menu entry ("Saropa: Audit Folder..."); and 4 missing i18n keys. A ~700-line
+`audit-report-html.ts` was split into `audit-report-styles.ts` and
+`audit-report-script.ts` to respect the project's file-size convention.
+
+**Phase 3 (Polish).** Debounced search, keyboard navigation, a "Copy JSON" export
+button, and an empty-state view were already present from Phase 2. The one real gap was
+error/cancellation feedback: a failed audit CLI run produced only a transient toast, and
+a canceled run produced no feedback at all — a silent-async violation, compounded by an
+already-open report panel from a prior successful run being left showing stale results
+with no indication anything had gone wrong. Fixed by adding `openAuditError()`, a
+script-free error/cancel view reused by both the failure and cancellation paths, wired
+through every failure branch in `audit-command.ts` (spawn error, exit code 2, JSON
+parse failure, and cancellation).
+
+**Post-implementation code review** found and fixed one further defect: on Windows,
+`taskkill /F /T`'s forced process-tree kill still fires the child process's `close`
+event after cancellation, with truncated or empty stdout — this raced against the
+already-resolved cancellation path and produced a second, contradictory "output could
+not be read" error toast on top of the "Audit canceled" toast. Fixed with a `canceled`
+guard flag in `spawnAuditCli()` that short-circuits the `close` handler once
+cancellation has already resolved the promise and surfaced its own message.
+
+**Known gap, not addressed:** no automated tests exist for `extension/src/audit/` —
+the extension test suite has no existing harness for mocking `child_process.spawn`
+(checked: no `sinon`-based spawn stubbing precedent anywhere in `extension/src/test/`),
+and `spawnAuditCli()` is not exported for direct unit testing. Building that harness
+was judged disproportionate to the specific fix it would cover (a 3-line cancellation
+guard) and was deferred rather than built ad hoc under this task's scope. The Dart CLI
+side is covered by `test/scan/rule_tier_index_test.dart`; the TypeScript side currently
+relies on `check-types` and manual verification only.
+
+**Translation coverage:** three new i18n keys added during the Phase 3 error/cancel
+work (`audit.error.canceled`, `audit.report.errorHeading`, `audit.report.canceledHeading`)
+were confirmed absent from all 11 non-English locale catalogs at review time. A manual
+run of `extension/scripts/generate_translations.py` was in progress when this report was
+written; coverage should be re-checked once it completes.

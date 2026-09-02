@@ -21,7 +21,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path/path.dart' as p;
-import 'package:saropa_lints/saropa_lints.dart' show getAllDefinedRules;
+import 'package:saropa_lints/saropa_lints.dart'
+    show getAllDefinedRules, saropaLintsVersion;
 import 'package:saropa_lints/scan.dart';
 import 'package:saropa_lints/src/config/rule_lane.dart' show RuleLane;
 import 'package:saropa_lints/src/native/saropa_context.dart'
@@ -220,7 +221,22 @@ Future<void> main(List<String> args) async {
     }
   }
 
-  final output = const JsonEncoder.withIndent('  ').convert(json);
+  // Native schema is the default; SARIF is derived from the same enriched
+  // diagnostic list at the very end so --since/--baseline/progress/exit-code
+  // behavior above is identical between the two formats — only the final
+  // serialization differs.
+  final String output;
+  if (parsed.format == 'sarif') {
+    final diagMaps = (json['diagnostics'] as List<dynamic>)
+        .cast<Map<String, dynamic>>();
+    output = sarifReportToJsonString(
+      diagMaps,
+      rootPath: path,
+      toolVersion: saropaLintsVersion,
+    );
+  } else {
+    output = const JsonEncoder.withIndent('  ').convert(json);
+  }
 
   // Write to --output path or stdout.
   if (parsed.outputPath != null) {
@@ -269,6 +285,7 @@ class _AuditArgs {
     this.saveBaseline = false,
     this.useBaseline = false,
     this.baselinePath,
+    this.format = 'native',
   });
 
   final String path;
@@ -280,6 +297,12 @@ class _AuditArgs {
   final bool quiet;
   final List<String> excludeGlobs;
   final List<String> includeGlobs;
+
+  /// Output schema: `native` (default, the audit-enriched scan JSON schema)
+  /// or `sarif` (SARIF 2.1.0, for GitHub code-scanning annotations —
+  /// especially useful with `--since` to annotate only a PR's changed
+  /// lines). Validated against this fixed set in `_parseArgs`.
+  final String format;
 
   /// When true, save the audit output as the project baseline.
   final bool saveBaseline;
@@ -303,6 +326,7 @@ _AuditArgs? _parseArgs(List<String> args) {
   var saveBaseline = false;
   var useBaseline = false;
   String? baselinePathOverride;
+  var format = 'native';
   final excludeGlobs = <String>[];
   final includeGlobs = <String>[];
 
@@ -315,6 +339,21 @@ _AuditArgs? _parseArgs(List<String> args) {
           return null;
         }
         outputPath = args[++i];
+      case '--format':
+        if (i + 1 >= args.length) {
+          stderr.writeln('Error: --format requires a value (native, sarif).');
+          return null;
+        }
+        format = args[++i];
+        // Fail fast on an unknown format rather than silently falling back
+        // to native — a typo here should not produce a confusing wrong-shape
+        // file for a CI step expecting SARIF.
+        if (format != 'native' && format != 'sarif') {
+          stderr.writeln(
+            'Error: --format must be "native" or "sarif" (got "$format").',
+          );
+          return null;
+        }
       case '--since':
         if (i + 1 >= args.length) {
           stderr.writeln('Error: --since requires a git ref argument.');
@@ -389,6 +428,7 @@ _AuditArgs? _parseArgs(List<String> args) {
     saveBaseline: saveBaseline,
     useBaseline: useBaseline,
     baselinePath: baselinePathOverride,
+    format: format,
   );
 }
 
@@ -434,6 +474,8 @@ void _printUsage() {
   print('');
   print('Options:');
   print('  --output <path>       Write JSON to a file instead of stdout');
+  print('  --format <fmt>        native (default) or sarif (SARIF 2.1.0,');
+  print('                        for GitHub code-scanning annotations)');
   print('  --since <ref>         Only audit files changed since this git ref');
   print('  --min-severity <s>    Post-filter: hide below this severity');
   print('                        (error, warning, info)');
@@ -458,4 +500,6 @@ void _printUsage() {
   print('  dart run saropa_lints audit /path/to/project --output report.json');
   print('  dart run saropa_lints audit . --since main');
   print('  dart run saropa_lints audit . --min-severity warning --quiet');
+  print('  dart run saropa_lints audit . --since main --format sarif '
+      '--output results.sarif');
 }
