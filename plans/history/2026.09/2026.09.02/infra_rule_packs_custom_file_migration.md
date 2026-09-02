@@ -51,14 +51,20 @@ Projects with `rule_packs` in the old plugin-block location continue to work —
 
 - `writeRulePacksToCustomFile` skips disk write when content is unchanged (avoids unnecessary I/O on every init run with no packs).
 - `migrate-config` (Dart and TS) now removes skipped keys from the legacy plugin block even when they already exist in the custom file — previously, a key present in both files would be "SKIP"ped but never removed from the main file, leaving the `unsupported_option` warning intact.
-- New test file: `test/init/write_rule_packs_custom_file_test.dart` (8 tests) — covers write, replace, clear, section-boundary safety, empty file, and file creation.
+- New test file: `test/init/write_rule_packs_custom_file_test.dart` (9 tests) — covers write, replace, clear, section-boundary safety, empty file, file creation, and CRLF handling.
+
+### Second hardening pass
+
+- **CRLF normalization**: all file-read paths in `writeRulePacksToCustomFile` (Dart), `writeRulePacksEnabled` / `removeLegacyRulePacksFromMainFile` (TS), and `migrate-config` (both) now normalize `\r\n` → `\n` before regex matching. Previously, Windows-edited files with `\r\n` caused regex patterns (anchored on `\n`) to silently fail, leaving blocks unmatched.
+- **`--dry-run` flag**: `dart run saropa_lints migrate-config --dry-run` and the TS `migrateConfigKeys(root, { dryRun: true })` API preview what would change without writing any files. Useful for CI pipelines and cautious users.
+- **CRLF test**: added test case verifying `writeRulePacksToCustomFile` handles `\r\n` files without corruption.
 
 ### Verification
 
 - Dart analysis: 0 issues across all touched files.
 - TypeScript: `tsc --noEmit` passes clean.
 - `test/init/write_config_test.dart`: 12/12 pass.
-- `test/init/write_rule_packs_custom_file_test.dart`: 8/8 pass (new).
+- `test/init/write_rule_packs_custom_file_test.dart`: 9/9 pass.
 - `test/config/analysis_options_rule_packs_test.dart`: all pass (parser unchanged).
 - `test/scan/rule_tier_index_test.dart`: 8/8 pass (rule registration integrity).
 

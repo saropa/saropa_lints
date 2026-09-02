@@ -130,7 +130,11 @@ function escapeRegex(value: string): string {
 export function writeRulePacksEnabled(workspaceRoot: string, packIds: readonly string[]): boolean {
   const cp = customFilePath(workspaceRoot);
   try {
-    let content = fs.existsSync(cp) ? fs.readFileSync(cp, 'utf-8') : '';
+    // Normalize line endings so regex patterns (which match `\n`) work on
+    // Windows files that may contain `\r\n`.
+    let content = fs.existsSync(cp)
+      ? fs.readFileSync(cp, 'utf-8').replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+      : '';
 
     // Build the new top-level block.
     const block = packIds.length === 0
@@ -181,7 +185,8 @@ export function removeLegacyRulePacksFromMainFile(workspaceRoot: string): void {
   const p = readAnalysisOptionsPath(workspaceRoot);
   if (!fs.existsSync(p)) return;
   try {
-    let content = fs.readFileSync(p, 'utf-8');
+    // Normalize line endings for consistent regex matching on Windows.
+    let content = fs.readFileSync(p, 'utf-8').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     let changed = false;
     if (PLUGIN_RULE_PACK_BLOCK.test(content)) {
       content = content.replace(PLUGIN_RULE_PACK_BLOCK, '');

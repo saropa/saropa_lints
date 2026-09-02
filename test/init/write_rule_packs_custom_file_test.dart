@@ -128,5 +128,21 @@ platforms:
       );
       expect(packs, ['drift']);
     });
+
+    test('handles CRLF line endings without corruption', () {
+      // Simulate a Windows-edited file with \r\n line endings.
+      customFile.writeAsStringSync(
+        '# PLATFORM SETTINGS\r\nplatforms:\r\n  android: true\r\n',
+      );
+      writeRulePacksToCustomFile(customFile, ['drift']);
+      final content = customFile.readAsStringSync();
+
+      // Packs written correctly.
+      final packs = parseRulePacksEnabledList(content);
+      expect(packs, ['drift']);
+      // Platform section preserved.
+      expect(content.contains('platforms:'), isTrue);
+      expect(content.contains('android: true'), isTrue);
+    });
   });
 }

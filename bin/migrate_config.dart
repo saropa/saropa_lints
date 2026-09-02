@@ -30,8 +30,15 @@ final _pluginRulePacksBlock = RegExp(
 );
 
 /// Entry point for `dart run saropa_lints migrate-config`.
+///
+/// Flags:
+///   `--dry-run`  Preview what would change without writing any files.
+///   First positional arg is the project directory (defaults to `.`).
 void main(List<String> args) {
-  final dir = args.isNotEmpty ? args.first : '.';
+  // Parse --dry-run flag and extract the directory argument.
+  final dryRun = args.contains('--dry-run');
+  final positional = args.where((a) => a != '--dry-run').toList();
+  final dir = positional.isNotEmpty ? positional.first : '.';
   final sep = Platform.pathSeparator;
 
   final mainFile = File('$dir${sep}analysis_options.yaml');
@@ -41,7 +48,10 @@ void main(List<String> args) {
     return;
   }
 
-  final mainContent = mainFile.readAsStringSync();
+  // Normalize line endings so removal regexes (which match `\n`) work on
+  // Windows files that may contain `\r\n`.
+  final mainContent =
+      mainFile.readAsStringSync().replaceAll('\r\n', '\n').replaceAll('\r', '\n');
 
   // --- Scalar keys (log_level, lane, memory_mode) ---
   final found = <String, String>{};
@@ -64,7 +74,7 @@ void main(List<String> args) {
   // Read or create the custom file.
   final customFile = File('$dir${sep}analysis_options_custom.yaml');
   var customContent = customFile.existsSync()
-      ? customFile.readAsStringSync()
+      ? customFile.readAsStringSync().replaceAll('\r\n', '\n').replaceAll('\r', '\n')
       : '';
 
   // Only add scalar keys that aren't already in the custom file, but always
@@ -93,7 +103,7 @@ void main(List<String> args) {
   }
 
   // Write the custom file with the scalar keys first.
-  if (added.isNotEmpty) {
+  if (added.isNotEmpty && !dryRun) {
     customFile.writeAsStringSync(customContent);
   }
 
@@ -112,7 +122,9 @@ void main(List<String> args) {
       print('  SKIP rule_packs: already in analysis_options_custom.yaml');
     } else {
       // Write rule_packs block to the custom file using the shared helper.
-      writeRulePacksToCustomFile(customFile, rulePackIds);
+      if (!dryRun) {
+        writeRulePacksToCustomFile(customFile, rulePackIds);
+      }
       print('  MOVE rule_packs: [${rulePackIds.join(', ')}]');
     }
   }
@@ -139,10 +151,17 @@ void main(List<String> args) {
     updatedMain = updatedMain.replaceAll(_pluginRulePacksBlock, '');
   }
 
-  mainFile.writeAsStringSync(updatedMain);
+  if (!dryRun) {
+    mainFile.writeAsStringSync(updatedMain);
+  }
 
   final totalMoved = added.length + (hasLegacyRulePacks ? 1 : 0);
   print('');
-  print('Migrated $totalMoved key(s) to analysis_options_custom.yaml.');
-  print('The unsupported_option warnings will no longer appear.');
+  if (dryRun) {
+    print('[dry-run] Would migrate $totalMoved key(s) to '
+        'analysis_options_custom.yaml. No files were modified.');
+  } else {
+    print('Migrated $totalMoved key(s) to analysis_options_custom.yaml.');
+    print('The unsupported_option warnings will no longer appear.');
+  }
 }

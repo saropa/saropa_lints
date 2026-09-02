@@ -60,6 +60,8 @@ export interface MigrateResult {
   moved: string[];
   /** Keys that were already in the custom file (skipped). */
   skipped: string[];
+  /** True when --dry-run was used (no files were modified). */
+  dryRun?: boolean;
   /** Error message if the operation failed entirely. */
   error?: string;
 }
@@ -67,8 +69,10 @@ export interface MigrateResult {
 /**
  * Runs the migration: reads legacy keys from the plugin block, adds them
  * to the custom file, removes them from the main file.
+ *
+ * Pass `dryRun: true` to preview changes without modifying any files.
  */
-export function migrateConfigKeys(root: string): MigrateResult {
+export function migrateConfigKeys(root: string, { dryRun = false } = {}): MigrateResult {
   const mainPath = path.join(root, 'analysis_options.yaml');
   if (!fs.existsSync(mainPath)) {
     return { moved: [], skipped: [], error: 'analysis_options.yaml not found' };
@@ -117,13 +121,13 @@ export function migrateConfigKeys(root: string): MigrateResult {
 
   // Write the custom file with the scalar keys (only if any were added).
   const scalarKeysChanged = moved.length > 0;
-  if (scalarKeysChanged) {
+  if (scalarKeysChanged && !dryRun) {
     fs.writeFileSync(customPath, customContent, 'utf8');
   }
 
   // Remove ALL found scalar keys from the main file's plugin block — even
   // skipped ones — so the unsupported_option warning is eliminated.
-  if (found.size > 0) {
+  if (found.size > 0 && !dryRun) {
     let updatedMain = mainContent;
     for (const key of found.keys()) {
       updatedMain = updatedMain.replace(
@@ -147,19 +151,21 @@ export function migrateConfigKeys(root: string): MigrateResult {
       skipped.push('rule_packs');
     } else {
       // writeRulePacksEnabled writes to custom file and cleans up main file.
-      writeRulePacksEnabled(root, rulePackIds);
+      if (!dryRun) {
+        writeRulePacksEnabled(root, rulePackIds);
+      }
       moved.push('rule_packs');
     }
     // Even if rule_packs was skipped (already in custom file), clean up the
     // legacy block from the main file to stop the warning.
-    if (!moved.includes('rule_packs')) {
+    if (!moved.includes('rule_packs') && !dryRun) {
       // removeLegacyRulePacksFromMainFile is called by writeRulePacksEnabled
       // when it runs; only need manual cleanup for the skip path.
       removeLegacyRulePacksFromMainFile(root);
     }
   }
 
-  return { moved, skipped };
+  return { moved, skipped, dryRun: dryRun || undefined };
 }
 
 /**

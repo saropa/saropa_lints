@@ -358,8 +358,10 @@ final _rulePacksBlockPattern = RegExp(
 /// block is written sorted alphabetically. Creates the file if it doesn't
 /// exist, inserting after the `# ANALYSIS SETTINGS` section when present.
 void writeRulePacksToCustomFile(File customFile, List<String> packIds) {
-  final original =
-      customFile.existsSync() ? customFile.readAsStringSync() : '';
+  final raw = customFile.existsSync() ? customFile.readAsStringSync() : '';
+  // Normalize line endings so regex patterns (which match `\n`) work on
+  // Windows files that may contain `\r\n`.
+  final original = raw.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
   var content = original;
 
   // Build the new block (empty string if no packs).

@@ -68,10 +68,11 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.2.9] — Unreleased
 
-The system health monitor now separates memory used by Saropa Lints from the total across all Dart processes, so users can see the real footprint instead of being blamed for the entire analysis server. The scan daemon auto-suspends under heavy memory pressure to reclaim its analyzer cache, and orphaned scan daemons are now detected and cleaned up alongside Flutter daemons. [log](https://github.com/saropa/saropa_lints/blob/v15.2.9/CHANGELOG.md)
+The system health monitor now separates memory used by Saropa Lints from the total across all Dart processes, so users can see the real footprint instead of being blamed for the entire analysis server. The scan daemon auto-suspends under heavy memory pressure to reclaim its analyzer cache, and orphaned scan daemons are now detected and cleaned up alongside Flutter daemons. A new Full Audit command scans a project against every rule regardless of its configured tier and opens the results in a filterable report panel. [log](https://github.com/saropa/saropa_lints/blob/v15.2.9/CHANGELOG.md)
 
 ### Added
 
+- New Full Audit command scans a project against every lint rule regardless of the configured tier — choose the whole project, only changed files versus a branch, or a comparison against a saved baseline. Results open in a dedicated report panel with tier/severity/category filters, search, file grouping, and a "Copy JSON" export. Run it from the Explorer context menu ("Saropa: Audit Folder...") or the audit icon in the dashboards sidebar.
 - Status bar tooltip now shows Saropa Lints process count and memory separately from the system-wide Dart total — no more blaming the extension for the entire analysis server. No action required.
 - Scan daemon auto-suspends when memory-pressure shedding reaches level 2+ (most rules shed), reclaiming the daemon's warm analyzer cache; resumes automatically when pressure drops. No action required.
 - Orphaned scan daemon detection — scan daemons left running after a VS Code crash are now identified and included in the Clean Up command alongside Flutter daemons. No action required.
@@ -85,6 +86,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Fixed case-insensitive script-tag matching in snapshot harness so upper-case `<SCRIPT>` tags are normalized correctly (CodeQL #20).
 - Status bar warning/critical suffix now shows Saropa Lints RSS when available instead of the misleading system-wide total. No action required.
 - Fixed 12 rule files (28 rule classes) that accessed `.constructorName.type.element` without declaring `usesTypeResolution => true` — these rules silently produced zero findings in the light analysis lane. The integrity test now detects this access pattern.
+- Fixed Full Audit showing a confusing second "output could not be read" error after canceling an audit — the forced process-tree kill on cancel could still fire a late completion event with truncated output.
 
 <details>
 <summary>Maintenance</summary>
@@ -98,6 +100,8 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Moved `PACKAGE_VIBRANCY.md` from `plans/guides/` to the repo root to match the path the extension's SDK vibrancy table expects; excluded `plans/` from the pub.dev package (already public on GitHub, this only trims the published tarball); added CI check `scripts/check_doc_links_excluded_paths.py` to catch shipped docs linking into `.pubignore`-excluded paths (resolves link targets relative to the linking file, reads exclusion prefixes directly from `.pubignore`, and checks both inline and reference-style Markdown links). Fixed 6 dead links it found across `README.md`, `doc/troubleshooting.md`, and `doc/guides/`.
 - Added GitHub issue form templates (`.github/ISSUE_TEMPLATE/`) for bug reports and feature requests, enforcing the structure from `bugs/ISSUE_REPORT_GUIDE.md` at filing time. Blank issues disabled.
 - Moved `rule_packs` config from `plugins > saropa_lints:` block in `analysis_options.yaml` to top-level key in `analysis_options_custom.yaml`, eliminating the false `unsupported_option` warning from the Dart SDK's plugin-block validator. Existing configs are read with deprecation fallback; run `dart run saropa_lints migrate-config` to migrate automatically.
+- Added `--dry-run` flag to `migrate-config` CLI — previews what would change without writing files.
+- Fixed CRLF line-ending handling in `rule_packs` write/migrate paths (Windows files with `\r\n` could silently corrupt regex matches).
 
 </details>
 
