@@ -67,6 +67,10 @@ class AvoidShrinkWrapInScrollViewRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_shrinkwrap_in_scrollview',
     '[avoid_shrinkwrap_in_scrollview] shrinkWrap: true on a scrollable list disables virtualization, forcing Flutter to lay out and render every child widget immediately regardless of visibility. This causes severe jank, high memory usage, and slow initial rendering for lists with more than a few dozen items, degrading the user experience. {v6}',

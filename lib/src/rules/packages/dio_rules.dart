@@ -529,6 +529,10 @@ class AvoidDioDebugPrintProductionRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_dio_debug_print_production',
     '[avoid_dio_debug_print_production] Using Dio LogInterceptor in production exposes sensitive request and response data\u2014including authentication tokens, user information, and API payloads\u2014to device logs. This can lead to data leaks, privacy violations, and compliance issues, especially on shared or rooted devices. Always restrict debug logging to development builds only. {v3}',

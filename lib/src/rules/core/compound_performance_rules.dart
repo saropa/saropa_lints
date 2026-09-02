@@ -46,6 +46,11 @@ abstract class _CompoundPerformanceRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  // Helpers in compound_performance_patterns.dart use
+  // .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   @override
   void runWithReporter(
     SaropaDiagnosticReporter reporter,

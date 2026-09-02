@@ -135,6 +135,10 @@ class RequireKeyboardTypeRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_keyboard_type',
     '[require_keyboard_type] Text field label suggests email or phone input but no keyboardType is specified. Without TextInputType.emailAddress or TextInputType.phone, users see a generic text keyboard lacking the @ key, .com shortcut, or numeric layout. This causes input errors, slows data entry, and hurts accessibility for users who rely on specialized keyboard layouts. {v3}',
@@ -273,6 +277,10 @@ class RequireTextOverflowInRowRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   /// Two context-aware fixes: "Wrap in Expanded" inside Row/Column/Flex,
   /// "Add maxLines" everywhere else. Only one activates per location (#320).
   @override
@@ -377,6 +385,10 @@ class RequireSecureKeyboardRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_secure_keyboard',
@@ -503,6 +515,10 @@ class RequireErrorMessageContextRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'require_error_message_context',

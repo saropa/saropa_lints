@@ -51,6 +51,10 @@ class AvoidCreatingVectorInUpdateRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_creating_vector_in_update',
     '[avoid_creating_vector_in_update] Creating new Vector objects (Vector2, Vector3, etc.) inside update() causes frequent garbage collection (GC) churn every frame, leading to performance degradation, frame drops, and increased CPU usage. In real-time games, this can cause stuttering, input lag, and poor user experience, especially on lower-end devices. {v2}',

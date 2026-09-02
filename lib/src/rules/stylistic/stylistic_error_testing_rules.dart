@@ -59,6 +59,10 @@ class PreferSpecificExceptionsRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   @override
   String get exampleBad => "throw Exception('bad input');";
 
@@ -129,6 +133,10 @@ class PreferGenericExceptionRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.medium;
+
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => "throw UserNotFoundException('not found');";

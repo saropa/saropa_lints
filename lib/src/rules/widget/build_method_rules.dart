@@ -60,6 +60,10 @@ class AvoidGradientInBuildRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_gradient_in_build',
     '[avoid_gradient_in_build] Creating Gradient in build() prevents reuse and causes allocations. This leads to unnecessary memory usage, slower UI performance, and increased battery drain. {v3}',
@@ -1349,6 +1353,10 @@ class PreferContainerRule extends SaropaLintRule {
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
+
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_single_container',

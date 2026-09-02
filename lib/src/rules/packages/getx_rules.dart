@@ -1553,6 +1553,10 @@ class AvoidMutableRxVariablesRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_mutable_rx_variables',
     '[avoid_mutable_rx_variables] Reassigning an Rx variable with = replaces the entire reactive wrapper, breaking all existing Obx listeners that still reference the old instance. The build method stops receiving updates because child widgets observe a stale object, leading to a frozen interface that appears unresponsive. {v4}',

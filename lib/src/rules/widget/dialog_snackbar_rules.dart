@@ -44,6 +44,10 @@ class RequireSnackbarDurationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_snackbar_duration',
     '[require_snackbar_duration] Default duration varies by platform, '

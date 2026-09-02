@@ -268,6 +268,10 @@ class AvoidInternalDependencyCreationRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.medium;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'avoid_internal_dependency_creation',
     '[avoid_internal_dependency_creation] Dependency created internally instead of being injected. Cannot substitute mock implementations for testing. This tight coupling reduces testability and makes the component harder to reuse. {v5}',

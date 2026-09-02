@@ -59,6 +59,10 @@ class PreferSizedBoxOverContainerRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   @override
   List<SaropaFixGenerator> get fixGenerators => [
     ({required CorrectionProducerContext context}) =>
@@ -154,6 +158,10 @@ class PreferContainerOverSizedBoxRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   @override
   String get exampleBad => 'SizedBox(width: 16, height: 16)';
 
@@ -235,6 +243,10 @@ class PreferTextRichOverRichTextRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   @override
   String get exampleBad => "RichText(text: TextSpan(text: 'Hi'))";
 
@@ -306,6 +318,10 @@ class PreferRichTextOverTextRichRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => "Text.rich(TextSpan(text: 'Hi'))";
@@ -381,6 +397,10 @@ class PreferEdgeInsetsSymmetricRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.widget};
@@ -489,6 +509,10 @@ class PreferEdgeInsetsOnlyRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   @override
   String get exampleBad => 'EdgeInsets.symmetric(horizontal: 16)';
 
@@ -564,6 +588,10 @@ class PreferBorderRadiusCircularRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   List<SaropaFixGenerator> get fixGenerators => [
@@ -660,6 +688,10 @@ class PreferExpandedOverFlexibleRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   @override
   String get exampleBad => 'Flexible(fit: FlexFit.tight, child: w)';
 
@@ -743,6 +775,10 @@ class PreferFlexibleOverExpandedRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'Expanded(child: w)';
@@ -1014,6 +1050,10 @@ class PreferClipRSuperellipseRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   @override
   String get exampleBad => 'ClipRRect(borderRadius: BorderRadius.circular(10))';
 
@@ -1102,6 +1142,10 @@ class PreferClipRSuperellipseClipperRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
 
   @override
   String get exampleBad => 'ClipRRect(clipper: MyClipper())';

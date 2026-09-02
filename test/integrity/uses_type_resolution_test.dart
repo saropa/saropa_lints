@@ -11,15 +11,14 @@ import 'package:test/test.dart';
 /// `hasDefaultValue`, `defaultValueCode`) that replaced the older
 /// `staticElement` call chain but still require full resolution.
 /// Matches resolved-type API calls. Includes `NamedType.element` via
-/// `.superclass.element` — a type-resolution accessor the original
-/// regex missed. NOTE: `.constructorName.type.element` is the same API
-/// but is used by 14+ rule files that predate the flag; tracked as a
-/// separate bulk fix (see bugs/type_element_resolution_gap.md).
+/// `.superclass.element` and `.constructorName.type.element` — both
+/// access the same type-resolution API through different AST paths.
 final _resolvedTypePatterns = RegExp(
   r'\.(staticType|allSupertypes|thisType|resolvedType'
   r'|declaredElement|staticElement|enclosingElement'
   r'|formalParameters|hasDefaultValue|defaultValueCode)\b'
-  r'|\.superclass\.element\b',
+  r'|\.superclass\.element\b'
+  r'|\.constructorName\.type\.element\b',
 );
 
 /// Matches `.library` access on elements — a resolved-type trigger — but
@@ -87,6 +86,12 @@ void main() {
       final ruleClassPattern = RegExp(
         r'class\s+\w+\s+extends\s+(?:Saropa|Dart)LintRule',
       );
+      // Files that delegate resolved-type API calls to an imported helper.
+      // The helper uses the API, not the rule file itself, so the regex
+      // won't find it — but the flag is still correct.
+      const indirectUsageAllowlist = {
+        'lib/src/rules/core/compound_performance_rules.dart',
+      };
       final falseClaims = <String>[];
 
       for (final file in ruleDir.listSync(recursive: true)) {
@@ -98,7 +103,10 @@ void main() {
         if (!content.contains('usesTypeResolution => true')) continue;
         // If the file genuinely uses resolved-type APIs, it's correct.
         if (_usesResolvedTypeApis(content)) continue;
-        falseClaims.add(file.path.replaceAll('\\', '/'));
+        final normalized = file.path.replaceAll('\\', '/');
+        // Skip files that use resolved APIs indirectly via imported helpers.
+        if (indirectUsageAllowlist.contains(normalized)) continue;
+        falseClaims.add(normalized);
       }
 
       expect(

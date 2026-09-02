@@ -153,6 +153,10 @@ class RequireAvatarFallbackRule extends SaropaLintRule {
   @override
   RuleCost get cost => RuleCost.low;
 
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
+
   static const LintCode _code = LintCode(
     'require_avatar_fallback',
     '[require_avatar_fallback] CircleAvatar with NetworkImage fails silently when image load fails. Users will see a broken or blank avatar with no indication of the error, leading to confusion, poor UX, and missed identity cues. This can also mask backend or connectivity issues during development. {v3}',
@@ -242,6 +246,10 @@ class PreferVideoLoadingPlaceholderRule extends SaropaLintRule {
 
   @override
   RuleCost get cost => RuleCost.low;
+
+  // Uses .constructorName.type.element for type resolution.
+  @override
+  bool get usesTypeResolution => true;
 
   static const LintCode _code = LintCode(
     'prefer_video_loading_placeholder',
