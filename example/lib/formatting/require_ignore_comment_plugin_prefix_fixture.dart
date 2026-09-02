@@ -4,6 +4,7 @@
 // BAD: bare rule name targeting a saropa_lints rule — silently ineffective in IDE.
 
 // LINT: require_ignore_comment_plugin_prefix
+// LINT_MESSAGE: without the required
 // ignore: avoid_null_assertion
 final x1 = 1;
 
@@ -48,6 +49,7 @@ final x4 = 4;
 // typo or renamed rule, suppression silently does nothing.
 
 // LINT: require_ignore_comment_plugin_prefix
+// LINT_MESSAGE: not a registered
 // ignore: saropa_lints/duplicate_ignore
 final x5 = 5;
 
@@ -56,6 +58,7 @@ final x5 = 5;
 final x6 = 6;
 
 // LINT: require_ignore_comment_plugin_prefix
+// LINT_MESSAGE: not a registered
 // ignore: saropa_lints/totally_made_up_rule_name
 final x7 = 7;
 

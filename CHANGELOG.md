@@ -83,6 +83,17 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Fixed case-insensitive script-tag matching in snapshot harness so upper-case `<SCRIPT>` tags are normalized correctly (CodeQL #20).
 - Status bar warning/critical suffix now shows Saropa Lints RSS when available instead of the misleading system-wide total. No action required.
 
+<details>
+<summary>Maintenance</summary>
+
+- Compiled competitor gap analysis (`plans/GAP_ANALYSIS.md`) — rule-by-rule audit of 48 Dart/Flutter lint packages against saropa_lints' catalog, with gap themes and per-package detail sections for planning future rule additions.
+- Added `// LINT_MESSAGE:` and `// LINT_NOT:` fixture marker infrastructure — declarative message-content validation and false-positive guards for resolved harness tests, eliminating boilerplate for each diagnostic variant.
+- `audit` CLI: fixed `RuntimeTierCap` silently capping the rule set — added `bypassTierCap` flag on `ScanRunner` so audit runs every rule regardless of the project's configured tier.
+- `audit` CLI: fixed tier enrichment bug — was looking up `entry['rule']` instead of `entry['ruleName']`, so tier field was never populated in JSON output.
+- `audit` CLI: added per-diagnostic `category` field to JSON output (derived from rule source file directory), with generated category map and drift-catching unit tests.
+
+</details>
+
 ---
 
 ## [15.2.8]
