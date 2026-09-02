@@ -87,18 +87,18 @@ function stripHtmlTags(html: string): string {
 }
 
 /**
- * Decode HTML entities in a single pass.  Runs AFTER tag stripping so
- * there is no double-unescape risk (CodeQL alert #5): an encoded
- * entity like `&amp;lt;` stays as the literal text `&lt;` because the
- * `&amp;` decode yields `&` and no second pass re-processes `&lt;`.
+ * Decode HTML entities in a single pass.  Runs AFTER tag stripping.
+ * Ampersand is decoded LAST to prevent double-unescaping: if `&amp;`
+ * were first, `&amp;lt;` would become `&lt;` and then `<` — injecting
+ * a bracket that was never in the original text (CodeQL #19 / CWE-116).
  */
 function decodeHtmlEntities(text: string): string {
     return text
-        .replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>')
         .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'");
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, '&');
 }
 
 function extractVersionFromHeading(html: string): string | null {

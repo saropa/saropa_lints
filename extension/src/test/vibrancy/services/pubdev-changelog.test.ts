@@ -46,6 +46,17 @@ describe('pubdev-changelog', () => {
             const md = parseChangelogHtml(html)!;
             assert.ok(md.includes('& enjoy <T>'));
         });
+
+        it('should not double-unescape entities (CodeQL #19)', () => {
+            // &amp;lt; is the literal text "&lt;" in the source — decoding
+            // should yield "&lt;", NOT "<" (which would be double-unescape)
+            const html = '<h2>1.0.0</h2><p>Show &amp;lt;T&amp;gt; literally</p>';
+            const md = parseChangelogHtml(html)!;
+            assert.ok(
+                md.includes('&lt;T&gt;'),
+                `Expected literal "&lt;T&gt;" but got: ${md}`,
+            );
+        });
     });
 
     describe('fetchPubDevChangelog', () => {

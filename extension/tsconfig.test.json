@@ -22,6 +22,7 @@
     "src/test/vibrancy/services/pubspec-sorter.test.ts",
     "src/test/vibrancy/services/pubspec-parser-comments.test.ts",
     "src/test/vibrancy/services/pin-intent-parser.test.ts",
+    "src/test/vibrancy/services/pubdev-changelog.test.ts",
     "src/test/vibrancy/providers/annotate-command.test.ts",
     "src/test/vibrancy/providers/adoption-gate.test.ts",
     "src/test/vibrancy/category-dictionary.test.ts",

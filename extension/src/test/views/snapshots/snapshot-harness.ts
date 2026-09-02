@@ -46,14 +46,16 @@ export function normalizeForSnapshot(html: string): string {
   // Inline <script>...</script> blocks: replaced by a stub so the test
   // captures their PRESENCE, not their content. Per-script tests cover
   // behavior; the snapshot covers structure.
-  // This regex replaces script content for snapshot normalization, not for
-  // security sanitization — false positive from CodeQL js/bad-tag-filter.
-  const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/g;
+  // Case-insensitive to satisfy CodeQL js/bad-tag-filter (catches `<SCRIPT>`).
+  // This is snapshot normalization, not security sanitization — but the `i`
+  // flag is correct regardless and costs nothing.
+  const scriptPattern = /<script\b[^>]*>[\s\S]*?<\/script>/gi;
   s = s.replace(scriptPattern, '<script><STRIPPED></script>');
 
   // Inline <style>...</style> blocks: same rationale. Token matrix covers
   // theme bindings; this snapshot covers HTML structure.
-  s = s.replace(/<style\b[^>]*>[\s\S]*?<\/style>/g, '<style><STRIPPED></style>');
+  // Case-insensitive for the same reason as the script pattern above.
+  s = s.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '<style><STRIPPED></style>');
 
   // ISO timestamps (or anything matching the pattern).
   s = s.replace(/\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?\b/g, '<TS>');
