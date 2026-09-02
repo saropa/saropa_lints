@@ -1,11 +1,12 @@
 /// Reverse-lookup indexes: rule name → tier, rule name → category.
 ///
-/// Built lazily from the tier sets in `tiers.dart` and the rule factory
-/// list in `saropa_lints.dart`. Used by the audit CLI to enrich each
-/// diagnostic with its tier and category in the JSON output.
+/// Built lazily from the tier sets in `tiers.dart` and the generated
+/// category map in `rule_category_map.dart`. Used by the audit CLI to
+/// enrich each diagnostic with its tier and category in the JSON output.
 library;
 
 import '../tiers.dart';
+import 'rule_category_map.dart';
 
 /// Canonical tier names in cumulative order (most inclusive tier wins when
 /// a rule appears in multiple tiers).
@@ -55,6 +56,22 @@ Map<String, String> tierIndexForRules(Set<String> ruleNames) {
   for (final name in ruleNames) {
     final tier = tierForRule(name);
     if (tier != null) result[name] = tier;
+  }
+  return result;
+}
+
+/// Returns the category slug for [ruleName] (e.g. `core`, `security`,
+/// `packages`), derived from the source file's parent directory.
+/// Returns `null` if the rule is not in the generated category map.
+String? categoryForRule(String ruleName) => ruleCategoryMap[ruleName];
+
+/// Returns the category for every rule in [ruleNames], keyed by rule name.
+/// Rules not in the category map are omitted from the result.
+Map<String, String> categoryIndexForRules(Set<String> ruleNames) {
+  final result = <String, String>{};
+  for (final name in ruleNames) {
+    final cat = categoryForRule(name);
+    if (cat != null) result[name] = cat;
   }
   return result;
 }

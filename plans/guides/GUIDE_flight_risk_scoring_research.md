@@ -1,16 +1,20 @@
-# PLAN — Project Vibrancy: flight-risk predictive scoring (Phase 5)
+# GUIDE — Flight-Risk Scoring: Research Outcome
 
 **Created:** 2026-06-24
-**Split from:** `TODO_vibrancy_residual_surfaces.md` §5.1 (parent TODO archived to `history/2026.06/2026.06.24/`)
-**Source plan:** `history/2026.04/2026.04.28/project_vibrancy_report.md` (§ Phase 5 — Flight-Risk)
+**Converted to guide:** 2026-09-02
 **Subsystem:** `lib/src/cli/project_vibrancy.dart` (collectors + score) + `extension/src/vibrancy/` (surface)
-**Status:** OPEN — RESEARCH-GATED. No production code until the scoring model is validated.
+**Status:** RESEARCH FAILED — candidate formula statistically worse than baseline.
+
+## Research outcome
+
 Gate attempted 2026-07-16 (twice: initial + hardened instrument): the candidate formula FAILED
 the baseline comparison on the in-repo incident corpus — under the hardened instrument it is
 statistically significantly WORSE than complexity-alone (p ≈ 0.046, n = 29). Negative result
-recorded; the gate remains unpassed. The validated residue (recency+complexity) shipped
-separately as the `fresh_code` vibrancy flag — a threshold flag on existing signals, not the
-gated composite score.
+recorded. The validated residue (recency+complexity) shipped separately as the `fresh_code`
+vibrancy flag — a threshold flag on existing signals, not the gated composite score.
+
+**Re-attempt conditions:** a fundamentally different formula (not parameter-tuning of this one)
+with a larger incident corpus (n > 50) that beats the complexity-alone baseline at p < 0.01.
 
 ---
 

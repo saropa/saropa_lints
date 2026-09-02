@@ -16,12 +16,37 @@ all shipped. These are the gaps.
 
 ---
 
-## 4.1 Accuracy measurement gate that reads `accuracyTarget` **[IN PROGRESS — paused since 2026-06-24, reviewed 2026-07-16]**
+## 4.1 Accuracy measurement gate that reads `accuracyTarget` **[BLOCKED — possible regression found 2026-09-02, needs root-cause triage before resuming]**
 
 > **Status as of 2026-07-16:** No further fixture-adequacy work had landed since 2026-06-24 (last
 > relevant commits: `a5c2dc2c` liveness tool + `avoid_hardcoded_api_urls` fix, `b9eddd7e` api_network
 > 20→0, `d724edff` code_quality 36→32). The instrument ships and works; the corpus cleanup is stalled.
-> **Next action → see "Next action" block at the end of §4.1.**
+
+> **Status as of 2026-09-02 — re-ran the §4.1 "Next action" step 1 command
+> (`accuracy_report --tier pedantic --fail-on none --format json`) to refresh the stale 2026-06-24
+> count. Result is NOT a stale-count confirmation — it is roughly double the last documented
+> baseline and looks like a regression, not organic fixture drift:
+>
+> ```
+> rulesMeasured: 1559
+> testedFiles:   1616
+> firedFiles:    109
+> silentRules:   1456   (93% silent — was 664–745 on 2026-07-16)
+> ```
+>
+> This magnitude jump matches the shape of the 2026-07-16 tier-gating confounder (a harness bug
+> that made 133 rules falsely silent) more than it matches "700 more fixtures went bad." **Root
+> cause is NOT diagnosed yet.** Before resuming the fixture-fix loop, confirm whether this is a
+> harness/registration regression or genuine drift:
+> 1. Spot-check a rule previously confirmed firing (e.g. `avoid_hardcoded_api_urls`, fixed
+>    2026-06-24) — if it now reports silent, this is systemic breakage, not fixture rot.
+>    **Do not start fixing fixtures until this is resolved** — fixing fixtures against a broken
+>    harness wastes the work and can mask the real bug.
+> 2. Compare `rulesMeasured` (1559) against the total defined rule count — if it doesn't match
+>    expectations, the report may be missing or double-counting rules.
+> 3. Full raw JSON saved for reference:
+>    `D:\.claude_temp\claude\d--src-saropa-lints\5caf7ce8-883d-4df7-b3b4-dc03c26de043\scratchpad\accuracy_report.json`
+>    (this is a session scratch path — copy anything needed before the session ends).
 
 ### Tool confounder removed 2026-07-16 — stylistic rules were 133 false silents
 

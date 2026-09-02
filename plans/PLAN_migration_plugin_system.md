@@ -22,11 +22,11 @@
 - Verification commands and outcomes are current and reproducible.
 - Public docs clearly explain canonical config key (`rule_packs`) and ownership semantics.
 
-### PACK-02 verification slice (active)
+### PACK-02 verification slice — CLOSED 2026-09-02
 
-- [ ] Run `dart test test/config/rule_packs_migration_membership_test.dart test/config/rule_packs_sdk_gates_test.dart test/config/rule_packs_config_test.dart`.
-- [ ] Record command output summary in this plan (pass/fail + notable deltas).
-- [ ] If any behavior changed, add/update regression tests before close-out.
+- [x] Run `dart test test/config/rule_packs_migration_membership_test.dart test/config/rule_packs_sdk_gates_test.dart test/config/rule_packs_config_test.dart`.
+- [x] Record command output summary: **32/32 tests passed, 0 failures.** No behavior changes since the 2026-05-08 verification.
+- [x] No regression tests needed — no behavior changed.
 
 **Single document:** Packs, pubspec-aware enablement, semver migrations, extension UI, and optional third-party plugins are **one product intent** delivered in **phases** (see [§10](#10-phases-one-roadmap)).
 

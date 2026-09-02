@@ -54,6 +54,7 @@ class ScanRunner {
     this.applyExclusionsToFileList = true,
     this.debugRule,
     this.excludeLightLane = false,
+    this.bypassTierCap = false,
     this.lane = RuleLane.full,
     this.laneStats = false,
     List<String> excludeGlobs = const [],
@@ -113,6 +114,12 @@ class ScanRunner {
   /// predicate in `lib/src/config/rule_lane.dart`, so the two sides cannot
   /// disagree about which rules the split covers.
   final bool excludeLightLane;
+
+  /// Skips `RuntimeTierCap.filterRuleSet()` in `_prepare()`, allowing
+  /// the full `enabledRuleNames` set to run uncapped. Used by the audit
+  /// CLI which must exercise every rule regardless of the project's
+  /// configured tier.
+  final bool bypassTierCap;
 
   /// Which lane the scan should use. Defaults to [RuleLane.full] so every
   /// enabled rule fires. Set to [RuleLane.light] via `--lane light` to
@@ -293,7 +300,12 @@ class ScanRunner {
     // Lane exclusion runs before the empty check so that "the light lane
     // covered everything you asked for" reports as nothing-to-scan rather
     // than scanning duplicates.
-    var ruleNames = RuntimeTierCap.filterRuleSet(resolved);
+    // When bypassTierCap is true (audit mode), skip the tier cap filter so
+    // every rule in enabledRuleNames runs regardless of the project's
+    // configured tier.
+    var ruleNames = bypassTierCap
+        ? resolved
+        : RuntimeTierCap.filterRuleSet(resolved);
     // Warn on the degenerate combination: --lane light keeps only light-lane
     // rules in the callback gate, while --exclude-light-lane removes those same
     // rules from the name set. The result is zero rules — not wrong, but almost
