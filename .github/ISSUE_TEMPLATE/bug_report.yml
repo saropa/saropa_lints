@@ -1,0 +1,166 @@
+# GitHub issue form for saropa_lints bug reports.
+# Mirrors the Bug Report Template in bugs/ISSUE_REPORT_GUIDE.md.
+name: Bug Report
+description: >
+  False positive, false negative, crash, wrong quick fix, or performance issue
+  in a saropa_lints rule.
+title: "`rule_name` — short description"
+labels: ["bug"]
+body:
+  # -- Attribution evidence (required) --
+  - type: markdown
+    attributes:
+      label: Attribution reminder
+      value: |
+        **Before filing:** run `grep -rn "'rule_name'" lib/src/rules/` and confirm at least one match.
+        Zero matches means the rule does not live in `saropa_lints` — do not file here.
+        See [Confirm Attribution Before Filing](../../bugs/ISSUE_REPORT_GUIDE.md#confirm-attribution-before-filing).
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - "False positive"
+        - "False negative"
+        - "Crash / exception"
+        - "Wrong quick fix"
+        - "Performance"
+    validations:
+      required: true
+
+  - type: input
+    id: rule_name
+    attributes:
+      label: Rule name
+      description: The exact rule id (e.g. `avoid_stream_subscription_in_field`).
+      placeholder: rule_name
+    validations:
+      required: true
+
+  - type: input
+    id: rule_file
+    attributes:
+      label: Rule source file
+      description: >
+        Path and approximate line from the positive grep
+        (e.g. `lib/src/rules/category/xxx_rules.dart:42`).
+      placeholder: "lib/src/rules/category/xxx_rules.dart (line ~NNN)"
+    validations:
+      required: true
+
+  # -- Summary --
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences — what happens vs what should happen.
+    validations:
+      required: true
+
+  # -- Attribution evidence --
+  - type: textarea
+    id: attribution
+    attributes:
+      label: Attribution evidence
+      description: >
+        Paste the output of the positive grep (and negative grep if the
+        diagnostic source label is ambiguous across sibling repos).
+      render: bash
+      placeholder: |
+        # Positive — rule IS defined here
+        $ grep -rn "'rule_name'" lib/src/rules/
+        lib/src/rules/category/file.dart:42: ... 'rule_name' ...
+
+        # Negative — rule is NOT in sibling repos (if applicable)
+        $ grep -rn "'rule_name'" ../saropa_drift_advisor/lib/src/
+        (0 matches)
+    validations:
+      required: true
+
+  # -- Reproducer --
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Reproducer
+      description: >
+        Minimal Dart code that triggers the bug. Mark expected behavior with
+        `// LINT` or `// OK` comments.
+      render: dart
+      placeholder: |
+        class Example {
+          void method() {
+            final x = something; // LINT — but should NOT lint (false positive)
+          }
+        }
+    validations:
+      required: true
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: Frequency
+      options:
+        - "Always"
+        - "Only with specific patterns"
+        - "Intermittent"
+    validations:
+      required: true
+
+  # -- Expected vs Actual --
+  - type: textarea
+    id: expected_vs_actual
+    attributes:
+      label: Expected vs Actual
+      description: What should happen and what actually happens.
+      placeholder: |
+        Expected: No diagnostic (code is correct)
+        Actual:   `[rule_name] Problem message text` reported at line N
+    validations:
+      required: true
+
+  # -- AST context --
+  - type: textarea
+    id: ast_context
+    attributes:
+      label: AST context
+      description: >
+        Parent chain from the flagged node to the enclosing declaration.
+        Helps pinpoint which visitor callback fires.
+      render: text
+      placeholder: |
+        ClassDeclaration (Example)
+          └─ MethodDeclaration (method)
+              └─ Block
+                  └─ VariableDeclarationStatement
+                      └─ VariableDeclaration (x)  ← node reported here
+
+  # -- Root cause / hypothesis --
+  - type: textarea
+    id: root_cause
+    attributes:
+      label: Root cause hypothesis
+      description: >
+        If you have a theory, explain which condition in the rule logic evaluates
+        wrong and why. Reference specific lines.
+
+  # -- Suggested fix --
+  - type: textarea
+    id: suggested_fix
+    attributes:
+      label: Suggested fix
+      description: Describe the code change needed. Reference line numbers in the rule file.
+
+  # -- Environment --
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Versions of relevant tooling.
+      placeholder: |
+        saropa_lints version:
+        Dart SDK version:
+        custom_lint version:
+        Triggering project/file:
+    validations:
+      required: true

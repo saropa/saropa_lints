@@ -95,6 +95,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - `audit` CLI: added per-diagnostic `category` field to JSON output (derived from rule source file directory), with generated category map and drift-catching unit tests.
 - Fixed l10n diagnostic param-extraction by replacing the fragile `OBJ_KEY_RE` regex with a state-machine parser that handles nested expressions, spread syntax, and trailing commas. Also added comment-aware scanning to prevent false positives from example calls inside code comments.
 - Moved `PACKAGE_VIBRANCY.md` from `plans/guides/` to the repo root to match the path the extension's SDK vibrancy table expects; excluded `plans/` from the pub.dev package (already public on GitHub, this only trims the published tarball); added CI check `scripts/check_doc_links_excluded_paths.py` to catch shipped docs linking into `.pubignore`-excluded paths.
+- Added GitHub issue form templates (`.github/ISSUE_TEMPLATE/`) for bug reports and feature requests, enforcing the structure from `bugs/ISSUE_REPORT_GUIDE.md` at filing time. Blank issues disabled.
 
 </details>
 

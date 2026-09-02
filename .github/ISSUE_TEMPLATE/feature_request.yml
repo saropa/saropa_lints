@@ -1,0 +1,128 @@
+# GitHub issue form for saropa_lints feature requests.
+# Mirrors the Feature Request Template in bugs/ISSUE_REPORT_GUIDE.md.
+name: Feature Request
+description: >
+  New rule proposal, quick fix idea, tier change, or tooling/infrastructure
+  improvement for saropa_lints.
+title: "proposal: short description"
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: request_type
+    attributes:
+      label: Request type
+      options:
+        - "New rule"
+        - "Quick fix"
+        - "Tier change"
+        - "Tooling / infrastructure"
+    validations:
+      required: true
+
+  - type: input
+    id: related_rules
+    attributes:
+      label: Related rules
+      description: >
+        Existing rule name(s) if this modifies or extends one (leave blank for
+        new rules or infra requests).
+      placeholder: "rule_name"
+
+  # -- Summary --
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences — what the feature does and why it matters.
+    validations:
+      required: true
+
+  # -- Motivation --
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: >
+        Why this feature is needed. Include concrete examples from real
+        codebases where this would have caught a bug, improved code quality,
+        or saved developer time. Link to external references if applicable.
+    validations:
+      required: true
+
+  # -- Detection / Behavior --
+  - type: textarea
+    id: bad_code
+    attributes:
+      label: "Should flag (bad code)"
+      description: >
+        For rules: code the rule should report on. For quick fixes: code before
+        the fix. For tooling: current behavior / input.
+      render: dart
+      placeholder: |
+        class Example {
+          void method() {
+            final x = something; // LINT
+          }
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: good_code
+    attributes:
+      label: "Should pass (good code)"
+      description: >
+        For rules: code the rule should NOT flag. For quick fixes: code after
+        the fix. For tooling: desired behavior / output.
+      render: dart
+      placeholder: |
+        class Example {
+          void method() {
+            final x = correctThing; // OK
+          }
+        }
+    validations:
+      required: true
+
+  # -- Proposed tier --
+  - type: dropdown
+    id: tier
+    attributes:
+      label: Proposed tier
+      description: >
+        Which tier should this rule belong to? For non-rule requests, choose
+        the closest fit or leave as N/A.
+      options:
+        - "Essential"
+        - "Recommended"
+        - "Professional"
+        - "Comprehensive"
+        - "Pedantic"
+        - "N/A (not a rule)"
+    validations:
+      required: true
+
+  - type: textarea
+    id: tier_justification
+    attributes:
+      label: Tier justification
+      description: Why this tier is appropriate for this rule.
+
+  # -- Edge cases --
+  - type: textarea
+    id: edge_cases
+    attributes:
+      label: Edge cases
+      description: >
+        Patterns that need special handling or explicit decisions
+        (e.g. generated code, test files, specific framework idioms).
+      placeholder: |
+        1. Case description — should flag / should pass / needs discussion
+        2. ...
+
+  # -- Alternatives --
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches and why this one is preferred.

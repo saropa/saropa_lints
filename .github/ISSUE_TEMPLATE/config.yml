@@ -1,0 +1,9 @@
+# Issue template chooser configuration.
+# Links appear below the template list when opening a new issue.
+blank_issues_enabled: false
+contact_links:
+  - name: Issue Report Guide
+    url: https://github.com/saropa/saropa_lints/blob/main/bugs/ISSUE_REPORT_GUIDE.md
+    about: >
+      Read the full guide before filing — it covers attribution, naming
+      conventions, severity, and investigation checklists.
