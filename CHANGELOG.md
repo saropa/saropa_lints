@@ -87,7 +87,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 <summary>Maintenance</summary>
 
 - Compiled competitor gap analysis (`plans/GAP_ANALYSIS.md`) — rule-by-rule audit of 48 Dart/Flutter lint packages against saropa_lints' catalog, with gap themes and per-package detail sections for planning future rule additions.
-- Added `// LINT_MESSAGE:` and `// LINT_NOT:` fixture marker infrastructure — declarative message-content validation and false-positive guards for resolved harness tests, eliminating boilerplate for each diagnostic variant.
+- Added `// LINT_MESSAGE:`, `// LINT_NOT:`, and `// LINT_COUNT:` fixture marker infrastructure — declarative message validation, false-positive guards, and whole-fixture count assertions for resolved harness tests.
 - `audit` CLI: fixed `RuntimeTierCap` silently capping the rule set — added `bypassTierCap` flag on `ScanRunner` so audit runs every rule regardless of the project's configured tier.
 - `audit` CLI: fixed tier enrichment bug — was looking up `entry['rule']` instead of `entry['ruleName']`, so tier field was never populated in JSON output.
 - `audit` CLI: added per-diagnostic `category` field to JSON output (derived from rule source file directory), with generated category map and drift-catching unit tests.

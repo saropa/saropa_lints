@@ -1,10 +1,10 @@
 // Assertion helpers that validate `runRuleResolved` diagnostics against
-// `// LINT:`, `// LINT_MESSAGE:`, and `// LINT_NOT:` markers parsed from
-// fixture source code.
+// `// LINT:`, `// LINT_MESSAGE:`, `// LINT_NOT:`, and `// LINT_COUNT:` markers
+// parsed from fixture source code.
 //
 // Combines the fixture marker parser with the resolved-analyzer harness to
 // provide declarative, in-fixture validation — no explicit test code needed
-// for each message variant or false-positive guard.
+// for each message variant, false-positive guard, or count assertion.
 library;
 
 import 'package:saropa_lints/saropa_lints.dart' show SaropaLintRule;
@@ -13,30 +13,29 @@ import 'package:test/test.dart';
 import 'fixture_marker_parser.dart';
 import 'resolved_rule_harness.dart';
 
-/// Runs [rule] against [source] via [runRuleResolved] and validates that each
-/// `// LINT:` marker has a matching diagnostic on the expected line, and each
-/// `// LINT_NOT:` marker has NO matching diagnostic.
+/// Runs [rule] against [source] via [runRuleResolved] and validates all
+/// fixture markers:
 ///
-/// When a `// LINT:` marker includes a `// LINT_MESSAGE: substring`, the
-/// diagnostic's message is also checked for that substring.
+/// - `// LINT:` — diagnostic MUST fire on the target line.
+/// - `// LINT_MESSAGE:` — diagnostic message must contain the substring.
+/// - `// LINT_NOT:` — diagnostic must NOT fire on the target line.
+/// - `// LINT_COUNT: rule N` — exactly N diagnostics from `rule` in total.
 ///
-/// Throws a [TestFailure] when:
-/// - No `// LINT:` or `// LINT_NOT:` markers are found in [source].
-/// - A `// LINT:` marker's target line has no matching diagnostic.
-/// - A `// LINT_MESSAGE:` substring is not found in the diagnostic's message.
-/// - A `// LINT_NOT:` marker's target line HAS a matching diagnostic.
+/// At least one marker of any kind must be present (guard against silent
+/// no-op test sources).
 Future<List<HarnessDiagnostic>> assertFixtureMarkers(
   SaropaLintRule rule,
   String source,
 ) async {
   final markers = parseFixtureMarkers(source);
   final negations = parseFixtureNegations(source);
+  final counts = parseFixtureCounts(source);
 
   // Guard: caller passed source with no markers at all — likely a mistake.
   expect(
-    markers.length + negations.length,
+    markers.length + negations.length + counts.length,
     greaterThan(0),
-    reason: 'Source contains no // LINT: or // LINT_NOT: markers to validate',
+    reason: 'Source contains no fixture markers to validate',
   );
 
   final diags = await runRuleResolved(rule, source);
@@ -88,6 +87,19 @@ Future<List<HarnessDiagnostic>> assertFixtureMarkers(
     );
   }
 
-  // Return the diagnostics so callers can add extra assertions if needed.
+  // Validate count expectations: exact number of diagnostics from the rule.
+  for (final countMarker in counts) {
+    final ruleCount =
+        diags.where((d) => d.ruleName == countMarker.ruleName).length;
+
+    expect(
+      ruleCount,
+      countMarker.expectedCount,
+      reason: '// LINT_COUNT: ${countMarker.ruleName} '
+          '${countMarker.expectedCount} — got $ruleCount diagnostic(s)',
+    );
+  }
+
+  // Return diagnostics so callers can add extra assertions if needed.
   return diags;
 }

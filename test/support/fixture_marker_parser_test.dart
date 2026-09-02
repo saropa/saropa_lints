@@ -174,6 +174,18 @@ target();
       expect(markers.first.targetLine, 3);
     });
 
+    test('marker inside string literal does not match (anchored to line start)', () {
+      // Markers require `//` at line start — a string containing marker text
+      // should not be parsed.
+      const source = '''
+final s = "// LINT: fake_rule";
+final t = '// LINT_NOT: fake_rule';
+''';
+      expect(parseFixtureMarkers(source), isEmpty);
+      expect(parseFixtureNegations(source), isEmpty);
+      expect(parseFixtureCounts(source), isEmpty);
+    });
+
     test('LINT_NOT is not parsed by parseFixtureMarkers', () {
       // LINT_NOT is handled by parseFixtureNegations, not parseFixtureMarkers.
       const source = '''
@@ -247,6 +259,62 @@ some_code();
     test('toString includes rule and line', () {
       final neg = FixtureNegation(ruleName: 'r', targetLine: 5);
       expect(neg.toString(), 'LINT_NOT:r@5');
+    });
+  });
+
+  group('parseFixtureCounts', () {
+    test('parses single LINT_COUNT marker', () {
+      const source = '''
+// LINT_COUNT: my_rule 3
+some_code();
+''';
+      final counts = parseFixtureCounts(source);
+      expect(counts, hasLength(1));
+      expect(counts.first.ruleName, 'my_rule');
+      expect(counts.first.expectedCount, 3);
+    });
+
+    test('parses zero count', () {
+      // Asserting zero diagnostics is valid — equivalent to a global negation.
+      const source = '// LINT_COUNT: my_rule 0';
+      final counts = parseFixtureCounts(source);
+      expect(counts, hasLength(1));
+      expect(counts.first.expectedCount, 0);
+    });
+
+    test('parses multiple LINT_COUNT markers', () {
+      const source = '''
+// LINT_COUNT: rule_a 2
+// LINT_COUNT: rule_b 5
+some_code();
+''';
+      final counts = parseFixtureCounts(source);
+      expect(counts, hasLength(2));
+      expect(counts[0].ruleName, 'rule_a');
+      expect(counts[0].expectedCount, 2);
+      expect(counts[1].ruleName, 'rule_b');
+      expect(counts[1].expectedCount, 5);
+    });
+
+    test('returns empty list when no LINT_COUNT markers present', () {
+      const source = '''
+// LINT: my_rule
+some_code();
+''';
+      final counts = parseFixtureCounts(source);
+      expect(counts, isEmpty);
+    });
+
+    test('CRLF line endings parse correctly', () {
+      const source = '// LINT_COUNT: my_rule 1\r\ncode();\r\n';
+      final counts = parseFixtureCounts(source);
+      expect(counts, hasLength(1));
+      expect(counts.first.expectedCount, 1);
+    });
+
+    test('toString includes rule and count', () {
+      final c = FixtureCount(ruleName: 'r', expectedCount: 4);
+      expect(c.toString(), 'LINT_COUNT:r=4');
     });
   });
 }

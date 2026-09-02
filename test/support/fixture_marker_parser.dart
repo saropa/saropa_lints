@@ -1,16 +1,19 @@
-// Parses `// LINT:`, `// LINT_MESSAGE:`, and `// LINT_NOT:` markers from
-// fixture source code.
+// Parses `// LINT:`, `// LINT_MESSAGE:`, `// LINT_NOT:`, and `// LINT_COUNT:`
+// markers from fixture source code.
 //
 // `// LINT: rule_name` declares that a diagnostic from `rule_name` is expected
 // on the next non-marker line. An optional `// LINT_MESSAGE: substring` on the
-// line immediately following adds a message-content assertion: the diagnostic's
-// `problemMessage` must contain that substring.
+// line immediately following adds a message-content assertion.
 //
-// `// LINT_NOT: rule_name` declares that a diagnostic from `rule_name` must NOT
-// appear on the next line — a declarative false-positive guard.
+// `// LINT_NOT: rule_name` declares that the rule must NOT fire on the next
+// line — a declarative false-positive guard.
 //
-// Backward compatible: fixtures without `// LINT_MESSAGE:` or `// LINT_NOT:`
-// continue to work as line-only assertions.
+// `// LINT_COUNT: rule_name N` declares that exactly N diagnostics from
+// `rule_name` must fire across the entire fixture — catches both false
+// positives (too many) and false negatives (too few).
+//
+// All markers require `//` at the start of the (trimmed) line so they cannot
+// false-match inside string literals or multi-line comments.
 library;
 
 /// Parsed positive expectation from `// LINT:` with optional `// LINT_MESSAGE:`.
@@ -56,14 +59,35 @@ class FixtureNegation {
   String toString() => 'LINT_NOT:$ruleName@$targetLine';
 }
 
-/// Matches `// LINT: rule_name` (leading whitespace allowed).
-final _lintPattern = RegExp(r'//\s*LINT:\s*(\S+)');
+/// Parsed count expectation from `// LINT_COUNT: rule_name N`.
+class FixtureCount {
+  const FixtureCount({
+    required this.ruleName,
+    required this.expectedCount,
+  });
+
+  /// The rule code whose total diagnostic count is being asserted.
+  final String ruleName;
+
+  /// Expected number of diagnostics from this rule across the entire fixture.
+  final int expectedCount;
+
+  @override
+  String toString() => 'LINT_COUNT:$ruleName=$expectedCount';
+}
+
+/// Matches `// LINT: rule_name` — anchored to line start (after optional
+/// whitespace) so it cannot match inside string literals.
+final _lintPattern = RegExp(r'^\s*//\s*LINT:\s*(\S+)');
 
 /// Matches `// LINT_MESSAGE: <substring>` (captures everything after the tag).
-final _messagePattern = RegExp(r'//\s*LINT_MESSAGE:\s*(.+)');
+final _messagePattern = RegExp(r'^\s*//\s*LINT_MESSAGE:\s*(.+)');
 
 /// Matches `// LINT_NOT: rule_name` — negative assertion marker.
-final _lintNotPattern = RegExp(r'//\s*LINT_NOT:\s*(\S+)');
+final _lintNotPattern = RegExp(r'^\s*//\s*LINT_NOT:\s*(\S+)');
+
+/// Matches `// LINT_COUNT: rule_name N` — whole-fixture count assertion.
+final _lintCountPattern = RegExp(r'^\s*//\s*LINT_COUNT:\s*(\S+)\s+(\d+)');
 
 /// Normalizes line endings and splits into lines for consistent parsing
 /// across Windows and Unix fixture files.
@@ -124,6 +148,30 @@ List<FixtureNegation> parseFixtureNegations(String source) {
       ruleName: match.group(1)!,
       // Target is the next line (1-based).
       targetLine: i + 2,
+    ));
+  }
+
+  return results;
+}
+
+/// Parses `// LINT_COUNT: rule_name N` markers from [source].
+///
+/// Returns one [FixtureCount] per marker. Unlike LINT/LINT_NOT, these are
+/// not position-based — they assert a total count across the entire fixture.
+List<FixtureCount> parseFixtureCounts(String source) {
+  final results = <FixtureCount>[];
+  final lines = _splitLines(source);
+
+  for (var i = 0; i < lines.length; i++) {
+    final match = _lintCountPattern.firstMatch(lines[i]);
+    if (match == null) continue;
+
+    final count = int.tryParse(match.group(2)!);
+    if (count == null) continue;
+
+    results.add(FixtureCount(
+      ruleName: match.group(1)!,
+      expectedCount: count,
     ));
   }
 

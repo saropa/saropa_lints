@@ -140,5 +140,60 @@ final x = 1;
 final x = 1;
 ''');
     });
+
+    test('validates LINT_COUNT with correct count', () async {
+      // Two bare saropa rule names → exactly 2 diagnostics expected.
+      await assertFixtureMarkers(rule, '''
+// LINT_COUNT: require_ignore_comment_plugin_prefix 2
+// ignore: avoid_null_assertion
+final x1 = 1;
+// ignore: avoid_null_assertion
+final x2 = 2;
+''');
+    });
+
+    test('validates LINT_COUNT zero (no diagnostics)', () async {
+      // Only compliant code — zero diagnostics expected.
+      await assertFixtureMarkers(rule, '''
+// LINT_COUNT: require_ignore_comment_plugin_prefix 0
+// ignore: saropa_lints/avoid_null_assertion
+final x = 1;
+''');
+    });
+
+    test('fails when LINT_COUNT does not match actual count', () async {
+      // Claims 5 but only 1 diagnostic will fire.
+      expect(
+        () => assertFixtureMarkers(rule, '''
+// LINT_COUNT: require_ignore_comment_plugin_prefix 5
+// ignore: avoid_null_assertion
+final x = 1;
+'''),
+        throwsA(isA<TestFailure>()),
+      );
+    });
+
+    test('LINT_COUNT-only source is valid', () async {
+      // Source with only a count marker — no LINT/LINT_NOT required.
+      await assertFixtureMarkers(rule, '''
+// LINT_COUNT: require_ignore_comment_plugin_prefix 1
+// ignore: avoid_null_assertion
+final x = 1;
+''');
+    });
+
+    test('validates mixed LINT, LINT_NOT, and LINT_COUNT', () async {
+      // All three marker types in one fixture.
+      await assertFixtureMarkers(rule, '''
+// LINT_COUNT: require_ignore_comment_plugin_prefix 1
+// LINT: require_ignore_comment_plugin_prefix
+// LINT_MESSAGE: without the required
+// ignore: avoid_null_assertion
+final x1 = 1;
+// LINT_NOT: require_ignore_comment_plugin_prefix
+// ignore: saropa_lints/avoid_null_assertion
+final x2 = 2;
+''');
+    });
   });
 }

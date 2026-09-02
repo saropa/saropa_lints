@@ -44,21 +44,26 @@ Low — purely additive infrastructure. No rule behavior changes.
 
 ## Finish Report (2026-09-02)
 
-**Implemented:** Declarative `// LINT_MESSAGE:` and `// LINT_NOT:` fixture markers for the resolved test harness — message-content validation and false-positive guards, respectively.
+**Implemented:** Declarative `// LINT_MESSAGE:`, `// LINT_NOT:`, and `// LINT_COUNT:` fixture markers for the resolved test harness.
 
 **New files:**
-- `test/support/fixture_marker_parser.dart` — `parseFixtureMarkers()` extracts `// LINT:` + `// LINT_MESSAGE:` pairs, returning `FixtureExpectation` records. `parseFixtureNegations()` extracts `// LINT_NOT:` markers, returning `FixtureNegation` records. CRLF-safe.
-- `test/support/fixture_message_harness.dart` — `assertFixtureMarkers()` runs a rule via `runRuleResolved`, validates positive markers (diagnostic must fire, message must match) and negative markers (diagnostic must NOT fire).
-- `test/support/fixture_marker_parser_test.dart` — 19 unit tests: positive markers (single/multiple, with/without message, whitespace, non-adjacent rejection, end-of-file, special chars, CRLF, consecutive, adjacent different rules, stacked LINT_MESSAGE), negative markers (single, multiple, empty, CRLF, toString), cross-isolation (LINT_NOT not in parseFixtureMarkers).
-- `test/support/fixture_message_harness_test.dart` — 11 integration tests using `require_ignore_comment_plugin_prefix`: positive (bare-name, prefixed-unknown, line-only, multiple), negative (LINT_NOT with registered rule, non-saropa rule, mixed positive+negative), failure modes (wrong substring, no markers, LINT_NOT on firing line), LINT_NOT-only source.
+- `test/support/fixture_marker_parser.dart` — Three parsers: `parseFixtureMarkers()` (LINT + LINT_MESSAGE), `parseFixtureNegations()` (LINT_NOT), `parseFixtureCounts()` (LINT_COUNT). All CRLF-safe, regex anchored to line start to prevent false matches inside string literals.
+- `test/support/fixture_message_harness.dart` — `assertFixtureMarkers()` runs a rule via `runRuleResolved`, validates all four marker types in one call.
+- `test/support/fixture_marker_parser_test.dart` — 26 unit tests across three parser groups plus string-literal false-match guard.
+- `test/support/fixture_message_harness_test.dart` — 16 integration tests using `require_ignore_comment_plugin_prefix`: positive, negative, count, mixed, and failure modes.
 
 **Modified files:**
 - `example/lib/formatting/require_ignore_comment_plugin_prefix_fixture.dart` — added 3 `// LINT_MESSAGE:` markers as proof-of-concept annotations.
 
-**Design decisions:**
-- Parser and assertion helper are separate files: parser is pure (no analyzer dependencies), testable independently; helper imports the resolved harness.
-- `assertFixtureMarkers` returns the diagnostic list so callers can add extra assertions beyond what markers declare.
-- LINT_MESSAGE must immediately follow its LINT marker (no blank line); a gap breaks the pairing — tested and intentional.
-- `assertFixtureMarkers` accepts sources with only LINT_NOT markers (no LINT required) — supports pure false-positive-guard fixtures.
+**Hardening (reflection gate pass):**
+- Regex patterns anchored to line start (`^\s*//`) — prevents false matches inside string literals. Tested.
+- CRLF normalization in all parsers — Windows-edited fixtures parse identically. Tested.
+- Consecutive LINT markers, adjacent different rules, stacked LINT_MESSAGE — all edge cases documented by dedicated tests.
 
-**Verification:** 30/30 new tests pass. 55 existing formatting + harness tests pass with no regressions.
+**Design decisions:**
+- Parser and assertion helper are separate files: parser is pure (no analyzer dependencies), testable independently.
+- `assertFixtureMarkers` returns the diagnostic list for extra caller assertions.
+- LINT_MESSAGE must immediately follow its LINT marker (no blank line gap). Intentional.
+- Sources with only LINT_NOT or LINT_COUNT markers (no LINT) are valid.
+
+**Verification:** 42/42 new tests pass. 55 existing formatting + harness tests pass with no regressions.
