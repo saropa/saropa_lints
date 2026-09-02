@@ -18,15 +18,61 @@ let _catalogCache: Map<string, string> | undefined;
 /** Watches en.json for changes to invalidate the catalog cache. */
 let _watcher: vscode.FileSystemWatcher | undefined;
 
-// Matches l10n('dotted.key') with single or double quotes.
+// Captures the quoted key argument from each l10n() call.
 const L10N_RE = /l10n\(\s*(['"])([a-zA-Z0-9_.]+)\1/g;
 
 // Extracts {placeholder} tokens from en.json values.
 const PLACEHOLDER_RE = /\{([a-zA-Z0-9_]+)\}/g;
 
-// Extracts JS object keys from a params argument.
-// Handles { count: val } and shorthand { message }.
-const OBJ_KEY_RE = /(?:^|[{,])\s*(?!\.\.\.)(\w+)\s*(?::|[,}])/g;
+/**
+ * Advance past a string literal. `i` must point at the opening quote
+ * character. Returns position immediately after the closing quote.
+ */
+function skipStringLiteral(text: string, i: number): number {
+  const q = text[i];
+  const n = text.length;
+  i++;
+  while (i < n) {
+    if (text[i] === '\\') { i += 2; continue; }
+    if (text[i] === q) return i + 1;
+    i++;
+  }
+  return i;
+}
+
+/**
+ * Replace comment contents with spaces so L10N_RE doesn't match inside
+ * comments. Preserves string length and newlines for correct position
+ * mapping back to the original document.
+ */
+function blankComments(text: string): string {
+  const out = text.split('');
+  const n = text.length;
+  let i = 0;
+  while (i < n) {
+    const c = text[i];
+    // Skip strings — they can contain // and /* which aren't comments.
+    if (c === "'" || c === '"' || c === '`') { i = skipStringLiteral(text, i); continue; }
+    // Line comment: blank from // to end-of-line.
+    if (c === '/' && i + 1 < n && text[i + 1] === '/') {
+      const start = i;
+      while (i < n && text[i] !== '\n') i++;
+      for (let j = start; j < i; j++) out[j] = ' ';
+      continue;
+    }
+    // Block comment: blank from /* to */, preserving newlines.
+    if (c === '/' && i + 1 < n && text[i + 1] === '*') {
+      const start = i;
+      i += 2;
+      while (i < n && !(text[i] === '*' && i + 1 < n && text[i + 1] === '/')) i++;
+      if (i < n) i += 2;
+      for (let j = start; j < i; j++) out[j] = text[j] === '\n' ? '\n' : ' ';
+      continue;
+    }
+    i++;
+  }
+  return out.join('');
+}
 
 /**
  * Flatten a nested JSON object into a Map of dotted keys to string values.
@@ -36,7 +82,6 @@ function flattenCatalog(obj: Record<string, unknown>, prefix = ''): Map<string, 
   for (const [k, v] of Object.entries(obj)) {
     const full = prefix ? `${prefix}.${k}` : k;
     if (typeof v === 'object' && v !== null && !Array.isArray(v)) {
-      // Recurse into nested namespaces.
       for (const [fk, fv] of flattenCatalog(v as Record<string, unknown>, full)) {
         result.set(fk, fv);
       }
@@ -47,16 +92,11 @@ function flattenCatalog(obj: Record<string, unknown>, prefix = ''): Map<string, 
   return result;
 }
 
-/**
- * Load and cache the flattened en.json catalog.
- */
+/** Load and cache the flattened en.json catalog. */
 function getCatalog(): Map<string, string> | undefined {
   if (_catalogCache) return _catalogCache;
-
-  // Find en.json relative to the extension src directory.
   const workspaceFolders = vscode.workspace.workspaceFolders;
   if (!workspaceFolders) return undefined;
-
   for (const folder of workspaceFolders) {
     const enJsonPath = path.join(
       folder.uri.fsPath, 'extension', 'src', 'i18n', 'locales', 'en.json',
@@ -67,7 +107,6 @@ function getCatalog(): Map<string, string> | undefined {
         _catalogCache = flattenCatalog(raw);
         return _catalogCache;
       } catch {
-        // Malformed en.json — skip validation until it's fixed.
         return undefined;
       }
     }
@@ -76,49 +115,79 @@ function getCatalog(): Map<string, string> | undefined {
 }
 
 /**
- * Extract a balanced { ... } block starting at position `start` in
- * `text`, handling nested braces and string literals.
+ * Extract a balanced { ... } block starting at position `start`,
+ * handling nested braces and string literals.
  */
 function extractParamsBlock(text: string, start: number): string | undefined {
-  // Skip whitespace then look for comma + object.
   let i = start;
   const n = text.length;
+  // Skip whitespace, expect comma then opening brace.
   while (i < n && /\s/.test(text[i])) i++;
   if (i >= n || text[i] !== ',') return undefined;
   i++;
   while (i < n && /\s/.test(text[i])) i++;
   if (i >= n || text[i] !== '{') return undefined;
 
-  // Balanced brace scan.
   let depth = 0;
   const objStart = i;
   while (i < n) {
     const c = text[i];
-    if (c === "'" || c === '"' || c === '`') {
-      // Skip string contents.
-      const q = c;
-      i++;
-      while (i < n) {
-        if (text[i] === '\\') { i += 2; continue; }
-        if (text[i] === q) break;
-        i++;
-      }
-    } else if (c === '{') {
-      depth++;
-    } else if (c === '}') {
-      depth--;
-      if (depth === 0) return text.slice(objStart, i + 1);
-    }
+    if (c === "'" || c === '"' || c === '`') { i = skipStringLiteral(text, i); continue; }
+    if (c === '{') { depth++; }
+    else if (c === '}') { depth--; if (depth === 0) return text.slice(objStart, i + 1); }
     i++;
   }
   return undefined;
 }
 
 /**
- * Validate a single TypeScript document for l10n key issues.
+ * State-machine extraction of top-level keys from a JS object literal.
+ * Tracks nesting depth for {}, (), [] and skips string literals, spread
+ * syntax (including member-access like ...obj.nested), and trailing commas.
  */
+function extractTopLevelKeys(block: string): Set<string> {
+  const keys = new Set<string>();
+  const n = block.length;
+  let i = 1; // Past opening brace.
+  let depth = 0;
+  while (i < n) {
+    const c = block[i];
+    if (c === "'" || c === '"' || c === '`') { i = skipStringLiteral(block, i); continue; }
+    if (c === '{' || c === '(' || c === '[') { depth++; i++; continue; }
+    if (c === '}' || c === ')' || c === ']') {
+      if (depth === 0) break; // Closing brace of params object.
+      depth--; i++; continue;
+    }
+    if (depth === 0) {
+      // Skip spread operator and its full operand (including member access).
+      if (c === '.' && i + 2 < n && block[i + 1] === '.' && block[i + 2] === '.') {
+        i += 3;
+        while (i < n && /\s/.test(block[i])) i++;
+        // Consume identifier.dotted.path so it isn't treated as a key.
+        while (i < n && /[\w$.]/.test(block[i])) i++;
+        continue;
+      }
+      // Match an identifier — a key candidate.
+      if (/[a-zA-Z_$]/.test(c)) {
+        const start = i;
+        while (i < n && /[\w$]/.test(block[i])) i++;
+        const ident = block.slice(start, i);
+        // Peek past whitespace for the delimiter that confirms it's a key.
+        let j = i;
+        while (j < n && /\s/.test(block[j])) j++;
+        if (j < n && (block[j] === ':' || block[j] === ',' || block[j] === '}')) {
+          keys.add(ident);
+        }
+        continue;
+      }
+    }
+    i++;
+  }
+  return keys;
+}
+
+/** Validate a single TypeScript document for l10n key issues. */
 function validateDocument(doc: vscode.TextDocument): void {
-  // Only validate TypeScript files inside extension/src/.
   if (doc.languageId !== 'typescript' && doc.languageId !== 'typescriptreact') return;
   if (!doc.uri.fsPath.includes(`extension${path.sep}src${path.sep}`)) return;
 
@@ -127,32 +196,29 @@ function validateDocument(doc: vscode.TextDocument): void {
 
   const diagnostics: vscode.Diagnostic[] = [];
   const text = doc.getText();
+  // Comment-blanked text for regex matching — prevents false positives
+  // from example l10n() calls inside code comments.
+  const scanText = blankComments(text);
 
-  // Reset the regex state for each document.
   L10N_RE.lastIndex = 0;
   let match: RegExpExecArray | null;
-  while ((match = L10N_RE.exec(text)) !== null) {
+  while ((match = L10N_RE.exec(scanText)) !== null) {
     const key = match[2];
     const keyStart = match.index + match[0].indexOf(key);
     const keyEnd = keyStart + key.length;
     const range = new vscode.Range(doc.positionAt(keyStart), doc.positionAt(keyEnd));
 
-    // Skip dynamic key prefixes.
     if (key.endsWith('.')) continue;
 
-    // Check 1: key exists in en.json.
     if (!catalog.has(key)) {
-      diagnostics.push(
-        new vscode.Diagnostic(
-          range,
-          `l10n key "${key}" is not defined in en.json`,
-          vscode.DiagnosticSeverity.Warning,
-        ),
-      );
+      diagnostics.push(new vscode.Diagnostic(
+        range,
+        `l10n key "${key}" is not defined in en.json`,
+        vscode.DiagnosticSeverity.Warning,
+      ));
       continue;
     }
 
-    // Check 2: interpolation params match.
     const catalogValue = catalog.get(key)!;
     const expectedParams = new Set<string>();
     PLACEHOLDER_RE.lastIndex = 0;
@@ -162,76 +228,52 @@ function validateDocument(doc: vscode.TextDocument): void {
     }
     if (expectedParams.size === 0) continue;
 
-    // Extract the params object from the call site.
+    // Use original text for param extraction — comment blanking only
+    // affects the L10N_RE scan, not the structural parse.
     const afterKey = match.index + match[0].length;
     const paramsBlock = extractParamsBlock(text, afterKey);
 
     if (!paramsBlock) {
-      // Catalog expects params but call site doesn't pass any.
-      diagnostics.push(
-        new vscode.Diagnostic(
-          range,
-          `l10n key "${key}" expects params {${[...expectedParams].join(', ')}} but none passed`,
-          vscode.DiagnosticSeverity.Warning,
-        ),
-      );
+      diagnostics.push(new vscode.Diagnostic(
+        range,
+        `l10n key "${key}" expects params {${[...expectedParams].join(', ')}} but none passed`,
+        vscode.DiagnosticSeverity.Warning,
+      ));
       continue;
     }
 
-    // Extract supplied keys from the params object.
-    const supplied = new Set<string>();
-    OBJ_KEY_RE.lastIndex = 0;
-    let km: RegExpExecArray | null;
-    while ((km = OBJ_KEY_RE.exec(paramsBlock)) !== null) {
-      supplied.add(km[1]);
-    }
-
+    const supplied = extractTopLevelKeys(paramsBlock);
     const missingParams = [...expectedParams].filter(p => !supplied.has(p));
     if (missingParams.length > 0) {
-      diagnostics.push(
-        new vscode.Diagnostic(
-          range,
-          `l10n key "${key}" missing params: {${missingParams.join(', ')}}`,
-          vscode.DiagnosticSeverity.Warning,
-        ),
-      );
+      diagnostics.push(new vscode.Diagnostic(
+        range,
+        `l10n key "${key}" missing params: {${missingParams.join(', ')}}`,
+        vscode.DiagnosticSeverity.Warning,
+      ));
     }
   }
 
   _collection?.set(doc.uri, diagnostics);
 }
 
-/**
- * Register the l10n diagnostic provider. Call once at extension activation.
- */
+/** Register the l10n diagnostic provider. Call once at extension activation. */
 export function registerL10nDiagnostics(context: vscode.ExtensionContext): void {
   _collection = vscode.languages.createDiagnosticCollection('saropa-l10n');
   context.subscriptions.push(_collection);
 
-  // Validate on save.
   context.subscriptions.push(
     vscode.workspace.onDidSaveTextDocument(validateDocument),
   );
-
-  // Validate when a TypeScript file is opened.
   context.subscriptions.push(
     vscode.workspace.onDidOpenTextDocument(validateDocument),
   );
 
-  // Invalidate catalog cache when en.json changes.
   _watcher = vscode.workspace.createFileSystemWatcher('**/i18n/locales/en.json');
   _watcher.onDidChange(() => {
-    // Clear cache so next validation picks up the new keys.
     _catalogCache = undefined;
-    // Re-validate all open TS documents.
-    for (const doc of vscode.workspace.textDocuments) {
-      validateDocument(doc);
-    }
+    for (const doc of vscode.workspace.textDocuments) { validateDocument(doc); }
   });
   context.subscriptions.push(_watcher);
 
-  // Validate all currently open TypeScript files.
-  for (const doc of vscode.workspace.textDocuments) {
-    validateDocument(doc);
-  }
+  for (const doc of vscode.workspace.textDocuments) { validateDocument(doc); }
 }

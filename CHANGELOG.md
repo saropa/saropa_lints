@@ -76,6 +76,8 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Scan daemon auto-suspends when memory-pressure shedding reaches level 2+ (most rules shed), reclaiming the daemon's warm analyzer cache; resumes automatically when pressure drops. No action required.
 - Orphaned scan daemon detection — scan daemons left running after a VS Code crash are now identified and included in the Clean Up command alongside Flutter daemons. No action required.
 - Health panel marks Saropa Lints processes with a "Saropa" type pill so they are visually distinct from analysis servers and other Dart processes. No action required.
+- Standalone LSP server plumbing test (Phase 0) — a second LSP server emits one diagnostic per severity level (error, warning, info, hint) with squiggles and quick fixes, proving two LSP servers coexist in the same VS Code Problems panel. Runs alongside the analyzer plugin — disable via `saropaLints.lspServer.enabled` if needed.
+- Debug Panel sidebar — shows status and toggle controls for all three diagnostic engines (Analyzer Plugin, Scan Daemon, LSP Server) with PID, rule count, RSS, and a live log tail. Disable via `saropaLints.debug.enabled` if not needed.
 
 ### Fixed
 
@@ -91,7 +93,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - `audit` CLI: fixed `RuntimeTierCap` silently capping the rule set — added `bypassTierCap` flag on `ScanRunner` so audit runs every rule regardless of the project's configured tier.
 - `audit` CLI: fixed tier enrichment bug — was looking up `entry['rule']` instead of `entry['ruleName']`, so tier field was never populated in JSON output.
 - `audit` CLI: added per-diagnostic `category` field to JSON output (derived from rule source file directory), with generated category map and drift-catching unit tests.
-- Fixed l10n diagnostic param-extraction regex consuming trailing delimiters, causing false "missing params" warnings on multi-param `l10n()` calls.
+- Fixed l10n diagnostic param-extraction by replacing the fragile `OBJ_KEY_RE` regex with a state-machine parser that handles nested expressions, spread syntax, and trailing commas. Also added comment-aware scanning to prevent false positives from example calls inside code comments.
 - Moved `PACKAGE_VIBRANCY.md` from `plans/guides/` to the repo root to match the path the extension's SDK vibrancy table expects; excluded `plans/` from the pub.dev package (already public on GitHub, this only trims the published tarball); added CI check `scripts/check_doc_links_excluded_paths.py` to catch shipped docs linking into `.pubignore`-excluded paths.
 
 </details>
