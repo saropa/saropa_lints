@@ -94,7 +94,9 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 <details>
 <summary>Maintenance</summary>
 
-- Compiled competitor gap analysis (`plans/GAP_ANALYSIS.md`) — rule-by-rule audit of 48 Dart/Flutter lint packages against saropa_lints' catalog, with gap themes and per-package detail sections for planning future rule additions.
+- Compiled alternative landscape gap analysis (`plans/GAP_ANALYSIS.md`) — rule-by-rule audit of 48 Dart/Flutter lint packages against saropa_lints' catalog, with gap themes and per-package detail sections for planning future rule additions.
+- Hardened dead-package language in migration guides for `accessibility_lint` (archived), `design_system_lints` (defunct since 2022), and `flutter_refactor_plugin` (source repo 404) — migration is mandatory, not optional.
+- Added migration packs plan (`plans/MIGRATION_PACKS_PLAN.md`) — rule packs that surface saropa equivalents for each alternative package in the extension's Config dashboard.
 - Added `// LINT_MESSAGE:`, `// LINT_NOT:`, and `// LINT_COUNT:` fixture marker infrastructure — declarative message validation, false-positive guards, and whole-fixture count assertions for resolved harness tests.
 - `audit` CLI: fixed `RuntimeTierCap` silently capping the rule set — added `bypassTierCap` flag on `ScanRunner` so audit runs every rule regardless of the project's configured tier.
 - `audit` CLI: fixed tier enrichment bug — was looking up `entry['rule']` instead of `entry['ruleName']`, so tier field was never populated in JSON output.
