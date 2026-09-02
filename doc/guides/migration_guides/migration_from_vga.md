@@ -217,7 +217,7 @@ Then run: `dart run saropa_lints:init --tier recommended`
 | `pedantic` | Google | Deprecated | ~30 |
 | `flutter_lints` | Flutter team | Active (Flutter default) | ~30 |
 
-All of these are **standard Dart analyzer rules** and work alongside saropa_lints (custom_lint rules). See our [flutter_lints guide](using_with_flutter_lints.md) for more details.
+All of these are **standard Dart analyzer rules** and work alongside saropa_lints (custom_lint rules). See our [flutter_lints guide](../packages/using_with_flutter_lints.md) for more details.
 
 ## Getting Help
 

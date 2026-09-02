@@ -409,13 +409,13 @@ If you use **GetX**, **Riverpod**, **Provider**, **Bloc**, **Isar**, **Hive**, o
 
 | Library      | Common issues caught                                                                             | Guide                                                    |
 | ------------ | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------- |
-| **GetX**     | Undisposed controllers, memory leaks from workers, missing super calls                           | [Using with GetX](doc/guides/using_with_getx.md)         |
-| **Riverpod** | Circular provider deps, ref.read() in build, missing ProviderScope                               | [Using with Riverpod](doc/guides/using_with_riverpod.md) |
-| **Provider** | Provider.of in build causing rebuilds, recreated providers losing state                          | [Using with Provider](doc/guides/using_with_provider.md) |
-| **Bloc**     | Events in constructor, mutable state, unclosed Blocs, BlocListener in build                      | [Using with Bloc](doc/guides/using_with_bloc.md)         |
-| **Isar**     | Enum fields causing data corruption on schema changes; caching Isar streams (runtime crash risk) | [Using with Isar](doc/guides/using_with_isar.md)         |
-| **Hive**     | Missing init, unclosed boxes, hardcoded encryption keys, type adapter issues                     | [Using with Hive](doc/guides/using_with_hive.md)         |
-| **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks               | [Using with Firebase](doc/guides/using_with_firebase.md) |
+| **GetX**     | Undisposed controllers, memory leaks from workers, missing super calls                           | [Using with GetX](doc/guides/packages/using_with_getx.md)         |
+| **Riverpod** | Circular provider deps, ref.read() in build, missing ProviderScope                               | [Using with Riverpod](doc/guides/packages/using_with_riverpod.md) |
+| **Provider** | Provider.of in build causing rebuilds, recreated providers losing state                          | [Using with Provider](doc/guides/packages/using_with_provider.md) |
+| **Bloc**     | Events in constructor, mutable state, unclosed Blocs, BlocListener in build                      | [Using with Bloc](doc/guides/packages/using_with_bloc.md)         |
+| **Isar**     | Enum fields causing data corruption on schema changes; caching Isar streams (runtime crash risk) | [Using with Isar](doc/guides/packages/using_with_isar.md)         |
+| **Hive**     | Missing init, unclosed boxes, hardcoded encryption keys, type adapter issues                     | [Using with Hive](doc/guides/packages/using_with_hive.md)         |
+| **Firebase** | Unbounded queries, missing batch writes, invalid Analytics events, FCM token leaks               | [Using with Firebase](doc/guides/packages/using_with_firebase.md) |
 
 ![Screenshot of analysis_options_custom.yaml](https://raw.githubusercontent.com/saropa/saropa_lints/main/assets/20260401_analysis_options_custom_yaml.png)
 
@@ -513,10 +513,10 @@ The tool is also built to **fix**. Saropa Lints diagnostics are engineered to be
 
 ### Migrating from other tools?
 
-- [Migrating from very_good_analysis](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_vga.md) (also covers `lints`, `lint`, `pedantic`)
-- [Migrating from DCM (Dart Code Metrics)](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_dcm.md)
-- [Migrating from solid_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_from_solid_lints.md)
-- [Using with flutter_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_flutter_lints.md) (complementary setup)
+- [Migrating from very_good_analysis](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_guides/migration_from_vga.md) (also covers `lints`, `lint`, `pedantic`)
+- [Migrating from DCM (Dart Code Metrics)](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_guides/migration_from_dcm.md)
+- [Migrating from solid_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_guides/migration_from_solid_lints.md)
+- [Using with flutter_lints](https://github.com/saropa/saropa_lints/blob/main/doc/guides/packages/using_with_flutter_lints.md) (complementary setup)
 
 > **Why three options?** The extension (Option A) is the recommended interactive experience (**Set Up Project** and the sidebar). Tier presets (Option B) are great for quick, zero-config setup. The CLI init tool (Option C) gives you explicit `true`/`false` for every rule, ideal for CI/scripting, plus `--list-packs` / `--enable-pack` for rule packs.
 
@@ -1492,13 +1492,13 @@ We provide specialized lint rules for popular Flutter packages. These catch libr
 
 | Category             | Package   | Guide                                                                                                       |
 | -------------------- | --------- | ----------------------------------------------------------------------------------------------------------- |
-| **State Management** | Riverpod  | [Using with Riverpod](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_riverpod.md)   |
-|                      | Bloc      | [Using with Bloc](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_bloc.md)           |
-|                      | Provider  | [Using with Provider](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_provider.md)   |
-|                      | GetX      | [Using with GetX](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_getx.md)           |
-| **Databases**        | Isar      | [Using with Isar](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_isar.md)           |
-|                      | Hive      | [Using with Hive](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_hive.md)           |
-| **Backend Services** | Firebase  | [Using with Firebase](https://github.com/saropa/saropa_lints/blob/main/doc/guides/using_with_firebase.md)   |
+| **State Management** | Riverpod  | [Using with Riverpod](https://github.com/saropa/saropa_lints/blob/main/doc/guides/packages/using_with_riverpod.md)   |
+|                      | Bloc      | [Using with Bloc](https://github.com/saropa/saropa_lints/blob/main/doc/guides/packages/using_with_bloc.md)           |
+|                      | Provider  | [Using with Provider](https://github.com/saropa/saropa_lints/blob/main/doc/guides/packages/using_with_provider.md)   |
+|                      | GetX      | [Using with GetX](https://github.com/saropa/saropa_lints/blob/main/doc/guides/packages/using_with_getx.md)           |
+| **Databases**        | Isar      | [Using with Isar](https://github.com/saropa/saropa_lints/blob/main/doc/guides/packages/using_with_isar.md)           |
+|                      | Hive      | [Using with Hive](https://github.com/saropa/saropa_lints/blob/main/doc/guides/packages/using_with_hive.md)           |
+| **Backend Services** | Firebase  | [Using with Firebase](https://github.com/saropa/saropa_lints/blob/main/doc/guides/packages/using_with_firebase.md)   |
 | **Platform**         | iOS/macOS | [Apple Platform Rules](https://github.com/saropa/saropa_lints/blob/main/doc/guides/apple_platform_rules.md) |
 
 #### For Package Authors
