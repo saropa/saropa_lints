@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Risoluzione tipi (costosa)",
       "categoryHighCost": "Alto costo",
       "categoryInfoSeverity": "INFO gravità",
-      "categoryWarningSeverity": "WARNING gravità"
+      "categoryWarningSeverity": "WARNING gravità",
+      "moreRules": "più non elencati",
+      "restartButton": "Riavvia analizzatore",
+      "restartTooltip": "Riavvia il server di analisi Dart per eliminare la pressione della memoria e ripristinare le regole di pulizia."
     }
   },
   "brand": {

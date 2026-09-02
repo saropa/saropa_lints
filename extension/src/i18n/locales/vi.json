@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Kiểm tra kiểu dữ liệu (tốn kém)",
       "categoryHighCost": "Chi phí cao",
       "categoryInfoSeverity": "INFO mức độ nghiêm trọng",
-      "categoryWarningSeverity": "WARNING mức độ nghiêm trọng"
+      "categoryWarningSeverity": "WARNING mức độ nghiêm trọng",
+      "moreRules": "nhiều hơn không được liệt kê",
+      "restartButton": "Khởi động lại phân tích",
+      "restartTooltip": "Khởi động lại máy chủ phân tích Dart để giải phóng áp lực bộ nhớ và khôi phục lại các quy tắc đã bị loại bỏ."
     }
   },
   "brand": {

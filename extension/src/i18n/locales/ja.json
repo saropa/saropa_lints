@@ -660,7 +660,10 @@
       "categoryTypeResolving": "型解決（コストが高い）",
       "categoryHighCost": "高コスト",
       "categoryInfoSeverity": "INFO セビリティ",
-      "categoryWarningSeverity": "警告 重度"
+      "categoryWarningSeverity": "警告 重度",
+      "moreRules": "より多く表示されていない",
+      "restartButton": "アナライザを再起動",
+      "restartTooltip": "Dart分析サーバーを再起動してメモリ圧力を解消し、シャドウルールを復元してください。"
     }
   },
   "brand": {

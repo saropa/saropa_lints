@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Kutambua mswalano (sukari)",
       "categoryHighCost": "Gharama ya juu",
       "categoryInfoSeverity": "Ukali wa INFO",
-      "categoryWarningSeverity": "ONYO ukali"
+      "categoryWarningSeverity": "ONYO ukali",
+      "moreRules": "zaidi sio anapangwa",
+      "restartButton": "Tumia analyzer yenye maelekezo ya kuanza uliopatikana",
+      "restartTooltip": "Tumia kujaribu kifedha kwa server ya analizi ya Dart kujaribu kujikumbuka kujikosomaa kwa muda mlele na kujikosomaa kifedha ya kifedha."
     }
   },
   "brand": {

@@ -660,7 +660,10 @@
       "categoryTypeResolving": "ניתוח סוגים (יקר)",
       "categoryHighCost": "הIGH-cost",
       "categoryInfoSeverity": "INFO אינטנסיביות",
-      "categoryWarningSeverity": "경고 중증도"
+      "categoryWarningSeverity": "경고 중증도",
+      "moreRules": "יותר לא רשומים",
+      "restartButton": "إعادة تشغيل המ phân석",
+      "restartTooltip": "הפעל מחדש את שרת ניתוח Dart כדי לנקות את לחץ הזיכרון ולשחזר את כללי השידור."
     }
   },
   "brand": {

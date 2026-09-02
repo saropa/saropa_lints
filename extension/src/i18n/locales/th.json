@@ -660,7 +660,10 @@
       "categoryTypeResolving": "การแก้ไขประเภท (มีค่าใช้จ่ายสูง)",
       "categoryHighCost": "ค่าใช้จ่ายสูง",
       "categoryInfoSeverity": "ข้อมูลสำคัญ",
-      "categoryWarningSeverity": "เตือนภัยความรุนแรง"
+      "categoryWarningSeverity": "เตือนภัยความรุนแรง",
+      "moreRules": "มากกว่าที่ระบุไว้",
+      "restartButton": "รีสตาร์ทอะนาไลเซอร์",
+      "restartTooltip": "รีสตาร์ทเซิร์ฟเวอร์การวิเคราะห์ Dart เพื่อทำความสะอาดความดันหน่วยความจำและกู้คืนกฎการจัดการ"
     }
   },
   "brand": {

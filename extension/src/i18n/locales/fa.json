@@ -660,7 +660,10 @@
       "categoryTypeResolving": "نوع تشخیص (گران)",
       "categoryHighCost": "کمک هزینه بالا",
       "categoryInfoSeverity": "اخطار سطح",
-      "categoryWarningSeverity": "تحذير جدیت"
+      "categoryWarningSeverity": "تحذير جدیت",
+      "moreRules": "بیشتر نمایش داده نشده",
+      "restartButton": "تحلیل کننده را بازگردانید",
+      "restartTooltip": "سرویس تحلیل Dart را مجدد راه اندازی کنید تا فشار حافظه را پاک کرده و قوانین ارائه شده را بازگردانید."
     }
   },
   "brand": {

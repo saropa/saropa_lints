@@ -660,7 +660,10 @@
       "categoryTypeResolving": "نوع تحلیل (مہنگا)",
       "categoryHighCost": "ہائی کوسٹ",
       "categoryInfoSeverity": "معلومات سطح سختی",
-      "categoryWarningSeverity": "تحذير سطحیت"
+      "categoryWarningSeverity": "تحذير سطحیت",
+      "moreRules": "زیادہ نہیں فہرست میں شامل نہیں",
+      "restartButton": "انالائزر کو دوبارہ شروع کریں",
+      "restartTooltip": "Dart تحلیل سرور کو دوبارہ شروع کریں تاکہ یادگیری دباؤ کو دور کیا جائے اور شیڈ قواعد بحال کیے جائیں۔"
     }
   },
   "brand": {

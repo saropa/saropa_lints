@@ -660,7 +660,10 @@
       "categoryTypeResolving": "类型解析（昂贵）",
       "categoryHighCost": "高成本",
       "categoryInfoSeverity": "INFO 严重级别",
-      "categoryWarningSeverity": "警告级别"
+      "categoryWarningSeverity": "警告级别",
+      "moreRules": "更多未列出",
+      "restartButton": "重启分析器",
+      "restartTooltip": "重启 Dart 分析服务器以清除内存压力并恢复舍弃的规则。"
     }
   },
   "brand": {

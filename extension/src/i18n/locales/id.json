@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Type-resolving (mahal)",
       "categoryHighCost": "Biaya tinggi",
       "categoryInfoSeverity": "Keparahan INFO",
-      "categoryWarningSeverity": "PERINGATAN tingkat keparahan"
+      "categoryWarningSeverity": "PERINGATAN tingkat keparahan",
+      "moreRules": "lebih banyak tidak terdaftar",
+      "restartButton": "Restart analisator",
+      "restartTooltip": "Restartkan server analisis Dart untuk membersihkan tekanan memori dan memulihkan aturan yang telah dibuang."
     }
   },
   "brand": {

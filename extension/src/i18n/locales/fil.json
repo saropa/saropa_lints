@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Type-resolving (mahal)",
       "categoryHighCost": "Mataas ang halaga",
       "categoryInfoSeverity": "INFO kalubhaan",
-      "categoryWarningSeverity": "BABALA kalubhaan"
+      "categoryWarningSeverity": "BABALA kalubhaan",
+      "moreRules": "hindi na nakalista",
+      "restartButton": "I-reset ang analisador",
+      "restartTooltip": "I-reset ang server ng analisis ng Dart upang malibog ang presyon sa memorya at i-backup muli ang mga patakaran."
     }
   },
   "brand": {

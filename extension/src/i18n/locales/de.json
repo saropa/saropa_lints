@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Typauflösend (aufwendig)",
       "categoryHighCost": "Hohe Kosten",
       "categoryInfoSeverity": "INFO Schweregrad",
-      "categoryWarningSeverity": "WARNING Schweregrad"
+      "categoryWarningSeverity": "WARNING Schweregrad",
+      "moreRules": "mehr nicht aufgelistet",
+      "restartButton": "Analyser neu starten",
+      "restartTooltip": "Den Dart-Analyse-Server neu starten, um den Speicherdruck zu beheben und die Shed-Regeln wiederherzustellen."
     }
   },
   "brand": {

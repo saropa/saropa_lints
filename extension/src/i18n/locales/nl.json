@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Type-resolver (duurzaam)",
       "categoryHighCost": "Hoog kostbaar",
       "categoryInfoSeverity": "INFO ernst",
-      "categoryWarningSeverity": "WAARSCHUWING ernst"
+      "categoryWarningSeverity": "WAARSCHUWING ernst",
+      "moreRules": "meer niet gelijst",
+      "restartButton": "Analyseer opnieuw",
+      "restartTooltip": "Herstart de Dart analyse-server om geheugenbelasting te verlagen en schaduwregels te herstellen."
     }
   },
   "brand": {

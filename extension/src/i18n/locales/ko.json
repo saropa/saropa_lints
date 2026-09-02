@@ -660,7 +660,10 @@
       "categoryTypeResolving": "타입 분석(비용이 많이 드는)",
       "categoryHighCost": "고비용",
       "categoryInfoSeverity": "INFO 심각도",
-      "categoryWarningSeverity": "경고 중증도"
+      "categoryWarningSeverity": "경고 중증도",
+      "moreRules": "더 나열되지 않음",
+      "restartButton": "분석기 재시작",
+      "restartTooltip": "Dart 분석 서버를 다시 시작하여 메모리 압력을 해제하고 쉐드 규칙을 복원하세요."
     }
   },
   "brand": {

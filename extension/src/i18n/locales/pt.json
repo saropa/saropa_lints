@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Resolução de tipos (caro)",
       "categoryHighCost": "Alta custo",
       "categoryInfoSeverity": "INFO severidade",
-      "categoryWarningSeverity": "AVISO severidade"
+      "categoryWarningSeverity": "AVISO severidade",
+      "moreRules": "mais não listado",
+      "restartButton": "Reiniciar analisador",
+      "restartTooltip": "Reinicie o servidor de análise Dart para liberar a pressão de memória e restaurar as regras de regra."
     }
   },
   "brand": {

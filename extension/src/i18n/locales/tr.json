@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Tip çözme (maliyetli)",
       "categoryHighCost": "Yüksek maliyetli",
       "categoryInfoSeverity": "INFO ciddiyeti",
-      "categoryWarningSeverity": "UYARı SEVİYESİ"
+      "categoryWarningSeverity": "UYARı SEVİYESİ",
+      "moreRules": "daha fazlası listede yer almıyor",
+      "restartButton": "Analizciyi yeniden başlat",
+      "restartTooltip": "Dart analiz sunucusunu yeniden başlatarak bellek baskısını kaldırıp shed kurallarını geri yükleyin."
     }
   },
   "brand": {

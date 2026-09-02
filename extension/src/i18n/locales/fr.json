@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Résolution de type (coûteuse)",
       "categoryHighCost": "Coûts élevés",
       "categoryInfoSeverity": "INFO gravité",
-      "categoryWarningSeverity": "AVERTISSEMENT gravité"
+      "categoryWarningSeverity": "AVERTISSEMENT gravité",
+      "moreRules": "plusieurs non listés",
+      "restartButton": "Redémarrer l'analyseur",
+      "restartTooltip": "Redémarrez le serveur d'analyse Dart pour libérer la pression mémoire et restaurer les règles déclenchées."
     }
   },
   "brand": {

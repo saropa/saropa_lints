@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Розв'язування типів (дороге)",
       "categoryHighCost": "Висока вартість",
       "categoryInfoSeverity": "INFO середнього рівня",
-      "categoryWarningSeverity": "ПОПЕРЕДЖЕННЯ середнього рівня"
+      "categoryWarningSeverity": "ПОПЕРЕДЖЕННЯ середнього рівня",
+      "moreRules": "більше не вказано",
+      "restartButton": "Перезапустити аналізатор",
+      "restartTooltip": "Перезапустіть аналізатор сервера Dart, щоб видалити тиск на пам'ять та відновити правила."
     }
   },
   "brand": {

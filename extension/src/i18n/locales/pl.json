@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Rozwiązanie typu (drożne)",
       "categoryHighCost": "Wysokie koszty",
       "categoryInfoSeverity": "INFO poziom poważności",
-      "categoryWarningSeverity": "UWAGA poziom poważny"
+      "categoryWarningSeverity": "UWAGA poziom poważny",
+      "moreRules": "więcej nie wymienionych",
+      "restartButton": "Restart analizatora",
+      "restartTooltip": "Zrestartuj serwer analizy Dart, aby oczyścić presję pamięci i przywrócić zasady przycinania."
     }
   },
   "brand": {

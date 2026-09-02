@@ -660,7 +660,10 @@
       "categoryTypeResolving": "प्रकार-निर्धारण (खराब)",
       "categoryHighCost": "उच्च लागत",
       "categoryInfoSeverity": "सूचना गुरुत्व",
-      "categoryWarningSeverity": "चेतावनी गुरुत्वपूर्णता"
+      "categoryWarningSeverity": "चेतावनी गुरुत्वपूर्णता",
+      "moreRules": "अधिक निर्दिष्ट नहीं किया गया",
+      "restartButton": "एनालाइजर रीस्टार्ट",
+      "restartTooltip": "Dart विश्लेषण सर्वर को फिर से शुरू करें ताकि स्मृति दबाव को दूर कर और शेड नियमों को बहाल कर सकें।"
     }
   },
   "brand": {

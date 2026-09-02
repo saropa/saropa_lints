@@ -660,7 +660,10 @@
       "categoryTypeResolving": "Типо-разрешение (дорогостоящее)",
       "categoryHighCost": "Высокая стоимость",
       "categoryInfoSeverity": "INFO уровень серьёзности",
-      "categoryWarningSeverity": "ПРЕДУПРЕЖДЕНИЕ severity"
+      "categoryWarningSeverity": "ПРЕДУПРЕЖДЕНИЕ severity",
+      "moreRules": "больше не перечислено",
+      "restartButton": "Перезапустить анализатор",
+      "restartTooltip": "Перезапустите сервер анализа Dart для очистки давления на память и восстановления правил."
     }
   },
   "brand": {

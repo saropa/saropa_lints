@@ -660,7 +660,10 @@
       "categoryTypeResolving": "التحقق من نوع البيانات (مكلف)",
       "categoryHighCost": "عالي التكلفة",
       "categoryInfoSeverity": "INFO مستوى الخطورة",
-      "categoryWarningSeverity": "تحذير درجة الخطورة"
+      "categoryWarningSeverity": "تحذير درجة الخطورة",
+      "moreRules": "أكثر مما تم توضيحه",
+      "restartButton": "إعادة تشغيل المُحلل",
+      "restartTooltip": "إعادة تشغيل خادم تحليل Dart لتفريغ الضغط على الذاكرة وإعادة تعيين قواعد الترشيح."
     }
   },
   "brand": {
