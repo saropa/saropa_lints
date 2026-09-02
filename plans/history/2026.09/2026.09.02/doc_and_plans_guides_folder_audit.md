@@ -58,8 +58,22 @@ longer exists, and `plans/history/2026.04/2026.04.28/project_vibrancy_report.md`
 ## Finish Report (2026-09-02)
 
 Scope: docs/scripts only. No Dart rule/analyzer code or extension
-TypeScript logic touched. `/code-review low` was run twice (once for the
-initial three-file fix, once after adding the CI check); both passes
-surfaced only pre-existing findings in `extension/src/systemHealth/` and
-`extension/src/scanOnSave/` from unrelated concurrent work already present
-in the working tree — none applicable to this change's diff.
+TypeScript logic touched. `/code-review low` was run three times across
+this task's iterations; all passes surfaced only pre-existing findings in
+`extension/src/systemHealth/` and `extension/src/scanOnSave/` from
+unrelated concurrent work already present in the working tree — none
+applicable to this change's diff.
+
+## Hardening pass
+
+`check_doc_links_excluded_paths.py` originally resolved every link target
+as repo-root-relative, which is wrong for Markdown/GitHub link semantics —
+a link in `doc/guides/foo.md` resolves relative to `doc/guides/`, not the
+repo root. Fixed to resolve against the linking file's own directory, and
+extended to flag any relative link whose target does not exist on disk
+(not just excluded-path links). Rerunning the corrected version against the
+repo surfaced 4 additional real dead links the root-relative-only version
+had been blind to: `doc/troubleshooting.md` and two spots in
+`doc/guides/composite_analyzer_plugin.md` / `doc/guides/rule_packs.md`, all
+linking into `plans/PLAN_*.md` files excluded from the pub.dev package.
+Those links were removed or de-linked to plain text.
