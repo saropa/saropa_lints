@@ -71,7 +71,7 @@ The fix producers ship inside saropa_lints itself; if the rule is registered wit
 python scripts/list_rules_without_fixes.py
 ```
 
-If your rule is in that list, it has no fix to offer — that's not a bug, that's missing coverage. See [`plans/PLAN_quick_fix.md`](../plans/PLAN_quick_fix.md) for the open list.
+If your rule is in that list, it has no fix to offer — that's not a bug, that's missing coverage. The open list is tracked internally in the project's planning docs (not shipped with the package).
 
 **Fix:**
 
