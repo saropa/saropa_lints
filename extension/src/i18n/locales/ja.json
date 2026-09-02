@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 ルール一時停止中 ({rssMb} MB)",
+      "shedCritical": "🔴 {count} ルールでシェッド（critical）",
       "shedWarning": "⚠ {count} ルールは適用されません",
-      "shedInfo": "⚡ {count} ルールでスッキリ",
+      "shedInfo": "⚡ {count} 高額なルールを削除",
       "pressureNoShed": "⚠ メモリ圧力 ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "メモリ圧力: 通常",
-      "shedLevel1": "メモリ圧力: {count} 低重大度ルールが削除され RSS",
-      "shedLevel2": "メモリ圧力: {count} ルールがシャドウ (INFO + ワーニング セバリティ)",
+      "shedLevel1": "メモリ負荷: {count} 高コストなルールは(type-resolving + 高コスト)を削減して RSS",
+      "shedLevel2": "メモリ圧力: {count} ルールがシャドウ (高コスト + INFO 重要度)",
+      "shedLevel3": "メモリ圧力: {count}ルールは(すべての非必須非ERROR)を削除します",
       "hardTripped": "メモリ制限を超えた — すべての非必須ルールが一時停止されました",
-      "pressureNoShed": "メモリ圧力が検出されました — analysis_options_custom.yaml でルールの切り捨てを有効にして、低重要度のルールを自動で切り捨ててください"
+      "pressureNoShed": "メモリ圧力が検出されました — analysis_options_custom.yaml でルールの切り捨てを有効にして、まず高コストなルールを自動的に切り捨ててください"
     },
     "notification": {
-      "shedDisabled": "分析器メモリ圧力検出 (RSS {rssMb} MB, ソフト制限 {softLimitMb} MB)。圧力下で低重要度のルールを自動的に無効にするルールシャーディングを有効にしてください。",
+      "shedDisabled": "分析器メモリ圧力検出 (RSS {rssMb} MB, ソフト制限 {softLimitMb} MB)。負荷下で高コストなルールを自動的に無効にするルールシャーディングを有効にしてください。",
       "enableButton": "Enable 設定を有効にします.",
       "learnMoreButton": "もっともっと学び,もっと学ぶ",
       "runInit": "'dart run saropa_lints:init'を実行してanalysis_options_custom.yamlを生成し、その後shed_rules: trueを設定してください。",
       "enabledConfirmation": "ルールの削除がanalysis_options_custom.yamlで有効化されました。解析器は次の再起動時に変更を検知します。"
+    },
+    "dashboard": {
+      "shedSectionTitle": "メモリ圧力（シェッドルール）",
+      "shedHint": "これらのルールは、メモリ圧力ハンドラによって一時的に無効化され、アナライザ RSS の負荷を減らします。メモリ圧力が下がると自動的に有効になります。",
+      "shedBadge": "シャドウ",
+      "shedBadgeTooltip": "このルールは一時的にメモリ圧力の下で削除されます。",
+      "categoryTypeResolving": "型解決（コストが高い）",
+      "categoryHighCost": "高コスト",
+      "categoryInfoSeverity": "INFO セビリティ",
+      "categoryWarningSeverity": "警告 重度"
     }
   },
   "brand": {

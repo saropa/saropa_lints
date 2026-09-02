@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Regras pausadas ({rssMb} MB)",
+      "shedCritical": "🔴 {count} regras de derrama (crítico)",
       "shedWarning": "⚠ Regras {count} de análise",
-      "shedInfo": "⚡ Regras {count} de análise",
+      "shedInfo": "⚡ Regras caras {count} eliminam",
       "pressureNoShed": "⚠ Pressão de memória ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Pressão de memória: normal",
-      "shedLevel1": "Pressão de memória: {count} regras de baixa gravidade são desativadas para reduzir RSS",
-      "shedLevel2": "Pressão de memória: {count} regras lançam (gravidade INFO + WARNING)",
+      "shedLevel1": "Pressão de memória: {count} regras caras eliminam (resolução de tipo + alto custo) para reduzir RSS",
+      "shedLevel2": "Pressão de memória: {count} regras lançam (caras + INFO severidade)",
+      "shedLevel3": "Pressão de memória: {count} regras eliminam (todas as não essenciais não-ERROR)",
       "hardTripped": "Limite de memória excedido — todas as regras não essenciais pausadas",
-      "pressureNoShed": "Pressão de memória detectada — ative a regra de descarte em analysis_options_custom.yaml para descartar automaticamente regras de baixa gravidade"
+      "pressureNoShed": "Pressão de memória detectada — ative a regra de descarte em analysis_options_custom.yaml para descartar primeiro as regras caras automaticamente"
     },
     "notification": {
-      "shedDisabled": "Pressão de memória do analisador detectada (RSS {rssMb} MB, limite suave {softLimitMb} MB). Ative a redução de regras para desativar automaticamente regras de baixa gravidade sob pressão.",
+      "shedDisabled": "Pressão de memória do analisador detectada (RSS {rssMb} MB, limite suave {softLimitMb} MB). Ative a redução de regras para desativar automaticamente regras caras sob pressão.",
       "enableButton": "Ativar habilitar ativar.",
       "learnMoreButton": "Saiba Mais Aprenda Mais.",
       "runInit": "Execute 'dart run saropa_lints:init' para gerar analysis_options_custom.yaml, em seguida, defina shed_rules: true.",
       "enabledConfirmation": "Regra de descarte ativada em analysis_options_custom.yaml. O analisador captará a alteração na próxima reinicialização."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Regras de liberação (pressão de memória)",
+      "shedHint": "Essas regras estão temporariamente desativadas pelo manipulador de pressão de memória para reduzir o analisador RSS. Eles retornam automaticamente quando a pressão de memória diminui.",
+      "shedBadge": "cabana",
+      "shedBadgeTooltip": "Esta regra é temporariamente desativada sob pressão de memória.",
+      "categoryTypeResolving": "Resolução de tipos (caro)",
+      "categoryHighCost": "Alta custo",
+      "categoryInfoSeverity": "INFO severidade",
+      "categoryWarningSeverity": "AVISO severidade"
     }
   },
   "brand": {

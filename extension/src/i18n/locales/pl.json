@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Zasady wstrzymane ({rssMb} MB)",
+      "shedCritical": "🔴 {count} reguły zasłaniają (krytyczne)",
       "shedWarning": "⚠ {count} reguły usuń",
-      "shedInfo": "⚡ {count} reguły usuwania",
+      "shedInfo": "⚡ {count} drogie reguły usuwania",
       "pressureNoShed": "⚠ Naciśnij przycisk ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Nacisk na pamięć: normalny",
-      "shedLevel1": "Nacisk na pamięć: {count} zasady o niskim poziomie zagrożenia pozwalające zmniejszyć RSS",
-      "shedLevel2": "Napięcie pamięci: {count} reguły wyrzucane (INFO + WARNING poziom poważności)",
+      "shedLevel1": "Nacisk na pamięć: {count} drogie reguły usuwają (rozwiązywanie typów + wysokie koszty) aby zmniejszyć RSS",
+      "shedLevel2": "Nacisk na pamięć: {count} reguły usuwają (droższe + INFO poziom znaczenia)",
+      "shedLevel3": "Nacisk na pamięć: {count} reguły usuwają (wszystkie niestosowne niestosowne niestosowne)",
       "hardTripped": "Limit pamięci przekroczony — wszystkie nieistotne reguły zawieszone",
-      "pressureNoShed": "Wykryto obciążenie pamięci — włącz reguły odrzucania w analysis_options_custom.yaml, aby automatycznie odrzucać reguły o niskim poziomie poważności"
+      "pressureNoShed": "Wykryto obciążenie pamięci — włącz zasady odrzucania reguł w analysis_options_custom.yaml, aby automatycznie odrzucać kosztowne reguły pierwsze"
     },
     "notification": {
-      "shedDisabled": "Wykryto obciążenie pamięci analizatora (RSS {rssMb} MB, miękki limit {softLimitMb} MB). Włącz reguły odrzucania, aby automatycznie wyłączać reguły o niskim poziomie poważności podczas obciążenia.",
+      "shedDisabled": "Wykryto obciążenie pamięci analizatora (RSS {rssMb} MB, miękki limit {softLimitMb} MB). Włącz reguły odrzucania, aby automatycznie wyłączać kosztowne reguły w trakcie obciążenia.",
       "enableButton": "Włącz Enable włączyć",
       "learnMoreButton": "Dowiedz się więcej Learn More Learn More",
       "runInit": "Uruchom 'dart run saropa_lints:init' aby wygenerować analysis_options_custom.yaml, a następnie ustaw shed_rules: true.",
       "enabledConfirmation": "Zasady odrzucania włączono w analysis_options_custom.yaml. Analizator zauważy zmianę podczas kolejnego jego uruchomienia."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Reguły dotyczące usuwania obiektów (nacisk na pamięć)",
+      "shedHint": "Te reguły są tymczasowo wyłączane przez obsługę presji pamięci, aby zmniejszyć analizator RSS. Włączane są automatycznie, gdy presja pamięci spadnie.",
+      "shedBadge": "szopa",
+      "shedBadgeTooltip": "Ta zasada jest tymczasowo wyłączona pod wpływem obciążenia pamięci.",
+      "categoryTypeResolving": "Rozwiązanie typu (drożne)",
+      "categoryHighCost": "Wysokie koszty",
+      "categoryInfoSeverity": "INFO poziom poważności",
+      "categoryWarningSeverity": "UWAGA poziom poważny"
     }
   },
   "brand": {

@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Regeln pausiert ({rssMb} MB)",
+      "shedCritical": "🔴 {count} Regeln werfen (kritisch)",
       "shedWarning": "⚠ {count} Regeln werden ausgewertet",
-      "shedInfo": "⚡ {count} Regeln für die Ausgabe",
+      "shedInfo": "⚡ {count} teure Regeln",
       "pressureNoShed": "⚠ Speicherdruck ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Speicherpressure: normal",
-      "shedLevel1": "Speicherpressure: {count} niedrigschwere Regeln zur Reduzierung von RSS",
-      "shedLevel2": "Speicherpressure: {count} Regeln werfen (INFO + WARNING Schweregrad)",
+      "shedLevel1": "Speicherpressure: {count} teure Regeln (Typauflösung + hoher Aufwand) reduzieren RSS",
+      "shedLevel2": "Speicherpressure: {count} Regeln werfen (teuer + INFO Schweregrad)",
+      "shedLevel3": "Speicherdruck: {count} Regeln werden ausgewertet (alle nicht notwendigen nicht-ERROR)",
       "hardTripped": "Speicherlimit überschritten — alle nicht notwendigen Regeln pausiert",
-      "pressureNoShed": "Speicherdruck erkannt — aktivieren Sie die Regelabbau-Funktion in analysis_options_custom.yaml, um Regeln mit geringer Schweregrad automatisch abzubauen"
+      "pressureNoShed": "Speicherdruck erkannt — aktivieren Sie die Regelabbau-Funktion in analysis_options_custom.yaml, um zunächst die kostspieligen Regeln automatisch abzubauen"
     },
     "notification": {
-      "shedDisabled": "Analyser-Speicherdruck erkannt (RSS {rssMb} MB, weicher Grenzwert {softLimitMb} MB). Aktivieren Sie die Regelabbau-Funktion, um unter Druck automatisch Regeln mit niedriger Schweregrad zu deaktivieren.",
+      "shedDisabled": "Analyser-Speicherdruck erkannt (RSS {rssMb} MB, weicher Grenzwert {softLimitMb} MB). Aktivieren Sie die Regelabbau-Regel, um unter Druck teure Regeln automatisch zu deaktivieren.",
       "enableButton": "Aktivieren Enable aktivieren",
       "learnMoreButton": "Erfahren Sie mehr erfahren Sie Mehr",
       "runInit": "Führe 'dart run saropa_lints:init' aus, um analysis_options_custom.yaml zu generieren, dann setze shed_rules: true.",
       "enabledConfirmation": "Regelabbau aktiviert in analysis_options_custom.yaml. Der Analyser wird den Änderung beim nächsten Neuladen aufnehmen."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Scheibenregeln (Speicherdruck)",
+      "shedHint": "Diese Regeln werden vorübergehend deaktiviert, um den Analyseprozess RSS zu reduzieren. Sie werden automatisch wieder aktiviert, wenn der Speicherbedarf sinkt.",
+      "shedBadge": "schütteln",
+      "shedBadgeTooltip": "Diese Regel wird vorübergehend deaktiviert, wenn der Arbeitsspeicher unter Druck steht.",
+      "categoryTypeResolving": "Typauflösend (aufwendig)",
+      "categoryHighCost": "Hohe Kosten",
+      "categoryInfoSeverity": "INFO Schweregrad",
+      "categoryWarningSeverity": "WARNING Schweregrad"
     }
   },
   "brand": {

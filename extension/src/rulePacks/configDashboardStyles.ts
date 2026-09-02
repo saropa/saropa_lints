@@ -31,6 +31,7 @@ export function getConfigDashboardStyles(): string {
     tierControlStyles(),
     packTableSpecifics(),
     disabledRulesStyles(),
+    shedRulesStyles(),
     stylisticStyles(),
     diagnosticsStyles(),
     sharedAtomStyles(),
@@ -419,6 +420,53 @@ details.expander > summary:focus-visible {
   outline: 1px solid var(--vscode-focusBorder);
   outline-offset: 2px;
   border-radius: 4px;
+}
+`;
+}
+
+/** Shed rules section — rules temporarily disabled under memory pressure.
+ * Visual treatment: warning-tinted background, dimmed rule links with a "shed" badge.
+ * Matches the disabled-rules layout but uses a distinct amber accent so the user
+ * immediately sees this is a transient system action, not a user choice. */
+function shedRulesStyles(): string {
+  return `
+/* Shed rules section */
+.shed-rules { margin-bottom: 14px; }
+.shed-rules-group { margin: 8px 0 0; }
+.shed-rules-group-heading {
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--vscode-editorWarning-foreground, #cca700);
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+.shed-rules-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.shed-rule-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+.shed-rule-row:hover { background: var(--vscode-list-hoverBackground); }
+.shed-rule-row .rule-link { opacity: 0.65; }
+/* Inline shed badge on rule links inside expanded pack rows */
+.rule-link.shed { opacity: 0.55; }
+.shed-badge {
+  display: inline-block;
+  font-size: 0.72em;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 3px;
+  vertical-align: middle;
+  margin-left: 2px;
+  background: var(--vscode-editorWarning-foreground, #cca700);
+  color: var(--vscode-editor-background, #1e1e1e);
 }
 `;
 }

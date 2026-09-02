@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Regels opgeschakeld ({rssMb} MB)",
+      "shedCritical": "🔴 {count} regels opwerpen (kritisch)",
       "shedWarning": "⚠ {count} regels weergeven",
-      "shedInfo": "⚡ {count} regels weerspiegelen",
+      "shedInfo": "⚡ {count} duurzame regels",
       "pressureNoShed": "⚠ Memory druk ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Memory pressure: normaal",
-      "shedLevel1": "Memory pressure: {count} lage-ernst regels worden toegepast om RSS te verminderen",
-      "shedLevel2": "Memory pressure: {count} regels weergeven (INFO + WARNING ernst)",
+      "shedLevel1": "Memory pressure: {count} duurzame regels (type-resolver + hoge kosten) verminderen om RSS",
+      "shedLevel2": "Memory pressure: {count} regels weergeven (duurzaam + INFO ernst)",
+      "shedLevel3": "Memory pressure: {count} regels weggooien (alle niet-essentiële niet-ERROR)",
       "hardTripped": "Geheugenlimiet overschreden — alle niet-essentiële regels opgeschort",
-      "pressureNoShed": "Geheugen druk gedetecteerd — activeer regelverlies in analysis_options_custom.yaml om automatisch lage-ernst regels te verwijderen"
+      "pressureNoShed": "Geheugen druk gedetecteerd — activeer regelverlies in analysis_options_custom.yaml om eerst duurzame regels automatisch te verwijderen"
     },
     "notification": {
-      "shedDisabled": "Analyser memory pressure gedetecteerd (RSS {rssMb} MB, soft limit {softLimitMb} MB). Schakel regelverlies in om automatisch laag-zwaarheidsregels te deactiveren onder druk.",
+      "shedDisabled": "Analyser memory pressure gedetecteerd (RSS {rssMb} MB, soft limit {softLimitMb} MB). Schakel regelverlies in om automatisch duurzame regels te deactiveren onder druk.",
       "enableButton": "Enable Enable is een functie die wordt ingeschakeld door de gebruiker.",
       "learnMoreButton": "Meer weten Leer meer Meer leren",
       "runInit": "Voer 'dart run saropa_lints:init' uit om analysis_options_custom.yaml te genereren, daarna shed_rules: true instellen.",
       "enabledConfirmation": "Regelverlies ingeschakeld in analysis_options_custom.yaml. De analyzer zal de wijziging opnemen bij de volgende herlaad."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Stramere regels (geheugen druk)",
+      "shedHint": "Deze regels worden tijdelijk uitgeschakeld door de memory pressure handler om de analyzer RSS te verminderen. Ze worden automatisch hersteld als de memory pressure daalt.",
+      "shedBadge": "vergoed",
+      "shedBadgeTooltip": "Deze regel wordt tijdelijk uitgeschakeld onder druk van geheugen.",
+      "categoryTypeResolving": "Type-resolver (duurzaam)",
+      "categoryHighCost": "Hoog kostbaar",
+      "categoryInfoSeverity": "INFO ernst",
+      "categoryWarningSeverity": "WAARSCHUWING ernst"
     }
   },
   "brand": {

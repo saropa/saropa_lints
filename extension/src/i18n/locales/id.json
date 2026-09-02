@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Aturan dijeda ({rssMb} MB)",
+      "shedCritical": "🔴 Aturan {count} ditumpahkan (kritis)",
       "shedWarning": "⚠ Aturan {count} menghilangkan",
-      "shedInfo": "⚡ Aturan {count} menghilangkan",
+      "shedInfo": "⚡ Aturan yang mahal {count} menghilangkan",
       "pressureNoShed": "⚠ Tekanan memori ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Tekanan memori: normal",
-      "shedLevel1": "Tekanan memori: {count} aturan beratitas rendah yang dihapus untuk mengurangi RSS",
-      "shedLevel2": "Tekanan memori: {count} aturan mengeluarkan (INFO + WARNING tingkat keparahan)",
+      "shedLevel1": "Tekanan memori: {count} aturan mahal (pemecahan tipe + biaya tinggi) untuk mengurangi RSS",
+      "shedLevel2": "Tekanan memori: {count} aturan mengeluarkan (mahal + INFO tingkat keparahan)",
+      "shedLevel3": "Tekanan memori: {count} aturan dilempar (semua non-esensial non-ERROR)",
       "hardTripped": "Memori melebihi batas — semua aturan non-esensial dijeda",
-      "pressureNoShed": "Tekanan memori terdeteksi — aktifkan aturan pengurangan dalam analysis_options_custom.yaml untuk otomatis mengurangi aturan dengan tingkat keparahan rendah"
+      "pressureNoShed": "Tekanan memori terdeteksi — aktifkan aturan pengurangan dalam analysis_options_custom.yaml untuk mengurangi aturan yang mahal secara otomatis terlebih dahulu"
     },
     "notification": {
-      "shedDisabled": "Tekanan memori analyzer terdeteksi (RSS {rssMb} MB, batas lunak {softLimitMb} MB). Aktifkan aturan pengurangan untuk secara otomatis menonaktifkan aturan dengan tingkat keparahan rendah saat terjadi tekanan.",
+      "shedDisabled": "Tekanan memori analyzer terdeteksi (RSS {rssMb} MB, batas lunak {softLimitMb} MB). Aktifkan aturan pengurangan untuk secara otomatis menonaktifkan aturan yang mahal saat terjadi tekanan.",
       "enableButton": "Enable mengaktifkan.",
       "learnMoreButton": "Belajar Lebih Banyak Pelajari Lebih Banyak",
       "runInit": "Jalankan 'dart run saropa_lints:init' untuk menghasilkan analysis_options_custom.yaml, lalu atur shed_rules: true.",
       "enabledConfirmation": "Aturan penghapusan diaktifkan dalam analysis_options_custom.yaml. Analizer akan mendeteksi perubahan pada kali reload berikutnya."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Aturan pengeluaran (tekanan memori)",
+      "shedHint": "Aturan-aturan ini dinonaktifkan sementara oleh penangani tekanan memori untuk mengurangi analis RSS. Mereka kembali secara otomatis ketika tekanan memori berkurang.",
+      "shedBadge": "gudang",
+      "shedBadgeTooltip": "Aturan ini sementara ditunda karena tekanan memori.",
+      "categoryTypeResolving": "Type-resolving (mahal)",
+      "categoryHighCost": "Biaya tinggi",
+      "categoryInfoSeverity": "Keparahan INFO",
+      "categoryWarningSeverity": "PERINGATAN tingkat keparahan"
     }
   },
   "brand": {

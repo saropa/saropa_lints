@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Kurallar durduruldu ({rssMb} MB)",
+      "shedCritical": "🔴 {count} kuralları döküldü (kritik)",
       "shedWarning": "⚠ {count} kurallarını uygula",
-      "shedInfo": "⚡ {count} kurallarını uygula",
+      "shedInfo": "⚡ {count} pahalı kurallar",
       "pressureNoShed": "⚠ Bellek baskısı ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Hafıza baskısı: normal",
-      "shedLevel1": "Hafıza baskısı: {count} düşük ciddiyetli kural, RSS azaltmak için bırakıldı",
-      "shedLevel2": "Hafıza baskısı: {count} kuralı uygulayın (INFO + UYARI ciddiyeti)",
+      "shedLevel1": "Yazılım baskısı: {count} pahalı kurallar (tip çözme + yüksek maliyet) kaldırılarak RSS azaltılır",
+      "shedLevel2": "Hafıza baskısı: {count} kuralı uygulandı (maliyetli + INFO ciddiyeti)",
+      "shedLevel3": "Hafıza baskısı: {count} kuralı uygulanıyor (tüm gerekli olmayan, HATA olmayanlar)",
       "hardTripped": "Hafıza limiti aşıldı — tüm gerekli olmayan kural lar durduruldu",
-      "pressureNoShed": "Yazılım basıncı algılandı — analysis_options_custom.yaml'da kural atamasını etkinleştirin, düşük ciddiyetli kuraları otomatik olarak atayın"
+      "pressureNoShed": "Yazılım bellek baskısı algılandı — analysis_options_custom.yaml'da kural atma özelliğini etkinleştirerek maliyetli kuraları öncelikle otomatik olarak atayın"
     },
     "notification": {
-      "shedDisabled": "Analizör bellek baskısı algılandı (RSS {rssMb} MB, yumuşak sınır {softLimitMb} MB). Basınç altında düşük ciddiyetli kuraları otomatik olarak devre dışı bırakmak için kural atamasını etkinleştirin.",
+      "shedDisabled": "Analizör bellek baskısı algılandı (RSS {rssMb} MB, yumuşak sınır {softLimitMb} MB). Basınç altında maliyetli kuraları otomatik olarak devre dışı bırakmak için kural atamasını etkinleştirin.",
       "enableButton": "Enable enable Etkinleştirin etkinleştir",
       "learnMoreButton": "Daha Fazlasını Öğrenin Daha fazlasını öğrenin",
       "runInit": "'dart run saropa_lints:init' komutunu çalıştırarak analysis_options_custom.yaml oluşturun, ardından shed_rules: true olarak ayarlayın.",
       "enabledConfirmation": "Kural atılımı analysis_options_custom.yaml'da etkinleştirildi. Analizleyici, bir sonraki yeniden yüklemede değişikliği alacaktır."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Kurallar (hafıza baskısı)",
+      "shedHint": "Bu kurallar, analizörün RSS'ü azaltmak için bellek baskısı yöneticisi tarafından geçici olarak devre dışı bırakılır. Bellek baskısı azaldığında otomatik olarak geri gelir.",
+      "shedBadge": "dökülmek",
+      "shedBadgeTooltip": "Bu kural geçici olarak bellek baskısı altında kaldırılıyor.",
+      "categoryTypeResolving": "Tip çözme (maliyetli)",
+      "categoryHighCost": "Yüksek maliyetli",
+      "categoryInfoSeverity": "INFO ciddiyeti",
+      "categoryWarningSeverity": "UYARı SEVİYESİ"
     }
   },
   "brand": {

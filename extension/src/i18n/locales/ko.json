@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 규칙 일시 중단 ({rssMb} MB)",
+      "shedCritical": "🔴 {count} 규칙 적용 (중요)",
       "shedWarning": "⚠ {count} 규칙은 제거",
-      "shedInfo": "⚡ {count} 규칙 적용",
+      "shedInfo": "⚡ {count} 비용이 많이 드는 규칙들",
       "pressureNoShed": "⚠ 메모리 압력 ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "메모리 압력: 정상",
-      "shedLevel1": "메모리 압력: {count} 저중요도 규칙이 RSS를 줄이기 위해 제거되었습니다.",
-      "shedLevel2": "메모리 압력: {count} 규칙이 제거됨 (INFO + WARNING 심각도)",
+      "shedLevel1": "메모리 압력: {count} 비용이 많이 드는 규칙은 (타입 분석 + 고비용)을 제거하여 RSS",
+      "shedLevel2": "메모리 압력: {count} 규칙이 제거됨 (비용이 많이 들고 + INFO 심각도)",
+      "shedLevel3": "메모리 압력: {count} 규칙은 (모든 비필수 비-ERROR)을 제거합니다",
       "hardTripped": "메모리 제한 초과 — 모든 비필수 규칙 일시 중단",
-      "pressureNoShed": "메모리 압력 감지 — analysis_options_custom.yaml에서 규칙 제거 기능을 활성화하여 저중요도 규칙을 자동으로 제거하세요"
+      "pressureNoShed": "메모리 압력 감지 — analysis_options_custom.yaml에서 규칙 제거를 활성화하여 먼저 비용이 많이 드는 규칙을 자동으로 제거하세요"
     },
     "notification": {
-      "shedDisabled": "분석기 메모리 압력 감지됨 (RSS {rssMb} MB, 소프트 제한 {softLimitMb} MB). 압력 하에서 저중요도 규칙을 자동으로 비활성화하려면 규칙 제거 기능을 활성화하십시오.",
+      "shedDisabled": "분석기 메모리 압력 감지됨 (RSS {rssMb} MB, 소프트 제한 {softLimitMb} MB). 압력 하에 비용이 많은 규칙을 자동으로 비활성화하려면 규칙 제거 기능을 활성화하십시오.",
       "enableButton": "Enable Enable를 활성화하십시오.",
       "learnMoreButton": "더 많은 것을 배우기 위해 더 많이 배워라.",
       "runInit": "' dart run saropa_lints:init '를 실행하여 analysis_options_custom.yaml을 생성한 다음 shed_rules: true로 설정하세요.",
       "enabledConfirmation": "규칙 제거가 analysis_options_custom.yaml에서 활성화되었습니다. 분석기는 다음 로드 시 변경 사항을 인식할 것입니다."
+    },
+    "dashboard": {
+      "shedSectionTitle": "규칙 제거 (메모리 압력)",
+      "shedHint": "이 규칙들은 메모리 압력 핸들러에 의해 일시적으로 비활성화되어 분석기 RSS의 부하를 줄입니다. 메모리 압력이 줄어들면 자동으로 다시 활성화됩니다.",
+      "shedBadge": "제공",
+      "shedBadgeTooltip": "이 규칙은 메모리 압력 아래에서 일시적으로 비활성화됩니다.",
+      "categoryTypeResolving": "타입 분석(비용이 많이 드는)",
+      "categoryHighCost": "고비용",
+      "categoryInfoSeverity": "INFO 심각도",
+      "categoryWarningSeverity": "경고 중증도"
     }
   },
   "brand": {

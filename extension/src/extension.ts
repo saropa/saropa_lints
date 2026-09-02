@@ -1230,6 +1230,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   memoryWatcher.onStateChange((state) => {
     memoryPressureState = state;
     updateAllStatusBars();
+    // Push shedding state to the Config Dashboard so it can mark shed rules
+    // and render the shed-rules section without re-reading the JSON file.
+    rulePacksWebviewProvider.setMemoryPressureState(state);
     // Prompt the user to enable rule shedding if pressure is detected but
     // shed_rules is not set. Shows once per session — see the function doc.
     promptEnableShedRulesIfNeeded(state);

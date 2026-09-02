@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 قواعد متوقفة ({rssMb} ميغا بايت)",
+      "shedCritical": "🔴 {count} قواعد تُلقى (مُهمة)",
       "shedWarning": "⚠ قواعد {count} تُلغي",
-      "shedInfo": "⚡ قواعد {count} تُلغي",
+      "shedInfo": "⚡ قواعد مكلفة {count} تُلغي",
       "pressureNoShed": "⚠ ضغط الذاكرة ({rssMb} ميغابايت)"
     },
     "tooltip": {
       "shedLevel0": "الضغط على الذاكرة: طبيعي",
-      "shedLevel1": "الضغط على الذاكرة: {count} قواعد منخفضة الأهمية تُطرح لخفض RSS",
-      "shedLevel2": "الضغط على الذاكرة: {count} قواعد تُلغي (مستوى المعلومات + تحذير)",
+      "shedLevel1": "الضغط على الذاكرة: {count} قواعد باهظة الثمن تُطرح (حل نوع + تكلفة عالية) لتقليل RSS",
+      "shedLevel2": "الضغط على الذاكرة: {count} قواعد تُطرح (مكلفة + مستوى المعلومات)",
+      "shedLevel3": "الضغط على الذاكرة: {count} قواعد تُطرح (كل ما ليس ضروريًا وليس خطأ)",
       "hardTripped": "الحد الأقصى للذاكرة تم تجاوزه — تم تعطيل جميع القواعد غير الضرورية",
-      "pressureNoShed": "تم اكتشاف ضغط الذاكرة — تفعيل قاعدة التخلص من القواعد في analysis_options_custom.yaml لتخليص القواعد ذات الدرجة المنخفضة تلقائيًا"
+      "pressureNoShed": "تم اكتشاف ضغط الذاكرة — تفعيل قاعدة التخلص من القواعد في analysis_options_custom.yaml لتخليص القواعد المكلفة تلقائيًا أولاً"
     },
     "notification": {
-      "shedDisabled": "تم اكتشاف ضغط ذاكرة المُحلِّل (RSS {rssMb} ميغابايت، الحد الأدنى {softLimitMb} ميغابايت). تفعيل قواعد التخفيض تلقائيًا لتعطيل القواعد ذات الدرجة المنخفضة تحت الضغط.",
+      "shedDisabled": "تم اكتشاف ضغط ذاكرة المُحلِّل (RSS {rssMb} ميغابايت، الحد الأدنى الناعم {softLimitMb} ميغابايت). تفعيل قواعد التخفيض تلقائيًا لتعطيل القواعد المكلفة تحت الضغط.",
       "enableButton": "تمكين Enable تمكين",
       "learnMoreButton": "تعلم المزيد تعرّف على المزيد",
       "runInit": "أعد تشغيل \"dart run saropa_lints:init\" لإنشاء analysis_options_custom.yaml، ثم قم بتعيين shed_rules: true.",
       "enabledConfirmation": "القاعدة المُعلقة مُفعّلة في analysis_options_custom.yaml. سيقوم المُحلّل بتطبيق التغيير في إعادة التحميل التالية."
+    },
+    "dashboard": {
+      "shedSectionTitle": "قواعد التخلص (الضغط على الذاكرة)",
+      "shedHint": "هذه القواعد مُعطَّلة مؤقتًا من قبل مُعالج ضغط الذاكرة لتقليل تحليل RSS. تعود تلقائيًا عندما ينخفض ضغط الذاكرة.",
+      "shedBadge": "يصلط",
+      "shedBadgeTooltip": "هذه القاعدة تُلغى مؤقتًا تحت ضغط الذاكرة.",
+      "categoryTypeResolving": "التحقق من نوع البيانات (مكلف)",
+      "categoryHighCost": "عالي التكلفة",
+      "categoryInfoSeverity": "INFO مستوى الخطورة",
+      "categoryWarningSeverity": "تحذير درجة الخطورة"
     }
   },
   "brand": {

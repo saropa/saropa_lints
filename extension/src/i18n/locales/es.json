@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Reglas pausadas ({rssMb} MB)",
+      "shedCritical": "🔴 {count} reglas dejan (crítico)",
       "shedWarning": "⚠ Reglas {count} de análisis",
-      "shedInfo": "⚡ Reglas {count} de análisis",
+      "shedInfo": "⚡ Reglas {count} costosas eliminan",
       "pressureNoShed": "⚠ Presión de memoria ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Presión de memoria: normal",
-      "shedLevel1": "Presión de memoria: {count} reglas de baja gravedad se aplican para reducir RSS",
-      "shedLevel2": "Presión de memoria: {count} reglas generan (severidad INFO + WARNING)",
+      "shedLevel1": "Presión de memoria: {count} reglas costosas eliminan (resolución de tipos + alto costo) para reducir RSS",
+      "shedLevel2": "Presión de memoria: {count} reglas generan (costosas + INFO severidad)",
+      "shedLevel3": "Presión de memoria: {count} reglas eliminan (todo lo no esencial no-ERROR)",
       "hardTripped": "Límite de memoria excedido — todas las reglas no esenciales pausadas",
-      "pressureNoShed": "Presión de memoria detectada — habilite la regla de descarte en analysis_options_custom.yaml para descartar automáticamente reglas de baja severidad"
+      "pressureNoShed": "Presión de memoria detectada — habilite la regla de descarte en analysis_options_custom.yaml para descartar primero las reglas costosas automáticamente"
     },
     "notification": {
-      "shedDisabled": "Presión de memoria del analizador detectada (RSS {rssMb} MB, límite suave {softLimitMb} MB). Activa la eliminación de reglas para desactivar automáticamente las reglas de baja severidad bajo presión.",
+      "shedDisabled": "Presión de memoria del analizador detectada (RSS {rssMb} MB, límite suave {softLimitMb} MB). Activa la eliminación de reglas para desactivar automáticamente las reglas costosas bajo presión.",
       "enableButton": "Habilitar habilitar para permitir.",
       "learnMoreButton": "Aprender más Conocer más.",
       "runInit": "Ejecute 'dart run saropa_lints:init' para generar analysis_options_custom.yaml, luego establezca shed_rules: true.",
       "enabledConfirmation": "Regla de eliminación activada en analysis_options_custom.yaml. El analizador detectará el cambio en su próxima carga."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Reglas de eliminación (presión de memoria)",
+      "shedHint": "Estas reglas están temporalmente desactivadas por el manejador de presión de memoria para reducir el analizador RSS. Se reactivan automáticamente cuando la presión de memoria disminuye.",
+      "shedBadge": "deshacer",
+      "shedBadgeTooltip": "Esta regla se desactiva temporalmente bajo presión de memoria.",
+      "categoryTypeResolving": "Resolución de tipos (costosa)",
+      "categoryHighCost": "Alto costo",
+      "categoryInfoSeverity": "INFO severidad",
+      "categoryWarningSeverity": "ADVERTENCIA severidad"
     }
   },
   "brand": {

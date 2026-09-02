@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 قوانین متوقف شد ({rssMb} مگابایت)",
+      "shedCritical": "🔴 قواعد {count} توزیع (حرجی)",
       "shedWarning": "⚠ قواعد {count} توزیع",
-      "shedInfo": "⚡ قواعد {count} توزیع",
+      "shedInfo": "⚡ قواعد گران قیمت {count} شد",
       "pressureNoShed": "⚠ فشار حافظه ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "فشار حافظه: نرمال",
-      "shedLevel1": "فشار حافظه: قاعده های پایین سطح {count} به منظور کاهش RSS",
-      "shedLevel2": "فشار حافظه: {count} قاعده شد (اهمیت + اخطار)",
+      "shedLevel1": "فشار حافظه: {count} قاعده های گران قیمت (حل کردن نوع + هزینه بالا) را برای کاهش RSS",
+      "shedLevel2": "فشار حافظه: {count} قاعده ای (گران + سطح اطلاعات) پرتاب شد",
+      "shedLevel3": "فشار حافظه: {count} قاعده (همه ی غیر ضروری غیر خطا)",
       "hardTripped": "محدودیت حافظه پر شد — تمام قوانین غیر ضروری متوقف شدند",
-      "pressureNoShed": "فشار حافظه تشخیص داده شده — قاعده ریزشی را در analysis_options_custom.yaml فعال کنید تا قاعده های کم اهمیت به طور خودکار ریزش شوند"
+      "pressureNoShed": "فشار حافظه تشخیص داده شد — قاعده را در analysis_options_custom.yaml فعال کنید تا قاعده های گران قیمت اولویت اول را خودکار حذف کند"
     },
     "notification": {
-      "shedDisabled": "فشار حافظه تحلیلگر تشخیص داده شد (RSS {rssMb} MB، محدوده نرم {softLimitMb} MB). قاعده‌های کاهشی را فعال کنید تا در زمان فشار، قاعده‌هایی با اهمیت پایین به طور خودکار غیرفعال شوند.",
+      "shedDisabled": "فشار حافظه تحلیلگر تشخیص داده شد (RSS {rssMb} MB، محدوده نرم {softLimitMb} MB). قوانین را به طور خودکار غیرفعال کنید تا در زمان فشار، قوانین گران قیمت غیرفعال شوند.",
       "enableButton": "فعال کردن enable Enable امکان پذیر ساختن",
       "learnMoreButton": "بیشتر بدانید Learn More بیشتر بدانید",
       "runInit": "'dart run saropa_lints:init' را اجرا کنید تا analysis_options_custom.yaml ایجاد شود، سپس shed_rules: true را تنظیم کنید.",
       "enabledConfirmation": "قاعده پرتاب در analysis_options_custom.yaml فعال شده است. تحلیلگر تغییر را در بارگذاری بعدی خود تشخیص خواهد داد."
+    },
+    "dashboard": {
+      "shedSectionTitle": "قواعد تخلیه (فشار حافظه)",
+      "shedHint": "این قوانین تا زمانی که فشار حافظه توسط مدیر فشار حافظه غیرفعال می‌شوند تا تحلیلگر RSS را کاهش دهند. این قوانین به طور خودکار به صورتی که فشار حافظه کاهش یابد، بازگردانی می‌شوند.",
+      "shedBadge": "شید",
+      "shedBadgeTooltip": "این قاعده به طور موقت تحت فشار حافظه قرار می‌گیرد.",
+      "categoryTypeResolving": "نوع تشخیص (گران)",
+      "categoryHighCost": "کمک هزینه بالا",
+      "categoryInfoSeverity": "اخطار سطح",
+      "categoryWarningSeverity": "تحذير جدیت"
     }
   },
   "brand": {

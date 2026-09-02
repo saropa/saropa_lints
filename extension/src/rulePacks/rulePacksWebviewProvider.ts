@@ -40,6 +40,7 @@ import { l10n } from '../i18n/runtime';
 import { createWebviewCspNonce } from '../vibrancy/views/html-utils';
 import { getConfigDashboardScript } from './configDashboardScript';
 import { getConfigDashboardStyles } from './configDashboardStyles';
+import type { MemoryPressureState } from '../systemHealth/memoryPressureWatcher';
 import { readRulePacksEnabled, writeRulePacksEnabled } from './rulePackYaml';
 import { computeConfigSuggestions } from '../config/configSuggestions';
 import { fetchRuleCounts, type RuleCountSummary } from '../views/ruleCountCliRunner';
@@ -99,6 +100,17 @@ interface DashboardContext {
    * Style & opinions section's toggles and radios.
    */
   enabledStylistic: ReadonlySet<string>;
+  /**
+   * Rule names currently shed under memory pressure, keyed by shed category.
+   * Empty when no rules are shed (shedLevel === 0 or no pressure state).
+   */
+  shedByCategory: ReadonlyMap<string, readonly string[]>;
+  /** Total count per category (may exceed the listed array, which caps at 20). */
+  shedCategoryTotals: ReadonlyMap<string, number>;
+  /** Total count of rules currently shed across all categories. */
+  shedRuleCount: number;
+  /** Flat set of all shed rule names for O(1) lookup when marking individual rules. */
+  shedRuleNames: ReadonlySet<string>;
 }
 
 export function isSdkPackId(id: string): boolean {
@@ -325,8 +337,17 @@ export class RulePacksWebviewProvider {
   // session — fetched once per panel open, then reused until the panel closes.
   private _ruleCounts: RuleCountSummary | null = null;
   private _ruleCountsRequested = false;
+  // Latest memory pressure snapshot pushed from MemoryPressureWatcher via
+  // extension.ts — drives the "Shed rules" section and per-rule shed badges.
+  private _memoryPressureState: MemoryPressureState | null = null;
 
   constructor(private readonly _extensionUri: vscode.Uri) {}
+
+  /** Receive a memory pressure update from the watcher; refreshes the panel if open. */
+  setMemoryPressureState(state: MemoryPressureState | null): void {
+    this._memoryPressureState = state;
+    this.refresh();
+  }
 
   /** Opens or focuses the Config Dashboard in the editor area and rebuilds HTML. */
   openEditorPanel(): void {
@@ -487,6 +508,7 @@ export class RulePacksWebviewProvider {
       // these overrides remove individual rules from it. Users coming from
       // the sidebar's "X rules disabled by override" row land here.
       this._buildDisabledRulesSection(ctx),
+      this._buildShedRulesSection(ctx),
       this._buildChartSection(ctx),
       this._buildDiagnostics(ctx),
     ].join('\n');
@@ -527,6 +549,34 @@ export class RulePacksWebviewProvider {
     for (const [rule, on] of readRuleOverrides(root)) {
       if (on) enabledStylistic.add(rule);
     }
+    // Build shed-by-category map from the memory pressure state. Each category
+    // key maps to the rule names the analyzer shed for that reason (capped at 20
+    // per category by getShedDetails — see handover gotcha).
+    const shedByCategory = new Map<string, readonly string[]>();
+    const shedCategoryTotals = new Map<string, number>();
+    const details = this._memoryPressureState?.shedDetails;
+    let shedRuleCount = this._memoryPressureState?.shedRuleCount ?? 0;
+    if (details && shedRuleCount > 0) {
+      // Populate both the rule-name arrays (capped at 20 by getShedDetails)
+      // and the category totals (always accurate). The gap between the two
+      // drives a "+N more" indicator in the shed section.
+      if (details.typeResolvingRules?.length) {
+        shedByCategory.set('typeResolving', details.typeResolvingRules);
+      }
+      if (details.typeResolving > 0) shedCategoryTotals.set('typeResolving', details.typeResolving);
+      if (details.highCostRules?.length) {
+        shedByCategory.set('highCost', details.highCostRules);
+      }
+      if (details.highCost > 0) shedCategoryTotals.set('highCost', details.highCost);
+      if (details.infoSeverityRules?.length) {
+        shedByCategory.set('infoSeverity', details.infoSeverityRules);
+      }
+      if (details.infoSeverity > 0) shedCategoryTotals.set('infoSeverity', details.infoSeverity);
+      if (details.warningSeverityRules?.length) {
+        shedByCategory.set('warningSeverity', details.warningSeverityRules);
+      }
+      if (details.warningSeverity > 0) shedCategoryTotals.set('warningSeverity', details.warningSeverity);
+    }
     return {
       pubspecInfo: info,
       currentTier,
@@ -540,6 +590,11 @@ export class RulePacksWebviewProvider {
       suppressionsStripHtml: buildSuppressionsExportSnapshotStripHtml(violationsForStrip),
       disabledRules,
       enabledStylistic,
+      shedByCategory,
+      shedCategoryTotals,
+      shedRuleCount,
+      // Flatten all category arrays into one set for O(1) per-rule lookup.
+      shedRuleNames: new Set([...shedByCategory.values()].flat()),
     };
   }
 
@@ -819,7 +874,7 @@ export class RulePacksWebviewProvider {
       a.label.localeCompare(b.label);
     const detected = [...ctx.packRows].filter((r) => r.detected).sort(byLabel);
     const rest = [...ctx.packRows].filter((r) => !r.detected).sort(byLabel);
-    const detectedRows = detected.map((row) => this._buildPackRow(row, true)).join('\n');
+    const detectedRows = detected.map((row) => this._buildPackRow(row, true, ctx.shedRuleNames)).join('\n');
     const detectedEmpty = `<tr class="packs-none"><td colspan="6" class="hint">${escapeHtml(l10n('packs.noneDetected'))}</td></tr>`;
     const detectedCount = packsAndRulesLabel(detected.length, sumPackRules(detected));
     const restCount = packsAndRulesLabel(rest.length, sumPackRules(rest));
@@ -836,7 +891,7 @@ export class RulePacksWebviewProvider {
 <details class="section expander" aria-label="${escapeHtml(l10n('packs.allPackages'))}">
   <summary><span class="expander-title">${escapeHtml(l10n('packs.allPackages'))}</span> <span class="muted">(${restCount})</span></summary>
   <p class="hint">${escapeHtml(l10n('packs.allPackagesHint'))}</p>
-  ${this._buildPackDomainGroups(rest)}
+  ${this._buildPackDomainGroups(rest, ctx.shedRuleNames)}
 </details>`;
   }
 
@@ -848,7 +903,7 @@ export class RulePacksWebviewProvider {
    * empty domains are skipped. Each sub-table reuses the shared `.packs-tbody`
    * class so the existing filter/sort logic spans every group.
    */
-  private _buildPackDomainGroups(rows: readonly PackChartRow[]): string {
+  private _buildPackDomainGroups(rows: readonly PackChartRow[], shedRuleNames: ReadonlySet<string>): string {
     const byDomain = new Map<string, PackChartRow[]>();
     for (const row of rows) {
       const domain = packDomainForId(row.id);
@@ -870,14 +925,14 @@ export class RulePacksWebviewProvider {
       return a.localeCompare(b);
     });
     return ordered
-      .map((domain) => this._buildPackDomainGroup(domain, byDomain.get(domain)!))
+      .map((domain) => this._buildPackDomainGroup(domain, byDomain.get(domain)!, shedRuleNames))
       .join('\n');
   }
 
   /** One domain sub-accordion: a collapsed table of that domain's packs. */
-  private _buildPackDomainGroup(domain: string, rows: PackChartRow[]): string {
+  private _buildPackDomainGroup(domain: string, rows: PackChartRow[], shedRuleNames: ReadonlySet<string>): string {
     const slug = domain.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-    const body = rows.map((row) => this._buildPackRow(row)).join('\n');
+    const body = rows.map((row) => this._buildPackRow(row, false, shedRuleNames)).join('\n');
     const rawDesc = l10n('packs.domainDesc.' + slug, undefined, { fallback: '' });
     const descHtml = rawDesc ? `<p class="hint domain-desc">${escapeHtml(rawDesc)}</p>` : '';
     return `<details class="domain-group">
@@ -913,7 +968,7 @@ export class RulePacksWebviewProvider {
    * (gate package + version constraint) goes into the `title` of the *In pubspec* cell, not as a
    * second visible footnote on the row.
    */
-  private _buildPackRow(row: PackChartRow, showDomain = false): string {
+  private _buildPackRow(row: PackChartRow, showDomain = false, shedRuleNames?: ReadonlySet<string>): string {
     const def = RULE_PACK_DEFINITIONS.find((d) => d.id === row.id)!;
     const isSdk = isSdkPackId(def.id);
     const riskKind = sdkPackRiskKind(def);
@@ -935,11 +990,18 @@ export class RulePacksWebviewProvider {
     // Inline disclosure: clicking the toggle reveals the detail row below (built
     // from def.ruleCodes) instead of opening a separate quick-pick popup, so the
     // rule list stays in context and each rule is a clickable link to its doc.
+    // Mark rules currently shed under memory pressure with a visual badge so the
+    // user sees exactly which rules in this pack are temporarily inactive.
     const ruleLinks = def.ruleCodes
-      .map(
-        (code) =>
-          `<a href="#" class="rule-link" data-rule="${escapeHtml(code)}" title="Open the explanation for ${escapeHtml(code)}.">${escapeHtml(code)}</a>`,
-      )
+      .map((code) => {
+        const esc = escapeHtml(code);
+        const isShed = shedRuleNames?.has(code) ?? false;
+        const shedClass = isShed ? ' shed' : '';
+        const shedBadge = isShed
+          ? ` <span class="shed-badge" title="${escapeHtml(l10n('memoryPressure.dashboard.shedBadgeTooltip'))}">${escapeHtml(l10n('memoryPressure.dashboard.shedBadge'))}</span>`
+          : '';
+        return `<a href="#" class="rule-link${shedClass}" data-rule="${esc}" title="Open the explanation for ${esc}.">${esc}${shedBadge}</a>`;
+      })
       .join('');
     // Merged Rules column (§ feedback 2026-06-23): the count IS the disclosure
     // control — a single "N rules" link toggles the detail row, replacing the old
@@ -1153,6 +1215,57 @@ ${detailRow}`;
   <div class="disabled-rules-groups">
     ${groupHtml}
   </div>
+</details>`;
+  }
+
+  /**
+   * Shed rules section: rules temporarily disabled by the memory pressure handler.
+   * Grouped by shed category (type-resolving, high-cost, INFO severity, WARNING
+   * severity) so the user understands why each rule was shed and at which pressure
+   * level it returns. Hidden when no rules are shed (shedLevel === 0).
+   */
+  private _buildShedRulesSection(ctx: DashboardContext): string {
+    if (ctx.shedRuleCount === 0) return '';
+    const summary = `<summary><span class="expander-title">${escapeHtml(l10n('memoryPressure.dashboard.shedSectionTitle'))}</span> <span class="muted">(${ctx.shedRuleCount})</span></summary>`;
+    // Category display order matches escalation: expensive first, then severity.
+    const categoryOrder: Array<{ key: string; labelKey: string }> = [
+      { key: 'typeResolving', labelKey: 'memoryPressure.dashboard.categoryTypeResolving' },
+      { key: 'highCost', labelKey: 'memoryPressure.dashboard.categoryHighCost' },
+      { key: 'infoSeverity', labelKey: 'memoryPressure.dashboard.categoryInfoSeverity' },
+      { key: 'warningSeverity', labelKey: 'memoryPressure.dashboard.categoryWarningSeverity' },
+    ];
+    const groupHtml = categoryOrder
+      .filter(({ key }) => ctx.shedByCategory.has(key) || (ctx.shedCategoryTotals.get(key) ?? 0) > 0)
+      .map(({ key, labelKey }) => {
+        const rules = ctx.shedByCategory.get(key) ?? [];
+        const total = ctx.shedCategoryTotals.get(key) ?? rules.length;
+        const rows = rules
+          .map((rule) => {
+            const esc = escapeHtml(rule);
+            return `<li class="shed-rule-row"><a href="#" class="rule-link" data-rule="${esc}" title="Open the explanation for ${esc}.">${esc}</a></li>`;
+          })
+          .join('\n');
+        // When the rule name array is capped (getShedDetails caps at 20
+        // per category) but the total is higher, show a "+N more" hint
+        // so the count stays accurate and the user isn't misled.
+        const overflow = total - rules.length;
+        const overflowHint = overflow > 0
+          ? `\n<li class="shed-rule-row muted">+${overflow} ${escapeHtml(l10n('memoryPressure.dashboard.moreRules'))}</li>`
+          : '';
+        return `<div class="shed-rules-group">
+  <h4 class="shed-rules-group-heading">${escapeHtml(l10n(labelKey))} <span class="muted">(${total})</span></h4>
+  <ul class="shed-rules-list">${rows}${overflowHint}</ul>
+</div>`;
+      })
+      .join('\n');
+    // Restart button lets the user clear shedding by restarting the analyzer —
+    // RSS resets on restart, so shedding de-escalates to level 0 if the project
+    // fits in memory on a fresh start. Uses the existing 'command' message type.
+    const restartBtn = `<button type="button" class="btn tier-2" data-command="restartAnalyzer" title="${escapeHtml(l10n('memoryPressure.dashboard.restartTooltip'))}">${escapeHtml(l10n('memoryPressure.dashboard.restartButton'))}</button>`;
+    return `<details class="section expander shed-rules" aria-label="${escapeHtml(l10n('memoryPressure.dashboard.shedSectionTitle'))}" open>
+  ${summary}
+  <p class="hint">${escapeHtml(l10n('memoryPressure.dashboard.shedHint'))} ${restartBtn}</p>
+  ${groupHtml}
 </details>`;
   }
 
@@ -1463,6 +1576,13 @@ ${detailRow}`;
     }
     if (id === 'enableDetectedDeprecationSdkPacks') {
       await this._enableDetectedSdkPacks({ selection: 'deprecation' });
+      return;
+    }
+    // Restart the Dart analysis server to clear memory pressure — RSS resets
+    // on restart, so shedding de-escalates to level 0 if the project fits in
+    // memory on a fresh start.
+    if (id === 'restartAnalyzer') {
+      await vscode.commands.executeCommand('dart.restartAnalysisServer');
       return;
     }
     // Per-rule re-enable from the Disabled rules section. The id arrives as

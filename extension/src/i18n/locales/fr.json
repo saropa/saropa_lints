@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Règles suspendues ({rssMb} Mo)",
+      "shedCritical": "🔴 {count} rules shed (critique)",
       "shedWarning": "⚠ Règles {count} strictes",
-      "shedInfo": "⚡ Règles {count} de suppression",
+      "shedInfo": "⚡ {count} règles coûteuses débarrassent",
       "pressureNoShed": "⚠ Pression mémoire ({rssMb} Mo)"
     },
     "tooltip": {
       "shedLevel0": "Pression mémoire : normale",
-      "shedLevel1": "Pression mémoire : {count} règles de faible gravité à supprimer pour réduire RSS",
-      "shedLevel2": "Pression mémoire : {count} règles déclenchent (gravité INFO + AVERTISSEMENT)",
+      "shedLevel1": "Pression mémoire : {count} règles coûteuses (résolution de type + coûteuses) sont éliminées pour réduire RSS",
+      "shedLevel2": "Pression mémoire : {count} règles déclenchées (coûteuses + INFO gravité)",
+      "shedLevel3": "Pression mémoire : {count} règles suppriment (tous les non-essentiels non-ERROR)",
       "hardTripped": "Limite de mémoire dépassée — toutes les règles non essentielles suspendues",
-      "pressureNoShed": "Pression mémoire détectée — activez la règle de suppression dans analysis_options_custom.yaml pour supprimer automatiquement les règles de faible gravité"
+      "pressureNoShed": "Pression mémoire détectée — activez la suppression des règles dans analysis_options_custom.yaml pour supprimer automatiquement d'abord les règles coûteuses"
     },
     "notification": {
-      "shedDisabled": "Pression mémoire de l'analyseur détectée (RSS {rssMb} Mo, limite douce {softLimitMb} Mo). Activez le retrait des règles pour désactiver automatiquement les règles de faible gravité sous pression.",
+      "shedDisabled": "Pression mémoire de l'analyseur détectée (RSS {rssMb} Mo, limite douce {softLimitMb} Mo). Activez le rejet des règles pour désactiver automatiquement les règles coûteuses sous pression.",
       "enableButton": "L'option Activer est activée.",
       "learnMoreButton": "Apprendre plus d'apprendre davantage.",
       "runInit": "Exécutez 'dart run saropa_lints:init' pour générer analysis_options_custom.yaml, puis définissez shed_rules: true.",
       "enabledConfirmation": "Règles de suppression activées dans analysis_options_custom.yaml. L'analyseur détectera le changement lors de son prochain redémarrage."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Règles de suppression (pression mémoire)",
+      "shedHint": "Ces règles sont temporairement désactivées par le gestionnaire de pression mémoire pour réduire l'analyseur RSS. Elles sont réactivées automatiquement lorsque la pression mémoire diminue.",
+      "shedBadge": "éparpiller",
+      "shedBadgeTooltip": "Cette règle est temporairement désactivée sous pression mémoire.",
+      "categoryTypeResolving": "Résolution de type (coûteuse)",
+      "categoryHighCost": "Coûts élevés",
+      "categoryInfoSeverity": "INFO gravité",
+      "categoryWarningSeverity": "AVERTISSEMENT gravité"
     }
   },
   "brand": {

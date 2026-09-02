@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 הכללים עוצרים ({rssMb} מ\"ב)",
+      "shedCritical": "🔴 {count} правила שודדים (קריטי)",
       "shedWarning": "⚠ סלילים {count} שמים",
-      "shedInfo": "⚡ סלילים {count} שומרים על",
+      "shedInfo": "⚡ {count} правила יקרות shed",
       "pressureNoShed": "⚠ לחץ זיכרון ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "לחץ הזיכרון: נורמלי",
-      "shedLevel1": "לחץ זיכרון: {count} правила נמוך-דרוג שוררים לลด RSS",
-      "shedLevel2": "לחץ זיכרון: {count} правила שורש (דרוג אינפורמציה + אזהרה)",
+      "shedLevel1": "לחץ זיכרון: {count} правила יקרות שורדו (שיפוד סוג + עלות גבוהה) כדי להפחית RSS",
+      "shedLevel2": "לחץ זיכרון: {count} правила שורש (יקר + רמת אינפורמציה)",
+      "shedLevel3": "לחץ זיכרון: {count} правила שורש (כל לא חובה לא-ERROR)",
       "hardTripped": "лимיט זיכרון מוגזם — כל כללי לא חובה נעצרו",
-      "pressureNoShed": "לחץ זיכרון détected — הפעל כלל הזרימה ב analysis_options_custom.yaml כדי לזרום אוטומטית правила נמוך-דרגה"
+      "pressureNoShed": "לחץ זיכרון détected — הפעל כלל הזרימה ב analysis_options_custom.yaml כדי לזרום אוטומטית את הכללים המבוקרים תחילה"
     },
     "notification": {
-      "shedDisabled": "הערכה של לחץ הזיכרון détected (RSS {rssMb} MB, גבול רך {softLimitMb} MB). הפעל שיקול תקינות כדי להשבית אוטומטית правила נמוך-דרגה תחת לחץ.",
+      "shedDisabled": "הפרשנות זיכרון נצפתה (RSS {rssMb} MB, גבול רך {softLimitMb} MB). הפעל שיקול תקציבים כדי להשבית אוטומטית правила יקרות תחת לחץ.",
       "enableButton": "Enable enable אפשר את הפעלת",
       "learnMoreButton": "למד עוד לומד יותר",
       "runInit": "הרץ \"dart run saropa_lints:init\" כדי ליצור analysis_options_custom.yaml, ואז установите shed_rules: true.",
       "enabledConfirmation": "חוקי הזרימה הופעלו ב-analysis_options_custom.yaml. האנליטיקס יקלוט את השינוי בטעינתו הבאה."
+    },
+    "dashboard": {
+      "shedSectionTitle": "חוקי שידור (לחץ זיכרון)",
+      "shedHint": "חוקי שיטה אלו מושנים באופן זמני על ידי מנהל לחץ הזיכרון כדי להפחית את האנליטיקס RSS. הם חוזרים אוטומטית כשהלחץ על הזיכרון יורד.",
+      "shedBadge": "שדר",
+      "shedBadgeTooltip": "חוק זה נדחה לרגע תחת לחץ זיכרון.",
+      "categoryTypeResolving": "ניתוח סוגים (יקר)",
+      "categoryHighCost": "הIGH-cost",
+      "categoryInfoSeverity": "INFO אינטנסיביות",
+      "categoryWarningSeverity": "경고 중증도"
     }
   },
   "brand": {

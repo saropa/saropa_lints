@@ -29,14 +29,14 @@
     },
     "report": {
       "title": "Saropa Lints Audit",
-      "heading": "Audit Report",
+      "heading": "Ulat ng Pag-audit",
       "subtitle": "{count} results · {timestamp}",
       "baselineSubtitle": "Kumpara sa baseline mula sa {date}",
       "searchPlaceholder": "Filtra ayon sa rule, file, o mensahe…",
       "filterTier": "Ang Tier 1 ay ang tier 2 na antas ng pag-uuri.",
       "filterSeverity": "Grabe ng sakit na ito ay ang pagiging malubhang.",
       "filterImpact": "Ang epekto ng impak ay ang mga epekto sa epekto.",
-      "filterBaselineStatus": "Baseline",
+      "filterBaselineStatus": "Batayan",
       "baselineNew": "Bagong",
       "baselineUnchanged": "Wala nang binago",
       "saveBaseline": "I-save bilang base line",
@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Nakatigil ang mga batas ({rssMb} MB)",
+      "shedCritical": "🔴 {count} rules shed (kritikal)",
       "shedWarning": "⚠ {count} mga rule na nagsisilbing shed",
-      "shedInfo": "⚡ {count} mga rule na nagsisilbing shed",
+      "shedInfo": "⚡ {count} mahal na mga rule na naglilinis",
       "pressureNoShed": "⚠ Presyon ng memorya ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Presyon ng memorya: normal",
-      "shedLevel1": "Memory pressure: {count} low-severity rules shed para mabawasan ang RSS",
-      "shedLevel2": "Presyon sa memorya: {count} na mga rule ay nagseselos (INFO + WARNING severity)",
+      "shedLevel1": "Memory pressure: {count} mahal ang mga rule na nagpapakita (type-resolving + mataas ang gastos) upang mapababa ang RSS",
+      "shedLevel2": "Memory pressure: {count} rules shed (mabait + INFO severity)",
+      "shedLevel3": "Memory pressure: {count} rules shed (lahat ng hindi esensyal na hindi ERROR)",
       "hardTripped": "Nag-override ng memory limit — lahat ng mga hindi pangunahing rule na ipinagbawal",
-      "pressureNoShed": "Narating ang presyon sa memorya — puntaan ang pagsusugat ng mga talaan sa analysis_options_custom.yaml upang mag-automate ng pagbawas ng mga talaan na may mas maliit na antas ng kahalagahan"
+      "pressureNoShed": "Narating ang presyon sa memorya — puntaan ang pagsusugat ng mga talaan sa analysis_options_custom.yaml upang mag-automate ng pag-ibot ng mga mahalagang talaan unang-una"
     },
     "notification": {
-      "shedDisabled": "Nabatay ang memorya ng analyzer (RSS {rssMb} MB, soft limit {softLimitMb} MB). Mag-enable ng rule shedding upang mag-automate ng pag-off ng mga low-severity rules sa presyon.",
+      "shedDisabled": "Nabatay ang memorya ng analyzer (RSS {rssMb} MB, soft limit {softLimitMb} MB). Mag-enable ng rule shedding upang mag-automate ng pag-off ng mahalagang mga rule sa presyon.",
       "enableButton": "Pagbibigay-daan sa paganahin ay pinapayagan.",
       "learnMoreButton": "Matuto ng Higit pang Alamin ang Higit Pang Aralin",
       "runInit": "Punan ang 'dart run saropa_lints:init' upang makagawa ng analysis_options_custom.yaml, pagkatapos ay itakda ang shed_rules: true.",
       "enabledConfirmation": "Nag-activate ang mga rule shedding sa analysis_options_custom.yaml. Ang analyzer ay magpapalabas ng pagbabago sa susunod na pag reload."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Nagbibigay ng mga tala (presyon ng memorya)",
+      "shedHint": "Ang mga panuntok na ito ay nangunguna na naka-disable sa pamamagitan ng memory pressure handler upang mapababa ang analyzer RSS. Ito ay bumabalik nang automatic kapag bumaba ang memory pressure.",
+      "shedBadge": "malaglag",
+      "shedBadgeTooltip": "Ang rule na ito ay nangunguna sa sandaling ang memorya ay nangangailangan ng presyon.",
+      "categoryTypeResolving": "Type-resolving (mahal)",
+      "categoryHighCost": "Mataas ang halaga",
+      "categoryInfoSeverity": "INFO kalubhaan",
+      "categoryWarningSeverity": "BABALA kalubhaan"
     }
   },
   "brand": {

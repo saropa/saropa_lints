@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 Uzito wa kifungu ({rssMb} MB)",
+      "shedCritical": "🔴 Sheria za {count} kumwaga (muhimu)",
       "shedWarning": "⚠ Kifungu {count} kusheshwa",
-      "shedInfo": "⚡ Tafutaji ya {count}",
+      "shedInfo": "⚡ {count} mazungumzo mbalimbali ya kifedha",
       "pressureNoShed": "⚠ Kifungu ya mifano ({rssMb} MB)"
     },
     "tooltip": {
       "shedLevel0": "Unganisho wa matokeo: normal",
-      "shedLevel1": "Unganisho wa matokeo: {count} matokeo ya ujumbe mbaya kushinda kuzuka RSS",
-      "shedLevel2": "Unganisho wa moyo: {count} rules shed (INFO + WARNING severity)",
+      "shedLevel1": "Unganisho wa moyo: {count} kundi ya kifedha kubadilisha (kifedha ya kifedha + kifedha ya kifedha kubadilisha) kuzuka RSS",
+      "shedLevel2": "Unganishaji wa memory: {count} rules shed (expensive + INFO severity)",
+      "shedLevel3": "Unganishaji wa moyo: {count} kujifunza (kote kila kipengele kikubwa kikubwa)",
       "hardTripped": "Ulimwenguni wa kipato uliokosa — wote kwa kundi la kipato kifupi kipaswa",
-      "pressureNoShed": "Shinikizo la kumbukumbu limegunduliwa - wezesha umwagaji wa sheria katika analysis_options_custom.yaml kuweka kiotomatiki sheria za ukali wa chini"
+      "pressureNoShed": "Shinikizo la kumbukumbu limegunduliwa - wezesha umwagaji wa sheria katika analysis_options_custom.yaml kuweka sheria ghali kiotomatiki kwanza"
     },
     "notification": {
-      "shedDisabled": "Moyo ya analyzer ya kifedha kifedha (RSS {rssMb} MB, limit ya kifedha {softLimitMb} MB). Angalia kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujifunza kujif.",
+      "shedDisabled": "Shinikizo la kumbukumbu ya kichanganuzi limegunduliwa (RSS {rssMb} MB, kikomo laini {softLimitMb} MB). Washa umwagaji wa sheria ili kuzima kiotomatiki sheria za gharama kubwa chini ya shinikizo.",
       "enableButton": "Enable Kuwezesha kuwezesha",
       "learnMoreButton": "Jifunze Zaidi Jifunze zaidi.",
       "runInit": "Tumia 'dart run saropa_lints:init' ili kupata analysis_options_custom.yaml, kisha tafuta shed_rules: true.",
       "enabledConfirmation": "Unganisha kujaribu kwa kujaribu kwa analysis_options_custom.yaml. Analizeri inaweza kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujaribu kwa kujar."
+    },
+    "dashboard": {
+      "shedSectionTitle": "Sheria za kumwaga (shinikizo la kumbukumbu)",
+      "shedHint": "Rudini huzaliwaka kwa muda muda na handler ya uwezo wa kujifunza kwa kuzuka analyzer RSS. Rudini huzalishwa kwa matokeo ya uwezo wa kujifunza.",
+      "shedBadge": "kumwaga",
+      "shedBadgeTooltip": "Kipengele hiki inatoa kwa muda mlima kati ya kipengele kwa kuzalisha maelekezo ya kipengele.",
+      "categoryTypeResolving": "Kutambua mswalano (sukari)",
+      "categoryHighCost": "Gharama ya juu",
+      "categoryInfoSeverity": "Ukali wa INFO",
+      "categoryWarningSeverity": "ONYO ukali"
     }
   },
   "brand": {

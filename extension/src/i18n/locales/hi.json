@@ -632,23 +632,35 @@
   "memoryPressure": {
     "statusBar": {
       "hardTripped": "🔴 नियम स्थगित ({rssMb} मेगाबाइट)",
+      "shedCritical": "🔴 {count} नियम फेंक दें (क्रिटिकल)",
       "shedWarning": "⚠ {count} नियम छोड़ें",
-      "shedInfo": "⚡ {count} नियम छोड़ें",
+      "shedInfo": "⚡ {count} महँगे नियम फेंको",
       "pressureNoShed": "⚠ मेमोरी दबाव ({rssMb} मेबी)"
     },
     "tooltip": {
       "shedLevel0": "मेमोरी दबाव: सामान्य",
-      "shedLevel1": "स्मृति दबाव: {count} कम गंभीर नियम छोड़कर घटाने के लिए RSS",
-      "shedLevel2": "स्मृति दबाव: {count} नियम छोड़ देते हैं (सूचना + चेतावनी गंभीरता)",
+      "shedLevel1": "मेमरी दबाव: {count} महँगे नियम छोड़ (टाइप-समाधान करना + उच्च लागत) के लिए RSS",
+      "shedLevel2": "स्मृति दबाव: {count} नियम छोड़ देते हैं (महंगा + जानकारी गंभीरता)",
+      "shedLevel3": "स्मृति दबाव: {count} नियम छोड़ देते हैं (सभी अनिवार्य अ-त्रुटि)",
       "hardTripped": "स्मृति सीमा के अतिक्रमण — सभी अनिवार्य नियम स्थगित कर दिए गए",
-      "pressureNoShed": "मेमरी दबाव अनुमानित हुआ है — analysis_options_custom.yaml में नियम छोड़ने को सक्षम करें ताकि कम गुरुत्वपूर्ण नियम स्वचालित रूप से छोड़ दिए जाएं"
+      "pressureNoShed": "मेमरी दबाव डिटेक्टेड — एनेबल रूल शेडिंग इन analysis_options_custom.yaml टू आटो-शेड एक्सपेंसिव रूल्स फर्स्ट"
     },
     "notification": {
-      "shedDisabled": "एनालाइजर मेमोरी प्रेशर डिटेक्टेड (RSS {rssMb} मेगाबाइट, सॉफ्ट लिमिट {softLimitMb} मेगाबाइट)। प्रावधान नियमों को बरकरार रखने के लिए सक्षम करें ताकि दबाव के तहत कम गुणवत्ता वाले नियम ऑटोमेटिकली बंद कर दें।",
+      "shedDisabled": "एनालाइजर मेमोरी प्रेशर डिटेक्टेड (RSS {rssMb} मेगाबाइट, सॉफ्ट लिमिट {softLimitMb} मेगाबाइट)। प्रतिबंध छोड़ने की नियम एनाबल करें ताकि दबाव के तहत महँगे नियम स्वचालित रूप से बंद कर दिए जाएं।",
       "enableButton": "सक्षम करें सक्षम करें",
       "learnMoreButton": "अधिक जानें और अधिक जानें",
       "runInit": "'dart run saropa_lints:init' चलाकर analysis_options_custom.yaml बनाएं, फिर shed_rules: true सेट करें।",
       "enabledConfirmation": "नियम छोड़न के लिए analysis_options_custom.yaml में सक्रिय किया गया है। एनालाइजर अगली बार रीलोड के समय बदलाव को लेंगे।"
+    },
+    "dashboard": {
+      "shedSectionTitle": "शेड नियम (स्मृति दबाव)",
+      "shedHint": "इन नियम तंत्र के दबाव के कारण आवर्जित कर दिए जाते हैं ताकि विश्लेषक RSS को कम करे। जब तंत्र के दबाव कम हो जाता है तो वे स्वतः वापस आ जाते हैं।",
+      "shedBadge": "शेड",
+      "shedBadgeTooltip": "इस नियम को समय के लिए स्मृति दबाव के तहत छोड़ दिया गया है।",
+      "categoryTypeResolving": "प्रकार-निर्धारण (खराब)",
+      "categoryHighCost": "उच्च लागत",
+      "categoryInfoSeverity": "सूचना गुरुत्व",
+      "categoryWarningSeverity": "चेतावनी गुरुत्वपूर्णता"
     }
   },
   "brand": {
