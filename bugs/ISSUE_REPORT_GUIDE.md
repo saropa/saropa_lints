@@ -512,6 +512,7 @@ Every bug fix must satisfy these before it can be closed.
 - [ ] `ROADMAP.md` updated if rule status changed
 - [ ] Bug report file updated with root cause, changes, and commit hashes
 - [ ] Status updated to `Closed`
+- [ ] If this proposal closes a gap tracked in a `doc/guides/migration_guides/migration_from_*.md` table (grep the new rule name across `doc/guides/migration_guides/` to find every row that references it), flip that row's Status from `TODO`/`PARTIAL` to `HAVE`/`ENHANCED` and swap the `TODO — see [proposal](...)` link for the shipped rule name — a proposal file left `Open` after the rule ships makes every migration guide table lying about coverage
 
 ---
 
