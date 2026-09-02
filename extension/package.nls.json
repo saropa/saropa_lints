@@ -8,6 +8,7 @@
   "views.status.name": "Status",
   "views.settings.name": "Settings",
   "views.severityFilters.name": "Diagnostics",
+  "command.auditFolder.title": "Saropa: Audit Folder...",
   "views.help.name": "Help",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart and Flutter lint rules for security, accessibility, and performance.\n\nRequires a Dart or Flutter project.\n\nOpen a folder containing a `pubspec.yaml` to get started.\n\n[Learn more online](https://pub.dev/packages/saropa_lints)\n[Browse All Commands](command:saropaLints.showCommandCatalog)\n[About Saropa Lints](command:saropaLints.showAbout)\n[Getting Started](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: Set Up Project (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "Show critical alert when total Dart RSS exceeds this value (GB).",
   "config.property.systemHealth.warningOrphanCount.description": "Show warning when orphaned Flutter daemon count reaches this value.",
   "config.property.systemHealth.criticalOrphanCount.description": "Show critical alert when orphaned Flutter daemon count reaches this value.",
-  "config.property.systemHealth.showNotifications.description": "Show a notification when system health reaches critical level."
+  "config.property.systemHealth.showNotifications.description": "Show a notification when system health reaches critical level.",
+  "views.debugPanel.name": "Debug",
+  "command.toggleDebugPanel.title": "Saropa Lints: Toggle Debug Panel",
+  "command.lspServer.start.title": "Saropa Lints: Start LSP Server",
+  "command.lspServer.stop.title": "Saropa Lints: Stop LSP Server",
+  "command.lspServer.restart.title": "Saropa Lints: Restart LSP Server",
+  "config.section.Debug.title": "Debug & Diagnostics Engines",
+  "config.property.debug.enabled.description": "Show the Debug Panel in the Saropa Lints sidebar. Displays status and controls for the three diagnostic engines (Analyzer Plugin, Scan Daemon, LSP Server).",
+  "config.property.lspServer.enabled.description": "Run the standalone Saropa Lints LSP server for diagnostics. When enabled, spawns a separate Dart process that delivers squiggles and quick fixes via the Language Server Protocol. Runs alongside (not instead of) the analyzer plugin."
 }

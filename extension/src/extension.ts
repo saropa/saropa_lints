@@ -157,6 +157,9 @@ import { registerCleanupCommand } from './systemHealth/cleanupCommand';
 import { HealthPanel } from './systemHealth/healthPanel';
 import { HealthLevel } from './systemHealth/types';
 import type { DartProcessSnapshot } from './systemHealth/types';
+import { SaropaLspClient } from './debug/saropaLspClient';
+import { DebugPanelProvider } from './debug/debugPanel';
+import type { EngineStatus } from './debug/debugPanel';
 import { createRelatedRuleTelemetry } from './relatedRuleTelemetry';
 import { registerCrossFileCommands } from './cross-file-commands';
 import { registerStaleIgnoreCommands } from './stale-ignore-commands';
@@ -1286,6 +1289,121 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (pollingSettings.some((k) => e.affectsConfiguration(k))) {
         processMonitor.start();
       }
+    }),
+  );
+
+  // ── Standalone LSP Server (Phase 0 — fake diagnostics for plumbing test) ──
+  // Spawns a second LSP server that publishes hardcoded test diagnostics into
+  // the same Problems panel as the Dart analyzer, proving the two-server
+  // architecture works. Controlled by saropaLints.lspServer.enabled setting.
+  let lspClient: SaropaLspClient | undefined;
+  const lspRoot = getProjectRoot();
+
+  // Start LSP server on activation if the setting is already enabled.
+  if (lspRoot && vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
+    lspClient = new SaropaLspClient(context, lspRoot);
+    void lspClient.start();
+  }
+
+  // React to setting changes — start/stop the LSP server without VS Code restart.
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration('saropaLints.lspServer.enabled')) {
+        const enabled = vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled');
+        if (enabled && !lspClient && lspRoot) {
+          lspClient = new SaropaLspClient(context, lspRoot);
+          void lspClient.start();
+        } else if (!enabled && lspClient) {
+          void lspClient.stop();
+          lspClient.dispose();
+          lspClient = undefined;
+        }
+      }
+    }),
+  );
+
+  // Commands for manual LSP server lifecycle control.
+  context.subscriptions.push(
+    vscode.commands.registerCommand('saropaLints.lspServer.start', async () => {
+      if (!lspRoot) { return; }
+      if (!lspClient) {
+        lspClient = new SaropaLspClient(context, lspRoot);
+      }
+      await lspClient.start();
+    }),
+    vscode.commands.registerCommand('saropaLints.lspServer.stop', async () => {
+      if (lspClient) { await lspClient.stop(); }
+    }),
+    vscode.commands.registerCommand('saropaLints.lspServer.restart', async () => {
+      if (lspClient) { await lspClient.restart(); }
+    }),
+  );
+
+  // ── Debug Panel (sidebar webview) ─────────────────────────────────────
+  // Shows status + toggle controls for the three diagnostic engines.
+  // Only registered when saropaLints.debug.enabled is true.
+  const debugPanelProvider = new DebugPanelProvider(
+    context.extensionUri,
+    {
+      // Analyzer Plugin status — in-process, no PID or RSS available.
+      getAnalyzerPluginStatus: (): EngineStatus => ({
+        name: 'Analyzer Plugin',
+        enabled: true, // Always on when plugins: saropa_lints: is in analysis_options
+        status: 'active',
+        ruleCount: 203,
+        rssNote: 'in-process, not separately measurable',
+      }),
+      // Scan Daemon status — read from the scan-on-save controller.
+      getScanDaemonStatus: (): EngineStatus => ({
+        name: 'Scan Daemon',
+        enabled: !scanOnSaveController.isDaemonSuspended,
+        status: scanOnSaveController.isDaemonSuspended ? 'suspended' : 'idle',
+        ruleCount: 2140,
+        rssBytes: systemHealthSnapshot?.saropaRssBytes,
+        pid: undefined, // TODO: expose daemon PID from ScanDaemonManager
+      }),
+      // LSP Server status — read from the client wrapper.
+      getLspServerStatus: (): EngineStatus => ({
+        name: 'LSP Server',
+        enabled: lspClient?.isRunning ?? false,
+        status: lspClient?.isRunning ? 'running' : 'stopped',
+        ruleCount: 4, // Fake test diagnostics
+        rssNote: lspClient?.isRunning ? undefined : 'not running',
+      }),
+    },
+  );
+
+  // Register the debug panel as a webview view provider.
+  context.subscriptions.push(
+    vscode.window.registerWebviewViewProvider(
+      DebugPanelProvider.viewType,
+      debugPanelProvider,
+    ),
+  );
+
+  // Wire debug panel toggle events to actual engine start/stop actions.
+  debugPanelProvider.onToggle(async ({ engine, enabled }) => {
+    if (engine === 'lspServer') {
+      if (enabled && lspRoot) {
+        if (!lspClient) {
+          lspClient = new SaropaLspClient(context, lspRoot);
+        }
+        await lspClient.start();
+      } else if (!enabled && lspClient) {
+        await lspClient.stop();
+      }
+    }
+    // Analyzer Plugin and Scan Daemon toggles are deferred — they require
+    // analysis_options.yaml edits and analysis server restarts respectively.
+    debugPanelProvider.refresh();
+  });
+
+  // Toggle debug panel visibility command.
+  context.subscriptions.push(
+    vscode.commands.registerCommand('saropaLints.toggleDebugPanel', () => {
+      const config = vscode.workspace.getConfiguration('saropaLints.debug');
+      const current = config.get<boolean>('enabled', false);
+      void config.update('enabled', !current, vscode.ConfigurationTarget.Workspace);
     }),
   );
 

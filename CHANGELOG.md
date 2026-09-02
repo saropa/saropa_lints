@@ -84,6 +84,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Fixed double-unescape vulnerability in pub.dev changelog entity decoder — `&amp;lt;` was incorrectly decoded to `<` instead of the literal `&lt;` (CodeQL #19, CWE-116).
 - Fixed case-insensitive script-tag matching in snapshot harness so upper-case `<SCRIPT>` tags are normalized correctly (CodeQL #20).
 - Status bar warning/critical suffix now shows Saropa Lints RSS when available instead of the misleading system-wide total. No action required.
+- Fixed 12 rule files (28 rule classes) that accessed `.constructorName.type.element` without declaring `usesTypeResolution => true` — these rules silently produced zero findings in the light analysis lane. The integrity test now detects this access pattern.
 
 <details>
 <summary>Maintenance</summary>

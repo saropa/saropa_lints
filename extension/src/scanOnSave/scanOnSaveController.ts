@@ -127,6 +127,11 @@ export class ScanOnSaveController implements vscode.Disposable {
   /** True when the daemon has been suspended due to heavy memory pressure. */
   private _daemonSuspended = false;
 
+  /** Public read access for the debug panel to display daemon suspension state. */
+  get isDaemonSuspended(): boolean {
+    return this._daemonSuspended;
+  }
+
   constructor(
     private readonly _collection: vscode.DiagnosticCollection,
     private readonly _getProjectRoot: () => string | undefined,

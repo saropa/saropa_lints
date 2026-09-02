@@ -6,6 +6,7 @@
     "alreadyRunning": "An audit is already running — wait for it to finish.",
     "noProject": "No Dart project found. Open a folder that contains a pubspec.yaml.",
     "missingDep": "This project does not depend on saropa_lints. Add it to dev_dependencies first.",
+    "pickWorkspaceFolder": "Which workspace folder should the audit run against?",
     "scope": {
       "placeholder": "Which files should the audit cover?",
       "full": "Full project",
@@ -54,7 +55,9 @@
       "keyboardHint": "Arrow keys to navigate · Enter to open file · Esc to clear search",
       "copiedJson": "Audit JSON copied to clipboard.",
       "baselineSaved": "Baseline saved. Future audits can compare against this snapshot.",
-      "baselineSaveFailed": "Could not save the baseline: {message}"
+      "baselineSaveFailed": "Could not save the baseline: {message}",
+      "deferredLoading": "Loading the full result set (this audit is large)…",
+      "deferredLoadFailed": "Could not load the full result set — showing the first {pageSize} findings only."
     }
   },
   "scanOnSave": {
@@ -1734,6 +1737,35 @@
       "ariaLabel": "Comparison actions",
       "packageDashboard": "Package Dashboard",
       "packageDashboardTitle": "Open the Package Dashboard to compare more packages."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "Debug Panel"
+    },
+    "section": {
+      "engines": "Diagnostic Engines",
+      "log": "Log"
+    },
+    "engine": {
+      "analyzerPlugin": "Analyzer Plugin",
+      "scanDaemon": "Scan Daemon",
+      "lspServer": "LSP Server",
+      "pid": "PID:",
+      "status": "Status:",
+      "rules": "Rules:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "ON",
+      "off": "OFF"
+    },
+    "action": {
+      "killAll": "Kill All",
+      "restartAll": "Restart All"
+    },
+    "log": {
+      "empty": "No log entries yet."
     }
   },
   "detailView": {
