@@ -93,6 +93,11 @@ jobs:
         # `meta` dep through as a non-fatal warning and burned v13.12.6/.7.
         # This Python gate has no such ambiguity. See scripts/check_dependency_imports.py.
         run: python scripts/check_dependency_imports.py
+      - name: Verify shipped docs don't link into .pubignore-excluded paths
+        # A doc under doc/ (shipped) that links to plans/, bugs/, or scripts/
+        # (all excluded from the pub.dev tarball) is a dead link for anyone
+        # reading the published package. See scripts/check_doc_links_excluded_paths.py.
+        run: python scripts/check_doc_links_excluded_paths.py
       - name: Dry run (pub.dev validation)
         # Catches missing direct dependencies and other pub.dev rules; exit 65 = warnings, 66+ = errors
         run: |

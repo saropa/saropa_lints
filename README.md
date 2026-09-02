@@ -349,7 +349,7 @@ violations.json        ───►  Health Score, Issues, Security,
 
 The **Dart package** provides **2332** lint rules via the native analyzer plugin. The **VS Code extension** reads `violations.json` and provides the UI: Health Score, Issues tree, Security Posture, File Risk, Setup & triage, and related views. Optional **Drift Advisor** integration shows index suggestions and data-quality anomalies from a running Drift Advisor server in a dedicated sidebar view and in Problems. Both are published together and versioned in sync.
 
-**Rule metadata:** Each rule can expose optional semantics—`RuleType` (bug, vulnerability, code smell, security hotspot), `tags`, MITRE **CWE** IDs, and `RuleStatus` (e.g. beta)—for compliance and future quality gates. Defaults are backward compatible; see [CONTRIBUTING.md](CONTRIBUTING.md) and [bugs/discussion/RULE_METADATA_BULK_STATUS.md](bugs/discussion/RULE_METADATA_BULK_STATUS.md).
+**Rule metadata:** Each rule can expose optional semantics—`RuleType` (bug, vulnerability, code smell, security hotspot), `tags`, MITRE **CWE** IDs, and `RuleStatus` (e.g. beta)—for compliance and future quality gates. Defaults are backward compatible; see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -913,7 +913,7 @@ dart run bin/project_vibrancy.dart \
 
 Exit code is non-zero when any configured gate is violated. A sample workflow is available at `.github/workflows/project-vibrancy.yml`.
 
-JSON summary includes `stubTestedCount`, `suspiciousCoverageCount`, and `testDriftCount` (see [plans/history/2026.04/2026.04.28/project_vibrancy_report.md](plans/history/2026.04/2026.04.28/project_vibrancy_report.md) for flag semantics; LCOV lacks per-test attribution, so flags use importer + trivial-assertion heuristics).
+JSON summary includes `stubTestedCount`, `suspiciousCoverageCount`, and `testDriftCount` (LCOV lacks per-test attribution, so flags use importer + trivial-assertion heuristics).
 
 ### Quality gate CLI (new-code focused)
 

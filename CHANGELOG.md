@@ -91,6 +91,8 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - `audit` CLI: fixed `RuntimeTierCap` silently capping the rule set — added `bypassTierCap` flag on `ScanRunner` so audit runs every rule regardless of the project's configured tier.
 - `audit` CLI: fixed tier enrichment bug — was looking up `entry['rule']` instead of `entry['ruleName']`, so tier field was never populated in JSON output.
 - `audit` CLI: added per-diagnostic `category` field to JSON output (derived from rule source file directory), with generated category map and drift-catching unit tests.
+- Fixed l10n diagnostic param-extraction regex consuming trailing delimiters, causing false "missing params" warnings on multi-param `l10n()` calls.
+- Moved `PACKAGE_VIBRANCY.md` from `plans/guides/` to the repo root to match the path the extension's SDK vibrancy table expects; excluded `plans/` from the pub.dev package (already public on GitHub, this only trims the published tarball); added CI check `scripts/check_doc_links_excluded_paths.py` to catch shipped docs linking into `.pubignore`-excluded paths.
 
 </details>
 
