@@ -8,6 +8,7 @@
   "views.status.name": "স্ট্যাটাস স্টেটস স্ট্যাটিস স্ট্যাটস",
   "views.settings.name": "সেটিংসেটস সেটিংস",
   "views.severityFilters.name": "ডায়াগনোস্টিকস",
+  "command.auditFolder.title": "Saropa: অডিট ফোল্ডার...",
   "views.help.name": "সাহায্যের জন্য সহায়তা করুন",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart এবং Flutter লিংট নিয়ম সুরক্ষা, অ্যাক্সেসিবিলিটি এবং পারফরম্যান্স জন্য।\n\nDart বা Flutter প্রকল্প প্রয়োজন।\n\nএকটি `pubspec.yaml` কনটেইন করা ফোল্ডার খুলুন যেখানে শুরু করুন।\n\n[অনলাইনে বেশি জানুন](https://pub.dev/packages/saropa_lints)\n[সকল কমান্ড দেখুন](command:saropaLints.showCommandCatalog)\n[আমার সম্পর্কে Saropa Lints](command:saropaLints.showAbout)\n[প্রারম্ভ করুন](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: প্রকল্প সেট আপ করুন (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "মোট Dart RSS এর মান এই মান ছাড়ি থাকলে গুরুতর বিজ্ঞপ্তি দেখান (জিবি)",
   "config.property.systemHealth.warningOrphanCount.description": "অরফান হওয়া Flutter ডেমন গণনা এই মানে পৌঁছায় তখন একটি বার্তা দেখানো হবে।",
   "config.property.systemHealth.criticalOrphanCount.description": "অরফান হওয়া Flutter ডেমন গণনা এই মান পৌঁছায় ক্রিটিক্যাল অ্যালার্ট দেখানো হবে।",
-  "config.property.systemHealth.showNotifications.description": "সিস্টেম হিলথ ক্রিটিক্যাল স্তর পৌঁছায় যখন একটি নোটিফিকেশন দেখানো হবে।"
+  "config.property.systemHealth.showNotifications.description": "সিস্টেম হিলথ ক্রিটিক্যাল স্তর পৌঁছায় যখন একটি নোটিফিকেশন দেখানো হবে।",
+  "views.debugPanel.name": "ডিবাগ",
+  "command.toggleDebugPanel.title": "Saropa Lints: ডেবাগ প্যানেল টুগেল করুন",
+  "command.lspServer.start.title": "Saropa Lints: এলএসপি সার্ভার শুরু করুন",
+  "command.lspServer.stop.title": "Saropa Lints: এলএসপি সার্ভার বন্ধ করুন",
+  "command.lspServer.restart.title": "Saropa Lints: LSP সার্ভার পুনরাবৃত্তি করুন",
+  "config.section.Debug.title": "ডিবাগ এবং ডায়নোস্টিক ইঞ্জিনসমূহ",
+  "config.property.debug.enabled.description": "Saropa Lints সাইডবারে ডিবাগ প্যানেল প্রদর্শন করুন। তিনটি ডায়নোস্টিক ইঞ্জিনের (এনালাইজার প্লাগইন, স্ক্যান Daemon, LSP সার্ভার) স্ট্যাটাস এবং কন্ট্রোল প্রদর্শন করে।",
+  "config.property.lspServer.enabled.description": "স্বতন্ত্র Saropa Lints LSP সার্ভারটি চালানো যাক ডায়নোস্টিকস জন্য। যখন সক্রিয় করা হয়, একটি আলাদা Dart প্রসেস স্পয়ন করে যা ভাষা সার্ভার প্রোটোকল এর মাধ্যমে স্কুইগলস এবং দ্রুত সংশোধন প্রদান করে। এটি এনালাইজার প্লাগইনের সাথে চালানো হয় (নয় এর পরিবর্তে)।"
 }

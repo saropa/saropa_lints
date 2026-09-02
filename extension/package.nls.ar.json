@@ -8,6 +8,7 @@
   "views.status.name": "الوضع الحالي Status",
   "views.settings.name": "تحديدات التسويات",
   "views.severityFilters.name": "التشخيصات",
+  "command.auditFolder.title": "Saropa: مراجعة المجلد ...",
   "views.help.name": "مساعدة المساعدات المساعدة",
   "viewsWelcome.banner.contents": "**Saropa Lints**\n\n2300+ Dart و Flutter قواعد التحقق من صحة الكود لضمان الأمان والوصول والكفاءة.\n\nيتطلب مشروع Dart أو Flutter.\n\nافتح مجلدًا يحتوي على ملف `pubspec.yaml` للبدء.\n\n[اقرأ المزيد على الإنترنت](https://pub.dev/packages/saropa_lints)\n[استعرض جميع الأوامر](command:saropaLints.showCommandCatalog)\n[حول Saropa Lints](command:saropaLints.showAbout)\n[البدء](command:saropaLints.openWalkthrough)",
   "command.enable.title": "Saropa Lints: إعداد المشروع (pubspec + config)",
@@ -340,5 +341,13 @@
   "config.property.systemHealth.criticalThresholdGB.description": "أظهر تنبيهًا حرجًا عندما تتجاوز القيمة الإجمالية Dart RSS هذه القيمة (جيجابايت)",
   "config.property.systemHealth.warningOrphanCount.description": "أظهر تحذير عندما يصل عدد الزومان Flutter المهجور إلى هذه القيمة.",
   "config.property.systemHealth.criticalOrphanCount.description": "أظهر تنبيهًا حرجًا عندما يصل عدد دايموند Flutter المهجور إلى هذه القيمة.",
-  "config.property.systemHealth.showNotifications.description": "أظهر إشعارًا عندما تصل صحة النظام إلى مستوى حرجة."
+  "config.property.systemHealth.showNotifications.description": "أظهر إشعارًا عندما تصل صحة النظام إلى مستوى حرجة.",
+  "views.debugPanel.name": "تصحيح",
+  "command.toggleDebugPanel.title": "Saropa Lints: تبديل لوحة التصحيح",
+  "command.lspServer.start.title": "Saropa Lints: بدء خادم LSP",
+  "command.lspServer.stop.title": "Saropa Lints: توقف خادم LSP",
+  "command.lspServer.restart.title": "Saropa Lints: إعادة تشغيل خادم LSP",
+  "config.section.Debug.title": "محركات التصحيح وتشخيص الأعطال",
+  "config.property.debug.enabled.description": "عرض لوحة التصحيح في القسم الجانبي Saropa Lints. تعرض الحالة وتحكم في الثلاثة محركات التشخيص (مُحلِّل الملحق، مُسح Daemon، خادم LSP).",
+  "config.property.lspServer.enabled.description": "تشغيل خادم Saropa Lints المستقل لخدمات LSP لتحليل الأخطاء. عند تمكينه، يقوم بإنشاء عملية منفصلة Dart تقدم تلميحات الأخطاء وحلول سريعة عبر بروتوكول خادم اللغة. يعمل جنبًا إلى جنب (وليس بدلًا من) مُحلل الملحق."
 }

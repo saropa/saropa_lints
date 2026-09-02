@@ -6,6 +6,7 @@
     "alreadyRunning": "مراجعة تُجرى بالفعل — انتظر حتى تنتهي.",
     "noProject": "لم يتم العثور على مشروع Dart. افتح مجلدًا يحتوي على pubspec.yaml.",
     "missingDep": "هذا المشروع لا يعتمد على saropa_lints. أضفه إلى dev_dependencies أولاً.",
+    "pickWorkspaceFolder": "أي مجلد مساحة العمل يجب أن يُجرى عليه التحقق؟",
     "scope": {
       "placeholder": "أي ملفات يجب أن تشملها الفحص؟",
       "full": "مشروع كامل",
@@ -54,7 +55,9 @@
       "keyboardHint": "مفاتيح السهم للتنقل · إدخال لفتح الملف · إس كيو تي لمسح البحث",
       "copiedJson": "مراجعة JSON تم نسخها إلى الحافظة.",
       "baselineSaved": "تم حفظ المعايير الأساسية. يمكن للمراجعة المستقبلية مقارنة هذا المقطع معه.",
-      "baselineSaveFailed": "لم يتم حفظ القاعدة الأساسية: {message}"
+      "baselineSaveFailed": "لم يتم حفظ القاعدة الأساسية: {message}",
+      "deferredLoading": "تحميل مجموعة النتائج الكاملة (هذا التقرير كبير)…",
+      "deferredLoadFailed": "لم يتم تحميل النتائج الكاملة — يتم عرض أول {pageSize} نتيجة فقط."
     }
   },
   "scanOnSave": {
@@ -586,7 +589,9 @@
     },
     "tooltip": {
       "processCount": "الإجراءات Dart: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} عملية(ات) ({size} RSS)",
       "daemonCount": "Flutter مُساعدين: {total} ({orphaned} مهجور)",
+      "scanDaemonOrphans": "الـديـمـونـات الـمُرَدَّدَة: {count} — استخدم تنظيف لـإنهاء",
       "warningHint": "استخدام الذاكرة مرتفع — انقر للحصول على التفاصيل",
       "criticalHint": "استخدام الذاكرة هو أمر حيوي — تنظيف موصى به"
     },
@@ -600,8 +605,8 @@
       "dontShowAgain": "لا تظهر مرة أخرى"
     },
     "cleanup": {
-      "noOrphans": "لم يتم العثور على أي دايمونز Flutter مهجورة.",
-      "confirm": "تم العثور على {count} عمليات خدمة Flutter مهجورة باستخدام {size}. هل ترغب في إنهاؤها؟",
+      "noOrphans": "لم يتم العثور على أي دايموندات مهجورة.",
+      "confirm": "تم العثور على {count} عملية(s) daemon مهجورة باستخدام {size}. هل ترغب في إنهاؤها؟",
       "killButton": "قتل الأبناء غير المرتبطين",
       "cancelButton": "إلغاء الإلغاء"
     },
@@ -622,6 +627,7 @@
       "colCommand": "التعليمات",
       "colAction": "الإجراء",
       "typeOrphan": "أُرَفَّه",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "العملية",
       "kill": "القتل",
@@ -1731,6 +1737,35 @@
       "ariaLabel": "إجراءات المقارنة:",
       "packageDashboard": "لوحة تحكم الحزمة",
       "packageDashboardTitle": "افتح لوحة تحكم الحزم لمقارنة المزيد من الحزم."
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "لوحة التصحيح"
+    },
+    "section": {
+      "engines": "محركات التشخيص",
+      "log": "السجل"
+    },
+    "engine": {
+      "analyzerPlugin": "مُحلِّل المُوسِّع",
+      "scanDaemon": "مسح Daemon",
+      "lspServer": "خادم LSP",
+      "pid": "PID:",
+      "status": "الحالة:",
+      "rules": "القواعد:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "على",
+      "off": "إف إف"
+    },
+    "action": {
+      "killAll": "القضاء على كل",
+      "restartAll": "إعادة التشغيل جميعًا"
+    },
+    "log": {
+      "empty": "لا توجد سجلات تسجيل بعد."
     }
   },
   "detailView": {

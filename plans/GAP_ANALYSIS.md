@@ -168,6 +168,7 @@ regeneration/investigation as a follow-up task independent of this document.
 | context_plus_lint | 4 | 0 | 0 | 4 | `context_plus` package's own `Ref`/`context.use()` API |
 | cosee_lints | 0 | 0 | 0 | 0 | Preset-only, zero custom rules |
 | **DCM proper (dcm.dev)** | **487** | **421** | **16** | **50** | Commercial product; 378 exact name matches + 43 semantic equivalents. See detail section. |
+| **very_good_analysis (VGA)** | **~206** | **~15** | **0** | **~191 N/A** | Preset-only (stock Dart analyzer rules). saropa operates in a separate namespace — not a gap, complementary. See detail section. |
 | dart_code_linter | 82 | 68 | 8 | ~9 | DCM fork; several rule ids ported as saropa `configAlias`es |
 | dart_code_metrics_annotations | 3 | 1 | 2 | 0 | `@Throws`/`@AcceptedTypes`/`@mutated` annotation contracts |
 | dart_code_metrics_presets | 77 | 27 | 6 | 44 | 15 package-specific preset YAMLs (bloc/riverpod/provider/etc.) |
@@ -1347,6 +1348,48 @@ equivalent for the other 5 categories:
 - `avoid-equatable-call-on-equality-base-class`
 - `prefer-equatable-key-name`
 - `sort-equatable-props`
+
+### very_good_analysis (VGA) — ~206 stock rules
+
+Audited 2026-09-02 against `analysis_options.10.0.0.yaml` from VGA's GitHub repo. VGA is a **preset-only**
+package — it ships zero custom rule implementations. It enables ~206 stock Dart SDK `linter: rules:` entries
+(style, formatting, documentation, basic correctness).
+
+**Key finding: VGA and saropa_lints operate in completely separate rule namespaces.**
+
+saropa_lints is a custom `analyzer_plugin`/`custom_lint` package — its ~2,390 rules are delivered through the
+`plugins: saropa_lints: diagnostics:` section of the generated `analysis_options.yaml`. saropa's config
+writer **never generates a `linter: rules:` block** for consumer projects. This means:
+
+- VGA rules are stock Dart analyzer rules (e.g. `prefer_final_locals`, `require_trailing_commas`, `public_member_api_docs`)
+- saropa rules are custom plugin rules (e.g. `prefer_final_locals_with_fix`, `prefer_trailing_comma`)
+- **Both can and should coexist** — users running saropa_lints still need `flutter_lints` or VGA for stock rule coverage
+
+**Conceptual equivalents (~12-15 rules)** — saropa has enhanced custom versions of some VGA stock rules:
+
+| VGA Stock Rule | Saropa Custom Equivalent | Enhancement |
+|---|---|---|
+| `avoid_positional_boolean_parameters` | `avoid_positional_boolean_parameters_with_fix` | Adds quick fix |
+| `avoid_print` | `avoid_print_in_release` / `avoid_print_in_production` | Context-aware (release only) |
+| `avoid_returning_this` | `avoid_returning_this_with_fix` | Adds quick fix |
+| `lines_longer_than_80_chars` | `prefer_readable_line_length` | Configurable threshold |
+| `prefer_const_constructors` | `prefer_declaring_const_constructor` | Declaration-side check |
+| `prefer_final_locals` | `prefer_final_locals_with_fix` | Adds quick fix |
+| `prefer_single_quotes` | `prefer_single_quotes_strict` | Stricter enforcement |
+| `require_trailing_commas` | `prefer_trailing_comma` / `prefer_trailing_comma_always` | |
+| `sized_box_for_whitespace` | `prefer_sized_box_for_whitespace` | |
+| `use_build_context_synchronously` | `check_mounted_after_async` / `require_mounted_check_after_await` | More specific checks |
+
+**The remaining ~191 VGA rules are NOT gaps** — they are stock Dart style/formatting rules that saropa
+intentionally does not reimplement (users get them from `flutter_lints`/VGA/`lints` alongside saropa). This
+includes: `camel_case_types`, `constant_identifier_names`, `unnecessary_this`, `always_use_package_imports`,
+`type_annotate_public_apis`, `public_member_api_docs`, `eol_at_end_of_file`, `directives_ordering`,
+`sort_constructors_first`, most `unnecessary_*` rules, most `prefer_*` style rules, and all doc-comment rules.
+
+**Recommendation**: saropa_lints' init CLI should recommend or auto-include VGA/flutter_lints via `include:`
+to ensure stock rule coverage. This is a documentation/init-config task, not a rule-building task.
+
+---
 
 **Known data-quality issue, found independently by 5+ research agents across different packages**:
 `saropa_rules_reference.json` / `saropa_rules_short.md` (the generated doc-comment catalog) has misattributed

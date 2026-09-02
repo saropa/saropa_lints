@@ -6,6 +6,7 @@
     "alreadyRunning": "একটি অ্যাউডিট বর্তমানে চালানো হচ্ছে — এটি শেষ হওয়া অপেক্ষা করুন।",
     "noProject": "কোনও Dart প্রকল্প খুঁজে পাওয়া যায়নি। একটি pubspec.yaml কোনও ফোল্ডার খুলুন।",
     "missingDep": "এই প্রকল্পটি saropa_lints এর উপর নির্ভর করে না। প্রথমে dev_dependencies এ যোগ করুন।",
+    "pickWorkspaceFolder": "কোন ওয়ার্কস্পেস ফোল্ডারে অডিট চালানো হবে?",
     "scope": {
       "placeholder": "কোন ফাইলগুলি পরিদর্শনের জন্য বিবেচনা করা উচিত?",
       "full": "পুরো প্রকল্প",
@@ -54,7 +55,9 @@
       "keyboardHint": "সাজানো কী বাটন · এন্টার করে ফাইল খুলুন · এস্ক করে খোঁজা পরিষ্কার করুন",
       "copiedJson": "ক্লিপবোর্ডে অডিট জেসন কপি করা হয়েছে।",
       "baselineSaved": "বেস লাইন সংরক্ষিত। ভবিষ্যৎ অডিটগুলি এই স্ন্যাপশটটির বিরুদ্ধে তুলনা করতে পারে।",
-      "baselineSaveFailed": "বেসলাইন সংরক্ষণ করা যায়নি: {message}"
+      "baselineSaveFailed": "বেসলাইন সংরক্ষণ করা যায়নি: {message}",
+      "deferredLoading": "পূর্ণ ফলাফল প্রস্তুত করছি (এই অডিটটি বড়)…",
+      "deferredLoadFailed": "পূর্ণ ফলাফল আন্তরিক করতে পারিনি — কেবলমাত্র প্রথম {pageSize} খুঁজতে দেখাচ্ছি।"
     }
   },
   "scanOnSave": {
@@ -586,7 +589,9 @@
     },
     "tooltip": {
       "processCount": "Dart প্রক্রিয়া: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} প্রক্রিয়া(গুলি) ({size} RSS)",
       "daemonCount": "Flutter ডেমন: {total} ({orphaned} অপসারিত)",
+      "scanDaemonOrphans": "অপরিচ্ছন্ন স্ক্যান ডেমন: {count} — ক্লিন আপ ব্যবহার করুন যাতে মারা যায়",
       "warningHint": "মেমরি ব্যবহার উচ্চ — ক্লিক করুন বিস্তারিত জন্য",
       "criticalHint": "মেমরি ব্যবহার গুরুত্বপূর্ণ — পরামর্শ দেওয়া হয়েছে পরিষ্কার করুন"
     },
@@ -600,8 +605,8 @@
       "dontShowAgain": "আবার দেখাও না"
     },
     "cleanup": {
-      "noOrphans": "কোনও অপ্রয়োজনীয় Flutter ডেমন খুঁজে পাওয়া যায়নি।",
-      "confirm": "{count} থেকে Flutter এর মধ্যে {size} ব্যবহার করে অপসারিত ডেমন প্রক্রিয়া খুঁজে পাওয়া গেল। তাদের মারা কি?",
+      "noOrphans": "কোনও অপসারিত ডেমন খুঁজে পাওয়া যায়নি।",
+      "confirm": "{count} থেকে খুঁজে পেলাম অপসারণ করা ডেমন প্রসেস(গুলি) এর সংখ্যা {size}। তাদের মারা কি?",
       "killButton": "অপরাধী মারা যাওয়া",
       "cancelButton": "বাতিল করুন Cancel"
     },
@@ -622,6 +627,7 @@
       "colCommand": "কমান্ড",
       "colAction": "অ্যাকশন",
       "typeOrphan": "অরফান",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "প্রক্রিয়া",
       "kill": "ঘুলাইয়ে দাও",
@@ -1731,6 +1737,35 @@
       "ariaLabel": "তুলনা কর্মকাণ্ডের সাথে তুলনা করুন।",
       "packageDashboard": "প্যাকেজ ড্যাশবোর্ড",
       "packageDashboardTitle": "আরও প্যাকেজ তুলনা করতে প্যাকেট ড্যাশবোর্ড খুলুন।"
+    }
+  },
+  "debug": {
+    "panel": {
+      "title": "ডিবাগ প্যানেল"
+    },
+    "section": {
+      "engines": "ডায়নোস্টিক ইঞ্জিনগুলি",
+      "log": "লগ"
+    },
+    "engine": {
+      "analyzerPlugin": "এনালাইজার প্লাগইন",
+      "scanDaemon": "Daemon স্ক্যান করুন",
+      "lspServer": "এলএসপি সার্ভার",
+      "pid": "PID:",
+      "status": "অবস্থা:",
+      "rules": "নিয়ম:",
+      "rss": "RSS:"
+    },
+    "toggle": {
+      "on": "অন/নো_থিং",
+      "off": "বন্ধ"
+    },
+    "action": {
+      "killAll": "কিল সব কিল সব",
+      "restartAll": "সমস্ত পুনরাবৃত্তি করুন"
+    },
+    "log": {
+      "empty": "আরো লগ এন্ট্রি নেই।"
     }
   },
   "detailView": {
