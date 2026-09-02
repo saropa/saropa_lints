@@ -586,7 +586,9 @@
     },
     "tooltip": {
       "processCount": "Dart processes: {count} ({size} RSS)",
+      "saropaProcessCount": "Saropa Lints: {count} process(es) ({size} RSS)",
       "daemonCount": "Flutter daemons: {total} ({orphaned} orphaned)",
+      "scanDaemonOrphans": "Orphaned scan daemons: {count} — use Clean Up to kill",
       "warningHint": "Memory usage is high — click for details",
       "criticalHint": "Memory usage is critical — clean up recommended"
     },
@@ -600,8 +602,8 @@
       "dontShowAgain": "Don’t Show Again"
     },
     "cleanup": {
-      "noOrphans": "No orphaned Flutter daemons found.",
-      "confirm": "Found {count} orphaned Flutter daemon processes using {size}. Kill them?",
+      "noOrphans": "No orphaned daemons found.",
+      "confirm": "Found {count} orphaned daemon process(es) using {size}. Kill them?",
       "killButton": "Kill Orphans",
       "cancelButton": "Cancel"
     },
@@ -622,6 +624,7 @@
       "colCommand": "Command",
       "colAction": "Action",
       "typeOrphan": "Orphan",
+      "typeSaropa": "Saropa",
       "typeDaemon": "Daemon",
       "typeProcess": "Process",
       "kill": "Kill",

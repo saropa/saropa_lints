@@ -2,7 +2,7 @@ import { createWebviewCspNonce, escapeHtml } from '../vibrancy/views/html-utils'
 import { l10n } from '../i18n/runtime';
 import { getHealthPanelStyles } from './healthPanel-styles';
 import { getHealthPanelScript } from './healthPanel-script';
-import { formatBytes, isDaemonProcess } from './processQuery';
+import { formatBytes, isDaemonProcess, isSaropaProcess } from './processQuery';
 import type { DartProcessInfo } from './types';
 
 export interface HealthPanelData {
@@ -70,13 +70,18 @@ function buildTableHtml(data: HealthPanelData): string {
   const rows = data.processes.map((p) => {
     const isOrphan = data.orphanPids.has(p.processId);
     const isDaemon = isDaemonProcess(p);
+    const isSaropa = isSaropaProcess(p);
 
     // Orphan takes priority over daemon in the type pill because an
     // orphaned daemon is the actionable case (has a kill button below);
     // a live daemon with a parent is normal and not worth flagging.
+    // Saropa processes get their own pill so users can distinguish
+    // saropa_lints scan daemons from the Dart analysis server.
     let typePill: string;
     if (isOrphan) {
       typePill = `<span class="pill pill-orphan">${escapeHtml(l10n('systemHealth.panel.typeOrphan'))}</span>`;
+    } else if (isSaropa) {
+      typePill = `<span class="pill pill-daemon">${escapeHtml(l10n('systemHealth.panel.typeSaropa'))}</span>`;
     } else if (isDaemon) {
       typePill = `<span class="pill pill-daemon">${escapeHtml(l10n('systemHealth.panel.typeDaemon'))}</span>`;
     } else {

@@ -1133,7 +1133,12 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (memPressureSuffix) {
         sysHealthSuffix = memPressureSuffix;
       } else if (systemHealthSnapshot && systemHealthLevel !== HealthLevel.Healthy) {
-        const size = formatBytes(systemHealthSnapshot.totalRssBytes);
+        // Show saropa-specific RSS in the suffix when available — the
+        // system-wide total wrongly blames saropa_lints for the entire
+        // Dart analysis server and every other dart.exe on the machine.
+        const size = systemHealthSnapshot.saropaProcessCount > 0
+          ? formatBytes(systemHealthSnapshot.saropaRssBytes)
+          : formatBytes(systemHealthSnapshot.totalRssBytes);
         sysHealthSuffix = systemHealthLevel === HealthLevel.Critical
           ? l10n('systemHealth.statusBar.critical', { size })
           : l10n('systemHealth.statusBar.warning', { size });
@@ -1190,8 +1195,27 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const sOrphaned = String(systemHealthSnapshot.orphanedDaemonPids.length);
         tooltipLines.push(
           l10n('systemHealth.tooltip.processCount', { count: sCount, size: sSize }),
+        );
+        // Show saropa_lints' own footprint separately so users know what's
+        // ours vs the Dart analysis server and other system-wide processes.
+        if (systemHealthSnapshot.saropaProcessCount > 0) {
+          tooltipLines.push(
+            l10n('systemHealth.tooltip.saropaProcessCount', {
+              count: String(systemHealthSnapshot.saropaProcessCount),
+              size: formatBytes(systemHealthSnapshot.saropaRssBytes),
+            }),
+          );
+        }
+        tooltipLines.push(
           l10n('systemHealth.tooltip.daemonCount', { total: sTotal, orphaned: sOrphaned }),
         );
+        // Surface orphaned scan daemons — these leak memory after VS Code crashes.
+        const scanOrphans = systemHealthSnapshot.orphanedScanDaemonPids.length;
+        if (scanOrphans > 0) {
+          tooltipLines.push(
+            l10n('systemHealth.tooltip.scanDaemonOrphans', { count: String(scanOrphans) }),
+          );
+        }
         if (systemHealthLevel === HealthLevel.Warning) {
           tooltipLines.push(l10n('systemHealth.tooltip.warningHint'));
         } else if (systemHealthLevel === HealthLevel.Critical) {
@@ -1236,6 +1260,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     // Prompt the user to enable rule shedding if pressure is detected but
     // shed_rules is not set. Shows once per session — see the function doc.
     promptEnableShedRulesIfNeeded(state);
+    // Suspend the scan daemon when heavy shedding makes it pointless —
+    // its warm AnalysisContextCollection costs ~1 GB+ and the few
+    // remaining rules don't justify it. Resumes when pressure drops.
+    scanOnSaveController.onMemoryPressureChange(state?.shedLevel ?? 0);
   });
   const memWatchRoot = getProjectRoot();
   if (memWatchRoot) {

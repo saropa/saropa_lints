@@ -121,6 +121,17 @@ export function isDaemonProcess(p: DartProcessInfo): boolean {
   return /\bdaemon\b/.test(cmd);
 }
 
+/** True when the process is a saropa_lints scan daemon or CLI scan. */
+export function isSaropaProcess(p: DartProcessInfo): boolean {
+  const cmd = p.commandLine ?? '';
+  return cmd.includes('saropa_lints:scan_daemon') || cmd.includes('saropa_lints:scan');
+}
+
+/** True when the process is specifically the long-lived scan daemon. */
+export function isScanDaemonProcess(p: DartProcessInfo): boolean {
+  return (p.commandLine ?? '').includes('saropa_lints:scan_daemon');
+}
+
 export function killProcess(pid: number): Promise<boolean> {
   return new Promise((resolve) => {
     execFile(
@@ -136,17 +147,28 @@ export async function buildSnapshot(
   processes: DartProcessInfo[],
 ): Promise<DartProcessSnapshot> {
   let totalRss = 0;
+  let saropaRss = 0;
+  let saropaCount = 0;
   const orphanPids: number[] = [];
+  const orphanScanDaemonPids: number[] = [];
   let legitimateCount = 0;
 
   for (const p of processes) {
     totalRss += p.workingSetSize;
+    // Separate saropa_lints processes from system-wide dart totals.
+    if (isSaropaProcess(p)) {
+      saropaRss += p.workingSetSize;
+      saropaCount++;
+    }
   }
 
-  const daemons = processes.filter(isDaemonProcess);
+  // Flutter daemons + scan daemons both need orphan detection.
+  const flutterDaemons = processes.filter(isDaemonProcess);
+  const scanDaemons = processes.filter(isScanDaemonProcess);
 
   // Collect unique parent PIDs so each is queried only once.
-  const parentPids = [...new Set(daemons.map((d) => d.parentProcessId))];
+  const allOrphanCandidates = [...flutterDaemons, ...scanDaemons];
+  const parentPids = [...new Set(allOrphanCandidates.map((d) => d.parentProcessId))];
   const parentMap = new Map<number, MinimalProcess | undefined>();
   await Promise.all(
     parentPids.map(async (pid) => {
@@ -154,11 +176,19 @@ export async function buildSnapshot(
     }),
   );
 
-  for (const d of daemons) {
+  // Check Flutter daemon orphans (existing behavior).
+  for (const d of flutterDaemons) {
     if (isParentAlive(parentMap.get(d.parentProcessId), d.creationDate)) {
       legitimateCount++;
     } else {
       orphanPids.push(d.processId);
+    }
+  }
+
+  // Check scan daemon orphans — a VS Code crash leaves these running.
+  for (const d of scanDaemons) {
+    if (!isParentAlive(parentMap.get(d.parentProcessId), d.creationDate)) {
+      orphanScanDaemonPids.push(d.processId);
     }
   }
 
@@ -167,6 +197,9 @@ export async function buildSnapshot(
     processCount: processes.length,
     orphanedDaemonPids: orphanPids,
     legitimateDaemonCount: legitimateCount,
+    saropaRssBytes: saropaRss,
+    saropaProcessCount: saropaCount,
+    orphanedScanDaemonPids: orphanScanDaemonPids,
     timestamp: Date.now(),
   };
 }

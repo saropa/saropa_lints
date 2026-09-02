@@ -15,6 +15,12 @@ export interface DartProcessSnapshot {
   processCount: number;
   orphanedDaemonPids: number[];
   legitimateDaemonCount: number;
+  /** RSS from saropa_lints-spawned processes (scan daemon, CLI scans). */
+  saropaRssBytes: number;
+  /** Count of saropa_lints-spawned processes currently alive. */
+  saropaProcessCount: number;
+  /** Orphaned scan daemon PIDs (parent process no longer alive). */
+  orphanedScanDaemonPids: number[];
   timestamp: number;
 }
 

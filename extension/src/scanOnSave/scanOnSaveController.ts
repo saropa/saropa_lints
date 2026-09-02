@@ -101,6 +101,14 @@ export function groupDiagnosticsByFile(
   return byFile;
 }
 
+/**
+ * Shed level at or above which the scan daemon is suspended. At level 2+
+ * most rules are shed (expensive + INFO severity), so the daemon's warm
+ * AnalysisContextCollection costs more memory than the few remaining
+ * rules justify. The daemon auto-resumes when pressure drops below this.
+ */
+const DAEMON_SUSPEND_SHED_LEVEL = 2;
+
 export class ScanOnSaveController implements vscode.Disposable {
   private readonly _disposables: vscode.Disposable[] = [];
   private readonly _statusBarItem: vscode.StatusBarItem;
@@ -116,6 +124,8 @@ export class ScanOnSaveController implements vscode.Disposable {
   /** Last raw scan results per file — retained so severity toggles can
    *  re-filter without rescanning (no _pendingFiles to trigger a rescan). */
   private _lastDiagnosticsByFile = new Map<string, ScanOnSaveDiagnostic[]>();
+  /** True when the daemon has been suspended due to heavy memory pressure. */
+  private _daemonSuspended = false;
 
   constructor(
     private readonly _collection: vscode.DiagnosticCollection,
@@ -168,6 +178,26 @@ export class ScanOnSaveController implements vscode.Disposable {
     );
   }
 
+  /**
+   * Called when the memory-pressure state changes. Suspends the daemon when
+   * shedding is heavy (level 2+: most rules shed) to reclaim the ~1 GB
+   * AnalysisContextCollection it holds. Resumes when pressure drops.
+   */
+  onMemoryPressureChange(shedLevel: number): void {
+    const shouldSuspend = shedLevel >= DAEMON_SUSPEND_SHED_LEVEL;
+    if (shouldSuspend && !this._daemonSuspended) {
+      // Kill the daemon — its warm analyzer state is the dominant cost
+      // and the few remaining rules don't justify it.
+      this._daemonSuspended = true;
+      this._daemonManager.dispose();
+      console.log(`saropa_lints: scan daemon suspended (shed level ${shedLevel})`);
+    } else if (!shouldSuspend && this._daemonSuspended) {
+      // Pressure dropped — let the next save respawn the daemon.
+      this._daemonSuspended = false;
+      console.log('saropa_lints: scan daemon suspension lifted');
+    }
+  }
+
   /** Reads the master toggle from config and applies {@link scanOnSaveIsEnabled}. */
   private _isEnabled(): boolean {
     const cfg = vscode.workspace.getConfiguration('saropaLints');
@@ -218,7 +248,11 @@ export class ScanOnSaveController implements vscode.Disposable {
       // Resolved scans go through the persistent daemon — spawn-per-save
       // `scan --resolve` pays a fixed ~80s warmup per invocation. The
       // syntactic path stays spawn-per-save (fast, no warm state to keep).
-      const result = resolveTypes
+      // When the daemon is suspended due to memory pressure, fall back to
+      // the lightweight syntactic scan — better partial coverage than a
+      // multi-GB daemon holding memory while most rules are shed anyway.
+      const useDaemon = resolveTypes && !this._daemonSuspended;
+      const result = useDaemon
         ? await this._scanViaDaemon(root, files, tier)
         : await runScanOnSave(root, files, tier, false);
       if (result.errorMessage) {

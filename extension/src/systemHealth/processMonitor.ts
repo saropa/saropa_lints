@@ -34,7 +34,8 @@ export function classifyHealth(
   config: SystemHealthConfig,
 ): HealthLevel {
   const rssGB = snapshot.totalRssBytes / BYTES_PER_GB;
-  const orphans = snapshot.orphanedDaemonPids.length;
+  // Both Flutter daemon and scan daemon orphans count toward the threshold.
+  const orphans = snapshot.orphanedDaemonPids.length + snapshot.orphanedScanDaemonPids.length;
   if (rssGB >= config.criticalThresholdGB || orphans >= config.criticalOrphanCount) {
     return HealthLevel.Critical;
   }
@@ -107,7 +108,9 @@ export class ProcessMonitor implements vscode.Disposable {
     this.lastNotificationTime = now;
 
     const size = formatBytes(snapshot.totalRssBytes);
-    const orphaned = String(snapshot.orphanedDaemonPids.length);
+    // Include both Flutter daemon and scan daemon orphans in the count.
+    const totalOrphans = snapshot.orphanedDaemonPids.length + snapshot.orphanedScanDaemonPids.length;
+    const orphaned = String(totalOrphans);
     const msg = l10n('systemHealth.notification.critical', { size, orphaned });
     const cleanUp = l10n('systemHealth.action.cleanUp');
     const optimize = l10n('systemHealth.action.optimizeAnalysis');

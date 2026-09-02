@@ -60,7 +60,7 @@ export class HealthPanel implements vscode.Disposable {
     const snapshot = await buildSnapshot(processes);
     return {
       processes,
-      orphanPids: new Set(snapshot.orphanedDaemonPids),
+      orphanPids: new Set([...snapshot.orphanedDaemonPids, ...snapshot.orphanedScanDaemonPids]),
       totalRssBytes: snapshot.totalRssBytes,
     };
   }

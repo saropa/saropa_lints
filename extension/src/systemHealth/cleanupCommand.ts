@@ -13,14 +13,18 @@ export function registerCleanupCommand(
         const processes = await queryDartProcesses();
         const snapshot = await buildSnapshot(processes);
 
-        if (snapshot.orphanedDaemonPids.length === 0) {
+        // Combine Flutter daemon and scan daemon orphans into one cleanup.
+        const pids = [
+          ...snapshot.orphanedDaemonPids,
+          ...snapshot.orphanedScanDaemonPids,
+        ];
+        if (pids.length === 0) {
           void vscode.window.showInformationMessage(
             l10n('systemHealth.cleanup.noOrphans'),
           );
           return;
         }
 
-        const pids = snapshot.orphanedDaemonPids;
         const size = formatBytes(snapshot.totalRssBytes);
         const count = String(pids.length);
 

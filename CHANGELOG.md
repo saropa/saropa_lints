@@ -66,6 +66,25 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.2.9] — Unreleased
+
+The system health monitor now separates memory used by Saropa Lints from the total across all Dart processes, so users can see the real footprint instead of being blamed for the entire analysis server. The scan daemon auto-suspends under heavy memory pressure to reclaim its analyzer cache, and orphaned scan daemons are now detected and cleaned up alongside Flutter daemons. [log](https://github.com/saropa/saropa_lints/blob/v15.2.9/CHANGELOG.md)
+
+### Added
+
+- Status bar tooltip now shows Saropa Lints process count and memory separately from the system-wide Dart total — no more blaming the extension for the entire analysis server. No action required.
+- Scan daemon auto-suspends when memory-pressure shedding reaches level 2+ (most rules shed), reclaiming the daemon's warm analyzer cache; resumes automatically when pressure drops. No action required.
+- Orphaned scan daemon detection — scan daemons left running after a VS Code crash are now identified and included in the Clean Up command alongside Flutter daemons. No action required.
+- Health panel marks Saropa Lints processes with a "Saropa" type pill so they are visually distinct from analysis servers and other Dart processes. No action required.
+
+### Fixed
+
+- Fixed double-unescape vulnerability in pub.dev changelog entity decoder — `&amp;lt;` was incorrectly decoded to `<` instead of the literal `&lt;` (CodeQL #19, CWE-116).
+- Fixed case-insensitive script-tag matching in snapshot harness so upper-case `<SCRIPT>` tags are normalized correctly (CodeQL #20).
+- Status bar warning/critical suffix now shows Saropa Lints RSS when available instead of the misleading system-wide total. No action required.
+
+---
+
 ## [15.2.8]
 
 Rule shedding under memory pressure is now cost-aware — expensive rules that drive the most memory consumption are shed first, keeping cheap syntactic rules running longer. The Config Dashboard surfaces which rules are currently shed and why, and the status bar tooltip shows shed category breakdowns. [log](https://github.com/saropa/saropa_lints/blob/v15.2.8/CHANGELOG.md)
