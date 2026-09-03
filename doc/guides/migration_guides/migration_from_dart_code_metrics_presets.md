@@ -178,7 +178,7 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `use-then-answer` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_use_then_answer.md). |
+| `use-then-answer` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_use_then_answer.md). |
 | `pass-mock-object` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_pass_mock_object.md). |
 | `avoid-implementation-in-mocks` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_implementation_in_mocks.md). |
 | `prefer-correct-any-matcher` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_correct_any_matcher.md). |

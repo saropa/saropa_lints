@@ -138,7 +138,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 
 | DCM Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `add-static-field` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_infra_add_static_field_code_assist.md) |
+| `add-static-field` | TODO | TODO — see [proposal](../../../plans/declined/proposal_infra_add_static_field_code_assist.md) |
 | `arguments-ordering` | HAVE | `prefer_arguments_ordering` |
 | `avoid-accessing-collections-by-constant-index` | HAVE | `avoid_accessing_collections_by_constant_index` |
 | `avoid-accessing-other-classes-private-members` | HAVE | `avoid_accessing_other_classes_private_members` |
@@ -252,7 +252,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-nested-switch-expressions` | HAVE | `avoid_nested_switch_expressions` |
 | `avoid-nested-switches` | HAVE | `avoid_nested_switches` |
 | `avoid-nested-try-statements` | HAVE | `avoid_nested_try_statements` |
-| `avoid-never-passed-parameters` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_infra_avoid_never_passed_parameters.md) |
+| `avoid-never-passed-parameters` | TODO | TODO — see [proposal](../../../plans/declined/proposal_infra_avoid_never_passed_parameters.md) |
 | `avoid-non-ascii-symbols` | HAVE | `avoid_non_ascii_symbols` |
 | `avoid-non-empty-constructor-bodies` | HAVE | `avoid_non_empty_constructor_bodies` |
 | `avoid-non-final-exception-class-fields` | HAVE | `avoid_non_final_exception_class_fields` |
@@ -347,7 +347,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-unused-assignment` | HAVE | `avoid_unused_assignment` |
 | `avoid-unused-generics` | HAVE | `avoid_unused_generics` |
 | `avoid-unused-instances` | HAVE | `avoid_unused_instances` |
-| `avoid-unused-local-variable` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_infra_avoid_unused_local_variable_na.md) |
+| `avoid-unused-local-variable` | TODO | TODO — see [proposal](../../../plans/declined/proposal_infra_avoid_unused_local_variable_na.md) |
 | `avoid-unused-parameters` | HAVE | `avoid_unused_parameters` |
 | `avoid-weak-cryptographic-algorithms` | HAVE | `avoid_weak_cryptographic_algorithms` |
 | `avoid-wildcard-cases-with-enums` | HAVE | `avoid_wildcard_cases_with_enums` |
@@ -423,7 +423,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `prefer-correct-handler-name` | HAVE | `prefer_correct_handler_name` |
 | `prefer-correct-identifier-length` | HAVE | `prefer_correct_identifier_length` |
 | `prefer-correct-json-casts` | HAVE | `prefer_correct_json_casts` |
-| `prefer-correct-mutated` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_infra_prefer_correct_mutated_na.md) |
+| `prefer-correct-mutated` | TODO | TODO — see [proposal](../../../plans/declined/proposal_infra_prefer_correct_mutated_na.md) |
 | `prefer-correct-setter-parameter-name` | HAVE | `prefer_correct_setter_parameter_name` |
 | `prefer-correct-stream-return-type` | HAVE | `prefer_correct_stream_return_type` |
 | `prefer-correct-switch-length` | HAVE | `prefer_correct_switch_length` |
@@ -501,7 +501,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 
 | DCM Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `add-copy-with` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_infra_add_copy_with_code_assist.md) |
+| `add-copy-with` | TODO | TODO — see [proposal](../../../plans/declined/proposal_infra_add_copy_with_code_assist.md) |
 | `always-pass-global-key` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_require_global_key_for_widget.md) |
 | `always-remove-listener` | HAVE | `always_remove_listener` |
 | `avoid-border-all` | HAVE | `avoid_border_all` |
@@ -547,7 +547,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `prefer-compute-over-isolate-run` | HAVE | `prefer_compute_over_isolate_run` |
 | `prefer-const-border-radius` | HAVE | `prefer_const_border_radius` |
 | `prefer-constrained-box-over-container` | HAVE | `prefer_constrained_box_over_container` |
-| `prefer-container` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_prefer_container.md) |
+| `prefer-container` | TODO | TODO — see [proposal](../../../plans/declined/proposal_prefer_container.md) |
 | `prefer-correct-edge-insets-constructor` | HAVE | `prefer_correct_edge_insets_constructor` |
 | `prefer-correct-static-icon-provider` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_correct_static_icon_provider.md) |
 | `prefer-dedicated-media-query-methods` | PARTIAL | `avoid_deprecated_use_inherited_media_query` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_deprecated_use_inherited_media_query_dcm_parity.md) |

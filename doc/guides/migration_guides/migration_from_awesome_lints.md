@@ -97,7 +97,7 @@ Coverage: 128 rules — 110 HAVE (85%), 7 PARTIAL, 11 TODO (8%)
 | `arguments_ordering` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_arguments_ordering.md) |
 | `avoid_accessing_collections_by_constant_index` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_accessing_collections_by_constant_index.md) |
 | `avoid_accessing_other_classes_private_members` | HAVE | `avoid_accessing_other_classes_private_members` |
-| `avoid_adjacent_strings` | TODO | TODO — saropa's `prefer_adjacent_strings` enforces the opposite convention — see [proposal](../../../bugs/declined/proposal_avoid_adjacent_strings.md) |
+| `avoid_adjacent_strings` | TODO | TODO — saropa's `prefer_adjacent_strings` enforces the opposite convention — see [proposal](../../../plans/declined/proposal_avoid_adjacent_strings.md) |
 | `avoid_always_null_parameters` | HAVE | `avoid_always_null_parameters` |
 | `avoid_assigning_to_static_field` | HAVE | `avoid_assigning_to_static_field` |
 | `avoid_assignments_as_conditions` | HAVE | `avoid_assignments_as_conditions` |
@@ -180,11 +180,11 @@ Coverage: 128 rules — 110 HAVE (85%), 7 PARTIAL, 11 TODO (8%)
 | `pass_existing_stream_to_stream_builder` | HAVE | `pass_existing_stream_to_stream_builder` |
 | `prefer_action_button_tooltip` | HAVE | `prefer_action_button_tooltip` |
 | `prefer_align_over_container` | HAVE | `prefer_align_over_container` |
-| `prefer_async_callback` | TODO | TODO — saropa has the opposite rule, `prefer_future_void_function_over_async_callback` — see [proposal](../../../bugs/declined/proposal_prefer_async_callback.md) |
+| `prefer_async_callback` | TODO | TODO — saropa has the opposite rule, `prefer_future_void_function_over_async_callback` — see [proposal](../../../plans/declined/proposal_prefer_async_callback.md) |
 | `prefer_center_over_align` | HAVE | `prefer_center_over_align` |
 | `prefer_compute_over_isolate_run` | HAVE | `prefer_compute_over_isolate_run` |
 | `prefer_constrained_box_over_container` | HAVE | `prefer_constrained_box_over_container` |
-| `prefer_container` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_prefer_container.md) |
+| `prefer_container` | TODO | TODO — see [proposal](../../../plans/declined/proposal_prefer_container.md) |
 | `prefer_dedicated_media_query_methods` | PARTIAL | `avoid_deprecated_use_inherited_media_query` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_deprecated_use_inherited_media_query_dcm_parity.md) |
 | `prefer_for_loop_in_children` | HAVE | `prefer_for_loop_in_children` |
 | `prefer_padding_over_container` | HAVE | `prefer_padding_over_container` |

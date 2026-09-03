@@ -53,10 +53,10 @@ Coverage: 9 rules — 3 PARTIAL, 6 TODO (66%)
 | `must_use_outcome` | PARTIAL | `avoid_ignoring_return_values` — flags any discarded return value generically, not specifically an `Outcome` monad type |
 | `must_await_all_futures` | PARTIAL | `avoid_unawaited_future` — fires generally; theirs is annotation-scoped (`@mustAwaitAllFutures`) with a separate error-severity tier |
 | `must_handle_return` | PARTIAL | `avoid_ignoring_return_values` / `missing_use_result_annotation` — same generic-discard concept, not annotation-driven with two severity tiers |
-| `no_future_outcome_type` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_no_future_outcome_type.md) |
+| `no_future_outcome_type` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_no_future_outcome_type.md) |
 | `must_be_anonymous` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_must_be_anonymous.md) |
 | `must_be_strong_ref` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_must_be_strong_ref.md) |
-| `no_futures` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_no_futures.md) |
+| `no_futures` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_no_futures.md) |
 | `must_use_unsafe_wrapper` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_must_use_unsafe_wrapper.md) |
 | `sendable` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_sendable.md) |
 

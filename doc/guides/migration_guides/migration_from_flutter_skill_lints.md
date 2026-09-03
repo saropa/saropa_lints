@@ -85,10 +85,10 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 | `avoid_unassigned_local_variable` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_unassigned_late_fields_dcm_parity.md) |
 | `avoid_unnecessary_parentheses` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_unnecessary_parentheses.md) |
 | `avoid_unnecessary_safe_area` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_unnecessary_safe_area.md) |
-| `avoid_unused_local_variable` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_infra_avoid_unused_local_variable_na.md) |
+| `avoid_unused_local_variable` | TODO | TODO — see [proposal](../../../plans/declined/proposal_infra_avoid_unused_local_variable_na.md) |
 | `keep_state_below_its_widget` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_state_class_below_widget.md) |
 | `pass_mock_object` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_pass_mock_object.md) |
-| `prefer_container` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_prefer_container.md) |
+| `prefer_container` | TODO | TODO — see [proposal](../../../plans/declined/proposal_prefer_container.md) |
 | `prefer_correct_any_matcher` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_correct_any_matcher.md) |
 | `prefer_correct_static_icon_provider` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_correct_static_icon_provider.md) |
 | `prefer_publish_to_none` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_publish_to_none.md) |
@@ -99,7 +99,7 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 | `use_local_notifications_exact_alarm_permission_api` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_use_local_notifications_exact_alarm_permission_api.md) |
 | `use_notifier_suffix` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_riverpod_notifier_suffix.md) |
 | `use_on_reorder_item_index_semantics` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_use_on_reorder_item_index_semantics.md) |
-| `use_then_answer` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_use_then_answer.md) |
+| `use_then_answer` | TODO | TODO — see [proposal](../../../plans/deferred/fpdart/proposal_use_then_answer.md) |
 
 ### Partial (7 rules)
 

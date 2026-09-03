@@ -51,9 +51,9 @@ Coverage: 3 rules — 3 TODO (100%)
 | architecture_linter Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | Banned-layer-import check (dynamic, one lint per configured layer pair) | PARTIAL | `avoid_ui_in_domain_layer` / `avoid_direct_data_access_in_ui` — fixed UI/domain/data rules, not a generic user-configurable N-layer engine |
-| `architecture_linter_config_file_error` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_architecture_linter_config_file_error.md) (tool self-diagnostic, not a code-quality rule) |
-| `architecture_linter_layers_not_found` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_architecture_linter_layers_not_found.md) (tool self-diagnostic, not a code-quality rule) |
-| `architecture_linter_banned_imports_not_found` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_architecture_linter_banned_imports_not_found.md) (tool self-diagnostic, not a code-quality rule) |
+| `architecture_linter_config_file_error` | TODO | TODO — see [proposal](../../../plans/declined/proposal_architecture_linter_config_file_error.md) (tool self-diagnostic, not a code-quality rule) |
+| `architecture_linter_layers_not_found` | TODO | TODO — see [proposal](../../../plans/declined/proposal_architecture_linter_layers_not_found.md) (tool self-diagnostic, not a code-quality rule) |
+| `architecture_linter_banned_imports_not_found` | TODO | TODO — see [proposal](../../../plans/declined/proposal_architecture_linter_banned_imports_not_found.md) (tool self-diagnostic, not a code-quality rule) |
 
 The three `TODO` rows are meta-diagnostics for `architecture_linter`'s own config file, not comparable code-quality checks — there is nothing for saropa_lints to reproduce.
 

@@ -52,8 +52,8 @@ Coverage: 31 rules — 9 HAVE (29%), 5 PARTIAL, 17 TODO (54%)
 
 | essential_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `alphabetize_arguments` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_alphabetize_arguments.md) |
-| `alphabetize_enum_constants` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_alphabetize_enum_constants.md) |
+| `alphabetize_arguments` | TODO | TODO — see [proposal](../../../plans/declined/proposal_alphabetize_arguments.md) |
+| `alphabetize_enum_constants` | TODO | TODO — see [proposal](../../../plans/declined/proposal_alphabetize_enum_constants.md) |
 | `ambiguous_positional_boolean` | HAVE | `avoid_positional_boolean_parameters_with_fix` |
 | `boolean_assignment` | HAVE | `avoid_assignments_as_conditions` |
 | `border_all` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_border_all.md) |
@@ -82,7 +82,7 @@ Coverage: 31 rules — 9 HAVE (29%), 5 PARTIAL, 17 TODO (54%)
 | `subtype_naming` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_subtype_naming.md) |
 | `unnecessary_setstate` | PARTIAL | `avoid_empty_setstate` — only catches empty-callback-body, not the broader "assigns the same value" no-op case |
 | `useless_else` | HAVE | `avoid_redundant_else` |
-| `variable_shadowing` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_variable_shadowing.md) |
+| `variable_shadowing` | TODO | TODO — see [proposal](../../../plans/declined/proposal_variable_shadowing.md) |
 
 ## Suppressing Rules
 

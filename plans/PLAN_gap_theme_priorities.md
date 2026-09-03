@@ -1,9 +1,10 @@
 # Gap Theme Build Priorities
 
 Source: `plans/GAP_ANALYSIS.md` § Gap Themes (14 themes, compiled 2026-09-02). Every individual rule
-named in each theme already has a proposal filed in `bugs/*/proposal_*.md` (336 total, see
-`CHANGELOG.md`); this document ranks the *themes* so implementation work has a build order instead of
-336 files spread across 6 tier folders.
+named in each theme already has a proposal filed (336 total, see `CHANGELOG.md`): 287 buildable
+proposals under `bugs/*/proposal_*.md` (tier_1/2/3/5), 22 rejected under `plans/declined/`, and 27
+parked under `plans/deferred/fpdart/` pending product sign-off. This document ranks the *themes* so
+implementation work has a build order instead of 336 unordered files.
 
 Ranking factors: gap size (rule count), implementation effort (incremental vs. new infrastructure),
 and value (how commonly the affected package/pattern shows up in real Flutter projects).
@@ -70,5 +71,6 @@ and value (how commonly the affected package/pattern shows up in real Flutter pr
 ## Cross-reference
 
 Every rule in this document has a filed proposal — see `doc/guides/migration_guides/README.md` for the
-per-package migration guides and `bugs/*/proposal_*.md` for implementation-ready specs. This document adds
-the ordering; it does not duplicate the per-rule detail already in the proposals.
+per-package migration guides and `bugs/*/proposal_*.md` (buildable), `plans/declined/` (rejected), or
+`plans/deferred/fpdart/` (parked) for implementation-ready specs. This document adds the ordering; it
+does not duplicate the per-rule detail already in the proposals.

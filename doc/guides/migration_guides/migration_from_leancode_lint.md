@@ -85,7 +85,7 @@ Coverage: 23 rules — 9 HAVE (39%), 5 PARTIAL, 9 TODO (39%)
 |---|---|---|
 | `add_cubit_suffix_for_your_cubits` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_add_cubit_suffix_for_your_cubits.md) |
 | `avoid_build_context_in_blocs` | HAVE | `avoid_passing_build_context_to_blocs` |
-| `avoid_catch_error` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_avoid_catch_error.md). saropa's `prefer_then_catcherror` recommends the opposite pattern (a documented philosophical conflict, not a gap) |
+| `avoid_catch_error` | TODO | TODO — see [proposal](../../../plans/declined/proposal_avoid_catch_error.md). saropa's `prefer_then_catcherror` recommends the opposite pattern (a documented philosophical conflict, not a gap) |
 | `avoid_conditional_hooks` | HAVE | `avoid_conditional_hooks` |
 | `avoid_context_read_in_build` | PARTIAL | `avoid_provider_in_init_state` / `prefer_context_read_in_callbacks` — saropa has initState-only and callbacks-only variants, none covers general `context.read` during `build()` |
 | `avoid_direct_collection_equality_checks` | HAVE | `avoid_collection_equality_checks` |

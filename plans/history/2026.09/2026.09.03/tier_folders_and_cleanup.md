@@ -16,7 +16,7 @@ correct tiers, leaving 74 genuinely high-value proposals.
 - **plans/PLAN_open_legacy_tasks.md** — open count 37 → 32; 5 legacy rules
   annotated as RESOLVED or NEEDS DECISION.
 - **7 declined proposals** — internal `Status:` header flipped from Open to
-  Declined to match their `bugs/declined/` folder placement.
+  Declined to match their `plans/declined/` folder placement.
 - **`avoid_connectivity_ui_decisions`** — deliberately left `Status: Open` in
   `tier_1_quick_wins/`; its Existing Coverage section argues it is a genuine
   narrowing of `avoid_connectivity_equals_internet`, not a duplicate. Flagged as
