@@ -52,10 +52,11 @@ class SuggestTestDescriptionFix extends SaropaFixProducer {
     'isa': 'return correct type for',
     'matches': 'match pattern for',
     // Widget test matchers
-    'findsonewidge': 'find widget for',
+    'findsonewidget': 'find widget for',
     'findsnothing': 'find nothing for',
     'findswidgets': 'find widgets for',
-    'findsatleastne': 'find at least one widget for',
+    'findsnwidgets': 'find N widgets for',
+    'findsatleastonewidget': 'find at least one widget for',
   };
 
   @override
