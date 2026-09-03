@@ -22,13 +22,22 @@ describe('escapeJsonStringForScriptBlock', () => {
 
     it('escapes U+2028 line separator', () => {
         // U+2028 is legal in JSON but illegal in a JS string literal (pre-ES2019).
-        const json = '{"text":"line break"}';
-        assert.ok(!escapeJsonStringForScriptBlock(json).includes(' '));
+        // Use String.fromCharCode so the char is explicit, not an invisible literal
+        // that editors may normalize or strip.
+        const ls = String.fromCharCode(0x2028);
+        const json = `{"text":"line${ls}break"}`;
+        const result = escapeJsonStringForScriptBlock(json);
+        assert.ok(!result.includes(ls), 'U+2028 should be escaped');
+        assert.ok(result.includes('\\u2028'), 'U+2028 should become \\u2028');
     });
 
     it('escapes U+2029 paragraph separator', () => {
-        const json = '{"text":"para break"}';
-        assert.ok(!escapeJsonStringForScriptBlock(json).includes(' '));
+        // Same rationale as U+2028 — explicit char construction.
+        const ps = String.fromCharCode(0x2029);
+        const json = `{"text":"para${ps}break"}`;
+        const result = escapeJsonStringForScriptBlock(json);
+        assert.ok(!result.includes(ps), 'U+2029 should be escaped');
+        assert.ok(result.includes('\\u2029'), 'U+2029 should become \\u2029');
     });
 
     it('passes through safe JSON unchanged', () => {

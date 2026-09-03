@@ -77,6 +77,23 @@ export function buildAuditReportHtml(
   ctx: AuditReportRenderContext,
 ): string {
   const diagnostics = (auditJson['diagnostics'] ?? []) as AuditDiagnostic[];
+
+  // Cheap sanity check: the pre-serialized string must represent a non-empty
+  // array when diagnostics has items (and vice versa). A full JSON.parse
+  // would defeat the performance goal, but checking for "[]" catches the most
+  // likely divergence — a stale empty serialization paired with a populated
+  // auditJson, or vice versa.
+  if (ctx.serializedDiagnostics) {
+    const serializedIsEmpty = ctx.serializedDiagnostics === '[]';
+    const objectIsEmpty = diagnostics.length === 0;
+    if (serializedIsEmpty !== objectIsEmpty) {
+      console.error(
+        `[buildAuditReportHtml] serializedDiagnostics empty=${serializedIsEmpty} but ` +
+        `diagnostics.length=${diagnostics.length} — sources of truth diverged`,
+      );
+    }
+  }
+
   const timestamp = (auditJson['timestamp'] as string) ?? '';
   const summary = auditJson['summary'] as Record<string, unknown> | undefined;
   const totalCount = (summary?.['totalCount'] as number) ?? diagnostics.length;
