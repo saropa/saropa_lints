@@ -59,9 +59,18 @@ List<String> _parseEnabledListForKey(String content, String key) {
   return const [];
 }
 
+/// Counts leading whitespace (spaces and tabs).
+///
+/// YAML spec forbids tabs for indentation, but real-world files use them.
+/// Counting only spaces broke block detection on tab-indented content —
+/// both header and children computed indent=0, collapsing the hierarchy.
+/// Matches the `_leadingWhitespace()` helper in `runtime_tier_cap.dart`.
 int _leadingSpaces(String value) {
   var count = 0;
-  while (count < value.length && value.codeUnitAt(count) == 32) {
+  while (count < value.length) {
+    final c = value.codeUnitAt(count);
+    // ASCII space (32) or tab (9).
+    if (c != 32 && c != 9) break;
     count++;
   }
   return count;

@@ -22,10 +22,11 @@ import 'package:saropa_lints/src/init/custom_overrides_core.dart'
 /// Scalar keys that were moved from the plugin block to the custom file.
 const _migrateKeys = <String>{'log_level', 'lane', 'memory_mode'};
 
-/// Pattern matching the indented `rule_packs:` block (with `enabled:` list)
-/// inside the plugin block. Used to remove it from analysis_options.yaml.
+/// Pattern matching the indented `rule_packs:` block (with optional `enabled:`
+/// list and optional trailing comment on the key line) inside the plugin block.
+/// Used to remove it from analysis_options.yaml after migration.
 final _pluginRulePacksBlock = RegExp(
-  r'^[ \t]+rule_packs:\s*\n(?:[ \t]+enabled:\s*\n)?(?:[ \t]+-\s+\S+.*\n|[ \t]+#[^\n]*\n|[ \t]*\n)*',
+  r'^[ \t]+rule_packs:\s*(?:#[^\n]*)?\n(?:[ \t]+enabled:\s*(?:#[^\n]*)?\n)?(?:[ \t]+-\s+\S+.*\n|[ \t]+#[^\n]*\n|[ \t]*\n)*',
   multiLine: true,
 );
 
@@ -65,7 +66,14 @@ void main(List<String> args) {
   // --- Nested key: rule_packs ---
   final rulePackIds = parseRulePacksEnabledList(mainContent);
 
-  if (found.isEmpty && rulePackIds.isEmpty) {
+  // Detect orphan `rule_packs:` in the plugin block even when `enabled:` is
+  // missing or empty — the bare key still triggers `unsupported_option`.
+  final hasRulePacksKeyInPluginBlock = RegExp(
+    r'^[ \t]+rule_packs:\s*(?:#[^\n]*)?$',
+    multiLine: true,
+  ).hasMatch(mainContent);
+
+  if (found.isEmpty && rulePackIds.isEmpty && !hasRulePacksKeyInPluginBlock) {
     print('Nothing to migrate — no legacy config keys found under '
         'plugins > saropa_lints:');
     return;
@@ -108,9 +116,10 @@ void main(List<String> args) {
   }
 
   // Migrate rule_packs: write to custom file, remove from main file.
-  // Always remove from the legacy block even when skipped, to eliminate
-  // the unsupported_option warning.
-  var hasLegacyRulePacks = rulePackIds.isNotEmpty;
+  // Always remove from the legacy block even when skipped or empty, to
+  // eliminate the unsupported_option warning. An orphan `rule_packs:` key
+  // (without `enabled:` or items) still triggers the SDK warning.
+  var hasLegacyRulePacks = hasRulePacksKeyInPluginBlock;
   if (rulePackIds.isNotEmpty) {
     // Check if rule_packs already exists in the custom file — reuse the
     // in-memory content (may have been updated with scalar keys above).

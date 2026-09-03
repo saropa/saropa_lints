@@ -22,6 +22,7 @@
 ///   impact-report   Run lint analysis and display results by impact level
 ///   scan            Run lint rules against any Dart project
 ///   migrate-config  Move log_level/lane/memory_mode to analysis_options_custom.yaml
+///   doctor          Check project configuration for common issues
 ///   memory-report   Summarize the analysis server's RSS trend from plugin.log
 ///
 /// Examples:
@@ -36,6 +37,7 @@ import 'package:collection/collection.dart';
 
 import 'audit.dart' as audit_cmd;
 import 'baseline.dart' as baseline_cmd;
+import 'doctor.dart' as doctor_cmd;
 import 'init.dart' as init_cmd;
 import 'memory_report.dart' as memory_report_cmd;
 import 'migrate_config.dart' as migrate_config_cmd;
@@ -72,6 +74,9 @@ Future<void> main(List<String> args) async {
     case 'migrate-config' || 'migrate_config':
       // migrate_config.main is synchronous — no await needed
       migrate_config_cmd.main(commandArgs);
+    case 'doctor':
+      // doctor.main is synchronous — no await needed
+      doctor_cmd.main(commandArgs);
     case 'memory-report' || 'memory_report':
       // memory_report.main is synchronous — no await needed
       memory_report_cmd.main(commandArgs);
@@ -94,6 +99,7 @@ void _printUsage() {
   print('  baseline        Generate/manage baseline for existing violations');
   print('  severity-report Run analysis and show results grouped by severity');
   print('  scan            Run configured lint rules against any Dart project');
+  print('  doctor          Check project configuration for common issues');
   print('  memory-report   Summarize analysis server RSS trend from plugin.log');
   print('');
   print('Options:');

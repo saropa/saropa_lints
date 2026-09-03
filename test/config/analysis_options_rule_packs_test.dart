@@ -70,6 +70,31 @@ plugins:
       expect(parseRulePacksEnabledList(yaml), ['riverpod', 'drift']);
     });
 
+    test('parses tab-indented blocks', () {
+      // Real-world files sometimes use tabs despite YAML spec forbidding them.
+      // The parser must count tabs as indentation, not treat them as zero-width.
+      const yaml = 'plugins:\n'
+          '\tsaropa_lints:\n'
+          '\t\trule_packs:\n'
+          '\t\t\tenabled:\n'
+          '\t\t\t\t- riverpod\n'
+          '\t\t\t\t- drift\n';
+      expect(parseRulePacksEnabledList(yaml), ['riverpod', 'drift']);
+    });
+
+    test('returns empty for orphan rule_packs key without enabled', () {
+      // A bare `rule_packs:` with no children should not crash — just
+      // return empty, so migrate-config can still remove the orphan key.
+      const yaml = '''
+plugins:
+  saropa_lints:
+    rule_packs:
+    diagnostics:
+      x: true
+''';
+      expect(parseRulePacksEnabledList(yaml), isEmpty);
+    });
+
     test('ignores blank lines and comment rows inside enabled block', () {
       const yaml = '''
 plugins:

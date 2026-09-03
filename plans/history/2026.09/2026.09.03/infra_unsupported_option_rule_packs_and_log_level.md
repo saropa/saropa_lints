@@ -95,3 +95,23 @@ Investigation confirmed the fix was already fully implemented across the codebas
 The bug report was filed based on warnings still visible in `saropa_drift_advisor`, which had not yet run the migration. No code changes were required in saropa_lints — the consumer project needs `dart run saropa_lints migrate-config`.
 
 The CHANGELOG heading for `[15.2.12]` was missing the required `— Unreleased` suffix; corrected as part of this task.
+
+### Hardening (2026-09-03)
+
+Three robustness gaps were fixed in the config migration infrastructure:
+
+1. **Tab indentation support** (`analysis_options_rule_packs.dart`): `_leadingSpaces()` now counts both spaces and tabs, matching the `_leadingWhitespace()` helper in `runtime_tier_cap.dart`. Previously, tab-indented YAML files caused all lines to compute indent=0, breaking block detection silently.
+
+2. **Orphan `rule_packs:` removal** (`migrate_config.dart`): `hasLegacyRulePacks` is now set based on whether the key exists in the plugin block (regex check), not just whether `parseRulePacksEnabledList()` returned items. A bare `rule_packs:` without `enabled:` or list items was previously left in the main file after migration.
+
+3. **Trailing comment handling** (`migrate_config.dart`): The `_pluginRulePacksBlock` removal regex now accepts optional trailing comments on `rule_packs:` and `enabled:` key lines (e.g. `rule_packs: # my packs`).
+
+### Doctor command (2026-09-03)
+
+New `dart run saropa_lints doctor [directory]` CLI command scans a consumer project's configuration for:
+- Keys misplaced under `plugins:` that belong in `analysis_options_custom.yaml`
+- Missing `analysis_options_custom.yaml`
+- Missing `saropa_lints` plugin entry
+- Missing version constraint
+
+Prints a numbered issue list with fix suggestions. Registered in the unified CLI router (`bin/saropa_lints.dart`).
