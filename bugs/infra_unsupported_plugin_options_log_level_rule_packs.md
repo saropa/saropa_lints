@@ -1,6 +1,6 @@
 # BUG: unsupported plugin options `log_level` and `rule_packs`
 
-**Status: Open**
+**Status: Fixed**
 
 <!-- Status values: Open -> Investigating -> Fix Ready -> Closed -->
 
@@ -177,17 +177,27 @@ N/A — infrastructure bug, not a rule detection issue. No rule fixture applies.
 
 ## Changes Made
 
-<!-- Fill in when a fix is written. -->
-
-(none yet)
+- **Auto-migration at plugin load time** (`lib/src/native/config_loader.dart`):
+  added `_autoMigrateLegacyPluginKeys()` that detects `log_level`, `lane`,
+  `memory_mode`, and `rule_packs` under `plugins > saropa_lints:` in
+  `analysis_options.yaml`, moves them to top-level keys in
+  `analysis_options_custom.yaml` (if not already present), and strips them
+  from the plugin block. Runs once per session (guard flag). Best-effort —
+  failures are logged, never thrown.
+- The Dart analyzer re-validates the file after the write, so
+  `unsupported_option` warnings clear automatically on the next analysis
+  pass (typically within seconds in an IDE).
+- The existing `dart run saropa_lints migrate-config` CLI command and the
+  deprecation-fallback reader remain as alternative/manual paths.
 
 ---
 
 ## Tests Added
 
-<!-- Fill in when a fix is written. -->
-
-(none yet)
+- `test/native/config_loader_auto_migrate_test.dart` — 6 tests covering:
+  scalar key migration, multiple keys, rule_packs block migration, skip
+  when already present in custom file, no-op when no legacy keys, and
+  guard-flag one-shot behavior.
 
 ---
 

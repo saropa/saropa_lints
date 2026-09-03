@@ -41,6 +41,7 @@ import '../config/runtime_tier_cap.dart';
 import '../report/diagnostic_statistics.dart';
 import '../saropa_lint_rule.dart' show ProgressTracker, SaropaLintRule;
 import 'plugin_logger.dart' show PluginLogLevel, PluginLogger;
+import '../init/custom_overrides_core.dart' show writeRulePacksToCustomFile;
 import 'package:saropa_lints/src/string_slice_utils.dart';
 
 /// Loads all plugin configuration from yaml and environment variables.
@@ -143,6 +144,11 @@ void _loadFromRoot(String? projectRoot) {
         return;
       }
     }
+
+    // Auto-migrate legacy keys (log_level, lane, memory_mode, rule_packs)
+    // from the plugin block to analysis_options_custom.yaml. Runs once per
+    // session; eliminates unsupported_option warnings without user action.
+    _autoMigrateLegacyPluginKeys(mainOptions, projectRoot);
 
     final content = _readProjectFile(
       'analysis_options_custom.yaml',
@@ -964,5 +970,150 @@ void _loadOutputConfig(String? content) {
         outputGroup.toLowerCase() == 'file') {
       ProgressTracker.setFileOnly(fileOnly: true);
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Auto-migration: strip legacy keys from the plugins block
+// ---------------------------------------------------------------------------
+
+/// Guard flag — the auto-migration runs at most once per plugin session.
+/// Prevents repeated file writes if [_loadFromRoot] is called multiple times
+/// (e.g. initial load then project-root reload).
+bool _legacyKeysMigrated = false;
+
+/// Resets the auto-migration guard so tests can run multiple scenarios.
+void resetLegacyMigrationForTesting() {
+  _legacyKeysMigrated = false;
+}
+
+/// Scalar keys that belong in `analysis_options_custom.yaml` (top-level) but
+/// may still be under `plugins > saropa_lints:` in old consumer configs.
+const _legacyScalarKeys = <String>{'log_level', 'lane', 'memory_mode'};
+
+/// Auto-migrates `log_level`, `lane`, `memory_mode`, and `rule_packs` from
+/// the `plugins > saropa_lints:` block in `analysis_options.yaml` to
+/// top-level keys in `analysis_options_custom.yaml`.
+///
+/// Runs once per session. Eliminates the Dart SDK's `unsupported_option`
+/// warnings that break `flutter analyze --fatal-warnings` without requiring
+/// the consumer to run `dart run saropa_lints migrate-config` manually.
+///
+/// The Dart analyzer validates plugin-block keys BEFORE the plugin loads, so
+/// the warnings still appear on the first analysis run after the plugin
+/// upgrades. On that run, this migration rewrites the file; the analyzer
+/// detects the change and re-validates — warnings disappear on the second
+/// pass (typically within seconds in an IDE).
+void _autoMigrateLegacyPluginKeys(String? mainOptions, String? projectRoot) {
+  if (_legacyKeysMigrated || mainOptions == null) return;
+  _legacyKeysMigrated = true;
+
+  try {
+    // Detect legacy scalar keys in the plugin block.
+    final foundScalars = <String, String>{};
+    for (final key in _legacyScalarKeys) {
+      final value = parseScalarFromPluginBlock(mainOptions, {key});
+      if (value != null) foundScalars[key] = value;
+    }
+
+    // Detect legacy rule_packs in the plugin block.
+    final rulePackIds = parseRulePacksEnabledList(mainOptions);
+
+    // Check for an orphan rule_packs: key (no enabled items but the key
+    // itself still triggers the SDK warning).
+    final hasRulePacksKey = RegExp(
+      r'^[ \t]+rule_packs:\s*(?:#[^\n]*)?$',
+      multiLine: true,
+    ).hasMatch(mainOptions);
+
+    if (foundScalars.isEmpty && rulePackIds.isEmpty && !hasRulePacksKey) {
+      return;
+    }
+
+    // Resolve project root for file paths.
+    final basePath = projectRoot ?? Directory.current.path;
+    if (basePath.isEmpty) return;
+    final sep = Platform.pathSeparator;
+
+    // Read the custom file to check what's already migrated.
+    final customFile = File('$basePath${sep}analysis_options_custom.yaml');
+    var customContent = customFile.existsSync()
+        ? customFile.readAsStringSync()
+            .replaceAll('\r\n', '\n')
+            .replaceAll('\r', '\n')
+        : '';
+
+    // Write scalar keys to the custom file if not already present.
+    var addedScalars = false;
+    for (final entry in foundScalars.entries) {
+      final alreadyPresent = RegExp(
+        '^${entry.key}:\\s',
+        multiLine: true,
+      ).hasMatch(customContent);
+      if (alreadyPresent) continue;
+
+      // Append the key.
+      if (customContent.isNotEmpty && !customContent.endsWith('\n')) {
+        customContent += '\n';
+      }
+      customContent += '${entry.key}: ${entry.value}\n';
+      addedScalars = true;
+    }
+
+    if (addedScalars) {
+      customFile.writeAsStringSync(customContent);
+    }
+
+    // Write rule_packs to the custom file if not already present.
+    if (rulePackIds.isNotEmpty) {
+      final customHasRulePacks = RegExp(
+        r'^rule_packs:\s',
+        multiLine: true,
+      ).hasMatch(customContent);
+      if (!customHasRulePacks) {
+        writeRulePacksToCustomFile(customFile, rulePackIds);
+      }
+    }
+
+    // Strip the legacy keys from analysis_options.yaml.
+    final mainFile = File('$basePath${sep}analysis_options.yaml');
+    var updatedMain = mainOptions;
+
+    // Remove scalar keys (indented lines inside the plugin block).
+    for (final key in foundScalars.keys) {
+      updatedMain = updatedMain.replaceAll(
+        RegExp('^[ \\t]+$key:\\s+[^\\n]*\\n', multiLine: true),
+        '',
+      );
+    }
+
+    // Remove rule_packs block (the key plus its indented children).
+    if (hasRulePacksKey) {
+      updatedMain = updatedMain.replaceAll(
+        RegExp(
+          r'^[ \t]+rule_packs:\s*(?:#[^\n]*)?\n(?:[ \t]+enabled:\s*(?:#[^\n]*)?\n)?(?:[ \t]+-\s+\S+.*\n|[ \t]+#[^\n]*\n|[ \t]*\n)*',
+          multiLine: true,
+        ),
+        '',
+      );
+    }
+
+    // Only write if something actually changed.
+    if (updatedMain != mainOptions) {
+      mainFile.writeAsStringSync(updatedMain);
+      final totalMoved = foundScalars.length + (hasRulePacksKey ? 1 : 0);
+      PluginLogger.log(
+        'Auto-migrated $totalMoved legacy config key(s) from '
+        'plugins > saropa_lints: to analysis_options_custom.yaml — '
+        'unsupported_option warnings will clear on next analysis.',
+      );
+    }
+  } on Object catch (e, st) {
+    // Migration is best-effort — config loading must not fail because of it.
+    PluginLogger.error(
+      'Auto-migration of legacy plugin keys failed',
+      error: e,
+      stackTrace: st,
+    );
   }
 }
