@@ -1,0 +1,746 @@
+{
+  "generated": "2026-09-03",
+  "summary": {
+    "open": 105,
+    "duplicate": 7,
+    "new": 93,
+    "unclear": 5
+  },
+  "proposals": [
+    {
+      "file": "proposal_add_resolution_workspace.md",
+      "rule_name": "add_resolution_workspace",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_always_put_doc_comments_before_annotations.md",
+      "rule_name": "always_put_doc_comments_before_annotations",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_always_specify_parameter_names.md",
+      "rule_name": "always_specify_parameter_names",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_arguments_ordering.md",
+      "rule_name": "arguments_ordering",
+      "status": "duplicate",
+      "existing_rule": "ArgumentsOrderingRule (prefer_arguments_ordering, alias arguments_ordering)",
+      "notes": "stylistic_rules.dart lists 'arguments_ordering' as a literal configAlias of prefer_arguments_ordering."
+    },
+    {
+      "file": "proposal_avoid_accessing_collections_by_constant_index.md",
+      "rule_name": "avoid_accessing_collections_by_constant_index",
+      "status": "duplicate",
+      "existing_rule": "AvoidAccessingCollectionsByConstantIndexRule (avoid_accessing_collections_by_constant_index)",
+      "notes": "Exact rule-name match already registered in code_quality_avoid_rules.dart."
+    },
+    {
+      "file": "proposal_avoid_any_version.md",
+      "rule_name": "avoid_any_version",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_connectivity_ui_decisions.md",
+      "rule_name": "avoid_connectivity_ui_decisions",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_dependency_overrides.md",
+      "rule_name": "avoid_dependency_overrides",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_disposing_late_fields.md",
+      "rule_name": "avoid_disposing_late_fields",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_dst_unsafe_date_arithmetic.md",
+      "rule_name": "avoid_dst_unsafe_date_arithmetic",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_dynamic_calls.md",
+      "rule_name": "avoid_dynamic_calls",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_equals_and_hash_code_on_mutable_classes.md",
+      "rule_name": "avoid_equals_and_hash_code_on_mutable_classes",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_final_with_getter.md",
+      "rule_name": "avoid_final_with_getter",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_futureor_return_type.md",
+      "rule_name": "avoid_futureor_return_type",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_implementing_value_types.md",
+      "rule_name": "avoid_implementing_value_types",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_inline_error_codes.md",
+      "rule_name": "avoid_inline_error_codes",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_large_assets_on_web.md",
+      "rule_name": "avoid_large_assets_on_web",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_missing_controller.md",
+      "rule_name": "avoid_missing_controller",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_missing_test_files.md",
+      "rule_name": "avoid_missing_test_files",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_mounted_check_in_finally.md",
+      "rule_name": "avoid_mounted_check_in_finally",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_mutating_constant_collections.md",
+      "rule_name": "avoid_mutating_constant_collections",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_non_configurable_callbacks_in_init_state.md",
+      "rule_name": "avoid_non_configurable_callbacks_in_init_state",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_not_assignable_collection_types.md",
+      "rule_name": "avoid_not_assignable_collection_types",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_null_checks_in_equality_operators.md",
+      "rule_name": "avoid_null_checks_in_equality_operators",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_nullable_async_or_collection_return_type.md",
+      "rule_name": "avoid_nullable_async_or_collection_return_type",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_parameter_aliases.md",
+      "rule_name": "avoid_parameter_aliases",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_private_typedef_functions.md",
+      "rule_name": "avoid_private_typedef_functions",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_public_late_final_without_initializer.md",
+      "rule_name": "avoid_public_late_final_without_initializer",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_public_members_in_states.md",
+      "rule_name": "avoid_public_members_in_states",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_repeated_property_aliases.md",
+      "rule_name": "avoid_repeated_property_aliases",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_single_child_in_multi_child_widgets.md",
+      "rule_name": "avoid_single_child_in_multi_child_widgets",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_skipped_tests.md",
+      "rule_name": "avoid_skipped_tests",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_suspicious_super_overrides.md",
+      "rule_name": "avoid_suspicious_super_overrides",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_then_return_with_future.md",
+      "rule_name": "avoid_then_return_with_future",
+      "status": "unclear",
+      "existing_rule": "AvoidReturningNullForFutureStrictRule (avoid_returning_null_for_future_strict)",
+      "notes": "Keyword overlap only ('future' + 'return'); proposal targets redundant `.then()` identity/constant callbacks, existing rule targets returning null from Future-typed functions. Likely a false lead but flagged for review."
+    },
+    {
+      "file": "proposal_avoid_unnecessary_else_after_control_flow.md",
+      "rule_name": "avoid_unnecessary_else_after_control_flow",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_unnecessary_factory_constructor.md",
+      "rule_name": "avoid_unnecessary_factory_constructor",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_unnecessary_parentheses.md",
+      "rule_name": "avoid_unnecessary_parentheses",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_unnecessary_return_variable.md",
+      "rule_name": "avoid_unnecessary_return_variable",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_avoid_unnecessary_safe_area.md",
+      "rule_name": "avoid_unnecessary_safe_area",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_class_order_rule.md",
+      "rule_name": "class_order_rule",
+      "status": "duplicate",
+      "existing_rule": "MemberOrderingFormattingRule (prefer_member_ordering, aliases enforce_member_ordering/member_ordering/prefer_sorted_members)",
+      "notes": "Existing rule already enforces fields-before-constructors-before-methods class member ordering."
+    },
+    {
+      "file": "proposal_closure_incorrect_type.md",
+      "rule_name": "closure_incorrect_type",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_constructor_parameters_and_fields_should_have_the_same_order.md",
+      "rule_name": "constructor_parameters_and_fields_should_have_the_same_order",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_document_enum.md",
+      "rule_name": "document_enum",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_document_fake_parameters.md",
+      "rule_name": "document_fake_parameters",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_document_interface.md",
+      "rule_name": "document_interface",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_duplicate_value.md",
+      "rule_name": "duplicate_value",
+      "status": "unclear",
+      "existing_rule": "AvoidDuplicateConstantValuesRule (avoid_duplicate_constant_values)",
+      "notes": "Proposal explicitly scopes to duplicate values within a single boolean expression (e.g. `a || a`), distinct from the existing rule's likely collection/constant-literal duplicate detection. Needs human confirmation of the existing rule's exact scope."
+    },
+    {
+      "file": "proposal_getters_in_member_list.md",
+      "rule_name": "getters_in_member_list",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_initializers_ordering.md",
+      "rule_name": "initializers_ordering",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_is_future.md",
+      "rule_name": "is_future",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_json_parser_requirements.md",
+      "rule_name": "json_parser_requirements",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_json_serializable_enforcement_rules.md",
+      "rule_name": "json_serializable_enforcement_rules",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_mutable_tearoff.md",
+      "rule_name": "mutable_tearoff",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_named_parameters_ordering.md",
+      "rule_name": "named_parameters_ordering",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_never_discard_build_context.md",
+      "rule_name": "never_discard_build_context",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_new_instance_cascade.md",
+      "rule_name": "new_instance_cascade",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_newline_before_case.md",
+      "rule_name": "newline_before_case",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_newline_before_constructor.md",
+      "rule_name": "newline_before_constructor",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_newline_before_method.md",
+      "rule_name": "newline_before_method",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_newline_before_pubspec_entry.md",
+      "rule_name": "newline_before_pubspec_entry",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_newline_before_return.md",
+      "rule_name": "newline_before_return",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_no_blank_line_before_single_return.md",
+      "rule_name": "no_blank_line_before_single_return",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_no_direct_iterable_access.md",
+      "rule_name": "no_direct_iterable_access",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_no_duplicate_imports.md",
+      "rule_name": "no_duplicate_imports",
+      "status": "unclear",
+      "existing_rule": "AvoidDuplicateNamedImportsRule (avoid_duplicate_named_imports)",
+      "notes": "Existing rule flags the same import path declared multiple times under different prefixes/aliases; proposal (closing a pyramid_lint gap) may intend broader duplicate-import detection (identical imports with no prefix difference). Needs human review to confirm scope difference."
+    },
+    {
+      "file": "proposal_no_internal_method_docs.md",
+      "rule_name": "no_internal_method_docs",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_no_optional_operators_in_tests.md",
+      "rule_name": "no_optional_operators_in_tests",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_blank_line_before_break.md",
+      "rule_name": "prefer_blank_line_before_break",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_blank_line_before_continue.md",
+      "rule_name": "prefer_blank_line_before_continue",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_blank_line_before_throw.md",
+      "rule_name": "prefer_blank_line_before_throw",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_caret_version_syntax.md",
+      "rule_name": "prefer_caret_version_syntax",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_commenting_pubspec_ignores.md",
+      "rule_name": "prefer_commenting_pubspec_ignores",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_composition_over_inheritance.md",
+      "rule_name": "prefer_composition_over_inheritance",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_correct_screenshots.md",
+      "rule_name": "prefer_correct_screenshots",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_correct_static_icon_provider.md",
+      "rule_name": "prefer_correct_static_icon_provider",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_date_format.md",
+      "rule_name": "prefer_date_format",
+      "status": "duplicate",
+      "existing_rule": "PreferDateFormatRule (prefer_date_format)",
+      "notes": "Exact rule-name match already registered in internationalization_rules.dart."
+    },
+    {
+      "file": "proposal_prefer_existing_widget_over_reimplementation.md",
+      "rule_name": "prefer_existing_widget_over_reimplementation",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_explicitly_named_parameters.md",
+      "rule_name": "prefer_explicitly_named_parameters",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_haptic_feedback_on_interaction.md",
+      "rule_name": "prefer_haptic_feedback_on_interaction",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_immutable_state.md",
+      "rule_name": "prefer_immutable_state",
+      "status": "unclear",
+      "existing_rule": "prefer_immutable_bloc_state (if present)",
+      "notes": "Proposal itself calls out prefer_immutable_bloc_state as a related/possibly-overlapping rule but wants broader name-pattern-matched State-class coverage (not just Bloc). Needs human review to confirm scope difference from any existing Bloc-specific immutability rule."
+    },
+    {
+      "file": "proposal_prefer_initializing_formals.md",
+      "rule_name": "prefer_initializing_formals",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_inline_comments_sparingly.md",
+      "rule_name": "prefer_inline_comments_sparingly",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_intent_filter_export.md",
+      "rule_name": "prefer_intent_filter_export",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_l10n_yaml_config.md",
+      "rule_name": "prefer_l10n_yaml_config",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_last.md",
+      "rule_name": "prefer_last",
+      "status": "duplicate",
+      "existing_rule": "PreferLastRule (prefer_list_last)",
+      "notes": "Existing rule's exampleBad/exampleGood is 'list[list.length - 1]' -> 'list.last', identical to the proposal's target pattern."
+    },
+    {
+      "file": "proposal_prefer_library_prefixes.md",
+      "rule_name": "prefer_library_prefixes",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_number_format.md",
+      "rule_name": "prefer_number_format",
+      "status": "duplicate",
+      "existing_rule": "PreferNumberFormatRule (prefer_number_format)",
+      "notes": "Exact rule-name match already registered in internationalization_rules.dart."
+    },
+    {
+      "file": "proposal_prefer_pinned_version_syntax.md",
+      "rule_name": "prefer_pinned_version_syntax",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_private_named_parameters.md",
+      "rule_name": "prefer_private_named_parameters",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_publish_to_none.md",
+      "rule_name": "prefer_publish_to_none",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_sorted_equatable_props.md",
+      "rule_name": "prefer_sorted_equatable_props",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_sorted_initializers.md",
+      "rule_name": "prefer_sorted_initializers",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_state_class_below_widget.md",
+      "rule_name": "prefer_state_class_below_widget",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_prefer_typed_exceptions.md",
+      "rule_name": "prefer_typed_exceptions",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_proper_from_environment.md",
+      "rule_name": "proper_from_environment",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_pubspec_ordering.md",
+      "rule_name": "pubspec_ordering",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_require_global_key_for_widget.md",
+      "rule_name": "require_global_key_for_widget",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_returning_widgets.md",
+      "rule_name": "returning_widgets",
+      "status": "duplicate",
+      "existing_rule": "AvoidReturningWidgetsRule (avoid_returning_widgets)",
+      "notes": "Proposal targets private Widget-returning helper methods; avoid_returning_widgets already flags exactly this pattern in widget_patterns_avoid_prefer_rules.dart."
+    },
+    {
+      "file": "proposal_sorting_members.md",
+      "rule_name": "sorting_members",
+      "status": "unclear",
+      "existing_rule": "MemberOrderingFormattingRule (prefer_member_ordering)",
+      "notes": "Proposal asks for annotation-opt-in member ordering (finer-grained/opt-in categories); existing rule enforces a fixed fields/constructors/methods order. Overlapping goal, different mechanism - needs human review."
+    },
+    {
+      "file": "proposal_specify_unknown_enum_value.md",
+      "rule_name": "specify_unknown_enum_value",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_standard_comment_style.md",
+      "rule_name": "standard_comment_style",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_start_comments_with_space.md",
+      "rule_name": "start_comments_with_space",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_test_file_mutation_coverage.md",
+      "rule_name": "test_file_mutation_coverage",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_todo_with_story_links.md",
+      "rule_name": "todo_with_story_links",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_use_compare_without_case.md",
+      "rule_name": "use_compare_without_case",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_use_context_is_current_modal_route.md",
+      "rule_name": "use_context_is_current_modal_route",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    },
+    {
+      "file": "proposal_use_descriptive_names_for_type_parameters.md",
+      "rule_name": "use_descriptive_names_for_type_parameters",
+      "status": "new",
+      "existing_rule": null,
+      "notes": "No matching rule name, alias, or clear conceptual overlap found in tiers.dart, saropa_lints.dart, or rule source files."
+    }
+  ]
+}
