@@ -1,6 +1,6 @@
 # PROPOSAL: Require a Blank Line Before Each `case` Clause
 
-**Status: Open**
+**Status: Duplicate** — already exists as `prefer_blank_line_before_case` (alias `newline_before_case`) in `formatting_rules.dart`
 
 Created: 2026-09-02
 Type: New rule

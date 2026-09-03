@@ -1,6 +1,6 @@
 # PROPOSAL: Require a Blank Line Before Method Declarations
 
-**Status: Open**
+**Status: Duplicate** — already exists as `prefer_blank_line_before_method` (alias `newline_before_method`) in `formatting_rules.dart`
 
 Created: 2026-09-02
 Type: New rule

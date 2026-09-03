@@ -1,6 +1,6 @@
 # PROPOSAL: Require a Blank Line Before a Trailing `return` in a Multi-Statement Block
 
-**Status: Open**
+**Status: Duplicate** — already exists as `prefer_blank_line_before_return` (alias `newline_before_return`) in `formatting_rules.dart`
 
 Created: 2026-09-02
 Type: New rule

@@ -1,6 +1,6 @@
 # PROPOSAL: Flag an Unnecessary Blank Line Before a Lone `return`
 
-**Status: Open**
+**Status: Duplicate** — already exists as `prefer_no_blank_line_before_return` in `stylistic_whitespace_constructor_rules.dart`
 
 Created: 2026-09-02
 Type: New rule
