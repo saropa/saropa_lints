@@ -28,12 +28,6 @@
 import * as path from 'path';
 import * as vscode from 'vscode';
 
-/**
- * Diagnostic source string the Phase 0 fake LSP server sets on its test
- * diagnostics. Must match the 'source' value in bin/lsp_server.dart so
- * buildViolationsDataFromDiagnostics can filter them out of real scores.
- */
-export const LSP_TEST_DIAGNOSTIC_SOURCE = 'saropa_lsp_test';
 import type {
   BySeverity,
   IssuesByRule,
@@ -122,10 +116,7 @@ export function buildViolationsDataFromDiagnostics(
     const file = path.relative(root, uri.fsPath).replaceAll('\\', '/');
 
     for (const diag of diagnostics) {
-      // Filter out fake test diagnostics from the Phase 0 LSP server —
-      // they use source LSP_TEST_DIAGNOSTIC_SOURCE and must not inflate the real score.
-      // This string must match the 'source' field set in bin/lsp_server.dart.
-      if (diag.source === LSP_TEST_DIAGNOSTIC_SOURCE) continue;
+
 
       const bucket = severityToBucket(diag.severity);
       violations.push({

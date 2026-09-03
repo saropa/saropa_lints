@@ -66,7 +66,21 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.2.10] — Unreleased
+## [15.2.11] — Unreleased
+
+Removed Phase 0 fake LSP test diagnostics that shipped in 15.2.10. The standalone LSP server infrastructure remains (off by default) but no longer emits test squiggles. [log](https://github.com/saropa/saropa_lints/blob/v15.2.11/CHANGELOG.md)
+
+### Fixed
+
+- **LSP server no longer emits fake test diagnostics.** Phase 0 proof-of-concept diagnostics were being published to every open `.dart` file when the LSP server was enabled. No action required — the setting now defaults to off.
+
+### Changed
+
+- **`saropaLints.lspServer.enabled` now defaults to `false`.** Previously defaulted to `true`, which activated the fake LSP server for all users. No action required.
+
+---
+
+## [15.2.10]
 
 Seventeen new lint rules across testing, equality, control flow, constructor style, widget lifecycle, formatting, code quality, documentation, and architecture. Cross-platform SARIF output fix, dead-link hardening for published docs, and orphan-publish recovery for the publish script. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
 

@@ -1,8 +1,8 @@
-/// Minimal fake LSP server for testing VS Code integration.
+/// Standalone Saropa Lints LSP server.
 ///
 /// Implements JSON-RPC 2.0 over stdin/stdout with Content-Length framing.
-/// Emits hardcoded test diagnostics (one per severity) to prove the
-/// standalone LSP plumbing works end-to-end — no real analysis.
+/// Phase 0: inert skeleton (no diagnostics). Phase 1 will wire real rules
+/// via AnalysisContextCollection.
 ///
 /// Run: `dart run saropa_lints:lsp_server`
 library;
@@ -11,49 +11,10 @@ import 'dart:convert';
 import 'dart:io';
 
 // ---------------------------------------------------------------------------
-// Diagnostic templates — one per LSP severity level.
+// Phase 0 test diagnostics REMOVED — proof-of-concept complete (3 of 4
+// severity levels confirmed working 2026-09-03). Phase 1 will wire real
+// rules here via AnalysisContextCollection.
 // ---------------------------------------------------------------------------
-
-/// Each entry defines a fake diagnostic at a specific severity.
-/// Severity codes follow the LSP spec: 1=Error, 2=Warning, 3=Info, 4=Hint.
-const _diagnosticTemplates = [
-  (
-    line: 0,
-    severity: 1,
-    code: 'saropa-lsp-test-error',
-    label: 'error',
-    message:
-        '[saropa_lsp_test] Error-level diagnostic '
-        '— proves red squiggles from standalone LSP',
-  ),
-  (
-    line: 1,
-    severity: 2,
-    code: 'saropa-lsp-test-warning',
-    label: 'warning',
-    message:
-        '[saropa_lsp_test] Warning-level diagnostic '
-        '— proves yellow squiggles from standalone LSP',
-  ),
-  (
-    line: 2,
-    severity: 3,
-    code: 'saropa-lsp-test-info',
-    label: 'info',
-    message:
-        '[saropa_lsp_test] Info-level diagnostic '
-        '— proves blue squiggles from standalone LSP',
-  ),
-  (
-    line: 3,
-    severity: 4,
-    code: 'saropa-lsp-test-hint',
-    label: 'hint',
-    message:
-        '[saropa_lsp_test] Hint-level diagnostic '
-        '— proves hint squiggles from standalone LSP',
-  ),
-];
 
 // ---------------------------------------------------------------------------
 // Entry point
@@ -164,17 +125,13 @@ void _handleMessage(Map<String, dynamic> message) {
       // Client acknowledges init — nothing to do.
       _log('initialized');
     case 'textDocument/didOpen':
-      // A file was opened — emit fake diagnostics.
-      _handleDidOpen(params);
     case 'textDocument/didSave':
-      // File saved — re-emit the same diagnostics.
-      _handleDidSave(params);
     case 'textDocument/didClose':
-      // File closed — clear diagnostics for that URI.
-      _handleDidClose(params);
+      // No-op — Phase 1 will wire real analysis here.
+      break;
     case 'textDocument/codeAction':
-      // Client is requesting quick-fix actions for a range.
-      _sendResponse(id, _handleCodeAction(params));
+      // No-op — Phase 1 will wire real quick fixes here.
+      _sendResponse(id, <Map<String, dynamic>>[]);
     case 'shutdown':
       // Graceful shutdown — respond, then wait for `exit`.
       _log('shutdown');
@@ -206,136 +163,14 @@ Map<String, dynamic> _handleInitialize() {
       'codeActionProvider': true,
     },
     'serverInfo': {
-      'name': 'saropa_lints_test_lsp',
-      'version': '0.0.0-fake',
+      'name': 'saropa_lints_lsp',
+      'version': '0.1.0',
     },
   };
 }
 
-/// Tracks the line count of each open file so we only emit diagnostics for
-/// lines that actually exist.
-final _openFileLineCount = <String, int>{};
-
-/// Handles `textDocument/didOpen` by recording the file's line count and
-/// publishing fake diagnostics for it.
-void _handleDidOpen(Map<String, dynamic> params) {
-  final textDocument = params['textDocument'] as Map<String, dynamic>;
-  final uri = textDocument['uri'] as String;
-  final text = textDocument['text'] as String? ?? '';
-
-  // Count lines so we don't emit diagnostics past end-of-file.
-  final lineCount = text.isEmpty ? 0 : text.split('\n').length;
-  _openFileLineCount[uri] = lineCount;
-
-  _publishDiagnostics(uri, lineCount);
-}
-
-/// Handles `textDocument/didSave` — re-publishes the same fake diagnostics.
-/// We don't re-read content here (save notifications may not include text),
-/// so we use the line count from the last didOpen.
-void _handleDidSave(Map<String, dynamic> params) {
-  final textDocument = params['textDocument'] as Map<String, dynamic>;
-  final uri = textDocument['uri'] as String;
-
-  // Fall back to 4 if we never saw didOpen (unlikely but defensive).
-  final lineCount = _openFileLineCount[uri] ?? 4;
-  _publishDiagnostics(uri, lineCount);
-}
-
-/// Handles `textDocument/didClose` — clears diagnostics for the file and
-/// forgets its line count.
-void _handleDidClose(Map<String, dynamic> params) {
-  final textDocument = params['textDocument'] as Map<String, dynamic>;
-  final uri = textDocument['uri'] as String;
-
-  _openFileLineCount.remove(uri);
-
-  // Empty diagnostics array clears the squiggles in the editor.
-  _sendNotification('textDocument/publishDiagnostics', {
-    'uri': uri,
-    'diagnostics': <Map<String, dynamic>>[],
-  });
-  _log('published 0 diagnostics for $uri');
-}
-
-/// Builds and publishes fake diagnostics for [uri], capped to [lineCount].
-void _publishDiagnostics(String uri, int lineCount) {
-  final diagnostics = <Map<String, dynamic>>[];
-
-  for (final t in _diagnosticTemplates) {
-    // Skip diagnostics for lines that don't exist in the file.
-    if (t.line >= lineCount) continue;
-
-    diagnostics.add({
-      'range': {
-        'start': {'line': t.line, 'character': 0},
-        // char 999 = "to end of line" (client clamps to actual line length).
-        'end': {'line': t.line, 'character': 999},
-      },
-      'severity': t.severity,
-      'code': t.code,
-      // Distinct source so liveDiagnosticsModel can filter out fake
-      // test diagnostics and not inflate the real score.
-      'source': 'saropa_lsp_test',
-      'message': t.message,
-    });
-  }
-
-  _sendNotification('textDocument/publishDiagnostics', {
-    'uri': uri,
-    'diagnostics': diagnostics,
-  });
-  _log('published ${diagnostics.length} diagnostics for $uri');
-}
-
-/// Handles `textDocument/codeAction` — returns a quick-fix CodeAction for
-/// each test diagnostic whose code starts with `saropa-lsp-test-`.
-///
-/// The fix inserts a dismiss comment at the start of the diagnostic's line,
-/// proving that TextEdit round-trip works end-to-end.
-List<Map<String, dynamic>> _handleCodeAction(Map<String, dynamic> params) {
-  final context = params['context'] as Map<String, dynamic>? ?? {};
-  final diagnostics =
-      (context['diagnostics'] as List<dynamic>?)?.cast<Map<String, dynamic>>() ?? [];
-  final textDocument = params['textDocument'] as Map<String, dynamic>;
-  final uri = textDocument['uri'] as String;
-
-  final actions = <Map<String, dynamic>>[];
-
-  for (final diag in diagnostics) {
-    final code = diag['code'] as String? ?? '';
-    if (!code.startsWith('saropa-lsp-test-')) continue;
-
-    // Derive the human-readable severity label from the diagnostic code.
-    final label = code.replaceFirst('saropa-lsp-test-', '');
-    final line = (diag['range'] as Map<String, dynamic>?)?['start']
-            as Map<String, dynamic>? ??
-        {};
-    final lineNumber = line['line'] as int? ?? 0;
-
-    actions.add({
-      'title': 'Dismiss this test $label diagnostic',
-      'kind': 'quickfix',
-      'diagnostics': [diag],
-      'edit': {
-        'changes': {
-          uri: [
-            {
-              // Insert the dismiss comment at column 0 of the diagnostic line.
-              'range': {
-                'start': {'line': lineNumber, 'character': 0},
-                'end': {'line': lineNumber, 'character': 0},
-              },
-              'newText': '// saropa_lsp_test: $label dismissed\n',
-            },
-          ],
-        },
-      },
-    });
-  }
-
-  return actions;
-}
+// Phase 1 will add real diagnostic handlers here — didOpen triggers analysis,
+// didSave re-analyzes, didClose clears, codeAction returns quick fixes.
 
 // ---------------------------------------------------------------------------
 // JSON-RPC output helpers
@@ -355,11 +190,6 @@ void _sendError(dynamic id, int code, String message) {
   });
 }
 
-/// Sends a JSON-RPC notification (no `id`, no response expected).
-void _sendNotification(String method, Map<String, dynamic> params) {
-  _send({'jsonrpc': '2.0', 'method': method, 'params': params});
-}
-
 /// Encodes a JSON-RPC message with Content-Length framing and writes it
 /// to stdout. This is the single point of egress for all LSP output.
 void _send(Map<String, dynamic> message) {
@@ -373,5 +203,5 @@ void _send(Map<String, dynamic> message) {
 /// Writes a timestamped log line to stderr. VS Code captures stderr and
 /// shows it in the language server's Output channel.
 void _log(String message) {
-  stderr.writeln('saropa_lsp_test: $message');
+  stderr.writeln('saropa_lsp: $message');
 }
