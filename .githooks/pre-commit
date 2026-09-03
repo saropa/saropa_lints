@@ -49,6 +49,38 @@ if [ -n "$doc_files" ]; then
   fi
 fi
 
+# ── generated index freshness gate ──
+# When rule files or migration guides change, regenerate the category map
+# and migration pack codes so the drift tests never fail in CI.
+rule_files=$(echo "$files" | grep -E '^lib/src/rules/.*_rule.*\.dart$')
+guide_files=$(echo "$files" | grep -E '^doc/guides/migration_guides/.*\.md$')
+tier_file=$(echo "$files" | grep -E '^lib/src/tiers\.dart$')
+
+if [ -n "$rule_files" ] || [ -n "$tier_file" ]; then
+  echo "Pre-commit: regenerating category map (rule/tier files changed)..."
+  $PY scripts/gen_category_map.py
+  gen_cat_status=$?
+  if [ "$gen_cat_status" -ne 0 ]; then
+    echo "Commit blocked: gen_category_map.py failed."
+    exit 1
+  fi
+  git add lib/src/scan/rule_category_map.dart
+fi
+
+if [ -n "$guide_files" ] || [ -n "$tier_file" ] || [ -n "$rule_files" ]; then
+  # Dart may not be on PATH in all contributor setups — skip gracefully.
+  if command -v dart >/dev/null 2>&1; then
+    echo "Pre-commit: regenerating migration pack codes (guide/rule/tier files changed)..."
+    dart run tool/generate_migration_pack_codes.dart
+    gen_mig_status=$?
+    if [ "$gen_mig_status" -ne 0 ]; then
+      echo "Commit blocked: generate_migration_pack_codes.dart failed."
+      exit 1
+    fi
+    git add lib/src/config/rule_pack_migration_codes.dart
+  fi
+fi
+
 # ── dart fix dry-run gate (exit 2 = dart missing, skip gracefully) ──
 $PY scripts/check_dart_fix.py
 fix_status=$?

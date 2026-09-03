@@ -120,35 +120,54 @@ void _handleMessage(Map<String, dynamic> message) {
   switch (method) {
     case 'initialize':
       // Client is asking for our capabilities.
+      _log('initialize request received');
       _sendResponse(id, _handleInitialize());
+      _log('initialize response sent');
     case 'initialized':
-      // Client acknowledges init — nothing to do.
-      _log('initialized');
+      // Client acknowledges init — handshake complete.
+      _log('initialized — handshake complete, server ready');
     case 'textDocument/didOpen':
+      // Phase 1 will trigger analysis here.
+      _log('didOpen: ${_uri(params)}');
     case 'textDocument/didChange':
+      // Phase 1 will trigger incremental re-analysis here.
+      _logTrace('didChange: ${_uri(params)}');
     case 'textDocument/didSave':
+      // Phase 1 will trigger full re-analysis here.
+      _log('didSave: ${_uri(params)}');
     case 'textDocument/didClose':
-      // No-op — Phase 1 will wire real analysis here.
-      break;
+      // Phase 1 will clear diagnostics here.
+      _log('didClose: ${_uri(params)}');
     case r'$/cancelRequest':
+      // Nothing to cancel in the inert server.
+      _logTrace('cancelRequest: id=${params['id'] ?? '(none)'}');
     case r'$/setTrace':
+      // Update trace level — 'verbose' enables _logTrace output.
+      final traceValue = params['value'] as String? ?? 'off';
+      _traceEnabled = traceValue == 'verbose';
+      _log('setTrace: $traceValue (trace logging ${_traceEnabled ? 'on' : 'off'})');
     case 'workspace/didChangeConfiguration':
-      // Standard notifications we acknowledge but don't act on yet.
-      break;
+      // Phase 1 will re-read analysis_options.yaml here.
+      _log('didChangeConfiguration');
     case 'textDocument/codeAction':
-      // No-op — Phase 1 will wire real quick fixes here.
+      // Phase 1 will return quick fixes here.
+      _logTrace('codeAction: ${_uri(params)}');
       _sendResponse(id, <Map<String, dynamic>>[]);
     case 'shutdown':
       // Graceful shutdown — respond, then wait for `exit`.
-      _log('shutdown');
+      _log('shutdown requested');
       _sendResponse(id, null);
     case 'exit':
       // Hard exit.
+      _log('exit — goodbye');
       exit(0);
     default:
-      // Unknown method — if it's a request (has id), send MethodNotFound.
+      // Unknown method — log it, and respond with MethodNotFound for requests.
       if (id != null) {
+        _log('unknown request: $method (id=$id) — sending MethodNotFound');
         _sendError(id, -32601, 'Method not found: $method');
+      } else {
+        _logTrace('unknown notification ignored: $method');
       }
   }
 }
@@ -210,4 +229,26 @@ void _send(Map<String, dynamic> message) {
 /// shows it in the language server's Output channel.
 void _log(String message) {
   stderr.writeln('saropa_lsp: $message');
+}
+
+/// Whether $/setTrace has been set to 'verbose' by the client.
+/// When false, _logTrace is suppressed to reduce Output channel noise.
+bool _traceEnabled = false;
+
+/// Verbose log for high-frequency messages (didChange, codeAction, cancel).
+/// Suppressed unless the client sends $/setTrace with value 'verbose'.
+void _logTrace(String message) {
+  if (!_traceEnabled) return;
+  stderr.writeln('saropa_lsp [trace]: $message');
+}
+
+// ---------------------------------------------------------------------------
+// Param helpers
+// ---------------------------------------------------------------------------
+
+/// Extracts the textDocument URI from an LSP params map, falling back to
+/// '(unknown)' when the structure is unexpected.
+String _uri(Map<String, dynamic> params) {
+  final td = params['textDocument'] as Map<String, dynamic>?;
+  return td?['uri'] as String? ?? '(unknown)';
 }

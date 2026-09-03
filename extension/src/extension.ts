@@ -1295,28 +1295,25 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     }),
   );
 
-  // ── Standalone LSP Server (Phase 0 — fake diagnostics for plumbing test) ──
-  // Spawns a second LSP server that publishes hardcoded test diagnostics into
-  // the same Problems panel as the Dart analyzer, proving the two-server
-  // architecture works. Controlled by saropaLints.lspServer.enabled setting.
+  // ── Standalone LSP Server (Phase 0) ──
+  // Controlled by saropaLints.lspServer.enabled setting (default: false).
+  // Users enable via the debug panel toggle or the start command.
   let lspClient: SaropaLspClient | undefined;
   const lspRoot = getProjectRoot();
 
   // Start LSP server on activation if the setting is already enabled.
   if (lspRoot && vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
     lspClient = new SaropaLspClient(context, lspRoot);
-
     void lspClient.start();
   }
 
-  // React to setting changes — start/stop the LSP server without VS Code restart.
+  // React to setting changes — start/stop the LSP server without reload.
   context.subscriptions.push(
     vscode.workspace.onDidChangeConfiguration((e) => {
       if (e.affectsConfiguration('saropaLints.lspServer.enabled')) {
         const enabled = vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled');
         if (enabled && !lspClient && lspRoot) {
           lspClient = new SaropaLspClient(context, lspRoot);
-
           void lspClient.start();
         } else if (!enabled && lspClient) {
           // Await stop before dispose to avoid a double-stop race —
