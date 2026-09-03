@@ -150,6 +150,16 @@ After adding, removing, or renaming rules under `lib/src/rules/packages/*_rules.
 3. Run **`dart run tool/rule_pack_audit.dart`** — must exit 0 (compares extracted
    `LintCode` names to `kRulePackRuleCodes`).
 
+After editing any **migration guide** (`doc/guides/migration_guides/*.md`):
+
+4. Run **`dart run tool/generate_migration_pack_codes.dart`** — re-derives
+   every `migrate_*` pack's rule set from its guide's HAVE/ENHANCED rows and
+   validates each code against `tiers.dart`. Regenerates
+   `lib/src/config/rule_pack_migration_codes.dart`.
+5. Run **`dart run tool/generate_migration_pack_codes.dart -- --check`** in CI
+   to fail the build if the pack file has drifted from the guides without a
+   regeneration step.
+
 The generator also warns when `kPubspecMarkersByPack` in
 `tool/generate_rule_pack_registry.dart` is missing a pack or lists an unused pack id.
 

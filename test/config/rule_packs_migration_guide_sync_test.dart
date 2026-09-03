@@ -81,13 +81,10 @@ void main() {
   test(
     'flutter_skill_lints pack code count matches guide-documented dedup',
     () {
-      // The guide has no per-rule HAVE table (see GAP_ANALYSIS.md instead),
-      // so this checks the arithmetic recorded in the pack file's own
-      // comment: 279 total - 41 GAP - 7 PARTIAL = 231 source HAVE rules,
-      // 2 of which map to a saropa rule another source rule already
-      // claims (prefer_dedicated_media_query_method, prefer_sliver_prefix),
-      // leaving 229 unique codes. If the guide's GAP/PARTIAL counts move,
-      // this recomputation moves with them.
+      // No per-rule HAVE table (see GAP_ANALYSIS.md), so verify the
+      // arithmetic: total - GAP - PARTIAL - dedup = unique codes.
+      // kFlutterSkillLintsDedupDelta is shared with the generator so
+      // neither can silently drift.
       final content = File(
         '${guideDir.path}/migration_from_flutter_skill_lints.md',
       ).readAsStringSync();
@@ -110,9 +107,9 @@ void main() {
       );
       final total = int.parse(totalMatch!.group(1)!);
 
-      const knownDedupDelta = 2;
+      // Shared constant so generator and test can't silently disagree.
       final expectedUniqueHave =
-          total - gapRows - partialRows - knownDedupDelta;
+          total - gapRows - partialRows - kFlutterSkillLintsDedupDelta;
 
       expect(
         kRulePackMigrationCodes['migrate_flutter_skill_lints']!.length,

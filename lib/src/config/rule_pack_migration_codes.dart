@@ -1,22 +1,16 @@
 // GENERATED FILE — DO NOT EDIT BY HAND.
 //
 // Produced by tool/generate_migration_pack_codes.dart from the HAVE/
-// ENHANCED rows in doc/guides/migration_guides/*.md. To change a pack's
-// rule set, edit the guide's mapping table and re-run the generator:
-//
+// ENHANCED rows in doc/guides/migration_guides/*.md. Re-run after edits:
 //   dart run tool/generate_migration_pack_codes.dart
 //
-// The two exceptions below are documented in tool/migration_pack_guide_sync.dart.
-//
-// Spread into [kRulePackRuleCodes] in rule_packs.dart so the canonical registry
-// includes migration packs alongside generated and SDK packs.
+// Exceptions: see tool/migration_pack_guide_sync.dart.
+// Spread into [kRulePackRuleCodes] in rule_packs.dart.
 // ignore_for_file: always_specify_types
 
 /// Migration pack rule codes, keyed by `migrate_<package>` pack id.
-///
-/// Each set contains saropa rule codes that cover functionality from the named
-/// alternative lint package. Enabling a migration pack opts the user into these
-/// rules on top of their tier floor, replacing the source package's coverage.
+/// Each set contains saropa rule codes that cover functionality from
+/// the named alternative lint package, replacing its coverage.
 const Map<String, Set<String>> kRulePackMigrationCodes = {
   // dcm — 425 HAVE rules covering 87% of 487 total (430 unique saropa codes after fan-out).
   'migrate_dcm': {
@@ -452,7 +446,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'use_setstate_synchronously',
   },
 
-  // flutter_skill_lints — 229 codes carried forward from the previous generation (no per-rule guide table; see plans/GAP_ANALYSIS.md). Verify manually after a guide update.
+  // flutter_skill_lints — 229 codes carried forward (no per-rule guide table; see plans/GAP_ANALYSIS.md).
   'migrate_flutter_skill_lints': {
     'always_remove_listener',
     'avoid_accessing_collections_by_constant_index',
@@ -812,6 +806,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'prefer_align_over_container',
     'prefer_any_or_every',
     'prefer_arguments_ordering',
+    'prefer_arrow_functions',
     'prefer_async_callback',
     'prefer_bloc_extensions',
     'prefer_boolean_prefixes',
@@ -856,7 +851,6 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'prefer_prefixed_global_constants',
     'prefer_return_await',
     'prefer_returning_condition',
-    'prefer_returning_shorthands',
     'prefer_shorthands_with_constructors',
     'prefer_shorthands_with_enums',
     'prefer_shorthands_with_static_fields',
@@ -1201,7 +1195,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'proper_super_calls',
   },
 
-  // very_good_analysis — 13 ENHANCED rule codes.
+  // very_good_analysis — 13 ENHANCED codes.
   'migrate_very_good_analysis': {
     'avoid_positional_boolean_parameters_with_fix',
     'avoid_print_in_production',
@@ -1326,8 +1320,9 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
   'migrate_hardcoded_strings_lint': {'avoid_hardcoded_strings_in_ui'},
 };
 
-/// Pubspec dependency markers for migration packs. Each migration pack fires
-/// when the source package is still present in pubspec.yaml (any version).
+/// Pubspec dependency markers for migration packs. Each migration
+/// pack fires when the source package is still present in
+/// pubspec.yaml (any version).
 const Map<String, Set<String>> kRulePackMigrationPubspecMarkers = {
   'migrate_dcm': {'dart_code_metrics', 'dcm'},
   'migrate_flutter_skill_lints': {'flutter_skill_lints'},

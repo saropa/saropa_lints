@@ -1,62 +1,81 @@
 // Regenerates lib/src/config/rule_pack_migration_codes.dart from the HAVE/
-// ENHANCED rows in doc/guides/migration_guides/*.md, so a guide edit (new
-// HAVE row, renamed saropa target, corrected mapping) flows into the pack
-// file without a hand-sync step. Run after editing any migration guide:
-//
+// ENHANCED rows in doc/guides/migration_guides/*.md:
 //   dart run tool/generate_migration_pack_codes.dart
-//
-// Two things can't be derived from guide text and are carried forward
-// unchanged from the current file:
-//   - kRulePackMigrationPubspecMarkers (the pub.dev package name(s) that
-//     trigger each pack — not guide content, doesn't change with rules).
-//   - migrate_flutter_skill_lints' code set (its guide has no per-rule
-//     table; see kMigrationPacksWithoutGuideTable in migration_pack_guide_sync.dart).
-//
-// Every other pack's code set is fully re-derived from its guide and
-// validated against lib/src/tiers.dart, so a typo'd or renamed saropa rule
-// in a guide fails the generation run instead of shipping silently.
+//   dart run tool/generate_migration_pack_codes.dart --check
+// Exceptions carried forward unchanged — see migration_pack_guide_sync.dart.
 library;
 
 import 'dart:io';
 
 import 'migration_pack_guide_sync.dart';
 
-const _generatedHeader = '''
-// GENERATED FILE — DO NOT EDIT BY HAND.
-//
-// Produced by tool/generate_migration_pack_codes.dart from the HAVE/
-// ENHANCED rows in doc/guides/migration_guides/*.md. To change a pack's
-// rule set, edit the guide's mapping table and re-run the generator:
-//
-//   dart run tool/generate_migration_pack_codes.dart
-//
-// The two exceptions below are documented in tool/migration_pack_guide_sync.dart.
-//
-// Spread into [kRulePackRuleCodes] in rule_packs.dart so the canonical registry
-// includes migration packs alongside generated and SDK packs.
-// ignore_for_file: always_specify_types
-''';
+/// Header stamped into the generated output.
+const _generatedHeader =
+    '// GENERATED FILE — DO NOT EDIT BY HAND.\n'
+    '//\n'
+    '// Produced by tool/generate_migration_pack_codes.dart from the HAVE/\n'
+    '// ENHANCED rows in doc/guides/migration_guides/*.md. Re-run after edits:\n'
+    '//   dart run tool/generate_migration_pack_codes.dart\n'
+    '//\n'
+    '// Exceptions: see tool/migration_pack_guide_sync.dart.\n'
+    '// Spread into [kRulePackRuleCodes] in rule_packs.dart.\n'
+    '// ignore_for_file: always_specify_types\n';
 
-void main() {
-  final repoRoot = _findRepoRoot();
+void main(List<String> args) {
+  final checkOnly = args.contains('--check');
+  final repoRoot = findRepoRoot();
   final targetFile = File(
     '$repoRoot/lib/src/config/rule_pack_migration_codes.dart',
   );
-  final tiersFile = File('$repoRoot/lib/src/tiers.dart');
+  final tiersContent = File('$repoRoot/lib/src/tiers.dart').readAsStringSync();
   final guideDir = Directory('$repoRoot/doc/guides/migration_guides');
 
-  final knownRuleCodes = _allQuotedIdentifiers(tiersFile.readAsStringSync());
+  // Strip comment lines before matching so commented-out rule names
+  // (e.g. "// 'old_rule' removed v4.2") don't false-pass validation.
+  final knownRuleCodes = activeQuotedIdentifiers(tiersContent);
   final oldContent = targetFile.readAsStringSync();
-  final preservedMarkersBlock = _extractBlock(
-    oldContent,
-    'const Map<String, Set<String>> kRulePackMigrationPubspecMarkers = {',
-  );
-  final preservedSkillLintsCodes = _extractPackCodes(
-    oldContent,
-    'migrate_flutter_skill_lints',
-  );
 
-  final entries = <_PackEntry>[];
+  final entries = _buildPackEntries(
+    guideDir: guideDir,
+    knownRuleCodes: knownRuleCodes,
+    oldContent: oldContent,
+  );
+  if (entries == null) return;
+
+  // Assemble the generated source and format it via a temp file.
+  final generated = _assembleSource(entries, oldContent);
+  final formatted = _formatSource(generated, repoRoot);
+  if (formatted == null) return;
+
+  if (checkOnly) {
+    // Compare against the current file without writing.
+    if (oldContent == formatted) {
+      stdout.writeln('OK: ${targetFile.path} is up to date.');
+    } else {
+      stderr.writeln(
+        'DRIFT: ${targetFile.path} is out of date. '
+        'Re-run: dart run tool/generate_migration_pack_codes.dart',
+      );
+      exitCode = 1;
+    }
+    return;
+  }
+
+  targetFile.writeAsStringSync(formatted);
+  stdout.writeln('Regenerated ${targetFile.path}: ${entries.length} packs.');
+  for (final e in entries) {
+    stdout.writeln('  ${e.id}: ${e.codes.length} codes');
+  }
+}
+
+/// Derives one pack entry per migration pack from the guides. Returns
+/// null and prints errors to stderr if any pack has unknown rule codes.
+List<({String id, Set<String> codes, String comment})>? _buildPackEntries({
+  required Directory guideDir,
+  required Set<String> knownRuleCodes,
+  required String oldContent,
+}) {
+  final entries = <({String id, Set<String> codes, String comment})>[];
   final errors = <String>[];
 
   for (final packId in kMigrationPackGuideFiles.keys) {
@@ -69,43 +88,35 @@ void main() {
     late final String comment;
 
     if (kMigrationPacksWithoutGuideTable.contains(packId)) {
-      codes = preservedSkillLintsCodes;
-      comment =
-          '  // flutter_skill_lints — ${codes.length} codes carried forward '
-          'from the previous generation (no per-rule guide table; see '
-          'plans/GAP_ANALYSIS.md). Verify manually after a guide update.';
-    } else {
-      final statusTag = kMigrationPacksUsingEnhancedTag.contains(packId)
-          ? 'ENHANCED'
-          : 'HAVE';
-      codes = codesFromGuideTable(guideContent, statusTag);
-      if (codes.isEmpty) {
-        errors.add(
-          '$packId: no $statusTag rows found in '
-          '${kMigrationPackGuideFiles[packId]}',
-        );
-        continue;
-      }
-
+      // Carry forward from previously-generated file, then validate.
+      codes = extractPackCodes(oldContent, packId);
       final unknown = codes.difference(knownRuleCodes);
       if (unknown.isNotEmpty) {
-        errors.add(
-          '$packId: guide references unknown saropa rule(s), not found in '
-          'tiers.dart: ${unknown.join(', ')}',
-        );
+        errors.add('$packId (carried forward): ${unknown.join(', ')}');
         continue;
       }
-
-      final coverage = parseCoverageLine(guideContent);
-      final packageName = packId.replaceFirst('migrate_', '');
-      comment = coverage != null
-          ? '  // $packageName — ${coverage.have} $statusTag rules covering '
-                '${coverage.percent}% of ${coverage.total} total'
-                '${codes.length != coverage.have ? ' (${codes.length} unique saropa codes after fan-out)' : ''}.'
-          : '  // $packageName — ${codes.length} $statusTag rule codes.';
+      comment =
+          '  // flutter_skill_lints — ${codes.length} codes carried '
+          'forward (no per-rule guide table; see plans/GAP_ANALYSIS.md).';
+    } else {
+      // Standard packs — fully re-derive from the guide table.
+      final tag = kMigrationPacksUsingEnhancedTag.contains(packId)
+          ? 'ENHANCED'
+          : 'HAVE';
+      codes = codesFromGuideTable(guideContent, tag);
+      if (codes.isEmpty) {
+        errors.add('$packId: no $tag rows in guide');
+        continue;
+      }
+      final unknown = codes.difference(knownRuleCodes);
+      if (unknown.isNotEmpty) {
+        errors.add('$packId: unknown rules: ${unknown.join(', ')}');
+        continue;
+      }
+      comment = buildPackComment(packId, tag, codes, guideContent);
     }
 
-    entries.add(_PackEntry(packId, codes, comment));
+    entries.add((id: packId, codes: codes, comment: comment));
   }
 
   if (errors.isNotEmpty) {
@@ -114,124 +125,75 @@ void main() {
       stderr.writeln('  - $e');
     }
     exitCode = 1;
-    return;
+    return null;
   }
 
-  // Largest packs first (mirrors the previous hand-authored "ship the
-  // highest-coverage packs first" ordering) so the file stays scannable.
+  // Largest packs first so the file stays scannable.
   entries.sort((a, b) {
     final byCoverage = b.codes.length.compareTo(a.codes.length);
-    return byCoverage != 0 ? byCoverage : a.packId.compareTo(b.packId);
+    return byCoverage != 0 ? byCoverage : a.id.compareTo(b.id);
   });
+  return entries;
+}
 
-  final buffer = StringBuffer()
+/// Builds the complete Dart source as a string, without writing it.
+String _assembleSource(
+  List<({String id, Set<String> codes, String comment})> entries,
+  String oldContent,
+) {
+  final markers = extractBlock(
+    oldContent,
+    'const Map<String, Set<String>> kRulePackMigrationPubspecMarkers = {',
+  );
+  final buf = StringBuffer()
     ..writeln(_generatedHeader)
     ..writeln(
-      '/// Migration pack rule codes, keyed by `migrate_<package>` pack id.',
-    )
-    ..writeln('///')
-    ..writeln(
-      '/// Each set contains saropa rule codes that cover functionality from the named',
-    )
-    ..writeln(
-      '/// alternative lint package. Enabling a migration pack opts the user into these',
-    )
-    ..writeln(
-      '/// rules on top of their tier floor, replacing the source package\'s coverage.',
+      '/// Migration pack rule codes, keyed by `migrate_<package>` pack id.\n'
+      '/// Each set contains saropa rule codes that cover functionality from\n'
+      '/// the named alternative lint package, replacing its coverage.',
     )
     ..writeln('const Map<String, Set<String>> kRulePackMigrationCodes = {');
-
-  for (final entry in entries) {
-    buffer.writeln(entry.comment);
-    buffer.writeln("  '${entry.packId}': {");
-    for (final code in entry.codes.toList()..sort()) {
-      buffer.writeln("    '$code',");
+  for (final e in entries) {
+    buf
+      ..writeln(e.comment)
+      ..writeln("  '${e.id}': {");
+    for (final code in e.codes.toList()..sort()) {
+      buf.writeln("    '$code',");
     }
-    buffer.writeln('  },');
-    buffer.writeln();
+    buf
+      ..writeln('  },')
+      ..writeln();
   }
-  buffer.writeln('};');
-  buffer.writeln();
-  buffer.writeln(
-    '/// Pubspec dependency markers for migration packs. Each migration pack fires',
-  );
-  buffer.writeln(
-    '/// when the source package is still present in pubspec.yaml (any version).',
-  );
-  buffer.writeln(preservedMarkersBlock);
-
-  targetFile.writeAsStringSync(buffer.toString());
-
-  final format = Process.runSync('dart', [
-    'format',
-    targetFile.path,
-  ], workingDirectory: repoRoot);
-  if (format.exitCode != 0) {
-    stderr.writeln('dart format failed:\n${format.stderr}');
-    exitCode = 1;
-    return;
-  }
-
-  stdout.writeln('Regenerated ${targetFile.path}: ${entries.length} packs.');
-  for (final entry in entries) {
-    stdout.writeln('  ${entry.packId}: ${entry.codes.length} codes');
-  }
+  buf
+    ..writeln('};')
+    ..writeln()
+    ..writeln(
+      '/// Pubspec dependency markers for migration packs. Each migration\n'
+      '/// pack fires when the source package is still present in\n'
+      '/// pubspec.yaml (any version).',
+    )
+    ..writeln(markers);
+  return buf.toString();
 }
 
-class _PackEntry {
-  _PackEntry(this.packId, this.codes, this.comment);
-
-  final String packId;
-  final Set<String> codes;
-  final String comment;
-}
-
-Set<String> _allQuotedIdentifiers(String content) {
-  return RegExp(
-    r"'([a-zA-Z0-9_]+)'",
-  ).allMatches(content).map((m) => m.group(1)!).toSet();
-}
-
-/// Extracts a `const ... = { ... };` block starting at [startMarker] up to
-/// and including its matching closing `};`.
-String _extractBlock(String content, String startMarker) {
-  final start = content.indexOf(startMarker);
-  if (start == -1) {
-    throw StateError('Could not find block starting with: $startMarker');
-  }
-  final end = content.indexOf('\n};', start);
-  if (end == -1) {
-    throw StateError('Could not find end of block starting with: $startMarker');
-  }
-  return content.substring(start, end + 3);
-}
-
-/// Extracts the quoted rule codes inside a single `'packId': { ... },` set
-/// literal from the existing generated file.
-Set<String> _extractPackCodes(String content, String packId) {
-  final keyPattern = RegExp("'$packId': \\{");
-  final start = keyPattern.firstMatch(content);
-  if (start == null) {
-    throw StateError('Could not find existing entry for $packId');
-  }
-  final end = content.indexOf('\n  },', start.end);
-  if (end == -1) {
-    throw StateError('Could not find end of entry for $packId');
-  }
-  final block = content.substring(start.end, end);
-  return RegExp(
-    r"'([a-zA-Z0-9_]+)'",
-  ).allMatches(block).map((m) => m.group(1)!).toSet();
-}
-
-String _findRepoRoot() {
-  var dir = Directory.current;
-  while (!File('${dir.path}/pubspec.yaml').existsSync()) {
-    final parent = dir.parent;
-    if (parent.path == dir.path) {
-      throw StateError('Could not locate repo root (pubspec.yaml not found)');
+/// Formats [source] via a temp file and returns the formatted string,
+/// or null on failure (sets exitCode and prints to stderr).
+String? _formatSource(String source, String repoRoot) {
+  final tmp = File('$repoRoot/.dart_tool/migration_gen_tmp.dart');
+  try {
+    tmp.writeAsStringSync(source);
+    final fmt = Process.runSync('dart', [
+      'format',
+      tmp.path,
+    ], workingDirectory: repoRoot);
+    if (fmt.exitCode != 0) {
+      stderr.writeln('dart format failed:\n${fmt.stderr}');
+      exitCode = 1;
+      return null;
     }
-    dir = parent;
+    return tmp.readAsStringSync();
+  } finally {
+    // Clean up the temp file.
+    if (tmp.existsSync()) tmp.deleteSync();
   }
-  return dir.path;
 }
