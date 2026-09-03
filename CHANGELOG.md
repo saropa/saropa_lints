@@ -78,6 +78,13 @@ Removed Phase 0 fake LSP test diagnostics that shipped in 15.2.10. The standalon
 
 - **`saropaLints.lspServer.enabled` now defaults to `false`.** Previously defaulted to `true`, which activated the fake LSP server for all users. No action required.
 
+<details>
+<summary>Maintenance</summary>
+
+- Regenerated category map and migration pack codes for 18 new rules added in 15.2.10 that were missing from the generated indexes.
+
+</details>
+
 ---
 
 ## [15.2.10]

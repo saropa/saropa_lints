@@ -185,8 +185,35 @@ Dart analyzer's diagnostics. No real analysis, no rules, no
 `AnalysisContextCollection`. Just: does the plumbing work?
 
 **Implementation status:** Code complete (commits `157e3c4e`, `67ed0562`,
-`38968fe9`). Locale catalogs regenerated (`93734f21`). Pending manual VS Code
-test (F5 Extension Development Host) to verify exit criteria.
+`38968fe9`). Test diagnostics removed after shipping default-on bug (`1ef3b058`).
+Setting now defaults to `false`. Locale catalogs regenerated (`93734f21`).
+
+**BLOCKER — server crash loop (2026-09-03):** The inert LSP server crashes
+during initialization or shortly after. VS Code's `LanguageClient` retries 5
+times then gives up with "Server initialization failed" / "will not be
+restarted." This violates the Phase 0 exit criterion that the server coexist
+without interference. Root causes to investigate:
+
+1. **Unhandled notifications in switch default.** `textDocument/didChange`,
+   `$/cancelRequest`, `$/setTrace`, `workspace/didChangeConfiguration` arrive
+   as notifications (no `id`). The default case calls `_sendError(id, ...)`
+   with `id == null` — sending an error response to a notification violates
+   JSON-RPC 2.0 and may crash `LanguageClient`.
+2. **`dart pub get` needed.** After removing code from `bin/lsp_server.dart`,
+   the server may fail to compile if the pub cache is stale.
+3. **Init handshake incomplete.** The `initialize` response must include all
+   fields `LanguageClient` expects. A missing or malformed capability may
+   cause the client to reject the handshake.
+
+**Fix approach:** Add all common notification methods as silent no-ops in the
+switch. For unknown methods without an `id` (notifications), log and ignore
+instead of sending an error. Run `dart pub get` before testing. Verify the
+`initialize` response satisfies `LanguageClient` expectations.
+
+**Lesson learned — default-on shipping incident:** `lspServer.enabled`
+shipped as `true` in 15.2.10, causing fake test diagnostics on every `.dart`
+file for all users. Hard rule going forward: **every new engine/feature
+defaults to OFF until its exit criteria are fully verified in a manual test.**
 
 **Control surface — extension Debug Panel:**
 
@@ -325,29 +352,37 @@ off doesn't affect the others.
    - `saropaLints.lspServer.enabled` (boolean, default: true)
    - New commands: toggle debug panel, start/stop/restart LSP server
 
-**Exit criteria:**
-- Enable `saropaLints.debug.enabled` + `saropaLints.lspServer.enabled` →
-  open any `.dart` file with 4+ lines → see all four fake diagnostics in
-  Problems panel alongside real Dart analyzer diagnostics
-- Each severity renders the correct squiggle color: red (error), yellow
-  (warning), blue (info), and faded/ellipsis (hint)
-- Each squiggle spans the full line text, not just a single character
-- Each diagnostic's quick fix (lightbulb) appears and applies correctly —
-  appends the dismiss comment to the target line
-- Debug Panel shows all three engines with correct status and toggle buttons
-- Toggle LSP Server OFF in Debug Panel → fake diagnostics clear immediately
-- Toggle LSP Server ON → diagnostics reappear without VS Code restart
-- Disable `saropaLints.lspServer.enabled` in settings → no LSP server,
-  no diagnostics, zero overhead
-- `Saropa Lints LSP` appears in Output channel dropdown
+**Exit criteria (updated 2026-09-03):**
 
-**What this proves:**
+Phase 0 test diagnostics have been removed (proven: 3 of 4 severity levels
+confirmed working 2026-09-03). Remaining exit criteria focus on stability:
+
+- **Crash-free coexistence (BLOCKER).** Enable `saropaLints.lspServer.enabled`
+  → LSP server starts, completes init handshake, stays alive indefinitely
+  with zero crashes. VS Code must never show "Server initialization failed"
+  or "will not be restarted." The server handles all notifications
+  (`textDocument/didChange`, `$/cancelRequest`, `$/setTrace`,
+  `workspace/didChangeConfiguration`, etc.) as silent no-ops without sending
+  error responses.
+- Debug Panel shows all three engines with correct status and toggle buttons
+- Toggle LSP Server OFF in Debug Panel → server stops cleanly
+- Toggle LSP Server ON → server restarts without VS Code restart
+- Disable `saropaLints.lspServer.enabled` in settings → no LSP server,
+  zero overhead
+- `Saropa Lints LSP` appears in Output channel dropdown
+- Reload window → no orphaned dart.exe in Task Manager
+
+**What Phase 0 proved (test diagnostics, now removed):**
 - VS Code allows two LSP servers to serve the same `language: 'dart'`
 - Diagnostics from both servers merge in the Problems panel without conflict
-- All four severity levels render distinct squiggle styles
-- Quick fix code actions from a non-analyzer LSP server work at every severity
-- `LanguageClient` lifecycle (spawn, crash recovery, shutdown) works
+- 3 of 4 severity levels render distinct squiggle styles (hint untested —
+  test files had <4 lines)
+- `LanguageClient` lifecycle (spawn, shutdown) works
 - No interference with the Dart extension's own LanguageClient
+
+**What Phase 0 has NOT yet proven (crash blocker):**
+- `LanguageClient` crash recovery — server currently crashes on init
+- Long-running stability — server must stay alive through an editing session
 
 **What this does NOT prove (deferred to Phase 1):**
 - Real analysis performance or memory footprint

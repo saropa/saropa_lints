@@ -12,7 +12,7 @@
 /// Each set contains saropa rule codes that cover functionality from
 /// the named alternative lint package, replacing its coverage.
 const Map<String, Set<String>> kRulePackMigrationCodes = {
-  // dcm — 425 HAVE rules covering 87% of 487 total (430 unique saropa codes after fan-out).
+  // dcm — 425 HAVE rules covering 87% of 487 total (431 unique saropa codes after fan-out).
   'migrate_dcm': {
     'always_remove_listener',
     'avoid_accessing_collections_by_constant_index',
@@ -361,6 +361,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'prefer_immutable_provider_arguments',
     'prefer_immutable_selector_value',
     'prefer_inferred_type_arguments',
+    'prefer_initializing_formals_extended',
     'prefer_iterable_of',
     'prefer_kebab_tag_name',
     'prefer_list_contains',
@@ -1195,8 +1196,9 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'proper_super_calls',
   },
 
-  // very_good_analysis — 13 ENHANCED codes.
+  // very_good_analysis — 15 ENHANCED codes.
   'migrate_very_good_analysis': {
+    'avoid_null_checks_in_equality_operators_extended',
     'avoid_positional_boolean_parameters_with_fix',
     'avoid_print_in_production',
     'avoid_print_in_release',
@@ -1204,6 +1206,7 @@ const Map<String, Set<String>> kRulePackMigrationCodes = {
     'check_mounted_after_async',
     'prefer_declaring_const_constructor',
     'prefer_final_locals_with_fix',
+    'prefer_initializing_formals_extended',
     'prefer_readable_line_length',
     'prefer_single_quotes_strict',
     'prefer_sized_box_for_whitespace',
