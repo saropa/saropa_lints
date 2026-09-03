@@ -125,9 +125,15 @@ void _handleMessage(Map<String, dynamic> message) {
       // Client acknowledges init — nothing to do.
       _log('initialized');
     case 'textDocument/didOpen':
+    case 'textDocument/didChange':
     case 'textDocument/didSave':
     case 'textDocument/didClose':
       // No-op — Phase 1 will wire real analysis here.
+      break;
+    case r'$/cancelRequest':
+    case r'$/setTrace':
+    case 'workspace/didChangeConfiguration':
+      // Standard notifications we acknowledge but don't act on yet.
       break;
     case 'textDocument/codeAction':
       // No-op — Phase 1 will wire real quick fixes here.
