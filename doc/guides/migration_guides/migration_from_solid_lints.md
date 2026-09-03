@@ -86,13 +86,13 @@ current published rule set (33 rules as of this audit; verified directly against
 |---|---|---|
 | `avoid_debug_print_in_release` | PARTIAL | `avoid_print_in_release` guards `print()`, not `debugPrint()` |
 | `avoid_duplicate_code` | TODO | Cross-project AST clone detector — no saropa equivalent. TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_duplicate_code.md) |
-| `avoid_final_with_getter` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_final_with_getter.md) |
+| `avoid_final_with_getter` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_final_with_getter.md) |
 | `avoid_global_state` | HAVE | `avoid_global_state` |
 | `avoid_late_keyword` | HAVE | `avoid_late_keyword` |
 | `avoid_non_null_assertion` | HAVE | `avoid_non_null_assertion` |
 | `avoid_returning_widgets` | TODO | Name collision only — saropa's same-named rule checks a different shape. TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_returning_widgets_solid_lints_parity.md) |
 | `avoid_similar_names` | TODO | Name collision only — saropa's same-named rule targets enum-indexed Map literals, not similar identifiers. TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_similar_names_solid_lints_parity.md) |
-| `avoid_unnecessary_return_variable` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_unnecessary_return_variable.md) |
+| `avoid_unnecessary_return_variable` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_unnecessary_return_variable.md) |
 | `avoid_unnecessary_setstate` | HAVE | `avoid_unnecessary_setstate` |
 | `avoid_unnecessary_type_assertions` | HAVE | `avoid_unnecessary_type_assertions` |
 | `avoid_unrelated_type_assertions` | HAVE | `avoid_unrelated_type_assertions` |
@@ -103,7 +103,7 @@ current published rule set (33 rules as of this audit; verified directly against
 | `feature_envy` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_feature_envy.md) |
 | `function_lines_of_code` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_function_lines_of_code.md) |
 | `member_ordering` | PARTIAL | `prefer_member_ordering` is a flat 3-bucket order vs. solid_lints' fully configurable DSL |
-| `named_parameters_ordering` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_named_parameters_ordering.md) |
+| `named_parameters_ordering` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_named_parameters_ordering.md) |
 | `newline_before_return` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_newline_before_return.md) |
 | `no_empty_block` | HAVE | `no_empty_block` |
 | `no_equal_then_else` | HAVE | `no_equal_then_else` |
@@ -115,7 +115,7 @@ current published rule set (33 rules as of this audit; verified directly against
 | `prefer_last` | TODO | length-1 index → `.last` — TODO, see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_last.md) |
 | `prefer_match_file_name` | HAVE | `prefer_match_file_name` |
 | `proper_super_calls` | HAVE | `proper_super_calls` |
-| `use_descriptive_names_for_type_parameters` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_use_descriptive_names_for_type_parameters.md) |
+| `use_descriptive_names_for_type_parameters` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_use_descriptive_names_for_type_parameters.md) |
 | `use_nearest_context` | TODO | Effectively a gap — corresponds to a known saropa bug, see Known Issues below. TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_extend_use_nearest_context_solid_lints_parity.md) |
 
 ## Known Issues

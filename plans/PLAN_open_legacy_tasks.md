@@ -25,7 +25,7 @@ a boilerplate field most were never updated after implementation. Cross-referenc
 | No `Status` field (implicitly not tracked) | 1 |
 | Already implemented (exact tiers.dart or source match) | 260 |
 | Already implemented (confirmed via class-name lookup, different final rule id) | 27 |
-| **Genuinely still open** | **37** |
+| **Genuinely still open** | **32** (37 minus 4 confirmed duplicates of shipped rules; see resolved items below) |
 | Duplicate filename across two history dates (same rule proposed twice) | 1 (`avoid_any_version`) |
 
 **287 of 335 "Planned" task files (85.7%) describe work that is already done.** Their `Status: Planned`
@@ -35,7 +35,7 @@ status fields was judged lower value than surfacing the actual open list below.
 
 ## Genuinely open (37 unique rules, no implementation and no filed proposal)
 
-Cross-checked against the 298 proposals filed this session (`bugs/proposal_*.md`) — none of these 37
+Cross-checked against the 336 proposals filed this session (`bugs/proposal_*.md`) — none of these 37
 overlap with a competitor-package migration-guide gap, meaning they are saropa's own internal roadmap
 ideas rather than DCM/alternative-package parity items.
 
@@ -44,8 +44,8 @@ ideas rather than DCM/alternative-package parity items.
 - `avoid_implementing_value_types`
 - `avoid_null_checks_in_equality_operators`
 - `avoid_private_typedef_functions`
-- `avoid_redundant_argument_values`
-- `prefer_expression_function_bodies`
+- `avoid_redundant_argument_values` — **RESOLVED — already shipped as `avoid_passing_default_values`, do not build**
+- `prefer_expression_function_bodies` — **RESOLVED — already shipped as `prefer_arrow_functions`, do not build**
 - `avoid_dynamic_calls`
 - `avoid_repeated_widget_creation`
 - `avoid_suspicious_global_reference`
@@ -65,15 +65,15 @@ ideas rather than DCM/alternative-package parity items.
 - `avoid_webview_local_storage_access`
 
 ### Platform / performance
-- `avoid_connectivity_ui_decisions`
+- `avoid_connectivity_ui_decisions` — **NEEDS DECISION — overlaps existing `avoid_connectivity_equals_internet`, extend vs. new**
 - `avoid_large_assets_on_web`
-- `avoid_large_object_in_state`
+- `avoid_large_object_in_state` — **RESOLVED — already shipped as `avoid_large_objects_in_state` (plural), do not build**
 - `avoid_pagination_refetch_all`
 - `prefer_intent_filter_export`
 
 ### pubspec.yaml hygiene
 - `add_resolution_workspace`
-- `dependencies_ordering`
+- `dependencies_ordering` — **RESOLVED — already shipped as `sort_pub_dependencies_extended`, do not build**
 - `newline_before_pubspec_entry`
 - `prefer_caret_version_syntax`
 - `prefer_commenting_pubspec_ignores`
@@ -123,6 +123,7 @@ state `bin/cross_file.dart` is in today); treat this section as the historical r
 
 ## Next step
 
-The 37 open items above have no proposal file. Before implementing any of them, file proposals
-(`bugs/proposal_*.md`, same format as the 298 filed this session) so they're tracked the same way as
-every other pending rule.
+Proposals now exist for all 37 items above (`bugs/*/proposal_*.md`). Of those, 4 turned out to be
+duplicates of already-shipped rules and 1 needs a decision on extend-vs-new (see RESOLVED / NEEDS
+DECISION annotations above) — leaving 32 genuinely open. The actionable next step is implementing
+the open items in the tier order set out in `plans/PLAN_gap_theme_priorities.md`.

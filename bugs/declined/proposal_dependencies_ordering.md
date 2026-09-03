@@ -1,6 +1,6 @@
 # PROPOSAL: Dependencies Ordering
 
-**Status: Open**
+**Status: Declined**
 
 Created: 2026-09-02
 

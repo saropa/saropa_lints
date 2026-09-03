@@ -1,6 +1,6 @@
 # PROPOSAL: DCM `add-static-field` Is a Code Assist, Not a Lint Rule Candidate
 
-**Status: Open**
+**Status: Declined**
 
 Created: 2026-09-02
 Type: Tooling / Infrastructure

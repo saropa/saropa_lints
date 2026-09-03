@@ -219,7 +219,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-inferrable-type-arguments` | HAVE | `prefer_inferred_type_arguments` |
 | `avoid-inverted-boolean-checks` | HAVE | `avoid_inverted_boolean_checks` |
 | `avoid-keywords-in-wildcard-pattern` | HAVE | `avoid_keywords_in_wildcard_pattern` |
-| `avoid-labels` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_labeled_statements.md) |
+| `avoid-labels` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_labeled_statements.md) |
 | `avoid-late-final-reassignment` | HAVE | `avoid_late_final_reassignment` |
 | `avoid-late-keyword` | HAVE | `avoid_late_keyword` |
 | `avoid-local-functions` | HAVE | `avoid_local_functions` |
@@ -238,7 +238,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-misused-wildcard-pattern` | PARTIAL | `avoid_keywords_in_wildcard_pattern` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_keywords_in_wildcard_pattern_dcm_parity.md) |
 | `avoid-mixing-named-and-positional-fields` | HAVE | `avoid_mixing_named_and_positional_fields` |
 | `avoid-multi-assignment` | HAVE | `avoid_multi_assignment` |
-| `avoid-mutating-constant-collections` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_mutating_constant_collections.md) |
+| `avoid-mutating-constant-collections` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_mutating_constant_collections.md) |
 | `avoid-mutating-parameters` | HAVE | `avoid_parameter_mutation` |
 | `avoid-negated-conditions` | HAVE | `avoid_negated_conditions` |
 | `avoid-negations-in-equality-checks` | HAVE | `avoid_negations_in_equality_checks` |
@@ -257,7 +257,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-non-empty-constructor-bodies` | HAVE | `avoid_non_empty_constructor_bodies` |
 | `avoid-non-final-exception-class-fields` | HAVE | `avoid_non_final_exception_class_fields` |
 | `avoid-non-null-assertion` | HAVE | `avoid_non_null_assertion` |
-| `avoid-not-assignable-collection-types` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_not_assignable_collection_types.md) |
+| `avoid-not-assignable-collection-types` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_not_assignable_collection_types.md) |
 | `avoid-not-encodable-in-to-json` | HAVE | `avoid_not_encodable_in_to_json` |
 | `avoid-nullable-interpolation` | HAVE | `avoid_nullable_interpolation` |
 | `avoid-nullable-parameters-with-default-values` | HAVE | `avoid_nullable_parameters_with_default_values` |
@@ -290,7 +290,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `avoid-stream-tostring` | HAVE | `avoid_stream_tostring` |
 | `avoid-substring` | HAVE | `avoid_string_substring` |
 | `avoid-suspicious-global-reference` | PARTIAL | `avoid_global_state` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_global_state_dcm_parity.md) |
-| `avoid-suspicious-super-overrides` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_suspicious_super_overrides.md) |
+| `avoid-suspicious-super-overrides` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_suspicious_super_overrides.md) |
 | `avoid-throw-in-catch-block` | HAVE | `avoid_throw_in_catch_block` |
 | `avoid-throw-objects-without-tostring` | HAVE | `avoid_throw_objects_without_tostring` |
 | `avoid-throw` | PARTIAL | `avoid_throw_in_finally` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_throw_in_finally_dcm_parity.md) |
@@ -362,7 +362,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `function-always-returns-null` | HAVE | `function_always_returns_null` |
 | `function-always-returns-same-value` | HAVE | `function_always_returns_same_value` |
 | `handle-throwing-invocations` | HAVE | `handle_throwing_invocations` |
-| `initializers-ordering` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_initializers_ordering.md) |
+| `initializers-ordering` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_initializers_ordering.md) |
 | `map-keys-ordering` | HAVE | `map_keys_ordering` |
 | `match-base-class-default-value` | HAVE | `match_base_class_default_value` |
 | `match-class-name-pattern` | HAVE | `match_class_name_pattern` |
@@ -443,7 +443,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `prefer-for-in` | HAVE | `prefer_for_in` |
 | `prefer-getter-over-method` | HAVE | `prefer_getter_over_method` |
 | `prefer-immediate-return` | HAVE | `prefer_immediate_return` |
-| `prefer-initializing-formals` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_initializing_formals.md) |
+| `prefer-initializing-formals` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_initializing_formals.md) |
 | `prefer-iterable-of` | HAVE | `prefer_iterable_of` |
 | `prefer-last` | HAVE | `prefer_list_last` |
 | `prefer-match-file-name` | HAVE | `prefer_match_file_name` |
@@ -502,10 +502,10 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | DCM Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `add-copy-with` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_infra_add_copy_with_code_assist.md) |
-| `always-pass-global-key` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_require_global_key_for_widget.md) |
+| `always-pass-global-key` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_require_global_key_for_widget.md) |
 | `always-remove-listener` | HAVE | `always_remove_listener` |
 | `avoid-border-all` | HAVE | `avoid_border_all` |
-| `avoid-disposing-late-fields` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_disposing_late_fields.md) |
+| `avoid-disposing-late-fields` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_disposing_late_fields.md) |
 | `avoid-empty-setstate` | HAVE | `avoid_empty_setstate` |
 | `avoid-expanded-as-spacer` | HAVE | `avoid_expanded_as_spacer` |
 | `avoid-flexible-outside-flex` | HAVE | `avoid_flexible_outside_flex` |
@@ -537,7 +537,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `check-for-equals-in-render-object-setters` | HAVE | `check_for_equals_in_render_object_setters` |
 | `consistent-update-render-object` | HAVE | `consistent_update_render_object` |
 | `dispose-fields` | HAVE | `dispose_widget_fields` / `dispose_class_fields` |
-| `keep-state-below-its-widget` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_state_class_below_widget.md) |
+| `keep-state-below-its-widget` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_state_class_below_widget.md) |
 | `pass-existing-future-to-future-builder` | HAVE | `pass_existing_future_to_future_builder` |
 | `pass-existing-stream-to-stream-builder` | HAVE | `pass_existing_stream_to_stream_builder` |
 | `prefer-action-button-tooltip` | HAVE | `prefer_action_button_tooltip` |
@@ -549,12 +549,12 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `prefer-constrained-box-over-container` | HAVE | `prefer_constrained_box_over_container` |
 | `prefer-container` | TODO | TODO — see [proposal](../../../bugs/declined/proposal_prefer_container.md) |
 | `prefer-correct-edge-insets-constructor` | HAVE | `prefer_correct_edge_insets_constructor` |
-| `prefer-correct-static-icon-provider` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_correct_static_icon_provider.md) |
+| `prefer-correct-static-icon-provider` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_correct_static_icon_provider.md) |
 | `prefer-dedicated-media-query-methods` | PARTIAL | `avoid_deprecated_use_inherited_media_query` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_deprecated_use_inherited_media_query_dcm_parity.md) |
 | `prefer-define-hero-tag` | HAVE | `prefer_define_hero_tag` |
 | `prefer-extracting-callbacks` | HAVE | `prefer_extracting_callbacks` |
 | `prefer-for-loop-in-children` | HAVE | `prefer_for_loop_in_children` |
-| `prefer-haptic-feedback-on-interaction` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_haptic_feedback_on_interaction.md) |
+| `prefer-haptic-feedback-on-interaction` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_haptic_feedback_on_interaction.md) |
 | `prefer-icon-button-tooltip` | HAVE | `avoid_icon_buttons_without_tooltip` |
 | `prefer-localized-semantic-labels` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_prefer_localized_semantic_labels.md) |
 | `prefer-padding-over-container` | HAVE | `prefer_padding_over_container` |
@@ -576,7 +576,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `provide-progress-indicator-semantics` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_require_progress_indicator_semantics.md) |
 | `provide-slider-semantic-formatter` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_require_slider_semantic_formatter.md) |
 | `use-closest-build-context` | HAVE | `use_closest_build_context` |
-| `use-existing-widget` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_existing_widget_over_reimplementation.md) |
+| `use-existing-widget` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_existing_widget_over_reimplementation.md) |
 | `use-setstate-synchronously` | HAVE | `use_setstate_synchronously` |
 
 ### Provider

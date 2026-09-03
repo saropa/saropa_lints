@@ -1,6 +1,6 @@
 # PROPOSAL: Avoid Redundant Argument Values
 
-**Status: Open**
+**Status: Declined**
 
 Created: 2026-09-02
 

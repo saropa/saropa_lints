@@ -1,6 +1,6 @@
 # PROPOSAL: Avoid Large Object In State
 
-**Status: Open**
+**Status: Declined**
 
 Created: 2026-09-02
 

@@ -1,6 +1,6 @@
 # PROPOSAL: Prefer Expression Function Bodies
 
-**Status: Open**
+**Status: Declined**
 
 Created: 2026-09-02
 

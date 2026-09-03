@@ -1,6 +1,6 @@
 # PROPOSAL: Code Assist to Generate `copyWith` Method
 
-**Status: Open**
+**Status: Declined**
 
 Created: 2026-09-02
 Type: Tooling / Infrastructure

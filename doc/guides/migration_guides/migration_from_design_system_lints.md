@@ -57,10 +57,10 @@ Coverage: 7 rules — 1 PARTIAL, 6 TODO (85%)
 |---|---|---|
 | `color` | PARTIAL | `avoid_hardcoded_colors` — flags `Color(0x...)`/`Colors.x` against `Theme.of(context)`, not an arbitrary `@designSystem`-annotated source class |
 | `edge_insets` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_use_design_system.md) |
-| `box_shadow` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_edge_insets.md) |
+| `box_shadow` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_edge_insets.md) |
 | `radius` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_use_design_system.md) |
 | `text_style` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_text_style.md) (saropa's similarly-named `avoid_hardcoded_text_styles` is a false cognate about `onHover`, not a match) |
-| `theme_data` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_theme_data.md) |
+| `theme_data` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_theme_data.md) |
 | `box_constraints` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_use_design_system.md) |
 
 All 6 `TODO` rows depend on a generic `@designSystem`-annotated source class mechanism that saropa_lints does not implement; saropa_lints' `avoid_hardcoded_colors` instead checks against Flutter's built-in `Theme.of(context)`.

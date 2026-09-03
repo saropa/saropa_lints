@@ -1,6 +1,6 @@
 # PROPOSAL: DCM `avoid-never-passed-parameters` Requires Whole-Program Call-Site Analysis
 
-**Status: Open**
+**Status: Declined**
 
 Created: 2026-09-02
 Type: Tooling / Infrastructure

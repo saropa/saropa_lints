@@ -116,7 +116,7 @@ Coverage: 87 rules — 77 HAVE (88%), 2 PARTIAL, 8 TODO (9%)
 | `avoid_missing_enum_constant_in_map` | HAVE | `avoid_missing_enum_constant_in_map` |
 | `avoid_nested_conditional_expressions` | HAVE | `avoid_nested_conditional_expressions` |
 | `avoid_non_ascii_symbols` | HAVE | `avoid_non_ascii_symbols` |
-| `avoid_non_configurable_callbacks_in_init_state` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_non_configurable_callbacks_in_init_state.md) |
+| `avoid_non_configurable_callbacks_in_init_state` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_non_configurable_callbacks_in_init_state.md) |
 | `avoid_non_exhaustive_switch_on_sealed_classes` | HAVE | `require_exhaustive_sealed_switch` |
 | `avoid_non_null_assertion` | HAVE | `avoid_non_null_assertion` |
 | `avoid_passing_async_when_sync_expected` | HAVE | `avoid_passing_async_when_sync_expected` |

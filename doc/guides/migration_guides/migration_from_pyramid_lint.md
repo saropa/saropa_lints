@@ -59,8 +59,8 @@ Coverage: 37 rules — 25 HAVE (67%), 4 PARTIAL, 8 TODO (21%)
 
 | pyramid_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `always_put_doc_comments_before_annotations` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_always_put_doc_comments_before_annotations.md) |
-| `always_specify_parameter_names` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_always_specify_parameter_names.md) |
+| `always_put_doc_comments_before_annotations` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_always_put_doc_comments_before_annotations.md) |
+| `always_specify_parameter_names` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_always_specify_parameter_names.md) |
 | `avoid_dynamic` | HAVE | `avoid_dynamic_type` |
 | `avoid_empty_blocks` | HAVE | `no_empty_block` |
 | `avoid_mutable_global_variables` | HAVE | `avoid_global_state` |
@@ -76,17 +76,17 @@ Coverage: 37 rules — 25 HAVE (67%), 4 PARTIAL, 8 TODO (21%)
 | `prefer_iterable_every` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_iterable_every.md) (same false-cognate note as `prefer_iterable_any`) |
 | `prefer_iterable_first` | HAVE | `prefer_list_first` |
 | `prefer_iterable_last` | HAVE | `prefer_list_last` |
-| `prefer_library_prefixes` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_library_prefixes.md) |
+| `prefer_library_prefixes` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_library_prefixes.md) |
 | `prefer_new_line_before_return` | HAVE | `prefer_blank_line_before_return` |
 | `prefer_underscore_for_unused_callback_parameters` | HAVE | `prefer_wildcard_for_unused_param` |
-| `proper_from_environment` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_proper_from_environment.md) |
+| `proper_from_environment` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_proper_from_environment.md) |
 | `unnecessary_nullable_return_type` | HAVE | `avoid_unnecessary_nullable_return_type` |
 
 ### Flutter Lints
 
 | pyramid_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid_public_members_in_states` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_public_members_in_states.md) |
+| `avoid_public_members_in_states` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_public_members_in_states.md) |
 | `avoid_single_child_in_flex` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_single_child_in_flex.md) |
 | `dispose_controllers` | PARTIAL | `require_form_field_controller` — pyramid's is type-checker-based (any disposable-typed field); saropa's is a fixed enumeration of known controller types, so a novel custom controller type would be missed by saropa but caught by pyramid. TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_dispose_controllers.md) |
 | `prefer_async_callback` | HAVE | `prefer_async_callback` |

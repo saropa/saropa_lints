@@ -72,7 +72,7 @@ Coverage: 24 rules — 5 HAVE (20%), 4 PARTIAL, 15 TODO (62%)
 | `prefer_fake_over_mock` | PARTIAL | `prefer_fake_over_mock` exists but its doc describes "excessive mocking" generally, not specifically the `extends Mock` → `extends Fake` pattern — needs verification |
 | `prevent_feature_module_dependencies` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_prevent_feature_module_dependencies.md) |
 | `prevent_library_module_dependencies` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_prevent_library_module_dependencies.md) |
-| `private_subject` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_private_subject.md) |
+| `private_subject` | TODO | TODO — see [proposal](../../../bugs/tier_5_niche/proposal_private_subject.md) |
 | `restrict_core_icon_data` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_restrict_core_icon_data.md) |
 | `sealed_over_dynamic` | HAVE | `prefer_switch_with_sealed_classes` |
 | `specific_exception_types` | HAVE | `avoid_catch_all` / `avoid_catching_generic_exception` |

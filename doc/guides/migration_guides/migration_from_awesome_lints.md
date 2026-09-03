@@ -94,8 +94,8 @@ Coverage: 128 rules — 110 HAVE (85%), 7 PARTIAL, 11 TODO (8%)
 
 | awesome_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `arguments_ordering` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_arguments_ordering.md) |
-| `avoid_accessing_collections_by_constant_index` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_accessing_collections_by_constant_index.md) |
+| `arguments_ordering` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_arguments_ordering.md) |
+| `avoid_accessing_collections_by_constant_index` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_accessing_collections_by_constant_index.md) |
 | `avoid_accessing_other_classes_private_members` | HAVE | `avoid_accessing_other_classes_private_members` |
 | `avoid_adjacent_strings` | TODO | TODO — saropa's `prefer_adjacent_strings` enforces the opposite convention — see [proposal](../../../bugs/declined/proposal_avoid_adjacent_strings.md) |
 | `avoid_always_null_parameters` | HAVE | `avoid_always_null_parameters` |
@@ -120,14 +120,14 @@ Coverage: 128 rules — 110 HAVE (85%), 7 PARTIAL, 11 TODO (8%)
 | `avoid_constant_assert_conditions` | HAVE | `avoid_constant_assert_conditions` |
 | `avoid_constant_conditions` | HAVE | `avoid_constant_conditions` |
 | `avoid_constant_switches` | HAVE | `avoid_constant_switches` |
-| `avoid_continue` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_continue.md) |
+| `avoid_continue` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_continue.md) |
 | `avoid_contradictory_expressions` | HAVE | `avoid_contradictory_expressions` |
 | `avoid_declaring_call_method` | HAVE | `avoid_declaring_call_method` |
 | `avoid_default_tostring` | HAVE | `avoid_default_tostring` |
 | `avoid_deprecated_usage` | HAVE | `avoid_deprecated_usage` |
 | `avoid_double_slash_imports` | HAVE | `avoid_double_slash_imports` |
 | `avoid_duplicate_cascades` | HAVE | `avoid_duplicate_cascades` |
-| `avoid_duplicate_collection_elements` | TODO | TODO — unconfirmed — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_duplicate_collection_elements.md) |
+| `avoid_duplicate_collection_elements` | TODO | TODO — unconfirmed — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_duplicate_collection_elements.md) |
 | `avoid_non_null_assertion` | HAVE | `avoid_non_null_assertion` |
 | `binary_expression_operand_order` | HAVE | `binary_expression_operand_order` |
 | `dispose_class_fields` | HAVE | `dispose_class_fields` |
