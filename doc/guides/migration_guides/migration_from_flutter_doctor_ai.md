@@ -59,7 +59,7 @@ dart analyze
 
 ## Rule Mapping
 
-Coverage: 5 HAVE (100%), 0 PARTIAL (0%), 0 TODO (0%). Clean sweep — saropa's
+Coverage: 5 rules — 5 HAVE (100%)
 dispose/mounted-check/print/empty-setState/long-function rules are all supersets of
 flutter_doctor_ai's static checks.
 

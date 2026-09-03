@@ -53,13 +53,13 @@ dart analyze
 
 ## Rule Mapping
 
-Coverage: 0 HAVE (0%), 0 PARTIAL (0%), 3 TODO (100%).
+Coverage: 3 rules — 3 TODO (100%)
 
 | json_serializable_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `require_json_serializable_from_json` | TODO | TODO — no proposal filed yet |
-| `require_json_serializable_to_json` | TODO | TODO — no proposal filed yet |
-| `require_annotation_from_json` | TODO | TODO — no proposal filed yet |
+| `require_json_serializable_from_json` | TODO | TODO — see [proposal](../../../bugs/proposal_json_serializable_enforcement_rules.md) |
+| `require_json_serializable_to_json` | TODO | TODO — see [proposal](../../../bugs/proposal_json_serializable_enforcement_rules.md) |
+| `require_annotation_from_json` | TODO | TODO — see [proposal](../../../bugs/proposal_json_serializable_enforcement_rules.md) |
 
 All three rules validate the same underlying contract: that `@JsonSerializable()`
 classes (and `@RequireFromJson()`-annotated hierarchies) actually implement the

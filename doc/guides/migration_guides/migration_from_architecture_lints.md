@@ -46,34 +46,34 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 0 HAVE (0%), 4 PARTIAL (17%), 19 TODO (83%) — audited 2026-09-02 against github.com/puntbyte/architecture_workspace (packages/architecture_lints).
+Coverage: 26 rules — 4 PARTIAL, 22 TODO (84%)
 
 | architecture_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `arch_dep_component` | PARTIAL | `avoid_cross_feature_dependencies` — fixed cross-feature check, not a configurable component graph |
 | `arch_dep_external` | PARTIAL | `avoid_direct_data_access_in_ui` / `prefer_abstract_dependencies` — fixed layer rules, not configurable per external package |
-| `arch_dep_module` | TODO | TODO — no proposal filed yet |
-| `arch_orphan_file` | TODO | TODO — no proposal filed yet |
-| `arch_parity_missing` | TODO | TODO — no proposal filed yet |
-| `arch_type_strict_inheritance` | TODO | TODO — no proposal filed yet |
-| `arch_type_forbidden` | TODO | TODO — no proposal filed yet |
-| `arch_type_missing_base` | TODO | TODO — no proposal filed yet |
-| `arch_member_forbidden` | TODO | TODO — no proposal filed yet |
-| `arch_member_missing` | TODO | TODO — no proposal filed yet |
-| `arch_annot_forbidden` | TODO | TODO — no proposal filed yet |
-| `arch_annot_missing` | TODO | TODO — no proposal filed yet |
-| `arch_annot_strict` | TODO | TODO — no proposal filed yet |
-| `arch_naming_grammar` | TODO | TODO — no proposal filed yet |
-| `arch_naming_antipattern` | TODO | TODO — no proposal filed yet |
-| `arch_naming_pattern` | TODO | TODO — no proposal filed yet |
-| `arch_exception_conversion` | TODO | TODO — no proposal filed yet |
-| `arch_exception_forbidden` | TODO | TODO — no proposal filed yet |
-| `arch_exception_missing` | TODO | TODO — no proposal filed yet |
-| `arch_safety_param_strict` | TODO | TODO — no proposal filed yet |
-| `arch_safety_param_forbidden` | TODO | TODO — no proposal filed yet |
-| `arch_safety_return_strict` | TODO | TODO — no proposal filed yet |
-| `arch_safety_return_forbidden` | TODO | TODO — no proposal filed yet |
-| `arch_usage_instantiation` | TODO | TODO — no proposal filed yet |
+| `arch_dep_module` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_orphan_file` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_parity_missing` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_type_strict_inheritance` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_type_forbidden` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_type_missing_base` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_member_forbidden` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_member_missing` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_annot_forbidden` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_annot_missing` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_annot_strict` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_naming_grammar` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_naming_antipattern` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_naming_pattern` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_exception_conversion` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_exception_forbidden` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_exception_missing` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_safety_param_strict` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_safety_param_forbidden` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_safety_return_strict` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_safety_return_forbidden` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
+| `arch_usage_instantiation` | TODO | TODO — see [proposal](../../../bugs/proposal_architecture_lints_enforcement_rules.md) |
 | `arch_location` | PARTIAL | `match_lib_folder_structure` — fixed folder-structure check, not a configurable per-component location rule |
 | `arch_usage_global_access` | PARTIAL | `avoid_service_locator_in_widgets` / `avoid_global_state` — fixed service-locator/global-state checks, not a configurable global-access graph |
 

@@ -63,11 +63,11 @@ bloc_lint runs as a standalone CLI (`bloc lint`) via `bloc_tools`, separate from
 
 ## Rule Mapping
 
-Coverage: 3 HAVE (33%), 5 PARTIAL (56%), 1 TODO (11%).
+Coverage: 8 rules — 3 HAVE (37%), 5 PARTIAL
 
 | bloc_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid_build_context_extensions` | TODO | N/A — philosophical conflict: saropa_lints' `prefer_bloc_extensions` recommends the opposite style (`context.read`/`watch` over `BlocProvider.of`) |
+| `avoid_build_context_extensions` | N/A | Philosophical conflict: saropa_lints' `prefer_bloc_extensions` recommends the opposite style (`context.read`/`watch` over `BlocProvider.of`) |
 | `avoid_flutter_imports` | HAVE | `avoid_ui_in_domain_layer` |
 | `avoid_public_bloc_methods` | PARTIAL | `avoid_bloc_public_methods` — narrower (stricter) allowlist than bloc_lint's |
 | `avoid_public_fields` | PARTIAL | `avoid_bloc_public_fields` — Bloc-only in saropa docs; Cubit coverage unconfirmed |

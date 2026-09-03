@@ -79,32 +79,32 @@ leancode_lint ships one fixed rule set (with optional programmatic customization
 
 ## Rule Mapping
 
-Coverage: 9 HAVE (39%), 5 PARTIAL (22%), 9 TODO (39%).
+Coverage: 23 rules — 9 HAVE (39%), 5 PARTIAL, 9 TODO (39%)
 
 | leancode_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `add_cubit_suffix_for_your_cubits` | TODO | TODO — no proposal filed yet |
+| `add_cubit_suffix_for_your_cubits` | TODO | TODO — see [proposal](../../../bugs/proposal_add_cubit_suffix_for_your_cubits.md) |
 | `avoid_build_context_in_blocs` | HAVE | `avoid_passing_build_context_to_blocs` |
-| `avoid_catch_error` | TODO | TODO — no proposal filed yet. saropa's `prefer_then_catcherror` recommends the opposite pattern (a documented philosophical conflict, not a gap) |
+| `avoid_catch_error` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_catch_error.md). saropa's `prefer_then_catcherror` recommends the opposite pattern (a documented philosophical conflict, not a gap) |
 | `avoid_conditional_hooks` | HAVE | `avoid_conditional_hooks` |
 | `avoid_context_read_in_build` | PARTIAL | `avoid_provider_in_init_state` / `prefer_context_read_in_callbacks` — saropa has initState-only and callbacks-only variants, none covers general `context.read` during `build()` |
 | `avoid_direct_collection_equality_checks` | HAVE | `avoid_collection_equality_checks` |
 | `avoid_single_child_in_multi_child_widgets` | PARTIAL | `avoid_single_child_column_row` — covers only Column/Row, not the sliver-group family |
 | `bloc_related_class_naming` | PARTIAL | `prefer_bloc_event_suffix` / `prefer_bloc_state_suffix` — saropa only checks suffix presence, not that the name matches the related Bloc's subject |
-| `bloc_subclasses_naming` | TODO | TODO — no proposal filed yet |
+| `bloc_subclasses_naming` | TODO | TODO — see [proposal](../../../bugs/proposal_bloc_subclasses_naming.md) |
 | `catch_parameter_names` | PARTIAL | `prefer_correct_error_name` — checks only the exception parameter name, not the stack-trace parameter, and isn't configurable |
-| `constructor_parameters_and_fields_should_have_the_same_order` | TODO | TODO — no proposal filed yet |
+| `constructor_parameters_and_fields_should_have_the_same_order` | TODO | TODO — see [proposal](../../../bugs/proposal_constructor_parameters_and_fields_should_have_the_same_order.md) |
 | `hook_widget_does_not_use_hooks` | HAVE | `avoid_unnecessary_hook_widgets` |
-| `never_discard_build_context` | TODO | TODO — no proposal filed yet |
+| `never_discard_build_context` | TODO | TODO — see [proposal](../../../bugs/proposal_never_discard_build_context.md) |
 | `prefer_abstract_final_class` | PARTIAL | `prefer_extension_over_utility_class` — detects the same static-methods-only class shape but recommends `extension` instead of `abstract final class` |
-| `prefer_center_over_align` | TODO | TODO — no proposal filed yet (not active upstream in leancode_lint either) |
+| `prefer_center_over_align` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_center_over_align.md) (not active upstream in leancode_lint either) |
 | `prefer_equatable_mixin` | HAVE | `require_extend_equatable` |
 | `prefix_widgets_returning_slivers` | HAVE | `prefer_sliver_prefix` |
-| `start_comments_with_space` | TODO | TODO — no proposal filed yet |
+| `start_comments_with_space` | TODO | TODO — see [proposal](../../../bugs/proposal_start_comments_with_space.md) |
 | `use_align` | HAVE | `prefer_align_over_container` |
 | `use_dedicated_media_query_methods` | HAVE | `avoid_deprecated_use_inherited_media_query` |
-| `use_design_system_item` | TODO | TODO — no proposal filed yet |
-| `use_padding` | TODO | TODO — no proposal filed yet |
+| `use_design_system_item` | TODO | TODO — see [proposal](../../../bugs/proposal_use_design_system_item.md) |
+| `use_padding` | TODO | TODO — see [proposal](../../../bugs/proposal_use_padding.md) |
 | `missing_equatable_props` | HAVE | `list_all_equatable_fields` |
 
 ## What You Gain

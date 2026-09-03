@@ -61,32 +61,32 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 0 HAVE (0%), 0 PARTIAL (0%), 20 TODO (100%) — all 20 rules are specific to the `all_observer`
+Coverage: 21 rules — 21 TODO (100%)
 reactive-state library and unrecognized by saropa_lints today.
 
 | all_observer_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid_reactive_creation_in_build` | TODO | TODO — no proposal filed yet |
-| `avoid_effect_creation_in_build` | TODO | TODO — no proposal filed yet |
-| `watch_only_inside_build` | TODO | TODO — no proposal filed yet |
-| `dispose_reactive_resources` | TODO | TODO — no proposal filed yet |
-| `avoid_reactive_write_in_computed` | TODO | TODO — no proposal filed yet |
-| `avoid_set_state_in_computed` | TODO | TODO — no proposal filed yet |
-| `avoid_worker_creation_in_computed` | TODO | TODO — no proposal filed yet |
-| `avoid_io_in_computed` | TODO | TODO — no proposal filed yet |
-| `avoid_observable_write_during_observer_build` | TODO | TODO — no proposal filed yet |
-| `self_referencing_computed` | TODO | TODO — no proposal filed yet |
-| `invalid_history_limit` | TODO | TODO — no proposal filed yet |
-| `async_inside_batch` | TODO | TODO — no proposal filed yet |
-| `prefer_computed_for_derived_state` | TODO | TODO — no proposal filed yet |
-| `prefer_batch_for_multiple_related_writes` | TODO | TODO — no proposal filed yet |
-| `prefer_assign_all_for_reactive_list_replace` | TODO | TODO — no proposal filed yet |
-| `unused_reactive_state` | TODO | TODO — no proposal filed yet |
-| `unobserved_reactive_read_in_build` | TODO | TODO — no proposal filed yet |
-| `observer_without_reactive_read` | TODO | TODO — no proposal filed yet |
-| `computed_without_reactive_read` | TODO | TODO — no proposal filed yet |
-| `effect_without_reactive_read` | TODO | TODO — no proposal filed yet |
-| `copied_reactive_collection_outside_tracking` | TODO | TODO — no proposal filed yet |
+| `avoid_reactive_creation_in_build` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_reactive_creation_in_build.md) |
+| `avoid_effect_creation_in_build` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_effect_creation_in_build.md) |
+| `watch_only_inside_build` | TODO | TODO — see [proposal](../../../bugs/proposal_watch_only_inside_build.md) |
+| `dispose_reactive_resources` | TODO | TODO — see [proposal](../../../bugs/proposal_dispose_reactive_resources.md) |
+| `avoid_reactive_write_in_computed` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_set_state_in_computed.md) |
+| `avoid_set_state_in_computed` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_set_state_in_computed.md) |
+| `avoid_worker_creation_in_computed` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_worker_creation_in_computed.md) |
+| `avoid_io_in_computed` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_io_in_computed.md) |
+| `avoid_observable_write_during_observer_build` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_observable_write_during_observer_build.md) |
+| `self_referencing_computed` | TODO | TODO — see [proposal](../../../bugs/proposal_self_referencing_computed.md) |
+| `invalid_history_limit` | TODO | TODO — see [proposal](../../../bugs/proposal_invalid_history_limit.md) |
+| `async_inside_batch` | TODO | TODO — see [proposal](../../../bugs/proposal_async_inside_batch.md) |
+| `prefer_computed_for_derived_state` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_computed_for_derived_state.md) |
+| `prefer_batch_for_multiple_related_writes` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_batch_for_multiple_related_writes.md) |
+| `prefer_assign_all_for_reactive_list_replace` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_assign_all_for_reactive_list_replace.md) |
+| `unused_reactive_state` | TODO | TODO — see [proposal](../../../bugs/proposal_unused_reactive_state.md) |
+| `unobserved_reactive_read_in_build` | TODO | TODO — see [proposal](../../../bugs/proposal_unobserved_reactive_read_in_build.md) |
+| `observer_without_reactive_read` | TODO | TODO — see [proposal](../../../bugs/proposal_observer_without_reactive_read.md) |
+| `computed_without_reactive_read` | TODO | TODO — see [proposal](../../../bugs/proposal_computed_without_reactive_read.md) |
+| `effect_without_reactive_read` | TODO | TODO — see [proposal](../../../bugs/proposal_effect_without_reactive_read.md) |
+| `copied_reactive_collection_outside_tracking` | TODO | TODO — see [proposal](../../../bugs/proposal_copied_reactive_collection_outside_tracking.md) |
 
 ## What You Gain
 

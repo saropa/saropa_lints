@@ -57,11 +57,11 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 0 HAVE (0%), 1 PARTIAL (100%), 0 TODO (0%).
+Coverage: 1 rules — 1 PARTIAL
 
 | mvvm_linter Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `class_order_rule` | PARTIAL | `prefer_member_ordering` — saropa's rule is a flat 3-bucket member order (fields, constructors, methods, roughly) with an autofix, not the 10-category MVVM-specific ordering (constructor → callback fields → repository fields → final/const/static → late → other mutable → getter/backing-field/setter triad → getter/setter → public methods → private methods) that `class_order_rule` enforces. TODO — no proposal filed yet for the finer-grained MVVM ordering. |
+| `class_order_rule` | PARTIAL | `prefer_member_ordering` — saropa's rule is a flat 3-bucket member order (fields, constructors, methods, roughly) with an autofix, not the 10-category MVVM-specific ordering (constructor → callback fields → repository fields → final/const/static → late → other mutable → getter/backing-field/setter triad → getter/setter → public methods → private methods) that `class_order_rule` enforces. TODO — see [proposal](../../../bugs/proposal_class_order_rule.md) for the finer-grained MVVM ordering. |
 
 ## What You Gain
 

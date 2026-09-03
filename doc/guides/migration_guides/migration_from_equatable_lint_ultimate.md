@@ -64,7 +64,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 1 HAVE (33%), 1 PARTIAL (33%), 1 TODO (33%).
+Coverage: 2 rules — 1 HAVE (50%), 1 TODO (50%)
 
 | equatable_lint_ultimate Rule | Status | Saropa Rule / Action |
 |---|---|---|

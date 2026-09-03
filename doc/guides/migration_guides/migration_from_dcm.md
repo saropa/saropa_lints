@@ -132,7 +132,7 @@ DCM has granular metric thresholds. saropa_lints uses progressive tiers:
 
 ## Rule Mapping
 
-Coverage: 425 HAVE (87%), 16 PARTIAL (3%), 46 TODO (9%) — audited 2026-09-02 against dcm.dev/docs/rules/.
+Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 
 ### Common Dart
 

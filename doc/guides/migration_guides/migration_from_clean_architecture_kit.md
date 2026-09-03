@@ -59,26 +59,26 @@ If you do want saropa_lints' architecture rules as a lighter-weight supplement (
 
 ## Rule Mapping
 
-Coverage: 0 HAVE (0%), 3 PARTIAL (19%), 13 TODO (81%).
+Coverage: 16 rules — 3 PARTIAL, 13 TODO (81%)
 
 | clean_architecture_kit Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `data_source_purity` | TODO | TODO — no proposal filed yet |
-| `disallow_flutter_imports_in_domain` | TODO | TODO — no proposal filed yet |
-| `disallow_flutter_types_in_domain` | TODO | TODO — no proposal filed yet |
-| `disallow_use_case_in_presentation` | TODO | TODO — no proposal filed yet |
+| `data_source_purity` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
+| `disallow_flutter_imports_in_domain` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
+| `disallow_flutter_types_in_domain` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
+| `disallow_use_case_in_presentation` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
 | `domain_layer_purity` | PARTIAL | `avoid_ui_in_domain_layer` — flags presentation logic in domain, not a generic configurable "domain cannot import layer X" check |
-| `enforce_abstract_data_source_dependency` | TODO | TODO — no proposal filed yet |
-| `enforce_custom_return_type` | TODO | TODO — no proposal filed yet |
-| `enforce_file_and_folder_location` | TODO | TODO — no proposal filed yet |
+| `enforce_abstract_data_source_dependency` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
+| `enforce_custom_return_type` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
+| `enforce_file_and_folder_location` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
 | `enforce_layer_independence` | PARTIAL | `avoid_ui_in_domain_layer` / `avoid_direct_data_access_in_ui` / `avoid_cross_feature_dependencies` — saropa's fixed UI/business/data checks aren't a configurable N-layer engine |
-| `enforce_naming_conventions` | TODO | TODO — no proposal filed yet |
-| `enforce_repository_inheritance` | TODO | TODO — no proposal filed yet |
-| `enforce_use_case_inheritance` | TODO | TODO — no proposal filed yet |
-| `missing_use_case` | TODO | TODO — no proposal filed yet |
-| `enforce_model_to_entity_mapping` | TODO | TODO — no proposal filed yet |
+| `enforce_naming_conventions` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
+| `enforce_repository_inheritance` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
+| `enforce_use_case_inheritance` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
+| `missing_use_case` | TODO | TODO — see [proposal](../../../bugs/proposal_missing_use_case.md) |
+| `enforce_model_to_entity_mapping` | TODO | TODO — see [proposal](../../../bugs/proposal_clean_architecture_enforcement_rules.md) |
 | `presentation_layer_purity` | PARTIAL | `avoid_direct_data_access_in_ui` — flags UI classes with Repository/DataSource fields directly, not a generic configurable "presentation cannot touch Repository" check |
-| `repository_implementation_purity` | TODO | TODO — no proposal filed yet |
+| `repository_implementation_purity` | TODO | TODO — see [proposal](../../../bugs/proposal_repository_implementation_purity.md) |
 
 ## What You Gain
 

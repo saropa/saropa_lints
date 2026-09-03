@@ -63,7 +63,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 2 HAVE (40%), 1 PARTIAL (20%), 2 TODO (40%).
+Coverage: 5 rules — 2 HAVE (40%), 1 PARTIAL, 2 TODO (40%)
 
 | flutter_best_practices_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|

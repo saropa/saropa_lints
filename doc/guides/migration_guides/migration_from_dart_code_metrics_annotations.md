@@ -57,7 +57,7 @@ Coverage: 1 HAVE (33%), 2 PARTIAL (67%), 0 TODO (0%).
 | Annotation / DCM Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `@Throws` (`handle-throwing-invocations` / `prefer-correct-throws`) | HAVE | `handle_throwing_invocations` / `prefer_correct_throws` — saropa flags unhandled throwing invocations without requiring an opt-in annotation. |
-| `@AcceptedTypes` (`pass-correct-accepted-types`) | PARTIAL | No saropa rule performs annotation-driven runtime-type-set narrowing on `Object`-typed parameters/fields. TODO — no proposal filed yet. |
+| `@AcceptedTypes` (`pass-correct-accepted-types`) | PARTIAL | No saropa rule performs annotation-driven runtime-type-set narrowing on `Object`-typed parameters/fields. see [proposal](../../../bugs/proposal_infra_configurable_widget_ban_mechanism.md) (accepted-types pattern tracked under configurable ban mechanism). |
 | `@mutated` (`prefer-correct-mutated`) | PARTIAL | `avoid_parameter_mutation` / `avoid_collection_mutating_methods` are unconditional heuristics with no opt-out annotation mechanism, and `avoid_collection_mutating_methods` is narrower in scope (setState-only) than the general-purpose competitor rule. Declined as a dedicated annotation — see [proposal](../../../bugs/proposal_infra_prefer_correct_mutated_na.md): building a saropa-specific `@mutated`-style annotations package for one rule was judged out of scope. |
 
 ## What You Gain

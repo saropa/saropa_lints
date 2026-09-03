@@ -48,41 +48,41 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 9 HAVE (29%), 5 PARTIAL (16%), 17 TODO (55%).
+Coverage: 31 rules — 9 HAVE (29%), 5 PARTIAL, 17 TODO (54%)
 
 | essential_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `alphabetize_arguments` | TODO | TODO — no proposal filed yet |
-| `alphabetize_enum_constants` | TODO | TODO — no proposal filed yet |
+| `alphabetize_arguments` | TODO | TODO — see [proposal](../../../bugs/proposal_alphabetize_arguments.md) |
+| `alphabetize_enum_constants` | TODO | TODO — see [proposal](../../../bugs/proposal_alphabetize_enum_constants.md) |
 | `ambiguous_positional_boolean` | HAVE | `avoid_positional_boolean_parameters_with_fix` |
 | `boolean_assignment` | HAVE | `avoid_assignments_as_conditions` |
-| `border_all` | TODO | TODO — no proposal filed yet |
+| `border_all` | TODO | TODO — see [proposal](../../../bugs/proposal_border_all.md) |
 | `border_radius_all` | PARTIAL | `prefer_const_border_radius` — targets const-ness, not the `.all` vs. `.circular` API choice |
-| `closure_incorrect_type` | TODO | TODO — no proposal filed yet |
+| `closure_incorrect_type` | TODO | TODO — see [proposal](../../../bugs/proposal_closure_incorrect_type.md) |
 | `completer_error_no_stack` | HAVE | `avoid_missing_completer_stack_trace` |
-| `duplicate_value` | TODO | TODO — no proposal filed yet. Their rule flags duplicate values within one boolean expression, distinct from saropa's cross-branch `no_equal_conditions`. |
-| `empty_container` | TODO | TODO — no proposal filed yet |
+| `duplicate_value` | TODO | TODO — see [proposal](../../../bugs/proposal_duplicate_value.md). Their rule flags duplicate values within one boolean expression, distinct from saropa's cross-branch `no_equal_conditions`. |
+| `empty_container` | TODO | TODO — see [proposal](../../../bugs/proposal_empty_container.md) |
 | `equal_statement` | PARTIAL | Likely overlaps `no_equal_switch_case`, not fully confirmed as identical trigger logic |
 | `explicit_casts` | PARTIAL | `avoid_unsafe_cast` — only flags casts that can fail at runtime, narrower than "all explicit casts" |
 | `first_getter` | HAVE | `prefer_list_first` |
-| `getters_in_member_list` | TODO | TODO — no proposal filed yet |
-| `is_future` | TODO | TODO — no proposal filed yet |
+| `getters_in_member_list` | TODO | TODO — see [proposal](../../../bugs/proposal_getters_in_member_list.md) |
+| `is_future` | TODO | TODO — see [proposal](../../../bugs/proposal_is_future.md) |
 | `last_getter` | HAVE | `prefer_list_last` |
-| `mutable_tearoff` | TODO | TODO — no proposal filed yet |
-| `new_instance_cascade` | TODO | TODO — no proposal filed yet |
+| `mutable_tearoff` | TODO | TODO — see [proposal](../../../bugs/proposal_mutable_tearoff.md) |
+| `new_instance_cascade` | TODO | TODO — see [proposal](../../../bugs/proposal_new_instance_cascade.md) |
 | `optional_positional_parameters` | HAVE | `prefer_optional_positional_params` |
 | `padding_over_container` | HAVE | `prefer_padding_over_container` |
 | `pending_listener` | PARTIAL | saropa's disposal-family rules (e.g. `always_remove_listener`) are type-specific, not a general "any `add()`-style listener needs a matching `remove()`" check |
-| `prefer_explicitly_named_parameters` | TODO | TODO — no proposal filed yet |
-| `returning_widgets` | TODO | TODO — no proposal filed yet |
+| `prefer_explicitly_named_parameters` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_explicitly_named_parameters.md) |
+| `returning_widgets` | TODO | TODO — see [proposal](../../../bugs/proposal_returning_widgets.md) |
 | `same_package_direct_import` | HAVE | `prefer_relative_imports_enforced` |
-| `sorting_members` | TODO | TODO — no proposal filed yet (own annotation-driven member-sort system) |
-| `standard_comment_style` | TODO | TODO — no proposal filed yet |
-| `subtype_annotating` | TODO | TODO — no proposal filed yet |
-| `subtype_naming` | TODO | TODO — no proposal filed yet |
+| `sorting_members` | TODO | TODO — see [proposal](../../../bugs/proposal_sorting_members.md) (own annotation-driven member-sort system) |
+| `standard_comment_style` | TODO | TODO — see [proposal](../../../bugs/proposal_standard_comment_style.md) |
+| `subtype_annotating` | TODO | TODO — see [proposal](../../../bugs/proposal_subtype_annotating.md) |
+| `subtype_naming` | TODO | TODO — see [proposal](../../../bugs/proposal_subtype_naming.md) |
 | `unnecessary_setstate` | PARTIAL | `avoid_empty_setstate` — only catches empty-callback-body, not the broader "assigns the same value" no-op case |
 | `useless_else` | HAVE | `avoid_redundant_else` |
-| `variable_shadowing` | TODO | TODO — no proposal filed yet |
+| `variable_shadowing` | TODO | TODO — see [proposal](../../../bugs/proposal_variable_shadowing.md) |
 
 ## Suppressing Rules
 

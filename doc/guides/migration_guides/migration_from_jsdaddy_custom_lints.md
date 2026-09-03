@@ -65,11 +65,11 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 0 HAVE (0%), 0 PARTIAL (0%), 1 TODO (100%).
+Coverage: 1 rules — 1 TODO (100%)
 
 | jsdaddy_custom_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `file_naming_kebab_case` | TODO | TODO — no proposal filed yet; conflicts with Dart's standard `snake_case` file-naming convention, so this is a deliberate house-style gap rather than an oversight |
+| `file_naming_kebab_case` | TODO | TODO — see [proposal](../../../bugs/proposal_file_naming_kebab_case.md); conflicts with Dart's standard `snake_case` file-naming convention, so this is a deliberate house-style gap rather than an oversight |
 
 If your team relies on kebab-case file names as a hard requirement, keep `jsdaddy_custom_lints` installed
 alongside `saropa_lints` — there is no conflict between the two plugins at runtime.

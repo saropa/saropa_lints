@@ -51,17 +51,17 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 0 HAVE (0%), 1 PARTIAL (14%), 6 TODO (86%) — audited 2026-09-02 against github.com/pattobrien/design_system_lints (7 active rules; 1 dead/commented-out rule excluded).
+Coverage: 7 rules — 1 PARTIAL, 6 TODO (85%)
 
 | design_system_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `color` | PARTIAL | `avoid_hardcoded_colors` — flags `Color(0x...)`/`Colors.x` against `Theme.of(context)`, not an arbitrary `@designSystem`-annotated source class |
-| `edge_insets` | TODO | TODO — no proposal filed yet |
-| `box_shadow` | TODO | TODO — no proposal filed yet |
-| `radius` | TODO | TODO — no proposal filed yet |
-| `text_style` | TODO | TODO — no proposal filed yet (saropa's similarly-named `avoid_hardcoded_text_styles` is a false cognate about `onHover`, not a match) |
-| `theme_data` | TODO | TODO — no proposal filed yet |
-| `box_constraints` | TODO | TODO — no proposal filed yet |
+| `edge_insets` | TODO | TODO — see [proposal](../../../bugs/proposal_use_design_system.md) |
+| `box_shadow` | TODO | TODO — see [proposal](../../../bugs/proposal_edge_insets.md) |
+| `radius` | TODO | TODO — see [proposal](../../../bugs/proposal_use_design_system.md) |
+| `text_style` | TODO | TODO — see [proposal](../../../bugs/proposal_text_style.md) (saropa's similarly-named `avoid_hardcoded_text_styles` is a false cognate about `onHover`, not a match) |
+| `theme_data` | TODO | TODO — see [proposal](../../../bugs/proposal_theme_data.md) |
+| `box_constraints` | TODO | TODO — see [proposal](../../../bugs/proposal_use_design_system.md) |
 
 All 6 `TODO` rows depend on a generic `@designSystem`-annotated source class mechanism that saropa_lints does not implement; saropa_lints' `avoid_hardcoded_colors` instead checks against Flutter's built-in `Theme.of(context)`.
 

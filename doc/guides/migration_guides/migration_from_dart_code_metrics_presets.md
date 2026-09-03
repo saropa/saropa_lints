@@ -61,7 +61,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 62 HAVE (73%), 3 PARTIAL (4%), 20 TODO (23%) — across all 15 presets, 85 rule references.
+Coverage: 63 rules — 41 HAVE (65%), 2 PARTIAL, 20 TODO (31%)
 
 ### bloc.yaml (22 rules — 21 HAVE, 1 PARTIAL)
 
@@ -142,8 +142,8 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 | `prefer-providing-intl-description` | HAVE | `prefer_providing_intl_description` |
 | `provide-correct-intl-args` | HAVE | `provide_correct_intl_args` |
 | `prefer-providing-intl-examples` | HAVE | `prefer_providing_intl_examples` |
-| `prefer-number-format` | TODO | TODO — no proposal filed yet. |
-| `prefer-date-format` | TODO | TODO — no proposal filed yet. |
+| `prefer-number-format` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_number_format.md). |
+| `prefer-date-format` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_date_format.md). |
 
 ### flame.yaml (4 rules — 2 HAVE, 2 TODO)
 
@@ -151,8 +151,8 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 |---|---|---|
 | `avoid-creating-vector-in-update` | HAVE | `avoid_creating_vector_in_update` |
 | `avoid-redundant-async-on-load` | HAVE | `avoid_redundant_async_on_load` |
-| `avoid-initializing-in-on-mount` | TODO | TODO — no proposal filed yet. |
-| `correct-game-instantiating` | TODO | TODO — no proposal filed yet. |
+| `avoid-initializing-in-on-mount` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_initializing_in_on_mount.md). |
+| `correct-game-instantiating` | TODO | TODO — see [proposal](../../../bugs/proposal_correct_game_instantiating.md). |
 
 ### firebase_analytics.yaml (2 rules — 2 HAVE)
 
@@ -172,35 +172,35 @@ Identical to the DCM Bloc rule set — see [Migrating from DCM: Bloc](migration_
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `prefer-symbol-over-key` | HAVE | `prefer_symbol_over_key` |
-| `prefer-custom-finder-over-find` | TODO | TODO — no proposal filed yet. |
+| `prefer-custom-finder-over-find` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_custom_finder_over_find.md). |
 
 ### mocktail.yaml (4 rules — 4 TODO)
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `use-then-answer` | TODO | TODO — no proposal filed yet. |
-| `pass-mock-object` | TODO | TODO — no proposal filed yet. |
-| `avoid-implementation-in-mocks` | TODO | TODO — no proposal filed yet. |
-| `prefer-correct-any-matcher` | TODO | TODO — no proposal filed yet. |
+| `use-then-answer` | TODO | TODO — see [proposal](../../../bugs/proposal_use_then_answer.md). |
+| `pass-mock-object` | TODO | TODO — see [proposal](../../../bugs/proposal_pass_mock_object.md). |
+| `avoid-implementation-in-mocks` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_implementation_in_mocks.md). |
+| `prefer-correct-any-matcher` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_correct_any_matcher.md). |
 
 ### easy_localization.yaml (2 rules — 2 TODO)
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid-missing-tr` | TODO | TODO — no proposal filed yet. |
-| `avoid-missing-tr-on-strings` | TODO | TODO — no proposal filed yet. |
+| `avoid-missing-tr` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_missing_tr.md). |
+| `avoid-missing-tr-on-strings` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_missing_tr_on_strings.md). |
 
 ### get_it.yaml (1 rule — 1 TODO)
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `avoid-functions-in-register-singleton` | TODO | TODO — no proposal filed yet. |
+| `avoid-functions-in-register-singleton` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_functions_in_register_singleton.md). |
 
 ### json_serializable.yaml (1 rule — 1 TODO)
 
 | Preset Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `specify-unknown-enum-value` | TODO | TODO — no proposal filed yet. |
+| `specify-unknown-enum-value` | TODO | TODO — see [proposal](../../../bugs/proposal_specify_unknown_enum_value.md). |
 
 ## What You Gain
 

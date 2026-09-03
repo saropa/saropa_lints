@@ -60,7 +60,7 @@ dart analyze
 
 ## Rule Mapping
 
-Coverage: 4 HAVE (80%), 1 PARTIAL (20%), 0 TODO (0%).
+Coverage: 5 rules — 4 HAVE (80%), 1 PARTIAL
 
 | accessibility_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|

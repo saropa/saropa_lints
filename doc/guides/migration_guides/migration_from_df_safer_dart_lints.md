@@ -46,19 +46,19 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 0 HAVE (0%), 3 PARTIAL (33%), 6 TODO (67%) — audited 2026-09-02 against github.com/robmllze/df_safer_dart_lints (9 rule classes; each also ships a separate ERROR-severity variant, 18 lint codes total).
+Coverage: 9 rules — 3 PARTIAL, 6 TODO (66%)
 
 | df_safer_dart_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
 | `must_use_outcome` | PARTIAL | `avoid_ignoring_return_values` — flags any discarded return value generically, not specifically an `Outcome` monad type |
 | `must_await_all_futures` | PARTIAL | `avoid_unawaited_future` — fires generally; theirs is annotation-scoped (`@mustAwaitAllFutures`) with a separate error-severity tier |
 | `must_handle_return` | PARTIAL | `avoid_ignoring_return_values` / `missing_use_result_annotation` — same generic-discard concept, not annotation-driven with two severity tiers |
-| `no_future_outcome_type` | TODO | TODO — no proposal filed yet |
-| `must_be_anonymous` | TODO | TODO — no proposal filed yet |
-| `must_be_strong_ref` | TODO | TODO — no proposal filed yet |
-| `no_futures` | TODO | TODO — no proposal filed yet |
-| `must_use_unsafe_wrapper` | TODO | TODO — no proposal filed yet |
-| `sendable` | TODO | TODO — no proposal filed yet |
+| `no_future_outcome_type` | TODO | TODO — see [proposal](../../../bugs/proposal_no_future_outcome_type.md) |
+| `must_be_anonymous` | TODO | TODO — see [proposal](../../../bugs/proposal_must_be_anonymous.md) |
+| `must_be_strong_ref` | TODO | TODO — see [proposal](../../../bugs/proposal_must_be_strong_ref.md) |
+| `no_futures` | TODO | TODO — see [proposal](../../../bugs/proposal_no_futures.md) |
+| `must_use_unsafe_wrapper` | TODO | TODO — see [proposal](../../../bugs/proposal_must_use_unsafe_wrapper.md) |
+| `sendable` | TODO | TODO — see [proposal](../../../bugs/proposal_sendable.md) |
 
 All 6 `TODO` rows are gated on `df_safer_dart_lints`' own annotation markers (`@sendable`, `@unsafe`, etc.) that saropa_lints does not recognize.
 

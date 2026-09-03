@@ -63,7 +63,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 0 HAVE (0%), 1 PARTIAL (100%), 0 TODO (0%) — low-confidence, source unverified.
+Coverage: 1 rules — 1 PARTIAL
 
 | flutter_refactor_plugin Rule | Status | Saropa Rule / Action |
 |---|---|---|

@@ -62,7 +62,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 1 HAVE (100%), 0 PARTIAL (0%), 0 TODO (0%) — unverified precision, see note below.
+Coverage: 1 rules — 1 HAVE (100%)
 
 | hardcoded_strings_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|

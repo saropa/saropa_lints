@@ -80,7 +80,7 @@ analyzer:
 
 ## Rule Mapping
 
-Coverage: 7 HAVE (54%), 2 PARTIAL (15%), 4 TODO (31%).
+Coverage: 13 rules — 7 HAVE (53%), 2 PARTIAL, 4 TODO (30%)
 
 | mad_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
@@ -91,12 +91,12 @@ Coverage: 7 HAVE (54%), 2 PARTIAL (15%), 4 TODO (31%).
 | `ensure_dispose_called` | HAVE | `dispose_class_fields` |
 | `use_wildcard_for_unused_parameters` | HAVE | `prefer_wildcard_for_unused_param` |
 | `incomplete_copy_with_for_states` | HAVE | `avoid_incomplete_copy_with` |
-| `stream_subscription_must_be_disposed` | PARTIAL | `avoid_unassigned_stream_subscriptions` — mad_lint targets a project-specific `.addDisposableTo(this)` helper; saropa expects assignment-to-variable + separate disposal call. Equivalent safety story, different convention. TODO — no proposal filed yet |
-| `missing_copy_with_for_states` | PARTIAL | `require_equatable_copy_with` / `prefer_copy_with_for_state` — mad_lint targets any Bloc/state class; saropa's `require_equatable_copy_with` is Equatable-scoped, so a non-Equatable state class could slip through. TODO — no proposal filed yet |
-| `mapped_fields_key_value_mismatch` | TODO | TODO — no proposal filed yet (MadBrains-internal `mappedFields` convention, no general-purpose Dart/Flutter analog) |
-| `mapped_fields_must_be_expression` | TODO | TODO — no proposal filed yet |
-| `mapped_fields_must_return_map` | TODO | TODO — no proposal filed yet |
-| `missing_mapped_fields_getter` | TODO | TODO — no proposal filed yet |
+| `stream_subscription_must_be_disposed` | PARTIAL | `avoid_unassigned_stream_subscriptions` — mad_lint targets a project-specific `.addDisposableTo(this)` helper; saropa expects assignment-to-variable + separate disposal call. Equivalent safety story, different convention. TODO — see [proposal](../../../bugs/proposal_stream_subscription_must_be_disposed.md) |
+| `missing_copy_with_for_states` | PARTIAL | `require_equatable_copy_with` / `prefer_copy_with_for_state` — mad_lint targets any Bloc/state class; saropa's `require_equatable_copy_with` is Equatable-scoped, so a non-Equatable state class could slip through. TODO — see [proposal](../../../bugs/proposal_missing_copy_with_for_states.md) |
+| `mapped_fields_key_value_mismatch` | TODO | TODO — see [proposal](../../../bugs/proposal_mad_lint_mapped_fields_rules.md) (MadBrains-internal `mappedFields` convention, no general-purpose Dart/Flutter analog) |
+| `mapped_fields_must_be_expression` | TODO | TODO — see [proposal](../../../bugs/proposal_mad_lint_mapped_fields_rules.md) |
+| `mapped_fields_must_return_map` | TODO | TODO — see [proposal](../../../bugs/proposal_mad_lint_mapped_fields_rules.md) |
+| `missing_mapped_fields_getter` | TODO | TODO — see [proposal](../../../bugs/proposal_mad_lint_mapped_fields_rules.md) |
 
 ## Getting Help
 

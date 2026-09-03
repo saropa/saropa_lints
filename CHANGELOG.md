@@ -115,7 +115,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Moved `rule_packs` config from `plugins > saropa_lints:` block in `analysis_options.yaml` to top-level key in `analysis_options_custom.yaml`, eliminating the false `unsupported_option` warning from the Dart SDK's plugin-block validator. Existing configs are read with deprecation fallback; run `dart run saropa_lints migrate-config` to migrate automatically.
 - Added `--dry-run` flag to `migrate-config` CLI — previews what would change without writing files.
 - Fixed CRLF line-ending handling in `rule_packs` write/migrate paths (Windows files with `\r\n` could silently corrupt regex matches).
-- Filed 61 new-rule and extension proposals (`bugs/proposal_*.md`) covering every DCM gap and partial-coverage rule, each traceable back to `plans/GAP_ANALYSIS.md` via a "Closes gap" line.
+- Filed 298 new-rule and extension proposals (`bugs/proposal_*.md`) covering every DCM gap, partial-coverage rule, and all 46 alternative-package migration-guide gaps, each traceable back to `plans/GAP_ANALYSIS.md` via a "Closes gap" line. All migration-guide TODO rows now link to their proposal.
 - Created 46 migration guides (`doc/guides/migration_guides/`) — one per alternative lint package audited in the gap analysis — with rule-mapping tables (HAVE / PARTIAL / TODO) and migration steps.
 - Added cross-referencing requirement to `bugs/ISSUE_REPORT_GUIDE.md`: implementing a proposal that closes a migration-guide gap must flip the corresponding table row from TODO/PARTIAL to HAVE/ENHANCED.
 - Corrected stale `prefer-container` false-gap entry in `plans/GAP_ANALYSIS.md` — saropa already covers this via `PreferContainerRule`.

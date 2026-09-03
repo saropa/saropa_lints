@@ -50,16 +50,16 @@ Both plugins run under the same `custom_lint` analyzer plugin host, so no furthe
 
 ## Rule Mapping
 
-Coverage: 0 HAVE (0%), 0 PARTIAL (0%), 4 TODO (100%).
+Coverage: 4 rules — 4 TODO (100%)
 
 `context_plus_lint`'s 4 rules are all specific to the `context_plus` package's `context.use()` / `Ref` API and have no saropa_lints equivalent — saropa_lints has no `context_plus` integration today.
 
 | context_plus_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `context_use_unique_key` | TODO | TODO — no proposal filed yet |
-| `context_ref_reassignment` | TODO | TODO — no proposal filed yet |
-| `wrong_ref_declaration` | TODO | TODO — no proposal filed yet |
-| `wrong_ref_type` | TODO | TODO — no proposal filed yet |
+| `context_use_unique_key` | TODO | TODO — see [proposal](../../../bugs/proposal_context_use_unique_key.md) |
+| `context_ref_reassignment` | TODO | TODO — see [proposal](../../../bugs/proposal_context_ref_reassignment.md) |
+| `wrong_ref_declaration` | TODO | TODO — see [proposal](../../../bugs/proposal_context_plus_ref_validation_rules.md) |
+| `wrong_ref_type` | TODO | TODO — see [proposal](../../../bugs/proposal_context_plus_ref_validation_rules.md) |
 
 ## What You Gain
 

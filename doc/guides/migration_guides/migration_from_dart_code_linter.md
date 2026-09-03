@@ -94,7 +94,7 @@ dart run saropa_lints:init --tier recommended
 
 ## Rule Mapping
 
-Coverage: 77 HAVE (88%), 2 PARTIAL (2%), 8 TODO (9%) — of 87 rules found in `bancolombia/dart-code-linter`'s `rules_list` source directory.
+Coverage: 87 rules — 77 HAVE (88%), 2 PARTIAL, 8 TODO (9%)
 
 | dart_code_linter Rule | Status | Saropa Rule / Action |
 |---|---|---|
@@ -111,12 +111,12 @@ Coverage: 77 HAVE (88%), 2 PARTIAL (2%), 8 TODO (9%) — of 87 rules found in `b
 | `avoid_expanded_as_spacer` | HAVE | `avoid_expanded_as_spacer` |
 | `avoid_global_state` | HAVE | `avoid_global_state` |
 | `avoid_ignoring_return_values` | HAVE | `avoid_ignoring_return_values` |
-| `avoid_initializing_in_on_mount` | TODO | TODO — no proposal filed yet (Flame-specific) |
+| `avoid_initializing_in_on_mount` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_initializing_in_on_mount.md) (Flame-specific) |
 | `avoid_late_keyword` | HAVE | `avoid_late_keyword` |
 | `avoid_missing_enum_constant_in_map` | HAVE | `avoid_missing_enum_constant_in_map` |
 | `avoid_nested_conditional_expressions` | HAVE | `avoid_nested_conditional_expressions` |
 | `avoid_non_ascii_symbols` | HAVE | `avoid_non_ascii_symbols` |
-| `avoid_non_configurable_callbacks_in_init_state` | TODO | TODO — no proposal filed yet |
+| `avoid_non_configurable_callbacks_in_init_state` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_non_configurable_callbacks_in_init_state.md) |
 | `avoid_non_exhaustive_switch_on_sealed_classes` | HAVE | `require_exhaustive_sealed_switch` |
 | `avoid_non_null_assertion` | HAVE | `avoid_non_null_assertion` |
 | `avoid_passing_async_when_sync_expected` | HAVE | `avoid_passing_async_when_sync_expected` |
@@ -138,21 +138,21 @@ Coverage: 77 HAVE (88%), 2 PARTIAL (2%), 8 TODO (9%) — of 87 rules found in `b
 | `binary_expression_operand_order` | HAVE | `binary_expression_operand_order` |
 | `check_for_equals_in_render_object_setters` | HAVE | `check_for_equals_in_render_object_setters` |
 | `consistent_update_render_object` | HAVE | `consistent_update_render_object` |
-| `correct_game_instantiating` | TODO | TODO — no proposal filed yet (Flame-specific) |
+| `correct_game_instantiating` | TODO | TODO — see [proposal](../../../bugs/proposal_correct_game_instantiating.md) (Flame-specific) |
 | `double_literal_format` | HAVE | `double_literal_format` |
 | `format_comment` | HAVE | `format_comment_style` |
 | `list_all_equatable_fields` | HAVE | `list_all_equatable_fields` |
 | `member_ordering` | HAVE | `prefer_member_ordering` |
 | `missing_test_assertion` | HAVE | `missing_test_assertion` |
 | `newline_before_return` | HAVE | `NewlineBeforeReturnRule` |
-| `no_blank_line_before_single_return` | TODO | TODO — no proposal filed yet |
+| `no_blank_line_before_single_return` | TODO | TODO — see [proposal](../../../bugs/proposal_no_blank_line_before_single_return.md) |
 | `no_boolean_literal_compare` | HAVE | `no_boolean_literal_compare` |
 | `no_empty_block` | HAVE | `no_empty_block` |
 | `no_equal_arguments` | HAVE | `no_equal_arguments` |
 | `no_equal_then_else` | HAVE | `no_equal_then_else` |
 | `no_magic_number` | HAVE | `no_magic_number` |
 | `no_object_declaration` | HAVE | `no_object_declaration` |
-| `only_barrel_import` | TODO | TODO — no proposal filed yet |
+| `only_barrel_import` | TODO | TODO — see [proposal](../../../bugs/proposal_only_barrel_import.md) |
 | `prefer_async_await` | HAVE | `prefer_async_await` |
 | `prefer_commenting_analyzer_ignores` | HAVE | `prefer_commenting_analyzer_ignores` |
 | `prefer_conditional_expressions` | HAVE | `prefer_conditional_expressions` |
@@ -166,7 +166,7 @@ Coverage: 77 HAVE (88%), 2 PARTIAL (2%), 8 TODO (9%) — of 87 rules found in `b
 | `prefer_enums_by_name` | HAVE | `prefer_enums_by_name` |
 | `prefer_extracting_callbacks` | HAVE | `prefer_extracting_callbacks` |
 | `prefer_first` | HAVE | `prefer_list_first` |
-| `prefer_first_or_null` | TODO | TODO — no proposal filed yet |
+| `prefer_first_or_null` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_first_or_null.md) |
 | `prefer_immediate_return` | HAVE | `prefer_immediate_return` |
 | `prefer_intl_name` | HAVE | `prefer_intl_name` |
 | `prefer_iterable_of` | HAVE | `prefer_iterable_of` |
@@ -183,7 +183,7 @@ Coverage: 77 HAVE (88%), 2 PARTIAL (2%), 8 TODO (9%) — of 87 rules found in `b
 | `prefer_using_list_view` | HAVE | `prefer_using_list_view` |
 | `provide_correct_intl_args` | HAVE | `provide_correct_intl_args` |
 | `tag_name` | HAVE | `prefer_kebab_tag_name` |
-| `use_design_system` | TODO | TODO — no proposal filed yet |
+| `use_design_system` | TODO | TODO — see [proposal](../../../bugs/proposal_use_design_system.md) |
 | `use_setstate_synchronously` | HAVE | `use_setstate_synchronously` |
 
 Also reports continuous metrics (cyclomatic complexity, LOC, Halstead-style maintainability index) via an HTML/console report — see [Architecture Differences](#architecture-differences).

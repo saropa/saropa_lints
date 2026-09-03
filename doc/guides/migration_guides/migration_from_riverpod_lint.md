@@ -80,7 +80,7 @@ riverpod_lint's rules are always-on. saropa_lints groups Riverpod coverage into 
 
 ## Rule Mapping
 
-Coverage: 4 HAVE (27%), 0 PARTIAL (0%), 11 TODO (73%).
+Coverage: 13 rules — 4 HAVE (30%), 9 TODO (69%)
 
 Note: the official riverpod_lint package ships 15 rules, not the 13 quoted by earlier internal audits — this table lists all 15, including the 2 framework-internal codegen validators that aren't code-quality rules and are out of scope for saropa_lints.
 
@@ -90,16 +90,16 @@ Note: the official riverpod_lint package ships 15 rules, not the 13 quoted by ea
 | `avoid_build_context_in_providers` | HAVE | `avoid_build_context_in_providers` |
 | `avoid_public_notifier_properties` | TODO | TODO — see [proposal](../../../bugs/proposal_avoid_public_notifier_properties.md) |
 | `avoid_ref_inside_state_dispose` | HAVE | `avoid_ref_inside_state_dispose` |
-| `functional_ref` | TODO | TODO — no proposal filed yet |
+| `functional_ref` | TODO | TODO — see [proposal](../../../bugs/proposal_functional_ref.md) |
 | `missing_provider_scope` | HAVE | `require_provider_scope` |
-| `notifier_build` | TODO | TODO — no proposal filed yet |
-| `notifier_extends` | TODO | TODO — no proposal filed yet |
-| `only_use_keep_alive_inside_keep_alive` | TODO | TODO — no proposal filed yet |
-| `protected_notifier_properties` | TODO | TODO — no proposal filed yet |
-| `provider_dependencies` | TODO | TODO — no proposal filed yet |
-| `provider_parameters` | TODO | TODO — no proposal filed yet |
+| `notifier_build` | TODO | TODO — see [proposal](../../../bugs/proposal_notifier_build.md) |
+| `notifier_extends` | TODO | TODO — see [proposal](../../../bugs/proposal_notifier_extends.md) |
+| `only_use_keep_alive_inside_keep_alive` | TODO | TODO — see [proposal](../../../bugs/proposal_only_use_keep_alive_inside_keep_alive.md) |
+| `protected_notifier_properties` | TODO | TODO — see [proposal](../../../bugs/proposal_protected_notifier_properties.md) |
+| `provider_dependencies` | TODO | TODO — see [proposal](../../../bugs/proposal_provider_dependencies.md) |
+| `provider_parameters` | TODO | TODO — see [proposal](../../../bugs/proposal_provider_parameters.md) |
 | `riverpod_syntax_error` | N/A | Framework-internal `@riverpod` codegen syntax validation — no code-quality equivalent needed |
-| `scoped_providers_should_specify_dependencies` | TODO | TODO — no proposal filed yet |
+| `scoped_providers_should_specify_dependencies` | TODO | TODO — see [proposal](../../../bugs/proposal_scoped_providers_should_specify_dependencies.md) |
 | `unsupported_provider_value` | N/A | Framework-internal codegen validation — no code-quality equivalent needed |
 
 ## What You Gain

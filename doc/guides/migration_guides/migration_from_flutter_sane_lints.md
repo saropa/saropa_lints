@@ -56,7 +56,7 @@ dart run custom_lint
 
 ## Rule Mapping
 
-Coverage: 2 HAVE (100%), 0 PARTIAL (0%), 0 TODO (0%) — clean sweep.
+Coverage: 2 rules — 2 HAVE (100%)
 
 | flutter_sane_lints Rule | Status | Saropa Rule / Action |
 |---|---|---|
