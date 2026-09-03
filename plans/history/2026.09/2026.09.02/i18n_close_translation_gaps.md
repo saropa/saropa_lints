@@ -52,3 +52,9 @@ The initial edit for the `de` `Status:` passthrough landed in the `es` (Spanish)
 ### Misroute prevention: locale-integrity validator
 
 Added `_check_dictionary_locale_integrity()` to `generate_locales.py`. The function parses `dictionaries.py` via AST to extract which locale section each entry belongs to structurally, then compares against the runtime `TRANSLATIONS` dict. A mismatch means an edit placed an entry in the wrong locale's block. The check runs as a hard gate at the start of every `generate_translations.py` invocation — a misroute now fails the pipeline before any locale files are written.
+
+Additional hardening (second pass):
+
+- **Swahili `active` MT garbage fixed** — MT output was `"active active kazi ya kufanya."` (repetition-loop garbage). Replaced with dictionary entry `"hai"` (alive/active), matching the single-word pattern of sibling status labels.
+- **Duplicate-key detection** — the integrity validator now detects duplicate keys within a locale section. Python silently keeps only the last value, making earlier entries dead code.
+- **Misroute diagnostics** — when a key is found in the wrong locale section, the error message now reports which locale the runtime dict actually holds it under, making the fix obvious.

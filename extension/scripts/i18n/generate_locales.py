@@ -105,15 +105,37 @@ def _check_dictionary_locale_integrity() -> list[str]:
             continue
         ast_locale = locale_key_node.value
         runtime_entries = TRANSLATIONS.get(ast_locale, {})
+        # Track keys seen in this locale section to detect duplicates (Python
+        # keeps only the last value, silently dropping earlier entries).
+        seen_in_section: dict[str, int] = {}
         for entry_key_node in locale_val_node.keys:
             if not isinstance(entry_key_node, ast.Constant):
                 continue
             entry_key = entry_key_node.value
-            if entry_key not in runtime_entries:
-                # AST says this key is under locale X, but runtime dict disagrees.
+            if entry_key in seen_in_section:
+                # Duplicate key — the earlier entry on the listed line is dead code.
                 misroutes.append(
                     f"  {ast_locale}: {entry_key!r} (line {entry_key_node.lineno}) "
-                    f"— present in AST but missing from runtime TRANSLATIONS[{ast_locale!r}]"
+                    f"— DUPLICATE of line {seen_in_section[entry_key]}; "
+                    f"Python keeps only the last value"
+                )
+            seen_in_section[entry_key] = entry_key_node.lineno
+            if entry_key not in runtime_entries:
+                # AST says this key is under locale X, but runtime dict disagrees.
+                # Find which locale the runtime dict actually holds this key under.
+                actual_locale = next(
+                    (loc for loc, entries in TRANSLATIONS.items()
+                     if entry_key in entries and loc != ast_locale),
+                    None,
+                )
+                hint = (
+                    f" (runtime has it under {actual_locale!r})"
+                    if actual_locale else ""
+                )
+                misroutes.append(
+                    f"  {ast_locale}: {entry_key!r} (line {entry_key_node.lineno}) "
+                    f"— present in AST but missing from runtime "
+                    f"TRANSLATIONS[{ast_locale!r}]{hint}"
                 )
 
     if misroutes:

@@ -1682,6 +1682,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "▾": "▾",
         # Manual: "idle" as a status label; single-word form matches sibling labels (kukimbia, mpona, kuanza).
         "idle": "tulivu",
+        # Manual: MT output was repetition-loop garbage ("active active kazi ya kufanya.").
+        "active": "hai",
     },
     "th": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
