@@ -111,13 +111,13 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `async_value_nullable_pattern` | HAVE | `avoid_nullable_async_value_pattern` |
 | `avoid_accessing_collections_by_constant_index` | HAVE | `avoid_accessing_collections_by_constant_index` |
 | `avoid_accessing_other_classes_private_members` | HAVE | `avoid_accessing_other_classes_private_members` |
-| `avoid_ad_hoc_left_type` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_dollar_outside_do_frame.md) (fpdart family, see Gap Theme 1) |
+| `avoid_ad_hoc_left_type` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_dollar_outside_do_frame.md) (fpdart family, see Gap Theme 1) |
 | `avoid_banned_annotations` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_banned_annotations.md) |
 | `avoid_banned_exports` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_banned_exports.md) |
 | `avoid_banned_imports` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_banned_imports.md) |
 | `avoid_banned_names` | PARTIAL | `banned_identifier_usage` — TODO extend, see [proposal](../../../bugs/tier_3_infrastructure/proposal_extend_banned_identifier_usage_dcm_parity.md) |
 | `avoid_banned_types` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_avoid_banned_types.md) |
-| `avoid_bare_await_in_do` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_bare_await_in_do.md) (fpdart family, see Gap Theme 1) |
+| `avoid_bare_await_in_do` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_bare_await_in_do.md) (fpdart family, see Gap Theme 1) |
 | `avoid_bloc_public_methods` | HAVE | `avoid_bloc_public_methods` |
 | `avoid_border_all` | HAVE | `avoid_border_all` |
 | `avoid_build_context_in_providers` | HAVE | `avoid_build_context_in_providers` |
@@ -135,13 +135,13 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `avoid_deep_nesting` | HAVE | `avoid_deep_nesting` |
 | `avoid_deep_widget_nesting` | HAVE | `avoid_deep_widget_nesting` |
 | `avoid_default_tostring` | HAVE | `avoid_default_tostring` |
-| `avoid_dollar_outside_do_frame` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_dollar_outside_do_frame.md) (fpdart family, see Gap Theme 1) |
+| `avoid_dollar_outside_do_frame` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_dollar_outside_do_frame.md) (fpdart family, see Gap Theme 1) |
 | `avoid_dst_unsafe_date_arithmetic` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_dst_unsafe_date_arithmetic.md) |
 | `avoid_duplicate_bloc_event_handlers` | HAVE | `avoid_duplicate_bloc_event_handlers` |
 | `avoid_duplicate_cascades` | HAVE | `avoid_duplicate_cascades` |
 | `avoid_duplicate_collection_elements` | HAVE | `avoid_duplicate_number_elements` / `avoid_duplicate_string_elements` / `avoid_duplicate_object_elements` |
 | `avoid_duplicate_mixins` | HAVE | `avoid_duplicate_mixins` |
-| `avoid_either_of_future` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_either_of_future.md) (fpdart family, see Gap Theme 1) |
+| `avoid_either_of_future` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_either_of_future.md) (fpdart family, see Gap Theme 1) |
 | `avoid_empty_catch` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_empty_catch.md) |
 | `avoid_empty_setstate` | HAVE | `avoid_empty_setstate` |
 | `avoid_empty_spread` | HAVE | `avoid_empty_spread` |
@@ -151,10 +151,10 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `avoid_flexible_outside_flex` | HAVE | `avoid_flexible_outside_flex` |
 | `avoid_focused_tests` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_skipped_tests.md) (test hygiene, see Gap Theme 10) |
 | `avoid_future_ignore` | HAVE | `avoid_future_ignore` |
-| `avoid_future_of_either` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_future_of_either.md) (fpdart family, see Gap Theme 1) |
-| `avoid_future_of_option` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_future_of_option.md) (fpdart family, see Gap Theme 1) |
+| `avoid_future_of_either` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_future_of_either.md) (fpdart family, see Gap Theme 1) |
+| `avoid_future_of_option` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_future_of_option.md) (fpdart family, see Gap Theme 1) |
 | `avoid_generics_shadowing` | HAVE | `avoid_generics_shadowing` |
-| `avoid_get_or_else_swallowing_failure` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_get_or_else_swallowing_failure.md) (fpdart family, see Gap Theme 1) |
+| `avoid_get_or_else_swallowing_failure` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_get_or_else_swallowing_failure.md) (fpdart family, see Gap Theme 1) |
 | `avoid_high_cyclomatic_complexity` | HAVE | `avoid_high_cyclomatic_complexity` |
 | `avoid_hooks_outside_build` | HAVE | `avoid_hooks_outside_build` |
 | `avoid_incomplete_copy_with` | HAVE | `avoid_incomplete_copy_with` |
@@ -175,7 +175,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `avoid_mounted_in_setstate` | HAVE | `avoid_mounted_in_setstate` |
 | `avoid_negated_conditions` | HAVE | `avoid_negated_conditions` |
 | `avoid_nested_conditional_expressions` | HAVE | `avoid_nested_conditional_expressions` |
-| `avoid_nested_do_notation` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_nested_do_notation.md) (fpdart family, see Gap Theme 1) |
+| `avoid_nested_do_notation` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_nested_do_notation.md) (fpdart family, see Gap Theme 1) |
 | `avoid_nested_futures` | HAVE | `avoid_nested_futures` |
 | `avoid_nested_shorthands` | HAVE | `avoid_nested_shorthands` |
 | `avoid_non_null_assertion` | HAVE | `avoid_non_null_assertion` |
@@ -192,7 +192,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `avoid_ref_inside_state_dispose` | HAVE | `avoid_ref_inside_state_dispose` |
 | `avoid_ref_read_inside_build` | HAVE | `avoid_ref_read_inside_build` |
 | `avoid_ref_watch_outside_build` | HAVE | `avoid_ref_watch_outside_build` |
-| `avoid_removed_fpdart_api` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_removed_fpdart_api.md) (fpdart family, see Gap Theme 1) |
+| `avoid_removed_fpdart_api` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_removed_fpdart_api.md) (fpdart family, see Gap Theme 1) |
 | `avoid_returning_widgets` | HAVE | `avoid_returning_widgets` |
 | `avoid_self_compare` | HAVE | `avoid_self_compare` |
 | `avoid_shadowed_extension_methods` | HAVE | `avoid_shadowed_extension_methods` |
@@ -202,7 +202,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `avoid_skipped_tests` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_avoid_skipped_tests.md) (test hygiene, see Gap Theme 10) |
 | `avoid_state_constructors` | HAVE | `avoid_state_constructors` |
 | `avoid_throw_in_catch_block` | HAVE | `avoid_throw_in_catch_block` |
-| `avoid_throw_in_fp_callback` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_throw_in_fp_callback.md) (fpdart family, see Gap Theme 1) |
+| `avoid_throw_in_fp_callback` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_throw_in_fp_callback.md) (fpdart family, see Gap Theme 1) |
 | `avoid_todo_comments` | PARTIAL | `prefer_todo_format` / `prefer_fixme_format` / `prefer_hack_format` — check marker format only, not issue/URL reference presence |
 | `avoid_too_many_methods` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_too_many_methods.md) (budget rule, see Gap Theme 9) |
 | `avoid_too_many_widgets_per_build` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_avoid_too_many_widgets_per_build.md) (budget rule, see Gap Theme 9) |
@@ -217,16 +217,16 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `avoid_unnecessary_gesture_detector` | HAVE | `avoid_unnecessary_gesture_detector` |
 | `avoid_unnecessary_hook_widgets` | HAVE | `avoid_unnecessary_hook_widgets` |
 | `avoid_unnecessary_negations` | HAVE | `avoid_unnecessary_negations` |
-| `avoid_unnecessary_option` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_unnecessary_option.md) (fpdart family, see Gap Theme 1) |
+| `avoid_unnecessary_option` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_unnecessary_option.md) (fpdart family, see Gap Theme 1) |
 | `avoid_unnecessary_overrides` | HAVE | `avoid_unnecessary_overrides` |
 | `avoid_unnecessary_return` | HAVE | `avoid_unnecessary_return` |
 | `avoid_unnecessary_setstate` | HAVE | `avoid_unnecessary_setstate` |
 | `avoid_unnecessary_stateful_widgets` | HAVE | `avoid_unnecessary_stateful_widgets` |
 | `avoid_unrelated_type_casts` | HAVE | `avoid_unrelated_type_casts` |
 | `avoid_unremovable_callbacks_in_listeners` | HAVE | `avoid_unremovable_callbacks_in_listeners` |
-| `avoid_unrun_task` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_unrun_task.md) (fpdart family, see Gap Theme 1) |
+| `avoid_unrun_task` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_unrun_task.md) (fpdart family, see Gap Theme 1) |
 | `avoid_unsafe_collection_methods` | HAVE | `avoid_unsafe_collection_methods` |
-| `avoid_untyped_safe_cast` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_avoid_untyped_safe_cast.md) (fpdart family, see Gap Theme 1) |
+| `avoid_untyped_safe_cast` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_avoid_untyped_safe_cast.md) (fpdart family, see Gap Theme 1) |
 | `avoid_unused_after_null_check` | HAVE | `avoid_unused_after_null_check` |
 | `avoid_wildcard_cases_with_enums` | HAVE | `avoid_wildcard_cases_with_enums` |
 | `avoid_wrapping_in_padding` | HAVE | `avoid_wrapping_in_padding` |
@@ -249,7 +249,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `match_class_name_pattern` | HAVE | `match_class_name_pattern` |
 | `match_getter_setter_field_names` | HAVE | `match_getter_setter_field_names` |
 | `match_lib_folder_structure` | HAVE | `match_lib_folder_structure` |
-| `match_pattern` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_match_pattern.md) (generic config-driven ban engine, see Gap Theme 2) |
+| `match_pattern` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_match_pattern.md) (generic config-driven ban engine, see Gap Theme 2) |
 | `max_imports` | HAVE | `limit_max_imports` |
 | `max_statements` | PARTIAL | `avoid_long_functions` — TODO extend, see [proposal](../../../bugs/tier_2_high_value/proposal_extend_avoid_long_functions_dcm_parity.md) |
 | `member_ordering` | HAVE | `prefer_member_ordering` |
@@ -269,14 +269,14 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `prefer_abstract_final_static_class` | HAVE | `prefer_abstract_final_static_class` |
 | `prefer_add_all` | HAVE | `prefer_add_all` |
 | `prefer_align_over_container` | HAVE | `prefer_align_over_container` |
-| `prefer_and_then` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_prefer_and_then.md) (fpdart family, see Gap Theme 1) |
+| `prefer_and_then` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_prefer_and_then.md) (fpdart family, see Gap Theme 1) |
 | `prefer_any_or_every` | HAVE | `prefer_any_or_every` |
 | `prefer_async_callback` | HAVE | `prefer_async_callback` |
 | `prefer_bloc_extensions` | HAVE | `prefer_bloc_extensions` |
 | `prefer_boolean_prefixes` | HAVE | `prefer_boolean_prefixes` |
 | `prefer_center_over_align` | HAVE | `prefer_center_over_align` |
-| `prefer_chain_either` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_prefer_chain_either.md) (fpdart family, see Gap Theme 1) |
-| `prefer_chaining_over_intermediate_run` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_prefer_chaining_over_intermediate_run.md) (fpdart family, see Gap Theme 1) |
+| `prefer_chain_either` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_prefer_chain_either.md) (fpdart family, see Gap Theme 1) |
+| `prefer_chaining_over_intermediate_run` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_prefer_chaining_over_intermediate_run.md) (fpdart family, see Gap Theme 1) |
 | `prefer_class_destructuring` | HAVE | `prefer_class_destructuring` |
 | `prefer_compute_over_isolate_run` | HAVE | `prefer_compute_over_isolate_run` |
 | `prefer_conditional_expressions` | HAVE | `prefer_conditional_expressions` |
@@ -294,7 +294,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `prefer_correct_test_file_name` | HAVE | `prefer_correct_test_file_name` |
 | `prefer_correct_type_name` | HAVE | `prefer_correct_type_name` |
 | `prefer_declaring_const_constructor` | HAVE | `prefer_declaring_const_constructor` |
-| `prefer_do_notation` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_prefer_do_notation.md) (fpdart family, see Gap Theme 1) |
+| `prefer_do_notation` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_prefer_do_notation.md) (fpdart family, see Gap Theme 1) |
 | `prefer_early_return` | HAVE | `prefer_early_return` |
 | `prefer_enums_by_name` | HAVE | `prefer_enums_by_name` |
 | `prefer_equatable_mixin` | HAVE | `prefer_equatable_mixin` |
@@ -304,8 +304,8 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `prefer_explicit_type_arguments` | HAVE | `prefer_explicit_type_arguments` |
 | `prefer_extracting_callbacks` | HAVE | `prefer_extracting_callbacks` |
 | `prefer_for_loop_in_children` | HAVE | `prefer_for_loop_in_children` |
-| `prefer_from_nullable` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_prefer_from_nullable.md) (fpdart family, see Gap Theme 1) |
-| `prefer_from_predicate` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_prefer_from_predicate.md) (fpdart family, see Gap Theme 1) |
+| `prefer_from_nullable` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_prefer_from_nullable.md) (fpdart family, see Gap Theme 1) |
+| `prefer_from_predicate` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_prefer_from_predicate.md) (fpdart family, see Gap Theme 1) |
 | `prefer_getter_over_method` | HAVE | `prefer_getter_over_method` |
 | `prefer_immediate_return` | HAVE | `prefer_immediate_return` |
 | `prefer_immutable_bloc_state` | HAVE | `prefer_immutable_bloc_state` |
@@ -323,7 +323,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `prefer_return_await` | HAVE | `prefer_return_await` |
 | `prefer_returning_condition` | HAVE | `prefer_returning_condition` |
 | `prefer_returning_shorthands` | HAVE | `prefer_arrow_functions` |
-| `prefer_safe_collection_access` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_prefer_safe_collection_access.md) (fpdart family, see Gap Theme 1) |
+| `prefer_safe_collection_access` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_prefer_safe_collection_access.md) (fpdart family, see Gap Theme 1) |
 | `prefer_shorthands_with_constructors` | HAVE | `prefer_shorthands_with_constructors` |
 | `prefer_shorthands_with_enums` | HAVE | `prefer_shorthands_with_enums` |
 | `prefer_shorthands_with_static_fields` | HAVE | `prefer_shorthands_with_static_fields` |
@@ -333,10 +333,10 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `prefer_single_widget_per_file` | HAVE | `prefer_single_widget_per_file` |
 | `prefer_sized_box_square` | HAVE | `prefer_sized_box_square` |
 | `prefer_spacing` | HAVE | `prefer_spacing_over_sizedbox` |
-| `prefer_string_parse_extensions` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_prefer_string_parse_extensions.md) (fpdart family, see Gap Theme 1) |
+| `prefer_string_parse_extensions` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_prefer_string_parse_extensions.md) (fpdart family, see Gap Theme 1) |
 | `prefer_switch_expression` | HAVE | `prefer_switch_expression` |
 | `prefer_switch_with_enums` | HAVE | `prefer_switch_with_enums` |
-| `prefer_task_either_over_try_catch` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_prefer_task_either_over_try_catch.md) (fpdart family, see Gap Theme 1) |
+| `prefer_task_either_over_try_catch` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_prefer_task_either_over_try_catch.md) (fpdart family, see Gap Theme 1) |
 | `prefer_test_matchers` | HAVE | `prefer_test_matchers` |
 | `prefer_text_rich` | HAVE | `prefer_text_rich` |
 | `prefer_theme_mode_getters` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_prefer_theme_mode_getters.md) |
@@ -344,7 +344,7 @@ Coverage: 266 rules — 198 HAVE (74%), 7 PARTIAL, 57 TODO (21%)
 | `prefer_type_over_var` | HAVE | `prefer_type_over_var` |
 | `prefer_typed_exceptions` | TODO | TODO — see [proposal](../../../bugs/tier_1_quick_wins/proposal_prefer_typed_exceptions.md) |
 | `prefer_typedefs_for_callbacks` | HAVE | `prefer_typedefs_for_callbacks` |
-| `prefer_unit_over_void` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_prefer_unit_over_void.md) (fpdart family, see Gap Theme 1) |
+| `prefer_unit_over_void` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_prefer_unit_over_void.md) (fpdart family, see Gap Theme 1) |
 | `prefer_use_callback` | HAVE | `prefer_use_callback` |
 | `prefer_use_prefix` | HAVE | `prefer_use_prefix` |
 | `prefer_void_callback` | HAVE | `prefer_void_callback` |

@@ -2,7 +2,7 @@
 
 All 336 `bugs/proposal_*.md` files were sorted into 6 tier folders
 (`tier_1_quick_wins`, `tier_2_high_value`, `tier_3_infrastructure`,
-`tier_4_needs_decision`, `tier_5_niche`, `declined`) matching the build order in
+`tier_4_fpdart`, `tier_5_niche`, `declined`) matching the build order in
 `plans/PLAN_gap_theme_priorities.md`. The initial tier_2 bucket was a
 keyword-match fallback (150 files); a redistribution pass moved 76 to their
 correct tiers, leaving 74 genuinely high-value proposals.
@@ -29,7 +29,7 @@ correct tiers, leaving 74 genuinely high-value proposals.
 | tier_1_quick_wins | 121 |
 | tier_2_high_value | 74 |
 | tier_3_infrastructure | 59 |
-| tier_4_needs_decision | 27 |
+| tier_4_fpdart | 27 |
 | tier_5_niche | 33 |
 | declined | 22 |
 | **Total** | **336** |

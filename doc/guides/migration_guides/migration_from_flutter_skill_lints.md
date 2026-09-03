@@ -99,7 +99,7 @@ flutter_skill_lints ships 279 rules across ~25 grouped rule-source files (archit
 | `use_local_notifications_exact_alarm_permission_api` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_use_local_notifications_exact_alarm_permission_api.md) |
 | `use_notifier_suffix` | TODO | TODO — see [proposal](../../../bugs/tier_2_high_value/proposal_prefer_riverpod_notifier_suffix.md) |
 | `use_on_reorder_item_index_semantics` | TODO | TODO — see [proposal](../../../bugs/tier_3_infrastructure/proposal_use_on_reorder_item_index_semantics.md) |
-| `use_then_answer` | TODO | TODO — see [proposal](../../../bugs/tier_4_needs_decision/proposal_use_then_answer.md) |
+| `use_then_answer` | TODO | TODO — see [proposal](../../../bugs/tier_4_fpdart/proposal_use_then_answer.md) |
 
 ### Partial (7 rules)
 

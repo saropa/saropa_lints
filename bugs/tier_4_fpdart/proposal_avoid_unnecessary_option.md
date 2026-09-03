@@ -81,7 +81,7 @@ Justification: Package-specific (fpdart) rule that only applies to projects usin
 
 ## Implementation Notes
 
-Package-specific (fpdart) rule — same candidate home as `avoid_throw_in_fp_callback` (see `bugs/tier_4_needs_decision/proposal_avoid_throw_in_fp_callback.md`): a new `lib/src/rules/packages/fpdart_rules.dart` file, gated on the fpdart package actually being a project dependency, following the established package-detection pattern used elsewhere in `lib/src/rules/packages/`. If both fpdart proposals are implemented, land them in the same file to share the fpdart-type-resolution helpers rather than duplicating them. Suggest Comprehensive or Pedantic tier per the batch instructions.
+Package-specific (fpdart) rule — same candidate home as `avoid_throw_in_fp_callback` (see `bugs/tier_4_fpdart/proposal_avoid_throw_in_fp_callback.md`): a new `lib/src/rules/packages/fpdart_rules.dart` file, gated on the fpdart package actually being a project dependency, following the established package-detection pattern used elsewhere in `lib/src/rules/packages/`. If both fpdart proposals are implemented, land them in the same file to share the fpdart-type-resolution helpers rather than duplicating them. Suggest Comprehensive or Pedantic tier per the batch instructions.
 
 ---
 
