@@ -178,44 +178,52 @@ from scripts.modules._publish_workflow import (
 )
 
 # Single source of truth for publish modes.
-# Each entry: (internal_key, menu_label, cli_aliases)
+# Each entry: (internal_key, menu_label, cli_aliases, has_retry)
 # Menu number is derived from list position (1-indexed).
-_MODE_TABLE: list[tuple[str, str, list[str]]] = [
+# has_retry: True if the mode runs pipeline steps with failure paths
+# where auto-retry is useful. Lightweight modes that exit early skip
+# the interactive auto-retry prompt to avoid noise.
+_MODE_TABLE: list[tuple[str, str, list[str], bool]] = [
     ("full",
      "Full publish (audit \u2192 format \u2192 analysis \u2192 tests \u2192 version \u2192 release)",
-     []),
+     [], True),
     ("audit_only",
      "Audit only (tier integrity, DX checks; no publish)",
-     ["audit"]),
+     ["audit"], False),
     ("fix_docs",
      "Fix doc comments (angle brackets, refs; then exit)",
-     []),
+     [], False),
     ("full_skip_audit",
      "Publish without audit (skip audit; format \u2192 analysis \u2192 tests \u2192 release)",
-     ["skip_audit"]),
+     ["skip_audit"], True),
     ("analyze_only",
      "Analyze only (run dart analyze, write log; then exit)",
-     ["analyze"]),
+     ["analyze"], False),
     ("extension_only",
      "Extension only (package .vsix, optionally publish to Marketplace/Open VSX)",
-     ["extension"]),
+     ["extension"], True),
     ("publish_existing_vsix",
      "Publish existing .vsix (skip packaging; newest in project root)",
-     []),
+     [], True),
     ("ci_fallback",
      "CI fallback playbook (manual publish URLs, commands, upload files)",
-     []),
+     [], False),
     ("pubdev_only",
      "Pub.dev only (full publish pipeline, skip extension entirely)",
-     []),
+     [], True),
     ("dry_run",
      "Dry run (audit + format + analyze + tests; no commit/tag/publish)",
-     []),
+     [], True),
 ]
+
+# Modes where auto-retry is useful (derived from _MODE_TABLE)
+_RETRY_WORTHY_MODES: set[str] = {
+    key for key, _, _, has_retry in _MODE_TABLE if has_retry
+}
 
 # Build the CLI alias lookup from the single mode table
 _VALID_MODES: dict[str, str] = {}
-for _key, _, _aliases in _MODE_TABLE:
+for _key, _, _aliases, _ in _MODE_TABLE:
     _VALID_MODES[_key] = _key
     for _alias in _aliases:
         _VALID_MODES[_alias] = _key
@@ -228,7 +236,7 @@ def _prompt_publish_mode() -> str:
     in one place updates both the CLI --mode flag and this menu.
     """
     print_header("PUBLISH OPTIONS")
-    for i, (_, label, _) in enumerate(_MODE_TABLE, 1):
+    for i, (_, label, _, _) in enumerate(_MODE_TABLE, 1):
         print(f"  {i}) {label}")
     try:
         raw = safe_input("  Choice [1]: ", "1").strip() or "1"
@@ -263,12 +271,7 @@ def main(
         mode = _prompt_publish_mode()
 
     # Auto-retry: only prompt for modes that run pipeline steps with
-    # failure paths. Quick modes (audit, fix_docs, analyze) exit early
-    # and never hit prompt_step_failure, so asking is noise.
-    _RETRY_WORTHY_MODES = {
-        "full", "full_skip_audit", "dry_run",
-        "extension_only", "pubdev_only", "publish_existing_vsix",
-    }
+    # failure paths (derived from _MODE_TABLE's has_retry flag).
     if mode in _RETRY_WORTHY_MODES and get_auto_retry_limit() == 0:
         raw_retry = safe_input(
             "  Auto-retry failed steps? Enter count [0]: ", "0"
@@ -358,7 +361,22 @@ def _parse_args(argv: list[str]) -> _ParsedArgs:
     i = 0
     while i < len(argv):
         arg = argv[i]
-        if arg == "--dry-run":
+        if arg in ("--help", "-h"):
+            # Print the flags section from the module docstring
+            print("Usage: python scripts/publish.py [flags]")
+            print()
+            print("Flags:")
+            print("  --dry-run               Shorthand for --mode dry_run")
+            print("  --mode <name>           Set publish mode")
+            print(f"    Valid: {', '.join(sorted(_VALID_MODES))}")
+            print("  --log-file <path>       Mirror output to a plain-text file")
+            print("  --log-append            Append to log file instead of overwriting")
+            print("  --auto-retry <n>        Auto-retry failed steps up to n times")
+            print("  --output-level <level>  Console verbosity:")
+            print(f"    Valid: {', '.join(sorted(_OUTPUT_LEVELS))}")
+            print("  --help, -h              Show this help")
+            sys.exit(0)
+        elif arg == "--dry-run":
             result.mode = "dry_run"
         elif arg == "--log-append":
             result.log_append = True
