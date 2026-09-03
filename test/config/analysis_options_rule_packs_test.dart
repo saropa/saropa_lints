@@ -73,7 +73,8 @@ plugins:
     test('parses tab-indented blocks', () {
       // Real-world files sometimes use tabs despite YAML spec forbidding them.
       // The parser must count tabs as indentation, not treat them as zero-width.
-      const yaml = 'plugins:\n'
+      const yaml =
+          'plugins:\n'
           '\tsaropa_lints:\n'
           '\t\trule_packs:\n'
           '\t\t\tenabled:\n'

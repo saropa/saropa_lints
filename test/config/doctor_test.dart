@@ -118,7 +118,8 @@ plugins:
 
     test('handles tab-indented plugin block', () {
       // Tab indentation is non-standard but must not crash or false-positive.
-      const yaml = 'plugins:\n'
+      const yaml =
+          'plugins:\n'
           '\tsaropa_lints:\n'
           '\t\tversion: "15.0.0"\n'
           '\t\tlog_level: info\n';

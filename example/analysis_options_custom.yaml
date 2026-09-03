@@ -1,0 +1,4 @@
+rule_packs:
+  enabled:
+    - dart_sdk_3_2
+    - dart_sdk_3_4
