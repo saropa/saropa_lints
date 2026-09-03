@@ -150,10 +150,6 @@ String sarifReportToJsonString(
   required String toolVersion,
 }) {
   return const JsonEncoder.withIndent('  ').convert(
-    buildSarifReport(
-      diagnostics,
-      rootPath: rootPath,
-      toolVersion: toolVersion,
-    ),
+    buildSarifReport(diagnostics, rootPath: rootPath, toolVersion: toolVersion),
   );
 }

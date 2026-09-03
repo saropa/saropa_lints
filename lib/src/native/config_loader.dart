@@ -778,13 +778,15 @@ void _reloadRulePacksFromRoot(String projectRoot) {
     'analysis_options_custom.yaml',
     projectRoot,
   );
-  final customNorm =
-      customContent?.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+  final customNorm = customContent
+      ?.replaceAll('\r\n', '\n')
+      .replaceAll('\r', '\n');
 
   // If the custom file contains a `rule_packs:` key at all (even with an
   // empty enabled list), treat it as canonical — don't fall back to the
   // legacy plugin-block location, which could resurrect stale pack ids.
-  final customHasKey = customNorm != null &&
+  final customHasKey =
+      customNorm != null &&
       RegExp(r'^rule_packs:\s', multiLine: true).hasMatch(customNorm);
   var packIds = const <String>[];
   if (customHasKey) {
@@ -800,8 +802,9 @@ void _reloadRulePacksFromRoot(String projectRoot) {
 
       return;
     }
-    final mainNorm =
-        mainContent.replaceAll('\r\n', '\n').replaceAll('\r', '\n');
+    final mainNorm = mainContent
+        .replaceAll('\r\n', '\n')
+        .replaceAll('\r', '\n');
     packIds = parseRulePacksEnabledList(mainNorm);
     if (packIds.isNotEmpty) {
       PluginLogger.warning(

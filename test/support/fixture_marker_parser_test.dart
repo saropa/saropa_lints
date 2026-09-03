@@ -113,13 +113,16 @@ target();
 target();
 ''';
       final markers = parseFixtureMarkers(source);
-      expect(markers.first.messageSubstring,
-          '"not a registered" saropa_lints/rule');
+      expect(
+        markers.first.messageSubstring,
+        '"not a registered" saropa_lints/rule',
+      );
     });
 
     test('CRLF line endings parse identically to LF', () {
       // Windows-edited fixtures may have \r\n — parser must normalize.
-      const source = '// LINT: my_rule\r\n// LINT_MESSAGE: found it\r\ntarget();\r\n';
+      const source =
+          '// LINT: my_rule\r\n// LINT_MESSAGE: found it\r\ntarget();\r\n';
       final markers = parseFixtureMarkers(source);
       expect(markers, hasLength(1));
       expect(markers.first.ruleName, 'my_rule');
@@ -127,36 +130,42 @@ target();
       expect(markers.first.messageSubstring, 'found it');
     });
 
-    test('consecutive LINT markers for same rule produce separate expectations', () {
-      // Two LINT markers back to back, each targeting the line after it.
-      const source = '''
+    test(
+      'consecutive LINT markers for same rule produce separate expectations',
+      () {
+        // Two LINT markers back to back, each targeting the line after it.
+        const source = '''
 // LINT: my_rule
 line_a();
 // LINT: my_rule
 line_b();
 ''';
-      final markers = parseFixtureMarkers(source);
-      expect(markers, hasLength(2));
-      expect(markers[0].targetLine, 2);
-      expect(markers[1].targetLine, 4);
-    });
+        final markers = parseFixtureMarkers(source);
+        expect(markers, hasLength(2));
+        expect(markers[0].targetLine, 2);
+        expect(markers[1].targetLine, 4);
+      },
+    );
 
-    test('two different rules on adjacent lines produce distinct expectations', () {
-      // Different rules can target the same or adjacent lines.
-      const source = '''
+    test(
+      'two different rules on adjacent lines produce distinct expectations',
+      () {
+        // Different rules can target the same or adjacent lines.
+        const source = '''
 // LINT: rule_a
 // LINT: rule_b
 target();
 ''';
-      final markers = parseFixtureMarkers(source);
-      expect(markers, hasLength(2));
-      // rule_a's target is line 2 (the LINT: rule_b line).
-      expect(markers[0].ruleName, 'rule_a');
-      expect(markers[0].targetLine, 2);
-      // rule_b's target is line 3 (the code line).
-      expect(markers[1].ruleName, 'rule_b');
-      expect(markers[1].targetLine, 3);
-    });
+        final markers = parseFixtureMarkers(source);
+        expect(markers, hasLength(2));
+        // rule_a's target is line 2 (the LINT: rule_b line).
+        expect(markers[0].ruleName, 'rule_a');
+        expect(markers[0].targetLine, 2);
+        // rule_b's target is line 3 (the code line).
+        expect(markers[1].ruleName, 'rule_b');
+        expect(markers[1].targetLine, 3);
+      },
+    );
 
     test('stacked LINT_MESSAGE only pairs first with LINT', () {
       // Two LINT_MESSAGE lines: only the first pairs with the LINT marker,
@@ -174,17 +183,20 @@ target();
       expect(markers.first.targetLine, 3);
     });
 
-    test('marker inside string literal does not match (anchored to line start)', () {
-      // Markers require `//` at line start — a string containing marker text
-      // should not be parsed.
-      const source = '''
+    test(
+      'marker inside string literal does not match (anchored to line start)',
+      () {
+        // Markers require `//` at line start — a string containing marker text
+        // should not be parsed.
+        const source = '''
 final s = "// LINT: fake_rule";
 final t = '// LINT_NOT: fake_rule';
 ''';
-      expect(parseFixtureMarkers(source), isEmpty);
-      expect(parseFixtureNegations(source), isEmpty);
-      expect(parseFixtureCounts(source), isEmpty);
-    });
+        expect(parseFixtureMarkers(source), isEmpty);
+        expect(parseFixtureNegations(source), isEmpty);
+        expect(parseFixtureCounts(source), isEmpty);
+      },
+    );
 
     test('LINT_NOT is not parsed by parseFixtureMarkers', () {
       // LINT_NOT is handled by parseFixtureNegations, not parseFixtureMarkers.
@@ -204,10 +216,7 @@ target();
       );
       expect(withMsg.toString(), 'LINT:r@5 message≈"text"');
 
-      final withoutMsg = FixtureExpectation(
-        ruleName: 'r',
-        targetLine: 3,
-      );
+      final withoutMsg = FixtureExpectation(ruleName: 'r', targetLine: 3);
       expect(withoutMsg.toString(), 'LINT:r@3');
     });
   });

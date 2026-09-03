@@ -141,55 +141,52 @@ void main() {
       }
     });
 
-    test(
-      'every value in the generated ruleCategoryMap is a known slug '
-      '(exhaustive, all ${ruleCategoryMap.length} entries)',
-      () {
-        // The previous test filters through getAllDefinedRules() (the union
-        // of tier sets), so a rule present in the generated map but NOT
-        // wired into any tier — a real registration-drift scenario, since
-        // the map is generated from the rule factory list while tier
-        // membership is a separate, hand-maintained step — would never be
-        // checked. Iterate ruleCategoryMap directly so a generator bug that
-        // emits an unexpected/misspelled slug for ANY of the 2334 entries
-        // fails CI, not just entries that also happen to be tier-registered.
-        final validCategories = {
-          'architecture',
-          'code_quality',
-          'codegen',
-          'commerce',
-          'config',
-          'core',
-          'data',
-          'flow',
-          'hardware',
-          'media',
-          'network',
-          'packages',
-          'platforms',
-          'resources',
-          'security',
-          'stylistic',
-          'testing',
-          'ui',
-          'widget',
-        };
+    test('every value in the generated ruleCategoryMap is a known slug '
+        '(exhaustive, all ${ruleCategoryMap.length} entries)', () {
+      // The previous test filters through getAllDefinedRules() (the union
+      // of tier sets), so a rule present in the generated map but NOT
+      // wired into any tier — a real registration-drift scenario, since
+      // the map is generated from the rule factory list while tier
+      // membership is a separate, hand-maintained step — would never be
+      // checked. Iterate ruleCategoryMap directly so a generator bug that
+      // emits an unexpected/misspelled slug for ANY of the 2334 entries
+      // fails CI, not just entries that also happen to be tier-registered.
+      final validCategories = {
+        'architecture',
+        'code_quality',
+        'codegen',
+        'commerce',
+        'config',
+        'core',
+        'data',
+        'flow',
+        'hardware',
+        'media',
+        'network',
+        'packages',
+        'platforms',
+        'resources',
+        'security',
+        'stylistic',
+        'testing',
+        'ui',
+        'widget',
+      };
 
-        final invalid = <String, String>{};
-        for (final entry in ruleCategoryMap.entries) {
-          if (!validCategories.contains(entry.value)) {
-            invalid[entry.key] = entry.value;
-          }
+      final invalid = <String, String>{};
+      for (final entry in ruleCategoryMap.entries) {
+        if (!validCategories.contains(entry.value)) {
+          invalid[entry.key] = entry.value;
         }
+      }
 
-        expect(
-          invalid,
-          isEmpty,
-          reason:
-              'ruleCategoryMap entries with an unrecognized category slug '
-              '(regenerate with gen_category_map.py): $invalid',
-        );
-      },
-    );
+      expect(
+        invalid,
+        isEmpty,
+        reason:
+            'ruleCategoryMap entries with an unrecognized category slug '
+            '(regenerate with gen_category_map.py): $invalid',
+      );
+    });
   });
 }

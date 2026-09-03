@@ -31,15 +31,18 @@ final x = 1;
 ''');
     });
 
-    test('validates prefixed-unknown message via LINT_MESSAGE marker', () async {
-      // Prefixed but unregistered rule name should emit "not a registered".
-      await assertFixtureMarkers(rule, '''
+    test(
+      'validates prefixed-unknown message via LINT_MESSAGE marker',
+      () async {
+        // Prefixed but unregistered rule name should emit "not a registered".
+        await assertFixtureMarkers(rule, '''
 // LINT: require_ignore_comment_plugin_prefix
 // LINT_MESSAGE: not a registered
 // ignore: saropa_lints/totally_fake_rule
 final x = 1;
 ''');
-    });
+      },
+    );
 
     test('validates LINT marker without LINT_MESSAGE (line-only)', () async {
       // Without LINT_MESSAGE, only checks that the rule fires on the right line.

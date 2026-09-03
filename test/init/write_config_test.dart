@@ -303,10 +303,10 @@ plugins:
           expect(customContent.contains('migration_packs:'), isFalse);
           expect(customContent.contains('rule_packs:'), isTrue);
           // Sorted alphabetically on write.
-          expect(
-            parseRulePacksEnabledList(customContent),
-            ['drift', 'riverpod'],
-          );
+          expect(parseRulePacksEnabledList(customContent), [
+            'drift',
+            'riverpod',
+          ]);
         } finally {
           safeDeleteDir(dir);
         }

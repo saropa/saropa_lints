@@ -8,7 +8,7 @@ Created: 2026-09-02
 
 ## Summary
 
-Flags `StreamSubscription` fields in `State` classes that are not cancelled in `dispose()`, causing memory leaks and stale callbacks.
+Flags `StreamSubscription` fields in `State` classes that are not canceled in `dispose()`, causing memory leaks and stale callbacks.
 
 ## Existing Coverage
 
@@ -17,7 +17,7 @@ Saropa already has `require_stream_subscription_cancel` (`disposal_rules.dart`, 
 ## Detection / Behavior
 
 ```dart
-// Bad — subscription never cancelled
+// Bad — subscription never canceled
 class _MyState extends State<MyWidget> {
   StreamSubscription? _sub;
   void initState() { _sub = stream.listen((_) {}); }

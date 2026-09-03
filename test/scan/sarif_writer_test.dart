@@ -55,7 +55,8 @@ void main() {
         toolVersion: '1.0.0',
       );
 
-      final run = (sarif['runs'] as List<dynamic>).first as Map<String, dynamic>;
+      final run =
+          (sarif['runs'] as List<dynamic>).first as Map<String, dynamic>;
       final rules = run['tool']['driver']['rules'] as List<dynamic>;
       expect(rules, hasLength(1));
       expect((rules.first as Map<String, dynamic>)['id'], 'avoid_print');
@@ -120,7 +121,8 @@ void main() {
         toolVersion: '1.0.0',
       );
 
-      final run = (sarif['runs'] as List<dynamic>).first as Map<String, dynamic>;
+      final run =
+          (sarif['runs'] as List<dynamic>).first as Map<String, dynamic>;
       final rules = run['tool']['driver']['rules'] as List<dynamic>;
       expect(rules, hasLength(1));
       expect(run['results'], hasLength(2));
@@ -144,8 +146,10 @@ void main() {
         toolVersion: '1.0.0',
       );
 
-      final run = (sarif['runs'] as List<dynamic>).first as Map<String, dynamic>;
-      final result = (run['results'] as List<dynamic>).first as Map<String, dynamic>;
+      final run =
+          (sarif['runs'] as List<dynamic>).first as Map<String, dynamic>;
+      final result =
+          (run['results'] as List<dynamic>).first as Map<String, dynamic>;
       final location =
           ((result['locations'] as List<dynamic>).first
                   as Map<String, dynamic>)['physicalLocation']

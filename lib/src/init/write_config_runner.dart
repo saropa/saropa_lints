@@ -188,8 +188,8 @@ WriteConfigResult runWriteConfig(WriteConfigOptions options) {
   final List<String> preservedRulePacks = options.reset
       ? const <String>[]
       : (customPackIds.isNotEmpty
-          ? customPackIds
-          : parseRulePacksEnabledList(existingContent));
+            ? customPackIds
+            : parseRulePacksEnabledList(existingContent));
 
   // New projects get the plugin block commented out by default — the
   // in-process plugin costs several GB on large projects and the daemon

@@ -44,10 +44,7 @@ class FixtureExpectation {
 
 /// Parsed negative expectation from `// LINT_NOT:` — rule must NOT fire here.
 class FixtureNegation {
-  const FixtureNegation({
-    required this.ruleName,
-    required this.targetLine,
-  });
+  const FixtureNegation({required this.ruleName, required this.targetLine});
 
   /// The rule code that must NOT fire (from `// LINT_NOT: <rule>`).
   final String ruleName;
@@ -61,10 +58,7 @@ class FixtureNegation {
 
 /// Parsed count expectation from `// LINT_COUNT: rule_name N`.
 class FixtureCount {
-  const FixtureCount({
-    required this.ruleName,
-    required this.expectedCount,
-  });
+  const FixtureCount({required this.ruleName, required this.expectedCount});
 
   /// The rule code whose total diagnostic count is being asserted.
   final String ruleName;
@@ -121,12 +115,14 @@ List<FixtureExpectation> parseFixtureMarkers(String source) {
       }
     }
 
-    results.add(FixtureExpectation(
-      ruleName: ruleName,
-      // Convert 0-based index to 1-based line number.
-      targetLine: targetIndex + 1,
-      messageSubstring: messageSubstring,
-    ));
+    results.add(
+      FixtureExpectation(
+        ruleName: ruleName,
+        // Convert 0-based index to 1-based line number.
+        targetLine: targetIndex + 1,
+        messageSubstring: messageSubstring,
+      ),
+    );
   }
 
   return results;
@@ -144,11 +140,13 @@ List<FixtureNegation> parseFixtureNegations(String source) {
     final match = _lintNotPattern.firstMatch(lines[i]);
     if (match == null) continue;
 
-    results.add(FixtureNegation(
-      ruleName: match.group(1)!,
-      // Target is the next line (1-based).
-      targetLine: i + 2,
-    ));
+    results.add(
+      FixtureNegation(
+        ruleName: match.group(1)!,
+        // Target is the next line (1-based).
+        targetLine: i + 2,
+      ),
+    );
   }
 
   return results;
@@ -169,10 +167,7 @@ List<FixtureCount> parseFixtureCounts(String source) {
     final count = int.tryParse(match.group(2)!);
     if (count == null) continue;
 
-    results.add(FixtureCount(
-      ruleName: match.group(1)!,
-      expectedCount: count,
-    ));
+    results.add(FixtureCount(ruleName: match.group(1)!, expectedCount: count));
   }
 
   return results;

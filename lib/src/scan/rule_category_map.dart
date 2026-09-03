@@ -8,6 +8,7 @@
 /// A unit test validates that every registered rule appears in this map.
 // ignore_for_file: prefer_single_quotes
 library;
+
 const Map<String, String> ruleCategoryMap = <String, String>{
   'abi_specific_integer_invalid': 'data',
   'abstract_field_initializer': 'architecture',

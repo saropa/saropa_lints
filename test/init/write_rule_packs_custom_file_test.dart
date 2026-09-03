@@ -123,9 +123,7 @@ platforms:
       writeRulePacksToCustomFile(customFile, ['drift']);
       expect(customFile.existsSync(), isTrue);
 
-      final packs = parseRulePacksEnabledList(
-        customFile.readAsStringSync(),
-      );
+      final packs = parseRulePacksEnabledList(customFile.readAsStringSync());
       expect(packs, ['drift']);
     });
 

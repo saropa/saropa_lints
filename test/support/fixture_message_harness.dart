@@ -51,7 +51,8 @@ Future<List<HarnessDiagnostic>> assertFixtureMarkers(
     expect(
       matching,
       isNotEmpty,
-      reason: '// LINT: ${marker.ruleName} expected diagnostic on line '
+      reason:
+          '// LINT: ${marker.ruleName} expected diagnostic on line '
           '${marker.targetLine} but none found. '
           'Reported: ${diags.map((d) => '${d.ruleName}:${d.line}').join(', ')}',
     );
@@ -61,7 +62,8 @@ Future<List<HarnessDiagnostic>> assertFixtureMarkers(
       expect(
         matching.first.message,
         contains(marker.messageSubstring),
-        reason: '// LINT_MESSAGE: "${marker.messageSubstring}" not found in '
+        reason:
+            '// LINT_MESSAGE: "${marker.messageSubstring}" not found in '
             'diagnostic message on line ${marker.targetLine}:\n'
             '"${matching.first.message}"',
       );
@@ -73,15 +75,15 @@ Future<List<HarnessDiagnostic>> assertFixtureMarkers(
     final matching = diags
         .where(
           (d) =>
-              d.ruleName == negation.ruleName &&
-              d.line == negation.targetLine,
+              d.ruleName == negation.ruleName && d.line == negation.targetLine,
         )
         .toList();
 
     expect(
       matching,
       isEmpty,
-      reason: '// LINT_NOT: ${negation.ruleName} expected NO diagnostic on '
+      reason:
+          '// LINT_NOT: ${negation.ruleName} expected NO diagnostic on '
           'line ${negation.targetLine} but found: '
           '${matching.map((d) => '${d.ruleName}:${d.line}').join(', ')}',
     );
@@ -89,13 +91,15 @@ Future<List<HarnessDiagnostic>> assertFixtureMarkers(
 
   // Validate count expectations: exact number of diagnostics from the rule.
   for (final countMarker in counts) {
-    final ruleCount =
-        diags.where((d) => d.ruleName == countMarker.ruleName).length;
+    final ruleCount = diags
+        .where((d) => d.ruleName == countMarker.ruleName)
+        .length;
 
     expect(
       ruleCount,
       countMarker.expectedCount,
-      reason: '// LINT_COUNT: ${countMarker.ruleName} '
+      reason:
+          '// LINT_COUNT: ${countMarker.ruleName} '
           '${countMarker.expectedCount} — got $ruleCount diagnostic(s)',
     );
   }

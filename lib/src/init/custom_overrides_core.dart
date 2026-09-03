@@ -451,10 +451,7 @@ String _insertRulePacksBlock(String content, String block) {
 /// `# PLATFORM SETTINGS` header or other unrelated comments.
 String _removeRulePacksTemplate(String content) {
   return content.replaceAll(
-    RegExp(
-      r'^# RULE PACKS\n(?:#[^\n]*\n)*(?:\n)?',
-      multiLine: true,
-    ),
+    RegExp(r'^# RULE PACKS\n(?:#[^\n]*\n)*(?:\n)?', multiLine: true),
     '',
   );
 }

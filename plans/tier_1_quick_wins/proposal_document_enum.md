@@ -30,7 +30,7 @@ Enum values are public API surface exactly like class members, but IDE tooltips 
 enum OrderStatus { // LINT — public enum missing DartDoc
   pending,
   shipped, // LINT — enum value missing DartDoc
-  cancelled,
+  canceled,
 }
 ```
 
@@ -45,8 +45,8 @@ enum OrderStatus {
   /// Order has left the warehouse.
   shipped,
 
-  /// Order was cancelled before shipping.
-  cancelled,
+  /// Order was canceled before shipping.
+  canceled,
 }
 ```
 
