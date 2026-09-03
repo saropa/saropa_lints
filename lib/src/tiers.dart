@@ -139,6 +139,9 @@ const Set<String> stylisticRules = <String>{
   'prefer_blank_line_before_method', // Moved from professional (opinionated)
   'prefer_blank_line_before_return', // Moved from professional (opinionated)
   'prefer_blank_line_before_else',
+  'prefer_blank_line_before_break', // Tier 1 quick wins — batch 3
+  'prefer_blank_line_before_continue', // Tier 1 quick wins — batch 3
+  'prefer_blank_line_before_throw', // Tier 1 quick wins — batch 3
   'prefer_blank_line_after_loop',
   'prefer_trailing_comma', // Moved from professional (opinionated)
   'prefer_readable_line_length', // Moved from professional (opinionated)
@@ -1748,6 +1751,9 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_unnecessary_else_after_control_flow', // INFO - redundant else after return/throw/break/continue
   'avoid_skipped_tests', // WARNING - skip:true left in test suite
   'avoid_public_members_in_states', // INFO - public API leak from State class
+
+  // Tier 1 quick wins — batch 3
+  'always_put_doc_comments_before_annotations', // INFO - doc comment after annotation breaks dartdoc
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -2970,6 +2976,9 @@ const Set<String> professionalOnlyRules = <String>{
   // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
   'require_dependency_lower_bound', // INFO - constraint missing lower bound
   'prefer_caret_constraint_in_app', // INFO - app: caret-equivalent range
+
+  // Tier 1 quick wins — batch 3
+  'todo_with_story_links', // INFO - TODO/FIXME without issue tracker reference
 };
 
 /// Rules that are only included in the comprehensive tier (not in professional).
@@ -3263,6 +3272,10 @@ const Set<String> comprehensiveOnlyRules = <String>{
   // Tier 1 quick wins — batch 2
   'prefer_initializing_formals', // INFO - constructor body assignment instead of this.param
   'no_optional_operators_in_tests', // INFO - ?. and ?? hide test failures
+
+  // Tier 1 quick wins — batch 3
+  'avoid_unnecessary_parentheses', // INFO - redundant parens that don't change precedence
+  'constructor_parameters_and_fields_should_have_the_same_order', // INFO - param order matches field order
 };
 
 /// Pedantic tier rules - pedantic, highly opinionated rules.
@@ -3294,6 +3307,9 @@ const Set<String> pedanticOnlyRules = <String>{
   'prefer_named_bool_params',
   // Test pedantry
   'avoid_duplicate_test_assertions', // no repeated assertions
+
+  // Tier 1 quick wins — batch 3
+  'start_comments_with_space', // INFO - // comment needs space after slashes
 };
 
 /// Returns the set of rule names for a given tier.

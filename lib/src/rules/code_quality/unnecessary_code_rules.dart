@@ -1666,3 +1666,232 @@ String? _rootIdentifierName(Expression? expr) {
   }
   return null;
 }
+
+/// Warns when parentheses around an expression are redundant — removing
+/// them would parse to the exact same AST in the exact same position, so
+/// they contribute nothing but visual noise.
+///
+/// Since: v15.2.10 | Rule version: v1
+///
+/// `dart format` never strips these (it only re-indents/re-wraps, it does
+/// not remove semantically-inert parens), so redundant parens accumulate
+/// from copy-paste, IDE auto-complete, and refactoring and never get
+/// cleaned up without a dedicated lint. This is the deliberately
+/// conservative "always safe to flag" subset of DCM's
+/// `avoid-unnecessary-parentheses`: only two shapes are ever reported —
+/// (1) a parenthesized expression that is itself wrapped in another pair
+/// of parens (`((x))`), and (2) parens sitting in a position where they
+/// are the *entire* expression consumed (a variable initializer, a
+/// `return` expression, a bare argument, a list element, an `if`/`while`
+/// condition, …) wrapping either a primary/postfix expression (identifier,
+/// literal, member access, method call — all of which bind tighter than
+/// every operator) or a full sub-expression that has no outer operator to
+/// clash with.
+///
+/// Deliberately NOT flagged, to keep the false-positive surface at zero:
+/// parens inside string interpolation (`${(expr)}`), parens directly
+/// around or containing an `is`/`as`/conditional (`? :`) expression (a
+/// common, intentional readability convention even when not strictly
+/// required — see the second "good" example below), parens around a
+/// cascade or `throw`, parens around `??`/`??=`, parens required to group
+/// a function expression before an immediate call (`(() => 1)()`), parens
+/// required to disambiguate a cascade receiver (`(a + b)..toString()`),
+/// and — critically — parens around a bare integer literal immediately
+/// followed by a member access (`(5).toString()`), because the Dart
+/// lexer would otherwise swallow the following `.` as the start of a
+/// double literal and fail to compile (`5.toString()` is a compile
+/// error).
+///
+/// **Bad:**
+/// ```dart
+/// final x = (5); // parens around a literal do nothing
+/// final y = (a + b); // no surrounding operator requires this grouping
+/// return (someValue); // parens around a standalone return expression
+/// final z = ((a + b)); // double-wrapped: the outer pair is pure noise
+/// ```
+///
+/// **Good:**
+/// ```dart
+/// final x = (a + b) * c; // required: changes evaluation order vs a + b * c
+/// final y = -(a + b); // required: negates the whole sum, not just a
+/// final ok = (a is String) && b; // common style allowance around is/&&
+/// final s = (5).toString(); // required: 5.toString() fails to lex
+/// ```
+class AvoidUnnecessaryParenthesesRule extends SaropaLintRule {
+  AvoidUnnecessaryParenthesesRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'maintainability', 'style'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_unnecessary_parentheses',
+    '[avoid_unnecessary_parentheses] These parentheses do not change '
+        'evaluation order, precedence, or associativity in this position — '
+        'removing them would produce the exact same parsed expression and '
+        'behavior. dart format never strips redundant parens (it only '
+        're-indents and re-wraps), so they silently accumulate from '
+        'copy-paste, IDE auto-complete, and refactoring and linger as pure '
+        'visual noise a reader has to mentally discard on every pass. {v1}',
+    correctionMessage:
+        'Remove the redundant parentheses. Keep parens only where they '
+        'change precedence/associativity (e.g. `(a + b) * c`) or where '
+        'convention favors them for readability (e.g. `(a is String) && b`).',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addParenthesizedExpression((ParenthesizedExpression node) {
+      final Expression inner = node.expression;
+      final AstNode? parent = node.parent;
+
+      // Case 1: a parenthesized expression directly wrapping another
+      // parenthesized expression. Removing the OUTER pair always leaves a
+      // structurally-identical `(x)` in the original position — the outer
+      // pair is unconditionally redundant regardless of surrounding
+      // context, so this is the one check that needs no position analysis.
+      if (inner is ParenthesizedExpression) {
+        reporter.atNode(node);
+        return;
+      }
+
+      // Never look inside string interpolation. `${(expr)}` is common,
+      // intentional style, and interpolation grammar has corner cases
+      // (e.g. adjacent-string joins) this rule has no business second-
+      // guessing.
+      if (parent is InterpolationExpression) return;
+
+      // `is`/`as`/conditional (`? :`) parens are excluded both as the
+      // OUTER context and as the INNER expression: teams commonly keep
+      // these for readability even when the grammar does not strictly
+      // require them (`(a is String) && b`), so flagging them would be a
+      // net readability loss, not a win. See proposal edge case #2.
+      if (parent is IsExpression ||
+          parent is AsExpression ||
+          parent is ConditionalExpression) {
+        return;
+      }
+      if (inner is IsExpression ||
+          inner is AsExpression ||
+          inner is ConditionalExpression) {
+        return;
+      }
+
+      // Cascades and `throw` carry real grammar/readability weight —
+      // stripping parens around either can change what a cascade targets
+      // or is simply unusual style. Never flag.
+      if (inner is CascadeExpression || inner is ThrowExpression) return;
+
+      // `??`/`??=` parens read as an explicit, commonly-kept grouping
+      // convention (mirrors the is/as allowance above); never flag.
+      if (inner is BinaryExpression) {
+        final TokenType op = inner.operator.type;
+        if (op == TokenType.QUESTION_QUESTION ||
+            op == TokenType.QUESTION_QUESTION_EQ) {
+          return;
+        }
+      }
+
+      // Case 2: the parens are the ENTIRE expression consumed at this AST
+      // position — not an operand of some further outer operator — so no
+      // operator exists that could ever need them for grouping. Safe to
+      // strip regardless of the inner expression's shape (the risky inner
+      // shapes were already excluded above).
+      if (_isStandaloneExpressionPosition(node, parent)) {
+        reporter.atNode(node);
+        return;
+      }
+
+      // Case 3: primary/postfix-precedence inner expressions (identifiers,
+      // literals, member access, method calls, `this`/`super`) bind
+      // tighter than every Dart operator, so parens around them are always
+      // redundant no matter what encloses them — EXCEPT a bare integer
+      // literal directly followed by a member access: the lexer would
+      // swallow the following `.` as the start of a double literal and
+      // fail to compile (`5.toString()` is a compile error; `(5).toString()`
+      // is required). That one shape must keep its parens.
+      if (_isAtomicExpression(inner)) {
+        if (inner is IntegerLiteral && _isMemberAccessTarget(node, parent)) {
+          return;
+        }
+        reporter.atNode(node);
+      }
+    });
+  }
+
+  /// Whether [node] sits at a position where it is the WHOLE expression
+  /// being consumed — a variable initializer, a `return`/assignment RHS, a
+  /// bare call argument, a list element, or an `if`/`while`/`switch`
+  /// condition — so there is no outer operator left that parens could ever
+  /// be needed to group against.
+  static bool _isStandaloneExpressionPosition(
+    Expression node,
+    AstNode? parent,
+  ) {
+    if (parent == null) return false;
+    if (parent is VariableDeclaration) return parent.initializer == node;
+    if (parent is ReturnStatement) return parent.expression == node;
+    if (parent is ExpressionStatement) return parent.expression == node;
+    if (parent is ExpressionFunctionBody) return parent.expression == node;
+    if (parent is AssignmentExpression) return parent.rightHandSide == node;
+    if (parent is NamedExpression) return parent.expression == node;
+    // A bare (positional) call argument: named arguments are wrapped in a
+    // NamedExpression, which becomes the immediate parent instead, so
+    // reaching ArgumentList directly means this is a plain positional arg.
+    if (parent is ArgumentList) return true;
+    if (parent is ListLiteral) return true;
+    // IfStatement's field is `expression` (not `condition`) in this
+    // analyzer version — it doubles as the pattern-match subject for
+    // `if (x case ...)`, so the getter was renamed away from `condition`.
+    if (parent is IfStatement) return parent.expression == node;
+    if (parent is WhileStatement) return parent.condition == node;
+    if (parent is DoStatement) return parent.condition == node;
+    if (parent is SwitchStatement) return parent.expression == node;
+    if (parent is SwitchExpression) return parent.expression == node;
+    return false;
+  }
+
+  /// Whether [expr] is a primary/postfix-precedence expression that binds
+  /// tighter than every Dart operator, so parens around it are redundant
+  /// regardless of the surrounding context.
+  static bool _isAtomicExpression(Expression expr) {
+    return expr is SimpleIdentifier ||
+        expr is PrefixedIdentifier ||
+        expr is PropertyAccess ||
+        expr is MethodInvocation ||
+        expr is IndexExpression ||
+        expr is InstanceCreationExpression ||
+        expr is ThisExpression ||
+        expr is SuperExpression ||
+        expr is IntegerLiteral ||
+        expr is DoubleLiteral ||
+        expr is BooleanLiteral ||
+        expr is NullLiteral ||
+        expr is SimpleStringLiteral ||
+        expr is ListLiteral;
+  }
+
+  /// Whether [node] is the receiver/target of a member access or call —
+  /// used to guard the one atomic shape (a bare integer literal) whose
+  /// parens are load-bearing for the lexer, not just the parser.
+  static bool _isMemberAccessTarget(Expression node, AstNode? parent) {
+    if (parent is PropertyAccess) return parent.target == node;
+    if (parent is MethodInvocation) return parent.target == node;
+    if (parent is IndexExpression) return parent.target == node;
+    if (parent is FunctionExpressionInvocation) return parent.function == node;
+    return false;
+  }
+}

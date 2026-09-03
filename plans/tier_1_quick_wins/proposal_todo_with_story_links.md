@@ -1,6 +1,6 @@
 # PROPOSAL: Require TODO/FIXME Comments to Reference a Tracked Issue
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Redundant Parentheses in Expressions
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

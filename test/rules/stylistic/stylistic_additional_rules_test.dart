@@ -166,6 +166,18 @@ void main() {
       'prefer_explicit_boolean_comparison',
       () => PreferExplicitBooleanComparisonRule(),
     );
+
+    testRule(
+      'AlwaysPutDocCommentsBeforeAnnotationsRule',
+      'always_put_doc_comments_before_annotations',
+      () => AlwaysPutDocCommentsBeforeAnnotationsRule(),
+    );
+
+    testRule(
+      'StartCommentsWithSpaceRule',
+      'start_comments_with_space',
+      () => StartCommentsWithSpaceRule(),
+    );
   });
 
   group('Stylistic Additional Rules - Fixture Verification', () {

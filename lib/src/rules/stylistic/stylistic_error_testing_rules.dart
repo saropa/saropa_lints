@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/source/source_range.dart';
 
 import '../../saropa_lint_rule.dart';
@@ -1240,6 +1241,130 @@ class PreferTestNameDescriptiveRule extends SaropaLintRule {
       // Flag should/when pattern
       if (testName.contains('should') && testName.contains('when')) {
         reporter.atNode(nameArg);
+      }
+    });
+  }
+}
+
+// =============================================================================
+// TODO / FIXME TRACEABILITY RULE
+// =============================================================================
+
+/// Warns when a `// TODO`/`// FIXME` comment has no issue-tracker reference.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// Related rules: `prefer_todo_format`, `prefer_fixme_format` (marker
+/// *format* only — author/parentheses); this rule enforces *traceability* —
+/// that the work is actually findable in an issue tracker.
+///
+/// An untracked TODO is a promise nobody can find again: it survives in the
+/// codebase indefinitely because there's no ticket to close it out. A
+/// comment satisfies this rule if it contains a URL, a `#123`-shaped GitHub
+/// reference, or a `PROJ-123`-shaped ticket ID.
+///
+/// ### Example
+///
+/// #### BAD (with this rule enabled):
+/// ```dart
+/// // TODO(alice): clean this up later
+/// void legacyMigration() {}
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// // TODO(alice): remove after PROJ-4821 ships
+/// void legacyMigration() {}
+///
+/// // FIXME(bob): https://github.com/saropa/app/issues/512
+/// void hackyWorkaround() {}
+/// ```
+class TodoWithStoryLinksRule extends SaropaLintRule {
+  TodoWithStoryLinksRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  // Pure comment-token text matching — no resolved types needed.
+  @override
+  bool get usesTypeResolution => false;
+
+  @override
+  String get exampleBad => '// TODO(alice): clean this up later';
+
+  @override
+  String get exampleGood => '// TODO(alice): remove after PROJ-4821 ships';
+
+  /// Back-compat / alternate spellings consumers may already reference in
+  /// analysis_options.yaml.
+  @override
+  List<String> get configAliases => const [
+    'require_todo_tracker_reference',
+    'todo_requires_issue',
+  ];
+
+  static const LintCode _code = LintCode(
+    'todo_with_story_links',
+    '[todo_with_story_links] TODO or FIXME comment does not reference a tracked issue (a URL, a #123-shaped reference, or a PROJ-123-shaped ticket ID). Untracked TODOs are promises nobody can find again — they survive indefinitely in the codebase because no ticket exists to close them out and revisit the work. {v1}',
+    correctionMessage:
+        'Add an issue reference to the comment, e.g. "// TODO(alice): '
+        'remove after PROJ-4821 ships" or "// FIXME(bob): '
+        'https://github.com/org/repo/issues/512".',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  /// Matches the leading `// TODO` / `// FIXME` marker (case-insensitive),
+  /// with or without an `(author)` tag — detection scope only, not format.
+  static final RegExp _todoOrFixmeMarker = RegExp(
+    r'^//\s*(TODO|FIXME)\b',
+    caseSensitive: false,
+  );
+
+  /// Matches any of the accepted tracker-reference shapes: a URL, a
+  /// `#123`-style GitHub short reference, or a `PROJ-123`-style ticket ID
+  /// (2+ uppercase letters, a dash, then digits — e.g. JIRA-123, PROJ-4821).
+  static final RegExp _trackerReference = RegExp(
+    r'(https?://\S+)|(#\d+)|([A-Z]{2,}-\d+)',
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit unit) {
+      Token? token = unit.beginToken;
+
+      while (token != null && !token.isEof) {
+        // Comments are attached to the token that immediately follows them,
+        // so walk each token's preceding-comment chain to visit every
+        // comment in the file exactly once.
+        Token? comment = token.precedingComments;
+        while (comment != null) {
+          final String lexeme = comment.lexeme;
+
+          // Skip doc comments (`///`) and block comments (`/* */`) —
+          // this rule only governs single-line `//` markers, matching the
+          // scope of the sibling prefer_todo_format/prefer_fixme_format
+          // rules.
+          if (!lexeme.startsWith('///') &&
+              _todoOrFixmeMarker.hasMatch(lexeme) &&
+              !_trackerReference.hasMatch(lexeme)) {
+            reporter.atOffset(offset: comment.offset, length: comment.length);
+          }
+
+          comment = comment.next;
+        }
+        token = token.next;
       }
     });
   }

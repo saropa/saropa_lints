@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.2.10] — Unreleased
 
-Nine new lint rules across testing, equality, control flow, constructor style, and widget lifecycle. Cross-platform SARIF output fix, dead-link hardening for published docs, and orphan-publish recovery for the publish script. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
+Seventeen new lint rules across testing, equality, control flow, constructor style, widget lifecycle, formatting, code quality, documentation, and architecture. Cross-platform SARIF output fix, dead-link hardening for published docs, and orphan-publish recovery for the publish script. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
 
 ### Fixed
 
@@ -91,6 +91,14 @@ Nine new lint rules across testing, equality, control flow, constructor style, a
 - New rule `avoid_skipped_tests` (Recommended) — flags `test()`/`group()` calls with `skip: true` or a skip message left in committed code.
 - New rule `no_optional_operators_in_tests` (Comprehensive) — flags `?.` and `??` operators in test files that silently swallow failures.
 - New rule `avoid_public_members_in_states` (Recommended) — flags public fields and methods in `State` subclasses that leak internal state as public API.
+- New rule `prefer_blank_line_before_break` (Stylistic) — requires a blank line before `break` in multi-statement blocks for visual separation.
+- New rule `prefer_blank_line_before_continue` (Stylistic) — requires a blank line before `continue` in multi-statement blocks.
+- New rule `prefer_blank_line_before_throw` (Stylistic) — requires a blank line before `throw` statements in multi-statement blocks.
+- New rule `avoid_unnecessary_parentheses` (Comprehensive) — flags redundant parentheses that don't change evaluation order or precedence.
+- New rule `always_put_doc_comments_before_annotations` (Recommended) — flags `///` doc comments placed after annotations instead of before, which breaks dartdoc association.
+- New rule `start_comments_with_space` (Pedantic) — flags `//comment` missing a space after the slashes.
+- New rule `constructor_parameters_and_fields_should_have_the_same_order` (Comprehensive) — flags constructors where parameter order doesn't match field declaration order.
+- New rule `todo_with_story_links` (Professional) — flags TODO/FIXME comments lacking an issue tracker reference.
 
 ### Changed
 

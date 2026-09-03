@@ -295,6 +295,11 @@ void main() {
       'uri_does_not_exist',
       () => UriDoesNotExistRule(),
     );
+    testRule(
+      'ConstructorParametersAndFieldsShouldHaveTheSameOrderRule',
+      'constructor_parameters_and_fields_should_have_the_same_order',
+      () => ConstructorParametersAndFieldsShouldHaveTheSameOrderRule(),
+    );
   });
   group('Structure Rules - Fixture Verification', () {
     final fixtureDir = Directory('example/lib/structure');

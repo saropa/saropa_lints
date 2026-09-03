@@ -2,11 +2,13 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/error/error.dart' show DiagnosticCode;
 import 'package:analyzer/source/line_info.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/formatting/add_blank_line_before_return_fix.dart';
+import '../../fixes/formatting/add_blank_line_before_statement_fix.dart';
 import '../../fixes/formatting/add_blank_line_fix.dart';
 import '../../fixes/formatting/add_trailing_comma_fix.dart';
 import '../../fixes/formatting/remove_unnecessary_trailing_comma_fix.dart';
@@ -1698,6 +1700,438 @@ class PreferReadableLineLengthRule extends SaropaLintRule {
           reporter.atOffset(offset: lineStart, length: length.clamp(1, 81));
           return;
         }
+      }
+    });
+  }
+}
+
+// =============================================================================
+// blank-line-before-exit-statement family: break / continue / throw
+// =============================================================================
+//
+// Shared helper for the three rules below. `break`, `continue`, and (via its
+// wrapping ExpressionStatement) `throw` are all block-exiting statements, so
+// each rule needs to find the statement's preceding sibling in the same
+// enclosing statement list to check for a blank-line gap. A `switch` case
+// body is a [SwitchMember], NOT a [Block] — `NewlineBeforeCaseRule` already
+// relies on this distinction — so both are handled here to match the DCM
+// parity proposals' bad-example switch/case scenarios.
+
+/// Returns the index of [statement] within its enclosing statement list
+/// (a [Block]'s `statements` or a [SwitchMember]'s `statements`), or `null`
+/// when there is no such enclosing list, or when [statement] is the first
+/// (or only) statement in it. The `index <= 0` case is intentionally treated
+/// as "nothing to separate from" — mirrors the guard in
+/// [NewlineBeforeReturnRule] that skips a lone/leading return.
+int? _blankLineBeforeExitSiblingIndex(Statement statement) {
+  final AstNode? parent = statement.parent;
+
+  // Both Block and SwitchMember expose a `NodeList<Statement> statements`
+  // list, but they are unrelated types, so a switch expression picks the
+  // right accessor rather than duplicating the lookup/index logic twice.
+  final NodeList<Statement>? statements = switch (parent) {
+    Block block => block.statements,
+    SwitchMember member => member.statements,
+    _ => null,
+  };
+  if (statements == null) return null;
+
+  final int index = statements.indexOf(statement);
+  if (index <= 0) return null;
+  return index;
+}
+
+/// Returns true when [statement] (at [index] within [statements]) is not
+/// preceded by a full blank line — i.e. the gap between the previous
+/// statement's end line and this statement's start line is less than 2.
+bool _blankLineBeforeExitIsMissing(
+  LineInfo lineInfo,
+  NodeList<Statement> statements,
+  int index,
+  Statement statement,
+) {
+  final Statement previous = statements[index - 1];
+  final int prevEndLine = lineInfo.getLocation(previous.end).lineNumber;
+  final int startLine = lineInfo.getLocation(statement.offset).lineNumber;
+  return startLine - prevEndLine < 2;
+}
+
+/// Warns when a `break` statement is not preceded by a blank line.
+///
+/// Since: v15.3.0 | Rule version: v1
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: blank_line_before_break, newline_before_break, break_spacing
+///
+/// A blank line before `break` visually marks the loop/switch exit point
+/// and separates it from the logic that led to it — the same rationale
+/// already documented for [NewlineBeforeReturnRule]. Closes the DCM
+/// `newline-before-break` parity gap.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// switch (x) {
+///   case 1:
+///     doSomething();
+///     break;  // no blank line
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// switch (x) {
+///   case 1:
+///     doSomething();
+///
+///     break;
+/// }
+/// ```
+class PreferBlankLineBeforeBreakRule extends SaropaLintRule {
+  PreferBlankLineBeforeBreakRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  // No addBreakStatement callback exists in the native RuleVisitorRegistry
+  // (unlike addContinueStatement/addThrowExpression), so this rule walks the
+  // whole compilation unit with a RecursiveAstVisitor — the same workaround
+  // used by AvoidLabeledStatementsRule for LabeledStatement.
+  @override
+  RuleCost get cost => RuleCost.high;
+
+  @override
+  String get exampleBad =>
+      'switch (x) {\n'
+      '  case 1:\n'
+      '    doSomething();\n'
+      '    break;  // no blank line\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'switch (x) {\n'
+      '  case 1:\n'
+      '    doSomething();\n'
+      '\n'
+      '    break;\n'
+      '}';
+
+  @override
+  List<String> get configAliases => const <String>[
+    'blank_line_before_break',
+    'newline_before_break',
+    'break_spacing',
+  ];
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeStatementFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_before_break',
+    '[prefer_blank_line_before_break] Adding a blank line before a break statement is a formatting preference with no impact on code behavior or performance, but it visually marks the loop/switch exit point and separates it from the logic that led to it. Enable via the stylistic tier. {v1}',
+    correctionMessage:
+        'Add a blank line before this break statement. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit node) {
+      node.visitChildren(
+        _BreakStatementBlankLineVisitor(reporter, context.lineInfo),
+      );
+    });
+  }
+}
+
+/// Walks an AST subtree reporting every [BreakStatement] missing a blank
+/// line before it, so labeled/nested breaks anywhere in the file (not just
+/// at the top level) are caught.
+class _BreakStatementBlankLineVisitor extends RecursiveAstVisitor<void> {
+  _BreakStatementBlankLineVisitor(this.reporter, this.lineInfo);
+
+  final SaropaDiagnosticReporter reporter;
+  final LineInfo lineInfo;
+
+  @override
+  void visitBreakStatement(BreakStatement node) {
+    final int? index = _blankLineBeforeExitSiblingIndex(node);
+    if (index == null) return;
+
+    // `parent` is guaranteed non-null here because
+    // _blankLineBeforeExitSiblingIndex only returns non-null when it found
+    // a Block or SwitchMember statements list off node.parent.
+    final AstNode parent = node.parent!;
+    final NodeList<Statement> statements = parent is Block
+        ? parent.statements
+        : (parent as SwitchMember).statements;
+
+    if (_blankLineBeforeExitIsMissing(lineInfo, statements, index, node)) {
+      reporter.atNode(node);
+    }
+
+    super.visitBreakStatement(node);
+  }
+}
+
+/// Warns when a `continue` statement is not preceded by a blank line.
+///
+/// Since: v15.3.0 | Rule version: v1
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: blank_line_before_continue, newline_before_continue, continue_spacing
+///
+/// A blank line before `continue` visually marks the loop-control exit
+/// point, distinguishing it from ordinary sequential statements — the same
+/// rationale already documented for [NewlineBeforeReturnRule]. Closes the
+/// DCM `newline-before-continue` parity gap.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// for (final item in items) {
+///   if (item.isInvalid) {
+///     log('skipping');
+///     continue;  // no blank line
+///   }
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// for (final item in items) {
+///   if (item.isInvalid) {
+///     log('skipping');
+///
+///     continue;
+///   }
+/// }
+/// ```
+class PreferBlankLineBeforeContinueRule extends SaropaLintRule {
+  PreferBlankLineBeforeContinueRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  // addContinueStatement is a native single-node-kind callback (unlike
+  // break's missing callback), so this is a cheap per-node check.
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'for (final x in xs) {\n'
+      '  if (x.invalid) {\n'
+      '    log(x);\n'
+      '    continue;  // no blank line\n'
+      '  }\n'
+      '}';
+
+  @override
+  String get exampleGood =>
+      'for (final x in xs) {\n'
+      '  if (x.invalid) {\n'
+      '    log(x);\n'
+      '\n'
+      '    continue;\n'
+      '  }\n'
+      '}';
+
+  @override
+  List<String> get configAliases => const <String>[
+    'blank_line_before_continue',
+    'newline_before_continue',
+    'continue_spacing',
+  ];
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeStatementFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_before_continue',
+    '[prefer_blank_line_before_continue] Adding a blank line before a continue statement is a formatting preference with no impact on code behavior or performance, but it visually marks the loop-control exit point and distinguishes it from ordinary sequential logic. Enable via the stylistic tier. {v1}',
+    correctionMessage:
+        'Add a blank line before this continue statement. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addContinueStatement((ContinueStatement node) {
+      final int? index = _blankLineBeforeExitSiblingIndex(node);
+      if (index == null) return;
+
+      final AstNode parent = node.parent!;
+      final NodeList<Statement> statements = parent is Block
+          ? parent.statements
+          : (parent as SwitchMember).statements;
+
+      if (_blankLineBeforeExitIsMissing(
+        context.lineInfo,
+        statements,
+        index,
+        node,
+      )) {
+        reporter.atNode(node);
+      }
+    });
+  }
+}
+
+/// Warns when a `throw` statement is not preceded by a blank line.
+///
+/// Since: v15.3.0 | Rule version: v1
+///
+/// **Stylistic rule (opt-in only).** No performance or correctness benefit.
+///
+/// Alias: blank_line_before_throw, newline_before_throw, throw_spacing
+///
+/// A `throw` statement is a block-exiting statement, structurally identical
+/// to `return` for this purpose — the same rationale already documented for
+/// [NewlineBeforeReturnRule]. Closes the DCM `newline-before-throw` parity
+/// gap.
+///
+/// **Scope:** only visits block-level `throw` statements (an
+/// [ExpressionStatement] wrapping a [ThrowExpression]), matching
+/// `return`'s scope. An inline throw-*expression* used inside a ternary or
+/// `??` chain (e.g. `value ?? (throw StateError('required'))`) has no
+/// preceding sibling statement to compare against and is intentionally not
+/// flagged. `rethrow` (a [RethrowExpression], not a [ThrowExpression]) is
+/// out of scope for this rule version — see
+/// `plans/tier_1_quick_wins/proposal_prefer_blank_line_before_throw.md` edge
+/// case 2 for the follow-up decision.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// if (trimmed.isEmpty) {
+///   throw ArgumentError('id cannot be empty');  // no blank line
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// if (trimmed.isEmpty) {
+///   log('rejecting empty id');
+///
+///   throw ArgumentError('id cannot be empty');
+/// }
+/// ```
+class PreferBlankLineBeforeThrowRule extends SaropaLintRule {
+  PreferBlankLineBeforeThrowRule() : super(code: _code);
+
+  /// Style/consistency. Large counts acceptable in legacy code.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  // addThrowExpression is a native single-node-kind callback, so this is a
+  // cheap per-node check (same cost class as prefer_blank_line_before_continue).
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  @override
+  String get exampleBad =>
+      'if (trimmed.isEmpty) {\n'
+      "  throw ArgumentError('empty');  // no blank line\n"
+      '}';
+
+  @override
+  String get exampleGood =>
+      'if (trimmed.isEmpty) {\n'
+      "  log('rejecting');\n"
+      '\n'
+      "  throw ArgumentError('empty');\n"
+      '}';
+
+  @override
+  List<String> get configAliases => const <String>[
+    'blank_line_before_throw',
+    'newline_before_throw',
+    'throw_spacing',
+  ];
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        AddBlankLineBeforeStatementFix(context: context),
+  ];
+
+  static const LintCode _code = LintCode(
+    'prefer_blank_line_before_throw',
+    '[prefer_blank_line_before_throw] Adding a blank line before a throw statement is a formatting preference with no impact on code behavior or performance, but it visually marks the point where control leaves the enclosing block, matching the same rationale already applied to return statements. Enable via the stylistic tier. {v1}',
+    correctionMessage:
+        'Add a blank line before this throw statement. Verify the change works correctly with existing tests and add coverage for the new behavior.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addThrowExpression((ThrowExpression node) {
+      // Only handle block-level `throw stmt;` — a throw used as an inline
+      // expression (ternary/??) has no enclosing statement list to compare
+      // against and must not be flagged (see class doc "Scope").
+      final AstNode? parent = node.parent;
+      if (parent is! ExpressionStatement) return;
+
+      final int? index = _blankLineBeforeExitSiblingIndex(parent);
+      if (index == null) return;
+
+      final AstNode statementParent = parent.parent!;
+      final NodeList<Statement> statements = statementParent is Block
+          ? statementParent.statements
+          : (statementParent as SwitchMember).statements;
+
+      if (_blankLineBeforeExitIsMissing(
+        context.lineInfo,
+        statements,
+        index,
+        parent,
+      )) {
+        // Report on the ExpressionStatement (the whole `throw ...;`), not
+        // just the ThrowExpression, so the quick fix inserts before the
+        // full statement's own line.
+        reporter.atNode(parent);
       }
     });
   }

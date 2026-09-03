@@ -1,6 +1,6 @@
 # PROPOSAL: Require a Space After `//` in Line Comments
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

@@ -1,6 +1,6 @@
 # PROPOSAL: Require Doc Comments Before Annotations, Not After
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

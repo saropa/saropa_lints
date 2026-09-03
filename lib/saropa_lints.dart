@@ -3310,6 +3310,16 @@ _allRuleFactories = <SaropaLintRule Function()>[
   AvoidSkippedTestsRule.new,
   NoOptionalOperatorsInTestsRule.new,
   AvoidPublicMembersInStatesRule.new,
+
+  // Tier 1 quick wins — batch 3
+  PreferBlankLineBeforeBreakRule.new,
+  PreferBlankLineBeforeContinueRule.new,
+  PreferBlankLineBeforeThrowRule.new,
+  AvoidUnnecessaryParenthesesRule.new,
+  AlwaysPutDocCommentsBeforeAnnotationsRule.new,
+  StartCommentsWithSpaceRule.new,
+  ConstructorParametersAndFieldsShouldHaveTheSameOrderRule.new,
+  TodoWithStoryLinksRule.new,
 ];
 
 // =============================================================================

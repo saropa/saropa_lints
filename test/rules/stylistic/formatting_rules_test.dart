@@ -105,6 +105,24 @@ void main() {
       'enum_constants_ordering',
       () => EnumConstantsOrderingRule(),
     );
+
+    testRule(
+      'PreferBlankLineBeforeBreakRule',
+      'prefer_blank_line_before_break',
+      () => PreferBlankLineBeforeBreakRule(),
+    );
+
+    testRule(
+      'PreferBlankLineBeforeContinueRule',
+      'prefer_blank_line_before_continue',
+      () => PreferBlankLineBeforeContinueRule(),
+    );
+
+    testRule(
+      'PreferBlankLineBeforeThrowRule',
+      'prefer_blank_line_before_throw',
+      () => PreferBlankLineBeforeThrowRule(),
+    );
   });
 
   group('Formatting Rules - Fixture Verification', () {
@@ -130,6 +148,7 @@ void main() {
       'lib/src/fixes/formatting/add_blank_line_fix.dart',
       'lib/src/fixes/formatting/add_blank_line_after_declarations_fix.dart',
       'lib/src/fixes/formatting/add_blank_line_before_return_fix.dart',
+      'lib/src/fixes/formatting/add_blank_line_before_statement_fix.dart',
       'lib/src/fixes/formatting/require_ignore_comment_spacing_fix.dart',
       'lib/src/fixes/formatting/require_ignore_comment_plugin_prefix_fix.dart',
     ];
@@ -243,6 +262,126 @@ void main() {
         expect(rule.fixGenerators, isNotEmpty);
       });
     });
+
+    group('prefer_blank_line_before_break', () {
+      test('is stylistic rule (opinionated impact)', () {
+        final rule = PreferBlankLineBeforeBreakRule();
+        expect(rule.impact, LintImpact.info);
+      });
+
+      test('rule offers quick fix (add blank line before break)', () {
+        final rule = PreferBlankLineBeforeBreakRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
+      test('fixture has bad example with expect_lint marker', () {
+        final content = File(
+          'example/lib/formatting/prefer_blank_line_before_break_fixture.dart',
+        ).readAsStringSync();
+        expect(
+          content,
+          contains('// expect_lint: prefer_blank_line_before_break'),
+        );
+        expect(content, contains('_bad'));
+      });
+
+      test('fixture has good example without violation', () {
+        final content = File(
+          'example/lib/formatting/prefer_blank_line_before_break_fixture.dart',
+        ).readAsStringSync();
+        expect(content, contains('_good'));
+      });
+
+      test(
+        'fixture has false-positive guard: sole break in loop must not trigger',
+        () {
+          final content = File(
+            'example/lib/formatting/prefer_blank_line_before_break_fixture.dart',
+          ).readAsStringSync();
+          expect(content, contains('_soleBreak'));
+        },
+      );
+    });
+
+    group('prefer_blank_line_before_continue', () {
+      test('is stylistic rule (opinionated impact)', () {
+        final rule = PreferBlankLineBeforeContinueRule();
+        expect(rule.impact, LintImpact.info);
+      });
+
+      test('rule offers quick fix (add blank line before continue)', () {
+        final rule = PreferBlankLineBeforeContinueRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
+      test('fixture has bad example with expect_lint marker', () {
+        final content = File(
+          'example/lib/formatting/prefer_blank_line_before_continue_fixture.dart',
+        ).readAsStringSync();
+        expect(
+          content,
+          contains('// expect_lint: prefer_blank_line_before_continue'),
+        );
+        expect(content, contains('_bad'));
+      });
+
+      test('fixture has good example without violation', () {
+        final content = File(
+          'example/lib/formatting/prefer_blank_line_before_continue_fixture.dart',
+        ).readAsStringSync();
+        expect(content, contains('_good'));
+      });
+
+      test(
+        'fixture has false-positive guard: sole continue guard must not trigger',
+        () {
+          final content = File(
+            'example/lib/formatting/prefer_blank_line_before_continue_fixture.dart',
+          ).readAsStringSync();
+          expect(content, contains('_soleContinue'));
+        },
+      );
+    });
+
+    group('prefer_blank_line_before_throw', () {
+      test('is stylistic rule (opinionated impact)', () {
+        final rule = PreferBlankLineBeforeThrowRule();
+        expect(rule.impact, LintImpact.info);
+      });
+
+      test('rule offers quick fix (add blank line before throw)', () {
+        final rule = PreferBlankLineBeforeThrowRule();
+        expect(rule.fixGenerators, isNotEmpty);
+      });
+
+      test('fixture has bad example with expect_lint marker', () {
+        final content = File(
+          'example/lib/formatting/prefer_blank_line_before_throw_fixture.dart',
+        ).readAsStringSync();
+        expect(
+          content,
+          contains('// expect_lint: prefer_blank_line_before_throw'),
+        );
+        expect(content, contains('_bad'));
+      });
+
+      test('fixture has good example without violation', () {
+        final content = File(
+          'example/lib/formatting/prefer_blank_line_before_throw_fixture.dart',
+        ).readAsStringSync();
+        expect(content, contains('_good'));
+      });
+
+      test(
+        'fixture has false-positive guard: inline throw-expression must not trigger',
+        () {
+          final content = File(
+            'example/lib/formatting/prefer_blank_line_before_throw_fixture.dart',
+          ).readAsStringSync();
+          expect(content, contains('_inlineThrowExpression'));
+        },
+      );
+    });
   });
 
   group('Formatting - General Rules', () {
@@ -327,6 +466,151 @@ final x = 1;
       final diags = await runRuleResolved(rule, '''
 // ignore: unused_import
 final x = 1;
+''');
+      expect(diags, isEmpty);
+    });
+  });
+
+  // Resolved tests: prove the three new blank-line-before-exit rules
+  // actually fire on bad code and stay silent on good/guard code, not just
+  // that they instantiate (see resolved_rule_harness.dart doc comment on
+  // why instantiation-only pins are not enough).
+  group('prefer_blank_line_before_break — resolved firing', () {
+    final rule = PreferBlankLineBeforeBreakRule();
+
+    test('break without blank line in a switch case fires', () async {
+      final diags = await runRuleResolved(rule, '''
+void f(int x) {
+  switch (x) {
+    case 2:
+      f(1);
+      break;
+  }
+}
+''');
+      expect(diags, hasLength(1));
+      expect(diags.first.ruleName, 'prefer_blank_line_before_break');
+    });
+
+    test('break with a blank line before it does not fire', () async {
+      final diags = await runRuleResolved(rule, '''
+void f(int x) {
+  switch (x) {
+    case 2:
+      f(1);
+
+      break;
+  }
+}
+''');
+      expect(diags, isEmpty);
+    });
+
+    test('break as the sole statement in a loop does not fire', () async {
+      final diags = await runRuleResolved(rule, '''
+void f() {
+  for (var i = 0; i < 10; i++) {
+    break;
+  }
+}
+''');
+      expect(diags, isEmpty);
+    });
+  });
+
+  group('prefer_blank_line_before_continue — resolved firing', () {
+    final rule = PreferBlankLineBeforeContinueRule();
+
+    test('continue without blank line inside a loop fires', () async {
+      final diags = await runRuleResolved(rule, '''
+void f(List<int> xs) {
+  for (final x in xs) {
+    if (x < 0) {
+      f(<int>[]);
+      continue;
+    }
+  }
+}
+''');
+      expect(diags, hasLength(1));
+      expect(diags.first.ruleName, 'prefer_blank_line_before_continue');
+    });
+
+    test('continue with a blank line before it does not fire', () async {
+      final diags = await runRuleResolved(rule, '''
+void f(List<int> xs) {
+  for (final x in xs) {
+    if (x < 0) {
+      f(<int>[]);
+
+      continue;
+    }
+  }
+}
+''');
+      expect(diags, isEmpty);
+    });
+
+    test(
+      'continue as the sole statement in a guard clause does not fire',
+      () async {
+        final diags = await runRuleResolved(rule, '''
+void f(List<int> xs) {
+  for (final x in xs) {
+    if (x < 0) continue;
+  }
+}
+''');
+        expect(diags, isEmpty);
+      },
+    );
+  });
+
+  group('prefer_blank_line_before_throw — resolved firing', () {
+    final rule = PreferBlankLineBeforeThrowRule();
+
+    test('throw without blank line inside a guard fires', () async {
+      final diags = await runRuleResolved(rule, '''
+void f(String raw) {
+  final trimmed = raw.trim();
+  if (trimmed.isEmpty) {
+    f(trimmed);
+    throw ArgumentError('empty');
+  }
+}
+''');
+      expect(diags, hasLength(1));
+      expect(diags.first.ruleName, 'prefer_blank_line_before_throw');
+    });
+
+    test('throw with a blank line before it does not fire', () async {
+      final diags = await runRuleResolved(rule, '''
+void f(String raw) {
+  final trimmed = raw.trim();
+  if (trimmed.isEmpty) {
+    f(trimmed);
+
+    throw ArgumentError('empty');
+  }
+}
+''');
+      expect(diags, isEmpty);
+    });
+
+    test('throw as the sole statement in a guard does not fire', () async {
+      final diags = await runRuleResolved(rule, '''
+void f(bool ok) {
+  if (!ok) throw StateError('invalid');
+}
+''');
+      expect(diags, isEmpty);
+    });
+
+    test('inline throw-expression (not a statement) does not fire', () async {
+      final diags = await runRuleResolved(rule, '''
+int f(int? value) {
+  return value ?? (throw StateError('required'));
+}
 ''');
       expect(diags, isEmpty);
     });

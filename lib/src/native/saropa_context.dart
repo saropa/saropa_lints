@@ -924,6 +924,15 @@ class SaropaContext {
     _registry.addObjectPattern(_rule, _visitor);
   }
 
+  // Added for avoid_unnecessary_parentheses: the first rule that needs to
+  // inspect raw `(expr)` grouping nodes directly.
+  void addParenthesizedExpression(
+    void Function(ParenthesizedExpression) callback,
+  ) {
+    _visitor.onParenthesizedExpression = _wrapCallback(callback);
+    _registry.addParenthesizedExpression(_rule, _visitor);
+  }
+
   void addPatternAssignment(void Function(PatternAssignment) callback) {
     _visitor.onPatternAssignment = _wrapCallback(callback);
     _registry.addPatternAssignment(_rule, _visitor);

@@ -79,6 +79,9 @@ class CompatVisitor extends SimpleAstVisitor<void> {
   void Function(NamedType)? onNamedType;
   void Function(NullCheckPattern)? onNullCheckPattern;
   void Function(ObjectPattern)? onObjectPattern;
+  // Added for avoid_unnecessary_parentheses: no rule previously needed to
+  // visit raw parenthesized expressions, so this hook did not exist yet.
+  void Function(ParenthesizedExpression)? onParenthesizedExpression;
   void Function(PatternAssignment)? onPatternAssignment;
   void Function(PatternField)? onPatternField;
   void Function(PatternVariableDeclaration)? onPatternVariableDeclaration;
@@ -260,6 +263,10 @@ class CompatVisitor extends SimpleAstVisitor<void> {
       onNullCheckPattern?.call(node);
   @override
   void visitObjectPattern(ObjectPattern node) => onObjectPattern?.call(node);
+  @override
+  // Dispatches to the avoid_unnecessary_parentheses rule's callback.
+  void visitParenthesizedExpression(ParenthesizedExpression node) =>
+      onParenthesizedExpression?.call(node);
   @override
   void visitPatternAssignment(PatternAssignment node) =>
       onPatternAssignment?.call(node);

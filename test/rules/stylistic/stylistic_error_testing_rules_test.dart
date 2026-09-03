@@ -97,6 +97,12 @@ void main() {
       'prefer_test_name_descriptive',
       () => PreferTestNameDescriptiveRule(),
     );
+
+    testRule(
+      'TodoWithStoryLinksRule',
+      'todo_with_story_links',
+      () => TodoWithStoryLinksRule(),
+    );
   });
 
   group('Stylistic Error Testing Rules - Fixture Verification', () {

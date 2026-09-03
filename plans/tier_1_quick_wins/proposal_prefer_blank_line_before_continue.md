@@ -1,6 +1,6 @@
 # PROPOSAL: Blank Line Before `continue` Statement
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

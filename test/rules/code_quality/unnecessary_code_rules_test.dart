@@ -99,6 +99,11 @@ void main() {
       'prefer_reusing_assigned_local',
       () => PreferReusingAssignedLocalRule(),
     );
+    testRule(
+      'AvoidUnnecessaryParenthesesRule',
+      'avoid_unnecessary_parentheses',
+      () => AvoidUnnecessaryParenthesesRule(),
+    );
   });
 
   group('Unnecessary Code Rules - Fixture Verification', () {

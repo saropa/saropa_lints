@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Constructor Parameter Order That Doesn't Match Field Declaration Order
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule

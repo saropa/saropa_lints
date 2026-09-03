@@ -1,6 +1,7 @@
 // ignore_for_file: depend_on_referenced_packages, deprecated_member_use
 
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/dart/ast/token.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 
 import '../../import_utils.dart';
@@ -2085,5 +2086,305 @@ class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
         reporter.atNode(node);
       }
     });
+  }
+}
+
+// =============================================================================
+// COMMENT FORMATTING RULES
+// =============================================================================
+
+/// Scans the token range covering an [AnnotatedNode]'s metadata for a `///`
+/// doc comment that was written after one or more annotations instead of
+/// before all of them.
+///
+/// Background: the analyzer only populates [AnnotatedNode.documentationComment]
+/// when the `///` block immediately precedes the *first* token of the node
+/// (i.e. before any `@annotation`). If a doc comment is written between two
+/// annotations, or after the last annotation but before the declaration
+/// keyword, `documentationComment` comes back `null` even though a `///`
+/// block is clearly present somewhere in the node's leading trivia — that
+/// stray doc comment is exactly what this rule needs to locate and flag.
+///
+/// Returns the comment token that is misplaced, or `null` when the node has
+/// no annotations (nothing to reorder) or its doc comment (if any) is
+/// already correctly positioned before all annotations.
+Token? _findMisplacedDocComment(AnnotatedNode node) {
+  // Nothing to reorder when there are no annotations at all.
+  if (node.metadata.isEmpty) return null;
+
+  // A non-null documentationComment means the doc block already precedes
+  // every annotation — the well-formed case defined by the analyzer parser.
+  if (node.documentationComment != null) return null;
+
+  // Walk every token from the start of the node (the first annotation's `@`)
+  // through the token immediately after all metadata (the declaration
+  // keyword/name). A `///` comment attaches as leading trivia to whichever
+  // real token follows it, so a doc comment stuck between annotations, or
+  // between the last annotation and the declaration, surfaces here.
+  final Token stop = node.firstTokenAfterCommentAndMetadata;
+  Token? token = node.beginToken;
+  while (token != null) {
+    Token? comment = token.precedingComments;
+    while (comment != null) {
+      if (comment.lexeme.startsWith('///')) {
+        return comment;
+      }
+      comment = comment.next;
+    }
+    if (token == stop) break;
+    token = token.next;
+  }
+  return null;
+}
+
+/// Warns when a `///` doc comment is written after annotations instead of
+/// before them.
+///
+/// Since: v15.3.0 | Rule version: v1
+///
+/// Tier: Recommended.
+///
+/// Dart's dartdoc tooling only associates a `///` doc comment with a
+/// declaration when the comment immediately precedes the *entire*
+/// declaration, annotations included. A doc comment placed between
+/// annotations, or after the last annotation but before the declaration
+/// keyword, is silently dropped from generated API docs — the analyzer
+/// gives no warning, so the mistake is easy to make and easy to miss.
+///
+/// Alias: `doc_comment_before_annotation`
+///
+/// ## Good Example
+/// ```dart
+/// class Widget {
+///   /// Builds the widget tree.
+///   @override
+///   Widget build(BuildContext context) => const SizedBox();
+/// }
+/// ```
+///
+/// ## Bad Example (flagged)
+/// ```dart
+/// class Widget {
+///   @override
+///   /// Builds the widget tree.
+///   Widget build(BuildContext context) => const SizedBox();
+/// }
+/// ```
+class AlwaysPutDocCommentsBeforeAnnotationsRule extends SaropaLintRule {
+  AlwaysPutDocCommentsBeforeAnnotationsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention', 'documentation'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => false;
+
+  @override
+  List<String> get configAliases => const <String>[
+    'doc_comment_before_annotation',
+  ];
+
+  @override
+  String get exampleBad =>
+      '@override\n/// Builds the widget.\nWidget build(BuildContext c) => x;';
+
+  @override
+  String get exampleGood =>
+      '/// Builds the widget.\n@override\nWidget build(BuildContext c) => x;';
+
+  static const LintCode _code = LintCode(
+    'always_put_doc_comments_before_annotations',
+    '[always_put_doc_comments_before_annotations] A /// doc comment was '
+        'found after one or more annotations (e.g. @override, @Deprecated) '
+        'instead of before all of them. Dartdoc only associates a doc '
+        'comment with a declaration when it precedes every annotation, so a '
+        'doc comment placed between or after annotations is silently '
+        'dropped from generated API documentation with no compiler warning. '
+        'Move the /// block above every annotation attached to this '
+        'declaration. {v1}',
+    correctionMessage:
+        'Move the /// doc comment above all annotations so dartdoc '
+        'associates it with the declaration.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Report at the misplaced comment token itself (not the declaration) so
+    // the squiggle lands directly on the doc comment that needs to move.
+    void check(AnnotatedNode node) {
+      final Token? misplaced = _findMisplacedDocComment(node);
+      if (misplaced != null) {
+        reporter.atToken(misplaced);
+      }
+    }
+
+    // Every declaration kind that can carry both a doc comment and
+    // annotations. Registered individually (rather than one generic AST
+    // visitor) to reuse SaropaContext's existing per-node-type dispatch and
+    // its gating/perf wrapper.
+    context.addClassDeclaration(check);
+    context.addMixinDeclaration(check);
+    context.addExtensionDeclaration(check);
+    context.addEnumDeclaration(check);
+    context.addMethodDeclaration(check);
+    context.addConstructorDeclaration(check);
+    context.addFieldDeclaration(check);
+    context.addFunctionDeclaration(check);
+    context.addTopLevelVariableDeclaration(check);
+  }
+}
+
+/// Warns when a `//` line comment has no space after the slashes.
+///
+/// Since: v15.3.0 | Rule version: v1
+///
+/// Tier: Pedantic.
+///
+/// A comment glued directly to its `//` (`//comment`) reads worse than a
+/// spaced one (`// comment`) and is a common artifact of fast typing or
+/// paste-without-reformat. This rule targets plain `//` line comments only —
+/// `///` doc comments have their own dartdoc conventions, and `// ignore:` /
+/// `// ignore_for_file:` suppression directives are covered by the more
+/// specific `require_ignore_comment_spacing` rule, so both are skipped here
+/// to avoid double-reporting the same token.
+///
+/// Alias: `require_space_after_double_slash`
+///
+/// ## Good Example
+/// ```dart
+/// // This explains the next line.
+/// final int x = compute();
+/// ```
+///
+/// ## Bad Example (flagged)
+/// ```dart
+/// //this explains the next line, but has no space
+/// final int x = compute();
+/// ```
+class StartCommentsWithSpaceRule extends SaropaLintRule {
+  StartCommentsWithSpaceRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention'};
+
+  @override
+  RuleCost get cost => RuleCost.trivial;
+
+  @override
+  bool get usesTypeResolution => false;
+
+  @override
+  List<String> get configAliases => const <String>[
+    'require_space_after_double_slash',
+  ];
+
+  @override
+  String get exampleBad => '//no space after the slashes';
+
+  @override
+  String get exampleGood => '// space after the slashes';
+
+  static const LintCode _code = LintCode(
+    'start_comments_with_space',
+    '[start_comments_with_space] A // line comment has no space between the '
+        'slashes and the comment text. An unspaced comment (//like this) is '
+        'harder to scan than a spaced one (// like this) and is usually the '
+        'result of fast typing or a paste without reformatting. Add a '
+        'single space immediately after the // so the comment text is '
+        'visually separated from the slashes. {v1}',
+    correctionMessage:
+        'Add a space immediately after // so the comment text is separated '
+        'from the slashes.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  /// Directive prefixes that are already covered by a more specific rule
+  /// ([RequireIgnoreCommentSpacingRule] in formatting_rules.dart) or that
+  /// are intentionally unspaced by convention (IDE suppression directives).
+  /// Comments starting with these are skipped here to avoid double-flagging
+  /// the same token under two different rules.
+  static const List<String> _skippedDirectivePrefixes = <String>[
+    'ignore:',
+    'ignore_for_file:',
+    'noinspection',
+  ];
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addCompilationUnit((CompilationUnit node) {
+      // Walk every token in the unit and inspect its preceding comment
+      // trivia — comments are not AST nodes, so they can only be reached
+      // via the token stream, not via an addXxx(node) callback.
+      Token? token = node.beginToken;
+      while (token != null && token != node.endToken) {
+        _checkPrecedingComments(token, reporter);
+        token = token.next;
+      }
+    });
+  }
+
+  void _checkPrecedingComments(Token token, SaropaDiagnosticReporter reporter) {
+    Token? comment = token.precedingComments;
+    while (comment != null) {
+      final String lexeme = comment.lexeme;
+
+      // Shebang lines (`#!/usr/bin/env dart`) are not `//` comments at all,
+      // but guard defensively in case a future analyzer version lexes them
+      // as comment trivia.
+      if (lexeme.startsWith('#!')) {
+        comment = comment.next;
+        continue;
+      }
+
+      // `///` doc comments and `//!` banged comments have their own
+      // conventions and are out of scope for this rule.
+      final bool isPlainLineComment =
+          lexeme.startsWith('//') &&
+          !lexeme.startsWith('///') &&
+          !lexeme.startsWith('//!');
+
+      if (isPlainLineComment) {
+        final String content = lexeme.substring(2);
+
+        // A bare `//` with nothing after it has no text to space.
+        if (content.isNotEmpty) {
+          final String firstChar = content[0];
+          final bool alreadySpaced = firstChar == ' ' || firstChar == '\t';
+
+          // Skip directive comments owned by a more specific rule.
+          final bool isSkippedDirective = _skippedDirectivePrefixes.any(
+            content.startsWith,
+          );
+
+          if (!alreadySpaced && !isSkippedDirective) {
+            reporter.atToken(comment);
+          }
+        }
+      }
+
+      comment = comment.next;
+    }
   }
 }

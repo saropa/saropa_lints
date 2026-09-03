@@ -4879,3 +4879,196 @@ class UriDoesNotExistRule extends SaropaLintRule {
     }
   }
 }
+
+/// Warns when a constructor's `this.field` parameter order doesn't match
+/// the order the same fields are declared in the enclosing class body.
+///
+/// Since: v4.13.0 | Rule version: v1
+///
+/// Alias: prefer_constructor_field_order, match_constructor_field_order
+///
+/// A constructor parameter list is effectively a second declaration of the
+/// same fields. When the two lists drift out of order — usually because a
+/// field was inserted mid-list, or params were reordered during an
+/// unrelated refactor — a reader checking "did this constructor forget a
+/// field?" has to cross-reference two differently-ordered lists instead of
+/// scanning both top-to-bottom in lockstep.
+///
+/// ### Example
+///
+/// #### BAD:
+/// ```dart
+/// class UserProfile {
+///   final String name;
+///   final int age;
+///   final String email;
+///
+///   UserProfile({
+///     required this.email, // fields are name, age, email but params
+///     required this.age,   // are ordered email, age, name
+///     required this.name,
+///   });
+/// }
+/// ```
+///
+/// #### GOOD:
+/// ```dart
+/// class UserProfile {
+///   final String name;
+///   final int age;
+///   final String email;
+///
+///   UserProfile({
+///     required this.name, // matches field declaration order
+///     required this.age,
+///     required this.email,
+///   });
+/// }
+/// ```
+class ConstructorParametersAndFieldsShouldHaveTheSameOrderRule
+    extends SaropaLintRule {
+  ConstructorParametersAndFieldsShouldHaveTheSameOrderRule()
+    : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'architecture'};
+
+  @override
+  RuleCost get cost => RuleCost.medium;
+
+  // Pure AST/token comparison — no resolved types needed.
+  @override
+  bool get usesTypeResolution => false;
+
+  /// Back-compat / alternate spellings consumers may already reference in
+  /// analysis_options.yaml.
+  @override
+  List<String> get configAliases => const [
+    'prefer_constructor_field_order',
+    'match_constructor_field_order',
+  ];
+
+  static const LintCode _code = LintCode(
+    'constructor_parameters_and_fields_should_have_the_same_order',
+    '[constructor_parameters_and_fields_should_have_the_same_order] Constructor parameter order does not match the order the corresponding fields are declared in the class body. Drifted ordering forces reviewers to cross-reference two differently-ordered lists instead of scanning both top-to-bottom in lockstep, making it easy to miss a field the constructor forgot to forward. {v1}',
+    correctionMessage:
+        'Reorder the constructor\'s this.field parameters (or the field '
+        'declarations) so they appear in the same relative order, letting '
+        'readers match constructor params to fields by visual position.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    context.addConstructorDeclaration((ConstructorDeclaration node) {
+      // Only applies to constructors declared directly inside a class body —
+      // the enclosing class supplies the "correct" field order to compare
+      // against.
+      final AstNode? parent = node.parent;
+      if (parent is! ClassDeclaration) return;
+
+      // Collect the enclosing class's own (non-static) instance field names
+      // in declaration order. Inherited/mixed-in fields are not visible in
+      // `bodyMembers`, so they are naturally excluded from comparison —
+      // matches edge case 5 in the proposal (only compare against fields
+      // declared directly in this class body).
+      final List<String> fieldOrder = <String>[];
+      for (final ClassMember member in parent.bodyMembers) {
+        if (member is FieldDeclaration && !member.isStatic) {
+          for (final VariableDeclaration v in member.fields.variables) {
+            fieldOrder.add(v.name.lexeme);
+          }
+        }
+      }
+      // Fewer than two fields means there's no possible ordering to violate.
+      if (fieldOrder.length < 2) return;
+
+      // Collect this.field forwarding parameters in left-to-right source
+      // order, split into positional and named groups. Dart requires
+      // positional-before-named at the language level regardless of field
+      // order, so each group is compared against the field order
+      // independently (edge case 2 in the proposal) rather than as one
+      // combined sequence.
+      final List<FormalParameter> positionalForwarding = <FormalParameter>[];
+      final List<FormalParameter> namedForwarding = <FormalParameter>[];
+
+      for (final FormalParameter p in node.parameters.parameters) {
+        // Named/optional/required params are wrapped in DefaultFormalParameter;
+        // unwrap to inspect the underlying parameter kind.
+        final FormalParameter inner = p is DefaultFormalParameter
+            ? p.parameter
+            : p;
+        // Only `this.field` shorthand parameters have a corresponding field
+        // position to compare against — a parameter used purely to compute
+        // a derived initializer-list value has none (edge case 3).
+        if (inner is! FieldFormalParameter) continue;
+        // Skip forwarding params that don't reference a field declared in
+        // this class (e.g. a typo, or a field only present via inheritance).
+        if (!fieldOrder.contains(inner.name.lexeme)) continue;
+
+        if (p.isNamed) {
+          namedForwarding.add(p);
+        } else {
+          positionalForwarding.add(p);
+        }
+      }
+
+      _checkGroupOrder(
+        group: positionalForwarding,
+        fieldOrder: fieldOrder,
+        reporter: reporter,
+      );
+      _checkGroupOrder(
+        group: namedForwarding,
+        fieldOrder: fieldOrder,
+        reporter: reporter,
+      );
+    });
+  }
+
+  /// Compares [group]'s left-to-right field-forwarding order against
+  /// [fieldOrder], restricted to only the fields present in [group]
+  /// (preserving their relative field-declaration order). Reports once, at
+  /// the first out-of-order parameter, for a precise error location — a
+  /// class with multiple drifted parameters doesn't need N separate reports.
+  static void _checkGroupOrder({
+    required List<FormalParameter> group,
+    required List<String> fieldOrder,
+    required SaropaDiagnosticReporter reporter,
+  }) {
+    // A single forwarding parameter has no relative order to violate.
+    if (group.length < 2) return;
+
+    final List<String> paramNames = group.map((FormalParameter p) {
+      final FormalParameter inner = p is DefaultFormalParameter
+          ? p.parameter
+          : p;
+      return (inner as FieldFormalParameter).name.lexeme;
+    }).toList();
+
+    // Filter the full field-declaration order down to only the fields this
+    // constructor actually forwards, preserving their declared order —
+    // this is the "expected" order for the parameter list to match
+    // (edge case 1: fields absent from the constructor are simply skipped).
+    final Set<String> paramNameSet = paramNames.toSet();
+    final List<String> expectedOrder = fieldOrder
+        .where(paramNameSet.contains)
+        .toList();
+
+    for (int i = 0; i < paramNames.length; i++) {
+      if (paramNames[i] != expectedOrder[i]) {
+        reporter.atNode(group[i]);
+        return;
+      }
+    }
+  }
+}
