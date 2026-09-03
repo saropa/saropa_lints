@@ -107,7 +107,7 @@ current published rule set (33 rules as of this audit; verified directly against
 | `newline_before_return` | TODO | TODO — see [proposal](../../../bugs/proposal_newline_before_return.md) |
 | `no_empty_block` | HAVE | `no_empty_block` |
 | `no_equal_then_else` | HAVE | `no_equal_then_else` |
-| `no_magic_number` | HAVE | `avoid_magic_numbers` (exemption support) |
+| `no_magic_number` | HAVE | `no_magic_number` |
 | `number_of_parameters` | PARTIAL | `prefer_named_parameters` targets excess positional params, not a pure count ceiling |
 | `prefer_conditional_expressions` | HAVE | `prefer_conditional_expressions` |
 | `prefer_early_return` | HAVE | `prefer_early_return` |

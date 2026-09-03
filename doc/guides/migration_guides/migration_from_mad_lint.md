@@ -84,7 +84,7 @@ Coverage: 13 rules — 7 HAVE (53%), 2 PARTIAL, 4 TODO (30%)
 
 | mad_lint Rule | Status | Saropa Rule / Action |
 |---|---|---|
-| `newline_before_return` | HAVE | `NewlineBeforeReturnRule` |
+| `newline_before_return` | HAVE | `prefer_blank_line_before_return` |
 | `no_magic_number` | HAVE | `no_magic_number` |
 | `no_bang_operator` | HAVE | `avoid_non_null_assertion` |
 | `required_full_props` | HAVE | `list_all_equatable_fields` |

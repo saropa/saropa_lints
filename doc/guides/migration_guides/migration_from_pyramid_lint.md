@@ -77,7 +77,7 @@ Coverage: 37 rules — 25 HAVE (67%), 4 PARTIAL, 8 TODO (21%)
 | `prefer_iterable_first` | HAVE | `prefer_list_first` |
 | `prefer_iterable_last` | HAVE | `prefer_list_last` |
 | `prefer_library_prefixes` | TODO | TODO — see [proposal](../../../bugs/proposal_prefer_library_prefixes.md) |
-| `prefer_new_line_before_return` | HAVE | `NewlineBeforeReturnRule` |
+| `prefer_new_line_before_return` | HAVE | `prefer_blank_line_before_return` |
 | `prefer_underscore_for_unused_callback_parameters` | HAVE | `prefer_wildcard_for_unused_param` |
 | `proper_from_environment` | TODO | TODO — see [proposal](../../../bugs/proposal_proper_from_environment.md) |
 | `unnecessary_nullable_return_type` | HAVE | `avoid_unnecessary_nullable_return_type` |

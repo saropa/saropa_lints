@@ -144,7 +144,7 @@ Coverage: 87 rules — 77 HAVE (88%), 2 PARTIAL, 8 TODO (9%)
 | `list_all_equatable_fields` | HAVE | `list_all_equatable_fields` |
 | `member_ordering` | HAVE | `prefer_member_ordering` |
 | `missing_test_assertion` | HAVE | `missing_test_assertion` |
-| `newline_before_return` | HAVE | `NewlineBeforeReturnRule` |
+| `newline_before_return` | HAVE | `prefer_blank_line_before_return` |
 | `no_blank_line_before_single_return` | TODO | TODO — see [proposal](../../../bugs/proposal_no_blank_line_before_single_return.md) |
 | `no_boolean_literal_compare` | HAVE | `no_boolean_literal_compare` |
 | `no_empty_block` | HAVE | `no_empty_block` |

@@ -99,6 +99,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Replaced hardcoded English engine names and status words in the Debug Panel with `l10n()` calls — added explicit `key` field to `EngineStatus` so toggle messages don't depend on locale-sensitive substring matching.
 - Removed hand-typed rule counts (203, 2140) from the Debug Panel engine status — these drifted as rules were added. The LSP server retains its fixed count of 4 (the actual test diagnostic count).
 - Fixed 4 migration packs that had drifted from their source guides: `migrate_dcm` was missing 9 documented rules and carried one typo'd rule name that never matched anything; `migrate_dart_code_metrics_presets` was missing 1 rule; `migrate_dart_code_linter` and `migrate_awesome_lints` each carried rules not backed by any guide row. Enabling these packs previously gave less (or, for the typo, slightly wrong) coverage than the migration guide promised.
+- Fixed 5 migration guides (`dcm`, `dart_code_linter`, `pyramid_lint`, `mad_lint`, `solid_lints`) that mapped a source rule to a saropa Dart *class* name (`NewlineBeforeReturnRule`) or a rule that never existed (`avoid_magic_numbers`) instead of the real rule codes (`prefer_blank_line_before_return`, `no_magic_number`). Every affected migration pack was silently missing that rule's coverage — the phantom code matched nothing.
 
 <details>
 <summary>Maintenance</summary>
@@ -128,6 +129,7 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Confirmed SARIF `properties` bag carrying `tier`/`category`/`baselineStatus` is compatible with GitHub code-scanning and VS Code SARIF Viewer per SARIF 2.1.0 §3.8 — added spec-reference comment.
 - Eliminated redundant JSON.stringify of the full diagnostics array in the audit report render path — the array is now serialized once in `openAuditReport` and the same string feeds both the size check and the inline embed.
 - Added `test/config/rule_packs_migration_guide_sync_test.dart` — re-derives each migration pack's expected rule set from its guide's HAVE/ENHANCED table and fails if the pack file drifts from the guide (caught the 4 packs fixed above).
+- `rule_pack_migration_codes.dart` is now generated, not hand-maintained: `tool/generate_migration_pack_codes.dart` parses the HAVE/ENHANCED rows out of every migration guide, validates each referenced saropa rule against `tiers.dart`, and rewrites the pack file — run it after editing any migration guide instead of hand-syncing the pack's `Set<String>`. Generation also caught (and the fix above corrected) 5 guides referencing a Dart *class* name (`NewlineBeforeReturnRule`) or a nonexistent rule (`avoid_magic_numbers`) instead of the real rule codes (`prefer_blank_line_before_return`, `no_magic_number`) — those packs were silently missing coverage for one rule each. Shared parsing lives in `tool/migration_pack_guide_sync.dart` so the generator and the drift test can't disagree.
 
 </details>
 

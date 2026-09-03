@@ -382,7 +382,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `newline-before-constructor` | HAVE | `prefer_blank_line_before_constructor` |
 | `newline-before-continue` | TODO | TODO — see [proposal](../../../bugs/proposal_newline_before_continue.md) |
 | `newline-before-method` | HAVE | `prefer_blank_line_before_method` |
-| `newline-before-return` | HAVE | `NewlineBeforeReturnRule` |
+| `newline-before-return` | HAVE | `prefer_blank_line_before_return` |
 | `newline-before-throw` | TODO | TODO — see [proposal](../../../bugs/proposal_newline_before_throw.md) |
 | `no-boolean-literal-compare` | HAVE | `no_boolean_literal_compare` |
 | `no-empty-block` | HAVE | `no_empty_block` |
