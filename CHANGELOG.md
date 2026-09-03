@@ -71,8 +71,13 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 ### Fixed
 
 - Fixed CI failure: `.pubignore` now excludes `doc/guides/migration_guides/` so shipped docs no longer contain dead links to `.pubignore`-excluded `plans/` proposals.
-- Fixed broken link in `README.md` to removed `doc/guides/upgrading_to_v7.md`.
+- Fixed `check_doc_links_excluded_paths.py` not filtering out source docs that are themselves `.pubignore`-excluded — the script now skips docs under excluded prefixes instead of scanning them for link targets.
+- Fixed broken links in `README.md` and `doc/README.md` to removed guide files (`upgrading_to_v7.md`, `migration_v4_to_v5.md`).
 - Fixed wrong relative path in `using_with_flutter_lints.md` link to VGA migration guide.
+
+### Changed
+
+- Added doc-link validation to `.githooks/pre-commit` — broken or excluded-path links in shipped docs are now caught before commit, not just in CI.
 
 ---
 

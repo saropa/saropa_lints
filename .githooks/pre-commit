@@ -35,6 +35,20 @@ if [ "$status" -ne 0 ]; then
   exit "$status"
 fi
 
+# ── shipped doc links gate ──
+# Catch dead or .pubignore-excluded links in shipped docs before they reach CI.
+# Only runs when a shipped doc (.md in doc/ or README.md) is being committed.
+doc_files=$(echo "$files" | grep -E '^(doc/|README\.md$|\.pubignore$)')
+if [ -n "$doc_files" ]; then
+  $PY scripts/check_doc_links_excluded_paths.py
+  doc_status=$?
+  if [ "$doc_status" -ne 0 ]; then
+    echo ""
+    echo "Commit blocked: shipped doc(s) have broken or excluded-path links. See above."
+    exit 1
+  fi
+fi
+
 # ── dart fix dry-run gate (exit 2 = dart missing, skip gracefully) ──
 $PY scripts/check_dart_fix.py
 fix_status=$?

@@ -65,12 +65,24 @@ def _excluded_prefixes(repo_root: Path) -> tuple[str, ...]:
     return tuple(prefixes)
 
 
-def _shipped_doc_files(repo_root: Path) -> list[Path]:
+def _shipped_doc_files(repo_root: Path, excluded_prefixes: tuple[str, ...]) -> list[Path]:
+    """Return .md files under doc/ and the root README that actually ship.
+
+    Files whose own path falls under a .pubignore-excluded prefix are
+    themselves excluded from the pub.dev tarball, so their links are
+    irrelevant to published-package readers.
+    """
     candidates = list((repo_root / "doc").rglob("*.md"))
     readme = repo_root / "README.md"
     if readme.exists():
         candidates.append(readme)
-    return candidates
+    # Drop docs that are themselves excluded from the package.
+    shipped = []
+    for p in candidates:
+        rel = p.relative_to(repo_root).as_posix()
+        if not any(rel.startswith(prefix) for prefix in excluded_prefixes):
+            shipped.append(p)
+    return shipped
 
 
 def _resolve_target(doc_path: Path, target: str, repo_root: Path) -> Path:
@@ -126,7 +138,7 @@ def main() -> int:
     repo_root = Path(__file__).resolve().parent.parent
     excluded_prefixes = _excluded_prefixes(repo_root)
     violations: list[str] = []
-    for doc_path in _shipped_doc_files(repo_root):
+    for doc_path in _shipped_doc_files(repo_root, excluded_prefixes):
         violations.extend(_violations(doc_path, repo_root, excluded_prefixes))
 
     if not violations:
