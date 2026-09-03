@@ -1,6 +1,6 @@
 # BUG: `unsupported_option` — `rule_packs` and `log_level` still trigger SDK warnings
 
-**Status: Open**
+**Status: Fixed**
 
 Created: 2026-09-03
 Rule: N/A (infrastructure — Dart SDK analyzer validation, not a saropa_lints rule)
@@ -81,3 +81,17 @@ No plugin API exists to register additional config keys. The SDK validates again
 - saropa_lints version: 14.3.8 (consumer), latest (source)
 - Dart SDK version: (current)
 - Triggering project: `d:\src\saropa_drift_advisor\analysis_options.yaml` lines 59-60
+
+---
+
+## Finish Report (2026-09-03)
+
+Investigation confirmed the fix was already fully implemented across the codebase:
+
+- `config_loader.dart` reads `rule_packs` and `log_level` from `analysis_options_custom.yaml` as canonical, falling back to the plugin block only with a deprecation warning directing users to run `migrate-config`.
+- The `init` command writes both keys to the custom file only — never under `plugins:`.
+- The `migrate-config` CLI handles all four migrated keys (`log_level`, `lane`, `memory_mode`, `rule_packs`) including the nested map structure for `rule_packs.enabled`.
+
+The bug report was filed based on warnings still visible in `saropa_drift_advisor`, which had not yet run the migration. No code changes were required in saropa_lints — the consumer project needs `dart run saropa_lints migrate-config`.
+
+The CHANGELOG heading for `[15.2.12]` was missing the required `— Unreleased` suffix; corrected as part of this task.
