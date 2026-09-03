@@ -11,6 +11,7 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/element/type.dart';
 
 import '../../saropa_lint_rule.dart';
+import '../../fixes/testing_best_practices/suggest_test_description_fix.dart';
 import '../../fixes/testing_best_practices/wrap_with_material_app_fix.dart';
 
 /// Warns when test has no assertions.
@@ -3470,6 +3471,14 @@ class RequireTestDescriptionConventionRule extends SaropaLintRule {
   RuleCost get cost => RuleCost.low;
   @override
   bool get usesTypeResolution => true;
+
+  /// Quick fix: auto-generate a "should [verb] ..." description prefix
+  /// based on expect() matchers found in the test body.
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        SuggestTestDescriptionFix(context: context),
+  ];
 
   @override
   Set<FileType>? get applicableFileTypes => {FileType.test};
