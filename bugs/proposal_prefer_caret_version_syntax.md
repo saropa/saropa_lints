@@ -6,6 +6,8 @@ Created: 2026-09-02
 
 **Conflicts with:** [`prefer_pinned_version_syntax`](proposal_prefer_pinned_version_syntax.md) — mutually exclusive; a project enables at most one.
 
+**Tier disposition — conflicting pair.** Both rules ship in the **stylistic tier** per the established `tiers.dart` convention for opposed rules (documented at the top of `stylisticRules`, e.g. `prefer_single_quotes_strict` vs `prefer_double_quotes_with_fix`): neither is enabled by default and the project explicitly opts into one. Add both to `stylisticRules` and list the pair in `README_STYLISTIC.md`. Never assign either to a default-on tier — there is no correct default here (apps favor reproducible pins, published packages need ranges so consumers can resolve).
+
 ## Summary
 
 Flags a verbose version-range constraint in `pubspec.yaml` (e.g. `">=1.2.3 <2.0.0"`) that is equivalent to a caret constraint, and suggests the shorter `^1.2.3` form.

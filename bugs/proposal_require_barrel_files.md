@@ -12,6 +12,8 @@ Flags a directory whose sibling files are imported individually from many other 
 
 `AvoidBarrelFilesRule` (`lib/src/rules/architecture/structure_rules.dart`) flags the opposite pattern — a file that IS a barrel (export-only) — as a build-time and dependency-tracking cost. `require_barrel_files` targets directories that *lack* one and would benefit from consolidating scattered individual imports. The two rules represent a deliberate tension (barrel files trade import ergonomics for build/tree-shaking cost) and are kept as separate, opt-in checks rather than merged — which convention applies depends on the directory's actual import fan-out, not a single project-wide policy.
 
+**Tier disposition — conflicting pair.** Follow the established `tiers.dart` convention for opposed rules (documented at the top of `stylisticRules`, e.g. `prefer_single_quotes_strict` vs `prefer_double_quotes_with_fix`): both rules live in the **stylistic tier**, neither is enabled by default, and a project explicitly opts into whichever direction it wants. When implementing, add `require_barrel_files` to `stylisticRules` and verify `AvoidBarrelFilesRule`'s current tier — if it sits in a default-on tier, move it to stylistic too so the pair is symmetric and one side isn't silently winning. Document the pair in `README_STYLISTIC.md` alongside the other conflicting pairs.
+
 ## Motivation
 
 When a directory's files are each imported piecemeal from dozens of call sites across the project, adding, removing, or renaming a file in that directory means touching every import site individually instead of one barrel export list. A barrel file centralizes that surface for genuinely cohesive modules (e.g. a `models/` directory consumed widely).

@@ -10,7 +10,9 @@ Flags dense trailing `//` comments stacked on consecutive lines that should be c
 
 ## Existing Coverage
 
-`RequireComplexLogicCommentsRule` (`lib/src/rules/core/documentation_rules.dart`) enforces the opposite direction — requiring a comment exist for complex logic. It does not check comment *density* or *placement*; this rule targets over-fragmented trailing comments, not their absence.
+`RequireComplexLogicCommentsRule` (`lib/src/rules/core/documentation_rules.dart`) requires that a comment *exist* for complex logic. It does not check comment density or placement; this rule targets over-fragmented trailing comments, not their absence.
+
+**These two rules are complementary, not conflicting — both can be satisfied at once** (comment your complex logic, as a block above rather than fragmented trailing). `RequireComplexLogicCommentsRule` governs *presence*; this rule governs *form*. They were briefly assessed as an opposed pair during triage; that reading is wrong and this note exists so it isn't re-raised. Neither rule reduces the comment density this project's CLAUDE.md mandates — see Motivation.
 
 ## Motivation
 
