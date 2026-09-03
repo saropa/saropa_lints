@@ -77,6 +77,7 @@ Hardens the LSP server against normal editor traffic and adds a `doctor` command
 ### Added
 
 - **New `doctor` command** scans consumer project configuration for misplaced keys, missing custom file, and other issues that produce SDK warnings. Run `dart run saropa_lints doctor [directory]`.
+- **`--trace` flag for LSP server** enables verbose logging from startup without waiting for the editor to send `$/setTrace`. Useful for standalone debugging: `dart run saropa_lints:lsp_server --trace`.
 
 <details>
 <summary>Maintenance</summary>

@@ -5,6 +5,8 @@
 /// via AnalysisContextCollection.
 ///
 /// Run: `dart run saropa_lints:lsp_server`
+/// Pass `--trace` to enable verbose logging from startup (otherwise trace
+/// output is suppressed until the client sends `$/setTrace` with `verbose`).
 library;
 
 import 'dart:convert';
@@ -17,14 +19,28 @@ import 'dart:io';
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+
+/// Whether trace-level logging is active. Set by --trace CLI flag or
+/// $/setTrace notification with value 'verbose'. When false, _logTrace
+/// calls are suppressed to reduce Output channel noise.
+bool _traceEnabled = false;
+
+// ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
 
 /// Starts the LSP server, reading JSON-RPC messages from stdin and writing
 /// responses to stdout. Lifecycle events go to stderr so VS Code can show
 /// them in the Output channel.
-void main() {
-  _log('server starting');
+///
+/// `--trace` enables verbose logging from startup without waiting for
+/// the client to send `$/setTrace verbose`.
+void main(List<String> args) {
+  // Parse --trace flag for standalone debugging (no $/setTrace needed).
+  _traceEnabled = args.contains('--trace');
+  _log('server starting${_traceEnabled ? ' (trace enabled via --trace)' : ''}');
 
   // Accumulates raw bytes until a complete Content-Length–framed message
   // arrives, then dispatches it.
@@ -142,7 +158,8 @@ void _handleMessage(Map<String, dynamic> message) {
       // Nothing to cancel in the inert server.
       _logTrace('cancelRequest: id=${params['id'] ?? '(none)'}');
     case r'$/setTrace':
-      // Update trace level — 'verbose' enables _logTrace output.
+      // LSP spec values: 'off', 'messages', 'verbose'. Only 'verbose'
+      // enables high-frequency _logTrace output; 'messages' and 'off' suppress it.
       final traceValue = params['value'] as String? ?? 'off';
       _traceEnabled = traceValue == 'verbose';
       _log('setTrace: $traceValue (trace logging ${_traceEnabled ? 'on' : 'off'})');
@@ -231,12 +248,8 @@ void _log(String message) {
   stderr.writeln('saropa_lsp: $message');
 }
 
-/// Whether $/setTrace has been set to 'verbose' by the client.
-/// When false, _logTrace is suppressed to reduce Output channel noise.
-bool _traceEnabled = false;
-
 /// Verbose log for high-frequency messages (didChange, codeAction, cancel).
-/// Suppressed unless the client sends $/setTrace with value 'verbose'.
+/// Suppressed unless --trace is passed or the client sends $/setTrace verbose.
 void _logTrace(String message) {
   if (!_traceEnabled) return;
   stderr.writeln('saropa_lsp [trace]: $message');
