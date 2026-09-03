@@ -68,7 +68,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.2.10]
 
-Cross-platform SARIF output fix so CI-generated code-scanning annotations resolve file paths correctly on Linux runners. The publish script gains a dedicated pub.dev-only mode for releasing the Dart package without touching the VS Code extension.
+Cross-platform SARIF output fix so CI-generated code-scanning annotations resolve file paths correctly on Linux runners. The publish script gains a dedicated pub.dev-only mode for releasing the Dart package without touching the VS Code extension. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
 
 ### Fixed
 
