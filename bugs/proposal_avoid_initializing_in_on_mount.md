@@ -1,43 +1,52 @@
-# PROPOSAL: Flag Heavy Initialization Logic Inside Flame's `onMount()`
+# PROPOSAL: Flag Component Initialization Inside Flame's `onMount()`
 
 **Status: Open**
 
 Created: 2026-09-02
-Type: New rule
+Type: New rule (package-specific — depends on the `flame` game-engine package)
 Related rules: none
-
-**Package dependency:** `flame`. This rule only applies to projects using the Flame game engine and should only run when `flame` is a declared dependency, targeting classes that extend/mix in Flame's `Component`.
 
 ---
 
 ## Summary
 
-Add `avoid_initializing_in_on_mount` to flag Flame `Component` subclasses that perform field initialization, resource loading, or state setup inside `onMount()` when that setup does not depend on the component's parent/game tree being attached — such initialization belongs in the constructor or `onLoad()`, both of which run earlier and more predictably, while `onMount()` is meant for logic that specifically requires the component to already be attached to its parent (e.g. reading a parent's size).
+Add `avoid-initializing-in-on-mount` (saropa id: `avoid_initializing_in_on_mount`) to flag component field
+initialization — assigning final/required state, allocating resources, constructing child components — done
+inside a Flame `Component`'s `onMount()` override instead of its constructor or `onLoad()`. `onMount()` runs
+every time a component is (re)attached to a parent (including after being removed and re-added), so
+initialization placed there re-runs on every remount instead of once per component lifetime.
 
-**Closes gap:** dart_code_linter `avoid_initializing_in_on_mount` (Flame-specific). Implementing this proposal as specified fully closes this competitive gap — see `plans/GAP_ANALYSIS.md`.
+**Closes gap:** `dart_code_metrics_presets` / `dart_code_linter` `avoid-initializing-in-on-mount` (Flame
+preset). Confirmed zero Flame-specific rules exist on either saropa or the official Flame-org preset side.
+Implementing this proposal as specified fully closes this competitive gap — see `plans/GAP_ANALYSIS.md`
+"Uncovered ecosystem packages" section.
 
 ---
 
 ## Motivation
 
-Flame components have a well-defined lifecycle (constructor → `onLoad()` → `onMount()` → `onGameResize()`/`update()`), and `onMount()` re-runs every time a component is re-attached to a different parent (e.g. when reparented), not just once. Initialization that belongs in the constructor or `onLoad()` but is placed in `onMount()` either runs redundantly on every reparent or silently assumes reparenting never happens, both of which are footguns unique to Flame's tree structure.
+Flame's component lifecycle has distinct phases: the constructor runs once, `onLoad()` runs once
+(async-capable, before first mount), and `onMount()` runs every time the component attaches to a parent —
+which can happen more than once if a component is removed and re-added to the tree (a common pattern for
+object pooling / reparenting in games). Code that assigns state or builds child objects in `onMount()`
+silently re-executes on every reattach, which is rarely the intended behavior and is a well-known Flame
+footgun. saropa has no Flame-aware rules at all; this is confirmed to be genuinely unaddressed even by
+Flame's own official lint preset.
 
 ---
 
 ## Detection / Behavior
 
-Flag assignments to instance fields inside an `onMount()` override where the assigned value does not reference `parent` (i.e. does not depend on the parent component being attached).
-
 ### Should flag (bad code)
 
 ```dart
 class Player extends PositionComponent {
-  late Sprite sprite;
+  late final Sprite sprite;
 
   @override
   void onMount() {
     super.onMount();
-    sprite = Sprite(_spriteImage); // LINT — no parent dependency; belongs in onLoad()
+    sprite = Sprite(Images.player); // LINT — avoid_initializing_in_on_mount: re-runs on every remount; belongs in onLoad()
   }
 }
 ```
@@ -45,13 +54,13 @@ class Player extends PositionComponent {
 ### Should pass (good code)
 
 ```dart
-class HealthBar extends PositionComponent {
-  late double maxWidth;
+class Player extends PositionComponent {
+  late final Sprite sprite;
 
   @override
-  void onMount() {
-    super.onMount();
-    maxWidth = parent!.size.x; // OK — genuinely depends on the attached parent
+  Future<void> onLoad() async {
+    await super.onLoad();
+    sprite = Sprite(Images.player); // OK — onLoad() runs once per component lifetime
   }
 }
 ```
@@ -60,23 +69,33 @@ class HealthBar extends PositionComponent {
 
 ## Proposed Tier
 
-Tier: Comprehensive
-Justification: Package-specific (Flame) lifecycle rule; only relevant to game-engine projects, appropriate for a deep-review tier.
+Tier: Comprehensive (package-dependent — see `flame` dependency note)
+Justification: Only fires in projects depending on `flame`; lifecycle-correctness footgun specific to a game
+engine, not a universal Dart/Flutter concern.
 
 ---
 
 ## Edge Cases
 
-1. **`onMount()` that calls `super.onMount()` and nothing else** — should pass; no flagged assignments present.
-2. **Assignment inside a conditional that also checks `parent` state (`if (parent is GameWorld) sprite = ...`)** — should pass; the branch itself depends on `parent`, satisfying the intent even if the assigned value doesn't literally reference `parent`.
-3. **Assignment to a field already fully initialized in the constructor, reassigned unconditionally in `onMount()`** — should flag; this is the exact redundant-reinitialization-on-every-reparent case the rule targets.
-4. **Async work started (not just field assignment) in `onMount()`, e.g. `unawaited(_loadAssets())`** — needs discussion; consider extending detection to flag async work with no `parent` dependency in a follow-up, since it carries the same reparent-repetition risk.
+1. **`onMount()` that only reads parent/tree state without assigning new fields** (e.g. repositioning
+   relative to a newly-attached parent) — should pass; re-deriving position from the current parent on every
+   mount is a legitimate, idiomatic use of `onMount()`.
+2. **Idempotent re-assignment guarded by a null check** (`sprite ??= Sprite(...)`) — needs discussion; still
+   arguably belongs in `onLoad()`, but the guard demonstrates awareness of the re-entry hazard — consider
+   whether to exempt guarded assignments or still flag them as misplaced.
+3. **`super.onMount()` call itself** — should pass; only user-added initialization statements are in scope,
+   not the required super call.
+4. **Project does not depend on `flame`** — must not fire; gate on package presence like saropa's other
+   ecosystem-specific rules.
 
 ---
 
 ## Alternatives Considered
 
-- **Flag any statement at all in `onMount()`, not just field assignment** — rejected as too broad; `onMount()` legitimately contains non-assignment setup (registering listeners, adding children) that isn't the redundant-reinitialization problem this rule targets.
+- **Flag ANY field assignment in `onMount()`, no exceptions** — rejected; Edge Case 1 (parent-relative
+  repositioning) is a legitimate, common `onMount()` use that would produce excessive false positives if
+  banned outright. Detection should target constructor-like allocation (`late final` first-assignment,
+  `Sprite(...)`/`Component(...)`-style constructions) rather than all field writes.
 
 ---
 
