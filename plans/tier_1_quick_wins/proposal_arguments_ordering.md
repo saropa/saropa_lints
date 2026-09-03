@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Named Arguments Passed Out of Declaration Order
 
-**Status: Open**
+**Status: Duplicate** — already exists as `prefer_arguments_ordering` (alias `arguments_ordering`) in `stylistic_rules.dart`
 
 Created: 2026-09-02
 Type: New rule

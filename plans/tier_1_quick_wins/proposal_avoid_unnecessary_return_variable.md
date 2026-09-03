@@ -1,6 +1,6 @@
 # PROPOSAL: `avoid_unnecessary_return_variable` — Flag a Variable Assigned Once Then Immediately Returned
 
-**Status: Open**
+**Status: Duplicate** — already exists as `prefer_immediate_return` in `return_rules.dart`. The proposal's own analysis confirms this.
 
 Created: 2026-09-02
 Type: New rule

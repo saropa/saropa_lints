@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Manual Number Formatting in Favor of `intl`'s `NumberFormat`
 
-**Status: Open**
+**Status: Duplicate** — already exists as `prefer_number_format` in `PreferNumberFormatRule`
 
 Created: 2026-09-02
 Type: New rule

@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Manual Date Formatting in Favor of `intl`'s `DateFormat`
 
-**Status: Open**
+**Status: Duplicate** — already exists as `prefer_date_format` in `PreferDateFormatRule`
 
 Created: 2026-09-02
 Type: New rule

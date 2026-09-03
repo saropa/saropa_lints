@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Redundant Custom Getter for a `final` Field of the Same Name
 
-**Status: Open**
+**Status: Duplicate** — already exists as `avoid_unnecessary_getter` in `unnecessary_code_rules.dart`
 
 Created: 2026-09-02
 Type: New rule

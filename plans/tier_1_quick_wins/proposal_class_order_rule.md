@@ -1,6 +1,6 @@
 # PROPOSAL: Class Member Ordering Rule
 
-**Status: Open**
+**Status: Duplicate** — already exists as `prefer_member_ordering` (aliases `enforce_member_ordering`/`member_ordering`/`prefer_sorted_members`) in `MemberOrderingFormattingRule`
 
 Created: 2026-09-02
 

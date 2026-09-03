@@ -1,6 +1,6 @@
 # PROPOSAL: Flag `list[list.length - 1]` — Use `list.last` Instead
 
-**Status: Open**
+**Status: Duplicate** — already exists as `prefer_list_last` in `PreferLastRule`
 
 Created: 2026-09-02
 Type: New rule
