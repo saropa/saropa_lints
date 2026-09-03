@@ -2,6 +2,7 @@
 
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/token.dart';
+import 'package:analyzer/dart/ast/visitor.dart';
 
 import '../../saropa_lint_rule.dart';
 import '../../fixes/control_flow/collapse_nested_if_fix.dart';
@@ -2768,5 +2769,214 @@ class YieldInNonGeneratorRule extends SaropaLintRule {
       if (body == null || body.isGenerator) return;
       reporter.atNode(node, code);
     });
+  }
+}
+
+// =============================================================================
+// avoid_exit_outside_entrypoint
+// =============================================================================
+
+/// Warns when exit() is called outside the top-level main() function.
+///
+/// Since: v15.2.10 | Rule version: v1
+///
+/// Calling exit() deep inside application logic terminates the entire
+/// process immediately, skips finally blocks, and bypasses cleanup.
+///
+/// Example of **bad** code:
+/// ```dart
+/// void validateConfig(Config config) {
+///   if (!config.isValid) {
+///     exit(1); // LINT — exit() outside main()
+///   }
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// void main(List<String> args) {
+///   final config = loadConfig(args);
+///   if (!config.isValid) {
+///     exit(1); // OK — top-level entrypoint
+///   }
+/// }
+/// ```
+class AvoidExitOutsideEntrypointRule extends SaropaLintRule {
+  AvoidExitOutsideEntrypointRule() : super(code: _code);
+
+  // Cheap pre-filter: skip files that don't even mention 'exit' before
+  // running the (more expensive) AST visitor and ancestor walk.
+  @override
+  Set<String>? get requiredPatterns => const {'exit'};
+
+  /// Correctness issue. Process-kill hidden in non-entrypoint code.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'reliability'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  static const LintCode _code = LintCode(
+    'avoid_exit_outside_entrypoint',
+    '[avoid_exit_outside_entrypoint] The exit() function is called outside the top-level main() function. Calling exit() deep inside application logic terminates the entire process immediately, skips finally blocks and stream close handlers, bypasses any async cleanup, and makes the code path untestable since the test runner is also killed. {v1}',
+    correctionMessage:
+        'Move the exit() call to main(), or throw an exception and let main() decide the exit code.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Check all method invocations for exit() calls.
+    context.addMethodInvocation((MethodInvocation node) {
+      // Only match exit() calls, not Isolate.exit() which has different
+      // semantics (terminates only the isolate, can carry a result).
+      if (node.methodName.name != 'exit') return;
+
+      // Skip Isolate.exit() — the target is a SimpleIdentifier named 'Isolate'.
+      // Allow prefix-imported calls like io.exit(1) — those are the same
+      // dart:io exit() through a library prefix, still a process-kill.
+      // Without type resolution, heuristic: skip targets that look like class
+      // names (uppercase start), allow everything else (library prefixes are
+      // conventionally lowercase).
+      if (node.target is SimpleIdentifier) {
+        final String targetName = (node.target! as SimpleIdentifier).name;
+        // Uppercase-start target = class/type receiver (e.g. Isolate.exit)
+        if (targetName.isNotEmpty &&
+            targetName[0] == targetName[0].toUpperCase() &&
+            targetName[0] != targetName[0].toLowerCase()) {
+          return;
+        }
+      }
+
+      // Walk up the AST to find the enclosing function declaration; exit()
+      // is only acceptable when it lives directly in the top-level main().
+      if (_isInsideMain(node)) return;
+
+      // Flag exit() calls outside main().
+      reporter.atNode(node);
+    });
+  }
+
+  /// Checks whether [node] is inside a top-level main() function by walking
+  /// up the AST until a matching FunctionDeclaration or the root is found.
+  static bool _isInsideMain(AstNode node) {
+    AstNode? current = node.parent;
+    while (current != null) {
+      // Top-level function declaration named 'main' (parent is the
+      // CompilationUnit, not a class) is the recognized entrypoint.
+      if (current is FunctionDeclaration &&
+          current.name.lexeme == 'main' &&
+          current.parent is CompilationUnit) {
+        return true;
+      }
+      current = current.parent;
+    }
+    return false;
+  }
+}
+
+// =============================================================================
+// avoid_labeled_statements
+// =============================================================================
+
+/// Warns when labeled statements are used for loop/switch control flow.
+///
+/// Since: v15.2.10 | Rule version: v1
+///
+/// Alias: avoid_labels
+///
+/// Labeled statements force readers to track a name across nested blocks
+/// instead of reasoning locally. Extract the labeled block into a helper
+/// method with an early return.
+///
+/// Example of **bad** code:
+/// ```dart
+/// outer:
+/// for (final row in grid) {
+///   for (final value in row) {
+///     if (value == target) break outer;
+///   }
+/// }
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// bool _contains(List<List<int>> grid, int target) {
+///   for (final row in grid) {
+///     for (final value in row) {
+///       if (value == target) return true;
+///     }
+///   }
+///   return false;
+/// }
+/// ```
+class AvoidLabeledStatementsRule extends SaropaLintRule {
+  AvoidLabeledStatementsRule() : super(code: _code);
+
+  /// Readability issue. Labels obscure control flow.
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'readability'};
+
+  // Uses RecursiveAstVisitor over the whole compilation unit, not a single
+  // node callback, so the cost is high (full AST walk per file).
+  @override
+  RuleCost get cost => RuleCost.high;
+
+  @override
+  List<String> get configAliases => const <String>['avoid_labels'];
+
+  static const LintCode _code = LintCode(
+    'avoid_labeled_statements',
+    '[avoid_labeled_statements] A labeled statement is used to control flow across nested loops or switches. Labels force readers to scan outward to find the target, breaking local reasoning about the innermost block. Extracting the labeled construct into a helper method with an early return almost always reads better and is independently testable. {v1}',
+    correctionMessage:
+        'Extract the labeled block into a helper method that uses a normal return instead of a labeled break or continue.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // LabeledStatement has no dedicated addXxx callback in the native
+    // RuleVisitorRegistry, so walk the whole compilation unit with a
+    // RecursiveAstVisitor to find every labeled statement in the file.
+    context.addCompilationUnit((CompilationUnit node) {
+      node.visitChildren(_LabeledStatementVisitor(reporter));
+    });
+  }
+}
+
+/// Walks an AST subtree reporting every [LabeledStatement] found, so labels
+/// nested anywhere in the file (not just at the top level) are flagged.
+class _LabeledStatementVisitor extends RecursiveAstVisitor<void> {
+  _LabeledStatementVisitor(this.reporter);
+
+  final SaropaDiagnosticReporter reporter;
+
+  @override
+  void visitLabeledStatement(LabeledStatement node) {
+    // Flag the label token(s) themselves, not the whole statement, so the
+    // diagnostic underlines exactly what should be removed.
+    for (final Label label in node.labels) {
+      reporter.atNode(label);
+    }
+    // Continue visiting in case a labeled statement contains another one.
+    super.visitLabeledStatement(node);
   }
 }

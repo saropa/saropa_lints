@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Positional Record Field Access (`$1`, `$2`) in Favor of Named Fields
 
-**Status: Open**
+**Status: Duplicate — already implemented as `AvoidPositionalRecordFieldAccessRule` (`avoid_positional_record_field_access`) in `lib/src/rules/data/record_pattern_rules.dart`**
 
 Created: 2026-09-02
 Type: New rule

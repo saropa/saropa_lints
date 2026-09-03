@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Focused Tests (`solo: true`) Left in Committed Code
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule
@@ -71,6 +71,13 @@ Justification: A focused test silently disables the rest of the suite in CI — 
 ---
 
 ## Implementation Notes
+
+- Rule class: `AvoidFocusedTestsRule` in `lib/src/rules/testing/test_rules.dart`
+- Tier: Essential (WARNING severity)
+- Detection: flags `test()`/`group()` calls with `solo: true` named argument
+- Scoped to test files only (`FileType.test`)
+- No fixture created — rule is simple enough for instantiation test only
+- No quick fix — removal of `solo: true` is trivial manual edit
 
 ---
 

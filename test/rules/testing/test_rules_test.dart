@@ -212,6 +212,12 @@ void main() {
       'avoid_misused_test_matchers',
       () => AvoidMisusedTestMatchersRule(),
     );
+
+    testRule(
+      'AvoidFocusedTestsRule',
+      'avoid_focused_tests',
+      () => AvoidFocusedTestsRule(),
+    );
   });
 
   group('Test Rules Rules - Fixture Verification', () {

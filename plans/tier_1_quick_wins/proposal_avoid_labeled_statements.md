@@ -1,6 +1,6 @@
 # PROPOSAL: Flag Labeled Statements as Rarely-Needed and Hard to Read
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule
@@ -91,6 +91,13 @@ Justification: Labeled statements are legal, rarely used, and not a correctness 
 ---
 
 ## Implementation Notes
+
+- Rule class: `AvoidLabeledStatementsRule` in `lib/src/rules/flow/control_flow_rules.dart`
+- Tier: Comprehensive (INFO severity)
+- Detection: uses `RecursiveAstVisitor` via `context.addCompilationUnit()` because `LabeledStatement` has no dedicated visitor callback in the analyzer's `RuleVisitorRegistry`
+- Reports each `Label` node (not the whole statement) for precise diagnostic underlining
+- Alias: `avoid_labels` (matches DCM prior art)
+- No quick fix — extracting labeled blocks into methods requires inferring signatures
 
 ---
 

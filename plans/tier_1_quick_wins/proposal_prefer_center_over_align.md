@@ -1,6 +1,6 @@
 # PROPOSAL: Flag `Align(alignment: Alignment.center, ...)` — Use `Center` Instead
 
-**Status: Open**
+**Status: Duplicate — already implemented as `PreferCenterOverAlignRule` in `lib/src/rules/widget/widget_layout_constraints_rules.dart`**
 
 Created: 2026-09-02
 Type: New rule

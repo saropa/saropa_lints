@@ -1,6 +1,6 @@
 # PROPOSAL: Flag `continue` Statements as a Readability Smell
 
-**Status: Open**
+**Status: Duplicate — already implemented as `AvoidContinueRule` (`prefer_no_continue_statement`, alias `avoid_continue_statement`) in `lib/src/rules/flow/control_flow_rules.dart`**
 
 Created: 2026-09-02
 Type: New rule

@@ -175,6 +175,16 @@ void main() {
       'prefer_null_aware_method_calls_extended',
       () => PreferNullAwareMethodCallsRule(),
     );
+    testRule(
+      'AvoidExitOutsideEntrypointRule',
+      'avoid_exit_outside_entrypoint',
+      () => AvoidExitOutsideEntrypointRule(),
+    );
+    testRule(
+      'AvoidLabeledStatementsRule',
+      'avoid_labeled_statements',
+      () => AvoidLabeledStatementsRule(),
+    );
   });
 
   group('Control Flow Rules - Fixture Verification', () {

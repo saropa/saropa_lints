@@ -3872,4 +3872,84 @@ class PreferTestReportRule extends SaropaLintRule {
   ) {}
 }
 
-/// Quick fix for [AvoidMisusedTestMatchersRule].
+/// Warns when focused tests (solo: true) are left in committed code.
+///
+/// Since: v15.2.10 | Rule version: v1
+///
+/// `solo: true` restricts the test run to only focused tests/groups,
+/// silently skipping every other test in the suite including in CI.
+///
+/// Example of **bad** code:
+/// ```dart
+/// test('computes total', () {
+///   expect(calculateTotal([1, 2, 3]), 6);
+/// }, solo: true); // LINT
+/// ```
+///
+/// Example of **good** code:
+/// ```dart
+/// test('computes total', () {
+///   expect(calculateTotal([1, 2, 3]), 6);
+/// });
+/// ```
+class AvoidFocusedTestsRule extends SaropaLintRule {
+  AvoidFocusedTestsRule() : super(code: _code);
+
+  /// CI safety issue. Focused tests silently skip the rest of the suite.
+  @override
+  LintImpact get impact => LintImpact.warning;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'testing'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  // Skip files that don't even mention 'solo' before running the visitor.
+  @override
+  Set<String>? get requiredPatterns => const {'solo'};
+
+  @override
+  Set<FileType>? get applicableFileTypes => {FileType.test};
+
+  static const LintCode _code = LintCode(
+    'avoid_focused_tests',
+    '[avoid_focused_tests] A test or group call passes solo: true, which restricts the test runner to only this focused test and silently skips every other test in the suite. Left in committed code, CI reports success while running only a fraction of the suite, giving a dangerous false-green signal that masks regressions. {v1}',
+    correctionMessage:
+        'Remove the solo: true argument so all tests in the suite run normally.',
+    severity: DiagnosticSeverity.WARNING,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Check every method invocation; only test()/group() calls are relevant.
+    context.addMethodInvocation((MethodInvocation node) {
+      final String methodName = node.methodName.name;
+
+      // test(), testWidgets(), and group() all accept the solo named parameter.
+      if (methodName != 'test' &&
+          methodName != 'testWidgets' &&
+          methodName != 'group') {
+        return;
+      }
+
+      // Look for a named `solo: true` argument among the call's arguments.
+      for (final Expression arg in node.argumentList.arguments) {
+        if (arg is NamedExpression &&
+            arg.name.label.name == 'solo' &&
+            arg.expression is BooleanLiteral &&
+            (arg.expression as BooleanLiteral).value == true) {
+          // Flag the `solo: true` argument itself for a precise error location.
+          reporter.atNode(arg);
+          return;
+        }
+      }
+    });
+  }
+}

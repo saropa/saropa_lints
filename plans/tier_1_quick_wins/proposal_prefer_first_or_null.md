@@ -1,6 +1,6 @@
 # PROPOSAL: Flag `list.isEmpty ? null : list.first` — Use `list.firstOrNull` Instead
 
-**Status: Open**
+**Status: Duplicate — already covered by `PreferFirstRule` alias `prefer_first_or_null` in `lib/src/rules/data/collection_rules.dart`**
 
 Created: 2026-09-02
 Type: New rule

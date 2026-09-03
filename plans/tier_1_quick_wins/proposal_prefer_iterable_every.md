@@ -1,6 +1,6 @@
 # PROPOSAL: Flag `.where(predicate).isEmpty` — Use `!iterable.any(predicate)` / `.every()` Instead
 
-**Status: Open**
+**Status: Duplicate — already covered by `PreferAnyOrEveryRule` (`prefer_any_or_every`) in `lib/src/rules/code_quality/code_quality_prefer_rules.dart` which flags `.where().isEmpty` → `!.any()`/`.every()`**
 
 Created: 2026-09-02
 Type: New rule

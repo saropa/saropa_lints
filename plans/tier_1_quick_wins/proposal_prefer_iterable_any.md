@@ -1,6 +1,6 @@
 # PROPOSAL: Flag `.where(predicate).isNotEmpty` — Use `.any(predicate)` Instead
 
-**Status: Open**
+**Status: Duplicate — already covered by `PreferAnyOrEveryRule` (`prefer_any_or_every`) in `lib/src/rules/code_quality/code_quality_prefer_rules.dart` which flags `.where().isNotEmpty` → `.any()`**
 
 Created: 2026-09-02
 Type: New rule

@@ -766,6 +766,8 @@ const Set<String> essentialRules = <String>{
   'yield_in_non_generator',
   // Ignore-comment infrastructure
   'require_ignore_comment_plugin_prefix', // WARNING - bare ignore silently ineffective in IDE
+  // Tier 1 quick wins — batch 1
+  'avoid_focused_tests', // WARNING - solo:true silently skips entire suite in CI
 };
 
 /// Recommended tier rules - Essential + common mistakes, performance basics.
@@ -1738,6 +1740,8 @@ const Set<String> recommendedOnlyRules = <String>{
   // Pubspec version-constraint hygiene (pubspec_constraint_rules.dart)
   'require_sdk_upper_bound', // WARNING - SDK constraint missing upper bound
   'avoid_unbounded_dependency', // WARNING - dependency pinned to `any`
+  // Tier 1 quick wins — batch 1
+  'avoid_exit_outside_entrypoint', // WARNING - exit() hidden outside main()
 };
 
 /// Professional tier rules - Recommended + architecture, testing, maintainability.
@@ -3247,6 +3251,8 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_parenthesized_button_caption',
   // SDK syntax vs constraint cross-check (sdk_syntax_match_rule.dart)
   'require_sdk_syntax_match',
+  // Tier 1 quick wins — batch 1
+  'avoid_labeled_statements', // INFO - labeled loop/switch control flow
 };
 
 /// Pedantic tier rules - pedantic, highly opinionated rules.

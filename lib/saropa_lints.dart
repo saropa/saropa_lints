@@ -3297,6 +3297,11 @@ _allRuleFactories = <SaropaLintRule Function()>[
   LocalAuthUseErrorDialogsRemovedRule.new,
   LocalAuthStickyAuthRenamedRule.new,
   LocalAuthPlatformExceptionCatchRule.new,
+
+  // Tier 1 quick wins — batch 1
+  AvoidFocusedTestsRule.new,
+  AvoidExitOutsideEntrypointRule.new,
+  AvoidLabeledStatementsRule.new,
 ];
 
 // =============================================================================

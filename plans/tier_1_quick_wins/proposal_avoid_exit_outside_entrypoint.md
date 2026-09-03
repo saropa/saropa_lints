@@ -1,6 +1,6 @@
 # PROPOSAL: Flag `exit()` Calls Outside `main()`
 
-**Status: Open**
+**Status: Implemented**
 
 Created: 2026-09-02
 Type: New rule
@@ -76,6 +76,13 @@ Justification: A process-killing call hidden away from the entrypoint is a real 
 ---
 
 ## Implementation Notes
+
+- Rule class: `AvoidExitOutsideEntrypointRule` in `lib/src/rules/flow/control_flow_rules.dart`
+- Tier: Recommended (WARNING severity)
+- Detection: flags bare `exit()` calls (no target) outside top-level `main()` function
+- Uses `requiredPatterns => {'exit'}` for cheap pre-filter
+- `Isolate.exit()` passes because it has a target (`node.target != null`)
+- AST walk checks `FunctionDeclaration.name.lexeme == 'main'` with `parent is CompilationUnit`
 
 ---
 
