@@ -700,6 +700,12 @@ def run_pubdev_only_mode(
 
         print_colored(f"      Publishing: {version}", Color.CYAN)
         print_colored(f"      Tag:        v{version}", Color.CYAN)
+        # Keep extension/package.json version in sync even though we
+        # skip extension packaging — the preflight check validates it,
+        # and a later extension-only publish (mode 6) needs the version
+        # to match the pub.dev release.
+        if extension_exists(ctx.project_dir):
+            set_extension_version(ctx.project_dir, version)
         print()
 
         # Preflight version check
