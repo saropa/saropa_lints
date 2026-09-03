@@ -1759,7 +1759,8 @@
       "status": "Status:",
       "rules": "Rules:",
       "rss": "RSS:",
-      "status": {
+      "statusLabel": "Status:",
+      "statusValue": {
         "active": "active",
         "idle": "idle",
         "running": "running",
@@ -1781,7 +1782,9 @@
       "restartAll": "Restart All"
     },
     "log": {
-      "empty": "No log entries yet."
+      "empty": "No log entries yet.",
+      "killAll": "Kill All: stopped all controllable engines.",
+      "restartAll": "Restart All: restarted all controllable engines."
     }
   },
   "detailView": {

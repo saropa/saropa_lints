@@ -1302,6 +1302,9 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Start LSP server on activation if the setting is already enabled.
   if (lspRoot && vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
     lspClient = new SaropaLspClient(context, lspRoot);
+    // Register for VS Code deactivation teardown so the spawned dart process
+    // is stopped even if dispose() is never called explicitly.
+    context.subscriptions.push(lspClient);
     void lspClient.start();
   }
 
@@ -1312,6 +1315,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const enabled = vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled');
         if (enabled && !lspClient && lspRoot) {
           lspClient = new SaropaLspClient(context, lspRoot);
+          context.subscriptions.push(lspClient);
           void lspClient.start();
         } else if (!enabled && lspClient) {
           // Await stop before dispose to avoid a double-stop race —
@@ -1330,6 +1334,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (!lspRoot) { return; }
       if (!lspClient) {
         lspClient = new SaropaLspClient(context, lspRoot);
+        context.subscriptions.push(lspClient);
       }
       await lspClient.start();
     }),
@@ -1348,11 +1353,15 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     context.extensionUri,
     {
       // Analyzer Plugin status — in-process, no PID or RSS available.
+      // Analyzer Plugin status — in-process, no PID or RSS available.
+      // status is a machine key matching debug.engine.statusValue.* in en.json —
+      // translated at display time in debugPanel-html.ts, NOT here, so
+      // statusColorClass() can still match against the English key.
       getAnalyzerPluginStatus: (): EngineStatus => ({
         key: 'analyzer',
         name: l10n('debug.engine.analyzerPlugin'),
         enabled: true, // Always on when plugins: saropa_lints: is in analysis_options
-        status: l10n('debug.engine.status.active'),
+        status: 'active',
         rssNote: l10n('debug.engine.rssNote.inProcess'),
       }),
       // Scan Daemon status — read from the scan-on-save controller.
@@ -1360,9 +1369,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         key: 'scanDaemon',
         name: l10n('debug.engine.scanDaemon'),
         enabled: !scanOnSaveController.isDaemonSuspended,
-        status: scanOnSaveController.isDaemonSuspended
-          ? l10n('debug.engine.status.suspended')
-          : l10n('debug.engine.status.idle'),
+        status: scanOnSaveController.isDaemonSuspended ? 'suspended' : 'idle',
         rssBytes: systemHealthSnapshot?.saropaRssBytes,
         pid: undefined, // TODO: expose daemon PID from ScanDaemonManager
       }),
@@ -1371,9 +1378,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         key: 'lspServer',
         name: l10n('debug.engine.lspServer'),
         enabled: lspClient?.isRunning ?? false,
-        status: lspClient?.isRunning
-          ? l10n('debug.engine.status.running')
-          : l10n('debug.engine.status.stopped'),
+        status: lspClient?.isRunning ? 'running' : 'stopped',
         ruleCount: 4, // Fake test diagnostics — fixed count for Phase 0
         rssNote: lspClient?.isRunning ? undefined : l10n('debug.engine.rssNote.notRunning'),
       }),
@@ -1395,7 +1400,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
     if (lspClient) {
       await lspClient.stop();
     }
-    debugPanelProvider.addLogEntry('Kill All: stopped all controllable engines.');
+    debugPanelProvider.addLogEntry(l10n('debug.log.killAll'));
     debugPanelProvider.refresh();
   });
   debugPanelProvider.onRestartAll(async () => {
@@ -1403,9 +1408,10 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       await lspClient.restart();
     } else if (lspRoot) {
       lspClient = new SaropaLspClient(context, lspRoot);
+      context.subscriptions.push(lspClient);
       await lspClient.start();
     }
-    debugPanelProvider.addLogEntry('Restart All: restarted all controllable engines.');
+    debugPanelProvider.addLogEntry(l10n('debug.log.restartAll'));
     debugPanelProvider.refresh();
   });
 
@@ -1415,6 +1421,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (enabled && lspRoot) {
         if (!lspClient) {
           lspClient = new SaropaLspClient(context, lspRoot);
+          context.subscriptions.push(lspClient);
         }
         await lspClient.start();
       } else if (!enabled && lspClient) {

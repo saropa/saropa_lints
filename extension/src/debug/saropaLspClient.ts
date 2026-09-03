@@ -174,8 +174,8 @@ export class SaropaLspClient implements vscode.Disposable {
   dispose(): void {
     // Best-effort synchronous teardown — `stop()` is async but
     // `dispose()` is called during extension deactivation which may not
-    // await. The LanguageClient's own dispose (registered in
-    // _context.subscriptions above) is the final backstop.
+    // await. The SaropaLspClient is registered in context.subscriptions
+    // at each creation site in extension.ts as the deactivation backstop.
     if (this._client) {
       // Fire-and-forget — deactivation doesn't await promises.
       void this.stop();

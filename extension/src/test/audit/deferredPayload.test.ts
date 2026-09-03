@@ -22,6 +22,26 @@ import {
 } from '../../audit/audit-report-panel';
 import { messageMock, resetMocks } from '../vibrancy/vscode-mock';
 
+/**
+ * Builds a diagnostics array whose JSON serialization exceeds MAX_INLINE_BYTES.
+ * Shared between tests that need to trigger the temp-file write path, so the
+ * byte-per-entry estimate and entry shape are defined in one place.
+ */
+function buildOversizedDiagnostics(): Record<string, unknown>[] {
+  // Each entry serializes to ~250 bytes; dividing by 120 with a +500 buffer
+  // ensures we comfortably exceed the threshold even if entry shape changes.
+  const entryCount = Math.ceil(MAX_INLINE_BYTES / 120) + 500;
+  return Array.from({ length: entryCount }, (_, i) => ({
+    ruleName: `really_long_rule_name_for_bulk_padding_${i}`,
+    filePath: `/project/deeply/nested/src/components/widgets/file_${i}.dart`,
+    line: i,
+    column: 1,
+    severity: 'warning',
+    impact: 'medium',
+    problemMessage: `Intentionally long problem message for entry ${i} to push the payload past the 10MB inline threshold`,
+  }));
+}
+
 describe('maybeWriteDeferredPayload', () => {
   let tmpDir: string;
 
@@ -68,18 +88,7 @@ describe('maybeWriteDeferredPayload', () => {
   });
 
   it('writes a temp file for payloads exceeding MAX_INLINE_BYTES', () => {
-    // Build a diagnostics array large enough to exceed the threshold.
-    // Each entry is ~200 bytes of JSON; need MAX_INLINE_BYTES / 200 entries.
-    const entryCount = Math.ceil(MAX_INLINE_BYTES / 200) + 100;
-    const diagnostics = Array.from({ length: entryCount }, (_, i) => ({
-      ruleName: `rule_${i}`,
-      filePath: `/project/src/file_${i}.dart`,
-      line: i,
-      column: 1,
-      severity: 'warning',
-      problemMessage: `This is a problem message for rule ${i} that adds some bulk to the entry`,
-    }));
-
+    const diagnostics = buildOversizedDiagnostics();
     const auditJson = { diagnostics };
     const result = maybeWriteDeferredPayload(auditJson, storageUri());
 
@@ -94,7 +103,7 @@ describe('maybeWriteDeferredPayload', () => {
     const content = fs.readFileSync(result!.fsPath, 'utf-8');
     const parsed = JSON.parse(content);
     assert.ok(Array.isArray(parsed), 'Temp file should contain a JSON array');
-    assert.strictEqual(parsed.length, entryCount);
+    assert.strictEqual(parsed.length, diagnostics.length);
   });
 
   it('cleans up prior temp files before writing a new one', () => {
@@ -104,17 +113,7 @@ describe('maybeWriteDeferredPayload', () => {
     // Also seed a non-diagnostics file that should NOT be touched.
     fs.writeFileSync(path.join(tmpDir, 'other.txt'), 'keep me');
 
-    // Each entry is ~170 bytes; need enough to exceed MAX_INLINE_BYTES.
-    const entryCount = Math.ceil(MAX_INLINE_BYTES / 100) + 500;
-    const diagnostics = Array.from({ length: entryCount }, (_, i) => ({
-      ruleName: `really_long_rule_name_for_bulk_padding_${i}`,
-      filePath: `/project/deeply/nested/src/components/widgets/file_${i}.dart`,
-      line: i,
-      column: 1,
-      severity: 'warning',
-      impact: 'medium',
-      problemMessage: `This is an intentionally long problem message for entry number ${i} to ensure the total serialized payload exceeds the 10MB inline threshold`,
-    }));
+    const diagnostics = buildOversizedDiagnostics();
 
     maybeWriteDeferredPayload({ diagnostics }, storageUri());
 

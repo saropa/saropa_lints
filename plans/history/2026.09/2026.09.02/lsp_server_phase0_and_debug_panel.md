@@ -70,3 +70,55 @@ plumbing), Phase 1 (full rules), Phase 2 (extension integration), Phase 3
 - `dart test` passes all affected tests (23/23): uses_type_resolution,
   rule_tier_index, write_config.
 - Manual VS Code test pending (requires Extension Development Host).
+
+## Finish Report (2026-09-02) — Phase 0 Review Fix Pass
+
+### Defect summary
+
+A code review of commit `157e3c4e` (the initial P0/P1 fix pass) found 6
+CONFIRMED regressions introduced by that commit, plus 2 pre-existing
+simplification opportunities.
+
+### Bugs fixed
+
+1. **en.json key collision** — `debug.engine.status` was defined as both a
+   string (`"Status:"`) and a nested object (`{active, idle, ...}`). JSON.parse
+   keeps only the last occurrence, so `l10n('debug.engine.status')` returned the
+   raw key string. Fixed by renaming: `statusLabel` for the display prefix,
+   `statusValue` for the nested enum.
+
+2. **statusColorClass() breaks on non-English locales** — `engine.status` was
+   populated with l10n'd display text, but `statusColorClass()` matches against
+   English literals. Fixed by keeping `status` as a machine key (not
+   translated); translation happens at display time in `debugPanel-html.ts` via
+   `l10n('debug.engine.statusValue.${engine.status}')`.
+
+3. **LSP client leaks on deactivation** — removing
+   `context.subscriptions.push(client)` (to fix unbounded growth) left no
+   deactivation disposal path. Fixed by pushing the `SaropaLspClient` wrapper
+   (not the inner LanguageClient) to `context.subscriptions` at each creation
+   site.
+
+4. **Kill All / Restart All log strings hardcoded English** — added
+   `debug.log.killAll` and `debug.log.restartAll` keys to en.json; calls now
+   route through `l10n()`.
+
+5. **Stale comment in dispose()** — claimed the LanguageClient was registered in
+   `_context.subscriptions` when that line had been deleted. Updated to describe
+   the actual backstop (SaropaLspClient in context.subscriptions).
+
+6. **Cross-language source string not a constant** — `'saropa_lsp_test'` was a
+   bare string in both `bin/lsp_server.dart` and `liveDiagnosticsModel.ts`.
+   Extracted to `LSP_TEST_DIAGNOSTIC_SOURCE` constant in the TS side with a
+   comment linking to the Dart counterpart.
+
+### Not fixed (pre-existing, out of scope)
+
+- `SPAWN_USE_SHELL` duplicated across 5 files — consolidation is a separate
+  refactor.
+- LSP lifecycle logic duplicated across 4 call sites — needs a shared helper
+  when a second controllable engine is added.
+
+### Verification
+
+- `tsc --noEmit` passes clean after all fixes.

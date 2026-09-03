@@ -337,9 +337,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          # Fetch enough history for --since to compare against the base branch.
-          fetch-depth: 0
+
+      # Fetch the base branch so --since can diff against it. A shallow
+      # fetch of just the merge-base is far cheaper than fetch-depth: 0
+      # (full history) on repos with long commit histories.
+      - run: git fetch origin ${{ github.base_ref }} --depth=1
 
       - uses: dart-lang/setup-dart@v1
       # Or for Flutter projects:

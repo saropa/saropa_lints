@@ -84,9 +84,11 @@ function buildEngineCard(engine: EngineStatus): string {
     : '';
 
   // Status pill — color class varies by lifecycle state.
-  const statusLabel = escapeHtml(l10n('debug.engine.status'));
+  // Status label is the "Status:" prefix; the value is translated from
+  // the machine key via debug.engine.statusValue.<key>.
+  const statusLabel = escapeHtml(l10n('debug.engine.statusLabel'));
   const statusClass = statusColorClass(engine.status);
-  const statusText = escapeHtml(engine.status);
+  const statusText = escapeHtml(l10n(`debug.engine.statusValue.${engine.status}`));
 
   // Rules and RSS on a secondary line.
   const metricsLine = buildMetricsLine(engine);
