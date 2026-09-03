@@ -24,6 +24,22 @@ const SCRIPT_BLOCK_LINE_SEP = new RegExp('\\u2028', 'g');
 const SCRIPT_BLOCK_PARA_SEP = new RegExp('\\u2029', 'g');
 
 /**
+ * Apply HTML-safe escaping to an already-serialized JSON string so it can
+ * be embedded inside a `<script>` element without breaking out of the
+ * script context. Use when the caller already holds a JSON string (e.g.
+ * from a prior JSON.stringify call) and only the escaping step is needed.
+ *
+ * See jsonForScriptBlock for the full rationale on each replacement.
+ */
+export function escapeJsonStringForScriptBlock(jsonString: string): string {
+    return jsonString
+        .replace(/</g, '\\u003c')
+        .replace(/&/g, '\\u0026')
+        .replace(SCRIPT_BLOCK_LINE_SEP, '\\u2028')
+        .replace(SCRIPT_BLOCK_PARA_SEP, '\\u2029');
+}
+
+/**
  * Serialize a value to JSON for embedding inside a `<script>` element.
  *
  * `JSON.stringify` alone is NOT safe inside a script block: a string containing
@@ -35,11 +51,7 @@ const SCRIPT_BLOCK_PARA_SEP = new RegExp('\\u2029', 'g');
  * not under our control — is interpolated into an inline `<script>`.
  */
 export function jsonForScriptBlock(value: unknown): string {
-    return JSON.stringify(value)
-        .replace(/</g, '\\u003c')
-        .replace(/&/g, '\\u0026')
-        .replace(SCRIPT_BLOCK_LINE_SEP, '\\u2028')
-        .replace(SCRIPT_BLOCK_PARA_SEP, '\\u2029');
+    return escapeJsonStringForScriptBlock(JSON.stringify(value));
 }
 
 /**

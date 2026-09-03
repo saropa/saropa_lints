@@ -67,14 +67,12 @@ describe('maybeWriteDeferredPayload', () => {
 
   it('returns null for a small diagnostics array (inline path)', () => {
     // A handful of diagnostics — well under 10MB.
-    const auditJson = {
-      diagnostics: [
-        { ruleName: 'test_rule', filePath: '/a.dart', line: 1 },
-        { ruleName: 'test_rule', filePath: '/b.dart', line: 2 },
-      ],
-    };
+    const small = [
+      { ruleName: 'test_rule', filePath: '/a.dart', line: 1 },
+      { ruleName: 'test_rule', filePath: '/b.dart', line: 2 },
+    ];
 
-    const result = maybeWriteDeferredPayload(auditJson, storageUri());
+    const result = maybeWriteDeferredPayload(JSON.stringify(small), storageUri());
 
     assert.strictEqual(result, null, 'Small payloads should return null (inline)');
     // No temp file should have been written.
@@ -82,15 +80,16 @@ describe('maybeWriteDeferredPayload', () => {
     assert.strictEqual(files.length, 0, 'No temp file for small payloads');
   });
 
-  it('returns null when diagnostics is not an array', () => {
-    const result = maybeWriteDeferredPayload({}, storageUri());
+  it('returns null when serializedDiagnostics is null', () => {
+    // Null input (diagnostics was not an array) — should return null immediately.
+    const result = maybeWriteDeferredPayload(null, storageUri());
     assert.strictEqual(result, null);
   });
 
   it('writes a temp file for payloads exceeding MAX_INLINE_BYTES', () => {
     const diagnostics = buildOversizedDiagnostics();
-    const auditJson = { diagnostics };
-    const result = maybeWriteDeferredPayload(auditJson, storageUri());
+    const serialized = JSON.stringify(diagnostics);
+    const result = maybeWriteDeferredPayload(serialized, storageUri());
 
     // Should return a Uri pointing to the written temp file.
     assert.ok(result !== null, 'Large payloads should return a temp file URI');
@@ -115,7 +114,7 @@ describe('maybeWriteDeferredPayload', () => {
 
     const diagnostics = buildOversizedDiagnostics();
 
-    maybeWriteDeferredPayload({ diagnostics }, storageUri());
+    maybeWriteDeferredPayload(JSON.stringify(diagnostics), storageUri());
 
     // Old diagnostics files should be gone.
     assert.ok(!fs.existsSync(path.join(tmpDir, 'diagnostics-111.json')));

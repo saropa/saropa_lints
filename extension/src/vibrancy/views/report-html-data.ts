@@ -9,7 +9,7 @@
 import { VibrancyResult, activeFileUsages } from '../types';
 import { categoryToGrade, categoryLabel } from '../scoring/status-classifier';
 import { formatSizeKB } from '../scoring/bloat-calculator';
-import { escapeHtml } from './html-utils';
+import { escapeHtml, escapeJsonStringForScriptBlock } from './html-utils';
 import { l10n } from '../../i18n/runtime';
 import { resolveRepoUrl, computeActivitySignal } from './report-html-shared';
 import { buildAiPromptBundle } from '../services/ai-prompt-bundle';
@@ -66,9 +66,9 @@ export function buildPackageDataScript(
         const val = JSON.stringify(buildPackageJson(r, overrideNames, repoShareMap));
         return `${key}:${val}`;
     });
-    /* Escape < to \u003c so embedded JSON cannot break out of the script tag */
+    // Full script-block escaping (<, &, U+2028, U+2029) via shared utility.
     const raw = `var packageData={${entries.join(',')}};`;
-    return raw.replace(/</g, '\\u003c');
+    return escapeJsonStringForScriptBlock(raw);
 }
 
 /**

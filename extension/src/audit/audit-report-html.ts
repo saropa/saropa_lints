@@ -15,7 +15,7 @@
  */
 import * as vscode from 'vscode';
 import { l10n } from '../i18n/runtime';
-import { createWebviewCspNonce, escapeHtml, jsonForScriptBlock } from '../vibrancy/views/html-utils';
+import { createWebviewCspNonce, escapeHtml, escapeJsonStringForScriptBlock, jsonForScriptBlock } from '../vibrancy/views/html-utils';
 import { buildAuditStyles } from './audit-report-styles';
 import { buildAuditScript } from './audit-report-script';
 
@@ -38,18 +38,43 @@ interface AuditDiagnostic {
 const PAGE_SIZE = 500;
 
 /**
- * Builds the complete HTML string for the audit report webview.
+ * Render-time context for buildAuditReportHtml. Groups the webview, project
+ * root, and optional payload-threading params into one object so the function
+ * stays within the project's ≤3-parameter convention.
  *
- * @param deferredUri When the diagnostics payload exceeded the inline size
- *   threshold (see MAX_INLINE_BYTES in audit-report-panel.ts), the full
- *   array is NOT embedded in the page — instead this is a webview-resolved
- *   URI the client script fetches lazily. Null for the normal inline path.
+ * CONTRACT: when `serializedDiagnostics` is non-null it MUST be
+ * `JSON.stringify(auditJson['diagnostics'])` — the same array the function
+ * reads as an object for counting/slicing. Passing a string derived from a
+ * different snapshot silently diverges the header counts from the inline
+ * embed the client renders.
+ */
+export interface AuditReportRenderContext {
+  /** The webview instance — used only for CSP source. */
+  webview: vscode.Webview;
+  /** Scanned project root — used for relative path display. */
+  root: string;
+  /**
+   * When the diagnostics payload exceeded the inline size threshold (see
+   * MAX_INLINE_BYTES in audit-report-panel.ts), the full array is NOT
+   * embedded in the page — instead this is a webview-resolved URI the
+   * client script fetches lazily. Null for the normal inline path.
+   */
+  deferredUri: string | null;
+  /**
+   * Pre-serialized JSON string of the diagnostics array, produced by the
+   * same upfront JSON.stringify that feeds the size check in
+   * maybeWriteDeferredPayload. Avoids a redundant second serialization.
+   * Null when diagnostics were not an array.
+   */
+  serializedDiagnostics: string | null;
+}
+
+/**
+ * Builds the complete HTML string for the audit report webview.
  */
 export function buildAuditReportHtml(
   auditJson: Record<string, unknown>,
-  _webview: vscode.Webview,
-  root: string,
-  deferredUri: string | null = null,
+  ctx: AuditReportRenderContext,
 ): string {
   const diagnostics = (auditJson['diagnostics'] ?? []) as AuditDiagnostic[];
   const timestamp = (auditJson['timestamp'] as string) ?? '';
@@ -79,13 +104,18 @@ export function buildAuditReportHtml(
   // connect-src is needed only for the deferred-fetch path (>10MB
   // payloads); harmless to always allow it since it's scoped to the
   // webview's own resource origin (cspSource), not arbitrary network access.
-  const csp = `default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; connect-src ${_webview.cspSource};`;
+  const csp = `default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; connect-src ${ctx.webview.cspSource};`;
 
   const initialPage = diagnostics.slice(0, PAGE_SIZE);
   // Full array embed is skipped when deferring — the client fetches it.
-  const embeddedJson = deferredUri ? null : jsonForScriptBlock(diagnostics);
+  // When a pre-serialized string is available (from the upfront serialize
+  // in openAuditReport), apply only the HTML-safe escaping step instead of
+  // re-serializing the full diagnostics array from scratch.
+  const embeddedJson = ctx.deferredUri ? null
+    : ctx.serializedDiagnostics ? escapeJsonStringForScriptBlock(ctx.serializedDiagnostics)
+    : jsonForScriptBlock(diagnostics);
   const initialJson = jsonForScriptBlock(initialPage);
-  const rootJson = jsonForScriptBlock(root);
+  const rootJson = jsonForScriptBlock(ctx.root);
 
   return /* html */ `<!DOCTYPE html>
 <html lang="en">
@@ -110,7 +140,7 @@ export function buildAuditReportHtml(
   </header>
 
   <!-- Shown only while a deferred (>10MB) payload is still loading. -->
-  ${deferredUri ? `<div class="audit-loading-banner" id="audit-loading-banner" data-fail-message="${escapeHtml(l10n('audit.report.deferredLoadFailed', { pageSize: String(PAGE_SIZE) }))}">${escapeHtml(l10n('audit.report.deferredLoading'))}</div>` : ''}
+  ${ctx.deferredUri ? `<div class="audit-loading-banner" id="audit-loading-banner" data-fail-message="${escapeHtml(l10n('audit.report.deferredLoadFailed', { pageSize: String(PAGE_SIZE) }))}">${escapeHtml(l10n('audit.report.deferredLoading'))}</div>` : ''}
 
   <!-- Controls: search + filters + actions -->
   <div class="audit-controls">
@@ -160,7 +190,7 @@ export function buildAuditReportHtml(
         </tr>
       </thead>
       <tbody id="audit-tbody">
-        ${buildDiagnosticRows(initialPage, root)}
+        ${buildDiagnosticRows(initialPage, ctx.root)}
       </tbody>
     </table>
     ${diagnostics.length === 0 ? `<div class="audit-empty"><span class="audit-empty-icon">✓</span><p>${escapeHtml(l10n('audit.report.empty'))}</p></div>` : ''}
@@ -180,7 +210,7 @@ export function buildAuditReportHtml(
   <!-- Keyboard navigation hint -->
   ${diagnostics.length > 0 ? `<p class="audit-keyboard-hint">${escapeHtml(l10n('audit.report.keyboardHint'))}</p>` : ''}
 
-  <script nonce="${nonce}">${buildAuditScript(embeddedJson, initialJson, deferredUri, rootJson)}</script>
+  <script nonce="${nonce}">${buildAuditScript(embeddedJson, initialJson, ctx.deferredUri, rootJson)}</script>
 </body>
 </html>`;
 }

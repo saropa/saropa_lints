@@ -42,7 +42,17 @@ export function openAuditReport(
 ): void {
   currentRoot = root;
   const storageDir = vscode.Uri.joinPath(context.globalStorageUri, 'audit-tmp');
-  const deferredFileUri = maybeWriteDeferredPayload(auditJson, storageDir);
+
+  // Serialize diagnostics once upfront — the same string is used for the
+  // size check in maybeWriteDeferredPayload AND for the inline embed in
+  // buildAuditReportHtml, avoiding a redundant second JSON.stringify of
+  // the full diagnostics array.
+  const diagnostics = auditJson['diagnostics'];
+  const serializedDiagnostics = Array.isArray(diagnostics)
+    ? JSON.stringify(diagnostics)
+    : null;
+
+  const deferredFileUri = maybeWriteDeferredPayload(serializedDiagnostics, storageDir);
 
   const p = ensurePanel(context, webviewOptions(storageDir));
   // Widen localResourceRoots on an already-existing panel so a *new*
@@ -52,7 +62,12 @@ export function openAuditReport(
   p.webview.options = webviewOptions(storageDir);
 
   const deferredUri = deferredFileUri ? p.webview.asWebviewUri(deferredFileUri).toString() : null;
-  p.webview.html = buildAuditReportHtml(auditJson, p.webview, root, deferredUri);
+  p.webview.html = buildAuditReportHtml(auditJson, {
+    webview: p.webview,
+    root,
+    deferredUri,
+    serializedDiagnostics,
+  });
   p.reveal(vscode.ViewColumn.One);
 }
 
@@ -152,6 +167,11 @@ function webviewOptions(storageDir: vscode.Uri): vscode.WebviewOptions {
  * returns that file's URI. Returns null for the normal (small payload)
  * path, where the array is embedded directly in the generated HTML.
  *
+ * Accepts the already-serialized JSON string (from the caller's upfront
+ * JSON.stringify) so the full diagnostics array is never serialized twice
+ * — the caller passes the same string to buildAuditReportHtml for inline
+ * embedding when this function returns null.
+ *
  * A fresh filename per call (timestamped) avoids a stale temp file being
  * served if a write fails partway through a previous run. Any leftover
  * files from PRIOR audit runs are deleted first — without this, every
@@ -161,20 +181,18 @@ function webviewOptions(storageDir: vscode.Uri): vscode.WebviewOptions {
  */
 /** @internal Exported for testing only — not part of the public API. */
 export function maybeWriteDeferredPayload(
-  auditJson: Record<string, unknown>,
+  serializedDiagnostics: string | null,
   storageDir: vscode.Uri,
 ): vscode.Uri | null {
-  const diagnostics = auditJson['diagnostics'];
-  if (!Array.isArray(diagnostics)) return null;
+  if (!serializedDiagnostics) return null;
 
-  const serialized = JSON.stringify(diagnostics);
-  if (Buffer.byteLength(serialized, 'utf-8') <= MAX_INLINE_BYTES) return null;
+  if (Buffer.byteLength(serializedDiagnostics, 'utf-8') <= MAX_INLINE_BYTES) return null;
 
   try {
     fs.mkdirSync(storageDir.fsPath, { recursive: true });
     cleanupDeferredPayloads(storageDir);
     const filePath = path.join(storageDir.fsPath, `diagnostics-${Date.now()}.json`);
-    fs.writeFileSync(filePath, serialized, 'utf-8');
+    fs.writeFileSync(filePath, serializedDiagnostics, 'utf-8');
     return vscode.Uri.file(filePath);
   } catch (e: unknown) {
     // Fall back to the inline path (large, but still correct) rather than
