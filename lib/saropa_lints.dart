@@ -3317,6 +3317,7 @@ _allRuleFactories = <SaropaLintRule Function()>[
   PreferBlankLineBeforeThrowRule.new,
   AvoidUnnecessaryParenthesesRule.new,
   AlwaysPutDocCommentsBeforeAnnotationsRule.new,
+  PreferDocCommentAfterAnnotationsRule.new,
   StartCommentsWithSpaceRule.new,
   ConstructorParametersAndFieldsShouldHaveTheSameOrderRule.new,
   TodoWithStoryLinksRule.new,

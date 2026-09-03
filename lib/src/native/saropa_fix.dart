@@ -44,6 +44,7 @@ import 'package:analysis_server_plugin/edit/dart/correction_producer.dart';
 // ignore: implementation_imports -- no public API for fix generator registration (analysis_server_plugin <=0.x)
 import 'package:analysis_server_plugin/src/correction/fix_generators.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:analyzer/source/source_range.dart';
 
 export 'package:analysis_server_plugin/edit/dart/correction_producer.dart'
     show CorrectionApplicability, CorrectionProducerContext;
@@ -103,6 +104,33 @@ abstract class SaropaFixProducer extends ResolvedCorrectionProducer {
       );
       return '';
     }
+  }
+
+  /// Returns a [SourceRange] covering the complete line(s) of [comment],
+  /// from the start of its first line to the start of the next line after
+  /// its last line. Uses [lineInfo] for line-ending-agnostic boundary
+  /// detection — handles LF, CRLF, and tab indentation transparently
+  /// without manual character scanning.
+  SourceRange lineBoundaryRange(Comment comment) {
+    final lineInfo = unitResult.lineInfo;
+    final content = unitResult.content;
+
+    // First line of the comment (0-based).
+    final firstLine = lineInfo.getLocation(comment.offset).lineNumber - 1;
+    // Last line of the comment (0-based).
+    final lastLine = lineInfo.getLocation(comment.end - 1).lineNumber - 1;
+
+    // Start of the comment's first line (includes its indentation).
+    final int deleteStart = lineInfo.getOffsetOfLine(firstLine);
+
+    // Start of the line after the comment's last line. If the comment
+    // is on the last line of the file, delete to end-of-file.
+    final int nextLine = lastLine + 1;
+    final int deleteEnd = nextLine < lineInfo.lineCount
+        ? lineInfo.getOffsetOfLine(nextLine)
+        : content.length;
+
+    return SourceRange(deleteStart, deleteEnd - deleteStart);
   }
 }
 

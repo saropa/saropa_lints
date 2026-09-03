@@ -7,6 +7,8 @@ import 'package:analyzer/dart/element/nullability_suffix.dart';
 import '../../import_utils.dart';
 import '../../saropa_lint_rule.dart';
 import '../../fixes/stylistic_additional/add_import_group_comments_fix.dart';
+import '../../fixes/stylistic_additional/move_doc_comment_after_annotations_fix.dart';
+import '../../fixes/stylistic_additional/move_doc_comment_before_annotations_fix.dart';
 import '../../fixes/stylistic_additional/prefer_double_quotes_fix.dart';
 import '../../fixes/stylistic_additional/prefer_object_over_dynamic_fix.dart';
 import '../../fixes/stylistic_additional/sort_imports_fix.dart';
@@ -2093,48 +2095,38 @@ class PreferExplicitBooleanComparisonRule extends SaropaLintRule {
 // COMMENT FORMATTING RULES
 // =============================================================================
 
-/// Scans the token range covering an [AnnotatedNode]'s metadata for a `///`
-/// doc comment that was written after one or more annotations instead of
-/// before all of them.
+/// Finds a `///` doc comment that was written after one or more annotations
+/// instead of before all of them.
 ///
-/// Background: the analyzer only populates [AnnotatedNode.documentationComment]
-/// when the `///` block immediately precedes the *first* token of the node
-/// (i.e. before any `@annotation`). If a doc comment is written between two
-/// annotations, or after the last annotation but before the declaration
-/// keyword, `documentationComment` comes back `null` even though a `///`
-/// block is clearly present somewhere in the node's leading trivia — that
-/// stray doc comment is exactly what this rule needs to locate and flag.
+/// Background (verified against `package:analyzer` 12.1.0
+/// `_AnnotatedNodeMixin` in `lib/src/dart/ast/ast.dart`):
+/// [AnnotatedNode.documentationComment] is populated with the node's `///`
+/// block regardless of whether it sits before, between, or after the
+/// node's annotations — the parser does NOT require doc-before-metadata
+/// ordering to assign it. So a null check alone cannot detect misplacement;
+/// the only reliable signal is comparing the doc comment's source offset
+/// against the *first* annotation's offset. If the doc comment starts
+/// after the first annotation starts, it cannot precede "all" annotations
+/// (whether it landed between two annotations or after the last one), so
+/// dartdoc will not associate it with the declaration.
 ///
-/// Returns the comment token that is misplaced, or `null` when the node has
-/// no annotations (nothing to reorder) or its doc comment (if any) is
-/// already correctly positioned before all annotations.
-Token? _findMisplacedDocComment(AnnotatedNode node) {
+/// Returns the doc comment's begin token when misplaced, or `null` when the
+/// node has no annotations (nothing to reorder), has no doc comment at all,
+/// or the doc comment already precedes every annotation.
+Token? findMisplacedDocComment(AnnotatedNode node) {
+  final Comment? doc = node.documentationComment;
+  if (doc == null) return null;
+
   // Nothing to reorder when there are no annotations at all.
   if (node.metadata.isEmpty) return null;
 
-  // A non-null documentationComment means the doc block already precedes
-  // every annotation — the well-formed case defined by the analyzer parser.
-  if (node.documentationComment != null) return null;
+  final Annotation firstAnnotation = node.metadata.first;
 
-  // Walk every token from the start of the node (the first annotation's `@`)
-  // through the token immediately after all metadata (the declaration
-  // keyword/name). A `///` comment attaches as leading trivia to whichever
-  // real token follows it, so a doc comment stuck between annotations, or
-  // between the last annotation and the declaration, surfaces here.
-  final Token stop = node.firstTokenAfterCommentAndMetadata;
-  Token? token = node.beginToken;
-  while (token != null) {
-    Token? comment = token.precedingComments;
-    while (comment != null) {
-      if (comment.lexeme.startsWith('///')) {
-        return comment;
-      }
-      comment = comment.next;
-    }
-    if (token == stop) break;
-    token = token.next;
-  }
-  return null;
+  // Correctly placed: doc comment starts before the first annotation, so it
+  // necessarily precedes every annotation on this declaration.
+  if (doc.offset < firstAnnotation.offset) return null;
+
+  return doc.beginToken;
 }
 
 /// Warns when a `///` doc comment is written after annotations instead of
@@ -2194,6 +2186,17 @@ class AlwaysPutDocCommentsBeforeAnnotationsRule extends SaropaLintRule {
   ];
 
   @override
+  List<String> get conflictingRules => const <String>[
+    'prefer_doc_comment_after_annotations',
+  ];
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        MoveDocCommentBeforeAnnotationsFix(context: context),
+  ];
+
+  @override
   String get exampleBad =>
       '@override\n/// Builds the widget.\nWidget build(BuildContext c) => x;';
 
@@ -2225,7 +2228,7 @@ class AlwaysPutDocCommentsBeforeAnnotationsRule extends SaropaLintRule {
     // Report at the misplaced comment token itself (not the declaration) so
     // the squiggle lands directly on the doc comment that needs to move.
     void check(AnnotatedNode node) {
-      final Token? misplaced = _findMisplacedDocComment(node);
+      final Token? misplaced = findMisplacedDocComment(node);
       if (misplaced != null) {
         reporter.atToken(misplaced);
       }
@@ -2235,6 +2238,127 @@ class AlwaysPutDocCommentsBeforeAnnotationsRule extends SaropaLintRule {
     // annotations. Registered individually (rather than one generic AST
     // visitor) to reuse SaropaContext's existing per-node-type dispatch and
     // its gating/perf wrapper.
+    context.addClassDeclaration(check);
+    context.addMixinDeclaration(check);
+    context.addExtensionDeclaration(check);
+    context.addEnumDeclaration(check);
+    context.addMethodDeclaration(check);
+    context.addConstructorDeclaration(check);
+    context.addFieldDeclaration(check);
+    context.addFunctionDeclaration(check);
+    context.addTopLevelVariableDeclaration(check);
+  }
+}
+
+/// Inverse of [AlwaysPutDocCommentsBeforeAnnotationsRule]. Checks whether a
+/// `///` doc comment was written *before* all annotations when the team's
+/// convention is to place doc comments *after* annotations (closer to the
+/// declaration keyword they describe).
+///
+/// Since: v15.3.0 | Rule version: v1
+///
+/// Tier: Stylistic (opt-in).
+///
+/// Some teams prefer `@override /// Doc` over `/// Doc @override`, arguing
+/// that the doc comment reads better adjacent to the method signature. This
+/// rule enforces that convention — the exact opposite of
+/// `always_put_doc_comments_before_annotations`.
+///
+/// Alias: `doc_comment_after_annotation`
+///
+/// ## Good Example
+/// ```dart
+/// class Widget {
+///   @override
+///   /// Builds the widget tree.
+///   Widget build(BuildContext context) => const SizedBox();
+/// }
+/// ```
+///
+/// ## Bad Example (flagged)
+/// ```dart
+/// class Widget {
+///   /// Builds the widget tree.
+///   @override
+///   Widget build(BuildContext context) => const SizedBox();
+/// }
+/// ```
+class PreferDocCommentAfterAnnotationsRule extends SaropaLintRule {
+  PreferDocCommentAfterAnnotationsRule() : super(code: _code);
+
+  @override
+  LintImpact get impact => LintImpact.info;
+
+  @override
+  RuleType? get ruleType => RuleType.codeSmell;
+
+  @override
+  Set<String> get tags => const {'convention', 'documentation'};
+
+  @override
+  RuleCost get cost => RuleCost.low;
+
+  @override
+  bool get usesTypeResolution => false;
+
+  @override
+  List<String> get configAliases => const <String>[
+    'doc_comment_after_annotation',
+  ];
+
+  @override
+  List<String> get conflictingRules => const <String>[
+    'always_put_doc_comments_before_annotations',
+  ];
+
+  @override
+  List<SaropaFixGenerator> get fixGenerators => [
+    ({required CorrectionProducerContext context}) =>
+        MoveDocCommentAfterAnnotationsFix(context: context),
+  ];
+
+  @override
+  String get exampleBad =>
+      '/// Builds the widget.\n@override\nWidget build(BuildContext c) => x;';
+
+  @override
+  String get exampleGood =>
+      '@override\n/// Builds the widget.\nWidget build(BuildContext c) => x;';
+
+  static const LintCode _code = LintCode(
+    'prefer_doc_comment_after_annotations',
+    '[prefer_doc_comment_after_annotations] A /// doc comment was found '
+        'before annotations instead of after the last annotation. Some '
+        'teams prefer doc comments adjacent to the declaration keyword '
+        'rather than above the annotations, for readability. Move the /// '
+        'block below the last annotation so the doc comment sits directly '
+        'above the declaration it describes. {v1}',
+    correctionMessage:
+        'Move the /// doc comment below the last annotation.',
+    severity: DiagnosticSeverity.INFO,
+  );
+
+  @override
+  void runWithReporter(
+    SaropaDiagnosticReporter reporter,
+    SaropaContext context,
+  ) {
+    // Flags the inverse of findMisplacedDocComment: a doc comment that
+    // PRECEDES all annotations when the convention says it should follow.
+    void check(AnnotatedNode node) {
+      final Comment? doc = node.documentationComment;
+      if (doc == null) return;
+      if (node.metadata.isEmpty) return;
+
+      final Annotation firstAnnotation = node.metadata.first;
+
+      // Doc is before the first annotation — this rule considers that wrong.
+      if (doc.offset < firstAnnotation.offset) {
+        reporter.atToken(doc.beginToken);
+      }
+    }
+
+    // Same declaration kinds as the before-annotations rule.
     context.addClassDeclaration(check);
     context.addMixinDeclaration(check);
     context.addExtensionDeclaration(check);

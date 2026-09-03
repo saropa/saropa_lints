@@ -78,6 +78,7 @@ Seventeen new lint rules across testing, equality, control flow, constructor sty
 - Fixed `check_doc_links_excluded_paths.py` not filtering out source docs that are themselves `.pubignore`-excluded — the script now skips docs under excluded prefixes instead of scanning them for link targets.
 - Fixed broken links in `README.md` and `doc/README.md` to removed guide files (`upgrading_to_v7.md`, `migration_v4_to_v5.md`).
 - Fixed wrong relative path in `using_with_flutter_lints.md` link to VGA migration guide.
+- Fixed `always_put_doc_comments_before_annotations` false-negative — the old token-walking detection assumed `documentationComment == null` for misplaced comments, but the analyzer populates it regardless of position. Replaced with offset comparison against the first annotation.
 
 ### Added
 
@@ -99,6 +100,8 @@ Seventeen new lint rules across testing, equality, control flow, constructor sty
 - New rule `start_comments_with_space` (Pedantic) — flags `//comment` missing a space after the slashes.
 - New rule `constructor_parameters_and_fields_should_have_the_same_order` (Comprehensive) — flags constructors where parameter order doesn't match field declaration order.
 - New rule `todo_with_story_links` (Professional) — flags TODO/FIXME comments lacking an issue tracker reference.
+- New quick fix for `always_put_doc_comments_before_annotations` — auto-moves misplaced `///` doc comments above all annotations with correct indentation. Supports bulk "Fix All" application across files.
+- New rule `prefer_doc_comment_after_annotations` (Stylistic) — inverse of `always_put_doc_comments_before_annotations`, for teams that prefer `///` doc comments adjacent to the declaration keyword rather than above annotations. Registered as a conflicting pair. Includes quick fix with bulk "Fix All" support.
 
 ### Changed
 

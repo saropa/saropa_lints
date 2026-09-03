@@ -1,3 +1,7 @@
+// ignore_for_file: deprecated_member_use
+// Why: parseString returns deprecated AnalysisError types; suppressing is
+// standard practice in this project's test files (no alternative API).
+
 import 'dart:io';
 
 import 'package:analyzer/dart/analysis/utilities.dart';
@@ -174,6 +178,12 @@ void main() {
     );
 
     testRule(
+      'PreferDocCommentAfterAnnotationsRule',
+      'prefer_doc_comment_after_annotations',
+      () => PreferDocCommentAfterAnnotationsRule(),
+    );
+
+    testRule(
       'StartCommentsWithSpaceRule',
       'start_comments_with_space',
       () => StartCommentsWithSpaceRule(),
@@ -264,6 +274,17 @@ void main() {
       );
     });
 
+    test('doc comment placement rules expose conflictingRules', () {
+      expect(
+        AlwaysPutDocCommentsBeforeAnnotationsRule().conflictingRules,
+        contains('prefer_doc_comment_after_annotations'),
+      );
+      expect(
+        PreferDocCommentAfterAnnotationsRule().conflictingRules,
+        contains('always_put_doc_comments_before_annotations'),
+      );
+    });
+
     group('prefer_var_over_explicit_type', () {
       test('has conflictingRules metadata', () {
         final rule = PreferVarOverExplicitTypeRule();
@@ -348,8 +369,206 @@ void f() {
     });
   });
 
-  // Stub-only behavior tests were removed from this file. Keep rule metadata,
-  // fixture verification, and targeted regression tests.
+  group('always_put_doc_comments_before_annotations', () {
+    // Counts how many AnnotatedNodes in [code] have a misplaced doc comment
+    // (doc comment appears after the first annotation).
+    int countMisplacements(String code) {
+      final result = parseString(content: code);
+      final collector = _MisplacedDocCollector();
+      result.unit.accept(collector);
+      return collector.count;
+    }
+
+    test('doc comment AFTER single annotation is flagged', () {
+      expect(
+        countMisplacements('''
+class A {
+  @override
+  /// This doc is misplaced.
+  void build() {}
+}
+'''),
+        1,
+      );
+    });
+
+    test('doc comment BETWEEN two annotations is flagged', () {
+      expect(
+        countMisplacements('''
+class A {
+  @Deprecated('old')
+  /// Misplaced doc between annotations.
+  @pragma('vm:prefer-inline')
+  void legacy() {}
+}
+'''),
+        1,
+      );
+    });
+
+    test('doc comment BEFORE all annotations is NOT flagged', () {
+      expect(
+        countMisplacements('''
+class A {
+  /// Correctly placed doc.
+  @override
+  void build() {}
+}
+'''),
+        0,
+      );
+    });
+
+    test('declaration with no annotations is NOT flagged', () {
+      expect(
+        countMisplacements('''
+/// Doc on a plain method — no annotations to reorder.
+void plainFunction() {}
+'''),
+        0,
+      );
+    });
+
+    test('annotations but no doc comment is NOT flagged', () {
+      expect(
+        countMisplacements('''
+class A {
+  @override
+  void build() {}
+}
+'''),
+        0,
+      );
+    });
+
+    test('top-level function with misplaced doc is flagged', () {
+      expect(
+        countMisplacements('''
+@Deprecated('use newFn')
+/// Misplaced top-level doc.
+void oldFn() {}
+'''),
+        1,
+      );
+    });
+
+    test('class-level doc after annotation is flagged', () {
+      expect(
+        countMisplacements('''
+@Deprecated('old')
+/// This class doc is misplaced.
+class OldWidget {}
+'''),
+        1,
+      );
+    });
+
+    test('multi-line doc comment after annotation is flagged', () {
+      expect(
+        countMisplacements('''
+class A {
+  @override
+  /// Line one of a long doc comment.
+  ///
+  /// Line three continues the description.
+  /// Line four ends the block.
+  void build() {}
+}
+'''),
+        1,
+      );
+    });
+
+    test('top-level variable with doc after annotation is flagged', () {
+      expect(
+        countMisplacements('''
+@Deprecated('old')
+/// Misplaced top-level variable doc.
+final int oldVar = 0;
+'''),
+        1,
+      );
+    });
+
+    test('field with doc after annotation is flagged', () {
+      expect(
+        countMisplacements('''
+class A {
+  @Deprecated('old')
+  /// Misplaced field doc.
+  int? oldField;
+}
+'''),
+        1,
+      );
+    });
+  });
+}
+
+/// Counts [AnnotatedNode]s where [findMisplacedDocComment] returns non-null.
+class _MisplacedDocCollector extends RecursiveAstVisitor<void> {
+  int count = 0;
+
+  /// Checks any annotated node for a misplaced doc comment.
+  void _check(AnnotatedNode node) {
+    if (findMisplacedDocComment(node) != null) {
+      count++;
+    }
+  }
+
+  @override
+  void visitClassDeclaration(ClassDeclaration node) {
+    _check(node);
+    super.visitClassDeclaration(node);
+  }
+
+  @override
+  void visitMethodDeclaration(MethodDeclaration node) {
+    _check(node);
+    super.visitMethodDeclaration(node);
+  }
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {
+    _check(node);
+    super.visitFunctionDeclaration(node);
+  }
+
+  @override
+  void visitFieldDeclaration(FieldDeclaration node) {
+    _check(node);
+    super.visitFieldDeclaration(node);
+  }
+
+  @override
+  void visitMixinDeclaration(MixinDeclaration node) {
+    _check(node);
+    super.visitMixinDeclaration(node);
+  }
+
+  @override
+  void visitExtensionDeclaration(ExtensionDeclaration node) {
+    _check(node);
+    super.visitExtensionDeclaration(node);
+  }
+
+  @override
+  void visitEnumDeclaration(EnumDeclaration node) {
+    _check(node);
+    super.visitEnumDeclaration(node);
+  }
+
+  @override
+  void visitConstructorDeclaration(ConstructorDeclaration node) {
+    _check(node);
+    super.visitConstructorDeclaration(node);
+  }
+
+  @override
+  void visitTopLevelVariableDeclaration(TopLevelVariableDeclaration node) {
+    _check(node);
+    super.visitTopLevelVariableDeclaration(node);
+  }
 }
 
 /// A short variable declaration found by [_findShortVarNames].

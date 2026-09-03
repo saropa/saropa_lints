@@ -156,6 +156,7 @@ const Set<String> stylisticRules = <String>{
   'prefer_sentence_case_comments_relaxed',
   'prefer_period_after_doc',
   'prefer_doc_comments_over_regular',
+  'prefer_doc_comment_after_annotations', // Inverse of always_put_doc_comments_before_annotations
   'prefer_no_commented_out_code', // Moved from pedantic (v4.2.0)
   // === Testing style ===
   'prefer_expect_over_assert_in_tests',
