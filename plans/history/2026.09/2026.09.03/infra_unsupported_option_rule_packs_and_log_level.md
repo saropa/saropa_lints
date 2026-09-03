@@ -115,3 +115,7 @@ New `dart run saropa_lints doctor [directory]` CLI command scans a consumer proj
 - Missing version constraint
 
 Prints a numbered issue list with fix suggestions. Registered in the unified CLI router (`bin/saropa_lints.dart`).
+
+### Doctor hardening (2026-09-03)
+
+Scoped key detection to the extracted `saropa_lints:` plugin block via `_extractSaropaPluginBlock()` — the initial implementation matched any indented key anywhere in the file, which would false-positive on top-level keys with the same name (e.g. a top-level `log_level:` in a complex config). Added 9 unit tests covering: clean config, each misplaced key type, multiple misplaced keys, keys outside the plugin block (false-positive guard), missing plugin entry, missing version, missing custom file, and tab indentation.

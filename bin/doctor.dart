@@ -32,7 +32,6 @@ void main(List<String> args) {
 
   final dir = args.where((a) => !a.startsWith('-')).firstOrNull ?? '.';
   final sep = Platform.pathSeparator;
-  final issues = <String>[];
 
   // --- Check analysis_options.yaml exists ---
   final mainFile = File('$dir${sep}analysis_options.yaml');
@@ -48,63 +47,8 @@ void main(List<String> args) {
       .replaceAll('\r\n', '\n')
       .replaceAll('\r', '\n');
 
-  // --- Check for misplaced keys in the plugin block ---
-  // Any of _customFileKeys under `plugins > saropa_lints:` triggers the
-  // SDK's `unsupported_option` warning.
-  for (final key in _customFileKeys) {
-    final keyInPluginBlock = RegExp(
-      '^[ \\t]+${RegExp.escape(key)}:\\s',
-      multiLine: true,
-    ).hasMatch(mainContent);
-    if (keyInPluginBlock) {
-      issues.add(
-        '  [$key] found under plugins > saropa_lints: in '
-        'analysis_options.yaml — causes unsupported_option warning.',
-      );
-    }
-  }
-
-  // --- Check analysis_options_custom.yaml ---
   final customFile = File('$dir${sep}analysis_options_custom.yaml');
-  final customExists = customFile.existsSync();
-
-  if (!customExists) {
-    // Only flag missing custom file if there are keys that need it, or if
-    // no custom file exists at all (the init command should create one).
-    final hasSaropaPlugin = mainContent.contains('saropa_lints:');
-    if (hasSaropaPlugin) {
-      issues.add(
-        '  [custom_file] analysis_options_custom.yaml not found — '
-        'run `dart run saropa_lints init` to create one.',
-      );
-    }
-  }
-
-  // --- Check for saropa_lints plugin entry ---
-  final hasSaropaPlugin = RegExp(
-    r'^\s+saropa_lints:\s*',
-    multiLine: true,
-  ).hasMatch(mainContent);
-  if (!hasSaropaPlugin) {
-    issues.add(
-      '  [plugin] saropa_lints not found under plugins: in '
-      'analysis_options.yaml — the plugin will not load.',
-    );
-  }
-
-  // --- Check for version key ---
-  if (hasSaropaPlugin) {
-    final hasVersion = RegExp(
-      r'^\s+version:\s+["\x27]?\d',
-      multiLine: true,
-    ).hasMatch(mainContent);
-    if (!hasVersion) {
-      issues.add(
-        '  [version] No version: constraint under saropa_lints: — '
-        'the plugin may resolve to an unexpected version.',
-      );
-    }
-  }
+  final issues = _diagnose(mainContent, customExists: customFile.existsSync());
 
   // --- Report ---
   if (issues.isEmpty) {
@@ -116,7 +60,7 @@ void main(List<String> args) {
   print('Found ${issues.length} issue(s):');
   print('');
   for (final issue in issues) {
-    print(issue);
+    print('  $issue');
   }
   print('');
 
@@ -129,6 +73,124 @@ void main(List<String> args) {
   }
 
   exitCode = 1;
+}
+
+/// Runs all diagnostic checks and returns a list of issue descriptions.
+///
+/// Extracted from main() so tests can call it without touching the filesystem
+/// or exit code. [mainContent] is the normalized analysis_options.yaml text;
+/// [customExists] indicates whether analysis_options_custom.yaml is present.
+List<String> diagnose(String mainContent, {required bool customExists}) {
+  return _diagnose(mainContent, customExists: customExists);
+}
+
+/// Internal: returns issue strings for all detected misconfigurations.
+List<String> _diagnose(String mainContent, {required bool customExists}) {
+  final issues = <String>[];
+
+  // Extract the saropa_lints plugin block so key checks are scoped to it,
+  // not to arbitrary indented keys elsewhere in the file.
+  final pluginBlock = _extractSaropaPluginBlock(mainContent);
+
+  // --- Check for saropa_lints plugin entry ---
+  if (pluginBlock == null) {
+    issues.add(
+      '[plugin] saropa_lints not found under plugins: in '
+      'analysis_options.yaml — the plugin will not load.',
+    );
+    return issues;
+  }
+
+  // --- Check for misplaced keys inside the saropa_lints plugin block ---
+  // Any of _customFileKeys under `plugins > saropa_lints:` triggers the
+  // SDK's `unsupported_option` warning.
+  for (final key in _customFileKeys) {
+    final keyInBlock = RegExp(
+      '^\\s+${RegExp.escape(key)}:\\s',
+      multiLine: true,
+    ).hasMatch(pluginBlock);
+    if (keyInBlock) {
+      issues.add(
+        '[$key] found under plugins > saropa_lints: in '
+        'analysis_options.yaml — causes unsupported_option warning.',
+      );
+    }
+  }
+
+  // --- Check analysis_options_custom.yaml ---
+  if (!customExists) {
+    issues.add(
+      '[custom_file] analysis_options_custom.yaml not found — '
+      'run `dart run saropa_lints init` to create one.',
+    );
+  }
+
+  // --- Check for version key inside the plugin block ---
+  final hasVersion = RegExp(
+    r'''^\s+version:\s+["']?\d''',
+    multiLine: true,
+  ).hasMatch(pluginBlock);
+  if (!hasVersion) {
+    issues.add(
+      '[version] No version: constraint under saropa_lints: — '
+      'the plugin may resolve to an unexpected version.',
+    );
+  }
+
+  return issues;
+}
+
+/// Extracts the `saropa_lints:` block from `analysis_options.yaml`.
+///
+/// Returns the block text (from the `saropa_lints:` line through all its
+/// indented children) or null if the plugin entry doesn't exist. Uses
+/// indentation-based detection: lines deeper than the `saropa_lints:` key
+/// are children; the block ends at the first line at or below that indent
+/// (or EOF).
+String? _extractSaropaPluginBlock(String content) {
+  final lines = content.split('\n');
+
+  for (var i = 0; i < lines.length; i++) {
+    final line = lines[i];
+    // Match `saropa_lints:` at any indent, with optional trailing comment.
+    if (!RegExp(r'^\s+saropa_lints:\s*(?:#.*)?$').hasMatch(line)) continue;
+    final baseIndent = _leadingWhitespace(line);
+
+    // Collect all child lines (deeper than baseIndent).
+    final block = StringBuffer(line);
+    for (var j = i + 1; j < lines.length; j++) {
+      final child = lines[j];
+      final trimmed = child.trim();
+      // Blank lines and comments inside the block are kept.
+      if (trimmed.isEmpty || trimmed.startsWith('#')) {
+        block
+          ..write('\n')
+          ..write(child);
+        continue;
+      }
+      // Dedent to or past the saropa_lints key means the block ended.
+      if (_leadingWhitespace(child) <= baseIndent) break;
+      block
+        ..write('\n')
+        ..write(child);
+    }
+    return block.toString();
+  }
+  return null;
+}
+
+/// Counts leading whitespace (spaces and tabs).
+///
+/// Matches the `_leadingWhitespace()` in `runtime_tier_cap.dart` and the
+/// updated `_leadingSpaces()` in `analysis_options_rule_packs.dart`.
+int _leadingWhitespace(String value) {
+  var count = 0;
+  while (count < value.length) {
+    final c = value.codeUnitAt(count);
+    if (c != 32 && c != 9) break;
+    count++;
+  }
+  return count;
 }
 
 void _printUsage() {
