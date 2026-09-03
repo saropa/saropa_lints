@@ -43,10 +43,19 @@ String sarifLevelForSeverity(String? severity) {
 /// emitting Windows backslashes here would produce an invalid SARIF file
 /// that GitHub's code-scanning importer rejects.
 String _toSarifUri(String filePath, String rootPath) {
-  // `p.relative` also normalizes `..`/`.` segments and mismatched
-  // separators between filePath and rootPath (e.g. one absolute, one not).
-  final relative = p.relative(filePath, from: rootPath);
-  return relative.replaceAll(r'\', '/');
+  // Normalize to forward slashes first — SARIF URIs always use `/`, and
+  // doing this up front lets simple prefix matching handle Windows paths
+  // on Linux CI, where `p.relative` can't parse drive letters and emits
+  // `../C:/project/...` instead of the correct relative path.
+  var normalFile = filePath.replaceAll(r'\', '/');
+  var normalRoot = rootPath.replaceAll(r'\', '/');
+  if (!normalRoot.endsWith('/')) normalRoot = '$normalRoot/';
+  // Direct prefix strip — avoids all p.relative() cross-platform pitfalls.
+  if (normalFile.startsWith(normalRoot)) {
+    return normalFile.substring(normalRoot.length);
+  }
+  // Fallback for paths that don't share a literal prefix.
+  return p.relative(normalFile, from: rootPath).replaceAll(r'\', '/');
 }
 
 /// Builds one SARIF `result` object from a single enriched diagnostic map

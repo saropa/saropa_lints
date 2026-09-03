@@ -66,6 +66,19 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.2.10] — Unreleased
+
+### Fixed
+
+- Fixed SARIF writer emitting `../C:/project/...` URIs on Linux CI — switched from `p.relative()` to prefix stripping after forward-slash normalization so Windows-style paths resolve correctly cross-platform.
+- Fixed `--fail-on error` scan test failing when error-level diagnostics exist in the fixture — test now uses `--fail-on-count 9999` to decouple exit-code assertion from project error count.
+
+### Added
+
+- New publish mode **9) Pub.dev only** — runs the full publish pipeline (audit, format, analyze, tests, version, commit, tag, pub.dev publish, GitHub release) but skips all extension packaging and Marketplace/Open VSX publishing. Use when the VSIX was already published separately or when only the Dart package needs a release.
+
+---
+
 ## [15.2.9]
 
 The system health monitor now separates memory used by Saropa Lints from the total across all Dart processes, so users can see the real footprint instead of being blamed for the entire analysis server. The scan daemon auto-suspends under heavy memory pressure to reclaim its analyzer cache, and orphaned scan daemons are now detected and cleaned up alongside Flutter daemons. A new Full Audit command scans a project against every rule regardless of its configured tier and opens the results in a filterable report panel. [log](https://github.com/saropa/saropa_lints/blob/v15.2.9/CHANGELOG.md)

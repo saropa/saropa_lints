@@ -17,7 +17,7 @@ Run:  python scripts/publish.py
                                               + `dart pub publish --dry-run`;
                                               no commit/tag/publish — for CI
                                               pre-merge validation)
-Modes: full publish / audit only / fix docs / skip audit / analyze only / extension only / dry run
+Modes: full publish / audit only / fix docs / skip audit / analyze only / extension only / dry run / pub.dev only
 1
 See scripts/README.md for the full architecture and module map.
 
@@ -147,6 +147,7 @@ from scripts.modules._publish_workflow import (
     run_extension_only_mode,
     run_fix_docs_mode,
     run_full_publish,
+    run_pubdev_only_mode,
     run_publish_existing_vsix_mode,
     validate_pubspec_changelog,
 )
@@ -165,6 +166,7 @@ def _prompt_publish_mode() -> str:
     print("  6) Extension only (package .vsix, optionally publish to Marketplace/Open VSX)")
     print("  7) Publish existing .vsix (skip packaging; newest in project root)")
     print("  8) CI fallback playbook (manual publish URLs, commands, upload files)")
+    print("  9) Pub.dev only (full publish pipeline, skip extension entirely)")
     try:
         raw = input("  Choice [1]: ").strip() or "1"
         n = int(raw)
@@ -182,6 +184,8 @@ def _prompt_publish_mode() -> str:
             return "publish_existing_vsix"
         if n == 8:
             return "ci_fallback"
+        if n == 9:
+            return "pubdev_only"
     except (ValueError, EOFError, KeyboardInterrupt):
         pass
     return "full"
@@ -194,7 +198,7 @@ def main(
     """Run publish workflow. Returns exit code (0 = success).
 
     Args:
-        mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'dry_run' | 'extension_only' | 'publish_existing_vsix' | 'ci_fallback'.
+        mode: 'full' | 'audit_only' | 'fix_docs' | 'full_skip_audit' | 'analyze_only' | 'dry_run' | 'extension_only' | 'publish_existing_vsix' | 'ci_fallback' | 'pubdev_only'.
               If None, prompts the user interactively (after displaying the logo so
               the Saropa brand always appears first — see "logo ALWAYS first" rule).
         output_level: Verbosity level (defaults to VERBOSE).
@@ -226,6 +230,7 @@ def main(
         lambda: run_extension_only_mode(mode, project_dir, pubspec_path),
         lambda: run_publish_existing_vsix_mode(mode, project_dir),
         lambda: run_fix_docs_mode(mode, project_dir),
+        lambda: run_pubdev_only_mode(mode, project_dir, pubspec_path, changelog_path, timer),
     ):
         code = handler()
         if code is not None:

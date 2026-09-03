@@ -617,6 +617,141 @@ def run_fix_docs_mode(mode: str, project_dir: Path) -> int | None:
     return ExitCode.SUCCESS.value
 
 
+def run_pubdev_only_mode(
+    mode: str,
+    project_dir: Path,
+    pubspec_path: Path,
+    changelog_path: Path,
+    timer: StepTimer,
+) -> int | None:
+    """If mode is pubdev_only, run full publish pipeline without any extension steps.
+
+    Identical to run_full_publish except:
+    - No extension packaging, install, or store publish
+    - No Marketplace / Open VSX verification
+    - Success banner omits extension URLs
+
+    Use when the VSIX was already published separately (e.g. via mode 6/7)
+    or when CI blocked pub.dev but the extension went through.
+    """
+    if mode != "pubdev_only":
+        return None
+
+    ctx = build_publish_context(project_dir, pubspec_path, changelog_path)
+
+    # Reuse the full publish banner so the user sees version/branch/rules
+    from scripts.publish import SCRIPT_VERSION
+    print_package_banner(ctx, SCRIPT_VERSION)
+
+    succeeded = False
+    version = ctx.pubspec_version
+
+    try:
+        # Dependency resolution before any analysis step
+        with timer.step("Dependencies"):
+            _run_step_with_retry(
+                "Dependency resolution (dart pub get)",
+                lambda: run_pub_get(ctx.project_dir),
+                ExitCode.PREREQUISITES_FAILED,
+            )
+
+        # Audit (never skipped in this mode)
+        code = run_audit_step(
+            ctx.project_dir, skip_audit=False, audit_only=False, timer=timer,
+        )
+        if code is not None:
+            return code
+
+        # Format, analyze, tests
+        run_pre_publish_pipeline(ctx.project_dir, ctx.branch, timer)
+
+        # Version prompt
+        print_header("VERSION")
+        default_version = (
+            increment_version(ctx.pubspec_version)
+            if has_unreleased_section(ctx.changelog_path)
+            else ctx.pubspec_version
+        )
+        changelog_version = get_latest_changelog_version(ctx.changelog_path)
+        if changelog_version and parse_version(changelog_version) > parse_version(
+            default_version
+        ):
+            default_version = changelog_version
+        version = prompt_version_until_valid(default_version)
+        with timer.step("Version sync"):
+            version = sync_version_with_changelog(
+                ctx.project_dir,
+                ctx.pubspec_path,
+                ctx.changelog_path,
+                ctx.pubspec_version,
+                version,
+            )
+            # Sync tier yamls even in pub.dev-only mode — consumers resolve
+            # against these constraints regardless of the extension state.
+            tier_changes = sync_tier_yamls(
+                ctx.project_dir / "lib" / "tiers", version,
+            )
+            for path, (previous, desired) in tier_changes.items():
+                rel = path.relative_to(ctx.project_dir)
+                print_colored(
+                    f"      tier yaml: {rel} {previous} -> {desired}",
+                    Color.CYAN,
+                )
+
+        print_colored(f"      Publishing: {version}", Color.CYAN)
+        print_colored(f"      Tag:        v{version}", Color.CYAN)
+        print()
+
+        # Preflight version check
+        with timer.step("Preflight version check"):
+            _run_step_with_retry(
+                "Preflight version check",
+                lambda: run_preflight_version_check(ctx.project_dir, version),
+                ExitCode.VALIDATION_FAILED,
+            )
+
+        # Badge sync, changelog validation, docs, dry-run
+        release_notes = run_badge_validation_docs_dryrun(
+            ctx.project_dir, version, ctx.rule_count, timer,
+        )
+
+        # Final CI gate
+        run_final_ci_gate(ctx.project_dir, timer)
+
+        # Commit, tag, publish to pub.dev, GitHub release — NO extension
+        run_commit_tag_publish_release(
+            ctx.project_dir, version, ctx.branch, release_notes, timer,
+        )
+        succeeded = True
+
+        # Verify pub.dev propagation
+        with timer.step("pub.dev verification"):
+            verify_pubdev_publication(ctx.package_name, version)
+
+        try:
+            webbrowser.open(
+                f"https://pub.dev/packages/{ctx.package_name}",
+            )
+        except Exception:
+            pass
+
+    finally:
+        timer.print_summary()
+
+    if succeeded:
+        repo_path = extract_repo_path(ctx.remote_url)
+        # No extension — pub.dev-only mode
+        print_success_banner(
+            ctx.package_name,
+            version,
+            repo_path,
+            publisher="",
+            extension_name="",
+            extension_published=False,
+        )
+    return ExitCode.SUCCESS.value
+
+
 def _prompt_extension_install_and_publish(
     vsix: Path, skip_publish_msg: str = "Extension NOT published to Marketplace.",
 ) -> bool:
