@@ -174,7 +174,7 @@ Then generate saropa_lints configuration:
 dart run saropa_lints:init --tier professional
 ```
 
-See our [VGA migration guide](migration_from_vga.md) for details.
+See our VGA migration guide on [GitHub](https://github.com/saropa/saropa_lints/blob/main/doc/guides/migration_guides/migration_from_vga.md) for details.
 
 ## CI Integration
 

@@ -74,6 +74,9 @@ bugs/
 # Internal planning docs / dev-only reference material
 plans/
 
+# Migration guides (link to plans/ proposals that aren't shipped)
+doc/guides/migration_guides/
+
 # Backup files
 *.bak
 

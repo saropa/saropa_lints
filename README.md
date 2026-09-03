@@ -1244,7 +1244,7 @@ The current major (`12.x`) is the actively maintained line — new rules, fixes,
 
 ### Can't use saropa_lints v7 in my Flutter project
 
-⚠️ **v7 was retracted.** It required **analyzer 10** (and **meta ^1.18.0**); the Flutter SDK pins **meta** to **1.17.0**, so 7.x could not run in Flutter projects. Use **saropa_lints 8.0.0**, which keeps all 7.x rule fixes and stays on **analyzer 9** for Flutter compatibility. See [CHANGELOG](CHANGELOG.md#800) and [Upgrading to v7](doc/guides/upgrading_to_v7.md) (reference only) for context.
+⚠️ **v7 was retracted.** It required **analyzer 10** (and **meta ^1.18.0**); the Flutter SDK pins **meta** to **1.17.0**, so 7.x could not run in Flutter projects. Use **saropa_lints 8.0.0**, which keeps all 7.x rule fixes and stays on **analyzer 9** for Flutter compatibility. See [CHANGELOG](CHANGELOG.md#800) for context.
 
 ### I'm new and completely lost
 

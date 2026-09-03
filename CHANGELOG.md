@@ -66,6 +66,16 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
+## [15.2.11] — Unreleased
+
+### Fixed
+
+- Fixed CI failure: `.pubignore` now excludes `doc/guides/migration_guides/` so shipped docs no longer contain dead links to `.pubignore`-excluded `plans/` proposals.
+- Fixed broken link in `README.md` to removed `doc/guides/upgrading_to_v7.md`.
+- Fixed wrong relative path in `using_with_flutter_lints.md` link to VGA migration guide.
+
+---
+
 ## [15.2.10]
 
 Cross-platform SARIF output fix so CI-generated code-scanning annotations resolve file paths correctly on Linux runners. The publish script gains a dedicated pub.dev-only mode for releasing the Dart package without touching the VS Code extension. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
