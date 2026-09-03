@@ -68,6 +68,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.2.11] — Unreleased
 
+Fixes dead links in the published package documentation and hardens the build so broken or excluded-path links are caught at commit time, not after push. The doc-link validation script now correctly skips docs that are themselves excluded from the package. [log](https://github.com/saropa/saropa_lints/blob/v15.2.11/CHANGELOG.md)
+
 ### Fixed
 
 - Fixed CI failure: `.pubignore` now excludes `doc/guides/migration_guides/` so shipped docs no longer contain dead links to `.pubignore`-excluded `plans/` proposals.
