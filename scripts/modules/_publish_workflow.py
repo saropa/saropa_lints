@@ -44,6 +44,7 @@ from scripts.modules._git_ops import (
     post_publish_commit,
     publish_to_pubdev_step,
     run_preflight_version_check,
+    tag_exists_on_remote,
 )
 from scripts.modules._pubdev_lint import (
     check_pubdev_lint_issues,
@@ -275,6 +276,103 @@ def validate_pubspec_changelog(
             f"CHANGELOG.md not found at {changelog_path}",
             ExitCode.PREREQUISITES_FAILED,
         )
+
+
+# =============================================================================
+# ORPHAN PUBLISH RECOVERY
+# =============================================================================
+
+
+def _get_last_published_tag_version(project_dir: Path) -> str | None:
+    """Return the version from the latest vX.Y.Z tag, or None."""
+    import subprocess
+    result = subprocess.run(
+        ["git", "tag", "--sort=-v:refname"],
+        capture_output=True, text=True, cwd=project_dir,
+    )
+    if result.returncode != 0:
+        return None
+    for line in result.stdout.strip().splitlines():
+        if re.match(r"^v\d+\.\d+\.\d+$", line.strip()):
+            return line.strip().lstrip("v")
+    return None
+
+
+def check_orphaned_version_bump(
+    project_dir: Path,
+    pubspec_path: Path,
+    changelog_path: Path,
+) -> None:
+    """Detect and recover from an aborted publish that left orphaned version bumps.
+
+    When the publish script pushes a "Release vX.Y.Z" commit but then
+    aborts before creating the git tag (e.g. CI failed), pubspec.yaml
+    and package.json carry the bumped version while no tag or pub.dev
+    release exists. Every subsequent publish attempt hits the
+    changelog_guard mismatch and CI fails on stale state.
+
+    This check compares the pubspec version against the latest git tag.
+    If pubspec is ahead and no tag exists for that version, the user is
+    offered a choice: reset the version files back to the last-tagged
+    version (so the next publish starts clean) or continue as-is (to
+    manually create the tag or re-attempt publishing that version).
+    """
+    pubspec_version = get_version_from_pubspec(pubspec_path)
+    last_tag_version = _get_last_published_tag_version(project_dir)
+    if last_tag_version is None:
+        # No tags at all — nothing to compare against.
+        return
+
+    # Only flag when pubspec is strictly ahead of the last tag AND no
+    # tag exists for the pubspec version (local or remote).
+    if parse_version(pubspec_version) <= parse_version(last_tag_version):
+        return
+    tag_name = f"v{pubspec_version}"
+    if tag_exists_on_remote(project_dir, tag_name):
+        return
+
+    print_warning(
+        f"Orphaned version bump detected: pubspec.yaml says {pubspec_version} "
+        f"but the last git tag is v{last_tag_version}. "
+        f"This means a previous publish of {pubspec_version} was aborted "
+        f"after the version-bump commit but before the tag was created."
+    )
+    print()
+    print_colored("  Options:", Color.WHITE)
+    print_colored(
+        f"    1) Reset versions to {last_tag_version} (recommended — "
+        f"next publish starts clean)",
+        Color.CYAN,
+    )
+    print_colored(
+        f"    2) Continue with {pubspec_version} as-is (you will publish "
+        f"this version)",
+        Color.CYAN,
+    )
+    try:
+        choice = input("  Choice [1]: ").strip() or "1"
+    except (EOFError, KeyboardInterrupt):
+        print()
+        exit_with_error("Aborted.", ExitCode.USER_CANCELLED)
+        return  # unreachable, for type checker
+
+    if choice != "2":
+        # Reset pubspec.yaml
+        set_version_in_pubspec(pubspec_path, last_tag_version)
+        print_success(
+            f"Reset pubspec.yaml to {last_tag_version}"
+        )
+        # Reset extension/package.json
+        if extension_exists(project_dir):
+            set_extension_version(project_dir, last_tag_version)
+            print_success(
+                f"Reset extension/package.json to {last_tag_version}"
+            )
+        print_info(
+            "Version files reset. The publish script will prompt for "
+            "the next version as usual."
+        )
+        print()
 
 
 # =============================================================================

@@ -66,35 +66,27 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ---
 
-## [15.2.11] — Unreleased
+## [15.2.10] — Unreleased
 
-Fixes dead links in the published package documentation and hardens the build so broken or excluded-path links are caught at commit time, not after push. The doc-link validation script now correctly skips docs that are themselves excluded from the package. [log](https://github.com/saropa/saropa_lints/blob/v15.2.11/CHANGELOG.md)
-
-### Fixed
-
-- Fixed CI failure: `.pubignore` now excludes `doc/guides/migration_guides/` so shipped docs no longer contain dead links to `.pubignore`-excluded `plans/` proposals.
-- Fixed `check_doc_links_excluded_paths.py` not filtering out source docs that are themselves `.pubignore`-excluded — the script now skips docs under excluded prefixes instead of scanning them for link targets.
-- Fixed broken links in `README.md` and `doc/README.md` to removed guide files (`upgrading_to_v7.md`, `migration_v4_to_v5.md`).
-- Fixed wrong relative path in `using_with_flutter_lints.md` link to VGA migration guide.
-
-### Changed
-
-- Added doc-link validation to `.githooks/pre-commit` — broken or excluded-path links in shipped docs are now caught before commit, not just in CI.
-
----
-
-## [15.2.10]
-
-Cross-platform SARIF output fix so CI-generated code-scanning annotations resolve file paths correctly on Linux runners. The publish script gains a dedicated pub.dev-only mode for releasing the Dart package without touching the VS Code extension. [log](https://github.com/saropa/saropa_lints/blob/v15.2.10/CHANGELOG.md)
+Cross-platform SARIF output fix, dead-link hardening for published docs, and orphan-publish recovery for the publish script.
 
 ### Fixed
 
 - Fixed SARIF writer emitting `../C:/project/...` URIs on Linux CI — switched from `p.relative()` to prefix stripping after forward-slash normalization so Windows-style paths resolve correctly cross-platform.
 - Fixed `--fail-on error` scan test failing when error-level diagnostics exist in the fixture — test now uses `--fail-on-count 9999` to decouple exit-code assertion from project error count.
+- Fixed CI failure: `.pubignore` now excludes `doc/guides/migration_guides/` so shipped docs no longer contain dead links to `.pubignore`-excluded `plans/` proposals.
+- Fixed `check_doc_links_excluded_paths.py` not filtering out source docs that are themselves `.pubignore`-excluded — the script now skips docs under excluded prefixes instead of scanning them for link targets.
+- Fixed broken links in `README.md` and `doc/README.md` to removed guide files (`upgrading_to_v7.md`, `migration_v4_to_v5.md`).
+- Fixed wrong relative path in `using_with_flutter_lints.md` link to VGA migration guide.
 
 ### Added
 
 - New publish mode **9) Pub.dev only** — runs the full publish pipeline (audit, format, analyze, tests, version, commit, tag, pub.dev publish, GitHub release) but skips all extension packaging and Marketplace/Open VSX publishing. Use when the VSIX was already published separately or when only the Dart package needs a release.
+
+### Changed
+
+- Added doc-link validation to `.githooks/pre-commit` — broken or excluded-path links in shipped docs are now caught before commit, not just in CI.
+- Publish script now detects orphaned version bumps from aborted publishes at startup and offers to reset versions, preventing cascading state corruption.
 
 ---
 

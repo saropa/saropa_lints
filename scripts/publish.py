@@ -140,6 +140,7 @@ from scripts.modules._utils import (
 from scripts.modules._timing import StepTimer
 from scripts.modules._publish_workflow import (
     build_publish_context,
+    check_orphaned_version_bump,
     print_package_banner,
     run_analyze_only,
     run_ci_fallback_mode,
@@ -217,6 +218,12 @@ def main(
     pubspec_path = project_dir / "pubspec.yaml"
     changelog_path = project_dir / "CHANGELOG.md"
     validate_pubspec_changelog(pubspec_path, changelog_path)
+
+    # Detect orphaned version bumps from aborted publishes — pubspec is
+    # ahead of the last git tag with no matching tag on remote. Offers to
+    # reset versions so the next publish starts clean instead of fighting
+    # stale state through the entire pipeline.
+    check_orphaned_version_bump(project_dir, pubspec_path, changelog_path)
 
     # Created here (not after the early-exit loop) so dry_run mode — an
     # early-exit mode — can still report step timings for the checks it runs.
