@@ -1756,7 +1756,11 @@
       "scanDaemon": "Tarama Daemon",
       "lspServer": "LSP Sunucusu",
       "pid": "PID:",
-      "status": {
+      "status": "Durum:",
+      "rules": "Kurallar:",
+      "rss": "RSS:",
+      "statusLabel": "Durum:",
+      "statusValue": {
         "active": "Aktif aktif olan aktiviteler.",
         "idle": "boşta",
         "running": "çalışıyor",
@@ -1764,8 +1768,6 @@
         "suspended": "askıya alınmış",
         "starting": "başlatma"
       },
-      "rules": "Kurallar:",
-      "rss": "RSS:",
       "rssNote": {
         "inProcess": "içerisinde, ayrı olarak ölçülmez",
         "notRunning": "çalışmıyor"
@@ -1780,7 +1782,9 @@
       "restartAll": "Tümü Yeniden Başlat"
     },
     "log": {
-      "empty": "Henüz log kaydı yok."
+      "empty": "Henüz log kaydı yok.",
+      "killAll": "Kilitle: tüm kontrol edilebilir motorları durdurdu.",
+      "restartAll": "Tümü Yeniden Başlat: tüm kontrol edilebilir motorları yeniden başlatıldı."
     }
   },
   "detailView": {

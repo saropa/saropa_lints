@@ -1756,7 +1756,11 @@
       "scanDaemon": "扫描 Daemon",
       "lspServer": "LSP 服务器",
       "pid": "PID:",
-      "status": {
+      "status": "状态:",
+      "rules": "规则：",
+      "rss": "RSS:",
+      "statusLabel": "状态:",
+      "statusValue": {
         "active": "活跃的积极活动.",
         "idle": "空闲",
         "running": "运行",
@@ -1764,8 +1768,6 @@
         "suspended": "暂停",
         "starting": "开始"
       },
-      "rules": "规则：",
-      "rss": "RSS:",
       "rssNote": {
         "inProcess": "进程内，不可单独测量",
         "notRunning": "未运行"
@@ -1780,7 +1782,9 @@
       "restartAll": "全部重启"
     },
     "log": {
-      "empty": "尚未有日志条目。"
+      "empty": "尚未有日志条目。",
+      "killAll": "全部停止：已停止所有可控制的引擎。",
+      "restartAll": "全部重启：已重启所有可控制的引擎。"
     }
   },
   "detailView": {

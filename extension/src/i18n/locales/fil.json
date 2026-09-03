@@ -1756,7 +1756,11 @@
       "scanDaemon": "I-scan Daemon",
       "lspServer": "LSP Server",
       "pid": "PID:",
-      "status": {
+      "status": "Katayuan:",
+      "rules": "Mga Tala:",
+      "rss": "RSS:",
+      "statusLabel": "Katayuan:",
+      "statusValue": {
         "active": "Aktibong aktibong aktibo na aktibo.",
         "idle": "walang ginagawa",
         "running": "nagsisimula",
@@ -1764,8 +1768,6 @@
         "suspended": "nagsususpende",
         "starting": "nagsimula"
       },
-      "rules": "Mga Tala:",
-      "rss": "RSS:",
       "rssNote": {
         "inProcess": "sa proseso, hindi nakakakita ng mas maliit na pagtatangka",
         "notRunning": "walang pagsusulong"
@@ -1780,7 +1782,9 @@
       "restartAll": "Ibalik Lahat"
     },
     "log": {
-      "empty": "Walang mga entry sa log pa."
+      "empty": "Walang mga entry sa log pa.",
+      "killAll": "Iwanan Lahat: nagsilbi na ang lahat ng mga engine na maaaring kontrolin.",
+      "restartAll": "Restart All: restarted lahat ng kontrolable nga engines."
     }
   },
   "detailView": {

@@ -1756,7 +1756,11 @@
       "scanDaemon": "סרוק Daemon",
       "lspServer": "שרת LSP",
       "pid": "PID:",
-      "status": {
+      "status": "מצב:",
+      "rules": "חוקי שיווק:",
+      "rss": "RSS:",
+      "statusLabel": "מצב:",
+      "statusValue": {
         "active": "פעילות אקטיבית פעילה.",
         "idle": "השהייה",
         "running": "מתבצעת",
@@ -1764,8 +1768,6 @@
         "suspended": "מושתקע",
         "starting": "התחלת"
       },
-      "rules": "חוקי שיווק:",
-      "rss": "RSS:",
       "rssNote": {
         "inProcess": "במעבדה, לא ניתן למדוד בנפרד",
         "notRunning": "לא רץ"
@@ -1780,7 +1782,9 @@
       "restartAll": "إعادة تشغيل כל"
     },
     "log": {
-      "empty": "אין רשומות לוג עדיין."
+      "empty": "אין רשומות לוג עדיין.",
+      "killAll": "הכבה הכל: עצמה כל מנועים שוטפים.",
+      "restartAll": "إعادة تشغيل جميع: تم إعادة تشغيل جميع المحركات القابلة للتحكم."
     }
   },
   "detailView": {

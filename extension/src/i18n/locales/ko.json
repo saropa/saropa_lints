@@ -1756,7 +1756,11 @@
       "scanDaemon": "스캔 Daemon",
       "lspServer": "LSP 서버",
       "pid": "PID:",
-      "status": {
+      "status": "상태:",
+      "rules": "규칙:",
+      "rss": "RSS:",
+      "statusLabel": "상태:",
+      "statusValue": {
         "active": "활동적인 액티브는 활성입니다.",
         "idle": "아이들",
         "running": "실행",
@@ -1764,8 +1768,6 @@
         "suspended": "중단됨",
         "starting": "시작"
       },
-      "rules": "규칙:",
-      "rss": "RSS:",
       "rssNote": {
         "inProcess": "인 프로세스, 별도로 측정 불가능",
         "notRunning": "작동하지 않음"
@@ -1780,7 +1782,9 @@
       "restartAll": "모두 재시작"
     },
     "log": {
-      "empty": "아직 로그 항목이 없습니다."
+      "empty": "아직 로그 항목이 없습니다.",
+      "killAll": "모두 중단: 모든 조작 가능한 엔진 중단.",
+      "restartAll": "모든 재시작: 모든 조작 가능한 엔진을 재시작했습니다."
     }
   },
   "detailView": {

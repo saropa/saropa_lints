@@ -1756,7 +1756,11 @@
       "scanDaemon": "Daemon scannen",
       "lspServer": "LSP-server",
       "pid": "PID:",
-      "status": {
+      "status": "Status:",
+      "rules": "Regels:",
+      "rss": "RSS:",
+      "statusLabel": "Status:",
+      "statusValue": {
         "active": "Actief actief actieve actieve",
         "idle": "inactief",
         "running": "uitvoeren",
@@ -1764,8 +1768,6 @@
         "suspended": "geschorst",
         "starting": "starten"
       },
-      "rules": "Regels:",
-      "rss": "RSS:",
       "rssNote": {
         "inProcess": "in-proces, niet afzonderlijk meetbaar",
         "notRunning": "niet actief"
@@ -1780,7 +1782,9 @@
       "restartAll": "Herstart Alles"
     },
     "log": {
-      "empty": "Geen logboekregistraties nog."
+      "empty": "Geen logboekregistraties nog.",
+      "killAll": "Stop Alles: alle bestuurbare motoren gestopt.",
+      "restartAll": "Herstart alles: alle bestuurbare motoren herstarten."
     }
   },
   "detailView": {

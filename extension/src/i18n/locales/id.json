@@ -1756,7 +1756,11 @@
       "scanDaemon": "Pindai Daemon",
       "lspServer": "Server LSP",
       "pid": "PID:",
-      "status": {
+      "status": "Status:",
+      "rules": "Aturan:",
+      "rss": "RSS:",
+      "statusLabel": "Status:",
+      "statusValue": {
         "active": "Aktivitas yang aktif.",
         "idle": "menganggur",
         "running": "berlari",
@@ -1764,8 +1768,6 @@
         "suspended": "dihanguskan",
         "starting": "memulai"
       },
-      "rules": "Aturan:",
-      "rss": "RSS:",
       "rssNote": {
         "inProcess": "dalam proses, tidak dapat diukur secara terpisah",
         "notRunning": "tidak berjalan"
@@ -1780,7 +1782,9 @@
       "restartAll": "Restart Semua"
     },
     "log": {
-      "empty": "Belum ada entri log."
+      "empty": "Belum ada entri log.",
+      "killAll": "Matikan Semua: semua mesin yang dapat dikendalikan telah dihentikan.",
+      "restartAll": "Restart Semua: mesin yang dapat dikendalikan telah di重启."
     }
   },
   "detailView": {

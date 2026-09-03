@@ -1756,7 +1756,11 @@
       "scanDaemon": "Analyser Daemon",
       "lspServer": "Serveur LSP",
       "pid": "PID:",
-      "status": {
+      "status": "Statut :",
+      "rules": "Règles :",
+      "rss": "RSS:",
+      "statusLabel": "Statut :",
+      "statusValue": {
         "active": "L'activité active est l'actif actif.",
         "idle": "inactif",
         "running": "en cours d'exécution",
@@ -1764,8 +1768,6 @@
         "suspended": "suspendu",
         "starting": "début"
       },
-      "rules": "Règles :",
-      "rss": "RSS:",
       "rssNote": {
         "inProcess": "en cours de processus, non mesurable séparément",
         "notRunning": "pas en cours d'exécution"
@@ -1780,7 +1782,9 @@
       "restartAll": "Redémarrer tout"
     },
     "log": {
-      "empty": "Aucune entrée de journal pour l'instant."
+      "empty": "Aucune entrée de journal pour l'instant.",
+      "killAll": "Tuer Tout : arrêté tous les moteurs contrôlables.",
+      "restartAll": "Redémarrer tout : tous les moteurs contrôlables redémarrés."
     }
   },
   "detailView": {
