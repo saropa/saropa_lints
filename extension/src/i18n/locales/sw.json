@@ -906,7 +906,7 @@
       "sectionAria": "Ukandamizaji wa mawazo.",
       "headingExport": "Kuondolewa (kuuza nje)",
       "viewHidesHeading": "Masuala maoni huficha maswala.",
-      "viewHidesMetaActive": "active active kazi ya kufanya.",
+      "viewHidesMetaActive": "hai",
       "viewHidesMetaNone": "Hakuna, hakuna hata mmoja.",
       "noneInExport": "Hakuna ukandamizaji wa kichanganuzi katika uhamishaji wa sasa wa `violations.json`. Fanya uchanganuzi baada ya kuhariri kupuuza au misingi ili kujaza.",
       "totalRow": "Jumla  ⁇  filters wazi na matokeo ya kufungua.",
@@ -1761,7 +1761,7 @@
       "rss": "RSS:",
       "statusLabel": "Hali:",
       "statusValue": {
-        "active": "active active kazi ya kufanya.",
+        "active": "hai",
         "idle": "tulivu",
         "running": "kukimbia",
         "stopped": "mpona",

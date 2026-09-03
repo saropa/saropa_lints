@@ -55,6 +55,12 @@ export class SaropaLspClient implements vscode.Disposable {
     // Create the output channel once — it survives stop/start cycles so
     // the user doesn't lose earlier log lines when the server restarts.
     this._outputChannel = vscode.window.createOutputChannel(OUTPUT_CHANNEL_NAME);
+
+    // Register for VS Code deactivation teardown exactly once per instance,
+    // so the spawned dart process is stopped even if dispose() is never
+    // called explicitly. Done in the constructor (not at each call site)
+    // to prevent duplicate pushes across toggle/restart/config-change paths.
+    this._context.subscriptions.push(this);
   }
 
   // ── Lifecycle ──────────────────────────────────────────────────────
