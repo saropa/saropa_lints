@@ -1302,9 +1302,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   // Start LSP server on activation if the setting is already enabled.
   if (lspRoot && vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled')) {
     lspClient = new SaropaLspClient(context, lspRoot);
-    // Register for VS Code deactivation teardown so the spawned dart process
-    // is stopped even if dispose() is never called explicitly.
-    context.subscriptions.push(lspClient);
+
     void lspClient.start();
   }
 
@@ -1315,7 +1313,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
         const enabled = vscode.workspace.getConfiguration('saropaLints.lspServer').get<boolean>('enabled');
         if (enabled && !lspClient && lspRoot) {
           lspClient = new SaropaLspClient(context, lspRoot);
-          context.subscriptions.push(lspClient);
+
           void lspClient.start();
         } else if (!enabled && lspClient) {
           // Await stop before dispose to avoid a double-stop race —
@@ -1334,7 +1332,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (!lspRoot) { return; }
       if (!lspClient) {
         lspClient = new SaropaLspClient(context, lspRoot);
-        context.subscriptions.push(lspClient);
       }
       await lspClient.start();
     }),
@@ -1408,7 +1405,6 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       await lspClient.restart();
     } else if (lspRoot) {
       lspClient = new SaropaLspClient(context, lspRoot);
-      context.subscriptions.push(lspClient);
       await lspClient.start();
     }
     debugPanelProvider.addLogEntry(l10n('debug.log.restartAll'));
@@ -1421,7 +1417,7 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
       if (enabled && lspRoot) {
         if (!lspClient) {
           lspClient = new SaropaLspClient(context, lspRoot);
-          context.subscriptions.push(lspClient);
+
         }
         await lspClient.start();
       } else if (!enabled && lspClient) {

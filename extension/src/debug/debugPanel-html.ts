@@ -178,8 +178,6 @@ function buildLogSection(logEntries: string[]): string {
 // Helpers
 // ────────────────────────────────────────────────────────────────
 
-// engineNameToKey() removed — EngineStatus.key is now the explicit key,
-// so locale-dependent substring matching is no longer needed.
 
 /**
  * Return a CSS class name that colors the status text according to
