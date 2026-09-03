@@ -106,7 +106,7 @@ void main() {
 
     testRule(
       'PreferInitializingFormalsRule',
-      'prefer_initializing_formals',
+      'prefer_initializing_formals_extended',
       () => PreferInitializingFormalsRule(),
     );
   });

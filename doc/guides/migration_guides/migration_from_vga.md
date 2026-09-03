@@ -142,7 +142,7 @@ stock Dart SDK style/correctness rules and belong to VGA's layer, not saropa's.
 | `avoid_init_to_null` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
 | `avoid_js_rounded_ints` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
 | `avoid_multiple_declarations_per_line` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
-| `avoid_null_checks_in_equality_operators` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
+| `avoid_null_checks_in_equality_operators` | **ENHANCED** | `avoid_null_checks_in_equality_operators_extended` (saropa metadata + requiredPatterns optimization) |
 | `avoid_positional_boolean_parameters` | **ENHANCED** | `avoid_positional_boolean_parameters_with_fix` (adds quick fix) |
 | `avoid_print` | **ENHANCED** | `avoid_print_in_release` / `avoid_print_in_production` (context-aware, release only) |
 | `avoid_private_typedef_functions` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
@@ -256,7 +256,7 @@ stock Dart SDK style/correctness rules and belong to VGA's layer, not saropa's.
 | `prefer_generic_function_type_aliases` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
 | `prefer_if_elements_to_conditional_expressions` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
 | `prefer_if_null_operators` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
-| `prefer_initializing_formals` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
+| `prefer_initializing_formals` | **ENHANCED** | `prefer_initializing_formals_extended` (inverse-rule pairing + saropa metadata) |
 | `prefer_inlined_adds` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
 | `prefer_int_literals` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |
 | `prefer_interpolation_to_compose_strings` | N/A (stock analyzer rule) | Keep VGA/flutter_lints for this — saropa does not reimplement stock style rules |

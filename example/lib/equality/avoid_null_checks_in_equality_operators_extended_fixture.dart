@@ -100,7 +100,7 @@
 // ignore_for_file: abstract_super_member_reference
 // ignore_for_file: equal_keys_in_map, unused_catch_stack
 // ignore_for_file: non_constant_default_value, not_a_type
-// Test fixture for: avoid_null_checks_in_equality_operators
+// Test fixture for: avoid_null_checks_in_equality_operators_extended
 // Source: lib\src\rules\data\equality_rules.dart
 
 import 'package:saropa_lints_example/flutter_mocks.dart';
@@ -113,7 +113,7 @@ class _BadPoint {
   final int y;
 
   @override
-  // expect_lint: avoid_null_checks_in_equality_operators
+  // expect_lint: avoid_null_checks_in_equality_operators_extended
   bool operator ==(Object other) {
     if (other == null) return false; // dead: other can never be null here
     return other is _BadPoint && other.x == x && other.y == y;
@@ -129,7 +129,7 @@ class _BadPointReversed {
   final int x;
 
   @override
-  // expect_lint: avoid_null_checks_in_equality_operators
+  // expect_lint: avoid_null_checks_in_equality_operators_extended
   bool operator ==(Object other) {
     if (null == other) return false; // dead: reversed operand order
     if (identical(other, null)) return false; // dead: identical() form

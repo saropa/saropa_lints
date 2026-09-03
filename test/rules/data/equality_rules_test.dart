@@ -74,11 +74,11 @@ void main() {
       final rule = AvoidNullChecksInEqualityOperatorsRule();
       expect(
         rule.code.lowerCaseName,
-        'avoid_null_checks_in_equality_operators',
+        'avoid_null_checks_in_equality_operators_extended',
       );
       expect(
         rule.code.problemMessage,
-        contains('[avoid_null_checks_in_equality_operators]'),
+        contains('[avoid_null_checks_in_equality_operators_extended]'),
       );
       expect(rule.code.problemMessage.length, greaterThan(50));
       expect(rule.code.correctionMessage, isNotNull);

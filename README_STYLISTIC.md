@@ -204,7 +204,7 @@ Preferences for blank lines, member ordering, and constructor patterns.
 ### Example: Initializing Formals
 
 ```dart
-// prefer_initializing_formals
+// prefer_initializing_formals_extended
 class User {
   final String name;
   User(this.name);

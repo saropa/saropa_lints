@@ -1327,7 +1327,7 @@ Every rule below has no quick fix. For each: add a fix producer under `lib/src/f
 - [ ] prefer_constructor_body_assignment
 - [ ] prefer_factory_for_validation
 - [ ] prefer_grouped_by_purpose
-- [ ] prefer_initializing_formals
+- [ ] prefer_initializing_formals_extended
 - [ ] prefer_no_blank_line_before_return
 - [ ] prefer_no_blank_line_inside_blocks
 - [ ] prefer_required_before_optional

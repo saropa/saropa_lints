@@ -7583,7 +7583,7 @@
       "prefer_import_group_comments",
       "prefer_import_over_part",
       "prefer_inferred_type_arguments",
-      "prefer_initializing_formals",
+      "prefer_initializing_formals_extended",
       "prefer_inline_callbacks",
       "prefer_inline_function_types",
       "prefer_instance_members_first",

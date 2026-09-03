@@ -728,8 +728,8 @@ class AvoidNullChecksInEqualityOperatorsRule extends SaropaLintRule {
   Set<String>? get requiredPatterns => const {'null'};
 
   static const LintCode _code = LintCode(
-    'avoid_null_checks_in_equality_operators',
-    '[avoid_null_checks_in_equality_operators] The operator== override contains a null check on its parameter (e.g. other == null, identical(other, null)), but under sound null safety the parameter is declared as non-nullable Object, so this comparison can never be true and the branch is unreachable dead code. This is typically leftover from a pre-null-safety codebase or copied from Java/C# equals() boilerplate where the parameter really could be null, and it can mask a real equality bug by making an early-return branch look like it handles a case it never actually reaches. {v1}',
+    'avoid_null_checks_in_equality_operators_extended',
+    '[avoid_null_checks_in_equality_operators_extended] The operator== override contains a null check on its parameter (e.g. other == null, identical(other, null)), but under sound null safety the parameter is declared as non-nullable Object, so this comparison can never be true and the branch is unreachable dead code. This is typically leftover from a pre-null-safety codebase or copied from Java/C# equals() boilerplate where the parameter really could be null, and it can mask a real equality bug by making an early-return branch look like it handles a case it never actually reaches. {v1}',
     correctionMessage:
         'Remove the redundant null check on the operator== parameter; it is unreachable under sound null safety.',
     severity: DiagnosticSeverity.INFO,

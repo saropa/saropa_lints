@@ -1,6 +1,6 @@
 // ignore_for_file: unused_element
 
-/// Fixture for `prefer_initializing_formals` (opposite of
+/// Fixture for `prefer_initializing_formals_extended` (opposite of
 /// prefer_constructor_body_assignment — flags manual field assignment that
 /// could instead use `this.field` shorthand).
 
@@ -8,7 +8,7 @@ class _BadUser {
   final String name;
   final int age;
 
-  // expect_lint: prefer_initializing_formals
+  // expect_lint: prefer_initializing_formals_extended
   _BadUser(String name, int age) : this.name = name, this.age = age;
 }
 
@@ -16,7 +16,7 @@ class _BadUserBody {
   final String name;
 
   _BadUserBody(String name) {
-    // expect_lint: prefer_initializing_formals
+    // expect_lint: prefer_initializing_formals_extended
     this.name = name;
   }
 }

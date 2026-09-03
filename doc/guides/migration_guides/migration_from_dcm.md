@@ -443,7 +443,7 @@ Coverage: 487 rules — 425 HAVE (87%), 16 PARTIAL, 46 TODO (9%)
 | `prefer-for-in` | HAVE | `prefer_for_in` |
 | `prefer-getter-over-method` | HAVE | `prefer_getter_over_method` |
 | `prefer-immediate-return` | HAVE | `prefer_immediate_return` |
-| `prefer-initializing-formals` | TODO | TODO — see [proposal](../../../plans/tier_1_quick_wins/proposal_prefer_initializing_formals.md) |
+| `prefer-initializing-formals` | HAVE | `prefer_initializing_formals_extended` |
 | `prefer-iterable-of` | HAVE | `prefer_iterable_of` |
 | `prefer-last` | HAVE | `prefer_list_last` |
 | `prefer-match-file-name` | HAVE | `prefer_match_file_name` |

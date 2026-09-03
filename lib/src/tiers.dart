@@ -1748,7 +1748,7 @@ const Set<String> recommendedOnlyRules = <String>{
   'avoid_exit_outside_entrypoint', // WARNING - exit() hidden outside main()
 
   // Tier 1 quick wins — batch 2
-  'avoid_null_checks_in_equality_operators', // INFO - dead null check in operator ==
+  'avoid_null_checks_in_equality_operators_extended', // INFO - dead null check in operator ==
   'avoid_unnecessary_else_after_control_flow', // INFO - redundant else after return/throw/break/continue
   'avoid_skipped_tests', // WARNING - skip:true left in test suite
   'avoid_public_members_in_states', // INFO - public API leak from State class
@@ -3271,7 +3271,7 @@ const Set<String> comprehensiveOnlyRules = <String>{
   'avoid_labeled_statements', // INFO - labeled loop/switch control flow
 
   // Tier 1 quick wins — batch 2
-  'prefer_initializing_formals', // INFO - constructor body assignment instead of this.param
+  'prefer_initializing_formals_extended', // INFO - constructor body assignment instead of this.param
   'no_optional_operators_in_tests', // INFO - ?. and ?? hide test failures
 
   // Tier 1 quick wins — batch 3

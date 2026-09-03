@@ -1382,8 +1382,8 @@ class PreferInitializingFormalsRule extends SaropaLintRule {
   String get exampleGood => 'User(this.name);';
 
   static const LintCode _code = LintCode(
-    'prefer_initializing_formals',
-    '[prefer_initializing_formals] Constructor parameter is manually '
+    'prefer_initializing_formals_extended',
+    '[prefer_initializing_formals_extended] Constructor parameter is manually '
         'assigned to a matching field with no transformation, which is '
         'exactly what Dart initializing formals (this.field) exist to '
         'replace. The manual assignment adds boilerplate without adding any '

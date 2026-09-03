@@ -193,7 +193,7 @@ Six new lints in Dart 3.13 for primary constructor adoption:
 Three deprecated lints:
 1. `avoid_private_typedef_functions`
 2. `one_member_abstracts`
-3. `avoid_null_checks_in_equality_operators`
+3. `avoid_null_checks_in_equality_operators` (saropa equivalent: `avoid_null_checks_in_equality_operators_extended`)
 
 - [ ] Check if any saropa rules duplicate these
 - [ ] Check if any saropa rules reference deprecated lints in docs/messages
