@@ -1756,16 +1756,18 @@
       "scanDaemon": "Tafuta Daemon",
       "lspServer": "Server ya LSP",
       "pid": "PID:",
-      "status": {
+      "status": "Hali:",
+      "rules": "Moto ya Kifundisho:",
+      "rss": "RSS:",
+      "statusLabel": "Hali:",
+      "statusValue": {
         "active": "active active kazi ya kufanya.",
-        "idle": "haina shughuli",
+        "idle": "tulivu",
         "running": "kukimbia",
         "stopped": "mpona",
         "suspended": "mehusikisa",
         "starting": "kuanza"
       },
-      "rules": "Moto ya Kifundisho:",
-      "rss": "RSS:",
       "rssNote": {
         "inProcess": "kati ya programu, sio kati kwa muda mmoja",
         "notRunning": "sio inapata"
@@ -1780,7 +1782,9 @@
       "restartAll": "Tumia Kila Mwaka"
     },
     "log": {
-      "empty": "Hakuna mstari ya log yet."
+      "empty": "Hakuna mstari ya log yet.",
+      "killAll": "Kifua Kote: imekifua kote moto ya engine ya kuchapisha.",
+      "restartAll": "Restart All: controllable engines ya zilizopatikana."
     }
   },
   "detailView": {

@@ -113,21 +113,61 @@ dart_code_metrics_annotations
 | F. Run tests (`rule_pack_*` test suite) | — | Small | B-E |
 | G. Update README index | 1 MD file | Trivial | A |
 
-Step A is done (2026-09-02).
+All steps complete (2026-09-02). Step E (l10n keys) was unnecessary —
+labels come from the Dart-side generator (`_uiLabelForPackId`), not from
+`en.json`. Migration packs are internal domain groupings, not user-facing
+i18n strings.
 
-## Open questions
+## Open questions (resolved 2026-09-02)
 
-1. **VGA** is a preset-only package (stock analyzer rules, not custom_lint).
-   Its migration pack would list the ~15 saropa rules that are enhanced
-   equivalents of VGA stock rules. Worth doing, but the `matchPubNames`
-   detection is different — VGA users include it via `analysis_options.yaml`
-   `include:`, not a pubspec dependency. May need special detection or
-   manual opt-in only.
+1. **VGA** — false premise. VGA is a normal `dev_dependencies` entry
+   (`very_good_analysis: ^10.0.0`), not preset-only. `matchPubNames`
+   detection works identically to every other migration pack. Shipped as
+   `migrate_very_good_analysis` with 13 rule codes.
 
-2. **DCM** is a commercial product (dcm.dev) with 487 rules. A migration
-   pack with 421 rule codes is large. Consider whether the pack should be
-   split into sub-packs (DCM-common, DCM-flutter, DCM-bloc, DCM-riverpod)
-   matching DCM's own categories, or kept as one large pack.
+2. **DCM** — kept as one large pack (`migrate_dcm`, 421 codes). Splitting
+   into sub-packs deferred; the single pack surfaces correctly in the
+   Migrations domain and users can disable individual rules via
+   `disabledRules`. Splitting is a UX refinement, not a blocker.
+
+## Finish Report (2026-09-02)
+
+24 migration packs added to the saropa_lints VS Code extension, covering
+all alternative lint packages with meaningful HAVE coverage (≥40% or ≥3
+rules). Each pack maps an alternative package's rules to their saropa
+equivalents, detected via pubspec `matchPubNames`.
+
+### Files changed
+
+- `lib/src/config/rule_pack_migration_codes.dart` — new file; const maps
+  for 24 migration packs (rule codes + pubspec markers)
+- `lib/src/config/rule_packs.dart` — spread migration maps into the
+  canonical `kRulePackRuleCodes` and `kRulePackPubspecMarkers`
+- `tool/generate_rule_pack_registry.dart` — `kPackUiLabels` entries for
+  DCM and VGA; `migrate_` prefix handler in `_uiLabelForPackId()`
+- `extension/src/rulePacks/packDomains.ts` — `MIGRATION_DOMAIN` constant,
+  domain order entry, `isMigrationPackId()` prefix matcher, domain resolver
+- `extension/src/rulePacks/rulePackDefinitions.ts` — regenerated with all
+  24 `migrate_*` entries
+- `doc/guides/migration_guides/README.md` — "One-click migration packs"
+  section
+- `CHANGELOG.md` — entry under `### Added`
+
+### Testing
+
+All rule pack tests pass (24/24): membership, pubspec markers, config,
+and registry audit. No new test files required — migration packs are
+data-only configuration exercised by existing parametric tests.
+
+### Design decisions
+
+- Separate file (`rule_pack_migration_codes.dart`) instead of inlining in
+  `rule_packs.dart` — keeps the ~622-line file from ballooning to ~2000
+- Prefix-based domain assignment (`isMigrationPackId`) instead of 24
+  manual entries in `PACK_DOMAIN_BY_ID` — matches existing `isSdkPackId`
+  pattern
+- Labels from generator, not i18n catalog — migration pack labels are
+  programmatic ("Migrate from X"), not editorial copy needing translation
 
 ---
 
