@@ -172,6 +172,8 @@ Set<String> extractPackCodes(String content, String packId) {
 
 /// Computes per-pack added/removed codes between old generated content
 /// and new entries. Returns human-readable diff lines (empty = no change).
+/// Catches [StateError] from [extractPackCodes] for packs that don't
+/// exist in oldContent yet (new packs) — treats them as all-additions.
 List<String> diffPackEntries(
   String oldContent,
   List<({String id, Set<String> codes, String comment})> entries,
@@ -182,7 +184,7 @@ List<String> diffPackEntries(
     try {
       oldCodes = extractPackCodes(oldContent, e.id);
     } on StateError {
-      // New pack — all codes are additions.
+      // New pack not in old file — every code is an addition.
       oldCodes = {};
     }
     final added = e.codes.difference(oldCodes);
