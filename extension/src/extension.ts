@@ -62,6 +62,7 @@ import { showRelatedRuleTelemetryPanel } from './views/relatedRuleTelemetryView'
 import { openProjectVibrancyReport, refreshCodeHealthDashboardIfOpen } from './views/projectVibrancyReportView';
 import { registerAuditCommand } from './audit/audit-command';
 import { registerL10nDiagnostics } from './i18n/l10nDiagnostics';
+import { registerL10nDeadKeys } from './i18n/l10nDeadKeys';
 // Shared path-segment constants/helpers — keeps 'reports'/'.saropa_lints' in one place.
 import { saropaLintsDataPath } from './reportsPaths';
 import { registerProjectMapCommand } from './views/projectMapView';
@@ -710,6 +711,8 @@ export function activate(context: vscode.ExtensionContext): SaropaLintsApi {
   registerAuditCommand(context);
   // Live l10n key validation — squiggles on missing keys / param mismatches.
   registerL10nDiagnostics(context);
+  // Dead-key detection — hints on en.json keys never referenced in source.
+  registerL10nDeadKeys(context);
   registerProjectMapCommand(context);
   registerSaropaDashboardsCommand(context);
   registerHealthCodeLens(context);

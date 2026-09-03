@@ -2,8 +2,11 @@
  * VS Code diagnostic provider for l10n key validation.
  *
  * On save of any TypeScript file under extension/src/, scans for
- * l10n() calls and reports missing keys or mismatched interpolation
- * params as diagnostics (yellow squiggles in the editor).
+ * l10n() calls and reports missing keys, mismatched interpolation
+ * params, and extra (unused) params as diagnostics.
+ *
+ * Suppress a single call with `// l10n-ignore-next-line` on the line above.
+ * Dead-key detection (unreferenced catalog entries) lives in l10nDeadKeys.ts.
  */
 import * as vscode from 'vscode';
 import * as fs from 'node:fs';
@@ -25,6 +28,9 @@ let _watcher: vscode.FileSystemWatcher | undefined;
 
 // Captures the quoted key argument from each l10n() call.
 const L10N_RE = /l10n\(\s*(['"])([a-zA-Z0-9_.]+)\1/g;
+
+// Inline suppress directive — place on the line before the l10n() call.
+const IGNORE_DIRECTIVE = 'l10n-ignore-next-line';
 
 // Extracts {placeholder} tokens from en.json values.
 const PLACEHOLDER_RE = /\{([a-zA-Z0-9_]+)\}/g;
@@ -73,6 +79,9 @@ function getCatalog(): Map<string, string> | undefined {
 function validateDocument(doc: vscode.TextDocument): void {
   if (doc.languageId !== 'typescript' && doc.languageId !== 'typescriptreact') return;
   if (!doc.uri.fsPath.includes(`extension${path.sep}src${path.sep}`)) return;
+  // Skip the parser test file — its string literals contain dummy localization
+  // calls with fake keys that the regex scanner can't distinguish from real ones.
+  if (doc.uri.fsPath.endsWith(`${path.sep}l10nParsers.test.ts`)) return;
 
   const catalog = getCatalog();
   if (!catalog) return;
@@ -93,6 +102,19 @@ function validateDocument(doc: vscode.TextDocument): void {
 
     if (key.endsWith('.')) continue;
 
+    // Check the preceding line for a suppress directive inside a comment.
+    const matchLine = doc.positionAt(match.index).line;
+    if (matchLine > 0) {
+      const prevLine = doc.lineAt(matchLine - 1).text;
+      // Pick whichever comment marker appears first on the line.
+      const lineIdx = prevLine.indexOf('//');
+      const blockIdx = prevLine.indexOf('/*');
+      const commentStart = lineIdx >= 0 && blockIdx >= 0
+        ? Math.min(lineIdx, blockIdx)
+        : lineIdx >= 0 ? lineIdx : blockIdx;
+      if (commentStart >= 0 && prevLine.indexOf(IGNORE_DIRECTIVE, commentStart) >= 0) continue;
+    }
+
     if (!catalog.has(key)) {
       diagnostics.push(new vscode.Diagnostic(
         range,
@@ -109,14 +131,13 @@ function validateDocument(doc: vscode.TextDocument): void {
     while ((pm = PLACEHOLDER_RE.exec(catalogValue)) !== null) {
       expectedParams.add(pm[1]);
     }
-    if (expectedParams.size === 0) continue;
-
     // Use original text for param extraction — comment blanking only
     // affects the L10N_RE scan, not the structural parse.
     const afterKey = match.index + match[0].length;
     const paramsBlock = extractParamsBlock(text, afterKey);
 
-    if (!paramsBlock) {
+    if (expectedParams.size > 0 && !paramsBlock) {
+      // Template has placeholders but no params object was passed.
       diagnostics.push(new vscode.Diagnostic(
         range,
         `l10n key "${key}" expects params {${[...expectedParams].join(', ')}} but none passed`,
@@ -125,6 +146,8 @@ function validateDocument(doc: vscode.TextDocument): void {
       continue;
     }
 
+    if (!paramsBlock) continue;
+
     const supplied = extractTopLevelKeys(paramsBlock);
     const missingParams = [...expectedParams].filter(p => !supplied.has(p));
     if (missingParams.length > 0) {
@@ -132,6 +155,16 @@ function validateDocument(doc: vscode.TextDocument): void {
         range,
         `l10n key "${key}" missing params: {${missingParams.join(', ')}}`,
         vscode.DiagnosticSeverity.Warning,
+      ));
+    }
+    // Warn about params passed to l10n() that the template doesn't use —
+    // they inflate the call without effect and may indicate a stale key.
+    const extraParams = [...supplied].filter(p => !expectedParams.has(p));
+    if (extraParams.length > 0) {
+      diagnostics.push(new vscode.Diagnostic(
+        range,
+        `l10n key "${key}" has extra params not in template: {${extraParams.join(', ')}}`,
+        vscode.DiagnosticSeverity.Hint,
       ));
     }
   }
