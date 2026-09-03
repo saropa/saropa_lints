@@ -154,6 +154,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "{visible} van {total} rijen zichtbaar",
         "{wk}w ago": "{wk} w geleden",
         "▾": "▾",
+        # Curated passthrough: "Status:" is spelled identically in Dutch; no translation needed.
+        "Status:": "Status:",
     },
     "fr": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -545,6 +547,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "{visible} von {total} Zeilen sichtbar",
         "{wk}w ago": "vor {wk} Wo.",
         "▾": "▾",
+        # Curated passthrough: "Status:" is spelled identically in German; no translation needed.
+        "Status:": "Status:",
     },
     "es": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -677,6 +681,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{count} flagged": "{count} segnalati",
         "{count} folder(s)": "{count} cartelle",
         "{count} function": "{count} funzione",
+        # Curated passthrough: "Debug" is the standard Italian tech term; no translation needed.
+        "Debug": "Debug",
     },
     "pt": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -742,6 +748,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "{visible} de {total} linhas visíveis",
         "{wk}w ago": "há {wk} sem",
         "▾": "▾",
+        # Curated passthrough: "Status:" is spelled identically in Portuguese; no translation needed.
+        "Status:": "Status:",
     },
     "ru": {
         # Manual: brand "Saropa Lints" stays untranslated; {error} placeholder preserved.
@@ -1395,6 +1403,14 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "{visible} sa {total} na row ang nakikita",
         "{wk}w ago": "{wk}l nakalipas",
         "▾": "▾",
+        # Manual: technical terms used as UI labels; Filipino tech UI retains English for these.
+        "Debug Panel": "Panel ng Debug",
+        # Curated passthrough: "LSP Server" is a protocol acronym; untranslated worldwide.
+        "LSP Server": "LSP Server",
+        # Curated passthrough: "Log" is the established Filipino tech loanword for log/journal output.
+        "Log": "Log",
+        # Manual: brand-prefixed command title; "I-audit ang Folder" is the Filipino imperative form.
+        "Saropa: Audit Folder...": "Saropa: I-audit ang Folder...",
     },
     "he": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -1518,6 +1534,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "{visible} dari {total} baris terlihat",
         "{wk}w ago": "{wk}m yang lalu",
         "▾": "▾",
+        # Curated passthrough: "Status:" is spelled identically in Indonesian; no translation needed.
+        "Status:": "Status:",
     },
     "pl": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.
@@ -1577,6 +1595,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "widocznych {visible} z {total} wierszy",
         "{wk}w ago": "{wk} tyg. temu",
         "▾": "▾",
+        # Curated passthrough: "Status:" is spelled identically in Polish; no translation needed.
+        "Status:": "Status:",
     },
     "sw": {
         # Manual: cached MT output for these five degenerated (repetition-loop garbage, one
@@ -1660,6 +1680,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "{visible} of {total} rows visible": "safu mlalo {visible} kati ya {total} zinaonekana",
         "{wk}w ago": "wiki {wk} zilizopita",
         "▾": "▾",
+        # Manual: "idle" as a status label; single-word form matches sibling labels (kukimbia, mpona, kuanza).
+        "idle": "tulivu",
     },
     "th": {
         # Curated passthrough: format-only string (bullet/colon + placeholders) has no translatable words.

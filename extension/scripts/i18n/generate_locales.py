@@ -71,6 +71,62 @@ class LocaleStats:
     missing: int
 
 
+def _check_dictionary_locale_integrity() -> list[str]:
+    """Detect dictionary entries placed under the wrong locale section.
+
+    Parses dictionaries.py via AST to extract which locale key each entry
+    belongs to structurally (by source position), then compares against the
+    runtime TRANSLATIONS dict. A mismatch means an edit tool placed an entry
+    in the wrong locale's block — a silent misroute that makes the passthrough
+    invisible to compute_stats.
+    """
+    import ast
+    import pathlib
+
+    src_path = pathlib.Path(__file__).parent / "dictionaries.py"
+    tree = ast.parse(src_path.read_text(encoding="utf-8"))
+
+    # Find the TRANSLATIONS = { ... } assignment.
+    trans_node = None
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id == "TRANSLATIONS":
+                    trans_node = node.value
+                    break
+
+    if trans_node is None or not isinstance(trans_node, ast.Dict):
+        return []
+
+    # Walk the AST dict: top-level keys are locale codes, values are dicts of entries.
+    misroutes: list[str] = []
+    for locale_key_node, locale_val_node in zip(trans_node.keys, trans_node.values):
+        if not isinstance(locale_key_node, ast.Constant) or not isinstance(locale_val_node, ast.Dict):
+            continue
+        ast_locale = locale_key_node.value
+        runtime_entries = TRANSLATIONS.get(ast_locale, {})
+        for entry_key_node in locale_val_node.keys:
+            if not isinstance(entry_key_node, ast.Constant):
+                continue
+            entry_key = entry_key_node.value
+            if entry_key not in runtime_entries:
+                # AST says this key is under locale X, but runtime dict disagrees.
+                misroutes.append(
+                    f"  {ast_locale}: {entry_key!r} (line {entry_key_node.lineno}) "
+                    f"— present in AST but missing from runtime TRANSLATIONS[{ast_locale!r}]"
+                )
+
+    if misroutes:
+        print(
+            c("yellow", f"  ⚠ {len(misroutes)} dictionary entry(ies) appear misrouted "
+                        "(source position does not match runtime key):"),
+        )
+        for line in misroutes:
+            print(c("yellow", line))
+        print()
+    return misroutes
+
+
 def _check_dictionary_drift(english_strings: set[str]) -> list[str]:
     """Warn when a curated dictionary key does not match any English source string.
 
@@ -826,6 +882,18 @@ def main() -> int:
     collect_unique_strings(package_en, unique_en)
     collect_unique_strings(runtime_en, unique_en)
     sorted_unique = sorted(unique_en)
+
+    # Structural check: detect dictionary entries placed under the wrong locale
+    # section (e.g., an edit tool matching an ambiguous anchor and inserting into
+    # the neighboring locale's block).
+    misroutes = _check_dictionary_locale_integrity()
+    if misroutes:
+        print(
+            c("red", "  Dictionary integrity gate FAILED: fix the misrouted entries "
+                     "in dictionaries.py before continuing."),
+            file=sys.stderr,
+        )
+        return 1
 
     # Early warning: curated dictionary keys that no longer match any English
     # source string — the translation silently stops being used and MT takes over.
