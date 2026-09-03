@@ -91,13 +91,14 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Fixed Full Audit showing a confusing second "output could not be read" error after canceling an audit — the forced process-tree kill on cancel could still fire a late completion event with truncated output.
 - Fixed Full Audit cancellation silently failing to stop the underlying `dart` process on macOS/Linux — the audit CLI kept running in the background after the "Audit canceled" toast, because killing the shell process alone (with `shell: true`) doesn't reach its `dart` child on POSIX.
 - Fixed Full Audit accumulating a temp file per run for large (>10MB) result sets with no cleanup, and silently swallowing a temp-file write failure instead of warning the user.
-- Fixed accuracy report showing 93% of rules as silent — the Problems-tab issue cap (500) was silently dropping diagnostics before they reached the accuracy matcher. The cap is now disabled for batch CLI analysis.
+- Fixed accuracy report and audit CLI showing most rules as silent — the Problems-tab issue cap (500) was silently dropping diagnostics before they reached the listener. Added `disableIssueCap` parameter to `ScanRunner` so batch CLI tools opt out of the IDE cap at construction, rather than each caller needing to know about `ProgressTracker`.
 - Fixed LSP server failing to spawn on Windows — `dart.bat` requires `shell: true` for PATHEXT resolution, matching the convention used by every other dart spawn in the extension.
 - Fixed fake LSP test diagnostics inflating the real score — changed the diagnostic source to `saropa_lsp_test` and added a source filter in `liveDiagnosticsModel` so status bar, Issues tree, and dashboard ignore them.
 - Fixed stop/dispose race when toggling the LSP server setting — `dispose()` was called before `stop()` completed, causing a double-stop. Now awaits stop before dispose.
 - Wired Kill All / Restart All buttons in the Debug Panel — previously they were rendered but nothing subscribed to the click events.
 - Replaced hardcoded English engine names and status words in the Debug Panel with `l10n()` calls — added explicit `key` field to `EngineStatus` so toggle messages don't depend on locale-sensitive substring matching.
 - Removed hand-typed rule counts (203, 2140) from the Debug Panel engine status — these drifted as rules were added. The LSP server retains its fixed count of 4 (the actual test diagnostic count).
+- Fixed 4 migration packs that had drifted from their source guides: `migrate_dcm` was missing 9 documented rules and carried one typo'd rule name that never matched anything; `migrate_dart_code_metrics_presets` was missing 1 rule; `migrate_dart_code_linter` and `migrate_awesome_lints` each carried rules not backed by any guide row. Enabling these packs previously gave less (or, for the typo, slightly wrong) coverage than the migration guide promised.
 
 <details>
 <summary>Maintenance</summary>
@@ -125,6 +126,8 @@ The system health monitor now separates memory used by Saropa Lints from the tot
 - Documented the circular-fallback risk when `globalStorageUri` temp-file write fails for large audit payloads — the fallback inlines a payload that was too large for inlining, which may stall the webview for 50MB+ results.
 - Documented GitHub code-scanning CI recipe in `doc/guides/cli.md` — example workflow using `--since` and `--format sarif` with `upload-sarif@v3` for inline PR annotations.
 - Confirmed SARIF `properties` bag carrying `tier`/`category`/`baselineStatus` is compatible with GitHub code-scanning and VS Code SARIF Viewer per SARIF 2.1.0 §3.8 — added spec-reference comment.
+- Eliminated redundant JSON.stringify of the full diagnostics array in the audit report render path — the array is now serialized once in `openAuditReport` and the same string feeds both the size check and the inline embed.
+- Added `test/config/rule_packs_migration_guide_sync_test.dart` — re-derives each migration pack's expected rule set from its guide's HAVE/ENHANCED table and fails if the pack file drifts from the guide (caught the 4 packs fixed above).
 
 </details>
 

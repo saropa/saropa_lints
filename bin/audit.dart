@@ -119,6 +119,8 @@ Future<void> main(List<String> args) async {
     messageSink: progressSink,
     // Always full lane — audit must exercise every rule.
     lane: RuleLane.full,
+    // Disable the IDE 500-issue cap — audit needs every diagnostic.
+    disableIssueCap: true,
     excludeGlobs: parsed.excludeGlobs,
     includeGlobs: parsed.includeGlobs,
   );

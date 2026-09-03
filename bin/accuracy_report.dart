@@ -26,7 +26,7 @@ import 'dart:io';
 
 import 'package:path/path.dart' as p;
 import 'package:saropa_lints/saropa_lints.dart'
-    show AccuracyTarget, ProgressTracker, allSaropaRules, getAllDefinedRules;
+    show AccuracyTarget, allSaropaRules, getAllDefinedRules;
 import 'package:saropa_lints/scan.dart';
 import 'package:saropa_lints/src/config/rule_lane.dart' show RuleLane;
 import 'package:saropa_lints/src/report/accuracy_report.dart';
@@ -57,12 +57,6 @@ Future<void> main(List<String> args) async {
     print('Error: fixtures directory not found: $fixturesDir');
     exit(2);
   }
-
-  // Disable the Problems-tab cap so every diagnostic reaches the
-  // RecordingDiagnosticListener. Without this, SaropaDiagnosticReporter
-  // silently drops non-ERROR diagnostics after 500 issues — the cap is
-  // designed for the IDE, not CLI batch analysis.
-  ProgressTracker.setMaxIssues(0);
 
   final expected = _collectExpectedLints(dir);
   final diagnostics = await _runScan(fixturesDir, tier);
@@ -116,6 +110,8 @@ Future<List<ScanDiagnostic>?> _runScan(String path, String? tier) {
     messageSink: (_) {},
     // Accuracy report must exercise every rule — always full lane.
     lane: RuleLane.full,
+    // Disable the IDE 500-issue cap so every diagnostic reaches the listener.
+    disableIssueCap: true,
   );
   return runner.runResolved();
 }

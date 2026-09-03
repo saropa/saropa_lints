@@ -104,6 +104,8 @@ Future<void> main(List<String> args) async {
     lane: parseRuleLane(parsed.lane ?? 'full'),
     laneStats: parsed.laneStats,
     messageSink: parsed.quiet ? (_) {} : null,
+    // Keep the IDE issue cap — scan output may feed the Problems tab.
+    // disableIssueCap: false (default),
     excludeGlobs: parsed.excludeGlobs,
     includeGlobs: parsed.includeGlobs,
   );

@@ -44,6 +44,11 @@ import 'scan_walker.dart';
 typedef ScanMessageSink = void Function(String message);
 
 /// Scans Dart files using saropa_lints rules without the plugin framework.
+///
+/// **Issue cap:** By default, [ProgressTracker] caps non-ERROR diagnostics at
+/// 500 for IDE Problems-tab performance. CLI tools that need complete output
+/// (accuracy report, audit) must pass [disableIssueCap] `= true` — otherwise
+/// rules silently appear "silent" after 500 issues are reached.
 class ScanRunner {
   ScanRunner({
     required this.targetPath,
@@ -57,6 +62,7 @@ class ScanRunner {
     this.bypassTierCap = false,
     this.lane = RuleLane.full,
     this.laneStats = false,
+    this.disableIssueCap = false,
     List<String> excludeGlobs = const [],
     List<String> includeGlobs = const [],
   }) : _excludePatterns = excludeGlobs.map(_globToRegex).toList(),
@@ -131,6 +137,13 @@ class ScanRunner {
   /// making the lane gate's effect observable. Activated by `--lane-stats`.
   final bool laneStats;
 
+  /// Disables the IDE Problems-tab issue cap (`ProgressTracker._maxIssues`)
+  /// so every diagnostic reaches the listener. The 500-issue default is
+  /// designed for live IDE analysis, not CLI batch scans where completeness
+  /// matters (accuracy report, audit). Without this, non-ERROR diagnostics
+  /// are silently dropped after 500 issues and rules appear "silent".
+  final bool disableIssueCap;
+
   /// Map from rule name to its declared LintImpact name (error/warning/info).
   /// Built by `_prepare` so [_collectDiagnostics] can stamp each diagnostic.
   Map<String, String> _ruleImpactMap = const {};
@@ -204,6 +217,9 @@ class ScanRunner {
   /// materially slower and requires the target project to have had `pub get`
   /// run (otherwise units fail to resolve and are skipped with a message).
   Future<List<ScanDiagnostic>?> runResolved() async {
+    // Disable the Problems-tab cap when the caller requests complete output.
+    if (disableIssueCap) ProgressTracker.setMaxIssues(0);
+
     final plan = _prepare();
     if (plan == null) return null;
     if (plan.files.isEmpty) return const [];
@@ -229,6 +245,9 @@ class ScanRunner {
   Future<List<ScanDiagnostic>?> runResolvedWithCollection(
     AnalysisContextCollection collection,
   ) async {
+    // Disable the Problems-tab cap when the caller requests complete output.
+    if (disableIssueCap) ProgressTracker.setMaxIssues(0);
+
     final plan = _prepare();
     if (plan == null) return null;
     if (plan.files.isEmpty) return const [];

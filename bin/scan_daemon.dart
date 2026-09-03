@@ -226,6 +226,8 @@ Future<void> _handleScanRequest(
       // The daemon is a separate process from the analysis server, so RSS
       // is not shared — full lane is always correct here.
       lane: RuleLane.full,
+      // Keep the IDE issue cap — daemon output feeds the Problems tab.
+      // disableIssueCap: false (default),
     );
     final diagnostics = await runner.runResolvedWithCollection(collection);
     if (diagnostics == null) {
