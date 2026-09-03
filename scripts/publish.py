@@ -13,10 +13,25 @@ and VS Code extension). Delegates all logic to scripts/modules/:
     _timing.py            — step timing and summary reporting
 
 Run:  python scripts/publish.py
-      python scripts/publish.py --dry-run   (audit + format + analyze + tests
-                                              + `dart pub publish --dry-run`;
-                                              no commit/tag/publish — for CI
-                                              pre-merge validation)
+      python scripts/publish.py --dry-run
+      python scripts/publish.py --mode audit_only --log-file publish.log
+      python scripts/publish.py --mode dry_run --log-file /tmp/ci.log
+
+Flags:
+    --dry-run             Shorthand for --mode dry_run
+    --mode <name>         Run a specific mode non-interactively:
+                            full, audit[_only], fix_docs, skip_audit,
+                            analyze[_only], extension[_only],
+                            publish_existing_vsix, ci_fallback,
+                            pubdev_only, dry_run
+    --log-file <path>     Mirror all output (ANSI-stripped) to a plain-text file
+    --auto-retry <n>      Auto-retry failed steps up to n times before aborting
+                            (also prompted interactively at startup)
+
+When --mode or --log-file is given (or stdin is not a TTY), the script
+runs non-interactively: prompts auto-answer with safe defaults and
+step failures auto-abort instead of waiting for user input.
+
 Modes: full publish / audit only / fix docs / skip audit / analyze only / extension only / dry run / pub.dev only
 1
 See scripts/README.md for the full architecture and module map.
@@ -131,9 +146,16 @@ if not check_modules_exist():
 # All modules verified — safe to import
 from scripts.modules._utils import (
     OutputLevel,
+    close_log_file,
     enable_ansi_support,
+    get_auto_retry_limit,
     get_project_dir,
     print_header,
+    print_info,
+    safe_input,
+    set_auto_retry_limit,
+    set_log_file,
+    set_non_interactive,
     set_output_level,
     show_saropa_logo,
 )
@@ -153,40 +175,64 @@ from scripts.modules._publish_workflow import (
     validate_pubspec_changelog,
 )
 
+# Single source of truth for publish modes.
+# Each entry: (internal_key, menu_label, cli_aliases)
+# Menu number is derived from list position (1-indexed).
+_MODE_TABLE: list[tuple[str, str, list[str]]] = [
+    ("full",
+     "Full publish (audit \u2192 format \u2192 analysis \u2192 tests \u2192 version \u2192 release)",
+     []),
+    ("audit_only",
+     "Audit only (tier integrity, DX checks; no publish)",
+     ["audit"]),
+    ("fix_docs",
+     "Fix doc comments (angle brackets, refs; then exit)",
+     []),
+    ("full_skip_audit",
+     "Publish without audit (skip audit; format \u2192 analysis \u2192 tests \u2192 release)",
+     ["skip_audit"]),
+    ("analyze_only",
+     "Analyze only (run dart analyze, write log; then exit)",
+     ["analyze"]),
+    ("extension_only",
+     "Extension only (package .vsix, optionally publish to Marketplace/Open VSX)",
+     ["extension"]),
+    ("publish_existing_vsix",
+     "Publish existing .vsix (skip packaging; newest in project root)",
+     []),
+    ("ci_fallback",
+     "CI fallback playbook (manual publish URLs, commands, upload files)",
+     []),
+    ("pubdev_only",
+     "Pub.dev only (full publish pipeline, skip extension entirely)",
+     []),
+    ("dry_run",
+     "Dry run (audit + format + analyze + tests; no commit/tag/publish)",
+     []),
+]
+
+# Build the CLI alias lookup from the single mode table
+_VALID_MODES: dict[str, str] = {}
+for _key, _, _aliases in _MODE_TABLE:
+    _VALID_MODES[_key] = _key
+    for _alias in _aliases:
+        _VALID_MODES[_alias] = _key
+
 
 def _prompt_publish_mode() -> str:
-    """Ask user for run mode via interactive menu (1-8)."""
+    """Ask user for run mode via interactive menu.
+
+    Menu items are generated from _MODE_TABLE so adding a mode
+    in one place updates both the CLI --mode flag and this menu.
+    """
     print_header("PUBLISH OPTIONS")
-    print(
-        "  1) Full publish (audit \u2192 format \u2192 analysis \u2192 tests \u2192 version \u2192 release)"
-    )
-    print("  2) Audit only (tier integrity, DX checks; no publish)")
-    print("  3) Fix doc comments (angle brackets, refs; then exit)")
-    print("  4) Publish without audit (skip audit; format \u2192 analysis \u2192 tests \u2192 release)")
-    print("  5) Analyze only (run dart analyze, write log; then exit)")
-    print("  6) Extension only (package .vsix, optionally publish to Marketplace/Open VSX)")
-    print("  7) Publish existing .vsix (skip packaging; newest in project root)")
-    print("  8) CI fallback playbook (manual publish URLs, commands, upload files)")
-    print("  9) Pub.dev only (full publish pipeline, skip extension entirely)")
+    for i, (_, label, _) in enumerate(_MODE_TABLE, 1):
+        print(f"  {i}) {label}")
     try:
-        raw = input("  Choice [1]: ").strip() or "1"
+        raw = safe_input("  Choice [1]: ", "1").strip() or "1"
         n = int(raw)
-        if n == 2:
-            return "audit_only"
-        if n == 3:
-            return "fix_docs"
-        if n == 4:
-            return "full_skip_audit"
-        if n == 5:
-            return "analyze_only"
-        if n == 6:
-            return "extension_only"
-        if n == 7:
-            return "publish_existing_vsix"
-        if n == 8:
-            return "ci_fallback"
-        if n == 9:
-            return "pubdev_only"
+        if 1 <= n <= len(_MODE_TABLE):
+            return _MODE_TABLE[n - 1][0]
     except (ValueError, EOFError, KeyboardInterrupt):
         pass
     return "full"
@@ -213,6 +259,19 @@ def main(
     # Prompt for mode AFTER the logo is displayed (previously prompted before logo).
     if mode is None:
         mode = _prompt_publish_mode()
+
+    # Auto-retry: prompt in interactive mode if not already set via CLI
+    if get_auto_retry_limit() == 0:
+        raw_retry = safe_input(
+            "  Auto-retry failed steps? Enter count [0]: ", "0"
+        ).strip()
+        try:
+            retry_n = int(raw_retry)
+            if retry_n > 0:
+                set_auto_retry_limit(retry_n)
+                print_info(f"Auto-retry set to {retry_n}")
+        except ValueError:
+            pass
 
     project_dir = get_project_dir()
     pubspec_path = project_dir / "pubspec.yaml"
@@ -249,17 +308,80 @@ def main(
     return run_full_publish(ctx, mode, timer)
 
 
-def _parse_mode_from_argv(argv: list[str]) -> str | None:
-    """Map CLI flags to a publish mode. Returns None for interactive prompting.
+def _parse_args(argv: list[str]) -> tuple[str | None, Path | None, int]:
+    """Parse CLI arguments into (mode, log_file_path, auto_retry).
 
-    Only --dry-run is currently supported as a flag; all other modes are
-    still chosen via the interactive menu (_prompt_publish_mode).
+    Supports:
+        --dry-run             Shorthand for --mode dry_run
+        --mode <name>         Set publish mode (see _VALID_MODES)
+        --log-file <path>     Tee all output to a plain-text log file
+        --auto-retry <n>      Auto-retry failed steps up to n times
+
+    When --mode or --log-file is given, the script also enables
+    non-interactive mode (prompts auto-answer with defaults).
+    Returns (None, None, 0) for fully interactive operation.
     """
-    if "--dry-run" in argv:
-        return "dry_run"
-    return None
+    mode: str | None = None
+    log_path: Path | None = None
+    auto_retry: int = 0
+    i = 0
+    while i < len(argv):
+        arg = argv[i]
+        if arg == "--dry-run":
+            mode = "dry_run"
+        elif arg == "--mode":
+            if i + 1 >= len(argv):
+                print("  ERROR: --mode requires a value")
+                print(f"  Valid modes: {', '.join(sorted(_VALID_MODES))}")
+                sys.exit(1)
+            i += 1
+            raw = argv[i].lower().replace("-", "_")
+            if raw not in _VALID_MODES:
+                print(f"  ERROR: Unknown mode '{argv[i]}'")
+                print(f"  Valid modes: {', '.join(sorted(_VALID_MODES))}")
+                sys.exit(1)
+            mode = _VALID_MODES[raw]
+        elif arg == "--log-file":
+            if i + 1 >= len(argv):
+                print("  ERROR: --log-file requires a file path")
+                sys.exit(1)
+            i += 1
+            log_path = Path(argv[i])
+        elif arg == "--auto-retry":
+            if i + 1 >= len(argv):
+                print("  ERROR: --auto-retry requires a number")
+                sys.exit(1)
+            i += 1
+            try:
+                auto_retry = int(argv[i])
+            except ValueError:
+                print(f"  ERROR: --auto-retry value must be a number, got '{argv[i]}'")
+                sys.exit(1)
+        i += 1
+    return mode, log_path, auto_retry
 
 
 if __name__ == "__main__":
-    # main() now displays the logo before prompting for mode, so call it directly.
-    sys.exit(main(mode=_parse_mode_from_argv(sys.argv[1:])))
+    parsed_mode, parsed_log, parsed_retry = _parse_args(sys.argv[1:])
+
+    # Enable non-interactive mode when a log file or explicit mode is given,
+    # or when stdin is not a terminal (piped / remote execution)
+    if parsed_log or parsed_mode or not sys.stdin.isatty():
+        set_non_interactive(True)
+        print_info("Running in non-interactive mode (prompts auto-answered)")
+
+    # Set auto-retry before any pipeline steps run
+    if parsed_retry > 0:
+        set_auto_retry_limit(parsed_retry)
+        print_info(f"Auto-retry limit: {parsed_retry}")
+
+    # Open the log file before any output so the logo is captured
+    if parsed_log:
+        set_log_file(parsed_log)
+        print_info(f"Logging to {parsed_log.resolve()}")
+
+    try:
+        sys.exit(main(mode=parsed_mode))
+    finally:
+        # Ensure the log file is flushed and closed on any exit path
+        close_log_file()

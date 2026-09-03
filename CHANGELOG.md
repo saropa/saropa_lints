@@ -68,6 +68,8 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 
 ## [15.2.12] — Unreleased
 
+Hardens the LSP server against normal editor traffic and adds a `doctor` command to catch misconfigured project settings before they cause confusing warnings. [log](https://github.com/saropa/saropa_lints/blob/v15.2.12/CHANGELOG.md)
+
 ### Fixed
 
 - **LSP server handles all standard notifications without crashing.** Added explicit no-op cases for `textDocument/didChange`, `$/cancelRequest`, `$/setTrace`, and `workspace/didChangeConfiguration` so the inert server stays alive under normal VS Code traffic. No action required.
@@ -84,6 +86,7 @@ Learn more at https://saropa.com, or mailto://dev.tools@saropa.com
 - `migrate-config` now removes orphan `rule_packs:` keys that have no `enabled:` child, and handles trailing comments on the key line.
 - Config parser (`_leadingSpaces`) now counts tabs as indentation, matching the scalar parser — fixes silent parse failures on tab-indented YAML.
 - `doctor` command now scopes key detection to the `saropa_lints:` plugin block — no longer false-positives on identically named top-level keys.
+- Publish script supports `--log-file <path>` for plain-text output logging, `--mode <name>` for non-interactive execution, and `--auto-retry <n>` for automatic step retries. Auto-detects non-TTY stdin for remote/CI use. Auto-retry is also prompted interactively at startup.
 
 </details>
 

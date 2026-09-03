@@ -14,7 +14,9 @@ Copyright: (c) 2025-2026 Saropa
 
 from __future__ import annotations
 
+import io
 import os
+import re as _re
 import shutil
 import subprocess
 import sys
@@ -76,6 +78,133 @@ def set_output_level(level: OutputLevel) -> None:
 def get_output_level() -> OutputLevel:
     """Get the current output verbosity level."""
     return _output_level
+
+
+# =============================================================================
+# FILE LOGGING & NON-INTERACTIVE MODE
+# =============================================================================
+# When a log file is set, every print_* call also writes a plain-text
+# (ANSI-stripped) copy to the log. Non-interactive mode auto-answers
+# prompts with their defaults so the script can run unattended.
+
+# Regex to strip ANSI escape sequences for plain-text log output
+_ANSI_RE = _re.compile(r"\x1b\[[0-9;]*m")
+
+# File handle for the optional log file; None = logging disabled
+_log_file: io.TextIOWrapper | None = None
+
+# Non-interactive flag — set when stdin is not a TTY or explicitly requested
+_non_interactive: bool = False
+
+
+def set_log_file(path: Path | str) -> None:
+    """Open a UTF-8 log file for tee-style output.
+
+    All print_* output is mirrored to this file with ANSI codes
+    stripped. Call close_log_file() at exit to flush and close.
+    Prints a warning and continues without logging if the path
+    is unwritable (e.g. missing parent directory, read-only).
+    """
+    global _log_file
+    # Close any previously opened log file
+    close_log_file()
+    try:
+        _log_file = open(path, "w", encoding="utf-8", errors="replace")
+    except OSError as exc:
+        # Don't crash the whole publish pipeline for a bad log path
+        print(f"  WARNING: Cannot open log file '{path}': {exc}")
+        print("  Continuing without file logging.")
+        return
+    log_write(f"--- saropa_lints publish log started {datetime.now().isoformat()} ---")
+
+
+def close_log_file() -> None:
+    """Flush and close the log file if one is open."""
+    global _log_file
+    if _log_file is not None:
+        try:
+            log_write(f"--- log ended {datetime.now().isoformat()} ---")
+            _log_file.close()
+        except OSError:
+            pass
+        _log_file = None
+
+
+def log_write(msg: str) -> None:
+    """Write one line to the log file (ANSI codes stripped).
+
+    Public API for other modules (e.g. _timing.py) that need
+    to log plain-text output alongside the print_* functions.
+    Defensive ANSI stripping covers future callers that may pass
+    colorized strings; current callers pass plain text.
+    """
+    if _log_file is None:
+        return
+    try:
+        clean = _ANSI_RE.sub("", msg)
+        _log_file.write(clean + "\n")
+    except OSError:
+        pass
+
+
+def set_non_interactive(enabled: bool) -> None:
+    """Enable or disable non-interactive mode.
+
+    When enabled, safe_input() returns the default value without
+    waiting for user input, and prompt_step_failure() auto-retries
+    (up to the auto-retry limit) then auto-aborts.
+    """
+    global _non_interactive
+    _non_interactive = enabled
+
+
+def is_non_interactive() -> bool:
+    """Check whether the session is running non-interactively."""
+    return _non_interactive
+
+
+# =============================================================================
+# AUTO-RETRY
+# =============================================================================
+# Maximum number of automatic retries for failed steps before aborting.
+# Set via set_auto_retry_limit(); checked in prompt_step_failure().
+
+_auto_retry_limit: int = 0
+_auto_retry_counts: dict[str, int] = {}
+
+
+def set_auto_retry_limit(limit: int) -> None:
+    """Set the maximum number of auto-retries for failed pipeline steps.
+
+    When > 0, prompt_step_failure() will auto-retry up to this many
+    times per step before aborting (in non-interactive mode) or
+    falling through to the interactive menu (in interactive mode).
+    """
+    global _auto_retry_limit
+    _auto_retry_limit = max(0, limit)
+
+
+def get_auto_retry_limit() -> int:
+    """Get the current auto-retry limit."""
+    return _auto_retry_limit
+
+
+def safe_input(prompt: str, default: str = "") -> str:
+    """Read user input, or return default in non-interactive mode.
+
+    In non-interactive mode, logs the prompt and default to the log
+    file and returns the default without blocking on stdin.
+    """
+    if _non_interactive:
+        log_write(f"[non-interactive] {prompt} -> {default!r}")
+        print(f"{prompt}{default}  [auto]")
+        return default
+    try:
+        return input(prompt)
+    except (EOFError, KeyboardInterrupt):
+        # stdin closed or interrupted — behave like non-interactive
+        print()
+        return default
 
 
 # =============================================================================
@@ -169,6 +298,10 @@ def show_saropa_logo() -> None:
     print(f"\033[38;5;195m(c) {copyright_year} Saropa. All rights reserved.\033[0m")
     print("\033[38;5;117mhttps://saropa.com\033[0m")
     print()
+    # Mirror the logo text to the log file (ANSI stripped)
+    log_write("Saropa")
+    log_write(f"(c) {copyright_year} Saropa. All rights reserved.")
+    log_write("https://saropa.com")
 
 
 # cspell: enable
@@ -178,10 +311,13 @@ def print_colored(message: str, color: Color) -> None:
     """Print a message with ANSI color codes.
 
     Respects the global output level: suppressed in SILENT mode.
+    Also mirrors the line (ANSI-stripped) to the log file if one is open.
     """
     if _output_level == OutputLevel.SILENT:
         return
-    print(f"{color.value}{message}{Color.RESET.value}")
+    formatted = f"{color.value}{message}{Color.RESET.value}"
+    print(formatted)
+    log_write(message)
 
 
 def print_header(text: str) -> None:
@@ -253,6 +389,7 @@ def print_stat(
         f"    {Color.DIM.value}{label}:{Color.RESET.value} "
         f"{color.value}{value}{Color.RESET.value}"
     )
+    log_write(f"    {label}: {value}")
 
 
 def print_stat_bar(
@@ -280,6 +417,7 @@ def print_stat_bar(
         f"    {label:<20} {color.value}{bar}{Color.RESET.value} "
         f"{value:>4}/{total:<4} ({pct:>5.1f}%)"
     )
+    log_write(f"    {label:<20} {value:>4}/{total:<4} ({pct:>5.1f}%)")
 
 
 # =============================================================================
@@ -333,21 +471,38 @@ def prompt_step_failure(
         'retry' | 'ignore' | 'abort'.
     """
     print_warning(f"{step_name} failed. Choose an action:")
+
+    # Auto-retry: if a retry budget is set, use it before prompting or aborting
+    if _auto_retry_limit > 0:
+        used = _auto_retry_counts.get(step_name, 0)
+        remaining = _auto_retry_limit - used
+        if remaining > 0:
+            _auto_retry_counts[step_name] = used + 1
+            print_info(
+                f"Auto-retrying {step_name} "
+                f"({used + 1}/{_auto_retry_limit})"
+            )
+            return "retry"
+        print_info(
+            f"Auto-retry limit ({_auto_retry_limit}) exhausted for {step_name}"
+        )
+
+    # Non-interactive mode: auto-abort after retries exhausted
+    if _non_interactive:
+        print_info(f"Non-interactive mode: aborting after {step_name} failure")
+        return "abort"
+
     print_colored("  [R]etry  (re-run after fixing the issue)", Color.CYAN)
     if allow_ignore:
         print_colored("  [I]gnore (continue despite the failure)", Color.CYAN)
     print_colored("  [A]bort  (stop the publish)", Color.CYAN)
-    try:
-        default = "a"
-        prompt = "  Choice [r/i/a]: " if allow_ignore else "  Choice [r/a]: "
-        raw = input(prompt).strip().lower() or default
-        if raw.startswith("r"):
-            return "retry"
-        if raw.startswith("i") and allow_ignore:
-            return "ignore"
-    except (EOFError, KeyboardInterrupt):
-        print()
-        return "abort"
+    default = "a"
+    prompt = "  Choice [r/i/a]: " if allow_ignore else "  Choice [r/a]: "
+    raw = safe_input(prompt, default).strip().lower() or default
+    if raw.startswith("r"):
+        return "retry"
+    if raw.startswith("i") and allow_ignore:
+        return "ignore"
     return "abort"
 
 
@@ -413,6 +568,8 @@ def run_command(
         The CompletedProcess result.
     """
     print_info(f"{description}...")
+    # Log the command line regardless of output level
+    log_write(f"      $ {' '.join(cmd)}")
     if _output_level.value >= OutputLevel.VERBOSE.value:
         print_colored(f"      $ {' '.join(cmd)}", Color.WHITE)
 

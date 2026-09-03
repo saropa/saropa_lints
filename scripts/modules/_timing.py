@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from scripts.modules._utils import (
     Color,
     OutputLevel,
+    log_write,
     get_output_level,
     print_colored,
 )
@@ -68,6 +69,9 @@ def _print_timing_row(
         bar_len = max(1, int(duration / max_duration * 15))
         bar = f"  {d}{'\u2588' * bar_len}{x}"
 
+    # Status icon as plain text for the log file
+    plain_icon = "+" if success else "x"
+    log_write(f"  {plain_icon}  {name:<28}{duration_str:>8}")
     print(f"  {icon_color}{icon}{x}  {name:<28}{duration_str:>8}{bar}")
 
 
@@ -138,4 +142,6 @@ class StepTimer:
         d = Color.DIM.value
         print(f"  {d}{'\u2500' * 49}{x}")
         print(f"    {'Total':<28}{format_duration(total):>8}")
+        log_write(f"  {'-' * 49}")
+        log_write(f"    {'Total':<28}{format_duration(total):>8}")
         print()
