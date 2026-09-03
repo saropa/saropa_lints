@@ -204,9 +204,12 @@ class _ExpectCollector extends RecursiveAstVisitor<void> {
   /// Collected expect() entries from the test body.
   final List<_ExpectEntry> entries = [];
 
+  /// Names recognized as expect-family functions (expect, expectLater, etc.).
+  static const _expectNames = {'expect', 'expectLater', 'expectAsync'};
+
   @override
   void visitMethodInvocation(MethodInvocation node) {
-    if (node.methodName.name == 'expect' &&
+    if (_expectNames.contains(node.methodName.name) &&
         node.argumentList.arguments.length >= 2) {
       final actual = node.argumentList.arguments[0];
       final matcher = node.argumentList.arguments[1];
