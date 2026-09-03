@@ -60,9 +60,25 @@ Added `test/integrity/core_lint_collision_test.dart` — reads
 any registered saropa_lints rule name collides. Catches collisions during
 `dart test`, not just at publish time.
 
+### Migration tool (new)
+
+Added `scripts/fix_ignores.py` — rewrites stale `// ignore:` comments and
+`analysis_options.yaml` rule names from all 37 pre-rename saropa_lints
+rule names to their current equivalents. Covers all renames from the
+August 2026 collision audit plus the two September 2026 additions.
+Dry-run by default; `--apply` to rewrite in place.
+
+### Publish audit freshness check (new)
+
+`_publish_steps.py` now calls `update_core_lint_names.py` in check mode
+during the publish audit. Non-blocking warning if `CORE_DART_LINT_NAMES`
+is stale; graceful skip on network failure.
+
 ### Verification
 
 - Tier integrity check: ALL CHECKS PASSED (0 collisions)
 - Rule tests: 61 pass
 - Integrity tests: 2705 pass
 - Core lint collision test: 1 pass
+- `fix_ignores.py` dry-run on project: 0 stale references (already clean)
+- `update_core_lint_names.py --check`: 227 rules, up to date

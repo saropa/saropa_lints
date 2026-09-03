@@ -585,12 +585,40 @@ def run_pre_publish_audits(project_dir: Path) -> tuple[bool, object]:
                     [],
                 ))
 
+    # --- Core lint names freshness (non-blocking, needs network) ---
+    core_lint_check: list[tuple[str, str, list[str]]] = []
+    try:
+        from scripts.update_core_lint_names import fetch_rule_names, update_file
+        # Fetch live rule names and check without modifying the file.
+        live_names = fetch_rule_names()
+        changed = update_file(live_names, check_only=True)
+        if changed:
+            core_lint_check.append((
+                "warn",
+                "CORE_DART_LINT_NAMES is stale — run "
+                "update_core_lint_names.py before publish",
+                [],
+            ))
+        else:
+            core_lint_check.append((
+                "pass",
+                f"CORE_DART_LINT_NAMES up to date ({len(live_names)} rules)",
+                [],
+            ))
+    except Exception as exc:  # noqa: BLE001
+        # Network unavailable or fetch failed — skip gracefully.
+        core_lint_check.append((
+            "warn",
+            f"Core lint names freshness check skipped ({exc})",
+            [],
+        ))
+
     # --- Full audit (includes tier integrity + quality checks) ---
     audit_result = run_full_audit(
         project_dir=project_dir,
         skip_dx=False,
         compact=True,
-        extra_checks=spelling_check + known_issues_check,
+        extra_checks=spelling_check + known_issues_check + core_lint_check,
     )
 
     # --- Run dart analyze as part of audit (fail fast; same as Step 6) ---
